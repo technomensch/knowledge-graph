@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0",
+  "active": null,
+  "graphs": {},
+  "sanitization": {
+    "enabled": false,
+    "patterns": [
+      { "type": "email", "enabled": true },
+      { "type": "api-key", "enabled": true }
+    ],
+    "action": "warn"
+  }
+}

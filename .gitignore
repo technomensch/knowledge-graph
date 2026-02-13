@@ -1,0 +1,31 @@
+# macOS system files
+.DS_Store
+**/.DS_Store
+
+# Node.js dependencies (MCP server)
+node_modules/
+mcp-server/dist/
+mcp-server/node_modules/
+
+# Python bytecode
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Development
+*.log
+.env
+.env.local
+
+# Build artifacts
+dist/
+build/
+*.tgz
