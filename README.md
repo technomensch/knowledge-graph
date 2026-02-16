@@ -2,8 +2,8 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 1.0.0 (Development)
-**Status:** Phase 5 - Sanitization & Publishing (In Progress)
+**Version:** 0.0.1-alpha
+**Status:** Alpha Release - Testing & Feedback
 
 ---
 
@@ -77,7 +77,7 @@ claude --plugin-dir .
 
 ---
 
-## Skills (16 Total)
+## Commands (16 Total)
 
 ### Configuration & Management
 - `/knowledge:init` — Initialize new knowledge graph with wizard
@@ -182,7 +182,7 @@ All knowledge graph commands use the `knowledge:` namespace:
 
 ### Core Design
 - **Platform-Agnostic Core** (`core/`) — Works with ANY LLM or IDE
-- **Claude Code Automation** (root-level skills, hooks) — Full automation layer
+- **Claude Code Automation** (commands, hooks) — Full automation layer
 - **MCP Server** (`mcp-server/`) — Cross-platform data access
 
 ### Directory Structure
@@ -268,7 +268,7 @@ knowledge-graph-plugin/
 
 **Core + Automation Architecture:**
 - **Core** (`core/`) — Pure markdown, works with ANY LLM
-- **Automation** (skills, hooks) — Claude Code specific
+- **Automation** (commands, hooks) — Claude Code specific
 
 **For non-Claude users:**
 1. Copy `core/` to your project
