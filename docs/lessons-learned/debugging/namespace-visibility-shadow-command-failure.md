@@ -136,6 +136,24 @@ description: Display active knowledge graph status
 - `.claude-plugin/plugin.json` (shadow command removed)
 - `mcp-server/src/index.ts` (shadow tool removed)
 
+## Related Discovery
+
+### Namespace Visibility in Marketplace
+
+**Important finding:** When testing the updated plugin via marketplace installation, namespace visibility behaves correctly:
+
+**Without filename prefix** (`status.md`):
+- Installed via marketplace: Shows `/knowledge:status` ✅
+- File prefix not required for namespace visibility in marketplace mode
+
+**With filename prefix** (`knowledge-status.md`):
+- Installed via marketplace: Also shows `/knowledge:status` ✅
+- Filename prefix is redundant but doesn't hurt
+
+**Conclusion:** The file prefix workaround (`knowledge-*.md`) was needed for local development testing, but marketplace installation handles namespace visibility correctly regardless of filename prefix.
+
+See related lesson: [Local Marketplace Testing - Two-Location Sync Required](../process/local-marketplace-testing-workflow.md)
+
 ## Tags
 
 `#debugging` `#namespace` `#cross-llm` `#gemini-failure` `#file-prefix-workaround`

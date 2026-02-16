@@ -2,7 +2,7 @@
 
 Comprehensive catalog of all lessons-learned documents.
 
-**Total Lessons:** 1
+**Total Lessons:** 2
 **Last Updated:** 2026-02-16
 
 ---
@@ -17,11 +17,11 @@ Comprehensive catalog of all lessons-learned documents.
 
 ---
 
-### Process Lessons (0 total)
+### Process Lessons (1 total)
 
-[Auto-populated when lessons are added]
+- [2026-02-16 - Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md) - When testing locally through Claude Code marketplace, changes must be synced from development directory to marketplace cache location
 
-**Tags:** #process
+**Tags:** #process #testing #marketplace #plugin-development #workflow
 
 ---
 
@@ -44,6 +44,7 @@ Comprehensive catalog of all lessons-learned documents.
 ## Chronological Index
 
 **2026**
+- 2026-02-16: [Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md)
 - 2026-02-16: [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md)
 
 ---
@@ -52,7 +53,8 @@ Comprehensive catalog of all lessons-learned documents.
 
 **#architecture** (0 lessons)
 
-**#process** (0 lessons)
+**#process** (1 lesson)
+- [Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md)
 
 **#patterns** (0 lessons)
 
@@ -70,6 +72,18 @@ Comprehensive catalog of all lessons-learned documents.
 
 **#cross-llm-compatibility** (1 lesson)
 - [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md)
+
+**#testing** (1 lesson)
+- [Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md)
+
+**#marketplace** (1 lesson)
+- [Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md)
+
+**#plugin-development** (1 lesson)
+- [Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md)
+
+**#workflow** (1 lesson)
+- [Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md)
 
 ---
 
