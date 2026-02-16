@@ -93,9 +93,12 @@
 
 ### Key Deliverables
 - **Skill**: knowledge-graph-usage (~13,900 words total guidance)
-- **KG**: Plugin documents itself with first lesson captured
+- **KG**: Plugin documents itself with 2 lessons captured
+  - Lesson 1: namespace-visibility-shadow-command-failure.md (debugging)
+  - Lesson 2: local-marketplace-testing-workflow.md (process)
 - **Branding**: tm-sis marketplace identity established
 - **Validation**: Comprehensive plugin validation complete
+- **Refactoring**: Command filenames optimized (knowledge-* → base names)
 
 ### Documentation Updates
 - CHANGELOG: v0.0.2-alpha entry added
@@ -146,12 +149,30 @@
 - Corrected README documentation
 - Cleaned up validation findings
 
+#### Phase 6: Testing & Discovery ✅
+- Discovered two-location sync requirement for local marketplace testing
+- Created comprehensive lesson: local-marketplace-testing-workflow.md (process category)
+- Updated namespace visibility lesson with marketplace discovery
+- Documented that namespace works correctly in marketplace regardless of filename
+- Updated master index with 2 lessons total (debugging + process)
+
+#### Phase 7: Command Refactoring ✅
+- Removed `knowledge-` prefix from all 16 command filenames
+- Renamed: `knowledge-status.md` → `status.md` (all 16 commands)
+- Git history preserved via rename detection (100% similarity)
+- Implemented lesson discovery: cleaner filenames sufficient for marketplace
+- Updated README namespace documentation
+- Updated CHANGELOG with refactoring details
+
 ### What Changed from v0.0.1-alpha
 - Added autonomous knowledge capture guidance (skill)
-- Plugin now uses itself for documentation
+- Plugin now uses itself for documentation (2 lessons captured)
 - Marketplace branding established
 - Comprehensive validation completed
 - Documentation accuracy improved
+- Command filenames optimized (no redundant prefix)
+- Local testing workflow documented
+- Cross-LLM compatibility insights captured
 
 ### Next Steps
 - 🔄 Test skill triggering with real usage

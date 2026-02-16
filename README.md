@@ -2,8 +2,8 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.0.1-alpha
-**Status:** Alpha Release - Testing & Feedback
+**Version:** 0.0.2-alpha
+**Status:** Validation & Enhancement Release - Testing & Feedback
 
 ---
 
@@ -121,42 +121,52 @@ See [tests/README.md](tests/README.md) for detailed testing documentation.
 
 ---
 
-## ⚠️ Critical: Skill Naming & Namespacing
+## ⚠️ Critical: Namespace Visibility & Marketplace Installation
 
-**IMPORTANT DISCOVERY** (Feb 14, 2026):
+**IMPORTANT DISCOVERY** (Feb 16, 2026):
 
-Claude Code requires explicit namespace prefix in skill YAML `name:` field for autocomplete to show the full namespaced command.
+Namespace visibility in Claude Code works differently for local development vs. marketplace installation.
 
-### How It Works
+### Marketplace Installation (Distribution Mode)
 
-**In SKILL.md frontmatter:**
-```yaml
----
-name: knowledge:capture-lesson    # ← Must include namespace prefix
-description: Document lessons learned
----
+When installed via marketplace, Claude Code correctly shows the `/knowledge:` namespace prefix regardless of filename:
+
+**Command files:**
+```
+commands/
+├── status.md          → Shows as /knowledge:status in UI ✅
+├── init.md            → Shows as /knowledge:init in UI ✅
+├── capture-lesson.md  → Shows as /knowledge:capture-lesson in UI ✅
 ```
 
-**In Claude Code autocomplete:**
-- When user types `/know` → shows `/knowledge:capture-lesson` (correct)
-- Without prefix in `name:` field → shows only `/capture-lesson` (incomplete)
+**Autocomplete behavior:**
+- User types `/know` → shows `/knowledge:status`, `/knowledge:init`, etc.
+- Namespace prefix is automatically applied by Claude Code
+- No filename prefix needed
 
-### The Fix
+### Key Insights
 
-All 16 plugin commands use the `knowledge-` prefix in their filenames:
-- ✅ `knowledge-capture-lesson.md` → `/knowledge-capture-lesson`
-- ✅ `knowledge-init.md` → `/knowledge-init`
-- ✅ `knowledge-recall.md` → `/knowledge-recall`
-- ✅ All 16 commands follow this pattern
+1. **File prefix workaround not needed:** Initial testing suggested using `knowledge-*.md` filenames, but marketplace installation handles namespacing correctly with clean base names
 
-### Why This Matters
+2. **Two-location sync for local testing:** When testing locally, changes must be synced from development directory to marketplace cache:
+   ```bash
+   rsync -av --delete \
+     /path/to/plugin/ \
+     ~/.claude/local-marketplace/plugins/plugin-name/
+   ```
 
-- **User Experience:** Users see correct full command names in autocomplete
-- **Consistency:** All knowledge graph commands appear under `knowledge:` namespace
-- **Prevention:** Prevents namespace collisions with existing global commands
-- **Documentation:** Helps users understand command organization
+3. **Cross-LLM compatibility:** Shadow command strategies (intentional collisions) fail with non-Claude LLMs like Gemini
 
-**For plugin developers:** Always include namespace prefix in the `name:` field when creating Claude Code plugins with namespaced commands.
+### For Plugin Developers
+
+- **Use clean filenames:** `status.md`, not `plugin-status.md`
+- **Test via marketplace:** Local testing may not reflect actual user experience
+- **Namespace is automatic:** Claude Code applies namespace prefix in Distribution Mode
+- **Avoid shadow commands:** They break cross-LLM compatibility
+
+See lessons:
+- [docs/lessons-learned/process/local-marketplace-testing-workflow.md](docs/lessons-learned/process/local-marketplace-testing-workflow.md)
+- [docs/lessons-learned/debugging/namespace-visibility-shadow-command-failure.md](docs/lessons-learned/debugging/namespace-visibility-shadow-command-failure.md)
 
 ---
 
@@ -230,12 +240,21 @@ knowledge-graph-plugin/
 
 See [ROADMAP.md](ROADMAP.md) for detailed version history and development progress.
 
-**Current Release:** v0.0.1-alpha (2026-02-16)
-- ✅ All 5 phases complete
-- ✅ 16 commands with namespace prefix
+**Current Release:** v0.0.2-alpha (2026-02-16)
+- ✅ Knowledge Graph Usage Skill (~13,900 words total guidance)
+- ✅ Plugin documents itself (2 lessons captured)
+- ✅ Marketplace branding: tm-sis identity established
+- ✅ Comprehensive validation: 0 critical issues
+- ✅ Command filenames optimized (no redundant prefix)
+- ✅ 16 commands with automatic namespace handling
 - ✅ MCP server with 7 tools + 2 resources
 - ✅ Platform-agnostic core system
-- ✅ Comprehensive documentation and examples
+
+**What's New in v0.0.2:**
+- Autonomous knowledge capture guidance (skill)
+- Local marketplace testing workflow documented
+- Namespace visibility cross-LLM compatibility lesson
+- Plugin validation and quality improvements
 
 **Next:** v1.0.0 stable release (Q2 2026) incorporating alpha feedback
 

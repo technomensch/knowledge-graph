@@ -28,18 +28,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **Version**: 0.0.1-alpha → 0.0.2-alpha
+- **Command Filenames**: Removed `knowledge-` prefix from all 16 command files
+  - `knowledge-status.md` → `status.md` (all commands renamed)
+  - Marketplace installation shows namespace correctly regardless of filename
+  - Cleaner, more maintainable filenames
+  - Git history preserved via rename detection
 - **README**: Corrected command count from 17 to 16 (accurate count)
-- **README**: Updated namespace documentation to reflect filename-based approach
+- **README**: Updated namespace documentation to reflect marketplace behavior
+  - Documents two-location sync requirement for local testing
+  - Explains Distribution Mode namespace handling
+  - References captured lessons for detailed workflow
 - **.gitignore**: Added selective KG strategy rules
   - Gitignore: docs/plans/, docs/sessions/, docs/chat-history/, docs/lessons-learned/debugging/
-  - Commit: docs/lessons-learned/architecture/, docs/lessons-learned/patterns/
+  - Commit: docs/lessons-learned/architecture/, docs/lessons-learned/patterns/, docs/lessons-learned/process/
 
 ### Fixed
 - Filename typo: `knowledge-updat-issue-plan.md` → `knowledge-update-issue-plan.md`
 
 ### Documentation
-- Captured lesson: Shadow command strategy failed with Gemini (cross-LLM incompatibility)
-- Documented file prefix workaround as cross-LLM compatible solution
+- **Lesson 1**: Shadow command strategy failed with Gemini (cross-LLM incompatibility)
+  - File: `docs/lessons-learned/debugging/namespace-visibility-shadow-command-failure.md`
+  - Documented file prefix workaround as cross-LLM compatible solution
+  - Updated with marketplace discovery (namespace works correctly regardless of prefix)
+  - Cross-references local marketplace testing workflow lesson
+- **Lesson 2**: Local marketplace testing requires two-location sync
+  - File: `docs/lessons-learned/process/local-marketplace-testing-workflow.md`
+  - Documents development directory vs marketplace cache locations
+  - Provides rsync automation script for sync workflow
+  - Explains Distribution Mode namespace behavior
+- **Master Index**: Updated with 2 lessons total (debugging + process categories)
+  - Chronological index with date-based navigation
+  - Tag index with 9 unique tags (#testing, #marketplace, #plugin-development, etc.)
 - Updated plugin validation criteria checklist in v0.0.2-validate-plugin.md plan
 
 ### Validation
