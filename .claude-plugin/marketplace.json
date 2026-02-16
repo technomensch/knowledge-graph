@@ -1,8 +1,8 @@
 {
-  "name": "knowledge-plugin-marketplace",
-  "description": "Marketplace for the Knowledge Graph Plugin",
+  "name": "tm-sis",
+  "description": "Plugin marketplace for technomensch-stayinginsync",
   "owner": {
-    "name": "technomensch",
+    "name": "technomensch-stayinginsync",
     "url": "https://github.com/technomensch",
     "email": "technomensch@stayinginsync.info"
   },
@@ -10,7 +10,7 @@
     {
       "name": "knowledge",
       "description": "Build a platform-agnostic knowledge base across sessions with any LLM—capture lessons learned, track decisions, and build institutional memory.",
-      "version": "0.0.1-alpha",
+      "version": "0.0.2-alpha",
       "source": {
         "source": "github",
         "repo": "technomensch/knowledge-graph-plugin"

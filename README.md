@@ -46,9 +46,11 @@ claude --plugin-dir .
 # Add marketplace (after publication)
 /plugin marketplace add technomensch/knowledge-graph-plugin
 
-# Install
-/plugin install knowledge@technomensch-tools
+# Install plugin from tm-sis marketplace
+/plugin install knowledge@tm-sis
 ```
+
+> **About the marketplace identifier:** The `tm-sis` marketplace identifier represents "technomensch-stayinginsync" and will host all plugins from this publisher. This allows for a consistent brand identity across multiple plugins.
 
 ### Verify Installation (Optional)
 
@@ -141,11 +143,11 @@ description: Document lessons learned
 
 ### The Fix
 
-All 17 plugin commands now have `knowledge:` prefix in their `name:` field:
-- ✅ `name: knowledge:capture-lesson`
-- ✅ `name: knowledge:init`
-- ✅ `name: knowledge:recall`
-- ✅ All 17 commands follow this pattern
+All 16 plugin commands use the `knowledge-` prefix in their filenames:
+- ✅ `knowledge-capture-lesson.md` → `/knowledge-capture-lesson`
+- ✅ `knowledge-init.md` → `/knowledge-init`
+- ✅ `knowledge-recall.md` → `/knowledge-recall`
+- ✅ All 16 commands follow this pattern
 
 ### Why This Matters
 
@@ -203,7 +205,7 @@ All knowledge graph commands use the `knowledge:` namespace:
 ```
 knowledge-graph-plugin/
 ├── .claude-plugin/           # Plugin manifest
-├── commands/                 # 17 commands (manual invocation)
+├── commands/                 # 16 commands (manual invocation)
 ├── agents/                   # Subagents (knowledge-reviewer)
 ├── hooks/                    # SessionStart hooks
 ├── scripts/                  # Helper scripts
