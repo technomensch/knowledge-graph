@@ -1,5 +1,4 @@
 ---
-name: knowledge:meta-issue
 description: Initialize and manage meta-issue tracking for complex multi-attempt problems
 ---
 

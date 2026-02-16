@@ -1,5 +1,4 @@
 ---
-name: knowledge:link-issue
 description: Manually link existing lesson or ADR to a GitHub issue with bidirectional references
 ---
 

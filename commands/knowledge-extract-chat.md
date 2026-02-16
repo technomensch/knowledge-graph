@@ -1,5 +1,4 @@
 ---
-name: knowledge:extract-chat
 description: Extract chat history from Claude and Gemini local log sources
 ---
 

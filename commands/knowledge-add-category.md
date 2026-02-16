@@ -1,5 +1,4 @@
 ---
-name: knowledge:add-category
 description: Add a new category to an existing knowledge graph with optional custom prefix
 ---
 

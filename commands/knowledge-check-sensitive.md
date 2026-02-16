@@ -1,5 +1,4 @@
 ---
-name: knowledge:check-sensitive
 description: Scan active knowledge graph for potentially sensitive information before public sharing
 ---
 

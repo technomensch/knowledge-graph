@@ -1,5 +1,4 @@
 ---
-name: knowledge:update-graph
 description: Extract structured insights from lessons-learned and sync to knowledge graph with git metadata preservation
 ---
 

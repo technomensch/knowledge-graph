@@ -1,5 +1,4 @@
 ---
-name: knowledge:update-issue-plan
 description: Synchronize Knowledge Graph extraction with active plans and local/GitHub issue tracking
 ---
 

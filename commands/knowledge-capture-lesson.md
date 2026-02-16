@@ -1,5 +1,4 @@
 ---
-name: knowledge:capture-lesson
 description: Document lessons learned, problems solved, and patterns with git metadata tracking
 ---
 

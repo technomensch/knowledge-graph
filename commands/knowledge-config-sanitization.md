@@ -1,5 +1,4 @@
 ---
-name: knowledge:configure-sanitization
 description: Interactive wizard to set up pre-commit hooks for sensitive data detection
 ---
 

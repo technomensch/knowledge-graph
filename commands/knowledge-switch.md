@@ -1,5 +1,4 @@
 ---
-name: knowledge:switch
 description: Change the active knowledge graph. Subsequent skills will operate on the selected KG.
 ---
 

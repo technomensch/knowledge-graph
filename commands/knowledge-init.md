@@ -1,5 +1,4 @@
 ---
-name: knowledge:init
 description: Initialize a new knowledge graph with wizard-based setup and flexible configuration
 ---
 

@@ -1,5 +1,4 @@
 ---
-name: knowledge:status
 description: Display active knowledge graph status, stats, and quick command reference
 ---
 

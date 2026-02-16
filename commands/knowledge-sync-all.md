@@ -1,5 +1,4 @@
 ---
-name: knowledge:sync-all
 description: Automated knowledge sync orchestrator — replaces 4-step manual pipeline with 1 command
 ---
 
