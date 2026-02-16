@@ -1,0 +1,26 @@
+{
+  "name": "knowledge-plugin-marketplace",
+  "description": "Marketplace for the Knowledge Graph Plugin",
+  "owner": {
+    "name": "technomensch",
+    "url": "https://github.com/technomensch",
+    "email": "technomensch@stayinginsync.info"
+  },
+  "plugins": [
+    {
+      "name": "knowledge",
+      "description": "Build a platform-agnostic knowledge base across sessions with any LLM—capture lessons learned, track decisions, and build institutional memory.",
+      "version": "0.0.1-alpha",
+      "source": {
+        "source": "github",
+        "repo": "technomensch/knowledge-graph-plugin"
+      },
+      "author": {
+        "name": "technomensch",
+        "url": "https://github.com/technomensch",
+        "email": "technomensch@stayinginsync.info"
+      },
+      "homepage": "https://github.com/technomensch/knowledge-graph-plugin"
+    }
+  ]
+}
