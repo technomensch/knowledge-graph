@@ -7,11 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0] - TBD
+## [0.0.1-alpha] - 2026-02-16
 
 ### Added
-- Initial release of Knowledge Plugin for Claude Code
-- 16 skills for knowledge capture, recall, sync, and management
+- Initial alpha release of Knowledge Plugin for Claude Code
+- 16 commands for knowledge capture, recall, sync, and management
 - Multi-KG support with per-category git strategies
 - Git metadata tracking in lesson/ADR YAML frontmatter
 - MCP server (7 tools + 2 resources) for cross-platform use
@@ -23,7 +23,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bidirectional KG ↔ MEMORY.md synchronization
 - Privacy-focused sanitization tools and documentation
 
-### Skills
+### Changed
+- **ARCHITECTURAL DECISION**: Migrated from `skills/` to `commands/` directory
+  - Commands provide manual invocation (not autonomous)
+  - Full workflow loading (not lazy-loaded)
+  - Better suited for deterministic knowledge operations
+- Updated plugin metadata (version 0.0.1-alpha, email, repository, license, keywords)
+- Updated README with commands vs skills architecture documentation
+- All command `name:` fields now include `knowledge:` namespace prefix for autocomplete
+
+### Commands
 - `/knowledge:init` - Initialize new knowledge graph with wizard
 - `/knowledge:list` - Display all configured knowledge graphs
 - `/knowledge:switch` - Change active knowledge graph
@@ -54,5 +63,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `kg://config` - Current kg-config.json contents (read-only)
 - `kg://templates/{name}` - Template files from core/templates/
 
-[Unreleased]: https://github.com/technomensch/knowledge-graph-plugin/compare/v1.0.0...HEAD
+## [1.0.0] - TBD (Future Release)
+
+### Added
+- Initial release of Knowledge Plugin for Claude Code
+- 16 skills for knowledge capture, recall, sync, and management
+- Multi-KG support with per-category git strategies
+- Git metadata tracking in lesson/ADR YAML frontmatter
+- MCP server (7 tools + 2 resources) for cross-platform use
+- Platform-agnostic core for non-Claude users (Cursor, Continue.dev, Aider, local LLMs)
+- ~30 generalized examples + 10 documentation files
+- SessionStart hook for MEMORY.md staleness detection
+- Python chat extraction scripts (Claude + Gemini)
+- Meta-issue tracking system for complex multi-attempt problems
+- Bidirectional KG ↔ MEMORY.md synchronization
+- Privacy-focused sanitization tools and documentation
+
+### Planned Features (v1.0.0)
+- TBD
+
+[Unreleased]: https://github.com/technomensch/knowledge-graph-plugin/compare/v0.0.1-alpha...HEAD
+[0.0.1-alpha]: https://github.com/technomensch/knowledge-graph-plugin/releases/tag/v0.0.1-alpha
 [1.0.0]: https://github.com/technomensch/knowledge-graph-plugin/releases/tag/v1.0.0

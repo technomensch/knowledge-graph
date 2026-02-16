@@ -4,7 +4,6 @@
 
 # Node.js dependencies (MCP server)
 node_modules/
-mcp-server/dist/
 mcp-server/node_modules/
 
 # Python bytecode
@@ -24,8 +23,14 @@ __pycache__/
 *.log
 .env
 .env.local
+chat-history/
+*.backup
 
 # Build artifacts
 dist/
+!mcp-server/dist/
 build/
 *.tgz
+
+# Internal development plans
+docs/plans/

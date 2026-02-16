@@ -3,7 +3,7 @@
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
 **Version:** 1.0.0 (Development)
-**Status:** Phase 1 - Foundation (In Progress)
+**Status:** Phase 5 - Sanitization & Publishing (In Progress)
 
 ---
 
@@ -34,9 +34,9 @@ A Claude Code plugin that provides:
 
 ```bash
 # Clone or copy this repository
-cd /Users/mkaplan/Documents/GitHub/knowledge-graph-plugin
+cd /path/to/knowledge-graph-plugin
 
-# Test locally
+# Test locally (MCP server builds automatically on first session start)
 claude --plugin-dir .
 ```
 
@@ -105,6 +105,79 @@ claude --plugin-dir .
 
 ---
 
+## ⚠️ Critical: Skill Naming & Namespacing
+
+**IMPORTANT DISCOVERY** (Feb 14, 2026):
+
+Claude Code requires explicit namespace prefix in skill YAML `name:` field for autocomplete to show the full namespaced command.
+
+### How It Works
+
+**In SKILL.md frontmatter:**
+```yaml
+---
+name: knowledge:capture-lesson    # ← Must include namespace prefix
+description: Document lessons learned
+---
+```
+
+**In Claude Code autocomplete:**
+- When user types `/know` → shows `/knowledge:capture-lesson` (correct)
+- Without prefix in `name:` field → shows only `/capture-lesson` (incomplete)
+
+### The Fix
+
+All 17 plugin commands now have `knowledge:` prefix in their `name:` field:
+- ✅ `name: knowledge:capture-lesson`
+- ✅ `name: knowledge:init`
+- ✅ `name: knowledge:recall`
+- ✅ All 17 commands follow this pattern
+
+### Why This Matters
+
+- **User Experience:** Users see correct full command names in autocomplete
+- **Consistency:** All knowledge graph commands appear under `knowledge:` namespace
+- **Prevention:** Prevents namespace collisions with existing global commands
+- **Documentation:** Helps users understand command organization
+
+**For plugin developers:** Always include namespace prefix in the `name:` field when creating Claude Code plugins with namespaced commands.
+
+---
+
+## ⚠️ Architecture: Commands vs Skills
+
+**IMPORTANT DECISION** (Feb 2026):
+
+This plugin uses the `commands/` directory instead of `skills/` based on research into Claude Code's distinction between these two patterns.
+
+### Why Commands?
+
+Knowledge graph operations are **deterministic workflows** that work best when:
+- User explicitly invokes them (manual control)
+- Full workflow loads immediately (not lazy-loaded)
+- Predictable execution flow (not autonomous decisions)
+
+### Commands vs Skills in Claude Code
+
+| Feature | Commands | Skills |
+|---------|----------|--------|
+| Location | `commands/` | `skills/` |
+| Invocation | Manual only | Manual + autonomous |
+| Loading | Full content on invocation | Lazy-loaded description first |
+| Use Case | Surgical operations | Complex capabilities |
+| Token Usage | Higher (full load) | Lower (on-demand) |
+
+### Invocation Pattern
+
+All knowledge graph commands use the `knowledge:` namespace:
+- `/knowledge:capture-lesson`
+- `/knowledge:init`
+- `/knowledge:recall`
+
+**For plugin developers:** Choose `commands/` when you want users to have explicit control over when workflows run. Choose `skills/` when you want Claude to autonomously discover and apply capabilities.
+
+---
+
 ## Architecture
 
 ### Core Design
@@ -116,7 +189,7 @@ claude --plugin-dir .
 ```
 knowledge-graph-plugin/
 ├── .claude-plugin/           # Plugin manifest
-├── skills/                   # 16 skills (8 complete, 8 pending)
+├── commands/                 # 17 commands (manual invocation)
 ├── agents/                   # Subagents (knowledge-reviewer)
 ├── hooks/                    # SessionStart hooks
 ├── scripts/                  # Helper scripts
@@ -139,34 +212,34 @@ knowledge-graph-plugin/
 
 ## Development Status
 
-### Phase 1: Foundation ✅ (In Progress)
+### Phase 1: Foundation ✅
 - [x] Plugin scaffold (plugin.json, config, LICENSE, CHANGELOG)
 - [x] Directory structure (16 skill dirs + core/)
-- [x] 8 skills converted with full detail preservation
-  - [x] capture-lesson (with git metadata)
-  - [x] recall (multi-KG support)
-  - [x] update-graph (preserves git metadata)
-  - [x] sync-all (automated pipeline)
-  - [x] update-issue-plan (PR integration)
-  - [x] session-summary (smart defaults)
-  - [x] extract-chat (OUTPUT_DIR fix)
-  - [x] meta-issue (ADR-008 pattern)
-- [ ] Python scripts (5 files with OUTPUT_DIR fix)
-- [ ] Templates (14 files in core/templates/)
-- [ ] Hooks & subagent
-- [ ] ROADMAP.md
+- [x] 8 initial skills converted with full detail preservation
+- [x] Python scripts (5 files with OUTPUT_DIR fix)
+- [x] Templates (14 files in core/templates/)
+- [x] Hooks & subagent
+- [x] ROADMAP.md
 
-### Phase 2: New Skills (Pending)
-7 new skills from scratch (init, list, switch, add-category, configure-sanitization, check-sensitive, link-issue, status)
+### Phase 2: New Skills ✅
+- [x] 8 new skills implemented from scratch (init, list, switch, add-category, configure-sanitization, check-sensitive, link-issue, status)
 
-### Phase 3: Examples + Docs (Pending)
-~30 example files + 10 documentation files
+### Phase 3: Examples + Docs ✅
+- [x] 10 Lesson learned examples with reference tracking
+- [x] 3 Knowledge graph sample entries
+- [x] 2 Architecture Decision Record (ADR) examples
+- [x] 1 Complex Meta-Issue implementation saga example
+- [x] 6 Core documentation files (Architecture, Patterns, Workflows, Sanitization, etc.)
+- [x] All ~30 generalized examples completed
 
-### Phase 4: MCP Server (Pending)
-7 tools + 2 resources
+### Phase 4: MCP Server ✅
+- [x] 7 Core tools implemented (init, list, switch, add-category, scaffold, search, sanitization)
+- [x] MCP server scaffolded and built
+- [x] 2 Resources implemented (config, templates)
 
-### Phase 5: Sanitization & Publishing (Pending)
-Full sanitization, testing, extraction, publication
+### Phase 5: Sanitization & Publishing (In Progress)
+- [x] Sanitization Checklist (8 Categories implemented)
+- [ ] Full sanitization pass, testing, extraction, publication
 
 ---
 
@@ -229,10 +302,10 @@ MIT License - See [LICENSE](LICENSE)
 
 - **Plans:** [docs/plans/](docs/plans/) — Phase 1-5 implementation roadmap
 - **Master Plan:** [docs/plans/v9.5.0-master-plan.md](docs/plans/v9.5.0-master-plan.md)
-- **Source Project:** [optimize-my-resume](https://github.com/technomensch/optimize-my-resume) (original development)
+- **Source:** Originally extracted from a production Claude Code project
 
 ---
 
 **Created:** 2026-02-12
-**Current Phase:** Phase 1 - Foundation
-**Next Milestone:** Complete Python scripts + templates
+**Current Phase:** Phase 5 - Sanitization & Publishing
+**Next Milestone:** Integration testing and GitHub publication

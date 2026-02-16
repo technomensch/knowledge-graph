@@ -1,0 +1,11 @@
+# Chat History Extraction Scripts
+# All scripts use Python standard library only (no required dependencies)
+
+# Optional: For Gemini protobuf file support (.pb files)
+# If not installed, Gemini extraction still works for JSON files (.json)
+# blackboxprotobuf>=1.0.0
+
+# To install optional dependencies:
+# pip install blackboxprotobuf
+
+# Python version requirement: 3.7+
