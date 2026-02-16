@@ -212,34 +212,16 @@ knowledge-graph-plugin/
 
 ## Development Status
 
-### Phase 1: Foundation ✅
-- [x] Plugin scaffold (plugin.json, config, LICENSE, CHANGELOG)
-- [x] Directory structure (16 skill dirs + core/)
-- [x] 8 initial skills converted with full detail preservation
-- [x] Python scripts (5 files with OUTPUT_DIR fix)
-- [x] Templates (14 files in core/templates/)
-- [x] Hooks & subagent
-- [x] ROADMAP.md
+See [ROADMAP.md](ROADMAP.md) for detailed version history and development progress.
 
-### Phase 2: New Skills ✅
-- [x] 8 new skills implemented from scratch (init, list, switch, add-category, configure-sanitization, check-sensitive, link-issue, status)
+**Current Release:** v0.0.1-alpha (2026-02-16)
+- ✅ All 5 phases complete
+- ✅ 16 commands with namespace prefix
+- ✅ MCP server with 7 tools + 2 resources
+- ✅ Platform-agnostic core system
+- ✅ Comprehensive documentation and examples
 
-### Phase 3: Examples + Docs ✅
-- [x] 10 Lesson learned examples with reference tracking
-- [x] 3 Knowledge graph sample entries
-- [x] 2 Architecture Decision Record (ADR) examples
-- [x] 1 Complex Meta-Issue implementation saga example
-- [x] 6 Core documentation files (Architecture, Patterns, Workflows, Sanitization, etc.)
-- [x] All ~30 generalized examples completed
-
-### Phase 4: MCP Server ✅
-- [x] 7 Core tools implemented (init, list, switch, add-category, scaffold, search, sanitization)
-- [x] MCP server scaffolded and built
-- [x] 2 Resources implemented (config, templates)
-
-### Phase 5: Sanitization & Publishing (In Progress)
-- [x] Sanitization Checklist (8 Categories implemented)
-- [ ] Full sanitization pass, testing, extraction, publication
+**Next:** v1.0.0 stable release (Q2 2026) incorporating alpha feedback
 
 ---
 

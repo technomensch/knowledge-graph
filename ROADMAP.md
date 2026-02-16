@@ -1,28 +1,79 @@
 # Knowledge Plugin — Roadmap
 
-## v1.0.0 (Current Development)
+## v0.0.1-alpha (Released: 2026-02-16)
 
-**Status**: Phase 1 Complete
-**Target**: Q1 2026
+**Status**: ✅ Complete - Alpha Testing
+**Branch**: `0.0.1-alpha`
 
-### Completed
+### Completed - All Phases
 - ✅ Plugin scaffold and manifest (.claude-plugin/plugin.json)
-- ✅ 8 ported skills (capture-lesson, recall, update-graph, sync-all, update-issue-plan, session-summary, extract-chat, meta-issue)
+- ✅ Architectural migration: skills/ → commands/ (research-driven decision)
+- ✅ 16 commands with `knowledge:` namespace prefix for autocomplete
 - ✅ Python chat extraction scripts with OUTPUT_DIR fix
 - ✅ 24 template files in core/templates/
 - ✅ Hooks system (SessionStart memory validation)
 - ✅ Knowledge reviewer subagent
+- ✅ ~30 generalized examples (patterns, concepts, gotchas, lessons, ADRs, meta-issue)
+- ✅ 10 documentation files (SETUP, core/docs/*)
+- ✅ MCP server (7 tools + 2 resources) with compiled dist/
+- ✅ Full metadata (repository, license, keywords)
+- ✅ Commands vs Skills architecture documentation
 
-### In Progress
-- 🔄 8 new skills (init, list, switch, add-category, configure-sanitization, check-sensitive, link-issue, status)
-- 🔄 ~30 generalized examples (patterns, concepts, gotchas, lessons, ADRs, meta-issue)
-- 🔄 10 documentation files (SETUP, core/docs/*)
-- 🔄 MCP server (7 tools + 2 resources)
+### Phase Breakdown
 
-### Pending
-- ⏳ Sanitization and testing
-- ⏳ Publishing to GitHub
-- ⏳ Marketplace submission
+#### Phase 1: Foundation ✅
+- Plugin scaffold (plugin.json, config, LICENSE, CHANGELOG)
+- Directory structure (16 command dirs + core/)
+- 8 initial commands converted with full detail preservation
+- Python scripts (5 files with OUTPUT_DIR fix)
+- Templates (14 files in core/templates/)
+- Hooks & subagent
+- ROADMAP.md
+
+#### Phase 2: New Commands ✅
+- 8 new commands implemented from scratch (init, list, switch, add-category, configure-sanitization, check-sensitive, link-issue, status)
+
+#### Phase 3: Examples + Docs ✅
+- 10 Lesson learned examples with reference tracking
+- 3 Knowledge graph sample entries
+- 2 Architecture Decision Record (ADR) examples
+- 1 Complex Meta-Issue implementation saga example
+- 6 Core documentation files (Architecture, Patterns, Workflows, Sanitization, etc.)
+- All ~30 generalized examples completed
+
+#### Phase 4: MCP Server ✅
+- 7 Core tools implemented (init, list, switch, add-category, scaffold, search, sanitization)
+- MCP server scaffolded and built
+- 2 Resources implemented (config, templates)
+- Built dist/ committed for out-of-box functionality
+
+#### Phase 5: Alpha Release ✅
+- Architectural migration documented (commands vs skills)
+- Sanitization checklist completed
+- Plugin metadata restored
+- README updated for v0.0.1-alpha
+- CHANGELOG entry created
+- Duplicate hooks reference fixed
+- Ready for alpha testing and feedback
+
+### Next Steps
+- 🔄 Alpha testing and feedback collection
+- ⏳ Bug fixes and refinements based on feedback
+- ⏳ v1.0.0 planning
+
+---
+
+## v1.0.0 (Planned: Q2 2026)
+
+**Status**: Planning
+**Focus**: Stable release with community feedback incorporated
+
+### Planned Features
+- Bug fixes from alpha testing
+- Performance optimizations
+- Enhanced documentation based on user feedback
+- Additional examples from real-world usage
+- Marketplace submission
 
 ---
 
@@ -334,12 +385,13 @@ Ideas for community-driven enhancements:
 
 ## Version History & Planning
 
-| Version | Focus | Target Date | Status |
+| Version | Focus | Release Date | Status |
 |---------|-------|-------------|--------|
-| v1.0.0 | Core plugin + 16 skills + MCP server | Q1 2026 | In Progress (Phase 1 done) |
-| v1.1.0 | Performance + UX improvements | Q2 2026 | Planning |
-| v1.2.0 | Cross-platform adapters | Q3 2026 | Roadmap |
-| v2.0.0 | Web UI + advanced automation | Q4 2026 | Vision |
+| v0.0.1-alpha | Core plugin + 16 commands + MCP server + architecture migration | 2026-02-16 | ✅ Released |
+| v1.0.0 | Stable release with alpha feedback | Q2 2026 | Planning |
+| v1.1.0 | Performance + UX improvements | Q3 2026 | Roadmap |
+| v1.2.0 | Cross-platform adapters | Q4 2026 | Roadmap |
+| v2.0.0 | Web UI + advanced automation | 2027 | Vision |
 
 ---
 
@@ -357,5 +409,5 @@ Ideas for community-driven enhancements:
 
 ---
 
-*Last updated: 2026-02-12*
-*Plugin Version: 1.0.0 (Phase 1 complete)*
+*Last updated: 2026-02-16*
+*Plugin Version: 0.0.1-alpha (Alpha Release)*
