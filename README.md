@@ -50,6 +50,20 @@ claude --plugin-dir .
 /plugin install knowledge@technomensch-tools
 ```
 
+### Verify Installation (Optional)
+
+After installation, you can verify the MCP server is working:
+
+```bash
+# Quick automated test
+./tests/test-mcp-direct.sh
+
+# Interactive web-based test
+./tests/test-mcp.sh
+```
+
+See [tests/README.md](tests/README.md) for detailed testing documentation.
+
 ---
 
 ## Quick Start
@@ -265,6 +279,48 @@ See [ROADMAP.md](ROADMAP.md) for detailed version history and development progre
 - Local LLMs: Use core templates with system prompts
 
 See: `core/docs/PLATFORM-ADAPTATION.md` (Phase 3)
+
+---
+
+## Troubleshooting
+
+### MCP Server Issues
+
+If commands aren't working or MCP tools are unavailable:
+
+1. **Verify MCP server is running:**
+   ```bash
+   ./tests/test-mcp-direct.sh
+   ```
+   Should show 7 tools listed.
+
+2. **Check for errors:**
+   - Restart Claude Code
+   - Verify Node.js is installed: `node --version`
+   - Check MCP server build exists: `ls mcp-server/dist/index.js`
+
+3. **Interactive debugging:**
+   ```bash
+   ./tests/test-mcp.sh
+   ```
+   Opens web UI to test each tool individually.
+
+See [tests/README.md](tests/README.md) for detailed troubleshooting.
+
+### Command Not Found
+
+If `/knowledge:command` doesn't autocomplete:
+- Verify plugin is loaded (check Claude Code plugin list)
+- Commands use `knowledge:` prefix with colon (not hyphen)
+- Try restarting Claude Code
+
+### Common Issues
+
+**"Duplicate hooks file detected"** - Already fixed in v0.0.1-alpha
+
+**Templates not found** - Ensure `core/templates/` exists and plugin loaded from correct directory
+
+**Git metadata missing** - Commands must run from a git repository
 
 ---
 
