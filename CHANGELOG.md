@@ -7,6 +7,66 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.3-alpha] - 2026-02-16
+
+### Added
+- **`/knowledge:archive-memory` Command** - Archive stale MEMORY.md entries to prevent bloat
+  - Token-based staleness detection (90-day threshold, customizable)
+  - Moves stale entries to MEMORY-archive.md with archive log
+  - Shows tokens freed and current size after archival
+  - Dry-run mode for previewing without writing
+- **Autonomous Triggering in Knowledge-Graph-Usage Skill**
+  - After lesson capture: Suggests `/knowledge:update-graph` immediately
+  - After significant commits: Detects fix/debug/pattern keywords, suggests capture within 30 minutes
+  - Before problem-solving: Suggests `/knowledge:recall` to check existing knowledge
+- **Post-Commit Hook Template** - Detects lesson-worthy commits
+  - Located in `core/examples-hooks/post-commit-lesson-suggestion`
+  - Triggers on keywords: fix, solved, debug, implement, refactor, pattern, architecture
+  - Optional installation via `/knowledge:init` wizard (default: no)
+- **SessionStart Hooks** - Three hooks for enhanced context
+  - `recent-lessons.sh` - Displays lessons modified in last 7 days
+  - `memory-diff-check.sh` - Notifies of MEMORY.md changes since last session
+  - Both scoped to active KG, silent when no changes
+- **Duplicate Detection Pre-Flight** - Step 1.1 in capture-lesson
+  - Searches for similar lessons before content gathering
+  - Offers merge (update existing), link (create with reference), or proceed (new)
+  - Prevents knowledge fragmentation
+
+### Changed
+- **Version**: 0.0.2-alpha → 0.0.3-alpha
+- **Command Count**: 16 → 17 (added archive-memory)
+- **MEMORY.md Limits**: Line-based (250/300) → Token-based (1,500/2,000)
+  - Token estimation: word_count × 1.3
+  - Soft limit: 1,500 tokens (warning, sync continues)
+  - Hard limit: 2,000 tokens (blocks MEMORY.md updates, suggests archive)
+  - Replaced all line-based references in update-graph.md Step 7 and sync-all.md
+- **capture-lesson.md Step 4.6** - Structured choice UI
+  - "Extract now (recommended)" - Inline update-graph execution
+  - "Manual later" - Deferred extraction
+  - "Skip" - Batch via sync-all
+- **update-graph.md** - Enhanced `--auto` flag behavior
+  - Returns structured quality feedback when called from capture-lesson
+  - Added `--edit-entry` flag for user review before saving
+- **knowledge-graph-usage skill** - Added duplicate detection guidance (~150 words)
+  - Search strategy before capturing
+  - Merge vs create new decision criteria
+
+### Fixed
+- Token-based size limits more accurate than line-based (short vs long lines)
+- MEMORY.md bloat prevention via archival system
+- Knowledge fragmentation via duplicate detection
+
+### Documentation
+- Plan: `docs/plans/v0.0.3-alpha-plan.md` (257 lines, consolidated from 1,174)
+- ROADMAP: v0.0.3-alpha section added with 3-phase breakdown
+- Verification: All Phase 1, 2, 3 checkboxes marked complete
+
+### Deferred to v0.0.4-alpha
+- MEMORY.md auto-sync rules engine (YAML rules, confidence scoring)
+- Smart summarization (LLM-powered entry consolidation)
+- `/knowledge:restore-memory` command (restore archived entries by ID)
+- Per-KG config directories with `memory-sync-rules.yaml`
+
 ## [0.0.2-alpha] - 2026-02-16
 
 ### Added

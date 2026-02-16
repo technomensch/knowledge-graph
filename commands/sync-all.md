@@ -72,12 +72,54 @@ For each new/modified lesson:
 
 **Logic:** Delegates to `/knowledge:update-graph` extraction logic
 
+### Step 2.5: MEMORY.md Size Check <!-- v0.0.3 Change -->
+
+**Before syncing to MEMORY.md, check size limits:**
+
+```bash
+# Calculate MEMORY.md token count
+memory_path=~/.claude/projects/$(basename $(pwd))/memory/MEMORY.md
+
+if [ -f "$memory_path" ]; then
+  memory_words=$(wc -w < "$memory_path")
+  memory_tokens=$((memory_words * 13 / 10))  # word_count × 1.3
+
+  if [ "$memory_tokens" -gt 2000 ]; then
+    echo "🛑 MEMORY.md exceeds hard limit: ~${memory_tokens}/2,000 tokens"
+    echo "   Run /knowledge:archive-memory before adding new entries"
+    echo ""
+    echo "   Sync will continue but MEMORY.md updates will be skipped."
+    SKIP_MEMORY_SYNC=true
+  elif [ "$memory_tokens" -gt 1500 ]; then
+    echo "⚠️  MEMORY.md approaching limit: ~${memory_tokens}/2,000 tokens"
+    echo "   Consider: /knowledge:archive-memory"
+    echo ""
+    echo "   Continuing with sync..."
+    SKIP_MEMORY_SYNC=false
+  else
+    SKIP_MEMORY_SYNC=false
+  fi
+else
+  SKIP_MEMORY_SYNC=false
+fi
+```
+
+**Token limits:**
+- **Soft limit: 1,500 tokens** (~1,100 words) — warning, sync continues
+- **Hard limit: 2,000 tokens** (~1,500 words) — block MEMORY.md updates, suggest archive
+
+**Rationale:** Token-based limits are more accurate than line-based limits because:
+- Short lines (5-10 words) vs long lines (30+ words) have very different context costs
+- Token count directly impacts system prompt size
+- Allows accurate headroom calculation
+
 ### Step 3: Check MEMORY.md Sync (ADR-011 Protocol)
 
 If new patterns, gotchas, or best practices were discovered:
-1. Check if MEMORY.md already has the information
-2. If not, append to appropriate section
-3. Keep MEMORY.md under 200 lines (truncation warning)
+1. **Check size limits** (Step 2.5) — skip if hard limit exceeded
+2. Check if MEMORY.md already has the information
+3. If not and within limits, append to appropriate section
+4. **Verify token count after update** — warn if approaching 2,000 tokens
 
 ### Step 4: Link to Active Plan
 

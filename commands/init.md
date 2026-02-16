@@ -203,6 +203,46 @@ if [ ! -f "~/.claude/projects/$(basename $(pwd))/memory/MEMORY.md" ]; then
 fi
 ```
 
+### Step 1.6.5: Install Post-Commit Hook (Optional) <!-- v0.0.3 Change -->
+
+**Prompt user:**
+```
+Install post-commit hook for lesson suggestions? [y/N]
+
+This hook will detect lesson-worthy commits (fix, debug, implement, refactor,
+pattern, architecture) and suggest running /knowledge:capture-lesson.
+
+Default: No (opt-in for alpha release)
+```
+
+**If yes:**
+```bash
+# Copy hook template to git hooks directory
+if [ -d .git ]; then
+  cp "${CLAUDE_PLUGIN_ROOT}/core/examples-hooks/post-commit-lesson-suggestion" \
+     .git/hooks/post-commit
+  chmod +x .git/hooks/post-commit
+
+  echo "✅ Post-commit hook installed: .git/hooks/post-commit"
+  echo "   Will suggest lesson capture for commits with keywords:"
+  echo "   fix, solved, debug, implement, refactor, pattern, architecture"
+else
+  echo "⚠️  No git repository detected. Hook not installed."
+  echo "   To install later, copy:"
+  echo "   ${CLAUDE_PLUGIN_ROOT}/core/examples-hooks/post-commit-lesson-suggestion"
+  echo "   to .git/hooks/post-commit and make executable."
+fi
+```
+
+**If no:**
+```
+Hook not installed. You can install it later by copying:
+  ${CLAUDE_PLUGIN_ROOT}/core/examples-hooks/post-commit-lesson-suggestion
+to .git/hooks/post-commit and making it executable.
+```
+
+**Note:** Default is "No" for v0.0.3-alpha. Consider changing to "Yes" for v1.0.0 once users have validated the hook behavior.
+
 ### Step 1.7: Update .gitignore (if git repo exists)
 
 ```bash

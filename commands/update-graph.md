@@ -48,7 +48,8 @@ This skill keeps the knowledge graph synchronized with lessons-learned by:
 
 **Parameters:**
 - `--lesson` (optional): Specific lesson file to extract from
-- `--auto` (optional): Auto-detect and update without prompting
+- `--auto` (optional): Auto-detect and update without prompting. When called from capture-lesson workflow, returns structured quality feedback instead of silent execution
+- `--edit-entry` (optional): Opens generated KG entry for user review/edit before saving <!-- v0.0.3 Change -->
 - `--category` (optional): Filter by knowledge category (patterns, architecture, workflow, debugging)
 - `--sync-all` (optional): Check all lessons for missing knowledge entries
 - `--show-updates` (optional): Display before/after diffs
@@ -58,7 +59,85 @@ This skill keeps the knowledge graph synchronized with lessons-learned by:
 /knowledge:update-graph
 /knowledge:update-graph --lesson=Three_Tier_Sync_Pattern.md
 /knowledge:update-graph --auto --sync-all
+/knowledge:update-graph --lesson=Pattern.md --edit-entry  # Review before saving
+/knowledge:update-graph --lesson=Pattern.md --auto        # Called from capture-lesson
 ```
+
+---
+
+## Flag Behaviors <!-- v0.0.3 Change -->
+
+### --auto Flag Enhancement
+
+**Standalone usage:**
+```bash
+/knowledge:update-graph --auto
+```
+- Silent execution (no prompts)
+- Processes all recent lessons
+- Outputs: "✅ Updated [count] entries"
+
+**Called from capture-lesson workflow:**
+```bash
+/knowledge:update-graph --lesson=Pattern.md --auto
+```
+- Silent execution (no prompts)
+- Processes specified lesson
+- Returns structured quality feedback:
+  ```
+  ✅ KG entry created: patterns.md → "Pattern Name"
+
+  Quality Assessment (knowledge-reviewer):
+  - Clarity: ✅ Good
+  - Completeness: ✅ Good
+  - Links: ✅ Bidirectional
+  - Category: ✅ Correct (patterns)
+
+  Files updated:
+  - knowledge/patterns.md
+  - lessons-learned/category/Pattern.md (Related Resources)
+  ```
+
+**Trigger:** When `--lesson` flag present, assume called from capture-lesson and return detailed feedback.
+
+### --edit-entry Flag
+
+**Usage:**
+```bash
+/knowledge:update-graph --lesson=Pattern.md --edit-entry
+```
+
+**Workflow:**
+1. Extract insights from lesson
+2. Generate KG entry draft
+3. **Present draft to user:**
+   ```markdown
+   Generated entry for "Pattern Name":
+
+   ### Pattern Name
+
+   **Problem:** [extracted problem]
+   **Solution:** [extracted solution]
+   **When to use:**
+   - [trigger 1]
+   - [trigger 2]
+
+   **Quick Reference:**
+   - [key point 1]
+   - [key point 2]
+
+   **Source:** [lesson title] (Branch: main, PR: #42)
+   **See:** [link to lesson]
+
+   ---
+
+   Review and edit? (y/n/edit)
+   ```
+4. If "edit": Open entry in editor for refinement
+5. If "y": Save as-is
+6. If "n": Cancel, don't save
+
+**Use case:** When you want to review/refine extracted content before committing to knowledge graph.
 
 ---
 
@@ -389,10 +468,22 @@ Update the appropriate MEMORY.md section:
 
 1. **Read** the relevant MEMORY.md section
 2. **Identify** the correct subsection for the new pattern
-3. **Update** with consistent formatting (tables, checklists, cross-references)
-4. **Link** back to knowledge graph entry and lesson-learned source
-5. **Verify** line count (total should stay under ~250 lines, link to detail files for 200+)
-6. **Stage** the memory update along with KG entry for single commit
+3. **Check token count** before updating <!-- v0.0.3 Change -->
+   ```bash
+   memory_words=$(wc -w < ~/.claude/projects/.../memory/MEMORY.md)
+   memory_tokens=$((memory_words * 13 / 10))  # word_count × 1.3
+   if [ "$memory_tokens" -gt 2000 ]; then
+     echo "🛑 MEMORY.md exceeds hard limit (${memory_tokens}/2,000 tokens)"
+     echo "Run /knowledge:archive-memory before adding new entries"
+     exit 1
+   elif [ "$memory_tokens" -gt 1500 ]; then
+     echo "⚠️  MEMORY.md approaching limit (${memory_tokens}/2,000 tokens)"
+   fi
+   ```
+4. **Update** with consistent formatting (tables, checklists, cross-references)
+5. **Link** back to knowledge graph entry and lesson-learned source
+6. **Verify token count** after update (should stay under 2,000 tokens) <!-- v0.0.3 Change -->
+7. **Stage** the memory update along with KG entry for single commit
 
 ### 7.4 Example: Project Memory Update for New Pattern
 
@@ -436,8 +527,12 @@ grep -n "Knowledge Graph.*Memory\|Memory.*Knowledge Graph" {active_kg_path}/know
 # - Knowledge graph entry should reference MEMORY.md via "See:" section
 # - MEMORY.md should reference knowledge graph pattern
 
-# 4. Verify line count remains reasonable
-wc -l ~/.claude/projects/.../memory/MEMORY.md  # Should stay under 300 lines
+# 4. Verify token count remains within limits <!-- v0.0.3 Change -->
+memory_words=$(wc -w < ~/.claude/projects/.../memory/MEMORY.md)
+memory_tokens=$((memory_words * 13 / 10))
+echo "MEMORY.md size: ~${memory_tokens}/2,000 tokens"
+# Soft limit: 1,500 tokens (warning)
+# Hard limit: 2,000 tokens (block new entries)
 ```
 
 ---

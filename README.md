@@ -2,8 +2,8 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.0.2-alpha
-**Status:** Validation & Enhancement Release - Testing & Feedback
+**Version:** 0.0.3-alpha
+**Status:** Automation & Memory Management Release - Testing & Feedback
 
 ---
 
@@ -215,7 +215,7 @@ All knowledge graph commands use the `knowledge:` namespace:
 ```
 knowledge-graph-plugin/
 ├── .claude-plugin/           # Plugin manifest
-├── commands/                 # 16 commands (manual invocation)
+├── commands/                 # 17 commands (manual invocation)
 ├── agents/                   # Subagents (knowledge-reviewer)
 ├── hooks/                    # SessionStart hooks
 ├── scripts/                  # Helper scripts
@@ -240,21 +240,23 @@ knowledge-graph-plugin/
 
 See [ROADMAP.md](ROADMAP.md) for detailed version history and development progress.
 
-**Current Release:** v0.0.2-alpha (2026-02-16)
+**Current Release:** v0.0.3-alpha (2026-02-16)
 - ✅ Knowledge Graph Usage Skill (~13,900 words total guidance)
 - ✅ Plugin documents itself (2 lessons captured)
 - ✅ Marketplace branding: tm-sis identity established
 - ✅ Comprehensive validation: 0 critical issues
 - ✅ Command filenames optimized (no redundant prefix)
-- ✅ 16 commands with automatic namespace handling
+- ✅ 17 commands with automatic namespace handling
 - ✅ MCP server with 7 tools + 2 resources
 - ✅ Platform-agnostic core system
 
-**What's New in v0.0.2:**
-- Autonomous knowledge capture guidance (skill)
-- Local marketplace testing workflow documented
-- Namespace visibility cross-LLM compatibility lesson
-- Plugin validation and quality improvements
+**What's New in v0.0.3:**
+- Autonomous triggering in knowledge-graph-usage skill
+- Post-commit hook for lesson-worthy commits
+- Duplicate detection pre-flight before lesson capture
+- Token-based MEMORY.md limits (1,500/2,000 tokens)
+- `/knowledge:archive-memory` command for bloat prevention
+- SessionStart notifications (recent lessons + memory changes)
 
 **Next:** v1.0.0 stable release (Q2 2026) incorporating alpha feedback
 

@@ -1,7 +1,7 @@
 ---
 name: Knowledge Graph Usage
-description: This skill should be used when the user mentions "documenting lessons", "capturing knowledge", "remembering this for later", "we solved this before", "institutional memory", "project memory", "track decisions", or when Claude detects recurring problems, repeated patterns, valuable insights worth preserving, or situations where learning should be captured for future reference.
-version: 1.0.0
+description: This skill should be used when the user mentions "documenting lessons", "capturing knowledge", "remembering this for later", "we solved this before", "institutional memory", "project memory", "track decisions", or when Claude detects recurring problems, repeated patterns, valuable insights worth preserving, situations after completing /knowledge:capture-lesson (suggest KG extraction), after git commits with fix/debug/pattern keywords (suggest lesson capture within 30min), or when user describes familiar problems (suggest searching existing lessons first).
+version: 1.0.1
 ---
 
 # Knowledge Graph Usage Guidance
@@ -67,6 +67,43 @@ Avoid capturing:
 - User-specific environment quirks
 - Incomplete solutions still being tested
 - Trivial fixes with obvious causes
+
+### Duplicate Detection <!-- v0.0.3 Change -->
+
+**Before capturing a new lesson, search for similar existing lessons to avoid duplication:**
+
+**Search strategy:**
+1. Extract key terms from the topic (problem domain, technology, pattern name)
+2. Use `/knowledge:recall "key terms"` to search existing lessons
+3. Review search results for similar content
+
+**If similar lesson found:**
+- **Merge option**: Update existing lesson (use `/knowledge:capture-lesson update <filename>`)
+- **Related option**: Create new lesson with explicit "Related:" link to similar lesson
+- **Proceed option**: Create new lesson if genuinely different (different root cause, different context, or significantly different solution)
+
+**When to merge vs create new:**
+- **Merge**: Same problem domain, updates/extends existing knowledge
+- **Create new with link**: Different angle on same topic, complementary insight
+- **Create new**: Different problem even if similar keywords
+
+**Benefits of duplicate detection:**
+- Prevents knowledge fragmentation
+- Improves searchability (one comprehensive source better than multiple partial sources)
+- Reduces cognitive load during recall
+- Maintains single source of truth for each pattern
+
+**Example workflow:**
+```
+User: "I want to capture a lesson about API error handling"
+Assistant: "Before capturing, let me search existing lessons..."
+          → Runs /knowledge:recall "API error handling"
+          → Finds: "Lessons_Learned_Error_Handling_Patterns.md"
+          → "I found a similar lesson. Would you like to:"
+            1. Update existing lesson (merge new findings)
+            2. Create new lesson with reference to existing
+            3. Proceed with new lesson (if significantly different)
+```
 
 ## Command Reference
 
@@ -179,6 +216,52 @@ Avoid capturing:
    - Captures lessons from extracted content
    - Updates knowledge graph with insights
 2. Review generated content for quality
+```
+
+**After lesson capture (NEW - v0.0.3):**
+```
+Context: User just completed /knowledge:capture-lesson
+
+Proactive suggestion:
+"✅ Lesson captured! Extract insights to Knowledge Graph?"
+- Recommended: /knowledge:update-graph (extracts patterns/gotchas/concepts)
+- Full pipeline: /knowledge:sync-all (extraction + MEMORY.md + GitHub)
+- Later: Skip for now, run manually later
+
+Why now: Fresh context enables better extraction. The knowledge-reviewer
+agent will assess quality automatically.
+```
+
+**After significant commits (NEW - v0.0.3):**
+```
+Context: Git commit completed with keywords (fix|debug|implement|refactor|pattern|architecture)
+
+Proactive suggestion:
+"💡 Lesson-worthy commit detected: [hash] - [message]
+
+This looks like knowledge worth capturing. Consider:
+- /knowledge:capture-lesson — Document while context is fresh
+- Within 30 minutes is optimal for quality
+
+Keywords detected: [fix/debug/pattern/etc]"
+
+Why now: 30-minute window is critical — after that, context fades and
+quality suffers. Commits are natural knowledge boundaries.
+```
+
+**Before starting problem-solving (NEW - v0.0.3):**
+```
+Context: User describes a problem; sounds familiar or recurring
+
+Proactive suggestion:
+"Before solving, check if we've seen this before:
+- /knowledge:recall \"[extracted keywords]\"
+- Might save time if similar pattern exists
+
+Would you like me to search existing lessons first?"
+
+Why now: Prevents re-solving known problems. Search takes 10 seconds,
+solving from scratch takes hours. Always search first.
 ```
 
 For detailed workflow patterns with timing, command combinations, and optimization strategies, see **`references/command-workflows.md`**.

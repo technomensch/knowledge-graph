@@ -8,6 +8,18 @@
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-memory.sh",
             "timeout": 60
+          },
+          {
+            "type": "command",
+            "comment": "Display recent lessons from active KG (last 7 days)",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/recent-lessons.sh",
+            "timeout": 60
+          },
+          {
+            "type": "command",
+            "comment": "Notify user of MEMORY.md changes since last session",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/memory-diff-check.sh",
+            "timeout": 60
           }
         ]
       }

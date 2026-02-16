@@ -161,6 +161,68 @@ v1.X Change
 
 When the user invokes this command without "update", follow this structured process:
 
+### Step 1.1: Duplicate Detection Pre-Flight <!-- v0.0.3 Change -->
+
+**Before gathering lesson details, check for similar existing lessons:**
+
+**Extract keywords from user's request:**
+- Topic/problem domain
+- Technology/tool names
+- Pattern/approach keywords
+
+**Example:**
+```
+User: "/knowledge:capture-lesson API error handling"
+Keywords: API, error, handling, errors
+```
+
+**Search for similar lessons:**
+```bash
+# Use kg_search MCP tool to search existing lessons
+/knowledge:recall "API error handling"
+
+# Or use MCP tool directly:
+mcp__plugin_knowledge_knowledge__kg_search(query: "API error handling", format: "summary")
+```
+
+**Evaluate search results:**
+
+**If similar lesson found:**
+Present options to user:
+```markdown
+🔍 **Similar Lesson Found:**
+
+**Existing:** Lessons_Learned_Error_Handling_Patterns.md
+**Created:** 2026-01-10 | **Category:** patterns
+
+**Would you like to:**
+1. **Update existing lesson** — Merge your new findings (recommended if same topic)
+   → Redirects to Step 0 (Update Existing Document)
+2. **Create new with link** — Create separate lesson with "Related:" reference
+   → Continues to Step 1, adds cross-reference
+3. **Proceed independently** — Create new lesson without explicit link
+   → Continues to Step 1
+
+[User selects option]
+```
+
+**Based on user selection:**
+- **Option 1**: Redirect to Step 0 (Update Existing Document) with filename from search result
+- **Option 2**: Continue to Step 1, store reference for later (add to "Related Resources" in Step 4)
+- **Option 3**: Continue to Step 1 normally
+
+**If no similar lesson found:**
+```
+No similar lessons found. Proceeding with new lesson...
+```
+→ Continue to Step 1
+
+**Benefits:**
+- Prevents duplicate documentation of same topic
+- Encourages consolidation over fragmentation
+- Maintains single source of truth for each pattern
+- Improves discoverability via cross-references
+
 ### Step 1: Verification (INTERACTIVE)
 
 **Ask the user these questions:**
@@ -410,23 +472,35 @@ Auto-generate tags from:
 **Last Updated:** 2026-02-12
 ```
 
-### Step 4.6: Update Knowledge Graph
+### Step 4.6: Update Knowledge Graph <!-- v0.0.3 Change -->
 
-**After updating the Master Index, trigger knowledge graph sync:**
+**After updating the Master Index, present structured choice:**
 
-Recommend user run `/knowledge:update-graph` to extract insights from this lesson to the knowledge graph.
+"✅ Lesson captured! Extract insights to Knowledge Graph?"
 
-**Auto-suggest KG impact areas:**
-1. **Patterns:** Does this lesson introduce a new reusable pattern?
-2. **Gotchas:** Does this lesson help avoid a recurring pitfall?
-3. **Concepts:** Does this lesson define a new architectural concept?
-4. **ADRs:** Does this lesson warrant an Architecture Decision Record?
+**Options:**
+1. ✅ **Extract now (recommended)** — Runs `/knowledge:update-graph` for this lesson
+   - Extracts patterns, gotchas, concepts to KG
+   - knowledge-reviewer agent assesses quality
+   - Includes KG files in same commit
 
-**Ask user for confirmation:**
-"I've identified that this lesson may impact the knowledge graph. Would you like to:
-1. Run `/knowledge:sync-all` now (full pipeline)
-2. Run `/knowledge:update-graph` manually later
-3. Skip KG update"
+2. **Manual later** — Run `/knowledge:update-graph` when ready
+   - Deferred extraction, you control timing
+
+3. **Skip** — Update KG later via `/knowledge:sync-all`
+   - Batch operation for multiple lessons
+
+**If option 1 selected:**
+Execute update-graph workflow inline:
+- Call `/knowledge:update-graph --lesson=[current-lesson-filename] --auto`
+- knowledge-reviewer agent runs async
+- Show quality feedback: "KG entry created. Quality: ✅ Good / ⚠️ Needs review"
+- Include KG files in Step 5 commit
+
+**If option 2 or 3:**
+Continue to Step 4.7
+
+**Why extract now?** Fresh context enables better pattern identification. Waiting risks forgetting nuances.
 
 ### Step 4.7: Link to GitHub Issue (Optional) <!-- v1.4 Change -->
 

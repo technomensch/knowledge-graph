@@ -63,6 +63,57 @@
 
 ---
 
+## v0.0.3-alpha (Released: 2026-02-16)
+
+**Status**: ✅ Complete - Automation & Memory Management Release
+**Branch**: `v0.0.3-alpha`
+
+### Completed - All Phases
+
+#### Phase 1: Skill Enhancement + Command Hooks
+- ✅ Enhanced knowledge-graph-usage skill with autonomous triggering
+  - After lesson capture: Suggest `/knowledge:update-graph` immediately
+  - After commits: Detect fix/debug/pattern keywords, suggest capture
+  - Before problem-solving: Suggest `/knowledge:recall` to check existing knowledge
+- ✅ Updated capture-lesson Step 4.6 with structured choice UI
+- ✅ Enhanced update-graph with `--edit-entry` flag and structured quality feedback
+- ✅ Created post-commit hook template (core/examples-hooks/)
+- ✅ Added hook installation to `/knowledge:init` wizard (optional, default: no)
+
+#### Phase 2: Context Enhancement + Duplicate Detection
+- ✅ Added recent-lessons.sh SessionStart hook (displays lessons from last 7 days)
+- ✅ Enhanced knowledge-graph-usage skill with duplicate detection guidance
+- ✅ Added capture-lesson Step 1.1 pre-flight (searches for similar lessons)
+- ✅ Merge/link/proceed options for duplicate handling
+
+#### Phase 3: MEMORY.md Bloat Prevention
+- ✅ Token-based limits (1,500 soft / 2,000 hard) replace line-based limits
+- ✅ Updated sync-all with MEMORY.md size check (Step 2.5)
+- ✅ Updated update-graph Step 7 with token-based verification
+- ✅ Created `/knowledge:archive-memory` command (new - 17th command)
+- ✅ Added memory-diff-check.sh SessionStart hook (shows changes since last session)
+
+### Key Deliverables
+- **Commands**: 17 total (added archive-memory)
+- **Hooks**: 3 SessionStart hooks (check-memory, recent-lessons, memory-diff-check)
+- **Automation**: Hybrid skill guidance + command hooks architecture
+- **Limits**: Token-based MEMORY.md management (word_count × 1.3)
+- **UX**: Proactive suggestions, structured choices, quality feedback
+
+### Documentation Updates
+- CHANGELOG: v0.0.3-alpha entry added
+- ROADMAP: This section added
+- Plan: docs/plans/v0.0.3-alpha-plan.md completed
+- Verification: All 3 phase checkboxes marked complete
+
+### Deferred to v0.0.4-alpha
+- MEMORY.md auto-sync rules engine (YAML rules, confidence scoring)
+- Smart summarization (LLM-powered entry consolidation)
+- `/knowledge:restore-memory` command (restore archived entries)
+- Per-KG config directories with memory-sync-rules.yaml
+
+---
+
 ## v0.0.2-alpha (Released: 2026-02-16)
 
 **Status**: ✅ Complete - Validation & Enhancement Release
