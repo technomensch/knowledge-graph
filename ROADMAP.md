@@ -63,6 +63,104 @@
 
 ---
 
+## v0.0.2-alpha (Released: 2026-02-16)
+
+**Status**: ✅ Complete - Validation & Enhancement Release
+**Branch**: `v0.0.2-alpha`
+
+### Completed - All Phases
+
+#### Phase 0: Marketplace & Foundation
+- ✅ Marketplace branding updated: "(knowledge)" → "(tm-sis)"
+- ✅ Plugin knowledge graph initialized (dogfooding)
+- ✅ Selective git strategy configured for KG
+- ✅ Namespace visibility lesson captured
+
+#### Phase 1-2: Skill Development
+- ✅ Knowledge Graph Usage Skill created
+  - 1,900-word lean SKILL.md (progressive disclosure)
+  - 5,800-word capture-patterns.md reference
+  - 6,200-word command-workflows.md reference
+  - Strong trigger phrases for autonomous activation
+  - 10 detailed workflow patterns
+
+#### Phase 3-5: Validation & Fixes
+- ✅ Lesson captured with git metadata tracking
+- ✅ Plugin-validator: PASS with 0 critical issues
+- ✅ Fixed filename typo: updat → update
+- ✅ Updated README command count: 17 → 16
+- ✅ Version bumped: 0.0.1-alpha → 0.0.2-alpha
+
+### Key Deliverables
+- **Skill**: knowledge-graph-usage (~13,900 words total guidance)
+- **KG**: Plugin documents itself with first lesson captured
+- **Branding**: tm-sis marketplace identity established
+- **Validation**: Comprehensive plugin validation complete
+
+### Documentation Updates
+- CHANGELOG: v0.0.2-alpha entry added
+- ROADMAP: This section added
+- Plan: docs/plans/v0.0.2-validate-plugin.md completed
+- Validation: All criteria checkboxes marked complete
+
+### Phase Breakdown
+
+#### Phase 0A: Marketplace Branding ✅
+- Changed marketplace name to "tm-sis"
+- Updated owner to "technomensch-stayinginsync"
+- Added README documentation for branding strategy
+
+#### Phase 0B: Knowledge Graph Initialization ✅
+- Initialized plugin KG in docs/
+- Created categories: architecture, debugging, patterns
+- Set up selective git strategy
+- Configured .gitignore rules
+
+#### Phase 1: Document Shadow Command Failure ✅
+- Created comprehensive lesson in debugging/ category
+- Documented Gemini compatibility issue
+- Captured file prefix workaround solution
+- Added to lessons-learned master index
+
+#### Phase 2: Create Knowledge-Graph-Usage Skill ✅
+- Wrote SKILL.md with third-person description
+- Created capture-patterns.md reference (5,800 words)
+- Created command-workflows.md reference (6,200 words)
+- Implemented progressive disclosure pattern
+
+#### Phase 3: Capture Lesson with Command ✅
+- Used /knowledge:capture-lesson on plugin itself
+- Validated git metadata capture
+- Updated master index automatically
+- Committed with proper message format
+
+#### Phase 4: Run Plugin-Validator ✅
+- Launched plugin-validator agent
+- Received comprehensive validation report
+- Identified 5 warnings (0 critical issues)
+- Validated all components (commands, skill, agent, hooks, MCP)
+
+#### Phase 5: Fix Validation Issues ✅
+- Fixed filename typo
+- Updated version numbers
+- Corrected README documentation
+- Cleaned up validation findings
+
+### What Changed from v0.0.1-alpha
+- Added autonomous knowledge capture guidance (skill)
+- Plugin now uses itself for documentation
+- Marketplace branding established
+- Comprehensive validation completed
+- Documentation accuracy improved
+
+### Next Steps
+- 🔄 Test skill triggering with real usage
+- 🔄 Gather feedback on skill guidance quality
+- 🔄 Continue capturing lessons as plugin evolves
+- ⏳ v1.0.0 planning continues
+
+---
+
 ## v1.0.0 (Planned: Q2 2026)
 
 **Status**: Planning
@@ -388,6 +486,7 @@ Ideas for community-driven enhancements:
 | Version | Focus | Release Date | Status |
 |---------|-------|-------------|--------|
 | v0.0.1-alpha | Core plugin + 16 commands + MCP server + architecture migration | 2026-02-16 | ✅ Released |
+| v0.0.2-alpha | Validation + knowledge-graph-usage skill + marketplace branding | 2026-02-16 | ✅ Released |
 | v1.0.0 | Stable release with alpha feedback | Q2 2026 | Planning |
 | v1.1.0 | Performance + UX improvements | Q3 2026 | Roadmap |
 | v1.2.0 | Cross-platform adapters | Q4 2026 | Roadmap |
@@ -410,4 +509,4 @@ Ideas for community-driven enhancements:
 ---
 
 *Last updated: 2026-02-16*
-*Plugin Version: 0.0.1-alpha (Alpha Release)*
+*Plugin Version: 0.0.2-alpha (Validation & Enhancement Release)*

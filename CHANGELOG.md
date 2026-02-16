@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.2-alpha] - 2026-02-16
+
+### Added
+- **Knowledge Graph Usage Skill** - Autonomous guidance for knowledge capture
+  - 1,900-word lean SKILL.md with progressive disclosure
+  - 5,800-word capture-patterns.md reference (problem-solution, architectural, meta-issue patterns)
+  - 6,200-word command-workflows.md reference (10 detailed workflow patterns)
+  - Triggers on phrases: "documenting lessons", "institutional memory", "we solved this before"
+  - Proactive recognition of recurring problems and valuable insights
+- **Plugin Knowledge Graph** - Plugin now documents itself (dogfooding)
+  - Initialized KG in `docs/` with categories: architecture, debugging, patterns
+  - Selective git strategy (commit shareable, gitignore personal notes)
+  - First lesson captured: namespace-visibility-shadow-command-failure.md
+  - Master index with chronological and tag-based navigation
+- **Marketplace Branding** - Changed identifier from "(knowledge)" to "(tm-sis)"
+  - Represents "technomensch-stayinginsync" publisher identity
+  - Updated marketplace.json with new branding
+  - README documentation of marketplace strategy
+
+### Changed
+- **Version**: 0.0.1-alpha → 0.0.2-alpha
+- **README**: Corrected command count from 17 to 16 (accurate count)
+- **README**: Updated namespace documentation to reflect filename-based approach
+- **.gitignore**: Added selective KG strategy rules
+  - Gitignore: docs/plans/, docs/sessions/, docs/chat-history/, docs/lessons-learned/debugging/
+  - Commit: docs/lessons-learned/architecture/, docs/lessons-learned/patterns/
+
+### Fixed
+- Filename typo: `knowledge-updat-issue-plan.md` → `knowledge-update-issue-plan.md`
+
+### Documentation
+- Captured lesson: Shadow command strategy failed with Gemini (cross-LLM incompatibility)
+- Documented file prefix workaround as cross-LLM compatible solution
+- Updated plugin validation criteria checklist in v0.0.2-validate-plugin.md plan
+
+### Validation
+- Plugin-validator: PASS with 0 critical issues
+- All 16 commands validated
+- Skill validated with proper progressive disclosure
+- MCP server validated (7 tools, 2 resources)
+
 ## [0.0.1-alpha] - 2026-02-16
 
 ### Added
