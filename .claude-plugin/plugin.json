@@ -18,7 +18,6 @@
     "meta-issue",
     "adr"
   ],
-  "hooks": "./hooks/hooks.json",
   "mcpServers": {
     "knowledge": {
       "type": "stdio",
