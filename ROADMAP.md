@@ -63,6 +63,76 @@
 
 ---
 
+## v0.0.4-alpha (Released: 2026-02-16)
+
+**Status**: ✅ Complete - MEMORY.md Restore Capability Release
+**Branch**: `v0.0.4-alpha`
+
+### Scope: Minimal (Restore Only)
+
+**Decision**: Implement restore command only. Defer rules engine and smart summarization to v0.0.5-alpha.
+
+**Rationale** (see ADR-001):
+- Archive without restore is incomplete UX (users need both capabilities)
+- Rules engine needs real-world MEMORY.md patterns from v0.0.3 usage
+- Smart summarization requires LLM integration (adds complexity)
+- Focused scope maintains release velocity (2-3 days vs 1-2 weeks)
+
+### Completed - All Phases
+
+#### Phase 1: Core Restore Command
+- ✅ Created `/knowledge:restore-memory` command (new - 18th command)
+  - Restore by entry title with fuzzy search
+  - Restore by entry ID/index from archive
+  - List all archived entries with `--list` flag
+  - Preview entry before restoring
+  - Target section selection with `--section` flag
+  - Dry-run mode with `--dry-run` flag
+  - Token limit checking before restoration
+  - Archive log restoration tracking
+- ✅ Created `scripts/fuzzy-search-archive.sh` helper
+  - Four-tier ranking: exact, starts-with, contains-all, contains-any
+  - Case-insensitive search with word-based fuzzy matching
+- ✅ Updated `/knowledge:archive-memory` command
+  - Added restoration tracking to archive log format
+  - Documents restore workflow and manual restoration process
+
+#### Phase 2: Integration & Polish
+- ✅ Updated `skills/knowledge-graph-usage/SKILL.md`
+  - Added restore workflow documentation
+  - Documented when to restore vs archive
+- ✅ Updated README.md
+  - Version: 0.0.3-alpha → 0.0.4-alpha
+  - Command count: 17 → 18
+  - Updated status and feature list
+- ✅ Updated ROADMAP.md with v0.0.4-alpha section
+- ✅ Updated CHANGELOG.md with v0.0.4-alpha entry
+
+#### Phase 3: ADR Documentation
+- ✅ Created `docs/decisions/ADR-001-defer-memory-rules-engine.md`
+  - Documents decision to defer rules engine to v0.0.5
+  - Options considered: rules+restore, full automation, restore only
+  - Rationale: Complete archive feature, gather feedback, maintain velocity
+
+### Key Deliverables
+- **Commands**: 18 total (added restore-memory)
+- **Scripts**: fuzzy-search-archive.sh (archive search helper)
+- **Documentation**: ADR-001 (architectural decision record)
+- **Timeline**: 2-3 days (vs 1-2 weeks for full automation)
+
+### Deferred to v0.0.5-alpha
+- MEMORY.md auto-sync rules engine (YAML-based pattern matching)
+- Smart summarization (LLM-powered entry consolidation)
+- Advanced confidence scoring for rule triggers
+- Config directory for per-KG memory-sync-rules.yaml
+
+### Next Steps
+- 🔄 Alpha testing restore workflow and feedback collection
+- ⏳ Gather real-world MEMORY.md patterns from v0.0.3/v0.0.4 usage
+- ⏳ v0.0.5-alpha planning (rules engine with observed patterns)
+
+---
+
 ## v0.0.3-alpha (Released: 2026-02-16)
 
 **Status**: ✅ Complete - Automation & Memory Management Release

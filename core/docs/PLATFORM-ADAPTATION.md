@@ -25,10 +25,10 @@ The knowledge graph core is platform-agnostic. This guide shows how to adapt it 
 **Status:** ✅ Fully supported (this plugin)
 
 **Features:**
-- 16 skills for automation
-- SessionStart hooks
+- 18 commands for automation
+- SessionStart hooks (check-memory, recent-lessons, memory-diff-check)
 - Subagents for review
-- MEMORY.md bidirectional sync
+- MEMORY.md bidirectional sync with archive/restore
 
 **Setup:** See main README.md and docs/SETUP.md
 

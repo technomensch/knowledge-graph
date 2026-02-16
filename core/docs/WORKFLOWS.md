@@ -577,6 +577,224 @@ mv docs/sessions/2022-* docs/sessions/archive/
 
 ---
 
+## Workflow 9: Manage MEMORY.md (Archive & Restore)
+
+**When:** MEMORY.md approaching token limits (1,500+) or need archived context
+
+**Purpose:** Maintain MEMORY.md within token budget while preserving historical context
+
+**With Claude Code:** `/knowledge:archive-memory` and `/knowledge:restore-memory`
+
+**Manual Alternative:** Follow steps below
+
+---
+
+### Part A: Archive Stale Entries
+
+**When MEMORY.md exceeds 1,500 tokens (≈1,150 words):**
+
+**1. Check current size:**
+
+```bash
+# Calculate token count
+MEMORY_PATH="$HOME/.claude/projects/$(basename $(pwd))/memory/MEMORY.md"
+memory_words=$(wc -w < "$MEMORY_PATH")
+memory_tokens=$((memory_words * 13 / 10))
+
+echo "Current size: ~${memory_tokens}/2,000 tokens"
+```
+
+**2. Identify stale entries:**
+
+Look for entries with:
+- Old dates (> 90 days): "Last updated: 2025-08-01"
+- Not referenced recently
+- Historical context only (not actively used)
+
+**3. Create archive file (if doesn't exist):**
+
+```bash
+cat > "$HOME/.claude/projects/$(basename $(pwd))/memory/MEMORY-archive.md" << 'EOF'
+# MEMORY.md Archive
+
+Historical entries archived from MEMORY.md to free token budget.
+
+**Purpose:** Preserve context while keeping active memory lean
+**Original:** `MEMORY.md` (project cross-session memory)
+
+---
+
+## Archive Log
+
+**YYYY-MM-DD:** Archived X entries (~Y tokens freed)
+- Entry 1 (Z days old)
+- Entry 2 (Z days old)
+
+---
+
+[Archived entries follow]
+EOF
+```
+
+**4. Move stale entries:**
+
+```bash
+# For each stale entry:
+# 1. Copy full section (### heading + content) from MEMORY.md
+# 2. Append to MEMORY-archive.md
+# 3. Remove from MEMORY.md
+# 4. Update archive log with entry title and age
+```
+
+**5. Add archive notice to MEMORY.md:**
+
+```markdown
+> **Note:** Stale entries are periodically archived to `MEMORY-archive.md` to keep this file lean.
+> Last archive: YYYY-MM-DD (X entries, ~Y tokens freed)
+```
+
+**6. Commit both files:**
+
+```bash
+git add memory/MEMORY*.md
+git commit -m "docs(memory): archive stale entries
+
+Archived X entries (~Y tokens freed):
+- Entry 1 (Z days old)
+- Entry 2 (Z days old)
+
+Current size: ~${new_tokens}/2,000 tokens
+Archive: memory/MEMORY-archive.md"
+```
+
+---
+
+### Part B: Restore Archived Entries
+
+**When you need archived knowledge for current work:**
+
+**1. List archived entries:**
+
+```bash
+# View archive
+cat memory/MEMORY-archive.md
+
+# Or extract just titles
+grep "^### " memory/MEMORY-archive.md
+```
+
+**Output example:**
+```
+### Git Pre-Commit Hooks
+### Old Docker Pattern
+### Deprecated API Approach
+### JWT Authentication Setup
+```
+
+**2. Find specific entry:**
+
+```bash
+# Search archive by keyword
+grep -A 20 "Git Pre-Commit" memory/MEMORY-archive.md
+```
+
+**3. Check current MEMORY.md size:**
+
+```bash
+# Verify space available before restoring
+memory_words=$(wc -w < memory/MEMORY.md)
+memory_tokens=$((memory_words * 13 / 10))
+
+echo "Current: ~${memory_tokens}/2,000 tokens"
+
+# Calculate entry size
+entry_words=$(grep -A 20 "Git Pre-Commit" memory/MEMORY-archive.md | wc -w)
+entry_tokens=$((entry_words * 13 / 10))
+
+new_total=$((memory_tokens + entry_tokens))
+echo "After restoration: ~${new_total}/2,000 tokens"
+
+# Warn if would exceed limits
+if [ "$new_total" -gt 2000 ]; then
+  echo "⚠️  Would exceed hard limit! Archive other entries first."
+fi
+```
+
+**4. Copy entry to MEMORY.md:**
+
+```bash
+# Extract entry (from ### heading to next ### or end)
+grep -A 20 "Git Pre-Commit" memory/MEMORY-archive.md > /tmp/entry.md
+
+# Choose target section in MEMORY.md
+# Append entry to appropriate section
+cat /tmp/entry.md >> memory/MEMORY.md
+
+# Or insert at specific location using editor
+vim memory/MEMORY.md
+```
+
+**5. Add restoration timestamp:**
+
+Edit the restored entry in MEMORY.md to add:
+```markdown
+### Git Pre-Commit Hooks
+
+**Restored:** 2026-02-16 (originally archived: 2026-02-16)
+**Last updated:** 2025-08-01
+
+[Original content...]
+```
+
+**6. Update archive log:**
+
+Mark entry as restored in MEMORY-archive.md:
+```markdown
+## Archive Log
+
+**2026-02-16:** Archived 5 entries (~340 tokens freed)
+- Git Pre-Commit Hooks (235 days old) **[Restored: 2026-02-20]**
+- Old Docker Pattern (187 days old)
+```
+
+**Note:** Entry content remains in archive for historical record.
+
+**7. Commit both files:**
+
+```bash
+git add memory/MEMORY*.md
+git commit -m "docs(memory): restore \"Git Pre-Commit Hooks\" from archive
+
+Restored entry from MEMORY-archive.md (archived: 2026-02-16)
+Added to: ## Best Practices
+Size: ~45 tokens
+
+Memory status:
+- Before: ~1,180/2,000 tokens
+- After: ~1,225/2,000 tokens"
+```
+
+---
+
+### Decision Criteria
+
+**Archive when:**
+- MEMORY.md > 1,500 tokens (soft limit)
+- Entry is > 90 days old with no recent references
+- Historical context, not actively needed
+
+**Restore when:**
+- Currently working on related problem
+- Need archived context for active task
+- MEMORY.md has space (< 1,500 tokens)
+
+**Keep archived when:**
+- Historical reference only
+- Not relevant to current work
+- Token budget is tight
+
+---
+
 ## Tips for Manual Workflows
 
 ### Use Shell Aliases

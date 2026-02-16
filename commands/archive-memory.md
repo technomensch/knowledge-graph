@@ -164,11 +164,9 @@ Historical entries archived from MEMORY.md to free token budget.
 ## Archive Log
 
 **2026-02-16:** Archived 5 entries (~340 tokens freed)
-- Git Pre-Commit Hooks (235 days old)
+- Git Pre-Commit Hooks (235 days old) [Restored: 2026-02-20]
 - Old Docker Pattern (187 days old)
 - Deprecated API Approach (156 days old)
-- Legacy Build Process (142 days old)
-- Old Testing Strategy (98 days old)
 
 ---
 
@@ -364,17 +362,37 @@ Current archives:
 
 ## Restoring Archived Entries
 
-**If you need to restore an archived entry:**
+**Use the restore-memory command** (v0.0.4-alpha):
+```bash
+/knowledge:restore-memory "Git Pre-Commit Hooks"   # Fuzzy search by title
+/knowledge:restore-memory --id=5                   # Restore by ID
+/knowledge:restore-memory --list                   # Show all archived entries
+```
+
+**Restoration tracking:**
+When entries are restored, the archive log is updated to track restorations:
+
+```markdown
+## Archive Log
+
+**2026-02-16:** Archived 5 entries (~340 tokens freed)
+- Git Pre-Commit Hooks (235 days old) **[Restored: 2026-02-20]**
+- Old Docker Pattern (187 days old)
+- Deprecated API Approach (156 days old)
+```
+
+Restored entries remain in the archive for historical record. The log tracks which entries have been restored and when, allowing you to:
+- See restoration history at a glance
+- Avoid duplicate restorations
+- Track knowledge lifecycle (archived → restored → potentially re-archived)
+
+**Manual restoration** (if preferred):
 1. Open `memory/MEMORY-archive.md`
 2. Copy desired section
 3. Paste into `MEMORY.md` at appropriate location
-4. Remove "Last updated:" date (or update to current)
-5. Commit: `git commit -m "docs(memory): restore [entry] from archive"`
-
-**Or use future command** (v0.0.4-alpha):
-```bash
-/knowledge:restore-memory "Git Pre-Commit Hooks"
-```
+4. Add "Restored: YYYY-MM-DD" timestamp
+5. Update archive log to mark entry as restored
+6. Commit: `git commit -m "docs(memory): restore [entry] from archive"`
 
 ---
 

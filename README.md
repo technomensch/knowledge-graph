@@ -2,8 +2,8 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.0.3-alpha
-**Status:** Automation & Memory Management Release - Testing & Feedback
+**Version:** 0.0.4-alpha
+**Status:** MEMORY.md Restore Capability Release - Testing & Feedback
 
 ---
 
@@ -93,7 +93,7 @@ See [tests/README.md](tests/README.md) for detailed testing documentation.
 
 ---
 
-## Commands (16 Total)
+## Commands (18 Total)
 
 ### Configuration & Management
 - `/knowledge:init` — Initialize new knowledge graph with wizard
@@ -113,6 +113,10 @@ See [tests/README.md](tests/README.md) for detailed testing documentation.
 - `/knowledge:sync-all` — Automated full sync pipeline
 - `/knowledge:update-issue-plan` — Sync KG → plan → issue → GitHub
 - `/knowledge:recall` — Search across all memory systems
+
+### Memory Management
+- `/knowledge:archive-memory` — Archive stale MEMORY.md entries
+- `/knowledge:restore-memory` — Restore archived entries
 
 ### Privacy & Security
 - `/knowledge:configure-sanitization` — Set up pre-commit hooks

@@ -7,6 +7,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.4-alpha] - 2026-02-16
+
+### Added
+- **`/knowledge:restore-memory` Command** - Restore archived MEMORY.md entries
+  - Fuzzy search by entry title using `fuzzy-search-archive.sh` helper script
+  - Restore by entry ID/index with `--id` flag
+  - List all archived entries with `--list` flag
+  - Preview entry content before restoring
+  - Target section selection with `--section` flag (auto-detect or user-specified)
+  - Dry-run mode with `--dry-run` flag for previewing without writing
+  - Token limit checking (blocks if would exceed 2,000 tokens, warns if > 1,500)
+  - Archive log restoration tracking (marks entries as "Restored: YYYY-MM-DD")
+  - Commits both MEMORY.md and MEMORY-archive.md with descriptive message
+- **Fuzzy Search Script** - `scripts/fuzzy-search-archive.sh`
+  - Four-tier ranking strategy: exact match, starts-with, contains-all words, contains-any word
+  - Case-insensitive search with word-based fuzzy matching
+  - Returns ranked list of matching entry IDs and titles
+- **Architecture Decision Record** - `docs/decisions/ADR-001-defer-memory-rules-engine.md`
+  - Documents decision to defer rules engine and smart summarization to v0.0.5-alpha
+  - Analyzes three options: rules+restore (medium scope), full automation (all features), restore only (minimal scope)
+  - Rationale: Archive without restore is incomplete UX, rules need real-world patterns, maintain velocity
+
+### Changed
+- **Version**: 0.0.3-alpha → 0.0.4-alpha
+- **Command Count**: 17 → 18 (added restore-memory)
+- **`/knowledge:archive-memory` Command** - Enhanced with restoration tracking
+  - Archive log now shows restoration timestamps: "[Restored: YYYY-MM-DD]"
+  - Restored entries remain in archive for historical record
+  - Documents restore workflow and manual restoration process
+- **knowledge-graph-usage skill** - Added restore workflow documentation
+  - When to restore archived entries (context needed for current work)
+  - Restore vs archive decision criteria
+  - Integration with archive-memory command
+
+### Documentation
+- Added implementation plan: `docs/plans/v0.0.4-alpha-plan.md`
+  - Complete 3-phase implementation breakdown
+  - 27 verification checkboxes across 4 categories
+  - Timeline estimation (2-3 days)
+- Updated ROADMAP.md with v0.0.4-alpha section
+- Updated README.md command count and status
+
+### Deferred
+- **MEMORY.md auto-sync rules engine** (deferred to v0.0.5-alpha)
+  - YAML-based pattern matching for automated sync decisions
+  - Global defaults + per-KG overrides
+  - Confidence scoring system
+- **Smart summarization** (deferred to v0.0.5-alpha)
+  - LLM-powered entry consolidation
+  - Batch processing or on-demand
+  - Merge similar entries strategy
+
 ## [0.0.3-alpha] - 2026-02-16
 
 ### Added
