@@ -1,5 +1,5 @@
 #!/bin/bash
-# install-vscode.sh — Auto-install knowledge-graph-plugin for VSCode Extension
+# install-vscode.sh — Auto-install knowledge-graph for VSCode Extension
 #
 # The VSCode extension doesn't support --plugin-dir like the CLI does.
 # This script symlinks skills into ~/.claude/skills/ for discovery.
@@ -13,7 +13,7 @@ PLUGIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILLS_DIR="$PLUGIN_DIR/skills"
 TARGET_DIR="$HOME/.claude/skills"
 
-echo "🔗 Installing knowledge-graph-plugin for VSCode Extension"
+echo "🔗 Installing knowledge-graph for VSCode Extension"
 echo "   Plugin: $PLUGIN_DIR"
 echo "   Target: $TARGET_DIR"
 echo ""

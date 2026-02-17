@@ -133,6 +133,29 @@
 
 ---
 
+## v0.0.6-alpha (Released: 2026-02-17)
+
+**Status**: ✅ Complete - Distribution Hygiene Release
+**Branch**: `v0.0.6-alpha`
+
+### Scope: files allowlist for clean marketplace distribution
+
+- ✅ Root `package.json` with `files` allowlist (npm-standard distribution hygiene)
+- ✅ `docs/` excluded from distribution without any directory rename
+- ✅ Fixed stale `kg-config.json` path (knowledge-graph-plugin → knowledge-graph)
+- ✅ Fixed stale GitHub URLs throughout repo
+- ✅ Added developer vs. distribution table to README
+
+### Deferred to v0.0.7
+- Plugin name consolidation `"knowledge"` → `"knowledge-graph"`
+- grep+sed → jq refactor in hook scripts
+
+### Key Deliverables
+- **Distribution size**: Reduced by excluding docs/, tests/ from installed package
+- **No breaking changes**: docs/ path unchanged; all commands and scripts unaffected
+
+---
+
 ## v0.0.5-alpha (Released: 2026-02-17)
 
 **Status**: ✅ Complete - Validation & Issue Tracking Release
@@ -674,8 +697,8 @@ Ideas for community-driven enhancements:
 
 ## Feedback & Feature Requests
 
-- **GitHub Issues**: https://github.com/technomensch/knowledge-graph-plugin/issues
-- **Discussions**: https://github.com/technomensch/knowledge-graph-plugin/discussions
+- **GitHub Issues**: https://github.com/technomensch/knowledge-graph/issues
+- **Discussions**: https://github.com/technomensch/knowledge-graph/discussions
 - **Priority Voting**: Community can upvote features in Discussions
 
 **Decision Criteria**:
@@ -687,4 +710,4 @@ Ideas for community-driven enhancements:
 ---
 
 *Last updated: 2026-02-17*
-*Plugin Version: 0.0.5-alpha (Validation & Issue Tracking Release)*
+*Plugin Version: 0.0.6-alpha (Distribution Hygiene Release)*

@@ -1,6 +1,6 @@
 #!/bin/bash
 # validate-plugin.sh
-# Sanitization validator for knowledge-graph-plugin
+# Sanitization validator for knowledge-graph
 # Scans all plugin files for project-specific references
 
 set -e

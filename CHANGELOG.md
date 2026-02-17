@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.6-alpha] - 2026-02-17
+
+### Added
+- Root `package.json` with `files` allowlist — implements npm-standard distribution
+  hygiene so marketplace-installed plugin excludes developer-only content:
+  - `docs/` (plugin developer's knowledge graph: decisions, lessons, KG entries)
+  - `tests/` (internal test suite)
+  - Root development files (ROADMAP.md, etc.)
+  `docs/` directory remains in git unchanged; no path changes to commands or scripts.
+
+### Fixed
+- Stale `kg-config.json` path: `knowledge-graph-plugin/docs` → `knowledge-graph/docs`
+  (repo was renamed in v0.0.3 but local config was never updated)
+- Stale GitHub URLs: updated `knowledge-graph-plugin` → `knowledge-graph` in CHANGELOG
+  footer, ROADMAP feedback links, README install example, tests/README, and scripts
+
+### Documentation
+- Added developer vs. distribution table to README.md
+- Updated ROADMAP.md with v0.0.6-alpha section
+
+**Version**: 0.0.5-alpha → 0.0.6-alpha
+
 ## [0.0.5-alpha] - 2026-02-17
 
 ### Added
@@ -299,6 +321,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Planned Features (v1.0.0)
 - TBD
 
-[Unreleased]: https://github.com/technomensch/knowledge-graph-plugin/compare/v0.0.1-alpha...HEAD
-[0.0.1-alpha]: https://github.com/technomensch/knowledge-graph-plugin/releases/tag/v0.0.1-alpha
-[1.0.0]: https://github.com/technomensch/knowledge-graph-plugin/releases/tag/v1.0.0
+[Unreleased]: https://github.com/technomensch/knowledge-graph/compare/v0.0.1-alpha...HEAD
+[0.0.1-alpha]: https://github.com/technomensch/knowledge-graph/releases/tag/v0.0.1-alpha
+[1.0.0]: https://github.com/technomensch/knowledge-graph/releases/tag/v1.0.0

@@ -114,4 +114,4 @@ These tests are also useful for plugin developers:
 ## Contributing
 
 If you find issues with these tests or want to add more test coverage, please open an issue or PR at:
-https://github.com/technomensch/knowledge-graph-plugin/issues
+https://github.com/technomensch/knowledge-graph/issues

@@ -2,8 +2,8 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.0.5-alpha
-**Status:** Validation & Issue Tracking Release - Testing & Feedback
+**Version:** 0.0.6-alpha
+**Status:** Distribution Hygiene Release
 
 ---
 
@@ -34,7 +34,7 @@ A Claude Code plugin that provides:
 
 ```bash
 # Clone or copy this repository
-cd /path/to/knowledge-graph-plugin
+cd /path/to/knowledge-graph
 
 # Test locally (MCP server builds automatically on first session start)
 claude --plugin-dir .
@@ -44,7 +44,7 @@ claude --plugin-dir .
 
 ```bash
 # Add marketplace (after publication)
-/plugin marketplace add technomensch/knowledge-graph-plugin
+/plugin marketplace add technomensch/knowledge-graph
 
 # Install plugin from tm-sis marketplace
 /plugin install knowledge@tm-sis
@@ -218,7 +218,7 @@ All knowledge graph commands use the `knowledge:` namespace:
 
 ### Directory Structure
 ```
-knowledge-graph-plugin/
+knowledge-graph/
 ├── .claude-plugin/           # Plugin manifest
 ├── commands/                 # 19 commands (manual invocation)
 ├── agents/                   # Subagents (knowledge-reviewer)
@@ -239,30 +239,41 @@ knowledge-graph-plugin/
 └── CHANGELOG.md              # Version history
 ```
 
+### Developer vs. Distribution Structure
+
+The root `package.json` `files` allowlist controls what is distributed when the plugin
+is installed from the marketplace. Developer-only content in `docs/` is excluded:
+
+| Directory    | In git | Distributed | Purpose                          |
+|--------------|--------|-------------|----------------------------------|
+| `commands/`  | ✅     | ✅          | Plugin commands                  |
+| `skills/`    | ✅     | ✅          | Plugin skills                    |
+| `core/`      | ✅     | ✅          | Platform-agnostic templates      |
+| `scripts/`   | ✅     | ✅          | Hook scripts                     |
+| `docs/`      | ✅     | ❌          | Plugin developer knowledge graph |
+| `tests/`     | ✅     | ❌          | Internal test suite              |
+
 ---
 
 ## Development Status
 
 See [ROADMAP.md](ROADMAP.md) for detailed version history and development progress.
 
-**Current Release:** v0.0.5-alpha (2026-02-17)
-- ✅ Knowledge Graph Usage Skill (~13,900 words total guidance)
-- ✅ Plugin documents itself (2 lessons captured)
-- ✅ Marketplace branding: tm-sis identity established
-- ✅ Comprehensive validation: 0 critical issues
-- ✅ Command filenames optimized (no redundant prefix)
+**Current Release:** v0.0.6-alpha (2026-02-17)
+- ✅ Root `package.json` with `files` allowlist (npm-standard distribution hygiene)
+- ✅ `docs/` and `tests/` excluded from marketplace distribution
+- ✅ Fixed stale `kg-config.json` path (knowledge-graph-plugin → knowledge-graph)
+- ✅ Fixed stale GitHub URLs throughout repo
 - ✅ 19 commands with automatic namespace handling
 - ✅ MCP server with 7 tools + 2 resources
 - ✅ Platform-agnostic core system
 
-**What's New in v0.0.5:**
-- `/knowledge:start-issue-tracking` — Full issue initialization workflow (19th command)
-- Fixed `.gitignore` inline comment bug (3 paths silently not ignored)
-- Removed orphaned `mcp-server/.claude-plugin/` artifact directory
-- Removed root-level `node_modules/` with no root `package.json`
-- Standardized command frontmatter (removed `name` field from 3 commands)
-- Fixed first `SessionStart` hook entry missing `comment` field
-- Fixed session-summary template not wrapped in fenced code block
+**What's New in v0.0.6:**
+- Root `package.json` with `files` allowlist — `docs/`, `tests/` excluded from
+  marketplace distribution (npm-standard distribution hygiene)
+- Fixed stale `kg-config.json` path (knowledge-graph-plugin → knowledge-graph)
+- Fixed stale GitHub URLs in CHANGELOG, ROADMAP, README, tests, and scripts
+- Added developer vs. distribution table to README
 
 **Next:** v1.0.0 stable release (Q2 2026) incorporating alpha feedback
 

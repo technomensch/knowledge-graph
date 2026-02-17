@@ -10,7 +10,7 @@ This guide walks you through setting up the Knowledge Graph plugin after install
 
 ```bash
 # Start Claude Code with the plugin
-claude --plugin-dir /path/to/knowledge-graph-plugin
+claude --plugin-dir /path/to/knowledge-graph
 
 # Skills will be available immediately (no additional setup needed)
 /knowledge:init
@@ -21,7 +21,7 @@ claude --plugin-dir /path/to/knowledge-graph-plugin
 The VSCode extension doesn't support `--plugin-dir` natively. Use the auto-install script:
 
 ```bash
-cd /path/to/knowledge-graph-plugin
+cd /path/to/knowledge-graph
 bash scripts/install-vscode.sh
 ```
 
