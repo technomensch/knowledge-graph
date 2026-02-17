@@ -129,7 +129,43 @@
 ### Next Steps
 - 🔄 Alpha testing restore workflow and feedback collection
 - ⏳ Gather real-world MEMORY.md patterns from v0.0.3/v0.0.4 usage
-- ⏳ v0.0.5-alpha planning (rules engine with observed patterns)
+- ✅ v0.0.5-alpha released (validation fixes + issue tracking command)
+
+---
+
+## v0.0.5-alpha (Released: 2026-02-17)
+
+**Status**: ✅ Complete - Validation & Issue Tracking Release
+**Branch**: `v0.0.5-alpha`
+
+### Scope: Validation Fixes + Issue Tracking Command
+
+#### Changes
+- ✅ `/knowledge:start-issue-tracking` — Full issue initialization workflow (19th command)
+  - Ported from optimize-my-resume, sanitized for cross-project portability
+  - LLM-platform-agnostic (no Claude-specific API calls)
+  - Auto-detects: parent branch, version from git, issue type, next issue number
+  - Smart defaults reduce prompts to 1 (issue description)
+  - Creates issue directory structure under `{active_kg_path}/issues/`
+  - Generates issue.md with metadata, git branch, KG sync
+  - Integrates with `/knowledge:update-issue-plan` and `/knowledge:link-issue`
+- ✅ Fixed `.gitignore` inline comment bug (silently prevented 3 paths from being ignored)
+- ✅ Removed orphaned `mcp-server/.claude-plugin/` artifact directory
+- ✅ Removed root-level `node_modules/` with no root `package.json`
+- ✅ Standardized command frontmatter (removed `name` field from 3 commands)
+- ✅ Fixed dangling `/knowledge:start-issue-tracking` references in `update-issue-plan.md`
+- ✅ Fixed first `SessionStart` hook entry missing `comment` field
+- ✅ Fixed session-summary template not fenced in code block
+- ✅ Confirmed: `SessionStart` hook event name is valid and working
+
+### Deferred to v0.0.6
+- grep+sed → jq refactor in hook scripts (higher-risk refactoring)
+- Plugin name consolidation `"knowledge"` → `"knowledge-graph"` (requires coordinated settings updates)
+
+### Key Deliverables
+- **Commands**: 19 total (added start-issue-tracking)
+- **Validation**: 0 critical issues, 4 major fixed, 11 warnings addressed
+- **Timeline**: Same-day release alongside v0.0.4-alpha
 
 ---
 
@@ -650,5 +686,5 @@ Ideas for community-driven enhancements:
 
 ---
 
-*Last updated: 2026-02-16*
-*Plugin Version: 0.0.2-alpha (Validation & Enhancement Release)*
+*Last updated: 2026-02-17*
+*Plugin Version: 0.0.5-alpha (Validation & Issue Tracking Release)*

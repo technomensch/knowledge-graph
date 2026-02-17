@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.5-alpha] - 2026-02-17
+
+### Added
+- `/knowledge:start-issue-tracking` command (19th command) — Full issue initialization
+  workflow, fully ported from prior project and sanitized for cross-project portability
+  and LLM-platform-agnostic use. Features:
+  - Auto-detects parent branch, version from git tag, issue type, and next issue number
+    from existing `issues/` directory
+  - Smart defaults reduce interactive prompts to 1 (issue description only)
+  - Creates structured directory under `{active_kg_path}/issues/{number}-{slug}/`
+  - Generates `issue.md` with full metadata (title, type, branch, version, date, scope)
+  - Git branch creation: `git checkout -b issue/{number}-{slug}`
+  - Knowledge graph synchronization via `/knowledge:update-issue-plan`
+  - Integrates with `/knowledge:link-issue` and `/knowledge:meta-issue`
+  - No project-specific dependencies; uses KG config for all path resolution
+
+### Fixed
+- `.gitignore` inline comments on pattern lines (3 paths were silently not being ignored
+  because git does not support inline comments on pattern lines)
+- Truncated marketplace slug `stayinginsync-knowledge-grap` (missing trailing `h`) in
+  `.claude/settings.json` and plugin cache `settings.json` — caused plugin-not-found
+  errors on every session start
+- Dangling `/knowledge:start-issue-tracking` references in `commands/update-issue-plan.md`
+  (lines ~61 and ~203) now resolve to the newly created command
+- First `SessionStart` hook entry (check-memory.sh) missing `comment` field
+- Session-summary command markdown template embedded as raw prose instead of fenced
+  code block, causing visual ambiguity between instruction and template content
+- Standardized command frontmatter: removed `name` field from `recall.md`, `list.md`,
+  and `session-summary.md` for consistency with all other 16 commands
+
+### Removed
+- Empty `mcp-server/.claude-plugin/` artifact directory (leftover from refactoring,
+  risked being parsed as a nested plugin by plugin discovery tools)
+- Orphaned root-level `node_modules/` directory (no root `package.json` exists;
+  packages were installed by mistake at an earlier point)
+
+### Documentation
+- Added `docs/lessons-learned/architecture/.gitkeep` and
+  `docs/lessons-learned/patterns/.gitkeep` to preserve empty tracked directories
+- Updated ROADMAP.md with v0.0.5-alpha section
+- Updated README.md version, status line, and command count (18 → 19)
+- Added implementation plan: `docs/plans/v0.0.5-alpha-plan.md`
+
+**Version**: 0.0.4-alpha → 0.0.5-alpha
+
 ## [0.0.4-alpha] - 2026-02-16
 
 ### Added

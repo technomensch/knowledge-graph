@@ -1,5 +1,4 @@
 ---
-name: knowledge:session-summary
 description: Create a summary of the current active chat session
 ---
 
@@ -136,6 +135,7 @@ Recommendation: Create summary now? [y/n]
 **Action:**
 Read and use the following template
 
+```markdown
 # Session: [Auto-Generated Title]
 
 **Date:** YYYY-MM-DD
@@ -168,9 +168,7 @@ Read and use the following template
 
 ## Commits Created
 
-```bash
 [commit hashes and messages]
-```
 
 ## Lessons Learned
 
@@ -191,6 +189,7 @@ Read and use the following template
 - Files read: Y
 - Commits: Z
 - Tokens used: ~XXK
+```
 
 
 ### Step 4: Present Draft to User

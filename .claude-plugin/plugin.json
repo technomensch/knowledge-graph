@@ -1,13 +1,13 @@
 {
   "name": "knowledge",
-  "version": "0.0.4-alpha",
+  "version": "0.0.5-alpha",
   "description": "Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects. Includes KG entries, ADRs, meta-issue tracking, chat extraction, and MEMORY.md bidirectional sync.",
   "author": {
     "name": "technomensch",
     "url": "https://github.com/technomensch",
     "email": "technomensch@stayinginsync.info"
   },
-  "repository": "https://github.com/technomensch/knowledge-graph-plugin",
+  "repository": "https://github.com/technomensch/knowledge-graph",
   "license": "MIT",
   "keywords": [
     "knowledge",
