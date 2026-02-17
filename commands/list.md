@@ -1,5 +1,4 @@
 ---
-name: knowledge:list
 description: Display all configured knowledge graphs from ~/.claude/kg-config.json
 ---
 

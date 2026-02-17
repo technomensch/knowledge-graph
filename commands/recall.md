@@ -1,5 +1,4 @@
 ---
-name: knowledge:recall
 description: Search across project memory systems (lessons, decisions, knowledge graph, sessions)
 ---
 

@@ -2,8 +2,8 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.0.4-alpha
-**Status:** MEMORY.md Restore Capability Release - Testing & Feedback
+**Version:** 0.0.5-alpha
+**Status:** Validation & Issue Tracking Release - Testing & Feedback
 
 ---
 
@@ -93,7 +93,7 @@ See [tests/README.md](tests/README.md) for detailed testing documentation.
 
 ---
 
-## Commands (18 Total)
+## Commands (19 Total)
 
 ### Configuration & Management
 - `/knowledge:init` — Initialize new knowledge graph with wizard
@@ -107,6 +107,7 @@ See [tests/README.md](tests/README.md) for detailed testing documentation.
 - `/knowledge:meta-issue` — Track complex multi-attempt problems
 - `/knowledge:session-summary` — Summarize current session
 - `/knowledge:extract-chat` — Extract Claude/Gemini chat history
+- `/knowledge:start-issue-tracking` — Initialize issue tracking with structured docs and Git branch
 
 ### Knowledge Sync
 - `/knowledge:update-graph` — Extract KG entries from lessons
@@ -219,7 +220,7 @@ All knowledge graph commands use the `knowledge:` namespace:
 ```
 knowledge-graph-plugin/
 ├── .claude-plugin/           # Plugin manifest
-├── commands/                 # 17 commands (manual invocation)
+├── commands/                 # 19 commands (manual invocation)
 ├── agents/                   # Subagents (knowledge-reviewer)
 ├── hooks/                    # SessionStart hooks
 ├── scripts/                  # Helper scripts
@@ -244,23 +245,24 @@ knowledge-graph-plugin/
 
 See [ROADMAP.md](ROADMAP.md) for detailed version history and development progress.
 
-**Current Release:** v0.0.3-alpha (2026-02-16)
+**Current Release:** v0.0.5-alpha (2026-02-17)
 - ✅ Knowledge Graph Usage Skill (~13,900 words total guidance)
 - ✅ Plugin documents itself (2 lessons captured)
 - ✅ Marketplace branding: tm-sis identity established
 - ✅ Comprehensive validation: 0 critical issues
 - ✅ Command filenames optimized (no redundant prefix)
-- ✅ 17 commands with automatic namespace handling
+- ✅ 19 commands with automatic namespace handling
 - ✅ MCP server with 7 tools + 2 resources
 - ✅ Platform-agnostic core system
 
-**What's New in v0.0.3:**
-- Autonomous triggering in knowledge-graph-usage skill
-- Post-commit hook for lesson-worthy commits
-- Duplicate detection pre-flight before lesson capture
-- Token-based MEMORY.md limits (1,500/2,000 tokens)
-- `/knowledge:archive-memory` command for bloat prevention
-- SessionStart notifications (recent lessons + memory changes)
+**What's New in v0.0.5:**
+- `/knowledge:start-issue-tracking` — Full issue initialization workflow (19th command)
+- Fixed `.gitignore` inline comment bug (3 paths silently not ignored)
+- Removed orphaned `mcp-server/.claude-plugin/` artifact directory
+- Removed root-level `node_modules/` with no root `package.json`
+- Standardized command frontmatter (removed `name` field from 3 commands)
+- Fixed first `SessionStart` hook entry missing `comment` field
+- Fixed session-summary template not wrapped in fenced code block
 
 **Next:** v1.0.0 stable release (Q2 2026) incorporating alpha feedback
 

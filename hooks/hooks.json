@@ -6,6 +6,7 @@
         "hooks": [
           {
             "type": "command",
+            "comment": "Validate KG configuration and display active knowledge graph status",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/check-memory.sh",
             "timeout": 60
           },

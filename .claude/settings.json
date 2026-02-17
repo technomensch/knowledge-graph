@@ -1,3 +1,5 @@
 {
-  "enabledPlugins": {}
+  "enabledPlugins": {
+    "knowledge@stayinginsync-knowledge-graph": true
+  }
 }

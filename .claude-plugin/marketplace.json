@@ -1,23 +1,25 @@
 {
-  "name": "tm-sis",
-  "description": "Plugin marketplace for technomensch-stayinginsync",
+  "name": "stayinginsync-knowledge-graph", 
+  "version": "1.0.0",
+  "description": "Marketplace for the knowledge graph plugin — structured knowledge capture and cross-session memory for Claude Code projects.",
   "owner": {
-    "name": "technomensch-stayinginsync",
+    "name": "technomensch",
     "url": "https://github.com/technomensch",
     "email": "technomensch@stayinginsync.info"
   },
   "plugins": [
     {
       "name": "knowledge",
-      "description": "Build a platform-agnostic knowledge base across sessions with any LLM—capture lessons learned, track decisions, and build institutional memory.",
-      "version": "0.0.2-alpha",
+      "version": "0.0.5-alpha",
+      "description": "Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects. Includes KG entries, ADRs, meta-issue tracking, chat extraction, and MEMORY.md bidirectional sync.",
       "source": "./",
       "author": {
         "name": "technomensch",
-        "url": "https://github.com/technomensch",
-        "email": "technomensch@stayinginsync.info"
+        "url": "https://github.com/technomensch"
       },
-      "homepage": "https://github.com/technomensch/knowledge-graph-plugin"
+      "repository": "https://github.com/technomensch/knowledge-graph",
+      "license": "MIT",
+      "keywords": ["knowledge", "lessons-learned", "memory", "documentation", "governance", "meta-issue", "adr"]
     }
   ]
 }

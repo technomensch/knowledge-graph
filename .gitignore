@@ -32,11 +32,13 @@ dist/
 build/
 *.tgz
 
-# Internal development plans
-docs/plans/
-
 # Knowledge Graph - selective strategy
-docs/lessons-learned/debugging/  # Personal debugging notes
-docs/sessions/                    # Session summaries (always private)
-docs/chat-history/                # Chat exports (always private)
+# Personal debugging notes
+docs/lessons-learned/debugging/
+# Session summaries (always private)
+docs/sessions/
+# Chat exports (always private)
+docs/chat-history/
+# Implementation plans (local only)
+docs/plans/
 # Note: architecture/ and patterns/ are committed for team sharing
