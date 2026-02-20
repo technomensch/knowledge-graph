@@ -20,6 +20,7 @@ __pycache__/
 *~
 
 # Development
+.agent
 *.log
 .env
 .env.local

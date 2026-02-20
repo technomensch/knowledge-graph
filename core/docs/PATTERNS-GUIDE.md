@@ -514,6 +514,54 @@ Before finalizing a knowledge entry:
 
 ---
 
+## MEMORY.md System
+
+### What is MEMORY.md?
+
+A special file that syncs your most important patterns to Claude's persistent memory.
+
+**Location**: `/MEMORY.md` in your knowledge graph root
+
+### How It Works
+
+1. You capture lessons and patterns over time
+2. Run `/knowledge:update-graph` (extracts patterns from lessons)
+3. Top patterns written to `MEMORY.md`
+4. Claude reads `MEMORY.md` at session start
+5. Claude "remembers" your patterns automatically
+
+### MEMORY.md Lifecycle
+
+**Active** (`MEMORY.md`):
+- Current, frequently-used patterns
+- Target: <200 lines (keeps Claude context efficient)
+- Updated by `/knowledge:update-graph`
+
+**Archived** (`MEMORY-archive.md`):
+- Older patterns, still valid but less used
+- Moved by `/knowledge:archive-memory`
+- Retrievable via `/knowledge:restore-memory`
+
+### Managing MEMORY.md
+
+**When to archive**:
+- MEMORY.md exceeds 200 lines
+- Patterns become less relevant over time
+- New project phase (archive old patterns)
+
+**When to restore**:
+- Need archived pattern again
+- Returning to previous project phase
+- Team member needs historical context
+
+**Commands**:
+- `/knowledge:archive-memory` - Move entries to archive
+- `/knowledge:restore-memory` - Bring back archived entries
+
+See [Command Guide](../../docs/COMMAND-GUIDE.md) for details.
+
+---
+
 ## Related Documentation
 
 **Resources**:

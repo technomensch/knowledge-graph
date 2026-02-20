@@ -334,8 +334,12 @@ MIT License - See [LICENSE](LICENSE)
 
 ## Documentation
 
+📚 **Lost?** See the [Navigation Index](docs/NAVIGATION-INDEX.md) for complete sitemap and decision trees.
+
 **New users**:
 - [Getting Started](docs/GETTING-STARTED.md) - Installation and first steps
+
+**Concepts**:
 - [Concepts Guide](docs/CONCEPTS.md) - What is a knowledge graph?
 - [Quick Reference](docs/CHEAT-SHEET.md) - One-page cheat sheet
 
@@ -352,7 +356,6 @@ MIT License - See [LICENSE](LICENSE)
 **Resources**:
 - [Templates](core/templates/) - Starting scaffolds
 - [Examples](core/examples/) - Real-world samples
-<!-- NAVIGATION-INDEX link will be added in Session 9 after the file is created -->
 
 ---
 
