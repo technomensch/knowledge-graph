@@ -111,19 +111,17 @@ Execute Sessions 2+3 simultaneously, then Sessions 4+5 simultaneously (see [Para
    Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
    ```
 
-4. **Push**: To remote
+4. **Push**: To remote for review
    ```bash
    git push -u origin v0.0.7-alpha-p1-s1
    ```
 
-5. **Merge**: Back to base
-   ```bash
-   git checkout v0.0.7-alpha-gitbook-docs
-   git merge v0.0.7-alpha-p1-s1
-   git push origin v0.0.7-alpha-gitbook-docs
-   ```
+5. **Review**: Branch remains open for manual review
+   - **DO NOT** merge automatically
+   - Branches will be merged manually after review
+   - This allows for parallel session execution and better change control
 
-6. **Next**: Start next session from updated base
+6. **Next**: Start next session from base (sessions can run in parallel)
 
 ---
 
