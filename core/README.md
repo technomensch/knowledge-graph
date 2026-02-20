@@ -158,14 +158,27 @@ Use these as inspiration for your own knowledge entries.
 
 ---
 
-## Documentation
+## Related Documentation
 
-- **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - System design and concepts
-- **[PATTERNS-GUIDE.md](./docs/PATTERNS-GUIDE.md)** - Writing good knowledge entries
-- **[WORKFLOWS.md](./docs/WORKFLOWS.md)** - Manual workflows for non-platform users
-- **[META-ISSUE-GUIDE.md](./docs/META-ISSUE-GUIDE.md)** - Complex problem tracking
-- **[PLATFORM-ADAPTATION.md](./docs/PLATFORM-ADAPTATION.md)** - Adapting for your platform
-- **[SANITIZATION-CHECKLIST.md](./docs/SANITIZATION-CHECKLIST.md)** - Privacy before sharing
+**Getting Started**:
+- [Installation Guide](../docs/GETTING-STARTED.md) - First-time setup
+- [Quick Reference](../docs/CHEAT-SHEET.md) - One-page command cheat sheet
+
+**Concepts & Guides**:
+- [Concepts Guide](../docs/CONCEPTS.md) - Plain-English term explanations
+- [Command Reference](../docs/COMMAND-GUIDE.md) - All commands with examples
+- [Pattern Writing](./docs/PATTERNS-GUIDE.md) - Writing effective entries
+
+**Core Docs**:
+- [Architecture](./docs/ARCHITECTURE.md) - System design and concepts
+- [Workflows](./docs/WORKFLOWS.md) - Manual workflows for non-platform users
+- [Meta-Issue Guide](./docs/META-ISSUE-GUIDE.md) - Complex problem tracking
+- [Sanitization](./docs/SANITIZATION-CHECKLIST.md) - Privacy before sharing
+- [Platform Adaptation](./docs/PLATFORM-ADAPTATION.md) - Adapting for your platform
+
+**Resources**:
+- [Templates](./templates/) - Starting scaffolds
+- [Examples](./examples/) - Real-world samples
 
 ---
 

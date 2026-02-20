@@ -1,5 +1,7 @@
 # Meta-Issue: [Problem Title]
 
+**Navigation**: [Home](../../../README.md) > [Getting Started](../../../docs/GETTING-STARTED.md) > [Manual Workflows](../../docs/WORKFLOWS.md) > Templates
+
 **Domain:** [architecture | performance | data | debugging]
 **Scope:** [version-range or "ongoing"]
 **Created:** YYYY-MM-DD
@@ -64,3 +66,13 @@
 4. **Extract lessons:** Create lessons-learned when patterns emerge
 5. **Sync to KG:** Run `/knowledge:update-graph` to extract insights
 
+---
+
+## Learn More
+
+**Concepts & Guides**:
+- [Concepts Guide](../../../docs/CONCEPTS.md#meta-issue) - Term explanations
+- [META-ISSUE-GUIDE.md](../../docs/META-ISSUE-GUIDE.md) - Full meta-issue guide
+
+**Resources**:
+- [Real Examples](../../examples/meta-issues/) - Real-world samples

@@ -1,5 +1,7 @@
 # Architecture Decision Records (ADRs)
 
+**Navigation**: [Home](../../../README.md) > [Getting Started](../../../docs/GETTING-STARTED.md) > [Manual Workflows](../../docs/WORKFLOWS.md) > Templates
+
 Formal documentation of significant architecture decisions.
 
 **Total ADRs:** 0
@@ -99,3 +101,14 @@ ADRs follow a lightweight format:
 - Standard sections: Context, Decision, Rationale, Consequences, Related
 - Status tracking (Proposed → Accepted → Deprecated/Superseded)
 
+---
+
+## Learn More
+
+**Concepts & Guides**:
+- [Concepts Guide](../../../docs/CONCEPTS.md#adr-architecture-decision-record) - Term explanations
+- [ADR template](ADR-template.md) - Starting scaffold
+
+**Resources**:
+- [Real Examples](../../examples/decisions/) - Filled-out ADRs
+- [Pattern Guide](../../docs/PATTERNS-GUIDE.md) - Writing quality tips

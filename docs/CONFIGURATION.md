@@ -285,12 +285,18 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 
 ---
 
-## Support & Resources
+## Related Documentation
 
-- **Quick Reference:** [CHEAT-SHEET.md](CHEAT-SHEET.md) — One-page command cheat sheet
-- **Documentation:** [core/docs/](../core/docs/)
-- **Examples:** [core/examples/](../core/examples/)
-- **Templates:** [core/templates/](../core/templates/)
-- **Platform Adaptation:** [core/docs/PLATFORM-ADAPTATION.md](../core/docs/PLATFORM-ADAPTATION.md)
+**Getting Started**:
+- [Installation Guide](GETTING-STARTED.md) - First-time setup
+- [Quick Reference](CHEAT-SHEET.md) - One-page command cheat sheet
+
+**Guides & References**:
+- [Command Reference](COMMAND-GUIDE.md) - All commands with examples
+- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) - AI assistant integration
+
+**Resources**:
+- [Templates](../core/templates/) - Starting scaffolds
+- [Examples](../core/examples/) - Real-world samples
 
 Questions? Check the examples or adapt the framework to your needs.

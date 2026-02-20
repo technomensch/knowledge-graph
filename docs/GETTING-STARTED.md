@@ -82,9 +82,10 @@ Expected output now shows: `1 lesson`
 
 ### Next Steps for Claude Code Users
 
-1. Review the [Essential Commands](COMMAND-GUIDE.md#essential-commands) (5 minutes)
-2. Browse [examples](../core/examples/) to see what fully-completed entries look like
-3. Set up [sanitization](CONFIGURATION.md#privacy--public-sharing) before sharing knowledge entries with a team
+**Next steps**:
+- Learn commands: [Essential Commands](COMMAND-GUIDE.md#essential-commands)
+- See examples: [Real-World Examples](../core/examples/)
+- Set up sharing: [Sanitization](CONFIGURATION.md#privacy--public-sharing)
 
 ---
 
@@ -196,9 +197,10 @@ The AI assistant uses the template to create a structured entry in `docs/lessons
 
 ### Next Steps for AI Assistant Users
 
-1. Read [Manual Workflows](../core/docs/WORKFLOWS.md) for detailed step-by-step guides
-2. Review [Platform Adaptation Guide](../core/docs/PLATFORM-ADAPTATION.md) for platform-specific configuration tips
-3. Study [examples](../core/examples/) to understand what complete entries look like
+**Next steps**:
+- See platform tips: [Platform Adaptation Guide](../core/docs/PLATFORM-ADAPTATION.md)
+- Follow manual workflows: [Workflows Guide](../core/docs/WORKFLOWS.md)
+- See examples: [Real-World Examples](../core/examples/)
 
 ---
 
@@ -278,10 +280,10 @@ git commit -m "docs: add first lesson"
 
 ### Next Steps for Manual Users
 
-1. Read [Manual Workflows](../core/docs/WORKFLOWS.md) for guides covering all 9 workflow types
-2. Set up [shell aliases](../core/docs/WORKFLOWS.md#tips-and-shortcuts) for faster day-to-day use
-3. Study [examples](../core/examples/) for inspiration on what complete entries look like
-4. Read the [Pattern Writing Guide](../core/docs/PATTERNS-GUIDE.md) to improve entry quality over time
+**Next steps**:
+- Follow all 9 workflows: [Manual Workflows Guide](../core/docs/WORKFLOWS.md)
+- Speed up with aliases: [Tips & Shortcuts](../core/docs/WORKFLOWS.md#tips-and-shortcuts)
+- Improve quality: [Pattern Writing Guide](../core/docs/PATTERNS-GUIDE.md)
 
 ---
 

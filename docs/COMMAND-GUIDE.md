@@ -996,11 +996,22 @@ git checkout -b issue/N-description
 
 ## Related Documentation
 
-- **[Quick Reference](CHEAT-SHEET.md)** — One-page command cheat sheet
-- **[Concepts Guide](CONCEPTS.md)** — Plain-English term explanations
-- **[Configuration Guide](CONFIGURATION.md)** — Installation and configuration
-- **[Platform Adaptation Guide](../core/docs/PLATFORM-ADAPTATION.md)** — Using outside Claude Code
-- **[Workflows Guide](../core/docs/WORKFLOWS.md)** — Core workflow reference
+**Quick help**:
+- [Cheat Sheet](CHEAT-SHEET.md) - One-page quick reference
+- [Concepts](CONCEPTS.md) - Term definitions
+
+**Writing better entries**:
+- [Patterns Guide](../core/docs/PATTERNS-GUIDE.md) - Quality standards
+- [Templates](../core/templates/) - Structured formats
+- [Examples](../core/examples/) - Real samples
+
+**Getting started**:
+- [Installation](GETTING-STARTED.md) - Setup guide
+- [Configuration](CONFIGURATION.md) - Post-install
+
+**Manual workflows**:
+- [Workflows](../core/docs/WORKFLOWS.md) - Non-Claude processes
+- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) - AI integrations
 
 ---
 

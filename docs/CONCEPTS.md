@@ -505,20 +505,21 @@ MEMORY.md works best under 200 lines. When it grows beyond that threshold:
 
 ---
 
-## Related Documentation
+## Next Steps
 
-**Getting started**:
-- [Getting Started Guide](GETTING-STARTED.md) — Installation and first steps
-- [Quick Reference](CHEAT-SHEET.md) — One-page command cheat sheet
+**New to knowledge graphs?**
+1. Read [Getting Started](GETTING-STARTED.md)
+2. Try the [Quick Reference](CHEAT-SHEET.md)
+3. Capture your first lesson
 
 **Going deeper**:
-- [Architecture Guide](../core/docs/ARCHITECTURE.md) — How the system is designed
-- [Pattern Writing Guide](../core/docs/PATTERNS-GUIDE.md) — Writing effective entries
-- [Command Reference](COMMAND-GUIDE.md) — All 19 commands with examples
+- [Architecture Guide](../core/docs/ARCHITECTURE.md) - How the system is designed
+- [Pattern Writing Guide](../core/docs/PATTERNS-GUIDE.md) - Writing effective entries
+- [Command Reference](COMMAND-GUIDE.md) - All 19 commands with examples
 
 **For non-Claude users**:
-- [Manual Workflows](../core/docs/WORKFLOWS.md) — Step-by-step processes without automation
-- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Cursor, Continue, Aider integration
+- [Manual Workflows](../core/docs/WORKFLOWS.md) - Step-by-step processes without automation
+- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) - Cursor, Continue, Aider integration
 
 ---
 

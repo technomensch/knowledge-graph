@@ -332,6 +332,30 @@ MIT License - See [LICENSE](LICENSE)
 
 ---
 
+## Documentation
+
+**New users**:
+- [Getting Started](docs/GETTING-STARTED.md) - Installation and first steps
+- [Concepts Guide](docs/CONCEPTS.md) - What is a knowledge graph?
+- [Quick Reference](docs/CHEAT-SHEET.md) - One-page cheat sheet
+
+**Command reference**:
+- [Command Guide](docs/COMMAND-GUIDE.md) - All 19 commands with learning path
+- [Essential Commands](docs/COMMAND-GUIDE.md#essential-commands) - Start here
+
+**Guides**:
+- [Configuration](docs/CONFIGURATION.md) - Post-install setup
+- [Platform Adaptation](core/docs/PLATFORM-ADAPTATION.md) - Cursor, Continue, Aider, etc.
+- [Pattern Writing](core/docs/PATTERNS-GUIDE.md) - Writing effective entries
+- [Manual Workflows](core/docs/WORKFLOWS.md) - Non-Claude workflows
+
+**Resources**:
+- [Templates](core/templates/) - Starting scaffolds
+- [Examples](core/examples/) - Real-world samples
+<!-- NAVIGATION-INDEX link will be added in Session 9 after the file is created -->
+
+---
+
 **Created:** 2026-02-12
 **Current Phase:** Phase 5 - Sanitization & Publishing
 **Next Milestone:** Integration testing and GitHub publication

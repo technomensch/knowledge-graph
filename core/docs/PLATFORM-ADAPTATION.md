@@ -1,8 +1,21 @@
 # Platform Adaptation Guide
 
+**Navigation**: [Home](../../README.md) > [Getting Started](../../docs/GETTING-STARTED.md) > Platform Adaptation
+
 **Using the knowledge graph with different AI coding platforms**
 
 The knowledge graph core is platform-agnostic. This guide shows how to adapt it for various platforms beyond Claude Code.
+
+---
+
+## Prerequisites
+
+Before adapting to your platform:
+- ✅ Complete [Getting Started](../../docs/GETTING-STARTED.md) setup
+- ✅ Have templates in your project (`core/templates/`)
+- ✅ Understand [basic concepts](../../docs/CONCEPTS.md)
+
+See [Installation Guide](../../docs/GETTING-STARTED.md#ai-assistant-setup) for initial setup.
 
 ---
 

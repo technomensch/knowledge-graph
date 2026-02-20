@@ -1,11 +1,18 @@
 # Manual Workflows
 
+**Navigation**: [Home](../../README.md) > [Getting Started](../../docs/GETTING-STARTED.md) > Manual Workflows
+
 **For users without Claude Code (or any automation platform)**
 
 This guide provides step-by-step workflows for using the knowledge graph system manually. Each workflow includes the exact commands to run and what to fill in at each step.
 
-> **New to knowledge graphs?** Read [CONCEPTS.md](../../docs/CONCEPTS.md) first for plain-English explanations of key terms (lesson, ADR, YAML frontmatter, MEMORY.md, etc.).
+> **💡 New to knowledge graphs?**
 >
+> This guide assumes you've completed initial setup. If not:
+> - Start with [Getting Started](../../docs/GETTING-STARTED.md#manual-setup)
+> - Read [Concepts Guide](../../docs/CONCEPTS.md) for term definitions
+> - Review [templates](../templates/) to understand structure
+
 > **Using Claude Code?** Most of these workflows have a single command equivalent. See [COMMAND-GUIDE.md](../../docs/COMMAND-GUIDE.md).
 
 ---

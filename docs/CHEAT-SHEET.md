@@ -150,13 +150,19 @@ Power users leverage these for complex workflows:
 
 ---
 
-## Getting Help
+## Related Documentation
 
-- **Detailed command docs**: See [Command Guide](COMMAND-GUIDE.md) (created in Session 5)
-- **Concepts explained**: See [Concepts Guide](CONCEPTS.md) (created in Session 4)
-- **Configuration help**: See [Configuration Guide](CONFIGURATION.md)
-- **Platform adaptation**: See [Platform Adaptation Guide](../core/docs/PLATFORM-ADAPTATION.md)
-- **Manual workflows**: See [Workflows Guide](../core/docs/WORKFLOWS.md)
+**Getting started**:
+- [Getting Started](GETTING-STARTED.md) - Installation and first steps
+- [Configuration](CONFIGURATION.md) - Post-install setup
+
+**Concepts & Guides**:
+- [Concepts Guide](CONCEPTS.md) - Plain-English term explanations
+- [Command Reference](COMMAND-GUIDE.md) - All commands with examples
+
+**Workflows**:
+- [Manual Workflows](../core/docs/WORKFLOWS.md) - Non-Claude processes
+- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) - AI integrations
 
 ---
 

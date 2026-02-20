@@ -1,5 +1,7 @@
 # Lessons Learned - Master Index
 
+**Navigation**: [Home](../../../README.md) > [Getting Started](../../../docs/GETTING-STARTED.md) > [Manual Workflows](../../docs/WORKFLOWS.md) > Templates
+
 Comprehensive catalog of all lessons-learned documents.
 
 **Total Lessons:** 0
@@ -113,3 +115,18 @@ See [core/examples/lessons-learned/](../../examples/lessons-learned/) for filled
 - **MEMORY.md:** Critical patterns from lessons sync to persistent memory
 - **Meta-Issues:** Complex problems reference multiple lessons
 
+---
+
+## Learn More
+
+**Understanding fields**:
+- [Concepts Guide](../../../docs/CONCEPTS.md#yaml-frontmatter) - YAML field explanations
+- [lesson-template.md](lesson-template.md) - See inline field comments
+
+**See examples**:
+- [Real Examples](../../examples/lessons-learned/) - Filled-out lessons
+- [Pattern Guide](../../docs/PATTERNS-GUIDE.md) - Writing quality tips
+
+**How to capture**:
+- [Manual Workflow](../../docs/WORKFLOWS.md#workflow-1-create-lesson-learned) - Step-by-step
+- [Command Guide](../../../docs/COMMAND-GUIDE.md#essential-commands) - Automated (Claude Code)

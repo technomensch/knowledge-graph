@@ -1,5 +1,7 @@
 # Writing Good Knowledge Graph Entries
 
+**Navigation**: [Home](../../README.md) > [Getting Started](../../docs/GETTING-STARTED.md) > Pattern Writing
+
 **Best practices for creating valuable lessons, ADRs, and knowledge graph entries**
 
 ---
@@ -512,9 +514,10 @@ Before finalizing a knowledge entry:
 
 ---
 
-## Related
+## Related Documentation
 
-- **Examples:** [../examples/](../examples/) - Study real examples
-- **Templates:** [../templates/](../templates/) - Start from these
-- **Architecture:** [ARCHITECTURE.md](./ARCHITECTURE.md) - System design
-- **Workflows:** [WORKFLOWS.md](./WORKFLOWS.md) - Manual processes
+**Resources**:
+- [Templates](../templates/) - Starting scaffolds
+- [Examples](../examples/) - Real-world samples
+- [Manual Workflows](WORKFLOWS.md) - Manual processes
+- [Architecture](ARCHITECTURE.md) - System design
