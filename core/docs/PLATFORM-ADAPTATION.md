@@ -30,7 +30,7 @@ The knowledge graph core is platform-agnostic. This guide shows how to adapt it 
 - Subagents for review
 - MEMORY.md bidirectional sync with archive/restore
 
-**Setup:** See main README.md and docs/SETUP.md
+**Setup:** See main README.md and [GETTING-STARTED.md](../../docs/GETTING-STARTED.md) for installation, [CONFIGURATION.md](../../docs/CONFIGURATION.md) for post-install configuration
 
 ---
 
