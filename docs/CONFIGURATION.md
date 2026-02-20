@@ -287,6 +287,7 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 
 ## Support & Resources
 
+- **Quick Reference:** [CHEAT-SHEET.md](CHEAT-SHEET.md) — One-page command cheat sheet
 - **Documentation:** [core/docs/](../core/docs/)
 - **Examples:** [core/examples/](../core/examples/)
 - **Templates:** [core/templates/](../core/templates/)

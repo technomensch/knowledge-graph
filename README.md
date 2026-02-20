@@ -95,34 +95,41 @@ See [tests/README.md](tests/README.md) for detailed testing documentation.
 
 ## Commands (19 Total)
 
-### Configuration & Management
-- `/knowledge:init` — Initialize new knowledge graph with wizard
+**Quick Reference**: See [CHEAT-SHEET.md](docs/CHEAT-SHEET.md) for one-page quick reference guide
+
+### 🟢 Essential Commands (Start Here)
+
+First-time users need these for basic operation:
+
+- `/knowledge:init` — Initialize new knowledge graph with wizard-based setup
+- `/knowledge:capture-lesson` — Document lessons learned with git metadata tracking
+- `/knowledge:status` — View active knowledge graph info and quick reference
+- `/knowledge:recall` — Search across all memory systems (lessons, decisions, knowledge)
+
+### 🟡 Intermediate Commands (Once Comfortable)
+
+Active users leverage these for regular workflows:
+
+- `/knowledge:update-graph` — Extract knowledge graph entries from lessons
+- `/knowledge:add-category` — Add a new category to existing knowledge graph
+- `/knowledge:session-summary` — Create summary of current chat session
 - `/knowledge:list` — Display all configured knowledge graphs
 - `/knowledge:switch` — Change active knowledge graph
-- `/knowledge:add-category` — Add category to existing KG
-- `/knowledge:status` — Show active KG info and quick reference
+- `/knowledge:check-sensitive` — Scan knowledge graph for potentially sensitive information
+- `/knowledge:config-sanitization` — Interactive wizard for pre-commit hook setup
+- `/knowledge:extract-chat` — Extract chat history from Claude and Gemini logs
 
-### Knowledge Capture
-- `/knowledge:capture-lesson` — Document lessons with git metadata
-- `/knowledge:meta-issue` — Track complex multi-attempt problems
-- `/knowledge:session-summary` — Summarize current session
-- `/knowledge:extract-chat` — Extract Claude/Gemini chat history
+### 🔴 Advanced Commands (Power Features)
+
+Power users use these for complex workflows:
+
+- `/knowledge:meta-issue` — Initialize meta-issue tracking for complex multi-attempt problems
 - `/knowledge:start-issue-tracking` — Initialize issue tracking with structured docs and Git branch
-
-### Knowledge Sync
-- `/knowledge:update-graph` — Extract KG entries from lessons
-- `/knowledge:sync-all` — Automated full sync pipeline
-- `/knowledge:update-issue-plan` — Sync KG → plan → issue → GitHub
-- `/knowledge:recall` — Search across all memory systems
-
-### Memory Management
-- `/knowledge:archive-memory` — Archive stale MEMORY.md entries
-- `/knowledge:restore-memory` — Restore archived entries
-
-### Privacy & Security
-- `/knowledge:configure-sanitization` — Set up pre-commit hooks
-- `/knowledge:check-sensitive` — Scan for sensitive data
-- `/knowledge:link-issue` — Link lessons to GitHub issues
+- `/knowledge:update-issue-plan` — Sync knowledge graph → plan → issue → GitHub
+- `/knowledge:link-issue` — Manually link existing lesson or ADR to GitHub issue
+- `/knowledge:archive-memory` — Archive stale MEMORY.md entries to prevent bloat
+- `/knowledge:restore-memory` — Restore archived MEMORY.md entries
+- `/knowledge:sync-all` — Automated full sync pipeline (4 steps → 1 command)
 
 ---
 
