@@ -2,7 +2,35 @@
 
 **For users without Claude Code (or any automation platform)**
 
-This guide provides step-by-step manual workflows for using the knowledge graph system without automation.
+This guide provides step-by-step workflows for using the knowledge graph system manually. Each workflow includes the exact commands to run and what to fill in at each step.
+
+> **New to knowledge graphs?** Read [CONCEPTS.md](../../docs/CONCEPTS.md) first for plain-English explanations of key terms (lesson, ADR, YAML frontmatter, MEMORY.md, etc.).
+>
+> **Using Claude Code?** Most of these workflows have a single command equivalent. See [COMMAND-GUIDE.md](../../docs/COMMAND-GUIDE.md).
+
+---
+
+## Table of Contents
+
+**Quick Start (first-time setup)**
+1. [Setup](#setup)
+
+**Daily Workflows (regular use)**
+2. [Workflow 1: Create Lesson Learned](#workflow-1-create-lesson-learned)
+3. [Workflow 2: Create Architecture Decision Record (ADR)](#workflow-2-create-architecture-decision-record-adr)
+4. [Workflow 3: Extract Chat History](#workflow-3-extract-chat-history)
+5. [Workflow 4: Search Knowledge Base](#workflow-4-search-knowledge-base)
+6. [Workflow 5: Create Session Summary](#workflow-5-create-session-summary)
+
+**Advanced Workflows (as needed)**
+7. [Workflow 6: Create Meta-Issue](#workflow-6-create-meta-issue)
+8. [Workflow 7: Extract Patterns to Knowledge Graph](#workflow-7-extract-patterns-to-knowledge-graph)
+
+**Maintenance (monthly/quarterly)**
+9. [Workflow 8: Review and Maintain](#workflow-8-review-and-maintain)
+10. [Workflow 9: Manage MEMORY.md](#workflow-9-manage-memorymd)
+
+11. [Tips and Shortcuts](#tips-and-shortcuts)
 
 ---
 
@@ -14,15 +42,9 @@ This guide provides step-by-step manual workflows for using the knowledge graph 
 # Create knowledge graph directories
 mkdir -p docs/{lessons-learned/{architecture,debugging,process,patterns},decisions,knowledge,sessions}
 
-# Create placeholder READMEs for each category
+# Create placeholder READMEs
 for dir in docs/lessons-learned/*/; do
-  cat > "$dir/README.md" << 'EOF'
-# Category
-
-Lessons in this category:
-
-<!-- Add links as you create lessons -->
-EOF
+  echo -e "# Category\n\nLessons in this category:\n\n<!-- Add links as you create lessons -->" > "$dir/README.md"
 done
 
 # Create main knowledge graph files
@@ -38,175 +60,119 @@ git commit -m "docs: initialize knowledge graph structure"
 ```bash
 # Copy all templates to your project
 cp -r core/templates/. docs/templates/
-
-# Templates now available at:
-# docs/templates/lessons-learned/lesson-template.md
-# docs/templates/decisions/ADR-template.md
-# etc.
 ```
+
+Templates available after copying:
+- `docs/templates/lessons-learned/lesson-template.md` — For problems solved
+- `docs/templates/decisions/ADR-template.md` — For important decisions
+- `docs/templates/knowledge/entry-template.md` — For patterns and concepts
+- `docs/templates/sessions/session-template.md` — For work session summaries
+
+> **What are templates?** See [Template](../../docs/CONCEPTS.md#template) in the Concepts Guide.
 
 ---
 
 ## Workflow 1: Create Lesson Learned
 
-**When:** You solved a non-trivial problem and want to document it.
+**When:** Solved a non-trivial problem and want to document the solution for future reference.
 
-###Step-by-Step
+**Claude Code equivalent:** `/knowledge:capture-lesson`
 
-**1. Choose category:**
+### Step-by-Step
 
-Based on problem type:
-- `architecture/` — System design, component structure
-- `debugging/` — Troubleshooting, bug fixes
-- `process/` — Workflow improvements, tools
-- `patterns/` — Reusable design patterns
+**1. Choose a category** based on problem type:
 
-**2. Copy template:**
+| Category | Use for |
+|---|---|
+| `architecture/` | System design, component structure |
+| `debugging/` | Troubleshooting, bug fixes |
+| `process/` | Workflow improvements, tools |
+| `patterns/` | Reusable design patterns |
+
+**2. Copy template with a meaningful filename:**
 
 ```bash
-# Choose meaningful filename (use underscores)
 cp docs/templates/lessons-learned/lesson-template.md \
    docs/lessons-learned/process/Database_Connection_Pooling.md
 ```
 
-**3. Fill in template:**
+**3. Fill in the template** — open the file and fill in `[MANUAL]` fields:
 
-```bash
-vim docs/lessons-learned/process/Database_Connection_Pooling.md
+```yaml
+---
+title: "Lesson: Database Connection Pooling"  # [MANUAL]
+category: process                              # [MANUAL]
+tags: [database, performance, pooling]         # [MANUAL]
+# [AUTO] fields (created, author, git.*) filled by command; leave blank manually
+---
 ```
 
-Replace all `[placeholders]` with your content:
+Then write the body — answer these four questions:
+- **Problem:** What went wrong?
+- **Root Cause:** Why did it happen?
+- **Solution:** What fixed it (step by step)?
+- **Prevention:** How to avoid this in the future?
+
+**4. Update the category README** — open `docs/lessons-learned/process/README.md` and add a link:
 
 ```markdown
-# Lesson Learned: Database Connection Pooling
-
-**Date:** 2024-10-15
-**Category:** process
-**Tags:** #database #performance #pooling
-
-## Problem
-
-Application was creating new database connection for every request,
-causing high latency (>5s response time) and connection exhaustion.
-
-[... fill in remaining sections ...]
-```
-
-**4. Update category README:**
-
-```bash
-vim docs/lessons-learned/process/README.md
-```
-
-Add link to new lesson:
-
-```markdown
-# Process Lessons
-
 - [Database Connection Pooling](./Database_Connection_Pooling.md) - Fixing connection exhaustion
-- [Existing Lesson](./Existing_Lesson.md)
 ```
 
-**5. (Optional) Extract to knowledge graph:**
-
-If lesson contains reusable pattern:
-
-```bash
-vim docs/knowledge/patterns.md
-```
-
-Add extracted pattern:
-
-```markdown
-## Connection Pooling Pattern
-
-**Problem:** Creating connection per request doesn't scale
-
-**Solution:** Maintain pool of reusable connections
-
-**When to use:** High-throughput applications, connection overhead noticeable
-
-**Cross-References:**
-- **Lesson:** [[lessons-learned/process/Database_Connection_Pooling.md]]
-```
+**5. (Optional) Extract reusable pattern** to knowledge graph — see [Workflow 7](#workflow-7-extract-patterns-to-knowledge-graph).
 
 **6. Commit:**
 
 ```bash
 git add docs/lessons-learned/process/Database_Connection_Pooling.md
 git add docs/lessons-learned/process/README.md
-git add docs/knowledge/patterns.md  # if you updated it
-
-git commit -m "docs: add lesson on database connection pooling
-
-Documented solution to connection exhaustion issue.
-Extracted connection pooling pattern to knowledge graph."
+git commit -m "docs: add lesson on database connection pooling"
 ```
+
+> **Why document immediately?** Details are freshest right after solving the problem. Documenting later means forgetting the root cause and key steps.
 
 ---
 
 ## Workflow 2: Create Architecture Decision Record (ADR)
 
-**When:** Making an architectural decision that affects multiple people or components.
+**When:** Making an architectural decision that affects multiple people or components — something a future team member might ask "why did the team do it this way?"
+
+**Claude Code equivalent:** `/knowledge:capture-lesson` (with ADR category)
+
+> **What is an ADR?** See [ADR](../../docs/CONCEPTS.md#adr-architecture-decision-record) in the Concepts Guide.
 
 ### Step-by-Step
 
-**1. Find next ADR number:**
+**1. Find the next ADR number:**
 
 ```bash
-# List existing ADRs
 ls docs/decisions/ | grep "ADR-"
-
-# Example output:
-# ADR-001-dual-format-docs.md
-# ADR-002-skills-architecture.md
-
-# Next number: ADR-003
+# Example: ADR-001-dual-format-docs.md, ADR-002-skills-architecture.md
+# → Next number: ADR-003
 ```
 
-**2. Copy template with number:**
+**2. Copy template with numbered filename:**
 
 ```bash
 cp docs/templates/decisions/ADR-template.md \
    docs/decisions/ADR-003-connection-pooling.md
 ```
 
-**3. Fill in template:**
+**3. Fill in the template** — focus on these four sections:
+- **Context:** Why was this decision needed?
+- **Options:** What alternatives were considered? (list 2–4 options)
+- **Decision:** What was chosen and why?
+- **Consequences:** What are the expected positive and negative outcomes?
 
-```bash
-vim docs/decisions/ADR-003-connection-pooling.md
-```
-
-Focus on:
-- **Context:** Why decision needed
-- **Options:** What alternatives considered (2-4 options)
-- **Decision:** What chosen and why
-- **Consequences:** Positive and negative outcomes
-
-**4. Update ADR index:**
-
-If you have `docs/decisions/README.md`:
+**4. Update ADR index** — open `docs/decisions/README.md` and add:
 
 ```markdown
-# Architecture Decision Records
-
-- [ADR-001: Dual-Format Documentation](./ADR-001-dual-format-docs.md) - Accepted
-- [ADR-002: Skills Architecture](./ADR-002-skills-architecture.md) - Accepted
 - [ADR-003: Connection Pooling Strategy](./ADR-003-connection-pooling.md) - Accepted
 ```
 
-**5. Link from related lessons:**
-
-If related lesson exists:
-
-```bash
-vim docs/lessons-learned/process/Database_Connection_Pooling.md
-```
-
-Add cross-reference:
+**5. Link from related lessons** (optional) — in the lesson file's Cross-References section:
 
 ```markdown
-## Cross-References
 - **ADR:** [[../../decisions/ADR-003-connection-pooling.md]]
 ```
 
@@ -214,108 +180,81 @@ Add cross-reference:
 
 ```bash
 git add docs/decisions/ADR-003-connection-pooling.md
-git commit -m "docs(adr): ADR-003 connection pooling strategy
-
-Decided to use PgBouncer for centralized connection pooling.
-Considered application-level pooling but chose proxy approach
-for better resource utilization."
+git commit -m "docs(adr): ADR-003 connection pooling strategy"
 ```
 
 ---
 
 ## Workflow 3: Extract Chat History
 
+**When:** A productive AI conversation contains insights worth preserving in the knowledge graph.
+
 **Platform:** Claude Code or Gemini/Antigravity
 
-### Claude Code
+### Run Extraction Script
+
+**Claude Code:**
 
 ```bash
-# Run extraction script
 python3 core/scripts/extract_claude.py
-
-# Output to chat-history/
-# Organized by date: chat-history/2024-10/2024-10-15-claude.md
+# Output: chat-history/YYYY-MM/YYYY-MM-DD-claude.md
 ```
 
-### Gemini/Antigravity
+**Gemini/Antigravity:**
 
 ```bash
 python3 core/scripts/extract_gemini.py
-
-# Output to chat-history/
-# Organized by date: chat-history/2024-10/2024-10-15-gemini.md
+# Output: chat-history/YYYY-MM/YYYY-MM-DD-gemini.md
 ```
 
 ### Review and Extract Knowledge
 
-**1. Read extracted chat:**
+Read the extracted chat and identify content to preserve:
 
-```bash
-cat chat-history/2024-10/2024-10-15-claude.md
-```
+| Found in chat | Action |
+|---|---|
+| Problem-solving session | → Create Lesson Learned (Workflow 1) |
+| Architectural discussion | → Create ADR (Workflow 2) |
+| Reusable pattern discovered | → Update Knowledge Graph (Workflow 7) |
 
-**2. Identify valuable content:**
+When creating a lesson from a chat, reference the source:
 
-Look for:
-- Problem-solving sessions (→ Lesson Learned)
-- Architectural discussions (→ ADR)
-- Discovered patterns (→ Knowledge Graph)
-
-**3. Create lesson from chat:**
-
-```bash
-# Copy relevant chat section to lesson template
-cp docs/templates/lessons-learned/lesson-template.md \
-   docs/lessons-learned/debugging/API_Timeout_Investigation.md
-
-# Fill in using chat as source material
-vim docs/lessons-learned/debugging/API_Timeout_Investigation.md
-
-# Reference original chat
-echo "**Source:** chat-history/2024-10/2024-10-15-claude.md" >> \
-  docs/lessons-learned/debugging/API_Timeout_Investigation.md
+```markdown
+**Source:** chat-history/2024-10/2024-10-15-claude.md
 ```
 
 ---
 
 ## Workflow 4: Search Knowledge Base
 
-**Manual search using grep:**
+**When:** Looking for a previously documented solution, pattern, or decision.
 
-### Search all knowledge
+**Claude Code equivalent:** `/knowledge:recall`
+
+### Search All Knowledge
 
 ```bash
-# Search for keyword across all docs
+# Search across all docs
 grep -r "connection pool" docs/
 
-# Search just lessons
-grep -r "connection pool" docs/lessons-learned/
-
-# Search with context (3 lines before/after)
+# Search with context (3 lines before/after match)
 grep -r -C 3 "connection pool" docs/
 ```
 
-### Search by category
+### Search by Category or Tag
 
 ```bash
 # Find all architecture lessons
 ls docs/lessons-learned/architecture/
 
-# Find all debugging lessons
-ls docs/lessons-learned/debugging/
-```
-
-### Search by tag
-
-```bash
 # Find all lessons tagged #performance
 grep -r "#performance" docs/lessons-learned/
 ```
 
-### Search knowledge graph
+### Search Knowledge Graph Files
 
 ```bash
-# Quick patterns reference
+# Browse all patterns (section headers)
 grep -A 5 "^## " docs/knowledge/patterns.md
 
 # Find specific pattern
@@ -329,45 +268,40 @@ grep -A 5 "^## " docs/knowledge/gotchas.md
 
 ## Workflow 5: Create Session Summary
 
-**When:** End of work session or major feature completion.
+**When:** End of a significant work session — major debugging, architecture discussion, or sprint.
+
+**Claude Code equivalent:** `/knowledge:session-summary`
+
+> **What is a session summary?** See [Session Summary](../../docs/CONCEPTS.md#session-summary) in the Concepts Guide.
 
 ### Step-by-Step
 
-**1. Create session file:**
+**1. Create session file organized by month:**
 
 ```bash
-# Organize by month
 mkdir -p docs/sessions/2024-10
-
-# Create summary
 cp docs/templates/sessions/session-template.md \
    docs/sessions/2024-10/session-2024-10-15.md
 ```
 
-**2. Fill in sections:**
+**2. Fill in the four main sections:**
 
 ```markdown
-# Session Summary: 2024-10-15
-
 ## Overview
-Implemented database connection pooling to fix performance issues.
+[1-2 sentences: what did this session accomplish?]
 
 ## Built
-- PgBouncer configuration
-- Application connection pool settings
-- Monitoring dashboard
+- [Concrete deliverable 1]
+- [Concrete deliverable 2]
 
 ## Decided
-- Use PgBouncer over application-level pooling (see ADR-003)
-- Transaction pooling mode (not session pooling)
+- [Key decision] (see ADR-003)
 
 ## Learned
-- CI needs higher pool size than local due to concurrency
-- Monitor pool utilization, not just connection count
+- [Insight that changes future approach]
 
 ## Next
-- Deploy to staging for load testing
-- Create runbook for PgBouncer operations
+- [First concrete next action]
 ```
 
 **3. Commit:**
@@ -381,143 +315,120 @@ git commit -m "docs(session): session summary for 2024-10-15"
 
 ## Workflow 6: Create Meta-Issue
 
-**When:** Complex problem requiring multiple solution attempts.
+**When:** A complex problem has required multiple solution attempts with evolving understanding — the problem is not yet resolved or just resolved after several attempts.
+
+**Claude Code equivalent:** `/knowledge:meta-issue`
+
+> **What is a meta-issue?** See [Meta-Issue](../../docs/CONCEPTS.md#meta-issue) in the Concepts Guide.
 
 ### Step-by-Step
 
-**1. Create meta-issue directory:**
+**1. Create the meta-issue directory structure:**
 
 ```bash
 mkdir -p docs/meta-issues/performance-degradation/{attempts,analysis}
 ```
 
-**2. Create core files:**
+**2. Copy core files from templates:**
 
 ```bash
-# Navigation hub
 cp core/templates/meta-issue/README-template.md \
    docs/meta-issues/performance-degradation/README.md
-
-# Living description
 cp core/templates/meta-issue/description-template.md \
    docs/meta-issues/performance-degradation/description.md
-
-# Implementation log
 cp core/templates/meta-issue/implementation-log-template.md \
    docs/meta-issues/performance-degradation/implementation-log.md
-
-# Test cases
 cp core/templates/meta-issue/test-cases-template.md \
    docs/meta-issues/performance-degradation/test-cases.md
 ```
 
-**3. Create first attempt:**
+**3. Create first attempt directory:**
 
 ```bash
 mkdir docs/meta-issues/performance-degradation/attempts/001-caching
-
-# Solution approach
 cp core/templates/meta-issue/solution-approach-template.md \
    docs/meta-issues/performance-degradation/attempts/001-caching/solution-approach.md
-
-# Results (create after attempt)
 cp core/templates/meta-issue/attempt-results-template.md \
    docs/meta-issues/performance-degradation/attempts/001-caching/attempt-results.md
 ```
 
-**4. Document as you go:**
+**4. Document as the investigation progresses:**
 
-- **Before attempt:** Fill in solution-approach.md
-- **During attempt:** Update implementation-log.md with daily progress
-- **After attempt:** Fill in attempt-results.md with outcome
-- **If failed:** Create next attempt directory (002-*)
-- **When resolved:** Update description.md with final understanding
+| Stage | Action |
+|---|---|
+| Before attempt | Fill in `solution-approach.md` |
+| During attempt | Update `implementation-log.md` with daily progress |
+| After attempt | Fill in `attempt-results.md` with outcome |
+| If failed | Create next attempt directory (`002-*`) |
+| When resolved | Update `description.md` with final understanding |
 
 **5. Extract lesson when resolved:**
 
 ```bash
 cp docs/templates/lessons-learned/lesson-template.md \
    docs/lessons-learned/debugging/Performance_Degradation_Resolution.md
-
-# Reference meta-issue in lesson
-echo "**Meta-Issue:** [[../meta-issues/performance-degradation/README.md]]" >> \
-  docs/lessons-learned/debugging/Performance_Degradation_Resolution.md
 ```
 
-See [META-ISSUE-GUIDE.md](./META-ISSUE-GUIDE.md) for detailed guide.
+Add cross-reference to the lesson:
+```markdown
+**Meta-Issue:** [[../meta-issues/performance-degradation/README.md]]
+```
+
+See [META-ISSUE-GUIDE.md](./META-ISSUE-GUIDE.md) for a detailed guide.
 
 ---
 
-## Workflow 7: Update Knowledge Graph from Lesson
+## Workflow 7: Extract Patterns to Knowledge Graph
 
-**When:** Lesson contains reusable pattern/concept/gotcha.
+**When:** A lesson contains a reusable pattern, concept, or common pitfall worth preserving as a quick-reference entry.
 
-### Extract Pattern
+**Claude Code equivalent:** `/knowledge:update-graph`
 
-**1. Identify pattern in lesson:**
+### Extract a Pattern
 
-Read lesson, find reusable approach:
+**1. Identify the reusable element** in the lesson:
 
 ```markdown
-# In lesson
+# In the lesson body:
 ## Solution
-We implemented connection pooling with these settings:
-- Pool size: 20 per instance
-- Idle timeout: 30s
-- Max wait: 10s
+Implemented connection pooling with: pool size 20, idle timeout 30s, max wait 10s.
 ```
 
-**2. Add to patterns.md:**
-
-```bash
-vim docs/knowledge/patterns.md
-```
-
-Add entry:
+**2. Add to `docs/knowledge/patterns.md`:**
 
 ```markdown
 ## Connection Pooling Pattern
 
-**Problem:** Per-request connections don't scale
+**Problem:** Per-request connections don't scale under load
 
-**Solution:** Maintain pool of reusable connections
+**Solution:** Maintain a pool of reusable connections
 
 **Quick Reference:**
-- Pool size: 10-20 per instance
-- Idle timeout: 30-60s
-- Max wait: 5-10s
+- Pool size: 10–20 per instance
+- Idle timeout: 30–60s
+- Max wait: 5–10s
 - Monitor: utilization, wait time, errors
 
-**When to use:**
-- High throughput (>100 req/sec)
-- Connection overhead noticeable
-- Connection limits
+**When to use:** High throughput (>100 req/sec), when connection overhead is noticeable
 
 **Cross-References:**
 - **Lesson:** [[lessons-learned/process/Database_Connection_Pooling.md]]
 - **ADR:** [[decisions/ADR-003-connection-pooling.md]]
 ```
 
-### Extract Gotcha
+### Extract a Gotcha
 
-If lesson reveals common pitfall:
-
-```bash
-vim docs/knowledge/gotchas.md
-```
-
-Add entry:
+If the lesson reveals a common pitfall, add it to `docs/knowledge/gotchas.md`:
 
 ```markdown
 ## CI Connection Exhaustion
 
 **Symptom:** Tests pass locally, fail in CI with "too many connections"
 
-**Gotcha:** CI runs tests in parallel, local runs sequentially. Higher concurrency → more connections needed.
+**Root Cause:** CI runs tests in parallel; local runs sequentially. Parallel execution
+multiplies connection usage.
 
-**Fix:** Increase pool size for CI environment (not local)
-
-**Why:** Parallel execution multiplies connection usage
+**Fix:** Increase pool size for CI environment specifically
 
 **Cross-References:**
 - **Lesson:** [[lessons-learned/debugging/CI_Connection_Issues.md]]
@@ -532,312 +443,116 @@ Add entry:
 ### Check for Stale Content
 
 ```bash
-# Find lessons older than 1 year
+# Find lessons not modified in over a year
 find docs/lessons-learned -name "*.md" -mtime +365
-
-# Review for relevance:
-# - Still accurate?
-# - Solution still recommended?
-# - Update or archive?
 ```
+
+For each stale lesson, ask:
+- Is the solution still accurate?
+- Is it still the recommended approach?
+- Should it be updated or archived?
 
 ### Consolidate Duplicates
 
 ```bash
 # Search for similar topics
 grep -r "connection pool" docs/lessons-learned/
-
-# If multiple lessons on same topic:
-# - Consolidate into one comprehensive lesson
-# - Cross-reference others
-# - Or: Keep both if different aspects
 ```
 
-### Update Cross-References
+If multiple lessons cover the same topic, either consolidate into one comprehensive lesson or keep both and cross-reference them.
 
-```bash
-# Find broken links
-grep -r "\[\[.*\]\]" docs/ | while read line; do
-  # Extract filename from [[filename]]
-  # Check if exists
-  # Report broken links
-done
-```
-
-### Archive Old Content
+### Archive Old Sessions
 
 ```bash
 # Move old sessions to archive
 mkdir -p docs/sessions/archive
 mv docs/sessions/2022-* docs/sessions/archive/
-
-# Update knowledge graph
-# (Remove patterns no longer used)
 ```
 
 ---
 
-## Workflow 9: Manage MEMORY.md (Archive & Restore)
+## Workflow 9: Manage MEMORY.md
 
-**When:** MEMORY.md approaching token limits (1,500+) or need archived context
+**When:** MEMORY.md is approaching the token budget limit (~1,500 tokens / ~200 lines) or archived knowledge needs to be retrieved.
 
-**Purpose:** Maintain MEMORY.md within token budget while preserving historical context
+**Claude Code equivalent:** `/knowledge:archive-memory` and `/knowledge:restore-memory`
 
-**With Claude Code:** `/knowledge:archive-memory` and `/knowledge:restore-memory`
-
-**Manual Alternative:** Follow steps below
-
----
+> **What is MEMORY.md?** See [MEMORY.md](../../docs/CONCEPTS.md#memorymd) in the Concepts Guide.
 
 ### Part A: Archive Stale Entries
-
-**When MEMORY.md exceeds 1,500 tokens (≈1,150 words):**
 
 **1. Check current size:**
 
 ```bash
-# Calculate token count
 MEMORY_PATH="$HOME/.claude/projects/$(basename $(pwd))/memory/MEMORY.md"
-memory_words=$(wc -w < "$MEMORY_PATH")
-memory_tokens=$((memory_words * 13 / 10))
-
-echo "Current size: ~${memory_tokens}/2,000 tokens"
+words=$(wc -w < "$MEMORY_PATH")
+echo "Current size: ~$((words * 13 / 10)) tokens (target: <1,500)"
 ```
 
-**2. Identify stale entries:**
+**2. Identify entries to archive** — look for:
+- Entries last referenced more than 90 days ago
+- Historical context no longer relevant to active work
 
-Look for entries with:
-- Old dates (> 90 days): "Last updated: 2025-08-01"
-- Not referenced recently
-- Historical context only (not actively used)
+**3. Move stale entries:**
+- Copy the full section (heading + content) from MEMORY.md to `MEMORY-archive.md`
+- Remove the section from MEMORY.md
+- Add an archive log entry noting what was archived and when
 
-**3. Create archive file (if doesn't exist):**
-
-```bash
-cat > "$HOME/.claude/projects/$(basename $(pwd))/memory/MEMORY-archive.md" << 'EOF'
-# MEMORY.md Archive
-
-Historical entries archived from MEMORY.md to free token budget.
-
-**Purpose:** Preserve context while keeping active memory lean
-**Original:** `MEMORY.md` (project cross-session memory)
-
----
-
-## Archive Log
-
-**YYYY-MM-DD:** Archived X entries (~Y tokens freed)
-- Entry 1 (Z days old)
-- Entry 2 (Z days old)
-
----
-
-[Archived entries follow]
-EOF
-```
-
-**4. Move stale entries:**
-
-```bash
-# For each stale entry:
-# 1. Copy full section (### heading + content) from MEMORY.md
-# 2. Append to MEMORY-archive.md
-# 3. Remove from MEMORY.md
-# 4. Update archive log with entry title and age
-```
-
-**5. Add archive notice to MEMORY.md:**
-
-```markdown
-> **Note:** Stale entries are periodically archived to `MEMORY-archive.md` to keep this file lean.
-> Last archive: YYYY-MM-DD (X entries, ~Y tokens freed)
-```
-
-**6. Commit both files:**
+**4. Commit both files:**
 
 ```bash
 git add memory/MEMORY*.md
-git commit -m "docs(memory): archive stale entries
-
-Archived X entries (~Y tokens freed):
-- Entry 1 (Z days old)
-- Entry 2 (Z days old)
-
-Current size: ~${new_tokens}/2,000 tokens
-Archive: memory/MEMORY-archive.md"
+git commit -m "docs(memory): archive stale entries (~X tokens freed)"
 ```
-
----
 
 ### Part B: Restore Archived Entries
 
-**When you need archived knowledge for current work:**
-
-**1. List archived entries:**
+**1. View archived entries:**
 
 ```bash
-# View archive
-cat memory/MEMORY-archive.md
-
-# Or extract just titles
 grep "^### " memory/MEMORY-archive.md
 ```
 
-**Output example:**
-```
-### Git Pre-Commit Hooks
-### Old Docker Pattern
-### Deprecated API Approach
-### JWT Authentication Setup
-```
+**2. Copy the needed entry** back to the appropriate section of MEMORY.md.
 
-**2. Find specific entry:**
+**3. Mark the restoration** in the archive log and commit both files.
 
-```bash
-# Search archive by keyword
-grep -A 20 "Git Pre-Commit" memory/MEMORY-archive.md
-```
+### Decision Guide
 
-**3. Check current MEMORY.md size:**
-
-```bash
-# Verify space available before restoring
-memory_words=$(wc -w < memory/MEMORY.md)
-memory_tokens=$((memory_words * 13 / 10))
-
-echo "Current: ~${memory_tokens}/2,000 tokens"
-
-# Calculate entry size
-entry_words=$(grep -A 20 "Git Pre-Commit" memory/MEMORY-archive.md | wc -w)
-entry_tokens=$((entry_words * 13 / 10))
-
-new_total=$((memory_tokens + entry_tokens))
-echo "After restoration: ~${new_total}/2,000 tokens"
-
-# Warn if would exceed limits
-if [ "$new_total" -gt 2000 ]; then
-  echo "⚠️  Would exceed hard limit! Archive other entries first."
-fi
-```
-
-**4. Copy entry to MEMORY.md:**
-
-```bash
-# Extract entry (from ### heading to next ### or end)
-grep -A 20 "Git Pre-Commit" memory/MEMORY-archive.md > /tmp/entry.md
-
-# Choose target section in MEMORY.md
-# Append entry to appropriate section
-cat /tmp/entry.md >> memory/MEMORY.md
-
-# Or insert at specific location using editor
-vim memory/MEMORY.md
-```
-
-**5. Add restoration timestamp:**
-
-Edit the restored entry in MEMORY.md to add:
-```markdown
-### Git Pre-Commit Hooks
-
-**Restored:** 2026-02-16 (originally archived: 2026-02-16)
-**Last updated:** 2025-08-01
-
-[Original content...]
-```
-
-**6. Update archive log:**
-
-Mark entry as restored in MEMORY-archive.md:
-```markdown
-## Archive Log
-
-**2026-02-16:** Archived 5 entries (~340 tokens freed)
-- Git Pre-Commit Hooks (235 days old) **[Restored: 2026-02-20]**
-- Old Docker Pattern (187 days old)
-```
-
-**Note:** Entry content remains in archive for historical record.
-
-**7. Commit both files:**
-
-```bash
-git add memory/MEMORY*.md
-git commit -m "docs(memory): restore \"Git Pre-Commit Hooks\" from archive
-
-Restored entry from MEMORY-archive.md (archived: 2026-02-16)
-Added to: ## Best Practices
-Size: ~45 tokens
-
-Memory status:
-- Before: ~1,180/2,000 tokens
-- After: ~1,225/2,000 tokens"
-```
+| Situation | Action |
+|---|---|
+| MEMORY.md > 1,500 tokens | Archive oldest entries |
+| Working on a related problem | Restore relevant archived entry |
+| Entry > 90 days old, not needed | Leave archived |
 
 ---
 
-### Decision Criteria
+## Tips and Shortcuts
 
-**Archive when:**
-- MEMORY.md > 1,500 tokens (soft limit)
-- Entry is > 90 days old with no recent references
-- Historical context, not actively needed
+### Shell Aliases
 
-**Restore when:**
-- Currently working on related problem
-- Need archived context for active task
-- MEMORY.md has space (< 1,500 tokens)
-
-**Keep archived when:**
-- Historical reference only
-- Not relevant to current work
-- Token budget is tight
-
----
-
-## Tips for Manual Workflows
-
-### Use Shell Aliases
+Add to `~/.bashrc` or `~/.zshrc`:
 
 ```bash
-# Add to ~/.bashrc or ~/.zshrc
-
 alias lesson='cp docs/templates/lessons-learned/lesson-template.md'
-alias adr='ls docs/decisions/ | grep ADR | tail -1'  # Shows last ADR number
 alias kg-search='grep -r'
 alias kg-patterns='cat docs/knowledge/patterns.md'
+alias last-adr='ls docs/decisions/ | grep ADR | tail -1'
 ```
 
-Usage:
+### Editor Template Shortcuts
 
-```bash
-lesson docs/lessons-learned/process/my-lesson.md
-adr  # Shows: ADR-005.md (so next is ADR-006)
-kg-search "validation" docs/
-kg-patterns | less
-```
+**Vim** (`~/.vimrc`): `command! Lesson r ~/.templates/lesson-template.md`
 
-### Use Editor Templates
-
-Configure your editor to insert templates:
-
-**Vim:**
-
-```vim
-" In ~/.vimrc
-command! Lesson r ~/.templates/lesson-template.md
-command! ADR r ~/.templates/ADR-template.md
-```
-
-**VSCode:**
-
-Create snippets in settings.json.
+**VSCode:** Create file snippets in `settings.json` to insert template content with a keyword shortcut.
 
 ---
 
-## Related
+## Related Documentation
 
-- **Architecture:** [ARCHITECTURE.md](./ARCHITECTURE.md) - System design
-- **Patterns Guide:** [PATTERNS-GUIDE.md](./PATTERNS-GUIDE.md) - Writing good entries
-- **Examples:** [../examples/](../examples/) - Study these
-- **Templates:** [../templates/](../templates/) - Start from these
+- **Architecture:** [ARCHITECTURE.md](./ARCHITECTURE.md) — How the system is designed
+- **Patterns Guide:** [PATTERNS-GUIDE.md](./PATTERNS-GUIDE.md) — Writing effective entries
+- **Concepts:** [CONCEPTS.md](../../docs/CONCEPTS.md) — Plain-English term definitions
+- **Examples:** [../examples/](../examples/) — Real-world samples to study
+- **Templates:** [../templates/](../templates/) — Starting scaffolds
+- **Command Guide:** [COMMAND-GUIDE.md](../../docs/COMMAND-GUIDE.md) — All commands (Claude Code users)
