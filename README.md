@@ -96,6 +96,7 @@ See [tests/README.md](tests/README.md) for detailed testing documentation.
 ## Commands (19 Total)
 
 **Quick Reference**: See [CHEAT-SHEET.md](docs/CHEAT-SHEET.md) for one-page quick reference guide
+**Detailed Guide**: See [COMMAND-GUIDE.md](docs/COMMAND-GUIDE.md) for comprehensive command documentation with learning paths
 
 ### 🟢 Essential Commands (Start Here)
 
