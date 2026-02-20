@@ -6,7 +6,7 @@ description: Document lessons learned, problems solved, and patterns with git me
 
 **Purpose:** Create a comprehensive Lessons Learned document after solving a problem or implementing a new pattern.
 
-**Version:** 1.4 (Updated: 2026-02-12) <!-- v1.4 Change: Plugin version with git metadata -->
+**Version:** 1.5 (Updated: 2026-02-20) <!-- v1.5 Change: ADR detection and bidirectional linking -->
 
 ---
 
@@ -526,12 +526,110 @@ git:
   issue_linked: true
 ```
 
+### Step 4.8: ADR Detection and Integration <!-- v1.5 Change -->
+
+**After the lesson file is written**, scan its full content for architectural decision indicators — title, problem, root cause, solution, and replication sections.
+
+**Decision keywords to scan for:**
+
+| Category | Keywords |
+|---|---|
+| Decision-making | "decision", "chose", "selected", "opted for" |
+| Architecture | "architecture", "design", "pattern" |
+| Rationale | "why we", "rationale", "instead of" |
+| Trade-offs | "trade-off", "alternative", "considered" |
+
+**False-positive mitigation:** Require **2 or more** keyword matches before prompting. A single match (e.g., "decision" appearing once) is not sufficient to trigger the prompt.
+
+**If 2+ keywords are detected**, present to user:
+
+```
+🔍 This lesson mentions: ["architecture", "chose", "alternative"]
+
+Does this lesson involve an architectural decision worth documenting as an ADR?
+
+1. ✅ Yes, create linked ADR — Launch /knowledge:create-adr with pre-filled context
+2. Lesson only — Skip ADR creation (lesson is complete as-is)
+3. Skip — Create ADR later via /knowledge:create-adr
+```
+
+**If fewer than 2 keywords detected:** Skip silently and continue to Step 5.
+
+---
+
+#### Step 4.8.1: Extract Pre-Population Context
+
+If user selects option 1, extract the following from the lesson file to pre-fill the ADR:
+
+| ADR Field | Source in Lesson |
+|---|---|
+| Title suggestion | Derived from lesson title + detected decision topic |
+| Context | Lesson's "Problem" section content |
+| Rationale (starting point) | Lesson's "Solution" section content |
+| Category suggestion | Lesson's category (architecture/ → architecture, process/ → process, etc.) |
+
+**Announce:**
+```
+Pre-filling ADR from lesson context:
+- Title suggestion: "[Derived from lesson topic]"
+- Context: Extracted from Problem section (edit as needed)
+- Rationale: Extracted from Solution section (edit as needed)
+
+Launching /knowledge:create-adr...
+```
+
+#### Step 4.8.2: Launch ADR Creation Flow
+
+Launch the full `/knowledge:create-adr` flow inline:
+- Pass pre-populated values as suggested defaults for each wizard prompt
+- Allow user to edit all pre-populated fields before confirming
+- Complete all create-adr steps: auto-increment number, git metadata, wizard, file creation, index update
+
+#### Step 4.8.3: Create Bidirectional Links
+
+After the ADR file is created, write bidirectional links atomically:
+
+**In the ADR YAML frontmatter** — update `related.lessons`:
+```yaml
+related:
+  adrs: []
+  lessons:
+    - lessons-learned/{category}/{Lesson_Filename}.md
+  kg_entries: []
+```
+
+**In the lesson file** — append "Related ADRs" section:
+```markdown
+## Related ADRs <!-- v1.5 Change -->
+
+- [ADR-{NNN}: {Decision Title}](../../decisions/ADR-{NNN}-{slug}.md)
+```
+
+**Duplicate check:** If a "Related ADRs" section already exists, append the new link to that section rather than creating a second one.
+
+**Announce:**
+```
+✅ Bidirectional links created:
+- ADR-{NNN} references lesson: {lesson filename}
+- Lesson references ADR-{NNN}: {decision title}
+```
+
+**If user selects option 2 or 3:** Continue to Step 5 without creating an ADR.
+
+---
+
 ### Step 5: Commit
 
 After documents are created and user approves:
 
 ```bash
+# Base files (always included):
 git add {active_kg_path}/lessons-learned/ {active_kg_path}/knowledge/
+
+# If ADR was created in Step 4.8 (add ADR file and updated index):
+git add {active_kg_path}/decisions/ADR-{NNN}-{slug}.md
+git add {active_kg_path}/decisions/README.md
+
 git commit -m "docs(lessons): create [topic] lessons learned
 
 [Brief description of what the document covers]
@@ -540,8 +638,10 @@ git commit -m "docs(lessons): create [topic] lessons learned
 - Lesson: lessons-learned/{category}/[Topic].md
 - Git metadata: branch={branch}, commit={commit}
 - KG Updates: [if applicable]
+- ADR: decisions/ADR-{NNN}-{slug}.md [if created in Step 4.8]
+- Bidirectional links: lesson ↔ ADR [if created]
 
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 "
 ```
 
@@ -590,7 +690,9 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 - [ ] Includes replication pattern for other projects
 - [ ] Master index updated
 - [ ] Knowledge graph sync recommended
-- [ ] Committed with descriptive message
+- [ ] ADR detection scan run after lesson is saved (Step 4.8)
+- [ ] If decision detected: ADR created and bidirectional links written
+- [ ] Committed with descriptive message (including ADR files if created)
 
 ---
 
@@ -599,9 +701,10 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 - `/knowledge:update-graph` - Extract insights from lessons to knowledge graph
 - `/knowledge:sync-all` - Full knowledge sync pipeline
 - `/knowledge:link-issue` - Manually link existing lesson to GitHub issue
+- `/knowledge:create-adr` - Create a standalone ADR (without lesson capture)
 
 ---
 
 **Created:** 2026-02-12
-**Version:** 1.4
+**Version:** 1.5
 **Usage:** Type `/knowledge:capture-lesson` when you want to document a problem solved or pattern implemented
