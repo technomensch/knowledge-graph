@@ -22,74 +22,14 @@ A Claude Code plugin that provides:
 
 ---
 
-## Installation
+## Getting Started
 
-**Prerequisites:**
-- Claude Code (latest version)
-- Node.js 18+ (for MCP server)
-- Python 3.7+ (for chat extraction)
-- Git (for metadata tracking)
+**Choose a setup path**:
+- **Claude Code users** — [5-minute setup](docs/GETTING-STARTED.md#path-a-claude-code-setup)
+- **Other AI assistants** (Cursor, Continue.dev, Aider) — [10-minute setup](docs/GETTING-STARTED.md#path-b-other-ai-assistant-setup)
+- **Manual workflows** — [15-minute setup](docs/GETTING-STARTED.md#path-c-manual-setup)
 
-### From Source (Development)
-
-```bash
-# Clone or copy this repository
-cd /path/to/knowledge-graph
-
-# Test locally (MCP server builds automatically on first session start)
-claude --plugin-dir .
-```
-
-### From Published Plugin (Future)
-
-```bash
-# Add marketplace (after publication)
-/plugin marketplace add technomensch/knowledge-graph
-
-# Install plugin from tm-sis marketplace
-/plugin install knowledge@tm-sis
-```
-
-> **About the marketplace identifier:** The `tm-sis` marketplace identifier represents "technomensch-stayinginsync" and will host all plugins from this publisher. This allows for a consistent brand identity across multiple plugins.
-
-### Verify Installation (Optional)
-
-After installation, you can verify the MCP server is working:
-
-```bash
-# Quick automated test
-./tests/test-mcp-direct.sh
-
-# Interactive web-based test
-./tests/test-mcp.sh
-```
-
-See [tests/README.md](tests/README.md) for detailed testing documentation.
-
----
-
-## Quick Start
-
-1. **Initialize your first knowledge graph:**
-   ```bash
-   /knowledge:init
-   ```
-   Follow the wizard to configure location, categories, and git strategy.
-
-2. **Create your first lesson:**
-   ```bash
-   /knowledge:capture-lesson
-   ```
-
-3. **Search your knowledge:**
-   ```bash
-   /knowledge:recall "topic"
-   ```
-
-4. **Check status:**
-   ```bash
-   /knowledge:status
-   ```
+See [Getting Started Guide](docs/GETTING-STARTED.md) for full installation instructions, prerequisites, and troubleshooting.
 
 ---
 

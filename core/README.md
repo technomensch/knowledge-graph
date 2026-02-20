@@ -21,41 +21,12 @@ core/
 
 ## Usage Without Claude Code
 
-### Manual Workflows
+See the main [Getting Started Guide](../../docs/GETTING-STARTED.md) for setup instructions across all platforms:
+- [Claude Code setup](../../docs/GETTING-STARTED.md#path-a-claude-code-setup) (~5 minutes)
+- [Other AI assistant setup](../../docs/GETTING-STARTED.md#path-b-other-ai-assistant-setup) (~10 minutes)
+- [Manual setup](../../docs/GETTING-STARTED.md#path-c-manual-setup) (~15 minutes)
 
-If you're not using Claude Code (or any AI platform), you can still use this knowledge system manually:
-
-**1. Create a lesson learned:**
-```bash
-# Copy template
-cp core/templates/lessons-learned/lesson-template.md \
-   docs/lessons-learned/process/my-lesson.md
-
-# Edit the file
-# Add to category README manually
-```
-
-**2. Create an ADR:**
-```bash
-# Find next number
-ls docs/decisions/ | grep "ADR-" | sort | tail -1
-# ADR-005.md (last one)
-
-# Copy template with next number
-cp core/templates/decisions/ADR-template.md \
-   docs/decisions/ADR-006-my-decision.md
-```
-
-**3. Extract chat history:**
-```bash
-# For Claude Code
-python3 core/scripts/extract_claude.py
-
-# For Gemini/Antigravity  
-python3 core/scripts/extract_gemini.py
-```
-
-See [core/docs/WORKFLOWS.md](./docs/WORKFLOWS.md) for detailed manual workflows.
+For detailed manual workflow steps after setup, see [core/docs/WORKFLOWS.md](./docs/WORKFLOWS.md).
 
 ---
 
@@ -184,31 +155,6 @@ The `core/examples/` directory contains generalized examples from real projects:
 Use these as inspiration for your own knowledge entries.
 
 ---
-
-## Quick Start (Manual)
-
-1. **Initialize directory structure:**
-   ```bash
-   mkdir -p docs/{lessons-learned/{architecture,debugging,process,patterns},decisions,knowledge,sessions}
-   ```
-
-2. **Copy templates:**
-   ```bash
-   cp -r core/templates/* docs/
-   ```
-
-3. **Create first lesson:**
-   ```bash
-   cp core/templates/lessons-learned/lesson-template.md \
-      docs/lessons-learned/process/first-lesson.md
-   # Edit docs/lessons-learned/process/first-lesson.md
-   ```
-
-4. **Add to version control:**
-   ```bash
-   git add docs/
-   git commit -m "docs: initialize knowledge graph"
-   ```
 
 ---
 
