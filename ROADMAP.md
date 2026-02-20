@@ -14,7 +14,7 @@
 - ✅ Hooks system (SessionStart memory validation)
 - ✅ Knowledge reviewer subagent
 - ✅ ~30 generalized examples (patterns, concepts, gotchas, lessons, ADRs, meta-issue)
-- ✅ 10 documentation files (SETUP, core/docs/*)
+- ✅ 10+ documentation files (CONFIGURATION, GETTING-STARTED, core/docs/*)
 - ✅ MCP server (7 tools + 2 resources) with compiled dist/
 - ✅ Full metadata (repository, license, keywords)
 - ✅ Commands vs Skills architecture documentation
@@ -411,7 +411,7 @@ Allow `.claude/kg-local.json` at project root to override global config:
 **Implementation Notes**:
 - Read hierarchy: project-local → global → defaults
 - Config schema stays same, just different precedence
-- Document merge behavior in SETUP.md
+- Document merge behavior in CONFIGURATION.md
 
 **Why not v1.0**: Multi-KG system already supports project-local KGs. This is for team collaboration at scale.
 
