@@ -530,9 +530,19 @@ Study existing docs, identify pattern, create templates.
 
 ---
 
-## Related
+## Learn More
 
-- **Manual Workflows:** [WORKFLOWS.md](./WORKFLOWS.md)
-- **Architecture:** [ARCHITECTURE.md](./ARCHITECTURE.md)
-- **Templates:** [../templates/](../templates/)
-- **Examples:** [../examples/](../examples/)
+**Core Concepts & Setup**:
+- [Getting Started](../../docs/GETTING-STARTED.md) - Installation and first steps
+- [Concepts Guide](../../docs/CONCEPTS.md) - Plain-English term explanations
+- [Configuration](../../docs/CONFIGURATION.md) - Post-install customization
+
+**Guides & References**:
+- [Architecture Guide](./ARCHITECTURE.md) - System design overview
+- [Patterns Guide](./PATTERNS-GUIDE.md) - Writing quality lessons and ADRs
+- [Manual Workflows](./WORKFLOWS.md) - Step-by-step processes for non-Claude users
+
+**Resources**:
+- [Templates](../templates/) - Starter scaffolds for all document types
+- [Examples](../examples/) - Real-world samples to study
+- [Command Guide](../../docs/COMMAND-GUIDE.md) - All 19 commands (Claude Code users)
