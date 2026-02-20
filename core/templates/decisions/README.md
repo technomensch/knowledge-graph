@@ -43,6 +43,36 @@ Formal documentation of significant architecture decisions.
 
 ---
 
+## Field Guide
+
+The ADR template uses manual markdown fields (no auto-fill commands yet):
+
+**Header Fields (all manual):**
+- `ADR-XXX` - Sequential number (e.g., ADR-001, ADR-002)
+- `Title` - Concise decision description
+- `Date` - Date decision was made (format: 2024-01-15)
+- `Status` - Current status (Proposed | Accepted | Deprecated | Superseded)
+- `Implements` - Optional: Version or feature this applies to
+- `Related` - Optional: Links to related ADRs, lessons, KG entries
+
+**Content Sections:**
+All sections are manually filled:
+- **Context** - Why this decision is needed
+- **Decision** - What was decided (clear, concise statement)
+- **Rationale** - Why this choice over alternatives
+- **Consequences** - Positive and negative impacts
+- **Related** - Links to implementation, lessons, KG entries
+
+**Troubleshooting:**
+- ADRs are created manually — no auto-fill commands yet
+- Replace all `[bracketed placeholders]` with your content
+- For sequential numbering, check the highest existing ADR number and add 1
+
+**Examples:**
+See [core/examples/decisions/](../../examples/decisions/) for filled-out ADR examples.
+
+---
+
 ## Creating a New ADR
 
 1. **Determine next number:** Find the highest existing ADR number and increment

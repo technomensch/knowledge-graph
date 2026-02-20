@@ -1,3 +1,10 @@
+<!--
+KNOWLEDGE GRAPH ENTRY TEMPLATE
+This template is filled manually when creating standalone KG entries.
+Most KG entries are auto-generated from lessons via /knowledge:update-graph.
+Use this template when you need to create a KG entry directly.
+-->
+
 # Template for New Knowledge Graph Entry
 
 Use this template when creating a new KG entry manually.

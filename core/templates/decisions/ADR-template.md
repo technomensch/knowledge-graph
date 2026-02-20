@@ -1,9 +1,15 @@
-# ADR-XXX: [Title of Decision]
+<!--
+ARCHITECTURE DECISION RECORD TEMPLATE
+This template is filled manually - no auto-fill commands for ADRs yet.
+Replace all [bracketed placeholders] with your content.
+-->
 
-**Date:** YYYY-MM-DD
-**Status:** [Proposed | Accepted | Deprecated | Superseded]
-**Implements:** [Version or feature if applicable]
-**Related:** [Links to related ADRs, lessons, KG entries]
+# ADR-XXX: [Title of Decision]  <!-- Replace XXX with sequential number (e.g., ADR-001) -->
+
+**Date:** YYYY-MM-DD  <!-- Date decision was made (format: 2024-01-15) -->
+**Status:** [Proposed | Accepted | Deprecated | Superseded]  <!-- Current status of this decision -->
+**Implements:** [Version or feature if applicable]  <!-- Optional: Which version/feature this applies to -->
+**Related:** [Links to related ADRs, lessons, KG entries]  <!-- Optional: Link to related documentation -->
 
 ---
 

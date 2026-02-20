@@ -75,6 +75,37 @@ Use `/knowledge:recall "query"` to search across all lessons.
 
 ---
 
+## Field Guide
+
+The lesson template uses YAML frontmatter with [AUTO] and [MANUAL] field markers:
+
+**[AUTO] fields** — Automatically filled by `/knowledge:capture-lesson` command:
+- `created` - Timestamp when lesson was created (ISO 8601 format)
+- `author` - From git config user.name
+- `email` - From git config user.email
+- `git.branch` - Current git branch
+- `git.commit` - Latest commit hash
+- `git.pr` - PR number (detected from branch name, or null)
+- `git.issue` - Issue number (detected from branch name, or null)
+
+**[MANUAL] fields** — You must fill these in:
+- `title` - Short descriptive title for the lesson
+- `tags` - Custom tags for searching (e.g., [database, performance])
+- `sources` - External articles/docs consulted (optional)
+
+**[AUTO-SUGGEST] fields** — Command suggests, you can override:
+- `category` - Command suggests based on content (architecture/process/patterns/debugging)
+
+**Troubleshooting:**
+- If you see `[AUTO]` next to a field — the command fills it automatically
+- If you see `[MANUAL]` next to a field — you need to fill it in
+- If you see `[AUTO-SUGGEST]` — command provides a suggestion, but you can change it
+
+**Examples:**
+See [core/examples/lessons-learned/](../../examples/lessons-learned/) for filled-out lesson examples.
+
+---
+
 ## Integration
 
 - **Knowledge Graph:** Lessons feed patterns, gotchas, concepts to KG
