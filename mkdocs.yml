@@ -1,0 +1,54 @@
+site_name: Knowledge Graph Plugin
+site_description: Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
+site_url: https://technomensch.github.io/knowledge-graph/
+repo_url: https://github.com/technomensch/knowledge-graph
+repo_name: technomensch/knowledge-graph
+edit_uri: edit/main/docs/
+
+docs_dir: docs
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - content.action.edit
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+nav:
+  - Home: index.md
+  - Getting Started: GETTING-STARTED.md
+  - Concepts: CONCEPTS.md
+  - Commands:
+      - Command Guide: COMMAND-GUIDE.md
+      - Cheat Sheet: CHEAT-SHEET.md
+  - Configuration: CONFIGURATION.md
+  - FAQ: FAQ.md
+  - Roadmap: ROADMAP.md
+  - Contributing:
+      - Style Guide: STYLE-GUIDE.md
+      - Navigation Index: NAVIGATION-INDEX.md
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+  - tables

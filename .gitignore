@@ -33,6 +33,9 @@ dist/
 build/
 *.tgz
 
+# MkDocs generated site
+site/
+
 # Knowledge Graph - selective strategy
 # Personal debugging notes
 docs/lessons-learned/debugging/
