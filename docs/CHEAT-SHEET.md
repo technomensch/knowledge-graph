@@ -1,8 +1,8 @@
 # Knowledge Graph Quick Reference
 
-One-page cheat sheet for the Knowledge Graph plugin. Print this and tape it to your monitor.
+> **Claude Code only:** The `/knowledge:` prefix requires Claude Code with this plugin installed. Other IDEs access equivalent functionality through MCP tools.
 
-For detailed documentation, see [Command Guide](COMMAND-GUIDE.md) (created in Session 5).
+One-page cheat sheet for the Knowledge Graph plugin. For detailed documentation, see [Command Guide](COMMAND-GUIDE.md).
 
 ---
 
@@ -20,6 +20,7 @@ For detailed documentation, see [Command Guide](COMMAND-GUIDE.md) (created in Se
 - **Check for sensitive data before sharing** → `/knowledge:check-sensitive`
 - **Work with multiple knowledge graphs** → `/knowledge:list` then `/knowledge:switch`
 - **Link lessons to GitHub issues** → `/knowledge:link-issue`
+- **Update plugin documentation** → `/knowledge:update-doc --user-facing`
 
 ---
 
@@ -50,6 +51,7 @@ Active users use these for regular workflows:
 | `/knowledge:check-sensitive` | Scan knowledge graph for potentially sensitive information |
 | `/knowledge:config-sanitization` | Interactive wizard for pre-commit hook setup |
 | `/knowledge:extract-chat` | Extract chat history from Claude and Gemini logs |
+| `/knowledge:update-doc` | Update plugin/project docs (`--user-facing`) or KG content |
 
 ### 🔴 Advanced (Power Features)
 
@@ -166,5 +168,7 @@ Power users leverage these for complex workflows:
 
 ---
 
-**Version**: 0.0.7-alpha
-**Last Updated**: 2026-02-20
+**Version**: 0.0.8.2-alpha
+**Last Updated**: 2026-02-21
+
+<!-- Updated: 2026-02-21 -->
