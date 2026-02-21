@@ -22,14 +22,13 @@ A Claude Code plugin that provides:
 
 ---
 
-## Getting Started
+## Quick Install
 
-**Choose a setup path**:
-- **Claude Code users** — [5-minute setup](docs/GETTING-STARTED.md#path-a-claude-code-setup)
-- **Other AI assistants** (Cursor, Continue.dev, Aider) — [10-minute setup](docs/GETTING-STARTED.md#path-b-other-ai-assistant-setup)
-- **Manual workflows** — [15-minute setup](docs/GETTING-STARTED.md#path-c-manual-setup)
+Paste [INSTALL.md](INSTALL.md) into any AI assistant for automated setup on any platform — Claude Code, Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Aider, or local LLMs.
 
-See [Getting Started Guide](docs/GETTING-STARTED.md) for full installation instructions, prerequisites, and troubleshooting.
+**Claude Code users:** Run `claude plugin install knowledge` or load with `claude --plugin-dir /path/to/knowledge-graph`, then run `/knowledge:init`.
+
+See [Getting Started Guide](docs/GETTING-STARTED.md) for prerequisites and troubleshooting.
 
 ---
 
@@ -254,20 +253,11 @@ See [ROADMAP.md](ROADMAP.md) for detailed version history and development progre
 **Core + Automation Architecture:**
 - **Core** (`core/`) — Pure markdown, works with ANY LLM
 - **Automation** (commands, hooks) — Claude Code specific
+- **MCP Server** (`mcp-server/`) — Cross-platform data access for any MCP-capable IDE
 
-**For non-Claude users:**
-1. Copy `core/` to your project
-2. Follow manual workflows in `core/docs/WORKFLOWS.md`
-3. Use templates directly
-4. Optionally use MCP server standalone
+**For non-Claude users:** Paste [INSTALL.md](INSTALL.md) into any AI assistant for automated setup. The installer detects the platform and configures the appropriate components.
 
-**Platform adaptation:**
-- Continue.dev: Create commands using core templates
-- Cursor: Create rules referencing core patterns
-- Aider: Create scripts populating core structure
-- Local LLMs: Use core templates with system prompts
-
-See: `core/docs/PLATFORM-ADAPTATION.md` (Phase 3)
+See: [Platform Adaptation Guide](core/docs/PLATFORM-ADAPTATION.md) for platform capability comparisons
 
 ---
 
