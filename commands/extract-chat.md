@@ -14,6 +14,9 @@ Automates the extraction of chat history from local Claude (.jsonl) and Gemini (
 /kg-sis:extract-chat [-claude | -gemini]
 /kg-sis:extract-chat --output-dir=<path>
 /kg-sis:extract-chat -claude --output-dir=<custom-path>
+/kg-sis:extract-chat -claude 2026-02-20 through 2026-02-21
+/kg-sis:extract-chat --today
+/kg-sis:extract-chat --project=knowledge-graph
 ```
 
 ---
@@ -24,6 +27,11 @@ Automates the extraction of chat history from local Claude (.jsonl) and Gemini (
 - `-gemini`: Extract only Antigravity/Gemini session history
 - (no option): Extract all available history
 - `--output-dir=<path>`: Override output directory (default: active KG's chat-history/)
+- `--today`: Extract only today's sessions (convenience flag)
+- `--date=YYYY-MM-DD`: Extract only sessions from a specific date
+- `--after=YYYY-MM-DD`: Extract sessions from this date onwards (inclusive)
+- `--before=YYYY-MM-DD`: Extract sessions up to and including this date
+- `--project=<fragment>`: Filter to sessions from a specific project (path fragment match against `~/.claude/projects/<name>/`)
 
 ---
 
@@ -95,6 +103,23 @@ case "$input" in
 esac
 ```
 
+### Step 2.5: Parse Date Range from User Input
+
+Translate any date constraints from the user's invocation into `$date_flags`:
+
+| User input | Resulting flags |
+|------------|----------------|
+| `--today` | `--today` |
+| `--date=2026-02-20` | `--date=2026-02-20` |
+| `--after=2026-02-20` | `--after=2026-02-20` |
+| `2026-02-20` (bare date) | `--date=2026-02-20` |
+| `2026-02-20 through 2026-02-21` | `--after=2026-02-20 --before=2026-02-21` |
+| `2026-02-20 to 2026-02-21` | `--after=2026-02-20 --before=2026-02-21` |
+| `--project=knowledge-graph` | `--project=knowledge-graph` |
+| (no date) | (empty — extracts all) |
+
+Store results as `$date_flags` variable.
+
 ### Step 3: Run Python Extraction Script
 
 **Execute with environment variable for output directory:**
@@ -104,7 +129,7 @@ esac
 export KG_OUTPUT_DIR="$output_dir"
 
 # Run extraction
-python3 ${CLAUDE_PLUGIN_ROOT}/core/scripts/run_extraction.py --source $source_flag
+python3 ${CLAUDE_PLUGIN_ROOT}/core/scripts/run_extraction.py --source $source_flag $date_flags
 ```
 
 **The Python script:**
@@ -309,6 +334,53 @@ Extracting to custom directory: /Users/name/archive/chat-logs
 Saved to:
 - /Users/name/archive/chat-logs/2026-02-12-claude.md
 - /Users/name/archive/chat-logs/2026-02-12-gemini.md
+```
+
+### Example 4: Extract a date range
+
+```bash
+/kg-sis:extract-chat -claude 2026-02-20 through 2026-02-21
+```
+
+**Output:**
+```
+Extracting Claude history (2026-02-20 to 2026-02-21)...
+✅ Found sessions for 2 dates
+
+Saved to:
+- {active_kg_path}/chat-history/2026-02-20-claude.md
+- {active_kg_path}/chat-history/2026-02-21-claude.md
+```
+
+### Example 5: Extract today only
+
+```bash
+/kg-sis:extract-chat --today
+```
+
+**Output:**
+```
+Extracting today's sessions (2026-02-21)...
+✅ Claude: 4 sessions
+✅ Gemini: 1 conversation
+
+Saved to:
+- {active_kg_path}/chat-history/2026-02-21-claude.md
+- {active_kg_path}/chat-history/2026-02-21-gemini.md
+```
+
+### Example 6: Extract sessions for a specific project
+
+```bash
+/kg-sis:extract-chat --project=knowledge-graph
+```
+
+**Output:**
+```
+Extracting Claude history (project filter: knowledge-graph)...
+✅ Found 3 sessions matching project
+
+Saved to: {active_kg_path}/chat-history/2026-02-21-claude.md
 ```
 
 ---

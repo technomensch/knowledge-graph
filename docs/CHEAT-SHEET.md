@@ -50,7 +50,7 @@ Active users use these for regular workflows:
 | `/kg-sis:switch` | Change active knowledge graph |
 | `/kg-sis:check-sensitive` | Scan knowledge graph for potentially sensitive information |
 | `/kg-sis:config-sanitization` | Interactive wizard for pre-commit hook setup |
-| `/kg-sis:extract-chat` | Extract chat history from Claude and Gemini logs |
+| `/kg-sis:extract-chat` | Extract chat history from Claude and Gemini logs (`--today`, `--date`, `--after`, `--before`, `--project`) |
 | `/kg-sis:update-doc` | Update plugin/project docs (`--user-facing`) or KG content |
 
 ### 🔴 Advanced (Power Features)

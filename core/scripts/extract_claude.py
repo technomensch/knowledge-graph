@@ -38,14 +38,17 @@ def parse_metadata_from_file(file_path: str) -> tuple[Optional[str], int]:
         print(f"Warning: Could not parse metadata from {file_path}: {e}")
     return last_ts, last_idx
 
-def extract_claude_sessions(days_back=None, date_filter=None, after_date=None, incremental=False):
+def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
+                             before_date=None, project_filter=None, incremental=False):
     """
     Scans Claude project directories for jsonl files and extracts them.
 
     Args:
         days_back: Legacy parameter (not used)
         date_filter: Extract only sessions from specific date (YYYY-MM-DD)
-        after_date: Extract only sessions after this date (YYYY-MM-DD)
+        after_date: Extract only sessions on or after this date (YYYY-MM-DD, inclusive)
+        before_date: Extract only sessions on or before this date (YYYY-MM-DD, inclusive)
+        project_filter: Filter to sessions from a specific project (path fragment match)
         incremental: Skip extraction if file already exists and is current
 
     Returns a list of processing results.
@@ -53,6 +56,11 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None, i
     results = []
     # Find all project directories
     project_dirs = glob.glob(os.path.join(CLAUDE_PROJECTS_DIR, "*"))
+
+    # Filter project directories by path fragment if --project provided
+    if project_filter:
+        project_dirs = [d for d in project_dirs
+                        if project_filter.lower() in os.path.basename(d).lower()]
     
     # Collect all sessions first
     all_sessions = []
@@ -131,8 +139,11 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None, i
     # Apply date filtering
     if date_filter:
         sessions_by_date = {k: v for k, v in sessions_by_date.items() if k == date_filter}
-    elif after_date:
-        sessions_by_date = {k: v for k, v in sessions_by_date.items() if k > after_date}
+    else:
+        if after_date:
+            sessions_by_date = {k: v for k, v in sessions_by_date.items() if k >= after_date}
+        if before_date:
+            sessions_by_date = {k: v for k, v in sessions_by_date.items() if k <= before_date}
 
     # Apply incremental mode (skip if file exists and has recent content)
     if incremental:

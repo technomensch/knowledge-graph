@@ -177,19 +177,28 @@ def extract_gemini_pb_sessions(limit=None):
 
     return all_pb_sessions
 
-def extract_all_gemini(limit=None):
+def extract_all_gemini(limit=None, date_filter=None, after_date=None, before_date=None):
     """Main controller to aggregate all Gemini sessions and write merged daily files."""
     results = []
-    
+
     json_sessions = extract_gemini_json_sessions(limit=limit)
     pb_sessions = extract_gemini_pb_sessions(limit=limit)
-    
+
     from collections import defaultdict
     sessions_by_date = defaultdict(list)
-    
+
     for s in json_sessions + pb_sessions:
         sessions_by_date[s['date']].append(s)
-        
+
+    # Apply date filtering (mirrors Claude extraction logic)
+    if date_filter:
+        sessions_by_date = {k: v for k, v in sessions_by_date.items() if k == date_filter}
+    else:
+        if after_date:
+            sessions_by_date = {k: v for k, v in sessions_by_date.items() if k >= after_date}
+        if before_date:
+            sessions_by_date = {k: v for k, v in sessions_by_date.items() if k <= before_date}
+
     for date, sessions in sessions_by_date.items():
         # Sort sessions by timestamp within the day
         sessions.sort(key=lambda x: x['ts'])

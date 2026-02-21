@@ -18,6 +18,8 @@ def main():
     parser.add_argument("--date", type=str, default=None, help="Extract only sessions from specific date (YYYY-MM-DD)")
     parser.add_argument("--after", type=str, default=None, help="Extract only sessions after this date (YYYY-MM-DD)")
     parser.add_argument("--today", action="store_true", help="Extract only today's sessions (convenience flag)")
+    parser.add_argument("--before", type=str, default=None, help="Extract only sessions on or before this date (YYYY-MM-DD)")
+    parser.add_argument("--project", type=str, default=None, help="Filter to sessions from a specific project (path fragment match against ~/.claude/projects/<name>/)")
     parser.add_argument("--incremental", action="store_true", help="Only extract new sessions (skip if file already exists and is current)")
 
     args = parser.parse_args()
@@ -78,13 +80,20 @@ def main():
         claude_res = extract_claude_sessions(
             date_filter=args.date,
             after_date=args.after,
+            before_date=args.before,
+            project_filter=args.project,
             incremental=args.incremental
         )
         results.extend(claude_res)
         
     if args.source in ['all', 'gemini']:
         print("Processing Gemini sessions (JSON & Protobuf)...")
-        gemini_res = extract_all_gemini(limit=args.limit)
+        gemini_res = extract_all_gemini(
+            limit=args.limit,
+            date_filter=args.date,
+            after_date=args.after,
+            before_date=args.before
+        )
         results.extend(gemini_res)
 
         
