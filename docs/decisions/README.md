@@ -2,35 +2,32 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 0
-**Last Updated:** [Date]
+**Total ADRs:** 2
+**Last Updated:** 2026-02-21
 
 ---
 
 ## Active ADRs
 
-[ADRs with Status: Accepted]
+- [ADR-001: Defer MEMORY.md Auto-Sync Rules Engine to v0.0.5](ADR-001-defer-memory-rules-engine.md) — **Status:** Accepted
+- [ADR-002: Defer Update Notifications and Version Sync to v0.0.9](ADR-002-defer-update-notifications.md) — **Status:** Accepted
 
 ---
 
 ## All ADRs (Chronological)
 
-[Auto-populated when ADRs are created]
-
-- [ADR-001: Title](ADR-001-title.md) — **Status:** Accepted — [Brief description]
+- [ADR-001: Defer MEMORY.md Auto-Sync Rules Engine to v0.0.5](ADR-001-defer-memory-rules-engine.md) — **Status:** Accepted — Deferred rules engine and smart summarization; shipped restore-only in v0.0.4
+- [ADR-002: Defer Update Notifications and Version Sync to v0.0.9](ADR-002-defer-update-notifications.md) — **Status:** Accepted — Deferred `kg_version` tool and cached GitHub check; version sync + `--version` flag planned for v0.0.9
 
 ---
 
 ## By Category
 
 ### Architecture
-- [ADR-XXX](ADR-XXX-title.md) — [Topic]
+- [ADR-002](ADR-002-defer-update-notifications.md) — Update notifications and version sync for Tier 2/3 users
 
 ### Process
-- [ADR-XXX](ADR-XXX-title.md) — [Topic]
-
-### Technology Choices
-- [ADR-XXX](ADR-XXX-title.md) — [Topic]
+- [ADR-001](ADR-001-defer-memory-rules-engine.md) — MEMORY.md rules engine deferral
 
 ---
 
@@ -68,4 +65,3 @@ ADRs follow a lightweight format:
 - Descriptive filename with slug
 - Standard sections: Context, Decision, Rationale, Consequences, Related
 - Status tracking (Proposed → Accepted → Deprecated/Superseded)
-

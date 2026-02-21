@@ -2,18 +2,19 @@
 
 Comprehensive catalog of all lessons-learned documents.
 
-**Total Lessons:** 2
-**Last Updated:** 2026-02-16
+**Total Lessons:** 4
+**Last Updated:** 2026-02-21
 
 ---
 
 ## By Category
 
-### Architecture Lessons (0 total)
+### Architecture Lessons (2 total)
 
-[Auto-populated when lessons are added]
+- [2026-02-21 - Plugin Example File Management — Why You Can't Gate the Download](architecture/Lessons_Learned_Plugin_Example_File_Management.md) - Plugin installs are atomic; git pull restores deleted tracked files; three options evaluated for opt-out; decision deferred
+- [2026-02-21 - Update Notifications for Non-Plugin Users — Version Sync and MCP Discovery Gap](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md) - MCP server version hardcoded and out of sync; four-part solution designed; deferred to v0.0.9
 
-**Tags:** #architecture
+**Tags:** #architecture #plugin-distribution #git #versioning #mcp #update-notifications
 
 ---
 
@@ -44,6 +45,8 @@ Comprehensive catalog of all lessons-learned documents.
 ## Chronological Index
 
 **2026**
+- 2026-02-21: [Plugin Example File Management — Why You Can't Gate the Download](architecture/Lessons_Learned_Plugin_Example_File_Management.md)
+- 2026-02-21: [Update Notifications for Non-Plugin Users — Version Sync and MCP Discovery Gap](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md)
 - 2026-02-16: [Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md)
 - 2026-02-16: [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md)
 
@@ -51,7 +54,22 @@ Comprehensive catalog of all lessons-learned documents.
 
 ## Tag Index
 
-**#architecture** (0 lessons)
+**#architecture** (2 lessons)
+- [Plugin Example File Management](architecture/Lessons_Learned_Plugin_Example_File_Management.md)
+- [Update Notifications for Non-Plugin Users](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md)
+
+**#plugin-distribution** (2 lessons)
+- [Plugin Example File Management](architecture/Lessons_Learned_Plugin_Example_File_Management.md)
+- [Update Notifications for Non-Plugin Users](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md)
+
+**#git** (1 lesson)
+- [Plugin Example File Management](architecture/Lessons_Learned_Plugin_Example_File_Management.md)
+
+**#versioning** (1 lesson)
+- [Update Notifications for Non-Plugin Users](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md)
+
+**#update-notifications** (1 lesson)
+- [Update Notifications for Non-Plugin Users](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md)
 
 **#process** (1 lesson)
 - [Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md)
@@ -64,7 +82,8 @@ Comprehensive catalog of all lessons-learned documents.
 **#claude-code** (1 lesson)
 - [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md)
 
-**#mcp** (1 lesson)
+**#mcp** (2 lessons)
+- [Update Notifications for Non-Plugin Users](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md)
 - [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md)
 
 **#namespace** (1 lesson)
