@@ -4,105 +4,117 @@
 
 **Using the knowledge graph with different AI coding platforms**
 
-The knowledge graph core is platform-agnostic. This guide shows how to adapt it for various platforms beyond Claude Code.
+The knowledge graph core is platform-agnostic. This guide covers platform capabilities and usage patterns after installation.
 
 ---
 
-## Prerequisites
+## Installation
 
-Before adapting to your platform:
-- ✅ Complete [Getting Started](../../docs/GETTING-STARTED.md) setup
-- ✅ Have templates in your project (`core/templates/`)
-- ✅ Understand [basic concepts](../../docs/CONCEPTS.md)
+**For installation on any platform**, paste [INSTALL.md](../../INSTALL.md) into the AI assistant for automated setup. The installer handles platform detection, MCP server configuration, and knowledge graph initialization.
 
-See [Installation Guide](../../docs/GETTING-STARTED.md#ai-assistant-setup) for initial setup.
+This guide focuses on **platform capabilities and usage patterns** after installation is complete.
 
 ---
 
 ## Quick Reference
 
-| Platform | Automation Level | Setup Method |
-|----------|-----------------|--------------|
-| **Claude Code** | Full | Install plugin (native support) |
-| **Continue.dev** | Medium | Configure context providers |
-| **Cursor** | Medium | Add to indexed directories |
-| **Aider** | Low | Reference docs in commands |
-| **Copilot Chat** | Low | Manual reference in prompts |
-| **Local LLMs** | Custom | System prompts + templates |
-| **MCP Server** | Universal | Run as MCP server |
+| Platform | Automation Level | MCP Support | Commands |
+|----------|-----------------|-------------|----------|
+| **Claude Code** | Full | ✅ | 22 commands |
+| **Cursor** | Medium | ✅ (via MCP) | None (use MCP tools) |
+| **Windsurf** | Medium | ✅ (via MCP) | None (use MCP tools) |
+| **Continue.dev** | Medium | ✅ (via MCP) | Custom slash commands |
+| **JetBrains AI** | Medium | ✅ (via MCP) | None (use MCP tools) |
+| **VS Code (Claude)** | Medium | ✅ (via MCP) | None (use MCP tools) |
+| **Claude Desktop** | Medium | ✅ (via MCP) | None (use MCP tools) |
+| **Aider** | Low | ❌ | Manual only |
+| **Copilot Chat** | Low | ❌ | Manual only |
+| **Local LLMs** | Custom | ❌ | Manual + system prompts |
 
 ---
 
-## Claude Code (Native - Full Automation)
+## Claude Code (Native — Full Automation)
 
 **Status:** ✅ Fully supported (this plugin)
 
-**Features:**
-- 18 commands for automation
-- SessionStart hooks (check-memory, recent-lessons, memory-diff-check)
-- Subagents for review
-- MEMORY.md bidirectional sync with archive/restore
+**Automation:** Full — all 22 commands, hooks, agents, and MCP tools available
 
-**Setup:** See main README.md and [GETTING-STARTED.md](../../docs/GETTING-STARTED.md) for installation, [CONFIGURATION.md](../../docs/CONFIGURATION.md) for post-install configuration
+**Features:**
+- 22 commands: `/knowledge:capture-lesson`, `/knowledge:recall`, `/knowledge:create-adr`, etc.
+- SessionStart hooks: check-memory, recent-lessons, memory-diff-check
+- Subagents for automated review
+- MEMORY.md bidirectional sync with archive/restore
+- ADR automation with bidirectional lesson linking
+- Git metadata auto-capture on every operation
+
+**For installation:** See [GETTING-STARTED.md](../../docs/GETTING-STARTED.md) or paste [INSTALL.md](../../INSTALL.md).
+
+---
+
+## Cursor
+
+**Platform:** VS Code fork with AI features
+**Automation:** Medium (MCP tools + indexed directories)
+
+**With MCP server installed (recommended):**
+- Use `kg_config_init`, `kg_config_list`, `kg_search`, `kg_scaffold` tools directly in Cursor chat
+- MCP provides the same data layer as Claude Code
+- Full search, lesson creation, and ADR scaffolding via MCP tools
+
+**Without MCP:**
+- Index `docs/knowledge/`, `docs/lessons-learned/`, `docs/decisions/` directories
+- Use Cursor rules (`.cursorrules`) to guide lesson creation
+- Use `@docs/knowledge` to reference knowledge in Composer
+
+**Limitations (without MCP):**
+- No automated git metadata tracking
+- No bidirectional MEMORY.md sync
+- Manual category README updates
+- No automated pipelines (`/knowledge:sync-all` equivalent)
+
+**Workaround:** Use manual workflows from [WORKFLOWS.md](./WORKFLOWS.md) + Cursor Composer for assistance
+
+---
+
+## Windsurf
+
+**Platform:** AI-native IDE by Codeium
+**Automation:** Medium (MCP tools + Cascade context)
+
+**With MCP server installed (recommended):**
+- MCP tools available directly in Cascade chat
+- `kg_search` integrates with Windsurf's context-aware search
+- `kg_scaffold` creates lessons from templates automatically
+
+**Without MCP:**
+- Use `.windsurfrules` to reference knowledge graph conventions
+- Index `docs/` directories for context
+
+**Limitations (without MCP):**
+- No automated git metadata tracking
+- Manual lesson creation and search
+- No ADR automation
+
+**Workaround:** Use manual workflows from [WORKFLOWS.md](./WORKFLOWS.md)
 
 ---
 
 ## Continue.dev
 
-**Platform:** VS Code / JetBrains extension  
-**Automation:** Medium (context providers + custom commands)
+**Platform:** VS Code / JetBrains extension
+**Automation:** Medium (MCP tools + context providers + custom slash commands)
 
-### Setup
+**With MCP server installed (recommended):**
+- MCP tools available via Continue's tool-calling interface
+- `kg_search` provides full-text knowledge search
+- `kg_scaffold` creates lessons from templates
 
-**1. Configure context providers:**
+**Without MCP:**
+- Configure context providers to index `docs/knowledge/`, `docs/lessons-learned/`, `docs/decisions/`
+- Create custom `/lesson` and `/recall` slash commands in `~/.continue/config.json`
+- Use `@knowledge` to reference docs in context
 
-```json
-// ~/.continue/config.json
-{
-  "contextProviders": [
-    {
-      "name": "knowledge",
-      "params": {
-        "folders": [
-          "docs/knowledge",
-          "docs/lessons-learned",
-          "docs/decisions"
-        ]
-      }
-    }
-  ]
-}
-```
-
-**2. Create custom commands:**
-
-```json
-// ~/.continue/config.json
-{
-  "slashCommands": [
-    {
-      "name": "lesson",
-      "description": "Create lesson learned",
-      "prompt": "Help me create a lesson learned document. Ask for: topic, category (architecture/debugging/process/patterns), problem description, solution, and lessons. Use template from docs/templates/lessons-learned/lesson-template.md. Save to docs/lessons-learned/{category}/{topic}.md"
-    },
-    {
-      "name": "recall",
-      "description": "Search knowledge base",
-      "prompt": "Search docs/lessons-learned/, docs/knowledge/, and docs/decisions/ for: {input}. Show relevant passages and file paths."
-    }
-  ]
-}
-```
-
-**3. Use knowledge in context:**
-
-```
-@knowledge what patterns do we have for database connections?
-```
-
-Continue.dev will search indexed folders.
-
-**Limitations:**
+**Limitations (without MCP):**
 - No automated git metadata tracking
 - No bidirectional MEMORY.md sync
 - Manual category README updates
@@ -111,343 +123,109 @@ Continue.dev will search indexed folders.
 
 ---
 
-## Cursor
+## JetBrains AI Assistant
 
-**Platform:** VS Code fork with AI features  
-**Automation:** Medium (indexed directories + rules)
+**Platform:** IntelliJ, WebStorm, PyCharm, etc.
+**Automation:** Medium (MCP tools via AI Assistant plugin)
 
-### Setup
-
-**1. Add knowledge dirs to index:**
-
-```json
-// .cursor/settings.json
-{
-  "cursor.includeDirectories": [
-    "docs/knowledge",
-    "docs/lessons-learned",
-    "docs/decisions"
-  ]
-}
-```
-
-**2. Create Cursor rules:**
-
-```
-// .cursorrules
-
-When documenting lessons learned:
-1. Use template from docs/templates/lessons-learned/lesson-template.md
-2. Save to docs/lessons-learned/{category}/
-3. Categories: architecture, debugging, process, patterns
-4. Update category README.md with link
-5. Extract patterns to docs/knowledge/patterns.md
-
-When searching for knowledge:
-1. Check docs/knowledge/ first (quick reference)
-2. Then docs/lessons-learned/ for details
-3. Then docs/decisions/ for architectural context
-```
-
-**3. Use in composer:**
-
-```
-@docs/knowledge what validation patterns exist?
-```
-
-Cursor will search indexed knowledge.
+**With MCP server installed (recommended):**
+- Configure MCP server in Settings → Tools → AI Assistant → MCP Servers
+- Use `kg_config_init`, `kg_search`, `kg_scaffold` tools in AI chat
 
 **Limitations:**
-- No automated pipelines (/knowledge:sync-all)
-- Manual lesson creation
-- No meta-issue tracking automation
+- No automated git metadata tracking
+- No bidirectional MEMORY.md sync
+- No ADR wizard (use `kg_scaffold` with ADR template)
 
-**Workaround:** Use manual workflows + Cursor composer for assistance
+---
+
+## VS Code (Claude Extension) and Claude Desktop
+
+**Platform:** VS Code with Anthropic Claude extension, Claude Desktop app
+**Automation:** Medium (MCP tools)
+
+**With MCP server installed (recommended):**
+- MCP tools available in Claude chat within the IDE
+- Full access to `kg_config_init`, `kg_search`, `kg_scaffold`, `kg_check_sensitive`
+- Config file location: `.vscode/mcp.json` (VS Code) or `~/Library/Application Support/Claude/claude_desktop_config.json` (Desktop)
+
+**Limitations:**
+- No Claude Code commands (22 commands are Claude Code-specific)
+- No SessionStart hooks
+- No automated pipeline (`/knowledge:sync-all` equivalent)
 
 ---
 
 ## Aider
 
-** Platform:** Terminal-based AI pair programming  
+**Platform:** Terminal-based AI pair programming
 **Automation:** Low (manual workflows with AI assistance)
 
-### Setup
-
-**1. Configure read-only paths:**
-
-```yaml
-# .aider.conf.yml
-read-only-paths:
-  - docs/knowledge/
-  - docs/lessons-learned/
-  - docs/decisions/
-```
-
-**2. Create helper script:**
-
-```bash
-#!/bin/bash
-# aider-lesson.sh
-
-cat << EOF
-I want to create a lesson learned.
-
-Template location: docs/templates/lessons-learned/lesson-template.md
-Target directory: docs/lessons-learned/\$CATEGORY/
-
-Please:
-1. Ask me for topic, category, problem, solution
-2. Create file using template
-3. Fill in with provided information
-4. Update docs/lessons-learned/\$CATEGORY/README.md
-EOF
-
-aider \
-  --read docs/templates/lessons-learned/lesson-template.md \
-  --read docs/lessons-learned/
-```
-
-**3. Search knowledge:**
-
-```bash
-# Launch Aider with knowledge context
-aider --read docs/knowledge/patterns.md
-
-# In Aider:
-# "What patterns exist for database connections?"
-```
+**Usage pattern:**
+- Add `read-only-paths` for knowledge directories in `.aider.conf.yml`
+- Ask Aider to create lessons using the template at `core/templates/lessons-learned/lesson-template.md`
+- Aider assists with content; file operations are manual
 
 **Limitations:**
 - Fully manual workflow
-- No automation
-- AI assists but doesn't execute
+- No MCP support
+- No git metadata automation
 
-**Workaround:** Use manual workflows from [WORKFLOWS.md](./WORKFLOWS.md), Aider helps write content
+**Workaround:** Use manual workflows from [WORKFLOWS.md](./WORKFLOWS.md); Aider helps write content
 
 ---
 
 ## GitHub Copilot Chat
 
-**Platform:** VS Code extension  
+**Platform:** VS Code extension
 **Automation:** Low (manual prompting)
 
-### Setup
-
-**1. Reference knowledge in workspace:**
-
-Copilot indexes workspace automatically. Ensure knowledge docs exist:
-
-```bash
-# Verify structure
-ls docs/knowledge/
-ls docs/lessons-learned/
-```
-
-**2. Reference in prompts:**
-
-```
-@workspace What patterns are in docs/knowledge/patterns.md?
-
-#file:docs/lessons-learned/process/ show lessons about workflows
-
-Based on docs/decisions/, what architectural decisions have we made?
-```
+**Usage pattern:**
+- Copilot indexes workspace automatically — ensure knowledge docs are in `docs/`
+- Reference knowledge via `@workspace` queries: `@workspace What patterns are in docs/knowledge/patterns.md?`
+- Use `#file:docs/lessons-learned/` references in prompts
 
 **Limitations:**
 - No skills/commands
-- No automation
-- Manual searching and creation
+- No MCP support
+- Fully manual searching and creation
 
-**Workaround:** Use entirely manual workflows, Copilot assists with writing
+**Workaround:** Use entirely manual workflows; Copilot assists with writing
 
 ---
 
 ## Local LLMs (Ollama, LM Studio, etc.)
 
-**Platform:** Self-hosted models  
+**Platform:** Self-hosted models
 **Automation:** Custom (system prompts + scripts)
 
-### Setup
-
-**1. Create system prompt:**
-
-```markdown
-# system-prompt.md
-
-You are a knowledge management assistant for this project.
-
-The project uses a knowledge graph with four components:
-1. Lessons Learned (docs/lessons-learned/) - Detailed problem-solving
-2. ADRs (docs/decisions/) - Architectural decisions
-3. Knowledge Graph (docs/knowledge/) - Quick reference
-4. Sessions (docs/sessions/) - Historical snapshots
-
-Templates available at: docs/templates/
-
-When user asks to create lesson:
-1. Use docs/templates/lessons-learned/lesson-template.md
-2. Ask for category (architecture/debugging/process/patterns)
-3. Fill in template with user input
-4. Save to docs/lessons-learned/{category}/{filename}.md
-
-When user asks to recall knowledge:
-1. Search docs/knowledge/ first
-2. Then docs/lessons-learned/
-3. Provide file paths and relevant quotes
-```
-
-**2. Launch with system prompt:**
-
-```bash
-# Ollama
-ollama run codellama --system "$(cat system-prompt.md)"
-
-# LM Studio
-# Paste system prompt into system message field
-```
-
-**3. Provide templates as context:**
-
-```bash
-# Include template in each request
-cat docs/templates/lessons-learned/lesson-template.md | \
-  ollama run codellama "Create lesson on database pooling"
-```
+**Usage pattern:**
+- Create a `system-prompt.md` describing the knowledge graph structure and conventions
+- Include the lesson template as context in each request
+- Use the system prompt to guide lesson creation, categorization, and search
 
 **Limitations:**
 - No IDE integration
-- No git automation
-- Manual file operations
+- No MCP support (unless running an MCP-compatible client)
+- Manual file operations required
 
-**Workaround:** Use LLM to generate content, manually save files
-
----
-
-## MCP Server (Universal Access)
-
-**Platform:** Any MCP-compatible client  
-**Automation:** High (server handles automation)
-
-### Setup
-
-**1. Install dependencies:**
-
-```bash
-npm install @anthropic/mcp
-```
-
-**2. Configure MCP server:**
-
-```javascript
-// core/mcp-server.js
-import { McpServer } from '@anthropic/mcp'
-
-const server = new McpServer({
-  name: 'knowledge-graph',
-  version: '1.0.0'
-})
-
-// Resources
-server.resource({
-  uri: 'knowledge://patterns',
-  name: 'Design Patterns',
-  mimeType: 'text/markdown',
-  handler: async () => {
-    return fs.readFileSync('docs/knowledge/patterns.md', 'utf8')
-  }
-})
-
-// Tools
-server.tool({
-  name: 'search_knowledge',
-  description: 'Search knowledge base',
-  parameters: {
-    query: { type: 'string', description: 'Search query' }
-  },
-  handler: async ({ query }) => {
-    // Implement search
-  }
-})
-
-server.listen(3000)
-```
-
-**3. Configure client:**
-
-```json
-// claude_desktop_config.json (Claude Desktop)
-{
-  "mcpServers": {
-    "knowledge-graph": {
-      "command": "node",
-      "args": ["core/mcp-server.js"],
-      "cwd": "/absolute/path/to/project"
-    }
-  }
-}
-```
-
-**4. Use from any MCP client:**
-
-```
-# In Claude Desktop or any MCP client
-What patterns are available?
-[MCP fetches from knowledge://patterns]
-
-Search for lessons about performance
-[MCP executes search_knowledge tool]
-```
-
-**Benefits:**
-- Works with any MCP-compatible platform
-- Centralized knowledge access
-- Can add authentication/authorization
-
-**See:** `core/mcp-server.js` (Phase 4 implementation)
+**Workaround:** Use LLM to generate content; manually save files using templates
 
 ---
 
-## Custom Integration
+## MCP Tools Reference
 
-For platforms not listed:
+For all MCP-capable platforms, these 7 tools are available:
 
-### 1. Identify Platform Capabilities
-
-- Can it read local files? → Point to `docs/`
-- Can it run scripts? → Use Python extraction scripts
-- Can it execute commands? → Create platform-specific commands
-- Can it use system prompts? → Include knowledge graph instructions
-
-### 2. Choose Integration Level
-
-**Level 1: Manual (No integration)**
-- Copy templates manually
-- Edit in any editor
-- Use grep for search
-
-**Level 2: Context-aware (Read-only)**
-- Platform reads `docs/` directories
-- AI can reference knowledge
--  Manual creation
-
-**Level 3: Semi-automated (Commands)**
-- Platform runs scripts to create lessons
-- AI assists with content
-- Some automation (git commits, indexing)
-
-**Level 4: Fully automated (Plugin)**
-- Custom plugin for platform
-- Full automation (like Claude Code version)
-
-### 3. Use Core Components
-
-All platforms can use:
-- ✅ Templates (copy and fill)
-- ✅ Directory structure (create manually)
-- ✅ Manual workflows (see WORKFLOWS.md)
-- ✅ Python scripts (chat extraction)
-
-Platform-specific automation optional.
+| Tool | Description |
+|------|-------------|
+| `kg_config_init` | Create a new knowledge graph with directory structure |
+| `kg_config_list` | List all configured knowledge graphs |
+| `kg_config_switch` | Change the active knowledge graph |
+| `kg_config_add_category` | Add a new category to the active KG |
+| `kg_search` | Full-text search across the active KG |
+| `kg_scaffold` | Create a file from a template |
+| `kg_check_sensitive` | Scan for potentially sensitive data |
 
 ---
 
@@ -455,38 +233,23 @@ Platform-specific automation optional.
 
 ### From Claude Code to Another Platform
 
-**1. Keep core knowledge:**
+**1. Keep core knowledge** — knowledge stays in `docs/` (platform-agnostic):
 
 ```bash
-# Knowledge stays in docs/ (platform-agnostic)
 git commit -m "docs: knowledge graph export"
 ```
 
-**2. Recreate automation for new platform:**
+**2. Use the MCP server** — run the knowledge graph as an MCP server to access from the new platform.
 
-- Review workflows in Claude Code skills
-- Implement equivalent in new platform
-- Or: Use manual workflows
-
-**3. Use MCP server:**
-
-Run knowledge graph as MCP server, access from new platform.
+**3. Recreate automation** — review Claude Code commands and implement equivalent patterns in the new platform, or use manual workflows.
 
 ### From Manual to Automated
 
-**1. Organize existing docs:**
+**1. Organize existing docs** — move to the standard directory structure.
 
-```bash
-# Move to standard structure
-mkdir -p docs/{lessons-learned,decisions,knowledge}
-mv old-docs/* docs/lessons-learned/process/
-```
+**2. Initialize config** — run `node mcp-server/dist/cli.js init` or paste INSTALL.md to set up `~/.claude/kg-config.json`.
 
-**2. Convert to templates:**
-
-Study existing docs, identify pattern, create templates.
-
-**3. Add git metadata retroactively:**
+**3. Add git metadata retroactively** if needed:
 
 ```markdown
 **Branch:** (unknown - created before tracking)
@@ -495,14 +258,7 @@ Study existing docs, identify pattern, create templates.
 
 ### Between AI Platforms
 
-**Knowledge is portable:**
-
-```bash
-# Same docs/ work with all platforms
-# Just configure platform to read from docs/
-```
-
-**Automation requires platform-specific implementation.**
+Knowledge is portable — the same `docs/` directory works with all platforms. Automation requires platform-specific implementation.
 
 ---
 
@@ -510,39 +266,42 @@ Study existing docs, identify pattern, create templates.
 
 ### Solo Developer
 
-**Platform:** Any (even manual)  
-**Recommendation:** Start simple (manual + templates), add automation if needed
+**Platform:** Any (even manual)
+**Recommendation:** Start with the universal installer, add automation where valuable
 
 ### Small Team (2-5)
 
-**Platform:** Continue.dev or Cursor (good IDE integration)  
-**Recommendation:** Context providers + manual workflows
+**Platform:** MCP-capable IDE (Cursor, Windsurf, Continue.dev)
+**Recommendation:** MCP tools provide the core data layer; each developer uses their preferred IDE
 
 ### Medium Team (6-20)
 
-**Platform:** Custom MCP server + any IDE  
-**Recommendation:** Centralized knowledge access, team can use different IDEs
+**Platform:** Mix of platforms sharing one MCP server
+**Recommendation:** Centralized knowledge access; team members use different IDEs
 
 ### Large Team (20+)
 
-**Platform:** Custom integration + knowledge curator  
-**Recommendation:** Dedicated tools, formal processes
+**Platform:** Custom integration + knowledge curator
+**Recommendation:** Dedicated tools, formal processes, dedicated MCP server instance
 
 ---
 
 ## Learn More
 
-**Core Concepts & Setup**:
-- [Getting Started](../../docs/GETTING-STARTED.md) - Installation and first steps
-- [Concepts Guide](../../docs/CONCEPTS.md) - Plain-English term explanations
-- [Configuration](../../docs/CONFIGURATION.md) - Post-install customization
+**Installation**:
+- [Universal Installer](../../INSTALL.md) — Automated setup for all platforms
+- [Getting Started](../../docs/GETTING-STARTED.md) — Claude Code setup guide
 
-**Guides & References**:
-- [Architecture Guide](./ARCHITECTURE.md) - System design overview
-- [Patterns Guide](./PATTERNS-GUIDE.md) - Writing quality lessons and ADRs
-- [Manual Workflows](./WORKFLOWS.md) - Step-by-step processes for non-Claude users
+**Core Concepts & Reference**:
+- [Concepts Guide](../../docs/CONCEPTS.md) — Plain-English term explanations
+- [Configuration](../../docs/CONFIGURATION.md) — Post-install customization
+- [Command Guide](../../docs/COMMAND-GUIDE.md) — All commands (Claude Code users)
+
+**Guides**:
+- [Architecture Guide](./ARCHITECTURE.md) — System design overview
+- [Patterns Guide](./PATTERNS-GUIDE.md) — Writing quality lessons and ADRs
+- [Manual Workflows](./WORKFLOWS.md) — Step-by-step processes for all platforms
 
 **Resources**:
-- [Templates](../templates/) - Starter scaffolds for all document types
-- [Examples](../examples/) - Real-world samples to study
-- [Command Guide](../../docs/COMMAND-GUIDE.md) - All 19 commands (Claude Code users)
+- [Templates](../templates/) — Starter scaffolds for all document types
+- [Examples](../examples/) — Real-world samples to study

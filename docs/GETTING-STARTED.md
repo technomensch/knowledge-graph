@@ -1,22 +1,18 @@
 # Getting Started with Knowledge Graph
 
-A step-by-step guide for setting up the knowledge graph system and capturing the first lesson. This guide covers all supported setup paths and takes 5–20 minutes to complete depending on the chosen approach.
+A step-by-step guide for setting up the knowledge graph system and capturing the first lesson.
 
-**Version**: 0.0.7-alpha
+**Version**: 0.0.8-alpha
 
 ---
 
-## Choose a Setup Path
+## Universal Installer (All Platforms)
 
-The knowledge graph system supports three distinct setup paths. Select the path that matches the current environment:
+**For Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Aider, and other AI assistants:** Paste [INSTALL.md](../INSTALL.md) into the AI assistant for fully automated setup. The installer detects the platform, configures the MCP server, and initializes a knowledge graph automatically.
 
-| Setup Path | Best For | Time to First Lesson |
-|---|---|---|
-| [Path A: Claude Code](#path-a-claude-code-setup) | Claude Code plugin users | ~5 minutes |
-| [Path B: Other AI Assistant](#path-b-other-ai-assistant-setup) | Cursor, Continue.dev, Aider users | ~10 minutes |
-| [Path C: Manual / No AI](#path-c-manual-setup) | Terminal and editor-only workflows | ~15 minutes |
+**For Claude Code users:** Follow the setup steps below, or paste [INSTALL.md](../INSTALL.md) for the same automated experience.
 
-**Not sure which path fits?** Read [CONCEPTS.md](CONCEPTS.md) for a plain-English overview of the system before proceeding.
+**Not sure which platform fits?** Read [CONCEPTS.md](CONCEPTS.md) for a plain-English overview of the system before proceeding.
 
 ---
 
@@ -89,204 +85,6 @@ Expected output now shows: `1 lesson`
 
 ---
 
-## Path B: Other AI Assistant Setup
-
-**For**: Users working with Cursor, Continue.dev, Aider, or any AI assistant other than Claude Code.
-
-**Time to first lesson**: ~10 minutes
-
-### Prerequisites
-
-- An AI assistant installed (Cursor, Continue.dev, Aider, etc.)
-- Git (recommended)
-- Terminal access
-
-### Step 1: Clone the Core System
-
-The `core/` directory contains the platform-agnostic templates, examples, and documentation that work with any AI assistant:
-
-```bash
-# Download the core system
-git clone https://github.com/technomensch/knowledge-graph.git /tmp/kg-source
-
-# Copy the core directory into the project
-cp -r /tmp/kg-source/core your-project/
-```
-
-### Step 2: Initialize the Directory Structure
-
-```bash
-cd your-project
-mkdir -p docs/{lessons-learned/{architecture,debugging,process,patterns},decisions,knowledge,sessions}
-cp -r core/templates/. docs/templates/
-```
-
-The directory structure after setup:
-
-```
-docs/
-├── lessons-learned/    # Problem-solving documentation
-│   ├── architecture/
-│   ├── debugging/
-│   ├── patterns/
-│   └── process/
-├── decisions/          # Architecture Decision Records
-├── knowledge/          # Quick-reference patterns and concepts
-├── sessions/           # Work session summaries
-└── templates/          # Fill-in-the-blank forms
-```
-
-### Step 3: Configure the AI Assistant
-
-Add the knowledge graph templates to the AI assistant's context so it can create entries automatically.
-
-**Continue.dev** — add to `~/.continue/config.json`:
-
-```json
-{
-  "contextProviders": [
-    {
-      "name": "knowledge",
-      "params": {
-        "folders": ["docs/knowledge", "docs/lessons-learned", "docs/decisions"]
-      }
-    }
-  ],
-  "slashCommands": [
-    {
-      "name": "lesson",
-      "description": "Create lesson learned",
-      "prompt": "Help me create a lesson learned document using the template at docs/templates/lessons-learned/lesson-template.md. Save to docs/lessons-learned/{category}/{Title}.md and fill in [MANUAL] fields only."
-    }
-  ]
-}
-```
-
-**Cursor** — add to `.cursor/settings.json`:
-
-```json
-{
-  "cursor.includeDirectories": [
-    "docs/knowledge",
-    "docs/lessons-learned",
-    "docs/decisions"
-  ]
-}
-```
-
-**Aider** — add to `.aider.conf.yml`:
-
-```yaml
-read-only-paths:
-  - docs/knowledge/
-  - docs/lessons-learned/
-  - docs/decisions/
-```
-
-For additional platform configurations, see [Platform Adaptation Guide](../core/docs/PLATFORM-ADAPTATION.md).
-
-### Step 4: Create the First Lesson
-
-Open a conversation with the AI assistant and ask it to document a recently solved problem:
-
-```
-"Help me create a lesson learned about [describe the problem and solution]."
-```
-
-The AI assistant uses the template to create a structured entry in `docs/lessons-learned/`.
-
-### Next Steps for AI Assistant Users
-
-**Next steps**:
-- See platform tips: [Platform Adaptation Guide](../core/docs/PLATFORM-ADAPTATION.md)
-- Follow manual workflows: [Workflows Guide](../core/docs/WORKFLOWS.md)
-- See examples: [Real-World Examples](../core/examples/)
-
----
-
-## Path C: Manual Setup
-
-**For**: Users who prefer to work without an AI assistant, or who want to understand the system before adding automation.
-
-**Time to first lesson**: ~15 minutes
-
-### Prerequisites
-
-- A text editor (any editor works — VSCode, vim, Sublime, Notepad++)
-- Terminal or command prompt
-- Git (optional but recommended)
-
-### Step 1: Get the Templates
-
-```bash
-# Download or clone the core system
-git clone https://github.com/technomensch/knowledge-graph.git /tmp/kg-source
-
-# Copy the core directory into the project
-cp -r /tmp/kg-source/core your-project/
-```
-
-### Step 2: Create the Directory Structure
-
-```bash
-cd your-project
-mkdir -p docs/{lessons-learned/{architecture,debugging,process,patterns},decisions,knowledge,sessions}
-cp -r core/templates/. docs/templates/
-touch docs/knowledge/{patterns.md,concepts.md,gotchas.md}
-```
-
-### Step 3: Create the First Lesson
-
-**3a. Choose a category** based on the type of problem:
-
-| Category | Use For |
-|---|---|
-| `architecture/` | System design, component structure |
-| `debugging/` | Bug fixes, troubleshooting |
-| `process/` | Workflow improvements, tools |
-| `patterns/` | Reusable solutions, best practices |
-
-**3b. Copy the lesson template** with a descriptive filename:
-
-```bash
-cp docs/templates/lessons-learned/lesson-template.md \
-   docs/lessons-learned/debugging/My_First_Lesson.md
-```
-
-**3c. Open the file** and fill in the `[MANUAL]` fields:
-
-```yaml
----
-title: "Lesson: [Short description of what was learned]"  # [MANUAL]
-category: debugging                                         # [MANUAL]
-tags: [relevant, keywords, here]                           # [MANUAL]
-# Fields marked [AUTO] are filled by commands — leave blank for manual workflow
----
-```
-
-**3d. Write the body** — answer these four questions:
-
-- **Problem:** What went wrong or what needed solving?
-- **Root Cause:** Why did it happen?
-- **Solution:** What fixed it, step by step?
-- **Prevention:** How to avoid this in the future?
-
-**3e. Commit** (if using git):
-
-```bash
-git add docs/lessons-learned/debugging/My_First_Lesson.md
-git commit -m "docs: add first lesson"
-```
-
-### Next Steps for Manual Users
-
-**Next steps**:
-- Follow all 9 workflows: [Manual Workflows Guide](../core/docs/WORKFLOWS.md)
-- Speed up with aliases: [Tips & Shortcuts](../core/docs/WORKFLOWS.md#tips-and-shortcuts)
-- Improve quality: [Pattern Writing Guide](../core/docs/PATTERNS-GUIDE.md)
-
----
-
 ## Troubleshooting
 
 ### Commands do not appear in Claude Code autocomplete
@@ -331,14 +129,17 @@ Git is recommended but not required. With git, the system automatically captures
 
 ## Related Documentation
 
+**Installation**:
+- [Universal Installer](../INSTALL.md) — Automated setup for all platforms (paste into any AI assistant)
+- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Platform capability comparisons and integration details
+
 **Getting deeper into the system**:
 - [Concepts Guide](CONCEPTS.md) — Plain-English definitions of every term used in documentation
-- [Command Reference](COMMAND-GUIDE.md) — All 19 commands with examples and learning path
+- [Command Reference](COMMAND-GUIDE.md) — All commands with examples and learning path
 - [Quick Reference](CHEAT-SHEET.md) — One-page cheat sheet for common tasks
 
 **Configuration and customization**:
 - [Configuration Guide](CONFIGURATION.md) — Post-install setup: sanitization, team workflows, MCP server
-- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Detailed guides for Cursor, Continue.dev, Aider, and other platforms
 
 **Writing effective entries**:
 - [Manual Workflows](../core/docs/WORKFLOWS.md) — Step-by-step guides for all 9 workflow types
@@ -347,5 +148,5 @@ Git is recommended but not required. With git, the system automatically captures
 
 ---
 
-**Version**: 0.0.7-alpha
+**Version**: 0.0.8-alpha
 **Last Updated**: 2026-02-20
