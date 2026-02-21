@@ -1,6 +1,8 @@
 # Command Reference Guide
 
-Complete guide to all 19 knowledge graph commands, organized by difficulty with learning paths.
+> **Claude Code only:** The `/knowledge:` prefix requires Claude Code with this plugin installed. Other IDEs access equivalent functionality through MCP tools — see [INSTALL.md](../INSTALL.md) for platform-specific setup.
+
+Complete reference for all knowledge graph commands, organized by difficulty with learning paths.
 
 ---
 
@@ -8,9 +10,9 @@ Complete guide to all 19 knowledge graph commands, organized by difficulty with 
 
 - [I Want To...](#i-want-to) — Task-based command finder
 - [Learning Path](#learning-path) — Progression from beginner to advanced
-- [Essential Commands](#essential-commands) — Start here (4 commands)
-- [Intermediate Commands](#intermediate-commands) — Daily use (8 commands)
-- [Advanced Commands](#advanced-commands) — Power features (7 commands)
+- [Essential Commands](#essential-commands) — Start here
+- [Intermediate Commands](#intermediate-commands) — Daily use
+- [Advanced Commands](#advanced-commands) — Power features
 - [Command Comparison](#command-comparison) — When to use which
 - [Troubleshooting](#troubleshooting) — Common problems and fixes
 - [Related Documentation](#related-documentation) — Links to other guides
@@ -30,6 +32,7 @@ Complete guide to all 19 knowledge graph commands, organized by difficulty with 
 - **Summarize this conversation** → `/knowledge:session-summary`
 - **Add a new category (e.g., security, ml-ops)** → `/knowledge:add-category`
 - **See my chat history** → `/knowledge:extract-chat`
+- **Update plugin documentation** → `/knowledge:update-doc --user-facing`
 
 ### Team Collaboration
 - **Share knowledge safely** → `/knowledge:config-sanitization`
@@ -567,6 +570,42 @@ Test the hook:
 
 ---
 
+### 🟡 `/knowledge:update-doc`
+
+**Purpose**: Update an existing documentation file — plugin/project documentation (`--user-facing`) or knowledge graph content
+
+**When to use**:
+- A plugin feature changed and COMMAND-GUIDE, CHEAT-SHEET, or README needs updating
+- Adding a new command entry to user-facing docs
+- Ensuring documentation follows v0.0.7 language standards (third-person, Section 508)
+
+**What it does**:
+
+Without `--user-facing`: shows a disambiguation dialog to distinguish plugin documentation from KG content.
+
+With `--user-facing`:
+1. Reads target file and displays current sections and version
+2. Asks what type of update (add command entry, update existing entry, add section, update metadata, validate only)
+3. Runs v0.0.7 standards validation (third-person voice, heading hierarchy, table headers, link text)
+4. Shows diff preview before writing
+5. Applies changes and commits with standards-compliant message
+
+**Time**: 2-5 minutes
+
+**Example**:
+```bash
+/knowledge:update-doc COMMAND-GUIDE.md --user-facing   # Update plugin documentation wizard
+/knowledge:update-doc README.md --user-facing           # Update README with new feature info
+/knowledge:update-doc some-lesson.md                    # Disambiguation dialog for KG content
+```
+
+**Tips**:
+- Always use `--user-facing` for plugin/project docs (README, COMMAND-GUIDE, CHEAT-SHEET, etc.)
+- Without `--user-facing`, a dialog clarifies whether the target is plugin docs or KG content
+- Standards validation runs automatically — violations are flagged before writing
+
+---
+
 ## Advanced Commands
 
 ### 🔴 `/knowledge:meta-issue`
@@ -1015,5 +1054,7 @@ git checkout -b issue/N-description
 
 ---
 
-**Version**: 0.0.7-alpha
-**Updated**: 2026-02-20
+**Version**: 0.0.8.2-alpha
+**Updated**: 2026-02-21
+
+<!-- Updated: 2026-02-21 -->

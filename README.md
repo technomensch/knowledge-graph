@@ -59,6 +59,7 @@ Active users leverage these for regular workflows:
 - `/knowledge:check-sensitive` — Scan knowledge graph for potentially sensitive information
 - `/knowledge:config-sanitization` — Interactive wizard for pre-commit hook setup
 - `/knowledge:extract-chat` — Extract chat history from Claude and Gemini logs
+- `/knowledge:update-doc` — Update plugin/project documentation (`--user-facing`) or KG content
 
 ### 🔴 Advanced Commands (Power Features)
 
@@ -168,7 +169,7 @@ All knowledge graph commands use the `knowledge:` namespace:
 ```
 knowledge-graph/
 ├── .claude-plugin/           # Plugin manifest
-├── commands/                 # 19 commands (manual invocation)
+├── commands/                 # commands (manual invocation)
 ├── agents/                   # Subagents (knowledge-reviewer)
 ├── hooks/                    # SessionStart hooks
 ├── scripts/                  # Helper scripts
@@ -212,7 +213,7 @@ See [ROADMAP.md](ROADMAP.md) for detailed version history and development progre
 - ✅ `docs/` and `tests/` excluded from marketplace distribution
 - ✅ Fixed stale `kg-config.json` path (knowledge-graph-plugin → knowledge-graph)
 - ✅ Fixed stale GitHub URLs throughout repo
-- ✅ 19 commands with automatic namespace handling
+- ✅ Commands with automatic namespace handling
 - ✅ MCP server with 7 tools + 2 resources
 - ✅ Platform-agnostic core system
 
@@ -344,7 +345,7 @@ MIT License - See [LICENSE](LICENSE)
 - [Quick Reference](docs/CHEAT-SHEET.md) - One-page cheat sheet
 
 **Command reference**:
-- [Command Guide](docs/COMMAND-GUIDE.md) - All 19 commands with learning path
+- [Command Guide](docs/COMMAND-GUIDE.md) - All commands with learning path
 - [Essential Commands](docs/COMMAND-GUIDE.md#essential-commands) - Start here
 
 **Guides**:
