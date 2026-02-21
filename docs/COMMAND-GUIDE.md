@@ -556,17 +556,29 @@ Test the hook:
 
 **Time**: Under 30 seconds
 
+**Date filtering options**:
+- `--today` — Extract only today's sessions
+- `--date=YYYY-MM-DD` — Extract only sessions from a specific date
+- `--after=YYYY-MM-DD` — Extract sessions from this date onwards (inclusive)
+- `--before=YYYY-MM-DD` — Extract sessions up to and including this date
+- `--project=<fragment>` — Filter to sessions from a specific project (path fragment match)
+
 **Example**:
 ```bash
-/kg-sis:extract-chat                # Extract all (Claude + Gemini)
-/kg-sis:extract-chat -claude        # Extract only Claude
-/kg-sis:extract-chat -gemini        # Extract only Gemini
-/kg-sis:extract-chat --output-dir=/custom/path   # Custom output location
+/kg-sis:extract-chat                                          # Extract all (Claude + Gemini)
+/kg-sis:extract-chat -claude                                  # Extract only Claude
+/kg-sis:extract-chat -gemini                                  # Extract only Gemini
+/kg-sis:extract-chat --output-dir=/custom/path               # Custom output location
+/kg-sis:extract-chat --today                                  # Today only
+/kg-sis:extract-chat -claude 2026-02-20 through 2026-02-21   # Date range
+/kg-sis:extract-chat --project=knowledge-graph               # Specific project only
 ```
 
 **Tips**:
 - Extracted files are automatically searchable via `/kg-sis:recall`
 - Optional `blackboxprotobuf` Python library enables Gemini protobuf file support
+- Date ranges use natural language: `YYYY-MM-DD through YYYY-MM-DD` or `YYYY-MM-DD to YYYY-MM-DD`
+- Gemini date filtering: passthrough implemented; underlying Gemini extraction may have known limitations
 
 ---
 
