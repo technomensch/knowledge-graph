@@ -11,9 +11,9 @@ Automates the extraction of chat history from local Claude (.jsonl) and Gemini (
 ## Usage
 
 ```bash
-/knowledge:extract-chat [-claude | -gemini]
-/knowledge:extract-chat --output-dir=<path>
-/knowledge:extract-chat -claude --output-dir=<custom-path>
+/kg-sis:extract-chat [-claude | -gemini]
+/kg-sis:extract-chat --output-dir=<path>
+/kg-sis:extract-chat -claude --output-dir=<custom-path>
 ```
 
 ---
@@ -169,11 +169,11 @@ python3 ${CLAUDE_PLUGIN_ROOT}/core/scripts/run_extraction.py --source $source_fl
 **Example:**
 ```bash
 # First run (morning)
-/knowledge:extract-chat -claude
+/kg-sis:extract-chat -claude
 # Creates: 2026-02-12-claude.md (2 sessions)
 
 # Second run (evening)
-/knowledge:extract-chat -claude
+/kg-sis:extract-chat -claude
 # Appends to: 2026-02-12-claude.md (now 5 sessions total)
 ```
 
@@ -183,7 +183,7 @@ python3 ${CLAUDE_PLUGIN_ROOT}/core/scripts/run_extraction.py --source $source_fl
 
 When using the default output directory (active KG):
 1. Extracts to `{active_kg_path}/chat-history/`
-2. Files are automatically included in `/knowledge:recall` searches
+2. Files are automatically included in `/kg-sis:recall` searches
 3. Session summaries can reference chat history
 4. Chat history can be analyzed for lesson extraction
 
@@ -193,7 +193,7 @@ When using the default output directory (active KG):
 
 When multiple knowledge graphs are configured:
 - Operates on the **active** KG from `~/.claude/kg-config.json`
-- Use `/knowledge:switch` to change active KG before extraction
+- Use `/kg-sis:switch` to change active KG before extraction
 - Each KG maintains its own chat-history/
 - Use `--output-dir` to extract to specific KG manually
 
@@ -237,7 +237,7 @@ When multiple knowledge graphs are configured:
 pip install blackboxprotobuf
 
 # Or skip protobuf files (JSON extraction still works)
-/knowledge:extract-chat -gemini  # Will warn about .pb files
+/kg-sis:extract-chat -gemini  # Will warn about .pb files
 ```
 
 ### Problem: Permission denied
@@ -255,7 +255,7 @@ chmod 755 {active_kg_path}/chat-history/
 ### Problem: Output directory not found
 
 **Solution:**
-- Ensure active KG is configured: `/knowledge:status`
+- Ensure active KG is configured: `/kg-sis:status`
 - Verify KG path exists: `ls {active_kg_path}`
 - Use `--output-dir` with absolute path as workaround
 
@@ -266,7 +266,7 @@ chmod 755 {active_kg_path}/chat-history/
 ### Example 1: Extract all history to active KG
 
 ```bash
-/knowledge:extract-chat
+/kg-sis:extract-chat
 ```
 
 **Output:**
@@ -283,7 +283,7 @@ Saved to:
 ### Example 2: Extract only Claude history
 
 ```bash
-/knowledge:extract-chat -claude
+/kg-sis:extract-chat -claude
 ```
 
 **Output:**
@@ -297,7 +297,7 @@ Saved to: {active_kg_path}/chat-history/2026-02-12-claude.md
 ### Example 3: Extract to custom directory
 
 ```bash
-/knowledge:extract-chat --output-dir=/Users/name/archive/chat-logs
+/kg-sis:extract-chat --output-dir=/Users/name/archive/chat-logs
 ```
 
 **Output:**
@@ -334,5 +334,5 @@ Saved to:
 
 **Created:** 2026-02-12
 **Version:** 1.0 (Plugin version with OUTPUT_DIR fix)
-**Integration:** Works with active KG, `/knowledge:recall`, session summaries
-**Related Skills:** /knowledge:session-summary, /knowledge:capture-lesson
+**Integration:** Works with active KG, `/kg-sis:recall`, session summaries
+**Related Skills:** /kg-sis:session-summary, /kg-sis:capture-lesson

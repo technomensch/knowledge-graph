@@ -2,15 +2,15 @@
 description: Manually link existing lesson or ADR to a GitHub issue with bidirectional references
 ---
 
-# /knowledge:link-issue — Link Lesson to GitHub Issue
+# /kg-sis:link-issue — Link Lesson to GitHub Issue
 
 Manually link an existing lesson-learned or ADR to a GitHub issue, creating bidirectional references.
 
 ## Syntax
 
 ```bash
-/knowledge:link-issue docs/lessons-learned/process/my-lesson.md --issue 42
-/knowledge:link-issue docs/decisions/ADR-005.md --issue 38 --pr 40
+/kg-sis:link-issue docs/lessons-learned/process/my-lesson.md --issue 42
+/kg-sis:link-issue docs/decisions/ADR-005.md --issue 38 --pr 40
 ```
 
 ## What This Does
@@ -39,7 +39,7 @@ fi
 # Check issue number provided
 if [ -z "$issue_num" ]; then
   echo "Error: Missing issue number"
-  echo "Usage: /knowledge:link-issue <file> --issue <num> [--pr <num>]"
+  echo "Usage: /kg-sis:link-issue <file> --issue <num> [--pr <num>]"
   exit 1
 fi
 ```
@@ -156,10 +156,10 @@ Error: File not found: docs/lessons-learned/nonexistent.md
 ### No Issue Number
 ```
 Error: Missing issue number
-Usage: /knowledge:link-issue <file> --issue <num> [--pr <num>]
+Usage: /kg-sis:link-issue <file> --issue <num> [--pr <num>]
 ```
 
 ## See Also
 
-- `/knowledge:capture-lesson` — Create new lesson with automatic git metadata
-- `/knowledge:update-issue-plan` — Sync KG to plan and GitHub issue
+- `/kg-sis:capture-lesson` — Create new lesson with automatic git metadata
+- `/kg-sis:update-issue-plan` — Sync KG to plan and GitHub issue

@@ -31,9 +31,9 @@ This skill analyzes the current chat context to extract and document:
 ## Usage
 
 ```bash
-/knowledge:session-summary
-/knowledge:session-summary --title="Custom Title"
-/knowledge:session-summary --auto
+/kg-sis:session-summary
+/kg-sis:session-summary --title="Custom Title"
+/kg-sis:session-summary --auto
 ```
 
 **Parameters:**
@@ -42,9 +42,9 @@ This skill analyzes the current chat context to extract and document:
 
 **Examples:**
 ```bash
-/knowledge:session-summary
-/knowledge:session-summary --title="Memory System Design"
-/knowledge:session-summary --auto
+/kg-sis:session-summary
+/kg-sis:session-summary --title="Memory System Design"
+/kg-sis:session-summary --auto
 ```
 
 ---
@@ -66,7 +66,7 @@ Single prompt: "Summarize session with 3 commits, sync KG? (y/n)"
 ```
 
 **Auto-Detection Logic:**
-- **Session scope:** All conversation context since last `/knowledge:session-summary`
+- **Session scope:** All conversation context since last `/kg-sis:session-summary`
 - **Git history:** `git log --since="[last session]" --oneline` (auto-included)
 - **KG sync:** If new patterns discovered → auto-suggest sync
 - **Conflict resolution:** Auto-detect existing file for today → offer append
@@ -232,7 +232,7 @@ I've analyzed this session and generated the following summary:
 ```
 
 **Next Steps:**
-- Phase 2: Implement skills (/knowledge:recall, /knowledge:session-summary, enhanced /knowledge:capture-lesson)
+- Phase 2: Implement skills (/kg-sis:recall, /kg-sis:session-summary, enhanced /kg-sis:capture-lesson)
 - Phase 3: Create initial ADRs and populate knowledge graph
 - Phase 4-5: Complete knowledge graph and integrate with workflows
 
@@ -364,7 +364,7 @@ cat ${kg_path}/sessions/README.md
 
 2. **Create lesson learned (if significant pattern discovered):**
    - Pattern: "Template-driven knowledge capture"
-   - Command: /knowledge:capture-lesson
+   - Command: /kg-sis:capture-lesson
 
 3. **Update knowledge graph (if new concepts emerged):**
    - Add to {active_kg_path}/knowledge/patterns.md
@@ -383,13 +383,13 @@ cat ${kg_path}/sessions/README.md
 
 **Before /patch:**
 ```
-Patch created → Suggests: /knowledge:session-summary to document the work
+Patch created → Suggests: /kg-sis:session-summary to document the work
 ```
 
 **Before context limits:**
 ```
 Warning: Token usage 180K/200K
-Recommendation: Run /knowledge:session-summary before compaction
+Recommendation: Run /kg-sis:session-summary before compaction
 ```
 
 **After /doc-update:**
@@ -399,13 +399,13 @@ Documentation updated → Auto-include in session summary
 
 **Integration points:**
 ```
-User completes work → /knowledge:session-summary
+User completes work → /kg-sis:session-summary
   ↓
 Creates session doc → Suggests related docs (ADR, lesson)
   ↓
 User creates ADR/lesson → Session links to them
   ↓
-Future /knowledge:recall finds all related docs
+Future /kg-sis:recall finds all related docs
 ```
 
 ---
@@ -415,7 +415,7 @@ Future /knowledge:recall finds all related docs
 When multiple knowledge graphs are configured:
 - Operates on the **active** KG from `~/.claude/kg-config.json`
 - Sessions stored in `{active_kg_path}/sessions/`
-- Use `/knowledge:switch` to change active KG before creating summary
+- Use `/kg-sis:switch` to change active KG before creating summary
 - Each KG maintains its own session history
 
 ---
@@ -467,7 +467,7 @@ mkdir -p ${kg_path}/sessions/2026-01/
 ### Problem: Can't detect session type
 
 **Solution:**
-- Manual override: `/knowledge:session-summary --type=feature`
+- Manual override: `/kg-sis:session-summary --type=feature`
 - Will prompt user if ambiguous
 - Default to "Feature Development" if unclear
 
@@ -486,7 +486,7 @@ mkdir -p ${kg_path}/sessions/2026-01/
 
 ```
 User: "I just finished implementing Phase 1 of the memory system"
-User: /knowledge:session-summary
+User: /kg-sis:session-summary
 ```
 
 **Output:**
@@ -510,7 +510,7 @@ I've analyzed this session and generated a summary:
 ### Example 2: Quick save with custom title
 
 ```
-User: /knowledge:session-summary --title="Bug Fix: Validation Script"
+User: /kg-sis:session-summary --title="Bug Fix: Validation Script"
 ```
 
 **Output:**
@@ -525,7 +525,7 @@ Session documented automatically (--auto mode not used, but title provided).
 ### Example 3: Auto mode (no confirmation)
 
 ```
-User: /knowledge:session-summary --auto
+User: /kg-sis:session-summary --auto
 ```
 
 **Output:**
@@ -539,7 +539,7 @@ Analyzing session...
 - 1 major decision
 - Planning session type
 
-Use /knowledge:recall to find this session later.
+Use /kg-sis:recall to find this session later.
 ```
 
 ---
@@ -564,4 +564,4 @@ Use /knowledge:recall to find this session later.
 **Created:** 2026-02-12
 **Version:** 1.0 (Plugin version)
 **Integration:** Works with /patch, /doc-update, context management
-**Related Skills:** /knowledge:capture-lesson, /knowledge:recall
+**Related Skills:** /kg-sis:capture-lesson, /kg-sis:recall

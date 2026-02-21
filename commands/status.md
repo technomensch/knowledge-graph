@@ -2,7 +2,7 @@
 description: Display active knowledge graph status, stats, and quick command reference
 ---
 
-# /knowledge:status — Knowledge Graph Status Dashboard
+# /kg-sis:status — Knowledge Graph Status Dashboard
 
 Display active knowledge graph information, statistics, and quick command reference.
 
@@ -35,11 +35,11 @@ Stats:
   Sessions: 8
 
 Quick Commands:
-  /knowledge:capture-lesson    — Document a lesson
-  /knowledge:recall "query"    — Search across all KG
-  /knowledge:sync-all          — Run full sync pipeline
-  /knowledge:update-graph      — Extract KG entries from lessons
-  /knowledge:session-summary   — Summarize this session
+  /kg-sis:capture-lesson    — Document a lesson
+  /kg-sis:recall "query"    — Search across all KG
+  /kg-sis:sync-all          — Run full sync pipeline
+  /kg-sis:update-graph      — Extract KG entries from lessons
+  /kg-sis:session-summary   — Summarize this session
 ```
 
 ## Implementation
@@ -52,7 +52,7 @@ CONFIG_PATH="$HOME/.claude/kg-config.json"
 if [ ! -f "$CONFIG_PATH" ]; then
   echo "No knowledge graphs configured."
   echo ""
-  echo "Get started with: /knowledge:init"
+  echo "Get started with: /kg-sis:init"
   exit 0
 fi
 ```
@@ -66,9 +66,9 @@ if [ "$active" == "null" ]; then
   echo "No active knowledge graph."
   echo ""
   echo "Available graphs:"
-  /knowledge:list --names-only
+  /kg-sis:list --names-only
   echo ""
-  echo "Activate one with: /knowledge:switch <name>"
+  echo "Activate one with: /kg-sis:switch <name>"
   exit 0
 fi
 ```
@@ -151,7 +151,7 @@ fi
 
 if [ -n "$memory_warning" ]; then
   echo "$memory_warning"
-  echo "   Consider running /knowledge:sync-all"
+  echo "   Consider running /kg-sis:sync-all"
   echo ""
 fi
 
@@ -163,11 +163,11 @@ echo "  Sessions: $session_count"
 echo ""
 
 echo "Quick Commands:"
-echo "  /knowledge:capture-lesson    — Document a lesson"
-echo "  /knowledge:recall \"query\"    — Search across all KG"
-echo "  /knowledge:sync-all          — Run full sync pipeline"
-echo "  /knowledge:update-graph      — Extract KG entries from lessons"
-echo "  /knowledge:session-summary   — Summarize this session"
+echo "  /kg-sis:capture-lesson    — Document a lesson"
+echo "  /kg-sis:recall \"query\"    — Search across all KG"
+echo "  /kg-sis:sync-all          — Run full sync pipeline"
+echo "  /kg-sis:update-graph      — Extract KG entries from lessons"
+echo "  /kg-sis:session-summary   — Summarize this session"
 ```
 
 ## Turbo Mode
@@ -175,7 +175,7 @@ echo "  /knowledge:session-summary   — Summarize this session"
 Minimal output:
 
 ```bash
-/knowledge:status --minimal
+/kg-sis:status --minimal
 ```
 
 Output:
@@ -186,7 +186,7 @@ my-project: 12 lessons, 28 KG entries, 5 ADRs
 JSON output:
 
 ```bash
-/knowledge:status --json
+/kg-sis:status --json
 ```
 
 Output:
@@ -211,6 +211,6 @@ Output:
 
 ## See Also
 
-- `/knowledge:list` — View all configured KGs
-- `/knowledge:switch` — Change active KG
-- `/knowledge:sync-all` — Sync KG with MEMORY.md
+- `/kg-sis:list` — View all configured KGs
+- `/kg-sis:switch` — Change active KG
+- `/kg-sis:sync-all` — Sync KG with MEMORY.md

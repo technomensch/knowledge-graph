@@ -36,7 +36,7 @@ Detailed workflow patterns for different knowledge graph usage scenarios, with c
 #### Step 1: Initialize Knowledge Graph
 
 ```bash
-/knowledge:init my-project
+/kg-sis:init my-project
 ```
 
 **Interactive Wizard:**
@@ -101,7 +101,7 @@ EOF
 
 ```bash
 # View status
-/knowledge:status
+/kg-sis:status
 
 # Expected output:
 # ✅ Active KG: my-project
@@ -113,7 +113,7 @@ EOF
 #### Step 5: Capture First Lesson
 
 ```bash
-/knowledge:capture-lesson initial-setup
+/kg-sis:capture-lesson initial-setup
 ```
 
 **Document:**
@@ -164,7 +164,7 @@ EOF
 
 ```bash
 # After resolving the bug
-/knowledge:capture-lesson debugging-session-title
+/kg-sis:capture-lesson debugging-session-title
 
 # Document while fresh:
 # - What was the symptom?
@@ -183,7 +183,7 @@ git add [fixed-files]
 git commit -m "fix: resolve issue description"
 
 # Capture the lesson (automatically records commit hash)
-/knowledge:capture-lesson debugging-issue-name
+/kg-sis:capture-lesson debugging-issue-name
 
 # Lesson now has git metadata linking to the fix commit
 ```
@@ -196,7 +196,7 @@ git commit -m "fix: resolve issue description"
 
 ```bash
 # After decision is made and initial implementation started
-/knowledge:capture-lesson architecture-decision-title
+/kg-sis:capture-lesson architecture-decision-title
 
 # Document:
 # - What options were considered?
@@ -215,7 +215,7 @@ git commit -m "fix: resolve issue description"
 
 ```bash
 # When pattern is working and tested
-/knowledge:capture-lesson pattern-name
+/kg-sis:capture-lesson pattern-name
 
 # Document:
 # - What problem does this solve?
@@ -284,7 +284,7 @@ Mental checklist:
 #### Step 2: Create Session Summary
 
 ```bash
-/knowledge:session-summary
+/kg-sis:session-summary
 ```
 
 **Generated Summary Includes:**
@@ -307,7 +307,7 @@ Mental checklist:
 
 **Check if lessons were captured:**
 ```bash
-/knowledge:status
+/kg-sis:status
 
 # If lessons were captured during session, they'll be linked automatically
 # If not, consider capturing significant learnings now
@@ -370,7 +370,7 @@ Mental checklist:
 **Before starting fresh investigation:**
 
 ```bash
-/knowledge:recall "problem description"
+/kg-sis:recall "problem description"
 
 # Search for:
 # - Similar problems solved before
@@ -407,7 +407,7 @@ Mental checklist:
 
 ```bash
 # After solution is verified
-/knowledge:capture-lesson problem-description
+/kg-sis:capture-lesson problem-description
 
 # Include:
 # - Problem and symptoms
@@ -421,7 +421,7 @@ Mental checklist:
 
 ```bash
 # If tracked in GitHub
-/knowledge:link-issue lesson-id issue-number
+/kg-sis:link-issue lesson-id issue-number
 
 # Creates bidirectional link:
 # - Lesson references GitHub issue
@@ -478,7 +478,7 @@ Mental checklist:
 
 ```bash
 # Create meta-issue for tracking
-/knowledge:meta-issue 123
+/kg-sis:meta-issue 123
 
 # Document in meta-issue:
 # - Pattern description
@@ -506,7 +506,7 @@ Mental checklist:
 
 ```bash
 # When problem recurs or initial attempts fail
-/knowledge:meta-issue 123
+/kg-sis:meta-issue 123
 
 # GitHub issue #123 is now tracked as meta-issue
 ```
@@ -578,7 +578,7 @@ Mental checklist:
 
 ```bash
 # Once resolved
-/knowledge:capture-lesson meta-issue-resolution
+/kg-sis:capture-lesson meta-issue-resolution
 
 # Include:
 # - Full investigation history
@@ -627,7 +627,7 @@ Mental checklist:
 
 ```bash
 # Extract chat history from recent sessions
-/knowledge:extract-chat
+/kg-sis:extract-chat
 
 # Processes:
 # - Claude chat logs (if available)
@@ -653,7 +653,7 @@ ls docs/chat-history/
 
 ```bash
 # For each significant learning not yet captured
-/knowledge:capture-lesson topic-from-chat
+/kg-sis:capture-lesson topic-from-chat
 
 # Fill in:
 # - Context from chat
@@ -665,7 +665,7 @@ ls docs/chat-history/
 
 ```bash
 # Consolidate lessons into knowledge graph
-/knowledge:update-graph
+/kg-sis:update-graph
 
 # Processes lessons-learned/:
 # - Extracts patterns
@@ -698,12 +698,12 @@ cat docs/knowledge/architecture.md
 
 ```bash
 # Single command for complete pipeline
-/knowledge:sync-all
+/kg-sis:sync-all
 
 # Equivalent to:
-# 1. /knowledge:extract-chat
+# 1. /kg-sis:extract-chat
 # 2. Auto-capture lessons from chats
-# 3. /knowledge:update-graph
+# 3. /kg-sis:update-graph
 # 4. Generate session summaries
 ```
 
@@ -754,12 +754,12 @@ cat docs/knowledge/architecture.md
 **For specific problems:**
 
 ```bash
-/knowledge:recall "specific problem description"
+/kg-sis:recall "specific problem description"
 
 # Examples:
-/knowledge:recall "database connection timeout"
-/knowledge:recall "React useEffect infinite loop"
-/knowledge:recall "Docker build cache"
+/kg-sis:recall "database connection timeout"
+/kg-sis:recall "React useEffect infinite loop"
+/kg-sis:recall "Docker build cache"
 ```
 
 **Search Scope:**
@@ -807,7 +807,7 @@ cat docs/knowledge/concepts.md
 **For quick reference:**
 
 ```bash
-/knowledge:status
+/kg-sis:status
 
 # Shows:
 # - Active KG info
@@ -827,14 +827,14 @@ cat docs/knowledge/concepts.md
 **Examples:**
 ```bash
 # Good queries:
-/knowledge:recall "PostgreSQL connection pool exhausted"
-/knowledge:recall "Next.js SSR hydration mismatch"
-/knowledge:recall "AWS Lambda cold start optimization"
+/kg-sis:recall "PostgreSQL connection pool exhausted"
+/kg-sis:recall "Next.js SSR hydration mismatch"
+/kg-sis:recall "AWS Lambda cold start optimization"
 
 # Vague queries (less effective):
-/knowledge:recall "database problem"
-/knowledge:recall "React issue"
-/knowledge:recall "deployment"
+/kg-sis:recall "database problem"
+/kg-sis:recall "React issue"
+/kg-sis:recall "deployment"
 ```
 
 ### When Search Returns Nothing
@@ -878,7 +878,7 @@ cat docs/knowledge/concepts.md
 **During KG initialization:**
 
 ```bash
-/knowledge:init team-project
+/kg-sis:init team-project
 
 # Git strategy: Selective
 # - Commit: architecture, patterns, process
@@ -964,7 +964,7 @@ Architectural decisions documented in:
 ```bash
 # Set up local KG
 git clone [repo]
-/knowledge:switch team-project
+/kg-sis:switch team-project
 
 # Browse knowledge graph
 cat docs/knowledge/index.md
@@ -972,8 +972,8 @@ cat docs/knowledge/architecture.md
 cat docs/knowledge/patterns.md
 
 # Search for specific topics
-/knowledge:recall "getting started"
-/knowledge:recall "local development setup"
+/kg-sis:recall "getting started"
+/kg-sis:recall "local development setup"
 ```
 
 ---
@@ -996,10 +996,10 @@ git clone [repo-url]
 cd [project]
 
 # Switch to project KG
-/knowledge:switch [project-name]
+/kg-sis:switch [project-name]
 
 # Verify activation
-/knowledge:status
+/kg-sis:status
 ```
 
 #### Step 2: Read Knowledge Graph Index
@@ -1059,9 +1059,9 @@ cat docs/knowledge/gotchas.md
 
 ```bash
 # As questions arise
-/knowledge:recall "how to deploy"
-/knowledge:recall "local database setup"
-/knowledge:recall "running tests"
+/kg-sis:recall "how to deploy"
+/kg-sis:recall "local database setup"
+/kg-sis:recall "running tests"
 ```
 
 ### Onboarding Checklist
@@ -1074,8 +1074,8 @@ cat docs/knowledge/gotchas.md
 - [ ] README.md (project overview)
 
 **Setup Validation:**
-- [ ] KG activated with `/knowledge:status`
-- [ ] Can search knowledge with `/knowledge:recall`
+- [ ] KG activated with `/kg-sis:status`
+- [ ] Can search knowledge with `/kg-sis:recall`
 - [ ] Local development environment working
 - [ ] Tests passing
 
@@ -1100,7 +1100,7 @@ cat docs/knowledge/gotchas.md
 #### Step 1: Review Statistics
 
 ```bash
-/knowledge:status
+/kg-sis:status
 
 # Check:
 # - Total lessons count
@@ -1126,7 +1126,7 @@ find docs/lessons-learned -name "*.md" -mtime +180
 
 ```bash
 # Scan for sensitive information
-/knowledge:check-sensitive
+/kg-sis:check-sensitive
 
 # Review matches for:
 # - API keys or tokens
@@ -1139,7 +1139,7 @@ find docs/lessons-learned -name "*.md" -mtime +180
 
 ```bash
 # Look for similar lessons
-/knowledge:recall "similar topic"
+/kg-sis:recall "similar topic"
 
 # Check for:
 # - Duplicate content
@@ -1151,7 +1151,7 @@ find docs/lessons-learned -name "*.md" -mtime +180
 
 ```bash
 # Re-consolidate lessons
-/knowledge:update-graph
+/kg-sis:update-graph
 
 # Review generated:
 # - docs/knowledge/patterns.md
@@ -1194,7 +1194,7 @@ rm docs/lessons-learned/obsolete-lesson.md
 
 **Metrics to Track:**
 - Lesson capture rate (per week/month)
-- Search usage (how often `/knowledge:recall` used)
+- Search usage (how often `/kg-sis:recall` used)
 - Knowledge reuse (citations in code/PRs)
 - Team satisfaction (developer surveys)
 
@@ -1211,39 +1211,39 @@ rm docs/lessons-learned/obsolete-lesson.md
 
 | Workflow | When | Duration | Frequency | Key Commands |
 |----------|------|----------|-----------|--------------|
-| First-Time Setup | New project | 10-15 min | Once | `/knowledge:init` |
-| Daily Development | Regular coding | 5-30 min | 1-3x/day | `/knowledge:capture-lesson` |
-| End-of-Session | After productive sessions | 5-10 min | 1-2x/day | `/knowledge:session-summary` |
-| Problem-Solving | Facing specific problem | Varies | As needed | `/knowledge:recall`, `/knowledge:capture-lesson` |
-| Complex Investigation | Multi-attempt problems | Multiple sessions | 1-2x/month | `/knowledge:meta-issue` |
-| Periodic Consolidation | Knowledge maintenance | 30-60 min | Weekly/bi-weekly | `/knowledge:sync-all` |
-| Knowledge Search | Finding past knowledge | 2-10 min | Multiple/day | `/knowledge:recall` |
+| First-Time Setup | New project | 10-15 min | Once | `/kg-sis:init` |
+| Daily Development | Regular coding | 5-30 min | 1-3x/day | `/kg-sis:capture-lesson` |
+| End-of-Session | After productive sessions | 5-10 min | 1-2x/day | `/kg-sis:session-summary` |
+| Problem-Solving | Facing specific problem | Varies | As needed | `/kg-sis:recall`, `/kg-sis:capture-lesson` |
+| Complex Investigation | Multi-attempt problems | Multiple sessions | 1-2x/month | `/kg-sis:meta-issue` |
+| Periodic Consolidation | Knowledge maintenance | 30-60 min | Weekly/bi-weekly | `/kg-sis:sync-all` |
+| Knowledge Search | Finding past knowledge | 2-10 min | Multiple/day | `/kg-sis:recall` |
 | Team Collaboration | Sharing with team | Continuous | Continuous | Selective git strategy |
-| Project Onboarding | Starting on project | 30-60 min | Once | `/knowledge:switch`, read knowledge graph |
-| Review & Maintenance | Quality assurance | 1-2 hours | Monthly/quarterly | `/knowledge:check-sensitive`, review stats |
+| Project Onboarding | Starting on project | 30-60 min | Once | `/kg-sis:switch`, read knowledge graph |
+| Review & Maintenance | Quality assurance | 1-2 hours | Monthly/quarterly | `/kg-sis:check-sensitive`, review stats |
 
 ## Quick Reference by Situation
 
 **"I just solved a complex bug"**
-→ `/knowledge:capture-lesson debugging-[issue]`
+→ `/kg-sis:capture-lesson debugging-[issue]`
 
 **"Made an architectural decision"**
-→ `/knowledge:capture-lesson architecture-[decision]`
+→ `/kg-sis:capture-lesson architecture-[decision]`
 
 **"End of productive day"**
-→ `/knowledge:session-summary`
+→ `/kg-sis:session-summary`
 
 **"Facing familiar problem"**
-→ `/knowledge:recall "[problem description]"`
+→ `/kg-sis:recall "[problem description]"`
 
 **"Same issue third time"**
-→ `/knowledge:meta-issue [number]`
+→ `/kg-sis:meta-issue [number]`
 
 **"Weekly review time"**
-→ `/knowledge:sync-all`
+→ `/kg-sis:sync-all`
 
 **"New project setup"**
-→ `/knowledge:init [name]`
+→ `/kg-sis:init [name]`
 
 **"Joining existing project"**
 → Read `docs/knowledge/index.md`
@@ -1252,7 +1252,7 @@ rm docs/lessons-learned/obsolete-lesson.md
 → Commit architecture/patterns/, gitignore debugging/
 
 **"Monthly maintenance"**
-→ `/knowledge:check-sensitive`, review stats
+→ `/kg-sis:check-sensitive`, review stats
 
 ---
 
@@ -1273,7 +1273,7 @@ rm docs/lessons-learned/obsolete-lesson.md
 - More efficient than constant updates
 
 **Automation:**
-- Use `/knowledge:sync-all` for full pipeline
+- Use `/kg-sis:sync-all` for full pipeline
 - Configure git hooks for validation
 - Automate sensitive data checks
 - Schedule periodic reviews

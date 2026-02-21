@@ -16,13 +16,13 @@ allowed-tools: Bash, Read, Write, Edit, Glob, Grep, AskUserQuestion
 ## Syntax Detection
 
 ```
-/knowledge:setup-platform
-/knowledge:setup-platform <platform>
+/kg-sis:setup-platform
+/kg-sis:setup-platform <platform>
 ```
 
 **Examples:**
-- `/knowledge:setup-platform` → Interactive wizard (prompts for platform)
-- `/knowledge:setup-platform cursor` → Generate Cursor-specific instructions directly
+- `/kg-sis:setup-platform` → Interactive wizard (prompts for platform)
+- `/kg-sis:setup-platform cursor` → Generate Cursor-specific instructions directly
 
 ---
 
@@ -188,12 +188,12 @@ If "Done" → End command.
 
 ## Related Commands
 
-- `/knowledge:init` — Initialize a knowledge graph on the current machine
-- `/knowledge:help` — Get help with any command
-- `/knowledge:status` — Check current knowledge graph status
+- `/kg-sis:init` — Initialize a knowledge graph on the current machine
+- `/kg-sis:help` — Get help with any command
+- `/kg-sis:status` — Check current knowledge graph status
 
 ---
 
 **Created:** 2026-02-20
 **Version:** 1.0
-**Usage:** Type `/knowledge:setup-platform` to generate installation instructions for another platform
+**Usage:** Type `/kg-sis:setup-platform` to generate installation instructions for another platform

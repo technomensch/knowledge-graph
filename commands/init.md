@@ -2,7 +2,7 @@
 description: Initialize a new knowledge graph with wizard-based setup and flexible configuration
 ---
 
-# /knowledge:init — Knowledge Graph Initialization Wizard
+# /kg-sis:init — Knowledge Graph Initialization Wizard
 
 Initialize a new knowledge graph with interactive wizard that guides you through location selection, category setup, and git strategy configuration.
 
@@ -210,7 +210,7 @@ fi
 Install post-commit hook for lesson suggestions? [y/N]
 
 This hook will detect lesson-worthy commits (fix, debug, implement, refactor,
-pattern, architecture) and suggest running /knowledge:capture-lesson.
+pattern, architecture) and suggest running /kg-sis:capture-lesson.
 
 Default: No (opt-in for alpha release)
 ```
@@ -310,14 +310,14 @@ Directory Structure:
   chat-history/        — Chat extraction output (always gitignored)
 
 Next steps:
-  /knowledge:status          — View KG info and quick reference
-  /knowledge:capture-lesson  — Document your first lesson
-  /knowledge:recall "query"  — Search across KG
+  /kg-sis:status          — View KG info and quick reference
+  /kg-sis:capture-lesson  — Document your first lesson
+  /kg-sis:recall "query"  — Search across KG
 
 Templates copied to $KG_PATH
 Examples available at ${CLAUDE_PLUGIN_ROOT}/core/examples/ (not copied by default)
 
-⚠️  Privacy reminder: Review sensitive data with /knowledge:check-sensitive before pushing to public repos.
+⚠️  Privacy reminder: Review sensitive data with /kg-sis:check-sensitive before pushing to public repos.
 ⚠️  Note: chat-history/ and sessions/ are always gitignored (never committed to version control)
 ```
 
@@ -328,8 +328,8 @@ Examples available at ${CLAUDE_PLUGIN_ROOT}/core/examples/ (not copied by defaul
 - Set this as first KG
 
 ### Name collision
-- Error: "Knowledge graph '$kg_name' already exists. Choose a different name or use /knowledge:switch to activate it."
-- Show existing graphs: `/knowledge:list`
+- Error: "Knowledge graph '$kg_name' already exists. Choose a different name or use /kg-sis:switch to activate it."
+- Show existing graphs: `/kg-sis:list`
 
 ### Custom path doesn't exist
 - Prompt: "Directory '$custom_path' doesn't exist. Create it? [y/N]"
@@ -351,7 +351,7 @@ Examples available at ${CLAUDE_PLUGIN_ROOT}/core/examples/ (not copied by defaul
 Skip wizard with flags:
 
 ```bash
-/knowledge:init --name my-project --location ./docs/ --categories architecture,process,patterns --git selective
+/kg-sis:init --name my-project --location ./docs/ --categories architecture,process,patterns --git selective
 ```
 
 **Parameters**:
@@ -363,10 +363,10 @@ Skip wizard with flags:
 
 ## Integration with Other Skills
 
-- `/knowledge:list` will show this KG
-- `/knowledge:switch` can change to/from this KG
-- `/knowledge:status` will reference this KG if active
-- `/knowledge:capture-lesson` will write to this KG
+- `/kg-sis:list` will show this KG
+- `/kg-sis:switch` can change to/from this KG
+- `/kg-sis:status` will reference this KG if active
+- `/kg-sis:capture-lesson` will write to this KG
 - All other skills operate on this KG once active
 
 ## Files Created
@@ -393,7 +393,7 @@ $KG_PATH/
 ├── sessions/                🔒 ALWAYS GITIGNORED
 │   └── session-template.md  (session summary template)
 └── chat-history/            🔒 ALWAYS GITIGNORED
-    (for /knowledge:extract-chat output — local use only)
+    (for /kg-sis:extract-chat output — local use only)
 ```
 
 **Git Handling:**
@@ -427,7 +427,7 @@ $KG_PATH/
 
 ## See Also
 
-- `/knowledge:list` — View all configured KGs
-- `/knowledge:switch` — Change active KG
-- `/knowledge:add-category` — Add categories to existing KG
-- `/knowledge:status` — View active KG info and stats
+- `/kg-sis:list` — View all configured KGs
+- `/kg-sis:switch` — Change active KG
+- `/kg-sis:add-category` — Add categories to existing KG
+- `/kg-sis:status` — View active KG info and stats

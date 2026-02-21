@@ -90,7 +90,7 @@ Comprehensive catalog of all lessons-learned documents.
 ## Usage
 
 **To add a new lesson:**
-Use `/knowledge:capture-lesson` which automatically:
+Use `/kg-sis:capture-lesson` which automatically:
 1. Creates the lesson file with template structure
 2. Auto-detects category based on topic
 3. Captures git metadata (branch, commit, PR, issue)
@@ -98,7 +98,7 @@ Use `/knowledge:capture-lesson` which automatically:
 5. Links to knowledge graph
 
 **To search lessons:**
-Use `/knowledge:recall "query"` to search across all lessons.
+Use `/kg-sis:recall "query"` to search across all lessons.
 
 ---
 

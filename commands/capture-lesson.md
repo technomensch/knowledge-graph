@@ -13,18 +13,18 @@ description: Document lessons learned, problems solved, and patterns with git me
 ## Syntax Detection
 
 **Create New Document:**
-- `/knowledge:capture-lesson` → Create new document (Steps 1-5 below)
-- `/knowledge:capture-lesson <topic>` → Create new document with topic
+- `/kg-sis:capture-lesson` → Create new document (Steps 1-5 below)
+- `/kg-sis:capture-lesson <topic>` → Create new document with topic
 
 **Update Existing Document:**
-- `/knowledge:capture-lesson update <filename>` → Update existing document (Step 0 below)
-- Example: `/knowledge:capture-lesson update Lessons_Learned_Chat_History_Workflow.md`
+- `/kg-sis:capture-lesson update <filename>` → Update existing document (Step 0 below)
+- Example: `/kg-sis:capture-lesson update Lessons_Learned_Chat_History_Workflow.md`
 
 ---
 
 ## Step 0: Update Existing Document
 
-**When user types:** `/knowledge:capture-lesson update <filename>`
+**When user types:** `/kg-sis:capture-lesson update <filename>`
 
 ### Step 0.1: Read Existing Document
 
@@ -172,14 +172,14 @@ When the user invokes this command without "update", follow this structured proc
 
 **Example:**
 ```
-User: "/knowledge:capture-lesson API error handling"
+User: "/kg-sis:capture-lesson API error handling"
 Keywords: API, error, handling, errors
 ```
 
 **Search for similar lessons:**
 ```bash
 # Use kg_search MCP tool to search existing lessons
-/knowledge:recall "API error handling"
+/kg-sis:recall "API error handling"
 
 # Or use MCP tool directly:
 mcp__plugin_knowledge_knowledge__kg_search(query: "API error handling", format: "summary")
@@ -479,20 +479,20 @@ Auto-generate tags from:
 "✅ Lesson captured! Extract insights to Knowledge Graph?"
 
 **Options:**
-1. ✅ **Extract now (recommended)** — Runs `/knowledge:update-graph` for this lesson
+1. ✅ **Extract now (recommended)** — Runs `/kg-sis:update-graph` for this lesson
    - Extracts patterns, gotchas, concepts to KG
    - knowledge-reviewer agent assesses quality
    - Includes KG files in same commit
 
-2. **Manual later** — Run `/knowledge:update-graph` when ready
+2. **Manual later** — Run `/kg-sis:update-graph` when ready
    - Deferred extraction, you control timing
 
-3. **Skip** — Update KG later via `/knowledge:sync-all`
+3. **Skip** — Update KG later via `/kg-sis:sync-all`
    - Batch operation for multiple lessons
 
 **If option 1 selected:**
 Execute update-graph workflow inline:
-- Call `/knowledge:update-graph --lesson=[current-lesson-filename] --auto`
+- Call `/kg-sis:update-graph --lesson=[current-lesson-filename] --auto`
 - knowledge-reviewer agent runs async
 - Show quality feedback: "KG entry created. Quality: ✅ Good / ⚠️ Needs review"
 - Include KG files in Step 5 commit
@@ -548,9 +548,9 @@ git:
 
 Does this lesson involve an architectural decision worth documenting as an ADR?
 
-1. ✅ Yes, create linked ADR — Launch /knowledge:create-adr with pre-filled context
+1. ✅ Yes, create linked ADR — Launch /kg-sis:create-adr with pre-filled context
 2. Lesson only — Skip ADR creation (lesson is complete as-is)
-3. Skip — Create ADR later via /knowledge:create-adr
+3. Skip — Create ADR later via /kg-sis:create-adr
 ```
 
 **If fewer than 2 keywords detected:** Skip silently and continue to Step 5.
@@ -575,12 +575,12 @@ Pre-filling ADR from lesson context:
 - Context: Extracted from Problem section (edit as needed)
 - Rationale: Extracted from Solution section (edit as needed)
 
-Launching /knowledge:create-adr...
+Launching /kg-sis:create-adr...
 ```
 
 #### Step 4.8.2: Launch ADR Creation Flow
 
-Launch the full `/knowledge:create-adr` flow inline:
+Launch the full `/kg-sis:create-adr` flow inline:
 - Pass pre-populated values as suggested defaults for each wizard prompt
 - Allow user to edit all pre-populated fields before confirming
 - Complete all create-adr steps: auto-increment number, git metadata, wizard, file creation, index update
@@ -649,7 +649,7 @@ Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 
 ## Example Invocation
 
-**User types:** `/knowledge:capture-lesson`
+**User types:** `/kg-sis:capture-lesson`
 
 **Assistant responds:**
 
@@ -698,13 +698,13 @@ Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 
 ## Related Commands
 
-- `/knowledge:update-graph` - Extract insights from lessons to knowledge graph
-- `/knowledge:sync-all` - Full knowledge sync pipeline
-- `/knowledge:link-issue` - Manually link existing lesson to GitHub issue
-- `/knowledge:create-adr` - Create a standalone ADR (without lesson capture)
+- `/kg-sis:update-graph` - Extract insights from lessons to knowledge graph
+- `/kg-sis:sync-all` - Full knowledge sync pipeline
+- `/kg-sis:link-issue` - Manually link existing lesson to GitHub issue
+- `/kg-sis:create-adr` - Create a standalone ADR (without lesson capture)
 
 ---
 
 **Created:** 2026-02-12
 **Version:** 1.5
-**Usage:** Type `/knowledge:capture-lesson` when you want to document a problem solved or pattern implemented
+**Usage:** Type `/kg-sis:capture-lesson` when you want to document a problem solved or pattern implemented

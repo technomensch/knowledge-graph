@@ -83,7 +83,7 @@ Templates available after copying:
 
 **When:** Solved a non-trivial problem and want to document the solution for future reference.
 
-**Claude Code equivalent:** `/knowledge:capture-lesson`
+**Claude Code equivalent:** `/kg-sis:capture-lesson`
 
 ### Step-by-Step
 
@@ -144,7 +144,7 @@ git commit -m "docs: add lesson on database connection pooling"
 
 **When:** Making an architectural decision that affects multiple people or components — something a future team member might ask "why did the team do it this way?"
 
-**Claude Code equivalent:** `/knowledge:capture-lesson` (with ADR category)
+**Claude Code equivalent:** `/kg-sis:capture-lesson` (with ADR category)
 
 > **What is an ADR?** See [ADR](../../docs/CONCEPTS.md#adr-architecture-decision-record) in the Concepts Guide.
 
@@ -236,7 +236,7 @@ When creating a lesson from a chat, reference the source:
 
 **When:** Looking for a previously documented solution, pattern, or decision.
 
-**Claude Code equivalent:** `/knowledge:recall`
+**Claude Code equivalent:** `/kg-sis:recall`
 
 ### Search All Knowledge
 
@@ -277,7 +277,7 @@ grep -A 5 "^## " docs/knowledge/gotchas.md
 
 **When:** End of a significant work session — major debugging, architecture discussion, or sprint.
 
-**Claude Code equivalent:** `/knowledge:session-summary`
+**Claude Code equivalent:** `/kg-sis:session-summary`
 
 > **What is a session summary?** See [Session Summary](../../docs/CONCEPTS.md#session-summary) in the Concepts Guide.
 
@@ -324,7 +324,7 @@ git commit -m "docs(session): session summary for 2024-10-15"
 
 **When:** A complex problem has required multiple solution attempts with evolving understanding — the problem is not yet resolved or just resolved after several attempts.
 
-**Claude Code equivalent:** `/knowledge:meta-issue`
+**Claude Code equivalent:** `/kg-sis:meta-issue`
 
 > **What is a meta-issue?** See [Meta-Issue](../../docs/CONCEPTS.md#meta-issue) in the Concepts Guide.
 
@@ -389,7 +389,7 @@ See [META-ISSUE-GUIDE.md](./META-ISSUE-GUIDE.md) for a detailed guide.
 
 **When:** A lesson contains a reusable pattern, concept, or common pitfall worth preserving as a quick-reference entry.
 
-**Claude Code equivalent:** `/knowledge:update-graph`
+**Claude Code equivalent:** `/kg-sis:update-graph`
 
 ### Extract a Pattern
 
@@ -482,7 +482,7 @@ mv docs/sessions/2022-* docs/sessions/archive/
 
 **When:** MEMORY.md is approaching the token budget limit (~1,500 tokens / ~200 lines) or archived knowledge needs to be retrieved.
 
-**Claude Code equivalent:** `/knowledge:archive-memory` and `/knowledge:restore-memory`
+**Claude Code equivalent:** `/kg-sis:archive-memory` and `/kg-sis:restore-memory`
 
 > **What is MEMORY.md?** See [MEMORY.md](../../docs/CONCEPTS.md#memorymd) in the Concepts Guide.
 

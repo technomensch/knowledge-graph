@@ -2,7 +2,7 @@
 description: Display all configured knowledge graphs from ~/.claude/kg-config.json
 ---
 
-# /knowledge:list — List All Knowledge Graphs
+# /kg-sis:list — List All Knowledge Graphs
 
 Display all configured knowledge graphs with their locations, categories, git strategies, and active status.
 
@@ -56,7 +56,7 @@ CONFIG_PATH="$HOME/.claude/kg-config.json"
 if [ ! -f "$CONFIG_PATH" ]; then
   echo "No knowledge graphs configured."
   echo ""
-  echo "Get started with: /knowledge:init"
+  echo "Get started with: /kg-sis:init"
   exit 0
 fi
 ```
@@ -161,14 +161,14 @@ format_date() {
 ```
 No knowledge graphs configured.
 
-Get started with: /knowledge:init
+Get started with: /kg-sis:init
 ```
 
 ### Empty config (no graphs)
 ```
 No knowledge graphs configured.
 
-Get started with: /knowledge:init
+Get started with: /kg-sis:init
 ```
 
 ### No active KG set
@@ -181,7 +181,7 @@ Knowledge Graphs:
    Last used: 2026-02-13 15:45
 
 ⚠️  No active knowledge graph set.
-    Use /knowledge:switch <name> to activate one.
+    Use /kg-sis:switch <name> to activate one.
 
 Total: 1 knowledge graph(s) configured
 ```
@@ -200,7 +200,7 @@ Knowledge Graphs:
 ```
 ⚠️  Active knowledge graph path does not exist: /Users/name/projects/my-app/docs/
     The project may have been moved or deleted.
-    Use /knowledge:switch to change to a different KG.
+    Use /kg-sis:switch to change to a different KG.
 ```
 
 ## Turbo Mode
@@ -208,7 +208,7 @@ Knowledge Graphs:
 Show only active KG:
 
 ```bash
-/knowledge:list --active-only
+/kg-sis:list --active-only
 ```
 
 Output:
@@ -222,7 +222,7 @@ Git: selective
 Show only names (for scripting):
 
 ```bash
-/knowledge:list --names-only
+/kg-sis:list --names-only
 ```
 
 Output:
@@ -234,9 +234,9 @@ cowork-devops
 
 ## Integration with Other Skills
 
-- `/knowledge:init` creates new entries shown here
-- `/knowledge:switch` changes which one is marked "active"
-- `/knowledge:status` shows detailed stats for active KG
+- `/kg-sis:init` creates new entries shown here
+- `/kg-sis:switch` changes which one is marked "active"
+- `/kg-sis:status` shows detailed stats for active KG
 - All other skills operate on the "active" KG shown here
 
 ## Machine-Readable Output
@@ -244,7 +244,7 @@ cowork-devops
 For scripting/automation, add `--json` flag:
 
 ```bash
-/knowledge:list --json
+/kg-sis:list --json
 ```
 
 Output:
@@ -269,7 +269,7 @@ Output:
 
 ## See Also
 
-- `/knowledge:init` — Create a new knowledge graph
-- `/knowledge:switch` — Change active KG
-- `/knowledge:status` — View detailed stats for active KG
-- `/knowledge:add-category` — Add categories to existing KG
+- `/kg-sis:init` — Create a new knowledge graph
+- `/kg-sis:switch` — Change active KG
+- `/kg-sis:status` — View detailed stats for active KG
+- `/kg-sis:add-category` — Add categories to existing KG

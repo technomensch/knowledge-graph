@@ -2,7 +2,7 @@
 description: Archive stale MEMORY.md entries to prevent bloat while preserving historical context
 ---
 
-# /knowledge:archive-memory — MEMORY.md Archive Management
+# /kg-sis:archive-memory — MEMORY.md Archive Management
 
 Archive stale entries from MEMORY.md to MEMORY-archive.md, freeing token budget while preserving historical context for future reference.
 
@@ -21,7 +21,7 @@ Manages MEMORY.md size by archiving stale entries:
 
 ## When to Use
 
-- MEMORY.md approaching 1,500 token soft limit (warning from `/knowledge:sync-all`)
+- MEMORY.md approaching 1,500 token soft limit (warning from `/kg-sis:sync-all`)
 - MEMORY.md exceeds 2,000 token hard limit (blocked from adding new entries)
 - Periodic cleanup (recommended quarterly)
 - Before major project phase changes (archive old context)
@@ -31,10 +31,10 @@ Manages MEMORY.md size by archiving stale entries:
 ## Usage
 
 ```bash
-/knowledge:archive-memory
-/knowledge:archive-memory --auto           # Skip confirmation
-/knowledge:archive-memory --dry-run        # Preview without writing
-/knowledge:archive-memory --threshold=180  # Custom staleness (days)
+/kg-sis:archive-memory
+/kg-sis:archive-memory --auto           # Skip confirmation
+/kg-sis:archive-memory --dry-run        # Preview without writing
+/kg-sis:archive-memory --threshold=180  # Custom staleness (days)
 ```
 
 **Parameters:**
@@ -315,7 +315,7 @@ Current size: ~1,180/2,000 tokens
 All entries appear to be actively referenced or recently updated.
 
 Tip: To archive manually, edit MEMORY.md directly or adjust threshold:
-  /knowledge:archive-memory --threshold=60
+  /kg-sis:archive-memory --threshold=60
 ```
 
 ### MEMORY.md Below Soft Limit
@@ -339,7 +339,7 @@ Current status: No action required
 All entries have been updated within the last 90 days.
 
 Options:
-  1. Adjust threshold: /knowledge:archive-memory --threshold=60
+  1. Adjust threshold: /kg-sis:archive-memory --threshold=60
   2. Manual review: Edit MEMORY.md directly to archive specific entries
   3. Wait: Archive recommended when size > 1,500 tokens
 ```
@@ -364,9 +364,9 @@ Current archives:
 
 **Use the restore-memory command** (v0.0.4-alpha):
 ```bash
-/knowledge:restore-memory "Git Pre-Commit Hooks"   # Fuzzy search by title
-/knowledge:restore-memory --id=5                   # Restore by ID
-/knowledge:restore-memory --list                   # Show all archived entries
+/kg-sis:restore-memory "Git Pre-Commit Hooks"   # Fuzzy search by title
+/kg-sis:restore-memory --id=5                   # Restore by ID
+/kg-sis:restore-memory --list                   # Show all archived entries
 ```
 
 **Restoration tracking:**
@@ -399,20 +399,20 @@ Restored entries remain in the archive for historical record. The log tracks whi
 ## Integration with Other Commands
 
 **Triggered by:**
-- `/knowledge:sync-all` (suggests archive when approaching limits)
-- `/knowledge:update-graph` Step 7 (warns when MEMORY.md > 1,500 tokens)
+- `/kg-sis:sync-all` (suggests archive when approaching limits)
+- `/kg-sis:update-graph` Step 7 (warns when MEMORY.md > 1,500 tokens)
 
 **Complementary commands:**
-- `/knowledge:status` — Shows current MEMORY.md size
-- `/knowledge:recall` — Search archived entries (future: include archive in search)
+- `/kg-sis:status` — Shows current MEMORY.md size
+- `/kg-sis:recall` — Search archived entries (future: include archive in search)
 
 ---
 
 ## Related Commands
 
-- `/knowledge:sync-all` — Full knowledge sync (warns of MEMORY.md size)
-- `/knowledge:update-graph` — KG extraction (checks MEMORY.md size in Step 7)
-- `/knowledge:status` — Display KG stats (includes MEMORY.md token count)
+- `/kg-sis:sync-all` — Full knowledge sync (warns of MEMORY.md size)
+- `/kg-sis:update-graph` — KG extraction (checks MEMORY.md size in Step 7)
+- `/kg-sis:status` — Display KG stats (includes MEMORY.md token count)
 
 ---
 

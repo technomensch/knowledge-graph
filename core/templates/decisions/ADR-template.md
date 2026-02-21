@@ -1,7 +1,7 @@
 ---
 # ====================
 # YAML FRONTMATTER - Metadata for this ADR
-# NOTE: No auto-fill commands yet - future /knowledge:create-adr will use this
+# NOTE: No auto-fill commands yet - future /kg-sis:create-adr will use this
 # Fields marked [FUTURE-AUTO] will be auto-filled when command is built
 # Fields marked [MANUAL] require you to fill them in
 # ====================

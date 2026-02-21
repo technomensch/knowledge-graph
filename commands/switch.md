@@ -2,9 +2,9 @@
 description: Change the active knowledge graph. Subsequent skills will operate on the selected KG.
 ---
 
-# /knowledge:switch — Change Active Knowledge Graph
+# /kg-sis:switch — Change Active Knowledge Graph
 
-Switch between configured knowledge graphs. All subsequent skill operations (`/knowledge:capture-lesson`, `/knowledge:recall`, etc.) will use the selected KG.
+Switch between configured knowledge graphs. All subsequent skill operations (`/kg-sis:capture-lesson`, `/kg-sis:recall`, etc.) will use the selected KG.
 
 ## What This Does
 
@@ -13,9 +13,9 @@ Updates the `active` field in `~/.claude/kg-config.json` to the specified knowle
 ## Syntax
 
 ```bash
-/knowledge:switch my-project
-/knowledge:switch ai-research
-/knowledge:switch cowork-devops
+/kg-sis:switch my-project
+/kg-sis:switch ai-research
+/kg-sis:switch cowork-devops
 ```
 
 ## When to Use
@@ -35,7 +35,7 @@ CONFIG_PATH="$HOME/.claude/kg-config.json"
 # Check if config exists
 if [ ! -f "$CONFIG_PATH" ]; then
   echo "Error: No knowledge graphs configured."
-  echo "Run /knowledge:init to create your first knowledge graph."
+  echo "Run /kg-sis:init to create your first knowledge graph."
   exit 1
 fi
 
@@ -45,10 +45,10 @@ target_kg="$1"
 if [ -z "$target_kg" ]; then
   echo "Error: Missing knowledge graph name."
   echo ""
-  echo "Usage: /knowledge:switch <kg-name>"
+  echo "Usage: /kg-sis:switch <kg-name>"
   echo ""
   echo "Available knowledge graphs:"
-  /knowledge:list --names-only
+  /kg-sis:list --names-only
   exit 1
 fi
 ```
@@ -63,9 +63,9 @@ if [ "$kg_exists" != "true" ]; then
   echo "Error: Knowledge graph '$target_kg' not found."
   echo ""
   echo "Available knowledge graphs:"
-  /knowledge:list --names-only
+  /kg-sis:list --names-only
   echo ""
-  echo "Create a new one with: /knowledge:init"
+  echo "Create a new one with: /kg-sis:init"
   exit 1
 fi
 ```
@@ -125,9 +125,9 @@ echo ""
 echo "All subsequent knowledge operations will use this graph."
 echo ""
 echo "Quick commands:"
-echo "  /knowledge:status          — View KG stats"
-echo "  /knowledge:capture-lesson  — Document a lesson"
-echo "  /knowledge:recall \"query\"   — Search this KG"
+echo "  /kg-sis:status          — View KG stats"
+echo "  /kg-sis:capture-lesson  — Document a lesson"
+echo "  /kg-sis:recall \"query\"   — Search this KG"
 ```
 
 ## Edge Cases
@@ -135,14 +135,14 @@ echo "  /knowledge:recall \"query\"   — Search this KG"
 ### No config file
 ```
 Error: No knowledge graphs configured.
-Run /knowledge:init to create your first knowledge graph.
+Run /kg-sis:init to create your first knowledge graph.
 ```
 
 ### Missing argument
 ```
 Error: Missing knowledge graph name.
 
-Usage: /knowledge:switch <kg-name>
+Usage: /kg-sis:switch <kg-name>
 
 Available knowledge graphs:
   my-project (active)
@@ -159,7 +159,7 @@ Available knowledge graphs:
   ai-research
   cowork-devops
 
-Create a new one with: /knowledge:init
+Create a new one with: /kg-sis:init
 ```
 
 ### KG path doesn't exist
@@ -191,7 +191,7 @@ Already using knowledge graph: my-project
 Skip confirmation for missing paths:
 
 ```bash
-/knowledge:switch my-project --force
+/kg-sis:switch my-project --force
 ```
 
 This will switch even if the path doesn't exist, useful for:
@@ -202,32 +202,32 @@ This will switch even if the path doesn't exist, useful for:
 ## Integration with Other Skills
 
 After switching:
-- `/knowledge:capture-lesson` writes to the newly active KG
-- `/knowledge:recall` searches the newly active KG
-- `/knowledge:update-graph` extracts to the newly active KG
-- `/knowledge:status` shows stats for the newly active KG
+- `/kg-sis:capture-lesson` writes to the newly active KG
+- `/kg-sis:recall` searches the newly active KG
+- `/kg-sis:update-graph` extracts to the newly active KG
+- `/kg-sis:status` shows stats for the newly active KG
 - All other knowledge operations target the newly active KG
 
 ## Multi-KG Workflow Example
 
 ```bash
 # Morning: Work on project documentation
-/knowledge:switch my-project
-/knowledge:capture-lesson   # Documents project-specific lesson
+/kg-sis:switch my-project
+/kg-sis:capture-lesson   # Documents project-specific lesson
 
 # Afternoon: Research AI patterns across projects
-/knowledge:switch ai-research
-/knowledge:recall "transformer architecture"  # Searches global AI KG
-/knowledge:capture-lesson   # Documents reusable AI pattern
+/kg-sis:switch ai-research
+/kg-sis:recall "transformer architecture"  # Searches global AI KG
+/kg-sis:capture-lesson   # Documents reusable AI pattern
 
 # Evening: Return to project
-/knowledge:switch my-project
-/knowledge:sync-all   # Syncs project KG
+/kg-sis:switch my-project
+/kg-sis:sync-all   # Syncs project KG
 ```
 
 ## See Also
 
-- `/knowledge:list` — View all configured KGs
-- `/knowledge:init` — Create a new KG
-- `/knowledge:status` — View active KG stats
-- `/knowledge:add-category` — Add categories to active KG
+- `/kg-sis:list` — View all configured KGs
+- `/kg-sis:init` — Create a new KG
+- `/kg-sis:status` — View active KG stats
+- `/kg-sis:add-category` — Add categories to active KG

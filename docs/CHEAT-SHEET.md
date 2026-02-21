@@ -1,6 +1,6 @@
 # Knowledge Graph Quick Reference
 
-> **Claude Code only:** The `/knowledge:` prefix requires Claude Code with this plugin installed. Other IDEs access equivalent functionality through MCP tools.
+> **Claude Code only:** The `/kg-sis:` prefix requires Claude Code with this plugin installed. Other IDEs access equivalent functionality through MCP tools.
 
 One-page cheat sheet for the Knowledge Graph plugin. For detailed documentation, see [Command Guide](COMMAND-GUIDE.md).
 
@@ -8,19 +8,19 @@ One-page cheat sheet for the Knowledge Graph plugin. For detailed documentation,
 
 ## I Want To...
 
-- **Start a new knowledge graph** → `/knowledge:init`
-- **Document what I just learned** → `/knowledge:capture-lesson`
-- **Find something I documented before** → `/knowledge:recall "search query"`
-- **See what's in my knowledge graph** → `/knowledge:status`
-- **Track a complex bug across multiple attempts** → `/knowledge:meta-issue`
-- **Set up team knowledge sharing** → `/knowledge:config-sanitization`
-- **Summarize my current chat session** → `/knowledge:session-summary`
-- **Extract my chat history** → `/knowledge:extract-chat`
-- **Sync lessons to the knowledge graph** → `/knowledge:update-graph`
-- **Check for sensitive data before sharing** → `/knowledge:check-sensitive`
-- **Work with multiple knowledge graphs** → `/knowledge:list` then `/knowledge:switch`
-- **Link lessons to GitHub issues** → `/knowledge:link-issue`
-- **Update plugin documentation** → `/knowledge:update-doc --user-facing`
+- **Start a new knowledge graph** → `/kg-sis:init`
+- **Document what I just learned** → `/kg-sis:capture-lesson`
+- **Find something I documented before** → `/kg-sis:recall "search query"`
+- **See what's in my knowledge graph** → `/kg-sis:status`
+- **Track a complex bug across multiple attempts** → `/kg-sis:meta-issue`
+- **Set up team knowledge sharing** → `/kg-sis:config-sanitization`
+- **Summarize my current chat session** → `/kg-sis:session-summary`
+- **Extract my chat history** → `/kg-sis:extract-chat`
+- **Sync lessons to the knowledge graph** → `/kg-sis:update-graph`
+- **Check for sensitive data before sharing** → `/kg-sis:check-sensitive`
+- **Work with multiple knowledge graphs** → `/kg-sis:list` then `/kg-sis:switch`
+- **Link lessons to GitHub issues** → `/kg-sis:link-issue`
+- **Update plugin documentation** → `/kg-sis:update-doc --user-facing`
 
 ---
 
@@ -32,10 +32,10 @@ First-time users need these for basic operation:
 
 | Command | Purpose |
 |---------|---------|
-| `/knowledge:init` | Initialize a new knowledge graph with wizard-based setup |
-| `/knowledge:capture-lesson` | Document lessons learned with git metadata tracking |
-| `/knowledge:status` | View active knowledge graph info and quick reference |
-| `/knowledge:recall` | Search across all memory systems (lessons, decisions, knowledge) |
+| `/kg-sis:init` | Initialize a new knowledge graph with wizard-based setup |
+| `/kg-sis:capture-lesson` | Document lessons learned with git metadata tracking |
+| `/kg-sis:status` | View active knowledge graph info and quick reference |
+| `/kg-sis:recall` | Search across all memory systems (lessons, decisions, knowledge) |
 
 ### 🟡 Intermediate (Once Comfortable)
 
@@ -43,15 +43,15 @@ Active users use these for regular workflows:
 
 | Command | Purpose |
 |---------|---------|
-| `/knowledge:update-graph` | Extract knowledge graph entries from lessons |
-| `/knowledge:add-category` | Add a new category to existing knowledge graph |
-| `/knowledge:session-summary` | Create summary of current chat session |
-| `/knowledge:list` | Display all configured knowledge graphs |
-| `/knowledge:switch` | Change active knowledge graph |
-| `/knowledge:check-sensitive` | Scan knowledge graph for potentially sensitive information |
-| `/knowledge:config-sanitization` | Interactive wizard for pre-commit hook setup |
-| `/knowledge:extract-chat` | Extract chat history from Claude and Gemini logs |
-| `/knowledge:update-doc` | Update plugin/project docs (`--user-facing`) or KG content |
+| `/kg-sis:update-graph` | Extract knowledge graph entries from lessons |
+| `/kg-sis:add-category` | Add a new category to existing knowledge graph |
+| `/kg-sis:session-summary` | Create summary of current chat session |
+| `/kg-sis:list` | Display all configured knowledge graphs |
+| `/kg-sis:switch` | Change active knowledge graph |
+| `/kg-sis:check-sensitive` | Scan knowledge graph for potentially sensitive information |
+| `/kg-sis:config-sanitization` | Interactive wizard for pre-commit hook setup |
+| `/kg-sis:extract-chat` | Extract chat history from Claude and Gemini logs |
+| `/kg-sis:update-doc` | Update plugin/project docs (`--user-facing`) or KG content |
 
 ### 🔴 Advanced (Power Features)
 
@@ -59,13 +59,13 @@ Power users leverage these for complex workflows:
 
 | Command | Purpose |
 |---------|---------|
-| `/knowledge:meta-issue` | Initialize meta-issue tracking for complex multi-attempt problems |
-| `/knowledge:start-issue-tracking` | Initialize issue tracking with structured docs and Git branch |
-| `/knowledge:update-issue-plan` | Sync knowledge graph → plan → issue → GitHub |
-| `/knowledge:link-issue` | Manually link existing lesson or ADR to GitHub issue |
-| `/knowledge:archive-memory` | Archive stale MEMORY.md entries to prevent bloat |
-| `/knowledge:restore-memory` | Restore archived MEMORY.md entries |
-| `/knowledge:sync-all` | Automated full sync pipeline (4 steps → 1 command) |
+| `/kg-sis:meta-issue` | Initialize meta-issue tracking for complex multi-attempt problems |
+| `/kg-sis:start-issue-tracking` | Initialize issue tracking with structured docs and Git branch |
+| `/kg-sis:update-issue-plan` | Sync knowledge graph → plan → issue → GitHub |
+| `/kg-sis:link-issue` | Manually link existing lesson or ADR to GitHub issue |
+| `/kg-sis:archive-memory` | Archive stale MEMORY.md entries to prevent bloat |
+| `/kg-sis:restore-memory` | Restore archived MEMORY.md entries |
+| `/kg-sis:sync-all` | Automated full sync pipeline (4 steps → 1 command) |
 
 ---
 
@@ -88,28 +88,28 @@ Power users leverage these for complex workflows:
 
 ### First Time Setup (5 minutes)
 
-1. `/knowledge:init`
+1. `/kg-sis:init`
    → Follow wizard to configure location, categories, and git strategy
 
-2. `/knowledge:capture-lesson`
+2. `/kg-sis:capture-lesson`
    → Document your first learning with guided prompts
 
-3. `/knowledge:status`
+3. `/kg-sis:status`
    → Verify everything is working correctly
 
 ### Daily Use (10 minutes)
 
 1. Solve a problem or learn something new
 
-2. `/knowledge:capture-lesson`
+2. `/kg-sis:capture-lesson`
    → Document it while fresh in your mind
 
-3. `/knowledge:update-graph`
+3. `/kg-sis:update-graph`
    → Sync to knowledge graph for quick reference
 
 ### Before Sharing Code (2 minutes)
 
-1. `/knowledge:check-sensitive`
+1. `/kg-sis:check-sensitive`
    → Scan for API keys, credentials, PII
 
 2. Review findings carefully
@@ -118,20 +118,20 @@ Power users leverage these for complex workflows:
 
 ### Working with Complex Bugs (30+ minutes)
 
-1. `/knowledge:meta-issue`
+1. `/kg-sis:meta-issue`
    → Initialize tracking for multi-attempt problem
 
 2. Attempt fixes, document each try
 
-3. `/knowledge:update-issue-plan`
+3. `/kg-sis:update-issue-plan`
    → Sync progress to GitHub issue
 
 ### Multi-Graph Workflows
 
-1. `/knowledge:list`
+1. `/kg-sis:list`
    → See all configured knowledge graphs
 
-2. `/knowledge:switch`
+2. `/kg-sis:switch`
    → Change to different project's KG
 
 3. Work with that project's knowledge
@@ -141,13 +141,13 @@ Power users leverage these for complex workflows:
 ## Quick Tips
 
 - **Start with Essential commands** — Add Intermediate and Advanced commands as needs arise
-- **Use `/knowledge:status` often** — Shows what's in your active knowledge graph at a glance
-- **`/knowledge:recall` searches everything** — Lessons, decisions, knowledge entries, and session summaries
+- **Use `/kg-sis:status` often** — Shows what's in your active knowledge graph at a glance
+- **`/kg-sis:recall` searches everything** — Lessons, decisions, knowledge entries, and session summaries
 - **MEMORY.md auto-updates** — Check it before important sessions to see what context is loaded
-- **Commands use colon syntax** — It's `/knowledge:` not `/knowledge-` (colon, not hyphen)
+- **Commands use colon syntax** — It's `/kg-sis:` not `/knowledge-` (colon, not hyphen)
 - **Git metadata is automatic** — Branch, commit, PR, and issue info captured when you create lessons
-- **Categories are flexible** — Start with defaults, add custom ones with `/knowledge:add-category`
-- **Sanitization is a wizard** — `/knowledge:config-sanitization` guides you through pre-commit hook setup
+- **Categories are flexible** — Start with defaults, add custom ones with `/kg-sis:add-category`
+- **Sanitization is a wizard** — `/kg-sis:config-sanitization` guides you through pre-commit hook setup
 - **Multiple KGs are powerful** — Separate knowledge graphs for work, personal, open-source projects
 
 ---

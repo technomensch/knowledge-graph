@@ -9,8 +9,8 @@
   },
   "plugins": [
     {
-      "name": "knowledge",
-      "version": "0.0.6-alpha",
+      "name": "kg-sis",
+      "version": "0.0.8.3-alpha",
       "description": "Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects. Includes KG entries, ADRs, meta-issue tracking, chat extraction, and MEMORY.md bidirectional sync.",
       "source": "./",
       "author": {
@@ -19,7 +19,7 @@
       },
       "repository": "https://github.com/technomensch/knowledge-graph",
       "license": "MIT",
-      "keywords": ["knowledge", "lessons-learned", "memory", "documentation", "governance", "meta-issue", "adr"]
+      "keywords": ["kg-sis", "knowledge", "lessons-learned", "memory", "documentation", "governance", "meta-issue", "adr"]
     }
   ]
 }

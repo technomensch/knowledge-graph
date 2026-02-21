@@ -138,8 +138,8 @@ Provide review feedback in this structure:
 ## Integration with Workflows
 
 This agent is called by:
-- `/knowledge:update-graph` (Step 6: Quality check)
-- `/knowledge:sync-all` (after KG extraction)
+- `/kg-sis:update-graph` (Step 6: Quality check)
+- `/kg-sis:sync-all` (after KG extraction)
 - Manual invocation when reviewing entries
 
 ## Success Metrics

@@ -13,11 +13,11 @@ deciders: technomensch, Claude Sonnet 4.5
 
 ## Context
 
-v0.0.3-alpha introduced MEMORY.md token-based limits (1,500/2,000 tokens) and `/knowledge:archive-memory` command for managing bloat. When planning v0.0.4-alpha, we considered three features from the v0.0.3 deferred list:
+v0.0.3-alpha introduced MEMORY.md token-based limits (1,500/2,000 tokens) and `/kg-sis:archive-memory` command for managing bloat. When planning v0.0.4-alpha, we considered three features from the v0.0.3 deferred list:
 
 1. **MEMORY.md auto-sync rules engine** - YAML-based pattern matching to automate sync decisions
 2. **Smart summarization** - LLM-powered entry consolidation
-3. **`/knowledge:restore-memory` command** - Restore archived entries
+3. **`/kg-sis:restore-memory` command** - Restore archived entries
 
 The question: Which features should be included in v0.0.4-alpha?
 
@@ -39,7 +39,7 @@ The question: Which features should be included in v0.0.4-alpha?
 #### Option 1: Rules Engine + Restore (Medium Scope)
 
 **Scope:**
-- Implement `/knowledge:restore-memory` command
+- Implement `/kg-sis:restore-memory` command
 - Implement basic rules engine (YAML-based pattern matching)
 - Skip smart summarization
 
@@ -96,7 +96,7 @@ memory_sync:
 #### Option 3: Restore Only (Minimal Scope) ← **SELECTED**
 
 **Scope:**
-- Implement `/knowledge:restore-memory` command only
+- Implement `/kg-sis:restore-memory` command only
 - Defer rules engine to v0.0.5-alpha
 - Defer smart summarization to v0.0.5-alpha
 
@@ -117,7 +117,7 @@ memory_sync:
 
 **Selected: Option 3 (Restore Only)**
 
-Implement `/knowledge:restore-memory` command in v0.0.4-alpha. Defer rules engine and smart summarization to v0.0.5-alpha.
+Implement `/kg-sis:restore-memory` command in v0.0.4-alpha. Defer rules engine and smart summarization to v0.0.5-alpha.
 
 ### Rationale
 
@@ -174,7 +174,7 @@ Implement `/knowledge:restore-memory` command in v0.0.4-alpha. Defer rules engin
 
 ### v0.0.4-alpha Scope
 
-**New command: `/knowledge:restore-memory`**
+**New command: `/kg-sis:restore-memory`**
 - Restore by entry title (fuzzy search)
 - Restore by entry ID from archive
 - List all archived entries

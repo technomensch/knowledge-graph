@@ -137,7 +137,7 @@ Implemented complete system with four complementary knowledge types:
 
 ## Automation & Workflows
 
-### `/knowledge:capture-lesson`
+### `/kg-sis:capture-lesson`
 
 Automates lesson creation:
 1. Prompt for topic and category
@@ -147,7 +147,7 @@ Automates lesson creation:
 5. Commit with standard message
 6. Link to related knowledge
 
-### `/knowledge:create-adr`
+### `/kg-sis:create-adr`
 
 Automates ADR creation:
 1. Generate next ADR number
@@ -156,11 +156,11 @@ Automates ADR creation:
 4. Commit with standard message
 5. Link from related lessons
 
-### `/knowledge:recall`
+### `/kg-sis:recall`
 
 Searches all knowledge systems:
 ```bash
-/knowledge:recall "validation issue"
+/kg-sis:recall "validation issue"
 
 Results:
 - Lessons: "Input Validation Debugging" (process/, 2024-08-15)
@@ -169,7 +169,7 @@ Results:
 - Session: "Validation Refactoring Session" (2024-08-22)
 ```
 
-### `/knowledge:sync-all`
+### `/kg-sis:sync-all`
 
 Complete pipeline automation:
 1. Capture lesson (if applicable)
@@ -301,7 +301,7 @@ After implementing complete system:
 **Phase 2:** Added automation (/lesson-learned, /create-adr)
 **Phase 3:** Added Knowledge Graph extraction
 **Phase 4:** Added session summaries
-**Phase 5:** Added /knowledge:sync-all pipeline
+**Phase 5:** Added /kg-sis:sync-all pipeline
 **Phase 6:** Integrated with MEMORY.md bidirectional sync
 
 Each phase built on previous, validating architecture.
@@ -333,9 +333,9 @@ Sources consulted while solving this problem:
 - [ADR-005: Memory System Architecture](../../decisions/ADR-005-example.md) — Core decision to adopt this patterns.
 
 **Workflows:**
-- `/knowledge:capture-lesson` - Standardized lesson extraction.
-- `/knowledge:create-adr` - Architectural record keeping.
-- `/knowledge:recall` - Unified search interface.
+- `/kg-sis:capture-lesson` - Standardized lesson extraction.
+- `/kg-sis:create-adr` - Architectural record keeping.
+- `/kg-sis:recall` - Unified search interface.
 
 ---
 

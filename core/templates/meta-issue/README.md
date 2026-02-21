@@ -64,7 +64,7 @@
 2. **Update understanding:** Edit `analysis/root-cause-evolution.md` when beliefs shift
 3. **Log progress:** Update `implementation-log.md` with each attempt
 4. **Extract lessons:** Create lessons-learned when patterns emerge
-5. **Sync to KG:** Run `/knowledge:update-graph` to extract insights
+5. **Sync to KG:** Run `/kg-sis:update-graph` to extract insights
 
 ---
 

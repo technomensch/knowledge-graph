@@ -228,10 +228,10 @@ The knowledge system automates capture *execution* when skills/commands are invo
 **What's Automatic (Execution):**
 
 When you invoke a command/skill, it automates:
-- **`/knowledge:capture-lesson`:** Auto-categorizes, updates indexes, creates cross-refs, commits
-- **`/knowledge:session-summary`:** Auto-detects session type, extracts key artifacts, organizes by date
-- **`/knowledge:recall`:** Auto-searches across all memory systems, ranks results, formats output
-- **`/knowledge:sync-all`:** Runs entire 4-step pipeline with single confirmation
+- **`/kg-sis:capture-lesson`:** Auto-categorizes, updates indexes, creates cross-refs, commits
+- **`/kg-sis:session-summary`:** Auto-detects session type, extracts key artifacts, organizes by date
+- **`/kg-sis:recall`:** Auto-searches across all memory systems, ranks results, formats output
+- **`/kg-sis:sync-all`:** Runs entire 4-step pipeline with single confirmation
 
 **What's Manual (Triggers):**
 
@@ -272,8 +272,8 @@ You must decide WHEN to invoke commands:
 
 *Not currently implemented, but could be added:*
 - Smart triggers: Detect patterns suggesting documentation (long debugging session, significant refactor)
-- Context-based suggestions: "You're at 180K tokens — run `/knowledge:session-summary`?"
-- Commit hooks: After significant commits, suggest `/knowledge:capture-lesson`
+- Context-based suggestions: "You're at 180K tokens — run `/kg-sis:session-summary`?"
+- Commit hooks: After significant commits, suggest `/kg-sis:capture-lesson`
 - Cross-reference detection: Auto-link related ADRs/lessons based on content analysis
 
 #### Key Insight

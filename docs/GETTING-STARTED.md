@@ -41,7 +41,7 @@ Verify the plugin loaded by typing `/knowledge` — the autocomplete menu should
 ### Step 2: Initialize the Knowledge Graph
 
 ```bash
-/knowledge:init
+/kg-sis:init
 ```
 
 The initialization wizard prompts for:
@@ -53,7 +53,7 @@ After completion, the command creates the knowledge graph directory structure in
 ### Step 3: Verify Setup
 
 ```bash
-/knowledge:status
+/kg-sis:status
 ```
 
 Expected output: `Knowledge Graph: [project-name] | 0 lessons | 0 decisions`
@@ -61,7 +61,7 @@ Expected output: `Knowledge Graph: [project-name] | 0 lessons | 0 decisions`
 ### Step 4: Capture the First Lesson
 
 ```bash
-/knowledge:capture-lesson
+/kg-sis:capture-lesson
 ```
 
 Claude Code guides the session through documenting a problem solved recently. The command auto-fills metadata fields (`created`, `author`, `git.*`) and asks for the manual fields (`title`, `category`, `tags`).
@@ -71,7 +71,7 @@ Claude Code guides the session through documenting a problem solved recently. Th
 ### Step 5: Verify the Lesson Was Saved
 
 ```bash
-/knowledge:status
+/kg-sis:status
 ```
 
 Expected output now shows: `1 lesson`
@@ -90,7 +90,7 @@ Expected output now shows: `1 lesson`
 ### Commands do not appear in Claude Code autocomplete
 
 - Verify the plugin is loaded: start Claude Code with `claude --plugin-dir /path/to/knowledge-graph`
-- Commands use the `knowledge:` prefix with a colon, not a hyphen: `/knowledge:init` (correct), `/knowledge-init` (incorrect)
+- Commands use the `knowledge:` prefix with a colon, not a hyphen: `/kg-sis:init` (correct), `/knowledge-init` (incorrect)
 - Restart Claude Code completely if commands still do not appear
 
 ### The MCP server does not start

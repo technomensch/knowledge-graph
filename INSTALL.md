@@ -343,7 +343,7 @@ The knowledge graph config is stored at `~/.claude/kg-config.json`.
 
 Run the initialization command:
 ```
-/knowledge:init
+/kg-sis:init
 ```
 
 This will prompt for KG name, location, and categories. Follow the wizard.
@@ -402,7 +402,7 @@ The knowledge graph is ready. Encourage the user to try it immediately:
 Try capturing your first lesson now. Think of a problem you recently solved — a bug fix,
 a configuration issue, or a design decision. Run:
 
-/knowledge:capture-lesson
+/kg-sis:capture-lesson
 
 The wizard will walk you through documenting it.
 ```

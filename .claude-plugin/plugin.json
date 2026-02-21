@@ -1,6 +1,6 @@
 {
-  "name": "knowledge",
-  "version": "0.0.6-alpha",
+  "name": "kg-sis",
+  "version": "0.0.8.3-alpha",
   "description": "Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects. Includes KG entries, ADRs, meta-issue tracking, chat extraction, and MEMORY.md bidirectional sync.",
   "author": {
     "name": "technomensch",
@@ -19,7 +19,7 @@
     "adr"
   ],
   "mcpServers": {
-    "knowledge": {
+    "kg-sis": {
       "type": "stdio",
       "command": "node",
       "args": ["${CLAUDE_PLUGIN_ROOT}/mcp-server/dist/index.js"]

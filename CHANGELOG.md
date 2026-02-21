@@ -32,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.5-alpha] - 2026-02-17
 
 ### Added
-- `/knowledge:start-issue-tracking` command (19th command) — Full issue initialization
+- `/kg-sis:start-issue-tracking` command (19th command) — Full issue initialization
   workflow, fully ported from prior project and sanitized for cross-project portability
   and LLM-platform-agnostic use. Features:
   - Auto-detects parent branch, version from git tag, issue type, and next issue number
@@ -41,8 +41,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Creates structured directory under `{active_kg_path}/issues/{number}-{slug}/`
   - Generates `issue.md` with full metadata (title, type, branch, version, date, scope)
   - Git branch creation: `git checkout -b issue/{number}-{slug}`
-  - Knowledge graph synchronization via `/knowledge:update-issue-plan`
-  - Integrates with `/knowledge:link-issue` and `/knowledge:meta-issue`
+  - Knowledge graph synchronization via `/kg-sis:update-issue-plan`
+  - Integrates with `/kg-sis:link-issue` and `/kg-sis:meta-issue`
   - No project-specific dependencies; uses KG config for all path resolution
 
 ### Fixed
@@ -51,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Truncated marketplace slug `stayinginsync-knowledge-grap` (missing trailing `h`) in
   `.claude/settings.json` and plugin cache `settings.json` — caused plugin-not-found
   errors on every session start
-- Dangling `/knowledge:start-issue-tracking` references in `commands/update-issue-plan.md`
+- Dangling `/kg-sis:start-issue-tracking` references in `commands/update-issue-plan.md`
   (lines ~61 and ~203) now resolve to the newly created command
 - First `SessionStart` hook entry (check-memory.sh) missing `comment` field
 - Session-summary command markdown template embedded as raw prose instead of fenced
@@ -77,7 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.4-alpha] - 2026-02-16
 
 ### Added
-- **`/knowledge:restore-memory` Command** - Restore archived MEMORY.md entries
+- **`/kg-sis:restore-memory` Command** - Restore archived MEMORY.md entries
   - Fuzzy search by entry title using `fuzzy-search-archive.sh` helper script
   - Restore by entry ID/index with `--id` flag
   - List all archived entries with `--list` flag
@@ -99,7 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **Version**: 0.0.3-alpha → 0.0.4-alpha
 - **Command Count**: 17 → 18 (added restore-memory)
-- **`/knowledge:archive-memory` Command** - Enhanced with restoration tracking
+- **`/kg-sis:archive-memory` Command** - Enhanced with restoration tracking
   - Archive log now shows restoration timestamps: "[Restored: YYYY-MM-DD]"
   - Restored entries remain in archive for historical record
   - Documents restore workflow and manual restoration process
@@ -129,19 +129,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.3-alpha] - 2026-02-16
 
 ### Added
-- **`/knowledge:archive-memory` Command** - Archive stale MEMORY.md entries to prevent bloat
+- **`/kg-sis:archive-memory` Command** - Archive stale MEMORY.md entries to prevent bloat
   - Token-based staleness detection (90-day threshold, customizable)
   - Moves stale entries to MEMORY-archive.md with archive log
   - Shows tokens freed and current size after archival
   - Dry-run mode for previewing without writing
 - **Autonomous Triggering in Knowledge-Graph-Usage Skill**
-  - After lesson capture: Suggests `/knowledge:update-graph` immediately
+  - After lesson capture: Suggests `/kg-sis:update-graph` immediately
   - After significant commits: Detects fix/debug/pattern keywords, suggests capture within 30 minutes
-  - Before problem-solving: Suggests `/knowledge:recall` to check existing knowledge
+  - Before problem-solving: Suggests `/kg-sis:recall` to check existing knowledge
 - **Post-Commit Hook Template** - Detects lesson-worthy commits
   - Located in `core/examples-hooks/post-commit-lesson-suggestion`
   - Triggers on keywords: fix, solved, debug, implement, refactor, pattern, architecture
-  - Optional installation via `/knowledge:init` wizard (default: no)
+  - Optional installation via `/kg-sis:init` wizard (default: no)
 - **SessionStart Hooks** - Three hooks for enhanced context
   - `recent-lessons.sh` - Displays lessons modified in last 7 days
   - `memory-diff-check.sh` - Notifies of MEMORY.md changes since last session
@@ -183,7 +183,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deferred to v0.0.4-alpha
 - MEMORY.md auto-sync rules engine (YAML rules, confidence scoring)
 - Smart summarization (LLM-powered entry consolidation)
-- `/knowledge:restore-memory` command (restore archived entries by ID)
+- `/kg-sis:restore-memory` command (restore archived entries by ID)
 - Per-KG config directories with `memory-sync-rules.yaml`
 
 ## [0.0.2-alpha] - 2026-02-16
@@ -272,22 +272,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All command `name:` fields now include `knowledge:` namespace prefix for autocomplete
 
 ### Commands
-- `/knowledge:init` - Initialize new knowledge graph with wizard
-- `/knowledge:list` - Display all configured knowledge graphs
-- `/knowledge:switch` - Change active knowledge graph
-- `/knowledge:add-category` - Add category to existing KG
-- `/knowledge:configure-sanitization` - Set up pre-commit hooks for sensitive data
-- `/knowledge:check-sensitive` - Scan KG for potentially sensitive information
-- `/knowledge:link-issue` - Link lesson to GitHub issue with bidirectional references
-- `/knowledge:status` - Display active KG status and quick reference
-- `/knowledge:capture-lesson` - Document lessons with git metadata
-- `/knowledge:recall` - Search across all KG systems
-- `/knowledge:update-graph` - Extract insights from lessons to KG
-- `/knowledge:sync-all` - Automated knowledge sync pipeline
-- `/knowledge:update-issue-plan` - Sync KG → plan → issue → GitHub
-- `/knowledge:session-summary` - Auto-document work sessions
-- `/knowledge:extract-chat` - Extract chat history from Claude/Gemini logs
-- `/knowledge:meta-issue` - Initialize meta-issue tracking for complex problems
+- `/kg-sis:init` - Initialize new knowledge graph with wizard
+- `/kg-sis:list` - Display all configured knowledge graphs
+- `/kg-sis:switch` - Change active knowledge graph
+- `/kg-sis:add-category` - Add category to existing KG
+- `/kg-sis:configure-sanitization` - Set up pre-commit hooks for sensitive data
+- `/kg-sis:check-sensitive` - Scan KG for potentially sensitive information
+- `/kg-sis:link-issue` - Link lesson to GitHub issue with bidirectional references
+- `/kg-sis:status` - Display active KG status and quick reference
+- `/kg-sis:capture-lesson` - Document lessons with git metadata
+- `/kg-sis:recall` - Search across all KG systems
+- `/kg-sis:update-graph` - Extract insights from lessons to KG
+- `/kg-sis:sync-all` - Automated knowledge sync pipeline
+- `/kg-sis:update-issue-plan` - Sync KG → plan → issue → GitHub
+- `/kg-sis:session-summary` - Auto-document work sessions
+- `/kg-sis:extract-chat` - Extract chat history from Claude/Gemini logs
+- `/kg-sis:meta-issue` - Initialize meta-issue tracking for complex problems
 
 ### MCP Tools
 - `kg_config_init` - Create KG directory structure + config entry
