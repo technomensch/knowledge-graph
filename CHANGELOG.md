@@ -7,6 +7,96 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.8.7-alpha] - 2026-02-22
+
+### Added
+- **Manual Documentation Updates & Security Fixes**
+  - ROADMAP version history table: Complete chronological record v0.0.1-alpha through v0.0.8.6-alpha
+  - ROADMAP footer: Updated to reflect v0.0.8.6-alpha current release
+
+### Fixed
+- **Security: npm audit vulnerabilities → 0 vulns**
+  - Fixed ajv ReDoS vulnerability (GHSA-2g4f-4pwh-qvx6) in MCP server dependencies
+  - Fixed hono timing comparison hardening (GHSA-gq3j-xvxp-8hrf) in MCP server dependencies
+  - Rebuilt mcp-server/dist/ with patched packages
+  - Updated mcp-server/package-lock.json with fixed versions
+
+### Documentation
+- Removed hardcoded version numbers to prevent docs becoming stale:
+  - Changed "22 slash commands" → "slash commands" in index.md
+  - Changed "7 MCP tools" → "MCP tools" in index.md
+- Added clarity to Four Pillars reference: "Learn about the Four Pillars this project was built on"
+- Simplified GETTING-STARTED.md heading format (removed "Path A" prefix)
+- Updated Getting Started card: Specified "local IDE CLI coding assistant" for clarity on platform scope
+
+**Branch**: `v0.0.8.7-alpha-manual-updates`
+**Commits**:
+- `ca59e184` - Docs: Remove hardcoded version numbers + clarifications
+- `9830f8aa` - Build: Fix npm security vulnerabilities
+- `949b04c1` - Docs: ROADMAP version history table
+- `0f8c19b7` - Docs: ROADMAP MkDocs customization section
+- `4e91d8e7` - Docs: CHANGELOG backfill v0.0.7-alpha through v0.0.8.4-alpha
+- `c92e9f7e` - Docs: Getting Started card "local IDE CLI coding assistant"
+
+## [0.0.8.6-alpha] - 2026-02-22
+
+### Added
+- **MkDocs Material Theme Customization (Phases 1-3)**
+  - Material theme v9.7.0+ with 10+ navigation features enabled
+  - Dark mode (slate scheme) as default with light mode fallback
+  - Sticky navigation tabs (`navigation.tabs.sticky`)
+  - Breadcrumbs above page titles (`navigation.path`)
+  - Footer navigation with Next/Previous buttons (`navigation.footer`)
+  - Integrated Table of Contents in left sidebar (`toc.integrate` + `toc.follow`)
+  - Copy buttons on all code blocks (`content.code.copy`)
+  - Search plugin configuration with autocomplete, highlighting, and sharing
+
+- **Custom CSS Styling (400+ lines)**
+  - Typography: Inter and JetBrains Mono from Google Fonts
+  - Dark mode colors: Navy primary (#1a1a2e), cyan accent (#00d2ff)
+  - Light mode colors: Blue primary (#003d82), orange accent (#ff6b35)
+  - Glassmorphism header effect with backdrop blur (dark mode only)
+  - WCAG AA contrast compliance for all color combinations
+  - Enhanced code blocks, tables, admonitions, and search box styling
+  - Print media support (hides navigation for exports)
+
+- **Page Restructuring & Visual Enhancements**
+  - Grid cards on index.md and GETTING-STARTED.md for visual navigation
+  - Tabbed interface in COMMAND-GUIDE.md (6 command categories)
+  - Mermaid diagrams: "Knowledge Capture Pipeline" (GETTING-STARTED.md)
+  - Mermaid diagrams: "Four Pillars Relationships" (CONCEPTS.md)
+  - All diagrams include accessibility attributes (accTitle, accDescr)
+  - Neutral mermaid theme for proper rendering in both color schemes
+
+- **Additional Experience Plugins**
+  - `mkdocs-git-revision-date-localized-plugin` — "Last updated" timestamps on all pages
+  - `mkdocs-glightbox` — Lightbox image/diagram viewing
+  - `mkdocs-minify-plugin` — Asset compression for snappy performance
+  - `mkdocs-roamlinks-plugin` — WikiLink support for knowledge entries
+
+- **Social Links & Copyright**
+  - GitHub: https://github.com/technomensch
+  - LinkedIn: https://www.linkedin.com/in/marckaplan/
+  - Copyright: "Staying in Sync"
+
+### Fixed
+- Mermaid diagram rendering in dark mode (removed hardcoded colors, adopted neutral theme)
+- Light mode header styling (restored Material theme defaults)
+- Grid card links accessibility (ensured descriptive text, no "click here")
+
+### Documentation
+- Updated STYLE-GUIDE.md with blockquote vs. admonition format guidance
+- Moved FAQ under Commands section in mkdocs.yml navigation
+- Added comprehensive Section 508 compliance documentation in STYLE-GUIDE.md
+
+### Technical
+- Updated `requirements.txt` with mkdocs-material>=9.7.0 and 4 plugins
+- mkdocs.yml: 15+ navigation features, plugin configuration, theme palette setup
+- Custom stylesheet: docs/stylesheets/extra.css (400+ lines)
+- No core document rewrites or file splitting (MkDocs rendering enhancements only)
+
+**Version**: 0.0.8.4-alpha → 0.0.8.6-alpha
+
 ## [0.0.6-alpha] - 2026-02-17
 
 ### Added

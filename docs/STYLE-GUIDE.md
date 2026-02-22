@@ -339,7 +339,11 @@ Apply these rules to every document before committing.
 
 ### 6.5 Callout boxes
 
-Use blockquote syntax with a bold label for important notes.
+Callouts highlight important information. Two formats are supported depending on rendering context:
+
+#### Format 1: Blockquote Syntax (GitHub-Compatible)
+
+Use blockquote syntax with a bold label. Works on GitHub and any markdown renderer.
 
 ```markdown
 > **Note:** Informational context the reader should know.
@@ -348,10 +352,40 @@ Use blockquote syntax with a bold label for important notes.
 > **Important:** A must-know requirement before proceeding.
 ```
 
-- Reserved keywords: **Note**, **Tip**, **Warning**, **Important**
-- Do not place consecutive callout boxes without prose between them
+**When to use**: Raw markdown files, GitHub previews, or when maximum compatibility is needed.
 
-**Citation**: `[GoogleDevDocs]` notes and warnings.
+#### Format 2: MkDocs Admonitions (MkDocs-Enhanced)
+
+Use MkDocs admonition syntax for richer styling on the documentation site.
+
+```markdown
+!!! note "Note"
+    Informational context the reader should know.
+
+!!! tip "Pro Tip"
+    Actionable optimization or shortcut.
+
+!!! warning "Common Pitfall"
+    Risk of data loss or a breaking change.
+
+!!! danger "Important"
+    A must-know requirement before proceeding.
+
+!!! info "For Your Information"
+    Additional context or related resources.
+```
+
+**When to use**: Comprehensive documentation files (COMMAND-GUIDE.md, CONCEPTS.md, GETTING-STARTED.md) where site rendering matters.
+
+#### Guidelines
+
+- Reserved keywords: **Note**, **Tip**, **Warning**, **Important**, **Info**
+- Do not place consecutive callout boxes without prose between them (either format)
+- Use blockquotes for lessons learned and concise guides
+- Use admonitions for main documentation sections and learning paths
+- All callout text must include accompanying text — never rely on formatting alone to convey meaning (WCAG 2.1)
+
+**Citation**: Google Dev Docs style guide, Material for MkDocs admonition support, WCAG 2.1 1.1.1 Non-text Content.
 
 ---
 

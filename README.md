@@ -2,12 +2,22 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.0.6-alpha
-**Status:** Distribution Hygiene Release
+**Version:** 0.0.8.6-alpha
+**Status:** Documentation UX Customization Release
 
 ---
 
 ## What is this?
+
+This is a platform-agnostic knowledge graph that was developed entirely using Gemini and Claude, leveraging very specific context and detailed natural language prompting.
+
+It is designed to take chats sessions with large language models (LLMs) and turn them into a searchable, institutional knowledge, library.
+
+The cool thing is, it helps users grab the important stuff (lessons learned, architecture decisions, recurring patterns, etc...) inside the development workflow without having to stop chatting.
+
+Then, users can easily look up that information not only in their current chat, but also in any other chat session, even if they switch to a totally different LLM!
+
+The key lies in the simple approach of embedding the knowledge directly within the project itself. This ensures the knowledge is always immediately available whenever and wherever the project is opened. Should the library become excessively large, users have the option to transfer it to an external third-party via MCP servers.
 
 A Claude Code plugin that provides:
 - **Lesson-Learned Capture** with categorized storage and git metadata tracking
@@ -32,7 +42,7 @@ See [Getting Started Guide](docs/GETTING-STARTED.md) for prerequisites and troub
 
 ---
 
-## Commands (19 Total)
+## Commands (22 Total)
 
 **Quick Reference**: See [CHEAT-SHEET.md](docs/CHEAT-SHEET.md) for one-page quick reference guide
 **Detailed Guide**: See [COMMAND-GUIDE.md](docs/COMMAND-GUIDE.md) for comprehensive command documentation with learning paths
@@ -207,21 +217,32 @@ is installed from the marketplace. Developer-only content in `docs/` is excluded
 
 See [ROADMAP.md](ROADMAP.md) for detailed version history and development progress.
 
-**Current Release:** v0.0.6-alpha (2026-02-17)
-- ✅ Root `package.json` with `files` allowlist (npm-standard distribution hygiene)
-- ✅ `docs/` and `tests/` excluded from marketplace distribution
-- ✅ Fixed stale `kg-config.json` path (knowledge-graph-plugin → knowledge-graph)
-- ✅ Fixed stale GitHub URLs throughout repo
-- ✅ Commands with automatic namespace handling
-- ✅ MCP server with 7 tools + 2 resources
-- ✅ Platform-agnostic core system
+**Current Release:** v0.0.8.6-alpha (2026-02-22)
+- ✅ Complete MkDocs Material theme customization with professional UX
+- ✅ Dark mode (slate) as default with glassmorphism header effect
+- ✅ Sticky navigation tabs, breadcrumbs, integrated Table of Contents
+- ✅ Grid cards for visual navigation on index and getting-started pages
+- ✅ Tabbed command interface for browsing commands by category
+- ✅ Mermaid diagrams with proper theme support for dark/light modes
+- ✅ Custom CSS with professional typography (Inter, JetBrains Mono)
+- ✅ 508 accessibility compliance (WCAG AA contrast ratios)
 
-**What's New in v0.0.6:**
-- Root `package.json` with `files` allowlist — `docs/`, `tests/` excluded from
-  marketplace distribution (npm-standard distribution hygiene)
-- Fixed stale `kg-config.json` path (knowledge-graph-plugin → knowledge-graph)
-- Fixed stale GitHub URLs in CHANGELOG, ROADMAP, README, tests, and scripts
-- Added developer vs. distribution table to README
+**What's New in v0.0.8.6:**
+- Material theme v9.7.0+ with 10+ navigation features (tabs, breadcrumbs, footer nav)
+- Professional dark mode (navy + cyan) with light mode Material defaults
+- Grid cards and tabbed interfaces for improved visual navigation
+- Mermaid diagram rendering with adaptive theming for both color schemes
+- Enhanced code blocks with copy buttons and syntax highlighting
+- Git revision dates and lightbox image viewing
+- 400+ lines of custom CSS with WCAG AA compliance
+
+**Recent Versions:**
+- v0.0.8.4-alpha (Feb 21): Extract-chat date/project filtering
+- v0.0.8.3-alpha (Feb 21): Plugin namespace rename (knowledge → kg-sis)
+- v0.0.8.2-alpha (Feb 21): Update-doc --user-facing command
+- v0.0.8.1-alpha (Feb 20): Documentation infrastructure
+- v0.0.8-alpha (Feb 20): Universal installer and 3-tier installation
+- v0.0.7-alpha (Feb 20): Documentation consolidation (5 new docs)
 
 **Next:** v1.0.0 stable release (Q2 2026) incorporating alpha feedback
 

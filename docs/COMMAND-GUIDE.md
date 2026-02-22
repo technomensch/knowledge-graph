@@ -125,6 +125,60 @@ Complete reference for all knowledge graph commands, organized by difficulty wit
 
 ---
 
+## Browse Commands by Category
+
+=== "Setup & Configuration"
+
+    Get the knowledge graph running and configure how it works.
+
+    - [🟢 `/kg-sis:init`](#-kgsisinitcommands-tab) — Initialize a new knowledge graph
+    - [🟡 `/kg-sis:list`](#-kgsislist-commands-tab) — View all configured knowledge graphs
+    - [🟡 `/kg-sis:switch`](#-kgsisswitch-commands-tab) — Switch to a different knowledge graph
+    - [🟡 `/kg-sis:add-category`](#-kgsisadd-category-commands-tab) — Add custom categories
+    - [🟡 `/kg-sis:config-sanitization`](#-kgsisconfig-sanitization-commands-tab) — Set up safety features for team sharing
+
+=== "Capture & Document"
+
+    Document lessons, capture history, and summarize sessions.
+
+    - [🟢 `/kg-sis:capture-lesson`](#-kgsiscapture-lesson-commands-tab) — Capture problems solved and patterns discovered
+    - [🟡 `/kg-sis:extract-chat`](#-kgsisextract-chat-commands-tab) — Export chat history to markdown
+    - [🟡 `/kg-sis:session-summary`](#-kgsisssession-summary-commands-tab) — Summarize important work sessions
+
+=== "Search & Synchronization"
+
+    Find knowledge and keep the graph synchronized.
+
+    - [🟢 `/kg-sis:status`](#-kgsistatus-commands-tab) — Check current knowledge graph status
+    - [🟢 `/kg-sis:recall`](#-kgsisrecall-commands-tab) — Search across all knowledge entries
+    - [🟡 `/kg-sis:update-graph`](#-kgsisupdate-graph-commands-tab) — Extract lessons into knowledge graph
+    - [🟡 `/kg-sis:update-doc`](#-kgsisupdate-doc-commands-tab) — Update documentation with changes
+    - [🔴 `/kg-sis:sync-all`](#-kgsissync-all-commands-tab) — Run complete synchronization pipeline
+
+=== "Team & Sharing"
+
+    Share knowledge safely with team members.
+
+    - [🟡 `/kg-sis:check-sensitive`](#-kgsischeck-sensitive-commands-tab) — Scan for sensitive data before sharing
+    - [🔴 `/kg-sis:link-issue`](#-kgsislink-issue-commands-tab) — Connect lessons to GitHub issues
+
+=== "Advanced Issues"
+
+    Track complex, multi-attempt problems systematically.
+
+    - [🔴 `/kg-sis:meta-issue`](#-kgsismeta-issue-commands-tab) — Track multi-attempt bugs and features
+    - [🔴 `/kg-sis:start-issue-tracking`](#-kgsisstart-issue-tracking-commands-tab) — Systematic issue tracking with Git branches
+    - [🔴 `/kg-sis:update-issue-plan`](#-kgsisupdate-issue-plan-commands-tab) — Sync progress with GitHub and plans
+
+=== "Memory Management"
+
+    Manage MEMORY.md size and archive old patterns.
+
+    - [🔴 `/kg-sis:archive-memory`](#-kgsisarchive-memory-commands-tab) — Archive old patterns from MEMORY.md
+    - [🔴 `/kg-sis:restore-memory`](#-kgsisrestore-memory-commands-tab) — Restore archived context
+
+---
+
 ## Essential Commands
 
 ### 🟢 `/kg-sis:init`
