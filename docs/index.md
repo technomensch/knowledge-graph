@@ -1,5 +1,11 @@
 # Knowledge Graph Plugin
 
+!!! info "📚 Project Origin"
+    This project was initially built as a **personal learning project** to explore **docs-as-code** practices and plugin development. It has evolved into a comprehensive knowledge management system designed for institutional knowledge capture and cross-session memory. The architecture reflects these principles: platform-agnostic core, automated workflows, and portable knowledge representation.
+
+!!! warning "🧪 Alpha Development Complete — Seeking Beta Testers"
+    This project has **finished its initial alpha development** and is now actively seeking feedback from test users before launching the beta phase. If you're interested in helping shape the future of this plugin, please [open an issue](https://github.com/technomensch/knowledge-graph/issues) with your feedback, feature requests, or bug reports.
+
 **Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.**
 
 This is a platform-agnostic knowledge graph that was developed entirely using Gemini and Claude, leveraging very specific context and detailed natural language prompting.
@@ -21,9 +27,6 @@ The cool thing is, it helps users grab the important stuff inside the developmen
 Then, users can easily look up that information not only in their current chat, but also in any other chat session, even if they switch to a totally different LLM!
 
 The key lies in the simple approach of embedding the knowledge directly within the project itself. This ensures the knowledge is always immediately available whenever and wherever the project is opened. Should the library become excessively large, users have the option to transfer it to an external third-party via MCP servers.
-
-!!! info "📚 Project Origin"
-    This project was initially built as a **personal learning project** to explore **docs-as-code** practices and plugin development. It has evolved into a comprehensive knowledge management system designed for institutional knowledge capture and cross-session memory. The architecture reflects these principles: platform-agnostic core, automated workflows, and portable knowledge representation.
 
 ---
 
