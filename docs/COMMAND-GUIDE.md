@@ -1,6 +1,6 @@
 # Command Reference Guide
 
-> **Claude Code only:** The `/kg-sis:` prefix requires Claude Code with this plugin installed. Other IDEs access equivalent functionality through MCP tools — see [INSTALL.md](../INSTALL.md) for platform-specific setup.
+> **Claude Code only:** The `/kg-sis:` prefix requires Claude Code with this plugin installed. Other IDEs access equivalent functionality through MCP tools — see [INSTALL.md](INSTALL.md) for platform-specific setup.
 
 Complete reference for all knowledge graph commands, organized by difficulty with learning paths.
 

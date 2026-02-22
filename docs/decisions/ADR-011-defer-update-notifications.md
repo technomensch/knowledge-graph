@@ -166,7 +166,7 @@ case "-v":
 
 ## References
 
-- [ROADMAP.md](../ROADMAP.md) — v0.0.9 planning
+- [ROADMAP.md](../../ROADMAP.md) — v0.0.9 planning
 - [Lessons Learned: Update Notifications for Non-Plugin Users](../lessons-learned/architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md)
 - [Lessons Learned: Plugin Example File Management](../lessons-learned/architecture/Lessons_Learned_Plugin_Example_File_Management.md)
 - ADR-001 — Pattern: defer automation until simple version ships and gathers feedback
