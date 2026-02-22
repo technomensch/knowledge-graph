@@ -10,7 +10,7 @@ The knowledge graph core is platform-agnostic. This guide covers platform capabi
 
 ## Installation
 
-**For installation on any platform**, paste [INSTALL.md](../../INSTALL.md) into the AI assistant for automated setup. The installer handles platform detection, MCP server configuration, and knowledge graph initialization.
+**For installation on any platform**, paste [INSTALL.md](../docs/INSTALL.md) into the AI assistant for automated setup. The installer handles platform detection, MCP server configuration, and knowledge graph initialization.
 
 This guide focuses on **platform capabilities and usage patterns** after installation is complete.
 
@@ -47,7 +47,7 @@ This guide focuses on **platform capabilities and usage patterns** after install
 - ADR automation with bidirectional lesson linking
 - Git metadata auto-capture on every operation
 
-**For installation:** See [GETTING-STARTED.md](../../docs/GETTING-STARTED.md) or paste [INSTALL.md](../../INSTALL.md).
+**For installation:** See [GETTING-STARTED.md](../../docs/GETTING-STARTED.md) or paste [INSTALL.md](../docs/INSTALL.md).
 
 ---
 
@@ -289,7 +289,7 @@ Knowledge is portable — the same `docs/` directory works with all platforms. A
 ## Learn More
 
 **Installation**:
-- [Universal Installer](../../INSTALL.md) — Automated setup for all platforms
+- [Universal Installer](../docs/INSTALL.md) — Automated setup for all platforms
 - [Getting Started](../../docs/GETTING-STARTED.md) — Claude Code setup guide
 
 **Core Concepts & Reference**:

@@ -8,9 +8,9 @@ A step-by-step guide for setting up the knowledge graph system and capturing the
 
 ## Universal Installer (All Platforms)
 
-**For Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Aider, and other AI assistants:** Paste [INSTALL.md](../INSTALL.md) into the AI assistant for fully automated setup. The installer detects the platform, configures the MCP server, and initializes a knowledge graph automatically.
+**For Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Aider, and other AI assistants:** Paste [INSTALL.md](INSTALL.md) into the AI assistant for fully automated setup. The installer detects the platform, configures the MCP server, and initializes a knowledge graph automatically.
 
-**For Claude Code users:** Follow the setup steps below, or paste [INSTALL.md](../INSTALL.md) for the same automated experience.
+**For Claude Code users:** Follow the setup steps below, or paste [INSTALL.md](INSTALL.md) for the same automated experience.
 
 **Not sure which platform fits?** Read [CONCEPTS.md](CONCEPTS.md) for a plain-English overview of the system before proceeding.
 
@@ -163,7 +163,7 @@ Git is recommended but not required. With git, the system automatically captures
 ## Related Documentation
 
 **Installation**:
-- [Universal Installer](../INSTALL.md) — Automated setup for all platforms (paste into any AI assistant)
+- [Universal Installer](INSTALL.md) — Automated setup for all platforms (paste into any AI assistant)
 - [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Platform capability comparisons and integration details
 
 **Getting deeper into the system**:
