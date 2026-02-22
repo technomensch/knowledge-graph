@@ -741,6 +741,17 @@ Ideas for community-driven enhancements:
 |---------|-------|-------------|--------|
 | v0.0.1-alpha | Core plugin + 16 commands + MCP server + architecture migration | 2026-02-16 | ✅ Released |
 | v0.0.2-alpha | Validation + knowledge-graph-usage skill + marketplace branding | 2026-02-16 | ✅ Released |
+| v0.0.3-alpha | Automation + memory management + duplicate detection | 2026-02-16 | ✅ Released |
+| v0.0.4-alpha | MEMORY.md restore capability | 2026-02-16 | ✅ Released |
+| v0.0.5-alpha | Validation fixes + issue tracking command | 2026-02-17 | ✅ Released |
+| v0.0.6-alpha | Distribution hygiene + files allowlist | 2026-02-17 | ✅ Released |
+| v0.0.7-alpha | Documentation consolidation (CHEAT-SHEET, CONCEPTS, COMMAND-GUIDE, etc.) | 2026-02-20 | ✅ Released |
+| v0.0.8-alpha | Universal installer + three-tier installation architecture | 2026-02-20 | ✅ Released |
+| v0.0.8.1-alpha | Documentation infrastructure (FAQ, DEPLOYMENT-SITEMAP, CONTRIBUTING) | 2026-02-21 | ✅ Released |
+| v0.0.8.2-alpha | Update-doc --user-facing command | 2026-02-21 | ✅ Released |
+| v0.0.8.3-alpha | Plugin namespace refactor (knowledge → kg-sis) | 2026-02-21 | ✅ Released |
+| v0.0.8.4-alpha | Extract-chat date/project filtering | 2026-02-21 | ✅ Released |
+| v0.0.8.6-alpha | MkDocs Material theme customization + documentation updates | 2026-02-22 | ✅ Released |
 | v1.0.0 | Stable release with alpha feedback | Q2 2026 | Planning |
 | v1.1.0 | Performance + UX improvements | Q3 2026 | Roadmap |
 | v1.2.0 | Cross-platform adapters | Q4 2026 | Roadmap |
@@ -762,5 +773,5 @@ Ideas for community-driven enhancements:
 
 ---
 
-*Last updated: 2026-02-17*
-*Plugin Version: 0.0.6-alpha (Distribution Hygiene Release)*
+*Last updated: 2026-02-22*
+*Plugin Version: 0.0.8.6-alpha (MkDocs Customization Release)*
