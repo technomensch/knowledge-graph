@@ -42,7 +42,7 @@ The knowledge graph system organizes information into four distinct types, each 
 All four pillars work together to create a comprehensive institutional memory system:
 
 ```mermaid
-%%{init: { 'flowchart': { 'useMaxWidth': true } }}%%
+%%{init: { 'flowchart': { 'useMaxWidth': true }, 'theme': 'neutral' }}%%
 graph TD
     A["📚 Lessons Learned<br/>What was the problem &amp; solution?"]
     B["🏛️ Architecture Decisions<br/>Why was this choice made?"]
@@ -54,11 +54,6 @@ graph TD
     A -->|documents| D
     B -->|referenced by| C
     C -->|links back to| A
-
-    style A fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
-    style B fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
-    style C fill:#fff3e0,stroke:#e65100,color:#bf360c
-    style D fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
 
     accTitle: Knowledge Graph Four Pillars
     accDescr: Relationship diagram showing how Lessons Learned provide evidence for Architecture Decisions and extract to Knowledge Entries. Decisions are referenced by Entries, which link back to Lessons. Session Summaries document what was accomplished.

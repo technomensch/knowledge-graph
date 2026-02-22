@@ -81,16 +81,11 @@ Expected output now shows: `1 lesson`
 The workflow for capturing and synchronizing knowledge follows a four-step pipeline:
 
 ```mermaid
-%%{init: { 'flowchart': { 'useMaxWidth': true } }}%%
+%%{init: { 'flowchart': { 'useMaxWidth': true }, 'theme': 'neutral' }}%%
 graph LR
     A["📝 Capture<br/>/kg-sis:capture-lesson"] --> B["📊 Extract<br/>/kg-sis:update-graph"]
     B --> C["🔄 Sync<br/>/kg-sis:sync-all"]
     C --> D["💾 Summarize<br/>/kg-sis:session-summary"]
-
-    style A fill:#4a90e2,stroke:#2c5aa0,color:#fff
-    style B fill:#7cb342,stroke:#558b2f,color:#fff
-    style C fill:#ffa726,stroke:#e65100,color:#fff
-    style D fill:#ab47bc,stroke:#6a1b9a,color:#fff
 
     accTitle: Knowledge Capture Pipeline
     accDescr: Four-step workflow: Capture lessons (step 1) feeds into Extract patterns (step 2), which feeds into Sync across graphs (step 3), which feeds into Summarize session (step 4)

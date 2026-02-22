@@ -72,9 +72,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-[data-md-color-scheme="default"] .md-header {
-  background-color: rgba(255, 255, 255, 0.9);
-}
+/* Light mode: use Material theme defaults (already looks great - no overrides needed) */
 
 /* ============================================================
    Code Block Enhancements
@@ -244,70 +242,19 @@
    ============================================================ */
 
 .mermaid {
-  background-color: rgba(26, 26, 46, 0.5);
+  background-color: rgba(26, 26, 46, 0.3);
   border-radius: 8px;
   padding: 1.5em;
   margin: 1.5em 0;
-  border: 1px solid rgba(0, 210, 255, 0.2);
+  border: 1px solid rgba(0, 210, 255, 0.15);
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* Dark mode mermaid diagram SVG text and elements */
-.mermaid text {
-  fill: #e8e8f0 !important;
-}
-
-.mermaid g text {
-  fill: #e8e8f0 !important;
-}
-
-.mermaid rect,
-.mermaid polygon,
-.mermaid path {
-  stroke: #00d2ff !important;
-  fill: rgba(0, 210, 255, 0.1) !important;
-}
-
-.mermaid .node rect,
-.mermaid .node polygon {
-  stroke: #00d2ff !important;
-  fill: rgba(0, 210, 255, 0.15) !important;
-}
-
-.mermaid line,
-.mermaid polyline {
-  stroke: #00d2ff !important;
-}
-
-/* Light mode mermaid diagrams */
 [data-md-color-scheme="default"] .mermaid {
-  background-color: rgba(0, 81, 163, 0.08);
-  border-color: rgba(0, 81, 163, 0.3);
-}
-
-[data-md-color-scheme="default"] .mermaid text,
-[data-md-color-scheme="default"] .mermaid g text {
-  fill: #1a1a1a !important;
-}
-
-[data-md-color-scheme="default"] .mermaid rect,
-[data-md-color-scheme="default"] .mermaid polygon,
-[data-md-color-scheme="default"] .mermaid path {
-  stroke: #0051a3 !important;
-  fill: rgba(0, 81, 163, 0.12) !important;
-}
-
-[data-md-color-scheme="default"] .mermaid .node rect,
-[data-md-color-scheme="default"] .mermaid .node polygon {
-  stroke: #0051a3 !important;
-  fill: rgba(0, 81, 163, 0.15) !important;
-}
-
-[data-md-color-scheme="default"] .mermaid line,
-[data-md-color-scheme="default"] .mermaid polyline {
-  stroke: #0051a3 !important;
+  background-color: rgba(0, 81, 163, 0.05);
+  border-color: rgba(0, 81, 163, 0.2);
 }
 
 /* ============================================================
