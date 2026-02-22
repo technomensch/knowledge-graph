@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.8.7-alpha] - 2026-02-22
+
+### Added
+- **Manual Documentation Updates & Security Fixes**
+  - ROADMAP version history table: Complete chronological record v0.0.1-alpha through v0.0.8.6-alpha
+  - ROADMAP footer: Updated to reflect v0.0.8.6-alpha current release
+
+### Fixed
+- **Security: npm audit vulnerabilities → 0 vulns**
+  - Fixed ajv ReDoS vulnerability (GHSA-2g4f-4pwh-qvx6) in MCP server dependencies
+  - Fixed hono timing comparison hardening (GHSA-gq3j-xvxp-8hrf) in MCP server dependencies
+  - Rebuilt mcp-server/dist/ with patched packages
+  - Updated mcp-server/package-lock.json with fixed versions
+
+### Documentation
+- Removed hardcoded version numbers to prevent docs becoming stale:
+  - Changed "22 slash commands" → "slash commands" in index.md
+  - Changed "7 MCP tools" → "MCP tools" in index.md
+- Added clarity to Four Pillars reference: "Learn about the Four Pillars this project was built on"
+- Simplified GETTING-STARTED.md heading format (removed "Path A" prefix)
+- Updated Getting Started card: Specified "local IDE CLI coding assistant" for clarity on platform scope
+
+**Branch**: `v0.0.8.7-alpha-manual-updates`
+**Commits**:
+- `ca59e184` - Docs: Remove hardcoded version numbers + clarifications
+- `9830f8aa` - Build: Fix npm security vulnerabilities
+- `949b04c1` - Docs: ROADMAP version history table
+- `0f8c19b7` - Docs: ROADMAP MkDocs customization section
+- `4e91d8e7` - Docs: CHANGELOG backfill v0.0.7-alpha through v0.0.8.4-alpha
+- `c92e9f7e` - Docs: Getting Started card "local IDE CLI coding assistant"
+
 ## [0.0.8.6-alpha] - 2026-02-22
 
 ### Added
