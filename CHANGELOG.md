@@ -7,6 +7,65 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.8.6-alpha] - 2026-02-22
+
+### Added
+- **MkDocs Material Theme Customization (Phases 1-3)**
+  - Material theme v9.7.0+ with 10+ navigation features enabled
+  - Dark mode (slate scheme) as default with light mode fallback
+  - Sticky navigation tabs (`navigation.tabs.sticky`)
+  - Breadcrumbs above page titles (`navigation.path`)
+  - Footer navigation with Next/Previous buttons (`navigation.footer`)
+  - Integrated Table of Contents in left sidebar (`toc.integrate` + `toc.follow`)
+  - Copy buttons on all code blocks (`content.code.copy`)
+  - Search plugin configuration with autocomplete, highlighting, and sharing
+
+- **Custom CSS Styling (400+ lines)**
+  - Typography: Inter and JetBrains Mono from Google Fonts
+  - Dark mode colors: Navy primary (#1a1a2e), cyan accent (#00d2ff)
+  - Light mode colors: Blue primary (#003d82), orange accent (#ff6b35)
+  - Glassmorphism header effect with backdrop blur (dark mode only)
+  - WCAG AA contrast compliance for all color combinations
+  - Enhanced code blocks, tables, admonitions, and search box styling
+  - Print media support (hides navigation for exports)
+
+- **Page Restructuring & Visual Enhancements**
+  - Grid cards on index.md and GETTING-STARTED.md for visual navigation
+  - Tabbed interface in COMMAND-GUIDE.md (6 command categories)
+  - Mermaid diagrams: "Knowledge Capture Pipeline" (GETTING-STARTED.md)
+  - Mermaid diagrams: "Four Pillars Relationships" (CONCEPTS.md)
+  - All diagrams include accessibility attributes (accTitle, accDescr)
+  - Neutral mermaid theme for proper rendering in both color schemes
+
+- **Additional Experience Plugins**
+  - `mkdocs-git-revision-date-localized-plugin` — "Last updated" timestamps on all pages
+  - `mkdocs-glightbox` — Lightbox image/diagram viewing
+  - `mkdocs-minify-plugin` — Asset compression for snappy performance
+  - `mkdocs-roamlinks-plugin` — WikiLink support for knowledge entries
+
+- **Social Links & Copyright**
+  - GitHub: https://github.com/technomensch
+  - LinkedIn: https://www.linkedin.com/in/marckaplan/
+  - Copyright: "Staying in Sync"
+
+### Fixed
+- Mermaid diagram rendering in dark mode (removed hardcoded colors, adopted neutral theme)
+- Light mode header styling (restored Material theme defaults)
+- Grid card links accessibility (ensured descriptive text, no "click here")
+
+### Documentation
+- Updated STYLE-GUIDE.md with blockquote vs. admonition format guidance
+- Moved FAQ under Commands section in mkdocs.yml navigation
+- Added comprehensive Section 508 compliance documentation in STYLE-GUIDE.md
+
+### Technical
+- Updated `requirements.txt` with mkdocs-material>=9.7.0 and 4 plugins
+- mkdocs.yml: 15+ navigation features, plugin configuration, theme palette setup
+- Custom stylesheet: docs/stylesheets/extra.css (400+ lines)
+- No core document rewrites or file splitting (MkDocs rendering enhancements only)
+
+**Version**: 0.0.8.4-alpha → 0.0.8.6-alpha
+
 ## [0.0.6-alpha] - 2026-02-17
 
 ### Added
