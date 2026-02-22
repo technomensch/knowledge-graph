@@ -16,7 +16,7 @@ This document tracks planned features, deferred decisions, and future release sc
 
 ## Upcoming Releases
 
-### v0.0.9-alpha — Version Sync and Update Notifications (Tier 2/3)
+### vTBD-alpha — Version Sync and Update Notifications (Tier 2/3)
 
 **Context:** ADR-011 (2026-02-21)
 
@@ -83,13 +83,19 @@ LLM-powered consolidation of similar MEMORY.md entries. Deferred until usage pat
 
 | Version | Key Feature | Date |
 |---------|-------------|------|
-| v0.0.8.4-alpha | extract-chat date/project filtering | 2026-02-21 |
-| v0.0.8.3-alpha | Namespace refactor (knowledge → kg-sis) | 2026-02-21 |
-| v0.0.8.2-alpha | update-doc --user-facing command | 2026-02-21 |
-| v0.0.8-alpha | Universal installer (INSTALL.md, 3-tier) | 2026-02-21 |
-| v0.0.4-alpha | restore-memory command | 2026-02-16 |
-| v0.0.3-alpha | MEMORY.md token limits, archive-memory | 2026-02-16 |
+| v0.0.8.4-alpha | extract-chat date/project filtering (`--after`, `--before`, `--project`) | 2026-02-21 |
+| v0.0.8.3-alpha | Namespace refactor (`/knowledge:*` → `/kg-sis:*` across 42 files) | 2026-02-21 |
+| v0.0.8.2-alpha | `/kg-sis:update-doc --user-facing` command | 2026-02-20 |
+| v0.0.8.1-alpha | FAQ.md, DEPLOYMENT-SITEMAP.md, CONTRIBUTING.md documentation | 2026-02-19 |
+| v0.0.8-alpha | Universal installer (INSTALL.md, three-tier architecture) | 2026-02-19 |
+| v0.0.7-alpha | Documentation consolidation (CONCEPTS.md, COMMAND-GUIDE.md, CHEAT-SHEET.md, etc.; 3 phases, 6 new docs) | 2026-02-18 |
+| v0.0.6-alpha | Distribution hygiene via package.json files allowlist (ADR-007) | 2026-02-17 |
+| v0.0.5-alpha | Third-party service integration scaffold, truncated marketplace slug fix | 2026-02-17 |
+| v0.0.4-alpha | `restore-memory` command, deferred rules engine to v0.0.5 (ADR-005) | 2026-02-16 |
+| v0.0.3-alpha | MEMORY.md token-based size limits (ADR-004), `archive-memory` command | 2026-02-16 |
+| v0.0.2-alpha | Shadow command workaround → file prefix pattern (ADR-003), local marketplace testing | 2026-02-15 |
+| v0.0.1-alpha | Initial multi-KG architecture, commands vs skills separation (ADR-001, ADR-002) | 2026-02-15 |
 
 ---
 
-*Last updated: 2026-02-21*
+*Last updated: 2026-02-22*

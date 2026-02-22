@@ -37,6 +37,42 @@ A **knowledge graph** is a structured way to organize information learned while 
 
 The knowledge graph system organizes information into four distinct types, each optimized for a different purpose. Together, these pillars form a comprehensive institutional memory.
 
+#### The Four Pillars Relationships
+
+All four pillars work together to create a comprehensive institutional memory system:
+
+```mermaid
+%%{init: { 'flowchart': { 'useMaxWidth': true } }}%%
+graph TD
+    A["📚 Lessons Learned<br/>What was the problem &amp; solution?"]
+    B["🏛️ Architecture Decisions<br/>Why was this choice made?"]
+    C["🗺️ Knowledge Entries<br/>What patterns emerged?"]
+    D["📸 Session Summaries<br/>What happened this session?"]
+
+    A -->|evidence for| B
+    A -->|extracts to| C
+    A -->|documents| D
+    B -->|referenced by| C
+    C -->|links back to| A
+
+    style A fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
+    style B fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
+    style C fill:#fff3e0,stroke:#e65100,color:#bf360c
+    style D fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+
+    accTitle: Knowledge Graph Four Pillars
+    accDescr: Relationship diagram showing how Lessons Learned provide evidence for Architecture Decisions and extract to Knowledge Entries. Decisions are referenced by Entries, which link back to Lessons. Session Summaries document what was accomplished.
+```
+
+**How they connect:**
+- Lessons provide evidence that motivates Decisions
+- Lessons are extracted to create Knowledge entries
+- Decisions are referenced in Knowledge entries
+- Sessions document what was accomplished
+- Everything links back together for future discovery
+
+---
+
 #### Pillar 1: Lessons Learned
 
 **What it is**: Detailed documentation of problems solved and how the solutions were reached.

@@ -10,10 +10,25 @@ The Knowledge Graph Plugin captures institutional knowledge — lessons learned,
 
 New to the plugin? Start here:
 
-1. [Getting Started](GETTING-STARTED.md) — install and initialize in under 5 minutes
-2. [Concepts](CONCEPTS.md) — understand the knowledge graph structure
-3. [Command Guide](COMMAND-GUIDE.md) — full reference for all 22 commands
-4. [Cheat Sheet](CHEAT-SHEET.md) — one-page quick reference
+<div class="grid cards" markdown>
+
+- **[Getting Started](GETTING-STARTED.md)**
+
+  Install and initialize in under 5 minutes. Step-by-step setup for Claude Code, MCP IDEs, or any platform.
+
+- **[Concepts](CONCEPTS.md)**
+
+  Understand the knowledge graph structure. Learn about the Four Pillars, key terminology, and how everything connects.
+
+- **[Command Guide](COMMAND-GUIDE.md)**
+
+  Full reference for all 22 commands, organized by learning path. Essential, intermediate, and advanced commands.
+
+- **[Cheat Sheet](CHEAT-SHEET.md)**
+
+  One-page quick reference with the most common commands and workflows at a glance.
+
+</div>
 
 ## Installation
 
