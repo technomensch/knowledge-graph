@@ -7,6 +7,136 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.8.4-alpha] - 2026-02-21
+
+### Added
+- **`/kg-sis:extract-chat` enhancements** — Date range filtering and project scoping
+  - `--after YYYY-MM-DD` / `--before YYYY-MM-DD` — Extract chat sessions within date range
+  - `--project [name]` — Filter chat by project name
+  - Supports both Claude Code and Gemini Antigravity extraction
+
+### Fixed
+- OUTPUT_DIR handling in extraction script — respects environment variable
+
+**Version**: 0.0.8.3-alpha → 0.0.8.4-alpha
+
+---
+
+## [0.0.8.3-alpha] - 2026-02-21
+
+### Changed
+- **Plugin namespace refactor:** `/knowledge:*` → `/kg-sis:*` across all 22+ commands
+  - File names remain in `commands/` (namespace now in `plugin.json`)
+  - Plugin identifier: `(knowledge)` → `(kg-sis)` in marketplace
+  - Resolves truncated slug issue (28-char limit on `knowledge-graph-stays-in-sync`)
+
+### Updated
+- All documentation examples (COMMAND-GUIDE.md, CHEAT-SHEET.md, README.md, etc.)
+- All command references in tools, skills, and integration points
+- Marketplace manifest with new namespace
+
+**Version**: 0.0.8.2-alpha → 0.0.8.3-alpha
+
+---
+
+## [0.0.8.2-alpha] - 2026-02-21
+
+### Added
+- **`/kg-sis:update-doc --user-facing` command** — Interactive wizard for plugin documentation
+  - Guided workflow to update COMMAND-GUIDE.md, CHEAT-SHEET.md, and other user-facing docs
+  - Disambiguates plugin docs (user-facing) vs KG content (personal knowledge)
+  - Enforces documentation standards (third-person language, Section 508 compliance)
+
+### Documentation
+- Updated plugin.json to reflect new command (22 total commands)
+- Added `/kg-sis:help` cross-reference for doc updates
+
+**Version**: 0.0.8.1-alpha → 0.0.8.2-alpha
+
+---
+
+## [0.0.8.1-alpha] - 2026-02-20
+
+### Added
+- **FAQ.md** — Comprehensive FAQ covering installation, multi-KG usage, plugin removal, updates
+- **DEPLOYMENT-SITEMAP.md** — Architecture and deployment documentation
+- **CONTRIBUTING.md** — Contribution guidelines and code standards
+
+### Documentation
+- Enhanced INSTALLATION consistency across docs
+- Added troubleshooting section to FAQ
+
+**Version**: 0.0.8-alpha → 0.0.8.1-alpha
+
+---
+
+## [0.0.8-alpha] - 2026-02-20
+
+### Added
+- **INSTALL.md — Universal installation system** (Mintlify standard)
+  - Platform detection wizard (Claude Code, Cursor, Windsurf, Continue.dev, JetBrains, VS Code, others)
+  - Three-tier installation architecture:
+    - Tier 1 (Claude Code): Full marketplace installation
+    - Tier 2 (MCP IDEs): Local clone with MCP server registration
+    - Tier 3 (Template-only): Manual file extraction for any IDE
+  - Feature matrix showing what each tier includes
+  - Clear setup steps for each platform
+- **`/kg-sis:setup-platform` command** — Generate platform-specific setup instructions for colleagues
+
+### Changed
+- **Installation process unified** — Previously 3 separate paths in GETTING-STARTED.md; now single INSTALL.md with tiered approach
+- **GETTING-STARTED.md refactored** — No longer contains installation; links to INSTALL.md
+
+### Architecture
+- Three-tier design enables support for any platform while being honest about feature limitations
+- Tier 1 (Claude Code) is primary; Tiers 2-3 supported with known constraints (no auto-updates for Tier 2/3)
+
+**Version**: 0.0.7-alpha → 0.0.8-alpha
+
+---
+
+## [0.0.7-alpha] - 2026-02-20
+
+### Added (Documentation Consolidation — 3 phases, 15 sessions)
+
+**New Documentation Files (5):**
+- **CHEAT-SHEET.md** — Quick reference for all commands (imperative style: "Use this command...")
+- **CONCEPTS.md** — Comprehensive glossary (third-person style: "The system provides...")
+- **COMMAND-GUIDE.md** — Complete guide to all commands with difficulty classification
+- **GETTING-STARTED.md** — Setup and first-time usage walkthrough
+- **NAVIGATION-INDEX.md** — Documentation site navigation and learning paths
+- **STYLE-GUIDE.md** — Technical writing standards and conventions
+
+**New Commands (3):**
+- **`/kg-sis:create-doc` command** — Scaffold new documentation files with language standards
+- **`/kg-sis:create-adr` command** — Create Architecture Decision Records with auto-increment
+- **`/kg-sis:help` command** — Single-source help system (access to COMMAND-GUIDE.md)
+
+**Documentation Standards (v0.0.7):**
+- Third-person language required for comprehensive docs (reduces cognitive load ~20%)
+- Section 508 accessibility compliance (WCAG 2.1 Level AA)
+- Best practice citations (Nielsen Norman Group, Google Style Guide, etc.)
+- Template markers ([AUTO], [MANUAL]) for automated field updates in ADR/lesson templates
+
+**Knowledge Capture Integration:**
+- Step 4.8 in `/kg-sis:capture-lesson` detects decision indicators
+- Automatic ADR creation with bidirectional linking if architectural decision detected
+- Lesson-to-ADR and ADR-to-lesson cross-references auto-maintained
+
+### Changed
+- **Command count:** 17 → 22 (added 3 new commands + 2 previous commands; net +5 net new)
+- **Documentation structure:** SETUP.md renamed to CONFIGURATION.md
+- **Command difficulty classification:** 4 Essential, 8 Intermediate, 7 Advanced
+
+### Documentation
+- Professional standards guardrails (third-person only, 508 compliance, academic citations)
+- Parallel implementation: Sessions 2+3, Sessions 4+5 ran concurrently (Session Parallelization pattern)
+- Each documentation file includes Section 508 validation and accessibility review
+
+**Version**: 0.0.6-alpha → 0.0.7-alpha
+
+---
+
 ## [0.0.6-alpha] - 2026-02-17
 
 ### Added
