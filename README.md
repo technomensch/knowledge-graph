@@ -5,6 +5,8 @@ Structured knowledge capture, lesson-learned documentation, and cross-session me
 **Version:** 0.0.8.6-alpha
 **Status:** Documentation UX Customization Release
 
+Documentation avaliable at - https://technomensch.github.io/knowledge-graph/
+
 ---
 
 ## What is this?
