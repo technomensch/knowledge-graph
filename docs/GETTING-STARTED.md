@@ -16,7 +16,7 @@ A step-by-step guide for setting up the knowledge graph system and capturing the
 
 ---
 
-## Path A: Claude Code Setup
+## Claude Code Setup
 
 **For**: Users with the Claude Code plugin installed.
 
@@ -76,12 +76,45 @@ Claude Code guides the session through documenting a problem solved recently. Th
 
 Expected output now shows: `1 lesson`
 
+### The Knowledge Capture Pipeline
+
+The workflow for capturing and synchronizing knowledge follows a four-step pipeline:
+
+```mermaid
+%%{init: { 'flowchart': { 'useMaxWidth': true }, 'theme': 'neutral' }}%%
+graph LR
+    A["📝 Capture<br/>/kg-sis:capture-lesson"] --> B["📊 Extract<br/>/kg-sis:update-graph"]
+    B --> C["🔄 Sync<br/>/kg-sis:sync-all"]
+    C --> D["💾 Summarize<br/>/kg-sis:session-summary"]
+
+    accTitle: Knowledge Capture Pipeline
+    accDescr: Four-step workflow: Capture lessons (step 1) feeds into Extract patterns (step 2), which feeds into Sync across graphs (step 3), which feeds into Summarize session (step 4)
+```
+
+Each step serves a specific purpose:
+
+1. **Capture** - Document what you learned immediately after solving a problem
+2. **Extract** - Transform lessons into searchable patterns and concepts
+3. **Sync** - Consolidate across multiple knowledge graphs
+4. **Summarize** - Create session snapshots for future reference
+
 ### Next Steps for Claude Code Users
 
-**Next steps**:
-- Learn commands: [Essential Commands](COMMAND-GUIDE.md#essential-commands)
-- See examples: [Real-World Examples](../core/examples/)
-- Set up sharing: [Sanitization](CONFIGURATION.md#privacy--public-sharing)
+<div class="grid cards" markdown>
+
+- **[Essential Commands](COMMAND-GUIDE.md#essential-commands)**
+
+  Start with the core commands: init, capture-lesson, status, and recall. These cover 80% of daily use.
+
+- **[Real-World Examples](../core/examples/)**
+
+  See completed examples of lessons learned, ADRs, and knowledge entries from real projects.
+
+- **[Set Up Sharing](CONFIGURATION.md#privacy--public-sharing)**
+
+  Configure sanitization to safely share your knowledge graph with team members and the public.
+
+</div>
 
 ---
 

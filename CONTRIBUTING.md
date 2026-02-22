@@ -1,35 +1,42 @@
 # Contributing
 
-This guide explains how to contribute to the Knowledge Graph plugin and outlines the standards for documentation and code changes.
+This project is currently in **active alpha development** and is **not accepting external code contributions** at this time.
 
----
+## For Users
 
-## 1. Documentation Standards
+We greatly appreciate your interest! Here's how you can help shape the future of this project:
 
-Contributors must review the [Style Guide](docs/STYLE-GUIDE.md) before making changes to any documentation or knowledge graph entries. All contributions adhere strictly to these defined formats.
+- 📋 **[Report bugs](https://github.com/technomensch/knowledge-graph/issues)** — Help us find and fix issues
+- ✨ **[Request features](https://github.com/technomensch/knowledge-graph/issues)** — Share what you'd like to see
+- 💬 **[Start a discussion](https://github.com/technomensch/knowledge-graph/discussions)** — Ask questions and share feedback
+- ⭐ **Star the repo** — Show support if you find it useful!
 
-## 2. Branch Naming Conventions
+## For Developers
 
-All branches follow strict conventions. Contributors never create orphan work. Every branch and commit MUST link to a GitHub Issue:
-- Example: `vX.Y.Z-feature-name-issue-N`
-- Preservation: The project NEVER deletes feature branches; they serve as historical records.
+This project was built as a personal learning project to explore **docs-as-code** practices and plugin development. The source is open for transparency and educational purposes.
 
-## 3. Pull Request Template
+**Code Contributions:**
+- ❌ Pull requests from external contributors are **not being accepted** during alpha
+- ✅ Issues and discussions are always welcome
+- ✅ Alpha testing and feedback is valuable
 
-When submitting a Pull Request, contributors use conventional commits: `feat(scope): desc Closes #N`. The process requires verifying that all tests and validations (like `branch-check` and `shadow-sync`) pass prior to submitting.
+## Timeline
 
-## 4. Local Testing
+- **Alpha Phase:** Feb 2026 (current) — stabilizing core features, seeking user feedback
+- **Beta Phase:** Q2 2026 — external contributions may be considered
+- **v1.0.0:** Q2 2026 — stable release, contribution guidelines will be established at that time
 
-To test changes locally, contributors follow these steps:
-1. Ensure the branch passes git governance validation.
-2. Review local file linkages and formatting.
-3. Validate plugin integrity if appropriate.
+## For Future Contributors (v1.0+)
 
-## 5. Code of Conduct
+Once we reach beta and v1.0.0, we'll establish comprehensive contribution guidelines including:
+- Code style standards
+- Testing requirements
+- Documentation standards (see current [Style Guide](docs/STYLE-GUIDE.md) for reference)
+- Branch naming conventions
+- Pull request process
 
-The project is released with a Contributor Code of Conduct. By participating in this project, contributors agree to abide by its terms.
+## Questions?
 
-## 6. Related Documentation
+Feel free to [open an issue](https://github.com/technomensch/knowledge-graph/issues) or [start a discussion](https://github.com/technomensch/knowledge-graph/discussions) with any questions or feedback!
 
-- [Style Guide](docs/STYLE-GUIDE.md) - Documentation and authoring standards.
-- [Workflows](core/docs/WORKFLOWS.md) - Manual workflows for contributing.
+Thank you for your interest in this project. 🙏

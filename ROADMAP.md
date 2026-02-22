@@ -1,5 +1,58 @@
 # Knowledge Plugin — Roadmap
 
+## v0.0.8.6-alpha (Released: 2026-02-22)
+
+**Status**: ✅ Complete - Documentation UX Customization
+**Branch**: `v0.0.8.6-alpha-customize-mkdocs`
+
+### Completed - All Phases
+- ✅ MkDocs Material theme v9.7.0+ configuration (10+ features)
+- ✅ Dark mode (slate) as default with glassmorphism header effect
+- ✅ Light mode Material theme defaults (preserved original styling)
+- ✅ Sticky navigation tabs, breadcrumbs, footer navigation
+- ✅ Integrated Table of Contents in left sidebar
+- ✅ Grid cards on index.md and GETTING-STARTED.md
+- ✅ Tabbed command interface in COMMAND-GUIDE.md
+- ✅ Mermaid diagrams with neutral theme (adapts to light/dark)
+- ✅ Custom CSS (400+ lines) with professional typography
+- ✅ WCAG AA accessibility compliance
+- ✅ 4 experience plugins (git-revision-date, glightbox, minify, roamlinks)
+
+### Phase Breakdown
+
+#### Phase 1: Global Configuration ✅
+- Material theme v9.7.0+ with 10+ navigation features
+- Dark mode as default, light mode fallback
+- Plugin configuration (search, emoji, superfences, tabbed)
+- Requirements.txt updated with all dependencies
+
+#### Phase 2: Custom CSS ✅
+- Typography: Inter and JetBrains Mono fonts
+- Dark mode colors: Navy + cyan with WCAG AA contrast
+- Light mode colors: Blue + orange
+- Glassmorphism header effect (dark mode only)
+- Enhanced styling for code, tables, admonitions, search
+
+#### Phase 3: Page Restructuring ✅
+- Grid cards for visual navigation
+- Tabbed command interface (6 categories)
+- Mermaid diagrams with accessibility attributes
+- STYLE-GUIDE.md updated with admonition guidance
+- FAQ moved under Commands section in navigation
+
+#### Phase 4: Validation & Audit ✅
+- WikiLink audit completed (1 in use)
+- Accessibility compliance verified
+- Syntax verification for YAML, diagrams, cards, tabs, CSS
+- Build verification: mkdocs build successful
+- Mermaid diagram rendering verified in both modes
+
+### Next Steps
+- 🔄 Merge to main and verify on GitHub Pages
+- 📦 Plan v0.0.9 (enhanced features)
+
+---
+
 ## v0.0.1-alpha (Released: 2026-02-16)
 
 **Status**: ✅ Complete - Alpha Testing
@@ -688,6 +741,17 @@ Ideas for community-driven enhancements:
 |---------|-------|-------------|--------|
 | v0.0.1-alpha | Core plugin + 16 commands + MCP server + architecture migration | 2026-02-16 | ✅ Released |
 | v0.0.2-alpha | Validation + knowledge-graph-usage skill + marketplace branding | 2026-02-16 | ✅ Released |
+| v0.0.3-alpha | Automation + memory management + duplicate detection | 2026-02-16 | ✅ Released |
+| v0.0.4-alpha | MEMORY.md restore capability | 2026-02-16 | ✅ Released |
+| v0.0.5-alpha | Validation fixes + issue tracking command | 2026-02-17 | ✅ Released |
+| v0.0.6-alpha | Distribution hygiene + files allowlist | 2026-02-17 | ✅ Released |
+| v0.0.7-alpha | Documentation consolidation (CHEAT-SHEET, CONCEPTS, COMMAND-GUIDE, etc.) | 2026-02-20 | ✅ Released |
+| v0.0.8-alpha | Universal installer + three-tier installation architecture | 2026-02-20 | ✅ Released |
+| v0.0.8.1-alpha | Documentation infrastructure (FAQ, DEPLOYMENT-SITEMAP, CONTRIBUTING) | 2026-02-21 | ✅ Released |
+| v0.0.8.2-alpha | Update-doc --user-facing command | 2026-02-21 | ✅ Released |
+| v0.0.8.3-alpha | Plugin namespace refactor (knowledge → kg-sis) | 2026-02-21 | ✅ Released |
+| v0.0.8.4-alpha | Extract-chat date/project filtering | 2026-02-21 | ✅ Released |
+| v0.0.8.6-alpha | MkDocs Material theme customization + documentation updates | 2026-02-22 | ✅ Released |
 | v1.0.0 | Stable release with alpha feedback | Q2 2026 | Planning |
 | v1.1.0 | Performance + UX improvements | Q3 2026 | Roadmap |
 | v1.2.0 | Cross-platform adapters | Q4 2026 | Roadmap |
@@ -709,5 +773,5 @@ Ideas for community-driven enhancements:
 
 ---
 
-*Last updated: 2026-02-17*
-*Plugin Version: 0.0.6-alpha (Distribution Hygiene Release)*
+*Last updated: 2026-02-22*
+*Plugin Version: 0.0.8.6-alpha (MkDocs Customization Release)*
