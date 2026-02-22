@@ -2,19 +2,38 @@
 
 **Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.**
 
-The Knowledge Graph Plugin captures institutional knowledge — lessons learned, architecture decisions, and recurring patterns — directly inside the development workflow. Claude Code users get 22 slash commands. MCP IDE users get 7 tools. Any platform gets the template system.
+This is a platform-agnostic knowledge graph that was developed entirely using Gemini and Claude, leveraging very specific context and detailed natural language prompting.
+
+It is designed to take chats sessions with large language models (LLMs) and turn them into a searchable, institutional knowledge, library.
+
+The cool thing is, it helps users grab the important stuff inside the development workflow without having to stop chatting:
+
+- **Lesson-Learned Capture** with categorized storage and git metadata tracking
+- **Knowledge Graph** with quick-reference entries linked to full lessons
+- **MEMORY.md Bidirectional Sync** for persistent cross-session context
+- **Meta-Issue Tracking** for complex multi-attempt problems
+- **Automated Knowledge Sync** pipeline (4 steps → 1 command)
+- **Chat History Extraction** from Claude Code and Gemini logs
+- **Session Summaries** for work documentation
+- **ADR Management** for architecture decisions
+- **Multi-KG Support** with flexible configuration
+
+Then, users can easily look up that information not only in their current chat, but also in any other chat session, even if they switch to a totally different LLM!
+
+The key lies in the simple approach of embedding the knowledge directly within the project itself. This ensures the knowledge is always immediately available whenever and wherever the project is opened. Should the library become excessively large, users have the option to transfer it to an external third-party via MCP servers.
+
 
 ---
 
 ## Quick Start
 
-New to the plugin? Start here:
+Start here:
 
 <div class="grid cards" markdown>
 
 - **[Getting Started](GETTING-STARTED.md)**
 
-  Install and initialize in under 5 minutes. Step-by-step setup for Claude Code, MCP IDEs, or any platform.
+  Install, initialize, and configure in under 5 minutes. Step-by-step setup for installing with Claude Code, Cursor, Cline, or any local IDE CLI coding assistant
 
 - **[Concepts](CONCEPTS.md)**
 
