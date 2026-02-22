@@ -18,7 +18,7 @@ This document tracks planned features, deferred decisions, and future release sc
 
 ### v0.0.9-alpha — Version Sync and Update Notifications (Tier 2/3)
 
-**Context:** ADR-002 (2026-02-21)
+**Context:** ADR-011 (2026-02-21)
 
 **Scope:**
 
@@ -65,7 +65,7 @@ This document tracks planned features, deferred decisions, and future release sc
 
 ### MEMORY.md Rules Engine (v0.0.5)
 
-**Context:** ADR-001 (2026-02-16)
+**Context:** ADR-005 (2026-02-16)
 
 Deferred YAML-based pattern matching to automate what gets synced to MEMORY.md. Needs real-world usage data from v0.0.3/v0.0.4 archive/restore workflows before implementation.
 
@@ -73,7 +73,7 @@ Deferred YAML-based pattern matching to automate what gets synced to MEMORY.md. 
 
 ### Smart Summarization (v0.0.6+)
 
-**Context:** ADR-001 (2026-02-16)
+**Context:** ADR-005 (2026-02-16)
 
 LLM-powered consolidation of similar MEMORY.md entries. Deferred until usage patterns from rules engine are observed.
 

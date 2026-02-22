@@ -1,11 +1,11 @@
 ---
-title: "ADR-002: Defer Update Notifications and Version Sync to v0.0.9"
+title: "ADR-011: Defer Update Notifications and Version Sync to v0.0.9"
 status: Accepted
 date: 2026-02-21
 deciders: technomensch, Claude Opus 4.6
 ---
 
-# ADR-002: Defer Update Notifications and Version Sync to v0.0.9
+# ADR-011: Defer Update Notifications and Version Sync to v0.0.9
 
 ## Status
 
@@ -103,7 +103,7 @@ Two-phase approach:
 
 3. **Network calls need design** — The cache strategy, error handling, and rate limit behavior for remote checks deserve dedicated scope, not bolted onto another release's plan.
 
-4. **Incremental approach aligns with existing pattern** — See ADR-001 (defer rules engine to v0.0.5 after gathering usage data). Same principle: ship the simple version, observe usage, then add automation.
+4. **Incremental approach aligns with existing pattern** — See ADR-005 (defer rules engine to v0.0.5 after gathering usage data). Same principle: ship the simple version, observe usage, then add automation.
 
 5. **MCP tool is the right surface** — A `kg_version` MCP tool is visible to all Tier 2 users in their IDE's tool list. A CLI flag covers Tier 3. Both are better than an opaque startup log message.
 

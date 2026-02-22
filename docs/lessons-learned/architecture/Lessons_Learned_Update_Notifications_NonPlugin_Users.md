@@ -174,7 +174,7 @@ Any plugin or tool that supports multiple installation tiers with different upda
 ## Related Documentation
 
 **Architecture Decisions:**
-- [ADR-002: Defer Update Notifications and Version Sync to v0.0.9](../../decisions/ADR-002-defer-update-notifications.md) — Formal decision record for this deferral
+- [ADR-011: Defer Update Notifications and Version Sync to v0.0.9](../../decisions/ADR-011-defer-update-notifications.md) — Formal decision record for this deferral
 
 **Other Lessons:**
 - [Plugin Example File Management](./Lessons_Learned_Plugin_Example_File_Management.md) — Companion lesson from the same design session

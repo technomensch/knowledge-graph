@@ -91,7 +91,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Four-tier ranking strategy: exact match, starts-with, contains-all words, contains-any word
   - Case-insensitive search with word-based fuzzy matching
   - Returns ranked list of matching entry IDs and titles
-- **Architecture Decision Record** - `docs/decisions/ADR-001-defer-memory-rules-engine.md`
+- **Architecture Decision Record** - `docs/decisions/ADR-005-defer-memory-rules-engine.md`
   - Documents decision to defer rules engine and smart summarization to v0.0.5-alpha
   - Analyzes three options: rules+restore (medium scope), full automation (all features), restore only (minimal scope)
   - Rationale: Archive without restore is incomplete UX, rules need real-world patterns, maintain velocity

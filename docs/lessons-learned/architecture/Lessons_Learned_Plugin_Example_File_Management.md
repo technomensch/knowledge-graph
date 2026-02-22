@@ -142,7 +142,7 @@ This lesson applies to any open-source tool that ships example/sample content al
 ## Related Documentation
 
 **Architecture Decisions:**
-- [ADR-002: Defer Update Notifications and Version Sync to v0.0.9](../../decisions/ADR-002-defer-update-notifications.md) — Companion deferred decision from the same design session
+- [ADR-011: Defer Update Notifications and Version Sync to v0.0.9](../../decisions/ADR-011-defer-update-notifications.md) — Companion deferred decision from the same design session
 
 **Other Lessons:**
 - [Local Marketplace Testing - Two-Location Sync Required](../process/local-marketplace-testing-workflow.md) — Related insight about plugin file location complexity
