@@ -33,15 +33,15 @@ Start here:
 
 - **[Getting Started](GETTING-STARTED.md)**
 
-  Install, initialize, and configure in under 5 minutes. Step-by-step setup for installing with Claude Code, Cursor, Cline, or any local IDE CLI coding assistant
+  Install, initialize, and configure in under 5 minutes. Step-by-step setup for installing with Claude Code, Cursor, or any local IDE CLI coding assistant
 
 - **[Concepts](CONCEPTS.md)**
 
-  Understand the knowledge graph structure. Learn about the Four Pillars, key terminology, and how everything connects.
+  Understand the knowledge graph structure. Learn about the Four Pillars this project was built on, key terminology, and how everything connects.
 
 - **[Command Guide](COMMAND-GUIDE.md)**
 
-  Full reference for all 22 commands, organized by learning path. Essential, intermediate, and advanced commands.
+  Full reference for all commands, organized by learning path. Essential, intermediate, and advanced commands.
 
 - **[Cheat Sheet](CHEAT-SHEET.md)**
 
@@ -55,8 +55,8 @@ The plugin supports three installation tiers:
 
 | Tier | Platform | Commands Available |
 |------|----------|--------------------|
-| **Tier 1** | Claude Code (marketplace or local) | 22 slash commands + hooks + agents |
-| **Tier 2** | MCP IDEs (Cursor, Windsurf, VS Code, JetBrains) | 7 MCP tools |
+| **Tier 1** | Claude Code (marketplace or local) | slash commands + hooks + agents |
+| **Tier 2** | MCP IDEs (Cursor, Windsurf, VS Code, JetBrains) | MCP tools |
 | **Tier 3** | Any platform (template-only) | Manual markdown workflow |
 
 See [Getting Started](GETTING-STARTED.md) for platform-specific setup instructions.

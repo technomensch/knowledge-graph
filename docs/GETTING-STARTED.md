@@ -16,7 +16,7 @@ A step-by-step guide for setting up the knowledge graph system and capturing the
 
 ---
 
-## Path A: Claude Code Setup
+## Claude Code Setup
 
 **For**: Users with the Claude Code plugin installed.
 
