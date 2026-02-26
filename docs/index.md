@@ -1,44 +1,55 @@
 # Knowledge Graph Plugin
 
-!!! info "📚 Project Origin"
+??? info "About This Project"
     This project was initially built as a **personal learning project** to explore **docs-as-code** practices and plugin development. It has evolved into a comprehensive knowledge management system designed for institutional knowledge capture and cross-session memory. The architecture reflects these principles: platform-agnostic core, automated workflows, and portable knowledge representation.
 
-!!! warning "🧪 Alpha Development Complete — Seeking Beta Testers"
-    This project has **finished its initial alpha development** and is now actively seeking feedback from test users before launching the beta phase. If you're interested in helping shape the future of this plugin, please [open an issue](https://github.com/technomensch/knowledge-graph/issues) with your feedback, feature requests, or bug reports.
+    This is a platform-agnostic knowledge graph that was developed entirely using Gemini and Claude, leveraging very specific context and detailed natural language prompting.
 
-**Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.**
+---
 
-This is a platform-agnostic knowledge graph that was developed entirely using Gemini and Claude, leveraging very specific context and detailed natural language prompting.
+**Stop losing knowledge in your LLM session chat history and never forget a prompting or coding breakthrough.**
 
-It is designed to take chats sessions with large language models (LLMs) and turn them into a searchable, institutional knowledge, library.
+**Start building a searchable library of everything you learn while developing, debugging, or architecting with AI, and retain it across sessions, projects, and even platforms (like switching from Claude to Gemini).**
 
-The cool thing is, it helps users grab the important stuff inside the development workflow without having to stop chatting:
+---
 
-- **Lesson-Learned Capture** with categorized storage and git metadata tracking
-- **Knowledge Graph** with quick-reference entries linked to full lessons
-- **MEMORY.md Bidirectional Sync** for persistent cross-session context
-- **Meta-Issue Tracking** for complex multi-attempt problems
-- **Automated Knowledge Sync** pipeline (4 steps → 1 command)
-- **Chat History Extraction** from Claude Code and Gemini logs
-- **Session Summaries** for work documentation
-- **ADR Management** for architecture decisions
-- **Multi-KG Support** with flexible configuration
+## Why It Matters
 
-Then, users can easily look up that information not only in their current chat, but also in any other chat session, even if they switch to a totally different LLM!
+<div class="grid cards" markdown>
 
-The key lies in the simple approach of embedding the knowledge directly within the project itself. This ensures the knowledge is always immediately available whenever and wherever the project is opened. Should the library become excessively large, users have the option to transfer it to an external third-party via MCP servers.
+- :material-chat-question: **The Problem**
+
+  Development knowledge lives in chat threads that disappear. Every LLM switch, session restart, or team handoff loses context: architecture decisions, debugging solutions, recurring patterns, and process learnings are lost permanently.
+
+- :material-lightbulb-on: **The Solution**
+
+  This plugin helps users capture the important stuff, like lessons learned, architecture decisions, and recurring patterns, inside the development workflow without having to stop chatting.
+
+- :material-database-check: **The Outcome**
+
+  Users can easily look up that information not only in their current chat, but also in any other chat session, even if they switch to a totally different LLM, IDE,or coding assistant!
+
+</div>
+
+---
+
+## When Would I Use This?
+
+- **After debugging for hours**: Capture what worked (and what didn't) so the next person or future-you doesn't repeat the investigation.
+- **Before switching LLMs or tools**: Knowledge embedded in the project travels with it, regardless of which AI assistant opens it next.
+- **During architecture decisions**: Record the reasoning, alternatives considered, and trade-offs so the "why" isn't lost when the code changes later.
+- **During agile sprint retrospectives**: Automatically gather all lessons learned during the sprint for team reviews and process improvements.
+- **Onboarding a teammate**: Point them at the knowledge graph instead of repeating tribal knowledge from memory.
 
 ---
 
 ## Quick Start
 
-Start here:
-
 <div class="grid cards" markdown>
 
 - **[Getting Started](GETTING-STARTED.md)**
 
-  Install, initialize, and configure in under 5 minutes. Step-by-step setup for installing with Claude Code, Cursor, or any local IDE CLI coding assistant
+  Install, initialize, and configure in under 5 minutes. Step-by-step setup for installing with Claude Code, Cursor, or any local IDE CLI coding assistant.
 
 - **[Concepts](CONCEPTS.md)**
 
@@ -54,6 +65,25 @@ Start here:
 
 </div>
 
+---
+
+## How It Works
+
+The key lies in the simple approach of embedding the knowledge directly within the project itself. This ensures the knowledge is always immediately available whenever and wherever the project is opened. Should the library become excessively large, users have the option to transfer it to an external third-party via MCP servers.
+
+??? note "Full Feature List"
+    - **Lesson-Learned Capture** with categorized storage and git metadata tracking
+    - **Knowledge Graph** with quick-reference entries linked to full lessons
+    - **MEMORY.md Bidirectional Sync** for persistent cross-session context
+    - **Meta-Issue Tracking** for complex multi-attempt problems
+    - **Automated Knowledge Sync** pipeline (4 steps → 1 command)
+    - **Chat History Extraction** from Claude Code and Gemini logs
+    - **Session Summaries** for work documentation
+    - **ADR Management** for architecture decisions
+    - **Multi-KG Support** with flexible configuration
+
+---
+
 ## Installation
 
 The plugin supports three installation tiers:
@@ -65,6 +95,13 @@ The plugin supports three installation tiers:
 | **Tier 3** | Any platform (template-only) | Manual markdown workflow |
 
 See [Getting Started](GETTING-STARTED.md) for platform-specific setup instructions.
+
+---
+
+!!! success "Help Shape the Beta Release"
+    This project has **finished its initial alpha development** and is now actively seeking feedback from test users before launching the beta phase. If you're interested in helping shape the future of this plugin, please [open an issue](https://github.com/technomensch/knowledge-graph/issues) with your feedback, feature requests, or bug reports.
+
+---
 
 ## Links
 

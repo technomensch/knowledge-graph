@@ -127,7 +127,7 @@ Complete reference for all knowledge graph commands, organized by difficulty wit
 
 ## Browse Commands by Category
 
-=== "Setup & Configuration"
+=== "Setup & Configuration" {: #-kgsisinitcommands-tab}
 
     Get the knowledge graph running and configure how it works.
 
@@ -137,7 +137,7 @@ Complete reference for all knowledge graph commands, organized by difficulty wit
     - [🟡 `/kg-sis:add-category`](#-kgsisadd-category-commands-tab) — Add custom categories
     - [🟡 `/kg-sis:config-sanitization`](#-kgsisconfig-sanitization-commands-tab) — Set up safety features for team sharing
 
-=== "Capture & Document"
+=== "Capture & Document" {: #-kgsiscapture-lesson-commands-tab}
 
     Document lessons, capture history, and summarize sessions.
 
@@ -145,7 +145,7 @@ Complete reference for all knowledge graph commands, organized by difficulty wit
     - [🟡 `/kg-sis:extract-chat`](#-kgsisextract-chat-commands-tab) — Export chat history to markdown
     - [🟡 `/kg-sis:session-summary`](#-kgsisssession-summary-commands-tab) — Summarize important work sessions
 
-=== "Search & Synchronization"
+=== "Search & Synchronization" {: #-kgsisstatus-commands-tab}
 
     Find knowledge and keep the graph synchronized.
 
@@ -155,14 +155,14 @@ Complete reference for all knowledge graph commands, organized by difficulty wit
     - [🟡 `/kg-sis:update-doc`](#-kgsisupdate-doc-commands-tab) — Update documentation with changes
     - [🔴 `/kg-sis:sync-all`](#-kgsissync-all-commands-tab) — Run complete synchronization pipeline
 
-=== "Team & Sharing"
+=== "Team & Sharing" {: #-kgsischeck-sensitive-commands-tab}
 
     Share knowledge safely with team members.
 
     - [🟡 `/kg-sis:check-sensitive`](#-kgsischeck-sensitive-commands-tab) — Scan for sensitive data before sharing
     - [🔴 `/kg-sis:link-issue`](#-kgsislink-issue-commands-tab) — Connect lessons to GitHub issues
 
-=== "Advanced Issues"
+=== "Advanced Issues" {: #-kgsismeta-issue-commands-tab}
 
     Track complex, multi-attempt problems systematically.
 
@@ -170,7 +170,7 @@ Complete reference for all knowledge graph commands, organized by difficulty wit
     - [🔴 `/kg-sis:start-issue-tracking`](#-kgsisstart-issue-tracking-commands-tab) — Systematic issue tracking with Git branches
     - [🔴 `/kg-sis:update-issue-plan`](#-kgsisupdate-issue-plan-commands-tab) — Sync progress with GitHub and plans
 
-=== "Memory Management"
+=== "Memory Management" {: #-kgsisarchive-memory-commands-tab}
 
     Manage MEMORY.md size and archive old patterns.
 

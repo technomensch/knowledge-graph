@@ -8,7 +8,12 @@ A step-by-step guide for setting up the knowledge graph system and capturing the
 
 ## Universal Installer (All Platforms)
 
-**For Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Aider, and other AI assistants:** Paste [INSTALL.md](INSTALL.md) into the AI assistant for fully automated setup. The installer detects the platform, configures the MCP server, and initializes a knowledge graph automatically.
+**For Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Aider, and other AI assistants:** Paste [INSTALL.md](INSTALL.md) into the AI assistant for fully automated setup.
+
+The universal installer is a natural language prompt designed to execute shell scripts and manage file system operations within the local project directory. The installer detects the platform, configures the Model Context Protocol (MCP) server, and initializes the knowledge graph automatically.
+
+!!! important "Access Requirements"
+    Automated setup requires an AI assistant with terminal and file system access. Assistants without these capabilities require manual configuration following the setup within the prompt itself.
 
 **For Claude Code users:** Follow the setup steps below, or paste [INSTALL.md](INSTALL.md) for the same automated experience.
 
@@ -110,7 +115,7 @@ Each step serves a specific purpose:
 
   See completed examples of lessons learned, ADRs, and knowledge entries from real projects.
 
-- **[Set Up Sharing](CONFIGURATION.md#privacy--public-sharing)**
+- **[Set Up Sharing](CONFIGURATION.md#privacy-public-sharing)**
 
   Configure sanitization to safely share your knowledge graph with team members and the public.
 
