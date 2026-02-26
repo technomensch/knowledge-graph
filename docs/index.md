@@ -1,10 +1,5 @@
 # Knowledge Graph Plugin
 
-??? info "About This Project"
-    This project was initially built as a **personal learning project** to explore **docs-as-code** practices and plugin development. It has evolved into a comprehensive knowledge management system designed for institutional knowledge capture and cross-session memory. The architecture reflects these principles: platform-agnostic core, automated workflows, and portable knowledge representation.
-
-    This is a platform-agnostic knowledge graph that was developed entirely using Gemini and Claude, leveraging very specific context and detailed natural language prompting.
-
 ---
 
 **Stop losing knowledge in your LLM session chat history and never forget a prompting or coding breakthrough.**
@@ -27,7 +22,7 @@
 
 - :material-database-check: **The Outcome**
 
-  Users can easily look up that information not only in their current chat, but also in any other chat session, even if they switch to a totally different LLM, IDE,or coding assistant!
+  Users can easily look up that information not only in their current chat, but also in any other chat session, even if they switch to a totally different LLM, IDE, or coding assistant!
 
 </div>
 
@@ -35,11 +30,45 @@
 
 ## When Would I Use This?
 
-- **After debugging for hours**: Capture what worked (and what didn't) so the next person or future-you doesn't repeat the investigation.
-- **Before switching LLMs or tools**: Knowledge embedded in the project travels with it, regardless of which AI assistant opens it next.
-- **During architecture decisions**: Record the reasoning, alternatives considered, and trade-offs so the "why" isn't lost when the code changes later.
-- **During agile sprint retrospectives**: Automatically gather all lessons learned during the sprint for team reviews and process improvements.
-- **Onboarding a teammate**: Point them at the knowledge graph instead of repeating tribal knowledge from memory.
+Knowledge capture fits naturally into everyday development:
+
+```mermaid
+%%{init: { 'flowchart': { 'useMaxWidth': true }, 'theme': 'neutral' }}%%
+graph LR
+    subgraph Trigger["⚡ The Moment"]
+        A["🐞 Debugging<br/>breakthrough"]
+        B["🏗️ Architecture<br/>decision"]
+        C["🔁 Recurring<br/>pattern discovered"]
+        D["⏸️ End of a<br/>work session"]
+        E["🧩 Multi-release<br/>problem solved"]
+        F["⚙️ Tricky setup<br/>figured out"]
+    end
+
+    subgraph Capture["📝 Capture It"]
+        G["Document the lesson,<br/>decision, or pattern"]
+    end
+
+    subgraph Payoff["🎯 Use It Later"]
+        H["🔄 Switch tools<br/>without losing context"]
+        I["🤝 Onboard teammates<br/>from real experience"]
+        J["🔍 Search past solutions<br/>in seconds"]
+        K["🏃 Review sprint lessons<br/>at the retrospective"]
+    end
+
+    A --> G
+    B --> G
+    C --> G
+    D --> G
+    E --> G
+    F --> G
+    G --> H
+    G --> I
+    G --> J
+    G --> K
+
+    accTitle: When to Use the Knowledge Graph
+    accDescr: Three-phase journey flow showing six trigger moments (debugging, architecture decisions, recurring patterns, end of session, multi-release problems, tricky setups) feeding into knowledge capture, which then enables four future benefits (tool switching, team onboarding, instant search, and sprint retrospective reviews).
+```
 
 ---
 
@@ -69,9 +98,9 @@
 
 ## How It Works
 
-The key lies in the simple approach of embedding the knowledge directly within the project itself. This ensures the knowledge is always immediately available whenever and wherever the project is opened. Should the library become excessively large, users have the option to transfer it to an external third-party via MCP servers.
+Knowledge is stored as markdown files inside the project directory. There is no external database and no cloud dependency. Any tool that opens the project can read it. If the library grows large, the content can be accessed externally via MCP servers.
 
-??? note "Full Feature List"
+???+ note "Full Feature List"
     - **Lesson-Learned Capture** with categorized storage and git metadata tracking
     - **Knowledge Graph** with quick-reference entries linked to full lessons
     - **MEMORY.md Bidirectional Sync** for persistent cross-session context
@@ -108,3 +137,10 @@ See [Getting Started](GETTING-STARTED.md) for platform-specific setup instructio
 - **Repository:** [github.com/technomensch/knowledge-graph](https://github.com/technomensch/knowledge-graph)
 - **Issues:** [github.com/technomensch/knowledge-graph/issues](https://github.com/technomensch/knowledge-graph/issues)
 - **Releases:** [github.com/technomensch/knowledge-graph/releases](https://github.com/technomensch/knowledge-graph/releases)
+
+---
+
+??? info "About This Project"
+    This project was initially built as a **personal learning project** to explore **docs-as-code** practices and plugin development. It has evolved into a comprehensive knowledge management system designed for institutional knowledge capture and cross-session memory. The architecture reflects these principles: platform-agnostic core, automated workflows, and portable knowledge representation.
+
+    This is a platform-agnostic knowledge graph that was developed entirely using Gemini and Claude, leveraging very specific context and detailed natural language prompting.
