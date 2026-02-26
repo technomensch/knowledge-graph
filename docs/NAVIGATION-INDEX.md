@@ -26,7 +26,7 @@
 **Configure & Customize**:
 - Set up sanitization hooks → [Configuration](CONFIGURATION.md)
 - Adapt to my AI assistant → [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md)
-- Add custom categories → [Add Category Command](COMMAND-GUIDE.md#add-category)
+- Add custom categories → [Add Category Command](COMMAND-GUIDE.md#kg-sisadd-category)
 
 **Understand the System**:
 - How does it work? → [Architecture Guide](../core/docs/ARCHITECTURE.md)
@@ -40,13 +40,13 @@
 
 **Track Complex Problems**:
 - Multi-attempt bugs → [Meta-Issue Guide](../core/docs/META-ISSUE-GUIDE.md)
-- Link to GitHub issues → [Link Issue Command](COMMAND-GUIDE.md#link-issue)
-- Issue tracking workflows → [Start Issue Tracking Command](COMMAND-GUIDE.md#start-issue-tracking)
+- Link to GitHub issues → [Link Issue Command](COMMAND-GUIDE.md#kg-sislink-issue)
+- Issue tracking workflows → [Start Issue Tracking Command](COMMAND-GUIDE.md#kg-sisstart-issue-tracking)
 
 **Share Safely**:
 - Remove sensitive data → [Sanitization Checklist](../core/docs/SANITIZATION-CHECKLIST.md)
-- Set up pre-commit hooks → [Config Sanitization Command](COMMAND-GUIDE.md#config-sanitization)
-- Check before sharing → [Check Sensitive Command](COMMAND-GUIDE.md#check-sensitive)
+- Set up pre-commit hooks → [Config Sanitization Command](COMMAND-GUIDE.md#kg-sisconfig-sanitization)
+- Check before sharing → [Check Sensitive Command](COMMAND-GUIDE.md#kg-sischeck-sensitive)
 
 ---
 
@@ -319,7 +319,7 @@ What term?
 
 ### Getting Started
 - [Installation](GETTING-STARTED.md)
-- [First Steps](GETTING-STARTED.md#next-steps)
+- [First Steps](GETTING-STARTED.md#first-steps)
 - [Concepts](CONCEPTS.md)
 
 ### Daily Use
