@@ -54,6 +54,7 @@ nav:
   - Contributing:
       - Style Guide: STYLE-GUIDE.md
       - Navigation Index: NAVIGATION-INDEX.md
+      - Documentation Changelog: CHANGELOG-DOCS-ONLY.md
 
 plugins:
   - search:
