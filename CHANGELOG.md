@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.9-alpha] - 2026-02-27
+
+### Added
+- **Plugin Infrastructure & Onboarding**
+  - Added `CLAUDE.md` to define project architecture, versioning rules, and strict AI constraints
+  - Re-introduced `mcpToolSearch: true` in settings to enable lazy-loading and reduce token overhead
+  - Step 0 ("Permissions") and Step 0.5 ("Migration Check") added to `INSTALL.md`
+
+### Changed
+- **Complete Namespace Migration**
+  - Renamed namespace across all code, manifest, and documentation from `/kg-sis:` to `/kmgraph:`
+  - `kg-sis` plugin disabled in settings; enabled `kmgraph` as the only active extension identifier
+- **Consolidated Automation Hooks**
+  - Replaced 3 separate shell scripts with single `hooks-master.sh` invoking 3 isolated sections (config, lessons, memory)
+  - Updated `hooks.json` to reduce plugin load overhead
+
+### Fixed
+- **Hook Security Audit (ADR-012)**
+  - Applied word-splitting protections (quoted subshells) in `memory-diff-check.sh`
+  - Validated strict avoidance of `eval`, network requests, and code-altering operations in all hooks
+  - Ensured MEMORY.md limits conform exactly to ADR-004 logic (2,000 token limit)
+
+### Documentation
+- Created `ADR-012: Hook Security Model` defining rules for plugin script execution
+- Added non-Claude platform instructions to `GETTING-STARTED.md` and `COMMAND-GUIDE.md`
+- Fixed lingering references to legacy namespace in `NAVIGATION-INDEX.md` and UI test files
+
 ## [0.0.8.7-alpha] - 2026-02-22
 
 ### Added
