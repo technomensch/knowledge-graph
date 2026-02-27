@@ -214,26 +214,37 @@ Use `--delegate knowledge-extractor` or `--delegate session-documenter` in comma
 
 ---
 
+## What's Next?
+
+After completing setup and your first lesson:
+
+- **Need quick reference?** → [Cheat Sheet](CHEAT-SHEET.md) — One-page guide to all commands
+- **Explore all commands?** → [Command Reference](COMMAND-GUIDE.md) — Detailed documentation with examples
+- **Understand the concepts?** → [Concepts Guide](CONCEPTS.md) — Definitions and explanations
+- **Customizing your setup?** → [Configuration Guide](CONFIGURATION.md) — Sanitization, team workflows, MCP server
+- **Using non-Claude platforms?** → [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Cursor, Windsurf, Continue integration
+
+---
+
 ## Related Documentation
 
-**Installation**:
+**Installation & Setup**:
 - [Universal Installer](INSTALL.md) — Automated setup for all platforms (paste into any AI assistant)
-- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Platform capability comparisons and integration details
+- [Configuration Guide](CONFIGURATION.md) — Post-install customization: sanitization, team workflows, MCP server
+- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Integration details for Cursor, Windsurf, Continue, VS Code, Aider
 
-**Getting deeper into the system**:
+**Learning & Reference**:
+- [Command Reference Guide](COMMAND-GUIDE.md) — All commands with examples, learning path, and troubleshooting
+- [Quick Reference (Cheat Sheet)](CHEAT-SHEET.md) — One-page guide for common tasks and commands
 - [Concepts Guide](CONCEPTS.md) — Plain-English definitions of every term used in documentation
-- [Command Reference](COMMAND-GUIDE.md) — All commands with examples and learning path
-- [Quick Reference](CHEAT-SHEET.md) — One-page cheat sheet for common tasks
+- [Examples](../core/examples/) — Real-world completed examples: lessons, ADRs, KG entries
 
-**Configuration and customization**:
-- [Configuration Guide](CONFIGURATION.md) — Post-install setup: sanitization, team workflows, MCP server
-
-**Writing effective entries**:
+**Advanced**:
 - [Manual Workflows](../core/docs/WORKFLOWS.md) — Step-by-step guides for all 9 workflow types
 - [Pattern Writing Guide](../core/docs/PATTERNS-GUIDE.md) — How to write high-quality knowledge entries
-- [Examples](../core/examples/) — Completed examples to learn from
+- [Style Guide](STYLE-GUIDE.md) — Documentation authoring standards and best practices
 
 ---
 
 **Version**: 0.0.10-alpha
-**Last Updated**: 2026-02-20
+**Last Updated**: 2026-02-27
