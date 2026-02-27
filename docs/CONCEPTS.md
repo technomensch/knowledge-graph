@@ -538,21 +538,43 @@ MEMORY.md works best under 200 lines. When it grows beyond that threshold:
 
 ## Next Steps
 
-**New to knowledge graphs?**
-1. Read [Getting Started](GETTING-STARTED.md)
-2. Try the [Quick Reference](CHEAT-SHEET.md)
-3. Capture your first lesson
+**New to the system?**
+1. Follow [Getting Started](GETTING-STARTED.md) — Installation and first lesson (5 min)
+2. Use [Quick Reference](CHEAT-SHEET.md) — One-page command cheat sheet
+3. Capture your first lesson with `/kmgraph:capture-lesson`
 
-**Going deeper**:
-- [Architecture Guide](../core/docs/ARCHITECTURE.md) - How the system is designed
-- [Pattern Writing Guide](../core/docs/PATTERNS-GUIDE.md) - Writing effective entries
-- [Command Reference](COMMAND-GUIDE.md) - All 19 commands with examples
+**Ready to dive deeper?**
+- **How it works**: [Architecture Guide](../core/docs/ARCHITECTURE.md) — System design and patterns
+- **Write better entries**: [Pattern Writing Guide](../core/docs/PATTERNS-GUIDE.md) — Best practices and examples
+- **All commands**: [Command Reference](COMMAND-GUIDE.md) — Complete documentation with examples
+- **Configuration**: [Configuration Guide](CONFIGURATION.md) — Sanitization, team workflows, MCP server
 
-**For non-Claude users**:
-- [Manual Workflows](../core/docs/WORKFLOWS.md) - Step-by-step processes without automation
-- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) - Cursor, Continue, Aider integration
+**Using other platforms?**
+- [Manual Workflows](../core/docs/WORKFLOWS.md) — Step-by-step guides without automation
+- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Cursor, Windsurf, Continue, VS Code, Aider setup
+
+---
+
+## Related Documentation
+
+**Getting started**:
+- [Getting Started Guide](GETTING-STARTED.md) — Installation, setup, first lesson walkthrough
+- [Installation](INSTALL.md) — Universal installer for all platforms
+- [Quick Reference](CHEAT-SHEET.md) — One-page cheat sheet for commands
+
+**Learning**:
+- [Command Reference](COMMAND-GUIDE.md) — All commands with detailed documentation and examples
+- [Configuration Guide](CONFIGURATION.md) — Post-install setup and customization
+- [Examples](../core/examples/) — Real-world lesson, ADR, and KG entry examples
+
+**Advanced**:
+- [Architecture Guide](../core/docs/ARCHITECTURE.md) — System design, data flow, and patterns
+- [Pattern Writing Guide](../core/docs/PATTERNS-GUIDE.md) — How to write high-quality knowledge entries
+- [Manual Workflows](../core/docs/WORKFLOWS.md) — Step-by-step guides for non-Claude platforms
+- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Integration for different IDEs and LLMs
+- [Style Guide](STYLE-GUIDE.md) — Documentation authoring standards
 
 ---
 
 **Version**: 0.0.10-alpha
-**Last Updated**: 2026-02-20
+**Last Updated**: 2026-02-27
