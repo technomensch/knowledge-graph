@@ -36,6 +36,18 @@ This skill keeps the knowledge graph synchronized with lessons-learned by:
 
 ---
 
+## Delegation Option
+
+For large lesson batches (10+ lessons or 50+ KB total), consider delegating to the `knowledge-extractor` subagent to reduce context window consumption:
+
+```bash
+/kmgraph:update-graph --delegate knowledge-extractor
+```
+
+This extracts patterns without consuming your main context, ideal when processing multiple lessons or updating large sections of the knowledge graph.
+
+---
+
 ## Usage
 
 ```bash

@@ -28,6 +28,18 @@ This skill analyzes the current chat context to extract and document:
 
 ---
 
+## Delegation Option
+
+For full session parsing across multiple branches or large commit histories, consider delegating to the `session-documenter` subagent:
+
+```bash
+/kmgraph:session-summary --delegate session-documenter
+```
+
+This handles git archaeology and session analysis without consuming your main context window, ideal when wrapping up complex multi-file sessions.
+
+---
+
 ## Usage
 
 ```bash
