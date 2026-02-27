@@ -340,6 +340,38 @@
 }
 
 /* ============================================================
+   Social Links: LinkedIn in Header
+   ============================================================ */
+
+/* LinkedIn container in header (positioned right) */
+.md-header__linkedin {
+  display: flex;
+  align-items: center;
+  margin-left: 0.5rem;
+}
+
+/* LinkedIn link styling */
+.md-header__linkedin .md-social__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  color: #0a66c2; /* LinkedIn brand blue */
+  transition: all 0.2s ease-in-out;
+}
+
+.md-header__linkedin .md-social__link:hover {
+  opacity: 0.8;
+  transform: scale(1.1);
+}
+
+/* Hide social links from footer (LinkedIn now in header) */
+.md-footer__inner .md-social {
+  display: none;
+}
+
+/* ============================================================
    Print Media (for documentation export)
    ============================================================ */
 
