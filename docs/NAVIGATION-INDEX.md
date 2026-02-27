@@ -1,6 +1,6 @@
 # Documentation Navigation Index
 
-**Complete sitemap** for knowledge graph plugin documentation. Find what you need in 3 clicks or less.
+**Complete sitemap** for Knowledge Management Graph documentation. Find what you need in 3 clicks or less.
 
 ---
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# recent-lessons.sh - Knowledge Graph plugin SessionStart hook
+# recent-lessons.sh - Knowledge Management Graph SessionStart hook
 # Displays recently modified lessons from active KG (last 7 days)
 
 # Exit codes:

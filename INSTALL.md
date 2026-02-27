@@ -1,4 +1,4 @@
-# Knowledge Graph Plugin — Installation Guide
+# Knowledge Management Graph — Installation Guide
 
 > **How to use this file:** Paste the entire contents of this document into any AI assistant (Claude Code, Cursor, Windsurf, Continue.dev, JetBrains AI, VS Code, Copilot, Aider, or any LLM). The assistant will detect the platform, install the appropriate components, and configure everything automatically.
 
@@ -6,7 +6,7 @@
 
 ## Instructions for the AI Assistant
 
-You are installing the **Knowledge Graph Plugin** — a system for capturing lessons learned, architecture decisions, and institutional knowledge. Follow the steps below in order. Do not skip steps. Ask the user questions only where indicated.
+You are installing the **Knowledge Management Graph** — a system for capturing lessons learned, architecture decisions, and institutional knowledge. Follow the steps below in order. Do not skip steps. Ask the user questions only where indicated.
 
 ---
 
@@ -113,7 +113,7 @@ Claude Code supports full plugin installation with all 22 commands, hooks, agent
 **Ask the user:**
 
 ```
-How would you like to install the Knowledge Graph Plugin?
+How would you like to install the Knowledge Management Graph?
 
 1. Marketplace install (recommended) — installs from the plugin registry
 2. Local install — clone the repo and load from disk

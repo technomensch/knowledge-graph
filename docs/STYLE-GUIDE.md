@@ -1,6 +1,6 @@
 # Documentation Style Guide
 
-Authoring standards for contributors writing or reviewing documentation for the Knowledge Graph plugin.
+Authoring standards for contributors writing or reviewing documentation for the Knowledge Management Graph.
 
 **Audience**: Contributors — human developers and AI documentation agents.
 **Version**: v0.0.8-alpha

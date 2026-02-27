@@ -1,5 +1,5 @@
 ---
-title: Command Workflows for Knowledge Graph Plugin
+title: Command Workflows for Knowledge Management Graph
 version: 1.0.0
 last_updated: 2026-02-16
 ---
@@ -25,7 +25,7 @@ Detailed workflow patterns for different knowledge graph usage scenarios, with c
 
 ## 1. First-Time Setup Workflow
 
-**When to use:** Installing knowledge graph plugin for the first time on a project.
+**When to use:** Installing Knowledge Management Graph for the first time on a project.
 
 **Duration:** 10-15 minutes
 
