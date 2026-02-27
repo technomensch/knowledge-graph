@@ -1189,10 +1189,21 @@ git checkout -b issue/N-description
 
 ## Next Steps
 
-- **First-time users**: Start with [Getting Started](GETTING-STARTED.md) for installation and first lesson
-- **Need a quick reference?**: See [Cheat Sheet](CHEAT-SHEET.md) for one-page command summary
-- **Understanding concepts**: Read [Concepts Guide](CONCEPTS.md) for plain-English explanations of all terms
-- **Multiple LLMs?**: Check [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) for Cursor, Windsurf, Continue.dev setup
+<div class="grid cards" markdown>
+
+- **[Getting Started](GETTING-STARTED.md)**
+
+  Installation, first lesson, and setup verification.
+
+- **[Quick Reference](CHEAT-SHEET.md)**
+
+  One-page cheat sheet with all commands at a glance.
+
+- **[Concepts Guide](CONCEPTS.md)**
+
+  Plain-English explanations of all key terms and patterns.
+
+</div>
 
 ---
 

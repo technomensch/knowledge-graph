@@ -538,20 +538,21 @@ MEMORY.md works best under 200 lines. When it grows beyond that threshold:
 
 ## Next Steps
 
-**New to the system?**
-1. Follow [Getting Started](GETTING-STARTED.md) — Installation and first lesson (5 min)
-2. Use [Quick Reference](CHEAT-SHEET.md) — One-page command cheat sheet
-3. Capture your first lesson with `/kmgraph:capture-lesson`
+<div class="grid cards" markdown>
 
-**Ready to dive deeper?**
-- **How it works**: [Architecture Guide](../core/docs/ARCHITECTURE.md) — System design and patterns
-- **Write better entries**: [Pattern Writing Guide](../core/docs/PATTERNS-GUIDE.md) — Best practices and examples
-- **All commands**: [Command Reference](COMMAND-GUIDE.md) — Complete documentation with examples
-- **Configuration**: [Configuration Guide](CONFIGURATION.md) — Sanitization, team workflows, MCP server
+- **[Getting Started](GETTING-STARTED.md)**
 
-**Using other platforms?**
-- [Manual Workflows](../core/docs/WORKFLOWS.md) — Step-by-step guides without automation
-- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Cursor, Windsurf, Continue, VS Code, Aider setup
+  New to the system? Follow the installation and first lesson walkthrough.
+
+- **[Command Reference](COMMAND-GUIDE.md)**
+
+  Ready to explore all commands? Detailed documentation with examples and learning path.
+
+- **[Architecture Guide](../core/docs/ARCHITECTURE.md)**
+
+  Want to understand how it works? Learn system design, patterns, and implementation details.
+
+</div>
 
 ---
 
