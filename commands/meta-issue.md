@@ -13,10 +13,10 @@ Initialize and manage meta-issue tracking for complex, multi-attempt problems th
 ## Usage
 
 ```bash
-/kg-sis:meta-issue "Problem Title"
-/kg-sis:meta-issue --add-attempt 003 "Try connection pooling"
-/kg-sis:meta-issue --update-understanding "Root cause is network latency"
-/kg-sis:meta-issue --status
+/kmgraph:meta-issue "Problem Title"
+/kmgraph:meta-issue --add-attempt 003 "Try connection pooling"
+/kmgraph:meta-issue --update-understanding "Root cause is network latency"
+/kmgraph:meta-issue --status
 ```
 
 ---
@@ -78,7 +78,7 @@ meta-issue-name/
 
 ## Command: Initialize Meta-Issue
 
-**Syntax:** `/kg-sis:meta-issue "Problem Title"`
+**Syntax:** `/kmgraph:meta-issue "Problem Title"`
 
 ### Step 1: Prompt for Metadata
 
@@ -194,7 +194,7 @@ cp "${CLAUDE_PLUGIN_ROOT}/core/templates/meta-issue/attempt-template/"* \
 
 ## Command: Add New Attempt
 
-**Syntax:** `/kg-sis:meta-issue --add-attempt 003 "Try connection pooling"`
+**Syntax:** `/kmgraph:meta-issue --add-attempt 003 "Try connection pooling"`
 
 ### SOP 1: Creating New Attempt Folder
 
@@ -224,7 +224,7 @@ echo "**Plan:** [v2.3.1](../../plans/v2.3.1-connection-pooling.md)" >> "${meta_d
 
 ## Command: Update Root Cause Understanding
 
-**Syntax:** `/kg-sis:meta-issue --update-understanding "Root cause is network latency"`
+**Syntax:** `/kmgraph:meta-issue --update-understanding "Root cause is network latency"`
 
 ### SOP 2: Documenting Root Cause Evolution
 
@@ -258,7 +258,7 @@ Changed strategy from query optimization to connection pooling/caching
 
 ## Command: Meta-Issue Status
 
-**Syntax:** `/kg-sis:meta-issue --status`
+**Syntax:** `/kmgraph:meta-issue --status`
 
 **Output:**
 ```
@@ -323,20 +323,20 @@ When KG entry updates with meta-issue evidence:
 
 ## Integration with Other Skills
 
-**With /kg-sis:capture-lesson:**
+**With /kmgraph:capture-lesson:**
 ```
 After resolving meta-issue → Create lesson from analysis/lessons-learned.md
 Link lesson back to meta-issue for evidence
 ```
 
-**With /kg-sis:update-graph:**
+**With /kmgraph:update-graph:**
 ```
 Extract patterns from meta-issue attempts
 Auto-detect when meta-issue has reusable insights
 Suggest KG sync when 3+ belief shifts documented
 ```
 
-**With /kg-sis:session-summary:**
+**With /kmgraph:session-summary:**
 ```
 Session summaries reference meta-issue progress
 Meta-issue timeline includes session links
@@ -349,7 +349,7 @@ Bidirectional documentation
 
 When multiple knowledge graphs are configured:
 - Meta-issues stored in active KG: `{active_kg_path}/issues/`
-- Use `/kg-sis:switch` to change active KG before creating meta-issue
+- Use `/kmgraph:switch` to change active KG before creating meta-issue
 - Each KG can track its own domain-specific meta-issues
 
 ---
@@ -382,7 +382,7 @@ cat attempts/003-connection-pooling/attempt-results.md
 cat analysis/root-cause-evolution.md
 
 # Suggest next attempt based on pattern
-/kg-sis:recall "performance latency"
+/kmgraph:recall "performance latency"
 ```
 
 ---
@@ -392,7 +392,7 @@ cat analysis/root-cause-evolution.md
 ### Example 1: Initialize new meta-issue
 
 ```bash
-/kg-sis:meta-issue "Authentication Redesign"
+/kmgraph:meta-issue "Authentication Redesign"
 ```
 
 **Output:**
@@ -414,7 +414,7 @@ Created:
 ### Example 2: Add attempt
 
 ```bash
-/kg-sis:meta-issue --add-attempt 002 "OAuth2 with JWT"
+/kmgraph:meta-issue --add-attempt 002 "OAuth2 with JWT"
 ```
 
 **Output:**
@@ -432,7 +432,7 @@ Updated: implementation-log.md (new entry)
 ### Example 3: Update understanding
 
 ```bash
-/kg-sis:meta-issue --update-understanding "Token expiry logic flawed, not session management"
+/kmgraph:meta-issue --update-understanding "Token expiry logic flawed, not session management"
 ```
 
 **Output:**
@@ -452,4 +452,4 @@ Updated: description.md (current understanding section)
 **Created:** 2026-02-12
 **Version:** 1.0 (Plugin version)
 **Based On:** ADR-008 Meta-Issue Tracking Pattern
-**Related Skills:** /kg-sis:capture-lesson, /kg-sis:update-graph, /kg-sis:session-summary
+**Related Skills:** /kmgraph:capture-lesson, /kmgraph:update-graph, /kmgraph:session-summary

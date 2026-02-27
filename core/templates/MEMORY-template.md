@@ -88,7 +88,7 @@ Persistent governance context and critical patterns loaded into every session.
 
 - **Update frequency:** When new patterns/governance emerge
 - **Max lines:** 200 (truncates after 200)
-- **Sync with KG:** Run `/kg-sis:update-graph` Step 7 for bidirectional sync
+- **Sync with KG:** Run `/kmgraph:update-graph` Step 7 for bidirectional sync
 - **Purpose:** Provide persistent context across sessions
 
 > **Warning:** This file is truncated after 200 lines. Keep concise; move detailed content to separate topic files and link from here.

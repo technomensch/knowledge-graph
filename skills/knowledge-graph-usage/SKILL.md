@@ -1,6 +1,6 @@
 ---
 name: Knowledge Graph Usage
-description: This skill should be used when the user mentions "documenting lessons", "capturing knowledge", "remembering this for later", "we solved this before", "institutional memory", "project memory", "track decisions", or when Claude detects recurring problems, repeated patterns, valuable insights worth preserving, situations after completing /kg-sis:capture-lesson (suggest KG extraction), after git commits with fix/debug/pattern keywords (suggest lesson capture within 30min), or when user describes familiar problems (suggest searching existing lessons first).
+description: This skill should be used when the user mentions "documenting lessons", "capturing knowledge", "remembering this for later", "we solved this before", "institutional memory", "project memory", "track decisions", or when Claude detects recurring problems, repeated patterns, valuable insights worth preserving, situations after completing /kmgraph:capture-lesson (suggest KG extraction), after git commits with fix/debug/pattern keywords (suggest lesson capture within 30min), or when user describes familiar problems (suggest searching existing lessons first).
 version: 1.0.1
 ---
 
@@ -74,11 +74,11 @@ Avoid capturing:
 
 **Search strategy:**
 1. Extract key terms from the topic (problem domain, technology, pattern name)
-2. Use `/kg-sis:recall "key terms"` to search existing lessons
+2. Use `/kmgraph:recall "key terms"` to search existing lessons
 3. Review search results for similar content
 
 **If similar lesson found:**
-- **Merge option**: Update existing lesson (use `/kg-sis:capture-lesson update <filename>`)
+- **Merge option**: Update existing lesson (use `/kmgraph:capture-lesson update <filename>`)
 - **Related option**: Create new lesson with explicit "Related:" link to similar lesson
 - **Proceed option**: Create new lesson if genuinely different (different root cause, different context, or significantly different solution)
 
@@ -97,7 +97,7 @@ Avoid capturing:
 ```
 User: "I want to capture a lesson about API error handling"
 Assistant: "Before capturing, let me search existing lessons..."
-          → Runs /kg-sis:recall "API error handling"
+          → Runs /kmgraph:recall "API error handling"
           → Finds: "Lessons_Learned_Error_Handling_Patterns.md"
           → "I found a similar lesson. Would you like to:"
             1. Update existing lesson (merge new findings)
@@ -109,70 +109,70 @@ Assistant: "Before capturing, let me search existing lessons..."
 
 ### Primary Capture Commands
 
-**`/kg-sis:capture-lesson [title]`**
+**`/kmgraph:capture-lesson [title]`**
 - Document lessons learned with git metadata tracking
 - Use after resolving significant problems or making important discoveries
 - Captures current git branch, commit, author, date
 - Categories: architecture, debugging, patterns, process, governance
 
-**`/kg-sis:meta-issue [issue-number]`**
+**`/kmgraph:meta-issue [issue-number]`**
 - Initialize tracking for complex recurring problems
 - Use when same issue encountered multiple times
 - Links attempts, tracks solutions, maintains context
 - Integrates with GitHub issues for team visibility
 
-**`/kg-sis:link-issue [lesson-id] [issue-number]`**
+**`/kmgraph:link-issue [lesson-id] [issue-number]`**
 - Create bidirectional links between lessons and GitHub issues
 - Use to connect documented knowledge with tracked work
 - Enables traceability and context preservation
 
 ### Search and Recall Commands
 
-**`/kg-sis:recall "query"`**
+**`/kmgraph:recall "query"`**
 - Search across all knowledge: lessons, decisions, sessions, graph
 - Use when facing familiar problem or needing past context
 - Semantic search finds relevant content even with different terms
 
-**`/kg-sis:status`**
+**`/kmgraph:status`**
 - Display active KG info, stats, quick command reference
 - Use to understand current KG setup and available categories
 - Shows recent activity and configuration
 
 ### Organization Commands
 
-**`/kg-sis:update-graph`**
+**`/kmgraph:update-graph`**
 - Extract structured insights from lessons into knowledge graph
 - Use after capturing multiple lessons to consolidate learnings
 - Preserves git metadata, creates topic-based organization
 
-**`/kg-sis:session-summary`**
+**`/kmgraph:session-summary`**
 - Create summary of current chat session
 - Use at end of productive sessions to preserve context
 - Documents what was accomplished and key decisions made
 
-**`/kg-sis:sync-all`**
+**`/kmgraph:sync-all`**
 - Automated orchestrator: extract chat → capture lessons → update graph
 - Use for complete knowledge pipeline in one command
 - Replaces manual 4-step workflow
 
 ### Advanced Commands
 
-**`/kg-sis:init [name]`**
+**`/kmgraph:init [name]`**
 - Initialize new knowledge graph with wizard setup
 - Use for first-time setup or creating new topic-based KGs
 - Configures categories, git strategy, directory structure
 
-**`/kg-sis:switch [name]`**
+**`/kmgraph:switch [name]`**
 - Change active knowledge graph
 - Use when working across multiple projects or topics
 - Subsequent commands operate on selected KG
 
-**`/kg-sis:configure-sanitization`**
+**`/kmgraph:configure-sanitization`**
 - Set up pre-commit hooks for sensitive data detection
 - Use before pushing knowledge to public repos
 - Interactive wizard configures patterns and actions
 
-**`/kg-sis:check-sensitive`**
+**`/kmgraph:check-sensitive`**
 - Scan active KG for potentially sensitive information
 - Use before public sharing or team distribution
 - Reports matches with file locations for review
@@ -183,35 +183,35 @@ Assistant: "Before capturing, let me search existing lessons..."
 
 **After debugging session:**
 ```
-1. /kg-sis:capture-lesson debugging-session-title
+1. /kmgraph:capture-lesson debugging-session-title
 2. Document problem, root cause, solution, prevention
 3. Tag with relevant categories
 ```
 
 **During recurring problem:**
 ```
-1. /kg-sis:meta-issue 123
+1. /kmgraph:meta-issue 123
 2. Document current attempt and findings
 3. Update issue plan as investigation progresses
 ```
 
 **End of productive session:**
 ```
-1. /kg-sis:session-summary
+1. /kmgraph:session-summary
 2. Review and refine generated summary
 3. Links to lessons captured during session
 ```
 
 **When facing familiar problem:**
 ```
-1. /kg-sis:recall "problem description"
+1. /kmgraph:recall "problem description"
 2. Review relevant lessons and decisions
 3. Apply documented solution or adapt approach
 ```
 
 **Periodic knowledge consolidation:**
 ```
-1. /kg-sis:sync-all
+1. /kmgraph:sync-all
    - Extracts recent chats
    - Captures lessons from extracted content
    - Updates knowledge graph with insights
@@ -220,12 +220,12 @@ Assistant: "Before capturing, let me search existing lessons..."
 
 **After lesson capture (NEW - v0.0.3):**
 ```
-Context: User just completed /kg-sis:capture-lesson
+Context: User just completed /kmgraph:capture-lesson
 
 Proactive suggestion:
 "✅ Lesson captured! Extract insights to Knowledge Graph?"
-- Recommended: /kg-sis:update-graph (extracts patterns/gotchas/concepts)
-- Full pipeline: /kg-sis:sync-all (extraction + MEMORY.md + GitHub)
+- Recommended: /kmgraph:update-graph (extracts patterns/gotchas/concepts)
+- Full pipeline: /kmgraph:sync-all (extraction + MEMORY.md + GitHub)
 - Later: Skip for now, run manually later
 
 Why now: Fresh context enables better extraction. The knowledge-reviewer
@@ -240,7 +240,7 @@ Proactive suggestion:
 "💡 Lesson-worthy commit detected: [hash] - [message]
 
 This looks like knowledge worth capturing. Consider:
-- /kg-sis:capture-lesson — Document while context is fresh
+- /kmgraph:capture-lesson — Document while context is fresh
 - Within 30 minutes is optimal for quality
 
 Keywords detected: [fix/debug/pattern/etc]"
@@ -255,7 +255,7 @@ Context: User describes a problem; sounds familiar or recurring
 
 Proactive suggestion:
 "Before solving, check if we've seen this before:
-- /kg-sis:recall \"[extracted keywords]\"
+- /kmgraph:recall \"[extracted keywords]\"
 - Might save time if similar pattern exists
 
 Would you like me to search existing lessons first?"
@@ -266,14 +266,14 @@ solving from scratch takes hours. Always search first.
 
 **After archiving entries (NEW - v0.0.4):**
 ```
-Context: User ran /kg-sis:archive-memory to free token budget
+Context: User ran /kmgraph:archive-memory to free token budget
 Context: User asks about a topic that was recently archived
 Context: User needs to reference archived knowledge for current work
 
 Restoration workflow:
-1. Check if entry is in archive: "/kg-sis:restore-memory --list"
-2. Restore by name: "/kg-sis:restore-memory \"Entry Name\""
-3. Restore by ID: "/kg-sis:restore-memory --id=5"
+1. Check if entry is in archive: "/kmgraph:restore-memory --list"
+2. Restore by name: "/kmgraph:restore-memory \"Entry Name\""
+3. Restore by ID: "/kmgraph:restore-memory --id=5"
 4. Preview before writing: All restorations show preview + token impact
 
 Decision criteria:
@@ -342,8 +342,8 @@ This enables:
 ### GitHub Integration
 
 Link lessons to tracked work:
-- Use `/kg-sis:link-issue` for bidirectional references
-- Use `/kg-sis:meta-issue` for complex recurring issues
+- Use `/kmgraph:link-issue` for bidirectional references
+- Use `/kmgraph:meta-issue` for complex recurring issues
 - Track investigation progress within issue context
 - Enable team visibility into problem-solving process
 
@@ -363,21 +363,21 @@ Recognize these patterns during conversation and suggest appropriate commands:
 
 **After complex debugging:**
 - User statement: "Finally figured it out", "That was tricky", "Took me hours"
-- Suggest: `/kg-sis:capture-lesson debugging-[topic]`
+- Suggest: `/kmgraph:capture-lesson debugging-[topic]`
 
 **During recurring issue discussion:**
 - User statement: "This keeps happening", "Same problem again", "Third time this week"
-- Suggest: `/kg-sis:meta-issue [number]` if tracked, or capture-lesson if not
+- Suggest: `/kmgraph:meta-issue [number]` if tracked, or capture-lesson if not
 
 **End of productive session:**
 - Multiple problems solved in one session
 - Significant progress on complex feature
 - Important decisions made
-- Suggest: `/kg-sis:session-summary`
+- Suggest: `/kmgraph:session-summary`
 
 **When user references past work:**
 - User statement: "We solved this before", "Remember when we fixed...", "Last time we..."
-- Suggest: `/kg-sis:recall "query"` to find previous solution
+- Suggest: `/kmgraph:recall "query"` to find previous solution
 
 **Architecture or design discussion:**
 - Multiple options discussed with trade-offs
@@ -391,7 +391,7 @@ Before solving problems, check if knowledge already exists:
 
 **Familiar-sounding problem:**
 - Search KG before starting fresh investigation
-- Use `/kg-sis:recall` to find relevant lessons
+- Use `/kmgraph:recall` to find relevant lessons
 - Present existing solutions or patterns
 
 **User mentions past work:**
@@ -416,7 +416,7 @@ For comprehensive guidance on specific topics:
 ### Command Documentation
 
 For detailed command syntax and options:
-- Use `/kg-sis:status` for quick reference and current KG info
+- Use `/kmgraph:status` for quick reference and current KG info
 - Check README.md for complete command documentation
 - See examples/ directory for real-world usage patterns
 
@@ -442,8 +442,8 @@ For detailed command syntax and options:
 ### Privacy and Security
 
 Before sharing knowledge:
-- Run `/kg-sis:check-sensitive` to scan for sensitive data
-- Configure sanitization hooks with `/kg-sis:configure-sanitization`
+- Run `/kmgraph:check-sensitive` to scan for sensitive data
+- Configure sanitization hooks with `/kmgraph:configure-sanitization`
 - Review lessons for company-private information
 - Use selective git strategy to keep personal notes private
 - Remove or redact sensitive details before committing

@@ -277,7 +277,7 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 
 ## Next Steps
 
-1. **Create first lesson** using `/kg-sis:capture-lesson`
+1. **Create first lesson** using `/kmgraph:capture-lesson`
 2. **Study examples** in `core/examples/`
 3. **Read architecture guide** at [core/docs/ARCHITECTURE.md](../core/docs/ARCHITECTURE.md)
 4. **Customize templates** in `core/templates/`

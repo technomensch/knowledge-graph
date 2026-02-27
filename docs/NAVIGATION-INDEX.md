@@ -215,12 +215,12 @@ Are you using Claude Code?
 
 ```
 What do you want to do?
-├─ Document a lesson → /kg-sis:capture-lesson
-├─ Search knowledge → /kg-sis:recall "query"
-├─ See status → /kg-sis:status
-├─ Initialize new KG → /kg-sis:init
-├─ Sync to MEMORY.md → /kg-sis:update-graph
-├─ Track complex bug → /kg-sis:meta-issue
+├─ Document a lesson → /kmgraph:capture-lesson
+├─ Search knowledge → /kmgraph:recall "query"
+├─ See status → /kmgraph:status
+├─ Initialize new KG → /kmgraph:init
+├─ Sync to MEMORY.md → /kmgraph:update-graph
+├─ Track complex bug → /kmgraph:meta-issue
 └─ Not sure → [Cheat Sheet: I Want To...](CHEAT-SHEET.md#i-want-to)
 ```
 

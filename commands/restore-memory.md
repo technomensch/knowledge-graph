@@ -2,7 +2,7 @@
 description: Restore archived MEMORY.md entries from MEMORY-archive.md to restore previously archived context
 ---
 
-# /kg-sis:restore-memory — MEMORY.md Restoration
+# /kmgraph:restore-memory — MEMORY.md Restoration
 
 Restore archived entries from MEMORY-archive.md back to MEMORY.md, bringing historical context back into active memory.
 
@@ -32,12 +32,12 @@ Restores previously archived entries to MEMORY.md:
 ## Usage
 
 ```bash
-/kg-sis:restore-memory                     # Interactive mode (show list, select)
-/kg-sis:restore-memory "Git Pre-Commit"   # Fuzzy search by title
-/kg-sis:restore-memory --id=5             # Restore by archive ID
-/kg-sis:restore-memory --list             # Show all archived entries
-/kg-sis:restore-memory --section="Patterns" # Restore to specific section
-/kg-sis:restore-memory --dry-run          # Preview without writing
+/kmgraph:restore-memory                     # Interactive mode (show list, select)
+/kmgraph:restore-memory "Git Pre-Commit"   # Fuzzy search by title
+/kmgraph:restore-memory --id=5             # Restore by archive ID
+/kmgraph:restore-memory --list             # Show all archived entries
+/kmgraph:restore-memory --section="Patterns" # Restore to specific section
+/kmgraph:restore-memory --dry-run          # Preview without writing
 ```
 
 **Parameters:**
@@ -124,8 +124,8 @@ Available Entries:
   ... (showing first 8 of 15)
 
 Usage:
-  /kg-sis:restore-memory "Git Pre-Commit"  # Fuzzy search
-  /kg-sis:restore-memory --id=1            # Restore by ID
+  /kmgraph:restore-memory "Git Pre-Commit"  # Fuzzy search
+  /kmgraph:restore-memory --id=1            # Restore by ID
 ```
 
 Exit after listing.
@@ -162,8 +162,8 @@ Which entry to restore? (1-3, or 0 to cancel): _
 ❌ No matches found for "auth patterns"
 
 Try:
-  • Broader search: /kg-sis:restore-memory "auth"
-  • List all: /kg-sis:restore-memory --list
+  • Broader search: /kmgraph:restore-memory "auth"
+  • List all: /kmgraph:restore-memory --list
   • Search archive directly: grep -i "auth" memory/MEMORY-archive.md
 ```
 
@@ -261,7 +261,7 @@ if [ "$new_tokens" -gt 2000 ]; then
     echo "   After restoration: ~${new_tokens}/2,000 tokens"
     echo ""
     echo "Free up space first:"
-    echo "   /kg-sis:archive-memory"
+    echo "   /kmgraph:archive-memory"
     exit 1
 elif [ "$new_tokens" -gt 1500 ]; then
     echo "⚠️  Warning: Restoration will approach soft limit"
@@ -276,7 +276,7 @@ fi
 
 **Option 1: User specifies --section flag**
 ```bash
-/kg-sis:restore-memory "Git Hooks" --section="Best Practices"
+/kmgraph:restore-memory "Git Hooks" --section="Best Practices"
 # Insert into "## Best Practices" section
 ```
 
@@ -497,7 +497,7 @@ Partial matches (contains some words):
 Archive location: memory/MEMORY-archive.md
 
 Nothing has been archived yet. To archive entries:
-  /kg-sis:archive-memory
+  /kmgraph:archive-memory
 ```
 
 ### Archive File Empty
@@ -537,7 +537,7 @@ Entry size: ~45 tokens
 After restoration: ~2,095/2,000 tokens
 
 Archive entries first to free space:
-  /kg-sis:archive-memory
+  /kmgraph:archive-memory
 
 Or manually remove entries from MEMORY.md
 ```
@@ -576,13 +576,13 @@ Which version to restore?
 ## Integration with Other Commands
 
 **Mentioned by:**
-- `/kg-sis:archive-memory` (suggests restore command in documentation)
-- `/kg-sis:sync-all` (could suggest restoration if query related to archived content)
+- `/kmgraph:archive-memory` (suggests restore command in documentation)
+- `/kmgraph:sync-all` (could suggest restoration if query related to archived content)
 
 **Complementary commands:**
-- `/kg-sis:archive-memory` — Archive stale entries
-- `/kg-sis:status` — Show MEMORY.md size and capacity
-- `/kg-sis:recall` — Search (could search archive too)
+- `/kmgraph:archive-memory` — Archive stale entries
+- `/kmgraph:status` — Show MEMORY.md size and capacity
+- `/kmgraph:recall` — Search (could search archive too)
 
 ---
 
@@ -607,14 +607,14 @@ Which version to restore?
 
 ## Related Commands
 
-- `/kg-sis:archive-memory` — Archive stale entries to free space
-- `/kg-sis:status` — View MEMORY.md token count and capacity
-- `/kg-sis:recall` — Search across project memory (future: include archive)
-- `/kg-sis:sync-all` — Full knowledge sync pipeline
+- `/kmgraph:archive-memory` — Archive stale entries to free space
+- `/kmgraph:status` — View MEMORY.md token count and capacity
+- `/kmgraph:recall` — Search across project memory (future: include archive)
+- `/kmgraph:sync-all` — Full knowledge sync pipeline
 
 ---
 
 **Created:** 2026-02-16
 **Version:** 0.0.4-alpha
 **Purpose:** Restore archived MEMORY.md entries to bring historical context back
-**Command:** `/kg-sis:restore-memory [query] [--id=N] [--list] [--section=Name] [--dry-run]`
+**Command:** `/kmgraph:restore-memory [query] [--id=N] [--list] [--section=Name] [--dry-run]`

@@ -168,11 +168,11 @@ Before testing plugin changes locally:
 **Important finding:** When testing the updated plugin via marketplace installation, namespace visibility behaves correctly:
 
 **Without filename prefix** (`status.md`):
-- Installed via marketplace: Shows `/kg-sis:status` ✅
+- Installed via marketplace: Shows `/kmgraph:status` ✅
 - File prefix not required for namespace visibility in marketplace mode
 
 **With filename prefix** (`knowledge-status.md`):
-- Installed via marketplace: Also shows `/kg-sis:status` ✅
+- Installed via marketplace: Also shows `/kmgraph:status` ✅
 - Filename prefix is redundant but doesn't hurt
 
 **Conclusion:** The file prefix workaround (`knowledge-*.md`) was needed for local development testing, but marketplace installation handles namespace visibility correctly regardless of filename prefix.

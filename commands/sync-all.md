@@ -11,9 +11,9 @@ description: Automated knowledge sync orchestrator — replaces 4-step manual pi
 ## Usage
 
 ```bash
-/kg-sis:sync-all
-/kg-sis:sync-all --auto           # Skip confirmation for GitHub posting
-/kg-sis:sync-all --dry-run        # Show what would sync without making changes
+/kmgraph:sync-all
+/kmgraph:sync-all --auto           # Skip confirmation for GitHub posting
+/kmgraph:sync-all --dry-run        # Show what would sync without making changes
 ```
 
 **Parameters:**
@@ -26,15 +26,15 @@ description: Automated knowledge sync orchestrator — replaces 4-step manual pi
 
 **Before (4 manual steps):**
 ```
-1. /kg-sis:capture-lesson        → Capture lesson in {active_kg_path}/lessons-learned/
-2. /kg-sis:update-graph           → Extract KG entries to {active_kg_path}/knowledge/
-3. /kg-sis:update-issue-plan      → Sync to plan and local issue
+1. /kmgraph:capture-lesson        → Capture lesson in {active_kg_path}/lessons-learned/
+2. /kmgraph:update-graph           → Extract KG entries to {active_kg_path}/knowledge/
+3. /kmgraph:update-issue-plan      → Sync to plan and local issue
 4. Manual GitHub comment             → Post progress to GitHub issue
 ```
 
 **After (1 step):**
 ```
-/kg-sis:sync-all                  → All 4 steps automated, 1 confirmation
+/kmgraph:sync-all                  → All 4 steps automated, 1 confirmation
 ```
 
 ---
@@ -70,7 +70,7 @@ For each new/modified lesson:
 3. Check if entry already exists in `{active_kg_path}/knowledge/patterns.md` (or appropriate KG file)
 4. Create or update entry with bidirectional links
 
-**Logic:** Delegates to `/kg-sis:update-graph` extraction logic
+**Logic:** Delegates to `/kmgraph:update-graph` extraction logic
 
 ### Step 2.5: MEMORY.md Size Check <!-- v0.0.3 Change -->
 
@@ -86,13 +86,13 @@ if [ -f "$memory_path" ]; then
 
   if [ "$memory_tokens" -gt 2000 ]; then
     echo "🛑 MEMORY.md exceeds hard limit: ~${memory_tokens}/2,000 tokens"
-    echo "   Run /kg-sis:archive-memory before adding new entries"
+    echo "   Run /kmgraph:archive-memory before adding new entries"
     echo ""
     echo "   Sync will continue but MEMORY.md updates will be skipped."
     SKIP_MEMORY_SYNC=true
   elif [ "$memory_tokens" -gt 1500 ]; then
     echo "⚠️  MEMORY.md approaching limit: ~${memory_tokens}/2,000 tokens"
-    echo "   Consider: /kg-sis:archive-memory"
+    echo "   Consider: /kmgraph:archive-memory"
     echo ""
     echo "   Continuing with sync..."
     SKIP_MEMORY_SYNC=false
@@ -170,16 +170,16 @@ Session:          2026-02-11 (enriched)
 ## Integration
 
 ### Trigger Points
-- After `/kg-sis:capture-lesson` completes (auto-suggest)
-- After significant work sessions (via `/kg-sis:session-summary`)
+- After `/kmgraph:capture-lesson` completes (auto-suggest)
+- After significant work sessions (via `/kmgraph:session-summary`)
 - Before committing governance-related changes
 - Manual invocation for catch-up sync
 
 ### Integrates With
-- `/kg-sis:update-graph` — KG extraction logic
-- `/kg-sis:update-issue-plan` — Plan/issue linking
-- `/kg-sis:capture-lesson` — Lesson source
-- `/kg-sis:session-summary` — Session enrichment
+- `/kmgraph:update-graph` — KG extraction logic
+- `/kmgraph:update-issue-plan` — Plan/issue linking
+- `/kmgraph:capture-lesson` — Lesson source
+- `/kmgraph:session-summary` — Session enrichment
 - Project-specific governance skills (if present)
 
 ---
@@ -198,7 +198,7 @@ This skill is idempotent — running it multiple times produces the same result:
 
 When multiple knowledge graphs are configured:
 - Operates on the **active** KG from `~/.claude/kg-config.json`
-- Use `/kg-sis:switch` to change active KG before syncing
+- Use `/kmgraph:switch` to change active KG before syncing
 - Supports selective sync: `--category=architecture` to sync only architecture lessons
 
 ---
