@@ -10,7 +10,51 @@ You are installing the **Knowledge Graph Plugin** — a system for capturing les
 
 ---
 
+## Step 0.5: Check for Previous Installation (Skip if first install)
+
+Run the scan below. **If the output is empty, skip this step entirely and proceed to Step 1.**
+Only take action if stale references are found.
+
+```bash
+# Scan for prior versions of this tool
+echo "=== Claude Code extension registry ==="
+claude extension list 2>/dev/null | grep -E "knowledge|kg-sis" || echo "None found"
+
+echo "=== MCP config files ==="
+for f in \
+  ~/.cursor/mcp.json \
+  ~/.codeium/windsurf/mcp_config.json \
+  ~/.continue/config.json \
+  "$HOME/Library/Application Support/Claude/claude_desktop_config.json" \
+  "$APPDATA/Claude/claude_desktop_config.json"; do
+  [ -f "$f" ] && grep -l "knowledge-graph\|kg-sis" "$f" 2>/dev/null && echo "STALE: $f"
+done || echo "None found"
+```
+
+**If output is empty → skip to Step 1.**
+
+**If stale references found → clean up before proceeding:**
+
+| Location | Action |
+|----------|--------|
+| Claude Code (`settings.local.json` `enabledPlugins`) | Run `claude extension uninstall knowledge` and/or `claude extension uninstall kg-sis` |
+| `~/.cursor/mcp.json` | Remove `"knowledge-graph"` or `"kg-sis"` server entry (do NOT overwrite the whole file) |
+| `~/.codeium/windsurf/mcp_config.json` | Remove stale server entry |
+| `~/.continue/config.json` | Remove stale server entry |
+| `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) | Remove stale server entry |
+| `%APPDATA%/Claude/claude_desktop_config.json` (Windows) | Remove stale server entry |
+| `.vscode/mcp.json` (workspace) | Remove stale server entry |
+| `~/.claude/kg-config.json` | Update repo path if repo was renamed/moved |
+
+After cleanup, re-run the scan to confirm zero results, then proceed to Step 1.
+
+**Note:** Claude Code may cache the extension registry between sessions — restart Claude Code
+after uninstalling before verifying.
+
+---
+
 ### Step 1: Detect Platform
+
 
 Check which AI coding environment is active by running these detection commands:
 
@@ -343,7 +387,7 @@ The knowledge graph config is stored at `~/.claude/kg-config.json`.
 
 Run the initialization command:
 ```
-/kg-sis:init
+/kmgraph:init
 ```
 
 This will prompt for KG name, location, and categories. Follow the wizard.
@@ -402,7 +446,7 @@ The knowledge graph is ready. Encourage the user to try it immediately:
 Try capturing your first lesson now. Think of a problem you recently solved — a bug fix,
 a configuration issue, or a design decision. Run:
 
-/kg-sis:capture-lesson
+/kmgraph:capture-lesson
 
 The wizard will walk you through documenting it.
 ```

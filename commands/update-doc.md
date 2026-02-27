@@ -9,22 +9,22 @@ allowed-tools: Bash, Read, Write, Edit, Glob, Grep, AskUserQuestion
 
 **Version:** 1.0 (Created: 2026-02-21)
 
-**Note:** This command updates existing files. To scaffold a new document, use `/kg-sis:create-doc`. To update a knowledge graph lesson, use `/kg-sis:capture-lesson`. To update an ADR, use `/kg-sis:create-adr`.
+**Note:** This command updates existing files. To scaffold a new document, use `/kmgraph:create-doc`. To update a knowledge graph lesson, use `/kmgraph:capture-lesson`. To update an ADR, use `/kmgraph:create-adr`.
 
 ---
 
 ## Syntax
 
 ```
-/kg-sis:update-doc <file>
-/kg-sis:update-doc <file> --user-facing
+/kmgraph:update-doc <file>
+/kmgraph:update-doc <file> --user-facing
 ```
 
 **Examples:**
-- `/kg-sis:update-doc COMMAND-GUIDE.md --user-facing` → Update plugin documentation wizard
-- `/kg-sis:update-doc README.md --user-facing` → Update README with new feature information
-- `/kg-sis:update-doc some-lesson.md` → Disambiguation dialog, then confirm KG content update
-- `/kg-sis:update-doc docs/CHEAT-SHEET.md --user-facing` → Update cheat sheet syntax block
+- `/kmgraph:update-doc COMMAND-GUIDE.md --user-facing` → Update plugin documentation wizard
+- `/kmgraph:update-doc README.md --user-facing` → Update README with new feature information
+- `/kmgraph:update-doc some-lesson.md` → Disambiguation dialog, then confirm KG content update
+- `/kmgraph:update-doc docs/CHEAT-SHEET.md --user-facing` → Update cheat sheet syntax block
 
 ---
 
@@ -66,7 +66,7 @@ Resolved file: $TARGET_FILE
 1. Plugin documentation (user-facing)
    Docs that ship with the plugin for end users
    (README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, etc.)
-   → Re-run with: /kg-sis:update-doc <file> --user-facing
+   → Re-run with: /kmgraph:update-doc <file> --user-facing
 
 2. Knowledge graph content
    Content created using the plugin
@@ -129,7 +129,7 @@ Last updated: [extracted from date in file, or "unknown"]
 ```
 What type of update?
 
-1. Add new command entry — adds a new /kg-sis:<command> block
+1. Add new command entry — adds a new /kmgraph:<command> block
 2. Update existing command entry — modify flags, examples, or descriptions
 3. Add new section — insert a new ## section
 4. Update metadata only — bump version number and/or last-updated date

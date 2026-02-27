@@ -5,7 +5,7 @@ allowed-tools: Read, Glob
 
 # Knowledge Graph Help
 
-**Purpose:** Display help information for any `/kg-sis:` command. Pulls content directly from `COMMAND-GUIDE.md` so help text always matches the authoritative reference.
+**Purpose:** Display help information for any `/kmgraph:` command. Pulls content directly from `COMMAND-GUIDE.md` so help text always matches the authoritative reference.
 
 **Version:** 1.0 (Created: 2026-02-20)
 
@@ -14,16 +14,16 @@ allowed-tools: Read, Glob
 ## Syntax Detection
 
 ```
-/kg-sis:help
-/kg-sis:help <command-name>
-/kg-sis:help --list
+/kmgraph:help
+/kmgraph:help <command-name>
+/kmgraph:help --list
 ```
 
 **Examples:**
-- `/kg-sis:help` → Show usage instructions for this command
-- `/kg-sis:help capture-lesson` → Show help for `/kg-sis:capture-lesson`
-- `/kg-sis:help create-adr` → Show help for `/kg-sis:create-adr`
-- `/kg-sis:help --list` → List all available commands with one-line descriptions
+- `/kmgraph:help` → Show usage instructions for this command
+- `/kmgraph:help capture-lesson` → Show help for `/kmgraph:capture-lesson`
+- `/kmgraph:help create-adr` → Show help for `/kmgraph:create-adr`
+- `/kmgraph:help --list` → List all available commands with one-line descriptions
 
 ---
 
@@ -33,21 +33,21 @@ allowed-tools: Read, Glob
 
 | Input | Mode |
 |-------|------|
-| `/kg-sis:help` (no argument) | Show this command's own help |
-| `/kg-sis:help --list` | List all commands |
-| `/kg-sis:help <name>` | Look up specific command |
+| `/kmgraph:help` (no argument) | Show this command's own help |
+| `/kmgraph:help --list` | List all commands |
+| `/kmgraph:help <name>` | Look up specific command |
 
 **Normalize the command name:**
-- Strip `/kg-sis:` prefix if user included it
+- Strip `/kmgraph:` prefix if user included it
 - Strip leading `--` if user typed `--capture-lesson`
 - Lowercase the name
-- Examples: `capture-lesson`, `Capture-Lesson`, `/kg-sis:capture-lesson` → all normalize to `capture-lesson`
+- Examples: `capture-lesson`, `Capture-Lesson`, `/kmgraph:capture-lesson` → all normalize to `capture-lesson`
 
 ---
 
 ## Step 2A: --list Mode
 
-**When user typed `/kg-sis:help --list`:**
+**When user typed `/kmgraph:help --list`:**
 
 Read `${CLAUDE_PLUGIN_ROOT}/docs/COMMAND-GUIDE.md` and extract every command heading line (lines matching `### 🟢`, `### 🟡`, or `### 🔴`) along with its `**Purpose**:` line.
 
@@ -57,38 +57,38 @@ Output in this format:
 📚 Knowledge Graph Commands (21 total)
 
 🟢 Essential
-  /kg-sis:init              Initialize a new knowledge graph
-  /kg-sis:capture-lesson    Document lessons learned and solved problems
-  /kg-sis:status            Display active KG status and stats
-  /kg-sis:recall            Search across all project memory systems
+  /kmgraph:init              Initialize a new knowledge graph
+  /kmgraph:capture-lesson    Document lessons learned and solved problems
+  /kmgraph:status            Display active KG status and stats
+  /kmgraph:recall            Search across all project memory systems
 
 🟡 Intermediate
-  /kg-sis:update-graph      Extract insights from lessons to knowledge graph
-  /kg-sis:add-category      Add a new category to an existing knowledge graph
-  /kg-sis:session-summary   Create a summary of the current chat session
-  /kg-sis:list              Display all configured knowledge graphs
-  /kg-sis:switch            Change the active knowledge graph
-  /kg-sis:check-sensitive   Scan for sensitive data before sharing
-  /kg-sis:config-sanitization  Set up pre-commit hooks for sensitive data
-  /kg-sis:extract-chat      Extract chat history from Claude/Gemini logs
+  /kmgraph:update-graph      Extract insights from lessons to knowledge graph
+  /kmgraph:add-category      Add a new category to an existing knowledge graph
+  /kmgraph:session-summary   Create a summary of the current chat session
+  /kmgraph:list              Display all configured knowledge graphs
+  /kmgraph:switch            Change the active knowledge graph
+  /kmgraph:check-sensitive   Scan for sensitive data before sharing
+  /kmgraph:config-sanitization  Set up pre-commit hooks for sensitive data
+  /kmgraph:extract-chat      Extract chat history from Claude/Gemini logs
 
 🔴 Advanced
-  /kg-sis:meta-issue        Track complex multi-attempt problems
-  /kg-sis:start-issue-tracking  Initialize structured issue tracking with Git branch
-  /kg-sis:update-issue-plan     Sync progress to plans and GitHub
-  /kg-sis:link-issue        Link lessons or ADRs to GitHub Issues
-  /kg-sis:archive-memory    Archive stale MEMORY.md entries
-  /kg-sis:restore-memory    Restore archived MEMORY.md entries
-  /kg-sis:sync-all          Run the full sync pipeline in one command
+  /kmgraph:meta-issue        Track complex multi-attempt problems
+  /kmgraph:start-issue-tracking  Initialize structured issue tracking with Git branch
+  /kmgraph:update-issue-plan     Sync progress to plans and GitHub
+  /kmgraph:link-issue        Link lessons or ADRs to GitHub Issues
+  /kmgraph:archive-memory    Archive stale MEMORY.md entries
+  /kmgraph:restore-memory    Restore archived MEMORY.md entries
+  /kmgraph:sync-all          Run the full sync pipeline in one command
 
 📄 Documentation
-  /kg-sis:create-doc        Scaffold new documentation files
-  /kg-sis:create-adr        Create Architecture Decision Records
+  /kmgraph:create-doc        Scaffold new documentation files
+  /kmgraph:create-adr        Create Architecture Decision Records
 
 💡 This command
-  /kg-sis:help              Show help for any command
+  /kmgraph:help              Show help for any command
 
-Run `/kg-sis:help <command-name>` for details on any command.
+Run `/kmgraph:help <command-name>` for details on any command.
 ```
 
 Then offer the interactive prompt (Step 3).
@@ -97,20 +97,20 @@ Then offer the interactive prompt (Step 3).
 
 ## Step 2B: Command Lookup Mode
 
-**When user typed `/kg-sis:help <command-name>`:**
+**When user typed `/kmgraph:help <command-name>`:**
 
 ### 2B.1: Search COMMAND-GUIDE.md
 
 Read `${CLAUDE_PLUGIN_ROOT}/docs/COMMAND-GUIDE.md`.
 
 Search for the heading line that matches the normalized command name:
-- Pattern: `` ### 🟢 `/kg-sis:{name}` `` or 🟡 or 🔴 variant
+- Pattern: `` ### 🟢 `/kmgraph:{name}` `` or 🟡 or 🔴 variant
 
 **If found:** Extract the complete entry — from the heading line through the next `---` separator. Output the full section verbatim.
 
 **Output format:**
 ```
-📖 Help: /kg-sis:{name}
+📖 Help: /kmgraph:{name}
 
 [Full section content from COMMAND-GUIDE.md, exactly as written]
 
@@ -130,7 +130,7 @@ If the command name is not found in COMMAND-GUIDE.md (e.g., `create-doc`, `creat
 3. Output:
 
 ```
-📖 Help: /kg-sis:{name}
+📖 Help: /kmgraph:{name}
 
 Purpose: [description from frontmatter]
 
@@ -146,9 +146,9 @@ Full documentation: commands/{name}.md
 If neither COMMAND-GUIDE.md nor `commands/{name}.md` contains the command:
 
 ```
-❓ Command not found: /kg-sis:{name}
+❓ Command not found: /kmgraph:{name}
 
-Run `/kg-sis:help --list` to see all available commands.
+Run `/kmgraph:help --list` to see all available commands.
 
 Did you mean one of these?
 [List 2-3 closest matches by name similarity]
@@ -158,23 +158,23 @@ Did you mean one of these?
 
 ## Step 2C: No Argument Mode
 
-**When user typed `/kg-sis:help` with no argument:**
+**When user typed `/kmgraph:help` with no argument:**
 
 Output:
 
 ```
-📚 /kg-sis:help — Command Help System
+📚 /kmgraph:help — Command Help System
 
 Display help for any knowledge graph command.
 
 Usage:
-  /kg-sis:help --list              List all 21 commands
-  /kg-sis:help <command-name>      Show full help for a command
+  /kmgraph:help --list              List all 21 commands
+  /kmgraph:help <command-name>      Show full help for a command
 
 Examples:
-  /kg-sis:help capture-lesson
-  /kg-sis:help create-adr
-  /kg-sis:help init
+  /kmgraph:help capture-lesson
+  /kmgraph:help create-adr
+  /kmgraph:help init
 
 The help system pulls content directly from COMMAND-GUIDE.md,
 so help text always matches the authoritative reference.
@@ -193,7 +193,7 @@ After outputting any help content, always offer:
 What would you like to do?
 
 1. See more detailed information — Open the full COMMAND-GUIDE.md entry
-2. Run this command now — Launch /kg-sis:{name} workflow
+2. Run this command now — Launch /kmgraph:{name} workflow
 3. Help with a different command — Type another command name
 ```
 
@@ -206,7 +206,7 @@ What would you like to do?
 
 **Option 2 — Run now:**
 - Immediately begin the command's normal workflow
-- Treat this as if the user typed `/kg-sis:{name}` directly
+- Treat this as if the user typed `/kmgraph:{name}` directly
 
 **Option 3 — Different command:**
 - Prompt: "Which command would you like help with?"
@@ -218,14 +218,14 @@ What would you like to do?
 
 ### Example 1: Look up a specific command
 
-**User types:** `/kg-sis:help capture-lesson`
+**User types:** `/kmgraph:help capture-lesson`
 
 **Assistant responds:**
 
 ```
-📖 Help: /kg-sis:capture-lesson
+📖 Help: /kmgraph:capture-lesson
 
-### 🟢 `/kg-sis:capture-lesson`
+### 🟢 `/kmgraph:capture-lesson`
 
 **Purpose**: Document lessons learned, problems solved, and patterns with git metadata tracking
 
@@ -251,7 +251,7 @@ What would you like to do?
 
 ### Example 2: List all commands
 
-**User types:** `/kg-sis:help --list`
+**User types:** `/kmgraph:help --list`
 
 **Assistant responds:**
 
@@ -259,29 +259,29 @@ What would you like to do?
 📚 Knowledge Graph Commands (21 total)
 
 🟢 Essential
-  /kg-sis:init              Initialize a new knowledge graph
+  /kmgraph:init              Initialize a new knowledge graph
   ...
 ```
 
 ### Example 3: Fallback for new command
 
-**User types:** `/kg-sis:help create-adr`
+**User types:** `/kmgraph:help create-adr`
 
 **Assistant responds:**
 
 ```
-📖 Help: /kg-sis:create-adr
+📖 Help: /kmgraph:create-adr
 
 Purpose: Create Architecture Decision Records with auto-filled git metadata,
          sequential numbering, and index auto-update
 
 Usage:
-  /kg-sis:create-adr
-  /kg-sis:create-adr <title>
+  /kmgraph:create-adr
+  /kmgraph:create-adr <title>
 
 Examples:
-  /kg-sis:create-adr
-  /kg-sis:create-adr Use PostgreSQL for primary database
+  /kmgraph:create-adr
+  /kmgraph:create-adr Use PostgreSQL for primary database
 
 ─────────────────────────────────────────
 Note: This command is not yet indexed in COMMAND-GUIDE.md.
@@ -310,11 +310,11 @@ What would you like to do?
 
 ## Related Commands
 
-- `/kg-sis:status` — Quick overview of the active knowledge graph
-- `/kg-sis:recall` — Search across all documented knowledge
+- `/kmgraph:status` — Quick overview of the active knowledge graph
+- `/kmgraph:recall` — Search across all documented knowledge
 
 ---
 
 **Created:** 2026-02-20
 **Version:** 1.0
-**Usage:** Type `/kg-sis:help <command-name>` for help on any command
+**Usage:** Type `/kmgraph:help <command-name>` for help on any command

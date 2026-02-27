@@ -46,7 +46,7 @@ Verify the plugin loaded by typing `/knowledge` — the autocomplete menu should
 ### Step 2: Initialize the Knowledge Graph
 
 ```bash
-/kg-sis:init
+/kmgraph:init
 ```
 
 The initialization wizard prompts for:
@@ -58,7 +58,7 @@ After completion, the command creates the knowledge graph directory structure in
 ### Step 3: Verify Setup
 
 ```bash
-/kg-sis:status
+/kmgraph:status
 ```
 
 Expected output: `Knowledge Graph: [project-name] | 0 lessons | 0 decisions`
@@ -66,7 +66,7 @@ Expected output: `Knowledge Graph: [project-name] | 0 lessons | 0 decisions`
 ### Step 4: Capture the First Lesson
 
 ```bash
-/kg-sis:capture-lesson
+/kmgraph:capture-lesson
 ```
 
 Claude Code guides the session through documenting a problem solved recently. The command auto-fills metadata fields (`created`, `author`, `git.*`) and asks for the manual fields (`title`, `category`, `tags`).
@@ -76,7 +76,7 @@ Claude Code guides the session through documenting a problem solved recently. Th
 ### Step 5: Verify the Lesson Was Saved
 
 ```bash
-/kg-sis:status
+/kmgraph:status
 ```
 
 Expected output now shows: `1 lesson`
@@ -88,9 +88,9 @@ The workflow for capturing and synchronizing knowledge follows a four-step pipel
 ```mermaid
 %%{init: { 'flowchart': { 'useMaxWidth': true }, 'theme': 'neutral' }}%%
 graph LR
-    A["📝 Capture<br/>/kg-sis:capture-lesson"] --> B["📊 Extract<br/>/kg-sis:update-graph"]
-    B --> C["🔄 Sync<br/>/kg-sis:sync-all"]
-    C --> D["💾 Summarize<br/>/kg-sis:session-summary"]
+    A["📝 Capture<br/>/kmgraph:capture-lesson"] --> B["📊 Extract<br/>/kmgraph:update-graph"]
+    B --> C["🔄 Sync<br/>/kmgraph:sync-all"]
+    C --> D["💾 Summarize<br/>/kmgraph:session-summary"]
 
     accTitle: Knowledge Capture Pipeline
     accDescr: Four-step workflow: Capture lessons (step 1) feeds into Extract patterns (step 2), which feeds into Sync across graphs (step 3), which feeds into Summarize session (step 4)
@@ -128,7 +128,7 @@ Each step serves a specific purpose:
 ### Commands do not appear in Claude Code autocomplete
 
 - Verify the plugin is loaded: start Claude Code with `claude --plugin-dir /path/to/knowledge-graph`
-- Commands use the `knowledge:` prefix with a colon, not a hyphen: `/kg-sis:init` (correct), `/knowledge-init` (incorrect)
+- Commands use the `knowledge:` prefix with a colon, not a hyphen: `/kmgraph:init` (correct), `/knowledge-init` (incorrect)
 - Restart Claude Code completely if commands still do not appear
 
 ### The MCP server does not start

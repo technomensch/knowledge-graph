@@ -2,7 +2,7 @@
 description: Interactive wizard to set up pre-commit hooks for sensitive data detection
 ---
 
-# /kg-sis:configure-sanitization — Setup Sanitization Hooks
+# /kmgraph:configure-sanitization — Setup Sanitization Hooks
 
 Interactive wizard to help users set up pre-commit hooks that scan for potentially sensitive information before committing knowledge graph entries.
 
@@ -96,4 +96,4 @@ Remove or use .sanitization-ignore to bypass.
 
 ## See Also
 
-- `/kg-sis:check-sensitive` — Manually scan KG for sensitive data
+- `/kmgraph:check-sensitive` — Manually scan KG for sensitive data
