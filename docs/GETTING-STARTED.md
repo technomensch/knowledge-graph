@@ -180,6 +180,37 @@ Git is recommended but not required. With git, the system automatically captures
 
 ---
 
+## Skills and Subagents
+
+As you work, the system provides two types of intelligent assistance:
+
+### Skills (Auto-Triggered Context Providers)
+
+Skills activate automatically based on what you're doing. They provide guidance without interrupting:
+
+| Skill | Triggers On | Suggests |
+|---|---|---|
+| **lesson-capture** | Bug solved, breakthrough made | Documenting what you learned |
+| **kg-recall** | Asking about project history, past decisions | Searching the knowledge graph first |
+| **session-wrap** | Session ending, context limit approaching | Summarizing the work before context loss |
+| **adr-guide** | Architecture decisions being made | Documenting decisions as ADRs |
+| **gov-execute-plan** | Implementing from a plan file | Strict plan execution protocol |
+
+You don't invoke skills directly — they appear as helpful context when relevant.
+
+### Subagents (Heavy-Lift Handlers)
+
+Subagents handle resource-intensive tasks in isolation, keeping your main context clean:
+
+| Subagent | Handles | When to Use |
+|---|---|---|
+| **knowledge-extractor** | Parsing large chat logs, extracting patterns from documents | When processing 10+ lessons or 50+ KB at once |
+| **session-documenter** | Git archaeology, session summary generation | When wrapping up complex multi-file sessions |
+
+Use `--delegate knowledge-extractor` or `--delegate session-documenter` in commands like `/kmgraph:update-graph` to invoke subagents for heavy operations.
+
+---
+
 ## Related Documentation
 
 **Installation**:
