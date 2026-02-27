@@ -21,6 +21,7 @@ One-page cheat sheet for the Knowledge Management Graph. For detailed documentat
 - **Work with multiple knowledge graphs** → `/kmgraph:list` then `/kmgraph:switch`
 - **Link lessons to GitHub issues** → `/kmgraph:link-issue`
 - **Update plugin documentation** → `/kmgraph:update-doc --user-facing`
+- **Create comprehensive project handoff** → `/kmgraph:handoff`
 
 ---
 
@@ -66,6 +67,58 @@ Power users leverage these for complex workflows:
 | `/kmgraph:archive-memory` | Archive stale MEMORY.md entries to prevent bloat |
 | `/kmgraph:restore-memory` | Restore archived MEMORY.md entries |
 | `/kmgraph:sync-all` | Automated full sync pipeline (4 steps → 1 command) |
+| `/kmgraph:handoff` | Create comprehensive handoff documentation for transitions or onboarding |
+
+---
+
+## Auto-Triggered Skills
+
+Skills activate automatically based on conversation context. No invocation needed.
+
+| Skill | Trigger Condition | Suggests |
+|-------|------------------|----------|
+| `lesson-capture` | Bug solved, breakthrough made, "figured it out" | `/kmgraph:capture-lesson` with pre-filled context |
+| `kg-recall` | History question, "have we solved this?", past decision | `/kmgraph:recall` with extracted search terms |
+| `session-wrap` | Context approaching limit, major milestone, session end | `/kmgraph:session-summary` before compaction |
+| `adr-guide` | Architecture decision discussed, "I'm thinking of using..." | `/kmgraph:create-adr` with decision guidance |
+| `gov-execute-plan` | "execute plan", implementation start, `docs/plans/*.md` mentioned | Zero-deviation 8-step execution protocol |
+
+---
+
+## Delegation for Heavy-Lift Tasks
+
+When processing large batches or complex files, delegate to subagents to reduce context usage.
+
+### Extraction & Parsing (knowledge-extractor)
+Use for: multi-file analysis, chat history parsing (10+ sessions), large lesson batches (50+ KB)
+```bash
+# Before delegation (default)
+/kmgraph:extract-chat --after=2026-02-01  # Loads all sessions into context
+
+# Suggested delegation
+/kmgraph:extract-chat --project=knowledge-graph
+# (Assistant suggests: "Consider delegating to knowledge-extractor for multi-project filtering")
+```
+
+### Documentation & Git (session-documenter)
+Use for: full session parsing across multiple branches, automated session summaries
+```bash
+# Before delegation (default)
+/kmgraph:session-summary  # Parses entire chat history in-context
+
+# Suggested delegation
+# (Assistant suggests: "For multi-session history, delegate to session-documenter")
+```
+
+### Knowledge Graph Updates (knowledge-extractor)
+Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
+```bash
+# Before delegation (default)
+/kmgraph:update-graph  # Processes all new lessons in-context
+
+# Suggested delegation
+# (Assistant suggests: "For 50+ KB of lessons, delegate to knowledge-extractor")
+```
 
 ---
 
