@@ -196,7 +196,7 @@ knowledge-graph/
 │   └── plans/                # Implementation plans (Phase 1-5)
 ├── README.md                 # This file
 ├── LICENSE                   # MIT
-└── CHANGELOG.md              # Version history
+└── docs/CHANGELOG.md         # Version history
 ```
 
 ### Developer vs. Distribution Structure

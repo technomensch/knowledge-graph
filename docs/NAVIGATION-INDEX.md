@@ -143,10 +143,10 @@
 ```
 knowledge-graph/
 ├── README.md ..................... Project overview
-├── CHANGELOG.md .................. Version history
 ├── ROADMAP.md .................... Development plans
 │
 ├── docs/ ......................... User-facing guides
+│   ├── CHANGELOG.md .............. Version history
 │   ├── GETTING-STARTED.md ........ Installation & first steps ⭐
 │   ├── CONFIGURATION.md .......... Post-install setup
 │   ├── CHEAT-SHEET.md ............ One-page quick reference ⭐

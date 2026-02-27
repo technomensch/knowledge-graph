@@ -13,7 +13,7 @@
     "core/",
     "config/",
     "README.md",
-    "CHANGELOG.md",
+    "docs/CHANGELOG.md",
     "LICENSE"
   ],
   "keywords": [
