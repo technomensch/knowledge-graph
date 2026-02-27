@@ -1,6 +1,6 @@
 {
   "name": "@knowledge-graph-plugin/mcp-server",
-  "version": "1.0.0",
+  "version": "0.0.9-alpha",
   "description": "MCP server for Knowledge Graph Plugin — cross-platform data layer for knowledge capture, search, and management",
   "main": "dist/index.js",
   "bin": {
@@ -17,7 +17,12 @@
     "dev": "tsc --watch",
     "postinstall": "npm run build"
   },
-  "keywords": ["mcp", "knowledge-graph", "lessons-learned", "memory"],
+  "keywords": [
+    "mcp",
+    "knowledge-graph",
+    "lessons-learned",
+    "memory"
+  ],
   "author": "technomensch",
   "license": "MIT",
   "type": "commonjs",
