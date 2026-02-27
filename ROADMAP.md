@@ -159,7 +159,7 @@
   - Command count: 17 → 18
   - Updated status and feature list
 - ✅ Updated ROADMAP.md with v0.0.4-alpha section
-- ✅ Updated CHANGELOG.md with v0.0.4-alpha entry
+- ✅ Updated docs/CHANGELOG.md with v0.0.4-alpha entry
 
 #### Phase 3: ADR Documentation
 - ✅ Created `docs/decisions/ADR-001-defer-memory-rules-engine.md`
@@ -532,7 +532,7 @@ reason: "Pattern evolved to support dynamic tier discovery"
 - v1.0 → v1.1 config changes need migration
 - Add `"version"` field to kg-config.json (already present in v1.0)
 - MCP `kg_config_init` should check version and migrate if needed
-- Document migration path in CHANGELOG.md
+- Document migration path in docs/CHANGELOG.md
 
 **Example migration**:
 ```javascript
@@ -579,7 +579,7 @@ reason: "Pattern evolved to support dynamic tier discovery"
 - [ ] Documentation is comprehensive
 - [ ] MCP server tested on macOS and Linux
 - [ ] README has installation instructions
-- [ ] CHANGELOG.md is up to date
+- [ ] docs/CHANGELOG.md is up to date
 
 **Why not v1.0**: v1.0 IS the marketplace launch. This is the post-launch checklist.
 
