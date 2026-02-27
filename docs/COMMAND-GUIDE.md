@@ -48,6 +48,10 @@ Commands work across platforms, but full automation is Claude Code-specific.
 - **Check for sensitive data before sharing** → `/kmgraph:check-sensitive`
 - **Link lessons to GitHub issues** → `/kmgraph:link-issue`
 
+### Project Transitions & Onboarding
+- **Create comprehensive handoff documentation** → `/kmgraph:handoff`
+- **Set up for new developer** → `/kmgraph:setup-platform`
+
 > **Note**: The term "issues" in this guide refers to GitHub Issues — a platform feature for tracking bugs, feature requests, and enhancements. This is distinct from "knowledge graph issues" (meta-issues) or "lessons learned issues" (problems documented in the KG).
 
 ### Working with Multiple Knowledge Graphs
@@ -934,6 +938,57 @@ Session:          2026-02-11 (enriched)
 **Tips**:
 - Idempotent — safe to run multiple times (existing entries updated, not duplicated)
 - GitHub integration is optional — works fully offline if `gh` CLI is not installed
+
+---
+
+### 🔴 `/kmgraph:handoff`
+
+**Purpose**: Create comprehensive project handoff documentation for transitions, context limits, or onboarding
+
+**When to use**:
+- Before transitioning project to another developer
+- Preparing for context window limits (>180K tokens)
+- Completing a major release cycle
+- Creating documentation for AI assistant handoffs
+- Before taking a long break
+
+**What it creates**:
+1. **START-HERE.md** — Current session state, active branch, next steps
+2. **DOCUMENTATION-MAP.md** — File inventory with purpose annotations
+3. **SESSION-COMPILATION.md** — Recent session summaries linked chronologically
+4. **OPEN-ISSUES.md** — Unresolved issues, PRs, and pending work
+5. **ARCHITECTURE-SNAPSHOT.md** — Current codebase structure and key decisions
+
+**Time**: 2-5 minutes depending on project size
+
+**Example**:
+```bash
+/kmgraph:handoff
+/kmgraph:handoff --output-dir=./backup/
+/kmgraph:handoff --skip-sessions     # Faster, smaller output
+```
+
+**Output**:
+```
+✅ Handoff package created!
+
+Location: ./handoff-packages/2026-02-27
+
+Files:
+- START-HERE.md               — 85 lines
+- DOCUMENTATION-MAP.md        — 156 lines
+- SESSION-COMPILATION.md      — 234 lines
+- OPEN-ISSUES.md              — 67 lines
+- ARCHITECTURE-SNAPSHOT.md    — 189 lines
+
+Total: ~731 lines of documentation
+Reading time: ~30-45 minutes for complete orientation
+```
+
+**Tips**:
+- Creates dated directory: `handoff-packages/YYYY-MM-DD/` by default
+- Files can be shared via zip or archived for future reference
+- Perfect companion to `/kmgraph:session-summary` for comprehensive handoff
 
 ---
 

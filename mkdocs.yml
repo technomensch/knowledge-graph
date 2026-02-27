@@ -6,6 +6,7 @@ repo_name: technomensch/knowledge-graph
 edit_uri: edit/main/docs/
 
 docs_dir: docs
+custom_dir: docs/overrides
 extra_css:
   - stylesheets/extra.css
 
@@ -51,10 +52,10 @@ nav:
       - Cheat Sheet: CHEAT-SHEET.md
       - FAQ: FAQ.md
   - Configuration: CONFIGURATION.md
+  - Changelog: CHANGELOG.md
   - Contributing:
       - Style Guide: STYLE-GUIDE.md
       - Navigation Index: NAVIGATION-INDEX.md
-      - Changelog: CHANGELOG.md
 
 plugins:
   - search:
