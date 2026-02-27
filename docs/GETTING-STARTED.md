@@ -131,7 +131,7 @@ Each step serves a specific purpose:
 
 - **[Real-World Examples](../core/examples/)**
 
-  See completed examples of lessons learned, ADRs, and knowledge entries from real projects.
+  See completed examples of lessons learned, ADRs, and KG entries from real projects.
 
 - **[Set Up Sharing](CONFIGURATION.md#privacy-public-sharing)**
 
@@ -211,26 +211,6 @@ Subagents handle resource-intensive tasks in isolation, keeping your main contex
 | **session-documenter** | Git archaeology (approval-gated commits/pushes) | Complex multi-file sessions, automated session summaries with conventional commit format. Never auto-commits or auto-pushes. |
 
 Use `--delegate knowledge-extractor` or `--delegate session-documenter` in commands like `/kmgraph:extract-chat`, `/kmgraph:update-graph`, or `/kmgraph:session-summary` to invoke subagents for heavy operations.
-
----
-
-## Next Steps for Claude Code Users
-
-<div class="grid cards" markdown>
-
-- **[Essential Commands](COMMAND-GUIDE.md#essential-commands)**
-
-  Start with the core commands: init, capture-lesson, status, and recall. These cover 80% of daily use.
-
-- **[Real-World Examples](../core/examples/)**
-
-  See completed examples of lessons learned, ADRs, and KG entries from real projects.
-
-- **[Set Up Sharing](CONFIGURATION.md#privacy-public-sharing)**
-
-  Configure sanitization to safely share your knowledge graph with team members and the public.
-
-</div>
 
 ---
 
