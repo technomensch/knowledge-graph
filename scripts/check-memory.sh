@@ -1,5 +1,5 @@
 #!/bin/bash
-# check-memory.sh - Knowledge Graph plugin SessionStart hook
+# check-memory.sh - Knowledge Management Graph SessionStart hook
 # Validates KG configuration and MEMORY.md status at session start
 
 # Exit codes:
@@ -33,7 +33,7 @@ if [ ! -f "$MCP_DIST" ]; then
         cd - > /dev/null 2>&1
     else
         echo ""
-        echo "Knowledge Graph plugin requires Node.js to enable search and configuration tools."
+        echo "Knowledge Management Graph requires Node.js to enable search and configuration tools."
         echo ""
         echo "To install Node.js:"
         echo "  macOS:   brew install node"

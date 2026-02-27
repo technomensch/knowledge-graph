@@ -1,6 +1,6 @@
 # Installation
 
-Users can install the Knowledge Graph Plugin using a **universal installer** — a single markdown file that any AI assistant can execute for automated setup.
+Users can install the Knowledge Management Graph using a **universal installer** — a single markdown file that any AI assistant can execute for automated setup.
 
 ---
 

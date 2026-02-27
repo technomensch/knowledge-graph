@@ -1,5 +1,5 @@
 #!/bin/bash
-# hooks-master.sh - Knowledge Graph plugin SessionStart master hook
+# hooks-master.sh - Knowledge Management Graph SessionStart master hook
 # Consolidates check-memory.sh, recent-lessons.sh, and memory-diff-check.sh
 # Security: no eval, no network requests, all variables quoted, subshells quoted
 
@@ -44,7 +44,7 @@ if [ ! -f "$MCP_DIST" ]; then
         cd - > /dev/null 2>&1
     else
         echo ""
-        echo "Knowledge Graph plugin requires Node.js to enable search and configuration tools."
+        echo "Knowledge Management Graph requires Node.js to enable search and configuration tools."
         echo ""
         echo "To install Node.js:"
         echo "  macOS:   brew install node"

@@ -23,7 +23,7 @@ category: architecture
 
 ## Problem
 
-Claude Code plugins support two orthogonal patterns for autonomous execution: **commands** (flat, direct, produce artifacts) and **skills** (hierarchical, guidance-focused). The knowledge graph plugin needed both immediate task automation and contextual guidance, requiring careful architectural research to avoid duplication and confusion.
+Claude Code plugins support two orthogonal patterns for autonomous execution: **commands** (flat, direct, produce artifacts) and **skills** (hierarchical, guidance-focused). The Knowledge Management Graph needed both immediate task automation and contextual guidance, requiring careful architectural research to avoid duplication and confusion.
 
 **Context:**
 - Plugin needed to support `/kg-sis:capture-lesson` (direct automation)

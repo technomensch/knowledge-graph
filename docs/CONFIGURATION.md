@@ -1,6 +1,6 @@
 # Configuration Guide
 
-This guide covers configuring and customizing the Knowledge Graph plugin after installation.
+This guide covers configuring and customizing the Knowledge Management Graph after installation.
 
 > **Installation instructions**: See [GETTING-STARTED.md](GETTING-STARTED.md) for installation steps.
 

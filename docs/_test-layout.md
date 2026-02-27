@@ -87,7 +87,7 @@ theme:
 
 ### Subsection 3.1: Getting Started
 
-The knowledge graph plugin provides structured knowledge capture for Claude Code projects.
+The Knowledge Management Graph provides structured knowledge capture for Claude Code projects.
 
 #### Step 1: Installation
 

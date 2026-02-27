@@ -1,6 +1,6 @@
 # Frequently Asked Questions (FAQ)
 
-This guide provides answers to common questions about using and maintaining the Knowledge Graph plugin.
+This guide provides answers to common questions about using and maintaining the Knowledge Management Graph.
 
 ---
 

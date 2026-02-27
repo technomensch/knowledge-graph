@@ -1,6 +1,6 @@
 # Knowledge Graph Concepts
 
-A plain-English guide to key terms and concepts used throughout the knowledge graph plugin documentation. This guide explains technical terminology in accessible language, with concrete examples for each concept.
+A plain-English guide to key terms and concepts used throughout the Knowledge Management Graph documentation. This guide explains technical terminology in accessible language, with concrete examples for each concept.
 
 **Audience**: First-time users, non-technical team members, and anyone encountering unfamiliar terms in the documentation.
 
@@ -341,7 +341,7 @@ graph TD
 
 **Example**: `/kmgraph:capture-lesson`, `/kmgraph:status`, `/kmgraph:recall` — all share the `knowledge:` prefix.
 
-**Why namespaces exist**: Claude Code plugins can each register their own commands. Namespaces prevent naming collisions when multiple plugins are installed. The `knowledge:` prefix clearly identifies commands belonging to the knowledge graph plugin.
+**Why namespaces exist**: Claude Code plugins can each register their own commands. Namespaces prevent naming collisions when multiple plugins are installed. The `knowledge:` prefix clearly identifies commands belonging to the Knowledge Management Graph.
 
 **Common mistake**: Using a hyphen instead of a colon. The correct syntax is `/kmgraph:command` (colon), not `/knowledge-command` (hyphen).
 

@@ -10,7 +10,7 @@ tags: [security, hooks, shell-scripts, session-start]
 
 ## Context
 
-Knowledge Graph plugin executes shell scripts on every Claude Code SessionStart via `hooks/hooks.json`. Three scripts run automatically:
+Knowledge Management Graph executes shell scripts on every Claude Code SessionStart via `hooks/hooks.json`. Three scripts run automatically:
 
 1. `scripts/check-memory.sh` — Validates KG configuration and MEMORY.md status
 2. `scripts/recent-lessons.sh` — Displays recently modified lessons

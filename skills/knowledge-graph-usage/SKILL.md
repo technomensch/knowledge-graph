@@ -8,7 +8,7 @@ version: 1.0.1
 
 ## Purpose
 
-Provide autonomous guidance for recognizing knowledge capture opportunities and using the knowledge graph plugin effectively. Enable Claude to proactively suggest capturing valuable insights, lessons learned, and decisions without explicit user requests.
+Provide autonomous guidance for recognizing knowledge capture opportunities and using the Knowledge Management Graph effectively. Enable Claude to proactively suggest capturing valuable insights, lessons learned, and decisions without explicit user requests.
 
 ## Core Principles
 

@@ -22,7 +22,7 @@ function ask(rl: readline.Interface, question: string): Promise<string> {
 
 function printHeader(): void {
   console.log("");
-  console.log("  Knowledge Graph Plugin — Setup Wizard");
+  console.log("  Knowledge Management Graph — Setup Wizard");
   console.log("  ======================================");
   console.log("");
 }
@@ -319,7 +319,7 @@ function printConfig(platform: string): void {
 
 function printUsage(): void {
   console.log("");
-  console.log("  Knowledge Graph Plugin CLI");
+  console.log("  Knowledge Management Graph CLI");
   console.log("");
   console.log("  Usage:");
   console.log("    node dist/cli.js              Start MCP server (default)");

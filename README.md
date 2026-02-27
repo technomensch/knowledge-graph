@@ -1,4 +1,4 @@
-# Knowledge Graph Plugin for Claude Code
+# Knowledge Management Graph for Claude Code
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# memory-diff-check.sh - Knowledge Graph plugin SessionStart hook
+# memory-diff-check.sh - Knowledge Management Graph SessionStart hook
 # Notifies user of MEMORY.md changes since last session
 
 # Exit codes:
