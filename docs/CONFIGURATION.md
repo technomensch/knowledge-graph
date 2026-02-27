@@ -277,12 +277,21 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 
 ## Next Steps
 
-**After configuration:**
-1. **Create your first lesson** — Run `/kmgraph:capture-lesson` to document something you've learned
-2. **Study real examples** — Review `core/examples/` to see lesson, ADR, and KG entry patterns
-3. **Customize templates** — Adapt templates in `core/templates/` to your preferences
-4. **Share with team** — Set up sanitization and establish team conventions
-5. **Explore advanced features** — Read [Architecture Guide](../core/docs/ARCHITECTURE.md) for system design
+<div class="grid cards" markdown>
+
+- **[Capture Your First Lesson](GETTING-STARTED.md#step-4-capture-the-first-lesson)**
+
+  Document what you've learned with `/kmgraph:capture-lesson` while details are fresh.
+
+- **[Study Real Examples](../core/examples/)**
+
+  Review completed examples of lessons learned, ADRs, and knowledge graph entries.
+
+- **[Explore Advanced Features](../core/docs/ARCHITECTURE.md)**
+
+  Understand system design, patterns, and how to build custom workflows.
+
+</div>
 
 ---
 

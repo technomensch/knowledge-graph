@@ -214,15 +214,23 @@ Use `--delegate knowledge-extractor` or `--delegate session-documenter` in comma
 
 ---
 
-## What's Next?
+## Next Steps for Claude Code Users
 
-After completing setup and your first lesson:
+<div class="grid cards" markdown>
 
-- **Need quick reference?** → [Cheat Sheet](CHEAT-SHEET.md) — One-page guide to all commands
-- **Explore all commands?** → [Command Reference](COMMAND-GUIDE.md) — Detailed documentation with examples
-- **Understand the concepts?** → [Concepts Guide](CONCEPTS.md) — Definitions and explanations
-- **Customizing your setup?** → [Configuration Guide](CONFIGURATION.md) — Sanitization, team workflows, MCP server
-- **Using non-Claude platforms?** → [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Cursor, Windsurf, Continue integration
+- **[Essential Commands](COMMAND-GUIDE.md#essential-commands)**
+
+  Start with the core commands: init, capture-lesson, status, and recall. These cover 80% of daily use.
+
+- **[Real-World Examples](../core/examples/)**
+
+  See completed examples of lessons learned, ADRs, and KG entries from real projects.
+
+- **[Set Up Sharing](CONFIGURATION.md#privacy-public-sharing)**
+
+  Configure sanitization to safely share your knowledge graph with team members and the public.
+
+</div>
 
 ---
 
