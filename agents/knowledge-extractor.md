@@ -45,3 +45,39 @@ Subagent: Reads chat files, extracts 5 lesson candidates with source refs
 User: "Approve these 3, reject that one, modify this one"
 Subagent: Writes approved items to knowledge graph
 ```
+
+---
+
+## Init-Backfill Mode
+
+**Trigger:** User runs `/kmgraph:init` on a pre-existing project and selects "backfill from existing context" (y/n prompt).
+
+**Input:**
+- List of files to parse:
+  - `README.md` (architecture overview, project context)
+  - `CHANGELOG.md` or `docs/CHANGELOG.md` (decision history, version changes)
+  - `docs/lessons-learned/` directory (existing lessons, if present)
+  - `docs/decisions/` directory (existing ADRs, if present)
+  - `docs/chat-history/` directory (extracted chat logs, if present)
+
+**Output:**
+- Structured lesson candidates extracted from source files
+- Format: category, title, problem/solution, source reference
+- Knowledge entries (patterns, concepts, gotchas) discovered in documentation
+- Presented to user for review before writing
+
+**Constraint:**
+- Remains **read-only** during extraction
+- Awaits explicit user approval of each item before writing to KG
+- User can edit, reject, or accept extracted content
+- Does NOT write to KG until approval received
+
+**Behavior:**
+1. Read README.md → extract architecture overview, key concepts
+2. Read CHANGELOG.md → extract decisions, version changes, important notes
+3. Scan lessons-learned/ → extract existing lessons, categorize by type
+4. Scan decisions/ → extract ADRs, architectural choices
+5. Scan chat-history/ → extract patterns, lessons, insights
+6. Consolidate findings → present candidates to user with source refs
+7. Wait for user approval (edit, reject, accept)
+8. Only then write approved items to active knowledge graph

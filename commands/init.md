@@ -321,6 +321,50 @@ Examples available at ${CLAUDE_PLUGIN_ROOT}/core/examples/ (not copied by defaul
 ⚠️  Note: chat-history/ and sessions/ are always gitignored (never committed to version control)
 ```
 
+### Step 1.10: Optional Backfill from Existing Project
+
+**Prompt user:**
+```
+If initializing in a pre-existing project with chat history, source files, or documentation:
+
+Would you like to backfill the knowledge graph from existing project context? [y/N]
+
+This will parse:
+  • README.md (architecture overview)
+  • CHANGELOG.md / docs/CHANGELOG.md (decision history)
+  • Files in docs/lessons-learned/ or docs/decisions/ (existing knowledge)
+  • Chat history files in docs/chat-history/ (if present)
+
+The knowledge-extractor subagent will suggest new lessons and knowledge entries
+for your review before writing them to the KG.
+```
+
+**If yes:**
+- Invoke `knowledge-extractor` subagent in "init-backfill" mode
+- Pass list of files to parse (README, CHANGELOG, docs/lessons-learned/, docs/decisions/, docs/chat-history/)
+- Present extracted lesson candidates to user for review
+- Write approved items to knowledge graph
+- Output summary of backfilled entries
+
+```
+✅ Backfill complete!
+
+Discovered and added:
+  • X lessons from existing documentation
+  • Y architecture decisions from CHANGELOG
+  • Z patterns from source files
+
+Review these entries in your KG and edit as needed.
+```
+
+**If no:**
+```
+Backfill skipped. The knowledge graph starts empty and grows as you document lessons
+and decisions during development.
+
+Start with: /kmgraph:capture-lesson to document your first learning.
+```
+
 ## Edge Cases
 
 ### No config file exists
