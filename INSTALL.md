@@ -10,6 +10,33 @@ You are installing the **Knowledge Graph Plugin** — a system for capturing les
 
 ---
 
+### Step 0: Verify Shell Access
+
+This installer requires shell access to your local directory. You'll need to grant
+the LLM permission to:
+- Run shell commands
+- Read/write files in your local directory
+
+**Claude Code:** Grant permission when prompted
+**Cursor/Windsurf:** Shell access enabled by default
+**Continue.dev:** Enable in settings
+**Other LLMs:** Not applicable (proceed to Manual Installation section)
+
+**Quick Test:**
+```bash
+echo "Shell access: OK" && node --version && git --version
+```
+
+If this fails, you don't have shell access. Skip to Manual Installation section below.
+
+```bash
+# Check node and git are available
+command -v node >/dev/null 2>&1 || echo "Node.js not found"
+command -v git >/dev/null 2>&1 || echo "Git not found"
+```
+
+---
+
 ## Step 0.5: Check for Previous Installation (Skip if first install)
 
 Run the scan below. **If the output is empty, skip this step entirely and proceed to Step 1.**
@@ -18,7 +45,7 @@ Only take action if stale references are found.
 ```bash
 # Scan for prior versions of this tool
 echo "=== Claude Code extension registry ==="
-claude extension list 2>/dev/null | grep -E "knowledge|kg-sis" || echo "None found"
+claude extension list 2>/dev/null | grep -E "knowledge|kg-sis|kmgraph" || echo "None found"
 
 echo "=== MCP config files ==="
 for f in \
@@ -50,7 +77,6 @@ After cleanup, re-run the scan to confirm zero results, then proceed to Step 1.
 
 **Note:** Claude Code may cache the extension registry between sessions — restart Claude Code
 after uninstalling before verifying.
-
 ---
 
 ### Step 1: Detect Platform
@@ -179,6 +205,8 @@ Store this as `MCP_SERVER_PATH`.
 }
 ```
 
+⚠️ **After modifying MCP config, restart your IDE** for changes to take effect.
+
 **Windsurf** — Write to `~/.codeium/windsurf/mcp_config.json`:
 ```json
 {
@@ -190,6 +218,8 @@ Store this as `MCP_SERVER_PATH`.
   }
 }
 ```
+
+⚠️ **After modifying MCP config, restart your IDE** for changes to take effect.
 
 **Continue.dev** — Add to `~/.continue/config.json` under the `mcpServers` key:
 ```json
@@ -204,6 +234,8 @@ Store this as `MCP_SERVER_PATH`.
 }
 ```
 
+⚠️ **After modifying MCP config, restart your IDE** for changes to take effect.
+
 **JetBrains** — Instruct the user:
 ```
 Open Settings → Tools → AI Assistant → MCP Servers → Add Server:
@@ -211,6 +243,8 @@ Open Settings → Tools → AI Assistant → MCP Servers → Add Server:
   Command: node
   Args: MCP_SERVER_PATH
 ```
+
+⚠️ **After modifying MCP config, restart your IDE** for changes to take effect.
 
 **VS Code (Claude extension)** — Write to `.vscode/mcp.json` in the workspace:
 ```json
@@ -223,6 +257,8 @@ Open Settings → Tools → AI Assistant → MCP Servers → Add Server:
   }
 }
 ```
+
+⚠️ **After modifying MCP config, restart your IDE** for changes to take effect.
 
 **Claude Desktop** — Add to the config file:
 - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
@@ -495,7 +531,69 @@ Open the new file and fill in:
 
 ---
 
+## Manual Installation (No Shell Access Required)
+
+If you don't have shell access, follow these steps manually:
+
+### 1. Download the repository
+- Clone or download as ZIP from [GitHub repo](https://github.com/technomensch/knowledge-graph)
+- Extract to preferred location (e.g., `~/tools/knowledge-graph/`)
+- Note the full path
+
+### 2. (Claude Code only) Install as Extension
+
+- Open Claude Code marketplace
+- Search for "kmgraph" or "knowledge graph"
+- Install and enable
+
+### 3. (MCP Platforms) Configure MCP Server
+
+**For Cursor:**
+- Open `.cursor/mcp.json` in text editor
+- Add entry for this tool (see [COMMAND-GUIDE.md](docs/COMMAND-GUIDE.md) for config format)
+- Restart Cursor
+
+**For Windsurf:**
+- Open `~/.codeium/windsurf/mcp_config.json` in text editor
+- Add entry for this tool
+- Restart Windsurf
+
+**For Continue.dev:**
+- Open `~/.continue/config.json` in text editor
+- Add entry under `mcpServers`
+- Restart Continue.dev
+
+**For VS Code:**
+- Open `.vscode/mcp.json` in workspace
+- Add entry for this tool
+- Restart VS Code
+
+**For Claude Desktop:**
+- macOS: Open `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: Open `%APPDATA%/Claude/claude_desktop_config.json`
+- Add entry under `mcpServers`
+- Restart Claude Desktop
+
+**For JetBrains:**
+- Open Settings → Tools → AI Assistant → MCP Servers → Add Server
+- Restart JetBrains IDE
+
+### 4. Available Commands
+
+Commands are available as reference documentation. Copy their content into your LLM:
+
+- `/kmgraph:init` — Initialize a new knowledge graph
+- `/kmgraph:capture-lesson` — Capture a lesson learned
+- `/kmgraph:recall` — Search across all knowledge
+- `/kmgraph:session-summary` — Generate session summary
+- `/kmgraph:create-adr` — Create architecture decision record
+
+See [COMMAND-GUIDE.md](docs/COMMAND-GUIDE.md) for complete command reference.
+
+---
+
 ## Troubleshooting
+
 
 **MCP server won't start:**
 - Verify Node.js 18+: `node --version`

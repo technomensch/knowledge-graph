@@ -21,7 +21,22 @@ The universal installer is a natural language prompt designed to execute shell s
 
 ---
 
+## Using Commands on Non-Claude-Code Platforms
+
+The commands in this guide work across different platforms:
+
+| Platform | How Commands Work |
+|---|---|
+| **Claude Code** | Slash commands: `/kmgraph:capture-lesson` — full automation |
+| **Cursor, Windsurf, Continue.dev, VS Code** | Paste command content into your LLM. Substitute `${CLAUDE_PLUGIN_ROOT}` with your actual path |
+| **Claude.ai, ChatGPT, Gemini, etc.** | Commands serve as reference documentation. Follow steps manually |
+
+**Note:** Commands are designed to work with any LLM. Full automation is Claude Code-exclusive, but the underlying workflows work everywhere.
+
+---
+
 ## Claude Code Setup
+
 
 **For**: Users with the Claude Code plugin installed.
 

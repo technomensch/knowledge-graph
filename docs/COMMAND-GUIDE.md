@@ -1,8 +1,17 @@
 # Command Reference Guide
 
 > **Claude Code only:** The `/kmgraph:` prefix requires Claude Code with this plugin installed. Other IDEs access equivalent functionality through MCP tools — see [INSTALL.md](INSTALL.md) for platform-specific setup.
+## About Commands on Other Platforms
 
-Complete reference for all knowledge graph commands, organized by difficulty with learning paths.
+These commands are designed as reference documentation for any LLM:
+
+- **Claude Code:** Invoke as slash commands (e.g., `/kmgraph:capture-lesson`)
+- **Other platforms:** Copy the command prompt into your LLM. Substitute `${CLAUDE_PLUGIN_ROOT}` with your actual project path
+- **No-tool LLMs:** Commands serve as workflow documentation — follow steps manually
+
+Commands work across platforms, but full automation is Claude Code-specific.
+
+
 
 ---
 
