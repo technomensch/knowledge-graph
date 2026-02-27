@@ -37,6 +37,18 @@ A knowledge management tool: Claude Code extension + cross-platform MCP server.
 - **Versions:** Sync package.json + plugin.json before pushing (mcp-server independent)
 - **Docs updates:** Update COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED when behavior changes
 
+## Commit Format (Conventional)
+
+Types: `feat` | `fix` | `docs` | `refactor` | `chore` | `perf` | `style` | `test` | `build` | `ci` | `revert`
+
+Format: `type(scope): subject` — include `Closes #N` in body. Scope auto-detected from changed file paths.
+
+## Branch Hierarchy
+
+Chained branches must branch from their parent branch, not main (e.g., `v0.0.10.2` branches from `v0.0.10.1`).
+
+Verify parent branch is fully committed before creating child branch.
+
 ## Quick Commands
 
 ```bash
