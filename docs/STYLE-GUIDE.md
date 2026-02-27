@@ -1,6 +1,6 @@
 # Documentation Style Guide
 
-Authoring standards for contributors writing or reviewing documentation for the Knowledge Graph plugin.
+Authoring standards for contributors writing or reviewing documentation for the Knowledge Management Graph.
 
 **Audience**: Contributors — human developers and AI documentation agents.
 **Version**: v0.0.8-alpha
@@ -66,7 +66,7 @@ Apply to: `CONCEPTS.md`, `COMMAND-GUIDE.md`, `GETTING-STARTED.md`, `NAVIGATION-I
 
 Apply to: `CHEAT-SHEET.md`.
 
-- ✅ "Run `/kg-sis:init` to initialize."
+- ✅ "Run `/kmgraph:init` to initialize."
 - ✅ "This command initializes the knowledge graph."
 - ❌ Mix of imperative and third-person within the same document.
 
@@ -117,7 +117,7 @@ Choose the correct voice for each document type. Mixing voices within a document
 | `COMMAND-GUIDE.md` | Third-person | "The command creates a lesson file in the active category." |
 | `GETTING-STARTED.md` | Third-person | "The initialization wizard prompts for project name." |
 | `NAVIGATION-INDEX.md` | Third-person | "The index organizes documentation into four access paths." |
-| `CHEAT-SHEET.md` | Imperative or neutral | "Run `/kg-sis:init`." or "This command initializes..." |
+| `CHEAT-SHEET.md` | Imperative or neutral | "Run `/kmgraph:init`." or "This command initializes..." |
 | `STYLE-GUIDE.md` (this document) | Imperative | "Use third-person voice." |
 | Code comments and examples | Any style | Exception to all voice rules. |
 
@@ -152,7 +152,7 @@ Use the terms in the "Use This Term" column consistently across all documentatio
 
 | Use This Term | Never Use | Definition |
 |---------------|-----------|------------|
-| **Command** | slash command, plugin command, skill | A prompt manually invoked by the contributor via `/kg-sis:…` |
+| **Command** | slash command, plugin command, skill | A prompt manually invoked by the contributor via `/kmgraph:…` |
 | **Skill** | command (for autonomous triggers) | A prompt triggered automatically by the AI |
 | **Template** | form, blank, scaffold | A pre-formatted markdown file providing structure |
 | **Knowledge graph** | KG (in contributor-facing prose), database, notes system | The quick-reference layer of organized documentation |
@@ -203,7 +203,7 @@ Apply to: `GETTING-STARTED.md`, `CONFIGURATION.md`, `WORKFLOWS.md`, and similar 
 Apply to: individual command entries in `COMMAND-GUIDE.md`.
 
 ```markdown
-### 🟢 `/kg-sis:[command-name]`
+### 🟢 `/kmgraph:[command-name]`
 
 **Purpose**: [One-line description]
 
@@ -219,7 +219,7 @@ Apply to: individual command entries in `COMMAND-GUIDE.md`.
 
 **Example**:
 ```bash
-/kg-sis:[command-name] [optional-args]
+/kmgraph:[command-name] [optional-args]
 ```
 
 **Tips** (optional):

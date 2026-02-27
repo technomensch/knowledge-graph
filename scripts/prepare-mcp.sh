@@ -1,5 +1,5 @@
 #!/bin/bash
-# prepare-mcp.sh - Build the MCP server for the Knowledge Graph plugin
+# prepare-mcp.sh - Build the MCP server for the Knowledge Management Graph
 # Checks prerequisites, installs dependencies, and builds TypeScript
 
 set -e

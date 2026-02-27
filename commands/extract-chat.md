@@ -11,12 +11,12 @@ Automates the extraction of chat history from local Claude (.jsonl) and Gemini (
 ## Usage
 
 ```bash
-/kg-sis:extract-chat [-claude | -gemini]
-/kg-sis:extract-chat --output-dir=<path>
-/kg-sis:extract-chat -claude --output-dir=<custom-path>
-/kg-sis:extract-chat -claude 2026-02-20 through 2026-02-21
-/kg-sis:extract-chat --today
-/kg-sis:extract-chat --project=knowledge-graph
+/kmgraph:extract-chat [-claude | -gemini]
+/kmgraph:extract-chat --output-dir=<path>
+/kmgraph:extract-chat -claude --output-dir=<custom-path>
+/kmgraph:extract-chat -claude 2026-02-20 through 2026-02-21
+/kmgraph:extract-chat --today
+/kmgraph:extract-chat --project=knowledge-graph
 ```
 
 ---
@@ -194,11 +194,11 @@ python3 ${CLAUDE_PLUGIN_ROOT}/core/scripts/run_extraction.py --source $source_fl
 **Example:**
 ```bash
 # First run (morning)
-/kg-sis:extract-chat -claude
+/kmgraph:extract-chat -claude
 # Creates: 2026-02-12-claude.md (2 sessions)
 
 # Second run (evening)
-/kg-sis:extract-chat -claude
+/kmgraph:extract-chat -claude
 # Appends to: 2026-02-12-claude.md (now 5 sessions total)
 ```
 
@@ -208,7 +208,7 @@ python3 ${CLAUDE_PLUGIN_ROOT}/core/scripts/run_extraction.py --source $source_fl
 
 When using the default output directory (active KG):
 1. Extracts to `{active_kg_path}/chat-history/`
-2. Files are automatically included in `/kg-sis:recall` searches
+2. Files are automatically included in `/kmgraph:recall` searches
 3. Session summaries can reference chat history
 4. Chat history can be analyzed for lesson extraction
 
@@ -218,7 +218,7 @@ When using the default output directory (active KG):
 
 When multiple knowledge graphs are configured:
 - Operates on the **active** KG from `~/.claude/kg-config.json`
-- Use `/kg-sis:switch` to change active KG before extraction
+- Use `/kmgraph:switch` to change active KG before extraction
 - Each KG maintains its own chat-history/
 - Use `--output-dir` to extract to specific KG manually
 
@@ -262,7 +262,7 @@ When multiple knowledge graphs are configured:
 pip install blackboxprotobuf
 
 # Or skip protobuf files (JSON extraction still works)
-/kg-sis:extract-chat -gemini  # Will warn about .pb files
+/kmgraph:extract-chat -gemini  # Will warn about .pb files
 ```
 
 ### Problem: Permission denied
@@ -280,7 +280,7 @@ chmod 755 {active_kg_path}/chat-history/
 ### Problem: Output directory not found
 
 **Solution:**
-- Ensure active KG is configured: `/kg-sis:status`
+- Ensure active KG is configured: `/kmgraph:status`
 - Verify KG path exists: `ls {active_kg_path}`
 - Use `--output-dir` with absolute path as workaround
 
@@ -291,7 +291,7 @@ chmod 755 {active_kg_path}/chat-history/
 ### Example 1: Extract all history to active KG
 
 ```bash
-/kg-sis:extract-chat
+/kmgraph:extract-chat
 ```
 
 **Output:**
@@ -308,7 +308,7 @@ Saved to:
 ### Example 2: Extract only Claude history
 
 ```bash
-/kg-sis:extract-chat -claude
+/kmgraph:extract-chat -claude
 ```
 
 **Output:**
@@ -322,7 +322,7 @@ Saved to: {active_kg_path}/chat-history/2026-02-12-claude.md
 ### Example 3: Extract to custom directory
 
 ```bash
-/kg-sis:extract-chat --output-dir=/Users/name/archive/chat-logs
+/kmgraph:extract-chat --output-dir=/Users/name/archive/chat-logs
 ```
 
 **Output:**
@@ -339,7 +339,7 @@ Saved to:
 ### Example 4: Extract a date range
 
 ```bash
-/kg-sis:extract-chat -claude 2026-02-20 through 2026-02-21
+/kmgraph:extract-chat -claude 2026-02-20 through 2026-02-21
 ```
 
 **Output:**
@@ -355,7 +355,7 @@ Saved to:
 ### Example 5: Extract today only
 
 ```bash
-/kg-sis:extract-chat --today
+/kmgraph:extract-chat --today
 ```
 
 **Output:**
@@ -372,7 +372,7 @@ Saved to:
 ### Example 6: Extract sessions for a specific project
 
 ```bash
-/kg-sis:extract-chat --project=knowledge-graph
+/kmgraph:extract-chat --project=knowledge-graph
 ```
 
 **Output:**
@@ -406,5 +406,5 @@ Saved to: {active_kg_path}/chat-history/2026-02-21-claude.md
 
 **Created:** 2026-02-12
 **Version:** 1.0 (Plugin version with OUTPUT_DIR fix)
-**Integration:** Works with active KG, `/kg-sis:recall`, session summaries
-**Related Skills:** /kg-sis:session-summary, /kg-sis:capture-lesson
+**Integration:** Works with active KG, `/kmgraph:recall`, session summaries
+**Related Skills:** /kmgraph:session-summary, /kmgraph:capture-lesson

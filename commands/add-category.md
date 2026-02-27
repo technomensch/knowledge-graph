@@ -2,16 +2,16 @@
 description: Add a new category to an existing knowledge graph with optional custom prefix
 ---
 
-# /kg-sis:add-category — Add Category to Knowledge Graph
+# /kmgraph:add-category — Add Category to Knowledge Graph
 
 Add a new category to the active knowledge graph with optional custom prefix and git strategy.
 
 ## Syntax
 
 ```bash
-/kg-sis:add-category
-/kg-sis:add-category security
-/kg-sis:add-category ml-ops --prefix ml- --git ignore
+/kmgraph:add-category
+/kmgraph:add-category security
+/kmgraph:add-category ml-ops --prefix ml- --git ignore
 ```
 
 ## What This Does
@@ -70,5 +70,5 @@ fi
 
 ## See Also
 
-- `/kg-sis:init` — Initialize new KG
-- `/kg-sis:list` — View all KGs and their categories
+- `/kmgraph:init` — Initialize new KG
+- `/kmgraph:list` — View all KGs and their categories

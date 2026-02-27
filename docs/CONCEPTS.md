@@ -1,6 +1,6 @@
 # Knowledge Graph Concepts
 
-A plain-English guide to key terms and concepts used throughout the knowledge graph plugin documentation. This guide explains technical terminology in accessible language, with concrete examples for each concept.
+A plain-English guide to key terms and concepts used throughout the Knowledge Management Graph documentation. This guide explains technical terminology in accessible language, with concrete examples for each concept.
 
 **Audience**: First-time users, non-technical team members, and anyone encountering unfamiliar terms in the documentation.
 
@@ -135,7 +135,7 @@ graph TD
 
 **Why it matters**: Users working across multiple projects may maintain separate knowledge graphs for each one (e.g., one for a web app, another for an infrastructure project). Commands operate on whichever graph is currently active.
 
-**How to manage**: The `/kg-sis:list` command displays all configured graphs. The `/kg-sis:switch` command changes the active selection.
+**How to manage**: The `/kmgraph:list` command displays all configured graphs. The `/kmgraph:switch` command changes the active selection.
 
 **Plain English**: The "currently open notebook" when multiple notebooks exist.
 
@@ -180,9 +180,9 @@ graph TD
 | **patterns** | Reusable design patterns, best practices | "Retry Pattern for API Calls" |
 | **debugging** | Troubleshooting, bug fixes, root cause analysis | "Solving Memory Leak in Node.js" |
 
-**Custom categories**: The `/kg-sis:add-category` command allows adding project-specific categories beyond the four defaults.
+**Custom categories**: The `/kmgraph:add-category` command allows adding project-specific categories beyond the four defaults.
 
-**Auto-detection**: When using the `/kg-sis:capture-lesson` command, the system suggests a category based on keywords in the lesson title and content. The suggestion can be accepted or overridden.
+**Auto-detection**: When using the `/kmgraph:capture-lesson` command, the system suggests a category based on keywords in the lesson title and content. The suggestion can be accepted or overridden.
 
 **Plain English**: Filing cabinet labels that organize lessons by topic.
 
@@ -219,7 +219,7 @@ graph TD
 
 **Why it matters**: Git metadata creates a breadcrumb trail from documentation back to code. When reviewing a lesson months later, the linked commit and PR provide direct access to the actual code changes.
 
-**How it works**: When running inside a git repository, the `/kg-sis:capture-lesson` command automatically detects and records these fields. No manual entry is required.
+**How it works**: When running inside a git repository, the `/kmgraph:capture-lesson` command automatically detects and records these fields. No manual entry is required.
 
 **Plain English**: A breadcrumb trail connecting lessons back to actual code changes.
 
@@ -229,7 +229,7 @@ graph TD
 
 **What it is**: A tracking item on GitHub used to report bugs, request features, or plan enhancements. In the knowledge graph context, "issue" refers specifically to GitHub Issues — not general problems or troubleshooting concerns.
 
-**Relationship to knowledge graph**: Lessons and ADRs can be linked to GitHub issues via the `/kg-sis:link-issue` command, creating bidirectional traceability between documentation and project management.
+**Relationship to knowledge graph**: Lessons and ADRs can be linked to GitHub issues via the `/kmgraph:link-issue` command, creating bidirectional traceability between documentation and project management.
 
 **Disambiguation**: When the documentation mentions "issues," it refers to GitHub Issues (bug reports or feature requests), not to "issues" in the general sense of problems or difficulties.
 
@@ -254,7 +254,7 @@ graph TD
 
 **Full example**: `2024-01-15T14:30:00Z` = January 15, 2024 at 2:30 PM UTC.
 
-**In templates**: Date fields use this format. The `/kg-sis:capture-lesson` command fills timestamps automatically. Manual users can use the date-only form: `2024-01-15`.
+**In templates**: Date fields use this format. The `/kmgraph:capture-lesson` command fills timestamps automatically. Manual users can use the date-only form: `2024-01-15`.
 
 **Plain English**: Year-Month-Day format that computers and humans both read consistently.
 
@@ -271,7 +271,7 @@ graph TD
 4. **Prevention** — How to avoid the same problem in the future
 5. **Key Takeaways** — Concise lessons for quick reference
 
-**How to create one**: Claude Code users run `/kg-sis:capture-lesson`. Manual users copy the lesson template from `core/templates/lessons-learned/lesson-template.md` and fill in each section.
+**How to create one**: Claude Code users run `/kmgraph:capture-lesson`. Manual users copy the lesson template from `core/templates/lessons-learned/lesson-template.md` and fill in each section.
 
 **When to write one**: After solving any non-trivial problem. The best time to document is immediately after solving the problem, while details are fresh.
 
@@ -303,14 +303,14 @@ graph TD
 
 **How it works**:
 1. Lessons and patterns accumulate over time
-2. The `/kg-sis:update-graph` command extracts the most important insights
+2. The `/kmgraph:update-graph` command extracts the most important insights
 3. Key patterns are written to MEMORY.md
 4. Claude loads MEMORY.md at the start of each session
 5. Claude "remembers" documented patterns without being reminded
 
 **Why it exists**: AI assistant context resets between sessions. MEMORY.md bridges that gap by ensuring key learnings persist across conversations.
 
-**Size management**: MEMORY.md works best under 200 lines. When it grows too large, the `/kg-sis:archive-memory` command moves older entries to `MEMORY-archive.md`. Archived entries can be restored with `/kg-sis:restore-memory`.
+**Size management**: MEMORY.md works best under 200 lines. When it grows too large, the `/kmgraph:archive-memory` command moves older entries to `MEMORY-archive.md`. Archived entries can be restored with `/kmgraph:restore-memory`.
 
 **Plain English**: The AI assistant's long-term memory file — ensures important learnings survive between sessions.
 
@@ -339,11 +339,11 @@ graph TD
 
 **What it is**: The `knowledge:` prefix that appears before every command name, grouping all knowledge graph commands under a single namespace.
 
-**Example**: `/kg-sis:capture-lesson`, `/kg-sis:status`, `/kg-sis:recall` — all share the `knowledge:` prefix.
+**Example**: `/kmgraph:capture-lesson`, `/kmgraph:status`, `/kmgraph:recall` — all share the `knowledge:` prefix.
 
-**Why namespaces exist**: Claude Code plugins can each register their own commands. Namespaces prevent naming collisions when multiple plugins are installed. The `knowledge:` prefix clearly identifies commands belonging to the knowledge graph plugin.
+**Why namespaces exist**: Claude Code plugins can each register their own commands. Namespaces prevent naming collisions when multiple plugins are installed. The `knowledge:` prefix clearly identifies commands belonging to the Knowledge Management Graph.
 
-**Common mistake**: Using a hyphen instead of a colon. The correct syntax is `/kg-sis:command` (colon), not `/knowledge-command` (hyphen).
+**Common mistake**: Using a hyphen instead of a colon. The correct syntax is `/kmgraph:command` (colon), not `/knowledge-command` (hyphen).
 
 **Plain English**: A label that groups all knowledge graph commands together and prevents name conflicts with other plugins.
 
@@ -369,7 +369,7 @@ graph TD
 
 **What it is**: An automated check that runs every time a `git commit` is attempted. In the knowledge graph context, pre-commit hooks scan for sensitive data (API keys, passwords, credentials) before allowing a commit to proceed.
 
-**How to set up**: The `/kg-sis:config-sanitization` command provides a wizard-based setup for configuring pre-commit hooks.
+**How to set up**: The `/kmgraph:config-sanitization` command provides a wizard-based setup for configuring pre-commit hooks.
 
 **What it catches**: API keys, passwords, tokens, email addresses, internal URLs, and other patterns that should not be committed to a shared repository.
 
@@ -390,8 +390,8 @@ graph TD
 - Company-specific or customer-specific data
 
 **Two levels of protection**:
-1. **Manual scan**: The `/kg-sis:check-sensitive` command scans all knowledge graph files and reports findings for review.
-2. **Automated prevention**: The `/kg-sis:config-sanitization` command sets up pre-commit hooks that block commits containing sensitive patterns.
+1. **Manual scan**: The `/kmgraph:check-sensitive` command scans all knowledge graph files and reports findings for review.
+2. **Automated prevention**: The `/kmgraph:config-sanitization` command sets up pre-commit hooks that block commits containing sensitive patterns.
 
 **Why it matters**: Knowledge graphs are most valuable when shared with team members. Sanitization ensures that sharing does not accidentally expose credentials or private information.
 
@@ -405,7 +405,7 @@ graph TD
 
 **When to create**: After a significant work session, particularly one involving architecture discussions, major debugging efforts, or important decisions.
 
-**How to create**: The `/kg-sis:session-summary` command generates a summary from the current conversation. Manual users can copy the session template from `core/templates/sessions/session-template.md`.
+**How to create**: The `/kmgraph:session-summary` command generates a summary from the current conversation. Manual users can copy the session template from `core/templates/sessions/session-template.md`.
 
 **Sections included**: Overview, key accomplishments, decisions made, lessons learned, and next steps.
 
@@ -422,7 +422,7 @@ graph TD
 3. **Sync** — Update MEMORY.md with new patterns
 4. **Summarize** — Create a session summary
 
-**How to run**: The `/kg-sis:sync-all` command orchestrates all four steps automatically. Individual steps can also be run separately for more control.
+**How to run**: The `/kmgraph:sync-all` command orchestrates all four steps automatically. Individual steps can also be run separately for more control.
 
 **When to use**: At major milestones, end-of-week reviews, or before sharing knowledge with the team. Daily use typically involves only Step 1 (capture) and Step 2 (extract).
 
@@ -447,7 +447,7 @@ graph TD
 
 **How to use (manual workflow)**: Copy the template, fill in `[MANUAL]` fields, write content in the body sections, save, and commit.
 
-**How to use (Claude Code)**: Run the corresponding command (e.g., `/kg-sis:capture-lesson`). The command fills `[AUTO]` fields and guides the user through `[MANUAL]` fields interactively.
+**How to use (Claude Code)**: Run the corresponding command (e.g., `/kmgraph:capture-lesson`). The command fills `[AUTO]` fields and guides the user through `[MANUAL]` fields interactively.
 
 **Plain English**: A fill-in-the-blank form that ensures every entry has the right structure.
 
@@ -530,9 +530,9 @@ Regular notes are freeform and often lost or forgotten. A knowledge graph adds s
 ### "What happens when MEMORY.md gets too large?"
 
 MEMORY.md works best under 200 lines. When it grows beyond that threshold:
-1. Run `/kg-sis:archive-memory` to move older entries to `MEMORY-archive.md`
+1. Run `/kmgraph:archive-memory` to move older entries to `MEMORY-archive.md`
 2. Archived entries remain available for reference but no longer load into AI context
-3. Run `/kg-sis:restore-memory` to bring back any archived entry when needed
+3. Run `/kmgraph:restore-memory` to bring back any archived entry when needed
 
 ---
 

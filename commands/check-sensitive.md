@@ -2,7 +2,7 @@
 description: Scan active knowledge graph for potentially sensitive information before public sharing
 ---
 
-# /kg-sis:check-sensitive — Scan for Sensitive Data
+# /kmgraph:check-sensitive — Scan for Sensitive Data
 
 Scan the active knowledge graph for potentially sensitive information using regex patterns from config or defaults.
 
@@ -17,8 +17,8 @@ Scans all markdown files in active KG for:
 ## Syntax
 
 ```bash
-/kg-sis:check-sensitive
-/kg-sis:check-sensitive --fix-suggestions
+/kmgraph:check-sensitive
+/kmgraph:check-sensitive --fix-suggestions
 ```
 
 ## Implementation
@@ -106,4 +106,4 @@ Run with --fix-suggestions to see recommended fixes.
 
 ## See Also
 
-- `/kg-sis:configure-sanitization` — Set up automated pre-commit scanning
+- `/kmgraph:configure-sanitization` — Set up automated pre-commit scanning

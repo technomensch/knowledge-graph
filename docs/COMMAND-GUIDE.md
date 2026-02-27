@@ -1,8 +1,17 @@
 # Command Reference Guide
 
-> **Claude Code only:** The `/kg-sis:` prefix requires Claude Code with this plugin installed. Other IDEs access equivalent functionality through MCP tools — see [INSTALL.md](INSTALL.md) for platform-specific setup.
+> **Claude Code only:** The `/kmgraph:` prefix requires Claude Code with this plugin installed. Other IDEs access equivalent functionality through MCP tools — see [INSTALL.md](INSTALL.md) for platform-specific setup.
+## About Commands on Other Platforms
 
-Complete reference for all knowledge graph commands, organized by difficulty with learning paths.
+These commands are designed as reference documentation for any LLM:
+
+- **Claude Code:** Invoke as slash commands (e.g., `/kmgraph:capture-lesson`)
+- **Other platforms:** Copy the command prompt into your LLM. Substitute `${CLAUDE_PLUGIN_ROOT}` with your actual project path
+- **No-tool LLMs:** Commands serve as workflow documentation — follow steps manually
+
+Commands work across platforms, but full automation is Claude Code-specific.
+
+
 
 ---
 
@@ -22,38 +31,38 @@ Complete reference for all knowledge graph commands, organized by difficulty wit
 ## I Want To...
 
 ### Getting Started
-- **Set up a new knowledge graph** → `/kg-sis:init`
-- **See what's in my knowledge graph** → `/kg-sis:status`
-- **Document what I just learned** → `/kg-sis:capture-lesson`
-- **Find something I documented before** → `/kg-sis:recall "search query"`
+- **Set up a new knowledge graph** → `/kmgraph:init`
+- **See what's in my knowledge graph** → `/kmgraph:status`
+- **Document what I just learned** → `/kmgraph:capture-lesson`
+- **Find something I documented before** → `/kmgraph:recall "search query"`
 
 ### Daily Use
-- **Sync lessons to the knowledge graph** → `/kg-sis:update-graph`
-- **Summarize this conversation** → `/kg-sis:session-summary`
-- **Add a new category (e.g., security, ml-ops)** → `/kg-sis:add-category`
-- **See my chat history** → `/kg-sis:extract-chat`
-- **Update plugin documentation** → `/kg-sis:update-doc --user-facing`
+- **Sync lessons to the knowledge graph** → `/kmgraph:update-graph`
+- **Summarize this conversation** → `/kmgraph:session-summary`
+- **Add a new category (e.g., security, ml-ops)** → `/kmgraph:add-category`
+- **See my chat history** → `/kmgraph:extract-chat`
+- **Update plugin documentation** → `/kmgraph:update-doc --user-facing`
 
 ### Team Collaboration
-- **Share knowledge safely** → `/kg-sis:config-sanitization`
-- **Check for sensitive data before sharing** → `/kg-sis:check-sensitive`
-- **Link lessons to GitHub issues** → `/kg-sis:link-issue`
+- **Share knowledge safely** → `/kmgraph:config-sanitization`
+- **Check for sensitive data before sharing** → `/kmgraph:check-sensitive`
+- **Link lessons to GitHub issues** → `/kmgraph:link-issue`
 
 > **Note**: The term "issues" in this guide refers to GitHub Issues — a platform feature for tracking bugs, feature requests, and enhancements. This is distinct from "knowledge graph issues" (meta-issues) or "lessons learned issues" (problems documented in the KG).
 
 ### Working with Multiple Knowledge Graphs
-- **View all configured knowledge graphs** → `/kg-sis:list`
-- **Switch to a different knowledge graph** → `/kg-sis:switch`
+- **View all configured knowledge graphs** → `/kmgraph:list`
+- **Switch to a different knowledge graph** → `/kmgraph:switch`
 
 ### Complex Problem Tracking
-- **Track a multi-attempt bug** → `/kg-sis:meta-issue`
-- **Start structured issue tracking with documentation and Git branch** → `/kg-sis:start-issue-tracking`
-- **Sync progress to plans and GitHub** → `/kg-sis:update-issue-plan`
+- **Track a multi-attempt bug** → `/kmgraph:meta-issue`
+- **Start structured issue tracking with documentation and Git branch** → `/kmgraph:start-issue-tracking`
+- **Sync progress to plans and GitHub** → `/kmgraph:update-issue-plan`
 
 ### Memory Management
-- **Free up MEMORY.md token budget** → `/kg-sis:archive-memory`
-- **Bring back archived context** → `/kg-sis:restore-memory`
-- **Run the full sync pipeline in one command** → `/kg-sis:sync-all`
+- **Free up MEMORY.md token budget** → `/kmgraph:archive-memory`
+- **Bring back archived context** → `/kmgraph:restore-memory`
+- **Run the full sync pipeline in one command** → `/kmgraph:sync-all`
 
 ---
 
@@ -64,15 +73,15 @@ Complete reference for all knowledge graph commands, organized by difficulty wit
 **Goal**: Capture your first 5 lessons
 
 1. **Day 1**: Setup
-   - Run `/kg-sis:init`
-   - Verify with `/kg-sis:status`
+   - Run `/kmgraph:init`
+   - Verify with `/kmgraph:status`
 
 2. **Day 2-5**: Daily capture
-   - After solving each problem: `/kg-sis:capture-lesson`
-   - Review captured lessons: `/kg-sis:status`
+   - After solving each problem: `/kmgraph:capture-lesson`
+   - Review captured lessons: `/kmgraph:status`
 
 3. **End of week**: Search
-   - Practice searching: `/kg-sis:recall "database"`
+   - Practice searching: `/kmgraph:recall "database"`
    - Goal: Find lessons you captured
 
 **Success**: 5 lessons documented, can find them via search
@@ -84,18 +93,18 @@ Complete reference for all knowledge graph commands, organized by difficulty wit
 **Goal**: Make knowledge graph part of daily workflow
 
 1. **Add custom categories** (if needed)
-   - `/kg-sis:add-category` for team-specific categories
+   - `/kmgraph:add-category` for team-specific categories
 
 2. **Sync regularly**
-   - End of each day: `/kg-sis:update-graph`
+   - End of each day: `/kmgraph:update-graph`
    - Keeps knowledge graph current
 
 3. **Summarize important sessions**
-   - After important discussions: `/kg-sis:session-summary`
+   - After important discussions: `/kmgraph:session-summary`
 
 4. **Work with multiple KGs** (optional)
-   - `/kg-sis:list` to see all
-   - `/kg-sis:switch` to change active
+   - `/kmgraph:list` to see all
+   - `/kmgraph:switch` to change active
 
 **Success**: Knowledge graph updates daily, MEMORY.md reflects learnings
 
@@ -106,20 +115,20 @@ Complete reference for all knowledge graph commands, organized by difficulty wit
 **Goal**: Power user features for complex workflows
 
 1. **Team safety**
-   - `/kg-sis:config-sanitization` (one-time setup)
-   - `/kg-sis:check-sensitive` (before sharing)
+   - `/kmgraph:config-sanitization` (one-time setup)
+   - `/kmgraph:check-sensitive` (before sharing)
 
 2. **Complex problem tracking**
-   - `/kg-sis:meta-issue` for multi-attempt bugs
-   - `/kg-sis:start-issue-tracking` for systematic tracking
+   - `/kmgraph:meta-issue` for multi-attempt bugs
+   - `/kmgraph:start-issue-tracking` for systematic tracking
 
 3. **GitHub integration**
-   - `/kg-sis:link-issue` to connect lessons with GitHub Issues
-   - `/kg-sis:update-issue-plan` to sync with GitHub
+   - `/kmgraph:link-issue` to connect lessons with GitHub Issues
+   - `/kmgraph:update-issue-plan` to sync with GitHub
 
 4. **Memory management**
-   - `/kg-sis:archive-memory` when MEMORY.md gets large
-   - `/kg-sis:restore-memory` to bring back old patterns
+   - `/kmgraph:archive-memory` when MEMORY.md gets large
+   - `/kmgraph:restore-memory` to bring back old patterns
 
 **Success**: Full integration with team workflow, GitHub tracking active
 
@@ -131,57 +140,57 @@ Complete reference for all knowledge graph commands, organized by difficulty wit
 
     Get the knowledge graph running and configure how it works.
 
-    - [🟢 `/kg-sis:init`](#-kgsisinitcommands-tab) — Initialize a new knowledge graph
-    - [🟡 `/kg-sis:list`](#-kgsislist-commands-tab) — View all configured knowledge graphs
-    - [🟡 `/kg-sis:switch`](#-kgsisswitch-commands-tab) — Switch to a different knowledge graph
-    - [🟡 `/kg-sis:add-category`](#-kgsisadd-category-commands-tab) — Add custom categories
-    - [🟡 `/kg-sis:config-sanitization`](#-kgsisconfig-sanitization-commands-tab) — Set up safety features for team sharing
+    - [🟢 `/kmgraph:init`](#-kgsisinitcommands-tab) — Initialize a new knowledge graph
+    - [🟡 `/kmgraph:list`](#-kgsislist-commands-tab) — View all configured knowledge graphs
+    - [🟡 `/kmgraph:switch`](#-kgsisswitch-commands-tab) — Switch to a different knowledge graph
+    - [🟡 `/kmgraph:add-category`](#-kgsisadd-category-commands-tab) — Add custom categories
+    - [🟡 `/kmgraph:config-sanitization`](#-kgsisconfig-sanitization-commands-tab) — Set up safety features for team sharing
 
 === "Capture & Document" {: #-kgsiscapture-lesson-commands-tab}
 
     Document lessons, capture history, and summarize sessions.
 
-    - [🟢 `/kg-sis:capture-lesson`](#-kgsiscapture-lesson-commands-tab) — Capture problems solved and patterns discovered
-    - [🟡 `/kg-sis:extract-chat`](#-kgsisextract-chat-commands-tab) — Export chat history to markdown
-    - [🟡 `/kg-sis:session-summary`](#-kgsisssession-summary-commands-tab) — Summarize important work sessions
+    - [🟢 `/kmgraph:capture-lesson`](#-kgsiscapture-lesson-commands-tab) — Capture problems solved and patterns discovered
+    - [🟡 `/kmgraph:extract-chat`](#-kgsisextract-chat-commands-tab) — Export chat history to markdown
+    - [🟡 `/kmgraph:session-summary`](#-kgsisssession-summary-commands-tab) — Summarize important work sessions
 
 === "Search & Synchronization" {: #-kgsisstatus-commands-tab}
 
     Find knowledge and keep the graph synchronized.
 
-    - [🟢 `/kg-sis:status`](#-kgsistatus-commands-tab) — Check current knowledge graph status
-    - [🟢 `/kg-sis:recall`](#-kgsisrecall-commands-tab) — Search across all knowledge entries
-    - [🟡 `/kg-sis:update-graph`](#-kgsisupdate-graph-commands-tab) — Extract lessons into knowledge graph
-    - [🟡 `/kg-sis:update-doc`](#-kgsisupdate-doc-commands-tab) — Update documentation with changes
-    - [🔴 `/kg-sis:sync-all`](#-kgsissync-all-commands-tab) — Run complete synchronization pipeline
+    - [🟢 `/kmgraph:status`](#-kgsistatus-commands-tab) — Check current knowledge graph status
+    - [🟢 `/kmgraph:recall`](#-kgsisrecall-commands-tab) — Search across all knowledge entries
+    - [🟡 `/kmgraph:update-graph`](#-kgsisupdate-graph-commands-tab) — Extract lessons into knowledge graph
+    - [🟡 `/kmgraph:update-doc`](#-kgsisupdate-doc-commands-tab) — Update documentation with changes
+    - [🔴 `/kmgraph:sync-all`](#-kgsissync-all-commands-tab) — Run complete synchronization pipeline
 
 === "Team & Sharing" {: #-kgsischeck-sensitive-commands-tab}
 
     Share knowledge safely with team members.
 
-    - [🟡 `/kg-sis:check-sensitive`](#-kgsischeck-sensitive-commands-tab) — Scan for sensitive data before sharing
-    - [🔴 `/kg-sis:link-issue`](#-kgsislink-issue-commands-tab) — Connect lessons to GitHub issues
+    - [🟡 `/kmgraph:check-sensitive`](#-kgsischeck-sensitive-commands-tab) — Scan for sensitive data before sharing
+    - [🔴 `/kmgraph:link-issue`](#-kgsislink-issue-commands-tab) — Connect lessons to GitHub issues
 
 === "Advanced Issues" {: #-kgsismeta-issue-commands-tab}
 
     Track complex, multi-attempt problems systematically.
 
-    - [🔴 `/kg-sis:meta-issue`](#-kgsismeta-issue-commands-tab) — Track multi-attempt bugs and features
-    - [🔴 `/kg-sis:start-issue-tracking`](#-kgsisstart-issue-tracking-commands-tab) — Systematic issue tracking with Git branches
-    - [🔴 `/kg-sis:update-issue-plan`](#-kgsisupdate-issue-plan-commands-tab) — Sync progress with GitHub and plans
+    - [🔴 `/kmgraph:meta-issue`](#-kgsismeta-issue-commands-tab) — Track multi-attempt bugs and features
+    - [🔴 `/kmgraph:start-issue-tracking`](#-kgsisstart-issue-tracking-commands-tab) — Systematic issue tracking with Git branches
+    - [🔴 `/kmgraph:update-issue-plan`](#-kgsisupdate-issue-plan-commands-tab) — Sync progress with GitHub and plans
 
 === "Memory Management" {: #-kgsisarchive-memory-commands-tab}
 
     Manage MEMORY.md size and archive old patterns.
 
-    - [🔴 `/kg-sis:archive-memory`](#-kgsisarchive-memory-commands-tab) — Archive old patterns from MEMORY.md
-    - [🔴 `/kg-sis:restore-memory`](#-kgsisrestore-memory-commands-tab) — Restore archived context
+    - [🔴 `/kmgraph:archive-memory`](#-kgsisarchive-memory-commands-tab) — Archive old patterns from MEMORY.md
+    - [🔴 `/kmgraph:restore-memory`](#-kgsisrestore-memory-commands-tab) — Restore archived context
 
 ---
 
 ## Essential Commands
 
-### 🟢 `/kg-sis:init`
+### 🟢 `/kmgraph:init`
 
 **Purpose**: Initialize a new knowledge graph with wizard-based setup
 
@@ -204,7 +213,7 @@ Complete reference for all knowledge graph commands, organized by difficulty wit
 
 **Example**:
 ```bash
-/kg-sis:init
+/kmgraph:init
 
 # Claude asks:
 # - What should this knowledge graph be called?
@@ -214,11 +223,11 @@ Complete reference for all knowledge graph commands, organized by difficulty wit
 # - Git strategy for each category? (commit/ignore)
 ```
 
-**Next steps**: Run `/kg-sis:status` to verify setup
+**Next steps**: Run `/kmgraph:status` to verify setup
 
 ---
 
-### 🟢 `/kg-sis:capture-lesson`
+### 🟢 `/kmgraph:capture-lesson`
 
 **Purpose**: Document lessons learned, problems solved, and patterns with git metadata tracking
 
@@ -236,14 +245,14 @@ Complete reference for all knowledge graph commands, organized by difficulty wit
 5. Guides content gathering (problem, root cause, solution, prevention)
 6. Writes the lesson file using the template from `core/templates/`
 7. Updates category and chronological indexes
-8. Optionally triggers `/kg-sis:update-graph` to extract KG entries
-9. Optionally links to a GitHub Issue via `/kg-sis:link-issue`
+8. Optionally triggers `/kmgraph:update-graph` to extract KG entries
+9. Optionally links to a GitHub Issue via `/kmgraph:link-issue`
 
 **Time**: 5-10 minutes (faster with practice)
 
 **Example**:
 ```bash
-/kg-sis:capture-lesson
+/kmgraph:capture-lesson
 
 # Claude guides you through:
 # 1. What problem did you encounter?
@@ -259,12 +268,12 @@ Complete reference for all knowledge graph commands, organized by difficulty wit
 
 ---
 
-### 🟢 `/kg-sis:status`
+### 🟢 `/kmgraph:status`
 
 **Purpose**: Display active knowledge graph status, stats, and quick command reference
 
 **When to use**:
-- Verify setup after running `/kg-sis:init`
+- Verify setup after running `/kmgraph:init`
 - See recent lessons at a glance
 - Check MEMORY.md staleness
 - Quick health check on the knowledge graph
@@ -297,16 +306,16 @@ Stats:
   Sessions: 8
 
 Quick Commands:
-  /kg-sis:capture-lesson    — Document a lesson
-  /kg-sis:recall "query"    — Search across all KG
-  /kg-sis:sync-all          — Run full sync pipeline
+  /kmgraph:capture-lesson    — Document a lesson
+  /kmgraph:recall "query"    — Search across all KG
+  /kmgraph:sync-all          — Run full sync pipeline
 ```
 
 **Tip**: Supports `--minimal` for a one-line summary and `--json` for machine-readable output.
 
 ---
 
-### 🟢 `/kg-sis:recall`
+### 🟢 `/kmgraph:recall`
 
 **Purpose**: Search across all project memory systems (lessons, decisions, knowledge graph, sessions)
 
@@ -327,7 +336,7 @@ Quick Commands:
 
 **Example**:
 ```bash
-/kg-sis:recall "database timeout"
+/kmgraph:recall "database timeout"
 
 # Results:
 # Lessons Learned (2 matches)
@@ -341,15 +350,15 @@ Quick Commands:
 **Search tips**:
 - Use specific terms ("PostgreSQL timeout" > "database")
 - Try synonyms if nothing found
-- Search by date: `/kg-sis:recall "2024-01"`
-- Search by category: `/kg-sis:recall "architecture"`
+- Search by date: `/kmgraph:recall "2024-01"`
+- Search by category: `/kmgraph:recall "architecture"`
 - Output formats: default (summary), `--format=paths` (file list), `--format=detailed` (full context)
 
 ---
 
 ## Intermediate Commands
 
-### 🟡 `/kg-sis:update-graph`
+### 🟡 `/kmgraph:update-graph`
 
 **Purpose**: Extract structured insights from lessons learned and sync to knowledge graph entries
 
@@ -372,19 +381,19 @@ Quick Commands:
 
 **Example**:
 ```bash
-/kg-sis:update-graph
-/kg-sis:update-graph --lesson=Pattern_Discovery.md    # Process specific lesson
-/kg-sis:update-graph --auto                          # Skip prompts, silent mode
-/kg-sis:update-graph --interactive                    # Review each entry before saving
+/kmgraph:update-graph
+/kmgraph:update-graph --lesson=Pattern_Discovery.md    # Process specific lesson
+/kmgraph:update-graph --auto                          # Skip prompts, silent mode
+/kmgraph:update-graph --interactive                    # Review each entry before saving
 ```
 
 **Tips**:
-- `--auto` flag is useful when called from other commands (e.g., after `/kg-sis:capture-lesson`)
+- `--auto` flag is useful when called from other commands (e.g., after `/kmgraph:capture-lesson`)
 - `--interactive` flag lets you review and edit each extracted entry before saving
 
 ---
 
-### 🟡 `/kg-sis:add-category`
+### 🟡 `/kmgraph:add-category`
 
 **Purpose**: Add a new category to an existing knowledge graph with optional custom prefix
 
@@ -406,16 +415,16 @@ Quick Commands:
 
 **Example**:
 ```bash
-/kg-sis:add-category
-/kg-sis:add-category security
-/kg-sis:add-category ml-ops --prefix ml- --git ignore
+/kmgraph:add-category
+/kmgraph:add-category security
+/kmgraph:add-category ml-ops --prefix ml- --git ignore
 ```
 
-**Next steps**: Capture lessons in the new category with `/kg-sis:capture-lesson`
+**Next steps**: Capture lessons in the new category with `/kmgraph:capture-lesson`
 
 ---
 
-### 🟡 `/kg-sis:session-summary`
+### 🟡 `/kmgraph:session-summary`
 
 **Purpose**: Create a summary of the current active chat session
 
@@ -438,8 +447,8 @@ Quick Commands:
 
 **Example**:
 ```bash
-/kg-sis:session-summary
-/kg-sis:session-summary --auto    # Skip confirmation, save immediately
+/kmgraph:session-summary
+/kmgraph:session-summary --auto    # Skip confirmation, save immediately
 ```
 
 **Tips**:
@@ -448,7 +457,7 @@ Quick Commands:
 
 ---
 
-### 🟡 `/kg-sis:list`
+### 🟡 `/kmgraph:list`
 
 **Purpose**: Display all configured knowledge graphs from `~/.claude/kg-config.json`
 
@@ -487,7 +496,7 @@ Total: 2 knowledge graph(s) configured
 
 ---
 
-### 🟡 `/kg-sis:switch`
+### 🟡 `/kmgraph:switch`
 
 **Purpose**: Change the active knowledge graph for all subsequent commands
 
@@ -507,24 +516,24 @@ Total: 2 knowledge graph(s) configured
 
 **Example**:
 ```bash
-/kg-sis:switch my-project
-/kg-sis:switch ai-research
-/kg-sis:switch cowork-devops --force    # Skip missing path warning
+/kmgraph:switch my-project
+/kmgraph:switch ai-research
+/kmgraph:switch cowork-devops --force    # Skip missing path warning
 ```
 
 **Tips**:
 - All subsequent knowledge commands operate on the newly active KG
-- Use `/kg-sis:list` first to see available options
+- Use `/kmgraph:list` first to see available options
 
 ---
 
-### 🟡 `/kg-sis:check-sensitive`
+### 🟡 `/kmgraph:check-sensitive`
 
 **Purpose**: Scan active knowledge graph for potentially sensitive information before public sharing
 
 **When to use**:
 - Before pushing knowledge graph files to a public or shared repository
-- As a manual check alongside `/kg-sis:config-sanitization` hooks
+- As a manual check alongside `/kmgraph:config-sanitization` hooks
 - Periodic audit of KG content
 
 **What it does**:
@@ -537,7 +546,7 @@ Total: 2 knowledge graph(s) configured
 
 **Example**:
 ```bash
-/kg-sis:check-sensitive
+/kmgraph:check-sensitive
 
 # Output:
 # ⚠️  Potential sensitive data found:
@@ -551,7 +560,7 @@ Total: 2 knowledge graph(s) configured
 
 ---
 
-### 🟡 `/kg-sis:config-sanitization`
+### 🟡 `/kmgraph:config-sanitization`
 
 **Purpose**: Interactive wizard to set up pre-commit hooks for sensitive data detection
 
@@ -570,7 +579,7 @@ Total: 2 knowledge graph(s) configured
 
 **Example**:
 ```bash
-/kg-sis:config-sanitization
+/kmgraph:config-sanitization
 
 # Wizard asks:
 # 1. What should be scanned for? (checkboxes for email, API keys, names, URLs)
@@ -593,7 +602,7 @@ Test the hook:
 
 ---
 
-### 🟡 `/kg-sis:extract-chat`
+### 🟡 `/kmgraph:extract-chat`
 
 **Purpose**: Extract chat history from Claude and Gemini local log sources
 
@@ -619,24 +628,24 @@ Test the hook:
 
 **Example**:
 ```bash
-/kg-sis:extract-chat                                          # Extract all (Claude + Gemini)
-/kg-sis:extract-chat -claude                                  # Extract only Claude
-/kg-sis:extract-chat -gemini                                  # Extract only Gemini
-/kg-sis:extract-chat --output-dir=/custom/path               # Custom output location
-/kg-sis:extract-chat --today                                  # Today only
-/kg-sis:extract-chat -claude 2026-02-20 through 2026-02-21   # Date range
-/kg-sis:extract-chat --project=knowledge-graph               # Specific project only
+/kmgraph:extract-chat                                          # Extract all (Claude + Gemini)
+/kmgraph:extract-chat -claude                                  # Extract only Claude
+/kmgraph:extract-chat -gemini                                  # Extract only Gemini
+/kmgraph:extract-chat --output-dir=/custom/path               # Custom output location
+/kmgraph:extract-chat --today                                  # Today only
+/kmgraph:extract-chat -claude 2026-02-20 through 2026-02-21   # Date range
+/kmgraph:extract-chat --project=knowledge-graph               # Specific project only
 ```
 
 **Tips**:
-- Extracted files are automatically searchable via `/kg-sis:recall`
+- Extracted files are automatically searchable via `/kmgraph:recall`
 - Optional `blackboxprotobuf` Python library enables Gemini protobuf file support
 - Date ranges use natural language: `YYYY-MM-DD through YYYY-MM-DD` or `YYYY-MM-DD to YYYY-MM-DD`
 - Gemini date filtering: passthrough implemented; underlying Gemini extraction may have known limitations
 
 ---
 
-### 🟡 `/kg-sis:update-doc`
+### 🟡 `/kmgraph:update-doc`
 
 **Purpose**: Update an existing documentation file — plugin/project documentation (`--user-facing`) or knowledge graph content
 
@@ -660,9 +669,9 @@ With `--user-facing`:
 
 **Example**:
 ```bash
-/kg-sis:update-doc COMMAND-GUIDE.md --user-facing   # Update plugin documentation wizard
-/kg-sis:update-doc README.md --user-facing           # Update README with new feature info
-/kg-sis:update-doc some-lesson.md                    # Disambiguation dialog for KG content
+/kmgraph:update-doc COMMAND-GUIDE.md --user-facing   # Update plugin documentation wizard
+/kmgraph:update-doc README.md --user-facing           # Update README with new feature info
+/kmgraph:update-doc some-lesson.md                    # Disambiguation dialog for KG content
 ```
 
 **Tips**:
@@ -674,7 +683,7 @@ With `--user-facing`:
 
 ## Advanced Commands
 
-### 🔴 `/kg-sis:meta-issue`
+### 🔴 `/kmgraph:meta-issue`
 
 **Purpose**: Initialize and manage meta-issue tracking for complex multi-attempt problems
 
@@ -686,7 +695,7 @@ With `--user-facing`:
 - Significant learning value for future similar problems
 
 **What it does**:
-1. **Initialize** (`/kg-sis:meta-issue "Problem Title"`):
+1. **Initialize** (`/kmgraph:meta-issue "Problem Title"`):
    - Prompts for domain, scope, severity, expected attempts
    - Creates structured directory under `{active_kg_path}/issues/[meta-issue-name]/`
    - Populates core files: README, description, implementation-log, test-cases
@@ -705,17 +714,17 @@ With `--user-facing`:
 
 **Example**:
 ```bash
-/kg-sis:meta-issue "Authentication Redesign"
-/kg-sis:meta-issue --add-attempt 002 "OAuth2 with JWT"
-/kg-sis:meta-issue --update-understanding "Token expiry logic flawed"
-/kg-sis:meta-issue --status
+/kmgraph:meta-issue "Authentication Redesign"
+/kmgraph:meta-issue --add-attempt 002 "OAuth2 with JWT"
+/kmgraph:meta-issue --update-understanding "Token expiry logic flawed"
+/kmgraph:meta-issue --status
 ```
 
-> **Note**: Do NOT use meta-issue for simple bugs, standard features, or one-off debugging. Use `/kg-sis:capture-lesson` instead.
+> **Note**: Do NOT use meta-issue for simple bugs, standard features, or one-off debugging. Use `/kmgraph:capture-lesson` instead.
 
 ---
 
-### 🔴 `/kg-sis:start-issue-tracking`
+### 🔴 `/kmgraph:start-issue-tracking`
 
 **Purpose**: Initialize issue tracking for a specific problem or enhancement with structured documentation and Git branch creation
 
@@ -742,9 +751,9 @@ With `--user-facing`:
 
 **Example**:
 ```bash
-/kg-sis:start-issue-tracking
-/kg-sis:start-issue-tracking CLI flag parsing fails on quoted args
-/kg-sis:start-issue-tracking Add token usage display
+/kmgraph:start-issue-tracking
+/kmgraph:start-issue-tracking CLI flag parsing fails on quoted args
+/kmgraph:start-issue-tracking Add token usage display
 ```
 
 **Tips**:
@@ -753,12 +762,12 @@ With `--user-facing`:
 
 ---
 
-### 🔴 `/kg-sis:update-issue-plan`
+### 🔴 `/kmgraph:update-issue-plan`
 
 **Purpose**: Synchronize knowledge graph extraction with active plans and local/GitHub issue tracking
 
 **When to use**:
-- After extracting new KG entries with `/kg-sis:update-graph`
+- After extracting new KG entries with `/kmgraph:update-graph`
 - When implementation plan needs to reflect new insights
 - Before committing governance-related changes
 - When progress needs to be posted to a GitHub Issue
@@ -766,7 +775,7 @@ With `--user-facing`:
 > **Note**: References to "issues" here mean GitHub Issues — platform-level bug reports or feature requests.
 
 **What it does**:
-1. **Knowledge extraction**: Runs `/kg-sis:update-graph` to extract patterns
+1. **Knowledge extraction**: Runs `/kmgraph:update-graph` to extract patterns
 2. **Plan sync**: Updates the active implementation plan with a "Lessons Learned Integration" section
 3. **Local issue update**: Appends progress and new verification requirements to local issue docs
 4. **GitHub sync**: Maps local issue ID to GitHub Issue number, posts a knowledge sync comment, and updates PR description with related lessons
@@ -776,9 +785,9 @@ With `--user-facing`:
 
 **Example**:
 ```bash
-/kg-sis:update-issue-plan
-/kg-sis:update-issue-plan --auto       # Skip prompts
-/kg-sis:update-issue-plan --pr=42      # Sync to specific PR
+/kmgraph:update-issue-plan
+/kmgraph:update-issue-plan --auto       # Skip prompts
+/kmgraph:update-issue-plan --pr=42      # Sync to specific PR
 ```
 
 **Tips**:
@@ -787,7 +796,7 @@ With `--user-facing`:
 
 ---
 
-### 🔴 `/kg-sis:link-issue`
+### 🔴 `/kmgraph:link-issue`
 
 **Purpose**: Manually link an existing lesson or ADR to a GitHub Issue with bidirectional references
 
@@ -809,18 +818,18 @@ With `--user-facing`:
 
 **Example**:
 ```bash
-/kg-sis:link-issue docs/lessons-learned/process/my-lesson.md --issue 42
-/kg-sis:link-issue docs/decisions/ADR-005.md --issue 38 --pr 40
+/kmgraph:link-issue docs/lessons-learned/process/my-lesson.md --issue 42
+/kmgraph:link-issue docs/decisions/ADR-005.md --issue 38 --pr 40
 ```
 
 ---
 
-### 🔴 `/kg-sis:archive-memory`
+### 🔴 `/kmgraph:archive-memory`
 
 **Purpose**: Archive stale MEMORY.md entries to prevent bloat while preserving historical context
 
 **When to use**:
-- MEMORY.md approaching 1,500 token soft limit (warning from `/kg-sis:sync-all`)
+- MEMORY.md approaching 1,500 token soft limit (warning from `/kmgraph:sync-all`)
 - MEMORY.md exceeds 2,000 token hard limit (blocked from adding new entries)
 - Periodic cleanup (recommended quarterly)
 - Before major project phase changes
@@ -837,19 +846,19 @@ With `--user-facing`:
 
 **Example**:
 ```bash
-/kg-sis:archive-memory
-/kg-sis:archive-memory --auto           # Skip confirmation
-/kg-sis:archive-memory --dry-run        # Preview without writing
-/kg-sis:archive-memory --threshold=180  # Custom staleness threshold (days)
+/kmgraph:archive-memory
+/kmgraph:archive-memory --auto           # Skip confirmation
+/kmgraph:archive-memory --dry-run        # Preview without writing
+/kmgraph:archive-memory --threshold=180  # Custom staleness threshold (days)
 ```
 
 **Tips**:
 - Token limits: 1,500 soft (warning) / 2,000 hard (block)
-- Archived entries can be restored with `/kg-sis:restore-memory`
+- Archived entries can be restored with `/kmgraph:restore-memory`
 
 ---
 
-### 🔴 `/kg-sis:restore-memory`
+### 🔴 `/kmgraph:restore-memory`
 
 **Purpose**: Restore archived MEMORY.md entries from MEMORY-archive.md back into active memory
 
@@ -872,16 +881,16 @@ With `--user-facing`:
 
 **Example**:
 ```bash
-/kg-sis:restore-memory                    # Interactive mode (show list, select)
-/kg-sis:restore-memory "Git Pre-Commit"  # Fuzzy search by title
-/kg-sis:restore-memory --id=5            # Restore by archive ID
-/kg-sis:restore-memory --list            # Show all archived entries
-/kg-sis:restore-memory --dry-run         # Preview without writing
+/kmgraph:restore-memory                    # Interactive mode (show list, select)
+/kmgraph:restore-memory "Git Pre-Commit"  # Fuzzy search by title
+/kmgraph:restore-memory --id=5            # Restore by archive ID
+/kmgraph:restore-memory --list            # Show all archived entries
+/kmgraph:restore-memory --dry-run         # Preview without writing
 ```
 
 ---
 
-### 🔴 `/kg-sis:sync-all`
+### 🔴 `/kmgraph:sync-all`
 
 **Purpose**: Automated knowledge sync orchestrator — replaces 4-step manual pipeline with 1 command
 
@@ -893,7 +902,7 @@ With `--user-facing`:
 
 **What it does**:
 1. **Scans** for new or modified lessons in `{active_kg_path}/lessons-learned/`
-2. **Extracts** KG entries from lessons (delegates to `/kg-sis:update-graph`)
+2. **Extracts** KG entries from lessons (delegates to `/kmgraph:update-graph`)
 3. **Checks** MEMORY.md size and syncs new patterns (respects token limits)
 4. **Links** to active implementation plan if relevant
 5. **Updates** local issue with KG references and progress notes
@@ -904,9 +913,9 @@ With `--user-facing`:
 
 **Example**:
 ```bash
-/kg-sis:sync-all
-/kg-sis:sync-all --auto       # Skip GitHub posting confirmation
-/kg-sis:sync-all --dry-run    # Preview without changes
+/kmgraph:sync-all
+/kmgraph:sync-all --auto       # Skip GitHub posting confirmation
+/kmgraph:sync-all --dry-run    # Preview without changes
 ```
 
 **Output**:
@@ -934,18 +943,18 @@ Session:          2026-02-11 (enriched)
 
 **Three ways to save learnings**:
 
-1. **`/kg-sis:capture-lesson`**
+1. **`/kmgraph:capture-lesson`**
    - Creates a NEW lesson file
    - Guided interview process
    - Use: When documenting new learnings
 
-2. **`/kg-sis:update-graph`**
+2. **`/kmgraph:update-graph`**
    - Extracts patterns from existing lessons
    - Updates knowledge entries
    - Syncs to MEMORY.md
    - Use: Daily or weekly to consolidate
 
-3. **`/kg-sis:sync-all`**
+3. **`/kmgraph:sync-all`**
    - Full 4-step pipeline (capture → update → sync → link)
    - Comprehensive sync across KG, plans, issues, and GitHub
    - Use: Weekly deep sync or before sharing
@@ -961,17 +970,17 @@ Session:          2026-02-11 (enriched)
 
 **Three ways to view knowledge**:
 
-1. **`/kg-sis:status`**
+1. **`/kmgraph:status`**
    - High-level overview of active KG
    - File counts, warnings, recent activity
    - Use: Daily check-in, health check
 
-2. **`/kg-sis:recall`**
+2. **`/kmgraph:recall`**
    - Deep full-text search across all memory systems
    - Find specific content by keyword
    - Use: Looking for something specific
 
-3. **`/kg-sis:list`**
+3. **`/kmgraph:list`**
    - Shows all configured KGs (if multiple)
    - Metadata only (names, paths, categories)
    - Use: Switching between projects
@@ -982,12 +991,12 @@ Session:          2026-02-11 (enriched)
 
 **Two levels of issue tracking**:
 
-1. **`/kg-sis:start-issue-tracking`**
+1. **`/kmgraph:start-issue-tracking`**
    - For individual bugs or enhancements
    - Creates a single issue directory, implementation plan, and Git branch
    - Standard workflow for most tracked work
 
-2. **`/kg-sis:meta-issue`**
+2. **`/kmgraph:meta-issue`**
    - For complex problems requiring 3+ solution attempts
    - Creates a richer directory structure with attempt folders and root-cause evolution
    - Tracks how understanding changes over time
@@ -1002,12 +1011,12 @@ Session:          2026-02-11 (enriched)
 
 **MEMORY.md lifecycle management**:
 
-1. **`/kg-sis:archive-memory`**
+1. **`/kmgraph:archive-memory`**
    - Moves stale entries (>90 days old by default) to `MEMORY-archive.md`
    - Frees token budget for new entries
    - Recommended when approaching 1,500 token soft limit
 
-2. **`/kg-sis:restore-memory`**
+2. **`/kmgraph:restore-memory`**
    - Brings archived entries back to active MEMORY.md
    - Fuzzy search or ID-based selection
    - Checks token limits before restoring
@@ -1018,13 +1027,13 @@ Session:          2026-02-11 (enriched)
 
 ### "Command not found"
 
-**Problem**: Claude doesn't recognize `/kg-sis:...` command
+**Problem**: Claude doesn't recognize `/kmgraph:...` command
 
 **Solutions**:
 1. Verify plugin installed: Check Claude Code > Extensions
 2. Restart Claude Code
 3. Update plugin: Check for updates in marketplace
-4. Check active KG: Run `/kg-sis:status`
+4. Check active KG: Run `/kmgraph:status`
 
 ---
 
@@ -1033,9 +1042,9 @@ Session:          2026-02-11 (enriched)
 **Problem**: Commands fail with "no active KG"
 
 **Solutions**:
-1. Run `/kg-sis:init` to create your first KG
-2. Run `/kg-sis:list` to see available KGs
-3. Run `/kg-sis:switch` to activate an existing KG
+1. Run `/kmgraph:init` to create your first KG
+2. Run `/kmgraph:list` to see available KGs
+3. Run `/kmgraph:switch` to activate an existing KG
 
 ---
 
@@ -1044,16 +1053,16 @@ Session:          2026-02-11 (enriched)
 **Problem**: MEMORY.md over 1,500 tokens, slowing down sessions or blocking new entries
 
 **Solutions**:
-1. Run `/kg-sis:archive-memory` to archive old entries
+1. Run `/kmgraph:archive-memory` to archive old entries
 2. Review archived entries: Check `MEMORY-archive.md`
-3. Restore if needed: `/kg-sis:restore-memory`
-4. Adjust threshold: `/kg-sis:archive-memory --threshold=60` for more aggressive archival
+3. Restore if needed: `/kmgraph:restore-memory`
+4. Adjust threshold: `/kmgraph:archive-memory --threshold=60` for more aggressive archival
 
 ---
 
 ### "No chat history found"
 
-**Problem**: `/kg-sis:extract-chat` finds no logs
+**Problem**: `/kmgraph:extract-chat` finds no logs
 
 **Solutions**:
 1. Verify log directories exist:
@@ -1076,14 +1085,14 @@ Session:          2026-02-11 (enriched)
 pip install blackboxprotobuf
 
 # Or skip protobuf files (JSON extraction still works)
-/kg-sis:extract-chat -gemini  # Will warn about .pb files
+/kmgraph:extract-chat -gemini  # Will warn about .pb files
 ```
 
 ---
 
 ### "Git branch creation fails"
 
-**Problem**: `/kg-sis:start-issue-tracking` can't create a branch
+**Problem**: `/kmgraph:start-issue-tracking` can't create a branch
 
 **Solutions**:
 ```bash

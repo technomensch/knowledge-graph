@@ -1,5 +1,5 @@
 #!/bin/bash
-# memory-diff-check.sh - Knowledge Graph plugin SessionStart hook
+# memory-diff-check.sh - Knowledge Management Graph SessionStart hook
 # Notifies user of MEMORY.md changes since last session
 
 # Exit codes:
@@ -17,7 +17,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 # Find project memory directory
-MEMORY_PATH="$HOME/.claude/projects/$(basename $(pwd))/memory/MEMORY.md"
+MEMORY_PATH="$HOME/.claude/projects/$(basename "$(pwd)")/memory/MEMORY.md"
 
 if [ ! -f "$MEMORY_PATH" ]; then
     # No MEMORY.md, nothing to check

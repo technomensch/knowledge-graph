@@ -23,9 +23,9 @@ This skill provides unified search across four memory systems:
 ## Usage
 
 ```bash
-/kg-sis:recall <topic>
-/kg-sis:recall <topic> --type=<lessons|decisions|knowledge|sessions|all>
-/kg-sis:recall <topic> --format=<summary|paths|detailed|none>
+/kmgraph:recall <topic>
+/kmgraph:recall <topic> --type=<lessons|decisions|knowledge|sessions|all>
+/kmgraph:recall <topic> --format=<summary|paths|detailed|none>
 ```
 
 **Parameters:**
@@ -35,10 +35,10 @@ This skill provides unified search across four memory systems:
 
 **Examples:**
 ```bash
-/kg-sis:recall skills architecture
-/kg-sis:recall deployment --type=lessons
-/kg-sis:recall version control --format=paths
-/kg-sis:recall dual format --format=detailed
+/kmgraph:recall skills architecture
+/kmgraph:recall deployment --type=lessons
+/kmgraph:recall version control --format=paths
+/kmgraph:recall dual format --format=detailed
 ```
 
 ---
@@ -57,7 +57,7 @@ This skill provides unified search across four memory systems:
 
 **If no config exists:**
 ```
-No knowledge graph configured. Run /kg-sis:init to get started.
+No knowledge graph configured. Run /kmgraph:init to get started.
 ```
 
 ### Step 1: Parse Query
@@ -66,7 +66,7 @@ Extract topic and options:
 
 **Example:**
 ```
-Input: "/kg-sis:recall CI/CD pipelines --type=lessons"
+Input: "/kmgraph:recall CI/CD pipelines --type=lessons"
 → Topic: "CI/CD pipelines"
 → Type: lessons
 → Format: summary (default)
@@ -182,7 +182,7 @@ Found X matches across memory systems:
 **Quick Actions:**
 - Read details: Use Read tool with paths above
 - Related topics: [extracted from cross-refs]
-- Create new: /kg-sis:capture-lesson (if no relevant results)
+- Create new: /kmgraph:capture-lesson (if no relevant results)
 ```
 
 **Star rating logic:**
@@ -230,7 +230,7 @@ Show full context with 5 lines before/after each match:
 
 No formatted output. Use this when you just want to trigger the search for analysis but don't need the full results displayed to user.
 
-**Use case:** When `/kg-sis:sync-all` needs to check if a topic already exists before creating new entries.
+**Use case:** When `/kmgraph:sync-all` needs to check if a topic already exists before creating new entries.
 
 ### Step 6: Suggest Next Actions
 
@@ -243,7 +243,7 @@ No matches found for "<topic>".
 **Suggestions:**
 - Try broader keywords
 - Check spelling
-- Create new documentation: /kg-sis:capture-lesson
+- Create new documentation: /kmgraph:capture-lesson
 ```
 
 **If 1-3 results:**
@@ -273,24 +273,24 @@ Extract from cross-references in found documents and suggest:
 
 ## Integration with Other Skills
 
-**With /kg-sis:capture-lesson:**
+**With /kmgraph:capture-lesson:**
 ```
-User: /kg-sis:recall authentication
+User: /kmgraph:recall authentication
 Claude: "Found 2 lessons about authentication..."
 User: "None of these match my issue"
-Claude: "Create new lesson? Type /kg-sis:capture-lesson"
+Claude: "Create new lesson? Type /kmgraph:capture-lesson"
 ```
 
-**With /kg-sis:session-summary:**
+**With /kmgraph:session-summary:**
 ```
-User: /kg-sis:recall today's work
-Claude: "No session summary found for today. Type /kg-sis:session-summary to create one"
+User: /kmgraph:recall today's work
+Claude: "No session summary found for today. Type /kmgraph:session-summary to create one"
 ```
 
-**With /kg-sis:update-graph:**
+**With /kmgraph:update-graph:**
 ```
-User: /kg-sis:recall skills architecture
-Claude: "Found 3 matches. To extract insights to KG, run /kg-sis:update-graph"
+User: /kmgraph:recall skills architecture
+Claude: "Found 3 matches. To extract insights to KG, run /kmgraph:update-graph"
 ```
 
 ---
@@ -300,7 +300,7 @@ Claude: "Found 3 matches. To extract insights to KG, run /kg-sis:update-graph"
 ### Example 1: Find architecture decisions
 
 ```
-User: /kg-sis:recall skills architecture
+User: /kmgraph:recall skills architecture
 ```
 
 **Output:**
@@ -340,7 +340,7 @@ Found 3 matches across memory systems:
 ### Example 2: Find debugging solutions
 
 ```
-User: /kg-sis:recall validation fails --type=lessons
+User: /kmgraph:recall validation fails --type=lessons
 ```
 
 **Output:**
@@ -351,14 +351,14 @@ Found 0 matches in lessons learned.
 
 **Suggestions:**
 - Try broader keywords: "validation" or "fails"
-- Check other systems: /kg-sis:recall validation --type=all
-- Create new lesson: /kg-sis:capture-lesson
+- Check other systems: /kmgraph:recall validation --type=all
+- Create new lesson: /kmgraph:capture-lesson
 ```
 
 ### Example 3: Get paths only
 
 ```
-User: /kg-sis:recall memory system --format=paths
+User: /kmgraph:recall memory system --format=paths
 ```
 
 **Output:**
@@ -394,7 +394,7 @@ User: /kg-sis:recall memory system --format=paths
 ### Problem: Too many results
 
 **Solution:**
-- Use `--type` filter: `/kg-sis:recall topic --type=lessons`
+- Use `--type` filter: `/kmgraph:recall topic --type=lessons`
 - Use more specific keywords
 - Browse category directly in active KG
 
@@ -404,15 +404,15 @@ User: /kg-sis:recall memory system --format=paths
 - Try broader keywords
 - Check spelling
 - Try different memory type: `--type=sessions` vs `--type=lessons`
-- Search all systems: `/kg-sis:recall topic --type=all`
-- Check if you're in the correct KG: `/kg-sis:status`
+- Search all systems: `/kmgraph:recall topic --type=all`
+- Check if you're in the correct KG: `/kmgraph:status`
 
 ### Problem: Results not relevant
 
 **Solution:**
 - Refine query with more specific technical terms
 - Browse categories manually to discover content
-- Use `/kg-sis:list` to see other configured KGs
+- Use `/kmgraph:list` to see other configured KGs
 
 ### Problem: Want to see full context
 
@@ -424,10 +424,10 @@ User: /kg-sis:recall memory system --format=paths
 
 ## Related Commands
 
-- `/kg-sis:capture-lesson` - Document new lessons learned
-- `/kg-sis:update-graph` - Extract insights from lessons to KG
-- `/kg-sis:sync-all` - Full knowledge sync pipeline
-- `/kg-sis:status` - Show active KG info and quick reference
+- `/kmgraph:capture-lesson` - Document new lessons learned
+- `/kmgraph:update-graph` - Extract insights from lessons to KG
+- `/kmgraph:sync-all` - Full knowledge sync pipeline
+- `/kmgraph:status` - Show active KG info and quick reference
 
 ---
 

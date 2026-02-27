@@ -1,6 +1,6 @@
 {
   "name": "knowledge-graph-plugin",
-  "version": "0.0.8.7-alpha",
+  "version": "0.0.9-alpha",
   "description": "Structured knowledge capture and cross-session memory for Claude Code projects.",
   "files": [
     ".claude-plugin/",
@@ -13,10 +13,16 @@
     "core/",
     "config/",
     "README.md",
-    "CHANGELOG.md",
+    "docs/CHANGELOG.md",
     "LICENSE"
   ],
-  "keywords": ["claude-code", "plugin", "knowledge-graph", "lessons-learned", "memory"],
+  "keywords": [
+    "claude-code",
+    "plugin",
+    "knowledge-graph",
+    "lessons-learned",
+    "memory"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",

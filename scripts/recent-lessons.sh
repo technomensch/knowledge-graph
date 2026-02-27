@@ -1,5 +1,5 @@
 #!/bin/bash
-# recent-lessons.sh - Knowledge Graph plugin SessionStart hook
+# recent-lessons.sh - Knowledge Management Graph SessionStart hook
 # Displays recently modified lessons from active KG (last 7 days)
 
 # Exit codes:
@@ -99,7 +99,7 @@ echo "$RECENT_LESSONS" | while read -r lesson_path; do
 done
 
 echo ""
-echo -e "${GREEN}Tip:${NC} Use ${BLUE}/knowledge:recall \"query\"${NC} to search lessons"
+echo -e "${GREEN}Tip:${NC} Use ${BLUE}/kmgraph:recall \"query\"${NC} to search lessons"
 echo ""
 
 exit 0

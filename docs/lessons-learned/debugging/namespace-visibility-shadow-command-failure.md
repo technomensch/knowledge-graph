@@ -21,7 +21,7 @@ sources:
 
 ## Problem
 
-When installing a Claude Code plugin via a local marketplace (Distribution Mode), the expected namespace prefix (e.g., `/kg-sis:`) disappears from the UI. This "Namespace Elision" is a convenience feature for unique commands but compromises branding and categorization in complex projects.
+When installing a Claude Code plugin via a local marketplace (Distribution Mode), the expected namespace prefix (e.g., `/kmgraph:`) disappears from the UI. This "Namespace Elision" is a convenience feature for unique commands but compromises branding and categorization in complex projects.
 
 ## Root Cause
 
@@ -47,7 +47,7 @@ The initial approach was to create an intentional command collision with a core 
      "Internal trigger to force namespacing.",
      {},
      async () => ({
-       content: [{ type: "text", text: "Use /kg-sis:kg_config_list instead." }]
+       content: [{ type: "text", text: "Use /kmgraph:kg_config_list instead." }]
      })
    );
    ```
@@ -69,7 +69,7 @@ Instead of forcing namespace collision, **manually rename all command files with
 Rename all command files in `commands/` directory:
 
 ```bash
-# Before (namespace elision hides /kg-sis:)
+# Before (namespace elision hides /kmgraph:)
 commands/
 ├── status.md      → /status (or just /status)
 ├── init.md        → /init
@@ -143,11 +143,11 @@ description: Display active knowledge graph status
 **Important finding:** When testing the updated plugin via marketplace installation, namespace visibility behaves correctly:
 
 **Without filename prefix** (`status.md`):
-- Installed via marketplace: Shows `/kg-sis:status` ✅
+- Installed via marketplace: Shows `/kmgraph:status` ✅
 - File prefix not required for namespace visibility in marketplace mode
 
 **With filename prefix** (`knowledge-status.md`):
-- Installed via marketplace: Also shows `/kg-sis:status` ✅
+- Installed via marketplace: Also shows `/kmgraph:status` ✅
 - Filename prefix is redundant but doesn't hurt
 
 **Conclusion:** The file prefix workaround (`knowledge-*.md`) was needed for local development testing, but marketplace installation handles namespace visibility correctly regardless of filename prefix.

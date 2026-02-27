@@ -1,7 +1,7 @@
 {
-  "name": "stayinginsync-knowledge-graph", 
+  "name": "stayinginsync-knowledge-graph",
   "version": "1.0.0",
-  "description": "Marketplace for the knowledge graph plugin — structured knowledge capture and cross-session memory for Claude Code projects.",
+  "description": "Marketplace for the Knowledge Management Graph — structured knowledge capture and cross-session memory for Claude Code projects.",
   "owner": {
     "name": "technomensch",
     "url": "https://github.com/technomensch",
@@ -9,7 +9,7 @@
   },
   "plugins": [
     {
-      "name": "kg-sis",
+      "name": "kmgraph",
       "version": "0.0.8.3-alpha",
       "description": "Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects. Includes KG entries, ADRs, meta-issue tracking, chat extraction, and MEMORY.md bidirectional sync.",
       "source": "./",
@@ -19,7 +19,16 @@
       },
       "repository": "https://github.com/technomensch/knowledge-graph",
       "license": "MIT",
-      "keywords": ["kg-sis", "knowledge", "lessons-learned", "memory", "documentation", "governance", "meta-issue", "adr"]
+      "keywords": [
+        "kg-sis",
+        "knowledge",
+        "lessons-learned",
+        "memory",
+        "documentation",
+        "governance",
+        "meta-issue",
+        "adr"
+      ]
     }
   ]
 }

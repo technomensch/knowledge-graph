@@ -87,7 +87,7 @@ theme:
 
 ### Subsection 3.1: Getting Started
 
-The knowledge graph plugin provides structured knowledge capture for Claude Code projects.
+The Knowledge Management Graph provides structured knowledge capture for Claude Code projects.
 
 #### Step 1: Installation
 
@@ -99,7 +99,7 @@ Set up your knowledge graph type (project-local, personal, or cowork).
 
 #### Step 3: Capture Your First Lesson
 
-Use `/kg-sis:capture-lesson` to document a problem you solved.
+Use `/kmgraph:capture-lesson` to document a problem you solved.
 
 ### Subsection 3.2: Advanced Usage
 
@@ -110,7 +110,7 @@ Explore multi-KG configurations and cross-project knowledge linking.
 ## Section 4: Admonitions
 
 !!! note "Pro Tip"
-    Use `/kg-sis:recall "pattern"` to search across all your knowledge entries.
+    Use `/kmgraph:recall "pattern"` to search across all your knowledge entries.
 
 !!! warning "Important"
     The `commands/` directory contains LLM prompts. Modifications may break plugin functionality.
@@ -120,7 +120,7 @@ Explore multi-KG configurations and cross-project knowledge linking.
 
 !!! example "Example Usage"
     ```bash
-    /kg-sis:capture-lesson "Async Error Handling"
+    /kmgraph:capture-lesson "Async Error Handling"
     ```
 
 ---
@@ -181,10 +181,10 @@ Capture → Extract → Sync → Summarize
 
 Each step corresponds to plugin commands:
 
-- `/kg-sis:capture-lesson` — Document what you learned
-- `/kg-sis:update-graph` — Extract patterns and concepts
-- `/kg-sis:sync-all` — Synchronize across KGs
-- `/kg-sis:session-summary` — Summarize session insights
+- `/kmgraph:capture-lesson` — Document what you learned
+- `/kmgraph:update-graph` — Extract patterns and concepts
+- `/kmgraph:sync-all` — Synchronize across KGs
+- `/kmgraph:session-summary` — Summarize session insights
 
 !!! info "Related Resources"
     - [Commands Guide](COMMAND-GUIDE.md) - Full command reference

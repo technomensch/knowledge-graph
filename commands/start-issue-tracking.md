@@ -12,14 +12,14 @@ allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 ## Command Syntax
 
 ```
-/kg-sis:start-issue-tracking
-/kg-sis:start-issue-tracking <brief-description>
+/kmgraph:start-issue-tracking
+/kmgraph:start-issue-tracking <brief-description>
 ```
 
 **Examples:**
-- `/kg-sis:start-issue-tracking`
-- `/kg-sis:start-issue-tracking CLI flag parsing fails on quoted args`
-- `/kg-sis:start-issue-tracking Add token usage display`
+- `/kmgraph:start-issue-tracking`
+- `/kmgraph:start-issue-tracking CLI flag parsing fails on quoted args`
+- `/kmgraph:start-issue-tracking Add token usage display`
 
 ---
 
@@ -53,7 +53,7 @@ Single prompt: "Create issue/5-slug from main as [Bug/Enhancement], push? (y/n)"
 
 ## When to Use This Command
 
-Use `/kg-sis:start-issue-tracking` when:
+Use `/kmgraph:start-issue-tracking` when:
 - You've identified a bug that needs to be fixed
 - You're planning a new feature or enhancement
 - You want to document a problem before solving it
@@ -65,7 +65,7 @@ Use `/kg-sis:start-issue-tracking` when:
 
 **Do NOT use for:**
 - Simple typo fixes or trivial changes
-- Work that's already complete (use `/kg-sis:capture-lesson` instead)
+- Work that's already complete (use `/kmgraph:capture-lesson` instead)
 - General documentation updates (use standard Git workflow)
 
 ---
@@ -254,15 +254,15 @@ gh pr create --draft --title "[Bug] Brief descriptive title" \
 Add entry to `docs/issue-tracker.md`. 
 
 ### 6.2: Knowledge Capture Integration (Delegation)
-**Mandatory Question:** *"We just identified [the problem]. Should I run **`/kg-sis:capture-lesson`** now to sync this pattern to the Knowledge Graph before we start the fix?"*
+**Mandatory Question:** *"We just identified [the problem]. Should I run **`/kmgraph:capture-lesson`** now to sync this pattern to the Knowledge Graph before we start the fix?"*
 
 If yes, run it. If no, ensure a task is added to the plan to update the KG after implementation.
 
 ### 6.3: Link Solution Approach
-The `solution-approach.md` MUST link to the resulting lesson or updated entry in the Knowledge Graph. Use `/kg-sis:link-issue` to create bidirectional references.
+The `solution-approach.md` MUST link to the resulting lesson or updated entry in the Knowledge Graph. Use `/kmgraph:link-issue` to create bidirectional references.
 
 ### 6.4: Release Documentation Hook
-**Mandatory Question:** *"Would you like me to run **`/kg-sis:update-issue-plan`** now to synchronize the ROADMAP and CHANGELOG before I stage and push these initialization files?"*
+**Mandatory Question:** *"Would you like me to run **`/kmgraph:update-issue-plan`** now to synchronize the ROADMAP and CHANGELOG before I stage and push these initialization files?"*
 
 ---
 
@@ -316,7 +316,7 @@ Merge to main when complete
 ```
 User identifies issue
   ↓
-/kg-sis:start-issue-tracking (creates docs)
+/kmgraph:start-issue-tracking (creates docs)
   ↓
 Docs committed to Git in feature branch
   ↓
@@ -337,7 +337,7 @@ Updates progress in issue docs
 
 **Input:**
 ```
-/kg-sis:start-issue-tracking CLI flag parsing fails on quoted args
+/kmgraph:start-issue-tracking CLI flag parsing fails on quoted args
 ```
 
 **Output:**
@@ -350,7 +350,7 @@ Updates progress in issue docs
 
 **Input:**
 ```
-/kg-sis:start-issue-tracking Add token usage display
+/kmgraph:start-issue-tracking Add token usage display
 ```
 
 **Output:**
@@ -364,16 +364,16 @@ Updates progress in issue docs
 ## Integration with Other Commands
 
 **Before starting work:**
-- `/kg-sis:start-issue-tracking` ← Initialize tracking
+- `/kmgraph:start-issue-tracking` ← Initialize tracking
 
 **During work:**
-- `/kg-sis:update-issue-plan` ← Sync plan progress and update GitHub issue
-- `/kg-sis:link-issue` ← Link lessons or ADRs to the issue
+- `/kmgraph:update-issue-plan` ← Sync plan progress and update GitHub issue
+- `/kmgraph:link-issue` ← Link lessons or ADRs to the issue
 - Standard Git commits referencing issue number
 
 **After completion:**
-- `/kg-sis:capture-lesson` ← Document what was learned
-- `/kg-sis:meta-issue` ← Escalate to meta-issue if problem recurs
+- `/kmgraph:capture-lesson` ← Document what was learned
+- `/kmgraph:meta-issue` ← Escalate to meta-issue if problem recurs
 - Update issue status to ✅ RESOLVED
 
 ---
@@ -450,5 +450,5 @@ git checkout -b fix/issue-N-description
 
 ---
 
-**Usage:** Type `/kg-sis:start-issue-tracking` when you identify a bug or want to plan an enhancement
-**Integration:** Works with `/kg-sis:update-issue-plan`, `/kg-sis:capture-lesson`, `/kg-sis:link-issue`, and `/kg-sis:meta-issue`
+**Usage:** Type `/kmgraph:start-issue-tracking` when you identify a bug or want to plan an enhancement
+**Integration:** Works with `/kmgraph:update-issue-plan`, `/kmgraph:capture-lesson`, `/kmgraph:link-issue`, and `/kmgraph:meta-issue`
