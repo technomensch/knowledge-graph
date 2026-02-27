@@ -55,7 +55,7 @@ NC='\033[0m' # No Color
 # First-run detection
 if [ ! -f "$CONFIG_PATH" ]; then
     echo -e "${BLUE}ℹ️  No knowledge graph configured.${NC}"
-    echo "   Run /knowledge:init to get started."
+    echo "   Run /kmgraph:init to get started."
     exit 0
 fi
 
@@ -64,7 +64,7 @@ ACTIVE_KG=$(grep -o '"active"[[:space:]]*:[[:space:]]*"[^"]*"' "$CONFIG_PATH" | 
 
 if [ -z "$ACTIVE_KG" ]; then
     echo -e "${YELLOW}⚠️  No active knowledge graph set in config.${NC}"
-    echo "   Run /knowledge:list and /knowledge:switch to activate a KG."
+    echo "   Run /kmgraph:list and /kmgraph:switch to activate a KG."
     exit 1
 fi
 
@@ -84,7 +84,7 @@ KG_PATH="${KG_PATH/#\~/$HOME}"
 if [ ! -d "$KG_PATH" ]; then
     echo -e "${RED}⚠️  Active KG path does not exist: $KG_PATH${NC}"
     echo "   KG: $ACTIVE_KG"
-    echo "   Run /knowledge:init or /knowledge:switch to fix configuration."
+    echo "   Run /kmgraph:init or /kmgraph:switch to fix configuration."
     exit 1
 fi
 
@@ -113,7 +113,7 @@ fi
 
 if [ "$MEMORY_FOUND" = false ]; then
     echo -e "${YELLOW}ℹ️  No MEMORY.md found for active KG: $ACTIVE_KG${NC}"
-    echo "   Consider creating one with /knowledge:capture-lesson --auto-sync"
+    echo "   Consider creating one with /kmgraph:capture-lesson --auto-sync"
     exit 0
 fi
 
@@ -133,7 +133,7 @@ if [ -f "$MEMORY_PATH" ]; then
 
     if [ $DAYS_OLD -gt 7 ]; then
         echo -e "${YELLOW}⚠️  MEMORY.md is stale (last updated $DAYS_OLD days ago)${NC}"
-        echo "   Consider running /knowledge:sync-all to update cross-session memory."
+        echo "   Consider running /kmgraph:sync-all to update cross-session memory."
         exit 1
     else
         echo -e "${GREEN}✅ Knowledge Graph: $ACTIVE_KG (memory synced $DAYS_OLD days ago)${NC}"
