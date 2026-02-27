@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block header %}
+  {{ super() }}
+{% endblock %}
+
+{% block header_inner %}
+  {{ super() }}
+
+  <!-- LinkedIn icon in header (between GitHub and search) -->
+  {% if config.extra.social %}
+    <div class="md-header__linkedin">
+      {% for social in config.extra.social %}
+        {% if 'linkedin' in social.link %}
+          <a href="{{ social.link }}"
+             class="md-social__link"
+             title="LinkedIn"
+             rel="noopener noreferrer"
+             target="_blank">
+            <svg class="md-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width: 1.2em; height: 1.2em;">
+              <path fill="currentColor" d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.39v-1.2h-2.5v8.5h2.5v-4.74c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.74h2.5M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.5H5.5v8.5h2.77z"/>
+            </svg>
+          </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}

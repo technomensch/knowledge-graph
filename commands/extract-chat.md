@@ -8,6 +8,18 @@ Automates the extraction of chat history from local Claude (.jsonl) and Gemini (
 
 ---
 
+## Delegation Option
+
+For multi-session history extraction (10+ sessions or 100+ KB chat logs), consider delegating to the `knowledge-extractor` subagent:
+
+```bash
+/kmgraph:extract-chat --delegate knowledge-extractor
+```
+
+This parses chat logs and extracts insights without consuming your main context, ideal for backfilling knowledge graphs from large chat histories.
+
+---
+
 ## Usage
 
 ```bash
