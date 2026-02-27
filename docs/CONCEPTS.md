@@ -554,5 +554,5 @@ MEMORY.md works best under 200 lines. When it grows beyond that threshold:
 
 ---
 
-**Version**: 0.0.7-alpha
+**Version**: 0.0.10-alpha
 **Last Updated**: 2026-02-20

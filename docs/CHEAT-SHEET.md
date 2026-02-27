@@ -221,7 +221,7 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 
 ---
 
-**Version**: 0.0.8.2-alpha
+**Version**: 0.0.10-alpha
 **Last Updated**: 2026-02-21
 
 <!-- Updated: 2026-02-21 -->
