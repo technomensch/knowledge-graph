@@ -2,7 +2,7 @@
 
 A step-by-step guide for setting up the knowledge graph system and capturing the first lesson.
 
-**Version**: 0.0.8-alpha
+**Version**: 0.0.10-alpha
 
 ---
 
@@ -67,6 +67,9 @@ Verify the plugin loaded by typing `/knowledge` — the autocomplete menu should
 The initialization wizard prompts for:
 - **Project name** — the name of the current project
 - **Git tracking** — enable to automatically capture branch and commit metadata
+- **Optional Backfill** (Step 1.10) — "Would you like to backfill the knowledge graph from existing project context? [y/N]"
+  - If yes: automatically extracts from README, CHANGELOG, existing lessons, decisions, and chat history
+  - If no: starts with empty knowledge graph, grows organically as you document lessons
 
 After completion, the command creates the knowledge graph directory structure in the project.
 
@@ -190,11 +193,11 @@ Skills activate automatically based on what you're doing. They provide guidance 
 
 | Skill | Triggers On | Suggests |
 |---|---|---|
-| **lesson-capture** | Bug solved, breakthrough made | Documenting what you learned |
-| **kg-recall** | Asking about project history, past decisions | Searching the knowledge graph first |
-| **session-wrap** | Session ending, context limit approaching | Summarizing the work before context loss |
-| **adr-guide** | Architecture decisions being made | Documenting decisions as ADRs |
-| **gov-execute-plan** | Implementing from a plan file | Strict plan execution protocol |
+| **lesson-capture** | "figured it out", bug solved, breakthrough made | `/kmgraph:capture-lesson` with pre-filled context |
+| **kg-recall** | "have we done this before", past decisions, history questions | `/kmgraph:recall` with extracted search terms |
+| **session-wrap** | Session ending, context limit (180K+), major milestone | `/kmgraph:session-summary` before compaction |
+| **adr-guide** | "I'm thinking of using...", architecture decisions | `/kmgraph:create-adr` with decision guidance |
+| **gov-execute-plan** | "execute plan", implementation start, `docs/plans/*.md` mentioned | Zero-deviation 8-step execution protocol |
 
 You don't invoke skills directly — they appear as helpful context when relevant.
 
@@ -202,12 +205,12 @@ You don't invoke skills directly — they appear as helpful context when relevan
 
 Subagents handle resource-intensive tasks in isolation, keeping your main context clean:
 
-| Subagent | Handles | When to Use |
+| Subagent | Mode | When to Use |
 |---|---|---|
-| **knowledge-extractor** | Parsing large chat logs, extracting patterns from documents | When processing 10+ lessons or 50+ KB at once |
-| **session-documenter** | Git archaeology, session summary generation | When wrapping up complex multi-file sessions |
+| **knowledge-extractor** | Read-only (approval-gated writes) | Parsing 10+ lessons, 50+ KB extracts, or backfill from existing project context. Never auto-writes without user review. |
+| **session-documenter** | Git archaeology (approval-gated commits/pushes) | Complex multi-file sessions, automated session summaries with conventional commit format. Never auto-commits or auto-pushes. |
 
-Use `--delegate knowledge-extractor` or `--delegate session-documenter` in commands like `/kmgraph:update-graph` to invoke subagents for heavy operations.
+Use `--delegate knowledge-extractor` or `--delegate session-documenter` in commands like `/kmgraph:extract-chat`, `/kmgraph:update-graph`, or `/kmgraph:session-summary` to invoke subagents for heavy operations.
 
 ---
 
@@ -232,5 +235,5 @@ Use `--delegate knowledge-extractor` or `--delegate session-documenter` in comma
 
 ---
 
-**Version**: 0.0.8-alpha
+**Version**: 0.0.10-alpha
 **Last Updated**: 2026-02-20

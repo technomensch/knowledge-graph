@@ -2,8 +2,8 @@
 
 Comprehensive catalog of all lessons-learned documents.
 
-**Total Lessons:** 4
-**Last Updated:** 2026-02-21
+**Total Lessons:** 5
+**Last Updated:** 2026-02-27
 
 ---
 
@@ -18,11 +18,12 @@ Comprehensive catalog of all lessons-learned documents.
 
 ---
 
-### Process Lessons (1 total)
+### Process Lessons (2 total)
 
+- [2026-02-27 - Documentation Update Triggers in Multi-Branch Feature Development](process/documentation-update-triggers-multibranchfeatures.md) - Multi-branch releases require two-layer documentation: per-feature updates (Layer 1) and comprehensive release sync (Layer 2). Without explicit triggers, documentation updates defer indefinitely. Solution: separate final branch with explicit plan file.
 - [2026-02-16 - Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md) - When testing locally through Claude Code marketplace, changes must be synced from development directory to marketplace cache location
 
-**Tags:** #process #testing #marketplace #plugin-development #workflow
+**Tags:** #process #documentation #release-management #testing #marketplace #plugin-development #workflow #multi-branch-workflow
 
 ---
 
@@ -45,6 +46,7 @@ Comprehensive catalog of all lessons-learned documents.
 ## Chronological Index
 
 **2026**
+- 2026-02-27: [Documentation Update Triggers in Multi-Branch Feature Development](process/documentation-update-triggers-multibranchfeatures.md)
 - 2026-02-21: [Plugin Example File Management — Why You Can't Gate the Download](architecture/Lessons_Learned_Plugin_Example_File_Management.md)
 - 2026-02-21: [Update Notifications for Non-Plugin Users — Version Sync and MCP Discovery Gap](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md)
 - 2026-02-16: [Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md)
@@ -71,7 +73,8 @@ Comprehensive catalog of all lessons-learned documents.
 **#update-notifications** (1 lesson)
 - [Update Notifications for Non-Plugin Users](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md)
 
-**#process** (1 lesson)
+**#process** (2 lessons)
+- [Documentation Update Triggers in Multi-Branch Feature Development](process/documentation-update-triggers-multibranchfeatures.md)
 - [Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md)
 
 **#patterns** (0 lessons)
@@ -103,6 +106,15 @@ Comprehensive catalog of all lessons-learned documents.
 
 **#workflow** (1 lesson)
 - [Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md)
+
+**#documentation** (1 lesson)
+- [Documentation Update Triggers in Multi-Branch Feature Development](process/documentation-update-triggers-multibranchfeatures.md)
+
+**#release-management** (1 lesson)
+- [Documentation Update Triggers in Multi-Branch Feature Development](process/documentation-update-triggers-multibranchfeatures.md)
+
+**#multi-branch-workflow** (1 lesson)
+- [Documentation Update Triggers in Multi-Branch Feature Development](process/documentation-update-triggers-multibranchfeatures.md)
 
 ---
 

@@ -209,9 +209,10 @@ Commands work across platforms, but full automation is Claude Code-specific.
 3. Asks for optional custom prefixes per category
 4. Creates directory structure (`knowledge/`, `lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`)
 5. Copies templates from the plugin
-6. Optionally installs a git post-commit hook for lesson capture suggestions
-7. Updates `.gitignore` based on chosen git strategy
-8. Registers the KG in `~/.claude/kg-config.json` and sets it as active
+6. **[NEW in v0.0.10.2]** Optionally backfills from existing project context (README, CHANGELOG, lessons, decisions, chat history)
+7. Optionally installs a git post-commit hook for lesson capture suggestions
+8. Updates `.gitignore` based on chosen git strategy
+9. Registers the KG in `~/.claude/kg-config.json` and sets it as active
 
 **Time**: 2-3 minutes
 
@@ -223,9 +224,21 @@ Commands work across platforms, but full automation is Claude Code-specific.
 # - What should this knowledge graph be called?
 # - Where should it be stored? (project-local / global / custom)
 # - Which categories do you want to include?
+# - Would you like to backfill from existing project context? (y/N)
+#   (If yes: scans README, CHANGELOG, lessons-learned/, decisions/, chat-history/)
 # - Install post-commit hook? (y/n)
 # - Git strategy for each category? (commit/ignore)
 ```
+
+**Backfill Feature**:
+When you enable backfill, the system extracts existing knowledge from your project:
+- **README.md** — Project overview and key concepts
+- **CHANGELOG.md** — Released features and changes
+- **lessons-learned/** — Existing lessons (if any)
+- **decisions/** — Architecture Decision Records
+- **chat-history/** — Extracted chat logs
+
+The system presents candidates for your review before creating entries.
 
 **Next steps**: Run `/kmgraph:status` to verify setup
 
@@ -1184,7 +1197,7 @@ git checkout -b issue/N-description
 
 ---
 
-**Version**: 0.0.8.2-alpha
-**Updated**: 2026-02-21
+**Version**: 0.0.10-alpha
+**Updated**: 2026-02-27
 
 <!-- Updated: 2026-02-21 -->
