@@ -1187,17 +1187,33 @@ git checkout -b issue/N-description
 - [Templates](../core/templates/) - Structured formats
 - [Examples](../core/examples/) - Real samples
 
-**Getting started**:
-- [Installation](GETTING-STARTED.md) - Setup guide
-- [Configuration](CONFIGURATION.md) - Post-install
+## Next Steps
 
-**Manual workflows**:
-- [Workflows](../core/docs/WORKFLOWS.md) - Non-Claude processes
-- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) - AI integrations
+- **First-time users**: Start with [Getting Started](GETTING-STARTED.md) for installation and first lesson
+- **Need a quick reference?**: See [Cheat Sheet](CHEAT-SHEET.md) for one-page command summary
+- **Understanding concepts**: Read [Concepts Guide](CONCEPTS.md) for plain-English explanations of all terms
+- **Multiple LLMs?**: Check [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) for Cursor, Windsurf, Continue.dev setup
+
+---
+
+## Related Documentation
+
+**Getting started**:
+- [Getting Started Guide](GETTING-STARTED.md) — Installation, first lesson, setup verification (5 min)
+- [Installation](INSTALL.md) — Universal installer for all platforms (paste-friendly)
+- [Configuration Guide](CONFIGURATION.md) — Post-install setup: sanitization, team workflows, MCP server
+
+**Learning resources**:
+- [Quick Reference](CHEAT-SHEET.md) — One-page cheat sheet for common tasks
+- [Concepts Guide](CONCEPTS.md) — Plain-English definitions of every term and pattern
+- [Examples](../core/examples/) — Real-world completed examples of lessons, ADRs, and KG entries
+
+**Advanced**:
+- [Workflows](../core/docs/WORKFLOWS.md) — Step-by-step guides for all 9 workflow types (non-Claude platforms)
+- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Integration details for Cursor, Windsurf, Continue, VS Code, Aider
+- [Style Guide](STYLE-GUIDE.md) — Documentation authoring standards and conventions
 
 ---
 
 **Version**: 0.0.10-alpha
 **Updated**: 2026-02-27
-
-<!-- Updated: 2026-02-21 -->

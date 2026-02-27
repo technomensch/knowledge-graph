@@ -277,26 +277,34 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 
 ## Next Steps
 
-1. **Create first lesson** using `/kmgraph:capture-lesson`
-2. **Study examples** in `core/examples/`
-3. **Read architecture guide** at [core/docs/ARCHITECTURE.md](../core/docs/ARCHITECTURE.md)
-4. **Customize templates** in `core/templates/`
-5. **Share with team** and establish conventions
+**After configuration:**
+1. **Create your first lesson** — Run `/kmgraph:capture-lesson` to document something you've learned
+2. **Study real examples** — Review `core/examples/` to see lesson, ADR, and KG entry patterns
+3. **Customize templates** — Adapt templates in `core/templates/` to your preferences
+4. **Share with team** — Set up sanitization and establish team conventions
+5. **Explore advanced features** — Read [Architecture Guide](../core/docs/ARCHITECTURE.md) for system design
 
 ---
 
 ## Related Documentation
 
-**Getting Started**:
-- [Installation Guide](GETTING-STARTED.md) - First-time setup
-- [Quick Reference](CHEAT-SHEET.md) - One-page command cheat sheet
+**Getting started**:
+- [Getting Started Guide](GETTING-STARTED.md) — Installation and setup walkthrough
+- [Command Reference](COMMAND-GUIDE.md) — All commands with detailed examples
+- [Quick Reference](CHEAT-SHEET.md) — One-page cheat sheet for common tasks
 
-**Guides & References**:
-- [Command Reference](COMMAND-GUIDE.md) - All commands with examples
-- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) - AI assistant integration
+**Learning**:
+- [Concepts Guide](CONCEPTS.md) — Plain-English definitions of all terms and patterns
+- [Examples](../core/examples/) — Real-world lesson, ADR, and KG entry examples
+- [Pattern Writing Guide](../core/docs/PATTERNS-GUIDE.md) — How to write high-quality entries
 
-**Resources**:
-- [Templates](../core/templates/) - Starting scaffolds
-- [Examples](../core/examples/) - Real-world samples
+**Advanced**:
+- [Architecture Guide](../core/docs/ARCHITECTURE.md) — System design and how components work together
+- [Manual Workflows](../core/docs/WORKFLOWS.md) — Step-by-step processes for non-Claude platforms
+- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Integration for Cursor, Windsurf, Continue, VS Code, Aider
+- [Style Guide](STYLE-GUIDE.md) — Documentation authoring standards and best practices
+- [Templates](../core/templates/) — Starting scaffolds for lessons, ADRs, and KG entries
 
-Questions? Check the examples or adapt the framework to your needs.
+---
+
+**Need help?** Check the [examples](../core/examples/) or adapt the templates to your workflow.

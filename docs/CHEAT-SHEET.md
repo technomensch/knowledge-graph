@@ -205,23 +205,34 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 
 ---
 
+## Need More Help?
+
+- **Want detailed examples?** → [Command Guide](COMMAND-GUIDE.md) — All commands with full documentation
+- **New to the system?** → [Getting Started](GETTING-STARTED.md) — Setup and first lesson walkthrough
+- **Understanding terminology?** → [Concepts Guide](CONCEPTS.md) — Definitions of all key terms
+- **Using other platforms?** → [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Cursor, Windsurf, Continue setup
+- **Configuring settings?** → [Configuration Guide](CONFIGURATION.md) — Post-install options and workflows
+
+---
+
 ## Related Documentation
 
 **Getting started**:
-- [Getting Started](GETTING-STARTED.md) - Installation and first steps
-- [Configuration](CONFIGURATION.md) - Post-install setup
+- [Getting Started Guide](GETTING-STARTED.md) — Installation, setup wizard, first lesson (5 min)
+- [Installation](INSTALL.md) — Universal installer for all platforms and LLMs
+- [Configuration Guide](CONFIGURATION.md) — Sanitization, team workflows, MCP server configuration
 
-**Concepts & Guides**:
-- [Concepts Guide](CONCEPTS.md) - Plain-English term explanations
-- [Command Reference](COMMAND-GUIDE.md) - All commands with examples
+**Learning**:
+- [Command Reference Guide](COMMAND-GUIDE.md) — Complete command documentation with examples and learning path
+- [Concepts Guide](CONCEPTS.md) — Plain-English definitions and explanations of all key terms
+- [Examples](../core/examples/) — Real-world lesson, ADR, and KG entry examples
 
-**Workflows**:
-- [Manual Workflows](../core/docs/WORKFLOWS.md) - Non-Claude processes
-- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) - AI integrations
+**Advanced topics**:
+- [Workflows](../core/docs/WORKFLOWS.md) — Step-by-step guides for manual workflows
+- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Integration for Cursor, Windsurf, Continue, VS Code, Aider
+- [Style Guide](STYLE-GUIDE.md) — Documentation authoring standards and best practices
 
 ---
 
 **Version**: 0.0.10-alpha
-**Last Updated**: 2026-02-21
-
-<!-- Updated: 2026-02-21 -->
+**Last Updated**: 2026-02-27
