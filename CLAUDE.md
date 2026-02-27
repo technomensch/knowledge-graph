@@ -18,6 +18,23 @@ A knowledge management tool: Claude Code extension + cross-platform MCP server.
 - `core/` — Platform-agnostic templates, docs, examples (PROTECTED: do not modify)
 - `docs/` — MkDocs Material documentation site
 
+## Skills
+
+Auto-triggered context providers that enhance agent behavior:
+
+- **lesson-capture** — Suggests `/kmgraph:capture-lesson` when bugs are solved or breakthroughs made
+- **kg-recall** — Guides knowledge graph search when asking about project history or past decisions
+- **session-wrap** — Prompts `/kmgraph:session-summary` when stopping work or approaching context limits
+- **adr-guide** — Suggests `/kmgraph:create-adr` when making architecture decisions
+- **gov-execute-plan** — Enforces zero-deviation plan execution protocol with strict constraints
+
+## Subagents
+
+Heavy-lift task handlers that keep main context clean:
+
+- **knowledge-extractor** — Read-only parsing of large files for KG extraction (approval-gated writes)
+- **session-documenter** — Git archaeology for session summaries (approval-gated commits/pushes)
+
 ## Code Protection Rules
 
 ⚠️ NEVER modify `commands/` or `core/templates/` without explicit user permission.
