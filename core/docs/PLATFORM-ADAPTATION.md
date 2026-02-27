@@ -40,7 +40,7 @@ This guide focuses on **platform capabilities and usage patterns** after install
 **Automation:** Full — all 22 commands, hooks, agents, and MCP tools available
 
 **Features:**
-- 22 commands: `/kg-sis:capture-lesson`, `/kg-sis:recall`, `/kg-sis:create-adr`, etc.
+- 22 commands: `/kmgraph:capture-lesson`, `/kmgraph:recall`, `/kmgraph:create-adr`, etc.
 - SessionStart hooks: check-memory, recent-lessons, memory-diff-check
 - Subagents for automated review
 - MEMORY.md bidirectional sync with archive/restore
@@ -70,7 +70,7 @@ This guide focuses on **platform capabilities and usage patterns** after install
 - No automated git metadata tracking
 - No bidirectional MEMORY.md sync
 - Manual category README updates
-- No automated pipelines (`/kg-sis:sync-all` equivalent)
+- No automated pipelines (`/kmgraph:sync-all` equivalent)
 
 **Workaround:** Use manual workflows from [WORKFLOWS.md](./WORKFLOWS.md) + Cursor Composer for assistance
 
@@ -152,7 +152,7 @@ This guide focuses on **platform capabilities and usage patterns** after install
 **Limitations:**
 - No Claude Code commands (22 commands are Claude Code-specific)
 - No SessionStart hooks
-- No automated pipeline (`/kg-sis:sync-all` equivalent)
+- No automated pipeline (`/kmgraph:sync-all` equivalent)
 
 ---
 

@@ -1,6 +1,6 @@
 # Configuration Guide
 
-This guide covers configuring and customizing the Knowledge Graph plugin after installation.
+This guide covers configuring and customizing the Knowledge Management Graph after installation.
 
 > **Installation instructions**: See [GETTING-STARTED.md](GETTING-STARTED.md) for installation steps.
 
@@ -277,7 +277,7 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 
 ## Next Steps
 
-1. **Create first lesson** using `/kg-sis:capture-lesson`
+1. **Create first lesson** using `/kmgraph:capture-lesson`
 2. **Study examples** in `core/examples/`
 3. **Read architecture guide** at [core/docs/ARCHITECTURE.md](../core/docs/ARCHITECTURE.md)
 4. **Customize templates** in `core/templates/`

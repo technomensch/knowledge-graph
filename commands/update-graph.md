@@ -39,11 +39,11 @@ This skill keeps the knowledge graph synchronized with lessons-learned by:
 ## Usage
 
 ```bash
-/kg-sis:update-graph
-/kg-sis:update-graph --lesson=Pattern_Discovery.md
-/kg-sis:update-graph --auto
-/kg-sis:update-graph --category=architecture
-/kg-sis:update-graph --sync-all
+/kmgraph:update-graph
+/kmgraph:update-graph --lesson=Pattern_Discovery.md
+/kmgraph:update-graph --auto
+/kmgraph:update-graph --category=architecture
+/kmgraph:update-graph --sync-all
 ```
 
 **Parameters:**
@@ -56,11 +56,11 @@ This skill keeps the knowledge graph synchronized with lessons-learned by:
 
 **Examples:**
 ```bash
-/kg-sis:update-graph
-/kg-sis:update-graph --lesson=Three_Tier_Sync_Pattern.md
-/kg-sis:update-graph --auto --sync-all
-/kg-sis:update-graph --lesson=Pattern.md --edit-entry  # Review before saving
-/kg-sis:update-graph --lesson=Pattern.md --auto        # Called from capture-lesson
+/kmgraph:update-graph
+/kmgraph:update-graph --lesson=Three_Tier_Sync_Pattern.md
+/kmgraph:update-graph --auto --sync-all
+/kmgraph:update-graph --lesson=Pattern.md --edit-entry  # Review before saving
+/kmgraph:update-graph --lesson=Pattern.md --auto        # Called from capture-lesson
 ```
 
 ---
@@ -71,7 +71,7 @@ This skill keeps the knowledge graph synchronized with lessons-learned by:
 
 **Standalone usage:**
 ```bash
-/kg-sis:update-graph --auto
+/kmgraph:update-graph --auto
 ```
 - Silent execution (no prompts)
 - Processes all recent lessons
@@ -79,7 +79,7 @@ This skill keeps the knowledge graph synchronized with lessons-learned by:
 
 **Called from capture-lesson workflow:**
 ```bash
-/kg-sis:update-graph --lesson=Pattern.md --auto
+/kmgraph:update-graph --lesson=Pattern.md --auto
 ```
 - Silent execution (no prompts)
 - Processes specified lesson
@@ -104,7 +104,7 @@ This skill keeps the knowledge graph synchronized with lessons-learned by:
 
 **Usage:**
 ```bash
-/kg-sis:update-graph --lesson=Pattern.md --edit-entry
+/kmgraph:update-graph --lesson=Pattern.md --edit-entry
 ```
 
 **Workflow:**
@@ -263,7 +263,7 @@ git log --oneline {active_kg_path}/lessons-learned/architecture/Pattern.md | hea
 ```
 
 **Typical sources:**
-- Just created during `/kg-sis:capture-lesson` skill
+- Just created during `/kmgraph:capture-lesson` skill
 - Modified as part of documentation updates
 - Referenced in recent session summary
 
@@ -474,7 +474,7 @@ Update the appropriate MEMORY.md section:
    memory_tokens=$((memory_words * 13 / 10))  # word_count × 1.3
    if [ "$memory_tokens" -gt 2000 ]; then
      echo "🛑 MEMORY.md exceeds hard limit (${memory_tokens}/2,000 tokens)"
-     echo "Run /kg-sis:archive-memory before adding new entries"
+     echo "Run /kmgraph:archive-memory before adding new entries"
      exit 1
    elif [ "$memory_tokens" -gt 1500 ]; then
      echo "⚠️  MEMORY.md approaching limit (${memory_tokens}/2,000 tokens)"
@@ -493,12 +493,12 @@ Update the appropriate MEMORY.md section:
 
 **Original Entry:**
 ```markdown
-| `/kg-sis:update-graph` | Extract structured insights from lessons learned | update-knowledge-graph.md |
+| `/kmgraph:update-graph` | Extract structured insights from lessons learned | update-knowledge-graph.md |
 ```
 
 **Updated Entry:**
 ```markdown
-| `/kg-sis:update-graph` | Extract structured insights & sync to memory (Step 7) | update-knowledge-graph.md |
+| `/kmgraph:update-graph` | Extract structured insights & sync to memory (Step 7) | update-knowledge-graph.md |
 ```
 
 **Additional note in "Core Governance Patterns":**
@@ -509,7 +509,7 @@ Update the appropriate MEMORY.md section:
 - KG provides quick-reference discovery mechanism
 - Bidirectional sync prevents knowledge drift between sessions
 
-**Implementation**: Step 7 of `/kg-sis:update-graph` skill checks if MEMORY.md needs updating when entries are created.
+**Implementation**: Step 7 of `/kmgraph:update-graph` skill checks if MEMORY.md needs updating when entries are created.
 
 **See**: [ADR-011: Knowledge Graph ↔ Memory Sync]({active_kg_path}/decisions/ADR-011-knowledge-graph-memory-sync.md)
 ```
@@ -602,11 +602,11 @@ echo "MEMORY.md size: ~${memory_tokens}/2,000 tokens"
 ### Typical Flow
 
 ```
-1. Create/Update Lesson (via /kg-sis:capture-lesson)
+1. Create/Update Lesson (via /kmgraph:capture-lesson)
    ↓
 2. Skill suggests: "Update knowledge graph?"
    ↓
-3. Run /kg-sis:update-graph --lesson=[file]
+3. Run /kmgraph:update-graph --lesson=[file]
    ↓
 4. Review extracted entry, approve or edit
    ↓
@@ -624,7 +624,7 @@ echo "MEMORY.md size: ~${memory_tokens}/2,000 tokens"
 ### Automatic Sync (--sync-all)
 
 ```bash
-/kg-sis:update-graph --sync-all
+/kmgraph:update-graph --sync-all
 
 # Checks:
 # 1. All lessons with "Related Resources:" links
@@ -696,7 +696,7 @@ declaring update complete.
 ### Processing Step
 
 ```bash
-/kg-sis:update-graph --lesson=Three_Tier_Sync_Pattern.md
+/kmgraph:update-graph --lesson=Three_Tier_Sync_Pattern.md
 ```
 
 ### Output: Knowledge Graph Entry
@@ -736,7 +736,7 @@ declaring update complete.
 ## Related Resources
 
 - **Knowledge Graph Entry:** [patterns.md → Three-Tier Sync Pattern]({active_kg_path}/knowledge/patterns.md#three-tier-sync-pattern)
-- **Related Skill:** `/kg-sis:update-graph`
+- **Related Skill:** `/kmgraph:update-graph`
 - **Session Summary:** [2026-01-16 v2.3 Config Sync Completion]({active_kg_path}/sessions/2026-01/2026-01-16_v2.3-config-sync-completion.md)
 - **GitHub Issue:** [ISSUE_ID] - Configuration Synchronization Enhancement
 ```
@@ -809,7 +809,7 @@ Enforce three-tier sync when updating modular files. See docs for details.
 
 ```bash
 # Check for orphaned or broken entries
-/kg-sis:update-graph --sync-all --show-updates
+/kmgraph:update-graph --sync-all --show-updates
 
 # Review and fix any broken links
 ```
@@ -831,13 +831,13 @@ Enforce three-tier sync when updating modular files. See docs for details.
 ## Integration with Other Skills
 
 **Creates entries from:**
-- `/kg-sis:capture-lesson` - Automatically suggests knowledge graph update
-- `/kg-sis:sync-all` - Calls this skill as part of automated pipeline
-- `/kg-sis:session-summary` - Auto-identifies patterns and suggests KG addition
+- `/kmgraph:capture-lesson` - Automatically suggests knowledge graph update
+- `/kmgraph:sync-all` - Calls this skill as part of automated pipeline
+- `/kmgraph:session-summary` - Auto-identifies patterns and suggests KG addition
 
 **Feeds into:**
-- `/kg-sis:recall` - Uses knowledge graph to find related lessons
-- `/kg-sis:update-issue-plan` - Links KG insights to plans and issues
+- `/kmgraph:recall` - Uses knowledge graph to find related lessons
+- `/kmgraph:update-issue-plan` - Links KG insights to plans and issues
 - Documentation updates - Knowledge entries get cited in decision docs
 
 ---
@@ -873,7 +873,7 @@ Three-Tier Sync Pattern appears in both patterns.md and architecture.md
 # Consolidate to primary location (usually patterns.md)
 # Remove from secondary location
 # Update cross-references
-# Run: /kg-sis:update-graph --sync-all
+# Run: /kmgraph:update-graph --sync-all
 ```
 
 ### Problem: Entry Is Too Generic
@@ -909,10 +909,10 @@ MEMORY.md is 320 lines (limit: 300)
 
 ## Related Commands
 
-- `/kg-sis:capture-lesson` - Document new lessons learned
-- `/kg-sis:recall` - Search across all KG systems
-- `/kg-sis:sync-all` - Full knowledge sync pipeline (calls this skill)
-- `/kg-sis:update-issue-plan` - Sync KG → plan → issue → GitHub
+- `/kmgraph:capture-lesson` - Document new lessons learned
+- `/kmgraph:recall` - Search across all KG systems
+- `/kmgraph:sync-all` - Full knowledge sync pipeline (calls this skill)
+- `/kmgraph:update-issue-plan` - Sync KG → plan → issue → GitHub
 
 ---
 

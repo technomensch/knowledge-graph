@@ -1,4 +1,4 @@
-site_name: Knowledge Graph Plugin
+site_name: Knowledge Management Graph
 site_description: Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 site_url: https://technomensch.github.io/knowledge-graph/
 repo_url: https://github.com/technomensch/knowledge-graph
@@ -54,7 +54,7 @@ nav:
   - Contributing:
       - Style Guide: STYLE-GUIDE.md
       - Navigation Index: NAVIGATION-INDEX.md
-      - Documentation Changelog: CHANGELOG-DOCS-ONLY.md
+      - Changelog: CHANGELOG.md
 
 plugins:
   - search:

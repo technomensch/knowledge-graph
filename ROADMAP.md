@@ -134,7 +134,7 @@
 ### Completed - All Phases
 
 #### Phase 1: Core Restore Command
-- ✅ Created `/kg-sis:restore-memory` command (new - 18th command)
+- ✅ Created `/kmgraph:restore-memory` command (new - 18th command)
   - Restore by entry title with fuzzy search
   - Restore by entry ID/index from archive
   - List all archived entries with `--list` flag
@@ -146,7 +146,7 @@
 - ✅ Created `scripts/fuzzy-search-archive.sh` helper
   - Four-tier ranking: exact, starts-with, contains-all, contains-any
   - Case-insensitive search with word-based fuzzy matching
-- ✅ Updated `/kg-sis:archive-memory` command
+- ✅ Updated `/kmgraph:archive-memory` command
   - Added restoration tracking to archive log format
   - Documents restore workflow and manual restoration process
 
@@ -159,7 +159,7 @@
   - Command count: 17 → 18
   - Updated status and feature list
 - ✅ Updated ROADMAP.md with v0.0.4-alpha section
-- ✅ Updated CHANGELOG.md with v0.0.4-alpha entry
+- ✅ Updated docs/CHANGELOG.md with v0.0.4-alpha entry
 
 #### Phase 3: ADR Documentation
 - ✅ Created `docs/decisions/ADR-001-defer-memory-rules-engine.md`
@@ -217,19 +217,19 @@
 ### Scope: Validation Fixes + Issue Tracking Command
 
 #### Changes
-- ✅ `/kg-sis:start-issue-tracking` — Full issue initialization workflow (19th command)
+- ✅ `/kmgraph:start-issue-tracking` — Full issue initialization workflow (19th command)
   - Ported from optimize-my-resume, sanitized for cross-project portability
   - LLM-platform-agnostic (no Claude-specific API calls)
   - Auto-detects: parent branch, version from git, issue type, next issue number
   - Smart defaults reduce prompts to 1 (issue description)
   - Creates issue directory structure under `{active_kg_path}/issues/`
   - Generates issue.md with metadata, git branch, KG sync
-  - Integrates with `/kg-sis:update-issue-plan` and `/kg-sis:link-issue`
+  - Integrates with `/kmgraph:update-issue-plan` and `/kmgraph:link-issue`
 - ✅ Fixed `.gitignore` inline comment bug (silently prevented 3 paths from being ignored)
 - ✅ Removed orphaned `mcp-server/.claude-plugin/` artifact directory
 - ✅ Removed root-level `node_modules/` with no root `package.json`
 - ✅ Standardized command frontmatter (removed `name` field from 3 commands)
-- ✅ Fixed dangling `/kg-sis:start-issue-tracking` references in `update-issue-plan.md`
+- ✅ Fixed dangling `/kmgraph:start-issue-tracking` references in `update-issue-plan.md`
 - ✅ Fixed first `SessionStart` hook entry missing `comment` field
 - ✅ Fixed session-summary template not fenced in code block
 - ✅ Confirmed: `SessionStart` hook event name is valid and working
@@ -254,13 +254,13 @@
 
 #### Phase 1: Skill Enhancement + Command Hooks
 - ✅ Enhanced knowledge-graph-usage skill with autonomous triggering
-  - After lesson capture: Suggest `/kg-sis:update-graph` immediately
+  - After lesson capture: Suggest `/kmgraph:update-graph` immediately
   - After commits: Detect fix/debug/pattern keywords, suggest capture
-  - Before problem-solving: Suggest `/kg-sis:recall` to check existing knowledge
+  - Before problem-solving: Suggest `/kmgraph:recall` to check existing knowledge
 - ✅ Updated capture-lesson Step 4.6 with structured choice UI
 - ✅ Enhanced update-graph with `--edit-entry` flag and structured quality feedback
 - ✅ Created post-commit hook template (core/examples-hooks/)
-- ✅ Added hook installation to `/kg-sis:init` wizard (optional, default: no)
+- ✅ Added hook installation to `/kmgraph:init` wizard (optional, default: no)
 
 #### Phase 2: Context Enhancement + Duplicate Detection
 - ✅ Added recent-lessons.sh SessionStart hook (displays lessons from last 7 days)
@@ -272,7 +272,7 @@
 - ✅ Token-based limits (1,500 soft / 2,000 hard) replace line-based limits
 - ✅ Updated sync-all with MEMORY.md size check (Step 2.5)
 - ✅ Updated update-graph Step 7 with token-based verification
-- ✅ Created `/kg-sis:archive-memory` command (new - 17th command)
+- ✅ Created `/kmgraph:archive-memory` command (new - 17th command)
 - ✅ Added memory-diff-check.sh SessionStart hook (shows changes since last session)
 
 ### Key Deliverables
@@ -291,7 +291,7 @@
 ### Deferred to v0.0.4-alpha
 - MEMORY.md auto-sync rules engine (YAML rules, confidence scoring)
 - Smart summarization (LLM-powered entry consolidation)
-- `/kg-sis:restore-memory` command (restore archived entries)
+- `/kmgraph:restore-memory` command (restore archived entries)
 - Per-KG config directories with memory-sync-rules.yaml
 
 ---
@@ -365,7 +365,7 @@
 - Implemented progressive disclosure pattern
 
 #### Phase 3: Capture Lesson with Command ✅
-- Used /kg-sis:capture-lesson on plugin itself
+- Used /kmgraph:capture-lesson on plugin itself
 - Validated git metadata capture
 - Updated master index automatically
 - Committed with proper message format
@@ -435,7 +435,7 @@
 **Priority**: Low
 **Rationale**: Typing speed is minor compared to LLM response time
 
-- Allow `/kg-sis:cl` as alias for `/kg-sis:capture-lesson`
+- Allow `/kmgraph:cl` as alias for `/kmgraph:capture-lesson`
 - Configurable aliases in kg-config.json
 - Example config:
   ```json
@@ -474,7 +474,7 @@ Allow `.claude/kg-local.json` at project root to override global config:
 **Priority**: Medium
 **Rationale**: Safety net for accidental deletions
 
-- `/kg-sis:switch` and `/kg-sis:init` should snapshot current state
+- `/kmgraph:switch` and `/kmgraph:init` should snapshot current state
 - Auto-backup before category deletion or KG removal
 - Lightweight: just `cp -r` to timestamped directory in `~/.claude/kg-backups/`
 
@@ -510,7 +510,7 @@ Current search is full-text file walk — works for <500 files. For larger KGs:
 
 - Mark KG entries as "superseded by [newer entry]"
 - Archive old lessons without deleting (move to `archive/` subdirectory)
-- `/kg-sis:archive` skill for managing lifecycle
+- `/kmgraph:archive` skill for managing lifecycle
 - Search includes archived content by default (flag to exclude)
 
 **Example frontmatter**:
@@ -532,7 +532,7 @@ reason: "Pattern evolved to support dynamic tier discovery"
 - v1.0 → v1.1 config changes need migration
 - Add `"version"` field to kg-config.json (already present in v1.0)
 - MCP `kg_config_init` should check version and migrate if needed
-- Document migration path in CHANGELOG.md
+- Document migration path in docs/CHANGELOG.md
 
 **Example migration**:
 ```javascript
@@ -579,7 +579,7 @@ reason: "Pattern evolved to support dynamic tier discovery"
 - [ ] Documentation is comprehensive
 - [ ] MCP server tested on macOS and Linux
 - [ ] README has installation instructions
-- [ ] CHANGELOG.md is up to date
+- [ ] docs/CHANGELOG.md is up to date
 
 **Why not v1.0**: v1.0 IS the marketplace launch. This is the post-launch checklist.
 
@@ -595,7 +595,7 @@ Potential new tools:
    - Already implemented in skills via bash, but MCP makes it reusable for other platforms
 
 2. **`kg_link_issue`** — Update YAML frontmatter + post GitHub comment
-   - Current implementation in `/kg-sis:link-issue` skill
+   - Current implementation in `/kmgraph:link-issue` skill
    - MCP makes it available to Cursor/Continue.dev/Cline users
 
 3. **`kg_extract_chat`** — Run Python extraction scripts

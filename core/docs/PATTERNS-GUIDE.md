@@ -525,7 +525,7 @@ A special file that syncs your most important patterns to Claude's persistent me
 ### How It Works
 
 1. You capture lessons and patterns over time
-2. Run `/kg-sis:update-graph` (extracts patterns from lessons)
+2. Run `/kmgraph:update-graph` (extracts patterns from lessons)
 3. Top patterns written to `MEMORY.md`
 4. Claude reads `MEMORY.md` at session start
 5. Claude "remembers" your patterns automatically
@@ -535,12 +535,12 @@ A special file that syncs your most important patterns to Claude's persistent me
 **Active** (`MEMORY.md`):
 - Current, frequently-used patterns
 - Target: <200 lines (keeps Claude context efficient)
-- Updated by `/kg-sis:update-graph`
+- Updated by `/kmgraph:update-graph`
 
 **Archived** (`MEMORY-archive.md`):
 - Older patterns, still valid but less used
-- Moved by `/kg-sis:archive-memory`
-- Retrievable via `/kg-sis:restore-memory`
+- Moved by `/kmgraph:archive-memory`
+- Retrievable via `/kmgraph:restore-memory`
 
 ### Managing MEMORY.md
 
@@ -555,8 +555,8 @@ A special file that syncs your most important patterns to Claude's persistent me
 - Team member needs historical context
 
 **Commands**:
-- `/kg-sis:archive-memory` - Move entries to archive
-- `/kg-sis:restore-memory` - Bring back archived entries
+- `/kmgraph:archive-memory` - Move entries to archive
+- `/kmgraph:restore-memory` - Bring back archived entries
 
 See [Command Guide](../../docs/COMMAND-GUIDE.md) for details.
 

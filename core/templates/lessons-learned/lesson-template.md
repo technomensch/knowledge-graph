@@ -1,7 +1,7 @@
 ---
 # ====================
 # YAML FRONTMATTER - Metadata for this lesson
-# Fields marked [AUTO] are filled by /kg-sis:capture-lesson command
+# Fields marked [AUTO] are filled by /kmgraph:capture-lesson command
 # Fields marked [MANUAL] require you to fill them in
 # ====================
 

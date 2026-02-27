@@ -29,7 +29,7 @@ echo "📚 Symlinking 16 skills..."
 count=0
 for skill_dir in "$SKILLS_DIR"/*; do
   skill_name=$(basename "$skill_dir")
-  target_link="$TARGET_DIR/knowledge:$skill_name.md"
+  target_link="$TARGET_DIR/kmgraph:$skill_name.md"
 
   # Remove existing symlink if present
   if [ -L "$target_link" ]; then
@@ -43,7 +43,7 @@ for skill_dir in "$SKILLS_DIR"/*; do
     echo "   ⚠ Skipping $skill_name (no SKILL.md found)"
     continue
   fi
-  echo "   ✓ /knowledge:$skill_name"
+  echo "   ✓ /kmgraph:$skill_name"
   ((count++))
 done
 
@@ -52,8 +52,8 @@ echo "✅ Installation complete! Linked $count skills."
 echo ""
 echo "📝 Next steps:"
 echo "   1. Restart your VSCode window (Cmd+Shift+P → Reload Window)"
-echo "   2. Type /knowledge: in Claude Code and verify all 16 skills appear"
-echo "   3. Run /knowledge:init to set up your knowledge graph"
+echo "   2. Type /kmgraph: in Claude Code and verify all 16 skills appear"
+echo "   3. Run /kmgraph:init to set up your knowledge graph"
 echo ""
 echo "⚠️  Rollback: To remove these symlinks, run:"
-echo "   rm $TARGET_DIR/knowledge:*.md"
+echo "   rm $TARGET_DIR/kmgraph:*.md"

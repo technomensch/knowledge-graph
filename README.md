@@ -1,8 +1,8 @@
-# Knowledge Graph Plugin for Claude Code
+# Knowledge Management Graph for Claude Code
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.0.8.7-alpha
+**Version:** 0.0.9-alpha
 **Status:** Security Fixes & Documentation Refinements
 
 Documentation avaliable at - https://technomensch.github.io/knowledge-graph/
@@ -38,7 +38,7 @@ A Claude Code plugin that provides:
 
 Paste [INSTALL.md](INSTALL.md) into any AI assistant for automated setup on any platform — Claude Code, Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Aider, or local LLMs.
 
-**Claude Code users:** Run `claude plugin install knowledge` or load with `claude --plugin-dir /path/to/knowledge-graph`, then run `/kg-sis:init`.
+**Claude Code users:** Run `claude plugin install knowledge` or load with `claude --plugin-dir /path/to/knowledge-graph`, then run `/kmgraph:init`.
 
 See [Getting Started Guide](docs/GETTING-STARTED.md) for prerequisites and troubleshooting.
 
@@ -53,36 +53,36 @@ See [Getting Started Guide](docs/GETTING-STARTED.md) for prerequisites and troub
 
 First-time users need these for basic operation:
 
-- `/kg-sis:init` — Initialize new knowledge graph with wizard-based setup
-- `/kg-sis:capture-lesson` — Document lessons learned with git metadata tracking
-- `/kg-sis:status` — View active knowledge graph info and quick reference
-- `/kg-sis:recall` — Search across all memory systems (lessons, decisions, knowledge)
+- `/kmgraph:init` — Initialize new knowledge graph with wizard-based setup
+- `/kmgraph:capture-lesson` — Document lessons learned with git metadata tracking
+- `/kmgraph:status` — View active knowledge graph info and quick reference
+- `/kmgraph:recall` — Search across all memory systems (lessons, decisions, knowledge)
 
 ### 🟡 Intermediate Commands (Once Comfortable)
 
 Active users leverage these for regular workflows:
 
-- `/kg-sis:update-graph` — Extract knowledge graph entries from lessons
-- `/kg-sis:add-category` — Add a new category to existing knowledge graph
-- `/kg-sis:session-summary` — Create summary of current chat session
-- `/kg-sis:list` — Display all configured knowledge graphs
-- `/kg-sis:switch` — Change active knowledge graph
-- `/kg-sis:check-sensitive` — Scan knowledge graph for potentially sensitive information
-- `/kg-sis:config-sanitization` — Interactive wizard for pre-commit hook setup
-- `/kg-sis:extract-chat` — Extract chat history from Claude and Gemini logs
-- `/kg-sis:update-doc` — Update plugin/project documentation (`--user-facing`) or KG content
+- `/kmgraph:update-graph` — Extract knowledge graph entries from lessons
+- `/kmgraph:add-category` — Add a new category to existing knowledge graph
+- `/kmgraph:session-summary` — Create summary of current chat session
+- `/kmgraph:list` — Display all configured knowledge graphs
+- `/kmgraph:switch` — Change active knowledge graph
+- `/kmgraph:check-sensitive` — Scan knowledge graph for potentially sensitive information
+- `/kmgraph:config-sanitization` — Interactive wizard for pre-commit hook setup
+- `/kmgraph:extract-chat` — Extract chat history from Claude and Gemini logs
+- `/kmgraph:update-doc` — Update plugin/project documentation (`--user-facing`) or KG content
 
 ### 🔴 Advanced Commands (Power Features)
 
 Power users use these for complex workflows:
 
-- `/kg-sis:meta-issue` — Initialize meta-issue tracking for complex multi-attempt problems
-- `/kg-sis:start-issue-tracking` — Initialize issue tracking with structured docs and Git branch
-- `/kg-sis:update-issue-plan` — Sync knowledge graph → plan → issue → GitHub
-- `/kg-sis:link-issue` — Manually link existing lesson or ADR to GitHub issue
-- `/kg-sis:archive-memory` — Archive stale MEMORY.md entries to prevent bloat
-- `/kg-sis:restore-memory` — Restore archived MEMORY.md entries
-- `/kg-sis:sync-all` — Automated full sync pipeline (4 steps → 1 command)
+- `/kmgraph:meta-issue` — Initialize meta-issue tracking for complex multi-attempt problems
+- `/kmgraph:start-issue-tracking` — Initialize issue tracking with structured docs and Git branch
+- `/kmgraph:update-issue-plan` — Sync knowledge graph → plan → issue → GitHub
+- `/kmgraph:link-issue` — Manually link existing lesson or ADR to GitHub issue
+- `/kmgraph:archive-memory` — Archive stale MEMORY.md entries to prevent bloat
+- `/kmgraph:restore-memory` — Restore archived MEMORY.md entries
+- `/kmgraph:sync-all` — Automated full sync pipeline (4 steps → 1 command)
 
 ---
 
@@ -94,18 +94,18 @@ Namespace visibility in Claude Code works differently for local development vs. 
 
 ### Marketplace Installation (Distribution Mode)
 
-When installed via marketplace, Claude Code correctly shows the `/kg-sis:` namespace prefix regardless of filename:
+When installed via marketplace, Claude Code correctly shows the `/kmgraph:` namespace prefix regardless of filename:
 
 **Command files:**
 ```
 commands/
-├── status.md          → Shows as /kg-sis:status in UI ✅
-├── init.md            → Shows as /kg-sis:init in UI ✅
-├── capture-lesson.md  → Shows as /kg-sis:capture-lesson in UI ✅
+├── status.md          → Shows as /kmgraph:status in UI ✅
+├── init.md            → Shows as /kmgraph:init in UI ✅
+├── capture-lesson.md  → Shows as /kmgraph:capture-lesson in UI ✅
 ```
 
 **Autocomplete behavior:**
-- User types `/know` → shows `/kg-sis:status`, `/kg-sis:init`, etc.
+- User types `/know` → shows `/kmgraph:status`, `/kmgraph:init`, etc.
 - Namespace prefix is automatically applied by Claude Code
 - No filename prefix needed
 
@@ -161,9 +161,9 @@ Knowledge graph operations are **deterministic workflows** that work best when:
 ### Invocation Pattern
 
 All knowledge graph commands use the `knowledge:` namespace:
-- `/kg-sis:capture-lesson`
-- `/kg-sis:init`
-- `/kg-sis:recall`
+- `/kmgraph:capture-lesson`
+- `/kmgraph:init`
+- `/kmgraph:recall`
 
 **For plugin developers:** Choose `commands/` when you want users to have explicit control over when workflows run. Choose `skills/` when you want Claude to autonomously discover and apply capabilities.
 
@@ -196,7 +196,7 @@ knowledge-graph/
 │   └── plans/                # Implementation plans (Phase 1-5)
 ├── README.md                 # This file
 ├── LICENSE                   # MIT
-└── CHANGELOG.md              # Version history
+└── docs/CHANGELOG.md         # Version history
 ```
 
 ### Developer vs. Distribution Structure
@@ -311,7 +311,7 @@ See [tests/README.md](tests/README.md) for detailed troubleshooting.
 
 ### Command Not Found
 
-If `/kg-sis:command` doesn't autocomplete:
+If `/kmgraph:command` doesn't autocomplete:
 - Verify plugin is loaded (check Claude Code plugin list)
 - Commands use `knowledge:` prefix with colon (not hyphen)
 - Try restarting Claude Code

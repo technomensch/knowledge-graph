@@ -2,7 +2,7 @@
 description: Display active knowledge graph status, stats, and quick command reference
 ---
 
-# /kg-sis:status — Knowledge Graph Status Dashboard
+# /kmgraph:status — Knowledge Graph Status Dashboard
 
 Display active knowledge graph information, statistics, and quick command reference.
 
@@ -35,11 +35,11 @@ Stats:
   Sessions: 8
 
 Quick Commands:
-  /kg-sis:capture-lesson    — Document a lesson
-  /kg-sis:recall "query"    — Search across all KG
-  /kg-sis:sync-all          — Run full sync pipeline
-  /kg-sis:update-graph      — Extract KG entries from lessons
-  /kg-sis:session-summary   — Summarize this session
+  /kmgraph:capture-lesson    — Document a lesson
+  /kmgraph:recall "query"    — Search across all KG
+  /kmgraph:sync-all          — Run full sync pipeline
+  /kmgraph:update-graph      — Extract KG entries from lessons
+  /kmgraph:session-summary   — Summarize this session
 ```
 
 ## Implementation
@@ -52,7 +52,7 @@ CONFIG_PATH="$HOME/.claude/kg-config.json"
 if [ ! -f "$CONFIG_PATH" ]; then
   echo "No knowledge graphs configured."
   echo ""
-  echo "Get started with: /kg-sis:init"
+  echo "Get started with: /kmgraph:init"
   exit 0
 fi
 ```
@@ -66,9 +66,9 @@ if [ "$active" == "null" ]; then
   echo "No active knowledge graph."
   echo ""
   echo "Available graphs:"
-  /kg-sis:list --names-only
+  /kmgraph:list --names-only
   echo ""
-  echo "Activate one with: /kg-sis:switch <name>"
+  echo "Activate one with: /kmgraph:switch <name>"
   exit 0
 fi
 ```
@@ -151,7 +151,7 @@ fi
 
 if [ -n "$memory_warning" ]; then
   echo "$memory_warning"
-  echo "   Consider running /kg-sis:sync-all"
+  echo "   Consider running /kmgraph:sync-all"
   echo ""
 fi
 
@@ -163,11 +163,11 @@ echo "  Sessions: $session_count"
 echo ""
 
 echo "Quick Commands:"
-echo "  /kg-sis:capture-lesson    — Document a lesson"
-echo "  /kg-sis:recall \"query\"    — Search across all KG"
-echo "  /kg-sis:sync-all          — Run full sync pipeline"
-echo "  /kg-sis:update-graph      — Extract KG entries from lessons"
-echo "  /kg-sis:session-summary   — Summarize this session"
+echo "  /kmgraph:capture-lesson    — Document a lesson"
+echo "  /kmgraph:recall \"query\"    — Search across all KG"
+echo "  /kmgraph:sync-all          — Run full sync pipeline"
+echo "  /kmgraph:update-graph      — Extract KG entries from lessons"
+echo "  /kmgraph:session-summary   — Summarize this session"
 ```
 
 ## Turbo Mode
@@ -175,7 +175,7 @@ echo "  /kg-sis:session-summary   — Summarize this session"
 Minimal output:
 
 ```bash
-/kg-sis:status --minimal
+/kmgraph:status --minimal
 ```
 
 Output:
@@ -186,7 +186,7 @@ my-project: 12 lessons, 28 KG entries, 5 ADRs
 JSON output:
 
 ```bash
-/kg-sis:status --json
+/kmgraph:status --json
 ```
 
 Output:
@@ -211,6 +211,6 @@ Output:
 
 ## See Also
 
-- `/kg-sis:list` — View all configured KGs
-- `/kg-sis:switch` — Change active KG
-- `/kg-sis:sync-all` — Sync KG with MEMORY.md
+- `/kmgraph:list` — View all configured KGs
+- `/kmgraph:switch` — Change active KG
+- `/kmgraph:sync-all` — Sync KG with MEMORY.md

@@ -92,5 +92,5 @@ Navigate all knowledge graph entries by category.
 5. Update this index
 
 **To search:**
-Use `/kg-sis:recall "query"` to search across all KG files.
+Use `/kmgraph:recall "query"` to search across all KG files.
 

@@ -1,6 +1,6 @@
 # Documentation Navigation Index
 
-**Complete sitemap** for knowledge graph plugin documentation. Find what you need in 3 clicks or less.
+**Complete sitemap** for Knowledge Management Graph documentation. Find what you need in 3 clicks or less.
 
 ---
 
@@ -26,7 +26,7 @@
 **Configure & Customize**:
 - Set up sanitization hooks → [Configuration](CONFIGURATION.md)
 - Adapt to my AI assistant → [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md)
-- Add custom categories → [Add Category Command](COMMAND-GUIDE.md#kg-sisadd-category)
+- Add custom categories → [Add Category Command](COMMAND-GUIDE.md#kmgraphadd-category)
 
 **Understand the System**:
 - How does it work? → [Architecture Guide](../core/docs/ARCHITECTURE.md)
@@ -40,13 +40,13 @@
 
 **Track Complex Problems**:
 - Multi-attempt bugs → [Meta-Issue Guide](../core/docs/META-ISSUE-GUIDE.md)
-- Link to GitHub issues → [Link Issue Command](COMMAND-GUIDE.md#kg-sislink-issue)
-- Issue tracking workflows → [Start Issue Tracking Command](COMMAND-GUIDE.md#kg-sisstart-issue-tracking)
+- Link to GitHub issues → [Link Issue Command](COMMAND-GUIDE.md#kmgraphlink-issue)
+- Issue tracking workflows → [Start Issue Tracking Command](COMMAND-GUIDE.md#kmgraphstart-issue-tracking)
 
 **Share Safely**:
 - Remove sensitive data → [Sanitization Checklist](../core/docs/SANITIZATION-CHECKLIST.md)
-- Set up pre-commit hooks → [Config Sanitization Command](COMMAND-GUIDE.md#kg-sisconfig-sanitization)
-- Check before sharing → [Check Sensitive Command](COMMAND-GUIDE.md#kg-sischeck-sensitive)
+- Set up pre-commit hooks → [Config Sanitization Command](COMMAND-GUIDE.md#kmgraphconfig-sanitization)
+- Check before sharing → [Check Sensitive Command](COMMAND-GUIDE.md#kmgraphcheck-sensitive)
 
 ---
 
@@ -143,10 +143,10 @@
 ```
 knowledge-graph/
 ├── README.md ..................... Project overview
-├── CHANGELOG.md .................. Version history
 ├── ROADMAP.md .................... Development plans
 │
 ├── docs/ ......................... User-facing guides
+│   ├── CHANGELOG.md .............. Version history
 │   ├── GETTING-STARTED.md ........ Installation & first steps ⭐
 │   ├── CONFIGURATION.md .......... Post-install setup
 │   ├── CHEAT-SHEET.md ............ One-page quick reference ⭐
@@ -215,12 +215,12 @@ Are you using Claude Code?
 
 ```
 What do you want to do?
-├─ Document a lesson → /kg-sis:capture-lesson
-├─ Search knowledge → /kg-sis:recall "query"
-├─ See status → /kg-sis:status
-├─ Initialize new KG → /kg-sis:init
-├─ Sync to MEMORY.md → /kg-sis:update-graph
-├─ Track complex bug → /kg-sis:meta-issue
+├─ Document a lesson → /kmgraph:capture-lesson
+├─ Search knowledge → /kmgraph:recall "query"
+├─ See status → /kmgraph:status
+├─ Initialize new KG → /kmgraph:init
+├─ Sync to MEMORY.md → /kmgraph:update-graph
+├─ Track complex bug → /kmgraph:meta-issue
 └─ Not sure → [Cheat Sheet: I Want To...](CHEAT-SHEET.md#i-want-to)
 ```
 

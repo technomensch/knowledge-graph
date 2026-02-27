@@ -9,20 +9,20 @@ allowed-tools: Bash, Read, Write, Edit, Glob, Grep, AskUserQuestion
 
 **Version:** 1.0 (Created: 2026-02-20)
 
-**Note:** This command creates Architecture Decision Records. For Lessons Learned, use `/kg-sis:capture-lesson`. For general documentation, use `/kg-sis:create-doc`.
+**Note:** This command creates Architecture Decision Records. For Lessons Learned, use `/kmgraph:capture-lesson`. For general documentation, use `/kmgraph:create-doc`.
 
 ---
 
 ## Syntax Detection
 
 ```
-/kg-sis:create-adr
-/kg-sis:create-adr <title>
+/kmgraph:create-adr
+/kmgraph:create-adr <title>
 ```
 
 **Examples:**
-- `/kg-sis:create-adr` → Interactive wizard (all prompts)
-- `/kg-sis:create-adr Use PostgreSQL for primary database` → Pre-fills title from argument
+- `/kmgraph:create-adr` → Interactive wizard (all prompts)
+- `/kmgraph:create-adr Use PostgreSQL for primary database` → Pre-fills title from argument
 
 ---
 
@@ -335,7 +335,7 @@ Entry format:
 
 **Update the "Creating a New ADR" section** to reference the new command:
 ```markdown
-Run `/kg-sis:create-adr` — the command handles numbering, metadata, and index updates automatically.
+Run `/kmgraph:create-adr` — the command handles numbering, metadata, and index updates automatically.
 ```
 
 Only add this line if it is not already present.
@@ -365,7 +365,7 @@ Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
 
 ## Example Invocation
 
-**User types:** `/kg-sis:create-adr`
+**User types:** `/kmgraph:create-adr`
 
 **Assistant responds:**
 
@@ -407,13 +407,13 @@ Let me ask a few questions:
 
 ## Related Commands
 
-- `/kg-sis:capture-lesson` — Document lessons learned (ADR link offered after capture)
-- `/kg-sis:create-doc` — Scaffold general documentation files
-- `/kg-sis:recall` — Search existing ADRs and lessons
-- `/kg-sis:link-issue` — Link an existing ADR to a GitHub issue
+- `/kmgraph:capture-lesson` — Document lessons learned (ADR link offered after capture)
+- `/kmgraph:create-doc` — Scaffold general documentation files
+- `/kmgraph:recall` — Search existing ADRs and lessons
+- `/kmgraph:link-issue` — Link an existing ADR to a GitHub issue
 
 ---
 
 **Created:** 2026-02-20
 **Version:** 1.0
-**Usage:** Type `/kg-sis:create-adr` to create a new Architecture Decision Record
+**Usage:** Type `/kmgraph:create-adr` to create a new Architecture Decision Record

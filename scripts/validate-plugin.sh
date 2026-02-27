@@ -100,7 +100,7 @@ done
 
 # Scan for version patterns
 for version in "${VERSION_PATTERNS[@]}"; do
-  # Exclude version numbers in CHANGELOG.md and plan file names
+  # Exclude version numbers in docs/CHANGELOG.md and plan file names
   scan_for_pattern "$version" "version pattern: $version" "CHANGELOG\.md|v9\.5\.0-|phase-"
 done
 

@@ -65,7 +65,7 @@ Comprehensive catalog of all lessons-learned documents.
 ## Usage
 
 **To add a new lesson:**
-Use `/kg-sis:capture-lesson` which automatically:
+Use `/kmgraph:capture-lesson` which automatically:
 1. Creates the lesson file with template structure
 2. Auto-detects category based on topic
 3. Captures git metadata (branch, commit, PR, issue)
@@ -73,7 +73,7 @@ Use `/kg-sis:capture-lesson` which automatically:
 5. Links to knowledge graph
 
 **To search lessons:**
-Use `/kg-sis:recall "query"` to search across all lessons.
+Use `/kmgraph:recall "query"` to search across all lessons.
 
 ---
 
@@ -81,7 +81,7 @@ Use `/kg-sis:recall "query"` to search across all lessons.
 
 The lesson template uses YAML frontmatter with [AUTO] and [MANUAL] field markers:
 
-**[AUTO] fields** — Automatically filled by `/kg-sis:capture-lesson` command:
+**[AUTO] fields** — Automatically filled by `/kmgraph:capture-lesson` command:
 - `created` - Timestamp when lesson was created (ISO 8601 format)
 - `author` - From git config user.name
 - `email` - From git config user.email

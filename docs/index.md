@@ -1,8 +1,8 @@
-# Knowledge Graph Plugin
+# Knowledge Management Graph (kmgraph)
 
 ---
 
-**Stop losing knowledge in your LLM session chat history and never forget a prompting or coding breakthrough.**
+**Stop losing knowledge in LLM session chat history and never forget a prompting or coding breakthrough.**
 
 **Start building a searchable library of everything you learn while developing, debugging, or architecting with AI, and retain it across sessions, projects, and even platforms (like switching from Claude to Gemini).**
 
