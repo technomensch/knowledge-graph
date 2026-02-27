@@ -17,7 +17,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 # Find project memory directory
-MEMORY_PATH="$HOME/.claude/projects/$(basename $(pwd))/memory/MEMORY.md"
+MEMORY_PATH="$HOME/.claude/projects/$(basename "$(pwd)")/memory/MEMORY.md"
 
 if [ ! -f "$MEMORY_PATH" ]; then
     # No MEMORY.md, nothing to check
