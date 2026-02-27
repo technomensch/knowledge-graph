@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.0.8.7-alpha
+**Version:** 0.0.9-alpha
 **Status:** Security Fixes & Documentation Refinements
 
 Documentation avaliable at - https://technomensch.github.io/knowledge-graph/
