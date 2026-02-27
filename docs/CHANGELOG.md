@@ -7,6 +7,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.10-alpha] - 2026-02-27
+
+### Added
+- **Skills System (v0.0.10.1)**
+  - 5 auto-triggered context providers: `lesson-capture` (bug solved), `kg-recall` (past decisions), `session-wrap` (context limits), `adr-guide` (architecture decisions), `gov-execute-plan` (plan execution)
+  - Skill auto-surfaces suggestions when trigger conditions detected in conversation
+  - Reduces context overhead by ~46.9% via lazy-loading
+
+- **Subagents for Heavy-Lift Tasks (v0.0.10.1)**
+  - `knowledge-extractor` — Read-only parsing of large files; presents findings for user approval before writing
+  - `session-documenter` — Git archaeology for session summaries with conventional commit format
+  - Both operate in approval-gated mode; never auto-writes without user confirmation
+
+- **Optional KG Backfill During Init (v0.0.10.2)**
+  - New Step 1.10 in `/kmgraph:init`: "Would you like to backfill the knowledge graph from existing project context? [y/N]"
+  - If yes: invokes `knowledge-extractor` to scan README, CHANGELOG, lessons-learned/, decisions/, and chat-history/
+  - Extracts candidates and presents for user review before creating entries
+  - Enables new users to inherit institutional knowledge immediately
+
+- **Handoff Command (v0.0.10.3)**
+  - New `/kmgraph:handoff` — Generate comprehensive project transition documentation
+  - Creates 5 documents: START-HERE (current state), DOCUMENTATION-MAP (file inventory), SESSION-COMPILATION (recent work), OPEN-ISSUES (blockers), ARCHITECTURE-SNAPSHOT (codebase structure)
+  - Purpose: Enable seamless knowledge transfer before context limits or developer transitions
+
+- **Delegation Options for Heavy Reads (v0.0.10.3)**
+  - Updated `/kmgraph:extract-chat`, `/kmgraph:session-summary`, `/kmgraph:update-graph` with guidance
+  - When processing 10+ sessions or 50+ KB, suggests delegating to appropriate subagent
+  - Reduces peak context usage for large operations
+
+- **Documentation Configuration (v0.0.10.3)**
+  - Moved CHANGELOG.md to top-level mkdocs navigation (was nested under Contributing)
+  - Added LinkedIn icon to header (between GitHub and search) via custom theme override
+  - Updated COMMAND-GUIDE.md with handoff section and new delegation patterns
+  - Updated GETTING-STARTED.md with skills and subagents explanation and trigger table
+
+### Changed
+- **Commands Reference**
+  - Added `/kmgraph:handoff` (new command)
+  - Command count updated: 22 → 23 total commands
+  - Install instructions now reference `kmgraph` namespace consistently
+
+### Documentation
+- Added "Skills and Subagents" section to GETTING-STARTED.md with trigger tables
+- Added "Project Transitions & Onboarding" section to COMMAND-GUIDE.md
+- Enhanced CHEAT-SHEET.md with delegation syntax examples
+- Updated CLAUDE.md with Skills, Subagents, and Commit Format sections
+
+**Commits across v0.0.10.0 through v0.0.10.3:**
+- v0.0.10.0: Cleanup and workflow consolidation
+- v0.0.10.1: Skills (5), Subagents (2), and KG backfill scaffolding
+- v0.0.10.2: Integrated init backfill option (knowledge-extractor powered)
+- v0.0.10.3: Handoff command, delegation blocks, documentation updates, theme customization
+
+---
+
 ## [0.0.9-alpha] - 2026-02-27
 
 ### Added

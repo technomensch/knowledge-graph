@@ -2,8 +2,8 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.0.9-alpha
-**Status:** Security Fixes & Documentation Refinements
+**Version:** 0.0.10-alpha
+**Status:** Skills, Subagents, Backfill & Token Optimization
 
 Documentation avaliable at - https://technomensch.github.io/knowledge-graph/
 
@@ -38,13 +38,13 @@ A Claude Code plugin that provides:
 
 Paste [INSTALL.md](INSTALL.md) into any AI assistant for automated setup on any platform — Claude Code, Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Aider, or local LLMs.
 
-**Claude Code users:** Run `claude plugin install knowledge` or load with `claude --plugin-dir /path/to/knowledge-graph`, then run `/kmgraph:init`.
+**Claude Code users:** Run `claude plugin install kmgraph` or load with `claude --plugin-dir /path/to/knowledge-graph`, then run `/kmgraph:init`.
 
 See [Getting Started Guide](docs/GETTING-STARTED.md) for prerequisites and troubleshooting.
 
 ---
 
-## Commands (22 Total)
+## Commands (23 Total)
 
 **Quick Reference**: See [CHEAT-SHEET.md](docs/CHEAT-SHEET.md) for one-page quick reference guide
 **Detailed Guide**: See [COMMAND-GUIDE.md](docs/COMMAND-GUIDE.md) for comprehensive command documentation with learning paths
@@ -83,6 +83,19 @@ Power users use these for complex workflows:
 - `/kmgraph:archive-memory` — Archive stale MEMORY.md entries to prevent bloat
 - `/kmgraph:restore-memory` — Restore archived MEMORY.md entries
 - `/kmgraph:sync-all` — Automated full sync pipeline (4 steps → 1 command)
+- `/kmgraph:handoff` — Create comprehensive handoff documentation for transitions, context limits, or onboarding
+
+---
+
+## v0.0.10 Feature Highlights
+
+**Released 2026-02-27**
+
+- **5 Auto-Triggered Skills** — Context providers activate automatically: lesson-capture (bug solved), kg-recall (past decisions), session-wrap (context limits), adr-guide (architecture decisions), gov-execute-plan (plan execution)
+- **2 Subagents** — Heavy-lift task handlers operating in approval-gated mode: knowledge-extractor (read-only parsing), session-documenter (git archaeology)
+- **Optional KG Backfill** — Initialize knowledge graph with automatic extraction from README, CHANGELOG, existing lessons, decisions, and chat history
+- **Handoff Command** — Generate comprehensive project transition packages (START-HERE, DOCUMENTATION-MAP, SESSION-COMPILATION, OPEN-ISSUES, ARCHITECTURE-SNAPSHOT)
+- **Token Optimization Phase 2** — 46.9% context reduction via skills lazy-loading, subagent delegation for heavy reads, and consolidated automation hooks
 
 ---
 
