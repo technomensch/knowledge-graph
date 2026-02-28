@@ -127,15 +127,15 @@ Each step serves a specific purpose:
 
 - **[Essential Commands](COMMAND-GUIDE.md#essential-commands)**
 
-  Start with the core commands: init, capture-lesson, status, and recall. These cover 80% of daily use.
+    Start with the core commands: init, capture-lesson, status, and recall. These cover 80% of daily use.
 
 - **[Real-World Examples](../core/examples/)**
 
-  See completed examples of lessons learned, ADRs, and KG entries from real projects.
+    See completed examples of lessons learned, ADRs, and KG entries from real projects.
 
 - **[Set Up Sharing](CONFIGURATION.md#privacy-public-sharing)**
 
-  Configure sanitization to safely share your knowledge graph with team members and the public.
+    Configure sanitization to safely share your knowledge graph with team members and the public.
 
 </div>
 

@@ -298,56 +298,6 @@
    Grid Cards (for homepage and section intros)
    ============================================================ */
 
-.grid,
-.grid.cards {
-  display: grid;
-  grid-gap: 1.5em;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  margin: 1.5em 0;
-}
-
-.grid.cards > ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: contents;
-}
-
-.grid.cards > ul > li {
-  border: 1px solid rgba(0, 210, 255, 0.2);
-  border-radius: 6px;
-  padding: 1.5em;
-  background-color: rgba(0, 210, 255, 0.05);
-  transition: all 0.2s ease-in-out;
-}
-
-.grid.cards > ul > li:hover {
-  border-color: var(--md-accent-fg-color);
-  background-color: rgba(0, 210, 255, 0.1);
-  box-shadow: 0 4px 12px rgba(0, 210, 255, 0.15);
-}
-
-.grid.cards > ul > li strong {
-  color: var(--md-accent-fg-color);
-  display: block;
-  margin-bottom: 0.5em;
-}
-
-[data-md-color-scheme="default"] .grid.cards > ul > li {
-  border-color: rgba(0, 81, 163, 0.2);
-  background-color: rgba(0, 81, 163, 0.05);
-}
-
-[data-md-color-scheme="default"] .grid.cards > ul > li:hover {
-  border-color: #0051a3;
-  background-color: rgba(0, 81, 163, 0.1);
-  box-shadow: 0 4px 12px rgba(0, 81, 163, 0.15);
-}
-
-[data-md-color-scheme="default"] .grid.cards > ul > li strong {
-  color: #0051a3;
-}
-
 .grid {
   display: grid;
   grid-gap: 1.5em;

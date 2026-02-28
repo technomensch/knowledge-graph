@@ -1193,15 +1193,15 @@ git checkout -b issue/N-description
 
 - **[Getting Started](GETTING-STARTED.md)**
 
-  Installation, first lesson, and setup verification.
+    Installation, first lesson, and setup verification.
 
 - **[Quick Reference](CHEAT-SHEET.md)**
 
-  One-page cheat sheet with all commands at a glance.
+    One-page cheat sheet with all commands at a glance.
 
 - **[Concepts Guide](CONCEPTS.md)**
 
-  Plain-English explanations of all key terms and patterns.
+    Plain-English explanations of all key terms and patterns.
 
 </div>
 

@@ -542,15 +542,15 @@ MEMORY.md works best under 200 lines. When it grows beyond that threshold:
 
 - **[Getting Started](GETTING-STARTED.md)**
 
-  New to the system? Follow the installation and first lesson walkthrough.
+    New to the system? Follow the installation and first lesson walkthrough.
 
 - **[Command Reference](COMMAND-GUIDE.md)**
 
-  Ready to explore all commands? Detailed documentation with examples and learning path.
+    Ready to explore all commands? Detailed documentation with examples and learning path.
 
 - **[Architecture Guide](../core/docs/ARCHITECTURE.md)**
 
-  Want to understand how it works? Learn system design, patterns, and implementation details.
+    Want to understand how it works? Learn system design, patterns, and implementation details.
 
 </div>
 
