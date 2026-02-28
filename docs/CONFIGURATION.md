@@ -281,15 +281,15 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 
 - **[Capture Your First Lesson](GETTING-STARTED.md#step-4-capture-the-first-lesson)**
 
-  Document what you've learned with `/kmgraph:capture-lesson` while details are fresh.
+    Document what you've learned with `/kmgraph:capture-lesson` while details are fresh.
 
 - **[Study Real Examples](../core/examples/)**
 
-  Review completed examples of lessons learned, ADRs, and knowledge graph entries.
+    Review completed examples of lessons learned, ADRs, and knowledge graph entries.
 
 - **[Explore Advanced Features](../core/docs/ARCHITECTURE.md)**
 
-  Understand system design, patterns, and how to build custom workflows.
+    Understand system design, patterns, and how to build custom workflows.
 
 </div>
 
