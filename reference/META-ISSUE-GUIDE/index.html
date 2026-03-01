@@ -1,0 +1,2180 @@
+<!DOCTYPE html><html lang="en" class="no-js"><head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.">
+      
+      
+      
+        <link rel="canonical" href="https://technomensch.github.io/knowledge-graph/reference/META-ISSUE-GUIDE/">
+      
+      
+        <link rel="prev" href="../PATTERNS-GUIDE/">
+      
+      
+        <link rel="next" href="../SANITIZATION-CHECKLIST/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+    
+    
+      
+        <title>Meta-Issue Guide - Knowledge Management Graph</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
+            html.glightbox-open { overflow: initial; height: 100%; }
+            .gslide-title { margin-top: 0px; user-select: text; }
+            .gslide-desc { color: #666; user-select: text; }
+            .gslide-image img { background: white; }
+            .gscrollbar-fixer { padding-right: 15px; }
+            .gdesc-inner { font-size: 0.75rem; }
+            body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color); }
+            body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color); }
+            body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color); }
+        </style></head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-orange" data-md-color-accent="cyan">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#meta-issue-tracking-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+  
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Knowledge Management Graph" class="md-header__button md-logo" aria-label="Knowledge Management Graph" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Knowledge Management Graph
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Meta-Issue Guide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-orange" data-md-color-accent="cyan" aria-label="Switch to light mode" type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="blue" aria-label="Switch to dark mode" type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"></path></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/technomensch/knowledge-graph" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+  </div>
+  <div class="md-source__repository">
+    technomensch/knowledge-graph
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../GETTING-STARTED/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../INSTALL/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Installation
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../CONCEPTS/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Concepts
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../COMMAND-GUIDE/" class="md-tabs__link">
+          
+  
+  
+  Commands
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../CONFIGURATION/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Configuration
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../CHANGELOG/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Changelog
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../STYLE-GUIDE/" class="md-tabs__link">
+          
+  
+  
+  Contributing
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../GLOSSARY/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Glossary
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../ARCHITECTURE/" class="md-tabs__link">
+          
+  
+  
+  Advanced
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Knowledge Management Graph" class="md-nav__button md-logo" aria-label="Knowledge Management Graph" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+
+    </a>
+    Knowledge Management Graph
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/technomensch/knowledge-graph" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+  </div>
+  <div class="md-source__repository">
+    technomensch/knowledge-graph
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../GETTING-STARTED/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../INSTALL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CONCEPTS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5">
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Commands
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Commands
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../COMMAND-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CHEAT-SHEET/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cheat Sheet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../FAQ/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CONFIGURATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8">
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Contributing
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../STYLE-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Style Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../NAVIGATION-INDEX/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Navigation Index
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../GLOSSARY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Advanced
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WORKFLOWS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manual Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PLATFORM-ADAPTATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform Adaptation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PATTERNS-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pattern Writing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meta-Issue Guide
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meta-Issue Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-a-meta-issue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is a Meta-Issue?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-create-one" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Create One
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="When to Create One">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-a-meta-issue-when" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ CREATE a meta-issue when:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dont-create-for" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ❌ DON'T create for:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rule-of-thumb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule of Thumb
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#directory-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Directory Structure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#readmemd-navigation-hub" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        README.md (Navigation Hub)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#descriptionmd-living-document" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        description.md (Living Document)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation-logmd-timeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        implementation-log.md (Timeline)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-casesmd-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        test-cases.md (Validation)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attempt-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Attempt Structure
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Attempt Structure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#solution-approachmd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        solution-approach.md
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#attempt-resultsmd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        attempt-results.md
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-meta-issue-attempt-attempt_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Create Meta-Issue (Attempt #[ATTEMPT_ID])
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-document-previous-attempts-retroactively" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Document Previous Attempts Retroactively
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-before-each-new-attempt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Before Each New Attempt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-during-attempt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. During Attempt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-after-attempt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. After Attempt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-extract-lesson-when-resolved" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Extract Lesson When Resolved
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tips-for-effective-meta-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tips for Effective Meta-Issues
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tips for Effective Meta-Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-update-descriptionmd-after-each-attempt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Update description.md After Each Attempt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-use-consistent-test-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Use Consistent Test Cases
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-document-failures-honestly" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Document Failures Honestly
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-include-codeconfig-samples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Include Code/Config Samples
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-link-profiling-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Link Profiling Data
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-real-world-meta-issue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: Real-World Meta-Issue
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-close-a-meta-issue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Close a Meta-Issue
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SANITIZATION-CHECKLIST/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sanitization Checklist
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="Navigation">
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../.." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../ARCHITECTURE/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Advanced
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/technomensch/knowledge-graph/edit/main/docs/reference/META-ISSUE-GUIDE.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"></path></svg>
+    </a>
+  
+  
+
+
+<h1 id="meta-issue-tracking-guide">Meta-Issue Tracking Guide<a class="headerlink" href="#meta-issue-tracking-guide" title="Permanent link">¶</a></h1>
+<p><strong>For complex problems requiring multiple solution attempts</strong></p>
+<hr>
+<h2 id="what-is-a-meta-issue">What is a Meta-Issue?<a class="headerlink" href="#what-is-a-meta-issue" title="Permanent link">¶</a></h2>
+<p>A <strong>meta-issue</strong> is structured documentation for problems that:
+- Require <strong>3+ solution attempts</strong> before resolution
+- Have <strong>evolving root cause understanding</strong> across attempts
+- Need to track <strong>"what we tried" and "what we learned"</strong>
+- Don't fit standard single-issue tracking</p>
+<p><strong>Example:</strong> Performance degradation that required trying caching (failed), query optimization (partial), and connection pooling (succeeded) before fully resolving.</p>
+<hr>
+<h2 id="when-to-create-one">When to Create One<a class="headerlink" href="#when-to-create-one" title="Permanent link">¶</a></h2>
+<h3 id="create-a-meta-issue-when">✅ CREATE a meta-issue when:<a class="headerlink" href="#create-a-meta-issue-when" title="Permanent link">¶</a></h3>
+<ul>
+<li>You're on <strong>attempt #[ATTEMPT_ID]</strong> for the same problem</li>
+<li>Root cause <strong>theory changed</strong> after failed attempts</li>
+<li>Standard issue tracking <strong>feels insufficient</strong></li>
+<li>Future-you will ask <strong>"why did we try so many things?"</strong></li>
+<li>Problem spans <strong>multiple components/systems</strong></li>
+</ul>
+<h3 id="dont-create-for">❌ DON'T create for:<a class="headerlink" href="#dont-create-for" title="Permanent link">¶</a></h3>
+<ul>
+<li>First attempt at solving problem (use regular lesson)</li>
+<li>Multiple unrelated issues (separate lessons)</li>
+<li>Simple bugs with clear solutions</li>
+</ul>
+<hr>
+<h2 id="rule-of-thumb">Rule of Thumb<a class="headerlink" href="#rule-of-thumb" title="Permanent link">¶</a></h2>
+<p><strong>If you're on attempt #[ATTEMPT_ID], create a meta-issue.</strong></p>
+<p>Convert your previous attempts into the meta-issue structure retroactively.</p>
+<hr>
+<h2 id="directory-structure">Directory Structure<a class="headerlink" href="#directory-structure" title="Permanent link">¶</a></h2>
+<div class="highlight"><pre><span></span><code>docs/meta-issues/[issue-name]/
+├── README.md                 # Navigation hub (start here)
+├── description.md            # Living document (updated as understanding evolves)
+├── implementation-log.md     # Timeline of all attempts
+├── test-cases.md             # Validation criteria
+└── attempts/
+    ├── 001-baseline/
+    │   ├── solution-approach.md    # What we tried
+    │   └── attempt-results.md      # What happened
+    ├── 002-query-optimization/
+    │   ├── solution-approach.md
+    │   └── attempt-results.md
+    └── 003-connection-pooling/
+        ├── solution-approach.md
+        └── attempt-results.md
+</code></pre></div>
+<hr>
+<h2 id="core-files">Core Files<a class="headerlink" href="#core-files" title="Permanent link">¶</a></h2>
+<h3 id="readmemd-navigation-hub">README.md (Navigation Hub)<a class="headerlink" href="#readmemd-navigation-hub" title="Permanent link">¶</a></h3>
+<p><strong>Purpose:</strong> Starting point for anyone reading this meta-issue</p>
+<p><strong>Contents:</strong>
+- Problem summary
+- Timeline of attempts
+- Final resolution
+- Link to detailed files</p>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="gh"># Meta-Issue: API Performance Degradation</span>
+
+<span class="gs">**Status:**</span> Resolved (Attempt 003)
+<span class="gs">**Duration:**</span> 6 weeks
+
+<span class="gu">## Quick Navigation</span>
+<span class="k">-</span><span class="w"> </span>[<span class="nt">Description</span>](<span class="na">./description.md</span>) - Evolving understanding
+<span class="k">-</span><span class="w"> </span>[<span class="nt">Implementation Log</span>](<span class="na">./implementation-log.md</span>) - Timeline
+<span class="k">-</span><span class="w"> </span>[<span class="nt">Test Cases</span>](<span class="na">./test-cases.md</span>) - Validation
+<span class="k">-</span><span class="w"> </span>[<span class="nt">Attempts</span>](<span class="na">./attempts/</span>) - Detailed solutions
+
+<span class="gu">## Summary</span>
+Performance degraded under load. Tried caching (failed),
+query optimization (partial), connection pooling (success).
+
+<span class="gu">## Resolution</span>
+Attempt 003: Connection pooling + async operations
+Result: 93% improvement, all targets met
+</code></pre></div>
+<h3 id="descriptionmd-living-document">description.md (Living Document)<a class="headerlink" href="#descriptionmd-living-document" title="Permanent link">¶</a></h3>
+<p><strong>Purpose:</strong> Track how understanding evolved</p>
+<p><strong>Key feature:</strong> <strong>Update this file</strong> as each attempt reveals new information</p>
+<p><strong>Structure:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="gh"># Description: [Problem Name]</span>
+
+<span class="gu">## Current Understanding (v3)</span>
+[Latest theory after all attempts]
+
+<span class="gu">## Evolution of Understanding</span>
+
+<span class="gu">### Version 1 (Date) - Initial Hypothesis</span>
+<span class="gs">**Theory:**</span> [What we thought]
+<span class="gs">**Evidence:**</span> [Why we thought it]
+<span class="gs">**Test:**</span> [What we tried]
+<span class="gs">**Result:**</span> [What happened]
+<span class="gs">**Learning:**</span> [What it revealed]
+
+<span class="gu">### Version 2 (Date) - Refined Hypothesis</span>
+...
+
+<span class="gu">### Version 3 (Date) - Final Understanding</span>
+...
+</code></pre></div>
+<p><strong>Why this matters:</strong> Shows the journey from wrong understanding to correct understanding.</p>
+<h3 id="implementation-logmd-timeline">implementation-log.md (Timeline)<a class="headerlink" href="#implementation-logmd-timeline" title="Permanent link">¶</a></h3>
+<p><strong>Purpose:</strong> Chronological record of all work</p>
+<p><strong>Structure:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="gh"># Implementation Log</span>
+
+<span class="gu">## Attempt 001: Caching Layer</span>
+<span class="gs">**Date:**</span> 2024-09-01 to 2024-09-07
+<span class="gs">**Hypothesis:**</span> Processing bottleneck
+<span class="gs">**Result:**</span> ❌ Failed (2% improvement)
+<span class="gs">**Learning:**</span> Processing not the bottleneck
+
+<span class="gu">## Attempt 002: Query Optimization</span>
+<span class="gs">**Date:**</span> 2024-09-15 to 2024-09-25
+<span class="gs">**Hypothesis:**</span> Slow queries
+<span class="gs">**Result:**</span> ⚠️ Partial (30% improvement)
+<span class="gs">**Learning:**</span> Queries slow but not primary issue
+
+<span class="gu">## Attempt 003: Connection Pooling</span>
+<span class="gs">**Date:**</span> 2024-10-01 to 2024-10-12
+<span class="gs">**Hypothesis:**</span> Connection overhead
+<span class="gs">**Result:**</span> ✅ Success (93% improvement)
+<span class="gs">**Learning:**</span> Connection management was root cause
+</code></pre></div>
+<h3 id="test-casesmd-validation">test-cases.md (Validation)<a class="headerlink" href="#test-casesmd-validation" title="Permanent link">¶</a></h3>
+<p><strong>Purpose:</strong> Consistent testing across attempts</p>
+<p><strong>Contents:</strong>
+- Success criteria (what does "solved" mean?)
+- Test procedures (how to validate)
+- Results for each attempt</p>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="gh"># Test Cases</span>
+
+<span class="gu">## Success Criteria</span>
+<span class="k">-</span><span class="w"> </span>Response time: &lt; 1,000ms (avg)
+<span class="k">-</span><span class="w"> </span>Memory: &lt; 512MB (peak)
+<span class="k">-</span><span class="w"> </span>CPU: &lt; 40% (avg)
+<span class="k">-</span><span class="w"> </span>Error rate: &lt; 1%
+
+<span class="gu">## TC-001: Load Test (100 users)</span>
+<span class="gs">**Procedure:**</span> ...
+
+<span class="gs">**Results:**</span>
+<span class="k">-</span><span class="w"> </span>Attempt 001: 5,100ms (FAIL)
+<span class="k">-</span><span class="w"> </span>Attempt 002: 3,800ms (FAIL)
+<span class="k">-</span><span class="w"> </span>Attempt 003: 380ms (PASS) ✅
+</code></pre></div>
+<hr>
+<h2 id="attempt-structure">Attempt Structure<a class="headerlink" href="#attempt-structure" title="Permanent link">¶</a></h2>
+<p>Each attempt has two files:</p>
+<h3 id="solution-approachmd">solution-approach.md<a class="headerlink" href="#solution-approachmd" title="Permanent link">¶</a></h3>
+<p><strong>Written BEFORE attempting solution</strong></p>
+<p><strong>Contents:</strong>
+- Hypothesis
+- Expected outcome
+- Implementation plan
+- Configuration
+- Testing approach</p>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="gh"># Attempt 001: Caching Layer</span>
+
+<span class="gu">## Hypothesis</span>
+High CPU suggests processing bottleneck. Caching will reduce
+redundant computation.
+
+<span class="gu">## Expected Outcome</span>
+70%+ cache hit rate → 70% reduction in processing time
+
+<span class="gu">## Implementation Plan</span>
+<span class="k">1.</span> Implement LRU cache
+<span class="k">2.</span> Cache key from request params
+<span class="k">3.</span> TTL: 5 minutes
+
+[... detailed plan ...]
+</code></pre></div>
+<h3 id="attempt-resultsmd">attempt-results.md<a class="headerlink" href="#attempt-resultsmd" title="Permanent link">¶</a></h3>
+<p><strong>Written AFTER completing attempt</strong></p>
+<p><strong>Contents:</strong>
+- Actual results
+- Comparison to expectations
+- Analysis of why it worked/failed
+- What was learned
+- Next steps</p>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="gh"># Attempt 001 Results</span>
+
+<span class="gu">## Actual Results</span>
+<span class="k">-</span><span class="w"> </span>Cache hit rate: 85% ✅ (better than expected)
+<span class="k">-</span><span class="w"> </span>Performance improvement: 2% ❌ (not 70%)
+<span class="k">-</span><span class="w"> </span>Memory usage: 7% worse ❌
+
+<span class="gu">## Why It Failed</span>
+Cache worked but optimized wrong thing. Profiling revealed:
+<span class="k">-</span><span class="w"> </span>Processing: 14% of total time (cache targeted this)
+<span class="k">-</span><span class="w"> </span>Connection setup: 47% of total time (actual bottleneck)
+
+<span class="gu">## Learning</span>
+Don't assume bottleneck - profile first.
+
+<span class="gu">## Next Steps</span>
+Focus on connection setup (2,400ms)
+</code></pre></div>
+<hr>
+<h2 id="workflow">Workflow<a class="headerlink" href="#workflow" title="Permanent link">¶</a></h2>
+<h3 id="1-create-meta-issue-attempt-attempt_id">1. Create Meta-Issue (Attempt #[ATTEMPT_ID])<a class="headerlink" href="#1-create-meta-issue-attempt-attempt_id" title="Permanent link">¶</a></h3>
+<div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span>docs/meta-issues/<span class="o">[</span>issue-name<span class="o">]</span>/<span class="o">{</span>attempts,analysis<span class="o">}</span>
+
+<span class="c1"># Copy templates</span>
+cp<span class="w"> </span>core/templates/meta-issue/README-template.md<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>docs/meta-issues/<span class="o">[</span>issue-name<span class="o">]</span>/README.md
+
+cp<span class="w"> </span>core/templates/meta-issue/description-template.md<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>docs/meta-issues/<span class="o">[</span>issue-name<span class="o">]</span>/description.md
+
+<span class="c1"># ... (copy other templates)</span>
+</code></pre></div>
+<h3 id="2-document-previous-attempts-retroactively">2. Document Previous Attempts Retroactively<a class="headerlink" href="#2-document-previous-attempts-retroactively" title="Permanent link">¶</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Create directories for attempts 001 and 002</span>
+mkdir<span class="w"> </span>docs/meta-issues/<span class="o">[</span>issue-name<span class="o">]</span>/attempts/<span class="o">{</span><span class="m">001</span>-caching,002-queries<span class="o">}</span>
+
+<span class="c1"># Document what you tried (from memory/git history)</span>
+<span class="c1"># Fill in solution-approach.md and attempt-results.md for each</span>
+</code></pre></div>
+<h3 id="3-before-each-new-attempt">3. Before Each New Attempt<a class="headerlink" href="#3-before-each-new-attempt" title="Permanent link">¶</a></h3>
+<p><strong>Create attempt directory:</strong></p>
+<div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>docs/meta-issues/<span class="o">[</span>issue-name<span class="o">]</span>/attempts/003-pooling
+</code></pre></div>
+<p><strong>Fill in solution-approach.md:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="gh"># Attempt 003: Connection Pooling</span>
+
+<span class="gu">## Hypothesis</span>
+Connection overhead is bottleneck.
+
+<span class="gu">## Plan</span>
+<span class="k">1.</span> Implement connection pool
+<span class="k">2.</span> Size: 20 per instance
+<span class="k">3.</span> Test under load
+
+<span class="gu">## Expected Outcome</span>
+90%+ improvement in response time
+</code></pre></div>
+<p><strong>Update description.md with new hypothesis:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="gu">### Version 3 (2024-10-01) - Connection Hypothesis</span>
+
+<span class="gs">**Theory:**</span> Connection overhead causing delays
+<span class="gs">**Evidence:**</span> Profiling shows 47% time in connection setup
+...
+</code></pre></div>
+<h3 id="4-during-attempt">4. During Attempt<a class="headerlink" href="#4-during-attempt" title="Permanent link">¶</a></h3>
+<p><strong>Update implementation-log.md:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="gu">## Attempt 003: Connection Pooling</span>
+
+<span class="gs">**2024-10-01:**</span> Started implementation
+<span class="gs">**2024-10-05:**</span> Pool configured, testing
+<span class="gs">**2024-10-08:**</span> Load test shows 90% improvement!
+<span class="gs">**2024-10-12:**</span> Deployed to production
+</code></pre></div>
+<h3 id="5-after-attempt">5. After Attempt<a class="headerlink" href="#5-after-attempt" title="Permanent link">¶</a></h3>
+<p><strong>Fill in attempt-results.md:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="gh"># Attempt 003 Results</span>
+
+<span class="gu">## Actual Results</span>
+<span class="k">-</span><span class="w"> </span>Response time: 380ms (93% improvement) ✅
+<span class="k">-</span><span class="w"> </span>All targets met ✅
+
+<span class="gu">## Why It Worked</span>
+Connection reuse eliminated expensive handshakes.
+Pool sizing prevented exhaustion.
+
+<span class="gu">## Validation</span>
+Tested at 50, 100, 200 concurrent users - all passing.
+</code></pre></div>
+<p><strong>Update README.md summary:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="gu">## Resolution</span>
+Attempt 003: Connection pooling + async
+Result: 93% improvement, all targets met ✅
+Status: Deployed to production, monitoring stable
+</code></pre></div>
+<h3 id="6-extract-lesson-when-resolved">6. Extract Lesson When Resolved<a class="headerlink" href="#6-extract-lesson-when-resolved" title="Permanent link">¶</a></h3>
+<div class="highlight"><pre><span></span><code>cp<span class="w"> </span>docs/templates/lessons-learned/lesson-template.md<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>docs/lessons-learned/debugging/Performance_Resolution.md
+
+<span class="c1"># Reference meta-issue</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">"**Meta-Issue:** [../../meta-issues/performance/](&lt;../../../meta-issues/performance/&gt;)"</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>docs/lessons-learned/debugging/Performance_Resolution.md
+</code></pre></div>
+<hr>
+<h2 id="tips-for-effective-meta-issues">Tips for Effective Meta-Issues<a class="headerlink" href="#tips-for-effective-meta-issues" title="Permanent link">¶</a></h2>
+<h3 id="1-update-descriptionmd-after-each-attempt">1. Update description.md After Each Attempt<a class="headerlink" href="#1-update-descriptionmd-after-each-attempt" title="Permanent link">¶</a></h3>
+<p>Show evolution of understanding:</p>
+<div class="highlight"><pre><span></span><code><span class="gu">### Version 1: Processing bottleneck (WRONG)</span>
+<span class="gu">### Version 2: Query bottleneck (PARTIAL)</span>
+<span class="gu">### Version 3: Connection bottleneck (CORRECT)</span>
+</code></pre></div>
+<p>This is valuable - shows learning journey.</p>
+<h3 id="2-use-consistent-test-cases">2. Use Consistent Test Cases<a class="headerlink" href="#2-use-consistent-test-cases" title="Permanent link">¶</a></h3>
+<p>Run same tests for every attempt:</p>
+<div class="highlight"><pre><span></span><code>Attempt 001: Load test → 5,100ms
+Attempt 002: Load test → 3,800ms
+Attempt 003: Load test → 380ms
+</code></pre></div>
+<p>Consistent measurement enables comparison.</p>
+<h3 id="3-document-failures-honestly">3. Document Failures Honestly<a class="headerlink" href="#3-document-failures-honestly" title="Permanent link">¶</a></h3>
+<p><strong>Bad:</strong>
+</p><div class="highlight"><pre><span></span><code>Attempt 001 didn't work. Moving on.
+</code></pre></div><p></p>
+<p><strong>Good:</strong>
+</p><div class="highlight"><pre><span></span><code>Attempt 001: Caching
+Expected: 70% improvement
+Actual: 2% improvement
+Why failed: Wrong assumption about bottleneck
+Value: Ruled out processing, identified real bottleneck via profiling
+</code></pre></div><p></p>
+<p>Failures have value - capture the learning.</p>
+<h3 id="4-include-codeconfig-samples">4. Include Code/Config Samples<a class="headerlink" href="#4-include-codeconfig-samples" title="Permanent link">¶</a></h3>
+<p><strong>In solution-approach.md:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Proposed configuration</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">cache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">LRU</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">max</span><span class="o">:</span><span class="w"> </span><span class="mf">1000</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">ttl</span><span class="o">:</span><span class="w"> </span><span class="mf">300000</span>
+<span class="p">})</span>
+</code></pre></div>
+<p><strong>In attempt-results.md:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1">// What actually worked</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Pool</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">min</span><span class="o">:</span><span class="w"> </span><span class="mf">5</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">max</span><span class="o">:</span><span class="w"> </span><span class="mf">20</span>
+<span class="p">})</span>
+</code></pre></div>
+<p>Future-you will want to see actual code.</p>
+<h3 id="5-link-profiling-data">5. Link Profiling Data<a class="headerlink" href="#5-link-profiling-data" title="Permanent link">¶</a></h3>
+<div class="highlight"><pre><span></span><code><span class="gh"># Attempt 001 Results</span>
+
+<span class="gu">## Profiling Data</span>
+
+See: <span class="sb">`profiling/001-cache-attempt/flame-graph.svg`</span>
+
+Breakdown:
+<span class="k">-</span><span class="w"> </span>Connection: 47% (2,400ms) ← Actual bottleneck!
+<span class="k">-</span><span class="w"> </span>Queries: 39% (2,000ms)
+<span class="k">-</span><span class="w"> </span>Processing: 14% (700ms) ← What we optimized
+</code></pre></div>
+<hr>
+<h2 id="example-real-world-meta-issue">Example: Real-World Meta-Issue<a class="headerlink" href="#example-real-world-meta-issue" title="Permanent link">¶</a></h2>
+<p>See <code>core/examples/meta-issue/example-performance-saga/</code> for complete example:</p>
+<ul>
+<li>README.md - Navigation and summary</li>
+<li>description.md - Evolution from wrong → correct understanding</li>
+<li>implementation-log.md - Timeline of 3 attempts over 6 weeks</li>
+<li>test-cases.md - Consistent validation across attempts</li>
+<li>attempts/001-baseline/ - Caching attempt (failed)</li>
+<li>attempts/002-* - Other attempts (study the pattern)</li>
+</ul>
+<p><strong>Study this example</strong> to understand the structure.</p>
+<hr>
+<h2 id="when-to-close-a-meta-issue">When to Close a Meta-Issue<a class="headerlink" href="#when-to-close-a-meta-issue" title="Permanent link">¶</a></h2>
+<p><strong>Resolved:</strong> When solution meets all success criteria</p>
+<p><strong>Abandoned:</strong> When problem no longer relevant (requirements changed)</p>
+<p><strong>Superseded:</strong> When root cause understanding reveals it's different problem</p>
+<p><strong>In all cases:</strong>
+- Document final state in README.md
+- Extract key lessons to lessons-learned/
+- Link from knowledge graph if pattern emerged</p>
+<hr>
+<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">¶</a></h2>
+<ul>
+<li><strong>Examples:</strong> <a href="../examples/meta-issue/">../examples/meta-issue/</a></li>
+<li><strong>Templates:</strong> <a href="../templates/meta-issue/">../templates/meta-issue/</a></li>
+<li><strong>Workflows:</strong> <a href="../WORKFLOWS/#workflow-6-create-meta-issue">WORKFLOWS.md#workflow-6-create-meta-issue</a></li>
+<li><strong>Architecture:</strong> <a href="../ARCHITECTURE/">ARCHITECTURE.md</a></li>
+</ul>
+
+
+
+
+
+
+
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="March 1, 2026 23:51:51 UTC">March 1, 2026</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"></path></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="March 1, 2026 23:51:51 UTC">March 1, 2026</span>
+  </span>
+
+    
+    
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer">
+        
+          
+          <a href="../PATTERNS-GUIDE/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Pattern Writing">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Pattern Writing
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../SANITIZATION-CHECKLIST/" class="md-footer__link md-footer__link--next" aria-label="Next: Sanitization Checklist">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Sanitization Checklist
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"></path></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Staying in Sync
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/technomensch" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"></path></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.linkedin.com/in/marckaplan/" target="_blank" rel="noopener" title="www.linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zM102.2 96a38.5 38.5 0 1 1 0 77 38.5 38.5 0 1 1 0-77m282.1 320h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"></path></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.path", "navigation.footer", "search.highlight", "search.suggest", "search.share", "content.action.edit", "content.code.copy", "toc.integrate", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(()=>{ lightbox.reload(); });
+</script></body></html>

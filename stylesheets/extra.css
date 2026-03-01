@@ -1,0 +1,357 @@
+/* Custom styles for Knowledge Graph Plugin v0.0.8.6
+   Theme customization, typography, and visual enhancements */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* ============================================================
+   Typography: Custom Font Families
+   ============================================================ */
+
+:root {
+  /* Text font: Inter (clean, modern, accessible) */
+  --md-text-font: 'Inter', sans-serif;
+
+  /* Code font: JetBrains Mono (monospace coding) */
+  --md-code-font: 'JetBrains Mono', monospace;
+}
+
+/* ============================================================
+   Dark Mode (Default) - Slate Scheme
+   ============================================================ */
+
+[data-md-color-scheme="slate"] {
+  /* Primary colors */
+  --md-primary-fg-color: #1a1a2e;        /* Deep navy background */
+  --md-primary-fg-color--light: #3d3d5c; /* Lighter navy for hover */
+  --md-primary-fg-color--lighter: #5a5a7a; /* Even lighter for focus */
+
+  /* Accent colors */
+  --md-accent-fg-color: #00d2ff;         /* Electric cyan */
+  --md-accent-fg-color--transparent: rgba(0, 210, 255, 0.1);
+
+  /* Text contrast (WCAG AA: 4.5:1 minimum for body text) */
+  --md-typeset-color: #e8e8f0;           /* Light text on dark bg */
+
+  /* Link colors (WCAG AA compliant) */
+  --md-typeset-a-color: #00d2ff;         /* Electric cyan links */
+}
+
+/* ============================================================
+   Light Mode - Default Scheme
+   ============================================================ */
+
+[data-md-color-scheme="default"] {
+  /* Primary colors */
+  --md-primary-fg-color: #003d82;        /* Deep blue */
+  --md-primary-fg-color--light: #0051a3;
+  --md-primary-fg-color--lighter: #0066cc;
+
+  /* Accent colors */
+  --md-accent-fg-color: #ff6b35;         /* Warm orange */
+  --md-accent-fg-color--transparent: rgba(255, 107, 53, 0.1);
+
+  /* Text contrast (WCAG AA) */
+  --md-typeset-color: #1a1a1a;           /* Dark text on light bg */
+
+  /* Link colors */
+  --md-typeset-a-color: #0051a3;         /* Deep blue links */
+}
+
+/* ============================================================
+   Glassmorphism Header Effect
+   ============================================================ */
+
+.md-header {
+  /* Backdrop blur for modern glassmorphic effect */
+  backdrop-filter: blur(10px);
+  background-color: rgba(26, 26, 46, 0.85); /* Semi-transparent with slight opacity */
+  -webkit-backdrop-filter: blur(10px);      /* Safari support */
+
+  /* Ensure text remains readable against blurred background */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Light mode: use Material theme defaults (already looks great - no overrides needed) */
+
+/* ============================================================
+   Code Block Enhancements
+   ============================================================ */
+
+/* Code copy button styling */
+.md-typeset .md-copy {
+  color: var(--md-accent-fg-color);
+  opacity: 0.7;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.md-typeset .md-copy:hover {
+  opacity: 1;
+  color: var(--md-accent-fg-color--light);
+}
+
+/* Inline code styling */
+.md-typeset code {
+  background-color: rgba(0, 210, 255, 0.1);
+  color: var(--md-accent-fg-color);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-family: var(--md-code-font);
+  font-size: 0.95em;
+}
+
+[data-md-color-scheme="default"] .md-typeset code {
+  background-color: rgba(0, 81, 163, 0.08);
+  color: #0051a3;
+}
+
+/* ============================================================
+   Navigation Enhancements
+   ============================================================ */
+
+/* Sticky tabs already configured in mkdocs.yml
+   This section provides visual enhancements */
+
+.md-tabs {
+  background-color: rgba(26, 26, 46, 0.95);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.md-tabs__item {
+  color: rgba(232, 232, 240, 0.7);
+  transition: color 0.2s ease-in-out;
+}
+
+.md-tabs__item:hover {
+  color: #00d2ff;
+}
+
+.md-tabs__item--active {
+  color: #00d2ff;
+  border-bottom-color: #00d2ff;
+}
+
+[data-md-color-scheme="default"] .md-tabs {
+  background-color: rgba(255, 255, 255, 0.98);
+}
+
+[data-md-color-scheme="default"] .md-tabs__item {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+[data-md-color-scheme="default"] .md-tabs__item--active {
+  color: #0051a3;
+  border-bottom-color: #0051a3;
+}
+
+/* ============================================================
+   Table of Contents Sidebar (Integrated)
+   ============================================================ */
+
+.md-nav__list {
+  font-family: var(--md-text-font);
+}
+
+.md-nav__link {
+  color: rgba(232, 232, 240, 0.8);
+  transition: color 0.2s ease-in-out;
+}
+
+.md-nav__link:hover {
+  color: #00d2ff;
+}
+
+.md-nav__link--active {
+  color: #00d2ff;
+  font-weight: 500;
+}
+
+[data-md-color-scheme="default"] .md-nav__link {
+  color: rgba(0, 0, 0, 0.75);
+}
+
+[data-md-color-scheme="default"] .md-nav__link--active {
+  color: #0051a3;
+}
+
+/* ============================================================
+   Breadcrumb Navigation (navigation.path)
+   ============================================================ */
+
+.md-breadcrumbs {
+  font-size: 0.9em;
+  margin-bottom: 1em;
+  color: rgba(232, 232, 240, 0.6);
+}
+
+[data-md-color-scheme="default"] .md-breadcrumbs {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* ============================================================
+   Admonition Styling (Callouts)
+   ============================================================ */
+
+.admonition {
+  border-left-width: 4px;
+  border-radius: 4px;
+}
+
+/* Note admonition */
+.admonition.note {
+  border-left-color: #00d2ff;
+  background-color: rgba(0, 210, 255, 0.08);
+}
+
+.admonition.note > .admonition-title {
+  color: #00d2ff;
+}
+
+/* Tip admonition */
+.admonition.tip {
+  border-left-color: #4caf50;
+  background-color: rgba(76, 175, 80, 0.08);
+}
+
+.admonition.tip > .admonition-title {
+  color: #4caf50;
+}
+
+/* Warning admonition */
+.admonition.warning {
+  border-left-color: #ff9800;
+  background-color: rgba(255, 152, 0, 0.08);
+}
+
+.admonition.warning > .admonition-title {
+  color: #ff9800;
+}
+
+/* Info admonition */
+.admonition.info {
+  border-left-color: #2196f3;
+  background-color: rgba(33, 150, 243, 0.08);
+}
+
+.admonition.info > .admonition-title {
+  color: #2196f3;
+}
+
+/* ============================================================
+   Mermaid Diagram Styling
+   ============================================================ */
+
+.mermaid {
+  background-color: rgba(26, 26, 46, 0.3);
+  border-radius: 8px;
+  padding: 1.5em;
+  margin: 1.5em 0;
+  border: 1px solid rgba(0, 210, 255, 0.15);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+[data-md-color-scheme="default"] .mermaid {
+  background-color: rgba(0, 81, 163, 0.05);
+  border-color: rgba(0, 81, 163, 0.2);
+}
+
+/* ============================================================
+   Search Box Enhancement
+   ============================================================ */
+
+.md-search__input {
+  font-family: var(--md-text-font);
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #e8e8f0;
+}
+
+.md-search__input::placeholder {
+  color: rgba(232, 232, 240, 0.5);
+}
+
+[data-md-color-scheme="default"] .md-search__input {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #1a1a1a;
+}
+
+[data-md-color-scheme="default"] .md-search__input::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+/* ============================================================
+   Footer Navigation (navigation.footer)
+   ============================================================ */
+
+.md-footer-nav__link {
+  font-family: var(--md-text-font);
+  color: var(--md-accent-fg-color);
+  transition: opacity 0.2s ease-in-out;
+}
+
+.md-footer-nav__link:hover {
+  opacity: 0.8;
+}
+
+/* ============================================================
+   Grid Cards (for homepage and section intros)
+   ============================================================ */
+
+.grid {
+  display: grid;
+  grid-gap: 1.5em;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  margin: 1.5em 0;
+}
+
+.grid-item {
+  border: 1px solid rgba(0, 210, 255, 0.2);
+  border-radius: 6px;
+  padding: 1.5em;
+  background-color: rgba(0, 210, 255, 0.05);
+  transition: all 0.2s ease-in-out;
+}
+
+.grid-item:hover {
+  border-color: var(--md-accent-fg-color);
+  background-color: rgba(0, 210, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 210, 255, 0.15);
+}
+
+.grid-item h3 {
+  color: var(--md-accent-fg-color);
+  margin-top: 0;
+}
+
+[data-md-color-scheme="default"] .grid-item {
+  border-color: rgba(0, 81, 163, 0.2);
+  background-color: rgba(0, 81, 163, 0.05);
+}
+
+[data-md-color-scheme="default"] .grid-item:hover {
+  border-color: #0051a3;
+  background-color: rgba(0, 81, 163, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 81, 163, 0.15);
+}
+
+[data-md-color-scheme="default"] .grid-item h3 {
+  color: #0051a3;
+}
+
+/* ============================================================
+   Print Media (for documentation export)
+   ============================================================ */
+
+@media print {
+  .md-header,
+  .md-sidebar,
+  .md-footer {
+    display: none;
+  }
+
+  body {
+    background-color: white;
+    color: black;
+  }
+}

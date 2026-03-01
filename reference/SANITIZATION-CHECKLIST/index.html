@@ -1,0 +1,2505 @@
+<!DOCTYPE html><html lang="en" class="no-js"><head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.">
+      
+      
+      
+        <link rel="canonical" href="https://technomensch.github.io/knowledge-graph/reference/SANITIZATION-CHECKLIST/">
+      
+      
+        <link rel="prev" href="../META-ISSUE-GUIDE/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+    
+    
+      
+        <title>Sanitization Checklist - Knowledge Management Graph</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
+            html.glightbox-open { overflow: initial; height: 100%; }
+            .gslide-title { margin-top: 0px; user-select: text; }
+            .gslide-desc { color: #666; user-select: text; }
+            .gslide-image img { background: white; }
+            .gscrollbar-fixer { padding-right: 15px; }
+            .gdesc-inner { font-size: 0.75rem; }
+            body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color); }
+            body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color); }
+            body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color); }
+        </style></head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-orange" data-md-color-accent="cyan">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#sanitization-checklist" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+  
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Knowledge Management Graph" class="md-header__button md-logo" aria-label="Knowledge Management Graph" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Knowledge Management Graph
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Sanitization Checklist
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-orange" data-md-color-accent="cyan" aria-label="Switch to light mode" type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="blue" aria-label="Switch to dark mode" type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"></path></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/technomensch/knowledge-graph" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+  </div>
+  <div class="md-source__repository">
+    technomensch/knowledge-graph
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../GETTING-STARTED/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../INSTALL/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Installation
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../CONCEPTS/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Concepts
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../COMMAND-GUIDE/" class="md-tabs__link">
+          
+  
+  
+  Commands
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../CONFIGURATION/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Configuration
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../CHANGELOG/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Changelog
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../STYLE-GUIDE/" class="md-tabs__link">
+          
+  
+  
+  Contributing
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../GLOSSARY/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Glossary
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../ARCHITECTURE/" class="md-tabs__link">
+          
+  
+  
+  Advanced
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Knowledge Management Graph" class="md-nav__button md-logo" aria-label="Knowledge Management Graph" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+
+    </a>
+    Knowledge Management Graph
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/technomensch/knowledge-graph" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+  </div>
+  <div class="md-source__repository">
+    technomensch/knowledge-graph
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../GETTING-STARTED/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../INSTALL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CONCEPTS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5">
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Commands
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Commands
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../COMMAND-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CHEAT-SHEET/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cheat Sheet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../FAQ/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CONFIGURATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8">
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Contributing
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../STYLE-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Style Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../NAVIGATION-INDEX/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Navigation Index
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../GLOSSARY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Advanced
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WORKFLOWS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manual Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PLATFORM-ADAPTATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform Adaptation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PATTERNS-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pattern Writing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../META-ISSUE-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meta-Issue Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sanitization Checklist
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sanitization Checklist
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#critical-review-before-publishing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ CRITICAL: Review Before Publishing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-scan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Scan
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#category-1-personal-information" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category 1: Personal Information
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Category 1: Personal Information">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#email-addresses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Email Addresses
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#names-people" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Names (People)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phone-numbers-addresses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phone Numbers, Addresses
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scan-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scan Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#category-2-authentication-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category 2: Authentication &amp; Credentials
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Category 2: Authentication &amp; Credentials">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#api-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Keys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#passwords" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Passwords
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bearer-tokens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bearer Tokens
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ssh-keys-private-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SSH Keys, Private Keys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aws-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS Keys
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scan-commands_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scan Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#category-3-infrastructure-networking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category 3: Infrastructure &amp; Networking
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Category 3: Infrastructure &amp; Networking">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#internal-ip-addresses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Internal IP Addresses
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internal-urlsdomains" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Internal URLs/Domains
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#database-connection-strings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database Connection Strings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#server-hostnames" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Server Hostnames
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scan-commands_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scan Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#category-4-company-project-specific" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category 4: Company &amp; Project Specific
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Category 4: Company &amp; Project Specific">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#company-names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Company Names
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#customer-names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Customer Names
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#project-code-names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Project Code Names
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#product-names-if-proprietary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Product Names (if proprietary)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scan-commands_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scan Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#category-5-version-numbers-project-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category 5: Version Numbers &amp; Project Metadata
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Category 5: Version Numbers &amp; Project Metadata">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#version-references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version References
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-remove-version-numbers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Remove Version Numbers?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-patterns-to-review" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Patterns to Review
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scan-commands_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scan Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#category-6-file-paths" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category 6: File Paths
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Category 6: File Paths">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#absolute-paths" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Absolute Paths
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#home-directory-references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Home Directory References
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scan-commands_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scan Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#category-7-metrics-performance-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category 7: Metrics &amp; Performance Data
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Category 7: Metrics &amp; Performance Data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#business-metrics-potentially-sensitive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Business Metrics (Potentially Sensitive)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-numbers-usually-ok" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Numbers (Usually OK)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#category-8-code-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category 8: Code &amp; Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Category 8: Code &amp; Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hardcoded-secrets-in-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardcoded Secrets in Code
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sanitization-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sanitization Strategy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sanitization Strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-generalize-vs-remove" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Generalize vs. Remove
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-use-standard-placeholders" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Use Standard Placeholders
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-document-what-you-sanitized" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Document What You Sanitized
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pre-commit-hook" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pre-Commit Hook
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sanitization-checklist-before-publishing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sanitization Checklist (Before Publishing)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#after-sanitization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        After Sanitization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="After Sanitization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#document-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Document Process
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-sanitization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Sanitization
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="Navigation">
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../.." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../ARCHITECTURE/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Advanced
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/technomensch/knowledge-graph/edit/main/docs/reference/SANITIZATION-CHECKLIST.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"></path></svg>
+    </a>
+  
+  
+
+
+<h1 id="sanitization-checklist">Sanitization Checklist<a class="headerlink" href="#sanitization-checklist" title="Permanent link">¶</a></h1>
+<p><strong>Privacy &amp; Security Before Sharing Your Knowledge Graph Publicly</strong></p>
+<hr>
+<h2 id="critical-review-before-publishing">⚠️ CRITICAL: Review Before Publishing<a class="headerlink" href="#critical-review-before-publishing" title="Permanent link">¶</a></h2>
+<p>Your knowledge graph likely contains sensitive information from your real project. Before sharing publicly (GitHub, blog posts, documentation sites), <strong>you must sanitize</strong>.</p>
+<p><strong>This checklist helps you identify and remove:</strong>
+- Personal information
+- Authentication credentials
+- Internal infrastructure details
+- Company/customer-specific data
+- Proprietary information</p>
+<hr>
+<h2 id="quick-scan">Quick Scan<a class="headerlink" href="#quick-scan" title="Permanent link">¶</a></h2>
+<p>Run automated scans first to catch obvious issues:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Scan for common patterns</span>
+grep<span class="w"> </span>-r<span class="w"> </span><span class="s2">"api[_-]key\|API[_-]KEY"</span><span class="w"> </span>docs/
+grep<span class="w"> </span>-r<span class="w"> </span><span class="s2">"password\|passwd\|pwd"</span><span class="w"> </span>docs/
+grep<span class="w"> </span>-r<span class="w"> </span><span class="s2">"secret\|token"</span><span class="w"> </span>docs/
+grep<span class="w"> </span>-r<span class="w"> </span><span class="s2">"@.*\.com"</span><span class="w"> </span>docs/<span class="w">  </span><span class="c1"># Email addresses</span>
+grep<span class="w"> </span>-r<span class="w"> </span><span class="s2">"/Users/\|/home/\|C:\\\\"</span><span class="w"> </span>docs/<span class="w">  </span><span class="c1"># Absolute paths</span>
+</code></pre></div>
+<p><strong>Found matches?</strong> Review each and decide: keep, generalize, or remove.</p>
+<hr>
+<h2 id="category-1-personal-information">Category 1: Personal Information<a class="headerlink" href="#category-1-personal-information" title="Permanent link">¶</a></h2>
+<h3 id="email-addresses">Email Addresses<a class="headerlink" href="#email-addresses" title="Permanent link">¶</a></h3>
+<p><strong>❌ Remove:</strong>
+</p><div class="highlight"><pre><span></span><code>Contact: user@example.com
+</code></pre></div><p></p>
+<p><strong>✅ Generalize:</strong>
+</p><div class="highlight"><pre><span></span><code>Contact: user@example.com
+</code></pre></div><p></p>
+<h3 id="names-people">Names (People)<a class="headerlink" href="#names-people" title="Permanent link">¶</a></h3>
+<p><strong>❌ Remove:</strong>
+</p><div class="highlight"><pre><span></span><code><span class="gs">**Authors:**</span> John Doe, Jane Smith
+</code></pre></div><p></p>
+<p><strong>✅ Generalize:</strong>
+</p><div class="highlight"><pre><span></span><code><span class="gs">**Authors:**</span> Development Team
+<span class="gh"># Or use roles:</span>
+<span class="gs">**Authors:**</span> Backend Engineer, DevOps Lead
+</code></pre></div><p></p>
+<h3 id="phone-numbers-addresses">Phone Numbers, Addresses<a class="headerlink" href="#phone-numbers-addresses" title="Permanent link">¶</a></h3>
+<p><strong>❌ Remove all:</strong>
+</p><div class="highlight"><pre><span></span><code>Office: +1 (555) 123-4567
+Location: 123 Main St, Anytown, CA
+</code></pre></div><p></p>
+<p><strong>✅ Generalize (if context needed):</strong>
+</p><div class="highlight"><pre><span></span><code>Office: (contact via company directory)
+Location: On-site datacenter
+</code></pre></div><p></p>
+<h3 id="scan-commands">Scan Commands<a class="headerlink" href="#scan-commands" title="Permanent link">¶</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Find emails</span>
+grep<span class="w"> </span>-rE<span class="w"> </span><span class="s2">"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"</span><span class="w"> </span>docs/
+
+<span class="c1"># Find phone numbers</span>
+grep<span class="w"> </span>-rE<span class="w"> </span><span class="s2">"\b[0-9]{3}[-.]?[0-9]{3}[-.]?[0-9]{4}\b"</span><span class="w"> </span>docs/
+
+<span class="c1"># Find SSN patterns</span>
+grep<span class="w"> </span>-rE<span class="w"> </span><span class="s2">"\b[0-9]{3}-[0-9]{2}-[0-9]{4}\b"</span><span class="w"> </span>docs/
+</code></pre></div>
+<hr>
+<h2 id="category-2-authentication-credentials">Category 2: Authentication &amp; Credentials<a class="headerlink" href="#category-2-authentication-credentials" title="Permanent link">¶</a></h2>
+<h3 id="api-keys">API Keys<a class="headerlink" href="#api-keys" title="Permanent link">¶</a></h3>
+<p><strong>❌ Remove:</strong>
+</p><div class="highlight"><pre><span></span><code>API_KEY=[SECRET_KEY]
+ANTHROPIC_API_KEY=[API_KEY]
+</code></pre></div><p></p>
+<p><strong>✅ Generalize:</strong>
+</p><div class="highlight"><pre><span></span><code>API_KEY=your_api_key_here
+ANTHROPIC_API_KEY=&lt;your-key&gt;
+</code></pre></div><p></p>
+<h3 id="passwords">Passwords<a class="headerlink" href="#passwords" title="Permanent link">¶</a></h3>
+<p><strong>❌ Remove:</strong>
+</p><div class="highlight"><pre><span></span><code>DB_PASSWORD=MyS3cur3P@ssw0rd!
+</code></pre></div><p></p>
+<p><strong>✅ Generalize:</strong>
+</p><div class="highlight"><pre><span></span><code>DB_PASSWORD=your_secure_password
+</code></pre></div><p></p>
+<h3 id="bearer-tokens">Bearer Tokens<a class="headerlink" href="#bearer-tokens" title="Permanent link">¶</a></h3>
+<p><strong>❌ Remove:</strong>
+</p><div class="highlight"><pre><span></span><code>Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+</code></pre></div><p></p>
+<p><strong>✅ Generalize:</strong>
+</p><div class="highlight"><pre><span></span><code>Authorization: Bearer &lt;token&gt;
+</code></pre></div><p></p>
+<h3 id="ssh-keys-private-keys">SSH Keys, Private Keys<a class="headerlink" href="#ssh-keys-private-keys" title="Permanent link">¶</a></h3>
+<p><strong>❌ Remove all:</strong>
+</p><div class="highlight"><pre><span></span><code>-----BEGIN RSA PRIVATE KEY-----
+[PRIVATE_KEY_CONTENT]
+-----END RSA PRIVATE KEY-----
+</code></pre></div><p></p>
+<p><strong>✅ Reference only:</strong>
+</p><div class="highlight"><pre><span></span><code><span class="gh"># Use your SSH private key</span>
+ssh -i ~/.ssh/id_rsa user@server
+</code></pre></div><p></p>
+<h3 id="aws-keys">AWS Keys<a class="headerlink" href="#aws-keys" title="Permanent link">¶</a></h3>
+<p><strong>❌ Remove:</strong>
+</p><div class="highlight"><pre><span></span><code>AWS_ACCESS_KEY_ID=[AWS_KEY_ID]
+AWS_SECRET_ACCESS_KEY=[AWS_SECRET_KEY]
+</code></pre></div><p></p>
+<p><strong>✅ Environment variables:</strong>
+</p><div class="highlight"><pre><span></span><code>export AWS_ACCESS_KEY_ID=&lt;your-key-id&gt;
+export AWS_SECRET_ACCESS_KEY=&lt;your-secret-key&gt;
+</code></pre></div><p></p>
+<h3 id="scan-commands_1">Scan Commands<a class="headerlink" href="#scan-commands_1" title="Permanent link">¶</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Find API keys</span>
+grep<span class="w"> </span>-rE<span class="w"> </span><span class="s2">"(api[_-]?key|apikey)[[:space:]]*[:=][[:space:]]*['\"]?[a-zA-Z0-9_-]{20,}"</span><span class="w"> </span>docs/
+
+<span class="c1"># Find passwords in code</span>
+grep<span class="w"> </span>-rE<span class="w"> </span><span class="s2">"(password|passwd|pwd)[[:space:]]*[:=][[:space:]]*['\"][^'\"]{3,}['\"]"</span><span class="w"> </span>docs/
+
+<span class="c1"># Find Bearer tokens</span>
+grep<span class="w"> </span>-r<span class="w"> </span><span class="s2">"Bearer[[:space:]]"</span><span class="w"> </span>docs/
+
+<span class="c1"># Find AWS keys</span>
+grep<span class="w"> </span>-r<span class="w"> </span><span class="s2">"AKIA[0-9A-Z]{16}"</span><span class="w"> </span>docs/
+
+<span class="c1"># Find private keys</span>
+grep<span class="w"> </span>-r<span class="w"> </span><span class="s2">"BEGIN.*PRIVATE KEY"</span><span class="w"> </span>docs/
+</code></pre></div>
+<hr>
+<h2 id="category-3-infrastructure-networking">Category 3: Infrastructure &amp; Networking<a class="headerlink" href="#category-3-infrastructure-networking" title="Permanent link">¶</a></h2>
+<h3 id="internal-ip-addresses">Internal IP Addresses<a class="headerlink" href="#internal-ip-addresses" title="Permanent link">¶</a></h3>
+<p><strong>❌ Remove:</strong>
+</p><div class="highlight"><pre><span></span><code>Database server: 192.0.2.23
+Internal API: 192.0.2.100
+</code></pre></div><p></p>
+<p><strong>✅ Generalize:</strong>
+</p><div class="highlight"><pre><span></span><code>Database server: &lt;internal-ip&gt;
+Internal API: 192.0.2.1  # RFC 5737 documentation IP
+</code></pre></div><p></p>
+<h3 id="internal-urlsdomains">Internal URLs/Domains<a class="headerlink" href="#internal-urlsdomains" title="Permanent link">¶</a></h3>
+<p><strong>❌ Remove:</strong>
+</p><div class="highlight"><pre><span></span><code>https://internal.example.com/api
+https://staging.example.com
+http://localhost:3000/admin
+</code></pre></div><p></p>
+<p><strong>✅ Generalize:</strong>
+</p><div class="highlight"><pre><span></span><code>https://internal.example.com/api
+https://staging.example.com
+http://localhost:3000/admin  # OK - localhost is generic
+</code></pre></div><p></p>
+<h3 id="database-connection-strings">Database Connection Strings<a class="headerlink" href="#database-connection-strings" title="Permanent link">¶</a></h3>
+<p><strong>❌ Remove:</strong>
+</p><div class="highlight"><pre><span></span><code>postgres://admin:password@db.example.com:5432/production
+mongodb://user:password@192.0.2.10:27017/app_db
+</code></pre></div><p></p>
+<p><strong>✅ Generalize:</strong>
+</p><div class="highlight"><pre><span></span><code>postgres://username:password@localhost:5432/database_name
+mongodb://user:password@db-host:27017/database
+</code></pre></div><p></p>
+<h3 id="server-hostnames">Server Hostnames<a class="headerlink" href="#server-hostnames" title="Permanent link">¶</a></h3>
+<p><strong>❌ Remove:</strong>
+</p><div class="highlight"><pre><span></span><code>web-prod-01.example.internal
+api-server-us-east-1a.aws.example.com
+</code></pre></div><p></p>
+<p><strong>✅ Generalize:</strong>
+</p><div class="highlight"><pre><span></span><code>web-server-01
+api-server-primary
+</code></pre></div><p></p>
+<h3 id="scan-commands_2">Scan Commands<a class="headerlink" href="#scan-commands_2" title="Permanent link">¶</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Find private IPs</span>
+grep<span class="w"> </span>-rE<span class="w"> </span><span class="s2">"\b(10\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.)[0-9]{1,3}\.[0-9]{1,3}\b"</span><span class="w"> </span>docs/
+
+<span class="c1"># Find internal URLs</span>
+grep<span class="w"> </span>-rE<span class="w"> </span><span class="s2">"https?://(localhost|127\.0\.0\.1|internal\.|staging\.|dev\.)"</span><span class="w"> </span>docs/
+
+<span class="c1"># Find database URLs</span>
+grep<span class="w"> </span>-rE<span class="w"> </span><span class="s2">"(postgres|mysql|mongodb)://[a-zA-Z0-9:@.-]+/"</span><span class="w"> </span>docs/
+</code></pre></div>
+<hr>
+<h2 id="category-4-company-project-specific">Category 4: Company &amp; Project Specific<a class="headerlink" href="#category-4-company-project-specific" title="Permanent link">¶</a></h2>
+<h3 id="company-names">Company Names<a class="headerlink" href="#company-names" title="Permanent link">¶</a></h3>
+<p><strong>❌ Remove:</strong>
+</p><div class="highlight"><pre><span></span><code>This solution was implemented at Acme Corp.
+Client: MegaCorp Industries
+</code></pre></div><p></p>
+<p><strong>✅ Generalize:</strong>
+</p><div class="highlight"><pre><span></span><code>This solution was implemented at &lt;company&gt;.
+Client: Example Corporation
+</code></pre></div><p></p>
+<h3 id="customer-names">Customer Names<a class="headerlink" href="#customer-names" title="Permanent link">¶</a></h3>
+<p><strong>❌ Remove:</strong>
+</p><div class="highlight"><pre><span></span><code>Deployed for BigClient Inc.
+Customer XYZ requested this feature
+</code></pre></div><p></p>
+<p><strong>✅ Generalize:</strong>
+</p><div class="highlight"><pre><span></span><code>Deployed for customer
+Client requested this feature
+</code></pre></div><p></p>
+<h3 id="project-code-names">Project Code Names<a class="headerlink" href="#project-code-names" title="Permanent link">¶</a></h3>
+<p><strong>❌ Remove:</strong>
+</p><div class="highlight"><pre><span></span><code>Project Falcon internal tracking: FLCN-1234
+</code></pre></div><p></p>
+<p><strong>✅ Generalize:</strong>
+</p><div class="highlight"><pre><span></span><code>Internal tracking: PROJ-1234
+</code></pre></div><p></p>
+<h3 id="product-names-if-proprietary">Product Names (if proprietary)<a class="headerlink" href="#product-names-if-proprietary" title="Permanent link">¶</a></h3>
+<p><strong>❌ Potentially remove:</strong>
+</p><div class="highlight"><pre><span></span><code>Our proprietary RevenueMaximizer platform
+</code></pre></div><p></p>
+<p><strong>✅ Generalize:</strong>
+</p><div class="highlight"><pre><span></span><code>The revenue optimization platform
+</code></pre></div><p></p>
+<p><strong>Note:</strong> Use judgment - if product is public, name is OK.</p>
+<h3 id="scan-commands_3">Scan Commands<a class="headerlink" href="#scan-commands_3" title="Permanent link">¶</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Find your company name (customize)</span>
+grep<span class="w"> </span>-ri<span class="w"> </span><span class="s2">"acme corp\|megacorp\|bigclient"</span><span class="w"> </span>docs/
+
+<span class="c1"># Find project codes (customize pattern)</span>
+grep<span class="w"> </span>-rE<span class="w"> </span><span class="s2">"PROJ-[0-9]{4,}"</span><span class="w"> </span>docs/
+</code></pre></div>
+<hr>
+<h2 id="category-5-version-numbers-project-metadata">Category 5: Version Numbers &amp; Project Metadata<a class="headerlink" href="#category-5-version-numbers-project-metadata" title="Permanent link">¶</a></h2>
+<h3 id="version-references">Version References<a class="headerlink" href="#version-references" title="Permanent link">¶</a></h3>
+<p><strong>❌ Remove:</strong>
+</p><div class="highlight"><pre><span></span><code>Implemented in v1.x.y
+Released as part of v9.x series
+Deprecated in v1.2.x
+Feature added in v2.1.0
+</code></pre></div><p></p>
+<p><strong>✅ Generalize:</strong>
+</p><div class="highlight"><pre><span></span><code>Implemented in version X.Y.Z
+Released as part of major version X
+Deprecated in earlier versions
+Feature added in version 2.1
+</code></pre></div><p></p>
+<h3 id="why-remove-version-numbers">Why Remove Version Numbers?<a class="headerlink" href="#why-remove-version-numbers" title="Permanent link">¶</a></h3>
+<p>Version numbers can reveal:
+- Implementation timeline (v1.x.y suggests many prior versions)
+- Project maturity level
+- Internal versioning scheme
+- Correlation with other public references</p>
+<p><strong>Exceptions:</strong>
+- Generic examples: "Version 1.0.0" (obvious placeholder)
+- External dependencies: "Requires Node.js v18+" (not your project)
+- Standard formats: "Follows semver (MAJOR.MINOR.PATCH)" (educational)</p>
+<h3 id="common-patterns-to-review">Common Patterns to Review<a class="headerlink" href="#common-patterns-to-review" title="Permanent link">¶</a></h3>
+<p><strong>Branch names with versions:</strong>
+</p><div class="highlight"><pre><span></span><code>❌ feature/new-api
+✅ feature/new-api
+</code></pre></div><p></p>
+<p><strong>Changelog references:</strong>
+</p><div class="highlight"><pre><span></span><code>❌ See CHANGELOG v1.x series for details
+✅ See CHANGELOG for details
+</code></pre></div><p></p>
+<p><strong>Documentation headers:</strong>
+</p><div class="highlight"><pre><span></span><code>❌ ## v1.0.0 Implementation Plan
+✅ ## Implementation Plan (Current Release)
+</code></pre></div><p></p>
+<p><strong>File paths with versions:</strong>
+</p><div class="highlight"><pre><span></span><code>❌ docs/plans/v9.5.0-phase-1.md
+✅ docs/plans/phase-1.md
+<span class="gh"># Or keep version if it's essential metadata:</span>
+✅ docs/plans/v9.5.0-phase-1.md (but add to .gitignore or sanitize before publish)
+</code></pre></div><p></p>
+<h3 id="scan-commands_4">Scan Commands<a class="headerlink" href="#scan-commands_4" title="Permanent link">¶</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Find version references</span>
+grep<span class="w"> </span>-rE<span class="w"> </span><span class="s2">"\bv[0-9]+(\.[0-9]+)?(\.[0-9]+)?(\.[xX])?\b"</span><span class="w"> </span>docs/
+
+<span class="c1"># Find semantic version patterns</span>
+grep<span class="w"> </span>-rE<span class="w"> </span><span class="s2">"\bv?[0-9]+\.[0-9]+\.[0-9]+\b"</span><span class="w"> </span>docs/
+</code></pre></div>
+<hr>
+<h2 id="category-6-file-paths">Category 6: File Paths<a class="headerlink" href="#category-6-file-paths" title="Permanent link">¶</a></h2>
+<h3 id="absolute-paths">Absolute Paths<a class="headerlink" href="#absolute-paths" title="Permanent link">¶</a></h3>
+<p><strong>❌ Remove:</strong>
+</p><div class="highlight"><pre><span></span><code>/Users/john/Documents/my-project/config.json
+/home/jane/projects/app/src/
+C:\Users\Developer\project\
+</code></pre></div><p></p>
+<p><strong>✅ Relative paths:</strong>
+</p><div class="highlight"><pre><span></span><code>./config.json
+./src/
+./project/
+</code></pre></div><p></p>
+<h3 id="home-directory-references">Home Directory References<a class="headerlink" href="#home-directory-references" title="Permanent link">¶</a></h3>
+<p><strong>❌ Remove:</strong>
+</p><div class="highlight"><pre><span></span><code>Copy config to /Users/john/.config/app/
+</code></pre></div><p></p>
+<p><strong>✅ Generalize:</strong>
+</p><div class="highlight"><pre><span></span><code>Copy config to ~/.config/app/
+<span class="gh"># Or</span>
+Copy config to $HOME/.config/app/
+<span class="gh"># Or (Windows)</span>
+Copy config to %USERPROFILE%\.config\app\
+</code></pre></div><p></p>
+<h3 id="scan-commands_5">Scan Commands<a class="headerlink" href="#scan-commands_5" title="Permanent link">¶</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Find absolute paths</span>
+grep<span class="w"> </span>-rE<span class="w"> </span><span class="s2">"/Users/[^/]+/|/home/[^/]+/|C:\\\\Users\\\\"</span><span class="w"> </span>docs/
+</code></pre></div>
+<hr>
+<h2 id="category-7-metrics-performance-data">Category 7: Metrics &amp; Performance Data<a class="headerlink" href="#category-7-metrics-performance-data" title="Permanent link">¶</a></h2>
+<h3 id="business-metrics-potentially-sensitive">Business Metrics (Potentially Sensitive)<a class="headerlink" href="#business-metrics-potentially-sensitive" title="Permanent link">¶</a></h3>
+<p><strong>❌ May reveal too much:</strong>
+</p><div class="highlight"><pre><span></span><code>Revenue increased 43% ($2.3M → $3.3M)
+Customer churn rate: 8.5%
+</code></pre></div><p></p>
+<p><strong>✅ Generalize percentages:</strong>
+</p><div class="highlight"><pre><span></span><code>Revenue increased 43%
+Customer churn reduced from X% to Y%
+</code></pre></div><p></p>
+<p><strong>Rule:</strong> Percentages usually OK, absolute numbers may reveal business scale.</p>
+<h3 id="performance-numbers-usually-ok">Performance Numbers (Usually OK)<a class="headerlink" href="#performance-numbers-usually-ok" title="Permanent link">¶</a></h3>
+<p><strong>✅ Generally safe:</strong>
+</p><div class="highlight"><pre><span></span><code>Response time: 5s → 300ms
+Memory usage: 4GB → 280MB
+</code></pre></div><p></p>
+<p><strong>Exception:</strong> If numbers reveal infrastructure scale (e.g., "10,000 servers"), consider generalizing.</p>
+<hr>
+<h2 id="category-8-code-configuration">Category 8: Code &amp; Configuration<a class="headerlink" href="#category-8-code-configuration" title="Permanent link">¶</a></h2>
+<h3 id="hardcoded-secrets-in-code">Hardcoded Secrets in Code<a class="headerlink" href="#hardcoded-secrets-in-code" title="Permanent link">¶</a></h3>
+<p><strong>❌ Remove:</strong>
+</p><div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">API_KEY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'sk_live_abc123'</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'MyPassword123'</span>
+</code></pre></div><p></p>
+<p><strong>✅ Environment variables:</strong>
+</p><div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">API_KEY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">API_KEY</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">DB_PASSWORD</span>
+</code></pre></div><p></p>
+<h3 id="configuration-files">Configuration Files<a class="headerlink" href="#configuration-files" title="Permanent link">¶</a></h3>
+<p>Review files like:
+- <code>.env</code> files → Never commit (should be <code>.gitignore</code>d anyway)
+- <code>config.json</code> → Sanitize values
+- <code>secrets.yml</code> → Remove or use placeholders</p>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Before (sensitive)</span>
+<span class="nt">database</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">db.internal.company.com</span>
+<span class="w">  </span><span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin_prod</span>
+<span class="w">  </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">S3cur3P@ss!</span>
+
+<span class="c1"># After (sanitized)</span>
+<span class="nt">database</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">localhost</span><span class="w">  </span><span class="c1"># Or: db.example.com</span>
+<span class="w">  </span><span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">database_user</span>
+<span class="w">  </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">your_secure_password</span>
+</code></pre></div>
+<hr>
+<h2 id="sanitization-strategy">Sanitization Strategy<a class="headerlink" href="#sanitization-strategy" title="Permanent link">¶</a></h2>
+<h3 id="1-generalize-vs-remove">1. Generalize vs. Remove<a class="headerlink" href="#1-generalize-vs-remove" title="Permanent link">¶</a></h3>
+<p><strong>Generalize</strong> when context is valuable:
+</p><div class="highlight"><pre><span></span><code><span class="gh"># Context valuable</span>
+Email: user@example.com
+Company: Example Corp
+</code></pre></div><p></p>
+<p><strong>Remove</strong> when not needed:
+</p><div class="highlight"><pre><span></span><code><span class="gh"># Not needed, remove entirely</span>
+<span class="gd">~~Employee ID: 12345~~</span>
+<span class="gd">~~SSN: 123-45-6789~~</span>
+</code></pre></div><p></p>
+<h3 id="2-use-standard-placeholders">2. Use Standard Placeholders<a class="headerlink" href="#2-use-standard-placeholders" title="Permanent link">¶</a></h3>
+<ul>
+<li><strong>Domains:</strong> <code>example.com</code>, <code>example.org</code></li>
+<li><strong>IPs:</strong> <code>192.0.2.1</code> (RFC 5737), <code>203.0.113.0/24</code></li>
+<li><strong>Emails:</strong> <code>user@example.com</code></li>
+<li><strong>Names:</strong> <code>John Doe</code>, <code>Jane Smith</code> (obviously generic)</li>
+<li><strong>Companies:</strong> <code>Acme Corp</code>, <code>Example Industries</code></li>
+</ul>
+<h3 id="3-document-what-you-sanitized">3. Document What You Sanitized<a class="headerlink" href="#3-document-what-you-sanitized" title="Permanent link">¶</a></h3>
+<p>Add note to README:</p>
+<div class="highlight"><pre><span></span><code><span class="gu">## Privacy Note</span>
+
+This knowledge graph has been sanitized for public sharing:
+<span class="k">-</span><span class="w"> </span>Company names generalized
+<span class="k">-</span><span class="w"> </span>Internal IPs replaced with RFC 5737 addresses
+<span class="k">-</span><span class="w"> </span>Customer names removed
+<span class="k">-</span><span class="w"> </span>Absolute file paths converted to relative
+
+The patterns and lessons remain intact and reusable.
+</code></pre></div>
+<hr>
+<h2 id="pre-commit-hook">Pre-Commit Hook<a class="headerlink" href="#pre-commit-hook" title="Permanent link">¶</a></h2>
+<p>Automate detection before committing:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Install pre-commit hook</span>
+cp<span class="w"> </span>core/examples-hooks/pre-commit-sanitization.sh<span class="w"> </span>.git/hooks/pre-commit
+chmod<span class="w"> </span>+x<span class="w"> </span>.git/hooks/pre-commit
+
+<span class="c1"># Customize patterns in hook</span>
+vim<span class="w"> </span>.git/hooks/pre-commit
+</code></pre></div>
+<p>Hook will scan staged files and:
+- <strong>Block commit</strong> if sensitive patterns detected (mode: block)
+- <strong>Warn</strong> but allow commit (mode: warn)</p>
+<p>See <code>core/examples-hooks/pre-commit-sanitization.sh</code> for full implementation.</p>
+<hr>
+<h2 id="sanitization-checklist-before-publishing">Sanitization Checklist (Before Publishing)<a class="headerlink" href="#sanitization-checklist-before-publishing" title="Permanent link">¶</a></h2>
+<p>Use this checklist before making repository public:</p>
+<p><strong>Personal Information:</strong>
+- [ ] Emails replaced with example.com
+- [ ] Real names replaced with roles or generic names
+- [ ] No phone numbers or addresses</p>
+<p><strong>Authentication:</strong>
+- [ ] No API keys
+- [ ] No passwords or secrets
+- [ ] No private keys
+- [ ] No AWS/cloud credentials</p>
+<p><strong>Infrastructure:</strong>
+- [ ] Internal IPs replaced with RFC 5737 addresses
+- [ ] Internal URLs generalized
+- [ ] Database URLs sanitized
+- [ ] Server hostnames generalized</p>
+<p><strong>Company/Project:</strong>
+- [ ] Company names generalized (if sensitive)
+- [ ] Customer names removed
+- [ ] Project codes sanitized (if proprietary)</p>
+<p><strong>File Paths:</strong>
+- [ ] Absolute paths converted to relative
+- [ ] User-specific paths use ~/ or $HOME</p>
+<p><strong>Code:</strong>
+- [ ] No hardcoded secrets in examples
+- [ ] Configuration files use placeholders</p>
+<p><strong>Final Steps:</strong>
+- [ ] Run automated scan (grep commands above)
+- [ ] Pre-commit hook installed and tested
+- [ ] Added privacy note to README
+- [ ] Reviewed with teammate (if applicable)</p>
+<hr>
+<h2 id="after-sanitization">After Sanitization<a class="headerlink" href="#after-sanitization" title="Permanent link">¶</a></h2>
+<h3 id="document-process">Document Process<a class="headerlink" href="#document-process" title="Permanent link">¶</a></h3>
+<div class="highlight"><pre><span></span><code><span class="gh"># In PROJECT-SANITIZATION.md</span>
+
+<span class="gu">## Sanitization Log</span>
+
+<span class="gs">**Date:**</span> 2024-10-15
+<span class="gs">**Scope:**</span> Full knowledge graph (docs/)
+
+<span class="gu">### Changes Made:</span>
+<span class="k">-</span><span class="w"> </span>Replaced 15 instances of company name
+<span class="k">-</span><span class="w"> </span>Generalized 8 internal IPs
+<span class="k">-</span><span class="w"> </span>Removed 3 API keys from examples
+<span class="k">-</span><span class="w"> </span>Converted 42 absolute paths to relative
+
+<span class="gu">### Verification:</span>
+<span class="k">- [x]</span> Automated scans passed
+<span class="k">- [x]</span> Manual review complete
+<span class="k">- [x]</span> Pre-commit hook installed
+</code></pre></div>
+<h3 id="test-sanitization">Test Sanitization<a class="headerlink" href="#test-sanitization" title="Permanent link">¶</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Clone to new directory (fresh eyes)</span>
+git<span class="w"> </span>clone<span class="w"> </span>/path/to/sanitized/repo<span class="w"> </span>/tmp/test-sanitized
+<span class="nb">cd</span><span class="w"> </span>/tmp/test-sanitized
+
+<span class="c1"># Search for your company name</span>
+grep<span class="w"> </span>-ri<span class="w"> </span><span class="s2">"YourCompany"</span><span class="w"> </span>.
+
+<span class="c1"># Should return: No matches</span>
+</code></pre></div>
+<hr>
+<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">¶</a></h2>
+<ul>
+<li><strong>Pre-Commit Hook:</strong> <a href="../examples-hooks/pre-commit-sanitization.sh">../examples-hooks/pre-commit-sanitization.sh</a></li>
+<li><strong>Examples:</strong> Study sanitized examples in <a href="../examples/">../examples/</a></li>
+<li><strong>Privacy Note:</strong> Always include in README before sharing</li>
+</ul>
+
+
+
+
+
+
+
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="March 1, 2026 23:51:51 UTC">March 1, 2026</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"></path></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="March 1, 2026 23:51:51 UTC">March 1, 2026</span>
+  </span>
+
+    
+    
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer">
+        
+          
+          <a href="../META-ISSUE-GUIDE/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Meta-Issue Guide">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Meta-Issue Guide
+              </div>
+            </div>
+          </a>
+        
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Staying in Sync
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/technomensch" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"></path></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.linkedin.com/in/marckaplan/" target="_blank" rel="noopener" title="www.linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zM102.2 96a38.5 38.5 0 1 1 0 77 38.5 38.5 0 1 1 0-77m282.1 320h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"></path></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.path", "navigation.footer", "search.highlight", "search.suggest", "search.share", "content.action.edit", "content.code.copy", "toc.integrate", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(()=>{ lightbox.reload(); });
+</script></body></html>

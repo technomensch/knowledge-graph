@@ -1,0 +1,2605 @@
+<!DOCTYPE html><html lang="en" class="no-js"><head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.">
+      
+      
+      
+        <link rel="canonical" href="https://technomensch.github.io/knowledge-graph/STYLE-GUIDE/">
+      
+      
+        <link rel="prev" href="../CHANGELOG/">
+      
+      
+        <link rel="next" href="../NAVIGATION-INDEX/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+    
+    
+      
+        <title>Style Guide - Knowledge Management Graph</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  <link href="../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
+            html.glightbox-open { overflow: initial; height: 100%; }
+            .gslide-title { margin-top: 0px; user-select: text; }
+            .gslide-desc { color: #666; user-select: text; }
+            .gslide-image img { background: white; }
+            .gscrollbar-fixer { padding-right: 15px; }
+            .gdesc-inner { font-size: 0.75rem; }
+            body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color); }
+            body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color); }
+            body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color); }
+        </style></head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-orange" data-md-color-accent="cyan">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#documentation-style-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+  
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Knowledge Management Graph" class="md-header__button md-logo" aria-label="Knowledge Management Graph" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Knowledge Management Graph
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Style Guide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-orange" data-md-color-accent="cyan" aria-label="Switch to light mode" type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="blue" aria-label="Switch to dark mode" type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"></path></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/technomensch/knowledge-graph" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+  </div>
+  <div class="md-source__repository">
+    technomensch/knowledge-graph
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../GETTING-STARTED/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../INSTALL/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Installation
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../CONCEPTS/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Concepts
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../COMMAND-GUIDE/" class="md-tabs__link">
+          
+  
+  
+  Commands
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../CONFIGURATION/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Configuration
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../CHANGELOG/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Changelog
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Contributing
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../GLOSSARY/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Glossary
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../reference/ARCHITECTURE/" class="md-tabs__link">
+          
+  
+  
+  Advanced
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Knowledge Management Graph" class="md-nav__button md-logo" aria-label="Knowledge Management Graph" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+
+    </a>
+    Knowledge Management Graph
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/technomensch/knowledge-graph" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
+  </div>
+  <div class="md-source__repository">
+    technomensch/knowledge-graph
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../GETTING-STARTED/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../INSTALL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CONCEPTS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5">
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Commands
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Commands
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../COMMAND-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHEAT-SHEET/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cheat Sheet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FAQ/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CONFIGURATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Contributing
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Style Guide
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Style Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#citation-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Citation Keys
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-non-negotiables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Non-Negotiables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Non-Negotiables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-third-person-voice-in-comprehensive-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Third-person voice in comprehensive documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-imperative-or-neutral-voice-in-quick-reference-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Imperative or neutral voice in quick-reference documentation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-platform-agnostic-language-unless-describing-claude-codespecific-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 Platform-agnostic language unless describing Claude Code–specific behavior
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#14-command-prompt-text-is-immutable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4 Command prompt text is immutable
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#15-never-modify-commands-or-coretemplates-without-explicit-permission" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5 Never modify /commands/ or core/templates/ without explicit permission
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-voice-and-tone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Voice and Tone
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Voice and Tone">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-voice-by-document-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Voice by document type
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-tone-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Tone principles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-canonical-terminology" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Canonical Terminology
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-page-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Page Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Page Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#4a-guide-page-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4a. Guide page pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4b-command-page-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4b. Command page pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4d-lesson-learned-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4d. Lesson Learned pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4e-adr-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4e. ADR pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-accessibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Accessibility
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-formatting-standards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Formatting Standards
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Formatting Standards">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-headings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 Headings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-lists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 Lists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-code-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.3 Code blocks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.4 Tables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#65-callout-boxes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.5 Callout boxes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.5 Callout boxes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#format-1-blockquote-syntax-github-compatible" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Format 1: Blockquote Syntax (GitHub-Compatible)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#format-2-mkdocs-admonitions-mkdocs-enhanced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Format 2: MkDocs Admonitions (MkDocs-Enhanced)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#guidelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Guidelines
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#66-emojis-and-badges" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.6 Emojis and badges
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-links-and-cross-references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Links and Cross-References
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Links and Cross-References">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-internal-links" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 Internal links
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-external-links" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 External links
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-anchor-links" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.3 Anchor links
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-citations-and-best-practice-traceability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Citations and Best-Practice Traceability
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Citations and Best-Practice Traceability">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#81-when-a-citation-is-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.1 When a citation is required
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#82-when-a-citation-is-not-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.2 When a citation is not required
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#83-citation-format-in-plan-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.3 Citation format in plan files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#84-citation-format-in-the-style-guide-itself" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.4 Citation format in the style guide itself
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-pre-commit-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Pre-Commit Checklist
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Pre-Commit Checklist">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#voice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Voice
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terminology" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Terminology
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#accessibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accessibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#formatting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Formatting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#links" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Links
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#citations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Citations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-related-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Related Documentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../NAVIGATION-INDEX/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Navigation Index
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../GLOSSARY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10">
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Advanced
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/ARCHITECTURE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/WORKFLOWS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manual Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/PLATFORM-ADAPTATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform Adaptation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/PATTERNS-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pattern Writing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/META-ISSUE-GUIDE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meta-Issue Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/SANITIZATION-CHECKLIST/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sanitization Checklist
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="Navigation">
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href=".." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="./" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/technomensch/knowledge-graph/edit/main/docs/STYLE-GUIDE.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"></path></svg>
+    </a>
+  
+  
+
+
+<h1 id="documentation-style-guide">Documentation Style Guide<a class="headerlink" href="#documentation-style-guide" title="Permanent link">¶</a></h1>
+<p>Authoring standards for contributors writing or reviewing documentation for the Knowledge Management Graph.</p>
+<p><strong>Audience</strong>: Contributors — human developers and AI documentation agents.
+<strong>Version</strong>: 0.0.10-alpha
+<strong>Last Updated</strong>: 2026-02-20</p>
+<blockquote>
+<p><strong>Before writing documentation</strong>, read this guide. Every rule includes a citation showing where the standard comes from.</p>
+</blockquote>
+<hr>
+<h2 id="contents">Contents<a class="headerlink" href="#contents" title="Permanent link">¶</a></h2>
+<ol>
+<li><a href="#1-non-negotiables">Non-Negotiables</a></li>
+<li><a href="#2-voice-and-tone">Voice and Tone</a></li>
+<li><a href="#3-canonical-terminology">Canonical Terminology</a></li>
+<li><a href="#4-page-patterns">Page Patterns</a></li>
+<li><a href="#5-accessibility">Accessibility</a></li>
+<li><a href="#6-formatting-standards">Formatting Standards</a></li>
+<li><a href="#7-links-and-cross-references">Links and Cross-References</a></li>
+<li><a href="#8-citations-and-best-practice-traceability">Citations and Best-Practice Traceability</a></li>
+<li><a href="#9-pre-commit-checklist">Pre-Commit Checklist</a></li>
+<li><a href="#10-related-documentation">Related Documentation</a></li>
+</ol>
+<hr>
+<h2 id="citation-keys">Citation Keys<a class="headerlink" href="#citation-keys" title="Permanent link">¶</a></h2>
+<p>The following authoritative sources are referenced throughout this guide using <code>[CitationKey]</code> notation.</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Source</th>
+<th>Principle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>[Nielsen2015]</code></td>
+<td>Nielsen Norman Group, "Plain Language Is for Everyone, Even Experts" (2015)</td>
+<td>Plain language reduces cognitive load; read time decreases 58%</td>
+</tr>
+<tr>
+<td><code>[GoogleDevDocs]</code></td>
+<td>Google Developer Documentation Style Guide (2024)</td>
+<td>Readers scan, not read linearly; hierarchy and information density matter</td>
+</tr>
+<tr>
+<td><code>[MicrosoftMSTP]</code></td>
+<td>Microsoft Manual of Style, 4th ed.</td>
+<td>Task-based organization improves findability; use active voice and imperative mood</td>
+</tr>
+<tr>
+<td><code>[508CFR1194]</code></td>
+<td>36 CFR Part 1194, Section 508 Standards</td>
+<td>Accessible technology requirements for documentation</td>
+</tr>
+<tr>
+<td><code>[WCAG21]</code></td>
+<td>WCAG 2.1, Level AA (W3C, 2018)</td>
+<td>Web Content Accessibility Guidelines</td>
+</tr>
+<tr>
+<td><code>[MadeToStick]</code></td>
+<td>Heath &amp; Heath, "Made to Stick" (2007)</td>
+<td>Concrete examples are 40% more memorable than abstract descriptions</td>
+</tr>
+<tr>
+<td><code>[DiataxisFramework]</code></td>
+<td>Divio Documentation System ("Diataxis"), Procida (2021)</td>
+<td>Four documentation types: tutorials, how-tos, explanations, references</td>
+</tr>
+<tr>
+<td><code>[WritersGuide]</code></td>
+<td>The Chicago Manual of Style, 17th ed.</td>
+<td>Comma usage, capitalization, heading case conventions</td>
+</tr>
+<tr>
+<td><code>[gitbook-style-guide]</code></td>
+<td><code>gitbook-docs/docs-maintenance/documentation-style-guide.md</code></td>
+<td>Project-specific platform language and page patterns</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="1-non-negotiables">1. Non-Negotiables<a class="headerlink" href="#1-non-negotiables" title="Permanent link">¶</a></h2>
+<p>These rules cannot be overridden without an explicit versioned decision (ADR). Every contributor must follow them on every document.</p>
+<h3 id="11-third-person-voice-in-comprehensive-documentation">1.1 Third-person voice in comprehensive documentation<a class="headerlink" href="#11-third-person-voice-in-comprehensive-documentation" title="Permanent link">¶</a></h3>
+<p>Apply to: <code>CONCEPTS.md</code>, <code>COMMAND-GUIDE.md</code>, <code>GETTING-STARTED.md</code>, <code>NAVIGATION-INDEX.md</code>.</p>
+<ul>
+<li>✅ "The system extracts metadata automatically."</li>
+<li>✅ "The command creates a lesson file in the active category."</li>
+<li>❌ "You can see that the system extracts..."</li>
+<li>❌ "We recommend running this command first."</li>
+</ul>
+<p><strong>Validation</strong>: <code>grep -iE "\b(you|your|we|our|they|them)\b" [file]</code></p>
+<p><strong>Citation</strong>: <code>[gitbook-style-guide]</code> Non-negotiable #1; <code>[MicrosoftMSTP]</code> Sec. 3.2 — third-person for reference documentation.</p>
+<hr>
+<h3 id="12-imperative-or-neutral-voice-in-quick-reference-documentation">1.2 Imperative or neutral voice in quick-reference documentation<a class="headerlink" href="#12-imperative-or-neutral-voice-in-quick-reference-documentation" title="Permanent link">¶</a></h3>
+<p>Apply to: <code>CHEAT-SHEET.md</code>.</p>
+<ul>
+<li>✅ "Run <code>/kmgraph:init</code> to initialize."</li>
+<li>✅ "This command initializes the knowledge graph."</li>
+<li>❌ Mix of imperative and third-person within the same document.</li>
+</ul>
+<p><strong>Citation</strong>: <code>[MicrosoftMSTP]</code> Sec. 3.4 — imperative mood for task instructions.</p>
+<hr>
+<h3 id="13-platform-agnostic-language-unless-describing-claude-codespecific-behavior">1.3 Platform-agnostic language unless describing Claude Code–specific behavior<a class="headerlink" href="#13-platform-agnostic-language-unless-describing-claude-codespecific-behavior" title="Permanent link">¶</a></h3>
+<ul>
+<li>✅ "The lesson template supports any LLM workflow."</li>
+<li>✅ "MCP-compatible tools can extend the plugin."</li>
+<li>✅ "Claude Code users can invoke commands via the <code>/</code> prefix."</li>
+<li>❌ "Claude will extract the metadata." (when the feature is not Claude Code–specific)</li>
+</ul>
+<p><strong>Citation</strong>: <code>[gitbook-style-guide]</code> Platform Language section.</p>
+<hr>
+<h3 id="14-command-prompt-text-is-immutable">1.4 Command prompt text is immutable<a class="headerlink" href="#14-command-prompt-text-is-immutable" title="Permanent link">¶</a></h3>
+<p>Never paraphrase or summarize code blocks in <code>/commands/</code>. Command prompt text must be reproduced verbatim; any modification is treated as a versioned decision requiring an ADR.</p>
+<p><strong>Citation</strong>: <code>[gitbook-style-guide]</code> Non-negotiable #5; immutability protects LLM reproducibility.</p>
+<hr>
+<h3 id="15-never-modify-commands-or-coretemplates-without-explicit-permission">1.5 Never modify <code>/commands/</code> or <code>core/templates/</code> without explicit permission<a class="headerlink" href="#15-never-modify-commands-or-coretemplates-without-explicit-permission" title="Permanent link">¶</a></h3>
+<p>These directories contain LLM execution prompts and structured parsing templates. Changes break functionality.</p>
+<ul>
+<li>If a change appears necessary: stop and ask the project maintainer first.</li>
+<li>Allowed: adding new files in these directories when explicitly authorized.</li>
+<li>Never allowed: editing existing command or template files without maintainer sign-off.</li>
+</ul>
+<p><strong>Citation</strong>: <code>MEMORY.md</code> Code Protection Rules; <code>[GoogleDevDocs]</code> "Separate concerns between authoring and execution."</p>
+<hr>
+<h2 id="2-voice-and-tone">2. Voice and Tone<a class="headerlink" href="#2-voice-and-tone" title="Permanent link">¶</a></h2>
+<h3 id="21-voice-by-document-type">2.1 Voice by document type<a class="headerlink" href="#21-voice-by-document-type" title="Permanent link">¶</a></h3>
+<p>Choose the correct voice for each document type. Mixing voices within a document is not permitted.</p>
+<table>
+<thead>
+<tr>
+<th>Document</th>
+<th>Voice</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CONCEPTS.md</code></td>
+<td>Third-person</td>
+<td>"The system captures git metadata automatically."</td>
+</tr>
+<tr>
+<td><code>COMMAND-GUIDE.md</code></td>
+<td>Third-person</td>
+<td>"The command creates a lesson file in the active category."</td>
+</tr>
+<tr>
+<td><code>GETTING-STARTED.md</code></td>
+<td>Third-person</td>
+<td>"The initialization wizard prompts for project name."</td>
+</tr>
+<tr>
+<td><code>NAVIGATION-INDEX.md</code></td>
+<td>Third-person</td>
+<td>"The index organizes documentation into four access paths."</td>
+</tr>
+<tr>
+<td><code>CHEAT-SHEET.md</code></td>
+<td>Imperative or neutral</td>
+<td>"Run <code>/kmgraph:init</code>." or "This command initializes..."</td>
+</tr>
+<tr>
+<td><code>STYLE-GUIDE.md</code> (this document)</td>
+<td>Imperative</td>
+<td>"Use third-person voice."</td>
+</tr>
+<tr>
+<td>Code comments and examples</td>
+<td>Any style</td>
+<td>Exception to all voice rules.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Citation</strong>: <code>[GoogleDevDocs]</code> "Match the voice to the document's purpose."</p>
+<hr>
+<h3 id="22-tone-principles">2.2 Tone principles<a class="headerlink" href="#22-tone-principles" title="Permanent link">¶</a></h3>
+<p>Lead every section with an outcome — state what the reader gains, not what the section contains.</p>
+<ul>
+<li>✅ "This section defines heading rules so contributors produce consistent hierarchy across all docs."</li>
+<li>❌ "This section is about heading rules."</li>
+</ul>
+<p>Prefer concrete nouns over pronouns:
+- ✅ "The command writes to <code>lessons-learned/</code>."
+- ❌ "It writes to the folder."</p>
+<p><strong>Additional tone rules</strong>:
+- Short paragraphs (4 lines or fewer)
+- Short lists (7 items or fewer before splitting into subsections)
+- Avoid implementation detail in introductory content; reserve it for Advanced sections
+- Every technical claim must be demonstrable with an example</p>
+<p><strong>Citations</strong>: <code>[GoogleDevDocs]</code> "State the purpose before the details."; <code>[Nielsen2015]</code> plain language reduces read time 58%; <code>[MicrosoftMSTP]</code> "Use short sentences and paragraphs."</p>
+<hr>
+<h2 id="3-canonical-terminology">3. Canonical Terminology<a class="headerlink" href="#3-canonical-terminology" title="Permanent link">¶</a></h2>
+<p>Use the terms in the "Use This Term" column consistently across all documentation. Using alternative terms creates confusion and undermines searchability.</p>
+<table>
+<thead>
+<tr>
+<th>Use This Term</th>
+<th>Never Use</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Command</strong></td>
+<td>slash command, plugin command, skill</td>
+<td>A prompt manually invoked by the contributor via <code>/kmgraph:…</code></td>
+</tr>
+<tr>
+<td><strong>Skill</strong></td>
+<td>command (for autonomous triggers)</td>
+<td>A prompt triggered automatically by the AI</td>
+</tr>
+<tr>
+<td><strong>Template</strong></td>
+<td>form, blank, scaffold</td>
+<td>A pre-formatted markdown file providing structure</td>
+</tr>
+<tr>
+<td><strong>Knowledge graph</strong></td>
+<td>KG (in contributor-facing prose), database, notes system</td>
+<td>The quick-reference layer of organized documentation</td>
+</tr>
+<tr>
+<td><strong>KG</strong></td>
+<td>kg, K.G.</td>
+<td>Acceptable abbreviation in code and technical contexts only</td>
+</tr>
+<tr>
+<td><strong>Lesson Learned</strong></td>
+<td>lesson, note, entry</td>
+<td>A structured problem-solving document in <code>lessons-learned/</code></td>
+</tr>
+<tr>
+<td><strong>ADR</strong></td>
+<td>decision record, architecture note</td>
+<td>Architecture Decision Record, numbered sequentially</td>
+</tr>
+<tr>
+<td><strong>MEMORY.md</strong></td>
+<td>memory file, context file</td>
+<td>The AI long-term context file at the KG root</td>
+</tr>
+<tr>
+<td><strong>Claude Code</strong></td>
+<td>Claude, the assistant</td>
+<td>When referring to the Claude Code IDE plugin specifically</td>
+</tr>
+<tr>
+<td><strong>Any LLM</strong></td>
+<td>Claude, the AI</td>
+<td>When describing platform-agnostic workflows</td>
+</tr>
+<tr>
+<td><strong>MCP</strong></td>
+<td>plugin API, tool</td>
+<td>Model Context Protocol integration</td>
+</tr>
+<tr>
+<td><strong>GitHub Issue</strong></td>
+<td>issue (alone)</td>
+<td>Platform-level bug report or feature request on GitHub</td>
+</tr>
+<tr>
+<td><strong><code>[AUTO]</code></strong></td>
+<td>automatic, auto-filled</td>
+<td>Field filled by the command without contributor input</td>
+</tr>
+<tr>
+<td><strong><code>[MANUAL]</code></strong></td>
+<td>manual, user-filled</td>
+<td>Field requiring contributor input</td>
+</tr>
+<tr>
+<td><strong>ISO 8601</strong></td>
+<td>date format</td>
+<td><code>YYYY-MM-DD</code> or <code>YYYY-MM-DDTHH:MM:SSZ</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Citation</strong>: <code>[gitbook-style-guide]</code> Terminology section; <code>[GoogleDevDocs]</code> "Use a word list to enforce consistency."</p>
+<hr>
+<h2 id="4-page-patterns">4. Page Patterns<a class="headerlink" href="#4-page-patterns" title="Permanent link">¶</a></h2>
+<p>Apply the correct structural pattern for each document type. Predictable structure improves scannability and reduces the cognitive load of finding information. <code>[GoogleDevDocs]</code></p>
+<h3 id="4a-guide-page-pattern">4a. Guide page pattern<a class="headerlink" href="#4a-guide-page-pattern" title="Permanent link">¶</a></h3>
+<p>Apply to: <code>GETTING-STARTED.md</code>, <code>CONFIGURATION.md</code>, <code>WORKFLOWS.md</code>, and similar task-oriented guides.</p>
+<div class="highlight"><pre><span></span><code><span class="gh"># [Title]</span>
+
+[One-sentence description of what this guide covers and who it is for.]
+
+---
+
+<span class="gu">## [What It Is] (optional — omit if obvious from title)</span>
+<span class="gu">## [When to Use / Choose a Path]</span>
+<span class="gu">## [Step-by-step content sections]</span>
+<span class="gu">## Troubleshooting</span>
+<span class="gu">## Related Documentation</span>
+</code></pre></div>
+<p><strong>Citation</strong>: <code>[gitbook-style-guide]</code> Guide Page pattern; <code>[DiataxisFramework]</code> How-to guide structure.</p>
+<hr>
+<h3 id="4b-command-page-pattern">4b. Command page pattern<a class="headerlink" href="#4b-command-page-pattern" title="Permanent link">¶</a></h3>
+<p>Apply to: individual command entries in <code>COMMAND-GUIDE.md</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="gu">### 🟢 `/kmgraph:[command-name]`</span>
+
+<span class="gs">**Purpose**</span>: [One-line description]
+
+<span class="gs">**When to use**</span>:
+<span class="k">-</span><span class="w"> </span>[Scenario 1]
+<span class="k">-</span><span class="w"> </span>[Scenario 2]
+
+<span class="gs">**What it does**</span>:
+<span class="k">1.</span> [Step 1]
+<span class="k">2.</span> [Step 2]
+
+<span class="gs">**Time**</span>: [Estimate]
+
+<span class="gs">**Example**</span>:
+```bash
+/kmgraph:[command-name] [optional-args]
+</code></pre></div>
+<p><strong>Tips</strong> (optional):
+- [Tip]
+</p><div class="highlight"><pre><span></span><code>Difficulty badges: 🟢 Essential / 🟡 Intermediate / 🔴 Advanced.
+
+**Citation**: `[gitbook-style-guide]` Command Page pattern; `[MicrosoftMSTP]` "Give examples for every major operation."
+
+---
+
+### 4c. Concept entry pattern
+
+Apply to: term definitions in `CONCEPTS.md`.
+
+```markdown
+### [Term]
+
+**What it is**: [Plain-English definition, 1–2 sentences]
+
+**Why it matters**: [Why a contributor needs to know this]
+
+**Example**: [Concrete example — never abstract]
+
+**Plain English**: [One-sentence analogy]
+</code></pre></div><p></p>
+<p><strong>Citation</strong>: <code>[MadeToStick]</code> — concrete examples are 40% more memorable; <code>[DiataxisFramework]</code> explanation document type.</p>
+<hr>
+<h3 id="4d-lesson-learned-pattern">4d. Lesson Learned pattern<a class="headerlink" href="#4d-lesson-learned-pattern" title="Permanent link">¶</a></h3>
+<p>Lessons follow the template in <code>core/templates/lessons-learned/lesson-template.md</code>. Refer contributors to that template. Do not duplicate the structure here.</p>
+<p><strong>Citation</strong>: <code>[DiataxisFramework]</code> — reference documents describe structure, not process.</p>
+<hr>
+<h3 id="4e-adr-pattern">4e. ADR pattern<a class="headerlink" href="#4e-adr-pattern" title="Permanent link">¶</a></h3>
+<p>ADRs follow the template in <code>core/templates/decisions/ADR-template.md</code>. Refer contributors to that template.</p>
+<p><strong>Citation</strong>: <code>[DiataxisFramework]</code> — reference documents describe structure, not process.</p>
+<hr>
+<h2 id="5-accessibility">5. Accessibility<a class="headerlink" href="#5-accessibility" title="Permanent link">¶</a></h2>
+<blockquote>
+<p><strong>All contributor-facing and user-facing documentation must meet Section 508 standards (36 CFR Part 1194) and WCAG 2.1 Level AA.</strong></p>
+</blockquote>
+<p>Apply these rules to every document before committing.</p>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Rule</th>
+<th>Validation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Heading hierarchy</td>
+<td>Never skip levels (H1→H2→H3, never H1→H3)</td>
+<td>Manual review</td>
+</tr>
+<tr>
+<td>Link text</td>
+<td>Always descriptive — never "click here", "read more", "here", or "this link"</td>
+<td><code>grep -i "click here\|read more\|\bhere\b\|this link"</code></td>
+</tr>
+<tr>
+<td>Table headers</td>
+<td>Every table has a header row with <code>\|---\|</code> separator</td>
+<td>Visual check</td>
+</tr>
+<tr>
+<td>Image alt text</td>
+<td>Every image has descriptive alt text <code>![description](path)</code></td>
+<td><code>grep -P "!\[\]\("</code> catches empty alt text</td>
+</tr>
+<tr>
+<td>Mermaid diagrams</td>
+<td>Require: text description before diagram, text-based alternative for screen readers, WCAG contrast-compliant colors</td>
+<td>Manual review</td>
+</tr>
+<tr>
+<td>Language complexity</td>
+<td>Plain language preferred; Flesch-Kincaid grade level ≤10 for contributor-facing docs</td>
+<td>Optional: <code>readable</code> npm package</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Citations</strong>: <code>[508CFR1194]</code> — 36 CFR Part 1194 Section 508 Standards; <code>[WCAG21]</code> — WCAG 2.1 Level AA; <code>MEMORY.md</code> 508 Accessibility Compliance section.</p>
+<hr>
+<h2 id="6-formatting-standards">6. Formatting Standards<a class="headerlink" href="#6-formatting-standards" title="Permanent link">¶</a></h2>
+<h3 id="61-headings">6.1 Headings<a class="headerlink" href="#61-headings" title="Permanent link">¶</a></h3>
+<ul>
+<li>Title case for H1 only: <code># Documentation Style Guide</code></li>
+<li>Sentence case for H2–H4: <code>## Voice and tone</code>, <code>### When to use imperative</code></li>
+<li>No punctuation at the end of headings</li>
+<li>No more than 4 levels of heading depth in any document</li>
+<li>Never use a heading solely for visual styling</li>
+</ul>
+<p><strong>Citation</strong>: <code>[GoogleDevDocs]</code> heading capitalization rules; <code>[WritersGuide]</code> heading case conventions.</p>
+<hr>
+<h3 id="62-lists">6.2 Lists<a class="headerlink" href="#62-lists" title="Permanent link">¶</a></h3>
+<ul>
+<li>Unordered lists (<code>-</code>) for items without inherent order</li>
+<li>Ordered lists (<code>1.</code>) for sequential steps only</li>
+<li>No more than 2 levels of nesting</li>
+<li>Each item is a complete thought, ending without punctuation unless it is a full sentence</li>
+<li>Lists of 8 or more items: break into subsections</li>
+</ul>
+<p><strong>Citation</strong>: <code>[MicrosoftMSTP]</code> list formatting.</p>
+<hr>
+<h3 id="63-code-blocks">6.3 Code blocks<a class="headerlink" href="#63-code-blocks" title="Permanent link">¶</a></h3>
+<ul>
+<li>Always specify the language: <code>```bash</code>, <code>```yaml</code>, <code>```markdown</code>, <code>```json</code></li>
+<li>Command invocations always use <code>bash</code> code blocks</li>
+<li>Inline code (backticks) for: file names, directory paths, command names, field names, flag names</li>
+<li>Never wrap multi-line code in inline code</li>
+</ul>
+<p><strong>Validation</strong>: <code>grep -n '^\</code>``$' [file]` — returns 0 for a clean file.</p>
+<p><strong>Citation</strong>: <code>[GoogleDevDocs]</code> code formatting.</p>
+<hr>
+<h3 id="64-tables">6.4 Tables<a class="headerlink" href="#64-tables" title="Permanent link">¶</a></h3>
+<ul>
+<li>Pipe-based markdown tables with a header separator row</li>
+<li>Left-aligned columns by default</li>
+<li>Keep table cells concise (15 words or fewer per cell)</li>
+<li>Provide a plain-text equivalent for complex tables when screen readers cannot parse them</li>
+</ul>
+<p><strong>Citation</strong>: <code>[WCAG21]</code> table accessibility; <code>[GoogleDevDocs]</code> table formatting.</p>
+<hr>
+<h3 id="65-callout-boxes">6.5 Callout boxes<a class="headerlink" href="#65-callout-boxes" title="Permanent link">¶</a></h3>
+<p>Callouts highlight important information. Two formats are supported depending on rendering context:</p>
+<h4 id="format-1-blockquote-syntax-github-compatible">Format 1: Blockquote Syntax (GitHub-Compatible)<a class="headerlink" href="#format-1-blockquote-syntax-github-compatible" title="Permanent link">¶</a></h4>
+<p>Use blockquote syntax with a bold label. Works on GitHub and any markdown renderer.</p>
+<div class="highlight"><pre><span></span><code><span class="k">&gt; </span><span class="ge">**Note:** Informational context the reader should know.</span>
+<span class="k">&gt; </span><span class="ge">**Tip:** Actionable optimization or shortcut.</span>
+<span class="k">&gt; </span><span class="ge">**Warning:** Risk of data loss or a breaking change.</span>
+<span class="k">&gt; </span><span class="ge">**Important:** A must-know requirement before proceeding.</span>
+</code></pre></div>
+<p><strong>When to use</strong>: Raw markdown files, GitHub previews, or when maximum compatibility is needed.</p>
+<h4 id="format-2-mkdocs-admonitions-mkdocs-enhanced">Format 2: MkDocs Admonitions (MkDocs-Enhanced)<a class="headerlink" href="#format-2-mkdocs-admonitions-mkdocs-enhanced" title="Permanent link">¶</a></h4>
+<p>Use MkDocs admonition syntax for richer styling on the documentation site.</p>
+<div class="highlight"><pre><span></span><code>!!! note "Note"
+    Informational context the reader should know.
+
+!!! tip "Pro Tip"
+    Actionable optimization or shortcut.
+
+!!! warning "Common Pitfall"
+    Risk of data loss or a breaking change.
+
+!!! danger "Important"
+    A must-know requirement before proceeding.
+
+!!! info "For Your Information"
+    Additional context or related resources.
+</code></pre></div>
+<p><strong>When to use</strong>: Comprehensive documentation files (COMMAND-GUIDE.md, CONCEPTS.md, GETTING-STARTED.md) where site rendering matters.</p>
+<h4 id="guidelines">Guidelines<a class="headerlink" href="#guidelines" title="Permanent link">¶</a></h4>
+<ul>
+<li>Reserved keywords: <strong>Note</strong>, <strong>Tip</strong>, <strong>Warning</strong>, <strong>Important</strong>, <strong>Info</strong></li>
+<li>Do not place consecutive callout boxes without prose between them (either format)</li>
+<li>Use blockquotes for lessons learned and concise guides</li>
+<li>Use admonitions for main documentation sections and learning paths</li>
+<li>All callout text must include accompanying text — never rely on formatting alone to convey meaning (WCAG 2.1)</li>
+</ul>
+<p><strong>Citation</strong>: Google Dev Docs style guide, Material for MkDocs admonition support, WCAG 2.1 1.1.1 Non-text Content.</p>
+<hr>
+<h3 id="66-emojis-and-badges">6.6 Emojis and badges<a class="headerlink" href="#66-emojis-and-badges" title="Permanent link">¶</a></h3>
+<ul>
+<li>Difficulty badges (🟢 Essential / 🟡 Intermediate / 🔴 Advanced) are permitted in command documentation only</li>
+<li>Emojis elsewhere: use only when they carry semantic meaning (✅ complete, ❌ not supported); never for decoration</li>
+<li>Every emoji must have accompanying text — never rely on an emoji alone to convey meaning</li>
+</ul>
+<p><strong>Citation</strong>: <code>[WCAG21]</code> 1.1.1 Non-text Content — emojis must not be the sole conveyor of information.</p>
+<hr>
+<h2 id="7-links-and-cross-references">7. Links and Cross-References<a class="headerlink" href="#7-links-and-cross-references" title="Permanent link">¶</a></h2>
+<h3 id="71-internal-links">7.1 Internal links<a class="headerlink" href="#71-internal-links" title="Permanent link">¶</a></h3>
+<ul>
+<li>Use relative paths: <code>[Command Guide](./COMMAND-GUIDE.md)</code>, <code>[Pattern Writing Guide](reference/PATTERNS-GUIDE.md)</code></li>
+<li>Never use absolute file system paths (<code>/Users/…</code>)</li>
+<li>Every document must have a "Related Documentation" section linking to at least 2 other documents</li>
+<li>Cross-references should be bidirectional: if doc A links to doc B, doc B should link back to doc A</li>
+</ul>
+<p><strong>Citation</strong>: <code>[GoogleDevDocs]</code> cross-reference guidance; <code>MEMORY.md</code> project standards.</p>
+<hr>
+<h3 id="72-external-links">7.2 External links<a class="headerlink" href="#72-external-links" title="Permanent link">¶</a></h3>
+<ul>
+<li>Use descriptive link text that describes the destination, not the URL</li>
+<li>✅ <code>[Google Developer Documentation Style Guide](https://developers.google.com/style)</code></li>
+<li>❌ <code>[https://developers.google.com/style](https://developers.google.com/style)</code></li>
+<li>Open in the same tab (default markdown behavior)</li>
+</ul>
+<p><strong>Citation</strong>: <code>[WCAG21]</code> 2.4.4 Link Purpose.</p>
+<hr>
+<h3 id="73-anchor-links">7.3 Anchor links<a class="headerlink" href="#73-anchor-links" title="Permanent link">¶</a></h3>
+<ul>
+<li>Section IDs are auto-generated from heading text in GitHub-flavored markdown</li>
+<li>Reference with <code>#heading-text-kebab-case</code></li>
+<li>Test all anchor links before committing:</li>
+</ul>
+<div class="highlight"><pre><span></span><code>npx<span class="w"> </span>markdown-link-check<span class="w"> </span><span class="o">[</span>file<span class="o">]</span>
+</code></pre></div>
+<p><strong>Citation</strong>: <code>[GoogleDevDocs]</code> anchor links.</p>
+<hr>
+<h2 id="8-citations-and-best-practice-traceability">8. Citations and Best-Practice Traceability<a class="headerlink" href="#8-citations-and-best-practice-traceability" title="Permanent link">¶</a></h2>
+<p>Every design decision in documentation must include a citation using the <code>[CitationKey]</code> notation defined in the Citation Keys table at the top of this guide.</p>
+<h3 id="81-when-a-citation-is-required">8.1 When a citation is required<a class="headerlink" href="#81-when-a-citation-is-required" title="Permanent link">¶</a></h3>
+<ul>
+<li>Any structural decision (why this heading order, not another)</li>
+<li>Any voice or tone rule</li>
+<li>Any accessibility requirement</li>
+<li>Any formatting convention that differs from generic markdown defaults</li>
+</ul>
+<h3 id="82-when-a-citation-is-not-required">8.2 When a citation is not required<a class="headerlink" href="#82-when-a-citation-is-not-required" title="Permanent link">¶</a></h3>
+<ul>
+<li>Code examples (these follow the behavior of the actual commands)</li>
+<li>Factual statements about the project itself (file paths, command names, dates)</li>
+</ul>
+<h3 id="83-citation-format-in-plan-files">8.3 Citation format in plan files<a class="headerlink" href="#83-citation-format-in-plan-files" title="Permanent link">¶</a></h3>
+<div class="highlight"><pre><span></span><code><span class="gs">**Citation**</span>: <span class="sb">`[Nielsen2015]`</span> — Plain language reduces cognitive load 50%
+</code></pre></div>
+<h3 id="84-citation-format-in-the-style-guide-itself">8.4 Citation format in the style guide itself<a class="headerlink" href="#84-citation-format-in-the-style-guide-itself" title="Permanent link">¶</a></h3>
+<p>Include the citation inline at the end of the rule it supports:</p>
+<div class="highlight"><pre><span></span><code><span class="k">&gt; </span><span class="ge">**Best practice**: Lead with outcomes before details. `[GoogleDevDocs]`</span>
+</code></pre></div>
+<p>Or as a standalone line after the rule block:</p>
+<div class="highlight"><pre><span></span><code><span class="gs">**Citation**</span>: <span class="sb">`[GoogleDevDocs]`</span> heading capitalization rules; <span class="sb">`[WritersGuide]`</span> heading case conventions.
+</code></pre></div>
+<p><strong>Citation</strong>: <code>MEMORY.md</code> Best Practice Citations section.</p>
+<hr>
+<h2 id="9-pre-commit-checklist">9. Pre-Commit Checklist<a class="headerlink" href="#9-pre-commit-checklist" title="Permanent link">¶</a></h2>
+<p>Run this checklist before marking documentation complete or committing a new or updated document.</p>
+<h3 id="voice">Voice<a class="headerlink" href="#voice" title="Permanent link">¶</a></h3>
+<ul>
+<li>[ ] Voice matches document type (third-person or imperative per Section 2)</li>
+<li>[ ] No second-person pronouns in comprehensive docs: <code>grep -iE "\b(you|your|we|our)\b" [file]</code></li>
+<li>[ ] Concrete nouns used instead of ambiguous pronouns where possible</li>
+</ul>
+<h3 id="terminology">Terminology<a class="headerlink" href="#terminology" title="Permanent link">¶</a></h3>
+<ul>
+<li>[ ] All terms match the Canonical Terminology table (Section 3)</li>
+<li>[ ] "GitHub Issue" used for platform issues, not bare "issue"</li>
+<li>[ ] Platform language correct: "Claude Code" vs "any LLM" vs "MCP"</li>
+</ul>
+<h3 id="structure">Structure<a class="headerlink" href="#structure" title="Permanent link">¶</a></h3>
+<ul>
+<li>[ ] Page follows the correct pattern for its document type (Section 4)</li>
+<li>[ ] H1 exists and is unique; headings never skip levels</li>
+<li>[ ] Every section leads with an outcome statement, not a content description</li>
+</ul>
+<h3 id="accessibility">Accessibility<a class="headerlink" href="#accessibility" title="Permanent link">¶</a></h3>
+<ul>
+<li>[ ] No "click here" or bare-URL link text: <code>grep -i "click here\|read more\|\bhere\b" [file]</code></li>
+<li>[ ] All tables have header rows</li>
+<li>[ ] All images have non-empty alt text: <code>grep -P "!\[\]\(" [file]</code></li>
+<li>[ ] Any Mermaid diagram has a text description before it</li>
+</ul>
+<h3 id="formatting">Formatting<a class="headerlink" href="#formatting" title="Permanent link">¶</a></h3>
+<ul>
+<li>[ ] All code blocks have a language specifier: <code>grep -n '^\</code>``$' [file]`</li>
+<li>[ ] File names and path names wrapped in inline code</li>
+<li>[ ] No absolute file system paths in prose: <code>grep "/Users/" [file]</code></li>
+<li>[ ] H1 in title case; H2–H4 in sentence case</li>
+</ul>
+<h3 id="links">Links<a class="headerlink" href="#links" title="Permanent link">¶</a></h3>
+<ul>
+<li>[ ] All internal links use relative paths</li>
+<li>[ ] "Related Documentation" section present with at least 2 links</li>
+<li>[ ] Broken link check: <code>npx markdown-link-check [file]</code></li>
+</ul>
+<h3 id="citations">Citations<a class="headerlink" href="#citations" title="Permanent link">¶</a></h3>
+<ul>
+<li>[ ] Every structural, voice, or accessibility decision has a <code>[CitationKey]</code></li>
+</ul>
+<hr>
+<h2 id="10-related-documentation">10. Related Documentation<a class="headerlink" href="#10-related-documentation" title="Permanent link">¶</a></h2>
+<p><strong>Authoring references</strong>:
+- <a href="../CONCEPTS/">Concepts Guide</a> — Canonical definitions of all terms used in this guide
+- <a href="../COMMAND-GUIDE/">Command Reference</a> — Example of the correct command page pattern in practice
+- <a href="../GETTING-STARTED/">Getting Started</a> — Example of the correct guide page pattern in practice</p>
+<p><strong>Templates</strong>:
+- <a href="../templates/lessons-learned/lesson-template/">Lesson Template</a> — Starting scaffold for Lesson Learned documents
+- <a href="../templates/decisions/ADR-template/">ADR Template</a> — Starting scaffold for Architecture Decision Records
+- <a href="../templates/documentation/doc-template/">Documentation Template</a> — Starting scaffold for general documentation</p>
+<p><strong>Contributor workflows</strong>:
+- <a href="../reference/WORKFLOWS/">Manual Workflows</a> — Workflow for contributing without Claude Code</p>
+<hr>
+<p><strong>Created</strong>: 2026-02-20
+<strong>Version</strong>: 1.0
+<strong>Applies to</strong>: v0.0.7-alpha and later</p>
+
+
+
+
+
+
+
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="March 1, 2026 23:51:26 UTC">March 1, 2026</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"></path></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="March 1, 2026 23:51:26 UTC">March 1, 2026</span>
+  </span>
+
+    
+    
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer">
+        
+          
+          <a href="../CHANGELOG/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Changelog">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Changelog
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../NAVIGATION-INDEX/" class="md-footer__link md-footer__link--next" aria-label="Next: Navigation Index">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Navigation Index
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"></path></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Staying in Sync
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/technomensch" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"></path></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.linkedin.com/in/marckaplan/" target="_blank" rel="noopener" title="www.linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zM102.2 96a38.5 38.5 0 1 1 0 77 38.5 38.5 0 1 1 0-77m282.1 320h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"></path></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.path", "navigation.footer", "search.highlight", "search.suggest", "search.share", "content.action.edit", "content.code.copy", "toc.integrate", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(()=>{ lightbox.reload(); });
+</script></body></html>
