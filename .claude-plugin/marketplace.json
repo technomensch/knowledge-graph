@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "kmgraph",
-      "version": "0.0.10-alpha",
+      "version": "0.0.9-alpha",
       "description": "Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects. Includes KG entries, ADRs, meta-issue tracking, chat extraction, and MEMORY.md bidirectional sync.",
       "source": "./",
       "author": {
