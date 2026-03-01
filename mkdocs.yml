@@ -50,7 +50,6 @@ nav:
   - Getting Started: GETTING-STARTED.md
   - Installation: INSTALL.md
   - Concepts: CONCEPTS.md
-  - Glossary: GLOSSARY.md
   - Commands:
       - Command Guide: COMMAND-GUIDE.md
       - Cheat Sheet: CHEAT-SHEET.md
@@ -77,9 +76,6 @@ plugins:
   - glightbox
   - minify
   - roamlinks
-  - mkdocs-glossary-plugin:
-      glossary_dirs:
-        - docs/GLOSSARY.md
 
 markdown_extensions:
   - admonition
