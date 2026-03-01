@@ -210,7 +210,7 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 - **Want detailed examples?** → [Command Guide](COMMAND-GUIDE.md) — All commands with full documentation
 - **New to the system?** → [Getting Started](GETTING-STARTED.md) — Setup and first lesson walkthrough
 - **Understanding terminology?** → [Concepts Guide](CONCEPTS.md) — Definitions of all key terms
-- **Using other platforms?** → [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Cursor, Windsurf, Continue setup
+- **Using other platforms?** → [Platform Adaptation](reference/PLATFORM-ADAPTATION.md) — Cursor, Windsurf, Continue setup
 - **Configuring settings?** → [Configuration Guide](CONFIGURATION.md) — Post-install options and workflows
 
 ---
@@ -225,11 +225,11 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 **Learning**:
 - [Command Reference Guide](COMMAND-GUIDE.md) — Complete command documentation with examples and learning path
 - [Concepts Guide](CONCEPTS.md) — Plain-English definitions and explanations of all key terms
-- [Examples](../core/examples/) — Real-world lesson, ADR, and KG entry examples
+- [Examples](examples/) — Real-world lesson, ADR, and KG entry examples
 
 **Advanced topics**:
-- [Workflows](../core/docs/WORKFLOWS.md) — Step-by-step guides for manual workflows
-- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Integration for Cursor, Windsurf, Continue, VS Code, Aider
+- [Workflows](reference/WORKFLOWS.md) — Step-by-step guides for manual workflows
+- [Platform Adaptation](reference/PLATFORM-ADAPTATION.md) — Integration for Cursor, Windsurf, Continue, VS Code, Aider
 - [Style Guide](STYLE-GUIDE.md) — Documentation authoring standards and best practices
 
 ---

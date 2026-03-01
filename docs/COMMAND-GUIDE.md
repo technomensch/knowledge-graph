@@ -1178,14 +1178,31 @@ git checkout -b issue/N-description
 
 ## Related Documentation
 
-**Quick help**:
-- [Cheat Sheet](CHEAT-SHEET.md) - One-page quick reference
-- [Concepts](CONCEPTS.md) - Term definitions
+### **Quick help**
+<div class="grid cards" markdown>
+- [Cheat Sheet](CHEAT-SHEET.md)
 
-**Writing better entries**:
-- [Patterns Guide](../core/docs/PATTERNS-GUIDE.md) - Quality standards
-- [Templates](../core/templates/) - Structured formats
-- [Examples](../core/examples/) - Real samples
+  One-page quick reference
+
+- [Concepts](CONCEPTS.md)
+
+  Term definitions
+</div>
+
+###**Writing better entries**
+<div class="grid cards" markdown>
+- [Patterns Guide](reference/PATTERNS-GUIDE.md)
+
+  Quality standards
+
+- [Templates](templates/)
+
+  Structured formats
+
+- [Examples](examples/)
+
+Real samples
+</div>
 
 ## Next Steps
 
@@ -1209,21 +1226,53 @@ git checkout -b issue/N-description
 
 ## Related Documentation
 
-**Getting started**:
-- [Getting Started Guide](GETTING-STARTED.md) — Installation, first lesson, setup verification (5 min)
-- [Installation](INSTALL.md) — Universal installer for all platforms (paste-friendly)
-- [Configuration Guide](CONFIGURATION.md) — Post-install setup: sanitization, team workflows, MCP server
+### **Getting started**
+<div class="grid cards" markdown>
 
-**Learning resources**:
-- [Quick Reference](CHEAT-SHEET.md) — One-page cheat sheet for common tasks
-- [Concepts Guide](CONCEPTS.md) — Plain-English definitions of every term and pattern
-- [Examples](../core/examples/) — Real-world completed examples of lessons, ADRs, and KG entries
+- [Getting Started Guide](GETTING-STARTED.md)
 
-**Advanced**:
-- [Workflows](../core/docs/WORKFLOWS.md) — Step-by-step guides for all 9 workflow types (non-Claude platforms)
-- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Integration details for Cursor, Windsurf, Continue, VS Code, Aider
-- [Style Guide](STYLE-GUIDE.md) — Documentation authoring standards and conventions
+  Installation, first lesson, setup verification (5 min)
 
+- [Installation](INSTALL.md)
+
+  Universal installer for all platforms (paste-friendly)
+
+- [Configuration Guide](CONFIGURATION.md)
+
+  Post-install setup: sanitization, team workflows, MCP server
+</div>
+
+### **Learning resources**
+<div class="grid cards" markdown>
+
+- [Quick Reference](CHEAT-SHEET.md)
+
+  One-page cheat sheet for common tasks
+
+- [Concepts Guide](CONCEPTS.md)
+
+  Plain-English definitions of every term and pattern
+
+- [Examples](examples/)
+
+  Real-world completed examples of lessons, ADRs, and KG entries
+</div>
+
+### **Advanced**
+<div class="grid cards" markdown>
+
+- [Workflows](reference/WORKFLOWS.md)
+
+  Step-by-step guides for all 9 workflow types (non-Claude platforms)
+
+- [Platform Adaptation](reference/PLATFORM-ADAPTATION.md)
+
+  Integration details for Cursor, Windsurf, Continue, VS Code, Aider
+
+- [Style Guide](STYLE-GUIDE.md)
+
+  Documentation authoring standards and conventions
+</div>
 ---
 
 **Version**: 0.0.10-alpha

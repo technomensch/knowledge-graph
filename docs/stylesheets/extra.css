@@ -1,4 +1,4 @@
-/* Custom styles for Knowledge Management Graph v0.0.8.6
+/* Custom styles for Knowledge Graph Plugin v0.0.8.6
    Theme customization, typography, and visual enhancements */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -337,38 +337,6 @@
 
 [data-md-color-scheme="default"] .grid-item h3 {
   color: #0051a3;
-}
-
-/* ============================================================
-   Social Links: LinkedIn in Header
-   ============================================================ */
-
-/* LinkedIn container in header (positioned right) */
-.md-header__linkedin {
-  display: flex;
-  align-items: center;
-  margin-left: 0.5rem;
-}
-
-/* LinkedIn link styling */
-.md-header__linkedin .md-social__link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  color: #0a66c2; /* LinkedIn brand blue */
-  transition: all 0.2s ease-in-out;
-}
-
-.md-header__linkedin .md-social__link:hover {
-  opacity: 0.8;
-  transform: scale(1.1);
-}
-
-/* Hide social links from footer (LinkedIn now in header) */
-.md-footer__inner .md-social {
-  display: none;
 }
 
 /* ============================================================

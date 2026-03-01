@@ -146,7 +146,7 @@ chmod +x .git/hooks/pre-commit
 vim .git/hooks/pre-commit
 ```
 
-See [core/docs/SANITIZATION-CHECKLIST.md](../core/docs/SANITIZATION-CHECKLIST.md) for details.
+See [core/docs/SANITIZATION-CHECKLIST.md](reference/SANITIZATION-CHECKLIST.md) for details.
 
 ---
 
@@ -184,7 +184,7 @@ node core/mcp-server.js
 # Should see: "MCP server listening..."
 ```
 
-See [core/docs/PLATFORM-ADAPTATION.md#mcp-server](../core/docs/PLATFORM-ADAPTATION.md#mcp-server) for troubleshooting.
+See [core/docs/PLATFORM-ADAPTATION.md#mcp-server](reference/PLATFORM-ADAPTATION.md#mcp-server) for troubleshooting.
 
 ---
 
@@ -283,11 +283,11 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 
   Document what you've learned with `/kmgraph:capture-lesson` while details are fresh.
 
-- **[Study Real Examples](../core/examples/)**
+- **[Study Real Examples](examples/)**
 
   Review completed examples of lessons learned, ADRs, and knowledge graph entries.
 
-- **[Explore Advanced Features](../core/docs/ARCHITECTURE.md)**
+- **[Explore Advanced Features](reference/ARCHITECTURE.md)**
 
   Understand system design, patterns, and how to build custom workflows.
 
@@ -297,23 +297,61 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 
 ## Related Documentation
 
-**Getting started**:
-- [Getting Started Guide](GETTING-STARTED.md) — Installation and setup walkthrough
-- [Command Reference](COMMAND-GUIDE.md) — All commands with detailed examples
-- [Quick Reference](CHEAT-SHEET.md) — One-page cheat sheet for common tasks
+### **Getting started**
+<div class="grid cards" markdown>
 
-**Learning**:
-- [Concepts Guide](CONCEPTS.md) — Plain-English definitions of all terms and patterns
-- [Examples](../core/examples/) — Real-world lesson, ADR, and KG entry examples
-- [Pattern Writing Guide](../core/docs/PATTERNS-GUIDE.md) — How to write high-quality entries
+- [Getting Started Guide](GETTING-STARTED.md)
 
-**Advanced**:
-- [Architecture Guide](../core/docs/ARCHITECTURE.md) — System design and how components work together
-- [Manual Workflows](../core/docs/WORKFLOWS.md) — Step-by-step processes for non-Claude platforms
-- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Integration for Cursor, Windsurf, Continue, VS Code, Aider
-- [Style Guide](STYLE-GUIDE.md) — Documentation authoring standards and best practices
-- [Templates](../core/templates/) — Starting scaffolds for lessons, ADRs, and KG entries
+  Installation and setup walkthrough
 
+- [Command Reference](COMMAND-GUIDE.md)
+
+  All commands with detailed examples
+
+- [Quick Reference](CHEAT-SHEET.md)
+
+  One-page cheat sheet for common tasks
+  </div>
+
+### **Learning**
+<div class="grid cards" markdown>
+
+- [Concepts Guide](CONCEPTS.md)
+
+  Plain-English definitions of all terms and patterns
+
+- [Examples](examples/)
+
+  Real-world lesson, ADR, and KG entry examples
+
+- [Pattern Writing Guide](reference/PATTERNS-GUIDE.md)
+
+  How to write high-quality entries
+  </div>
+
+### **Advanced**
+<div class="grid cards" markdown>
+
+- [Architecture Guide](reference/ARCHITECTURE.md)
+
+  System design and how components work together
+
+- [Manual Workflows](reference/WORKFLOWS.md)
+
+  Step-by-step processes for non-Claude platforms
+
+- [Platform Adaptation](reference/PLATFORM-ADAPTATION.md) 
+
+  Integration for Cursor, Windsurf, Continue, VS Code, Aider
+
+- [Style Guide](STYLE-GUIDE.md)
+
+  Documentation authoring standards and best practices
+
+- [Templates](templates/)
+
+  Starting scaffolds for lessons, ADRs, and KG entries
+</div>
 ---
 
-**Need help?** Check the [examples](../core/examples/) or adapt the templates to your workflow.
+**Need help?** Check the [examples](examples/) or adapt the templates to your workflow.
