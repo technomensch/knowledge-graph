@@ -6,12 +6,15 @@ repo_name: technomensch/knowledge-graph
 edit_uri: edit/main/docs/
 
 docs_dir: docs
-custom_dir: docs/overrides
 extra_css:
   - stylesheets/extra.css
 
+hooks:
+  - docs/hooks.py
+
 theme:
   name: material
+  custom_dir: docs/overrides
   features:
     - navigation.tabs
     - navigation.tabs.sticky
@@ -56,6 +59,13 @@ nav:
   - Contributing:
       - Style Guide: STYLE-GUIDE.md
       - Navigation Index: NAVIGATION-INDEX.md
+  - Advanced:
+      - Architecture: reference/ARCHITECTURE.md
+      - Manual Workflows: reference/WORKFLOWS.md
+      - Platform Adaptation: reference/PLATFORM-ADAPTATION.md
+      - Pattern Writing: reference/PATTERNS-GUIDE.md
+      - Meta-Issue Guide: reference/META-ISSUE-GUIDE.md
+      - Sanitization Checklist: reference/SANITIZATION-CHECKLIST.md
 
 plugins:
   - search:

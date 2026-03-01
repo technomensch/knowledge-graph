@@ -19,32 +19,32 @@
 - Learn command workflow → [Command Guide Learning Path](COMMAND-GUIDE.md#learning-path)
 
 **Write Better Entries**:
-- Understand quality standards → [Pattern Writing Guide](../core/docs/PATTERNS-GUIDE.md)
-- See template structure → [Templates](../core/templates/)
-- Review real examples → [Examples](../core/examples/)
+- Understand quality standards → [Pattern Writing Guide](reference/PATTERNS-GUIDE.md)
+- See template structure → [Templates](templates/)
+- Review real examples → [Examples](examples/)
 
 **Configure & Customize**:
 - Set up sanitization hooks → [Configuration](CONFIGURATION.md)
-- Adapt to my AI assistant → [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md)
+- Adapt to my AI assistant → [Platform Adaptation](reference/PLATFORM-ADAPTATION.md)
 - Add custom categories → [Add Category Command](COMMAND-GUIDE.md#kmgraphadd-category)
 
 **Understand the System**:
-- How does it work? → [Architecture Guide](../core/docs/ARCHITECTURE.md)
+- How does it work? → [Architecture Guide](reference/ARCHITECTURE.md)
 - What are the components? → [Concepts](CONCEPTS.md#core-components)
-- What's the design philosophy? → [Architecture: Design Principles](../core/docs/ARCHITECTURE.md#design-principles)
+- What's the design philosophy? → [Architecture: Design Principles](reference/ARCHITECTURE.md#design-principles)
 
 **Manual Workflows** (Non-Claude users):
-- Step-by-step processes → [Workflows](../core/docs/WORKFLOWS.md)
-- Shell aliases for speed → [Workflows: Aliases](../core/docs/WORKFLOWS.md#shell-aliases)
-- Editor integration → [Workflows: Editor Templates](../core/docs/WORKFLOWS.md#editor-templates)
+- Step-by-step processes → [Workflows](reference/WORKFLOWS.md)
+- Shell aliases for speed → [Workflows: Aliases](reference/WORKFLOWS.md#shell-aliases)
+- Editor integration → [Workflows: Editor Templates](reference/WORKFLOWS.md#editor-templates)
 
 **Track Complex Problems**:
-- Multi-attempt bugs → [Meta-Issue Guide](../core/docs/META-ISSUE-GUIDE.md)
+- Multi-attempt bugs → [Meta-Issue Guide](reference/META-ISSUE-GUIDE.md)
 - Link to GitHub issues → [Link Issue Command](COMMAND-GUIDE.md#kmgraphlink-issue)
 - Issue tracking workflows → [Start Issue Tracking Command](COMMAND-GUIDE.md#kmgraphstart-issue-tracking)
 
 **Share Safely**:
-- Remove sensitive data → [Sanitization Checklist](../core/docs/SANITIZATION-CHECKLIST.md)
+- Remove sensitive data → [Sanitization Checklist](reference/SANITIZATION-CHECKLIST.md)
 - Set up pre-commit hooks → [Config Sanitization Command](COMMAND-GUIDE.md#kmgraphconfig-sanitization)
 - Check before sharing → [Check Sensitive Command](COMMAND-GUIDE.md#kmgraphcheck-sensitive)
 
@@ -61,8 +61,8 @@
 
 **Then**:
 4. [Essential Commands](COMMAND-GUIDE.md#essential-commands) - Learn 4 core commands
-5. [Templates](../core/templates/) - See structure
-6. [Examples](../core/examples/) - Real-world usage
+5. [Templates](templates/) - See structure
+6. [Examples](examples/) - Real-world usage
 
 **Avoid for now**:
 - Advanced commands
@@ -79,14 +79,14 @@
 - [Concepts](CONCEPTS.md) - Term definitions
 
 **Weekly/monthly**:
-- [Pattern Writing](../core/docs/PATTERNS-GUIDE.md) - Quality tips
+- [Pattern Writing](reference/PATTERNS-GUIDE.md) - Quality tips
 - [Configuration](CONFIGURATION.md) - Team setup, sanitization
-- [Examples](../core/examples/) - Inspiration
+- [Examples](examples/) - Inspiration
 
 **When needed**:
-- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) - Switching AI assistants
-- [Meta-Issue Guide](../core/docs/META-ISSUE-GUIDE.md) - Complex bug tracking
-- [Sanitization](../core/docs/SANITIZATION-CHECKLIST.md) - Before sharing
+- [Platform Adaptation](reference/PLATFORM-ADAPTATION.md) - Switching AI assistants
+- [Meta-Issue Guide](reference/META-ISSUE-GUIDE.md) - Complex bug tracking
+- [Sanitization](reference/SANITIZATION-CHECKLIST.md) - Before sharing
 
 ---
 
@@ -94,14 +94,14 @@
 
 **Essential reading**:
 1. [Getting Started: Manual Setup](GETTING-STARTED.md#manual-setup)
-2. [Workflows](../core/docs/WORKFLOWS.md) - Complete manual processes
-3. [Templates](../core/templates/) - What to copy
-4. [Examples](../core/examples/) - Filled examples
+2. [Workflows](reference/WORKFLOWS.md) - Complete manual processes
+3. [Templates](templates/) - What to copy
+4. [Examples](examples/) - Filled examples
 
 **Platform-specific**:
-- Cursor → [Cursor Guide](../core/docs/PLATFORM-ADAPTATION.md#cursor)
-- Continue → [Continue Guide](../core/docs/PLATFORM-ADAPTATION.md#continue)
-- Aider → [Aider Guide](../core/docs/PLATFORM-ADAPTATION.md#aider)
+- Cursor → [Cursor Guide](reference/PLATFORM-ADAPTATION.md#cursor)
+- Continue → [Continue Guide](reference/PLATFORM-ADAPTATION.md#continue)
+- Aider → [Aider Guide](reference/PLATFORM-ADAPTATION.md#aider)
 
 **Skip**:
 - Command Guide (Claude Code specific)
@@ -114,27 +114,27 @@
 **Setup checklist**:
 1. [Getting Started](GETTING-STARTED.md) - Choose team path
 2. [Configuration: Team Workflows](CONFIGURATION.md#team-workflows)
-3. [Sanitization Checklist](../core/docs/SANITIZATION-CHECKLIST.md) - Before sharing
-4. [Pattern Writing Guide](../core/docs/PATTERNS-GUIDE.md) - Team standards
+3. [Sanitization Checklist](reference/SANITIZATION-CHECKLIST.md) - Before sharing
+4. [Pattern Writing Guide](reference/PATTERNS-GUIDE.md) - Team standards
 
 **Share with team**:
 - [Cheat Sheet](CHEAT-SHEET.md) - Quick reference
 - [Concepts](CONCEPTS.md) - Onboarding guide
-- [Examples](../core/examples/) - What good looks like
+- [Examples](examples/) - What good looks like
 
 ---
 
 ### Developers (Extending the System)
 
 **Understanding the system**:
-1. [Architecture](../core/docs/ARCHITECTURE.md) - How it works
+1. [Architecture](reference/ARCHITECTURE.md) - How it works
 2. [README](../README.md) - Overview
-3. [Core README](../core/README.md) - Core system details
+3. [Core README](reference/README.md) - Core system details
 
 **Customization**:
-- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) - Add new platforms
-- [Templates](../core/templates/) - Modify scaffolds
-- [Workflows](../core/docs/WORKFLOWS.md) - Understand manual processes
+- [Platform Adaptation](reference/PLATFORM-ADAPTATION.md) - Add new platforms
+- [Templates](templates/) - Modify scaffolds
+- [Workflows](reference/WORKFLOWS.md) - Understand manual processes
 
 ---
 
@@ -328,19 +328,19 @@ What term?
 - [Essential Commands](COMMAND-GUIDE.md#essential-commands)
 
 ### Writing Quality
-- [Pattern Writing](../core/docs/PATTERNS-GUIDE.md)
-- [Templates](../core/templates/)
-- [Examples](../core/examples/)
+- [Pattern Writing](reference/PATTERNS-GUIDE.md)
+- [Templates](templates/)
+- [Examples](examples/)
 
 ### Configuration
 - [Post-Install Setup](CONFIGURATION.md)
-- [Sanitization](../core/docs/SANITIZATION-CHECKLIST.md)
-- [Platform Guides](../core/docs/PLATFORM-ADAPTATION.md)
+- [Sanitization](reference/SANITIZATION-CHECKLIST.md)
+- [Platform Guides](reference/PLATFORM-ADAPTATION.md)
 
 ### Advanced
-- [Architecture](../core/docs/ARCHITECTURE.md)
-- [Meta-Issues](../core/docs/META-ISSUE-GUIDE.md)
-- [Manual Workflows](../core/docs/WORKFLOWS.md)
+- [Architecture](reference/ARCHITECTURE.md)
+- [Meta-Issues](reference/META-ISSUE-GUIDE.md)
+- [Manual Workflows](reference/WORKFLOWS.md)
 
 ---
 
@@ -359,7 +359,7 @@ What term?
 **"Too many files, which do I need?"**
 - New user? Just read files marked ⭐ in [File Structure](#complete-file-structure)
 - Regular user? [Cheat Sheet](CHEAT-SHEET.md) + [Command Guide](COMMAND-GUIDE.md)
-- Manual workflows? [Workflows](../core/docs/WORKFLOWS.md) + [Templates](../core/templates/)
+- Manual workflows? [Workflows](reference/WORKFLOWS.md) + [Templates](templates/)
 
 ---
 

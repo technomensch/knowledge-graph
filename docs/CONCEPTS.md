@@ -542,15 +542,15 @@ MEMORY.md works best under 200 lines. When it grows beyond that threshold:
 
 - **[Getting Started](GETTING-STARTED.md)**
 
-    New to the system? Follow the installation and first lesson walkthrough.
+  New to the system? Follow the installation and first lesson walkthrough.
 
 - **[Command Reference](COMMAND-GUIDE.md)**
 
-    Ready to explore all commands? Detailed documentation with examples and learning path.
+  Ready to explore all commands? Detailed documentation with examples and learning path.
 
-- **[Architecture Guide](../core/docs/ARCHITECTURE.md)**
+- **[Architecture Guide](reference/ARCHITECTURE.md)**
 
-    Want to understand how it works? Learn system design, patterns, and implementation details.
+  Want to understand how it works? Learn system design, patterns, and implementation details.
 
 </div>
 
@@ -558,23 +558,61 @@ MEMORY.md works best under 200 lines. When it grows beyond that threshold:
 
 ## Related Documentation
 
-**Getting started**:
-- [Getting Started Guide](GETTING-STARTED.md) — Installation, setup, first lesson walkthrough
-- [Installation](INSTALL.md) — Universal installer for all platforms
-- [Quick Reference](CHEAT-SHEET.md) — One-page cheat sheet for commands
+### **Getting started**
 
-**Learning**:
-- [Command Reference](COMMAND-GUIDE.md) — All commands with detailed documentation and examples
-- [Configuration Guide](CONFIGURATION.md) — Post-install setup and customization
-- [Examples](../core/examples/) — Real-world lesson, ADR, and KG entry examples
+<div class="grid cards" markdown>
 
-**Advanced**:
-- [Architecture Guide](../core/docs/ARCHITECTURE.md) — System design, data flow, and patterns
-- [Pattern Writing Guide](../core/docs/PATTERNS-GUIDE.md) — How to write high-quality knowledge entries
-- [Manual Workflows](../core/docs/WORKFLOWS.md) — Step-by-step guides for non-Claude platforms
-- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Integration for different IDEs and LLMs
-- [Style Guide](STYLE-GUIDE.md) — Documentation authoring standards
+- [Getting Started Guide](GETTING-STARTED.md)
 
+ Installation, setup, first lesson walkthrough
+
+- [Installation](INSTALL.md)
+
+  Universal installer for all platforms
+
+- [Quick Reference](CHEAT-SHEET.md)
+
+  One-page cheat sheet for commands
+
+</div>
+
+### **Learning**
+<div class="grid cards" markdown>
+- [Command Reference](COMMAND-GUIDE.md)
+
+  All commands with detailed documentation and examples
+
+- [Configuration Guide](CONFIGURATION.md)
+
+  Post-install setup and customization
+
+- [Examples](examples/)
+
+  Real-world lesson, ADR, and KG entry examples
+</div>
+
+### **Advanced**
+<div class="grid cards" markdown>
+- [Architecture Guide](reference/ARCHITECTURE.md)
+
+  System design, data flow, and patterns
+
+- [Pattern Writing Guide](reference/PATTERNS-GUIDE.md)
+
+  How to write high-quality knowledge entries
+
+- [Manual Workflows](reference/WORKFLOWS.md)
+
+  Step-by-step guides for non-Claude platforms
+
+- [Platform Adaptation](reference/PLATFORM-ADAPTATION.md)
+
+  Integration for different IDEs and LLMs
+
+- [Style Guide](STYLE-GUIDE.md)
+
+  Documentation authoring standards
+</div>
 ---
 
 **Version**: 0.0.10-alpha
