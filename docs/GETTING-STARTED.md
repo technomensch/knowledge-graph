@@ -129,7 +129,7 @@ Each step serves a specific purpose:
 
     Start with the core commands: init, capture-lesson, status, and recall. These cover 80% of daily use.
 
-- **[Real-World Examples](../core/examples/)**
+- **[Real-World Examples](examples/)**
 
     See completed examples of lessons learned, ADRs, and KG entries from real projects.
 
@@ -216,21 +216,55 @@ Use `--delegate knowledge-extractor` or `--delegate session-documenter` in comma
 
 ## Related Documentation
 
-**Installation & Setup**:
-- [Universal Installer](INSTALL.md) — Automated setup for all platforms (paste into any AI assistant)
-- [Configuration Guide](CONFIGURATION.md) — Post-install customization: sanitization, team workflows, MCP server
-- [Platform Adaptation](../core/docs/PLATFORM-ADAPTATION.md) — Integration details for Cursor, Windsurf, Continue, VS Code, Aider
+### **Installation & Setup**
+<div class="grid cards" markdown>
+- [Universal Installer](INSTALL.md)
 
-**Learning & Reference**:
-- [Command Reference Guide](COMMAND-GUIDE.md) — All commands with examples, learning path, and troubleshooting
-- [Quick Reference (Cheat Sheet)](CHEAT-SHEET.md) — One-page guide for common tasks and commands
-- [Concepts Guide](CONCEPTS.md) — Plain-English definitions of every term used in documentation
-- [Examples](../core/examples/) — Real-world completed examples: lessons, ADRs, KG entries
+  Automated setup for all platforms (paste into any AI assistant)
 
-**Advanced**:
-- [Manual Workflows](../core/docs/WORKFLOWS.md) — Step-by-step guides for all 9 workflow types
-- [Pattern Writing Guide](../core/docs/PATTERNS-GUIDE.md) — How to write high-quality knowledge entries
-- [Style Guide](STYLE-GUIDE.md) — Documentation authoring standards and best practices
+- [Configuration Guide](CONFIGURATION.md)
+
+  Post-install customization: sanitization, team workflows, MCP server
+
+- [Platform Adaptation](reference/PLATFORM-ADAPTATION.md)
+
+  Integration details for Cursor, Windsurf, Continue, VS Code, Aider
+</div>
+
+### **Learning & Reference**
+<div class="grid cards" markdown>
+- [Command Reference Guide](COMMAND-GUIDE.md)
+
+  All commands with examples, learning path, and troubleshooting
+
+- [Quick Reference (Cheat Sheet)](CHEAT-SHEET.md)
+
+  One-page guide for common tasks and commands
+
+- [Concepts Guide](CONCEPTS.md)
+
+  Plain-English definitions of every term used in documentation
+
+- [Examples](examples/)
+
+  Real-world completed examples: lessons, ADRs, KG entries
+</div>
+
+### **Advanced**
+<div class="grid cards" markdown>
+- [Manual Workflows](reference/WORKFLOWS.md)
+
+  Step-by-step guides for all 9 workflow types
+
+- [Pattern Writing Guide](reference/PATTERNS-GUIDE.md)
+
+  How to write high-quality knowledge entries
+
+- [Style Guide](STYLE-GUIDE.md)
+
+  Documentation authoring standards and best practices
+
+</div>
 
 ---
 

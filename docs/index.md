@@ -14,17 +14,21 @@
 
 - :material-chat-question: **The Problem**
 
-    Development knowledge lives in chat threads that disappear. Every LLM switch, session restart, or team handoff loses context: architecture decisions, debugging solutions, recurring patterns, and process learnings are lost permanently.
+  Development knowledge lives in chat threads that disappear. Every LLM switch, session restart, or team handoff loses context: architecture decisions, debugging solutions, recurring patterns, and process learnings are lost permanently.
 
 - :material-lightbulb-on: **The Solution**
 
-    This plugin helps users capture the important stuff, like lessons learned, architecture decisions, and recurring patterns, inside the development workflow without having to stop chatting.
+  This plugin helps users capture the important stuff, like lessons learned, architecture decisions, and recurring patterns, inside the development workflow without having to stop chatting.
 
 - :material-database-check: **The Outcome**
 
-    Users can easily look up that information not only in their current chat, but also in any other chat session, even if they switch to a totally different LLM, IDE, or coding assistant!
+  Users can easily look up that information not only in their current chat, but also in any other chat session, even if they switch to a totally different LLM, IDE, or coding assistant!
 
 </div>
+
+
+
+
 
 ---
 
@@ -78,19 +82,19 @@ graph LR
 
 - **[Getting Started](GETTING-STARTED.md)**
 
-    Install, initialize, and configure in under 5 minutes. Step-by-step setup for installing with Claude Code, Cursor, or any local IDE CLI coding assistant.
+  Install, initialize, and configure in under 5 minutes. Step-by-step setup for installing with Claude Code, Cursor, or any local IDE CLI coding assistant.
 
 - **[Concepts](CONCEPTS.md)**
 
-    Understand the knowledge graph structure. Learn about the Four Pillars this project was built on, key terminology, and how everything connects.
+  Understand the knowledge graph structure. Learn about the Four Pillars this project was built on, key terminology, and how everything connects.
 
 - **[Command Guide](COMMAND-GUIDE.md)**
 
-    Full reference for all commands, organized by learning path. Essential, intermediate, and advanced commands.
+  Full reference for all commands, organized by learning path. Essential, intermediate, and advanced commands.
 
 - **[Cheat Sheet](CHEAT-SHEET.md)**
 
-    One-page quick reference with the most common commands and workflows at a glance.
+  One-page quick reference with the most common commands and workflows at a glance.
 
 </div>
 

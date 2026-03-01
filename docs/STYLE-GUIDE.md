@@ -403,7 +403,7 @@ Use MkDocs admonition syntax for richer styling on the documentation site.
 
 ### 7.1 Internal links
 
-- Use relative paths: `[Command Guide](COMMAND-GUIDE.md)`, `[Pattern Writing Guide](../core/docs/PATTERNS-GUIDE.md)`
+- Use relative paths: `[Command Guide](COMMAND-GUIDE.md)`, `[Pattern Writing Guide](reference/PATTERNS-GUIDE.md)`
 - Never use absolute file system paths (`/Users/…`)
 - Every document must have a "Related Documentation" section linking to at least 2 other documents
 - Cross-references should be bidirectional: if doc A links to doc B, doc B should link back to doc A
@@ -533,12 +533,12 @@ Run this checklist before marking documentation complete or committing a new or 
 - [Getting Started](GETTING-STARTED.md) — Example of the correct guide page pattern in practice
 
 **Templates**:
-- [Lesson Template](../core/templates/lessons-learned/lesson-template.md) — Starting scaffold for Lesson Learned documents
-- [ADR Template](../core/templates/decisions/ADR-template.md) — Starting scaffold for Architecture Decision Records
-- [Documentation Template](../core/templates/documentation/doc-template.md) — Starting scaffold for general documentation
+- [Lesson Template](templates/lessons-learned/lesson-template.md) — Starting scaffold for Lesson Learned documents
+- [ADR Template](templates/decisions/ADR-template.md) — Starting scaffold for Architecture Decision Records
+- [Documentation Template](templates/documentation/doc-template.md) — Starting scaffold for general documentation
 
 **Contributor workflows**:
-- [Manual Workflows](../core/docs/WORKFLOWS.md) — Workflow for contributing without Claude Code
+- [Manual Workflows](reference/WORKFLOWS.md) — Workflow for contributing without Claude Code
 
 ---
 
