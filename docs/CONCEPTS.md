@@ -59,7 +59,9 @@ graph TD
     accDescr: Relationship diagram showing how Lessons Learned provide evidence for Architecture Decisions and extract to Knowledge Entries. Decisions are referenced by Entries, which link back to Lessons. Session Summaries document what was accomplished.
 ```
 
+
 **How they connect:**
+
 - Lessons provide evidence that motivates Decisions
 - Lessons are extracted to create Knowledge entries
 - Decisions are referenced in Knowledge entries
@@ -76,8 +78,10 @@ graph TD
 
 **When to create**: After solving a non-trivial problem, discovering a useful technique, or fixing a tricky bug.
 
-**Example**: "Lesson: Fixing PostgreSQL Connection Timeouts" — documents the problem, root cause, solution steps, and prevention strategies.
-
+**Example**:
+```
+"Lesson: Fixing PostgreSQL Connection Timeouts" — documents the problem, root cause, solution steps, and prevention strategies.
+```
 **Plain English**: A detective's case file for every problem solved.
 
 ---
@@ -90,7 +94,11 @@ graph TD
 
 **When to create**: When making a significant choice — selecting a database, choosing a framework, defining an API structure — where future team members might ask "why did the team do it this way?"
 
-**Example**: "ADR-003: Choosing PostgreSQL Over MongoDB" — records the context, options considered, decision made, and expected consequences.
+**Example**:
+
+```
+"ADR-003: Choosing PostgreSQL Over MongoDB" — records the context, options considered, decision made, and expected consequences.
+```
 
 **Plain English**: A written record of "why this choice was made" so the reasoning is never lost.
 
@@ -121,7 +129,11 @@ graph TD
 
 **When to create**: After a significant work session — a major debugging effort, an architecture discussion, a sprint planning session.
 
-**Example**: "2024-01-15 Database Migration Session" — records what was built, what was decided, what was learned, and what comes next.
+**Example**:
+
+```
+"2024-01-15 Database Migration Session" — records what was built, what was decided, what was learned, and what comes next.
+```
 
 **Plain English**: Meeting minutes for work sessions.
 
