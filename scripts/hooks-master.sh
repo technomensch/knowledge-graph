@@ -23,24 +23,63 @@ NC='\033[0m' # No Color
 # ─────────────────────────────────────────────────────────────
 
 MCP_DIST="$PLUGIN_ROOT/mcp-server/dist/index.js"
+MCP_NODE_MODULES="$PLUGIN_ROOT/mcp-server/node_modules/@modelcontextprotocol"
+
+# Check if dependencies or build are missing
+NEEDS_INSTALL=false
+NEEDS_BUILD=false
+
+if [ ! -d "$MCP_NODE_MODULES" ]; then
+    NEEDS_INSTALL=true
+fi
+
 if [ ! -f "$MCP_DIST" ]; then
+    NEEDS_BUILD=true
+fi
+
+# Only proceed if something is needed
+if [ "$NEEDS_INSTALL" = true ] || [ "$NEEDS_BUILD" = true ]; then
     if command -v node &> /dev/null && command -v npm &> /dev/null; then
-        echo "Building MCP server (first run)..."
-        cd "$PLUGIN_ROOT/mcp-server" && npm install --silent 2>/dev/null && npm run build --silent 2>/dev/null
-        if [ -f "$MCP_DIST" ]; then
-            echo "MCP server built successfully."
-        else
-            echo ""
-            echo "MCP server build failed. Search and configuration tools will be unavailable."
-            echo ""
-            echo "To fix this manually, run:"
-            echo "  cd $PLUGIN_ROOT/mcp-server"
-            echo "  npm install"
-            echo "  npm run build"
-            echo ""
-            echo "Then restart Claude Code."
-            echo ""
+        cd "$PLUGIN_ROOT/mcp-server"
+
+        # Install dependencies if missing (always needed before build or runtime)
+        if [ "$NEEDS_INSTALL" = true ]; then
+            echo "Installing MCP server dependencies..."
+            npm install --omit=dev --silent 2>/dev/null
+            if [ ! -d "$MCP_NODE_MODULES" ]; then
+                echo ""
+                echo "Failed to install MCP server dependencies. Search and configuration tools will be unavailable."
+                echo ""
+                echo "To fix this manually, run:"
+                echo "  cd $PLUGIN_ROOT/mcp-server"
+                echo "  npm install"
+                echo ""
+                echo "Then restart Claude Code."
+                echo ""
+            fi
         fi
+
+        # Build if source is missing (only after dependencies are installed)
+        if [ "$NEEDS_BUILD" = true ] && [ -d "$MCP_NODE_MODULES" ]; then
+            echo "Building MCP server (first run)..."
+            npm run build --silent 2>/dev/null
+            if [ -f "$MCP_DIST" ]; then
+                echo "MCP server built successfully."
+            else
+                echo ""
+                echo "MCP server build failed. Search and configuration tools will be unavailable."
+                echo ""
+                echo "To fix this manually, run:"
+                echo "  cd $PLUGIN_ROOT/mcp-server"
+                echo "  npm run build"
+                echo ""
+                echo "Then restart Claude Code."
+                echo ""
+            fi
+        elif [ "$NEEDS_BUILD" = false ] && [ "$NEEDS_INSTALL" = true ] && [ -d "$MCP_NODE_MODULES" ]; then
+            echo "MCP server dependencies installed successfully."
+        fi
+
         cd - > /dev/null 2>&1
     else
         echo ""
