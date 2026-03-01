@@ -59,6 +59,7 @@ nav:
   - Contributing:
       - Style Guide: STYLE-GUIDE.md
       - Navigation Index: NAVIGATION-INDEX.md
+  - Glossary: GLOSSARY.md
   - Advanced:
       - Architecture: reference/ARCHITECTURE.md
       - Manual Workflows: reference/WORKFLOWS.md
