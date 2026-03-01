@@ -2,8 +2,8 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 12
-**Last Updated:** 2026-02-27
+**Total ADRs:** 14
+**Last Updated:** 2026-03-01
 
 ---
 
@@ -21,6 +21,7 @@ Formal documentation of significant architecture decisions.
 - [ADR-010: Plugin Namespace Rename: knowledge → kg-sis](ADR-010-namespace-rename-knowledge-to-kg-sis.md) — **Status:** Proposed
 - [ADR-011: Defer Update Notifications and Version Sync to v0.0.9](ADR-011-defer-update-notifications.md) — **Status:** Accepted
 - [ADR-013: Documentation Update Protocol for Multi-Branch Releases](ADR-013-documentation-update-protocol.md) — **Status:** Accepted
+- [ADR-014: Maintain Dual Plan File Locations](ADR-014-maintain-dual-plan-file-locations.md) — **Status:** Accepted
 
 ---
 
@@ -40,6 +41,7 @@ Formal documentation of significant architecture decisions.
 | **ADR-010** | Feb 21 | Plugin Namespace Rename: knowledge → kg-sis | v0.0.8.3 | Proposed |
 | **ADR-011** | Feb 21 | Defer Update Notifications and Version Sync to v0.0.9 | v0.0.9 | Accepted |
 | **ADR-013** | Feb 27 | Documentation Update Protocol for Multi-Branch Releases | v0.0.10 | Accepted |
+| **ADR-014** | Mar 01 | Maintain Dual Plan File Locations | v0.0.10 | Accepted |
 
 ---
 
@@ -60,6 +62,7 @@ Formal documentation of significant architecture decisions.
 ### Standards & Documentation
 - [ADR-008](ADR-008-third-person-language-standard.md) — Third-person only in user-facing docs
 - [ADR-013](ADR-013-documentation-update-protocol.md) — Two-layer documentation update protocol for releases
+- [ADR-014](ADR-014-maintain-dual-plan-file-locations.md) — Dual plan file locations (~/.claude/plans/ and docs/plans/)
 
 ### Deferral & Roadmap
 - [ADR-005](ADR-005-defer-memory-rules-engine.md) — Defer rules engine to v0.0.5 (restore-only in v0.0.4)
