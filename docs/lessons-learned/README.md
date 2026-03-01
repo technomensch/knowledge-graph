@@ -2,8 +2,8 @@
 
 Comprehensive catalog of all lessons-learned documents.
 
-**Total Lessons:** 6
-**Last Updated:** 2026-02-28
+**Total Lessons:** 7
+**Last Updated:** 2026-03-01
 
 ---
 
@@ -18,12 +18,13 @@ Comprehensive catalog of all lessons-learned documents.
 
 ---
 
-### Process Lessons (2 total)
+### Process Lessons (3 total)
 
+- [2026-03-01 - Plan File Dual-Location Protocol](process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md) - Dual plan files serve different purposes: ~/.claude/plans/ (internal/ephemeral) vs docs/plans/ (project audit trail). Both required before implementation. Protocol violation occurs when docs/plans/ skipped. Prevention: pre-implementation checklist.
 - [2026-02-27 - Documentation Update Triggers in Multi-Branch Feature Development](process/documentation-update-triggers-multibranchfeatures.md) - Multi-branch releases require two-layer documentation: per-feature updates (Layer 1) and comprehensive release sync (Layer 2). Without explicit triggers, documentation updates defer indefinitely. Solution: separate final branch with explicit plan file.
 - [2026-02-16 - Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md) - When testing locally through Claude Code marketplace, changes must be synced from development directory to marketplace cache location
 
-**Tags:** #process #documentation #release-management #testing #marketplace #plugin-development #workflow #multi-branch-workflow
+**Tags:** #process #documentation #release-management #testing #marketplace #plugin-development #workflow #multi-branch-workflow #planning #protocol #claude-code
 
 ---
 
@@ -47,6 +48,7 @@ Comprehensive catalog of all lessons-learned documents.
 ## Chronological Index
 
 **2026**
+- 2026-03-01: [Plan File Dual-Location Protocol](process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md)
 - 2026-02-28: [MkDocs Grid Cards Require 4-Space Indentation](debugging/Lessons_Learned_MkDocs_Grid_Cards_Indentation.md)
 - 2026-02-27: [Documentation Update Triggers in Multi-Branch Feature Development](process/documentation-update-triggers-multibranchfeatures.md)
 - 2026-02-21: [Plugin Example File Management — Why You Can't Gate the Download](architecture/Lessons_Learned_Plugin_Example_File_Management.md)
@@ -75,7 +77,8 @@ Comprehensive catalog of all lessons-learned documents.
 **#update-notifications** (1 lesson)
 - [Update Notifications for Non-Plugin Users](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md)
 
-**#process** (2 lessons)
+**#process** (3 lessons)
+- [Plan File Dual-Location Protocol](process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md)
 - [Documentation Update Triggers in Multi-Branch Feature Development](process/documentation-update-triggers-multibranchfeatures.md)
 - [Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md)
 
@@ -83,9 +86,6 @@ Comprehensive catalog of all lessons-learned documents.
 
 **#debugging** (2 lessons)
 - [MkDocs Grid Cards Require 4-Space Indentation](debugging/Lessons_Learned_MkDocs_Grid_Cards_Indentation.md)
-- [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md)
-
-**#claude-code** (1 lesson)
 - [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md)
 
 **#mcp** (2 lessons)
@@ -136,6 +136,16 @@ Comprehensive catalog of all lessons-learned documents.
 
 **#markdown** (1 lesson)
 - [MkDocs Grid Cards Require 4-Space Indentation](debugging/Lessons_Learned_MkDocs_Grid_Cards_Indentation.md)
+
+**#planning** (1 lesson)
+- [Plan File Dual-Location Protocol](process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md)
+
+**#protocol** (1 lesson)
+- [Plan File Dual-Location Protocol](process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md)
+
+**#claude-code** (2 lessons)
+- [Plan File Dual-Location Protocol](process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md)
+- [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md)
 
 ---
 
