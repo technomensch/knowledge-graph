@@ -321,15 +321,6 @@ Any MCP-compatible platform can access.
 - PR review of documentation
 - Metadata linking (commit → lesson)
 
-### Why Four Pillars?
-
-Different knowledge types need different structures:
-- Quick reference ≠ detailed narrative
-- Formal decision ≠ informal learning
-- Snapshot ≠ timeless knowledge
-
-Forcing everything into one format loses value.
-
 ### Why Bidirectional Sync?
 
 - KG stays current (updated from lessons)
