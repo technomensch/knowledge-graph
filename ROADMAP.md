@@ -1,4 +1,4 @@
-# Knowledge Plugin — Roadmap
+# Knowledge Management Graph — Roadmap
 
 ## v0.0.10.4-alpha (Released: 2026-03-01)
 
@@ -93,9 +93,10 @@
 - Build verification: mkdocs build successful
 - Mermaid diagram rendering verified in both modes
 
-### Next Steps
-- 🔄 Merge to main and verify on GitHub Pages
-- 📦 Plan v0.0.9 (enhanced features)
+### Superseded by
+- ✅ v0.0.9-alpha (2026-02-27): Infrastructure alignment, namespace migration
+- ✅ v0.0.10-alpha (2026-02-27): Skills, subagents, backfill, handoff
+- ✅ v0.0.10.4-alpha (2026-03-01): MCP node_modules fix
 
 ---
 
