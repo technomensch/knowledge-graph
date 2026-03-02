@@ -47,9 +47,16 @@ Heavy-lift task handlers that keep main context clean:
 | Bug fix | `v{ver}-fix-{description}` | `v0.0.8.7.3-alpha-fix-installer-page` |
 | Docs-only update | `v{ver}-docs-update-{description}` | `v0.0.9-docs-update-command-guide` |
 
+## Mandatory Plan Steps (include in every implementation plan)
+
+1. Create branch from correct parent
+2. Create `docs/plans/{filename}.md` (copy from `~/.claude/plans/`)
+3. [implementation steps]
+4. Commit, push, PR, merge
+
 ## Key Workflows
 
-- **Plans:** Create in `docs/plans/` BEFORE any code changes
+- **Plans:** Every plan must include `Create docs/plans/{filename}.md` as an explicit step (step 2 above). Create this file before any code changes.
 - **Branches:** Push to origin, await user review (never auto-merge)
 - **Versions:** Sync package.json + plugin.json before pushing (mcp-server independent)
 - **Docs updates:** Update COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED when behavior changes

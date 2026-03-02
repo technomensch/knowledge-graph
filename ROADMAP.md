@@ -1,5 +1,51 @@
 # Knowledge Plugin — Roadmap
 
+## v0.0.10.4-alpha (Released: 2026-03-01)
+
+**Status**: ✅ Complete - MCP Server Dependency Fix
+**Branch**: `v0.0.10.4-fix-mcp-missing-node-modules`
+
+### Completed
+- ✅ Fixed MCP startup failure when `node_modules/` absent after marketplace plugin install
+- ✅ Split `hooks-master.sh` build guard into separate `NEEDS_INSTALL` and `NEEDS_BUILD` checks
+- ✅ `dist/` present + `node_modules/` missing → runs `npm install --omit=dev` only (no rebuild)
+- ✅ Both absent → full install + build (existing behavior preserved)
+- ✅ Both present → no-op (no performance regression)
+
+---
+
+## v0.0.10-alpha (Released: 2026-02-27)
+
+**Status**: ✅ Complete - Skills, Subagents, Backfill & Token Optimization
+**Branches**: `v0.0.10.0` through `v0.0.10.3`
+
+### Completed
+- ✅ **Skills System (5 providers)**: `lesson-capture`, `kg-recall`, `session-wrap`, `adr-guide`, `gov-execute-plan`
+- ✅ **Subagents (2)**: `knowledge-extractor` (read-only, approval-gated), `session-documenter` (conventional commits)
+- ✅ **KG Backfill in Init**: Optional Step 1.10 — scan existing context before first use
+- ✅ **Handoff Command**: `/kmgraph:handoff` generates 5-document transition package
+- ✅ **Delegation Patterns**: `extract-chat`, `session-summary`, `update-graph` updated with subagent guidance
+- ✅ **Documentation**: CLAUDE.md updated; GETTING-STARTED, COMMAND-GUIDE, CHEAT-SHEET expanded
+- ✅ **Navigation**: CHANGELOG moved to top nav; LinkedIn icon added to header
+
+---
+
+## v0.0.9-alpha (Released: 2026-02-27)
+
+**Status**: ✅ Complete - Infrastructure Alignment & Namespace Migration
+**Branches**: `v0.0.9-alpha-namespace-replacement`, `v0.0.9.1` through `v0.0.9.4`
+
+### Completed
+- ✅ **Namespace Migration**: `/kg-sis:` → `/kmgraph:` across all code, manifest, and docs
+- ✅ **CLAUDE.md**: Created project-level CLAUDE.md with architecture, version rules, AI constraints
+- ✅ **Hook Consolidation**: 3 scripts replaced with `hooks-master.sh` (3 isolated sections)
+- ✅ **Security Audit (ADR-012)**: Word-splitting protections; no eval/network in any hook
+- ✅ **MCP Lazy Loading**: `mcpToolSearch: true` re-enabled; reduces context overhead ~46.9%
+- ✅ **INSTALL.md**: Step 0 permissions gateway + Step 0.5 migration check for alpha upgraders
+- ✅ **Documentation**: Non-Claude platform instructions added to GETTING-STARTED and COMMAND-GUIDE
+
+---
+
 ## v0.0.8.6-alpha (Released: 2026-02-22)
 
 **Status**: ✅ Complete - Documentation UX Customization
@@ -752,6 +798,10 @@ Ideas for community-driven enhancements:
 | v0.0.8.3-alpha | Plugin namespace refactor (knowledge → kg-sis) | 2026-02-21 | ✅ Released |
 | v0.0.8.4-alpha | Extract-chat date/project filtering | 2026-02-21 | ✅ Released |
 | v0.0.8.6-alpha | MkDocs Material theme customization + documentation updates | 2026-02-22 | ✅ Released |
+| v0.0.8.7-alpha | Manual documentation updates + npm security fixes | 2026-02-22 | ✅ Released |
+| v0.0.9-alpha | Infrastructure alignment, kmgraph namespace, hook consolidation | 2026-02-27 | ✅ Released |
+| v0.0.10-alpha | Skills (5), subagents (2), KG backfill, handoff command | 2026-02-27 | ✅ Released |
+| v0.0.10.4-alpha | MCP node_modules auto-install fix | 2026-03-01 | ✅ Released |
 | v1.0.0 | Stable release with alpha feedback | Q2 2026 | Planning |
 | v1.1.0 | Performance + UX improvements | Q3 2026 | Roadmap |
 | v1.2.0 | Cross-platform adapters | Q4 2026 | Roadmap |
@@ -773,5 +823,5 @@ Ideas for community-driven enhancements:
 
 ---
 
-*Last updated: 2026-02-22*
-*Plugin Version: 0.0.8.6-alpha (MkDocs Customization Release)*
+*Last updated: 2026-03-02*
+*Plugin Version: 0.0.10.4-alpha (MCP Fix Release)*
