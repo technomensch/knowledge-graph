@@ -7,7 +7,12 @@ edit_uri: edit/main/docs/
 
 docs_dir: docs
 exclude_docs: |
-  plans/
+  plans/**
+  chat-history/**
+  sessions/**
+  reference/**
+  examples/**
+  templates/**
 extra_css:
   - stylesheets/extra.css
 
@@ -76,6 +81,13 @@ plugins:
       separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
   - git-revision-date-localized:
       enable_creation_date: true
+      exclude:
+        - plans/**
+        - chat-history/**
+        - sessions/**
+        - reference/**
+        - examples/**
+        - templates/**
   - glightbox
   - minify
   - roamlinks
