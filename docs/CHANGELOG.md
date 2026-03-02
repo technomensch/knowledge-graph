@@ -5,48 +5,70 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
 ## [Unreleased]
+
+## [0.0.10.4-alpha] - 2026-03-01
+
+### Fixed
+- **MCP Server Auto-Install on Plugin Cache Miss**
+    - `hooks-master.sh` Section 1 previously skipped `npm install` when `dist/index.js`
+      existed, even if `node_modules/` was absent (common after marketplace plugin install)
+    - Split check into `NEEDS_INSTALL` (`node_modules/@modelcontextprotocol` missing) and
+      `NEEDS_BUILD` (`dist/index.js` missing); each triggers independently
+    - Plugin installs with pre-built `dist/` now auto-install deps on first session start
+    - When both exist: Section 1 is a no-op (no performance regression)
+
+**Branch**: `v0.0.10.4-fix-mcp-missing-node-modules`
+
+---
 
 ## [0.0.10-alpha] - 2026-02-27
 
 ### Added
 - **Skills System (v0.0.10.1)**
-  - 5 auto-triggered context providers: `lesson-capture` (bug solved), `kg-recall` (past decisions), `session-wrap` (context limits), `adr-guide` (architecture decisions), `gov-execute-plan` (plan execution)
-  - Skill auto-surfaces suggestions when trigger conditions detected in conversation
-  - Reduces context overhead by ~46.9% via lazy-loading
+    - 5 auto-triggered context providers: `lesson-capture` (bug solved), `kg-recall` (past decisions), `session-wrap` (context limits), `adr-guide` (architecture decisions), `gov-execute-plan` (plan execution)
+    - Skill auto-surfaces suggestions when trigger conditions detected in conversation
+    - Reduces context overhead by ~46.9% via lazy-loading
 
 - **Subagents for Heavy-Lift Tasks (v0.0.10.1)**
-  - `knowledge-extractor` — Read-only parsing of large files; presents findings for user approval before writing
-  - `session-documenter` — Git archaeology for session summaries with conventional commit format
-  - Both operate in approval-gated mode; never auto-writes without user confirmation
+
+    - `knowledge-extractor` — Read-only parsing of large files; presents findings for user approval before writing
+    - `session-documenter` — Git archaeology for session summaries with conventional commit format
+    - Both operate in approval-gated mode; never auto-writes without user confirmation
 
 - **Optional KG Backfill During Init (v0.0.10.2)**
-  - New Step 1.10 in `/kmgraph:init`: "Would you like to backfill the knowledge graph from existing project context? [y/N]"
-  - If yes: invokes `knowledge-extractor` to scan README, CHANGELOG, lessons-learned/, decisions/, and chat-history/
-  - Extracts candidates and presents for user review before creating entries
-  - Enables new users to inherit institutional knowledge immediately
+
+    - New Step 1.10 in `/kmgraph:init`: "Would you like to backfill the knowledge graph from existing project context? [y/N]"
+    - If yes: invokes `knowledge-extractor` to scan README, CHANGELOG, lessons-learned/, decisions/, and chat-history/
+    - Extracts candidates and presents for user review before creating entries
+    - Enables new users to inherit institutional knowledge immediately
 
 - **Handoff Command (v0.0.10.3)**
-  - New `/kmgraph:handoff` — Generate comprehensive project transition documentation
-  - Creates 5 documents: START-HERE (current state), DOCUMENTATION-MAP (file inventory), SESSION-COMPILATION (recent work), OPEN-ISSUES (blockers), ARCHITECTURE-SNAPSHOT (codebase structure)
-  - Purpose: Enable seamless knowledge transfer before context limits or developer transitions
+
+    - New `/kmgraph:handoff` — Generate comprehensive project transition documentation
+    - Creates 5 documents: START-HERE (current state), DOCUMENTATION-MAP (file inventory), SESSION-COMPILATION (recent work), OPEN-ISSUES (blockers), ARCHITECTURE-SNAPSHOT (codebase structure)
+    - Purpose: Enable seamless knowledge transfer before context limits or developer transitions
 
 - **Delegation Options for Heavy Reads (v0.0.10.3)**
-  - Updated `/kmgraph:extract-chat`, `/kmgraph:session-summary`, `/kmgraph:update-graph` with guidance
-  - When processing 10+ sessions or 50+ KB, suggests delegating to appropriate subagent
-  - Reduces peak context usage for large operations
+
+    - Updated `/kmgraph:extract-chat`, `/kmgraph:session-summary`, `/kmgraph:update-graph` with guidance
+    - When processing 10+ sessions or 50+ KB, suggests delegating to appropriate subagent
+    - Reduces peak context usage for large operations
 
 - **Documentation Configuration (v0.0.10.3)**
-  - Moved CHANGELOG.md to top-level mkdocs navigation (was nested under Contributing)
-  - Added LinkedIn icon to header (between GitHub and search) via custom theme override
-  - Updated COMMAND-GUIDE.md with handoff section and new delegation patterns
-  - Updated GETTING-STARTED.md with skills and subagents explanation and trigger table
+
+    - Moved CHANGELOG.md to top-level mkdocs navigation (was nested under Contributing)
+    - Added LinkedIn icon to header (between GitHub and search) via custom theme override
+    - Updated COMMAND-GUIDE.md with handoff section and new delegation patterns
+    - Updated GETTING-STARTED.md with skills and subagents explanation and trigger table
 
 ### Changed
 - **Commands Reference**
-  - Added `/kmgraph:handoff` (new command)
-  - Command count updated: 22 → 23 total commands
-  - Install instructions now reference `kmgraph` namespace consistently
+
+    - Added `/kmgraph:handoff` (new command)
+    - Command count updated: 22 → 23 total commands
+    - Install instructions now reference `kmgraph` namespace consistently
 
 ### Documentation
 - Added "Skills and Subagents" section to GETTING-STARTED.md with trigger tables
@@ -55,6 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated CLAUDE.md with Skills, Subagents, and Commit Format sections
 
 **Commits across v0.0.10.0 through v0.0.10.3:**
+
 - v0.0.10.0: Cleanup and workflow consolidation
 - v0.0.10.1: Skills (5), Subagents (2), and KG backfill scaffolding
 - v0.0.10.2: Integrated init backfill option (knowledge-extractor powered)
@@ -66,23 +89,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Plugin Infrastructure & Onboarding**
-  - Added `CLAUDE.md` to define project architecture, versioning rules, and strict AI constraints
-  - Re-introduced `mcpToolSearch: true` in settings to enable lazy-loading and reduce token overhead
-  - Step 0 ("Permissions") and Step 0.5 ("Migration Check") added to `INSTALL.md`
+    - Added `CLAUDE.md` to define project architecture, versioning rules, and strict AI constraints
+    - Re-introduced `mcpToolSearch: true` in settings to enable lazy-loading and reduce token overhead
+    - Step 0 ("Permissions") and Step 0.5 ("Migration Check") added to `INSTALL.md`
 
 ### Changed
 - **Complete Namespace Migration**
-  - Renamed namespace across all code, manifest, and documentation from `/kg-sis:` to `/kmgraph:`
-  - `kg-sis` plugin disabled in settings; enabled `kmgraph` as the only active extension identifier
+    - Renamed namespace across all code, manifest, and documentation from `/kg-sis:` to `/kmgraph:`
+    - `kg-sis` plugin disabled in settings; enabled `kmgraph` as the only active extension identifier
+        - Uninstaller included
+        - Might require clearing of local cache
 - **Consolidated Automation Hooks**
-  - Replaced 3 separate shell scripts with single `hooks-master.sh` invoking 3 isolated sections (config, lessons, memory)
-  - Updated `hooks.json` to reduce plugin load overhead
+    - Replaced 3 separate shell scripts with single `hooks-master.sh` invoking 3 isolated sections (config, lessons, memory)
+    - Updated `hooks.json` to reduce plugin load overhead
 
 ### Fixed
 - **Hook Security Audit (ADR-012)**
-  - Applied word-splitting protections (quoted subshells) in `memory-diff-check.sh`
-  - Validated strict avoidance of `eval`, network requests, and code-altering operations in all hooks
-  - Ensured MEMORY.md limits conform exactly to ADR-004 logic (2,000 token limit)
+    - Applied word-splitting protections (quoted subshells) in `memory-diff-check.sh`
+    - Validated strict avoidance of `eval`, network requests, and code-altering operations in all hooks
+    - Ensured MEMORY.md limits conform exactly to ADR-004 logic (2,000 token limit)
 
 ### Documentation
 - Created `ADR-012: Hook Security Model` defining rules for plugin script execution
@@ -93,26 +118,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Manual Documentation Updates & Security Fixes**
-  - ROADMAP version history table: Complete chronological record v0.0.1-alpha through v0.0.8.6-alpha
-  - ROADMAP footer: Updated to reflect v0.0.8.6-alpha current release
+    - ROADMAP version history table: Complete chronological record v0.0.1-alpha through v0.0.8.6-alpha
+    - ROADMAP footer: Updated to reflect v0.0.8.6-alpha current release
 
 ### Fixed
 - **Security: npm audit vulnerabilities → 0 vulns**
-  - Fixed ajv ReDoS vulnerability (GHSA-2g4f-4pwh-qvx6) in MCP server dependencies
-  - Fixed hono timing comparison hardening (GHSA-gq3j-xvxp-8hrf) in MCP server dependencies
-  - Rebuilt mcp-server/dist/ with patched packages
-  - Updated mcp-server/package-lock.json with fixed versions
+    - Fixed ajv ReDoS vulnerability (GHSA-2g4f-4pwh-qvx6) in MCP server dependencies
+    - Fixed hono timing comparison hardening (GHSA-gq3j-xvxp-8hrf) in MCP server dependencies
+    - Rebuilt mcp-server/dist/ with patched packages
+    - Updated mcp-server/package-lock.json with fixed versions
 
 ### Documentation
 - Removed hardcoded version numbers to prevent docs becoming stale:
-  - Changed "22 slash commands" → "slash commands" in index.md
-  - Changed "7 MCP tools" → "MCP tools" in index.md
+
+    - Changed "22 slash commands" → "slash commands" in index.md
+    - Changed "7 MCP tools" → "MCP tools" in index.md
+
 - Added clarity to Four Pillars reference: "Learn about the Four Pillars this project was built on"
 - Simplified GETTING-STARTED.md heading format (removed "Path A" prefix)
 - Updated Getting Started card: Specified "local IDE CLI coding assistant" for clarity on platform scope
 
 **Branch**: `v0.0.8.7-alpha-manual-updates`
 **Commits**:
+
 - `ca59e184` - Docs: Remove hardcoded version numbers + clarifications
 - `9830f8aa` - Build: Fix npm security vulnerabilities
 - `949b04c1` - Docs: ROADMAP version history table
@@ -124,42 +152,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **MkDocs Material Theme Customization (Phases 1-3)**
-  - Material theme v9.7.0+ with 10+ navigation features enabled
-  - Dark mode (slate scheme) as default with light mode fallback
-  - Sticky navigation tabs (`navigation.tabs.sticky`)
-  - Breadcrumbs above page titles (`navigation.path`)
-  - Footer navigation with Next/Previous buttons (`navigation.footer`)
-  - Integrated Table of Contents in left sidebar (`toc.integrate` + `toc.follow`)
-  - Copy buttons on all code blocks (`content.code.copy`)
-  - Search plugin configuration with autocomplete, highlighting, and sharing
+    - Material theme v9.7.0+ with 10+ navigation features enabled
+    - Dark mode (slate scheme) as default with light mode fallback
+    - Sticky navigation tabs (`navigation.tabs.sticky`)
+    - Breadcrumbs above page titles (`navigation.path`)
+    - Footer navigation with Next/Previous buttons (`navigation.footer`)
+    - Integrated Table of Contents in left sidebar (`toc.integrate` + `toc.follow`)
+    - Copy buttons on all code blocks (`content.code.copy`)
+    - Search plugin configuration with autocomplete, highlighting, and sharing
 
 - **Custom CSS Styling (400+ lines)**
-  - Typography: Inter and JetBrains Mono from Google Fonts
-  - Dark mode colors: Navy primary (#1a1a2e), cyan accent (#00d2ff)
-  - Light mode colors: Blue primary (#003d82), orange accent (#ff6b35)
-  - Glassmorphism header effect with backdrop blur (dark mode only)
-  - WCAG AA contrast compliance for all color combinations
-  - Enhanced code blocks, tables, admonitions, and search box styling
-  - Print media support (hides navigation for exports)
+    - Typography: Inter and JetBrains Mono from Google Fonts
+    - Dark mode colors: Navy primary (#1a1a2e), cyan accent (#00d2ff)
+    - Light mode colors: Blue primary (#003d82), orange accent (#ff6b35)
+    - Glassmorphism header effect with backdrop blur (dark mode only)
+    - WCAG AA contrast compliance for all color combinations
+    - Enhanced code blocks, tables, admonitions, and search box styling
+    - Print media support (hides navigation for exports)
 
 - **Page Restructuring & Visual Enhancements**
-  - Grid cards on index.md and GETTING-STARTED.md for visual navigation
-  - Tabbed interface in COMMAND-GUIDE.md (6 command categories)
-  - Mermaid diagrams: "Knowledge Capture Pipeline" (GETTING-STARTED.md)
-  - Mermaid diagrams: "Four Pillars Relationships" (CONCEPTS.md)
-  - All diagrams include accessibility attributes (accTitle, accDescr)
-  - Neutral mermaid theme for proper rendering in both color schemes
+    - Grid cards on index.md and GETTING-STARTED.md for visual navigation
+    - Tabbed interface in COMMAND-GUIDE.md (6 command categories)
+    - Mermaid diagrams: "Knowledge Capture Pipeline" (GETTING-STARTED.md)
+    - Mermaid diagrams: "Four Pillars Relationships" (CONCEPTS.md)
+    - All diagrams include accessibility attributes (accTitle, accDescr)
+    - Neutral mermaid theme for proper rendering in both color schemes
 
 - **Additional Experience Plugins**
-  - `mkdocs-git-revision-date-localized-plugin` — "Last updated" timestamps on all pages
-  - `mkdocs-glightbox` — Lightbox image/diagram viewing
-  - `mkdocs-minify-plugin` — Asset compression for snappy performance
-  - `mkdocs-roamlinks-plugin` — WikiLink support for knowledge entries
+    - `mkdocs-git-revision-date-localized-plugin` — "Last updated" timestamps on all pages
+    - `mkdocs-glightbox` — Lightbox image/diagram viewing
+    - `mkdocs-minify-plugin` — Asset compression for snappy performance
+    - `mkdocs-roamlinks-plugin` — WikiLink support for knowledge entries
 
 - **Social Links & Copyright**
-  - GitHub: https://github.com/technomensch
-  - LinkedIn: https://www.linkedin.com/in/marckaplan/
-  - Copyright: "Staying in Sync"
+    - GitHub: https://github.com/technomensch
+    - LinkedIn: https://www.linkedin.com/in/marckaplan/
+    - Copyright: "Staying in Sync"
 
 ### Fixed
 - Mermaid diagram rendering in dark mode (removed hardcoded colors, adopted neutral theme)
@@ -184,9 +212,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Root `package.json` with `files` allowlist — implements npm-standard distribution
   hygiene so marketplace-installed plugin excludes developer-only content:
-  - `docs/` (plugin developer's knowledge graph: decisions, lessons, KG entries)
-  - `tests/` (internal test suite)
-  - Root development files (ROADMAP.md, etc.)
+    - `docs/` (plugin developer's knowledge graph: decisions, lessons, KG entries)
+    - `tests/` (internal test suite)
+    - Root development files (ROADMAP.md, etc.)
   `docs/` directory remains in git unchanged; no path changes to commands or scripts.
 
 ### Fixed
@@ -207,15 +235,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `/kmgraph:start-issue-tracking` command (19th command) — Full issue initialization
   workflow, fully ported from prior project and sanitized for cross-project portability
   and LLM-platform-agnostic use. Features:
-  - Auto-detects parent branch, version from git tag, issue type, and next issue number
+    - Auto-detects parent branch, version from git tag, issue type, and next issue number
     from existing `issues/` directory
-  - Smart defaults reduce interactive prompts to 1 (issue description only)
-  - Creates structured directory under `{active_kg_path}/issues/{number}-{slug}/`
-  - Generates `issue.md` with full metadata (title, type, branch, version, date, scope)
-  - Git branch creation: `git checkout -b issue/{number}-{slug}`
-  - Knowledge graph synchronization via `/kmgraph:update-issue-plan`
-  - Integrates with `/kmgraph:link-issue` and `/kmgraph:meta-issue`
-  - No project-specific dependencies; uses KG config for all path resolution
+    - Smart defaults reduce interactive prompts to 1 (issue description only)
+    - Creates structured directory under `{active_kg_path}/issues/{number}-{slug}/`
+    - Generates `issue.md` with full metadata (title, type, branch, version, date, scope)
+    - Git branch creation: `git checkout -b issue/{number}-{slug}`
+    - Knowledge graph synchronization via `/kmgraph:update-issue-plan`
+    - Integrates with `/kmgraph:link-issue` and `/kmgraph:meta-issue`
+    - No project-specific dependencies; uses KG config for all path resolution
 
 ### Fixed
 - `.gitignore` inline comments on pattern lines (3 paths were silently not being ignored
@@ -250,97 +278,97 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **`/kmgraph:restore-memory` Command** - Restore archived MEMORY.md entries
-  - Fuzzy search by entry title using `fuzzy-search-archive.sh` helper script
-  - Restore by entry ID/index with `--id` flag
-  - List all archived entries with `--list` flag
-  - Preview entry content before restoring
-  - Target section selection with `--section` flag (auto-detect or user-specified)
-  - Dry-run mode with `--dry-run` flag for previewing without writing
-  - Token limit checking (blocks if would exceed 2,000 tokens, warns if > 1,500)
-  - Archive log restoration tracking (marks entries as "Restored: YYYY-MM-DD")
-  - Commits both MEMORY.md and MEMORY-archive.md with descriptive message
+    - Fuzzy search by entry title using `fuzzy-search-archive.sh` helper script
+    - Restore by entry ID/index with `--id` flag
+    - List all archived entries with `--list` flag
+    - Preview entry content before restoring
+    - Target section selection with `--section` flag (auto-detect or user-specified)
+    - Dry-run mode with `--dry-run` flag for previewing without writing
+    - Token limit checking (blocks if would exceed 2,000 tokens, warns if > 1,500)
+    - Archive log restoration tracking (marks entries as "Restored: YYYY-MM-DD")
+    - Commits both MEMORY.md and MEMORY-archive.md with descriptive message
 - **Fuzzy Search Script** - `scripts/fuzzy-search-archive.sh`
-  - Four-tier ranking strategy: exact match, starts-with, contains-all words, contains-any word
-  - Case-insensitive search with word-based fuzzy matching
-  - Returns ranked list of matching entry IDs and titles
+    - Four-tier ranking strategy: exact match, starts-with, contains-all words, contains-any word
+    - Case-insensitive search with word-based fuzzy matching
+    - Returns ranked list of matching entry IDs and titles
 - **Architecture Decision Record** - `docs/decisions/ADR-005-defer-memory-rules-engine.md`
-  - Documents decision to defer rules engine and smart summarization to v0.0.5-alpha
-  - Analyzes three options: rules+restore (medium scope), full automation (all features), restore only (minimal scope)
-  - Rationale: Archive without restore is incomplete UX, rules need real-world patterns, maintain velocity
+    - Documents decision to defer rules engine and smart summarization to v0.0.5-alpha
+    - Analyzes three options: rules+restore (medium scope), full automation (all features), restore only (minimal scope)
+    - Rationale: Archive without restore is incomplete UX, rules need real-world patterns, maintain velocity
 
 ### Changed
 - **Version**: 0.0.3-alpha → 0.0.4-alpha
 - **Command Count**: 17 → 18 (added restore-memory)
 - **`/kmgraph:archive-memory` Command** - Enhanced with restoration tracking
-  - Archive log now shows restoration timestamps: "[Restored: YYYY-MM-DD]"
-  - Restored entries remain in archive for historical record
-  - Documents restore workflow and manual restoration process
+    - Archive log now shows restoration timestamps: "[Restored: YYYY-MM-DD]"
+    - Restored entries remain in archive for historical record
+    - Documents restore workflow and manual restoration process
 - **knowledge-graph-usage skill** - Added restore workflow documentation
-  - When to restore archived entries (context needed for current work)
-  - Restore vs archive decision criteria
-  - Integration with archive-memory command
+    - When to restore archived entries (context needed for current work)
+    - Restore vs archive decision criteria
+    - Integration with archive-memory command
 
 ### Documentation
 - Added implementation plan: `docs/plans/v0.0.4-alpha-plan.md`
-  - Complete 3-phase implementation breakdown
-  - 27 verification checkboxes across 4 categories
-  - Timeline estimation (2-3 days)
+    - Complete 3-phase implementation breakdown
+    - 27 verification checkboxes across 4 categories
+    - Timeline estimation (2-3 days)
 - Updated ROADMAP.md with v0.0.4-alpha section
 - Updated README.md command count and status
 
 ### Deferred
 - **MEMORY.md auto-sync rules engine** (deferred to v0.0.5-alpha)
-  - YAML-based pattern matching for automated sync decisions
-  - Global defaults + per-KG overrides
-  - Confidence scoring system
+    - YAML-based pattern matching for automated sync decisions
+    - Global defaults + per-KG overrides
+    - Confidence scoring system
 - **Smart summarization** (deferred to v0.0.5-alpha)
-  - LLM-powered entry consolidation
-  - Batch processing or on-demand
-  - Merge similar entries strategy
+    - LLM-powered entry consolidation
+    - Batch processing or on-demand
+    - Merge similar entries strategy
 
 ## [0.0.3-alpha] - 2026-02-16
 
 ### Added
 - **`/kmgraph:archive-memory` Command** - Archive stale MEMORY.md entries to prevent bloat
-  - Token-based staleness detection (90-day threshold, customizable)
-  - Moves stale entries to MEMORY-archive.md with archive log
-  - Shows tokens freed and current size after archival
-  - Dry-run mode for previewing without writing
+    - Token-based staleness detection (90-day threshold, customizable)
+    - Moves stale entries to MEMORY-archive.md with archive log
+    - Shows tokens freed and current size after archival
+    - Dry-run mode for previewing without writing
 - **Autonomous Triggering in Knowledge-Graph-Usage Skill**
-  - After lesson capture: Suggests `/kmgraph:update-graph` immediately
-  - After significant commits: Detects fix/debug/pattern keywords, suggests capture within 30 minutes
-  - Before problem-solving: Suggests `/kmgraph:recall` to check existing knowledge
+    - After lesson capture: Suggests `/kmgraph:update-graph` immediately
+    - After significant commits: Detects fix/debug/pattern keywords, suggests capture within 30 minutes
+    - Before problem-solving: Suggests `/kmgraph:recall` to check existing knowledge
 - **Post-Commit Hook Template** - Detects lesson-worthy commits
-  - Located in `core/examples-hooks/post-commit-lesson-suggestion`
-  - Triggers on keywords: fix, solved, debug, implement, refactor, pattern, architecture
-  - Optional installation via `/kmgraph:init` wizard (default: no)
+    - Located in `core/examples-hooks/post-commit-lesson-suggestion`
+    - Triggers on keywords: fix, solved, debug, implement, refactor, pattern, architecture
+    - Optional installation via `/kmgraph:init` wizard (default: no)
 - **SessionStart Hooks** - Three hooks for enhanced context
-  - `recent-lessons.sh` - Displays lessons modified in last 7 days
-  - `memory-diff-check.sh` - Notifies of MEMORY.md changes since last session
-  - Both scoped to active KG, silent when no changes
+    - `recent-lessons.sh` - Displays lessons modified in last 7 days
+    - `memory-diff-check.sh` - Notifies of MEMORY.md changes since last session
+    - Both scoped to active KG, silent when no changes
 - **Duplicate Detection Pre-Flight** - Step 1.1 in capture-lesson
-  - Searches for similar lessons before content gathering
-  - Offers merge (update existing), link (create with reference), or proceed (new)
-  - Prevents knowledge fragmentation
+    - Searches for similar lessons before content gathering
+    - Offers merge (update existing), link (create with reference), or proceed (new)
+    - Prevents knowledge fragmentation
 
 ### Changed
 - **Version**: 0.0.2-alpha → 0.0.3-alpha
 - **Command Count**: 16 → 17 (added archive-memory)
 - **MEMORY.md Limits**: Line-based (250/300) → Token-based (1,500/2,000)
-  - Token estimation: word_count × 1.3
-  - Soft limit: 1,500 tokens (warning, sync continues)
-  - Hard limit: 2,000 tokens (blocks MEMORY.md updates, suggests archive)
-  - Replaced all line-based references in update-graph.md Step 7 and sync-all.md
+    - Token estimation: word_count × 1.3
+    - Soft limit: 1,500 tokens (warning, sync continues)
+    - Hard limit: 2,000 tokens (blocks MEMORY.md updates, suggests archive)
+    - Replaced all line-based references in update-graph.md Step 7 and sync-all.md
 - **capture-lesson.md Step 4.6** - Structured choice UI
-  - "Extract now (recommended)" - Inline update-graph execution
-  - "Manual later" - Deferred extraction
-  - "Skip" - Batch via sync-all
+    - "Extract now (recommended)" - Inline update-graph execution
+    - "Manual later" - Deferred extraction
+    - "Skip" - Batch via sync-all
 - **update-graph.md** - Enhanced `--auto` flag behavior
-  - Returns structured quality feedback when called from capture-lesson
-  - Added `--edit-entry` flag for user review before saving
+    - Returns structured quality feedback when called from capture-lesson
+    - Added `--edit-entry` flag for user review before saving
 - **knowledge-graph-usage skill** - Added duplicate detection guidance (~150 words)
-  - Search strategy before capturing
-  - Merge vs create new decision criteria
+    - Search strategy before capturing
+    - Merge vs create new decision criteria
 
 ### Fixed
 - Token-based size limits more accurate than line-based (short vs long lines)
@@ -362,54 +390,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Knowledge Graph Usage Skill** - Autonomous guidance for knowledge capture
-  - 1,900-word lean SKILL.md with progressive disclosure
-  - 5,800-word capture-patterns.md reference (problem-solution, architectural, meta-issue patterns)
-  - 6,200-word command-workflows.md reference (10 detailed workflow patterns)
-  - Triggers on phrases: "documenting lessons", "institutional memory", "we solved this before"
-  - Proactive recognition of recurring problems and valuable insights
+    - 1,900-word lean SKILL.md with progressive disclosure
+    - 5,800-word capture-patterns.md reference (problem-solution, architectural, meta-issue patterns)
+    - 6,200-word command-workflows.md reference (10 detailed workflow patterns)
+    - Triggers on phrases: "documenting lessons", "institutional memory", "we solved this before"
+    - Proactive recognition of recurring problems and valuable insights
 - **Plugin Knowledge Graph** - Plugin now documents itself (dogfooding)
-  - Initialized KG in `docs/` with categories: architecture, debugging, patterns
-  - Selective git strategy (commit shareable, gitignore personal notes)
-  - First lesson captured: namespace-visibility-shadow-command-failure.md
-  - Master index with chronological and tag-based navigation
+    - Initialized KG in `docs/` with categories: architecture, debugging, patterns
+    - Selective git strategy (commit shareable, gitignore personal notes)
+    - First lesson captured: namespace-visibility-shadow-command-failure.md
+    - Master index with chronological and tag-based navigation
 - **Marketplace Branding** - Changed identifier from "(knowledge)" to "(tm-sis)"
-  - Represents "technomensch-stayinginsync" publisher identity
-  - Updated marketplace.json with new branding
-  - README documentation of marketplace strategy
+    - Represents "technomensch-stayinginsync" publisher identity
+    - Updated marketplace.json with new branding
+    - README documentation of marketplace strategy
 
 ### Changed
 - **Version**: 0.0.1-alpha → 0.0.2-alpha
 - **Command Filenames**: Removed `knowledge-` prefix from all 16 command files
-  - `knowledge-status.md` → `status.md` (all commands renamed)
-  - Marketplace installation shows namespace correctly regardless of filename
-  - Cleaner, more maintainable filenames
-  - Git history preserved via rename detection
+    - `knowledge-status.md` → `status.md` (all commands renamed)
+    - Marketplace installation shows namespace correctly regardless of filename
+    - Cleaner, more maintainable filenames
+    - Git history preserved via rename detection
 - **README**: Corrected command count from 17 to 16 (accurate count)
 - **README**: Updated namespace documentation to reflect marketplace behavior
-  - Documents two-location sync requirement for local testing
-  - Explains Distribution Mode namespace handling
-  - References captured lessons for detailed workflow
+    - Documents two-location sync requirement for local testing
+    - Explains Distribution Mode namespace handling
+    - References captured lessons for detailed workflow
 - **.gitignore**: Added selective KG strategy rules
-  - Gitignore: docs/plans/, docs/sessions/, docs/chat-history/, docs/lessons-learned/debugging/
-  - Commit: docs/lessons-learned/architecture/, docs/lessons-learned/patterns/, docs/lessons-learned/process/
+    - Gitignore: docs/plans/, docs/sessions/, docs/chat-history/, docs/lessons-learned/debugging/
+    - Commit: docs/lessons-learned/architecture/, docs/lessons-learned/patterns/, docs/lessons-learned/process/
 
 ### Fixed
 - Filename typo: `knowledge-updat-issue-plan.md` → `knowledge-update-issue-plan.md`
 
 ### Documentation
 - **Lesson 1**: Shadow command strategy failed with Gemini (cross-LLM incompatibility)
-  - File: `docs/lessons-learned/debugging/namespace-visibility-shadow-command-failure.md`
-  - Documented file prefix workaround as cross-LLM compatible solution
-  - Updated with marketplace discovery (namespace works correctly regardless of prefix)
-  - Cross-references local marketplace testing workflow lesson
+    - File: `docs/lessons-learned/debugging/namespace-visibility-shadow-command-failure.md`
+    - Documented file prefix workaround as cross-LLM compatible solution
+    - Updated with marketplace discovery (namespace works correctly regardless of prefix)
+    - Cross-references local marketplace testing workflow lesson
 - **Lesson 2**: Local marketplace testing requires two-location sync
-  - File: `docs/lessons-learned/process/local-marketplace-testing-workflow.md`
-  - Documents development directory vs marketplace cache locations
-  - Provides rsync automation script for sync workflow
-  - Explains Distribution Mode namespace behavior
+    - File: `docs/lessons-learned/process/local-marketplace-testing-workflow.md`
+    - Documents development directory vs marketplace cache locations
+    - Provides rsync automation script for sync workflow
+    - Explains Distribution Mode namespace behavior
 - **Master Index**: Updated with 2 lessons total (debugging + process categories)
-  - Chronological index with date-based navigation
-  - Tag index with 9 unique tags (#testing, #marketplace, #plugin-development, etc.)
+    - Chronological index with date-based navigation
+    - Tag index with 9 unique tags (#testing, #marketplace, #plugin-development, etc.)
 - Updated plugin validation criteria checklist in v0.0.2-validate-plugin.md plan
 
 ### Validation
@@ -421,6 +449,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.1-alpha] - 2026-02-16
 
 ### Added
+
 - Initial alpha release of Knowledge Plugin for Claude Code
 - 16 commands for knowledge capture, recall, sync, and management
 - Multi-KG support with per-category git strategies
@@ -435,15 +464,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Privacy-focused sanitization tools and documentation
 
 ### Changed
+
 - **ARCHITECTURAL DECISION**: Migrated from `skills/` to `commands/` directory
-  - Commands provide manual invocation (not autonomous)
-  - Full workflow loading (not lazy-loaded)
-  - Better suited for deterministic knowledge operations
+    - Commands provide manual invocation (not autonomous)
+    - Full workflow loading (not lazy-loaded)
+    - Better suited for deterministic knowledge operations
 - Updated plugin metadata (version 0.0.1-alpha, email, repository, license, keywords)
 - Updated README with commands vs skills architecture documentation
 - All command `name:` fields now include `knowledge:` namespace prefix for autocomplete
 
-### Commands
+### Commands (renamed to "kmgraph" in v.0.0.10-alpha)
+
 - `/kmgraph:init` - Initialize new knowledge graph with wizard
 - `/kmgraph:list` - Display all configured knowledge graphs
 - `/kmgraph:switch` - Change active knowledge graph
@@ -474,7 +505,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `kg://config` - Current kg-config.json contents (read-only)
 - `kg://templates/{name}` - Template files from core/templates/
 
-## [1.0.0] - TBD (Future Release)
+## [Features under consideration for Future Release]
 
 ### Added
 - Initial release of Knowledge Plugin for Claude Code
