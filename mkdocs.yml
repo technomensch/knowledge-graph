@@ -111,5 +111,7 @@ extra:
       link: https://github.com/technomensch
     - icon: fontawesome/brands/linkedin
       link: https://www.linkedin.com/in/marckaplan/
+    - icon: fontawesome/solid/heart
+      link: https://buymeacoffee.com/technomensch
 
 copyright: Staying in Sync
