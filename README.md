@@ -232,32 +232,20 @@ is installed from the marketplace. Developer-only content in `docs/` is excluded
 
 See [ROADMAP.md](ROADMAP.md) for detailed version history and development progress.
 
-**Current Release:** v0.0.8.6-alpha (2026-02-22)
-- ✅ Complete MkDocs Material theme customization with professional UX
-- ✅ Dark mode (slate) as default with glassmorphism header effect
-- ✅ Sticky navigation tabs, breadcrumbs, integrated Table of Contents
-- ✅ Grid cards for visual navigation on index and getting-started pages
-- ✅ Tabbed command interface for browsing commands by category
-- ✅ Mermaid diagrams with proper theme support for dark/light modes
-- ✅ Custom CSS with professional typography (Inter, JetBrains Mono)
-- ✅ 508 accessibility compliance (WCAG AA contrast ratios)
-
-**What's New in v0.0.8.6:**
-- Material theme v9.7.0+ with 10+ navigation features (tabs, breadcrumbs, footer nav)
-- Professional dark mode (navy + cyan) with light mode Material defaults
-- Grid cards and tabbed interfaces for improved visual navigation
-- Mermaid diagram rendering with adaptive theming for both color schemes
-- Enhanced code blocks with copy buttons and syntax highlighting
-- Git revision dates and lightbox image viewing
-- 400+ lines of custom CSS with WCAG AA compliance
+**Current Release:** v0.0.10.4-alpha (2026-03-01)
+- ✅ MCP server auto-installs dependencies when node_modules missing after plugin install
+- ✅ Skills system (5 auto-triggered context providers)
+- ✅ Subagents: knowledge-extractor (read-only) and session-documenter
+- ✅ KG backfill option during `/kmgraph:init`
+- ✅ Handoff command (`/kmgraph:handoff`) for project transitions
+- ✅ Complete namespace migration: `/kmgraph:` everywhere
 
 **Recent Versions:**
-- v0.0.8.4-alpha (Feb 21): Extract-chat date/project filtering
-- v0.0.8.3-alpha (Feb 21): Plugin namespace rename (knowledge → kg-sis)
-- v0.0.8.2-alpha (Feb 21): Update-doc --user-facing command
-- v0.0.8.1-alpha (Feb 20): Documentation infrastructure
-- v0.0.8-alpha (Feb 20): Universal installer and 3-tier installation
-- v0.0.7-alpha (Feb 20): Documentation consolidation (5 new docs)
+- v0.0.10.3-alpha (Feb 27): Handoff command, delegation patterns, navigation updates
+- v0.0.10.2-alpha (Feb 27): KG backfill in init (knowledge-extractor powered)
+- v0.0.10.1-alpha (Feb 27): Skills (5), Subagents (2)
+- v0.0.10.0-alpha (Feb 27): Cleanup and workflow consolidation
+- v0.0.9-alpha (Feb 27): Namespace migration, CLAUDE.md, hook consolidation
 
 **Next:** v1.0.0 stable release (Q2 2026) incorporating alpha feedback
 

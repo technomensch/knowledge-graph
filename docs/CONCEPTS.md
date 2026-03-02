@@ -25,7 +25,7 @@ A **knowledge graph** is a structured way to organize information learned while 
 !!! info
 
     - Everything links back together for future discovery
-    
+
     - All artifacts remain searchable and interconnected
 
 
@@ -127,7 +127,10 @@ flowchart LR
 
 **Location**: `/decisions/` directory, numbered sequentially (ADR-001, ADR-002, etc.).
 
-**When to create**: When making a significant choice — selecting a database, choosing a framework, defining an API structure — where future team members might ask "why did the team do it this way?"
+**When to create**: When making a significant choice
+
+ — selecting a database, choosing a framework, defining an API structure
+ — where future team members might ask "why did the team do it this way?"
 
 **Plain English**: A written record of "why this choice was made" so the reasoning is never lost.
 
