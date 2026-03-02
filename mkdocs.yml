@@ -10,9 +10,6 @@ exclude_docs: |
   plans/**
   chat-history/**
   sessions/**
-  reference/**
-  examples/**
-  templates/**
 extra_css:
   - stylesheets/extra.css
 
@@ -85,9 +82,6 @@ plugins:
         - plans/**
         - chat-history/**
         - sessions/**
-        - reference/**
-        - examples/**
-        - templates/**
   - glightbox
   - minify
   - roamlinks
