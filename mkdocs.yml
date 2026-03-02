@@ -6,6 +6,8 @@ repo_name: technomensch/knowledge-graph
 edit_uri: edit/main/docs/
 
 docs_dir: docs
+exclude_docs: |
+  plans/
 extra_css:
   - stylesheets/extra.css
 
