@@ -2,10 +2,10 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.0.11-alpha
-**Status:** Pre-Beta Comprehensive Testing & Production Fixes
+**Version:** 0.1.0-beta
+**Status:** Beta Release — First External Testing Phase
 
-Documentation avaliable at - https://technomensch.github.io/knowledge-graph/
+Documentation available at - https://technomensch.github.io/knowledge-graph/
 
 Buy me a coffee if you find this useful - https://buymeacoffee.com/technomensch
 ---
@@ -233,29 +233,25 @@ is installed from the marketplace. Developer-only content in `docs/` is excluded
 
 See [ROADMAP.md](ROADMAP.md) for detailed version history and development progress.
 
-**Current Release:** v0.0.11-alpha (2026-03-03)
-- ✅ **Comprehensive Pre-Beta Test Suite** — 9 test suites covering all 113 test cases
-  - MCP server tools, resources, offloading verification
-  - Plugin components (25 commands, 6 skills, 3 agents) structural validation
-  - Hook integration and pre-commit sanitization testing
-  - Python chat extraction script validation
-- ✅ **Production Hook Fixes** — Pre-commit sanitization hook now bash 3.2 compatible (macOS default)
-- ✅ **Test Infrastructure** — Isolated test execution with KG_CONFIG_PATH environment variable support
-- ✅ MCP server auto-installs dependencies when node_modules missing after plugin install
-- ✅ Skills system (5 auto-triggered context providers)
-- ✅ Subagents: knowledge-extractor (read-only) and session-documenter
-- ✅ KG backfill option during `/kmgraph:init`
-- ✅ Handoff command (`/kmgraph:handoff`) for project transitions
-- ✅ Complete namespace migration: `/kmgraph:` everywhere
+**Current Release:** v0.1.0-beta (2026-03-03)
+- ✅ Complete alpha cycle (v0.0.9 through v0.0.11-alpha integrated)
+- ✅ Comprehensive pre-beta test suite (113 tests, 9 suites) validating all systems
+- ✅ Production fixes (pre-commit sanitization hook bash 3.2 compatible)
+- ✅ Skills system fully functional (6 context providers)
+- ✅ Subagents operational with governance workflows (3 agents: knowledge-extractor, session-documenter, knowledge-reviewer)
+- ✅ KG initialization with optional backfill
+- ✅ Complete `/kmgraph:` namespace (no legacy `/knowledge:` references)
+- ✅ MCP server auto-installs and upgrades cleanly
+- ✅ Comprehensive documentation (CLAUDE.md, GETTING-STARTED, COMMAND-GUIDE, CHEAT-SHEET)
+- ⚠️ Beta status: API subject to breaking changes before v1.0.0 stable
 
 **Recent Versions:**
-- v0.0.10.4-alpha (Mar 1): Pre-beta validation checkpoint
-- v0.0.10.3-alpha (Feb 27): Handoff command, delegation patterns, navigation updates
-- v0.0.10.2-alpha (Feb 27): KG backfill in init (knowledge-extractor powered)
-- v0.0.10.1-alpha (Feb 27): Skills (5), Subagents (2)
-- v0.0.10.0-alpha (Feb 27): Cleanup and workflow consolidation
+- v0.0.11-alpha (Mar 3): Pre-beta test suite, pre-commit hook bash 3.2 fix
+- v0.0.10.4-alpha (Mar 1): MCP node_modules auto-install fix
+- v0.0.10-alpha (Feb 27): Skills (5), Subagents (2), KG backfill, handoff
+- v0.0.9-alpha (Feb 27): Namespace migration, CLAUDE.md, hook consolidation
 
-**Next:** v0.1.0-beta stable release (2026-03-10) — Final review of test suite, then transition to beta program
+**Next:** v1.0.0 stable release — TBD (post-beta feedback cycle)
 
 ---
 
