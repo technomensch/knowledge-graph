@@ -1275,5 +1275,5 @@ Real samples
 </div>
 ---
 
-**Version**: 0.0.10-alpha
+**Version**: 0.1.0-beta
 **Updated**: 2026-02-27
