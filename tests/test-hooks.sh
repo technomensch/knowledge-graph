@@ -240,67 +240,58 @@ else
   fail "Pre-commit hook example missing or not executable at core/examples-hooks/pre-commit-sanitization.sh"
 fi
 
-# The hook uses declare -A (bash 4+); macOS ships bash 3.2
-if bash -c 'declare -A _t' 2>/dev/null; then
-  # Set up isolated git repo
-  git init "$HOOK_REPO" -q 2>/dev/null
-  git -C "$HOOK_REPO" config user.email "test@example.com"
-  git -C "$HOOK_REPO" config user.name "Test Runner"
+# Set up isolated git repo for hook execution tests
+git init "$HOOK_REPO" -q 2>/dev/null
+git -C "$HOOK_REPO" config user.email "test@example.com"
+git -C "$HOOK_REPO" config user.name "Test Runner"
 
-  # ── Warn mode (default): sensitive data warns but commit proceeds ──────────
-  cp "$PRECOMMIT_HOOK" "$HOOK_REPO/.git/hooks/pre-commit"
-  chmod +x "$HOOK_REPO/.git/hooks/pre-commit"
+# ── Warn mode (default): sensitive data warns but commit proceeds ──────────
+cp "$PRECOMMIT_HOOK" "$HOOK_REPO/.git/hooks/pre-commit"
+chmod +x "$HOOK_REPO/.git/hooks/pre-commit"
 
-  echo "Contact: leakme@company-internal.com for support" > "$HOOK_REPO/notes.md"
-  git -C "$HOOK_REPO" add notes.md
-  HOOK_OUTPUT=$(git -C "$HOOK_REPO" commit -m "test: warn mode" 2>&1) || true
-  if echo "$HOOK_OUTPUT" | grep -qiE "WARNING|warning"; then
-    pass "Warn mode: email address detected and warning shown"
-  else
-    fail "Warn mode: hook should warn on email pattern (got: $(echo "$HOOK_OUTPUT" | head -3))"
-  fi
-  # Commit should still have been created (exit 0 in warn mode)
-  if git -C "$HOOK_REPO" log --oneline 2>/dev/null | grep -q "warn mode"; then
-    pass "Warn mode: commit proceeds despite warning"
-  else
-    fail "Warn mode: commit should succeed in warn mode"
-  fi
-
-  # ── Block mode: sensitive data prevents commit ─────────────────────────────
-  sed 's/MODE="warn"/MODE="block"/' "$PRECOMMIT_HOOK" > "$HOOK_REPO/.git/hooks/pre-commit"
-  chmod +x "$HOOK_REPO/.git/hooks/pre-commit"
-
-  echo "api_key: 'sk-prod-abcdef1234567890abcdef1234567890'" > "$HOOK_REPO/secrets.md"
-  git -C "$HOOK_REPO" add secrets.md
-  HOOK_OUTPUT=$(git -C "$HOOK_REPO" commit -m "test: block mode" 2>&1) || HOOK_EXIT=$?
-  HOOK_EXIT=${HOOK_EXIT:-0}
-  if echo "$HOOK_OUTPUT" | grep -qiE "BLOCKED|ERROR|error"; then
-    pass "Block mode: API key triggers block message"
-  else
-    fail "Block mode: hook should output BLOCKED/ERROR (got: $(echo "$HOOK_OUTPUT" | head -3))"
-  fi
-  if [ "${HOOK_EXIT}" -ne 0 ]; then
-    pass "Block mode: git commit exits non-zero (commit rejected)"
-  else
-    fail "Block mode: git commit should exit non-zero"
-  fi
-
-  # ── Clean file: no sensitive data, commit allowed without warning ──────────
-  git -C "$HOOK_REPO" reset HEAD secrets.md > /dev/null 2>&1 || true
-  echo "# Architecture Notes — no sensitive data here" > "$HOOK_REPO/clean.md"
-  git -C "$HOOK_REPO" add clean.md
-  HOOK_OUTPUT=$(git -C "$HOOK_REPO" commit -m "test: clean file" 2>&1) || true
-  if echo "$HOOK_OUTPUT" | grep -qiE "No sensitive|no.*sensitive|✓"; then
-    pass "Block mode: clean file passes without sensitive data warning"
-  else
-    fail "Block mode: clean file should report no sensitive data (got: $(echo "$HOOK_OUTPUT" | head -3))"
-  fi
-
+echo "Contact: leakme@company-internal.com for support" > "$HOOK_REPO/notes.md"
+git -C "$HOOK_REPO" add notes.md
+HOOK_OUTPUT=$(git -C "$HOOK_REPO" commit -m "test: warn mode" 2>&1) || true
+if echo "$HOOK_OUTPUT" | grep -qiE "WARNING|warning"; then
+  pass "Warn mode: email address detected and warning shown"
 else
-  echo "  ⚠  SKIP (3 tests): pre-commit hook requires bash 4+ (declare -A); system bash is $(bash --version | head -1 | grep -o 'version [0-9]\+' | head -1))"
-  echo "     Install bash 4+ (e.g. brew install bash) to run execution tests"
-  # Still count as passes since the limitation is environmental, not a bug
-  pass "Pre-commit hook bash 4+ skip acknowledged (structural test passed above)"
+  fail "Warn mode: hook should warn on email pattern (got: $(echo "$HOOK_OUTPUT" | head -3))"
+fi
+# Commit should still have been created (exit 0 in warn mode)
+if git -C "$HOOK_REPO" log --oneline 2>/dev/null | grep -q "warn mode"; then
+  pass "Warn mode: commit proceeds despite warning"
+else
+  fail "Warn mode: commit should succeed in warn mode"
+fi
+
+# ── Block mode: sensitive data prevents commit ─────────────────────────────
+sed 's/MODE="warn"/MODE="block"/' "$PRECOMMIT_HOOK" > "$HOOK_REPO/.git/hooks/pre-commit"
+chmod +x "$HOOK_REPO/.git/hooks/pre-commit"
+
+echo "api_key: 'sk-prod-abcdef1234567890abcdef1234567890'" > "$HOOK_REPO/secrets.md"
+git -C "$HOOK_REPO" add secrets.md
+HOOK_OUTPUT=$(git -C "$HOOK_REPO" commit -m "test: block mode" 2>&1) || HOOK_EXIT=$?
+HOOK_EXIT=${HOOK_EXIT:-0}
+if echo "$HOOK_OUTPUT" | grep -qiE "BLOCKED|ERROR|error"; then
+  pass "Block mode: API key triggers block message"
+else
+  fail "Block mode: hook should output BLOCKED/ERROR (got: $(echo "$HOOK_OUTPUT" | head -3))"
+fi
+if [ "${HOOK_EXIT}" -ne 0 ]; then
+  pass "Block mode: git commit exits non-zero (commit rejected)"
+else
+  fail "Block mode: git commit should exit non-zero"
+fi
+
+# ── Clean file: no sensitive data, commit allowed without warning ──────────
+git -C "$HOOK_REPO" reset HEAD secrets.md > /dev/null 2>&1 || true
+echo "# Architecture Notes — no sensitive data here" > "$HOOK_REPO/clean.md"
+git -C "$HOOK_REPO" add clean.md
+HOOK_OUTPUT=$(git -C "$HOOK_REPO" commit -m "test: clean file" 2>&1) || true
+if echo "$HOOK_OUTPUT" | grep -qiE "No sensitive|no.*sensitive|✓"; then
+  pass "Clean file: no sensitive data detected"
+else
+  fail "Clean file: should report no sensitive data (got: $(echo "$HOOK_OUTPUT" | head -3))"
 fi
 
 echo ""
