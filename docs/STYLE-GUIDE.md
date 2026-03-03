@@ -3,8 +3,8 @@
 Authoring standards for contributors writing or reviewing documentation for the Knowledge Management Graph.
 
 **Audience**: Contributors — human developers and AI documentation agents.
-**Version**: 0.0.10-alpha
-**Last Updated**: 2026-02-20
+**Version**: 0.1.0-beta
+**Last Updated**: 2026-03-03
 
 > **Before writing documentation**, read this guide. Every rule includes a citation showing where the standard comes from.
 

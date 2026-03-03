@@ -8,6 +8,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-beta] - 2026-03-03
+
+### Added
+- First beta release milestone — infrastructure and features stable for external testing
+- All features from alpha cycle (v0.0.9 through v0.0.11-alpha) integrated and verified
+- Comprehensive pre-beta test suite (113 tests, 9 suites) validating all systems
+
+### Changed
+- Version number bumped from v0.0.11-alpha to v0.1.0-beta to reflect stability
+- Updated command count (25), skills count (6), subagents count (3) across documentation
+
+### Fixed
+- Pre-commit sanitization hook now bash 3.2 compatible (macOS default) — no longer fails silently
+- marketplace.json version two releases behind (0.0.9-alpha → 0.1.0-beta)
+- mcp-server/src/index.ts hardcoded version "1.0.0" never updated from scaffold
+- marketplace.json typo: `knowedge-graph` → `knowledge-graph`
+- README.md typo: `avaliable` → `available`
+
+### Documentation
+- Added v0.1.0-beta section to ROADMAP.md
+- Synced CHANGELOG, ROADMAP, README to v0.1.0-beta
+
+### Important Note
+This is a beta release. API and behavior may change before a stable release.
+
+---
+
 ## [0.0.10.4-alpha] - 2026-03-01
 
 ### Fixed
@@ -524,6 +551,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Planned Features (v1.0.0)
 - TBD
 
-[Unreleased]: https://github.com/technomensch/knowledge-graph/compare/v0.0.1-alpha...HEAD
+[Unreleased]: https://github.com/technomensch/knowledge-graph/compare/v0.1.0-beta...HEAD
+[0.1.0-beta]: https://github.com/technomensch/knowledge-graph/compare/v0.0.11-alpha...v0.1.0-beta
 [0.0.1-alpha]: https://github.com/technomensch/knowledge-graph/releases/tag/v0.0.1-alpha
-[1.0.0]: https://github.com/technomensch/knowledge-graph/releases/tag/v1.0.0

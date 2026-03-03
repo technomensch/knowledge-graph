@@ -1,5 +1,24 @@
 # Knowledge Management Graph — Roadmap
 
+## v0.1.0-beta (Released: 2026-03-03)
+
+**Status**: ✅ Complete - First Beta Release — Ready for External Testing
+**Branch**: `v0.1.0-beta`
+
+### Completed
+- ✅ All alpha features stable (v0.0.9 through v0.0.11-alpha integrated)
+- ✅ Comprehensive pre-beta test suite (113 tests, 9 suites) validating all systems
+- ✅ Production fixes (pre-commit sanitization hook bash 3.2 compatible)
+- ✅ Skills system fully functional (6 context providers)
+- ✅ Subagents operational with governance workflows (3 agents)
+- ✅ KG initialization with optional backfill
+- ✅ Complete `/kmgraph:` namespace (no legacy `/knowledge:` references)
+- ✅ MCP server auto-installs and upgrades cleanly
+- ✅ Comprehensive documentation (CLAUDE.md, GETTING-STARTED, COMMAND-GUIDE, CHEAT-SHEET)
+- ⚠️ Beta status: API subject to breaking changes before v1.0.0 stable
+
+---
+
 ## v0.0.10.4-alpha (Released: 2026-03-01)
 
 **Status**: ✅ Complete - MCP Server Dependency Fix

@@ -1,10 +1,21 @@
 # Knowledge Management Graph (kmgraph)
 
 ---
+!!! info
 
-**Stop losing knowledge in LLM session chat history and never forget a prompting or coding breakthrough.**
+    **Institutional knowledge from LLM sessions no longer has to disappear. Prompting breakthroughs and coding solutions can persist permanently.**
 
-**Start building a searchable library of everything you learn while developing, debugging, or architecting with AI, and retain it across sessions, projects, and even platforms (like switching from Claude to Gemini).**
+    **The plugin builds a searchable library of lessons learned during development, debugging, and architecture work that is retained across sessions and projects, with cross-model portability through chat history extraction.**
+
+
+The Knowledge Management Graph captures and structures key insights from LLM conversations (lessons learned, architecture decisions, session summaries, and more), and stores them as portable markdown files for persistent access. Storage locations are configurable (project-local or centralized).
+
+Context persists across sessions. Cross-model portability is supported through chat history extraction and manual MEMORY.md synchronization, enabling knowledge reuse when switching between LLMs.
+
+Knowledge graphs can be version-controlled and shared via Git. When a graph outgrows project-local storage, the built-in MCP server provides structured read access to graph data from any configured path and any MCP-compatible IDE.
+
+Setup takes under 5 minutes for Claude Code marketplace installs. Other platforms and local LLMs may require additional configuration time. Compatible with Claude Code, Cursor, Windsurf, and more.
+
 
 ---
 
@@ -22,7 +33,7 @@
 
 - :material-database-check: **The Outcome**
 
-  Users can easily look up that information not only in their current chat, but also in any other chat session, even if they switch to a totally different LLM, IDE, or coding assistant!
+  Captured knowledge is accessible in any session. Cross-platform portability is supported through markdown storage and chat history extraction, enabling reuse across different LLMs and IDEs.
 
 </div>
 
@@ -82,7 +93,7 @@ graph LR
 
 - **[Getting Started](GETTING-STARTED.md)**
 
-  Install, initialize, and configure in under 5 minutes. Step-by-step setup for installing with Claude Code, Cursor, or any local IDE CLI coding assistant.
+  Install, initialize, and configure the plugin. Claude Code marketplace setup takes under 5 minutes; other platforms and local LLMs may require additional configuration. Step-by-step instructions for all supported platforms.
 
 - **[Concepts](CONCEPTS.md)**
 
@@ -102,7 +113,7 @@ graph LR
 
 ## How It Works
 
-Knowledge is stored as markdown files inside the project directory. There is no external database and no cloud dependency. Any tool that opens the project can read it. If the library grows large, the content can be accessed externally via MCP servers.
+Knowledge is stored as markdown files with configurable storage locations. There is no external database and no cloud dependency. Any tool that opens the project directory can read the files directly. If the library grows large, the built-in MCP server handles access from any configured path and any MCP-compatible IDE.
 
 ???+ note "Full Feature List"
     - **Lesson-Learned Capture** with categorized storage and git metadata tracking
@@ -131,8 +142,8 @@ See [Getting Started](GETTING-STARTED.md) for platform-specific setup instructio
 
 ---
 
-!!! success "Help Shape the Beta Release"
-    This project has **finished its initial alpha development** and is now actively seeking feedback from test users before launching the beta phase. If you're interested in helping shape the future of this plugin, please [open an issue](https://github.com/technomensch/knowledge-graph/issues) with your feedback, feature requests, or bug reports.
+!!! success "Now in Beta"
+    This project has **completed its initial alpha development** and is now in beta, actively seeking feedback from test users. Feedback, feature requests, and bug reports are welcome via the [issue tracker](https://github.com/technomensch/knowledge-graph/issues).
 
 ---
 

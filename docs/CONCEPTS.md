@@ -299,5 +299,5 @@ MEMORY.md works best under 200 lines. When it grows beyond that threshold:
 </div>
 ---
 
-**Version**: 0.0.10-alpha
-**Last Updated**: 2026-03-02
+**Version**: 0.1.0-beta
+**Last Updated**: 2026-03-03

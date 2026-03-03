@@ -1,6 +1,6 @@
 {
   "name": "knowledge-management-graph",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Marketplace for the Knowledge Management Graph — structured knowledge capture and cross-session memory for Claude Code projects.",
   "owner": {
     "name": "technomensch",
@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "kmgraph",
-      "version": "0.0.9-alpha",
+      "version": "0.1.0-beta",
       "description": "Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects. Includes KG entries, ADRs, meta-issue tracking, chat extraction, and MEMORY.md bidirectional sync.",
       "source": "./",
       "author": {
@@ -22,7 +22,7 @@
       "keywords": [
         "kmgraph",
         "knowledge",
-        "knowedge-graph",
+        "knowledge-graph",
         "knowledge-management",
         "knowledge-capture",
         "structured-knowledge",
