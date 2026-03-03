@@ -2,11 +2,12 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.0.10-alpha
-**Status:** Skills, Subagents, Backfill & Token Optimization
+**Version:** 0.0.11-alpha
+**Status:** Pre-Beta Comprehensive Testing & Production Fixes
 
 Documentation avaliable at - https://technomensch.github.io/knowledge-graph/
 
+Buy me a coffee if you find this useful - https://buymeacoffee.com/technomensch
 ---
 
 ## What is this?
@@ -232,7 +233,14 @@ is installed from the marketplace. Developer-only content in `docs/` is excluded
 
 See [ROADMAP.md](ROADMAP.md) for detailed version history and development progress.
 
-**Current Release:** v0.0.10.4-alpha (2026-03-01)
+**Current Release:** v0.0.11-alpha (2026-03-03)
+- ✅ **Comprehensive Pre-Beta Test Suite** — 9 test suites covering all 113 test cases
+  - MCP server tools, resources, offloading verification
+  - Plugin components (25 commands, 6 skills, 3 agents) structural validation
+  - Hook integration and pre-commit sanitization testing
+  - Python chat extraction script validation
+- ✅ **Production Hook Fixes** — Pre-commit sanitization hook now bash 3.2 compatible (macOS default)
+- ✅ **Test Infrastructure** — Isolated test execution with KG_CONFIG_PATH environment variable support
 - ✅ MCP server auto-installs dependencies when node_modules missing after plugin install
 - ✅ Skills system (5 auto-triggered context providers)
 - ✅ Subagents: knowledge-extractor (read-only) and session-documenter
@@ -241,13 +249,13 @@ See [ROADMAP.md](ROADMAP.md) for detailed version history and development progre
 - ✅ Complete namespace migration: `/kmgraph:` everywhere
 
 **Recent Versions:**
+- v0.0.10.4-alpha (Mar 1): Pre-beta validation checkpoint
 - v0.0.10.3-alpha (Feb 27): Handoff command, delegation patterns, navigation updates
 - v0.0.10.2-alpha (Feb 27): KG backfill in init (knowledge-extractor powered)
 - v0.0.10.1-alpha (Feb 27): Skills (5), Subagents (2)
 - v0.0.10.0-alpha (Feb 27): Cleanup and workflow consolidation
-- v0.0.9-alpha (Feb 27): Namespace migration, CLAUDE.md, hook consolidation
 
-**Next:** v1.0.0 stable release (Q2 2026) incorporating alpha feedback
+**Next:** v0.1.0-beta stable release (2026-03-10) — Final review of test suite, then transition to beta program
 
 ---
 
@@ -375,5 +383,5 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Phase:** Phase 5 - Sanitization & Publishing
-**Next Milestone:** Integration testing and GitHub publication
+**Current Phase:** Pre-Beta Quality Assurance (v0.0.11-alpha)
+**Next Milestone:** v0.1.0-beta release (March 2026) — Comprehensive testing complete, production-ready
