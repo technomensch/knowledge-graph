@@ -9,7 +9,7 @@ const sanitization_js_1 = require("./tools/sanitization.js");
 const index_js_1 = require("./resources/index.js");
 const server = new mcp_js_1.McpServer({
     name: "knowledge-graph",
-    version: "1.0.0",
+    version: "0.1.0-beta",
 });
 // Register tools (7 core tools)
 (0, config_js_1.registerConfigTools)(server); // kg_config_init, kg_config_list, kg_config_switch, kg_config_add_category

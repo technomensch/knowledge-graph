@@ -8,7 +8,7 @@ import { registerConfigResource, registerTemplatesResource } from "./resources/i
 
 const server = new McpServer({
   name: "knowledge-graph",
-  version: "1.0.0",
+  version: "0.1.0-beta",
 });
 
 // Register tools (7 core tools)
