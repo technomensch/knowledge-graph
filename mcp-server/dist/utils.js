@@ -42,7 +42,7 @@ exports.walkDir = walkDir;
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const os = __importStar(require("os"));
-exports.CONFIG_PATH = path.join(os.homedir(), ".claude", "kg-config.json");
+exports.CONFIG_PATH = process.env.KG_CONFIG_PATH || path.join(os.homedir(), ".claude", "kg-config.json");
 const DEFAULT_CONFIG = {
     version: "1.0.0",
     active: null,

@@ -18,7 +18,7 @@ export function registerConfigTools(server: McpServer): void {
     "kg_config_init",
     "Create a new knowledge graph: directory structure + config entry",
     {
-      name: z.string().describe("Unique name for this knowledge graph"),
+      name: z.string().min(1).describe("Unique name for this knowledge graph"),
       kgPath: z.string().describe("Absolute path where KG should be created"),
       type: z
         .enum(["project-local", "global", "cowork", "custom"])

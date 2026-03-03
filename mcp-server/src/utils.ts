@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 
-export const CONFIG_PATH = path.join(os.homedir(), ".claude", "kg-config.json");
+export const CONFIG_PATH = process.env.KG_CONFIG_PATH || path.join(os.homedir(), ".claude", "kg-config.json");
 
 export interface CategoryConfig {
   name: string;

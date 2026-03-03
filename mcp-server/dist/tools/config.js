@@ -42,7 +42,7 @@ const utils_js_1 = require("../utils.js");
 function registerConfigTools(server) {
     // ── kg_config_init ──────────────────────────────────────────────
     server.tool("kg_config_init", "Create a new knowledge graph: directory structure + config entry", {
-        name: zod_1.z.string().describe("Unique name for this knowledge graph"),
+        name: zod_1.z.string().min(1).describe("Unique name for this knowledge graph"),
         kgPath: zod_1.z.string().describe("Absolute path where KG should be created"),
         type: zod_1.z
             .enum(["project-local", "global", "cowork", "custom"])

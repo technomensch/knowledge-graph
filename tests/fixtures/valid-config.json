@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "active": "test-kg",
+  "graphs": {
+    "test-kg": {
+      "name": "test-kg",
+      "path": "__TEST_KG_PATH__",
+      "type": "project-local",
+      "categories": [
+        { "name": "architecture", "prefix": null, "git": "commit" },
+        { "name": "process", "prefix": null, "git": "commit" },
+        { "name": "patterns", "prefix": null, "git": "commit" }
+      ],
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "lastUsed": "2026-01-01T00:00:00.000Z"
+    }
+  },
+  "sanitization": {
+    "enabled": false,
+    "patterns": [],
+    "action": "warn"
+  }
+}
