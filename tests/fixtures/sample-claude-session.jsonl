@@ -1,0 +1,4 @@
+{"type":"user","uuid":"test-001","timestamp":"2026-01-15T10:00:00Z","message":{"role":"user","content":[{"type":"text","text":"How do I configure the MCP server?"}]}}
+{"type":"assistant","uuid":"test-002","timestamp":"2026-01-15T10:00:05Z","message":{"role":"assistant","content":[{"type":"text","text":"To configure the MCP server, update your .mcp.json file with the correct path to mcp-server/dist/index.js."}]}}
+{"type":"user","uuid":"test-003","timestamp":"2026-01-15T10:01:00Z","message":{"role":"user","content":[{"type":"text","text":"What about the package name?"}]}}
+{"type":"assistant","uuid":"test-004","timestamp":"2026-01-15T10:01:05Z","message":{"role":"assistant","content":[{"type":"text","text":"Use @modelcontextprotocol/sdk as the package, not @anthropic/mcp which does not exist."}]}}
