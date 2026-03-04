@@ -143,6 +143,32 @@ Each step serves a specific purpose:
 
 ## Troubleshooting
 
+### Plugin update does not take effect { #plugin-update-does-not-take-effect }
+
+!!! warning "Known Claude Code Limitation: Plugin Cache Not Refreshed on Update"
+    Claude Code's "Update Now" feature and `claude plugin update` command update version metadata but do **not** re-download plugin files. The installed plugin continues running from the old cached version after an update.
+
+    This is a known platform issue ([#19197](https://github.com/anthropics/claude-code/issues/19197), [#14061](https://github.com/anthropics/claude-code/issues/14061)).
+
+    **Symptoms:**
+    - Installed tab still shows the old version number
+    - New commands or skills added in the update are unavailable
+    - MCP server shows a `failed` status
+
+    **Fix — clear the cache and reinstall:**
+
+    ```bash
+    # Step 1: Remove the stale cache
+    rm -rf ~/.claude/plugins/cache/stayinginsync-knowledge-graph/
+
+    # Step 2: Reinstall via the Claude Code /plugin UI
+    # Uninstall kmgraph, then reinstall from the marketplace
+    ```
+
+    **Step 3: Reconnect the MCP server**
+
+    After reinstalling, open `/plugin` → **Installed** → **kmgraph** → **MCP Server** → **Reconnect**.
+
 ### Commands do not appear in Claude Code autocomplete
 
 - Verify the plugin is loaded: start Claude Code with `claude --plugin-dir /path/to/knowledge-graph`
