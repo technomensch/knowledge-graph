@@ -2,8 +2,8 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 14
-**Last Updated:** 2026-03-01
+**Total ADRs:** 16
+**Last Updated:** 2026-03-16
 
 ---
 
@@ -22,6 +22,8 @@ Formal documentation of significant architecture decisions.
 - [ADR-011: Defer Update Notifications and Version Sync to v0.0.9](ADR-011-defer-update-notifications.md) — **Status:** Accepted
 - [ADR-013: Documentation Update Protocol for Multi-Branch Releases](ADR-013-documentation-update-protocol.md) — **Status:** Accepted
 - [ADR-014: Maintain Dual Plan File Locations](ADR-014-maintain-dual-plan-file-locations.md) — **Status:** Accepted
+- [ADR-015: Choose node-sqlite3-wasm for FTS5 Full-Text Search](ADR-015-node-sqlite3-wasm-for-fts5-search.md) — **Status:** Accepted
+- [ADR-016: Graceful Fallback Pattern for Optional MCP Server Dependencies](ADR-016-graceful-fallback-optional-mcp-dependencies.md) — **Status:** Accepted
 
 ---
 
@@ -42,6 +44,8 @@ Formal documentation of significant architecture decisions.
 | **ADR-011** | Feb 21 | Defer Update Notifications and Version Sync to v0.0.9 | v0.0.9 | Accepted |
 | **ADR-013** | Feb 27 | Documentation Update Protocol for Multi-Branch Releases | v0.0.10 | Accepted |
 | **ADR-014** | Mar 01 | Maintain Dual Plan File Locations | v0.0.10 | Accepted |
+| **ADR-015** | Mar 16 | Choose node-sqlite3-wasm for FTS5 Full-Text Search | v0.1.2-beta | Accepted |
+| **ADR-016** | Mar 16 | Graceful Fallback Pattern for Optional MCP Server Dependencies | v0.1.2-beta | Accepted |
 
 ---
 
@@ -53,6 +57,8 @@ Formal documentation of significant architecture decisions.
 - [ADR-006](ADR-006-delegated-vs-inline-kg-updates.md) — Delegated vs inline KG update architecture
 - [ADR-009](ADR-009-three-tier-installation-architecture.md) — Three-tier installation (Tier 1/2/3)
 - [ADR-010](ADR-010-namespace-rename-knowledge-to-kg-sis.md) — Plugin namespace: `knowledge` → `kg-sis`
+- [ADR-015](ADR-015-node-sqlite3-wasm-for-fts5-search.md) — node-sqlite3-wasm (WASM SQLite) for FTS5 search
+- [ADR-016](ADR-016-graceful-fallback-optional-mcp-dependencies.md) — Graceful fallback pattern for optional MCP dependencies
 
 ### Implementation & Patterns
 - [ADR-003](ADR-003-abandon-shadow-commands-for-file-prefix.md) — Shadow commands → file prefix workaround

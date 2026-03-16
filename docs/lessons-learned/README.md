@@ -2,19 +2,20 @@
 
 Comprehensive catalog of all lessons-learned documents.
 
-**Total Lessons:** 7
-**Last Updated:** 2026-03-01
+**Total Lessons:** 8
+**Last Updated:** 2026-03-16
 
 ---
 
 ## By Category
 
-### Architecture Lessons (2 total)
+### Architecture Lessons (3 total)
 
+- [2026-03-16 - Native FTS5 Search and Context-Mode Integration (v0.1.1+v0.1.2)](architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2.md) - node-sqlite3-wasm chosen for FTS5 over better-sqlite3 (native) and sql.js (FTS3 only); zero-config upgrade via package.json hash check; try/require graceful fallback for optional deps; TypeScript TS2749 fix; context-mode detection-based integration
 - [2026-02-21 - Plugin Example File Management — Why You Can't Gate the Download](architecture/Lessons_Learned_Plugin_Example_File_Management.md) - Plugin installs are atomic; git pull restores deleted tracked files; three options evaluated for opt-out; decision deferred
 - [2026-02-21 - Update Notifications for Non-Plugin Users — Version Sync and MCP Discovery Gap](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md) - MCP server version hardcoded and out of sync; four-part solution designed; deferred to v0.0.9
 
-**Tags:** #architecture #plugin-distribution #git #versioning #mcp #update-notifications
+**Tags:** #architecture #plugin-distribution #git #versioning #mcp #update-notifications #fts5 #search #sqlite #wasm #zero-config #upgrade #graceful-fallback #context-mode #typescript
 
 ---
 
@@ -48,6 +49,7 @@ Comprehensive catalog of all lessons-learned documents.
 ## Chronological Index
 
 **2026**
+- 2026-03-16: [Native FTS5 Search and Context-Mode Integration (v0.1.1+v0.1.2)](architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2.md)
 - 2026-03-01: [Plan File Dual-Location Protocol](process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md)
 - 2026-02-28: [MkDocs Grid Cards Require 4-Space Indentation](debugging/Lessons_Learned_MkDocs_Grid_Cards_Indentation.md)
 - 2026-02-27: [Documentation Update Triggers in Multi-Branch Feature Development](process/documentation-update-triggers-multibranchfeatures.md)
@@ -60,9 +62,19 @@ Comprehensive catalog of all lessons-learned documents.
 
 ## Tag Index
 
-**#architecture** (2 lessons)
+**#architecture** (3 lessons)
+- [Native FTS5 Search and Context-Mode Integration](architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2.md)
 - [Plugin Example File Management](architecture/Lessons_Learned_Plugin_Example_File_Management.md)
 - [Update Notifications for Non-Plugin Users](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md)
+
+**#fts5** (1 lesson)
+- [Native FTS5 Search and Context-Mode Integration](architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2.md)
+
+**#zero-config** (1 lesson)
+- [Native FTS5 Search and Context-Mode Integration](architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2.md)
+
+**#graceful-fallback** (1 lesson)
+- [Native FTS5 Search and Context-Mode Integration](architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2.md)
 
 **#plugin-distribution** (2 lessons)
 - [Plugin Example File Management](architecture/Lessons_Learned_Plugin_Example_File_Management.md)
