@@ -360,33 +360,49 @@ cat ${kg_path}/sessions/README.md
 **Last Updated:** 2026-01-02
 ```
 
-### Step 9: Suggest Related Actions
+### Step 9: Lesson Capture Check
 
-**After saving, suggest:**
+**After saving, assess whether the session had meaningful work:**
+
+Meaningful work indicators (require 2 or more):
+- New files created or significant code changes
+- Architectural decisions made or significant problems solved
+- New patterns, bugs, or workflows discovered
+- More than 2 commits created
+
+**If meaningful work detected**, ask the user:
 
 ```markdown
-✅ **Session summary saved:**
-{active_kg_path}/sessions/2026-01/2026-01-02_memory-system-design.md
+✅ Session summary saved: {filename}
 
-**Suggested next actions:**
+Did you capture a lesson learned for this session?
 
-1. **Create ADR (if architectural decisions made):**
-   - Decision: "Four-pillar memory architecture"
-   - Command: Create ADR-005 documenting this choice
+The session summary records *what happened* — a lesson captures *why it worked*
+and *how to apply it again*. They serve different purposes and are both worth having
+for sessions with significant decisions or discoveries.
 
-2. **Create lesson learned (if significant pattern discovered):**
-   - Pattern: "Template-driven knowledge capture"
-   - Command: /kmgraph:capture-lesson
+1. Yes, already captured — done
+2. No, launch /kmgraph:capture-lesson now
+3. Skip — I'll capture it later or it's not needed
+```
 
-3. **Update knowledge graph (if new concepts emerged):**
-   - Add to {active_kg_path}/knowledge/patterns.md
-   - Add to {active_kg_path}/knowledge/concepts.md
+**If user selects 1 (already captured):** Confirm and end.
 
-4. **Commit summary:**
-   ```bash
-   git add ${kg_path}/sessions/
-   git commit -m "docs(session): add memory system design summary"
-   ```
+**If user selects 2 (launch capture-lesson):** Hand off directly to `/kmgraph:capture-lesson`.
+- Pre-fill context: suggest the session title as the lesson topic starting point
+- The capture-lesson workflow takes over from here (ADR detection, git metadata, etc.)
+
+**If user selects 3 (skip):** End cleanly — no warning, no repeat prompt.
+
+**If session had no meaningful work** (e.g., read-only session, short planning discussion, trivial changes): Skip this prompt entirely — do not ask about lessons for low-signal sessions.
+
+**After lesson check, suggest remaining actions if relevant:**
+
+```markdown
+**Other suggested actions:**
+
+- Update knowledge graph: /kmgraph:update-graph (if new lessons were captured)
+- Sync everything: /kmgraph:sync-all (weekly consolidation)
 ```
 
 ---
@@ -574,6 +590,6 @@ Use /kmgraph:recall to find this session later.
 ---
 
 **Created:** 2026-02-12
-**Version:** 1.0 (Plugin version)
+**Version:** 1.1 (Updated: 2026-03-16) <!-- v1.1 Change: lesson capture prompt in Step 9 -->
 **Integration:** Works with /patch, /doc-update, context management
 **Related Skills:** /kmgraph:capture-lesson, /kmgraph:recall
