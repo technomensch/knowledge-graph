@@ -2,8 +2,8 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.1.1-beta
-**Status:** Beta Release — Context-Mode Token Savings Integration
+**Version:** 0.1.2-beta
+**Status:** Beta Release — Native FTS5 Search with BM25 Ranking
 
 Documentation available at - https://technomensch.github.io/knowledge-graph/
 

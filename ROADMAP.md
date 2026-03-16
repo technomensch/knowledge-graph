@@ -1,5 +1,20 @@
 # Knowledge Management Graph — Roadmap
 
+## v0.1.2-beta (In Progress: 2026-03-16)
+
+**Status**: 🔄 In Progress - Native FTS5 Search
+**Branch**: `v0.1.2-beta-native-fts5-search`
+
+### Completed
+- ✅ `kg_fts5_rebuild` MCP tool: incremental rebuild, BM25 ranking, porter stemming, deletion cleanup
+- ✅ `kg_search`: FTS5 path when `.fts5.db` exists; linear scan fallback; `(FTS5)` label
+- ✅ `sync-all` Step 8: auto-refresh or one-time offer; `fts5_declined` preference persistence
+- ✅ `node-sqlite3-wasm` dependency (WASM, FTS5+BM25, zero native compilation)
+- ✅ `.fts5.db` added to `.gitignore`
+- ⚠️ User-facing docs (COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED) deferred to v0.0.4-github-docs after testing
+
+---
+
 ## v0.1.1-beta (Released: 2026-03-16)
 
 **Status**: ✅ Complete - Context-Mode Token Savings Integration
