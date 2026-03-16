@@ -44,7 +44,7 @@ Active users use these for regular workflows:
 
 | Command | Purpose |
 |---------|---------|
-| `/kmgraph:update-graph` | Extract knowledge graph entries from lessons |
+| `/kmgraph:update-graph` | Extract knowledge graph entries from lessons. Uses background file reading for large batches when context-mode is installed |
 | `/kmgraph:add-category` | Add a new category to existing knowledge graph |
 | `/kmgraph:session-summary` | Create summary of current chat session |
 | `/kmgraph:list` | Display all configured knowledge graphs |
@@ -66,7 +66,7 @@ Power users leverage these for complex workflows:
 | `/kmgraph:link-issue` | Manually link existing lesson or ADR to GitHub issue |
 | `/kmgraph:archive-memory` | Archive stale MEMORY.md entries to prevent bloat |
 | `/kmgraph:restore-memory` | Restore archived MEMORY.md entries |
-| `/kmgraph:sync-all` | Automated full sync pipeline (4 steps → 1 command) |
+| `/kmgraph:sync-all` | Automated full sync pipeline (4 steps → 1 command). Uses background file scanning when context-mode is installed. Refreshes search index automatically if built |
 | `/kmgraph:handoff` | Create comprehensive handoff documentation for transitions or onboarding |
 
 ---
@@ -134,6 +134,7 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 - **Active KG**: The currently selected knowledge graph when multiple graphs are configured
 - **Session Summary**: Markdown summary of a chat session extracted from conversation history
 - **Recall**: Unified search across lessons learned, decisions, knowledge graph, and session summaries
+- **Search Index** (`kg_fts5_rebuild`): Optional catalog of all knowledge graph content. Build or refresh it for faster, relevance-ranked search results. Updates automatically during sync-all once enabled
 
 ---
 
