@@ -65,6 +65,7 @@ Verify the plugin loaded by typing `/knowledge` — the autocomplete menu should
 ```
 
 The initialization wizard prompts for:
+
 - **Project name** — the name of the current project
 - **Git tracking** — enable to automatically capture branch and commit metadata
 - **Optional Backfill** (Step 1.10) — "Would you like to backfill the knowledge graph from existing project context? [y/N]"

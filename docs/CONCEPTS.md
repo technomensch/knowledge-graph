@@ -175,6 +175,106 @@ flowchart LR
 
 ---
 
+---
+
+## Keeping the Conversation Focused
+
+When kmgraph syncs or updates the knowledge graph, it reads files to do its work. In a large knowledge graph, that means a lot of content entering the conversation at once — content that stays in memory even after the work is done. The context-mode plugin, when installed, moves that file-reading to a background process. Only a short summary returns to the conversation. The knowledge graph gets updated the same way — the conversation just stays cleaner.
+
+The diagram below illustrates the difference between reading files inline versus in a background process.
+
+```mermaid
+flowchart LR
+    subgraph inline ["Without background processing"]
+        direction TB
+        W1([Sync starts]) --> W2[File 1 enters chat]
+        W2 --> W3[File 2 enters chat]
+        W3 --> W4[File 3 enters chat ...]
+        W4 --> W5([Chat is now crowded])
+    end
+    subgraph background ["With background processing"]
+        direction TB
+        B1([Sync starts]) --> B2[Files read\nin background]
+        B2 --> B3([One-line summary\nenters chat])
+    end
+```
+
+Both approaches produce identical results. Background processing is optional and activates automatically when the context-mode plugin is installed. No configuration is required.
+
+---
+
+## How Search Works
+
+When a search is run, kmgraph needs to match the query against everything in the knowledge graph. There are two ways to do this. The first is to open each file one by one and check whether the query appears — straightforward, but slower as the knowledge graph grows, and results are sorted by where the match appeared in the file rather than how relevant the file is. The second is to maintain a search index: a compact catalog built from all the files that can be queried directly. The index returns results ranked by relevance — files that closely match the query float to the top. The index is optional and kept current automatically.
+
+The diagram below compares search without and with the index.
+
+```mermaid
+flowchart LR
+    subgraph without ["Without index (default)"]
+        direction TB
+        S1([Search query]) --> F1[Read file 1]
+        F1 --> F2[Read file 2]
+        F2 --> F3[Read file 3 ...]
+        F3 --> R1([Results in file order])
+    end
+    subgraph with ["With index (optional)"]
+        direction TB
+        S2([Search query]) --> I[Query index]
+        I --> R2([Ranked results instantly])
+    end
+```
+
+Without an index, kmgraph reads each file in the knowledge graph sequentially. With an index, a single query returns results sorted by relevance. Both methods return the same files — the index is faster and ranks more relevant matches higher.
+
+The diagram below shows the two search paths in detail.
+
+```mermaid
+flowchart TD
+    A([Search query]) --> B{Search index\navailable?}
+
+    B -- No --> C[Open each file\none by one]
+    C --> D[Collect matches]
+    D --> E([Results in\nfile order])
+
+    B -- Yes --> F[Query the index]
+    F --> G([Results ranked\nby relevance])
+```
+
+Both paths return results from the same knowledge graph files. The difference is speed and ranking: the indexed path is faster for large knowledge graphs and surfaces the most relevant results first. The index is built once and updated automatically during sync.
+
+The search label `(FTS5)` in results means the index was used. FTS5 stands for Full-Text Search version 5 — the underlying search technology. The label can be ignored; it is there for users who want to know which path was taken.
+
+### How to Enable the Search Index
+
+The index is off by default and takes about a second to build. Once enabled, it stays current automatically — no maintenance required.
+
+The first time `/kmgraph:sync-all` is run, it will ask once whether to build the index. Answer yes and the index builds automatically. After that, every `sync-all` run keeps it current with no prompts.
+
+To build the index at any time without running sync-all: call `kg_fts5_rebuild` from the MCP tool panel.
+
+The diagram below shows what happens the first time sync-all is run after upgrading.
+
+```mermaid
+flowchart TD
+    A([Run sync-all]) --> B{Index already\nbuilt?}
+    B -- Yes --> C([Index refreshes\nautomatically])
+    B -- No --> D{Previously\ndeclined?}
+    D -- Yes --> E([Skipped silently])
+    D -- No --> F{Asked once:\nBuild search index?}
+    F -- Yes --> G([Index built —\nauto-updates from now on])
+    F -- No --> H([Skipped —\nnot asked again])
+```
+
+If a search index already exists, sync-all refreshes it automatically with no prompt. If no index exists and the user has not previously declined, sync-all asks once. The preference is remembered — users are never asked again regardless of the answer.
+
+- **How to tell it is active**: search results show `(FTS5)` — this means the index was used
+- **How to re-enable after declining**: run `kg_fts5_rebuild` directly
+- **How to revert**: delete the `.fts5.db` file from the knowledge graph root folder
+
+---
+
+
 ## Common Questions
 
 ### "Is git required to use the knowledge graph?"
@@ -194,6 +294,7 @@ Both types are valuable. Lessons capture problem-solving journeys. Decisions cap
 ### "Can the knowledge graph be used without Claude Code?"
 
 Yes. The core system (`core/` directory) is platform-agnostic and works with:
+
 - **Manual workflows** — Copy templates, edit by hand, commit to git
 - **Other AI assistants** — Cursor, Continue, Aider, or any tool that reads markdown
 - **Python scripts** — Included in `core/scripts/` for standalone operations
@@ -214,6 +315,7 @@ Regular notes are freeform and often lost or forgotten. A knowledge graph adds s
 ### "What happens when MEMORY.md gets too large?"
 
 MEMORY.md works best under 200 lines. When it grows beyond that threshold:
+
 1. Run `/kmgraph:archive-memory` to move older entries to `MEMORY-archive.md`
 2. Archived entries remain available for reference but no longer load into AI context
 3. Run `/kmgraph:restore-memory` to bring back any archived entry when needed
@@ -248,7 +350,7 @@ MEMORY.md works best under 200 lines. When it grows beyond that threshold:
 
 - [Getting Started Guide](GETTING-STARTED.md)
 
- Installation, setup, first lesson walkthrough
+  Installation, setup, first lesson walkthrough
 
 - [Installation](INSTALL.md)
 
@@ -274,58 +376,6 @@ MEMORY.md works best under 200 lines. When it grows beyond that threshold:
 
   Real-world lesson, ADR, and KG entry examples
 </div>
-
----
-
-## Keeping the Conversation Focused
-
-When kmgraph syncs or updates the knowledge graph, it reads files to do its work. In a large knowledge graph, that means a lot of content entering the conversation at once — content that stays in memory even after the work is done. The context-mode plugin, when installed, moves that file-reading to a background process. Only a short summary returns to the conversation. The knowledge graph gets updated the same way — the conversation just stays cleaner.
-
-The diagram below illustrates the difference between reading files inline versus in a background process.
-
-```mermaid
-flowchart LR
-    subgraph inline ["Without background processing"]
-        direction TB
-        W1([Sync starts]) --> W2[File 1 enters chat]
-        W2 --> W3[File 2 enters chat]
-        W3 --> W4[File 3 enters chat ...]
-        W4 --> W5([Chat is now crowded])
-    end
-    subgraph background ["With background processing"]
-        direction TB
-        B1([Sync starts]) --> B2[Files read\nin background]
-        B2 --> B3([One-line summary\nenters chat])
-    end
-```
-
-Both approaches produce identical results. Background processing is optional and activates automatically when the context-mode plugin is installed. No configuration is required.
-
----
-
-## How Search Works
-
-When a search is run, kmgraph needs to match the query against everything in the knowledge graph. There are two ways to do this. The first is to open each file one by one and check whether the query appears — straightforward, but slower as the knowledge graph grows, and results are sorted by where the match appeared in the file rather than how relevant the file is. The second is to maintain a search index: a compact catalog built from all the files that can be queried directly. The index returns results ranked by relevance — files that closely match the query float to the top. The index is optional and kept current automatically.
-
-The diagram below shows the two search paths.
-
-```mermaid
-flowchart TD
-    A([Search query]) --> B{Search index\navailable?}
-
-    B -- No --> C[Open each file\none by one]
-    C --> D[Collect matches]
-    D --> E([Results in\nfile order])
-
-    B -- Yes --> F[Query the index]
-    F --> G([Results ranked\nby relevance])
-```
-
-Both paths return results from the same knowledge graph files. The difference is speed and ranking: the indexed path is faster for large knowledge graphs and surfaces the most relevant results first. The index is built once and updated automatically during sync.
-
-The search label `(FTS5)` in results means the index was used. FTS5 stands for Full-Text Search version 5 — the underlying search technology. The label can be ignored; it is there for users who want to know which path was taken.
-
----
 
 ### **Advanced**
 <div class="grid cards" markdown>
