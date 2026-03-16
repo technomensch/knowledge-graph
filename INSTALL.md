@@ -138,13 +138,31 @@ Then instruct the user to launch Claude Code with the plugin directory:
 claude --plugin-dir /path/to/knowledge-graph
 ```
 
-**After installation, go to Step 3 (Initialize Knowledge Graph).**
+**After installation, go to Step 2A.1 (Optional: install context-mode), then Step 3.**
+
+#### Step 2A.1: Install context-mode (Optional — Claude Code only)
+
+context-mode is a companion plugin that keeps the conversation cleaner when syncing large knowledge graphs. When installed, `sync-all` and `update-graph` offload file reading to a background process — only a short summary returns to the conversation. Nothing changes if it is not installed.
+
+Ask the user:
+
+```
+Would you like to install context-mode for cleaner conversations during large syncs? (y/N)
+```
+
+**If yes:**
+
+```bash
+claude plugin install context-mode
+```
+
+After installing, restart Claude Code. No further configuration is needed — kmgraph detects context-mode automatically.
 
 ---
 
 ### Step 2B: MCP IDE Installation (Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Claude Desktop)
 
-This path installs the MCP server, which provides 7 tools for knowledge management: `kg_config_init`, `kg_config_list`, `kg_config_switch`, `kg_config_add_category`, `kg_search`, `kg_scaffold`, and `kg_check_sensitive`.
+This path installs the MCP server, which provides 8 tools for knowledge management: `kg_config_init`, `kg_config_list`, `kg_config_switch`, `kg_config_add_category`, `kg_search`, `kg_scaffold`, `kg_check_sensitive`, and `kg_fts5_rebuild` (build or refresh a search index for faster, relevance-ranked results).
 
 #### 2B.1: Check Prerequisites
 

@@ -141,6 +141,72 @@ Each step serves a specific purpose:
 
 ---
 
+## Optional Features
+
+### Cleaner Conversations
+
+If the context-mode plugin is installed alongside kmgraph, `sync-all` and `update-graph` offload heavy file-reading to a background process, keeping the conversation cleaner. No configuration is required — kmgraph detects context-mode automatically. Nothing changes if context-mode is not installed.
+
+The diagram below shows how `sync-all` handles file reading differently depending on whether context-mode is installed.
+
+```mermaid
+flowchart LR
+    A([sync-all runs]) --> B{context-mode\ninstalled?}
+    B -- Yes --> C[File reading\nruns in background]
+    C --> D([Short summary\nreturns to chat])
+    B -- No --> E[File reading\nruns in chat]
+    E --> D
+```
+
+When context-mode is installed, file reading is offloaded to a background process. When it is not installed, file reading runs inline in the conversation. Both paths produce the same result.
+
+---
+
+### Faster Search (Optional)
+
+By default, kmgraph searches by reading every file in the knowledge graph. For larger knowledge graphs, building a search index makes results faster and ranks them by relevance. The first time `/kmgraph:sync-all` is run after upgrading, kmgraph will ask once whether to build the index. After that, the index stays current automatically.
+
+The diagram below compares how kmgraph searches without and with a search index.
+
+```mermaid
+flowchart LR
+    subgraph without ["Without index (default)"]
+        direction TB
+        S1([Search query]) --> F1[Read file 1]
+        F1 --> F2[Read file 2]
+        F2 --> F3[Read file 3 ...]
+        F3 --> R1([Results in file order])
+    end
+    subgraph with ["With index (optional)"]
+        direction TB
+        S2([Search query]) --> I[Query index]
+        I --> R2([Ranked results instantly])
+    end
+```
+
+Without an index, kmgraph reads each file in the knowledge graph sequentially. With an index, a single query returns results sorted by relevance. Both methods return the same files — the index is faster and ranks more relevant matches higher.
+
+The diagram below shows what happens the first time `sync-all` is run after upgrading to a version that supports the search index.
+
+```mermaid
+flowchart TD
+    A([Run sync-all]) --> B{Index already\nbuilt?}
+    B -- Yes --> C([Index refreshes\nautomatically])
+    B -- No --> D{Previously\ndeclined?}
+    D -- Yes --> E([Skipped silently])
+    D -- No --> F{Asked once:\nBuild search index?}
+    F -- Yes --> G([Index built —\nauto-updates from now on])
+    F -- No --> H([Skipped —\nnot asked again])
+```
+
+If a search index already exists, sync-all refreshes it automatically with no prompt. If no index exists and the user has not previously declined, sync-all asks once. The preference is remembered — users are never asked again regardless of the answer.
+
+How to tell the index is active: search results show `(FTS5)` — this just means the index was used. How to build the index manually: run `kg_fts5_rebuild` from the MCP tool panel. How to revert: delete the `.fts5.db` file from the knowledge graph root folder.
+
+**After backfill:** If the backfill option was used during `/kmgraph:init`, the knowledge graph now contains a full set of imported content. This is a good time to build the search index so all that content is immediately searchable by relevance. Run `/kmgraph:sync-all` and accept the index prompt, or call `kg_fts5_rebuild` directly.
+
+---
+
 ## Troubleshooting
 
 ### Plugin update does not take effect { #plugin-update-does-not-take-effect }
