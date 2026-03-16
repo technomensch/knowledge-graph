@@ -138,7 +138,25 @@ Then instruct the user to launch Claude Code with the plugin directory:
 claude --plugin-dir /path/to/knowledge-graph
 ```
 
-**After installation, go to Step 3 (Initialize Knowledge Graph).**
+**After installation, go to Step 2A.1 (Optional: install context-mode), then Step 3.**
+
+#### Step 2A.1: Install context-mode (Optional — Claude Code only)
+
+context-mode is a companion plugin that keeps the conversation cleaner when syncing large knowledge graphs. When installed, `sync-all` and `update-graph` offload file reading to a background process — only a short summary returns to the conversation. Nothing changes if it is not installed.
+
+Ask the user:
+
+```
+Would you like to install context-mode for cleaner conversations during large syncs? (y/N)
+```
+
+**If yes:**
+
+```bash
+claude plugin install context-mode
+```
+
+After installing, restart Claude Code. No further configuration is needed — kmgraph detects context-mode automatically.
 
 ---
 
