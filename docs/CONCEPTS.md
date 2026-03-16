@@ -248,7 +248,7 @@ MEMORY.md works best under 200 lines. When it grows beyond that threshold:
 
 - [Getting Started Guide](GETTING-STARTED.md)
 
- Installation, setup, first lesson walkthrough
+  Installation, setup, first lesson walkthrough
 
 - [Installation](INSTALL.md)
 
