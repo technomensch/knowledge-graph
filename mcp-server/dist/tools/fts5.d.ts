@@ -1,5 +1,4 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { Database } from "node-sqlite3-wasm";
 export declare const FTS5_DB_FILENAME = ".fts5.db";
 export interface RebuildResult {
     indexed: number;
@@ -28,13 +27,13 @@ export declare function sanitizeFts5Query(raw: string): string;
  * Creates the FTS5 virtual table and the index-meta tracking table if they do
  * not already exist.
  */
-export declare function initDb(db: Database): void;
+export declare function initDb(db: any): void;
 /**
  * Parses a single markdown file into sections and inserts FTS5 rows.
  *
  * Returns the number of rows inserted.
  */
-export declare function indexFile(db: Database, filePath: string, kgPath: string): number;
+export declare function indexFile(db: any, filePath: string, kgPath: string): number;
 /**
  * Incrementally rebuilds the FTS5 index for a knowledge graph.
  *
