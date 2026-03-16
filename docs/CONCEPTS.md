@@ -194,6 +194,7 @@ Both types are valuable. Lessons capture problem-solving journeys. Decisions cap
 ### "Can the knowledge graph be used without Claude Code?"
 
 Yes. The core system (`core/` directory) is platform-agnostic and works with:
+
 - **Manual workflows** — Copy templates, edit by hand, commit to git
 - **Other AI assistants** — Cursor, Continue, Aider, or any tool that reads markdown
 - **Python scripts** — Included in `core/scripts/` for standalone operations
@@ -214,6 +215,7 @@ Regular notes are freeform and often lost or forgotten. A knowledge graph adds s
 ### "What happens when MEMORY.md gets too large?"
 
 MEMORY.md works best under 200 lines. When it grows beyond that threshold:
+
 1. Run `/kmgraph:archive-memory` to move older entries to `MEMORY-archive.md`
 2. Archived entries remain available for reference but no longer load into AI context
 3. Run `/kmgraph:restore-memory` to bring back any archived entry when needed
