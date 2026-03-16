@@ -140,7 +140,7 @@ Commands work across platforms, but full automation is Claude Code-specific.
 
 ## Browse Commands by Category
 
-=== "Setup & Configuration" {: #-kgsisinitcommands-tab}
+=== "Setup & Configuration"
 
     Get the knowledge graph running and configure how it works.
 
@@ -150,7 +150,7 @@ Commands work across platforms, but full automation is Claude Code-specific.
     - [🟡 `/kmgraph:add-category`](#-kgsisadd-category-commands-tab) — Add custom categories
     - [🟡 `/kmgraph:config-sanitization`](#-kgsisconfig-sanitization-commands-tab) — Set up safety features for team sharing
 
-=== "Capture & Document" {: #-kgsiscapture-lesson-commands-tab}
+=== "Capture & Document"
 
     Document lessons, capture history, and summarize sessions.
 
@@ -158,7 +158,7 @@ Commands work across platforms, but full automation is Claude Code-specific.
     - [🟡 `/kmgraph:extract-chat`](#-kgsisextract-chat-commands-tab) — Export chat history to markdown
     - [🟡 `/kmgraph:session-summary`](#-kgsisssession-summary-commands-tab) — Summarize important work sessions
 
-=== "Search & Synchronization" {: #-kgsisstatus-commands-tab}
+=== "Search & Sync"
 
     Find knowledge and keep the graph synchronized.
 
@@ -168,14 +168,14 @@ Commands work across platforms, but full automation is Claude Code-specific.
     - [🟡 `/kmgraph:update-doc`](#-kgsisupdate-doc-commands-tab) — Update documentation with changes
     - [🔴 `/kmgraph:sync-all`](#-kgsissync-all-commands-tab) — Run complete synchronization pipeline
 
-=== "Team & Sharing" {: #-kgsischeck-sensitive-commands-tab}
+=== "Team & Sharing"
 
     Share knowledge safely with team members.
 
     - [🟡 `/kmgraph:check-sensitive`](#-kgsischeck-sensitive-commands-tab) — Scan for sensitive data before sharing
     - [🔴 `/kmgraph:link-issue`](#-kgsislink-issue-commands-tab) — Connect lessons to GitHub issues
 
-=== "Advanced Issues" {: #-kgsismeta-issue-commands-tab}
+=== "Advanced Issues"
 
     Track complex, multi-attempt problems systematically.
 
@@ -183,7 +183,7 @@ Commands work across platforms, but full automation is Claude Code-specific.
     - [🔴 `/kmgraph:start-issue-tracking`](#-kgsisstart-issue-tracking-commands-tab) — Systematic issue tracking with Git branches
     - [🔴 `/kmgraph:update-issue-plan`](#-kgsisupdate-issue-plan-commands-tab) — Sync progress with GitHub and plans
 
-=== "Memory Management" {: #-kgsisarchive-memory-commands-tab}
+=== "Memory Management"
 
     Manage MEMORY.md size and archive old patterns.
 
@@ -1300,7 +1300,7 @@ flowchart TD
   Term definitions
 </div>
 
-###**Writing better entries**
+### **Writing better entries**
 <div class="grid cards" markdown>
 - [Patterns Guide](reference/PATTERNS-GUIDE.md)
 
@@ -1312,7 +1312,7 @@ flowchart TD
 
 - [Examples](examples/)
 
-Real samples
+  Real samples
 </div>
 
 ## Next Steps
