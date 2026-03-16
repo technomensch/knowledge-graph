@@ -285,6 +285,7 @@ The system presents candidates for your review before creating entries.
 ```
 
 **Tips**:
+
 - Capture while the problem is fresh (don't wait)
 - Include error messages verbatim
 - Note what DIDN'T work (helps future you)
@@ -303,6 +304,7 @@ The system presents candidates for your review before creating entries.
 - Quick health check on the knowledge graph
 
 **What it shows**:
+
 - Active KG name and file path
 - Categories and git strategy
 - Last sync timestamp
@@ -351,6 +353,7 @@ Quick Commands:
 - Searching for context on a topic
 
 **What it searches**:
+
 - Lessons learned (full text)
 - Architecture decisions (ADRs)
 - Knowledge entries (patterns, gotchas, concepts)
@@ -373,6 +376,7 @@ Quick Commands:
 ```
 
 **Search tips**:
+
 - Use specific terms ("PostgreSQL timeout" > "database")
 - Try synonyms if nothing found
 - Search by date: `/kmgraph:recall "2024-01"`
@@ -415,6 +419,7 @@ Quick Commands:
 ```
 
 **Tips**:
+
 - `--auto` flag is useful when called from other commands (e.g., after `/kmgraph:capture-lesson`)
 - `--interactive` flag lets you review and edit each extracted entry before saving
 
@@ -485,6 +490,7 @@ Quick Commands:
 ```
 
 **Tips**:
+
 - Captures git commits automatically — no need to list them manually
 - Auto-suggests summary when context approaches ~180K tokens
 
@@ -502,6 +508,7 @@ Quick Commands:
 - Verify a new KG was created successfully
 
 **What it shows**:
+
 - All configured knowledge graphs with numbered list
 - Active KG highlighted
 - Location paths, categories, git strategy, last used timestamp
@@ -558,6 +565,7 @@ Total: 2 knowledge graph(s) configured
 ```
 
 **Tips**:
+
 - All subsequent knowledge commands operate on the newly active KG
 - Use `/kmgraph:list` first to see available options
 
@@ -662,6 +670,7 @@ Test the hook:
 **Time**: Under 30 seconds
 
 **Date filtering options**:
+
 - `--today` — Extract only today's sessions
 - `--date=YYYY-MM-DD` — Extract only sessions from a specific date
 - `--after=YYYY-MM-DD` — Extract sessions from this date onwards (inclusive)
@@ -680,6 +689,7 @@ Test the hook:
 ```
 
 **Tips**:
+
 - Extracted files are automatically searchable via `/kmgraph:recall`
 - Optional `blackboxprotobuf` Python library enables Gemini protobuf file support
 - Date ranges use natural language: `YYYY-MM-DD through YYYY-MM-DD` or `YYYY-MM-DD to YYYY-MM-DD`
@@ -718,6 +728,7 @@ With `--user-facing`:
 ```
 
 **Tips**:
+
 - Always use `--user-facing` for plugin/project docs (README, COMMAND-GUIDE, CHEAT-SHEET, etc.)
 - Without `--user-facing`, a dialog clarifies whether the target is plugin docs or KG content
 - Standards validation runs automatically — violations are flagged before writing
@@ -803,6 +814,7 @@ With `--user-facing`:
 ```
 
 **Tips**:
+
 - Uses the Dual-ID Policy: local IDs (`issue-N` or `ENH-NNN`) are independent from GitHub issue numbers (`#N`)
 - Always use `--body-file` flag (not manual summary) when creating the GitHub Issue
 
@@ -839,6 +851,7 @@ With `--user-facing`:
 ```
 
 **Tips**:
+
 - Works fully offline — GitHub steps gracefully degrade if `gh` CLI is not installed
 - Decision gates will prompt before creating new issues for out-of-scope discoveries
 
@@ -905,6 +918,7 @@ With `--user-facing`:
 ```
 
 **Tips**:
+
 - Token limits: 1,500 soft (warning) / 2,000 hard (block)
 - Archived entries can be restored with `/kmgraph:restore-memory`
 
@@ -988,6 +1002,7 @@ Session:          2026-02-11 (enriched)
 ```
 
 **Tips**:
+
 - Idempotent — safe to run multiple times (existing entries updated, not duplicated)
 - GitHub integration is optional — works fully offline if `gh` CLI is not installed
 
@@ -1010,6 +1025,7 @@ Session:          2026-02-11 (enriched)
 - Before taking a long break
 
 **What it creates**:
+
 1. **START-HERE.md** — Current session state, active branch, next steps
 2. **DOCUMENTATION-MAP.md** — File inventory with purpose annotations
 3. **SESSION-COMPILATION.md** — Recent session summaries linked chronologically
@@ -1043,6 +1059,7 @@ Reading time: ~30-45 minutes for complete orientation
 ```
 
 **Tips**:
+
 - Creates dated directory: `handoff-packages/YYYY-MM-DD/` by default
 - Files can be shared via zip or archived for future reference
 - Perfect companion to `/kmgraph:session-summary` for comprehensive handoff
@@ -1072,6 +1089,7 @@ Reading time: ~30-45 minutes for complete orientation
    - Use: Weekly deep sync or before sharing
 
 **When to use which**:
+
 - Just solved a problem → `capture-lesson`
 - End of day/week → `update-graph`
 - Major milestone → `sync-all`
@@ -1114,6 +1132,7 @@ Reading time: ~30-45 minutes for complete orientation
    - Tracks how understanding changes over time
 
 **When to use which**:
+
 - Standard bug or feature → `start-issue-tracking`
 - Multi-attempt investigation → `meta-issue`
 
@@ -1142,6 +1161,7 @@ Reading time: ~30-45 minutes for complete orientation
 **Problem**: Claude doesn't recognize `/kmgraph:...` command
 
 **Solutions**:
+
 1. Verify plugin installed: Check Claude Code > Extensions
 2. Restart Claude Code
 3. Update plugin: Check for updates in marketplace
@@ -1154,6 +1174,7 @@ Reading time: ~30-45 minutes for complete orientation
 **Problem**: Commands fail with "no active KG"
 
 **Solutions**:
+
 1. Run `/kmgraph:init` to create your first KG
 2. Run `/kmgraph:list` to see available KGs
 3. Run `/kmgraph:switch` to activate an existing KG
@@ -1165,6 +1186,7 @@ Reading time: ~30-45 minutes for complete orientation
 **Problem**: MEMORY.md over 1,500 tokens, slowing down sessions or blocking new entries
 
 **Solutions**:
+
 1. Run `/kmgraph:archive-memory` to archive old entries
 2. Review archived entries: Check `MEMORY-archive.md`
 3. Restore if needed: `/kmgraph:restore-memory`
@@ -1177,6 +1199,7 @@ Reading time: ~30-45 minutes for complete orientation
 **Problem**: `/kmgraph:extract-chat` finds no logs
 
 **Solutions**:
+
 1. Verify log directories exist:
    ```bash
    ls ~/.claude/projects/
