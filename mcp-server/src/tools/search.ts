@@ -4,14 +4,8 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import { readConfig, getActiveGraphPath, walkDir } from "../utils.js";
-
-interface SearchResult {
-  file: string;
-  relativePath: string;
-  line: number;
-  context: string;
-  matchType: "title" | "heading" | "body";
-}
+import { searchFts5, getDbPath } from "./fts5.js";
+import type { SearchResult } from "./fts5.js";
 
 function searchFile(
   filePath: string,
@@ -99,29 +93,53 @@ export function registerSearchTool(server: McpServer): void {
         };
       }
 
-      // Search across all KG directories
-      const searchDirs = [
-        "knowledge",
-        "lessons-learned",
-        "decisions",
-        "sessions",
-      ];
-      const allResults: SearchResult[] = [];
+      // FTS5 detection: use indexed search when .fts5.db exists
+      const dbPath = getDbPath(kgPath);
+      let allResults: SearchResult[];
+      let usingFts5 = false;
 
-      for (const dir of searchDirs) {
-        const dirPath = path.join(kgPath, dir);
-        const files = walkDir(dirPath, ".md");
-
-        for (const file of files) {
-          const results = searchFile(file, query, kgPath);
-          allResults.push(...results);
+      if (fs.existsSync(dbPath)) {
+        try {
+          allResults = searchFts5(dbPath, query, kgPath);
+          usingFts5 = true;
+        } catch (err) {
+          // FTS5 query failed (corrupt db, syntax issue) — fall back silently
+          console.error("FTS5 search failed, falling back to linear scan:", err);
+          allResults = [];
         }
+      } else {
+        allResults = [];
       }
 
-      // Also search MEMORY.md if it exists at KG root
-      const memoryPath = path.join(kgPath, "MEMORY.md");
-      if (fs.existsSync(memoryPath)) {
-        allResults.push(...searchFile(memoryPath, query, kgPath));
+      if (!usingFts5) {
+        // Linear scan fallback
+        allResults = [];
+        const searchDirs = [
+          "knowledge",
+          "lessons-learned",
+          "decisions",
+          "sessions",
+        ];
+
+        for (const dir of searchDirs) {
+          const dirPath = path.join(kgPath, dir);
+          const files = walkDir(dirPath, ".md");
+
+          for (const file of files) {
+            const results = searchFile(file, query, kgPath);
+            allResults.push(...results);
+          }
+        }
+
+        // Also search MEMORY.md if it exists at KG root
+        const memoryPath = path.join(kgPath, "MEMORY.md");
+        if (fs.existsSync(memoryPath)) {
+          allResults.push(...searchFile(memoryPath, query, kgPath));
+        }
+
+        // Sort: title matches first, then headings, then body
+        const typeOrder = { title: 0, heading: 1, body: 2 };
+        allResults.sort((a, b) => typeOrder[a.matchType] - typeOrder[b.matchType]);
       }
 
       if (allResults.length === 0) {
@@ -135,22 +153,19 @@ export function registerSearchTool(server: McpServer): void {
         };
       }
 
-      // Sort: title matches first, then headings, then body
-      const typeOrder = { title: 0, heading: 1, body: 2 };
-      allResults.sort((a, b) => typeOrder[a.matchType] - typeOrder[b.matchType]);
-
       // Format output
+      const searchLabel = usingFts5 ? " (FTS5)" : "";
       let output: string;
 
       if (format === "paths") {
         const uniquePaths = [...new Set(allResults.map((r) => r.relativePath))];
-        output = `Found ${allResults.length} matches in ${uniquePaths.length} files:\n\n${uniquePaths.join("\n")}`;
+        output = `Found ${allResults.length} matches${searchLabel} in ${uniquePaths.length} files:\n\n${uniquePaths.join("\n")}`;
       } else if (format === "detailed") {
         const formatted = allResults.map(
           (r) =>
-            `[${r.matchType}] ${r.relativePath}:${r.line}\n${r.context}\n`
+            `[${r.matchType}${searchLabel}] ${r.relativePath}:${r.line}\n${r.context}\n`
         );
-        output = `Found ${allResults.length} matches for "${query}":\n\n${formatted.join("\n---\n\n")}`;
+        output = `Found ${allResults.length} matches${searchLabel} for "${query}":\n\n${formatted.join("\n---\n\n")}`;
       } else {
         // summary
         const byFile = new Map<string, SearchResult[]>();
@@ -171,7 +186,7 @@ export function registerSearchTool(server: McpServer): void {
           lines.push(`${filePath} (${results.length} matches, best: ${bestType})`);
         }
 
-        output = `Found ${allResults.length} matches in ${byFile.size} files for "${query}":\n\n${lines.join("\n")}`;
+        output = `Found ${allResults.length} matches${searchLabel} in ${byFile.size} files for "${query}":\n\n${lines.join("\n")}`;
       }
 
       return {

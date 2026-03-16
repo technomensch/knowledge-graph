@@ -171,6 +171,26 @@ If new patterns, gotchas, or best practices were discovered:
 3. **Single confirmation:** "Post sync summary to GitHub #[N]? (y/n)"
 4. If yes: `gh issue comment [N] --body "[summary]"`
 
+### Step 8: Refresh Native FTS5 Search Index
+
+Check for existing native search index and user preference:
+
+**If `.fts5.db` exists in active KG root:**
+- Call `kg_fts5_rebuild` to refresh with any new/modified files (no prompt, automatic)
+- Output: "FTS5 index: refreshed (N files updated, M skipped)"
+
+**If no `.fts5.db` AND user has not previously declined:**
+- Check `~/.claude/kg-config.json` for `fts5_declined` flag on active graph
+- If flag not set, ask once:
+  "No search index found. Build FTS5 index for faster /kmgraph:recall? (~5-30s) [y/n]"
+  - Yes: call `kg_fts5_rebuild`, set `"fts5": true` in config
+  - No: set `"fts5_declined": true` in config, skip
+    Add to sync summary: "FTS5: declined (run kg_fts5_rebuild anytime to enable)"
+
+**If user previously declined:**
+- Skip silently
+- Add to sync summary: "FTS5: not enabled"
+
 ---
 
 ## Output: Sync Summary
@@ -185,6 +205,7 @@ Plan linked:      v2.0 (Step 2 → Prefix Naming lesson)
 Local issue:      issue-42 (updated)
 GitHub:           [ISSUE_ID] (comment posted)
 Session:          2026-02-11 (enriched)
+FTS5 index:       refreshed (47 updated, 153 skipped)
 ```
 
 ---

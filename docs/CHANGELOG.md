@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2-beta] - 2026-03-16
+
+### Added
+- `kg_fts5_rebuild` MCP tool: builds/refreshes a native SQLite FTS5 full-text search index for the active knowledge graph with incremental rebuild (only re-indexes changed files), BM25 relevance ranking, porter stemming, and deletion cleanup
+- `kg_search` now uses FTS5 index when `.fts5.db` exists in the active KG root; falls back to existing linear scan transparently
+- FTS5 results show `(FTS5)` label in search output so users know indexed search is active
+- `sync-all` Step 8: auto-refreshes FTS5 index if present; offers one-time opt-in to build index when absent; respects declined preference (`fts5_declined` flag in kg-config.json)
+- `node-sqlite3-wasm` dependency — WASM-based SQLite with FTS5 compiled in, zero native compilation required
+
+### Changed
+- `kg_search`: uses BM25 ranking when FTS5 path is active; existing heuristic sort (title/heading/body) retained for linear scan fallback
+- `.gitignore`: added `**/.fts5.db` pattern (local index, rebuilt on demand, not committed)
+
 ## [0.1.1-beta] - 2026-03-16
 
 ### Added

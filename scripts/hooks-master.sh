@@ -24,6 +24,8 @@ NC='\033[0m' # No Color
 
 MCP_DIST="$PLUGIN_ROOT/mcp-server/dist/index.js"
 MCP_NODE_MODULES="$PLUGIN_ROOT/mcp-server/node_modules/@modelcontextprotocol"
+MCP_PKG_JSON="$PLUGIN_ROOT/mcp-server/package.json"
+MCP_PKG_HASH_FILE="$PLUGIN_ROOT/mcp-server/node_modules/.pkg-installed-hash"
 
 # Check if dependencies or build are missing
 NEEDS_INSTALL=false
@@ -31,6 +33,20 @@ NEEDS_BUILD=false
 
 if [ ! -d "$MCP_NODE_MODULES" ]; then
     NEEDS_INSTALL=true
+elif [ -f "$MCP_PKG_JSON" ]; then
+    # Re-run install if package.json has changed since last install
+    # Handles new dependencies added in upgrades (e.g. node-sqlite3-wasm in v0.1.2)
+    if command -v md5sum &> /dev/null; then
+        CURRENT_HASH=$(md5sum "$MCP_PKG_JSON" | cut -d' ' -f1)
+    elif command -v md5 &> /dev/null; then
+        CURRENT_HASH=$(md5 -q "$MCP_PKG_JSON")
+    else
+        CURRENT_HASH=""
+    fi
+    STORED_HASH=$(cat "$MCP_PKG_HASH_FILE" 2>/dev/null || echo "")
+    if [ -n "$CURRENT_HASH" ] && [ "$CURRENT_HASH" != "$STORED_HASH" ]; then
+        NEEDS_INSTALL=true
+    fi
 fi
 
 if [ ! -f "$MCP_DIST" ]; then
@@ -42,7 +58,7 @@ if [ "$NEEDS_INSTALL" = true ] || [ "$NEEDS_BUILD" = true ]; then
     if command -v node &> /dev/null && command -v npm &> /dev/null; then
         cd "$PLUGIN_ROOT/mcp-server"
 
-        # Install dependencies if missing (always needed before build or runtime)
+        # Install dependencies if missing or package.json changed
         if [ "$NEEDS_INSTALL" = true ]; then
             echo "Installing MCP server dependencies..."
             npm install --omit=dev --silent 2>/dev/null
@@ -56,6 +72,9 @@ if [ "$NEEDS_INSTALL" = true ] || [ "$NEEDS_BUILD" = true ]; then
                 echo ""
                 echo "Then restart Claude Code."
                 echo ""
+            elif [ -n "$CURRENT_HASH" ]; then
+                # Record hash so we don't re-install unless package.json changes again
+                echo "$CURRENT_HASH" > "$MCP_PKG_HASH_FILE"
             fi
         fi
 
