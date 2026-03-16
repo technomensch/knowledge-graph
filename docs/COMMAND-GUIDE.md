@@ -140,7 +140,7 @@ Commands work across platforms, but full automation is Claude Code-specific.
 
 ## Browse Commands by Category
 
-=== "Setup & Configuration" {: #-kgsisinitcommands-tab}
+=== "Setup & Configuration"
 
     Get the knowledge graph running and configure how it works.
 
@@ -150,7 +150,7 @@ Commands work across platforms, but full automation is Claude Code-specific.
     - [🟡 `/kmgraph:add-category`](#-kgsisadd-category-commands-tab) — Add custom categories
     - [🟡 `/kmgraph:config-sanitization`](#-kgsisconfig-sanitization-commands-tab) — Set up safety features for team sharing
 
-=== "Capture & Document" {: #-kgsiscapture-lesson-commands-tab}
+=== "Capture & Document"
 
     Document lessons, capture history, and summarize sessions.
 
@@ -158,7 +158,7 @@ Commands work across platforms, but full automation is Claude Code-specific.
     - [🟡 `/kmgraph:extract-chat`](#-kgsisextract-chat-commands-tab) — Export chat history to markdown
     - [🟡 `/kmgraph:session-summary`](#-kgsisssession-summary-commands-tab) — Summarize important work sessions
 
-=== "Search & Synchronization" {: #-kgsisstatus-commands-tab}
+=== "Search & Sync"
 
     Find knowledge and keep the graph synchronized.
 
@@ -168,14 +168,14 @@ Commands work across platforms, but full automation is Claude Code-specific.
     - [🟡 `/kmgraph:update-doc`](#-kgsisupdate-doc-commands-tab) — Update documentation with changes
     - [🔴 `/kmgraph:sync-all`](#-kgsissync-all-commands-tab) — Run complete synchronization pipeline
 
-=== "Team & Sharing" {: #-kgsischeck-sensitive-commands-tab}
+=== "Team & Sharing"
 
     Share knowledge safely with team members.
 
     - [🟡 `/kmgraph:check-sensitive`](#-kgsischeck-sensitive-commands-tab) — Scan for sensitive data before sharing
     - [🔴 `/kmgraph:link-issue`](#-kgsislink-issue-commands-tab) — Connect lessons to GitHub issues
 
-=== "Advanced Issues" {: #-kgsismeta-issue-commands-tab}
+=== "Advanced Issues"
 
     Track complex, multi-attempt problems systematically.
 
@@ -183,7 +183,7 @@ Commands work across platforms, but full automation is Claude Code-specific.
     - [🔴 `/kmgraph:start-issue-tracking`](#-kgsisstart-issue-tracking-commands-tab) — Systematic issue tracking with Git branches
     - [🔴 `/kmgraph:update-issue-plan`](#-kgsisupdate-issue-plan-commands-tab) — Sync progress with GitHub and plans
 
-=== "Memory Management" {: #-kgsisarchive-memory-commands-tab}
+=== "Memory Management"
 
     Manage MEMORY.md size and archive old patterns.
 
@@ -199,11 +199,13 @@ Commands work across platforms, but full automation is Claude Code-specific.
 **Purpose**: Initialize a new knowledge graph with wizard-based setup
 
 **When to use**:
+
 - First time setup on any project
 - Starting a new project that needs its own knowledge graph
 - Creating a separate KG for different work (e.g., personal vs. team)
 
 **What it does**:
+
 1. Asks for KG name and storage location (project-local, global, or custom path)
 2. Prompts for category selection (architecture, process, patterns, debugging, or custom)
 3. Asks for optional custom prefixes per category
@@ -232,6 +234,7 @@ Commands work across platforms, but full automation is Claude Code-specific.
 
 **Backfill Feature**:
 When you enable backfill, the system extracts existing knowledge from your project:
+
 - **README.md** — Project overview and key concepts
 - **CHANGELOG.md** — Released features and changes
 - **lessons-learned/** — Existing lessons (if any)
@@ -251,12 +254,14 @@ The system presents candidates for your review before creating entries.
 **Purpose**: Document lessons learned, problems solved, and patterns with git metadata tracking
 
 **When to use**:
+
 - Just solved a problem
 - Discovered a reusable pattern
 - Fixed a tricky bug worth remembering
 - Learned something that future you will need
 
 **What it does**:
+
 1. Checks for duplicate/similar existing lessons (pre-flight search)
 2. Asks verification questions (topic, audience, scope)
 3. Auto-detects category from keywords (architecture, debugging, process, patterns)
@@ -281,6 +286,7 @@ The system presents candidates for your review before creating entries.
 ```
 
 **Tips**:
+
 - Capture while the problem is fresh (don't wait)
 - Include error messages verbatim
 - Note what DIDN'T work (helps future you)
@@ -292,12 +298,14 @@ The system presents candidates for your review before creating entries.
 **Purpose**: Display active knowledge graph status, stats, and quick command reference
 
 **When to use**:
+
 - Verify setup after running `/kmgraph:init`
 - See recent lessons at a glance
 - Check MEMORY.md staleness
 - Quick health check on the knowledge graph
 
 **What it shows**:
+
 - Active KG name and file path
 - Categories and git strategy
 - Last sync timestamp
@@ -339,12 +347,14 @@ Quick Commands:
 **Purpose**: Search across all project memory systems (lessons, decisions, knowledge graph, sessions)
 
 **When to use**:
+
 - "I solved this before..."
 - Looking for a specific pattern or solution
 - Need to find a past architectural decision
 - Searching for context on a topic
 
 **What it searches**:
+
 - Lessons learned (full text)
 - Architecture decisions (ADRs)
 - Knowledge entries (patterns, gotchas, concepts)
@@ -367,6 +377,7 @@ Quick Commands:
 ```
 
 **Search tips**:
+
 - Use specific terms ("PostgreSQL timeout" > "database")
 - Try synonyms if nothing found
 - Search by date: `/kmgraph:recall "2024-01"`
@@ -382,12 +393,14 @@ Quick Commands:
 **Purpose**: Extract structured insights from lessons learned and sync to knowledge graph entries
 
 **When to use**:
+
 - After creating or updating lesson-learned documents
 - When discovering new patterns or best practices
 - Before completing complex work sessions
 - Daily or weekly consolidation of captured knowledge
 
 **What it does**:
+
 1. Identifies new or modified lessons (since last sync or last 24 hours)
 2. Reads each lesson and extracts: title, problem, solution, when-to-use triggers
 3. Checks if a matching KG entry already exists in `knowledge/patterns.md` (or similar)
@@ -407,6 +420,7 @@ Quick Commands:
 ```
 
 **Tips**:
+
 - `--auto` flag is useful when called from other commands (e.g., after `/kmgraph:capture-lesson`)
 - `--interactive` flag lets you review and edit each extracted entry before saving
 
@@ -419,11 +433,13 @@ Quick Commands:
 **Purpose**: Add a new category to an existing knowledge graph with optional custom prefix
 
 **When to use**:
+
 - Need to track a new domain (e.g., security, ml-ops, devops)
 - Team-specific categorization needed beyond defaults
 - Organizing lessons into more granular groups
 
 **What it does**:
+
 1. Prompts for category name (or accepts from command argument)
 2. Asks for optional prefix (e.g., "sec-" for security lessons)
 3. Asks for git strategy (commit or ignore)
@@ -450,12 +466,14 @@ Quick Commands:
 **Purpose**: Create a summary of the current active chat session
 
 **When to use**:
+
 - Before context limits are reached (~180K tokens)
 - At major milestones during long sessions
 - Before handing work to another developer
 - End of a productive work session to preserve context
 
 **What it does**:
+
 1. Auto-detects session scope from conversation context since last summary
 2. Classifies session type (feature development, debugging, planning, research)
 3. Generates summary with: goals, problems solved, files touched, commits, lessons, next steps
@@ -473,6 +491,7 @@ Quick Commands:
 ```
 
 **Tips**:
+
 - Captures git commits automatically — no need to list them manually
 - Auto-suggests summary when context approaches ~180K tokens
 
@@ -483,12 +502,14 @@ Quick Commands:
 **Purpose**: Display all configured knowledge graphs from `~/.claude/kg-config.json`
 
 **When to use**:
+
 - View all available knowledge graphs
 - Check which KG is currently active
 - Review KG configurations before switching
 - Verify a new KG was created successfully
 
 **What it shows**:
+
 - All configured knowledge graphs with numbered list
 - Active KG highlighted
 - Location paths, categories, git strategy, last used timestamp
@@ -522,11 +543,13 @@ Total: 2 knowledge graph(s) configured
 **Purpose**: Change the active knowledge graph for all subsequent commands
 
 **When to use**:
+
 - Switch between different project knowledge graphs
 - Change to a topic-based KG for cross-project patterns
 - Return to a previously used KG
 
 **What it does**:
+
 1. Validates the target KG exists in config
 2. Verifies KG path exists on disk (warns if missing, allows override)
 3. Updates the `active` field in `~/.claude/kg-config.json`
@@ -543,6 +566,7 @@ Total: 2 knowledge graph(s) configured
 ```
 
 **Tips**:
+
 - All subsequent knowledge commands operate on the newly active KG
 - Use `/kmgraph:list` first to see available options
 
@@ -553,11 +577,13 @@ Total: 2 knowledge graph(s) configured
 **Purpose**: Scan active knowledge graph for potentially sensitive information before public sharing
 
 **When to use**:
+
 - Before pushing knowledge graph files to a public or shared repository
 - As a manual check alongside `/kmgraph:config-sanitization` hooks
 - Periodic audit of KG content
 
 **What it does**:
+
 1. Loads scan patterns from `.claude/sanitization-config.json` (or uses defaults)
 2. Scans all markdown files in the active KG for: email addresses, API keys/tokens, URLs
 3. Reports findings with file name, line number, and matched content
@@ -586,10 +612,12 @@ Total: 2 knowledge graph(s) configured
 **Purpose**: Interactive wizard to set up pre-commit hooks for sensitive data detection
 
 **When to use**:
+
 - One-time setup per repository for automated security scanning
 - When team members need consistent sanitization enforcement
 
 **What it does**:
+
 1. Prompts for scan patterns (emails, API keys, personal names, internal URLs)
 2. Collects custom regex patterns specific to your project
 3. Asks for action on match (warn or block commit)
@@ -628,11 +656,13 @@ Test the hook:
 **Purpose**: Extract chat history from Claude and Gemini local log sources
 
 **When to use**:
+
 - Preserve chat history for reference or knowledge extraction
 - End of day archival of important conversations
 - When logs might be cleared by app updates
 
 **What it does**:
+
 1. Determines output directory (active KG's `chat-history/` by default, or custom path)
 2. Scans Claude logs (`~/.claude/projects/` for `.jsonl` files) and/or Gemini logs (`~/.gemini/tmp/`, `~/.gemini/antigravity/conversations/` for `.json`/`.pb` files)
 3. Merges sessions by date into `YYYY-MM-DD-claude.md` and/or `YYYY-MM-DD-gemini.md`
@@ -641,6 +671,7 @@ Test the hook:
 **Time**: Under 30 seconds
 
 **Date filtering options**:
+
 - `--today` — Extract only today's sessions
 - `--date=YYYY-MM-DD` — Extract only sessions from a specific date
 - `--after=YYYY-MM-DD` — Extract sessions from this date onwards (inclusive)
@@ -659,6 +690,7 @@ Test the hook:
 ```
 
 **Tips**:
+
 - Extracted files are automatically searchable via `/kmgraph:recall`
 - Optional `blackboxprotobuf` Python library enables Gemini protobuf file support
 - Date ranges use natural language: `YYYY-MM-DD through YYYY-MM-DD` or `YYYY-MM-DD to YYYY-MM-DD`
@@ -671,6 +703,7 @@ Test the hook:
 **Purpose**: Update an existing documentation file — plugin/project documentation (`--user-facing`) or knowledge graph content
 
 **When to use**:
+
 - A plugin feature changed and COMMAND-GUIDE, CHEAT-SHEET, or README needs updating
 - Adding a new command entry to user-facing docs
 - Ensuring documentation follows v0.0.7 language standards (third-person, Section 508)
@@ -680,6 +713,7 @@ Test the hook:
 Without `--user-facing`: shows a disambiguation dialog to distinguish plugin documentation from KG content.
 
 With `--user-facing`:
+
 1. Reads target file and displays current sections and version
 2. Asks what type of update (add command entry, update existing entry, add section, update metadata, validate only)
 3. Runs v0.0.7 standards validation (third-person voice, heading hierarchy, table headers, link text)
@@ -696,6 +730,7 @@ With `--user-facing`:
 ```
 
 **Tips**:
+
 - Always use `--user-facing` for plugin/project docs (README, COMMAND-GUIDE, CHEAT-SHEET, etc.)
 - Without `--user-facing`, a dialog clarifies whether the target is plugin docs or KG content
 - Standards validation runs automatically — violations are flagged before writing
@@ -709,6 +744,7 @@ With `--user-facing`:
 **Purpose**: Initialize and manage meta-issue tracking for complex multi-attempt problems
 
 **When to use** (2 or more criteria should be met):
+
 - 3+ solution attempts already tried or expected
 - Root cause understanding has shifted 2+ times
 - Problem spans multiple project versions
@@ -716,6 +752,7 @@ With `--user-facing`:
 - Significant learning value for future similar problems
 
 **What it does**:
+
 1. **Initialize** (`/kmgraph:meta-issue "Problem Title"`):
    - Prompts for domain, scope, severity, expected attempts
    - Creates structured directory under `{active_kg_path}/issues/[meta-issue-name]/`
@@ -750,6 +787,7 @@ With `--user-facing`:
 **Purpose**: Initialize issue tracking for a specific problem or enhancement with structured documentation and Git branch creation
 
 **When to use**:
+
 - Identified a bug that needs structured tracking
 - Planning a new feature or enhancement
 - Documenting a problem before solving it
@@ -758,6 +796,7 @@ With `--user-facing`:
 > **Note**: The term "issue" here refers to a GitHub Issue — a platform feature for tracking bugs and feature requests/enhancements.
 
 **What it does**:
+
 1. Scans chat history for recent proposals ("Would you like me to...")
 2. Runs git authority check and auto-detects version increment path
 3. Auto-detects issue type from keywords (bug vs. enhancement)
@@ -778,6 +817,7 @@ With `--user-facing`:
 ```
 
 **Tips**:
+
 - Uses the Dual-ID Policy: local IDs (`issue-N` or `ENH-NNN`) are independent from GitHub issue numbers (`#N`)
 - Always use `--body-file` flag (not manual summary) when creating the GitHub Issue
 
@@ -788,6 +828,7 @@ With `--user-facing`:
 **Purpose**: Synchronize knowledge graph extraction with active plans and local/GitHub issue tracking
 
 **When to use**:
+
 - After extracting new KG entries with `/kmgraph:update-graph`
 - When implementation plan needs to reflect new insights
 - Before committing governance-related changes
@@ -796,6 +837,7 @@ With `--user-facing`:
 > **Note**: References to "issues" here mean GitHub Issues — platform-level bug reports or feature requests.
 
 **What it does**:
+
 1. **Knowledge extraction**: Runs `/kmgraph:update-graph` to extract patterns
 2. **Plan sync**: Updates the active implementation plan with a "Lessons Learned Integration" section
 3. **Local issue update**: Appends progress and new verification requirements to local issue docs
@@ -812,6 +854,7 @@ With `--user-facing`:
 ```
 
 **Tips**:
+
 - Works fully offline — GitHub steps gracefully degrade if `gh` CLI is not installed
 - Decision gates will prompt before creating new issues for out-of-scope discoveries
 
@@ -822,6 +865,7 @@ With `--user-facing`:
 **Purpose**: Manually link an existing lesson or ADR to a GitHub Issue with bidirectional references
 
 **When to use**:
+
 - A lesson was captured but not linked to its relevant GitHub Issue
 - An ADR should reference the GitHub Issue that prompted the decision
 - Building traceability between knowledge and tracked work
@@ -829,6 +873,7 @@ With `--user-facing`:
 > **Note**: "Issue" here refers to a GitHub Issue — which could be a bug report or a feature request/enhancement.
 
 **What it does**:
+
 1. Validates the file exists and issue number is provided
 2. Updates YAML frontmatter in the lesson/ADR with issue and PR metadata
 3. Posts a comment to the GitHub Issue with a link to the lesson (if `gh` CLI available)
@@ -850,12 +895,14 @@ With `--user-facing`:
 **Purpose**: Archive stale MEMORY.md entries to prevent bloat while preserving historical context
 
 **When to use**:
+
 - MEMORY.md approaching 1,500 token soft limit (warning from `/kmgraph:sync-all`)
 - MEMORY.md exceeds 2,000 token hard limit (blocked from adding new entries)
 - Periodic cleanup (recommended quarterly)
 - Before major project phase changes
 
 **What it does**:
+
 1. Calculates current MEMORY.md token count (word count × 1.3)
 2. Identifies stale entries using date-based staleness criteria (default: 90 days)
 3. Previews entries proposed for archival with token savings estimate
@@ -874,6 +921,7 @@ With `--user-facing`:
 ```
 
 **Tips**:
+
 - Token limits: 1,500 soft (warning) / 2,000 hard (block)
 - Archived entries can be restored with `/kmgraph:restore-memory`
 
@@ -884,12 +932,14 @@ With `--user-facing`:
 **Purpose**: Restore archived MEMORY.md entries from MEMORY-archive.md back into active memory
 
 **When to use**:
+
 - Need to reference archived knowledge for current work
 - Working on a problem related to a previously archived solution
 - Rebuilding context from a previous project phase
 - Token budget has been freed up and historical context is needed
 
 **What it does**:
+
 1. Parses all archived entries with IDs, titles, dates, and token sizes
 2. Supports fuzzy search by title, ID-based selection, or interactive list
 3. Previews entry content and calculates post-restoration token count
@@ -916,12 +966,14 @@ With `--user-facing`:
 **Purpose**: Automated knowledge sync orchestrator — replaces 4-step manual pipeline with 1 command
 
 **When to use**:
+
 - After significant work sessions to consolidate everything
 - Weekly deep sync to ensure KG, MEMORY.md, plans, and GitHub are aligned
 - Before major milestones or project phase changes
 - As a catch-up sync if you've been capturing lessons without syncing
 
 **What it does**:
+
 1. **Scans** for new or modified lessons in `{active_kg_path}/lessons-learned/`
 2. **Extracts** KG entries from lessons (delegates to `/kmgraph:update-graph`)
 3. **Checks** MEMORY.md size and syncs new patterns (respects token limits)
@@ -953,6 +1005,7 @@ Session:          2026-02-11 (enriched)
 ```
 
 **Tips**:
+
 - Idempotent — safe to run multiple times (existing entries updated, not duplicated)
 - GitHub integration is optional — works fully offline if `gh` CLI is not installed
 
@@ -967,6 +1020,7 @@ Session:          2026-02-11 (enriched)
 **Purpose**: Create comprehensive project handoff documentation for transitions, context limits, or onboarding
 
 **When to use**:
+
 - Before transitioning project to another developer
 - Preparing for context window limits (>180K tokens)
 - Completing a major release cycle
@@ -974,6 +1028,7 @@ Session:          2026-02-11 (enriched)
 - Before taking a long break
 
 **What it creates**:
+
 1. **START-HERE.md** — Current session state, active branch, next steps
 2. **DOCUMENTATION-MAP.md** — File inventory with purpose annotations
 3. **SESSION-COMPILATION.md** — Recent session summaries linked chronologically
@@ -1007,6 +1062,7 @@ Reading time: ~30-45 minutes for complete orientation
 ```
 
 **Tips**:
+
 - Creates dated directory: `handoff-packages/YYYY-MM-DD/` by default
 - Files can be shared via zip or archived for future reference
 - Perfect companion to `/kmgraph:session-summary` for comprehensive handoff
@@ -1036,6 +1092,7 @@ Reading time: ~30-45 minutes for complete orientation
    - Use: Weekly deep sync or before sharing
 
 **When to use which**:
+
 - Just solved a problem → `capture-lesson`
 - End of day/week → `update-graph`
 - Major milestone → `sync-all`
@@ -1078,6 +1135,7 @@ Reading time: ~30-45 minutes for complete orientation
    - Tracks how understanding changes over time
 
 **When to use which**:
+
 - Standard bug or feature → `start-issue-tracking`
 - Multi-attempt investigation → `meta-issue`
 
@@ -1106,6 +1164,7 @@ Reading time: ~30-45 minutes for complete orientation
 **Problem**: Claude doesn't recognize `/kmgraph:...` command
 
 **Solutions**:
+
 1. Verify plugin installed: Check Claude Code > Extensions
 2. Restart Claude Code
 3. Update plugin: Check for updates in marketplace
@@ -1118,6 +1177,7 @@ Reading time: ~30-45 minutes for complete orientation
 **Problem**: Commands fail with "no active KG"
 
 **Solutions**:
+
 1. Run `/kmgraph:init` to create your first KG
 2. Run `/kmgraph:list` to see available KGs
 3. Run `/kmgraph:switch` to activate an existing KG
@@ -1129,6 +1189,7 @@ Reading time: ~30-45 minutes for complete orientation
 **Problem**: MEMORY.md over 1,500 tokens, slowing down sessions or blocking new entries
 
 **Solutions**:
+
 1. Run `/kmgraph:archive-memory` to archive old entries
 2. Review archived entries: Check `MEMORY-archive.md`
 3. Restore if needed: `/kmgraph:restore-memory`
@@ -1141,6 +1202,7 @@ Reading time: ~30-45 minutes for complete orientation
 **Problem**: `/kmgraph:extract-chat` finds no logs
 
 **Solutions**:
+
 1. Verify log directories exist:
    ```bash
    ls ~/.claude/projects/
@@ -1183,71 +1245,6 @@ git checkout -b issue/N-description
 ```
 
 ---
-
-## Search Index
-
-The search index is an optional feature that makes `/kmgraph:recall` faster and returns results ranked by relevance instead of file order. Once built, it stays current automatically.
-
-### MCP Tools Reference
-
-| Tool | Description |
-|------|-------------|
-| `kg_config_init` | Initialize a new knowledge graph configuration |
-| `kg_config_list` | List all configured knowledge graphs |
-| `kg_config_switch` | Switch the active knowledge graph |
-| `kg_config_add_category` | Add a category to the active knowledge graph |
-| `kg_search` | Search the knowledge graph by keyword |
-| `kg_scaffold` | Create a new knowledge graph entry from a template |
-| `kg_check_sensitive` | Scan for potentially sensitive content |
-| `kg_fts5_rebuild` | Build or refresh the search index. Run after large imports (including backfill during init) or if search results seem stale. The index updates automatically during sync-all once enabled. |
-
-### How to Enable the Search Index
-
-The first time `/kmgraph:sync-all` is run after upgrading, it will ask once whether to build the index. Answer yes and the index builds automatically. After that, every `sync-all` run keeps it current with no prompts.
-
-To build the index at any time without running sync-all: call `kg_fts5_rebuild` from the MCP tool panel.
-
-The diagram below compares search without and with the index.
-
-```mermaid
-flowchart LR
-    subgraph without ["Without index (default)"]
-        direction TB
-        S1([Search query]) --> F1[Read file 1]
-        F1 --> F2[Read file 2]
-        F2 --> F3[Read file 3 ...]
-        F3 --> R1([Results in file order])
-    end
-    subgraph with ["With index (optional)"]
-        direction TB
-        S2([Search query]) --> I[Query index]
-        I --> R2([Ranked results instantly])
-    end
-```
-
-Without an index, kmgraph reads each file in the knowledge graph sequentially. With an index, a single query returns results sorted by relevance. Both methods return the same files — the index is faster and ranks more relevant matches higher.
-
-The diagram below shows what happens the first time sync-all is run after upgrading.
-
-```mermaid
-flowchart TD
-    A([Run sync-all]) --> B{Index already\nbuilt?}
-    B -- Yes --> C([Index refreshes\nautomatically])
-    B -- No --> D{Previously\ndeclined?}
-    D -- Yes --> E([Skipped silently])
-    D -- No --> F{Asked once:\nBuild search index?}
-    F -- Yes --> G([Index built —\nauto-updates from now on])
-    F -- No --> H([Skipped —\nnot asked again])
-```
-
-If a search index already exists, sync-all refreshes it automatically with no prompt. If no index exists and the user has not previously declined, sync-all asks once. The preference is remembered — users are never asked again regardless of the answer.
-
-- **How to tell it is active**: search results show `(FTS5)` — this means the index was used
-- **How to re-enable after declining**: run `kg_fts5_rebuild` directly
-- **How to revert**: delete the `.fts5.db` file from the knowledge graph root folder
-
----
-
 ## Technical Details
 
 This section covers implementation specifics for users who want to understand how features work internally.
@@ -1300,7 +1297,7 @@ flowchart TD
   Term definitions
 </div>
 
-###**Writing better entries**
+### **Writing better entries**
 <div class="grid cards" markdown>
 - [Patterns Guide](reference/PATTERNS-GUIDE.md)
 
@@ -1312,7 +1309,7 @@ flowchart TD
 
 - [Examples](examples/)
 
-Real samples
+  Real samples
 </div>
 
 ## Next Steps
