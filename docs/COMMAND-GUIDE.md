@@ -234,6 +234,7 @@ Commands work across platforms, but full automation is Claude Code-specific.
 
 **Backfill Feature**:
 When you enable backfill, the system extracts existing knowledge from your project:
+
 - **README.md** — Project overview and key concepts
 - **CHANGELOG.md** — Released features and changes
 - **lessons-learned/** — Existing lessons (if any)
@@ -712,6 +713,7 @@ Test the hook:
 Without `--user-facing`: shows a disambiguation dialog to distinguish plugin documentation from KG content.
 
 With `--user-facing`:
+
 1. Reads target file and displays current sections and version
 2. Asks what type of update (add command entry, update existing entry, add section, update metadata, validate only)
 3. Runs v0.0.7 standards validation (third-person voice, heading hierarchy, table headers, link text)
@@ -742,6 +744,7 @@ With `--user-facing`:
 **Purpose**: Initialize and manage meta-issue tracking for complex multi-attempt problems
 
 **When to use** (2 or more criteria should be met):
+
 - 3+ solution attempts already tried or expected
 - Root cause understanding has shifted 2+ times
 - Problem spans multiple project versions
