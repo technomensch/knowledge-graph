@@ -5,17 +5,19 @@ import { registerSearchTool } from "./tools/search.js";
 import { registerScaffoldTool } from "./tools/scaffold.js";
 import { registerSanitizationTool } from "./tools/sanitization.js";
 import { registerConfigResource, registerTemplatesResource } from "./resources/index.js";
+import { registerFts5Tool } from "./tools/fts5.js";
 
 const server = new McpServer({
   name: "knowledge-graph",
-  version: "0.1.0-beta",
+  version: "0.1.2-beta",
 });
 
-// Register tools (7 core tools)
+// Register tools (8 core tools)
 registerConfigTools(server);    // kg_config_init, kg_config_list, kg_config_switch, kg_config_add_category
 registerSearchTool(server);     // kg_search
 registerScaffoldTool(server);   // kg_scaffold
 registerSanitizationTool(server); // kg_check_sensitive
+registerFts5Tool(server);       // kg_fts5_rebuild
 
 // Register resources (2 resources)
 registerConfigResource(server);    // kg://config
