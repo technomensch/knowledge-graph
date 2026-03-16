@@ -36,15 +36,18 @@ This skill keeps the knowledge graph synchronized with lessons-learned by:
 
 ---
 
-## Delegation Option
+## Context Efficiency Options
 
-For large lesson batches (10+ lessons or 50+ KB total), consider delegating to the `knowledge-extractor` subagent to reduce context window consumption:
+**With context-mode installed (preferred for large batches):**
+When processing 10+ lessons via `--sync-all`, use `ctx_execute_file` to read each lesson file in the sandbox. The file content stays out of the main context window; only a structured summary is returned for LLM extraction. The LLM still performs the semantic extraction step (classification, cross-referencing, entry generation).
 
+**Without context-mode (fallback):**
 ```bash
 /kmgraph:update-graph --delegate knowledge-extractor
 ```
+Delegates to the `knowledge-extractor` subagent for large batches, keeping main context clean.
 
-This extracts patterns without consuming your main context, ideal when processing multiple lessons or updating large sections of the knowledge graph.
+**Single lesson (either mode):** Process directly with the Read tool — fits in context.
 
 ---
 
@@ -278,6 +281,18 @@ git log --oneline {active_kg_path}/lessons-learned/architecture/Pattern.md | hea
 - Just created during `/kmgraph:capture-lesson` skill
 - Modified as part of documentation updates
 - Referenced in recent session summary
+
+### Step 1.5: Choose Reading Method
+
+Before reading lesson files, select the appropriate method based on batch size and available tools:
+
+- **10+ lessons AND context-mode available:** Use `ctx_execute_file` to read each file in the sandbox — file content stays out of context; a structured summary (frontmatter + section headings + first 500 chars per section) is returned for LLM extraction
+- **10+ lessons, no context-mode:** Delegate to `knowledge-extractor` subagent (`/kmgraph:update-graph --delegate knowledge-extractor`)
+- **1–9 lessons:** Read directly with the Read tool — fits comfortably in context
+
+The LLM always performs the semantic extraction step regardless of reading method.
+
+---
 
 ### Step 2: Extract Key Elements
 

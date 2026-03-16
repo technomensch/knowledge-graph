@@ -41,6 +41,14 @@ description: Automated knowledge sync orchestrator — replaces 4-step manual pi
 
 ## Workflow Steps
 
+### Step 0: Detect Context-Mode (Optional Optimization)
+
+Check whether `mcp__plugin_context-mode_context-mode__ctx_batch_execute` is available in the current session:
+- **Yes:** Steps 1 and 2.5 (shell commands) can use ctx_batch_execute for context savings — only a summary enters the main context window
+- **No:** Execute all steps individually as documented below; behavior is identical
+
+---
+
 ### Step 1: Scan for New/Modified Lessons
 
 Get active KG path from `~/.claude/kg-config.json`:
@@ -56,6 +64,20 @@ find ${kg_path}/lessons-learned -name "*.md" -newer .claude/last-sync-timestamp 
 # Fallback: find lessons modified in last 24 hours
 find ${kg_path}/lessons-learned -name "*.md" -mtime -1
 ```
+
+#### ctx_batch_execute option (when context-mode available)
+
+Combine the Step 1 file scan and Step 2.5 MEMORY.md size check in one sandboxed call:
+
+```
+ctx_batch_execute(commands: [
+  { label: "scan-lessons", command: "find ${kg_path}/lessons-learned -name '*.md' -mtime -1" },
+  { label: "scan-sessions", command: "find ${kg_path}/sessions -name '*.md' -mtime -1" },
+  { label: "memory-size", command: "wc -w < ${memory_path}" }
+], queries: ["new lessons found", "MEMORY.md token count"])
+```
+
+Only the summary enters context; raw file listings stay in the sandbox. Skip this if context-mode is not available — the existing `find`/`wc` commands work identically.
 
 If no new lessons found, check for:
 - Recent session summaries with patterns

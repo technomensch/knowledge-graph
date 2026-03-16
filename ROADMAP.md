@@ -1,5 +1,18 @@
 # Knowledge Management Graph — Roadmap
 
+## v0.1.1-beta (Released: 2026-03-16)
+
+**Status**: ✅ Complete - Context-Mode Token Savings Integration
+**Branch**: `v0.1.1-beta-context-mode-integration`
+
+### Completed
+- ✅ `sync-all` optionally uses `ctx_batch_execute` for shell steps when context-mode installed
+- ✅ `update-graph` optionally uses `ctx_execute_file` for reading large lesson batches
+- ✅ Both commands fully backwards-compatible — identical behavior without context-mode
+- ⚠️ User-facing docs (COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED) deferred to v0.0.4-github-docs after testing
+
+---
+
 ## v0.1.0-beta (Released: 2026-03-03)
 
 **Status**: ✅ Complete - First Beta Release — Ready for External Testing
