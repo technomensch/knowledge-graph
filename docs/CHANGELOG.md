@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1-beta] - 2026-03-16
+
+### Added
+- `sync-all`: Optional Step 0 detects context-mode availability; Steps 1 and 2.5 (shell commands) can use `ctx_batch_execute` for context savings when context-mode is installed
+- `update-graph`: Step 1.5 reading method selection — uses `ctx_execute_file` for large batches (10+ lessons) when context-mode available; falls back to knowledge-extractor subagent otherwise
+- Graceful degradation: both commands execute identically when context-mode is absent
+
+### Changed
+- `update-graph`: "Delegation Option" section replaced with "Context Efficiency Options" covering context-mode path, subagent fallback, and single-lesson direct path
+
 ## [0.1.0-beta] - 2026-03-03
 
 ### Added
