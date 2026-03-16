@@ -2,8 +2,8 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.1.0-beta
-**Status:** Beta Release — First External Testing Phase
+**Version:** 0.1.1-beta
+**Status:** Beta Release — Context-Mode Token Savings Integration
 
 Documentation available at - https://technomensch.github.io/knowledge-graph/
 
