@@ -3,8 +3,19 @@ import { z } from "zod";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { Database } from "node-sqlite3-wasm";
 import { readConfig, writeConfig, getActiveGraphPath, walkDir } from "../utils.js";
+
+// Graceful fallback: node-sqlite3-wasm may be absent on first run after upgrade.
+// The SessionStart hook will install it and prompt users to restart Claude Code.
+// Until then, FTS5 functions return empty results and kg_search falls back to linear scan.
+let Database: any;
+let fts5Available = false;
+try {
+  Database = require("node-sqlite3-wasm").Database;
+  fts5Available = true;
+} catch {
+  // node-sqlite3-wasm not installed yet — FTS5 disabled until next restart
+}
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -65,7 +76,7 @@ export function sanitizeFts5Query(raw: string): string {
  * Creates the FTS5 virtual table and the index-meta tracking table if they do
  * not already exist.
  */
-export function initDb(db: Database): void {
+export function initDb(db: any): void {
   db.exec(`
     CREATE VIRTUAL TABLE IF NOT EXISTS kg_entries USING fts5(
       file_path UNINDEXED,
@@ -104,7 +115,7 @@ interface ParsedSection {
  *
  * Returns the number of rows inserted.
  */
-export function indexFile(db: Database, filePath: string, kgPath: string): number {
+export function indexFile(db: any, filePath: string, kgPath: string): number {
   const content = fs.readFileSync(filePath, "utf-8");
   const relativePath = path.relative(kgPath, filePath);
   const lines = content.split("\n");
@@ -226,6 +237,11 @@ export function indexFile(db: Database, filePath: string, kgPath: string): numbe
  * - Skips files that haven't changed.
  */
 export function rebuildIndex(kgPath: string): RebuildResult {
+  if (!fts5Available) {
+    throw new Error(
+      "FTS5 search engine not available. Restart Claude Code to complete the upgrade installation."
+    );
+  }
   const start = Date.now();
   const dbPath = getDbPath(kgPath);
   const db = new Database(dbPath);
@@ -301,6 +317,9 @@ export function searchFts5(
   query: string,
   kgPath: string
 ): SearchResult[] {
+  if (!fts5Available) {
+    return []; // Falls back to linear scan in search.ts; upgrade install pending restart
+  }
   const sanitized = sanitizeFts5Query(query);
   const db = new Database(dbPath, { fileMustExist: true });
 
@@ -356,6 +375,15 @@ export function registerFts5Tool(server: McpServer): void {
         .describe("Override KG path (default: active KG)"),
     },
     async ({ kgPath }) => {
+      if (!fts5Available) {
+        return {
+          content: [{
+            type: "text" as const,
+            text: "Search index is not available yet. The required package was installed in the background — please restart Claude Code and try again.",
+          }],
+          isError: true,
+        };
+      }
       try {
         const config = readConfig();
         let resolvedPath: string;

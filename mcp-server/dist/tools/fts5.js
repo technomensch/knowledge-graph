@@ -45,8 +45,19 @@ const zod_1 = require("zod");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const os = __importStar(require("os"));
-const node_sqlite3_wasm_1 = require("node-sqlite3-wasm");
 const utils_js_1 = require("../utils.js");
+// Graceful fallback: node-sqlite3-wasm may be absent on first run after upgrade.
+// The SessionStart hook will install it and prompt users to restart Claude Code.
+// Until then, FTS5 functions return empty results and kg_search falls back to linear scan.
+let Database;
+let fts5Available = false;
+try {
+    Database = require("node-sqlite3-wasm").Database;
+    fts5Available = true;
+}
+catch {
+    // node-sqlite3-wasm not installed yet — FTS5 disabled until next restart
+}
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
@@ -209,9 +220,12 @@ function indexFile(db, filePath, kgPath) {
  * - Skips files that haven't changed.
  */
 function rebuildIndex(kgPath) {
+    if (!fts5Available) {
+        throw new Error("FTS5 search engine not available. Restart Claude Code to complete the upgrade installation.");
+    }
     const start = Date.now();
     const dbPath = getDbPath(kgPath);
-    const db = new node_sqlite3_wasm_1.Database(dbPath);
+    const db = new Database(dbPath);
     try {
         initDb(db);
         // Collect all .md files from target subdirectories
@@ -265,8 +279,11 @@ function rebuildIndex(kgPath) {
  * Searches the FTS5 index using BM25 ranking. Returns up to 50 results.
  */
 function searchFts5(dbPath, query, kgPath) {
+    if (!fts5Available) {
+        return []; // Falls back to linear scan in search.ts; upgrade install pending restart
+    }
     const sanitized = sanitizeFts5Query(query);
-    const db = new node_sqlite3_wasm_1.Database(dbPath, { fileMustExist: true });
+    const db = new Database(dbPath, { fileMustExist: true });
     try {
         const rows = db.all(`SELECT file_path, relative_path, section_heading, content, match_type,
               line_offset, bm25(kg_entries) as rank
@@ -302,6 +319,15 @@ function registerFts5Tool(server) {
             .optional()
             .describe("Override KG path (default: active KG)"),
     }, async ({ kgPath }) => {
+        if (!fts5Available) {
+            return {
+                content: [{
+                        type: "text",
+                        text: "Search index is not available yet. The required package was installed in the background — please restart Claude Code and try again.",
+                    }],
+                isError: true,
+            };
+        }
         try {
             const config = (0, utils_js_1.readConfig)();
             let resolvedPath;
