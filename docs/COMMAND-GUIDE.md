@@ -240,6 +240,8 @@ When you enable backfill, the system extracts existing knowledge from your proje
 
 The system presents candidates for your review before creating entries.
 
+**After backfill**: If backfill was used, the knowledge graph now contains a full set of imported content. This is a good time to build the search index so all that content is immediately searchable by relevance. Run `/kmgraph:sync-all` and accept the index prompt, or call `kg_fts5_rebuild` directly from the MCP tool panel.
+
 **Next steps**: Run `/kmgraph:status` to verify setup
 
 ---
@@ -407,6 +409,8 @@ Quick Commands:
 **Tips**:
 - `--auto` flag is useful when called from other commands (e.g., after `/kmgraph:capture-lesson`)
 - `--interactive` flag lets you review and edit each extracted entry before saving
+
+**Cleaner conversations**: When the context-mode plugin is installed and there are 10 or more lessons to process, `update-graph` reads the lesson files in a background process instead of inline. This keeps the conversation cleaner without changing any results. Falls back automatically if context-mode is not installed.
 
 ---
 
@@ -952,6 +956,10 @@ Session:          2026-02-11 (enriched)
 - Idempotent — safe to run multiple times (existing entries updated, not duplicated)
 - GitHub integration is optional — works fully offline if `gh` CLI is not installed
 
+**Cleaner conversations**: When the context-mode plugin is installed, `sync-all` runs file scans in a background process so the results do not fill the conversation. Falls back automatically if context-mode is not installed. No configuration required.
+
+**Search index**: Each run of `sync-all` automatically refreshes the search index if one has been built. On the first run after upgrading, `sync-all` will ask once whether to build the index. The preference is remembered.
+
 ---
 
 ### 🔴 `/kmgraph:handoff`
@@ -1173,6 +1181,109 @@ git checkout main
 # Try again
 git checkout -b issue/N-description
 ```
+
+---
+
+## Search Index
+
+The search index is an optional feature that makes `/kmgraph:recall` faster and returns results ranked by relevance instead of file order. Once built, it stays current automatically.
+
+### MCP Tools Reference
+
+| Tool | Description |
+|------|-------------|
+| `kg_config_init` | Initialize a new knowledge graph configuration |
+| `kg_config_list` | List all configured knowledge graphs |
+| `kg_config_switch` | Switch the active knowledge graph |
+| `kg_config_add_category` | Add a category to the active knowledge graph |
+| `kg_search` | Search the knowledge graph by keyword |
+| `kg_scaffold` | Create a new knowledge graph entry from a template |
+| `kg_check_sensitive` | Scan for potentially sensitive content |
+| `kg_fts5_rebuild` | Build or refresh the search index. Run after large imports (including backfill during init) or if search results seem stale. The index updates automatically during sync-all once enabled. |
+
+### How to Enable the Search Index
+
+The first time `/kmgraph:sync-all` is run after upgrading, it will ask once whether to build the index. Answer yes and the index builds automatically. After that, every `sync-all` run keeps it current with no prompts.
+
+To build the index at any time without running sync-all: call `kg_fts5_rebuild` from the MCP tool panel.
+
+The diagram below compares search without and with the index.
+
+```mermaid
+flowchart LR
+    subgraph without ["Without index (default)"]
+        direction TB
+        S1([Search query]) --> F1[Read file 1]
+        F1 --> F2[Read file 2]
+        F2 --> F3[Read file 3 ...]
+        F3 --> R1([Results in file order])
+    end
+    subgraph with ["With index (optional)"]
+        direction TB
+        S2([Search query]) --> I[Query index]
+        I --> R2([Ranked results instantly])
+    end
+```
+
+Without an index, kmgraph reads each file in the knowledge graph sequentially. With an index, a single query returns results sorted by relevance. Both methods return the same files — the index is faster and ranks more relevant matches higher.
+
+The diagram below shows what happens the first time sync-all is run after upgrading.
+
+```mermaid
+flowchart TD
+    A([Run sync-all]) --> B{Index already\nbuilt?}
+    B -- Yes --> C([Index refreshes\nautomatically])
+    B -- No --> D{Previously\ndeclined?}
+    D -- Yes --> E([Skipped silently])
+    D -- No --> F{Asked once:\nBuild search index?}
+    F -- Yes --> G([Index built —\nauto-updates from now on])
+    F -- No --> H([Skipped —\nnot asked again])
+```
+
+If a search index already exists, sync-all refreshes it automatically with no prompt. If no index exists and the user has not previously declined, sync-all asks once. The preference is remembered — users are never asked again regardless of the answer.
+
+- **How to tell it is active**: search results show `(FTS5)` — this means the index was used
+- **How to re-enable after declining**: run `kg_fts5_rebuild` directly
+- **How to revert**: delete the `.fts5.db` file from the knowledge graph root folder
+
+---
+
+## Technical Details
+
+This section covers implementation specifics for users who want to understand how features work internally.
+
+### Context-Mode Integration
+
+When the [context-mode plugin](https://github.com/steventcramer/context-mode) is installed alongside kmgraph:
+
+- `sync-all` uses `ctx_batch_execute` to combine lesson scanning and MEMORY.md size checks in a single sandboxed background process
+- `update-graph` uses `ctx_execute_file` for sandboxed file reads when processing 10 or more lessons; falls back to the knowledge-extractor subagent for large batches without context-mode, or reads directly for small batches
+- Detection: kmgraph checks for `mcp__plugin_context-mode_context-mode__ctx_batch_execute` at runtime; no configuration required; zero breaking change if context-mode is absent
+
+### Search Index Implementation
+
+The diagram below shows how `kg_search` decides which search method to use.
+
+```mermaid
+flowchart TD
+    A([kg_search called]) --> B{Search index\n.fts5.db exists?}
+    B -- Yes --> C[Query index\nBM25 ranked]
+    B -- No --> D[Scan files\nsequentially]
+    C --> E{Index error?}
+    E -- Yes --> D
+    E -- No --> F([Return results\nwith index label])
+    D --> G([Return results\nno label])
+```
+
+`kg_search` checks for a search index first. If the index exists, it queries the index and returns BM25-ranked results with an index label. If the index does not exist or encounters an error, `kg_search` falls back to reading files sequentially. The caller receives the same result format either way.
+
+- Index format: SQLite database using FTS5 (Full-Text Search version 5) extension
+- Ranking: BM25 — the same relevance algorithm used by most search engines
+- Stemming: porter stemmer — "searching" matches "search", "decisions" matches "decision"
+- Rebuild strategy: incremental — only re-indexes files whose modification time changed
+- Storage: `{kg-root}/.fts5.db` — gitignored, local only, rebuilt on demand
+- Package: `node-sqlite3-wasm` (WASM-based SQLite, no native compilation required)
+- Fallback: if the index is corrupt or missing, `kg_search` silently uses file-scan
 
 ---
 

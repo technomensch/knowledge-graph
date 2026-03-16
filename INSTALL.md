@@ -144,7 +144,7 @@ claude --plugin-dir /path/to/knowledge-graph
 
 ### Step 2B: MCP IDE Installation (Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Claude Desktop)
 
-This path installs the MCP server, which provides 7 tools for knowledge management: `kg_config_init`, `kg_config_list`, `kg_config_switch`, `kg_config_add_category`, `kg_search`, `kg_scaffold`, and `kg_check_sensitive`.
+This path installs the MCP server, which provides 8 tools for knowledge management: `kg_config_init`, `kg_config_list`, `kg_config_switch`, `kg_config_add_category`, `kg_search`, `kg_scaffold`, `kg_check_sensitive`, and `kg_fts5_rebuild` (build or refresh a search index for faster, relevance-ranked results).
 
 #### 2B.1: Check Prerequisites
 
