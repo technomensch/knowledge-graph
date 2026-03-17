@@ -2,7 +2,7 @@
 
 Comprehensive catalog of all lessons-learned documents.
 
-**Total Lessons:** 8
+**Total Lessons:** 7
 **Last Updated:** 2026-03-16
 
 ---
@@ -37,12 +37,11 @@ Comprehensive catalog of all lessons-learned documents.
 
 ---
 
-### Debugging Lessons (2 total)
+### Debugging Lessons (1 total)
 
-- [2026-02-28 - MkDocs Grid Cards Require 4-Space Indentation](debugging/Lessons_Learned_MkDocs_Grid_Cards_Indentation.md) - Grid cards broke due to 2-space indentation; Material for MkDocs requires 4-space indent for description text to nest inside list items
 - [2026-02-16 - Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md) - Shadow command strategy failed with Gemini; file prefix workaround is cross-LLM compatible solution
 
-**Tags:** #debugging #claude-code #mcp #namespace #cross-llm-compatibility #mkdocs #material-theme #grid-cards #css #indentation #markdown
+**Tags:** #debugging #claude-code #mcp #namespace #cross-llm-compatibility
 
 ---
 
@@ -51,7 +50,6 @@ Comprehensive catalog of all lessons-learned documents.
 **2026**
 - 2026-03-16: [Native FTS5 Search and Context-Mode Integration (v0.1.1+v0.1.2)](architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2.md)
 - 2026-03-01: [Plan File Dual-Location Protocol](process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md)
-- 2026-02-28: [MkDocs Grid Cards Require 4-Space Indentation](debugging/Lessons_Learned_MkDocs_Grid_Cards_Indentation.md)
 - 2026-02-27: [Documentation Update Triggers in Multi-Branch Feature Development](process/documentation-update-triggers-multibranchfeatures.md)
 - 2026-02-21: [Plugin Example File Management — Why You Can't Gate the Download](architecture/Lessons_Learned_Plugin_Example_File_Management.md)
 - 2026-02-21: [Update Notifications for Non-Plugin Users — Version Sync and MCP Discovery Gap](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md)
@@ -96,8 +94,7 @@ Comprehensive catalog of all lessons-learned documents.
 
 **#patterns** (0 lessons)
 
-**#debugging** (2 lessons)
-- [MkDocs Grid Cards Require 4-Space Indentation](debugging/Lessons_Learned_MkDocs_Grid_Cards_Indentation.md)
+**#debugging** (1 lesson)
 - [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md)
 
 **#mcp** (2 lessons)
