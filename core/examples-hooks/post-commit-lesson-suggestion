@@ -5,7 +5,7 @@
 #   cp core/examples-hooks/post-commit-lesson-suggestion .git/hooks/post-commit
 #   chmod +x .git/hooks/post-commit
 #
-# Or use /knowledge:init wizard to install automatically
+# Or use /kmgraph:init wizard to install automatically
 
 commit_msg=$(git log -1 --pretty=%B)
 
@@ -14,7 +14,7 @@ if echo "$commit_msg" | grep -qiE "(fix|solved|debug|implement|refactor|pattern|
   echo ""
   echo "💡 Lesson-worthy commit detected: $(git log -1 --pretty=%h) - ${commit_msg:0:60}"
   echo "   Consider capturing this lesson while context is fresh:"
-  echo "   /knowledge:capture-lesson"
+  echo "   /kmgraph:capture-lesson"
   echo ""
   echo "   Tip: Capturing within 30 minutes yields higher quality documentation"
   echo ""
