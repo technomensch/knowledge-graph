@@ -177,6 +177,37 @@ flowchart LR
 
 ---
 
+## System Architecture
+
+The knowledge graph system is organized into four layers. Each layer has a distinct responsibility; together they form a clean separation between detection, execution, automation, and persistence.
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  CONTEXT LAYER — Skills + AGENTS.md                     │
+│  Detect the moment, pre-structure data, dispatch        │
+├─────────────────────────────────────────────────────────┤
+│  LOGIC LAYER — Agents                                   │
+│  Own all execution logic (one agent per concern)        │
+├─────────────────────────────────────────────────────────┤
+│  LIFECYCLE LAYER — Hooks                                │
+│  Automate at the right moment                           │
+│  (Stop, PostToolUse, PreToolUse/Bash, Notification)     │
+├─────────────────────────────────────────────────────────┤
+│  DATA LAYER — MCP (kg_* tools)                          │
+│  Persistence, search, retrieval                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Context Layer** — Skills are auto-triggered context providers. When a skill fires (e.g., after a bug is solved), it detects the moment, pre-structures the relevant data, and dispatches directly to the appropriate agent. `AGENTS.md` (and `GEMINI.md` for Gemini CLI) provides the same context-layer guidance for non-Claude-Code platforms.
+
+**Logic Layer** — Agents own all execution logic. Each agent is responsible for one concern: `knowledge-extractor` handles parsing and extraction; `session-documenter` handles git archaeology and session summaries. Skills dispatch to agents rather than suggesting commands.
+
+**Lifecycle Layer** — Hooks automate knowledge capture at the right moment without manual intervention. `PostToolUse` fires after significant file changes, `Stop` runs at session end, and `PreToolUse` gates commit-worthy Bash commands.
+
+**Data Layer** — The MCP server exposes `kg_*` tools that handle all persistence operations: storing lessons, searching the knowledge graph, managing configuration, and maintaining the optional FTS5 search index.
+
+---
+
 ## Keeping the Conversation Focused
 
 When kmgraph syncs or updates the knowledge graph, it reads files to do its work. In a large knowledge graph, that means a lot of content entering the conversation at once — content that stays in memory even after the work is done. The context-mode plugin, when installed, moves that file-reading to a background process. Only a short summary returns to the conversation. The knowledge graph gets updated the same way — the conversation just stays cleaner.
@@ -401,5 +432,5 @@ MEMORY.md works best under 200 lines. When it grows beyond that threshold:
 </div>
 ---
 
-**Version**: 0.1.0-beta
-**Last Updated**: 2026-03-03
+**Version**: 0.2.0-beta
+**Last Updated**: 2026-03-27
