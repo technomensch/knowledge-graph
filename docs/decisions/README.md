@@ -2,8 +2,8 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 16
-**Last Updated:** 2026-03-16
+**Total ADRs:** 20
+**Last Updated:** 2026-03-27
 
 ---
 
@@ -24,6 +24,10 @@ Formal documentation of significant architecture decisions.
 - [ADR-014: Maintain Dual Plan File Locations](ADR-014-maintain-dual-plan-file-locations.md) — **Status:** Accepted
 - [ADR-015: Choose node-sqlite3-wasm for FTS5 Full-Text Search](ADR-015-node-sqlite3-wasm-for-fts5-search.md) — **Status:** Accepted
 - [ADR-016: Graceful Fallback Pattern for Optional MCP Server Dependencies](ADR-016-graceful-fallback-optional-mcp-dependencies.md) — **Status:** Accepted
+- [ADR-017: Four-Layer Architecture with Thin Command Dispatchers](ADR-017-four-layer-architecture-thin-commands.md) — **Status:** Accepted
+- [ADR-018: Platform-Agnostic AGENTS-template for Cross-Platform Portability](ADR-018-agents-template-platform-portability.md) — **Status:** Accepted
+- [ADR-019: Write Guard via Agent Instructions (v0.2.0) vs Data Layer (v0.2.1)](ADR-019-write-guard-agent-instructions-vs-data-layer.md) — **Status:** Accepted
+- [ADR-020: Lifecycle Hooks Suite for Automated Knowledge Capture](ADR-020-lifecycle-hooks-suite-automated-capture.md) — **Status:** Accepted
 
 ---
 
@@ -46,6 +50,10 @@ Formal documentation of significant architecture decisions.
 | **ADR-014** | Mar 01 | Maintain Dual Plan File Locations | v0.0.10 | Accepted |
 | **ADR-015** | Mar 16 | Choose node-sqlite3-wasm for FTS5 Full-Text Search | v0.1.2-beta | Accepted |
 | **ADR-016** | Mar 16 | Graceful Fallback Pattern for Optional MCP Server Dependencies | v0.1.2-beta | Accepted |
+| **ADR-017** | Mar 27 | Four-Layer Architecture with Thin Command Dispatchers | v0.2.0-beta | Accepted |
+| **ADR-018** | Mar 27 | Platform-Agnostic AGENTS-template for Cross-Platform Portability | v0.2.0-beta | Accepted |
+| **ADR-019** | Mar 27 | Write Guard via Agent Instructions (v0.2.0) vs Data Layer (v0.2.1) | v0.2.0-beta | Accepted |
+| **ADR-020** | Mar 27 | Lifecycle Hooks Suite for Automated Knowledge Capture | v0.2.0-beta | Accepted |
 
 ---
 
@@ -59,6 +67,10 @@ Formal documentation of significant architecture decisions.
 - [ADR-010](ADR-010-namespace-rename-knowledge-to-kg-sis.md) — Plugin namespace: `knowledge` → `kg-sis`
 - [ADR-015](ADR-015-node-sqlite3-wasm-for-fts5-search.md) — node-sqlite3-wasm (WASM SQLite) for FTS5 search
 - [ADR-016](ADR-016-graceful-fallback-optional-mcp-dependencies.md) — Graceful fallback pattern for optional MCP dependencies
+- [ADR-017](ADR-017-four-layer-architecture-thin-commands.md) — Four-layer architecture: context / logic / lifecycle / data
+- [ADR-018](ADR-018-agents-template-platform-portability.md) — Platform-agnostic AGENTS-template for non-Claude Code platforms
+- [ADR-019](ADR-019-write-guard-agent-instructions-vs-data-layer.md) — Write guard in agent instructions (v0.2.0) deferred to data layer (v0.2.1)
+- [ADR-020](ADR-020-lifecycle-hooks-suite-automated-capture.md) — Lifecycle hooks suite: 6 scripts for automated capture prompts
 
 ### Implementation & Patterns
 - [ADR-003](ADR-003-abandon-shadow-commands-for-file-prefix.md) — Shadow commands → file prefix workaround
@@ -87,7 +99,7 @@ Formal documentation of significant architecture decisions.
 
 ## Creating a New ADR
 
-1. **Determine next number:** Currently at ADR-011; next would be ADR-012
+1. **Determine next number:** Currently at ADR-020; next would be ADR-021
 2. **Copy template:** Use [ADR-template.md](ADR-template.md)
 3. **Fill all sections:** Context, Decision, Rationale, Consequences
 4. **Link to evidence:** Reference lessons learned, KG entries, implementation

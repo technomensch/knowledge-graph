@@ -23,6 +23,8 @@ Authoring standards for contributors writing or reviewing documentation for the 
 9. [Pre-Commit Checklist](#9-pre-commit-checklist)
 10. [Related Documentation](#10-related-documentation)
 
+> **Changelog authors**: See [Section 4f](#4f-changelog-entry-pattern) for the required `### What This Means For You` subsection format.
+
 ---
 
 ## Citation Keys
@@ -265,6 +267,56 @@ Lessons follow the template in `core/templates/lessons-learned/lesson-template.m
 ADRs follow the template in `core/templates/decisions/ADR-template.md`. Refer contributors to that template.
 
 **Citation**: `[DiataxisFramework]` — reference documents describe structure, not process.
+
+---
+
+### 4f. Changelog entry pattern
+
+Apply to: every version section in `docs/CHANGELOG.md`.
+
+Each version section opens with a `### TL;DR` subsection, followed by the standard Keep a Changelog technical blocks (`### Added`, `### Changed`, `### Removed`, `### Fixed`).
+
+#### Required subsection structure
+
+```markdown
+### TL;DR
+
+- [plain-English bullet describing a user-visible change]
+- [plain-English bullet for a workflow that is now automated]
+- [plain-English bullet for a command that changed behavior]
+- [plain-English bullet explicitly flagging a behind-the-scenes change]
+```
+
+#### Rules for `### TL;DR`
+
+- Write for a developer who uses KMGraph daily but is not reading the source code
+- State what is different about daily use, not what code changed internally
+- Explicitly call out workflows that are now automated — what the user no longer needs to do manually
+- Explicitly call out commands whose behavior, name, or invocation changed
+- Explicitly flag changes that are purely behind the scenes with a phrase such as "Behind the scenes only" or "No UX impact" — do not omit them; include one bullet to confirm nothing changed for the user
+- Use plain English; avoid technical terms that are not already defined in Section 3 of this guide
+- Use bullet points only — no sub-bullets, no code blocks, no headers inside this subsection
+- Each bullet is a complete thought and stands alone without requiring the reader to check the technical sections below
+
+#### Placement
+
+Place `### TL;DR` immediately after the `## [version] - date` heading, before all technical subsections (`### Added`, `### Changed`, `### Removed`, `### Fixed`). The user sees the plain-English summary first; the technical detail follows for those who need it.
+
+#### Example
+
+```markdown
+## [1.0.0] - 2026-04-01
+
+### TL;DR
+
+- Capturing a lesson now works from Cursor and Windsurf without the `/kmgraph:capture-lesson` command — the MCP tool handles it directly.
+- Behind the scenes only: the internal search index format changed; search results are unchanged from your perspective.
+
+### Added
+- New `kg_capture` MCP write tool
+```
+
+**Citation**: `[Nielsen2015]` — plain language reduces cognitive load; changelog readers are users, not implementers. `[GoogleDevDocs]` — "State the purpose before the details."
 
 ---
 
@@ -543,5 +595,6 @@ Run this checklist before marking documentation complete or committing a new or 
 ---
 
 **Created**: 2026-02-20
-**Version**: 1.0
+**Version**: 1.1.0
+**Last Updated**: 2026-03-27
 **Applies to**: v0.0.7-alpha and later
