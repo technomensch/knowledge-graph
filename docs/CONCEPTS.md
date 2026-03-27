@@ -200,7 +200,7 @@ The knowledge graph system is organized into four layers. Each layer has a disti
 
 **Context Layer** — Skills are auto-triggered context providers. When a skill fires (e.g., after a bug is solved), it detects the moment, pre-structures the relevant data, and dispatches directly to the appropriate agent. `AGENTS.md` (and `GEMINI.md` for Gemini CLI) provides the same context-layer guidance for non-Claude-Code platforms.
 
-**Logic Layer** — Agents own all execution logic. Each agent is responsible for one concern: `knowledge-extractor` handles parsing and extraction; `session-documenter` handles git archaeology and session summaries. Skills dispatch to agents rather than suggesting commands.
+**Logic Layer** — Agents own all execution logic. Each agent handles one concern: `lesson-capture-agent` captures single lessons in real time; `recall-agent` searches and formats results; `session-summary-agent` summarizes the current session; `platform-sync-agent` syncs AI tool config files; `knowledge-extractor` handles bulk extraction from large files; `session-documenter` handles deep git archaeology. Skills dispatch to agents rather than suggesting commands.
 
 **Lifecycle Layer** — Hooks automate knowledge capture at the right moment without manual intervention. `PostToolUse` fires after significant file changes, `Stop` runs at session end, and `PreToolUse` gates commit-worthy Bash commands.
 
