@@ -365,6 +365,150 @@ and decisions during development.
 Start with: /kmgraph:capture-lesson to document your first learning.
 ```
 
+### Step 1.11: Configure AI Platform Files (Optional)
+
+After the knowledge graph is initialized, detect which AI coding tools are installed and offer to write platform-specific configuration files so those tools are aware of KMGraph.
+
+#### Platform Detection
+
+Run these checks to build the list of detected platforms:
+
+```bash
+# Gemini CLI
+which gemini 2>/dev/null || [ -d "$HOME/.gemini" ]
+
+# Cursor
+[ -d "$HOME/.cursor" ] || [ -d "$HOME/Library/Application Support/Cursor" ]
+
+# Windsurf
+[ -d "$HOME/.windsurf" ] || [ -d "$HOME/Library/Application Support/Windsurf" ]
+
+# Continue.dev
+[ -d "$HOME/.continue" ]
+
+# VS Code Copilot
+code --list-extensions 2>/dev/null | grep -q "GitHub.copilot"
+
+# Aider
+which aider 2>/dev/null
+```
+
+Collect results into `detected_platforms` array (values: `gemini`, `cursor`, `windsurf`, `continue`, `copilot`, `aider`).
+
+#### Multi-Platform Confirmation UX
+
+**No platforms detected:** Skip this step silently. Do not prompt.
+
+**One platform detected:**
+```
+Want me to configure KMGraph for [platform]? [y/N]
+```
+
+**Multiple platforms detected:**
+```
+I see you have [A], [B], and [C]. Want me to configure KMGraph for all of them?
+
+1. Configure all
+2. Choose which ones
+3. Skip (I'll do it myself)
+```
+
+If option 2 (choose), prompt individually for each detected platform.
+
+**For any platform the user declines:** Show the exact file path and exact content to paste — never redirect to docs. Then show a verification step:
+```
+To configure manually, create/edit:
+  [exact file path]
+
+Paste this content:
+  [exact file content]
+
+Once added, ask your AI: "Is there a knowledge graph available?"
+It should respond with a description of KMGraph's capture and recall capabilities.
+```
+
+#### Platform File Map
+
+| Platform | File | Content source |
+|---|---|---|
+| Gemini CLI | `GEMINI.md` in project root | `core/templates/AGENTS-template.md` |
+| Cursor | `.cursorrules` | Project conventions + KMGraph behaviors subset |
+| Windsurf | `.windsurfrules` | Same as `.cursorrules` |
+| Continue.dev | `.continue/config.json` prompt section | KMGraph behaviors subset |
+| VS Code Copilot | `.github/copilot-instructions.md` | Project conventions + KMGraph behaviors subset |
+| Aider | `.aider.conf.yml` conventions section | KMGraph behaviors subset |
+
+#### Overwrite Protection
+
+Before writing any platform file, check if it already exists:
+
+```bash
+if [ -f "$target_file" ]; then
+  # Show a human-readable diff: describe the sections that would change
+  echo "⚠️  $target_file already exists."
+  echo "Here is what would change:"
+  # Describe additions (KMGraph section) vs. existing content
+  diff "$target_file" "$proposed_content_temp_file"
+  echo ""
+  # Prompt before overwriting
+  echo "Overwrite $target_file with the updated content? [y/N]"
+fi
+# Never silently replace an existing file
+```
+
+If the user declines overwrite: show the exact content to merge manually (per the declined-platform flow above).
+
+#### Writing Platform Files
+
+For each approved platform, write the appropriate file using the content source in the table above:
+
+```bash
+# Gemini CLI example
+cp "${CLAUDE_PLUGIN_ROOT}/core/templates/AGENTS-template.md" "$(pwd)/GEMINI.md"
+
+# Cursor / Windsurf — write KMGraph behaviors subset
+# Continue.dev — inject prompt section into .continue/config.json
+# VS Code Copilot — write .github/copilot-instructions.md
+# Aider — inject conventions section into .aider.conf.yml
+```
+
+Output confirmation per platform:
+```
+✅ Configured: GEMINI.md (Gemini CLI)
+✅ Configured: .cursorrules (Cursor)
+```
+
+#### Config Registration
+
+After writing each platform file, register the platform name in `~/.claude/kg-config.json` under the active KG entry's `platforms` array. Use the canonical names: `"gemini"`, `"cursor"`, `"windsurf"`, `"continue"`, `"copilot"`, `"aider"`.
+
+```bash
+# Add platform to the platforms array for the active KG
+# If the "platforms" field is absent, initialize it as an empty array first
+jq ".graphs[\"$kg_name\"].platforms = (.graphs[\"$kg_name\"].platforms // []) + [\"$platform_name\"]" \
+  ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+```
+
+Do not error if the `platforms`, `autoSwitch`, or `notification` fields are absent in an existing config entry — treat all missing fields as their defaults:
+- `platforms`: `[]`
+- `autoSwitch`: `false`
+- `notification.webhookUrl`: `""`
+
+The updated config entry schema:
+
+```json
+{
+  "my-project": {
+    "path": "/path/to/kg/docs",
+    "type": "project-local",
+    "autoSwitch": false,
+    "platforms": ["gemini", "cursor"],
+    "notification": { "webhookUrl": "" }
+  }
+}
+```
+
 ## Edge Cases
 
 ### No config file exists
