@@ -74,7 +74,7 @@ The initialization wizard prompts for:
 
 After completion, the command creates the knowledge graph directory structure in the project.
 
-### Step 2b: AI Tool Detection (Automatic)
+#### AI Tool Detection (Automatic)
 
 After initialization, `/kmgraph:init` scans for installed AI coding tools and offers to configure each one automatically. Detected tools include:
 
@@ -313,9 +313,9 @@ Skills activate automatically based on what you're doing. They detect the right 
 
 | Skill | Triggers On | Action |
 |---|---|---|
-| **lesson-capture** | "figured it out", bug solved, breakthrough made | Dispatches to `knowledge-extractor` agent with pre-filled context |
-| **kg-recall** | "have we done this before", past decisions, history questions | Dispatches to recall with extracted search terms |
-| **session-wrap** | Session ending, context limit (180K+), major milestone | Dispatches to `session-documenter` agent before compaction |
+| **lesson-capture** | "figured it out", bug solved, breakthrough made | Dispatches to `lesson-capture-agent` with pre-filled context |
+| **kg-recall** | "have we done this before", past decisions, history questions | Dispatches to `recall-agent` with extracted search terms |
+| **session-wrap** | Session ending, context limit (180K+), major milestone | Dispatches to `session-summary-agent` before compaction |
 | **adr-guide** | "I'm thinking of using...", architecture decisions | Dispatches to ADR creation with decision guidance |
 | **gov-execute-plan** | "execute plan", implementation start, `docs/plans/*.md` mentioned | Zero-deviation 8-step execution protocol |
 
