@@ -1,14 +1,51 @@
 ---
 name: Knowledge Graph Usage
-description: This skill should be used when the user mentions "documenting lessons", "capturing knowledge", "remembering this for later", "we solved this before", "institutional memory", "project memory", "track decisions", or when Claude detects recurring problems, repeated patterns, valuable insights worth preserving, situations after completing /kmgraph:capture-lesson (suggest KG extraction), after git commits with fix/debug/pattern keywords (suggest lesson capture within 30min), or when user describes familiar problems (suggest searching existing lessons first).
-version: 1.0.1
+description: This skill orients the system to the four-layer architecture (context, logic, lifecycle, data) and how each layer coordinates knowledge capture, retrieval, and synchronization. Skill recognizes knowledge capture opportunities, provides command reference for manual interactive use, and guides understanding of how skills and hooks automate triggering.
+version: 2.0.0
 ---
 
 # Knowledge Graph Usage Guidance
 
 ## Purpose
 
-Provide autonomous guidance for recognizing knowledge capture opportunities and using the Knowledge Management Graph effectively. Enable Claude to proactively suggest capturing valuable insights, lessons learned, and decisions without explicit user requests.
+Provide orientation to the Knowledge Graph system architecture and guidance for recognizing knowledge capture opportunities. The system operates across four coordinated layers that automate knowledge lifecycle management while keeping manual commands available for interactive use.
+
+## System Architecture: Four Layers
+
+The Knowledge Graph system coordinates across four layers that work together seamlessly:
+
+### Context Layer: Skills + AGENTS.md
+**Detects the moment, pre-structures data, dispatches to logic layer**
+
+- **Skills** (this file and others) — Recognize when knowledge operations are needed
+- **AGENTS.md** — Define dispatch rules and routing logic
+- Example: Lesson capture skill detects "Finally figured it out" → pre-structures problem/solution → dispatches to lesson-capture-agent
+
+### Logic Layer: Agents
+**Execute the work with full context**
+
+- **lesson-capture-agent** — Real-time single-lesson capture (user-initiated or skill-triggered)
+- **recall-agent** — Knowledge search and retrieval (context-aware ranking)
+- **session-summary-agent** — Lightweight current-session summary (fresh context preservation)
+- **platform-sync-agent** — Cross-platform config file sync (Claude Desktop + Claude Code alignment)
+- **knowledge-extractor** — Batch backfill from large files (approval-gated writes)
+- **session-documenter** — Deep git archaeology for summaries (approval-gated commits)
+- **knowledge-reviewer** — Review KG entry quality (ongoing curation)
+
+### Lifecycle Layer: Hooks
+**Automate at the right moment**
+
+- **PostToolUse** — After commands complete, trigger follow-up suggestions (e.g., extract to KG after lesson capture)
+- **Stop** — Session ending, prompt for session summary
+- **PreToolUse** — Before problem-solving, suggest recall search
+
+### Data Layer: MCP kg_* Tools
+**Persistence, search, retrieval**
+
+- `kg_search` — Full-text search across lessons, decisions, sessions
+- `kg_scaffold` — Create entries from templates
+- `kg_config_*` — Configuration and sync
+- `kg_fts5_rebuild` — Indexing and performance
 
 ## Core Principles
 
@@ -68,17 +105,17 @@ Avoid capturing:
 - Incomplete solutions still being tested
 - Trivial fixes with obvious causes
 
-### Duplicate Detection <!-- v0.0.3 Change -->
+### Duplicate Detection
 
 **Before capturing a new lesson, search for similar existing lessons to avoid duplication:**
 
 **Search strategy:**
 1. Extract key terms from the topic (problem domain, technology, pattern name)
-2. Use `/kmgraph:recall "key terms"` to search existing lessons
+2. Recall search via recall-agent (automatic or explicit with `/kmgraph:recall "key terms"`)
 3. Review search results for similar content
 
 **If similar lesson found:**
-- **Merge option**: Update existing lesson (use `/kmgraph:capture-lesson update <filename>`)
+- **Merge option**: Update existing lesson
 - **Related option**: Create new lesson with explicit "Related:" link to similar lesson
 - **Proceed option**: Create new lesson if genuinely different (different root cause, different context, or significantly different solution)
 
@@ -93,89 +130,74 @@ Avoid capturing:
 - Reduces cognitive load during recall
 - Maintains single source of truth for each pattern
 
-**Example workflow:**
-```
-User: "I want to capture a lesson about API error handling"
-Assistant: "Before capturing, let me search existing lessons..."
-          → Runs /kmgraph:recall "API error handling"
-          → Finds: "Lessons_Learned_Error_Handling_Patterns.md"
-          → "I found a similar lesson. Would you like to:"
-            1. Update existing lesson (merge new findings)
-            2. Create new lesson with reference to existing
-            3. Proceed with new lesson (if significantly different)
-```
+## Automation: How Layers Coordinate
 
-## Command Reference
+The system automates knowledge lifecycle through layer coordination:
 
-### Primary Capture Commands
+**Example: After solving a problem**
+1. **Context layer (skill)** detects "Finally figured it out"
+2. **Logic layer (agent)** dispatches to lesson-capture-agent
+3. **Lifecycle layer (hook)** PostToolUse triggers post-capture suggestions
+4. **Data layer** persists entry and updates search index
+
+**Example: Before starting problem-solving**
+1. **Context layer (skill)** detects problem description
+2. **Lifecycle layer (hook)** PreToolUse triggers recall-agent
+3. **Logic layer** searches KG for similar patterns
+4. **Data layer** returns ranked results
+
+This automation eliminates the need to remember to run commands—the system recognizes the moment and dispatches appropriate logic.
+
+## Command Reference: Manual Interactive Use
+
+Commands remain available for explicit, interactive use. They operate on all four layers:
+
+### Capture and Organization
 
 **`/kmgraph:capture-lesson [title]`**
-- Document lessons learned with git metadata tracking
-- Use after resolving significant problems or making important discoveries
-- Captures current git branch, commit, author, date
-- Categories: architecture, debugging, patterns, process, governance
-
-**`/kmgraph:meta-issue [issue-number]`**
-- Initialize tracking for complex recurring problems
-- Use when same issue encountered multiple times
-- Links attempts, tracks solutions, maintains context
-- Integrates with GitHub issues for team visibility
-
-**`/kmgraph:link-issue [lesson-id] [issue-number]`**
-- Create bidirectional links between lessons and GitHub issues
-- Use to connect documented knowledge with tracked work
-- Enables traceability and context preservation
-
-### Search and Recall Commands
-
-**`/kmgraph:recall "query"`**
-- Search across all knowledge: lessons, decisions, sessions, graph
-- Use when facing familiar problem or needing past context
-- Semantic search finds relevant content even with different terms
-
-**`/kmgraph:status`**
-- Display active KG info, stats, quick command reference
-- Use to understand current KG setup and available categories
-- Shows recent activity and configuration
-
-### Organization Commands
-
-**`/kmgraph:update-graph`**
-- Extract structured insights from lessons into knowledge graph
-- Use after capturing multiple lessons to consolidate learnings
-- Preserves git metadata, creates topic-based organization
+- Interactive lesson capture with git metadata tracking
+- Available for manual use when automation doesn't trigger
+- Dispatches to lesson-capture-agent
 
 **`/kmgraph:session-summary`**
-- Create summary of current chat session
-- Use at end of productive sessions to preserve context
-- Documents what was accomplished and key decisions made
+- Create summary of current session interactively
+- Available for manual use at any time
+- Dispatches to session-summary-agent
 
 **`/kmgraph:sync-all`**
-- Automated orchestrator: extract chat → capture lessons → update graph
-- Use for complete knowledge pipeline in one command
-- Replaces manual 4-step workflow
+- Full orchestration pipeline in one command
+- Extract → capture → update graph
+- Dispatches multiple agents in sequence
 
-### Advanced Commands
+### Search and Recall
+
+**`/kmgraph:recall "query"`**
+- Explicit search across all knowledge
+- Manual trigger for recall-agent
+- Useful when automation doesn't suggest search
+
+**`/kmgraph:status`**
+- View KG config, stats, recent activity
+- Non-dispatching information command
+
+### Configuration
 
 **`/kmgraph:init [name]`**
-- Initialize new knowledge graph with wizard setup
-- Use for first-time setup or creating new topic-based KGs
-- Configures categories, git strategy, directory structure
+- Create new knowledge graph
+- Configure categories and git strategy
+- One-time setup command
 
 **`/kmgraph:switch [name]`**
-- Change active knowledge graph
-- Use when working across multiple projects or topics
-- Subsequent commands operate on selected KG
-
-**`/kmgraph:configure-sanitization`**
-- Set up pre-commit hooks for sensitive data detection
-- Use before pushing knowledge to public repos
-- Interactive wizard configures patterns and actions
+- Change active KG
+- Routes subsequent commands to selected graph
 
 **`/kmgraph:check-sensitive`**
-- Scan active KG for potentially sensitive information
-- Use before public sharing or team distribution
-- Reports matches with file locations for review
+- Scan for sensitive data before sharing
+- Manual security check before commits/pushes
+
+**`/kmgraph:configure-sanitization`**
+- Set up pre-commit hooks for data protection
+- One-time security configuration
 
 ## Workflow Patterns
 
