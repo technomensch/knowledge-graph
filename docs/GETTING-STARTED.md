@@ -223,35 +223,35 @@ How to tell the index is active: search results show `(FTS5)` — this just mean
     - New commands or skills added in the update are unavailable
     - MCP server shows a `failed` status
 
+!!! info "Command types used in this guide"
+    Two types of commands appear below. Make sure to run each in the right place:
+
+    - **Shell commands** — run in the terminal (the same place `claude` is launched to start Claude Code)
+    - **Claude Code commands** — type directly into the Claude Code prompt (the `>` input)
+
 **Fix — clear the cache and reinstall:**
 
-=== "Command Line (macOS / Linux)"
+=== "macOS / Linux"
 
-    **Step 1: Remove the stale cache**
+    **Step 1 — Shell: Remove the stale plugin cache**
 
     ```bash
     rm -rf ~/.claude/plugins/cache/stayinginsync-knowledge-graph/
     ```
 
-    **Step 2: Reload plugins**
-
-    ```
-    /reload-plugins
-    ```
-
-    **Step 3: Uninstall kmgraph**
+    **Step 2 — Claude Code: Uninstall kmgraph**
 
     ```
     /plugin uninstall kmgraph
     ```
 
-    **Step 4: Reload plugins again**
+    **Step 3 — Claude Code: Reload plugins**
 
     ```
     /reload-plugins
     ```
 
-    **Step 5: Update the marketplace listing**
+    **Step 4 — Claude Code: Update the marketplace listing**
 
     ```
     /plugin update stayinginsync
@@ -260,51 +260,82 @@ How to tell the index is active: search results show `(FTS5)` — this just mean
     !!! note
         The marketplace may still show the older version number after this step. That is expected — continue anyway.
 
-    **Step 6: Reinstall kmgraph**
+    **Step 5 — Claude Code: Reinstall kmgraph**
 
     ```
     /plugin install stayinginsync
     ```
 
-    **Step 7: Reload plugins one more time**
+    **Step 6 — Claude Code: Reload plugins**
 
     ```
     /reload-plugins
     ```
 
-    **Step 8: Close and reopen Claude Code**
+    **Step 7 — Shell: Close and reopen Claude Code**
 
-    Fully quit Claude Code and relaunch it before continuing.
+    Fully quit Claude Code (`exit` or close the terminal) and relaunch it:
 
-    **Step 9: Restart the MCP server**
+    ```bash
+    claude
+    ```
+
+    **Step 8 — Claude Code: Restart the MCP server**
 
     ```
     /mcp restart kmgraph
     ```
 
-=== "Command Line (Windows)"
+    **Step 9 — Claude Code: Verify and upgrade the knowledge graph**
 
-    **Step 1: Remove the stale cache**
+    ```
+    /kmgraph:init
+    ```
+
+    Select **option 1 (Verify/upgrade)** when prompted. This checks that the existing knowledge graph directories, config fields, and templates are current with the new plugin version. Existing lessons and decisions are never modified.
+
+=== "Windows"
+
+    **Step 1 — Shell (PowerShell): Remove the stale plugin cache**
 
     ```powershell
     Remove-Item -Recurse -Force "$env:USERPROFILE\.claude\plugins\cache\stayinginsync-knowledge-graph"
     ```
 
-    **Steps 2–7:** Same as macOS/Linux — run the same `/reload-plugins`, `/plugin uninstall`, `/plugin update`, `/plugin install`, and final `/reload-plugins` commands in Claude Code.
+    **Steps 2–6 — Claude Code:** Run the following commands in Claude Code one at a time:
 
-    **Step 8: Close and reopen Claude Code**
+    ```
+    /plugin uninstall kmgraph
+    /reload-plugins
+    /plugin update stayinginsync
+    /plugin install stayinginsync
+    /reload-plugins
+    ```
 
-    Fully quit Claude Code and relaunch it before continuing.
+    !!! note
+        The marketplace may still show the older version number after `/plugin update stayinginsync`. That is expected — continue with the reinstall.
 
-    **Step 9: Restart the MCP server**
+    **Step 7 — Shell: Close and reopen Claude Code**
+
+    Fully quit Claude Code and relaunch from the terminal or Start menu.
+
+    **Step 8 — Claude Code: Restart the MCP server**
 
     ```
     /mcp restart kmgraph
     ```
 
+    **Step 9 — Claude Code: Verify and upgrade the knowledge graph**
+
+    ```
+    /kmgraph:init
+    ```
+
+    Select **option 1 (Verify/upgrade)** when prompted.
+
 === "GUI (Finder / File Explorer)"
 
-    **Step 1: Delete the stale cache folder**
+    **Step 1 — Finder/File Explorer: Delete the stale cache folder**
 
     === "macOS (Finder)"
 
@@ -327,10 +358,9 @@ How to tell the index is active: search results show `(FTS5)` — this just mean
 
         3. Delete the `stayinginsync-knowledge-graph` folder (right-click → Delete)
 
-    **Steps 2–7:** Switch to the Claude Code terminal and run:
+    **Steps 2–6 — Claude Code:** Open a Claude Code terminal and run these commands one at a time:
 
     ```
-    /reload-plugins
     /plugin uninstall kmgraph
     /reload-plugins
     /plugin update stayinginsync
@@ -341,15 +371,21 @@ How to tell the index is active: search results show `(FTS5)` — this just mean
     !!! note
         The marketplace may still show the older version number after `/plugin update stayinginsync`. That is expected — continue with the reinstall.
 
-    **Step 8: Close and reopen Claude Code**
+    **Step 7:** Fully quit Claude Code and relaunch it.
 
-    Fully quit Claude Code and relaunch it before continuing.
-
-    **Step 9: Restart the MCP server**
+    **Step 8 — Claude Code: Restart the MCP server**
 
     ```
     /mcp restart kmgraph
     ```
+
+    **Step 9 — Claude Code: Verify and upgrade the knowledge graph**
+
+    ```
+    /kmgraph:init
+    ```
+
+    Select **option 1 (Verify/upgrade)** when prompted.
 
 ### Commands do not appear in Claude Code autocomplete
 
