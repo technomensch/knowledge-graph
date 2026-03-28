@@ -12,29 +12,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### TL;DR
 
-!!! info "Just-in-Time MCP Setup."
-    If you skip the `init` command and the MCP server isn't connected, the assistant will now intercept the failure and offer to automatically configure your IDE.
+!!! info "Automatic setup if the plugin isn't connected."
+    If your editor loses connection to the knowledge graph, the assistant will seamlessly intercept the error and set it back up for you. No manual configuration editing required.
 
-!!! info "Lesson capture now works everywhere."
-    Platforms that only support MCP tools (like Cursor or Windsurf) can now capture lessons, session summaries, and ADRs via the new `kg_capture` tool without needing file system write access.
+!!! info "Lesson capture now works without the slash command."
+    Capturing a lesson now works from Cursor and Windsurf directly — the plugin handles it natively.
 
-!!! info "Backend refactoring for performance and maintainability."
-    The `sync-all` and `update-graph` commands, as well as the `adr-guide` skill, have been modernized to use the new lightweight dispatcher pattern.
-
-!!! info "Admonitions are the new standard for Changelog TL;DRs."
-    The Style Guide now enforces `!!! info` blocks for release notes instead of plain bullet points.
-
-!!! info "Webhook configuration is now documented."
-    Added user-facing instructions in `docs/CONFIGURATION.md` on how to opt-in to Slack/webhook notifications for lessons and ADRs.
-
-!!! info "Visual upgrade for architecture diagrams."
-    The ASCII art in `CONCEPTS.md` has been replaced with Mermaid flowcharts for better readability and theme consistency.
+!!! info "Behind the scenes only:"
+    We modernized the backend commands and updated the documentation style rules. These are internal upgrades; nothing changed from your perspective.
 
 ### Added
 - **`kg_capture` MCP Write Tool** — Enables full lesson, session, and ADR capture capabilities for platforms that lack raw file system tools. Includes automatic FTS5 index rebuilding.
 - **MCP Auto-Registration Agent** — Intercepts failed MCP tool calls and interactively offers to write the correct `mcp.json` or `settings.json` configuration for the active IDE (Gemini CLI, Cursor, Windsurf, Continue.dev, VS Code).
 - **Active Work Guard Enforcement** — The `kg_capture` tool enforces an active-KG-to-CWD validation check at the data layer, returning structured errors (`KG_MISMATCH`) if they drift.
-- Notification Webhooks configuration section to `docs/CONFIGURATION.md`
 - Changelog format validation (Keep a Changelog + Semantic Versioning) to the `/kmgraph:update-doc` wizard
 
 ### Changed
@@ -46,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Re-established `CHANGELOG.md` as the single source of truth for release notes via symlink (resolving the dual-maintenance issue)
 
 ### Fixed
+- Added missing Notification Webhooks instructions to `docs/CONFIGURATION.md` (resolving dead link in v0.2.0-beta changelog)
 - Recovered missing Changelog style guide formatting rules (Section 4f) from commit history
 - Restored original v0.2.0-beta TL;DR release notes that were accidentally overwritten
 
