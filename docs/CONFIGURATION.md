@@ -188,7 +188,55 @@ See [core/docs/PLATFORM-ADAPTATION.md#mcp-server](reference/PLATFORM-ADAPTATION.
 
 ---
 
-## Customization
+## Notification Webhooks (Optional)
+
+KMGraph can send a notification to a Slack channel or any webhook endpoint whenever a lesson or ADR is saved. This feature is **off by default** — no configuration is required unless you want it.
+
+### How to enable
+
+**1. Get a webhook URL**
+
+- **Slack:** Go to [api.slack.com/apps](https://api.slack.com/apps), create an app, enable *Incoming Webhooks*, and copy the generated URL.
+- **Other services:** Any service that accepts an HTTP POST with a JSON body works (Discord, Teams, custom endpoints, etc.).
+
+**2. Set the webhook URL**
+
+Add it to your shell environment or `.env` file in your project root:
+
+```bash
+# In your shell profile (~/.zshrc or ~/.bashrc)
+export KMGRAPH_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+
+# Or in a .env file in your project root (make sure .env is in .gitignore)
+KMGRAPH_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+```
+
+> **Note:** `docs/sessions/` and `.env` are gitignored by default. Never commit a webhook URL to version control.
+
+**3. Verify it works**
+
+After capturing your next lesson or ADR, you should receive a notification within a few seconds. If nothing arrives, check that the URL is correctly exported in your current shell session.
+
+### What the notification contains
+
+```json
+{
+  "text": "📝 KMGraph: New lesson captured — 'JWT Timestamp Unit Mismatch' in docs/lessons-learned/"
+}
+```
+
+The message includes the entry type, title, and file path. No file contents are sent.
+
+### Disabling webhooks
+
+Unset the environment variable:
+
+```bash
+unset KMGRAPH_WEBHOOK_URL
+```
+
+Or remove `KMGRAPH_WEBHOOK_URL` from your `.env` file.
+
 
 ### Templates
 

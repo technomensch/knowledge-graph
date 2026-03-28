@@ -12,17 +12,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### TL;DR
 
-- **You no longer need to remember to run `/kmgraph:capture-lesson` after breakthroughs.** The tool now watches your file writes and automatically asks if something worth capturing just happened.
-- **Session summaries happen on their own.** When you say "done", "wrapping up", or similar, KMGraph will offer to write a session summary for you — no need to invoke the command manually.
-- **Before you commit, KMGraph will check in.** If you have changes that look lesson-worthy but haven't been documented, you'll get a prompt before the commit goes through.
-- **Platform file changes trigger a sync reminder.** If you edit a config file like CLAUDE.md or GEMINI.md, KMGraph will ask if you want to sync it to your other AI tool configs.
-- **Plans you write to `~/.claude/plans/` are automatically mirrored to `docs/plans/`.** No manual copy needed.
-- **Cross-project write protection is now active.** If you're working in one project but your knowledge graph is pointed at another, KMGraph will warn you before writing anything — preventing accidental cross-project entries.
-- **The three main commands (`/kmgraph:capture-lesson`, `/kmgraph:recall`, `/kmgraph:session-summary`) load noticeably faster.** They work exactly the same, just with less startup overhead. No behavior change from your perspective.
-- **If you use Gemini CLI, Cursor, Windsurf, or any other AI coding tool:** you can now load `core/templates/AGENTS-template.md` as a system prompt and get the same KMGraph behaviors without needing `/kmgraph:` commands.
-- **The init command now detects which AI tools you have installed** and offers to configure KMGraph for all of them at once — no separate setup per tool.
-- **Notification webhooks are available (opt-in only).** If you configure a Slack or webhook URL in your settings, you'll get notified when lessons or ADRs are saved. Off by default, no action needed.
-- **Behind the scenes only:** The internal architecture was reorganized into four layers. Nothing about how you use KMGraph changes — this is a structural improvement that makes the tool easier to maintain and extend.
+!!! info "Session summaries happen on their own."
+    When the LLM is prompted with "done", "wrapping up", or similar, KMGraph will offer to write a session summary — no need to invoke the command manually.
+
+!!! info "Before committing, KMGraph will check in."
+    If there are changes that look lesson-worthy but haven't been documented, users will be prompted before the commit goes through.
+
+!!! info "Platform file changes trigger a sync reminder."
+    If a config file like CLAUDE.md or GEMINI.md, KMGraph will ask if whether or not to sync it to other AI tool configs.
+
+!!! info "Plans written to `~/.claude/plans/` are automatically mirrored to `docs/plans/`."
+    No manual copy needed.
+
+!!! info "Cross-project write protection is now active."
+    If users are working in one project but the active knowledge graph is pointed at another, KMGraph will display a warning before writing anything — preventing accidental cross-project entries.
+
+!!! info "The three main commands (`/kmgraph:capture-lesson`, `/kmgraph:recall`, `/kmgraph:session-summary`) load noticeably faster."
+    They work exactly the same, just with less startup overhead.
+
+!!! info "Additional feature support for Gemini CLI, Cursor, Windsurf, or any other AI coding tools"
+    Users can now load `core/templates/AGENTS-template.md` as a system prompt and get the same KMGraph behaviors without needing `/kmgraph:` commands.
+
+!!! info "The `init` command now detects which AI tools are installed"
+    The `init` command now offers to configure KMGraph for all of them at once — no separate setup per tool.
+
+!!! info "Notification webhooks are available (opt-in only)."
+    If a Slack or webhook URL is configured, users will get notified when lessons or ADRs are saved. Off by default, no action needed. See [Notification Webhooks](CONFIGURATION.md#notification-webhooks-optional) for setup instructions.
+
+!!! info "Behind the scenes only:"
+    The internal architecture was reorganized into four layers. This is a structural improvement that makes the tool easier to maintain and extend.
 
 ### Added
 

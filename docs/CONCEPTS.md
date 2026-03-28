@@ -183,26 +183,43 @@ flowchart LR
 
 KMGraph separates responsibilities into four layers. Each layer handles one concern, and layers communicate in a single direction: Context feeds Logic, Logic triggers Lifecycle, and Lifecycle calls Data. This separation keeps each layer independently testable, replaceable, and portable across platforms.
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    Context Layer                        │
-│         Skills detect moments, pre-structure data       │
-│              Dispatch to the right agent                │
-├─────────────────────────────────────────────────────────┤
-│                     Logic Layer                         │
-│           Agents own execution (one per concern)        │
-│         Platform-agnostic processing and decisions      │
-├─────────────────────────────────────────────────────────┤
-│                   Lifecycle Layer                       │
-│         Hooks fire at the right moments                 │
-│    SessionStart · PostToolUse · Stop · Notification     │
-├─────────────────────────────────────────────────────────┤
-│                      Data Layer                         │
-│            MCP tools handle persistence                 │
-│          Search, retrieval, and storage (kg_*)          │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+%%{init: { 'flowchart': { 'useMaxWidth': true }, 'theme': 'neutral' }}%%
+flowchart TD
+    subgraph Context ["Context Layer"]
+        direction TB
+        C1["Skills detect moments, pre-structure data"]
+        C2["Dispatch to the right agent"]
+        C1 ~~~ C2
+    end
 
-        Flow:  Context  →  Logic  →  Lifecycle  →  Data
+    subgraph Logic ["Logic Layer"]
+        direction TB
+        L1["Agents own execution (one per concern)"]
+        L2["Platform-agnostic processing and decisions"]
+        L1 ~~~ L2
+    end
+
+    subgraph Lifecycle ["Lifecycle Layer"]
+        direction TB
+        F1["Hooks fire at the right moments"]
+        F2["SessionStart · PostToolUse · Stop · Notification"]
+        F1 ~~~ F2
+    end
+
+    subgraph Data ["Data Layer"]
+        direction TB
+        D1["MCP tools handle persistence"]
+        D2["Search, retrieval, and storage (kg_*)"]
+        D1 ~~~ D2
+    end
+
+    Context --> Logic
+    Logic --> Lifecycle
+    Lifecycle --> Data
+
+    accTitle: Four-Layer Architecture
+    accDescr: Flow diagram showing data moving from Context Layer (Skills) to Logic Layer (Agents) to Lifecycle Layer (Hooks) to Data Layer (MCP tools).
 ```
 
 ### Context Layer — Skills
