@@ -8,6 +8,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0-beta] - 2026-03-27
+
+### TL;DR
+
+- **You no longer need to remember to run `/kmgraph:capture-lesson` after breakthroughs.** The tool now watches your file writes and automatically asks if something worth capturing just happened.
+- **Session summaries happen on their own.** When you say "done", "wrapping up", or similar, KMGraph will offer to write a session summary for you — no need to invoke the command manually.
+- **Before you commit, KMGraph will check in.** If you have changes that look lesson-worthy but haven't been documented, you'll get a prompt before the commit goes through.
+- **Platform file changes trigger a sync reminder.** If you edit a config file like CLAUDE.md or GEMINI.md, KMGraph will ask if you want to sync it to your other AI tool configs.
+- **Plans you write to `~/.claude/plans/` are automatically mirrored to `docs/plans/`.** No manual copy needed.
+- **Cross-project write protection is now active.** If you're working in one project but your knowledge graph is pointed at another, KMGraph will warn you before writing anything — preventing accidental cross-project entries.
+- **The three main commands (`/kmgraph:capture-lesson`, `/kmgraph:recall`, `/kmgraph:session-summary`) load noticeably faster.** They work exactly the same, just with less startup overhead. No behavior change from your perspective.
+- **If you use Gemini CLI, Cursor, Windsurf, or any other AI coding tool:** you can now load `core/templates/AGENTS-template.md` as a system prompt and get the same KMGraph behaviors without needing `/kmgraph:` commands.
+- **The init command now detects which AI tools you have installed** and offers to configure KMGraph for all of them at once — no separate setup per tool.
+- **Notification webhooks are available (opt-in only).** If you configure a Slack or webhook URL in your settings, you'll get notified when lessons or ADRs are saved. Off by default, no action needed.
+- **Behind the scenes only:** The internal architecture was reorganized into four layers. Nothing about how you use KMGraph changes — this is a structural improvement that makes the tool easier to maintain and extend.
+
+### Added
+
+- **Four-Layer Architecture** — Restructured into Context, Logic, Lifecycle, and Data layers for reduced friction, platform portability, and maintainability
+- **`core/templates/AGENTS-template.md`** — Platform-agnostic behavior spec; loads into any LLM (Gemini CLI, Cursor, Windsurf, etc.) to give it KMGraph-aware behaviors without `/kmgraph:` commands. Validated on Gemini Flash via Antigravity (Phase 7b)
+- **Three new agents** (Logic Layer):
+    - `agents/lesson-capture-agent.md` — Real-time lesson capture with duplicate detection, git metadata extraction, write guard (active KG ↔ CWD), and post-write FTS5 rebuild
+    - `agents/recall-agent.md` — Conversational knowledge graph search using `kg_search`; surfaces related lessons
+    - `agents/session-summary-agent.md` — Session wrap-up: plan status with unchecked steps, draft ADR surface, uncaptured commit detection, FTS5 rebuild after write
+    - `agents/platform-sync-agent.md` — Platform file sync; selects and adapts relevant content per target platform (Gemini, Cursor, Windsurf, VS Code, etc.)
+- **Lifecycle hook suite** (6 new scripts + hooks.json entries):
+    - `scripts/post-tool-lesson-check.sh` — PostToolUse: detects lesson-worthy signals after file writes
+    - `scripts/session-end-prompt.sh` — Stop: session wrap-up prompt with open plan / draft ADR / uncaptured commit checks; PPID-scoped flag prevents double-fire
+    - `scripts/pre-commit-knowledge-gate.sh` — PreToolUse: intercepts `git commit`; prompts when undocumented lesson-worthy changes exist
+    - `scripts/notification-dispatch.sh` — Notification: configurable webhook/Slack dispatch (off by default)
+    - `scripts/platform-file-change-check.sh` — PostToolUse: triggers sync suggestion when CLAUDE.md, GEMINI.md, etc. are modified
+    - `scripts/plan-mirror.sh` — PostToolUse: mirrors `~/.claude/plans/` writes to `docs/plans/` automatically
+- **Write guard in agents** — `lesson-capture-agent` and `session-summary-agent` verify active KG matches current working directory before any write; blocks with clear message if mismatch
+- **Auto-switch option** — Per-graph `autoSwitch: true` flag in `kg-config.json`; `hooks-master.sh` silently switches active KG to match CWD instead of warning
+- **Multi-platform installer** — `/kmgraph:init` and `/kmgraph:setup-platform` detect installed AI coding tools (Gemini CLI, Cursor, Windsurf, Continue.dev, VS Code Copilot, Aider) and auto-write appropriate config files with diff-and-confirm overwrite protection
+- **v0.2.1 backlog issue** — `docs/issues/issue-1/` tracking Items A (`kg_capture` MCP write tool), B (`sync-all`/`update-graph` layered-pattern adoption), C (skill modernization), D (MCP auto-registration on first use)
+
+### Changed
+
+- **`commands/capture-lesson.md`** — Refactored from ~710 lines to ~120 lines; thin dispatcher to `lesson-capture-agent`
+- **`commands/recall.md`** — Refactored from ~437 lines to ~80 lines; thin dispatcher to `recall-agent`
+- **`commands/session-summary.md`** — Refactored from ~595 lines to ~80 lines; thin dispatcher to `session-summary-agent`
+- **Skills refactored** (Context Layer):
+    - `lesson-capture/SKILL.md` — Richer context pre-structuring; user-friendly language (no internal mechanics)
+    - `kg-recall/SKILL.md` — Dispatches to `recall-agent`; improved result surfacing
+    - `session-wrap/SKILL.md` — Three additional trigger signals: open plan steps, draft ADRs, lesson-worthy commits
+    - `knowledge-graph-usage/SKILL.md` — Updated to reflect new architecture
+- **`scripts/hooks-master.sh`** — Added `autoSwitch` per-graph config support
+- Documentation: COMMAND-GUIDE.md, CHEAT-SHEET.md, GETTING-STARTED.md, CONCEPTS.md updated for four-layer architecture
+
+### Removed
+
+- `scripts/check-memory.sh` — Consolidated into `hooks-master.sh`
+- `scripts/recent-lessons.sh` — Consolidated into `hooks-master.sh`
+- `scripts/memory-diff-check.sh` — Consolidated into `hooks-master.sh`
+
 ## [0.1.2-beta] - 2026-03-16
 
 ### Added
@@ -574,6 +630,9 @@ This is a beta release. API and behavior may change before a stable release.
 ### Planned Features (v1.0.0)
 - TBD
 
-[Unreleased]: https://github.com/technomensch/knowledge-graph/compare/v0.1.0-beta...HEAD
+[Unreleased]: https://github.com/technomensch/knowledge-graph/compare/v0.2.0-beta...HEAD
+[0.2.0-beta]: https://github.com/technomensch/knowledge-graph/compare/v0.1.2-beta...v0.2.0-beta
+[0.1.2-beta]: https://github.com/technomensch/knowledge-graph/compare/v0.1.1-beta...v0.1.2-beta
+[0.1.1-beta]: https://github.com/technomensch/knowledge-graph/compare/v0.1.0-beta...v0.1.1-beta
 [0.1.0-beta]: https://github.com/technomensch/knowledge-graph/compare/v0.0.11-alpha...v0.1.0-beta
 [0.0.1-alpha]: https://github.com/technomensch/knowledge-graph/releases/tag/v0.0.1-alpha

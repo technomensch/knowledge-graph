@@ -2,8 +2,8 @@
 
 Comprehensive catalog of all lessons-learned documents.
 
-**Total Lessons:** 7
-**Last Updated:** 2026-03-16
+**Total Lessons:** 11
+**Last Updated:** 2026-03-27
 
 ---
 
@@ -19,21 +19,23 @@ Comprehensive catalog of all lessons-learned documents.
 
 ---
 
-### Process Lessons (3 total)
+### Process Lessons (5 total)
 
+- [2026-03-27 - MCP Server Binary Exists But Each IDE Needs Explicit Registration](process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration.md) - Building mcp-server/dist/index.js does not register it in any IDE. Each IDE (Claude Code, Gemini CLI, etc.) requires explicit registration in its own MCP config file using an absolute path to the binary.
+- [2026-03-27 - Plan Subagent Is Read-Only — Write Files Manually After Opus Analysis](process/Lessons_Learned_Plan_Subagent_Is_Read_Only.md) - Plan subagents (subagent_type: Plan) can only read — they cannot call Write, Edit, or Bash. After receiving design output from a Plan subagent, write files manually in the main conversation using Write tool.
 - [2026-03-01 - Plan File Dual-Location Protocol](process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md) - Dual plan files serve different purposes: ~/.claude/plans/ (internal/ephemeral) vs docs/plans/ (project audit trail). Both required before implementation. Protocol violation occurs when docs/plans/ skipped. Prevention: pre-implementation checklist.
 - [2026-02-27 - Documentation Update Triggers in Multi-Branch Feature Development](process/documentation-update-triggers-multibranchfeatures.md) - Multi-branch releases require two-layer documentation: per-feature updates (Layer 1) and comprehensive release sync (Layer 2). Without explicit triggers, documentation updates defer indefinitely. Solution: separate final branch with explicit plan file.
 - [2026-02-16 - Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md) - When testing locally through Claude Code marketplace, changes must be synced from development directory to marketplace cache location
 
-**Tags:** #process #documentation #release-management #testing #marketplace #plugin-development #workflow #multi-branch-workflow #planning #protocol #claude-code
+**Tags:** #process #documentation #release-management #testing #marketplace #plugin-development #workflow #multi-branch-workflow #planning #protocol #claude-code #subagents #plan-mode #read-only #write-tool #mcp #ide-integration #gemini-cli #registration #platform-portability #antigravity
 
 ---
 
-### Patterns Lessons (0 total)
+### Patterns Lessons (1 total)
 
-[Auto-populated when lessons are added]
+- [2026-03-27 - AGENTS-template.md Enables Full KMGraph Workflow on Non-Claude Platforms Without MCP](patterns/Lessons_Learned_AGENTS_Template_Platform_Portability.md) - AGENTS-template.md alone is sufficient for a capable LLM to adopt all KMGraph behaviors; MCP tools are an enhancement, not a requirement; graceful fallback to file-reading when kg_search is unavailable
 
-**Tags:** #patterns
+**Tags:** #patterns #platform-portability #agents-template #gemini #antigravity #mcp-optional #graceful-degradation
 
 ---
 
@@ -48,6 +50,9 @@ Comprehensive catalog of all lessons-learned documents.
 ## Chronological Index
 
 **2026**
+- 2026-03-27: [AGENTS-template.md Enables Full KMGraph Workflow on Non-Claude Platforms Without MCP](patterns/Lessons_Learned_AGENTS_Template_Platform_Portability.md)
+- 2026-03-27: [MCP Server Binary Exists But Each IDE Needs Explicit Registration](process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration.md)
+- 2026-03-27: [Plan Subagent Is Read-Only — Write Files Manually After Opus Analysis](process/Lessons_Learned_Plan_Subagent_Is_Read_Only.md)
 - 2026-03-16: [Native FTS5 Search and Context-Mode Integration (v0.1.1+v0.1.2)](architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2.md)
 - 2026-03-01: [Plan File Dual-Location Protocol](process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md)
 - 2026-02-27: [Documentation Update Triggers in Multi-Branch Feature Development](process/documentation-update-triggers-multibranchfeatures.md)
@@ -87,19 +92,63 @@ Comprehensive catalog of all lessons-learned documents.
 **#update-notifications** (1 lesson)
 - [Update Notifications for Non-Plugin Users](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md)
 
-**#process** (3 lessons)
+**#process** (4 lessons)
+- [Plan Subagent Is Read-Only — Write Files Manually After Opus Analysis](process/Lessons_Learned_Plan_Subagent_Is_Read_Only.md)
 - [Plan File Dual-Location Protocol](process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md)
 - [Documentation Update Triggers in Multi-Branch Feature Development](process/documentation-update-triggers-multibranchfeatures.md)
 - [Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md)
 
-**#patterns** (0 lessons)
+**#subagents** (1 lesson)
+- [Plan Subagent Is Read-Only — Write Files Manually After Opus Analysis](process/Lessons_Learned_Plan_Subagent_Is_Read_Only.md)
+
+**#plan-mode** (1 lesson)
+- [Plan Subagent Is Read-Only — Write Files Manually After Opus Analysis](process/Lessons_Learned_Plan_Subagent_Is_Read_Only.md)
+
+**#read-only** (1 lesson)
+- [Plan Subagent Is Read-Only — Write Files Manually After Opus Analysis](process/Lessons_Learned_Plan_Subagent_Is_Read_Only.md)
+
+**#write-tool** (1 lesson)
+- [Plan Subagent Is Read-Only — Write Files Manually After Opus Analysis](process/Lessons_Learned_Plan_Subagent_Is_Read_Only.md)
+
+**#patterns** (1 lesson)
+- [AGENTS-template.md Enables Full KMGraph Workflow on Non-Claude Platforms Without MCP](patterns/Lessons_Learned_AGENTS_Template_Platform_Portability.md)
+
+**#agents-template** (1 lesson)
+- [AGENTS-template.md Enables Full KMGraph Workflow on Non-Claude Platforms Without MCP](patterns/Lessons_Learned_AGENTS_Template_Platform_Portability.md)
+
+**#mcp-optional** (1 lesson)
+- [AGENTS-template.md Enables Full KMGraph Workflow on Non-Claude Platforms Without MCP](patterns/Lessons_Learned_AGENTS_Template_Platform_Portability.md)
+
+**#graceful-degradation** (1 lesson)
+- [AGENTS-template.md Enables Full KMGraph Workflow on Non-Claude Platforms Without MCP](patterns/Lessons_Learned_AGENTS_Template_Platform_Portability.md)
+
+**#gemini** (1 lesson)
+- [AGENTS-template.md Enables Full KMGraph Workflow on Non-Claude Platforms Without MCP](patterns/Lessons_Learned_AGENTS_Template_Platform_Portability.md)
 
 **#debugging** (1 lesson)
 - [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md)
 
-**#mcp** (2 lessons)
+**#mcp** (3 lessons)
+- [MCP Server Binary Exists But Each IDE Needs Explicit Registration](process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration.md)
 - [Update Notifications for Non-Plugin Users](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md)
 - [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md)
+
+**#ide-integration** (1 lesson)
+- [MCP Server Binary Exists But Each IDE Needs Explicit Registration](process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration.md)
+
+**#gemini-cli** (1 lesson)
+- [MCP Server Binary Exists But Each IDE Needs Explicit Registration](process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration.md)
+
+**#registration** (1 lesson)
+- [MCP Server Binary Exists But Each IDE Needs Explicit Registration](process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration.md)
+
+**#platform-portability** (2 lessons)
+- [MCP Server Binary Exists But Each IDE Needs Explicit Registration](process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration.md)
+- [AGENTS-template.md Enables Full KMGraph Workflow on Non-Claude Platforms Without MCP](patterns/Lessons_Learned_AGENTS_Template_Platform_Portability.md)
+
+**#antigravity** (2 lessons)
+- [MCP Server Binary Exists But Each IDE Needs Explicit Registration](process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration.md)
+- [AGENTS-template.md Enables Full KMGraph Workflow on Non-Claude Platforms Without MCP](patterns/Lessons_Learned_AGENTS_Template_Platform_Portability.md)
 
 **#namespace** (1 lesson)
 - [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md)
