@@ -247,6 +247,65 @@ Proceed? (yes / edit / cancel)
 
 ---
 
+## Step 6b: Deprecation Strategy (When Applicable)
+
+**When to deprecate old documentation:**
+
+If updating documentation introduces a breaking change to documented patterns, APIs, or commands (e.g., old command pattern replaced by new agent-dispatched pattern), mark the old section as deprecated rather than deleting it.
+
+**Deprecation format:**
+
+```markdown
+> ⚠️ **DEPRECATED (v0.X.0):** This pattern is no longer recommended.
+>
+> **Reason:** [Brief explanation — why this changed, what replaced it]
+>
+> **Migration path:** [Concrete steps or link to new pattern]
+>
+> **Removal timeline:** Scheduled for removal in v[future-version] ([date or release cycle])
+>
+> **Affected users:** [Who this impacts — old commands, specific workflows, etc.]
+```
+
+**Examples:**
+
+```markdown
+> ⚠️ **DEPRECATED (v0.2.0):** Thick commands (200+ lines) are no longer the standard pattern.
+>
+> **Reason:** Thin command + agent separation reduces duplication and improves maintainability.
+>
+> **Migration path:** Old thick command → Thin dispatcher (~100-150 lines) + Agent execution logic.
+> See `/kmgraph:create-agent` for agent scaffolding.
+>
+> **Removal timeline:** Scheduled for removal in v0.3.0 (Q3 2026)
+>
+> **Affected users:** Anyone maintaining custom commands or extending KMGraph
+```
+
+**Path from deprecation to cleanup:**
+
+1. **Deprecation phase** (v0.X.0 → v0.X+1.0)
+   - Mark section with deprecation notice
+   - Document migration path clearly
+   - Keep full documentation for reference
+   - Commit: `docs(deprecation): mark [section] as deprecated in v0.X.0`
+
+2. **Cleanup phase** (v0.X+1.0 → v0.X+2.0)
+   - After minimum 1-2 minor version cycles, audit deprecated sections
+   - If no longer needed in practice: move to `docs/deprecated/` archive folder
+   - Commit: `docs(cleanup): archive [section] to docs/deprecated/ (removal from v0.X+2.0)`
+   - Create `/kmgraph:start-issue-tracking` issue documenting removal rationale
+
+3. **Removal phase** (v0.X+2.0+)
+   - Delete archived documentation
+   - Commit: `docs(removal): delete archived [section] (removed in v0.X+2.0)`
+   - Update CHANGELOG with removal notice
+   - Capture lesson: "Deprecation → Cleanup → Removal lifecycle for user-facing docs"
+
+**Key principle:** Never delete user-facing documentation without a visible deprecation period. Give users time to migrate before removal.
+
+---
+
 ## Step 7: Apply Changes and Commit
 
 **Apply changes** using the Edit tool (preferred) or Write tool for full rewrites.
