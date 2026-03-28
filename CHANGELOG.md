@@ -8,6 +8,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1-beta] - 2026-03-28
+
+### TL;DR
+
+!!! info "Zero-friction MCP setup."
+    If the KMGraph MCP server isn't connected, the assistant will now offer to automatically configure it for Gemini CLI, Cursor, Windsurf, Continue.dev, or VS Code. No manual JSON editing required.
+
+!!! info "Admonitions are the new standard for Changelog TL;DRs."
+    The Style Guide now enforces `!!! info` blocks for release notes instead of plain bullet points.
+
+!!! info "Behind the scenes only:"
+    Backend commands were modernized and documentation style rules updated. These are internal upgrades; functionality remains unchanged for end users.
+
+### Added
+- **`kg_capture` MCP Write Tool** — Enables full lesson, session, and ADR capture capabilities for platforms that lack raw file system tools. Includes automatic FTS5 index rebuilding.
+- **MCP Auto-Registration Agent** — Intercepts failed MCP tool calls and interactively offers to write the correct `mcp.json` or `settings.json` configuration for the active IDE (Gemini CLI, Cursor, Windsurf, Continue.dev, VS Code).
+- **Active Work Guard Enforcement** — The `kg_capture` tool enforces an active-KG-to-CWD validation check at the data layer, returning structured errors (`KG_MISMATCH`) if they drift.
+- Changelog format validation (Keep a Changelog + Semantic Versioning) to the `/kmgraph:update-doc` wizard
+
+### Changed
+- **Command Refactors** — Modernized `commands/sync-all.md` and `commands/update-graph.md` to the thin dispatcher pattern (<150 lines), delegating logic to specialized agents `sync-all-agent` and `knowledge-extractor`.
+- **Skill Modernization** — Refactored `skills/adr-guide/SKILL.md` to dispatch directly to an agent rather than suggesting a manual command invocation.
+- **Agent Dependency Updates** — `lesson-capture-agent` and `session-summary-agent` now strictly depend on `kg_capture` instead of legacy Write/Edit tools.
+- Replaced the ASCII "Four-Layer Architecture" diagram in `docs/CONCEPTS.md` with a Mermaid flowchart
+- Updated `STYLE-GUIDE.md` Section 4f to require MkDocs Admonition syntax for the Changelog `### TL;DR` section
+- Re-established `CHANGELOG.md` as the single source of truth for release notes via symlink (resolving the dual-maintenance issue)
+
+### Fixed
+- Added missing Notification Webhooks instructions to `docs/CONFIGURATION.md` (resolving dead link in v0.2.0-beta changelog)
+- Recovered missing Changelog style guide formatting rules (Section 4f) from commit history
+- Restored original v0.2.0-beta TL;DR release notes that were accidentally overwritten
+
 ## [0.2.0-beta] - 2026-03-27
 
 ### TL;DR
@@ -648,7 +680,8 @@ This is a beta release. API and behavior may change before a stable release.
 ### Planned Features (v1.0.0)
 - TBD
 
-[Unreleased]: https://github.com/technomensch/knowledge-graph/compare/v0.2.0-beta...HEAD
+[Unreleased]: https://github.com/technomensch/knowledge-graph/compare/v0.2.1-beta...HEAD
+[0.2.1-beta]: https://github.com/technomensch/knowledge-graph/compare/v0.2.0-beta...v0.2.1-beta
 [0.2.0-beta]: https://github.com/technomensch/knowledge-graph/compare/v0.1.2-beta...v0.2.0-beta
 [0.1.2-beta]: https://github.com/technomensch/knowledge-graph/compare/v0.1.1-beta...v0.1.2-beta
 [0.1.1-beta]: https://github.com/technomensch/knowledge-graph/compare/v0.1.0-beta...v0.1.1-beta
