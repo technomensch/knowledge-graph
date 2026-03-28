@@ -198,6 +198,30 @@ If yes, call with `version: "v1.1"` to update.
 
 Surface and ask to retry or abandon.
 
+**MCP not registered / connection failed:**
+
+Delegate to `mcp-setup-agent` — see Step 8F below.
+
+---
+
+## Step 8F: MCP Failure Handling
+
+If `kg_capture` fails because the MCP server is not registered, not found, or not reachable:
+
+1. **Do not silently fall back.** Surface the problem to the user.
+2. **Delegate to `mcp-setup-agent`** with the following context:
+   - The error message from the failed `kg_capture` call
+   - The original operation: save a session summary
+   - The full payload (content, type, metadata) so it can be retried
+3. **Wait for the return signal** from `mcp-setup-agent`:
+   - If `registration_status: "success"`: retry the `kg_capture` call from Step 8 exactly once.
+   - If `registration_status: "failed"`: use file-system fallback.
+4. **File-system fallback:**
+   - Write the session summary markdown directly to `{active_kg_path}/sessions/` using the `Write` tool.
+   - Follow existing file naming conventions (e.g., `YYYY-MM-DD-session-type.md`).
+   - Tell the user: "Saved to the file system. Search won't be ranked until the index is connected."
+5. **Never lose the session summary** — the user's content is preserved regardless of MCP status.
+
 ---
 
 ## Step 9: Suggest Next Actions

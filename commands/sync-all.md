@@ -39,161 +39,42 @@ description: Automated knowledge sync orchestrator — replaces 4-step manual pi
 
 ---
 
-## Workflow Steps
+## Execution
 
-### Step 0: Detect Context-Mode (Optional Optimization)
+### Step 1: Parse Flags
 
-Check whether `mcp__plugin_context-mode_context-mode__ctx_batch_execute` is available in the current session:
-- **Yes:** Steps 1 and 2.5 (shell commands) can use ctx_batch_execute for context savings — only a summary enters the main context window
-- **No:** Execute all steps individually as documented below; behavior is identical
+Detect which flags the user passed:
 
----
+| Flag | Behavior |
+|------|----------|
+| (none) | Interactive mode — confirm at decision points |
+| `--auto` | Skip all confirmations; execute full pipeline |
+| `--dry-run` | Preview all actions; write nothing |
 
-### Step 1: Scan for New/Modified Lessons
+### Step 2: Delegate to sync-all-agent
 
-Get active KG path from `~/.claude/kg-config.json`:
-```bash
-# Read config to find active KG
-active_kg=$(jq -r '.active' ~/.claude/kg-config.json)
-kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.claude/kg-config.json)
-```
-
-```bash
-# Find lessons updated since last sync
-find ${kg_path}/lessons-learned -name "*.md" -newer .claude/last-sync-timestamp 2>/dev/null
-# Fallback: find lessons modified in last 24 hours
-find ${kg_path}/lessons-learned -name "*.md" -mtime -1
-```
-
-#### ctx_batch_execute option (when context-mode available)
-
-Combine the Step 1 file scan and Step 2.5 MEMORY.md size check in one sandboxed call:
+Spawn the `sync-all-agent` subagent with parsed flags:
 
 ```
-ctx_batch_execute(commands: [
-  { label: "scan-lessons", command: "find ${kg_path}/lessons-learned -name '*.md' -mtime -1" },
-  { label: "scan-sessions", command: "find ${kg_path}/sessions -name '*.md' -mtime -1" },
-  { label: "memory-size", command: "wc -w < ${memory_path}" }
-], queries: ["new lessons found", "MEMORY.md token count"])
+Agent: agents/sync-all-agent.md
+Parameters:
+  auto: [true/false based on --auto flag]
+  dry_run: [true/false based on --dry-run flag]
 ```
 
-Only the summary enters context; raw file listings stay in the sandbox. Skip this if context-mode is not available — the existing `find`/`wc` commands work identically.
+The agent executes the full 8-step pipeline:
+1. Scan for new/modified lessons
+2. Extract knowledge graph entries
+3. Check MEMORY.md sync requirements
+4. Link to active plan
+5. Update local issue
+6. Auto-update session summary
+7. Generate GitHub comment draft
+8. Refresh FTS5 search index
 
-If no new lessons found, check for:
-- Recent session summaries with patterns
-- Knowledge graph entries without lesson links
-- Report: "No new lessons to sync" and exit
+### Step 3: Display Results
 
-### Step 2: Extract Knowledge Graph Entries
-
-For each new/modified lesson:
-1. Read the lesson file
-2. Extract: title, problem, solution, when-to-use triggers, category
-3. Check if entry already exists in `{active_kg_path}/knowledge/patterns.md` (or appropriate KG file)
-4. Create or update entry with bidirectional links
-
-**Logic:** Delegates to `/kmgraph:update-graph` extraction logic
-
-### Step 2.5: MEMORY.md Size Check <!-- v0.0.3 Change -->
-
-**Before syncing to MEMORY.md, check size limits:**
-
-```bash
-# Calculate MEMORY.md token count
-memory_path=~/.claude/projects/$(basename $(pwd))/memory/MEMORY.md
-
-if [ -f "$memory_path" ]; then
-  memory_words=$(wc -w < "$memory_path")
-  memory_tokens=$((memory_words * 13 / 10))  # word_count × 1.3
-
-  if [ "$memory_tokens" -gt 2000 ]; then
-    echo "🛑 MEMORY.md exceeds hard limit: ~${memory_tokens}/2,000 tokens"
-    echo "   Run /kmgraph:archive-memory before adding new entries"
-    echo ""
-    echo "   Sync will continue but MEMORY.md updates will be skipped."
-    SKIP_MEMORY_SYNC=true
-  elif [ "$memory_tokens" -gt 1500 ]; then
-    echo "⚠️  MEMORY.md approaching limit: ~${memory_tokens}/2,000 tokens"
-    echo "   Consider: /kmgraph:archive-memory"
-    echo ""
-    echo "   Continuing with sync..."
-    SKIP_MEMORY_SYNC=false
-  else
-    SKIP_MEMORY_SYNC=false
-  fi
-else
-  SKIP_MEMORY_SYNC=false
-fi
-```
-
-**Token limits:**
-- **Soft limit: 1,500 tokens** (~1,100 words) — warning, sync continues
-- **Hard limit: 2,000 tokens** (~1,500 words) — block MEMORY.md updates, suggest archive
-
-**Rationale:** Token-based limits are more accurate than line-based limits because:
-- Short lines (5-10 words) vs long lines (30+ words) have very different context costs
-- Token count directly impacts system prompt size
-- Allows accurate headroom calculation
-
-### Step 3: Check MEMORY.md Sync (ADR-011 Protocol)
-
-If new patterns, gotchas, or best practices were discovered:
-1. **Check size limits** (Step 2.5) — skip if hard limit exceeded
-2. Check if MEMORY.md already has the information
-3. If not and within limits, append to appropriate section
-4. **Verify token count after update** — warn if approaching 2,000 tokens
-
-### Step 4: Link to Active Plan
-
-1. Find current active plan in `{active_kg_path}/plans/` (status: Active or In Progress)
-2. If plan exists and insight is relevant:
-   - Append "Lessons Learned Integration" section
-   - Link KG entry to specific plan task
-
-### Step 5: Update Local Issue
-
-1. Find local issue linked to current branch/plan
-2. If found: append progress note with KG references
-3. **Decision Gate:** If insight represents separate scope:
-   - Auto-detect: "New discovery outside current issue scope"
-   - Suggest: "Create new issue or update current?"
-
-### Step 6: Auto-Update Session Summary
-
-1. Check for today's session: `{active_kg_path}/sessions/$(date +%Y-%m)/$(date +%Y-%m-%d)_*.md`
-2. If exists: append KG insights to "Lessons Learned" section
-3. If not exists: create minimal session entry with KG context
-
-### Step 7: Generate GitHub Comment Draft
-
-1. Map local issue to GitHub issue number
-2. Compile sync summary (lessons captured, KG entries created, plan updated)
-3. **Single confirmation:** "Post sync summary to GitHub #[N]? (y/n)"
-4. If yes: `gh issue comment [N] --body "[summary]"`
-
-### Step 8: Refresh Native FTS5 Search Index
-
-Check for existing native search index and user preference:
-
-**If `.fts5.db` exists in active KG root:**
-- Call `kg_fts5_rebuild` to refresh with any new/modified files (no prompt, automatic)
-- Output: "FTS5 index: refreshed (N files updated, M skipped)"
-
-**If no `.fts5.db` AND user has not previously declined:**
-- Check `~/.claude/kg-config.json` for `fts5_declined` flag on active graph
-- If flag not set, ask once:
-  "No search index found. Build FTS5 index for faster /kmgraph:recall? (~5-30s) [y/n]"
-  - Yes: call `kg_fts5_rebuild`, set `"fts5": true` in config
-  - No: set `"fts5_declined": true` in config, skip
-    Add to sync summary: "FTS5: declined (run kg_fts5_rebuild anytime to enable)"
-
-**If user previously declined:**
-- Skip silently
-- Add to sync summary: "FTS5: not enabled"
-
----
-
-## Output: Sync Summary
+The agent returns a sync summary in this format:
 
 ```
 Knowledge Sync Complete
@@ -208,32 +89,13 @@ Session:          2026-02-11 (enriched)
 FTS5 index:       refreshed (47 updated, 153 skipped)
 ```
 
----
+If `--dry-run`, the summary is prefixed with:
+```
+DRY RUN — No changes made
+--------------------------
+```
 
-## Integration
-
-### Trigger Points
-- After `/kmgraph:capture-lesson` completes (auto-suggest)
-- After significant work sessions (via `/kmgraph:session-summary`)
-- Before committing governance-related changes
-- Manual invocation for catch-up sync
-
-### Integrates With
-- `/kmgraph:update-graph` — KG extraction logic
-- `/kmgraph:update-issue-plan` — Plan/issue linking
-- `/kmgraph:capture-lesson` — Lesson source
-- `/kmgraph:session-summary` — Session enrichment
-- Project-specific governance skills (if present)
-
----
-
-## Idempotency
-
-This skill is idempotent — running it multiple times produces the same result:
-- Existing KG entries are updated, not duplicated
-- MEMORY.md checks for existing content before adding
-- GitHub comments include timestamps to prevent duplicate posts
-- Plan links are checked before adding
+Display the summary exactly as returned by the agent. Do not reformat or add additional commentary.
 
 ---
 
@@ -253,10 +115,37 @@ If GitHub CLI (`gh`) is not installed or no remote is configured:
 - Step 7 (GitHub comment) is skipped with warning
 - Workflow continues without error
 
-**Graceful degradation:** The skill works fully offline/non-GitHub projects.
+**Graceful degradation:** The command works fully offline/non-GitHub projects.
+
+---
+
+## Integration
+
+### Trigger Points
+- After `/kmgraph:capture-lesson` completes (auto-suggest)
+- After significant work sessions (via `/kmgraph:session-summary`)
+- Before committing governance-related changes
+- Manual invocation for catch-up sync
+
+### Integrates With
+- `/kmgraph:update-graph` — KG extraction logic (via sync-all-agent)
+- `/kmgraph:update-issue-plan` — Plan/issue linking (via sync-all-agent)
+- `/kmgraph:capture-lesson` — Lesson source
+- `/kmgraph:session-summary` — Session enrichment
+- Project-specific governance skills (if present)
+
+---
+
+## Idempotency
+
+This command is idempotent — running it multiple times produces the same result:
+- Existing KG entries are updated, not duplicated
+- MEMORY.md checks for existing content before adding
+- GitHub comments include timestamps to prevent duplicate posts
+- Plan links are checked before adding
 
 ---
 
 **Created:** 2026-02-12
-**Version:** 1.0 (Plugin version)
+**Version:** 2.0 (Refactored to thin dispatcher + sync-all-agent)
 **Purpose:** Replace 4-step manual knowledge sync with automated 1-command pipeline
