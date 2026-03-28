@@ -8,6 +8,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1-beta] - 2026-03-28
+
+### TL;DR
+
+!!! info "Admonitions are the new standard for Changelog TL;DRs."
+    The Style Guide now enforces `!!! info` blocks for release notes instead of plain bullet points.
+
+!!! info "Webhook configuration is now documented."
+    Added user-facing instructions in `docs/CONFIGURATION.md` on how to opt-in to Slack/webhook notifications for lessons and ADRs.
+
+!!! info "Visual upgrade for architecture diagrams."
+    The ASCII art in `CONCEPTS.md` has been replaced with Mermaid flowcharts for better readability and theme consistency.
+
+### Added
+- Notification Webhooks configuration section to `docs/CONFIGURATION.md`
+- Changelog format validation (Keep a Changelog + Semantic Versioning) to the `/kmgraph:update-doc` wizard
+
+### Changed
+- Replaced the ASCII "Four-Layer Architecture" diagram in `docs/CONCEPTS.md` with a Mermaid flowchart
+- Updated `STYLE-GUIDE.md` Section 4f to require MkDocs Admonition syntax for the Changelog `### TL;DR` section
+- Re-established `CHANGELOG.md` as the single source of truth for release notes via symlink (resolving the dual-maintenance issue)
+- Enhanced `.gitignore` with `**/.SynologyWorkingDirectory/` to prevent syncing Synology metadata
+
+### Fixed
+- Recovered missing Changelog style guide formatting rules (Section 4f) from commit history
+- Restored original v0.2.0-beta TL;DR release notes that were accidentally overwritten
+
 ## [0.2.0-beta] - 2026-03-27
 
 ### TL;DR
@@ -648,7 +675,8 @@ This is a beta release. API and behavior may change before a stable release.
 ### Planned Features (v1.0.0)
 - TBD
 
-[Unreleased]: https://github.com/technomensch/knowledge-graph/compare/v0.2.0-beta...HEAD
+[Unreleased]: https://github.com/technomensch/knowledge-graph/compare/v0.2.1-beta...HEAD
+[0.2.1-beta]: https://github.com/technomensch/knowledge-graph/compare/v0.2.0-beta...v0.2.1-beta
 [0.2.0-beta]: https://github.com/technomensch/knowledge-graph/compare/v0.1.2-beta...v0.2.0-beta
 [0.1.2-beta]: https://github.com/technomensch/knowledge-graph/compare/v0.1.1-beta...v0.1.2-beta
 [0.1.1-beta]: https://github.com/technomensch/knowledge-graph/compare/v0.1.0-beta...v0.1.1-beta
