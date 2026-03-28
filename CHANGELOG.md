@@ -36,7 +36,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Re-established `CHANGELOG.md` as the single source of truth for release notes via symlink (resolving the dual-maintenance issue)
 
 ### Fixed
-- Added missing Notification Webhooks instructions to `docs/CONFIGURATION.md` (resolving dead link in v0.2.0-beta changelog)
 - Recovered missing Changelog style guide formatting rules (Section 4f) from commit history
 - Restored original v0.2.0-beta TL;DR release notes that were accidentally overwritten
 
