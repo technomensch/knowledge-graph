@@ -311,6 +311,59 @@ If updating documentation introduces a breaking change to documented patterns, A
 
 ---
 
+## Single Source of Truth (DRY for Documentation)
+
+When updating documentation that explains a concept or architectural pattern, establish and maintain a **single authoritative source** to avoid duplication and version skew.
+
+**Pattern:**
+
+```
+Concept: Four-Layer Architecture
+
+Authoritative source: docs/CONCEPTS.md (primary documentation with diagrams, examples, rationale)
+├─ COMMAND-GUIDE.md → References: "See CONCEPTS.md § Four-Layer Architecture for overview"
+├─ GETTING-STARTED.md → References: "See CONCEPTS.md § Four-Layer Architecture"
+└─ CHEAT-SHEET.md → May repeat only syntax/quick-ref snippets, NOT conceptual explanations
+```
+
+**Why:**
+- Single point of update reduces maintenance burden
+- Prevents version skew (old info in one doc, new in another)
+- Readers always see current, consistent explanations
+- Cross-references establish information hierarchy
+
+**How to apply:**
+
+1. **Identify the authority** — Which doc is the "home" for this concept?
+   - Architectural patterns → `docs/CONCEPTS.md`
+   - Command usage/syntax → `docs/COMMAND-GUIDE.md`
+   - Quick reference → `docs/CHEAT-SHEET.md`
+   - Getting started workflows → `docs/GETTING-STARTED.md`
+
+2. **Write authoritative version once** — Full explanation, examples, rationale in the authority doc
+
+3. **Reference from other docs** — "For details on X, see [CONCEPTS.md § Heading](link)"
+
+4. **Repeat only syntax/code snippets** — Quick-reference sections can repeat examples if they help readability, but NOT explanations
+
+5. **Audit cross-references** — When updating authority doc, verify all references point to current section
+
+**Example (avoid):**
+```
+docs/CONCEPTS.md: "The four-layer architecture separates concerns across Context, Logic, Lifecycle, and Data layers..."
+docs/COMMAND-GUIDE.md: "The four-layer architecture separates concerns across Context, Logic, Lifecycle, and Data layers..."
+← DUPLICATION: Version skew risk if one is updated but not the other
+```
+
+**Example (correct):**
+```
+docs/CONCEPTS.md: "The four-layer architecture separates concerns across Context, Logic, Lifecycle, and Data layers. [full explanation with diagrams]"
+docs/COMMAND-GUIDE.md: "See CONCEPTS.md § Four-Layer Architecture for architectural overview."
+← SINGLE SOURCE: One place to update, all docs stay in sync
+```
+
+---
+
 ## Step 7: Apply Changes and Commit
 
 **Apply changes** using the Edit tool (preferred) or Write tool for full rewrites.
