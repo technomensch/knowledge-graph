@@ -8,6 +8,91 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1-beta] — 2026-03-27
+
+**TL;DR:** Four-layer architecture refactor — thin commands + 8 agents + lifecycle hooks + MCP auto-registration. Reduced command complexity by 65-80% (thick 200-950 line commands → thin 80-150 line dispatchers). Introduced automated knowledge capture via lifecycle hooks.
+
+### Added
+
+- **Four-layer architecture** — Context Layer (skills), Logic Layer (agents), Lifecycle Layer (hooks), Data Layer (MCP)
+  - Separates concerns: skills detect moments, agents own execution logic, hooks automate at the right time, MCP handles persistence
+  - Enables platform portability — agents are plain markdown, usable by any LLM
+
+- **8 Agent implementations** (3 original + 5 new)
+  - `lesson-capture-agent` — Real-time lesson capture with git metadata + similar-lesson check
+  - `session-summary-agent` — Session summaries with open plans, pending ADRs, lesson-worthy commits tracking
+  - `recall-agent` — Natural-language knowledge graph search with conversational formatting
+  - `platform-sync-agent` — Cross-platform configuration file management (Gemini, Cursor, Windsurf, Continue.dev)
+  - `mcp-setup-agent` — IDE detection + MCP server registration + connection testing + retry logic
+  - `sync-all-agent` — Extracted execution logic from thick `sync-all.md` command
+  - `create-adr-agent` — Architecture Decision Record creation wizard
+
+- **Lifecycle hook suite** — Automated knowledge capture without user invocation
+  - **SessionStart** — Display recent lessons, check for stale MEMORY.md, offer sync
+  - **PostToolUse** (File writes) — Detect lesson-worthy changes, suggest capture
+  - **Stop** (Session end) — Prompt for session summary, check for open plans/ADRs
+  - **PreToolUse** (Git commit) — Check for undocumented lesson-worthy commits before committing
+  - **Notification** — Optional webhook/Slack dispatch on lesson/ADR save
+
+- **MCP auto-registration** — Detects installed AI tools (Gemini CLI, Cursor, Windsurf, Continue.dev, VS Code, Claude Code) and auto-configures MCP connections with retry logic
+
+- **`kg_capture` MCP tool** — Platform-agnostic write tool for lessons, ADRs, and session summaries; enforces active-KG/CWD alignment at the data layer
+
+- **AGENTS-template.md** — Platform-agnostic agent behavior specification for non-Claude Code LLMs
+
+- **KG/CWD alignment guard** — lesson-capture-agent and session-summary-agent block writes if active knowledge graph doesn't match current project directory
+
+### Changed
+
+- **Command refactoring** — 3 high-value commands reduced from 200-950 lines to 80-153 lines
+  - `capture-lesson.md` — 710 → 108 lines (thin dispatcher)
+  - `recall.md` — 437 → 79 lines (thin dispatcher)
+  - `session-summary.md` — 595 → 80 lines (thin dispatcher)
+  - `sync-all.md` — 263 → 151 lines (thin dispatcher)
+  - `update-graph.md` — 951 → 153 lines (thin dispatcher)
+
+- **Skill modernization** — All skills updated to dispatch to agents rather than suggesting command invocation
+
+- **Documentation pattern** — Established deprecation strategy (mark + migration path + removal timeline) and Single Source of Truth (DRY) rule for documentation
+
+### Fixed
+
+- `start-issue-tracking` — Added Active Work Guard (Step 5.0): detects non-main branches and presents document-only / create-branch / cancel options before switching
+
+### Deprecated
+
+> ⚠️ **DEPRECATED (v0.2.1-beta):** Thick command pattern (200+ lines all-in-one implementation)
+>
+> **Migration path:** Old thick command → Thin dispatcher (80-150 lines) + Agent in `agents/`
+>
+> **Removal timeline:** Scheduled for removal in v0.3.0 (Q3 2026)
+
+### Breaking Changes
+
+None — all changes are additive. v0.2.0 workflows remain fully compatible.
+
+---
+
+## [0.2.0-beta] — 2026-03-27
+
+**TL;DR:** Major architectural restructuring introducing the four-layer model. Version bump from 0.1.2-beta. See v0.2.1-beta for the completed agent/hook implementations that followed.
+
+### Added
+
+- Four-layer architecture foundation (Context / Logic / Lifecycle / Data layers)
+- `core/templates/AGENTS-template.md` — platform-agnostic agent spec
+- `commands/init.md` — multi-platform AI tool detection + auto-config
+- `commands/setup-platform.md` — self-service AI tool configurator
+
+### Changed
+
+- Version: 0.1.2-beta → 0.2.0-beta
+- `scripts/hooks-master.sh` — added autoSwitch option (silent CWD-based KG switching)
+- 3 superseded scripts removed: `check-memory.sh`, `recent-lessons.sh`, `memory-diff-check.sh`
+- All `/knowledge:` namespace references migrated to `/kmgraph:`
+
+---
+
 ## [0.1.2-beta] - 2026-03-16
 
 ### Added
