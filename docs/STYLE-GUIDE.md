@@ -272,7 +272,7 @@ ADRs follow the template in `core/templates/decisions/ADR-template.md`. Refer co
 
 ### 4f. Changelog entry pattern
 
-Apply to: every version section in `docs/CHANGELOG.md`.
+Apply to: every version section in `CHANGELOG.md`.
 
 Each version section opens with a `### TL;DR` subsection, followed by the standard Keep a Changelog technical blocks (`### Added`, `### Changed`, `### Removed`, `### Fixed`).
 
@@ -281,10 +281,14 @@ Each version section opens with a `### TL;DR` subsection, followed by the standa
 ```markdown
 ### TL;DR
 
-- [plain-English bullet describing a user-visible change]
-- [plain-English bullet for a workflow that is now automated]
-- [plain-English bullet for a command that changed behavior]
-- [plain-English bullet explicitly flagging a behind-the-scenes change]
+!!! info "Short plain-English headline describing a user-visible change."
+    Brief plain-English explanatory text providing context.
+
+!!! info "Short plain-English headline for a workflow that is now automated."
+    Brief plain-English explanatory text on what the user no longer needs to do manually.
+
+!!! info "Short plain-English headline explicitly flagging a behind-the-scenes change."
+    For example: Internal architecture reorganized; no changes from your perspective.
 ```
 
 #### Rules for `### TL;DR`
@@ -293,14 +297,15 @@ Each version section opens with a `### TL;DR` subsection, followed by the standa
 - State what is different about daily use, not what code changed internally
 - Explicitly call out workflows that are now automated — what the user no longer needs to do manually
 - Explicitly call out commands whose behavior, name, or invocation changed
-- Explicitly flag changes that are purely behind the scenes with a phrase such as "Behind the scenes only" or "No UX impact" — do not omit them; include one bullet to confirm nothing changed for the user
+- Explicitly flag changes that are purely behind the scenes — do not omit them; include an info block to confirm nothing changed for the user
 - Use plain English; avoid technical terms that are not already defined in Section 3 of this guide
-- Use bullet points only — no sub-bullets, no code blocks, no headers inside this subsection
-- Each bullet is a complete thought and stands alone without requiring the reader to check the technical sections below
+- Use MkDocs `!!! info "Headline"` admonitions rather than plain bullet points
+- No sub-bullets, code blocks, or nested headers are permitted inside the admonition block
+- Each block is a complete thought and stands alone without requiring the reader to check the technical sections below
 
 #### Placement
 
-Place `### TL;DR` immediately after the `## [version] - date` heading, before all technical subsections (`### Added`, `### Changed`, `### Removed`, `### Fixed`). The user sees the plain-English summary first; the technical detail follows for those who need it.
+Place `### TL;DR` immediately after the `## [version] - date` heading, before all technical subsections (`### Added`, `### Changed`, `### Removed`, `### Fixed`). The user sees the high-level summary first; the technical detail follows for those who need it.
 
 #### Example
 
@@ -309,8 +314,11 @@ Place `### TL;DR` immediately after the `## [version] - date` heading, before al
 
 ### TL;DR
 
-- Capturing a lesson now works from Cursor and Windsurf without the `/kmgraph:capture-lesson` command — the MCP tool handles it directly.
-- Behind the scenes only: the internal search index format changed; search results are unchanged from your perspective.
+!!! info "Zero-friction MCP setup."
+    If the KMGraph MCP server isn't connected, the assistant will now offer to automatically configure it for Gemini CLI, Cursor, Windsurf, Continue.dev, or VS Code. No manual JSON editing required.
+
+!!! info "Behind the scenes only:"
+    The internal search index format changed; search results are unchanged from your perspective.
 
 ### Added
 - New `kg_capture` MCP write tool

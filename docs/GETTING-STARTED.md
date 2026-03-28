@@ -2,7 +2,7 @@
 
 A step-by-step guide for setting up the knowledge graph system and capturing the first lesson.
 
-**Version**: 0.2.0-beta
+**Version**: 0.1.0-beta
 
 ---
 
@@ -73,21 +73,6 @@ The initialization wizard prompts for:
   - If no: starts with empty knowledge graph, grows organically as you document lessons
 
 After completion, the command creates the knowledge graph directory structure in the project.
-
-#### AI Tool Detection (Automatic)
-
-After initialization, `/kmgraph:init` scans for installed AI coding tools and offers to configure each one automatically. Detected tools include:
-
-- Gemini CLI
-- Cursor
-- Windsurf
-- Continue.dev
-- VS Code Copilot
-- Aider
-
-For each detected tool, the wizard offers to write the appropriate configuration file so the knowledge graph is accessible from that platform. This step is optional — skip any tool or all tools if you prefer to configure manually.
-
-**Non-Claude-Code platforms:** If you work primarily in Gemini CLI, Cursor, or another tool, follow `AGENTS.md` (or `GEMINI.md` for Gemini CLI) in the plugin root for knowledge capture workflows. You do not need to know any `/kmgraph:` commands — the instruction files describe everything in plain language for your platform.
 
 ### Step 3: Verify Setup
 
@@ -406,35 +391,47 @@ Git is recommended but not required. With git, the system automatically captures
 
 ---
 
+<!-- Updated: 2026-03-27 -->
+## Meet Your New Agents
+
+Agents are heavy-lift task handlers that run separately from your main conversation. They exist so that complex or resource-intensive work — parsing large files, searching the knowledge graph, assembling session summaries — happens in isolation and does not crowd out your working context. You rarely invoke agents directly; skills and commands trigger them automatically when the work warrants it.
+
+| Agent | What it does |
+|---|---|
+| **lesson-capture-agent** | Real-time lesson capture from active sessions |
+| **session-summary-agent** | Session summaries with open plans and ADRs tracked |
+| **recall-agent** | Natural-language search across your knowledge graph |
+| **knowledge-extractor** | Large-file parsing for KG extraction (approval-gated writes) |
+| **knowledge-reviewer** | Quality review for lessons and ADRs before saving |
+| **session-documenter** | Git archaeology for complex multi-branch sessions |
+| **platform-sync-agent** | Cross-platform config file management |
+| **mcp-setup-agent** | IDE detection and MCP server registration |
+
+**Next steps:**
+
+- For detailed architecture, see [CONCEPTS.md § Four-Layer Architecture](CONCEPTS.md#four-layer-architecture)
+- For command examples, see [COMMAND-GUIDE.md](COMMAND-GUIDE.md)
+- For specific agent workflows, run `/kmgraph:help`
+
+---
+
 ## Skills and Subagents
 
-As you work, the system provides two types of intelligent assistance.
-
-### Lifecycle Hooks (Always On)
-
-After setup, lifecycle hooks run automatically at key moments without any manual action:
-
-| Hook | When it fires | What it does |
-|---|---|---|
-| **PostToolUse** | After significant file changes (Write, Edit, MultiEdit) | Prompts for knowledge capture if the change looks lesson-worthy |
-| **Stop** | When the AI session ends | Asks whether to run `/kmgraph:session-summary` before context is lost |
-| **PreToolUse** | Before Bash commands that touch source files | Gate to capture lessons from commit-worthy changes |
-
-Hooks are configured automatically when `/kmgraph:init` detects a supported platform.
+As you work, the system provides two types of intelligent assistance:
 
 ### Skills (Auto-Triggered Context Providers)
 
-Skills activate automatically based on what you're doing. They detect the right moment, pre-structure data, and dispatch directly to agents — no manual command needed:
+Skills activate automatically based on what you're doing. They provide guidance without interrupting:
 
-| Skill | Triggers On | Action |
+| Skill | Triggers On | Suggests |
 |---|---|---|
-| **lesson-capture** | "figured it out", bug solved, breakthrough made | Dispatches to `lesson-capture-agent` with pre-filled context |
-| **kg-recall** | "have we done this before", past decisions, history questions | Dispatches to `recall-agent` with extracted search terms |
-| **session-wrap** | Session ending, context limit (180K+), major milestone | Dispatches to `session-summary-agent` before compaction |
-| **adr-guide** | "I'm thinking of using...", architecture decisions | Dispatches to ADR creation with decision guidance |
+| **lesson-capture** | "figured it out", bug solved, breakthrough made | `/kmgraph:capture-lesson` with pre-filled context |
+| **kg-recall** | "have we done this before", past decisions, history questions | `/kmgraph:recall` with extracted search terms |
+| **session-wrap** | Session ending, context limit (180K+), major milestone | `/kmgraph:session-summary` before compaction |
+| **adr-guide** | "I'm thinking of using...", architecture decisions | `/kmgraph:create-adr` with decision guidance |
 | **gov-execute-plan** | "execute plan", implementation start, `docs/plans/*.md` mentioned | Zero-deviation 8-step execution protocol |
 
-You don't invoke skills directly — they appear as helpful context when relevant and dispatch to the appropriate agent automatically.
+You don't invoke skills directly — they appear as helpful context when relevant.
 
 ### Subagents (Heavy-Lift Handlers)
 
@@ -503,5 +500,5 @@ Use `--delegate knowledge-extractor` or `--delegate session-documenter` in comma
 
 ---
 
-**Version**: 0.2.0-beta
-**Last Updated**: 2026-03-27
+**Version**: 0.2.1-beta
+**Last Updated**: 2026-03-28

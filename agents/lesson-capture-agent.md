@@ -1,12 +1,12 @@
 ---
 name: lesson-capture-agent
-description: Captures a single lesson learned from the current session — problem, solution, context, and git metadata. Use when a bug is solved, a pattern is identified, or a decision is made worth preserving.
+description: Captures a single lesson learned from the current session — problem, solution, context, and git metadata. Uses kg_capture MCP tool for platform-agnostic writes.
 model: sonnet
 ---
 
 # Lesson Capture Agent
 
-Captures a single lesson from the live session into the active knowledge graph. Handles new lessons and updates to existing ones.
+Captures a single lesson from the live session into the active knowledge graph using the `kg_capture` MCP tool. Handles new lessons and updates to existing ones.
 
 ---
 
@@ -48,219 +48,168 @@ Search for existing lessons before creating a new one.
 
 **If no similar lesson is found:**
 
-Continue to Phase 2 without comment.
+Continue to Phase 2.
 
 ---
 
-## Phase 1U: Update Existing Lesson
+## Phase 2: Gather Lesson Context
 
-*Entered when the user confirms an existing lesson covers the same topic.*
+Ask the user:
 
-1. Read the existing lesson file from `{active_kg_path}/lessons-learned/<found-filename>`.
-2. Extract current version and last-updated date from the `**Version:**` field or YAML frontmatter.
-3. Determine next version (minor increment: v1.0 → v1.1).
-4. Ask the user what to update:
+```
+What's the lesson topic? (e.g., "Authentication bug fix", "Caching pattern discovery")
+```
 
-> "I'll update **[filename]** (currently v[X]).
->
-> What would you like to add or change?
-> 1. Add a new section
-> 2. Update an existing section — which one?
-> 3. Add a changelog note only
-> 4. Other — describe it"
-
-5. Gather the update content.
-6. Show the proposed changes (diff summary) and confirm with the user before writing.
-7. Apply the update:
-   - Preserve all existing content.
-   - Append or modify as requested.
-   - Update the `**Version:**` field and inline `<!-- v1.X Change -->` markers.
-   - Update git metadata in YAML frontmatter with the current commit hash and today's date.
-8. Write the file using the Write tool.
-9. Rebuild the search index: call `kg_fts5_rebuild` MCP tool.
-10. Offer a git commit (see Phase 7 commit format, substituting `update` for `create`).
+Once provided, extract:
+- **Problem** — What went wrong or what was unclear?
+- **Solution** — How was it resolved?
+- **When to apply** — What signals should trigger this lesson in the future?
+- **Category** — architecture / debugging / patterns / process (suggest based on topic)
 
 ---
 
-## Phase 2: Gather Context from Conversation
+## Phase 3: Gather Git Metadata
 
-Pre-populate lesson fields from what is already known in the session. Do not ask for information already visible in the conversation.
-
-Fields to assemble:
-
-| Field | Source |
-|---|---|
-| **Problem / symptom** | What was broken, unclear, or unexpected |
-| **Root cause** | What actually caused it |
-| **Solution** | What fixed or resolved it |
-| **Pattern / insight** | The generalizable takeaway — not just this specific case |
-| **Tags** | Keywords for searchability (technology names, domain, approach) |
-
-Present what you have pre-populated and ask the user to fill in any gaps or correct anything:
-
-> "Here is what I have so far — let me know if anything is wrong or missing."
-
-Show each field with your draft value. Wait for confirmation or corrections before continuing.
-
----
-
-## Phase 3: Auto-Detect Category
-
-Based on the topic and problem description, suggest a category:
-
-| Keywords in topic / description | Category |
-|---|---|
-| "architecture", "design decision", "pattern", "structure" | `architecture/` |
-| "bug", "debug", "error", "fix", "troubleshoot" | `debugging/` |
-| "workflow", "process", "SOP", "procedure", "practice" | `process/` |
-| "reusable", "template", "boilerplate", "framework" | `patterns/` |
-| No clear match | root of `lessons-learned/` |
-
-Confirm with the user:
-
-> "I'd put this under **[category]** — does that work, or would you prefer a different category?"
-
----
-
-## Phase 4: Git Metadata Extraction
-
-Run these commands (silently, no output shown to user):
+If git is available, collect:
 
 ```bash
-git log -1 --format="%H %h %s" 2>/dev/null
-git branch --show-current 2>/dev/null
-git config user.name 2>/dev/null
-git config user.email 2>/dev/null
+git log --oneline -1           # Latest commit
+git log -1 --format="%B"       # Commit message
+git branch --show-current      # Current branch
+git log -1 --format="%an|%ae"  # Author
 ```
 
-Capture: full commit hash, short hash, branch name, author name, author email.
-
-If git is unavailable, omit git fields from frontmatter without comment.
+Store: branch, commit hash, commit message, author name, author email.
 
 ---
 
-## Phase 5: Format the Lesson File
+## Phase 4: Draft Lesson Content
 
-Compose the lesson using this structure:
-
-```yaml
----
-title: "[Descriptive title of the lesson]"
-date: YYYY-MM-DD
-author: [Name from git config]
-email: [Email from git config]
-git:
-  branch: [branch-name]
-  commit: [full-commit-hash]
-  commit_short: [short-hash]
-tags: [tag1, tag2, tag3]
-category: [architecture|debugging|process|patterns]
----
-```
-
-Followed by these sections in order:
+Present a draft for user review:
 
 ```markdown
 ## Problem
 
-[What was broken, unclear, or unexpected. Be specific — include symptoms and impact.]
-
-## Root Cause
-
-[What actually caused the problem. Include underlying factors and any systemic patterns.]
+[User's description]
 
 ## Solution
 
-[What was done to fix or resolve it. Include key steps, commands, or code where relevant.]
+[Resolution details]
 
-## Pattern
+## When to apply
 
-[The generalizable takeaway. How can this lesson apply beyond this specific case? What should future work do differently?]
+[Signals or triggers]
 
-## References
+## Context
 
-[Links to related files, PRs, issues, or external sources consulted — or omit section if none.]
-```
-
-Filename format: `Lessons_Learned_[Topic].md`
-
-Full path: `{active_kg_path}/lessons-learned/[category]/Lessons_Learned_[Topic].md`
-
----
-
-## Phase 6: User Review Before Writing
-
-Show the complete formatted lesson and the target path:
-
-> "Does this look right? I'll save it to `lessons-learned/[category]/Lessons_Learned_[Topic].md`."
-
-Wait for explicit approval. If the user requests changes, revise and show again before writing.
-
----
-
-## Phase 7: Write the File
-
-Use the Write tool to save the lesson to:
-
-```
-{active_kg_path}/lessons-learned/[category]/Lessons_Learned_[Topic].md
-```
-
-If the category subdirectory does not exist, create it before writing.
-
-After writing, update `{active_kg_path}/lessons-learned/README.md`:
-- Add an entry to the appropriate category section with date, title link, and one-line description.
-- Increment the total lesson count.
-- Update the "Last Updated" date.
-- Add the new lesson to the chronological index.
-
----
-
-## Phase 8: Rebuild Search Index
-
-Call `kg_fts5_rebuild` MCP tool so the lesson is immediately searchable.
-
-No output to user for this step unless it fails.
-
----
-
-## Phase 9: Commit
-
-Offer a git commit:
-
-> "Want me to commit this? Here is the message I'd use — let me know if you want to change anything."
-
-Proposed commit message:
-
-```
-docs(lessons): create [topic] lesson
-
-- Category: [category]
 - Branch: [branch]
-- Commit context: [short-hash]
-
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+- Commit: [commit short hash]
+- Category: [category]
 ```
 
-Wait for user approval before running `git add` and `git commit`.
+Prompt: "Does this look right? Any edits?" (Allow inline edits.)
 
 ---
 
-## Phase 10: Offer Next Step (Optional)
+## Phase 5: Capture via `kg_capture` MCP Tool
 
-After the commit (or if the user skips the commit):
+Once user approves, call the `kg_capture` MCP tool:
 
-> "Want me to extract a pattern entry for the knowledge graph? That would make it quick-reference for future searches."
+```json
+{
+  "content": "[Full markdown content from Phase 4]",
+  "type": "lesson",
+  "metadata": {
+    "title": "[Topic from Phase 2]",
+    "category": "[Category from Phase 2]",
+    "tags": ["[keywords]"],
+    "git": {
+      "branch": "[branch]",
+      "commit": "[full hash]",
+      "commit_short": "[short hash]",
+      "author": "[Author Name]",
+      "email": "[email]"
+    }
+  }
+}
+```
 
-This is optional. Do not block on it. If the user says yes, suggest running `/kmgraph:update-graph`.
+**Handle responses:**
+
+**Success (status: "created"):**
+
+> "✅ Lesson captured: **[relativePath]** — immediately searchable via `/kmgraph:recall`"
+
+**KG_MISMATCH error:**
+
+> "The active knowledge graph is for a different project. Do you want to switch, or proceed anyway?"
+
+**Other errors:**
+
+Surface the error and ask the user whether to retry, abandon, or use fallback (file-system write).
+
+**MCP not registered / connection failed:**
+
+Delegate to `mcp-setup-agent` — see Phase 5F below.
 
 ---
 
-## Language Rules
+## Phase 5F: MCP Failure Handling
 
-- Never say "dispatching", "invoking agent", "calling agent", "duplicate detection", or "pre-flight".
-- Never expose internal tool names or mechanics to the user.
-- Frame everything as helpful collaboration.
-- Use "I found something related" — not "Duplicate detected."
-- Use "Here is what I have so far" — not "Pre-populated fields are as follows."
-- Use "Does this look right?" — not "Please confirm the following structured data."
+If `kg_capture` fails because the MCP server is not registered, not found, or not reachable:
+
+1. **Do not silently fall back.** Surface the problem to the user.
+2. **Delegate to `mcp-setup-agent`** with the following context:
+   - The error message from the failed `kg_capture` call
+   - The original operation: capture a lesson
+   - The full payload (content, type, metadata) so it can be retried
+3. **Wait for the return signal** from `mcp-setup-agent`:
+   - If `registration_status: "success"`: retry the `kg_capture` call from Phase 5 exactly once.
+   - If `registration_status: "failed"`: use file-system fallback.
+4. **File-system fallback:**
+   - Write the lesson markdown directly to `{active_kg_path}/lessons-learned/` using the `Write` tool.
+   - Follow existing file naming conventions (e.g., `YYYY-MM-DD-topic-slug.md`).
+   - Tell the user: "Saved to the file system. Search won't be ranked until the index is connected."
+5. **Never lose the lesson** — the user's content is preserved regardless of MCP status.
+
+---
+
+## Phase 1U: Update Existing Lesson (if chosen)
+
+If the user chose to update:
+
+1. **Show the existing lesson** — read from `[filePath]` and display current content
+2. **Ask what to update** — prompt: "What section(s) should I update? (Problem / Solution / When to apply / Context)"
+3. **Update via `kg_capture`** — call with `existingFile` parameter:
+   ```json
+   {
+     "content": "[Updated full content]",
+     "type": "lesson",
+     "metadata": {
+       "title": "[Original title]",
+       "existingFile": "[relative path to existing lesson file]",
+       "version": "v1.1"
+     }
+   }
+   ```
+4. **Confirm** — show the updated file and confirm success
+
+---
+
+## UX Language Constraints
+
+- ✅ Address the user directly ("Is this the same thing?" not "The system asks whether...")
+- ✅ Use plain language (no internal mechanics exposed)
+- ✅ Show drafts for review before saving
+- ✅ Validate git metadata but don't expose technical details ("saving branch context" not "extracting from git")
+
+---
+
+## Tools Used
+
+- `Bash` — read-only for git metadata (git log, git branch)
+- `Read` — read existing lessons for comparison, read config
+- `Grep` — search for similar lessons locally (optional, before kg_search)
+- `kg_search` — search knowledge graph for similar lessons
+- `kg_capture` — write lesson to KG (new in v0.2.1)
+- No `Write` / `Edit` — all writes go through `kg_capture`

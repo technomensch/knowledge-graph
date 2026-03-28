@@ -79,6 +79,17 @@ export function getPluginRoot(): string {
 }
 
 /**
+ * Derive project root from KG path.
+ * If path ends in /docs, parent is project root; otherwise path itself is root.
+ */
+export function getProjectRoot(kgPath: string): string {
+  if (kgPath.endsWith('/docs')) {
+    return path.dirname(kgPath);
+  }
+  return kgPath;
+}
+
+/**
  * Recursively walk a directory and return all matching file paths
  */
 export function walkDir(dir: string, ext: string = ".md"): string[] {

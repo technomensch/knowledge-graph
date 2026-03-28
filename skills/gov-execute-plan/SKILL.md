@@ -41,3 +41,11 @@ User: "Let's execute the v0.0.10.1 plan from docs/plans/v0.0.10.1-alpha-skills-a
 
 **Assistant Response:**
 Output STRICT EXECUTION MODE banner and follow 8-step protocol.
+
+**v0.2.1 Decision Note — Agent Dispatch Evaluation:**
+Agent dispatch was evaluated and **rejected** for this skill. Rationale:
+- This skill is a **behavioral constraint**, not a delegatable task — it modifies how the main assistant operates, not what a subagent does
+- The protocol requires **full conversation context** — the assistant must see the plan, user instructions, and ongoing edits in real-time to enforce zero-deviation
+- **Checkpoint/HALT gates are conversational** — steps 4-6 require stopping mid-execution and asking the user, which works naturally in the main thread but poorly in a subagent with limited context
+- An agent would **lose the context needed for enforcement** — detecting "unauthorized improvements" or ambiguity requires seeing the full edit history
+- Pattern kept: **skill-only** (no companion agent)

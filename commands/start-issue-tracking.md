@@ -218,6 +218,40 @@ Every generated plan MUST include this **Safety Header** and **Atomic Approval P
 
 ## Step 5: Git Integration
 
+### 5.0: Active Work Guard
+
+Before creating a branch, check if the user is currently working on another branch:
+
+```bash
+current_branch=$(git branch --show-current)
+default_branch="main"  # or detect via git remote show origin
+```
+
+**If `current_branch` is NOT `main` (or the default branch):**
+
+```
+You're currently on branch **[current_branch]**.
+
+Creating a new issue branch will switch you away from your active work.
+All subsequent commits would go to the new branch instead of [current_branch].
+
+How would you like to proceed?
+
+1. **Document only** — Create issue documentation but stay on [current_branch]
+   (Branch will be created later when you're ready to start implementation)
+
+2. **Create branch now** — Switch to a new issue branch immediately
+   (Use this if you're done with [current_branch] or ready to context-switch)
+
+3. **Cancel** — Abort issue tracking
+```
+
+- **Option 1 (Document only):** Skip Step 5.1 (no branch creation). Create all documentation (Steps 3-4, 6). Add a note to the issue docs: `**Branch:** Not yet created — run \`git checkout -b issue/{N}-{slug}\` when ready to implement.`
+- **Option 2 (Create branch now):** Proceed to Step 5.1 as normal.
+- **Option 3 (Cancel):** Exit.
+
+**If `current_branch` IS `main`:** Proceed directly to Step 5.1 (no guard needed).
+
 ### 5.1: Create Feature Branch
 
 Create the branch with a descriptive name derived from the issue number and slug:

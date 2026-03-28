@@ -65,7 +65,7 @@ Resolved file: $TARGET_FILE
 
 1. Plugin documentation (user-facing)
    Docs that ship with the plugin for end users
-   (README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, etc.)
+   (README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, CHANGELOG, etc.)
    → Re-run with: /kmgraph:update-doc <file> --user-facing
 
 2. Knowledge graph content
@@ -211,6 +211,12 @@ grep -inE "\[click here\]|\[here\]|\[link\]" "$TARGET_FILE"
 ```
 Flag any bare or non-descriptive link text.
 
+**Check 5 — Changelog standards (if `basename "$TARGET_FILE"` is `CHANGELOG.md`):**
+- Verify the use of [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) standard category headings (`### Added`, `### Changed`, `### Deprecated`, `### Removed`, `### Fixed`, `### Security`)
+- Verify [Semantic Versioning](https://semver.org/spec/v2.0.0.html) format for release headings (`## [X.Y.Z] - YYYY-MM-DD` or `## [Unreleased]`)
+- Verify the presence of a `### TL;DR` section immediately following the release heading (as required by `STYLE-GUIDE.md` Section 4f)
+- Flag any custom heading names under a release version.
+
 **Display validation summary:**
 ```
 Standards check (v0.0.7):
@@ -219,6 +225,7 @@ Standards check (v0.0.7):
 ✅ Heading hierarchy   (or ⚠️  Skipped level — ## to #### at line X)
 ✅ Table headers       (or ⚠️  Table missing header at line X)
 ✅ Link text           (or ⚠️  Non-descriptive link at line X)
+✅ Changelog format    (or ⚠️  Invalid heading format at line X)   <- Only shown if CHANGELOG.md
 ```
 
 If option 5 (validation only): display the report and exit.
@@ -244,6 +251,124 @@ Proceed? (yes / edit / cancel)
 - **yes:** Apply changes
 - **edit:** Return to Step 4 to revise
 - **cancel:** Exit without changes
+
+---
+
+## Step 6b: Deprecation Strategy (When Applicable)
+
+**When to deprecate old documentation:**
+
+If updating documentation introduces a breaking change to documented patterns, APIs, or commands (e.g., old command pattern replaced by new agent-dispatched pattern), mark the old section as deprecated rather than deleting it.
+
+**Deprecation format:**
+
+```markdown
+> ⚠️ **DEPRECATED (v0.X.0):** This pattern is no longer recommended.
+>
+> **Reason:** [Brief explanation — why this changed, what replaced it]
+>
+> **Migration path:** [Concrete steps or link to new pattern]
+>
+> **Removal timeline:** Scheduled for removal in v[future-version] ([date or release cycle])
+>
+> **Affected users:** [Who this impacts — old commands, specific workflows, etc.]
+```
+
+**Examples:**
+
+```markdown
+> ⚠️ **DEPRECATED (v0.2.0):** Thick commands (200+ lines) are no longer the standard pattern.
+>
+> **Reason:** Thin command + agent separation reduces duplication and improves maintainability.
+>
+> **Migration path:** Old thick command → Thin dispatcher (~100-150 lines) + Agent execution logic.
+> See `/kmgraph:create-agent` for agent scaffolding.
+>
+> **Removal timeline:** Scheduled for removal in v0.3.0 (Q3 2026)
+>
+> **Affected users:** Anyone maintaining custom commands or extending KMGraph
+```
+
+**Path from deprecation to cleanup (with user approval):**
+
+1. **Deprecation phase** (v0.X.0 → v0.X+1.0)
+   - Mark section with deprecation notice (see format above)
+   - Document migration path clearly
+   - Keep full documentation for reference
+   - Commit: `docs(deprecation): mark [section] as deprecated in v0.X.0`
+
+2. **Cleanup phase** (v0.X+1.0 → v0.X+2.0) — **Requires user approval**
+   - After minimum 1-2 minor version cycles, audit deprecated sections
+   - Check if section is still referenced in issues, discussions, or community feedback
+   - **Ask user approval:** "This section has been deprecated since v0.X.0. Is it safe to archive to docs/deprecated/? Any concerns from users?"
+   - If approved: move to `docs/deprecated/` archive folder
+   - Commit: `docs(cleanup): archive [section] to docs/deprecated/ (removal scheduled v0.X+2.0)`
+   - **Create tracking:** Use `/kmgraph:start-issue-tracking` to document removal rationale and get final approval for removal phase
+
+3. **Removal phase** (v0.X+2.0+) — **Requires explicit user approval**
+   - Review archived section; confirm no remaining references or user questions
+   - **Ask final approval:** "Ready to permanently remove [section] from documentation? (This cannot be undone via git history)."
+   - If approved:
+     - Delete archived file from `docs/deprecated/`
+     - Commit: `docs(removal): delete archived [section] (removed in v0.X+2.0)`
+     - Update CHANGELOG with removal entry under "Removed" section
+   - **Capture lesson:** "Deprecation → Cleanup → Removal lifecycle with approval gates"
+
+**Key principle:** Never delete user-facing documentation without explicit user approval at two gates (cleanup approval, removal approval). Documented deprecation + approval = no surprises.
+
+---
+
+## Single Source of Truth (DRY for Documentation)
+
+When updating documentation that explains a concept or architectural pattern, establish and maintain a **single authoritative source** to avoid duplication and version skew.
+
+**Pattern:**
+
+```
+Concept: Four-Layer Architecture
+
+Authoritative source: docs/CONCEPTS.md (primary documentation with diagrams, examples, rationale)
+├─ COMMAND-GUIDE.md → References: "See CONCEPTS.md § Four-Layer Architecture for overview"
+├─ GETTING-STARTED.md → References: "See CONCEPTS.md § Four-Layer Architecture"
+└─ CHEAT-SHEET.md → May repeat only syntax/quick-ref snippets, NOT conceptual explanations
+```
+
+**Why:**
+- Single point of update reduces maintenance burden
+- Prevents version skew (old info in one dc, new in another)
+- Readers always see current, consistent explanations
+- Cross-references establish information hierarchy
+
+**How to apply:**
+
+1. **Identify the authority** — Which doc is the "home" for this concept?
+   - Architectural patterns → `docs/CONCEPTS.md`
+   - Command usage/syntax → `docs/COMMAND-GUIDE.md`
+   - Quick reference → `docs/CHEAT-SHEET.md`
+   - Getting started workflows → `docs/GETTING-STARTED.md`
+   - Release notes/version history → `CHANGELOG.md`
+
+2. **Write authoritative version once** — Full explanation, examples, rationale in the authority doc
+
+3. **Reference from other docs** — "For details on X, see [CONCEPTS.md § Heading](link)"
+
+4. **Repeat only syntax/code snippets** — Quick-reference sections can repeat examples if they help readability, but NOT explanations
+
+5. **Audit cross-references** — When updating authority doc, verify all references point to current section
+
+**Example (avoid):**
+```
+docs/CONCEPTS.md: "The four-layer architecture separates concerns across Context, Logic, Lifecycle, and Data layers..."
+docs/COMMAND-GUIDE.md: "The four-layer architecture separates concerns across Context, Logic, Lifecycle, and Data layers..."
+← DUPLICATION: Version skew risk if one is updated but not the other
+```
+
+**Example (correct):**
+```
+docs/CONCEPTS.md: "The four-layer architecture separates concerns across Context, Logic, Lifecycle, and Data layers. [full explanation with diagrams]"
+docs/COMMAND-GUIDE.md: "See CONCEPTS.md § Four-Layer Architecture for architectural overview."
+← SINGLE SOURCE: One place to update, all docs stay in sync
+```
 
 ---
 

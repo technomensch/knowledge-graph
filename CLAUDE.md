@@ -56,7 +56,7 @@ Heavy-lift task handlers that keep main context clean:
 
 ## Key Workflows
 
-- **Plans:** Every plan must include `Create docs/plans/{filename}.md` as an explicit step (step 2 above). Create this file before any code changes.
+- **Plans:** Plans are **LOCAL-ONLY and gitignored** (`docs/plans/` is in `.gitignore`). Work in `~/.claude/plans/` first, then copy to `docs/plans/` for local reference during implementation. **Do NOT attempt to commit plan files.** Only commit implementation work (code, tests, docs).
 - **Branches:** Push to origin, await user review (never auto-merge)
 - **Versions:** Sync package.json + plugin.json before pushing (mcp-server independent)
 - **Docs updates:** Update COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED when behavior changes
@@ -80,7 +80,7 @@ Verify parent branch is fully committed before creating child branch.
 grep -r "version" package.json .claude-plugin/plugin.json mcp-server/package.json
 
 # Check for stale /knowledge: references
-grep -r "/knowledge:" scripts/
+grep -r "/kmgraph:" commands/ agents/ skills/
 
 # Build & verify docs
 mkdocs build
@@ -88,4 +88,4 @@ mkdocs build
 
 ## Active Work
 
-Check `git branch` and `docs/plans/` for current work in progress.
+Check `git branch` for current work in progress. Plans live locally in `~/.claude/plans/` (not git-synced) and are copied to `docs/plans/` for working reference only.
