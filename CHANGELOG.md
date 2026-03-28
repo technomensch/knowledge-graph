@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1.1-beta] - 2026-03-28
+
+### TL;DR
+
+!!! info "Behind the scenes only: dependency security fixes."
+    14 Dependabot alerts (1 critical, 7 high, 6 moderate) were resolved. MkDocs Material was upgraded to address reported vulnerabilities. No user-facing behavior changed. See the [GitHub security advisories](https://github.com/technomensch/knowledge-graph/security/dependabot) for details.
+
+### Fixed
+- Resolved 14 Dependabot dependency alerts (1 critical, 7 high, 6 moderate) via `npm audit fix` and targeted package upgrades
+- Upgraded `mkdocs-material` to the latest stable release to address reported CVEs
+- No API, command, or behavioral changes; this is a dependency hygiene patch only
+
 ## [0.2.1-beta] - 2026-03-28
 
 ### TL;DR
