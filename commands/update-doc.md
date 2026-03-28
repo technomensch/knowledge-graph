@@ -65,7 +65,7 @@ Resolved file: $TARGET_FILE
 
 1. Plugin documentation (user-facing)
    Docs that ship with the plugin for end users
-   (README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, etc.)
+   (README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, CHANGELOG, etc.)
    → Re-run with: /kmgraph:update-doc <file> --user-facing
 
 2. Knowledge graph content
@@ -211,6 +211,12 @@ grep -inE "\[click here\]|\[here\]|\[link\]" "$TARGET_FILE"
 ```
 Flag any bare or non-descriptive link text.
 
+**Check 5 — Changelog standards (if `basename "$TARGET_FILE"` is `CHANGELOG.md`):**
+- Verify the use of [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) standard category headings (`### Added`, `### Changed`, `### Deprecated`, `### Removed`, `### Fixed`, `### Security`)
+- Verify [Semantic Versioning](https://semver.org/spec/v2.0.0.html) format for release headings (`## [X.Y.Z] - YYYY-MM-DD` or `## [Unreleased]`)
+- Verify the presence of a `### TL;DR` section immediately following the release heading (as required by `STYLE-GUIDE.md` Section 4f)
+- Flag any custom heading names under a release version.
+
 **Display validation summary:**
 ```
 Standards check (v0.0.7):
@@ -219,6 +225,7 @@ Standards check (v0.0.7):
 ✅ Heading hierarchy   (or ⚠️  Skipped level — ## to #### at line X)
 ✅ Table headers       (or ⚠️  Table missing header at line X)
 ✅ Link text           (or ⚠️  Non-descriptive link at line X)
+✅ Changelog format    (or ⚠️  Invalid heading format at line X)   <- Only shown if CHANGELOG.md
 ```
 
 If option 5 (validation only): display the report and exit.
@@ -328,7 +335,7 @@ Authoritative source: docs/CONCEPTS.md (primary documentation with diagrams, exa
 
 **Why:**
 - Single point of update reduces maintenance burden
-- Prevents version skew (old info in one doc, new in another)
+- Prevents version skew (old info in one dc, new in another)
 - Readers always see current, consistent explanations
 - Cross-references establish information hierarchy
 
@@ -339,6 +346,7 @@ Authoritative source: docs/CONCEPTS.md (primary documentation with diagrams, exa
    - Command usage/syntax → `docs/COMMAND-GUIDE.md`
    - Quick reference → `docs/CHEAT-SHEET.md`
    - Getting started workflows → `docs/GETTING-STARTED.md`
+   - Release notes/version history → `CHANGELOG.md`
 
 2. **Write authoritative version once** — Full explanation, examples, rationale in the authority doc
 
