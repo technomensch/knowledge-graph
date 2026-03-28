@@ -38,6 +38,7 @@ exports.readConfig = readConfig;
 exports.writeConfig = writeConfig;
 exports.getActiveGraphPath = getActiveGraphPath;
 exports.getPluginRoot = getPluginRoot;
+exports.getProjectRoot = getProjectRoot;
 exports.walkDir = walkDir;
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
@@ -79,6 +80,16 @@ function getPluginRoot() {
     // When running as plugin: CLAUDE_PLUGIN_ROOT is set
     // When running standalone: use parent of mcp-server directory
     return process.env.CLAUDE_PLUGIN_ROOT || path.resolve(__dirname, "..", "..");
+}
+/**
+ * Derive project root from KG path.
+ * If path ends in /docs, parent is project root; otherwise path itself is root.
+ */
+function getProjectRoot(kgPath) {
+    if (kgPath.endsWith('/docs')) {
+        return path.dirname(kgPath);
+    }
+    return kgPath;
 }
 /**
  * Recursively walk a directory and return all matching file paths

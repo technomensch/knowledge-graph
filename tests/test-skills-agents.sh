@@ -1,5 +1,5 @@
 #!/bin/bash
-# test-skills-agents.sh — Structural validation for all 6 skills and 3 agents
+# test-skills-agents.sh — Structural validation for all 6 skills and 8 agents
 #
 # Skills: auto-triggered context providers in skills/
 # Agents: heavy-lift task handlers in agents/
@@ -104,10 +104,10 @@ if [ -n "$SKILLS_DIR" ]; then
   # Test 6: lesson-capture references /kmgraph:capture-lesson
   if [ -d "$SKILLS_DIR/lesson-capture" ]; then
     CONTENT=$(cat "$SKILLS_DIR/lesson-capture"/* 2>/dev/null)
-    if echo "$CONTENT" | grep -qE "lesson-capture-agent|capture-lesson|kmgraph"; then
-      pass "lesson-capture skill references lesson-capture-agent or capture-lesson"
+    if echo "$CONTENT" | grep -q "capture-lesson\|kmgraph"; then
+      pass "lesson-capture skill references /kmgraph:capture-lesson"
     else
-      fail "lesson-capture skill should reference lesson-capture-agent or capture-lesson"
+      fail "lesson-capture skill should reference capture-lesson command"
     fi
   else
     fail "lesson-capture skill directory not found"
@@ -163,9 +163,10 @@ EXPECTED_AGENTS=(
   "session-documenter"
   "knowledge-reviewer"
   "lesson-capture-agent"
-  "recall-agent"
   "session-summary-agent"
-  "platform-sync-agent"
+  "mcp-setup-agent"
+  "sync-all-agent"
+  "create-adr-agent"
 )
 
 # Test 10: Agents directory exists
@@ -181,7 +182,7 @@ else
   [ $FAIL -eq 0 ] && exit 0 || exit 1
 fi
 
-# Test 11: All 7 agent files present (agents are .md files, not directories)
+# Test 11: All 8 agent files present (agents are .md files, not directories)
 MISSING_AGENTS=0
 for agent in "${EXPECTED_AGENTS[@]}"; do
   if [ ! -f "$AGENTS_DIR/$agent.md" ]; then
@@ -190,17 +191,17 @@ for agent in "${EXPECTED_AGENTS[@]}"; do
   fi
 done
 if [ $MISSING_AGENTS -eq 0 ]; then
-  pass "All 7 agent files present"
+  pass "All 8 agent files present"
 else
   fail "$MISSING_AGENTS agent file(s) missing"
 fi
 
-# Test 12: Exact count is 7
+# Test 12: Exact count is 8
 ACTUAL_COUNT=$(find "$AGENTS_DIR" -name "*.md" -maxdepth 1 -type f | wc -l | tr -d ' ')
-if [ "$ACTUAL_COUNT" -eq 7 ]; then
-  pass "Exact agent count is 7"
+if [ "$ACTUAL_COUNT" -eq 8 ]; then
+  pass "Exact agent count is 8"
 else
-  fail "Agent count is $ACTUAL_COUNT (expected 7)"
+  fail "Agent count is $ACTUAL_COUNT (expected 8)"
 fi
 
 # Test 13: No empty agent files
@@ -217,8 +218,8 @@ else
   fail "$EMPTY_AGENTS agent file(s) are empty"
 fi
 
-# Test 14: No deprecated /knowledge: namespace in agents (exclude doc examples like /knowledge:*)
-DEPRECATED=$(grep -rn "/knowledge:" "$AGENTS_DIR" 2>/dev/null | grep -v "^Binary" | grep -v "/knowledge:\*" || true)
+# Test 14: No deprecated /knowledge: namespace in agents
+DEPRECATED=$(grep -rn "/knowledge:" "$AGENTS_DIR" 2>/dev/null | grep -v "^Binary" || true)
 if [ -z "$DEPRECATED" ]; then
   pass "No deprecated /knowledge: namespace in agents"
 else
