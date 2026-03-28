@@ -282,27 +282,32 @@ If updating documentation introduces a breaking change to documented patterns, A
 > **Affected users:** Anyone maintaining custom commands or extending KMGraph
 ```
 
-**Path from deprecation to cleanup:**
+**Path from deprecation to cleanup (with user approval):**
 
 1. **Deprecation phase** (v0.X.0 → v0.X+1.0)
-   - Mark section with deprecation notice
+   - Mark section with deprecation notice (see format above)
    - Document migration path clearly
    - Keep full documentation for reference
    - Commit: `docs(deprecation): mark [section] as deprecated in v0.X.0`
 
-2. **Cleanup phase** (v0.X+1.0 → v0.X+2.0)
+2. **Cleanup phase** (v0.X+1.0 → v0.X+2.0) — **Requires user approval**
    - After minimum 1-2 minor version cycles, audit deprecated sections
-   - If no longer needed in practice: move to `docs/deprecated/` archive folder
-   - Commit: `docs(cleanup): archive [section] to docs/deprecated/ (removal from v0.X+2.0)`
-   - Create `/kmgraph:start-issue-tracking` issue documenting removal rationale
+   - Check if section is still referenced in issues, discussions, or community feedback
+   - **Ask user approval:** "This section has been deprecated since v0.X.0. Is it safe to archive to docs/deprecated/? Any concerns from users?"
+   - If approved: move to `docs/deprecated/` archive folder
+   - Commit: `docs(cleanup): archive [section] to docs/deprecated/ (removal scheduled v0.X+2.0)`
+   - **Create tracking:** Use `/kmgraph:start-issue-tracking` to document removal rationale and get final approval for removal phase
 
-3. **Removal phase** (v0.X+2.0+)
-   - Delete archived documentation
-   - Commit: `docs(removal): delete archived [section] (removed in v0.X+2.0)`
-   - Update CHANGELOG with removal notice
-   - Capture lesson: "Deprecation → Cleanup → Removal lifecycle for user-facing docs"
+3. **Removal phase** (v0.X+2.0+) — **Requires explicit user approval**
+   - Review archived section; confirm no remaining references or user questions
+   - **Ask final approval:** "Ready to permanently remove [section] from documentation? (This cannot be undone via git history)."
+   - If approved:
+     - Delete archived file from `docs/deprecated/`
+     - Commit: `docs(removal): delete archived [section] (removed in v0.X+2.0)`
+     - Update CHANGELOG with removal entry under "Removed" section
+   - **Capture lesson:** "Deprecation → Cleanup → Removal lifecycle with approval gates"
 
-**Key principle:** Never delete user-facing documentation without a visible deprecation period. Give users time to migrate before removal.
+**Key principle:** Never delete user-facing documentation without explicit user approval at two gates (cleanup approval, removal approval). Documented deprecation + approval = no surprises.
 
 ---
 
