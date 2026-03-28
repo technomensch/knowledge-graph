@@ -18,11 +18,139 @@ Creates a complete knowledge graph structure with:
 ## When to Use
 
 - First-time setup after installing the plugin
+- **After a plugin update** — verify/upgrade existing KG to current version
 - Creating a new project-local knowledge graph
 - Setting up a topic-based global knowledge graph
 - Creating a Claude Cowork knowledge space
 
-## Wizard Steps
+## Pre-Wizard: Existing KG Detection
+
+Before starting the wizard, check if a knowledge graph already exists for this project in `~/.claude/kg-config.json`. If the current working directory matches an existing KG's path (or is a parent/child of one), present this menu instead of jumping straight to the wizard:
+
+```
+A knowledge graph named "[name]" already exists in the config and is set as active.
+It's [type] at [path] with categories: [list].
+
+What would you like to do?
+
+1. Verify/upgrade existing KG — check for missing directories, update templates,
+   add new config fields from this plugin version
+2. Create a new, separate knowledge graph (different name/location)
+3. Re-initialize "[name]" (reset categories, git strategy, etc.)
+4. Cancel — the existing KG is already set up
+```
+
+### Option 1: Verify/Upgrade Flow
+
+When the user selects verify/upgrade, perform these checks in order:
+
+#### 1a. Directory structure check
+
+Verify all expected directories exist. Create any that are missing:
+
+```bash
+expected_dirs=(knowledge lessons-learned decisions sessions chat-history)
+for dir in "${expected_dirs[@]}"; do
+  if [ ! -d "$KG_PATH/$dir" ]; then
+    mkdir -p "$KG_PATH/$dir"
+    echo "✅ Created missing directory: $dir/"
+  fi
+done
+
+# Check category subdirectories
+for category in "${categories[@]}"; do
+  if [ ! -d "$KG_PATH/lessons-learned/$category" ]; then
+    mkdir -p "$KG_PATH/lessons-learned/$category"
+    echo "✅ Created missing category directory: lessons-learned/$category/"
+  fi
+done
+```
+
+#### 1b. Config field check
+
+Check for config fields introduced in newer versions. Add defaults for any missing fields without overwriting existing values:
+
+```bash
+# Fields that may be missing from older installs:
+# - platforms: [] (added in v0.2.0)
+# - autoSwitch: false (added in v0.2.0)
+# - notification: { webhookUrl: "" } (added in v0.2.0)
+
+jq '
+  .graphs["'"$kg_name"'"] |=
+    if .platforms == null then .platforms = [] else . end |
+    if .autoSwitch == null then .autoSwitch = false else . end |
+    if .notification == null then .notification = { "webhookUrl": "" } else . end
+' ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+```
+
+#### 1c. Template update check
+
+Compare installed templates against the plugin's current templates. If newer versions exist, offer to update:
+
+```bash
+template_dirs=("knowledge" "lessons-learned" "decisions" "sessions")
+updates_available=()
+
+for tdir in "${template_dirs[@]}"; do
+  for template in "${CLAUDE_PLUGIN_ROOT}/core/templates/$tdir/"*; do
+    dest="$KG_PATH/$tdir/$(basename $template)"
+    if [ -f "$dest" ]; then
+      if ! diff -q "$template" "$dest" > /dev/null 2>&1; then
+        updates_available+=("$tdir/$(basename $template)")
+      fi
+    else
+      updates_available+=("$tdir/$(basename $template) (new)")
+    fi
+  done
+done
+```
+
+If updates are available, present them:
+
+```
+Template updates available:
+  • knowledge/index.md (updated)
+  • sessions/session-template.md (new)
+
+Update templates? This will NOT overwrite your existing lessons or decisions.
+  1. Update all templates
+  2. Review each one
+  3. Skip template updates
+```
+
+**Important:** Never overwrite user-created files (lessons, ADRs, KG entries). Only update template/scaffold files.
+
+#### 1d. Platform config check
+
+Re-run platform detection (Step 1.11) and offer to configure any newly detected platforms that aren't already registered.
+
+#### 1e. Output verification summary
+
+```
+✅ Knowledge graph "[name]" verified!
+
+  Directories:  all present (X created)
+  Config:       up to date (Y fields added)
+  Templates:    X updated, Y skipped
+  Platforms:    [list] configured
+
+  Plugin version: [version from plugin.json]
+  KG version:     [version from kg-config.json, if tracked]
+
+No action needed — your KG is ready to use.
+```
+
+### Options 2–4
+
+- **Option 2 (Create new):** Proceed to the full wizard (Step 1 below) with a different name.
+- **Option 3 (Re-initialize):** Run the full wizard but pre-populate answers from the existing config. Warn that this will reset categories and git strategy. Do NOT delete existing lessons or decisions.
+- **Option 4 (Cancel):** Exit with no changes.
+
+---
+
+## Wizard Steps (New KG)
 
 ### Step 1: KG Location
 
@@ -516,8 +644,8 @@ The updated config entry schema:
 - Set this as first KG
 
 ### Name collision
-- Error: "Knowledge graph '$kg_name' already exists. Choose a different name or use /kmgraph:switch to activate it."
-- Show existing graphs: `/kmgraph:list`
+- If detected during pre-wizard check: present the 4-option menu (verify/upgrade, create new, re-initialize, cancel)
+- If detected during wizard Step 2 (user typed a name that exists): suggest verify/upgrade or a different name
 
 ### Custom path doesn't exist
 - Prompt: "Directory '$custom_path' doesn't exist. Create it? [y/N]"
