@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 !!! info "Lesson capture now works without the slash command."
     Capturing a lesson now works from Cursor and Windsurf directly — the plugin handles it natively.
 
+!!! info "Admonitions are the new standard for Changelog TL;DRs."
+    The Style Guide now enforces `!!! info` blocks for release notes instead of plain bullet points.
+
 !!! info "Behind the scenes only:"
     We modernized the backend commands and updated the documentation style rules. These are internal upgrades; nothing changed from your perspective.
 
