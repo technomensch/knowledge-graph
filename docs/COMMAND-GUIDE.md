@@ -11,7 +11,15 @@ These commands are designed as reference documentation for any LLM:
 
 Commands work across platforms, but full automation is Claude Code-specific.
 
+---
 
+> ⚠️ **DEPRECATED PATTERN (v0.2.1-beta):** Thick commands (200+ lines) are no longer the standard pattern.
+>
+> **New pattern:** Thin dispatchers (80-150 lines) + execution logic in agents/. See [CONCEPTS.md § Four-Layer Architecture](CONCEPTS.md) for overview.
+>
+> **Why changed:** Reduces duplication, improves maintainability, enables platform portability.
+>
+> **Migration:** Old thick-command pattern remains functional but deprecated. New commands should use thin-dispatcher + agent pattern.
 
 ---
 
@@ -251,7 +259,11 @@ The system presents candidates for your review before creating entries.
 
 ### 🟢 `/kmgraph:capture-lesson`
 
-**Purpose**: Document lessons learned, problems solved, and patterns with git metadata tracking
+<!-- Updated: 2026-03-27 -->
+
+**Purpose**: Guided UX dispatcher for documenting lessons learned, problems solved, and patterns with git metadata tracking
+
+> **Command refactored in v0.2.1-beta: 710 → 108 lines.** Execution logic delegated to `agents/` for platform portability. See [CONCEPTS.md § Four-Layer Architecture](CONCEPTS.md).
 
 **When to use**:
 
@@ -261,6 +273,8 @@ The system presents candidates for your review before creating entries.
 - Learned something that future you will need
 
 **What it does**:
+
+Dispatches to the capture-lesson agent, which handles:
 
 1. Checks for duplicate/similar existing lessons (pre-flight search)
 2. Asks verification questions (topic, audience, scope)
@@ -278,7 +292,7 @@ The system presents candidates for your review before creating entries.
 ```bash
 /kmgraph:capture-lesson
 
-# Claude guides you through:
+# Agent guides you through:
 # 1. What problem did you encounter?
 # 2. What was the root cause?
 # 3. How did you solve it?
@@ -344,7 +358,11 @@ Quick Commands:
 
 ### 🟢 `/kmgraph:recall`
 
-**Purpose**: Search across all project memory systems (lessons, decisions, knowledge graph, sessions)
+<!-- Updated: 2026-03-27 -->
+
+**Purpose**: Guided UX dispatcher for searching across all project memory systems (lessons, decisions, knowledge graph, sessions)
+
+> **Command refactored in v0.2.1-beta: 437 → 79 lines.** Execution logic delegated to `agents/` for platform portability. See [CONCEPTS.md § Four-Layer Architecture](CONCEPTS.md).
 
 **When to use**:
 
@@ -354,6 +372,8 @@ Quick Commands:
 - Searching for context on a topic
 
 **What it searches**:
+
+Dispatches to the recall agent, which searches:
 
 - Lessons learned (full text)
 - Architecture decisions (ADRs)

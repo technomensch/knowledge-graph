@@ -391,6 +391,30 @@ Git is recommended but not required. With git, the system automatically captures
 
 ---
 
+<!-- Updated: 2026-03-27 -->
+## Meet Your New Agents
+
+Agents are heavy-lift task handlers that run separately from your main conversation. They exist so that complex or resource-intensive work — parsing large files, searching the knowledge graph, assembling session summaries — happens in isolation and does not crowd out your working context. You rarely invoke agents directly; skills and commands trigger them automatically when the work warrants it.
+
+| Agent | What it does |
+|---|---|
+| **lesson-capture-agent** | Real-time lesson capture from active sessions |
+| **session-summary-agent** | Session summaries with open plans and ADRs tracked |
+| **recall-agent** | Natural-language search across your knowledge graph |
+| **knowledge-extractor** | Large-file parsing for KG extraction (approval-gated writes) |
+| **knowledge-reviewer** | Quality review for lessons and ADRs before saving |
+| **session-documenter** | Git archaeology for complex multi-branch sessions |
+| **platform-sync-agent** | Cross-platform config file management |
+| **mcp-setup-agent** | IDE detection and MCP server registration |
+
+**Next steps:**
+
+- For detailed architecture, see [CONCEPTS.md § Four-Layer Architecture](CONCEPTS.md#four-layer-architecture)
+- For command examples, see [COMMAND-GUIDE.md](COMMAND-GUIDE.md)
+- For specific agent workflows, run `/kmgraph:help`
+
+---
+
 ## Skills and Subagents
 
 As you work, the system provides two types of intelligent assistance:
