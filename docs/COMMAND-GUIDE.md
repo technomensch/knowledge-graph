@@ -215,6 +215,7 @@ Commands work across platforms, but full automation is Claude Code-specific.
 7. Optionally installs a git post-commit hook for lesson capture suggestions
 8. Updates `.gitignore` based on chosen git strategy
 9. Registers the KG in `~/.claude/kg-config.json` and sets it as active
+10. **[NEW in v0.2.0-beta]** Auto-detects and configures installed AI tools via `platform-sync-agent` (Gemini CLI, Cursor, Windsurf, Continue.dev, VS Code Copilot, Aider)
 
 **Time**: 2-3 minutes
 
@@ -262,15 +263,15 @@ The system presents candidates for your review before creating entries.
 
 **What it does**:
 
+This command is a thin dispatcher (~100 lines). It runs a guided Q&A then hands off to `lesson-capture-agent` for all file operations.
+
 1. Checks for duplicate/similar existing lessons (pre-flight search)
 2. Asks verification questions (topic, audience, scope)
 3. Auto-detects category from keywords (architecture, debugging, process, patterns)
 4. Gathers git metadata (branch, commit hash, PR, issue number) from YAML frontmatter
-5. Guides content gathering (problem, root cause, solution, prevention)
-6. Writes the lesson file using the template from `core/templates/`
-7. Updates category and chronological indexes
-8. Optionally triggers `/kmgraph:update-graph` to extract KG entries
-9. Optionally links to a GitHub Issue via `/kmgraph:link-issue`
+5. Dispatches to `lesson-capture-agent`, which: writes the lesson file, updates indexes, and optionally triggers KG extraction and issue linking
+
+Also auto-triggered via the `lesson-capture` skill and the PostToolUse hook.
 
 **Time**: 5-10 minutes (faster with practice)
 
@@ -353,6 +354,10 @@ Quick Commands:
 - Need to find a past architectural decision
 - Searching for context on a topic
 
+**What it does**:
+
+This command is a thin dispatcher (~80 lines). It parses the query then hands off to `recall-agent` for multi-source search and result formatting.
+
 **What it searches**:
 
 - Lessons learned (full text)
@@ -360,6 +365,8 @@ Quick Commands:
 - Knowledge entries (patterns, gotchas, concepts)
 - Session summaries
 - MEMORY.md
+
+Also auto-triggered via the `kg-recall` skill.
 
 **Time**: 1-2 seconds
 
@@ -474,13 +481,13 @@ Quick Commands:
 
 **What it does**:
 
+This command is a thin dispatcher (~68 lines). It collects parameters then hands off to `session-summary-agent` for all analysis and file operations.
+
 1. Auto-detects session scope from conversation context since last summary
 2. Classifies session type (feature development, debugging, planning, research)
-3. Generates summary with: goals, problems solved, files touched, commits, lessons, next steps
-4. Handles duplicate detection — offers to update existing or create new summary
-5. Saves to `{active_kg_path}/sessions/YYYY-MM/YYYY-MM-DD_description.md`
-6. Updates sessions README index
-7. Optionally triggers lesson capture and KG update
+3. Dispatches to `session-summary-agent`, which: generates the summary, handles duplicate detection, saves to `{active_kg_path}/sessions/YYYY-MM/YYYY-MM-DD_description.md`, updates the sessions README index, and optionally triggers lesson capture and KG update
+
+Also auto-triggered via the `session-wrap` skill and the Stop hook.
 
 **Time**: Under 10 seconds (analysis + write)
 
@@ -1249,6 +1256,49 @@ git checkout -b issue/N-description
 
 This section covers implementation specifics for users who want to understand how features work internally.
 
+### Layered Architecture (v0.2.0-beta)
+
+The system is organized into four layers:
+
+| Layer | Components | Role |
+|-------|-----------|------|
+| **Context** | Skills + AGENTS.md | Detect the moment, dispatch to the right agent |
+| **Logic** | Agents | Execute the work (heavy-lift, approval-gated) |
+| **Lifecycle** | Hooks | Automate at the right moment (PostToolUse, Stop, PreToolUse, Notification) |
+| **Data** | MCP `kg_*` tools | Persistence and search |
+
+**Thin-dispatcher commands**: Three commands are now lightweight coordinators rather than monolithic scripts:
+
+- `capture-lesson` (~100 lines) — guided Q&A then dispatches to `lesson-capture-agent`
+- `recall` (~80 lines) — parses query then dispatches to `recall-agent`
+- `session-summary` (~68 lines) — collects parameters then dispatches to `session-summary-agent`
+
+The agents handle all heavy processing: file writes, git operations, and MCP tool calls.
+
+### Hooks
+
+Hooks automate knowledge capture at lifecycle events without requiring manual invocation:
+
+| Hook | Event | Behavior |
+|------|-------|----------|
+| **PostToolUse** | Write/Edit file matcher | Detects lesson signals after file saves; suggests capture |
+| **Stop** | Session end | Triggers session-summary prompt before context closes |
+| **PreToolUse** | git commit matcher | Gates commits — prompts for lesson capture if unresolved learnings detected |
+| **Notification** | Background events | Delivers async signals from long-running agent tasks |
+
+Hooks are defined in `hooks/hooks.json` and run automatically — no invocation needed.
+
+### Agents
+
+| Agent | Role |
+|-------|------|
+| `lesson-capture-agent` | Executes full lesson capture workflow (file write, index update, git) |
+| `recall-agent` | Runs multi-source search and formats ranked results |
+| `session-summary-agent` | Parses conversation history, generates summary, commits to sessions/ |
+| `platform-sync-agent` | Detects and configures AI tool integrations (Gemini CLI, Cursor, Windsurf, Continue.dev, VS Code Copilot, Aider) |
+| `knowledge-extractor` | Read-only parsing of large files for KG extraction (approval-gated writes) |
+| `session-documenter` | Git archaeology for session summaries (approval-gated commits/pushes) |
+
 ### Context-Mode Integration
 
 When the [context-mode plugin](https://github.com/steventcramer/context-mode) is installed alongside kmgraph:
@@ -1383,5 +1433,5 @@ flowchart TD
 </div>
 ---
 
-**Version**: 0.1.0-beta
-**Updated**: 2026-02-27
+**Version**: 0.2.0-beta
+**Updated**: 2026-03-27
