@@ -268,8 +268,7 @@ ADRs follow the template in `core/templates/decisions/ADR-template.md`. Refer co
 
 ---
 
-<<<<<<< Updated upstream
-=======
+
 ### 4f. Changelog entry pattern
 
 Apply to: every version section in `CHANGELOG.md`.
@@ -328,7 +327,6 @@ Place `### TL;DR` immediately after the `## [version] - date` heading, before al
 
 ---
 
->>>>>>> Stashed changes
 ## 5. Accessibility
 
 > **All contributor-facing and user-facing documentation must meet Section 508 standards (36 CFR Part 1194) and WCAG 2.1 Level AA.**
