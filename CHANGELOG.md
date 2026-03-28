@@ -12,14 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### TL;DR
 
-!!! info "Zero-friction MCP setup."
-    If the KMGraph MCP server isn't connected, the assistant will now offer to automatically configure it for Gemini CLI, Cursor, Windsurf, Continue.dev, or VS Code. No manual JSON editing required.
+!!! info "Just-in-Time MCP Setup."
+    If you skip the `init` command and the MCP server isn't connected, the assistant will now intercept the failure and offer to automatically configure your IDE.
 
 !!! info "Lesson capture now works everywhere."
     Platforms that only support MCP tools (like Cursor or Windsurf) can now capture lessons, session summaries, and ADRs via the new `kg_capture` tool without needing file system write access.
-
-!!! info "Active Work Guard protects your data."
-    KMGraph now strictly enforces that the active Knowledge Graph matches your current working directory before writing anything, preventing accidental cross-project changes.
 
 !!! info "Backend refactoring for performance and maintainability."
     The `sync-all` and `update-graph` commands, as well as the `adr-guide` skill, have been modernized to use the new lightweight dispatcher pattern.
