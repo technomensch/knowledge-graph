@@ -500,5 +500,5 @@ Use `--delegate knowledge-extractor` or `--delegate session-documenter` in comma
 
 ---
 
-**Version**: 0.1.0-beta
-**Last Updated**: 2026-03-03
+**Version**: 0.2.1-beta
+**Last Updated**: 2026-03-28

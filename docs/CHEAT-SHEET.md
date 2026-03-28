@@ -98,6 +98,9 @@ Heavy-lift task handlers. Usually invoked automatically by skills/commands.
 | session-summary-agent | Session wrap-up and documentation | Auto-triggered at end of work |
 | mcp-setup-agent | MCP server setup and configuration | IDE detection + auto-config |
 | knowledge-extractor | Batch KG extraction and parsing | Via `/kmgraph:sync-all` |
+| sync-all-agent | Executing KG sync pipeline | Via `/kmgraph:sync-all` command |
+| create-adr-agent | ADR creation wizard | Via `/kmgraph:create-adr` command |
+| knowledge-reviewer | Quality review for lessons and ADRs | Via `/kmgraph:update-graph` command |
 
 See [Concepts Guide](CONCEPTS.md) § Four-Layer Architecture for full agent overview and when each operates.
 

@@ -80,7 +80,7 @@ Verify parent branch is fully committed before creating child branch.
 grep -r "version" package.json .claude-plugin/plugin.json mcp-server/package.json
 
 # Check for stale /knowledge: references
-grep -r "/knowledge:" scripts/
+grep -r "/kmgraph:" commands/ agents/ skills/
 
 # Build & verify docs
 mkdocs build

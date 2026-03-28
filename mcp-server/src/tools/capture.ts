@@ -236,7 +236,8 @@ export async function handleCapture(
   const activeKgRoot = getProjectRoot(kgPath);
   const cwd = process.cwd();
 
-  if (!cwd.startsWith(activeKgRoot)) {
+  const normalizedRoot = activeKgRoot.endsWith(path.sep) ? activeKgRoot : activeKgRoot + path.sep;
+  if (cwd !== activeKgRoot && !cwd.startsWith(normalizedRoot)) {
     return {
       error: "KG_MISMATCH",
       activeKg: config.active ?? undefined,
@@ -248,6 +249,10 @@ export async function handleCapture(
   // Update-in-place path
   if (request.metadata.existingFile) {
     const existing = path.resolve(request.metadata.existingFile);
+    const normalizedKgRoot = kgPath.endsWith(path.sep) ? kgPath : kgPath + path.sep;
+    if (existing !== kgPath && !existing.startsWith(normalizedKgRoot)) {
+      return { error: "IO_ERROR", message: `existingFile path is outside the active knowledge graph: ${existing}` };
+    }
     if (!fs.existsSync(existing)) {
       return { error: "IO_ERROR", message: `existingFile not found: ${existing}` };
     }

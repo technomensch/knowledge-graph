@@ -385,4 +385,176 @@ describe("kg_capture — existingFile update-in-place", () => {
 
     expect(rebuildIndex).toHaveBeenCalledWith(kgRoot);
   });
+
+  test("returns IO_ERROR when existingFile path does not exist", async () => {
+    const kgRoot = makeTempDir("update-missing");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    const result = await handleCapture({
+      content: "## Content\n",
+      type: "lesson",
+      metadata: { title: "Some Lesson", existingFile: path.join(kgRoot, "nonexistent.md") },
+    });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(true);
+    expect((result as CaptureError).error).toBe("IO_ERROR");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// C-9: deriveFileName unit tests
+// ---------------------------------------------------------------------------
+
+describe("deriveFileName", () => {
+  test("lesson without category produces PascalCase filename", () => {
+    const name = deriveFileName("lesson", { title: "auth token refresh" });
+    expect(name).toBe("Lessons_Learned_Auth_Token_Refresh.md");
+  });
+
+  test("lesson with category includes category prefix", () => {
+    const name = deriveFileName("lesson", { title: "retry logic", category: "patterns" });
+    expect(name).toBe("Lessons_Learned_Patterns_Retry_Logic.md");
+  });
+
+  test("session filename includes today's date prefix", () => {
+    const today = new Date().toISOString().slice(0, 10);
+    const name = deriveFileName("session", { title: "Feature Work" });
+    expect(name).toMatch(new RegExp(`^${today}-`));
+    expect(name).toContain("feature-work");
+  });
+
+  test("adr filename pads number to 3 digits", () => {
+    const name = deriveFileName("adr", { title: "Use TypeScript" }, 5);
+    expect(name).toBe("ADR-005-use-typescript.md");
+  });
+
+  test("adr filename defaults to 001 when no adrNumber provided", () => {
+    const name = deriveFileName("adr", { title: "First Decision" });
+    expect(name).toBe("ADR-001-first-decision.md");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// C-10: generateFrontmatter unit tests
+// ---------------------------------------------------------------------------
+
+describe("generateFrontmatter", () => {
+  test("lesson frontmatter includes title, created, updated, git, tags, category", () => {
+    const fm = generateFrontmatter("lesson", {
+      title: "Auth Lesson",
+      category: "debugging",
+      tags: ["auth", "token"],
+      git: { branch: "main", commit: "abc123", author: "dev" },
+    });
+    expect(fm).toContain('title: "Auth Lesson"');
+    expect(fm).toContain("created:");
+    expect(fm).toContain("updated:");
+    expect(fm).toContain("author: dev");
+    expect(fm).toContain("  branch: main");
+    expect(fm).toContain("  commit: abc123");
+    expect(fm).toContain("tags: [auth, token]");
+    expect(fm).toContain("category: debugging");
+  });
+
+  test("session frontmatter includes date, branch, commit_short, tags", () => {
+    const today = new Date().toISOString().slice(0, 10);
+    const fm = generateFrontmatter("session", {
+      title: "My Session",
+      tags: ["feature"],
+      git: { branch: "dev", commit_short: "abc1234" },
+    });
+    expect(fm).toContain('title: "My Session"');
+    expect(fm).toContain(`date: ${today}`);
+    expect(fm).toContain("branch: dev");
+    expect(fm).toContain("commit: abc1234");
+    expect(fm).toContain("tags: [feature]");
+  });
+
+  test("adr frontmatter has status Proposed and date", () => {
+    const today = new Date().toISOString().slice(0, 10);
+    const fm = generateFrontmatter("adr", {
+      title: "Use Postgres",
+      tags: ["db"],
+      git: { author: "alice" },
+    });
+    expect(fm).toContain('title: "Use Postgres"');
+    expect(fm).toContain("status: Proposed");
+    expect(fm).toContain(`date: ${today}`);
+    expect(fm).toContain("deciders: alice");
+    expect(fm).toContain("tags: [db]");
+  });
+
+  test("frontmatter opens and closes with --- delimiters", () => {
+    const fm = generateFrontmatter("lesson", { title: "Simple" });
+    expect(fm.startsWith("---\n")).toBe(true);
+    expect(fm).toContain("\n---\n");
+  });
+
+  test("title with double quotes is escaped in frontmatter", () => {
+    const fm = generateFrontmatter("lesson", { title: 'Say "hello"' });
+    expect(fm).toContain('title: "Say \\"hello\\""');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// C-11: resolveTargetPath unit tests
+// ---------------------------------------------------------------------------
+
+describe("resolveTargetPath", () => {
+  test("lesson without category resolves to lessons-learned/", () => {
+    const { dir, fileName } = resolveTargetPath("/kg", "lesson", { title: "Test Lesson" });
+    expect(dir).toBe("/kg/lessons-learned");
+    expect(fileName).toBe("Lessons_Learned_Test_Lesson.md");
+  });
+
+  test("lesson with category resolves to lessons-learned/<slug>/", () => {
+    const { dir } = resolveTargetPath("/kg", "lesson", { title: "Test", category: "Architecture" });
+    expect(dir).toBe("/kg/lessons-learned/architecture");
+  });
+
+  test("session resolves to sessions/<YYYY-MM>/", () => {
+    const ym = new Date().toISOString().slice(0, 7);
+    const { dir } = resolveTargetPath("/kg", "session", { title: "My Session" });
+    expect(dir).toBe(`/kg/sessions/${ym}`);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// C-12: checkExistingFile unit tests
+// ---------------------------------------------------------------------------
+
+describe("checkExistingFile", () => {
+  test("returns null for lesson type (only sessions checked)", () => {
+    const kgRoot = makeTempDir("check-lesson");
+    tempDirs.push(kgRoot);
+    const result = checkExistingFile("lesson", kgRoot, { title: "Something" });
+    expect(result).toBeNull();
+  });
+
+  test("returns null when no session file exists for today", () => {
+    const kgRoot = makeTempDir("check-no-session");
+    tempDirs.push(kgRoot);
+    const result = checkExistingFile("session", kgRoot, { title: "My Session" });
+    expect(result).toBeNull();
+  });
+
+  test("returns file path when a session file for today exists", () => {
+    const kgRoot = makeTempDir("check-session-exists");
+    tempDirs.push(kgRoot);
+    const today = new Date().toISOString().slice(0, 10);
+    const ym = today.slice(0, 7);
+    const sessionDir = path.join(kgRoot, "sessions", ym);
+    fs.mkdirSync(sessionDir, { recursive: true });
+    const existingFile = path.join(sessionDir, `${today}-my-work.md`);
+    fs.writeFileSync(existingFile, "# Session\n", "utf-8");
+
+    const result = checkExistingFile("session", kgRoot, { title: "My Session" });
+    expect(result).toBe(existingFile);
+  });
 });
