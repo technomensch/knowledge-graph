@@ -32,6 +32,11 @@ export declare function writeConfig(config: KgConfig): void;
 export declare function getActiveGraphPath(config: KgConfig): string | null;
 export declare function getPluginRoot(): string;
 /**
+ * Derive project root from KG path.
+ * If path ends in /docs, parent is project root; otherwise path itself is root.
+ */
+export declare function getProjectRoot(kgPath: string): string;
+/**
  * Recursively walk a directory and return all matching file paths
  */
 export declare function walkDir(dir: string, ext?: string): string[];
