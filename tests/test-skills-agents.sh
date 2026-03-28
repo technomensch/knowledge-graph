@@ -1,5 +1,5 @@
 #!/bin/bash
-# test-skills-agents.sh — Structural validation for all 6 skills and 3 agents
+# test-skills-agents.sh — Structural validation for all 6 skills and 8 agents
 #
 # Skills: auto-triggered context providers in skills/
 # Agents: heavy-lift task handlers in agents/
@@ -162,6 +162,11 @@ EXPECTED_AGENTS=(
   "knowledge-extractor"
   "session-documenter"
   "knowledge-reviewer"
+  "lesson-capture-agent"
+  "session-summary-agent"
+  "mcp-setup-agent"
+  "sync-all-agent"
+  "create-adr-agent"
 )
 
 # Test 10: Agents directory exists
@@ -177,7 +182,7 @@ else
   [ $FAIL -eq 0 ] && exit 0 || exit 1
 fi
 
-# Test 11: All 3 agent files present (agents are .md files, not directories)
+# Test 11: All 8 agent files present (agents are .md files, not directories)
 MISSING_AGENTS=0
 for agent in "${EXPECTED_AGENTS[@]}"; do
   if [ ! -f "$AGENTS_DIR/$agent.md" ]; then
@@ -186,17 +191,17 @@ for agent in "${EXPECTED_AGENTS[@]}"; do
   fi
 done
 if [ $MISSING_AGENTS -eq 0 ]; then
-  pass "All 3 agent files present"
+  pass "All 8 agent files present"
 else
   fail "$MISSING_AGENTS agent file(s) missing"
 fi
 
-# Test 12: Exact count is 3
+# Test 12: Exact count is 8
 ACTUAL_COUNT=$(find "$AGENTS_DIR" -name "*.md" -maxdepth 1 -type f | wc -l | tr -d ' ')
-if [ "$ACTUAL_COUNT" -eq 3 ]; then
-  pass "Exact agent count is 3"
+if [ "$ACTUAL_COUNT" -eq 8 ]; then
+  pass "Exact agent count is 8"
 else
-  fail "Agent count is $ACTUAL_COUNT (expected 3)"
+  fail "Agent count is $ACTUAL_COUNT (expected 8)"
 fi
 
 # Test 13: No empty agent files
