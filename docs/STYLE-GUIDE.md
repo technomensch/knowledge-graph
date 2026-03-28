@@ -268,6 +268,67 @@ ADRs follow the template in `core/templates/decisions/ADR-template.md`. Refer co
 
 ---
 
+<<<<<<< Updated upstream
+=======
+### 4f. Changelog entry pattern
+
+Apply to: every version section in `CHANGELOG.md`.
+
+Each version section opens with a `### TL;DR` subsection, followed by the standard Keep a Changelog technical blocks (`### Added`, `### Changed`, `### Removed`, `### Fixed`).
+
+#### Required subsection structure
+
+```markdown
+### TL;DR
+
+!!! info "Short plain-English headline describing a user-visible change."
+    Brief plain-English explanatory text providing context.
+
+!!! info "Short plain-English headline for a workflow that is now automated."
+    Brief plain-English explanatory text on what the user no longer needs to do manually.
+
+!!! info "Short plain-English headline explicitly flagging a behind-the-scenes change."
+    For example: Internal architecture reorganized; no changes from your perspective.
+```
+
+#### Rules for `### TL;DR`
+
+- Write for a developer who uses KMGraph daily but is not reading the source code
+- State what is different about daily use, not what code changed internally
+- Explicitly call out workflows that are now automated — what the user no longer needs to do manually
+- Explicitly call out commands whose behavior, name, or invocation changed
+- Explicitly flag changes that are purely behind the scenes — do not omit them; include an info block to confirm nothing changed for the user
+- Use plain English; avoid technical terms that are not already defined in Section 3 of this guide
+- Use MkDocs `!!! info "Headline"` admonitions rather than plain bullet points
+- Sub-bullets, code blocks, or nested headers are permitted inside the admonition block
+- Each block is a complete thought and stands alone without requiring the reader to check the technical sections below
+
+#### Placement
+
+Place `### TL;DR` immediately after the `## [version] - date` heading, before all technical subsections (`### Added`, `### Changed`, `### Removed`, `### Fixed`). The user sees the high-level summary first; the technical detail follows for those who need it.
+
+#### Example
+
+```markdown
+## [1.0.0] - 2026-04-01
+
+### TL;DR
+
+!!! info "Zero-friction MCP setup."
+    If the KMGraph MCP server isn't connected, the assistant will now offer to automatically configure it for Gemini CLI, Cursor, Windsurf, Continue.dev, or VS Code. No manual JSON editing required.
+
+!!! info "Behind the scenes only:"
+    The internal search index format changed; search results are unchanged from your perspective.
+
+### Added
+- New `kg_capture` MCP write tool
+```
+
+**Citation**: `[Nielsen2015]` — plain language reduces cognitive load; changelog readers are users, not implementers. `[GoogleDevDocs]` — "State the purpose before the details."
+
+---
+
+>>>>>>> Stashed changes
 ## 5. Accessibility
 
 > **All contributor-facing and user-facing documentation must meet Section 508 standards (36 CFR Part 1194) and WCAG 2.1 Level AA.**
