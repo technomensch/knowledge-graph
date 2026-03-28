@@ -1,26 +1,46 @@
 # Skill: session-wrap
 
-**Purpose:** Prompt for session summary when user indicates they're stopping work, approaching context limits, or reaching milestones.
+**Purpose:** Prompt for session summary when user indicates they're stopping work, approaching context limits, reaching milestones, or when open plan items, draft decisions, or uncaptured lessons are detected.
 
 **Trigger Indicators:**
-- User says "stopping", "done", "wrapping up", "I'm out"
+
+**User Intent Signals:**
+- User says "stopping", "done for today", "that's it for now", "wrapping up", "I'm done"
 - Context approaching 180K tokens (~90% of limit)
-- Pushing a PR or closing an issue
-- Reaching a feature milestone or version bump
-- End-of-day or natural stopping point in conversation
+- PR just pushed
+- Milestone completed
+
+**Active Work Signals:**
+- `docs/plans/*.md` contains unchecked `- [ ]` items (mid-plan indicator)
+- `docs/decisions/*.md` has ADRs with `Status: Proposed` or `Status: Draft` (open decisions)
+- Recent commits have lesson-worthy keywords (`fix`, `solved`, `implement`, `pattern`, `debug`, `refactor`) but no corresponding lesson file in `docs/lessons-learned/`
+
+**Block Conditions:**
+- Stop hook temp flag exists: `/tmp/.kg-session-summarized-{PPID}-{date}` — if present, do NOT prompt (Stop hook already fired; avoid double-prompting)
 
 **Behavior:**
-When triggered, remind and guide user to:
-- Run `/kmgraph:session-summary` to document current work state
-- Capture what was built, decided, and learned
-- Record commits and file changes for future reference
-- Optionally sync findings to knowledge graph
+When triggered, directly dispatch to `session-summary-agent` with conversational language that addresses the user, never exposing internal mechanics.
 
-**Example Trigger:**
+**Example Triggers:**
+
 ```
 User: "Alright, I've pushed this to the branch. Wrapping up for today."
+→ "Before you go — want a quick note on what we worked on today?"
 ```
 
-**Assistant Response:**
-"Before I lose context, let me document this session so we don't lose the work summary..."
-Then prompt: "Ready to run `/kmgraph:session-summary` to capture what we built today?"
+```
+[Skill detects unchecked plan steps]
+→ "You're mid-plan — want to mark off what we finished before wrapping up?"
+```
+
+```
+[Skill detects lesson-worthy commits without corresponding lesson]
+→ "Looks like some meaningful work wasn't captured — want to save a note before finishing?"
+```
+
+**User-Facing Language Rules:**
+- Address the user directly (never expose internal tool names or agent names)
+- Conversational, inviting language
+- No technical jargon about "dispatching", "agents", or internal file paths
+- Single, clear question per prompt
+- Treat the session summary as optional but valuable

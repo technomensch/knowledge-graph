@@ -8,16 +8,18 @@ const scaffold_js_1 = require("./tools/scaffold.js");
 const sanitization_js_1 = require("./tools/sanitization.js");
 const index_js_1 = require("./resources/index.js");
 const fts5_js_1 = require("./tools/fts5.js");
+const capture_js_1 = require("./tools/capture.js");
 const server = new mcp_js_1.McpServer({
     name: "knowledge-graph",
-    version: "0.1.2-beta",
+    version: "0.2.1-beta",
 });
-// Register tools (8 core tools)
+// Register tools (9 core tools)
 (0, config_js_1.registerConfigTools)(server); // kg_config_init, kg_config_list, kg_config_switch, kg_config_add_category
 (0, search_js_1.registerSearchTool)(server); // kg_search
 (0, scaffold_js_1.registerScaffoldTool)(server); // kg_scaffold
 (0, sanitization_js_1.registerSanitizationTool)(server); // kg_check_sensitive
 (0, fts5_js_1.registerFts5Tool)(server); // kg_fts5_rebuild
+(0, capture_js_1.registerCaptureTool)(server); // kg_capture
 // Register resources (2 resources)
 (0, index_js_1.registerConfigResource)(server); // kg://config
 (0, index_js_1.registerTemplatesResource)(server); // kg://templates/{name}

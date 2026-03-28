@@ -12,6 +12,80 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "comment": "After file writes: check for lesson-worthy signals and prompt capture",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-tool-lesson-check.sh",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "comment": "After file writes: check if a platform config file was modified and offer sync",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/platform-file-change-check.sh",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "comment": "After writing to ~/.claude/plans/: mirror to docs/plans/ in active KG project",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/plan-mirror.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash.*git commit",
+        "hooks": [
+          {
+            "type": "command",
+            "comment": "Before git commit: check if lesson-worthy changes are undocumented",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/pre-commit-knowledge-gate.sh",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "comment": "Session end: surface open plans, draft ADRs, uncaptured lessons",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/session-end-prompt.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "comment": "Notification events: forward to configured webhook (opt-in, graceful no-op if unconfigured)",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/notification-dispatch.sh",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }
