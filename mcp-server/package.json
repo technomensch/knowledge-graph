@@ -18,6 +18,11 @@
     "test": "jest",
     "postinstall": "npm run build"
   },
+  "overrides": {
+    "handlebars": ">=4.7.9",
+    "path-to-regexp": ">=8.4.0",
+    "picomatch": ">=2.3.2"
+  },
   "keywords": [
     "mcp",
     "knowledge-graph",
