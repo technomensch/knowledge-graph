@@ -1,7 +1,7 @@
 # ADR-023: Single Source of Truth for CHANGELOG — Root File Included by MkDocs
 
 **Date:** 2026-03-28
-**Status:** Proposed
+**Status:** Accepted — Implemented (symlink, v0.2.1-beta)
 **Implements:** v0.2.2 — eliminate dual-changelog maintenance burden
 **Related:** [ADR-021](ADR-021-single-source-of-truth-dry-documentation.md), [Lesson: Dual Changelog Both Must Be Updated](../lessons-learned/process/Lessons_Learned_Dual_Changelog_Both_Must_Be_Updated.md)
 
@@ -53,9 +53,16 @@ Add a MkDocs hook that copies `CHANGELOG.md` to `docs/CHANGELOG.md` at build tim
 
 ### Chosen Option
 
-**Option B (include-markdown plugin)** — most explicit and already in the dependency tree. The `docs/CHANGELOG.md` file becomes a thin include wrapper rather than a hand-maintained file.
+**Option A (symlink)** — simplest, no plugin dependency, implemented in v0.2.1-beta.
 
-Interim (until Option B is implemented): **dual-update rule** — both files must be updated in the same commit on every release. Verified by: `grep -c "\[0\.2\." CHANGELOG.md docs/CHANGELOG.md` — counts must match.
+```bash
+rm docs/CHANGELOG.md
+ln -s ../CHANGELOG.md docs/CHANGELOG.md
+```
+
+`docs/CHANGELOG.md` is now a symlink to `../CHANGELOG.md`. MkDocs resolves it at build time. The `gh-pages` branch receives the resolved file. No plugin required.
+
+**Result:** Edit only `CHANGELOG.md` at the project root. MkDocs renders it at the docs URL automatically.
 
 ---
 
