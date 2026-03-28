@@ -281,13 +281,13 @@ Each version section opens with a `### TL;DR` subsection, followed by the standa
 ```markdown
 ### TL;DR
 
-!!! info "Short headline describing a user-visible change."
-    Brief explanatory text providing context.
+!!! info "Short plain-English headline describing a user-visible change."
+    Brief plain-English explanatory text providing context.
 
-!!! info "Short headline for a workflow that is now automated."
-    Brief explanatory text on what the user no longer needs to do manually.
+!!! info "Short plain-English headline for a workflow that is now automated."
+    Brief plain-English explanatory text on what the user no longer needs to do manually.
 
-!!! info "Short headline explicitly flagging a behind-the-scenes change."
+!!! info "Short plain-English headline explicitly flagging a behind-the-scenes change."
     For example: Internal architecture reorganized; no changes from your perspective.
 ```
 
@@ -300,6 +300,7 @@ Each version section opens with a `### TL;DR` subsection, followed by the standa
 - Explicitly flag changes that are purely behind the scenes — do not omit them; include an info block to confirm nothing changed for the user
 - Use plain English; avoid technical terms that are not already defined in Section 3 of this guide
 - Use MkDocs `!!! info "Headline"` admonitions rather than plain bullet points
+- No sub-bullets, code blocks, or nested headers are permitted inside the admonition block
 - Each block is a complete thought and stands alone without requiring the reader to check the technical sections below
 
 #### Placement
@@ -313,8 +314,8 @@ Place `### TL;DR` immediately after the `## [version] - date` heading, before al
 
 ### TL;DR
 
-!!! info "Lesson capture now works without the slash command."
-    Capturing a lesson now works from Cursor and Windsurf directly — the MCP tool handles it.
+!!! info "Zero-friction MCP setup."
+    If the KMGraph MCP server isn't connected, the assistant will now offer to automatically configure it for Gemini CLI, Cursor, Windsurf, Continue.dev, or VS Code. No manual JSON editing required.
 
 !!! info "Behind the scenes only:"
     The internal search index format changed; search results are unchanged from your perspective.

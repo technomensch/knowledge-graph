@@ -15,9 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 !!! info "Zero-friction MCP setup."
     If the KMGraph MCP server isn't connected, the assistant will now offer to automatically configure it for Gemini CLI, Cursor, Windsurf, Continue.dev, or VS Code. No manual JSON editing required.
 
-!!! info "Lesson capture now works without the slash command."
-    Capturing a lesson now works from Cursor and Windsurf directly — the plugin handles it natively.
-
 !!! info "Admonitions are the new standard for Changelog TL;DRs."
     The Style Guide now enforces `!!! info` blocks for release notes instead of plain bullet points.
 
