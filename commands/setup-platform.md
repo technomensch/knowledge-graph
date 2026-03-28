@@ -1,15 +1,11 @@
 ---
-description: Generate installation instructions for colleagues on other AI coding platforms (Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Aider)
+description: Detect installed AI coding tools and configure KMGraph for each one — useful when you install a new AI tool after initial setup
 allowed-tools: Bash, Read, Write, Edit, Glob, Grep, AskUserQuestion
 ---
 
-# Cross-Platform Setup Helper
+# Configure AI Platforms for KMGraph
 
-**Purpose:** Generate ready-to-paste installation instructions for a colleague who uses a different AI coding platform. Reads from INSTALL.md (single source of truth) and customizes with current project paths.
-
-**Version:** 1.0 (Created: 2026-02-20)
-
-**Note:** This command generates instructions for other users. For self-installation, paste INSTALL.md directly into the target AI assistant.
+**Purpose:** Detect which AI coding tools are installed on this machine and write the appropriate config files so they know how to use the knowledge graph. Run this when you install a new AI tool after the initial `/kmgraph:init` setup.
 
 ---
 
@@ -21,179 +17,193 @@ allowed-tools: Bash, Read, Write, Edit, Glob, Grep, AskUserQuestion
 ```
 
 **Examples:**
-- `/kmgraph:setup-platform` → Interactive wizard (prompts for platform)
-- `/kmgraph:setup-platform cursor` → Generate Cursor-specific instructions directly
+- `/kmgraph:setup-platform` → Detect and configure all installed platforms
+- `/kmgraph:setup-platform gemini` → Configure Gemini CLI only
 
 ---
 
-## Step 1: Detect Current Project Context
-
-**Collect project information automatically:**
+## Step 1: Read Active KG Config
 
 ```bash
-# Plugin root
-echo "${CLAUDE_PLUGIN_ROOT}"
-
-# Repo URL (if available)
-git remote get-url origin 2>/dev/null
-
-# MCP server path
-ls "${CLAUDE_PLUGIN_ROOT}/mcp-server/dist/index.js" 2>/dev/null
+cat ~/.claude/kg-config.json
 ```
 
-Store the repo URL and MCP server path for use in generated instructions.
+Extract:
+- `active` key → active KG name
+- Active KG's `path` field → KG path
+- Active KG's `platforms` array → already-configured platforms (skip these, or note "already configured")
+
+If no config exists: ask the user to run `/kmgraph:init` first.
 
 ---
 
-## Step 2: Select Target Platform (INTERACTIVE)
+## Step 2: Detect Installed AI Coding Tools
 
-If a platform was passed as argument, use it directly. Otherwise, prompt:
+Run these checks to build the list of detected platforms:
 
-```
-Which platform does the recipient use?
-
-1. Cursor
-2. Windsurf
-3. Continue.dev
-4. JetBrains (IntelliJ, WebStorm, PyCharm, etc.)
-5. VS Code (with Claude extension)
-6. Claude Desktop
-7. Aider
-8. GitHub Copilot
-9. Other / Local LLM
-```
-
-**Wait for user selection.**
-
----
-
-## Step 3: Select Output Format
-
-```
-How should the instructions be delivered?
-
-1. Copy-pasteable text block (default) — Ready to paste into a message or doc
-2. INSTALL.md reference — Point them to the universal installer
-3. MCP config JSON only — Just the IDE configuration snippet
-```
-
-**Wait for user selection.**
-
----
-
-## Step 4: Generate Instructions
-
-### 4.1 Read INSTALL.md
-
-```
-Action: Read ${CLAUDE_PLUGIN_ROOT}/INSTALL.md
-```
-
-Use INSTALL.md as the authoritative source for all installation steps.
-
-### 4.2 Generate Platform-Specific Output
-
-**For MCP-capable platforms (Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Claude Desktop):**
-
-Generate a message containing:
-
-1. **Prerequisites:** Git, Node.js 18+
-2. **Clone command:** Using the detected repo URL
-3. **Build command:** `cd mcp-server && npm install && npm run build`
-4. **MCP config:** The correct JSON block for the target platform
-
-To get the MCP config JSON, run:
 ```bash
-node "${CLAUDE_PLUGIN_ROOT}/mcp-server/dist/cli.js" config <platform>
+# Gemini CLI
+which gemini 2>/dev/null || [ -d "$HOME/.gemini" ] && echo "gemini"
+
+# Cursor
+([ -d "$HOME/.cursor" ] || [ -d "$HOME/Library/Application Support/Cursor" ]) && echo "cursor"
+
+# Windsurf
+([ -d "$HOME/.windsurf" ] || [ -d "$HOME/Library/Application Support/Windsurf" ]) && echo "windsurf"
+
+# Continue.dev
+[ -d "$HOME/.continue" ] && echo "continue"
+
+# VS Code Copilot (check extensions list)
+code --list-extensions 2>/dev/null | grep -q "GitHub.copilot" && echo "copilot"
+
+# Aider
+which aider 2>/dev/null && echo "aider"
 ```
 
-5. **Init instruction:** "After configuring MCP, use the `kg_config_init` tool to create a knowledge graph"
-6. **First use prompt:** "Try capturing a lesson about a recent problem you solved"
-
-**For non-MCP platforms (Aider, Copilot, Other):**
-
-Generate a message containing:
-
-1. **Clone command**
-2. **Directory structure creation** (from INSTALL.md Step 2C)
-3. **Template copying instructions**
-4. **Manual config creation**
-5. **Instructions file reference**
-
-### 4.3 Format Output
-
-**If copy-pasteable text block:**
-
-Present the full instructions in a fenced code block that the user can copy:
-
-```
-Here are the instructions for [platform]. Copy everything below and send to the recipient:
+Collect results. Note which are already in the `platforms` array (already configured).
 
 ---
 
-[Generated instructions]
+## Step 3: Confirmation Prompt
+
+If a platform was passed as an argument, skip this step and go directly to configuration.
+
+**No new platforms detected:** "All detected platforms are already configured, or no supported AI tools were found."
+
+**One new platform detected:**
+```
+Want me to configure KMGraph for [platform]? [y/N]
+```
+
+**Multiple new platforms detected:**
+```
+I see you have [A], [B], and [C] that aren't configured for KMGraph yet.
+Want me to configure all of them?
+
+1. Configure all
+2. Choose which ones
+3. Skip — I'll do it myself
+```
+
+**If option 2 (choose):** Prompt individually for each detected platform.
 
 ---
-```
 
-**If INSTALL.md reference:**
+## Step 4: Platform File Map
 
-```
-Share this with the recipient:
-
-"Paste the contents of INSTALL.md into your AI assistant for automated setup:
-https://github.com/[repo]/blob/main/INSTALL.md
-
-Or download and paste locally:
-curl -sL https://raw.githubusercontent.com/[repo]/main/INSTALL.md | pbcopy"
-```
-
-**If MCP config JSON only:**
-
-Output just the JSON block from the CLI tool.
+| Platform | File | Content source |
+|---|---|---|
+| Gemini CLI | `GEMINI.md` in project root | `${CLAUDE_PLUGIN_ROOT}/core/templates/AGENTS-template.md` |
+| Cursor | `.cursorrules` | Project conventions + KMGraph behaviors subset |
+| Windsurf | `.windsurfrules` | Same as `.cursorrules` |
+| Continue.dev | `.continue/config.json` prompt section | KMGraph behaviors subset |
+| VS Code Copilot | `.github/copilot-instructions.md` | Project conventions + KMGraph behaviors subset |
+| Aider | `.aider.conf.yml` conventions section | KMGraph behaviors subset |
 
 ---
 
-## Step 5: Offer Follow-Up
+## Step 5: Write Platform Files
 
-After generating instructions:
+For each approved platform:
+
+**Overwrite protection:** If the target file already exists, show a diff (describe what content will change) and ask before writing. Never silently replace an existing file.
+
+**Writing Gemini CLI (`GEMINI.md`):**
+```
+Action: Read ${CLAUDE_PLUGIN_ROOT}/core/templates/AGENTS-template.md
+Action: Write contents to GEMINI.md in the current project root
+```
+
+**Writing Cursor/Windsurf (`.cursorrules` / `.windsurfrules`):**
+Write a KMGraph behaviors subset covering:
+- When to suggest capturing lessons (bug resolved, decision made, pattern found)
+- How to use recall before answering questions about project history
+- Session wrap-up cues
+- Available MCP tools: `kg_search`, `kg_fts5_rebuild`, `kg_scaffold`, `kg_config_*`
+
+Do NOT include: Claude Code slash commands, hooks syntax, or Claude Code-specific tool references.
+
+**Writing VS Code Copilot (`.github/copilot-instructions.md`):**
+Include project coding conventions plus the KMGraph behaviors subset above.
+Create the `.github/` directory if it doesn't exist.
+
+**Writing Continue.dev (`.continue/config.json`):**
+Add a `systemPrompt` entry with the KMGraph behaviors subset.
+If the file already exists, add to the existing config rather than overwriting.
+
+**Writing Aider (`.aider.conf.yml`):**
+Add a `conventions` section with the KMGraph behaviors subset.
+If the file already exists, add to the existing config rather than overwriting.
+
+**Output confirmation per platform:**
+```
+✅ Configured: GEMINI.md (Gemini CLI)
+✅ Configured: .cursorrules (Cursor)
+⚠️  .windsurfrules already existed — showed diff, user declined overwrite
+```
+
+---
+
+## Step 6: For Any Declined Platform
+
+Show the exact file path and exact content to paste — never redirect to docs:
 
 ```
-Instructions generated. Would you like to:
+To configure [platform] manually:
 
-1. Generate instructions for another platform
-2. Test the MCP config locally (verify it works)
-3. Done
+File: [exact path]
+
+Contents to paste:
+[exact content block]
+
+Verification: Once added, ask your AI: "Is there a knowledge graph available?"
+Expected response: Your AI should describe KMGraph's capture, recall, and session
+summary capabilities and mention the kg_search MCP tool.
 ```
 
-**Wait for user selection.**
+---
 
-If "Generate for another platform" → return to Step 2.
-If "Test MCP config" → Run: `node ${CLAUDE_PLUGIN_ROOT}/mcp-server/dist/cli.js config <platform>` and verify output.
-If "Done" → End command.
+## Step 7: Register Platforms in Config
+
+After writing each platform file, add the platform name to the `platforms` array in
+`~/.claude/kg-config.json` for the active KG:
+
+```bash
+# Platform names: "gemini", "cursor", "windsurf", "continue", "copilot", "aider"
+# Read current config, add platform name to the platforms array
+# If platforms array is absent, initialize it first
+```
+
+Use Read + Edit to update the config. Never error if the `platforms` field is missing — treat absence as an empty array.
+
+Final config shape for the active KG entry:
+```json
+{
+  "path": "/path/to/kg/docs",
+  "type": "project-local",
+  "autoSwitch": false,
+  "platforms": ["gemini", "cursor"],
+  "notification": { "webhookUrl": "" }
+}
+```
 
 ---
 
 ## Checklist
 
-- [ ] Current project context detected (repo URL, MCP server path)
-- [ ] Target platform selected
-- [ ] Output format selected
-- [ ] INSTALL.md read as source of truth
-- [ ] Platform-specific instructions generated with correct config paths
-- [ ] MCP config JSON generated via CLI tool (for MCP platforms)
-- [ ] Output formatted for easy copy-paste
+- [ ] Active KG config read; already-configured platforms identified
+- [ ] Installed platforms detected
+- [ ] User confirmed which platforms to configure
+- [ ] Platform files written with overwrite protection
+- [ ] Manual instructions provided for any declined platforms (exact content, not "see docs")
+- [ ] Platforms array updated in kg-config.json
+- [ ] Verification step shown for each configured platform
 
 ---
 
 ## Related Commands
 
-- `/kmgraph:init` — Initialize a knowledge graph on the current machine
-- `/kmgraph:help` — Get help with any command
+- `/kmgraph:init` — Initialize a knowledge graph (includes platform detection at setup time)
 - `/kmgraph:status` — Check current knowledge graph status
-
----
-
-**Created:** 2026-02-20
-**Version:** 1.0
-**Usage:** Type `/kmgraph:setup-platform` to generate installation instructions for another platform
+- `/kmgraph:switch` — Change the active knowledge graph

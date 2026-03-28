@@ -9,7 +9,7 @@ import { registerFts5Tool } from "./tools/fts5.js";
 
 const server = new McpServer({
   name: "knowledge-graph",
-  version: "0.1.2-beta",
+  version: "0.2.0-beta",
 });
 
 // Register tools (8 core tools)

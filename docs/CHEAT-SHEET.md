@@ -33,10 +33,10 @@ First-time users need these for basic operation:
 
 | Command | Purpose |
 |---------|---------|
-| `/kmgraph:init` | Initialize a new knowledge graph with wizard-based setup |
-| `/kmgraph:capture-lesson` | Document lessons learned with git metadata tracking |
+| `/kmgraph:init` | Initialize a new knowledge graph with wizard-based setup; auto-detects AI tools (Gemini CLI, Cursor, Windsurf, Continue.dev, VS Code Copilot, Aider) |
+| `/kmgraph:capture-lesson` | Document lessons learned with git metadata tracking — **auto-triggered via `lesson-capture` skill and PostToolUse hook** |
 | `/kmgraph:status` | View active knowledge graph info and quick reference |
-| `/kmgraph:recall` | Search across all memory systems (lessons, decisions, knowledge) |
+| `/kmgraph:recall` | Search across all memory systems (lessons, decisions, knowledge) — **auto-triggered via `kg-recall` skill** |
 
 ### 🟡 Intermediate (Once Comfortable)
 
@@ -46,7 +46,7 @@ Active users use these for regular workflows:
 |---------|---------|
 | `/kmgraph:update-graph` | Extract knowledge graph entries from lessons. Uses background file reading for large batches when context-mode is installed |
 | `/kmgraph:add-category` | Add a new category to existing knowledge graph |
-| `/kmgraph:session-summary` | Create summary of current chat session |
+| `/kmgraph:session-summary` | Create summary of current chat session — **auto-triggered via `session-wrap` skill and Stop hook** |
 | `/kmgraph:list` | Display all configured knowledge graphs |
 | `/kmgraph:switch` | Change active knowledge graph |
 | `/kmgraph:check-sensitive` | Scan knowledge graph for potentially sensitive information |
@@ -85,9 +85,24 @@ Skills activate automatically based on conversation context. No invocation neede
 
 ---
 
+## Lifecycle Hooks
+
+Hooks automate knowledge capture at session lifecycle events. Defined in `hooks/hooks.json`; no invocation needed.
+
+| Hook | Event | Behavior |
+|------|-------|----------|
+| **PostToolUse** | Write/Edit file | Detects lesson signals after file saves; suggests `/kmgraph:capture-lesson` |
+| **Stop** | Session end | Triggers `/kmgraph:session-summary` prompt before context closes |
+| **PreToolUse** | git commit | Gates commits — prompts for lesson capture if unresolved learnings detected |
+| **Notification** | Background events | Delivers async signals from long-running agent tasks |
+
+---
+
 ## Delegation for Heavy-Lift Tasks
 
 When processing large batches or complex files, delegate to subagents to reduce context usage.
+
+**Available agents**: `lesson-capture-agent` (dispatched by `capture-lesson`), `recall-agent` (dispatched by `recall`), `session-summary-agent` (dispatched by `session-summary`), `platform-sync-agent` (AI tool configuration), `knowledge-extractor` (bulk extraction), `session-documenter` (git archaeology).
 
 ### Extraction & Parsing (knowledge-extractor)
 Use for: multi-file analysis, chat history parsing (10+ sessions), large lesson batches (50+ KB)
@@ -124,6 +139,7 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 
 ## Key Concepts
 
+- **Layered Architecture (v0.2.0-beta)**: Four layers — Context (skills + AGENTS.md), Logic (agents), Lifecycle (hooks), Data (MCP `kg_*` tools). Commands like `capture-lesson`, `recall`, and `session-summary` are thin dispatchers that hand off to dedicated agents.
 - **Knowledge Graph**: Structured collection of lessons learned, decisions, and patterns stored as markdown files with YAML frontmatter
 - **YAML Frontmatter**: Metadata at the top of files (title, date, tags, context, etc.) used for organization and search
 - **Git Metadata**: Automatic tracking of branch, commit, PR, and issue information when capturing lessons
@@ -235,5 +251,5 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 
 ---
 
-**Version**: 0.1.0-beta
-**Last Updated**: 2026-03-03
+**Version**: 0.2.0-beta
+**Last Updated**: 2026-03-27
