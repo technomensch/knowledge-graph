@@ -23,8 +23,6 @@ Authoring standards for contributors writing or reviewing documentation for the 
 9. [Pre-Commit Checklist](#9-pre-commit-checklist)
 10. [Related Documentation](#10-related-documentation)
 
-> **Changelog authors**: See [Section 4f](#4f-changelog-entry-pattern) for the required `### What This Means For You` subsection format.
-
 ---
 
 ## Citation Keys
@@ -270,6 +268,7 @@ ADRs follow the template in `core/templates/decisions/ADR-template.md`. Refer co
 
 ---
 
+
 ### 4f. Changelog entry pattern
 
 Apply to: every version section in `CHANGELOG.md`.
@@ -300,7 +299,7 @@ Each version section opens with a `### TL;DR` subsection, followed by the standa
 - Explicitly flag changes that are purely behind the scenes — do not omit them; include an info block to confirm nothing changed for the user
 - Use plain English; avoid technical terms that are not already defined in Section 3 of this guide
 - Use MkDocs `!!! info "Headline"` admonitions rather than plain bullet points
-- No sub-bullets, code blocks, or nested headers are permitted inside the admonition block
+- Sub-bullets, code blocks, or nested headers are permitted inside the admonition block
 - Each block is a complete thought and stands alone without requiring the reader to check the technical sections below
 
 #### Placement
@@ -603,6 +602,5 @@ Run this checklist before marking documentation complete or committing a new or 
 ---
 
 **Created**: 2026-02-20
-**Version**: 1.1.0
-**Last Updated**: 2026-03-27
+**Version**: 1.0
 **Applies to**: v0.0.7-alpha and later
