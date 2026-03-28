@@ -78,6 +78,7 @@ plugins:
       separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
   - git-revision-date-localized:
       enable_creation_date: true
+      enable_git_follow: false
       exclude:
         - plans/**
         - chat-history/**
