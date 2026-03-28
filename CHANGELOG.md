@@ -12,8 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### TL;DR
 
-!!! info "Just-in-Time automatic connection recovery."
-    If an editor loses connection to the knowledge graph, the assistant seamlessly intercepts the failure and restores the configuration automatically. Manual JSON editing is no longer required.
+!!! info "Zero-friction MCP setup."
+    If the KMGraph MCP server isn't connected, the assistant will now offer to automatically configure it for Gemini CLI, Cursor, Windsurf, Continue.dev, or VS Code. No manual JSON editing required.
+
+!!! info "Lesson capture now works without the slash command."
+    Capturing a lesson now works from Cursor and Windsurf directly — the plugin handles it natively.
 
 !!! info "Admonitions are the new standard for Changelog TL;DRs."
     The Style Guide now enforces `!!! info` blocks for release notes instead of plain bullet points.
@@ -36,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Re-established `CHANGELOG.md` as the single source of truth for release notes via symlink (resolving the dual-maintenance issue)
 
 ### Fixed
+- Added missing Notification Webhooks instructions to `docs/CONFIGURATION.md` (resolving dead link in v0.2.0-beta changelog)
 - Recovered missing Changelog style guide formatting rules (Section 4f) from commit history
 - Restored original v0.2.0-beta TL;DR release notes that were accidentally overwritten
 
