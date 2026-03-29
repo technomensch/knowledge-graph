@@ -209,7 +209,7 @@ If a search index already exists, sync-all refreshes it automatically with no pr
 
 How to tell the index is active: search results show `(FTS5)` — this just means the index was used. How to build the index manually: run `kg_fts5_rebuild` from the MCP tool panel. How to revert: delete the `.fts5.db` file from the knowledge graph root folder.
 
-**After backfill:** If the backfill option was used during `/kmgraph:init`, the knowledge graph now contains a full set of imported content. This is a good time to build the search index so all that content is immediately searchable by relevance. Run `/kmgraph:sync-all` and accept the index prompt, or call `kg_fts5_rebuild` directly.
+**After backfill or upgrade with existing lessons:** If the backfill option was used during `/kmgraph:init`, or if lessons already existed before the plugin was installed, run `/kmgraph:update-graph` to populate `knowledge/` with structured patterns and concepts extracted from those lessons. Without this step, `knowledge/` remains empty and recall results will lack extracted insights. After extraction, run `/kmgraph:sync-all` to build the search index so all content is immediately searchable by relevance.
 
 ---
 
@@ -297,7 +297,7 @@ How to tell the index is active: search results show `(FTS5)` — this just mean
     /kmgraph:init
     ```
 
-    Select **option 1 (Verify/upgrade)** when prompted. This checks that directories, config fields, templates, and the search index are current with the new plugin version. If the search index (`.fts5.db`) is missing, the wizard offers to rebuild it. Existing lessons and decisions are never modified.
+    Select **option 1 (Verify/upgrade)** when prompted. This checks that directories, config fields, templates, and the search index are current with the new plugin version. If the search index (`.fts5.db`) is missing, the wizard offers to rebuild it. If `knowledge/` is empty despite existing lessons, the wizard offers to run `/kmgraph:update-graph` to populate structured KG entries. Existing lessons and decisions are never modified.
 
 === "Windows"
 
