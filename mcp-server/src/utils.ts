@@ -90,6 +90,29 @@ export function getProjectRoot(kgPath: string): string {
 }
 
 /**
+ * Returns all registered KG paths, optionally filtered by type.
+ * Expands ~ in paths. Skips graphs without a path.
+ */
+export function getAllGraphPaths(
+  config: KgConfig,
+  types?: Array<GraphConfig["type"]>
+): Array<{ name: string; path: string; type: GraphConfig["type"] }> {
+  return Object.entries(config.graphs)
+    .filter(([, graph]) => {
+      if (!graph.path) return false;
+      if (!types) return true;
+      // Treat missing type as "project-local" for v0.2.1 compat
+      const graphType = (graph.type || "project-local") as GraphConfig["type"];
+      return types.includes(graphType);
+    })
+    .map(([name, graph]) => ({
+      name,
+      path: graph.path.replace(/^~/, os.homedir()),
+      type: (graph.type || "project-local") as GraphConfig["type"],
+    }));
+}
+
+/**
  * Recursively walk a directory and return all matching file paths
  */
 export function walkDir(dir: string, ext: string = ".md"): string[] {
