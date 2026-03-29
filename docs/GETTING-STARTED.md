@@ -165,7 +165,12 @@ When context-mode is installed, file reading is offloaded to a background proces
 
 ### Faster Search (Optional)
 
-By default, kmgraph searches by reading every file in the knowledge graph. For larger knowledge graphs, building a search index makes results faster and ranks them by relevance. The first time `/kmgraph:sync-all` is run after upgrading, kmgraph will ask once whether to build the index. After that, the index stays current automatically.
+By default, kmgraph searches by reading every file in the knowledge graph. For larger knowledge graphs, building a search index makes results faster and ranks them by relevance. The index is local-only and is not included in version control, so it does not survive a fresh install or upgrade.
+
+After a plugin upgrade, two paths offer to rebuild a missing index:
+
+- **`/kmgraph:init` → option 1 (Verify/upgrade)** — the wizard checks for a missing index and offers to rebuild it as part of the standard post-upgrade flow.
+- **`/kmgraph:sync-all`** — if the index is absent and has not been previously declined, sync-all asks once whether to build it. After that, the index stays current automatically.
 
 The diagram below compares how kmgraph searches without and with a search index.
 
@@ -292,7 +297,7 @@ How to tell the index is active: search results show `(FTS5)` — this just mean
     /kmgraph:init
     ```
 
-    Select **option 1 (Verify/upgrade)** when prompted. This checks that the existing knowledge graph directories, config fields, and templates are current with the new plugin version. Existing lessons and decisions are never modified.
+    Select **option 1 (Verify/upgrade)** when prompted. This checks that directories, config fields, templates, and the search index are current with the new plugin version. If the search index (`.fts5.db`) is missing, the wizard offers to rebuild it. Existing lessons and decisions are never modified.
 
 === "Windows"
 
@@ -331,7 +336,7 @@ How to tell the index is active: search results show `(FTS5)` — this just mean
     /kmgraph:init
     ```
 
-    Select **option 1 (Verify/upgrade)** when prompted.
+    Select **option 1 (Verify/upgrade)** when prompted. The wizard checks directories, config fields, templates, and the search index.
 
 === "GUI (Finder / File Explorer)"
 
@@ -385,7 +390,7 @@ How to tell the index is active: search results show `(FTS5)` — this just mean
     /kmgraph:init
     ```
 
-    Select **option 1 (Verify/upgrade)** when prompted.
+    Select **option 1 (Verify/upgrade)** when prompted. The wizard checks directories, config fields, templates, and the search index.
 
 ### Commands do not appear in Claude Code autocomplete
 
@@ -427,7 +432,7 @@ Git is recommended but not required. With git, the system automatically captures
 
 ---
 
-<!-- Updated: 2026-03-27 -->
+<!-- Updated: 2026-03-29 -->
 ## Meet Your New Agents
 
 Agents are heavy-lift task handlers that run separately from your main conversation. They exist so that complex or resource-intensive work — parsing large files, searching the knowledge graph, assembling session summaries — happens in isolation and does not crowd out your working context. You rarely invoke agents directly; skills and commands trigger them automatically when the work warrants it.
