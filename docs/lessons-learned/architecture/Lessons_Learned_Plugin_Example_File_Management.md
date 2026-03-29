@@ -149,6 +149,13 @@ This lesson applies to any open-source tool that ships example/sample content al
 
 ---
 
+## See Also
+
+- [Knowledge Graph: Concepts — Plugin Distribution Tier Model](../../knowledge/concepts.md#plugin-distribution-tier-model)
+- [Knowledge Graph: Concepts — Git Atomic Delivery Constraint](../../knowledge/concepts.md#git-atomic-delivery-constraint)
+
+---
+
 **Version:** 1.0
 **Created:** 2026-02-21
 **Last Updated:** 2026-02-21

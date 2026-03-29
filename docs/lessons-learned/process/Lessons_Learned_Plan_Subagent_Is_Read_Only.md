@@ -34,3 +34,9 @@ This applies to all subagent types with restricted tool sets: know which tools e
 - Branch: `v0.2.0-beta-layered-architecture`, Phase 7 planning work
 - Commit context: `a09611b5`
 - Date: 2026-03-27
+
+---
+
+## See Also
+
+- [Knowledge Graph: Gotchas — Plan Subagent Is Read-Only](../../knowledge/gotchas.md#plan-subagent-is-read-only--write-this-file-prompts-silently-fail)

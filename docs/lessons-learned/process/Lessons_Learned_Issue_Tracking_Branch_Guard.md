@@ -88,6 +88,12 @@ This guard pattern applies to **any command that creates Git branches**, includi
 
 ---
 
+## See Also
+
+- [Knowledge Graph: Patterns — Active Work Guard for Branch-Creating Commands](../../knowledge/patterns.md#active-work-guard-for-branch-creating-commands)
+
+---
+
 **Category:** process
 **Status:** Implemented in start-issue-tracking (v0.2.1-beta)
 **Last Updated:** 2026-03-28

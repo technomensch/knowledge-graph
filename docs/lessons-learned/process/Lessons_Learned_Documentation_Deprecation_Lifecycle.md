@@ -98,6 +98,12 @@ The full deprecation format, phase descriptions, and approval language are in:
 
 ---
 
+## See Also
+
+- [Knowledge Graph: Patterns — Documentation Deprecation Lifecycle](../../knowledge/patterns.md#documentation-deprecation-lifecycle-deprecate--archive--remove)
+
+---
+
 **Category:** process
 **Status:** Implemented in update-doc command (v0.2.1-beta)
 **Last Updated:** 2026-03-28

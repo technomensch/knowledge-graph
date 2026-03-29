@@ -181,6 +181,13 @@ Any plugin or tool that supports multiple installation tiers with different upda
 
 ---
 
+## See Also
+
+- [Knowledge Graph: Concepts — Plugin Distribution Tier Model](../../knowledge/concepts.md#plugin-distribution-tier-model)
+- [Knowledge Graph: Concepts — Single Version Source Pattern](../../knowledge/concepts.md#single-version-source-pattern)
+
+---
+
 **Version:** 1.0
 **Created:** 2026-02-21
 **Last Updated:** 2026-02-21

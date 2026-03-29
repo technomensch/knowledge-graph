@@ -78,6 +78,12 @@ Verify with: `grep -n "0\.\(current version\)" CHANGELOG.md docs/CHANGELOG.md` â
 
 ---
 
+## See Also
+
+- [Knowledge Graph: Concepts â€” Dual Changelog Pattern](../../knowledge/concepts.md#dual-changelog-pattern)
+
+---
+
 **Category:** process
 **Status:** Discovered during v0.2.1-beta wrap-up; docs/CHANGELOG.md fixed in same commit
 **Last Updated:** 2026-03-28

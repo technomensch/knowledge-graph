@@ -115,6 +115,12 @@ Suggest: "Documentation updates may be needed. If multi-branch release series co
 - **ADR-008**: Third-person language standard (applies to all doc updates)
 - **[Future] ADR-013**: Documentation Update Protocol (formalizes this pattern as mandatory)
 
+---
+
+## See Also
+
+- [Knowledge Graph: Patterns — Two-Layer Documentation Model](../../knowledge/patterns.md#two-layer-documentation-model-per-branch--release-sync)
+
 ## Application to Portfolio
 
 This pattern demonstrates:
