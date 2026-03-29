@@ -20,6 +20,8 @@ If the config file does not exist or no active graph is set:
 
 Stop here.
 
+Also check for registered global KGs: scan `graphs` for any entry with `type: "global"`. Store `{has_global_kg} = true/false` and the list of global KG names. This determines the search scope in Step 3.
+
 ---
 
 ## Step 1: Parse the Query
@@ -31,6 +33,9 @@ Extract from the input passed to this agent:
   - Valid values: `lessons` | `decisions` | `knowledge` | `sessions` | `all`
 - **`--format`** — output style (default: `summary`)
   - Valid values: `summary` | `detailed` | `paths`
+- **`--scope`** — which KGs to search (default: auto-detected from config)
+  - Valid values: `active` (active KG only) | `all` (active + global KGs) | `global-only`
+  - When absent: auto-detect (use `all` if global KGs registered, `active` otherwise)
 
 Example parse:
 ```
@@ -65,6 +70,13 @@ Use the `kg_search` MCP tool to search across the resolved directories. Search t
 - File names (case-insensitive)
 - File content (case-insensitive)
 - YAML frontmatter fields and metadata tags
+
+**Search scope:**
+- If `{has_global_kg}` is true (global KGs registered): pass `searchScope: "all"` to `kg_search`
+- If `{has_global_kg}` is false: pass `searchScope: "active"` (default, no change)
+- The user can override with `--scope=active|all|global-only` flag (parse in Step 1)
+
+Results from multi-KG search include `[project: name]` or `[global: name]` source labels — pass these through to the formatted output so the user knows which KG a result came from.
 
 **Multi-keyword handling:** Search for each keyword independently and rank files that match more keywords higher.
 
@@ -104,23 +116,27 @@ Respond conversationally. Group results by type. For each result include: title,
 
 **Lessons Learned** (N found)
 1. Title — [1–2 sentence summary]
-   Path: {active_kg_path}/lessons-learned/...
+   Path: {kg_path}/lessons-learned/...    ← include KG source label if multi-KG: [project: name] or [global: name]
 
 **Architecture Decisions** (N found)
 1. Title (Status: Accepted) — [1–2 sentence summary]
-   Path: {active_kg_path}/decisions/...
+   Path: {kg_path}/decisions/...
 
 **Knowledge Graph** (N found)
 1. file.md → Section Name — [1–2 sentence summary]
-   Path: {active_kg_path}/knowledge/...
+   Path: {kg_path}/knowledge/...
 
 **Session Summaries** (N found)
 1. YYYY-MM-DD description — [1–2 sentence summary]
-   Path: {active_kg_path}/sessions/...
+   Path: {kg_path}/sessions/...
 
 ---
 Related topics I noticed in these files: [extracted cross-references]
 ```
+
+When results span multiple KGs, add a note at the bottom:
+
+> Results from 2 KGs: **knowledge-graph** (project) and **personal** (global). To search only one, use `--scope=active` or `--scope=global-only`.
 
 ### Format: `paths`
 
