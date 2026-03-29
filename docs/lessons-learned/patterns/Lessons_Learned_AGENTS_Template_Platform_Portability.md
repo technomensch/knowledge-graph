@@ -51,3 +51,9 @@ This confirms the template is self-sufficient for a capable LLM to adopt all KMG
 - `core/templates/AGENTS-template.md` — the template validated in this test
 - Phase 7b validation: branch `v0.2.0-beta-layered-architecture`
 - v0.2.1 backlog Item A: `kg_capture` MCP tool for write-only platforms (issue-1)
+
+---
+
+## See Also
+
+- [Knowledge Graph: Patterns — AGENTS Template as Minimum Viable KMGraph Integration](../../knowledge/patterns.md#agents-template-as-minimum-viable-kmgraph-integration)

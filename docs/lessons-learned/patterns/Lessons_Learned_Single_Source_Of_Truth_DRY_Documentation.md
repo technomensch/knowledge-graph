@@ -96,6 +96,12 @@ The full DRY documentation pattern, authority map, and enforcement guidance are 
 
 ---
 
+## See Also
+
+- [Knowledge Graph: Patterns — Single Source of Truth (DRY) for Documentation](../../knowledge/patterns.md#single-source-of-truth-dry-for-documentation)
+
+---
+
 **Category:** patterns
 **Status:** Implemented in update-doc command (v0.2.1-beta)
 **Last Updated:** 2026-03-28

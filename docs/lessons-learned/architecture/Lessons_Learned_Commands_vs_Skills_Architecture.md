@@ -120,6 +120,12 @@ When designing plugin components, evaluate each piece against these criteria:
 
 ---
 
+## See Also
+
+- [Knowledge Graph: Concepts — Commands vs Skills Architecture](../../knowledge/concepts.md#commands-vs-skills-architecture)
+
+---
+
 **Version:** 1.0
 **Created:** 2026-02-16
 **Last Updated:** 2026-02-22
