@@ -128,10 +128,48 @@ Re-run platform detection (Step 1.11) and offer to configure any newly detected 
 
 #### 1e. FTS5 index check
 
-The search index (`.fts5.db`) is local-only and gitignored — it does not survive upgrades or fresh clones. Check whether it needs to be rebuilt:
+The search index (`.fts5.db`) is local-only and gitignored — it does not survive upgrades or fresh clones.
+
+**Before offering a rebuild, verify the KG path is correct:**
+
+The `kg_fts5_rebuild` tool indexes `lessons-learned/`, `decisions/`, `sessions/`, and `knowledge/` at the KG root. If those directories do not exist at the configured root but do exist at `{kgPath}/docs/`, the configured path is wrong — the rebuild will return 0 files and search will be broken.
 
 ```bash
 KG_ROOT=$(jq -r '.graphs["'"$kg_name"'"].path' ~/.claude/kg-config.json)
+
+# Check for content directories at root
+DIRS_AT_ROOT=0
+for dir in lessons-learned decisions sessions knowledge; do
+  [ -d "$KG_ROOT/$dir" ] && DIRS_AT_ROOT=$((DIRS_AT_ROOT + 1))
+done
+
+# Check if content is under docs/ instead
+DIRS_AT_DOCS=0
+for dir in lessons-learned decisions sessions knowledge; do
+  [ -d "$KG_ROOT/docs/$dir" ] && DIRS_AT_DOCS=$((DIRS_AT_DOCS + 1))
+done
+
+if [ "$DIRS_AT_ROOT" -eq 0 ] && [ "$DIRS_AT_DOCS" -gt 0 ]; then
+  echo "⚠️  KG path misconfiguration detected."
+  echo ""
+  echo "  Configured path: $KG_ROOT"
+  echo "  Content found at: $KG_ROOT/docs/"
+  echo ""
+  echo "  The search index and recall commands will return 0 results with the"
+  echo "  current path. The KG root should point to the directory that contains"
+  echo "  lessons-learned/, decisions/, and sessions/ directly."
+  echo ""
+  echo "  Fix the KG path?"
+  echo "    1. Yes — update config to $KG_ROOT/docs/"
+  echo "    2. No — leave as-is (index rebuild skipped)"
+  # If user selects Yes: update kg-config.json path for this KG to $KG_ROOT/docs/
+  # then continue with the corrected path
+fi
+```
+
+If the path is confirmed correct, check whether the index needs rebuilding:
+
+```bash
 FTS5_DECLINED=$(jq -r '.graphs["'"$kg_name"'"].fts5_declined // false' ~/.claude/kg-config.json)
 
 if [ "$FTS5_DECLINED" = "true" ]; then
@@ -145,7 +183,12 @@ elif [ ! -f "$KG_ROOT/.fts5.db" ]; then
 fi
 ```
 
-If the user selects **Yes**, call `kg_fts5_rebuild`. If the user selects **Skip**, continue without rebuilding (linear scan remains available as fallback).
+If the user selects **Yes**, call `kg_fts5_rebuild`. **After the rebuild, validate the result:**
+
+- If `indexed` is 0: display a warning — "Search index built but 0 files were indexed. Verify the KG path points to the directory containing lessons-learned/, decisions/, and sessions/. Current path: {kgPath}"
+- If `indexed` > 0: confirm success — "✅ Search index built: {indexed} files indexed in {duration_ms}ms"
+
+If the user selects **Skip**, continue without rebuilding (linear scan remains available as fallback).
 
 #### 1f. Output verification summary
 
