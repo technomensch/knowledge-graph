@@ -75,14 +75,27 @@ Check for config fields introduced in newer versions. Add defaults for any missi
 # - platforms: [] (added in v0.2.0)
 # - autoSwitch: false (added in v0.2.0)
 # - notification: { webhookUrl: "" } (added in v0.2.0)
+# - type: "project-local" (added in v0.2.2 — required for multi-KG support)
 
 jq '
   .graphs["'"$kg_name"'"] |=
     if .platforms == null then .platforms = [] else . end |
     if .autoSwitch == null then .autoSwitch = false else . end |
-    if .notification == null then .notification = { "webhookUrl": "" } else . end
+    if .notification == null then .notification = { "webhookUrl": "" } else . end |
+    if .type == null then .type = "project-local" else . end
 ' ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
 mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+```
+
+**After the migration, check for graphs still missing `type`** (e.g., if the user has multiple registered KGs from v0.2.1):
+
+```bash
+GRAPHS_WITHOUT_TYPE=$(jq -r '.graphs | to_entries[] | select(.value.type == null) | .key' ~/.claude/kg-config.json)
+if [ -n "$GRAPHS_WITHOUT_TYPE" ]; then
+  echo "⚠️  Some registered KGs are missing a type field (defaulted to project-local):"
+  echo "$GRAPHS_WITHOUT_TYPE"
+  echo "   If any of these should be a global KG, run /kmgraph:init-global-kg to re-register correctly."
+fi
 ```
 
 #### 1c. Template update check
@@ -503,6 +516,74 @@ jq ".graphs[\"$kg_name\"] = $config_entry | .active = \"$kg_name\"" \
   ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
 mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
 ```
+
+### Step 1.8.5: Global Personal KG Offer
+
+After the project KG is registered and active, offer to create a global personal KG for cross-project knowledge:
+
+```
+Would you like to create a personal knowledge graph for cross-project lessons?
+
+This creates a single global KG at ~/.claude/knowledge-graph/ where you can save
+lessons, patterns, and ADRs that apply across all your projects — not just this one.
+
+Examples of global lessons:
+  • "Plan language: use Create vs Update for new vs existing files"
+  • "MCP registration quirks across IDEs"
+  • "TypeScript strict mode gotchas"
+
+1. Yes — create personal KG at ~/.claude/knowledge-graph/
+2. No — skip for now (can create later with /kmgraph:init-global-kg)
+```
+
+**If Yes:**
+
+1. Check if `~/.claude/knowledge-graph/` already exists in `kg-config.json` (any entry with `type: "global"` at that path). If so:
+   > "A personal KG already exists at `~/.claude/knowledge-graph/`. Skipping creation."
+   Register it if not already in config; otherwise no-op.
+
+2. Create directory structure:
+   ```bash
+   mkdir -p "$HOME/.claude/knowledge-graph"/{knowledge,lessons-learned,decisions,sessions}
+   mkdir -p "$HOME/.claude/knowledge-graph/lessons-learned"/{architecture,debugging,patterns,process}
+   ```
+
+3. Copy templates (same as project KG setup):
+   ```bash
+   for f in patterns.md gotchas.md concepts.md architecture.md workflows.md index.md; do
+     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/$f" "$HOME/.claude/knowledge-graph/knowledge/" 2>/dev/null || true
+   done
+   ```
+
+4. Register in `~/.claude/kg-config.json`:
+   ```json
+   "personal": {
+     "name": "personal",
+     "path": "~/.claude/knowledge-graph",
+     "type": "global",
+     "categories": [
+       {"name": "architecture", "prefix": null, "git": "ignore"},
+       {"name": "debugging", "prefix": null, "git": "ignore"},
+       {"name": "patterns", "prefix": null, "git": "ignore"},
+       {"name": "process", "prefix": null, "git": "ignore"}
+     ],
+     "createdAt": "[timestamp]",
+     "lastUsed": "[timestamp]"
+   }
+   ```
+   Note: `"active"` is NOT changed — project KG remains active.
+
+5. Build FTS5 index for the new global KG:
+   Call `kg_fts5_rebuild` with `kgPath: "~/.claude/knowledge-graph"`. Post-rebuild guard: if `indexed` is 0, log a note (normal for empty KG).
+
+6. Confirm:
+   > "✅ Personal KG created at `~/.claude/knowledge-graph/`
+   > Capture cross-project lessons with `/kmgraph:capture-lesson` — you'll be asked which KG to save to."
+
+**If No:**
+   > "No problem. Run `/kmgraph:init-global-kg` any time to set this up later."
+
+---
 
 ### Step 1.9: Output success message
 
