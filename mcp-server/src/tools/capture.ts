@@ -216,15 +216,31 @@ export function updateReadmeIndex(
 }
 
 export async function handleCapture(
-  request: CaptureRequest
+  request: CaptureRequest,
+  targetKg?: string
 ): Promise<CaptureResponse | CaptureError> {
   // Validate metadata
   const validated = validateMetadata(request.metadata);
   if ("error" in validated) return validated as CaptureError;
 
-  // Active-KG / CWD alignment check
   const config = readConfig();
-  const kgPath = getActiveGraphPath(config);
+  let kgPath: string | null;
+  let skipCwdCheck = false;
+
+  if (targetKg) {
+    // Explicit target KG: resolve path from config, skip CWD check (intentional user choice)
+    const graphConfig = config.graphs[targetKg];
+    if (!graphConfig) {
+      return {
+        error: "VALIDATION_ERROR",
+        message: `Unknown KG name: "${targetKg}". Check /kmgraph:status for registered KGs.`,
+      };
+    }
+    kgPath = graphConfig.path.replace(/^~/, require("os").homedir());
+    skipCwdCheck = true;
+  } else {
+    kgPath = getActiveGraphPath(config);
+  }
 
   if (!kgPath) {
     return {
@@ -233,17 +249,19 @@ export async function handleCapture(
     };
   }
 
-  const activeKgRoot = getProjectRoot(kgPath);
-  const cwd = process.cwd();
-
-  const normalizedRoot = activeKgRoot.endsWith(path.sep) ? activeKgRoot : activeKgRoot + path.sep;
-  if (cwd !== activeKgRoot && !cwd.startsWith(normalizedRoot)) {
-    return {
-      error: "KG_MISMATCH",
-      activeKg: config.active ?? undefined,
-      activeKgRoot,
-      cwd,
-    };
+  // Active-KG / CWD alignment check (skipped when targetKg explicitly provided)
+  if (!skipCwdCheck) {
+    const activeKgRoot = getProjectRoot(kgPath);
+    const cwd = process.cwd();
+    const normalizedRoot = activeKgRoot.endsWith(path.sep) ? activeKgRoot : activeKgRoot + path.sep;
+    if (cwd !== activeKgRoot && !cwd.startsWith(normalizedRoot)) {
+      return {
+        error: "KG_MISMATCH",
+        activeKg: config.active ?? undefined,
+        activeKgRoot,
+        cwd,
+      };
+    }
   }
 
   // Update-in-place path
@@ -334,9 +352,11 @@ export async function handleCapture(
 export function registerCaptureTool(server: McpServer): void {
   server.tool(
     "kg_capture",
-    "Write a lesson, session summary, or ADR to the active knowledge graph. " +
+    "Write a lesson, session summary, or ADR to a knowledge graph. " +
+      "Defaults to the active KG. Pass targetKg to write to a named KG (e.g., a global personal KG). " +
       "Handles file naming, frontmatter generation, directory routing, README index update, " +
-      "and FTS5 rebuild automatically. Returns KG_MISMATCH error when CWD is outside the active KG root.",
+      "and FTS5 rebuild automatically. Returns KG_MISMATCH error when CWD is outside the active KG root " +
+      "(bypassed when targetKg is specified).",
     {
       content: z.string().describe("Full markdown body of the lesson, session summary, or ADR"),
       type: z
@@ -367,9 +387,16 @@ export function registerCaptureTool(server: McpServer): void {
             .describe("Absolute path to existing file for update-in-place"),
         })
         .describe("Entry metadata"),
+      targetKg: z
+        .string()
+        .optional()
+        .describe(
+          "Named KG to write to (from kg-config.json). Use for global/personal KG captures. " +
+            "If omitted, writes to the active KG. CWD alignment check is skipped when targetKg is set."
+        ),
     },
-    async ({ content, type, metadata }) => {
-      const result = await handleCapture({ content, type, metadata });
+    async ({ content, type, metadata, targetKg }) => {
+      const result = await handleCapture({ content, type, metadata }, targetKg);
       if ("error" in result) {
         return {
           content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
