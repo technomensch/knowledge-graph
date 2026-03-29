@@ -51,6 +51,7 @@ kg_search(query: string, options?: { kgs?: string[], activeKgOnly?: boolean }): 
 
 1. **`agents/lesson-capture-agent.md`**
    - After Phase 4 (Draft review), ask: "Save to project KG or personal (global) KG?"
+   - **Guard:** Only show this picker when ≥2 KGs are registered in `kg-config.json`. If only one KG exists, skip the picker entirely and write to it silently.
    - Remember choice for duration of session (avoid repetitive prompting)
    - Default: project KG (safer default for project-specific lessons)
 
@@ -75,7 +76,11 @@ kg_search(query: string, options?: { kgs?: string[], activeKgOnly?: boolean }): 
 1. After creating project-local KG, ask: "Want to create a global personal KG for cross-project lessons?"
 2. If yes: create `~/.claude/knowledge-graph/` with standard directory structure
 3. Register in `~/.claude/kg-config.json` as `{ "type": "global", "path": "~/.claude/knowledge-graph" }`
-4. If no: offer `kmgraph:init-global-kg` command for later setup
+4. Run FTS5 rebuild for the new global KG immediately after creation (same as project KG init flow)
+5. If no: offer `/kmgraph:init-global-kg` command for later setup
+
+**Config migration (v0.2.1 users):**
+v0.2.1-beta users may have `kg-config.json` entries without a `type` field (only `path` was required before v0.2.2). During init verify/upgrade, check each registered graph for missing `type` and default to `"project-local"` if absent. Warn the user: "Graph 'X' has no type field — defaulting to project-local. Run `/kmgraph:init-global-kg` if this should be a global KG."
 
 **New command:** `/kmgraph:init-global-kg`
 - Creates global KG at user-defined path (default: `~/.claude/knowledge-graph/`)
