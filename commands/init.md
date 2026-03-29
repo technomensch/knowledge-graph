@@ -126,7 +126,28 @@ Update templates? This will NOT overwrite your existing lessons or decisions.
 
 Re-run platform detection (Step 1.11) and offer to configure any newly detected platforms that aren't already registered.
 
-#### 1e. Output verification summary
+#### 1e. FTS5 index check
+
+The search index (`.fts5.db`) is local-only and gitignored — it does not survive upgrades or fresh clones. Check whether it needs to be rebuilt:
+
+```bash
+KG_ROOT=$(jq -r '.graphs["'"$kg_name"'"].path' ~/.claude/kg-config.json)
+FTS5_DECLINED=$(jq -r '.graphs["'"$kg_name"'"].fts5_declined // false' ~/.claude/kg-config.json)
+
+if [ "$FTS5_DECLINED" = "true" ]; then
+  echo "⏭️  Search index: skipped (previously declined)"
+elif [ ! -f "$KG_ROOT/.fts5.db" ]; then
+  echo "⚠️  Search index not found (local file, not version-controlled)."
+  echo ""
+  echo "  Rebuild now? This may take a moment for large knowledge graphs."
+  echo "    1. Yes — rebuild index"
+  echo "    2. Skip for now (search will use linear scan)"
+fi
+```
+
+If the user selects **Yes**, call `kg_fts5_rebuild`. If the user selects **Skip**, continue without rebuilding (linear scan remains available as fallback).
+
+#### 1f. Output verification summary
 
 ```
 ✅ Knowledge graph "[name]" verified!
@@ -135,6 +156,7 @@ Re-run platform detection (Step 1.11) and offer to configure any newly detected 
   Config:       up to date (Y fields added)
   Templates:    X updated, Y skipped
   Platforms:    [list] configured
+  Index:        rebuilt / skipped / not applicable
 
   Plugin version: [version from plugin.json]
   KG version:     [version from kg-config.json, if tracked]
