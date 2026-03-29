@@ -37,6 +37,15 @@ export declare function getPluginRoot(): string;
  */
 export declare function getProjectRoot(kgPath: string): string;
 /**
+ * Returns all registered KG paths, optionally filtered by type.
+ * Expands ~ in paths. Skips graphs without a path.
+ */
+export declare function getAllGraphPaths(config: KgConfig, types?: Array<GraphConfig["type"]>): Array<{
+    name: string;
+    path: string;
+    type: GraphConfig["type"];
+}>;
+/**
  * Recursively walk a directory and return all matching file paths
  */
 export declare function walkDir(dir: string, ext?: string): string[];
