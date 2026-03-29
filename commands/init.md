@@ -190,6 +190,25 @@ If the user selects **Yes**, call `kg_fts5_rebuild`. **After the rebuild, valida
 
 If the user selects **Skip**, continue without rebuilding (linear scan remains available as fallback).
 
+#### 1g. Knowledge extraction check
+
+The `knowledge/` directory holds structured patterns, concepts, and gotchas extracted from lessons. It is populated by `/kmgraph:update-graph` and is never populated automatically. Check whether extraction has been run:
+
+```bash
+LESSON_COUNT=$(find "$KG_ROOT/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+KG_COUNT=$(find "$KG_ROOT/knowledge" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+
+if [ "$LESSON_COUNT" -gt 0 ] && [ "$KG_COUNT" -eq 0 ]; then
+  echo "⚠️  knowledge/ is empty — $LESSON_COUNT lessons exist but patterns have never been extracted."
+  echo ""
+  echo "  Run /kmgraph:update-graph now to populate structured KG entries?"
+  echo "    1. Yes — extract patterns from existing lessons"
+  echo "    2. Skip for now"
+fi
+```
+
+If the user selects **Yes**, run `/kmgraph:update-graph`. If the user selects **Skip**, continue — `update-graph` can be run at any time.
+
 #### 1f. Output verification summary
 
 ```
