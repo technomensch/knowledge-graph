@@ -207,7 +207,7 @@ if [ "$LESSON_COUNT" -gt 0 ] && [ "$KG_COUNT" -eq 0 ]; then
 fi
 ```
 
-If the user selects **Yes**, run `/kmgraph:update-graph`. If the user selects **Skip**, continue — `update-graph` can be run at any time.
+If the user selects **Yes**, run `/kmgraph:update-graph --auto --sync-all`. The `--auto` flag skips per-lesson prompts (consent was given by answering Yes here) and `--sync-all` processes all lessons with missing entries in one pass. If the user selects **Skip**, continue — `update-graph` can be run at any time.
 
 #### 1f. Output verification summary
 

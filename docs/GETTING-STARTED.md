@@ -297,7 +297,7 @@ How to tell the index is active: search results show `(FTS5)` — this just mean
     /kmgraph:init
     ```
 
-    Select **option 1 (Verify/upgrade)** when prompted. This checks that directories, config fields, templates, and the search index are current with the new plugin version. If the search index (`.fts5.db`) is missing, the wizard offers to rebuild it. If `knowledge/` is empty despite existing lessons, the wizard offers to run `/kmgraph:update-graph` to populate structured KG entries. Existing lessons and decisions are never modified.
+    Select **option 1 (Verify/upgrade)** when prompted. This checks that directories, config fields, templates, and the search index are current with the new plugin version. If the search index (`.fts5.db`) is missing, the wizard offers to rebuild it. If `knowledge/` is empty despite existing lessons, the wizard offers to run `/kmgraph:update-graph --auto --sync-all` — this processes all lessons silently in one pass without per-lesson prompts. Existing lessons and decisions are never modified.
 
 === "Windows"
 
