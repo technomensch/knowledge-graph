@@ -55,6 +55,32 @@ These are complementary. kmgraph does not replicate context-mode's event logging
 
 ---
 
+## User Notification (Post-Implementation Docs — DO NOT WRITE UNTIL IMPLEMENTED)
+
+Two notification surfaces, both optional:
+
+**1. GETTING-STARTED.md — Optional Features section**
+
+Add a third entry alongside "Cleaner Conversations" and "Faster Search". Plain-English framing:
+
+> Session summaries are built by looking backwards — reading recent git commits, checking open plans, scanning for lesson-worthy work. This works well when a session has clear git activity.
+>
+> If context-mode is also installed, session summaries can read a live event log instead. Context-mode tracks everything as it happens — every file edited, every command run, every agent spawned. This catches sessions that were mostly conversation, investigation, or planning with few commits. Those sessions currently produce thin summaries; with context-mode they produce complete ones.
+>
+> Context-mode is not required. Without it, session summaries work exactly as they do today.
+
+**2. In-summary sparse hint**
+
+When the generated summary is sparse (low-commit session, few items captured), append a single one-time tip:
+
+> *Tip: Install context-mode to improve summaries for sessions like this one — see GETTING-STARTED.md § Optional Features*
+
+Only fire when the summary is actually thin — not as a blanket message every session.
+
+**Rule:** Neither notification should be written until ENH-004 is fully implemented and tested. Docs written before implementation go stale.
+
+---
+
 ## Out of Scope
 
 - kmgraph owning or writing to context-mode's event database
