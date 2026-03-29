@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2-beta] - 2026-03-29
+
+### TL;DR
+
+!!! info "Search index now checked during upgrade."
+    After a plugin upgrade, the search index (`.fts5.db`) no longer silently disappears. The `/kmgraph:init` verify/upgrade flow now detects a missing index, validates the KG path, and offers to rebuild — preventing the "FTS5 rebuild found 0 files" error reported after upgrade.
+
+### Fixed
+- **`/kmgraph:init` verify/upgrade — FTS5 index check (step 1e)**: The search index (`.fts5.db`) is local-only and does not survive reinstalls or upgrades. The verify/upgrade flow now checks for a missing index, respects the `fts5_declined` preference, and offers to rebuild via `kg_fts5_rebuild`
+- **`/kmgraph:init` verify/upgrade — KG path validation**: If content directories (`lessons-learned/`, `decisions/`, `sessions/`) are absent at the configured KG root but present at `{kgPath}/docs/`, the wizard detects the misconfiguration and offers to correct the path before rebuilding. A post-rebuild guard surfaces a clear error if `kg_fts5_rebuild` returns 0 indexed files rather than silently succeeding
+
+### Documentation
+- Updated `GETTING-STARTED.md` — Faster Search section now explains that `.fts5.db` is local-only and does not survive upgrades; documents both `/kmgraph:init` and `/kmgraph:sync-all` as paths to rebuild a missing index. Step 9 in the plugin update troubleshooting flow updated to mention the search index check
+
 ## [0.2.1.1-beta] - 2026-03-28
 
 ### TL;DR
