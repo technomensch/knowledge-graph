@@ -77,6 +77,13 @@ When the generated summary is sparse (low-commit session, few items captured), a
 
 Only fire when the summary is actually thin — not as a blanket message every session.
 
+**Sparse threshold definition:** A summary is considered sparse if ALL of the following are true:
+- Fewer than 3 commits found in session scope
+- Fewer than 2 captured plan items / lessons / ADRs identified
+- Summary body is under 200 words after generation
+
+If context-mode is present and the threshold is still met (e.g., a genuine do-nothing session), do NOT show the tip — the user already has context-mode installed.
+
 **Rule:** Neither notification should be written until ENH-004 is fully implemented and tested. Docs written before implementation go stale.
 
 ---

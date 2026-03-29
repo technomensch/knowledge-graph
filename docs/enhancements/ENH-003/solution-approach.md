@@ -32,20 +32,38 @@ Do NOT match on:
 
 ## Routing Logic
 
+Precedence order matters — check in this exact sequence:
+
 ```
-if "session summary" in intent:
+if "session summary" in intent:        ← FIRST: named commands take priority
   → /kmgraph:session-summary
 
-elif filename resolved:
-  → /kmgraph:update-doc --user-facing {resolved_path}
-
-elif "changelog" in intent:
+elif "changelog" in intent:            ← SECOND: named docs before generic filename resolution
   → /kmgraph:update-doc --user-facing CHANGELOG.md
 
-else:
+elif "adr" in intent:                  ← SECOND (cont): named doc types
+  → /kmgraph:create-adr
+
+elif filename resolved from intent:    ← THIRD: generic filename resolution
+  → /kmgraph:update-doc --user-facing {resolved_path}
+
+else:                                  ← LAST: fallback disambiguation
   → ask: "Which doc would you like to update?"
      then → /kmgraph:update-doc --user-facing
 ```
+
+**Rationale for precedence:** Named commands and doc types are more specific than filename resolution. "Update the changelog" should never fall through to filename resolution even if `CHANGELOG.md` happens to exist nearby.
+
+## Conflict with session-wrap
+
+`doc-update-router` and `session-wrap` do **not** conflict — they serve different triggers:
+
+| Skill | Fires on |
+|---|---|
+| `doc-update-router` | Explicit user request: "update the session summary" |
+| `session-wrap` | End-of-session signals: "stop", "I'm done", context limit approaching |
+
+If both could theoretically fire (e.g., "update the session summary and stop"), `doc-update-router` takes precedence since it was the explicit intent. `session-wrap` adds the end-of-session wrap-up on top.
 
 ## Extensibility
 
