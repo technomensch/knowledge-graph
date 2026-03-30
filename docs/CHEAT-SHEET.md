@@ -9,6 +9,7 @@ One-page cheat sheet for the Knowledge Management Graph. For detailed documentat
 ## I Want To...
 
 - **Start a new knowledge graph** → `/kmgraph:init`
+- **Create a cross-project personal KG** → `/kmgraph:init-global-kg`
 - **Document what I just learned** → `/kmgraph:capture-lesson [topic]` (v0.2.1-beta refactored)
 - **Find something I documented before** → `/kmgraph:recall [query]` (v0.2.1-beta refactored)
 - **See what's in my knowledge graph** → `/kmgraph:status`
@@ -34,6 +35,7 @@ First-time users need these for basic operation:
 | Command | Purpose |
 |---------|---------|
 | `/kmgraph:init` | Initialize a new knowledge graph with wizard-based setup |
+| `/kmgraph:init-global-kg` | Create personal global KG at `~/.claude/knowledge-graph/` for cross-project lessons |
 | `/kmgraph:capture-lesson [topic]` | Document lessons learned with git metadata tracking (v0.2.1-beta refactored) |
 | `/kmgraph:status` | View active knowledge graph info and quick reference |
 | `/kmgraph:recall [query]` | Search across all memory systems (lessons, decisions, knowledge) (v0.2.1-beta refactored) |
@@ -217,13 +219,13 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 
 - **Start with Essential commands** — Add Intermediate and Advanced commands as needs arise
 - **Use `/kmgraph:status` often** — Shows what's in your active knowledge graph at a glance
-- **`/kmgraph:recall` searches everything** — Lessons, decisions, knowledge entries, and session summaries
+- **`/kmgraph:recall` searches everything** — Lessons, decisions, knowledge entries, and session summaries; add `--scope=all` to include global KG
 - **MEMORY.md auto-updates** — Check it before important sessions to see what context is loaded
 - **Commands use colon syntax** — It's `/kmgraph:` not `/knowledge-` (colon, not hyphen)
 - **Git metadata is automatic** — Branch, commit, PR, and issue info captured when you create lessons
 - **Categories are flexible** — Start with defaults, add custom ones with `/kmgraph:add-category`
 - **Sanitization is a wizard** — `/kmgraph:config-sanitization` guides you through pre-commit hook setup
-- **Multiple KGs are powerful** — Separate knowledge graphs for work, personal, open-source projects
+- **Multiple KGs are powerful** — Separate knowledge graphs for work, personal, open-source projects; global KG shares lessons across all of them
 
 ---
 
@@ -256,5 +258,5 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 
 ---
 
-**Version**: 0.2.1-beta
-**Last Updated**: 2026-03-27
+**Version**: 0.2.2-beta
+**Last Updated**: 2026-03-29

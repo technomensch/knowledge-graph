@@ -529,6 +529,146 @@ describe("resolveTargetPath", () => {
 // C-12: checkExistingFile unit tests
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// C-7: Multi-KG capture — targetKg parameter
+// ---------------------------------------------------------------------------
+
+describe("kg_capture — targetKg (multi-KG)", () => {
+  function mockMultiKgConfig(projRoot: string, globalRoot: string): void {
+    (readConfig as jest.Mock).mockReturnValue({
+      active: "my-project",
+      graphs: {
+        "my-project": {
+          name: "my-project",
+          path: projRoot,
+          type: "project-local",
+          categories: [],
+          createdAt: new Date().toISOString(),
+          lastUsed: new Date().toISOString(),
+        },
+        "personal": {
+          name: "personal",
+          path: globalRoot,
+          type: "global",
+          categories: [],
+          createdAt: new Date().toISOString(),
+          lastUsed: new Date().toISOString(),
+        },
+      },
+    });
+    (getActiveGraphPath as jest.Mock).mockReturnValue(projRoot);
+  }
+
+  test("writes lesson to global KG when targetKg='personal'", async () => {
+    const projRoot = makeTempDir("multi-proj");
+    const globalRoot = makeTempDir("multi-global");
+    tempDirs.push(projRoot, globalRoot);
+    scaffoldKg(projRoot);
+    scaffoldKg(globalRoot);
+    mockMultiKgConfig(projRoot, globalRoot);
+
+    // CWD is in the project root (matches project KG), but we write to global
+    const origCwd = process.cwd;
+    process.cwd = () => projRoot;
+
+    const request: CaptureRequest = {
+      content: "## Problem\n\nCross-project pattern.\n",
+      type: "lesson",
+      metadata: { title: "Create vs Update Terminology", category: "process", tags: ["plans"] },
+    };
+
+    const result = await handleCapture(request, "personal");
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    expect(ok.status).toBe("created");
+    // File must be inside globalRoot, not projRoot
+    expect(ok.filePath.startsWith(globalRoot)).toBe(true);
+    expect(ok.filePath.startsWith(projRoot)).toBe(false);
+    expect(fs.existsSync(ok.filePath)).toBe(true);
+  });
+
+  test("skips CWD check when targetKg provided — writes even from mismatched CWD", async () => {
+    const projRoot = makeTempDir("multi-proj-cwd");
+    const globalRoot = makeTempDir("multi-global-cwd");
+    const unrelatedDir = makeTempDir("unrelated");
+    tempDirs.push(projRoot, globalRoot, unrelatedDir);
+    scaffoldKg(projRoot);
+    scaffoldKg(globalRoot);
+    mockMultiKgConfig(projRoot, globalRoot);
+
+    // CWD is completely unrelated — would trigger KG_MISMATCH without targetKg
+    const origCwd = process.cwd;
+    process.cwd = () => unrelatedDir;
+
+    const request: CaptureRequest = {
+      content: "## Problem\n\nGlobal lesson.\n",
+      type: "lesson",
+      metadata: { title: "Global Pattern", category: "patterns" },
+    };
+
+    const result = await handleCapture(request, "personal");
+    process.cwd = origCwd;
+
+    // Should succeed, not KG_MISMATCH
+    expect("error" in result).toBe(false);
+    expect((result as CaptureResponse).status).toBe("created");
+  });
+
+  test("returns VALIDATION_ERROR for unknown targetKg name", async () => {
+    const projRoot = makeTempDir("multi-unknown");
+    const globalRoot = makeTempDir("multi-unknown-g");
+    tempDirs.push(projRoot, globalRoot);
+    scaffoldKg(projRoot);
+    mockMultiKgConfig(projRoot, globalRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => projRoot;
+
+    const request: CaptureRequest = {
+      content: "content",
+      type: "lesson",
+      metadata: { title: "Test" },
+    };
+
+    const result = await handleCapture(request, "nonexistent-kg");
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(true);
+    expect((result as CaptureError).error).toBe("VALIDATION_ERROR");
+    expect((result as CaptureError).message).toContain("nonexistent-kg");
+  });
+
+  test("without targetKg still enforces CWD check — returns KG_MISMATCH from unrelated CWD", async () => {
+    const projRoot = makeTempDir("multi-cwd-check");
+    const globalRoot = makeTempDir("multi-cwd-check-g");
+    const unrelatedDir = makeTempDir("unrelated-cwd");
+    tempDirs.push(projRoot, globalRoot, unrelatedDir);
+    scaffoldKg(projRoot);
+    mockMultiKgConfig(projRoot, globalRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => unrelatedDir;
+
+    const request: CaptureRequest = {
+      content: "content",
+      type: "lesson",
+      metadata: { title: "Test" },
+    };
+
+    const result = await handleCapture(request); // no targetKg
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(true);
+    expect((result as CaptureError).error).toBe("KG_MISMATCH");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// checkExistingFile
+// ---------------------------------------------------------------------------
+
 describe("checkExistingFile", () => {
   test("returns null for lesson type (only sessions checked)", () => {
     const kgRoot = makeTempDir("check-lesson");
