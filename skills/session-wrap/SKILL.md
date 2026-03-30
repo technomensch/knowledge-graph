@@ -16,7 +16,9 @@
 - Recent commits have lesson-worthy keywords (`fix`, `solved`, `implement`, `pattern`, `debug`, `refactor`) but no corresponding lesson file in `docs/lessons-learned/`
 
 **Block Conditions:**
-- Stop hook temp flag exists: `/tmp/.kg-session-summarized-{PPID}-{date}` — if present, do NOT prompt (Stop hook already fired; avoid double-prompting)
+- Stop hook coordination flag exists: `/tmp/.kg-session-summarized-{PPID}-{date}` — if present, do NOT prompt (Stop hook already fired; avoid double-prompting)
+
+**ECC Compatibility Note:** This skill is coordinated with the Stop hook to prevent duplicate prompting. On Claude Code, the /tmp flag mechanism is used for inter-process coordination. On other ECC platforms, equivalent synchronization mechanisms (environment variables, shared state, or hook phase detection) should be used to prevent re-prompting if the Stop hook has already triggered this workflow.
 
 **Snapshot Awareness:**
 - Check for snapshot flag: `/tmp/.kg-snapshot-{YYYY-MM-DD}` (today's date)

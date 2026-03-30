@@ -17,20 +17,22 @@
 **Routing Logic (check in this order):**
 
 1. If intent includes "session summary" / "current session" / "today's session":
-   → Dispatch to `/kmgraph:session-summary`
+   → Dispatch to `session-summary-agent` (or `/kmgraph:session-summary` on Claude Code)
 
 2. If intent includes "changelog":
-   → Dispatch to `/kmgraph:update-doc --user-facing CHANGELOG.md`
+   → Dispatch to document update handler with CHANGELOG.md (or `/kmgraph:update-doc --user-facing CHANGELOG.md` on Claude Code)
 
 3. If intent includes "adr":
-   → Dispatch to `/kmgraph:create-adr`
+   → Dispatch to ADR creation handler (or `/kmgraph:create-adr` on Claude Code)
 
 4. If a doc filename or name can be resolved from the intent:
-   → Dispatch to `/kmgraph:update-doc --user-facing {resolved_path}`
+   → Dispatch to document update handler with {resolved_path} (or `/kmgraph:update-doc --user-facing {resolved_path}` on Claude Code)
 
 5. If intent is ambiguous (e.g., "update the docs"):
    → Ask: "Which doc would you like to update?"
-   → Then dispatch to `/kmgraph:update-doc --user-facing`
+   → Then dispatch to document update handler
+
+**ECC Compatibility Note:** The routing above describes agent and function-based dispatch in platform-agnostic terms. The parenthetical Claude Code command syntax is provided for reference but should not be hard-coded in ECC implementations. Each platform dispatches through its native agent/command system.
 
 **Conflict with session-wrap:** These skills serve different intents and do not conflict.
 

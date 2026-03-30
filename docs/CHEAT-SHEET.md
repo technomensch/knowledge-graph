@@ -84,6 +84,7 @@ Skills activate automatically based on conversation context. No invocation neede
 | `session-wrap` | Context approaching limit, major milestone, session end | `/kmgraph:session-summary` before compaction |
 | `adr-guide` | Architecture decision discussed, "I'm thinking of using..." | `/kmgraph:create-adr` with decision guidance |
 | `doc-update-router` | "update [doc name]", "update the session summary", "update the changelog" | Routes to `/kmgraph:update-doc --user-facing`, `/kmgraph:session-summary`, or `/kmgraph:create-adr` |
+| `capture-router` | "capture that" / "remember that" / "save that" | Auto-detects type+location, single confirmation before writing |
 | `gov-execute-plan` | "execute plan", implementation start, `docs/plans/*.md` mentioned | Zero-deviation 8-step execution protocol |
 
 ---
@@ -259,5 +260,5 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 
 ---
 
-**Version**: 0.2.2-beta
-**Last Updated**: 2026-03-29
+**Version**: 0.2.3-beta
+**Last Updated**: 2026-03-30
