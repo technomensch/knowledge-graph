@@ -68,6 +68,7 @@ The initialization wizard prompts for:
 
 - **Project name** — the name of the current project
 - **Git tracking** — enable to automatically capture branch and commit metadata
+- **KG type** — `project-local` (default, stored in the project) or `personal` (stored at `~/.claude/knowledge-graph/`, shared across all projects). Use `/kmgraph:init-personal-kg` to create a personal KG separately.
 - **Optional Backfill** (Step 1.10) — "Would you like to backfill the knowledge graph from existing project context? [y/N]"
   - If yes: automatically extracts from README, CHANGELOG, existing lessons, decisions, and chat history
   - If no: starts with empty knowledge graph, grows organically as you document lessons
@@ -117,10 +118,10 @@ graph LR
 
 Each step serves a specific purpose:
 
-1. **Capture** - Document what you learned immediately after solving a problem
+1. **Capture** - Document what you learned immediately after solving a problem. `/kmgraph:capture-lesson` optionally prompts to snapshot the current session first (`--snapshot` gate) so context is preserved before the lesson is written.
 2. **Extract** - Transform lessons into searchable patterns and concepts
 3. **Sync** - Consolidate across multiple knowledge graphs
-4. **Summarize** - Create session snapshots for future reference
+4. **Summarize** - Create session snapshots for future reference. Use `/kmgraph:session-summary --snapshot` for a lightweight mid-session checkpoint that appends to the current session file without replacing it.
 
 ### Next Steps for Claude Code Users
 
