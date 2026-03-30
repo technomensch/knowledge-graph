@@ -23,7 +23,9 @@ When triggered:
    - Extract the **pattern** — any generalizable lesson or warning worth noting
    - Identify relevant **tags** from conversation (technology names, domain, etc.)
 
-2. **Dispatch to lesson-capture-agent** with that pre-structured context
+2. **Note:** When dispatching to `/kmgraph:capture-lesson`, the command includes a snapshot gate that offers to preserve session context first. This is presented to the user inside the command flow — do not add a separate snapshot prompt here.
+
+3. **Dispatch to lesson-capture-agent** with that pre-structured context
 
 3. **Use friendly, user-addressed language** — never mention agent mechanics:
    - ✅ "Looks like you just solved something worth keeping — here's what I'd save:"

@@ -25,6 +25,170 @@ model: sonnet
 
 ---
 
+## Step 0: Mode Detection
+
+Parse flags passed to this agent:
+
+| Flag | Description |
+|---|---|
+| (none) | **Full mode** — complete session summary with all steps, user review gate |
+| `--snapshot` | **Snapshot mode** — lightweight mid-session capture, no review gate, appends to today |
+| `--snapshot --git` | Snapshot mode with git history included |
+| `--auto` | Full mode, skip review gate (auto-confirm) |
+| `--title="..."` | Custom title for the session summary |
+
+**If `--snapshot` flag is present:**
+
+Go directly to [Snapshot Mode](#snapshot-mode) below. Skip Steps 1–9.
+
+**Otherwise:** Proceed to Step 1 (full mode).
+
+---
+
+## Snapshot Mode
+
+*Lightweight mid-session capture. Runs in under 10 seconds (without git) or 30 seconds (with git). Writes immediately — no user review gate. Appends to today's summary if one exists.*
+
+### S1: Resolve output path
+
+Read `~/.claude/kg-config.json` → active KG path → `{active_kg_path}/sessions/`.
+
+Check if a session file for today already exists:
+```bash
+today=$(date +%Y-%m-%d)
+ls {active_kg_path}/sessions/ | grep "^$today"
+```
+
+Store `{snapshot_exists} = true/false` and `{existing_snapshot_path}` if found.
+
+### S2: Gather lightweight context
+
+Run only these commands:
+```bash
+git diff --stat HEAD 2>/dev/null          # Unstaged + staged file changes
+git diff --stat --cached HEAD 2>/dev/null # Staged only
+```
+
+If `--git` flag present, also run:
+```bash
+git log --oneline -5 2>/dev/null
+```
+
+Read open plan items only (skip ADR and lesson scans):
+```bash
+grep -r "^\- \[ \]" {active_kg_path}/plans/ --include="*.md" -l 2>/dev/null
+```
+
+### S3: Compose snapshot block
+
+Write a compact snapshot block:
+
+```markdown
+---
+### Snapshot: HH:MM (triggered by: [capture type — lesson|ADR|issue|manual])
+
+**Context:** [1-2 sentences from conversational thread — what was being worked on when capture fired]
+
+**Files in progress:**
+[output from git diff --stat, 5 lines max]
+
+**Open plan items:** [N unchecked steps across [plan names]]
+
+[If --git]: **Recent commits:** [git log --oneline -5]
+```
+
+### S4: Write or append
+
+**If `{snapshot_exists}` is false:** Create a new session file:
+```markdown
+---
+title: "Session Snapshot — [Date]"
+date: [YYYY-MM-DD]
+branch: [current branch]
+tags: [session, snapshot]
+---
+# Session Snapshot — [Date]
+
+[snapshot block from S3]
+```
+
+**If `{snapshot_exists}` is true:** Append the snapshot block to the existing file.
+
+Deduplication before appending:
+- Commit hashes already in the file → skip those lines from the new block
+- File paths already in "Files in progress" entries → skip duplicates
+- Plan items already listed → skip duplicates
+
+### S5: Save via `kg_capture`
+
+Call `kg_capture` with:
+```json
+{
+  "content": "[full snapshot content]",
+  "type": "session",
+  "metadata": {
+    "title": "Session Snapshot — [Date]",
+    "tags": ["session", "snapshot", "[branch]"],
+    "git": { "branch": "[branch]" }
+  }
+}
+```
+
+If today's session already exists, include `"version": "append"` in metadata to signal append intent.
+
+On success: return the snapshot file path and a one-line confirmation. **Do not ask for review — return immediately.**
+
+> ✅ Snapshot saved to `[relativePath]`. Context preserved. Continuing with capture...
+
+Set flag file: `touch /tmp/.kg-snapshot-$(date +%Y-%m-%d)` so hooks can detect a snapshot was taken today.
+
+**On any error:** Surface the error and note that capture can proceed without snapshot. Do not block the capture flow.
+
+---
+
+## Step 0b: Context-Mode Detection (Optional Enrichment)
+
+*This step is optional and has no effect on fallback behavior if context-mode is absent.*
+
+Check for context-mode's session event DB for the current project:
+
+```python
+import sqlite3, os, glob, json
+
+cwd = os.getcwd()
+db_files = glob.glob(os.path.expanduser('~/.claude/context-mode/sessions/*.db'))
+
+ctxmode_db = None
+ctxmode_session_id = None
+
+for db_path in sorted(db_files):
+    try:
+        conn = sqlite3.connect(db_path)
+        row = conn.execute(
+            "SELECT session_id FROM session_meta WHERE project_dir = ? ORDER BY last_event_at DESC LIMIT 1",
+            (cwd,)
+        ).fetchone()
+        if row:
+            ctxmode_session_id = row[0]
+            ctxmode_db = db_path
+            conn.close()
+            break
+        conn.close()
+    except Exception:
+        pass
+
+ctxmode_available = ctxmode_db is not None
+```
+
+**If `ctxmode_available` is true:**
+- Store `{ctxmode_db}` and `{ctxmode_session_id}` for use in Step 2
+- Note: context-mode data supplements git history — it does not replace it
+
+**If `ctxmode_available` is false:**
+- Proceed normally — no degradation, no error messages to the user
+
+---
+
 ## Step 1: Active KG / CWD Guard
 
 Read `~/.claude/kg-config.json`. Extract `active` key and resolve the active graph's `path`.
@@ -46,7 +210,27 @@ git log --oneline -10 2>/dev/null
 git diff --stat HEAD~5..HEAD 2>/dev/null
 ```
 
-From the commit messages, infer session type using this classification:
+**If `{ctxmode_available}` is true:** supplement git history with context-mode event data.
+
+Query session events for files edited, agent invocations, and activity that may not appear in git:
+
+```python
+conn = sqlite3.connect(ctxmode_db)
+events = conn.execute(
+    "SELECT type, category, data, created_at FROM session_events WHERE session_id = ? ORDER BY created_at",
+    (ctxmode_session_id,)
+).fetchall()
+conn.close()
+```
+
+Use event data to surface:
+- Files edited but not yet committed (fills gap when sessions have few commits)
+- Agent invocations and their outcomes (planning sessions, investigative sessions)
+- Tool activity patterns (e.g., heavy read-only exploration vs active writes)
+
+Merge with git log: git history is authoritative for committed work; event data fills uncommitted activity.
+
+From the commit messages and event data, infer session type using this classification:
 
 | Pattern | Type | Example |
 |---------|------|---------|
@@ -126,7 +310,7 @@ Compose a summary with these sections:
 
 ## What Was Built / Fixed / Learned
 
-[3-5 bullet points from recent commits and conversation context]
+[3-5 bullet points from recent commits, conversation context, and context-mode events (if available)]
 
 ## Open Items
 
@@ -186,9 +370,10 @@ Once approved, call `kg_capture`:
 
 **Conflict error (duplicate session for same date):**
 
-> "A session already exists for today. Overwrite it? (y/n)"
+> "A session already exists for today. Append new content to it, or overwrite? (append / overwrite / cancel)"
 
-If yes, call with `version: "v1.1"` to update.
+If append: call with `"version": "append"` in metadata.
+If overwrite: call with `version: "v1.1"` to update.
 
 **KG_MISMATCH error:**
 
@@ -221,6 +406,25 @@ If `kg_capture` fails because the MCP server is not registered, not found, or no
    - Follow existing file naming conventions (e.g., `YYYY-MM-DD-session-type.md`).
    - Tell the user: "Saved to the file system. Search won't be ranked until the index is connected."
 5. **Never lose the session summary** — the user's content is preserved regardless of MCP status.
+
+---
+
+## Step 8b: Sparse Summary Hint (Optional)
+
+After generating the summary, check if it is sparse. A summary is sparse if ALL of the following are true:
+- Fewer than 3 commits found in session scope
+- Fewer than 2 plan items / lessons / ADRs identified
+- Summary body is under 200 words
+
+**If sparse AND `{ctxmode_available}` is false:**
+
+Append this one-time tip to the end of the saved summary:
+
+> *Tip: Install context-mode to improve summaries for sessions like this one — see GETTING-STARTED.md § Optional Features*
+
+**If sparse AND `{ctxmode_available}` is true:** Do not show the tip — the user already has context-mode installed.
+
+**If not sparse:** Do not show the tip regardless.
 
 ---
 

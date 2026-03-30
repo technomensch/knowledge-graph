@@ -151,7 +151,7 @@ knowledge-graph/
 │   ├── CONFIGURATION.md .......... Post-install setup
 │   ├── CHEAT-SHEET.md ............ One-page quick reference ⭐
 │   ├── CONCEPTS.md ............... Term definitions ⭐
-│   ├── COMMAND-GUIDE.md .......... All 19 commands ⭐
+│   ├── COMMAND-GUIDE.md .......... Command reference ⭐
 │   └── NAVIGATION-INDEX.md ....... This file
 │
 ├── core/ ......................... Platform-agnostic system

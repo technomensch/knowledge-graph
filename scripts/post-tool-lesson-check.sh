@@ -43,6 +43,6 @@ esac
 
 # Surface prompt
 echo -e "${YELLOW}📝 That looks like it might be worth keeping.${NC}"
-echo "   Want to capture what you just solved? /kmgraph:capture-lesson"
+echo "   /kmgraph:capture-lesson — capture what you just solved (includes optional session snapshot)"
 
 exit 0

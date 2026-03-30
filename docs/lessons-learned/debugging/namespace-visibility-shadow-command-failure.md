@@ -157,3 +157,9 @@ See related lesson: [Local Marketplace Testing - Two-Location Sync Required](../
 ## Tags
 
 `#debugging` `#namespace` `#cross-llm` `#gemini-failure` `#file-prefix-workaround`
+
+---
+
+## See Also
+
+- [Knowledge Graph: Gotchas — Namespace Elision and Shadow Command Failure](../../knowledge/gotchas.md#namespace-elision-hides-plugin-prefix-in-local-dev-shadow-command-workaround-breaks-gemini)

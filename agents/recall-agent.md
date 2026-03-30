@@ -20,6 +20,8 @@ If the config file does not exist or no active graph is set:
 
 Stop here.
 
+Also check for registered personal KGs: scan `graphs` for any entry with `type: "personal"`. Store `{has_personal_kg} = true/false` and the list of personal KG names. This determines the search scope in Step 3.
+
 ---
 
 ## Step 1: Parse the Query
@@ -31,6 +33,9 @@ Extract from the input passed to this agent:
   - Valid values: `lessons` | `decisions` | `knowledge` | `sessions` | `all`
 - **`--format`** — output style (default: `summary`)
   - Valid values: `summary` | `detailed` | `paths`
+- **`--scope`** — which KGs to search (default: auto-detected from config)
+  - Valid values: `active` (active KG only) | `all` (active + personal KGs) | `personal-only`
+  - When absent: auto-detect (use `all` if personal KGs registered, `active` otherwise)
 
 Example parse:
 ```
@@ -65,6 +70,13 @@ Use the `kg_search` MCP tool to search across the resolved directories. Search t
 - File names (case-insensitive)
 - File content (case-insensitive)
 - YAML frontmatter fields and metadata tags
+
+**Search scope:**
+- If `{has_personal_kg}` is true (personal KGs registered): pass `searchScope: "all"` to `kg_search`
+- If `{has_personal_kg}` is false: pass `searchScope: "active"` (default, no change)
+- The user can override with `--scope=active|all|personal-only` flag (parse in Step 1)
+
+Results from multi-KG search include `[project: name]` or `[personal: name]` source labels — pass these through to the formatted output so the user knows which KG a result came from.
 
 **Multi-keyword handling:** Search for each keyword independently and rank files that match more keywords higher.
 
@@ -104,23 +116,27 @@ Respond conversationally. Group results by type. For each result include: title,
 
 **Lessons Learned** (N found)
 1. Title — [1–2 sentence summary]
-   Path: {active_kg_path}/lessons-learned/...
+   Path: {kg_path}/lessons-learned/...    ← include KG source label if multi-KG: [project: name] or [personal: name]
 
 **Architecture Decisions** (N found)
 1. Title (Status: Accepted) — [1–2 sentence summary]
-   Path: {active_kg_path}/decisions/...
+   Path: {kg_path}/decisions/...
 
 **Knowledge Graph** (N found)
 1. file.md → Section Name — [1–2 sentence summary]
-   Path: {active_kg_path}/knowledge/...
+   Path: {kg_path}/knowledge/...
 
 **Session Summaries** (N found)
 1. YYYY-MM-DD description — [1–2 sentence summary]
-   Path: {active_kg_path}/sessions/...
+   Path: {kg_path}/sessions/...
 
 ---
 Related topics I noticed in these files: [extracted cross-references]
 ```
+
+When results span multiple KGs, add a note at the bottom:
+
+> Results from 2 KGs: **knowledge-graph** (project) and **personal** (personal). To search only one, use `--scope=active` or `--scope=personal-only`.
 
 ### Format: `paths`
 

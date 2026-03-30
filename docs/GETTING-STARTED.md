@@ -68,6 +68,7 @@ The initialization wizard prompts for:
 
 - **Project name** — the name of the current project
 - **Git tracking** — enable to automatically capture branch and commit metadata
+- **KG type** — `project-local` (default, stored in the project) or `personal` (stored at `~/.claude/knowledge-graph/`, shared across all projects). Use `/kmgraph:init-personal-kg` to create a personal KG separately.
 - **Optional Backfill** (Step 1.10) — "Would you like to backfill the knowledge graph from existing project context? [y/N]"
   - If yes: automatically extracts from README, CHANGELOG, existing lessons, decisions, and chat history
   - If no: starts with empty knowledge graph, grows organically as you document lessons
@@ -117,10 +118,10 @@ graph LR
 
 Each step serves a specific purpose:
 
-1. **Capture** - Document what you learned immediately after solving a problem
+1. **Capture** - Document what you learned immediately after solving a problem. `/kmgraph:capture-lesson` optionally prompts to snapshot the current session first (`--snapshot` gate) so context is preserved before the lesson is written.
 2. **Extract** - Transform lessons into searchable patterns and concepts
 3. **Sync** - Consolidate across multiple knowledge graphs
-4. **Summarize** - Create session snapshots for future reference
+4. **Summarize** - Create session snapshots for future reference. Use `/kmgraph:session-summary --snapshot` for a lightweight mid-session checkpoint that appends to the current session file without replacing it.
 
 ### Next Steps for Claude Code Users
 
@@ -163,9 +164,24 @@ When context-mode is installed, file reading is offloaded to a background proces
 
 ---
 
+### Richer Session Summaries (Optional)
+
+Session summaries are built by looking backwards — reading recent git commits, checking open plans, scanning for lesson-worthy work. This works well when a session has clear git activity.
+
+If context-mode is also installed, session summaries can read a live event log instead. Context-mode tracks everything as it happens — every file edited, every command run, every agent spawned. This catches sessions that were mostly conversation, investigation, or planning with few commits. Those sessions currently produce thin summaries; with context-mode they produce complete ones.
+
+Context-mode is not required. Without it, session summaries work exactly as they do today.
+
+---
+
 ### Faster Search (Optional)
 
-By default, kmgraph searches by reading every file in the knowledge graph. For larger knowledge graphs, building a search index makes results faster and ranks them by relevance. The first time `/kmgraph:sync-all` is run after upgrading, kmgraph will ask once whether to build the index. After that, the index stays current automatically.
+By default, kmgraph searches by reading every file in the knowledge graph. For larger knowledge graphs, building a search index makes results faster and ranks them by relevance. The index is local-only and is not included in version control, so it does not survive a fresh install or upgrade.
+
+After a plugin upgrade, two paths offer to rebuild a missing index:
+
+- **`/kmgraph:init` → option 1 (Verify/upgrade)** — the wizard checks for a missing index and offers to rebuild it as part of the standard post-upgrade flow.
+- **`/kmgraph:sync-all`** — if the index is absent and has not been previously declined, sync-all asks once whether to build it. After that, the index stays current automatically.
 
 The diagram below compares how kmgraph searches without and with a search index.
 
@@ -204,7 +220,7 @@ If a search index already exists, sync-all refreshes it automatically with no pr
 
 How to tell the index is active: search results show `(FTS5)` — this just means the index was used. How to build the index manually: run `kg_fts5_rebuild` from the MCP tool panel. How to revert: delete the `.fts5.db` file from the knowledge graph root folder.
 
-**After backfill:** If the backfill option was used during `/kmgraph:init`, the knowledge graph now contains a full set of imported content. This is a good time to build the search index so all that content is immediately searchable by relevance. Run `/kmgraph:sync-all` and accept the index prompt, or call `kg_fts5_rebuild` directly.
+**After backfill or upgrade with existing lessons:** If the backfill option was used during `/kmgraph:init`, or if lessons already existed before the plugin was installed, run `/kmgraph:update-graph` to populate `knowledge/` with structured patterns and concepts extracted from those lessons. Without this step, `knowledge/` remains empty and recall results will lack extracted insights. After extraction, run `/kmgraph:sync-all` to build the search index so all content is immediately searchable by relevance.
 
 ---
 
@@ -292,7 +308,7 @@ How to tell the index is active: search results show `(FTS5)` — this just mean
     /kmgraph:init
     ```
 
-    Select **option 1 (Verify/upgrade)** when prompted. This checks that the existing knowledge graph directories, config fields, and templates are current with the new plugin version. Existing lessons and decisions are never modified.
+    Select **option 1 (Verify/upgrade)** when prompted. This checks that directories, config fields, templates, and the search index are current with the new plugin version. If the search index (`.fts5.db`) is missing, the wizard offers to rebuild it. If `knowledge/` is empty despite existing lessons, the wizard offers to run `/kmgraph:update-graph --auto --sync-all` — this processes all lessons silently in one pass without per-lesson prompts. Existing lessons and decisions are never modified.
 
 === "Windows"
 
@@ -331,7 +347,7 @@ How to tell the index is active: search results show `(FTS5)` — this just mean
     /kmgraph:init
     ```
 
-    Select **option 1 (Verify/upgrade)** when prompted.
+    Select **option 1 (Verify/upgrade)** when prompted. The wizard checks directories, config fields, templates, and the search index.
 
 === "GUI (Finder / File Explorer)"
 
@@ -385,7 +401,7 @@ How to tell the index is active: search results show `(FTS5)` — this just mean
     /kmgraph:init
     ```
 
-    Select **option 1 (Verify/upgrade)** when prompted.
+    Select **option 1 (Verify/upgrade)** when prompted. The wizard checks directories, config fields, templates, and the search index.
 
 ### Commands do not appear in Claude Code autocomplete
 
@@ -427,7 +443,7 @@ Git is recommended but not required. With git, the system automatically captures
 
 ---
 
-<!-- Updated: 2026-03-27 -->
+<!-- Updated: 2026-03-29 -->
 ## Meet Your New Agents
 
 Agents are heavy-lift task handlers that run separately from your main conversation. They exist so that complex or resource-intensive work — parsing large files, searching the knowledge graph, assembling session summaries — happens in isolation and does not crowd out your working context. You rarely invoke agents directly; skills and commands trigger them automatically when the work warrants it.
@@ -465,6 +481,7 @@ Skills activate automatically based on what you're doing. They provide guidance 
 | **kg-recall** | "have we done this before", past decisions, history questions | `/kmgraph:recall` with extracted search terms |
 | **session-wrap** | Session ending, context limit (180K+), major milestone | `/kmgraph:session-summary` before compaction |
 | **adr-guide** | "I'm thinking of using...", architecture decisions | `/kmgraph:create-adr` with decision guidance |
+| **doc-update-router** | "update [doc name]", "update the session summary", "update the changelog" | Routes to correct update command, bypassing direct file edits |
 | **gov-execute-plan** | "execute plan", implementation start, `docs/plans/*.md` mentioned | Zero-deviation 8-step execution protocol |
 
 You don't invoke skills directly — they appear as helpful context when relevant.

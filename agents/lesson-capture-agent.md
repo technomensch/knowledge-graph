@@ -111,6 +111,33 @@ Prompt: "Does this look right? Any edits?" (Allow inline edits.)
 
 ---
 
+## Phase 4.5: KG Destination (multi-KG only)
+
+**Only run this phase if ≥2 KGs are registered in `~/.claude/kg-config.json`.**
+
+Count entries in `graphs`. If only one KG exists, skip this phase and write to the active KG.
+
+If ≥2 KGs:
+
+1. Identify available destinations:
+   - Active/project KG: `graphs[active]` — name and path
+   - Personal KGs: all entries with `type: "personal"` — names and paths
+
+2. Present the picker:
+
+   > "Where should this lesson be saved?
+   >
+   > 1. **[active KG name]** — project KG (this project only)
+   > 2. **[personal KG name]** — personal KG (available across all projects)
+   >
+   > Choose 1 or 2:"
+
+3. Wait for user choice. Store the chosen KG name as `{target_kg}`.
+
+4. **Session memory:** Remember `{target_kg}` for the duration of this session to avoid re-prompting on subsequent captures. Only re-prompt if the user explicitly changes KG via `/kmgraph:switch`.
+
+---
+
 ## Phase 5: Capture via `kg_capture` MCP Tool
 
 Once user approves, call the `kg_capture` MCP tool:
@@ -119,6 +146,7 @@ Once user approves, call the `kg_capture` MCP tool:
 {
   "content": "[Full markdown content from Phase 4]",
   "type": "lesson",
+  "targetKg": "[{target_kg} from Phase 4.5, omit if single-KG or active KG chosen]",
   "metadata": {
     "title": "[Topic from Phase 2]",
     "category": "[Category from Phase 2]",
@@ -138,7 +166,7 @@ Once user approves, call the `kg_capture` MCP tool:
 
 **Success (status: "created"):**
 
-> "✅ Lesson captured: **[relativePath]** — immediately searchable via `/kmgraph:recall`"
+> "✅ Lesson captured: **[relativePath]** in **[target KG name]** — immediately searchable via `/kmgraph:recall`"
 
 **KG_MISMATCH error:**
 

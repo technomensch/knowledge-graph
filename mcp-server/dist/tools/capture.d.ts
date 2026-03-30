@@ -44,6 +44,6 @@ export declare function updateReadmeIndex(indexPath: string, entry: {
     relativePath: string;
     description?: string;
 }): void;
-export declare function handleCapture(request: CaptureRequest): Promise<CaptureResponse | CaptureError>;
+export declare function handleCapture(request: CaptureRequest, targetKg?: string): Promise<CaptureResponse | CaptureError>;
 export declare function registerCaptureTool(server: McpServer): void;
 //# sourceMappingURL=capture.d.ts.map

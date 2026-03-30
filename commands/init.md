@@ -20,7 +20,7 @@ Creates a complete knowledge graph structure with:
 - First-time setup after installing the plugin
 - **After a plugin update** — verify/upgrade existing KG to current version
 - Creating a new project-local knowledge graph
-- Setting up a topic-based global knowledge graph
+- Setting up a topic-based personal knowledge graph
 - Creating a Claude Cowork knowledge space
 
 ## Pre-Wizard: Existing KG Detection
@@ -75,15 +75,29 @@ Check for config fields introduced in newer versions. Add defaults for any missi
 # - platforms: [] (added in v0.2.0)
 # - autoSwitch: false (added in v0.2.0)
 # - notification: { webhookUrl: "" } (added in v0.2.0)
+# - type: "project-local" (added in v0.2.2 — required for multi-KG support)
 
 jq '
   .graphs["'"$kg_name"'"] |=
     if .platforms == null then .platforms = [] else . end |
     if .autoSwitch == null then .autoSwitch = false else . end |
-    if .notification == null then .notification = { "webhookUrl": "" } else . end
+    if .notification == null then .notification = { "webhookUrl": "" } else . end |
+    if .type == null then .type = "project-local" else . end
 ' ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
 mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
 ```
+
+**After the migration, check for graphs still missing `type`** (e.g., if the user has multiple registered KGs from v0.2.1):
+
+```bash
+GRAPHS_WITHOUT_TYPE=$(jq -r '.graphs | to_entries[] | select(.value.type == null) | .key' ~/.claude/kg-config.json)
+if [ -n "$GRAPHS_WITHOUT_TYPE" ]; then
+  echo "⚠️  Some registered KGs are missing a type field (defaulted to project-local):"
+  echo "$GRAPHS_WITHOUT_TYPE"
+  echo "   If any of these should be a personal KG, run /kmgraph:init-personal-kg to re-register correctly."
+fi
+```
+
 
 #### 1c. Template update check
 
@@ -126,7 +140,90 @@ Update templates? This will NOT overwrite your existing lessons or decisions.
 
 Re-run platform detection (Step 1.11) and offer to configure any newly detected platforms that aren't already registered.
 
-#### 1e. Output verification summary
+#### 1e. FTS5 index check
+
+The search index (`.fts5.db`) is local-only and gitignored — it does not survive upgrades or fresh clones.
+
+**Before offering a rebuild, verify the KG path is correct:**
+
+The `kg_fts5_rebuild` tool indexes `lessons-learned/`, `decisions/`, `sessions/`, and `knowledge/` at the KG root. If those directories do not exist at the configured root but do exist at `{kgPath}/docs/`, the configured path is wrong — the rebuild will return 0 files and search will be broken.
+
+```bash
+KG_ROOT=$(jq -r '.graphs["'"$kg_name"'"].path' ~/.claude/kg-config.json)
+
+# Check for content directories at root
+DIRS_AT_ROOT=0
+for dir in lessons-learned decisions sessions knowledge; do
+  [ -d "$KG_ROOT/$dir" ] && DIRS_AT_ROOT=$((DIRS_AT_ROOT + 1))
+done
+
+# Check if content is under docs/ instead
+DIRS_AT_DOCS=0
+for dir in lessons-learned decisions sessions knowledge; do
+  [ -d "$KG_ROOT/docs/$dir" ] && DIRS_AT_DOCS=$((DIRS_AT_DOCS + 1))
+done
+
+if [ "$DIRS_AT_ROOT" -eq 0 ] && [ "$DIRS_AT_DOCS" -gt 0 ]; then
+  echo "⚠️  KG path misconfiguration detected."
+  echo ""
+  echo "  Configured path: $KG_ROOT"
+  echo "  Content found at: $KG_ROOT/docs/"
+  echo ""
+  echo "  The search index and recall commands will return 0 results with the"
+  echo "  current path. The KG root should point to the directory that contains"
+  echo "  lessons-learned/, decisions/, and sessions/ directly."
+  echo ""
+  echo "  Fix the KG path?"
+  echo "    1. Yes — update config to $KG_ROOT/docs/"
+  echo "    2. No — leave as-is (index rebuild skipped)"
+  # If user selects Yes: update kg-config.json path for this KG to $KG_ROOT/docs/
+  # then continue with the corrected path
+fi
+```
+
+If the path is confirmed correct, check whether the index needs rebuilding:
+
+```bash
+FTS5_DECLINED=$(jq -r '.graphs["'"$kg_name"'"].fts5_declined // false' ~/.claude/kg-config.json)
+
+if [ "$FTS5_DECLINED" = "true" ]; then
+  echo "⏭️  Search index: skipped (previously declined)"
+elif [ ! -f "$KG_ROOT/.fts5.db" ]; then
+  echo "⚠️  Search index not found (local file, not version-controlled)."
+  echo ""
+  echo "  Rebuild now? This may take a moment for large knowledge graphs."
+  echo "    1. Yes — rebuild index"
+  echo "    2. Skip for now (search will use linear scan)"
+fi
+```
+
+If the user selects **Yes**, call `kg_fts5_rebuild`. **After the rebuild, validate the result:**
+
+- If `indexed` is 0: display a warning — "Search index built but 0 files were indexed. Verify the KG path points to the directory containing lessons-learned/, decisions/, and sessions/. Current path: {kgPath}"
+- If `indexed` > 0: confirm success — "✅ Search index built: {indexed} files indexed in {duration_ms}ms"
+
+If the user selects **Skip**, continue without rebuilding (linear scan remains available as fallback).
+
+#### 1g. Knowledge extraction check
+
+The `knowledge/` directory holds structured patterns, concepts, and gotchas extracted from lessons. It is populated by `/kmgraph:update-graph` and is never populated automatically. Check whether extraction has been run:
+
+```bash
+LESSON_COUNT=$(find "$KG_ROOT/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+KG_COUNT=$(find "$KG_ROOT/knowledge" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+
+if [ "$LESSON_COUNT" -gt 0 ] && [ "$KG_COUNT" -eq 0 ]; then
+  echo "⚠️  knowledge/ is empty — $LESSON_COUNT lessons exist but patterns have never been extracted."
+  echo ""
+  echo "  Run /kmgraph:update-graph now to populate structured KG entries?"
+  echo "    1. Yes — extract patterns from existing lessons"
+  echo "    2. Skip for now"
+fi
+```
+
+If the user selects **Yes**, run `/kmgraph:update-graph --auto --sync-all`. The `--auto` flag skips per-lesson prompts (consent was given by answering Yes here) and `--sync-all` processes all lessons with missing entries in one pass. If the user selects **Skip**, continue — `update-graph` can be run at any time.
+
+#### 1f. Output verification summary
 
 ```
 ✅ Knowledge graph "[name]" verified!
@@ -135,6 +232,7 @@ Re-run platform detection (Step 1.11) and offer to configure any newly detected 
   Config:       up to date (Y fields added)
   Templates:    X updated, Y skipped
   Platforms:    [list] configured
+  Index:        rebuilt / skipped / not applicable
 
   Plugin version: [version from plugin.json]
   KG version:     [version from kg-config.json, if tracked]
@@ -163,7 +261,7 @@ Where should this knowledge graph be stored?
 4. Custom path
 ```
 
-**Recommendation**: Project-local for single-project use, global for topic-based knowledge sharing across projects.
+**Recommendation**: Project-local for single-project use, personal for topic-based knowledge sharing across projects.
 
 ### Step 2: KG Name
 
@@ -255,7 +353,7 @@ fi
 ### Step 1.2: Run wizard prompts
 
 Use `AskUserQuestion` tool for each step. Collect:
-- `location_type`: "project-local", "global", "cowork", "custom"
+- `location_type`: "project-local", "personal", "cowork", "custom"
 - `custom_path`: if location_type == "custom"
 - `kg_name`: alphanumeric + hyphens
 - `categories`: array of selected categories
@@ -276,7 +374,7 @@ case $location_type in
   "project-local")
     KG_PATH="./docs/"
     ;;
-  "global")
+  "personal")
     KG_PATH="$HOME/.claude/knowledge-graphs/$kg_name/"
     ;;
   "cowork")
@@ -419,6 +517,74 @@ jq ".graphs[\"$kg_name\"] = $config_entry | .active = \"$kg_name\"" \
   ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
 mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
 ```
+
+### Step 1.8.5: Global Personal KG Offer
+
+After the project KG is registered and active, offer to create a personal KG for cross-project knowledge:
+
+```
+Would you like to create a personal knowledge graph for cross-project lessons?
+
+This creates a personal KG at ~/.claude/knowledge-graph/ where you can save
+lessons, patterns, and ADRs that apply across all your projects — not just this one.
+
+Examples of personal lessons:
+  • "Plan language: use Create vs Update for new vs existing files"
+  • "MCP registration quirks across IDEs"
+  • "TypeScript strict mode gotchas"
+
+1. Yes — create personal KG at ~/.claude/knowledge-graph/
+2. No — skip for now (can create later with /kmgraph:init-personal-kg)
+```
+
+**If Yes:**
+
+1. Check if `~/.claude/knowledge-graph/` already exists in `kg-config.json` (any entry with `type: "personal"` at that path). If so:
+   > "A personal KG already exists at `~/.claude/knowledge-graph/`. Skipping creation."
+   Register it if not already in config; otherwise no-op.
+
+2. Create directory structure:
+   ```bash
+   mkdir -p "$HOME/.claude/knowledge-graph"/{knowledge,lessons-learned,decisions,sessions}
+   mkdir -p "$HOME/.claude/knowledge-graph/lessons-learned"/{architecture,debugging,patterns,process}
+   ```
+
+3. Copy templates (same as project KG setup):
+   ```bash
+   for f in patterns.md gotchas.md concepts.md architecture.md workflows.md index.md; do
+     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/$f" "$HOME/.claude/knowledge-graph/knowledge/" 2>/dev/null || true
+   done
+   ```
+
+4. Register in `~/.claude/kg-config.json`:
+   ```json
+   "personal": {
+     "name": "personal",
+     "path": "~/.claude/knowledge-graph",
+     "type": "personal",
+     "categories": [
+       {"name": "architecture", "prefix": null, "git": "ignore"},
+       {"name": "debugging", "prefix": null, "git": "ignore"},
+       {"name": "patterns", "prefix": null, "git": "ignore"},
+       {"name": "process", "prefix": null, "git": "ignore"}
+     ],
+     "createdAt": "[timestamp]",
+     "lastUsed": "[timestamp]"
+   }
+   ```
+   Note: `"active"` is NOT changed — project KG remains active.
+
+5. Build FTS5 index for the new personal KG:
+   Call `kg_fts5_rebuild` with `kgPath: "~/.claude/knowledge-graph"`. Post-rebuild guard: if `indexed` is 0, log a note (normal for empty KG).
+
+6. Confirm:
+   > "✅ Personal KG created at `~/.claude/knowledge-graph/`
+   > Capture cross-project lessons with `/kmgraph:capture-lesson` — you'll be asked which KG to save to."
+
+**If No:**
+   > "No problem. Run `/kmgraph:init-personal-kg` any time to set this up later."
+
+---
 
 ### Step 1.9: Output success message
 

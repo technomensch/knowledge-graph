@@ -9,6 +9,7 @@ One-page cheat sheet for the Knowledge Management Graph. For detailed documentat
 ## I Want To...
 
 - **Start a new knowledge graph** → `/kmgraph:init`
+- **Create a cross-project personal KG** → `/kmgraph:init-personal-kg`
 - **Document what I just learned** → `/kmgraph:capture-lesson [topic]` (v0.2.1-beta refactored)
 - **Find something I documented before** → `/kmgraph:recall [query]` (v0.2.1-beta refactored)
 - **See what's in my knowledge graph** → `/kmgraph:status`
@@ -34,6 +35,7 @@ First-time users need these for basic operation:
 | Command | Purpose |
 |---------|---------|
 | `/kmgraph:init` | Initialize a new knowledge graph with wizard-based setup |
+| `/kmgraph:init-personal-kg` | Create personal KG at `~/.claude/knowledge-graph/` for cross-project lessons |
 | `/kmgraph:capture-lesson [topic]` | Document lessons learned with git metadata tracking (v0.2.1-beta refactored) |
 | `/kmgraph:status` | View active knowledge graph info and quick reference |
 | `/kmgraph:recall [query]` | Search across all memory systems (lessons, decisions, knowledge) (v0.2.1-beta refactored) |
@@ -46,7 +48,7 @@ Active users use these for regular workflows:
 |---------|---------|
 | `/kmgraph:update-graph` | Extract knowledge graph entries from lessons. Uses background file reading for large batches when context-mode is installed |
 | `/kmgraph:add-category` | Add a new category to existing knowledge graph |
-| `/kmgraph:session-summary` | Create summary of current chat session (v0.2.1-beta refactored) |
+| `/kmgraph:session-summary` | Create summary of current chat session; `--snapshot` for lightweight mid-session capture (v0.2.2-beta) |
 | `/kmgraph:list` | Display all configured knowledge graphs |
 | `/kmgraph:switch` | Change active knowledge graph |
 | `/kmgraph:check-sensitive` | Scan knowledge graph for potentially sensitive information |
@@ -81,6 +83,7 @@ Skills activate automatically based on conversation context. No invocation neede
 | `kg-recall` | History question, "have we solved this?", past decision | `/kmgraph:recall` with extracted search terms |
 | `session-wrap` | Context approaching limit, major milestone, session end | `/kmgraph:session-summary` before compaction |
 | `adr-guide` | Architecture decision discussed, "I'm thinking of using..." | `/kmgraph:create-adr` with decision guidance |
+| `doc-update-router` | "update [doc name]", "update the session summary", "update the changelog" | Routes to `/kmgraph:update-doc --user-facing`, `/kmgraph:session-summary`, or `/kmgraph:create-adr` |
 | `gov-execute-plan` | "execute plan", implementation start, `docs/plans/*.md` mentioned | Zero-deviation 8-step execution protocol |
 
 ---
@@ -217,13 +220,13 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 
 - **Start with Essential commands** — Add Intermediate and Advanced commands as needs arise
 - **Use `/kmgraph:status` often** — Shows what's in your active knowledge graph at a glance
-- **`/kmgraph:recall` searches everything** — Lessons, decisions, knowledge entries, and session summaries
+- **`/kmgraph:recall` searches everything** — Lessons, decisions, knowledge entries, and session summaries; add `--scope=all` to include personal KG
 - **MEMORY.md auto-updates** — Check it before important sessions to see what context is loaded
 - **Commands use colon syntax** — It's `/kmgraph:` not `/knowledge-` (colon, not hyphen)
 - **Git metadata is automatic** — Branch, commit, PR, and issue info captured when you create lessons
 - **Categories are flexible** — Start with defaults, add custom ones with `/kmgraph:add-category`
 - **Sanitization is a wizard** — `/kmgraph:config-sanitization` guides you through pre-commit hook setup
-- **Multiple KGs are powerful** — Separate knowledge graphs for work, personal, open-source projects
+- **Multiple KGs are powerful** — Separate knowledge graphs for work, personal, open-source projects; personal KG shares lessons across all of them
 
 ---
 
@@ -256,5 +259,5 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 
 ---
 
-**Version**: 0.2.1-beta
-**Last Updated**: 2026-03-27
+**Version**: 0.2.2-beta
+**Last Updated**: 2026-03-29
