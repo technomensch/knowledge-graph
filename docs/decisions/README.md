@@ -2,8 +2,8 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 20
-**Last Updated:** 2026-03-27
+**Total ADRs:** 21
+**Last Updated:** 2026-03-30
 
 ---
 
@@ -27,6 +27,7 @@ Formal documentation of significant architecture decisions.
 - [ADR-017: Four-Layer Architecture with Thin Command Dispatchers](ADR-017-four-layer-architecture-thin-commands.md) — **Status:** Accepted
 - [ADR-018: Platform-Agnostic AGENTS-template for Cross-Platform Portability](ADR-018-agents-template-platform-portability.md) — **Status:** Accepted
 - [ADR-019: Write Guard via Agent Instructions (v0.2.0) vs Data Layer (v0.2.1)](ADR-019-write-guard-agent-instructions-vs-data-layer.md) — **Status:** Accepted
+- [ADR-024: Decouple Issue Tracking Decisions into Four Independent Sequential Prompts](ADR-024-decouple-issue-tracking-decisions-sequential-prompts.md) — **Status:** Accepted
 - [ADR-020: Lifecycle Hooks Suite for Automated Knowledge Capture](ADR-020-lifecycle-hooks-suite-automated-capture.md) — **Status:** Accepted
 
 ---
@@ -54,6 +55,7 @@ Formal documentation of significant architecture decisions.
 | **ADR-018** | Mar 27 | Platform-Agnostic AGENTS-template for Cross-Platform Portability | v0.2.0-beta | Accepted |
 | **ADR-019** | Mar 27 | Write Guard via Agent Instructions (v0.2.0) vs Data Layer (v0.2.1) | v0.2.0-beta | Accepted |
 | **ADR-020** | Mar 27 | Lifecycle Hooks Suite for Automated Knowledge Capture | v0.2.0-beta | Accepted |
+| **ADR-024** | Mar 30 | Decouple Issue Tracking Decisions into Four Independent Sequential Prompts | v0.2.2-beta | Accepted |
 
 ---
 
@@ -81,6 +83,9 @@ Formal documentation of significant architecture decisions.
 - [ADR-008](ADR-008-third-person-language-standard.md) — Third-person only in user-facing docs
 - [ADR-013](ADR-013-documentation-update-protocol.md) — Two-layer documentation update protocol for releases
 - [ADR-014](ADR-014-maintain-dual-plan-file-locations.md) — Dual plan file locations (~/.claude/plans/ and docs/plans/)
+
+### Process & Command UX
+- [ADR-024](ADR-024-decouple-issue-tracking-decisions-sequential-prompts.md) — Decouple `start-issue-tracking` Step 1 into four sequential prompts; enforcement gates at Steps 6.2 and 6.4
 
 ### Deferral & Roadmap
 - [ADR-005](ADR-005-defer-memory-rules-engine.md) — Defer rules engine to v0.0.5 (restore-only in v0.0.4)
