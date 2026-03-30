@@ -98,6 +98,7 @@ if [ -n "$GRAPHS_WITHOUT_TYPE" ]; then
 fi
 ```
 
+
 #### 1c. Template update check
 
 Compare installed templates against the plugin's current templates. If newer versions exist, offer to update:
