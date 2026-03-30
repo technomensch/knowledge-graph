@@ -9,6 +9,8 @@ import {
   rebuildIndex,
   searchFts5,
   getDbPath,
+  getFTS5DbPath,
+  resolveContentRoot,
   FTS5_DB_FILENAME,
 } from "../src/tools/fts5.js";
 
@@ -160,12 +162,12 @@ describe("rebuildIndex", () => {
     writeMd(path.join(kgRoot, "knowledge"), "c.md", "# C\nContent C");
 
     // First build
-    const first = rebuildIndex(kgRoot);
+    const first = rebuildIndex(kgRoot, "rebuild-skip");
     expect(first.indexed).toBe(3);
     expect(first.skipped).toBe(0);
 
     // Rebuild without changes
-    const second = rebuildIndex(kgRoot);
+    const second = rebuildIndex(kgRoot, "rebuild-skip");
     expect(second.indexed).toBe(0);
     expect(second.skipped).toBe(3);
   });
@@ -180,7 +182,7 @@ describe("rebuildIndex", () => {
     writeMd(path.join(kgRoot, "knowledge"), "c.md", "# C\nContent C");
 
     // First build
-    rebuildIndex(kgRoot);
+    rebuildIndex(kgRoot, "rebuild-mod");
 
     // Modify one file — need to change mtime. Write new content and ensure mtime differs.
     const fileB = path.join(kgRoot, "knowledge", "b.md");
@@ -194,7 +196,7 @@ describe("rebuildIndex", () => {
       fs.utimesSync(fileB, future, future);
     }
 
-    const second = rebuildIndex(kgRoot);
+    const second = rebuildIndex(kgRoot, "rebuild-mod");
     expect(second.indexed).toBe(1);
     expect(second.skipped).toBe(2);
   });
@@ -209,12 +211,12 @@ describe("rebuildIndex", () => {
     writeMd(path.join(kgRoot, "knowledge"), "c.md", "# C\nContent C");
 
     // First build
-    rebuildIndex(kgRoot);
+    rebuildIndex(kgRoot, "rebuild-del");
 
     // Delete one file
     fs.unlinkSync(path.join(kgRoot, "knowledge", "c.md"));
 
-    const second = rebuildIndex(kgRoot);
+    const second = rebuildIndex(kgRoot, "rebuild-del");
     expect(second.indexed).toBe(0);
     expect(second.skipped).toBe(2);
     expect(second.removed).toBe(1);
@@ -238,9 +240,9 @@ describe("searchFts5", () => {
     );
 
     // Build index
-    rebuildIndex(kgRoot);
+    rebuildIndex(kgRoot, "search-shape");
 
-    const dbPath = getDbPath(kgRoot);
+    const dbPath = getFTS5DbPath("search-shape");
     const results = searchFts5(dbPath, "authentication", kgRoot);
 
     expect(results.length).toBeGreaterThan(0);
@@ -269,9 +271,9 @@ describe("searchFts5", () => {
     scaffoldKg(kgRoot);
 
     writeMd(path.join(kgRoot, "knowledge"), "test.md", "# Test\nSome content.");
-    rebuildIndex(kgRoot);
+    rebuildIndex(kgRoot, "search-empty");
 
-    const dbPath = getDbPath(kgRoot);
+    const dbPath = getFTS5DbPath("search-empty");
 
     // Empty query — sanitizeFts5Query returns '""' which FTS5 handles
     // Should not throw
@@ -295,5 +297,219 @@ describe("corrupt database", () => {
 
     // searchFts5 should throw (search.ts would catch this and fall back)
     expect(() => searchFts5(dbPath, "test query", kgRoot)).toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// TC-001: DB is created at ~/.claude/kg-fts5/{name}.db on first rebuild
+// ---------------------------------------------------------------------------
+
+describe("getFTS5DbPath", () => {
+  test("TC-001: DB created at ~/.claude/kg-fts5/{name}.db on first rebuild", () => {
+    const kgRoot = makeTempDir("tc-001-db-path");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+
+    writeMd(path.join(kgRoot, "knowledge"), "test.md", "# Test\nContent");
+
+    // Rebuild should use getFTS5DbPath internally
+    const result = rebuildIndex(kgRoot, "test-kg-001");
+
+    // Verify DB path in result
+    expect(result.db_path).toContain(".claude");
+    expect(result.db_path).toContain("kg-fts5");
+    expect(result.db_path).toContain("test-kg-001.db");
+
+    // Verify file actually exists
+    expect(fs.existsSync(result.db_path)).toBe(true);
+
+    // Verify it's in the home directory, not in the project
+    const homeDir = os.homedir();
+    expect(result.db_path).toContain(homeDir);
+  });
+
+  test("getFTS5DbPath creates ~/.claude/kg-fts5 directory if missing", () => {
+    const dbPath = getFTS5DbPath("test-kg-dir-creation");
+    const dirPath = path.dirname(dbPath);
+
+    expect(fs.existsSync(dirPath)).toBe(true);
+    expect(dirPath).toContain("kg-fts5");
+    expect(fs.statSync(dirPath).isDirectory()).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// TC-002: Content root auto-detection finds docs/ when docs/lessons-learned/ exists
+// ---------------------------------------------------------------------------
+
+describe("resolveContentRoot", () => {
+  test("TC-002: Auto-detects docs/ subdir when docs/lessons-learned/ exists", () => {
+    const kgRoot = makeTempDir("tc-002-content-root");
+    tempDirs.push(kgRoot);
+
+    // Create v0.2+ layout: docs/lessons-learned exists
+    fs.mkdirSync(path.join(kgRoot, "docs", "lessons-learned"), {
+      recursive: true,
+    });
+
+    const resolved = resolveContentRoot(kgRoot);
+
+    // Should return docs/ not kgRoot
+    expect(resolved).toBe(path.join(kgRoot, "docs"));
+    expect(resolved).not.toBe(kgRoot);
+  });
+
+  test("TC-003: Falls back to root when no docs/lessons-learned/ subdir", () => {
+    const kgRoot = makeTempDir("tc-003-content-root-fallback");
+    tempDirs.push(kgRoot);
+
+    // Create minimal structure (no docs/lessons-learned)
+    fs.mkdirSync(path.join(kgRoot, "knowledge"), { recursive: true });
+
+    const resolved = resolveContentRoot(kgRoot);
+
+    // Should fall back to kgRoot
+    expect(resolved).toBe(kgRoot);
+  });
+
+  test("resolveContentRoot uses correct path when docs/ exists but no lessons-learned", () => {
+    const kgRoot = makeTempDir("tc-003b-docs-exists-only");
+    tempDirs.push(kgRoot);
+
+    // Create docs/ but not docs/lessons-learned/
+    fs.mkdirSync(path.join(kgRoot, "docs"), { recursive: true });
+
+    const resolved = resolveContentRoot(kgRoot);
+
+    // Should still fall back to kgRoot
+    expect(resolved).toBe(kgRoot);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// TC-007: Multiple KGs get separate DB files (no path conflicts)
+// ---------------------------------------------------------------------------
+
+describe("Multiple KGs with separate DBs", () => {
+  test("TC-007: Multiple KGs get separate DB files with no conflicts", () => {
+    const projRoot1 = makeTempDir("tc-007-kg1");
+    const projRoot2 = makeTempDir("tc-007-kg2");
+    tempDirs.push(projRoot1, projRoot2);
+
+    scaffoldKg(projRoot1);
+    scaffoldKg(projRoot2);
+
+    writeMd(
+      path.join(projRoot1, "knowledge"),
+      "doc1.md",
+      "# Doc 1\nContent for KG1"
+    );
+    writeMd(
+      path.join(projRoot2, "knowledge"),
+      "doc2.md",
+      "# Doc 2\nContent for KG2"
+    );
+
+    const result1 = rebuildIndex(projRoot1, "kg-instance-1");
+    const result2 = rebuildIndex(projRoot2, "kg-instance-2");
+
+    // Both should have DB at ~/.claude/kg-fts5/
+    expect(result1.db_path).toContain("kg-fts5");
+    expect(result2.db_path).toContain("kg-fts5");
+
+    // But with different filenames
+    expect(result1.db_path).not.toBe(result2.db_path);
+    expect(result1.db_path).toContain("kg-instance-1.db");
+    expect(result2.db_path).toContain("kg-instance-2.db");
+
+    // Both should exist and be valid databases
+    expect(fs.existsSync(result1.db_path)).toBe(true);
+    expect(fs.existsSync(result2.db_path)).toBe(true);
+
+    // Verify they're actually separate by opening and checking content
+    const db1 = new Database(result1.db_path);
+    const db2 = new Database(result2.db_path);
+
+    try {
+      const rows1 = db1.all(
+        "SELECT COUNT(*) as cnt FROM kg_entries"
+      ) as Array<{ cnt: number }>;
+      const rows2 = db2.all(
+        "SELECT COUNT(*) as cnt FROM kg_entries"
+      ) as Array<{ cnt: number }>;
+
+      expect(rows1[0].cnt).toBeGreaterThan(0);
+      expect(rows2[0].cnt).toBeGreaterThan(0);
+    } finally {
+      db1.close();
+      db2.close();
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// TC-008: DB file is not inside project directory (survives git clean)
+// ---------------------------------------------------------------------------
+
+describe("DB file location independence", () => {
+  test("TC-008: DB file is not inside the project directory", () => {
+    const kgRoot = makeTempDir("tc-008-db-outside");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+
+    writeMd(path.join(kgRoot, "knowledge"), "test.md", "# Test\nContent");
+
+    const result = rebuildIndex(kgRoot, "tc-008-kg");
+
+    // DB should be in user's home, not in project
+    expect(result.db_path).not.toContain(kgRoot);
+    expect(result.db_path).toContain(os.homedir());
+    expect(result.db_path).toContain(".claude/kg-fts5");
+
+    // Verify by checking path structure
+    const dbDir = path.dirname(result.db_path);
+    const projectIsNotAncestor = !result.db_path.startsWith(kgRoot);
+    expect(projectIsNotAncestor).toBe(true);
+  });
+
+  test("TC-008b: Simulated git clean does not remove user DB", () => {
+    const kgRoot = makeTempDir("tc-008b-git-clean-sim");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+
+    writeMd(path.join(kgRoot, "knowledge"), "test.md", "# Test\nContent");
+
+    const result = rebuildIndex(kgRoot, "tc-008b-kg");
+    const dbPath = result.db_path;
+
+    // Verify DB exists
+    expect(fs.existsSync(dbPath)).toBe(true);
+
+    // Simulate "git clean -fdx" by removing entire project directory
+    fs.rmSync(kgRoot, { recursive: true, force: true });
+
+    // DB should still exist (not in project)
+    expect(fs.existsSync(dbPath)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// TC-009: .gitignore does not contain .fts5.db pattern at project root
+// ---------------------------------------------------------------------------
+
+describe(".gitignore patterns", () => {
+  test("TC-009: .gitignore does not contain .fts5.db pattern (DB lives in ~/.claude/kg-fts5/)", () => {
+    const gitignorePath = path.join(
+      process.cwd(),
+      "..",
+      ".gitignore"
+    );
+
+    const content = fs.readFileSync(gitignorePath, "utf-8");
+
+    // DB now lives at ~/.claude/kg-fts5/{name}.db — outside the project.
+    // No gitignore entry is needed or correct.
+    expect(content).not.toContain(".fts5.db");
+    expect(content).not.toContain("kg-fts5");
   });
 });

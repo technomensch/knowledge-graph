@@ -8,6 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.3-beta] — 2026-03-30
+
+### Added
+- **ENH-005: FTS5 Database Relocation** — Search index moved from `{kgPath}/.fts5.db` to `~/.claude/kg-fts5/{kg-name}.db`. Index now survives git pulls, upgrades, and fresh clones. Content root auto-detection for `docs/`-layout KGs.
+- **ENH-006: Issue Tracking UX** — `start-issue-tracking` Steps 1.1–1.4 redesigned as four independent sequential prompts (type, version impact, branch, plan). Steps 6.2 and 6.4 are now mandatory gates. `gov-execute-plan` checks Step 6.4 completion before implementation. Expanded `adr-guide` and `lesson-capture` trigger vocabularies.
+- **ENH-007: ECC Compatibility** — All KMGraph skills audited for compatibility with everything-claude-code agent harness. Trigger conditions are natural language only across all platforms.
+- **ENH-008: capture-router Skill** — New skill routes "capture that" / "remember that" to correct destination (memory, lesson, ADR) via auto-detection and single confirmation prompt.
+
+### Changed
+- `.gitignore` no longer contains `.fts5.db` pattern (DB is now outside project directory)
+- `init` verify/upgrade migrates legacy `.fts5.db` to user cache silently on first run
+
+### Version Sync Rule
+Whenever a new version is added to CHANGELOG.md, all version files and doc footers must be updated in the same commit. Files: `package.json`, `mcp-server/package.json`, `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` (plugins[0].version only).
+
 ## [0.2.2-beta] - 2026-03-29
 
 ### TL;DR

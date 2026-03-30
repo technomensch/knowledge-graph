@@ -281,7 +281,10 @@ export async function handleCapture(
         "utf-8"
       );
       let indexResult: Record<string, unknown> = {};
-      try { indexResult = rebuildIndex(kgPath) as unknown as Record<string, unknown>; } catch { /* best-effort */ }
+      try {
+        const kgName = targetKg || config.active || path.basename(kgPath);
+        indexResult = rebuildIndex(kgPath, kgName) as unknown as Record<string, unknown>;
+      } catch { /* best-effort */ }
       return { status: "updated", filePath: existing, relativePath: path.relative(kgPath, existing), indexResult };
     } catch (err: unknown) {
       return { error: "IO_ERROR", message: err instanceof Error ? err.message : String(err) };
@@ -339,7 +342,10 @@ export async function handleCapture(
 
   // FTS5 rebuild (in-process, best-effort)
   let indexResult: Record<string, unknown> = {};
-  try { indexResult = rebuildIndex(kgPath) as unknown as Record<string, unknown>; } catch { /* absent if node-sqlite3-wasm not installed */ }
+  try {
+    const kgName = targetKg || config.active || path.basename(kgPath);
+    indexResult = rebuildIndex(kgPath, kgName) as unknown as Record<string, unknown>;
+  } catch { /* absent if node-sqlite3-wasm not installed */ }
 
   return {
     status: "created",

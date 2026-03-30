@@ -117,7 +117,7 @@ describe("kg_capture — lesson write", () => {
     expect(content).toContain("tags: [auth, token]");
     expect(content).toContain("## Problem");
 
-    expect(rebuildIndex).toHaveBeenCalledWith(kgRoot);
+    expect(rebuildIndex).toHaveBeenCalledWith(kgRoot, "test-kg");
   });
 });
 
@@ -383,7 +383,7 @@ describe("kg_capture — existingFile update-in-place", () => {
     expect(content).toContain("## Updated content");
     expect(content).not.toContain("Old content");
 
-    expect(rebuildIndex).toHaveBeenCalledWith(kgRoot);
+    expect(rebuildIndex).toHaveBeenCalledWith(kgRoot, "test-kg");
   });
 
   test("returns IO_ERROR when existingFile path does not exist", async () => {

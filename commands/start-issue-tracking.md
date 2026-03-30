@@ -113,34 +113,42 @@ Keep in mind: you'll be asked at Step 5 whether to create a new branch now or do
 
 Store `{active_work_guard_triggered} = true` if current branch ≠ main, for use in Step 6.2.
 
-### 1.1: Versioning Decision
-Based on the Git check, ask the user:
-```markdown
-I detect existing work on [Branch Name]. Is this:
+### 1.1: Type
+Ask only this question and wait for the answer before proceeding:
 
-1. [ ] A **New Feature**? (vX.[Minor].0 - New Issue)
-2. [ ] A **Patch** to Merged Work? (vX.X.[Patch] - Bug/Correction to Main)
-3. [ ] A **WIP Update**? (Continue on existing branch, update existing plan)
-4. [ ] A **Hotfix**? (vX.X.X.[Hotfix] - Critical fix to a patch)
+> "What type of issue is this? Bug / Enhancement / Refactor / Hardening"
 
-Please select the version increment path (1-4):
-```
+**WAIT FOR USER ANSWER. Do not ask 1.2 until answer is received.**
 
-### 1.2: Issue Type
-```
-6. [ ] 🔧 Refactor - Code restructuring without behavior change
-7. [ ] 🛡️ Hardening - Strengthening existing guardrails or validation logic
+### 1.2: Version Impact
+Ask only this question and wait for the answer before proceeding:
 
-What type of issue is this?
-```
+> "Version impact? New minor / Patch to merged / WIP update / Hotfix"
 
-### 1.3: Issue Details
-*(Pre-filled from Discourse Capture)*
-```
-... [same as before] ...
-```
+**WAIT FOR USER ANSWER. Do not ask 1.3 until answer is received.**
 
-**WAIT FOR USER INPUT** before proceeding to Step 2.
+### 1.3: Branch
+Ask only this question and wait for the answer before proceeding:
+
+> "Branch strategy? New branch / Stay on current / Defer branch creation"
+
+**WAIT FOR USER ANSWER. Do not ask 1.4 until answer is received.**
+
+### 1.4: Plan
+Ask only this question and wait for the answer before proceeding:
+
+> "Plan approach? New plan / Append to existing / Document-only"
+
+**WAIT FOR USER ANSWER.**
+
+### After All Four Answers Received
+State your assumptions clearly based on all four answers, then ask:
+
+> "Here's what I'll do: [summarize type, version path, branch strategy, plan approach]. Confirm? (y/n)"
+
+Do not write any files or create any directories until the user confirms.
+
+**WAIT FOR USER CONFIRMATION before proceeding to Step 2.**
 
 ---
 
@@ -241,40 +249,6 @@ Every generated plan MUST include this **Safety Header** and **Atomic Approval P
 
 ## Step 5: Git Integration
 
-### 5.0: Active Work Guard
-
-Before creating a branch, check if the user is currently working on another branch:
-
-```bash
-current_branch=$(git branch --show-current)
-default_branch="main"  # or detect via git remote show origin
-```
-
-**If `current_branch` is NOT `main` (or the default branch):**
-
-```
-You're currently on branch **[current_branch]**.
-
-Creating a new issue branch will switch you away from your active work.
-All subsequent commits would go to the new branch instead of [current_branch].
-
-How would you like to proceed?
-
-1. **Document only** — Create issue documentation but stay on [current_branch]
-   (Branch will be created later when you're ready to start implementation)
-
-2. **Create branch now** — Switch to a new issue branch immediately
-   (Use this if you're done with [current_branch] or ready to context-switch)
-
-3. **Cancel** — Abort issue tracking
-```
-
-- **Option 1 (Document only):** Skip Step 5.1 (no branch creation). Create all documentation (Steps 3-4, 6). Add a note to the issue docs: `**Branch:** Not yet created — run \`git checkout -b issue/{N}-{slug}\` when ready to implement.`
-- **Option 2 (Create branch now):** Proceed to Step 5.1 as normal.
-- **Option 3 (Cancel):** Exit.
-
-**If `current_branch` IS `main`:** Proceed directly to Step 5.1 (no guard needed).
-
 ### 5.1: Create Feature Branch
 
 Create the branch with a descriptive name derived from the issue number and slug:
@@ -318,11 +292,15 @@ Add entry to `docs/issue-tracker.md`.
 >
 > Run `/kmgraph:capture-lesson` now? **(yes / defer to plan)**"
 
+**MANDATORY GATE: Do not proceed to Step 7 until the user responds to this question. "yes" and "defer to plan" are both valid answers. Silence is not a valid answer — wait.**
+
 If deferred: add a task to the implementation plan: "Capture lesson: [issue description] — identified during [current_branch] work."
 
 **If `{active_work_guard_triggered}` is false** (issue identified from main or a clean state):
 
-> "We just identified [the problem]. Should I run `/kmgraph:capture-lesson` now to sync this pattern to the Knowledge Graph before we start the fix?"
+> "We just identified [the problem]. Should I run `/kmgraph:capture-lesson` now to sync this pattern to the Knowledge Graph before we start the fix? **(yes / no)**"
+
+**MANDATORY GATE: Do not proceed to Step 7 until the user responds to this question. "yes" and "no" are both valid answers. Silence is not a valid answer — wait.**
 
 If yes, run it. If no, ensure a task is added to the plan to update the KG after implementation.
 
@@ -330,7 +308,11 @@ If yes, run it. If no, ensure a task is added to the plan to update the KG after
 The `solution-approach.md` MUST link to the resulting lesson or updated entry in the Knowledge Graph. Use `/kmgraph:link-issue` to create bidirectional references.
 
 ### 6.4: Release Documentation Hook
-**Mandatory Question:** *"Would you like me to run **`/kmgraph:update-issue-plan`** now to synchronize the ROADMAP and CHANGELOG before I stage and push these initialization files?"*
+**Mandatory Question:** Present this question and wait for a user response:
+
+> "Would you like me to run **`/kmgraph:update-issue-plan`** now to synchronize the ROADMAP and CHANGELOG before I stage and push these initialization files? **(yes / no)**"
+
+**MANDATORY GATE: Do not proceed to Step 7 until the user responds to this question. "yes" and "no" are both valid answers. Silence is not a valid answer — wait.**
 
 ---
 

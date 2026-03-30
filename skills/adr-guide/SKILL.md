@@ -9,7 +9,12 @@
 - "which approach"
 - "best way to"
 - "should we use"
+- "the problem is that"
+- "here's what it should look like" / "here's what it should do instead"
+- "needs to be redesigned" / "should be redesigned"
+- "this should be" (when followed by an architectural description)
 - Architecture/design discussions with choices
+- Pattern identified during active use of a command or workflow
 
 **Behavior:**
 When triggered, guide the user toward documenting the decision as an Architecture Decision Record:

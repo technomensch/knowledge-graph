@@ -24,6 +24,35 @@ try {
 export const FTS5_DB_FILENAME = ".fts5.db";
 
 // ---------------------------------------------------------------------------
+// Path helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns the absolute path to the user-level FTS5 database for a given KG name.
+ * Stored in ~/.claude/kg-fts5/<kgName>.db (outside project directories).
+ * Creates the directory if it does not exist.
+ */
+export function getFTS5DbPath(kgName: string): string {
+  const dir = path.join(os.homedir(), ".claude", "kg-fts5");
+  fs.mkdirSync(dir, { recursive: true });
+  return path.join(dir, `${kgName}.db`);
+}
+
+/**
+ * Resolves the content root for a KG path.
+ * If the KG contains a docs/lessons-learned subdirectory (v0.2+ layout),
+ * returns the docs/ directory so that lessons-learned, decisions, and sessions
+ * are found under docs/. Otherwise falls back to kgPath itself.
+ */
+export function resolveContentRoot(kgPath: string): string {
+  const docsLessons = path.join(kgPath, "docs", "lessons-learned");
+  if (fs.existsSync(docsLessons)) {
+    return path.join(kgPath, "docs");
+  }
+  return kgPath;
+}
+
+// ---------------------------------------------------------------------------
 // Interfaces
 // ---------------------------------------------------------------------------
 
@@ -53,6 +82,7 @@ export interface SearchResult {
 
 /**
  * Returns the absolute path to the FTS5 database for a given KG root.
+ * @deprecated Use getFTS5DbPath(kgName) instead — stores DB in user-level cache.
  */
 export function getDbPath(kgPath: string): string {
   return path.join(kgPath, FTS5_DB_FILENAME);
@@ -240,25 +270,28 @@ export function indexFile(db: any, filePath: string, kgPath: string): number {
  * - Removes index rows for files that no longer exist on disk.
  * - Skips files that haven't changed.
  */
-export function rebuildIndex(kgPath: string): RebuildResult {
+export function rebuildIndex(kgPath: string, kgName: string): RebuildResult {
   if (!fts5Available) {
     throw new Error(
       "FTS5 search engine not available. Restart Claude Code to complete the upgrade installation."
     );
   }
   const start = Date.now();
-  const dbPath = getDbPath(kgPath);
+  const dbPath = getFTS5DbPath(kgName);
   const db = new Database(dbPath);
 
   try {
     initDb(db);
+
+    // Resolve content root: v0.2+ KGs store content under docs/
+    const contentRoot = resolveContentRoot(kgPath);
 
     // Collect all .md files from target subdirectories
     const searchDirs = ["knowledge", "lessons-learned", "decisions", "sessions"];
     const allFiles: string[] = [];
 
     for (const dir of searchDirs) {
-      const dirPath = path.join(kgPath, dir);
+      const dirPath = path.join(contentRoot, dir);
       allFiles.push(...walkDir(dirPath, ".md"));
     }
 
@@ -391,9 +424,15 @@ export function registerFts5Tool(server: McpServer): void {
       try {
         const config = readConfig();
         let resolvedPath: string;
+        let resolvedName: string;
 
         if (kgPath) {
           resolvedPath = kgPath.replace(/^~/, os.homedir());
+          // Find the matching KG name from config, or derive from path basename
+          const matchedEntry = Object.entries(config.graphs || {}).find(
+            ([, g]) => (g as any).path === resolvedPath
+          );
+          resolvedName = matchedEntry ? matchedEntry[0] : path.basename(resolvedPath);
         } else {
           const activePath = getActiveGraphPath(config);
           if (!activePath) {
@@ -408,6 +447,7 @@ export function registerFts5Tool(server: McpServer): void {
             };
           }
           resolvedPath = activePath;
+          resolvedName = config.active!;
         }
 
         if (!fs.existsSync(resolvedPath)) {
@@ -422,7 +462,7 @@ export function registerFts5Tool(server: McpServer): void {
           };
         }
 
-        const result = rebuildIndex(resolvedPath);
+        const result = rebuildIndex(resolvedPath, resolvedName);
 
         // Update config to mark FTS5 as enabled, remove declined flag
         if (config.active && config.graphs[config.active]) {
