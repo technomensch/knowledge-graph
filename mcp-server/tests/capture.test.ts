@@ -549,7 +549,7 @@ describe("kg_capture — targetKg (multi-KG)", () => {
         "personal": {
           name: "personal",
           path: globalRoot,
-          type: "global",
+          type: "personal",
           categories: [],
           createdAt: new Date().toISOString(),
           lastUsed: new Date().toISOString(),
@@ -559,7 +559,7 @@ describe("kg_capture — targetKg (multi-KG)", () => {
     (getActiveGraphPath as jest.Mock).mockReturnValue(projRoot);
   }
 
-  test("writes lesson to global KG when targetKg='personal'", async () => {
+  test("writes lesson to personal KG when targetKg='personal'", async () => {
     const projRoot = makeTempDir("multi-proj");
     const globalRoot = makeTempDir("multi-global");
     tempDirs.push(projRoot, globalRoot);

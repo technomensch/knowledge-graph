@@ -114,7 +114,7 @@ function searchKg(
 /** Returns a human-readable source label for a result. */
 function sourceLabel(r: SearchResult): string {
   if (!r.sourceKg) return "";
-  const typeTag = r.sourceKgType === "global" ? "global" : "project";
+  const typeTag = r.sourceKgType === "personal" ? "personal" : "project";
   return ` [${typeTag}: ${r.sourceKg}]`;
 }
 
@@ -122,7 +122,7 @@ export function registerSearchTool(server: McpServer): void {
   server.tool(
     "kg_search",
     "Full-text search across knowledge graph files. By default searches the active KG only. " +
-      "Use searchScope='all' to include all registered KGs (project-local + global).",
+      "Use searchScope='all' to include all registered KGs (project-local + personal).",
     {
       query: z.string().describe("Search query (case-insensitive)"),
       format: z
@@ -130,12 +130,12 @@ export function registerSearchTool(server: McpServer): void {
         .default("summary")
         .describe("Output format: summary (default), paths only, or detailed with context"),
       searchScope: z
-        .enum(["active", "all", "global-only"])
+        .enum(["active", "all", "personal-only"])
         .default("active")
         .describe(
           "Which KGs to search: active (default, active KG only), " +
-            "all (active KG + all registered global KGs), " +
-            "global-only (only KGs with type=global)"
+            "all (active KG + all registered personal KGs), " +
+            "personal-only (only KGs with type=personal)"
         ),
     },
     async ({ query, format, searchScope }) => {
@@ -144,14 +144,14 @@ export function registerSearchTool(server: McpServer): void {
       // Determine which KGs to query
       let kgsToSearch: Array<{ name: string; path: string; type: string }>;
 
-      if (searchScope === "global-only") {
-        kgsToSearch = getAllGraphPaths(config, ["global"]);
+      if (searchScope === "personal-only") {
+        kgsToSearch = getAllGraphPaths(config, ["personal"]);
         if (kgsToSearch.length === 0) {
           return {
             content: [
               {
                 type: "text" as const,
-                text: "No global KGs registered. Create one with /kmgraph:init-global-kg.",
+                text: "No personal KGs registered. Create one with /kmgraph:init-personal-kg.",
               },
             ],
           };
@@ -208,7 +208,7 @@ export function registerSearchTool(server: McpServer): void {
       // Sort merged results: project-local before global (within same match quality)
       if (kgsToSearch.length > 1) {
         const typeOrder = { title: 0, heading: 1, body: 2 };
-        const kgOrder = (r: SearchResult) => r.sourceKgType === "global" ? 1 : 0;
+        const kgOrder = (r: SearchResult) => r.sourceKgType === "personal" ? 1 : 0;
         allResults.sort((a, b) => {
           const kg = kgOrder(a) - kgOrder(b);
           if (kg !== 0) return kg;

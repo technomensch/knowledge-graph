@@ -20,7 +20,7 @@ Creates a complete knowledge graph structure with:
 - First-time setup after installing the plugin
 - **After a plugin update** — verify/upgrade existing KG to current version
 - Creating a new project-local knowledge graph
-- Setting up a topic-based global knowledge graph
+- Setting up a topic-based personal knowledge graph
 - Creating a Claude Cowork knowledge space
 
 ## Pre-Wizard: Existing KG Detection
@@ -94,7 +94,7 @@ GRAPHS_WITHOUT_TYPE=$(jq -r '.graphs | to_entries[] | select(.value.type == null
 if [ -n "$GRAPHS_WITHOUT_TYPE" ]; then
   echo "⚠️  Some registered KGs are missing a type field (defaulted to project-local):"
   echo "$GRAPHS_WITHOUT_TYPE"
-  echo "   If any of these should be a global KG, run /kmgraph:init-global-kg to re-register correctly."
+  echo "   If any of these should be a personal KG, run /kmgraph:init-personal-kg to re-register correctly."
 fi
 ```
 
@@ -260,7 +260,7 @@ Where should this knowledge graph be stored?
 4. Custom path
 ```
 
-**Recommendation**: Project-local for single-project use, global for topic-based knowledge sharing across projects.
+**Recommendation**: Project-local for single-project use, personal for topic-based knowledge sharing across projects.
 
 ### Step 2: KG Name
 
@@ -352,7 +352,7 @@ fi
 ### Step 1.2: Run wizard prompts
 
 Use `AskUserQuestion` tool for each step. Collect:
-- `location_type`: "project-local", "global", "cowork", "custom"
+- `location_type`: "project-local", "personal", "cowork", "custom"
 - `custom_path`: if location_type == "custom"
 - `kg_name`: alphanumeric + hyphens
 - `categories`: array of selected categories
@@ -373,7 +373,7 @@ case $location_type in
   "project-local")
     KG_PATH="./docs/"
     ;;
-  "global")
+  "personal")
     KG_PATH="$HOME/.claude/knowledge-graphs/$kg_name/"
     ;;
   "cowork")
@@ -519,26 +519,26 @@ mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
 
 ### Step 1.8.5: Global Personal KG Offer
 
-After the project KG is registered and active, offer to create a global personal KG for cross-project knowledge:
+After the project KG is registered and active, offer to create a personal KG for cross-project knowledge:
 
 ```
 Would you like to create a personal knowledge graph for cross-project lessons?
 
-This creates a single global KG at ~/.claude/knowledge-graph/ where you can save
+This creates a personal KG at ~/.claude/knowledge-graph/ where you can save
 lessons, patterns, and ADRs that apply across all your projects — not just this one.
 
-Examples of global lessons:
+Examples of personal lessons:
   • "Plan language: use Create vs Update for new vs existing files"
   • "MCP registration quirks across IDEs"
   • "TypeScript strict mode gotchas"
 
 1. Yes — create personal KG at ~/.claude/knowledge-graph/
-2. No — skip for now (can create later with /kmgraph:init-global-kg)
+2. No — skip for now (can create later with /kmgraph:init-personal-kg)
 ```
 
 **If Yes:**
 
-1. Check if `~/.claude/knowledge-graph/` already exists in `kg-config.json` (any entry with `type: "global"` at that path). If so:
+1. Check if `~/.claude/knowledge-graph/` already exists in `kg-config.json` (any entry with `type: "personal"` at that path). If so:
    > "A personal KG already exists at `~/.claude/knowledge-graph/`. Skipping creation."
    Register it if not already in config; otherwise no-op.
 
@@ -560,7 +560,7 @@ Examples of global lessons:
    "personal": {
      "name": "personal",
      "path": "~/.claude/knowledge-graph",
-     "type": "global",
+     "type": "personal",
      "categories": [
        {"name": "architecture", "prefix": null, "git": "ignore"},
        {"name": "debugging", "prefix": null, "git": "ignore"},
@@ -573,7 +573,7 @@ Examples of global lessons:
    ```
    Note: `"active"` is NOT changed — project KG remains active.
 
-5. Build FTS5 index for the new global KG:
+5. Build FTS5 index for the new personal KG:
    Call `kg_fts5_rebuild` with `kgPath: "~/.claude/knowledge-graph"`. Post-rebuild guard: if `indexed` is 0, log a note (normal for empty KG).
 
 6. Confirm:
@@ -581,7 +581,7 @@ Examples of global lessons:
    > Capture cross-project lessons with `/kmgraph:capture-lesson` — you'll be asked which KG to save to."
 
 **If No:**
-   > "No problem. Run `/kmgraph:init-global-kg` any time to set this up later."
+   > "No problem. Run `/kmgraph:init-personal-kg` any time to set this up later."
 
 ---
 

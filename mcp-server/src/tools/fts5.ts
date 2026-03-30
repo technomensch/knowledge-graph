@@ -43,7 +43,7 @@ export interface SearchResult {
   matchType: "title" | "heading" | "body";
   /** KG name this result came from. Populated by multi-KG search; absent for single-KG calls. */
   sourceKg?: string;
-  /** KG type this result came from ("project-local" | "global" | etc.). */
+  /** KG type this result came from ("project-local" | "personal" | etc.). */
   sourceKgType?: string;
 }
 

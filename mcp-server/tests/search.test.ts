@@ -74,21 +74,21 @@ describe("getAllGraphPaths", () => {
   it("returns all graphs when no type filter given", () => {
     const config = makeConfig("proj", {
       proj: { path: "/tmp/proj", type: "project-local" },
-      global: { path: "/tmp/global", type: "global" },
+      personal: { path: "/tmp/personal", type: "personal" },
     });
     const result = getAllGraphPaths(config);
     expect(result).toHaveLength(2);
   });
 
-  it("filters to global type only", () => {
+  it("filters to personal type only", () => {
     const config = makeConfig("proj", {
       proj: { path: "/tmp/proj", type: "project-local" },
-      global: { path: "/tmp/global", type: "global" },
+      personal: { path: "/tmp/personal", type: "personal" },
     });
-    const result = getAllGraphPaths(config, ["global"]);
+    const result = getAllGraphPaths(config, ["personal"]);
     expect(result).toHaveLength(1);
-    expect(result[0].name).toBe("global");
-    expect(result[0].type).toBe("global");
+    expect(result[0].name).toBe("personal");
+    expect(result[0].type).toBe("personal");
   });
 
   it("defaults missing type to project-local (v0.2.1 compat)", () => {
@@ -103,7 +103,7 @@ describe("getAllGraphPaths", () => {
 
   it("expands ~ in paths", () => {
     const config = makeConfig("home", {
-      home: { path: "~/.claude/knowledge-graph", type: "global" },
+      home: { path: "~/.claude/knowledge-graph", type: "personal" },
     });
     const result = getAllGraphPaths(config);
     expect(result[0].path).toBe(path.join(os.homedir(), ".claude/knowledge-graph"));
@@ -126,7 +126,7 @@ describe("getAllGraphPaths", () => {
 describe("multi-KG search via FTS5", () => {
   it("indexes two separate KG roots independently", () => {
     const projRoot = makeTempDir("proj");
-    const globalRoot = makeTempDir("global");
+    const globalRoot = makeTempDir("personal");
     tempDirs.push(projRoot, globalRoot);
 
     scaffoldKg(projRoot);
@@ -155,9 +155,9 @@ describe("multi-KG search via FTS5", () => {
     expect(fs.existsSync(path.join(globalRoot, ".fts5.db"))).toBe(true);
   });
 
-  it("project KG does not contain global KG content and vice versa", () => {
+  it("project KG does not contain personal KG content and vice versa", () => {
     const projRoot = makeTempDir("proj");
-    const globalRoot = makeTempDir("global");
+    const globalRoot = makeTempDir("personal");
     tempDirs.push(projRoot, globalRoot);
 
     scaffoldKg(projRoot);

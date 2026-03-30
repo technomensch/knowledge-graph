@@ -153,7 +153,7 @@ Commands work across platforms, but full automation is Claude Code-specific.
     Get the knowledge graph running and configure how it works.
 
     - [🟢 `/kmgraph:init`](#-kgsisinitcommands-tab) — Initialize a new knowledge graph
-    - [🟡 `/kmgraph:init-global-kg`](#-kgsisinitglobalkg-commands-tab) — Create personal global KG for cross-project lessons
+    - [🟡 `/kmgraph:init-personal-kg`](#-kmgraphinit-personal-kg) — Create personal KG for cross-project lessons
     - [🟡 `/kmgraph:list`](#-kgsislist-commands-tab) — View all configured knowledge graphs
     - [🟡 `/kmgraph:switch`](#-kgsisswitch-commands-tab) — Switch to a different knowledge graph
     - [🟡 `/kmgraph:add-category`](#-kgsisadd-category-commands-tab) — Add custom categories
@@ -216,12 +216,12 @@ Commands work across platforms, but full automation is Claude Code-specific.
 
 **What it does**:
 
-1. Asks for KG name and storage location (project-local, global, or custom path)
+1. Asks for KG name and storage location (project-local, personal, or custom path)
 2. Prompts for category selection (architecture, process, patterns, debugging, or custom)
 3. Asks for optional custom prefixes per category
 4. Creates directory structure (`knowledge/`, `lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`)
 5. Copies templates from the plugin
-6. **[NEW in v0.2.2-beta]** Offers to create a **global personal KG** at `~/.claude/knowledge-graph/` for cross-project lessons (see [`/kmgraph:init-global-kg`](#-kgsisinitglobalkg-commands-tab))
+6. **[NEW in v0.2.2-beta]** Offers to create a **personal KG** at `~/.claude/knowledge-graph/` for cross-project lessons (see [`/kmgraph:init-personal-kg`](#-kgsisinitpersonalkg-commands-tab))
 7. **[NEW in v0.0.10.2]** Optionally backfills from existing project context (README, CHANGELOG, lessons, decisions, chat history)
 8. Optionally installs a git post-commit hook for lesson capture suggestions
 9. Updates `.gitignore` based on chosen git strategy
@@ -235,7 +235,7 @@ Commands work across platforms, but full automation is Claude Code-specific.
 
 # Claude asks:
 # - What should this knowledge graph be called?
-# - Where should it be stored? (project-local / global / custom)
+# - Where should it be stored? (project-local / personal / custom)
 # - Which categories do you want to include?
 # - Would you like to backfill from existing project context? (y/N)
 #   (If yes: scans README, CHANGELOG, lessons-learned/, decisions/, chat-history/)
@@ -260,21 +260,21 @@ The system presents candidates for your review before creating entries.
 
 ---
 
-### 🟡 `/kmgraph:init-global-kg`
+### 🟡 `/kmgraph:init-personal-kg`
 
 <!-- Updated: 2026-03-29 -->
 
-**Purpose**: Create or register a global personal knowledge graph for cross-project lessons
+**Purpose**: Create or register a personal knowledge graph for cross-project lessons
 
 **When to use**:
 
-- After running `/kmgraph:init` and skipping the global KG offer
+- After running `/kmgraph:init` and skipping the personal KG offer
 - When you want a dedicated place for workflow lessons, cross-project gotchas, and personal ADRs that apply across all projects, not just the current one
 
 **What it does**:
 
 1. Creates `~/.claude/knowledge-graph/` with standard directory structure
-2. Registers it as `type: "global"` with name `"personal"` in `~/.claude/kg-config.json`
+2. Registers it as `type: "personal"` with name `"personal"` in `~/.claude/kg-config.json`
 3. Copies knowledge templates (patterns, gotchas, concepts)
 4. Builds FTS5 search index for the new KG
 5. Does **not** change the active KG — project KG remains active
@@ -285,14 +285,14 @@ After setup:
 
 **Example**:
 ```bash
-/kmgraph:init-global-kg
+/kmgraph:init-personal-kg
 
 # Claude creates ~/.claude/knowledge-graph/
-# Registers "personal" KG (type: global) in config
+# Registers "personal" KG (type: personal) in config
 # Active KG unchanged
 ```
 
-**Related**: See [Global vs Project-Local Knowledge](CONCEPTS.md#global-vs-project-local-knowledge) for when to use each.
+**Related**: See [Personal vs Project Knowledge](CONCEPTS.md#personal-vs-project-knowledge) for when to use each.
 
 ---
 
@@ -419,9 +419,9 @@ Dispatches to the recall agent, which searches:
 - Knowledge entries (patterns, gotchas, concepts)
 - Session summaries
 - MEMORY.md
-- **[NEW in v0.2.2-beta]** Global personal KG (if registered) — automatically included when a global KG exists
+- **[NEW in v0.2.2-beta]** Personal KG (if registered) — automatically included when a personal KG exists
 
-**Multi-KG behavior**: When a personal global KG is registered, `recall` searches both project and global KGs by default. Results include a source label (`[project]` or `[global]`) so origin is always clear.
+**Multi-KG behavior**: When a personal KG is registered, `recall` searches both project and personal KGs by default. Results include a source label (`[project]` or `[personal]`) so origin is always clear.
 
 **Time**: 1-2 seconds (single KG); 2-4 seconds (multi-KG with FTS5)
 
@@ -429,13 +429,13 @@ Dispatches to the recall agent, which searches:
 ```bash
 /kmgraph:recall "database timeout"
 /kmgraph:recall "auth patterns" --scope=all
-/kmgraph:recall "workflow patterns" --scope=global-only
+/kmgraph:recall "workflow patterns" --scope=personal-only
 
 # Multi-KG result format:
 # Lessons Learned (3 matches)
 # 1. Debugging PostgreSQL Connection Timeouts — [project: my-project]
 # 2. Connection Pool Best Practices — [project: my-project]
-# 3. Database Timeout Patterns — [global: personal]
+# 3. Database Timeout Patterns — [personal: personal]
 ```
 
 **`--scope` parameter** (v0.2.2-beta):
@@ -443,8 +443,8 @@ Dispatches to the recall agent, which searches:
 | Value | Behavior |
 |---|---|
 | `active` | Active KG only (original behavior) |
-| `all` | Active KG + all registered KGs (auto-default when global KG exists) |
-| `global-only` | Only KGs with `type: global` |
+| `all` | Active KG + all registered KGs (auto-default when personal KG exists) |
+| `personal-only` | Only KGs with `type: personal` |
 
 **Search tips**:
 

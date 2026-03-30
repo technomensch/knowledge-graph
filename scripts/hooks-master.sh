@@ -267,7 +267,7 @@ if command -v node &> /dev/null && [ -f "$CONFIG_PATH" ]; then
       try {
         const cfg = JSON.parse(require('fs').readFileSync('$CONFIG_PATH', 'utf8'));
         const globals = Object.entries(cfg.graphs || {})
-          .filter(([, g]) => g.type === 'global')
+          .filter(([, g]) => g.type === 'personal')
           .map(([name, g]) => ({ name, path: (g.path || '').replace(/^~/, process.env.HOME) }));
         if (globals.length > 0) process.stdout.write(JSON.stringify(globals));
       } catch(e) {}
@@ -305,7 +305,7 @@ if command -v node &> /dev/null && [ -f "$CONFIG_PATH" ]; then
                 if [ "$GLOBAL_COUNT" -gt 3 ]; then
                     echo "   … and $((GLOBAL_COUNT - 3)) more"
                 fi
-                echo -e "   Use ${BLUE}/kmgraph:recall \"query\" --scope=global-only${NC} to search personal KG"
+                echo -e "   Use ${BLUE}/kmgraph:recall \"query\" --scope=personal-only${NC} to search personal KG"
                 echo ""
             fi
         fi

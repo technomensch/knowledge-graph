@@ -86,8 +86,8 @@ enhancement_id: ENH-001
 **Depends on:** Phase 1, 2 completion
 
 **Tasks:**
-- [ ] Update `commands/init.md` — add global KG creation option
-- [ ] Create new command: `/kmgraph:init-global-kg`
+- [ ] Update `commands/init.md` — add personal KG creation option
+- [ ] Create new command: `/kmgraph:init-personal-kg`
 - [ ] Enhance `scripts/hooks-master.sh` — SessionStart to surface global lessons
 - [ ] Test TC-3.1 through TC-3.5
 - [ ] Commit with message: `feat(init): Global KG creation + SessionStart context awareness`
@@ -95,8 +95,8 @@ enhancement_id: ENH-001
 **Blockers:** Awaiting Phase 1, 2 completion
 
 **Notes:**
-- Init offers global KG creation (not silent)
-- SessionStart warns if global KG exists but no lessons found
+- Init offers personal KG creation (not silent)
+- SessionStart warns if personal KG exists but no lessons found
 - Link to `/kmgraph:recall` for exploration
 
 ---
@@ -113,12 +113,12 @@ enhancement_id: ENH-001
 - [ ] Execute all test cases (TC-1.1 through TC-4.3, TC-INT-1 through TC-INT-3)
 - [ ] Test on Gemini CLI, Claude Code, Cursor
 - [ ] Update documentation:
-  - [ ] `GETTING-STARTED.md` — global KG option mention
+  - [ ] `GETTING-STARTED.md` — personal KG option mention
   - [ ] `COMMAND-GUIDE.md` — new commands
   - [ ] `CONCEPTS.md` — "Global vs Project-Local" section
   - [ ] `CHANGELOG.md` — v0.2.2 entry with TL;DR
 - [ ] Verify no performance regression (< 5% overhead)
-- [ ] Commit with message: `docs: v0.2.2 global KG feature + test validation`
+- [ ] Commit with message: `docs: v0.2.2 personal KG feature + test validation`
 
 **Blockers:** Awaiting Phase 1, 2, 3 completion
 
@@ -144,31 +144,31 @@ enhancement_id: ENH-001
 
 **Status:** ⏳ Deferred
 
-**After v0.2.2 ships and global KG is live:**
+**After v0.2.2 ships and personal KG is live:**
 
 1. **Lesson 1: Create vs Update Pattern**
    - Run `/kmgraph:capture-lesson`
    - Topic: "Plan language — Create vs Update distinction"
    - Category: patterns
-   - Save to: global KG (reusable across projects)
+   - Save to: personal KG (reusable across projects)
 
 2. **ADR 1: Plan Language Convention**
    - Run `/kmgraph:create-adr`
    - Title: "Explicit Create/Update terminology in implementation plans"
    - Status: Accepted (established practice, v0.2.1-beta)
-   - Save to: global KG
+   - Save to: personal KG
 
 3. **Lesson 2: Feature Workflow Discovery**
    - Run `/kmgraph:capture-lesson`
    - Topic: "Feature discovery — add-to-plan vs start-issue-tracking"
    - Category: process
-   - Save to: global KG
+   - Save to: personal KG
 
 4. **ADR 2: Feature Workflow Decision**
    - Run `/kmgraph:create-adr`
    - Title: "Feature workflow discovery — amend active plan or create new issue"
    - Status: Accepted
-   - Save to: global KG
+   - Save to: personal KG
 
 **Reference:** `docs/sessions/2026-03/2026-03-27_v0.2.1-beta-plan-language-and-user-kg-discovery.md`
 
@@ -179,7 +179,7 @@ enhancement_id: ENH-001
 ### Design Decisions Made (2026-03-27)
 
 1. **Multi-KG search default behavior:**
-   - Query both project-local and global KGs automatically
+   - Query both project-local and personal KGs automatically
    - Return all results with source tags
    - Rationale: Users benefit from seeing all relevant knowledge without extra prompts
 
@@ -189,7 +189,7 @@ enhancement_id: ENH-001
    - Rationale: Forces user to think about knowledge scope, prevents accidental global saves
 
 3. **SessionStart enhancement:**
-   - Surface global KG context (lightweight check for relevant lessons)
+   - Surface personal KG context (lightweight check for relevant lessons)
    - Don't make it intrusive (1-2 line tip, not modal)
    - Rationale: Discovers knowledge passively without friction
 
@@ -202,10 +202,10 @@ enhancement_id: ENH-001
 
 | Risk | Mitigation | Status |
 |------|-----------|--------|
-| Accidental project-specific lesson in global KG | Default to project KG, warn on keywords | Documented in solution-approach |
+| Accidental project-specific lesson in personal KG | Default to project KG, warn on keywords | Documented in solution-approach |
 | Search performance regression | Query in parallel, monitor in tests | TC-1.4 covers this |
-| Users forget to create global KG | Explicit offer in init, SessionStart reminder | Documented in test cases |
-| Config conflicts (multiple global KGs) | Validate config schema, clear error messaging | Design detail to finalize in Phase 1 |
+| Users forget to create personal KG | Explicit offer in init, SessionStart reminder | Documented in test cases |
+| Config conflicts (multiple personal KGs) | Validate config schema, clear error messaging | Design detail to finalize in Phase 1 |
 
 ---
 
