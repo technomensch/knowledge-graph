@@ -260,4 +260,4 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 ---
 
 **Version**: 0.2.2-beta
-**Last Updated**: 2026-03-29
+**Last Updated**: 2026-03-30
