@@ -124,35 +124,35 @@ function searchKg(kgPath, kgName, kgType, query) {
 function sourceLabel(r) {
     if (!r.sourceKg)
         return "";
-    const typeTag = r.sourceKgType === "global" ? "global" : "project";
+    const typeTag = r.sourceKgType === "personal" ? "personal" : "project";
     return ` [${typeTag}: ${r.sourceKg}]`;
 }
 function registerSearchTool(server) {
     server.tool("kg_search", "Full-text search across knowledge graph files. By default searches the active KG only. " +
-        "Use searchScope='all' to include all registered KGs (project-local + global).", {
+        "Use searchScope='all' to include all registered KGs (project-local + personal).", {
         query: zod_1.z.string().describe("Search query (case-insensitive)"),
         format: zod_1.z
             .enum(["summary", "paths", "detailed"])
             .default("summary")
             .describe("Output format: summary (default), paths only, or detailed with context"),
         searchScope: zod_1.z
-            .enum(["active", "all", "global-only"])
+            .enum(["active", "all", "personal-only"])
             .default("active")
             .describe("Which KGs to search: active (default, active KG only), " +
-            "all (active KG + all registered global KGs), " +
-            "global-only (only KGs with type=global)"),
+            "all (active KG + all registered personal KGs), " +
+            "personal-only (only KGs with type=personal)"),
     }, async ({ query, format, searchScope }) => {
         const config = (0, utils_js_1.readConfig)();
         // Determine which KGs to query
         let kgsToSearch;
-        if (searchScope === "global-only") {
-            kgsToSearch = (0, utils_js_1.getAllGraphPaths)(config, ["global"]);
+        if (searchScope === "personal-only") {
+            kgsToSearch = (0, utils_js_1.getAllGraphPaths)(config, ["personal"]);
             if (kgsToSearch.length === 0) {
                 return {
                     content: [
                         {
                             type: "text",
-                            text: "No global KGs registered. Create one with /kmgraph:init-global-kg.",
+                            text: "No personal KGs registered. Create one with /kmgraph:init-personal-kg.",
                         },
                     ],
                 };
@@ -209,7 +209,7 @@ function registerSearchTool(server) {
         // Sort merged results: project-local before global (within same match quality)
         if (kgsToSearch.length > 1) {
             const typeOrder = { title: 0, heading: 1, body: 2 };
-            const kgOrder = (r) => r.sourceKgType === "global" ? 1 : 0;
+            const kgOrder = (r) => r.sourceKgType === "personal" ? 1 : 0;
             allResults.sort((a, b) => {
                 const kg = kgOrder(a) - kgOrder(b);
                 if (kg !== 0)

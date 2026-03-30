@@ -8,13 +8,13 @@ enhancement_id: ENH-001
 ## Phase 1: Multi-KG Search
 
 ### TC-1.1: Single KG Search (Backwards Compatibility)
-- **Setup:** Project-local KG only, no global KG
+- **Setup:** Project-local KG only, no personal KG
 - **Action:** `/kmgraph:recall "authentication pattern"`
 - **Expected:** Returns results from project KG only, no source tag needed
 - **Status:** ✓ Pass (existing behavior preserved)
 
 ### TC-1.2: Multi-KG Search with Global KG
-- **Setup:** Project KG + global KG both exist with overlapping content
+- **Setup:** Project KG + personal KG both exist with overlapping content
   - Project: "Login flow for our app"
   - Global: "OAuth2 authentication pattern"
 - **Action:** `/kmgraph:recall "authentication"`
@@ -25,13 +25,13 @@ enhancement_id: ENH-001
 - **Status:** ✓ Pass
 
 ### TC-1.3: Global-Only Match
-- **Setup:** Project KG empty, global KG has lesson: "MCP registration quirks"
+- **Setup:** Project KG empty, personal KG has lesson: "MCP registration quirks"
 - **Action:** `/kmgraph:recall "MCP registration"`
-- **Expected:** Returns global KG result with "(global)" tag
+- **Expected:** Returns personal KG result with "(global)" tag
 - **Status:** ✓ Pass
 
 ### TC-1.4: Performance — No Regression
-- **Setup:** Project KG (50 lessons), global KG (100 lessons)
+- **Setup:** Project KG (50 lessons), personal KG (100 lessons)
 - **Action:** Time 10 sequential search queries
 - **Expected:** Average search time < 150ms (allow 5% overhead vs single-KG)
 - **Status:** ✓ Pass
@@ -64,7 +64,7 @@ enhancement_id: ENH-001
 - **Action:** Run `/kmgraph:capture-lesson` for "AI assistant workflow patterns"
 - **Interactive:** User selects "(global) — reuse across projects"
 - **Expected:**
-  - Saves to global KG at `~/.claude/knowledge-graph/docs/knowledge/lessons-learned/`
+  - Saves to personal KG at `~/.claude/knowledge-graph/docs/knowledge/lessons-learned/`
   - Immediately searchable via `/kmgraph:recall` in any project
 - **Status:** ✓ Pass
 
@@ -79,14 +79,14 @@ enhancement_id: ENH-001
 
 ### TC-2.4: Recall Cross-Project
 - **Setup:**
-  - Project A: Capture lesson "Vue.js error handling" to global KG
+  - Project A: Capture lesson "Vue.js error handling" to personal KG
   - Project B: Fresh session, unrelated project
 - **Action:** `/kmgraph:recall "Vue error"`
 - **Expected:** Finds lesson saved in Project A, marked "(global)"
 - **Status:** ✓ Pass
 
 ### TC-2.5: Session Summary Surfaces Global KG
-- **Setup:** Session in project X, global KG has 3 lessons related to session activity
+- **Setup:** Session in project X, personal KG has 3 lessons related to session activity
 - **Action:** `/kmgraph:session-summary` near end of session
 - **Expected:**
   - Summary includes: "Found 3 lessons in personal KG that might be relevant: [list]"
@@ -102,30 +102,30 @@ enhancement_id: ENH-001
 - **Action:** Run init, answer "yes" to "Create global personal KG?"
 - **Expected:**
   - Creates `~/.claude/knowledge-graph/docs/` directory structure
-  - Registers in `~/.claude/kg-config.json` as "personal" with type "global"
+  - Registers in `~/.claude/kg-config.json` as "personal" with type "personal"
   - Both KGs now available in config
 - **Status:** ✓ Pass
 
 ### TC-3.2: Init Skips Global KG (User Declines)
-- **Setup:** Fresh project, user answers "no" to global KG
+- **Setup:** Fresh project, user answers "no" to personal KG
 - **Action:** Run init normally
 - **Expected:**
   - Project KG created only
-  - Offer shown: "Create later with `/kmgraph:init-global-kg`"
+  - Offer shown: "Create later with `/kmgraph:init-personal-kg`"
   - Config has only project KG
 - **Status:** ✓ Pass
 
-### TC-3.3: New Command — init-global-kg
-- **Setup:** User previously declined global KG, now wants it
-- **Action:** Run `/kmgraph:init-global-kg`
+### TC-3.3: New Command — init-personal-kg
+- **Setup:** User previously declined personal KG, now wants it
+- **Action:** Run `/kmgraph:init-personal-kg`
 - **Expected:**
-  - Creates global KG at `~/.claude/knowledge-graph/`
+  - Creates personal KG at `~/.claude/knowledge-graph/`
   - Registers in config
   - Brief success message
 - **Status:** ✓ Pass
 
 ### TC-3.4: SessionStart Surfaces Global Context
-- **Setup:** New session in project, global KG has 2 relevant lessons
+- **Setup:** New session in project, personal KG has 2 relevant lessons
 - **Action:** Session starts
 - **Expected:** Hook output includes:
   ```
@@ -138,13 +138,13 @@ enhancement_id: ENH-001
 - **Status:** ✓ Pass
 
 ### TC-3.5: SessionStart When No Global KG
-- **Setup:** Project-local only, no global KG
+- **Setup:** Project-local only, no personal KG
 - **Action:** Session starts
 - **Expected:**
   ```
   ✅ Knowledge Graph: knowledge-graph (project-local)
   ```
-  (No global KG mention; clean output)
+  (No personal KG mention; clean output)
 - **Status:** ✓ Pass
 
 ---
@@ -152,7 +152,7 @@ enhancement_id: ENH-001
 ## Phase 4: Cross-Platform Validation
 
 ### TC-4.1: Gemini CLI with Global KG
-- **Setup:** Gemini CLI, global KG at `~/.claude/knowledge-graph/`
+- **Setup:** Gemini CLI, personal KG at `~/.claude/knowledge-graph/`
 - **Action:** Capture lesson via `kg_capture`, search via `kg_search`
 - **Expected:** Both operations work without file system tools (MCP only)
 - **Status:** ✓ Pass
@@ -180,9 +180,9 @@ enhancement_id: ENH-001
 ## Integration Test Cases
 
 ### TC-INT-1: Full Workflow — Create Global, Capture, Recall Across Projects
-- **Setup:** Start with no global KG
+- **Setup:** Start with no personal KG
 - **Steps:**
-  1. Run `/kmgraph:init-global-kg` (create global)
+  1. Run `/kmgraph:init-personal-kg` (create global)
   2. In Project A: `/kmgraph:capture-lesson` → select "global" → save "Auth pattern"
   3. Switch to Project B
   4. Run `/kmgraph:recall "Auth"` → should find lesson from Project A
@@ -194,7 +194,7 @@ enhancement_id: ENH-001
 - **Steps:**
   1. Run `/kmgraph:init`
   2. Accept project KG creation
-  3. Answer "yes" to global KG offer
+  3. Answer "yes" to personal KG offer
   4. Complete init
 - **Expected:**
   - Both KGs configured
@@ -202,7 +202,7 @@ enhancement_id: ENH-001
 - **Status:** ✓ Pass
 
 ### TC-INT-3: SessionStart → Relevant Lessons → Recall Workflow
-- **Setup:** Session in project, global KG has 3 lessons
+- **Setup:** Session in project, personal KG has 3 lessons
 - **Steps:**
   1. Session starts → hook surfaces "Found 3 lessons"
   2. User notices relevant lesson

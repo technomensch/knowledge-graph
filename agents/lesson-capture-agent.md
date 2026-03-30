@@ -121,14 +121,14 @@ If ≥2 KGs:
 
 1. Identify available destinations:
    - Active/project KG: `graphs[active]` — name and path
-   - Global KGs: all entries with `type: "global"` — names and paths
+   - Personal KGs: all entries with `type: "personal"` — names and paths
 
 2. Present the picker:
 
    > "Where should this lesson be saved?
    >
    > 1. **[active KG name]** — project KG (this project only)
-   > 2. **[global KG name]** — personal KG (available across all projects)
+   > 2. **[personal KG name]** — personal KG (available across all projects)
    >
    > Choose 1 or 2:"
 

@@ -8,11 +8,11 @@ status: Proposed
 
 ## Design Overview
 
-User-level global KGs leverage the multi-KG config foundation from v0.2.1-beta. The architecture adds three capabilities:
+User-level personal KGs leverage the multi-KG config foundation from v0.2.1-beta. The architecture adds three capabilities:
 
-1. **Multi-KG search** — query both project-local and global KGs
+1. **Multi-KG search** — query both project-local and personal KGs
 2. **KG picker workflows** — allow users to choose save destination
-3. **SessionStart awareness** — surface global KG context at session start
+3. **SessionStart awareness** — surface personal KG context at session start
 
 ## Implementation Strategy
 
@@ -38,7 +38,7 @@ kg_search(query: string, options?: { kgs?: string[], activeKgOnly?: boolean }): 
 - `mcp-server/tests/search.test.ts` — test multi-KG queries
 
 **Design decision:**
-- If user has both project-local and global KGs: search both by default
+- If user has both project-local and personal KGs: search both by default
 - Results tagged with source: `{ result, source: "project" | "global" }`
 - No need to rebuild search index; query both FTS5 indexes and merge results
 - Ranking: project-local results first (more specific), then global (more general)
@@ -61,7 +61,7 @@ kg_search(query: string, options?: { kgs?: string[], activeKgOnly?: boolean }): 
    - Note: minimal change (just pass multi-KG option to existing search)
 
 3. **`agents/session-summary-agent.md`**
-   - When gathering context, check global KG for relevant lessons
+   - When gathering context, check personal KG for relevant lessons
    - Surface in summary: "Found X lessons in personal KG that might be relevant"
 
 **Changes to commands:**
@@ -70,26 +70,26 @@ kg_search(query: string, options?: { kgs?: string[], activeKgOnly?: boolean }): 
 
 ### Phase 3: Init & SessionStart Enhancements
 
-**Goal:** Make global KG setup seamless during first use.
+**Goal:** Make personal KG setup seamless during first use.
 
 **Init changes (`commands/init.md`):**
 1. After creating project-local KG, ask: "Want to create a global personal KG for cross-project lessons?"
 2. If yes: create `~/.claude/knowledge-graph/` with standard directory structure
-3. Register in `~/.claude/kg-config.json` as `{ "type": "global", "path": "~/.claude/knowledge-graph" }`
-4. Run FTS5 rebuild for the new global KG immediately after creation (same as project KG init flow)
-5. If no: offer `/kmgraph:init-global-kg` command for later setup
+3. Register in `~/.claude/kg-config.json` as `{ "type": "personal", "path": "~/.claude/knowledge-graph" }`
+4. Run FTS5 rebuild for the new personal KG immediately after creation (same as project KG init flow)
+5. If no: offer `/kmgraph:init-personal-kg` command for later setup
 
 **Config migration (v0.2.1 users):**
-v0.2.1-beta users may have `kg-config.json` entries without a `type` field (only `path` was required before v0.2.2). During init verify/upgrade, check each registered graph for missing `type` and default to `"project-local"` if absent. Warn the user: "Graph 'X' has no type field — defaulting to project-local. Run `/kmgraph:init-global-kg` if this should be a global KG."
+v0.2.1-beta users may have `kg-config.json` entries without a `type` field (only `path` was required before v0.2.2). During init verify/upgrade, check each registered graph for missing `type` and default to `"project-local"` if absent. Warn the user: "Graph 'X' has no type field — defaulting to project-local. Run `/kmgraph:init-personal-kg` if this should be a personal KG."
 
-**New command:** `/kmgraph:init-global-kg`
-- Creates global KG at user-defined path (default: `~/.claude/knowledge-graph/`)
+**New command:** `/kmgraph:init-personal-kg`
+- Creates personal KG at user-defined path (default: `~/.claude/knowledge-graph/`)
 - Registers in config
 - Brief setup guide
 
 **SessionStart hook enhancement (`scripts/hooks-master.sh`):**
-1. Check if both project-local and global KGs exist
-2. If global KG exists: run lightweight search for lessons matching recent activity
+1. Check if both project-local and personal KGs exist
+2. If personal KG exists: run lightweight search for lessons matching recent activity
 3. Surface: "Found 2 lessons in personal KG: [list]"
 4. Link to `/kmgraph:recall` for exploration
 
@@ -97,19 +97,19 @@ v0.2.1-beta users may have `kg-config.json` entries without a `type` field (only
 
 **Testing:**
 - Unit tests: multi-KG search with overlapping content
-- Integration tests: capture to global KG, recall in different project
-- End-to-end: init with global KG creation → capture lesson → recall in new project
+- Integration tests: capture to personal KG, recall in different project
+- End-to-end: init with personal KG creation → capture lesson → recall in new project
 - Platform tests: Gemini CLI, Cursor, Claude Code
 
 **Documentation updates:**
-- `GETTING-STARTED.md` — mention global KG option during init
-- `COMMAND-GUIDE.md` — document new `/kmgraph:init-global-kg` command
+- `GETTING-STARTED.md` — mention personal KG option during init
+- `COMMAND-GUIDE.md` — document new `/kmgraph:init-personal-kg` command
 - `CONCEPTS.md` — add section on "Global vs Project-Local Knowledge"
-- `CHANGELOG.md` — v0.2.2 entry with global KG feature
+- `CHANGELOG.md` — v0.2.2 entry with personal KG feature
 
 ## Risk Mitigation
 
-**Risk:** User accidentally saves project-specific lesson to global KG
+**Risk:** User accidentally saves project-specific lesson to personal KG
 
 **Mitigation:**
 - Default KG choice: project-local (safer)
@@ -123,7 +123,7 @@ v0.2.1-beta users may have `kg-config.json` entries without a `type` field (only
 - Cache merged results briefly
 - Monitor query time in tests; fail if regression > 10%
 
-**Risk:** Users forget to create global KG and miss benefit
+**Risk:** Users forget to create personal KG and miss benefit
 
 **Mitigation:**
 - Explicit offer during init (not silent)
@@ -141,13 +141,13 @@ v0.2.1-beta users may have `kg-config.json` entries without a `type` field (only
 }
 ```
 
-**v0.2.2 (with global KG):**
+**v0.2.2 (with personal KG):**
 ```json
 {
   "active": "knowledge-graph",
   "graphs": {
     "knowledge-graph": { "type": "project-local", "path": "/path/to/project/docs" },
-    "personal": { "type": "global", "path": "~/.claude/knowledge-graph" }
+    "personal": { "type": "personal", "path": "~/.claude/knowledge-graph" }
   }
 }
 ```
@@ -155,7 +155,7 @@ v0.2.1-beta users may have `kg-config.json` entries without a `type` field (only
 **Per-project selection of active KG:**
 ```bash
 # User can switch active KG per project
-/kmgraph:switch personal  # use global KG as active
+/kmgraph:switch personal  # use personal KG as active
 /kmgraph:switch knowledge-graph  # switch back to project KG
 ```
 
@@ -168,11 +168,11 @@ v0.2.1-beta users may have `kg-config.json` entries without a `type` field (only
 | `mcp-server/tests/search.test.ts` | Add multi-KG test cases | 1 |
 | `agents/lesson-capture-agent.md` | Add KG picker workflow | 2 |
 | `agents/recall-agent.md` | Update to use multi-KG search | 2 |
-| `agents/session-summary-agent.md` | Check global KG for context | 2 |
-| `commands/init.md` | Add global KG creation option | 3 |
-| `commands/init-global-kg.md` | New command for standalone global KG setup | 3 |
+| `agents/session-summary-agent.md` | Check personal KG for context | 2 |
+| `commands/init.md` | Add personal KG creation option | 3 |
+| `commands/init-personal-kg.md` | New command for standalone personal KG setup | 3 |
 | `scripts/hooks-master.sh` | Enhance SessionStart to surface global lessons | 3 |
-| `GETTING-STARTED.md` | Mention global KG option | 4 |
+| `GETTING-STARTED.md` | Mention personal KG option | 4 |
 | `COMMAND-GUIDE.md` | Document new commands | 4 |
 | `CONCEPTS.md` | Add "Global vs Project-Local" section | 4 |
 | `CHANGELOG.md` | v0.2.2 entry | 4 |
@@ -185,10 +185,10 @@ v0.2.1-beta users may have `kg-config.json` entries without a `type` field (only
 
 ## Success Criteria
 
-- [ ] User can create global KG during init
+- [ ] User can create personal KG during init
 - [ ] `/kmgraph:recall` searches both KGs, results show source
 - [ ] `/kmgraph:capture-lesson` allows choosing target KG
-- [ ] SessionStart surfaces global KG context
+- [ ] SessionStart surfaces personal KG context
 - [ ] No performance regression in search (< 5% overhead)
 - [ ] Works on Gemini CLI, Claude Code, Cursor
 - [ ] Documentation complete

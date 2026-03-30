@@ -7,7 +7,7 @@ export interface CategoryConfig {
 export interface GraphConfig {
     name: string;
     path: string;
-    type: "project-local" | "global" | "cowork" | "custom";
+    type: "project-local" | "personal" | "cowork" | "custom";
     categories: CategoryConfig[];
     createdAt: string;
     lastUsed: string;

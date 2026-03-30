@@ -20,7 +20,7 @@ If the config file does not exist or no active graph is set:
 
 Stop here.
 
-Also check for registered global KGs: scan `graphs` for any entry with `type: "global"`. Store `{has_global_kg} = true/false` and the list of global KG names. This determines the search scope in Step 3.
+Also check for registered personal KGs: scan `graphs` for any entry with `type: "personal"`. Store `{has_personal_kg} = true/false` and the list of personal KG names. This determines the search scope in Step 3.
 
 ---
 
@@ -34,8 +34,8 @@ Extract from the input passed to this agent:
 - **`--format`** — output style (default: `summary`)
   - Valid values: `summary` | `detailed` | `paths`
 - **`--scope`** — which KGs to search (default: auto-detected from config)
-  - Valid values: `active` (active KG only) | `all` (active + global KGs) | `global-only`
-  - When absent: auto-detect (use `all` if global KGs registered, `active` otherwise)
+  - Valid values: `active` (active KG only) | `all` (active + personal KGs) | `personal-only`
+  - When absent: auto-detect (use `all` if personal KGs registered, `active` otherwise)
 
 Example parse:
 ```
@@ -72,11 +72,11 @@ Use the `kg_search` MCP tool to search across the resolved directories. Search t
 - YAML frontmatter fields and metadata tags
 
 **Search scope:**
-- If `{has_global_kg}` is true (global KGs registered): pass `searchScope: "all"` to `kg_search`
-- If `{has_global_kg}` is false: pass `searchScope: "active"` (default, no change)
-- The user can override with `--scope=active|all|global-only` flag (parse in Step 1)
+- If `{has_personal_kg}` is true (personal KGs registered): pass `searchScope: "all"` to `kg_search`
+- If `{has_personal_kg}` is false: pass `searchScope: "active"` (default, no change)
+- The user can override with `--scope=active|all|personal-only` flag (parse in Step 1)
 
-Results from multi-KG search include `[project: name]` or `[global: name]` source labels — pass these through to the formatted output so the user knows which KG a result came from.
+Results from multi-KG search include `[project: name]` or `[personal: name]` source labels — pass these through to the formatted output so the user knows which KG a result came from.
 
 **Multi-keyword handling:** Search for each keyword independently and rank files that match more keywords higher.
 
@@ -116,7 +116,7 @@ Respond conversationally. Group results by type. For each result include: title,
 
 **Lessons Learned** (N found)
 1. Title — [1–2 sentence summary]
-   Path: {kg_path}/lessons-learned/...    ← include KG source label if multi-KG: [project: name] or [global: name]
+   Path: {kg_path}/lessons-learned/...    ← include KG source label if multi-KG: [project: name] or [personal: name]
 
 **Architecture Decisions** (N found)
 1. Title (Status: Accepted) — [1–2 sentence summary]
@@ -136,7 +136,7 @@ Related topics I noticed in these files: [extracted cross-references]
 
 When results span multiple KGs, add a note at the bottom:
 
-> Results from 2 KGs: **knowledge-graph** (project) and **personal** (global). To search only one, use `--scope=active` or `--scope=global-only`.
+> Results from 2 KGs: **knowledge-graph** (project) and **personal** (personal). To search only one, use `--scope=active` or `--scope=personal-only`.
 
 ### Format: `paths`
 

@@ -335,15 +335,15 @@ Both approaches produce identical results. Background processing is optional and
 
 ---
 
-## Global vs Project-Local Knowledge
+## Personal vs Project Knowledge
 
 <!-- Updated: 2026-03-29 -->
 
-Every knowledge graph belongs to one of two scopes: **project-local** or **global**.
+Every knowledge graph belongs to one of two scopes: **project** or **personal**.
 
-### Project-Local KG
+### Project KG
 
-A project-local KG lives inside a project's directory (typically `./docs/`). It contains knowledge specific to that project:
+A project KG lives inside a project's directory (typically `./docs/`). It contains knowledge specific to that project:
 
 - Bug fixes and workarounds found in this codebase
 - Architecture decisions for this system
@@ -351,9 +351,9 @@ A project-local KG lives inside a project's directory (typically `./docs/`). It 
 
 **Best for**: Anything that only makes sense in the context of one project.
 
-### Global (Personal) KG
+### Personal KG
 
-A global KG lives at `~/.claude/knowledge-graph/` and is accessible from any project. It contains cross-project patterns and lessons:
+A personal KG lives at `~/.claude/knowledge-graph/` and is accessible from any project. It contains cross-project patterns and lessons:
 
 - Workflow habits ("Create vs Update in implementation plans")
 - Tool quirks that appear across projects (MCP registration, IDE setup)
@@ -366,27 +366,27 @@ A global KG lives at `~/.claude/knowledge-graph/` and is accessible from any pro
 
 | Behavior | Detail |
 |---|---|
-| **`/kmgraph:recall`** | Searches both KGs automatically when a global KG is registered. Results show `[project]` or `[global]` source labels. |
+| **`/kmgraph:recall`** | Searches both KGs automatically when a personal KG is registered. Results show `[project]` or `[personal]` source labels. |
 | **`/kmgraph:capture-lesson`** | Shows a KG picker when ≥2 KGs are registered. Only one prompt per session (choice remembered). |
-| **SessionStart hook** | Surfaces recent global KG lessons alongside project lessons. |
-| **Active KG** | Unchanged by global KG setup — project KG stays active for new captures by default. |
+| **SessionStart hook** | Surfaces recent personal KG lessons alongside project lessons. |
+| **Active KG** | Unchanged by personal KG setup — project KG stays active for new captures by default. |
 
-### When to Use Global vs Local
+### When to Use Personal vs Project
 
 | Situation | Save to |
 |---|---|
 | "I fixed a bug specific to this repo" | Project KG |
-| "I learned a general debugging pattern" | Global KG |
+| "I learned a general debugging pattern" | Personal KG |
 | "We decided to use Redis for this project" | Project KG |
-| "I always prefer feature flags over config files" | Global KG |
-| "This MCP registration quirk affects all IDEs" | Global KG |
+| "I always prefer feature flags over config files" | Personal KG |
+| "This MCP registration quirk affects all IDEs" | Personal KG |
 
 ### Setup
 
-- **During init**: `/kmgraph:init` offers to create a global KG at the end of setup
-- **Standalone**: `/kmgraph:init-global-kg` creates and registers the global KG at any time
+- **During init**: `/kmgraph:init` offers to create a personal KG at the end of setup
+- **Standalone**: `/kmgraph:init-personal-kg` creates and registers the personal KG at any time
 
-See [COMMAND-GUIDE.md § init-global-kg](COMMAND-GUIDE.md#-kgsisinitglobalkg-commands-tab) for setup details.
+See [COMMAND-GUIDE.md § init-personal-kg](COMMAND-GUIDE.md#-kmgraphinit-personal-kg) for setup details.
 
 ---
 

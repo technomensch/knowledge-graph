@@ -18,9 +18,9 @@ Currently, KMGraph knowledge graphs are project-local by default. Users must cap
 ## Goals
 
 1. **Persistent cross-project knowledge** — capture a lesson once, access across all projects
-2. **Clear separation of concerns** — project-specific knowledge (project KG) vs. personal/cross-project patterns (global KG)
-3. **Seamless recall** — `/kmgraph:recall` searches both local and global KGs automatically
-4. **No friction setup** — init process offers to create global KG alongside project KGs
+2. **Clear separation of concerns** — project-specific knowledge (project KG) vs. personal/cross-project patterns (personal KG)
+3. **Seamless recall** — `/kmgraph:recall` searches both local and personal KGs automatically
+4. **No friction setup** — init process offers to create personal KG alongside project KGs
 5. **Platform agnostic** — works with user-level plugin installation (not just project-scoped)
 
 ## Use Cases
@@ -35,10 +35,10 @@ Currently, KMGraph knowledge graphs are project-local by default. Users must cap
 
 ### Functional
 
-- [ ] Users can create a global KG at `~/.claude/knowledge-graph/` during init or via `/kmgraph:init-global-kg`
-- [ ] `/kmgraph:recall "query"` searches both project-local and global KGs
+- [ ] Users can create a personal KG at `~/.claude/knowledge-graph/` during init or via `/kmgraph:init-personal-kg`
+- [ ] `/kmgraph:recall "query"` searches both project-local and personal KGs
 - [ ] Search results distinguish source: "(project)" vs "(global)"
-- [ ] `/kmgraph:capture-lesson` offers to save to project KG or global KG
+- [ ] `/kmgraph:capture-lesson` offers to save to project KG or personal KG
 - [ ] SessionStart hook checks both KGs for relevant context when session begins
 - [ ] Multi-KG `kg_search` MCP tool (or index merging) supports querying both KG indexes
 - [ ] FTS5 search works across both KGs with ranking/relevance
@@ -52,17 +52,17 @@ Currently, KMGraph knowledge graphs are project-local by default. Users must cap
 
 ### Configuration
 
-- [ ] `~/.claude/kg-config.json` can register global KG:
+- [ ] `~/.claude/kg-config.json` can register personal KG:
   ```json
   {
     "active": "knowledge-graph",
     "graphs": {
       "knowledge-graph": { "type": "project-local", "path": "/path/to/project/docs" },
-      "personal": { "type": "global", "path": "~/.claude/knowledge-graph" }
+      "personal": { "type": "personal", "path": "~/.claude/knowledge-graph" }
     }
   }
   ```
-- [ ] `init` process detects if global KG already exists; offers to reuse or create new
+- [ ] `init` process detects if personal KG already exists; offers to reuse or create new
 
 ## Architecture Changes
 
@@ -73,7 +73,7 @@ Currently, KMGraph knowledge graphs are project-local by default. Users must cap
 
 **Proposed (v0.2.2):**
 - `kg_search` accepts optional `kgs: ["local", "global"]` parameter
-- Default: search active KG + all registered global KGs
+- Default: search active KG + all registered personal KGs
 - Results tagged with source KG for clarity
 
 ### SessionStart Enhancement
@@ -83,7 +83,7 @@ Currently, KMGraph knowledge graphs are project-local by default. Users must cap
 - Suggests `/kmgraph:switch`
 
 **Proposed (v0.2.2):**
-- Additionally check for relevant lessons in global KG at session start
+- Additionally check for relevant lessons in personal KG at session start
 - Surface in hook output: "Found 3 relevant lessons in your personal KG"
 - Link to `/kmgraph:recall` for user to explore
 
@@ -105,7 +105,7 @@ Currently, KMGraph knowledge graphs are project-local by default. Users must cap
 **Proposed (v0.2.2):**
 - After project KG setup, ask: "Want to create a global personal KG for cross-project lessons?"
 - If yes: create at `~/.claude/knowledge-graph/` and register in config
-- If no: can create later with `/kmgraph:init-global-kg`
+- If no: can create later with `/kmgraph:init-personal-kg`
 
 ## Related Knowledge Artifacts
 
@@ -114,32 +114,32 @@ After v0.2.2 ships, two lessons and ADRs must be captured:
 1. **Lesson:** "Plan language — Create vs Update distinction" (discovered 2026-03-27)
    - Problem: ambiguous "Update" language wastes context tokens
    - Solution: explicit "Create" for new files, "Update" for existing
-   - To be saved to global KG for cross-project reference
+   - To be saved to personal KG for cross-project reference
 
 2. **Lesson:** "Feature workflow discovery — add-to-plan vs start-issue-tracking" (discovered 2026-03-27)
    - Problem: unclear when new features belong in existing plans vs separate issues
    - Solution: two-tier approach based on active-plan context
-   - To be saved to global KG for workflow reference
+   - To be saved to personal KG for workflow reference
 
 See: `docs/sessions/2026-03/2026-03-27_v0.2.1-beta-plan-language-and-user-kg-discovery.md`
 
 ## Out of Scope (v0.2.3+)
 
-- UI dashboard for global KG management
-- Web interface for remote global KG sync
-- Team-shared global KGs (currently user-scoped only)
-- Encryption for sensitive lessons in global KG
+- UI dashboard for personal KG management
+- Web interface for remote personal KG sync
+- Team-shared personal KGs (currently user-scoped only)
+- Encryption for sensitive lessons in personal KG
 - Auto-cleanup of stale lessons
 
 ## Acceptance Criteria
 
 - [ ] Global KG can be created at `~/.claude/knowledge-graph/`
-- [ ] `kg_search` queries both project-local and global KGs
+- [ ] `kg_search` queries both project-local and personal KGs
 - [ ] Search results clearly indicate source (project vs global)
 - [ ] `/kmgraph:capture-lesson` allows choosing target KG
-- [ ] SessionStart surfaces relevant global KG lessons
+- [ ] SessionStart surfaces relevant personal KG lessons
 - [ ] No regression in single-KG workflows
-- [ ] Init process offers global KG creation
+- [ ] Init process offers personal KG creation
 - [ ] Works on all supported platforms
 - [ ] FTS5 indexes both KGs correctly
 - [ ] Documentation updated (COMMAND-GUIDE, GETTING-STARTED, CONCEPTS)
