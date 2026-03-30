@@ -12,3 +12,17 @@ title: "ENH-004 Progress Log"
 - Added to `docs/plans/v0.2.2-beta.md`
 - Branch: `v0.2.2-beta`
 - Status: 🔴 PROPOSED — awaiting implementation approval
+
+## 2026-03-30 — Implemented
+- Added Step 0b to `agents/session-summary-agent.md`: Python-based context-mode DB detection
+  - Scans `~/.claude/context-mode/sessions/*.db` for current project's session ID
+  - Full graceful fallback: no errors or UI changes when context-mode absent
+- Modified Step 2: supplemental event query when context-mode present
+  - Surfaces uncommitted files, agent invocations, low-commit session activity
+  - Git history remains authoritative; event data fills gaps
+- Added Step 8b: sparse summary hint
+  - Fires only when summary is thin AND context-mode is absent
+  - Suppressed when context-mode already installed
+- Added Optional Features section to `docs/GETTING-STARTED.md` (Richer Session Summaries)
+  - Copied from ENH-004 spec's "User Notification" section as specified
+- Status: ✅ IMPLEMENTED

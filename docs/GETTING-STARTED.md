@@ -164,6 +164,16 @@ When context-mode is installed, file reading is offloaded to a background proces
 
 ---
 
+### Richer Session Summaries (Optional)
+
+Session summaries are built by looking backwards — reading recent git commits, checking open plans, scanning for lesson-worthy work. This works well when a session has clear git activity.
+
+If context-mode is also installed, session summaries can read a live event log instead. Context-mode tracks everything as it happens — every file edited, every command run, every agent spawned. This catches sessions that were mostly conversation, investigation, or planning with few commits. Those sessions currently produce thin summaries; with context-mode they produce complete ones.
+
+Context-mode is not required. Without it, session summaries work exactly as they do today.
+
+---
+
 ### Faster Search (Optional)
 
 By default, kmgraph searches by reading every file in the knowledge graph. For larger knowledge graphs, building a search index makes results faster and ranks them by relevance. The index is local-only and is not included in version control, so it does not survive a fresh install or upgrade.
@@ -471,6 +481,7 @@ Skills activate automatically based on what you're doing. They provide guidance 
 | **kg-recall** | "have we done this before", past decisions, history questions | `/kmgraph:recall` with extracted search terms |
 | **session-wrap** | Session ending, context limit (180K+), major milestone | `/kmgraph:session-summary` before compaction |
 | **adr-guide** | "I'm thinking of using...", architecture decisions | `/kmgraph:create-adr` with decision guidance |
+| **doc-update-router** | "update [doc name]", "update the session summary", "update the changelog" | Routes to correct update command, bypassing direct file edits |
 | **gov-execute-plan** | "execute plan", implementation start, `docs/plans/*.md` mentioned | Zero-deviation 8-step execution protocol |
 
 You don't invoke skills directly — they appear as helpful context when relevant.
