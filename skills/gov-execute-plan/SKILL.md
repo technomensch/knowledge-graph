@@ -15,10 +15,12 @@ When triggered, surface the STRICT EXECUTION MODE banner and enforce the 8-step 
 ```
 ═══════════════════════════════════════════════════════════════
 STRICT EXECUTION MODE
-Allowed Tools: Read, Edit, Write, Bash (verification only)
+Allowed Tools: File read, file edit, file write, shell (verification only)
 Forbidden: Improvements, assumptions, gap-filling, unauthorized fixes
 ═══════════════════════════════════════════════════════════════
 ```
+
+**ECC Compatibility Note:** The banner above uses generic tool categories (file read/edit/write, shell) to maintain portability across ECC platforms. On Claude Code, these map to Read, Edit, Write, and Bash tools. On other platforms, the underlying MCP or native tool implementations are used automatically. The constraint semantics remain identical: no authorization changes outside the plan.
 
 **Protocol Steps:**
 1. **State Initialization** — Output STRICT EXECUTION MODE banner before any action
