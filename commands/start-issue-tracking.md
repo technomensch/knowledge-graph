@@ -78,6 +78,16 @@ Use `/kmgraph:start-issue-tracking` when:
 2. **behavior_lock:** Explicitly state: *"Establishing safety locks. I will capture your recent proposal into documentation and stop cold before implementation."*
 3. **stop_on_error:** Confirm that you will stop after every documentation step to show its work and will NOT proceed to implementation without explicit approval.
 
+4. **Snapshot gate:** After behavior lock, ask:
+
+   > "Before documenting this issue — want to snapshot the session first?
+   > This preserves context about what you were working on when you found this.
+   >
+   > [y] Snapshot first   [n] Skip"
+
+   If `y`: invoke `session-summary-agent --snapshot`. When done, continue.
+   If `n`: proceed to Step 1.
+
 ---
 
 ## Step 1: Verification & Versioning Gate (INTERACTIVE)

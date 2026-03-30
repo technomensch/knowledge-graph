@@ -23,6 +23,14 @@ fi
 
 # Clean up stale flag files older than 1 day
 find /tmp -name ".kg-session-summarized-*" -mtime +1 -delete 2>/dev/null
+find /tmp -name ".kg-snapshot-*" -mtime +1 -delete 2>/dev/null
+
+# Check if a snapshot was taken today (set by session-summary-agent --snapshot)
+SNAPSHOT_FLAG="/tmp/.kg-snapshot-$(date +%Y-%m-%d)"
+SNAPSHOT_TODAY=false
+if [ -f "$SNAPSHOT_FLAG" ]; then
+    SNAPSHOT_TODAY=true
+fi
 
 # ─────────────────────────────────────────────────────────────
 # Config check — require active KG
@@ -140,10 +148,18 @@ if [ "$HAS_ITEMS" = true ]; then
     [ -n "$DRAFT_ADR_MSG" ] && echo -e "${YELLOW}$DRAFT_ADR_MSG${NC}"
     [ -n "$LESSON_MSG" ] && echo -e "${YELLOW}$LESSON_MSG${NC}"
     echo ""
-    echo "Run /kmgraph:session-summary to document this session."
+    if [ "$SNAPSHOT_TODAY" = true ]; then
+        echo "You have a session snapshot from today — run /kmgraph:session-summary to complete the wrap-up."
+    else
+        echo "Run /kmgraph:session-summary to document this session."
+    fi
     echo ""
 else
-    echo -e "${GREEN}✅ Good stopping point. /kmgraph:session-summary if you'd like a summary.${NC}"
+    if [ "$SNAPSHOT_TODAY" = true ]; then
+        echo -e "${GREEN}✅ Session snapshot taken. Run /kmgraph:session-summary to finalize the wrap-up.${NC}"
+    else
+        echo -e "${GREEN}✅ Good stopping point. /kmgraph:session-summary if you'd like a summary.${NC}"
+    fi
 fi
 
 # Create session flag to avoid double-prompting
