@@ -10,3 +10,10 @@ title: "ENH-003 Progress Log"
 - Added to `docs/plans/v0.2.2-beta.md`
 - Branch: `v0.2.2-beta`
 - Status: 🔴 PROPOSED — awaiting implementation approval
+
+## 2026-03-30 — Implemented
+- Created `skills/doc-update-router/SKILL.md`
+- Routing table: session summary → `/kmgraph:session-summary`; changelog → update-doc; ADR → create-adr; resolved filename → update-doc; ambiguous → disambiguation prompt
+- Explicit non-trigger list to prevent false positives on code/test update requests
+- Conflict resolution rule with `session-wrap` documented
+- Status: ✅ IMPLEMENTED

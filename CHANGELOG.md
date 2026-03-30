@@ -35,6 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Snapshot gate added to `capture-lesson`, `create-adr`, and `start-issue-tracking`
   - `session-end-prompt.sh` detects `/tmp/.kg-snapshot-{date}` flag; adjusts wrap-up prompt
   - `session-wrap` skill is snapshot-aware: adjusts trigger language when snapshot already taken
+- **ENH-003: doc-update-router skill** — New `skills/doc-update-router/SKILL.md` intercepts explicit doc-update requests ("update GETTING-STARTED.md", "update the session summary") and routes to the correct command (`/kmgraph:update-doc --user-facing`, `/kmgraph:session-summary`, `/kmgraph:create-adr`). Prevents doc edits from bypassing the update-doc wizard and standards validation. Includes explicit non-trigger list and conflict resolution with `session-wrap`.
+- **ENH-004: Richer session summaries with context-mode** — `session-summary-agent` optionally reads context-mode's SQLite event database when present. Surfaces uncommitted files, agent invocations, and low-commit session activity that git history misses. Graceful fallback to existing git-archaeology when context-mode is absent — no degradation, no errors. Sparse summary hint fires when summary is thin and context-mode is not installed.
 
 ### Changed
 - **Terminology**: KG type renamed from `"global"` → `"personal"` throughout. `searchScope: "global-only"` → `"personal-only"`. Source labels: `[global]` → `[personal]`.

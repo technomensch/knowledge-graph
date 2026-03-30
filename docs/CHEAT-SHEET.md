@@ -83,6 +83,7 @@ Skills activate automatically based on conversation context. No invocation neede
 | `kg-recall` | History question, "have we solved this?", past decision | `/kmgraph:recall` with extracted search terms |
 | `session-wrap` | Context approaching limit, major milestone, session end | `/kmgraph:session-summary` before compaction |
 | `adr-guide` | Architecture decision discussed, "I'm thinking of using..." | `/kmgraph:create-adr` with decision guidance |
+| `doc-update-router` | "update [doc name]", "update the session summary", "update the changelog" | Routes to `/kmgraph:update-doc --user-facing`, `/kmgraph:session-summary`, or `/kmgraph:create-adr` |
 | `gov-execute-plan` | "execute plan", implementation start, `docs/plans/*.md` mentioned | Zero-deviation 8-step execution protocol |
 
 ---

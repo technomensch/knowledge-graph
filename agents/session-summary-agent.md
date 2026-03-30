@@ -146,6 +146,49 @@ Set flag file: `touch /tmp/.kg-snapshot-$(date +%Y-%m-%d)` so hooks can detect a
 
 ---
 
+## Step 0b: Context-Mode Detection (Optional Enrichment)
+
+*This step is optional and has no effect on fallback behavior if context-mode is absent.*
+
+Check for context-mode's session event DB for the current project:
+
+```python
+import sqlite3, os, glob, json
+
+cwd = os.getcwd()
+db_files = glob.glob(os.path.expanduser('~/.claude/context-mode/sessions/*.db'))
+
+ctxmode_db = None
+ctxmode_session_id = None
+
+for db_path in sorted(db_files):
+    try:
+        conn = sqlite3.connect(db_path)
+        row = conn.execute(
+            "SELECT session_id FROM session_meta WHERE project_dir = ? ORDER BY last_event_at DESC LIMIT 1",
+            (cwd,)
+        ).fetchone()
+        if row:
+            ctxmode_session_id = row[0]
+            ctxmode_db = db_path
+            conn.close()
+            break
+        conn.close()
+    except Exception:
+        pass
+
+ctxmode_available = ctxmode_db is not None
+```
+
+**If `ctxmode_available` is true:**
+- Store `{ctxmode_db}` and `{ctxmode_session_id}` for use in Step 2
+- Note: context-mode data supplements git history — it does not replace it
+
+**If `ctxmode_available` is false:**
+- Proceed normally — no degradation, no error messages to the user
+
+---
+
 ## Step 1: Active KG / CWD Guard
 
 Read `~/.claude/kg-config.json`. Extract `active` key and resolve the active graph's `path`.
@@ -167,7 +210,27 @@ git log --oneline -10 2>/dev/null
 git diff --stat HEAD~5..HEAD 2>/dev/null
 ```
 
-From the commit messages, infer session type using this classification:
+**If `{ctxmode_available}` is true:** supplement git history with context-mode event data.
+
+Query session events for files edited, agent invocations, and activity that may not appear in git:
+
+```python
+conn = sqlite3.connect(ctxmode_db)
+events = conn.execute(
+    "SELECT type, category, data, created_at FROM session_events WHERE session_id = ? ORDER BY created_at",
+    (ctxmode_session_id,)
+).fetchall()
+conn.close()
+```
+
+Use event data to surface:
+- Files edited but not yet committed (fills gap when sessions have few commits)
+- Agent invocations and their outcomes (planning sessions, investigative sessions)
+- Tool activity patterns (e.g., heavy read-only exploration vs active writes)
+
+Merge with git log: git history is authoritative for committed work; event data fills uncommitted activity.
+
+From the commit messages and event data, infer session type using this classification:
 
 | Pattern | Type | Example |
 |---------|------|---------|
@@ -247,7 +310,7 @@ Compose a summary with these sections:
 
 ## What Was Built / Fixed / Learned
 
-[3-5 bullet points from recent commits and conversation context]
+[3-5 bullet points from recent commits, conversation context, and context-mode events (if available)]
 
 ## Open Items
 
@@ -343,6 +406,25 @@ If `kg_capture` fails because the MCP server is not registered, not found, or no
    - Follow existing file naming conventions (e.g., `YYYY-MM-DD-session-type.md`).
    - Tell the user: "Saved to the file system. Search won't be ranked until the index is connected."
 5. **Never lose the session summary** — the user's content is preserved regardless of MCP status.
+
+---
+
+## Step 8b: Sparse Summary Hint (Optional)
+
+After generating the summary, check if it is sparse. A summary is sparse if ALL of the following are true:
+- Fewer than 3 commits found in session scope
+- Fewer than 2 plan items / lessons / ADRs identified
+- Summary body is under 200 words
+
+**If sparse AND `{ctxmode_available}` is false:**
+
+Append this one-time tip to the end of the saved summary:
+
+> *Tip: Install context-mode to improve summaries for sessions like this one — see GETTING-STARTED.md § Optional Features*
+
+**If sparse AND `{ctxmode_available}` is true:** Do not show the tip — the user already has context-mode installed.
+
+**If not sparse:** Do not show the tip regardless.
 
 ---
 
