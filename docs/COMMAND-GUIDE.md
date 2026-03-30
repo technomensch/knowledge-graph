@@ -298,7 +298,7 @@ After setup:
 
 ### 🟢 `/kmgraph:capture-lesson`
 
-<!-- Updated: 2026-03-27 -->
+<!-- Updated: 2026-03-30 -->
 
 **Purpose**: Guided UX dispatcher for documenting lessons learned, problems solved, and patterns with git metadata tracking
 
@@ -315,15 +315,16 @@ After setup:
 
 Dispatches to the capture-lesson agent, which handles:
 
-1. Checks for duplicate/similar existing lessons (pre-flight search)
-2. Asks verification questions (topic, audience, scope)
-3. Auto-detects category from keywords (architecture, debugging, process, patterns)
-4. Gathers git metadata (branch, commit hash, PR, issue number) from YAML frontmatter
-5. Guides content gathering (problem, root cause, solution, prevention)
-6. Writes the lesson file using the template from `core/templates/`
-7. Updates category and chronological indexes
-8. Optionally triggers `/kmgraph:update-graph` to extract KG entries
-9. Optionally links to a GitHub Issue via `/kmgraph:link-issue`
+1. **[NEW in v0.2.2-beta] Snapshot gate** — optionally takes a lightweight session snapshot before the capture dialog, preserving the "why" at the moment of discovery (see `/kmgraph:session-summary --snapshot`)
+2. Checks for duplicate/similar existing lessons (pre-flight search)
+3. Asks verification questions (topic, audience, scope)
+4. Auto-detects category from keywords (architecture, debugging, process, patterns)
+5. Gathers git metadata (branch, commit hash, PR, issue number) from YAML frontmatter
+6. Guides content gathering (problem, root cause, solution, prevention)
+7. Writes the lesson file using the template from `core/templates/`
+8. Updates category and chronological indexes
+9. Optionally triggers `/kmgraph:update-graph` to extract KG entries
+10. Optionally links to a GitHub Issue via `/kmgraph:link-issue`
 
 **Time**: 5-10 minutes (faster with practice)
 
@@ -569,6 +570,48 @@ Dispatches to the recall agent, which searches:
 - Captures git commits automatically — no need to list them manually
 - Auto-suggests summary when context approaches ~180K tokens
 - If a snapshot was taken earlier in the session, wrap-up only adds closing context
+
+---
+
+### 🟡 `/kmgraph:create-adr`
+
+<!-- Updated: 2026-03-30 -->
+
+**Purpose**: Create Architecture Decision Records with auto-filled git metadata, sequential numbering, and index auto-update
+
+**When to use**:
+
+- Making a significant architecture, process, or technology decision
+- Choosing between competing approaches and want to document the rationale
+- After a decision has already been made and needs to be formally recorded
+- When a lesson learned reveals a decision that should be captured as an ADR
+
+**What it does**:
+
+1. **[NEW in v0.2.2-beta] Snapshot gate** — optionally takes a lightweight session snapshot before the ADR dialog, preserving the "why" at the moment the decision was made (see `/kmgraph:session-summary --snapshot`)
+2. Resolves active KG path from `~/.claude/kg-config.json`
+3. Auto-increments ADR number (scans existing `ADR-NNN-*.md` files, uses highest + 1)
+4. Collects git metadata automatically (author, email, branch, commit SHA, PR/issue numbers)
+5. Interactive wizard: title, status (Proposed/Accepted/Deprecated/Superseded), category (Architecture/Process/Technology), context, decision, rationale, consequences, related lessons
+6. Generates filename (`ADR-{NNN}-{slug}.md`) and presents summary for user confirmation before writing
+7. Creates ADR file from `core/templates/decisions/ADR-template.md` with fully populated frontmatter
+8. Updates `decisions/README.md` — total count, chronological list, and by-category section
+9. Commits both files with a structured commit message
+
+**Time**: 5-15 minutes (depends on how much detail you provide)
+
+**Example**:
+```bash
+/kmgraph:create-adr
+/kmgraph:create-adr Use PostgreSQL for primary database   # Pre-fills title, skips first prompt
+```
+
+**Tips**:
+
+- Pass a title as an argument to skip the first wizard prompt
+- Use Proposed status for decisions still under review; Accepted for decisions already implemented
+- Link to related lessons in Step 3.8 — creates bidirectional traceability
+- If a snapshot was taken earlier in the session, the ADR's Context section can draw from it
 
 ---
 
@@ -859,6 +902,8 @@ With `--user-facing`:
 
 ### 🔴 `/kmgraph:start-issue-tracking`
 
+<!-- Updated: 2026-03-30 -->
+
 **Purpose**: Initialize issue tracking for a specific problem or enhancement with structured documentation and Git branch creation
 
 **When to use**:
@@ -872,15 +917,17 @@ With `--user-facing`:
 
 **What it does**:
 
-1. Scans chat history for recent proposals ("Would you like me to...")
-2. Runs git authority check and auto-detects version increment path
-3. Auto-detects issue type from keywords (bug vs. enhancement)
-4. Creates directory structure with documentation templates (description, solution approach, test cases, implementation log)
-5. Generates an implementation plan with safety headers and atomic approval protocol
-6. Creates a Git feature branch (`issue/{N}-{slug}`)
-7. Optionally creates a draft PR on GitHub with `--body-file` populated from solution approach
-8. Links to knowledge graph and prompts for lesson capture
-9. Engages implementation freeze — stops before any code changes
+1. **[NEW in v0.2.2-beta] Snapshot gate** — optionally takes a session snapshot before the issue dialog
+2. **[NEW in v0.2.2-beta] Branch guard** — Step 1.0 now surfaces a ⚠️ warning when current branch ≠ main, priming the user before versioning decisions; Step 6.2 lesson capture prompt becomes strongly recommended when working on a non-main branch
+3. Scans chat history for recent proposals ("Would you like me to...")
+4. Runs git authority check and auto-detects version increment path
+5. Auto-detects issue type from keywords (bug vs. enhancement)
+6. Creates directory structure with documentation templates (description, solution approach, test cases, implementation log)
+7. Generates an implementation plan with safety headers and atomic approval protocol
+8. Creates a Git feature branch (`issue/{N}-{slug}`)
+9. Optionally creates a draft PR on GitHub with `--body-file` populated from solution approach
+10. Links to knowledge graph and prompts for lesson capture
+11. Engages implementation freeze — stops before any code changes
 
 **Time**: 5-10 minutes
 
