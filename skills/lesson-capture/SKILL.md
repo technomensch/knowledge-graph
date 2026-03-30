@@ -11,8 +11,13 @@
 - "I found out why"
 - "learned that"
 - "pattern here is"
+- "this is a gap"
+- "the issue is" (when describing a process or UX failure, not a git issue)
+- "noticed that"
+- "this doesn't work because"
 - Bug resolved, workaround found, first-time setup complete, pattern identified
 - Completion of debugging/troubleshooting context
+- UX or process failure observed and named during active use
 
 **Behavior:**
 When triggered:
@@ -23,7 +28,9 @@ When triggered:
    - Extract the **pattern** — any generalizable lesson or warning worth noting
    - Identify relevant **tags** from conversation (technology names, domain, etc.)
 
-2. **Note:** When dispatching to `/kmgraph:capture-lesson`, the command includes a snapshot gate that offers to preserve session context first. This is presented to the user inside the command flow — do not add a separate snapshot prompt here.
+2. **Note:** When dispatching to lesson capture, the lesson-capture-agent includes a snapshot gate that offers to preserve session context first. This is presented to the user inside the agent flow — do not add a separate snapshot prompt here.
+
+   **ECC Compatibility:** The slash command syntax (`/kmgraph:capture-lesson`) is Claude Code–specific. On other ECC platforms, the lesson-capture-agent is dispatched directly via agent invocation without a command namespace.
 
 3. **Dispatch to lesson-capture-agent** with that pre-structured context
 
