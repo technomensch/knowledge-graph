@@ -22,6 +22,31 @@ Forbidden: Improvements, assumptions, gap-filling, unauthorized fixes
 
 **ECC Compatibility Note:** The banner above uses generic tool categories (file read/edit/write, shell) to maintain portability across ECC platforms. On Claude Code, these map to Read, Edit, Write, and Bash tools. On other platforms, the underlying MCP or native tool implementations are used automatically. The constraint semantics remain identical: no authorization changes outside the plan.
 
+**Prerequisite Check — Step 6.4 Sync Verification:**
+Before implementing any ENH or issue in scope, verify that Step 6.4 (ROADMAP + CHANGELOG sync) was completed for each item. This check fires at implementation start, not at issue-tracking completion.
+
+For each ENH/issue in the plan:
+1. Check whether Step 6.4 was completed (ROADMAP entry added, CHANGELOG entry added).
+2. If Step 6.4 was skipped for any item, surface the following prompt and wait for user response before proceeding:
+
+```
+⚠️  PREREQUISITE CHECK — Step 6.4 Not Completed
+Before implementing [ENH-NNN / issue-N], Step 6.4 (ROADMAP + CHANGELOG sync) was not completed.
+
+Options:
+  [C] Complete now — run ROADMAP + CHANGELOG sync inline, then proceed
+  [S] Skip — proceed without sync (your choice; noted in commit message)
+  [X] Cancel — abort implementation
+
+Enter choice (C / S / X):
+```
+
+3. **Complete now (C):** Run the ROADMAP + CHANGELOG sync inline (update the relevant ROADMAP entry and CHANGELOG entry for the item), then continue with implementation.
+4. **Skip (S):** Proceed with implementation. Note the skipped sync in the commit message.
+5. **Cancel (X):** Abort implementation. Output: `HALT — Implementation cancelled. Complete Step 6.4 before retrying.`
+
+This check runs once per item, before the first edit for that item.
+
 **Protocol Steps:**
 1. **State Initialization** — Output STRICT EXECUTION MODE banner before any action
 2. **Literal Mapping** — Quote each plan instruction before executing (literal mapping, no assumptions)

@@ -140,7 +140,30 @@ Update templates? This will NOT overwrite your existing lessons or decisions.
 
 Re-run platform detection (Step 1.11) and offer to configure any newly detected platforms that aren't already registered.
 
-#### 1e. FTS5 index check
+#### 1f.0. Legacy migration
+
+When upgrading from v0.2.1 or earlier, the `.fts5.db` index may be stored in the project root. Migrate it to the user cache:
+
+```bash
+if [ -f "$KG_ROOT/.fts5.db" ]; then
+  mkdir -p "$HOME/.claude/kg-fts5"
+  mv "$KG_ROOT/.fts5.db" "$HOME/.claude/kg-fts5/$kg_name.db"
+  echo "✅ Legacy search index migrated to user cache."
+fi
+```
+
+Then remove `.fts5.db` from `.gitignore` if present:
+
+```bash
+if [ -f "$KG_ROOT/.gitignore" ]; then
+  grep -v "^\*\*/\.fts5\.db$" "$KG_ROOT/.gitignore" > "$KG_ROOT/.gitignore.tmp"
+  mv "$KG_ROOT/.gitignore.tmp" "$KG_ROOT/.gitignore"
+fi
+```
+
+Proceed to the FTS5 rebuild check (Step 1f) below.
+
+#### 1f. FTS5 index check
 
 The search index (`.fts5.db`) is local-only and gitignored — it does not survive upgrades or fresh clones.
 
@@ -223,7 +246,7 @@ fi
 
 If the user selects **Yes**, run `/kmgraph:update-graph --auto --sync-all`. The `--auto` flag skips per-lesson prompts (consent was given by answering Yes here) and `--sync-all` processes all lessons with missing entries in one pass. If the user selects **Skip**, continue — `update-graph` can be run at any time.
 
-#### 1f. Output verification summary
+#### 1h. Output verification summary
 
 ```
 ✅ Knowledge graph "[name]" verified!

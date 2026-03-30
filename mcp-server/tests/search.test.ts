@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { rebuildIndex } from "../src/tools/fts5.js";
+import { rebuildIndex, getFTS5DbPath, searchFts5 } from "../src/tools/fts5.js";
 import { KgConfig } from "../src/utils.js";
 
 // ---------------------------------------------------------------------------
@@ -144,15 +144,17 @@ describe("multi-KG search via FTS5", () => {
       "---\ntitle: Create vs Update\n---\n# Create vs Update\n\nUse Create for new files, Update for existing."
     );
 
-    const projResult = rebuildIndex(projRoot);
-    const globalResult = rebuildIndex(globalRoot);
+    const projResult = rebuildIndex(projRoot, "proj-kg");
+    const globalResult = rebuildIndex(globalRoot, "personal-kg");
 
     expect(projResult.indexed).toBeGreaterThan(0);
     expect(globalResult.indexed).toBeGreaterThan(0);
 
-    // Verify indexes are at their respective KG paths
-    expect(fs.existsSync(path.join(projRoot, ".fts5.db"))).toBe(true);
-    expect(fs.existsSync(path.join(globalRoot, ".fts5.db"))).toBe(true);
+    // Verify indexes are at user-level ~/.claude/kg-fts5/ path
+    expect(projResult.db_path).toContain("kg-fts5");
+    expect(globalResult.db_path).toContain("kg-fts5");
+    expect(fs.existsSync(projResult.db_path)).toBe(true);
+    expect(fs.existsSync(globalResult.db_path)).toBe(true);
   });
 
   it("project KG does not contain personal KG content and vice versa", () => {
@@ -174,20 +176,21 @@ describe("multi-KG search via FTS5", () => {
       "---\ntitle: Global Knowledge\n---\n\nThis belongs to the global KG only."
     );
 
-    rebuildIndex(projRoot);
-    rebuildIndex(globalRoot);
+    rebuildIndex(projRoot, "proj-kg");
+    rebuildIndex(globalRoot, "personal-kg");
 
-    const { searchFts5, getDbPath } = require("../src/tools/fts5.js");
+    const projDbPath = getFTS5DbPath("proj-kg");
+    const globalDbPath = getFTS5DbPath("personal-kg");
 
-    const projResults = searchFts5(getDbPath(projRoot), "project KG only", projRoot);
-    const globalResults = searchFts5(getDbPath(globalRoot), "global KG only", globalRoot);
+    const projResults = searchFts5(projDbPath, "project KG only", projRoot);
+    const globalResults = searchFts5(globalDbPath, "global KG only", globalRoot);
 
     expect(projResults.length).toBeGreaterThan(0);
     expect(globalResults.length).toBeGreaterThan(0);
 
     // Cross-contamination check
-    const projResultsForGlobal = searchFts5(getDbPath(projRoot), "global KG only", projRoot);
-    const globalResultsForProj = searchFts5(getDbPath(globalRoot), "project KG only", globalRoot);
+    const projResultsForGlobal = searchFts5(projDbPath, "global KG only", projRoot);
+    const globalResultsForProj = searchFts5(globalDbPath, "project KG only", globalRoot);
 
     expect(projResultsForGlobal).toHaveLength(0);
     expect(globalResultsForProj).toHaveLength(0);
@@ -200,7 +203,6 @@ describe("multi-KG search via FTS5", () => {
 
 describe("SearchResult sourceKg field", () => {
   it("SearchResult interface allows sourceKg and sourceKgType fields", () => {
-    const { searchFts5, getDbPath, rebuildIndex: rebuild } = require("../src/tools/fts5.js");
     const root = makeTempDir("tag");
     tempDirs.push(root);
     scaffoldKg(root);
@@ -211,8 +213,9 @@ describe("SearchResult sourceKg field", () => {
       "---\ntitle: Test Entry\n---\n\nSome content here."
     );
 
-    rebuild(root);
-    const results = searchFts5(getDbPath(root), "content", root);
+    rebuildIndex(root, "tag-kg");
+    const dbPath = getFTS5DbPath("tag-kg");
+    const results = searchFts5(dbPath, "content", root);
     expect(results.length).toBeGreaterThan(0);
 
     // Tag results as multi-KG search would
@@ -223,5 +226,89 @@ describe("SearchResult sourceKg field", () => {
 
     expect(results[0].sourceKg).toBe("my-project");
     expect(results[0].sourceKgType).toBe("project-local");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// TC-004: kg_search reads from the new ~/.claude/kg-fts5/ path
+// ---------------------------------------------------------------------------
+
+describe("searchFts5 uses getFTS5DbPath for user-level storage", () => {
+  test("TC-004: searchFts5 reads from ~/.claude/kg-fts5/{name}.db path", () => {
+    const kgRoot = makeTempDir("tc-004-fts5-search");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+
+    writeMd(
+      path.join(kgRoot, "knowledge"),
+      "research.md",
+      "---\ntitle: Research Results\n---\n# Research Results\n\nKey findings on authentication patterns."
+    );
+
+    // Rebuild using new path function
+    const rebuildResult = rebuildIndex(kgRoot, "tc-004-kg");
+
+    // Verify DB is at user-level path
+    expect(rebuildResult.db_path).toContain(os.homedir());
+    expect(rebuildResult.db_path).toContain("kg-fts5");
+
+    // Verify searchFts5 can read from that path
+    const dbPath = getFTS5DbPath("tc-004-kg");
+    expect(fs.existsSync(dbPath)).toBe(true);
+
+    // Search should work
+    const results = searchFts5(dbPath, "authentication", kgRoot);
+    expect(results.length).toBeGreaterThan(0);
+
+    // Verify result shape and content
+    const firstResult = results[0];
+    expect(firstResult).toHaveProperty("file");
+    expect(firstResult).toHaveProperty("relativePath");
+    expect(firstResult).toHaveProperty("line");
+    expect(firstResult).toHaveProperty("context");
+    expect(firstResult.relativePath).toContain("research.md");
+  });
+
+  test("TC-004b: Multiple KG names use separate user-level databases", () => {
+    const kg1Root = makeTempDir("tc-004b-kg1");
+    const kg2Root = makeTempDir("tc-004b-kg2");
+    tempDirs.push(kg1Root, kg2Root);
+
+    scaffoldKg(kg1Root);
+    scaffoldKg(kg2Root);
+
+    writeMd(
+      path.join(kg1Root, "knowledge"),
+      "doc1.md",
+      "---\ntitle: Project Doc\n---\n\nProject-specific content."
+    );
+    writeMd(
+      path.join(kg2Root, "knowledge"),
+      "doc2.md",
+      "---\ntitle: Personal Doc\n---\n\nPersonal-specific content."
+    );
+
+    // Rebuild both with distinct names
+    rebuildIndex(kg1Root, "project-kg");
+    rebuildIndex(kg2Root, "personal-kg");
+
+    const projDbPath = getFTS5DbPath("project-kg");
+    const persDbPath = getFTS5DbPath("personal-kg");
+
+    // Verify separate paths
+    expect(projDbPath).not.toBe(persDbPath);
+    expect(fs.existsSync(projDbPath)).toBe(true);
+    expect(fs.existsSync(persDbPath)).toBe(true);
+
+    // Verify content isolation
+    const projResults = searchFts5(projDbPath, "Project", kg1Root);
+    const persResults = searchFts5(persDbPath, "Personal", kg2Root);
+
+    expect(projResults.length).toBeGreaterThan(0);
+    expect(persResults.length).toBeGreaterThan(0);
+
+    // Cross-contamination check: project search shouldn't find personal content
+    const projSearchForPersonal = searchFts5(projDbPath, "Personal", kg1Root);
+    expect(projSearchForPersonal).toHaveLength(0);
   });
 });

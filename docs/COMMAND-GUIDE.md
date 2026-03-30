@@ -26,7 +26,6 @@ Commands work across platforms, but full automation is Claude Code-specific.
 ## Quick Navigation
 
 - [I Want To...](#i-want-to) — Task-based command finder
-- [Learning Path](#learning-path) — Progression from beginner to advanced
 - [Essential Commands](#essential-commands) — Start here
 - [Intermediate Commands](#intermediate-commands) — Daily use
 - [Advanced Commands](#advanced-commands) — Power features
@@ -76,73 +75,8 @@ Commands work across platforms, but full automation is Claude Code-specific.
 - **Bring back archived context** → `/kmgraph:restore-memory`
 - **Run the full sync pipeline in one command** → `/kmgraph:sync-all`
 
----
 
-## Learning Path
 
-### Week 1: Essential Commands
-
-**Goal**: Capture your first 5 lessons
-
-1. **Day 1**: Setup
-   - Run `/kmgraph:init`
-   - Verify with `/kmgraph:status`
-
-2. **Day 2-5**: Daily capture
-   - After solving each problem: `/kmgraph:capture-lesson`
-   - Review captured lessons: `/kmgraph:status`
-
-3. **End of week**: Search
-   - Practice searching: `/kmgraph:recall "database"`
-   - Goal: Find lessons you captured
-
-**Success**: 5 lessons documented, can find them via search
-
----
-
-### Week 2-4: Intermediate Commands
-
-**Goal**: Make knowledge graph part of daily workflow
-
-1. **Add custom categories** (if needed)
-   - `/kmgraph:add-category` for team-specific categories
-
-2. **Sync regularly**
-   - End of each day: `/kmgraph:update-graph`
-   - Keeps knowledge graph current
-
-3. **Summarize important sessions**
-   - After important discussions: `/kmgraph:session-summary`
-
-4. **Work with multiple KGs** (optional)
-   - `/kmgraph:list` to see all
-   - `/kmgraph:switch` to change active
-
-**Success**: Knowledge graph updates daily, MEMORY.md reflects learnings
-
----
-
-### Month 2+: Advanced Commands
-
-**Goal**: Power user features for complex workflows
-
-1. **Team safety**
-   - `/kmgraph:config-sanitization` (one-time setup)
-   - `/kmgraph:check-sensitive` (before sharing)
-
-2. **Complex problem tracking**
-   - `/kmgraph:meta-issue` for multi-attempt bugs
-   - `/kmgraph:start-issue-tracking` for systematic tracking
-
-3. **GitHub integration**
-   - `/kmgraph:link-issue` to connect lessons with GitHub Issues
-   - `/kmgraph:update-issue-plan` to sync with GitHub
-
-4. **Memory management**
-   - `/kmgraph:archive-memory` when MEMORY.md gets large
-   - `/kmgraph:restore-memory` to bring back old patterns
-
-**Success**: Full integration with team workflow, GitHub tracking active
 
 ---
 
@@ -919,15 +853,18 @@ With `--user-facing`:
 
 1. **[NEW in v0.2.2-beta] Snapshot gate** — optionally takes a session snapshot before the issue dialog
 2. **[NEW in v0.2.2-beta] Branch guard** — Step 1.0 now surfaces a ⚠️ warning when current branch ≠ main, priming the user before versioning decisions; Step 6.2 lesson capture prompt becomes strongly recommended when working on a non-main branch
-3. Scans chat history for recent proposals ("Would you like me to...")
-4. Runs git authority check and auto-detects version increment path
-5. Auto-detects issue type from keywords (bug vs. enhancement)
-6. Creates directory structure with documentation templates (description, solution approach, test cases, implementation log)
-7. Generates an implementation plan with safety headers and atomic approval protocol
-8. Creates a Git feature branch (`issue/{N}-{slug}`)
-9. Optionally creates a draft PR on GitHub with `--body-file` populated from solution approach
-10. Links to knowledge graph and prompts for lesson capture
-11. Engages implementation freeze — stops before any code changes
+3. **Steps 1.1–1.4 ask one question at a time** — type (bug vs. enhancement), version impact, branch name, and plan filename are each asked independently, waiting for a response before the next question. No multi-question prompts.
+4. Scans chat history for recent proposals ("Would you like me to...")
+5. Runs git authority check and auto-detects version increment path
+6. Auto-detects issue type from keywords (bug vs. enhancement)
+7. Creates directory structure with documentation templates (description, solution approach, test cases, implementation log)
+8. Generates an implementation plan with safety headers and atomic approval protocol
+9. Creates a Git feature branch (`issue/{N}-{slug}`)
+10. Optionally creates a draft PR on GitHub with `--body-file` populated from solution approach
+11. **Step 6.2 (lesson capture) is a mandatory gate** — must receive a response before continuing. When working on a non-main branch, this step is strongly recommended.
+12. **Step 6.4 (ROADMAP + CHANGELOG update) is a mandatory gate** — must receive a response confirming ROADMAP and CHANGELOG entries have been considered before the command completes.
+13. Links to knowledge graph and prompts for lesson capture
+14. Engages implementation freeze — stops before any code changes
 
 **Time**: 5-10 minutes
 
@@ -1505,5 +1442,5 @@ flowchart TD
 </div>
 ---
 
-**Version**: 0.1.0-beta
-**Updated**: 2026-02-27
+**Version**: 0.2.3-beta
+**Updated**: 2026-03-30
