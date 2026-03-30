@@ -90,6 +90,19 @@ git log -n 5
 ```
 **RULE:** The Git branch history is the source of truth for versioning. Ignore stale versioning strings in file headers if they conflict with the branch naming schema.
 
+**Active branch check:** After running git commands, check if current branch is NOT `main` (or the project default). If so, display this notice **before** presenting the Step 1.1 versioning prompt — it primes the user before they make versioning decisions:
+
+```
+⚠️  You are currently on branch **[current_branch]**, not main.
+
+This means you're likely mid-implementation on existing work.
+The versioning and branch decisions below apply to the *new* issue, not [current_branch].
+
+Keep in mind: you'll be asked at Step 5 whether to create a new branch now or document-only and stay on [current_branch].
+```
+
+Store `{active_work_guard_triggered} = true` if current branch ≠ main, for use in Step 6.2.
+
 ### 1.1: Versioning Decision
 Based on the Git check, ask the user:
 ```markdown
@@ -288,7 +301,18 @@ gh pr create --draft --title "[Bug] Brief descriptive title" \
 Add entry to `docs/issue-tracker.md`. 
 
 ### 6.2: Knowledge Capture Integration (Delegation)
-**Mandatory Question:** *"We just identified [the problem]. Should I run **`/kmgraph:capture-lesson`** now to sync this pattern to the Knowledge Graph before we start the fix?"*
+
+**If `{active_work_guard_triggered}` is true** (issue identified during active implementation on a non-main branch):
+
+> "This issue was identified during active implementation on **[current_branch]**. Capturing a lesson before starting is strongly recommended — it preserves the context of how you found this while it's fresh.
+>
+> Run `/kmgraph:capture-lesson` now? **(yes / defer to plan)**"
+
+If deferred: add a task to the implementation plan: "Capture lesson: [issue description] — identified during [current_branch] work."
+
+**If `{active_work_guard_triggered}` is false** (issue identified from main or a clean state):
+
+> "We just identified [the problem]. Should I run `/kmgraph:capture-lesson` now to sync this pattern to the Knowledge Graph before we start the fix?"
 
 If yes, run it. If no, ensure a task is added to the plan to update the KG after implementation.
 

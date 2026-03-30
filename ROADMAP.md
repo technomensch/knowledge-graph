@@ -1,6 +1,57 @@
 # Knowledge Management Graph — Roadmap
 
-## v0.1.2-beta (In Progress: 2026-03-16)
+## v0.2.2-beta (In Progress: 2026-03-29)
+
+**Status**: 🔄 In Progress — Personal KG + Session Snapshot on Capture
+**Branch**: `v0.2.2-beta`
+
+### Completed
+- ✅ Bug Fix: FTS5 index not rebuilt after upgrade — `init` verify/upgrade now checks and offers rebuild
+- ✅ Bug Fix: KG path validation (root vs docs/) in `init` verify/upgrade
+- ✅ Bug Fix: Empty `knowledge/` detected in verify/upgrade; offers `update-graph` run
+- ✅ ENH-001 Phase 1.1: Multi-KG search — `kg_search` extended with `searchScope: active|all|personal-only`
+- ✅ ENH-001 Phase 1.2: Capture picker — `lesson-capture-agent` shows KG picker when ≥2 KGs registered; `kg_capture` extended with `targetKg` parameter
+- ✅ ENH-001 Phase 1.3: Init extended with personal KG offer (Step 1.8.5); `hooks-master.sh` surfaces personal KG lessons; new `init-personal-kg` command
+- ✅ ENH-001 Phase 1.4: Documentation — COMMAND-GUIDE, CONCEPTS, CHEAT-SHEET updated for multi-KG patterns
+- ✅ Terminology: renamed `global` → `personal` throughout (VS Code "User vs Workspace" model)
+
+### In Progress
+- 🔄 Phase Group 2: `start-issue-tracking` gap fixes + ROADMAP update
+- ⏳ Phase Group 3: ENH-002 Session Snapshot on Capture
+
+---
+
+## v0.2.1-beta (Released: 2026-03-27)
+
+**Status**: ✅ Complete — MCP Write Tools + Agent Portability
+**Branch**: `v0.2.1-beta`
+**PR**: #40
+
+### Completed
+- ✅ `kg_capture` MCP tool: write lessons, ADRs, and KG entries from any platform
+- ✅ `kg_fts5_rebuild` MCP tool: rebuild FTS5 index from any platform
+- ✅ `lesson-capture-agent`, `recall-agent`, `session-summary-agent` refactored to use MCP tools
+- ✅ `AGENTS-template.md` for non-Claude platforms (Gemini, Cursor, Windsurf, etc.)
+- ✅ Agent portability: agents work identically with MCP tools regardless of IDE
+
+---
+
+## v0.2.0-beta (Released: 2026-03-16)
+
+**Status**: ✅ Complete — Layered Architecture Restructuring
+**Branch**: `v0.2.0-beta`
+**PR**: #38
+
+### Completed
+- ✅ Four-layer architecture: Context (skills) → Logic (commands) → Lifecycle (agents) → Data (KG)
+- ✅ Commands restructured: thick commands split into thin dispatchers + agents
+- ✅ Hooks system consolidated: `hooks-master.sh` replaces individual hook scripts
+- ✅ `core/` directory: platform-agnostic templates and examples
+- ✅ SessionStart hook: automatic context loading at session start
+
+---
+
+## v0.1.2-beta (Released: 2026-03-16)
 
 **Status**: 🔄 In Progress - Native FTS5 Search
 **Branch**: `v0.1.2-beta-native-fts5-search`
@@ -850,6 +901,9 @@ Ideas for community-driven enhancements:
 | v0.0.9-alpha | Infrastructure alignment, kmgraph namespace, hook consolidation | 2026-02-27 | ✅ Released |
 | v0.0.10-alpha | Skills (5), subagents (2), KG backfill, handoff command | 2026-02-27 | ✅ Released |
 | v0.0.10.4-alpha | MCP node_modules auto-install fix | 2026-03-01 | ✅ Released |
+| v0.2.0-beta | Layered architecture restructuring | 2026-03-16 | ✅ Released |
+| v0.2.1-beta | MCP write tools, agent portability, AGENTS-template | 2026-03-27 | ✅ Released |
+| v0.2.2-beta | Personal KG, session snapshot on capture, FTS5 upgrade fix | 2026-03-29 | 🔄 In Progress |
 | v1.0.0 | Stable release with alpha feedback | Q2 2026 | Planning |
 | v1.1.0 | Performance + UX improvements | Q3 2026 | Roadmap |
 | v1.2.0 | Cross-platform adapters | Q4 2026 | Roadmap |
@@ -871,5 +925,5 @@ Ideas for community-driven enhancements:
 
 ---
 
-*Last updated: 2026-03-02*
-*Plugin Version: 0.0.10.4-alpha (MCP Fix Release)*
+*Last updated: 2026-03-29*
+*Plugin Version: 0.2.2-beta (In Progress)*
