@@ -199,30 +199,48 @@ function updateReadmeIndex(indexPath, entry) {
     content = content.trimEnd() + "\n" + line + "\n";
     fs.writeFileSync(indexPath, content, "utf-8");
 }
-async function handleCapture(request) {
+async function handleCapture(request, targetKg) {
     // Validate metadata
     const validated = validateMetadata(request.metadata);
     if ("error" in validated)
         return validated;
-    // Active-KG / CWD alignment check
     const config = (0, utils_js_1.readConfig)();
-    const kgPath = (0, utils_js_1.getActiveGraphPath)(config);
+    let kgPath;
+    let skipCwdCheck = false;
+    if (targetKg) {
+        // Explicit target KG: resolve path from config, skip CWD check (intentional user choice)
+        const graphConfig = config.graphs[targetKg];
+        if (!graphConfig) {
+            return {
+                error: "VALIDATION_ERROR",
+                message: `Unknown KG name: "${targetKg}". Check /kmgraph:status for registered KGs.`,
+            };
+        }
+        kgPath = graphConfig.path.replace(/^~/, require("os").homedir());
+        skipCwdCheck = true;
+    }
+    else {
+        kgPath = (0, utils_js_1.getActiveGraphPath)(config);
+    }
     if (!kgPath) {
         return {
             error: "VALIDATION_ERROR",
             message: "No active knowledge graph. Use kg_config_init or kg_config_switch first.",
         };
     }
-    const activeKgRoot = (0, utils_js_1.getProjectRoot)(kgPath);
-    const cwd = process.cwd();
-    const normalizedRoot = activeKgRoot.endsWith(path.sep) ? activeKgRoot : activeKgRoot + path.sep;
-    if (cwd !== activeKgRoot && !cwd.startsWith(normalizedRoot)) {
-        return {
-            error: "KG_MISMATCH",
-            activeKg: config.active ?? undefined,
-            activeKgRoot,
-            cwd,
-        };
+    // Active-KG / CWD alignment check (skipped when targetKg explicitly provided)
+    if (!skipCwdCheck) {
+        const activeKgRoot = (0, utils_js_1.getProjectRoot)(kgPath);
+        const cwd = process.cwd();
+        const normalizedRoot = activeKgRoot.endsWith(path.sep) ? activeKgRoot : activeKgRoot + path.sep;
+        if (cwd !== activeKgRoot && !cwd.startsWith(normalizedRoot)) {
+            return {
+                error: "KG_MISMATCH",
+                activeKg: config.active ?? undefined,
+                activeKgRoot,
+                cwd,
+            };
+        }
     }
     // Update-in-place path
     if (request.metadata.existingFile) {
@@ -310,9 +328,11 @@ async function handleCapture(request) {
     };
 }
 function registerCaptureTool(server) {
-    server.tool("kg_capture", "Write a lesson, session summary, or ADR to the active knowledge graph. " +
+    server.tool("kg_capture", "Write a lesson, session summary, or ADR to a knowledge graph. " +
+        "Defaults to the active KG. Pass targetKg to write to a named KG (e.g., a global personal KG). " +
         "Handles file naming, frontmatter generation, directory routing, README index update, " +
-        "and FTS5 rebuild automatically. Returns KG_MISMATCH error when CWD is outside the active KG root.", {
+        "and FTS5 rebuild automatically. Returns KG_MISMATCH error when CWD is outside the active KG root " +
+        "(bypassed when targetKg is specified).", {
         content: zod_1.z.string().describe("Full markdown body of the lesson, session summary, or ADR"),
         type: zod_1.z
             .enum(["lesson", "session", "adr"])
@@ -342,8 +362,13 @@ function registerCaptureTool(server) {
                 .describe("Absolute path to existing file for update-in-place"),
         })
             .describe("Entry metadata"),
-    }, async ({ content, type, metadata }) => {
-        const result = await handleCapture({ content, type, metadata });
+        targetKg: zod_1.z
+            .string()
+            .optional()
+            .describe("Named KG to write to (from kg-config.json). Use for global/personal KG captures. " +
+            "If omitted, writes to the active KG. CWD alignment check is skipped when targetKg is set."),
+    }, async ({ content, type, metadata, targetKg }) => {
+        const result = await handleCapture({ content, type, metadata }, targetKg);
         if ("error" in result) {
             return {
                 content: [{ type: "text", text: JSON.stringify(result, null, 2) }],

@@ -152,51 +152,52 @@ Commands work across platforms, but full automation is Claude Code-specific.
 
     Get the knowledge graph running and configure how it works.
 
-    - [🟢 `/kmgraph:init`](#-kgsisinitcommands-tab) — Initialize a new knowledge graph
-    - [🟡 `/kmgraph:list`](#-kgsislist-commands-tab) — View all configured knowledge graphs
-    - [🟡 `/kmgraph:switch`](#-kgsisswitch-commands-tab) — Switch to a different knowledge graph
-    - [🟡 `/kmgraph:add-category`](#-kgsisadd-category-commands-tab) — Add custom categories
-    - [🟡 `/kmgraph:config-sanitization`](#-kgsisconfig-sanitization-commands-tab) — Set up safety features for team sharing
+    - [🟢 `/kmgraph:init`](#-kmgraphinit) — Initialize a new knowledge graph
+    - [🟡 `/kmgraph:init-personal-kg`](#-kmgraphinit-personal-kg) — Create personal KG for cross-project lessons
+    - [🟡 `/kmgraph:list`](#-kmgraphlist) — View all configured knowledge graphs
+    - [🟡 `/kmgraph:switch`](#-kmgraphswitch) — Switch to a different knowledge graph
+    - [🟡 `/kmgraph:add-category`](#-kmgraphadd-category) — Add custom categories
+    - [🟡 `/kmgraph:config-sanitization`](#-kmgraphconfig-sanitization) — Set up safety features for team sharing
 
 === "Capture & Document"
 
     Document lessons, capture history, and summarize sessions.
 
-    - [🟢 `/kmgraph:capture-lesson`](#-kgsiscapture-lesson-commands-tab) — Capture problems solved and patterns discovered
-    - [🟡 `/kmgraph:extract-chat`](#-kgsisextract-chat-commands-tab) — Export chat history to markdown
-    - [🟡 `/kmgraph:session-summary`](#-kgsisssession-summary-commands-tab) — Summarize important work sessions
+    - [🟢 `/kmgraph:capture-lesson`](#-kmgraphcapture-lesson) — Capture problems solved and patterns discovered
+    - [🟡 `/kmgraph:extract-chat`](#-kmgraphextract-chat) — Export chat history to markdown
+    - [🟡 `/kmgraph:session-summary`](#-kmgraphsession-summary) — Summarize important work sessions
 
 === "Search & Sync"
 
     Find knowledge and keep the graph synchronized.
 
-    - [🟢 `/kmgraph:status`](#-kgsistatus-commands-tab) — Check current knowledge graph status
-    - [🟢 `/kmgraph:recall`](#-kgsisrecall-commands-tab) — Search across all knowledge entries
-    - [🟡 `/kmgraph:update-graph`](#-kgsisupdate-graph-commands-tab) — Extract lessons into knowledge graph
-    - [🟡 `/kmgraph:update-doc`](#-kgsisupdate-doc-commands-tab) — Update documentation with changes
-    - [🔴 `/kmgraph:sync-all`](#-kgsissync-all-commands-tab) — Run complete synchronization pipeline
+    - [🟢 `/kmgraph:status`](#-kmgraphstatus) — Check current knowledge graph status
+    - [🟢 `/kmgraph:recall`](#-kmgraphrecall) — Search across all knowledge entries
+    - [🟡 `/kmgraph:update-graph`](#-kmgraphupdate-graph) — Extract lessons into knowledge graph
+    - [🟡 `/kmgraph:update-doc`](#-kmgraphupdate-doc) — Update documentation with changes
+    - [🔴 `/kmgraph:sync-all`](#-kmgraphsync-all) — Run complete synchronization pipeline
 
 === "Team & Sharing"
 
     Share knowledge safely with team members.
 
-    - [🟡 `/kmgraph:check-sensitive`](#-kgsischeck-sensitive-commands-tab) — Scan for sensitive data before sharing
-    - [🔴 `/kmgraph:link-issue`](#-kgsislink-issue-commands-tab) — Connect lessons to GitHub issues
+    - [🟡 `/kmgraph:check-sensitive`](#-kmgraphcheck-sensitive) — Scan for sensitive data before sharing
+    - [🔴 `/kmgraph:link-issue`](#-kmgraphlink-issue) — Connect lessons to GitHub issues
 
 === "Advanced Issues"
 
     Track complex, multi-attempt problems systematically.
 
-    - [🔴 `/kmgraph:meta-issue`](#-kgsismeta-issue-commands-tab) — Track multi-attempt bugs and features
-    - [🔴 `/kmgraph:start-issue-tracking`](#-kgsisstart-issue-tracking-commands-tab) — Systematic issue tracking with Git branches
-    - [🔴 `/kmgraph:update-issue-plan`](#-kgsisupdate-issue-plan-commands-tab) — Sync progress with GitHub and plans
+    - [🔴 `/kmgraph:meta-issue`](#-kmgraphmeta-issue) — Track multi-attempt bugs and features
+    - [🔴 `/kmgraph:start-issue-tracking`](#-kmgraphstart-issue-tracking) — Systematic issue tracking with Git branches
+    - [🔴 `/kmgraph:update-issue-plan`](#-kmgraphupdate-issue-plan) — Sync progress with GitHub and plans
 
 === "Memory Management"
 
     Manage MEMORY.md size and archive old patterns.
 
-    - [🔴 `/kmgraph:archive-memory`](#-kgsisarchive-memory-commands-tab) — Archive old patterns from MEMORY.md
-    - [🔴 `/kmgraph:restore-memory`](#-kgsisrestore-memory-commands-tab) — Restore archived context
+    - [🔴 `/kmgraph:archive-memory`](#-kmgrapharchive-memory) — Archive old patterns from MEMORY.md
+    - [🔴 `/kmgraph:restore-memory`](#-kmgraphrestore-memory) — Restore archived context
 
 ---
 
@@ -211,18 +212,20 @@ Commands work across platforms, but full automation is Claude Code-specific.
 - First time setup on any project
 - Starting a new project that needs its own knowledge graph
 - Creating a separate KG for different work (e.g., personal vs. team)
+- **After a plugin update** — verify/upgrade existing KG to current version
 
 **What it does**:
 
-1. Asks for KG name and storage location (project-local, global, or custom path)
+1. Asks for KG name and storage location (project-local, personal, or custom path)
 2. Prompts for category selection (architecture, process, patterns, debugging, or custom)
 3. Asks for optional custom prefixes per category
 4. Creates directory structure (`knowledge/`, `lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`)
 5. Copies templates from the plugin
-6. **[NEW in v0.0.10.2]** Optionally backfills from existing project context (README, CHANGELOG, lessons, decisions, chat history)
-7. Optionally installs a git post-commit hook for lesson capture suggestions
-8. Updates `.gitignore` based on chosen git strategy
-9. Registers the KG in `~/.claude/kg-config.json` and sets it as active
+6. **[NEW in v0.2.2-beta]** Offers to create a **personal KG** at `~/.claude/knowledge-graph/` for cross-project lessons (see [`/kmgraph:init-personal-kg`](#-kmgraphinit-personal-kg))
+7. **[NEW in v0.0.10.2]** Optionally backfills from existing project context (README, CHANGELOG, lessons, decisions, chat history)
+8. Optionally installs a git post-commit hook for lesson capture suggestions
+9. Updates `.gitignore` based on chosen git strategy
+10. Registers the KG in `~/.claude/kg-config.json` and sets it as active
 
 **Time**: 2-3 minutes
 
@@ -232,7 +235,7 @@ Commands work across platforms, but full automation is Claude Code-specific.
 
 # Claude asks:
 # - What should this knowledge graph be called?
-# - Where should it be stored? (project-local / global / custom)
+# - Where should it be stored? (project-local / personal / custom)
 # - Which categories do you want to include?
 # - Would you like to backfill from existing project context? (y/N)
 #   (If yes: scans README, CHANGELOG, lessons-learned/, decisions/, chat-history/)
@@ -257,9 +260,45 @@ The system presents candidates for your review before creating entries.
 
 ---
 
+### 🟡 `/kmgraph:init-personal-kg`
+
+<!-- Updated: 2026-03-29 -->
+
+**Purpose**: Create or register a personal knowledge graph for cross-project lessons
+
+**When to use**:
+
+- After running `/kmgraph:init` and skipping the personal KG offer
+- When you want a dedicated place for workflow lessons, cross-project gotchas, and personal ADRs that apply across all projects, not just the current one
+
+**What it does**:
+
+1. Creates `~/.claude/knowledge-graph/` with standard directory structure
+2. Registers it as `type: "personal"` with name `"personal"` in `~/.claude/kg-config.json`
+3. Copies knowledge templates (patterns, gotchas, concepts)
+4. Builds FTS5 search index for the new KG
+5. Does **not** change the active KG — project KG remains active
+
+After setup:
+- `/kmgraph:capture-lesson` shows a **KG picker** when ≥2 KGs are registered
+- `/kmgraph:recall` searches both project and personal KGs automatically
+
+**Example**:
+```bash
+/kmgraph:init-personal-kg
+
+# Claude creates ~/.claude/knowledge-graph/
+# Registers "personal" KG (type: personal) in config
+# Active KG unchanged
+```
+
+**Related**: See [Personal vs Project Knowledge](CONCEPTS.md#personal-vs-project-knowledge) for when to use each.
+
+---
+
 ### 🟢 `/kmgraph:capture-lesson`
 
-<!-- Updated: 2026-03-27 -->
+<!-- Updated: 2026-03-30 -->
 
 **Purpose**: Guided UX dispatcher for documenting lessons learned, problems solved, and patterns with git metadata tracking
 
@@ -276,15 +315,16 @@ The system presents candidates for your review before creating entries.
 
 Dispatches to the capture-lesson agent, which handles:
 
-1. Checks for duplicate/similar existing lessons (pre-flight search)
-2. Asks verification questions (topic, audience, scope)
-3. Auto-detects category from keywords (architecture, debugging, process, patterns)
-4. Gathers git metadata (branch, commit hash, PR, issue number) from YAML frontmatter
-5. Guides content gathering (problem, root cause, solution, prevention)
-6. Writes the lesson file using the template from `core/templates/`
-7. Updates category and chronological indexes
-8. Optionally triggers `/kmgraph:update-graph` to extract KG entries
-9. Optionally links to a GitHub Issue via `/kmgraph:link-issue`
+1. **[NEW in v0.2.2-beta] Snapshot gate** — optionally takes a lightweight session snapshot before the capture dialog, preserving the "why" at the moment of discovery (see `/kmgraph:session-summary --snapshot`)
+2. Checks for duplicate/similar existing lessons (pre-flight search)
+3. Asks verification questions (topic, audience, scope)
+4. Auto-detects category from keywords (architecture, debugging, process, patterns)
+5. Gathers git metadata (branch, commit hash, PR, issue number) from YAML frontmatter
+6. Guides content gathering (problem, root cause, solution, prevention)
+7. Writes the lesson file using the template from `core/templates/`
+8. Updates category and chronological indexes
+9. Optionally triggers `/kmgraph:update-graph` to extract KG entries
+10. Optionally links to a GitHub Issue via `/kmgraph:link-issue`
 
 **Time**: 5-10 minutes (faster with practice)
 
@@ -380,21 +420,32 @@ Dispatches to the recall agent, which searches:
 - Knowledge entries (patterns, gotchas, concepts)
 - Session summaries
 - MEMORY.md
+- **[NEW in v0.2.2-beta]** Personal KG (if registered) — automatically included when a personal KG exists
 
-**Time**: 1-2 seconds
+**Multi-KG behavior**: When a personal KG is registered, `recall` searches both project and personal KGs by default. Results include a source label (`[project]` or `[personal]`) so origin is always clear.
+
+**Time**: 1-2 seconds (single KG); 2-4 seconds (multi-KG with FTS5)
 
 **Example**:
 ```bash
 /kmgraph:recall "database timeout"
+/kmgraph:recall "auth patterns" --scope=all
+/kmgraph:recall "workflow patterns" --scope=personal-only
 
-# Results:
-# Lessons Learned (2 matches)
-# 1. Debugging PostgreSQL Connection Timeouts ⭐⭐⭐⭐
-# 2. Connection Pool Best Practices ⭐⭐⭐
-#
-# Architecture Decisions (1 match)
-# 1. ADR-003: Choosing Connection Pool Library ⭐⭐⭐⭐
+# Multi-KG result format:
+# Lessons Learned (3 matches)
+# 1. Debugging PostgreSQL Connection Timeouts — [project: my-project]
+# 2. Connection Pool Best Practices — [project: my-project]
+# 3. Database Timeout Patterns — [personal: personal]
 ```
+
+**`--scope` parameter** (v0.2.2-beta):
+
+| Value | Behavior |
+|---|---|
+| `active` | Active KG only (original behavior) |
+| `all` | Active KG + all registered KGs (auto-default when personal KG exists) |
+| `personal-only` | Only KGs with `type: personal` |
 
 **Search tips**:
 
@@ -403,6 +454,7 @@ Dispatches to the recall agent, which searches:
 - Search by date: `/kmgraph:recall "2024-01"`
 - Search by category: `/kmgraph:recall "architecture"`
 - Output formats: default (summary), `--format=paths` (file list), `--format=detailed` (full context)
+- Scope override: `--scope=active` to restrict to project KG only
 
 ---
 
@@ -502,18 +554,64 @@ Dispatches to the recall agent, which searches:
 6. Updates sessions README index
 7. Optionally triggers lesson capture and KG update
 
-**Time**: Under 10 seconds (analysis + write)
+**[NEW in v0.2.2-beta] Snapshot mode** (`--snapshot`): Lightweight mid-session capture. Runs before any capture command when the user opts in. Appends to today's session file (or creates one) without a user review gate. Optional git history (`--snapshot --git`). Used by `capture-lesson`, `create-adr`, and `start-issue-tracking` to preserve the "why" at the moment of discovery.
+
+**Time**: Under 10 seconds (full mode); under 5 seconds (snapshot mode without git)
 
 **Example**:
 ```bash
 /kmgraph:session-summary
-/kmgraph:session-summary --auto    # Skip confirmation, save immediately
+/kmgraph:session-summary --auto        # Skip confirmation, save immediately
+/kmgraph:session-summary --snapshot    # Lightweight mid-session append (no review gate)
 ```
 
 **Tips**:
 
 - Captures git commits automatically — no need to list them manually
 - Auto-suggests summary when context approaches ~180K tokens
+- If a snapshot was taken earlier in the session, wrap-up only adds closing context
+
+---
+
+### 🟡 `/kmgraph:create-adr`
+
+<!-- Updated: 2026-03-30 -->
+
+**Purpose**: Create Architecture Decision Records with auto-filled git metadata, sequential numbering, and index auto-update
+
+**When to use**:
+
+- Making a significant architecture, process, or technology decision
+- Choosing between competing approaches and want to document the rationale
+- After a decision has already been made and needs to be formally recorded
+- When a lesson learned reveals a decision that should be captured as an ADR
+
+**What it does**:
+
+1. **[NEW in v0.2.2-beta] Snapshot gate** — optionally takes a lightweight session snapshot before the ADR dialog, preserving the "why" at the moment the decision was made (see `/kmgraph:session-summary --snapshot`)
+2. Resolves active KG path from `~/.claude/kg-config.json`
+3. Auto-increments ADR number (scans existing `ADR-NNN-*.md` files, uses highest + 1)
+4. Collects git metadata automatically (author, email, branch, commit SHA, PR/issue numbers)
+5. Interactive wizard: title, status (Proposed/Accepted/Deprecated/Superseded), category (Architecture/Process/Technology), context, decision, rationale, consequences, related lessons
+6. Generates filename (`ADR-{NNN}-{slug}.md`) and presents summary for user confirmation before writing
+7. Creates ADR file from `core/templates/decisions/ADR-template.md` with fully populated frontmatter
+8. Updates `decisions/README.md` — total count, chronological list, and by-category section
+9. Commits both files with a structured commit message
+
+**Time**: 5-15 minutes (depends on how much detail you provide)
+
+**Example**:
+```bash
+/kmgraph:create-adr
+/kmgraph:create-adr Use PostgreSQL for primary database   # Pre-fills title, skips first prompt
+```
+
+**Tips**:
+
+- Pass a title as an argument to skip the first wizard prompt
+- Use Proposed status for decisions still under review; Accepted for decisions already implemented
+- Link to related lessons in Step 3.8 — creates bidirectional traceability
+- If a snapshot was taken earlier in the session, the ADR's Context section can draw from it
 
 ---
 
@@ -804,6 +902,8 @@ With `--user-facing`:
 
 ### 🔴 `/kmgraph:start-issue-tracking`
 
+<!-- Updated: 2026-03-30 -->
+
 **Purpose**: Initialize issue tracking for a specific problem or enhancement with structured documentation and Git branch creation
 
 **When to use**:
@@ -817,15 +917,17 @@ With `--user-facing`:
 
 **What it does**:
 
-1. Scans chat history for recent proposals ("Would you like me to...")
-2. Runs git authority check and auto-detects version increment path
-3. Auto-detects issue type from keywords (bug vs. enhancement)
-4. Creates directory structure with documentation templates (description, solution approach, test cases, implementation log)
-5. Generates an implementation plan with safety headers and atomic approval protocol
-6. Creates a Git feature branch (`issue/{N}-{slug}`)
-7. Optionally creates a draft PR on GitHub with `--body-file` populated from solution approach
-8. Links to knowledge graph and prompts for lesson capture
-9. Engages implementation freeze — stops before any code changes
+1. **[NEW in v0.2.2-beta] Snapshot gate** — optionally takes a session snapshot before the issue dialog
+2. **[NEW in v0.2.2-beta] Branch guard** — Step 1.0 now surfaces a ⚠️ warning when current branch ≠ main, priming the user before versioning decisions; Step 6.2 lesson capture prompt becomes strongly recommended when working on a non-main branch
+3. Scans chat history for recent proposals ("Would you like me to...")
+4. Runs git authority check and auto-detects version increment path
+5. Auto-detects issue type from keywords (bug vs. enhancement)
+6. Creates directory structure with documentation templates (description, solution approach, test cases, implementation log)
+7. Generates an implementation plan with safety headers and atomic approval protocol
+8. Creates a Git feature branch (`issue/{N}-{slug}`)
+9. Optionally creates a draft PR on GitHub with `--body-file` populated from solution approach
+10. Links to knowledge graph and prompts for lesson capture
+11. Engages implementation freeze — stops before any code changes
 
 **Time**: 5-10 minutes
 

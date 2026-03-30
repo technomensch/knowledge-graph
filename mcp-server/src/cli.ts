@@ -88,7 +88,7 @@ async function runInit(): Promise<void> {
     console.log("");
     console.log("  Knowledge graph type:");
     console.log("  1. project-local (default) — tied to this project");
-    console.log("  2. global — shared across projects");
+    console.log("  2. personal — shared across projects (your personal KG)");
     console.log("  3. cowork — shared with team members");
     console.log("  4. custom");
     console.log("");
@@ -96,7 +96,7 @@ async function runInit(): Promise<void> {
 
     const typeMap: Record<string, GraphConfig["type"]> = {
       "1": "project-local",
-      "2": "global",
+      "2": "personal",
       "3": "cowork",
       "4": "custom",
     };

@@ -199,6 +199,12 @@ The protocol violation wasn't about forgetting a file — it was about misunders
 
 ---
 
+## See Also
+
+- [Knowledge Graph: Concepts — Dual Plan File Protocol](../../knowledge/concepts.md#dual-plan-file-protocol)
+
+---
+
 ## Checklist for Similar Problems
 
 When you catch a protocol violation in future work:

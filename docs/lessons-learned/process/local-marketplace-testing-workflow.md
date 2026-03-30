@@ -199,3 +199,9 @@ See related lesson: [Plugin Namespace Visibility - Shadow Command Failure](../de
 ## Related Lessons
 
 - [Plugin Namespace Visibility - Shadow Command Failure](../debugging/namespace-visibility-shadow-command-failure.md) - File prefix workaround for namespace visibility
+
+---
+
+## See Also
+
+- [Knowledge Graph: Gotchas — Local Marketplace Testing Two-Location Sync](../../knowledge/gotchas.md#local-marketplace-testing--changes-require-two-location-sync)

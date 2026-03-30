@@ -57,3 +57,9 @@ Every new IDE where KMGraph is used requires a separate, explicit registration s
 - v0.2.1 backlog meta-issue (Item D: MCP auto-registration on first use)
 - Phase 7b validation notes, branch `v0.2.0-beta-layered-architecture`
 - Gemini CLI MCP settings: `~/.gemini/settings.json`
+
+---
+
+## See Also
+
+- [Knowledge Graph: Gotchas — MCP Server Binary Present But Not Registered in IDE](../../knowledge/gotchas.md#mcp-server-binary-present-but-not-registered-in-ide--tools-silently-missing)

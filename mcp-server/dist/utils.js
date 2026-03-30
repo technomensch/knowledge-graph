@@ -39,6 +39,7 @@ exports.writeConfig = writeConfig;
 exports.getActiveGraphPath = getActiveGraphPath;
 exports.getPluginRoot = getPluginRoot;
 exports.getProjectRoot = getProjectRoot;
+exports.getAllGraphPaths = getAllGraphPaths;
 exports.walkDir = walkDir;
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
@@ -90,6 +91,27 @@ function getProjectRoot(kgPath) {
         return path.dirname(kgPath);
     }
     return kgPath;
+}
+/**
+ * Returns all registered KG paths, optionally filtered by type.
+ * Expands ~ in paths. Skips graphs without a path.
+ */
+function getAllGraphPaths(config, types) {
+    return Object.entries(config.graphs)
+        .filter(([, graph]) => {
+        if (!graph.path)
+            return false;
+        if (!types)
+            return true;
+        // Treat missing type as "project-local" for v0.2.1 compat
+        const graphType = (graph.type || "project-local");
+        return types.includes(graphType);
+    })
+        .map(([name, graph]) => ({
+        name,
+        path: graph.path.replace(/^~/, os.homedir()),
+        type: (graph.type || "project-local"),
+    }));
 }
 /**
  * Recursively walk a directory and return all matching file paths

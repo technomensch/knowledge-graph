@@ -18,6 +18,12 @@
 **Block Conditions:**
 - Stop hook temp flag exists: `/tmp/.kg-session-summarized-{PPID}-{date}` — if present, do NOT prompt (Stop hook already fired; avoid double-prompting)
 
+**Snapshot Awareness:**
+- Check for snapshot flag: `/tmp/.kg-snapshot-{YYYY-MM-DD}` (today's date)
+- If snapshot flag exists: session summary already has partial content. Adjust prompt:
+  > "You took a session snapshot earlier — want to complete the wrap-up and save the final summary?"
+- If no snapshot flag: use standard wrap-up prompt.
+
 **Behavior:**
 When triggered, directly dispatch to `session-summary-agent` with conversational language that addresses the user, never exposing internal mechanics.
 

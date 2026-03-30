@@ -78,6 +78,12 @@ Never attempt to commit files under `docs/plans/`. When setting up a new branch 
 
 ---
 
+## See Also
+
+- [Knowledge Graph: Concepts — Dual Plan File Protocol](../../knowledge/concepts.md#dual-plan-file-protocol)
+
+---
+
 **Category:** process
 **Status:** Captured from v0.2.1-beta implementation incident
 **Last Updated:** 2026-03-28

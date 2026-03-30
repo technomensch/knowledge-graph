@@ -7,7 +7,7 @@ export interface CategoryConfig {
 export interface GraphConfig {
     name: string;
     path: string;
-    type: "project-local" | "global" | "cowork" | "custom";
+    type: "project-local" | "personal" | "cowork" | "custom";
     categories: CategoryConfig[];
     createdAt: string;
     lastUsed: string;
@@ -36,6 +36,15 @@ export declare function getPluginRoot(): string;
  * If path ends in /docs, parent is project root; otherwise path itself is root.
  */
 export declare function getProjectRoot(kgPath: string): string;
+/**
+ * Returns all registered KG paths, optionally filtered by type.
+ * Expands ~ in paths. Skips graphs without a path.
+ */
+export declare function getAllGraphPaths(config: KgConfig, types?: Array<GraphConfig["type"]>): Array<{
+    name: string;
+    path: string;
+    type: GraphConfig["type"];
+}>;
 /**
  * Recursively walk a directory and return all matching file paths
  */

@@ -89,6 +89,8 @@ New: Checks if snapshot was taken today (flag file: `/tmp/.kg-snapshot-{PPID}-{d
 → If snapshot exists: "You have a session snapshot from today — want to complete the wrap-up?"
 → If no snapshot: existing full wrap-up prompt
 
+**⚠️ PPID concern:** `$PPID` may not be stable or available in all agent execution contexts. Before implementation, verify whether `$PPID` is reliably set when hooks run. If not, fall back to `$CLAUDE_SESSION_ID` (if available) or a UUID written at first snapshot and cached in `/tmp/.kg-snapshot-id-{date}`. Do not assume PPID without verification.
+
 ## Append-Mode Deduplication
 
 When session-summary-agent appends to an existing summary, it checks:

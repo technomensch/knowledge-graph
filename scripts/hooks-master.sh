@@ -259,6 +259,60 @@ if [ -d "$LESSONS_DIR" ]; then
 fi
 
 # ─────────────────────────────────────────────────────────────
+# SECTION 3.5: Global KG Lessons (cross-project personal KG)
+# ─────────────────────────────────────────────────────────────
+
+if command -v node &> /dev/null && [ -f "$CONFIG_PATH" ]; then
+    GLOBAL_KG_INFO=$(node -e "
+      try {
+        const cfg = JSON.parse(require('fs').readFileSync('$CONFIG_PATH', 'utf8'));
+        const globals = Object.entries(cfg.graphs || {})
+          .filter(([, g]) => g.type === 'personal')
+          .map(([name, g]) => ({ name, path: (g.path || '').replace(/^~/, process.env.HOME) }));
+        if (globals.length > 0) process.stdout.write(JSON.stringify(globals));
+      } catch(e) {}
+    " 2>/dev/null)
+
+    if [ -n "$GLOBAL_KG_INFO" ]; then
+        # Find recent lessons in global KG (last 7 days)
+        GLOBAL_KG_PATH=$(node -e "
+          try {
+            const g = JSON.parse('$GLOBAL_KG_INFO');
+            process.stdout.write(g[0].path || '');
+          } catch(e) {}
+        " 2>/dev/null)
+        GLOBAL_KG_NAME=$(node -e "
+          try {
+            const g = JSON.parse('$GLOBAL_KG_INFO');
+            process.stdout.write(g[0].name || 'personal');
+          } catch(e) {}
+        " 2>/dev/null)
+
+        if [ -n "$GLOBAL_KG_PATH" ] && [ -d "$GLOBAL_KG_PATH/lessons-learned" ]; then
+            GLOBAL_LESSONS=$(find "$GLOBAL_KG_PATH/lessons-learned" -name "*.md" -type f -mtime -7 2>/dev/null)
+            GLOBAL_COUNT=$(echo "$GLOBAL_LESSONS" | grep -c . 2>/dev/null || echo 0)
+            # Suppress count if find returned empty string
+            [ -z "$GLOBAL_LESSONS" ] && GLOBAL_COUNT=0
+
+            if [ "$GLOBAL_COUNT" -gt 0 ]; then
+                echo -e "${BLUE}🌐 Personal KG — Recent Lessons (last 7 days):${NC}"
+                echo "$GLOBAL_LESSONS" | head -3 | while read -r lesson_path; do
+                    [ -z "$lesson_path" ] && continue
+                    title=$(grep -m 1 '^title:' "$lesson_path" 2>/dev/null | sed 's/^title:[[:space:]]*"\?\([^"]*\)"\?/\1/')
+                    [ -z "$title" ] && title=$(basename "$lesson_path" .md | sed 's/_/ /g')
+                    echo "   • $title"
+                done
+                if [ "$GLOBAL_COUNT" -gt 3 ]; then
+                    echo "   … and $((GLOBAL_COUNT - 3)) more"
+                fi
+                echo -e "   Use ${BLUE}/kmgraph:recall \"query\" --scope=personal-only${NC} to search personal KG"
+                echo ""
+            fi
+        fi
+    fi
+fi
+
+# ─────────────────────────────────────────────────────────────
 # SECTION 4: MEMORY.md Status (from check-memory.sh)
 # ─────────────────────────────────────────────────────────────
 

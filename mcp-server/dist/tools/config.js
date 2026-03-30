@@ -45,7 +45,7 @@ function registerConfigTools(server) {
         name: zod_1.z.string().min(1).describe("Unique name for this knowledge graph"),
         kgPath: zod_1.z.string().describe("Absolute path where KG should be created"),
         type: zod_1.z
-            .enum(["project-local", "global", "cowork", "custom"])
+            .enum(["project-local", "personal", "cowork", "custom"])
             .default("project-local")
             .describe("KG type"),
         categories: zod_1.z
