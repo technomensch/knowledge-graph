@@ -152,52 +152,52 @@ Commands work across platforms, but full automation is Claude Code-specific.
 
     Get the knowledge graph running and configure how it works.
 
-    - [🟢 `/kmgraph:init`](#-kgsisinitcommands-tab) — Initialize a new knowledge graph
+    - [🟢 `/kmgraph:init`](#-kmgraphinit) — Initialize a new knowledge graph
     - [🟡 `/kmgraph:init-personal-kg`](#-kmgraphinit-personal-kg) — Create personal KG for cross-project lessons
-    - [🟡 `/kmgraph:list`](#-kgsislist-commands-tab) — View all configured knowledge graphs
-    - [🟡 `/kmgraph:switch`](#-kgsisswitch-commands-tab) — Switch to a different knowledge graph
-    - [🟡 `/kmgraph:add-category`](#-kgsisadd-category-commands-tab) — Add custom categories
-    - [🟡 `/kmgraph:config-sanitization`](#-kgsisconfig-sanitization-commands-tab) — Set up safety features for team sharing
+    - [🟡 `/kmgraph:list`](#-kmgraphlist) — View all configured knowledge graphs
+    - [🟡 `/kmgraph:switch`](#-kmgraphswitch) — Switch to a different knowledge graph
+    - [🟡 `/kmgraph:add-category`](#-kmgraphadd-category) — Add custom categories
+    - [🟡 `/kmgraph:config-sanitization`](#-kmgraphconfig-sanitization) — Set up safety features for team sharing
 
 === "Capture & Document"
 
     Document lessons, capture history, and summarize sessions.
 
-    - [🟢 `/kmgraph:capture-lesson`](#-kgsiscapture-lesson-commands-tab) — Capture problems solved and patterns discovered
-    - [🟡 `/kmgraph:extract-chat`](#-kgsisextract-chat-commands-tab) — Export chat history to markdown
-    - [🟡 `/kmgraph:session-summary`](#-kgsisssession-summary-commands-tab) — Summarize important work sessions
+    - [🟢 `/kmgraph:capture-lesson`](#-kmgraphcapture-lesson) — Capture problems solved and patterns discovered
+    - [🟡 `/kmgraph:extract-chat`](#-kmgraphextract-chat) — Export chat history to markdown
+    - [🟡 `/kmgraph:session-summary`](#-kmgraphsession-summary) — Summarize important work sessions
 
 === "Search & Sync"
 
     Find knowledge and keep the graph synchronized.
 
-    - [🟢 `/kmgraph:status`](#-kgsistatus-commands-tab) — Check current knowledge graph status
-    - [🟢 `/kmgraph:recall`](#-kgsisrecall-commands-tab) — Search across all knowledge entries
-    - [🟡 `/kmgraph:update-graph`](#-kgsisupdate-graph-commands-tab) — Extract lessons into knowledge graph
-    - [🟡 `/kmgraph:update-doc`](#-kgsisupdate-doc-commands-tab) — Update documentation with changes
-    - [🔴 `/kmgraph:sync-all`](#-kgsissync-all-commands-tab) — Run complete synchronization pipeline
+    - [🟢 `/kmgraph:status`](#-kmgraphstatus) — Check current knowledge graph status
+    - [🟢 `/kmgraph:recall`](#-kmgraphrecall) — Search across all knowledge entries
+    - [🟡 `/kmgraph:update-graph`](#-kmgraphupdate-graph) — Extract lessons into knowledge graph
+    - [🟡 `/kmgraph:update-doc`](#-kmgraphupdate-doc) — Update documentation with changes
+    - [🔴 `/kmgraph:sync-all`](#-kmgraphsync-all) — Run complete synchronization pipeline
 
 === "Team & Sharing"
 
     Share knowledge safely with team members.
 
-    - [🟡 `/kmgraph:check-sensitive`](#-kgsischeck-sensitive-commands-tab) — Scan for sensitive data before sharing
-    - [🔴 `/kmgraph:link-issue`](#-kgsislink-issue-commands-tab) — Connect lessons to GitHub issues
+    - [🟡 `/kmgraph:check-sensitive`](#-kmgraphcheck-sensitive) — Scan for sensitive data before sharing
+    - [🔴 `/kmgraph:link-issue`](#-kmgraphlink-issue) — Connect lessons to GitHub issues
 
 === "Advanced Issues"
 
     Track complex, multi-attempt problems systematically.
 
-    - [🔴 `/kmgraph:meta-issue`](#-kgsismeta-issue-commands-tab) — Track multi-attempt bugs and features
-    - [🔴 `/kmgraph:start-issue-tracking`](#-kgsisstart-issue-tracking-commands-tab) — Systematic issue tracking with Git branches
-    - [🔴 `/kmgraph:update-issue-plan`](#-kgsisupdate-issue-plan-commands-tab) — Sync progress with GitHub and plans
+    - [🔴 `/kmgraph:meta-issue`](#-kmgraphmeta-issue) — Track multi-attempt bugs and features
+    - [🔴 `/kmgraph:start-issue-tracking`](#-kmgraphstart-issue-tracking) — Systematic issue tracking with Git branches
+    - [🔴 `/kmgraph:update-issue-plan`](#-kmgraphupdate-issue-plan) — Sync progress with GitHub and plans
 
 === "Memory Management"
 
     Manage MEMORY.md size and archive old patterns.
 
-    - [🔴 `/kmgraph:archive-memory`](#-kgsisarchive-memory-commands-tab) — Archive old patterns from MEMORY.md
-    - [🔴 `/kmgraph:restore-memory`](#-kgsisrestore-memory-commands-tab) — Restore archived context
+    - [🔴 `/kmgraph:archive-memory`](#-kmgrapharchive-memory) — Archive old patterns from MEMORY.md
+    - [🔴 `/kmgraph:restore-memory`](#-kmgraphrestore-memory) — Restore archived context
 
 ---
 
@@ -221,7 +221,7 @@ Commands work across platforms, but full automation is Claude Code-specific.
 3. Asks for optional custom prefixes per category
 4. Creates directory structure (`knowledge/`, `lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`)
 5. Copies templates from the plugin
-6. **[NEW in v0.2.2-beta]** Offers to create a **personal KG** at `~/.claude/knowledge-graph/` for cross-project lessons (see [`/kmgraph:init-personal-kg`](#-kgsisinitpersonalkg-commands-tab))
+6. **[NEW in v0.2.2-beta]** Offers to create a **personal KG** at `~/.claude/knowledge-graph/` for cross-project lessons (see [`/kmgraph:init-personal-kg`](#-kmgraphinit-personal-kg))
 7. **[NEW in v0.0.10.2]** Optionally backfills from existing project context (README, CHANGELOG, lessons, decisions, chat history)
 8. Optionally installs a git post-commit hook for lesson capture suggestions
 9. Updates `.gitignore` based on chosen git strategy
@@ -553,18 +553,22 @@ Dispatches to the recall agent, which searches:
 6. Updates sessions README index
 7. Optionally triggers lesson capture and KG update
 
-**Time**: Under 10 seconds (analysis + write)
+**[NEW in v0.2.2-beta] Snapshot mode** (`--snapshot`): Lightweight mid-session capture. Runs before any capture command when the user opts in. Appends to today's session file (or creates one) without a user review gate. Optional git history (`--snapshot --git`). Used by `capture-lesson`, `create-adr`, and `start-issue-tracking` to preserve the "why" at the moment of discovery.
+
+**Time**: Under 10 seconds (full mode); under 5 seconds (snapshot mode without git)
 
 **Example**:
 ```bash
 /kmgraph:session-summary
-/kmgraph:session-summary --auto    # Skip confirmation, save immediately
+/kmgraph:session-summary --auto        # Skip confirmation, save immediately
+/kmgraph:session-summary --snapshot    # Lightweight mid-session append (no review gate)
 ```
 
 **Tips**:
 
 - Captures git commits automatically — no need to list them manually
 - Auto-suggests summary when context approaches ~180K tokens
+- If a snapshot was taken earlier in the session, wrap-up only adds closing context
 
 ---
 

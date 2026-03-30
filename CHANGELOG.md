@@ -12,8 +12,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### TL;DR
 
+!!! info "Personal knowledge graph — cross-project lessons, always available."
+    A personal KG at `~/.claude/knowledge-graph/` stores lessons that apply across all your projects. When registered, `/kmgraph:recall` searches both project and personal KGs automatically. Results show `[project]` or `[personal]` source labels. Set up during `/kmgraph:init` or any time with `/kmgraph:init-personal-kg`.
+
+!!! info "Session snapshot on capture — preserve the 'why' mid-session."
+    Any capture command (`/kmgraph:capture-lesson`, `/kmgraph:create-adr`, `/kmgraph:start-issue-tracking`) now offers a lightweight snapshot gate before the capture dialog. A snapshot records the current context and open items in under 10 seconds, without interrupting your flow.
+
 !!! info "Search index now checked during upgrade."
     After a plugin upgrade, the search index (`.fts5.db`) no longer silently disappears. The `/kmgraph:init` verify/upgrade flow now detects a missing index, validates the KG path, and offers to rebuild — preventing the "FTS5 rebuild found 0 files" error reported after upgrade.
+
+### Added
+- **ENH-001: Personal KG** — New `type: "personal"` for KGs that are not tied to a project. Live at `~/.claude/knowledge-graph/` by default. Accessible from any project via multi-KG search.
+  - `kg_search` extended with `searchScope: "active" | "all" | "personal-only"` parameter
+  - `kg_capture` extended with optional `targetKg` parameter — bypasses CWD check when an explicit target KG is named
+  - `lesson-capture-agent` shows a KG picker when ≥2 KGs are registered; session memory avoids re-prompting
+  - `recall-agent` auto-detects personal KGs and passes `searchScope: "all"` automatically
+  - `/kmgraph:init` Step 1.8.5: offers to create personal KG at end of setup
+  - New command `/kmgraph:init-personal-kg`: standalone wizard for personal KG creation
+  - `hooks-master.sh` Section 3.5: surfaces recent personal KG lessons at SessionStart
+- **ENH-002: Session Snapshot on Capture** — Lightweight snapshot gate at every capture entry point.
+  - `session-summary-agent` `--snapshot` mode: appends to today's session file, optional git, no review gate, deduplicates content
+  - Snapshot gate added to `capture-lesson`, `create-adr`, and `start-issue-tracking`
+  - `session-end-prompt.sh` detects `/tmp/.kg-snapshot-{date}` flag; adjusts wrap-up prompt
+  - `session-wrap` skill is snapshot-aware: adjusts trigger language when snapshot already taken
+
+### Changed
+- **Terminology**: KG type renamed from `"global"` → `"personal"` throughout. `searchScope: "global-only"` → `"personal-only"`. Source labels: `[global]` → `[personal]`.
+- **`start-issue-tracking`**: Step 1.0 now surfaces a visible `⚠️` notice when the current branch ≠ main, priming the user before versioning decisions. Step 6.2 lesson capture prompt is now context-aware — strongly recommended when Active Work Guard triggered.
+- **ROADMAP.md**: Added v0.2.0, v0.2.1, v0.2.2 sections (was stale at v0.1.2).
+- **COMMAND-GUIDE.md TOC**: Fixed stale `kgsis` anchor prefix throughout — replaced with correct pymdownx-generated anchors (`-kmgraph<command>`).
 
 ### Fixed
 - **`/kmgraph:init` verify/upgrade — FTS5 index check (step 1e)**: The search index (`.fts5.db`) is local-only and does not survive reinstalls or upgrades. The verify/upgrade flow now checks for a missing index, respects the `fts5_declined` preference, and offers to rebuild via `kg_fts5_rebuild`
@@ -21,6 +48,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 - Updated `GETTING-STARTED.md` — Faster Search section now explains that `.fts5.db` is local-only and does not survive upgrades; documents both `/kmgraph:init` and `/kmgraph:sync-all` as paths to rebuild a missing index. Step 9 in the plugin update troubleshooting flow updated to mention the search index check
+- `CONCEPTS.md`: Added "Personal vs Project Knowledge" section — decision table, behavior summary, when-to-use guide
+- `COMMAND-GUIDE.md`: Added `/kmgraph:init-personal-kg` entry; updated `/kmgraph:recall` with `--scope` table and multi-KG result format; updated `/kmgraph:session-summary` with snapshot mode docs
+- `CHEAT-SHEET.md`: Added `init-personal-kg`; updated recall and session-summary entries
 
 ## [0.2.1.1-beta] - 2026-03-28
 

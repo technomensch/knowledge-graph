@@ -386,7 +386,7 @@ A personal KG lives at `~/.claude/knowledge-graph/` and is accessible from any p
 - **During init**: `/kmgraph:init` offers to create a personal KG at the end of setup
 - **Standalone**: `/kmgraph:init-personal-kg` creates and registers the personal KG at any time
 
-See [COMMAND-GUIDE.md § init-personal-kg](COMMAND-GUIDE.md#-kmgraphinit-personal-kg) for setup details.
+See [`/kmgraph:init-personal-kg`](COMMAND-GUIDE.md#-kmgraphinit-personal-kg) in COMMAND-GUIDE.md for setup details.
 
 ---
 

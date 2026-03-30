@@ -48,7 +48,7 @@ Active users use these for regular workflows:
 |---------|---------|
 | `/kmgraph:update-graph` | Extract knowledge graph entries from lessons. Uses background file reading for large batches when context-mode is installed |
 | `/kmgraph:add-category` | Add a new category to existing knowledge graph |
-| `/kmgraph:session-summary` | Create summary of current chat session (v0.2.1-beta refactored) |
+| `/kmgraph:session-summary` | Create summary of current chat session; `--snapshot` for lightweight mid-session capture (v0.2.2-beta) |
 | `/kmgraph:list` | Display all configured knowledge graphs |
 | `/kmgraph:switch` | Change active knowledge graph |
 | `/kmgraph:check-sensitive` | Scan knowledge graph for potentially sensitive information |
