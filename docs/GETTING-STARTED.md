@@ -218,7 +218,9 @@ flowchart TD
 
 If a search index already exists, sync-all refreshes it automatically with no prompt. If no index exists and the user has not previously declined, sync-all asks once. The preference is remembered — users are never asked again regardless of the answer.
 
-How to tell the index is active: search results show `(FTS5)` — this just means the index was used. How to build the index manually: run `kg_fts5_rebuild` from the MCP tool panel. How to revert: delete the `.fts5.db` file from the knowledge graph root folder.
+How to tell the index is active: search results show `(FTS5)` — this just means the index was used. How to build the index manually: run `kg_fts5_rebuild` from the MCP tool panel. How to revert: delete `~/.claude/kg-fts5/{kg-name}.db`.
+
+**Index storage location**: The search index lives at `~/.claude/kg-fts5/{kg-name}.db` — outside the project directory. This means the index survives git pulls, plugin upgrades, and fresh clones. It is never committed to version control and does not need to be rebuilt after upgrading the plugin or pulling a new branch.
 
 **After backfill or upgrade with existing lessons:** If the backfill option was used during `/kmgraph:init`, or if lessons already existed before the plugin was installed, run `/kmgraph:update-graph` to populate `knowledge/` with structured patterns and concepts extracted from those lessons. Without this step, `knowledge/` remains empty and recall results will lack extracted insights. After extraction, run `/kmgraph:sync-all` to build the search index so all content is immediately searchable by relevance.
 
@@ -308,7 +310,7 @@ How to tell the index is active: search results show `(FTS5)` — this just mean
     /kmgraph:init
     ```
 
-    Select **option 1 (Verify/upgrade)** when prompted. This checks that directories, config fields, templates, and the search index are current with the new plugin version. If the search index (`.fts5.db`) is missing, the wizard offers to rebuild it. If `knowledge/` is empty despite existing lessons, the wizard offers to run `/kmgraph:update-graph --auto --sync-all` — this processes all lessons silently in one pass without per-lesson prompts. Existing lessons and decisions are never modified.
+    Select **option 1 (Verify/upgrade)** when prompted. This checks that directories, config fields, templates, and the search index are current with the new plugin version. If the search index (`~/.claude/kg-fts5/{kg-name}.db`) is missing, the wizard offers to rebuild it. The index lives outside the project directory, so it survives git pulls and upgrades — rebuilding is only needed after a fresh machine setup or manual deletion. If `knowledge/` is empty despite existing lessons, the wizard offers to run `/kmgraph:update-graph --auto --sync-all` — this processes all lessons silently in one pass without per-lesson prompts. Existing lessons and decisions are never modified.
 
 === "Windows"
 
@@ -482,6 +484,7 @@ Skills activate automatically based on what you're doing. They provide guidance 
 | **session-wrap** | Session ending, context limit (180K+), major milestone | `/kmgraph:session-summary` before compaction |
 | **adr-guide** | "I'm thinking of using...", architecture decisions | `/kmgraph:create-adr` with decision guidance |
 | **doc-update-router** | "update [doc name]", "update the session summary", "update the changelog" | Routes to correct update command, bypassing direct file edits |
+| **capture-router** | "capture that", "remember that", "save that", and similar natural-language capture phrases | Auto-detects content type and destination from content signals, presents single confirmation before writing |
 | **gov-execute-plan** | "execute plan", implementation start, `docs/plans/*.md` mentioned | Zero-deviation 8-step execution protocol |
 
 You don't invoke skills directly — they appear as helpful context when relevant.
@@ -553,5 +556,5 @@ Use `--delegate knowledge-extractor` or `--delegate session-documenter` in comma
 
 ---
 
-**Version**: 0.2.1-beta
-**Last Updated**: 2026-03-28
+**Version**: 0.2.3-beta
+**Last Updated**: 2026-03-30

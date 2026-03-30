@@ -55,6 +55,3 @@ docs/plans/
 docs/reference/
 docs/examples/
 docs/templates/
-
-# FTS5 search index (local, rebuilt on demand)
-**/.fts5.db
