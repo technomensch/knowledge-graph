@@ -47,6 +47,28 @@ mkdir -p {active_kg_path}/decisions/
 
 ---
 
+## Snapshot Gate
+
+*Runs before Step 1 — context preservation before the ADR dialog.*
+
+Ask:
+
+> "Before creating the ADR — want to snapshot the session first?
+> This captures the conversation context and open items around why this decision was made.
+>
+> [y] Snapshot first   [n] Skip   [?] What does this do?"
+
+If `y`:
+> "Include git history? (adds ~5-15 sec)
+>
+> [y] Yes   [n] No — conversation + files only"
+
+Invoke `session-summary-agent --snapshot` (with `--git` if yes). When done, continue to Step 1 — the session summary is now available as context for the ADR's Context section.
+
+If `n`: proceed to Step 1.
+
+---
+
 ## Step 1: Auto-Increment ADR Number
 
 **Scan for existing ADRs:**

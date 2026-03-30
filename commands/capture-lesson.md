@@ -43,6 +43,30 @@ allowed-tools: Bash, Read, Write, Edit, Glob, Grep, kg_search, kg_fts5_rebuild
 
 ---
 
+## Snapshot Gate (New Lesson Path)
+
+*Runs before Step 1 when creating a new lesson (not an update).*
+
+Ask:
+
+> "Before capturing — want to snapshot the session first?
+> This preserves the current context and "why" behind this capture.
+>
+> [y] Snapshot first   [n] Skip   [?] What does this do?"
+
+If `?`: explain that a snapshot is a lightweight mid-session save that records what was being worked on, open plan items, and file changes — so the "why" behind this lesson is preserved in context.
+
+If `y`:
+> "Include git history in the snapshot? (adds ~5-15 sec)
+>
+> [y] Yes — include commits   [n] No — conversation + files only"
+
+Then invoke `session-summary-agent` with `--snapshot` (and `--git` if user said yes). When the agent returns, continue to Step 1 — the session summary is now available as context for the lesson's `context` field.
+
+If `n`: proceed directly to Step 1.
+
+---
+
 ## Step 1: Gather Context (New Lesson)
 
 *When no "update" keyword is present.*

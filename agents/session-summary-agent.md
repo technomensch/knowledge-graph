@@ -25,6 +25,127 @@ model: sonnet
 
 ---
 
+## Step 0: Mode Detection
+
+Parse flags passed to this agent:
+
+| Flag | Description |
+|---|---|
+| (none) | **Full mode** — complete session summary with all steps, user review gate |
+| `--snapshot` | **Snapshot mode** — lightweight mid-session capture, no review gate, appends to today |
+| `--snapshot --git` | Snapshot mode with git history included |
+| `--auto` | Full mode, skip review gate (auto-confirm) |
+| `--title="..."` | Custom title for the session summary |
+
+**If `--snapshot` flag is present:**
+
+Go directly to [Snapshot Mode](#snapshot-mode) below. Skip Steps 1–9.
+
+**Otherwise:** Proceed to Step 1 (full mode).
+
+---
+
+## Snapshot Mode
+
+*Lightweight mid-session capture. Runs in under 10 seconds (without git) or 30 seconds (with git). Writes immediately — no user review gate. Appends to today's summary if one exists.*
+
+### S1: Resolve output path
+
+Read `~/.claude/kg-config.json` → active KG path → `{active_kg_path}/sessions/`.
+
+Check if a session file for today already exists:
+```bash
+today=$(date +%Y-%m-%d)
+ls {active_kg_path}/sessions/ | grep "^$today"
+```
+
+Store `{snapshot_exists} = true/false` and `{existing_snapshot_path}` if found.
+
+### S2: Gather lightweight context
+
+Run only these commands:
+```bash
+git diff --stat HEAD 2>/dev/null          # Unstaged + staged file changes
+git diff --stat --cached HEAD 2>/dev/null # Staged only
+```
+
+If `--git` flag present, also run:
+```bash
+git log --oneline -5 2>/dev/null
+```
+
+Read open plan items only (skip ADR and lesson scans):
+```bash
+grep -r "^\- \[ \]" {active_kg_path}/plans/ --include="*.md" -l 2>/dev/null
+```
+
+### S3: Compose snapshot block
+
+Write a compact snapshot block:
+
+```markdown
+---
+### Snapshot: HH:MM (triggered by: [capture type — lesson|ADR|issue|manual])
+
+**Context:** [1-2 sentences from conversational thread — what was being worked on when capture fired]
+
+**Files in progress:**
+[output from git diff --stat, 5 lines max]
+
+**Open plan items:** [N unchecked steps across [plan names]]
+
+[If --git]: **Recent commits:** [git log --oneline -5]
+```
+
+### S4: Write or append
+
+**If `{snapshot_exists}` is false:** Create a new session file:
+```markdown
+---
+title: "Session Snapshot — [Date]"
+date: [YYYY-MM-DD]
+branch: [current branch]
+tags: [session, snapshot]
+---
+# Session Snapshot — [Date]
+
+[snapshot block from S3]
+```
+
+**If `{snapshot_exists}` is true:** Append the snapshot block to the existing file.
+
+Deduplication before appending:
+- Commit hashes already in the file → skip those lines from the new block
+- File paths already in "Files in progress" entries → skip duplicates
+- Plan items already listed → skip duplicates
+
+### S5: Save via `kg_capture`
+
+Call `kg_capture` with:
+```json
+{
+  "content": "[full snapshot content]",
+  "type": "session",
+  "metadata": {
+    "title": "Session Snapshot — [Date]",
+    "tags": ["session", "snapshot", "[branch]"],
+    "git": { "branch": "[branch]" }
+  }
+}
+```
+
+If today's session already exists, include `"version": "append"` in metadata to signal append intent.
+
+On success: return the snapshot file path and a one-line confirmation. **Do not ask for review — return immediately.**
+
+> ✅ Snapshot saved to `[relativePath]`. Context preserved. Continuing with capture...
+
+Set flag file: `touch /tmp/.kg-snapshot-$(date +%Y-%m-%d)` so hooks can detect a snapshot was taken today.
+
+**On any error:** Surface the error and note that capture can proceed without snapshot. Do not block the capture flow.
+
+---
+
 ## Step 1: Active KG / CWD Guard
 
 Read `~/.claude/kg-config.json`. Extract `active` key and resolve the active graph's `path`.
@@ -186,9 +307,10 @@ Once approved, call `kg_capture`:
 
 **Conflict error (duplicate session for same date):**
 
-> "A session already exists for today. Overwrite it? (y/n)"
+> "A session already exists for today. Append new content to it, or overwrite? (append / overwrite / cancel)"
 
-If yes, call with `version: "v1.1"` to update.
+If append: call with `"version": "append"` in metadata.
+If overwrite: call with `version: "v1.1"` to update.
 
 **KG_MISMATCH error:**
 
