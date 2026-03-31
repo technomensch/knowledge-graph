@@ -1,5 +1,7 @@
 # Knowledge Graph Quick Reference
 
+**Version:** 0.2.3-beta | **Updated:** 2026-03-31
+
 > **Claude Code only:** The `/kmgraph:` prefix requires Claude Code with this plugin installed. Other IDEs access equivalent functionality through MCP tools.
 
 One-page cheat sheet for the Knowledge Management Graph. For detailed documentation, see [Command Guide](COMMAND-GUIDE.md).

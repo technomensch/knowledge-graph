@@ -2,7 +2,7 @@
 
 A step-by-step guide for setting up the knowledge graph system and capturing the first lesson.
 
-**Version**: 0.1.0-beta
+**Version**: 0.2.3-beta
 
 ---
 
@@ -254,7 +254,7 @@ How to tell the index is active: search results show `(FTS5)` — this just mean
     **Step 1 — Shell: Remove the stale plugin cache**
 
     ```bash
-    rm -rf ~/.claude/plugins/cache/stayinginsync-knowledge-graph/
+    rm -Rf ~/.claude/plugins/cache/stayinginsync-knowledge-graph/
     ```
 
     **Step 2 — Claude Code: Uninstall kmgraph**
@@ -281,7 +281,7 @@ How to tell the index is active: search results show `(FTS5)` — this just mean
     **Step 5 — Claude Code: Reinstall kmgraph**
 
     ```
-    /plugin install stayinginsync
+    /plugin install kmgraph
     ```
 
     **Step 6 — Claude Code: Reload plugins**
@@ -382,7 +382,7 @@ How to tell the index is active: search results show `(FTS5)` — this just mean
     /plugin uninstall kmgraph
     /reload-plugins
     /plugin update stayinginsync
-    /plugin install stayinginsync
+    /plugin install kmgraph
     /reload-plugins
     ```
 
