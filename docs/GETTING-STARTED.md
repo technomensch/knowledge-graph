@@ -249,13 +249,21 @@ How to tell the index is active: search results show `(FTS5)` — this just mean
 
 **Fix — clear the cache and reinstall:**
 
+!!! tip "Try the quick fix first"
+    Clearing the cache alone may be enough to pick up the latest version. Relaunch Claude Code after Step 1 and check the installed version before continuing. If the version is current, stop here. If the version is still outdated or behavior is unchanged, continue with the full reinstall steps below.
+
+    Clearing the cache is not guaranteed to work in all cases — see [#14061](https://github.com/anthropics/claude-code/issues/14061) for the underlying Claude Code limitation. The full reinstall steps are the reliable fallback.
+
 === "macOS / Linux"
 
     **Step 1 — Shell: Remove the stale plugin cache**
 
     ```bash
-    rm -Rf ~/.claude/plugins/cache/stayinginsync-knowledge-graph/
+    rm -Rf ~/.claude/plugins/cache/stayinginsync-knowledge-graph
     ```
+
+    !!! warning
+        Do not include a trailing slash. `rm -Rf path/` fails silently on populated directories on macOS/Linux. Use `rm -Rf path` without the slash.
 
     **Step 2 — Claude Code: Uninstall kmgraph**
 
