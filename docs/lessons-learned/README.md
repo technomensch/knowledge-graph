@@ -1,209 +1,64 @@
 # Lessons Learned - Master Index
 
+**Navigation**: [Home](../../../README.md) > [Getting Started](../../../docs/GETTING-STARTED.md) > [Manual Workflows](../../docs/WORKFLOWS.md) > Templates
+
 Comprehensive catalog of all lessons-learned documents.
 
-**Total Lessons:** 11
-**Last Updated:** 2026-03-27
+**Total Lessons:** 0
+**Last Updated:** [Date]
 
 ---
 
 ## By Category
 
-### Architecture Lessons (3 total)
+### Architecture Lessons (0 total)
 
-- [2026-03-16 - Native FTS5 Search and Context-Mode Integration (v0.1.1+v0.1.2)](architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2.md) - node-sqlite3-wasm chosen for FTS5 over better-sqlite3 (native) and sql.js (FTS3 only); zero-config upgrade via package.json hash check; try/require graceful fallback for optional deps; TypeScript TS2749 fix; context-mode detection-based integration
-- [2026-02-21 - Plugin Example File Management — Why You Can't Gate the Download](architecture/Lessons_Learned_Plugin_Example_File_Management.md) - Plugin installs are atomic; git pull restores deleted tracked files; three options evaluated for opt-out; decision deferred
-- [2026-02-21 - Update Notifications for Non-Plugin Users — Version Sync and MCP Discovery Gap](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md) - MCP server version hardcoded and out of sync; four-part solution designed; deferred to v0.0.9
+[Auto-populated when lessons are added]
 
-**Tags:** #architecture #plugin-distribution #git #versioning #mcp #update-notifications #fts5 #search #sqlite #wasm #zero-config #upgrade #graceful-fallback #context-mode #typescript
+**Tags:** #architecture
 
 ---
 
-### Process Lessons (5 total)
+### Process Lessons (0 total)
 
-- [2026-03-27 - MCP Server Binary Exists But Each IDE Needs Explicit Registration](process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration.md) - Building mcp-server/dist/index.js does not register it in any IDE. Each IDE (Claude Code, Gemini CLI, etc.) requires explicit registration in its own MCP config file using an absolute path to the binary.
-- [2026-03-27 - Plan Subagent Is Read-Only — Write Files Manually After Opus Analysis](process/Lessons_Learned_Plan_Subagent_Is_Read_Only.md) - Plan subagents (subagent_type: Plan) can only read — they cannot call Write, Edit, or Bash. After receiving design output from a Plan subagent, write files manually in the main conversation using Write tool.
-- [2026-03-01 - Plan File Dual-Location Protocol](process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md) - Dual plan files serve different purposes: ~/.claude/plans/ (internal/ephemeral) vs docs/plans/ (project audit trail). Both required before implementation. Protocol violation occurs when docs/plans/ skipped. Prevention: pre-implementation checklist.
-- [2026-02-27 - Documentation Update Triggers in Multi-Branch Feature Development](process/documentation-update-triggers-multibranchfeatures.md) - Multi-branch releases require two-layer documentation: per-feature updates (Layer 1) and comprehensive release sync (Layer 2). Without explicit triggers, documentation updates defer indefinitely. Solution: separate final branch with explicit plan file.
-- [2026-02-16 - Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md) - When testing locally through Claude Code marketplace, changes must be synced from development directory to marketplace cache location
+[Auto-populated when lessons are added]
 
-**Tags:** #process #documentation #release-management #testing #marketplace #plugin-development #workflow #multi-branch-workflow #planning #protocol #claude-code #subagents #plan-mode #read-only #write-tool #mcp #ide-integration #gemini-cli #registration #platform-portability #antigravity
+**Tags:** #process
 
 ---
 
-### Patterns Lessons (1 total)
+### Patterns Lessons (0 total)
 
-- [2026-03-27 - AGENTS-template.md Enables Full KMGraph Workflow on Non-Claude Platforms Without MCP](patterns/Lessons_Learned_AGENTS_Template_Platform_Portability.md) - AGENTS-template.md alone is sufficient for a capable LLM to adopt all KMGraph behaviors; MCP tools are an enhancement, not a requirement; graceful fallback to file-reading when kg_search is unavailable
+[Auto-populated when lessons are added]
 
-**Tags:** #patterns #platform-portability #agents-template #gemini #antigravity #mcp-optional #graceful-degradation
+**Tags:** #patterns
 
 ---
 
-### Debugging Lessons (1 total)
+### Debugging Lessons (0 total)
 
-- [2026-02-16 - Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md) - Shadow command strategy failed with Gemini; file prefix workaround is cross-LLM compatible solution
+[Auto-populated when lessons are added]
 
-**Tags:** #debugging #claude-code #mcp #namespace #cross-llm-compatibility
+**Tags:** #debugging
 
 ---
 
 ## Chronological Index
 
-**2026**
-- 2026-03-27: [AGENTS-template.md Enables Full KMGraph Workflow on Non-Claude Platforms Without MCP](patterns/Lessons_Learned_AGENTS_Template_Platform_Portability.md)
-- 2026-03-27: [MCP Server Binary Exists But Each IDE Needs Explicit Registration](process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration.md)
-- 2026-03-27: [Plan Subagent Is Read-Only — Write Files Manually After Opus Analysis](process/Lessons_Learned_Plan_Subagent_Is_Read_Only.md)
-- 2026-03-16: [Native FTS5 Search and Context-Mode Integration (v0.1.1+v0.1.2)](architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2.md)
-- 2026-03-01: [Plan File Dual-Location Protocol](process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md)
-- 2026-02-27: [Documentation Update Triggers in Multi-Branch Feature Development](process/documentation-update-triggers-multibranchfeatures.md)
-- 2026-02-21: [Plugin Example File Management — Why You Can't Gate the Download](architecture/Lessons_Learned_Plugin_Example_File_Management.md)
-- 2026-02-21: [Update Notifications for Non-Plugin Users — Version Sync and MCP Discovery Gap](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md)
-- 2026-02-16: [Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md)
-- 2026-02-16: [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md)
+**[Current Year]**
+- [YYYY-MM-DD] - [Lesson Title](category/Lessons_Learned_Title.md) - Brief description
 
 ---
 
 ## Tag Index
 
-**#architecture** (3 lessons)
-- [Native FTS5 Search and Context-Mode Integration](architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2.md)
-- [Plugin Example File Management](architecture/Lessons_Learned_Plugin_Example_File_Management.md)
-- [Update Notifications for Non-Plugin Users](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md)
+**#architecture** (0 lessons)
 
-**#fts5** (1 lesson)
-- [Native FTS5 Search and Context-Mode Integration](architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2.md)
+**#process** (0 lessons)
 
-**#zero-config** (1 lesson)
-- [Native FTS5 Search and Context-Mode Integration](architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2.md)
+**#patterns** (0 lessons)
 
-**#graceful-fallback** (1 lesson)
-- [Native FTS5 Search and Context-Mode Integration](architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2.md)
-
-**#plugin-distribution** (2 lessons)
-- [Plugin Example File Management](architecture/Lessons_Learned_Plugin_Example_File_Management.md)
-- [Update Notifications for Non-Plugin Users](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md)
-
-**#git** (1 lesson)
-- [Plugin Example File Management](architecture/Lessons_Learned_Plugin_Example_File_Management.md)
-
-**#versioning** (1 lesson)
-- [Update Notifications for Non-Plugin Users](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md)
-
-**#update-notifications** (1 lesson)
-- [Update Notifications for Non-Plugin Users](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md)
-
-**#process** (4 lessons)
-- [Plan Subagent Is Read-Only — Write Files Manually After Opus Analysis](process/Lessons_Learned_Plan_Subagent_Is_Read_Only.md)
-- [Plan File Dual-Location Protocol](process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md)
-- [Documentation Update Triggers in Multi-Branch Feature Development](process/documentation-update-triggers-multibranchfeatures.md)
-- [Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md)
-
-**#subagents** (1 lesson)
-- [Plan Subagent Is Read-Only — Write Files Manually After Opus Analysis](process/Lessons_Learned_Plan_Subagent_Is_Read_Only.md)
-
-**#plan-mode** (1 lesson)
-- [Plan Subagent Is Read-Only — Write Files Manually After Opus Analysis](process/Lessons_Learned_Plan_Subagent_Is_Read_Only.md)
-
-**#read-only** (1 lesson)
-- [Plan Subagent Is Read-Only — Write Files Manually After Opus Analysis](process/Lessons_Learned_Plan_Subagent_Is_Read_Only.md)
-
-**#write-tool** (1 lesson)
-- [Plan Subagent Is Read-Only — Write Files Manually After Opus Analysis](process/Lessons_Learned_Plan_Subagent_Is_Read_Only.md)
-
-**#patterns** (1 lesson)
-- [AGENTS-template.md Enables Full KMGraph Workflow on Non-Claude Platforms Without MCP](patterns/Lessons_Learned_AGENTS_Template_Platform_Portability.md)
-
-**#agents-template** (1 lesson)
-- [AGENTS-template.md Enables Full KMGraph Workflow on Non-Claude Platforms Without MCP](patterns/Lessons_Learned_AGENTS_Template_Platform_Portability.md)
-
-**#mcp-optional** (1 lesson)
-- [AGENTS-template.md Enables Full KMGraph Workflow on Non-Claude Platforms Without MCP](patterns/Lessons_Learned_AGENTS_Template_Platform_Portability.md)
-
-**#graceful-degradation** (1 lesson)
-- [AGENTS-template.md Enables Full KMGraph Workflow on Non-Claude Platforms Without MCP](patterns/Lessons_Learned_AGENTS_Template_Platform_Portability.md)
-
-**#gemini** (1 lesson)
-- [AGENTS-template.md Enables Full KMGraph Workflow on Non-Claude Platforms Without MCP](patterns/Lessons_Learned_AGENTS_Template_Platform_Portability.md)
-
-**#debugging** (1 lesson)
-- [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md)
-
-**#mcp** (3 lessons)
-- [MCP Server Binary Exists But Each IDE Needs Explicit Registration](process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration.md)
-- [Update Notifications for Non-Plugin Users](architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users.md)
-- [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md)
-
-**#ide-integration** (1 lesson)
-- [MCP Server Binary Exists But Each IDE Needs Explicit Registration](process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration.md)
-
-**#gemini-cli** (1 lesson)
-- [MCP Server Binary Exists But Each IDE Needs Explicit Registration](process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration.md)
-
-**#registration** (1 lesson)
-- [MCP Server Binary Exists But Each IDE Needs Explicit Registration](process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration.md)
-
-**#platform-portability** (2 lessons)
-- [MCP Server Binary Exists But Each IDE Needs Explicit Registration](process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration.md)
-- [AGENTS-template.md Enables Full KMGraph Workflow on Non-Claude Platforms Without MCP](patterns/Lessons_Learned_AGENTS_Template_Platform_Portability.md)
-
-**#antigravity** (2 lessons)
-- [MCP Server Binary Exists But Each IDE Needs Explicit Registration](process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration.md)
-- [AGENTS-template.md Enables Full KMGraph Workflow on Non-Claude Platforms Without MCP](patterns/Lessons_Learned_AGENTS_Template_Platform_Portability.md)
-
-**#namespace** (1 lesson)
-- [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md)
-
-**#cross-llm-compatibility** (1 lesson)
-- [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md)
-
-**#testing** (1 lesson)
-- [Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md)
-
-**#marketplace** (1 lesson)
-- [Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md)
-
-**#plugin-development** (1 lesson)
-- [Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md)
-
-**#workflow** (1 lesson)
-- [Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md)
-
-**#documentation** (1 lesson)
-- [Documentation Update Triggers in Multi-Branch Feature Development](process/documentation-update-triggers-multibranchfeatures.md)
-
-**#release-management** (1 lesson)
-- [Documentation Update Triggers in Multi-Branch Feature Development](process/documentation-update-triggers-multibranchfeatures.md)
-
-**#multi-branch-workflow** (1 lesson)
-- [Documentation Update Triggers in Multi-Branch Feature Development](process/documentation-update-triggers-multibranchfeatures.md)
-
-**#mkdocs** (1 lesson)
-- [MkDocs Grid Cards Require 4-Space Indentation](debugging/Lessons_Learned_MkDocs_Grid_Cards_Indentation.md)
-
-**#material-theme** (1 lesson)
-- [MkDocs Grid Cards Require 4-Space Indentation](debugging/Lessons_Learned_MkDocs_Grid_Cards_Indentation.md)
-
-**#grid-cards** (1 lesson)
-- [MkDocs Grid Cards Require 4-Space Indentation](debugging/Lessons_Learned_MkDocs_Grid_Cards_Indentation.md)
-
-**#css** (1 lesson)
-- [MkDocs Grid Cards Require 4-Space Indentation](debugging/Lessons_Learned_MkDocs_Grid_Cards_Indentation.md)
-
-**#indentation** (1 lesson)
-- [MkDocs Grid Cards Require 4-Space Indentation](debugging/Lessons_Learned_MkDocs_Grid_Cards_Indentation.md)
-
-**#markdown** (1 lesson)
-- [MkDocs Grid Cards Require 4-Space Indentation](debugging/Lessons_Learned_MkDocs_Grid_Cards_Indentation.md)
-
-**#planning** (1 lesson)
-- [Plan File Dual-Location Protocol](process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md)
-
-**#protocol** (1 lesson)
-- [Plan File Dual-Location Protocol](process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md)
-
-**#claude-code** (2 lessons)
-- [Plan File Dual-Location Protocol](process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md)
-- [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md)
+**#debugging** (0 lessons)
 
 ---
 
@@ -222,6 +77,37 @@ Use `/kmgraph:recall "query"` to search across all lessons.
 
 ---
 
+## Field Guide
+
+The lesson template uses YAML frontmatter with [AUTO] and [MANUAL] field markers:
+
+**[AUTO] fields** — Automatically filled by `/kmgraph:capture-lesson` command:
+- `created` - Timestamp when lesson was created (ISO 8601 format)
+- `author` - From git config user.name
+- `email` - From git config user.email
+- `git.branch` - Current git branch
+- `git.commit` - Latest commit hash
+- `git.pr` - PR number (detected from branch name, or null)
+- `git.issue` - Issue number (detected from branch name, or null)
+
+**[MANUAL] fields** — You must fill these in:
+- `title` - Short descriptive title for the lesson
+- `tags` - Custom tags for searching (e.g., [database, performance])
+- `sources` - External articles/docs consulted (optional)
+
+**[AUTO-SUGGEST] fields** — Command suggests, you can override:
+- `category` - Command suggests based on content (architecture/process/patterns/debugging)
+
+**Troubleshooting:**
+- If you see `[AUTO]` next to a field — the command fills it automatically
+- If you see `[MANUAL]` next to a field — you need to fill it in
+- If you see `[AUTO-SUGGEST]` — command provides a suggestion, but you can change it
+
+**Examples:**
+See [core/examples/lessons-learned/](../../examples/lessons-learned/) for filled-out lesson examples.
+
+---
+
 ## Integration
 
 - **Knowledge Graph:** Lessons feed patterns, gotchas, concepts to KG
@@ -229,3 +115,18 @@ Use `/kmgraph:recall "query"` to search across all lessons.
 - **MEMORY.md:** Critical patterns from lessons sync to persistent memory
 - **Meta-Issues:** Complex problems reference multiple lessons
 
+---
+
+## Learn More
+
+**Understanding fields**:
+- [Concepts Guide](../../../docs/CONCEPTS.md#yaml-frontmatter) - YAML field explanations
+- [lesson-template.md](lesson-template.md) - See inline field comments
+
+**See examples**:
+- [Real Examples](../../examples/lessons-learned/) - Filled-out lessons
+- [Pattern Guide](../../docs/PATTERNS-GUIDE.md) - Writing quality tips
+
+**How to capture**:
+- [Manual Workflow](../../docs/WORKFLOWS.md#workflow-1-create-lesson-learned) - Step-by-step
+- [Command Guide](../../../docs/COMMAND-GUIDE.md#essential-commands) - Automated (Claude Code)

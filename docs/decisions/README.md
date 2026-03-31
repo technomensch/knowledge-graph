@@ -1,123 +1,95 @@
 # Architecture Decision Records (ADRs)
 
+**Navigation**: [Home](../../../README.md) > [Getting Started](../../../docs/GETTING-STARTED.md) > [Manual Workflows](../../docs/WORKFLOWS.md) > Templates
+
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 21
-**Last Updated:** 2026-03-30
+**Total ADRs:** 0
+**Last Updated:** [Date]
 
 ---
 
 ## Active ADRs
 
-- [ADR-001: Centralized Multi-KG Configuration](ADR-001-centralized-multi-kg-configuration.md) — **Status:** Proposed
-- [ADR-002: Commands vs Skills Architecture](ADR-002-commands-vs-skills-architecture.md) — **Status:** Proposed
-- [ADR-003: Abandon Shadow Commands; Use File Prefix](ADR-003-abandon-shadow-commands-for-file-prefix.md) — **Status:** Proposed
-- [ADR-004: Token-Based MEMORY.md Size Limits](ADR-004-token-based-memory-size-limits.md) — **Status:** Proposed
-- [ADR-005: Defer MEMORY.md Auto-Sync Rules Engine to v0.0.5](ADR-005-defer-memory-rules-engine.md) — **Status:** Accepted
-- [ADR-006: Delegated vs Inline KG Update Architecture](ADR-006-delegated-vs-inline-kg-updates.md) — **Status:** Proposed
-- [ADR-007: Distribution Hygiene via package.json Allowlist](ADR-007-distribution-hygiene-files-allowlist.md) — **Status:** Proposed
-- [ADR-008: Third-Person Language Standard for User-Facing Docs](ADR-008-third-person-language-standard.md) — **Status:** Proposed
-- [ADR-009: Three-Tier Installation Architecture](ADR-009-three-tier-installation-architecture.md) — **Status:** Proposed
-- [ADR-010: Plugin Namespace Rename: knowledge → kg-sis](ADR-010-namespace-rename-knowledge-to-kg-sis.md) — **Status:** Proposed
-- [ADR-011: Defer Update Notifications and Version Sync to v0.0.9](ADR-011-defer-update-notifications.md) — **Status:** Accepted
-- [ADR-013: Documentation Update Protocol for Multi-Branch Releases](ADR-013-documentation-update-protocol.md) — **Status:** Accepted
-- [ADR-014: Maintain Dual Plan File Locations](ADR-014-maintain-dual-plan-file-locations.md) — **Status:** Accepted
-- [ADR-015: Choose node-sqlite3-wasm for FTS5 Full-Text Search](ADR-015-node-sqlite3-wasm-for-fts5-search.md) — **Status:** Accepted
-- [ADR-016: Graceful Fallback Pattern for Optional MCP Server Dependencies](ADR-016-graceful-fallback-optional-mcp-dependencies.md) — **Status:** Accepted
-- [ADR-017: Four-Layer Architecture with Thin Command Dispatchers](ADR-017-four-layer-architecture-thin-commands.md) — **Status:** Accepted
-- [ADR-018: Platform-Agnostic AGENTS-template for Cross-Platform Portability](ADR-018-agents-template-platform-portability.md) — **Status:** Accepted
-- [ADR-019: Write Guard via Agent Instructions (v0.2.0) vs Data Layer (v0.2.1)](ADR-019-write-guard-agent-instructions-vs-data-layer.md) — **Status:** Accepted
-- [ADR-024: Decouple Issue Tracking Decisions into Four Independent Sequential Prompts](ADR-024-decouple-issue-tracking-decisions-sequential-prompts.md) — **Status:** Accepted
-- [ADR-020: Lifecycle Hooks Suite for Automated Knowledge Capture](ADR-020-lifecycle-hooks-suite-automated-capture.md) — **Status:** Accepted
+[ADRs with Status: Accepted]
 
 ---
 
 ## All ADRs (Chronological)
 
-| # | Date | Title | Version | Status |
-|---|------|-------|---------|--------|
-| **ADR-001** | Feb 15 | Centralized Multi-KG Configuration | v0.0.1 | Proposed |
-| **ADR-002** | Feb 16 | Commands vs Skills Architecture | v0.0.1 | Proposed |
-| **ADR-003** | Feb 16 | Abandon Shadow Commands; Use File Prefix | v0.0.1-v0.0.2 | Proposed |
-| **ADR-004** | Feb 16 | Token-Based MEMORY.md Size Limits | v0.0.3 | Proposed |
-| **ADR-005** | Feb 16 | Defer MEMORY.md Auto-Sync Rules Engine to v0.0.5 | v0.0.3→v0.0.4 | Accepted |
-| **ADR-006** | Feb 16 | Delegated vs Inline KG Update Architecture | v0.0.3 | Proposed |
-| **ADR-007** | Feb 17 | Distribution Hygiene via package.json Allowlist | v0.0.6 | Proposed |
-| **ADR-008** | Feb 20 | Third-Person Language Standard for User-Facing Docs | v0.0.7 | Proposed |
-| **ADR-009** | Feb 20 | Three-Tier Installation Architecture | v0.0.8 | Proposed |
-| **ADR-010** | Feb 21 | Plugin Namespace Rename: knowledge → kg-sis | v0.0.8.3 | Proposed |
-| **ADR-011** | Feb 21 | Defer Update Notifications and Version Sync to v0.0.9 | v0.0.9 | Accepted |
-| **ADR-013** | Feb 27 | Documentation Update Protocol for Multi-Branch Releases | v0.0.10 | Accepted |
-| **ADR-014** | Mar 01 | Maintain Dual Plan File Locations | v0.0.10 | Accepted |
-| **ADR-015** | Mar 16 | Choose node-sqlite3-wasm for FTS5 Full-Text Search | v0.1.2-beta | Accepted |
-| **ADR-016** | Mar 16 | Graceful Fallback Pattern for Optional MCP Server Dependencies | v0.1.2-beta | Accepted |
-| **ADR-017** | Mar 27 | Four-Layer Architecture with Thin Command Dispatchers | v0.2.0-beta | Accepted |
-| **ADR-018** | Mar 27 | Platform-Agnostic AGENTS-template for Cross-Platform Portability | v0.2.0-beta | Accepted |
-| **ADR-019** | Mar 27 | Write Guard via Agent Instructions (v0.2.0) vs Data Layer (v0.2.1) | v0.2.0-beta | Accepted |
-| **ADR-020** | Mar 27 | Lifecycle Hooks Suite for Automated Knowledge Capture | v0.2.0-beta | Accepted |
-| **ADR-024** | Mar 30 | Decouple Issue Tracking Decisions into Four Independent Sequential Prompts | v0.2.2-beta | Accepted |
+[Auto-populated when ADRs are created]
+
+- [ADR-001: Title](ADR-001-title.md) — **Status:** Accepted — [Brief description]
 
 ---
 
 ## By Category
 
-### Architecture & System Design
-- [ADR-001](ADR-001-centralized-multi-kg-configuration.md) — Centralized multi-KG configuration pattern
-- [ADR-002](ADR-002-commands-vs-skills-architecture.md) — Commands (flat) vs Skills (hierarchical) pattern
-- [ADR-006](ADR-006-delegated-vs-inline-kg-updates.md) — Delegated vs inline KG update architecture
-- [ADR-009](ADR-009-three-tier-installation-architecture.md) — Three-tier installation (Tier 1/2/3)
-- [ADR-010](ADR-010-namespace-rename-knowledge-to-kg-sis.md) — Plugin namespace: `knowledge` → `kg-sis`
-- [ADR-015](ADR-015-node-sqlite3-wasm-for-fts5-search.md) — node-sqlite3-wasm (WASM SQLite) for FTS5 search
-- [ADR-016](ADR-016-graceful-fallback-optional-mcp-dependencies.md) — Graceful fallback pattern for optional MCP dependencies
-- [ADR-017](ADR-017-four-layer-architecture-thin-commands.md) — Four-layer architecture: context / logic / lifecycle / data
-- [ADR-018](ADR-018-agents-template-platform-portability.md) — Platform-agnostic AGENTS-template for non-Claude Code platforms
-- [ADR-019](ADR-019-write-guard-agent-instructions-vs-data-layer.md) — Write guard in agent instructions (v0.2.0) deferred to data layer (v0.2.1)
-- [ADR-020](ADR-020-lifecycle-hooks-suite-automated-capture.md) — Lifecycle hooks suite: 6 scripts for automated capture prompts
+### Architecture
+- [ADR-XXX](ADR-XXX-title.md) — [Topic]
 
-### Implementation & Patterns
-- [ADR-003](ADR-003-abandon-shadow-commands-for-file-prefix.md) — Shadow commands → file prefix workaround
-- [ADR-004](ADR-004-token-based-memory-size-limits.md) — Token-based (not line-based) MEMORY.md limits
-- [ADR-007](ADR-007-distribution-hygiene-files-allowlist.md) — Plugin distribution via allowlist
+### Process
+- [ADR-XXX](ADR-XXX-title.md) — [Topic]
 
-### Standards & Documentation
-- [ADR-008](ADR-008-third-person-language-standard.md) — Third-person only in user-facing docs
-- [ADR-013](ADR-013-documentation-update-protocol.md) — Two-layer documentation update protocol for releases
-- [ADR-014](ADR-014-maintain-dual-plan-file-locations.md) — Dual plan file locations (~/.claude/plans/ and docs/plans/)
-
-### Process & Command UX
-- [ADR-024](ADR-024-decouple-issue-tracking-decisions-sequential-prompts.md) — Decouple `start-issue-tracking` Step 1 into four sequential prompts; enforcement gates at Steps 6.2 and 6.4
-
-### Deferral & Roadmap
-- [ADR-005](ADR-005-defer-memory-rules-engine.md) — Defer rules engine to v0.0.5 (restore-only in v0.0.4)
-- [ADR-011](ADR-011-defer-update-notifications.md) — Defer update notifications to v0.0.9 (local version reporting in v0.0.9)
+### Technology Choices
+- [ADR-XXX](ADR-XXX-title.md) — [Topic]
 
 ---
 
 ## ADR Statuses
 
-- **Proposed:** Decision identified and documented (awaiting formal acceptance)
+- **Proposed:** Decision under consideration
 - **Accepted:** Decision approved and implemented
 - **Deprecated:** No longer relevant or superseded
 - **Superseded:** Replaced by a newer ADR
 
 ---
 
+## Field Guide
+
+The ADR template uses manual markdown fields (no auto-fill commands yet):
+
+**Header Fields (all manual):**
+- `ADR-XXX` - Sequential number (e.g., ADR-001, ADR-002)
+- `Title` - Concise decision description
+- `Date` - Date decision was made (format: 2024-01-15)
+- `Status` - Current status (Proposed | Accepted | Deprecated | Superseded)
+- `Implements` - Optional: Version or feature this applies to
+- `Related` - Optional: Links to related ADRs, lessons, KG entries
+
+**Content Sections:**
+All sections are manually filled:
+- **Context** - Why this decision is needed
+- **Decision** - What was decided (clear, concise statement)
+- **Rationale** - Why this choice over alternatives
+- **Consequences** - Positive and negative impacts
+- **Related** - Links to implementation, lessons, KG entries
+
+**Troubleshooting:**
+- ADRs are created manually — no auto-fill commands yet
+- Replace all `[bracketed placeholders]` with your content
+- For sequential numbering, check the highest existing ADR number and add 1
+
+**Examples:**
+See [core/examples/decisions/](../../examples/decisions/) for filled-out ADR examples.
+
+---
+
 ## Creating a New ADR
 
-1. **Determine next number:** Currently at ADR-020; next would be ADR-021
+1. **Determine next number:** Find the highest existing ADR number and increment
 2. **Copy template:** Use [ADR-template.md](ADR-template.md)
 3. **Fill all sections:** Context, Decision, Rationale, Consequences
 4. **Link to evidence:** Reference lessons learned, KG entries, implementation
-5. **Update this index:** Add entry above in chronological position
+5. **Update this index:** Add entry above
 
 ---
 
 ## Integration
 
 - **Knowledge Graph:** Architecture ADRs link to architecture.md entries
-- **Lessons Learned:** Decisions often emerge from lessons; bidirectional linking recommended
-- **ROADMAP.md:** Future releases reference ADRs for context
-- **Meta-Issues:** Complex decisions may reference investigation issues
+- **Lessons Learned:** Decisions often emerge from lessons
+- **Meta-Issues:** Complex decisions may reference meta-issue investigations
 
 ---
 
@@ -125,19 +97,18 @@ Formal documentation of significant architecture decisions.
 
 ADRs follow a lightweight format:
 - Sequential numbering (001, 002, ...)
-- Chronological ordering by decision date (not creation date)
 - Descriptive filename with slug
 - Standard sections: Context, Decision, Rationale, Consequences, Related
 - Status tracking (Proposed → Accepted → Deprecated/Superseded)
-- YAML frontmatter with metadata (date, deciders, status)
 
 ---
 
-## Notes on Renumbering
+## Learn More
 
-**v0.0.22 Backfill (2026-02-22):** Original ADRs were renumbered to match chronological order:
-- Former ADR-001 (defer rules engine, Feb 16 v0.0.3→v0.0.4) → **ADR-005**
-- Former ADR-002 (defer update notifications, Feb 21 v0.0.9) → **ADR-011**
-- Nine new ADRs created (ADR-001 through ADR-004, ADR-006 through ADR-010) to capture decisions made during v0.0.1 through v0.0.8 development
+**Concepts & Guides**:
+- [Concepts Guide](../../../docs/CONCEPTS.md#adr-architecture-decision-record) - Term explanations
+- [ADR template](ADR-template.md) - Starting scaffold
 
-All cross-references updated in: ROADMAP.md, FAQ.md, CHANGELOG.md, lessons-learned files.
+**Resources**:
+- [Real Examples](../../examples/decisions/) - Filled-out ADRs
+- [Pattern Guide](../../docs/PATTERNS-GUIDE.md) - Writing quality tips
