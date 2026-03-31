@@ -2,8 +2,8 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.1.2-beta
-**Status:** Beta Release — Native FTS5 Search with BM25 Ranking
+**Version:** 0.2.3-beta
+**Status:** Beta Release — FTS5 Relocation, Issue Tracking UX, ECC Compatibility
 
 Documentation available at - https://technomensch.github.io/knowledge-graph/
 
@@ -88,15 +88,15 @@ Power users use these for complex workflows:
 
 ---
 
-## v0.0.10 Feature Highlights
+## v0.2.3-beta Feature Highlights
 
-**Released 2026-02-27**
+**Released 2026-03-31**
 
-- **5 Auto-Triggered Skills** — Context providers activate automatically: lesson-capture (bug solved), kg-recall (past decisions), session-wrap (context limits), adr-guide (architecture decisions), gov-execute-plan (plan execution)
-- **2 Subagents** — Heavy-lift task handlers operating in approval-gated mode: knowledge-extractor (read-only parsing), session-documenter (git archaeology)
-- **Optional KG Backfill** — Initialize knowledge graph with automatic extraction from README, CHANGELOG, existing lessons, decisions, and chat history
-- **Handoff Command** — Generate comprehensive project transition packages (START-HERE, DOCUMENTATION-MAP, SESSION-COMPILATION, OPEN-ISSUES, ARCHITECTURE-SNAPSHOT)
-- **Token Optimization Phase 2** — 46.9% context reduction via skills lazy-loading, subagent delegation for heavy reads, and consolidated automation hooks
+- **FTS5 Relocation** — Full-text search index moved to `docs/.fts5.db` for centralized knowledge management and faster rebuilds
+- **Issue Tracking UX** — Enhanced issue tracking workflow with structured prompts and GitHub bidirectional linking
+- **ECC Compatibility** — Full support for Everything Claude Code plugin ecosystem and cross-platform agent portability
+- **Capture Router** — Intelligent auto-detection of capture type (lesson/ADR/session) and automatic storage location
+- **6 Auto-Triggered Skills** — Context providers activate automatically: lesson-capture (bug solved), kg-recall (past decisions), session-wrap (context limits), adr-guide (architecture decisions), doc-update-router (docs), capture-router (auto-type detection)
 
 ---
 
@@ -233,25 +233,24 @@ is installed from the marketplace. Developer-only content in `docs/` is excluded
 
 See [ROADMAP.md](ROADMAP.md) for detailed version history and development progress.
 
-**Current Release:** v0.1.0-beta (2026-03-03)
-- ✅ Complete alpha cycle (v0.0.9 through v0.0.11-alpha integrated)
-- ✅ Comprehensive pre-beta test suite (113 tests, 9 suites) validating all systems
-- ✅ Production fixes (pre-commit sanitization hook bash 3.2 compatible)
-- ✅ Skills system fully functional (6 context providers)
-- ✅ Subagents operational with governance workflows (3 agents: knowledge-extractor, session-documenter, knowledge-reviewer)
-- ✅ KG initialization with optional backfill
-- ✅ Complete `/kmgraph:` namespace (no legacy `/knowledge:` references)
-- ✅ MCP server auto-installs and upgrades cleanly
-- ✅ Comprehensive documentation (CLAUDE.md, GETTING-STARTED, COMMAND-GUIDE, CHEAT-SHEET)
+**Current Release:** v0.2.3-beta (2026-03-31)
+- ✅ FTS5 relocation to centralized `docs/.fts5.db` for improved performance
+- ✅ Issue tracking UX with structured prompts and GitHub bidirectional linking
+- ✅ ECC (Everything Claude Code) compatibility for cross-platform agent portability
+- ✅ Capture router with intelligent type detection and auto-routing to lessons, ADRs, or sessions
+- ✅ 6 auto-triggered skills for context-aware assistance
+- ✅ 2 subagents for heavy-lift tasks (knowledge-extractor, session-documenter)
+- ✅ Complete documentation with v0.0.7 Section 508 compliance
+- ✅ MCP server with full cross-platform support (Cursor, Windsurf, Continue.dev, JetBrains, VS Code)
 - ⚠️ Beta status: API subject to breaking changes before v1.0.0 stable
 
 **Recent Versions:**
-- v0.0.11-alpha (Mar 3): Pre-beta test suite, pre-commit hook bash 3.2 fix
-- v0.0.10.4-alpha (Mar 1): MCP node_modules auto-install fix
-- v0.0.10-alpha (Feb 27): Skills (5), Subagents (2), KG backfill, handoff
-- v0.0.9-alpha (Feb 27): Namespace migration, CLAUDE.md, hook consolidation
+- v0.2.3-beta (Mar 31): FTS5 relocation, ECC compatibility, capture-router, issue tracking UX
+- v0.2.2-beta (Mar 28): Personal KG, session snapshots, branch guard, snapshot gates
+- v0.2.1-beta (Mar 25): Command/agent architecture refactor, thin dispatchers
+- v0.2.0-beta (Mar 20): Multi-KG support with flexible configuration
 
-**Next:** v1.0.0 stable release — TBD (post-beta feedback cycle)
+**Next:** v0.3.0 — Expanded agent capabilities and improved search UX (post-beta feedback cycle)
 
 ---
 
@@ -379,5 +378,5 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Phase:** Pre-Beta Quality Assurance (v0.0.11-alpha)
-**Next Milestone:** v0.1.0-beta release (March 2026) — Comprehensive testing complete, production-ready
+**Current Phase:** Beta Release Cycle (v0.2.3-beta)
+**Next Milestone:** v0.3.0 — Expanded agent capabilities and improved search UX
