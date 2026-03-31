@@ -326,7 +326,7 @@ How to tell the index is active: search results show `(FTS5)` — this just mean
     /plugin uninstall kmgraph
     /reload-plugins
     /plugin update stayinginsync
-    /plugin install stayinginsync
+    /plugin install kmgraph
     /reload-plugins
     ```
 

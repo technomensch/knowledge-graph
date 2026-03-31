@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.3.1-beta] — 2026-03-31
+
+### Fixed
+- **GETTING-STARTED.md § Plugin update does not take effect** — Corrected plugin install commands (Windows section had incorrect `stayinginsync` reference)
+
 ## [0.2.3-beta] — 2026-03-30
 
 ### Added
