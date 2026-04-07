@@ -1,7 +1,7 @@
 ---
 id: ENH-009
 type: Hardening
-status: OPEN
+status: IMPLEMENTED
 github-issue: "#58"
 branch: v0.2.3.4-beta
 created: 2026-04-07
