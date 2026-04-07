@@ -25,7 +25,7 @@ const sidebars = {
       ],
     },
     {type: 'doc', id: 'CONFIGURATION', label: 'Configuration'},
-    {type: 'doc', id: 'CHANGELOG', label: 'Changelog'},
+    {type: 'link', label: 'Changelog', href: 'https://github.com/technomensch/knowledge-graph/blob/main/CHANGELOG.md'},
     {
       type: 'category',
       label: 'Contributing',
