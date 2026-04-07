@@ -4,6 +4,7 @@
 # macOS system files
 .DS_Store
 **/.DS_Store
+Icon?
 **/.SynologyWorkingDirectory/
 
 # Node.js dependencies (MCP server)
