@@ -62,16 +62,7 @@
   color: #26c6da;
 }
 
-/* Deep sky blue for body links (dark mode) */
-[data-theme='dark'] a {
-  color: #2196F3;
-}
-
-[data-theme='dark'] a:hover {
-  color: #1976D2;
-}
-
-/* Light mode contrast fixes — darker blue for text, teal code with background */
+/* Light mode only — darker colors for WCAG AA contrast compliance */
 :not([data-theme='dark']) a {
   color: #1565C0;
 }
