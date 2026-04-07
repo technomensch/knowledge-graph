@@ -57,9 +57,19 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
-/* Teal inline code highlight (dark mode only) */
+/* Teal inline code highlight */
+:root code,
 [data-theme='dark'] code {
   color: #26c6da;
+}
+
+/* Deep sky blue for body links */
+a {
+  color: #2196F3;
+}
+
+a:hover {
+  color: #1976D2;
 }
 
 /* Light mode only — darker colors for WCAG AA contrast compliance */
