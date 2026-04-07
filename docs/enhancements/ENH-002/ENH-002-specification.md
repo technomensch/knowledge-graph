@@ -66,6 +66,7 @@ Wrap-up: session summary already populated; final run adds closing context only
 - [ ] The capture that triggered the snapshot can reference the session summary file for its "context" field
 - [ ] Hooks (PostToolUse lesson check, Stop hook) also offer snapshot-first behavior before capture prompts
 - [ ] Session summary skill (`session-wrap`) is aware of whether a snapshot was taken this session
+- [ ] `lesson-capture-agent` checks for an existing session summary for today before asking user for context — if found, offers to pre-fill from it: "I found a session summary from today — use it to pre-fill the lesson context? [y] Yes   [n] Ask me instead"
 
 ### Non-Functional
 
@@ -82,6 +83,7 @@ Wrap-up: session summary already populated; final run adds closing context only
 | `commands/capture-lesson.md` | Add snapshot prompt before capture dialog |
 | `commands/create-adr.md` | Add snapshot prompt before ADR dialog |
 | `commands/start-issue-tracking.md` | Add snapshot prompt before Step 1 |
+| `agents/lesson-capture-agent.md` | Phase 2: check for today's session summary before asking user for context; offer to pre-fill from it |
 | `skills/session-wrap/SKILL.md` | Track whether snapshot taken this session; adjust Stop hook prompt |
 | `skills/lesson-capture/SKILL.md` | Offer snapshot before dispatching to lesson-capture-agent |
 | `scripts/post-tool-lesson-check.sh` | Add snapshot offer before lesson capture prompt |

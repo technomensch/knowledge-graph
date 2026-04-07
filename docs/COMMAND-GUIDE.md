@@ -498,14 +498,14 @@ Dispatches to the recall agent, which searches:
 ```bash
 /kmgraph:session-summary
 /kmgraph:session-summary --auto        # Skip confirmation, save immediately
-/kmgraph:session-summary --snapshot    # Lightweight mid-session append (no review gate)
+/kmgraph:session-summary --snapshot    # Mid-session save without review gate — used by capture commands
 ```
 
 **Tips**:
 
 - Captures git commits automatically — no need to list them manually
 - Auto-suggests summary when context approaches ~180K tokens
-- If a snapshot was taken earlier in the session, wrap-up only adds closing context
+- If a session summary was saved earlier in the session (via a capture gate), wrap-up only adds closing context
 
 ---
 

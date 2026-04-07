@@ -49,19 +49,23 @@ allowed-tools: Bash, Read, Write, Edit, Glob, Grep, kg_search, kg_fts5_rebuild
 
 Ask:
 
-> "Before capturing — want to snapshot the session first?
-> This preserves the current context and "why" behind this capture.
+> "Before capturing — want to run a session summary first?
+> This saves the current session state as a persistent summary and makes the 'why' behind this lesson available for the lesson's context field.
 >
-> [y] Snapshot first   [n] Skip   [?] What does this do?"
+> [y] Run session summary   [n] Skip   [?] What does this do?"
 
-If `?`: explain that a snapshot is a lightweight mid-session save that records what was being worked on, open plan items, and file changes — so the "why" behind this lesson is preserved in context.
+If `?`: explain that this runs `/kmgraph:session-summary` in snapshot mode — a lightweight variant that records what was worked on, open plan items, and file changes without requiring a full wrap-up. The result is written to disk and used to enrich the lesson's context field.
 
 If `y`:
-> "Include git history in the snapshot? (adds ~5-15 sec)
+> "Include git history in the session summary? (adds ~5-15 sec)
 >
 > [y] Yes — include commits   [n] No — conversation + files only"
 
-Then invoke `session-summary-agent` with `--snapshot` (and `--git` if user said yes). When the agent returns, continue to Step 1 — the session summary is now available as context for the lesson's `context` field.
+Then invoke `session-summary-agent` with `--snapshot` (and `--git` if user said yes). When the agent returns, say:
+
+> "Session summary saved — I'll use that to fill in the lesson's context and background."
+
+Then continue to Step 1.
 
 If `n`: proceed directly to Step 1.
 
