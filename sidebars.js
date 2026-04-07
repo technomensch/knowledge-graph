@@ -18,6 +18,14 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Issues',
+      items: [
+        {type: 'doc', id: 'TRACK-ISSUES', label: 'How to Track Issues'},
+        {type: 'doc', id: 'reference/META-ISSUE-GUIDE', label: 'Meta-Issue Guide'},
+      ]
+    },
+    {
+      type: 'category',
       label: 'Commands',
       items: [
         {type: 'doc', id: 'COMMAND-GUIDE', label: 'Command Guide'},
@@ -43,7 +51,6 @@ const sidebars = {
         {type: 'doc', id: 'reference/WORKFLOWS', label: 'Manual Workflows'},
         {type: 'doc', id: 'reference/PLATFORM-ADAPTATION', label: 'Platform Adaptation'},
         {type: 'doc', id: 'reference/PATTERNS-GUIDE', label: 'Pattern Writing'},
-        {type: 'doc', id: 'reference/META-ISSUE-GUIDE', label: 'Meta-Issue Guide'},
         {type: 'doc', id: 'reference/SANITIZATION-CHECKLIST', label: 'Sanitization Checklist'},
       ],
     },

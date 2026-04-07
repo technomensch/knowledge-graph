@@ -11,7 +11,7 @@ A step-by-step guide for setting up the knowledge graph system and capturing the
 
 ---
 
-## Universal Installer (All Platforms)
+# Universal Installer (All Platforms)
 
 **For Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Aider, and other AI assistants:** Paste [INSTALL.md](INSTALL.md) into the AI assistant for fully automated setup.
 
@@ -28,7 +28,7 @@ Automated setup requires an AI assistant with terminal and file system access. A
 
 ---
 
-## Using Commands on Non-Claude-Code Platforms
+# Using Commands on Non-Claude-Code Platforms
 
 The commands in this guide work across different platforms:
 
@@ -42,20 +42,20 @@ The commands in this guide work across different platforms:
 
 ---
 
-## Claude Code Setup
+# Claude Code Setup
 
 
 **For**: Users with the Claude Code plugin installed.
 
 **Time to first lesson**: ~5 minutes
 
-### Prerequisites
+## Prerequisites
 
 - Claude Code (latest version)
 - Git (recommended; enables automatic code linking)
 - Node.js 18+ (required for the MCP server)
 
-### Step 1: Load the Plugin
+## Step 1: Load the Plugin
 
 Start Claude Code from the plugin directory to load the knowledge graph commands:
 
@@ -65,7 +65,7 @@ claude --plugin-dir /path/to/knowledge-graph
 
 Verify the plugin loaded by typing `/knowledge` — the autocomplete menu should display available commands.
 
-### Step 2: Initialize the Knowledge Graph
+## Step 2: Initialize the Knowledge Graph
 
 ```bash
 /kmgraph:init
@@ -82,7 +82,7 @@ The initialization wizard prompts for:
 
 After completion, the command creates the knowledge graph directory structure in the project.
 
-### Step 3: Verify Setup
+## Step 3: Verify Setup
 
 ```bash
 /kmgraph:status
@@ -90,7 +90,7 @@ After completion, the command creates the knowledge graph directory structure in
 
 Expected output: `Knowledge Graph: [project-name] | 0 lessons | 0 decisions`
 
-### Step 4: Capture the First Lesson
+## Step 4: Capture the First Lesson
 
 ```bash
 /kmgraph:capture-lesson
@@ -100,7 +100,7 @@ Claude Code guides the session through documenting a problem solved recently. Th
 
 **Tip**: The best time to document is immediately after solving a problem — details are freshest then.
 
-### Step 5: Verify the Lesson Was Saved
+## Step 5: Verify the Lesson Was Saved
 
 ```bash
 /kmgraph:status
@@ -108,7 +108,9 @@ Claude Code guides the session through documenting a problem solved recently. Th
 
 Expected output now shows: `1 lesson`
 
-### The Knowledge Capture Pipeline
+---
+
+# The Knowledge Capture Pipeline
 
 The workflow for capturing and synchronizing knowledge follows a four-step pipeline:
 
@@ -130,7 +132,9 @@ Each step serves a specific purpose:
 3. **Sync** - Consolidate across multiple knowledge graphs
 4. **Summarize** - Create session snapshots for future reference. Use `/kmgraph:session-summary --snapshot` for a lightweight mid-session checkpoint that appends to the current session file without replacing it.
 
-### Next Steps for Claude Code Users
+---
+
+# Next Steps for Claude Code Users
 
 <div class="grid cards" markdown>
 
@@ -150,9 +154,9 @@ Each step serves a specific purpose:
 
 ---
 
-## Optional Features
+# Optional Features
 
-### Cleaner Conversations
+## Cleaner Conversations
 
 If the context-mode plugin is installed alongside kmgraph, `sync-all` and `update-graph` offload heavy file-reading to a background process, keeping the conversation cleaner. No configuration is required — kmgraph detects context-mode automatically. Nothing changes if context-mode is not installed.
 
@@ -171,7 +175,7 @@ When context-mode is installed, file reading is offloaded to a background proces
 
 ---
 
-### Richer Session Summaries (Optional)
+## Richer Session Summaries (Optional)
 
 Session summaries are built by looking backwards — reading recent git commits, checking open plans, scanning for lesson-worthy work. This works well when a session has clear git activity.
 
@@ -181,7 +185,7 @@ Context-mode is not required. Without it, session summaries work exactly as they
 
 ---
 
-### Faster Search (Optional)
+## Faster Search (Optional)
 
 By default, kmgraph searches by reading every file in the knowledge graph. For larger knowledge graphs, building a search index makes results faster and ranks them by relevance. The index is local-only and is not included in version control, so it does not survive a fresh install or upgrade.
 
@@ -233,9 +237,9 @@ How to tell the index is active: search results show `(FTS5)` — this just mean
 
 ---
 
-## Troubleshooting
+# Troubleshooting
 
-### Plugin update does not take effect { #plugin-update-does-not-take-effect }
+## Plugin update does not take effect { #plugin-update-does-not-take-effect }
 
 :::warning[Known Claude Code Limitation: Plugin Cache Not Refreshed on Update]
 
@@ -421,13 +425,13 @@ Clearing the cache is not guaranteed to work in all cases — see [#14061](https
 
     Select **option 1 (Verify/upgrade)** when prompted. The wizard checks directories, config fields, templates, and the search index.
 
-### Commands do not appear in Claude Code autocomplete
+## Commands do not appear in Claude Code autocomplete
 
 - Verify the plugin is loaded: start Claude Code with `claude --plugin-dir /path/to/knowledge-graph`
 - Commands use the `knowledge:` prefix with a colon, not a hyphen: `/kmgraph:init` (correct), `/knowledge-init` (incorrect)
 - Restart Claude Code completely if commands still do not appear
 
-### The MCP server does not start
+## The MCP server does not start
 
 ```bash
 # Verify Node.js is installed
@@ -440,11 +444,11 @@ ls mcp-server/dist/index.js
 ./tests/test-mcp-direct.sh
 ```
 
-### Templates are not found
+## Templates are not found
 
 Verify that `core/templates/` exists in the project directory and that templates were copied to `docs/templates/` with `cp -r core/templates/. docs/templates/`.
 
-### Which category should this lesson use?
+## Which category should this lesson use?
 
 | Category | Use for |
 |---|---|
@@ -455,14 +459,14 @@ Verify that `core/templates/` exists in the project directory and that templates
 
 When uncertain, choose `debugging` for problem-solving documentation and `process` for workflow-related insights.
 
-### Is git required?
+## Is git required?
 
 Git is recommended but not required. With git, the system automatically captures branch name, commit hash, and PR/issue numbers as lesson metadata. Without git, all features remain available — only automatic code linking is unavailable.
 
 ---
 
 <!-- Updated: 2026-03-29 -->
-## Meet Your New Agents
+# Meet Your New Agents
 
 Agents are heavy-lift task handlers that run separately from your main conversation. They exist so that complex or resource-intensive work — parsing large files, searching the knowledge graph, assembling session summaries — happens in isolation and does not crowd out your working context. You rarely invoke agents directly; skills and commands trigger them automatically when the work warrants it.
 
@@ -485,11 +489,11 @@ Agents are heavy-lift task handlers that run separately from your main conversat
 
 ---
 
-## Skills and Subagents
+# Skills and Subagents
 
 As you work, the system provides two types of intelligent assistance:
 
-### Skills (Auto-Triggered Context Providers)
+## Skills (Auto-Triggered Context Providers)
 
 Skills activate automatically based on what you're doing. They provide guidance without interrupting:
 
@@ -505,7 +509,7 @@ Skills activate automatically based on what you're doing. They provide guidance 
 
 You don't invoke skills directly — they appear as helpful context when relevant.
 
-### Subagents (Heavy-Lift Handlers)
+## Subagents (Heavy-Lift Handlers)
 
 Subagents handle resource-intensive tasks in isolation, keeping your main context clean:
 
@@ -518,9 +522,9 @@ Use `--delegate knowledge-extractor` or `--delegate session-documenter` in comma
 
 ---
 
-## Related Documentation
+# Related Documentation
 
-### **Installation & Setup**
+## **Installation & Setup**
 <div class="grid cards" markdown>
 - [Universal Installer](INSTALL.md)
 
@@ -535,7 +539,7 @@ Use `--delegate knowledge-extractor` or `--delegate session-documenter` in comma
   Integration details for Cursor, Windsurf, Continue, VS Code, Aider
 </div>
 
-### **Learning & Reference**
+## **Learning & Reference**
 <div class="grid cards" markdown>
 - [Command Reference Guide](COMMAND-GUIDE.md)
 
@@ -554,7 +558,7 @@ Use `--delegate knowledge-extractor` or `--delegate session-documenter` in comma
   Real-world completed examples: lessons, ADRs, KG entries
 </div>
 
-### **Advanced**
+## **Advanced**
 <div class="grid cards" markdown>
 - [Manual Workflows](reference/WORKFLOWS.md)
 
