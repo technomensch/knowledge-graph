@@ -50,9 +50,17 @@ If this returns any lines, a new version was added and sync is required.
 
 ## Acceptance Criteria
 
-- [ ] `update-issue-plan` detects new version headers in CHANGELOG diff
-- [ ] Gate fires before any commit when a new version is detected
-- [ ] All 7 version files/footers are listed in the prompt
-- [ ] User must explicitly respond before commit proceeds
-- [ ] Skip path warns user of sync gap
-- [ ] No change in behavior when CHANGELOG is updated without a new version header
+- [x] `update-issue-plan` detects new version headers in CHANGELOG diff
+- [x] Gate fires before any commit when a new version is detected
+- [x] All 8 version files/footers are listed in the prompt (including CONCEPTS.md)
+- [x] User must explicitly respond before commit proceeds
+- [x] Skip path warns user of sync gap
+- [x] No change in behavior when CHANGELOG is updated without a new version header
+
+## Additional Findings (Opus analysis, 2026-04-07)
+
+Opus identified that the root cause of both issue-2 and issue-3 is the same: **`start-issue-tracking` treats tracking as a terminal state** rather than a transition state. The fix to `update-issue-plan` (this issue) addresses the symptom; the structural fix is in ENH-004 (start-issue-tracking redesign), which adds:
+- Mode selection gate: "Implement then Track" / "Track then Implement" / "Track only"
+- Pre-flight working-tree check
+- Exit handoff banner with explicit next-action commands
+- `status:` field on issue description template

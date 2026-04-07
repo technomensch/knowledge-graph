@@ -29,12 +29,16 @@ If a new version header is found: pause, list all files requiring bumps, and req
 
 Apply this gate whenever a skill or agent writes a new `## [version]` header to `CHANGELOG.md` as part of an automated or semi-automated workflow. The signal is any staged diff on `CHANGELOG.md` containing a new version header line. Without the gate, version drift accumulates silently and is only discovered at release time.
 
+## Broader Context (Opus analysis, 2026-04-07)
+
+Both issue-2 and issue-3 share a root cause: **`start-issue-tracking` treats tracking as a terminal state** rather than a transition state with an explicit successor action. The version sync omission is a symptom; the structural fix is adding a mode selection gate to `start-issue-tracking` — see ENH-004. The gate gives users a conscious choice: "Implement then Track", "Track then Implement", or "Track only (defer)". Mode 1 ends with an explicit "Proceed to implementation now?" prompt; if declined, the issue is flagged `status: tracked-not-implemented`.
+
 ## Context
 
-- Branch: v0.2.3.4-issue-2-start-issue-tracking-no-git
+- Branch: v0.2.3.4-beta
 - Commit: bf2b5235
 - Category: process
-- Related: issue-3, GitHub #57
+- Related: issue-3, GitHub #57, ENH-004
 
 ---
 
