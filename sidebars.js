@@ -9,8 +9,8 @@ const sidebars = {
       label: 'Concepts',
       items: [
         {type: 'doc', id: 'CONCEPTS', label: 'Overview'},
-        {type: 'doc', id: '4-LAYERS', label: 'Four-Layer Architecture'},
-        {type: 'doc', id: '4-PILLARS', label: 'Four Pillars'},
+        {type: 'doc', id: '4LAYERS', label: 'Four-Layer Architecture'},
+        {type: 'doc', id: '4PILLARS', label: 'Four Pillars'},
         {type: 'doc', id: 'PERSONAL-V-PROJECT', label: 'Personal vs Project'},
         {type: 'doc', id: 'SEARCH', label: 'How Search Works'},
       ],

@@ -1,5 +1,5 @@
 ---
-id: 4-PILLARS
+id: 4PILLARS
 ---
 
 #### The Four Pillars Relationships
