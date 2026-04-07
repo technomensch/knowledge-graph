@@ -5,7 +5,7 @@ const {themes: prismThemes} = require('prism-react-renderer');
 const config = {
   title: 'Knowledge Management Graph',
   tagline: 'Structured knowledge capture and cross-session memory for Claude Code projects.',
-  favicon: undefined,
+  favicon: 'img/square.png',
 
   url: 'https://technomensch.github.io',
   baseUrl: '/knowledge-graph/',
@@ -58,6 +58,10 @@ const config = {
       },
       navbar: {
         title: 'KMGraph',
+        logo: {
+          alt: 'Staying in Sync',
+          src: 'img/avatar.png',
+        },
         items: [
           {to: '/GETTING-STARTED', label: 'Getting Started', position: 'left'},
           {to: '/CONCEPTS', label: 'Concepts', position: 'left'},
