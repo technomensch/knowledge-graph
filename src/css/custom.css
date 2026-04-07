@@ -57,38 +57,31 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
-/* Teal inline code highlight */
-:root code,
+/* Teal inline code highlight (dark mode only) */
 [data-theme='dark'] code {
   color: #26c6da;
 }
 
-/* Deep sky blue for body links */
-a {
+/* Deep sky blue for body links (dark mode) */
+[data-theme='dark'] a {
   color: #2196F3;
 }
 
-a:hover {
+[data-theme='dark'] a:hover {
   color: #1976D2;
 }
 
-/* Light mode contrast fixes */
-:root {
-  /* Darker link color for light mode (WCAG AA compliant) */
-  --link-color-dark: #1565C0;
-  --code-bg-light: #f0f7ff;
+/* Light mode contrast fixes — darker blue for text, teal code with background */
+:not([data-theme='dark']) a {
+  color: #1565C0;
 }
 
-:root a {
-  color: var(--link-color-dark);
-}
-
-:root a:hover {
+:not([data-theme='dark']) a:hover {
   color: #0d47a1;
 }
 
-:root code {
-  background-color: var(--code-bg-light);
+:not([data-theme='dark']) code {
+  background-color: #f0f7ff;
   color: #00838f;
   padding: 2px 6px;
   border-radius: 3px;
