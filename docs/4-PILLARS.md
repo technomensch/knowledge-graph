@@ -66,10 +66,11 @@ flowchart LR
 
 **Plain English**: A detective's case file for every problem solved.
 
-!!! example
+:::note
 
-    "Lesson: Fixing PostgreSQL Connection Timeouts" — documents the problem, root cause, solution steps, and prevention strategies.
+"Lesson: Fixing PostgreSQL Connection Timeouts" — documents the problem, root cause, solution steps, and prevention strategies.
 
+:::
 ---
 
 #### Pillar 2: Architecture Decision Records (ADRs)
@@ -85,10 +86,11 @@ flowchart LR
 
 **Plain English**: A written record of "why this choice was made" so the reasoning is never lost.
 
-!!! example
+:::note
 
-    "ADR-003: Choosing PostgreSQL Over MongoDB" — records the context, options considered, decision made, and expected consequences.
+"ADR-003: Choosing PostgreSQL Over MongoDB" — records the context, options considered, decision made, and expected consequences.
 
+:::
 ---
 
 #### Pillar 3: Knowledge Entries
@@ -119,6 +121,8 @@ flowchart LR
 
 **Plain English**: Meeting minutes for work sessions.
 
-!!! example
+:::note
 
-    "2024-01-15 Database Migration Session" — records what was built, what was decided, what was learned, and what comes next.
+"2024-01-15 Database Migration Session" — records what was built, what was decided, what was learned, and what comes next.
+
+:::

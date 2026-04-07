@@ -1,3 +1,8 @@
+---
+hide_table_of_contents: true
+displayed_sidebar: null
+---
+
 # Changelog
 
 All notable changes to the Knowledge Plugin will be documented in this file.
@@ -62,15 +67,21 @@ Whenever a new version is added to CHANGELOG.md, all version files and doc foote
 
 ### TL;DR
 
-!!! info "Personal knowledge graph — cross-project lessons, always available."
-    A personal KG at `~/.claude/knowledge-graph/` stores lessons that apply across all your projects. When registered, `/kmgraph:recall` searches both project and personal KGs automatically. Results show `[project]` or `[personal]` source labels. Set up during `/kmgraph:init` or any time with `/kmgraph:init-personal-kg`.
+:::info[Personal knowledge graph — cross-project lessons, always available.]
 
-!!! info "Session snapshot on capture — preserve the 'why' mid-session."
-    Any capture command (`/kmgraph:capture-lesson`, `/kmgraph:create-adr`, `/kmgraph:start-issue-tracking`) now offers a lightweight snapshot gate before the capture dialog. A snapshot records the current context and open items in under 10 seconds, without interrupting your flow.
+A personal KG at `~/.claude/knowledge-graph/` stores lessons that apply across all your projects. When registered, `/kmgraph:recall` searches both project and personal KGs automatically. Results show `[project]` or `[personal]` source labels. Set up during `/kmgraph:init` or any time with `/kmgraph:init-personal-kg`.
 
-!!! info "Search index now checked during upgrade."
-    After a plugin upgrade, the search index (`.fts5.db`) no longer silently disappears. The `/kmgraph:init` verify/upgrade flow now detects a missing index, validates the KG path, and offers to rebuild — preventing the "FTS5 rebuild found 0 files" error reported after upgrade.
+:::
+:::info[Session snapshot on capture — preserve the 'why' mid-session.]
 
+Any capture command (`/kmgraph:capture-lesson`, `/kmgraph:create-adr`, `/kmgraph:start-issue-tracking`) now offers a lightweight snapshot gate before the capture dialog. A snapshot records the current context and open items in under 10 seconds, without interrupting your flow.
+
+:::
+:::info[Search index now checked during upgrade.]
+
+After a plugin upgrade, the search index (`.fts5.db`) no longer silently disappears. The `/kmgraph:init` verify/upgrade flow now detects a missing index, validates the KG path, and offers to rebuild — preventing the "FTS5 rebuild found 0 files" error reported after upgrade.
+
+:::
 ### Added
 - **ENH-001: Personal KG** — New `type: "personal"` for KGs that are not tied to a project. Live at `~/.claude/knowledge-graph/` by default. Accessible from any project via multi-KG search.
   - `kg_search` extended with `searchScope: "active" | "all" | "personal-only"` parameter
@@ -108,9 +119,11 @@ Whenever a new version is added to CHANGELOG.md, all version files and doc foote
 
 ### TL;DR
 
-!!! info "Behind the scenes only: dependency security fixes."
-    14 Dependabot alerts (1 critical, 7 high, 6 moderate) were resolved. MkDocs Material was upgraded to address reported vulnerabilities. No user-facing behavior changed. See the [GitHub security advisories](https://github.com/technomensch/knowledge-graph/security/dependabot) for details.
+:::info[Behind the scenes only: dependency security fixes.]
 
+14 Dependabot alerts (1 critical, 7 high, 6 moderate) were resolved. MkDocs Material was upgraded to address reported vulnerabilities. No user-facing behavior changed. See the [GitHub security advisories](https://github.com/technomensch/knowledge-graph/security/dependabot) for details.
+
+:::
 ### Fixed
 - Resolved 14 Dependabot dependency alerts (1 critical, 7 high, 6 moderate) via `npm audit fix` and targeted package upgrades
 - Upgraded `mkdocs-material` to the latest stable release to address reported CVEs
@@ -120,15 +133,21 @@ Whenever a new version is added to CHANGELOG.md, all version files and doc foote
 
 ### TL;DR
 
-!!! info "Zero-friction MCP setup."
-    If the KMGraph MCP server isn't connected, the assistant will now offer to automatically configure it for Gemini CLI, Cursor, Windsurf, Continue.dev, or VS Code. No manual JSON editing required.
+:::info[Zero-friction MCP setup.]
 
-!!! info "Admonitions are the new standard for Changelog TL;DRs."
-    The Style Guide now enforces `!!! info` blocks for release notes instead of plain bullet points.
+If the KMGraph MCP server isn't connected, the assistant will now offer to automatically configure it for Gemini CLI, Cursor, Windsurf, Continue.dev, or VS Code. No manual JSON editing required.
 
-!!! info "Behind the scenes only:"
-    Backend commands were modernized and documentation style rules updated. These are internal upgrades; functionality remains unchanged for end users.
+:::
+:::info[Admonitions are the new standard for Changelog TL;DRs.]
 
+The Style Guide now enforces `!!! info` blocks for release notes instead of plain bullet points.
+
+:::
+:::info[Behind the scenes only:]
+
+Backend commands were modernized and documentation style rules updated. These are internal upgrades; functionality remains unchanged for end users.
+
+:::
 ### Added
 - **`kg_capture` MCP Write Tool** — Enables full lesson, session, and ADR capture capabilities for platforms that lack raw file system tools. Includes automatic FTS5 index rebuilding.
 - **MCP Auto-Registration Agent** — Intercepts failed MCP tool calls and interactively offers to write the correct `mcp.json` or `settings.json` configuration for the active IDE (Gemini CLI, Cursor, Windsurf, Continue.dev, VS Code).
@@ -152,36 +171,56 @@ Whenever a new version is added to CHANGELOG.md, all version files and doc foote
 
 ### TL;DR
 
-!!! info "Session summaries happen on their own."
-    When the LLM is prompted with "done", "wrapping up", or similar, KMGraph will offer to write a session summary — no need to invoke the command manually.
+:::info[Session summaries happen on their own.]
 
-!!! info "Before committing, KMGraph will check in."
-    If there are changes that look lesson-worthy but haven't been documented, users will be prompted before the commit goes through.
+When the LLM is prompted with "done", "wrapping up", or similar, KMGraph will offer to write a session summary — no need to invoke the command manually.
 
-!!! info "Platform file changes trigger a sync reminder."
-    If a config file like CLAUDE.md or GEMINI.md, KMGraph will ask if whether or not to sync it to other AI tool configs.
+:::
+:::info[Before committing, KMGraph will check in.]
 
-!!! info "Plans written to `~/.claude/plans/` are automatically mirrored to `docs/plans/`."
-    No manual copy needed.
+If there are changes that look lesson-worthy but haven't been documented, users will be prompted before the commit goes through.
 
-!!! info "Cross-project write protection is now active."
-    If users are working in one project but the active knowledge graph is pointed at another, KMGraph will display a warning before writing anything — preventing accidental cross-project entries.
+:::
+:::info[Platform file changes trigger a sync reminder.]
 
-!!! info "The three main commands (`/kmgraph:capture-lesson`, `/kmgraph:recall`, `/kmgraph:session-summary`) load noticeably faster."
-    They work exactly the same, just with less startup overhead.
+If a config file like CLAUDE.md or GEMINI.md, KMGraph will ask if whether or not to sync it to other AI tool configs.
 
-!!! info "Additional feature support for Gemini CLI, Cursor, Windsurf, or any other AI coding tools"
-    Users can now load `core/templates/AGENTS-template.md` as a system prompt and get the same KMGraph behaviors without needing `/kmgraph:` commands.
+:::
+:::info[Plans written to `~/.claude/plans/` are automatically mirrored to `docs/plans/`.]
 
-!!! info "The `init` command now detects which AI tools are installed"
-    The `init` command now offers to configure KMGraph for all of them at once — no separate setup per tool.
+No manual copy needed.
 
-!!! info "Notification webhooks are available (opt-in only)."
-    If a Slack or webhook URL is configured, users will get notified when lessons or ADRs are saved. Off by default, no action needed. See [Notification Webhooks](CONFIGURATION.md#notification-webhooks-optional) for setup instructions.
+:::
+:::info[Cross-project write protection is now active.]
 
-!!! info "Behind the scenes only:"
-    The internal architecture was reorganized into four layers. This is a structural improvement that makes the tool easier to maintain and extend.
+If users are working in one project but the active knowledge graph is pointed at another, KMGraph will display a warning before writing anything — preventing accidental cross-project entries.
 
+:::
+:::info[The three main commands (`/kmgraph:capture-lesson`, `/kmgraph:recall`, `/kmgraph:session-summary`) load noticeably faster.]
+
+They work exactly the same, just with less startup overhead.
+
+:::
+:::info[Additional feature support for Gemini CLI, Cursor, Windsurf, or any other AI coding tools]
+
+Users can now load `core/templates/AGENTS-template.md` as a system prompt and get the same KMGraph behaviors without needing `/kmgraph:` commands.
+
+:::
+:::info[The `init` command now detects which AI tools are installed]
+
+The `init` command now offers to configure KMGraph for all of them at once — no separate setup per tool.
+
+:::
+:::info[Notification webhooks are available (opt-in only).]
+
+If a Slack or webhook URL is configured, users will get notified when lessons or ADRs are saved. Off by default, no action needed. See [Notification Webhooks](CONFIGURATION.md#notification-webhooks-optional) for setup instructions.
+
+:::
+:::info[Behind the scenes only:]
+
+The internal architecture was reorganized into four layers. This is a structural improvement that makes the tool easier to maintain and extend.
+
+:::
 ### Added
 
 - **Four-Layer Architecture** — Restructured into Context, Logic, Lifecycle, and Data layers for reduced friction, platform portability, and maintainability

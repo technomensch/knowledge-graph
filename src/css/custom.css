@@ -1,0 +1,27 @@
+/**
+ * Custom CSS — brand colors migrated from MkDocs Material (deep orange primary)
+ * Generate variants: https://docusaurus.io/docs/styling-layout#styling-your-site-with-infima
+ */
+
+:root {
+  --ifm-color-primary: #ff6d00;
+  --ifm-color-primary-dark: #e66200;
+  --ifm-color-primary-darker: #d95c00;
+  --ifm-color-primary-darkest: #b34c00;
+  --ifm-color-primary-light: #ff7d1a;
+  --ifm-color-primary-lighter: #ff8526;
+  --ifm-color-primary-lightest: #ff9d52;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #ff8c42;
+  --ifm-color-primary-dark: #ff7a26;
+  --ifm-color-primary-darker: #ff7019;
+  --ifm-color-primary-darkest: #ec5700;
+  --ifm-color-primary-light: #ff9e5e;
+  --ifm-color-primary-lighter: #ffa86b;
+  --ifm-color-primary-lightest: #ffcc9d;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
