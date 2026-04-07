@@ -3,6 +3,10 @@
    mask-image + var(--ifm-navbar-link-color) handles light/dark automatically
    ============================================================ */
 
+.navbar__logo img {
+  border-radius: 50%;
+}
+
 .header-github-link,
 .header-linkedin-link {
   padding: 0 8px;
