@@ -1,3 +1,7 @@
+---
+id: 4-PILLARS
+---
+
 #### The Four Pillars Relationships
 
 Different knowledge types need different structures:
