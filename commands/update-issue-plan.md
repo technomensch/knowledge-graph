@@ -129,7 +129,29 @@ If a PR exists for the current branch:
 ## Step 5: Final Governance Audit
 
 1. **Shadow Sync:** If project uses modular configuration sync, run project-specific governance tools to ensure configuration files acknowledge the new issue/plan status.
-2. **Close Loop:** Output a **Governance Sync Summary Table**:
+
+2. **Version Sync Gate:** After CHANGELOG is updated, check if a new version header was added:
+   ```bash
+   git diff --cached CHANGELOG.md | grep "^+## \[" | grep -v "^\+\+\+"
+   ```
+   - **If new version detected:**
+     - Display: "⚠️ New version [X.Y.Z] added to CHANGELOG. Version sync required before commit."
+     - List all files requiring version bump:
+       - `package.json`
+       - `mcp-server/package.json`
+       - `.claude-plugin/plugin.json`
+       - `.claude-plugin/marketplace.json` (plugins[0].version only — NOT top-level "version")
+       - `docs/CHEAT-SHEET.md` footer
+       - `docs/COMMAND-GUIDE.md` footer
+       - `docs/GETTING-STARTED.md` footer
+       - `docs/CONCEPTS.md` (if version reference present)
+     - Ask: **"Run version sync now? (yes / skip)"**
+     - **MANDATORY GATE:** Do not proceed until user responds.
+     - If `yes`: Run version sync across all files, include them in commit.
+     - If `skip`: Warn "Version sync skipped — CHANGELOG will be out of sync with version files."
+   - **If no new version header:** Proceed to next step normally.
+
+3. **Close Loop:** Output a **Governance Sync Summary Table**:
 
 | Component | Target ID/File | Status |
 | :--- | :--- | :--- |
