@@ -17,6 +17,9 @@
 
 ### In Progress
 - 🔄 Phase Group 2: `start-issue-tracking` gap fixes + ROADMAP update
+  - ✅ Hardening: Git steps conditional on repo presence (issue-2, #56)
+  - ✅ Hardening: `update-issue-plan` version sync gate after CHANGELOG entry (issue-3, #57)
+  - 🔴 ENH-009: `start-issue-tracking` mode gate + pre-flight working-tree check (#58)
 - ⏳ Phase Group 3: ENH-002 Session Snapshot on Capture
 
 ---
