@@ -56,6 +56,11 @@ const config = {
       mermaid: {
         theme: {light: 'neutral', dark: 'dark'},
       },
+      colorMode: {
+        defaultMode: 'dark',
+        disableSwitch: false,
+        respectPrefersColorScheme: false,
+      },
       navbar: {
         title: 'KMGraph',
         logo: {
