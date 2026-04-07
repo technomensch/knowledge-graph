@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.2.3.4-beta] — 2026-04-07
+
+### Hardening
+- **`start-issue-tracking`: Git steps now conditional on repo presence** — Added `git rev-parse --is-inside-work-tree` gate at Step 1.0. When no Git repo is detected, Step 1.3 (branch strategy) is skipped, Step 5 (Git Integration) is skipped entirely, and Step 7 summary omits Git rows. Prevents errors when command is used in non-Git projects. Closes #56.
+
+### Knowledge
+- **Lesson: Git Presence Gate in Commands** — Documents the pattern of gating Git-dependent steps on `git rev-parse` before running any git subcommands.
+
 ## [0.2.3.3-beta] — 2026-04-06
 
 ### Documentation
