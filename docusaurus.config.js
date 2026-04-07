@@ -72,6 +72,12 @@ const config = {
       },
       footer: {
         style: 'dark',
+        logo: {
+          alt: 'Staying in Sync',
+          src: 'img/banner.jpeg',
+          href: 'https://github.com/technomensch/knowledge-graph',
+          width: 160,
+        },
         links: [
           {
             title: 'Docs',
