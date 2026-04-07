@@ -2,6 +2,8 @@
 slug: /
 ---
 
+<img src="/knowledge-graph/img/banner.jpeg" alt="Staying in Sync" style="width:100%;border-radius:8px;margin-bottom:1.5rem;" />
+
 # Knowledge Management Graph (kmgraph)
 
 ---
