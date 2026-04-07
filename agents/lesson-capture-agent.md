@@ -54,6 +54,23 @@ Continue to Phase 2.
 
 ## Phase 2: Gather Lesson Context
 
+**Step 2.0: Check for today's session summary**
+
+Before asking the user for context, check whether a session summary was written today:
+
+1. Read `~/.claude/kg-config.json` to get the active KG path.
+2. Look for any file matching `{kgPath}/sessions/YYYY-MM/*` where the filename contains today's date (format: `YYYY-MM-DD`).
+3. If found, ask:
+
+   > "I found a session summary from today — use it to pre-fill the lesson context?
+   >
+   > [y] Yes — use session summary   [n] No — I'll describe it myself"
+
+   - If `y`: read the session summary file and use its content to pre-populate the fields below. Present the pre-filled draft to the user for review before proceeding.
+   - If `n`: proceed to the prompt below.
+
+**Step 2.1: Gather context (if not pre-filled)**
+
 Ask the user:
 
 ```

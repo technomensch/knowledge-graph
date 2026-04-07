@@ -53,17 +53,23 @@ mkdir -p {active_kg_path}/decisions/
 
 Ask:
 
-> "Before creating the ADR — want to snapshot the session first?
-> This captures the conversation context and open items around why this decision was made.
+> "Before creating the ADR — want to run a session summary first?
+> This saves the current session state as a persistent summary and makes the 'why' behind this decision available for the ADR's Context section.
 >
-> [y] Snapshot first   [n] Skip   [?] What does this do?"
+> [y] Run session summary   [n] Skip   [?] What does this do?"
+
+If `?`: explain that this runs `/kmgraph:session-summary` in snapshot mode — a lightweight variant that records what was worked on, open plan items, and file changes without requiring a full wrap-up. The result is written to disk and used to enrich the ADR's Context section.
 
 If `y`:
-> "Include git history? (adds ~5-15 sec)
+> "Include git history in the session summary? (adds ~5-15 sec)
 >
-> [y] Yes   [n] No — conversation + files only"
+> [y] Yes — include commits   [n] No — conversation + files only"
 
-Invoke `session-summary-agent --snapshot` (with `--git` if yes). When done, continue to Step 1 — the session summary is now available as context for the ADR's Context section.
+Invoke `session-summary-agent --snapshot` (with `--git` if yes). When the agent returns, say:
+
+> "Session summary saved — I'll use that to fill in the ADR's context and background."
+
+Then continue to Step 1.
 
 If `n`: proceed to Step 1.
 
