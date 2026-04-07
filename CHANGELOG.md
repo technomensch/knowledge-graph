@@ -6,12 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [Unreleased]
+## [Released]
+
+## [0.2.3.2-beta] — 2026-04-06
+
+### Fixed
+- **Plugin uninstall scope error** — Removed committed `enabledPlugins` block from `.claude/settings.json`. The entry created an orphaned scope reference without a matching install record in the global plugin registry, causing `claude plugin uninstall kmgraph@stayinginsync-knowledge-graph` to fail with "not installed in project scope" for any developer cloning the repo. The `.claude-plugin/plugin.json` auto-detection already loads the plugin in the development environment, making the committed entry redundant and harmful. This fix ensures clean uninstalls for all users going forward.
+
+### Documentation
+- **ADR-025: Do not commit `enabledPlugins` blocks in `.claude/settings.json`** — Establishes policy that committed `enabledPlugins` entries create scope mismatches. Plugin loading should rely on `.claude-plugin/plugin.json` auto-detection.
+- **Lesson: Plugin Settings Scope Consistency** — Documents root cause analysis, audit checklist for plugin repos, and how to avoid this pattern in the future.
+
+### Version Sync Rule
+Whenever a new version is added to CHANGELOG.md, all version files and doc footers must be updated in the same commit. Files: `package.json`, `mcp-server/package.json`, `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` (plugins[0].version only). Doc footers: CHEAT-SHEET.md, COMMAND-GUIDE.md, GETTING-STARTED.md.
 
 ## [0.2.3.1-beta] — 2026-03-31
 
 ### Fixed
-- **GETTING-STARTED.md § Plugin update does not take effect** — Corrected plugin install commands (Windows section had incorrect `stayinginsync` reference)
+- **GETTING-STARTED.md: Plugin update does not take effect** — Corrected plugin update commands. Multiple sections incorrectly referenced `stayinginsync` marketplace instead of `kmgraph` plugin. This fix ensures that all platform instructions now correctly reference the `kmgraph` plugin, allowing updates to take effect as intended.
+- **Plugin cache removal command** — Documented that `rm -Rf` (capital R) is required for removing nested cache folders on macOS/Linux (lowercase `-r` fails on populated directories)
 
 ## [0.2.3-beta] — 2026-03-30
 
