@@ -69,8 +69,15 @@ const config = {
           {to: '/CONFIGURATION', label: 'Configuration', position: 'left'},
           {
             href: 'https://github.com/technomensch/knowledge-graph',
-            label: 'GitHub',
             position: 'right',
+            className: 'header-github-link',
+            'aria-label': 'GitHub repository',
+          },
+          {
+            href: 'https://www.linkedin.com/in/marckaplan/',
+            position: 'right',
+            className: 'header-linkedin-link',
+            'aria-label': 'LinkedIn profile',
           },
         ],
       },
