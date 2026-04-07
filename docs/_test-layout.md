@@ -4,7 +4,6 @@ title: Test Layout
 sidebar_label: Test Layout
 description: Test page demonstrating admonitions and layout components
 ---
-# MkDocs Layout Test
 
 This temporary test document demonstrates the new Material theme layout with:
 - Sticky horizontal navigation tabs at the top

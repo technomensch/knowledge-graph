@@ -5,8 +5,6 @@ sidebar_label: Four Pillars
 description: "Four distinct knowledge types: Lessons, Patterns, Decisions, and Gotchas"
 ---
 
-### The Four Pillars
-
 The knowledge graph system organizes information into four distinct types, each optimized for a different purpose. Together, these pillars form a comprehensive institutional memory.
 
 #### The Four Pillars Relationships

@@ -4,7 +4,6 @@ title: Concepts
 sidebar_label: Concepts
 description: "Core concepts: the four-layer architecture, pillars, search, and knowledge graph"
 ---
-# Knowledge Graph Concepts
 
 A plain-English guide to key terms and concepts used throughout the Knowledge Management Graph documentation. This guide explains technical terminology in accessible language, with concrete examples for each concept.
 
@@ -37,19 +36,6 @@ A **knowledge graph** is a structured way to organize information learned while 
 | Linked to code | Rarely | Automatic via git metadata |
 | AI-readable | No | Yes (MEMORY.md syncs to AI context) |
 | Team sharing | Difficult | Built-in sanitization for safe sharing |
-
----
-
-## Core Components
-
-### The Four Pillars
-
-The knowledge graph system organizes information into four distinct types, each optimized for a different purpose. Together, these pillars form a comprehensive institutional memory.
-
-
-
----
-
 
 ---
 

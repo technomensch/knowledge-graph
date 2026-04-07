@@ -4,7 +4,6 @@ title: Personal vs Project KGs
 sidebar_label: Personal vs Project
 description: Understanding personal and project-scoped knowledge graphs
 ---
-## Personal vs Project Knowledge
 
 <!-- Updated: 2026-03-29 -->
 
