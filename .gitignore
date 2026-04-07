@@ -1,3 +1,6 @@
+# Local MCP configuration (contains machine-specific paths)
+.mcp.json
+
 # macOS system files
 .DS_Store
 **/.DS_Store
