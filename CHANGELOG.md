@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Knowledge
 - **Lesson: Git Presence Gate in Commands** — Documents the pattern of gating Git-dependent steps on `git rev-parse` before running any git subcommands.
+- **Lesson: CHANGELOG Version Sync Gate Missing in Governance Skills** — Documents the pattern of detecting new version headers in CHANGELOG diffs and requiring version sync before committing. Tracked as issue-3, #57.
 
 ## [0.2.3.3-beta] — 2026-04-06
 
