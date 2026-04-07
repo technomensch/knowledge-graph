@@ -2,7 +2,7 @@
 
 A step-by-step guide for setting up the knowledge graph system and capturing the first lesson.
 
-**Version**: 0.2.3-beta
+**Version**: 0.2.3.3-beta
 
 ---
 
@@ -564,5 +564,5 @@ Use `--delegate knowledge-extractor` or `--delegate session-documenter` in comma
 
 ---
 
-**Version**: 0.2.3-beta
-**Last Updated**: 2026-03-30
+**Version**: 0.2.3.3-beta
+**Last Updated**: 2026-04-06
