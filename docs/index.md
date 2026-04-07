@@ -1,5 +1,8 @@
 ---
-slug: /
+id: index
+title: Knowledge Management Graph
+sidebar_label: Home
+description: Structured knowledge capture and cross-session memory for Claude Code projects
 ---
 
 <img src="/knowledge-graph/img/banner.jpeg" alt="Staying in Sync" style="width:100%;border-radius:8px;margin-bottom:1.5rem;" />

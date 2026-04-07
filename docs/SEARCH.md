@@ -1,3 +1,9 @@
+---
+id: SEARCH
+title: How Search Works
+sidebar_label: How Search Works
+description: Full-text search with FTS5, local indexing, and multi-KG support
+---
 ## How Search Works
 
 When a search is run, kmgraph needs to match the query against everything in the knowledge graph. There are two ways to do this. The first is to open each file one by one and check whether the query appears — straightforward, but slower as the knowledge graph grows, and results are sorted by where the match appeared in the file rather than how relevant the file is. The second is to maintain a search index: a compact catalog built from all the files that can be queried directly. The index returns results ranked by relevance — files that closely match the query float to the top. The index is optional and kept current automatically.

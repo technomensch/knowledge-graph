@@ -1,3 +1,9 @@
+---
+id: DEPLOYMENT-SITEMAP
+title: Deployment Sitemap
+sidebar_label: Deployment Sitemap
+description: URL structure and deployment paths for GitHub Pages
+---
 # Deployment Sitemap
 
 ## 1. Inventory of User-Facing Files
