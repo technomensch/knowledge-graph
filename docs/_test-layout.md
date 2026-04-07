@@ -109,20 +109,28 @@ Explore multi-KG configurations and cross-project knowledge linking.
 
 ## Section 4: Admonitions
 
-!!! note "Pro Tip"
-    Use `/kmgraph:recall "pattern"` to search across all your knowledge entries.
+:::note[Pro Tip]
 
-!!! warning "Important"
-    The `commands/` directory contains LLM prompts. Modifications may break plugin functionality.
+Use `/kmgraph:recall "pattern"` to search across all your knowledge entries.
 
-!!! tip "Best Practice"
-    Always link lessons to related Architecture Decision Records (ADRs).
+:::
+:::warning[Important]
 
-!!! example "Example Usage"
-    ```bash
-    /kmgraph:capture-lesson "Async Error Handling"
-    ```
+The `commands/` directory contains LLM prompts. Modifications may break plugin functionality.
 
+:::
+:::tip[Best Practice]
+
+Always link lessons to related Architecture Decision Records (ADRs).
+
+:::
+:::note[Example Usage]
+
+```bash
+/kmgraph:capture-lesson "Async Error Handling"
+```
+
+:::
 ---
 
 ## Section 5: Mermaid Diagram
@@ -186,11 +194,13 @@ Each step corresponds to plugin commands:
 - `/kmgraph:sync-all` — Synchronize across KGs
 - `/kmgraph:session-summary` — Summarize session insights
 
-!!! info "Related Resources"
-    - [Commands Guide](COMMAND-GUIDE.md) - Full command reference
-    - [Concepts](CONCEPTS.md) - Architectural concepts
-    - [Getting Started](GETTING-STARTED.md) - Setup guide
+:::info[Related Resources]
 
+- [Commands Guide](COMMAND-GUIDE.md) - Full command reference
+- [Concepts](CONCEPTS.md) - Architectural concepts
+- [Getting Started](GETTING-STARTED.md) - Setup guide
+
+:::
 ---
 
 ## Summary

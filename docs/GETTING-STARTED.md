@@ -12,9 +12,11 @@ A step-by-step guide for setting up the knowledge graph system and capturing the
 
 The universal installer is a natural language prompt designed to execute shell scripts and manage file system operations within the local project directory. The installer detects the platform, configures the Model Context Protocol (MCP) server, and initializes the knowledge graph automatically.
 
-!!! important "Access Requirements"
-    Automated setup requires an AI assistant with terminal and file system access. Assistants without these capabilities require manual configuration following the setup within the prompt itself.
+:::important[Access Requirements]
 
+Automated setup requires an AI assistant with terminal and file system access. Assistants without these capabilities require manual configuration following the setup within the prompt itself.
+
+:::
 **For Claude Code users:** Follow the setup steps below, or paste [INSTALL.md](INSTALL.md) for the same automated experience.
 
 **Not sure which platform fits?** Read [CONCEPTS.md](CONCEPTS.md) for a plain-English overview of the system before proceeding.
@@ -230,30 +232,31 @@ How to tell the index is active: search results show `(FTS5)` — this just mean
 
 ### Plugin update does not take effect { #plugin-update-does-not-take-effect }
 
-!!! warning "Known Claude Code Limitation: Plugin Cache Not Refreshed on Update"
-    Claude Code's "Update Now" feature and `claude plugin update` command update version metadata but do **not** re-download plugin files. The installed plugin continues running from the old cached version after an update.
+:::warning[Known Claude Code Limitation: Plugin Cache Not Refreshed on Update]
 
-    This is a known platform issue ([#19197](https://github.com/anthropics/claude-code/issues/19197), [#14061](https://github.com/anthropics/claude-code/issues/14061)).
+Claude Code's "Update Now" feature and `claude plugin update` command update version metadata but do **not** re-download plugin files. The installed plugin continues running from the old cached version after an update.
+This is a known platform issue ([#19197](https://github.com/anthropics/claude-code/issues/19197), [#14061](https://github.com/anthropics/claude-code/issues/14061)).
+**Symptoms:**
+- Installed tab still shows the old version number
+- New commands or skills added in the update are unavailable
+- MCP server shows a `failed` status
 
-    **Symptoms:**
+:::
+:::info[Command types used in this guide]
 
-    - Installed tab still shows the old version number
-    - New commands or skills added in the update are unavailable
-    - MCP server shows a `failed` status
+Two types of commands appear below. Make sure to run each in the right place:
+- **Shell commands** — run in the terminal (the same place `claude` is launched to start Claude Code)
+- **Claude Code commands** — type directly into the Claude Code prompt (the `>` input)
 
-!!! info "Command types used in this guide"
-    Two types of commands appear below. Make sure to run each in the right place:
-
-    - **Shell commands** — run in the terminal (the same place `claude` is launched to start Claude Code)
-    - **Claude Code commands** — type directly into the Claude Code prompt (the `>` input)
-
+:::
 **Fix — clear the cache and reinstall:**
 
-!!! tip "Try the quick fix first"
-    Clearing the cache alone may be enough to pick up the latest version. Relaunch Claude Code after Step 1 and check the installed version before continuing. If the version is current, stop here. If the version is still outdated or behavior is unchanged, continue with the full reinstall steps below.
+:::tip[Try the quick fix first]
 
-    Clearing the cache is not guaranteed to work in all cases — see [#14061](https://github.com/anthropics/claude-code/issues/14061) for the underlying Claude Code limitation. The full reinstall steps are the reliable fallback.
+Clearing the cache alone may be enough to pick up the latest version. Relaunch Claude Code after Step 1 and check the installed version before continuing. If the version is current, stop here. If the version is still outdated or behavior is unchanged, continue with the full reinstall steps below.
+Clearing the cache is not guaranteed to work in all cases — see [#14061](https://github.com/anthropics/claude-code/issues/14061) for the underlying Claude Code limitation. The full reinstall steps are the reliable fallback.
 
+:::
 === "macOS / Linux"
 
     **Step 1 — Shell: Remove the stale plugin cache**

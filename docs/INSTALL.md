@@ -14,30 +14,28 @@ The universal installer detects the platform (Claude Code, Cursor, Windsurf, Con
 
 ## Get the Installer
 
-!!! warning "Important: Use the Raw File"
+:::warning[Important: Use the Raw File]
 
-    This page shows a preview of the installer. To actually install, **copy and paste the raw markdown file** into an AI assistant.
+This page shows a preview of the installer. To actually install, **copy and paste the raw markdown file** into an AI assistant.
+**[→ Get the raw installer file](https://raw.githubusercontent.com/technomensch/knowledge-graph/main/INSTALL.md)**
+- Click the link above
+- Select all text (Ctrl+A / Cmd+A)
+- Copy to clipboard (Ctrl+C / Cmd+C)
+- Paste into Claude, ChatGPT, Cursor, or any AI assistant
+- Follow the assistant's instructions
 
-    **[→ Get the raw installer file](https://raw.githubusercontent.com/technomensch/knowledge-graph/main/INSTALL.md)**
-
-    - Click the link above
-    - Select all text (Ctrl+A / Cmd+A)
-    - Copy to clipboard (Ctrl+C / Cmd+C)
-    - Paste into Claude, ChatGPT, Cursor, or any AI assistant
-    - Follow the assistant's instructions
-
+:::
 ---
 
 ## For Claude Code Users
 
-!!! tip "Claude Code Quick Start"
+:::tip[Claude Code Quick Start]
 
-    Claude Code users can follow a manual setup walkthrough instead:
+Claude Code users can follow a manual setup walkthrough instead:
+→ [Claude Code Setup Guide](GETTING-STARTED.md)
+Or paste the universal installer above for the same automated experience.
 
-    → [Claude Code Setup Guide](GETTING-STARTED.md)
-
-    Or paste the universal installer above for the same automated experience.
-
+:::
 ---
 
 ## Platform Capabilities
