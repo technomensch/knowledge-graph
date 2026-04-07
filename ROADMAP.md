@@ -17,6 +17,7 @@
 
 ### In Progress
 - 🔄 Phase Group 2: `start-issue-tracking` gap fixes + ROADMAP update
+  - ✅ Hardening: Git steps conditional on repo presence (issue-2, #56)
 - ⏳ Phase Group 3: ENH-002 Session Snapshot on Capture
 
 ---
