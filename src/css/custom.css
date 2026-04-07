@@ -63,6 +63,15 @@
   color: #26c6da;
 }
 
+/* Deep sky blue for body links */
+a {
+  color: #2196F3;
+}
+
+a:hover {
+  color: #1976D2;
+}
+
 /* ============================================================
    Mermaid diagram dark mode — prevent white/light background
    ============================================================ */
