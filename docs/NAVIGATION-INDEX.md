@@ -32,6 +32,10 @@
 - How does it work? → [Architecture Guide](reference/ARCHITECTURE.md)
 - What are the components? → [Concepts](CONCEPTS.md#core-components)
 - What's the design philosophy? → [Architecture: Design Principles](reference/ARCHITECTURE.md#design-principles)
+- How are responsibilities divided? → [Four-Layer Architecture](4-LAYERS.md)
+- What are the knowledge types? → [Four Pillars](4-PILLARS.md)
+- Personal vs project scope? → [Personal vs Project](PERSONAL-V-PROJECT.md)
+- How does search work? → [Search](SEARCH.md)
 
 **Manual Workflows** (Non-Claude users):
 - Step-by-step processes → [Workflows](reference/WORKFLOWS.md)
@@ -151,6 +155,10 @@ knowledge-graph/
 │   ├── CONFIGURATION.md .......... Post-install setup
 │   ├── CHEAT-SHEET.md ............ One-page quick reference ⭐
 │   ├── CONCEPTS.md ............... Term definitions ⭐
+│   ├── 4-LAYERS.md ............... Four-layer architecture
+│   ├── 4-PILLARS.md .............. Four pillars of KMGraph
+│   ├── PERSONAL-V-PROJECT.md ..... Personal vs project KG scope
+│   ├── SEARCH.md ................. How search and the index work
 │   ├── COMMAND-GUIDE.md .......... Command reference ⭐
 │   └── NAVIGATION-INDEX.md ....... This file
 │
