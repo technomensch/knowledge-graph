@@ -1,3 +1,9 @@
+---
+id: CHANGELOG-DOCS-ONLY
+title: Changelog (Docs)
+sidebar_label: Changelog (Docs)
+description: Documentation-only changelog tracking doc changes separately
+---
 # Documentation Changelog (Docs Only)
 
 This file tracks changes to the project documentation that do not affect the application's version or source code. These updates are specific to the documentation infrastructure, content refinements, and visual enhancements.

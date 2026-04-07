@@ -1,3 +1,9 @@
+---
+id: INSTALL
+title: Installation
+sidebar_label: Installation
+description: Step-by-step installation guide for Claude Code, MCP IDEs, and manual setup
+---
 # Installation
 
 Users can install the Knowledge Management Graph using a **universal installer** — a single markdown file that any AI assistant can execute for automated setup.

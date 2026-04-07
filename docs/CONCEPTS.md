@@ -1,3 +1,9 @@
+---
+id: CONCEPTS
+title: Concepts
+sidebar_label: Concepts
+description: "Core concepts: the four-layer architecture, pillars, search, and knowledge graph"
+---
 # Knowledge Graph Concepts
 
 A plain-English guide to key terms and concepts used throughout the Knowledge Management Graph documentation. This guide explains technical terminology in accessible language, with concrete examples for each concept.

@@ -1,5 +1,8 @@
 ---
-id: 4LAYERS
+id: layers-four
+title: Four-Layer Architecture
+sidebar_label: Four-Layer Architecture
+description: "KMGraph's four-layer architecture separating concerns: Context, Logic, Lifecycle, and Data"
 ---
 
 ## Four-Layer Architecture
