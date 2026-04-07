@@ -64,8 +64,20 @@
   background-color: transparent;
 }
 
+/* Override Mermaid dark theme inline background style on <svg> */
 [data-theme='dark'] .docusaurus-mermaid-container svg {
-  background-color: transparent;
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Mermaid dark theme renders a <rect class="background"> as the first SVG child */
+[data-theme='dark'] .docusaurus-mermaid-container svg rect.background {
+  fill: transparent !important;
+}
+
+/* Also target the first rect in case class name differs across mermaid versions */
+[data-theme='dark'] .docusaurus-mermaid-container svg > rect:first-child {
+  fill: transparent !important;
 }
 
 [data-theme='dark'] {
