@@ -1,5 +1,5 @@
 ---
-id: 4-LAYERS
+id: 4LAYERS
 ---
 
 ## Four-Layer Architecture
