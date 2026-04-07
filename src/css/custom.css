@@ -72,6 +72,28 @@ a:hover {
   color: #1976D2;
 }
 
+/* Light mode contrast fixes */
+:root {
+  /* Darker link color for light mode (WCAG AA compliant) */
+  --link-color-dark: #1565C0;
+  --code-bg-light: #f0f7ff;
+}
+
+:root a {
+  color: var(--link-color-dark);
+}
+
+:root a:hover {
+  color: #0d47a1;
+}
+
+:root code {
+  background-color: var(--code-bg-light);
+  color: #00838f;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
 /* ============================================================
    Mermaid diagram dark mode — prevent white/light background
    ============================================================ */
