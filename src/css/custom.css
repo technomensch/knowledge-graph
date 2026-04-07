@@ -73,19 +73,44 @@ a:hover {
 }
 
 /* Light mode only — darker colors for WCAG AA contrast compliance */
-:not([data-theme='dark']) a {
+/* Underlines on all content/nav links (both modes) for WCAG 1.4.1 */
+article a,
+.menu__link,
+.table-of-contents__link {
+  text-decoration: underline;
+}
+
+/* Light mode — darker blue for WCAG AA contrast */
+[data-theme='light'] article a,
+[data-theme='light'] .menu__link,
+[data-theme='light'] .table-of-contents__link {
   color: #1565C0;
 }
 
-:not([data-theme='dark']) a:hover {
+/* Active sidebar link — bold + background for clear distinction */
+.menu__link--active,
+.table-of-contents__link--active {
+  font-weight: 700;
+}
+
+[data-theme='light'] .menu__link--active {
+  background-color: #e3f2fd;
+}
+
+[data-theme='dark'] .menu__link--active {
+  background-color: rgba(33, 150, 243, 0.15);
+}
+
+[data-theme='light'] article a:visited {
+  color: #6A1B9A;
+}
+
+[data-theme='light'] article a:hover {
   color: #0d47a1;
 }
 
-:not([data-theme='dark']) code {
-  background-color: #f0f7ff;
+[data-theme='light'] code {
   color: #00838f;
-  padding: 2px 6px;
-  border-radius: 3px;
 }
 
 /* ============================================================
