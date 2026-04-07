@@ -4,7 +4,6 @@ title: Getting Started
 sidebar_label: Getting Started
 description: Install and configure KMGraph for your platform in under 5 minutes
 ---
-# Getting Started with Knowledge Graph
 
 A step-by-step guide for setting up the knowledge graph system and capturing the first lesson.
 

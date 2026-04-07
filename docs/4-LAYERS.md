@@ -5,8 +5,6 @@ sidebar_label: Four-Layer Architecture
 description: "KMGraph's four-layer architecture separating concerns: Context, Logic, Lifecycle, and Data"
 ---
 
-## Four-Layer Architecture
-
 KMGraph separates responsibilities into four layers. Each layer handles one concern, and layers communicate in a single direction: Context feeds Logic, Logic triggers Lifecycle, and Lifecycle calls Data. This separation keeps each layer independently testable, replaceable, and portable across platforms.
 
 ```mermaid

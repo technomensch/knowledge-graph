@@ -4,7 +4,6 @@ title: Command Guide
 sidebar_label: Commands
 description: "Complete reference for all /kmgraph: slash commands"
 ---
-# Command Reference Guide
 
 **Version:** 0.2.3.3-beta | **Updated:** 2026-04-06
 

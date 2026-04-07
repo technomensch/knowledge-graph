@@ -4,7 +4,6 @@ title: Style Guide
 sidebar_label: Style Guide
 description: Writing conventions, documentation standards, and pattern documentation
 ---
-# Documentation Style Guide
 
 Authoring standards for contributors writing or reviewing documentation for the Knowledge Management Graph.
 

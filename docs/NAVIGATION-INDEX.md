@@ -4,7 +4,6 @@ title: Navigation Index
 sidebar_label: Navigation Index
 description: Complete map of all documentation pages and their relationships
 ---
-# Documentation Navigation Index
 
 **Complete sitemap** for Knowledge Management Graph documentation. Find what you need in 3 clicks or less.
 
