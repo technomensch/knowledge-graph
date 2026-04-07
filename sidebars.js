@@ -9,8 +9,9 @@ const sidebars = {
       label: 'Concepts',
       items: [
         {type: 'doc', id: 'CONCEPTS', label: 'Overview'},
-        {type: 'doc', id: 'layers-four', label: 'Four-Layer Architecture'},
+        {type: 'doc', id: 'reference/ARCHITECTURE', label: 'Architecture'},
         {type: 'doc', id: 'pillars-four', label: 'Four Pillars'},
+        {type: 'doc', id: 'layers-four', label: 'Four-Layers'},
         {type: 'doc', id: 'PERSONAL-V-PROJECT', label: 'Personal vs Project'},
         {type: 'doc', id: 'SEARCH', label: 'How Search Works'},
       ],
@@ -39,7 +40,6 @@ const sidebars = {
       type: 'category',
       label: 'Advanced',
       items: [
-        {type: 'doc', id: 'reference/ARCHITECTURE', label: 'Architecture'},
         {type: 'doc', id: 'reference/WORKFLOWS', label: 'Manual Workflows'},
         {type: 'doc', id: 'reference/PLATFORM-ADAPTATION', label: 'Platform Adaptation'},
         {type: 'doc', id: 'reference/PATTERNS-GUIDE', label: 'Pattern Writing'},
