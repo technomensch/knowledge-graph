@@ -462,6 +462,64 @@ If a search index already exists, sync-all refreshes it automatically with no pr
 ---
 
 
+## Knowledge capture workflow
+
+The capture workflow describes the sequence of events from a trigger moment to a committed knowledge entry. The diagram below shows each decision point a contributor encounters when running a capture command.
+
+The two branching decisions — KG picker and snapshot gate — resolve before the capture dialog opens. The KG picker appears only when multiple knowledge graphs are registered; the snapshot gate appears only when no session summary exists for the current day.
+
+```mermaid
+%%{init: { 'flowchart': { 'useMaxWidth': true }, 'theme': 'neutral' }}%%
+flowchart TD
+    A([Trigger: bug fixed / decision made / issue closed]) --> B{Multiple KGs\nregistered?}
+    B -- Yes --> C[KG picker shown\nContributor selects target KG]
+    B -- No --> D{Session summary\nexists for today?}
+    C --> D
+    D -- No --> E[Session snapshot written\nto today's session file]
+    D -- Yes --> F[Capture command dialog opens]
+    E --> F
+    F --> G[Lesson / ADR / Issue document\nwritten to active KG]
+    G --> H[sync-all updates MEMORY.md\nand refreshes search index]
+    H --> I([Knowledge entry searchable\nand linked in MEMORY.md])
+
+    accTitle: Knowledge capture workflow
+    accDescr: Flowchart showing capture trigger, KG picker decision, snapshot gate decision, capture dialog, document write, and sync steps.
+```
+
+The capture commands that follow this workflow are `/kmgraph:capture-lesson`, `/kmgraph:create-adr`, and `/kmgraph:start-issue-tracking`. Each command enters the workflow at the same trigger point and follows identical branching logic.
+
+---
+
+## Issue tracking process
+
+The issue tracking process documents a problem or enhancement from identification through resolution. The `/kmgraph:start-issue-tracking` command drives this process. Beginning with v0.2.3.4-beta, the command gates all git-dependent steps on repository presence — when no git repository is detected, branch strategy and git integration steps are omitted automatically.
+
+The diagram below shows the full issue tracking flow, including the git presence gate introduced in v0.2.3.4-beta.
+
+```mermaid
+%%{init: { 'flowchart': { 'useMaxWidth': true }, 'theme': 'neutral' }}%%
+flowchart TD
+    A([/kmgraph:start-issue-tracking]) --> B{Git repo\ndetected?}
+    B -- Yes --> C[Step 1.3: Branch strategy\nselected and recorded]
+    B -- No --> D[Git steps skipped:\nbranch strategy omitted\nGit Integration section skipped]
+    C --> E[Issue document created\nin active KG]
+    D --> E
+    E --> F[Implementation tracked\nagainst issue document]
+    F --> G{Git repo\ndetected?}
+    G -- Yes --> H[Step 5: Git Integration\nBranch and PR linked to issue]
+    G -- No --> I[Summary omits\ngit metadata rows]
+    H --> J([Issue closed])
+    I --> J
+
+    accTitle: Issue tracking process with git presence gate
+    accDescr: Flowchart showing start-issue-tracking command flow, git presence gate at Step 1.0, issue document creation, implementation tracking, and conditional git integration or omission steps at completion.
+```
+
+The git presence check runs once at Step 1.0 using `git rev-parse --is-inside-work-tree`. The result is applied at every subsequent step that would otherwise invoke a git subcommand.
+
+---
+
+
 ## Common Questions
 
 ### "Is git required to use the knowledge graph?"
@@ -588,5 +646,5 @@ MEMORY.md works best under 200 lines. When it grows beyond that threshold:
 </div>
 ---
 
-**Version**: 0.2.2-beta
-**Last Updated**: 2026-03-29
+**Version**: 0.2.3.4-beta
+**Last Updated**: 2026-04-07
