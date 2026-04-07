@@ -4,8 +4,8 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 0
-**Last Updated:** [Date]
+**Total ADRs:** 25
+**Last Updated:** 2026-04-06
 
 ---
 
@@ -17,9 +17,7 @@ Formal documentation of significant architecture decisions.
 
 ## All ADRs (Chronological)
 
-[Auto-populated when ADRs are created]
-
-- [ADR-001: Title](ADR-001-title.md) — **Status:** Accepted — [Brief description]
+- [ADR-025: Do not commit `enabledPlugins` blocks in `.claude/settings.json`](ADR-025-do-not-commit-enabledplugins-blocks.md) — **Status:** Accepted — Committed `enabledPlugins` blocks create orphaned scope references for cloners; rely on `.claude-plugin/plugin.json` auto-detection instead.
 
 ---
 
@@ -29,7 +27,7 @@ Formal documentation of significant architecture decisions.
 - [ADR-XXX](ADR-XXX-title.md) — [Topic]
 
 ### Process
-- [ADR-XXX](ADR-XXX-title.md) — [Topic]
+- [ADR-025: Do not commit `enabledPlugins` blocks](ADR-025-do-not-commit-enabledplugins-blocks.md) — Plugin settings scope hygiene for committed repos
 
 ### Technology Choices
 - [ADR-XXX](ADR-XXX-title.md) — [Topic]
