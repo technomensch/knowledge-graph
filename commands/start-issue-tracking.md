@@ -80,12 +80,21 @@ Use `/kmgraph:start-issue-tracking` when:
 
 4. **Snapshot gate:** After behavior lock, ask:
 
-   > "Before documenting this issue — want to snapshot the session first?
-   > This preserves context about what you were working on when you found this.
+   > "Before documenting this issue — want to run a session summary first?
+   > This saves the current session state as a persistent summary and preserves context about what you were working on when you found this.
    >
-   > [y] Snapshot first   [n] Skip"
+   > [y] Run session summary   [n] Skip   [?] What does this do?"
 
-   If `y`: invoke `session-summary-agent --snapshot`. When done, continue.
+   If `?`: explain that this runs `/kmgraph:session-summary` in snapshot mode — a lightweight variant that records what was worked on, open plan items, and file changes without requiring a full wrap-up. The result is written to disk and used to enrich the issue's context.
+
+   If `y`: ask "Include git history? (adds ~5-15 sec) [y] Yes   [n] No — conversation + files only"
+
+   Invoke `session-summary-agent --snapshot` (with `--git` if yes). When the agent returns, say:
+
+   > "Session summary saved — I'll use that to fill in the issue's context and background."
+
+   Then continue to Step 1.
+
    If `n`: proceed to Step 1.
 
 ---

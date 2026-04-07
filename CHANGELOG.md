@@ -12,10 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **Plugin uninstall scope error** — Removed committed `enabledPlugins` block from `.claude/settings.json`. The entry created an orphaned scope reference without a matching install record in the global plugin registry, causing `claude plugin uninstall kmgraph@stayinginsync-knowledge-graph` to fail with "not installed in project scope" for any developer cloning the repo. The `.claude-plugin/plugin.json` auto-detection already loads the plugin in the development environment, making the committed entry redundant and harmful. This fix ensures clean uninstalls for all users going forward.
+- **Snapshot Gate language corrected in all capture commands** — All three capture commands (`capture-lesson`, `create-adr`, `start-issue-tracking`) described the gate as a "lightweight mid-session save" (context-only temp) rather than invoking `session-summary-agent --snapshot` as originally designed in ENH-002. Corrected to use "session summary" terminology, added `[?]` explanation naming `/kmgraph:session-summary`, and added a transition message after the agent returns confirming the summary is available as context.
+- **`lesson-capture-agent` Phase 2 now checks for today's session summary** — If a session summary exists for today, the agent offers to pre-fill lesson context from it before prompting the user. Closes the model-switch fragility loop: gate writes the summary to disk → agent reads it → context survives any context reset or model switch.
+- **`session-summary-agent` Step 7 now makes unsaved state explicit** — Draft review prompt now opens with "⚠️ Not saved yet." and requires an explicit "save" or "looks good" reply before writing to disk. Previously ambiguous phrasing could mislead users into thinking the summary had already been captured.
 
 ### Documentation
 - **ADR-025: Do not commit `enabledPlugins` blocks in `.claude/settings.json`** — Establishes policy that committed `enabledPlugins` entries create scope mismatches. Plugin loading should rely on `.claude-plugin/plugin.json` auto-detection.
 - **Lesson: Plugin Settings Scope Consistency** — Documents root cause analysis, audit checklist for plugin repos, and how to avoid this pattern in the future.
+- **ADR-026: Snapshot Gate invokes session-summary-agent** — Documents original design intent, implementation drift, and why session-summary (persistent file, single mechanism, model-switch resilient) is the correct mechanism over a bespoke temp snapshot.
+- **ENH-002 progress log updated** — Gate language fix applied to all three capture commands; status changed to Partially Implemented. Full implementation (agent `--snapshot` mode, flag file, hooks) pending ENH-002 branch.
 
 ### Version Sync Rule
 Whenever a new version is added to CHANGELOG.md, all version files and doc footers must be updated in the same commit. Files: `package.json`, `mcp-server/package.json`, `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` (plugins[0].version only). Doc footers: CHEAT-SHEET.md, COMMAND-GUIDE.md, GETTING-STARTED.md.
