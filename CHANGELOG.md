@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.2.3.3-beta] — 2026-04-06
+
+### Documentation
+- **Lesson: Plugin Settings Scope Consistency** — Documents root cause analysis and audit checklist for committed `enabledPlugins` blocks in plugin repos (captured from v0.2.3.2-beta session)
+- **Lesson: Skill Auto-Triggers Miss Process Vocabulary** — Documents trigger vocabulary pattern: auto-triggers only fire on outcome vocabulary, not process vocabulary
+- **GEMINI.md** — Platform config for Gemini CLI added to repo
+- **Issue tracking: sessionstart-hook-path-saga** — Issue tracking directory added for SessionStart hook path investigation
+- **lessons-learned/README.md** — Index updated to reflect newly captured lessons
+
+### Version Sync Rule
+Whenever a new version is added to CHANGELOG.md, all version files and doc footers must be updated in the same commit. Files: `package.json`, `mcp-server/package.json`, `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` (plugins[0].version only). Doc footers: CHEAT-SHEET.md, COMMAND-GUIDE.md, GETTING-STARTED.md.
+
 ## [0.2.3.2-beta] — 2026-04-06
 
 ### Fixed
