@@ -34,7 +34,11 @@ Apply this pattern whenever a command or skill:
 
 The gate should be the very first action, before any user-facing output that references Git state.
 
+## Broader Context (Opus analysis, 2026-04-07)
+
+This issue also revealed a deeper structural gap: when a fix already exists as uncommitted working-tree changes, `start-issue-tracking` has no pre-flight check to detect this. The fix rides silently into the tracking commit without being acknowledged as implementation. A working-tree diff check at pre-flight is recommended — see ENH-004.
+
 ## Context
 
-- Branch: v0.2.3.4-issue-2-start-issue-tracking-no-git
-- Related: GitHub issue #56
+- Branch: v0.2.3.4-beta (renamed from v0.2.3.4-issue-2-start-issue-tracking-no-git)
+- Related: GitHub issue #56, ENH-004

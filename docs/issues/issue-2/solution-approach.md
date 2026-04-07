@@ -37,10 +37,14 @@ Add a Git presence gate to `commands/start-issue-tracking.md` so all Git-depende
 **Best Practice #3**
 - Soften to: "Use branches when working in a Git repo"
 
+## Additional Findings (Opus analysis, 2026-04-07)
+
+The unauthorized-edit-before-tracking pattern in this session revealed a broader structural gap in `start-issue-tracking`: the skill has no pre-flight working-tree check. If uncommitted changes already exist that look like a fix for the issue being tracked, they silently ride along in the tracking commit. This is addressed in ENH-004 (start-issue-tracking redesign).
+
 ## Acceptance Criteria
 
-- [ ] Step 1.0 detects Git presence before any other git command runs
-- [ ] Step 1.3 is skipped/bypassed when no Git repo
-- [ ] Step 5 is fully skipped when no Git repo
-- [ ] Step 7 summary adapts to no-Git state
-- [ ] No `git` commands run in a non-Git project context
+- [x] Step 1.0 detects Git presence before any other git command runs
+- [x] Step 1.3 is skipped/bypassed when no Git repo
+- [x] Step 5 is fully skipped when no Git repo
+- [x] Step 7 summary adapts to no-Git state
+- [x] No `git` commands run in a non-Git project context
