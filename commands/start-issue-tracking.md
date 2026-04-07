@@ -95,7 +95,65 @@ Use `/kmgraph:start-issue-tracking` when:
 
    Then continue to Step 1.
 
-   If `n`: proceed to Step 1.
+   If `n`: proceed to Step 0.5.
+
+---
+
+## Step 0.5: Mode Selection Gate
+
+After the snapshot gate, present this question and **wait for the user's answer** before proceeding:
+
+> "Issue scope identified. Choose workflow:
+>
+> **[1] Track then Implement** *(default)*
+> Creates issue docs + branch, then you implement.
+> Best for: unknown scope, needs planning, multi-phase work.
+>
+> **[2] Implement then Track**
+> Fix already exists or is trivial. Commits fix first, then generates docs retroactively referencing the fix commit.
+> Best for: one-line fixes, hot patches, changes already in working tree.
+>
+> **[3] Track only** *(defer implementation)*
+> Creates issue docs + GitHub issue. No branch created. Adds to backlog.
+> Best for: deferred work, triage, reporting bugs you won't fix now."
+
+Store `{workflow_mode}` = 1, 2, or 3.
+
+- **Mode 1:** Continue to Step 0.6, then Step 1 as normal. At Step 7 exit, prompt "Proceed to implementation now? [y/N]" — if N, set `status: tracked-not-implemented` in issue frontmatter.
+- **Mode 2:** Continue to Step 0.6 (pre-flight check is mandatory for this mode). After pre-flight, commit any existing implementation changes first, then generate docs retroactively with fix commit hash recorded.
+- **Mode 3:** Skip Step 1.3 (branch strategy — no branch needed). At Step 7 exit, set `status: deferred` in issue frontmatter.
+
+**WAIT FOR USER ANSWER before proceeding to Step 0.6.**
+
+---
+
+## Step 0.6: Pre-flight Working-Tree Check
+
+**CONDITIONAL:** Only run if `{git_available} = true`. Skip entirely if no Git repo.
+
+Run:
+```bash
+git status --porcelain
+git diff --stat HEAD
+```
+
+If **no uncommitted changes exist:** proceed to Step 1.
+
+If **uncommitted changes exist:**
+- Display: "⚠️ Uncommitted changes detected in working tree."
+- List the modified files
+- Ask: "Do these changes relate to the issue being tracked?
+  **[y]** Yes — commit as implementation before tracking
+  **[n]** No — unrelated, continue
+  **[?]** Not sure — show me the diff"
+
+If `?`: show `git diff --stat HEAD` and re-ask.
+
+If `y`: commit the changes with message `fix([scope]): [brief description] — implementation prior to tracking`, then proceed to Step 1.
+
+If `n`: proceed to Step 1.
+
+**MANDATORY GATE: Do not proceed to Step 1 until user responds. Silence is not a valid answer — wait.**
 
 ---
 
@@ -217,6 +275,23 @@ mkdir -p {active_kg_path}/issues/issue-N/
 # - test-cases.md (how to test)
 # - implementation-log.md (work log)
 ```
+
+**Required frontmatter for `issue-N-description.md`:**
+```yaml
+---
+id: issue-N
+type: [Bug|Enhancement|Refactor|Hardening]
+status: [tracked|in-progress|implemented|deferred|tracked-not-implemented]
+github-issue: "#N"
+branch: [branch-name or "none"]
+created: YYYY-MM-DD
+---
+```
+
+Set initial `status` based on `{workflow_mode}`:
+- Mode 1: `tracked`
+- Mode 2: `implemented`
+- Mode 3: `deferred`
 
 ### 3.2: For Enhancements
 ```bash
@@ -356,6 +431,24 @@ The `solution-approach.md` MUST link to the resulting lesson or updated entry in
 **Logic Sync:**
 - [x] Git Authority Validated   ← show as "N/A — no Git repo" if {git_available} = false
 - [x] Knowledge Graph Lesson Initialized
+```
+
+**Mode-aware status and follow-through:**
+
+- **Mode 1:** Ask: "Proceed to implementation now? [y/N]"
+  - If `y`: set `status: in-progress` in issue frontmatter; hand off to implementation
+  - If `n`: set `status: tracked-not-implemented` in issue frontmatter
+- **Mode 2:** Set `status: implemented` (fix already committed)
+- **Mode 3:** Set `status: deferred` (no branch, no implementation planned)
+
+**Exit handoff banner** (always display after summary):
+
+```
+Next actions:
+  → To implement now:     say "Execute Step 1" or start implementation
+  → To update progress:   /kmgraph:update-issue-plan
+  → To capture learning:  /kmgraph:capture-lesson
+  → To defer:             issue is flagged status: deferred
 ```
 
 **CRITICAL TERMINATION:**
