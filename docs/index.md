@@ -29,15 +29,15 @@ Setup takes under 5 minutes for Claude Code marketplace installs. Other platform
 
 <div class="grid cards" markdown>
 
-- :material-chat-question: **The Problem**
+- ❓ **The Problem**
 
   Development knowledge lives in chat threads that disappear. Every LLM switch, session restart, or team handoff loses context: architecture decisions, debugging solutions, recurring patterns, and process learnings are lost permanently.
 
-- :material-lightbulb-on: **The Solution**
+- 💡 **The Solution**
 
   This plugin helps users capture the important stuff, like lessons learned, architecture decisions, and recurring patterns, inside the development workflow without having to stop chatting.
 
-- :material-database-check: **The Outcome**
+- ✅ **The Outcome**
 
   Captured knowledge is accessible in any session. Cross-platform portability is supported through markdown storage and chat history extraction, enabling reuse across different LLMs and IDEs.
 
