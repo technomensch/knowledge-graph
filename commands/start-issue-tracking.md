@@ -104,12 +104,21 @@ Use `/kmgraph:start-issue-tracking` when:
 ### 1.0: Git Authority Check
 Run these commands BEFORE asking the user questions:
 ```bash
+git rev-parse --is-inside-work-tree 2>/dev/null && echo "GIT_PRESENT" || echo "NO_GIT"
 git branch -a
 git log -n 5
 ```
+
+**Git presence gate:** If the first command returns `NO_GIT`, store `{git_available} = false`. In this state:
+- Skip all Git-related questions in Step 1.3 (branch strategy is irrelevant — skip or auto-answer "N/A")
+- Skip Step 5 entirely
+- Omit Git rows from the Step 7 summary
+
+If Git is present, store `{git_available} = true` and proceed normally.
+
 **RULE:** The Git branch history is the source of truth for versioning. Ignore stale versioning strings in file headers if they conflict with the branch naming schema.
 
-**Active branch check:** After running git commands, check if current branch is NOT `main` (or the project default). If so, display this notice **before** presenting the Step 1.1 versioning prompt — it primes the user before they make versioning decisions:
+**Active branch check:** After running git commands (when `{git_available} = true`), check if current branch is NOT `main` (or the project default). If so, display this notice **before** presenting the Step 1.1 versioning prompt — it primes the user before they make versioning decisions:
 
 ```
 ⚠️  You are currently on branch **[current_branch]**, not main.
@@ -258,6 +267,8 @@ Every generated plan MUST include this **Safety Header** and **Atomic Approval P
 
 ## Step 5: Git Integration
 
+**CONDITIONAL:** Only execute this step if `{git_available} = true`. If the project has no Git repository, skip this step entirely — no branch is needed and no Git commands should run.
+
 ### 5.1: Create Feature Branch
 
 Create the branch with a descriptive name derived from the issue number and slug:
@@ -335,15 +346,15 @@ The `solution-approach.md` MUST link to the resulting lesson or updated entry in
 
 **Local Issue #N: [Type] Descriptive Title**
 - Status: 🔴 ACTIVE (LOCKED)
-- Branch: v[Major.Minor.Patch]-[issue N]-brief-slug
-- GitHub Issue: #[N] (Reopened/Created)
+- Branch: v[Major.Minor.Patch]-[issue N]-brief-slug   ← omit if {git_available} = false
+- GitHub Issue: #[N] (Reopened/Created)               ← omit if {git_available} = false
 
 **Files Created:**
 - {active_kg_path}/issues/issue-N/issue-N-description.md
 - {active_kg_path}/plans/vX.X.X-issue-N-slug.md
 
 **Logic Sync:**
-- [x] Git Authority Validated
+- [x] Git Authority Validated   ← show as "N/A — no Git repo" if {git_available} = false
 - [x] Knowledge Graph Lesson Initialized
 ```
 
