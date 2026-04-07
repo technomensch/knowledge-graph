@@ -56,6 +56,18 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
+/* ============================================================
+   Mermaid diagram dark mode — prevent white/light background
+   ============================================================ */
+
+[data-theme='dark'] .docusaurus-mermaid-container {
+  background-color: transparent;
+}
+
+[data-theme='dark'] .docusaurus-mermaid-container svg {
+  background-color: transparent;
+}
+
 [data-theme='dark'] {
   --ifm-color-primary: #ff8c42;
   --ifm-color-primary-dark: #ff7a26;
