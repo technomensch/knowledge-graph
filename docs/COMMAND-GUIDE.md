@@ -1,6 +1,6 @@
 # Command Reference Guide
 
-**Version:** 0.2.3-beta | **Updated:** 2026-03-31
+**Version:** 0.2.3.3-beta | **Updated:** 2026-04-06
 
 > **Claude Code only:** The `/kmgraph:` prefix requires Claude Code with this plugin installed. Other IDEs access equivalent functionality through MCP tools — see [INSTALL.md](INSTALL.md) for platform-specific setup.
 ## About Commands on Other Platforms
@@ -1444,5 +1444,5 @@ flowchart TD
 </div>
 ---
 
-**Version**: 0.2.3-beta
+**Version**: 0.2.3.3-beta
 **Updated**: 2026-03-30
