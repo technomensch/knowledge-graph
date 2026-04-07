@@ -335,11 +335,19 @@ Compose a summary with these sections:
 
 ## Step 7: User Review & Edits
 
-Present the draft:
+Present the draft with an explicit unsaved-state header:
 
-> "Here's what I'd save before you go. Anything to add or change?"
+> "⚠️ **Not saved yet.** Review the draft below and reply to save it.
+>
+> ---
+>
+> [draft content]
+>
+> ---
+>
+> Reply **save** (or **looks good**) to write this to disk, **edit** to make changes, or **cancel** to discard."
 
-Allow inline edits. If user says "looks good", proceed. If user adds context, re-draft.
+Allow inline edits. If user adds context, re-draft and re-present with the same unsaved-state header. Do not proceed to Step 8 until the user explicitly confirms.
 
 ---
 

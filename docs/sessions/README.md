@@ -4,6 +4,12 @@ Cross-session work summaries, architectural decisions, and progress tracking.
 
 ---
 
+## 2026-04 (1 session)
+
+- [2026-04-06 - Snapshot Gate Language Correction and Lesson-Capture Resilience](2026-04/2026-04-06-snapshot-gate-language-correction.md) — Corrected Snapshot Gate language across all three capture commands; added session-summary pre-fill to lesson-capture-agent Phase 2; created ADR-026; updated ENH-002
+
+---
+
 ## 2026-03 (3 sessions)
 
 - [2026-03-16 - v0.1.1 + v0.1.2 Release, Merge, and Documentation](2026-03/2026-03-16_v0.1.1-v0.1.2-release-and-documentation.md) — Merged v0.1.1/v0.1.2 into main; v0.0.4 docs pass; architecture lesson + ADR-015 + ADR-016 captured; KG sync complete (5 patterns/gotchas/architecture entries added)
@@ -12,9 +18,9 @@ Cross-session work summaries, architectural decisions, and progress tracking.
 
 ---
 
-**Total Sessions:** 3
-**Last Session:** 2026-03-16
-**Last Updated:** 2026-03-16
+**Total Sessions:** 4
+**Last Session:** 2026-04-06
+**Last Updated:** 2026-04-06
 
 ---
 
@@ -41,3 +47,4 @@ sessions/
 - **Refactoring** — Code improvements, pattern extraction
 - **Planning** — Design documents, strategy sessions
 - **Documentation** — Knowledge graph building, content updates
+- [Session Snapshot — 2026-04-06](2026-04/2026-04-07-session-snapshot-2026-04-06.md)
