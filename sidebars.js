@@ -24,7 +24,7 @@ const sidebars = {
     {
       type: 'category',
       label: '🍳 How-to Guides',
-      collapsed: false,
+      collapsed: true,
       items: [
         {type: 'doc', id: 'guides/capture-from-bugfix', label: 'Capture from a bug fix'},
         {type: 'doc', id: 'guides/create-adr', label: 'Create an ADR'},
@@ -55,7 +55,7 @@ const sidebars = {
     {
       type: 'category',
       label: '📚 Reference',
-      collapsed: false,
+      collapsed: true,
       items: [
         {type: 'doc', id: 'reference/commands', label: 'Commands'},
         {type: 'doc', id: 'reference/skills', label: 'Skills'},
