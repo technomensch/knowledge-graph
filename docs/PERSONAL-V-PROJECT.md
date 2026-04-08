@@ -49,9 +49,34 @@ A personal KG lives at `~/.claude/knowledge-graph/` and is accessible from any p
 | "I always prefer feature flags over config files" | Personal KG |
 | "This MCP registration quirk affects all IDEs" | Personal KG |
 
+### Scope Diagram
+
+```mermaid
+%%{init: {'theme': 'neutral'}}%%
+graph TB
+    subgraph Personal ["🧑 Personal KG (~/.claude/knowledge-graph/)"]
+        P1["Cross-project patterns"]
+        P2["Tool quirks & IDE setup"]
+        P3["Personal ADRs"]
+    end
+
+    subgraph Project ["📁 Project KG (./docs/)"]
+        PJ1["Project-specific bug fixes"]
+        PJ2["Architecture decisions"]
+        PJ3["Codebase-specific patterns"]
+    end
+
+    Recall["🔍 /kmgraph:recall"]
+    Recall -->|searches both| Personal
+    Recall -->|searches both| Project
+
+    accTitle: Personal vs Project KG scopes
+    accDescr: Two KG scopes — Personal stored at ~/.claude/knowledge-graph/ and Project stored in ./docs/. Recall searches both automatically.
+```
+
 ### Setup
 
 - **During init**: `/kmgraph:init` offers to create a personal KG at the end of setup
 - **Standalone**: `/kmgraph:init-personal-kg` creates and registers the personal KG at any time
 
-See [`/kmgraph:init-personal-kg`](COMMAND-GUIDE.md#-kmgraphinit-personal-kg) in COMMAND-GUIDE.md for setup details.
+See [Multi-KG Workflows](/guides/multi-kg-workflows) for advanced configuration.

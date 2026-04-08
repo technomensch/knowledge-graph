@@ -83,7 +83,7 @@ const sidebars = {
         {type: 'doc', id: 'layers-four', label: 'Four-Layer Architecture'},
         {type: 'doc', id: 'PERSONAL-V-PROJECT', label: 'Personal vs Project'},
         {type: 'doc', id: 'SEARCH', label: 'How Search Works'},
-        // Phase 7: concepts/automation-layer added when created
+        {type: 'doc', id: 'concepts/automation-layer', label: 'Automation Layer'},
       ],
     },
 
