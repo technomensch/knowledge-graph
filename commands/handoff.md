@@ -190,8 +190,8 @@ $recent_commits
 ## Quick Navigation
 
 - **Setup & Installation:** docs/INSTALL.md
-- **Commands Reference:** docs/COMMAND-GUIDE.md
-- **For developers:** docs/GETTING-STARTED.md
+- **Commands Reference:** docs/reference/commands.md
+- **Quickstart:** docs/quickstart.md
 - **Architecture:** decisions/ (ADRs)
 - **Lessons learned:** lessons-learned/ (by category)
 - **Session history:** docs/sessions/
@@ -460,10 +460,11 @@ knowledge-graph/
 │   ├── templates/        — YAML frontmatter structures
 │   ├── examples/         — Reference implementations
 │   └── scripts/          — Python extraction utilities
-├── docs/                 — MkDocs Material documentation site
-│   ├── COMMAND-GUIDE.md
+├── docs/                 — Docusaurus documentation site
+│   ├── reference/        — Commands, skills, agents, hooks, templates
+│   ├── guides/           — How-to guides
+│   ├── quickstart.md
 │   ├── CHEAT-SHEET.md
-│   ├── GETTING-STARTED.md
 │   ├── plans/            — Implementation plans (gitignored)
 │   ├── sessions/         — Session summaries (gitignored)
 │   └── chat-history/     — Extracted chat logs (gitignored)

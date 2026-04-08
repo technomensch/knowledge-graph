@@ -321,8 +321,8 @@ When updating documentation that explains a concept or architectural pattern, es
 Concept: Four-Layer Architecture
 
 Authoritative source: docs/CONCEPTS.md (primary documentation with diagrams, examples, rationale)
-├─ COMMAND-GUIDE.md → References: "See CONCEPTS.md § Four-Layer Architecture for overview"
-├─ GETTING-STARTED.md → References: "See CONCEPTS.md § Four-Layer Architecture"
+├─ reference/commands.md → References: "See CONCEPTS.md § Four-Layer Architecture for overview"
+├─ quickstart.md → References: "See CONCEPTS.md § Four-Layer Architecture"
 └─ CHEAT-SHEET.md → May repeat only syntax/quick-ref snippets, NOT conceptual explanations
 ```
 
@@ -336,9 +336,9 @@ Authoritative source: docs/CONCEPTS.md (primary documentation with diagrams, exa
 
 1. **Identify the authority** — Which doc is the "home" for this concept?
    - Architectural patterns → `docs/CONCEPTS.md`
-   - Command usage/syntax → `docs/COMMAND-GUIDE.md`
+   - Command usage/syntax → `docs/reference/commands.md`
    - Quick reference → `docs/CHEAT-SHEET.md`
-   - Getting started workflows → `docs/GETTING-STARTED.md`
+   - Getting started workflows → `docs/quickstart.md`
 
 2. **Write authoritative version once** — Full explanation, examples, rationale in the authority doc
 
