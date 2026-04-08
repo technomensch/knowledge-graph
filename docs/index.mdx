@@ -7,65 +7,63 @@ description: Structured knowledge capture and cross-session memory — for every
 
 import styles from '@site/src/css/home.module.css';
 
-<div className={styles.hero}>
-  <img
-    src="/knowledge-graph/img/banner.jpeg"
-    alt="KMGraph — Staying in Sync"
-    className={styles.heroImage}
-  />
+<div className={styles.homePage}>
+  <div className={styles.layout}>
 
-  <p className={styles.heroTagline}>
-    Your AI assistant starts every session with no memory of yesterday's work.
-  </p>
-
-  <ul className={styles.heroBullets}>
-    <li>✓ Decisions made three sprints ago are gone — no record, no rationale, no trail</li>
-    <li>✓ The same bug gets solved twice because no one remembered solving it the first time</li>
-    <li>✓ Switching between Claude, Cursor, and Gemini means starting over every time</li>
-  </ul>
-
-  <code className={styles.heroCode}>
-    claude --plugin-dir /path/to/knowledge-graph
-  </code>
-  <p className={styles.heroSubtext}>
-    Then run <code>/kmgraph:init</code> — first lesson captured in under 5 minutes.
-  </p>
-</div>
-
-<div className="container">
-  <div className="row" style={{gap: '1rem', justifyContent: 'center', marginTop: '0.5rem'}}>
-
-    <div className="col col--5 card" style={{padding: '1.5rem', marginBottom: '1rem'}}>
-      <h3>🚀 Quickstart</h3>
-      <p>Install, init, and capture your first lesson in 5 minutes.</p>
-      <a href="/knowledge-graph/quickstart" className="button button--primary button--sm">Get started →</a>
+    {/* ── Hero ── */}
+    <div className={styles.hero}>
+      <img
+        src="/knowledge-graph/img/banner.jpeg"
+        alt="KMGraph — Staying in Sync"
+        className={styles.heroImage}
+      />
+      <p className={styles.heroTagline}>
+        Your AI assistant starts every session with no memory of yesterday's work.
+      </p>
+      <ul className={styles.heroBullets}>
+        <li>✓ Decisions made three sprints ago are gone — no record, no rationale, no trail</li>
+        <li>✓ The same bug gets solved twice because no one remembered solving it the first time</li>
+        <li>✓ Switching between Claude, Cursor, and Gemini means starting over every time</li>
+      </ul>
+      <code className={styles.heroCode}>
+        claude --plugin-dir /path/to/knowledge-graph
+      </code>
+      <p className={styles.heroSubtext}>
+        Then run <code>/kmgraph:init</code> — first lesson captured in under 5 minutes.
+      </p>
     </div>
 
-    <div className="col col--5 card" style={{padding: '1.5rem', marginBottom: '1rem'}}>
-      <h3>📋 Browse Commands</h3>
-      <p>Every slash command, MCP tool, and skill — one reference page.</p>
-      <a href="/knowledge-graph/reference/commands" className="button button--secondary button--sm">Browse →</a>
-    </div>
-
-    <div className="col col--5 card" style={{padding: '1.5rem', marginBottom: '1rem'}}>
-      <h3>🧠 How It Works</h3>
-      <p>The problem KMGraph solves, when to use it, and how knowledge is stored.</p>
-      <a href="/knowledge-graph/concepts/why-kmgraph" className="button button--secondary button--sm">Read more →</a>
-    </div>
-
-    <div className="col col--5 card" style={{padding: '1.5rem', marginBottom: '1rem'}}>
-      <h3>⚡ Cheat Sheet</h3>
-      <p>One-page quick reference — the commands you will use every day.</p>
-      <a href="/knowledge-graph/CHEAT-SHEET" className="button button--secondary button--sm">Open →</a>
+    {/* ── Cards ── */}
+    <div className={styles.cards}>
+      <div className={styles.card}>
+        <h3>🚀 Quickstart</h3>
+        <p>Install, init, and capture your first lesson in 5 minutes.</p>
+        <a href="/knowledge-graph/quickstart" className="button button--primary button--sm">Get started →</a>
+      </div>
+      <div className={styles.card}>
+        <h3>📋 Browse Commands</h3>
+        <p>Every slash command, MCP tool, and skill — one reference page.</p>
+        <a href="/knowledge-graph/reference/commands" className="button button--secondary button--sm">Browse →</a>
+      </div>
+      <div className={styles.card}>
+        <h3>🧠 How It Works</h3>
+        <p>The problem KMGraph solves, when to use it, and how knowledge is stored.</p>
+        <a href="/knowledge-graph/concepts/why-kmgraph" className="button button--secondary button--sm">Read more →</a>
+      </div>
+      <div className={styles.card}>
+        <h3>⚡ Cheat Sheet</h3>
+        <p>One-page quick reference — the commands you use every day.</p>
+        <a href="/knowledge-graph/CHEAT-SHEET" className="button button--secondary button--sm">Open →</a>
+      </div>
     </div>
 
   </div>
-</div>
 
----
+  <div className={styles.beta}>
 
 :::tip[Now in Beta]
-
 KMGraph is in beta and actively seeking feedback. Reports and feature requests are welcome via the [issue tracker](https://github.com/technomensch/knowledge-graph/issues).
-
 :::
+
+  </div>
+</div>
