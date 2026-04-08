@@ -1,0 +1,30 @@
+.glossary {
+  position: relative;
+  cursor: help;
+  border-bottom: 1px dotted var(--ifm-color-primary);
+  text-decoration: none;
+}
+
+.glossary:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 0;
+  top: 100%;
+  z-index: 100;
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  max-width: 320px;
+  white-space: normal;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  line-height: 1.4;
+}
+
+.indicator {
+  font-size: 0.7em;
+  vertical-align: super;
+  color: var(--ifm-color-primary);
+  margin-left: 1px;
+}

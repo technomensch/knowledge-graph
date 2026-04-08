@@ -48,3 +48,4 @@ sessions/
 - **Planning** — Design documents, strategy sessions
 - **Documentation** — Knowledge graph building, content updates
 - [Session Snapshot — 2026-04-06](2026-04/2026-04-07-session-snapshot-2026-04-06.md)
+- [Docusaurus Migration — Home Layout + Asset Loading Fixes](2026-04/2026-04-08-docusaurus-migration-home-layout-asset-loading-fixes.md)

@@ -1,0 +1,57 @@
+---
+id: skills
+title: Skills Catalog
+sidebar_label: Skills
+description: Every auto-triggered skill in KMGraph — trigger keywords, what it suggests, and when it fires
+---
+
+# Skills Catalog
+
+Skills are auto-triggered context providers. They activate based on natural-language signals in the conversation — no explicit invocation needed. Each skill provides guidance and suggests the most relevant command for the current moment.
+
+## How Skills Work
+
+Skills listen for keywords and patterns in the conversation. When a match is detected, the skill surfaces a suggestion in the conversation context. The user can act on the suggestion or ignore it — skills never execute commands automatically.
+
+## Skill Reference
+
+| Skill | Triggers On | Suggests |
+|---|---|---|
+| **lesson-capture** | "figured it out", "solved it", "pattern here is", bug breakthrough, debugging victory | `/kmgraph:capture-lesson` with pre-filled context |
+| **kg-recall** | "have we done this before", "did we solve this", past decisions, history questions | `/kmgraph:recall` with extracted search terms |
+| **session-wrap** | Session ending, context limit approaching, major milestone completed | `/kmgraph:session-summary` before compaction |
+| **adr-guide** | "I'm thinking of using...", architecture decisions, tech choice discussions | `/kmgraph:create-adr` with decision guidance |
+| **doc-update-router** | "update [doc name]", "update the session summary", "update the changelog" | Routes to the correct update command; bypasses direct file edits |
+| **capture-router** | "capture that", "remember that", "save that", and similar natural-language capture phrases | Auto-detects content type and destination from content signals; presents single confirmation before writing |
+| **gov-execute-plan** | "execute plan", implementation start, `docs/plans/*.md` mentioned | Zero-deviation 8-step execution protocol |
+| **knowledge-graph-usage** | Questions about KMGraph itself, "how do I...", "what command..." | Orients to the four-layer architecture and surfaces relevant commands |
+
+## Trigger Keywords
+
+Skills use pattern matching on natural language, not exact commands. The `lesson-capture` skill fires on phrases that indicate a breakthrough:
+
+- "figured it out"
+- "solved it"
+- "the pattern here is"
+- "the fix was"
+- "turns out the issue was"
+- "what I learned"
+
+The `capture-router` skill fires on capture intent phrases:
+
+- "capture that"
+- "remember that"
+- "save that"
+- "let's document this"
+
+Skills are designed to catch capture opportunities that users would otherwise miss because they are in flow.
+
+## Skills vs Commands
+
+Skills provide suggestions. Commands execute actions. A skill surfaces `/kmgraph:capture-lesson` at the right moment; the command does the actual capture. Skills can be thought of as a smart prompt layer that knows when to interrupt.
+
+## Related
+
+- [Agents Catalog](agents) — Heavy-lift handlers triggered by skills
+- [Command Guide](/COMMAND-GUIDE) — Full command reference
+- [Concepts — Automation Layer](/concepts/why-kmgraph) — How skills, agents, and hooks fit together

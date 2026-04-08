@@ -1,0 +1,39 @@
+---
+title: "Documentation restructured — Diátaxis IA, search, demos"
+authors: [technomensch]
+tags: [docs, ux, docusaurus]
+date: 2026-04-08
+---
+
+The KMGraph documentation site has been fully restructured using the [Diátaxis](https://diataxis.fr) information architecture: Tutorials, How-to Guides, Reference, and Concepts. Every page now has a clear intent, and navigation reflects what you're trying to do — not internal feature groupings.
+
+<!-- truncate -->
+
+## What changed
+
+**New structure**
+
+- **Quickstart** — zero-to-first-lesson in 5 minutes with terminal demo GIFs
+- **15 how-to guides** — task-oriented recipes: capture from a bugfix, write a pattern, sync across machines, integrate with Obsidian/Notion/NotebookLM, and more
+- **Reference** — commands, skills, agents, hooks, and templates in sortable tables; condensed from the old COMMAND-GUIDE
+- **Concepts** — explanatory pages for the mental models behind KMGraph (why it exists, the four pillars, personal vs project KGs, the automation layer)
+
+**Demo GIFs**
+
+Every core command now has a VHS terminal recording embedded in the Quickstart page: `init`, `status`, `recall`, `capture-lesson`, and `session-summary`.
+
+**Search**
+
+Full-text search is active via `@orama/plugin-docusaurus-v3` — no crawler required.
+
+**Glossary tooltips**
+
+KMGraph-specific terms (lesson, ADR, KG, skill, agent, capture, recall, session, handoff, hook, pattern) now show definition tooltips on hover via the new `<Glossary>` component.
+
+## Files removed
+
+The following legacy pages were split into the new structure and removed:
+
+- `GETTING-STARTED.md` → Quickstart + Troubleshooting + reference/agents + reference/skills
+- `CHANGELOG-DOCS-ONLY.md` → seeded into this `docs-updates/` feed
+- `_test-layout.md`, `DEPLOYMENT-SITEMAP.md`, `NAVIGATION-INDEX.md` — orphaned, removed

@@ -1,4 +1,9 @@
-# Frequently Asked Questions (FAQ)
+---
+id: FAQ
+title: FAQ
+sidebar_label: FAQ
+description: Frequently asked questions and troubleshooting
+---
 
 This guide provides answers to common questions about using and maintaining the Knowledge Management Graph.
 

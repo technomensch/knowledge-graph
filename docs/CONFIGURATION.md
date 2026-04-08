@@ -1,4 +1,9 @@
-# Configuration Guide
+---
+id: CONFIGURATION
+title: Configuration
+sidebar_label: Configuration
+description: Configure KMGraph for your workspace, IDE, and personal KG
+---
 
 This guide covers configuring and customizing the Knowledge Management Graph after installation.
 
