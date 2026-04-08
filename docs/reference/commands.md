@@ -7,6 +7,8 @@ description: Every KMGraph slash command — category, description, and key flag
 
 **Version:** 0.2.3.3-beta | All commands use the `/kmgraph:` prefix in Claude Code. Other platforms access equivalent functionality through `kg_*` MCP tools — see [INSTALL.md](../INSTALL.md) for details.
 
+<img src="/img/demos/session-summary.gif" alt="KMGraph session-summary demo — snapshot of captured lessons and open plans" width="800" />
+
 ---
 
 ## Essential

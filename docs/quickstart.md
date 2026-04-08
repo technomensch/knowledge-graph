@@ -57,6 +57,8 @@ Copy `core/templates/` into your project. Follow the template READMEs to manuall
 
 ## Step 2 — Initialize
 
+<img src="/img/demos/init.gif" alt="KMGraph init demo — wizard creates knowledge graph structure" width="800" />
+
 ```bash
 /kmgraph:init
 ```
@@ -70,6 +72,8 @@ The wizard asks for:
 
 ## Step 3 — Capture your first lesson
 
+<img src="/img/demos/capture-lesson.gif" alt="KMGraph capture-lesson demo — structured lesson saved with git metadata" width="800" />
+
 ```bash
 /kmgraph:capture-lesson
 ```
@@ -80,6 +84,8 @@ Describe what you just learned or solved. The command structures it into a markd
 
 ## Step 4 — Recall it
 
+<img src="/img/demos/recall.gif" alt="KMGraph recall demo — full-text search returns matching lessons" width="800" />
+
 ```bash
 /kmgraph:recall "what you captured"
 ```
@@ -89,6 +95,8 @@ Full-text search across all captured lessons, decisions, and patterns.
 ---
 
 ## Step 5 — Check status
+
+<img src="/img/demos/status.gif" alt="KMGraph status demo — shows entry counts and last capture time" width="800" />
 
 ```bash
 /kmgraph:status
