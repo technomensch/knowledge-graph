@@ -1,0 +1,20 @@
+{
+  "id": "contributing/docs-updates-workflow",
+  "title": "Documentation Updates Workflow",
+  "description": "How to publish a docs-only branch as a post in the docs-updates feed",
+  "source": "@site/docs/contributing/docs-updates-workflow.md",
+  "sourceDirName": "contributing",
+  "slug": "/contributing/docs-updates-workflow",
+  "permalink": "/knowledge-graph/contributing/docs-updates-workflow",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/contributing/docs-updates-workflow.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "docs-updates-workflow",
+    "title": "Documentation Updates Workflow",
+    "sidebar_label": "Docs Updates Workflow",
+    "description": "How to publish a docs-only branch as a post in the docs-updates feed"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "id": "NAVIGATION-INDEX",
+  "title": "Navigation Index",
+  "description": "Complete map of all documentation pages and their relationships",
+  "source": "@site/docs/NAVIGATION-INDEX.md",
+  "sourceDirName": ".",
+  "slug": "/NAVIGATION-INDEX",
+  "permalink": "/knowledge-graph/NAVIGATION-INDEX",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/NAVIGATION-INDEX.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "NAVIGATION-INDEX",
+    "title": "Navigation Index",
+    "sidebar_label": "Navigation Index",
+    "description": "Complete map of all documentation pages and their relationships"
+  },
+  "sidebar": "docs",
+  "previous": {
+    "title": "Style Guide",
+    "permalink": "/knowledge-graph/STYLE-GUIDE"
+  },
+  "next": {
+    "title": "Glossary",
+    "permalink": "/knowledge-graph/GLOSSARY"
+  }
+}

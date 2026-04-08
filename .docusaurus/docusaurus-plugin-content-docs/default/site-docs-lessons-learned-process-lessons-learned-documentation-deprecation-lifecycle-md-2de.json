@@ -1,0 +1,58 @@
+{
+  "id": "lessons-learned/process/Lessons_Learned_Documentation_Deprecation_Lifecycle",
+  "title": "Lesson: Documentation Deprecation Lifecycle — Deprecate → Cleanup → Removal",
+  "description": "Date: 2026-03-28",
+  "source": "@site/docs/lessons-learned/process/Lessons_Learned_Documentation_Deprecation_Lifecycle.md",
+  "sourceDirName": "lessons-learned/process",
+  "slug": "/lessons-learned/process/Lessons_Learned_Documentation_Deprecation_Lifecycle",
+  "permalink": "/knowledge-graph/lessons-learned/process/Lessons_Learned_Documentation_Deprecation_Lifecycle",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/lessons-learned/process/Lessons_Learned_Documentation_Deprecation_Lifecycle.md",
+  "tags": [
+    {
+      "inline": true,
+      "label": "documentation",
+      "permalink": "/knowledge-graph/tags/documentation"
+    },
+    {
+      "inline": true,
+      "label": "deprecation",
+      "permalink": "/knowledge-graph/tags/deprecation"
+    },
+    {
+      "inline": true,
+      "label": "lifecycle",
+      "permalink": "/knowledge-graph/tags/lifecycle"
+    },
+    {
+      "inline": true,
+      "label": "user-facing",
+      "permalink": "/knowledge-graph/tags/user-facing"
+    },
+    {
+      "inline": true,
+      "label": "kmgraph",
+      "permalink": "/knowledge-graph/tags/kmgraph"
+    }
+  ],
+  "version": "current",
+  "frontMatter": {
+    "title": "Lesson: Documentation Deprecation Lifecycle — Deprecate → Cleanup → Removal",
+    "created": "2026-03-28T00:00:00.000Z",
+    "author": "Claude Sonnet 4.6",
+    "email": "noreply@anthropic.com",
+    "git": {
+      "branch": "v0.2.1-beta-mcp-write-and-portability",
+      "commit": "2b06634b"
+    },
+    "tags": [
+      "documentation",
+      "deprecation",
+      "lifecycle",
+      "user-facing",
+      "kmgraph"
+    ],
+    "category": "process"
+  }
+}

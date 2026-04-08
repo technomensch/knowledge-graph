@@ -1,0 +1,15 @@
+{
+  "id": "decisions/ADR-020-lifecycle-hooks-suite-automated-capture",
+  "title": "ADR-020: Lifecycle Hooks Suite for Automated Knowledge Capture",
+  "description": "Date: 2026-03-27",
+  "source": "@site/docs/decisions/ADR-020-lifecycle-hooks-suite-automated-capture.md",
+  "sourceDirName": "decisions",
+  "slug": "/decisions/ADR-020-lifecycle-hooks-suite-automated-capture",
+  "permalink": "/knowledge-graph/decisions/ADR-020-lifecycle-hooks-suite-automated-capture",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/decisions/ADR-020-lifecycle-hooks-suite-automated-capture.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

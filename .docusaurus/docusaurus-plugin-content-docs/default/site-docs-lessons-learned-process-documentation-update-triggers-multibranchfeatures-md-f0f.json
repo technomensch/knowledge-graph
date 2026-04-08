@@ -1,0 +1,49 @@
+{
+  "id": "lessons-learned/process/documentation-update-triggers-multibranchfeatures",
+  "title": "Documentation Update Triggers in Multi-Branch Feature Development",
+  "description": "Problem Identified",
+  "source": "@site/docs/lessons-learned/process/documentation-update-triggers-multibranchfeatures.md",
+  "sourceDirName": "lessons-learned/process",
+  "slug": "/lessons-learned/process/documentation-update-triggers-multibranchfeatures",
+  "permalink": "/knowledge-graph/lessons-learned/process/documentation-update-triggers-multibranchfeatures",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/lessons-learned/process/documentation-update-triggers-multibranchfeatures.md",
+  "tags": [
+    {
+      "inline": true,
+      "label": "release-management",
+      "permalink": "/knowledge-graph/tags/release-management"
+    },
+    {
+      "inline": true,
+      "label": "multi-branch-workflow",
+      "permalink": "/knowledge-graph/tags/multi-branch-workflow"
+    },
+    {
+      "inline": true,
+      "label": "documentation",
+      "permalink": "/knowledge-graph/tags/documentation"
+    },
+    {
+      "inline": true,
+      "label": "portfolio-quality",
+      "permalink": "/knowledge-graph/tags/portfolio-quality"
+    }
+  ],
+  "version": "current",
+  "frontMatter": {
+    "title": "Documentation Update Triggers in Multi-Branch Feature Development",
+    "category": "process",
+    "date": "2026-02-27T00:00:00.000Z",
+    "tags": [
+      "release-management",
+      "multi-branch-workflow",
+      "documentation",
+      "portfolio-quality"
+    ],
+    "status": "Discovered",
+    "source": "v0.0.10 Feature Development Series",
+    "context": "4 serialized branches (v0.0.10.0-10.3) completed without triggering comprehensive documentation updates, discovered only in hindsight"
+  }
+}

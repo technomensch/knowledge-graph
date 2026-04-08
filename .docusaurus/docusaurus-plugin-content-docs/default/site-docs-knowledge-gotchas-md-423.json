@@ -1,0 +1,15 @@
+{
+  "id": "knowledge/gotchas",
+  "title": "Knowledge Graph - Gotchas",
+  "description": "Quick-reference pitfalls and anti-patterns to avoid.",
+  "source": "@site/docs/knowledge/gotchas.md",
+  "sourceDirName": "knowledge",
+  "slug": "/knowledge/gotchas",
+  "permalink": "/knowledge-graph/knowledge/gotchas",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/knowledge/gotchas.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

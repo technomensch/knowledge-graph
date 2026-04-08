@@ -1,0 +1,15 @@
+{
+  "id": "decisions/ADR-015-node-sqlite3-wasm-for-fts5-search",
+  "title": "ADR-015: Choose node-sqlite3-wasm for FTS5 Full-Text Search",
+  "description": "Date: 2026-03-16",
+  "source": "@site/docs/decisions/ADR-015-node-sqlite3-wasm-for-fts5-search.md",
+  "sourceDirName": "decisions",
+  "slug": "/decisions/ADR-015-node-sqlite3-wasm-for-fts5-search",
+  "permalink": "/knowledge-graph/decisions/ADR-015-node-sqlite3-wasm-for-fts5-search",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/decisions/ADR-015-node-sqlite3-wasm-for-fts5-search.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

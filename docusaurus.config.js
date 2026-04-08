@@ -31,6 +31,41 @@ const config = {
     },
   },
 
+  plugins: [
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        redirects: [
+          // Phase 4+: populated as pages move
+          // { from: '/GETTING-STARTED', to: '/quickstart' },
+        ],
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-blog',
+      {
+        id: 'docs-updates',
+        routeBasePath: 'docs-updates',
+        path: './docs-updates',
+        blogTitle: 'Documentation Updates',
+        blogDescription: 'Changes to the KMGraph documentation site',
+        showReadingTime: false,
+        feedOptions: {
+          type: ['rss', 'atom'],
+          title: 'KMGraph Docs Updates',
+        },
+        blogSidebarCount: 'ALL',
+      },
+    ],
+    'plugin-image-zoom',
+    [
+      '@orama/plugin-docusaurus-v3',
+      {
+        analytics: { enabled: false },
+      },
+    ],
+  ],
+
   presets: [
     [
       'classic',

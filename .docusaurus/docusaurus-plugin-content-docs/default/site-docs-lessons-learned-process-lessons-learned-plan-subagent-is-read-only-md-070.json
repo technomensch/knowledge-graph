@@ -1,0 +1,59 @@
+{
+  "id": "lessons-learned/process/Lessons_Learned_Plan_Subagent_Is_Read_Only",
+  "title": "Plan Subagent Is Read-Only — Write Files Manually After Opus Analysis",
+  "description": "Problem",
+  "source": "@site/docs/lessons-learned/process/Lessons_Learned_Plan_Subagent_Is_Read_Only.md",
+  "sourceDirName": "lessons-learned/process",
+  "slug": "/lessons-learned/process/Lessons_Learned_Plan_Subagent_Is_Read_Only",
+  "permalink": "/knowledge-graph/lessons-learned/process/Lessons_Learned_Plan_Subagent_Is_Read_Only",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/lessons-learned/process/Lessons_Learned_Plan_Subagent_Is_Read_Only.md",
+  "tags": [
+    {
+      "inline": true,
+      "label": "subagents",
+      "permalink": "/knowledge-graph/tags/subagents"
+    },
+    {
+      "inline": true,
+      "label": "plan-mode",
+      "permalink": "/knowledge-graph/tags/plan-mode"
+    },
+    {
+      "inline": true,
+      "label": "workflow",
+      "permalink": "/knowledge-graph/tags/workflow"
+    },
+    {
+      "inline": true,
+      "label": "read-only",
+      "permalink": "/knowledge-graph/tags/read-only"
+    },
+    {
+      "inline": true,
+      "label": "write-tool",
+      "permalink": "/knowledge-graph/tags/write-tool"
+    }
+  ],
+  "version": "current",
+  "frontMatter": {
+    "title": "Plan Subagent Is Read-Only — Write Files Manually After Opus Analysis",
+    "date": "2026-03-27T00:00:00.000Z",
+    "author": "technomensch",
+    "email": "917847+technomensch@users.noreply.github.com",
+    "git": {
+      "branch": "v0.2.0-beta-layered-architecture",
+      "commit": "a09611b50725a5c2141c178f0de7067dd9b41b1b",
+      "commit_short": "a09611b5"
+    },
+    "tags": [
+      "subagents",
+      "plan-mode",
+      "workflow",
+      "read-only",
+      "write-tool"
+    ],
+    "category": "process"
+  }
+}

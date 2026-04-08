@@ -1,0 +1,15 @@
+{
+  "id": "templates/meta-issue/test-cases",
+  "title": "Test Cases & Validation",
+  "description": "Scenarios that must pass for this problem to be considered solved.",
+  "source": "@site/docs/templates/meta-issue/test-cases.md",
+  "sourceDirName": "templates/meta-issue",
+  "slug": "/templates/meta-issue/test-cases",
+  "permalink": "/knowledge-graph/templates/meta-issue/test-cases",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/templates/meta-issue/test-cases.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

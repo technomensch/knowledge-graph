@@ -1,0 +1,20 @@
+{
+  "id": "decisions/ADR-006-document-cache-clear-upgrade-workaround",
+  "title": "ADR-006: Document Cache-Clear as Official Upgrade Path for Claude Code Plugin",
+  "description": "Status",
+  "source": "@site/docs/decisions/ADR-006-document-cache-clear-upgrade-workaround.md",
+  "sourceDirName": "decisions",
+  "slug": "/decisions/ADR-006-document-cache-clear-upgrade-workaround",
+  "permalink": "/knowledge-graph/decisions/ADR-006-document-cache-clear-upgrade-workaround",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/decisions/ADR-006-document-cache-clear-upgrade-workaround.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "ADR-006: Document Cache-Clear as Official Upgrade Path for Claude Code Plugin",
+    "status": "Accepted",
+    "date": "2026-03-03T00:00:00.000Z",
+    "deciders": "technomensch, Claude Haiku 4.5"
+  }
+}

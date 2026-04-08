@@ -1,0 +1,29 @@
+{
+  "id": "STYLE-GUIDE",
+  "title": "Style Guide",
+  "description": "Writing conventions, documentation standards, and pattern documentation",
+  "source": "@site/docs/STYLE-GUIDE.md",
+  "sourceDirName": ".",
+  "slug": "/STYLE-GUIDE",
+  "permalink": "/knowledge-graph/STYLE-GUIDE",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/STYLE-GUIDE.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "STYLE-GUIDE",
+    "title": "Style Guide",
+    "sidebar_label": "Style Guide",
+    "description": "Writing conventions, documentation standards, and pattern documentation"
+  },
+  "sidebar": "docs",
+  "previous": {
+    "title": "Configuration",
+    "permalink": "/knowledge-graph/CONFIGURATION"
+  },
+  "next": {
+    "title": "Navigation Index",
+    "permalink": "/knowledge-graph/NAVIGATION-INDEX"
+  }
+}

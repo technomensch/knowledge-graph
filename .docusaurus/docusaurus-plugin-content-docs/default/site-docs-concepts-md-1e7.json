@@ -1,0 +1,29 @@
+{
+  "id": "CONCEPTS",
+  "title": "Concepts",
+  "description": "Core concepts: the four-layer architecture, pillars, search, and knowledge graph",
+  "source": "@site/docs/CONCEPTS.md",
+  "sourceDirName": ".",
+  "slug": "/CONCEPTS",
+  "permalink": "/knowledge-graph/CONCEPTS",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/CONCEPTS.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "CONCEPTS",
+    "title": "Concepts",
+    "sidebar_label": "Concepts",
+    "description": "Core concepts: the four-layer architecture, pillars, search, and knowledge graph"
+  },
+  "sidebar": "docs",
+  "previous": {
+    "title": "Installation",
+    "permalink": "/knowledge-graph/INSTALL"
+  },
+  "next": {
+    "title": "Architecture",
+    "permalink": "/knowledge-graph/reference/ARCHITECTURE"
+  }
+}

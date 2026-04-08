@@ -1,0 +1,70 @@
+{
+  "id": "lessons-learned/patterns/Lessons_Learned_Patterns_Skill_Auto_Triggers_Miss_Process_Vocabulary_—_Only_Fire_On_Outcome_Vocabulary",
+  "title": "Skill Auto-Triggers Miss Process Vocabulary — Only Fire on Outcome Vocabulary",
+  "description": "Problem",
+  "source": "@site/docs/lessons-learned/patterns/Lessons_Learned_Patterns_Skill_Auto_Triggers_Miss_Process_Vocabulary_—_Only_Fire_On_Outcome_Vocabulary.md",
+  "sourceDirName": "lessons-learned/patterns",
+  "slug": "/lessons-learned/patterns/Lessons_Learned_Patterns_Skill_Auto_Triggers_Miss_Process_Vocabulary_—_Only_Fire_On_Outcome_Vocabulary",
+  "permalink": "/knowledge-graph/lessons-learned/patterns/Lessons_Learned_Patterns_Skill_Auto_Triggers_Miss_Process_Vocabulary_—_Only_Fire_On_Outcome_Vocabulary",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/lessons-learned/patterns/Lessons_Learned_Patterns_Skill_Auto_Triggers_Miss_Process_Vocabulary_—_Only_Fire_On_Outcome_Vocabulary.md",
+  "tags": [
+    {
+      "inline": true,
+      "label": "kmgraph",
+      "permalink": "/knowledge-graph/tags/kmgraph"
+    },
+    {
+      "inline": true,
+      "label": "skill-triggers",
+      "permalink": "/knowledge-graph/tags/skill-triggers"
+    },
+    {
+      "inline": true,
+      "label": "lesson-capture",
+      "permalink": "/knowledge-graph/tags/lesson-capture"
+    },
+    {
+      "inline": true,
+      "label": "adr-guide",
+      "permalink": "/knowledge-graph/tags/adr-guide"
+    },
+    {
+      "inline": true,
+      "label": "UX",
+      "permalink": "/knowledge-graph/tags/ux"
+    },
+    {
+      "inline": true,
+      "label": "process-vocabulary",
+      "permalink": "/knowledge-graph/tags/process-vocabulary"
+    },
+    {
+      "inline": true,
+      "label": "auto-trigger",
+      "permalink": "/knowledge-graph/tags/auto-trigger"
+    }
+  ],
+  "version": "current",
+  "frontMatter": {
+    "title": "Skill Auto-Triggers Miss Process Vocabulary — Only Fire on Outcome Vocabulary",
+    "created": "2026-03-30T13:58:57.789Z",
+    "updated": "2026-03-30T13:58:57.789Z",
+    "author": "technomensch",
+    "git": {
+      "branch": "v0.2.2-beta",
+      "commit": "9a2f626063b6b3d5f3b3b3b3b3b3b3b3b3b3b3b3"
+    },
+    "tags": [
+      "kmgraph",
+      "skill-triggers",
+      "lesson-capture",
+      "adr-guide",
+      "UX",
+      "process-vocabulary",
+      "auto-trigger"
+    ],
+    "category": "patterns"
+  }
+}

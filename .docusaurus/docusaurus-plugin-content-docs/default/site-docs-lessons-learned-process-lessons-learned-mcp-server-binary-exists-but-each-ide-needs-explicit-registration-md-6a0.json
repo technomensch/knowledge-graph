@@ -1,0 +1,65 @@
+{
+  "id": "lessons-learned/process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration",
+  "title": "MCP Server Binary Exists But Each IDE Needs Explicit Registration",
+  "description": "Problem",
+  "source": "@site/docs/lessons-learned/process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration.md",
+  "sourceDirName": "lessons-learned/process",
+  "slug": "/lessons-learned/process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration",
+  "permalink": "/knowledge-graph/lessons-learned/process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/lessons-learned/process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration.md",
+  "tags": [
+    {
+      "inline": true,
+      "label": "mcp",
+      "permalink": "/knowledge-graph/tags/mcp"
+    },
+    {
+      "inline": true,
+      "label": "ide-integration",
+      "permalink": "/knowledge-graph/tags/ide-integration"
+    },
+    {
+      "inline": true,
+      "label": "gemini-cli",
+      "permalink": "/knowledge-graph/tags/gemini-cli"
+    },
+    {
+      "inline": true,
+      "label": "registration",
+      "permalink": "/knowledge-graph/tags/registration"
+    },
+    {
+      "inline": true,
+      "label": "platform-portability",
+      "permalink": "/knowledge-graph/tags/platform-portability"
+    },
+    {
+      "inline": true,
+      "label": "antigravity",
+      "permalink": "/knowledge-graph/tags/antigravity"
+    }
+  ],
+  "version": "current",
+  "frontMatter": {
+    "title": "MCP Server Binary Exists But Each IDE Needs Explicit Registration",
+    "date": "2026-03-27T00:00:00.000Z",
+    "author": "technomensch",
+    "email": "917847+technomensch@users.noreply.github.com",
+    "git": {
+      "branch": "v0.2.0-beta-layered-architecture",
+      "commit": "a09611b50725a5c2141c178f0de7067dd9b41b1b",
+      "commit_short": "a09611b5"
+    },
+    "tags": [
+      "mcp",
+      "ide-integration",
+      "gemini-cli",
+      "registration",
+      "platform-portability",
+      "antigravity"
+    ],
+    "category": "process"
+  }
+}

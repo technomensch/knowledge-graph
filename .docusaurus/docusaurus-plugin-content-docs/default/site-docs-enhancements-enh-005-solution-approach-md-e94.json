@@ -1,0 +1,21 @@
+{
+  "id": "enhancements/ENH-005/solution-approach",
+  "title": "Solution Approach — ENH-005 FTS5 Database Relocation",
+  "description": "Local ID #46",
+  "source": "@site/docs/enhancements/ENH-005/solution-approach.md",
+  "sourceDirName": "enhancements/ENH-005",
+  "slug": "/enhancements/ENH-005/solution-approach",
+  "permalink": "/knowledge-graph/enhancements/ENH-005/solution-approach",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/enhancements/ENH-005/solution-approach.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Solution Approach — ENH-005 FTS5 Database Relocation",
+    "enhancement_id": "ENH-005",
+    "github_issue": 46,
+    "status": "Draft",
+    "created": "2026-03-30T00:00:00.000Z"
+  }
+}

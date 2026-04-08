@@ -1,0 +1,22 @@
+{
+  "id": "enhancements/ENH-001/ENH-001-specification",
+  "title": "User-Level Global Knowledge Graphs",
+  "description": "Problem Statement",
+  "source": "@site/docs/enhancements/ENH-001/ENH-001-specification.md",
+  "sourceDirName": "enhancements/ENH-001",
+  "slug": "/enhancements/ENH-001/ENH-001-specification",
+  "permalink": "/knowledge-graph/enhancements/ENH-001/ENH-001-specification",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/enhancements/ENH-001/ENH-001-specification.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "User-Level Global Knowledge Graphs",
+    "enhancement_id": "ENH-001",
+    "version": "0.2.2",
+    "status": "Proposed",
+    "created": "2026-03-27T00:00:00.000Z",
+    "author": "mkaplan"
+  }
+}

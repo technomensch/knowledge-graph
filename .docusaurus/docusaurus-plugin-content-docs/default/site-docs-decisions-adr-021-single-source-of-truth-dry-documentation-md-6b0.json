@@ -1,0 +1,15 @@
+{
+  "id": "decisions/ADR-021-single-source-of-truth-dry-documentation",
+  "title": "ADR-021: Single Source of Truth for Documentation — DRY Principle",
+  "description": "Date: 2026-03-28",
+  "source": "@site/docs/decisions/ADR-021-single-source-of-truth-dry-documentation.md",
+  "sourceDirName": "decisions",
+  "slug": "/decisions/ADR-021-single-source-of-truth-dry-documentation",
+  "permalink": "/knowledge-graph/decisions/ADR-021-single-source-of-truth-dry-documentation",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/decisions/ADR-021-single-source-of-truth-dry-documentation.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

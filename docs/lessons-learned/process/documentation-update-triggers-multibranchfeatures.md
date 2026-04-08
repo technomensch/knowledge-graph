@@ -43,7 +43,7 @@ This occurred despite the v0.0.10.1 plan explicitly listing "Step 5: Update COMM
 - **All other doc files**: version number consistency, cross-references to new features
 - **Verification**: mkdocs build with zero warnings
 
-**Trigger**: Must be a separate documented final branch (`v{version}-docs-update-{description}`) with explicit plan file
+**Trigger**: Must be a separate documented final branch (`docs-update-{description}`) with explicit plan file. *(Branch naming updated 2026-04-08 per ADR-027 — no version prefix for docs-only branches.)*
 
 ## Why This Pattern Matters
 

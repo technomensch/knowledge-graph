@@ -1,0 +1,61 @@
+{
+  "id": "lessons-learned/debugging/Lessons_Learned_Truncated_Marketplace_Slug",
+  "title": "Lesson: Truncated Plugin Marketplace Slug Bug (28-char limit)",
+  "description": "Date: 2026-02-17",
+  "source": "@site/docs/lessons-learned/debugging/Lessons_Learned_Truncated_Marketplace_Slug.md",
+  "sourceDirName": "lessons-learned/debugging",
+  "slug": "/lessons-learned/debugging/Lessons_Learned_Truncated_Marketplace_Slug",
+  "permalink": "/knowledge-graph/lessons-learned/debugging/Lessons_Learned_Truncated_Marketplace_Slug",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/lessons-learned/debugging/Lessons_Learned_Truncated_Marketplace_Slug.md",
+  "tags": [
+    {
+      "inline": true,
+      "label": "debugging",
+      "permalink": "/knowledge-graph/tags/debugging"
+    },
+    {
+      "inline": true,
+      "label": "marketplace",
+      "permalink": "/knowledge-graph/tags/marketplace"
+    },
+    {
+      "inline": true,
+      "label": "configuration",
+      "permalink": "/knowledge-graph/tags/configuration"
+    },
+    {
+      "inline": true,
+      "label": "silent-failures",
+      "permalink": "/knowledge-graph/tags/silent-failures"
+    },
+    {
+      "inline": true,
+      "label": "constraints",
+      "permalink": "/knowledge-graph/tags/constraints"
+    }
+  ],
+  "version": "current",
+  "frontMatter": {
+    "title": "Lesson: Truncated Plugin Marketplace Slug Bug (28-char limit)",
+    "created": "2026-02-17T00:00:00.000Z",
+    "author": "technomensch",
+    "email": "917847+technomensch@users.noreply.github.com",
+    "git": {
+      "branch": "main",
+      "commit": "37f7e544e5b3b2f1c9a7d5e3f1b9a7c5e3f1b9a7",
+      "pr": null,
+      "issue": null
+    },
+    "sources": [],
+    "tags": [
+      "debugging",
+      "marketplace",
+      "configuration",
+      "silent-failures",
+      "constraints"
+    ],
+    "category": "debugging"
+  }
+}

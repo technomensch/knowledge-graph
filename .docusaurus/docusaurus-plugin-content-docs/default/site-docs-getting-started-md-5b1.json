@@ -1,0 +1,29 @@
+{
+  "id": "GETTING-STARTED",
+  "title": "Getting Started",
+  "description": "Install and configure KMGraph for your platform in under 5 minutes",
+  "source": "@site/docs/GETTING-STARTED.md",
+  "sourceDirName": ".",
+  "slug": "/GETTING-STARTED",
+  "permalink": "/knowledge-graph/GETTING-STARTED",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/GETTING-STARTED.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "GETTING-STARTED",
+    "title": "Getting Started",
+    "sidebar_label": "Getting Started",
+    "description": "Install and configure KMGraph for your platform in under 5 minutes"
+  },
+  "sidebar": "docs",
+  "previous": {
+    "title": "Home",
+    "permalink": "/knowledge-graph/"
+  },
+  "next": {
+    "title": "Installation",
+    "permalink": "/knowledge-graph/INSTALL"
+  }
+}

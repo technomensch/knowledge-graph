@@ -513,7 +513,7 @@ knowledge-graph/
 ### Branch Names
 - Feature: `v{major}.{minor}.{patch}-{description}` (e.g., v0.0.10.1-alpha-skills)
 - Bug fix: `v{major}.{minor}.{patch}.{subpatch}-fix-{description}` (e.g., v0.0.8.7.3-alpha-fix-installer)
-- Docs-only: `v{major}.{minor}-docs-update-{description}` (e.g., v0.0.9-docs-update-command-guide)
+- Docs site only: `docs-update-{description}` (e.g., docs-update-command-guide) — no version prefix
 
 ### Commit Format
 ```

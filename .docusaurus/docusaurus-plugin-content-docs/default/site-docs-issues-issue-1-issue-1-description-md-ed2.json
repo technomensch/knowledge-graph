@@ -1,0 +1,24 @@
+{
+  "id": "issues/issue-1/issue-1-description",
+  "title": "v0.2.1 Backlog — kg_capture MCP Tool, sync-all/update-graph Refactor, Skill Modernization, MCP Auto-Registration",
+  "description": "Local ID: issue-1",
+  "source": "@site/docs/issues/issue-1/issue-1-description.md",
+  "sourceDirName": "issues/issue-1",
+  "slug": "/issues/issue-1/issue-1-description",
+  "permalink": "/knowledge-graph/issues/issue-1/issue-1-description",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/issues/issue-1/issue-1-description.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "v0.2.1 Backlog — kg_capture MCP Tool, sync-all/update-graph Refactor, Skill Modernization, MCP Auto-Registration",
+    "local-id": "issue-1",
+    "github-id": 39,
+    "type": "meta-issue",
+    "status": "open",
+    "version-target": "0.2.1-beta",
+    "created": "2026-03-27T00:00:00.000Z",
+    "parent": "v0.2.0-beta-layered-architecture"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "id": "CHANGELOG-DOCS-ONLY",
+  "title": "Changelog (Docs)",
+  "description": "Documentation-only changelog tracking doc changes separately",
+  "source": "@site/docs/CHANGELOG-DOCS-ONLY.md",
+  "sourceDirName": ".",
+  "slug": "/CHANGELOG-DOCS-ONLY",
+  "permalink": "/knowledge-graph/CHANGELOG-DOCS-ONLY",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/CHANGELOG-DOCS-ONLY.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "CHANGELOG-DOCS-ONLY",
+    "title": "Changelog (Docs)",
+    "sidebar_label": "Changelog (Docs)",
+    "description": "Documentation-only changelog tracking doc changes separately"
+  }
+}

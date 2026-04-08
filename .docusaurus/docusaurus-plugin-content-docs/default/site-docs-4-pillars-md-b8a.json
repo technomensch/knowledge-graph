@@ -1,0 +1,30 @@
+{
+  "id": "pillars-four",
+  "title": "Four Pillars",
+  "description": "Four distinct knowledge types: Lessons, Patterns, Decisions, and Gotchas",
+  "source": "@site/docs/4-PILLARS.md",
+  "sourceDirName": ".",
+  "slug": "/pillars-four",
+  "permalink": "/knowledge-graph/pillars-four",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/4-PILLARS.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 4,
+  "frontMatter": {
+    "id": "pillars-four",
+    "title": "Four Pillars",
+    "sidebar_label": "Four Pillars",
+    "description": "Four distinct knowledge types: Lessons, Patterns, Decisions, and Gotchas"
+  },
+  "sidebar": "docs",
+  "previous": {
+    "title": "Architecture",
+    "permalink": "/knowledge-graph/reference/ARCHITECTURE"
+  },
+  "next": {
+    "title": "Four-Layer Architecture",
+    "permalink": "/knowledge-graph/layers-four"
+  }
+}

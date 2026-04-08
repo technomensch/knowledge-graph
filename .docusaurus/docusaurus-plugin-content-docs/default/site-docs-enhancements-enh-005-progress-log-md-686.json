@@ -1,0 +1,21 @@
+{
+  "id": "enhancements/ENH-005/progress-log",
+  "title": "Progress Log — ENH-005 FTS5 Database Relocation",
+  "description": "Status: 🔴 PROPOSED",
+  "source": "@site/docs/enhancements/ENH-005/progress-log.md",
+  "sourceDirName": "enhancements/ENH-005",
+  "slug": "/enhancements/ENH-005/progress-log",
+  "permalink": "/knowledge-graph/enhancements/ENH-005/progress-log",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/enhancements/ENH-005/progress-log.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Progress Log — ENH-005 FTS5 Database Relocation",
+    "enhancement_id": "ENH-005",
+    "github_issue": 46,
+    "status": "Proposed",
+    "created": "2026-03-30T00:00:00.000Z"
+  }
+}

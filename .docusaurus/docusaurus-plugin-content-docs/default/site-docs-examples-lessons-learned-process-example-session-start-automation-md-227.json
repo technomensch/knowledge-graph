@@ -1,0 +1,61 @@
+{
+  "id": "examples/lessons-learned/process/Example_SessionStart_Automation",
+  "title": "Lesson: Hook-Based Session Automation",
+  "description": "Date: 2026-01-03",
+  "source": "@site/docs/examples/lessons-learned/process/Example_SessionStart_Automation.md",
+  "sourceDirName": "examples/lessons-learned/process",
+  "slug": "/examples/lessons-learned/process/Example_SessionStart_Automation",
+  "permalink": "/knowledge-graph/examples/lessons-learned/process/Example_SessionStart_Automation",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/examples/lessons-learned/process/Example_SessionStart_Automation.md",
+  "tags": [
+    {
+      "inline": true,
+      "label": "#automation",
+      "permalink": "/knowledge-graph/tags/automation"
+    },
+    {
+      "inline": true,
+      "label": "#hooks",
+      "permalink": "/knowledge-graph/tags/hooks"
+    },
+    {
+      "inline": true,
+      "label": "#workflow",
+      "permalink": "/knowledge-graph/tags/workflow"
+    },
+    {
+      "inline": true,
+      "label": "#knowledge-management",
+      "permalink": "/knowledge-graph/tags/knowledge-management"
+    }
+  ],
+  "version": "current",
+  "frontMatter": {
+    "title": "Lesson: Hook-Based Session Automation",
+    "created": "2026-01-03T11:00:00.000Z",
+    "author": "Example User",
+    "git": {
+      "branch": null,
+      "commit": null,
+      "pr": null,
+      "issue": null
+    },
+    "sources": [
+      {
+        "url": "https://git-scm.com/docs/githooks",
+        "title": "Git Hooks Documentation",
+        "accessed": "2026-01-03",
+        "context": "Reference for implementing post-commit trigger logic"
+      }
+    ],
+    "tags": [
+      "#automation",
+      "#hooks",
+      "#workflow",
+      "#knowledge-management"
+    ],
+    "category": "process"
+  }
+}

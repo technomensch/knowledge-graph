@@ -1,0 +1,58 @@
+{
+  "id": "lessons-learned/process/Lessons_Learned_Issue_Tracking_Branch_Guard",
+  "title": "Lesson: Issue Tracking Branch Guard — Don't Switch Branches During Active Implementation",
+  "description": "Date: 2026-03-28",
+  "source": "@site/docs/lessons-learned/process/Lessons_Learned_Issue_Tracking_Branch_Guard.md",
+  "sourceDirName": "lessons-learned/process",
+  "slug": "/lessons-learned/process/Lessons_Learned_Issue_Tracking_Branch_Guard",
+  "permalink": "/knowledge-graph/lessons-learned/process/Lessons_Learned_Issue_Tracking_Branch_Guard",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/lessons-learned/process/Lessons_Learned_Issue_Tracking_Branch_Guard.md",
+  "tags": [
+    {
+      "inline": true,
+      "label": "git",
+      "permalink": "/knowledge-graph/tags/git"
+    },
+    {
+      "inline": true,
+      "label": "workflow",
+      "permalink": "/knowledge-graph/tags/workflow"
+    },
+    {
+      "inline": true,
+      "label": "issue-tracking",
+      "permalink": "/knowledge-graph/tags/issue-tracking"
+    },
+    {
+      "inline": true,
+      "label": "branch-management",
+      "permalink": "/knowledge-graph/tags/branch-management"
+    },
+    {
+      "inline": true,
+      "label": "kmgraph",
+      "permalink": "/knowledge-graph/tags/kmgraph"
+    }
+  ],
+  "version": "current",
+  "frontMatter": {
+    "title": "Lesson: Issue Tracking Branch Guard — Don't Switch Branches During Active Implementation",
+    "created": "2026-03-28T00:00:00.000Z",
+    "author": "Claude Sonnet 4.6",
+    "email": "noreply@anthropic.com",
+    "git": {
+      "branch": "v0.2.1-beta-mcp-write-and-portability",
+      "commit": "2b06634b"
+    },
+    "tags": [
+      "git",
+      "workflow",
+      "issue-tracking",
+      "branch-management",
+      "kmgraph"
+    ],
+    "category": "process"
+  }
+}

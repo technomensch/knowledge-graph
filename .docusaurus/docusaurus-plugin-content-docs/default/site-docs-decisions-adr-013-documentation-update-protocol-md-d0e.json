@@ -1,0 +1,54 @@
+{
+  "id": "decisions/ADR-013-documentation-update-protocol",
+  "title": "ADR-013: Documentation Update Protocol for Multi-Branch Releases",
+  "description": "Status: Accepted",
+  "source": "@site/docs/decisions/ADR-013-documentation-update-protocol.md",
+  "sourceDirName": "decisions",
+  "slug": "/decisions/ADR-013-documentation-update-protocol",
+  "permalink": "/knowledge-graph/decisions/ADR-013-documentation-update-protocol",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/decisions/ADR-013-documentation-update-protocol.md",
+  "tags": [
+    {
+      "inline": true,
+      "label": "documentation",
+      "permalink": "/knowledge-graph/tags/documentation"
+    },
+    {
+      "inline": true,
+      "label": "release-management",
+      "permalink": "/knowledge-graph/tags/release-management"
+    },
+    {
+      "inline": true,
+      "label": "process",
+      "permalink": "/knowledge-graph/tags/process"
+    }
+  ],
+  "version": "current",
+  "frontMatter": {
+    "title": "ADR-013: Documentation Update Protocol for Multi-Branch Releases",
+    "number": 11,
+    "created": "2026-02-27T00:00:00.000Z",
+    "status": "Accepted",
+    "author": "technomensch",
+    "category": "process",
+    "tags": [
+      "documentation",
+      "release-management",
+      "process"
+    ],
+    "decision": "Establish two-layer documentation update protocol mandatory for all multi-branch feature releases",
+    "related": {
+      "adrs": [
+        1,
+        2,
+        "008"
+      ],
+      "lessons": [
+        "documentation-update-triggers-multibranchfeatures.md"
+      ]
+    }
+  }
+}

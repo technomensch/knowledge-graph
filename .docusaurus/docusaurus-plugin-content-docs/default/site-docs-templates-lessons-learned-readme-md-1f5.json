@@ -1,0 +1,15 @@
+{
+  "id": "templates/lessons-learned/README",
+  "title": "Lessons Learned - Master Index",
+  "description": "Navigation: Home > Getting Started > Manual Workflows > Templates",
+  "source": "@site/docs/templates/lessons-learned/README.md",
+  "sourceDirName": "templates/lessons-learned",
+  "slug": "/templates/lessons-learned/",
+  "permalink": "/knowledge-graph/templates/lessons-learned/",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/templates/lessons-learned/README.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

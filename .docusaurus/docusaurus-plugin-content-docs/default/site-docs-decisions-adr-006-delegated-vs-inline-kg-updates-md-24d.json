@@ -1,0 +1,20 @@
+{
+  "id": "decisions/ADR-006-delegated-vs-inline-kg-updates",
+  "title": "ADR-006: Delegated vs Inline KG Update Architecture",
+  "description": "Status",
+  "source": "@site/docs/decisions/ADR-006-delegated-vs-inline-kg-updates.md",
+  "sourceDirName": "decisions",
+  "slug": "/decisions/ADR-006-delegated-vs-inline-kg-updates",
+  "permalink": "/knowledge-graph/decisions/ADR-006-delegated-vs-inline-kg-updates",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/decisions/ADR-006-delegated-vs-inline-kg-updates.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "ADR-006: Delegated vs Inline KG Update Architecture",
+    "status": "Accepted",
+    "date": "2026-02-16T00:00:00.000Z",
+    "deciders": "technomensch, Claude Sonnet 4.5"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "id": "decisions/ADR-011-defer-update-notifications",
+  "title": "ADR-011: Defer Update Notifications and Version Sync to v0.0.9",
+  "description": "Status",
+  "source": "@site/docs/decisions/ADR-011-defer-update-notifications.md",
+  "sourceDirName": "decisions",
+  "slug": "/decisions/ADR-011-defer-update-notifications",
+  "permalink": "/knowledge-graph/decisions/ADR-011-defer-update-notifications",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/decisions/ADR-011-defer-update-notifications.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "ADR-011: Defer Update Notifications and Version Sync to v0.0.9",
+    "status": "Accepted",
+    "date": "2026-02-21T00:00:00.000Z",
+    "deciders": "technomensch, Claude Opus 4.6"
+  }
+}

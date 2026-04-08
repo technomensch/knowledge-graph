@@ -1,0 +1,15 @@
+{
+  "id": "templates/MEMORY-template",
+  "title": "Project Memory - [Project Name]",
+  "description": "Persistent governance context and critical patterns loaded into every session.",
+  "source": "@site/docs/templates/MEMORY-template.md",
+  "sourceDirName": "templates",
+  "slug": "/templates/MEMORY-template",
+  "permalink": "/knowledge-graph/templates/MEMORY-template",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/templates/MEMORY-template.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

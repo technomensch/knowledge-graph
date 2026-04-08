@@ -1,0 +1,20 @@
+{
+  "id": "decisions/ADR-005-defer-memory-rules-engine",
+  "title": "ADR-005: Defer MEMORY.md Auto-Sync Rules Engine to v0.0.5",
+  "description": "Status",
+  "source": "@site/docs/decisions/ADR-005-defer-memory-rules-engine.md",
+  "sourceDirName": "decisions",
+  "slug": "/decisions/ADR-005-defer-memory-rules-engine",
+  "permalink": "/knowledge-graph/decisions/ADR-005-defer-memory-rules-engine",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/decisions/ADR-005-defer-memory-rules-engine.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "ADR-005: Defer MEMORY.md Auto-Sync Rules Engine to v0.0.5",
+    "status": "Accepted",
+    "date": "2026-02-16T00:00:00.000Z",
+    "deciders": "technomensch, Claude Sonnet 4.5"
+  }
+}

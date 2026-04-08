@@ -1,0 +1,20 @@
+{
+  "id": "decisions/ADR-001-centralized-multi-kg-configuration",
+  "title": "ADR-001: Centralized Multi-KG Configuration",
+  "description": "Status",
+  "source": "@site/docs/decisions/ADR-001-centralized-multi-kg-configuration.md",
+  "sourceDirName": "decisions",
+  "slug": "/decisions/ADR-001-centralized-multi-kg-configuration",
+  "permalink": "/knowledge-graph/decisions/ADR-001-centralized-multi-kg-configuration",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/decisions/ADR-001-centralized-multi-kg-configuration.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "ADR-001: Centralized Multi-KG Configuration",
+    "status": "Accepted",
+    "date": "2026-02-15T00:00:00.000Z",
+    "deciders": "technomensch, Claude Sonnet 4.5"
+  }
+}

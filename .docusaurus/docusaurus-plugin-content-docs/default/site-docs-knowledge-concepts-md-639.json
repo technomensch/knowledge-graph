@@ -1,0 +1,15 @@
+{
+  "id": "knowledge/concepts",
+  "title": "Knowledge Graph - Concepts",
+  "description": "Quick-reference architectural concepts and terminology.",
+  "source": "@site/docs/knowledge/concepts.md",
+  "sourceDirName": "knowledge",
+  "slug": "/knowledge/concepts",
+  "permalink": "/knowledge-graph/knowledge/concepts",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/knowledge/concepts.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}
