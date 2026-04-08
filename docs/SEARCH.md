@@ -49,6 +49,18 @@ The search label `(FTS5)` in results means the index was used. FTS5 stands for F
 
 The index is off by default and takes about a second to build. Once enabled, it stays current automatically — no maintenance required.
 
+```mermaid
+graph LR
+    accTitle: Recall Search Paths
+    accDescr: Flowchart showing the two recall search paths - a recall query checks whether the FTS5 index is available, and if yes queries the fast structured index, otherwise falls back to walking files on disk, with both paths converging on ranked results.
+    Q["/kmgraph:recall query"] --> D{FTS5 index<br/>available?}
+    D -- Yes --> F["FTS5 index<br/>fast, structured"]
+    D -- No --> W["File-walk fallback<br/>stale or missing index"]
+    F --> R["Ranked results"]
+    W --> R
+```
+
+
 The first time `/kmgraph:sync-all` is run, it will ask once whether to build the index. Answer yes and the index builds automatically. After that, every `sync-all` run keeps it current with no prompts.
 
 To build the index at any time without running sync-all: call `kg_fts5_rebuild` from the MCP tool panel.

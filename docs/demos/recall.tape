@@ -1,59 +1,73 @@
 # KMGraph — recall demo
-# Records a simulated /kmgraph:recall search workflow
 # Run: vhs docs/demos/recall.tape
 
 Output static/img/demos/recall.gif
 
 Set Shell "bash"
 Set FontSize 14
-Set Width 800
+Set Width 900
 Set Height 480
 Set Theme "Dracula"
 Set Padding 20
 Set Framerate 24
 Set PlaybackSpeed 1.0
 
-Type "# Search the knowledge graph for a past solution"
+Type "# Search for past solutions before solving a problem"
 Sleep 500ms
 Enter
 Sleep 300ms
 
-Type "echo '> /kmgraph:recall redis-timeout'"
+Type "echo '> /kmgraph:recall connection pooling'"
 Sleep 300ms
 Enter
 Sleep 800ms
 
 Type "echo ''"
 Enter
-Type "echo 'Searching knowledge graph...'"
+Type "echo 'Searching knowledge graph for: connection pooling...'"
 Sleep 600ms
 Enter
 
 Type "echo ''"
 Enter
-Type "echo '🔍 Found 2 results for: redis timeout'"
+Type "echo 'Found 3 results'"
 Sleep 300ms
 Enter
 
 Type "echo ''"
 Enter
-Type "echo '1. [debugging] Redis connection timeout on cold start'"
+Type "echo '[debugging] lessons-learned/debugging/api-rate-limit-handling.md'"
 Sleep 200ms
 Enter
-Type "echo '   2026-03-15 · branch: fix/redis-cold-start'"
-Sleep 200ms
+Type "echo '  API Rate Limit Handling — Exponential Backoff with Jitter'"
+Sleep 150ms
 Enter
-Type "echo '   Root cause: Connection pool not initialized before first request.'"
+Type "echo '  Tags: api, rate-limit, retry · Branch: fix/api-client'"
 Sleep 400ms
 Enter
 
 Type "echo ''"
 Enter
-Type "echo '2. [patterns] Always pre-warm connection pools on startup'"
+Type "echo '[patterns] lessons-learned/patterns/connection-pool-pre-warm.md'"
 Sleep 200ms
 Enter
-Type "echo '   2026-03-20 · cross-project pattern'"
+Type "echo '  Always Pre-Warm Connection Pools on Startup'"
+Sleep 150ms
+Enter
+Type "echo '  Tags: connection-pool, redis, database · Branch: fix/redis-cold-start'"
+Sleep 400ms
+Enter
+
+Type "echo ''"
+Enter
+Type "echo '[decisions] decisions/ADR-001-connection-pooling.md'"
+Sleep 200ms
+Enter
+Type "echo '  ADR-001: Use Connection Pooling for All Database Clients'"
+Sleep 150ms
+Enter
+Type "echo '  Status: accepted · Date: 2026-04-06'"
 Sleep 500ms
 Enter
 
-Sleep 2000ms
+Sleep 2500ms

@@ -5,12 +5,6 @@ sidebar_label: Concepts
 description: "Core concepts: the four-layer architecture, pillars, search, and knowledge graph"
 ---
 
-A plain-English guide to key terms and concepts used throughout the Knowledge Management Graph documentation. This guide explains technical terminology in accessible language, with concrete examples for each concept.
-
-**Audience**: First-time users, non-technical team members, and anyone encountering unfamiliar terms in the documentation.
-
----
-
 ## What is a Knowledge Graph?
 
 A **knowledge graph** is a structured way to organize information learned while working on projects. Unlike freeform notes, a knowledge graph uses consistent templates, links related information together, and enables fast searching across all captured learnings.

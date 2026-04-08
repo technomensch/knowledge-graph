@@ -4,52 +4,30 @@
   padding: 2rem 1.5rem;
 }
 
-/* ── Full-width header ───────────────────────────────────────────── */
-.header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  margin-bottom: 2rem;
-  gap: 0.75rem;
-}
-
+/* ── Banner ──────────────────────────────────────────────────────── */
 .headerImage {
   width: 100%;
-  height: auto;
+  height: 280px;
+  object-fit: cover;
+  object-position: center 20%;
   border-radius: 10px;
   display: block;
+  margin-bottom: 2rem;
 }
 
-
-/* ── Three-column layout ─────────────────────────────────────────── */
-.layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-auto-rows: 1fr;
-  gap: 1.75rem;
-  align-items: stretch;
-}
-
-/* ── Hero (column 1, spans both rows) ────────────────────────────── */
+/* ── Hero (full-width callout box) ───────────────────────────────── */
 .hero {
   background: var(--ifm-color-primary);
   border-radius: 12px;
-  padding: 1.75rem;
-  grid-column: 1;
-  grid-row: 1 / span 2;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.75rem;
 }
-
-.cardC2R1 { grid-column: 2; grid-row: 1; }
-.cardC3R1 { grid-column: 3; grid-row: 1; }
-.cardC2R2 { grid-column: 2; grid-row: 2; }
-.cardC3R2 { grid-column: 3; grid-row: 2; }
 
 .heroBullets {
   list-style: none;
   padding: 0;
-  margin: 0 0 1.5rem;
-  font-size: 0.93rem;
+  margin: 0 0 1.25rem;
+  font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.9);
 }
 
@@ -59,10 +37,10 @@
 }
 
 .heroCode {
-  display: block;
+  display: inline-block;
   background: rgba(0, 0, 0, 0.28);
   color: #fff !important;
-  padding: 0.7rem 1.1rem;
+  padding: 0.6rem 1rem;
   border-radius: 6px;
   font-size: 0.88rem;
   margin: 0 0 0.5rem;
@@ -71,7 +49,7 @@
 }
 
 .heroSubtext {
-  font-size: 0.83rem;
+  font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.72);
   margin: 0;
 }
@@ -81,7 +59,15 @@
   color: #fff;
 }
 
+/* ── Four cards in a row ─────────────────────────────────────────── */
+.cards {
+  display: flex;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
 .card {
+  flex: 1;
   background: var(--ifm-card-background-color);
   border: 1px solid var(--ifm-color-emphasis-200);
   border-radius: 10px;
@@ -94,7 +80,6 @@
 .card h3 {
   font-size: 0.95rem;
   margin: 0;
-  white-space: nowrap;
 }
 
 .card p {
@@ -108,57 +93,29 @@
   margin-top: auto;
 }
 
-/* ── Beta notice ─────────────────────────────────────────────────── */
-.beta {
-  margin-top: 2rem;
-}
-
-/* ── Tablet: stack hero above 2×2 cards ─────────────────────────── */
+/* ── Tablet: 2×2 cards ───────────────────────────────────────────── */
 @media (max-width: 860px) {
-  .layout {
-    grid-template-columns: 1fr 1fr;
-    grid-auto-rows: auto;
+  .cards {
+    flex-wrap: wrap;
   }
 
-  .hero {
-    grid-column: 1 / -1;
-    grid-row: auto;
-  }
-
-  .cardC2R1, .cardC3R1, .cardC2R2, .cardC3R2 {
-    grid-column: auto;
-    grid-row: auto;
-  }
-
-  .headerTagline {
-    font-size: 1.35rem;
+  .card {
+    flex: 1 1 calc(50% - 0.625rem);
   }
 }
 
-/* ── Mobile: single column everything ───────────────────────────── */
+/* ── Mobile: single column ───────────────────────────────────────── */
 @media (max-width: 480px) {
   .homePage {
     padding: 1rem 0.75rem;
   }
 
-  .headerTagline {
-    font-size: 1.15rem;
-  }
-
-  .hero {
-    padding: 1.25rem 1rem;
-    border-radius: 8px;
-  }
-
-  .layout {
-    grid-template-columns: 1fr;
-  }
-
-  .card h3 {
-    white-space: normal;
+  .card {
+    flex: 1 1 100%;
   }
 
   .heroCode {
     font-size: 0.8rem;
+    white-space: normal;
   }
 }

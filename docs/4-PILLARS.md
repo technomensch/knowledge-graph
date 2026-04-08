@@ -11,6 +11,16 @@ The knowledge graph system organizes information into four distinct types, each 
 
 Different knowledge types need different structures:
 
+```mermaid
+graph LR
+    accTitle: Four Pillars of Knowledge Flow
+    accDescr: Horizontal flow showing the four pillars side by side - Capture records new knowledge, Recall surfaces prior knowledge on demand, Synthesize distills patterns across entries, and Persist stores durable artifacts on disk.
+    Capture["Capture<br/>Record lessons and decisions"] --> Recall["Recall<br/>Surface prior knowledge"]
+    Recall --> Synthesize["Synthesize<br/>Distill patterns across entries"]
+    Synthesize --> Persist["Persist<br/>Store durable artifacts"]
+```
+
+
 - Quick reference ≠ detailed narrative
 - Formal decision ≠ informal learning
 - Snapshot ≠ timeless knowledge
