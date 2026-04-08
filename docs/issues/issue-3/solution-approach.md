@@ -1,5 +1,5 @@
 ---
-id: issue-3
+id: issue-3-solution
 type: Hardening
 status: OPEN
 ---
