@@ -21,27 +21,35 @@ const sidebars = {
     // },
 
     // ── How-to Guides ─────────────────────────────────────────────────────
-    // Phase 5: guides/ pages added when created
-    // {
-    //   type: 'category',
-    //   label: '🍳 How-to Guides',
-    //   items: [
-    //     'guides/capture-from-bugfix',
-    //     'guides/create-adr',
-    //     'guides/track-meta-issue',
-    //     'guides/sync-across-machines',
-    //     'guides/sanitize-before-sharing',
-    //     'guides/backfill-existing-notes',
-    //     'guides/use-in-cursor',
-    //     'guides/migrate-claude-gemini',
-    //     'guides/customize-templates',
-    //     'guides/customize-hooks',
-    //     'guides/multi-kg-workflows',
-    //     'guides/integrate-notion',
-    //     'guides/integrate-obsidian',
-    //     'guides/integrate-notebooklm',
-    //   ],
-    // },
+    {
+      type: 'category',
+      label: '🍳 How-to Guides',
+      collapsed: false,
+      items: [
+        {type: 'doc', id: 'guides/capture-from-bugfix', label: 'Capture from a bug fix'},
+        {type: 'doc', id: 'guides/create-adr', label: 'Create an ADR'},
+        {type: 'doc', id: 'guides/track-meta-issue', label: 'Track a meta-issue'},
+        {type: 'doc', id: 'guides/sync-across-machines', label: 'Sync across machines'},
+        {type: 'doc', id: 'guides/sanitize-before-sharing', label: 'Sanitize before sharing'},
+        {type: 'doc', id: 'guides/backfill-existing-notes', label: 'Backfill existing notes'},
+        {type: 'doc', id: 'guides/use-in-cursor', label: 'Use in Cursor/Windsurf/VS Code'},
+        {type: 'doc', id: 'guides/migrate-claude-gemini', label: 'Migrate Claude ↔ Gemini'},
+        {type: 'doc', id: 'guides/customize-templates', label: 'Customize templates'},
+        {type: 'doc', id: 'guides/customize-hooks', label: 'Customize hooks'},
+        {type: 'doc', id: 'guides/multi-kg-workflows', label: 'Multi-KG workflows'},
+        {type: 'doc', id: 'guides/pattern-writing', label: 'Pattern writing'},
+        {
+          type: 'category',
+          label: 'Integrations',
+          collapsed: true,
+          items: [
+            {type: 'doc', id: 'guides/integrate-notion', label: 'Integrate with Notion'},
+            {type: 'doc', id: 'guides/integrate-obsidian', label: 'Integrate with Obsidian'},
+            {type: 'doc', id: 'guides/integrate-notebooklm', label: 'Integrate with NotebookLM'},
+          ],
+        },
+      ],
+    },
 
     // ── Reference ─────────────────────────────────────────────────────────
     {
