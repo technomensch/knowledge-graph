@@ -7,6 +7,7 @@ const sidebars = {
     // ── Quickstart ────────────────────────────────────────────────────────
     {type: 'doc', id: 'quickstart', label: '🚀 Quickstart (5 min)'},
     {type: 'doc', id: 'INSTALL', label: 'Installation'},
+    {type: 'doc', id: 'COMMAND-GUIDE', label: '📖 Command Guide'},
 
     // ── Tutorials ─────────────────────────────────────────────────────────
     // Phase 4/5: tutorial pages created in those phases

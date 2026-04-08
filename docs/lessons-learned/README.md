@@ -131,3 +131,4 @@ See [core/examples/lessons-learned/](../../examples/lessons-learned/) for filled
 - [Manual Workflow](../../docs/WORKFLOWS.md#workflow-1-create-lesson-learned) - Step-by-step
 - [Command Guide](../../../docs/COMMAND-GUIDE.md#essential-commands) - Automated (Claude Code)
 - [Spec Drift In Command Language](process/Lessons_Learned_Process_Spec_Drift_In_Command_Language.md)
+- [Git Presence Gate in Commands](patterns/Lessons_Learned_Patterns_Git_Presence_Gate_In_Commands.md)
