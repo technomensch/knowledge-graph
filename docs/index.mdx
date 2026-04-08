@@ -38,27 +38,25 @@ import styles from '@site/src/css/home.module.css';
     </div>
 
     {/* Cards: navigation */}
-    <div className={styles.cards}>
-      <div className={styles.card}>
-        <h3>🚀 Quickstart</h3>
-        <p>Install, init, and capture your first lesson in 5 minutes.</p>
-        <a href="/knowledge-graph/quickstart" className="button button--primary button--sm">Get started →</a>
-      </div>
-      <div className={styles.card}>
-        <h3>📋 Browse Commands</h3>
-        <p>Every slash command, MCP tool, and skill — one reference page.</p>
-        <a href="/knowledge-graph/reference/commands" className="button button--secondary button--sm">Browse →</a>
-      </div>
-      <div className={styles.card}>
-        <h3>🧠 How It Works</h3>
-        <p>The problem KMGraph solves, when to use it, and how knowledge is stored.</p>
-        <a href="/knowledge-graph/concepts/why-kmgraph" className="button button--secondary button--sm">Read more →</a>
-      </div>
-      <div className={styles.card}>
-        <h3>⚡ Cheat Sheet</h3>
-        <p>One-page quick reference — the commands you use every day.</p>
-        <a href="/knowledge-graph/CHEAT-SHEET" className="button button--secondary button--sm">Open →</a>
-      </div>
+    <div className={`${styles.card} ${styles.cardC2R1}`}>
+      <h3>🚀 Quickstart</h3>
+      <p>Install, init, and capture your first lesson in 5 minutes.</p>
+      <a href="/knowledge-graph/quickstart" className="button button--primary button--sm">Get started →</a>
+    </div>
+    <div className={`${styles.card} ${styles.cardC3R1}`}>
+      <h3>📋 Browse Commands</h3>
+      <p>Every slash command, MCP tool, and skill — one reference page.</p>
+      <a href="/knowledge-graph/reference/commands" className="button button--secondary button--sm">Browse →</a>
+    </div>
+    <div className={`${styles.card} ${styles.cardC2R2}`}>
+      <h3>🧠 How It Works</h3>
+      <p>The problem KMGraph solves, when to use it, and how knowledge is stored.</p>
+      <a href="/knowledge-graph/concepts/why-kmgraph" className="button button--secondary button--sm">Read more →</a>
+    </div>
+    <div className={`${styles.card} ${styles.cardC3R2}`}>
+      <h3>⚡ Cheat Sheet</h3>
+      <p>One-page quick reference — the commands you use every day.</p>
+      <a href="/knowledge-graph/CHEAT-SHEET" className="button button--secondary button--sm">Open →</a>
     </div>
 
   </div>
