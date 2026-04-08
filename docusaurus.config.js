@@ -103,7 +103,7 @@ const config = {
           src: 'img/avatar.png',
         },
         items: [
-          {to: '/GETTING-STARTED', label: 'Getting Started', position: 'left'},
+          {to: '/quickstart', label: 'Getting Started', position: 'left'},
           {to: '/CONCEPTS', label: 'Concepts', position: 'left'},
           {to: '/COMMAND-GUIDE', label: 'Commands', position: 'left'},
           {to: '/CONFIGURATION', label: 'Configuration', position: 'left'},
@@ -133,7 +133,7 @@ const config = {
           {
             title: 'Docs',
             items: [
-              {label: 'Getting Started', to: '/GETTING-STARTED'},
+              {label: 'Getting Started', to: '/quickstart'},
               {label: 'Command Guide', to: '/COMMAND-GUIDE'},
               {label: 'Cheat Sheet', to: '/CHEAT-SHEET'},
               {label: 'FAQ', to: '/FAQ'},
