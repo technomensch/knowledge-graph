@@ -1,0 +1,85 @@
+{
+  "id": "decisions/ADR-027-docusaurus-restructure-diataxis-docs-feed",
+  "title": "ADR-027: Docusaurus Docs Restructure — Diátaxis IA, docs-updates Feed, Branch Schema, and Landing Page Strategy",
+  "description": "Date: 2026-04-08",
+  "source": "@site/docs/decisions/ADR-027-docusaurus-restructure-diataxis-docs-feed.md",
+  "sourceDirName": "decisions",
+  "slug": "/decisions/ADR-027-docusaurus-restructure-diataxis-docs-feed",
+  "permalink": "/knowledge-graph/decisions/ADR-027-docusaurus-restructure-diataxis-docs-feed",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/decisions/ADR-027-docusaurus-restructure-diataxis-docs-feed.md",
+  "tags": [
+    {
+      "inline": true,
+      "label": "docs",
+      "permalink": "/knowledge-graph/tags/docs"
+    },
+    {
+      "inline": true,
+      "label": "docusaurus",
+      "permalink": "/knowledge-graph/tags/docusaurus"
+    },
+    {
+      "inline": true,
+      "label": "diataxis",
+      "permalink": "/knowledge-graph/tags/diataxis"
+    },
+    {
+      "inline": true,
+      "label": "information-architecture",
+      "permalink": "/knowledge-graph/tags/information-architecture"
+    },
+    {
+      "inline": true,
+      "label": "changelog",
+      "permalink": "/knowledge-graph/tags/changelog"
+    },
+    {
+      "inline": true,
+      "label": "branch-naming",
+      "permalink": "/knowledge-graph/tags/branch-naming"
+    },
+    {
+      "inline": true,
+      "label": "landing-page",
+      "permalink": "/knowledge-graph/tags/landing-page"
+    }
+  ],
+  "version": "current",
+  "frontMatter": {
+    "title": "ADR-027: Docusaurus Docs Restructure — Diátaxis IA, docs-updates Feed, Branch Schema, and Landing Page Strategy",
+    "number": 23,
+    "created": "2026-04-08T00:00:00.000Z",
+    "status": "Accepted",
+    "author": "mkaplan",
+    "git": {
+      "branch": "docs-update-docusaurus-migration-restructure",
+      "commit": null,
+      "pr": null,
+      "issue": null
+    },
+    "implements": "v0.0.6",
+    "related": {
+      "adrs": [
+        13,
+        23
+      ],
+      "lessons": [
+        "lessons-learned/process/Lessons_Learned_Dual_Changelog_Both_Must_Be_Updated.md",
+        "lessons-learned/process/documentation-update-triggers-multibranchfeatures.md"
+      ],
+      "kg_entries": []
+    },
+    "tags": [
+      "docs",
+      "docusaurus",
+      "diataxis",
+      "information-architecture",
+      "changelog",
+      "branch-naming",
+      "landing-page"
+    ],
+    "category": "process"
+  }
+}

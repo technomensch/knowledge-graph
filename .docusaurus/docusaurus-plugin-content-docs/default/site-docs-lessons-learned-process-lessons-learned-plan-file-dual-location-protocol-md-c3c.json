@@ -1,0 +1,52 @@
+{
+  "id": "lessons-learned/process/Lessons_Learned_Plan_File_Dual_Location_Protocol",
+  "title": "Lesson: Plan File Dual-Location Protocol",
+  "description": "Date: 2026-03-01",
+  "source": "@site/docs/lessons-learned/process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md",
+  "sourceDirName": "lessons-learned/process",
+  "slug": "/lessons-learned/process/Lessons_Learned_Plan_File_Dual_Location_Protocol",
+  "permalink": "/knowledge-graph/lessons-learned/process/Lessons_Learned_Plan_File_Dual_Location_Protocol",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/lessons-learned/process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md",
+  "tags": [
+    {
+      "inline": true,
+      "label": "workflow",
+      "permalink": "/knowledge-graph/tags/workflow"
+    },
+    {
+      "inline": true,
+      "label": "protocol",
+      "permalink": "/knowledge-graph/tags/protocol"
+    },
+    {
+      "inline": true,
+      "label": "planning",
+      "permalink": "/knowledge-graph/tags/planning"
+    },
+    {
+      "inline": true,
+      "label": "claude-code",
+      "permalink": "/knowledge-graph/tags/claude-code"
+    }
+  ],
+  "version": "current",
+  "frontMatter": {
+    "title": "Lesson: Plan File Dual-Location Protocol",
+    "created": "2026-03-01T12:00:00.000Z",
+    "author": "Claude Sonnet 4.6",
+    "email": "noreply@anthropic.com",
+    "git": {
+      "branch": "v0.0.8.7.3-alpha-fix-installer-page",
+      "commit": "56b96ea7a7c04b96c7d8e8c0f2d1e3a4"
+    },
+    "tags": [
+      "workflow",
+      "protocol",
+      "planning",
+      "claude-code"
+    ],
+    "category": "process"
+  }
+}

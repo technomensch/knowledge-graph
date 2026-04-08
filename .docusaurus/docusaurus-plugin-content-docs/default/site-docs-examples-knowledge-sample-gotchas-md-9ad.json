@@ -1,0 +1,15 @@
+{
+  "id": "examples/knowledge/sample-gotchas",
+  "title": "Common Gotchas & Solutions",
+  "description": "Last Updated: 2026-02-13",
+  "source": "@site/docs/examples/knowledge/sample-gotchas.md",
+  "sourceDirName": "examples/knowledge",
+  "slug": "/examples/knowledge/sample-gotchas",
+  "permalink": "/knowledge-graph/examples/knowledge/sample-gotchas",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/examples/knowledge/sample-gotchas.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

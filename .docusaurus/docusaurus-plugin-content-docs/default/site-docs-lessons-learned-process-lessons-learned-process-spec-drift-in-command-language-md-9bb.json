@@ -1,0 +1,58 @@
+{
+  "id": "lessons-learned/process/Lessons_Learned_Process_Spec_Drift_In_Command_Language",
+  "title": "Spec Drift In Command Language",
+  "description": "Problem",
+  "source": "@site/docs/lessons-learned/process/Lessons_Learned_Process_Spec_Drift_In_Command_Language.md",
+  "sourceDirName": "lessons-learned/process",
+  "slug": "/lessons-learned/process/Lessons_Learned_Process_Spec_Drift_In_Command_Language",
+  "permalink": "/knowledge-graph/lessons-learned/process/Lessons_Learned_Process_Spec_Drift_In_Command_Language",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/lessons-learned/process/Lessons_Learned_Process_Spec_Drift_In_Command_Language.md",
+  "tags": [
+    {
+      "inline": true,
+      "label": "spec-drift",
+      "permalink": "/knowledge-graph/tags/spec-drift"
+    },
+    {
+      "inline": true,
+      "label": "command-language",
+      "permalink": "/knowledge-graph/tags/command-language"
+    },
+    {
+      "inline": true,
+      "label": "snapshot-gate",
+      "permalink": "/knowledge-graph/tags/snapshot-gate"
+    },
+    {
+      "inline": true,
+      "label": "consistency",
+      "permalink": "/knowledge-graph/tags/consistency"
+    },
+    {
+      "inline": true,
+      "label": "process",
+      "permalink": "/knowledge-graph/tags/process"
+    }
+  ],
+  "version": "current",
+  "frontMatter": {
+    "title": "Spec Drift In Command Language",
+    "created": "2026-04-07T01:48:30.478Z",
+    "updated": "2026-04-07T01:48:30.478Z",
+    "author": "technomensch",
+    "git": {
+      "branch": "v0.2.3.2-beta",
+      "commit": "0c0c73f2b6e1d3a5c9f4e7b2d8a1c6e0f3b5d7a9"
+    },
+    "tags": [
+      "spec-drift",
+      "command-language",
+      "snapshot-gate",
+      "consistency",
+      "process"
+    ],
+    "category": "process"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "enhancements/ENH-004/ENH-004-specification",
+  "title": "ENH-004: session-summary optional context-mode event DB integration",
+  "description": "Status: 🔴 PROPOSED",
+  "source": "@site/docs/enhancements/ENH-004/ENH-004-specification.md",
+  "sourceDirName": "enhancements/ENH-004",
+  "slug": "/enhancements/ENH-004/ENH-004-specification",
+  "permalink": "/knowledge-graph/enhancements/ENH-004/ENH-004-specification",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/enhancements/ENH-004/ENH-004-specification.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "ENH-004: session-summary optional context-mode event DB integration",
+    "local-id": "ENH-004",
+    "type": "enhancement",
+    "status": "proposed",
+    "created": "2026-03-29T00:00:00.000Z",
+    "version-target": "0.2.2"
+  }
+}

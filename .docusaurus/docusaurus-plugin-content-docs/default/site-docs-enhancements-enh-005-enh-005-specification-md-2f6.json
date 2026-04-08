@@ -1,0 +1,23 @@
+{
+  "id": "enhancements/ENH-005/ENH-005-specification",
+  "title": "FTS5 Database Relocation to User-Level Cache",
+  "description": "Local ID #46",
+  "source": "@site/docs/enhancements/ENH-005/ENH-005-specification.md",
+  "sourceDirName": "enhancements/ENH-005",
+  "slug": "/enhancements/ENH-005/ENH-005-specification",
+  "permalink": "/knowledge-graph/enhancements/ENH-005/ENH-005-specification",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/enhancements/ENH-005/ENH-005-specification.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "FTS5 Database Relocation to User-Level Cache",
+    "enhancement_id": "ENH-005",
+    "github_issue": 46,
+    "version": "0.2.2",
+    "status": "Proposed",
+    "created": "2026-03-30T00:00:00.000Z",
+    "author": "mkaplan"
+  }
+}

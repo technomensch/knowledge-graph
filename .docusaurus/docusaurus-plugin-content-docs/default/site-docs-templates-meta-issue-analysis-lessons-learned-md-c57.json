@@ -1,0 +1,15 @@
+{
+  "id": "templates/meta-issue/analysis/lessons-learned",
+  "title": "Lessons Learned (Meta-Issue)",
+  "description": "Reusable insights from this investigation.",
+  "source": "@site/docs/templates/meta-issue/analysis/lessons-learned.md",
+  "sourceDirName": "templates/meta-issue/analysis",
+  "slug": "/templates/meta-issue/analysis/lessons-learned",
+  "permalink": "/knowledge-graph/templates/meta-issue/analysis/lessons-learned",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/templates/meta-issue/analysis/lessons-learned.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

@@ -1,0 +1,29 @@
+{
+  "id": "reference/PLATFORM-ADAPTATION",
+  "title": "Platform Adaptation",
+  "description": "Integration guide for different IDEs and LLMs",
+  "source": "@site/docs/reference/PLATFORM-ADAPTATION.md",
+  "sourceDirName": "reference",
+  "slug": "/reference/PLATFORM-ADAPTATION",
+  "permalink": "/knowledge-graph/reference/PLATFORM-ADAPTATION",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/reference/PLATFORM-ADAPTATION.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "PLATFORM-ADAPTATION",
+    "title": "Platform Adaptation",
+    "sidebar_label": "Platform Adaptation",
+    "description": "Integration guide for different IDEs and LLMs"
+  },
+  "sidebar": "docs",
+  "previous": {
+    "title": "Manual Workflows",
+    "permalink": "/knowledge-graph/reference/WORKFLOWS"
+  },
+  "next": {
+    "title": "Pattern Writing",
+    "permalink": "/knowledge-graph/reference/PATTERNS-GUIDE"
+  }
+}

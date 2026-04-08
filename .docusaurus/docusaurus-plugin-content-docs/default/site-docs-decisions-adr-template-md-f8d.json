@@ -1,0 +1,54 @@
+{
+  "id": "decisions/ADR-template",
+  "title": "ADR-XXX: [Title of Decision]",
+  "description": "Date: YYYY-MM-DD",
+  "source": "@site/docs/decisions/ADR-template.md",
+  "sourceDirName": "decisions",
+  "slug": "/decisions/ADR-template",
+  "permalink": "/knowledge-graph/decisions/ADR-template",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/decisions/ADR-template.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "ADR-XXX: [Title of Decision]",
+    "number": "XXX",
+    "created": "YYYY-MM-DDTHH:MM:SSZ",
+    "status": [
+      "Proposed|Accepted|Deprecated|Superseded"
+    ],
+    "author": [
+      "Your Name"
+    ],
+    "email": [
+      "Your Email"
+    ],
+    "git": {
+      "branch": [
+        "branch-name"
+      ],
+      "commit": [
+        "commit-hash"
+      ],
+      "pr": [
+        "pr-number or null"
+      ],
+      "issue": [
+        "issue-number or null"
+      ]
+    },
+    "implements": [
+      "version or null"
+    ],
+    "related": {
+      "adrs": [],
+      "lessons": [],
+      "kg_entries": []
+    },
+    "tags": [],
+    "category": [
+      "architecture|process|technology"
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "id": "decisions/ADR-012-hook-security-model",
+  "title": "ADR-012: Hook Security Model",
+  "description": "Context",
+  "source": "@site/docs/decisions/ADR-012-hook-security-model.md",
+  "sourceDirName": "decisions",
+  "slug": "/decisions/ADR-012-hook-security-model",
+  "permalink": "/knowledge-graph/decisions/ADR-012-hook-security-model",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/decisions/ADR-012-hook-security-model.md",
+  "tags": [
+    {
+      "inline": true,
+      "label": "security",
+      "permalink": "/knowledge-graph/tags/security"
+    },
+    {
+      "inline": true,
+      "label": "hooks",
+      "permalink": "/knowledge-graph/tags/hooks"
+    },
+    {
+      "inline": true,
+      "label": "shell-scripts",
+      "permalink": "/knowledge-graph/tags/shell-scripts"
+    },
+    {
+      "inline": true,
+      "label": "session-start",
+      "permalink": "/knowledge-graph/tags/session-start"
+    }
+  ],
+  "version": "current",
+  "frontMatter": {
+    "title": "ADR-012: Hook Security Model",
+    "status": "accepted",
+    "created": "2026-02-27T00:00:00.000Z",
+    "category": "architecture",
+    "tags": [
+      "security",
+      "hooks",
+      "shell-scripts",
+      "session-start"
+    ]
+  }
+}

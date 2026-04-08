@@ -45,7 +45,7 @@ Heavy-lift task handlers that keep main context clean:
 |---|---|---|
 | Feature development | `v{ver}-{description}` | `v0.0.9.1-alpha-claude-md` |
 | Bug fix | `v{ver}-fix-{description}` | `v0.0.8.7.3-alpha-fix-installer-page` |
-| Docs-only update | `v{ver}-docs-update-{description}` | `v0.0.9-docs-update-command-guide` |
+| Docs site only | `docs-update-{description}` | `docs-update-command-guide` |
 
 ## Mandatory Plan Steps (include in every implementation plan)
 
@@ -59,7 +59,15 @@ Heavy-lift task handlers that keep main context clean:
 - **Plans:** Plans are **LOCAL-ONLY and gitignored** (`docs/plans/` is in `.gitignore`). Work in `~/.claude/plans/` first, then copy to `docs/plans/` for local reference during implementation. **Do NOT attempt to commit plan files.** Only commit implementation work (code, tests, docs).
 - **Branches:** Push to origin, await user review (never auto-merge)
 - **Versions:** Sync package.json + plugin.json before pushing (mcp-server independent)
-- **Docs updates:** Update COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED when behavior changes
+- **Docs updates:** Update affected reference and guide pages when behavior changes
+
+## Documentation Updates Workflow
+
+- Docs-only branches use `docs-update-{description}` (no version prefix)
+- Code releases use `v{ver}-{description}`
+- Docs-only branches publish one post to `docs-updates/` — not `CHANGELOG.md`
+- `CHANGELOG.md` is for code releases only; `docs-updates/` feed is for docs site changes
+- One branch = one feed post at `docs-updates/YYYY-MM-DD-{slug}.mdx`
 
 ## Commit Format (Conventional)
 

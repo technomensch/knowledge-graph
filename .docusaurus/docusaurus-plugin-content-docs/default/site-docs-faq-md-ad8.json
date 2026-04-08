@@ -1,0 +1,29 @@
+{
+  "id": "FAQ",
+  "title": "FAQ",
+  "description": "Frequently asked questions and troubleshooting",
+  "source": "@site/docs/FAQ.md",
+  "sourceDirName": ".",
+  "slug": "/FAQ",
+  "permalink": "/knowledge-graph/FAQ",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/FAQ.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "FAQ",
+    "title": "FAQ",
+    "sidebar_label": "FAQ",
+    "description": "Frequently asked questions and troubleshooting"
+  },
+  "sidebar": "docs",
+  "previous": {
+    "title": "Cheat Sheet",
+    "permalink": "/knowledge-graph/CHEAT-SHEET"
+  },
+  "next": {
+    "title": "Configuration",
+    "permalink": "/knowledge-graph/CONFIGURATION"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "knowledge/index",
+  "title": "Knowledge Graph - Master Index",
+  "description": "Navigate all knowledge graph entries by category.",
+  "source": "@site/docs/knowledge/index.md",
+  "sourceDirName": "knowledge",
+  "slug": "/knowledge/",
+  "permalink": "/knowledge-graph/knowledge/",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/knowledge/index.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

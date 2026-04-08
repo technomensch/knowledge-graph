@@ -1,0 +1,50 @@
+{
+  "id": "lessons-learned/lesson-template",
+  "title": "Lesson: [Title]",
+  "description": "Date: YYYY-MM-DD",
+  "source": "@site/docs/lessons-learned/lesson-template.md",
+  "sourceDirName": "lessons-learned",
+  "slug": "/lessons-learned/lesson-template",
+  "permalink": "/knowledge-graph/lessons-learned/lesson-template",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/lessons-learned/lesson-template.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "Lesson: [Title]",
+    "created": "YYYY-MM-DDTHH:MM:SSZ",
+    "author": [
+      "Your Name"
+    ],
+    "email": [
+      "Your Email"
+    ],
+    "git": {
+      "branch": [
+        "branch-name"
+      ],
+      "commit": [
+        "commit-hash"
+      ],
+      "pr": [
+        "pr-number or null"
+      ],
+      "issue": [
+        "issue-number or null"
+      ]
+    },
+    "sources": [
+      {
+        "url": "https://example.com/article",
+        "title": "Article Title",
+        "accessed": "YYYY-MM-DD",
+        "context": "Used for [specific insight]"
+      }
+    ],
+    "tags": [],
+    "category": [
+      "architecture|process|patterns|debugging"
+    ]
+  }
+}

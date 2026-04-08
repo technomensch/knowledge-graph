@@ -1,0 +1,15 @@
+{
+  "id": "templates/meta-issue/attempt-template/solution-approach",
+  "title": "Attempt NNN: [Approach Name]",
+  "description": "Solution Approach",
+  "source": "@site/docs/templates/meta-issue/attempt-template/solution-approach.md",
+  "sourceDirName": "templates/meta-issue/attempt-template",
+  "slug": "/templates/meta-issue/attempt-template/solution-approach",
+  "permalink": "/knowledge-graph/templates/meta-issue/attempt-template/solution-approach",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/templates/meta-issue/attempt-template/solution-approach.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

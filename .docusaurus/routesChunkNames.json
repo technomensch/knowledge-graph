@@ -1,0 +1,1284 @@
+{
+  "/knowledge-graph/docs-updates/-219": {
+    "__comp": "a6aa9e1f",
+    "__context": {
+      "plugin": "3c1f7b23"
+    },
+    "sidebar": "efe2bc2d",
+    "items": [
+      {
+        "content": "d37b9203"
+      }
+    ],
+    "__props": "5a787cfc"
+  },
+  "/knowledge-graph/docs-updates/archive/-283": {
+    "__comp": "9e4087bc",
+    "__context": {
+      "plugin": "3c1f7b23"
+    },
+    "__props": "979f0ed2"
+  },
+  "/knowledge-graph/docs-updates/authors/-f50": {
+    "__comp": "621db11d",
+    "__context": {
+      "data": {
+        "blogMetadata": "ea86cc5b"
+      },
+      "plugin": "3c1f7b23"
+    },
+    "sidebar": "efe2bc2d",
+    "__props": "9a589e0e"
+  },
+  "/knowledge-graph/docs-updates/github-docs-visuals/-8a2": {
+    "__comp": "ccc49370",
+    "__context": {
+      "data": {
+        "blogMetadata": "ea86cc5b"
+      },
+      "plugin": "3c1f7b23"
+    },
+    "sidebar": "efe2bc2d",
+    "content": "da22886f"
+  },
+  "/knowledge-graph/docs-updates/tags/-021": {
+    "__comp": "01a85c17",
+    "__context": {
+      "plugin": "3c1f7b23"
+    },
+    "sidebar": "efe2bc2d",
+    "__props": "93281b20"
+  },
+  "/knowledge-graph/docs-updates/tags/accessibility/-d4d": {
+    "__comp": "6875c492",
+    "__context": {
+      "plugin": "3c1f7b23"
+    },
+    "sidebar": "efe2bc2d",
+    "items": [
+      {
+        "content": "d37b9203"
+      }
+    ],
+    "__props": "f6535009"
+  },
+  "/knowledge-graph/docs-updates/tags/ux/-cbd": {
+    "__comp": "6875c492",
+    "__context": {
+      "plugin": "3c1f7b23"
+    },
+    "sidebar": "efe2bc2d",
+    "items": [
+      {
+        "content": "d37b9203"
+      }
+    ],
+    "__props": "58f87de7"
+  },
+  "/knowledge-graph/docs-updates/tags/visuals/-8bb": {
+    "__comp": "6875c492",
+    "__context": {
+      "plugin": "3c1f7b23"
+    },
+    "sidebar": "efe2bc2d",
+    "items": [
+      {
+        "content": "d37b9203"
+      }
+    ],
+    "__props": "f448b338"
+  },
+  "/knowledge-graph/-8fa": {
+    "__comp": "5e95c892",
+    "__context": {
+      "plugin": "aba21aa0"
+    }
+  },
+  "/knowledge-graph/-8b9": {
+    "__comp": "a7bd4aaa",
+    "__props": "006c84ba"
+  },
+  "/knowledge-graph/tags/-914": {
+    "__comp": "3720c009",
+    "__props": "209faf0f"
+  },
+  "/knowledge-graph/tags/adr-guide/-d1c": {
+    "__comp": "df203c0f",
+    "__props": "a0389eb8"
+  },
+  "/knowledge-graph/tags/agents-template/-d37": {
+    "__comp": "df203c0f",
+    "__props": "cdc6100e"
+  },
+  "/knowledge-graph/tags/ai-drift/-761": {
+    "__comp": "df203c0f",
+    "__props": "fba679be"
+  },
+  "/knowledge-graph/tags/antigravity/-691": {
+    "__comp": "df203c0f",
+    "__props": "01a2ee4d"
+  },
+  "/knowledge-graph/tags/architecture/-f70": {
+    "__comp": "df203c0f",
+    "__props": "71184cb2"
+  },
+  "/knowledge-graph/tags/audit-trail/-4b4": {
+    "__comp": "df203c0f",
+    "__props": "b0d1136d"
+  },
+  "/knowledge-graph/tags/auto-detect/-651": {
+    "__comp": "df203c0f",
+    "__props": "f2c36d44"
+  },
+  "/knowledge-graph/tags/auto-trigger/-e8c": {
+    "__comp": "df203c0f",
+    "__props": "41371cb4"
+  },
+  "/knowledge-graph/tags/automation/-c89": {
+    "__comp": "df203c0f",
+    "__props": "e84e940a"
+  },
+  "/knowledge-graph/tags/best-practices/-601": {
+    "__comp": "df203c0f",
+    "__props": "1b5eebc6"
+  },
+  "/knowledge-graph/tags/branch-management/-399": {
+    "__comp": "df203c0f",
+    "__props": "a0beb5e8"
+  },
+  "/knowledge-graph/tags/branch-naming/-de2": {
+    "__comp": "df203c0f",
+    "__props": "cdbda5bc"
+  },
+  "/knowledge-graph/tags/branches/-e6f": {
+    "__comp": "df203c0f",
+    "__props": "352d2cf4"
+  },
+  "/knowledge-graph/tags/cache/-f06": {
+    "__comp": "df203c0f",
+    "__props": "b0fdb83f"
+  },
+  "/knowledge-graph/tags/capture-lesson/-634": {
+    "__comp": "df203c0f",
+    "__props": "6404286c"
+  },
+  "/knowledge-graph/tags/capture/-081": {
+    "__comp": "df203c0f",
+    "__props": "93137984"
+  },
+  "/knowledge-graph/tags/changelog/-a6b": {
+    "__comp": "df203c0f",
+    "__props": "b96ad80e"
+  },
+  "/knowledge-graph/tags/chat-extraction/-d72": {
+    "__comp": "df203c0f",
+    "__props": "07a20f25"
+  },
+  "/knowledge-graph/tags/claude-code/-c4d": {
+    "__comp": "df203c0f",
+    "__props": "a90e1fb6"
+  },
+  "/knowledge-graph/tags/command-language/-fe4": {
+    "__comp": "df203c0f",
+    "__props": "489c037f"
+  },
+  "/knowledge-graph/tags/command-ux/-d14": {
+    "__comp": "df203c0f",
+    "__props": "7c8cd09e"
+  },
+  "/knowledge-graph/tags/commands/-5c0": {
+    "__comp": "df203c0f",
+    "__props": "3776dc1c"
+  },
+  "/knowledge-graph/tags/configuration/-64f": {
+    "__comp": "df203c0f",
+    "__props": "36dab9e3"
+  },
+  "/knowledge-graph/tags/consistency/-307": {
+    "__comp": "df203c0f",
+    "__props": "1d787a03"
+  },
+  "/knowledge-graph/tags/constraints/-881": {
+    "__comp": "df203c0f",
+    "__props": "89de3304"
+  },
+  "/knowledge-graph/tags/context-mode/-286": {
+    "__comp": "df203c0f",
+    "__props": "9da6375f"
+  },
+  "/knowledge-graph/tags/cross-llm-compatibility/-e9f": {
+    "__comp": "df203c0f",
+    "__props": "e3023d63"
+  },
+  "/knowledge-graph/tags/debugging/-9f9": {
+    "__comp": "df203c0f",
+    "__props": "23747911"
+  },
+  "/knowledge-graph/tags/decoupling/-ef5": {
+    "__comp": "df203c0f",
+    "__props": "126f3768"
+  },
+  "/knowledge-graph/tags/deprecation/-759": {
+    "__comp": "df203c0f",
+    "__props": "35b57f6f"
+  },
+  "/knowledge-graph/tags/diataxis/-a42": {
+    "__comp": "df203c0f",
+    "__props": "09f2e19d"
+  },
+  "/knowledge-graph/tags/discovery/-ef2": {
+    "__comp": "df203c0f",
+    "__props": "bebe6640"
+  },
+  "/knowledge-graph/tags/docs/-0fd": {
+    "__comp": "df203c0f",
+    "__props": "98b4ae9f"
+  },
+  "/knowledge-graph/tags/documentation/-6fc": {
+    "__comp": "df203c0f",
+    "__props": "d75937aa"
+  },
+  "/knowledge-graph/tags/docusaurus/-5e9": {
+    "__comp": "df203c0f",
+    "__props": "4b2d3786"
+  },
+  "/knowledge-graph/tags/drift/-95a": {
+    "__comp": "df203c0f",
+    "__props": "955a25b1"
+  },
+  "/knowledge-graph/tags/dry/-12c": {
+    "__comp": "df203c0f",
+    "__props": "3f7785ad"
+  },
+  "/knowledge-graph/tags/enforcement/-8a0": {
+    "__comp": "df203c0f",
+    "__props": "fda253ee"
+  },
+  "/knowledge-graph/tags/examples/-ba0": {
+    "__comp": "df203c0f",
+    "__props": "8208f6f5"
+  },
+  "/knowledge-graph/tags/friction/-754": {
+    "__comp": "df203c0f",
+    "__props": "49ce1a5b"
+  },
+  "/knowledge-graph/tags/fts-5/-c19": {
+    "__comp": "df203c0f",
+    "__props": "f476d314"
+  },
+  "/knowledge-graph/tags/gemini-cli/-3f5": {
+    "__comp": "df203c0f",
+    "__props": "62ffc382"
+  },
+  "/knowledge-graph/tags/gemini/-a66": {
+    "__comp": "df203c0f",
+    "__props": "8fe6b0ae"
+  },
+  "/knowledge-graph/tags/git/-741": {
+    "__comp": "df203c0f",
+    "__props": "6c75748a"
+  },
+  "/knowledge-graph/tags/governance/-31c": {
+    "__comp": "df203c0f",
+    "__props": "ce3cc484"
+  },
+  "/knowledge-graph/tags/graceful-degradation/-8df": {
+    "__comp": "df203c0f",
+    "__props": "a5853f30"
+  },
+  "/knowledge-graph/tags/graceful-fallback/-b5c": {
+    "__comp": "df203c0f",
+    "__props": "baa31aad"
+  },
+  "/knowledge-graph/tags/guardrails/-214": {
+    "__comp": "df203c0f",
+    "__props": "cc193d61"
+  },
+  "/knowledge-graph/tags/hooks/-961": {
+    "__comp": "df203c0f",
+    "__props": "d8f3bb7d"
+  },
+  "/knowledge-graph/tags/ide-integration/-733": {
+    "__comp": "df203c0f",
+    "__props": "a56b31a4"
+  },
+  "/knowledge-graph/tags/identifiers/-f60": {
+    "__comp": "df203c0f",
+    "__props": "830ce26f"
+  },
+  "/knowledge-graph/tags/information-architecture/-962": {
+    "__comp": "df203c0f",
+    "__props": "87cd4426"
+  },
+  "/knowledge-graph/tags/install/-969": {
+    "__comp": "df203c0f",
+    "__props": "163e619c"
+  },
+  "/knowledge-graph/tags/interactivity/-ab3": {
+    "__comp": "df203c0f",
+    "__props": "6bdd6751"
+  },
+  "/knowledge-graph/tags/issue-tracking/-437": {
+    "__comp": "df203c0f",
+    "__props": "5d478fd0"
+  },
+  "/knowledge-graph/tags/kmgraph/-b8b": {
+    "__comp": "df203c0f",
+    "__props": "88d6035f"
+  },
+  "/knowledge-graph/tags/knowledge-management/-b6b": {
+    "__comp": "df203c0f",
+    "__props": "aecd65a5"
+  },
+  "/knowledge-graph/tags/landing-page/-5e2": {
+    "__comp": "df203c0f",
+    "__props": "bc62a7cc"
+  },
+  "/knowledge-graph/tags/lesson-capture/-f28": {
+    "__comp": "df203c0f",
+    "__props": "906b14dd"
+  },
+  "/knowledge-graph/tags/lifecycle/-40e": {
+    "__comp": "df203c0f",
+    "__props": "d1c63880"
+  },
+  "/knowledge-graph/tags/llm-engineering/-e21": {
+    "__comp": "df203c0f",
+    "__props": "a7a8c56c"
+  },
+  "/knowledge-graph/tags/logic-redundancy/-936": {
+    "__comp": "df203c0f",
+    "__props": "5133ffc0"
+  },
+  "/knowledge-graph/tags/marketplace/-d43": {
+    "__comp": "df203c0f",
+    "__props": "d954b361"
+  },
+  "/knowledge-graph/tags/mcp-optional/-d20": {
+    "__comp": "df203c0f",
+    "__props": "bfdc8861"
+  },
+  "/knowledge-graph/tags/mcp-server/-6fa": {
+    "__comp": "df203c0f",
+    "__props": "1dcb9ce4"
+  },
+  "/knowledge-graph/tags/mcp/-c98": {
+    "__comp": "df203c0f",
+    "__props": "1c6fd4a7"
+  },
+  "/knowledge-graph/tags/measurement/-bcd": {
+    "__comp": "df203c0f",
+    "__props": "a97651c4"
+  },
+  "/knowledge-graph/tags/memory-system/-13c": {
+    "__comp": "df203c0f",
+    "__props": "a65f77c6"
+  },
+  "/knowledge-graph/tags/memory/-3f7": {
+    "__comp": "df203c0f",
+    "__props": "6f47219c"
+  },
+  "/knowledge-graph/tags/metrics/-80f": {
+    "__comp": "df203c0f",
+    "__props": "0b96dff6"
+  },
+  "/knowledge-graph/tags/modularity/-2ee": {
+    "__comp": "df203c0f",
+    "__props": "e1f438ad"
+  },
+  "/knowledge-graph/tags/multi-branch-workflow/-e4c": {
+    "__comp": "df203c0f",
+    "__props": "057be3eb"
+  },
+  "/knowledge-graph/tags/namespace/-28e": {
+    "__comp": "df203c0f",
+    "__props": "a08b9265"
+  },
+  "/knowledge-graph/tags/paths/-d3a": {
+    "__comp": "df203c0f",
+    "__props": "c1d9bc36"
+  },
+  "/knowledge-graph/tags/plan-mode/-c57": {
+    "__comp": "df203c0f",
+    "__props": "3ec06dc1"
+  },
+  "/knowledge-graph/tags/planning/-5fe": {
+    "__comp": "df203c0f",
+    "__props": "e9c01482"
+  },
+  "/knowledge-graph/tags/platform-portability/-e0c": {
+    "__comp": "df203c0f",
+    "__props": "d9aed739"
+  },
+  "/knowledge-graph/tags/plugin-design/-19b": {
+    "__comp": "df203c0f",
+    "__props": "6ffc8c65"
+  },
+  "/knowledge-graph/tags/plugin-development/-fc7": {
+    "__comp": "df203c0f",
+    "__props": "cb45555a"
+  },
+  "/knowledge-graph/tags/plugin-distribution/-ced": {
+    "__comp": "df203c0f",
+    "__props": "b8ac0331"
+  },
+  "/knowledge-graph/tags/plugin-hooks/-5f2": {
+    "__comp": "df203c0f",
+    "__props": "d4ae8984"
+  },
+  "/knowledge-graph/tags/plugin-json/-af9": {
+    "__comp": "df203c0f",
+    "__props": "51129aae"
+  },
+  "/knowledge-graph/tags/plugin/-a9d": {
+    "__comp": "df203c0f",
+    "__props": "6af8884a"
+  },
+  "/knowledge-graph/tags/portability/-8ed": {
+    "__comp": "df203c0f",
+    "__props": "7d41c72c"
+  },
+  "/knowledge-graph/tags/portfolio-quality/-851": {
+    "__comp": "df203c0f",
+    "__props": "18d76b84"
+  },
+  "/knowledge-graph/tags/process-vocabulary/-3df": {
+    "__comp": "df203c0f",
+    "__props": "511dbd31"
+  },
+  "/knowledge-graph/tags/process/-f93": {
+    "__comp": "df203c0f",
+    "__props": "877c8770"
+  },
+  "/knowledge-graph/tags/protocol/-222": {
+    "__comp": "df203c0f",
+    "__props": "0782845d"
+  },
+  "/knowledge-graph/tags/read-only/-1aa": {
+    "__comp": "df203c0f",
+    "__props": "d20c9232"
+  },
+  "/knowledge-graph/tags/registration/-0ea": {
+    "__comp": "df203c0f",
+    "__props": "f36f9d67"
+  },
+  "/knowledge-graph/tags/release-management/-9bc": {
+    "__comp": "df203c0f",
+    "__props": "06e9942e"
+  },
+  "/knowledge-graph/tags/release/-a20": {
+    "__comp": "df203c0f",
+    "__props": "02f749a1"
+  },
+  "/knowledge-graph/tags/routing/-b08": {
+    "__comp": "df203c0f",
+    "__props": "055b490b"
+  },
+  "/knowledge-graph/tags/scope-consistency/-a2f": {
+    "__comp": "df203c0f",
+    "__props": "5e2d4ee6"
+  },
+  "/knowledge-graph/tags/search/-546": {
+    "__comp": "df203c0f",
+    "__props": "6da2d809"
+  },
+  "/knowledge-graph/tags/security/-f09": {
+    "__comp": "df203c0f",
+    "__props": "fa328252"
+  },
+  "/knowledge-graph/tags/session-start/-9a0": {
+    "__comp": "df203c0f",
+    "__props": "7c841de9"
+  },
+  "/knowledge-graph/tags/session-summary/-353": {
+    "__comp": "df203c0f",
+    "__props": "67b41715"
+  },
+  "/knowledge-graph/tags/settings-management/-04a": {
+    "__comp": "df203c0f",
+    "__props": "3a138bc9"
+  },
+  "/knowledge-graph/tags/shell-scripts/-fd8": {
+    "__comp": "df203c0f",
+    "__props": "71207271"
+  },
+  "/knowledge-graph/tags/silent-failures/-860": {
+    "__comp": "df203c0f",
+    "__props": "64ddb6ee"
+  },
+  "/knowledge-graph/tags/single-source-of-truth/-c31": {
+    "__comp": "df203c0f",
+    "__props": "a8269c16"
+  },
+  "/knowledge-graph/tags/skill-triggers/-6a5": {
+    "__comp": "df203c0f",
+    "__props": "8db08bb3"
+  },
+  "/knowledge-graph/tags/skills/-71c": {
+    "__comp": "df203c0f",
+    "__props": "0b5e8454"
+  },
+  "/knowledge-graph/tags/snapshot-gate/-8da": {
+    "__comp": "df203c0f",
+    "__props": "dbf91687"
+  },
+  "/knowledge-graph/tags/spec-drift/-2a9": {
+    "__comp": "df203c0f",
+    "__props": "f668290d"
+  },
+  "/knowledge-graph/tags/sqlite/-534": {
+    "__comp": "df203c0f",
+    "__props": "b631e5d2"
+  },
+  "/knowledge-graph/tags/stdin/-1e3": {
+    "__comp": "df203c0f",
+    "__props": "cc6109e9"
+  },
+  "/knowledge-graph/tags/subagents/-4fa": {
+    "__comp": "df203c0f",
+    "__props": "8b795a71"
+  },
+  "/knowledge-graph/tags/synchronization/-106": {
+    "__comp": "df203c0f",
+    "__props": "b2eea175"
+  },
+  "/knowledge-graph/tags/testing/-821": {
+    "__comp": "df203c0f",
+    "__props": "e4ac0288"
+  },
+  "/knowledge-graph/tags/tier-2/-e20": {
+    "__comp": "df203c0f",
+    "__props": "32cab11e"
+  },
+  "/knowledge-graph/tags/tier-3/-6ca": {
+    "__comp": "df203c0f",
+    "__props": "e8797ecb"
+  },
+  "/knowledge-graph/tags/typescript/-1e2": {
+    "__comp": "df203c0f",
+    "__props": "4385aae1"
+  },
+  "/knowledge-graph/tags/update-notifications/-92b": {
+    "__comp": "df203c0f",
+    "__props": "e118ea53"
+  },
+  "/knowledge-graph/tags/update/-f93": {
+    "__comp": "df203c0f",
+    "__props": "6b80b0b4"
+  },
+  "/knowledge-graph/tags/upgrade/-9e7": {
+    "__comp": "df203c0f",
+    "__props": "8b9693d6"
+  },
+  "/knowledge-graph/tags/user-facing/-eef": {
+    "__comp": "df203c0f",
+    "__props": "0eb5311f"
+  },
+  "/knowledge-graph/tags/ux/-bad": {
+    "__comp": "df203c0f",
+    "__props": "925e9de8"
+  },
+  "/knowledge-graph/tags/validation/-b89": {
+    "__comp": "df203c0f",
+    "__props": "eacb4a54"
+  },
+  "/knowledge-graph/tags/version/-e64": {
+    "__comp": "df203c0f",
+    "__props": "436d905a"
+  },
+  "/knowledge-graph/tags/versioning/-d81": {
+    "__comp": "df203c0f",
+    "__props": "db66a768"
+  },
+  "/knowledge-graph/tags/wasm/-518": {
+    "__comp": "df203c0f",
+    "__props": "65d7f9f6"
+  },
+  "/knowledge-graph/tags/workflow/-19c": {
+    "__comp": "df203c0f",
+    "__props": "adb8a59a"
+  },
+  "/knowledge-graph/tags/write-tool/-129": {
+    "__comp": "df203c0f",
+    "__props": "ebba77ad"
+  },
+  "/knowledge-graph/tags/zero-config/-42a": {
+    "__comp": "df203c0f",
+    "__props": "dcf2a265"
+  },
+  "/knowledge-graph/-289": {
+    "__comp": "a94703ab"
+  },
+  "/knowledge-graph/CHANGELOG-DOCS-ONLY/-d2d": {
+    "__comp": "17896441",
+    "content": "8eb4f1d7"
+  },
+  "/knowledge-graph/CHEAT-SHEET/-b0a": {
+    "__comp": "17896441",
+    "content": "159e13d8"
+  },
+  "/knowledge-graph/COMMAND-GUIDE/-43e": {
+    "__comp": "17896441",
+    "content": "7cafc8b8"
+  },
+  "/knowledge-graph/CONCEPTS/-b4b": {
+    "__comp": "17896441",
+    "content": "1e7baccd"
+  },
+  "/knowledge-graph/CONFIGURATION/-396": {
+    "__comp": "17896441",
+    "content": "bbce7fe2"
+  },
+  "/knowledge-graph/contributing/docs-updates-workflow/-2c5": {
+    "__comp": "17896441",
+    "content": "dca335b0"
+  },
+  "/knowledge-graph/decisions/-b99": {
+    "__comp": "17896441",
+    "content": "0f517f40"
+  },
+  "/knowledge-graph/decisions/ADR-001-centralized-multi-kg-configuration/-ae3": {
+    "__comp": "17896441",
+    "content": "9de6a972"
+  },
+  "/knowledge-graph/decisions/ADR-002-commands-vs-skills-architecture/-75e": {
+    "__comp": "17896441",
+    "content": "96341303"
+  },
+  "/knowledge-graph/decisions/ADR-003-abandon-shadow-commands-for-file-prefix/-b38": {
+    "__comp": "17896441",
+    "content": "b25a3ea4"
+  },
+  "/knowledge-graph/decisions/ADR-004-token-based-memory-size-limits/-98e": {
+    "__comp": "17896441",
+    "content": "755a01fd"
+  },
+  "/knowledge-graph/decisions/ADR-005-defer-memory-rules-engine/-354": {
+    "__comp": "17896441",
+    "content": "6f5e6d21"
+  },
+  "/knowledge-graph/decisions/ADR-006-delegated-vs-inline-kg-updates/-cbe": {
+    "__comp": "17896441",
+    "content": "24d9c787"
+  },
+  "/knowledge-graph/decisions/ADR-006-document-cache-clear-upgrade-workaround/-1df": {
+    "__comp": "17896441",
+    "content": "a625ca7c"
+  },
+  "/knowledge-graph/decisions/ADR-007-distribution-hygiene-files-allowlist/-1d2": {
+    "__comp": "17896441",
+    "content": "1460712b"
+  },
+  "/knowledge-graph/decisions/ADR-008-third-person-language-standard/-bc5": {
+    "__comp": "17896441",
+    "content": "9c69ddd2"
+  },
+  "/knowledge-graph/decisions/ADR-009-three-tier-installation-architecture/-8c5": {
+    "__comp": "17896441",
+    "content": "bf348128"
+  },
+  "/knowledge-graph/decisions/ADR-010-namespace-rename-knowledge-to-kg-sis/-859": {
+    "__comp": "17896441",
+    "content": "c290274b"
+  },
+  "/knowledge-graph/decisions/ADR-011-defer-update-notifications/-18c": {
+    "__comp": "17896441",
+    "content": "220f4cba"
+  },
+  "/knowledge-graph/decisions/ADR-012-hook-security-model/-7f9": {
+    "__comp": "17896441",
+    "content": "6b899952"
+  },
+  "/knowledge-graph/decisions/ADR-013-documentation-update-protocol/-ada": {
+    "__comp": "17896441",
+    "content": "d0e1886b"
+  },
+  "/knowledge-graph/decisions/ADR-014-maintain-dual-plan-file-locations/-879": {
+    "__comp": "17896441",
+    "content": "7e0e80a9"
+  },
+  "/knowledge-graph/decisions/ADR-015-node-sqlite3-wasm-for-fts5-search/-5bd": {
+    "__comp": "17896441",
+    "content": "c6412f36"
+  },
+  "/knowledge-graph/decisions/ADR-016-graceful-fallback-optional-mcp-dependencies/-0ff": {
+    "__comp": "17896441",
+    "content": "4461d718"
+  },
+  "/knowledge-graph/decisions/ADR-017-four-layer-architecture-thin-commands/-613": {
+    "__comp": "17896441",
+    "content": "3088f323"
+  },
+  "/knowledge-graph/decisions/ADR-018-agents-template-platform-portability/-6c6": {
+    "__comp": "17896441",
+    "content": "8602172f"
+  },
+  "/knowledge-graph/decisions/ADR-019-write-guard-agent-instructions-vs-data-layer/-6ed": {
+    "__comp": "17896441",
+    "content": "2c1f8f5d"
+  },
+  "/knowledge-graph/decisions/ADR-020-lifecycle-hooks-suite-automated-capture/-a5d": {
+    "__comp": "17896441",
+    "content": "9424ae64"
+  },
+  "/knowledge-graph/decisions/ADR-021-single-source-of-truth-dry-documentation/-8cf": {
+    "__comp": "17896441",
+    "content": "6b046849"
+  },
+  "/knowledge-graph/decisions/ADR-022-branch-creation-commands-active-work-guard/-9eb": {
+    "__comp": "17896441",
+    "content": "0a477019"
+  },
+  "/knowledge-graph/decisions/ADR-023-single-source-of-truth-changelog/-28c": {
+    "__comp": "17896441",
+    "content": "947c2067"
+  },
+  "/knowledge-graph/decisions/ADR-024-decouple-issue-tracking-decisions-sequential-prompts/-17b": {
+    "__comp": "17896441",
+    "content": "0d902cf5"
+  },
+  "/knowledge-graph/decisions/ADR-025-do-not-commit-enabledplugins-blocks/-8e3": {
+    "__comp": "17896441",
+    "content": "5899d247"
+  },
+  "/knowledge-graph/decisions/ADR-026-snapshot-gate-uses-session-summary/-0bd": {
+    "__comp": "17896441",
+    "content": "68609354"
+  },
+  "/knowledge-graph/decisions/ADR-027-docusaurus-restructure-diataxis-docs-feed/-4f5": {
+    "__comp": "17896441",
+    "content": "57ff8765"
+  },
+  "/knowledge-graph/decisions/ADR-template/-506": {
+    "__comp": "17896441",
+    "content": "f8dd16d2"
+  },
+  "/knowledge-graph/DEPLOYMENT-SITEMAP/-efa": {
+    "__comp": "17896441",
+    "content": "28c91900"
+  },
+  "/knowledge-graph/enhancements/closed/recall-context-mode-integration/-995": {
+    "__comp": "17896441",
+    "content": "0bde770e"
+  },
+  "/knowledge-graph/enhancements/ENH-001/ENH-001-specification/-505": {
+    "__comp": "17896441",
+    "content": "d6d4194f"
+  },
+  "/knowledge-graph/enhancements/ENH-001/progress-log/-701": {
+    "__comp": "17896441",
+    "content": "4f5d6c18"
+  },
+  "/knowledge-graph/enhancements/ENH-001/solution-approach/-0f4": {
+    "__comp": "17896441",
+    "content": "0b3e3620"
+  },
+  "/knowledge-graph/enhancements/ENH-001/test-cases/-4de": {
+    "__comp": "17896441",
+    "content": "acd408bb"
+  },
+  "/knowledge-graph/enhancements/ENH-002/ENH-002-specification/-659": {
+    "__comp": "17896441",
+    "content": "1deb711c"
+  },
+  "/knowledge-graph/enhancements/ENH-002/progress-log/-2aa": {
+    "__comp": "17896441",
+    "content": "0aa1639d"
+  },
+  "/knowledge-graph/enhancements/ENH-002/solution-approach/-6ff": {
+    "__comp": "17896441",
+    "content": "13aac9eb"
+  },
+  "/knowledge-graph/enhancements/ENH-002/test-cases/-c40": {
+    "__comp": "17896441",
+    "content": "c30e3c43"
+  },
+  "/knowledge-graph/enhancements/ENH-003/ENH-003-specification/-422": {
+    "__comp": "17896441",
+    "content": "0f52ebfd"
+  },
+  "/knowledge-graph/enhancements/ENH-003/progress-log/-4ee": {
+    "__comp": "17896441",
+    "content": "1a37ff28"
+  },
+  "/knowledge-graph/enhancements/ENH-003/solution-approach/-cea": {
+    "__comp": "17896441",
+    "content": "413ac2e9"
+  },
+  "/knowledge-graph/enhancements/ENH-003/test-cases/-3fd": {
+    "__comp": "17896441",
+    "content": "419adfec"
+  },
+  "/knowledge-graph/enhancements/ENH-004/ENH-004-specification/-8ee": {
+    "__comp": "17896441",
+    "content": "097fb8b4"
+  },
+  "/knowledge-graph/enhancements/ENH-004/progress-log/-2a0": {
+    "__comp": "17896441",
+    "content": "3fbac2eb"
+  },
+  "/knowledge-graph/enhancements/ENH-004/solution-approach/-87c": {
+    "__comp": "17896441",
+    "content": "27516e5c"
+  },
+  "/knowledge-graph/enhancements/ENH-005/ENH-005-specification/-bcf": {
+    "__comp": "17896441",
+    "content": "2f65af67"
+  },
+  "/knowledge-graph/enhancements/ENH-005/progress-log/-82e": {
+    "__comp": "17896441",
+    "content": "686828d1"
+  },
+  "/knowledge-graph/enhancements/ENH-005/solution-approach/-83b": {
+    "__comp": "17896441",
+    "content": "e945797d"
+  },
+  "/knowledge-graph/enhancements/ENH-005/test-cases/-181": {
+    "__comp": "17896441",
+    "content": "77fa0131"
+  },
+  "/knowledge-graph/enhancements/ENH-006/ENH-006-specification/-e47": {
+    "__comp": "17896441",
+    "content": "8c5bec15"
+  },
+  "/knowledge-graph/enhancements/ENH-006/progress-log/-89b": {
+    "__comp": "17896441",
+    "content": "44e62114"
+  },
+  "/knowledge-graph/enhancements/ENH-006/solution-approach/-245": {
+    "__comp": "17896441",
+    "content": "d13dc140"
+  },
+  "/knowledge-graph/enhancements/ENH-006/test-cases/-002": {
+    "__comp": "17896441",
+    "content": "d2207609"
+  },
+  "/knowledge-graph/enhancements/ENH-008/ENH-008-specification/-5cd": {
+    "__comp": "17896441",
+    "content": "f7e063bc"
+  },
+  "/knowledge-graph/enhancements/ENH-008/progress-log/-075": {
+    "__comp": "17896441",
+    "content": "0dc069c9"
+  },
+  "/knowledge-graph/enhancements/ENH-008/solution-approach/-063": {
+    "__comp": "17896441",
+    "content": "0042200d"
+  },
+  "/knowledge-graph/examples/decisions/ADR-001-example/-31d": {
+    "__comp": "17896441",
+    "content": "94295ee0"
+  },
+  "/knowledge-graph/examples/decisions/ADR-002-example/-8d9": {
+    "__comp": "17896441",
+    "content": "c8053959"
+  },
+  "/knowledge-graph/examples/knowledge/sample-concepts/-45f": {
+    "__comp": "17896441",
+    "content": "7b8b3e25"
+  },
+  "/knowledge-graph/examples/knowledge/sample-gotchas/-1ea": {
+    "__comp": "17896441",
+    "content": "9ad29661"
+  },
+  "/knowledge-graph/examples/knowledge/sample-patterns/-a68": {
+    "__comp": "17896441",
+    "content": "ed5b59c1"
+  },
+  "/knowledge-graph/examples/lessons-learned/architecture/Example_Claude_Code_Skills_Arch/-724": {
+    "__comp": "17896441",
+    "content": "d37aff37"
+  },
+  "/knowledge-graph/examples/lessons-learned/architecture/Example_Three_Tier_Sync/-402": {
+    "__comp": "17896441",
+    "content": "d72b3b96"
+  },
+  "/knowledge-graph/examples/lessons-learned/patterns/Example_Complete_Memory_System/-76f": {
+    "__comp": "17896441",
+    "content": "29e210cf"
+  },
+  "/knowledge-graph/examples/lessons-learned/process/Example_Agentic_Momentum/-ec1": {
+    "__comp": "17896441",
+    "content": "656708e5"
+  },
+  "/knowledge-graph/examples/lessons-learned/process/Example_Chat_History_Workflow/-524": {
+    "__comp": "17896441",
+    "content": "814d6ae2"
+  },
+  "/knowledge-graph/examples/lessons-learned/process/Example_Effective_LLM_Constraints/-eb9": {
+    "__comp": "17896441",
+    "content": "7e98983e"
+  },
+  "/knowledge-graph/examples/lessons-learned/process/Example_Git_Branch_Preservation/-c0e": {
+    "__comp": "17896441",
+    "content": "80b7432d"
+  },
+  "/knowledge-graph/examples/lessons-learned/process/Example_Identifier_Decoupling/-764": {
+    "__comp": "17896441",
+    "content": "d16a457b"
+  },
+  "/knowledge-graph/examples/lessons-learned/process/Example_Relative_File_Paths/-ee9": {
+    "__comp": "17896441",
+    "content": "12be63e4"
+  },
+  "/knowledge-graph/examples/lessons-learned/process/Example_SessionStart_Automation/-668": {
+    "__comp": "17896441",
+    "content": "227c825a"
+  },
+  "/knowledge-graph/examples/meta-issue/example-performance-saga/-ec4": {
+    "__comp": "17896441",
+    "content": "abfc3441"
+  },
+  "/knowledge-graph/examples/meta-issue/example-performance-saga/attempts/baseline/attempt-results/-5de": {
+    "__comp": "17896441",
+    "content": "317d80fd"
+  },
+  "/knowledge-graph/examples/meta-issue/example-performance-saga/attempts/baseline/solution-approach/-f17": {
+    "__comp": "17896441",
+    "content": "2f9ebfa8"
+  },
+  "/knowledge-graph/examples/meta-issue/example-performance-saga/attempts/caching/attempt-results/-a16": {
+    "__comp": "17896441",
+    "content": "b4214f6c"
+  },
+  "/knowledge-graph/examples/meta-issue/example-performance-saga/attempts/caching/solution-approach/-e32": {
+    "__comp": "17896441",
+    "content": "11c07aa0"
+  },
+  "/knowledge-graph/examples/meta-issue/example-performance-saga/description/-649": {
+    "__comp": "17896441",
+    "content": "02e5651e"
+  },
+  "/knowledge-graph/examples/meta-issue/example-performance-saga/implementation-log/-2e3": {
+    "__comp": "17896441",
+    "content": "e8fcd980"
+  },
+  "/knowledge-graph/examples/meta-issue/example-performance-saga/test-cases/-060": {
+    "__comp": "17896441",
+    "content": "fa8cdb3b"
+  },
+  "/knowledge-graph/FAQ/-2b6": {
+    "__comp": "17896441",
+    "content": "ad895e75"
+  },
+  "/knowledge-graph/GETTING-STARTED/-414": {
+    "__comp": "17896441",
+    "content": "5b1a03d8"
+  },
+  "/knowledge-graph/GLOSSARY/-c2d": {
+    "__comp": "17896441",
+    "content": "aeb329ea"
+  },
+  "/knowledge-graph/INSTALL/-7f5": {
+    "__comp": "17896441",
+    "content": "78c243a7"
+  },
+  "/knowledge-graph/issues/issue-1/issue-1-description/-609": {
+    "__comp": "17896441",
+    "content": "ed20c211"
+  },
+  "/knowledge-graph/knowledge/-866": {
+    "__comp": "17896441",
+    "content": "e795a04f"
+  },
+  "/knowledge-graph/knowledge/architecture/-559": {
+    "__comp": "17896441",
+    "content": "395b9015"
+  },
+  "/knowledge-graph/knowledge/concepts/-858": {
+    "__comp": "17896441",
+    "content": "63983b7a"
+  },
+  "/knowledge-graph/knowledge/entry-template/-51b": {
+    "__comp": "17896441",
+    "content": "c1620149"
+  },
+  "/knowledge-graph/knowledge/gotchas/-792": {
+    "__comp": "17896441",
+    "content": "42376cf7"
+  },
+  "/knowledge-graph/knowledge/patterns/-415": {
+    "__comp": "17896441",
+    "content": "96bf4f0a"
+  },
+  "/knowledge-graph/knowledge/workflows/-9a2": {
+    "__comp": "17896441",
+    "content": "5b0f9383"
+  },
+  "/knowledge-graph/layers-four/-555": {
+    "__comp": "17896441",
+    "content": "f99fd2d8"
+  },
+  "/knowledge-graph/lessons-learned/-0e9": {
+    "__comp": "17896441",
+    "content": "17764ac5"
+  },
+  "/knowledge-graph/lessons-learned/architecture/Lessons_Learned_Commands_vs_Skills_Architecture/-909": {
+    "__comp": "17896441",
+    "content": "5fd866ec"
+  },
+  "/knowledge-graph/lessons-learned/architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2/-98d": {
+    "__comp": "17896441",
+    "content": "e07ce2ff"
+  },
+  "/knowledge-graph/lessons-learned/architecture/Lessons_Learned_Plugin_Example_File_Management/-289": {
+    "__comp": "17896441",
+    "content": "cde25c24"
+  },
+  "/knowledge-graph/lessons-learned/architecture/Lessons_Learned_Update_Notifications_NonPlugin_Users/-e45": {
+    "__comp": "17896441",
+    "content": "a3f38c32"
+  },
+  "/knowledge-graph/lessons-learned/debugging/Lessons_Learned_Duplicate_Hooks_Declaration/-8d8": {
+    "__comp": "17896441",
+    "content": "4ca51d79"
+  },
+  "/knowledge-graph/lessons-learned/debugging/Lessons_Learned_Interactive_Prompts_Dont_Work_In_Hooks/-dc9": {
+    "__comp": "17896441",
+    "content": "a2adedc8"
+  },
+  "/knowledge-graph/lessons-learned/debugging/Lessons_Learned_Line_vs_Token_Metrics_Confusion/-a8f": {
+    "__comp": "17896441",
+    "content": "32257399"
+  },
+  "/knowledge-graph/lessons-learned/debugging/Lessons_Learned_Plugin_Namespace_Visibility_Shadow_Command_Failure/-413": {
+    "__comp": "17896441",
+    "content": "792b801d"
+  },
+  "/knowledge-graph/lessons-learned/debugging/Lessons_Learned_Truncated_Marketplace_Slug/-081": {
+    "__comp": "17896441",
+    "content": "be932d5a"
+  },
+  "/knowledge-graph/lessons-learned/debugging/namespace-visibility-shadow-command-failure/-1f6": {
+    "__comp": "17896441",
+    "content": "c4dab187"
+  },
+  "/knowledge-graph/lessons-learned/lesson-template/-7da": {
+    "__comp": "17896441",
+    "content": "0113d927"
+  },
+  "/knowledge-graph/lessons-learned/patterns/2026-03-30-capture-router-auto-detect-type-and-location/-84d": {
+    "__comp": "17896441",
+    "content": "9dcc6a39"
+  },
+  "/knowledge-graph/lessons-learned/patterns/Lessons_Learned_AGENTS_Template_Platform_Portability/-c9e": {
+    "__comp": "17896441",
+    "content": "544ff55c"
+  },
+  "/knowledge-graph/lessons-learned/patterns/Lessons_Learned_Patterns_Skill_Auto_Triggers_Miss_Process_Vocabulary_—_Only_Fire_On_Outcome_Vocabulary/-c80": {
+    "__comp": "17896441",
+    "content": "aa7a78e5"
+  },
+  "/knowledge-graph/lessons-learned/patterns/Lessons_Learned_Plugin_Settings_Scope_Consistency/-c77": {
+    "__comp": "17896441",
+    "content": "3b29ed49"
+  },
+  "/knowledge-graph/lessons-learned/patterns/Lessons_Learned_Single_Source_Of_Truth_DRY_Documentation/-97f": {
+    "__comp": "17896441",
+    "content": "c7308869"
+  },
+  "/knowledge-graph/lessons-learned/process/claude-code-plugin-cache-stale-after-update/-6f7": {
+    "__comp": "17896441",
+    "content": "7ef70c58"
+  },
+  "/knowledge-graph/lessons-learned/process/documentation-update-triggers-multibranchfeatures/-afb": {
+    "__comp": "17896441",
+    "content": "f0fe204e"
+  },
+  "/knowledge-graph/lessons-learned/process/Lessons_Learned_Documentation_Deprecation_Lifecycle/-bcc": {
+    "__comp": "17896441",
+    "content": "2de39038"
+  },
+  "/knowledge-graph/lessons-learned/process/Lessons_Learned_Dual_Changelog_Both_Must_Be_Updated/-051": {
+    "__comp": "17896441",
+    "content": "2d750c8e"
+  },
+  "/knowledge-graph/lessons-learned/process/Lessons_Learned_Issue_Tracking_Branch_Guard/-bee": {
+    "__comp": "17896441",
+    "content": "85ead6c2"
+  },
+  "/knowledge-graph/lessons-learned/process/Lessons_Learned_MCP_Server_Binary_Exists_But_Each_IDE_Needs_Explicit_Registration/-0f8": {
+    "__comp": "17896441",
+    "content": "6a0b10a4"
+  },
+  "/knowledge-graph/lessons-learned/process/Lessons_Learned_Plan_File_Dual_Location_Protocol/-e30": {
+    "__comp": "17896441",
+    "content": "c3c0998e"
+  },
+  "/knowledge-graph/lessons-learned/process/Lessons_Learned_Plan_Files_Gitignored_Local_Only/-254": {
+    "__comp": "17896441",
+    "content": "ac0121e1"
+  },
+  "/knowledge-graph/lessons-learned/process/Lessons_Learned_Plan_Subagent_Is_Read_Only/-255": {
+    "__comp": "17896441",
+    "content": "07050666"
+  },
+  "/knowledge-graph/lessons-learned/process/Lessons_Learned_Process_Spec_Drift_In_Command_Language/-cec": {
+    "__comp": "17896441",
+    "content": "9bb63bf5"
+  },
+  "/knowledge-graph/lessons-learned/process/local-marketplace-testing-workflow/-634": {
+    "__comp": "17896441",
+    "content": "9a1a175e"
+  },
+  "/knowledge-graph/NAVIGATION-INDEX/-ec4": {
+    "__comp": "17896441",
+    "content": "c73aec2f"
+  },
+  "/knowledge-graph/PERSONAL-V-PROJECT/-0f9": {
+    "__comp": "17896441",
+    "content": "f26b998a"
+  },
+  "/knowledge-graph/pillars-four/-850": {
+    "__comp": "17896441",
+    "content": "b8a4b901"
+  },
+  "/knowledge-graph/reference/ARCHITECTURE/-404": {
+    "__comp": "17896441",
+    "content": "990d3b15"
+  },
+  "/knowledge-graph/reference/META-ISSUE-GUIDE/-577": {
+    "__comp": "17896441",
+    "content": "59d1048f"
+  },
+  "/knowledge-graph/reference/PATTERNS-GUIDE/-e33": {
+    "__comp": "17896441",
+    "content": "94b09986"
+  },
+  "/knowledge-graph/reference/PLATFORM-ADAPTATION/-0df": {
+    "__comp": "17896441",
+    "content": "bb1c2be6"
+  },
+  "/knowledge-graph/reference/SANITIZATION-CHECKLIST/-2bd": {
+    "__comp": "17896441",
+    "content": "bb71e288"
+  },
+  "/knowledge-graph/reference/WORKFLOWS/-0db": {
+    "__comp": "17896441",
+    "content": "5d58ac37"
+  },
+  "/knowledge-graph/SEARCH/-2f1": {
+    "__comp": "17896441",
+    "content": "31209681"
+  },
+  "/knowledge-graph/STYLE-GUIDE/-8e5": {
+    "__comp": "17896441",
+    "content": "37de30de"
+  },
+  "/knowledge-graph/templates/-f76": {
+    "__comp": "17896441",
+    "content": "e8d4a1b7"
+  },
+  "/knowledge-graph/templates/AGENTS-template/-343": {
+    "__comp": "17896441",
+    "content": "9ed8b180"
+  },
+  "/knowledge-graph/templates/decisions/-b67": {
+    "__comp": "17896441",
+    "content": "0ff1425d"
+  },
+  "/knowledge-graph/templates/decisions/ADR-template/-b2f": {
+    "__comp": "17896441",
+    "content": "c3b5d809"
+  },
+  "/knowledge-graph/templates/documentation/doc-template/-093": {
+    "__comp": "17896441",
+    "content": "a42bc9af"
+  },
+  "/knowledge-graph/templates/knowledge/-922": {
+    "__comp": "17896441",
+    "content": "c539307c"
+  },
+  "/knowledge-graph/templates/knowledge/architecture/-6dd": {
+    "__comp": "17896441",
+    "content": "48c70b39"
+  },
+  "/knowledge-graph/templates/knowledge/concepts/-f1a": {
+    "__comp": "17896441",
+    "content": "082b7736"
+  },
+  "/knowledge-graph/templates/knowledge/entry-template/-1e3": {
+    "__comp": "17896441",
+    "content": "04b16476"
+  },
+  "/knowledge-graph/templates/knowledge/gotchas/-93a": {
+    "__comp": "17896441",
+    "content": "ca048c7f"
+  },
+  "/knowledge-graph/templates/knowledge/patterns/-b5a": {
+    "__comp": "17896441",
+    "content": "c2abc602"
+  },
+  "/knowledge-graph/templates/knowledge/workflows/-3b4": {
+    "__comp": "17896441",
+    "content": "487db026"
+  },
+  "/knowledge-graph/templates/lessons-learned/-3a6": {
+    "__comp": "17896441",
+    "content": "1f58ab2d"
+  },
+  "/knowledge-graph/templates/lessons-learned/lesson-template/-c36": {
+    "__comp": "17896441",
+    "content": "e4273690"
+  },
+  "/knowledge-graph/templates/MEMORY-template/-9a9": {
+    "__comp": "17896441",
+    "content": "aadf46d5"
+  },
+  "/knowledge-graph/templates/meta-issue/-15c": {
+    "__comp": "17896441",
+    "content": "bd60e546"
+  },
+  "/knowledge-graph/templates/meta-issue/analysis/lessons-learned/-d0f": {
+    "__comp": "17896441",
+    "content": "c570fa78"
+  },
+  "/knowledge-graph/templates/meta-issue/analysis/root-cause-evolution/-da0": {
+    "__comp": "17896441",
+    "content": "1df51f4a"
+  },
+  "/knowledge-graph/templates/meta-issue/analysis/timeline/-ad4": {
+    "__comp": "17896441",
+    "content": "840d7238"
+  },
+  "/knowledge-graph/templates/meta-issue/attempt-template/attempt-results/-cb2": {
+    "__comp": "17896441",
+    "content": "903e750d"
+  },
+  "/knowledge-graph/templates/meta-issue/attempt-template/plan-reference/-ed9": {
+    "__comp": "17896441",
+    "content": "701bb08c"
+  },
+  "/knowledge-graph/templates/meta-issue/attempt-template/solution-approach/-b9d": {
+    "__comp": "17896441",
+    "content": "2338ffce"
+  },
+  "/knowledge-graph/templates/meta-issue/description/-bb0": {
+    "__comp": "17896441",
+    "content": "60c6fc24"
+  },
+  "/knowledge-graph/templates/meta-issue/implementation-log/-448": {
+    "__comp": "17896441",
+    "content": "6e626b3f"
+  },
+  "/knowledge-graph/templates/meta-issue/related-issues/github-links/-ec3": {
+    "__comp": "17896441",
+    "content": "5403c8fe"
+  },
+  "/knowledge-graph/templates/meta-issue/test-cases/-a1c": {
+    "__comp": "17896441",
+    "content": "0a8e488f"
+  },
+  "/knowledge-graph/templates/sessions/session-template/-628": {
+    "__comp": "17896441",
+    "content": "ae6fb7a7"
+  },
+  "/knowledge-graph/TRACK-ISSUES/-453": {
+    "__comp": "17896441",
+    "content": "c2509ce1"
+  },
+  "/knowledge-graph/-757": {
+    "__comp": "17896441",
+    "content": "c377a04b"
+  }
+}

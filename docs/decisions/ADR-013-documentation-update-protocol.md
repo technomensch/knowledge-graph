@@ -53,8 +53,8 @@ Establish **mandatory two-layer documentation update protocol** for all multi-br
 **Enforcement**: Separate documented final branch with explicit plan file
 **Owner**: Release lead (designated session/developer)
 
-**Branch Name Convention**: `v{major}.{minor}-docs-update-{description}`
-**Example**: `v0.0.11-docs-update-release-sync`
+**Branch Name Convention**: `docs-update-{description}` (no version prefix — superseded by ADR-027)
+**Example**: `docs-update-release-sync`
 
 **Mandatory Updates**:
 - [ ] README.md: version number, feature summary, command count
@@ -201,6 +201,19 @@ This decision is mandatory for all releases starting with **v0.0.11-alpha** and 
 - Master plan file must be created before feature branches start
 - Release lead must confirm both Layer 1 and Layer 2 updates before release tag
 - No release can be tagged without passing release documentation checklist
+
+---
+
+## Amendment — 2026-04-08 (superseded in part by ADR-027)
+
+**ADR-027** (Docusaurus restructure and Diátaxis docs feed) supersedes the branch naming convention in this ADR.
+
+- **Old:** `v{major}.{minor}-docs-update-{description}` (e.g., `v0.0.11-docs-update-release-sync`)
+- **New:** `docs-update-{description}` (e.g., `docs-update-release-sync`) — no version prefix
+
+**Also superseded:** `CHANGELOG-DOCS-ONLY.md` is deleted. Docs-only branch changes are now recorded as posts in the `docs-updates/` Docusaurus feed (one post per branch). `CHANGELOG.md` is code-releases only.
+
+See [ADR-027](ADR-027-docusaurus-restructure-diataxis-docs-feed.md) for rationale.
 
 ---
 

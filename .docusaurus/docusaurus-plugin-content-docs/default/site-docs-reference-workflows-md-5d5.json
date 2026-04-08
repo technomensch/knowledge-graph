@@ -1,0 +1,29 @@
+{
+  "id": "reference/WORKFLOWS",
+  "title": "Manual Workflows",
+  "description": "Step-by-step workflows for users without Claude Code: lessons, ADRs, chat extraction, search, sessions, meta-issues, patterns, maintenance, and MEMORY.md management",
+  "source": "@site/docs/reference/WORKFLOWS.md",
+  "sourceDirName": "reference",
+  "slug": "/reference/WORKFLOWS",
+  "permalink": "/knowledge-graph/reference/WORKFLOWS",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/reference/WORKFLOWS.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "id": "WORKFLOWS",
+    "title": "Manual Workflows",
+    "sidebar_label": "Manual Workflows",
+    "description": "Step-by-step workflows for users without Claude Code: lessons, ADRs, chat extraction, search, sessions, meta-issues, patterns, maintenance, and MEMORY.md management"
+  },
+  "sidebar": "docs",
+  "previous": {
+    "title": "Glossary",
+    "permalink": "/knowledge-graph/GLOSSARY"
+  },
+  "next": {
+    "title": "Platform Adaptation",
+    "permalink": "/knowledge-graph/reference/PLATFORM-ADAPTATION"
+  }
+}

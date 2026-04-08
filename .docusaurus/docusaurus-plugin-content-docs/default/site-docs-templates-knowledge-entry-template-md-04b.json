@@ -1,0 +1,15 @@
+{
+  "id": "templates/knowledge/entry-template",
+  "title": "entry-template",
+  "description": "<!--",
+  "source": "@site/docs/templates/knowledge/entry-template.md",
+  "sourceDirName": "templates/knowledge",
+  "slug": "/templates/knowledge/entry-template",
+  "permalink": "/knowledge-graph/templates/knowledge/entry-template",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/templates/knowledge/entry-template.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

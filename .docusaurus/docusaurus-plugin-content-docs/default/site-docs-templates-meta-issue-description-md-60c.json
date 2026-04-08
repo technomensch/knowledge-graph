@@ -1,0 +1,15 @@
+{
+  "id": "templates/meta-issue/description",
+  "title": "Problem Description (Living Document)",
+  "description": "Created: YYYY-MM-DD",
+  "source": "@site/docs/templates/meta-issue/description.md",
+  "sourceDirName": "templates/meta-issue",
+  "slug": "/templates/meta-issue/description",
+  "permalink": "/knowledge-graph/templates/meta-issue/description",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/templates/meta-issue/description.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

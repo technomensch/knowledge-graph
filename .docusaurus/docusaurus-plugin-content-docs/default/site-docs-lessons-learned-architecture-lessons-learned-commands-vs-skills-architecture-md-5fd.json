@@ -1,0 +1,61 @@
+{
+  "id": "lessons-learned/architecture/Lessons_Learned_Commands_vs_Skills_Architecture",
+  "title": "Lesson: Commands vs Skills Architecture Research",
+  "description": "Date: 2026-02-16",
+  "source": "@site/docs/lessons-learned/architecture/Lessons_Learned_Commands_vs_Skills_Architecture.md",
+  "sourceDirName": "lessons-learned/architecture",
+  "slug": "/lessons-learned/architecture/Lessons_Learned_Commands_vs_Skills_Architecture",
+  "permalink": "/knowledge-graph/lessons-learned/architecture/Lessons_Learned_Commands_vs_Skills_Architecture",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/lessons-learned/architecture/Lessons_Learned_Commands_vs_Skills_Architecture.md",
+  "tags": [
+    {
+      "inline": true,
+      "label": "architecture",
+      "permalink": "/knowledge-graph/tags/architecture"
+    },
+    {
+      "inline": true,
+      "label": "plugin-design",
+      "permalink": "/knowledge-graph/tags/plugin-design"
+    },
+    {
+      "inline": true,
+      "label": "commands",
+      "permalink": "/knowledge-graph/tags/commands"
+    },
+    {
+      "inline": true,
+      "label": "skills",
+      "permalink": "/knowledge-graph/tags/skills"
+    },
+    {
+      "inline": true,
+      "label": "automation",
+      "permalink": "/knowledge-graph/tags/automation"
+    }
+  ],
+  "version": "current",
+  "frontMatter": {
+    "title": "Lesson: Commands vs Skills Architecture Research",
+    "created": "2026-02-16T00:00:00.000Z",
+    "author": "technomensch",
+    "email": "917847+technomensch@users.noreply.github.com",
+    "git": {
+      "branch": "main",
+      "commit": "37f7e544e5b3b2f1c9a7d5e3f1b9a7c5e3f1b9a7",
+      "pr": null,
+      "issue": null
+    },
+    "sources": [],
+    "tags": [
+      "architecture",
+      "plugin-design",
+      "commands",
+      "skills",
+      "automation"
+    ],
+    "category": "architecture"
+  }
+}

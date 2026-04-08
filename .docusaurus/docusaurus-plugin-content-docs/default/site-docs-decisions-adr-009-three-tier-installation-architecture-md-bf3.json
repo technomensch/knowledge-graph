@@ -1,0 +1,20 @@
+{
+  "id": "decisions/ADR-009-three-tier-installation-architecture",
+  "title": "ADR-009: Three-Tier Installation Architecture",
+  "description": "Status",
+  "source": "@site/docs/decisions/ADR-009-three-tier-installation-architecture.md",
+  "sourceDirName": "decisions",
+  "slug": "/decisions/ADR-009-three-tier-installation-architecture",
+  "permalink": "/knowledge-graph/decisions/ADR-009-three-tier-installation-architecture",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/decisions/ADR-009-three-tier-installation-architecture.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "ADR-009: Three-Tier Installation Architecture",
+    "status": "Accepted",
+    "date": "2026-02-20T00:00:00.000Z",
+    "deciders": "technomensch, Claude Opus 4.6"
+  }
+}

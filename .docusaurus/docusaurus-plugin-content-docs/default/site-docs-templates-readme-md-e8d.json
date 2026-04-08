@@ -1,0 +1,15 @@
+{
+  "id": "templates/README",
+  "title": "Templates — Source Directory",
+  "description": "This is the canonical source for all KMGraph templates. Edit templates here.",
+  "source": "@site/docs/templates/README.md",
+  "sourceDirName": "templates",
+  "slug": "/templates/",
+  "permalink": "/knowledge-graph/templates/",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/templates/README.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

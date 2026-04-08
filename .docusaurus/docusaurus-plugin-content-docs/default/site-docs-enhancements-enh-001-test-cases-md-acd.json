@@ -1,0 +1,18 @@
+{
+  "id": "enhancements/ENH-001/test-cases",
+  "title": "User-Level Global KG — Test Cases & Acceptance Criteria",
+  "description": "Phase 1: Multi-KG Search",
+  "source": "@site/docs/enhancements/ENH-001/test-cases.md",
+  "sourceDirName": "enhancements/ENH-001",
+  "slug": "/enhancements/ENH-001/test-cases",
+  "permalink": "/knowledge-graph/enhancements/ENH-001/test-cases",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/enhancements/ENH-001/test-cases.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "User-Level Global KG — Test Cases & Acceptance Criteria",
+    "enhancement_id": "ENH-001"
+  }
+}

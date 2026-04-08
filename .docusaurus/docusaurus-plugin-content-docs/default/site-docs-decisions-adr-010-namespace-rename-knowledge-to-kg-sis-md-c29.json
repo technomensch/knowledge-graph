@@ -1,0 +1,20 @@
+{
+  "id": "decisions/ADR-010-namespace-rename-knowledge-to-kg-sis",
+  "title": "ADR-010: Plugin Namespace Rename: knowledge → kg-sis",
+  "description": "Status",
+  "source": "@site/docs/decisions/ADR-010-namespace-rename-knowledge-to-kg-sis.md",
+  "sourceDirName": "decisions",
+  "slug": "/decisions/ADR-010-namespace-rename-knowledge-to-kg-sis",
+  "permalink": "/knowledge-graph/decisions/ADR-010-namespace-rename-knowledge-to-kg-sis",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/decisions/ADR-010-namespace-rename-knowledge-to-kg-sis.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "ADR-010: Plugin Namespace Rename: knowledge → kg-sis",
+    "status": "Accepted",
+    "date": "2026-02-21T00:00:00.000Z",
+    "deciders": "technomensch, Claude Opus 4.6"
+  }
+}

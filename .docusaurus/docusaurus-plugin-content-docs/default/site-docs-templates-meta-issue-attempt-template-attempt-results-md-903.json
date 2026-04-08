@@ -1,0 +1,15 @@
+{
+  "id": "templates/meta-issue/attempt-template/attempt-results",
+  "title": "Attempt NNN: Results",
+  "description": "Outcome",
+  "source": "@site/docs/templates/meta-issue/attempt-template/attempt-results.md",
+  "sourceDirName": "templates/meta-issue/attempt-template",
+  "slug": "/templates/meta-issue/attempt-template/attempt-results",
+  "permalink": "/knowledge-graph/templates/meta-issue/attempt-template/attempt-results",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/templates/meta-issue/attempt-template/attempt-results.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

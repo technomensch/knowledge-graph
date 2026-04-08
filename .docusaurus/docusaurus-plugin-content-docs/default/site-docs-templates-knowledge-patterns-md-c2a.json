@@ -1,0 +1,15 @@
+{
+  "id": "templates/knowledge/patterns",
+  "title": "Knowledge Graph - Patterns",
+  "description": "Quick-reference patterns discovered from lessons learned.",
+  "source": "@site/docs/templates/knowledge/patterns.md",
+  "sourceDirName": "templates/knowledge",
+  "slug": "/templates/knowledge/patterns",
+  "permalink": "/knowledge-graph/templates/knowledge/patterns",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/templates/knowledge/patterns.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

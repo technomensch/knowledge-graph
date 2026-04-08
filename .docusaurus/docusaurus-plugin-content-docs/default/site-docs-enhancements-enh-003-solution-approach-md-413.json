@@ -1,0 +1,17 @@
+{
+  "id": "enhancements/ENH-003/solution-approach",
+  "title": "ENH-003 Solution Approach",
+  "description": "Approach",
+  "source": "@site/docs/enhancements/ENH-003/solution-approach.md",
+  "sourceDirName": "enhancements/ENH-003",
+  "slug": "/enhancements/ENH-003/solution-approach",
+  "permalink": "/knowledge-graph/enhancements/ENH-003/solution-approach",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/enhancements/ENH-003/solution-approach.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "ENH-003 Solution Approach"
+  }
+}

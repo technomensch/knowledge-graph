@@ -1,0 +1,67 @@
+{
+  "id": "examples/lessons-learned/process/Example_Relative_File_Paths",
+  "title": "Lesson: Relative File Path Hygiene",
+  "description": "Date: 2024-07-22",
+  "source": "@site/docs/examples/lessons-learned/process/Example_Relative_File_Paths.md",
+  "sourceDirName": "examples/lessons-learned/process",
+  "slug": "/examples/lessons-learned/process/Example_Relative_File_Paths",
+  "permalink": "/knowledge-graph/examples/lessons-learned/process/Example_Relative_File_Paths",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/examples/lessons-learned/process/Example_Relative_File_Paths.md",
+  "tags": [
+    {
+      "inline": true,
+      "label": "#portability",
+      "permalink": "/knowledge-graph/tags/portability"
+    },
+    {
+      "inline": true,
+      "label": "#paths",
+      "permalink": "/knowledge-graph/tags/paths"
+    },
+    {
+      "inline": true,
+      "label": "#documentation",
+      "permalink": "/knowledge-graph/tags/documentation"
+    },
+    {
+      "inline": true,
+      "label": "#best-practices",
+      "permalink": "/knowledge-graph/tags/best-practices"
+    }
+  ],
+  "version": "current",
+  "frontMatter": {
+    "title": "Lesson: Relative File Path Hygiene",
+    "created": "2026-01-07T14:20:00.000Z",
+    "author": "Example User",
+    "git": {
+      "branch": null,
+      "commit": null,
+      "pr": null,
+      "issue": null
+    },
+    "sources": [
+      {
+        "url": "https://keepachangelog.com/en/1.0.0/",
+        "title": "Keep a Changelog",
+        "accessed": "2026-01-07",
+        "context": "Standardizing the versioning documentation format"
+      },
+      {
+        "url": "https://semver.org/spec/v2.0.0.html",
+        "title": "Semantic Versioning 2.0.0",
+        "accessed": "2026-01-07",
+        "context": "Defining version increment logic for multi-user environments"
+      }
+    ],
+    "tags": [
+      "#portability",
+      "#paths",
+      "#documentation",
+      "#best-practices"
+    ],
+    "category": "process"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "templates/knowledge/workflows",
+  "title": "Knowledge Graph - Workflows",
+  "description": "Quick-reference workflows and standard operating procedures.",
+  "source": "@site/docs/templates/knowledge/workflows.md",
+  "sourceDirName": "templates/knowledge",
+  "slug": "/templates/knowledge/workflows",
+  "permalink": "/knowledge-graph/templates/knowledge/workflows",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/technomensch/knowledge-graph/edit/main/docs/templates/knowledge/workflows.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}
