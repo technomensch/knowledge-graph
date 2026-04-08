@@ -1,12 +1,11 @@
 # KMGraph — capture-lesson demo
-# Records a simulated /kmgraph:capture-lesson workflow
 # Run: vhs docs/demos/capture-lesson.tape
 
 Output static/img/demos/capture-lesson.gif
 
 Set Shell "bash"
 Set FontSize 14
-Set Width 800
+Set Width 900
 Set Height 480
 Set Theme "Dracula"
 Set Padding 20
@@ -18,44 +17,59 @@ Sleep 500ms
 Enter
 Sleep 300ms
 
-Type "# Imagine Claude Code is open and you just fixed a Redis timeout bug"
-Sleep 500ms
-Enter
-Sleep 300ms
-
 Type "echo '> /kmgraph:capture-lesson'"
 Sleep 300ms
 Enter
-Sleep 800ms
+Sleep 600ms
 
 Type "echo ''"
 Enter
-Type "echo 'Capturing lesson...'"
-Sleep 300ms
-Enter
-
-Type "echo ''"
-Enter
-Type "echo '📝 Title: Redis connection timeout on cold start'"
+Type "echo 'What problem did you solve or pattern did you implement?'"
 Sleep 400ms
 Enter
-Type "echo '📁 Category: debugging'"
-Sleep 300ms
-Enter
-Type "echo '🏷  Tags: redis, connection, timeout, cold-start'"
-Sleep 300ms
-Enter
-Type "echo '🌿 Branch: fix/redis-cold-start  |  Commit: a3f2b91'"
-Sleep 400ms
-Enter
-
-Type "echo ''"
-Enter
-Type "echo '✅ Lesson saved to:'"
-Sleep 300ms
-Enter
-Type "echo '   docs/lessons-learned/debugging/redis-connection-timeout-on-cold-start.md'"
+Type "echo '> API client threw unhandled errors on 429 rate-limit responses'"
 Sleep 500ms
 Enter
 
-Sleep 2000ms
+Type "echo ''"
+Enter
+Type "echo 'What was the root cause or key insight?'"
+Sleep 400ms
+Enter
+Type "echo '> No retry logic — need exponential backoff with jitter'"
+Sleep 500ms
+Enter
+
+Type "echo ''"
+Enter
+Type "echo 'Category: debugging'"
+Sleep 200ms
+Enter
+Type "echo 'Tags:     api, rate-limit, retry, exponential-backoff'"
+Sleep 200ms
+Enter
+Type "echo 'Branch:   fix/api-client · Commit: b7d3a21'"
+Sleep 400ms
+Enter
+
+Type "echo ''"
+Enter
+Type "echo 'Saving lesson...'"
+Sleep 700ms
+Enter
+
+Type "echo ''"
+Enter
+Type "echo '✅ Lesson saved!'"
+Sleep 200ms
+Enter
+Type "echo ''"
+Enter
+Type "echo '  File:   lessons-learned/debugging/api-rate-limit-handling.md'"
+Sleep 200ms
+Enter
+Type "echo '  Index:  FTS5 updated — lesson is now searchable'"
+Sleep 500ms
+Enter
+
+Sleep 2500ms

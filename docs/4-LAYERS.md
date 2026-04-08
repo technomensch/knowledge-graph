@@ -50,6 +50,20 @@ flowchart TD
 
 Skills are auto-triggered context providers. They watch for specific moments in a conversation and respond by pre-structuring data and dispatching to the appropriate agent or command.
 
+```mermaid
+graph TB
+    accTitle: KMGraph Four-Layer Stack
+    accDescr: Vertical stack of the four KMGraph layers from top to bottom - Context Layer holding skills that detect moments, Logic Layer holding agents that process decisions, Lifecycle Layer holding hooks that fire on system events, and Data Layer holding MCP tools that persist and search knowledge.
+    Context["Context Layer<br/>Skills detect moments and dispatch"]
+    Logic["Logic Layer<br/>Agents own execution and decisions"]
+    Lifecycle["Lifecycle Layer<br/>Hooks fire on system events"]
+    Data["Data Layer<br/>MCP tools persist, search, retrieve"]
+    Context --> Logic
+    Logic --> Lifecycle
+    Lifecycle --> Data
+```
+
+
 **What skills do:**
 
 - Detect that a bug was just fixed and suggest capturing a lesson

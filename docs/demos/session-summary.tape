@@ -5,8 +5,8 @@ Output static/img/demos/session-summary.gif
 
 Set Shell "bash"
 Set FontSize 14
-Set Width 800
-Set Height 480
+Set Width 900
+Set Height 500
 Set Theme "Dracula"
 Set Padding 20
 Set Framerate 24
@@ -15,45 +15,66 @@ Set PlaybackSpeed 1.0
 Type "echo '> /kmgraph:session-summary'"
 Sleep 300ms
 Enter
-Sleep 600ms
+Sleep 500ms
 
 Type "echo ''"
 Enter
-Type "echo 'Generating session summary...'"
+Type "echo 'Let me pull together what we worked on today...'"
 Sleep 700ms
 Enter
 
 Type "echo ''"
 Enter
-Type "echo '📸 Session Summary — 2026-04-08'"
+Type "echo 'Session Summary — 2026-04-08'"
+Sleep 200ms
+Enter
+Type "echo 'Branch: fix/api-client'"
+Sleep 200ms
+Enter
+Type "echo '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'"
+Sleep 200ms
+Enter
+
+Type "echo ''"
+Enter
+Type "echo 'What we worked on:'"
+Sleep 200ms
+Enter
+Type "echo '  Fixed API rate limit handling — added exponential backoff'"
+Sleep 150ms
+Enter
+Type "echo '  with jitter to prevent thundering herd on 429 responses.'"
 Sleep 300ms
 Enter
-Type "echo '═══════════════════════════════'"
-Sleep 200ms
+
+Type "echo ''"
 Enter
-Type "echo 'Branch:  fix/redis-cold-start'"
-Sleep 200ms
+Type "echo 'Changes:'"
+Sleep 150ms
 Enter
-Type "echo 'Commits: 3'"
-Sleep 200ms
+Type "echo '  • src/api/client.ts      — retry logic (3 attempts, exp backoff)'"
+Sleep 150ms
 Enter
-Type "echo '───────────────────────────────'"
-Sleep 200ms
+Type "echo '  • tests/api/client.test.ts — rate limit test cases'"
+Sleep 300ms
+Enter
+
+Type "echo ''"
 Enter
 Type "echo 'Lessons captured:  1'"
-Sleep 200ms
+Sleep 150ms
 Enter
 Type "echo 'ADRs created:      0'"
-Sleep 200ms
+Sleep 150ms
 Enter
-Type "echo 'Open plans:        1  (docs/plans/redis-fix.md)'"
+Type "echo 'Open plans:        0'"
 Sleep 400ms
 Enter
 
 Type "echo ''"
 Enter
-Type "echo '✅ Summary saved: docs/sessions/2026-04-08-fix-redis-cold-start.md'"
+Type "echo '✅ Summary saved: sessions/2026-04-08-fix-api-client.md'"
 Sleep 500ms
 Enter
 
-Sleep 2000ms
+Sleep 2500ms
