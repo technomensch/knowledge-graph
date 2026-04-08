@@ -41,6 +41,9 @@ dist/
 build/
 *.tgz
 
+# Docusaurus cache (generated at build time)
+.docusaurus/
+
 # MkDocs generated site
 site/
 
