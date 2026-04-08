@@ -47,8 +47,6 @@ The commands in this guide work across different platforms:
 
 **For**: Users with the Claude Code plugin installed.
 
-**Time to first lesson**: ~5 minutes
-
 ## Prerequisites
 
 - Claude Code (latest version)
