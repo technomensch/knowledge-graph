@@ -1,5 +1,31 @@
 # Knowledge Management Graph — Roadmap
 
+## Future / Deferred (captured 2026-04-07 during docs-restructure planning)
+
+These items were identified during the v0.0.6-docs-restructure planning session and explicitly deferred. None are scheduled to a specific release yet — promote to enhancement issues when they reach the queue.
+
+### Architectural (version-bump territory)
+
+- **Pluggable knowledge graph storage backends** — Notion, Obsidian, and NotebookLM as primary stores instead of local markdown. Requires `/kmgraph:init` wizard updates, MCP server config schema additions, and per-backend adapter modules. Captured because the docs-restructure plan adds integration guides for these tools but cannot change the storage layer in scope.
+- **Contributor commands vs user commands — surface area separation** — `update-doc`, `create-doc`, and the `doc-update-router` skill exist to update the KMGraph project's own docs site. Today they ship to every end user, conflating two audiences. Future work: move to a separate plugin (`kmgraph-contrib`?), gate by a `.kmgraph-contributor` marker file, or use a `commands/contributing/` subdirectory with conditional registration.
+
+### Documentation polish (post-v0.0.6-docs-restructure)
+
+- Slim-down rewrite of [STYLE-GUIDE.md](docs/STYLE-GUIDE.md) (currently 633 lines, contributors-only audience)
+- `docusaurus-plugin-remote-content` to pull `CHANGELOG.md` from main branch at build time
+- `docusaurus-theme-github-codeblock` for embedding source by line range
+- Markprompt / LLM-powered Q&A search (wait until Algolia DocSearch usage data exists)
+- Interactive decision tree component for "lesson vs ADR vs session-summary vs meta-issue"
+- Setup guide for `scripts/notification-dispatch.sh`
+
+### Process / governance (ADRs to capture)
+
+- ADR placeholder: "Pluggable storage backends — Notion, Obsidian, NotebookLM"
+- ADR placeholder: "Contributor command surface area separation"
+- ADR placeholder: "Documentation updates feed via Docusaurus blog plugin" (lands in Phase 0 of the docs-restructure)
+
+---
+
 ## v0.2.2-beta (In Progress: 2026-03-29)
 
 **Status**: 🔄 In Progress — Personal KG + Session Snapshot on Capture
