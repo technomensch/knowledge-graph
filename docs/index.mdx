@@ -5,44 +5,30 @@ sidebar_label: Home
 description: Structured knowledge capture and cross-session memory — for every AI-assisted project
 ---
 
-<div style={{
-  background: 'var(--ifm-color-primary)',
-  borderRadius: '12px',
-  padding: '2.5rem 2rem',
-  textAlign: 'center',
-  marginBottom: '2rem',
-}}>
+import styles from '@site/src/css/home.module.css';
+
+<div className={styles.hero}>
   <img
     src="/knowledge-graph/img/banner.jpeg"
     alt="KMGraph — Staying in Sync"
-    style={{width: '100%', maxWidth: '480px', borderRadius: '8px', marginBottom: '1.75rem', display: 'block', marginLeft: 'auto', marginRight: 'auto'}}
+    className={styles.heroImage}
   />
 
-  <p style={{fontSize: '1.15rem', fontWeight: 600, color: '#fff', maxWidth: '560px', margin: '0 auto 1.25rem'}}>
+  <p className={styles.heroTagline}>
     Your AI assistant starts every session with no memory of yesterday's work.
   </p>
 
-  <ul style={{listStyle: 'none', padding: 0, margin: '0 auto 1.75rem', maxWidth: '520px', textAlign: 'left', fontSize: '0.95rem', color: 'rgba(255,255,255,0.9)'}}>
-    <li style={{marginBottom: '0.4rem'}}>✓ Decisions made three sprints ago are gone — no record, no rationale, no trail</li>
-    <li style={{marginBottom: '0.4rem'}}>✓ The same bug gets solved twice because no one remembered solving it the first time</li>
+  <ul className={styles.heroBullets}>
+    <li>✓ Decisions made three sprints ago are gone — no record, no rationale, no trail</li>
+    <li>✓ The same bug gets solved twice because no one remembered solving it the first time</li>
     <li>✓ Switching between Claude, Cursor, and Gemini means starting over every time</li>
   </ul>
 
-  <code style={{
-    display: 'block',
-    background: 'rgba(0,0,0,0.25)',
-    color: '#fff',
-    padding: '0.75rem 1.5rem',
-    borderRadius: '6px',
-    fontSize: '0.95rem',
-    maxWidth: '460px',
-    margin: '0 auto 0.5rem',
-    textAlign: 'left',
-  }}>
+  <code className={styles.heroCode}>
     claude --plugin-dir /path/to/knowledge-graph
   </code>
-  <p style={{fontSize: '0.85rem', color: 'rgba(255,255,255,0.75)', margin: '0 auto 0', maxWidth: '460px', textAlign: 'left'}}>
-    Then run <code style={{background: 'rgba(0,0,0,0.2)', color: '#fff'}}>/kmgraph:init</code> — first lesson captured in under 5 minutes.
+  <p className={styles.heroSubtext}>
+    Then run <code>/kmgraph:init</code> — first lesson captured in under 5 minutes.
   </p>
 </div>
 
