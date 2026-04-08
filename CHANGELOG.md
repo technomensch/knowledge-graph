@@ -13,6 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.2.4-beta] — 2026-04-08
+
+### Documentation
+- **Diátaxis restructure** — Full docs site reorganized into Tutorials / How-to Guides / Reference / Concepts per the Diátaxis IA framework
+- **15 new how-to guides** — Task-oriented recipes for capture, ADRs, meta-issues, patterns, sync, integrations, and more
+- **Terminal demo GIFs** — VHS recordings for `init`, `status`, `recall`, `capture-lesson`, and `session-summary` embedded in Quickstart
+- **Glossary component** — Hover tooltips for KMGraph-specific terms across all docs
+- **Full-text search** — Orama v3 plugin active in navbar (no crawler required)
+- **docs-updates/ feed** — New blog feed for docs-only announcements
+- **Redirects** — `@docusaurus/plugin-client-redirects` wired; old URLs preserved
+
 ## [0.2.3.3-beta] — 2026-04-06
 
 ### Documentation
