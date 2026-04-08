@@ -16,7 +16,6 @@
 
 .headerImage {
   width: 100%;
-  max-width: 900px;
   height: auto;
   border-radius: 10px;
   display: block;
@@ -26,7 +25,7 @@
 /* ── Two-column layout ───────────────────────────────────────────── */
 .layout {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 2fr;
   gap: 1.75rem;
   align-items: start;
 }
