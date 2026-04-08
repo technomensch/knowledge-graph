@@ -12,7 +12,7 @@ const config = {
 
   organizationName: 'technomensch',
   projectName: 'knowledge-graph',
-  trailingSlash: true,
+  trailingSlash: undefined,
 
   onBrokenLinks: 'warn',
 
