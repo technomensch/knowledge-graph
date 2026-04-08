@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkknowledge_graph_plugin=self.webpackChunkknowledge_graph_plugin||[]).push([[4821],{94821(e,p,a){a.d(p,{createGitGraphServices:()=>r.b});var r=a(24187);a(72519)}}]);

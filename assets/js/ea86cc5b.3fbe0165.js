@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkknowledge_graph_plugin=self.webpackChunkknowledge_graph_plugin||[]).push([[3520],{92732(e){e.exports=JSON.parse('{"blogBasePath":"/knowledge-graph/docs-updates","blogTitle":"Documentation Updates","authorsListPath":"/knowledge-graph/docs-updates/authors"}')}}]);

@@ -1,1640 +1,318 @@
-<!DOCTYPE html><html lang="en" class="no-js"><head>
-    
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      
-        <meta name="description" content="Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.">
-      
-      
-        <meta name="author" content="technomensch">
-      
-      
-        <link rel="canonical" href="https://technomensch.github.io/knowledge-graph/lessons-learned/architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2/">
-      
-      
-      
-      
-        
-      
-      
-      <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
-    
-    
-      
-        <title>Lesson: Native FTS5 Search and Context-Mode Integration (v0.1.1 + v0.1.2) - Knowledge Management Graph</title>
-      
-    
-    
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
-      
-        
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
-      
-      
-
-
-    
-    
-      
-    
-    
-      
-        
-        
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback">
-        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
-      
-    
-    
-      <link rel="stylesheet" href="../../../stylesheets/extra.css">
-    
-    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
-    
-      
-
-    
-    
-  <link href="../../../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../../../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
-            html.glightbox-open { overflow: initial; height: 100%; }
-            .gslide-title { margin-top: 0px; user-select: text; }
-            .gslide-desc { color: #666; user-select: text; }
-            .gslide-image img { background: white; }
-            .gscrollbar-fixer { padding-right: 15px; }
-            .gdesc-inner { font-size: 0.75rem; }
-            body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color); }
-            body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color); }
-            body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color); }
-        </style></head>
-  
-  
-    
-    
-      
-    
-    
-    
-    
-    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="deep-orange" data-md-color-accent="cyan">
-  
-    
-    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
-    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-    <label class="md-overlay" for="__drawer"></label>
-    <div data-md-component="skip">
-      
-        
-        <a href="#lesson-learned-native-fts5-search-and-context-mode-integration-v011-v012" class="md-skip">
-          Skip to content
-        </a>
-      
-    </div>
-    <div data-md-component="announce">
-      
-    </div>
-    
-    
-  
-      
-
-  
-
-<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
-  <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../.." title="Knowledge Management Graph" class="md-header__button md-logo" aria-label="Knowledge Management Graph" data-md-component="logo">
-      
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
-
-    </a>
-    <label class="md-header__button md-icon" for="__drawer">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
-    </label>
-    <div class="md-header__title" data-md-component="header-title">
-      <div class="md-header__ellipsis">
-        <div class="md-header__topic">
-          <span class="md-ellipsis">
-            Knowledge Management Graph
-          </span>
-        </div>
-        <div class="md-header__topic" data-md-component="header-topic">
-          <span class="md-ellipsis">
-            
-              Lesson: Native FTS5 Search and Context-Mode Integration (v0.1.1 + v0.1.2)
-            
-          </span>
-        </div>
-      </div>
-    </div>
-    
-      
-        <form class="md-header__option" data-md-component="palette">
-  
-    
-    
-    
-    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-orange" data-md-color-accent="cyan" aria-label="Switch to light mode" type="radio" name="__palette" id="__palette_0">
-    
-      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden="">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
-      </label>
-    
-  
-    
-    
-    
-    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="blue" aria-label="Switch to dark mode" type="radio" name="__palette" id="__palette_1">
-    
-      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden="">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
-      </label>
-    
-  
-</form>
-      
-    
-    
-      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
-    
-    
-    
-      
-      
-        <label class="md-header__button md-icon" for="__search">
-          
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
-        </label>
-        <div class="md-search" data-md-component="search" role="dialog">
-  <label class="md-search__overlay" for="__search"></label>
-  <div class="md-search__inner" role="search">
-    <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required="">
-      <label class="md-search__icon md-icon" for="__search">
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
-      </label>
-      <nav class="md-search__options" aria-label="Search">
-        
-          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard="" data-clipboard-text="" data-md-component="search-share" tabindex="-1">
-            
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"></path></svg>
-          </a>
-        
-        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
-          
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
-        </button>
-      </nav>
-      
-        <div class="md-search__suggest" data-md-component="search-suggest"></div>
-      
-    </form>
-    <div class="md-search__output">
-      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix="">
-        <div class="md-search-result" data-md-component="search-result">
-          <div class="md-search-result__meta">
-            Initializing search
-          </div>
-          <ol class="md-search-result__list" role="presentation"></ol>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-      
-    
-    
-      <div class="md-header__source">
-        <a href="https://github.com/technomensch/knowledge-graph" title="Go to repository" class="md-source" data-md-component="source">
-  <div class="md-source__icon md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
-  </div>
-  <div class="md-source__repository">
-    technomensch/knowledge-graph
-  </div>
-</a>
-      </div>
-    
-  </nav>
-  
-    
-      
-<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
-  <div class="md-grid">
-    <ul class="md-tabs__list">
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../../.." class="md-tabs__link">
-        
-  
-  
-    
-  
-  Home
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../../../GETTING-STARTED/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  Getting Started
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../../../INSTALL/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  Installation
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../../../CONCEPTS/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  Concepts
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="../../../COMMAND-GUIDE/" class="md-tabs__link">
-          
-  
-  
-  Commands
-
-        </a>
-      </li>
-    
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../../../CONFIGURATION/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  Configuration
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../../../CHANGELOG/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  Changelog
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="../../../STYLE-GUIDE/" class="md-tabs__link">
-          
-  
-  
-  Contributing
-
-        </a>
-      </li>
-    
-  
-
-      
-        
-  
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../../../GLOSSARY/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  Glossary
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="../../../reference/ARCHITECTURE/" class="md-tabs__link">
-          
-  
-  
-  Advanced
-
-        </a>
-      </li>
-    
-  
-
-      
-    </ul>
-  </div>
-</nav>
-    
-  
-</header>
-    
-
-    <div class="md-container" data-md-component="container">
-      
-      
-        
-      
-      <main class="md-main" data-md-component="main">
-        <div class="md-main__inner md-grid">
-          
-            
-              
-              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-
-
-  
-
-
-  
-
-<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
-  <label class="md-nav__title" for="__drawer">
-    <a href="../../.." title="Knowledge Management Graph" class="md-nav__button md-logo" aria-label="Knowledge Management Graph" data-md-component="logo">
-      
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
-
-    </a>
-    Knowledge Management Graph
-  </label>
-  
-    <div class="md-nav__source">
-      <a href="https://github.com/technomensch/knowledge-graph" title="Go to repository" class="md-source" data-md-component="source">
-  <div class="md-source__icon md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"></path></svg>
-  </div>
-  <div class="md-source__repository">
-    technomensch/knowledge-graph
-  </div>
-</a>
-    </div>
-  
-  <ul class="md-nav__list" data-md-scrollfix="">
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../.." class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Home
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../GETTING-STARTED/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Getting Started
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../INSTALL/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Installation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../CONCEPTS/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Concepts
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5">
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Commands
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Commands
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix="">
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../COMMAND-GUIDE/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Command Guide
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../CHEAT-SHEET/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Cheat Sheet
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../FAQ/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    FAQ
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../CONFIGURATION/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../CHANGELOG/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Changelog
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8">
-        
-          
-          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contributing
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Contributing
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix="">
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../STYLE-GUIDE/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Style Guide
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../NAVIGATION-INDEX/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Navigation Index
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../GLOSSARY/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Glossary
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10">
-        
-          
-          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Advanced
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_10">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Advanced
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix="">
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/ARCHITECTURE/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Architecture
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/WORKFLOWS/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Manual Workflows
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/PLATFORM-ADAPTATION/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Platform Adaptation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/PATTERNS-GUIDE/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Pattern Writing
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/META-ISSUE-GUIDE/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Meta-Issue Guide
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/SANITIZATION-CHECKLIST/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Sanitization Checklist
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-  </ul>
-</nav>
-                  </div>
-                </div>
-              </div>
-            
-            
-          
-          
-            <div class="md-content" data-md-component="content">
-              
-                
-
-
-
-  
-
-
-              
-              <article class="md-content__inner md-typeset">
-                
-                  
-
-
-  
-    <a href="https://github.com/technomensch/knowledge-graph/edit/main/docs/lessons-learned/architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"></path></svg>
-    </a>
-  
-  
-
-
-<h1 id="lesson-learned-native-fts5-search-and-context-mode-integration-v011-v012">Lesson Learned: Native FTS5 Search and Context-Mode Integration (v0.1.1 + v0.1.2)<a class="headerlink" href="#lesson-learned-native-fts5-search-and-context-mode-integration-v011-v012" title="Permanent link">¶</a></h1>
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-lessons-learned/architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">Lesson: Native FTS5 Search and Context-Mode Integration (v0.1.1 + v0.1.2) | Knowledge Management Graph</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://technomensch.github.io/knowledge-graph/lessons-learned/architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Lesson: Native FTS5 Search and Context-Mode Integration (v0.1.1 + v0.1.2) | Knowledge Management Graph"><meta data-rh="true" name="description" content="Date: 2026-03-16"><meta data-rh="true" property="og:description" content="Date: 2026-03-16"><link data-rh="true" rel="icon" href="/knowledge-graph/img/square.png"><link data-rh="true" rel="canonical" href="https://technomensch.github.io/knowledge-graph/lessons-learned/architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/lessons-learned/architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2" hreflang="en"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/lessons-learned/architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2" hreflang="x-default"><link rel="alternate" type="application/rss+xml" href="/knowledge-graph/docs-updates/rss.xml" title="KMGraph Docs Updates RSS Feed">
+<link rel="alternate" type="application/atom+xml" href="/knowledge-graph/docs-updates/atom.xml" title="KMGraph Docs Updates Atom Feed"><link rel="stylesheet" href="/knowledge-graph/assets/css/styles.99b149bd.css">
+<script src="/knowledge-graph/assets/js/runtime~main.d95e2047.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/main.c879433e.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||"dark"),document.documentElement.setAttribute("data-theme-choice",t||"dark")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/knowledge-graph/"><div class="navbar__logo"><img src="/knowledge-graph/img/avatar.png" alt="Staying in Sync" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/knowledge-graph/img/avatar.png" alt="Staying in Sync" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate">KMGraph</b></a><a class="navbar__item navbar__link" href="/knowledge-graph/quickstart">Getting Started</a><a class="navbar__item navbar__link" href="/knowledge-graph/CONCEPTS">Concepts</a><a class="navbar__item navbar__link" href="/knowledge-graph/COMMAND-GUIDE">Commands</a><a class="navbar__item navbar__link" href="/knowledge-graph/CONFIGURATION">Configuration</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/technomensch/knowledge-graph" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link header-github-link" aria-label="GitHub repository"></a><a href="https://www.linkedin.com/in/marckaplan/" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link header-linkedin-link" aria-label="LinkedIn profile"></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="system mode" aria-label="Switch between dark and light mode (currently system mode)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"><div>Loading Search...</div></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><main class="docMainContainer_TBSr docMainContainerEnhanced_lQrH"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>Lesson Learned: Native FTS5 Search and Context-Mode Integration (v0.1.1 + v0.1.2)</h1></header>
 <p><strong>Date:</strong> 2026-03-16
 <strong>Category:</strong> architecture
 <strong>Version:</strong> 1.0</p>
 <hr>
-<h2 id="problem">Problem<a class="headerlink" href="#problem" title="Permanent link">¶</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="problem">Problem<a href="#problem" class="hash-link" aria-label="Direct link to Problem" title="Direct link to Problem" translate="no">​</a></h2>
 <p>Two independent scalability issues emerged as the knowledge graph grew beyond small personal projects.</p>
-<h3 id="problem-1-conversation-flooding-v011">Problem 1: Conversation Flooding (v0.1.1)<a class="headerlink" href="#problem-1-conversation-flooding-v011" title="Permanent link">¶</a></h3>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="problem-1-conversation-flooding-v011">Problem 1: Conversation Flooding (v0.1.1)<a href="#problem-1-conversation-flooding-v011" class="hash-link" aria-label="Direct link to Problem 1: Conversation Flooding (v0.1.1)" title="Direct link to Problem 1: Conversation Flooding (v0.1.1)" translate="no">​</a></h3>
 <p><code>/kmgraph:sync-all</code> and <code>/kmgraph:update-graph</code> read many <code>.md</code> files inline during execution. For a knowledge graph with 30+ lessons, this flooded the conversation context with raw file content that persisted in memory long after the work was done. The knowledge graph got updated correctly, but the conversation became cluttered and consumed tokens that should be available for actual work.</p>
-<p><strong>Context:</strong>
-- Commands read files using Claude Code's Read tool, which inlines content into the context window
-- No mechanism existed to read files "silently" without entering the conversation
-- The problem worsened linearly with KG size</p>
-<p><strong>Impact:</strong>
-- Large syncs consumed 10,000–40,000 tokens of conversation context on file reads alone
-- Users with large KGs experienced noticeably slower, more expensive sessions
-- No way to sync without the conversation filling up</p>
-<h3 id="problem-2-slow-unranked-search-v012">Problem 2: Slow, Unranked Search (v0.1.2)<a class="headerlink" href="#problem-2-slow-unranked-search-v012" title="Permanent link">¶</a></h3>
+<p><strong>Context:</strong></p>
+<ul>
+<li class="">Commands read files using Claude Code&#x27;s Read tool, which inlines content into the context window</li>
+<li class="">No mechanism existed to read files &quot;silently&quot; without entering the conversation</li>
+<li class="">The problem worsened linearly with KG size</li>
+</ul>
+<p><strong>Impact:</strong></p>
+<ul>
+<li class="">Large syncs consumed 10,000–40,000 tokens of conversation context on file reads alone</li>
+<li class="">Users with large KGs experienced noticeably slower, more expensive sessions</li>
+<li class="">No way to sync without the conversation filling up</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="problem-2-slow-unranked-search-v012">Problem 2: Slow, Unranked Search (v0.1.2)<a href="#problem-2-slow-unranked-search-v012" class="hash-link" aria-label="Direct link to Problem 2: Slow, Unranked Search (v0.1.2)" title="Direct link to Problem 2: Slow, Unranked Search (v0.1.2)" translate="no">​</a></h3>
 <p><code>kg_search</code> (MCP tool) performed a linear file scan on every query — reading all <code>.md</code> files with <code>fs.readFileSync</code> and scoring matches by a simple title/heading/body heuristic. Results were ordered by match type (title &gt; heading &gt; body) with no relevance ranking within each tier.</p>
-<p><strong>Context:</strong>
-- All <code>.md</code> files read synchronously on every search call
-- No index, no caching, no relevance model
-- Performance degraded linearly with KG size</p>
-<p><strong>Impact:</strong>
-- Search on a 50-file KG took 200–500ms
-- Results sorted by file position, not relevance — the most useful file could appear anywhere
-- No way to improve without a fundamentally different approach</p>
+<p><strong>Context:</strong></p>
+<ul>
+<li class="">All <code>.md</code> files read synchronously on every search call</li>
+<li class="">No index, no caching, no relevance model</li>
+<li class="">Performance degraded linearly with KG size</li>
+</ul>
+<p><strong>Impact:</strong></p>
+<ul>
+<li class="">Search on a 50-file KG took 200–500ms</li>
+<li class="">Results sorted by file position, not relevance — the most useful file could appear anywhere</li>
+<li class="">No way to improve without a fundamentally different approach</li>
+</ul>
 <hr>
-<h2 id="root-cause">Root Cause<a class="headerlink" href="#root-cause" title="Permanent link">¶</a></h2>
-<h3 id="problem-1-root-cause">Problem 1 Root Cause<a class="headerlink" href="#problem-1-root-cause" title="Permanent link">¶</a></h3>
-<p>Claude Code has no native "background file read" primitive. All file reads via the Read tool enter the conversation context. The only way to avoid this is to delegate reads to an external process whose output does not enter the main context.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="root-cause">Root Cause<a href="#root-cause" class="hash-link" aria-label="Direct link to Root Cause" title="Direct link to Root Cause" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="problem-1-root-cause">Problem 1 Root Cause<a href="#problem-1-root-cause" class="hash-link" aria-label="Direct link to Problem 1 Root Cause" title="Direct link to Problem 1 Root Cause" translate="no">​</a></h3>
+<p>Claude Code has no native &quot;background file read&quot; primitive. All file reads via the Read tool enter the conversation context. The only way to avoid this is to delegate reads to an external process whose output does not enter the main context.</p>
 <p>The context-mode plugin (<code>mksglu/context-mode</code>) provides exactly this: <code>ctx_batch_execute</code> and <code>ctx_execute_file</code> run shell commands and file reads in a sandboxed subprocess, returning only a compact summary to the conversation.</p>
 <p>The root cause of the problem was not using this capability — because kmgraph had no integration with context-mode at all.</p>
-<h3 id="problem-2-root-cause">Problem 2 Root Cause<a class="headerlink" href="#problem-2-root-cause" title="Permanent link">¶</a></h3>
-<p>Linear scan is the simplest possible search implementation. It works at small scale but has no path to relevance ranking without a fundamentally different data structure. SQLite's FTS5 extension provides a production-grade full-text search index with BM25 relevance ranking built in — but choosing the right SQLite package for a Node.js plugin with a zero-config install requirement turned out to be non-trivial.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="problem-2-root-cause">Problem 2 Root Cause<a href="#problem-2-root-cause" class="hash-link" aria-label="Direct link to Problem 2 Root Cause" title="Direct link to Problem 2 Root Cause" translate="no">​</a></h3>
+<p>Linear scan is the simplest possible search implementation. It works at small scale but has no path to relevance ranking without a fundamentally different data structure. SQLite&#x27;s FTS5 extension provides a production-grade full-text search index with BM25 relevance ranking built in — but choosing the right SQLite package for a Node.js plugin with a zero-config install requirement turned out to be non-trivial.</p>
 <hr>
-<h2 id="solution">Solution<a class="headerlink" href="#solution" title="Permanent link">¶</a></h2>
-<h3 id="solution-1-context-mode-integration-v011">Solution 1: Context-Mode Integration (v0.1.1)<a class="headerlink" href="#solution-1-context-mode-integration-v011" title="Permanent link">¶</a></h3>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="solution">Solution<a href="#solution" class="hash-link" aria-label="Direct link to Solution" title="Direct link to Solution" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="solution-1-context-mode-integration-v011">Solution 1: Context-Mode Integration (v0.1.1)<a href="#solution-1-context-mode-integration-v011" class="hash-link" aria-label="Direct link to Solution 1: Context-Mode Integration (v0.1.1)" title="Direct link to Solution 1: Context-Mode Integration (v0.1.1)" translate="no">​</a></h3>
 <p><strong>Approach:</strong> Detection-based optional integration. At runtime, kmgraph checks whether <code>mcp__plugin_context-mode_context-mode__ctx_batch_execute</code> is available. If yes, use it. If no, fall back to existing behavior. Zero hard dependency.</p>
-<p><strong>Key design principle:</strong> The integration must be invisible to users who don't have context-mode. No configuration, no errors, no degraded behavior — just a transparent optimization.</p>
-<p><strong>Changes to <code>commands/sync-all.md</code>:</strong>
-- Added Step 0 detection block before the main sync loop
-- When context-mode is available: wraps the lesson scan and MEMORY.md size check in a single <code>ctx_batch_execute</code> call — only a one-line summary enters the conversation
-- When context-mode is absent: existing inline file-read behavior unchanged</p>
-<p><strong>Changes to <code>commands/update-graph.md</code>:</strong>
-- Added three-tier fallback based on lesson count and context-mode availability:
-  1. ≥10 lessons AND context-mode available → <code>ctx_execute_file</code> per lesson (sandboxed reads)
-  2. ≥10 lessons, no context-mode → delegate to <code>knowledge-extractor</code> subagent
-  3. &lt;10 lessons → direct Read (unchanged)</p>
+<p><strong>Key design principle:</strong> The integration must be invisible to users who don&#x27;t have context-mode. No configuration, no errors, no degraded behavior — just a transparent optimization.</p>
+<p><strong>Changes to <code>commands/sync-all.md</code>:</strong></p>
+<ul>
+<li class="">Added Step 0 detection block before the main sync loop</li>
+<li class="">When context-mode is available: wraps the lesson scan and MEMORY.md size check in a single <code>ctx_batch_execute</code> call — only a one-line summary enters the conversation</li>
+<li class="">When context-mode is absent: existing inline file-read behavior unchanged</li>
+</ul>
+<p><strong>Changes to <code>commands/update-graph.md</code>:</strong></p>
+<ul>
+<li class="">Added three-tier fallback based on lesson count and context-mode availability:
+<ol>
+<li class="">≥10 lessons AND context-mode available → <code>ctx_execute_file</code> per lesson (sandboxed reads)</li>
+<li class="">≥10 lessons, no context-mode → delegate to <code>knowledge-extractor</code> subagent</li>
+<li class="">&lt;10 lessons → direct Read (unchanged)</li>
+</ol>
+</li>
+</ul>
 <p><strong>Result:</strong> Users with context-mode installed get significantly cleaner conversations during large syncs. Users without it see no change.</p>
 <hr>
-<h3 id="solution-2-native-fts5-search-v012">Solution 2: Native FTS5 Search (v0.1.2)<a class="headerlink" href="#solution-2-native-fts5-search-v012" title="Permanent link">¶</a></h3>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="solution-2-native-fts5-search-v012">Solution 2: Native FTS5 Search (v0.1.2)<a href="#solution-2-native-fts5-search-v012" class="hash-link" aria-label="Direct link to Solution 2: Native FTS5 Search (v0.1.2)" title="Direct link to Solution 2: Native FTS5 Search (v0.1.2)" translate="no">​</a></h3>
 <p><strong>Approach:</strong> Add a SQLite FTS5 index at <code>{kg-root}/.fts5.db</code>. <code>kg_search</code> checks for this file first; if present, queries the index for BM25-ranked results. If absent or on error, falls back to the existing linear scan. The index is built and maintained by a new <code>kg_fts5_rebuild</code> MCP tool.</p>
-<h4 id="package-selection-why-node-sqlite3-wasm">Package Selection: Why node-sqlite3-wasm<a class="headerlink" href="#package-selection-why-node-sqlite3-wasm" title="Permanent link">¶</a></h4>
-<p>Three packages were evaluated. The selection was constrained by kmgraph's zero-config install requirement: the SessionStart hook runs <code>npm install --omit=dev</code> automatically, and any package requiring native C++ compilation would fail on machines without build tools.</p>
-<table>
-<thead>
-<tr>
-<th>Package</th>
-<th>FTS5</th>
-<th>API Style</th>
-<th>Compilation</th>
-<th>Verdict</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>better-sqlite3</code></td>
-<td>✅</td>
-<td>Synchronous</td>
-<td>Native C++ — requires python3, make, compiler</td>
-<td>❌ Rejected</td>
-</tr>
-<tr>
-<td><code>sql.js</code></td>
-<td>❌</td>
-<td>Synchronous</td>
-<td>WASM — no native compilation</td>
-<td>❌ Rejected (FTS3 only)</td>
-</tr>
-<tr>
-<td><code>@sqlite.org/sqlite-wasm</code></td>
-<td>✅</td>
-<td>Async</td>
-<td>WASM — no native compilation</td>
-<td>❌ Rejected (ESM-only)</td>
-</tr>
-<tr>
-<td><code>node-sqlite3-wasm</code></td>
-<td>✅</td>
-<td>Synchronous</td>
-<td>WASM — no native compilation</td>
-<td>✅ Chosen</td>
-</tr>
-</tbody>
-</table>
-<p><strong>sql.js failure (confirmed in testing):</strong>
-</p><div class="highlight"><pre><span></span><code><span class="c1">-- This fails at runtime with sql.js:</span>
-<span class="k">CREATE</span><span class="w"> </span><span class="n">VIRTUAL</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">test</span><span class="w"> </span><span class="k">USING</span><span class="w"> </span><span class="n">fts5</span><span class="p">(</span><span class="n">content</span><span class="p">);</span>
-<span class="c1">-- Error: "no such module: fts5"</span>
-</code></pre></div>
-sql.js ships with FTS3 compiled in, not FTS5. This was discovered by running the CREATE TABLE statement — not from documentation.<p></p>
+<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="package-selection-why-node-sqlite3-wasm">Package Selection: Why node-sqlite3-wasm<a href="#package-selection-why-node-sqlite3-wasm" class="hash-link" aria-label="Direct link to Package Selection: Why node-sqlite3-wasm" title="Direct link to Package Selection: Why node-sqlite3-wasm" translate="no">​</a></h4>
+<p>Three packages were evaluated. The selection was constrained by kmgraph&#x27;s zero-config install requirement: the SessionStart hook runs <code>npm install --omit=dev</code> automatically, and any package requiring native C++ compilation would fail on machines without build tools.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Package</th><th>FTS5</th><th>API Style</th><th>Compilation</th><th>Verdict</th></tr></thead><tbody><tr><td><code>better-sqlite3</code></td><td>✅</td><td>Synchronous</td><td>Native C++ — requires python3, make, compiler</td><td>❌ Rejected</td></tr><tr><td><code>sql.js</code></td><td>❌</td><td>Synchronous</td><td>WASM — no native compilation</td><td>❌ Rejected (FTS3 only)</td></tr><tr><td><code>@sqlite.org/sqlite-wasm</code></td><td>✅</td><td>Async</td><td>WASM — no native compilation</td><td>❌ Rejected (ESM-only)</td></tr><tr><td><code>node-sqlite3-wasm</code></td><td>✅</td><td>Synchronous</td><td>WASM — no native compilation</td><td>✅ Chosen</td></tr></tbody></table>
+<p><strong>sql.js failure (confirmed in testing):</strong></p>
+<div class="language-sql codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-sql codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token comment" style="color:rgb(98, 114, 164)">-- This fails at runtime with sql.js:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">CREATE</span><span class="token plain"> VIRTUAL </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">TABLE</span><span class="token plain"> test </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">USING</span><span class="token plain"> fts5</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">content</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token comment" style="color:rgb(98, 114, 164)">-- Error: &quot;no such module: fts5&quot;</span><br></span></code></pre></div></div>
+<p>sql.js ships with FTS3 compiled in, not FTS5. This was discovered by running the CREATE TABLE statement — not from documentation.</p>
 <p><strong>@sqlite.org/sqlite-wasm rejection:</strong>
-The official SQLite WASM package uses ESM (<code>import</code>/<code>export</code>). The MCP server package.json has <code>"type": "commonjs"</code>. ESM-only packages cannot be used in a CommonJS module. Rejected without testing.</p>
-<p><strong>node-sqlite3-wasm selection:</strong>
-- WASM-compiled SQLite with FTS5 + BM25 enabled
-- Synchronous API (no async init, no <code>db.export()</code> serialization)
-- Persistent file-based database (reads/writes directly to <code>.fts5.db</code>)
-- CommonJS-compatible
-- Single npm dependency, ~3MB</p>
-<p><strong>API pattern used:</strong>
-</p><div class="highlight"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">db</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Database</span><span class="p">(</span><span class="s1">'/path/to/file.db'</span><span class="p">);</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">db</span><span class="p">.</span><span class="nx">all</span><span class="p">(</span>
-<span class="w">  </span><span class="sb">`SELECT file_path, section_heading, content, bm25(kg_entries) as rank</span>
-<span class="sb">   FROM kg_entries WHERE kg_entries MATCH ? ORDER BY rank LIMIT 50`</span><span class="p">,</span>
-<span class="w">  </span><span class="p">[</span><span class="nx">sanitizedQuery</span><span class="p">]</span>
-<span class="p">);</span>
-<span class="nx">db</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span>
-</code></pre></div><p></p>
-<h4 id="zero-config-upgrade-mechanism">Zero-Config Upgrade Mechanism<a class="headerlink" href="#zero-config-upgrade-mechanism" title="Permanent link">¶</a></h4>
+The official SQLite WASM package uses ESM (<code>import</code>/<code>export</code>). The MCP server package.json has <code>&quot;type&quot;: &quot;commonjs&quot;</code>. ESM-only packages cannot be used in a CommonJS module. Rejected without testing.</p>
+<p><strong>node-sqlite3-wasm selection:</strong></p>
+<ul>
+<li class="">WASM-compiled SQLite with FTS5 + BM25 enabled</li>
+<li class="">Synchronous API (no async init, no <code>db.export()</code> serialization)</li>
+<li class="">Persistent file-based database (reads/writes directly to <code>.fts5.db</code>)</li>
+<li class="">CommonJS-compatible</li>
+<li class="">Single npm dependency, ~3MB</li>
+</ul>
+<p><strong>API pattern used:</strong></p>
+<div class="language-typescript codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-typescript codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">const</span><span class="token plain"> db </span><span class="token operator">=</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">new</span><span class="token plain"> </span><span class="token class-name">Database</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token string" style="color:rgb(255, 121, 198)">&#x27;/path/to/file.db&#x27;</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">const</span><span class="token plain"> rows </span><span class="token operator">=</span><span class="token plain"> db</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token function" style="color:rgb(80, 250, 123)">all</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token template-string template-punctuation string" style="color:rgb(255, 121, 198)">`</span><span class="token template-string string" style="color:rgb(255, 121, 198)">SELECT file_path, section_heading, content, bm25(kg_entries) as rank</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token template-string string" style="color:rgb(255, 121, 198)">   FROM kg_entries WHERE kg_entries MATCH ? ORDER BY rank LIMIT 50</span><span class="token template-string template-punctuation string" style="color:rgb(255, 121, 198)">`</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token punctuation" style="color:rgb(248, 248, 242)">[</span><span class="token plain">sanitizedQuery</span><span class="token punctuation" style="color:rgb(248, 248, 242)">]</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">db</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token function" style="color:rgb(80, 250, 123)">close</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><br></span></code></pre></div></div>
+<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="zero-config-upgrade-mechanism">Zero-Config Upgrade Mechanism<a href="#zero-config-upgrade-mechanism" class="hash-link" aria-label="Direct link to Zero-Config Upgrade Mechanism" title="Direct link to Zero-Config Upgrade Mechanism" translate="no">​</a></h4>
 <p><strong>Problem:</strong> Existing v0.1.0 users have <code>node_modules/@modelcontextprotocol</code> already installed. The SessionStart hook only triggered <code>npm install</code> when that folder was absent. Adding <code>node-sqlite3-wasm</code> as a new dependency would never be installed for existing users.</p>
 <p><strong>Solution:</strong> Store an md5 hash of <code>package.json</code> in <code>node_modules/.pkg-installed-hash</code> after each successful install. On every session start, recompute the hash. If it differs, trigger <code>npm install</code> again.</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># In hooks-master.sh:</span>
-<span class="nv">MCP_PKG_HASH_FILE</span><span class="o">=</span><span class="s2">"</span><span class="nv">$PLUGIN_ROOT</span><span class="s2">/mcp-server/node_modules/.pkg-installed-hash"</span>
-
-<span class="k">if</span><span class="w"> </span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>md5sum<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="nv">CURRENT_HASH</span><span class="o">=</span><span class="k">$(</span>md5sum<span class="w"> </span><span class="s2">"</span><span class="nv">$MCP_PKG_JSON</span><span class="s2">"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="s1">' '</span><span class="w"> </span>-f1<span class="k">)</span>
-<span class="k">elif</span><span class="w"> </span><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>md5<span class="w"> </span><span class="p">&amp;</span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="nv">CURRENT_HASH</span><span class="o">=</span><span class="k">$(</span>md5<span class="w"> </span>-q<span class="w"> </span><span class="s2">"</span><span class="nv">$MCP_PKG_JSON</span><span class="s2">"</span><span class="k">)</span>
-<span class="k">fi</span>
-<span class="nv">STORED_HASH</span><span class="o">=</span><span class="k">$(</span>cat<span class="w"> </span><span class="s2">"</span><span class="nv">$MCP_PKG_HASH_FILE</span><span class="s2">"</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">""</span><span class="k">)</span>
-
-<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">"</span><span class="nv">$CURRENT_HASH</span><span class="s2">"</span><span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">"</span><span class="nv">$CURRENT_HASH</span><span class="s2">"</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">"</span><span class="nv">$STORED_HASH</span><span class="s2">"</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="nv">NEEDS_INSTALL</span><span class="o">=</span><span class="nb">true</span>
-<span class="k">fi</span>
-
-<span class="c1"># After successful install:</span>
-<span class="nb">echo</span><span class="w"> </span><span class="s2">"</span><span class="nv">$CURRENT_HASH</span><span class="s2">"</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="nv">$MCP_PKG_HASH_FILE</span><span class="s2">"</span>
-</code></pre></div>
-<p><strong>Result:</strong> Any future dependency change in <code>package.json</code> automatically triggers re-install on the user's next session start. No user action required.</p>
-<h4 id="graceful-fallback-for-optional-dependencies">Graceful Fallback for Optional Dependencies<a class="headerlink" href="#graceful-fallback-for-optional-dependencies" title="Permanent link">¶</a></h4>
-<p><strong>Problem:</strong> <code>node-sqlite3-wasm</code> is installed by the SessionStart hook at first run. Between upgrading the plugin and the first session restart, the package does not exist. A hard <code>import { Database } from "node-sqlite3-wasm"</code> at module load would crash the MCP server.</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain"># In hooks-master.sh:</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">MCP_PKG_HASH_FILE=&quot;$PLUGIN_ROOT/mcp-server/node_modules/.pkg-installed-hash&quot;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">if command -v md5sum &amp;&gt; /dev/null; then</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    CURRENT_HASH=$(md5sum &quot;$MCP_PKG_JSON&quot; | cut -d&#x27; &#x27; -f1)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">elif command -v md5 &amp;&gt; /dev/null; then</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    CURRENT_HASH=$(md5 -q &quot;$MCP_PKG_JSON&quot;)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">fi</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">STORED_HASH=$(cat &quot;$MCP_PKG_HASH_FILE&quot; 2&gt;/dev/null || echo &quot;&quot;)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">if [ -n &quot;$CURRENT_HASH&quot; ] &amp;&amp; [ &quot;$CURRENT_HASH&quot; != &quot;$STORED_HASH&quot; ]; then</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    NEEDS_INSTALL=true</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">fi</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># After successful install:</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">echo &quot;$CURRENT_HASH&quot; &gt; &quot;$MCP_PKG_HASH_FILE&quot;</span><br></span></code></pre></div></div>
+<p><strong>Result:</strong> Any future dependency change in <code>package.json</code> automatically triggers re-install on the user&#x27;s next session start. No user action required.</p>
+<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="graceful-fallback-for-optional-dependencies">Graceful Fallback for Optional Dependencies<a href="#graceful-fallback-for-optional-dependencies" class="hash-link" aria-label="Direct link to Graceful Fallback for Optional Dependencies" title="Direct link to Graceful Fallback for Optional Dependencies" translate="no">​</a></h4>
+<p><strong>Problem:</strong> <code>node-sqlite3-wasm</code> is installed by the SessionStart hook at first run. Between upgrading the plugin and the first session restart, the package does not exist. A hard <code>import { Database } from &quot;node-sqlite3-wasm&quot;</code> at module load would crash the MCP server.</p>
 <p><strong>Solution:</strong> Replace the static import with a <code>try/require</code> pattern. Guard all FTS5 operations with a boolean flag.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Before (crashes MCP server if package absent):</span>
-<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Database</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s2">"node-sqlite3-wasm"</span><span class="p">;</span>
-
-<span class="c1">// After (graceful — MCP server starts normally):</span>
-<span class="kd">let</span><span class="w"> </span><span class="nx">Database</span><span class="o">:</span><span class="w"> </span><span class="kt">any</span><span class="p">;</span>
-<span class="kd">let</span><span class="w"> </span><span class="nx">fts5Available</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
-<span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="nx">Database</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s2">"node-sqlite3-wasm"</span><span class="p">).</span><span class="nx">Database</span><span class="p">;</span>
-<span class="w">  </span><span class="nx">fts5Available</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
-<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="c1">// node-sqlite3-wasm not installed yet — FTS5 disabled until next restart</span>
-<span class="p">}</span>
-</code></pre></div>
+<div class="language-typescript codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-typescript codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token comment" style="color:rgb(98, 114, 164)">// Before (crashes MCP server if package absent):</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">import</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"> Database </span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">from</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">&quot;node-sqlite3-wasm&quot;</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token comment" style="color:rgb(98, 114, 164)">// After (graceful — MCP server starts normally):</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">let</span><span class="token plain"> Database</span><span class="token operator">:</span><span class="token plain"> </span><span class="token builtin" style="color:rgb(189, 147, 249)">any</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">let</span><span class="token plain"> fts5Available </span><span class="token operator">=</span><span class="token plain"> </span><span class="token boolean">false</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">try</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  Database </span><span class="token operator">=</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">require</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token string" style="color:rgb(255, 121, 198)">&quot;node-sqlite3-wasm&quot;</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain">Database</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  fts5Available </span><span class="token operator">=</span><span class="token plain"> </span><span class="token boolean">true</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">catch</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token comment" style="color:rgb(98, 114, 164)">// node-sqlite3-wasm not installed yet — FTS5 disabled until next restart</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><br></span></code></pre></div></div>
 <p><strong>TypeScript complication (TS2749):</strong>
-After switching to <code>let Database: any</code>, the original function signatures used <code>Database</code> as a type:
-</p><div class="highlight"><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">initDb</span><span class="p">(</span><span class="nx">db</span><span class="o">:</span><span class="w"> </span><span class="kt">Database</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="ow">void</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span><span class="w">     </span><span class="c1">// TS2749: 'Database' refers to a value</span>
-<span class="kd">function</span><span class="w"> </span><span class="nx">indexFile</span><span class="p">(</span><span class="nx">db</span><span class="o">:</span><span class="w"> </span><span class="kt">Database</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="c1">// TS2749: same error</span>
-</code></pre></div>
-TypeScript cannot use a runtime <code>let</code> variable as a type annotation. Fix: change parameter types to <code>any</code>:
-<div class="highlight"><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">initDb</span><span class="p">(</span><span class="nx">db</span><span class="o">:</span><span class="w"> </span><span class="kt">any</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="ow">void</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
-<span class="kd">function</span><span class="w"> </span><span class="nx">indexFile</span><span class="p">(</span><span class="nx">db</span><span class="o">:</span><span class="w"> </span><span class="kt">any</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span><span class="o">:</span><span class="w"> </span><span class="kt">number</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
-</code></pre></div><p></p>
-<p><strong>Behavioral result:</strong>
-- If FTS5 unavailable: <code>kg_search</code> returns <code>[]</code> from <code>searchFts5</code>, falls back to linear scan
-- If FTS5 unavailable: <code>kg_fts5_rebuild</code> returns a helpful message asking user to restart
-- MCP server starts cleanly regardless of whether <code>node-sqlite3-wasm</code> is installed</p>
-<hr>
-<h2 id="verification">Verification<a class="headerlink" href="#verification" title="Permanent link">¶</a></h2>
-<h3 id="context-mode-integration">Context-Mode Integration<a class="headerlink" href="#context-mode-integration" title="Permanent link">¶</a></h3>
+After switching to <code>let Database: any</code>, the original function signatures used <code>Database</code> as a type:</p>
+<div class="language-typescript codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-typescript codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">function</span><span class="token plain"> </span><span class="token function" style="color:rgb(80, 250, 123)">initDb</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">db</span><span class="token operator">:</span><span class="token plain"> Database</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token operator">:</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">void</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"> </span><span class="token operator">...</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><span class="token plain">     </span><span class="token comment" style="color:rgb(98, 114, 164)">// TS2749: &#x27;Database&#x27; refers to a value</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">function</span><span class="token plain"> </span><span class="token function" style="color:rgb(80, 250, 123)">indexFile</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">db</span><span class="token operator">:</span><span class="token plain"> Database</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> </span><span class="token operator">...</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token operator">:</span><span class="token plain"> </span><span class="token builtin" style="color:rgb(189, 147, 249)">number</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"> </span><span class="token operator">...</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><span class="token plain"> </span><span class="token comment" style="color:rgb(98, 114, 164)">// TS2749: same error</span><br></span></code></pre></div></div>
+<p>TypeScript cannot use a runtime <code>let</code> variable as a type annotation. Fix: change parameter types to <code>any</code>:</p>
+<div class="language-typescript codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-typescript codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">function</span><span class="token plain"> </span><span class="token function" style="color:rgb(80, 250, 123)">initDb</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">db</span><span class="token operator">:</span><span class="token plain"> </span><span class="token builtin" style="color:rgb(189, 147, 249)">any</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token operator">:</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">void</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"> </span><span class="token operator">...</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">function</span><span class="token plain"> </span><span class="token function" style="color:rgb(80, 250, 123)">indexFile</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">db</span><span class="token operator">:</span><span class="token plain"> </span><span class="token builtin" style="color:rgb(189, 147, 249)">any</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> </span><span class="token operator">...</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token operator">:</span><span class="token plain"> </span><span class="token builtin" style="color:rgb(189, 147, 249)">number</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"> </span><span class="token operator">...</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><br></span></code></pre></div></div>
+<p><strong>Behavioral result:</strong></p>
 <ul>
-<li>Manual test: <code>sync-all</code> completes with identical results with and without context-mode</li>
-<li>Manual test: <code>update-graph</code> reads files in background when context-mode present and ≥10 lessons</li>
-<li>Detection failure test: context-mode absent → existing behavior, no errors</li>
-</ul>
-<h3 id="fts5-search">FTS5 Search<a class="headerlink" href="#fts5-search" title="Permanent link">¶</a></h3>
-<ul>
-<li>10 unit tests in <code>mcp-server/tests/fts5.test.ts</code> — all passing:</li>
-<li><code>sanitizeFts5Query</code>: strips operators, handles empty input</li>
-<li><code>indexFile</code>: parses frontmatter title, headings, body into correct rows</li>
-<li><code>rebuildIndex</code>: skips unchanged files, re-indexes modified files, removes deleted files</li>
-<li><code>searchFts5</code>: returns correct shape, handles empty query</li>
-<li>Corrupt database: <code>searchFts5</code> throws on corrupt <code>.fts5.db</code> (does not silently return empty)</li>
-<li>Build verification: <code>npm run build</code> zero errors after TS2749 fix</li>
+<li class="">If FTS5 unavailable: <code>kg_search</code> returns <code>[]</code> from <code>searchFts5</code>, falls back to linear scan</li>
+<li class="">If FTS5 unavailable: <code>kg_fts5_rebuild</code> returns a helpful message asking user to restart</li>
+<li class="">MCP server starts cleanly regardless of whether <code>node-sqlite3-wasm</code> is installed</li>
 </ul>
 <hr>
-<h2 id="prevention-system">Prevention System<a class="headerlink" href="#prevention-system" title="Permanent link">¶</a></h2>
-<p><strong>Dependency upgrade pattern (for future MCP server deps):</strong>
-1. Add hash check to <code>hooks-master.sh</code> — already in place, covers all future <code>package.json</code> changes
-2. Use <code>try/require</code> for any optional or first-run dependency
-3. Change type annotations from the loaded class to <code>any</code> in any function that receives the instance
-4. Add a <code>fooAvailable</code> boolean guard at module level
-5. Add unit tests that run with the real package (not mocked) to catch API changes early</p>
-<p><strong>Plugin integration pattern (for future optional companion plugins):</strong>
-1. Check tool availability at runtime, not install-time
-2. All integration paths must have a fallback that preserves existing behavior
-3. Document detection mechanism in comments — it is not obvious to future maintainers
-4. Add a plain-language note in user docs: "activates automatically when X is installed"</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="verification">Verification<a href="#verification" class="hash-link" aria-label="Direct link to Verification" title="Direct link to Verification" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="context-mode-integration">Context-Mode Integration<a href="#context-mode-integration" class="hash-link" aria-label="Direct link to Context-Mode Integration" title="Direct link to Context-Mode Integration" translate="no">​</a></h3>
+<ul>
+<li class="">Manual test: <code>sync-all</code> completes with identical results with and without context-mode</li>
+<li class="">Manual test: <code>update-graph</code> reads files in background when context-mode present and ≥10 lessons</li>
+<li class="">Detection failure test: context-mode absent → existing behavior, no errors</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="fts5-search">FTS5 Search<a href="#fts5-search" class="hash-link" aria-label="Direct link to FTS5 Search" title="Direct link to FTS5 Search" translate="no">​</a></h3>
+<ul>
+<li class="">10 unit tests in <code>mcp-server/tests/fts5.test.ts</code> — all passing:
+<ul>
+<li class=""><code>sanitizeFts5Query</code>: strips operators, handles empty input</li>
+<li class=""><code>indexFile</code>: parses frontmatter title, headings, body into correct rows</li>
+<li class=""><code>rebuildIndex</code>: skips unchanged files, re-indexes modified files, removes deleted files</li>
+<li class=""><code>searchFts5</code>: returns correct shape, handles empty query</li>
+<li class="">Corrupt database: <code>searchFts5</code> throws on corrupt <code>.fts5.db</code> (does not silently return empty)</li>
+</ul>
+</li>
+<li class="">Build verification: <code>npm run build</code> zero errors after TS2749 fix</li>
+</ul>
 <hr>
-<h2 id="replication-pattern">Replication Pattern<a class="headerlink" href="#replication-pattern" title="Permanent link">¶</a></h2>
-<h3 id="pattern-zero-config-dependency-upgrade-in-a-shell-hook-managed-npm-project">Pattern: Zero-Config Dependency Upgrade in a Shell-Hook-Managed npm Project<a class="headerlink" href="#pattern-zero-config-dependency-upgrade-in-a-shell-hook-managed-npm-project" title="Permanent link">¶</a></h3>
-<p><strong>When to apply:</strong>
-- A Node.js project whose dependencies are managed by a shell script (e.g., a Claude Code hook)
-- The script checks for existing <code>node_modules</code> but does not re-run on dependency changes
-- A new dependency is being added in an upgrade</p>
-<p><strong>Universal pattern:</strong>
-1. Compute a hash of <code>package.json</code> (use <code>md5sum</code> on Linux, <code>md5 -q</code> on macOS — check both)
-2. Store the hash in <code>node_modules/.pkg-installed-hash</code> after a successful install
-3. On each hook run, compare current hash to stored hash; re-run install if they differ
-4. Handle the "hash tool not available" case gracefully (skip comparison, don't re-install)</p>
-<p><strong>Customization points:</strong>
-- Hash file location (any path inside <code>node_modules/</code> works)
-- Hash tool detection (<code>md5sum</code> vs <code>md5</code> vs <code>sha256sum</code>)
-- Error handling strategy for failed installs</p>
-<hr>
-<h3 id="pattern-graceful-fallback-for-optional-npm-dependencies-in-a-typescript-mcp-server">Pattern: Graceful Fallback for Optional npm Dependencies in a TypeScript MCP Server<a class="headerlink" href="#pattern-graceful-fallback-for-optional-npm-dependencies-in-a-typescript-mcp-server" title="Permanent link">¶</a></h3>
-<p><strong>When to apply:</strong>
-- An MCP server gains a new optional feature backed by an npm package
-- The package may not be present at startup (first-run, pending install, upgrade in progress)
-- The feature should degrade gracefully, not crash the server</p>
-<p><strong>Universal pattern:</strong>
-</p><div class="highlight"><pre><span></span><code><span class="kd">let</span><span class="w"> </span><span class="nx">OptionalLib</span><span class="o">:</span><span class="w"> </span><span class="kt">any</span><span class="p">;</span>
-<span class="kd">let</span><span class="w"> </span><span class="nx">featureAvailable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
-<span class="k">try</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="nx">OptionalLib</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s2">"optional-package"</span><span class="p">).</span><span class="nx">ClassName</span><span class="p">;</span>
-<span class="w">  </span><span class="nx">featureAvailable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
-<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="c1">// Package not installed yet — feature disabled</span>
-<span class="p">}</span>
-
-<span class="c1">// Guard all usage:</span>
-<span class="k">export</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">doFeatureThing</span><span class="p">(...)</span><span class="o">:</span><span class="w"> </span><span class="nx">ReturnType</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">featureAvailable</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">defaultFallback</span><span class="p">;</span><span class="w"> </span><span class="c1">// or throw descriptive error</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">OptionalLib</span><span class="p">(</span><span class="nx">args</span><span class="p">);</span>
-<span class="w">  </span><span class="c1">// ...</span>
-<span class="p">}</span>
-</code></pre></div><p></p>
-<p><strong>TypeScript note:</strong> Any function that accepts an instance of the dynamically-loaded class must use <code>any</code> for that parameter's type, since the class is a runtime value, not a compile-time type.</p>
-<hr>
-<h2 id="what-didnt-work">What Didn't Work<a class="headerlink" href="#what-didnt-work" title="Permanent link">¶</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="prevention-system">Prevention System<a href="#prevention-system" class="hash-link" aria-label="Direct link to Prevention System" title="Direct link to Prevention System" translate="no">​</a></h2>
+<p><strong>Dependency upgrade pattern (for future MCP server deps):</strong></p>
 <ol>
-<li>
+<li class="">Add hash check to <code>hooks-master.sh</code> — already in place, covers all future <code>package.json</code> changes</li>
+<li class="">Use <code>try/require</code> for any optional or first-run dependency</li>
+<li class="">Change type annotations from the loaded class to <code>any</code> in any function that receives the instance</li>
+<li class="">Add a <code>fooAvailable</code> boolean guard at module level</li>
+<li class="">Add unit tests that run with the real package (not mocked) to catch API changes early</li>
+</ol>
+<p><strong>Plugin integration pattern (for future optional companion plugins):</strong></p>
+<ol>
+<li class="">Check tool availability at runtime, not install-time</li>
+<li class="">All integration paths must have a fallback that preserves existing behavior</li>
+<li class="">Document detection mechanism in comments — it is not obvious to future maintainers</li>
+<li class="">Add a plain-language note in user docs: &quot;activates automatically when X is installed&quot;</li>
+</ol>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="replication-pattern">Replication Pattern<a href="#replication-pattern" class="hash-link" aria-label="Direct link to Replication Pattern" title="Direct link to Replication Pattern" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="pattern-zero-config-dependency-upgrade-in-a-shell-hook-managed-npm-project">Pattern: Zero-Config Dependency Upgrade in a Shell-Hook-Managed npm Project<a href="#pattern-zero-config-dependency-upgrade-in-a-shell-hook-managed-npm-project" class="hash-link" aria-label="Direct link to Pattern: Zero-Config Dependency Upgrade in a Shell-Hook-Managed npm Project" title="Direct link to Pattern: Zero-Config Dependency Upgrade in a Shell-Hook-Managed npm Project" translate="no">​</a></h3>
+<p><strong>When to apply:</strong></p>
+<ul>
+<li class="">A Node.js project whose dependencies are managed by a shell script (e.g., a Claude Code hook)</li>
+<li class="">The script checks for existing <code>node_modules</code> but does not re-run on dependency changes</li>
+<li class="">A new dependency is being added in an upgrade</li>
+</ul>
+<p><strong>Universal pattern:</strong></p>
+<ol>
+<li class="">Compute a hash of <code>package.json</code> (use <code>md5sum</code> on Linux, <code>md5 -q</code> on macOS — check both)</li>
+<li class="">Store the hash in <code>node_modules/.pkg-installed-hash</code> after a successful install</li>
+<li class="">On each hook run, compare current hash to stored hash; re-run install if they differ</li>
+<li class="">Handle the &quot;hash tool not available&quot; case gracefully (skip comparison, don&#x27;t re-install)</li>
+</ol>
+<p><strong>Customization points:</strong></p>
+<ul>
+<li class="">Hash file location (any path inside <code>node_modules/</code> works)</li>
+<li class="">Hash tool detection (<code>md5sum</code> vs <code>md5</code> vs <code>sha256sum</code>)</li>
+<li class="">Error handling strategy for failed installs</li>
+</ul>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="pattern-graceful-fallback-for-optional-npm-dependencies-in-a-typescript-mcp-server">Pattern: Graceful Fallback for Optional npm Dependencies in a TypeScript MCP Server<a href="#pattern-graceful-fallback-for-optional-npm-dependencies-in-a-typescript-mcp-server" class="hash-link" aria-label="Direct link to Pattern: Graceful Fallback for Optional npm Dependencies in a TypeScript MCP Server" title="Direct link to Pattern: Graceful Fallback for Optional npm Dependencies in a TypeScript MCP Server" translate="no">​</a></h3>
+<p><strong>When to apply:</strong></p>
+<ul>
+<li class="">An MCP server gains a new optional feature backed by an npm package</li>
+<li class="">The package may not be present at startup (first-run, pending install, upgrade in progress)</li>
+<li class="">The feature should degrade gracefully, not crash the server</li>
+</ul>
+<p><strong>Universal pattern:</strong></p>
+<div class="language-typescript codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-typescript codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">let</span><span class="token plain"> OptionalLib</span><span class="token operator">:</span><span class="token plain"> </span><span class="token builtin" style="color:rgb(189, 147, 249)">any</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">let</span><span class="token plain"> featureAvailable </span><span class="token operator">=</span><span class="token plain"> </span><span class="token boolean">false</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">try</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  OptionalLib </span><span class="token operator">=</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">require</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token string" style="color:rgb(255, 121, 198)">&quot;optional-package&quot;</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain">ClassName</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  featureAvailable </span><span class="token operator">=</span><span class="token plain"> </span><span class="token boolean">true</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">catch</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token comment" style="color:rgb(98, 114, 164)">// Package not installed yet — feature disabled</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token comment" style="color:rgb(98, 114, 164)">// Guard all usage:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">export</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">function</span><span class="token plain"> </span><span class="token function" style="color:rgb(80, 250, 123)">doFeatureThing</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token operator">...</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token operator">:</span><span class="token plain"> ReturnType </span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">if</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token operator">!</span><span class="token plain">featureAvailable</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">return</span><span class="token plain"> defaultFallback</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"> </span><span class="token comment" style="color:rgb(98, 114, 164)">// or throw descriptive error</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">const</span><span class="token plain"> instance </span><span class="token operator">=</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">new</span><span class="token plain"> </span><span class="token class-name">OptionalLib</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">args</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token comment" style="color:rgb(98, 114, 164)">// ...</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><br></span></code></pre></div></div>
+<p><strong>TypeScript note:</strong> Any function that accepts an instance of the dynamically-loaded class must use <code>any</code> for that parameter&#x27;s type, since the class is a runtime value, not a compile-time type.</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="what-didnt-work">What Didn&#x27;t Work<a href="#what-didnt-work" class="hash-link" aria-label="Direct link to What Didn&#x27;t Work" title="Direct link to What Didn&#x27;t Work" translate="no">​</a></h2>
+<ol>
+<li class="">
 <p><strong>sql.js for FTS5</strong> — Documentation implies FTS support; testing proved only FTS3 is compiled in. Always run <code>CREATE VIRTUAL TABLE USING fts5(...)</code> as a smoke test before committing to a package.</p>
 </li>
-<li>
-<p><strong>@sqlite.org/sqlite-wasm</strong> — ESM-only. Cannot be used in a <code>"type": "commonjs"</code> package. Check ESM/CJS compatibility before evaluating a package's API.</p>
+<li class="">
+<p><strong>@sqlite.org/sqlite-wasm</strong> — ESM-only. Cannot be used in a <code>&quot;type&quot;: &quot;commonjs&quot;</code> package. Check ESM/CJS compatibility before evaluating a package&#x27;s API.</p>
 </li>
-<li>
+<li class="">
 <p><strong><code>npx jest</code> using global jest instead of local</strong> — In some environments, <code>npx jest</code> downloads a fresh global copy rather than using the local install. Use <code>node_modules/.bin/jest</code> directly when running tests from a specific project.</p>
 </li>
-<li>
+<li class="">
 <p><strong><code>npm install</code> skipping devDependencies</strong> — In some shell environments, bare <code>npm install</code> acts like production mode. Use <code>npm install --include=dev</code> explicitly when devDependencies are needed (e.g., for running tests).</p>
 </li>
-<li>
-<p><strong>Static import for an upgrade-added package</strong> — The first instinct was a clean <code>import { Database } from "node-sqlite3-wasm"</code>. This would have crashed the MCP server for any existing user on their first session after upgrading. The try/require pattern must be established before the package ships.</p>
+<li class="">
+<p><strong>Static import for an upgrade-added package</strong> — The first instinct was a clean <code>import { Database } from &quot;node-sqlite3-wasm&quot;</code>. This would have crashed the MCP server for any existing user on their first session after upgrading. The try/require pattern must be established before the package ships.</p>
 </li>
 </ol>
 <hr>
-<h2 id="lessons-takeaways">Lessons &amp; Takeaways<a class="headerlink" href="#lessons-takeaways" title="Permanent link">¶</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="lessons--takeaways">Lessons &amp; Takeaways<a href="#lessons--takeaways" class="hash-link" aria-label="Direct link to Lessons &amp; Takeaways" title="Direct link to Lessons &amp; Takeaways" translate="no">​</a></h2>
 <p><strong>Key Insights:</strong></p>
 <ol>
-<li>
-<p><strong>Zero-config is a constraint, not a feature</strong> — Every dependency decision must be evaluated against "will this install automatically on a user's machine without any tools?". Native compilation (better-sqlite3) fails this test. ESM-only packages fail this test in CommonJS projects. WASM packages with synchronous APIs pass.</p>
+<li class="">
+<p><strong>Zero-config is a constraint, not a feature</strong> — Every dependency decision must be evaluated against &quot;will this install automatically on a user&#x27;s machine without any tools?&quot;. Native compilation (better-sqlite3) fails this test. ESM-only packages fail this test in CommonJS projects. WASM packages with synchronous APIs pass.</p>
 </li>
-<li>
-<p><strong>Package documentation does not equal package behavior</strong> — sql.js says "FTS support" but ships FTS3. The only reliable test is to run the feature-specific SQL at development time.</p>
+<li class="">
+<p><strong>Package documentation does not equal package behavior</strong> — sql.js says &quot;FTS support&quot; but ships FTS3. The only reliable test is to run the feature-specific SQL at development time.</p>
 </li>
-<li>
-<p><strong>Hash-based change detection is the right primitive for hook-managed installs</strong> — Checking for a specific folder (like <code>node_modules/@modelcontextprotocol</code>) only detects "installed vs not installed". It misses the "installed but outdated" state that every upgrade creates. A package.json hash catches both.</p>
+<li class="">
+<p><strong>Hash-based change detection is the right primitive for hook-managed installs</strong> — Checking for a specific folder (like <code>node_modules/@modelcontextprotocol</code>) only detects &quot;installed vs not installed&quot;. It misses the &quot;installed but outdated&quot; state that every upgrade creates. A package.json hash catches both.</p>
 </li>
-<li>
-<p><strong>Try/require is the right pattern for optional MCP features</strong> — The MCP server must start cleanly even if a feature's package isn't installed yet. <code>try/require</code> with a boolean guard is idiomatic Node.js for this; the TypeScript implication (use <code>any</code> for types) is a small price.</p>
+<li class="">
+<p><strong>Try/require is the right pattern for optional MCP features</strong> — The MCP server must start cleanly even if a feature&#x27;s package isn&#x27;t installed yet. <code>try/require</code> with a boolean guard is idiomatic Node.js for this; the TypeScript implication (use <code>any</code> for types) is a small price.</p>
 </li>
-<li>
-<p><strong>Detection-based optional integrations are more resilient than configuration-based</strong> — Checking for a tool's availability at runtime (does <code>ctx_batch_execute</code> exist?) is more reliable than checking a config flag (is <code>context-mode: true</code> set?). The tool either works or it doesn't.</p>
+<li class="">
+<p><strong>Detection-based optional integrations are more resilient than configuration-based</strong> — Checking for a tool&#x27;s availability at runtime (does <code>ctx_batch_execute</code> exist?) is more reliable than checking a config flag (is <code>context-mode: true</code> set?). The tool either works or it doesn&#x27;t.</p>
 </li>
 </ol>
-<p><strong>What Worked:</strong>
-- Keeping both features independently fallback-safe — each can be absent without affecting the other
-- Writing unit tests for the FTS5 module before merging (caught the TS2749 error early)
-- Separating the "install the package" problem from the "use the package" problem in hooks-master.sh</p>
-<p><strong>If We Had to Do It Again:</strong>
-- Evaluate WASM SQLite packages first when native compilation is off the table
-- Run a smoke test (FTS5 CREATE TABLE) earlier in package evaluation to avoid going deep on sql.js
-- Add the hash check to hooks-master.sh at the same time as adding the first npm dependency, not reactively when a second one appears</p>
-<hr>
-<h2 id="related-adrs">Related ADRs<a class="headerlink" href="#related-adrs" title="Permanent link">¶</a></h2>
+<p><strong>What Worked:</strong></p>
 <ul>
-<li><a href="../../../decisions/ADR-015-node-sqlite3-wasm-for-fts5-search/">ADR-015: Choose node-sqlite3-wasm for FTS5 Search</a></li>
-<li><a href="../../../decisions/ADR-016-graceful-fallback-optional-mcp-dependencies/">ADR-016: Graceful Fallback Pattern for Optional MCP Dependencies</a></li>
+<li class="">Keeping both features independently fallback-safe — each can be absent without affecting the other</li>
+<li class="">Writing unit tests for the FTS5 module before merging (caught the TS2749 error early)</li>
+<li class="">Separating the &quot;install the package&quot; problem from the &quot;use the package&quot; problem in hooks-master.sh</li>
+</ul>
+<p><strong>If We Had to Do It Again:</strong></p>
+<ul>
+<li class="">Evaluate WASM SQLite packages first when native compilation is off the table</li>
+<li class="">Run a smoke test (FTS5 CREATE TABLE) earlier in package evaluation to avoid going deep on sql.js</li>
+<li class="">Add the hash check to hooks-master.sh at the same time as adding the first npm dependency, not reactively when a second one appears</li>
 </ul>
 <hr>
-<h2 id="related-documentation">Related Documentation<a class="headerlink" href="#related-documentation" title="Permanent link">¶</a></h2>
-<p><strong>Architecture Decisions:</strong>
-- See ADR-015 and ADR-016 (created with this lesson)</p>
-<p><strong>Implementation:</strong>
-- <code>mcp-server/src/tools/fts5.ts</code> — FTS5 index management and search
-- <code>mcp-server/src/tools/search.ts</code> — <code>kg_search</code> with FTS5/linear-scan routing
-- <code>scripts/hooks-master.sh</code> — Zero-config upgrade via package.json hash check
-- <code>commands/sync-all.md</code> — Context-mode integration (Step 0)
-- <code>commands/update-graph.md</code> — Context-mode integration (three-tier fallback)</p>
-<p><strong>Tests:</strong>
-- <code>mcp-server/tests/fts5.test.ts</code> — 10 unit tests for FTS5 module</p>
-<p><strong>User Documentation:</strong>
-- <code>docs/CONCEPTS.md</code> — "Keeping the Conversation Focused", "How Search Works"
-- <code>docs/GETTING-STARTED.md</code> — Optional Features section
-- <code>docs/COMMAND-GUIDE.md</code> — Search Index section, Technical Details section</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="related-adrs">Related ADRs<a href="#related-adrs" class="hash-link" aria-label="Direct link to Related ADRs" title="Direct link to Related ADRs" translate="no">​</a></h2>
+<ul>
+<li class=""><a class="" href="/knowledge-graph/decisions/ADR-015-node-sqlite3-wasm-for-fts5-search">ADR-015: Choose node-sqlite3-wasm for FTS5 Search</a></li>
+<li class=""><a class="" href="/knowledge-graph/decisions/ADR-016-graceful-fallback-optional-mcp-dependencies">ADR-016: Graceful Fallback Pattern for Optional MCP Dependencies</a></li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="related-documentation">Related Documentation<a href="#related-documentation" class="hash-link" aria-label="Direct link to Related Documentation" title="Direct link to Related Documentation" translate="no">​</a></h2>
+<p><strong>Architecture Decisions:</strong></p>
+<ul>
+<li class="">See ADR-015 and ADR-016 (created with this lesson)</li>
+</ul>
+<p><strong>Implementation:</strong></p>
+<ul>
+<li class=""><code>mcp-server/src/tools/fts5.ts</code> — FTS5 index management and search</li>
+<li class=""><code>mcp-server/src/tools/search.ts</code> — <code>kg_search</code> with FTS5/linear-scan routing</li>
+<li class=""><code>scripts/hooks-master.sh</code> — Zero-config upgrade via package.json hash check</li>
+<li class=""><code>commands/sync-all.md</code> — Context-mode integration (Step 0)</li>
+<li class=""><code>commands/update-graph.md</code> — Context-mode integration (three-tier fallback)</li>
+</ul>
+<p><strong>Tests:</strong></p>
+<ul>
+<li class=""><code>mcp-server/tests/fts5.test.ts</code> — 10 unit tests for FTS5 module</li>
+</ul>
+<p><strong>User Documentation:</strong></p>
+<ul>
+<li class=""><code>docs/CONCEPTS.md</code> — &quot;Keeping the Conversation Focused&quot;, &quot;How Search Works&quot;</li>
+<li class=""><code>docs/GETTING-STARTED.md</code> — Optional Features section</li>
+<li class=""><code>docs/COMMAND-GUIDE.md</code> — Search Index section, Technical Details section</li>
+</ul>
 <hr>
 <p><strong>Version:</strong> 1.0
 <strong>Created:</strong> 2026-03-16
-<strong>Last Updated:</strong> 2026-03-16</p>
-
-
-
-
-
-
-
-  
-    
-  
-  
-    
-  
-
-
-  <aside class="md-source-file">
-    
-      
-  <span class="md-source-file__fact">
-    <span class="md-icon" title="Last update">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
-    </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="April 7, 2026 13:03:48 UTC">April 7, 2026</span>
-  </span>
-
-    
-    
-      
-  <span class="md-source-file__fact">
-    <span class="md-icon" title="Created">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"></path></svg>
-    </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="April 7, 2026 13:03:48 UTC">April 7, 2026</span>
-  </span>
-
-    
-    
-    
-  </aside>
-
-
-
-
-
-                
-              </article>
-            </div>
-          
-          
-<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
-        </div>
-        
-          <button type="button" class="md-top md-icon" data-md-component="top" hidden="">
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
-  Back to top
-</button>
-        
-      </main>
-      
-        <footer class="md-footer">
-  
-    
-  
-  <div class="md-footer-meta md-typeset">
-    <div class="md-footer-meta__inner md-grid">
-      <div class="md-copyright">
-  
-    <div class="md-copyright__highlight">
-      Staying in Sync
-    </div>
-  
-  
-    Made with
-    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-      Material for MkDocs
-    </a>
-  
-</div>
-      
-        
-<div class="md-social">
-  
-    
-    
-    
-    
-      
-      
-    
-    <a href="https://github.com/technomensch" target="_blank" rel="noopener" title="github.com" class="md-social__link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"></path></svg>
-    </a>
-  
-    
-    
-    
-    
-      
-      
-    
-    <a href="https://www.linkedin.com/in/marckaplan/" target="_blank" rel="noopener" title="www.linkedin.com" class="md-social__link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zM102.2 96a38.5 38.5 0 1 1 0 77 38.5 38.5 0 1 1 0-77m282.1 320h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"></path></svg>
-    </a>
-  
-    
-    
-    
-    
-      
-      
-    
-    <a href="https://buymeacoffee.com/technomensch" target="_blank" rel="noopener" title="buymeacoffee.com" class="md-social__link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="m241 87.1 15 20.7 15-20.7C296 52.5 336.2 32 378.9 32 452.4 32 512 91.6 512 165.1v2.6c0 112.2-139.9 242.5-212.9 298.2-12.4 9.4-27.6 14.1-43.1 14.1s-30.8-4.6-43.1-14.1C139.9 410.2 0 279.9 0 167.7v-2.6C0 91.6 59.6 32 133.1 32 175.8 32 216 52.5 241 87.1"></path></svg>
-    </a>
-  
-</div>
-      
-    </div>
-  </div>
-</footer>
-      
-    </div>
-    <div class="md-dialog" data-md-component="dialog">
-      <div class="md-dialog__inner md-typeset"></div>
-    </div>
-    
-    
-    
-      
-      
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.path", "navigation.footer", "search.highlight", "search.suggest", "search.share", "content.action.edit", "content.code.copy", "toc.integrate", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
-    
-    
-      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
-      
-    
-  
-<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
-document$.subscribe(()=>{ lightbox.reload(); });
-</script></body></html>
+<strong>Last Updated:</strong> 2026-03-16</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-tags-row"><div class="col"><b>Tags:</b><ul class="tags_jXut padding--none margin-left--sm"><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/knowledge-graph/tags/fts-5">fts5</a></li><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/knowledge-graph/tags/search">search</a></li><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/knowledge-graph/tags/sqlite">sqlite</a></li><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/knowledge-graph/tags/wasm">wasm</a></li><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/knowledge-graph/tags/context-mode">context-mode</a></li><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/knowledge-graph/tags/zero-config">zero-config</a></li><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/knowledge-graph/tags/upgrade">upgrade</a></li><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/knowledge-graph/tags/graceful-fallback">graceful-fallback</a></li><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/knowledge-graph/tags/typescript">typescript</a></li><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/knowledge-graph/tags/mcp-server">mcp-server</a></li></ul></div></div><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_WFHX"><a href="https://github.com/technomensch/knowledge-graph/edit/main/docs/lessons-learned/architecture/Lessons_Learned_FTS5_Search_And_Context_Mode_v0.1.1_v0.1.2.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_JAkA"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#problem" class="table-of-contents__link toc-highlight">Problem</a><ul><li><a href="#problem-1-conversation-flooding-v011" class="table-of-contents__link toc-highlight">Problem 1: Conversation Flooding (v0.1.1)</a></li><li><a href="#problem-2-slow-unranked-search-v012" class="table-of-contents__link toc-highlight">Problem 2: Slow, Unranked Search (v0.1.2)</a></li></ul></li><li><a href="#root-cause" class="table-of-contents__link toc-highlight">Root Cause</a><ul><li><a href="#problem-1-root-cause" class="table-of-contents__link toc-highlight">Problem 1 Root Cause</a></li><li><a href="#problem-2-root-cause" class="table-of-contents__link toc-highlight">Problem 2 Root Cause</a></li></ul></li><li><a href="#solution" class="table-of-contents__link toc-highlight">Solution</a><ul><li><a href="#solution-1-context-mode-integration-v011" class="table-of-contents__link toc-highlight">Solution 1: Context-Mode Integration (v0.1.1)</a></li><li><a href="#solution-2-native-fts5-search-v012" class="table-of-contents__link toc-highlight">Solution 2: Native FTS5 Search (v0.1.2)</a></li></ul></li><li><a href="#verification" class="table-of-contents__link toc-highlight">Verification</a><ul><li><a href="#context-mode-integration" class="table-of-contents__link toc-highlight">Context-Mode Integration</a></li><li><a href="#fts5-search" class="table-of-contents__link toc-highlight">FTS5 Search</a></li></ul></li><li><a href="#prevention-system" class="table-of-contents__link toc-highlight">Prevention System</a></li><li><a href="#replication-pattern" class="table-of-contents__link toc-highlight">Replication Pattern</a><ul><li><a href="#pattern-zero-config-dependency-upgrade-in-a-shell-hook-managed-npm-project" class="table-of-contents__link toc-highlight">Pattern: Zero-Config Dependency Upgrade in a Shell-Hook-Managed npm Project</a></li><li><a href="#pattern-graceful-fallback-for-optional-npm-dependencies-in-a-typescript-mcp-server" class="table-of-contents__link toc-highlight">Pattern: Graceful Fallback for Optional npm Dependencies in a TypeScript MCP Server</a></li></ul></li><li><a href="#what-didnt-work" class="table-of-contents__link toc-highlight">What Didn&#39;t Work</a></li><li><a href="#lessons--takeaways" class="table-of-contents__link toc-highlight">Lessons &amp; Takeaways</a></li><li><a href="#related-adrs" class="table-of-contents__link toc-highlight">Related ADRs</a></li><li><a href="#related-documentation" class="table-of-contents__link toc-highlight">Related Documentation</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Docs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/quickstart">Getting Started</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/COMMAND-GUIDE">Command Guide</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/CHEAT-SHEET">Cheat Sheet</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/FAQ">FAQ</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/technomensch/knowledge-graph" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://www.linkedin.com/in/marckaplan/" target="_blank" rel="noopener noreferrer" class="footer__link-item">LinkedIn<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://buymeacoffee.com/technomensch" target="_blank" rel="noopener noreferrer" class="footer__link-item">Buy Me a Coffee<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="margin-bottom--sm"><a href="https://github.com/technomensch/knowledge-graph" rel="noopener noreferrer" class="footerLogoLink_BH7S"><img src="/knowledge-graph/img/banner.jpeg" alt="Staying in Sync" class="footer__logo themedComponent_mlkZ themedComponent--light_NVdE" width="160"><img src="/knowledge-graph/img/banner.jpeg" alt="Staying in Sync" class="footer__logo themedComponent_mlkZ themedComponent--dark_xIcU" width="160"></a></div><div class="footer__copyright">Staying in Sync</div></div></div></footer></div>
+</body>
+</html>

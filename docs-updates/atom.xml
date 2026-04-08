@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://technomensch.github.io/knowledge-graph/docs-updates</id>
+    <title>KMGraph Docs Updates</title>
+    <updated>2026-04-08T00:00:00.000Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://technomensch.github.io/knowledge-graph/docs-updates"/>
+    <subtitle>Knowledge Management Graph Blog</subtitle>
+    <icon>https://technomensch.github.io/knowledge-graph/img/square.png</icon>
+    <entry>
+        <title type="html"><![CDATA[Documentation restructured — Diátaxis IA, search, demos]]></title>
+        <id>https://technomensch.github.io/knowledge-graph/docs-updates/2026/04/08/docusaurus-restructure</id>
+        <link href="https://technomensch.github.io/knowledge-graph/docs-updates/2026/04/08/docusaurus-restructure"/>
+        <updated>2026-04-08T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[The KMGraph documentation site has been fully restructured using the Diátaxis information architecture: Tutorials, How-to Guides, Reference, and Concepts. Every page now has a clear intent, and navigation reflects what you're trying to do — not internal feature groupings.]]></summary>
+        <content type="html"><![CDATA[<p>The KMGraph documentation site has been fully restructured using the <a href="https://diataxis.fr/" target="_blank" rel="noopener noreferrer" class="">Diátaxis</a> information architecture: Tutorials, How-to Guides, Reference, and Concepts. Every page now has a clear intent, and navigation reflects what you're trying to do — not internal feature groupings.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="what-changed">What changed<a href="https://technomensch.github.io/knowledge-graph/docs-updates/2026/04/08/docusaurus-restructure#what-changed" class="hash-link" aria-label="Direct link to What changed" title="Direct link to What changed" translate="no">​</a></h2>
+<p><strong>New structure</strong></p>
+<ul>
+<li class=""><strong>Quickstart</strong> — zero-to-first-lesson in 5 minutes with terminal demo GIFs</li>
+<li class=""><strong>15 how-to guides</strong> — task-oriented recipes: capture from a bugfix, write a pattern, sync across machines, integrate with Obsidian/Notion/NotebookLM, and more</li>
+<li class=""><strong>Reference</strong> — commands, skills, agents, hooks, and templates in sortable tables; condensed from the old COMMAND-GUIDE</li>
+<li class=""><strong>Concepts</strong> — explanatory pages for the mental models behind KMGraph (why it exists, the four pillars, personal vs project KGs, the automation layer)</li>
+</ul>
+<p><strong>Demo GIFs</strong></p>
+<p>Every core command now has a VHS terminal recording embedded in the Quickstart page: <code>init</code>, <code>status</code>, <code>recall</code>, <code>capture-lesson</code>, and <code>session-summary</code>.</p>
+<p><strong>Search</strong></p>
+<p>Full-text search is active via <code>@orama/plugin-docusaurus-v3</code> — no crawler required.</p>
+<p><strong>Glossary tooltips</strong></p>
+<p>KMGraph-specific terms (lesson, ADR, KG, skill, agent, capture, recall, session, handoff, hook, pattern) now show definition tooltips on hover via the new <code>&lt;Glossary&gt;</code> component.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="files-removed">Files removed<a href="https://technomensch.github.io/knowledge-graph/docs-updates/2026/04/08/docusaurus-restructure#files-removed" class="hash-link" aria-label="Direct link to Files removed" title="Direct link to Files removed" translate="no">​</a></h2>
+<p>The following legacy pages were split into the new structure and removed:</p>
+<ul>
+<li class=""><code>GETTING-STARTED.md</code> → Quickstart + Troubleshooting + reference/agents + reference/skills</li>
+<li class=""><code>CHANGELOG-DOCS-ONLY.md</code> → seeded into this <code>docs-updates/</code> feed</li>
+<li class=""><code>_test-layout.md</code>, <code>DEPLOYMENT-SITEMAP.md</code>, <code>NAVIGATION-INDEX.md</code> — orphaned, removed</li>
+</ul>]]></content>
+        <author>
+            <name>Marc Kaplan</name>
+            <uri>https://github.com/technomensch</uri>
+        </author>
+        <category label="docs" term="docs"/>
+        <category label="ux" term="ux"/>
+        <category label="docusaurus" term="docusaurus"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Homepage visuals, UX improvements, and doc fixes]]></title>
+        <id>https://technomensch.github.io/knowledge-graph/docs-updates/github-docs-visuals</id>
+        <link href="https://technomensch.github.io/knowledge-graph/docs-updates/github-docs-visuals"/>
+        <updated>2026-02-26T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Initial documentation site improvements: homepage journey flow diagram, expanded scenarios, and accessibility fixes.]]></summary>
+        <content type="html"><![CDATA[<p>Initial documentation site improvements: homepage journey flow diagram, expanded scenarios, and accessibility fixes.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="homepage-visuals--ux">Homepage Visuals &amp; UX<a href="https://technomensch.github.io/knowledge-graph/docs-updates/github-docs-visuals#homepage-visuals--ux" class="hash-link" aria-label="Direct link to Homepage Visuals &amp; UX" title="Direct link to Homepage Visuals &amp; UX" translate="no">​</a></h2>
+<ul>
+<li class=""><strong>Journey Flow Mermaid Diagram</strong>: Replaced bulleted scenarios with a narrative left-to-right flow.</li>
+<li class=""><strong>Expanded Scenarios</strong>: Added trigger moments and future payoffs (including agile sprint retrospectives).</li>
+<li class=""><strong>"About This Project" Repositioning</strong>: Moved project backstory to the bottom of the page in a collapsed info box.</li>
+<li class=""><strong>"How It Works" Concrete Rewrite</strong>: Clarified markdown-based storage and absence of external database dependencies.</li>
+<li class=""><strong>Feature Discoverability</strong>: Set the full feature list to be open by default.</li>
+<li class=""><strong>Intro Sentence</strong>: Added a guiding sentence before the journey flow diagram.</li>
+<li class=""><strong>Typography</strong>: Removed emdashes from descriptive text for a cleaner documentation style.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="general-documentation-updates">General Documentation Updates<a href="https://technomensch.github.io/knowledge-graph/docs-updates/github-docs-visuals#general-documentation-updates" class="hash-link" aria-label="Direct link to General Documentation Updates" title="Direct link to General Documentation Updates" translate="no">​</a></h2>
+<ul>
+<li class=""><strong>Universal Installer Clarification</strong>: Added details to <code>GETTING-STARTED.md</code> regarding behavioral expectations and terminal/file access requirements.</li>
+<li class=""><strong>Fragment Links &amp; Anchors</strong>: Fixed broken internal navigation links in <code>COMMAND-GUIDE.md</code> and <code>NAVIGATION-INDEX.md</code>.</li>
+<li class=""><strong>Accessibility Fixes</strong>: Added <code>accTitle</code> and <code>accDescr</code> to all new diagrams for Section 508 compliance.</li>
+<li class=""><strong>Typo Fix</strong>: Corrected missing space in <code>index.md</code> Outcome card.</li>
+</ul>]]></content>
+        <author>
+            <name>Marc Kaplan</name>
+            <uri>https://github.com/technomensch</uri>
+        </author>
+        <category label="visuals" term="visuals"/>
+        <category label="ux" term="ux"/>
+        <category label="accessibility" term="accessibility"/>
+    </entry>
+</feed>

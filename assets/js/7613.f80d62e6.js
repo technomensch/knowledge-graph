@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkknowledge_graph_plugin=self.webpackChunkknowledge_graph_plugin||[]).push([[7613],{37613(e,p,a){a.d(p,{createPieServices:()=>g.f});var g=a(29515);a(72519)}}]);

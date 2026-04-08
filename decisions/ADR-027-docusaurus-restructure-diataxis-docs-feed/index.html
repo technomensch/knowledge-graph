@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-decisions/ADR-027-docusaurus-restructure-diataxis-docs-feed" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">ADR-027: Docusaurus Docs Restructure — Diátaxis IA, docs-updates Feed, Branch Schema, and Landing Page Strategy | Knowledge Management Graph</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://technomensch.github.io/knowledge-graph/decisions/ADR-027-docusaurus-restructure-diataxis-docs-feed"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="ADR-027: Docusaurus Docs Restructure — Diátaxis IA, docs-updates Feed, Branch Schema, and Landing Page Strategy | Knowledge Management Graph"><meta data-rh="true" name="description" content="Date: 2026-04-08"><meta data-rh="true" property="og:description" content="Date: 2026-04-08"><link data-rh="true" rel="icon" href="/knowledge-graph/img/square.png"><link data-rh="true" rel="canonical" href="https://technomensch.github.io/knowledge-graph/decisions/ADR-027-docusaurus-restructure-diataxis-docs-feed"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/decisions/ADR-027-docusaurus-restructure-diataxis-docs-feed" hreflang="en"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/decisions/ADR-027-docusaurus-restructure-diataxis-docs-feed" hreflang="x-default"><link rel="alternate" type="application/rss+xml" href="/knowledge-graph/docs-updates/rss.xml" title="KMGraph Docs Updates RSS Feed">
+<link rel="alternate" type="application/atom+xml" href="/knowledge-graph/docs-updates/atom.xml" title="KMGraph Docs Updates Atom Feed"><link rel="stylesheet" href="/knowledge-graph/assets/css/styles.99b149bd.css">
+<script src="/knowledge-graph/assets/js/runtime~main.d95e2047.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/main.c879433e.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||"dark"),document.documentElement.setAttribute("data-theme-choice",t||"dark")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/knowledge-graph/"><div class="navbar__logo"><img src="/knowledge-graph/img/avatar.png" alt="Staying in Sync" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/knowledge-graph/img/avatar.png" alt="Staying in Sync" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate">KMGraph</b></a><a class="navbar__item navbar__link" href="/knowledge-graph/quickstart">Getting Started</a><a class="navbar__item navbar__link" href="/knowledge-graph/CONCEPTS">Concepts</a><a class="navbar__item navbar__link" href="/knowledge-graph/COMMAND-GUIDE">Commands</a><a class="navbar__item navbar__link" href="/knowledge-graph/CONFIGURATION">Configuration</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/technomensch/knowledge-graph" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link header-github-link" aria-label="GitHub repository"></a><a href="https://www.linkedin.com/in/marckaplan/" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link header-linkedin-link" aria-label="LinkedIn profile"></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="system mode" aria-label="Switch between dark and light mode (currently system mode)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"><div>Loading Search...</div></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><main class="docMainContainer_TBSr docMainContainerEnhanced_lQrH"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>ADR-027: Docusaurus Docs Restructure — Diátaxis IA, docs-updates Feed, Branch Schema, and Landing Page Strategy</h1></header>
+<p><strong>Date:</strong> 2026-04-08
+<strong>Status:</strong> Accepted
+<strong>Implements:</strong> v0.0.6 docs site (branch: <code>docs-update-docusaurus-migration-restructure</code>)
+<strong>Related:</strong> ADR-013 (documentation update protocol), ADR-023 (single source of truth changelog)</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="context">Context<a href="#context" class="hash-link" aria-label="Direct link to Context" title="Direct link to Context" translate="no">​</a></h2>
+<p>The KMGraph documentation site (Docusaurus v3, branch <code>v0.0.6-docusaurus-migration</code>) was audited in April 2026 and found to have significant structural problems:</p>
+<ul>
+<li class=""><code>GETTING-STARTED.md</code> was 578 lines conflating tutorial, how-to, reference, troubleshooting, and agent/skill catalogs</li>
+<li class=""><code>COMMAND-GUIDE.md</code> was 1,453 lines of dense prose with no visual cues or learning path</li>
+<li class="">Landing page (<code>index.md</code>) opened with two prose paragraphs and a &quot;Why It Matters&quot; block before any actionable link</li>
+<li class="">Zero static images, only 2 Mermaid diagrams across the entire docs tree</li>
+<li class="">Sidebar grouped by feature (Concepts, Issues, Commands, Contributing) rather than by user intent</li>
+<li class="">13 features existed in code with no user-facing documentation (hooks system, full skill catalog, full agent catalog, MCP tool reference, template library, auto-trigger keywords, config types)</li>
+<li class=""><code>CHANGELOG-DOCS-ONLY.md</code> was an orphan file with no feed, no URL, and a dual-update footgun documented in <code>Lessons_Learned_Dual_Changelog_Both_Must_Be_Updated.md</code></li>
+<li class="">Branch naming (<code>v{ver}-docs-update-{description}</code>) attached version numbers to docs-only branches, creating ambiguity for mixed-type changes</li>
+</ul>
+<p>A documentation platform evaluation was also conducted. Mintlify was explored and fully reverted — its scraper does not support MkDocs Material, and it cannot deploy to the existing <code>technomensch.github.io/knowledge-graph</code> path without breaking all external promotional links.</p>
+<p><strong>Plan reference:</strong> <code>~/.claude/plans/gleaming-skipping-hammock.md</code> — 9-phase execution plan, ~750 lines, written 2026-04-07.</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="decision">Decision<a href="#decision" class="hash-link" aria-label="Direct link to Decision" title="Direct link to Decision" translate="no">​</a></h2>
+<p>Seven distinct decisions were made in this planning session, captured together because they are architecturally interdependent.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="decision-1--docusaurus-over-mintlify">Decision 1 — Docusaurus over Mintlify<a href="#decision-1--docusaurus-over-mintlify" class="hash-link" aria-label="Direct link to Decision 1 — Docusaurus over Mintlify" title="Direct link to Decision 1 — Docusaurus over Mintlify" translate="no">​</a></h3>
+<p>Docusaurus remains the documentation platform. Mintlify was evaluated and rejected.</p>
+<p><strong>Reason:</strong> GitHub Pages URL continuity is non-negotiable. All external promotional links (LinkedIn, Slack, Reddit, blog posts) point to <code>https://technomensch.github.io/knowledge-graph</code>. Mintlify requires a separate domain or subdomain and cannot be deployed to the existing <code>github.io</code> path without breaking every external link. Docusaurus supports the existing URL via <code>baseUrl</code> + <code>routeBasePath</code> configuration with zero disruption.</p>
+<p>Mintlify was fully reverted: <code>mint.json</code>, <code>.mintignore</code>, <code>convert_admonitions.py</code> deleted; 6 files restored via <code>git checkout</code>; 3 <code>&lt;Note&gt;</code> tags reverted to <code>!!! example</code>. No Mintlify artifacts remain.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="decision-2--diátaxis-framework-for-information-architecture">Decision 2 — Diátaxis Framework for Information Architecture<a href="#decision-2--diátaxis-framework-for-information-architecture" class="hash-link" aria-label="Direct link to Decision 2 — Diátaxis Framework for Information Architecture" title="Direct link to Decision 2 — Diátaxis Framework for Information Architecture" translate="no">​</a></h3>
+<p>The documentation sidebar and page structure will be reorganized around the Diátaxis four-quadrant model:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Type</th><th>Serves</th><th>Focus</th><th>Sidebar group</th></tr></thead><tbody><tr><td><strong>Tutorial</strong></td><td>Learning</td><td>Action — guided lesson</td><td><code>tutorials/</code></td></tr><tr><td><strong>How-to guide</strong></td><td>Working</td><td>Action — solve a specific problem</td><td><code>guides/</code></td></tr><tr><td><strong>Reference</strong></td><td>Working</td><td>Cognition — neutral facts</td><td><code>reference/</code></td></tr><tr><td><strong>Explanation</strong></td><td>Learning</td><td>Cognition — context and &quot;why&quot;</td><td><code>concepts/</code></td></tr></tbody></table>
+<p>The current feature-grouped sidebar (Concepts / Issues / Commands / Contributing) is replaced with an intent-grouped sidebar (Quickstart / Tutorials / How-to Guides / Reference / Concepts / Troubleshooting / Contributing).</p>
+<p><strong>Reason:</strong> Current sidebar forces new users toward six pages of architectural prose before they have done anything useful. Diátaxis separates &quot;studying&quot; content from &quot;working&quot; content, enabling a new user to reach a captured lesson in ≤5 minutes following only the Quickstart page. Validated by audit of comparable Docusaurus sites (Supabase, Prisma, Astro, tRPC).</p>
+<p><strong>Existing splits preserved:</strong> <code>CONCEPTS.md</code> was already split into 5 pages on this branch (<code>4-LAYERS.md</code>, <code>4-PILLARS.md</code>, <code>PERSONAL-V-PROJECT.md</code>, <code>SEARCH.md</code>). These are kept as-is and only enhanced with diagrams in Phase 7. They are not merged back.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="decision-3--landing-page-problem-recognition-value-qualification-not-install-command">Decision 3 — Landing Page: Problem-Recognition Value Qualification, Not Install Command<a href="#decision-3--landing-page-problem-recognition-value-qualification-not-install-command" class="hash-link" aria-label="Direct link to Decision 3 — Landing Page: Problem-Recognition Value Qualification, Not Install Command" title="Direct link to Decision 3 — Landing Page: Problem-Recognition Value Qualification, Not Install Command" translate="no">​</a></h3>
+<p>The landing page above-the-fold section will contain problem-recognition statements, not an install command or &quot;who is this for&quot; framing.</p>
+<p><strong>Layout:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">[tagline — one sentence naming the problem without naming the tool]</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">✓ [outcome statement — something the visitor has felt but couldn&#x27;t fix]</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">✓ [outcome statement — something they didn&#x27;t know was possible]</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">✓ [outcome statement — removes friction they&#x27;ve accepted as normal]</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">✓ [outcome statement — makes them feel understood]</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">[card grid: Quickstart / Browse / How It Works / Install]</span><br></span></code></pre></div></div>
+<p><strong>Reason:</strong> The goal of the above-the-fold section is for visitors to self-identify — to read it and think &quot;this is exactly my problem&quot; — before they understand what KMGraph does or how to install it. Install paths are a downstream step reached via the card grid after the visitor has already decided they want the product. An <code>npx kmgraph install</code> hero command was initially drafted but rejected: (a) no such npm package exists — the install mechanism is copy-paste of <code>INSTALL.md</code> or <code>claude --plugin-dir</code>; (b) even if it existed, leading with an install command before value qualification assumes the visitor has already decided they want the product.</p>
+<p><strong>Writing rules:</strong></p>
+<ul>
+<li class="">Problem-recognition first, not feature description</li>
+<li class="">No &quot;who is this for&quot; labels, no persona framing</li>
+<li class="">No tool names or jargon above the fold</li>
+<li class="">No hardcoded counts (see Decision 6)</li>
+<li class="">Each statement stands alone — scannable in 5 seconds</li>
+<li class="">4 lines maximum</li>
+</ul>
+<p>The deeper &quot;why&quot; prose (existing &quot;Why It Matters&quot; / &quot;When Would I Use This&quot;) moves to <code>docs/concepts/why-kmgraph.md</code>, linked from the &quot;How It Works&quot; card.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="decision-4--docs-updates-feed-replaces-changelog-docs-onlymd">Decision 4 — docs-updates/ Feed Replaces CHANGELOG-DOCS-ONLY.md<a href="#decision-4--docs-updates-feed-replaces-changelog-docs-onlymd" class="hash-link" aria-label="Direct link to Decision 4 — docs-updates/ Feed Replaces CHANGELOG-DOCS-ONLY.md" title="Direct link to Decision 4 — docs-updates/ Feed Replaces CHANGELOG-DOCS-ONLY.md" translate="no">​</a></h3>
+<p><code>CHANGELOG-DOCS-ONLY.md</code> is deleted and replaced by a Docusaurus blog plugin instance mounted at <code>/docs-updates/</code>.</p>
+<p><strong>Scope boundary (non-negotiable):</strong></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>What happened</th><th>Goes in</th><th>Never in</th></tr></thead><tbody><tr><td>Code release (feature, fix, version bump)</td><td><code>CHANGELOG.md</code></td><td><code>docs-updates/</code></td></tr><tr><td>Docs site change (restructure, new page, gap closure)</td><td><code>docs-updates/YYYY-MM-DD-{slug}.mdx</code></td><td><code>CHANGELOG.md</code></td></tr></tbody></table>
+<p>One docs-only branch = one feed post. Each post gets its own URL, tags, and authors. The feed has a built-in RSS endpoint at <code>/docs-updates/rss.xml</code>.</p>
+<p><strong>Configuration:</strong></p>
+<div class="language-js codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-js codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token literal-property property">plugins</span><span class="token operator">:</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">[</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token punctuation" style="color:rgb(248, 248, 242)">[</span><span class="token string" style="color:rgb(255, 121, 198)">&#x27;@docusaurus/plugin-content-blog&#x27;</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token literal-property property">id</span><span class="token operator">:</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">&#x27;docs-updates&#x27;</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token literal-property property">routeBasePath</span><span class="token operator">:</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">&#x27;docs-updates&#x27;</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token literal-property property">path</span><span class="token operator">:</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">&#x27;./docs-updates&#x27;</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token literal-property property">blogTitle</span><span class="token operator">:</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">&#x27;Documentation Updates&#x27;</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token literal-property property">feedOptions</span><span class="token operator">:</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"> </span><span class="token literal-property property">type</span><span class="token operator">:</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">[</span><span class="token string" style="color:rgb(255, 121, 198)">&#x27;rss&#x27;</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">&#x27;atom&#x27;</span><span class="token punctuation" style="color:rgb(248, 248, 242)">]</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token literal-property property">blogSidebarCount</span><span class="token operator">:</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">&#x27;ALL&#x27;</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><span class="token punctuation" style="color:rgb(248, 248, 242)">]</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">]</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><br></span></code></pre></div></div>
+<p><strong>Reason:</strong> <code>CHANGELOG-DOCS-ONLY.md</code> was an orphan file with no linking, no feed, no URL, and high maintenance burden — updating it required discipline with no enforcement mechanism. The dual-changelog problem is documented in <code>Lessons_Learned_Dual_Changelog_Both_Must_Be_Updated.md</code>. The Docusaurus blog plugin is native, requires no extra dependencies, and makes docs changes first-class navigable content. The management burden does not increase — it shifts the docs entry from an unmarked file to a published post with a URL that can be linked from PRs and release notes.</p>
+<p><strong>Supersedes:</strong> The lesson <code>Lessons_Learned_Dual_Changelog_Both_Must_Be_Updated.md</code> for the docs-only case. The dual-changelog problem is resolved by making the two files non-overlapping by scope, not by merging them.</p>
+<p><strong>Historical entries</strong> from <code>CHANGELOG-DOCS-ONLY.md</code> are migrated to seed posts in <code>docs-updates/</code> (one post per entry, original dates preserved) before the file is deleted.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="decision-5--branch-naming-schema-docs-update-description-no-version-prefix">Decision 5 — Branch Naming Schema: docs-update-{description}, No Version Prefix<a href="#decision-5--branch-naming-schema-docs-update-description-no-version-prefix" class="hash-link" aria-label="Direct link to Decision 5 — Branch Naming Schema: docs-update-{description}, No Version Prefix" title="Direct link to Decision 5 — Branch Naming Schema: docs-update-{description}, No Version Prefix" translate="no">​</a></h3>
+<p>Docs-only branches drop the version prefix entirely:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Change type</th><th>Old format</th><th>New format</th></tr></thead><tbody><tr><td>Code / mixed / infra</td><td><code>v{ver}-{description}</code></td><td><code>v{ver}-{description}</code> (unchanged)</td></tr><tr><td>Docs site only</td><td><code>v{ver}-docs-update-{description}</code></td><td><code>docs-update-{description}</code></td></tr></tbody></table>
+<p><strong>Current branch rename:</strong> <code>v0.0.6-docusaurus-migration</code> → <code>docs-update-docusaurus-migration-restructure</code></p>
+<p><strong>Reason:</strong> The version prefix on docs branches was meaningful only because it mirrored <code>CHANGELOG-DOCS-ONLY.md</code> entries (which are going away). With the <code>docs-updates/</code> feed, the branch name maps 1:1 to the feed post slug — <code>docs-update-{description}</code> → <code>docs-updates/YYYY-MM-DD-{description}.mdx</code>. No version disambiguation is needed for a docs-only change. Removing the prefix also eliminates the ambiguity of which version to attach when docs work spans multiple code versions.</p>
+<p><strong>All locations that must be updated</strong> to reflect the new schema (Phase 0 task):</p>
+<ul>
+<li class=""><code>CLAUDE.md</code> (project) — branch-naming table</li>
+<li class=""><code>~/.claude/CLAUDE.md</code> (user-level) — branch suffix rule</li>
+<li class=""><code>commands/handoff.md</code>, <code>commands/update-doc.md</code>, <code>commands/create-doc.md</code></li>
+<li class=""><code>skills/doc-update-router/SKILL.md</code></li>
+<li class=""><code>docs/decisions/ADR-013-documentation-update-protocol.md</code> (amendment)</li>
+<li class=""><code>docs/decisions/ADR-020-lifecycle-hooks-suite-automated-capture.md</code></li>
+<li class=""><code>docs/enhancements/ENH-003/ENH-003-specification.md</code></li>
+<li class=""><code>docs/lessons-learned/process/documentation-update-triggers-multibranchfeatures.md</code></li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="decision-6--no-hardcoded-counts-in-user-facing-docs-style-guide-16">Decision 6 — No Hardcoded Counts in User-Facing Docs (STYLE-GUIDE §1.6)<a href="#decision-6--no-hardcoded-counts-in-user-facing-docs-style-guide-16" class="hash-link" aria-label="Direct link to Decision 6 — No Hardcoded Counts in User-Facing Docs (STYLE-GUIDE §1.6)" title="Direct link to Decision 6 — No Hardcoded Counts in User-Facing Docs (STYLE-GUIDE §1.6)" translate="no">​</a></h3>
+<p>Specific counts for mutable collections are prohibited in user-facing documentation.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Disallowed</th><th>Allowed</th></tr></thead><tbody><tr><td>&quot;26 slash commands&quot;</td><td>&quot;Every slash command&quot;, &quot;All slash commands&quot;</td></tr><tr><td>&quot;10 skills&quot;</td><td>&quot;Each auto-triggered skill&quot;, &quot;All skills&quot;</td></tr><tr><td>&quot;8 subagents&quot;</td><td>&quot;Every subagent&quot;, &quot;The agent catalog&quot;</td></tr></tbody></table>
+<p><strong>Reason:</strong> A specific number means every release that adds or removes an item also requires a documentation edit. Missed edits are silent inaccuracies that erode trust. Reference pages must be programmatically built from source directories (via <code>docusaurus-plugin-typedoc</code> for MCP tools, and build-time scripts reading frontmatter from <code>commands/</code>, <code>skills/</code>, <code>agents/</code>) so they never go stale.</p>
+<p><strong>Validation grep</strong> (added to STYLE-GUIDE §9 pre-commit checklist):</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">grep -nE &#x27;\b[0-9]+\s+(commands?|skills?|agents?|hooks?|templates?|tools?|subagents?|events?)\b&#x27; docs/</span><br></span></code></pre></div></div>
+<p>Any match in user-facing docs is a style violation.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="decision-7--approved-plugin-set">Decision 7 — Approved Plugin Set<a href="#decision-7--approved-plugin-set" class="hash-link" aria-label="Direct link to Decision 7 — Approved Plugin Set" title="Direct link to Decision 7 — Approved Plugin Set" translate="no">​</a></h3>
+<p>The following plugins are approved for installation in Phase 0:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Plugin</th><th>Purpose</th><th>Source</th></tr></thead><tbody><tr><td><code>@docusaurus/theme-mermaid</code></td><td>Diagrams in MDX (config flip)</td><td>Built-in</td></tr><tr><td><code>@docusaurus/plugin-client-redirects</code></td><td>Old URL → new URL redirects</td><td>Built-in</td></tr><tr><td><code>@docusaurus/plugin-content-blog</code> (second instance)</td><td><code>docs-updates/</code> feed</td><td>Built-in</td></tr><tr><td><code>plugin-image-zoom</code></td><td>Click-to-zoom for screenshots</td><td>Community</td></tr><tr><td><code>@orama/plugin-docusaurus-v3</code></td><td>Local full-text search (while Algolia pending)</td><td>Community</td></tr><tr><td><code>docusaurus-plugin-typedoc</code></td><td>Auto-generate MCP tool reference from TypeScript</td><td>Community</td></tr><tr><td>Algolia DocSearch</td><td>Final search experience (free for OSS, ~2 week approval)</td><td>Application required</td></tr></tbody></table>
+<p>Deferred: <code>docusaurus-plugin-remote-content</code>, <code>docusaurus-theme-github-codeblock</code>, Markprompt — re-evaluate after Phase 9.</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="rationale">Rationale<a href="#rationale" class="hash-link" aria-label="Direct link to Rationale" title="Direct link to Rationale" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="why-diátaxis-specifically">Why Diátaxis specifically<a href="#why-diátaxis-specifically" class="hash-link" aria-label="Direct link to Why Diátaxis specifically" title="Direct link to Why Diátaxis specifically" translate="no">​</a></h3>
+<p>Diátaxis is the only framework that explicitly names the failure mode KMGraph docs exhibits: &quot;writers of tutorials anxious that students should know things overload tutorials with distracting explanation.&quot; The current <code>GETTING-STARTED.md</code> is the canonical example — it is tutorial, how-to, reference, and explanation all in one 578-line file. The framework provides a testable compass for every page: &quot;Does this serve action or cognition? Is the user studying or working?&quot; Pages that fail this test are the ones overwhelming new users.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="why-the-landing-page-leads-with-problems-not-features">Why the landing page leads with problems, not features<a href="#why-the-landing-page-leads-with-problems-not-features" class="hash-link" aria-label="Direct link to Why the landing page leads with problems, not features" title="Direct link to Why the landing page leads with problems, not features" translate="no">​</a></h3>
+<p>A visitor who does not yet know they need KMGraph will not be persuaded by a feature list. They will be persuaded by seeing their own problem described back to them. The value qualification section&#x27;s job is recognition, not comprehension. The reader should not need to understand KMGraph to know they want it. This is distinct from &quot;who is this for&quot; framing — no personas, no audience labels, no literal enumeration of use cases. Just problem statements that land or don&#x27;t.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="why-the-docs-updates-feed-is-not-redundant">Why the docs-updates feed is not redundant<a href="#why-the-docs-updates-feed-is-not-redundant" class="hash-link" aria-label="Direct link to Why the docs-updates feed is not redundant" title="Direct link to Why the docs-updates feed is not redundant" translate="no">​</a></h3>
+<p>The <code>CHANGELOG.md</code> and <code>docs-updates/</code> feed have non-overlapping scopes by definition. A docs-only branch does not touch <code>CHANGELOG.md</code>. A code release does not produce a feed post. The management burden is the same as maintaining <code>CHANGELOG-DOCS-ONLY.md</code> — one entry per branch — but the feed post has a URL, tags, RSS, and is navigable from the docs site. The orphan markdown file had none of these.</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="consequences">Consequences<a href="#consequences" class="hash-link" aria-label="Direct link to Consequences" title="Direct link to Consequences" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="positive">Positive<a href="#positive" class="hash-link" aria-label="Direct link to Positive" title="Direct link to Positive" translate="no">​</a></h3>
+<ol>
+<li class=""><strong>New users reach first value in ≤5 minutes</strong> — Quickstart page + intent-grouped sidebar replaces 10 dense screens of reading.</li>
+<li class=""><strong>13 code-vs-docs gaps closed</strong> — Hooks, skills, agents, MCP tools, templates, auto-trigger keywords, and config types all get documented reference pages.</li>
+<li class=""><strong>Docs changelog is first-class</strong> — Each docs update gets a URL, RSS feed entry, and PR linkable post.</li>
+<li class=""><strong>Reference pages never go stale</strong> — Programmatic generation from source directories enforced by STYLE-GUIDE §1.6.</li>
+<li class=""><strong>URL continuity preserved</strong> — All external promotional links remain valid via <code>@docusaurus/plugin-client-redirects</code>.</li>
+</ol>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="negative">Negative<a href="#negative" class="hash-link" aria-label="Direct link to Negative" title="Direct link to Negative" translate="no">​</a></h3>
+<ol>
+<li class=""><strong>Phase 0 audit is high-touch</strong> — Every file referencing the old branch schema or <code>CHANGELOG-DOCS-ONLY.md</code> must be updated and validated before work begins.</li>
+<li class=""><strong>New contributor workflow required</strong> — <code>docs/contributing/docs-updates-workflow.md</code> must be written and maintained as the canonical reference for the new schema.</li>
+<li class=""><strong>Discipline required on scope boundary</strong> — If a docs-only change touches <code>CHANGELOG.md</code>, or a code release produces a feed post, the non-overlap guarantee breaks. The CLAUDE.md scope boundary rule is the only enforcement mechanism.</li>
+</ol>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="neutral">Neutral<a href="#neutral" class="hash-link" aria-label="Direct link to Neutral" title="Direct link to Neutral" translate="no">​</a></h3>
+<ol>
+<li class=""><strong>No content lost</strong> — All content from deleted files (<code>GETTING-STARTED.md</code>, <code>CHANGELOG-DOCS-ONLY.md</code>, <code>NAVIGATION-INDEX.md</code>, <code>DEPLOYMENT-SITEMAP.md</code>, <code>_test-layout.md</code>) is either rehomed or migrated before deletion.</li>
+<li class=""><strong>Existing concept page splits preserved</strong> — The 5-page split of <code>CONCEPTS.md</code> done earlier on this branch is kept as-is.</li>
+</ol>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="implementation">Implementation<a href="#implementation" class="hash-link" aria-label="Direct link to Implementation" title="Direct link to Implementation" translate="no">​</a></h2>
+<p><strong>Timeline:</strong> 9-phase plan, starting with Phase 0 (infrastructure, no user-visible content change)</p>
+<p><strong>Plan file:</strong> <code>~/.claude/plans/gleaming-skipping-hammock.md</code></p>
+<p><strong>Affected components:</strong></p>
+<ul>
+<li class=""><code>docs/</code> — full restructure across all 9 phases</li>
+<li class=""><code>sidebars.js</code> — full rewrite (Phase 3)</li>
+<li class=""><code>docusaurus.config.js</code> — plugin additions (Phase 0)</li>
+<li class=""><code>package.json</code> — new plugin deps (Phase 0)</li>
+<li class=""><code>CLAUDE.md</code> (project + user-level) — branch schema + docs workflow update (Phase 0)</li>
+<li class=""><code>commands/update-doc.md</code>, <code>commands/create-doc.md</code>, <code>commands/handoff.md</code> — workflow update (Phase 0 + Phase 6)</li>
+<li class=""><code>skills/doc-update-router/SKILL.md</code> — routing update (Phase 6)</li>
+<li class=""><code>docs/STYLE-GUIDE.md</code> — §1.6 no-counts rule + validation grep (Phase 6)</li>
+</ul>
+<p><strong>Migration path for CHANGELOG-DOCS-ONLY.md:</strong></p>
+<ol>
+<li class="">Migrate each entry to a dated <code>docs-updates/YYYY-MM-DD-{slug}.mdx</code> post (preserve original dates)</li>
+<li class="">Delete <code>docs/CHANGELOG-DOCS-ONLY.md</code></li>
+<li class="">Add redirect if the URL was ever linked externally</li>
+</ol>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="validation">Validation<a href="#validation" class="hash-link" aria-label="Direct link to Validation" title="Direct link to Validation" translate="no">​</a></h2>
+<p><strong>Success criteria:</strong></p>
+<ul class="contains-task-list containsTaskList_mC6p">
+<li class="task-list-item"><input type="checkbox" disabled=""> <code>npm run build</code> passes with zero broken-link warnings after each phase</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> <code>/docs-updates/</code> renders with RSS feed at <code>/docs-updates/rss.xml</code></li>
+<li class="task-list-item"><input type="checkbox" disabled=""> New user reaches a captured lesson in ≤5 minutes following only the Quickstart page (wall-clock test)</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> <code>grep -nE &#x27;\b[0-9]+\s+(commands?|skills?|agents?|hooks?|templates?)\b&#x27; docs/</code> returns zero matches in user-facing docs</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> <code>grep -rn &quot;CHANGELOG-DOCS-ONLY&quot; CLAUDE.md commands/ skills/ agents/</code> returns zero matches after Phase 0</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> All 13 code-vs-docs gaps have a documented reference page after Phase 6</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> Lighthouse accessibility ≥ 95 on home and Quickstart pages</li>
+</ul>
+<p><strong>Review date:</strong> After Phase 4 (mid-restructure checkpoint), and again after Phase 9 (final).</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="related-decisions">Related Decisions<a href="#related-decisions" class="hash-link" aria-label="Direct link to Related Decisions" title="Direct link to Related Decisions" translate="no">​</a></h2>
+<ul>
+<li class=""><strong><a class="" href="/knowledge-graph/decisions/ADR-013-documentation-update-protocol">ADR-013</a>:</strong> Original documentation update protocol — superseded in part by this ADR&#x27;s branch schema and changelog decisions; add amendment to ADR-013 pointing here</li>
+<li class=""><strong><a class="" href="/knowledge-graph/decisions/ADR-023-single-source-of-truth-changelog">ADR-023</a>:</strong> Single source of truth for CHANGELOG — this ADR extends the scope boundary to cover the docs-updates feed</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="related-documentation">Related Documentation<a href="#related-documentation" class="hash-link" aria-label="Direct link to Related Documentation" title="Direct link to Related Documentation" translate="no">​</a></h2>
+<p><strong>Lessons Learned:</strong></p>
+<ul>
+<li class=""><a class="" href="/knowledge-graph/lessons-learned/process/Lessons_Learned_Dual_Changelog_Both_Must_Be_Updated">Dual Changelog Footgun</a> — the problem this ADR resolves for the docs case</li>
+<li class=""><a class="" href="/knowledge-graph/lessons-learned/process/documentation-update-triggers-multibranchfeatures">Documentation Update Triggers in Multi-Branch Features</a> — superseded by new branch schema</li>
+</ul>
+<p><strong>Plan:</strong></p>
+<ul>
+<li class=""><a class="" href="/knowledge-graph/decisions/~/.claude/plans/gleaming-skipping-hammock.md">gleaming-skipping-hammock.md</a> — full 9-phase execution plan with per-phase acceptance criteria, redirect map, and plugin configuration details</li>
+</ul>
+<p><strong>Session:</strong></p>
+<ul>
+<li class=""><a class="" href="/knowledge-graph/sessions/2026-04/2026-04-07-docs-restructure-planning.md">2026-04-07 Docs Restructure Planning</a> — full session record including all decisions, code-vs-docs gap audit, and deferred items</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="deferred-out-of-scope-captured-for-future-adrs">Deferred (out of scope, captured for future ADRs)<a href="#deferred-out-of-scope-captured-for-future-adrs" class="hash-link" aria-label="Direct link to Deferred (out of scope, captured for future ADRs)" title="Direct link to Deferred (out of scope, captured for future ADRs)" translate="no">​</a></h2>
+<ol>
+<li class=""><strong>Pluggable storage backends</strong> — Notion, Obsidian, NotebookLM as primary KG stores instead of local markdown. Requires changes to <code>/kmgraph:init</code>, MCP server config schema, and backend adapters. Version-bump territory. Integration <em>guides</em> are in scope for this restructure; storage layer changes are not.</li>
+<li class=""><strong>Contributor vs user command surface area</strong> — <code>update-doc</code>, <code>create-doc</code>, and <code>doc-update-router</code> are KMGraph project contributor tools, not end-user tools. Today they ship to every user. Future: separate via <code>kmgraph-contrib</code> plugin, a marker file, or a <code>commands/contributing/</code> subdirectory with conditional registration.</li>
+<li class=""><strong>STYLE-GUIDE.md slim-down</strong> — Currently 633 lines; audience is contributors only. Deferred per user direction.</li>
+</ol>
+<hr>
+<p><strong>Decision Made:</strong> 2026-04-07 (planning session) / 2026-04-08 (branch schema finalized)
+<strong>Last Updated:</strong> 2026-04-08
+<strong>Status:</strong> Accepted</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-tags-row"><div class="col"><b>Tags:</b><ul class="tags_jXut padding--none margin-left--sm"><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/knowledge-graph/tags/docs">docs</a></li><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/knowledge-graph/tags/docusaurus">docusaurus</a></li><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/knowledge-graph/tags/diataxis">diataxis</a></li><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/knowledge-graph/tags/information-architecture">information-architecture</a></li><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/knowledge-graph/tags/changelog">changelog</a></li><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/knowledge-graph/tags/branch-naming">branch-naming</a></li><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/knowledge-graph/tags/landing-page">landing-page</a></li></ul></div></div><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_WFHX"><a href="https://github.com/technomensch/knowledge-graph/edit/main/docs/decisions/ADR-027-docusaurus-restructure-diataxis-docs-feed.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_JAkA"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#context" class="table-of-contents__link toc-highlight">Context</a></li><li><a href="#decision" class="table-of-contents__link toc-highlight">Decision</a><ul><li><a href="#decision-1--docusaurus-over-mintlify" class="table-of-contents__link toc-highlight">Decision 1 — Docusaurus over Mintlify</a></li><li><a href="#decision-2--diátaxis-framework-for-information-architecture" class="table-of-contents__link toc-highlight">Decision 2 — Diátaxis Framework for Information Architecture</a></li><li><a href="#decision-3--landing-page-problem-recognition-value-qualification-not-install-command" class="table-of-contents__link toc-highlight">Decision 3 — Landing Page: Problem-Recognition Value Qualification, Not Install Command</a></li><li><a href="#decision-4--docs-updates-feed-replaces-changelog-docs-onlymd" class="table-of-contents__link toc-highlight">Decision 4 — docs-updates/ Feed Replaces CHANGELOG-DOCS-ONLY.md</a></li><li><a href="#decision-5--branch-naming-schema-docs-update-description-no-version-prefix" class="table-of-contents__link toc-highlight">Decision 5 — Branch Naming Schema: docs-update-{description}, No Version Prefix</a></li><li><a href="#decision-6--no-hardcoded-counts-in-user-facing-docs-style-guide-16" class="table-of-contents__link toc-highlight">Decision 6 — No Hardcoded Counts in User-Facing Docs (STYLE-GUIDE §1.6)</a></li><li><a href="#decision-7--approved-plugin-set" class="table-of-contents__link toc-highlight">Decision 7 — Approved Plugin Set</a></li></ul></li><li><a href="#rationale" class="table-of-contents__link toc-highlight">Rationale</a><ul><li><a href="#why-diátaxis-specifically" class="table-of-contents__link toc-highlight">Why Diátaxis specifically</a></li><li><a href="#why-the-landing-page-leads-with-problems-not-features" class="table-of-contents__link toc-highlight">Why the landing page leads with problems, not features</a></li><li><a href="#why-the-docs-updates-feed-is-not-redundant" class="table-of-contents__link toc-highlight">Why the docs-updates feed is not redundant</a></li></ul></li><li><a href="#consequences" class="table-of-contents__link toc-highlight">Consequences</a><ul><li><a href="#positive" class="table-of-contents__link toc-highlight">Positive</a></li><li><a href="#negative" class="table-of-contents__link toc-highlight">Negative</a></li><li><a href="#neutral" class="table-of-contents__link toc-highlight">Neutral</a></li></ul></li><li><a href="#implementation" class="table-of-contents__link toc-highlight">Implementation</a></li><li><a href="#validation" class="table-of-contents__link toc-highlight">Validation</a></li><li><a href="#related-decisions" class="table-of-contents__link toc-highlight">Related Decisions</a></li><li><a href="#related-documentation" class="table-of-contents__link toc-highlight">Related Documentation</a></li><li><a href="#deferred-out-of-scope-captured-for-future-adrs" class="table-of-contents__link toc-highlight">Deferred (out of scope, captured for future ADRs)</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Docs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/quickstart">Getting Started</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/COMMAND-GUIDE">Command Guide</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/CHEAT-SHEET">Cheat Sheet</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/FAQ">FAQ</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/technomensch/knowledge-graph" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://www.linkedin.com/in/marckaplan/" target="_blank" rel="noopener noreferrer" class="footer__link-item">LinkedIn<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://buymeacoffee.com/technomensch" target="_blank" rel="noopener noreferrer" class="footer__link-item">Buy Me a Coffee<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="margin-bottom--sm"><a href="https://github.com/technomensch/knowledge-graph" rel="noopener noreferrer" class="footerLogoLink_BH7S"><img src="/knowledge-graph/img/banner.jpeg" alt="Staying in Sync" class="footer__logo themedComponent_mlkZ themedComponent--light_NVdE" width="160"><img src="/knowledge-graph/img/banner.jpeg" alt="Staying in Sync" class="footer__logo themedComponent_mlkZ themedComponent--dark_xIcU" width="160"></a></div><div class="footer__copyright">Staying in Sync</div></div></div></footer></div>
+</body>
+</html>
