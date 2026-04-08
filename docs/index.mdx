@@ -8,18 +8,24 @@ description: Structured knowledge capture and cross-session memory — for every
 import styles from '@site/src/css/home.module.css';
 
 <div className={styles.homePage}>
+
+  {/* ── Full-width header ── */}
+  <div className={styles.header}>
+    <img
+      src="/knowledge-graph/img/banner.jpeg"
+      alt="KMGraph logo"
+      className={styles.headerImage}
+    />
+    <h1 className={styles.headerTagline}>
+      Your AI assistant starts every session with no memory of yesterday's work.
+    </h1>
+  </div>
+
+  {/* ── Two-column body ── */}
   <div className={styles.layout}>
 
-    {/* ── Hero ── */}
+    {/* Hero: problem + install */}
     <div className={styles.hero}>
-      <img
-        src="/knowledge-graph/img/banner.jpeg"
-        alt="KMGraph — Staying in Sync"
-        className={styles.heroImage}
-      />
-      <p className={styles.heroTagline}>
-        Your AI assistant starts every session with no memory of yesterday's work.
-      </p>
       <ul className={styles.heroBullets}>
         <li>✓ Decisions made three sprints ago are gone — no record, no rationale, no trail</li>
         <li>✓ The same bug gets solved twice because no one remembered solving it the first time</li>
@@ -33,7 +39,7 @@ import styles from '@site/src/css/home.module.css';
       </p>
     </div>
 
-    {/* ── Cards ── */}
+    {/* Cards: navigation */}
     <div className={styles.cards}>
       <div className={styles.card}>
         <h3>🚀 Quickstart</h3>
@@ -66,4 +72,5 @@ KMGraph is in beta and actively seeking feedback. Reports and feature requests a
 :::
 
   </div>
+
 </div>
