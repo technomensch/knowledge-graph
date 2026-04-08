@@ -22,20 +22,28 @@
 }
 
 
-/* ── Two-column layout ───────────────────────────────────────────── */
+/* ── Three-column layout ─────────────────────────────────────────── */
 .layout {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-auto-rows: 1fr;
   gap: 1.75rem;
-  align-items: start;
+  align-items: stretch;
 }
 
-/* ── Hero (left column) ──────────────────────────────────────────── */
+/* ── Hero (column 1, spans both rows) ────────────────────────────── */
 .hero {
   background: var(--ifm-color-primary);
   border-radius: 12px;
   padding: 1.75rem;
+  grid-column: 1;
+  grid-row: 1 / span 2;
 }
+
+.cardC2R1 { grid-column: 2; grid-row: 1; }
+.cardC3R1 { grid-column: 3; grid-row: 1; }
+.cardC2R2 { grid-column: 2; grid-row: 2; }
+.cardC3R2 { grid-column: 3; grid-row: 2; }
 
 .heroBullets {
   list-style: none;
@@ -73,13 +81,6 @@
   color: #fff;
 }
 
-/* ── Card grid (right column) ────────────────────────────────────── */
-.cards {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
 .card {
   background: var(--ifm-card-background-color);
   border: 1px solid var(--ifm-color-emphasis-200);
@@ -115,7 +116,18 @@
 /* ── Tablet: stack hero above 2×2 cards ─────────────────────────── */
 @media (max-width: 860px) {
   .layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: auto;
+  }
+
+  .hero {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+
+  .cardC2R1, .cardC3R1, .cardC2R2, .cardC3R2 {
+    grid-column: auto;
+    grid-row: auto;
   }
 
   .headerTagline {
@@ -138,7 +150,7 @@
     border-radius: 8px;
   }
 
-  .cards {
+  .layout {
     grid-template-columns: 1fr;
   }
 
