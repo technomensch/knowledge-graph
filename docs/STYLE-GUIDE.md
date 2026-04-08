@@ -108,6 +108,30 @@ These directories contain LLM execution prompts and structured parsing templates
 
 **Citation**: `MEMORY.md` Code Protection Rules; `[GoogleDevDocs]` "Separate concerns between authoring and execution."
 
+### 1.6 No hardcoded counts of mutable collections
+
+Never write specific counts for collections that grow between releases.
+
+Apply to any reference to `commands/`, `skills/`, `agents/`, `hooks/`, `core/templates/`, `mcp-server/src/tools/`, or any directory whose contents change between releases.
+
+| Disallowed | Allowed |
+|---|---|
+| "26 slash commands" | "Every slash command", "All slash commands" |
+| "10 skills" | "Each auto-triggered skill", "All skills" |
+| "8 subagents" | "Every subagent", "The agent catalog" |
+| "13+ templates" | "All bundled templates", "The template library" |
+| "5 lifecycle events" | "Each lifecycle event", "The lifecycle hooks" |
+
+**Why:** A specific number means every release that adds or removes an item also requires a documentation edit. Missed edits become silent inaccuracies that erode trust.
+
+**Validation grep** (see §9 Pre-Commit Checklist):
+```bash
+grep -nE '\b[0-9]+\s+(commands?|skills?|agents?|hooks?|templates?|tools?|subagents?|events?)\b' docs/
+```
+Any match in user-facing docs is a style violation. Allowed exceptions: line counts, phase counts, version numbers.
+
+**Citation**: `[GoogleDevDocs]` "Avoid information that quickly becomes stale"; `[gitbook-style-guide]` (ADR-027, 2026-04-08).
+
 ---
 
 ## 2. Voice and Tone

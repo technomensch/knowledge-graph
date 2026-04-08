@@ -57,11 +57,11 @@ const sidebars = {
       label: '📚 Reference',
       collapsed: false,
       items: [
+        {type: 'doc', id: 'reference/commands', label: 'Commands'},
         {type: 'doc', id: 'reference/skills', label: 'Skills'},
         {type: 'doc', id: 'reference/agents', label: 'Agents'},
-        // Phase 6: reference/commands, reference/hooks, reference/templates, reference/mcp-tools
-        //          added when those pages are created
-        {type: 'doc', id: 'COMMAND-GUIDE', label: 'Commands'},
+        {type: 'doc', id: 'reference/hooks', label: 'Hooks'},
+        {type: 'doc', id: 'reference/templates', label: 'Templates'},
         {type: 'doc', id: 'CHEAT-SHEET', label: 'Cheat Sheet'},
         {type: 'doc', id: 'FAQ', label: 'FAQ'},
         {type: 'doc', id: 'CONFIGURATION', label: 'Configuration'},

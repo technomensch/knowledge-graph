@@ -3,7 +3,7 @@
 **Purpose:** Intercept explicit doc-update requests and route to the correct command. Prevents doc edits from bypassing the `/kmgraph:update-doc` wizard, standards validation, and changelog enforcement.
 
 **Trigger Patterns (match any):**
-- "update [filename or doc name]" — e.g., "update GETTING-STARTED.md", "update the command guide"
+- "update [filename or doc name]" — e.g., "update quickstart.md", "update the command guide"
 - "update this doc" / "update the doc" — resolves to most recently referenced doc
 - "update today's session summary" / "update the session summary" / "update the current session"
 - "update the changelog"
@@ -45,5 +45,5 @@ If both could fire simultaneously (e.g., "update the session summary and stop"),
 
 **User-Facing Language:**
 - Address the user directly; never expose command names or internal routing mechanics unprompted
-- Confirm the resolved target before dispatching: "Got it — updating `GETTING-STARTED.md` through the update wizard..."
+- Confirm the resolved target before dispatching: "Got it — updating `[resolved doc]` through the update wizard..."
 - Use the appropriate command naturally: "I'll use the update-doc wizard to make sure standards are applied."
