@@ -6,6 +6,7 @@ const sidebars = {
 
     // ── Quickstart ────────────────────────────────────────────────────────
     {type: 'doc', id: 'quickstart', label: '🚀 Quickstart (5 min)'},
+    {type: 'doc', id: 'INSTALL', label: 'Installation'},
 
     // ── Tutorials ─────────────────────────────────────────────────────────
     // Phase 4/5: tutorial pages created in those phases
@@ -48,8 +49,9 @@ const sidebars = {
       label: '📚 Reference',
       collapsed: false,
       items: [
-        // Phase 6: reference/commands, reference/skills, reference/agents,
-        //          reference/hooks, reference/templates, reference/mcp-tools
+        {type: 'doc', id: 'reference/skills', label: 'Skills'},
+        {type: 'doc', id: 'reference/agents', label: 'Agents'},
+        // Phase 6: reference/commands, reference/hooks, reference/templates, reference/mcp-tools
         //          added when those pages are created
         {type: 'doc', id: 'COMMAND-GUIDE', label: 'Commands'},
         {type: 'doc', id: 'CHEAT-SHEET', label: 'Cheat Sheet'},
@@ -78,12 +80,7 @@ const sidebars = {
     },
 
     // ── Troubleshooting ───────────────────────────────────────────────────
-    // Phase 4: troubleshooting/ pages added when split from GETTING-STARTED
-    // {
-    //   type: 'category',
-    //   label: '🛠 Troubleshooting',
-    //   items: ['troubleshooting/index'],
-    // },
+    {type: 'doc', id: 'troubleshooting/troubleshooting', label: '🛠 Troubleshooting'},
 
     // ── Changelog ─────────────────────────────────────────────────────────
     {

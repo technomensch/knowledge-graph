@@ -36,8 +36,8 @@ const config = {
       '@docusaurus/plugin-client-redirects',
       {
         redirects: [
-          // Phase 4+: populated as pages move
-          // { from: '/GETTING-STARTED', to: '/quickstart' },
+          // Phase 4+: redirects added as pages are confirmed moved
+          // Note: only add 'from' paths that do NOT currently exist as pages
         ],
       },
     ],
