@@ -1,0 +1,63 @@
+---
+id: index
+title: Knowledge Management Graph
+sidebar_label: Home
+description: Structured knowledge capture and cross-session memory — for every AI-assisted project
+hide_title: true
+hide_table_of_contents: true
+---
+
+import styles from '@site/src/css/home.module.css';
+
+<div className={styles.homePage}>
+
+  <img
+    src="/knowledge-graph/img/Staying_in_Sync_Banner_Dark.png"
+    alt="KMGraph — The Knowledge Management Graph"
+    className={styles.headerImage}
+  />
+
+  <div className={styles.hero}>
+    <ul className={styles.heroBullets}>
+      <li>✓ Decisions made three sprints ago are gone — no record, no rationale, no trail</li>
+      <li>✓ The same bug gets solved twice because no one remembered solving it the first time</li>
+      <li>✓ Switching between Claude, Cursor, and Gemini means starting over every time</li>
+    </ul>
+    <code className={styles.heroCode}>claude --plugin-dir /path/to/knowledge-graph</code>
+    <p className={styles.heroSubtext}>
+      Then run <code>/kmgraph:init</code> — first lesson captured in under 5 minutes.
+    </p>
+  </div>
+
+  <div className={styles.cards}>
+    <div className={styles.card}>
+      <h3>🚀 Quickstart</h3>
+      <p>Install, init, and capture your first lesson in 5 minutes.</p>
+      <a href="/knowledge-graph/quickstart" className="button button--primary button--sm">Get started →</a>
+    </div>
+    <div className={styles.card}>
+      <h3>📋 Browse Commands</h3>
+      <p>Every slash command, MCP tool, and skill — one reference page.</p>
+      <a href="/knowledge-graph/reference/commands" className="button button--secondary button--sm">Browse →</a>
+    </div>
+    <div className={styles.card}>
+      <h3>🧠 How It Works</h3>
+      <p>The problem KMGraph solves, when to use it, and how knowledge is stored.</p>
+      <a href="/knowledge-graph/concepts/why-kmgraph" className="button button--secondary button--sm">Read more →</a>
+    </div>
+    <div className={styles.card}>
+      <h3>⚡ Cheat Sheet</h3>
+      <p>One-page quick reference — the commands you use every day.</p>
+      <a href="/knowledge-graph/CHEAT-SHEET" className="button button--secondary button--sm">Open →</a>
+    </div>
+  </div>
+
+  <div className={styles.beta}>
+
+:::tip[Now in Beta]
+KMGraph is in beta and actively seeking feedback. Reports and feature requests are welcome via the [issue tracker](https://github.com/technomensch/knowledge-graph/issues).
+:::
+
+  </div>
+
+</div>

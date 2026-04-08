@@ -1,4 +1,9 @@
-# Documentation Style Guide
+---
+id: STYLE-GUIDE
+title: Style Guide
+sidebar_label: Style Guide
+description: Writing conventions, documentation standards, and pattern documentation
+---
 
 Authoring standards for contributors writing or reviewing documentation for the Knowledge Management Graph.
 
@@ -102,6 +107,30 @@ These directories contain LLM execution prompts and structured parsing templates
 - Never allowed: editing existing command or template files without maintainer sign-off.
 
 **Citation**: `MEMORY.md` Code Protection Rules; `[GoogleDevDocs]` "Separate concerns between authoring and execution."
+
+### 1.6 No hardcoded counts of mutable collections
+
+Never write specific counts for collections that grow between releases.
+
+Apply to any reference to `commands/`, `skills/`, `agents/`, `hooks/`, `core/templates/`, `mcp-server/src/tools/`, or any directory whose contents change between releases.
+
+| Disallowed | Allowed |
+|---|---|
+| "26 slash commands" | "Every slash command", "All slash commands" |
+| "10 skills" | "Each auto-triggered skill", "All skills" |
+| "8 subagents" | "Every subagent", "The agent catalog" |
+| "13+ templates" | "All bundled templates", "The template library" |
+| "5 lifecycle events" | "Each lifecycle event", "The lifecycle hooks" |
+
+**Why:** A specific number means every release that adds or removes an item also requires a documentation edit. Missed edits become silent inaccuracies that erode trust.
+
+**Validation grep** (see §9 Pre-Commit Checklist):
+```bash
+grep -nE '\b[0-9]+\s+(commands?|skills?|agents?|hooks?|templates?|tools?|subagents?|events?)\b' docs/
+```
+Any match in user-facing docs is a style violation. Allowed exceptions: line counts, phase counts, version numbers.
+
+**Citation**: `[GoogleDevDocs]` "Avoid information that quickly becomes stale"; `[gitbook-style-guide]` (ADR-027, 2026-04-08).
 
 ---
 
@@ -280,14 +309,21 @@ Each version section opens with a `### TL;DR` subsection, followed by the standa
 ```markdown
 ### TL;DR
 
-!!! info "Short plain-English headline describing a user-visible change."
-    Brief plain-English explanatory text providing context.
+:::info[Short plain-English headline describing a user-visible change.]
 
-!!! info "Short plain-English headline for a workflow that is now automated."
-    Brief plain-English explanatory text on what the user no longer needs to do manually.
+Brief plain-English explanatory text providing context.
 
-!!! info "Short plain-English headline explicitly flagging a behind-the-scenes change."
-    For example: Internal architecture reorganized; no changes from your perspective.
+:::
+:::info[Short plain-English headline for a workflow that is now automated.]
+
+Brief plain-English explanatory text on what the user no longer needs to do manually.
+
+:::
+:::info[Short plain-English headline explicitly flagging a behind-the-scenes change.]
+
+For example: Internal architecture reorganized; no changes from your perspective.
+
+:::
 ```
 
 #### Rules for `### TL;DR`
@@ -313,12 +349,16 @@ Place `### TL;DR` immediately after the `## [version] - date` heading, before al
 
 ### TL;DR
 
-!!! info "Zero-friction MCP setup."
-    If the KMGraph MCP server isn't connected, the assistant will now offer to automatically configure it for Gemini CLI, Cursor, Windsurf, Continue.dev, or VS Code. No manual JSON editing required.
+:::info[Zero-friction MCP setup.]
 
-!!! info "Behind the scenes only:"
-    The internal search index format changed; search results are unchanged from your perspective.
+If the KMGraph MCP server isn't connected, the assistant will now offer to automatically configure it for Gemini CLI, Cursor, Windsurf, Continue.dev, or VS Code. No manual JSON editing required.
 
+:::
+:::info[Behind the scenes only:]
+
+The internal search index format changed; search results are unchanged from your perspective.
+
+:::
 ### Added
 - New `kg_capture` MCP write tool
 ```
@@ -418,20 +458,31 @@ Use blockquote syntax with a bold label. Works on GitHub and any markdown render
 Use MkDocs admonition syntax for richer styling on the documentation site.
 
 ```markdown
-!!! note "Note"
-    Informational context the reader should know.
+:::note[Note]
 
-!!! tip "Pro Tip"
-    Actionable optimization or shortcut.
+Informational context the reader should know.
 
-!!! warning "Common Pitfall"
-    Risk of data loss or a breaking change.
+:::
+:::tip[Pro Tip]
 
-!!! danger "Important"
-    A must-know requirement before proceeding.
+Actionable optimization or shortcut.
 
-!!! info "For Your Information"
-    Additional context or related resources.
+:::
+:::warning[Common Pitfall]
+
+Risk of data loss or a breaking change.
+
+:::
+:::danger[Important]
+
+A must-know requirement before proceeding.
+
+:::
+:::info[For Your Information]
+
+Additional context or related resources.
+
+:::
 ```
 
 **When to use**: Comprehensive documentation files (COMMAND-GUIDE.md, CONCEPTS.md, GETTING-STARTED.md) where site rendering matters.

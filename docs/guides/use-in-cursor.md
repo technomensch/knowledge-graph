@@ -1,0 +1,156 @@
+---
+id: use-in-cursor
+title: Use KMGraph in Cursor, Windsurf, VS Code, and JetBrains
+sidebar_label: Use in Cursor/Windsurf/VS Code
+description: How to install and use KMGraph with MCP-compatible IDEs beyond Claude Code
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Use KMGraph in Cursor, Windsurf, VS Code, and JetBrains
+
+## Goal
+
+Configure KMGraph's MCP server in a non-Claude-Code IDE so that `kg_*` tools are available to the AI assistant.
+
+## Prerequisites
+
+- Node.js 18+ installed
+- KMGraph repository cloned locally
+- The target IDE installed with MCP support
+
+## Step 1 — Build the MCP server
+
+```bash
+cd /path/to/knowledge-graph/mcp-server
+npm install
+npm run build
+```
+
+The server binary is at `mcp-server/dist/index.js`.
+
+## Step 2 — Register the MCP server in your IDE
+
+<Tabs groupId="ide">
+  <TabItem value="cursor" label="Cursor" default>
+
+Open `.cursor/mcp.json` (create if absent):
+
+```json
+{
+  "mcpServers": {
+    "kmgraph": {
+      "command": "node",
+      "args": ["/path/to/knowledge-graph/mcp-server/dist/index.js"],
+      "env": {
+        "KG_CONFIG_PATH": "/path/to/kg-config.json"
+      }
+    }
+  }
+}
+```
+
+Restart Cursor. The `kg_*` tools appear in the MCP tools panel.
+
+  </TabItem>
+  <TabItem value="windsurf" label="Windsurf">
+
+Open `.windsurf/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "kmgraph": {
+      "command": "node",
+      "args": ["/path/to/knowledge-graph/mcp-server/dist/index.js"]
+    }
+  }
+}
+```
+
+  </TabItem>
+  <TabItem value="vscode" label="VS Code">
+
+Run the VS Code installer script:
+
+```bash
+bash scripts/install-vscode.sh
+```
+
+The script auto-detects the VS Code settings path and registers the MCP server.
+
+Alternatively, add to `.vscode/settings.json`:
+
+```json
+{
+  "mcp.servers": {
+    "kmgraph": {
+      "command": "node",
+      "args": ["/path/to/knowledge-graph/mcp-server/dist/index.js"]
+    }
+  }
+}
+```
+
+  </TabItem>
+  <TabItem value="jetbrains" label="JetBrains">
+
+In JetBrains settings → Tools → AI Assistant → MCP Servers, add:
+
+- **Name:** `kmgraph`
+- **Command:** `node`
+- **Args:** `/path/to/knowledge-graph/mcp-server/dist/index.js`
+
+  </TabItem>
+  <TabItem value="continue" label="Continue.dev">
+
+In `.continue/config.json`:
+
+```json
+{
+  "mcpServers": [
+    {
+      "name": "kmgraph",
+      "command": "node",
+      "args": ["/path/to/knowledge-graph/mcp-server/dist/index.js"]
+    }
+  ]
+}
+```
+
+  </TabItem>
+</Tabs>
+
+## Step 3 — Initialize the knowledge graph
+
+In the IDE's AI chat, ask the assistant:
+
+```
+Use kg_config_init to initialize a new knowledge graph for this project.
+```
+
+Or paste the contents of [INSTALL.md](/INSTALL) for automated setup.
+
+## Step 4 — Add workflow instructions
+
+Copy `core/templates/AGENTS-template.md` to your project as `AGENTS.md`. This file gives the AI assistant the KMGraph workflow instructions for non-Claude-Code platforms.
+
+## Verify
+
+Ask the AI assistant:
+
+```
+Use kg_search to search for "test" in the knowledge graph.
+```
+
+The tool should return results (or an empty result if the graph is new).
+
+## Available MCP tools
+
+All `kg_*` tools are available: `kg_capture`, `kg_search`, `kg_config_init`, `kg_config_list`, `kg_config_switch`, `kg_fts5_rebuild`, `kg_scaffold`, `kg_check_sensitive`.
+
+## Next steps
+
+- [Platform Adaptation reference](/reference/PLATFORM-ADAPTATION) — full IDE compatibility matrix
+- [Migrate between Claude and Gemini](/guides/migrate-claude-gemini) — switching platforms with KG continuity

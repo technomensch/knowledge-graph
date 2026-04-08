@@ -5,16 +5,17 @@ Structured knowledge capture, lesson-learned documentation, and cross-session me
 **Version:** 0.2.3-beta
 **Status:** Beta Release — FTS5 Relocation, Issue Tracking UX, ECC Compatibility
 
-Documentation available at - https://technomensch.github.io/knowledge-graph/
+Documentation: https://kmgraph.stayinginsync.info
 
 Buy me a coffee if you find this useful - https://buymeacoffee.com/technomensch
+
 ---
 
 ## What is this?
 
 This is a platform-agnostic knowledge graph that was developed entirely using Gemini and Claude, leveraging very specific context and detailed natural language prompting.
 
-It is designed to take chats sessions with large language models (LLMs) and turn them into a searchable, institutional knowledge, library.
+It is designed to take chat sessions with large language models (LLMs) and turn them into a searchable, institutional knowledge library.
 
 The cool thing is, it helps users grab the important stuff (lessons learned, architecture decisions, recurring patterns, etc...) inside the development workflow without having to stop chatting.
 
@@ -52,16 +53,12 @@ See [Getting Started Guide](docs/GETTING-STARTED.md) for prerequisites and troub
 
 ### 🟢 Essential Commands (Start Here)
 
-First-time users need these for basic operation:
-
 - `/kmgraph:init` — Initialize new knowledge graph with wizard-based setup
 - `/kmgraph:capture-lesson` — Document lessons learned with git metadata tracking
 - `/kmgraph:status` — View active knowledge graph info and quick reference
 - `/kmgraph:recall` — Search across all memory systems (lessons, decisions, knowledge)
 
 ### 🟡 Intermediate Commands (Once Comfortable)
-
-Active users leverage these for regular workflows:
 
 - `/kmgraph:update-graph` — Extract knowledge graph entries from lessons
 - `/kmgraph:add-category` — Add a new category to existing knowledge graph
@@ -74,8 +71,6 @@ Active users leverage these for regular workflows:
 - `/kmgraph:update-doc` — Update plugin/project documentation (`--user-facing`) or KG content
 
 ### 🔴 Advanced Commands (Power Features)
-
-Power users use these for complex workflows:
 
 - `/kmgraph:meta-issue` — Initialize meta-issue tracking for complex multi-attempt problems
 - `/kmgraph:start-issue-tracking` — Initialize issue tracking with structured docs and Git branch
@@ -100,89 +95,6 @@ Power users use these for complex workflows:
 
 ---
 
-## ⚠️ Critical: Namespace Visibility & Marketplace Installation
-
-**IMPORTANT DISCOVERY** (Feb 16, 2026):
-
-Namespace visibility in Claude Code works differently for local development vs. marketplace installation.
-
-### Marketplace Installation (Distribution Mode)
-
-When installed via marketplace, Claude Code correctly shows the `/kmgraph:` namespace prefix regardless of filename:
-
-**Command files:**
-```
-commands/
-├── status.md          → Shows as /kmgraph:status in UI ✅
-├── init.md            → Shows as /kmgraph:init in UI ✅
-├── capture-lesson.md  → Shows as /kmgraph:capture-lesson in UI ✅
-```
-
-**Autocomplete behavior:**
-- User types `/know` → shows `/kmgraph:status`, `/kmgraph:init`, etc.
-- Namespace prefix is automatically applied by Claude Code
-- No filename prefix needed
-
-### Key Insights
-
-1. **File prefix workaround not needed:** Initial testing suggested using `knowledge-*.md` filenames, but marketplace installation handles namespacing correctly with clean base names
-
-2. **Two-location sync for local testing:** When testing locally, changes must be synced from development directory to marketplace cache:
-   ```bash
-   rsync -av --delete \
-     /path/to/plugin/ \
-     ~/.claude/local-marketplace/plugins/plugin-name/
-   ```
-
-3. **Cross-LLM compatibility:** Shadow command strategies (intentional collisions) fail with non-Claude LLMs like Gemini
-
-### For Plugin Developers
-
-- **Use clean filenames:** `status.md`, not `plugin-status.md`
-- **Test via marketplace:** Local testing may not reflect actual user experience
-- **Namespace is automatic:** Claude Code applies namespace prefix in Distribution Mode
-- **Avoid shadow commands:** They break cross-LLM compatibility
-
-See lessons:
-- [docs/lessons-learned/process/local-marketplace-testing-workflow.md](docs/lessons-learned/process/local-marketplace-testing-workflow.md)
-- [docs/lessons-learned/debugging/namespace-visibility-shadow-command-failure.md](docs/lessons-learned/debugging/namespace-visibility-shadow-command-failure.md)
-
----
-
-## ⚠️ Architecture: Commands vs Skills
-
-**IMPORTANT DECISION** (Feb 2026):
-
-This plugin uses the `commands/` directory instead of `skills/` based on research into Claude Code's distinction between these two patterns.
-
-### Why Commands?
-
-Knowledge graph operations are **deterministic workflows** that work best when:
-- User explicitly invokes them (manual control)
-- Full workflow loads immediately (not lazy-loaded)
-- Predictable execution flow (not autonomous decisions)
-
-### Commands vs Skills in Claude Code
-
-| Feature | Commands | Skills |
-|---------|----------|--------|
-| Location | `commands/` | `skills/` |
-| Invocation | Manual only | Manual + autonomous |
-| Loading | Full content on invocation | Lazy-loaded description first |
-| Use Case | Surgical operations | Complex capabilities |
-| Token Usage | Higher (full load) | Lower (on-demand) |
-
-### Invocation Pattern
-
-All knowledge graph commands use the `knowledge:` namespace:
-- `/kmgraph:capture-lesson`
-- `/kmgraph:init`
-- `/kmgraph:recall`
-
-**For plugin developers:** Choose `commands/` when you want users to have explicit control over when workflows run. Choose `skills/` when you want Claude to autonomously discover and apply capabilities.
-
----
-
 ## Architecture
 
 ### Core Design
@@ -194,7 +106,7 @@ All knowledge graph commands use the `knowledge:` namespace:
 ```
 knowledge-graph/
 ├── .claude-plugin/           # Plugin manifest
-├── commands/                 # commands (manual invocation)
+├── commands/                 # Commands (manual invocation)
 ├── agents/                   # Subagents (knowledge-reviewer)
 ├── hooks/                    # SessionStart hooks
 ├── scripts/                  # Helper scripts
@@ -205,18 +117,13 @@ knowledge-graph/
 │   ├── scripts/              # Python extraction scripts
 │   ├── examples-hooks/       # Pre-commit sanitization
 │   └── docs/                 # Documentation
-├── mcp-server/               # MCP data layer (Phase 4)
-├── docs/
-│   └── plans/                # Implementation plans (Phase 1-5)
+├── mcp-server/               # MCP data layer
 ├── README.md                 # This file
 ├── LICENSE                   # MIT
 └── docs/CHANGELOG.md         # Version history
 ```
 
 ### Developer vs. Distribution Structure
-
-The root `package.json` `files` allowlist controls what is distributed when the plugin
-is installed from the marketplace. Developer-only content in `docs/` is excluded:
 
 | Directory    | In git | Distributed | Purpose                          |
 |--------------|--------|-------------|----------------------------------|
@@ -284,8 +191,6 @@ See [ROADMAP.md](ROADMAP.md) for detailed version history and development progre
 
 **For non-Claude users:** Paste [INSTALL.md](INSTALL.md) into any AI assistant for automated setup. The installer detects the platform and configures the appropriate components.
 
-See: [Platform Adaptation Guide](core/docs/PLATFORM-ADAPTATION.md) for platform capability comparisons
-
 ---
 
 ## Troubleshooting
@@ -317,16 +222,16 @@ See [tests/README.md](tests/README.md) for detailed troubleshooting.
 
 If `/kmgraph:command` doesn't autocomplete:
 - Verify plugin is loaded (check Claude Code plugin list)
-- Commands use `knowledge:` prefix with colon (not hyphen)
+- Commands use `kmgraph:` prefix with colon
 - Try restarting Claude Code
 
 ### Common Issues
 
-**"Duplicate hooks file detected"** - Already fixed in v0.0.1-alpha
+**"Duplicate hooks file detected"** — Already fixed in v0.0.1-alpha
 
-**Templates not found** - Ensure `core/templates/` exists and plugin loaded from correct directory
+**Templates not found** — Ensure `core/templates/` exists and plugin loaded from correct directory
 
-**Git metadata missing** - Commands must run from a git repository
+**Git metadata missing** — Commands must run from a git repository
 
 ---
 
@@ -342,41 +247,8 @@ MIT License - See [LICENSE](LICENSE)
 
 ---
 
-## Links
-
-- **Plans:** [docs/plans/](docs/plans/) — Phase 1-5 implementation roadmap
-- **Master Plan:** [docs/plans/v9.5.0-master-plan.md](docs/plans/v9.5.0-master-plan.md)
-- **Source:** Originally extracted from a production Claude Code project
-
----
-
-## Documentation
-
-📚 **Lost?** See the [Navigation Index](docs/NAVIGATION-INDEX.md) for complete sitemap and decision trees.
-
-**New users**:
-- [Getting Started](docs/GETTING-STARTED.md) - Installation and first steps
-
-**Concepts**:
-- [Concepts Guide](docs/CONCEPTS.md) - What is a knowledge graph?
-- [Quick Reference](docs/CHEAT-SHEET.md) - One-page cheat sheet
-
-**Command reference**:
-- [Command Guide](docs/COMMAND-GUIDE.md) - All commands with learning path
-- [Essential Commands](docs/COMMAND-GUIDE.md#essential-commands) - Start here
-
-**Guides**:
-- [Configuration](docs/CONFIGURATION.md) - Post-install setup
-- [Platform Adaptation](core/docs/PLATFORM-ADAPTATION.md) - Cursor, Continue, Aider, etc.
-- [Pattern Writing](core/docs/PATTERNS-GUIDE.md) - Writing effective entries
-- [Manual Workflows](core/docs/WORKFLOWS.md) - Non-Claude workflows
-
-**Resources**:
-- [Templates](core/templates/) - Starting scaffolds
-- [Examples](core/examples/) - Real-world samples
-
----
-
 **Created:** 2026-02-12
 **Current Phase:** Beta Release Cycle (v0.2.3-beta)
 **Next Milestone:** v0.3.0 — Expanded agent capabilities and improved search UX
+
+📚 **Full documentation:** https://kmgraph.stayinginsync.info

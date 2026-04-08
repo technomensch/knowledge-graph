@@ -1,4 +1,9 @@
-# Knowledge Graph Quick Reference
+---
+id: CHEAT-SHEET
+title: Cheat Sheet
+sidebar_label: Cheat Sheet
+description: Quick reference for common KMGraph workflows and commands
+---
 
 **Version:** 0.2.3.3-beta | **Updated:** 2026-04-06
 
