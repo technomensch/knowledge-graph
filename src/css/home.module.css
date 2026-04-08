@@ -1,0 +1,95 @@
+.hero {
+  background: var(--ifm-color-primary);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  margin: 0 auto 2rem;
+  max-width: 680px;
+}
+
+.heroImage {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0 auto 1rem;
+  display: block;
+}
+
+.heroTagline {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 1.25rem;
+}
+
+.heroBullets {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.75rem;
+  text-align: left;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.heroBullets li {
+  margin-bottom: 0.4rem;
+}
+
+.heroCode {
+  display: block;
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
+  padding: 0.75rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin: 0 0 0.5rem;
+  text-align: left;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.heroSubtext {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0;
+  text-align: left;
+}
+
+.heroSubtext code {
+  background: rgba(0, 0, 0, 0.2);
+  color: #fff;
+}
+
+/* Tablet: loosen padding, allow text to reflow naturally */
+@media (max-width: 768px) {
+  .hero {
+    padding: 1.5rem 1.25rem;
+    border-radius: 8px;
+  }
+
+  .heroTagline {
+    font-size: 1.05rem;
+  }
+
+  .heroBullets {
+    font-size: 0.9rem;
+  }
+
+  .heroCode {
+    font-size: 0.82rem;
+  }
+}
+
+/* Mobile: full-width, no border-radius on edges */
+@media (max-width: 480px) {
+  .hero {
+    padding: 1.25rem 1rem;
+    border-radius: 6px;
+    max-width: 100%;
+  }
+
+  .heroCode {
+    font-size: 0.78rem;
+  }
+}
