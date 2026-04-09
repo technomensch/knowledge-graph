@@ -4,8 +4,10 @@ Cross-session work summaries, architectural decisions, and progress tracking.
 
 ---
 
-## 2026-04 (1 session)
+## 2026-04 (4 sessions)
 
+- [2026-04-09 - v0.3.0-beta Planning — Default KG Path Change and rules/me Scaffold](2026-04/2026-04-09-v0.3.0-beta-planning-default-path-and-rules-scaffold.md) — Research confirmed `knowledge/` as correct default; designed migration step for existing `docs/` layouts; designed `me.md`/`rules.md` as platform-agnostic source of truth; created ADR-028 and ENH-010
+- [2026-04-08 - Docusaurus Migration Home Layout and Asset Loading Fixes](2026-04/2026-04-08-docusaurus-migration-home-layout-asset-loading-fixes.md)
 - [2026-04-06 - Snapshot Gate Language Correction and Lesson-Capture Resilience](2026-04/2026-04-06-snapshot-gate-language-correction.md) — Corrected Snapshot Gate language across all three capture commands; added session-summary pre-fill to lesson-capture-agent Phase 2; created ADR-026; updated ENH-002
 
 ---
@@ -18,9 +20,9 @@ Cross-session work summaries, architectural decisions, and progress tracking.
 
 ---
 
-**Total Sessions:** 4
-**Last Session:** 2026-04-06
-**Last Updated:** 2026-04-06
+**Total Sessions:** 7
+**Last Session:** 2026-04-09
+**Last Updated:** 2026-04-09
 
 ---
 
@@ -32,8 +34,10 @@ Sessions are organized by month (YYYY-MM/) for easy archival and historical refe
 
 ```
 sessions/
+├── 2026-02/
 ├── 2026-03/
-│   └── 2026-03-03_release-completion-v0-0-11-alpha-v0-1-0-beta.md
+├── 2026-04/
+│   └── 2026-04-09-v0.3.0-beta-planning-default-path-and-rules-scaffold.md
 └── README.md (this file)
 ```
 
