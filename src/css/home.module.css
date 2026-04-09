@@ -91,6 +91,105 @@
   margin-top: auto;
 }
 
+/* ── Context grid (2×2) ──────────────────────────────────────────── */
+.contextGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.contextItem {
+  background: var(--ifm-card-background-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+}
+
+.contextItem strong {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.contextItem span {
+  font-size: 0.85rem;
+  color: var(--ifm-color-content-secondary);
+}
+
+/* ── What it stores ──────────────────────────────────────────────── */
+.storesList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.storesList li {
+  font-size: 0.95rem;
+  padding-left: 1.5rem;
+  position: relative;
+  line-height: 1.45;
+}
+
+.storesList li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--ifm-color-primary);
+  font-weight: 700;
+}
+
+/* ── Audience badges ─────────────────────────────────────────────── */
+.audienceSection {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.audienceLabel {
+  font-size: 0.85rem;
+  color: var(--ifm-color-content-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.badge {
+  background: var(--ifm-color-emphasis-100);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 20px;
+  padding: 0.3rem 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--ifm-color-content);
+}
+
+/* ── Demo GIF ────────────────────────────────────────────────────── */
+.demoSection {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.demoLabel {
+  font-size: 0.85rem;
+  color: var(--ifm-color-content-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.demoGif {
+  width: 100%;
+  max-width: 700px;
+  border-radius: 8px;
+  border: 1px solid var(--ifm-color-emphasis-200);
+}
+
 /* ── Tablet: 2×2 cards ───────────────────────────────────────────── */
 @media (max-width: 860px) {
   .cards {
@@ -99,6 +198,13 @@
 
   .card {
     flex: 1 1 calc(50% - 0.625rem);
+  }
+}
+
+/* ── Collapse context grid on small screens ──────────────────────── */
+@media (max-width: 600px) {
+  .contextGrid {
+    grid-template-columns: 1fr;
   }
 }
 
