@@ -8,6 +8,13 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 
 - **Pluggable knowledge graph storage backends** — Notion, Obsidian, and NotebookLM as primary stores instead of local markdown. Requires `/kmgraph:init` wizard updates, MCP server config schema additions, and per-backend adapter modules. Captured because the docs-restructure plan adds integration guides for these tools but cannot change the storage layer in scope.
 - **Contributor commands vs user commands — surface area separation** — `update-doc`, `create-doc`, and the `doc-update-router` skill exist to update the KMGraph project's own docs site. Today they ship to every end user, conflating two audiences. Future work: move to a separate plugin (`kmgraph-contrib`?), gate by a `.kmgraph-contributor` marker file, or use a `commands/contributing/` subdirectory with conditional registration.
+- **Hierarchical skill invocation pattern** — Future support for `/kmgraph:[category]/[skill-name]` notation to navigate skill hierarchy (currently flat). Requires Claude Code plugin evolution or workaround pattern (ADR-002).
+- **`--all-graphs` flag for kg_capture MCP tool** — Enable multi-KG capture operations: write to all registered KGs in single operation. Currently requires separate calls per KG (ADR-006).
+
+### MEMORY Management
+
+- **MEMORY.md auto-sync rules engine** — YAML-based pattern matching to automate sync decisions (e.g., "gotcha" → "Common Failure Patterns", "best practice" → "Best Practices"). Requires real-world MEMORY.md patterns from live usage before implementation (ADR-005).
+- **MEMORY.md smart summarization** — LLM-powered entry consolidation to merge similar entries and reduce token bloat. Lower priority until rules engine is operational (ADR-005).
 
 ### Documentation polish (post-v0.0.6-docs-restructure)
 
@@ -17,12 +24,16 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 - Markprompt / LLM-powered Q&A search (wait until Algolia DocSearch usage data exists)
 - Interactive decision tree component for "lesson vs ADR vs session-summary vs meta-issue"
 - Setup guide for `scripts/notification-dispatch.sh`
+- CONCEPTS.md page reordering — move process/workflow sections earlier for first-time users (currently buried after 400 lines of theory)
+- CONCEPTS.md length reduction — trim Four-Layer Architecture (~100 lines) and How Search Works (~30 lines); currently 650 lines
+- CONCEPTS.md accessibility improvements — add `accTitle`/`accDescr` to search diagrams; fix second-person pronouns in Personal vs Project section
 
 ### Process / governance (ADRs to capture)
 
 - ADR placeholder: "Pluggable storage backends — Notion, Obsidian, NotebookLM"
 - ADR placeholder: "Contributor command surface area separation"
 - ADR placeholder: "Documentation updates feed via Docusaurus blog plugin" (lands in Phase 0 of the docs-restructure)
+- ADR placeholder: "Update notifications and version sync mechanism" — Discovery and auto-detection for MCP/template-only users; version consistency across multiple files (ADR-011)
 
 ---
 
