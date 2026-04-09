@@ -189,8 +189,12 @@ The two-level pattern is already established in KMGraph via CLAUDE.md (project v
 **Files to create:**
 - `core/templates/knowledge/me.md` — platform-agnostic me.md template
 - `core/templates/knowledge/rules.md` — platform-agnostic rules.md template
-- `core/templates/knowledge/index.md` — project KG master index template
+- `core/templates/knowledge/kg-index.md` — project KG root index template (deployed as `$KG_PATH/index.md`)
 - `core/templates/knowledge/index-personal.md` — personal KG master index template
+
+**Files to rename:**
+- `core/templates/knowledge/index.md` → `core/templates/knowledge/kg-category-index.md` (KG category navigator for patterns/gotchas/concepts/architecture/workflows; avoids ambiguity with the new kg-index.md root index)
+  - Update `commands/init.md:437` to reference `kg-category-index.md`
 - `core/templates/platform/claude-md-shim.md`
 - `core/templates/platform/cursorrules-shim.md`
 - `core/templates/platform/copilot-instructions-shim.md`
@@ -209,8 +213,9 @@ The two-level pattern is already established in KMGraph via CLAUDE.md (project v
 **Success criteria:**
 - [ ] `core/templates/knowledge/me.md` exists with documented structure
 - [ ] `core/templates/knowledge/rules.md` exists with documented structure
-- [ ] `core/templates/knowledge/index.md` exists with directory map and wiki-linked key files
-- [ ] `kmgraph init` scaffolds all three files in `knowledge/` for new installs
+- [ ] `core/templates/knowledge/kg-index.md` exists with directory map and wiki-linked key files; deployed as `$KG_PATH/index.md`
+- [ ] `core/templates/knowledge/index.md` renamed to `kg-category-index.md`; `commands/init.md:437` updated
+- [ ] `kmgraph init` scaffolds all three files at `$KG_PATH/` root for new installs
 - [ ] Step 1.6.5 content migration offer present: prompts user to populate me.md/rules.md from existing CLAUDE.md
 - [ ] Personal KG scaffold also creates `index.md`, `me.md`, `rules.md` at `~/.claude/knowledge-graph/`
 - [ ] At least one platform shim template exists in `core/templates/platform/`
@@ -237,5 +242,5 @@ The two-level pattern is already established in KMGraph via CLAUDE.md (project v
 ---
 
 **Decision Made:** 2026-04-09
-**Last Updated:** 2026-04-09 (added index.md as third scaffolded file; content migration offer moved from Deferred to in-scope)
+**Last Updated:** 2026-04-09 (added kg-index.md as third scaffolded file, deployed as `$KG_PATH/index.md`; existing `core/templates/knowledge/index.md` renamed to `kg-category-index.md` to prevent collision; content migration offer moved from Deferred to in-scope)
 **Status:** Proposed

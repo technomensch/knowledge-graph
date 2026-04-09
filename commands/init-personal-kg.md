@@ -79,7 +79,7 @@ mkdir -p "{personal_kg_path}/lessons-learned"/{architecture,debugging,patterns,p
 ### Step 4: Copy templates
 
 ```bash
-for f in patterns.md gotchas.md concepts.md architecture.md workflows.md index.md; do
+for f in patterns.md gotchas.md concepts.md architecture.md workflows.md kg-category-index.md; do
   src="${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/$f"
   dest="{personal_kg_path}/knowledge/$f"
   [ -f "$src" ] && [ ! -f "$dest" ] && cp "$src" "$dest"
