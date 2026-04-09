@@ -191,6 +191,24 @@ The protocol violation wasn't about forgetting a file — it was about misunders
 
 ---
 
+## When the Violation Recurs: Use It As ADR Evidence
+
+<!-- v1.1 Addition -->
+
+If the same violation happens *during a planning session for the system meant to prevent it*, that recurrence is primary evidence for the architectural decision it motivates.
+
+Document it explicitly in the ADR context section. It demonstrates that memory-backed or scattered rules have insufficient enforcement surface — a rule that gets violated while you are planning its fix is a rule that belongs in a more prominent, centralized location.
+
+**Live example (2026-04-09):** The dual-location rule was violated during v0.3.0-beta planning (the session designing `rules.md` to prevent exactly this). That violation was documented in ADR-028's context section and became the primary evidence for centralizing behavioral rules in `knowledge/rules.md`. See ADR-028 — context section, paragraph 4.
+
+**Pattern:**
+1. Violation occurs mid-session
+2. Ask: "Is this session planning a fix for this class of violation?"
+3. If yes: reference the violation explicitly in the ADR context. Phrase it as "this violation demonstrates that [root cause] — not just 'another protocol miss.'"
+4. The ADR rationale becomes grounded in observed evidence, not hypothetical risk.
+
+---
+
 ## Related Documentation
 
 - **ADR-014:** Maintain Dual Plan File Locations (architectural decision)
@@ -212,13 +230,15 @@ When you catch a protocol violation in future work:
 - [ ] Identify what protocol was violated
 - [ ] Document the root cause (misunderstanding vs. oversight)
 - [ ] Create the missing artifact(s) retroactively
+- [ ] Before adding a new lesson, search the graph for similar existing entries — update rather than create if found (see ENH-011)
 - [ ] Add a lesson for the pattern (prevents recurrence)
+- [ ] If the violation occurred *during planning for its own fix*, reference it in the ADR context section as evidence of the broader fragility it demonstrates
 - [ ] Update CLAUDE.md if the protocol needs clarification
 - [ ] Share with team if collaborative project
 
 ---
 
 **Category:** process
-**Status:** Lesson created from observed protocol violation
-**Last Updated:** 2026-03-01
-**Version:** 1.0
+**Status:** Active
+**Last Updated:** 2026-04-09
+**Version:** 1.1
