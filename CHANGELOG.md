@@ -13,7 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
-## [0.2.4-beta] — 2026-04-08
+## [0.2.4.1-beta] - 2026-04-09
+
+### CI
+- **GitHub Actions updated to Node.js 24** - Updated `actions/setup-node@v4` node-version from 20 to 24 and `peaceiris/actions-gh-pages` from v3 to v4. Prevents workflow failures after Node.js 20 deprecation on GitHub Actions runners (June 2026).
+
+## [0.2.4-beta] - 2026-04-08
 
 ### Documentation
 - **Diátaxis restructure** — Full docs site reorganized into Tutorials / How-to Guides / Reference / Concepts per the Diátaxis IA framework

@@ -1449,5 +1449,5 @@ flowchart TD
 </div>
 ---
 
-**Version**: 0.2.3.4-beta
+**Version**: 0.2.4.1-beta
 **Updated**: 2026-03-30
