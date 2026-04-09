@@ -4,8 +4,8 @@
 
 Comprehensive catalog of all lessons-learned documents.
 
-**Total Lessons:** 0
-**Last Updated:** [Date]
+**Total Lessons:** 4
+**Last Updated:** 2026-04-09
 
 ---
 
@@ -27,17 +27,19 @@ Comprehensive catalog of all lessons-learned documents.
 
 ---
 
-### Patterns Lessons (0 total)
+### Patterns Lessons (3 total)
 
-[Auto-populated when lessons are added]
+- [KMGraph Fingerprint Detection Before Migration](patterns/Lessons_Learned_KMGraph_Fingerprint_Detection_Before_Migration.md) — Use KMGraph-specific subdirectories as identity sentinels before triggering migration prompts; path name alone is insufficient
+- [Template Source Files Should Encode Role, Not Deployed Output Name](patterns/Lessons_Learned_Template_Source_Naming_Role_Not_Output.md) — Name templates by role (kg-index.md, kg-category-index.md); deploy-time copy commands map role names to output filenames; prevents silent overwrites
+- [Two-Level Identity and Rules Hierarchy for AI Agents](patterns/Lessons_Learned_Two_Level_Identity_Rules_Hierarchy.md) — Separate identity (me.md, gitignored) from rules (rules.md, committed); make platform files thin shims to eliminate rule drift
 
 **Tags:** #patterns
 
 ---
 
-### Debugging Lessons (0 total)
+### Debugging Lessons (1 total)
 
-[Auto-populated when lessons are added]
+- [Plugin Cache Not Synced From Local Repo](debugging/Lessons_Learned_Debugging_Plugin_Cache_Not_Synced_From_Local_Repo.md) — `/reload-plugins` loads from the marketplace cache, not the local repo; copy files manually into the cache before reloading to test local changes
 
 **Tags:** #debugging
 
@@ -45,8 +47,11 @@ Comprehensive catalog of all lessons-learned documents.
 
 ## Chronological Index
 
-**[Current Year]**
-- [YYYY-MM-DD] - [Lesson Title](category/Lessons_Learned_Title.md) - Brief description
+**2026**
+- [2026-04-09] - [KMGraph Fingerprint Detection Before Migration](patterns/Lessons_Learned_KMGraph_Fingerprint_Detection_Before_Migration.md) - Fingerprint detection pattern for migration triggers using KMGraph-specific subdirectories
+- [2026-04-09] - [Template Source Files Should Encode Role, Not Deployed Output Name](patterns/Lessons_Learned_Template_Source_Naming_Role_Not_Output.md) - Role-based source naming for core/templates/ prevents silent overwrite collisions
+- [2026-04-09] - [Two-Level Identity and Rules Hierarchy for AI Agents](patterns/Lessons_Learned_Two_Level_Identity_Rules_Hierarchy.md) - Separate identity from rules in agent context files; platform files become thin shims
+- [2026-04-09] - [Plugin Cache Not Synced From Local Repo](debugging/Lessons_Learned_Debugging_Plugin_Cache_Not_Synced_From_Local_Repo.md) - /reload-plugins reads from the marketplace cache, not the local repo; copy files manually to test local changes
 
 ---
 
@@ -56,9 +61,13 @@ Comprehensive catalog of all lessons-learned documents.
 
 **#process** (0 lessons)
 
-**#patterns** (0 lessons)
+**#patterns** (3 lessons)
+- [KMGraph Fingerprint Detection Before Migration](patterns/Lessons_Learned_KMGraph_Fingerprint_Detection_Before_Migration.md) — #fingerprint #migration #detection #init #false-positive
+- [Template Source Files Should Encode Role, Not Deployed Output Name](patterns/Lessons_Learned_Template_Source_Naming_Role_Not_Output.md) — #templates #naming #core-templates #init #collision #overwrite #file-naming
+- [Two-Level Identity and Rules Hierarchy for AI Agents](patterns/Lessons_Learned_Two_Level_Identity_Rules_Hierarchy.md) — #identity #rules #hierarchy #context-files #agent-design #platform-portability #shim
 
-**#debugging** (0 lessons)
+**#debugging** (1 lesson)
+- [Plugin Cache Not Synced From Local Repo](debugging/Lessons_Learned_Debugging_Plugin_Cache_Not_Synced_From_Local_Repo.md) — #plugin-cache #reload-plugins #local-development #commands
 
 ---
 
