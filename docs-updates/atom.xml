@@ -2,11 +2,37 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://technomensch.github.io/knowledge-graph/docs-updates</id>
     <title>KMGraph Docs Updates</title>
-    <updated>2026-04-08T00:00:00.000Z</updated>
+    <updated>2026-04-09T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://technomensch.github.io/knowledge-graph/docs-updates"/>
     <subtitle>Knowledge Management Graph Blog</subtitle>
     <icon>https://technomensch.github.io/knowledge-graph/img/square.png</icon>
+    <entry>
+        <title type="html"><![CDATA[Home page redesigned - clearer audience, context grid, demo GIF]]></title>
+        <id>https://technomensch.github.io/knowledge-graph/docs-updates/2026/04/09/homepage-rewrite</id>
+        <link href="https://technomensch.github.io/knowledge-graph/docs-updates/2026/04/09/homepage-rewrite"/>
+        <updated>2026-04-09T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[The KMGraph home page has been redesigned based on user feedback. The previous page didn't immediately answer who KMGraph is for or what it does - visitors had to read too far before the value was clear.]]></summary>
+        <content type="html"><![CDATA[<p>The KMGraph home page has been redesigned based on user feedback. The previous page didn't immediately answer who KMGraph is for or what it does - visitors had to read too far before the value was clear.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="what-changed">What changed<a href="https://technomensch.github.io/knowledge-graph/docs-updates/2026/04/09/homepage-rewrite#what-changed" class="hash-link" aria-label="Direct link to What changed" title="Direct link to What changed" translate="no">​</a></h2>
+<p><strong>New banner</strong> - updated to lead with the audience hook, the problem, and the solution in a single visual:</p>
+<ul>
+<li class=""><em>"Using an AI coding assistant? KMGraph is for you."</em></li>
+<li class=""><em>"KMGraph remembers what you and your tools forget."</em></li>
+<li class=""><em>"Lessons Learned. Decisions. Institutional Knowledge."</em></li>
+</ul>
+<p><strong>Context grid</strong> - a 2×2 grid immediately answers "what does it bridge?": sessions, models, tools, and teammates.</p>
+<p><strong>What it stores</strong> - three plain-language bullets mapping directly to the tricolon: lessons learned, decisions, and institutional knowledge.</p>
+<p><strong>Audience badges</strong> - explicit audience callout: Developer · Vibe-Coder · Prompt Engineer · Open-Source Maintainer · Small Agile Team.</p>
+<p><strong>Demo GIF</strong> - <code>capture-lesson</code> demo now shown on the home page so visitors see the tool in action before being asked to install it.</p>]]></content>
+        <author>
+            <name>Marc Kaplan</name>
+            <uri>https://github.com/technomensch</uri>
+        </author>
+        <category label="docs" term="docs"/>
+        <category label="ux" term="ux"/>
+        <category label="homepage" term="homepage"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Documentation restructured — Diátaxis IA, search, demos]]></title>
         <id>https://technomensch.github.io/knowledge-graph/docs-updates/2026/04/08/docusaurus-restructure</id>

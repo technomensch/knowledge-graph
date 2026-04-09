@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkknowledge_graph_plugin=self.webpackChunkknowledge_graph_plugin||[]).push([[8657],{58697(e){e.exports=JSON.parse('{"metadata":{"permalink":"/knowledge-graph/docs-updates","page":1,"postsPerPage":10,"totalPages":1,"totalCount":3,"blogDescription":"Changes to the KMGraph documentation site","blogTitle":"Documentation Updates"}}')}}]);
