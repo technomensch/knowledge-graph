@@ -2,7 +2,7 @@
 id: index
 title: Knowledge Management Graph
 sidebar_label: Home
-description: Structured knowledge capture and cross-session memory — for every AI-assisted project
+description: Persistent memory for anyone using AI coding assistants - across sessions, models, tools, and teams
 hide_title: true
 hide_table_of_contents: true
 ---
@@ -13,19 +13,59 @@ import styles from '@site/src/css/home.module.css';
 
   <img
     src="/knowledge-graph/img/Staying_in_Sync_Banner_Dark.png"
-    alt="KMGraph — The Knowledge Management Graph"
+    alt="KMGraph - Using an AI coding assistant? KMGraph is for you."
     className={styles.headerImage}
   />
 
+  <div className={styles.contextGrid}>
+    <div className={styles.contextItem}>
+      <strong>Between sessions</strong>
+      <span>Day-to-day, week-to-week - context survives session resets</span>
+    </div>
+    <div className={styles.contextItem}>
+      <strong>Between models</strong>
+      <span>Claude, Gemini, Codex, and more - same knowledge, any AI</span>
+    </div>
+    <div className={styles.contextItem}>
+      <strong>Between tools</strong>
+      <span>VS Code, Cursor, CLI, Antigravity - one repo, everywhere</span>
+    </div>
+    <div className={styles.contextItem}>
+      <strong>Between teammates</strong>
+      <span>Stored on GitHub - shared automatically with your team</span>
+    </div>
+  </div>
+
+  <ul className={styles.storesList}>
+    <li>Remembers your <strong>lessons learned</strong> from every bug and breakthrough</li>
+    <li>Tracks the <strong>decisions you made</strong> - and the rationale behind them</li>
+    <li><strong>Institutional knowledge</strong> - in a local, platform-agnostic repo that follows you everywhere</li>
+  </ul>
+
+  <div className={styles.audienceSection}>
+    <p className={styles.audienceLabel}>Built for everyone building with AI:</p>
+    <div className={styles.badges}>
+      <span className={styles.badge}>Developer</span>
+      <span className={styles.badge}>Vibe-Coder</span>
+      <span className={styles.badge}>Prompt Engineer</span>
+      <span className={styles.badge}>Open-Source Maintainer</span>
+      <span className={styles.badge}>Small Agile Team</span>
+    </div>
+  </div>
+
+  <div className={styles.demoSection}>
+    <p className={styles.demoLabel}>See it in action - capturing a lesson at the end of a session:</p>
+    <img
+      src="/knowledge-graph/img/demos/capture-lesson.gif"
+      alt="KMGraph capture-lesson demo"
+      className={styles.demoGif}
+    />
+  </div>
+
   <div className={styles.hero}>
-    <ul className={styles.heroBullets}>
-      <li>✓ Decisions made three sprints ago are gone — no record, no rationale, no trail</li>
-      <li>✓ The same bug gets solved twice because no one remembered solving it the first time</li>
-      <li>✓ Switching between Claude, Cursor, and Gemini means starting over every time</li>
-    </ul>
     <code className={styles.heroCode}>claude --plugin-dir /path/to/knowledge-graph</code>
     <p className={styles.heroSubtext}>
-      Then run <code>/kmgraph:init</code> — first lesson captured in under 5 minutes.
+      Then run <code>/kmgraph:init</code> - first lesson captured in under 5 minutes.
     </p>
   </div>
 
@@ -37,7 +77,7 @@ import styles from '@site/src/css/home.module.css';
     </div>
     <div className={styles.card}>
       <h3>📋 Browse Commands</h3>
-      <p>Every slash command, MCP tool, and skill — one reference page.</p>
+      <p>Every slash command, MCP tool, and skill - one reference page.</p>
       <a href="/knowledge-graph/reference/commands" className="button button--secondary button--sm">Browse →</a>
     </div>
     <div className={styles.card}>
@@ -47,7 +87,7 @@ import styles from '@site/src/css/home.module.css';
     </div>
     <div className={styles.card}>
       <h3>⚡ Cheat Sheet</h3>
-      <p>One-page quick reference — the commands you use every day.</p>
+      <p>One-page quick reference - the commands you use every day.</p>
       <a href="/knowledge-graph/CHEAT-SHEET" className="button button--secondary button--sm">Open →</a>
     </div>
   </div>
