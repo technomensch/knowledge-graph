@@ -231,6 +231,56 @@ The two-level pattern is already established in KMGraph via CLAUDE.md (project v
 
 ---
 
+## UX Decision: "See What's New" Before Applying Upgrade
+
+When a user runs `/kmgraph:init` or `/kmgraph:init-personal-kg` and an existing KG is detected, Option 1 in the menu uses the label:
+
+> **"See what's new — review improvements in this version, then decide what to apply"**
+
+This applies to both commands:
+- `/kmgraph:init` — shown when an existing project KG is detected (pre-wizard detection menu)
+- `/kmgraph:init-personal-kg` — shown when an existing personal KG is already registered (Step 1)
+
+When selected, the command **inspects the KG's actual state first** and reports only what is missing or upgradeable for that specific install — not a generic version changelog. Items already present are never listed.
+
+Example output for a KG missing `me.md` and `rules.md`:
+```
+Here's what's available for your install:
+  • New: me.md — your identity and working style in this project
+  • New: rules.md — project conventions and behavioral rules
+
+Apply all, pick individually, or skip?
+  1. Apply all
+  2. Let me choose which ones to apply
+  3. Skip — my setup is already how I want it
+```
+
+If nothing is missing or upgradeable, the command says "✅ Your setup is already up to date" and exits without prompting.
+
+The personal KG variant (`/kmgraph:init-personal-kg`) applies the same inspection pattern, scoped to `~/.claude/knowledge-graph/` and omitting the `docs/ → knowledge/` migration check (not applicable to personal KGs).
+
+### FTS5 gitignore guard
+
+Before migrating or removing `.fts5.db` during Step 1f.0 (legacy migration), the command checks whether the file is intentionally gitignored:
+
+- **Gitignored (project KG):** the file is active local state — leave it in place. After path migration it will be orphaned but harmless; a fresh index is rebuilt at the new location on next use.
+- **Not gitignored (project KG):** legacy stray — migrate to user cache and remove the gitignore rule.
+- **Personal KG:** always outside git, so `git check-ignore` does not apply. A `.fts5.db` that exists is always intentional. Only surface it as an upgrade item when it is *missing* (offer to rebuild).
+
+This prevents the wizard from destroying an active local search index under the assumption that it is a stray file.
+
+---
+
+### Rationale
+
+A static version-keyed changelog becomes stale immediately and requires manual maintenance on every release. More critically, it tells users what changed globally, not what will change for them — a user who already has `me.md` doesn't need to see it listed.
+
+State-derived reporting is always accurate, requires no maintenance, and respects the user's existing setup. It scales naturally: new upgrade checks added in future versions are automatically surfaced without touching any summary text.
+
+This pattern is consistent with the ADR's broader principle — the user should understand what structure is being introduced before it takes effect, and only what is actually relevant to their install.
+
+---
+
 ## Deferred
 
 1. **Automated shim validation** — A hook or pre-commit check that verifies platform files contain the shim reference rather than duplicate rules. Out of scope for v0.3.0-beta.
@@ -242,5 +292,5 @@ The two-level pattern is already established in KMGraph via CLAUDE.md (project v
 ---
 
 **Decision Made:** 2026-04-09
-**Last Updated:** 2026-04-09 (added kg-index.md as third scaffolded file, deployed as `$KG_PATH/index.md`; existing `core/templates/knowledge/index.md` renamed to `kg-category-index.md` to prevent collision; content migration offer moved from Deferred to in-scope)
+**Last Updated:** 2026-04-09 (added kg-index.md as third scaffolded file; content migration offer moved in-scope; "See what's new" UX added for verify/upgrade option; switched from static version changelog to state-derived upgrade reporting)
 **Status:** Proposed

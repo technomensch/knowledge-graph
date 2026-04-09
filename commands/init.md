@@ -2,6 +2,10 @@
 description: Initialize a new knowledge graph with wizard-based setup and flexible configuration
 ---
 
+## Execution Rules
+
+All bash/shell checks in this command are **implementation guidance only** — run them silently as internal steps. Never show bash commands, shell code, or raw command output to the user. Present only plain-English results, prompts, and status messages.
+
 # /kmgraph:init — Knowledge Graph Initialization Wizard
 
 Initialize a new knowledge graph with interactive wizard that guides you through location selection, category setup, and git strategy configuration.
@@ -33,16 +37,86 @@ It's [type] at [path] with categories: [list].
 
 What would you like to do?
 
-1. Verify/upgrade existing KG — check for missing directories, update templates,
-   add new config fields from this plugin version
+1. See what's new — review improvements in this version, then decide what to apply
 2. Create a new, separate knowledge graph (different name/location)
 3. Re-initialize "[name]" (reset categories, git strategy, etc.)
 4. Cancel — the existing KG is already set up
 ```
 
-### Option 1: Verify/Upgrade Flow
+### Option 1: See What's New
 
-When the user selects verify/upgrade, perform these checks in order:
+When the user selects option 1, **before running any checks or making any changes**, inspect the KG's actual state and report only what is missing or upgradeable for this specific install:
+
+```bash
+# Inspect what's actually missing or upgradeable
+upgrades=()
+
+# Missing directories
+for dir in knowledge lessons-learned decisions sessions chat-history tmp; do
+  [ ! -d "$KG_PATH/$dir" ] && upgrades+=("Missing directory: $dir/")
+done
+
+# Index reorganization — knowledge/index.md renamed to kg-category-index.md; new root kg-index.md created
+if [ -f "$KG_PATH/knowledge/index.md" ] && [ ! -f "$KG_PATH/knowledge/kg-category-index.md" ]; then
+  upgrades+=("Index update: renames ${KG_PATH}/knowledge/index.md to kg-category-index.md and adds a new kg-index.md at the knowledge graph root as the primary entry point")
+elif [ ! -f "$KG_PATH/index.md" ]; then
+  upgrades+=("New: kg-index.md — the primary entry point for this knowledge graph")
+fi
+
+# Missing root-level scaffold files
+[ ! -f "$KG_PATH/me.md" ]      && upgrades+=("New: me.md — your identity and working style in this project")
+[ ! -f "$KG_PATH/rules.md" ]   && upgrades+=("New: rules.md — project conventions and behavioral rules")
+
+# Path migration available
+CONFIGURED_PATH=$(jq -r '.graphs["'"$kg_name"'"].path' ~/.claude/kg-config.json)
+echo "$CONFIGURED_PATH" | grep -qE '/docs/?$' && \
+  [ -d "$CONFIGURED_PATH/lessons-learned" ] && \
+  upgrades+=("Migration available: move KMGraph content from docs/ to knowledge/")
+
+# New templates (files in plugin core/templates not yet in KG)
+# Skip templates that are already covered by the scaffold file checks above:
+#   kg-index.md deploys as $KG_PATH/index.md — already checked
+#   me.md and rules.md deploy to $KG_PATH root — already checked
+scaffold_covered=("kg-index.md" "me.md" "rules.md" "index-personal.md")
+for tdir in knowledge lessons-learned decisions sessions; do
+  for template in "${CLAUDE_PLUGIN_ROOT}/core/templates/$tdir/"*; do
+    tname=$(basename "$template")
+    # Skip if this template is covered by a scaffold check
+    skip=false
+    for covered in "${scaffold_covered[@]}"; do
+      [ "$tname" = "$covered" ] && skip=true && break
+    done
+    $skip && continue
+    dest="$KG_PATH/$tdir/$tname"
+    [ ! -f "$dest" ] && upgrades+=("New template: $tdir/$tname")
+  done
+done
+```
+
+If nothing is upgradeable, say:
+```
+✅ Your setup is already up to date. Nothing to apply.
+```
+And exit.
+
+If upgrades exist, present them:
+```
+Here's what's available for your install:
+  • [item 1]
+  • [item 2]
+  ...
+
+Apply all, pick individually, or skip?
+  1. Apply all
+  2. Let me choose which ones to apply
+  3. Skip — my setup is already how I want it
+```
+
+If the user picks option 2 (choose individually), present each item as a separate yes/no prompt before running it.
+
+If the user picks option 3 (skip), exit with no changes.
+
+Then perform these checks in order:
 
 #### 1a. Directory structure check
 
@@ -142,22 +216,26 @@ Re-run platform detection (Step 1.11) and offer to configure any newly detected 
 
 #### 1f.0. Legacy migration
 
-When upgrading from v0.2.1 or earlier, the `.fts5.db` index may be stored in the project root. Migrate it to the user cache:
+When upgrading from v0.2.1 or earlier, the `.fts5.db` index may be stored in the project root. Before migrating, check whether the file is intentionally gitignored — if it is, it is active local state, not a legacy stray, and must not be moved or have its gitignore rule removed:
 
 ```bash
 if [ -f "$KG_ROOT/.fts5.db" ]; then
-  mkdir -p "$HOME/.claude/kg-fts5"
-  mv "$KG_ROOT/.fts5.db" "$HOME/.claude/kg-fts5/$kg_name.db"
-  echo "✅ Legacy search index migrated to user cache."
-fi
-```
-
-Then remove `.fts5.db` from `.gitignore` if present:
-
-```bash
-if [ -f "$KG_ROOT/.gitignore" ]; then
-  grep -v "^\*\*/\.fts5\.db$" "$KG_ROOT/.gitignore" > "$KG_ROOT/.gitignore.tmp"
-  mv "$KG_ROOT/.gitignore.tmp" "$KG_ROOT/.gitignore"
+  if git -C "$KG_ROOT" check-ignore -q ".fts5.db" 2>/dev/null; then
+    # Intentionally gitignored — this is the active local index, not a legacy file.
+    # Leave it in place. After any path migration it will be orphaned but harmless;
+    # a fresh index will be rebuilt at the new location on next use.
+    echo "ℹ️  Search index at $KG_ROOT/.fts5.db is gitignored (local state) — leaving in place."
+  else
+    # Not gitignored — this is a legacy stray file. Migrate to user cache.
+    mkdir -p "$HOME/.claude/kg-fts5"
+    mv "$KG_ROOT/.fts5.db" "$HOME/.claude/kg-fts5/$kg_name.db"
+    echo "✅ Legacy search index migrated to user cache."
+    # Remove the .fts5.db gitignore rule only if it was a legacy stray (not intentional)
+    if [ -f "$KG_ROOT/.gitignore" ]; then
+      grep -v "^\*\*/\.fts5\.db$" "$KG_ROOT/.gitignore" > "$KG_ROOT/.gitignore.tmp"
+      mv "$KG_ROOT/.gitignore.tmp" "$KG_ROOT/.gitignore"
+    fi
+  fi
 fi
 ```
 

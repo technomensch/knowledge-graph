@@ -3,6 +3,10 @@ description: Create or register a personal knowledge graph for cross-project les
 allowed-tools: Bash, Read, Write, kg_fts5_rebuild
 ---
 
+## Execution Rules
+
+All bash/shell checks in this command are **implementation guidance only** — run them silently as internal steps. Never show bash commands, shell code, or raw command output to the user. Present only plain-English results, prompts, and status messages.
+
 # /kmgraph:init-personal-kg
 
 Create a personal knowledge graph at `~/.claude/knowledge-graph/` for capturing
@@ -42,10 +46,55 @@ Read `~/.claude/kg-config.json`. Look for any entry with `type: "personal"`.
 A personal KG is already registered: "[name]" at [path]
 
 Options:
-1. Use this existing KG (no action needed)
+1. See what's new — review improvements in this version, then decide what to apply
 2. Re-initialize it (reset structure, keep existing lessons)
 3. Register a different path as personal KG
 4. Cancel
+```
+
+**If option 1 selected**, inspect the personal KG's actual state and report only what is missing or upgradeable for this specific install:
+
+```bash
+upgrades=()
+
+# Index reorganization — knowledge/index.md renamed to kg-category-index.md; new root kg-index.md created
+if [ -f "{personal_kg_path}/knowledge/index.md" ] && [ ! -f "{personal_kg_path}/knowledge/kg-category-index.md" ]; then
+  upgrades+=("Index update: renames {personal_kg_path}/knowledge/index.md to kg-category-index.md and adds a new kg-index.md at the knowledge graph root as the primary entry point")
+elif [ ! -f "{personal_kg_path}/index.md" ]; then
+  upgrades+=("New: kg-index.md — the primary entry point for this knowledge graph")
+fi
+
+[ ! -f "{personal_kg_path}/me.md" ]    && upgrades+=("New: me.md — your cross-project identity and working style")
+[ ! -f "{personal_kg_path}/rules.md" ] && upgrades+=("New: rules.md — cross-project behavioral rules and preferences")
+
+# FTS5 index — personal KG is always outside git so gitignore doesn't apply.
+# If .fts5.db exists it is intentional local state — never suggest removal or migration.
+# Only surface it if missing (offer to rebuild).
+[ ! -f "{personal_kg_path}/.fts5.db" ] && upgrades+=("Search index missing — will be rebuilt on first use")
+
+for tdir in knowledge lessons-learned decisions sessions; do
+  for template in "${CLAUDE_PLUGIN_ROOT}/core/templates/$tdir/"*; do
+    dest="{personal_kg_path}/$tdir/$(basename $template)"
+    [ ! -f "$dest" ] && upgrades+=("New template: $tdir/$(basename $template)")
+  done
+done
+```
+
+If nothing is upgradeable:
+```
+✅ Your personal KG is already up to date. Nothing to apply.
+```
+
+If upgrades exist:
+```
+Here's what's available for your personal KG:
+  • [item 1]
+  • [item 2]
+
+Apply all, pick individually, or skip?
+  1. Apply all
+  2. Let me choose which ones to apply
+  3. Skip — my setup is already how I want it
 ```
 
 **If none exists:** Proceed to Step 2.
