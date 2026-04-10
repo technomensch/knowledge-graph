@@ -374,29 +374,6 @@ if [ -n "$MEMORY_FILE" ]; then
   fi
 fi
 
-# e2. Rewrite docs/ path references inside migrated markdown files
-find knowledge/ -name "*.md" -type f | while read f; do
-  sed -i '' \
-    -e 's|docs/lessons-learned/|knowledge/lessons-learned/|g' \
-    -e 's|docs/decisions/|knowledge/decisions/|g' \
-    -e 's|docs/sessions/|knowledge/sessions/|g' \
-    -e 's|docs/chat-history/|knowledge/chat-history/|g' \
-    -e 's|docs/knowledge/|knowledge/concepts/|g' \
-    "$f"
-done
-
-# Also update CLAUDE.md and README.md if present
-for f in CLAUDE.md README.md; do
-  [ -f "$f" ] && sed -i '' \
-    -e 's|docs/lessons-learned/|knowledge/lessons-learned/|g' \
-    -e 's|docs/decisions/|knowledge/decisions/|g' \
-    -e 's|docs/knowledge/|knowledge/concepts/|g' \
-    "$f" || true
-done
-
-echo "⚠️  Note: memory entries in ~/.claude/projects/ may still reference docs/ paths."
-echo "   Run /kmgraph:recall to find stale references after migration."
-
 # f. Clear migration flag
 jq 'del(.graphs["'"$kg_name"'"].migration_in_progress)' \
   ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp

@@ -126,7 +126,11 @@ Parent commands (`init.md`, `init-personal-kg.md`) are reduced to stubs that set
 - `commands/init-shared/config-entry-write.md` (new)
 
 **Migration Path:**
-No migration required for end users. Internal refactor only; command behavior and output are unchanged.
+No migration required for end users for the shared module refactor itself.
+
+**Amendment (2026-04-10): Cross-reference rewrite added to path migration**
+
+The `docs/ → knowledge/` migration execution in `commands/init.md` (section 1f.1) previously moved files and updated `.gitignore` but left internal markdown cross-references pointing at old `docs/` paths, silently breaking any `[link](docs/lessons-learned/...)` in KG files, CLAUDE.md, or README.md. A new step `e2` has been added to the migration block that runs a `find | sed` pass over all migrated `.md` files plus CLAUDE.md and README.md, rewriting `docs/{subdir}/` to `knowledge/{subdir}/`. MEMORY.md entries (under `~/.claude/projects/`) cannot be auto-rewritten and a warning is emitted instead.
 
 ---
 
@@ -168,5 +172,5 @@ None
 ---
 
 **Decision Made:** 2026-04-10
-**Last Updated:** 2026-04-10
+**Last Updated:** 2026-04-10 (amended: cross-reference rewrite added to path migration)
 **Status:** Accepted
