@@ -543,6 +543,45 @@ fi
 #   4. Rewrite CLAUDE.md to pointer: "For full context, read knowledge/rules.md and knowledge/me.md before acting."
 #   5. If user aborts, restore from CLAUDE.md.bak and delete it
 
+# h.2. Evidence seeding — scan for Why/Source candidates after rules.md is populated
+# Only runs if rules.md was just written (either from CLAUDE.md or scaffolded)
+if [ -f "knowledge/rules.md" ]; then
+  echo ""
+  echo "  Scanning your existing lessons and decisions for evidence candidates..."
+  echo "  I'll suggest Why: and Source: annotations for rules where evidence exists."
+  echo "  You can accept each suggestion individually or skip all."
+  echo ""
+  
+  # For each major section in the written rules.md, search lessons-learned/ and decisions/
+  # for files whose title/content matches the rule topic.
+  # Present matches as: "Section '[name]' — found potential source: [filename]"
+  # Ask: "Add Why: + Source: to this section? [y/n]"
+  # If yes: append the Why: and Source: lines to the section in rules.md
+  #
+  # Search strategy:
+  # - grep -r for keywords from the rule section heading in lessons-learned/ and decisions/
+  # - Surface up to 1-2 candidates per section (best match by filename keyword overlap)
+  # - Skip sections that already have Why:/Source: lines
+  # - Skip if lessons-learned/ and decisions/ are both empty
+  
+  LESSON_COUNT=$(find "knowledge/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+  ADR_COUNT=$(find "knowledge/decisions" -name "ADR-*.md" 2>/dev/null | wc -l | tr -d ' ')
+  
+  if [ "$LESSON_COUNT" -eq 0 ] && [ "$ADR_COUNT" -eq 0 ]; then
+    echo "  (No lessons or decisions yet — evidence seeding skipped. Run this again after capturing lessons.)"
+  else
+    echo "  Found $LESSON_COUNT lessons and $ADR_COUNT decisions to scan."
+    echo ""
+    echo "  For each rule section where a match is found, you'll be asked to confirm"
+    echo "  the Why: and Source: annotation before it's written."
+    echo ""
+    echo "    1. Scan and show me suggestions"
+    echo "    2. Skip — I'll add evidence links manually"
+    # If 1: execute the per-section scan and offer annotation per match
+    # If 2: continue to step i
+  fi
+fi
+
 # i. Personal KG prompt — offer to run /kmgraph:init at user level if not already set up
 PERSONAL_KG_EXISTS=$(jq -r '.graphs | to_entries[] | select(.value.type == "personal") | .key' ~/.claude/kg-config.json 2>/dev/null)
 if [ -z "$PERSONAL_KG_EXISTS" ]; then
@@ -559,6 +598,9 @@ if [ -z "$PERSONAL_KG_EXISTS" ]; then
   #   Targets: ~/.claude/knowledge-graph/me.md, ~/.claude/knowledge-graph/rules.md
   #   Also offer to migrate user-type entries from ~/.claude/projects/.../memory/MEMORY.md → personal me.md
   #   (See Step 1.6.5 Personal KG case for full details)
+  # After personal KG me.md/rules.md are created: run the same evidence seeding offer
+  # using personal KG path for both the target files and the source scan directories
+  # (~/.claude/knowledge-graph/lessons-learned/ and ~/.claude/knowledge-graph/decisions/)
 fi
 ```
 
