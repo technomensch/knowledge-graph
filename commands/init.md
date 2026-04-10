@@ -59,7 +59,7 @@ done
 # Index reorganization — knowledge/index.md renamed to kg-category-index.md; new root kg-index.md created
 if [ -f "$KG_PATH/knowledge/index.md" ] && [ ! -f "$KG_PATH/knowledge/kg-category-index.md" ]; then
   upgrades+=("Index update: renames ${KG_PATH}/knowledge/index.md to kg-category-index.md and adds a new kg-index.md at the knowledge graph root as the primary entry point")
-elif [ ! -f "$KG_PATH/index.md" ]; then
+elif [ ! -f "$KG_PATH/kg-index.md" ]; then
   upgrades+=("New: kg-index.md — the primary entry point for this knowledge graph")
 fi
 
@@ -293,7 +293,7 @@ if [ "$MIGRATION_IN_PROGRESS" = "true" ]; then
   mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
 
   # rb-a. Reverse root scaffold file moves
-  for f in me.md rules.md index.md; do
+  for f in me.md rules.md kg-index.md; do
     [ -f "knowledge/$f" ] && mv "knowledge/$f" "docs/$f"
   done
 
@@ -422,7 +422,7 @@ if [ -d "docs/knowledge" ]; then
 fi
 
 # Move root-level scaffold files if present
-for f in me.md rules.md index.md; do
+for f in me.md rules.md kg-index.md; do
   [ -f "docs/$f" ] && mv "docs/$f" "knowledge/$f"
 done
 
@@ -796,12 +796,20 @@ cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/workflows.md" "$KG_PATH/knowl
 cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-category-index.md" "$KG_PATH/knowledge/"
 
 # Copy root-level files (E6 — skip if already exists to preserve teammate copies)
-[ -f "$KG_PATH/rules.md" ] && echo "rules.md already exists — skipping scaffold (teammate copy preserved)." || \
-  cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/rules.md" "$KG_PATH/rules.md"
-[ -f "$KG_PATH/index.md" ] && echo "index.md already exists — skipping scaffold." || \
-  cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-index.md" "$KG_PATH/index.md"
+# If KG is docs/-based and migration will be offered, scaffold directly to knowledge/ so files
+# land at the final destination rather than docs/ (migration would move them, but this is cleaner).
+SCAFFOLD_ROOT="$KG_PATH"
+if echo "$KG_PATH" | grep -qE '/docs/?$'; then
+  PROJECT_ROOT_FOR_SCAFFOLD=$(echo "$KG_PATH" | sed 's|/docs/*$||')
+  mkdir -p "$PROJECT_ROOT_FOR_SCAFFOLD/knowledge"
+  SCAFFOLD_ROOT="$PROJECT_ROOT_FOR_SCAFFOLD/knowledge"
+fi
+[ -f "$SCAFFOLD_ROOT/rules.md" ] && echo "rules.md already exists — skipping scaffold (teammate copy preserved)." || \
+  cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/rules.md" "$SCAFFOLD_ROOT/rules.md"
+[ -f "$SCAFFOLD_ROOT/kg-index.md" ] && echo "kg-index.md already exists — skipping scaffold." || \
+  cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-index.md" "$SCAFFOLD_ROOT/kg-index.md"
 # me.md is always gitignored — safe to scaffold fresh
-cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/me.md" "$KG_PATH/me.md"
+cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/me.md" "$SCAFFOLD_ROOT/me.md"
 
 # Copy lesson/ADR templates
 cp "${CLAUDE_PLUGIN_ROOT}/core/templates/lessons-learned/README.md" "$KG_PATH/lessons-learned/"
@@ -1047,7 +1055,7 @@ Directory Structure:
   tmp/                 — Scratch space (always gitignored)
 
   Root files:
-  index.md             — KG navigation hub
+  kg-index.md          — KG navigation hub
   me.md                — Personal context (always gitignored)
   rules.md             — Project rules and conventions
 
@@ -1316,7 +1324,7 @@ Skip wizard with flags:
 
 ```
 $KG_PATH/
-├── index.md                 (KG navigation hub)
+├── kg-index.md              (KG navigation hub)
 ├── me.md                    🔒 ALWAYS GITIGNORED (personal context)
 ├── rules.md                 (project rules and conventions)
 ├── knowledge/
