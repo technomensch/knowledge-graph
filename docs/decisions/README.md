@@ -4,8 +4,8 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 26
-**Last Updated:** 2026-04-09
+**Total ADRs:** 27
+**Last Updated:** 2026-04-10
 
 ---
 
@@ -17,6 +17,7 @@ Formal documentation of significant architecture decisions.
 
 ## All ADRs (Chronological)
 
+- [ADR-030: Migration Moves KMGraph-Named Subdirectories Only — Never the Entire docs/ Directory](ADR-030-migration-moves-named-subdirs-only-never-entire-docs.md) — **Status:** Accepted — Migration moves only KMGraph-named subdirs (`lessons-learned/`, `decisions/`, etc.) plus scaffold files; never the entire `docs/` directory.
 - [ADR-029: Plan File Location in Knowledge Graph](ADR-029-plan-file-location-in-knowledge-graph.md) — **Status:** Accepted — Plans linked to an ENH go in `knowledge/ENH-NNN/vX-plan.md`; issue plans in `knowledge/issue-NNN/vX-plan.md`; misc bundled plans in `knowledge/plans/vX-plan.md`.
 - [ADR-025: Do not commit `enabledPlugins` blocks in `.claude/settings.json`](ADR-025-do-not-commit-enabledplugins-blocks.md) — **Status:** Accepted — Committed `enabledPlugins` blocks create orphaned scope references for cloners; rely on `.claude-plugin/plugin.json` auto-detection instead.
 
@@ -25,7 +26,7 @@ Formal documentation of significant architecture decisions.
 ## By Category
 
 ### Architecture
-- [ADR-XXX](ADR-XXX-title.md) — [Topic]
+- [ADR-030: Migration Moves KMGraph-Named Subdirectories Only](ADR-030-migration-moves-named-subdirs-only-never-entire-docs.md) — Named subdir list prevents collision with docs sites; explicit scope over blanket directory moves
 
 ### Process
 - [ADR-029: Plan File Location in Knowledge Graph](ADR-029-plan-file-location-in-knowledge-graph.md) — Three-location plan structure: ENH folder, issue folder, or knowledge/plans/ fallback
