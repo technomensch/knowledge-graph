@@ -67,6 +67,7 @@ elif [ ! -f "{personal_kg_path}/kg-index-global.md" ]; then
 fi
 
 [ ! -f "{personal_kg_path}/me.md" ]    && upgrades+=("New: me.md — your cross-project identity and working style")
+# When writing me.md to personal KG, strip the "See also: ~/.claude/knowledge-graph/me.md" line — self-referential at personal KG level
 [ ! -f "{personal_kg_path}/rules.md" ] && upgrades+=("New: rules.md — cross-project behavioral rules and preferences")
 
 # FTS5 index — personal KG is always outside git so gitignore doesn't apply.
@@ -98,6 +99,8 @@ Apply all, pick individually, or skip?
   2. Let me choose which ones to apply
   3. Skip — my setup is already how I want it
 ```
+
+After applying upgrades (or if nothing to upgrade), **always continue to Step 8 (content migration) and Step 9 (evidence seeding)**. These run independently of the template upgrade check — an up-to-date template install does not mean me.md/rules.md have been populated.
 
 **If none exists:** Proceed to Step 2.
 
@@ -142,6 +145,8 @@ dest="{personal_kg_path}/knowledge/kg-category-index-global.md"
 ```
 
 Only copy if template doesn't already exist (preserves user content on re-init).
+
+When deploying `me.md` to the personal KG, strip the "See also: ~/.claude/knowledge-graph/me.md" line — it is a project-KG cross-reference that points to itself when deployed as the personal KG's own me.md.
 
 ---
 

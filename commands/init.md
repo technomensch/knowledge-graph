@@ -965,6 +965,7 @@ from your existing CLAUDE.md?
 - Never delete content from source files without user confirmation.
 - Never auto-write to `~/.claude/CLAUDE.md` — only suggest; user executes manually or approves per-write.
 - If source file does not exist, skip silently.
+- **Skip this step** if `me.md` already has substantial content (more than the template placeholder text) — the user has already populated it manually.
 
 **Personal KG case:** When initializing the personal KG (Step 1.8.5), run the same offer using `~/.claude/CLAUDE.md` as source and `~/.claude/knowledge-graph/me.md` / `~/.claude/knowledge-graph/rules.md` as targets. Also offer to migrate relevant entries from `~/.claude/projects/.../memory/MEMORY.md` (user-type memories: role, preferences, expertise) to personal `me.md`.
 
@@ -1155,6 +1156,7 @@ Examples of personal lessons:
    ```
 
    Apply all the same safety rules from Step 1.6.5: no auto-write, user confirms per section, backup before rewrite.
+   **Skip this step** if `me.md` already has substantial content (more than the template placeholder text) — the user has already populated it manually.
 
 8. Evidence seeding for personal me.md and rules.md:
 
