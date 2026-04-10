@@ -280,6 +280,8 @@ fi
 - Configured path ends in `/docs` or `/docs/`
 - `docs/lessons-learned/` exists at that path (confirms KMGraph content, not just any docs folder)
 
+Note: Migration applies to project-local KGs only. Personal KGs (`~/.claude/knowledge-graph/`) use a fixed path and never have a `docs/` layout — they are intentionally excluded by the type check above.
+
 ```bash
 KG_TYPE=$(jq -r '.graphs["'"$kg_name"'"].type' ~/.claude/kg-config.json)
 KG_PATH_ENDS_DOCS=$(echo "$CONFIGURED_PATH" | grep -E '/docs/?$')
@@ -296,6 +298,15 @@ fi
 **Migration logic (if user selects Yes):**
 
 ```bash
+# Portable in-place sed (macOS uses -i '', GNU/Linux uses -i)
+_sed_inplace() {
+  if sed --version 2>/dev/null | grep -q GNU; then
+    sed -i "$@"
+  else
+    sed -i '' "$@"
+  fi
+}
+
 # a. Create new location
 mkdir -p knowledge/
 
@@ -349,7 +360,7 @@ done
 
 # e. Update .gitignore rules
 if [ -f .gitignore ]; then
-  sed -i '' \
+  _sed_inplace \
     -e 's|docs/sessions/|knowledge/sessions/|g' \
     -e 's|docs/chat-history/|knowledge/chat-history/|g' \
     -e 's|docs/lessons-learned/\(.*\)/|knowledge/lessons-learned/\1/|g' \
@@ -359,12 +370,12 @@ if [ -f .gitignore ]; then
   # Rewrite blanket docs/ KMGraph rule only if KMGraph confirmed to own docs/
   # (trigger condition verified docs/lessons-learned/ exists above — safe to rewrite)
   grep -qx 'docs/' .gitignore && \
-    sed -i '' -e 's|^docs/$|knowledge/|' .gitignore || true
+    _sed_inplace -e 's|^docs/$|knowledge/|' .gitignore || true
 fi
 
 # e2. Rewrite docs/ path references inside migrated markdown files
 find knowledge/ -name "*.md" -type f | while read f; do
-  sed -i '' \
+  _sed_inplace \
     -e 's|docs/lessons-learned/|knowledge/lessons-learned/|g' \
     -e 's|docs/decisions/|knowledge/decisions/|g' \
     -e 's|docs/sessions/|knowledge/sessions/|g' \
@@ -375,7 +386,7 @@ done
 
 # Also update platform config files if present
 for f in CLAUDE.md README.md GEMINI.md .cursorrules .windsurfrules .github/copilot-instructions.md .aider.conf.yml; do
-  [ -f "$f" ] && sed -i '' \
+  [ -f "$f" ] && _sed_inplace \
     -e 's|docs/lessons-learned/|knowledge/lessons-learned/|g' \
     -e 's|docs/decisions/|knowledge/decisions/|g' \
     -e 's|docs/sessions/|knowledge/sessions/|g' \
