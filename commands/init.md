@@ -521,7 +521,29 @@ if [ "$LESSON_COUNT" -gt 0 ] && [ "$KG_ENTRY_COUNT" -eq 0 ]; then
   # If Yes: invoke /kmgraph:update-graph --auto --sync-all
 fi
 
-# h. Personal KG prompt — offer to run /kmgraph:init at user level if not already set up
+# h. Content migration offer — populate me.md and rules.md from existing CLAUDE.md
+# me.md and rules.md were scaffolded empty. If a CLAUDE.md exists, offer to populate them.
+ME_MD="knowledge/me.md"
+RULES_MD="knowledge/rules.md"
+PROJECT_CLAUDE_MD="$(pwd)/CLAUDE.md"
+
+if [ -f "$PROJECT_CLAUDE_MD" ] && { [ -f "$ME_MD" ] || [ -f "$RULES_MD" ]; }; then
+  echo ""
+  echo "  me.md and rules.md have been created in knowledge/."
+  echo "  Would you like help populating them from your existing CLAUDE.md?"
+  echo ""
+  echo "    1. Yes — show me what would move where (review before writing)"
+  echo "    2. No — I'll fill them in manually"
+fi
+# If Yes:
+#   Follow Step 1.6.5 exactly:
+#   1. Parse project CLAUDE.md; display proposed section → file mapping before writing
+#   2. User confirms each section
+#   3. Before rewriting CLAUDE.md, copy original to CLAUDE.md.bak
+#   4. Rewrite CLAUDE.md to pointer: "For full context, read knowledge/rules.md and knowledge/me.md before acting."
+#   5. If user aborts, restore from CLAUDE.md.bak and delete it
+
+# i. Personal KG prompt — offer to run /kmgraph:init at user level if not already set up
 PERSONAL_KG_EXISTS=$(jq -r '.graphs | to_entries[] | select(.value.type == "personal") | .key' ~/.claude/kg-config.json 2>/dev/null)
 if [ -z "$PERSONAL_KG_EXISTS" ]; then
   echo ""
@@ -529,9 +551,14 @@ if [ -z "$PERSONAL_KG_EXISTS" ]; then
   echo "  A personal KG at ~/.claude/knowledge-graph/ captures cross-project lessons"
   echo "  and conventions that apply everywhere, not just this project."
   echo ""
-  echo "    1. Yes — run /kmgraph:init at user level now"
+  echo "    1. Yes — run /kmgraph:init-personal-kg now"
   echo "    2. Skip — I'll set it up later with /kmgraph:init-personal-kg"
   # If Yes: invoke /kmgraph:init-personal-kg
+  # After personal KG is set up, run the content migration offer for the personal level:
+  #   Source: ~/.claude/CLAUDE.md
+  #   Targets: ~/.claude/knowledge-graph/me.md, ~/.claude/knowledge-graph/rules.md
+  #   Also offer to migrate user-type entries from ~/.claude/projects/.../memory/MEMORY.md → personal me.md
+  #   (See Step 1.6.5 Personal KG case for full details)
 fi
 ```
 
