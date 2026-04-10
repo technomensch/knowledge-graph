@@ -60,8 +60,8 @@ upgrades=()
 # Index reorganization — knowledge/index.md renamed to kg-category-index.md; new root kg-index.md created
 if [ -f "{personal_kg_path}/knowledge/index.md" ] && [ ! -f "{personal_kg_path}/knowledge/kg-category-index.md" ]; then
   upgrades+=("Index update: renames {personal_kg_path}/knowledge/index.md to kg-category-index.md and adds a new kg-index.md at the knowledge graph root as the primary entry point")
-elif [ ! -f "{personal_kg_path}/index.md" ]; then
-  upgrades+=("New: kg-index.md — the primary entry point for this knowledge graph")
+elif [ ! -f "{personal_kg_path}/kg-index-user.md" ]; then
+  upgrades+=("New: kg-index-user.md — the primary entry point for this personal knowledge graph")
 fi
 
 [ ! -f "{personal_kg_path}/me.md" ]    && upgrades+=("New: me.md — your cross-project identity and working style")
