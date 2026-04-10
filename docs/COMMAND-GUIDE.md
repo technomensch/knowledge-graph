@@ -5,7 +5,7 @@ sidebar_label: Commands
 description: "Complete reference for all /kmgraph: slash commands"
 ---
 
-**Version:** 0.2.3.3-beta | **Updated:** 2026-04-06
+**Version:** 0.3.2-beta | **Updated:** 2026-04-10
 
 > **Claude Code only:** The `/kmgraph:` prefix requires Claude Code with this plugin installed. Other IDEs access equivalent functionality through MCP tools — see [INSTALL.md](INSTALL.md) for platform-specific setup.
 ## About Commands on Other Platforms
@@ -1449,5 +1449,5 @@ flowchart TD
 </div>
 ---
 
-**Version**: 0.2.3.4-beta
-**Updated**: 2026-03-30
+**Version**: 0.3.2-beta
+**Updated**: 2026-04-10
