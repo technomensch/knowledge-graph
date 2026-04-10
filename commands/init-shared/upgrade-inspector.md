@@ -15,25 +15,7 @@ description: Shared upgrade inspector module — detects missing dirs, templates
 
 ---
 
-## Pre-Wizard: Existing KG Detection
-
-Before running any checks or making any changes, check if a knowledge graph already exists for this project in `~/.claude/kg-config.json`. If the current working directory matches an existing KG's path (or is a parent/child of one), present this menu instead of jumping straight to setup:
-
-```
-A knowledge graph named "[name]" already exists in the config and is set as active.
-It's [type] at [path] with categories: [list].
-
-What would you like to do?
-
-1. See what's new — review improvements in this version, then decide what to apply
-2. Create a new, separate knowledge graph (different name/location)
-3. Re-initialize "[name]" (reset categories, git strategy, etc.)
-4. Cancel — the existing KG is already set up
-```
-
-### Option 1: See What's New
-
-When the user selects option 1, **before running any checks or making any changes**, inspect the KG's actual state and report only what is missing or upgradeable for this specific install:
+**Before running any checks or making any changes**, inspect the KG's actual state and report only what is missing or upgradeable for this specific install:
 
 ```bash
 # Inspect what's actually missing or upgradeable
