@@ -46,7 +46,7 @@ Read `~/.claude/kg-config.json`. Look for any entry with `type: "personal"`.
 A personal KG is already registered: "[name]" at [path]
 
 Options:
-1. Verify and upgrade — check for missing files, new templates, and offer to populate me.md/rules.md
+1. See what's new — review improvements in this version, then decide what to apply
 2. Re-initialize it (reset structure, keep existing lessons)
 3. Register a different path as personal KG
 4. Cancel
