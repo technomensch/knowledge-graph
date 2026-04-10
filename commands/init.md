@@ -305,16 +305,30 @@ jq '.graphs["'"$kg_name"'"].migration_in_progress = true' \
 mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
 
 # c. Move ONLY known KMGraph subdirs (never the entire docs/)
-for subdir in lessons-learned decisions sessions chat-history; do
+for subdir in lessons-learned decisions sessions chat-history tmp; do
+  if [ -L "docs/$subdir" ]; then
+    echo "⚠️  docs/$subdir is a symlink — skipping automatic move. Move manually if needed."
+    continue
+  fi
   [ -d "docs/$subdir" ] && mv "docs/$subdir" "knowledge/$subdir"
 done
 
-# Special case: docs/knowledge/ would create knowledge/knowledge/ nesting — rename instead
+# Special case: docs/knowledge/ would create knowledge/knowledge/ nesting — merge or rename
 if [ -d "docs/knowledge" ]; then
-  echo "⚠️  docs/knowledge/ detected. Moving to knowledge/concepts/ to avoid nesting."
-  echo "   If you prefer a different name, rename knowledge/concepts/ manually."
-  mv "docs/knowledge" "knowledge/concepts"
+  if [ -d "knowledge/concepts" ]; then
+    echo "⚠️  docs/knowledge/ detected but knowledge/concepts/ already exists — merging."
+    rsync -a --ignore-existing "docs/knowledge/" "knowledge/concepts/" && rm -rf "docs/knowledge"
+  else
+    echo "⚠️  docs/knowledge/ detected. Moving to knowledge/concepts/ to avoid nesting."
+    echo "   If you prefer a different name, rename knowledge/concepts/ manually."
+    mv "docs/knowledge" "knowledge/concepts"
+  fi
 fi
+
+# Move root-level scaffold files if present
+for f in me.md rules.md index.md; do
+  [ -f "docs/$f" ] && mv "docs/$f" "knowledge/$f"
+done
 
 # d. Update kg-config.json path
 PROJECT_ROOT=$(pwd)
@@ -362,7 +376,7 @@ mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
 echo "✅ Graph moved to knowledge/. Config updated. Run /kmgraph:status to verify."
 ```
 
-**Safety constraint:** Only named KMGraph subdirectories (`lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`) are moved. Never touch other `docs/` contents.
+**Safety constraint:** Only named KMGraph subdirectories (`lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`, `tmp/`) and root scaffold files (`me.md`, `rules.md`, `index.md`) are moved. Never touch other `docs/` contents. Symlinked subdirs are skipped with a warning.
 
 #### 1f. FTS5 index check
 
