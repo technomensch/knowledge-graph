@@ -38,11 +38,24 @@ When `kmgraph init` detects a `docs/`-based layout, Step 1f.1 is added:
 
 - Lists KMGraph-managed directories found under `docs/`
 - Shows what would move; confirms non-KMGraph content will not be touched
-- Requires explicit user confirmation before any move
+- Requires explicit user confirmation before any move — prompt discloses that rollback is available
 - Updates `~/.claude/kg-config.json` after move
-- Warns on any broken cross-links found in moved files
+- Rewrites internal cross-references in all moved `.md` files and platform config files (CLAUDE.md, GEMINI.md, .cursorrules, .windsurfrules, .github/copilot-instructions.md, .aider.conf.yml)
+- Scans project MEMORY.md for stale `docs/` references and surfaces them
+- Updates `.gitignore` path rules including `tmp/`, `me.md`, and blanket `docs/` rule if present
+- Provides full rollback via re-running `/kmgraph:init` — restores files, config, and cross-references
 
-Migration is opt-in and never automatic.
+Migration is opt-in, reversible, and never automatic.
+
+### Phase 4: Migration hardening (v0.3.2)
+
+Opus audit of the migration execution block identified 13 gaps after initial v0.3.0-beta implementation. Two were fixed in v0.3.0-beta (exit code trap in upgrade-inspector; cross-reference rewrite gap). The remaining 11 are addressed in v0.3.2:
+
+- Move loop: adds `tmp/`, symlink guard, merge-safe `docs/knowledge/` handling (rsync), root scaffold file moves
+- `.gitignore`: adds `tmp/`, `me.md`, and blanket `docs/` rule (with safety gate)
+- Cross-reference rewrite: expands to all platform config files; replaces passive MEMORY.md warning with active scan
+- Portability: replaces macOS-only `sed -i ''` with cross-platform `_sed_inplace` helper
+- Rollback: full implementation with `rollback_in_progress` atomicity flag; disclosed to users in migration prompt before confirmation
 
 ### Phase 3: Scaffold me.md and rules.md templates
 
@@ -59,7 +72,9 @@ Platform shim templates generated in `core/templates/platform/` for Claude, Curs
 
 **Phase 1:** `commands/init.md` — change default path suggestion
 
-**Phase 2:** `commands/init.md` — add Step 1f.1 migration detection and prompt
+**Phase 2:** `commands/init.md` — add Step 1f.1 migration detection, prompt, cross-reference rewrite, MEMORY.md scan
+
+**Phase 4 (v0.3.2):** `commands/init.md` — migration hardening (move loop, .gitignore, cross-ref rewrite, portability, rollback)
 
 **Phase 3:**
 - `core/templates/knowledge/me.md` (create)
@@ -89,6 +104,10 @@ See ADR-028: me.md + rules.md as Platform-Agnostic Source of Truth.
 - [ ] `kmgraph init` on an existing `docs/`-based project detects old layout and offers migration
 - [ ] Migration moves only KMGraph-managed directories; no non-KMGraph `docs/` content is touched
 - [ ] Migration updates `~/.claude/kg-config.json` correctly
+- [ ] Migration prompt informs user that rollback is available before confirmation
+- [ ] Migration rewrites internal cross-references in moved files and platform config files
+- [ ] Migration scans project MEMORY.md and surfaces stale `docs/` references
+- [ ] Rollback restores files, config, and cross-references atomically
 - [ ] `knowledge/rules.md` is scaffolded with documented structure
 - [ ] `knowledge/me.md` is scaffolded with documented structure
 - [ ] `knowledge/index.md` is scaffolded as graph entry point with directory map and wiki-linked key files
@@ -110,8 +129,10 @@ See ADR-028: me.md + rules.md as Platform-Agnostic Source of Truth.
 
 ## Session Reference
 
-2026-04-09 Planning Session: sessions/2026-04/2026-04-09-v0.3.0-beta-planning-default-path-and-rules-scaffold.md
+- 2026-04-09 Planning Session: sessions/2026-04/2026-04-09-v0.3.0-beta-planning-default-path-and-rules-scaffold.md
+- 2026-04-10 Implementation + Hardening: sessions/2026-04/2026-04-10-feature-development-refactoring-session-init-shared-modules.md
 
 ## Plan Reference
 
 `~/.claude/plans/swift-juggling-narwhal.md` (local only, not committed)
+`docs/plans/v0.3.0-beta.md` — Phase 4 Migration Hardening added 2026-04-10
