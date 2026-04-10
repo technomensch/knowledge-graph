@@ -57,11 +57,11 @@ Options:
 ```bash
 upgrades=()
 
-# Index reorganization — knowledge/index.md renamed to kg-category-index.md; new root kg-index.md created
-if [ -f "{personal_kg_path}/knowledge/index.md" ] && [ ! -f "{personal_kg_path}/knowledge/kg-category-index.md" ]; then
-  upgrades+=("Index update: renames {personal_kg_path}/knowledge/index.md to kg-category-index.md and adds a new kg-index.md at the knowledge graph root as the primary entry point")
-elif [ ! -f "{personal_kg_path}/kg-index-user.md" ]; then
-  upgrades+=("New: kg-index-user.md — the primary entry point for this personal knowledge graph")
+# Index reorganization — knowledge/index.md renamed to kg-category-index-global.md; new root kg-index-global.md created
+if [ -f "{personal_kg_path}/knowledge/index.md" ] && [ ! -f "{personal_kg_path}/knowledge/kg-category-index-global.md" ]; then
+  upgrades+=("Index update: renames {personal_kg_path}/knowledge/index.md to kg-category-index-global.md and adds a new kg-index-global.md at the personal KG root as the primary entry point")
+elif [ ! -f "{personal_kg_path}/kg-index-global.md" ]; then
+  upgrades+=("New: kg-index-global.md — the primary entry point for this personal knowledge graph")
 fi
 
 [ ! -f "{personal_kg_path}/me.md" ]    && upgrades+=("New: me.md — your cross-project identity and working style")
@@ -128,11 +128,15 @@ mkdir -p "{personal_kg_path}/lessons-learned"/{architecture,debugging,patterns,p
 ### Step 4: Copy templates
 
 ```bash
-for f in patterns.md gotchas.md concepts.md architecture.md workflows.md kg-category-index.md; do
+for f in patterns.md gotchas.md concepts.md architecture.md workflows.md; do
   src="${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/$f"
   dest="{personal_kg_path}/knowledge/$f"
   [ -f "$src" ] && [ ! -f "$dest" ] && cp "$src" "$dest"
 done
+# kg-category-index deploys as kg-category-index-global.md at personal KG level
+src="${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-category-index.md"
+dest="{personal_kg_path}/knowledge/kg-category-index-global.md"
+[ -f "$src" ] && [ ! -f "$dest" ] && cp "$src" "$dest"
 ```
 
 Only copy if template doesn't already exist (preserves user content on re-init).
