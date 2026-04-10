@@ -45,6 +45,7 @@ Parameters:
 - `{kg_name}` = "personal"
 - `{KG_TYPE}` = "personal"
 - `{categories}` = ["architecture", "debugging", "patterns", "process"]
+- `{preserve_active}` = true
 
 **After upgrade-inspector completes (Option 1), always continue to Step 8 (content migration) and Step 9 (evidence seeding).** These run independently of the template upgrade check — an up-to-date template install does not mean me.md/rules.md have been populated.
 
