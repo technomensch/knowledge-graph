@@ -60,7 +60,19 @@ If the decisions directory does not exist, create it:
 mkdir -p {active_kg_path}/decisions/
 ```
 
-Tell the user: "Auto-detected: ADR-NNN (next sequential number from N existing ADRs)"
+**Cross-branch collision check:**
+
+Before proceeding, verify the number is not already taken on any other branch:
+
+```bash
+git log --all --oneline -- "decisions/ADR-{NNN}-*.md" 2>/dev/null
+```
+
+- If the command returns no output: number is clean — proceed.
+- If the command returns results: another branch has already used ADR-{NNN}. Increment by 1 and re-run the check. Repeat until a clean number is found.
+- If git is unavailable: skip this check and proceed with the calculated number.
+
+Tell the user: "Auto-detected: ADR-NNN (verified clean across all branches)"
 
 ---
 
