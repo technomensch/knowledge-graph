@@ -13,6 +13,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.3.0-beta] — 2026-04-10
+
+### Features
+- **Default KG path changed to `knowledge/`** — New projects initialize at `./knowledge/` instead of `./docs/`. Avoids collision with documentation site roots (MkDocs, Docusaurus, GitHub Pages). All path resolution remains runtime-dynamic from `~/.claude/kg-config.json` — no hardcoded paths changed.
+- **`/kmgraph:init` migration step** — Detects existing `docs/`-based KG layouts and offers a guided, opt-in migration to `knowledge/`. Migration moves only KMGraph-managed subdirectories (`lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`, `tmp/`) and root scaffold files. Non-KMGraph `docs/` content is never touched.
+- **Migration hardening (M1-M5)** — Symlink guard, `tmp/` handling, rsync-safe merge for `docs/knowledge/` collision, expanded `.gitignore` patterns, sibling KG config updates, cross-reference rewrite across all platform config files (CLAUDE.md, GEMINI.md, .cursorrules, .windsurfrules, copilot-instructions.md), MEMORY.md stale-reference scan, portable `_sed_inplace` helper (macOS + Linux), and full rollback with atomicity flags.
+- **`me.md` + `rules.md` scaffold** — `kmgraph init` now scaffolds `knowledge/me.md` (user identity, gitignored) and `knowledge/rules.md` (behavioral conventions, committed) at init and post-migration.
+- **`kg-index.md` scaffold** — Navigation entry point created at `knowledge/kg-index.md` for project KGs; `kg-index-global.md` + `kg-category-index-global.md` for personal KGs.
+- **Content migration offer** — After scaffold, `init` offers to populate `me.md` and `rules.md` from existing `CLAUDE.md` via the Step 1.6.5 section-mapping protocol. Same offer runs for personal KG using `~/.claude/CLAUDE.md` as source.
+- **Post-migration backfill** — After migration: (1) FTS5 index rebuilt automatically (file paths changed), (2) `update-graph` extraction offered if lessons exist with no KG entries, (3) personal KG setup offered if not already registered.
+- **ENH-011: rules.md/me.md evidence backlink pattern** — `rules.md` entries support optional `Why:` (one-sentence micro-rationale) and `Source:` (direct link to the lesson or ADR that created the rule) annotations. `me.md` uses inline rationale only. Enables lazy-load context access from rules without token overhead. Migration evidence seeding scans existing lessons and decisions for candidates.
+
+### Templates
+- **`core/templates/knowledge/rules.md`** — Updated with Why/Source pattern documentation and populated + omitted examples.
+- **`core/templates/knowledge/me.md`** — Updated with inline rationale pattern documentation and examples.
+- **`core/templates/knowledge/kg-index.md`** — New project KG root index template.
+- **`core/templates/knowledge/kg-index-global.md`** — New personal KG root index template (`-global` suffix mirrors git `--local`/`--global` scope convention).
+
+### Knowledge
+- **Lesson: Default KG Path Collision With Docs Convention** — Documents the `docs/` collision pattern and the `knowledge/` solution.
+- **Lesson: KG Index Naming Convention** — Documents `kg-` prefix and `-global` scope suffix conventions.
+- **Lesson: Migration Must Rewrite Cross-References** — Moving files without rewriting references silently breaks them.
+- **Lesson: Check Gitignore Before Migration Cleanup** — Verify gitignore patterns before writing migration cleanup logic.
+- **Lesson: Shell Boolean Guard** — Exit code trap with `$var && cmd` pattern.
+- **Lesson: KMGraph Fingerprint Detection Before Migration** — Check for KMGraph fingerprints before attempting migration.
+- **Lesson: Post-Migration Content Migration Offer** — Scaffold alone is not enough; offer to populate me.md/rules.md after creation.
+- **ADR-030** — Migration moves named subdirectories only, never entire `docs/`.
+
 ## [0.2.4-beta] — 2026-04-08
 
 ### Documentation
