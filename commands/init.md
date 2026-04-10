@@ -400,7 +400,25 @@ jq '.graphs["'"$kg_name"'"].migration_in_progress = true' \
   ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
 mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
 
-# c. Move ONLY known KMGraph subdirs (never the entire docs/)
+# c. Archive KMGraph content from docs/ before moving (preserve for validation and recovery)
+ARCHIVE_DATE=$(date +%Y-%m-%d)
+ARCHIVE_DIR=".kg-archive-${ARCHIVE_DATE}"
+mkdir -p "$ARCHIVE_DIR"
+
+for subdir in lessons-learned decisions sessions chat-history tmp; do
+  [ -d "docs/$subdir" ] && [ ! -L "docs/$subdir" ] && cp -r "docs/$subdir" "$ARCHIVE_DIR/$subdir"
+done
+if [ -d "docs/knowledge" ]; then
+  cp -r "docs/knowledge" "$ARCHIVE_DIR/knowledge"
+fi
+for f in me.md rules.md kg-index.md; do
+  [ -f "docs/$f" ] && cp "docs/$f" "$ARCHIVE_DIR/$f"
+done
+
+# Add archive dir to .gitignore so it is never committed
+grep -qxF ".kg-archive-*/" .gitignore 2>/dev/null || echo ".kg-archive-*/" >> .gitignore
+
+# d. Move ONLY known KMGraph subdirs (never the entire docs/)
 for subdir in lessons-learned decisions sessions chat-history tmp; do
   if [ -L "docs/$subdir" ]; then
     echo "⚠️  docs/$subdir is a symlink — skipping automatic move. Move manually if needed."
@@ -425,6 +443,28 @@ fi
 for f in me.md rules.md kg-index.md; do
   [ -f "docs/$f" ] && mv "docs/$f" "knowledge/$f"
 done
+
+# e-pre. Validate file counts match archive before proceeding
+VALIDATION_FAILED=0
+for subdir in lessons-learned decisions sessions chat-history tmp; do
+  if [ -d "$ARCHIVE_DIR/$subdir" ]; then
+    ARCHIVE_COUNT=$(find "$ARCHIVE_DIR/$subdir" -type f | wc -l | tr -d ' ')
+    DEST_COUNT=$(find "knowledge/$subdir" -type f 2>/dev/null | wc -l | tr -d ' ')
+    if [ "$ARCHIVE_COUNT" -ne "$DEST_COUNT" ]; then
+      echo "⚠️  File count mismatch in $subdir: archive has $ARCHIVE_COUNT, knowledge/ has $DEST_COUNT"
+      VALIDATION_FAILED=1
+    fi
+  fi
+done
+
+if [ "$VALIDATION_FAILED" -eq 1 ]; then
+  echo ""
+  echo "❌ Migration validation failed — file counts do not match."
+  echo "   Your original content is preserved at: $ARCHIVE_DIR/"
+  echo "   Triggering rollback..."
+  # Trigger rollback (see rollback block below)
+  ROLLBACK_REASON="validation_failed"
+fi
 
 # d. Update kg-config.json path
 PROJECT_ROOT=$(pwd)
@@ -498,6 +538,10 @@ jq 'del(.graphs["'"$kg_name"'"].migration_in_progress)' \
 mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
 
 echo "✅ Graph moved to knowledge/. Config updated."
+echo ""
+echo "📦 Archive preserved at: $ARCHIVE_DIR/"
+echo "   Your original docs/ content is intact there. Once you've verified everything"
+echo "   migrated correctly, delete it with: rm -rf $ARCHIVE_DIR"
 echo ""
 
 # g. Post-migration backfill
