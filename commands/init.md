@@ -497,10 +497,45 @@ jq 'del(.graphs["'"$kg_name"'"].migration_in_progress)' \
   ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
 mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
 
-echo "✅ Graph moved to knowledge/. Config updated. Run /kmgraph:status to verify."
+echo "✅ Graph moved to knowledge/. Config updated."
+echo ""
+
+# g. Post-migration backfill
+# The search index always needs a rebuild after migration — file paths changed.
+echo "Rebuilding search index for new location..."
+# Call kg_fts5_rebuild with the new KG path (knowledge/)
+# If indexed > 0: confirm. If indexed == 0: warn about path misconfiguration.
+
+echo ""
+LESSON_COUNT=$(find "knowledge/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+KG_ENTRY_COUNT=$(find "knowledge/knowledge" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+
+if [ "$LESSON_COUNT" -gt 0 ] && [ "$KG_ENTRY_COUNT" -eq 0 ]; then
+  echo "⚠️  $LESSON_COUNT lessons migrated but no KG entries exist yet."
+  echo ""
+  echo "  Run /kmgraph:update-graph to extract patterns from your lessons?"
+  echo "  This populates knowledge/ with structured entries for fast recall."
+  echo ""
+  echo "    1. Yes — run update-graph now"
+  echo "    2. Skip — I'll run it later"
+  # If Yes: invoke /kmgraph:update-graph --auto --sync-all
+fi
+
+# h. Personal KG prompt — offer to run /kmgraph:init at user level if not already set up
+PERSONAL_KG_EXISTS=$(jq -r '.graphs | to_entries[] | select(.value.type == "personal") | .key' ~/.claude/kg-config.json 2>/dev/null)
+if [ -z "$PERSONAL_KG_EXISTS" ]; then
+  echo ""
+  echo "  Your project KG is now at knowledge/ — want to set up a personal KG too?"
+  echo "  A personal KG at ~/.claude/knowledge-graph/ captures cross-project lessons"
+  echo "  and conventions that apply everywhere, not just this project."
+  echo ""
+  echo "    1. Yes — run /kmgraph:init at user level now"
+  echo "    2. Skip — I'll set it up later with /kmgraph:init-personal-kg"
+  # If Yes: invoke /kmgraph:init-personal-kg
+fi
 ```
 
-**Safety constraint:** Only named KMGraph subdirectories (`lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`, `tmp/`) and root scaffold files (`me.md`, `rules.md`, `index.md`) are moved. Never touch other `docs/` contents. Symlinked subdirs are skipped with a warning.
+**Safety constraint:** Only named KMGraph subdirectories (`lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`, `tmp/`) and root scaffold files (`me.md`, `rules.md`, `kg-index.md`) are moved. Never touch other `docs/` contents. Symlinked subdirs are skipped with a warning.
 
 #### 1f. FTS5 index check
 
