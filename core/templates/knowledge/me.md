@@ -1,5 +1,13 @@
 # About Me — [Project Name]
 
+<!-- INLINE RATIONALE PATTERN (me.md only)
+     me.md uses INLINE rationale only — a brief parenthetical or dash-suffix on the preference line itself.
+     me.md does NOT use Why:/Source: graph links (it's personal/gitignored; preferences don't need provenance chains).
+     Inline rationale is optional — only add it when the reason is non-obvious or helps an LLM understand the constraint.
+     Evidence blocks (Why:/Source:) from rules.md are NOT used in me.md. Inline rationale only.
+     If a preference has a complex backstory, capture it as a lesson in lessons-learned/ instead.
+-->
+
 ## Role and Context
 
 <!-- What is this project, and what is your role in it? -->
@@ -40,6 +48,17 @@ Assumed background: ...
 
 <!-- How should the assistant format and style its responses for you? -->
 <!-- Example: "No emojis. Markdown headers for structure. Bullet points over paragraphs. Always narrate reasoning in visible text." -->
+<!--
+     INLINE RATIONALE EXAMPLES
+     With inline rationale (reason is non-obvious or constrains LLM behavior):
+       - No emojis unless requested — renders inconsistently in terminal output
+       - No trailing summaries after tool calls — I can read the diff
+       - Use markdown links [file](path) not backtick code — renders as clickable in IDE
+
+     Without inline rationale (reason is obvious or preference is self-explanatory):
+       - Concise output by default
+       - Bullet points over paragraphs
+-->
 
 - Emoji policy: ...
 - Response format: ...
