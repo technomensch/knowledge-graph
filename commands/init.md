@@ -1137,7 +1137,48 @@ Examples of personal lessons:
    > "✅ Personal KG created at `~/.claude/knowledge-graph/`
    > Capture cross-project lessons with `/kmgraph:capture-lesson` — you'll be asked which KG to save to."
 
-**If No:**
+7. Content migration offer for personal KG:
+
+   Run the Step 1.6.5 content migration logic with personal KG parameters:
+   - Source file: `~/.claude/CLAUDE.md`
+   - Target me.md: `~/.claude/knowledge-graph/me.md`
+   - Target rules.md: `~/.claude/knowledge-graph/rules.md`
+   - Also offer to migrate `user`-type entries from `~/.claude/projects/*/memory/MEMORY.md` into personal `me.md` (role, preferences, expertise — not project-specific entries)
+
+   Prompt:
+   ```
+   me.md and rules.md have been created in your personal KG.
+   Would you like help populating them from your global ~/.claude/CLAUDE.md?
+
+     1. Yes — show me what would move where (review before writing)
+     2. No — I'll fill them in manually
+   ```
+
+   Apply all the same safety rules from Step 1.6.5: no auto-write, user confirms per section, backup before rewrite.
+
+8. Evidence seeding for personal me.md and rules.md:
+
+   After step 7 (whether or not the user ran the migration offer), check whether existing personal lessons or ADRs can seed Why/Source links into rules.md:
+
+   ```bash
+   LESSON_COUNT=$(find "$HOME/.claude/knowledge-graph/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+   ADR_COUNT=$(find "$HOME/.claude/knowledge-graph/decisions" -name "ADR-*.md" 2>/dev/null | wc -l | tr -d ' ')
+   ```
+
+   If `LESSON_COUNT` or `ADR_COUNT` is greater than 0:
+   ```
+   Your personal KG has [N] lessons and [M] ADRs.
+   Would you like me to scan them and suggest Why:/Source: links for rules.md entries?
+
+     1. Yes — scan and show me suggestions (you approve each one before it is written)
+     2. Skip — I'll add evidence links manually
+   ```
+
+   If Yes: scan each lesson and ADR for topic matches against rules.md entries. Surface candidate Why/Source pairs one at a time — user accepts or skips each. Write only accepted pairs.
+
+   If `LESSON_COUNT` and `ADR_COUNT` are both 0: skip silently (normal for a fresh personal KG).
+
+**If No (to the overall personal KG offer):**
    > "No problem. Run `/kmgraph:init-personal-kg` any time to set this up later."
 
 ---
