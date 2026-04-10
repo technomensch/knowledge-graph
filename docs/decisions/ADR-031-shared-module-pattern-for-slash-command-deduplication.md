@@ -1,6 +1,6 @@
 ---
-title: "ADR-030: Shared Module Pattern for Slash Command Deduplication"
-number: 030
+title: "ADR-031: Shared Module Pattern for Slash Command Deduplication"
+number: 031
 created: 2026-04-10T00:00:00Z
 status: Accepted
 author: technomensch
@@ -19,7 +19,7 @@ tags: [architecture]
 category: architecture
 ---
 
-# ADR-030: Shared Module Pattern for Slash Command Deduplication
+# ADR-031: Shared Module Pattern for Slash Command Deduplication
 
 **Date:** 2026-04-10
 **Status:** Accepted

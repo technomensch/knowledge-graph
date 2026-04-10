@@ -4,7 +4,7 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 27
+**Total ADRs:** 28
 **Last Updated:** 2026-04-10
 
 ---
@@ -27,11 +27,8 @@ Formal documentation of significant architecture decisions.
 ## By Category
 
 ### Architecture
-<<<<<<< HEAD
+- [ADR-031: Shared Module Pattern for Slash Command Deduplication](ADR-031-shared-module-pattern-for-slash-command-deduplication.md) — Parameterized shared modules under `commands/init-shared/` replace duplicated instruction blocks across init commands
 - [ADR-030: Migration Moves KMGraph-Named Subdirectories Only](ADR-030-migration-moves-named-subdirs-only-never-entire-docs.md) — Named subdir list prevents collision with docs sites; explicit scope over blanket directory moves
-=======
-- [ADR-030: Shared Module Pattern for Slash Command Deduplication](ADR-030-shared-module-pattern-for-slash-command-deduplication.md) — Parameterized shared modules under `commands/init-shared/` replace duplicated instruction blocks across init commands
->>>>>>> 5d61ab4c (docs(adr): create ADR-030: Shared Module Pattern for Slash Command Deduplication)
 
 ### Process
 - [ADR-029: Plan File Location in Knowledge Graph](ADR-029-plan-file-location-in-knowledge-graph.md) — Three-location plan structure: ENH folder, issue folder, or knowledge/plans/ fallback
