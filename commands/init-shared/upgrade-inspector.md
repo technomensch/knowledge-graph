@@ -56,9 +56,9 @@ for tdir in knowledge lessons-learned decisions sessions; do
     for covered in "${scaffold_covered[@]}"; do
       [ "$tname" = "$covered" ] && skip=true && break
     done
-    $skip && continue
+    [ "$skip" = "true" ] && continue
     dest="{KG_PATH}/$tdir/$tname"
-    [ ! -f "$dest" ] && upgrades+=("New template: $tdir/$tname")
+    [ ! -f "$dest" ] && upgrades+=("New template: $tdir/$tname") || true
   done
 done
 ```
