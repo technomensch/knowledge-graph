@@ -46,11 +46,13 @@ Read `~/.claude/kg-config.json`. Look for any entry with `type: "personal"`.
 A personal KG is already registered: "[name]" at [path]
 
 Options:
-1. See what's new — review improvements in this version, then decide what to apply
+1. Verify and upgrade — check for missing files, new templates, and offer to populate me.md/rules.md
 2. Re-initialize it (reset structure, keep existing lessons)
 3. Register a different path as personal KG
 4. Cancel
 ```
+
+**Important:** Option 1 is the default upgrade path. Do NOT offer "use as-is / no action needed" — there may be new templates, missing files, or unpopulated me.md/rules.md to address. Always run the upgrade check.
 
 **If option 1 selected**, inspect the personal KG's actual state and report only what is missing or upgradeable for this specific install:
 
@@ -190,6 +192,65 @@ How to use:
   • /kmgraph:recall "query" — now searches both project and personal KGs automatically
   • /kmgraph:switch personal — make personal KG active (advanced; usually not needed)
 ```
+
+---
+
+### Step 8: Content migration offer
+
+Offer to populate `me.md` and `rules.md` from `~/.claude/CLAUDE.md`:
+
+```
+me.md and rules.md have been created in your personal KG.
+Would you like help populating them from your global ~/.claude/CLAUDE.md?
+
+  1. Yes — show me what would move where (review before writing)
+  2. No — I'll fill them in manually
+```
+
+**If Yes:**
+1. Parse `~/.claude/CLAUDE.md` and display proposed mapping before writing anything:
+   ```
+   Proposed mapping from ~/.claude/CLAUDE.md:
+     "Personal Preferences" section → me.md
+     "Cross-Project Conventions" section → rules.md
+     Platform-specific / project-specific content → CLAUDE.md (retained)
+   ```
+2. User confirms each section before it is written.
+3. Before rewriting CLAUDE.md, copy original to `CLAUDE.md.bak`.
+4. Rewrite `~/.claude/CLAUDE.md` to a minimal pointer:
+   ```
+   For full context, read ~/.claude/knowledge-graph/rules.md and ~/.claude/knowledge-graph/me.md before acting.
+   ```
+5. Also offer to migrate `user`-type entries from `~/.claude/projects/*/memory/MEMORY.md` (role, preferences, expertise — not project-specific entries) into personal `me.md`.
+6. If user declines or aborts, restore from `CLAUDE.md.bak` and delete it.
+
+**Safety rules:** Never auto-write. User confirms per section. If `~/.claude/CLAUDE.md` does not exist, skip silently.
+
+**Skip this step** if `me.md` already has substantial content (more than the template placeholder text) — the user has already populated it manually.
+
+---
+
+### Step 9: Evidence seeding
+
+After Step 8 (whether or not the migration ran), check whether existing personal lessons or ADRs can seed `Why:`/`Source:` links into `rules.md`:
+
+```bash
+LESSON_COUNT=$(find "{personal_kg_path}/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+ADR_COUNT=$(find "{personal_kg_path}/decisions" -name "ADR-*.md" 2>/dev/null | wc -l | tr -d ' ')
+```
+
+If `LESSON_COUNT` or `ADR_COUNT` is greater than 0:
+```
+Your personal KG has [N] lessons and [M] ADRs.
+Would you like me to scan them and suggest Why:/Source: links for rules.md entries?
+
+  1. Yes — scan and show me suggestions (you approve each one before it is written)
+  2. Skip — I'll add evidence links manually
+```
+
+If Yes: scan each lesson and ADR for topic matches against `rules.md` entries. Surface candidate `Why:`/`Source:` pairs one at a time — user accepts or skips each. Write only accepted pairs.
+
+If both counts are 0: skip silently (normal for a fresh personal KG).
 
 ---
 
