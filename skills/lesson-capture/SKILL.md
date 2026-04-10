@@ -32,7 +32,18 @@ When triggered:
 
    **ECC Compatibility:** The slash command syntax (`/kmgraph:capture-lesson`) is Claude Code–specific. On other ECC platforms, the lesson-capture-agent is dispatched directly via agent invocation without a command namespace.
 
-3. **Dispatch to lesson-capture-agent** with that pre-structured context
+3. **Dispatch to lesson-capture-agent** with the pre-structured context as a named payload:
+
+   ```
+   context_provided: true
+   problem: "[extracted problem]"
+   solution: "[extracted solution]"
+   pattern: "[extracted generalizable lesson]"
+   tags: ["[tag1]", "[tag2]"]
+   suggested_category: "[architecture|debugging|patterns|process]"
+   ```
+
+   The agent uses `context_provided: true` to skip its interactive wizard and go directly to draft generation.
 
 3. **Use friendly, user-addressed language** — never mention agent mechanics:
    - ✅ "Looks like you just solved something worth keeping — here's what I'd save:"
@@ -51,5 +62,6 @@ Skill response:
 - Problem: Config being cached in memory between writes
 - Solution: Invalidate cache on every write operation
 - Pattern: Cache invalidation timing matters in multi-state systems
+- Tags: [caching, memory, invalidation]
 
 Want me to document this as a lesson?"
