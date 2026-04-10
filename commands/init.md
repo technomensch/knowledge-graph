@@ -77,7 +77,7 @@ echo "$CONFIGURED_PATH" | grep -qE '/docs/?$' && \
 # Skip templates that are already covered by the scaffold file checks above:
 #   kg-index.md deploys as $KG_PATH/index.md — already checked
 #   me.md and rules.md deploy to $KG_PATH root — already checked
-scaffold_covered=("kg-index.md" "me.md" "rules.md" "kg-index-user.md")
+scaffold_covered=("kg-index.md" "me.md" "rules.md" "kg-index-global.md")
 for tdir in knowledge lessons-learned decisions sessions; do
   for template in "${CLAUDE_PLUGIN_ROOT}/core/templates/$tdir/"*; do
     tname=$(basename "$template")
@@ -995,15 +995,17 @@ Examples of personal lessons:
 3. Copy templates:
    ```bash
    # Category templates → knowledge/ subfolder
-   for f in patterns.md gotchas.md concepts.md architecture.md workflows.md kg-category-index.md; do
+   for f in patterns.md gotchas.md concepts.md architecture.md workflows.md; do
      cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/$f" "$HOME/.claude/knowledge-graph/knowledge/" 2>/dev/null || true
    done
-   # Root-level files — me.md, rules.md, kg-index-user.md → KG root
+   # kg-category-index deploys as kg-category-index-global.md at personal KG level
+   cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-category-index.md" "$HOME/.claude/knowledge-graph/knowledge/kg-category-index-global.md" 2>/dev/null || true
+   # Root-level files — me.md, rules.md, kg-index-global.md → KG root
    cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/me.md" "$HOME/.claude/knowledge-graph/me.md"
    [ -f "$HOME/.claude/knowledge-graph/rules.md" ] && echo "rules.md already exists — skipping scaffold." || \
      cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/rules.md" "$HOME/.claude/knowledge-graph/rules.md"
-   [ -f "$HOME/.claude/knowledge-graph/kg-index-user.md" ] && echo "kg-index-user.md already exists — skipping scaffold." || \
-     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-index-user.md" "$HOME/.claude/knowledge-graph/kg-index-user.md"
+   [ -f "$HOME/.claude/knowledge-graph/kg-index-global.md" ] && echo "kg-index-global.md already exists — skipping scaffold." || \
+     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-index-global.md" "$HOME/.claude/knowledge-graph/kg-index-global.md"
    ```
 
 4. Register in `~/.claude/kg-config.json`:
