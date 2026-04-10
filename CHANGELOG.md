@@ -13,6 +13,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.3.2-beta] — 2026-04-10
+
+### Features
+- **Draft-and-approve UX for lesson capture** — `lesson-capture` skill now extracts full context from the conversation (problem, solution, pattern, tags, category) and passes it as a structured payload to `lesson-capture-agent`. The agent skips its interactive wizard when context is provided and generates a complete draft silently, then presents **Approve / Edit / Discard**. Edit accepts free-form natural-language corrections with re-display loop. Wizard path preserved for direct invocation.
+- **Draft-and-approve UX for ADR creation** — `adr-guide` skill now extracts all 7 ADR fields (title, status, category, context, decision, rationale, consequences) from the conversation before asking the user, shows a pre-filled summary, and passes the full context payload to `create-adr-agent`. Phase 0.5 gate sets `wizard_mode: false`, populates all fields, and presents the full ADR draft via Phase 3.5 **Approve / Edit / Discard** — skipping the 8-question wizard entirely.
+- **Session snapshot on capture approval** — When a lesson or ADR is approved, `session-summary-agent --snapshot` fires non-blocking (`triggered by: lesson` or `triggered by: ADR`). Creates today's session file if absent; appends if present.
+
+### Fixed
+- **Cross-branch ADR/ENH number collision** — `create-adr-agent` Phase 1 now runs `git log --all` after calculating the next ADR number to verify it is not already taken on another branch; bumps and re-checks until clean. Same check added to `start-issue-tracking` Step 2.2 for both issue and ENH numbers. Prevents duplicate numbering when branches diverge before merging.
+
+---
+
+## [0.3.1-beta] — 2026-04-10
+
+### Refactor
+- **`init-shared/` module layer** — Five reusable shared modules extracted into `commands/init-shared/`: `directory-scaffold`, `template-seed`, `fts5-rebuild`, `config-entry-write`, `upgrade-inspector`. Each has a single responsibility and a documented interface.
+- **`/kmgraph:init` uses shared modules** — Duplicate init logic replaced with calls to `init-shared` modules. The command is now a thin orchestrator.
+- **`/kmgraph:init-personal-kg` uses shared modules** — Same refactor applied. Duplicate scaffold, template-seed, fts5-rebuild, config-entry-write, and upgrade-inspector sections removed.
+
+### Fixed
+- **`upgrade-inspector` verification** — Trimmed inspector to only check verifiable steps; removed phantom parameter; guarded `preserve_active` call.
+
+### Knowledge
+- **ADR-031: Shared Module Pattern for Slash Command Deduplication** — Documents the decision to extract shared logic into `commands/init-shared/` rather than duplicating across slash commands.
+- **Lesson: Check Gitignore Before Migration Cleanup** — Verify gitignore patterns before writing migration cleanup logic to avoid silently skipping cleanup steps.
+
+---
+
 ## [0.3.0-beta] — 2026-04-10
 
 ### Features
@@ -40,6 +68,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Lesson: KMGraph Fingerprint Detection Before Migration** — Check for KMGraph fingerprints before attempting migration.
 - **Lesson: Post-Migration Content Migration Offer** — Scaffold alone is not enough; offer to populate me.md/rules.md after creation.
 - **ADR-030** — Migration moves named subdirectories only, never entire `docs/`.
+
+---
 
 ## [0.2.4-beta] — 2026-04-08
 
