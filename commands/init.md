@@ -373,17 +373,28 @@ find knowledge/ -name "*.md" -type f | while read f; do
     "$f"
 done
 
-# Also update CLAUDE.md and README.md if present
-for f in CLAUDE.md README.md; do
+# Also update platform config files if present
+for f in CLAUDE.md README.md GEMINI.md .cursorrules .windsurfrules .github/copilot-instructions.md .aider.conf.yml; do
   [ -f "$f" ] && sed -i '' \
     -e 's|docs/lessons-learned/|knowledge/lessons-learned/|g' \
     -e 's|docs/decisions/|knowledge/decisions/|g' \
+    -e 's|docs/sessions/|knowledge/sessions/|g' \
+    -e 's|docs/chat-history/|knowledge/chat-history/|g' \
     -e 's|docs/knowledge/|knowledge/concepts/|g' \
     "$f" || true
 done
 
-echo "⚠️  Note: memory entries in ~/.claude/projects/ may still reference docs/ paths."
-echo "   Run /kmgraph:recall to find stale references after migration."
+# Scan project MEMORY.md for stale docs/ references and surface them
+PROJECT_DIR_NAME=$(basename "$(pwd)")
+MEMORY_FILE=$(find "$HOME/.claude/projects/" -path "*${PROJECT_DIR_NAME}*/memory/MEMORY.md" 2>/dev/null | head -1)
+if [ -n "$MEMORY_FILE" ]; then
+  STALE=$(grep -n "docs/" "$MEMORY_FILE" | grep -E "docs/(lessons-learned|decisions|sessions|knowledge)" || true)
+  if [ -n "$STALE" ]; then
+    echo "⚠️  Stale docs/ references found in your MEMORY.md ($MEMORY_FILE):"
+    echo "$STALE"
+    echo "   Update manually or re-run /kmgraph:init after editing."
+  fi
+fi
 
 # f. Clear migration flag
 jq 'del(.graphs["'"$kg_name"'"].migration_in_progress)' \
