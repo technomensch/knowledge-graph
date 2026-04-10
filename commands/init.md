@@ -51,7 +51,6 @@ Parameters:
 - `{kg_name}` = name key of the matched KG in kg-config.json
 - `{KG_TYPE}` = type field from the KG config entry ("project-local" or "personal")
 - `{categories}` = categories array from the KG config entry
-- `{preserve_active}` = false
 
 
 #### 1d. Platform config check

@@ -39,8 +39,17 @@ EOF
 )
 
 # Update config with jq (or manual JSON manipulation)
+# Only include the .active assignment when {preserve_active} is false.
+# Use the appropriate form below based on the value of {preserve_active}:
+
+# If {preserve_active} is FALSE — set the active KG:
 jq ".graphs[\"{kg_name}\"] = $config_entry | .active = \"{kg_name}\"" \
   ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+
+# If {preserve_active} is TRUE — do NOT modify .active:
+jq ".graphs[\"{kg_name}\"] = $config_entry" \
+  ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+
 mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
 ```
 
@@ -76,4 +85,3 @@ if [ -n "$GRAPHS_WITHOUT_TYPE" ]; then
 fi
 ```
 
-If {preserve_active} is true, do not modify the "active" field in ~/.claude/kg-config.json.
