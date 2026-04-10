@@ -30,6 +30,16 @@ Block until the user responds. Do not proceed until resolved.
 
 ---
 
+## Phase 0.5: Context-Input Gate
+
+Check whether the dispatching skill passed a context payload (`context_provided: true`).
+
+**If context was passed:** store the payload fields for use in Phase 3. Set an internal flag: `wizard_mode: false`. Continue to Phase 1 (numbering) and Phase 2 (git metadata) as normal — these are always auto-collected.
+
+**If no context was passed (direct invocation):** set `wizard_mode: true`. Continue to Phase 1 as normal. Phase 3 will run the interactive wizard.
+
+---
+
 ## Phase 1: Auto-Increment ADR Number
 
 Scan the decisions directory for existing ADRs:
@@ -73,6 +83,22 @@ If git is unavailable, skip git metadata and proceed with manual fields only.
 
 ## Phase 3: Interactive Wizard
 
+**If `wizard_mode: false` (context was passed):**
+
+Skip all 8 wizard questions. Use the passed payload to populate all fields:
+- title → from payload
+- status → from payload (default "Proposed" if blank)
+- category → from payload
+- context → from payload
+- decision → from payload
+- rationale → from payload
+- consequences → from payload (leave as "None" if blank)
+- related_lessons → from payload (empty array if blank)
+
+Proceed directly to Phase 3.5.
+
+**If `wizard_mode: true` (no context passed):**
+
 Ask the user each question. Wait for a response before proceeding to the next.
 
 If a title was passed as input, pre-fill question 1 and confirm it.
@@ -88,7 +114,56 @@ If a title was passed as input, pre-fill question 1 and confirm it.
 
 ---
 
+## Phase 3.5: Draft Display and Approve/Edit/Discard
+
+**Only runs when `wizard_mode: false`.** When `wizard_mode: true`, Phase 4 (Confirm Before Writing) handles the summary review — skip this phase.
+
+Generate the full ADR content from the populated fields (same template as Phase 5). Display it to the user:
+
+> "Here's the ADR draft:
+>
+> ---
+> **ADR-{NNN}: {title}**
+> Status: {status} | Category: {category}
+>
+> **Context**
+> {context}
+>
+> **Decision**
+> {decision}
+>
+> **Rationale**
+> {rationale}
+>
+> **Consequences**
+> {consequences}
+>
+> **Related lessons:** {related_lessons or "None"}
+>
+> **Git metadata:** Author: {name}, Branch: {branch}, Commit: {short-hash}
+> ---
+>
+> **Approve** — create ADR from this draft
+> **Edit** — tell me what to change
+> **Discard** — don't create this ADR"
+
+**If Approve:**
+1. Dispatch `session-summary-agent --snapshot` with context `triggered by: ADR` — non-blocking; the agent creates today's session file if absent or appends if present. Do not wait for it to complete before proceeding.
+2. Skip Phase 4 (Confirm Before Writing) and proceed directly to Phase 5 (file write).
+
+**If Edit:**
+- Ask: "What would you like to change?" (free-form — e.g., "the rationale should include the option we rejected" or "set status to Accepted")
+- Apply the correction to the relevant field(s)
+- Re-display the full updated draft with the same Approve / Edit / Discard prompt
+- Repeat until user selects Approve or Discard
+
+**If Discard:** Stop. Confirm: "ADR discarded — nothing was saved."
+
+---
+
 ## Phase 4: Confirm Before Writing
+
+**Runs when:** `wizard_mode: true` (interactive wizard path). When `wizard_mode: false`, Phase 3.5 handles review and this phase is skipped.
 
 Generate the filename:
 - Derive slug from title: lowercase, spaces to hyphens, remove special characters
