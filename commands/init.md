@@ -332,9 +332,20 @@ done
 
 # d. Update kg-config.json path
 PROJECT_ROOT=$(pwd)
+OLD_PATH="$PROJECT_ROOT/docs"
 jq ".graphs[\"$kg_name\"].path = \"$PROJECT_ROOT/knowledge\"" \
   ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
 mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+
+# d2. Update sibling KG entries pointing to the same old path (exact match only)
+jq -r '.graphs | to_entries[] | select(.value.path == "'"$OLD_PATH"'") | .key' \
+  ~/.claude/kg-config.json | while read sibling; do
+  [ "$sibling" = "$kg_name" ] && continue
+  jq ".graphs[\"$sibling\"].path = \"$PROJECT_ROOT/knowledge\"" \
+    ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+  mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+  echo "Updated sibling KG config path: $sibling → $PROJECT_ROOT/knowledge"
+done
 
 # e. Update .gitignore rules
 if [ -f .gitignore ]; then
@@ -342,7 +353,13 @@ if [ -f .gitignore ]; then
     -e 's|docs/sessions/|knowledge/sessions/|g' \
     -e 's|docs/chat-history/|knowledge/chat-history/|g' \
     -e 's|docs/lessons-learned/\(.*\)/|knowledge/lessons-learned/\1/|g' \
+    -e 's|docs/tmp/|knowledge/tmp/|g' \
+    -e 's|docs/me\.md|knowledge/me.md|g' \
     .gitignore
+  # Rewrite blanket docs/ KMGraph rule only if KMGraph confirmed to own docs/
+  # (trigger condition verified docs/lessons-learned/ exists above — safe to rewrite)
+  grep -qx 'docs/' .gitignore && \
+    sed -i '' -e 's|^docs/$|knowledge/|' .gitignore || true
 fi
 
 # e2. Rewrite docs/ path references inside migrated markdown files
