@@ -47,7 +47,7 @@ A personal KG is already registered: "[name]" at [path]
 
 Options:
 1. See what's new — review improvements in this version, then decide what to apply
-2. Re-initialize it (reset structure, keep existing lessons)
+2. Re-initialize it — archive existing content, reset structure, keep all lessons and ADRs
 3. Register a different path as personal KG
 4. Cancel
 ```
@@ -101,6 +101,48 @@ Apply all, pick individually, or skip?
 ```
 
 After applying upgrades (or if nothing to upgrade), **always continue to Step 8 (content migration) and Step 9 (evidence seeding)**. These run independently of the template upgrade check — an up-to-date template install does not mean me.md/rules.md have been populated.
+
+**If option 2 selected (re-initialize):**
+
+1. Archive all existing content before touching anything:
+   ```bash
+   ARCHIVE_DATE=$(date +%Y-%m-%d)
+   ARCHIVE_DIR="{personal_kg_path}/.kg-archive-${ARCHIVE_DATE}"
+   mkdir -p "$ARCHIVE_DIR"
+   for subdir in knowledge lessons-learned decisions sessions; do
+     [ -d "{personal_kg_path}/$subdir" ] && cp -r "{personal_kg_path}/$subdir" "$ARCHIVE_DIR/$subdir"
+   done
+   for f in me.md rules.md kg-index-global.md; do
+     [ -f "{personal_kg_path}/$f" ] && cp "{personal_kg_path}/$f" "$ARCHIVE_DIR/$f"
+   done
+   ```
+
+2. Record pre-archive lesson and ADR counts for post-validation:
+   ```bash
+   PRE_LESSON_COUNT=$(find "{personal_kg_path}/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+   PRE_ADR_COUNT=$(find "{personal_kg_path}/decisions" -name "ADR-*.md" 2>/dev/null | wc -l | tr -d ' ')
+   ```
+
+3. Proceed through Steps 3-7 (directory structure, templates, config, FTS5 index, confirm).
+
+4. After re-init, validate lesson and ADR counts are preserved:
+   ```bash
+   POST_LESSON_COUNT=$(find "{personal_kg_path}/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+   POST_ADR_COUNT=$(find "{personal_kg_path}/decisions" -name "ADR-*.md" 2>/dev/null | wc -l | tr -d ' ')
+
+   if [ "$PRE_LESSON_COUNT" -ne "$POST_LESSON_COUNT" ] || [ "$PRE_ADR_COUNT" -ne "$POST_ADR_COUNT" ]; then
+     echo "⚠️  Content count mismatch after re-init."
+     echo "   Before: $PRE_LESSON_COUNT lessons, $PRE_ADR_COUNT ADRs"
+     echo "   After:  $POST_LESSON_COUNT lessons, $POST_ADR_COUNT ADRs"
+     echo "   Archive preserved at: $ARCHIVE_DIR"
+   else
+     echo "✅ Re-initialization complete. $POST_LESSON_COUNT lessons and $POST_ADR_COUNT ADRs preserved."
+     echo "📦 Archive preserved at: $ARCHIVE_DIR"
+     echo "   Delete when satisfied: rm -rf $ARCHIVE_DIR"
+   fi
+   ```
+
+5. Continue to Step 8 (content migration) and Step 9 (evidence seeding).
 
 **If none exists:** Proceed to Step 2.
 
