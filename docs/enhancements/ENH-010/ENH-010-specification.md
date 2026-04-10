@@ -72,6 +72,8 @@ Opus audit of the migration execution block identified 13 gaps after initial v0.
 
 **Scaffold path fix:** When upgrading a docs/-based KG, root scaffold files write directly to `knowledge/` (the final destination), not `docs/` (which would require migration to move them).
 
+**Post-migration content migration offer:** After migration scaffolds me.md and rules.md (empty), step h prompts user to populate them from the existing CLAUDE.md (project level). Same offer runs after personal KG setup using `~/.claude/CLAUDE.md` as source and personal `me.md`/`rules.md` as targets. Both follow the Step 1.6.5 content migration protocol: show proposed section mapping, confirm per-section, backup original before rewriting. This applies to both project and personal KG levels.
+
 Platform shim templates generated in `core/templates/platform/` for Claude, Cursor, Windsurf, and Copilot.
 
 ---
