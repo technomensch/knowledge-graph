@@ -245,6 +245,24 @@ ls -1 "$KG_PATH/enhancements/" 2>/dev/null | grep -E '^ENH-[0-9]+' | sort -V
 
 ### 2.2: Assign Next Number
 
+**Cross-branch collision check:**
+
+After calculating the next number from the directory listing, verify it is not already taken on any other branch:
+
+For issues:
+```bash
+git log --all --oneline -- "issues/issue-{N}*" 2>/dev/null
+```
+
+For enhancements:
+```bash
+git log --all --oneline -- "enhancements/ENH-{NNN}*" 2>/dev/null
+```
+
+- If the command returns no output: number is clean — proceed.
+- If the command returns results: another branch has already used that number. Increment by 1 and re-run the check. Repeat until a clean number is found.
+- If git is unavailable: skip this check and proceed with the calculated number.
+
 **POLICY: Identifier Decoupling (Dual-ID Policy)**
 - **Local ID (Logical):** `issue-N` or `ENH-NNN`. A sequential count of internal project tasks/folders. This is the **Source of Truth** for the local file system and branch names.
 - **GitHub ID (Platform):** `#N`. The serial ID assigned by GitHub.
