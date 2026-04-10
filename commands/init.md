@@ -263,6 +263,17 @@ fi
 
 ```bash
 MIGRATION_IN_PROGRESS=$(jq -r '.graphs["'"$kg_name"'"].migration_in_progress // false' ~/.claude/kg-config.json)
+ROLLBACK_IN_PROGRESS=$(jq -r '.graphs["'"$kg_name"'"].rollback_in_progress // false' ~/.claude/kg-config.json)
+
+if [ "$ROLLBACK_IN_PROGRESS" = "true" ]; then
+  echo "⚠️  A previous rollback was interrupted."
+  echo ""
+  echo "   Options:"
+  echo "     1. Resume rollback — continue restoring files to docs/"
+  echo "     2. Skip — leave in current state (may be inconsistent)"
+  # If user selects Resume rollback: continue the rollback steps below
+  # If user selects Skip: exit without changes
+fi
 
 if [ "$MIGRATION_IN_PROGRESS" = "true" ]; then
   echo "⚠️  A previous migration was interrupted."
@@ -271,7 +282,81 @@ if [ "$MIGRATION_IN_PROGRESS" = "true" ]; then
   echo "     1. Resume — complete the move from docs/ to knowledge/"
   echo "     2. Rollback — move files back to docs/ and restore config"
   echo "     3. Skip — leave in current state (may be inconsistent)"
-  # Handle user selection before proceeding
+
+  # If user selects Resume: continue with migration steps below (fall through)
+  # If user selects Skip: exit without changes
+
+  # If user selects Rollback:
+  # Set rollback flag before starting; clears both flags on completion
+  jq '.graphs["'"$kg_name"'"].rollback_in_progress = true' \
+    ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+  mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+
+  # rb-a. Reverse root scaffold file moves
+  for f in me.md rules.md index.md; do
+    [ -f "knowledge/$f" ] && mv "knowledge/$f" "docs/$f"
+  done
+
+  # rb-b. Reverse subdir moves (skip symlinks)
+  for subdir in lessons-learned decisions sessions chat-history tmp; do
+    if [ -L "knowledge/$subdir" ]; then
+      echo "⚠️  knowledge/$subdir is a symlink — skipping. Move manually if needed."
+      continue
+    fi
+    [ -d "knowledge/$subdir" ] && mv "knowledge/$subdir" "docs/$subdir"
+  done
+
+  # rb-b2. Reverse knowledge/concepts/ if it was moved from docs/knowledge/
+  if [ -d "knowledge/concepts" ] && [ ! -d "docs/knowledge" ]; then
+    mv "knowledge/concepts" "docs/knowledge"
+  fi
+
+  # rb-c. Restore kg-config.json path
+  PROJECT_ROOT=$(pwd)
+  jq ".graphs[\"$kg_name\"].path = \"$PROJECT_ROOT/docs\"" \
+    ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+  mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+
+  # rb-d. Reverse .gitignore rules
+  if [ -f .gitignore ]; then
+    _sed_inplace \
+      -e 's|knowledge/sessions/|docs/sessions/|g' \
+      -e 's|knowledge/chat-history/|docs/chat-history/|g' \
+      -e 's|knowledge/lessons-learned/\(.*\)/|docs/lessons-learned/\1/|g' \
+      -e 's|knowledge/tmp/|docs/tmp/|g' \
+      -e 's|knowledge/me\.md|docs/me.md|g' \
+      .gitignore
+    grep -qx 'knowledge/' .gitignore && \
+      _sed_inplace -e 's|^knowledge/$|docs/|' .gitignore || true
+  fi
+
+  # rb-e. Reverse cross-reference rewrites in docs/ files and platform configs
+  find docs/ -name "*.md" -type f 2>/dev/null | while read f; do
+    _sed_inplace \
+      -e 's|knowledge/lessons-learned/|docs/lessons-learned/|g' \
+      -e 's|knowledge/decisions/|docs/decisions/|g' \
+      -e 's|knowledge/sessions/|docs/sessions/|g' \
+      -e 's|knowledge/chat-history/|docs/chat-history/|g' \
+      -e 's|knowledge/concepts/|docs/knowledge/|g' \
+      "$f"
+  done
+  for f in CLAUDE.md README.md GEMINI.md .cursorrules .windsurfrules .github/copilot-instructions.md .aider.conf.yml; do
+    [ -f "$f" ] && _sed_inplace \
+      -e 's|knowledge/lessons-learned/|docs/lessons-learned/|g' \
+      -e 's|knowledge/decisions/|docs/decisions/|g' \
+      -e 's|knowledge/sessions/|docs/sessions/|g' \
+      -e 's|knowledge/chat-history/|docs/chat-history/|g' \
+      -e 's|knowledge/concepts/|docs/knowledge/|g' \
+      "$f" || true
+  done
+
+  # rb-f. Clear both flags
+  jq 'del(.graphs["'"$kg_name"'"].migration_in_progress) | del(.graphs["'"$kg_name"'"].rollback_in_progress)' \
+    ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+  mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+
+  echo "✅ Rollback complete. KG restored to docs/. Run /kmgraph:status to verify."
+  # Exit — do not proceed with forward migration
 fi
 ```
 
@@ -289,8 +374,8 @@ KG_PATH_ENDS_DOCS=$(echo "$CONFIGURED_PATH" | grep -E '/docs/?$')
 if [ "$KG_TYPE" = "project-local" ] && [ -n "$KG_PATH_ENDS_DOCS" ] && [ -d "$CONFIGURED_PATH/lessons-learned" ]; then
   echo "Your knowledge graph is stored in docs/ — the new recommended location is knowledge/."
   echo ""
-  echo "Move it now?"
-  echo "  1. Yes — move KMGraph subdirs to knowledge/, update config"
+  echo "Move it now? This is reversible — if anything goes wrong, run /kmgraph:init again to roll back."
+  echo "  1. Yes — move KMGraph subdirs to knowledge/, update config and all cross-references"
   echo "  2. No — keep in docs/ (no changes)"
 fi
 ```
