@@ -13,6 +13,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.3.6-beta] — 2026-04-11
+
+### Features
+
+**Workstream 1 — Rules-Capture Platform-Awareness**
+
+- **Platform-aware `rules-capture`** — The `rules-capture` skill and agent now detect the active platform via a 9-level file-presence heuristic and classify captured rules as platform-specific or universal. Platform-specific rules (containing Claude Code tool names like `Glob`, `Grep`, `Bash`, etc.) are routed to the native platform config file (`CLAUDE.md`, `GEMINI.md`, `.windsurfrules`, etc.) instead of `knowledge/rules.md`.
+- **Platform detection (9-level heuristic)** — Detects Claude Code (`.claude/`), Gemini (`GEMINI.md`/`AGENT.md`), Cursor (`.cursor/`), Windsurf (`.windsurfrules`), GitHub Copilot (`.github/copilot-instructions.md`), Zed (`.zed/`/`.rules`), AGENTS.md-native tools, Claude Code web (`CLAUDE.md` only), and unknown. Wrong-case detection warns when `claude.md` is found instead of `CLAUDE.md`.
+- **Extended routing menu** — `rules-capture` routing menu adds `platform` (write to native platform file) and `agents` (write to `AGENTS.md`) shortcuts alongside existing `yes / project-me / personal-rule / personal-me / no`. Shortcuts appear conditionally based on detection result.
+- **Pre-write safety checks** — Before writing to any platform file: permission check, binary file detection, trailing newline normalization, multiple-heading guard (append after last occurrence), RTL direction-override character strip, 500-character length limit.
+- **Cursor MDC support** — Rules targeting Cursor write to `.cursor/rules/project-preferences.mdc` (new standard). MDC file picker shown when multiple `.mdc` files exist. Detection-only `.cursorrules` never written to.
+- **New-file creation** — If the target platform file doesn't exist, it is created with the standard platform header (Claude Code, Gemini, Windsurf, Copilot, Cursor, Zed, AGENTS.md templates).
+- **AGENTS.md as 6th routing target** — `AGENTS.md` (open cross-platform standard for Aider, Amp, Devin, Jules, Warp, Roo Code, and others) is available as a routing target when present.
+
+**Workstream 2 — Migration Hardening**
+
+- **`/kmgraph:migration list`** — List all migration restore points (project and personal KG archives) with id, date, reason, files, and size. Handles missing/invalid manifest gracefully.
+- **`/kmgraph:migration rollback <id>`** — Roll back KG files to a prior archived state. Creates a pre-rollback safety archive first. Includes idempotency check, missing-file warnings, symlink prompt, scope isolation (project/personal never mixed), and `--include-platform-config` flag to also remove migrated lines from CLAUDE.md.
+- **`/kmgraph:migration purge`** — Delete old migration archives with `--list`, `--older-than <days>` (default 30), or `--id <id>` variants. Always confirms before deleting.
+- **Schema version marker (`kmgraph_schema: 2`)** — New YAML frontmatter field in `rules.md` allows the migrator to skip re-running the platform-split migration if already completed. Fresh-install `rules.md` template includes `kmgraph_schema: 2` from day one.
+- **`kg_upgrade` MCP tool** — New MCP tool enabling upgrade inspection and application for MCP-only installations (Cursor, Windsurf, Continue.dev, VS Code, JetBrains). Returns `{upgrades, warnings}` in inspect mode; applies selected categories non-interactively via `apply` parameter. Platform-split requires `confirm_platform_split: true`.
+- **`kg_version` MCP tool** — Returns `{installed, schema}` — installed version and current schema level.
+- **Upgrade wizard preview mode** — New option 0 ("Preview all changes") added to the Apply/Choose/Skip menu. Shows dirs to create, config field diffs, template diffs, and section-d flagged lines with target and archive path. Prints "X changes would be applied. Nothing was written." before returning to menu. Also accessible via `/kmgraph:init --preview`.
+- **25-case smoke test suite** — `mcp-server/tests/upgrade.test.ts` covering upgrade-inspector scenarios, false-positive contamination detection, schema gate, apply modes, idempotency, missing KG/rules.md, and edge cases.
+- **Archive size warning** — After upgrade, if total migration archives exceed 10MB, a cleanup suggestion is printed.
+
+---
+
 ## [0.3.5-beta] — 2026-04-11
 
 ### Features
