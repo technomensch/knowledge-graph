@@ -13,10 +13,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.3.5-beta] — 2026-04-11
+
+### Features
+- **Platform split for tool directives** — Claude Code-specific tool preferences (`Glob`, `Grep`, `Bash`, `context-mode`, `subagent`, `.jsonl` scoping rules) relocated out of `knowledge/rules.md`. Keeps `knowledge/rules.md` platform-agnostic.
+- **`CLAUDE.md` is the platform config** — `CLAUDE.md` at repo root now contains a `## Platform Preferences (Claude Code)` section with all Claude-specific tool directives. `CLAUDE.md` IS the platform file for Claude Code — no separate `knowledge/platform/` directory needed. Other platforms use their native files (`GEMINI.md`, `.cursorrules`, `AGENTS.md`).
+- **ADR-032** — Documents the platform-split decision. Superseded in v0.3.5 fixup: `knowledge/platform/` directory removed; native platform files (`CLAUDE.md` etc.) are the authoritative platform config homes.
+- **`kmgraph init` — upgrade flow migration** — The upgrade-inspector detects Claude-specific tool names in existing `knowledge/rules.md` and offers auto-relocation to `CLAUDE.md`.
+- **Personal KG default path** — Changed from `~/.claude/knowledge-graph/` to `~/.kmgraph/` (platform-neutral). Existing personal KGs at the old path are unaffected — config entries retain their recorded path. New personal KG inits use `~/.kmgraph/` as the default.
+
+### Architecture
+- **`knowledge/rules.md` hardened** — Tool Preferences section stripped of all Claude-specific tool names. Platform-agnostic preferences only.
+
+### ENH
+- **ENH-012** — Platform split for tool directives. Specification: `docs/enhancements/ENH-012/ENH-012-specification.md`.
+
+---
+
 ## [0.3.4-beta] — 2026-04-10
 
 ### Features
-- **`rules-capture` skill** — New skill that detects implicit mid-session behavioral corrections ("always X", "never X", "from now on X", "I prefer X", "make that a rule") and offers to write them to one of four authoritative targets — `knowledge/rules.md` (project team rule), `knowledge/me.md` (project personal preference), `~/.claude/knowledge-graph/rules.md` (personal cross-project rule), or `~/.claude/knowledge-graph/me.md` (personal identity/style). Appends a single inline suggestion to the normal reply with a 4-target shortcut menu `(yes / project-me / personal-rule / personal-me / no)`. Does NOT fire on ephemeral instructions, code corrections, clarifications, or in-context choices.
+- **`rules-capture` skill** — New skill that detects implicit mid-session behavioral corrections ("always X", "never X", "from now on X", "I prefer X", "make that a rule") and offers to write them to one of four authoritative targets — `knowledge/rules.md` (project team rule), `knowledge/me.md` (project personal preference), `~/.kmgraph/rules.md` (personal cross-project rule), or `~/.kmgraph/me.md` (personal identity/style). Appends a single inline suggestion to the normal reply with a 4-target shortcut menu `(yes / project-me / personal-rule / personal-me / no)`. Does NOT fire on ephemeral instructions, code corrections, clarifications, or in-context choices.
 - **`rules-capture-agent`** — New agent dispatched by `rules-capture` skill (and `capture-router` for explicit "capture that" + behavioral correction). Reads the target file, runs a dedup check against existing entries, drafts the rule in house style (Always/Never bullet with Why: and Source: lines), presents Approve / Edit / Discard loop, writes atomically (best-effort), and creates a scope-aware MEMORY.md pointer stub.
 - **MEMORY.md feedback-entry backfill** — `/kmgraph:init` upgrade flow now scans the project MEMORY.md for feedback-type behavioral rules not yet mirrored in `knowledge/rules.md` and offers per-entry migration with preview before writing.
 
@@ -41,7 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Seven NO-SUBSTITUTE zones enforced: YAML frontmatter, triple-backtick blocks, 4-space indented code, inline backtick spans, existing wiki links, existing markdown links, heading lines.
 - Symlinked files skipped with warning. Template files (`*template*`) skipped.
 - `chat-history/` excluded from scan scope.
-- Pattern 4 (lesson filenames) scoped to `Lessons_Learned_` prefix only — system-enforced by `capture.ts:deriveFileName()`. Five legacy manually-created files excluded (see ADR-032).
+- Pattern 4 (lesson filenames) scoped to `Lessons_Learned_` prefix only — system-enforced by `capture.ts:deriveFileName()`. Five legacy manually-created files excluded (see ADR-031).
 
 ### Templates
 - **All 9 core templates updated** — `ADR-template.md`, `lesson-template.md`, `session-template.md`, and 6 knowledge templates now use `[[wiki link]]` format in cross-reference examples.
@@ -190,7 +207,7 @@ Whenever a new version is added to CHANGELOG.md, all version files and doc foote
 
 :::info[Personal knowledge graph — cross-project lessons, always available.]
 
-A personal KG at `~/.claude/knowledge-graph/` stores lessons that apply across all your projects. When registered, `/kmgraph:recall` searches both project and personal KGs automatically. Results show `[project]` or `[personal]` source labels. Set up during `/kmgraph:init` or any time with `/kmgraph:init-personal-kg`.
+A personal KG at `~/.kmgraph/` stores lessons that apply across all your projects. When registered, `/kmgraph:recall` searches both project and personal KGs automatically. Results show `[project]` or `[personal]` source labels. Set up during `/kmgraph:init` or any time with `/kmgraph:init-personal-kg`.
 
 :::
 :::info[Session snapshot on capture — preserve the 'why' mid-session.]
@@ -204,7 +221,7 @@ After a plugin upgrade, the search index (`.fts5.db`) no longer silently disappe
 
 :::
 ### Added
-- **ENH-001: Personal KG** — New `type: "personal"` for KGs that are not tied to a project. Live at `~/.claude/knowledge-graph/` by default. Accessible from any project via multi-KG search.
+- **ENH-001: Personal KG** — New `type: "personal"` for KGs that are not tied to a project. Live at `~/.kmgraph/` by default. Accessible from any project via multi-KG search.
   - `kg_search` extended with `searchScope: "active" | "all" | "personal-only"` parameter
   - `kg_capture` extended with optional `targetKg` parameter — bypasses CWD check when an explicit target KG is named
   - `lesson-capture-agent` shows a KG picker when ≥2 KGs are registered; session memory avoids re-prompting

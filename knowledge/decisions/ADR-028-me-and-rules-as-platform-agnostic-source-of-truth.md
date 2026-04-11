@@ -114,9 +114,9 @@ Mirrors the existing CLAUDE.md two-level pattern:
 | Project | `knowledge/index.md` | ✅ Yes | Entry point, directory map, key file links |
 | Project | `knowledge/rules.md` | ✅ Yes | Rules specific to this project — shared by all contributors |
 | Project | `knowledge/me.md` | ❌ Gitignored | Who I am in this project — personal, per-contributor |
-| Personal (cross-project) | `~/.claude/knowledge-graph/index.md` | N/A (local) | Entry point for personal KG |
-| Personal (cross-project) | `~/.claude/knowledge-graph/me.md` | N/A (local) | Personal identity, cross-project preferences |
-| Personal (cross-project) | `~/.claude/knowledge-graph/rules.md` | N/A (local) | Personal behavioral rules across all projects |
+| Personal (cross-project) | `~/.kmgraph/index.md` | N/A (local) | Entry point for personal KG |
+| Personal (cross-project) | `~/.kmgraph/me.md` | N/A (local) | Personal identity, cross-project preferences |
+| Personal (cross-project) | `~/.kmgraph/rules.md` | N/A (local) | Personal behavioral rules across all projects |
 
 Project-scoped files take precedence over personal files when they conflict. Personal files supply defaults.
 
@@ -217,7 +217,7 @@ The two-level pattern is already established in KMGraph via CLAUDE.md (project v
 - [ ] `core/templates/knowledge/index.md` renamed to `kg-category-index.md`; `commands/init.md:437` updated
 - [ ] `kmgraph init` scaffolds all three files at `$KG_PATH/` root for new installs
 - [ ] Step 1.6.5 content migration offer present: prompts user to populate me.md/rules.md from existing CLAUDE.md
-- [ ] Personal KG scaffold also creates `index.md`, `me.md`, `rules.md` at `~/.claude/knowledge-graph/`
+- [ ] Personal KG scaffold also creates `index.md`, `me.md`, `rules.md` at `~/.kmgraph/` (updated from `~/.claude/knowledge-graph/` per v0.3.5 path migration — see Path Migration section)
 - [ ] At least one platform shim template exists in `core/templates/platform/`
 - [ ] Two-level hierarchy is documented in GETTING-STARTED or equivalent
 
@@ -294,3 +294,22 @@ This pattern is consistent with the ADR's broader principle — the user should 
 **Decision Made:** 2026-04-09
 **Last Updated:** 2026-04-09 (added kg-index.md as third scaffolded file; content migration offer moved in-scope; "See what's new" UX added for verify/upgrade option; switched from static version changelog to state-derived upgrade reporting)
 **Status:** Proposed
+
+---
+
+## Path Migration (v0.3.5-beta — 2026-04-11)
+
+**Original decision:** The personal (cross-project) knowledge graph was initialized at `~/.claude/knowledge-graph/` by the `init-personal-kg` command.
+
+**Correction:** This path violated the platform-agnostic principle established by this ADR. `~/.claude/` is a Claude Code-specific directory; Gemini CLI, Copilot, and Codex users cannot reach it as a shared personal KG location.
+
+**Updated default:** `~/.kmgraph/` — a platform-neutral home-directory location consistent with the existing `mcp-server/src/cli.ts` convention for project KG home-directory defaults.
+
+**Scope of change:** All commands, skills, agents, and templates that referenced `~/.claude/knowledge-graph/` have been updated. Existing users with a personal KG at the old path should run `/kmgraph:init-personal-kg` which will detect and offer to migrate the installation, or migrate manually:
+
+```bash
+mv ~/.claude/knowledge-graph ~/.kmgraph
+# Then update ~/.claude/kg-config.json personal.path field
+```
+
+**Historical context preserved:** This note records the correction. The original decision text above remains unchanged.

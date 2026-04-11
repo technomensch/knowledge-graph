@@ -15,7 +15,7 @@ Access the same knowledge graph on multiple machines — a home workstation and 
 
 - KMGraph initialized on at least one machine
 - A Git remote accessible from all machines (GitHub, GitLab, or self-hosted)
-- For personal KGs: the graph lives at `~/.claude/knowledge-graph/` — initialize a git repo there
+- For personal KGs: the graph lives at `~/.kmgraph/` — initialize a git repo there
 
 ## Steps
 
@@ -23,12 +23,12 @@ Access the same knowledge graph on multiple machines — a home workstation and 
 
 Project KGs sync automatically with the project's git remote. No additional setup is needed beyond `git pull` on each machine.
 
-### Personal KG (stored at `~/.claude/knowledge-graph/`)
+### Personal KG (stored at `~/.kmgraph/`)
 
 **On the source machine:**
 
 ```bash
-cd ~/.claude/knowledge-graph
+cd ~/.kmgraph
 git init
 git remote add origin git@github.com:yourname/personal-kg.git
 git add .
@@ -39,7 +39,7 @@ git push -u origin main
 **On additional machines:**
 
 ```bash
-git clone git@github.com:yourname/personal-kg.git ~/.claude/knowledge-graph
+git clone git@github.com:yourname/personal-kg.git ~/.kmgraph
 ```
 
 Then register the KG with KMGraph:
@@ -54,7 +54,7 @@ Then register the KG with KMGraph:
 
 ```bash
 # Pull latest from another machine
-cd ~/.claude/knowledge-graph && git pull
+cd ~/.kmgraph && git pull
 
 # Push captures done on this machine
 git add . && git commit -m "chore: sync captures" && git push
@@ -65,7 +65,7 @@ git add . && git commit -m "chore: sync captures" && git push
 Add a post-commit hook to auto-push personal KG entries:
 
 ```bash
-# ~/.claude/knowledge-graph/.git/hooks/post-commit
+# ~/.kmgraph/.git/hooks/post-commit
 #!/bin/bash
 git push origin main --quiet
 ```

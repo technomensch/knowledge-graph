@@ -16,7 +16,7 @@ Capture and retrieve knowledge across multiple knowledge graphs — a project-lo
 | Type | Storage location | Shared with |
 |---|---|---|
 | `project-local` | `docs/` (in the project repo) | Anyone with repo access |
-| `personal` | `~/.claude/knowledge-graph/` | Only the individual (synced via personal git remote) |
+| `personal` | `~/.kmgraph/` | Only the individual (synced via personal git remote) |
 | `cowork` | Configurable shared path | Team (synced via shared git remote) |
 | `custom` | Any path | Configured per instance |
 
@@ -51,7 +51,7 @@ All capture and recall commands operate on the active KG.
 /kmgraph:init-personal-kg
 ```
 
-Creates `~/.claude/knowledge-graph/` and registers it. Use this for patterns that apply across all projects.
+Creates `~/.kmgraph/` and registers it. Use this for patterns that apply across all projects.
 
 ### Configure a cowork KG
 

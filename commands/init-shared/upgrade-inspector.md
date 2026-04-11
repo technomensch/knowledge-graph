@@ -12,6 +12,9 @@ description: Shared upgrade inspector module — detects missing dirs, templates
 | `{kg_name}` | Name key used in kg-config.json |
 | `{KG_TYPE}` | Type string: "project-local" or "personal" |
 | `{categories}` | Array of category names configured for this KG |
+| `{preserve_active}` | Boolean — if true, do not change the active KG after upgrade |
+
+> **Caller note:** All `{PARAM}` placeholders in this module must be substituted by the caller before any bash block is executed. There is no runtime substitution — any unsubstituted `{PARAM}` will be passed literally to shell commands, producing silent errors (e.g., `grep` will look for a file literally named `{KG_PATH}/rules.md`).
 
 ---
 
@@ -37,11 +40,41 @@ fi
 [ ! -f "{KG_PATH}/me.md" ]      && upgrades+=("New: me.md — your identity and working style in this project")
 [ ! -f "{KG_PATH}/rules.md" ]   && upgrades+=("New: rules.md — project conventions and behavioral rules")
 
+# rules.md platform-split check (v0.3.5 — ADR-032)
+# Content fingerprint only: Claude-specific tool names present in rules.md
+# Detection note: pattern targets tool-directive lines only (lines with preference verbs
+# + Claude tool names). Does not match mentions in other contexts, e.g. "Grep output requires
+# review" or "never use Glob in filenames". False negatives are acceptable — under-detection
+# is safer than over-detection for a migration that removes user content.
+if [ -f "{KG_PATH}/rules.md" ]; then
+  CONTAMINATION=$(grep -nE '(use|prefer|avoid|never use|always use|do not use|switch to|stop using).{0,80}(\bGlob\b|\bGrep\b|context-mode|\bsubagent\b|\.jsonl)|(\bGlob\b|\bGrep\b|context-mode|\bsubagent\b|\.jsonl).{0,80}(use|prefer|avoid|instead|only|never)' "{KG_PATH}/rules.md" 2>/dev/null)
+  [ -n "$CONTAMINATION" ] && \
+    upgrades+=("Update: rules.md — Claude-specific tool references detected; offer to relocate to CLAUDE.md § Platform Preferences (ADR-032)")
+fi
+
 # Path migration available
 CONFIGURED_PATH=$(jq -r '.graphs["{kg_name}"].path' ~/.claude/kg-config.json)
 echo "$CONFIGURED_PATH" | grep -qE '/docs/?$' && \
   [ -d "$CONFIGURED_PATH/lessons-learned" ] && \
   upgrades+=("Migration available: move KMGraph content from docs/ to knowledge/")
+
+# Archive path convention (for Task A rollback command in v0.3.6):
+# Archives created by knowledge-file-migrator are at: {KG_PATH}/.kg-archive-YYYYMMDD-HHMMSS/
+# Each archive contains the backed-up files + manifest.json
+# Use /kmgraph:migration list (v0.3.6) to enumerate restore points.
+
+# docs/ knowledge content migration check (v0.3.5 — legacy layout cleanup)
+# Applies when KG has been migrated to knowledge/ but docs/ subdirs still contain files
+KG_PARENT=$(dirname "{KG_PATH}")
+DOCS_FOUND=()
+for subdir in decisions enhancements lessons-learned issues chat-history; do
+  if [ -d "$KG_PARENT/docs/$subdir" ]; then
+    file_count=$(find "$KG_PARENT/docs/$subdir" -name "*.md" -type f 2>/dev/null | wc -l | tr -d ' ')
+    [ "$file_count" -gt 0 ] && DOCS_FOUND+=("  docs/$subdir/  — $file_count files")
+  fi
+done
+[ ${#DOCS_FOUND[@]} -gt 0 ] && \
+  upgrades+=("Migration available: knowledge content found under docs/ (pre-migration layout) — move to knowledge/")
 
 # New templates (files in plugin core/templates not yet in KG)
 # Skip templates that are already covered by the scaffold file checks above:
@@ -179,3 +212,182 @@ Update templates? This will NOT overwrite your existing lessons or decisions.
 ```
 
 **Important:** Never overwrite user-created files (lessons, ADRs, KG entries). Only update template/scaffold files.
+
+#### d. rules.md platform-split check (v0.3.5-beta — ADR-032)
+
+**Purpose:** Detect and offer to relocate Claude Code-specific tool directives from `rules.md` to the platform's native config file (`CLAUDE.md § Platform Preferences` for project-local KGs; `~/.claude/CLAUDE.md § Platform Preferences` for personal KGs), preserving `rules.md` as platform-agnostic per ADR-032.
+
+**Detection — content fingerprint only:**
+
+```bash
+# Detection note: pattern targets tool-directive lines only (lines with preference verbs
+# + Claude tool names). Does not match mentions in other contexts, e.g. "Grep output requires
+# review" or "never use Glob in filenames". False negatives are acceptable — under-detection
+# is safer than over-detection for a migration that removes user content.
+CONTAMINATION=$(grep -nE '(use|prefer|avoid|never use|always use|do not use|switch to|stop using).{0,80}(\bGlob\b|\bGrep\b|context-mode|\bsubagent\b|\.jsonl)|(\bGlob\b|\bGrep\b|context-mode|\bsubagent\b|\.jsonl).{0,80}(use|prefer|avoid|instead|only|never)' "{KG_PATH}/rules.md" 2>/dev/null)
+```
+
+If `CONTAMINATION` is empty, skip this check silently.
+
+**If matches found:** display the flagged lines and offer. The user should review the shown lines before choosing — option (a) will move exactly what is listed:
+
+```
+Found Claude-specific tool references in rules.md:
+  Line 14: - File search: Glob and Grep — not Bash find/grep
+  Line 15: - Content search: Grep tool — not rg or grep in Bash
+  ...
+
+Review the lines above. These appear to be Claude Code-specific tool directives.
+They belong in CLAUDE.md (## Platform Preferences section), not rules.md.
+
+Options:
+  a. Relocate automatically — move exactly the lines shown above to CLAUDE.md and remove from rules.md
+  b. Show me the lines — I'll handle the edit manually
+  s. Skip — leave both files unchanged
+```
+
+**If option (a) — auto-relocate (bulk):**
+
+→ Execute shared module: Read `commands/init-shared/knowledge-file-migrator.md` and follow it exactly.
+Parameters:
+- `{KG_PATH}` = `{KG_PATH}`
+- `{KG_TYPE}` = `{KG_TYPE}`
+- `{PROJECT_ROOT}` = current project root directory
+- `{CONTAMINATION}` = grep output from the detection step above
+
+The shared module handles: archiving `rules.md`, appending flagged lines to the correct `CLAUDE.md`, removing them from `rules.md`, and adding a guidance comment.
+
+**If option (b) — manual review:**
+
+Display each flagged line with its line number. Print:
+```
+Here are the lines to move manually:
+  [line content 1]
+  [line content 2]
+  ...
+
+Target: CLAUDE.md § Platform Preferences
+No changes made — move them manually when ready.
+```
+
+**If option (s) — skip:**
+
+Leave both files unchanged.
+
+**Safety rules:**
+- Option (a) is a bulk operation — all flagged lines are relocated in one shot (archive is taken first).
+- If `CLAUDE.md § Platform Preferences` already exists, append — never overwrite existing content.
+- If user selects skip or manual, leave both files unchanged.
+
+#### e. docs/ knowledge content migration (legacy layout cleanup)
+
+**Purpose:** Detect knowledge artifacts left under `docs/` from pre-v0.3.0 layouts and offer to move them to `knowledge/` (current layout).
+
+**Detection:**
+
+```bash
+KG_PARENT=$(dirname "{KG_PATH}")
+DOCS_FOUND=()
+for subdir in decisions enhancements lessons-learned issues chat-history; do
+  if [ -d "$KG_PARENT/docs/$subdir" ]; then
+    file_count=$(find "$KG_PARENT/docs/$subdir" -name "*.md" -type f 2>/dev/null | wc -l | tr -d ' ')
+    [ "$file_count" -gt 0 ] && DOCS_FOUND+=("  docs/$subdir/  — $file_count files")
+  fi
+done
+```
+
+If `DOCS_FOUND` is empty, skip this check silently.
+
+**If content found,** display and offer:
+
+```
+Found knowledge content under docs/ (pre-migration layout):
+  docs/decisions/  — N files
+  docs/lessons-learned/ — M files
+  ...
+
+These belong in knowledge/ (current layout). Options:
+  a. Migrate automatically — archive docs/ content, move to knowledge/, update cross-references
+  b. Skip — I'll migrate manually
+```
+
+**If option (a) — auto-migrate:**
+
+1. **Archive first** — before moving any file, create a timestamped archive:
+   ```bash
+   ARCHIVE_DIR="{KG_PATH}/.kg-archive-$(date +%Y%m%d-%H%M%S)"
+   mkdir -p "$ARCHIVE_DIR"
+   for subdir in decisions enhancements lessons-learned issues chat-history; do
+     [ -d "$KG_PARENT/docs/$subdir" ] && cp -r "$KG_PARENT/docs/$subdir" "$ARCHIVE_DIR/"
+   done
+   echo "{\"archived_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"source\": \"docs/\", \"trigger\": \"upgrade-inspector-section-e\"}" > "$ARCHIVE_DIR/manifest.json"
+   echo "✅ Archive created at $ARCHIVE_DIR"
+   ```
+
+2. **Move files** — for each populated subdir, move `.md` files:
+   ```bash
+   for subdir in decisions enhancements lessons-learned issues chat-history; do
+     src="$KG_PARENT/docs/$subdir"
+     dest="{KG_PATH}/$subdir"
+     if [ -d "$src" ]; then
+       mkdir -p "$dest"
+       find "$src" -name "*.md" -type f -print0 | while IFS= read -r -d '' f; do
+         rel="${f#$src/}"
+         dest_file="$dest/$rel"
+         dest_dir=$(dirname "$dest_file")
+         mkdir -p "$dest_dir"
+         mv "$f" "$dest_file"
+         echo "Moved: docs/$subdir/$rel → knowledge/$subdir/$rel"
+       done
+     fi
+   done
+   ```
+
+3. **Cross-reference rewrite** — update any remaining `docs/{subdir}/` references in the KG files to `knowledge/{subdir}/`:
+   ```bash
+   find "{KG_PATH}" -name "*.md" -type f -print0 | xargs -0 sed -i.bak \
+     -e 's|docs/decisions/|knowledge/decisions/|g' \
+     -e 's|docs/lessons-learned/|knowledge/lessons-learned/|g' \
+     -e 's|docs/enhancements/|knowledge/enhancements/|g' \
+     -e 's|docs/issues/|knowledge/issues/|g' \
+     -e 's|docs/chat-history/|knowledge/chat-history/|g'
+   find "{KG_PATH}" -name "*.md.bak" -delete
+   echo "✅ Cross-references rewritten"
+   ```
+
+4. **Cleanup** — remove now-empty source dirs:
+   ```bash
+   for subdir in decisions enhancements lessons-learned issues chat-history; do
+     src="$KG_PARENT/docs/$subdir"
+     if [ -d "$src" ] && [ -z "$(find "$src" -name "*.md" -type f 2>/dev/null)" ]; then
+       rmdir "$src" 2>/dev/null && echo "Removed empty dir: docs/$subdir/" || echo "Skipped (non-empty): docs/$subdir/"
+     fi
+   done
+   echo "✅ Cleanup complete"
+   ```
+   Uses `rmdir` — fails safely if anything remains in the directory (hidden files, assets, subdirs).
+
+5. **Report:**
+   ```
+   ✅ Migration complete.
+
+   Files moved to knowledge/. Archive available at: {KG_PATH}/.kg-archive-YYYYMMDD-HHMMSS/
+   Empty source dirs removed from docs/.
+   To rollback: copy files from the archive back to docs/ manually.
+   (Automated rollback command planned for v0.3.6.)
+   ```
+
+**If option (b) — skip:**
+
+Leave all files unchanged. Print:
+```
+Skipped docs/ migration — no changes made.
+To migrate manually: move files from docs/{decisions,lessons-learned,...}/ to knowledge/ and update cross-references.
+```
+
+**Safety rules:**
+- Archive is always taken before any file is moved (step 1 is mandatory).
+- Never delete the source `docs/` directory — only move `.md` files. Non-markdown assets remain in place.
+- Cleanup (step 4) uses `rmdir` — fails safely on any dir that still has content.
+- Cross-reference rewrite uses `find -print0 | xargs -0` — safe on paths with spaces.
+- Cross-reference rewrite only targets files inside `{KG_PATH}` — does not touch project source code or other directories.

@@ -82,4 +82,4 @@ Known constraints or non-goals: ...
 
 ## See Also
 
-See also: ~/.claude/knowledge-graph/me.md for cross-project identity
+See also: ~/.kmgraph/me.md for cross-project identity

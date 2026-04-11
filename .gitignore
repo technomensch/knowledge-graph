@@ -24,6 +24,7 @@ env/
 .vscode/
 .idea/
 docs/.obsidian/
+.obsidian/
 *.swp
 *.swo
 *~

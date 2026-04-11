@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import * as readline from "readline";
+import { createRequire } from "module";
 import {
   readConfig,
   writeConfig,
@@ -11,6 +12,9 @@ import {
   GraphConfig,
   CategoryConfig,
 } from "./utils.js";
+
+const require = createRequire(import.meta.url);
+const { version: SERVER_VERSION } = require("../package.json") as { version: string };
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
@@ -58,7 +62,7 @@ async function runInit(): Promise<void> {
     console.log("");
     console.log("  Where should the knowledge graph be stored?");
     console.log("  1. Current directory (./docs/)");
-    console.log("  2. Home directory (~/.knowledge-graph/)");
+    console.log("  2. Home directory (~/.kmgraph/)");
     console.log("  3. Custom path");
     console.log("");
     const locationChoice = await ask(rl, "  Choice [1/2/3]: ");
@@ -69,7 +73,7 @@ async function runInit(): Promise<void> {
         kgPath = path.resolve("docs");
         break;
       case "2":
-        kgPath = path.join("~", ".knowledge-graph");
+        kgPath = path.join("~", ".kmgraph");
         break;
       case "3": {
         const customPath = await ask(rl, "  Enter path: ");
@@ -361,7 +365,7 @@ async function main(): Promise<void> {
 
     const server = new McpServer({
       name: "knowledge-graph",
-      version: "1.0.0",
+      version: SERVER_VERSION,
     });
 
     registerConfigTools(server);
