@@ -311,7 +311,7 @@ Write to {target_file} § {heading or "end of file"}?
 
 Write the rule to the target file:
 - For `knowledge/rules.md`: append under the appropriate section (Always, Never, or Project Conventions)
-- For `CLAUDE.md` / `GEMINI.md`: append under the platform preference heading (creating it if absent); if heading appears multiple times, append after the last occurrence
+- For `CLAUDE.md` / `GEMINI.md` / `AGENT.md` (when used as Gemini target): append under the platform preference heading (creating it if absent); if heading appears multiple times, append after the last occurrence
 - For `.windsurfrules`, `.github/copilot-instructions.md`, `.rules`, `AGENTS.md`: append to end of file
 - For `.cursor/rules/*.mdc`: append to end of file, after any YAML frontmatter block
 - For all other targets: append to the appropriate section
