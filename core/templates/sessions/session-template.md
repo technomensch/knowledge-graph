@@ -123,17 +123,20 @@ def456g - fix(scope): commit message
 ## Related Resources
 
 **Plans:**
-- [Link to active plan](../../plans/plan-file.md)
+- [[plan-file-name]]
 
 **Issues:**
-- [Link to local issue](../../issues/issue-file.md)
+- [[GitHub_Issue_Number]]
 - GitHub #XXX (if applicable)
 
+**Architecture Decisions:**
+- [[ADR-XXX-decision-title]]
+
 **Knowledge Graph:**
-- [Link to KG entry](../../knowledge/file.md#section)
+- [[concept-name]]
 
 **Lessons Learned:**
-- [Link to lesson](../../lessons-learned/category/lesson.md)
+- [[Lessons_Learned_category_lesson]]
 
 ---
 

@@ -2,8 +2,8 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.2.3-beta
-**Status:** Beta Release — FTS5 Relocation, Issue Tracking UX, ECC Compatibility
+**Version:** 0.3.3-beta
+**Status:** Beta Release — Obsidian Wiki Links, Path Migration, me.md/rules.md Scaffold
 
 Documentation: https://kmgraph.stayinginsync.info
 
@@ -83,15 +83,30 @@ See [Getting Started Guide](docs/GETTING-STARTED.md) for prerequisites and troub
 
 ---
 
-## v0.2.3-beta Feature Highlights
+## v0.3.x Feature Highlights
 
-**Released 2026-03-31**
+**v0.3.3-beta — 2026-04-10**
 
-- **FTS5 Relocation** — Full-text search index moved to `docs/.fts5.db` for centralized knowledge management and faster rebuilds
-- **Issue Tracking UX** — Enhanced issue tracking workflow with structured prompts and GitHub bidirectional linking
-- **ECC Compatibility** — Full support for Everything Claude Code plugin ecosystem and cross-platform agent portability
-- **Capture Router** — Intelligent auto-detection of capture type (lesson/ADR/session) and automatic storage location
-- **6 Auto-Triggered Skills** — Context providers activate automatically: lesson-capture (bug solved), kg-recall (past decisions), session-wrap (context limits), adr-guide (architecture decisions), doc-update-router (docs), capture-router (auto-type detection)
+- **Obsidian wiki link pass** — `/kmgraph:init` and `/kmgraph:init-personal-kg` automatically convert bare cross-references (`ENH-010`, `ADR-028`, `#123`, `Lessons_Learned_X`) to `[[wiki link]]` format for Obsidian graph navigation and backlink tracking
+- **ADR collision-safe links** — Pre-pass filename map ensures `[[ADR-028-full-title]]` is always emitted (never ambiguous bare `[[ADR-028]]`); collision detection warns and skips when two files share a number
+- **Atomic writes + idempotency** — Temp-file + rename pattern prevents truncation on crash; `wiki_pass_complete` config flag makes re-runs no-ops
+
+**v0.3.2-beta — 2026-04-10**
+
+- **Draft-and-approve UX** — Lesson capture and ADR creation now extract full context from the conversation, generate a complete draft silently, then present Approve / Edit / Discard flow — no wizard required
+- **init-shared module layer** — Five reusable shared modules extracted; `/kmgraph:init` and `/kmgraph:init-personal-kg` refactored to thin orchestrators
+- **Cross-branch collision detection** — ADR and ENH number collision checks across all branches before assignment
+
+**v0.3.1-beta — 2026-04-10**
+
+- **init-shared module layer** — Five reusable shared modules extracted into `commands/init-shared/`; `/kmgraph:init` and `/kmgraph:init-personal-kg` refactored to thin orchestrators eliminating duplicated scaffold, template-seed, FTS5-rebuild, config-write, and upgrade-inspector logic
+- **upgrade-inspector hardening** — Trimmed to only check verifiable steps; phantom parameter removed; `{preserve_active}` param restored
+
+**v0.3.0-beta — 2026-04-10**
+
+- **Default KG path → `knowledge/`** — New projects initialize at `./knowledge/` instead of `./docs/` to avoid collision with documentation site roots
+- **Guided migration** — Opt-in migration from `docs/`-based layouts with symlink guard, rollback, and cross-reference rewrite
+- **me.md + rules.md scaffold** — Identity and behavioral convention files scaffolded at init; `rules.md` supports `Why:` and `Source:` evidence backlinks
 
 ---
 
@@ -120,7 +135,7 @@ knowledge-graph/
 ├── mcp-server/               # MCP data layer
 ├── README.md                 # This file
 ├── LICENSE                   # MIT
-└── docs/CHANGELOG.md         # Version history
+└── CHANGELOG.md              # Version history
 ```
 
 ### Developer vs. Distribution Structure
@@ -140,24 +155,25 @@ knowledge-graph/
 
 See [ROADMAP.md](ROADMAP.md) for detailed version history and development progress.
 
-**Current Release:** v0.2.3-beta (2026-03-31)
-- ✅ FTS5 relocation to centralized `docs/.fts5.db` for improved performance
-- ✅ Issue tracking UX with structured prompts and GitHub bidirectional linking
-- ✅ ECC (Everything Claude Code) compatibility for cross-platform agent portability
-- ✅ Capture router with intelligent type detection and auto-routing to lessons, ADRs, or sessions
-- ✅ 6 auto-triggered skills for context-aware assistance
-- ✅ 2 subagents for heavy-lift tasks (knowledge-extractor, session-documenter)
-- ✅ Complete documentation with v0.0.7 Section 508 compliance
+**Current Release:** v0.3.3-beta (2026-04-10)
+- ✅ Obsidian wiki link pass with ADR collision detection and atomic writes
+- ✅ Draft-and-approve UX for lesson capture and ADR creation
+- ✅ init-shared module layer — thin command orchestrators with shared modules
+- ✅ `knowledge/` default path with guided migration from `docs/`-based layouts
+- ✅ me.md + rules.md scaffold with Why/Source evidence backlinks
+- ✅ Personal KG support with `/kmgraph:init-personal-kg`
+- ✅ FTS5 full-text search with native SQLite3 WASM
 - ✅ MCP server with full cross-platform support (Cursor, Windsurf, Continue.dev, JetBrains, VS Code)
 - ⚠️ Beta status: API subject to breaking changes before v1.0.0 stable
 
 **Recent Versions:**
+- v0.3.3-beta (Apr 10): Obsidian wiki links, ADR collision detection, atomic writes, personal KG pass
+- v0.3.2-beta (Apr 10): Draft-and-approve UX, init-shared modules, cross-branch collision detection
+- v0.3.1-beta (Apr 10): init-shared module extraction, upgrade-inspector hardening
+- v0.3.0-beta (Apr 10): Default path `knowledge/`, guided migration, me.md/rules.md scaffold
 - v0.2.3-beta (Mar 31): FTS5 relocation, ECC compatibility, capture-router, issue tracking UX
-- v0.2.2-beta (Mar 28): Personal KG, session snapshots, branch guard, snapshot gates
-- v0.2.1-beta (Mar 25): Command/agent architecture refactor, thin dispatchers
-- v0.2.0-beta (Mar 20): Multi-KG support with flexible configuration
 
-**Next:** v0.3.0 — Expanded agent capabilities and improved search UX (post-beta feedback cycle)
+**Next:** v0.4.x — Expanded wiki link coverage (kebab-case lesson files), automated knowledge graph extraction improvements
 
 ---
 
@@ -248,7 +264,7 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Phase:** Beta Release Cycle (v0.2.3-beta)
-**Next Milestone:** v0.3.0 — Expanded agent capabilities and improved search UX
+**Current Phase:** Beta Release Cycle (v0.3.3-beta)
+**Next Milestone:** v0.4.x — Expanded wiki link coverage and knowledge graph improvements
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info

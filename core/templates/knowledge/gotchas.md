@@ -18,11 +18,11 @@ Copy this template for each new gotcha:
 - **Prevention:** [How to avoid it]
 
 **Evidence:**
-[Link to lesson learned](../../lessons-learned/category/lesson-file.md) — [Context]
+[[Lessons_Learned_category_lesson]] — [Context]
 - [What went wrong]
 - [How it was discovered]
 
-**See Lesson:** [Link to full lesson with debugging details]
+**See Lesson:** [[Lessons_Learned_lesson_filename]]
 ```
 
 ---

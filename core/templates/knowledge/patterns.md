@@ -17,11 +17,11 @@ Copy this template for each new pattern:
 - **When to Use:** [Trigger conditions]
 
 **Evidence:**
-[Link to lesson learned](../../lessons-learned/category/lesson-file.md) — [Context]
+[[Lessons_Learned_category_lesson]] — [Context]
 - [Key finding from lesson]
 - [Measurement or result]
 
-**See Lesson:** [Link to full lesson with details]
+**See Lesson:** [[Lessons_Learned_lesson_filename]]
 ```
 
 ---

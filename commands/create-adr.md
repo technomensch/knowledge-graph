@@ -56,7 +56,7 @@ Ask:
 > "Before creating the ADR — want to run a session summary first?
 > This saves the current session state as a persistent summary and makes the 'why' behind this decision available for the ADR's Context section.
 >
-> [y] Run session summary   [n] Skip   [?] What does this do?"
+> [y] Run session summary   [u] Update existing   [n] Skip   [?] What does this do?"
 
 If `?`: explain that this runs `/kmgraph:session-summary` in snapshot mode — a lightweight variant that records what was worked on, open plan items, and file changes without requiring a full wrap-up. The result is written to disk and used to enrich the ADR's Context section.
 
@@ -68,6 +68,17 @@ If `y`:
 Invoke `session-summary-agent --snapshot` (with `--git` if yes). When the agent returns, say:
 
 > "Session summary saved — I'll use that to fill in the ADR's context and background."
+
+Then continue to Step 1.
+
+If `u`:
+> "Include git history in the updated session summary? (adds ~5-15 sec)
+>
+> [y] Yes — include commits   [n] No — conversation + files only"
+
+Invoke `session-summary-agent --snapshot --update` (with `--git` if yes). This refreshes the most recent session summary for the current session rather than creating a new one. When the agent returns, say:
+
+> "Session summary updated — I'll use that to fill in the ADR's context and background."
 
 Then continue to Step 1.
 
@@ -325,6 +336,8 @@ Populate each section with the content gathered in Step 3:
 - **Related Documentation / Lessons Learned:** Linked lessons if provided in Step 3.8
 
 **Preserve all template section headers.** Fill placeholder text with user responses; leave unprovided optional sections as "None" or empty.
+
+**Cross-References:** When referencing other KMGraph files in the ADR body, use Obsidian wiki link syntax: `[[filename-without-extension]]`. For ADRs, always use the full filename: `[[ADR-028-rules-md-scaffolding]]`, not `[[ADR-028]]`. For external GitHub issues and PRs, use standard markdown links: `[#NNN](url)`. Never use wiki links for external URLs.
 
 ---
 

@@ -13,6 +13,92 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.3.3-beta] — 2026-04-10
+
+### Features
+- **Obsidian wiki link pass** — `/kmgraph:init` (Step 1f.2) and `/kmgraph:init-personal-kg` (Step 8.1) automatically convert bare cross-references in your knowledge graph to Obsidian `[[wiki link]]` format. Supports four patterns: `ENH-NNN` → `[[ENH-NNN]]`, `ADR-NNN` → `[[ADR-NNN-full-title]]` (full filename, collision-safe), `#NNN` → `[#NNN](GitHub URL)`, and `Lessons_Learned_X` → `[[Lessons_Learned_X]]`.
+- **ADR collision detection** — Pre-pass scans `decisions/` and builds a number→filename map before substitution. If two ADR files share the same number, the substitution is skipped for that number with a warning rather than writing ambiguous `[[ADR-NNN]]` links.
+- **Atomic wiki pass writes** — Each file write uses temp + atomic rename (`file.md.tmp` → `file.md`), preventing truncation on crash or context limit interruption.
+- **`wiki_pass_complete` config flag** — Written to `~/.claude/kg-config.json` on completion. Re-running init on an already-converted KG is a no-op. `--dry-run` mode previews changes without writing.
+- **Already-migrated upgrade path** — Users who completed the `docs/` → `knowledge/` migration in v0.3.0 or v0.3.1 get wiki links applied on their first v0.3.3 upgrade without needing to re-run migration.
+- **Personal KG wiki pass** — `/kmgraph:init-personal-kg` now applies the wiki link pass as content enrichment (not gated on migration).
+
+### Safety
+- Seven NO-SUBSTITUTE zones enforced: YAML frontmatter, triple-backtick blocks, 4-space indented code, inline backtick spans, existing wiki links, existing markdown links, heading lines.
+- Symlinked files skipped with warning. Template files (`*template*`) skipped.
+- `chat-history/` excluded from scan scope.
+- Pattern 4 (lesson filenames) scoped to `Lessons_Learned_` prefix only — system-enforced by `capture.ts:deriveFileName()`. Five legacy manually-created files excluded (see ADR-032).
+
+### Templates
+- **All 9 core templates updated** — `ADR-template.md`, `lesson-template.md`, `session-template.md`, and 6 knowledge templates now use `[[wiki link]]` format in cross-reference examples.
+- **`lesson-template.md`** — New `related:` YAML frontmatter block added alongside existing body "Related Documentation" section. Both coexist: frontmatter for machine-readable tooling, body for human-readable Obsidian navigation.
+
+### Commands & Agents
+- `capture-lesson`, `create-adr`, `session-documenter`, `knowledge-extractor` — Output format rules updated to emit `[[wiki link]]` syntax for KMGraph cross-references.
+
+### Knowledge
+- **ADR-031: Use Plural `Lessons_Learned_` Prefix for Lesson Filenames** — Retroactively documents the naming convention established in v0.2.1-beta. Plural form is semantically correct; hardcoded in `capture.ts`; changing it would require migration of 33+ files.
+
+---
+
+## [0.3.2-beta] — 2026-04-10
+
+### Features
+- **Draft-and-approve UX for lesson capture** — `lesson-capture` skill now extracts full context from the conversation (problem, solution, pattern, tags, category) and passes it as a structured payload to `lesson-capture-agent`. The agent skips its interactive wizard when context is provided and generates a complete draft silently, then presents **Approve / Edit / Discard**. Edit accepts free-form natural-language corrections with re-display loop. Wizard path preserved for direct invocation.
+- **Draft-and-approve UX for ADR creation** — `adr-guide` skill now extracts all 7 ADR fields (title, status, category, context, decision, rationale, consequences) from the conversation before asking the user, shows a pre-filled summary, and passes the full context payload to `create-adr-agent`. Phase 0.5 gate sets `wizard_mode: false`, populates all fields, and presents the full ADR draft via Phase 3.5 **Approve / Edit / Discard** — skipping the 8-question wizard entirely.
+- **Session snapshot on capture approval** — When a lesson or ADR is approved, `session-summary-agent --snapshot` fires non-blocking (`triggered by: lesson` or `triggered by: ADR`). Creates today's session file if absent; appends if present.
+
+### Fixed
+- **Cross-branch ADR/ENH number collision** — `create-adr-agent` Phase 1 now runs `git log --all` after calculating the next ADR number to verify it is not already taken on another branch; bumps and re-checks until clean. Same check added to `start-issue-tracking` Step 2.2 for both issue and ENH numbers. Prevents duplicate numbering when branches diverge before merging.
+
+---
+
+## [0.3.1-beta] — 2026-04-10
+
+### Refactor
+- **`init-shared/` module layer** — Five reusable shared modules extracted into `commands/init-shared/`: `directory-scaffold`, `template-seed`, `fts5-rebuild`, `config-entry-write`, `upgrade-inspector`. Each has a single responsibility and a documented interface.
+- **`/kmgraph:init` uses shared modules** — Duplicate init logic replaced with calls to `init-shared` modules. The command is now a thin orchestrator.
+- **`/kmgraph:init-personal-kg` uses shared modules** — Same refactor applied. Duplicate scaffold, template-seed, fts5-rebuild, config-entry-write, and upgrade-inspector sections removed.
+
+### Fixed
+- **`upgrade-inspector` verification** — Trimmed inspector to only check verifiable steps; removed phantom parameter; guarded `preserve_active` call.
+
+### Knowledge
+- **ADR-031: Shared Module Pattern for Slash Command Deduplication** — Documents the decision to extract shared logic into `commands/init-shared/` rather than duplicating across slash commands.
+- **Lesson: Check Gitignore Before Migration Cleanup** — Verify gitignore patterns before writing migration cleanup logic to avoid silently skipping cleanup steps.
+
+---
+
+## [0.3.0-beta] — 2026-04-10
+
+### Features
+- **Default KG path changed to `knowledge/`** — New projects initialize at `./knowledge/` instead of `./docs/`. Avoids collision with documentation site roots (MkDocs, Docusaurus, GitHub Pages). All path resolution remains runtime-dynamic from `~/.claude/kg-config.json` — no hardcoded paths changed.
+- **`/kmgraph:init` migration step** — Detects existing `docs/`-based KG layouts and offers a guided, opt-in migration to `knowledge/`. Migration moves only KMGraph-managed subdirectories (`lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`, `tmp/`) and root scaffold files. Non-KMGraph `docs/` content is never touched.
+- **Migration hardening (M1-M5)** — Symlink guard, `tmp/` handling, rsync-safe merge for `docs/knowledge/` collision, expanded `.gitignore` patterns, sibling KG config updates, cross-reference rewrite across all platform config files (CLAUDE.md, GEMINI.md, .cursorrules, .windsurfrules, copilot-instructions.md), MEMORY.md stale-reference scan, portable `_sed_inplace` helper (macOS + Linux), and full rollback with atomicity flags.
+- **`me.md` + `rules.md` scaffold** — `kmgraph init` now scaffolds `knowledge/me.md` (user identity, gitignored) and `knowledge/rules.md` (behavioral conventions, committed) at init and post-migration.
+- **`kg-index.md` scaffold** — Navigation entry point created at `knowledge/kg-index.md` for project KGs; `kg-index-global.md` + `kg-category-index-global.md` for personal KGs.
+- **Content migration offer** — After scaffold, `init` offers to populate `me.md` and `rules.md` from existing `CLAUDE.md` via the Step 1.6.5 section-mapping protocol. Same offer runs for personal KG using `~/.claude/CLAUDE.md` as source.
+- **Post-migration backfill** — After migration: (1) FTS5 index rebuilt automatically (file paths changed), (2) `update-graph` extraction offered if lessons exist with no KG entries, (3) personal KG setup offered if not already registered.
+- **ENH-011: rules.md/me.md evidence backlink pattern** — `rules.md` entries support optional `Why:` (one-sentence micro-rationale) and `Source:` (direct link to the lesson or ADR that created the rule) annotations. `me.md` uses inline rationale only. Enables lazy-load context access from rules without token overhead. Migration evidence seeding scans existing lessons and decisions for candidates.
+
+### Templates
+- **`core/templates/knowledge/rules.md`** — Updated with Why/Source pattern documentation and populated + omitted examples.
+- **`core/templates/knowledge/me.md`** — Updated with inline rationale pattern documentation and examples.
+- **`core/templates/knowledge/kg-index.md`** — New project KG root index template.
+- **`core/templates/knowledge/kg-index-global.md`** — New personal KG root index template (`-global` suffix mirrors git `--local`/`--global` scope convention).
+
+### Knowledge
+- **Lesson: Default KG Path Collision With Docs Convention** — Documents the `docs/` collision pattern and the `knowledge/` solution.
+- **Lesson: KG Index Naming Convention** — Documents `kg-` prefix and `-global` scope suffix conventions.
+- **Lesson: Migration Must Rewrite Cross-References** — Moving files without rewriting references silently breaks them.
+- **Lesson: Check Gitignore Before Migration Cleanup** — Verify gitignore patterns before writing migration cleanup logic.
+- **Lesson: Shell Boolean Guard** — Exit code trap with `$var && cmd` pattern.
+- **Lesson: KMGraph Fingerprint Detection Before Migration** — Check for KMGraph fingerprints before attempting migration.
+- **Lesson: Post-Migration Content Migration Offer** — Scaffold alone is not enough; offer to populate me.md/rules.md after creation.
+- **ADR-030** — Migration moves named subdirectories only, never entire `docs/`.
+
+---
+
 ## [0.2.4-beta] — 2026-04-08
 
 ### Documentation

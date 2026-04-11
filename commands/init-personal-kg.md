@@ -3,6 +3,10 @@ description: Create or register a personal knowledge graph for cross-project les
 allowed-tools: Bash, Read, Write, kg_fts5_rebuild
 ---
 
+## Execution Rules
+
+All bash/shell checks in this command are **implementation guidance only** — run them silently as internal steps. Never show bash commands, shell code, or raw command output to the user. Present only plain-English results, prompts, and status messages.
+
 # /kmgraph:init-personal-kg
 
 Create a personal knowledge graph at `~/.claude/knowledge-graph/` for capturing
@@ -35,18 +39,57 @@ After setup, `/kmgraph:capture-lesson` shows a KG picker when saving lessons, an
 
 ### Step 1: Check for existing personal KG
 
-Read `~/.claude/kg-config.json`. Look for any entry with `type: "personal"`.
+**→ Execute shared module:** Read `commands/init-shared/upgrade-inspector.md` and follow it exactly.
+Parameters:
+- `{KG_PATH}` = resolved personal KG path
+- `{kg_name}` = "personal"
+- `{KG_TYPE}` = "personal"
+- `{categories}` = ["architecture", "debugging", "patterns", "process"]
+- `{preserve_active}` = true
 
-**If one already exists:**
-```
-A personal KG is already registered: "[name]" at [path]
+**After upgrade-inspector completes (Option 1), always continue to Step 8 (content migration) and Step 9 (evidence seeding).** These run independently of the template upgrade check — an up-to-date template install does not mean me.md/rules.md have been populated.
 
-Options:
-1. Use this existing KG (no action needed)
-2. Re-initialize it (reset structure, keep existing lessons)
-3. Register a different path as personal KG
-4. Cancel
-```
+**If option 2 selected (re-initialize):**
+
+1. Archive all existing content before touching anything:
+   ```bash
+   ARCHIVE_DATE=$(date +%Y-%m-%d)
+   ARCHIVE_DIR="{personal_kg_path}/.kg-archive-${ARCHIVE_DATE}"
+   mkdir -p "$ARCHIVE_DIR"
+   for subdir in knowledge lessons-learned decisions sessions; do
+     [ -d "{personal_kg_path}/$subdir" ] && cp -r "{personal_kg_path}/$subdir" "$ARCHIVE_DIR/$subdir"
+   done
+   for f in me.md rules.md kg-index-global.md; do
+     [ -f "{personal_kg_path}/$f" ] && cp "{personal_kg_path}/$f" "$ARCHIVE_DIR/$f"
+   done
+   ```
+
+2. Record pre-archive lesson and ADR counts for post-validation:
+   ```bash
+   PRE_LESSON_COUNT=$(find "{personal_kg_path}/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+   PRE_ADR_COUNT=$(find "{personal_kg_path}/decisions" -name "ADR-*.md" 2>/dev/null | wc -l | tr -d ' ')
+   ```
+
+3. Proceed through Steps 3-7 (directory structure, templates, config, FTS5 index, confirm).
+
+4. After re-init, validate lesson and ADR counts are preserved:
+   ```bash
+   POST_LESSON_COUNT=$(find "{personal_kg_path}/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+   POST_ADR_COUNT=$(find "{personal_kg_path}/decisions" -name "ADR-*.md" 2>/dev/null | wc -l | tr -d ' ')
+
+   if [ "$PRE_LESSON_COUNT" -ne "$POST_LESSON_COUNT" ] || [ "$PRE_ADR_COUNT" -ne "$POST_ADR_COUNT" ]; then
+     echo "⚠️  Content count mismatch after re-init."
+     echo "   Before: $PRE_LESSON_COUNT lessons, $PRE_ADR_COUNT ADRs"
+     echo "   After:  $POST_LESSON_COUNT lessons, $POST_ADR_COUNT ADRs"
+     echo "   Archive preserved at: $ARCHIVE_DIR"
+   else
+     echo "✅ Re-initialization complete. $POST_LESSON_COUNT lessons and $POST_ADR_COUNT ADRs preserved."
+     echo "📦 Archive preserved at: $ARCHIVE_DIR"
+     echo "   Delete when satisfied: rm -rf $ARCHIVE_DIR"
+   fi
+   ```
+
+5. Continue to Step 8 (content migration) and Step 9 (evidence seeding).
 
 **If none exists:** Proceed to Step 2.
 
@@ -69,57 +112,44 @@ Store resolved path as `{personal_kg_path}`.
 
 ### Step 3: Create directory structure
 
-```bash
-mkdir -p "{personal_kg_path}"/{knowledge,lessons-learned,decisions,sessions}
-mkdir -p "{personal_kg_path}/lessons-learned"/{architecture,debugging,patterns,process}
-```
+**→ Execute shared module:** Read `commands/init-shared/directory-scaffold.md` and follow it exactly.
+Parameters:
+- `{KG_PATH}` = resolved personal KG path
+- `{categories}` = ["architecture", "debugging", "patterns", "process"]
 
 ---
 
 ### Step 4: Copy templates
 
-```bash
-for f in patterns.md gotchas.md concepts.md architecture.md workflows.md index.md; do
-  src="${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/$f"
-  dest="{personal_kg_path}/knowledge/$f"
-  [ -f "$src" ] && [ ! -f "$dest" ] && cp "$src" "$dest"
-done
-```
+**→ Execute shared module:** Read `commands/init-shared/template-seed.md` and follow it exactly.
+Parameters:
+- `{KG_PATH}` = resolved personal KG path
+- `{CLAUDE_PLUGIN_ROOT}` = plugin root path
 
-Only copy if template doesn't already exist (preserves user content on re-init).
+When deploying `me.md` to the personal KG, strip the "See also: ~/.claude/knowledge-graph/me.md" line — it is a project-KG cross-reference that points to itself when deployed as the personal KG's own me.md.
 
 ---
 
 ### Step 5: Register in config
 
-Add or update the `"personal"` entry in `~/.claude/kg-config.json`:
-
-```json
-"personal": {
-  "name": "personal",
-  "path": "~/.claude/knowledge-graph",
-  "type": "personal",
-  "categories": [
-    {"name": "architecture", "prefix": null, "git": "ignore"},
-    {"name": "debugging",    "prefix": null, "git": "ignore"},
-    {"name": "patterns",     "prefix": null, "git": "ignore"},
-    {"name": "process",      "prefix": null, "git": "ignore"}
-  ],
-  "createdAt": "[timestamp]",
-  "lastUsed": "[timestamp]"
-}
-```
-
-Do NOT change `"active"` — project KG remains active.
+**→ Execute shared module:** Read `commands/init-shared/config-entry-write.md` and follow it exactly.
+Parameters:
+- `{KG_PATH}` = resolved personal KG path
+- `{kg_name}` = "personal"
+- `{KG_TYPE}` = "personal"
+- `{categories}` = ["architecture", "debugging", "patterns", "process"]
+- `{git_strategy}` = "all-ignore"
+- `{category_git_rules}` = all categories set to "ignore"
+- `{preserve_active}` = true
 
 ---
 
 ### Step 6: Build FTS5 index
 
-Call `kg_fts5_rebuild` with `kgPath: "{personal_kg_path}"`.
-
-- If `indexed > 0`: confirm success
-- If `indexed = 0`: normal for empty KG — log note, not an error
+**→ Execute shared module:** Read `commands/init-shared/fts5-rebuild.md` and follow it exactly.
+Parameters:
+- `{KG_PATH}` = resolved personal KG path
+- `{kg_name}` = "personal"
 
 ---
 
@@ -137,6 +167,147 @@ How to use:
   • /kmgraph:recall "query" — now searches both project and personal KGs automatically
   • /kmgraph:switch personal — make personal KG active (advanced; usually not needed)
 ```
+
+---
+
+### Step 8: Content migration offer
+
+Offer to populate `me.md` and `rules.md` from `~/.claude/CLAUDE.md`:
+
+```
+me.md and rules.md have been created in your personal KG.
+Would you like help populating them from your global ~/.claude/CLAUDE.md?
+
+  1. Yes — show me what would move where (review before writing)
+  2. No — I'll fill them in manually
+```
+
+**If Yes:**
+1. Parse `~/.claude/CLAUDE.md` and display proposed mapping before writing anything:
+   ```
+   Proposed mapping from ~/.claude/CLAUDE.md:
+     "Personal Preferences" section → me.md
+     "Cross-Project Conventions" section → rules.md
+     Platform-specific / project-specific content → CLAUDE.md (retained)
+   ```
+2. User confirms each section before it is written.
+3. Before rewriting CLAUDE.md, copy original to `CLAUDE.md.bak`.
+4. Rewrite `~/.claude/CLAUDE.md` to a minimal pointer:
+   ```
+   For full context, read ~/.claude/knowledge-graph/rules.md and ~/.claude/knowledge-graph/me.md before acting.
+   ```
+5. Also offer to migrate `user`-type entries from `~/.claude/projects/*/memory/MEMORY.md` (role, preferences, expertise — not project-specific entries) into personal `me.md`.
+6. If user declines or aborts, restore from `CLAUDE.md.bak` and delete it.
+
+**Safety rules:** Never auto-write. User confirms per section. If `~/.claude/CLAUDE.md` does not exist, skip silently.
+
+**Skip this step** if `me.md` already has substantial content (more than the template placeholder text) — the user has already populated it manually.
+
+---
+
+### Step 8.1: Obsidian wiki link pass
+
+Run this step as content enrichment on every init/upgrade for personal KGs that do not yet have `wiki_pass_complete: true` in their config entry. This step is NOT gated on migration (personal KGs are never migrated).
+
+**Trigger:** Skip this step only if the config entry for this personal KG already has `wiki_pass_complete: true`. Otherwise, always proceed.
+
+**Pre-pass: Build ADR number → filename map**
+
+Before any substitution, scan `{personal_kg_path}/decisions/` and build a lookup table:
+
+```bash
+# Build map: ADR number → full basename (without extension)
+declare -A ADR_MAP
+declare -A ADR_COLLISION
+
+for f in "$personal_kg_path/decisions"/ADR-*.md; do
+  [ -e "$f" ] || continue
+  basename_noext=$(basename "$f" .md)
+  num=$(echo "$basename_noext" | grep -oE '^ADR-[0-9]+')
+  if [ -n "${ADR_MAP[$num]:-}" ]; then
+    ADR_COLLISION[$num]=1
+    echo "⚠️  ADR number collision: $num maps to both ${ADR_MAP[$num]} and $basename_noext — skipping substitution for $num"
+  else
+    ADR_MAP[$num]="$basename_noext"
+  fi
+done
+```
+
+Any number in `ADR_COLLISION` is skipped during substitution with a warning.
+
+**GitHub repo URL:** Read from `git remote get-url origin` (run from the personal KG root), strip `.git`, append `/issues/`. If no remote is configured, skip `#NNN` substitution entirely and log: `ℹ️  No git remote detected — skipping GitHub issue link substitution.`
+
+**Scope:** Process only `.md` files under these four subdirectories:
+- `{personal_kg_path}/lessons-learned/`
+- `{personal_kg_path}/decisions/`
+- `{personal_kg_path}/sessions/`
+- `{personal_kg_path}/concepts/`
+
+Never touch `chat-history/` or files outside these four directories.
+
+**For each `.md` file in scope:**
+
+Skip the file if:
+- It is a symlink (skip with warning: `⚠️  Skipping symlink: {path}`)
+- Its filename matches `*template*`
+
+Processing:
+1. Parse the file and mark NO-SUBSTITUTE zones: YAML frontmatter (opening `---` to closing `---` at file top), triple-backtick code blocks, 4-space indented code blocks, inline backtick spans, existing wiki links (`[[...]]`), existing markdown links (`[...](...)`  or `[...][...]`), and heading lines (lines starting with one or more `#` characters).
+
+2. In body text only (outside all NO-SUBSTITUTE zones), apply substitutions in this order:
+   - **a. ENH references:** Replace bare `ENH-NNN` → `[[ENH-NNN]]`
+   - **b. ADR references:** Replace bare `ADR-NNN` (not in `ADR_COLLISION`) → `[[{ADR_MAP[ADR-NNN]}]]` (full filename from pre-pass map). Skip with warning if collision or if number not in map.
+   - **c. GitHub issues:** Replace bare `#NNN` (not in a heading, not in inline code) → `[#NNN]({GITHUB_ISSUES_URL}/NNN)`. Skip entirely if no git remote.
+   - **d. Lesson filenames:** Replace bare `Lessons_Learned_X` or `Lessons_Learned_X.md` → `[[Lessons_Learned_X]]` (build match list from `Lessons_Learned_*` filenames in `lessons-learned/` at scan time).
+
+3. Write back ONLY if content changed:
+   ```bash
+   # Atomic write — prevents truncation on crash
+   printf '%s' "$new_content" > "${file}.tmp"
+   mv "${file}.tmp" "${file}"
+   ```
+
+**On completion:**
+
+```
+✅ Wiki links applied to N files. (M files unchanged)
+```
+
+Write `wiki_pass_complete: true` to the KG config entry:
+
+```bash
+jq '.graphs["personal"].wiki_pass_complete = true' \
+  ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+```
+
+If the personal KG has no content files yet (fresh install), exit cleanly with `0 files modified` — no error.
+
+**`--dry-run` mode (optional):** Print what would change per file without writing anything and do not set the `wiki_pass_complete` flag.
+
+---
+
+### Step 9: Evidence seeding
+
+After Step 8 (whether or not the migration ran), check whether existing personal lessons or ADRs can seed `Why:`/`Source:` links into `rules.md`:
+
+```bash
+LESSON_COUNT=$(find "{personal_kg_path}/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+ADR_COUNT=$(find "{personal_kg_path}/decisions" -name "ADR-*.md" 2>/dev/null | wc -l | tr -d ' ')
+```
+
+If `LESSON_COUNT` or `ADR_COUNT` is greater than 0:
+```
+Your personal KG has [N] lessons and [M] ADRs.
+Would you like me to scan them and suggest Why:/Source: links for rules.md entries?
+
+  1. Yes — scan and show me suggestions (you approve each one before it is written)
+  2. Skip — I'll add evidence links manually
+```
+
+If Yes: scan each lesson and ADR for topic matches against `rules.md` entries. Surface candidate `Why:`/`Source:` pairs one at a time — user accepts or skips each. Write only accepted pairs.
+
+If both counts are 0: skip silently (normal for a fresh personal KG).
 
 ---
 

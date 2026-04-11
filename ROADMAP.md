@@ -15,6 +15,13 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 
 - **MEMORY.md auto-sync rules engine** — YAML-based pattern matching to automate sync decisions (e.g., "gotcha" → "Common Failure Patterns", "best practice" → "Best Practices"). Requires real-world MEMORY.md patterns from live usage before implementation (ADR-005).
 - **MEMORY.md smart summarization** — LLM-powered entry consolidation to merge similar entries and reduce token bloat. Lower priority until rules engine is operational (ADR-005).
+- **`me.md` as canonical identity home** — v0.3.0-beta introduces `knowledge/me.md` (project) and `~/.claude/knowledge-graph/me.md` (personal) as the authoritative home for user identity, working style, and domain expertise. MEMORY.md retains session-derived memories; `me.md` holds intentional static identity. Init will offer to migrate user-type memory entries into `me.md` during setup. See ADR-028.
+- **`rules.md` as canonical rules home** — v0.3.0-beta introduces `knowledge/rules.md` as the single source of truth for behavioral rules, replacing scattered rules in CLAUDE.md, memory files, and platform config files. CLAUDE.md and platform files become thin shims that point to `rules.md`. See ADR-028.
+- **MEMORY.md scope narrowing** — Once `me.md` and `rules.md` absorb static identity and rules content, MEMORY.md scope narrows to: session-derived discoveries, temporary working context, and pointers to external resources. Long-term: evaluate whether MEMORY.md becomes redundant for well-maintained KGs.
+
+### Navigation / discoverability
+
+- **Add `docs-updates` feed to site navigation** — The documentation updates feed (`/knowledge-graph/docs-updates/`) is live but unreachable from the navbar or footer. Add a navbar or footer link so users can discover changelog-style docs posts. RSS/Atom feeds also exist at `/docs-updates/rss.xml` and `/docs-updates/atom.xml` but are not advertised anywhere.
 
 ### Documentation polish (post-v0.0.6-docs-restructure)
 
@@ -34,6 +41,70 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 - ADR placeholder: "Contributor command surface area separation"
 - ADR placeholder: "Documentation updates feed via Docusaurus blog plugin" (lands in Phase 0 of the docs-restructure)
 - ADR placeholder: "Update notifications and version sync mechanism" — Discovery and auto-detection for MCP/template-only users; version consistency across multiple files (ADR-011)
+
+### UX / Ergonomics
+
+- **Skill aliases / short commands** (Low priority) — Allow `/kmgraph:cl` as alias for `/kmgraph:capture-lesson` etc., configurable in kg-config.json. Deferred: marginal UX gain vs configuration complexity; autocomplete already handles this.
+- **Backup before destructive operations** (Medium priority) — `switch` and `init` should auto-snapshot current state before category deletion or KG removal (`cp -r` to `~/.claude/kg-backups/`). Deferred: users should use git for versioning; this is insurance against user error only.
+- **Archival / superseding KG entries** (Low priority) — Mark entries as `status: superseded`, archive to `archive/` subdirectory, search includes archived content. Useful for mature KGs where patterns evolve. Deferred: adds lifecycle complexity before core usage patterns are established.
+
+### Data / Storage
+
+- **Per-project config overrides** (Medium priority) — Allow `.claude/kg-local.json` at project root to commit shared category definitions for teams. Read hierarchy: project-local → global → defaults. Deferred: multi-KG already supports project-local KGs; this targets team collaboration at scale.
+- **Cross-repo knowledge graphs** (Medium priority) — Share KG entries across multiple repos via global topic-based KGs at `~/.claude/knowledge-graphs/<topic>/`. Deferred: pattern already documentable; needs usage examples in PLATFORM-ADAPTATION.md.
+- **Config schema migration** (High — activate when v1.1 introduces breaking changes) — Add `"version"` field to kg-config.json, auto-migrate on `kg_config_init`. No breaking changes yet; implement when v1.1 ships.
+
+### MCP / Platform Extensibility
+
+- **Additional MCP tools** (Medium priority) — Port skill operations to MCP for cross-platform portability:
+  - `kg_git_metadata` — capture branch, commit, author, PR, issue (currently bash in skills)
+  - `kg_link_issue` — update YAML frontmatter + post GitHub comment (currently `/kmgraph:link-issue`)
+  - `kg_extract_chat` — wrap Python extraction scripts with structured results
+  - Deferred: skills already implement these; MCP layer adds value after v1.0 proves adoption.
+
+### Visualization
+
+- **Web UI for knowledge graph browsing** (Low priority) — Static site converting KG markdown to browsable HTML with interactive graph visualization (D3.js/Cytoscape.js) and search (Lunr.js). Deferred: KG is optimized for LLM consumption; markdown is readable enough for current scale.
+
+### Marketplace
+
+- **Plugin marketplace integration** (High — post-v1.0 launch) — Submit to official Claude Code plugin directory; auto-update mechanism; version compatibility matrix.
+  - Requirements: sanitization checks pass, examples generalized, docs comprehensive, MCP tested on macOS + Linux, README has install instructions, CHANGELOG current.
+
+---
+
+## v0.3.0-beta (Planned)
+
+**Status**: 📋 Planned — KG Default Path Migration + Plan Metadata Standards
+**Branch**: `v0.3.0-beta`
+
+### Planned
+
+- 🔲 Change default KG location from `docs/` to `knowledge/` + opt-in migration for existing `docs/`-based installs (Phase 1 + 2)
+- 🔲 Scaffold `knowledge/me.md`, `knowledge/rules.md`, `knowledge/index.md` on new installs (Phase 3A)
+- 🔲 Content migration offer (Step 1.6.5) — init prompts to populate `me.md`/`rules.md` from existing `CLAUDE.md` and memory files (Phase 3B)
+- 🔲 `knowledge/index.md` as graph entry point — directory map, wiki-linked pillars, AI agent guidance (Phase 3C)
+- 🔲 Plan file metadata standards — standard plan template at `core/templates/plans/plan-template.md`:
+  - **Implemented in version** field (filled post-implementation)
+  - **Plan lineage** — parent plan ref for bugfix/hotfix plans; related fix plans list for feature plans
+  - **Implementation Record** section — deviations, merged PR, fix plans spawned
+- 🔲 **ENH-011**: Duplicate check in `capture-lesson` before creating new entry — search graph for similar lessons first; first practical test of `rules.md` surfacing
+
+**See:** [docs/plans/v0.3.0-beta.md](docs/plans/v0.3.0-beta.md) and ADR-028
+
+---
+
+## v0.3.1-beta (Planned)
+
+**Status**: 📋 Planned — Obsidian Wiki Link Formatting
+**Branch**: `v0.3.1-beta` (branches from `v0.3.0-beta` after merge)
+
+### Planned
+
+- 🔲 Obsidian wiki link pass (Step 1f.2) — post-migration conversion of bare ENH/ADR/issue refs to `[[wiki]]` links (Phase 4A)
+- 🔲 All core templates and content-generating commands/agents emit `[[wiki]]` links for internal cross-references (Phase 4B + 4C)
+
+**See:** [docs/plans/v0.3.1-beta-obsidian-wiki-links.md](docs/plans/v0.3.1-beta-obsidian-wiki-links.md)
 
 ---
 
@@ -93,7 +164,7 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 
 ## v0.1.2-beta (Released: 2026-03-16)
 
-**Status**: 🔄 In Progress - Native FTS5 Search
+**Status**: ✅ Complete - Native FTS5 Search
 **Branch**: `v0.1.2-beta-native-fts5-search`
 
 ### Completed
@@ -102,7 +173,7 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 - ✅ `sync-all` Step 8: auto-refresh or one-time offer; `fts5_declined` preference persistence
 - ✅ `node-sqlite3-wasm` dependency (WASM, FTS5+BM25, zero native compilation)
 - ✅ `.fts5.db` added to `.gitignore`
-- ⚠️ User-facing docs (COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED) deferred to v0.0.4-github-docs after testing
+- ✅ User-facing docs (COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED) updated — completed in v0.0.10-alpha
 
 ---
 
@@ -115,7 +186,7 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 - ✅ `sync-all` optionally uses `ctx_batch_execute` for shell steps when context-mode installed
 - ✅ `update-graph` optionally uses `ctx_execute_file` for reading large lesson batches
 - ✅ Both commands fully backwards-compatible — identical behavior without context-mode
-- ⚠️ User-facing docs (COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED) deferred to v0.0.4-github-docs after testing
+- ✅ User-facing docs (COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED) updated — completed in v0.0.10-alpha
 
 ---
 
@@ -295,9 +366,9 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 - Ready for alpha testing and feedback
 
 ### Next Steps
-- 🔄 Alpha testing and feedback collection
-- ⏳ Bug fixes and refinements based on feedback
-- ⏳ v1.0.0 planning
+- ✅ Alpha testing and feedback collection
+- ✅ Bug fixes and refinements based on feedback
+- ✅ v1.0.0 planning
 
 ---
 
@@ -593,226 +664,26 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 - Cross-LLM compatibility insights captured
 
 ### Next Steps
-- 🔄 Test skill triggering with real usage
-- 🔄 Gather feedback on skill guidance quality
-- 🔄 Continue capturing lessons as plugin evolves
-- ⏳ v1.0.0 planning continues
+- ✅ Test skill triggering with real usage
+- ✅ Gather feedback on skill guidance quality
+- ✅ Continue capturing lessons as plugin evolves
+- ✅ v1.0.0 planning continues
 
 ---
 
 ## v1.0.0 (Planned: Q2 2026)
 
 **Status**: Planning
-**Focus**: Stable release with community feedback incorporated
+**Focus**: Stable release — community feedback incorporated, marketplace launch
 
-### Planned Features
-- Bug fixes from alpha testing
-- Performance optimizations
-- Enhanced documentation based on user feedback
-- Additional examples from real-world usage
-- Marketplace submission
+### Planned
+- 🔲 Bug fixes from beta testing
+- 🔲 Performance optimizations (large KG search benchmarking — target: <2s for 500+ files)
+- 🔲 Enhanced documentation based on user feedback
+- 🔲 Additional real-world usage examples
+- 🔲 Marketplace submission (plugin passes sanitization, docs comprehensive, MCP tested macOS + Linux)
 
----
-
-## Future Considerations
-
-### Skill Aliases / Short Commands
-**Priority**: Low
-**Rationale**: Typing speed is minor compared to LLM response time
-
-- Allow `/kmgraph:cl` as alias for `/kmgraph:capture-lesson`
-- Configurable aliases in kg-config.json
-- Example config:
-  ```json
-  {
-    "aliases": {
-      "cl": "capture-lesson",
-      "ug": "update-graph",
-      "sa": "sync-all"
-    }
-  }
-  ```
-
-**Why not v1.0**: Adds configuration complexity for marginal UX gain. Skills are invoked via autocomplete anyway.
-
----
-
-### Per-Project Config Overrides
-**Priority**: Medium
-**Use Case**: Team-shared KG settings committed to repo
-
-Allow `.claude/kg-local.json` at project root to override global config:
-- Team can commit shared category definitions
-- Individual developers keep private categories in global config
-- Merge strategy: project-local overrides global defaults
-
-**Implementation Notes**:
-- Read hierarchy: project-local → global → defaults
-- Config schema stays same, just different precedence
-- Document merge behavior in CONFIGURATION.md
-
-**Why not v1.0**: Multi-KG system already supports project-local KGs. This is for team collaboration at scale.
-
----
-
-### Backup Before Destructive Operations
-**Priority**: Medium
-**Rationale**: Safety net for accidental deletions
-
-- `/kmgraph:switch` and `/kmgraph:init` should snapshot current state
-- Auto-backup before category deletion or KG removal
-- Lightweight: just `cp -r` to timestamped directory in `~/.claude/kg-backups/`
-
-**Implementation**:
-```bash
-# Before destructive operation
-timestamp=$(date +%Y%m%d_%H%M%S)
-cp -r "$KG_PATH" "$HOME/.claude/kg-backups/$ACTIVE_KG_$timestamp"
-```
-
-**Why not v1.0**: Adds storage overhead. Users should use git for versioning. This is insurance against user error, not a primary feature.
-
----
-
-### Large KG Performance
-**Priority**: Low (becomes Medium if adopted at scale)
-**Trigger**: When `kg_search` response time exceeds 2 seconds
-
-Current search is full-text file walk — works for <500 files. For larger KGs:
-- Index-based search (SQLite FTS5 or similar)
-- Pre-compute search index on KG updates
-- Incremental index updates (don't rebuild on every capture-lesson)
-
-**Benchmark**: Test with 1000+ lessons, 200+ KG entries to validate need.
-
-**Why not v1.0**: Premature optimization. Real-world usage will reveal if this is needed.
-
----
-
-### Archival / Superseding Entries
-**Priority**: Low
-**Use Case**: KG entries become outdated as patterns evolve
-
-- Mark KG entries as "superseded by [newer entry]"
-- Archive old lessons without deleting (move to `archive/` subdirectory)
-- `/kmgraph:archive` skill for managing lifecycle
-- Search includes archived content by default (flag to exclude)
-
-**Example frontmatter**:
-```yaml
-status: superseded
-superseded_by: docs/knowledge/patterns.md#multi-tier-sync-v2
-superseded_at: 2026-03-15
-reason: "Pattern evolved to support dynamic tier discovery"
-```
-
-**Why not v1.0**: Adds complexity. Users can manually move files or delete. This is workflow tooling for mature KGs.
-
----
-
-### Config Schema Migration
-**Priority**: High (as soon as v1.1 introduces breaking changes)
-**Rationale**: Graceful upgrades for users
-
-- v1.0 → v1.1 config changes need migration
-- Add `"version"` field to kg-config.json (already present in v1.0)
-- MCP `kg_config_init` should check version and migrate if needed
-- Document migration path in docs/CHANGELOG.md
-
-**Example migration**:
-```javascript
-// v1.0 config
-{ "version": "1.0.0", "graphs": {...} }
-
-// v1.1 adds sanitization rules
-{ "version": "1.1.0", "graphs": {...}, "sanitization": {...} }
-
-// Migration: auto-add sanitization defaults if missing
-```
-
-**Why not v1.0**: No breaking changes yet. Implement when v1.1 ships.
-
----
-
-### Cross-Repo Knowledge Graphs
-**Priority**: Medium
-**Use Case**: Share KG entries across multiple repos via global topic-based KGs
-
-- MEMORY.md can reference cross-repo patterns
-- KG entry links use absolute paths for cross-repo references
-- Document pattern in PLATFORM-ADAPTATION.md
-
-**Example**:
-- Developer has 3 microservices repos
-- Shared "microservices-patterns" KG at `~/.claude/knowledge-graphs/microservices-patterns/`
-- Each repo's MEMORY.md references: "See microservices-patterns KG: [Circuit Breaker Pattern](~/.claude/knowledge-graphs/microservices-patterns/docs/knowledge/patterns.md#circuit-breaker)"
-
-**Why not v1.0**: Multi-KG system already supports this. Just needs documentation and examples.
-
----
-
-### Plugin Marketplace Integration
-**Priority**: High (post-v1.0 launch)
-**Actions**:
-- Submit to official Claude Code plugin directory at https://clau.de/plugin-directory-submission
-- Auto-update mechanism when new versions are released
-- Version compatibility matrix (which Claude Code versions support which plugin versions)
-
-**Requirements**:
-- [ ] Plugin passes all sanitization checks
-- [ ] Examples are clearly marked and generalized
-- [ ] Documentation is comprehensive
-- [ ] MCP server tested on macOS and Linux
-- [ ] README has installation instructions
-- [ ] docs/CHANGELOG.md is up to date
-
-**Why not v1.0**: v1.0 IS the marketplace launch. This is the post-launch checklist.
-
----
-
-### Additional MCP Tools
-**Priority**: Medium
-**Extends**: MCP server capabilities for automation
-
-Potential new tools:
-1. **`kg_git_metadata`** — Capture branch, commit, author, PR, issue
-   - Reduces skill complexity by delegating git operations to MCP
-   - Already implemented in skills via bash, but MCP makes it reusable for other platforms
-
-2. **`kg_link_issue`** — Update YAML frontmatter + post GitHub comment
-   - Current implementation in `/kmgraph:link-issue` skill
-   - MCP makes it available to Cursor/Continue.dev/Cline users
-
-3. **`kg_extract_chat`** — Run Python extraction scripts
-   - Wrapper around chat extraction Python scripts
-   - Handles environment setup (KG_OUTPUT_DIR)
-   - Returns structured results instead of raw files
-
-**Implementation Notes**:
-- These are skill → MCP ports (make deterministic operations platform-agnostic)
-- All require git CLI or gh CLI availability checks
-- Should gracefully degrade if dependencies missing
-
-**Why not v1.0**: Skills already implement these. MCP layer is for cross-platform portability after v1.0 proves value.
-
----
-
-### Web UI for Knowledge Graph Browsing
-**Priority**: Low (nice-to-have)
-**Use Case**: Visual exploration of KG without file navigation
-
-- Static site generator that converts KG markdown to browsable HTML
-- Interactive graph visualization of cross-references
-- Search interface (leverages MCP `kg_search`)
-- Hosted locally or deployed to GitHub Pages
-
-**Tech Stack**:
-- Markdown → HTML: marked.js or remark
-- Graph viz: D3.js or Cytoscape.js
-- Search: Lunr.js or MiniSearch
-- Static site: 11ty or Astro
-
-**Why not v1.0**: Adds significant scope. KG is optimized for LLM consumption, not human browsing. Markdown is readable enough.
+_See [Future / Deferred](#future--deferred-captured-2026-04-07-during-docs-restructure-planning) for post-v1.0 feature backlog._
 
 ---
 

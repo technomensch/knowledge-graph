@@ -18,15 +18,45 @@
 
 **Behavior:**
 When triggered, guide the user toward documenting the decision as an Architecture Decision Record:
-- Detect the decision topic from conversation context
-- Suggest creating an ADR and pre-fill the title from the decision topic
-- Dispatch to `create-adr-agent` with the detected context (title, category if inferrable)
-- The agent handles the full interactive wizard: numbering, git metadata, prompts, template, index update
+
+1. **Extract context** from the conversation before asking anything:
+   - **Title** — the decision topic (e.g., "Use PostgreSQL for Primary Database")
+   - **Context** — the situation or problem that forced this decision (2-5 sentences from conversation)
+   - **Decision** — what was decided or is being proposed (1-3 sentences)
+   - **Rationale** — reasons and alternatives mentioned in conversation (bullets if multiple)
+   - **Consequences** — impacts mentioned (positive and negative; leave blank if not discussed)
+   - **Status** — default "Proposed" unless user said "we decided" / "we're going with" (use "Accepted")
+   - **Category** — infer from topic (Architecture / Process / Technology)
+
+2. **Show the user a summary** of what was extracted:
+   > "This looks like an architecture decision worth capturing. Here's what I'd pre-fill:
+   >
+   > **Title:** [title]
+   > **Status:** [status]
+   > **Context:** [context]
+   > **Decision:** [decision]
+   > **Rationale:** [rationale]
+   >
+   > Want me to create the ADR from this?"
+
+3. **Dispatch to `create-adr-agent`** with the full context payload if user agrees:
+
+   ```
+   context_provided: true
+   title: "[title]"
+   status: "[Proposed|Accepted]"
+   category: "[Architecture|Process|Technology]"
+   context: "[context text]"
+   decision: "[decision text]"
+   rationale: "[rationale text]"
+   consequences: "[consequences text or blank]"
+   related_lessons: []
+   ```
+
+   The agent uses `context_provided: true` to skip its interactive wizard and go directly to draft generation.
 
 **Dispatch:**
-When the user agrees to create an ADR, spawn the `create-adr-agent` subagent with:
-- `title`: the detected decision topic (if available)
-- Let the agent handle all subsequent interaction
+When the user agrees to create an ADR, spawn the `create-adr-agent` subagent with the full context payload defined in Behavior step 3 above.
 
 **Example Trigger:**
 ```
@@ -35,8 +65,16 @@ or stick with the current approach?"
 ```
 
 **Assistant Response:**
-"This sounds like an architecture decision worth documenting. Want me to create an ADR for it? I can pre-fill the title as 'Use PostgreSQL for Primary Database'."
+"This looks like an architecture decision worth capturing. Here's what I'd pre-fill:
 
-If the user agrees, dispatch to `create-adr-agent` with the pre-filled title.
+**Title:** Use PostgreSQL for Primary Database
+**Status:** Proposed
+**Context:** The team is evaluating whether to adopt PostgreSQL for the main database or continue with the current approach.
+**Decision:** Switch to PostgreSQL as the primary database.
+**Rationale:** PostgreSQL offers better support for complex queries and has strong community support.
+
+Want me to create the ADR from this?"
+
+If the user agrees, dispatch to `create-adr-agent` with the full context payload.
 
 **v0.2.1 Decision Note:** Agent dispatch was chosen over the previous `/kmgraph:create-adr` command suggestion because the ADR creation workflow (7 phases, 8 user prompts, git metadata, template population, index management) benefits from dedicated agent handling. The `create-adr` command's thin refactor to dispatch to this agent is deferred to v0.2.2.
