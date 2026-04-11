@@ -158,7 +158,7 @@ Do not use numbered headings in knowledge files — use plain headings (e.g., `#
 
 ## Tool Preferences
 
-<!-- Platform-specific tool directives belong in the platform's native config file:            -->
+<!-- Platform-specific tool directives belong in the platform's native config file (ADR-032):  -->
 <!-- Claude Code → CLAUDE.md (root), Gemini CLI → GEMINI.md, Cursor → .cursorrules            -->
 <!-- This section contains only platform-agnostic preferences.                                 -->
 

@@ -980,8 +980,9 @@ Claude Code-specific tool directives. This section is the authoritative home for
 
 ### Search Scope Restrictions
 
-Never run grep scans over `docs/plans/` or `.jsonl` chat history files
+Never run grep scans over plan directories or `.jsonl` chat history files
 - **Why:** these paths contain non-executable plan text and chat transcripts — scanning them consumes context without reaching executable code
+- **Example paths to avoid:** `docs/plans/`, `knowledge/plans/`, `*.jsonl`
 PLATFORM_EOF
   echo "✅ Added ## Platform Preferences (Claude Code) section to CLAUDE.md"
 else

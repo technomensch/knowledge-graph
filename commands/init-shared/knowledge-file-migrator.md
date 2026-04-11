@@ -12,18 +12,29 @@ description: Shared migration module — archives rules.md and relocates Claude-
 |---|---|
 | `{KG_PATH}` | Absolute path to the knowledge graph root directory |
 | `{KG_TYPE}` | Type: "project-local" or "personal" |
-| `{PROJECT_ROOT}` | Absolute path to the project root (ignored for personal KGs) |
-| `{CONTAMINATION}` | grep -n output of flagged lines from rules.md |
+| `{PROJECT_ROOT}` | Absolute path to the project root (used for project-local KGs; unused for personal KGs) |
+| `{CONTAMINATION}` | grep -n output of flagged lines from rules.md (format: `NNN:content`) |
+
+---
+
+### Step 0: Bind parameters to shell variables
+
+```bash
+CONTAMINATION="{CONTAMINATION}"
+KG_PATH="{KG_PATH}"
+KG_TYPE="{KG_TYPE}"
+PROJECT_ROOT="{PROJECT_ROOT}"
+```
 
 ---
 
 ### Step 1: Resolve platform config target
 
 ```bash
-if [ "{KG_TYPE}" = "personal" ]; then
+if [ "$KG_TYPE" = "personal" ]; then
   PLATFORM_CONFIG="$HOME/.claude/CLAUDE.md"
 else
-  PLATFORM_CONFIG="{PROJECT_ROOT}/CLAUDE.md"
+  PLATFORM_CONFIG="$PROJECT_ROOT/CLAUDE.md"
 fi
 ```
 
@@ -35,9 +46,9 @@ Create a timestamped archive of `rules.md` before modifying it:
 
 ```bash
 ARCHIVE_TS=$(date +%Y%m%d-%H%M%S)
-ARCHIVE_DIR="{KG_PATH}/.kg-archive-${ARCHIVE_TS}"
+ARCHIVE_DIR="$KG_PATH/.kg-archive-${ARCHIVE_TS}"
 mkdir -p "$ARCHIVE_DIR"
-cp "{KG_PATH}/rules.md" "$ARCHIVE_DIR/rules.md"
+cp "$KG_PATH/rules.md" "$ARCHIVE_DIR/rules.md"
 ```
 
 Write a `manifest.json` to the archive:
@@ -56,8 +67,10 @@ Print: `📦 Archive saved: $ARCHIVE_DIR`
 
 ### Step 3: Ensure Platform Preferences section exists in platform config
 
+Match the full heading to avoid false-positive on future platform sections (e.g., `## Platform Preferences (Gemini)`):
+
 ```bash
-grep -q "## Platform Preferences" "$PLATFORM_CONFIG" 2>/dev/null || \
+grep -qF "## Platform Preferences (Claude Code)" "$PLATFORM_CONFIG" 2>/dev/null || \
   printf '\n## Platform Preferences (Claude Code)\n\n' >> "$PLATFORM_CONFIG"
 ```
 
@@ -65,10 +78,13 @@ grep -q "## Platform Preferences" "$PLATFORM_CONFIG" 2>/dev/null || \
 
 ### Step 4: Append flagged lines to platform config
 
-Extract matched line content (strip line numbers from grep -n output) and append under `## Platform Preferences`:
+Strip line numbers from grep -n output and append. Skip any line already present in the target to avoid duplicates if migration is run more than once:
 
 ```bash
-echo "$CONTAMINATION" | sed 's/^[0-9]*://' >> "$PLATFORM_CONFIG"
+while IFS= read -r line; do
+  content=$(echo "$line" | sed 's/^[0-9]*://')
+  grep -qF "$content" "$PLATFORM_CONFIG" 2>/dev/null || echo "$content" >> "$PLATFORM_CONFIG"
+done <<< "$CONTAMINATION"
 ```
 
 Print: `✅ Flagged lines appended to $PLATFORM_CONFIG`
@@ -77,12 +93,12 @@ Print: `✅ Flagged lines appended to $PLATFORM_CONFIG`
 
 ### Step 5: Remove flagged lines from rules.md
 
-Extract line numbers from `{CONTAMINATION}` (format: `NNN:content`) and delete them. Remove in reverse order to preserve line numbering during deletion:
+Extract line numbers from `$CONTAMINATION` (format: `NNN:content`) and delete them in reverse order to preserve line numbering during deletion:
 
 ```bash
 LINE_NUMS=$(echo "$CONTAMINATION" | grep -oE '^[0-9]+' | sort -rn)
 for ln in $LINE_NUMS; do
-  # Delete line $ln from {KG_PATH}/rules.md
+  sed -i.bak "${ln}d" "$KG_PATH/rules.md" && rm -f "$KG_PATH/rules.md.bak"
 done
 ```
 
@@ -92,10 +108,21 @@ Print: `✅ Flagged lines removed from rules.md`
 
 ### Step 6: Add guidance comment to rules.md Tool Preferences section
 
-If `rules.md` does not already contain a platform-directives guidance comment, insert one after the Tool Preferences heading:
+If `rules.md` does not already contain a platform-directives guidance comment, insert one after the `## Tool Preferences` heading. If no `## Tool Preferences` heading exists, append the comment at the end of the file:
 
-```
-<!-- Platform-specific directives belong in the platform's native config file (CLAUDE.md, GEMINI.md, etc.) -->
+```bash
+COMMENT='<!-- Platform-specific directives belong in the platform'\''s native config file (CLAUDE.md, GEMINI.md, etc.) — see ADR-032 -->'
+
+if grep -q "$COMMENT" "$KG_PATH/rules.md" 2>/dev/null; then
+  : # already present, skip
+elif TOOL_LINE=$(grep -n "^## Tool Preferences" "$KG_PATH/rules.md" | head -1 | cut -d: -f1) && [ -n "$TOOL_LINE" ]; then
+  # Insert after the heading line
+  sed -i.bak "${TOOL_LINE}a\\
+${COMMENT}" "$KG_PATH/rules.md" && rm -f "$KG_PATH/rules.md.bak"
+else
+  # No Tool Preferences heading — append to EOF
+  printf '\n%s\n' "$COMMENT" >> "$KG_PATH/rules.md"
+fi
 ```
 
 ---
