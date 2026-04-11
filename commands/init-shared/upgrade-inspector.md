@@ -14,6 +14,8 @@ description: Shared upgrade inspector module — detects missing dirs, templates
 | `{categories}` | Array of category names configured for this KG |
 | `{preserve_active}` | Boolean — if true, do not change the active KG after upgrade |
 
+> **Caller note:** All `{PARAM}` placeholders in this module must be substituted by the caller before any bash block is executed. There is no runtime substitution — any unsubstituted `{PARAM}` will be passed literally to shell commands, producing silent errors (e.g., `grep` will look for a file literally named `{KG_PATH}/rules.md`).
+
 ---
 
 **Before running any checks or making any changes**, inspect the KG's actual state and report only what is missing or upgradeable for this specific install:
@@ -40,8 +42,12 @@ fi
 
 # rules.md platform-split check (v0.3.5 — ADR-032)
 # Content fingerprint only: Claude-specific tool names present in rules.md
+# Detection note: pattern targets tool-directive lines only (lines with preference verbs
+# + Claude tool names). Does not match mentions in other contexts, e.g. "Grep output requires
+# review" or "never use Glob in filenames". False negatives are acceptable — under-detection
+# is safer than over-detection for a migration that removes user content.
 if [ -f "{KG_PATH}/rules.md" ]; then
-  CONTAMINATION=$(grep -nE '\bGlob\b|\bGrep\b|context-mode|\bsubagent\b|\.jsonl' "{KG_PATH}/rules.md" 2>/dev/null)
+  CONTAMINATION=$(grep -nE '(use|prefer|avoid|never use|always use|do not use|switch to|stop using).{0,80}(\bGlob\b|\bGrep\b|context-mode|\bsubagent\b|\.jsonl)|(\bGlob\b|\bGrep\b|context-mode|\bsubagent\b|\.jsonl).{0,80}(use|prefer|avoid|instead|only|never)' "{KG_PATH}/rules.md" 2>/dev/null)
   [ -n "$CONTAMINATION" ] && \
     upgrades+=("Update: rules.md — Claude-specific tool references detected; offer to relocate to CLAUDE.md § Platform Preferences (ADR-032)")
 fi
@@ -51,6 +57,11 @@ CONFIGURED_PATH=$(jq -r '.graphs["{kg_name}"].path' ~/.claude/kg-config.json)
 echo "$CONFIGURED_PATH" | grep -qE '/docs/?$' && \
   [ -d "$CONFIGURED_PATH/lessons-learned" ] && \
   upgrades+=("Migration available: move KMGraph content from docs/ to knowledge/")
+
+# Archive path convention (for Task A rollback command in v0.3.6):
+# Archives created by knowledge-file-migrator are at: {KG_PATH}/.kg-archive-YYYYMMDD-HHMMSS/
+# Each archive contains the backed-up files + manifest.json
+# Use /kmgraph:migration list (v0.3.6) to enumerate restore points.
 
 # New templates (files in plugin core/templates not yet in KG)
 # Skip templates that are already covered by the scaffold file checks above:
@@ -196,7 +207,11 @@ Update templates? This will NOT overwrite your existing lessons or decisions.
 **Detection — content fingerprint only:**
 
 ```bash
-CONTAMINATION=$(grep -nE '\bGlob\b|\bGrep\b|context-mode|\bsubagent\b|\.jsonl' "{KG_PATH}/rules.md" 2>/dev/null)
+# Detection note: pattern targets tool-directive lines only (lines with preference verbs
+# + Claude tool names). Does not match mentions in other contexts, e.g. "Grep output requires
+# review" or "never use Glob in filenames". False negatives are acceptable — under-detection
+# is safer than over-detection for a migration that removes user content.
+CONTAMINATION=$(grep -nE '(use|prefer|avoid|never use|always use|do not use|switch to|stop using).{0,80}(\bGlob\b|\bGrep\b|context-mode|\bsubagent\b|\.jsonl)|(\bGlob\b|\bGrep\b|context-mode|\bsubagent\b|\.jsonl).{0,80}(use|prefer|avoid|instead|only|never)' "{KG_PATH}/rules.md" 2>/dev/null)
 ```
 
 If `CONTAMINATION` is empty, skip this check silently.

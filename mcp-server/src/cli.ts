@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import * as readline from "readline";
+import { createRequire } from "module";
 import {
   readConfig,
   writeConfig,
@@ -11,6 +12,9 @@ import {
   GraphConfig,
   CategoryConfig,
 } from "./utils.js";
+
+const require = createRequire(import.meta.url);
+const { version: SERVER_VERSION } = require("../package.json") as { version: string };
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
@@ -361,7 +365,7 @@ async function main(): Promise<void> {
 
     const server = new McpServer({
       name: "knowledge-graph",
-      version: "1.0.0",
+      version: SERVER_VERSION,
     });
 
     registerConfigTools(server);
