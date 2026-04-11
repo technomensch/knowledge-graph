@@ -110,10 +110,66 @@ Here's what's available for your install:
   ...
 
 Apply all, pick individually, or skip?
+  0. Preview all changes — see what would change before anything is written
   1. Apply all
   2. Let me choose which ones to apply
   3. Skip — my setup is already how I want it
 ```
+
+#### Option 0: Preview all changes
+
+If the user selects option 0 (or if the command was invoked with `--preview`):
+
+For each item in `upgrades[]`, show a preview entry:
+
+- **Directories (check a):** list each directory path that would be created, e.g.:
+  ```
+  [preview] Would create directory: {KG_PATH}/sessions/
+  [preview] Would create directory: {KG_PATH}/chat-history/
+  ```
+
+- **Config fields (check b):** show the current JSON value (missing/null) and the default that would be written, e.g.:
+  ```
+  [preview] kg-config.json — graphs.{kg_name}.platforms: (missing) → []
+  [preview] kg-config.json — graphs.{kg_name}.autoSwitch: (missing) → false
+  ```
+
+- **Templates (check c):** for each template that would be updated, show a line-by-line unified diff between the installed version and the plugin version. For templates that are new (not yet installed), show the full file content. Use plain text — no ANSI color codes required:
+  ```
+  [preview] Template update: knowledge/index.md
+  --- installed
+  +++ plugin
+  - old line
+  + new line
+
+  [preview] New template: sessions/session-template.md
+  (full file content follows)
+  ```
+  Compute the diff using a simple line-by-line comparison (no external `diff` dependency required).
+
+- **Section d (platform-split):** for each flagged line from `rules.md`, show its line number, the line content, the target heading in `CLAUDE.md` it would be appended under, and the archive path that would be created:
+  ```
+  [preview] rules.md platform-split:
+    Line 14: - File search: Glob and Grep — not Bash find/grep
+    Line 15: - Content search: Grep tool — not rg or grep in Bash
+    Target: CLAUDE.md § Platform Preferences
+    Archive: {KG_PATH}/.kg-archive-YYYYMMDD-HHMMSS/ (would be created before any write)
+  ```
+
+After showing all preview entries, print the summary:
+```
+X changes would be applied. Nothing was written.
+```
+
+Then show the Apply/Choose/Skip menu again so the user can proceed with full information:
+```
+Apply all, pick individually, or skip?
+  1. Apply all
+  2. Let me choose which ones to apply
+  3. Skip — my setup is already how I want it
+```
+
+**Implementation note:** The preview is a display-only pass over the same inspection data already collected — no new filesystem checks are needed. The `--preview` flag can be passed as an argument to `/kmgraph:init` to jump directly to the preview without showing the menu first: if the command is invoked with `--preview`, run the inspection, show the preview, and then show the Apply/Choose/Skip menu (without option 0, since preview has already run).
 
 If the user picks option 2 (choose individually), present each item as a separate yes/no prompt before running it.
 
@@ -387,8 +443,7 @@ These belong in knowledge/ (current layout). Options:
 
    Files moved to knowledge/. Archive available at: {KG_PATH}/.kg-archive-YYYYMMDD-HHMMSS/
    Empty source dirs removed from docs/.
-   To rollback: copy files from the archive back to docs/ manually.
-   (Automated rollback command planned for v0.3.6.)
+   To rollback: run `/kmgraph:migration rollback <id>` to restore. Use `/kmgraph:migration list` to see restore points.
    ```
 
 **If option (b) — skip:**

@@ -129,6 +129,12 @@ Apply all, pick individually, or skip?
   3. Skip — my setup is already how I want it
 ```
 
+**To preview all changes at once before anything is written:** choose **option 0** at the Apply/Choose/Skip menu, or invoke the command with the `--preview` flag:
+```
+/kmgraph:init --preview
+```
+The preview shows dirs that would be created, config field diffs, template diffs (line-by-line), and section-d lines with their target location — then prints "X changes would be applied. Nothing was written." and returns to the Apply/Choose/Skip menu.
+
 **To preview each change individually:** choose option 2. Each upgrade item is presented as a separate yes/no prompt — you see what it will do before it runs.
 
 **For the platform-split migration (check d) specifically:** even after choosing "Apply all", the wizard shows you the exact lines it detected in `rules.md` and offers three options before touching any file:
@@ -139,13 +145,13 @@ Apply all, pick individually, or skip?
 ```
 Option **b** lets you review and act on your own — nothing is written.
 
-> **Note:** A full dry-run mode (preview all changes with a diff, no prompts, no writes) is planned for v0.3.6.
+> **Full dry-run mode** is available: run `/kmgraph:init --preview`, or choose **option 0** at the Apply/Choose/Skip menu. The preview shows exactly what would change for each item — no files are written until you choose option 1 or 2 and confirm.
 
 ---
 
 ### What gets backed up
 
-Before any content migration runs, the wizard archives the affected files to a timestamped restore point at `{KG_PATH}/.kg-archive-YYYYMMDD-HHMMSS/`. If anything goes wrong, you can restore manually from that directory. A formal `/kmgraph:migration rollback` command is planned for v0.3.6.
+Before any content migration runs, the wizard archives the affected files to a timestamped restore point at `{KG_PATH}/.kg-archive-YYYYMMDD-HHMMSS/`. If anything goes wrong, you can restore manually from that directory. Run `/kmgraph:migration rollback <id>` to restore from any archive. Use `/kmgraph:migration list` to see available restore points.
 
 ---
 
