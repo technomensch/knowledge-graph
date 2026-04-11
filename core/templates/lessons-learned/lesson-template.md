@@ -32,6 +32,12 @@ category: [architecture|process|patterns|debugging]  # [AUTO-SUGGEST] Command su
 # - process: Workflow improvements, tools, procedures
 # - patterns: Reusable design patterns, best practices
 # - debugging: Troubleshooting, bug fixes, investigations
+
+related:  # [MANUAL] Optional: Links to related ADRs, enhancements, issues, and lessons
+  adrs: []          # e.g. ["[[ADR-028-rules-md-scaffolding]]"]
+  enhancements: []  # e.g. ["[[ENH-010]]"]
+  issues: []        # e.g. ["[#123](GITHUB_ISSUES_URL/123)"]
+  lessons: []       # e.g. ["[[Lessons_Learned_Plan_File_Dual_Location_Protocol]]"]
 ---
 
 # Lesson Learned: [Title]
@@ -177,16 +183,16 @@ Sources consulted while solving this problem:
 ## Related Documentation
 
 **Knowledge Graph:**
-- [Link to KG entry](../../knowledge/file.md#section) — [Brief context]
+- [[concept-name]] — [Brief context]
 
 **Architecture Decisions:**
-- [Link to ADR](../../decisions/ADR-XXX.md) — [Decision context]
+- [[ADR-XXX-decision-title]] — [Decision context]
 
 **Other Lessons:**
-- [Link to related lesson](./category/Other_Lesson.md) — [Relation]
+- [[Lessons_Learned_Other_Lesson]] — [Relation]
 
 **Meta-Issues:**
-- [Link to meta-issue](../../issues/meta-issue-name/) — [Context if part of larger investigation]
+- [#123](GITHUB_ISSUES_URL/123) — [Context if part of larger investigation]
 
 ---
 

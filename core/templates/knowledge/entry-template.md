@@ -31,9 +31,9 @@ Use this template when creating a new KG entry manually.
 - [Source Title](https://docs.example.com) — [Brief context of what was learned]
 
 **Related:**
-- [Related KG entry](./file.md#section)
-- [Related concept](./concepts.md#section)
-- [Related ADR](../../decisions/ADR-XXX.md)
+- [[related-concept-name]]
+- [[another-related-entry]]
+- [[ADR-XXX-decision-title]]
 
 **See Lesson:** [Full lesson with deep dive]
 
