@@ -1,0 +1,69 @@
+---
+title: "ENH-012: Rules and Identity File Hardening — Platform Split for Tool Directives"
+date: 2026-04-11
+branch: v0.3.5-beta
+tags: [enhancement, rules-md, platform-portability, tool-preferences, adr-032, v0.3.5-beta]
+---
+# ENH-012: Rules and Identity File Hardening — Platform Split for Tool Directives
+
+## Problem
+
+`knowledge/rules.md` is designed to be platform-agnostic (ADR-028), but contains Claude Code-specific tool references in its Tool Preferences section:
+
+- `Glob`, `Grep`, `Bash`, `Read`, `Edit` — Claude Code tool API names
+- `context-mode MCP tools` — Claude Code-specific plugin
+- `subagents` — Claude Code delegation pattern
+- `.jsonl` — Claude Code transcript format
+
+On non-Claude platforms (Gemini CLI, Cursor, Codex), these directives reference tools that do not exist. This violates ADR-028's platform-agnostic guarantee and prevents `knowledge/rules.md` from traveling cleanly to other platforms.
+
+---
+
+## Expected Behavior
+
+After this enhancement:
+
+1. `knowledge/rules.md` contains zero Claude Code-specific tool names
+2. Claude-specific tool directives live in `knowledge/platform/claude.md`
+3. `CLAUDE.md` has a thin `## Platform Preferences` shim pointing to `knowledge/platform/claude.md`
+4. `core/templates/knowledge/rules.md` reflects the same platform split with a guidance comment
+5. `kmgraph init` scaffolds `knowledge/platform/claude.md` for new installs and detects contamination in existing installs
+
+---
+
+## Implementation Plan
+
+See `docs/plans/v0.3.5-beta.md` for the full plan.
+
+| Task | Description | Files |
+|------|-------------|-------|
+| 0 | Audit pass — enumerate contamination sites | read-only |
+| 1 | Scaffold `knowledge/platform/` + ADR-032 | create `knowledge/platform/claude.md`, update `CLAUDE.md`, create ADR-032 |
+| 2 | Clean `knowledge/rules.md` | remove Claude-specific entries, add ADR-032 reference comment |
+| 3 | Restructure `core/templates/knowledge/rules.md` | adopt new H2/H3 hierarchy, add guidance comment |
+| 4 | Update `commands/init.md` upgrade flow | detect contamination, offer relocation |
+| 5 | Version bump + CHANGELOG + PR | bump to 0.3.5-beta, open PR |
+
+---
+
+## Architecture Decision
+
+**ADR-032** documents the `knowledge/platform/` pattern. Key decision: Claude-specific directives belong in `knowledge/platform/claude.md`, not `CLAUDE.md` (CLAUDE.md is a shim, not a directive store).
+
+---
+
+## Acceptance Criteria
+
+- [ ] `knowledge/platform/claude.md` exists with relocated Claude-specific directives
+- [ ] `knowledge/rules.md` passes `grep -E 'Glob|Grep|Bash|Read|Edit|WebFetch|\.jsonl'` — zero hits on tool-specific lines
+- [ ] `CLAUDE.md` references `knowledge/platform/claude.md` and adds no new content
+- [ ] `core/templates/knowledge/rules.md` has no Claude-specific tool refs; has ADR-032 guidance comment
+- [ ] `commands/init.md` upgrade flow detects and offers to relocate Claude-specific strings
+- [ ] ADR-032 written in both `docs/decisions/` and `knowledge/decisions/`
+- [ ] Version bumped to `0.3.5-beta`; CHANGELOG updated; PR opened
+
+---
+
+## Status
+
+**In progress** — v0.3.5-beta branch

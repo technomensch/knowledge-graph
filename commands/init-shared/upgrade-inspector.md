@@ -37,6 +37,22 @@ fi
 [ ! -f "{KG_PATH}/me.md" ]      && upgrades+=("New: me.md — your identity and working style in this project")
 [ ! -f "{KG_PATH}/rules.md" ]   && upgrades+=("New: rules.md — project conventions and behavioral rules")
 
+# Platform directive scaffold (v0.3.5 — ADR-032)
+[ ! -d "{KG_PATH}/platform" ] && upgrades+=("New: platform/ — per-platform tool directive directory (ADR-032)")
+[ ! -f "{KG_PATH}/platform/claude.md" ] && upgrades+=("New: platform/claude.md — Claude Code-specific tool directives (ADR-032)")
+
+# rules.md platform-split check (v0.3.5 — ADR-032)
+# Detect old flat structure and Claude-specific content contamination
+if [ -f "{KG_PATH}/rules.md" ]; then
+  # Structure fingerprint: old flat structure uses "## Always / Never Rules"
+  grep -q "## Always / Never Rules" "{KG_PATH}/rules.md" && \
+    upgrades+=("Update: rules.md — old flat heading structure detected; offer to upgrade to H2/H3 hierarchy (v0.3.5)")
+  # Content fingerprint: Claude-specific tool names present in rules.md
+  CONTAMINATION=$(grep -nE '\bGlob\b|\bGrep\b|context-mode|\bsubagent\b|\.jsonl' "{KG_PATH}/rules.md" 2>/dev/null)
+  [ -n "$CONTAMINATION" ] && \
+    upgrades+=("Update: rules.md — Claude-specific tool references detected; offer to relocate to platform/claude.md (ADR-032)")
+fi
+
 # Path migration available
 CONFIGURED_PATH=$(jq -r '.graphs["{kg_name}"].path' ~/.claude/kg-config.json)
 echo "$CONFIGURED_PATH" | grep -qE '/docs/?$' && \
@@ -179,3 +195,67 @@ Update templates? This will NOT overwrite your existing lessons or decisions.
 ```
 
 **Important:** Never overwrite user-created files (lessons, ADRs, KG entries). Only update template/scaffold files.
+
+#### d. rules.md platform-split check (v0.3.5-beta — ADR-032)
+
+**Purpose:** Detect and offer to relocate Claude Code-specific tool directives from `rules.md` to `platform/claude.md`, preserving `rules.md` as platform-agnostic per ADR-032.
+
+**Two detection fingerprints:**
+
+1. **Structure fingerprint** — presence of `## Always / Never Rules` heading in `rules.md` signals the old flat structure from v0.3.4 and earlier. Offer to restructure to the H2/H3 hierarchy.
+
+2. **Content fingerprint** — scan for known Claude-specific strings:
+
+```bash
+CONTAMINATION=$(grep -nE '\bGlob\b|\bGrep\b|context-mode|\bsubagent\b|\.jsonl' "{KG_PATH}/rules.md" 2>/dev/null)
+```
+
+**For each issue found:** display affected lines and offer:
+
+```
+Found Claude-specific tool references in knowledge/rules.md:
+  Line 14: - File search: Glob and Grep — not Bash find/grep
+  Line 15: - Content search: Grep tool — not rg or grep in Bash
+  ...
+
+These belong in knowledge/platform/claude.md, not rules.md (ADR-032).
+
+Options:
+  a. Relocate automatically — move flagged lines to platform/claude.md and remove from rules.md
+  b. Show me the lines to review manually
+  s. Skip
+```
+
+**If auto-relocate (option a):**
+
+```bash
+# Create platform/ directory if absent
+mkdir -p "{KG_PATH}/platform"
+
+# Seed platform/claude.md if absent
+if [ ! -f "{KG_PATH}/platform/claude.md" ]; then
+  # Try plugin template first; fall back to inline
+  cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/platform/claude.md" \
+     "{KG_PATH}/platform/claude.md" 2>/dev/null || \
+  cat > "{KG_PATH}/platform/claude.md" << 'EOF'
+# Platform Directives — Claude Code
+
+This file contains Claude Code-specific tool preferences relocated from `knowledge/rules.md` per ADR-032.
+**Scope:** Claude Code CLI and desktop app only.
+
+## Tool Preferences
+<!-- Entries relocated from rules.md — see ADR-032 -->
+EOF
+fi
+
+# Append flagged lines from rules.md into platform/claude.md under ## Tool Preferences
+# Remove those lines from rules.md
+# Insert ADR-032 guidance comment in rules.md Tool Preferences section if absent
+```
+
+**Safety rules:**
+- Never remove lines from `rules.md` without per-line user confirmation.
+- If `platform/claude.md` already exists, append — never overwrite.
+- If user selects skip, leave both files unchanged.
+- After relocation, add the ADR-032 reference comment to `rules.md`'s Tool Preferences section:
+  `<!-- Platform-specific directives belong in knowledge/platform/<platform>.md — see ADR-032 -->`

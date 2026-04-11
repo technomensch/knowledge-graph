@@ -1,57 +1,173 @@
 # Rules — knowledge-graph
 
-## Project Conventions
+> Quick navigation: [Version & Release](#version--release) · [Git Workflow](#git-workflow) · [Development Workflow](#development-workflow) · [Knowledge Capture](#knowledge-capture) · [Code Protection](#code-protection) · [Tool Preferences](#tool-preferences) · [File Paths & Directory Map](#file-paths--directory-map)
 
-- Branch naming: `v{ver}-{description}` for features | `v{ver}-fix-{description}` for bugs | `docs-update-{description}` for docs-only
-- Commit format: Conventional Commits — `type(scope): subject` with `Closes #N` in body
-- Commit types: `feat` | `fix` | `docs` | `refactor` | `chore` | `perf` | `style` | `test` | `build` | `ci` | `revert`
-- Version files to keep in sync: `package.json`, `.claude-plugin/plugin.json`, `mcp-server/package.json`
-  - Why: version files silently drifted out of sync during releases, causing inconsistent behavior between the plugin and MCP server
-- PR policy: push branches, await user review — never auto-merge, never delete branches
-- Chained branches must branch from their parent, not main — verify parent is fully committed first
-  - Why: branch-creating commands previously switched context silently mid-implementation, landing commits on the wrong branch
-  - Source: [Issue Tracking Branch Guard](lessons-learned/process/Lessons_Learned_Issue_Tracking_Branch_Guard.md)
+---
 
-## Always / Never Rules
+## Version & Release
 
-Always:
-- Stop and ask before pushing, creating PRs, merging, or any other action visible to others
-- Sync all three version files (package.json ×2, plugin.json) before pushing a release
-- Update both CHANGELOG.md (code releases) and docs-updates/ feed (docs-only) as appropriate — one branch = one feed post at `docs-updates/YYYY-MM-DD-{slug}.mdx`
-  - Why: during v0.2.1-beta, root CHANGELOG.md was updated but docs/CHANGELOG.md was forgotten, leaving the public docs site showing a changelog that stopped at v0.1.2-beta
-  - Source: [Dual Changelog Both Must Be Updated](lessons-learned/process/Lessons_Learned_Dual_Changelog_Both_Must_Be_Updated.md)
-- Update affected user-facing docs (README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, CONCEPTS, INSTALL.md) when behavior changes
-  - Why: doc updates were missed after command and agent changes, leaving guides and CHEAT-SHEET inconsistent with actual behavior
-  - Source: [ADR-013 Documentation Update Protocol](decisions/ADR-013-documentation-update-protocol.md)
-- Narrate reasoning in visible text — thinking blocks are not shown to the user
-- Validate plan acceptance criteria are ticked before marking a task complete
-- Before creating a PR with doc changes: run `git diff HEAD~N -- docs/` for each changed file, check for formatting regressions (stray spaces, broken tables, removed blank lines, wrong agent names), then run `mkdocs build` and confirm no new warnings
-  - Why: agent-written doc content caused silent regressions (broken tables, stray whitespace) that only showed after push; catching them pre-PR avoids review iteration
-- After any `git push`: scan output for Dependabot vulnerability notices — stop and surface to user before merging or deploying
-  - Why: a vulnerability notice appeared in push output and was nearly missed; would have shipped vulnerable dependencies
-  - Known/ignored: The 4 vulnerabilities on the default branch (2 high, 2 moderate) are Docusaurus dev-dependency issues in `node_modules/` — not runtime vulnerabilities, not introduced by KMGraph code. Do NOT stop or warn on these. Only surface NEW vulnerabilities not on this list.
-- After installing everything-claude-code (ECC): verify KMGraph's `SessionStart` hook is still present in `hooks/hooks.json` — ECC installer may clobber shared hooks config
-  - Why: ECC installer silently overwrote hooks.json, dropping KMGraph's SessionStart hook; the session ran without lesson capture for two sessions before the gap was noticed
-- When version-syncing doc footers: grep for major.minor prefix (e.g., `0\.2\.`) not the exact prior version string — footers may use a shorter format and silently miss an exact-version grep
-  - Why: footer version strings use shortened format that an exact-version grep silently skips, leaving a footer at the old version after release
-  - Source: [CHANGELOG Version Sync Gate In Governance Skills](lessons-learned/process/Lessons_Learned_CHANGELOG_Version_Sync_Gate_In_Governance_Skills.md)
+### Version Files
 
-Never:
-- Modify `commands/` or `core/templates/` without explicit user permission
-- Start a new branch or implementation without explicit "Proceed" or "Start" command
-  - Why: implementing without a plan led to hard-to-reverse scaffolding decisions and out-of-sequence commits that required branch surgery to clean up
-  - Source: [ADR-022 Branch Creation Commands Active Work Guard](decisions/ADR-022-branch-creation-commands-active-work-guard.md)
-- Auto-merge, force-push, or delete branches
-- Commit plan files (`docs/plans/` is gitignored — local-only)
-  - Why: attempting to commit plan files wastes time; git silently ignores them with no error, causing confusion about why nothing is staged
-  - Source: [Plan Files Gitignored Local Only](lessons-learned/process/Lessons_Learned_Plan_Files_Gitignored_Local_Only.md)
-- Skip `--no-verify` or bypass signing unless explicitly asked
-- Use "Update" in a plan for a file that doesn't exist yet — use "Create"
-  - Why: ambiguous language forces a file-existence check during execution that consumes context and delays work; clear language enables immediate action
-- Run namespace grep scans over `docs/plans/` or `.jsonl` chat history files — too many tokens, not executable code
-  - Why: scanning these paths pulls thousands of tokens of non-executable plan text, hitting context limits before reaching actual command files
+Sync all three version files before every push: `package.json`, `.claude-plugin/plugin.json`, `mcp-server/package.json`
+- **Why:** version files silently drifted out of sync during releases, causing inconsistent behavior between the plugin and MCP server
 
-## File Paths and Directory Map
+### Changelog & Docs Feed
+
+- `CHANGELOG.md` — code releases only
+- `docs-updates/YYYY-MM-DD-{slug}.mdx` — docs-only branches only; one post per branch
+- **Why:** during v0.2.1-beta, root CHANGELOG.md was updated but docs/CHANGELOG.md was forgotten, leaving the public docs site showing a changelog that stopped at v0.1.2-beta
+- **Source:** [Dual Changelog Both Must Be Updated](lessons-learned/process/Lessons_Learned_Dual_Changelog_Both_Must_Be_Updated.md)
+
+### Footer Version Grep
+
+Grep for major.minor prefix (e.g., `0\.2\.`) not the exact prior version string — footers may use a shorter format and silently miss an exact-version grep
+- **Why:** footer version strings use a shortened format that an exact-version grep silently skips, leaving a footer at the old version after release
+- **Source:** [CHANGELOG Version Sync Gate In Governance Skills](lessons-learned/process/Lessons_Learned_CHANGELOG_Version_Sync_Gate_In_Governance_Skills.md)
+
+### User-Facing Docs Updates
+
+Update affected docs (README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, CONCEPTS, INSTALL.md) when behavior changes
+- **Why:** doc updates were missed after command and agent changes, leaving guides and CHEAT-SHEET inconsistent with actual behavior
+- **Source:** [ADR-013 Documentation Update Protocol](decisions/ADR-013-documentation-update-protocol.md)
+
+### Pre-PR Doc Verification
+
+Before creating a PR with doc changes: run `git diff HEAD~N -- docs/` for each changed file, check for formatting regressions (stray spaces, broken tables, removed blank lines, wrong agent names), then run `mkdocs build` and confirm no new warnings
+- **Why:** agent-written doc content caused silent regressions (broken tables, stray whitespace) that only showed after push; catching them pre-PR avoids review iteration
+
+---
+
+## Git Workflow
+
+### Branch Naming
+
+- Feature: `v{ver}-{description}`
+- Bug fix: `v{ver}-fix-{description}`
+- Docs-only: `docs-update-{description}`
+
+### Branch Hierarchy & Chaining
+
+Chained branches must branch from their parent, not main — verify parent is fully committed first
+- **Why:** branch-creating commands previously switched context silently mid-implementation, landing commits on the wrong branch
+- **Source:** [Issue Tracking Branch Guard](lessons-learned/process/Lessons_Learned_Issue_Tracking_Branch_Guard.md)
+
+### PR Target Verification
+
+Before creating a PR, verify the target branch is the parent in the chain, not main
+- **Why:** v0.3.3-beta was PRed against main instead of its parent v0.3.2; required a rebase to restore the correct chain
+
+### Commits
+
+- Format: `type(scope): subject` — include `Closes #N` in body
+- Types: `feat` | `fix` | `docs` | `refactor` | `chore` | `perf` | `style` | `test` | `build` | `ci` | `revert`
+
+### PR Policy
+
+Push branches, await user review — never auto-merge, never delete branches, never force-push
+
+### Post-Push Security Scan
+
+After any `git push`: scan output for Dependabot vulnerability notices — stop and surface to user before merging or deploying
+- **Why:** a vulnerability notice appeared in push output and was nearly missed; would have shipped vulnerable dependencies
+- **Known/ignored:** The 4 vulnerabilities on the default branch (2 high, 2 moderate) are Docusaurus dev-dependency issues in `node_modules/` — not runtime vulnerabilities. Do NOT stop or warn on these. Only surface NEW vulnerabilities not on this list.
+
+### Cherry-Pick Safety
+
+After any cherry-pick: verify source branch state before continuing work on either branch
+- **Why:** branch contamination from a cherry-pick required a force push to fix; the sooner caught, the cheaper the fix
+
+---
+
+## Development Workflow
+
+### Plugin Cache & Local Testing
+
+Local `commands/` or `core/` changes are not live during testing; copy files to `~/.claude/plugins/cache/stayinginsync-knowledge-graph/kmgraph/{version}/` then run `/reload-plugins`
+- **Why:** `/reload-plugins` serves from cache, not the local repo; local fixes had no effect until the cache path was discovered during v0.3.0-beta testing
+- **Source:** [Plugin Cache Not Synced From Local Repo](lessons-learned/debugging/Lessons_Learned_Debugging_Plugin_Cache_Not_Synced_From_Local_Repo.md)
+
+### Init Command Parity
+
+After any new step added to `commands/init.md`, immediately check `commands/init-personal-kg.md` for the equivalent step
+- **Why:** Steps 8-9 were missing from init-personal-kg.md after being added to init.md; found during 2026-04-10 testing
+
+### Hook Safety
+
+After installing everything-claude-code (ECC): verify KMGraph's `SessionStart` hook is still present in `hooks/hooks.json` — ECC installer may clobber shared hooks config
+- **Why:** ECC installer silently overwrote hooks.json, dropping KMGraph's SessionStart hook; the session ran without lesson capture for two sessions before the gap was noticed
+
+---
+
+## Knowledge Capture
+
+### When to Capture
+
+- **ADR trigger:** any decision that changes a public interface, deployment method, or core architectural pattern
+- **Lesson trigger:** any bug solved, unexpected behavior discovered, or non-obvious pattern identified
+
+### Search Before Creating (DRY)
+
+Before capturing a new lesson via `/kmgraph:capture-lesson`, search the graph for similar existing lessons — update an existing lesson rather than creating a duplicate
+- **Source:** [Single Source Of Truth DRY Documentation](lessons-learned/patterns/Lessons_Learned_Single_Source_Of_Truth_DRY_Documentation.md)
+
+### Plan-First Rule
+
+Always update the plan before executing, not after. If work is done without a plan entry, add it retroactively and note it was added after the fact.
+
+### Plan File Routing (ADR-029)
+
+Plans stored in `knowledge/` are searchable via `kg_search` and visible in the Obsidian graph:
+- ENH parent → `knowledge/ENH-NNN/vX-plan.md`
+- Issue/bug → `knowledge/issue-NNN/vX-plan.md`
+- Misc (no parent) → `knowledge/plans/vX-plan.md`
+
+**Source:** [ADR-029 Plan File Location](decisions/ADR-029-plan-file-location-in-knowledge-graph.md)
+
+### Capture Checkpoints
+
+Add `/kmgraph:capture-lesson` or `/kmgraph:create-adr` step after each phase of a plan that produces a decision or learning
+
+### Cross-Reference Format
+
+- Internal KMGraph cross-references: `[[filename-without-extension]]` Obsidian wiki link format
+- External GitHub URLs: standard `[#NNN](url)` markdown
+- **Why:** bare text references (`ENH-010`, `ADR-028`) are not navigable in Obsidian or wiki-aware tools; wiki links enable graph view, one-click navigation, and backlink tracking
+
+### Heading Conventions
+
+Do not use numbered headings in knowledge files — use plain headings (e.g., `## Git Workflow` not `## 1. Git Workflow`)
+- **Why:** numbered anchors break silently when sections are reordered; plain anchors (e.g., `#git-workflow`) are stable and safe to link from me.md, lessons, and ADRs
+
+### Cadence & Routing
+
+- Run `/kmgraph:sync-all` at the end of each significant work session
+- Feature/enhancement suggestions: use `/kmgraph:start-issue-tracking` for standalone deferred work; for active plans, offer to add as a new phase rather than creating an informal suggestion
+
+---
+
+## Code Protection
+
+### Protected Paths
+
+| Path | Status |
+|------|--------|
+| `commands/` | PROTECTED — do not modify without explicit permission |
+| `core/templates/` | PROTECTED — do not modify without explicit permission |
+
+---
+
+## Tool Preferences
+
+<!-- Platform-specific tool directives (tool names, MCP plugins, subagent patterns) belong in -->
+<!-- knowledge/platform/<platform>.md — not here. See ADR-032.                                -->
+<!-- Claude Code users: read knowledge/platform/claude.md for Glob/Grep/Bash/context-mode     -->
+<!-- and subagent preferences. This section contains only platform-agnostic preferences.       -->
+
+- Parallel calls: always run independent searches/reads in parallel
+
+---
+
+## File Paths & Directory Map
 
 | Path | Purpose | Committed? |
 |------|---------|------------|
@@ -69,60 +185,6 @@ Never:
 | `knowledge/tmp/` | Scratch files | no (gitignored) |
 | `knowledge/me.md` | Personal identity file | no (gitignored) |
 | `docs/plans/` | Local plan files (working reference) | no (gitignored) |
-
-Protected paths (do not modify without explicit permission):
-- `commands/`
-- `core/templates/`
-
-## Tool Preferences
-
-- File search: Glob and Grep — not Bash find/grep
-- Content search: Grep tool — not rg or grep in Bash
-- Parallel calls: always run independent searches/reads in parallel
-- Avoid: Bash commands producing >20 lines of output — use context-mode MCP tools instead
-- Subagents: use for heavy file exploration to keep main context clean
-
-## Plan Protocol
-
-- Plan location: write to `~/.claude/plans/` first, copy to `docs/plans/` for working reference
-  - Source: [Plan File Dual Location Protocol](lessons-learned/process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md) · [ADR-029 Plan File Location](decisions/ADR-029-plan-file-location-in-knowledge-graph.md)
-- Plan language: use "Create" for new files, "Update" for existing files — never "Update" for files that don't exist yet
-  - Why: "Update" for nonexistent files wastes tokens during execution as the agent tries to determine if the file exists, consuming context before acting
-- Mandatory plan steps (include in every implementation plan): (1) Create branch from correct parent, (2) Create `docs/plans/{filename}.md` copy from `~/.claude/plans/`, (3) implementation steps, (4) Commit, push, PR, merge
-- Capture checkpoints: add `/kmgraph:capture-lesson` or `/kmgraph:create-adr` step after each phase that produces a decision or learning
-- Acceptance criteria: tick plan checkboxes after each phase completes, not at the end
-- Parallel analysis: after writing a plan, identify parallelizable tasks, assign Opus/Sonnet/Haiku per task, and state whether a team is needed
-  - Team needed: 3+ independent tasks that together take >15 min sequentially, or tasks that benefit from model specialization
-  - Team not needed: linear dependency chain, short plan (<5 tasks), or tasks too tightly coupled to parallelize safely
-  - Why: plans were initially written without parallelism analysis, leading to sequential execution of tasks that could have run concurrently
-- Multi-phase plans: create separate phase files for checkpoint management and rate-limit recovery
-  - Why: rate-limit hits during long multi-phase implementations reset context mid-plan, making it hard to resume without re-reading the full plan
-- Open plan file in editor immediately after writing: run `open -a "Visual Studio Code" <path>` (note: `code` is not on PATH — use `open -a`)
-  - Why: user finds it disruptive to ask follow-up questions about whether content was captured; seeing the file live removes that friction
-- Add capture/ADR checkpoints to each phase of every plan
-- When spawning background agents or teams, require a structured completion report before proceeding to the next phase:
-  - Format: phase name + status (COMPLETE / BLOCKED / ERROR) + commit hash(es) + "Safe to proceed: YES / NO"
-  - Never auto-spawn the next phase; wait for explicit "Safe to proceed: YES"
-  - Why: users have no visibility into background agent status; silent spawning creates uncertainty and prevents course-correction
-
-## Communication
-
-- Output style: concise, no emojis unless requested, markdown headers for structure
-- Approval gates: stop after every "Next Steps" summary and wait for explicit confirmation
-- Escalation: if blocked or uncertain after investigation, ask — don't retry blindly or silently switch tactics
-- Do not: interrupt findings with mid-analysis approval prompts — present fully, then ask
-  - Why: mid-analysis approval prompts interrupt the user before they have enough information to evaluate; they cannot give informed consent to continue until they see the full picture
-
-## Knowledge Capture
-
-**Standing rules:**
-
-1. Always update the plan before executing, not after. If work is done without a plan entry, add it retroactively and note it was added after the fact.
-
-2. Before capturing a new lesson via `/kmgraph:capture-lesson`, search the graph for similar existing lessons. Update an existing lesson rather than creating a duplicate.
-  - Source: [Single Source Of Truth DRY Documentation](lessons-learned/patterns/Lessons_Learned_Single_Source_Of_Truth_DRY_Documentation.md)
-
-- ADR trigger: any decision that changes a public interface, deployment method, or core architectural pattern
-- Lesson trigger: any bug solved, unexpected behavior discovered, or non-obvious pattern identified
-- Review cadence: run `/kmgraph:sync-all` at the end of each significant work session
-- Feature/enhancement suggestions: use `/kmgraph:start-issue-tracking` for standalone deferred work; for active plans, offer to add as a new phase rather than creating an informal suggestion
+| `commands/init-shared/` | Shared parameterized modules called by init.md and init-personal-kg.md | yes |
+| `knowledge/ENH-NNN/` | Plans and specs for a specific enhancement (ADR-029) | selective |
+| `knowledge/plans/` | Misc plans with no ENH/issue parent (ADR-029) | selective |

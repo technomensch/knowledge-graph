@@ -954,6 +954,54 @@ to .git/hooks/post-commit and making it executable.
 
 **Note:** Default is "No" for v0.0.3-alpha. Consider changing to "Yes" for v1.0.0 once users have validated the hook behavior.
 
+### Step 1.6.7: Platform directive scaffold (new install only)
+
+Create `knowledge/platform/` and seed `knowledge/platform/claude.md` for Claude Code users. This file is the authoritative home for Claude Code-specific tool directives per ADR-032.
+
+```bash
+mkdir -p "${KG_PATH}platform/"
+
+# Seed platform/claude.md from plugin template if available; create inline otherwise
+if [ -f "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/platform/claude.md" ]; then
+  cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/platform/claude.md" \
+     "${KG_PATH}platform/claude.md"
+else
+  cat > "${KG_PATH}platform/claude.md" << 'PLATFORM_EOF'
+# Platform Directives — Claude Code
+
+This file contains Claude Code-specific tool preferences for this project.
+It is the authoritative home for directives that reference Claude Code tool names.
+**Scope:** Claude Code CLI and desktop app only.
+
+See `knowledge/rules.md` for platform-agnostic rules. See ADR-032 for rationale.
+
+## Tool Preferences
+
+### File and Content Search
+
+- File search: use Glob and Grep tools — not Bash `find` or `grep`
+- Content search: use Grep tool — not `rg` or `grep` in Bash
+
+### Output and Context Management
+
+- Avoid Bash commands producing >20 lines of output — use context-mode MCP tools instead
+- Subagents: use for heavy file exploration to keep main context clean
+
+### Search Scope Restrictions
+
+Never run grep scans over `docs/plans/` or `.jsonl` chat history files
+- **Why:** these paths contain non-executable plan text and chat transcripts — scanning them consumes context without reaching executable code
+PLATFORM_EOF
+fi
+
+echo "✅ Created knowledge/platform/claude.md — Claude Code-specific tool directives."
+echo "   Review and customize: ${KG_PATH}platform/claude.md"
+```
+
+**Note:** This step runs on new installs only. Existing installs detect and migrate via the upgrade-inspector's section d check.
+
+---
+
 ### Step 1.7: Update .gitignore (if git repo exists)
 
 ```bash
