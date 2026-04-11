@@ -97,6 +97,11 @@ See [Getting Started Guide](docs/GETTING-STARTED.md) for prerequisites and troub
 - **init-shared module layer** — Five reusable shared modules extracted; `/kmgraph:init` and `/kmgraph:init-personal-kg` refactored to thin orchestrators
 - **Cross-branch collision detection** — ADR and ENH number collision checks across all branches before assignment
 
+**v0.3.1-beta — 2026-04-10**
+
+- **init-shared module layer** — Five reusable shared modules extracted into `commands/init-shared/`; `/kmgraph:init` and `/kmgraph:init-personal-kg` refactored to thin orchestrators eliminating duplicated scaffold, template-seed, FTS5-rebuild, config-write, and upgrade-inspector logic
+- **upgrade-inspector hardening** — Trimmed to only check verifiable steps; phantom parameter removed; `{preserve_active}` param restored
+
 **v0.3.0-beta — 2026-04-10**
 
 - **Default KG path → `knowledge/`** — New projects initialize at `./knowledge/` instead of `./docs/` to avoid collision with documentation site roots
