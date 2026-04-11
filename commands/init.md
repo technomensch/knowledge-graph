@@ -1201,8 +1201,8 @@ Would you like to backfill the knowledge graph from existing project context? [y
 This will parse:
   • README.md (architecture overview)
   • CHANGELOG.md / docs/CHANGELOG.md (decision history)
-  • Files in docs/lessons-learned/ or docs/decisions/ (existing knowledge)
-  • Chat history files in docs/chat-history/ (if present)
+  • Files in knowledge/lessons-learned/ or knowledge/decisions/ (existing knowledge)
+  • Chat history files in knowledge/chat-history/ (if present)
 
 The knowledge-extractor subagent will suggest new lessons and knowledge entries
 for your review before writing them to the KG.
@@ -1210,7 +1210,7 @@ for your review before writing them to the KG.
 
 **If yes:**
 - Invoke `knowledge-extractor` subagent in "init-backfill" mode
-- Pass list of files to parse (README, CHANGELOG, docs/lessons-learned/, docs/decisions/, docs/chat-history/)
+- Pass list of files to parse (README, CHANGELOG, knowledge/lessons-learned/, knowledge/decisions/, knowledge/chat-history/)
 - Present extracted lesson candidates to user for review
 - Write approved items to knowledge graph
 - Output summary of backfilled entries
