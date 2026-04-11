@@ -54,6 +54,25 @@ Continue to Phase 2.
 
 ## Phase 2: Gather Lesson Context
 
+**Step 2.C: Context-input gate**
+
+Check whether the dispatching skill passed a context payload (`context_provided: true`).
+
+**If context was passed:**
+- Skip Step 2.0 (session summary check) and Step 2.1 (topic prompt)
+- Use the passed values as the pre-filled draft fields:
+  - `problem` → Problem section
+  - `solution` → Solution section
+  - `pattern` → When to apply section
+  - `tags` → tags metadata
+  - `suggested_category` → Category (confirm or override based on topic)
+- Jump directly to Phase 3 (gather git metadata) then Phase 4 (draft display)
+
+**If no context was passed (direct invocation):**
+- Continue to Step 2.0 as normal (existing wizard path)
+
+---
+
 **Step 2.0: Check for today's session summary**
 
 Before asking the user for context, check whether a session summary was written today:
@@ -124,7 +143,27 @@ Present a draft for user review:
 - Category: [category]
 ```
 
-Prompt: "Does this look right? Any edits?" (Allow inline edits.)
+Present the draft and prompt:
+
+> "Here's the lesson I'd capture:
+>
+> [full draft markdown]
+>
+> **Approve** — save as shown
+> **Edit** — tell me what to change
+> **Discard** — don't save this"
+
+**If Approve:**
+1. Dispatch `session-summary-agent --snapshot` with context `triggered by: lesson` — non-blocking; the agent creates today's session file if absent or appends if present. Do not wait for it to complete before proceeding.
+2. Proceed to Phase 4.5 (KG destination).
+
+**If Edit:**
+- Ask: "What would you like to change?" (free-form — e.g., "the solution is wrong, it was actually X" or "change the category to architecture")
+- Apply the correction to the relevant field(s)
+- Re-display the full updated draft with the same Approve / Edit / Discard prompt
+- Repeat until user selects Approve or Discard
+
+**If Discard:** Stop. Confirm: "Lesson discarded — nothing was saved."
 
 ---
 

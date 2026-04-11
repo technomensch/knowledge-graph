@@ -29,6 +29,7 @@ Always:
   - Why: agent-written doc content caused silent regressions (broken tables, stray whitespace) that only showed after push; catching them pre-PR avoids review iteration
 - After any `git push`: scan output for Dependabot vulnerability notices — stop and surface to user before merging or deploying
   - Why: a vulnerability notice appeared in push output and was nearly missed; would have shipped vulnerable dependencies
+  - Known/ignored: The 4 vulnerabilities on the default branch (2 high, 2 moderate) are Docusaurus dev-dependency issues in `node_modules/` — not runtime vulnerabilities, not introduced by KMGraph code. Do NOT stop or warn on these. Only surface NEW vulnerabilities not on this list.
 - After installing everything-claude-code (ECC): verify KMGraph's `SessionStart` hook is still present in `hooks/hooks.json` — ECC installer may clobber shared hooks config
   - Why: ECC installer silently overwrote hooks.json, dropping KMGraph's SessionStart hook; the session ran without lesson capture for two sessions before the gap was noticed
 - When version-syncing doc footers: grep for major.minor prefix (e.g., `0\.2\.`) not the exact prior version string — footers may use a shorter format and silently miss an exact-version grep

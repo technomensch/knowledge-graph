@@ -45,6 +45,7 @@ Parameters:
 - `{kg_name}` = "personal"
 - `{KG_TYPE}` = "personal"
 - `{categories}` = ["architecture", "debugging", "patterns", "process"]
+- `{preserve_active}` = true
 
 **After upgrade-inspector completes (Option 1), always continue to Step 8 (content migration) and Step 9 (evidence seeding).** These run independently of the template upgrade check — an up-to-date template install does not mean me.md/rules.md have been populated.
 
@@ -201,6 +202,88 @@ Would you like help populating them from your global ~/.claude/CLAUDE.md?
 **Safety rules:** Never auto-write. User confirms per section. If `~/.claude/CLAUDE.md` does not exist, skip silently.
 
 **Skip this step** if `me.md` already has substantial content (more than the template placeholder text) — the user has already populated it manually.
+
+---
+
+### Step 8.1: Obsidian wiki link pass
+
+Run this step as content enrichment on every init/upgrade for personal KGs that do not yet have `wiki_pass_complete: true` in their config entry. This step is NOT gated on migration (personal KGs are never migrated).
+
+**Trigger:** Skip this step only if the config entry for this personal KG already has `wiki_pass_complete: true`. Otherwise, always proceed.
+
+**Pre-pass: Build ADR number → filename map**
+
+Before any substitution, scan `{personal_kg_path}/decisions/` and build a lookup table:
+
+```bash
+# Build map: ADR number → full basename (without extension)
+declare -A ADR_MAP
+declare -A ADR_COLLISION
+
+for f in "$personal_kg_path/decisions"/ADR-*.md; do
+  [ -e "$f" ] || continue
+  basename_noext=$(basename "$f" .md)
+  num=$(echo "$basename_noext" | grep -oE '^ADR-[0-9]+')
+  if [ -n "${ADR_MAP[$num]:-}" ]; then
+    ADR_COLLISION[$num]=1
+    echo "⚠️  ADR number collision: $num maps to both ${ADR_MAP[$num]} and $basename_noext — skipping substitution for $num"
+  else
+    ADR_MAP[$num]="$basename_noext"
+  fi
+done
+```
+
+Any number in `ADR_COLLISION` is skipped during substitution with a warning.
+
+**GitHub repo URL:** Read from `git remote get-url origin` (run from the personal KG root), strip `.git`, append `/issues/`. If no remote is configured, skip `#NNN` substitution entirely and log: `ℹ️  No git remote detected — skipping GitHub issue link substitution.`
+
+**Scope:** Process only `.md` files under these four subdirectories:
+- `{personal_kg_path}/lessons-learned/`
+- `{personal_kg_path}/decisions/`
+- `{personal_kg_path}/sessions/`
+- `{personal_kg_path}/concepts/`
+
+Never touch `chat-history/` or files outside these four directories.
+
+**For each `.md` file in scope:**
+
+Skip the file if:
+- It is a symlink (skip with warning: `⚠️  Skipping symlink: {path}`)
+- Its filename matches `*template*`
+
+Processing:
+1. Parse the file and mark NO-SUBSTITUTE zones: YAML frontmatter (opening `---` to closing `---` at file top), triple-backtick code blocks, 4-space indented code blocks, inline backtick spans, existing wiki links (`[[...]]`), existing markdown links (`[...](...)`  or `[...][...]`), and heading lines (lines starting with one or more `#` characters).
+
+2. In body text only (outside all NO-SUBSTITUTE zones), apply substitutions in this order:
+   - **a. ENH references:** Replace bare `ENH-NNN` → `[[ENH-NNN]]`
+   - **b. ADR references:** Replace bare `ADR-NNN` (not in `ADR_COLLISION`) → `[[{ADR_MAP[ADR-NNN]}]]` (full filename from pre-pass map). Skip with warning if collision or if number not in map.
+   - **c. GitHub issues:** Replace bare `#NNN` (not in a heading, not in inline code) → `[#NNN]({GITHUB_ISSUES_URL}/NNN)`. Skip entirely if no git remote.
+   - **d. Lesson filenames:** Replace bare `Lessons_Learned_X` or `Lessons_Learned_X.md` → `[[Lessons_Learned_X]]` (build match list from `Lessons_Learned_*` filenames in `lessons-learned/` at scan time).
+
+3. Write back ONLY if content changed:
+   ```bash
+   # Atomic write — prevents truncation on crash
+   printf '%s' "$new_content" > "${file}.tmp"
+   mv "${file}.tmp" "${file}"
+   ```
+
+**On completion:**
+
+```
+✅ Wiki links applied to N files. (M files unchanged)
+```
+
+Write `wiki_pass_complete: true` to the KG config entry:
+
+```bash
+jq '.graphs["personal"].wiki_pass_complete = true' \
+  ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+```
+
+If the personal KG has no content files yet (fresh install), exit cleanly with `0 files modified` — no error.
+
+**`--dry-run` mode (optional):** Print what would change per file without writing anything and do not set the `wiki_pass_complete` flag.
 
 ---
 

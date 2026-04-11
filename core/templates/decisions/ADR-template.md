@@ -27,9 +27,9 @@ git:  # [FUTURE-AUTO] All git metadata detected automatically
 implements: [version or null]  # [MANUAL] Optional: Version or feature this applies to (e.g., "v2.0.0")
 
 related:  # [MANUAL] Optional: Links to related ADRs, lessons, KG entries
-  adrs: []  # List of related ADR numbers (e.g., [1, 3, 5])
-  lessons: []  # Links to lessons-learned files
-  kg_entries: []  # Links to knowledge graph entries
+  adrs: []  # e.g. ["[[ADR-001-use-postgresql]]", "[[ADR-002-title]]"]
+  lessons: []  # e.g. ["[[Lessons_Learned_filename]]"]
+  kg_entries: []  # e.g. ["[[concept-name]]"]
 
 tags: []  # [MANUAL] Custom tags for searching (e.g., [database, architecture, postgresql])
 

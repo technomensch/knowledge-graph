@@ -202,6 +202,8 @@ grep -i "[pattern name]" ${kg_path}/knowledge/gotchas.md
 **Related:** [Link to related patterns/ADRs]
 ```
 
+**Cross-Reference Format:** Generated knowledge entries use Obsidian wiki link syntax for internal KMGraph links: `[[filename-without-extension]]` for lessons and patterns, `[[ADR-028-rules-md-scaffolding]]` for full ADR filenames (never abbreviated). Use standard markdown `[#NNN](url)` for GitHub issues and PRs. Never use wiki links for external URLs.
+
 **Category placement logic:**
 
 | Category | Indicators |
