@@ -492,6 +492,87 @@ fi
 
 **Safety constraint:** Only named KMGraph subdirectories (`lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`, `tmp/`) and root scaffold files (`me.md`, `rules.md`, `kg-index.md`) are moved. Never touch other `docs/` contents. Symlinked subdirs are skipped with a warning.
 
+#### 1f.2. Obsidian wiki link pass
+
+**Trigger:** Run this step if either of the following is true:
+1. Migration ran in Step 1f.1 during this session (migration just completed), OR
+2. The KG config entry has no `wiki_pass_complete: true` flag AND the configured path is already `knowledge/` (prior migration detected — first upgrade to v0.3.3)
+
+If neither condition is true, skip this step entirely (`wiki_pass_complete` is already set).
+
+**Pre-pass: Build ADR number → filename map**
+
+Before any substitution, scan `{KG_PATH}/decisions/` and build a lookup table:
+
+```bash
+# Build map: ADR number → full basename (without extension)
+declare -A ADR_MAP
+declare -A ADR_COLLISION
+
+for f in "$KG_PATH/decisions"/ADR-*.md; do
+  [ -e "$f" ] || continue
+  basename_noext=$(basename "$f" .md)
+  num=$(echo "$basename_noext" | grep -oE '^ADR-[0-9]+')
+  if [ -n "${ADR_MAP[$num]:-}" ]; then
+    # Collision — two files share the same number
+    ADR_COLLISION[$num]=1
+    echo "⚠️  ADR number collision: $num maps to both ${ADR_MAP[$num]} and $basename_noext — skipping substitution for $num"
+  else
+    ADR_MAP[$num]="$basename_noext"
+  fi
+done
+```
+
+Any number in `ADR_COLLISION` is skipped during substitution. Print a warning for each collision so the user can resolve them manually.
+
+**GitHub repo URL:** Read from `git remote get-url origin`, strip `.git`, append `/issues/`. If no remote is configured, skip `#NNN` substitution entirely and log: `ℹ️  No git remote detected — skipping GitHub issue link substitution.`
+
+**Scope:** Process only `.md` files under these four subdirectories:
+- `{KG_PATH}/lessons-learned/`
+- `{KG_PATH}/decisions/`
+- `{KG_PATH}/sessions/`
+- `{KG_PATH}/concepts/`
+
+Never touch `chat-history/` or files outside these four directories.
+
+**For each `.md` file in scope:**
+
+Skip the file if:
+- It is a symlink (skip with warning: `⚠️  Skipping symlink: {path}`)
+- Its filename matches `*template*`
+
+Processing:
+1. Parse the file and mark NO-SUBSTITUTE zones: YAML frontmatter (opening `---` to closing `---` at file top), triple-backtick code blocks, 4-space indented code blocks, inline backtick spans, existing wiki links (`[[...]]`), existing markdown links (`[...](...)`  or `[...][...]`), and heading lines (lines starting with one or more `#` characters).
+
+2. In body text only (outside all NO-SUBSTITUTE zones), apply substitutions in this order:
+   - **a. ENH references:** Replace bare `ENH-NNN` → `[[ENH-NNN]]`
+   - **b. ADR references:** Replace bare `ADR-NNN` (where `ADR-NNN` is not in `ADR_COLLISION`) → `[[{ADR_MAP[ADR-NNN]}]]` (full filename from pre-pass map). Skip with warning if collision or if number not in map.
+   - **c. GitHub issues:** Replace bare `#NNN` (not in a heading, not in inline code) → `[#NNN]({GITHUB_ISSUES_URL}/NNN)`. Skip entirely if no git remote.
+   - **d. Lesson filenames:** Replace bare `Lessons_Learned_X` or `Lessons_Learned_X.md` → `[[Lessons_Learned_X]]` (build match list from `Lessons_Learned_*` filenames in `lessons-learned/` at scan time).
+
+3. Write back ONLY if content changed:
+   ```bash
+   # Atomic write — prevents truncation on crash
+   printf '%s' "$new_content" > "${file}.tmp"
+   mv "${file}.tmp" "${file}"
+   ```
+
+**On completion:**
+
+```
+✅ Wiki links applied to N files. (M files unchanged)
+```
+
+Write `wiki_pass_complete: true` to the KG config entry:
+
+```bash
+jq '.graphs["'"$kg_name"'"].wiki_pass_complete = true' \
+  ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+```
+
+**`--dry-run` mode (optional):** If `--dry-run` was passed to `/kmgraph:init`, print what would change per file without writing anything and do not set the `wiki_pass_complete` flag.
+
 #### 1f. FTS5 index check
 
 The search index (`.fts5.db`) is local-only and gitignored — it does not survive upgrades or fresh clones.
