@@ -41,7 +41,10 @@ Never:
 - Start a new branch or implementation without explicit "Proceed" or "Start" command
   - Why: implementing without a plan led to hard-to-reverse scaffolding decisions and out-of-sequence commits that required branch surgery to clean up
   - Source: [ADR-022 Branch Creation Commands Active Work Guard](decisions/ADR-022-branch-creation-commands-active-work-guard.md)
-- Auto-merge, force-push, or delete branches
+- Auto-merge or force-push branches
+- Delete any branch — locally (`git branch -d/-D`) or on origin (`git push origin --delete` / `gh` branch delete / `--delete-branch` flag on merge) — without explicit user approval first
+  - Why: `gh pr merge --delete-branch` was used during v0.3.3-beta without the user being asked; branch deletion is irreversible without a reflog recovery
+  - How to apply: always omit `--delete-branch` from merge commands; if a branch cleanup is needed, list the candidates and wait for the user to confirm each one
 - Commit plan files (`docs/plans/` is gitignored — local-only)
   - Why: attempting to commit plan files wastes time; git silently ignores them with no error, causing confusion about why nothing is staged
   - Source: [Plan Files Gitignored Local Only](lessons-learned/process/Lessons_Learned_Plan_Files_Gitignored_Local_Only.md)
