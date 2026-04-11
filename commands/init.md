@@ -694,6 +694,22 @@ If the user selects **Yes**, run `/kmgraph:update-graph --auto --sync-all`. The 
 No action needed — your KG is ready to use.
 ```
 
+#### 1i. Post-upgrade archive size check
+
+After the upgrade inspection completes (section 1h), silently calculate the total disk usage of all migration archive directories across both scopes:
+
+```bash
+TOTAL_BYTES=$(du -sb "${KG_PATH}/.kg-archive-"*/ "$HOME/.kmgraph/.kg-archive-"*/ 2>/dev/null \
+              | awk '{sum += $1} END {print sum+0}')
+TOTAL_MB=$(echo "$TOTAL_BYTES / 1048576" | bc)
+```
+
+- If total > 10 MB: print the following (substituting the actual MB value):
+  > Note: Migration archives are taking up `X` MB. Run `/kmgraph:migration purge --older-than 30` to clean up.
+- If total ≤ 10 MB or no archive directories exist: silent (no output).
+
+---
+
 ### Options 2–4
 
 - **Option 2 (Create new):** Proceed to the full wizard (Step 1 below) with a different name.
