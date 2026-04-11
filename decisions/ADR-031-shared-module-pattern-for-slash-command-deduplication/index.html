@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-decisions/ADR-031-shared-module-pattern-for-slash-command-deduplication" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">ADR-031: Shared Module Pattern for Slash Command Deduplication | Knowledge Management Graph</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://technomensch.github.io/knowledge-graph/decisions/ADR-031-shared-module-pattern-for-slash-command-deduplication"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="ADR-031: Shared Module Pattern for Slash Command Deduplication | Knowledge Management Graph"><meta data-rh="true" name="description" content="Date: 2026-04-10"><meta data-rh="true" property="og:description" content="Date: 2026-04-10"><link data-rh="true" rel="icon" href="/knowledge-graph/img/square.png"><link data-rh="true" rel="canonical" href="https://technomensch.github.io/knowledge-graph/decisions/ADR-031-shared-module-pattern-for-slash-command-deduplication"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/decisions/ADR-031-shared-module-pattern-for-slash-command-deduplication" hreflang="en"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/decisions/ADR-031-shared-module-pattern-for-slash-command-deduplication" hreflang="x-default"><link rel="alternate" type="application/rss+xml" href="/knowledge-graph/docs-updates/rss.xml" title="KMGraph Docs Updates RSS Feed">
+<link rel="alternate" type="application/atom+xml" href="/knowledge-graph/docs-updates/atom.xml" title="KMGraph Docs Updates Atom Feed"><link rel="stylesheet" href="/knowledge-graph/assets/css/styles.295a293b.css">
+<script src="/knowledge-graph/assets/js/runtime~main.0c46c77c.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/main.7db295d2.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||"dark"),document.documentElement.setAttribute("data-theme-choice",t||"dark")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/knowledge-graph/"><div class="navbar__logo"><img src="/knowledge-graph/img/avatar.png" alt="Staying in Sync" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/knowledge-graph/img/avatar.png" alt="Staying in Sync" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate">KMGraph</b></a><a class="navbar__item navbar__link" href="/knowledge-graph/quickstart">Getting Started</a><a class="navbar__item navbar__link" href="/knowledge-graph/CONCEPTS">Concepts</a><a class="navbar__item navbar__link" href="/knowledge-graph/COMMAND-GUIDE">Commands</a><a class="navbar__item navbar__link" href="/knowledge-graph/CONFIGURATION">Configuration</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/technomensch/knowledge-graph" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link header-github-link" aria-label="GitHub repository"></a><a href="https://www.linkedin.com/in/marckaplan/" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link header-linkedin-link" aria-label="LinkedIn profile"></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="system mode" aria-label="Switch between dark and light mode (currently system mode)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"><div>Loading Search...</div></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><main class="docMainContainer_TBSr docMainContainerEnhanced_lQrH"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>ADR-031: Shared Module Pattern for Slash Command Deduplication</h1></header>
+<p><strong>Date:</strong> 2026-04-10
+<strong>Status:</strong> Accepted
+<strong>Implements:</strong> v0.3.1
+<strong>Related:</strong> None</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="context">Context<a href="#context" class="hash-link" aria-label="Direct link to Context" title="Direct link to Context" translate="no">​</a></h2>
+<p><code>commands/init.md</code> and <code>commands/init-personal-kg.md</code> contained large duplicated instruction blocks covering the same logic: upgrade detection, directory scaffolding, template seeding, FTS5 index rebuild, and config entry writing. Any change to this shared logic required parallel edits in both files, creating maintenance risk and drift. The commands are markdown instruction files followed by Claude — not compiled code — so there is no native import or include mechanism.</p>
+<p><strong>Problem:</strong></p>
+<ul>
+<li class="">Duplicated instruction blocks across two command files required paired edits for every logic change</li>
+<li class="">Drift between the two files was a persistent risk with no structural enforcement</li>
+<li class="">No native module/include mechanism exists for Claude markdown instruction files</li>
+</ul>
+<p><strong>Scope:</strong></p>
+<ul>
+<li class="">In scope: <code>commands/init.md</code>, <code>commands/init-personal-kg.md</code>, and the five new shared modules under <code>commands/init-shared/</code></li>
+<li class="">Out of scope: other command files not sharing logic with init commands</li>
+<li class="">Constraint: solution must work within Claude&#x27;s markdown instruction execution model</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="decision">Decision<a href="#decision" class="hash-link" aria-label="Direct link to Decision" title="Direct link to Decision" translate="no">​</a></h2>
+<p>Extract duplicated instruction blocks into parameterized shared module files under <code>commands/init-shared/</code>. Each module file begins with a parameter contract table listing the variables it expects. Parent commands invoke a module by instructing Claude to read the shared file and execute it with named parameter values.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="core-components">Core Components<a href="#core-components" class="hash-link" aria-label="Direct link to Core Components" title="Direct link to Core Components" translate="no">​</a></h3>
+<ol>
+<li class=""><strong><code>upgrade-inspector.md</code>:</strong> Detects whether an existing KG installation requires upgrade, and what version it is upgrading from</li>
+<li class=""><strong><code>directory-scaffold.md</code>:</strong> Creates the required directory structure for a new or upgraded KG</li>
+<li class=""><strong><code>template-seed.md</code>:</strong> Seeds template files from <code>core/templates/</code> into the active KG path</li>
+<li class=""><strong><code>fts5-rebuild.md</code>:</strong> Rebuilds the FTS5 full-text search index</li>
+<li class=""><strong><code>config-entry-write.md</code>:</strong> Writes or updates the KG config entry in <code>~/.claude/kg-config.json</code></li>
+</ol>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="implementation-approach">Implementation Approach<a href="#implementation-approach" class="hash-link" aria-label="Direct link to Implementation Approach" title="Direct link to Implementation Approach" translate="no">​</a></h3>
+<p>Parent commands (<code>init.md</code>, <code>init-personal-kg.md</code>) are reduced to stubs that set named parameters and instruct Claude to read and execute each shared module in sequence. Each module opens with a parameter contract table (e.g., <code>KG_PATH</code>, <code>KG_NAME</code>) so the interface is explicit and verifiable before execution.</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="rationale">Rationale<a href="#rationale" class="hash-link" aria-label="Direct link to Rationale" title="Direct link to Rationale" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="why-this-approach">Why This Approach<a href="#why-this-approach" class="hash-link" aria-label="Direct link to Why This Approach" title="Direct link to Why This Approach" translate="no">​</a></h3>
+<ol>
+<li class=""><strong>Single source of truth:</strong> Each shared behavior is written once and updated once; no parallel edits required</li>
+<li class=""><strong>Explicit parameter contracts:</strong> Module interface is declared at the top of each file, making dependencies verifiable</li>
+<li class=""><strong>Copy-verbatim-then-minimize-diffs:</strong> Preserves original prose and reduces token cost versus full rewrites</li>
+</ol>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="alternatives-considered">Alternatives Considered<a href="#alternatives-considered" class="hash-link" aria-label="Direct link to Alternatives Considered" title="Direct link to Alternatives Considered" translate="no">​</a></h3>
+<p><strong>Option A: Keep duplication, use comments to flag paired files</strong></p>
+<ul>
+<li class="">Pros: No structural change required; simpler to understand at a glance</li>
+<li class="">Cons: Relies on discipline rather than structure; drift is not prevented, only flagged</li>
+<li class="">Rejected because: enforcement is not structural — any edit that misses the comment pairing creates silent drift</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="trade-offs">Trade-offs<a href="#trade-offs" class="hash-link" aria-label="Direct link to Trade-offs" title="Direct link to Trade-offs" translate="no">​</a></h3>
+<p><strong>Benefits:</strong></p>
+<ul>
+<li class="">Changes to shared logic (e.g., a new upgrade check) only require editing one file</li>
+<li class="">Parameter contracts make module dependencies explicit and reviewable</li>
+<li class="">Reduces total token load for both parent commands</li>
+</ul>
+<p><strong>Costs:</strong></p>
+<ul>
+<li class="">Slight indirection — readers of <code>init.md</code> must follow a stub to understand the full flow</li>
+<li class="">Bash array notation in module bodies (<code>{categories[@]}</code>) is instructional pseudo-code, not real shell; callers must expand correctly</li>
+</ul>
+<p><strong>Mitigation:</strong></p>
+<ul>
+<li class="">A future lesson-learned capture will document the pseudo-code array expansion requirement to prevent misuse</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="consequences">Consequences<a href="#consequences" class="hash-link" aria-label="Direct link to Consequences" title="Direct link to Consequences" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="positive">Positive<a href="#positive" class="hash-link" aria-label="Direct link to Positive" title="Direct link to Positive" translate="no">​</a></h3>
+<ol>
+<li class=""><strong>Reduced maintenance surface:</strong> Shared logic changes propagate automatically to both init commands</li>
+<li class=""><strong>Explicit interfaces:</strong> Parameter contract tables make it clear what each module requires before execution</li>
+<li class=""><strong>Token efficiency:</strong> Parent command stubs are smaller; Claude reads only the modules needed per invocation</li>
+</ol>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="negative">Negative<a href="#negative" class="hash-link" aria-label="Direct link to Negative" title="Direct link to Negative" translate="no">​</a></h3>
+<ol>
+<li class=""><strong>Indirection:</strong> The full init flow is no longer readable in a single file; readers must follow cross-file references</li>
+<li class=""><strong>Pseudo-code risk:</strong> Array expansion in module bodies is instructional, not executable shell — callers must handle correctly</li>
+</ol>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="neutral">Neutral<a href="#neutral" class="hash-link" aria-label="Direct link to Neutral" title="Direct link to Neutral" translate="no">​</a></h3>
+<ol>
+<li class=""><strong>Residual overlap:</strong> Two modules (<code>upgrade-inspector</code> and <code>config-entry-write</code>) still contain overlapping &quot;config field backfill&quot; logic — a v0.3.2 cleanup candidate</li>
+</ol>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="implementation">Implementation<a href="#implementation" class="hash-link" aria-label="Direct link to Implementation" title="Direct link to Implementation" translate="no">​</a></h2>
+<p><strong>Timeline:</strong> Implemented in branch <code>v0.3.1-init-shared-refactor</code></p>
+<p><strong>Affected Components:</strong></p>
+<ul>
+<li class=""><code>commands/init.md</code></li>
+<li class=""><code>commands/init-personal-kg.md</code></li>
+<li class=""><code>commands/init-shared/upgrade-inspector.md</code> (new)</li>
+<li class=""><code>commands/init-shared/directory-scaffold.md</code> (new)</li>
+<li class=""><code>commands/init-shared/template-seed.md</code> (new)</li>
+<li class=""><code>commands/init-shared/fts5-rebuild.md</code> (new)</li>
+<li class=""><code>commands/init-shared/config-entry-write.md</code> (new)</li>
+</ul>
+<p><strong>Migration Path:</strong>
+No migration required for end users for the shared module refactor itself.</p>
+<p><strong>Amendment (2026-04-10): Cross-reference rewrite added to path migration</strong></p>
+<p>The <code>docs/ → knowledge/</code> migration execution in <code>commands/init.md</code> (section 1f.1) previously moved files and updated <code>.gitignore</code> but left internal markdown cross-references pointing at old <code>docs/</code> paths, silently breaking any <code>[link](docs/lessons-learned/...)</code> in KG files, CLAUDE.md, or README.md. A new step <code>e2</code> has been added to the migration block that runs a <code>find | sed</code> pass over all migrated <code>.md</code> files plus CLAUDE.md and README.md, rewriting <code>docs/{subdir}/</code> to <code>knowledge/{subdir}/</code>. MEMORY.md entries (under <code>~/.claude/projects/</code>) cannot be auto-rewritten and a warning is emitted instead.</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="validation">Validation<a href="#validation" class="hash-link" aria-label="Direct link to Validation" title="Direct link to Validation" translate="no">​</a></h2>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li class="">Both <code>init.md</code> and <code>init-personal-kg.md</code> invoke shared modules rather than containing duplicated blocks</li>
+<li class="">Each shared module begins with a parameter contract table</li>
+<li class="">A two-stage review (Sonnet then Opus) confirmed correctness before merge</li>
+</ul>
+<p><strong>Review Date:</strong> Reassess at v0.4.0 — consider whether additional commands can adopt this pattern</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="related-decisions">Related Decisions<a href="#related-decisions" class="hash-link" aria-label="Direct link to Related Decisions" title="Direct link to Related Decisions" translate="no">​</a></h2>
+<p>None</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="related-documentation">Related Documentation<a href="#related-documentation" class="hash-link" aria-label="Direct link to Related Documentation" title="Direct link to Related Documentation" translate="no">​</a></h2>
+<p><strong>Knowledge Graph:</strong></p>
+<ul>
+<li class="">None</li>
+</ul>
+<p><strong>Lessons Learned:</strong></p>
+<ul>
+<li class="">Lesson to be captured separately covering pseudo-code array expansion in module bodies</li>
+</ul>
+<p><strong>Implementation:</strong></p>
+<ul>
+<li class=""><code>commands/init-shared/</code> directory — five shared module files</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="future-considerations">Future Considerations<a href="#future-considerations" class="hash-link" aria-label="Direct link to Future Considerations" title="Direct link to Future Considerations" translate="no">​</a></h2>
+<ol>
+<li class=""><strong>v0.3.2 cleanup:</strong> Consolidate overlapping config field backfill logic in <code>upgrade-inspector</code> and <code>config-entry-write</code> modules</li>
+<li class=""><strong>Pattern expansion:</strong> Evaluate whether other command pairs (e.g., <code>capture-lesson</code> variants) benefit from the same shared module pattern</li>
+</ol>
+<hr>
+<p><strong>Decision Made:</strong> 2026-04-10
+<strong>Last Updated:</strong> 2026-04-10 (amended: cross-reference rewrite added to path migration)
+<strong>Status:</strong> Accepted</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-tags-row"><div class="col"><b>Tags:</b><ul class="tags_jXut padding--none margin-left--sm"><li class="tag_QGVx"><a rel="tag" class="tag_zVej tagRegular_sFm0" href="/knowledge-graph/tags/architecture">architecture</a></li></ul></div></div><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_WFHX"><a href="https://github.com/technomensch/knowledge-graph/edit/main/docs/decisions/ADR-031-shared-module-pattern-for-slash-command-deduplication.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_JAkA"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#context" class="table-of-contents__link toc-highlight">Context</a></li><li><a href="#decision" class="table-of-contents__link toc-highlight">Decision</a><ul><li><a href="#core-components" class="table-of-contents__link toc-highlight">Core Components</a></li><li><a href="#implementation-approach" class="table-of-contents__link toc-highlight">Implementation Approach</a></li></ul></li><li><a href="#rationale" class="table-of-contents__link toc-highlight">Rationale</a><ul><li><a href="#why-this-approach" class="table-of-contents__link toc-highlight">Why This Approach</a></li><li><a href="#alternatives-considered" class="table-of-contents__link toc-highlight">Alternatives Considered</a></li><li><a href="#trade-offs" class="table-of-contents__link toc-highlight">Trade-offs</a></li></ul></li><li><a href="#consequences" class="table-of-contents__link toc-highlight">Consequences</a><ul><li><a href="#positive" class="table-of-contents__link toc-highlight">Positive</a></li><li><a href="#negative" class="table-of-contents__link toc-highlight">Negative</a></li><li><a href="#neutral" class="table-of-contents__link toc-highlight">Neutral</a></li></ul></li><li><a href="#implementation" class="table-of-contents__link toc-highlight">Implementation</a></li><li><a href="#validation" class="table-of-contents__link toc-highlight">Validation</a></li><li><a href="#related-decisions" class="table-of-contents__link toc-highlight">Related Decisions</a></li><li><a href="#related-documentation" class="table-of-contents__link toc-highlight">Related Documentation</a></li><li><a href="#future-considerations" class="table-of-contents__link toc-highlight">Future Considerations</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Docs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/quickstart">Getting Started</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/COMMAND-GUIDE">Command Guide</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/CHEAT-SHEET">Cheat Sheet</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/FAQ">FAQ</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/technomensch/knowledge-graph" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://www.linkedin.com/in/marckaplan/" target="_blank" rel="noopener noreferrer" class="footer__link-item">LinkedIn<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://buymeacoffee.com/technomensch" target="_blank" rel="noopener noreferrer" class="footer__link-item">Buy Me a Coffee<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="margin-bottom--sm"><a href="https://github.com/technomensch/knowledge-graph" rel="noopener noreferrer" class="footerLogoLink_BH7S"><img src="/knowledge-graph/img/banner.jpeg" alt="Staying in Sync" class="footer__logo themedComponent_mlkZ themedComponent--light_NVdE" width="160"><img src="/knowledge-graph/img/banner.jpeg" alt="Staying in Sync" class="footer__logo themedComponent_mlkZ themedComponent--dark_xIcU" width="160"></a></div><div class="footer__copyright">Staying in Sync</div></div></div></footer></div>
+</body>
+</html>
