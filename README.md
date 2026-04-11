@@ -2,8 +2,8 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.3.3-beta
-**Status:** Beta Release — Obsidian Wiki Links, Path Migration, me.md/rules.md Scaffold
+**Version:** 0.3.4-beta
+**Status:** Beta Release — Behavioral Rule Live-Capture, 4-Target rules/me System
 
 Documentation: https://kmgraph.stayinginsync.info
 
@@ -85,6 +85,12 @@ See [Getting Started Guide](docs/GETTING-STARTED.md) for prerequisites and troub
 
 ## v0.3.x Feature Highlights
 
+**v0.3.4-beta — 2026-04-10**
+
+- **`rules-capture` skill** — Detects implicit behavioral corrections ("always X", "never X", "from now on X", "I prefer X") mid-session and offers to write them to one of four authoritative targets: `knowledge/rules.md` (project rule), `knowledge/me.md` (project personal), `~/.claude/knowledge-graph/rules.md` (personal rule), or `~/.claude/knowledge-graph/me.md` (personal style). Suggestion appended inline with 4-target shortcut menu.
+- **`rules-capture-agent`** — Dedup check, house-style draft (Always/Never + Why/Source), Approve/Edit/Discard loop, atomic write, and MEMORY.md pointer stub.
+- **MEMORY.md feedback backfill** — `/kmgraph:init` upgrade flow now offers to migrate behavioral rules from MEMORY.md feedback entries into `knowledge/rules.md` with per-entry preview and confirmation.
+
 **v0.3.3-beta — 2026-04-10**
 
 - **Obsidian wiki link pass** — `/kmgraph:init` and `/kmgraph:init-personal-kg` automatically convert bare cross-references (`ENH-010`, `ADR-028`, `#123`, `Lessons_Learned_X`) to `[[wiki link]]` format for Obsidian graph navigation and backlink tracking
@@ -155,7 +161,8 @@ knowledge-graph/
 
 See [ROADMAP.md](ROADMAP.md) for detailed version history and development progress.
 
-**Current Release:** v0.3.3-beta (2026-04-10)
+**Current Release:** v0.3.4-beta (2026-04-10)
+- ✅ Behavioral rule live-capture — `rules-capture` skill + agent with 4-target routing
 - ✅ Obsidian wiki link pass with ADR collision detection and atomic writes
 - ✅ Draft-and-approve UX for lesson capture and ADR creation
 - ✅ init-shared module layer — thin command orchestrators with shared modules
@@ -167,11 +174,11 @@ See [ROADMAP.md](ROADMAP.md) for detailed version history and development progre
 - ⚠️ Beta status: API subject to breaking changes before v1.0.0 stable
 
 **Recent Versions:**
+- v0.3.4-beta (Apr 10): Behavioral rule live-capture, rules-capture skill + agent, 4-target routing
 - v0.3.3-beta (Apr 10): Obsidian wiki links, ADR collision detection, atomic writes, personal KG pass
 - v0.3.2-beta (Apr 10): Draft-and-approve UX, init-shared modules, cross-branch collision detection
 - v0.3.1-beta (Apr 10): init-shared module extraction, upgrade-inspector hardening
 - v0.3.0-beta (Apr 10): Default path `knowledge/`, guided migration, me.md/rules.md scaffold
-- v0.2.3-beta (Mar 31): FTS5 relocation, ECC compatibility, capture-router, issue tracking UX
 
 **Next:** v0.4.x — Expanded wiki link coverage (kebab-case lesson files), automated knowledge graph extraction improvements
 
@@ -264,7 +271,7 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Phase:** Beta Release Cycle (v0.3.3-beta)
+**Current Phase:** Beta Release Cycle (v0.3.4-beta)
 **Next Milestone:** v0.4.x — Expanded wiki link coverage and knowledge graph improvements
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info
