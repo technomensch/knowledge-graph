@@ -22,6 +22,89 @@ If invoked without this payload (e.g., direct command), immediately ask:
 - personal-rule → ~/.kmgraph/rules.md (cross-project process rule)
 - personal-me → ~/.kmgraph/me.md (identity/style across all projects)"
 
+## Phase 0: Platform Detection
+
+Run this detection block once at the start of each invocation, before Phase 1. Detection result is a conceptual struct: `{platform: string, agents_present: bool}`.
+
+`platform` is one of: `claude-code`, `gemini`, `cursor`, `windsurf`, `copilot`, `zed`, `claude-code-web`, `unknown`.
+`agents_present` is true when `AGENTS.md` (or a recognized case variant) is found at project root, regardless of which platform is detected.
+
+### Step 1: Resolve project root
+
+Walk up from cwd until a `.git/` directory is found. If none found, use cwd as root. All paths below are relative to this root.
+
+### Step 2: Check for AGENTS.md (set agents_present flag — independent of platform detection)
+
+Use Glob to look for `AGENTS.md`, `agents.md`, `Agents.md` at project root.
+- If the canonical `AGENTS.md` is found: set `agents_present = true`.
+- If only a wrong-case variant (`agents.md` or `Agents.md`) is found: set `agents_present = true` AND record a warning: "Found `agents.md` — the AGENTS.md spec requires uppercase `AGENTS.md`. Rename to activate for all tool adopters."
+- If none found: set `agents_present = false`.
+
+### Step 3: Detect platform using the 9-level priority table (check in order; use first match)
+
+**Priority 1 — Claude Code:** Check whether a `.claude/` directory exists at project root (Glob: `.claude/`).
+- If present: `platform = "claude-code"`. Config target: `CLAUDE.md`.
+
+**Priority 2 — Gemini:** Check whether `GEMINI.md` or `AGENT.md` exists at project root. Also check wrong-case variants `gemini.md`, `Gemini.md`, `agent.md`, `Agent.md`.
+- If canonical uppercase file found: `platform = "gemini"`. Config target: `GEMINI.md`.
+- If only wrong-case variant found: `platform = "gemini"` AND record warning: "Found `gemini.md` (or `agent.md`) — Gemini CLI requires uppercase `GEMINI.md`. Rename to activate."
+
+**Priority 3 — Cursor:** Check whether a `.cursor/` directory exists at project root (Glob: `.cursor/`).
+- If present: `platform = "cursor"`. Config target: `.cursor/rules/` (fallback: `.cursorrules`).
+
+**Priority 4 — Windsurf:** Check whether `.windsurfrules` **file** exists at project root. Use `[ -f "$root/.windsurfrules" ]` (not `-e`) — if `.windsurfrules` is a directory, Windsurf is NOT detected.
+- If a regular file: `platform = "windsurf"`. Config target: `.windsurfrules`.
+
+**Priority 5 — GitHub Copilot:** Check whether `.github/copilot-instructions.md` exists at project root (Glob: `.github/copilot-instructions.md`).
+- If present: `platform = "copilot"`. Config target: `.github/copilot-instructions.md`.
+
+**Priority 6 — Zed:** Check whether a `.zed/` directory OR a `.rules` **file** exists at project root. For `.rules`, use `[ -f "$root/.rules" ]` — if `.rules` is a directory, Zed is NOT detected via that indicator.
+- If either condition is true: `platform = "zed"`. Config target: `.rules`.
+
+**Priority 7 — AGENTS.md only (no other native indicator matched):** `agents_present` was set in Step 2. Platform is not set by this priority level — it contributes only to the `agents_present` flag. `platform` is not assigned at this step — leave it at its current unset value and continue to Priority 8.
+
+**Priority 8 — Claude Code (web / IDE without CLI):** Check whether `CLAUDE.md` exists at project root with no `.claude/` directory (already confirmed absent from priority 1). Also check wrong-case variants `claude.md`, `Claude.md`.
+- If canonical `CLAUDE.md` found: `platform = "claude-code-web"`. Config target: `CLAUDE.md`.
+- If only wrong-case variant found: `platform = "claude-code-web"` AND record warning: "Found `claude.md` — Claude Code requires uppercase `CLAUDE.md`. Rename to activate."
+
+**Priority 9 — Unknown:** No indicator matched in priorities 1–8.
+- `platform = "unknown"`. Route to `knowledge/rules.md` with a note (see Phase 1).
+
+### Step 4: Apply multi-match rules
+
+- **AGENTS.md + a native platform file detected (e.g., `.claude/` + `AGENTS.md`):** This is expected layering. Keep the native platform result; set `agents_present = true`. Do NOT ask the user.
+- **Two native platform files** (e.g., `GEMINI.md` + `.windsurfrules` both present): Genuine ambiguity — ask the user: "I found both `GEMINI.md` and `.windsurfrules`. Which platform should I write this rule to?" Then use the user's answer as the detected platform.
+
+### Step 5: Symlink dedup (before presenting any routing menu)
+
+Before presenting routing targets to the user, check whether the top two candidate target files resolve to the same inode using `realpath -e`:
+
+```bash
+realpath -e "$root/CLAUDE.md"
+realpath -e "$root/AGENTS.md"
+```
+
+- If both commands succeed and return the same path: deduplicate — show only one entry in the routing menu (label it "cross-tool + Claude Code").
+- If `realpath -e` returns an error for either path (dangling symlink, circular chain, permission denied): treat that file as absent for dedup purposes only, and log: "Found broken symlink at `<path>` — treating as absent."
+
+### Step 6: Surface any case-mismatch warnings
+
+If any wrong-case warning was recorded in Steps 2–3, append it to the routing suggestion shown to the user. Example:
+
+```
+ Want me to make this a rule? → CLAUDE.md § Platform Preferences  (Claude Code)
+ ⚠️  Found "claude.md" — Claude Code requires the filename to be "CLAUDE.md" (uppercase).
+    The file is not loaded by Claude Code. Rename it to activate.
+```
+
+Still route the rule to the correct target (the user's intent is clear; the rename is their fix).
+
+### Detection output
+
+After completing Steps 1–6, the detection result `{platform, agents_present}` is available for use in Phase 1 and subsequent phases. Detection is not cached across invocations — LLM context has no persistent state between calls.
+
+---
+
 ## Phase 1: Read target file
 
 Read the full target file based on `target_file` in the payload:
