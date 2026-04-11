@@ -18,6 +18,7 @@
 - "capture a lesson" → handled by `lesson-capture` skill
 - "create an ADR" → handled by `adr-guide` skill
 - "update the doc" / "update [filename]" → handled by `doc-update-router` skill
+- Implicit behavioral corrections without "capture that" vocabulary ("always X", "never X", "from now on X", "don't do X" as a standing rule) → handled by `rules-capture` skill
 
 ## Execution Flow
 
@@ -43,7 +44,7 @@ Apply detection logic in this order:
 
 | Signal | → Type | Subtype | Location Signal |
 |---|---|---|---|
-| Correction, preference, "don't do X", "always/never", behavior rule | **Feedback (memory)** | Feedback | Repo-specific → project; general Claude → user |
+| Correction, preference, "don't do X", "always/never", behavior rule | **Rule/Me** | Route to `rules-capture-agent` with `source_quote` and `session_context`; do not write FEEDBACK file |
 | Ongoing work, deadline, stakeholder, in-progress state, task | **Project (memory)** | Project | Always project-level |
 | External system pointer, URL, tool name + location, reference | **Reference (memory)** | Reference | Always project-level |
 | Bug solved, pattern learned, "next time", "I learned", insight | **Lesson** | N/A | Dispatch to `/kmgraph:capture-lesson` |
