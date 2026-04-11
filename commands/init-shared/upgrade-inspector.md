@@ -217,6 +217,20 @@ Update templates? This will NOT overwrite your existing lessons or decisions.
 
 **Purpose:** Detect and offer to relocate Claude Code-specific tool directives from `rules.md` to the platform's native config file (`CLAUDE.md § Platform Preferences` for project-local KGs; `~/.claude/CLAUDE.md § Platform Preferences` for personal KGs), preserving `rules.md` as platform-agnostic per ADR-032.
 
+**Schema version gate (skip section d if already migrated):**
+
+Before running the contamination grep, check the `kmgraph_schema` field in `{KG_PATH}/rules.md`:
+
+```bash
+SCHEMA_VERSION=$(awk '/^---$/{if(in_front){in_front=0;exit}else{in_front=1;next}} in_front && /^kmgraph_schema:/{gsub(/[^0-9]/,"",$2);print $2;exit}' "{KG_PATH}/rules.md" 2>/dev/null)
+```
+
+If `$SCHEMA_VERSION` is a valid integer and `$SCHEMA_VERSION -ge 2`:
+- Skip section d entirely — print nothing, add no upgrade item.
+- This prevents re-offering platform-split migration on every `/kmgraph:init` run after migration has already completed.
+
+If `$SCHEMA_VERSION` is absent, empty, or non-numeric: treat as absent — proceed with the contamination grep below.
+
 **Detection — content fingerprint only:**
 
 ```bash

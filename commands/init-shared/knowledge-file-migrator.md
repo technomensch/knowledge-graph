@@ -28,6 +28,22 @@ PROJECT_ROOT="{PROJECT_ROOT}"
 
 ---
 
+### Step 0.5: Schema version check (idempotency gate)
+
+Read the `kmgraph_schema` field from `{KG_PATH}/rules.md` YAML frontmatter:
+
+```bash
+SCHEMA_VERSION=$(awk '/^---$/{if(in_front){in_front=0;exit}else{in_front=1;next}} in_front && /^kmgraph_schema:/{gsub(/[^0-9]/,"",$2);print $2;exit}' "{KG_PATH}/rules.md" 2>/dev/null)
+```
+
+If `$SCHEMA_VERSION` is a valid integer and `$SCHEMA_VERSION -ge 2`:
+- Print: `rules.md already at schema v2 — skipping platform-split migration.`
+- Exit this module without making any changes.
+
+If `$SCHEMA_VERSION` is absent, empty, or non-numeric (e.g., `kmgraph_schema: not-a-number`): treat as absent — proceed with migration normally.
+
+---
+
 ### Step 1: Resolve platform config target
 
 ```bash
@@ -125,6 +141,33 @@ else
   printf '\n%s\n' "$COMMENT" >> "$KG_PATH/rules.md"
 fi
 ```
+
+---
+
+### Step 6.5: Write schema version marker to rules.md
+
+Write `kmgraph_schema: 2` to `{KG_PATH}/rules.md` YAML frontmatter. This must run AFTER Step 5 (line deletion) and Step 6 (guidance comment).
+
+```bash
+# Check if frontmatter block already exists (starts with ---)
+if head -1 "{KG_PATH}/rules.md" | grep -qx '---'; then
+  # Frontmatter exists — update or insert the kmgraph_schema field using awk
+  awk '
+    /^---$/ && !in_front { in_front=1; print; next }
+    in_front && /^---$/ {
+      if (!wrote_schema) print "kmgraph_schema: 2"
+      in_front=0; wrote_schema=0; print; next
+    }
+    in_front && /^kmgraph_schema:/ { print "kmgraph_schema: 2"; wrote_schema=1; next }
+    { print }
+  ' "{KG_PATH}/rules.md" > "{KG_PATH}/rules.md.tmp" && mv "{KG_PATH}/rules.md.tmp" "{KG_PATH}/rules.md"
+else
+  # No frontmatter — prepend it
+  printf -- '---\nkmgraph_schema: 2\n---\n\n' | cat - "{KG_PATH}/rules.md" > "{KG_PATH}/rules.md.tmp" && mv "{KG_PATH}/rules.md.tmp" "{KG_PATH}/rules.md"
+fi
+```
+
+Print: `✅ Schema version marker written: kmgraph_schema: 2`
 
 ---
 
