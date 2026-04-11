@@ -47,7 +47,7 @@ After ENH-005:
 - `kg_search` reads from `~/.claude/kg-fts5/{kg-name}.db`
 - `init` verify/upgrade flow detects old `.fts5.db` in project dir and migrates it
 - `.gitignore` entry for `.fts5.db` removed (no longer in project dir)
-- Content path auto-detection: tool checks both `{kgPath}/lessons-learned/` and `{kgPath}/docs/lessons-learned/` and uses whichever exists
+- Content path auto-detection: tool checks both `{kgPath}/lessons-learned/` and `{kgPath}/knowledge/lessons-learned/` and uses whichever exists
 
 ## Requirements
 

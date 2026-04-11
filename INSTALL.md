@@ -149,6 +149,30 @@ Before any content migration runs, the wizard archives the affected files to a t
 
 ---
 
+### After migration: cleaning up leftover docs/ directories
+
+After a successful docs/ → knowledge/ migration, empty subdirectories may remain under `docs/`. The upgrade wizard removes them automatically (step 4 of check e). To verify manually:
+
+```bash
+find docs/{decisions,enhancements,lessons-learned,issues,chat-history} -name "*.md" -type f 2>/dev/null | wc -l
+```
+
+If this returns `0`, all content has been migrated. Any empty dirs that remain can be safely deleted:
+
+```bash
+for subdir in decisions enhancements lessons-learned issues chat-history; do
+  if [ -d "docs/$subdir" ]; then
+    if find "docs/$subdir" -name "*.md" -type f | grep -q .; then
+      echo "docs/$subdir/ still has .md files — do not delete"
+    else
+      rm -rf "docs/$subdir" && echo "Removed empty: docs/$subdir/"
+    fi
+  fi
+done
+```
+
+---
+
 ### Upgrade path by version
 
 | From version | What to expect |

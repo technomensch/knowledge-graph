@@ -57,7 +57,7 @@ See `docs/plans/v0.3.5-beta.md` for the full plan.
 - [x] `knowledge/rules.md` passes `grep -E 'Glob|Grep|Bash|Read|Edit|WebFetch|\.jsonl'` — zero hits on tool-specific lines
 - [x] `CLAUDE.md` has `## Platform Preferences (Claude Code)` with all relocated directives
 - [x] `knowledge/platform/` directory removed
-- [x] ADR-032 marked Superseded in both `docs/decisions/` and `knowledge/decisions/`
+- [x] ADR-032 marked Superseded in both `knowledge/decisions/` and `knowledge/decisions/`
 - [ ] `core/templates/knowledge/rules.md` guidance comment updated (protected — pending permission)
 - [ ] `commands/init.md` upgrade flow target updated from `knowledge/platform/claude.md` → `CLAUDE.md` (protected — pending permission)
 - [ ] Version bumped to `0.3.5-beta`; CHANGELOG updated; PR opened
