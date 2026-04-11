@@ -13,6 +13,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.3.3-beta] — 2026-04-10
+
+### Features
+- **Obsidian wiki link pass** — `/kmgraph:init` (Step 1f.2) and `/kmgraph:init-personal-kg` (Step 8.1) automatically convert bare cross-references in your knowledge graph to Obsidian `[[wiki link]]` format. Supports four patterns: `ENH-NNN` → `[[ENH-NNN]]`, `ADR-NNN` → `[[ADR-NNN-full-title]]` (full filename, collision-safe), `#NNN` → `[#NNN](GitHub URL)`, and `Lessons_Learned_X` → `[[Lessons_Learned_X]]`.
+- **ADR collision detection** — Pre-pass scans `decisions/` and builds a number→filename map before substitution. If two ADR files share the same number, the substitution is skipped for that number with a warning rather than writing ambiguous `[[ADR-NNN]]` links.
+- **Atomic wiki pass writes** — Each file write uses temp + atomic rename (`file.md.tmp` → `file.md`), preventing truncation on crash or context limit interruption.
+- **`wiki_pass_complete` config flag** — Written to `~/.claude/kg-config.json` on completion. Re-running init on an already-converted KG is a no-op. `--dry-run` mode previews changes without writing.
+- **Already-migrated upgrade path** — Users who completed the `docs/` → `knowledge/` migration in v0.3.0 or v0.3.1 get wiki links applied on their first v0.3.3 upgrade without needing to re-run migration.
+- **Personal KG wiki pass** — `/kmgraph:init-personal-kg` now applies the wiki link pass as content enrichment (not gated on migration).
+
+### Safety
+- Seven NO-SUBSTITUTE zones enforced: YAML frontmatter, triple-backtick blocks, 4-space indented code, inline backtick spans, existing wiki links, existing markdown links, heading lines.
+- Symlinked files skipped with warning. Template files (`*template*`) skipped.
+- `chat-history/` excluded from scan scope.
+- Pattern 4 (lesson filenames) scoped to `Lessons_Learned_` prefix only — system-enforced by `capture.ts:deriveFileName()`. Five legacy manually-created files excluded (see ADR-032).
+
+### Templates
+- **All 9 core templates updated** — `ADR-template.md`, `lesson-template.md`, `session-template.md`, and 6 knowledge templates now use `[[wiki link]]` format in cross-reference examples.
+- **`lesson-template.md`** — New `related:` YAML frontmatter block added alongside existing body "Related Documentation" section. Both coexist: frontmatter for machine-readable tooling, body for human-readable Obsidian navigation.
+
+### Commands & Agents
+- `capture-lesson`, `create-adr`, `session-documenter`, `knowledge-extractor` — Output format rules updated to emit `[[wiki link]]` syntax for KMGraph cross-references.
+
+### Knowledge
+- **ADR-031: Use Plural `Lessons_Learned_` Prefix for Lesson Filenames** — Retroactively documents the naming convention established in v0.2.1-beta. Plural form is semantically correct; hardcoded in `capture.ts`; changing it would require migration of 33+ files.
+
+---
+
 ## [0.3.2-beta] — 2026-04-10
 
 ### Features
