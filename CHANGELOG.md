@@ -13,6 +13,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.3.5-beta] — 2026-04-11
+
+### Features
+- **`knowledge/platform/` directory** — New per-platform directive store. `knowledge/platform/claude.md` is the canonical home for Claude Code-specific tool preferences (`Glob`, `Grep`, `Bash`, `context-mode`, `subagent`, `.jsonl` scoping rules). Keeps `knowledge/rules.md` platform-agnostic per ADR-028.
+- **ADR-032** — Documents the `knowledge/platform/<platform>.md` pattern. Establishes that platform files (not `CLAUDE.md`, not `rules.md`) own tool-specific directives. Extensible to `gemini.md`, `cursor.md`, `codex.md` in future releases.
+- **`CLAUDE.md` platform shim** — New `## Platform Preferences` section points to `knowledge/platform/claude.md`. CLAUDE.md remains a thin shim with no tool directive content.
+- **`kmgraph init` — new install scaffold** — Step 1.6.7 now scaffolds `knowledge/platform/claude.md` for new Claude Code installs with seeded tool preferences.
+- **`kmgraph init` — upgrade flow migration** — The upgrade-inspector now detects two contamination fingerprints in existing `knowledge/rules.md`: (1) old flat heading structure (`## Always / Never Rules`), (2) Claude-specific tool names. For each hit, offers auto-relocation to `platform/claude.md` with per-line confirmation.
+
+### Architecture
+- **`knowledge/rules.md` hardened** — Tool Preferences section stripped of all Claude-specific tool names. Replaced with ADR-032 guidance comment. Parallel calls preference retained (platform-agnostic).
+- **Template updated** — `core/templates/knowledge/rules.md` restructured to H2/H3 heading hierarchy matching live `knowledge/rules.md`. Tool Preferences section now has ADR-032 guidance comment and platform-agnostic placeholders only.
+
+### ENH
+- **ENH-012** — Platform split for tool directives. Specification: `docs/enhancements/ENH-012/ENH-012-specification.md`.
+
+---
+
 ## [0.3.4-beta] — 2026-04-10
 
 ### Features

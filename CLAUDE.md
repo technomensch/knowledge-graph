@@ -94,6 +94,10 @@ grep -r "/kmgraph:" commands/ agents/ skills/
 mkdocs build
 ```
 
+## Platform Preferences
+
+See [`knowledge/platform/claude.md`](knowledge/platform/claude.md) for Claude Code-specific tool directives (Glob/Grep/Bash preferences, context-mode usage, subagent strategy). Do not duplicate those directives here.
+
 ## Active Work
 
 Check `git branch` for current work in progress. Plans live locally in `~/.claude/plans/` (not git-synced) and are copied to `docs/plans/` for working reference only.
