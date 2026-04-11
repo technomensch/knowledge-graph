@@ -345,7 +345,7 @@ These belong in knowledge/ (current layout). Options:
 
 3. **Cross-reference rewrite** — update any remaining `docs/{subdir}/` references in the KG files to `knowledge/{subdir}/`:
    ```bash
-   find "{KG_PATH}" -name "*.md" -type f | xargs sed -i.bak \
+   find "{KG_PATH}" -name "*.md" -type f -print0 | xargs -0 sed -i.bak \
      -e 's|docs/decisions/|knowledge/decisions/|g' \
      -e 's|docs/lessons-learned/|knowledge/lessons-learned/|g' \
      -e 's|docs/enhancements/|knowledge/enhancements/|g' \
@@ -355,11 +355,24 @@ These belong in knowledge/ (current layout). Options:
    echo "✅ Cross-references rewritten"
    ```
 
-4. **Report:**
+4. **Cleanup** — remove now-empty source dirs:
+   ```bash
+   for subdir in decisions enhancements lessons-learned issues chat-history; do
+     src="$KG_PARENT/docs/$subdir"
+     if [ -d "$src" ] && [ -z "$(find "$src" -name "*.md" -type f 2>/dev/null)" ]; then
+       rmdir "$src" 2>/dev/null && echo "Removed empty dir: docs/$subdir/" || echo "Skipped (non-empty): docs/$subdir/"
+     fi
+   done
+   echo "✅ Cleanup complete"
+   ```
+   Uses `rmdir` — fails safely if anything remains in the directory (hidden files, assets, subdirs).
+
+5. **Report:**
    ```
    ✅ Migration complete.
-   
+
    Files moved to knowledge/. Archive available at: {KG_PATH}/.kg-archive-YYYYMMDD-HHMMSS/
+   Empty source dirs removed from docs/.
    To rollback: copy files from the archive back to docs/ manually.
    (Automated rollback command planned for v0.3.6.)
    ```
@@ -372,30 +385,9 @@ Skipped docs/ migration — no changes made.
 To migrate manually: move files from docs/{decisions,lessons-learned,...}/ to knowledge/ and update cross-references.
 ```
 
-4. **Cleanup** — after confirming all `.md` files are moved, remove now-empty source dirs:
-   ```bash
-   for subdir in decisions enhancements lessons-learned issues chat-history; do
-     src="$KG_PARENT/docs/$subdir"
-     if [ -d "$src" ] && [ -z "$(find "$src" -name "*.md" -type f 2>/dev/null)" ]; then
-       rm -rf "$src" && echo "Removed empty dir: docs/$subdir/"
-     fi
-   done
-   echo "✅ Cleanup complete"
-   ```
-   Only removes dirs that are empty after migration — never removes dirs with remaining content.
-
-5. **Report:**
-   ```
-   ✅ Migration complete.
-
-   Files moved to knowledge/. Archive available at: {KG_PATH}/.kg-archive-YYYYMMDD-HHMMSS/
-   Empty source dirs removed from docs/.
-   To rollback: copy files from the archive back to docs/ manually.
-   (Automated rollback command planned for v0.3.6.)
-   ```
-
 **Safety rules:**
 - Archive is always taken before any file is moved (step 1 is mandatory).
 - Never delete the source `docs/` directory — only move `.md` files. Non-markdown assets remain in place.
-- Cleanup (step 4) only removes subdirs that are empty after the move — it never removes dirs with remaining content.
+- Cleanup (step 4) uses `rmdir` — fails safely on any dir that still has content.
+- Cross-reference rewrite uses `find -print0 | xargs -0` — safe on paths with spaces.
 - Cross-reference rewrite only targets files inside `{KG_PATH}` — does not touch project source code or other directories.

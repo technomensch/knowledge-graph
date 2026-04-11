@@ -83,7 +83,7 @@ Strip line numbers from grep -n output and append. Skip any line already present
 ```bash
 while IFS= read -r line; do
   content=$(echo "$line" | sed 's/^[0-9]*://')
-  grep -qF "$content" "$PLATFORM_CONFIG" 2>/dev/null || echo "$content" >> "$PLATFORM_CONFIG"
+  grep -qxF "$content" "$PLATFORM_CONFIG" 2>/dev/null || echo "$content" >> "$PLATFORM_CONFIG"
 done <<< "$CONTAMINATION"
 ```
 
@@ -111,14 +111,15 @@ Print: `✅ Flagged lines removed from rules.md`
 If `rules.md` does not already contain a platform-directives guidance comment, insert one after the `## Tool Preferences` heading. If no `## Tool Preferences` heading exists, append the comment at the end of the file:
 
 ```bash
-COMMENT='<!-- Platform-specific directives belong in the platform'\''s native config file (CLAUDE.md, GEMINI.md, etc.) — see ADR-032 -->'
+COMMENT='<!-- Platform-specific directives belong in the platform'"'"'s native config file (CLAUDE.md, GEMINI.md, etc.) — see ADR-032 -->'
 
-if grep -q "$COMMENT" "$KG_PATH/rules.md" 2>/dev/null; then
+if grep -qxF "$COMMENT" "$KG_PATH/rules.md" 2>/dev/null; then
   : # already present, skip
-elif TOOL_LINE=$(grep -n "^## Tool Preferences" "$KG_PATH/rules.md" | head -1 | cut -d: -f1) && [ -n "$TOOL_LINE" ]; then
-  # Insert after the heading line
-  sed -i.bak "${TOOL_LINE}a\\
-${COMMENT}" "$KG_PATH/rules.md" && rm -f "$KG_PATH/rules.md.bak"
+elif grep -q "^## Tool Preferences" "$KG_PATH/rules.md"; then
+  # Insert after the ## Tool Preferences heading using awk (portable, handles special chars)
+  awk -v comment="$COMMENT" \
+    '/^## Tool Preferences/ { print; print comment; next } 1' \
+    "$KG_PATH/rules.md" > "$KG_PATH/rules.md.tmp" && mv "$KG_PATH/rules.md.tmp" "$KG_PATH/rules.md"
 else
   # No Tool Preferences heading — append to EOF
   printf '\n%s\n' "$COMMENT" >> "$KG_PATH/rules.md"
