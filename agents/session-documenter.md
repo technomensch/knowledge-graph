@@ -33,6 +33,7 @@
      - Key decisions and rationale
      - Lessons learned
      - Next steps
+   - **Cross-references:** Use Obsidian wiki link syntax for KMGraph internal references: `[[filename-without-extension]]` for lessons and concepts, `[[ADR-028-rules-md-scaffolding]]` for full ADR filenames. Use standard markdown `[#NNN](url)` for external GitHub issues and PRs. Never use wiki links for external URLs.
    - Present to user for review and edit
 
 4. **Commit & Push Phase:**

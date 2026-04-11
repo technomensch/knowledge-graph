@@ -337,6 +337,8 @@ Populate each section with the content gathered in Step 3:
 
 **Preserve all template section headers.** Fill placeholder text with user responses; leave unprovided optional sections as "None" or empty.
 
+**Cross-References:** When referencing other KMGraph files in the ADR body, use Obsidian wiki link syntax: `[[filename-without-extension]]`. For ADRs, always use the full filename: `[[ADR-028-rules-md-scaffolding]]`, not `[[ADR-028]]`. For external GitHub issues and PRs, use standard markdown links: `[#NNN](url)`. Never use wiki links for external URLs.
+
 ---
 
 ## Step 6: Update Decisions Index
