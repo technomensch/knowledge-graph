@@ -51,6 +51,9 @@ When triggered:
    - ❌ "Dispatching to lesson-capture-agent..."
    - ❌ "Triggering agent with context..."
 
+**Do NOT trigger on:**
+- Behavioral process directives without a solved bug or learned pattern ("always X", "from now on X", "don't do X" as a standing rule) → handled by `rules-capture` skill. If both a lesson and a rule apply to the same turn, both skills fire independently.
+
 **Example Trigger:**
 ```
 User: "Figured it out! The issue was the config being cached in memory.
