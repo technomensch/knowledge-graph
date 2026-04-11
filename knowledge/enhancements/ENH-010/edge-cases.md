@@ -31,7 +31,7 @@ These occurred in prior sessions and are documented in chat history.
 **Phase:** Phase 2 — Migration
 **Source:** v0.0.6-alpha release: "Fixed stale `kg-config.json` path (knowledge-graph-plugin → knowledge-graph)." User had to manually clean up orphaned plugin entries from `~/.claude.json` after a repository rename. Confirmed that config path staleness is a recurring production problem.
 
-**Scenario:** Migration moves files (step 3b) but fails before updating config (step 3c). Next init run sees `docs/lessons-learned/` missing (already moved) so trigger conditions fail. User is stuck with files at `knowledge/` but config still pointing to `docs/`.
+**Scenario:** Migration moves files (step 3b) but fails before updating config (step 3c). Next init run sees `knowledge/lessons-learned/` missing (already moved) so trigger conditions fail. User is stuck with files at `knowledge/` but config still pointing to `docs/`.
 
 **Mitigation:** Atomic migration: write `"migration_in_progress": true` to kg-config.json before moving files. Clear flag after config update completes. Re-running init while flag is set offers resume/rollback/skip.
 
@@ -53,7 +53,7 @@ These occurred in prior sessions and are documented in chat history.
 **Phase:** Phase 2 — Migration trigger
 **Source:** v0.0.6-alpha release: "Fixed stale `kg-config.json` path (knowledge-graph-plugin → knowledge-graph)." Repository was renamed multiple times; each rename left orphaned entries. Also: `docs/chat-history/2026-02/2026-02-17-claude.md` — user explicitly had to clean up orphaned plugin entries due to renaming.
 
-**Scenario:** User renames or moves their project directory. `kg-config.json` still points to the old path. Phase 2 trigger checks whether the configured path ends in `/docs` — but the path doesn't exist on disk, so `docs/lessons-learned/` is never found. Migration never triggers, no error is shown, user wonders why nothing happened.
+**Scenario:** User renames or moves their project directory. `kg-config.json` still points to the old path. Phase 2 trigger checks whether the configured path ends in `/docs` — but the path doesn't exist on disk, so `knowledge/lessons-learned/` is never found. Migration never triggers, no error is shown, user wonders why nothing happened.
 
 **Mitigation:** Before evaluating trigger conditions, verify the configured path exists on disk. If it doesn't, surface a warning with options to update or skip.
 
@@ -91,7 +91,7 @@ These were identified through design analysis, not observed incidents.
 **Phase:** Phase 2 — Migration
 **Source:** v0.0.6-alpha release: "Fixed stale `kg-config.json` path (knowledge-graph-plugin → knowledge-graph)."
 
-**Scenario:** Migration moves files (step 3b) but fails before updating config (step 3c). Next init run sees `docs/lessons-learned/` missing (already moved) so trigger conditions fail.
+**Scenario:** Migration moves files (step 3b) but fails before updating config (step 3c). Next init run sees `knowledge/lessons-learned/` missing (already moved) so trigger conditions fail.
 
 **Mitigation:** Atomic migration with `migration_in_progress` flag. Re-running init while flag is set offers resume/rollback/skip. Rollback is fully implemented (Task M5, v0.3.2): reverses all file moves, cross-reference rewrites, and config changes with its own `rollback_in_progress` guard. If rollback itself is interrupted, re-running init detects `rollback_in_progress` and offers resume-rollback.
 
@@ -156,7 +156,7 @@ Identified 2026-04-10 via Opus audit. Two were fixed in v0.3.0-beta (E-beta-1, E
 ### E-beta-2 — Cross-references not rewritten after migration *(fixed in v0.3.0-beta)*
 **Type:** Implementation gap
 **Phase:** Phase 2 — Migration execution
-**Scenario:** Files are moved but `[link](docs/lessons-learned/...)` references inside `.md` files, CLAUDE.md, and README.md remain pointing at old paths. Links break silently.
+**Scenario:** Files are moved but `[link](knowledge/lessons-learned/...)` references inside `.md` files, CLAUDE.md, and README.md remain pointing at old paths. Links break silently.
 **Fix:** Added step `e2` — `find | sed` pass over all migrated files and platform configs. Landed commit `7ad95cc6`.
 
 ---
@@ -189,7 +189,7 @@ Identified 2026-04-10 via Opus audit. Two were fixed in v0.3.0-beta (E-beta-1, E
 ### E20 — Platform config files not rewritten during migration
 **Type:** Theoretical
 **Phase:** Phase 2 — Migration step e2
-**Scenario:** User has `GEMINI.md`, `.cursorrules`, `.windsurfrules`, `.github/copilot-instructions.md`, or `.aider.conf.yml` referencing `docs/lessons-learned/` paths. Step e2 only rewrites `CLAUDE.md` and `README.md`; platform files retain stale paths.
+**Scenario:** User has `GEMINI.md`, `.cursorrules`, `.windsurfrules`, `.github/copilot-instructions.md`, or `.aider.conf.yml` referencing `knowledge/lessons-learned/` paths. Step e2 only rewrites `CLAUDE.md` and `README.md`; platform files retain stale paths.
 **Mitigation:** Expand step e2 platform file loop to include all files init can write. (Task M3)
 
 ---

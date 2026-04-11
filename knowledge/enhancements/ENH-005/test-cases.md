@@ -20,7 +20,7 @@ created: 2026-03-30
 
 ## TC-002: Content root auto-detection (docs/ subdir)
 
-**Setup:** KG root is `/path/to/repo`; content lives at `/path/to/repo/docs/lessons-learned/`
+**Setup:** KG root is `/path/to/repo`; content lives at `/path/to/repo/knowledge/lessons-learned/`
 **Action:** Run `kg_fts5_rebuild`
 **Expected:** Tool detects `docs/` subdir and indexes files from `/path/to/repo/docs/`; > 0 files indexed
 

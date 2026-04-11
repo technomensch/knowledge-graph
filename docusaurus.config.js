@@ -75,7 +75,7 @@ const config = {
           sidebarPath: require.resolve('./sidebars.js'),
           routeBasePath: '/',
           editUrl: 'https://github.com/technomensch/knowledge-graph/edit/main/',
-          exclude: ['plans/**', 'chat-history/**', 'sessions/**', '_test-layout.md'],
+          exclude: ['plans/**', 'chat-history/**', 'sessions/**', '_test-layout.md', 'enhancements/**', 'issues/**', 'knowledge/**'],
         },
         blog: false,
         theme: {

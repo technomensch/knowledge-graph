@@ -19,10 +19,10 @@ enhancement_id: ENH-001
 - [x] Progress log initialized (progress-log.md)
 
 **Files created:**
-- `docs/enhancements/ENH-001/ENH-001-specification.md`
-- `docs/enhancements/ENH-001/solution-approach.md`
-- `docs/enhancements/ENH-001/test-cases.md`
-- `docs/enhancements/ENH-001/progress-log.md`
+- `knowledge/enhancements/ENH-001/ENH-001-specification.md`
+- `knowledge/enhancements/ENH-001/solution-approach.md`
+- `knowledge/enhancements/ENH-001/test-cases.md`
+- `knowledge/enhancements/ENH-001/progress-log.md`
 - `docs/plans/v0.2.2-ENH-001-global-kg.md` (pending — to be created when Phase 1 begins)
 
 **Next:** Wait for explicit approval to proceed with Phase 1 implementation
