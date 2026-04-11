@@ -47,6 +47,8 @@ Parameters:
 - `{categories}` = ["architecture", "debugging", "patterns", "process"]
 - `{preserve_active}` = true
 
+**Cross-project platform-split check (section d):** When upgrade-inspector runs section d for this personal KG, it uses `{KG_TYPE}` = "personal" to route relocations to `~/.claude/CLAUDE.md § Platform Preferences` (not the project-local `CLAUDE.md`). No extra parameters needed — the shared module (`knowledge-file-migrator.md`) handles the target path resolution automatically.
+
 **After upgrade-inspector completes (Option 1), always continue to Step 8 (content migration) and Step 9 (evidence seeding).** These run independently of the template upgrade check — an up-to-date template install does not mean me.md/rules.md have been populated.
 
 **If option 2 selected (re-initialize):**
