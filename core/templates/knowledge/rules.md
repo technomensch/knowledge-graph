@@ -146,17 +146,16 @@ Protected paths (do not modify without explicit permission):
 
 ## Tool Preferences
 
-<!-- Tool-specific preferences belong in knowledge/platform/<platform>.md -->
-<!-- (e.g., knowledge/platform/claude.md for Claude Code, knowledge/platform/gemini.md for Gemini CLI). -->
-<!-- See ADR-032: https://github.com/your-repo/docs/decisions/ADR-032-platform-specific-directives-in-platform-config.md -->
-<!--                                                                                                        -->
-<!-- This section should contain ONLY platform-agnostic preferences:                                        -->
-<!--   - Parallel calls strategy (independent searches in parallel)                                         -->
-<!--   - Context budget policies (avoid bulk output)                                                        -->
-<!--   - Caching or batching conventions                                                                     -->
-<!--                                                                                                        -->
-<!-- Do NOT put tool names here (Glob, Grep, Bash, Read, Edit, rg, WebFetch, etc.) —                      -->
-<!-- those are platform-specific and belong in knowledge/platform/<platform>.md.                             -->
+<!-- Tool-specific preferences belong in the platform's native config file:             -->
+<!-- Claude Code → CLAUDE.md, Gemini CLI → GEMINI.md, Cursor → .cursorrules             -->
+<!--                                                                                      -->
+<!-- This section should contain ONLY platform-agnostic preferences:                     -->
+<!--   - Parallel calls strategy (independent searches in parallel)                      -->
+<!--   - Context budget policies (avoid bulk output)                                     -->
+<!--   - Caching or batching conventions                                                  -->
+<!--                                                                                      -->
+<!-- Do NOT put tool names here (Glob, Grep, Bash, Read, Edit, rg, WebFetch, etc.) —    -->
+<!-- those are platform-specific and belong in the platform's native config file.         -->
 
 - Parallel calls: always run independent searches/reads in parallel
 - Avoid bulk output: limit single operations that produce large output — use targeted queries instead
@@ -172,5 +171,5 @@ Protected paths (do not modify without explicit permission):
 |------|---------|------------|
 | `src/` | ... | yes |
 | `docs/plans/` | local plan files | no (gitignored) |
-| `knowledge/platform/` | per-platform tool directive files | yes |
+| `CLAUDE.md` | Claude Code platform config (tool directives, platform preferences) | yes |
 | `...` | ... | ... |

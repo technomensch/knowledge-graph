@@ -956,26 +956,17 @@ to .git/hooks/post-commit and making it executable.
 
 ### Step 1.6.7: Platform directive scaffold (new install only)
 
-Create `knowledge/platform/` and seed `knowledge/platform/claude.md` for Claude Code users. This file is the authoritative home for Claude Code-specific tool directives per ADR-032.
+Seed the `## Platform Preferences (Claude Code)` section in `CLAUDE.md` for Claude Code users. `CLAUDE.md` at the repo root IS the authoritative platform config file for Claude Code — no separate `knowledge/platform/` directory needed.
+
+Check whether `CLAUDE.md` already has a `## Platform Preferences` section. If not, append it:
 
 ```bash
-mkdir -p "${KG_PATH}platform/"
+if ! grep -q "## Platform Preferences" "${PROJECT_ROOT}/CLAUDE.md" 2>/dev/null; then
+  cat >> "${PROJECT_ROOT}/CLAUDE.md" << 'PLATFORM_EOF'
 
-# Seed platform/claude.md from plugin template if available; create inline otherwise
-if [ -f "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/platform/claude.md" ]; then
-  cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/platform/claude.md" \
-     "${KG_PATH}platform/claude.md"
-else
-  cat > "${KG_PATH}platform/claude.md" << 'PLATFORM_EOF'
-# Platform Directives — Claude Code
+## Platform Preferences (Claude Code)
 
-This file contains Claude Code-specific tool preferences for this project.
-It is the authoritative home for directives that reference Claude Code tool names.
-**Scope:** Claude Code CLI and desktop app only.
-
-See `knowledge/rules.md` for platform-agnostic rules. See ADR-032 for rationale.
-
-## Tool Preferences
+Claude Code-specific tool directives. This section is the authoritative home for Claude Code tool preferences.
 
 ### File and Content Search
 
@@ -992,10 +983,10 @@ See `knowledge/rules.md` for platform-agnostic rules. See ADR-032 for rationale.
 Never run grep scans over `docs/plans/` or `.jsonl` chat history files
 - **Why:** these paths contain non-executable plan text and chat transcripts — scanning them consumes context without reaching executable code
 PLATFORM_EOF
+  echo "✅ Added ## Platform Preferences (Claude Code) section to CLAUDE.md"
+else
+  echo "ℹ️  CLAUDE.md already has a Platform Preferences section — skipping."
 fi
-
-echo "✅ Created knowledge/platform/claude.md — Claude Code-specific tool directives."
-echo "   Review and customize: ${KG_PATH}platform/claude.md"
 ```
 
 **Note:** This step runs on new installs only. Existing installs detect and migrate via the upgrade-inspector's section d check.

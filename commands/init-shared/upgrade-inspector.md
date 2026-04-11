@@ -218,10 +218,11 @@ Found Claude-specific tool references in knowledge/rules.md:
   Line 15: - Content search: Grep tool — not rg or grep in Bash
   ...
 
-These belong in knowledge/platform/claude.md, not rules.md (ADR-032).
+These belong in CLAUDE.md (## Platform Preferences section), not rules.md.
+CLAUDE.md is the platform config file for Claude Code.
 
 Options:
-  a. Relocate automatically — move flagged lines to platform/claude.md and remove from rules.md
+  a. Relocate automatically — move flagged lines to CLAUDE.md and remove from rules.md
   b. Show me the lines to review manually
   s. Skip
 ```
@@ -229,33 +230,19 @@ Options:
 **If auto-relocate (option a):**
 
 ```bash
-# Create platform/ directory if absent
-mkdir -p "{KG_PATH}/platform"
-
-# Seed platform/claude.md if absent
-if [ ! -f "{KG_PATH}/platform/claude.md" ]; then
-  # Try plugin template first; fall back to inline
-  cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/platform/claude.md" \
-     "{KG_PATH}/platform/claude.md" 2>/dev/null || \
-  cat > "{KG_PATH}/platform/claude.md" << 'EOF'
-# Platform Directives — Claude Code
-
-This file contains Claude Code-specific tool preferences relocated from `knowledge/rules.md` per ADR-032.
-**Scope:** Claude Code CLI and desktop app only.
-
-## Tool Preferences
-<!-- Entries relocated from rules.md — see ADR-032 -->
-EOF
+# Ensure CLAUDE.md has a Platform Preferences section; append header if absent
+if ! grep -q "## Platform Preferences" "${PROJECT_ROOT}/CLAUDE.md" 2>/dev/null; then
+  printf '\n## Platform Preferences (Claude Code)\n\n' >> "${PROJECT_ROOT}/CLAUDE.md"
 fi
 
-# Append flagged lines from rules.md into platform/claude.md under ## Tool Preferences
+# Append flagged lines from rules.md into CLAUDE.md under ## Platform Preferences
 # Remove those lines from rules.md
-# Insert ADR-032 guidance comment in rules.md Tool Preferences section if absent
+# Insert guidance comment in rules.md Tool Preferences section if absent
 ```
 
 **Safety rules:**
 - Never remove lines from `rules.md` without per-line user confirmation.
-- If `platform/claude.md` already exists, append — never overwrite.
+- If `CLAUDE.md` Platform Preferences section already exists, append — never overwrite existing content.
 - If user selects skip, leave both files unchanged.
-- After relocation, add the ADR-032 reference comment to `rules.md`'s Tool Preferences section:
-  `<!-- Platform-specific directives belong in knowledge/platform/<platform>.md — see ADR-032 -->`
+- After relocation, update the guidance comment in `rules.md`'s Tool Preferences section:
+  `<!-- Platform-specific directives belong in the platform's native config file (CLAUDE.md, GEMINI.md, etc.) -->`
