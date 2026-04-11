@@ -37,20 +37,12 @@ fi
 [ ! -f "{KG_PATH}/me.md" ]      && upgrades+=("New: me.md — your identity and working style in this project")
 [ ! -f "{KG_PATH}/rules.md" ]   && upgrades+=("New: rules.md — project conventions and behavioral rules")
 
-# Platform directive scaffold (v0.3.5 — ADR-032)
-[ ! -d "{KG_PATH}/platform" ] && upgrades+=("New: platform/ — per-platform tool directive directory (ADR-032)")
-[ ! -f "{KG_PATH}/platform/claude.md" ] && upgrades+=("New: platform/claude.md — Claude Code-specific tool directives (ADR-032)")
-
 # rules.md platform-split check (v0.3.5 — ADR-032)
-# Detect old flat structure and Claude-specific content contamination
+# Content fingerprint only: Claude-specific tool names present in rules.md
 if [ -f "{KG_PATH}/rules.md" ]; then
-  # Structure fingerprint: old flat structure uses "## Always / Never Rules"
-  grep -q "## Always / Never Rules" "{KG_PATH}/rules.md" && \
-    upgrades+=("Update: rules.md — old flat heading structure detected; offer to upgrade to H2/H3 hierarchy (v0.3.5)")
-  # Content fingerprint: Claude-specific tool names present in rules.md
   CONTAMINATION=$(grep -nE '\bGlob\b|\bGrep\b|context-mode|\bsubagent\b|\.jsonl' "{KG_PATH}/rules.md" 2>/dev/null)
   [ -n "$CONTAMINATION" ] && \
-    upgrades+=("Update: rules.md — Claude-specific tool references detected; offer to relocate to platform/claude.md (ADR-032)")
+    upgrades+=("Update: rules.md — Claude-specific tool references detected; offer to relocate to CLAUDE.md § Platform Preferences (ADR-032)")
 fi
 
 # Path migration available
@@ -198,22 +190,20 @@ Update templates? This will NOT overwrite your existing lessons or decisions.
 
 #### d. rules.md platform-split check (v0.3.5-beta — ADR-032)
 
-**Purpose:** Detect and offer to relocate Claude Code-specific tool directives from `rules.md` to `platform/claude.md`, preserving `rules.md` as platform-agnostic per ADR-032.
+**Purpose:** Detect and offer to relocate Claude Code-specific tool directives from `rules.md` to the platform's native config file (`CLAUDE.md § Platform Preferences` for project-local KGs; `~/.claude/CLAUDE.md § Platform Preferences` for personal KGs), preserving `rules.md` as platform-agnostic per ADR-032.
 
-**Two detection fingerprints:**
-
-1. **Structure fingerprint** — presence of `## Always / Never Rules` heading in `rules.md` signals the old flat structure from v0.3.4 and earlier. Offer to restructure to the H2/H3 hierarchy.
-
-2. **Content fingerprint** — scan for known Claude-specific strings:
+**Detection — content fingerprint only:**
 
 ```bash
 CONTAMINATION=$(grep -nE '\bGlob\b|\bGrep\b|context-mode|\bsubagent\b|\.jsonl' "{KG_PATH}/rules.md" 2>/dev/null)
 ```
 
-**For each issue found:** display affected lines and offer:
+If `CONTAMINATION` is empty, skip this check silently.
+
+**If matches found:** display affected lines and offer:
 
 ```
-Found Claude-specific tool references in knowledge/rules.md:
+Found Claude-specific tool references in rules.md:
   Line 14: - File search: Glob and Grep — not Bash find/grep
   Line 15: - Content search: Grep tool — not rg or grep in Bash
   ...
@@ -222,27 +212,40 @@ These belong in CLAUDE.md (## Platform Preferences section), not rules.md.
 CLAUDE.md is the platform config file for Claude Code.
 
 Options:
-  a. Relocate automatically — move flagged lines to CLAUDE.md and remove from rules.md
-  b. Show me the lines to review manually
+  a. Relocate automatically — move all flagged lines to CLAUDE.md and remove from rules.md
+  b. Show me the lines — I'll handle the edit manually
   s. Skip
 ```
 
-**If auto-relocate (option a):**
+**If option (a) — auto-relocate (bulk):**
 
-```bash
-# Ensure CLAUDE.md has a Platform Preferences section; append header if absent
-if ! grep -q "## Platform Preferences" "${PROJECT_ROOT}/CLAUDE.md" 2>/dev/null; then
-  printf '\n## Platform Preferences (Claude Code)\n\n' >> "${PROJECT_ROOT}/CLAUDE.md"
-fi
+→ Execute shared module: Read `commands/init-shared/knowledge-file-migrator.md` and follow it exactly.
+Parameters:
+- `{KG_PATH}` = `{KG_PATH}`
+- `{KG_TYPE}` = `{KG_TYPE}`
+- `{PROJECT_ROOT}` = current project root directory
+- `{CONTAMINATION}` = grep output from the detection step above
 
-# Append flagged lines from rules.md into CLAUDE.md under ## Platform Preferences
-# Remove those lines from rules.md
-# Insert guidance comment in rules.md Tool Preferences section if absent
+The shared module handles: archiving `rules.md`, appending flagged lines to the correct `CLAUDE.md`, removing them from `rules.md`, and adding a guidance comment.
+
+**If option (b) — manual review:**
+
+Display each flagged line with its line number. Print:
+```
+Here are the lines to move manually:
+  [line content 1]
+  [line content 2]
+  ...
+
+Target: CLAUDE.md § Platform Preferences
+No changes made — move them manually when ready.
 ```
 
+**If option (s) — skip:**
+
+Leave both files unchanged.
+
 **Safety rules:**
-- Never remove lines from `rules.md` without per-line user confirmation.
-- If `CLAUDE.md` Platform Preferences section already exists, append — never overwrite existing content.
-- If user selects skip, leave both files unchanged.
-- After relocation, update the guidance comment in `rules.md`'s Tool Preferences section:
-  `<!-- Platform-specific directives belong in the platform's native config file (CLAUDE.md, GEMINI.md, etc.) -->`
+- Option (a) is a bulk operation — all flagged lines are relocated in one shot (archive is taken first).
+- If `CLAUDE.md § Platform Preferences` already exists, append — never overwrite existing content.
+- If user selects skip or manual, leave both files unchanged.
