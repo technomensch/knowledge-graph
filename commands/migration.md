@@ -42,24 +42,13 @@ Usage: `/kmgraph:migration list`
 
 ### Steps
 
-**Step 1 — Locate archive directories.**
-
-Scan both scopes for archive directories:
-
-```bash
-# Project KG archives
-PROJECT_ARCHIVES=$(ls -d "${KG_PATH}/.kg-archive-"*/ 2>/dev/null)
-
-# Personal KG archives
-PERSONAL_ARCHIVES=$(ls -d "$HOME/.kmgraph/.kg-archive-"*/ 2>/dev/null)
-```
-
-**Step 2 — Read manifests and build table.**
+**Step 1 — Read manifests and build table.**
 
 For each archive directory found (project scope first, then personal), read `manifest.json`:
 
 ```bash
-for ARCHIVE_DIR in $PROJECT_ARCHIVES $PERSONAL_ARCHIVES; do
+for ARCHIVE_DIR in "${KG_PATH}/.kg-archive-"*/ "$HOME/.kmgraph/.kg-archive-"*/; do
+  [ -d "$ARCHIVE_DIR" ] || continue
   MANIFEST="$ARCHIVE_DIR/manifest.json"
 
   if [ ! -f "$MANIFEST" ]; then
@@ -153,7 +142,7 @@ Before making any changes, compare each archived file against the current on-dis
 
 ```bash
 ALL_IDENTICAL=true
-for f in $FILES; do
+while IFS= read -r f; do
   CURRENT_FILE="$DEST_BASE/$f"
   ARCHIVED_FILE="$ARCHIVE_DIR/$f"
   if [ ! -f "$ARCHIVED_FILE" ]; then
@@ -164,7 +153,7 @@ for f in $FILES; do
     ALL_IDENTICAL=false
     break
   fi
-done
+done <<< "$FILES"
 
 if [ "$ALL_IDENTICAL" = "true" ]; then
   echo "Already at this state — no changes made."
@@ -197,21 +186,23 @@ fi
 
 mkdir -p "$SAFETY_DIR"
 
-# Write manifest for the safety archive
+# Copy current files into safety archive; build list of actually-copied files
+COPIED_FILES="[]"
+while IFS= read -r f; do
+  if [ -f "$DEST_BASE/$f" ]; then
+    cp "$DEST_BASE/$f" "$SAFETY_DIR/$f"
+    COPIED_FILES=$(echo "$COPIED_FILES" | jq --arg f "$f" '. + [$f]')
+  fi
+done <<< "$FILES"
+
+# Write manifest with only the files that were actually copied
 cat > "$SAFETY_DIR/manifest.json" <<EOF
 {
   "archived_at": "$SAFETY_TS",
   "reason": "pre-rollback-safety-snapshot",
-  "files": $(jq -c '.files' "$MANIFEST")
+  "files": $COPIED_FILES
 }
 EOF
-
-# Copy current files into safety archive
-for f in $FILES; do
-  if [ -f "$DEST_BASE/$f" ]; then
-    cp "$DEST_BASE/$f" "$SAFETY_DIR/$f"
-  fi
-done
 ```
 
 Inform the user: "Pre-rollback snapshot saved as `.kg-archive-${SAFETY_TS}`."
@@ -221,7 +212,7 @@ Inform the user: "Pre-rollback snapshot saved as `.kg-archive-${SAFETY_TS}`."
 For each file listed in `manifest.json`:
 
 ```bash
-for f in $FILES; do
+while IFS= read -r f; do
   ARCHIVE_FILE="$ARCHIVE_DIR/$f"
   DEST_FILE="$DEST_BASE/$f"
 
@@ -244,7 +235,7 @@ for f in $FILES; do
   # Restore the file
   cp "$ARCHIVE_FILE" "$DEST_FILE"
   echo "Restored: $f"
-done
+done <<< "$FILES"
 ```
 
 - If a file is **missing from the archive**: warn "⚠️  `<filename>` missing from archive — skipped." and continue with remaining files.
@@ -311,8 +302,8 @@ Deletes one or more migration archives. **Never auto-deletes without user confir
 - After purge completes, check total remaining archive disk usage across both scopes:
 
 ```bash
-TOTAL_BYTES=$(du -sb "${KG_PATH}/.kg-archive-"*/ "$HOME/.kmgraph/.kg-archive-"*/ 2>/dev/null | awk '{sum += $1} END {print sum+0}')
-TOTAL_MB=$(echo "$TOTAL_BYTES / 1048576" | bc)
+TOTAL_KB=$(du -sk "${KG_PATH}/.kg-archive-"*/ "$HOME/.kmgraph/.kg-archive-"*/ 2>/dev/null | awk '{sum += $1} END {print sum+0}')
+TOTAL_MB=$((TOTAL_KB / 1024))
 ```
 
 If total exceeds 10 MB, print:
