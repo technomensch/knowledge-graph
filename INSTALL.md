@@ -54,7 +54,7 @@ for f in \
   ~/.continue/config.json \
   "$HOME/Library/Application Support/Claude/claude_desktop_config.json" \
   "$APPDATA/Claude/claude_desktop_config.json"; do
-  [ -f "$f" ] && grep -l "knowledge-graph\|kg-sis" "$f" 2>/dev/null && echo "STALE: $f"
+  [ -f "$f" ] && grep -l "knowledge-graph\|kg-sis\|kmgraph" "$f" 2>/dev/null && echo "STALE: $f"
 done || echo "None found"
 ```
 
@@ -64,7 +64,7 @@ done || echo "None found"
 
 | Location | Action |
 |----------|--------|
-| Claude Code (`settings.local.json` `enabledPlugins`) | Run `claude extension uninstall knowledge` and/or `claude extension uninstall kg-sis` |
+| Claude Code (`settings.local.json` `enabledPlugins`) | Run `claude extension uninstall kmgraph` (current name) and/or `claude extension uninstall knowledge` / `claude extension uninstall kg-sis` (legacy names) |
 | `~/.cursor/mcp.json` | Remove `"knowledge-graph"` or `"kg-sis"` server entry (do NOT overwrite the whole file) |
 | `~/.codeium/windsurf/mcp_config.json` | Remove stale server entry |
 | `~/.continue/config.json` | Remove stale server entry |
@@ -77,6 +77,88 @@ After cleanup, re-run the scan to confirm zero results, then proceed to Step 1.
 
 **Note:** Claude Code may cache the extension registry between sessions — restart Claude Code
 after uninstalling before verifying.
+
+---
+
+## Step 0.6: Upgrading from a Previous Version (Skip if first install)
+
+If you have an existing KMGraph installation, **do not follow the full install steps below**. The upgrade path runs entirely through the init wizard.
+
+### How to upgrade
+
+**Claude Code users:**
+```
+/kmgraph:init
+```
+The wizard detects your existing knowledge graph and presents an upgrade menu:
+```
+A knowledge graph named "[name]" already exists at [path].
+  1. See what's new — review improvements in this version, then decide what to apply
+  2. Create a new, separate knowledge graph
+  3. Re-initialize "[name]"
+  4. Cancel
+```
+Choose **option 1**. The wizard inspects your actual install state and shows only what is missing or upgradeable for your specific setup — nothing is applied yet.
+
+**MCP IDE users** (Cursor, Windsurf, Continue.dev, VS Code, JetBrains):
+Use the `kg_upgrade` MCP tool to inspect and apply upgrades without leaving your IDE. See Step 3 for tool usage.
+
+---
+
+### What the upgrade wizard checks
+
+The inspector runs four checks in order and reports what it finds before asking you to apply anything:
+
+| Check | What it looks for |
+|-------|-------------------|
+| **a. Directories** | Missing subdirectories (`knowledge/`, `decisions/`, `sessions/`, etc.) |
+| **b. Config fields** | Missing fields in `~/.claude/kg-config.json` introduced in newer versions |
+| **c. Templates** | Template files that have been updated or added since your install |
+| **d. Platform split** | Claude-specific tool directives in `knowledge/rules.md` that belong in `CLAUDE.md` |
+
+---
+
+### Previewing changes before applying
+
+**You are never committed until you confirm.** After the inspection report is shown, you choose how to proceed:
+
+```
+Apply all, pick individually, or skip?
+  1. Apply all
+  2. Let me choose which ones to apply
+  3. Skip — my setup is already how I want it
+```
+
+**To preview each change individually:** choose option 2. Each upgrade item is presented as a separate yes/no prompt — you see what it will do before it runs.
+
+**For the platform-split migration (check d) specifically:** even after choosing "Apply all", the wizard shows you the exact lines it detected in `rules.md` and offers three options before touching any file:
+```
+  a. Relocate automatically — move exactly the lines shown above to CLAUDE.md
+  b. Show me the lines — I'll handle the edit manually
+  s. Skip — leave both files unchanged
+```
+Option **b** lets you review and act on your own — nothing is written.
+
+> **Note:** A full dry-run mode (preview all changes with a diff, no prompts, no writes) is planned for v0.3.6.
+
+---
+
+### What gets backed up
+
+Before any content migration runs, the wizard archives the affected files to a timestamped restore point at `{KG_PATH}/.kg-archive-YYYYMMDD-HHMMSS/`. If anything goes wrong, you can restore manually from that directory. A formal `/kmgraph:migration rollback` command is planned for v0.3.6.
+
+---
+
+### Upgrade path by version
+
+| From version | What to expect |
+|---|---|
+| **v0.2.x** | Check d may offer to move tool directives from `rules.md` → `CLAUDE.md`. Checks a/b/c may add missing dirs, config fields, and new templates. |
+| **v0.3.0–v0.3.4** | Check d only (if `rules.md` still has Claude-specific lines). All other checks are likely already satisfied. |
+| **v0.3.5** | No upgrade items expected for a clean v0.3.5 install. |
+
+After the wizard completes, your existing lessons, ADRs, sessions, and chat history are untouched.
+
 ---
 
 ### Step 1: Detect Platform

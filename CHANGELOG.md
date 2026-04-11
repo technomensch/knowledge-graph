@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`CLAUDE.md` is the platform config** — `CLAUDE.md` at repo root now contains a `## Platform Preferences (Claude Code)` section with all Claude-specific tool directives. `CLAUDE.md` IS the platform file for Claude Code — no separate `knowledge/platform/` directory needed. Other platforms use their native files (`GEMINI.md`, `.cursorrules`, `AGENTS.md`).
 - **ADR-032** — Documents the platform-split decision. Superseded in v0.3.5 fixup: `knowledge/platform/` directory removed; native platform files (`CLAUDE.md` etc.) are the authoritative platform config homes.
 - **`kmgraph init` — upgrade flow migration** — The upgrade-inspector detects Claude-specific tool names in existing `knowledge/rules.md` and offers auto-relocation to `CLAUDE.md`.
+- **Personal KG default path** — Changed from `~/.claude/knowledge-graph/` to `~/.kmgraph/` (platform-neutral). Existing personal KGs at the old path are unaffected — config entries retain their recorded path. New personal KG inits use `~/.kmgraph/` as the default.
 
 ### Architecture
 - **`knowledge/rules.md` hardened** — Tool Preferences section stripped of all Claude-specific tool names. Platform-agnostic preferences only.
@@ -57,7 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Seven NO-SUBSTITUTE zones enforced: YAML frontmatter, triple-backtick blocks, 4-space indented code, inline backtick spans, existing wiki links, existing markdown links, heading lines.
 - Symlinked files skipped with warning. Template files (`*template*`) skipped.
 - `chat-history/` excluded from scan scope.
-- Pattern 4 (lesson filenames) scoped to `Lessons_Learned_` prefix only — system-enforced by `capture.ts:deriveFileName()`. Five legacy manually-created files excluded (see ADR-032).
+- Pattern 4 (lesson filenames) scoped to `Lessons_Learned_` prefix only — system-enforced by `capture.ts:deriveFileName()`. Five legacy manually-created files excluded (see ADR-031).
 
 ### Templates
 - **All 9 core templates updated** — `ADR-template.md`, `lesson-template.md`, `session-template.md`, and 6 knowledge templates now use `[[wiki link]]` format in cross-reference examples.

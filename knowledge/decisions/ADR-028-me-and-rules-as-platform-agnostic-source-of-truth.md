@@ -114,9 +114,9 @@ Mirrors the existing CLAUDE.md two-level pattern:
 | Project | `knowledge/index.md` | ✅ Yes | Entry point, directory map, key file links |
 | Project | `knowledge/rules.md` | ✅ Yes | Rules specific to this project — shared by all contributors |
 | Project | `knowledge/me.md` | ❌ Gitignored | Who I am in this project — personal, per-contributor |
-| Personal (cross-project) | `~/.claude/knowledge-graph/index.md` | N/A (local) | Entry point for personal KG |
-| Personal (cross-project) | `~/.claude/knowledge-graph/me.md` | N/A (local) | Personal identity, cross-project preferences |
-| Personal (cross-project) | `~/.claude/knowledge-graph/rules.md` | N/A (local) | Personal behavioral rules across all projects |
+| Personal (cross-project) | `~/.kmgraph/index.md` | N/A (local) | Entry point for personal KG |
+| Personal (cross-project) | `~/.kmgraph/me.md` | N/A (local) | Personal identity, cross-project preferences |
+| Personal (cross-project) | `~/.kmgraph/rules.md` | N/A (local) | Personal behavioral rules across all projects |
 
 Project-scoped files take precedence over personal files when they conflict. Personal files supply defaults.
 
@@ -217,7 +217,7 @@ The two-level pattern is already established in KMGraph via CLAUDE.md (project v
 - [ ] `core/templates/knowledge/index.md` renamed to `kg-category-index.md`; `commands/init.md:437` updated
 - [ ] `kmgraph init` scaffolds all three files at `$KG_PATH/` root for new installs
 - [ ] Step 1.6.5 content migration offer present: prompts user to populate me.md/rules.md from existing CLAUDE.md
-- [ ] Personal KG scaffold also creates `index.md`, `me.md`, `rules.md` at `~/.claude/knowledge-graph/`
+- [ ] Personal KG scaffold also creates `index.md`, `me.md`, `rules.md` at `~/.kmgraph/` (updated from `~/.claude/knowledge-graph/` per v0.3.5 path migration — see Path Migration section)
 - [ ] At least one platform shim template exists in `core/templates/platform/`
 - [ ] Two-level hierarchy is documented in GETTING-STARTED or equivalent
 
