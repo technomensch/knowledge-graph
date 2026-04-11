@@ -51,14 +51,23 @@ site/
 # Knowledge Graph - selective strategy
 # Personal debugging notes
 docs/lessons-learned/debugging/
+knowledge/lessons-learned/debugging/
 # Session summaries (always private)
 docs/sessions/
+knowledge/sessions/
 # Chat exports (always private)
 docs/chat-history/
+knowledge/chat-history/
 # Implementation plans (local only)
 docs/plans/
 # Scratch/temp files (always private)
 docs/tmp/
+knowledge/tmp/
+# Personal identity file (always private)
+knowledge/me.md
+# FTS5 search index (local only, rebuilt on demand)
+**/.fts5.db
 # Note: architecture/ and patterns/ are committed for team sharing
 
 # Note: reference/, examples/, and templates/ are now committed for Docusaurus
+.kg-archive-*/

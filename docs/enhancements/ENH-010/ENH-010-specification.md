@@ -57,12 +57,22 @@ Opus audit of the migration execution block identified 13 gaps after initial v0.
 - Portability: replaces macOS-only `sed -i ''` with cross-platform `_sed_inplace` helper
 - Rollback: full implementation with `rollback_in_progress` atomicity flag; disclosed to users in migration prompt before confirmation
 
-### Phase 3: Scaffold me.md and rules.md templates
+### Phase 3: Scaffold me.md, rules.md, and kg-index.md templates
 
-`kmgraph init` Phase 3 scaffolds two new files in `knowledge/`:
+`kmgraph init` Phase 3 scaffolds three new files at the `knowledge/` root:
 
 - `knowledge/rules.md` — behavioral rules and workflow conventions (platform-agnostic)
-- `knowledge/me.md` — user identity and working style for this project
+- `knowledge/me.md` — user identity and working style for this project (always gitignored)
+- `knowledge/kg-index.md` — primary entry point and navigation hub for the KG
+
+**Naming convention (established during live testing, 2026-04-10):**
+- `kg-` prefix avoids collision with documentation site `index.md` files (MkDocs, Docusaurus, etc.)
+- Project KG: `kg-index.md`, `kg-category-index.md`
+- Personal/global KG: `kg-index-global.md`, `kg-category-index-global.md` — mirrors git's `--local`/`--global` scope convention
+
+**Scaffold path fix:** When upgrading a docs/-based KG, root scaffold files write directly to `knowledge/` (the final destination), not `docs/` (which would require migration to move them).
+
+**Post-migration content migration offer:** After migration scaffolds me.md and rules.md (empty), step h prompts user to populate them from the existing CLAUDE.md (project level). Same offer runs after personal KG setup using `~/.claude/CLAUDE.md` as source and personal `me.md`/`rules.md` as targets. Both follow the Step 1.6.5 content migration protocol: show proposed section mapping, confirm per-section, backup original before rewriting. This applies to both project and personal KG levels.
 
 Platform shim templates generated in `core/templates/platform/` for Claude, Cursor, Windsurf, and Copilot.
 
@@ -79,7 +89,8 @@ Platform shim templates generated in `core/templates/platform/` for Claude, Curs
 **Phase 3:**
 - `core/templates/knowledge/me.md` (create)
 - `core/templates/knowledge/rules.md` (create)
-- `core/templates/knowledge/index.md` (create)
+- `core/templates/knowledge/kg-index.md` (create) — project KG root index
+- `core/templates/knowledge/kg-index-global.md` (create) — personal KG root index
 - `core/templates/platform/claude-md-shim.md` (create)
 - `core/templates/platform/cursorrules-shim.md` (create)
 - `core/templates/platform/copilot-instructions-shim.md` (create)
