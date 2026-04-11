@@ -25,7 +25,6 @@
    - Map to git metadata (authors, timestamps, issue references)
 
 3. **Output Phase:**
-   - **Consolidation check (one file per day rule):** Before proposing a filename, check whether a session summary for today already exists in `{active_kg_path}/sessions/YYYY-MM/`. If one exists, the new content must be appended to it — do not propose a new file. Inform the user: "A session summary for today already exists — appending to it."
    - Generate markdown session summary with:
      - Session title and date
      - Type (Feature, Bug Fix, Refactoring, Planning, Documentation)
