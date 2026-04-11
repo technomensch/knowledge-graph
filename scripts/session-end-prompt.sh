@@ -84,7 +84,7 @@ fi
 # Check 2: Draft or Proposed ADRs
 # ─────────────────────────────────────────────────────────────
 
-DECISIONS_DIR="$KG_PROJECT_ROOT/docs/decisions"
+DECISIONS_DIR="$KG_PROJECT_ROOT/knowledge/decisions"
 DRAFT_ADR_MSG=""
 
 if [ -d "$DECISIONS_DIR" ]; then
@@ -109,7 +109,7 @@ fi
 # ─────────────────────────────────────────────────────────────
 
 LESSON_MSG=""
-LESSONS_DIR="$KG_PROJECT_ROOT/docs/lessons-learned"
+LESSONS_DIR="$KG_PROJECT_ROOT/knowledge/lessons-learned"
 
 if command -v git &>/dev/null && [ -d "$KG_PROJECT_ROOT/.git" ]; then
     RECENT_COMMITS="$(git -C "$KG_PROJECT_ROOT" log -5 --format="%s" 2>/dev/null)"

@@ -19,20 +19,20 @@ If invoked without this payload (e.g., direct command), immediately ask:
 "What rule should I capture, and where?
 - project-rule → knowledge/rules.md (team-wide, committed)
 - project-me → knowledge/me.md (your preferences for this project, gitignored)
-- personal-rule → ~/.claude/knowledge-graph/rules.md (cross-project process rule)
-- personal-me → ~/.claude/knowledge-graph/me.md (identity/style across all projects)"
+- personal-rule → ~/.kmgraph/rules.md (cross-project process rule)
+- personal-me → ~/.kmgraph/me.md (identity/style across all projects)"
 
 ## Phase 1: Read target file
 
 Read the full target file based on `target_file` in the payload:
 - `knowledge/rules.md` → read from project root
 - `knowledge/me.md` → read from project root (gitignored — safe to write)
-- `~/.claude/knowledge-graph/rules.md` → read from absolute path
-- `~/.claude/knowledge-graph/me.md` → read from absolute path
+- `~/.kmgraph/rules.md` → read from absolute path
+- `~/.kmgraph/me.md` → read from absolute path
 
 If the target file does not exist:
 - `knowledge/rules.md` or `knowledge/me.md`: "Target file not found. Run /kmgraph:init first, or I can scaffold it now."
-- `~/.claude/knowledge-graph/rules.md` or `me.md`: "Personal KG not initialized. Run /kmgraph:init-personal-kg first."
+- `~/.kmgraph/rules.md` or `me.md`: "Personal KG not initialized. Run /kmgraph:init-personal-kg first."
 
 ## Phase 2: Dedup check
 
@@ -66,7 +66,7 @@ Scan the target file for semantically similar existing entries:
 
 Draft the rule entry matching the format of existing entries in the target file.
 
-**For `knowledge/rules.md` (project-rule) and `~/.claude/knowledge-graph/rules.md` (personal-rule):**
+**For `knowledge/rules.md` (project-rule) and `~/.kmgraph/rules.md` (personal-rule):**
 Always/Never entries use this format:
 ```
 - [Always/Never] [behavioral directive]
@@ -81,7 +81,7 @@ Personal working preferences for this project. Note it is gitignored and user-sp
 ```
 Example: "In this project, show me the full diff before pushing." or "Remind me to verify the hook config after any ECC install."
 
-**For `~/.claude/knowledge-graph/me.md` (personal-me):**
+**For `~/.kmgraph/me.md` (personal-me):**
 Identity and cross-project style. Short declarative statement with ISO date:
 ```
 - [Style/preference statement] <!-- captured YYYY-MM-DD -->
@@ -140,10 +140,10 @@ Exact stub formats (must match existing `[→ rules.md]` convention):
 - [Rule: {title}](knowledge/me.md) — {one-line summary} `[→ me.md]`
 
 # For personal-rule → ~/.claude/memory/MEMORY.md:
-- [Rule: {title}](~/.claude/knowledge-graph/rules.md) — {one-line summary} `[→ personal-rules.md]`
+- [Rule: {title}](~/.kmgraph/rules.md) — {one-line summary} `[→ personal-rules.md]`
 
 # For personal-me → ~/.claude/memory/MEMORY.md:
-- [Rule: {title}](~/.claude/knowledge-graph/me.md) — {one-line summary} `[→ personal-me.md]`
+- [Rule: {title}](~/.kmgraph/me.md) — {one-line summary} `[→ personal-me.md]`
 ```
 
 **Path resolution note:** "project-level" memory is the auto-memory directory at `~/.claude/projects/{encoded-project-path}/memory/MEMORY.md` (e.g. `~/.claude/projects/-Users-mkaplan-GitHub-knowledge-graph/memory/MEMORY.md`). The agent must resolve this from the current working directory, not hardcode it.
@@ -162,6 +162,6 @@ Confirm: "Rule saved to {target_file}."
 - Never write without user approval (Phase 4 is mandatory)
 - Use atomic write (full file in single Write call) — never append-only to avoid partial-write corruption
 - Never show more than one dedup/conflict prompt — surface all conflicts together
-- `knowledge/me.md` and `~/.claude/knowledge-graph/me.md` are always gitignored — safe to write; no warning needed
+- `knowledge/me.md` and `~/.kmgraph/me.md` are always gitignored — safe to write; no warning needed
 - `knowledge/rules.md` is committed — note when confirming: "This will be committed to the repo and visible to all contributors."
-- `~/.claude/knowledge-graph/rules.md` — note: "This applies across all your projects."
+- `~/.kmgraph/rules.md` — note: "This applies across all your projects."

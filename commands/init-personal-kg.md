@@ -9,7 +9,7 @@ All bash/shell checks in this command are **implementation guidance only** — r
 
 # /kmgraph:init-personal-kg
 
-Create a personal knowledge graph at `~/.claude/knowledge-graph/` for capturing
+Create a personal knowledge graph at `~/.kmgraph/` (platform-neutral default path) for capturing
 lessons, patterns, and ADRs that apply across multiple projects.
 
 ---
@@ -24,7 +24,7 @@ lessons, patterns, and ADRs that apply across multiple projects.
 
 ## What This Does
 
-1. Creates `~/.claude/knowledge-graph/` with standard directory structure
+1. Creates `~/.kmgraph/` with standard directory structure
 2. Registers it in `~/.claude/kg-config.json` as `type: "personal"` with name `"personal"`
 3. Copies knowledge templates (patterns, gotchas, concepts)
 4. Builds FTS5 search index
@@ -46,6 +46,8 @@ Parameters:
 - `{KG_TYPE}` = "personal"
 - `{categories}` = ["architecture", "debugging", "patterns", "process"]
 - `{preserve_active}` = true
+
+**Cross-project platform-split check (section d):** Section d auto-routes to `~/.claude/CLAUDE.md § Platform Preferences` for personal KGs via the `{KG_TYPE}` = "personal" passed above — no extra parameters needed.
 
 **After upgrade-inspector completes (Option 1), always continue to Step 8 (content migration) and Step 9 (evidence seeding).** These run independently of the template upgrade check — an up-to-date template install does not mean me.md/rules.md have been populated.
 
@@ -98,11 +100,11 @@ Parameters:
 ### Step 2: Confirm path
 
 ```
-Creating personal knowledge graph at: ~/.claude/knowledge-graph/
+Creating personal knowledge graph at: ~/.kmgraph/
 
 This is the default path for cross-project lessons. Use a custom path?
 
-1. Use default (~/.claude/knowledge-graph/)
+1. Use default (~/.kmgraph/)
 2. Custom path — enter full path
 ```
 
@@ -126,7 +128,7 @@ Parameters:
 - `{KG_PATH}` = resolved personal KG path
 - `{CLAUDE_PLUGIN_ROOT}` = plugin root path
 
-When deploying `me.md` to the personal KG, strip the "See also: ~/.claude/knowledge-graph/me.md" line — it is a project-KG cross-reference that points to itself when deployed as the personal KG's own me.md.
+When deploying `me.md` to the personal KG, strip the "See also: ~/.kmgraph/me.md" line — it is a project-KG cross-reference that points to itself when deployed as the personal KG's own me.md.
 
 ---
 
@@ -156,7 +158,7 @@ Parameters:
 ### Step 7: Confirm
 
 ```
-✅ Personal KG ready at ~/.claude/knowledge-graph/
+✅ Personal KG ready at ~/.kmgraph/
 
 What changed:
   • Registered as "personal" (type: personal) in ~/.claude/kg-config.json
@@ -194,7 +196,7 @@ Would you like help populating them from your global ~/.claude/CLAUDE.md?
 3. Before rewriting CLAUDE.md, copy original to `CLAUDE.md.bak`.
 4. Rewrite `~/.claude/CLAUDE.md` to a minimal pointer:
    ```
-   For full context, read ~/.claude/knowledge-graph/rules.md and ~/.claude/knowledge-graph/me.md before acting.
+   For full context, read ~/.kmgraph/rules.md and ~/.kmgraph/me.md before acting.
    ```
 5. Also offer to migrate `user`-type entries from `~/.claude/projects/*/memory/MEMORY.md` (role, preferences, expertise — not project-specific entries) into personal `me.md`.
 6. If user declines or aborts, restore from `CLAUDE.md.bak` and delete it.

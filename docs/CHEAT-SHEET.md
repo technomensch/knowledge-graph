@@ -42,7 +42,7 @@ First-time users need these for basic operation:
 | Command | Purpose |
 |---------|---------|
 | `/kmgraph:init` | Initialize a new knowledge graph with wizard-based setup |
-| `/kmgraph:init-personal-kg` | Create personal KG at `~/.claude/knowledge-graph/` for cross-project lessons |
+| `/kmgraph:init-personal-kg` | Create personal KG at `~/.kmgraph/` for cross-project lessons |
 | `/kmgraph:capture-lesson [topic]` | Document lessons learned with git metadata tracking (v0.2.1-beta refactored) |
 | `/kmgraph:status` | View active knowledge graph info and quick reference |
 | `/kmgraph:recall [query]` | Search across all memory systems (lessons, decisions, knowledge) (v0.2.1-beta refactored) |

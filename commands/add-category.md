@@ -63,8 +63,8 @@ mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
 
 ```bash
 if [ "$git_strategy" == "ignore" ] && [ -f .gitignore ]; then
-  echo "docs/lessons-learned/$category/" >> .gitignore
-  echo "docs/knowledge/${category}.md" >> .gitignore
+  echo "knowledge/lessons-learned/$category/" >> .gitignore
+  echo "knowledge/${category}.md" >> .gitignore
 fi
 ```
 

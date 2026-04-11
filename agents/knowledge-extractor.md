@@ -60,9 +60,9 @@ Subagent: Writes approved items to knowledge graph
 - List of files to parse:
   - `README.md` (architecture overview, project context)
   - `CHANGELOG.md` or `docs/CHANGELOG.md` (decision history, version changes)
-  - `docs/lessons-learned/` directory (existing lessons, if present)
-  - `docs/decisions/` directory (existing ADRs, if present)
-  - `docs/chat-history/` directory (extracted chat logs, if present)
+  - `knowledge/lessons-learned/` directory (existing lessons, if present)
+  - `knowledge/decisions/` directory (existing ADRs, if present)
+  - `knowledge/chat-history/` directory (extracted chat logs, if present)
 
 **Output:**
 - Structured lesson candidates extracted from source files

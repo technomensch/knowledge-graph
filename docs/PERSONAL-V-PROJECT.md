@@ -21,7 +21,7 @@ A project KG lives inside a project's directory (typically `./docs/`). It contai
 
 ### Personal KG
 
-A personal KG lives at `~/.claude/knowledge-graph/` and is accessible from any project. It contains cross-project patterns and lessons:
+A personal KG lives at `~/.kmgraph/` and is accessible from any project. It contains cross-project patterns and lessons:
 
 - Workflow habits ("Create vs Update in implementation plans")
 - Tool quirks that appear across projects (MCP registration, IDE setup)
@@ -54,7 +54,7 @@ A personal KG lives at `~/.claude/knowledge-graph/` and is accessible from any p
 ```mermaid
 %%{init: {'theme': 'neutral'}}%%
 graph TB
-    subgraph Personal ["🧑 Personal KG (~/.claude/knowledge-graph/)"]
+    subgraph Personal ["🧑 Personal KG (~/.kmgraph/)"]
         P1["Cross-project patterns"]
         P2["Tool quirks & IDE setup"]
         P3["Personal ADRs"]
@@ -71,7 +71,7 @@ graph TB
     Recall -->|searches both| Project
 
     accTitle: Personal vs Project KG scopes
-    accDescr: Two KG scopes — Personal stored at ~/.claude/knowledge-graph/ and Project stored in ./docs/. Recall searches both automatically.
+    accDescr: Two KG scopes — Personal stored at ~/.kmgraph/ and Project stored in ./docs/. Recall searches both automatically.
 ```
 
 ### Setup

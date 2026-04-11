@@ -87,7 +87,7 @@ See [Getting Started Guide](docs/GETTING-STARTED.md) for prerequisites and troub
 
 **v0.3.4-beta — 2026-04-10**
 
-- **`rules-capture` skill** — Detects implicit behavioral corrections ("always X", "never X", "from now on X", "I prefer X") mid-session and offers to write them to one of four authoritative targets: `knowledge/rules.md` (project rule), `knowledge/me.md` (project personal), `~/.claude/knowledge-graph/rules.md` (personal rule), or `~/.claude/knowledge-graph/me.md` (personal style). Suggestion appended inline with 4-target shortcut menu.
+- **`rules-capture` skill** — Detects implicit behavioral corrections ("always X", "never X", "from now on X", "I prefer X") mid-session and offers to write them to one of four authoritative targets: `knowledge/rules.md` (project rule), `knowledge/me.md` (project personal), `~/.kmgraph/rules.md` (personal rule), or `~/.kmgraph/me.md` (personal style). Suggestion appended inline with 4-target shortcut menu.
 - **`rules-capture-agent`** — Dedup check, house-style draft (Always/Never + Why/Source), Approve/Edit/Discard loop, atomic write, and MEMORY.md pointer stub.
 - **MEMORY.md feedback backfill** — `/kmgraph:init` upgrade flow now offers to migrate behavioral rules from MEMORY.md feedback entries into `knowledge/rules.md` with per-entry preview and confirmation.
 
