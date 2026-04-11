@@ -342,6 +342,78 @@ function applyPlatformSplit(kgPath: string): string {
   return `Platform-split applied. Removed ${removed.length} line(s). kmgraph_schema set to 2.\n${removed.slice(0, 5).join("\n")}`;
 }
 
+// ── Exported handler for direct testing ──────────────────────────────────────
+
+export type ApplyCategory = "directories" | "config" | "templates" | "platform-split";
+
+export interface HandleUpgradeParams {
+  apply?: ApplyCategory[];
+  confirm_platform_split?: boolean;
+}
+
+export interface HandleUpgradeResult {
+  [x: string]: unknown;
+  content: Array<{ type: "text"; text: string }>;
+  isError?: true;
+}
+
+export async function handleUpgrade(params: HandleUpgradeParams): Promise<HandleUpgradeResult> {
+  const config = readConfig();
+
+  if (!config.active || !config.graphs[config.active]) {
+    return {
+      content: [{ type: "text" as const, text: "Error: No active knowledge graph configured. Use kg_config_init or kg_config_switch first." }],
+      isError: true,
+    };
+  }
+
+  const rawPath = config.graphs[config.active].path;
+  const kgPath = rawPath.replace(/^~/, os.homedir());
+
+  if (!fs.existsSync(kgPath)) {
+    return {
+      content: [{ type: "text" as const, text: `Error: KG path not found: ${kgPath}` }],
+      isError: true,
+    };
+  }
+
+  const applyList = params.apply ?? [];
+
+  if (applyList.length === 0) {
+    const result: InspectResult = { upgrades: [], warnings: [] };
+    result.upgrades.push(...checkDirectories(kgPath));
+    result.upgrades.push(...checkConfig(kgPath));
+    result.upgrades.push(...checkTemplates(kgPath));
+    const platformWarning = checkPlatformSplit(kgPath);
+    if (platformWarning) result.warnings.push(platformWarning);
+    return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
+  }
+
+  const results: string[] = [];
+  for (const category of applyList) {
+    switch (category) {
+      case "directories":
+        results.push(`[directories] ${applyDirectories(kgPath)}`);
+        break;
+      case "config":
+        results.push(`[config] ${applyConfig()}`);
+        break;
+      case "templates":
+        results.push(`[templates] ${applyTemplates(kgPath)}`);
+        break;
+      case "platform-split":
+        if (!params.confirm_platform_split) {
+          results.push("[platform-split] WARNING: platform-split migration removes content from rules.md. Pass confirm_platform_split: true to proceed.");
+        } else {
+          results.push(`[platform-split] ${applyPlatformSplit(kgPath)}`);
+        }
+        break;
+    }
+  }
+
+  return { content: [{ type: "text" as const, text: results.join("\n\n") }] };
+}
+
 // ── Tool registration ────────────────────────────────────────────────────────
 
 export function registerUpgradeTool(server: McpServer): void {
@@ -365,96 +437,7 @@ export function registerUpgradeTool(server: McpServer): void {
         ),
     },
     async ({ apply, confirm_platform_split }) => {
-      const config = readConfig();
-
-      if (!config.active || !config.graphs[config.active]) {
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: "Error: No active knowledge graph configured. Use kg_config_init or kg_config_switch first.",
-            },
-          ],
-          isError: true,
-        };
-      }
-
-      const rawPath = config.graphs[config.active].path;
-      const kgPath = rawPath.replace(/^~/, os.homedir());
-
-      if (!fs.existsSync(kgPath)) {
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: `Error: KG path not found: ${kgPath}`,
-            },
-          ],
-          isError: true,
-        };
-      }
-
-      const applyList = apply ?? [];
-
-      // ── Inspect-only mode ─────────────────────────────────────────
-      if (applyList.length === 0) {
-        const result: InspectResult = { upgrades: [], warnings: [] };
-
-        result.upgrades.push(...checkDirectories(kgPath));
-        result.upgrades.push(...checkConfig(kgPath));
-        result.upgrades.push(...checkTemplates(kgPath));
-
-        const platformWarning = checkPlatformSplit(kgPath);
-        if (platformWarning) result.warnings.push(platformWarning);
-
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: JSON.stringify(result, null, 2),
-            },
-          ],
-        };
-      }
-
-      // ── Apply mode ────────────────────────────────────────────────
-      const results: string[] = [];
-
-      for (const category of applyList) {
-        switch (category) {
-          case "directories":
-            results.push(`[directories] ${applyDirectories(kgPath)}`);
-            break;
-
-          case "config":
-            results.push(`[config] ${applyConfig()}`);
-            break;
-
-          case "templates":
-            results.push(`[templates] ${applyTemplates(kgPath)}`);
-            break;
-
-          case "platform-split":
-            if (!confirm_platform_split) {
-              results.push(
-                "[platform-split] WARNING: platform-split migration removes content from rules.md. " +
-                  "Pass confirm_platform_split: true to proceed."
-              );
-            } else {
-              results.push(`[platform-split] ${applyPlatformSplit(kgPath)}`);
-            }
-            break;
-        }
-      }
-
-      return {
-        content: [
-          {
-            type: "text" as const,
-            text: results.join("\n\n"),
-          },
-        ],
-      };
+      return handleUpgrade({ apply: apply as ApplyCategory[] | undefined, confirm_platform_split });
     }
   );
 }
