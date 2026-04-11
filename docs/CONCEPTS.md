@@ -125,6 +125,17 @@ Regular notes are freeform and often lost or forgotten. A knowledge graph adds s
 - **Git-linked** — Lessons connect back to actual code changes
 - **AI-integrated** — Key patterns sync to MEMORY.md for cross-session persistence
 
+### "How do cross-references work?"
+
+Cross-references in the knowledge graph follow the Obsidian wiki link convention (`[[...]]`), which enables navigation in compatible editors:
+
+- **Enhancements**: `[[ENH-010]]`
+- **Architecture Decisions**: `[[ADR-028-postgres-over-mongodb]]` (includes full filename for clarity)
+- **Lessons**: `[[Lessons_Learned_5]]`
+- **GitHub Issues**: Linked via `/kmgraph:link-issue` (generates `[#NNN](url)` format)
+
+These formats are automatically applied during knowledge graph initialization (see `/kmgraph:init` and `/kmgraph:init-personal-kg`). Once applied, cross-references become clickable links in Obsidian and other tools that support wiki link syntax.
+
 ### "What happens when MEMORY.md gets too large?"
 
 MEMORY.md works best under 200 lines. When it grows beyond that threshold:

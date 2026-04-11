@@ -237,6 +237,44 @@ After setup:
 
 ---
 
+## Cross-Reference Formatting (Wiki Links)
+
+When you run `/kmgraph:init` (Step 1f.2) or `/kmgraph:init-personal-kg` (Step 8.1), the system automatically converts cross-references in your knowledge graph to Obsidian wiki link format for seamless navigation in compatible editors.
+
+### Supported Formats
+
+The wiki pass applies these auto-linkification patterns:
+
+- **Enhancements**: `[[ENH-NNN]]` (e.g., `[[ENH-010]]`)
+- **Architecture Decisions**: `[[ADR-NNN-full-title]]` (e.g., `[[ADR-028-postgres-over-mongodb]]`)
+- **Lessons Learned**: `[[Lessons_Learned_X]]` (e.g., `[[Lessons_Learned_5]]`)
+- **GitHub Issues**: `[#NNN](url)` format (automatically applied when linking via `/kmgraph:link-issue`)
+
+### When Links Are Applied
+
+- During initial `/kmgraph:init` setup (Step 1f.2: "Apply Obsidian wiki link formatting to cross-references")
+- During `/kmgraph:init-personal-kg` (Step 8.1: "Applying wiki pass to personal KG")
+- Only once — controlled by the `wiki_pass_complete` config flag to avoid re-running on subsequent setups
+
+### Preview Changes with --dry-run
+
+To preview what links will be created without applying them:
+
+```bash
+/kmgraph:init --dry-run
+```
+
+The `--dry-run` mode shows which files will be modified and what cross-references will be converted, without writing any changes.
+
+### Scope & Limitations
+
+- **5 legacy lesson files** without the `Lessons_Learned_` prefix are excluded from auto-linking (e.g., `lesson-1.md`, `debug-tip.md`). Manual cross-references to these files still work — they are fully searchable and accessible.
+- Lesson files created *after* v0.3.3 automatically follow the `Lessons_Learned_X` naming convention and are auto-linked.
+
+**Related**: For naming conventions and documentation structure, see [Style Guide](STYLE-GUIDE.md).
+
+---
+
 ### 🟢 `/kmgraph:capture-lesson`
 
 <!-- Updated: 2026-03-30 -->
