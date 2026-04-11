@@ -66,8 +66,6 @@ docs/tmp/
 knowledge/tmp/
 # Personal identity file (always private)
 knowledge/me.md
-# FTS5 search index (local only, rebuilt on demand)
-**/.fts5.db
 # Note: architecture/ and patterns/ are committed for team sharing
 
 # Note: reference/, examples/, and templates/ are now committed for Docusaurus
