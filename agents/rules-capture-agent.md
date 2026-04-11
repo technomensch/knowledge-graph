@@ -9,18 +9,31 @@ This agent is only dispatched by `rules-capture` skill with a structured payload
 ```
 context:
   rule_preview: "Always open the plan file in the editor immediately after writing it."
-  target_file: "knowledge/rules.md"   # one of four paths — see scope table
-  scope: "project-rule"               # project-rule | project-me | personal-rule | personal-me
+  target_file: "knowledge/rules.md"   # one of six paths — see scope table
+  scope: "project-rule"               # project-rule | project-me | personal-rule | personal-me | platform-specific | agents
   source_quote: "[exact user phrase]"
   session_context: "[1-2 sentence summary]"
+  platform: "claude-code"             # from Phase 0 detection; omitted if unknown
+  agents_present: true                # from Phase 0 detection
 ```
+
+**`target_file` accepted values:**
+- Original four: `knowledge/rules.md`, `knowledge/me.md`, `~/.kmgraph/rules.md`, `~/.kmgraph/me.md`
+- Platform files: `CLAUDE.md`, `GEMINI.md`, `.windsurfrules`, `.github/copilot-instructions.md`, `.cursor/rules/project-preferences.mdc`, `.rules`
+- Agents file: `AGENTS.md`
+
+**`scope` accepted values:**
+- Original four: `project-rule`, `project-me`, `personal-rule`, `personal-me`
+- New: `platform-specific`, `agents`
 
 If invoked without this payload (e.g., direct command), immediately ask:
 "What rule should I capture, and where?
 - project-rule → knowledge/rules.md (team-wide, committed)
 - project-me → knowledge/me.md (your preferences for this project, gitignored)
 - personal-rule → ~/.kmgraph/rules.md (cross-project process rule)
-- personal-me → ~/.kmgraph/me.md (identity/style across all projects)"
+- personal-me → ~/.kmgraph/me.md (identity/style across all projects)
+- platform-specific → platform config file (CLAUDE.md, GEMINI.md, etc.)
+- agents → AGENTS.md (cross-tool agent instructions)"
 
 ## Phase 0: Platform Detection
 
@@ -108,14 +121,30 @@ After completing Steps 1–6, the detection result `{platform, agents_present}` 
 ## Phase 1: Read target file
 
 Read the full target file based on `target_file` in the payload:
+
+**Original four targets (behavior unchanged):**
 - `knowledge/rules.md` → read from project root
 - `knowledge/me.md` → read from project root (gitignored — safe to write)
 - `~/.kmgraph/rules.md` → read from absolute path
 - `~/.kmgraph/me.md` → read from absolute path
 
-If the target file does not exist:
+If the target file does not exist (original targets):
 - `knowledge/rules.md` or `knowledge/me.md`: "Target file not found. Run /kmgraph:init first, or I can scaffold it now."
 - `~/.kmgraph/rules.md` or `me.md`: "Personal KG not initialized. Run /kmgraph:init-personal-kg first."
+
+**New platform file targets (read from project root):**
+- `CLAUDE.md` → read from project root
+- `GEMINI.md` → read from project root
+- `.windsurfrules` → read from project root
+- `.github/copilot-instructions.md` → read from project root
+- `.cursor/rules/project-preferences.mdc` → read from project root (see Cursor picker logic in Phase 3)
+- `.rules` → read from project root
+- `AGENTS.md` → read from project root
+
+If any new platform target file does not exist:
+- Offer to create it with the standard platform header (see new-file templates in Phase 3).
+- Append `[new file]` note in the routing suggestion shown to the user.
+- Proceed to Phase 2 (dedup check skipped — no existing content) and Phase 3.
 
 ## Phase 2: Dedup check
 
@@ -145,7 +174,7 @@ Scan the target file for semantically similar existing entries:
 - Surface ALL conflicts at once — do not prompt once per conflict
 - If no similar entry: proceed to Phase 3
 
-## Phase 3: Draft in house style
+## Phase 3: Draft in house style and platform write target logic
 
 Draft the rule entry matching the format of existing entries in the target file.
 
@@ -171,9 +200,76 @@ Identity and cross-project style. Short declarative statement with ISO date:
 ```
 Example: "No em dashes in written content — use spaced hyphen instead."
 
-## Phase 4: Display draft for approval
+**For platform-specific targets (scope = `platform-specific`):**
 
-Show the full draft:
+Append the rule under the platform's preference heading:
+
+| Platform | Write target | Heading to append under |
+|---|---|---|
+| `claude-code` / `claude-code-web` | `CLAUDE.md` | `## Platform Preferences (Claude Code)` |
+| `gemini` | `GEMINI.md` | `## Platform Preferences (Gemini)` |
+| `windsurf` | `.windsurfrules` | (append to end — no heading required) |
+| `copilot` | `.github/copilot-instructions.md` | (append to end — no heading required) |
+| `cursor` | `.cursor/rules/project-preferences.mdc` | (append to end — after frontmatter) |
+| `zed` | `.rules` | (append to end — no heading required) |
+
+For files with a preference heading (CLAUDE.md, GEMINI.md): if the heading doesn't exist yet, create it before appending. If the heading exists and appears more than once, append after the last occurrence (this also satisfies pre-write safety check #4). If it exists once, append after the last line under that heading.
+
+**For agents target (scope = `agents`):**
+
+Write target: `AGENTS.md` — append to end, no heading required.
+
+**Cursor write target picker logic:**
+
+Before writing to Cursor target:
+1. Check whether `.cursor/rules/` directory exists.
+2. If it does not exist: create `.cursor/rules/` directory and write to `project-preferences.mdc`.
+3. If `.cursor/rules/` exists and contains exactly one `.mdc` file: write to that file instead of `project-preferences.mdc`.
+4. If `.cursor/rules/` exists and contains multiple `.mdc` files: present a picker to the user:
+   ```
+   Which Cursor rule file should I write to?
+   [list each .mdc file]
+   ```
+   Use the user's selection as the write target.
+5. Never write to `.cursorrules` — that is a detection-only legacy format.
+
+**New-file templates (used when target file does not exist):**
+
+| Target | Header written on create |
+|---|---|
+| `CLAUDE.md` | `# Claude Code Configuration\n\n## Platform Preferences (Claude Code)\n\n` |
+| `GEMINI.md` | `# Gemini CLI Configuration\n\n## Platform Preferences (Gemini)\n\n` |
+| `.windsurfrules` | `# Windsurf Rules\n\n` |
+| `.github/copilot-instructions.md` | `# GitHub Copilot Instructions\n\n` |
+| `.cursor/rules/project-preferences.mdc` | `---\ndescription: Project AI preferences\nalwaysApply: true\n---\n\n` |
+| `.rules` (Zed) | `# Zed AI Rules\n\n` |
+| `AGENTS.md` | `# Agent Instructions\n\n` |
+
+## Phase 4: Pre-write safety checks + display draft for approval
+
+### Pre-write safety checks (platform targets only)
+
+Run these checks BEFORE showing the confirmation prompt. These apply ONLY to platform file targets (`CLAUDE.md`, `GEMINI.md`, `.windsurfrules`, `.github/copilot-instructions.md`, `.cursor/rules/*.mdc`, `.rules`, `AGENTS.md`). The original four targets (`knowledge/rules.md`, `knowledge/me.md`, `~/.kmgraph/rules.md`, `~/.kmgraph/me.md`) keep their existing behavior unchanged.
+
+**New-file exception:** If the target file does not exist and is being newly created (from Phase 1's new-file detection), skip checks 1–4 (permission, binary, trailing newline, multiple headings). Only checks 5 (RTL strip) and 6 (length limit) apply to newly created content.
+
+**Cursor path note:** For Cursor targets, use the picker-resolved path from Phase 3 (not the payload's `target_file` value) in all checks below.
+
+1. **Permission check:** Run `[ -w "$TARGET" ]`. If file is not writable: abort with "Cannot write to `<file>` — file is read-only. Fix permissions first."
+
+2. **Binary check:** Run `file "$TARGET"`. If output does not indicate plain text (e.g., contains NUL bytes or non-text magic type): abort with "Target file appears binary or corrupted — refusing to write."
+
+3. **Trailing newline:** If the target file exists and does not end with a newline (`\n`), prepend `\n` before the new rule text when appending.
+
+4. **Multiple headings:** If `## Platform Preferences` (or the platform-specific equivalent heading) appears more than once in the file, append after the LAST occurrence, not at EOF.
+
+5. **RTL strip:** Scan the rule text for Unicode direction-override characters (U+202E RIGHT-TO-LEFT OVERRIDE, U+202D LEFT-TO-RIGHT OVERRIDE, U+200F RIGHT-TO-LEFT MARK, U+061C ARABIC LETTER MARK). Strip any found before display and write. If any were stripped, warn: "⚠️ Removed Unicode direction-override characters from rule text before writing."
+
+6. **Length limit:** If rule text exceeds 500 characters, stop and ask: "This rule is {N} characters — please shorten it before I can save it."
+
+### Display draft for approval
+
+For **original targets**, show the standard prompt:
 ```
 Here's the rule I'd add to {target_file}:
 
@@ -184,16 +280,28 @@ Here's the rule I'd add to {target_file}:
 Approve / Edit / Discard?
 ```
 
-**On "Approve":** proceed to Phase 5
-**On "Edit [natural language]":** apply the edit, re-display the draft, ask again
-**On "Discard":** acknowledge and stop — "Got it, nothing captured."
+For **platform file targets**, show:
+```
+Write to {target_file} § {heading or "end of file"}?
+
+"{rule text}"
+
+[y/n]
+```
+
+**On "Approve" / "y":** proceed to Phase 5
+**On "Edit [natural language]":** apply the edit, re-run safety checks, re-display the draft, ask again
+**On "Discard" / "n":** acknowledge and stop — "Got it, nothing captured."
 
 ## Phase 5: Write
 
-**Atomic write protocol:** Read the full current file into memory, append the new entry, write the complete file in a single Write tool call. Never write partial content. This is best-effort atomicity — the Claude Code Write tool does not do OS-level temp+rename, so a mid-write crash could still leave a truncated file. This is a known limitation; the risk is low enough not to block ship. If true atomicity is needed in a future release, the agent would need to shell out to write to a `.tmp` file and `mv` it into place.
+**Atomic write protocol:** Read the full current file into memory, append the new entry, write the complete file in a single Write tool call. Never write partial content. This applies to ALL targets — original four and new platform/agents targets alike. This is best-effort atomicity — the Claude Code Write tool does not do OS-level temp+rename, so a mid-write crash could still leave a truncated file. This is a known limitation; the risk is low enough not to block ship. If true atomicity is needed in a future release, the agent would need to shell out to write to a `.tmp` file and `mv` it into place.
 
 Write the rule to the target file:
 - For `knowledge/rules.md`: append under the appropriate section (Always, Never, or Project Conventions)
+- For `CLAUDE.md` / `GEMINI.md`: append under the platform preference heading (creating it if absent); if heading appears multiple times, append after the last occurrence
+- For `.windsurfrules`, `.github/copilot-instructions.md`, `.rules`, `AGENTS.md`: append to end of file
+- For `.cursor/rules/*.mdc`: append to end of file, after any YAML frontmatter block
 - For all other targets: append to the appropriate section
 
 **MEMORY.md pointer stub — scope-aware destination:**
@@ -204,6 +312,8 @@ Write the rule to the target file:
 | project-me | `~/.claude/projects/{project}/memory/MEMORY.md` |
 | personal-rule | `~/.claude/memory/MEMORY.md` |
 | personal-me | `~/.claude/memory/MEMORY.md` |
+| platform-specific | `~/.claude/projects/{project}/memory/MEMORY.md` |
+| agents | `~/.claude/projects/{project}/memory/MEMORY.md` |
 
 If the destination MEMORY.md does not exist, create it with this minimal header before appending:
 ```markdown
@@ -227,6 +337,19 @@ Exact stub formats (must match existing `[→ rules.md]` convention):
 
 # For personal-me → ~/.claude/memory/MEMORY.md:
 - [Rule: {title}](~/.kmgraph/me.md) — {one-line summary} `[→ personal-me.md]`
+
+# For platform-specific → ~/.claude/projects/{project}/memory/MEMORY.md:
+# (adjust path label per actual platform file — examples below)
+# (AGENTS.md uses the `agents` scope row below — not listed here.)
+- [Rule: {title}](CLAUDE.md) — {one-line summary} `[→ CLAUDE.md]`
+- [Rule: {title}](GEMINI.md) — {one-line summary} `[→ GEMINI.md]`
+- [Rule: {title}](.windsurfrules) — {one-line summary} `[→ .windsurfrules]`
+- [Rule: {title}](.github/copilot-instructions.md) — {one-line summary} `[→ copilot-instructions.md]`
+- [Rule: {title}](.cursor/rules/project-preferences.mdc) — {one-line summary} `[→ .cursor/rules]`
+- [Rule: {title}](.rules) — {one-line summary} `[→ .rules]`
+
+# For agents → ~/.claude/projects/{project}/memory/MEMORY.md:
+- [Rule: {title}](AGENTS.md) — {one-line summary} `[→ AGENTS.md]`
 ```
 
 **Path resolution note:** "project-level" memory is the auto-memory directory at `~/.claude/projects/{encoded-project-path}/memory/MEMORY.md` (e.g. `~/.claude/projects/-Users-mkaplan-GitHub-knowledge-graph/memory/MEMORY.md`). The agent must resolve this from the current working directory, not hardcode it.
