@@ -3,6 +3,10 @@ description: Create or register a personal knowledge graph for cross-project les
 allowed-tools: Bash, Read, Write, kg_fts5_rebuild
 ---
 
+## Execution Rules
+
+All bash/shell checks in this command are **implementation guidance only** — run them silently as internal steps. Never show bash commands, shell code, or raw command output to the user. Present only plain-English results, prompts, and status messages.
+
 # /kmgraph:init-personal-kg
 
 Create a personal knowledge graph at `~/.claude/knowledge-graph/` for capturing
@@ -42,11 +46,103 @@ Read `~/.claude/kg-config.json`. Look for any entry with `type: "personal"`.
 A personal KG is already registered: "[name]" at [path]
 
 Options:
-1. Use this existing KG (no action needed)
-2. Re-initialize it (reset structure, keep existing lessons)
+1. See what's new — review improvements in this version, then decide what to apply
+2. Re-initialize it — archive existing content, reset structure, keep all lessons and ADRs
 3. Register a different path as personal KG
 4. Cancel
 ```
+
+**Important:** Option 1 is the default upgrade path. Do NOT offer "use as-is / no action needed" — there may be new templates, missing files, or unpopulated me.md/rules.md to address. Always run the upgrade check.
+
+**If option 1 selected**, inspect the personal KG's actual state and report only what is missing or upgradeable for this specific install:
+
+```bash
+upgrades=()
+
+# Index reorganization — knowledge/index.md renamed to kg-category-index-global.md; new root kg-index-global.md created
+if [ -f "{personal_kg_path}/knowledge/index.md" ] && [ ! -f "{personal_kg_path}/knowledge/kg-category-index-global.md" ]; then
+  upgrades+=("Index update: renames {personal_kg_path}/knowledge/index.md to kg-category-index-global.md and adds a new kg-index-global.md at the personal KG root as the primary entry point")
+elif [ ! -f "{personal_kg_path}/kg-index-global.md" ]; then
+  upgrades+=("New: kg-index-global.md — the primary entry point for this personal knowledge graph")
+fi
+
+[ ! -f "{personal_kg_path}/me.md" ]    && upgrades+=("New: me.md — your cross-project identity and working style")
+# When writing me.md to personal KG, strip the "See also: ~/.claude/knowledge-graph/me.md" line — self-referential at personal KG level
+[ ! -f "{personal_kg_path}/rules.md" ] && upgrades+=("New: rules.md — cross-project behavioral rules and preferences")
+
+# FTS5 index — personal KG is always outside git so gitignore doesn't apply.
+# If .fts5.db exists it is intentional local state — never suggest removal or migration.
+# Only surface it if missing (offer to rebuild).
+[ ! -f "{personal_kg_path}/.fts5.db" ] && upgrades+=("Search index missing — will be rebuilt on first use")
+
+for tdir in knowledge lessons-learned decisions sessions; do
+  for template in "${CLAUDE_PLUGIN_ROOT}/core/templates/$tdir/"*; do
+    dest="{personal_kg_path}/$tdir/$(basename $template)"
+    [ ! -f "$dest" ] && upgrades+=("New template: $tdir/$(basename $template)")
+  done
+done
+```
+
+If nothing is upgradeable:
+```
+✅ Your personal KG is already up to date. Nothing to apply.
+```
+
+If upgrades exist:
+```
+Here's what's available for your personal KG:
+  • [item 1]
+  • [item 2]
+
+Apply all, pick individually, or skip?
+  1. Apply all
+  2. Let me choose which ones to apply
+  3. Skip — my setup is already how I want it
+```
+
+After applying upgrades (or if nothing to upgrade), **always continue to Step 8 (content migration) and Step 9 (evidence seeding)**. These run independently of the template upgrade check — an up-to-date template install does not mean me.md/rules.md have been populated.
+
+**If option 2 selected (re-initialize):**
+
+1. Archive all existing content before touching anything:
+   ```bash
+   ARCHIVE_DATE=$(date +%Y-%m-%d)
+   ARCHIVE_DIR="{personal_kg_path}/.kg-archive-${ARCHIVE_DATE}"
+   mkdir -p "$ARCHIVE_DIR"
+   for subdir in knowledge lessons-learned decisions sessions; do
+     [ -d "{personal_kg_path}/$subdir" ] && cp -r "{personal_kg_path}/$subdir" "$ARCHIVE_DIR/$subdir"
+   done
+   for f in me.md rules.md kg-index-global.md; do
+     [ -f "{personal_kg_path}/$f" ] && cp "{personal_kg_path}/$f" "$ARCHIVE_DIR/$f"
+   done
+   ```
+
+2. Record pre-archive lesson and ADR counts for post-validation:
+   ```bash
+   PRE_LESSON_COUNT=$(find "{personal_kg_path}/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+   PRE_ADR_COUNT=$(find "{personal_kg_path}/decisions" -name "ADR-*.md" 2>/dev/null | wc -l | tr -d ' ')
+   ```
+
+3. Proceed through Steps 3-7 (directory structure, templates, config, FTS5 index, confirm).
+
+4. After re-init, validate lesson and ADR counts are preserved:
+   ```bash
+   POST_LESSON_COUNT=$(find "{personal_kg_path}/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+   POST_ADR_COUNT=$(find "{personal_kg_path}/decisions" -name "ADR-*.md" 2>/dev/null | wc -l | tr -d ' ')
+
+   if [ "$PRE_LESSON_COUNT" -ne "$POST_LESSON_COUNT" ] || [ "$PRE_ADR_COUNT" -ne "$POST_ADR_COUNT" ]; then
+     echo "⚠️  Content count mismatch after re-init."
+     echo "   Before: $PRE_LESSON_COUNT lessons, $PRE_ADR_COUNT ADRs"
+     echo "   After:  $POST_LESSON_COUNT lessons, $POST_ADR_COUNT ADRs"
+     echo "   Archive preserved at: $ARCHIVE_DIR"
+   else
+     echo "✅ Re-initialization complete. $POST_LESSON_COUNT lessons and $POST_ADR_COUNT ADRs preserved."
+     echo "📦 Archive preserved at: $ARCHIVE_DIR"
+     echo "   Delete when satisfied: rm -rf $ARCHIVE_DIR"
+   fi
+   ```
+
+5. Continue to Step 8 (content migration) and Step 9 (evidence seeding).
 
 **If none exists:** Proceed to Step 2.
 
@@ -79,14 +175,20 @@ mkdir -p "{personal_kg_path}/lessons-learned"/{architecture,debugging,patterns,p
 ### Step 4: Copy templates
 
 ```bash
-for f in patterns.md gotchas.md concepts.md architecture.md workflows.md index.md; do
+for f in patterns.md gotchas.md concepts.md architecture.md workflows.md; do
   src="${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/$f"
   dest="{personal_kg_path}/knowledge/$f"
   [ -f "$src" ] && [ ! -f "$dest" ] && cp "$src" "$dest"
 done
+# kg-category-index deploys as kg-category-index-global.md at personal KG level
+src="${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-category-index.md"
+dest="{personal_kg_path}/knowledge/kg-category-index-global.md"
+[ -f "$src" ] && [ ! -f "$dest" ] && cp "$src" "$dest"
 ```
 
 Only copy if template doesn't already exist (preserves user content on re-init).
+
+When deploying `me.md` to the personal KG, strip the "See also: ~/.claude/knowledge-graph/me.md" line — it is a project-KG cross-reference that points to itself when deployed as the personal KG's own me.md.
 
 ---
 
@@ -137,6 +239,65 @@ How to use:
   • /kmgraph:recall "query" — now searches both project and personal KGs automatically
   • /kmgraph:switch personal — make personal KG active (advanced; usually not needed)
 ```
+
+---
+
+### Step 8: Content migration offer
+
+Offer to populate `me.md` and `rules.md` from `~/.claude/CLAUDE.md`:
+
+```
+me.md and rules.md have been created in your personal KG.
+Would you like help populating them from your global ~/.claude/CLAUDE.md?
+
+  1. Yes — show me what would move where (review before writing)
+  2. No — I'll fill them in manually
+```
+
+**If Yes:**
+1. Parse `~/.claude/CLAUDE.md` and display proposed mapping before writing anything:
+   ```
+   Proposed mapping from ~/.claude/CLAUDE.md:
+     "Personal Preferences" section → me.md
+     "Cross-Project Conventions" section → rules.md
+     Platform-specific / project-specific content → CLAUDE.md (retained)
+   ```
+2. User confirms each section before it is written.
+3. Before rewriting CLAUDE.md, copy original to `CLAUDE.md.bak`.
+4. Rewrite `~/.claude/CLAUDE.md` to a minimal pointer:
+   ```
+   For full context, read ~/.claude/knowledge-graph/rules.md and ~/.claude/knowledge-graph/me.md before acting.
+   ```
+5. Also offer to migrate `user`-type entries from `~/.claude/projects/*/memory/MEMORY.md` (role, preferences, expertise — not project-specific entries) into personal `me.md`.
+6. If user declines or aborts, restore from `CLAUDE.md.bak` and delete it.
+
+**Safety rules:** Never auto-write. User confirms per section. If `~/.claude/CLAUDE.md` does not exist, skip silently.
+
+**Skip this step** if `me.md` already has substantial content (more than the template placeholder text) — the user has already populated it manually.
+
+---
+
+### Step 9: Evidence seeding
+
+After Step 8 (whether or not the migration ran), check whether existing personal lessons or ADRs can seed `Why:`/`Source:` links into `rules.md`:
+
+```bash
+LESSON_COUNT=$(find "{personal_kg_path}/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+ADR_COUNT=$(find "{personal_kg_path}/decisions" -name "ADR-*.md" 2>/dev/null | wc -l | tr -d ' ')
+```
+
+If `LESSON_COUNT` or `ADR_COUNT` is greater than 0:
+```
+Your personal KG has [N] lessons and [M] ADRs.
+Would you like me to scan them and suggest Why:/Source: links for rules.md entries?
+
+  1. Yes — scan and show me suggestions (you approve each one before it is written)
+  2. Skip — I'll add evidence links manually
+```
+
+If Yes: scan each lesson and ADR for topic matches against `rules.md` entries. Surface candidate `Why:`/`Source:` pairs one at a time — user accepts or skips each. Write only accepted pairs.
+
+If both counts are 0: skip silently (normal for a fresh personal KG).
 
 ---
 

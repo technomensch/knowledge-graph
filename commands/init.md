@@ -2,6 +2,10 @@
 description: Initialize a new knowledge graph with wizard-based setup and flexible configuration
 ---
 
+## Execution Rules
+
+All bash/shell checks in this command are **implementation guidance only** — run them silently as internal steps. Never show bash commands, shell code, or raw command output to the user. Present only plain-English results, prompts, and status messages.
+
 # /kmgraph:init — Knowledge Graph Initialization Wizard
 
 Initialize a new knowledge graph with interactive wizard that guides you through location selection, category setup, and git strategy configuration.
@@ -33,16 +37,86 @@ It's [type] at [path] with categories: [list].
 
 What would you like to do?
 
-1. Verify/upgrade existing KG — check for missing directories, update templates,
-   add new config fields from this plugin version
+1. See what's new — review improvements in this version, then decide what to apply
 2. Create a new, separate knowledge graph (different name/location)
 3. Re-initialize "[name]" (reset categories, git strategy, etc.)
 4. Cancel — the existing KG is already set up
 ```
 
-### Option 1: Verify/Upgrade Flow
+### Option 1: See What's New
 
-When the user selects verify/upgrade, perform these checks in order:
+When the user selects option 1, **before running any checks or making any changes**, inspect the KG's actual state and report only what is missing or upgradeable for this specific install:
+
+```bash
+# Inspect what's actually missing or upgradeable
+upgrades=()
+
+# Missing directories
+for dir in knowledge lessons-learned decisions sessions chat-history tmp; do
+  [ ! -d "$KG_PATH/$dir" ] && upgrades+=("Missing directory: $dir/")
+done
+
+# Index reorganization — knowledge/index.md renamed to kg-category-index.md; new root kg-index.md created
+if [ -f "$KG_PATH/knowledge/index.md" ] && [ ! -f "$KG_PATH/knowledge/kg-category-index.md" ]; then
+  upgrades+=("Index update: renames ${KG_PATH}/knowledge/index.md to kg-category-index.md and adds a new kg-index.md at the knowledge graph root as the primary entry point")
+elif [ ! -f "$KG_PATH/kg-index.md" ]; then
+  upgrades+=("New: kg-index.md — the primary entry point for this knowledge graph")
+fi
+
+# Missing root-level scaffold files
+[ ! -f "$KG_PATH/me.md" ]      && upgrades+=("New: me.md — your identity and working style in this project")
+[ ! -f "$KG_PATH/rules.md" ]   && upgrades+=("New: rules.md — project conventions and behavioral rules")
+
+# Path migration available
+CONFIGURED_PATH=$(jq -r '.graphs["'"$kg_name"'"].path' ~/.claude/kg-config.json)
+echo "$CONFIGURED_PATH" | grep -qE '/docs/?$' && \
+  [ -d "$CONFIGURED_PATH/lessons-learned" ] && \
+  upgrades+=("Migration available: move KMGraph content from docs/ to knowledge/")
+
+# New templates (files in plugin core/templates not yet in KG)
+# Skip templates that are already covered by the scaffold file checks above:
+#   kg-index.md deploys as $KG_PATH/index.md — already checked
+#   me.md and rules.md deploy to $KG_PATH root — already checked
+scaffold_covered=("kg-index.md" "me.md" "rules.md" "kg-index-global.md")
+for tdir in knowledge lessons-learned decisions sessions; do
+  for template in "${CLAUDE_PLUGIN_ROOT}/core/templates/$tdir/"*; do
+    tname=$(basename "$template")
+    # Skip if this template is covered by a scaffold check
+    skip=false
+    for covered in "${scaffold_covered[@]}"; do
+      [ "$tname" = "$covered" ] && skip=true && break
+    done
+    $skip && continue
+    dest="$KG_PATH/$tdir/$tname"
+    [ ! -f "$dest" ] && upgrades+=("New template: $tdir/$tname")
+  done
+done
+```
+
+If nothing is upgradeable, say:
+```
+✅ Your setup is already up to date. Nothing to apply.
+```
+And exit.
+
+If upgrades exist, present them:
+```
+Here's what's available for your install:
+  • [item 1]
+  • [item 2]
+  ...
+
+Apply all, pick individually, or skip?
+  1. Apply all
+  2. Let me choose which ones to apply
+  3. Skip — my setup is already how I want it
+```
+
+If the user picks option 2 (choose individually), present each item as a separate yes/no prompt before running it.
+
+If the user picks option 3 (skip), exit with no changes.
+
+Then perform these checks in order:
 
 #### 1a. Directory structure check
 
@@ -142,26 +216,439 @@ Re-run platform detection (Step 1.11) and offer to configure any newly detected 
 
 #### 1f.0. Legacy migration
 
-When upgrading from v0.2.1 or earlier, the `.fts5.db` index may be stored in the project root. Migrate it to the user cache:
+When upgrading from v0.2.1 or earlier, the `.fts5.db` index may be stored in the project root. Before migrating, check whether the file is intentionally gitignored — if it is, it is active local state, not a legacy stray, and must not be moved or have its gitignore rule removed:
 
 ```bash
 if [ -f "$KG_ROOT/.fts5.db" ]; then
-  mkdir -p "$HOME/.claude/kg-fts5"
-  mv "$KG_ROOT/.fts5.db" "$HOME/.claude/kg-fts5/$kg_name.db"
-  echo "✅ Legacy search index migrated to user cache."
-fi
-```
-
-Then remove `.fts5.db` from `.gitignore` if present:
-
-```bash
-if [ -f "$KG_ROOT/.gitignore" ]; then
-  grep -v "^\*\*/\.fts5\.db$" "$KG_ROOT/.gitignore" > "$KG_ROOT/.gitignore.tmp"
-  mv "$KG_ROOT/.gitignore.tmp" "$KG_ROOT/.gitignore"
+  if git -C "$KG_ROOT" check-ignore -q ".fts5.db" 2>/dev/null; then
+    # Intentionally gitignored — this is the active local index, not a legacy file.
+    # Leave it in place. After any path migration it will be orphaned but harmless;
+    # a fresh index will be rebuilt at the new location on next use.
+    echo "ℹ️  Search index at $KG_ROOT/.fts5.db is gitignored (local state) — leaving in place."
+  else
+    # Not gitignored — this is a legacy stray file. Migrate to user cache.
+    mkdir -p "$HOME/.claude/kg-fts5"
+    mv "$KG_ROOT/.fts5.db" "$HOME/.claude/kg-fts5/$kg_name.db"
+    echo "✅ Legacy search index migrated to user cache."
+    # Remove the .fts5.db gitignore rule only if it was a legacy stray (not intentional)
+    if [ -f "$KG_ROOT/.gitignore" ]; then
+      grep -v "^\*\*/\.fts5\.db$" "$KG_ROOT/.gitignore" > "$KG_ROOT/.gitignore.tmp"
+      mv "$KG_ROOT/.gitignore.tmp" "$KG_ROOT/.gitignore"
+    fi
+  fi
 fi
 ```
 
 Proceed to the FTS5 rebuild check (Step 1f) below.
+
+#### 1f.1. Project-local path migration (docs/ → knowledge/)
+
+**E15 — Stale path pre-check:** Before evaluating migration triggers, verify the configured path exists on disk:
+
+```bash
+CONFIGURED_PATH=$(jq -r '.graphs["'"$kg_name"'"].path' ~/.claude/kg-config.json)
+
+if [ ! -d "$CONFIGURED_PATH" ]; then
+  echo "⚠️  Your configured KG path does not exist: $CONFIGURED_PATH"
+  echo "   This may be due to a project rename or directory move."
+  echo ""
+  echo "   Options:"
+  echo "     1. Update the path — re-run /kmgraph:init to reconfigure"
+  echo "     2. Skip — leave config as-is"
+  # Do not proceed with migration trigger evaluation if the path is missing.
+fi
+```
+
+**E3 — Recovery flag check:** If `migration_in_progress: true` is set in the config entry, display recovery options before continuing:
+
+```bash
+MIGRATION_IN_PROGRESS=$(jq -r '.graphs["'"$kg_name"'"].migration_in_progress // false' ~/.claude/kg-config.json)
+ROLLBACK_IN_PROGRESS=$(jq -r '.graphs["'"$kg_name"'"].rollback_in_progress // false' ~/.claude/kg-config.json)
+
+if [ "$ROLLBACK_IN_PROGRESS" = "true" ]; then
+  echo "⚠️  A previous rollback was interrupted."
+  echo ""
+  echo "   Options:"
+  echo "     1. Resume rollback — continue restoring files to docs/"
+  echo "     2. Skip — leave in current state (may be inconsistent)"
+  # If user selects Resume rollback: continue the rollback steps below
+  # If user selects Skip: exit without changes
+fi
+
+if [ "$MIGRATION_IN_PROGRESS" = "true" ]; then
+  echo "⚠️  A previous migration was interrupted."
+  echo ""
+  echo "   Options:"
+  echo "     1. Resume — complete the move from docs/ to knowledge/"
+  echo "     2. Rollback — move files back to docs/ and restore config"
+  echo "     3. Skip — leave in current state (may be inconsistent)"
+
+  # If user selects Resume: continue with migration steps below (fall through)
+  # If user selects Skip: exit without changes
+
+  # If user selects Rollback:
+  # Set rollback flag before starting; clears both flags on completion
+  jq '.graphs["'"$kg_name"'"].rollback_in_progress = true' \
+    ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+  mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+
+  # rb-a. Reverse root scaffold file moves
+  for f in me.md rules.md kg-index.md; do
+    [ -f "knowledge/$f" ] && mv "knowledge/$f" "docs/$f"
+  done
+
+  # rb-b. Reverse subdir moves (skip symlinks)
+  for subdir in lessons-learned decisions sessions chat-history tmp; do
+    if [ -L "knowledge/$subdir" ]; then
+      echo "⚠️  knowledge/$subdir is a symlink — skipping. Move manually if needed."
+      continue
+    fi
+    [ -d "knowledge/$subdir" ] && mv "knowledge/$subdir" "docs/$subdir"
+  done
+
+  # rb-b2. Reverse knowledge/concepts/ if it was moved from docs/knowledge/
+  if [ -d "knowledge/concepts" ] && [ ! -d "docs/knowledge" ]; then
+    mv "knowledge/concepts" "docs/knowledge"
+  fi
+
+  # rb-c. Restore kg-config.json path
+  PROJECT_ROOT=$(pwd)
+  jq ".graphs[\"$kg_name\"].path = \"$PROJECT_ROOT/docs\"" \
+    ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+  mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+
+  # rb-d. Reverse .gitignore rules
+  if [ -f .gitignore ]; then
+    _sed_inplace \
+      -e 's|knowledge/sessions/|docs/sessions/|g' \
+      -e 's|knowledge/chat-history/|docs/chat-history/|g' \
+      -e 's|knowledge/lessons-learned/\(.*\)/|docs/lessons-learned/\1/|g' \
+      -e 's|knowledge/tmp/|docs/tmp/|g' \
+      -e 's|knowledge/me\.md|docs/me.md|g' \
+      .gitignore
+    grep -qx 'knowledge/' .gitignore && \
+      _sed_inplace -e 's|^knowledge/$|docs/|' .gitignore || true
+  fi
+
+  # rb-e. Reverse cross-reference rewrites in docs/ files and platform configs
+  find docs/ -name "*.md" -type f 2>/dev/null | while read f; do
+    _sed_inplace \
+      -e 's|knowledge/lessons-learned/|docs/lessons-learned/|g' \
+      -e 's|knowledge/decisions/|docs/decisions/|g' \
+      -e 's|knowledge/sessions/|docs/sessions/|g' \
+      -e 's|knowledge/chat-history/|docs/chat-history/|g' \
+      -e 's|knowledge/concepts/|docs/knowledge/|g' \
+      "$f"
+  done
+  for f in CLAUDE.md README.md GEMINI.md .cursorrules .windsurfrules .github/copilot-instructions.md .aider.conf.yml; do
+    [ -f "$f" ] && _sed_inplace \
+      -e 's|knowledge/lessons-learned/|docs/lessons-learned/|g' \
+      -e 's|knowledge/decisions/|docs/decisions/|g' \
+      -e 's|knowledge/sessions/|docs/sessions/|g' \
+      -e 's|knowledge/chat-history/|docs/chat-history/|g' \
+      -e 's|knowledge/concepts/|docs/knowledge/|g' \
+      "$f" || true
+  done
+
+  # rb-f. Clear both flags
+  jq 'del(.graphs["'"$kg_name"'"].migration_in_progress) | del(.graphs["'"$kg_name"'"].rollback_in_progress)' \
+    ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+  mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+
+  echo "✅ Rollback complete. KG restored to docs/. Run /kmgraph:status to verify."
+  # Exit — do not proceed with forward migration
+fi
+```
+
+**Trigger conditions** (all must be true):
+- KG type is `project-local`
+- Configured path ends in `/docs` or `/docs/`
+- `docs/lessons-learned/` exists at that path (confirms KMGraph content, not just any docs folder)
+
+Note: Migration applies to project-local KGs only. Personal KGs (`~/.claude/knowledge-graph/`) use a fixed path and never have a `docs/` layout — they are intentionally excluded by the type check above.
+
+```bash
+KG_TYPE=$(jq -r '.graphs["'"$kg_name"'"].type' ~/.claude/kg-config.json)
+KG_PATH_ENDS_DOCS=$(echo "$CONFIGURED_PATH" | grep -E '/docs/?$')
+
+if [ "$KG_TYPE" = "project-local" ] && [ -n "$KG_PATH_ENDS_DOCS" ] && [ -d "$CONFIGURED_PATH/lessons-learned" ]; then
+  echo "Your knowledge graph is stored in docs/ — the new recommended location is knowledge/."
+  echo ""
+  echo "Move it now? This is reversible — if anything goes wrong, run /kmgraph:init again to roll back."
+  echo "  1. Yes — move KMGraph subdirs to knowledge/, update config and all cross-references"
+  echo "  2. No — keep in docs/ (no changes)"
+fi
+```
+
+**Migration logic (if user selects Yes):**
+
+```bash
+# Portable in-place sed (macOS uses -i '', GNU/Linux uses -i)
+_sed_inplace() {
+  if sed --version 2>/dev/null | grep -q GNU; then
+    sed -i "$@"
+  else
+    sed -i '' "$@"
+  fi
+}
+
+# a. Create new location
+mkdir -p knowledge/
+
+# b. Set atomic migration flag before moving files
+jq '.graphs["'"$kg_name"'"].migration_in_progress = true' \
+  ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+
+# c. Archive KMGraph content from docs/ before moving (preserve for validation and recovery)
+ARCHIVE_DATE=$(date +%Y-%m-%d)
+ARCHIVE_DIR=".kg-archive-${ARCHIVE_DATE}"
+mkdir -p "$ARCHIVE_DIR"
+
+for subdir in lessons-learned decisions sessions chat-history tmp; do
+  [ -d "docs/$subdir" ] && [ ! -L "docs/$subdir" ] && cp -r "docs/$subdir" "$ARCHIVE_DIR/$subdir"
+done
+if [ -d "docs/knowledge" ]; then
+  cp -r "docs/knowledge" "$ARCHIVE_DIR/knowledge"
+fi
+for f in me.md rules.md kg-index.md; do
+  [ -f "docs/$f" ] && cp "docs/$f" "$ARCHIVE_DIR/$f"
+done
+
+# Add archive dir to .gitignore so it is never committed
+grep -qxF ".kg-archive-*/" .gitignore 2>/dev/null || echo ".kg-archive-*/" >> .gitignore
+
+# d. Move ONLY known KMGraph subdirs (never the entire docs/)
+for subdir in lessons-learned decisions sessions chat-history tmp; do
+  if [ -L "docs/$subdir" ]; then
+    echo "⚠️  docs/$subdir is a symlink — skipping automatic move. Move manually if needed."
+    continue
+  fi
+  [ -d "docs/$subdir" ] && mv "docs/$subdir" "knowledge/$subdir"
+done
+
+# Special case: docs/knowledge/ would create knowledge/knowledge/ nesting — merge or rename
+if [ -d "docs/knowledge" ]; then
+  if [ -d "knowledge/concepts" ]; then
+    echo "⚠️  docs/knowledge/ detected but knowledge/concepts/ already exists — merging."
+    rsync -a --ignore-existing "docs/knowledge/" "knowledge/concepts/" && rm -rf "docs/knowledge"
+  else
+    echo "⚠️  docs/knowledge/ detected. Moving to knowledge/concepts/ to avoid nesting."
+    echo "   If you prefer a different name, rename knowledge/concepts/ manually."
+    mv "docs/knowledge" "knowledge/concepts"
+  fi
+fi
+
+# Move root-level scaffold files if present
+for f in me.md rules.md kg-index.md; do
+  [ -f "docs/$f" ] && mv "docs/$f" "knowledge/$f"
+done
+
+# e-pre. Validate file counts match archive before proceeding
+VALIDATION_FAILED=0
+for subdir in lessons-learned decisions sessions chat-history tmp; do
+  if [ -d "$ARCHIVE_DIR/$subdir" ]; then
+    ARCHIVE_COUNT=$(find "$ARCHIVE_DIR/$subdir" -type f | wc -l | tr -d ' ')
+    DEST_COUNT=$(find "knowledge/$subdir" -type f 2>/dev/null | wc -l | tr -d ' ')
+    if [ "$ARCHIVE_COUNT" -ne "$DEST_COUNT" ]; then
+      echo "⚠️  File count mismatch in $subdir: archive has $ARCHIVE_COUNT, knowledge/ has $DEST_COUNT"
+      VALIDATION_FAILED=1
+    fi
+  fi
+done
+
+if [ "$VALIDATION_FAILED" -eq 1 ]; then
+  echo ""
+  echo "❌ Migration validation failed — file counts do not match."
+  echo "   Your original content is preserved at: $ARCHIVE_DIR/"
+  echo "   Triggering rollback..."
+  # Trigger rollback (see rollback block below)
+  ROLLBACK_REASON="validation_failed"
+fi
+
+# d. Update kg-config.json path
+PROJECT_ROOT=$(pwd)
+OLD_PATH="$PROJECT_ROOT/docs"
+jq ".graphs[\"$kg_name\"].path = \"$PROJECT_ROOT/knowledge\"" \
+  ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+
+# d2. Update sibling KG entries pointing to the same old path (exact match only)
+jq -r '.graphs | to_entries[] | select(.value.path == "'"$OLD_PATH"'") | .key' \
+  ~/.claude/kg-config.json | while read sibling; do
+  [ "$sibling" = "$kg_name" ] && continue
+  jq ".graphs[\"$sibling\"].path = \"$PROJECT_ROOT/knowledge\"" \
+    ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+  mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+  echo "Updated sibling KG config path: $sibling → $PROJECT_ROOT/knowledge"
+done
+
+# e. Update .gitignore rules
+if [ -f .gitignore ]; then
+  _sed_inplace \
+    -e 's|docs/sessions/|knowledge/sessions/|g' \
+    -e 's|docs/chat-history/|knowledge/chat-history/|g' \
+    -e 's|docs/lessons-learned/\(.*\)/|knowledge/lessons-learned/\1/|g' \
+    -e 's|docs/tmp/|knowledge/tmp/|g' \
+    -e 's|docs/me\.md|knowledge/me.md|g' \
+    .gitignore
+  # Rewrite blanket docs/ KMGraph rule only if KMGraph confirmed to own docs/
+  # (trigger condition verified docs/lessons-learned/ exists above — safe to rewrite)
+  grep -qx 'docs/' .gitignore && \
+    _sed_inplace -e 's|^docs/$|knowledge/|' .gitignore || true
+fi
+
+# e2. Rewrite docs/ path references inside migrated markdown files
+find knowledge/ -name "*.md" -type f | while read f; do
+  _sed_inplace \
+    -e 's|docs/lessons-learned/|knowledge/lessons-learned/|g' \
+    -e 's|docs/decisions/|knowledge/decisions/|g' \
+    -e 's|docs/sessions/|knowledge/sessions/|g' \
+    -e 's|docs/chat-history/|knowledge/chat-history/|g' \
+    -e 's|docs/knowledge/|knowledge/concepts/|g' \
+    "$f"
+done
+
+# Also update platform config files if present
+for f in CLAUDE.md README.md GEMINI.md .cursorrules .windsurfrules .github/copilot-instructions.md .aider.conf.yml; do
+  [ -f "$f" ] && _sed_inplace \
+    -e 's|docs/lessons-learned/|knowledge/lessons-learned/|g' \
+    -e 's|docs/decisions/|knowledge/decisions/|g' \
+    -e 's|docs/sessions/|knowledge/sessions/|g' \
+    -e 's|docs/chat-history/|knowledge/chat-history/|g' \
+    -e 's|docs/knowledge/|knowledge/concepts/|g' \
+    "$f" || true
+done
+
+# Scan project MEMORY.md for stale docs/ references and surface them
+PROJECT_DIR_NAME=$(basename "$(pwd)")
+MEMORY_FILE=$(find "$HOME/.claude/projects/" -path "*${PROJECT_DIR_NAME}*/memory/MEMORY.md" 2>/dev/null | head -1)
+if [ -n "$MEMORY_FILE" ]; then
+  STALE=$(grep -n "docs/" "$MEMORY_FILE" | grep -E "docs/(lessons-learned|decisions|sessions|knowledge)" || true)
+  if [ -n "$STALE" ]; then
+    echo "⚠️  Stale docs/ references found in your MEMORY.md ($MEMORY_FILE):"
+    echo "$STALE"
+    echo "   Update manually or re-run /kmgraph:init after editing."
+  fi
+fi
+
+# f. Clear migration flag
+jq 'del(.graphs["'"$kg_name"'"].migration_in_progress)' \
+  ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+
+echo "✅ Graph moved to knowledge/. Config updated."
+echo ""
+echo "📦 Archive preserved at: $ARCHIVE_DIR/"
+echo "   Your original docs/ content is intact there. Once you've verified everything"
+echo "   migrated correctly, delete it with: rm -rf $ARCHIVE_DIR"
+echo ""
+
+# g. Post-migration backfill
+# The search index always needs a rebuild after migration — file paths changed.
+echo "Rebuilding search index for new location..."
+# Call kg_fts5_rebuild with the new KG path (knowledge/)
+# If indexed > 0: confirm. If indexed == 0: warn about path misconfiguration.
+
+echo ""
+LESSON_COUNT=$(find "knowledge/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+KG_ENTRY_COUNT=$(find "knowledge/knowledge" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+
+if [ "$LESSON_COUNT" -gt 0 ] && [ "$KG_ENTRY_COUNT" -eq 0 ]; then
+  echo "⚠️  $LESSON_COUNT lessons migrated but no KG entries exist yet."
+  echo ""
+  echo "  Run /kmgraph:update-graph to extract patterns from your lessons?"
+  echo "  This populates knowledge/ with structured entries for fast recall."
+  echo ""
+  echo "    1. Yes — run update-graph now"
+  echo "    2. Skip — I'll run it later"
+  # If Yes: invoke /kmgraph:update-graph --auto --sync-all
+fi
+
+# h. Content migration offer — populate me.md and rules.md from existing CLAUDE.md
+# me.md and rules.md were scaffolded empty. If a CLAUDE.md exists, offer to populate them.
+ME_MD="knowledge/me.md"
+RULES_MD="knowledge/rules.md"
+PROJECT_CLAUDE_MD="$(pwd)/CLAUDE.md"
+
+if [ -f "$PROJECT_CLAUDE_MD" ] && { [ -f "$ME_MD" ] || [ -f "$RULES_MD" ]; }; then
+  echo ""
+  echo "  me.md and rules.md have been created in knowledge/."
+  echo "  Would you like help populating them from your existing CLAUDE.md?"
+  echo ""
+  echo "    1. Yes — show me what would move where (review before writing)"
+  echo "    2. No — I'll fill them in manually"
+fi
+# If Yes:
+#   Follow Step 1.6.5 exactly:
+#   1. Parse project CLAUDE.md; display proposed section → file mapping before writing
+#   2. User confirms each section
+#   3. Before rewriting CLAUDE.md, copy original to CLAUDE.md.bak
+#   4. Rewrite CLAUDE.md to pointer: "For full context, read knowledge/rules.md and knowledge/me.md before acting."
+#   5. If user aborts, restore from CLAUDE.md.bak and delete it
+
+# h.2. Evidence seeding — scan for Why/Source candidates after rules.md is populated
+# Only runs if rules.md was just written (either from CLAUDE.md or scaffolded)
+if [ -f "knowledge/rules.md" ]; then
+  echo ""
+  echo "  Scanning your existing lessons and decisions for evidence candidates..."
+  echo "  I'll suggest Why: and Source: annotations for rules where evidence exists."
+  echo "  You can accept each suggestion individually or skip all."
+  echo ""
+  
+  # For each major section in the written rules.md, search lessons-learned/ and decisions/
+  # for files whose title/content matches the rule topic.
+  # Present matches as: "Section '[name]' — found potential source: [filename]"
+  # Ask: "Add Why: + Source: to this section? [y/n]"
+  # If yes: append the Why: and Source: lines to the section in rules.md
+  #
+  # Search strategy:
+  # - grep -r for keywords from the rule section heading in lessons-learned/ and decisions/
+  # - Surface up to 1-2 candidates per section (best match by filename keyword overlap)
+  # - Skip sections that already have Why:/Source: lines
+  # - Skip if lessons-learned/ and decisions/ are both empty
+  
+  LESSON_COUNT=$(find "knowledge/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+  ADR_COUNT=$(find "knowledge/decisions" -name "ADR-*.md" 2>/dev/null | wc -l | tr -d ' ')
+  
+  if [ "$LESSON_COUNT" -eq 0 ] && [ "$ADR_COUNT" -eq 0 ]; then
+    echo "  (No lessons or decisions yet — evidence seeding skipped. Run this again after capturing lessons.)"
+  else
+    echo "  Found $LESSON_COUNT lessons and $ADR_COUNT decisions to scan."
+    echo ""
+    echo "  For each rule section where a match is found, you'll be asked to confirm"
+    echo "  the Why: and Source: annotation before it's written."
+    echo ""
+    echo "    1. Scan and show me suggestions"
+    echo "    2. Skip — I'll add evidence links manually"
+    # If 1: execute the per-section scan and offer annotation per match
+    # If 2: continue to step i
+  fi
+fi
+
+# i. Personal KG prompt — offer to run /kmgraph:init at user level if not already set up
+PERSONAL_KG_EXISTS=$(jq -r '.graphs | to_entries[] | select(.value.type == "personal") | .key' ~/.claude/kg-config.json 2>/dev/null)
+if [ -z "$PERSONAL_KG_EXISTS" ]; then
+  echo ""
+  echo "  Your project KG is now at knowledge/ — want to set up a personal KG too?"
+  echo "  A personal KG at ~/.claude/knowledge-graph/ captures cross-project lessons"
+  echo "  and conventions that apply everywhere, not just this project."
+  echo ""
+  echo "    1. Yes — run /kmgraph:init-personal-kg now"
+  echo "    2. Skip — I'll set it up later with /kmgraph:init-personal-kg"
+  # If Yes: invoke /kmgraph:init-personal-kg
+  # After personal KG is set up, run the content migration offer for the personal level:
+  #   Source: ~/.claude/CLAUDE.md
+  #   Targets: ~/.claude/knowledge-graph/me.md, ~/.claude/knowledge-graph/rules.md
+  #   Also offer to migrate user-type entries from ~/.claude/projects/.../memory/MEMORY.md → personal me.md
+  #   (See Step 1.6.5 Personal KG case for full details)
+  # After personal KG me.md/rules.md are created: run the same evidence seeding offer
+  # using personal KG path for both the target files and the source scan directories
+  # (~/.claude/knowledge-graph/lessons-learned/ and ~/.claude/knowledge-graph/decisions/)
+fi
+```
+
+**Safety constraint:** Only named KMGraph subdirectories (`lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`, `tmp/`) and root scaffold files (`me.md`, `rules.md`, `kg-index.md`) are moved. Never touch other `docs/` contents. Symlinked subdirs are skipped with a warning.
 
 #### 1f. FTS5 index check
 
@@ -278,7 +765,7 @@ No action needed — your KG is ready to use.
 ```
 Where should this knowledge graph be stored?
 
-1. Project-local (./docs/)
+1. Project-local (./knowledge/)
 2. Global topic-based (~/.claude/knowledge-graphs/[name]/)
 3. Claude Cowork (~/.claude/cowork-knowledge/[topic]/)
 4. Custom path
@@ -395,7 +882,7 @@ Use `AskUserQuestion` tool for each step. Collect:
 ```bash
 case $location_type in
   "project-local")
-    KG_PATH="./docs/"
+    KG_PATH="./knowledge/"
     ;;
   "personal")
     KG_PATH="$HOME/.claude/knowledge-graphs/$kg_name/"
@@ -411,8 +898,28 @@ esac
 
 ### Step 1.5: Create directory structure
 
+**Pre-flight check (E2, E16):** Before running `mkdir -p`, check if `$KG_PATH` already exists:
+
 ```bash
-mkdir -p "$KG_PATH"/{knowledge,lessons-learned,decisions,sessions,chat-history}
+if [ -d "$KG_PATH" ]; then
+  # Check for KMGraph markers
+  if [ -d "$KG_PATH/lessons-learned" ] || [ -d "$KG_PATH/decisions" ]; then
+    # Already a KMGraph install — skip to Verify/Upgrade (Step 1f)
+    echo "KMGraph directories detected at $KG_PATH — switching to Verify/Upgrade flow."
+    # proceed to Step 1f
+  else
+    # Directory exists but no KMGraph markers
+    echo "⚠️  $KG_PATH already exists with unrecognized content."
+    echo "Create only missing KMGraph subdirectories inside it? [y/N]"
+    echo "Choosing N aborts init — use --location to specify a different path."
+    # If user answers N: exit init
+    # If user answers Y: proceed with mkdir -p below (existing non-KMGraph files untouched)
+  fi
+fi
+```
+
+```bash
+mkdir -p "$KG_PATH"/{knowledge,lessons-learned,decisions,sessions,chat-history,tmp}
 
 # Create category subdirectories
 for category in "${categories[@]}"; do
@@ -434,7 +941,23 @@ cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/gotchas.md" "$KG_PATH/knowled
 cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/concepts.md" "$KG_PATH/knowledge/"
 cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/architecture.md" "$KG_PATH/knowledge/"
 cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/workflows.md" "$KG_PATH/knowledge/"
-cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/index.md" "$KG_PATH/knowledge/"
+cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-category-index.md" "$KG_PATH/knowledge/"
+
+# Copy root-level files (E6 — skip if already exists to preserve teammate copies)
+# If KG is docs/-based and migration will be offered, scaffold directly to knowledge/ so files
+# land at the final destination rather than docs/ (migration would move them, but this is cleaner).
+SCAFFOLD_ROOT="$KG_PATH"
+if echo "$KG_PATH" | grep -qE '/docs/?$'; then
+  PROJECT_ROOT_FOR_SCAFFOLD=$(echo "$KG_PATH" | sed 's|/docs/*$||')
+  mkdir -p "$PROJECT_ROOT_FOR_SCAFFOLD/knowledge"
+  SCAFFOLD_ROOT="$PROJECT_ROOT_FOR_SCAFFOLD/knowledge"
+fi
+[ -f "$SCAFFOLD_ROOT/rules.md" ] && echo "rules.md already exists — skipping scaffold (teammate copy preserved)." || \
+  cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/rules.md" "$SCAFFOLD_ROOT/rules.md"
+[ -f "$SCAFFOLD_ROOT/kg-index.md" ] && echo "kg-index.md already exists — skipping scaffold." || \
+  cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-index.md" "$SCAFFOLD_ROOT/kg-index.md"
+# me.md is always gitignored — safe to scaffold fresh
+cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/me.md" "$SCAFFOLD_ROOT/me.md"
 
 # Copy lesson/ADR templates
 cp "${CLAUDE_PLUGIN_ROOT}/core/templates/lessons-learned/README.md" "$KG_PATH/lessons-learned/"
@@ -452,7 +975,47 @@ if [ ! -f "~/.claude/projects/$(basename $(pwd))/memory/MEMORY.md" ]; then
 fi
 ```
 
-### Step 1.6.5: Install Post-Commit Hook (Optional) <!-- v0.0.3 Change -->
+### Step 1.6.5: Content migration offer (new install only)
+
+After scaffolding `me.md` and `rules.md`, offer to populate them from existing CLAUDE.md files:
+
+```
+me.md and rules.md have been created. Would you like help populating them
+from your existing CLAUDE.md?
+
+  1. Yes — show me what would move where (review before writing)
+  2. No — I'll fill them in manually
+```
+
+**If Yes:**
+
+1. Parse the project-level `CLAUDE.md` (in current working directory) first, then `~/.claude/CLAUDE.md` for personal content.
+2. Display proposed mapping before writing anything:
+   ```
+   Proposed mapping from CLAUDE.md:
+     Section "Project Conventions" → rules.md
+     Section "Personal Preferences" → me.md
+     Platform-specific adapter content → CLAUDE.md (retained as pointer + platform content)
+   ```
+3. User confirms each section before it is written.
+4. Before rewriting CLAUDE.md, copy original to `CLAUDE.md.bak`.
+5. Rewrite CLAUDE.md to a minimal pointer + any platform-specific content with no home in rules.md:
+   ```
+   For full context, read knowledge/rules.md and knowledge/me.md before acting.
+   ```
+6. If user declines or aborts mid-migration, restore from `CLAUDE.md.bak` and delete it.
+
+**Safety rules:**
+- Never delete content from source files without user confirmation.
+- Never auto-write to `~/.claude/CLAUDE.md` — only suggest; user executes manually or approves per-write.
+- If source file does not exist, skip silently.
+- **Skip this step** if `me.md` already has substantial content (more than the template placeholder text) — the user has already populated it manually.
+
+**Personal KG case:** When initializing the personal KG (Step 1.8.5), run the same offer using `~/.claude/CLAUDE.md` as source and `~/.claude/knowledge-graph/me.md` / `~/.claude/knowledge-graph/rules.md` as targets. Also offer to migrate relevant entries from `~/.claude/projects/.../memory/MEMORY.md` (user-type memories: role, preferences, expertise) to personal `me.md`.
+
+---
+
+### Step 1.6.6: Install Post-Commit Hook (Optional) <!-- v0.0.3 Change -->
 
 **Prompt user:**
 ```
@@ -498,18 +1061,24 @@ to .git/hooks/post-commit and making it executable.
 if [ -d .git ] && [ "$location_type" == "project-local" ]; then
   # Add gitignore rules based on git strategy
   if [ "$git_strategy" == "all-ignore" ]; then
-    echo "docs/" >> .gitignore
+    echo "knowledge/" >> .gitignore
   elif [ "$git_strategy" == "selective" ]; then
     for category in "${!category_git_rules[@]}"; do
       if [ "${category_git_rules[$category]}" == "ignore" ]; then
-        echo "docs/lessons-learned/$category/" >> .gitignore
-        echo "docs/knowledge/${category}.md" >> .gitignore
+        echo "knowledge/lessons-learned/$category/" >> .gitignore
+        echo "knowledge/knowledge/${category}.md" >> .gitignore
       fi
     done
-    # Always gitignore sessions and chat-history
-    echo "docs/sessions/" >> .gitignore
-    echo "docs/chat-history/" >> .gitignore
+    # Always gitignore sessions, chat-history, tmp, and me.md
+    echo "knowledge/sessions/" >> .gitignore
+    echo "knowledge/chat-history/" >> .gitignore
+    echo "knowledge/tmp/" >> .gitignore
   fi
+  # E14 — me.md is always personal regardless of git strategy
+  echo "knowledge/me.md" >> .gitignore
+  echo ""
+  echo "Note: knowledge/me.md is always personal — gitignored regardless of your git strategy."
+  echo "      Each contributor maintains their own copy."
 fi
 ```
 
@@ -572,11 +1141,20 @@ Examples of personal lessons:
    mkdir -p "$HOME/.claude/knowledge-graph/lessons-learned"/{architecture,debugging,patterns,process}
    ```
 
-3. Copy templates (same as project KG setup):
+3. Copy templates:
    ```bash
-   for f in patterns.md gotchas.md concepts.md architecture.md workflows.md index.md; do
+   # Category templates → knowledge/ subfolder
+   for f in patterns.md gotchas.md concepts.md architecture.md workflows.md; do
      cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/$f" "$HOME/.claude/knowledge-graph/knowledge/" 2>/dev/null || true
    done
+   # kg-category-index deploys as kg-category-index-global.md at personal KG level
+   cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-category-index.md" "$HOME/.claude/knowledge-graph/knowledge/kg-category-index-global.md" 2>/dev/null || true
+   # Root-level files — me.md, rules.md, kg-index-global.md → KG root
+   cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/me.md" "$HOME/.claude/knowledge-graph/me.md"
+   [ -f "$HOME/.claude/knowledge-graph/rules.md" ] && echo "rules.md already exists — skipping scaffold." || \
+     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/rules.md" "$HOME/.claude/knowledge-graph/rules.md"
+   [ -f "$HOME/.claude/knowledge-graph/kg-index-global.md" ] && echo "kg-index-global.md already exists — skipping scaffold." || \
+     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-index-global.md" "$HOME/.claude/knowledge-graph/kg-index-global.md"
    ```
 
 4. Register in `~/.claude/kg-config.json`:
@@ -604,7 +1182,49 @@ Examples of personal lessons:
    > "✅ Personal KG created at `~/.claude/knowledge-graph/`
    > Capture cross-project lessons with `/kmgraph:capture-lesson` — you'll be asked which KG to save to."
 
-**If No:**
+7. Content migration offer for personal KG:
+
+   Run the Step 1.6.5 content migration logic with personal KG parameters:
+   - Source file: `~/.claude/CLAUDE.md`
+   - Target me.md: `~/.claude/knowledge-graph/me.md`
+   - Target rules.md: `~/.claude/knowledge-graph/rules.md`
+   - Also offer to migrate `user`-type entries from `~/.claude/projects/*/memory/MEMORY.md` into personal `me.md` (role, preferences, expertise — not project-specific entries)
+
+   Prompt:
+   ```
+   me.md and rules.md have been created in your personal KG.
+   Would you like help populating them from your global ~/.claude/CLAUDE.md?
+
+     1. Yes — show me what would move where (review before writing)
+     2. No — I'll fill them in manually
+   ```
+
+   Apply all the same safety rules from Step 1.6.5: no auto-write, user confirms per section, backup before rewrite.
+   **Skip this step** if `me.md` already has substantial content (more than the template placeholder text) — the user has already populated it manually.
+
+8. Evidence seeding for personal me.md and rules.md:
+
+   After step 7 (whether or not the user ran the migration offer), check whether existing personal lessons or ADRs can seed Why/Source links into rules.md:
+
+   ```bash
+   LESSON_COUNT=$(find "$HOME/.claude/knowledge-graph/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+   ADR_COUNT=$(find "$HOME/.claude/knowledge-graph/decisions" -name "ADR-*.md" 2>/dev/null | wc -l | tr -d ' ')
+   ```
+
+   If `LESSON_COUNT` or `ADR_COUNT` is greater than 0:
+   ```
+   Your personal KG has [N] lessons and [M] ADRs.
+   Would you like me to scan them and suggest Why:/Source: links for rules.md entries?
+
+     1. Yes — scan and show me suggestions (you approve each one before it is written)
+     2. Skip — I'll add evidence links manually
+   ```
+
+   If Yes: scan each lesson and ADR for topic matches against rules.md entries. Surface candidate Why/Source pairs one at a time — user accepts or skips each. Write only accepted pairs.
+
+   If `LESSON_COUNT` and `ADR_COUNT` are both 0: skip silently (normal for a fresh personal KG).
+
+**If No (to the overall personal KG offer):**
    > "No problem. Run `/kmgraph:init-personal-kg` any time to set this up later."
 
 ---
@@ -625,6 +1245,12 @@ Directory Structure:
   decisions/           — Architecture Decision Records
   sessions/            — Session summaries (always gitignored)
   chat-history/        — Chat extraction output (always gitignored)
+  tmp/                 — Scratch space (always gitignored)
+
+  Root files:
+  kg-index.md          — KG navigation hub
+  me.md                — Personal context (always gitignored)
+  rules.md             — Project rules and conventions
 
 Next steps:
   /kmgraph:status          — View KG info and quick reference
@@ -635,7 +1261,10 @@ Templates copied to $KG_PATH
 Examples available at ${CLAUDE_PLUGIN_ROOT}/core/examples/ (not copied by default)
 
 ⚠️  Privacy reminder: Review sensitive data with /kmgraph:check-sensitive before pushing to public repos.
-⚠️  Note: chat-history/ and sessions/ are always gitignored (never committed to version control)
+⚠️  Note: chat-history/, sessions/, tmp/, and me.md are always gitignored (never committed to version control)
+
+💡 Quarterly review recommended: me.md and rules.md change slowly but do change — review for drift and bloat every few months.
+   Update knowledge/index.md whenever you add major new subdirectories.
 ```
 
 ### Step 1.10: Optional Backfill from Existing Project
@@ -777,16 +1406,25 @@ If the user declines overwrite: show the exact content to merge manually (per th
 
 #### Writing Platform Files
 
+Each platform file written should begin with the knowledge pointer line, followed only by minimal platform-specific adapter content. Full rules are not duplicated here — they live in `knowledge/rules.md` and `knowledge/me.md`.
+
+```
+For full context, read knowledge/rules.md and knowledge/me.md before acting.
+```
+
 For each approved platform, write the appropriate file using the content source in the table above:
 
 ```bash
 # Gemini CLI example
-cp "${CLAUDE_PLUGIN_ROOT}/core/templates/AGENTS-template.md" "$(pwd)/GEMINI.md"
+# Prepend pointer line then append template content
+echo "For full context, read knowledge/rules.md and knowledge/me.md before acting." > "$(pwd)/GEMINI.md"
+echo "" >> "$(pwd)/GEMINI.md"
+cat "${CLAUDE_PLUGIN_ROOT}/core/templates/AGENTS-template.md" >> "$(pwd)/GEMINI.md"
 
-# Cursor / Windsurf — write KMGraph behaviors subset
-# Continue.dev — inject prompt section into .continue/config.json
-# VS Code Copilot — write .github/copilot-instructions.md
-# Aider — inject conventions section into .aider.conf.yml
+# Cursor / Windsurf — write pointer line + KMGraph behaviors subset
+# Continue.dev — inject pointer line + prompt section into .continue/config.json
+# VS Code Copilot — write pointer line + minimal content to .github/copilot-instructions.md
+# Aider — inject pointer line + conventions section into .aider.conf.yml
 ```
 
 Output confirmation per platform:
@@ -817,7 +1455,7 @@ The updated config entry schema:
 ```json
 {
   "my-project": {
-    "path": "/path/to/kg/docs",
+    "path": "/path/to/kg/knowledge",
     "type": "project-local",
     "autoSwitch": false,
     "platforms": ["gemini", "cursor"],
@@ -845,23 +1483,24 @@ The updated config entry schema:
 - Warning: "No git repository detected. Git strategy will have no effect."
 - Continue with setup, skip .gitignore updates
 
-### Project already has docs/ directory
-- Detect existing directories
-- Prompt: "docs/ already exists. Merge with existing structure? [y/N]"
-- If yes: Create only missing subdirectories, don't overwrite
-- If no: Return to wizard Step 1, suggest different location
+### Project already has knowledge/ directory
+- Detect existing directories (handled by E2/E16 pre-flight in Step 1.5)
+- If KMGraph markers exist: switch to Verify/Upgrade flow
+- If no markers: Prompt: "knowledge/ already exists with unrecognized content. Create only missing KMGraph subdirectories inside it? [y/N]"
+- If yes: Create only missing subdirectories, don't overwrite existing content
+- If no: Return to wizard Step 1, suggest different location via `--location`
 
 ## Turbo Mode
 
 Skip wizard with flags:
 
 ```bash
-/kmgraph:init --name my-project --location ./docs/ --categories architecture,process,patterns --git selective
+/kmgraph:init --name my-project --location ./knowledge/ --categories architecture,process,patterns --git selective
 ```
 
 **Parameters**:
 - `--name`: KG name (required)
-- `--location`: Path (default: `./docs/`)
+- `--location`: Path (default: `./knowledge/`)
 - `--categories`: Comma-separated list (default: `architecture,process,patterns`)
 - `--git`: `all-commit`, `all-ignore`, or `selective` (default: `selective`)
 - `--category-git`: For selective, specify per-category: `architecture:commit,process:ignore`
@@ -878,13 +1517,16 @@ Skip wizard with flags:
 
 ```
 $KG_PATH/
+├── kg-index.md              (KG navigation hub)
+├── me.md                    🔒 ALWAYS GITIGNORED (personal context)
+├── rules.md                 (project rules and conventions)
 ├── knowledge/
 │   ├── patterns.md          (empty template)
 │   ├── gotchas.md           (empty template)
 │   ├── concepts.md          (empty template)
 │   ├── architecture.md      (empty template)
 │   ├── workflows.md         (empty template)
-│   └── index.md             (navigation hub)
+│   └── kg-category-index.md (category navigation)
 ├── lessons-learned/
 │   ├── README.md            (index template)
 │   ├── lesson-template.md   (lesson template with git metadata)
@@ -897,12 +1539,13 @@ $KG_PATH/
 │   └── ADR-template.md      (ADR template)
 ├── sessions/                🔒 ALWAYS GITIGNORED
 │   └── session-template.md  (session summary template)
-└── chat-history/            🔒 ALWAYS GITIGNORED
-    (for /kmgraph:extract-chat output — local use only)
+├── chat-history/            🔒 ALWAYS GITIGNORED
+│   (for /kmgraph:extract-chat output — local use only)
+└── tmp/                     🔒 ALWAYS GITIGNORED (scratch space)
 ```
 
 **Git Handling:**
-- `sessions/` and `chat-history/` are ALWAYS added to `.gitignore` (never committed)
+- `sessions/`, `chat-history/`, `tmp/`, and `me.md` are ALWAYS added to `.gitignore` (never committed)
 - `lessons-learned/` categories follow the selected git strategy (selective/all-ignore/all-commit)
 - `knowledge/` follows the selected git strategy per-file
 - `decisions/` typically committed (architecture decisions are usually shared)
@@ -916,7 +1559,7 @@ $KG_PATH/
   "graphs": {
     "my-project": {
       "name": "my-project",
-      "path": "/Users/name/projects/my-app/docs/",
+      "path": "/Users/name/projects/my-app/knowledge/",
       "type": "project-local",
       "categories": [
         { "name": "architecture", "prefix": null, "git": "commit" },
