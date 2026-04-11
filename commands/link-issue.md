@@ -9,8 +9,8 @@ Manually link an existing lesson-learned or ADR to a GitHub issue, creating bidi
 ## Syntax
 
 ```bash
-/kmgraph:link-issue docs/lessons-learned/process/my-lesson.md --issue 42
-/kmgraph:link-issue docs/decisions/ADR-005.md --issue 38 --pr 40
+/kmgraph:link-issue knowledge/lessons-learned/process/my-lesson.md --issue 42
+/kmgraph:link-issue knowledge/decisions/ADR-005.md --issue 38 --pr 40
 ```
 
 ## What This Does
@@ -129,7 +129,7 @@ echo "  Issue → Lesson: GitHub comment posted (if gh CLI available)"
 
 ✅ Lesson linked to GitHub issue #42
 
-Updated: docs/lessons-learned/process/auth-race-condition.md
+Updated: knowledge/lessons-learned/process/auth-race-condition.md
 PR: #40
 
 Bidirectional links created:
@@ -150,7 +150,7 @@ Note: Install gh CLI for automatic GitHub comment posting:
 
 ### File Not Found
 ```
-Error: File not found: docs/lessons-learned/nonexistent.md
+Error: File not found: knowledge/lessons-learned/nonexistent.md
 ```
 
 ### No Issue Number

@@ -267,7 +267,7 @@ Offer a quick checklist update.
 ## Step 4: Scan for Draft ADRs
 
 ```bash
-find {active_kg_path}/docs/decisions -name "*.md" -type f
+find {active_kg_path}/knowledge/decisions -name "*.md" -type f
 grep -l "Status: Proposed\|Status: Draft" {decision_files}
 ```
 
