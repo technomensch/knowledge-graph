@@ -256,7 +256,8 @@ async function handleCapture(request, targetKg) {
             fs.writeFileSync(existing, generateFrontmatter(request.type, request.metadata) + request.content, "utf-8");
             let indexResult = {};
             try {
-                indexResult = (0, fts5_js_1.rebuildIndex)(kgPath);
+                const kgName = targetKg || config.active || path.basename(kgPath);
+                indexResult = (0, fts5_js_1.rebuildIndex)(kgPath, kgName);
             }
             catch { /* best-effort */ }
             return { status: "updated", filePath: existing, relativePath: path.relative(kgPath, existing), indexResult };
@@ -317,7 +318,8 @@ async function handleCapture(request, targetKg) {
     // FTS5 rebuild (in-process, best-effort)
     let indexResult = {};
     try {
-        indexResult = (0, fts5_js_1.rebuildIndex)(kgPath);
+        const kgName = targetKg || config.active || path.basename(kgPath);
+        indexResult = (0, fts5_js_1.rebuildIndex)(kgPath, kgName);
     }
     catch { /* absent if node-sqlite3-wasm not installed */ }
     return {

@@ -34,6 +34,8 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FTS5_DB_FILENAME = void 0;
+exports.getFTS5DbPath = getFTS5DbPath;
+exports.resolveContentRoot = resolveContentRoot;
 exports.getDbPath = getDbPath;
 exports.sanitizeFts5Query = sanitizeFts5Query;
 exports.initDb = initDb;
@@ -63,10 +65,37 @@ catch {
 // ---------------------------------------------------------------------------
 exports.FTS5_DB_FILENAME = ".fts5.db";
 // ---------------------------------------------------------------------------
+// Path helpers
+// ---------------------------------------------------------------------------
+/**
+ * Returns the absolute path to the user-level FTS5 database for a given KG name.
+ * Stored in ~/.claude/kg-fts5/<kgName>.db (outside project directories).
+ * Creates the directory if it does not exist.
+ */
+function getFTS5DbPath(kgName) {
+    const dir = path.join(os.homedir(), ".claude", "kg-fts5");
+    fs.mkdirSync(dir, { recursive: true });
+    return path.join(dir, `${kgName}.db`);
+}
+/**
+ * Resolves the content root for a KG path.
+ * If the KG contains a docs/lessons-learned subdirectory (v0.2+ layout),
+ * returns the docs/ directory so that lessons-learned, decisions, and sessions
+ * are found under docs/. Otherwise falls back to kgPath itself.
+ */
+function resolveContentRoot(kgPath) {
+    const docsLessons = path.join(kgPath, "docs", "lessons-learned");
+    if (fs.existsSync(docsLessons)) {
+        return path.join(kgPath, "docs");
+    }
+    return kgPath;
+}
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 /**
  * Returns the absolute path to the FTS5 database for a given KG root.
+ * @deprecated Use getFTS5DbPath(kgName) instead — stores DB in user-level cache.
  */
 function getDbPath(kgPath) {
     return path.join(kgPath, exports.FTS5_DB_FILENAME);
@@ -219,20 +248,22 @@ function indexFile(db, filePath, kgPath) {
  * - Removes index rows for files that no longer exist on disk.
  * - Skips files that haven't changed.
  */
-function rebuildIndex(kgPath) {
+function rebuildIndex(kgPath, kgName) {
     if (!fts5Available) {
         throw new Error("FTS5 search engine not available. Restart Claude Code to complete the upgrade installation.");
     }
     const start = Date.now();
-    const dbPath = getDbPath(kgPath);
+    const dbPath = getFTS5DbPath(kgName);
     const db = new Database(dbPath);
     try {
         initDb(db);
+        // Resolve content root: v0.2+ KGs store content under docs/
+        const contentRoot = resolveContentRoot(kgPath);
         // Collect all .md files from target subdirectories
         const searchDirs = ["knowledge", "lessons-learned", "decisions", "sessions"];
         const allFiles = [];
         for (const dir of searchDirs) {
-            const dirPath = path.join(kgPath, dir);
+            const dirPath = path.join(contentRoot, dir);
             allFiles.push(...(0, utils_js_1.walkDir)(dirPath, ".md"));
         }
         let indexed = 0;
@@ -331,8 +362,12 @@ function registerFts5Tool(server) {
         try {
             const config = (0, utils_js_1.readConfig)();
             let resolvedPath;
+            let resolvedName;
             if (kgPath) {
                 resolvedPath = kgPath.replace(/^~/, os.homedir());
+                // Find the matching KG name from config, or derive from path basename
+                const matchedEntry = Object.entries(config.graphs || {}).find(([, g]) => g.path === resolvedPath);
+                resolvedName = matchedEntry ? matchedEntry[0] : path.basename(resolvedPath);
             }
             else {
                 const activePath = (0, utils_js_1.getActiveGraphPath)(config);
@@ -348,6 +383,7 @@ function registerFts5Tool(server) {
                     };
                 }
                 resolvedPath = activePath;
+                resolvedName = config.active;
             }
             if (!fs.existsSync(resolvedPath)) {
                 return {
@@ -360,7 +396,7 @@ function registerFts5Tool(server) {
                     isError: true,
                 };
             }
-            const result = rebuildIndex(resolvedPath);
+            const result = rebuildIndex(resolvedPath, resolvedName);
             // Update config to mark FTS5 as enabled, remove declined flag
             if (config.active && config.graphs[config.active]) {
                 const graph = config.graphs[config.active];

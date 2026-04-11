@@ -5,13 +5,13 @@ sidebar_label: Personal vs Project
 description: Understanding personal and project-scoped knowledge graphs
 ---
 
-<!-- Updated: 2026-03-29 -->
+<!-- Updated: 2026-04-11 -->
 
 Every knowledge graph belongs to one of two scopes: **project** or **personal**.
 
 ### Project KG
 
-A project KG lives inside a project's directory (typically `./docs/`). It contains knowledge specific to that project:
+A project KG lives inside a project's directory at `./knowledge/`. It contains knowledge specific to that project:
 
 - Bug fixes and workarounds found in this codebase
 - Architecture decisions for this system
@@ -29,6 +29,19 @@ A personal KG lives at `~/.kmgraph/` and is accessible from any project. It cont
 - Reusable checklists and process patterns
 
 **Best for**: Knowledge that would apply identically in your next project.
+
+### Identity and Rules Files
+
+Each scope also scaffolds two special files:
+
+| File | Scope | Committed? | Purpose |
+|---|---|---|---|
+| `knowledge/rules.md` | Project | Yes | Project conventions shared by all contributors |
+| `knowledge/me.md` | Project | No — gitignored | Who you are in this project (per-contributor) |
+| `~/.kmgraph/rules.md` | Personal | N/A local | Cross-project behavioral rules |
+| `~/.kmgraph/me.md` | Personal | N/A local | Cross-project personal identity and preferences |
+
+These files are the platform-agnostic foundation that all AI platform config files (CLAUDE.md, .cursorrules, etc.) point to. See [Portable AI Identity](me-and-rules.md) for the full setup guide.
 
 ### How They Work Together
 
@@ -55,12 +68,16 @@ A personal KG lives at `~/.kmgraph/` and is accessible from any project. It cont
 %%{init: {'theme': 'neutral'}}%%
 graph TB
     subgraph Personal ["🧑 Personal KG (~/.kmgraph/)"]
-        P1["Cross-project patterns"]
+        PM["me.md — cross-project identity (local)"]
+        PR["rules.md — cross-project rules (local)"]
+        P1["Patterns & lessons"]
         P2["Tool quirks & IDE setup"]
         P3["Personal ADRs"]
     end
 
-    subgraph Project ["📁 Project KG (./docs/)"]
+    subgraph Project ["📁 Project KG (./knowledge/)"]
+        PJM["me.md — contributor identity (gitignored)"]
+        PJR["rules.md — project conventions (committed)"]
         PJ1["Project-specific bug fixes"]
         PJ2["Architecture decisions"]
         PJ3["Codebase-specific patterns"]
@@ -71,7 +88,7 @@ graph TB
     Recall -->|searches both| Project
 
     accTitle: Personal vs Project KG scopes
-    accDescr: Two KG scopes — Personal stored at ~/.kmgraph/ and Project stored in ./docs/. Recall searches both automatically.
+    accDescr: Two KG scopes — Personal stored at ~/.kmgraph/ and Project stored in ./knowledge/. Each scope includes me.md for identity and rules.md for behavioral conventions. Recall searches both automatically.
 ```
 
 ### Setup
@@ -79,4 +96,4 @@ graph TB
 - **During init**: `/kmgraph:init` offers to create a personal KG at the end of setup
 - **Standalone**: `/kmgraph:init-personal-kg` creates and registers the personal KG at any time
 
-See [Multi-KG Workflows](/guides/multi-kg-workflows) for advanced configuration.
+See [Multi-KG Workflows](/guides/multi-kg-workflows) for advanced configuration and [Portable AI Identity](me-and-rules.md) for setting up `me.md` and `rules.md`.

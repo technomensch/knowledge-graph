@@ -25,12 +25,16 @@ KMGraph stores all entries as plain markdown. Obsidian reads markdown natively. 
 Point an Obsidian vault at the KG directory. In Obsidian:
 
 1. **File → Open vault**
-2. Select `~/.kmgraph/` (personal KG) or `docs/` (project KG)
+2. Select `~/.kmgraph/` (personal KG) or `./knowledge/` (project KG)
 3. Open the vault
 
 All lessons, ADRs, patterns, and session summaries are immediately browsable. Obsidian's graph view shows links between entries. Tag filtering works on the YAML frontmatter `tags:` field.
 
 This is read-only in the sense that Obsidian will not corrupt KMGraph structure — you can edit files in Obsidian and they remain valid KMGraph markdown.
+
+:::tip[Wiki links are automatic]
+Starting in v0.3.3, `kmgraph init` converts all cross-references to Obsidian `[[wiki link]]` format automatically. `ADR-028`, `ENH-010`, `Lessons_Learned_X`, and GitHub issue references are all converted on first init or upgrade. This means Obsidian's graph view shows real connections between lessons, decisions, and enhancements without any manual linking.
+:::
 
 ## Option B — Bidirectional sync with an MCP bridge
 

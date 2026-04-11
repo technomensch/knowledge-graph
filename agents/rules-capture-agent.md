@@ -207,13 +207,24 @@ Append the rule under the platform's preference heading:
 | Platform | Write target | Heading to append under |
 |---|---|---|
 | `claude-code` / `claude-code-web` | `CLAUDE.md` | `## Platform Preferences (Claude Code)` |
-| `gemini` | `GEMINI.md` | `## Platform Preferences (Gemini)` |
+| `gemini` | `GEMINI.md` or `AGENT.md` (see Gemini write-target picker below) | `## Platform Preferences (Gemini)` |
 | `windsurf` | `.windsurfrules` | (append to end — no heading required) |
 | `copilot` | `.github/copilot-instructions.md` | (append to end — no heading required) |
 | `cursor` | `.cursor/rules/project-preferences.mdc` | (append to end — after frontmatter) |
 | `zed` | `.rules` | (append to end — no heading required) |
 
-For files with a preference heading (CLAUDE.md, GEMINI.md): if the heading doesn't exist yet, create it before appending. If the heading exists and appears more than once, append after the last occurrence (this also satisfies pre-write safety check #4). If it exists once, append after the last line under that heading.
+**Gemini write-target picker logic:**
+
+Before writing to a Gemini target, resolve the actual file path:
+1. Check whether `GEMINI.md` exists at project root (`[ -f "$PROJECT_ROOT/GEMINI.md" ]`).
+2. If `GEMINI.md` exists: use `GEMINI.md` as the write target.
+3. If `GEMINI.md` does not exist, check whether `AGENT.md` exists at project root (`[ -f "$PROJECT_ROOT/AGENT.md" ]`).
+4. If `AGENT.md` exists (and `GEMINI.md` does not): use `AGENT.md` as the write target.
+5. If neither exists: default to creating `GEMINI.md` (canonical Gemini file).
+
+The heading to append under is always `## Platform Preferences (Gemini)` regardless of which file is used.
+
+For files with a preference heading (CLAUDE.md, GEMINI.md, AGENT.md when used as Gemini target): if the heading doesn't exist yet, create it before appending. If the heading exists and appears more than once, append after the last occurrence (this also satisfies pre-write safety check #4). If it exists once, append after the last line under that heading.
 
 **For agents target (scope = `agents`):**
 
@@ -239,6 +250,7 @@ Before writing to Cursor target:
 |---|---|
 | `CLAUDE.md` | `# Claude Code Configuration\n\n## Platform Preferences (Claude Code)\n\n` |
 | `GEMINI.md` | `# Gemini CLI Configuration\n\n## Platform Preferences (Gemini)\n\n` |
+| `AGENT.md` (Gemini fallback) | `# Gemini CLI Configuration\n\n## Platform Preferences (Gemini)\n\n` |
 | `.windsurfrules` | `# Windsurf Rules\n\n` |
 | `.github/copilot-instructions.md` | `# GitHub Copilot Instructions\n\n` |
 | `.cursor/rules/project-preferences.mdc` | `---\ndescription: Project AI preferences\nalwaysApply: true\n---\n\n` |

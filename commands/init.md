@@ -699,9 +699,9 @@ No action needed — your KG is ready to use.
 After the upgrade inspection completes (section 1h), silently calculate the total disk usage of all migration archive directories across both scopes:
 
 ```bash
-TOTAL_BYTES=$(du -sb "${KG_PATH}/.kg-archive-"*/ "$HOME/.kmgraph/.kg-archive-"*/ 2>/dev/null \
-              | awk '{sum += $1} END {print sum+0}')
-TOTAL_MB=$(echo "$TOTAL_BYTES / 1048576" | bc)
+TOTAL_KB=$(du -sk "${KG_PATH}/.kg-archive-"*/ "$HOME/.kmgraph/.kg-archive-"*/ 2>/dev/null \
+           | awk '{sum += $1} END {print sum+0}')
+TOTAL_MB=$((TOTAL_KB / 1024))
 ```
 
 - If total > 10 MB: print the following (substituting the actual MB value):
