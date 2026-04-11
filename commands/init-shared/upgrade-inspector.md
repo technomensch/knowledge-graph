@@ -63,6 +63,19 @@ echo "$CONFIGURED_PATH" | grep -qE '/docs/?$' && \
 # Each archive contains the backed-up files + manifest.json
 # Use /kmgraph:migration list (v0.3.6) to enumerate restore points.
 
+# docs/ knowledge content migration check (v0.3.5 — legacy layout cleanup)
+# Applies when KG has been migrated to knowledge/ but docs/ subdirs still contain files
+KG_PARENT=$(dirname "{KG_PATH}")
+DOCS_FOUND=()
+for subdir in decisions enhancements lessons-learned issues chat-history; do
+  if [ -d "$KG_PARENT/docs/$subdir" ]; then
+    file_count=$(find "$KG_PARENT/docs/$subdir" -name "*.md" -type f 2>/dev/null | wc -l | tr -d ' ')
+    [ "$file_count" -gt 0 ] && DOCS_FOUND+=("  docs/$subdir/  — $file_count files")
+  fi
+done
+[ ${#DOCS_FOUND[@]} -gt 0 ] && \
+  upgrades+=("Migration available: knowledge content found under docs/ (pre-migration layout) — move to knowledge/")
+
 # New templates (files in plugin core/templates not yet in KG)
 # Skip templates that are already covered by the scaffold file checks above:
 #   kg-index.md deploys as {KG_PATH}/index.md — already checked
@@ -265,3 +278,101 @@ Leave both files unchanged.
 - Option (a) is a bulk operation — all flagged lines are relocated in one shot (archive is taken first).
 - If `CLAUDE.md § Platform Preferences` already exists, append — never overwrite existing content.
 - If user selects skip or manual, leave both files unchanged.
+
+#### e. docs/ knowledge content migration (legacy layout cleanup)
+
+**Purpose:** Detect knowledge artifacts left under `docs/` from pre-v0.3.0 layouts and offer to move them to `knowledge/` (current layout).
+
+**Detection:**
+
+```bash
+KG_PARENT=$(dirname "{KG_PATH}")
+DOCS_FOUND=()
+for subdir in decisions enhancements lessons-learned issues chat-history; do
+  if [ -d "$KG_PARENT/docs/$subdir" ]; then
+    file_count=$(find "$KG_PARENT/docs/$subdir" -name "*.md" -type f 2>/dev/null | wc -l | tr -d ' ')
+    [ "$file_count" -gt 0 ] && DOCS_FOUND+=("  docs/$subdir/  — $file_count files")
+  fi
+done
+```
+
+If `DOCS_FOUND` is empty, skip this check silently.
+
+**If content found,** display and offer:
+
+```
+Found knowledge content under docs/ (pre-migration layout):
+  docs/decisions/  — N files
+  docs/lessons-learned/ — M files
+  ...
+
+These belong in knowledge/ (current layout). Options:
+  a. Migrate automatically — archive docs/ content, move to knowledge/, update cross-references
+  b. Skip — I'll migrate manually
+```
+
+**If option (a) — auto-migrate:**
+
+1. **Archive first** — before moving any file, create a timestamped archive:
+   ```bash
+   ARCHIVE_DIR="{KG_PATH}/.kg-archive-$(date +%Y%m%d-%H%M%S)"
+   mkdir -p "$ARCHIVE_DIR"
+   for subdir in decisions enhancements lessons-learned issues chat-history; do
+     [ -d "$KG_PARENT/docs/$subdir" ] && cp -r "$KG_PARENT/docs/$subdir" "$ARCHIVE_DIR/"
+   done
+   echo "{\"archived_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"source\": \"docs/\", \"trigger\": \"upgrade-inspector-section-e\"}" > "$ARCHIVE_DIR/manifest.json"
+   echo "✅ Archive created at $ARCHIVE_DIR"
+   ```
+
+2. **Move files** — for each populated subdir, move `.md` files:
+   ```bash
+   for subdir in decisions enhancements lessons-learned issues chat-history; do
+     src="$KG_PARENT/docs/$subdir"
+     dest="{KG_PATH}/$subdir"
+     if [ -d "$src" ]; then
+       mkdir -p "$dest"
+       find "$src" -name "*.md" -type f | while read f; do
+         rel="${f#$src/}"
+         dest_file="$dest/$rel"
+         dest_dir=$(dirname "$dest_file")
+         mkdir -p "$dest_dir"
+         mv "$f" "$dest_file"
+         echo "Moved: docs/$subdir/$rel → knowledge/$subdir/$rel"
+       done
+     fi
+   done
+   ```
+
+3. **Cross-reference rewrite** — update any remaining `docs/{subdir}/` references in the KG files to `knowledge/{subdir}/`:
+   ```bash
+   find "{KG_PATH}" -name "*.md" -type f | xargs sed -i.bak \
+     -e 's|docs/decisions/|knowledge/decisions/|g' \
+     -e 's|docs/lessons-learned/|knowledge/lessons-learned/|g' \
+     -e 's|docs/enhancements/|knowledge/enhancements/|g' \
+     -e 's|docs/issues/|knowledge/issues/|g' \
+     -e 's|docs/chat-history/|knowledge/chat-history/|g'
+   find "{KG_PATH}" -name "*.md.bak" -delete
+   echo "✅ Cross-references rewritten"
+   ```
+
+4. **Report:**
+   ```
+   ✅ Migration complete.
+   
+   Files moved to knowledge/. Archive available at: {KG_PATH}/.kg-archive-YYYYMMDD-HHMMSS/
+   To rollback: copy files from the archive back to docs/ manually.
+   (Automated rollback command planned for v0.3.6.)
+   ```
+
+**If option (b) — skip:**
+
+Leave all files unchanged. Print:
+```
+Skipped docs/ migration — no changes made.
+To migrate manually: move files from docs/{decisions,lessons-learned,...}/ to knowledge/ and update cross-references.
+```
+
+**Safety rules:**
+- Archive is always taken before any file is moved (step 1 is mandatory).
+- Never delete the source `docs/` directory — only move `.md` files. Non-markdown assets remain in place.
+- Cross-reference rewrite only targets files inside `{KG_PATH}` — does not touch project source code or other directories.
