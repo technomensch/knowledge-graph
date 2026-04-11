@@ -5,7 +5,7 @@ sidebar_label: Cheat Sheet
 description: Quick reference for common KMGraph workflows and commands
 ---
 
-**Version:** 0.3.2-beta | **Updated:** 2026-04-10
+**Version:** 0.3.3-beta | **Updated:** 2026-04-10
 
 > **Claude Code only:** The `/kmgraph:` prefix requires Claude Code with this plugin installed. Other IDEs access equivalent functionality through MCP tools.
 
@@ -267,5 +267,5 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 
 ---
 
-**Version**: 0.3.2-beta
+**Version**: 0.3.3-beta
 **Last Updated**: 2026-04-10
