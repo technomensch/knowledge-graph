@@ -24,10 +24,10 @@ On non-Claude platforms (Gemini CLI, Cursor, Codex), these directives reference 
 After this enhancement:
 
 1. `knowledge/rules.md` contains zero Claude Code-specific tool names
-2. Claude-specific tool directives live in `knowledge/platform/claude.md`
-3. `CLAUDE.md` has a thin `## Platform Preferences` shim pointing to `knowledge/platform/claude.md`
+2. Claude-specific tool directives live in `CLAUDE.md` (root) under `## Platform Preferences (Claude Code)` — `CLAUDE.md` IS the platform config file for Claude Code; no separate `knowledge/platform/` directory
+3. Other platforms use their native files: `GEMINI.md`, `.cursorrules`, `AGENTS.md`
 4. `core/templates/knowledge/rules.md` reflects the same platform split with a guidance comment
-5. `kmgraph init` scaffolds `knowledge/platform/claude.md` for new installs and detects contamination in existing installs
+5. `kmgraph init` upgrade flow detects contamination in existing `knowledge/rules.md` and offers relocation to `CLAUDE.md`
 
 ---
 
@@ -48,18 +48,18 @@ See `docs/plans/v0.3.5-beta.md` for the full plan.
 
 ## Architecture Decision
 
-**ADR-032** documents the `knowledge/platform/` pattern. Key decision: Claude-specific directives belong in `knowledge/platform/claude.md`, not `CLAUDE.md` (CLAUDE.md is a shim, not a directive store).
+**ADR-032** originally proposed a `knowledge/platform/` directory pattern. Superseded in v0.3.5-beta fixup: `CLAUDE.md` at repo root IS the platform config for Claude Code — no intermediate directory needed. Native platform files (`CLAUDE.md`, `GEMINI.md`, `.cursorrules`, `AGENTS.md`) own tool directives directly.
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] `knowledge/platform/claude.md` exists with relocated Claude-specific directives
-- [ ] `knowledge/rules.md` passes `grep -E 'Glob|Grep|Bash|Read|Edit|WebFetch|\.jsonl'` — zero hits on tool-specific lines
-- [ ] `CLAUDE.md` references `knowledge/platform/claude.md` and adds no new content
-- [ ] `core/templates/knowledge/rules.md` has no Claude-specific tool refs; has ADR-032 guidance comment
-- [ ] `commands/init.md` upgrade flow detects and offers to relocate Claude-specific strings
-- [ ] ADR-032 written in both `docs/decisions/` and `knowledge/decisions/`
+- [x] `knowledge/rules.md` passes `grep -E 'Glob|Grep|Bash|Read|Edit|WebFetch|\.jsonl'` — zero hits on tool-specific lines
+- [x] `CLAUDE.md` has `## Platform Preferences (Claude Code)` with all relocated directives
+- [x] `knowledge/platform/` directory removed
+- [x] ADR-032 marked Superseded in both `docs/decisions/` and `knowledge/decisions/`
+- [ ] `core/templates/knowledge/rules.md` guidance comment updated (protected — pending permission)
+- [ ] `commands/init.md` upgrade flow target updated from `knowledge/platform/claude.md` → `CLAUDE.md` (protected — pending permission)
 - [ ] Version bumped to `0.3.5-beta`; CHANGELOG updated; PR opened
 
 ---
