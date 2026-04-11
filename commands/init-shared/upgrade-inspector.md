@@ -12,6 +12,7 @@ description: Shared upgrade inspector module — detects missing dirs, templates
 | `{kg_name}` | Name key used in kg-config.json |
 | `{KG_TYPE}` | Type string: "project-local" or "personal" |
 | `{categories}` | Array of category names configured for this KG |
+| `{preserve_active}` | Boolean — if true, do not change the active KG after upgrade |
 
 ---
 
@@ -200,7 +201,7 @@ CONTAMINATION=$(grep -nE '\bGlob\b|\bGrep\b|context-mode|\bsubagent\b|\.jsonl' "
 
 If `CONTAMINATION` is empty, skip this check silently.
 
-**If matches found:** display affected lines and offer:
+**If matches found:** display the flagged lines and offer. The user should review the shown lines before choosing — option (a) will move exactly what is listed:
 
 ```
 Found Claude-specific tool references in rules.md:
@@ -208,13 +209,13 @@ Found Claude-specific tool references in rules.md:
   Line 15: - Content search: Grep tool — not rg or grep in Bash
   ...
 
-These belong in CLAUDE.md (## Platform Preferences section), not rules.md.
-CLAUDE.md is the platform config file for Claude Code.
+Review the lines above. These appear to be Claude Code-specific tool directives.
+They belong in CLAUDE.md (## Platform Preferences section), not rules.md.
 
 Options:
-  a. Relocate automatically — move all flagged lines to CLAUDE.md and remove from rules.md
+  a. Relocate automatically — move exactly the lines shown above to CLAUDE.md and remove from rules.md
   b. Show me the lines — I'll handle the edit manually
-  s. Skip
+  s. Skip — leave both files unchanged
 ```
 
 **If option (a) — auto-relocate (bulk):**
