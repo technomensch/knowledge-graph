@@ -292,6 +292,148 @@ Print which files were restored and from where, followed by the above completion
 
 ---
 
+## Subcommand: `purge`
+
+Usage:
+- `/kmgraph:migration purge --list`
+- `/kmgraph:migration purge --older-than <days>`
+- `/kmgraph:migration purge --id <id>`
+
+Deletes one or more migration archives. **Never auto-deletes without user confirmation.**
+
+### Shared behavior for all variants
+
+- Always confirm before deleting each archive:
+  > Delete archive from `<date>` (`<N>` files, `<size>`)? [y/n]
+- Never mix project and personal scope in a single operation — each scope is evaluated and confirmed independently.
+- On completion, print count of archives deleted and total space freed:
+  > Deleted 2 archive(s), freed 18 KB.
+- After purge completes, check total remaining archive disk usage across both scopes:
+
+```bash
+TOTAL_BYTES=$(du -sb "${KG_PATH}/.kg-archive-"*/ "$HOME/.kmgraph/.kg-archive-"*/ 2>/dev/null | awk '{sum += $1} END {print sum+0}')
+TOTAL_MB=$(echo "$TOTAL_BYTES / 1048576" | bc)
+```
+
+If total exceeds 10 MB, print:
+> Note: Migration archives are taking up `X` MB total. Run `/kmgraph:migration purge --older-than 30` to clean up.
+
+If total is ≤ 10 MB or no archives remain, this check is silent.
+
+---
+
+### `--list` variant
+
+Usage: `/kmgraph:migration purge --list`
+
+Show all archives from both project and personal scopes. Output the same formatted table as `migration list`:
+
+| ID (timestamp) | Scope | Reason | Files | Size on disk |
+
+If no archives found in either scope, print:
+> No archives found.
+
+---
+
+### `--older-than <days>` variant
+
+Usage: `/kmgraph:migration purge --older-than <days>`
+
+If `--older-than` is omitted, default to **30 days**.
+
+**Steps:**
+
+**Step 1 — Scan archives in both scopes.**
+
+```bash
+DAYS="${1:-30}"
+NOW=$(date +%s)
+CUTOFF=$((NOW - DAYS * 86400))
+
+for ARCHIVE_DIR in "${KG_PATH}/.kg-archive-"*/ "$HOME/.kmgraph/.kg-archive-"*/; do
+  [ -d "$ARCHIVE_DIR" ] || continue
+  MANIFEST="$ARCHIVE_DIR/manifest.json"
+  if [ ! -f "$MANIFEST" ] || ! jq empty "$MANIFEST" 2>/dev/null; then
+    continue
+  fi
+
+  ARCHIVED_AT=$(jq -r '.archived_at // empty' "$MANIFEST")
+  # Convert YYYYMMDD-HHMMSS to epoch
+  ARCHIVE_EPOCH=$(date -j -f "%Y%m%d-%H%M%S" "$ARCHIVED_AT" "+%s" 2>/dev/null \
+                  || date -d "${ARCHIVED_AT:0:8} ${ARCHIVED_AT:9:2}:${ARCHIVED_AT:11:2}:${ARCHIVED_AT:13:2}" "+%s" 2>/dev/null)
+
+  if [ -n "$ARCHIVE_EPOCH" ] && [ "$ARCHIVE_EPOCH" -lt "$CUTOFF" ]; then
+    # This archive is older than DAYS — prompt for confirmation
+    FILES_COUNT=$(jq -r '.files | length' "$MANIFEST")
+    SIZE=$(du -sh "$ARCHIVE_DIR" 2>/dev/null | cut -f1)
+    REASON=$(jq -r '.reason // "—"' "$MANIFEST")
+
+    echo "Delete archive from $ARCHIVED_AT ($REASON, $FILES_COUNT files, $SIZE)? [y/n]"
+    read -r CONFIRM
+    if [ "$CONFIRM" = "y" ]; then
+      rm -rf "$ARCHIVE_DIR"
+      DELETED_COUNT=$((DELETED_COUNT + 1))
+    fi
+  fi
+done
+```
+
+**Step 2 — Report.**
+
+Print count of archives deleted and space freed. Apply post-purge size warning if applicable (see Shared behavior above).
+
+---
+
+### `--id <id>` variant
+
+Usage: `/kmgraph:migration purge --id <id>`
+
+Where `<id>` is the timestamp string from the manifest (e.g., `20260411-143022`).
+
+**Steps:**
+
+**Step 1 — Locate the archive.**
+
+```bash
+ID="$1"
+
+if [ -d "${KG_PATH}/.kg-archive-${ID}" ]; then
+  ARCHIVE_DIR="${KG_PATH}/.kg-archive-${ID}"
+  PURGE_SCOPE="project"
+elif [ -d "$HOME/.kmgraph/.kg-archive-${ID}" ]; then
+  ARCHIVE_DIR="$HOME/.kmgraph/.kg-archive-${ID}"
+  PURGE_SCOPE="personal"
+else
+  abort "Archive not found: .kg-archive-${ID}. Run \`/kmgraph:migration purge --list\` to see available archives."
+fi
+
+MANIFEST="$ARCHIVE_DIR/manifest.json"
+FILES_COUNT=$(jq -r '.files | length' "$MANIFEST" 2>/dev/null || echo "?")
+SIZE=$(du -sh "$ARCHIVE_DIR" 2>/dev/null | cut -f1)
+ARCHIVED_AT=$(jq -r '.archived_at // "unknown"' "$MANIFEST" 2>/dev/null)
+```
+
+**Step 2 — Confirm.**
+
+Prompt the user:
+> Delete archive `<id>` from `<date>` (`<N>` files, `<size>`)? [y/n]
+
+**Step 3 — Delete if confirmed.**
+
+```bash
+read -r CONFIRM
+if [ "$CONFIRM" = "y" ]; then
+  rm -rf "$ARCHIVE_DIR"
+  echo "Deleted archive $ID."
+else
+  echo "Cancelled — no changes made."
+fi
+```
+
+Apply post-purge size warning if applicable (see Shared behavior above).
+
+---
+
 ## Path Safety Requirements
 
 - `KG_PATH` and `ARCHIVE_DIR` **must always be double-quoted** in all shell commands.
