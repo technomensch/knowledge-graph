@@ -27,9 +27,9 @@ Copy this template for each new workflow:
 - **Next Steps:** [What typically follows]
 
 **Evidence:**
-[Link to lesson learned](../../lessons-learned/process/lesson-file.md) — [Context]
+[[Lessons_Learned_process_lesson]] — [Context]
 
-**See Also:** [Related workflows, skills, automation]
+**See Also:** [[related-workflow]], [[related-skill]], [[related-automation]]
 ```
 
 ---

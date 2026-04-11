@@ -21,10 +21,10 @@ Copy this template for each new architecture entry:
 - **Used by:** [Components that use this]
 
 **Evidence:**
-[Link to ADR](../../decisions/ADR-XXX.md) — [Decision rationale]
-[Link to lesson learned](../../lessons-learned/architecture/lesson-file.md) — [Implementation insights]
+[[ADR-XXX-decision-title]] — [Decision rationale]
+[[Lessons_Learned_architecture_lesson]] — [Implementation insights]
 
-**See Also:** [Related architecture entries, patterns, concepts]
+**See Also:** [[related-architecture-component]], [[related-pattern]], [[related-concept]]
 ```
 
 ---

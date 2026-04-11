@@ -21,10 +21,10 @@ Copy this template for each new concept:
 - [How it relates to other concepts]
 
 **Evidence:**
-[Link to lesson learned](../../lessons-learned/category/lesson-file.md) — [Context]
-[Link to ADR](../../decisions/ADR-XXX.md) — [Decision context]
+[[Lessons_Learned_category_lesson]] — [Context]
+[[ADR-XXX-decision-title]] — [Decision context]
 
-**See Also:** [Related concepts, patterns, decisions]
+**See Also:** [[related-concept]], [[related-pattern]], [[ADR-YYY-title]]
 ```
 
 ---
