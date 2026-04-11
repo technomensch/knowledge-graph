@@ -17,6 +17,7 @@ jest.mock("../src/utils.js", () => {
 });
 
 import { handleUpgrade } from "../src/tools/upgrade.js";
+import { handleVersion } from "../src/tools/version.js";
 import { readConfig, writeConfig } from "../src/utils.js";
 import type { KgConfig } from "../src/utils.js";
 
@@ -363,15 +364,11 @@ describe("T-11: malformed kmgraph_schema value", () => {
 // ---------------------------------------------------------------------------
 
 describe("T-12: kg_version response", () => {
-  test("installed version is non-empty and schema is 2", async () => {
-    // Import the raw package.json directly — version.ts reads it the same way
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const pkg = require("../../package.json") as { version: string };
-    const SCHEMA_VERSION = 2;
-
-    expect(pkg.version).toBeTruthy();
-    expect(typeof pkg.version).toBe("string");
-    expect(SCHEMA_VERSION).toBe(2);
+  test("handleVersion returns non-empty installed string and schema 2", () => {
+    const result = handleVersion();
+    expect(result.installed).toBeTruthy();
+    expect(typeof result.installed).toBe("string");
+    expect(result.schema).toBe(2);
   });
 });
 

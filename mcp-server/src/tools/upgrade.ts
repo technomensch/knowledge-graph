@@ -327,14 +327,16 @@ function applyPlatformSplit(kgPath: string): string {
     }
   }
 
-  // Update or add kmgraph_schema: 2 in frontmatter
+  // Update or add kmgraph_schema: 2 in frontmatter (CRLF-safe)
   let updated = kept.join("\n");
-  if (updated.startsWith("---")) {
-    updated = updated.replace(/^(---\n)([\s\S]*?)(---\n)/, (_m, open, body, close) => {
-      if (/kmgraph_schema:/.test(body)) {
-        return open + body.replace(/kmgraph_schema:\s*\d+/, "kmgraph_schema: 2") + close;
+  if (updated.startsWith("---\r\n") || updated.startsWith("---\n")) {
+    updated = updated.replace(/^(---\r?\n)([\s\S]*?)(---\r?\n)/, (_m, open, body, close) => {
+      // Normalize to LF for consistent output
+      const normalizedBody = body.replace(/\r\n/g, "\n");
+      if (/kmgraph_schema:/.test(normalizedBody)) {
+        return "---\n" + normalizedBody.replace(/kmgraph_schema:\s*\d+/, "kmgraph_schema: 2") + "---\n";
       }
-      return open + body + "kmgraph_schema: 2\n" + close;
+      return "---\n" + normalizedBody + "kmgraph_schema: 2\n" + "---\n";
     });
   }
 
