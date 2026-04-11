@@ -331,7 +331,7 @@ These belong in knowledge/ (current layout). Options:
      dest="{KG_PATH}/$subdir"
      if [ -d "$src" ]; then
        mkdir -p "$dest"
-       find "$src" -name "*.md" -type f | while read f; do
+       find "$src" -name "*.md" -type f -print0 | while IFS= read -r -d '' f; do
          rel="${f#$src/}"
          dest_file="$dest/$rel"
          dest_dir=$(dirname "$dest_file")
