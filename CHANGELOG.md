@@ -32,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.3.4-beta] — 2026-04-10
 
 ### Features
-- **`rules-capture` skill** — New skill that detects implicit mid-session behavioral corrections ("always X", "never X", "from now on X", "I prefer X", "make that a rule") and offers to write them to one of four authoritative targets — `knowledge/rules.md` (project team rule), `knowledge/me.md` (project personal preference), `~/.claude/knowledge-graph/rules.md` (personal cross-project rule), or `~/.claude/knowledge-graph/me.md` (personal identity/style). Appends a single inline suggestion to the normal reply with a 4-target shortcut menu `(yes / project-me / personal-rule / personal-me / no)`. Does NOT fire on ephemeral instructions, code corrections, clarifications, or in-context choices.
+- **`rules-capture` skill** — New skill that detects implicit mid-session behavioral corrections ("always X", "never X", "from now on X", "I prefer X", "make that a rule") and offers to write them to one of four authoritative targets — `knowledge/rules.md` (project team rule), `knowledge/me.md` (project personal preference), `~/.kmgraph/rules.md` (personal cross-project rule), or `~/.kmgraph/me.md` (personal identity/style). Appends a single inline suggestion to the normal reply with a 4-target shortcut menu `(yes / project-me / personal-rule / personal-me / no)`. Does NOT fire on ephemeral instructions, code corrections, clarifications, or in-context choices.
 - **`rules-capture-agent`** — New agent dispatched by `rules-capture` skill (and `capture-router` for explicit "capture that" + behavioral correction). Reads the target file, runs a dedup check against existing entries, drafts the rule in house style (Always/Never bullet with Why: and Source: lines), presents Approve / Edit / Discard loop, writes atomically (best-effort), and creates a scope-aware MEMORY.md pointer stub.
 - **MEMORY.md feedback-entry backfill** — `/kmgraph:init` upgrade flow now scans the project MEMORY.md for feedback-type behavioral rules not yet mirrored in `knowledge/rules.md` and offers per-entry migration with preview before writing.
 
@@ -206,7 +206,7 @@ Whenever a new version is added to CHANGELOG.md, all version files and doc foote
 
 :::info[Personal knowledge graph — cross-project lessons, always available.]
 
-A personal KG at `~/.claude/knowledge-graph/` stores lessons that apply across all your projects. When registered, `/kmgraph:recall` searches both project and personal KGs automatically. Results show `[project]` or `[personal]` source labels. Set up during `/kmgraph:init` or any time with `/kmgraph:init-personal-kg`.
+A personal KG at `~/.kmgraph/` stores lessons that apply across all your projects. When registered, `/kmgraph:recall` searches both project and personal KGs automatically. Results show `[project]` or `[personal]` source labels. Set up during `/kmgraph:init` or any time with `/kmgraph:init-personal-kg`.
 
 :::
 :::info[Session snapshot on capture — preserve the 'why' mid-session.]
@@ -220,7 +220,7 @@ After a plugin upgrade, the search index (`.fts5.db`) no longer silently disappe
 
 :::
 ### Added
-- **ENH-001: Personal KG** — New `type: "personal"` for KGs that are not tied to a project. Live at `~/.claude/knowledge-graph/` by default. Accessible from any project via multi-KG search.
+- **ENH-001: Personal KG** — New `type: "personal"` for KGs that are not tied to a project. Live at `~/.kmgraph/` by default. Accessible from any project via multi-KG search.
   - `kg_search` extended with `searchScope: "active" | "all" | "personal-only"` parameter
   - `kg_capture` extended with optional `targetKg` parameter — bypasses CWD check when an explicit target KG is named
   - `lesson-capture-agent` shows a KG picker when ≥2 KGs are registered; session memory avoids re-prompting

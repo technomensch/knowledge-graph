@@ -35,7 +35,7 @@ Currently, KMGraph knowledge graphs are project-local by default. Users must cap
 
 ### Functional
 
-- [ ] Users can create a personal KG at `~/.claude/knowledge-graph/` during init or via `/kmgraph:init-personal-kg`
+- [ ] Users can create a personal KG at `~/.kmgraph/` during init or via `/kmgraph:init-personal-kg`
 - [ ] `/kmgraph:recall "query"` searches both project-local and personal KGs
 - [ ] Search results distinguish source: "(project)" vs "(global)"
 - [ ] `/kmgraph:capture-lesson` offers to save to project KG or personal KG
@@ -58,7 +58,7 @@ Currently, KMGraph knowledge graphs are project-local by default. Users must cap
     "active": "knowledge-graph",
     "graphs": {
       "knowledge-graph": { "type": "project-local", "path": "/path/to/project/docs" },
-      "personal": { "type": "personal", "path": "~/.claude/knowledge-graph" }
+      "personal": { "type": "personal", "path": "~/.kmgraph" }
     }
   }
   ```
@@ -104,7 +104,7 @@ Currently, KMGraph knowledge graphs are project-local by default. Users must cap
 
 **Proposed (v0.2.2):**
 - After project KG setup, ask: "Want to create a global personal KG for cross-project lessons?"
-- If yes: create at `~/.claude/knowledge-graph/` and register in config
+- If yes: create at `~/.kmgraph/` and register in config
 - If no: can create later with `/kmgraph:init-personal-kg`
 
 ## Related Knowledge Artifacts
@@ -133,7 +133,7 @@ See: `docs/sessions/2026-03/2026-03-27_v0.2.1-beta-plan-language-and-user-kg-dis
 
 ## Acceptance Criteria
 
-- [ ] Global KG can be created at `~/.claude/knowledge-graph/`
+- [ ] Global KG can be created at `~/.kmgraph/`
 - [ ] `kg_search` queries both project-local and personal KGs
 - [ ] Search results clearly indicate source (project vs global)
 - [ ] `/kmgraph:capture-lesson` allows choosing target KG

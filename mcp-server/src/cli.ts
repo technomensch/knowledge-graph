@@ -58,7 +58,7 @@ async function runInit(): Promise<void> {
     console.log("");
     console.log("  Where should the knowledge graph be stored?");
     console.log("  1. Current directory (./docs/)");
-    console.log("  2. Home directory (~/.knowledge-graph/)");
+    console.log("  2. Home directory (~/.kmgraph/)");
     console.log("  3. Custom path");
     console.log("");
     const locationChoice = await ask(rl, "  Choice [1/2/3]: ");
@@ -69,7 +69,7 @@ async function runInit(): Promise<void> {
         kgPath = path.resolve("docs");
         break;
       case "2":
-        kgPath = path.join("~", ".knowledge-graph");
+        kgPath = path.join("~", ".kmgraph");
         break;
       case "3": {
         const customPath = await ask(rl, "  Enter path: ");

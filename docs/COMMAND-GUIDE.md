@@ -162,7 +162,7 @@ Commands work across platforms, but full automation is Claude Code-specific.
 3. Asks for optional custom prefixes per category
 4. Creates directory structure (`knowledge/`, `lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`)
 5. Copies templates from the plugin
-6. **[NEW in v0.2.2-beta]** Offers to create a **personal KG** at `~/.claude/knowledge-graph/` for cross-project lessons (see [`/kmgraph:init-personal-kg`](#-kmgraphinit-personal-kg))
+6. **[NEW in v0.2.2-beta]** Offers to create a **personal KG** at `~/.kmgraph/` for cross-project lessons (see [`/kmgraph:init-personal-kg`](#-kmgraphinit-personal-kg))
 7. **[NEW in v0.0.10.2]** Optionally backfills from existing project context (README, CHANGELOG, lessons, decisions, chat history)
 8. Optionally installs a git post-commit hook for lesson capture suggestions
 9. Updates `.gitignore` based on chosen git strategy
@@ -214,7 +214,7 @@ The system presents candidates for your review before creating entries.
 
 **What it does**:
 
-1. Creates `~/.claude/knowledge-graph/` with standard directory structure
+1. Creates `~/.kmgraph/` with standard directory structure
 2. Registers it as `type: "personal"` with name `"personal"` in `~/.claude/kg-config.json`
 3. Copies knowledge templates (patterns, gotchas, concepts)
 4. Builds FTS5 search index for the new KG
@@ -228,7 +228,7 @@ After setup:
 ```bash
 /kmgraph:init-personal-kg
 
-# Claude creates ~/.claude/knowledge-graph/
+# Claude creates ~/.kmgraph/
 # Registers "personal" KG (type: personal) in config
 # Active KG unchanged
 ```

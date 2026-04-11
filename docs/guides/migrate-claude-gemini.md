@@ -38,7 +38,7 @@ Extracts any lessons from the departing session that haven't been formally captu
 
 ### 3. On the target platform, point to the same knowledge graph
 
-The knowledge graph is platform-agnostic markdown. If it is in the project directory, `git pull` is all that is needed. If it is a personal KG at `~/.claude/knowledge-graph/`, pull that repo too.
+The knowledge graph is platform-agnostic markdown. If it is in the project directory, `git pull` is all that is needed. If it is a personal KG at `~/.kmgraph/`, pull that repo too.
 
 ### 4. Register the KG on the target platform
 

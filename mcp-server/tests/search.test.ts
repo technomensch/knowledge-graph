@@ -103,10 +103,10 @@ describe("getAllGraphPaths", () => {
 
   it("expands ~ in paths", () => {
     const config = makeConfig("home", {
-      home: { path: "~/.claude/knowledge-graph", type: "personal" },
+      home: { path: "~/.kmgraph", type: "personal" },
     });
     const result = getAllGraphPaths(config);
-    expect(result[0].path).toBe(path.join(os.homedir(), ".claude/knowledge-graph"));
+    expect(result[0].path).toBe(path.join(os.homedir(), ".kmgraph"));
     expect(result[0].path).not.toContain("~");
   });
 
