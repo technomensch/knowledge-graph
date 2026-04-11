@@ -4,7 +4,7 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 27
+**Total ADRs:** 28
 **Last Updated:** 2026-04-10
 
 ---
@@ -17,6 +17,7 @@ Formal documentation of significant architecture decisions.
 
 ## All ADRs (Chronological)
 
+- [ADR-031: Shared Module Pattern for Slash Command Deduplication](ADR-031-shared-module-pattern-for-slash-command-deduplication.md) — **Status:** Accepted — Duplicated init command logic extracted into five parameterized shared modules under `commands/init-shared/`; parent commands invoke modules by name with explicit parameter contracts.
 - [ADR-030: Migration Moves KMGraph-Named Subdirectories Only — Never the Entire docs/ Directory](ADR-030-migration-moves-named-subdirs-only-never-entire-docs.md) — **Status:** Accepted — Migration moves only KMGraph-named subdirs (`lessons-learned/`, `decisions/`, etc.) plus scaffold files; never the entire `docs/` directory.
 - [ADR-029: Plan File Location in Knowledge Graph](ADR-029-plan-file-location-in-knowledge-graph.md) — **Status:** Accepted — Plans linked to an ENH go in `knowledge/ENH-NNN/vX-plan.md`; issue plans in `knowledge/issue-NNN/vX-plan.md`; misc bundled plans in `knowledge/plans/vX-plan.md`.
 - [ADR-025: Do not commit `enabledPlugins` blocks in `.claude/settings.json`](ADR-025-do-not-commit-enabledplugins-blocks.md) — **Status:** Accepted — Committed `enabledPlugins` blocks create orphaned scope references for cloners; rely on `.claude-plugin/plugin.json` auto-detection instead.
@@ -26,6 +27,7 @@ Formal documentation of significant architecture decisions.
 ## By Category
 
 ### Architecture
+- [ADR-031: Shared Module Pattern for Slash Command Deduplication](ADR-031-shared-module-pattern-for-slash-command-deduplication.md) — Parameterized shared modules under `commands/init-shared/` replace duplicated instruction blocks across init commands
 - [ADR-030: Migration Moves KMGraph-Named Subdirectories Only](ADR-030-migration-moves-named-subdirs-only-never-entire-docs.md) — Named subdir list prevents collision with docs sites; explicit scope over blanket directory moves
 
 ### Process

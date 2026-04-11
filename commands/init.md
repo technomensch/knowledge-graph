@@ -45,170 +45,13 @@ What would you like to do?
 
 ### Option 1: See What's New
 
-When the user selects option 1, **before running any checks or making any changes**, inspect the KG's actual state and report only what is missing or upgradeable for this specific install:
+**→ Execute shared module:** Read `commands/init-shared/upgrade-inspector.md` and follow it exactly.
+Parameters:
+- `{KG_PATH}` = resolved path for this KG (from `~/.claude/kg-config.json` entry for the matched KG)
+- `{kg_name}` = name key of the matched KG in kg-config.json
+- `{KG_TYPE}` = type field from the KG config entry ("project-local" or "personal")
+- `{categories}` = categories array from the KG config entry
 
-```bash
-# Inspect what's actually missing or upgradeable
-upgrades=()
-
-# Missing directories
-for dir in knowledge lessons-learned decisions sessions chat-history tmp; do
-  [ ! -d "$KG_PATH/$dir" ] && upgrades+=("Missing directory: $dir/")
-done
-
-# Index reorganization — knowledge/index.md renamed to kg-category-index.md; new root kg-index.md created
-if [ -f "$KG_PATH/knowledge/index.md" ] && [ ! -f "$KG_PATH/knowledge/kg-category-index.md" ]; then
-  upgrades+=("Index update: renames ${KG_PATH}/knowledge/index.md to kg-category-index.md and adds a new kg-index.md at the knowledge graph root as the primary entry point")
-elif [ ! -f "$KG_PATH/kg-index.md" ]; then
-  upgrades+=("New: kg-index.md — the primary entry point for this knowledge graph")
-fi
-
-# Missing root-level scaffold files
-[ ! -f "$KG_PATH/me.md" ]      && upgrades+=("New: me.md — your identity and working style in this project")
-[ ! -f "$KG_PATH/rules.md" ]   && upgrades+=("New: rules.md — project conventions and behavioral rules")
-
-# Path migration available
-CONFIGURED_PATH=$(jq -r '.graphs["'"$kg_name"'"].path' ~/.claude/kg-config.json)
-echo "$CONFIGURED_PATH" | grep -qE '/docs/?$' && \
-  [ -d "$CONFIGURED_PATH/lessons-learned" ] && \
-  upgrades+=("Migration available: move KMGraph content from docs/ to knowledge/")
-
-# New templates (files in plugin core/templates not yet in KG)
-# Skip templates that are already covered by the scaffold file checks above:
-#   kg-index.md deploys as $KG_PATH/index.md — already checked
-#   me.md and rules.md deploy to $KG_PATH root — already checked
-scaffold_covered=("kg-index.md" "me.md" "rules.md" "kg-index-global.md")
-for tdir in knowledge lessons-learned decisions sessions; do
-  for template in "${CLAUDE_PLUGIN_ROOT}/core/templates/$tdir/"*; do
-    tname=$(basename "$template")
-    # Skip if this template is covered by a scaffold check
-    skip=false
-    for covered in "${scaffold_covered[@]}"; do
-      [ "$tname" = "$covered" ] && skip=true && break
-    done
-    $skip && continue
-    dest="$KG_PATH/$tdir/$tname"
-    [ ! -f "$dest" ] && upgrades+=("New template: $tdir/$tname")
-  done
-done
-```
-
-If nothing is upgradeable, say:
-```
-✅ Your setup is already up to date. Nothing to apply.
-```
-And exit.
-
-If upgrades exist, present them:
-```
-Here's what's available for your install:
-  • [item 1]
-  • [item 2]
-  ...
-
-Apply all, pick individually, or skip?
-  1. Apply all
-  2. Let me choose which ones to apply
-  3. Skip — my setup is already how I want it
-```
-
-If the user picks option 2 (choose individually), present each item as a separate yes/no prompt before running it.
-
-If the user picks option 3 (skip), exit with no changes.
-
-Then perform these checks in order:
-
-#### 1a. Directory structure check
-
-Verify all expected directories exist. Create any that are missing:
-
-```bash
-expected_dirs=(knowledge lessons-learned decisions sessions chat-history)
-for dir in "${expected_dirs[@]}"; do
-  if [ ! -d "$KG_PATH/$dir" ]; then
-    mkdir -p "$KG_PATH/$dir"
-    echo "✅ Created missing directory: $dir/"
-  fi
-done
-
-# Check category subdirectories
-for category in "${categories[@]}"; do
-  if [ ! -d "$KG_PATH/lessons-learned/$category" ]; then
-    mkdir -p "$KG_PATH/lessons-learned/$category"
-    echo "✅ Created missing category directory: lessons-learned/$category/"
-  fi
-done
-```
-
-#### 1b. Config field check
-
-Check for config fields introduced in newer versions. Add defaults for any missing fields without overwriting existing values:
-
-```bash
-# Fields that may be missing from older installs:
-# - platforms: [] (added in v0.2.0)
-# - autoSwitch: false (added in v0.2.0)
-# - notification: { webhookUrl: "" } (added in v0.2.0)
-# - type: "project-local" (added in v0.2.2 — required for multi-KG support)
-
-jq '
-  .graphs["'"$kg_name"'"] |=
-    if .platforms == null then .platforms = [] else . end |
-    if .autoSwitch == null then .autoSwitch = false else . end |
-    if .notification == null then .notification = { "webhookUrl": "" } else . end |
-    if .type == null then .type = "project-local" else . end
-' ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
-mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
-```
-
-**After the migration, check for graphs still missing `type`** (e.g., if the user has multiple registered KGs from v0.2.1):
-
-```bash
-GRAPHS_WITHOUT_TYPE=$(jq -r '.graphs | to_entries[] | select(.value.type == null) | .key' ~/.claude/kg-config.json)
-if [ -n "$GRAPHS_WITHOUT_TYPE" ]; then
-  echo "⚠️  Some registered KGs are missing a type field (defaulted to project-local):"
-  echo "$GRAPHS_WITHOUT_TYPE"
-  echo "   If any of these should be a personal KG, run /kmgraph:init-personal-kg to re-register correctly."
-fi
-```
-
-
-#### 1c. Template update check
-
-Compare installed templates against the plugin's current templates. If newer versions exist, offer to update:
-
-```bash
-template_dirs=("knowledge" "lessons-learned" "decisions" "sessions")
-updates_available=()
-
-for tdir in "${template_dirs[@]}"; do
-  for template in "${CLAUDE_PLUGIN_ROOT}/core/templates/$tdir/"*; do
-    dest="$KG_PATH/$tdir/$(basename $template)"
-    if [ -f "$dest" ]; then
-      if ! diff -q "$template" "$dest" > /dev/null 2>&1; then
-        updates_available+=("$tdir/$(basename $template)")
-      fi
-    else
-      updates_available+=("$tdir/$(basename $template) (new)")
-    fi
-  done
-done
-```
-
-If updates are available, present them:
-
-```
-Template updates available:
-  • knowledge/index.md (updated)
-  • sessions/session-template.md (new)
-
-Update templates? This will NOT overwrite your existing lessons or decisions.
-  1. Update all templates
-  2. Review each one
-  3. Skip template updates
-```
-
-**Important:** Never overwrite user-created files (lessons, ADRs, KG entries). Only update template/scaffold files.
 
 #### 1d. Platform config check
 
@@ -532,6 +375,29 @@ if [ -n "$MEMORY_FILE" ]; then
   fi
 fi
 
+# e2. Rewrite docs/ path references inside migrated markdown files
+find knowledge/ -name "*.md" -type f | while read f; do
+  sed -i '' \
+    -e 's|docs/lessons-learned/|knowledge/lessons-learned/|g' \
+    -e 's|docs/decisions/|knowledge/decisions/|g' \
+    -e 's|docs/sessions/|knowledge/sessions/|g' \
+    -e 's|docs/chat-history/|knowledge/chat-history/|g' \
+    -e 's|docs/knowledge/|knowledge/concepts/|g' \
+    "$f"
+done
+
+# Also update CLAUDE.md and README.md if present
+for f in CLAUDE.md README.md; do
+  [ -f "$f" ] && sed -i '' \
+    -e 's|docs/lessons-learned/|knowledge/lessons-learned/|g' \
+    -e 's|docs/decisions/|knowledge/decisions/|g' \
+    -e 's|docs/knowledge/|knowledge/concepts/|g' \
+    "$f" || true
+done
+
+echo "⚠️  Note: memory entries in ~/.claude/projects/ may still reference docs/ paths."
+echo "   Run /kmgraph:recall to find stale references after migration."
+
 # f. Clear migration flag
 jq 'del(.graphs["'"$kg_name"'"].migration_in_progress)' \
   ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
@@ -691,28 +557,10 @@ if [ "$DIRS_AT_ROOT" -eq 0 ] && [ "$DIRS_AT_DOCS" -gt 0 ]; then
 fi
 ```
 
-If the path is confirmed correct, check whether the index needs rebuilding:
-
-```bash
-FTS5_DECLINED=$(jq -r '.graphs["'"$kg_name"'"].fts5_declined // false' ~/.claude/kg-config.json)
-
-if [ "$FTS5_DECLINED" = "true" ]; then
-  echo "⏭️  Search index: skipped (previously declined)"
-elif [ ! -f "$KG_ROOT/.fts5.db" ]; then
-  echo "⚠️  Search index not found (local file, not version-controlled)."
-  echo ""
-  echo "  Rebuild now? This may take a moment for large knowledge graphs."
-  echo "    1. Yes — rebuild index"
-  echo "    2. Skip for now (search will use linear scan)"
-fi
-```
-
-If the user selects **Yes**, call `kg_fts5_rebuild`. **After the rebuild, validate the result:**
-
-- If `indexed` is 0: display a warning — "Search index built but 0 files were indexed. Verify the KG path points to the directory containing lessons-learned/, decisions/, and sessions/. Current path: {kgPath}"
-- If `indexed` > 0: confirm success — "✅ Search index built: {indexed} files indexed in {duration_ms}ms"
-
-If the user selects **Skip**, continue without rebuilding (linear scan remains available as fallback).
+**→ Execute shared module:** Read `commands/init-shared/fts5-rebuild.md` and follow it exactly.
+Parameters:
+- `{KG_PATH}` = resolved KG path (confirmed correct from the check above)
+- `{kg_name}` = name key of this KG in kg-config.json
 
 #### 1g. Knowledge extraction check
 
@@ -918,62 +766,17 @@ if [ -d "$KG_PATH" ]; then
 fi
 ```
 
-```bash
-mkdir -p "$KG_PATH"/{knowledge,lessons-learned,decisions,sessions,chat-history,tmp}
-
-# Create category subdirectories
-for category in "${categories[@]}"; do
-  mkdir -p "$KG_PATH/lessons-learned/$category"
-done
-
-# Create meta-issue if governance category selected
-if [[ " ${categories[@]} " =~ " governance " ]]; then
-  mkdir -p "$KG_PATH/meta-issues"
-fi
-```
+**→ Execute shared module:** Read `commands/init-shared/directory-scaffold.md` and follow it exactly.
+Parameters:
+- `{KG_PATH}` = resolved KG path (from Step 1.4)
+- `{categories}` = categories array collected in Step 1.2
 
 ### Step 1.6: Copy templates
 
-```bash
-# Copy KG templates
-cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/patterns.md" "$KG_PATH/knowledge/"
-cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/gotchas.md" "$KG_PATH/knowledge/"
-cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/concepts.md" "$KG_PATH/knowledge/"
-cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/architecture.md" "$KG_PATH/knowledge/"
-cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/workflows.md" "$KG_PATH/knowledge/"
-cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-category-index.md" "$KG_PATH/knowledge/"
-
-# Copy root-level files (E6 — skip if already exists to preserve teammate copies)
-# If KG is docs/-based and migration will be offered, scaffold directly to knowledge/ so files
-# land at the final destination rather than docs/ (migration would move them, but this is cleaner).
-SCAFFOLD_ROOT="$KG_PATH"
-if echo "$KG_PATH" | grep -qE '/docs/?$'; then
-  PROJECT_ROOT_FOR_SCAFFOLD=$(echo "$KG_PATH" | sed 's|/docs/*$||')
-  mkdir -p "$PROJECT_ROOT_FOR_SCAFFOLD/knowledge"
-  SCAFFOLD_ROOT="$PROJECT_ROOT_FOR_SCAFFOLD/knowledge"
-fi
-[ -f "$SCAFFOLD_ROOT/rules.md" ] && echo "rules.md already exists — skipping scaffold (teammate copy preserved)." || \
-  cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/rules.md" "$SCAFFOLD_ROOT/rules.md"
-[ -f "$SCAFFOLD_ROOT/kg-index.md" ] && echo "kg-index.md already exists — skipping scaffold." || \
-  cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-index.md" "$SCAFFOLD_ROOT/kg-index.md"
-# me.md is always gitignored — safe to scaffold fresh
-cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/me.md" "$SCAFFOLD_ROOT/me.md"
-
-# Copy lesson/ADR templates
-cp "${CLAUDE_PLUGIN_ROOT}/core/templates/lessons-learned/README.md" "$KG_PATH/lessons-learned/"
-cp "${CLAUDE_PLUGIN_ROOT}/core/templates/lessons-learned/lesson-template.md" "$KG_PATH/lessons-learned/"
-cp "${CLAUDE_PLUGIN_ROOT}/core/templates/decisions/README.md" "$KG_PATH/decisions/"
-cp "${CLAUDE_PLUGIN_ROOT}/core/templates/decisions/ADR-template.md" "$KG_PATH/decisions/"
-
-# Copy session template
-cp "${CLAUDE_PLUGIN_ROOT}/core/templates/sessions/session-template.md" "$KG_PATH/sessions/"
-
-# Copy MEMORY template if not exists
-if [ ! -f "~/.claude/projects/$(basename $(pwd))/memory/MEMORY.md" ]; then
-  echo "Note: MEMORY.md template available at ${CLAUDE_PLUGIN_ROOT}/core/templates/MEMORY-template.md"
-  echo "Copy manually if needed for new projects."
-fi
-```
+**→ Execute shared module:** Read `commands/init-shared/template-seed.md` and follow it exactly.
+Parameters:
+- `{KG_PATH}` = resolved KG path (from Step 1.4)
+- `{CLAUDE_PLUGIN_ROOT}` = plugin root path (environment variable available in this context)
 
 ### Step 1.6.5: Content migration offer (new install only)
 
@@ -1084,31 +887,15 @@ fi
 
 ### Step 1.8: Write config entry
 
-```bash
-# Build config entry JSON
-config_entry=$(cat <<EOF
-{
-  "name": "$kg_name",
-  "path": "$KG_PATH",
-  "type": "$location_type",
-  "categories": [
-    $(for cat in "${categories[@]}"; do
-      prefix="${category_prefixes[$cat]:-null}"
-      git_rule="${category_git_rules[$cat]:-commit}"
-      echo "{ \"name\": \"$cat\", \"prefix\": $prefix, \"git\": \"$git_rule\" },"
-    done | sed '$ s/,$//')
-  ],
-  "createdAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-  "lastUsed": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-}
-EOF
-)
-
-# Update config with jq (or manual JSON manipulation)
-jq ".graphs[\"$kg_name\"] = $config_entry | .active = \"$kg_name\"" \
-  ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
-mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
-```
+**→ Execute shared module:** Read `commands/init-shared/config-entry-write.md` and follow it exactly.
+Parameters:
+- `{KG_PATH}` = resolved KG path (from Step 1.4)
+- `{kg_name}` = KG name collected in Step 1.2
+- `{KG_TYPE}` = type field — "project-local", "personal", or "cowork" (from `location_type` in Step 1.2)
+- `{categories}` = categories array collected in Step 1.2
+- `{git_strategy}` = selected git strategy from Step 1.2
+- `{category_git_rules}` = per-category git rules map from Step 1.2 (if selective strategy)
+- `{preserve_active}` = false
 
 ### Step 1.8.5: Global Personal KG Offer
 

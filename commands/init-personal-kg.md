@@ -39,68 +39,14 @@ After setup, `/kmgraph:capture-lesson` shows a KG picker when saving lessons, an
 
 ### Step 1: Check for existing personal KG
 
-Read `~/.claude/kg-config.json`. Look for any entry with `type: "personal"`.
+**→ Execute shared module:** Read `commands/init-shared/upgrade-inspector.md` and follow it exactly.
+Parameters:
+- `{KG_PATH}` = resolved personal KG path
+- `{kg_name}` = "personal"
+- `{KG_TYPE}` = "personal"
+- `{categories}` = ["architecture", "debugging", "patterns", "process"]
 
-**If one already exists:**
-```
-A personal KG is already registered: "[name]" at [path]
-
-Options:
-1. See what's new — review improvements in this version, then decide what to apply
-2. Re-initialize it — archive existing content, reset structure, keep all lessons and ADRs
-3. Register a different path as personal KG
-4. Cancel
-```
-
-**Important:** Option 1 is the default upgrade path. Do NOT offer "use as-is / no action needed" — there may be new templates, missing files, or unpopulated me.md/rules.md to address. Always run the upgrade check.
-
-**If option 1 selected**, inspect the personal KG's actual state and report only what is missing or upgradeable for this specific install:
-
-```bash
-upgrades=()
-
-# Index reorganization — knowledge/index.md renamed to kg-category-index-global.md; new root kg-index-global.md created
-if [ -f "{personal_kg_path}/knowledge/index.md" ] && [ ! -f "{personal_kg_path}/knowledge/kg-category-index-global.md" ]; then
-  upgrades+=("Index update: renames {personal_kg_path}/knowledge/index.md to kg-category-index-global.md and adds a new kg-index-global.md at the personal KG root as the primary entry point")
-elif [ ! -f "{personal_kg_path}/kg-index-global.md" ]; then
-  upgrades+=("New: kg-index-global.md — the primary entry point for this personal knowledge graph")
-fi
-
-[ ! -f "{personal_kg_path}/me.md" ]    && upgrades+=("New: me.md — your cross-project identity and working style")
-# When writing me.md to personal KG, strip the "See also: ~/.claude/knowledge-graph/me.md" line — self-referential at personal KG level
-[ ! -f "{personal_kg_path}/rules.md" ] && upgrades+=("New: rules.md — cross-project behavioral rules and preferences")
-
-# FTS5 index — personal KG is always outside git so gitignore doesn't apply.
-# If .fts5.db exists it is intentional local state — never suggest removal or migration.
-# Only surface it if missing (offer to rebuild).
-[ ! -f "{personal_kg_path}/.fts5.db" ] && upgrades+=("Search index missing — will be rebuilt on first use")
-
-for tdir in knowledge lessons-learned decisions sessions; do
-  for template in "${CLAUDE_PLUGIN_ROOT}/core/templates/$tdir/"*; do
-    dest="{personal_kg_path}/$tdir/$(basename $template)"
-    [ ! -f "$dest" ] && upgrades+=("New template: $tdir/$(basename $template)")
-  done
-done
-```
-
-If nothing is upgradeable:
-```
-✅ Your personal KG is already up to date. Nothing to apply.
-```
-
-If upgrades exist:
-```
-Here's what's available for your personal KG:
-  • [item 1]
-  • [item 2]
-
-Apply all, pick individually, or skip?
-  1. Apply all
-  2. Let me choose which ones to apply
-  3. Skip — my setup is already how I want it
-```
-
-After applying upgrades (or if nothing to upgrade), **always continue to Step 8 (content migration) and Step 9 (evidence seeding)**. These run independently of the template upgrade check — an up-to-date template install does not mean me.md/rules.md have been populated.
+**After upgrade-inspector completes (Option 1), always continue to Step 8 (content migration) and Step 9 (evidence seeding).** These run independently of the template upgrade check — an up-to-date template install does not mean me.md/rules.md have been populated.
 
 **If option 2 selected (re-initialize):**
 
@@ -165,28 +111,19 @@ Store resolved path as `{personal_kg_path}`.
 
 ### Step 3: Create directory structure
 
-```bash
-mkdir -p "{personal_kg_path}"/{knowledge,lessons-learned,decisions,sessions}
-mkdir -p "{personal_kg_path}/lessons-learned"/{architecture,debugging,patterns,process}
-```
+**→ Execute shared module:** Read `commands/init-shared/directory-scaffold.md` and follow it exactly.
+Parameters:
+- `{KG_PATH}` = resolved personal KG path
+- `{categories}` = ["architecture", "debugging", "patterns", "process"]
 
 ---
 
 ### Step 4: Copy templates
 
-```bash
-for f in patterns.md gotchas.md concepts.md architecture.md workflows.md; do
-  src="${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/$f"
-  dest="{personal_kg_path}/knowledge/$f"
-  [ -f "$src" ] && [ ! -f "$dest" ] && cp "$src" "$dest"
-done
-# kg-category-index deploys as kg-category-index-global.md at personal KG level
-src="${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-category-index.md"
-dest="{personal_kg_path}/knowledge/kg-category-index-global.md"
-[ -f "$src" ] && [ ! -f "$dest" ] && cp "$src" "$dest"
-```
-
-Only copy if template doesn't already exist (preserves user content on re-init).
+**→ Execute shared module:** Read `commands/init-shared/template-seed.md` and follow it exactly.
+Parameters:
+- `{KG_PATH}` = resolved personal KG path
+- `{CLAUDE_PLUGIN_ROOT}` = plugin root path
 
 When deploying `me.md` to the personal KG, strip the "See also: ~/.claude/knowledge-graph/me.md" line — it is a project-KG cross-reference that points to itself when deployed as the personal KG's own me.md.
 
@@ -194,34 +131,24 @@ When deploying `me.md` to the personal KG, strip the "See also: ~/.claude/knowle
 
 ### Step 5: Register in config
 
-Add or update the `"personal"` entry in `~/.claude/kg-config.json`:
-
-```json
-"personal": {
-  "name": "personal",
-  "path": "~/.claude/knowledge-graph",
-  "type": "personal",
-  "categories": [
-    {"name": "architecture", "prefix": null, "git": "ignore"},
-    {"name": "debugging",    "prefix": null, "git": "ignore"},
-    {"name": "patterns",     "prefix": null, "git": "ignore"},
-    {"name": "process",      "prefix": null, "git": "ignore"}
-  ],
-  "createdAt": "[timestamp]",
-  "lastUsed": "[timestamp]"
-}
-```
-
-Do NOT change `"active"` — project KG remains active.
+**→ Execute shared module:** Read `commands/init-shared/config-entry-write.md` and follow it exactly.
+Parameters:
+- `{KG_PATH}` = resolved personal KG path
+- `{kg_name}` = "personal"
+- `{KG_TYPE}` = "personal"
+- `{categories}` = ["architecture", "debugging", "patterns", "process"]
+- `{git_strategy}` = "all-ignore"
+- `{category_git_rules}` = all categories set to "ignore"
+- `{preserve_active}` = true
 
 ---
 
 ### Step 6: Build FTS5 index
 
-Call `kg_fts5_rebuild` with `kgPath: "{personal_kg_path}"`.
-
-- If `indexed > 0`: confirm success
-- If `indexed = 0`: normal for empty KG — log note, not an error
+**→ Execute shared module:** Read `commands/init-shared/fts5-rebuild.md` and follow it exactly.
+Parameters:
+- `{KG_PATH}` = resolved personal KG path
+- `{kg_name}` = "personal"
 
 ---
 
