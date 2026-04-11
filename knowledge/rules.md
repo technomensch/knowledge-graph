@@ -158,10 +158,9 @@ Do not use numbered headings in knowledge files — use plain headings (e.g., `#
 
 ## Tool Preferences
 
-<!-- Platform-specific tool directives (tool names, MCP plugins, subagent patterns) belong in -->
-<!-- knowledge/platform/<platform>.md — not here. See ADR-032.                                -->
-<!-- Claude Code users: read knowledge/platform/claude.md for Glob/Grep/Bash/context-mode     -->
-<!-- and subagent preferences. This section contains only platform-agnostic preferences.       -->
+<!-- Platform-specific tool directives belong in the platform's native config file:            -->
+<!-- Claude Code → CLAUDE.md (root), Gemini CLI → GEMINI.md, Cursor → .cursorrules            -->
+<!-- This section contains only platform-agnostic preferences.                                 -->
 
 - Parallel calls: always run independent searches/reads in parallel
 

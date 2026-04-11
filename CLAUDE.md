@@ -94,9 +94,24 @@ grep -r "/kmgraph:" commands/ agents/ skills/
 mkdocs build
 ```
 
-## Platform Preferences
+## Platform Preferences (Claude Code)
 
-See [`knowledge/platform/claude.md`](knowledge/platform/claude.md) for Claude Code-specific tool directives (Glob/Grep/Bash preferences, context-mode usage, subagent strategy). Do not duplicate those directives here.
+Claude Code-specific tool directives. This section is the authoritative home for Claude Code tool preferences — `CLAUDE.md` IS the platform config file for Claude Code.
+
+### File and Content Search
+
+- File search: use Glob and Grep tools — not Bash `find` or `grep`
+- Content search: use Grep tool — not `rg` or `grep` in Bash
+
+### Output and Context Management
+
+- Avoid Bash commands producing >20 lines of output — use context-mode MCP tools instead
+- Subagents: use for heavy file exploration to keep main context clean
+
+### Search Scope Restrictions
+
+Never run namespace grep scans over `docs/plans/` or `.jsonl` chat history files
+- **Why:** scanning these paths pulls thousands of tokens of non-executable plan text, hitting context limits before reaching actual command files
 
 ## Active Work
 

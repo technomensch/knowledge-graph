@@ -5,7 +5,7 @@ number: 032
 
 created: 2026-04-11T00:00:00Z
 
-status: Accepted
+status: Superseded
 
 author: technomensch
 
@@ -31,7 +31,8 @@ category: architecture
 # ADR-032: Platform-Specific Tool Directives Belong in `knowledge/platform/<platform>.md`
 
 **Date:** 2026-04-11
-**Status:** Accepted
+**Status:** Superseded (v0.3.5-beta fixup)
+**Superseded by:** `CLAUDE.md` at repo root is the platform config for Claude Code. Other platforms use their native files (`GEMINI.md`, `.cursorrules`, `AGENTS.md`). The `knowledge/platform/` directory is removed — native platform files own tool directives directly.
 **Implements:** v0.3.5-beta
 **Related:** ADR-028 (me.md + rules.md as platform-agnostic source of truth), ADR-017 (four-layer architecture), ADR-021 (single source of truth)
 
