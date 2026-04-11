@@ -91,11 +91,19 @@ Protected paths (do not modify without explicit permission):
 - Mandatory plan steps (include in every implementation plan): (1) Create branch from correct parent, (2) Create `docs/plans/{filename}.md` copy from `~/.claude/plans/`, (3) implementation steps, (4) Commit, push, PR, merge
 - Capture checkpoints: add `/kmgraph:capture-lesson` or `/kmgraph:create-adr` step after each phase that produces a decision or learning
 - Acceptance criteria: tick plan checkboxes after each phase completes, not at the end
-- Parallel analysis: after writing a plan, identify parallelizable tasks and assign Opus/Sonnet/Haiku per task
+- Parallel analysis: after writing a plan, identify parallelizable tasks, assign Opus/Sonnet/Haiku per task, and state whether a team is needed
+  - Team needed: 3+ independent tasks that together take >15 min sequentially, or tasks that benefit from model specialization
+  - Team not needed: linear dependency chain, short plan (<5 tasks), or tasks too tightly coupled to parallelize safely
   - Why: plans were initially written without parallelism analysis, leading to sequential execution of tasks that could have run concurrently
 - Multi-phase plans: create separate phase files for checkpoint management and rate-limit recovery
   - Why: rate-limit hits during long multi-phase implementations reset context mid-plan, making it hard to resume without re-reading the full plan
-- Open plan file in editor immediately after writing; add capture/ADR checkpoints to each phase
+- Open plan file in editor immediately after writing: run `open -a "Visual Studio Code" <path>` (note: `code` is not on PATH — use `open -a`)
+  - Why: user finds it disruptive to ask follow-up questions about whether content was captured; seeing the file live removes that friction
+- Add capture/ADR checkpoints to each phase of every plan
+- When spawning background agents or teams, require a structured completion report before proceeding to the next phase:
+  - Format: phase name + status (COMPLETE / BLOCKED / ERROR) + commit hash(es) + "Safe to proceed: YES / NO"
+  - Never auto-spawn the next phase; wait for explicit "Safe to proceed: YES"
+  - Why: users have no visibility into background agent status; silent spawning creates uncertainty and prevents course-correction
 
 ## Communication
 

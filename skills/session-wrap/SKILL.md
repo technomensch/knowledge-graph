@@ -14,6 +14,7 @@
 - `docs/plans/*.md` contains unchecked `- [ ]` items (mid-plan indicator)
 - `docs/decisions/*.md` has ADRs with `Status: Proposed` or `Status: Draft` (open decisions)
 - Recent commits have lesson-worthy keywords (`fix`, `solved`, `implement`, `pattern`, `debug`, `refactor`) but no corresponding lesson file in `docs/lessons-learned/`
+- Rules were captured to `knowledge/rules.md` or `knowledge/me.md` this session: surface "N rule(s) captured this session — run `/kmgraph:recall` to review rules.md for drift or conflicts."
 
 **Block Conditions:**
 - Stop hook coordination flag exists: `/tmp/.kg-session-summarized-{PPID}-{date}` — if present, do NOT prompt (Stop hook already fired; avoid double-prompting)
