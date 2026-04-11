@@ -105,7 +105,7 @@ A rule is **platform-specific** if and only if it references a **named tool, API
 | "Always use Grep not rg" | Platform-specific — `Grep` is a Claude Code tool | `CLAUDE.md` |
 | "Always run tests before committing" | Universal — no platform tool named | `knowledge/rules.md` |
 | "Don't use context-mode for small files" | Platform-specific — `context-mode` is a Claude plugin | `CLAUDE.md` |
-| "Keep responses short" | Universal — communication style | `~/.claude/knowledge-graph/me.md` |
+| "Keep responses short" | Universal — communication style | `~/.kmgraph/me.md` |
 | "Always open the plan file after writing it" | Universal — workflow process | `knowledge/rules.md` |
 
 For **hybrid rules** (part universal, part platform-specific):
@@ -118,7 +118,7 @@ For **hybrid rules** (part universal, part platform-specific):
 
 ## Design Question 5 — Cross-Project Platform Rules
 
-**Question:** Should `~/.claude/knowledge-graph/platform/claude.md` exist for cross-project platform prefs?
+**Question:** Should `~/.kmgraph/platform/claude.md` exist for cross-project platform prefs?
 
 **Decision: Yes — add as a 6th routing target, but defer UI to v0.3.7.**
 
@@ -129,9 +129,9 @@ The full routing matrix becomes:
 | Project | Rule | `knowledge/rules.md` | Yes (team-wide) |
 | Project | Me | `knowledge/me.md` | No (gitignored) |
 | Project | Platform | native platform file (`CLAUDE.md`, `GEMINI.md`, etc.) | Yes (team-wide) |
-| Personal | Rule | `~/.claude/knowledge-graph/rules.md` | Personal KG |
-| Personal | Me | `~/.claude/knowledge-graph/me.md` | Personal KG |
-| Personal | Platform | `~/.claude/knowledge-graph/platform/<platform>.md` | Personal KG |
+| Personal | Rule | `~/.kmgraph/rules.md` | Personal KG |
+| Personal | Me | `~/.kmgraph/me.md` | Personal KG |
+| Personal | Platform | `~/.kmgraph/platform/<platform>.md` | Personal KG |
 
 **v0.3.6 scope (this release):** Implement targets 1–5 only (project platform file). The personal platform target (row 6) is scaffolded in the routing table but the dispatch path is deferred.
 
@@ -148,8 +148,8 @@ After classification, the 5 active targets + shortcuts:
 | native platform file (`CLAUDE.md`, `GEMINI.md`, etc.) | `platform (project, <platform>)` | `platform` |
 | `knowledge/rules.md` | `rules.md (project, universal)` | `yes` |
 | `knowledge/me.md` | `me.md (project, personal)` | `project-me` |
-| `~/.claude/knowledge-graph/rules.md` | `rules.md (personal, universal)` | `personal-rule` |
-| `~/.claude/knowledge-graph/me.md` | `me.md (personal, style)` | `personal-me` |
+| `~/.kmgraph/rules.md` | `rules.md (personal, universal)` | `personal-rule` |
+| `~/.kmgraph/me.md` | `me.md (personal, style)` | `personal-me` |
 
 ---
 

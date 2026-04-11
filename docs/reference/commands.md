@@ -96,7 +96,7 @@ description: Every KMGraph slash command — category, description, and key flag
 | Command | Description | Key flags |
 |---|---|---|
 | [`/kmgraph:init`](#init) | Create a new KG with wizard; optionally backfills from existing project context | — |
-| [`/kmgraph:init-personal-kg`](#init-personal-kg) | Create a personal KG at `~/.claude/knowledge-graph/` for cross-project lessons | — |
+| [`/kmgraph:init-personal-kg`](#init-personal-kg) | Create a personal KG at `~/.kmgraph/` for cross-project lessons | — |
 | [`/kmgraph:add-category`](#add-category) | Add a new category directory and KG entry file to an existing knowledge graph | `--prefix <p>`, `--git ignore\|commit` |
 | [`/kmgraph:list`](#list) | List all configured knowledge graphs from `~/.claude/kg-config.json` | `--names-only`, `--json` |
 | [`/kmgraph:switch`](#switch) | Change the active knowledge graph | `--force` |

@@ -76,8 +76,8 @@ Two-level hierarchy modeled on the existing `CLAUDE.md` pattern:
 |---|---|---|---|
 | Project | `knowledge/rules.md` | Yes | Project conventions shared by all contributors |
 | Project | `knowledge/me.md` | No - gitignored | Who I am in this project (per-contributor) |
-| Personal | `~/.claude/knowledge-graph/rules.md` | N/A local | Cross-project behavioral rules |
-| Personal | `~/.claude/knowledge-graph/me.md` | N/A local | Personal identity, cross-project preferences |
+| Personal | `~/.kmgraph/rules.md` | N/A local | Cross-project behavioral rules |
+| Personal | `~/.kmgraph/me.md` | N/A local | Personal identity, cross-project preferences |
 
 **Precedence:** Project-scoped files take precedence over personal files when they conflict. Personal files supply defaults.
 

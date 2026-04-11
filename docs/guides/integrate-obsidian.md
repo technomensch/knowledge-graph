@@ -25,7 +25,7 @@ KMGraph stores all entries as plain markdown. Obsidian reads markdown natively. 
 Point an Obsidian vault at the KG directory. In Obsidian:
 
 1. **File → Open vault**
-2. Select `~/.claude/knowledge-graph/` (personal KG) or `docs/` (project KG)
+2. Select `~/.kmgraph/` (personal KG) or `docs/` (project KG)
 3. Open the vault
 
 All lessons, ADRs, patterns, and session summaries are immediately browsable. Obsidian's graph view shows links between entries. Tag filtering works on the YAML frontmatter `tags:` field.

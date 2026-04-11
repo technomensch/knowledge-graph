@@ -207,7 +207,7 @@ fi
 - Configured path ends in `/docs` or `/docs/`
 - `docs/lessons-learned/` exists at that path (confirms KMGraph content, not just any docs folder)
 
-Note: Migration applies to project-local KGs only. Personal KGs (`~/.claude/knowledge-graph/`) use a fixed path and never have a `docs/` layout — they are intentionally excluded by the type check above.
+Note: Migration applies to project-local KGs only. Personal KGs (`~/.kmgraph/`) use a fixed path and never have a `docs/` layout — they are intentionally excluded by the type check above.
 
 ```bash
 KG_TYPE=$(jq -r '.graphs["'"$kg_name"'"].type' ~/.claude/kg-config.json)
@@ -512,7 +512,7 @@ PERSONAL_KG_EXISTS=$(jq -r '.graphs | to_entries[] | select(.value.type == "pers
 if [ -z "$PERSONAL_KG_EXISTS" ]; then
   echo ""
   echo "  Your project KG is now at knowledge/ — want to set up a personal KG too?"
-  echo "  A personal KG at ~/.claude/knowledge-graph/ captures cross-project lessons"
+  echo "  A personal KG at ~/.kmgraph/ captures cross-project lessons"
   echo "  and conventions that apply everywhere, not just this project."
   echo ""
   echo "    1. Yes — run /kmgraph:init-personal-kg now"
@@ -520,12 +520,12 @@ if [ -z "$PERSONAL_KG_EXISTS" ]; then
   # If Yes: invoke /kmgraph:init-personal-kg
   # After personal KG is set up, run the content migration offer for the personal level:
   #   Source: ~/.claude/CLAUDE.md
-  #   Targets: ~/.claude/knowledge-graph/me.md, ~/.claude/knowledge-graph/rules.md
+  #   Targets: ~/.kmgraph/me.md, ~/.kmgraph/rules.md
   #   Also offer to migrate user-type entries from ~/.claude/projects/.../memory/MEMORY.md → personal me.md
   #   (See Step 1.6.5 Personal KG case for full details)
   # After personal KG me.md/rules.md are created: run the same evidence seeding offer
   # using personal KG path for both the target files and the source scan directories
-  # (~/.claude/knowledge-graph/lessons-learned/ and ~/.claude/knowledge-graph/decisions/)
+  # (~/.kmgraph/lessons-learned/ and ~/.kmgraph/decisions/)
 fi
 ```
 
@@ -910,7 +910,7 @@ from your existing CLAUDE.md?
 - If source file does not exist, skip silently.
 - **Skip this step** if `me.md` already has substantial content (more than the template placeholder text) — the user has already populated it manually.
 
-**Personal KG case:** When initializing the personal KG (Step 1.8.5), run the same offer using `~/.claude/CLAUDE.md` as source and `~/.claude/knowledge-graph/me.md` / `~/.claude/knowledge-graph/rules.md` as targets. Also offer to migrate relevant entries from `~/.claude/projects/.../memory/MEMORY.md` (user-type memories: role, preferences, expertise) to personal `me.md`.
+**Personal KG case:** When initializing the personal KG (Step 1.8.5), run the same offer using `~/.claude/CLAUDE.md` as source and `~/.kmgraph/me.md` / `~/.kmgraph/rules.md` as targets. Also offer to migrate relevant entries from `~/.claude/projects/.../memory/MEMORY.md` (user-type memories: role, preferences, expertise) to personal `me.md`.
 
 ---
 
@@ -1040,7 +1040,7 @@ After the project KG is registered and active, offer to create a personal KG for
 ```
 Would you like to create a personal knowledge graph for cross-project lessons?
 
-This creates a personal KG at ~/.claude/knowledge-graph/ where you can save
+This creates a personal KG at ~/.kmgraph/ where you can save
 lessons, patterns, and ADRs that apply across all your projects — not just this one.
 
 Examples of personal lessons:
@@ -1048,43 +1048,43 @@ Examples of personal lessons:
   • "MCP registration quirks across IDEs"
   • "TypeScript strict mode gotchas"
 
-1. Yes — create personal KG at ~/.claude/knowledge-graph/
+1. Yes — create personal KG at ~/.kmgraph/
 2. No — skip for now (can create later with /kmgraph:init-personal-kg)
 ```
 
 **If Yes:**
 
-1. Check if `~/.claude/knowledge-graph/` already exists in `kg-config.json` (any entry with `type: "personal"` at that path). If so:
-   > "A personal KG already exists at `~/.claude/knowledge-graph/`. Skipping creation."
+1. Check if `~/.kmgraph/` already exists in `kg-config.json` (any entry with `type: "personal"` at that path). If so:
+   > "A personal KG already exists at `~/.kmgraph/`. Skipping creation."
    Register it if not already in config; otherwise no-op.
 
 2. Create directory structure:
    ```bash
-   mkdir -p "$HOME/.claude/knowledge-graph"/{knowledge,lessons-learned,decisions,sessions}
-   mkdir -p "$HOME/.claude/knowledge-graph/lessons-learned"/{architecture,debugging,patterns,process}
+   mkdir -p "$HOME/.kmgraph"/{knowledge,lessons-learned,decisions,sessions}
+   mkdir -p "$HOME/.kmgraph/lessons-learned"/{architecture,debugging,patterns,process}
    ```
 
 3. Copy templates:
    ```bash
    # Category templates → knowledge/ subfolder
    for f in patterns.md gotchas.md concepts.md architecture.md workflows.md; do
-     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/$f" "$HOME/.claude/knowledge-graph/knowledge/" 2>/dev/null || true
+     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/$f" "$HOME/.kmgraph/knowledge/" 2>/dev/null || true
    done
    # kg-category-index deploys as kg-category-index-global.md at personal KG level
-   cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-category-index.md" "$HOME/.claude/knowledge-graph/knowledge/kg-category-index-global.md" 2>/dev/null || true
+   cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-category-index.md" "$HOME/.kmgraph/knowledge/kg-category-index-global.md" 2>/dev/null || true
    # Root-level files — me.md, rules.md, kg-index-global.md → KG root
-   cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/me.md" "$HOME/.claude/knowledge-graph/me.md"
-   [ -f "$HOME/.claude/knowledge-graph/rules.md" ] && echo "rules.md already exists — skipping scaffold." || \
-     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/rules.md" "$HOME/.claude/knowledge-graph/rules.md"
-   [ -f "$HOME/.claude/knowledge-graph/kg-index-global.md" ] && echo "kg-index-global.md already exists — skipping scaffold." || \
-     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-index-global.md" "$HOME/.claude/knowledge-graph/kg-index-global.md"
+   cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/me.md" "$HOME/.kmgraph/me.md"
+   [ -f "$HOME/.kmgraph/rules.md" ] && echo "rules.md already exists — skipping scaffold." || \
+     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/rules.md" "$HOME/.kmgraph/rules.md"
+   [ -f "$HOME/.kmgraph/kg-index-global.md" ] && echo "kg-index-global.md already exists — skipping scaffold." || \
+     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-index-global.md" "$HOME/.kmgraph/kg-index-global.md"
    ```
 
 4. Register in `~/.claude/kg-config.json`:
    ```json
    "personal": {
      "name": "personal",
-     "path": "~/.claude/knowledge-graph",
+     "path": "~/.kmgraph",
      "type": "personal",
      "categories": [
        {"name": "architecture", "prefix": null, "git": "ignore"},
@@ -1099,18 +1099,18 @@ Examples of personal lessons:
    Note: `"active"` is NOT changed — project KG remains active.
 
 5. Build FTS5 index for the new personal KG:
-   Call `kg_fts5_rebuild` with `kgPath: "~/.claude/knowledge-graph"`. Post-rebuild guard: if `indexed` is 0, log a note (normal for empty KG).
+   Call `kg_fts5_rebuild` with `kgPath: "~/.kmgraph"`. Post-rebuild guard: if `indexed` is 0, log a note (normal for empty KG).
 
 6. Confirm:
-   > "✅ Personal KG created at `~/.claude/knowledge-graph/`
+   > "✅ Personal KG created at `~/.kmgraph/`
    > Capture cross-project lessons with `/kmgraph:capture-lesson` — you'll be asked which KG to save to."
 
 7. Content migration offer for personal KG:
 
    Run the Step 1.6.5 content migration logic with personal KG parameters:
    - Source file: `~/.claude/CLAUDE.md`
-   - Target me.md: `~/.claude/knowledge-graph/me.md`
-   - Target rules.md: `~/.claude/knowledge-graph/rules.md`
+   - Target me.md: `~/.kmgraph/me.md`
+   - Target rules.md: `~/.kmgraph/rules.md`
    - Also offer to migrate `user`-type entries from `~/.claude/projects/*/memory/MEMORY.md` into personal `me.md` (role, preferences, expertise — not project-specific entries)
 
    Prompt:
@@ -1130,8 +1130,8 @@ Examples of personal lessons:
    After step 7 (whether or not the user ran the migration offer), check whether existing personal lessons or ADRs can seed Why/Source links into rules.md:
 
    ```bash
-   LESSON_COUNT=$(find "$HOME/.claude/knowledge-graph/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
-   ADR_COUNT=$(find "$HOME/.claude/knowledge-graph/decisions" -name "ADR-*.md" 2>/dev/null | wc -l | tr -d ' ')
+   LESSON_COUNT=$(find "$HOME/.kmgraph/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
+   ADR_COUNT=$(find "$HOME/.kmgraph/decisions" -name "ADR-*.md" 2>/dev/null | wc -l | tr -d ' ')
    ```
 
    If `LESSON_COUNT` or `ADR_COUNT` is greater than 0:

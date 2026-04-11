@@ -132,7 +132,7 @@ These were identified through design analysis, not observed incidents.
 ### E13 — Cross-KG precedence undefined when personal and project rules.md conflict
 **Type:** Theoretical
 **Phase:** Phase 3A — Two-level hierarchy
-**Scenario:** Personal `~/.claude/knowledge-graph/rules.md` says "never use semicolons in JS." Project `knowledge/rules.md` says "always use semicolons." Platform shims read both but in unspecified order — which wins?
+**Scenario:** Personal `~/.kmgraph/rules.md` says "never use semicolons in JS." Project `knowledge/rules.md` says "always use semicolons." Platform shims read both but in unspecified order — which wins?
 **Mitigation:** Document precedence: project `rules.md` > personal `rules.md`. Platform shims read personal rules first, then project rules (last-read wins). Document in ADR-028.
 
 ---

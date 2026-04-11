@@ -64,7 +64,7 @@ enhancement_id: ENH-001
 - **Action:** Run `/kmgraph:capture-lesson` for "AI assistant workflow patterns"
 - **Interactive:** User selects "(global) — reuse across projects"
 - **Expected:**
-  - Saves to personal KG at `~/.claude/knowledge-graph/docs/knowledge/lessons-learned/`
+  - Saves to personal KG at `~/.kmgraph/docs/knowledge/lessons-learned/`
   - Immediately searchable via `/kmgraph:recall` in any project
 - **Status:** ✓ Pass
 
@@ -101,7 +101,7 @@ enhancement_id: ENH-001
 - **Setup:** Fresh project, first time running `/kmgraph:init`
 - **Action:** Run init, answer "yes" to "Create global personal KG?"
 - **Expected:**
-  - Creates `~/.claude/knowledge-graph/docs/` directory structure
+  - Creates `~/.kmgraph/docs/` directory structure
   - Registers in `~/.claude/kg-config.json` as "personal" with type "personal"
   - Both KGs now available in config
 - **Status:** ✓ Pass
@@ -119,7 +119,7 @@ enhancement_id: ENH-001
 - **Setup:** User previously declined personal KG, now wants it
 - **Action:** Run `/kmgraph:init-personal-kg`
 - **Expected:**
-  - Creates personal KG at `~/.claude/knowledge-graph/`
+  - Creates personal KG at `~/.kmgraph/`
   - Registers in config
   - Brief success message
 - **Status:** ✓ Pass
@@ -152,7 +152,7 @@ enhancement_id: ENH-001
 ## Phase 4: Cross-Platform Validation
 
 ### TC-4.1: Gemini CLI with Global KG
-- **Setup:** Gemini CLI, personal KG at `~/.claude/knowledge-graph/`
+- **Setup:** Gemini CLI, personal KG at `~/.kmgraph/`
 - **Action:** Capture lesson via `kg_capture`, search via `kg_search`
 - **Expected:** Both operations work without file system tools (MCP only)
 - **Status:** ✓ Pass
@@ -167,7 +167,7 @@ enhancement_id: ENH-001
 - **Setup:**
   - Project A: `docs/` (project KG)
   - Project B: `docs/` (project KG)
-  - Global: `~/.claude/knowledge-graph/` (shared)
+  - Global: `~/.kmgraph/` (shared)
 - **Action:**
   1. In Project A: capture to global
   2. Switch to Project B

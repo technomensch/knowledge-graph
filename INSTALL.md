@@ -317,7 +317,7 @@ git clone https://github.com/technomensch/knowledge-graph.git
 Where should the knowledge graph be stored?
 
 1. Current project directory (./docs/) — for project-specific knowledge
-2. Home directory (~/.knowledge-graph/) — for cross-project knowledge
+2. Home directory (~/.kmgraph/) — for cross-project knowledge
 3. Custom path — enter a path
 ```
 
@@ -452,7 +452,7 @@ Use the MCP tool to initialize:
 ```
 Call the kg_config_init tool with:
   name: (ask user for a name, e.g., "my-project")
-  kgPath: (ask user for a path, e.g., "./docs" or "~/.knowledge-graph")
+  kgPath: (ask user for a path, e.g., "./docs" or "~/.kmgraph")
 ```
 
 **For template-only installations (Step 2C):**

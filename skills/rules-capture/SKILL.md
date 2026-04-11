@@ -1,6 +1,6 @@
 # Skill: rules-capture
 
-**Purpose:** Detect implicit mid-session behavioral corrections and preferences — phrases the user issues without asking to "capture" anything — and offer to write them to the authoritative rule files (`knowledge/rules.md` or `~/.claude/knowledge-graph/me.md`), rather than only the MEMORY.md feedback system.
+**Purpose:** Detect implicit mid-session behavioral corrections and preferences — phrases the user issues without asking to "capture" anything — and offer to write them to the authoritative rule files (`knowledge/rules.md` or `~/.kmgraph/me.md`), rather than only the MEMORY.md feedback system.
 
 ## Trigger Patterns (match any)
 
@@ -68,14 +68,14 @@ Combined into four targets:
 |-------|------|-----------|------------|
 | Project | Rule | `knowledge/rules.md` | Yes (team-wide) |
 | Project | Me | `knowledge/me.md` | No (gitignored, user-specific) |
-| Personal | Rule | `~/.claude/knowledge-graph/rules.md` | Personal KG |
-| Personal | Me | `~/.claude/knowledge-graph/me.md` | Personal KG (gitignored) |
+| Personal | Rule | `~/.kmgraph/rules.md` | Personal KG |
+| Personal | Me | `~/.kmgraph/me.md` | Personal KG (gitignored) |
 
 Signal examples per target:
 - `knowledge/rules.md`: "always run mkdocs build before PR", "never force-push", "from now on identify model per phase" — team process
 - `knowledge/me.md`: "in this project, I prefer to see diffs before you push", "remind me to check the hook after ECC installs" — personal workflow for this project
-- `~/.claude/knowledge-graph/rules.md`: "don't use the term 'update' for files that need to be created" — cross-project process rule
-- `~/.claude/knowledge-graph/me.md`: "no em dashes in any written content", "less technical jargon in confirmations" — identity/style across all projects
+- `~/.kmgraph/rules.md`: "don't use the term 'update' for files that need to be created" — cross-project process rule
+- `~/.kmgraph/me.md`: "no em dashes in any written content", "less technical jargon in confirmations" — identity/style across all projects
 
 If both axes are ambiguous: ask one question — "Is this a rule for the whole team on this project, just for you on this project, or for all your projects?"
 
@@ -109,8 +109,8 @@ Append a single suggestion line to the end of your normal reply (do NOT replace 
 The shortcut options let the user flip to any of the four targets without typing a full sentence:
 - `yes` — accept suggested target as-is
 - `project-me` → `knowledge/me.md`
-- `personal-rule` → `~/.claude/knowledge-graph/rules.md`
-- `personal-me` → `~/.claude/knowledge-graph/me.md`
+- `personal-rule` → `~/.kmgraph/rules.md`
+- `personal-me` → `~/.kmgraph/me.md`
 - `no` — drop, do not re-prompt this session
 
 Examples:
@@ -120,7 +120,7 @@ Examples:
  (yes / project-me / personal-rule / personal-me / no)
 ```
 ```
- Want me to make this a rule? → ~/.claude/knowledge-graph/me.md (personal style)
+ Want me to make this a rule? → ~/.kmgraph/me.md (personal style)
  "Avoid technical jargon in user-facing confirmation messages."
  (yes / project-me / personal-rule / personal-me / no)
 ```
@@ -129,8 +129,8 @@ Examples:
 
 - **"yes"** → dispatch to `rules-capture-agent` with structured payload (see below)
 - **"project-me"** → flip target to `knowledge/me.md`, dispatch to agent
-- **"personal-rule"** → flip target to `~/.claude/knowledge-graph/rules.md`, dispatch to agent
-- **"personal-me"** → flip target to `~/.claude/knowledge-graph/me.md`, dispatch to agent
+- **"personal-rule"** → flip target to `~/.kmgraph/rules.md`, dispatch to agent
+- **"personal-me"** → flip target to `~/.kmgraph/me.md`, dispatch to agent
 - **"no"** / silence → drop, do not re-prompt for the same correction this session
 - Natural language override always works: "make it project me.md", "user rules", "nope", "skip", "put it in my personal me"
 
@@ -143,8 +143,8 @@ context:
   target_file: "knowledge/rules.md"   # exact path — one of four possible values:
                                       #   knowledge/rules.md
                                       #   knowledge/me.md
-                                      #   ~/.claude/knowledge-graph/rules.md
-                                      #   ~/.claude/knowledge-graph/me.md
+                                      #   ~/.kmgraph/rules.md
+                                      #   ~/.kmgraph/me.md
   scope: "project-rule"               # one of: project-rule | project-me | personal-rule | personal-me
   source_quote: "[exact phrase user said that triggered this]"
   session_context: "[1-2 sentence summary of what was happening when this correction arose]"

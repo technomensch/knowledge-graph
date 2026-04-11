@@ -294,3 +294,22 @@ This pattern is consistent with the ADR's broader principle — the user should 
 **Decision Made:** 2026-04-09
 **Last Updated:** 2026-04-09 (added kg-index.md as third scaffolded file; content migration offer moved in-scope; "See what's new" UX added for verify/upgrade option; switched from static version changelog to state-derived upgrade reporting)
 **Status:** Proposed
+
+---
+
+## Path Migration (v0.3.5-beta — 2026-04-11)
+
+**Original decision:** The personal (cross-project) knowledge graph was initialized at `~/.claude/knowledge-graph/` by the `init-personal-kg` command.
+
+**Correction:** This path violated the platform-agnostic principle established by this ADR. `~/.claude/` is a Claude Code-specific directory; Gemini CLI, Copilot, and Codex users cannot reach it as a shared personal KG location.
+
+**Updated default:** `~/.kmgraph/` — a platform-neutral home-directory location consistent with the existing `mcp-server/src/cli.ts` convention for project KG home-directory defaults.
+
+**Scope of change:** All commands, skills, agents, and templates that referenced `~/.claude/knowledge-graph/` have been updated. Existing users with a personal KG at the old path should run `/kmgraph:init-personal-kg` which will detect and offer to migrate the installation, or migrate manually:
+
+```bash
+mv ~/.claude/knowledge-graph ~/.kmgraph
+# Then update ~/.claude/kg-config.json personal.path field
+```
+
+**Historical context preserved:** This note records the correction. The original decision text above remains unchanged.
