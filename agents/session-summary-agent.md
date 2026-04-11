@@ -297,26 +297,7 @@ If found:
 
 ---
 
-## Step 6: Check for Existing Today File (consolidation rule)
-
-Before drafting, check whether a session summary for today already exists:
-
-```bash
-today=$(date +%Y-%m-%d)
-ls {active_kg_path}/sessions/$(date +%Y-%m)/ 2>/dev/null | grep "^$today"
-```
-
-**If a file exists for today:** set `{append_mode} = true` and `{existing_session_path}` to that file. Read it — the new summary content will be appended to it, not saved as a new file. Inform the user:
-
-> "A session summary for today already exists — I'll append to it rather than create a new file."
-
-**If no file exists for today:** set `{append_mode} = false` and proceed to create a new file.
-
-**Rule:** Never create more than one session summary file per calendar day. All sessions for a day are consolidated into a single file.
-
----
-
-## Step 7: Draft Session Summary
+## Step 6: Draft Session Summary
 
 Compose a summary with these sections:
 
@@ -352,7 +333,7 @@ Compose a summary with these sections:
 
 ---
 
-## Step 8: User Review & Edits
+## Step 7: User Review & Edits
 
 Present the draft with an explicit unsaved-state header:
 
@@ -370,13 +351,13 @@ Allow inline edits. If user adds context, re-draft and re-present with the same 
 
 ---
 
-## Step 9: Capture via `kg_capture` MCP Tool
+## Step 8: Capture via `kg_capture` MCP Tool
 
-Once approved, call `kg_capture`. If `{append_mode}` is true, include `"version": "append"` so content is appended to the existing today file rather than creating a new one:
+Once approved, call `kg_capture`:
 
 ```json
 {
-  "content": "[Full markdown summary from Step 7]",
+  "content": "[Full markdown summary from Step 6]",
   "type": "session",
   "metadata": {
     "title": "[Session Type] Session",
@@ -384,21 +365,23 @@ Once approved, call `kg_capture`. If `{append_mode}` is true, include `"version"
     "git": {
       "branch": "[current branch]",
       "commit_short": "[latest short hash]"
-    },
-    "version": "{append_mode ? 'append' : ''}"
+    }
   }
 }
 ```
 
 **Handle responses:**
 
-**Success (status: "created" or "appended"):**
+**Success (status: "created"):**
 
 > "✅ Session saved: **[relativePath]** — logged for future reference"
 
 **Conflict error (duplicate session for same date):**
 
-Auto-append — do not ask. Call again with `"version": "append"` in metadata. This enforces the one-file-per-day rule.
+> "A session already exists for today. Append new content to it, or overwrite? (append / overwrite / cancel)"
+
+If append: call with `"version": "append"` in metadata.
+If overwrite: call with `version: "v1.1"` to update.
 
 **KG_MISMATCH error:**
 
