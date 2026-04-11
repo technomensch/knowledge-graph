@@ -13,6 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.3.4-beta] — 2026-04-10
+
+### Features
+- **`rules-capture` skill** — New skill that detects implicit mid-session behavioral corrections ("always X", "never X", "from now on X", "I prefer X", "make that a rule") and offers to write them to one of four authoritative targets — `knowledge/rules.md` (project team rule), `knowledge/me.md` (project personal preference), `~/.claude/knowledge-graph/rules.md` (personal cross-project rule), or `~/.claude/knowledge-graph/me.md` (personal identity/style). Appends a single inline suggestion to the normal reply with a 4-target shortcut menu `(yes / project-me / personal-rule / personal-me / no)`. Does NOT fire on ephemeral instructions, code corrections, clarifications, or in-context choices.
+- **`rules-capture-agent`** — New agent dispatched by `rules-capture` skill (and `capture-router` for explicit "capture that" + behavioral correction). Reads the target file, runs a dedup check against existing entries, drafts the rule in house style (Always/Never bullet with Why: and Source: lines), presents Approve / Edit / Discard loop, writes atomically (best-effort), and creates a scope-aware MEMORY.md pointer stub.
+- **MEMORY.md feedback-entry backfill** — `/kmgraph:init` upgrade flow now scans the project MEMORY.md for feedback-type behavioral rules not yet mirrored in `knowledge/rules.md` and offers per-entry migration with preview before writing.
+
+### Fixed
+- **`capture-router`** — Explicit "capture that" + behavioral correction now dispatches to `rules-capture-agent` instead of writing a FEEDBACK memory file directly. Implicit corrections (no "capture that") added to exclusion list.
+- **`lesson-capture`** — Added symmetric exclusion: behavioral process directives without a solved bug or learned pattern route to `rules-capture` instead of `lesson-capture`. Dual-fire case preserved: if both a lesson and a rule apply to the same turn, both skills fire independently.
+- **`session-wrap`** — Surfaces "N rule(s) captured this session — run `/kmgraph:recall` to review rules.md for drift or conflicts" when rules were written during the session.
+
+---
+
 ## [0.3.3-beta] — 2026-04-10
 
 ### Features
