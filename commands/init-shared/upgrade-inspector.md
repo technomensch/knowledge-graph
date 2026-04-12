@@ -76,6 +76,22 @@ done
 [ ${#DOCS_FOUND[@]} -gt 0 ] && \
   upgrades+=("Migration available: knowledge content found under docs/ (pre-migration layout) — move to knowledge/")
 
+# Stale in-project FTS5 file check (post-~/.kmgraph/index/ migration)
+REAL_DB="$HOME/.kmgraph/index/projects/{kg_name}.db"
+if [ -f "$REAL_DB" ]; then
+  STALE_FTS5=$(find "$KG_PARENT" \
+    -not -path "$KG_PARENT/.git/*" \
+    \( -name ".fts5.db" -o -name ".fts5.db-journal" \) \
+    2>/dev/null)
+  [ -n "$STALE_FTS5" ] && \
+    upgrades+=("Cleanup available: stale .fts5.db files found in project tree — pre-migration artifacts safe to delete")
+fi
+
+# Wiki pass check
+WIKI_DONE=$(jq -r '.graphs["{kg_name}"].wiki_pass_complete // false' ~/.claude/kg-config.json 2>/dev/null)
+[ "$WIKI_DONE" != "true" ] && \
+  upgrades+=("Wiki pass available: convert bare ADR-NNN, ENH-NNN, #NNN, and lesson filename references to [[wiki links]] across knowledge files")
+
 # New templates (files in plugin core/templates not yet in KG)
 # Skip templates that are already covered by the scaffold file checks above:
 #   kg-index.md deploys as {KG_PATH}/index.md — already checked
@@ -460,3 +476,26 @@ To migrate manually: move files from docs/{decisions,lessons-learned,...}/ to kn
 - Cleanup (step 4) uses `rmdir` — fails safely on any dir that still has content.
 - Cross-reference rewrite uses `find -print0 | xargs -0` — safe on paths with spaces.
 - Cross-reference rewrite only targets files inside `{KG_PATH}` — does not touch project source code or other directories.
+
+#### f. Stale in-project FTS5 file cleanup
+
+**Purpose:** Remove `.fts5.db` and `.fts5.db-journal` files left in the project tree after the search index migrated to `~/.kmgraph/index/`. These files waste disk space and can crash third-party tools (e.g. Obsidian) when indexing the vault.
+
+**Execute:** Read `commands/init.md` and run **Step 1f.0b** (Stale in-project FTS5 file cleanup) exactly as written there. Pass `{kg_name}` and the project root (`dirname {KG_PATH}`) as `KG_ROOT`.
+
+**Constraints:**
+- Only runs if the detection check above found stale files
+- Only deletes when real DB at `~/.kmgraph/index/projects/{kg_name}.db` is confirmed
+- Always prompts — never auto-deletes
+- Adds `**/.fts5.db` and `**/.fts5.db-journal` to `.gitignore` on cleanup (idempotent)
+
+#### g. Wiki pass
+
+**Purpose:** Convert bare `ADR-NNN`, `ENH-NNN`, `#NNN` (GitHub issues), and `Lessons_Learned_X` filename references to `[[wiki links]]` across all files in `lessons-learned/`, `decisions/`, `sessions/`, and `knowledge/concepts/`.
+
+**Execute:** Read `commands/init.md` and run **Step 1f.2** (Obsidian wiki link pass) exactly as written there. Pass `{kg_name}` and `{KG_PATH}`.
+
+**Constraints:**
+- Only runs if `wiki_pass_complete` is not `true` in kg-config (the detection check above already verified this)
+- Sets `wiki_pass_complete: true` in kg-config on successful completion
+- Idempotent: re-running `/kmgraph:init` after completion skips this check silently
