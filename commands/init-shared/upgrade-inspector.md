@@ -30,9 +30,10 @@ for dir in knowledge lessons-learned decisions sessions chat-history tmp; do
 done
 
 # Index reorganization — knowledge/index.md renamed to kg-category-index.md; new root kg-index.md created
+# Note: kg-index.md and index.md are treated as equivalent root nav files — if either exists, skip.
 if [ -f "{KG_PATH}/knowledge/index.md" ] && [ ! -f "{KG_PATH}/knowledge/kg-category-index.md" ]; then
   upgrades+=("Index update: renames {KG_PATH}/knowledge/index.md to kg-category-index.md and adds a new kg-index.md at the knowledge graph root as the primary entry point")
-elif [ ! -f "{KG_PATH}/index.md" ]; then
+elif [ ! -f "{KG_PATH}/index.md" ] && [ ! -f "{KG_PATH}/kg-index.md" ]; then
   upgrades+=("New: kg-index.md — the primary entry point for this knowledge graph")
 fi
 
@@ -94,15 +95,19 @@ WIKI_DONE=$(jq -r '.graphs["{kg_name}"].wiki_pass_complete // false' ~/.claude/k
   upgrades+=("Wiki pass available: convert bare ADR-NNN, ENH-NNN, #NNN, and lesson filename references to [[wiki links]] across knowledge files")
 
 # New templates (files in plugin core/templates not yet in KG)
-# Skip templates that are already covered by the scaffold file checks above:
-#   kg-index.md deploys as {KG_PATH}/index.md — already checked
-#   me.md and rules.md deploy to {KG_PATH} root — already checked
+# IMPORTANT: The following filenames must NEVER be added to upgrades[] by this loop,
+# regardless of whether they exist at the template destination path.
+# They are handled by dedicated scaffold checks above (section h) with interactive flows.
+# Do not add them as "New template:" items under any circumstances:
+#   kg-index.md  — covered by index check above (deploys as index.md or kg-index.md)
+#   me.md        — covered by section h (interactive backfill)
+#   rules.md     — covered by section h (interactive backfill)
+#   triggers.md  — covered by section h (interactive backfill, deploys to KG root)
+#   index-personal.md — personal KG only, handled separately
 scaffold_covered=("kg-index.md" "me.md" "rules.md" "index-personal.md" "triggers.md")
 for tdir in knowledge lessons-learned decisions sessions; do
   for template in "${CLAUDE_PLUGIN_ROOT}/core/templates/$tdir/"*; do
     tname=$(basename "$template")
-    # Skip if this template is covered by a scaffold check
-    # triggers.md is handled by section h (interactive flow) — not a silent copy
     skip=false
     for covered in "${scaffold_covered[@]}"; do
       [ "$tname" = "$covered" ] && skip=true && break
