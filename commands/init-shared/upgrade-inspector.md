@@ -119,13 +119,23 @@ for tdir in knowledge lessons-learned decisions sessions; do
 done
 ```
 
-If nothing is upgradeable, say:
+**IMPORTANT — Filter before presenting:** Before displaying the upgrades list or the "nothing to upgrade" message, remove any item from `upgrades[]` whose basename matches any of the following scaffold-only filenames:
+
+- `kg-index.md`
+- `me.md`
+- `rules.md`
+- `triggers.md`
+- `index-personal.md`
+
+These files are handled exclusively by section h with an interactive backfill flow. They must **never** appear as "New template:" or "Updated template:" items in the menu, regardless of what the detection loop added. Remove them now, before any further processing.
+
+If nothing is upgradeable after filtering, say:
 ```
 ✅ Your setup is already up to date. Nothing to apply.
 ```
 And exit.
 
-If upgrades exist, present them:
+If upgrades exist after filtering, present them:
 ```
 Here's what's available for your install:
   • [item 1]
