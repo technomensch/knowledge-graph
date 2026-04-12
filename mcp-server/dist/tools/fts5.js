@@ -35,6 +35,9 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FTS5_DB_FILENAME = void 0;
 exports.getFTS5DbPath = getFTS5DbPath;
+exports.getPersonalDbPath = getPersonalDbPath;
+exports.getProjectDbPath = getProjectDbPath;
+exports.resolveDbPath = resolveDbPath;
 exports.resolveContentRoot = resolveContentRoot;
 exports.getDbPath = getDbPath;
 exports.sanitizeFts5Query = sanitizeFts5Query;
@@ -71,11 +74,37 @@ exports.FTS5_DB_FILENAME = ".fts5.db";
  * Returns the absolute path to the user-level FTS5 database for a given KG name.
  * Stored in ~/.claude/kg-fts5/<kgName>.db (outside project directories).
  * Creates the directory if it does not exist.
+ * @deprecated Use resolveDbPath(kgName, "project-local") — DB now at ~/.kmgraph/index/
  */
 function getFTS5DbPath(kgName) {
     const dir = path.join(os.homedir(), ".claude", "kg-fts5");
     fs.mkdirSync(dir, { recursive: true });
     return path.join(dir, `${kgName}.db`);
+}
+function getPersonalDbPath() {
+    const dir = path.join(os.homedir(), ".kmgraph", "index");
+    fs.mkdirSync(dir, { recursive: true });
+    return path.join(dir, "personal.db");
+}
+function getProjectDbPath(kgName) {
+    // TODO(v0.3.7): name collision risk — two repos with the same kgName share this file.
+    // Future: use a registry with stable content-hash IDs as filenames.
+    const dir = path.join(os.homedir(), ".kmgraph", "index", "projects");
+    fs.mkdirSync(dir, { recursive: true });
+    return path.join(dir, `${kgName}.db`);
+}
+/**
+ * Central dispatcher: routes to personal.db or projects/<kgName>.db based on kgType.
+ * Note: kgName is ignored when kgType is "personal" (personal DB is a fixed singleton path).
+ */
+function resolveDbPath(kgName, kgType) {
+    if (kgType === "personal")
+        return getPersonalDbPath();
+    if (kgType === "project-local" || kgType === "project")
+        return getProjectDbPath(kgName);
+    // Unknown type — default to project-local with a console warning
+    console.warn(`resolveDbPath: unknown kgType "${kgType}", defaulting to project-local`);
+    return getProjectDbPath(kgName);
 }
 /**
  * Resolves the content root for a KG path.
