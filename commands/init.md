@@ -301,10 +301,6 @@ grep -qxF ".kg-archive-*/" .gitignore 2>/dev/null || echo ".kg-archive-*/" >> .g
 # IMPORTANT: Do NOT add 'knowledge' to this list — docs/knowledge/ is handled
 # by the special case below (renamed to knowledge/concepts/ to avoid nesting).
 for subdir in lessons-learned decisions sessions chat-history tmp; do
-  if [ "$subdir" = "knowledge" ]; then
-    echo "⚠️  Skipping knowledge/ — handled by special case below."
-    continue
-  fi
   if [ -L "docs/$subdir" ]; then
     echo "⚠️  docs/$subdir is a symlink — skipping automatic move. Move manually if needed."
     continue
