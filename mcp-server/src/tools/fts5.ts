@@ -297,14 +297,14 @@ export function indexFile(db: any, filePath: string, kgPath: string): number {
  * - Removes index rows for files that no longer exist on disk.
  * - Skips files that haven't changed.
  */
-export function rebuildIndex(kgPath: string, kgName: string): RebuildResult {
+export function rebuildIndex(kgPath: string, kgName: string, kgType = "project-local"): RebuildResult {
   if (!fts5Available) {
     throw new Error(
       "FTS5 search engine not available. Restart Claude Code to complete the upgrade installation."
     );
   }
   const start = Date.now();
-  const dbPath = getFTS5DbPath(kgName);
+  const dbPath = resolveDbPath(kgName, kgType);
   const db = new Database(dbPath);
 
   try {
@@ -489,7 +489,11 @@ export function registerFts5Tool(server: McpServer): void {
           };
         }
 
-        const result = rebuildIndex(resolvedPath, resolvedName);
+        // Determine kgType for the resolved graph
+        const graphEntry = config.graphs[resolvedName];
+        const resolvedType = (graphEntry as any)?.type || "project-local";
+
+        const result = rebuildIndex(resolvedPath, resolvedName, resolvedType);
 
         // Update config to mark FTS5 as enabled, remove declined flag
         if (config.active && config.graphs[config.active]) {
