@@ -150,9 +150,9 @@ describe("multi-KG search via FTS5", () => {
     expect(projResult.indexed).toBeGreaterThan(0);
     expect(globalResult.indexed).toBeGreaterThan(0);
 
-    // Verify indexes are at user-level ~/.claude/kg-fts5/ path
-    expect(projResult.db_path).toContain("kg-fts5");
-    expect(globalResult.db_path).toContain("kg-fts5");
+    // Verify indexes are at user-level ~/.kmgraph/index/ path
+    expect(projResult.db_path).toContain(".kmgraph/index");
+    expect(globalResult.db_path).toContain(".kmgraph/index");
     expect(fs.existsSync(projResult.db_path)).toBe(true);
     expect(fs.existsSync(globalResult.db_path)).toBe(true);
   });
@@ -230,11 +230,11 @@ describe("SearchResult sourceKg field", () => {
 });
 
 // ---------------------------------------------------------------------------
-// TC-004: kg_search reads from the new ~/.claude/kg-fts5/ path
+// TC-004: kg_search reads from the new ~/.kmgraph/index/ path
 // ---------------------------------------------------------------------------
 
 describe("searchFts5 uses getFTS5DbPath for user-level storage", () => {
-  test("TC-004: searchFts5 reads from ~/.claude/kg-fts5/{name}.db path", () => {
+  test("TC-004: searchFts5 reads from ~/.kmgraph/index/ path", () => {
     const kgRoot = makeTempDir("tc-004-fts5-search");
     tempDirs.push(kgRoot);
     scaffoldKg(kgRoot);
@@ -250,7 +250,7 @@ describe("searchFts5 uses getFTS5DbPath for user-level storage", () => {
 
     // Verify DB is at user-level path
     expect(rebuildResult.db_path).toContain(os.homedir());
-    expect(rebuildResult.db_path).toContain("kg-fts5");
+    expect(rebuildResult.db_path).toContain(".kmgraph/index");
 
     // Verify searchFts5 can read from that path
     const dbPath = getFTS5DbPath("tc-004-kg");
