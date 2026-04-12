@@ -13,6 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## v0.3.7-beta (2026-04-12)
+
+### Bug Fixes
+- **init:** `docs/knowledge/` now correctly moves to `knowledge/concepts/` instead of creating a nested `knowledge/knowledge/` directory — loop guard strengthened and special-case comment clarified
+- **init:** `me.md` and `rules.md` backfill offer now runs after content migration (not new-install only); explanation text added so users understand what these files are
+
+### Features
+- **init:** Wiki link pass (`[[...]]` conversion) now runs on every `/kmgraph:init` where `wiki_pass_complete` is not set — no separate command needed, re-run init at any time
+- **init:** Wiki pass added to new-install path (Step 1.6.8) alongside the existing upgrade path (Step 1f.2)
+- **triggers.md:** New platform-agnostic companion file to `rules.md` that maps workflow phases to rules — scaffolded by `init-personal-kg`, optional stub in project KGs; merge semantics (project extends, never overrides, user-level)
+
+### Documentation
+- **INSTALL.md:** Wiki pass added to upgrade checks table (check e); re-run safety note added
+
 ## [0.3.6-beta] — 2026-04-11
 
 ### Features
