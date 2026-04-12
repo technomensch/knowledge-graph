@@ -1200,6 +1200,24 @@ Examples of personal lessons:
    cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/me.md" "$HOME/.kmgraph/me.md"
    [ -f "$HOME/.kmgraph/rules.md" ] && echo "rules.md already exists — skipping scaffold." || \
      cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/rules.md" "$HOME/.kmgraph/rules.md"
+   # triggers.md — optional, project-specific trigger extensions only
+   # Most projects do not need this file. Create it only if you have project-specific
+   # rules that should fire at different phases than your user-level triggers.
+   # If created, entries extend (never replace) ~/.kmgraph/triggers.md.
+   if [ ! -f "$HOME/.kmgraph/triggers.md" ]; then
+     cat > "$HOME/.kmgraph/triggers.md" << 'EOF'
+# Triggers — Project-Level Extensions (Optional)
+#
+# This file extends ~/.kmgraph/triggers.md. Entries here are additive.
+# User-level triggers always apply. Only add entries for project-specific overrides.
+#
+# Example — narrow a user trigger:
+# ## After writing an implementation plan
+# - Apply: rules.md § Plan Protocol > Parallelism Analysis
+#   Condition: skip if plan has fewer than 3 tasks (this project always has short plans)
+EOF
+     echo "ℹ️  triggers.md stub created at $HOME/.kmgraph/triggers.md (optional — see file for usage)"
+   fi
    [ -f "$HOME/.kmgraph/kg-index-global.md" ] && echo "kg-index-global.md already exists — skipping scaffold." || \
      cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-index-global.md" "$HOME/.kmgraph/kg-index-global.md"
    ```
