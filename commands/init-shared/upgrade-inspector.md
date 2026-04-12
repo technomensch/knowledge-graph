@@ -39,7 +39,7 @@ fi
 # Missing root-level scaffold files
 [ ! -f "{KG_PATH}/me.md" ]                    && upgrades+=("New: me.md — your identity and working style in this project")
 [ ! -f "{KG_PATH}/rules.md" ]                 && upgrades+=("New: rules.md — project conventions and behavioral rules")
-[ ! -f "{KG_PATH}/knowledge/triggers.md" ]    && upgrades+=("New: triggers.md — when to apply rules from rules.md")
+[ ! -f "{KG_PATH}/triggers.md" ]              && upgrades+=("New: triggers.md — when to apply rules from rules.md")
 
 # rules.md platform-split check (v0.3.5 — ADR-032)
 # Content fingerprint only: Claude-specific tool names present in rules.md
@@ -537,9 +537,9 @@ For each source found, note: filename → extracted content → which target fil
 
 ---
 
-**Step 2 — Present dry run**
+**Step 2 — Present dry run (MANDATORY — do not skip or abbreviate)**
 
-Display a full preview before writing anything. Format:
+**STOP. Do not write any files yet.** Display the full preview first. The user must see and approve the proposed content before anything is written. Format:
 
 ```
 ── Dry run: here's what would be created ──────────────────────────────────
@@ -567,7 +567,7 @@ rules.md  ({KG_PATH}/rules.md)
   │  ...                                                                │
   └─────────────────────────────────────────────────────────────────────┘
 
-triggers.md  ({KG_PATH}/knowledge/triggers.md)
+triggers.md  ({KG_PATH}/triggers.md)
   Sources: template defaults + [any phase-based lessons found]
   ┌─────────────────────────────────────────────────────────────────────┐
   │ [pre-populated trigger entries]                                     │
