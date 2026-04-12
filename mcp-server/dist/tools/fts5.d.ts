@@ -4,8 +4,16 @@ export declare const FTS5_DB_FILENAME = ".fts5.db";
  * Returns the absolute path to the user-level FTS5 database for a given KG name.
  * Stored in ~/.claude/kg-fts5/<kgName>.db (outside project directories).
  * Creates the directory if it does not exist.
+ * @deprecated Use resolveDbPath(kgName, "project-local") — DB now at ~/.kmgraph/index/
  */
 export declare function getFTS5DbPath(kgName: string): string;
+export declare function getPersonalDbPath(): string;
+export declare function getProjectDbPath(kgName: string): string;
+/**
+ * Central dispatcher: routes to personal.db or projects/<kgName>.db based on kgType.
+ * Note: kgName is ignored when kgType is "personal" (personal DB is a fixed singleton path).
+ */
+export declare function resolveDbPath(kgName: string, kgType: string): string;
 /**
  * Resolves the content root for a KG path.
  * If the KG contains a docs/lessons-learned subdirectory (v0.2+ layout),
