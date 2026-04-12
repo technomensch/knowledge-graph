@@ -80,7 +80,7 @@ function searchKg(kgPath, kgName, kgType, query) {
     if (!fs.existsSync(kgPath)) {
         return { results: [], usingFts5: false };
     }
-    const dbPath = (0, fts5_js_1.getFTS5DbPath)(kgName);
+    const dbPath = (0, fts5_js_1.resolveDbPath)(kgName, kgType);
     let results;
     let usingFts5 = false;
     if (fs.existsSync(dbPath)) {

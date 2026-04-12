@@ -5,7 +5,7 @@ import { registerSearchTool } from "./tools/search.js";
 import { registerScaffoldTool } from "./tools/scaffold.js";
 import { registerSanitizationTool } from "./tools/sanitization.js";
 import { registerConfigResource, registerTemplatesResource } from "./resources/index.js";
-import { registerFts5Tool } from "./tools/fts5.js";
+import { registerFts5Tool, registerFts5StatusTool } from "./tools/fts5.js";
 import { registerCaptureTool } from "./tools/capture.js";
 import { registerUpgradeTool } from "./tools/upgrade.js";
 import { registerVersionTool } from "./tools/version.js";
@@ -21,6 +21,7 @@ registerSearchTool(server);     // kg_search
 registerScaffoldTool(server);   // kg_scaffold
 registerSanitizationTool(server); // kg_check_sensitive
 registerFts5Tool(server);       // kg_fts5_rebuild
+registerFts5StatusTool(server); // kg_fts5_status
 registerCaptureTool(server);    // kg_capture
 registerUpgradeTool(server);    // kg_upgrade
 registerVersionTool(server);    // kg_version

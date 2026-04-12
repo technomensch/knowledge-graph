@@ -33,6 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.handleUpgrade = handleUpgrade;
 exports.registerUpgradeTool = registerUpgradeTool;
 const zod_1 = require("zod");
 const fs = __importStar(require("fs"));
@@ -324,18 +325,71 @@ function applyPlatformSplit(kgPath) {
             kept.push(lines[i]);
         }
     }
-    // Update or add kmgraph_schema: 2 in frontmatter
+    // Update or add kmgraph_schema: 2 in frontmatter (CRLF-safe)
     let updated = kept.join("\n");
-    if (updated.startsWith("---")) {
-        updated = updated.replace(/^(---\n)([\s\S]*?)(---\n)/, (_m, open, body, close) => {
-            if (/kmgraph_schema:/.test(body)) {
-                return open + body.replace(/kmgraph_schema:\s*\d+/, "kmgraph_schema: 2") + close;
+    if (updated.startsWith("---\r\n") || updated.startsWith("---\n")) {
+        updated = updated.replace(/^(---\r?\n)([\s\S]*?)(---\r?\n)/, (_m, open, body, close) => {
+            // Normalize to LF for consistent output
+            const normalizedBody = body.replace(/\r\n/g, "\n");
+            if (/kmgraph_schema:/.test(normalizedBody)) {
+                return "---\n" + normalizedBody.replace(/kmgraph_schema:\s*\d+/, "kmgraph_schema: 2") + "---\n";
             }
-            return open + body + "kmgraph_schema: 2\n" + close;
+            return "---\n" + normalizedBody + "kmgraph_schema: 2\n" + "---\n";
         });
     }
     fs.writeFileSync(rulesPath, updated, "utf-8");
     return `Platform-split applied. Removed ${removed.length} line(s). kmgraph_schema set to 2.\n${removed.slice(0, 5).join("\n")}`;
+}
+async function handleUpgrade(params) {
+    const config = (0, utils_js_1.readConfig)();
+    if (!config.active || !config.graphs[config.active]) {
+        return {
+            content: [{ type: "text", text: "Error: No active knowledge graph configured. Use kg_config_init or kg_config_switch first." }],
+            isError: true,
+        };
+    }
+    const rawPath = config.graphs[config.active].path;
+    const kgPath = rawPath.replace(/^~/, os.homedir());
+    if (!fs.existsSync(kgPath)) {
+        return {
+            content: [{ type: "text", text: `Error: KG path not found: ${kgPath}` }],
+            isError: true,
+        };
+    }
+    const applyList = params.apply ?? [];
+    if (applyList.length === 0) {
+        const result = { upgrades: [], warnings: [] };
+        result.upgrades.push(...checkDirectories(kgPath));
+        result.upgrades.push(...checkConfig(kgPath));
+        result.upgrades.push(...checkTemplates(kgPath));
+        const platformWarning = checkPlatformSplit(kgPath);
+        if (platformWarning)
+            result.warnings.push(platformWarning);
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+    }
+    const results = [];
+    for (const category of applyList) {
+        switch (category) {
+            case "directories":
+                results.push(`[directories] ${applyDirectories(kgPath)}`);
+                break;
+            case "config":
+                results.push(`[config] ${applyConfig()}`);
+                break;
+            case "templates":
+                results.push(`[templates] ${applyTemplates(kgPath)}`);
+                break;
+            case "platform-split":
+                if (!params.confirm_platform_split) {
+                    results.push("[platform-split] WARNING: platform-split migration removes content from rules.md. Pass confirm_platform_split: true to proceed.");
+                }
+                else {
+                    results.push(`[platform-split] ${applyPlatformSplit(kgPath)}`);
+                }
+                break;
+        }
+    }
+    return { content: [{ type: "text", text: results.join("\n\n") }] };
 }
 // ── Tool registration ────────────────────────────────────────────────────────
 function registerUpgradeTool(server) {
@@ -351,82 +405,7 @@ function registerUpgradeTool(server) {
             .default(false)
             .describe("Must be true to apply platform-split migration (removes content from rules.md)"),
     }, async ({ apply, confirm_platform_split }) => {
-        const config = (0, utils_js_1.readConfig)();
-        if (!config.active || !config.graphs[config.active]) {
-            return {
-                content: [
-                    {
-                        type: "text",
-                        text: "Error: No active knowledge graph configured. Use kg_config_init or kg_config_switch first.",
-                    },
-                ],
-                isError: true,
-            };
-        }
-        const rawPath = config.graphs[config.active].path;
-        const kgPath = rawPath.replace(/^~/, os.homedir());
-        if (!fs.existsSync(kgPath)) {
-            return {
-                content: [
-                    {
-                        type: "text",
-                        text: `Error: KG path not found: ${kgPath}`,
-                    },
-                ],
-                isError: true,
-            };
-        }
-        const applyList = apply ?? [];
-        // ── Inspect-only mode ─────────────────────────────────────────
-        if (applyList.length === 0) {
-            const result = { upgrades: [], warnings: [] };
-            result.upgrades.push(...checkDirectories(kgPath));
-            result.upgrades.push(...checkConfig(kgPath));
-            result.upgrades.push(...checkTemplates(kgPath));
-            const platformWarning = checkPlatformSplit(kgPath);
-            if (platformWarning)
-                result.warnings.push(platformWarning);
-            return {
-                content: [
-                    {
-                        type: "text",
-                        text: JSON.stringify(result, null, 2),
-                    },
-                ],
-            };
-        }
-        // ── Apply mode ────────────────────────────────────────────────
-        const results = [];
-        for (const category of applyList) {
-            switch (category) {
-                case "directories":
-                    results.push(`[directories] ${applyDirectories(kgPath)}`);
-                    break;
-                case "config":
-                    results.push(`[config] ${applyConfig()}`);
-                    break;
-                case "templates":
-                    results.push(`[templates] ${applyTemplates(kgPath)}`);
-                    break;
-                case "platform-split":
-                    if (!confirm_platform_split) {
-                        results.push("[platform-split] WARNING: platform-split migration removes content from rules.md. " +
-                            "Pass confirm_platform_split: true to proceed.");
-                    }
-                    else {
-                        results.push(`[platform-split] ${applyPlatformSplit(kgPath)}`);
-                    }
-                    break;
-            }
-        }
-        return {
-            content: [
-                {
-                    type: "text",
-                    text: results.join("\n\n"),
-                },
-            ],
-        };
+        return handleUpgrade({ apply: apply, confirm_platform_split });
     });
 }
 //# sourceMappingURL=upgrade.js.map

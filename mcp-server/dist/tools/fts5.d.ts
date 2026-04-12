@@ -67,11 +67,17 @@ export declare function indexFile(db: any, filePath: string, kgPath: string): nu
  * - Removes index rows for files that no longer exist on disk.
  * - Skips files that haven't changed.
  */
-export declare function rebuildIndex(kgPath: string, kgName: string): RebuildResult;
+export declare function rebuildIndex(kgPath: string, kgName: string, kgType?: string): RebuildResult;
 /**
  * Searches the FTS5 index using BM25 ranking. Returns up to 50 results.
  */
 export declare function searchFts5(dbPath: string, query: string, kgPath: string): SearchResult[];
+/**
+ * Registers the `kg_fts5_status` MCP tool.
+ * Returns { exists: boolean, db_path: string, kgType: string } — read-only probe,
+ * never creates directories.
+ */
+export declare function registerFts5StatusTool(server: McpServer): void;
 /**
  * Registers the `kg_fts5_rebuild` MCP tool.
  */

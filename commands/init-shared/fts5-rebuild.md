@@ -15,19 +15,20 @@ description: Shared FTS5 rebuild module — offers to build/rebuild the search i
 
 If the path is confirmed correct, check whether the index needs rebuilding:
 
-```bash
-FTS5_DECLINED=$(jq -r '.graphs["{kg_name}"].fts5_declined // false' ~/.claude/kg-config.json)
+Call `kg_fts5_status`. Branch on the returned `exists` field:
 
-if [ "$FTS5_DECLINED" = "true" ]; then
-  echo "⏭️  Search index: skipped (previously declined)"
-elif [ ! -f "{KG_PATH}/.fts5.db" ]; then
-  echo "⚠️  Search index not found (local file, not version-controlled)."
-  echo ""
-  echo "  Rebuild now? This may take a moment for large knowledge graphs."
-  echo "    1. Yes — rebuild index"
-  echo "    2. Skip for now (search will use linear scan)"
-fi
-```
+**If `exists === false` AND `FTS5_DECLINED` is not true:**
+- Display: "⚠️  Search index not found."
+- Offer to rebuild:
+  ```
+  Rebuild now? This may take a moment for large knowledge graphs.
+    1. Yes — rebuild index
+    2. Skip for now (search will use linear scan)
+  ```
+
+**If `exists === true`:** The index is present — no offer needed unless the user explicitly requests a rebuild.
+
+**If `FTS5_DECLINED` is true:** Skip silently (check `~/.claude/kg-config.json` for `.graphs["{kg_name}"].fts5_declined`).
 
 If the user selects **Yes**, call `kg_fts5_rebuild`. **After the rebuild, validate the result:**
 
