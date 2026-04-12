@@ -151,6 +151,10 @@ function sanitizeFts5Query(raw) {
  * not already exist.
  */
 function initDb(db) {
+    // WAL mode: safe for concurrent readers during rebuild
+    db.run("PRAGMA journal_mode=WAL;");
+    // Schema version stamp for future migration detection
+    db.run("PRAGMA user_version = 1;");
     db.exec(`
     CREATE VIRTUAL TABLE IF NOT EXISTS kg_entries USING fts5(
       file_path UNINDEXED,
