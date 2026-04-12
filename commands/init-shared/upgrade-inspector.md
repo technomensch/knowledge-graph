@@ -30,16 +30,17 @@ for dir in knowledge lessons-learned decisions sessions chat-history tmp; do
 done
 
 # Index reorganization — knowledge/index.md renamed to kg-category-index.md; new root kg-index.md created
+# Note: kg-index.md and index.md are treated as equivalent root nav files — if either exists, skip.
 if [ -f "{KG_PATH}/knowledge/index.md" ] && [ ! -f "{KG_PATH}/knowledge/kg-category-index.md" ]; then
   upgrades+=("Index update: renames {KG_PATH}/knowledge/index.md to kg-category-index.md and adds a new kg-index.md at the knowledge graph root as the primary entry point")
-elif [ ! -f "{KG_PATH}/index.md" ]; then
+elif [ ! -f "{KG_PATH}/index.md" ] && [ ! -f "{KG_PATH}/kg-index.md" ]; then
   upgrades+=("New: kg-index.md — the primary entry point for this knowledge graph")
 fi
 
 # Missing root-level scaffold files
 [ ! -f "{KG_PATH}/me.md" ]                    && upgrades+=("New: me.md — your identity and working style in this project")
 [ ! -f "{KG_PATH}/rules.md" ]                 && upgrades+=("New: rules.md — project conventions and behavioral rules")
-[ ! -f "{KG_PATH}/knowledge/triggers.md" ]    && upgrades+=("New: triggers.md — when to apply rules from rules.md")
+[ ! -f "{KG_PATH}/triggers.md" ]              && upgrades+=("New: triggers.md — when to apply rules from rules.md")
 
 # rules.md platform-split check (v0.3.5 — ADR-032)
 # Content fingerprint only: Claude-specific tool names present in rules.md
@@ -94,15 +95,19 @@ WIKI_DONE=$(jq -r '.graphs["{kg_name}"].wiki_pass_complete // false' ~/.claude/k
   upgrades+=("Wiki pass available: convert bare ADR-NNN, ENH-NNN, #NNN, and lesson filename references to [[wiki links]] across knowledge files")
 
 # New templates (files in plugin core/templates not yet in KG)
-# Skip templates that are already covered by the scaffold file checks above:
-#   kg-index.md deploys as {KG_PATH}/index.md — already checked
-#   me.md and rules.md deploy to {KG_PATH} root — already checked
+# IMPORTANT: The following filenames must NEVER be added to upgrades[] by this loop,
+# regardless of whether they exist at the template destination path.
+# They are handled by dedicated scaffold checks above (section h) with interactive flows.
+# Do not add them as "New template:" items under any circumstances:
+#   kg-index.md  — covered by index check above (deploys as index.md or kg-index.md)
+#   me.md        — covered by section h (interactive backfill)
+#   rules.md     — covered by section h (interactive backfill)
+#   triggers.md  — covered by section h (interactive backfill, deploys to KG root)
+#   index-personal.md — personal KG only, handled separately
 scaffold_covered=("kg-index.md" "me.md" "rules.md" "index-personal.md" "triggers.md")
 for tdir in knowledge lessons-learned decisions sessions; do
   for template in "${CLAUDE_PLUGIN_ROOT}/core/templates/$tdir/"*; do
     tname=$(basename "$template")
-    # Skip if this template is covered by a scaffold check
-    # triggers.md is handled by section h (interactive flow) — not a silent copy
     skip=false
     for covered in "${scaffold_covered[@]}"; do
       [ "$tname" = "$covered" ] && skip=true && break
@@ -114,13 +119,23 @@ for tdir in knowledge lessons-learned decisions sessions; do
 done
 ```
 
-If nothing is upgradeable, say:
+**IMPORTANT — Filter before presenting:** Before displaying the upgrades list or the "nothing to upgrade" message, remove any item from `upgrades[]` whose basename matches any of the following scaffold-only filenames:
+
+- `kg-index.md`
+- `me.md`
+- `rules.md`
+- `triggers.md`
+- `index-personal.md`
+
+These files are handled exclusively by section h with an interactive backfill flow. They must **never** appear as "New template:" or "Updated template:" items in the menu, regardless of what the detection loop added. Remove them now, before any further processing.
+
+If nothing is upgradeable after filtering, say:
 ```
 ✅ Your setup is already up to date. Nothing to apply.
 ```
 And exit.
 
-If upgrades exist, present them:
+If upgrades exist after filtering, present them:
 ```
 Here's what's available for your install:
   • [item 1]
@@ -518,6 +533,12 @@ To migrate manually: move files from docs/{decisions,lessons-learned,...}/ to kn
 
 Before prompting, read every available source to build recommendations:
 
+**MANDATORY: Check for each platform file at `{PROJECT_ROOT}` and log its presence before extracting anything.** Print a "Sources found" line before the dry run:
+```
+Sources found: CLAUDE.md ✓  GEMINI.md ✓  .cursorrules –  AGENTS.md –  README.md ✓  package.json ✓  (+ 3 ADRs, 12 lessons, 2 sessions)
+```
+Do not skip this line. If a platform file exists but was not checked, that is a bug.
+
 | Source | What to extract |
 |--------|----------------|
 | `CLAUDE.md` (project + global) | Platform preferences, always/never rules, tool directives, workflow constraints |
@@ -532,14 +553,21 @@ Before prompting, read every available source to build recommendations:
 | KG decisions (`decisions/`) | ADRs with architectural rules |
 | KG sessions | Working style, communication patterns |
 | Existing partial `me.md` / `rules.md` | Preserve any content already filled in |
+| `rules.md` (just seeded, if applicable) | Derive trigger phase mappings for `triggers.md` |
 
 For each source found, note: filename → extracted content → which target file it informs (`me.md`, `rules.md`, or `triggers.md`).
 
+**For `triggers.md` specifically:** map each section heading in `rules.md` to a trigger phase. Example mapping:
+- `§ Plan Protocol` → "After writing an implementation plan — Apply: rules.md § Plan Protocol"
+- `§ Git Workflow` → "Before committing — Apply: rules.md § Git Workflow"
+- `§ Knowledge Capture` → "When making an architecture decision — Apply: rules.md § Knowledge Capture > When to Capture"
+- Any enforcement/guardrail section → add as a project-specific trigger with the section name
+
 ---
 
-**Step 2 — Present dry run**
+**Step 2 — Present dry run (MANDATORY — do not skip or abbreviate)**
 
-Display a full preview before writing anything. Format:
+**STOP. Do not write any files yet.** Display the full preview first. The user must see and approve the proposed content before anything is written. Format:
 
 ```
 ── Dry run: here's what would be created ──────────────────────────────────
@@ -567,22 +595,42 @@ rules.md  ({KG_PATH}/rules.md)
   │  ...                                                                │
   └─────────────────────────────────────────────────────────────────────┘
 
-triggers.md  ({KG_PATH}/knowledge/triggers.md)
-  Sources: template defaults + [any phase-based lessons found]
+triggers.md  ({KG_PATH}/triggers.md)
+  Sources: rules.md sections + template defaults + [any phase-based lessons found]
   ┌─────────────────────────────────────────────────────────────────────┐
-  │ [pre-populated trigger entries]                                     │
+  │ [trigger entries derived from rules.md section headings,           │
+  │  each citing its rules.md source — not generic template defaults]   │
   │  ...                                                                │
   └─────────────────────────────────────────────────────────────────────┘
 
-── Platform files that would be updated ───────────────────────────────────
+── Platform files found ────────────────────────────────────────────────────
 
-CLAUDE.md  (rules moving to rules.md would be removed from here)
+**MANDATORY — do not skip this section.** For every platform file that exists at {PROJECT_ROOT},
+show it here with its proposed update. If no platform files exist, print:
+  (no platform config files found at {PROJECT_ROOT})
+
+For each platform file found, show:
+  1. What cross-reference comment would be added (always): `# See also: knowledge/rules.md`
+  2. Any content that overlaps with the newly created rules.md (user must explicitly approve removal)
+
+Format per file:
+
+CLAUDE.md  ✓ found at {PROJECT_ROOT}/CLAUDE.md
   ┌─────────────────────────────────────────────────────────────────────┐
-  │ [updated CLAUDE.md with cross-reference to rules.md added,         │
-  │  any duplicated content removed]                                    │
+  │ [proposed addition near top of file:]                               │
+  │ # See also: knowledge/rules.md — project conventions live there     │
+  │                                                                     │
+  │ [overlapping content detected (if any):]                            │
+  │   Line 14-18: "Never start implementation without Proceed"          │
+  │   → Already captured in rules.md § Git Workflow — remove? [y/n]    │
   └─────────────────────────────────────────────────────────────────────┘
 
-[repeat for GEMINI.md, .cursorrules, etc. if any content would move]
+GEMINI.md  ✓ found at {PROJECT_ROOT}/GEMINI.md
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │ [same format]                                                       │
+  └─────────────────────────────────────────────────────────────────────┘
+
+[repeat for .cursorrules, AGENTS.md, .github/copilot-instructions.md if found]
 
 ── Nothing has been written. These are recommendations only. ──────────────
 All content can be edited before applying, and changed again at any time
