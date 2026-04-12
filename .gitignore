@@ -23,8 +23,7 @@ env/
 # IDE
 .vscode/
 .idea/
-docs/.obsidian/
-.obsidian/
+**/.obsidian/
 *.swp
 *.swo
 *~
@@ -42,6 +41,10 @@ dist/
 !mcp-server/dist/
 build/
 *.tgz
+
+# FTS5 SQLite databases (generated artifacts)
+**/.fts5.db
+**/.fts5.db-journal
 
 # Docusaurus cache (generated at build time)
 .docusaurus/

@@ -120,6 +120,75 @@ fi
 - Idempotency: On Yes, write `fts5_index_migrated: true` to the active graph's entry in `~/.claude/kg-config.json` (done by the jq command above). On subsequent `/kmgraph:init` runs, the `FTS5_MIGRATED` check skips the prompt.
 - On No: do NOT write the marker — prompt reappears on next init (correct behavior)
 
+#### 1f.0b. Stale in-project FTS5 file cleanup
+
+After the DB location migrated to `~/.kmgraph/index/`, old `.fts5.db` files can remain scattered throughout the project tree. These are dead weight — they waste disk space and can cause third-party tools (e.g. Obsidian) to crash when indexing the vault.
+
+**When to run:** Always run this check during the upgrade path. It is idempotent — if no stale files exist, it exits silently.
+
+```bash
+KG_ROOT="{project_root}"  # root of the git repo containing the KG
+
+# 1. Confirm real DB exists at the new location before deleting anything
+REAL_DB="$HOME/.kmgraph/index/projects/${kg_name}.db"
+if [ ! -f "$REAL_DB" ]; then
+  echo "ℹ️  Skipping stale FTS5 cleanup — new-location DB not found at $REAL_DB."
+  echo "   Run /kmgraph:sync-all to build it first, then re-run /kmgraph:init."
+  # exit_step
+fi
+
+# 2. Find all stale .fts5.db and .fts5.db-journal files in the project tree
+STALE_FILES=$(find "$KG_ROOT" \
+  -not -path "$KG_ROOT/.git/*" \
+  \( -name ".fts5.db" -o -name ".fts5.db-journal" \) \
+  2>/dev/null)
+
+if [ -z "$STALE_FILES" ]; then
+  # Nothing to clean up
+  exit_step
+fi
+
+# 3. Show what was found and offer to delete
+echo ""
+echo "Stale FTS5 index files found in project tree:"
+echo "$STALE_FILES" | while read -r f; do
+  SIZE=$(du -sh "$f" 2>/dev/null | cut -f1)
+  echo "  $f  ($SIZE)"
+done
+echo ""
+echo "These are pre-migration artifacts. The real search index lives at:"
+echo "  $REAL_DB"
+echo ""
+echo "Safe to delete?  1. Yes — remove stale files   2. No — skip"
+read -r CLEANUP_CONSENT
+
+if [ "$CLEANUP_CONSENT" = "1" ]; then
+  echo "$STALE_FILES" | while read -r f; do
+    rm -f "$f" && echo "  ✓ Deleted $f"
+  done
+
+  # 4. Ensure **/.fts5.db is in .gitignore to prevent recurrence
+  GITIGNORE="$KG_ROOT/.gitignore"
+  if [ -f "$GITIGNORE" ] && ! grep -qF "**/.fts5.db" "$GITIGNORE"; then
+    echo "" >> "$GITIGNORE"
+    echo "# FTS5 search index (lives in ~/.kmgraph/index/, never in the project tree)" >> "$GITIGNORE"
+    echo "**/.fts5.db" >> "$GITIGNORE"
+    echo "**/.fts5.db-journal" >> "$GITIGNORE"
+    echo "  ✓ Added **/.fts5.db and **/.fts5.db-journal to .gitignore"
+  fi
+
+  echo "✅ Stale FTS5 cleanup complete."
+else
+  echo "Skipped. Files left in place."
+fi
+```
+
+**Constraints:**
+- Do NOT delete unless real DB at `~/.kmgraph/index/projects/` is confirmed
+- Always prompt — never auto-delete
+- Add both `**/.fts5.db` and `**/.fts5.db-journal` to `.gitignore` (idempotent check)
+- Skip `.git/` directory in the find scan
+
 #### 1f.1. Project-local path migration (docs/ → knowledge/)
 
 **E15 — Stale path pre-check:** Before evaluating migration triggers, verify the configured path exists on disk:
