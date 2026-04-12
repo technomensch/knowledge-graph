@@ -43,6 +43,15 @@ Or paste the universal installer above for the same automated experience.
 :::
 ---
 
+:::note[Not using Claude Code?]
+
+The `commands/`, `skills/`, `agents/`, and `hooks/` directories in this repo are loaded exclusively
+by the Claude Code plugin system. Do not copy these directories if using Cursor, Windsurf,
+Continue.dev, JetBrains, VS Code, or any other tool — they will not work outside the plugin system.
+All cross-platform functionality is provided through the MCP server as `kg_*` tools.
+
+:::
+
 ## Platform Capabilities
 
 Users can install on multiple platforms with varying automation levels:

@@ -10,6 +10,14 @@ You are installing the **Knowledge Management Graph** — a system for capturing
 
 ---
 
+> **Note:** The `commands/`, `skills/`, `agents/`, and `hooks/` directories are loaded exclusively
+> by the Claude Code plugin system. If you are using Cursor, Windsurf, Continue.dev, JetBrains,
+> VS Code, or any other tool, do not copy these directories — they will not work outside the plugin
+> system. All cross-platform functionality is available through the MCP server as `kg_*` tools.
+> Non-Claude-Code users: skip to **Step 2B**.
+
+---
+
 ### Step 0: Verify Shell Access
 
 This installer requires shell access to your local directory. You'll need to grant
@@ -77,6 +85,36 @@ After cleanup, re-run the scan to confirm zero results, then proceed to Step 1.
 
 **Note:** Claude Code may cache the extension registry between sessions — restart Claude Code
 after uninstalling before verifying.
+
+**If using Claude Code — also check for manually-copied command files:**
+
+```bash
+echo "=== Manual command file conflicts (Claude Code only) ==="
+COMMANDS_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/commands"
+REPO_DIR="$(git rev-parse --show-toplevel 2>/dev/null || echo .)"
+conflicts=0
+for f in "$REPO_DIR/commands"/*.md; do
+  [ -f "$f" ] || continue
+  name=$(basename "$f" .md)
+  [ -f "$COMMANDS_DIR/$name.md" ] && echo "CONFLICT: $COMMANDS_DIR/$name.md" && conflicts=$((conflicts+1))
+done
+[ $conflicts -eq 0 ] && echo "None found"
+```
+
+**If output is empty → skip to Step 1.**
+
+**If conflicts found:**
+
+These files were manually copied without the `kmgraph:` namespace prefix and will conflict with your existing commands. They are safe to remove — the plugin install does not touch `~/.claude/commands/` and existing commands will not be affected.
+
+To fix:
+```bash
+# Remove each conflicting file (replace with actual paths from output above)
+rm ~/.claude/commands/<name>.md
+
+# Then install via the plugin system (commands are auto-namespaced as /kmgraph:*)
+claude plugin install kmgraph
+```
 
 ---
 
