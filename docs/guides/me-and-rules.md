@@ -59,12 +59,13 @@ flowchart TB
     accDescr: All platform config files (CLAUDE.md, .cursorrules, GEMINI.md, copilot-instructions) point to two foundation files in knowledge/ — rules.md and me.md. Project scope overrides personal scope defaults in ~/.kmgraph/.
 ```
 
-KMGraph implements this pattern directly. Two files, scaffolded automatically during `kmgraph init`:
+KMGraph implements this pattern directly. Three files, scaffolded automatically during `kmgraph init`:
 
 | File | Purpose | Committed? |
 |---|---|---|
 | `knowledge/rules.md` | Project conventions shared by all contributors — branch naming, commit format, workflow rules | Yes |
 | `knowledge/me.md` | Who *you* are in this project — working style, domain expertise, communication preferences | No — gitignored |
+| `knowledge/triggers.md` | When to apply rules — maps workflow phases (planning, committing, architecture decisions) to the relevant `rules.md` sections | Yes |
 
 Your platform files (`CLAUDE.md`, `.cursorrules`, etc.) become one-line shims:
 
@@ -85,8 +86,10 @@ The same pattern extends to a personal scope — rules and identity that apply a
 |---|---|---|
 | Project | `knowledge/rules.md` | Project-specific conventions — committed, shared by all contributors |
 | Project | `knowledge/me.md` | Your identity in this project — gitignored, per-contributor |
+| Project | `knowledge/triggers.md` | When to apply rules — workflow phase → rules.md section mappings — committed |
 | Personal | `~/.kmgraph/rules.md` | Cross-project behavioral rules (e.g., "always use feature flags") |
 | Personal | `~/.kmgraph/me.md` | Your identity across all projects — style, expertise, preferences |
+| Personal | `~/.kmgraph/triggers.md` | Cross-project trigger timing — personal phases extend (never replace) project entries |
 
 **Precedence:** project-scoped files override personal files when they conflict. Personal files supply defaults.
 
@@ -138,15 +141,51 @@ Two contributors on the same project have different `me.md` files. Committing on
 
 ---
 
+## `knowledge/triggers.md` — When Rules Apply
+
+`triggers.md` is the third identity file. It maps workflow phases to the rules in `rules.md` — telling the AI assistant *when* to apply each rule, not just *what* the rules say.
+
+```markdown
+# Triggers — When to Apply Rules
+
+## After writing an implementation plan
+
+- Apply: `rules.md § Plan Protocol > Parallelism Analysis`
+- If plan includes changes to `commands/` or `core/templates/`:
+  apply `rules.md § Development Workflow > Plugin Cache & Local Testing`
+  (add cache sync + reload as the final implementation step)
+
+## Before committing
+
+- Apply: `rules.md § Knowledge Capture > Plan-First Rule`
+- Apply: `rules.md § Knowledge Capture > Branch-Close Rule`
+
+## When making an architecture decision
+
+- Apply: `rules.md § Knowledge Capture > When to Capture` (ADR trigger condition)
+
+## At session end
+
+- Apply: `rules.md § Knowledge Capture > Cadence & Routing` (run sync-all)
+```
+
+`triggers.md` is committed — it documents project workflow phases shared by all contributors. The AI reads it alongside `rules.md` at every phase transition to ensure the right rules are applied at the right time. All AI platforms read this file; there is no platform-specific version.
+
+During init, `triggers.md` is pre-populated by mapping the section headings in `rules.md` to trigger phases. The dry-run preview shows the derived entries so the user can confirm, edit, or skip each one.
+
+---
+
 ## Setting Up
 
-Run `kmgraph init` in any project. The wizard:
+Run `kmgraph init` in any project. When `me.md`, `rules.md`, or `triggers.md` are missing, the wizard:
 
-1. Creates `knowledge/rules.md` with the Why/Source template populated with examples
-2. Creates `knowledge/me.md` with the identity sections scaffolded
-3. Offers to populate both files from your existing `CLAUDE.md` via a section-mapping step
+1. **Scans existing sources** — reads all platform files found at the project root (`CLAUDE.md`, `GEMINI.md`, `.cursorrules`, `AGENTS.md`, etc.), plus `README`, ADRs, lessons, and sessions to extract recommendations
+2. **Presents a dry-run preview** — shows proposed content for each missing file, pre-populated from the scan, before anything is written
+3. **Archives originals** — any existing file that would be overwritten is archived to `.kg-archive-{date}/` with a note showing the archive path so it can be rolled back
+4. **Waits for approval** — the user confirms, edits, or skips each file individually before it is written
+5. **Updates platform files** — shows which cross-reference comments would be added to each platform file and flags any content that overlaps with `rules.md` for optional removal (with user approval)
 
-For the personal scope, run `/kmgraph:init-personal-kg`. It creates `~/.kmgraph/me.md` and `~/.kmgraph/rules.md` and offers to populate them from `~/.claude/CLAUDE.md`.
+For the personal scope, run `/kmgraph:init-personal-kg`. It creates `~/.kmgraph/me.md`, `~/.kmgraph/rules.md`, and `~/.kmgraph/triggers.md` and offers to populate them from `~/.claude/CLAUDE.md`.
 
 ---
 
@@ -185,10 +224,12 @@ CLAUDE.md           ← rules + identity + Claude-specific syntax, 150 lines
 ```
 knowledge/rules.md          ← single authoritative rules source (committed)
 knowledge/me.md             ← contributor identity in this project (gitignored)
+knowledge/triggers.md       ← when to apply rules — workflow phase mappings (committed)
 ~/.kmgraph/rules.md         ← cross-project personal rules (local only)
 ~/.kmgraph/me.md            ← cross-project personal identity (local only)
-CLAUDE.md                   ← shim: "read knowledge/rules.md and knowledge/me.md"
-.cursorrules                ← shim: "read knowledge/rules.md and knowledge/me.md"
+~/.kmgraph/triggers.md      ← cross-project trigger timing (local only)
+CLAUDE.md                   ← shim: "read knowledge/rules.md, me.md, and triggers.md"
+.cursorrules                ← shim: "read knowledge/rules.md, me.md, and triggers.md"
 ```
 
 One rule update. Four platforms served.
