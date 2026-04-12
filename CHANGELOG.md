@@ -39,6 +39,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **25-case smoke test suite** — `mcp-server/tests/upgrade.test.ts` covering upgrade-inspector scenarios, false-positive contamination detection, schema gate, apply modes, idempotency, missing KG/rules.md, and edge cases.
 - **Archive size warning** — After upgrade, if total migration archives exceed 10MB, a cleanup suggestion is printed.
 
+**Workstream 3 — FTS5 Database Architecture Migration**
+
+- **Platform-neutral FTS5 index location** — Search indexes relocated from `~/.claude/kg-fts5/` (Claude Code–coupled) to `~/.kmgraph/index/` (works across all AI coding tools). Personal KG index at `~/.kmgraph/index/personal.db`; project KG indexes at `~/.kmgraph/index/projects/<name>.db`.
+- **`kg_fts5_status` MCP tool** — New read-only probe returning `{ exists, db_path, kgType }`. Used by `fts5-rebuild.md` and `sync-all` Step 8 to check index presence without creating directories.
+- **Dual-DB path dispatcher (`resolveDbPath`)** — Central routing function in `fts5.ts`: routes to `personal.db` for `kgType="personal"` or `projects/<name>.db` otherwise. `getFTS5DbPath` retained as deprecated for rollback safety.
+- **User consent prompt in `/kmgraph:init`** — When `~/.claude/kg-fts5/<name>.db` exists and the user hasn't already consented, a prompt explains the location change before any action is taken. Idempotent: `fts5_index_migrated: true` flag in `kg-config.json` prevents the prompt from reappearing after consent.
+- **WAL mode + schema version** — FTS5 databases are initialized with `PRAGMA journal_mode=WAL` (concurrent read safety) and `PRAGMA user_version = 1` (migration detection).
+- **Rollback safety** — Old `~/.claude/kg-fts5/` directory is never auto-deleted. Reverting to a prior plugin version immediately restores old search behavior without any rebuild.
+
 ---
 
 ## [0.3.5-beta] — 2026-04-11
