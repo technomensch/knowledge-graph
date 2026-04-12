@@ -491,7 +491,7 @@ export function registerFts5Tool(server: McpServer): void {
 
         // Determine kgType for the resolved graph
         const graphEntry = config.graphs[resolvedName];
-        const resolvedType = (graphEntry as any)?.type || "project-local";
+        const resolvedType = graphEntry?.type ?? "project-local";
 
         const result = rebuildIndex(resolvedPath, resolvedName, resolvedType);
 
