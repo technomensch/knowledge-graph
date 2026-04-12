@@ -37,8 +37,9 @@ elif [ ! -f "{KG_PATH}/index.md" ]; then
 fi
 
 # Missing root-level scaffold files
-[ ! -f "{KG_PATH}/me.md" ]      && upgrades+=("New: me.md — your identity and working style in this project")
-[ ! -f "{KG_PATH}/rules.md" ]   && upgrades+=("New: rules.md — project conventions and behavioral rules")
+[ ! -f "{KG_PATH}/me.md" ]                    && upgrades+=("New: me.md — your identity and working style in this project")
+[ ! -f "{KG_PATH}/rules.md" ]                 && upgrades+=("New: rules.md — project conventions and behavioral rules")
+[ ! -f "{KG_PATH}/knowledge/triggers.md" ]    && upgrades+=("New: triggers.md — when to apply rules from rules.md")
 
 # rules.md platform-split check (v0.3.5 — ADR-032)
 # Content fingerprint only: Claude-specific tool names present in rules.md
@@ -96,11 +97,12 @@ WIKI_DONE=$(jq -r '.graphs["{kg_name}"].wiki_pass_complete // false' ~/.claude/k
 # Skip templates that are already covered by the scaffold file checks above:
 #   kg-index.md deploys as {KG_PATH}/index.md — already checked
 #   me.md and rules.md deploy to {KG_PATH} root — already checked
-scaffold_covered=("kg-index.md" "me.md" "rules.md" "index-personal.md")
+scaffold_covered=("kg-index.md" "me.md" "rules.md" "index-personal.md" "triggers.md")
 for tdir in knowledge lessons-learned decisions sessions; do
   for template in "${CLAUDE_PLUGIN_ROOT}/core/templates/$tdir/"*; do
     tname=$(basename "$template")
     # Skip if this template is covered by a scaffold check
+    # triggers.md is handled by section h (interactive flow) — not a silent copy
     skip=false
     for covered in "${scaffold_covered[@]}"; do
       [ "$tname" = "$covered" ] && skip=true && break
