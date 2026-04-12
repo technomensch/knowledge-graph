@@ -298,7 +298,13 @@ done
 grep -qxF ".kg-archive-*/" .gitignore 2>/dev/null || echo ".kg-archive-*/" >> .gitignore
 
 # d. Move ONLY known KMGraph subdirs (never the entire docs/)
+# IMPORTANT: Do NOT add 'knowledge' to this list — docs/knowledge/ is handled
+# by the special case below (renamed to knowledge/concepts/ to avoid nesting).
 for subdir in lessons-learned decisions sessions chat-history tmp; do
+  if [ "$subdir" = "knowledge" ]; then
+    echo "⚠️  Skipping knowledge/ — handled by special case below."
+    continue
+  fi
   if [ -L "docs/$subdir" ]; then
     echo "⚠️  docs/$subdir is a symlink — skipping automatic move. Move manually if needed."
     continue
@@ -306,7 +312,10 @@ for subdir in lessons-learned decisions sessions chat-history tmp; do
   [ -d "docs/$subdir" ] && mv "docs/$subdir" "knowledge/$subdir"
 done
 
-# Special case: docs/knowledge/ would create knowledge/knowledge/ nesting — merge or rename
+# Special case: docs/knowledge/ → knowledge/concepts/ (NOT knowledge/knowledge/)
+# This MUST run after the loop above. The loop explicitly excludes 'knowledge'
+# so this block is the only place docs/knowledge/ is handled.
+# Result: knowledge/concepts/ (quick-reference entries), never knowledge/knowledge/.
 if [ -d "docs/knowledge" ]; then
   if [ -d "knowledge/concepts" ]; then
     echo "⚠️  docs/knowledge/ detected but knowledge/concepts/ already exists — merging."
