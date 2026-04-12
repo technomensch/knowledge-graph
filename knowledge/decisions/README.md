@@ -115,3 +115,4 @@ ADRs follow a lightweight format:
 **Resources**:
 - [Real Examples](../../examples/decisions/) - Filled-out ADRs
 - [Pattern Guide](../../docs/PATTERNS-GUIDE.md) - Writing quality tips
+- [triggers.md — Platform-Agnostic Rule Timing Companion File](ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file.md)

@@ -120,6 +120,75 @@ fi
 - Idempotency: On Yes, write `fts5_index_migrated: true` to the active graph's entry in `~/.claude/kg-config.json` (done by the jq command above). On subsequent `/kmgraph:init` runs, the `FTS5_MIGRATED` check skips the prompt.
 - On No: do NOT write the marker — prompt reappears on next init (correct behavior)
 
+#### 1f.0b. Stale in-project FTS5 file cleanup
+
+After the DB location migrated to `~/.kmgraph/index/`, old `.fts5.db` files can remain scattered throughout the project tree. These are dead weight — they waste disk space and can cause third-party tools (e.g. Obsidian) to crash when indexing the vault.
+
+**When to run:** Always run this check during the upgrade path. It is idempotent — if no stale files exist, it exits silently.
+
+```bash
+KG_ROOT="{project_root}"  # root of the git repo containing the KG
+
+# 1. Confirm real DB exists at the new location before deleting anything
+REAL_DB="$HOME/.kmgraph/index/projects/${kg_name}.db"
+if [ ! -f "$REAL_DB" ]; then
+  echo "ℹ️  Skipping stale FTS5 cleanup — new-location DB not found at $REAL_DB."
+  echo "   Run /kmgraph:sync-all to build it first, then re-run /kmgraph:init."
+  # exit_step
+fi
+
+# 2. Find all stale .fts5.db and .fts5.db-journal files in the project tree
+STALE_FILES=$(find "$KG_ROOT" \
+  -not -path "$KG_ROOT/.git/*" \
+  \( -name ".fts5.db" -o -name ".fts5.db-journal" \) \
+  2>/dev/null)
+
+if [ -z "$STALE_FILES" ]; then
+  # Nothing to clean up
+  exit_step
+fi
+
+# 3. Show what was found and offer to delete
+echo ""
+echo "Stale FTS5 index files found in project tree:"
+echo "$STALE_FILES" | while read -r f; do
+  SIZE=$(du -sh "$f" 2>/dev/null | cut -f1)
+  echo "  $f  ($SIZE)"
+done
+echo ""
+echo "These are pre-migration artifacts. The real search index lives at:"
+echo "  $REAL_DB"
+echo ""
+echo "Safe to delete?  1. Yes — remove stale files   2. No — skip"
+read -r CLEANUP_CONSENT
+
+if [ "$CLEANUP_CONSENT" = "1" ]; then
+  echo "$STALE_FILES" | while read -r f; do
+    rm -f "$f" && echo "  ✓ Deleted $f"
+  done
+
+  # 4. Ensure **/.fts5.db is in .gitignore to prevent recurrence
+  GITIGNORE="$KG_ROOT/.gitignore"
+  if [ -f "$GITIGNORE" ] && ! grep -qF "**/.fts5.db" "$GITIGNORE"; then
+    echo "" >> "$GITIGNORE"
+    echo "# FTS5 search index (lives in ~/.kmgraph/index/, never in the project tree)" >> "$GITIGNORE"
+    echo "**/.fts5.db" >> "$GITIGNORE"
+    echo "**/.fts5.db-journal" >> "$GITIGNORE"
+    echo "  ✓ Added **/.fts5.db and **/.fts5.db-journal to .gitignore"
+  fi
+
+  echo "✅ Stale FTS5 cleanup complete."
+else
+  echo "Skipped. Files left in place."
+fi
+```
+
+**Constraints:**
+- Do NOT delete unless real DB at `~/.kmgraph/index/projects/` is confirmed
+- Always prompt — never auto-delete
+- Add both `**/.fts5.db` and `**/.fts5.db-journal` to `.gitignore` (idempotent check)
+- Skip `.git/` directory in the find scan
+
 #### 1f.1. Project-local path migration (docs/ → knowledge/)
 
 **E15 — Stale path pre-check:** Before evaluating migration triggers, verify the configured path exists on disk:
@@ -298,6 +367,8 @@ done
 grep -qxF ".kg-archive-*/" .gitignore 2>/dev/null || echo ".kg-archive-*/" >> .gitignore
 
 # d. Move ONLY known KMGraph subdirs (never the entire docs/)
+# IMPORTANT: Do NOT add 'knowledge' to this list — docs/knowledge/ is handled
+# by the special case below (renamed to knowledge/concepts/ to avoid nesting).
 for subdir in lessons-learned decisions sessions chat-history tmp; do
   if [ -L "docs/$subdir" ]; then
     echo "⚠️  docs/$subdir is a symlink — skipping automatic move. Move manually if needed."
@@ -306,7 +377,10 @@ for subdir in lessons-learned decisions sessions chat-history tmp; do
   [ -d "docs/$subdir" ] && mv "docs/$subdir" "knowledge/$subdir"
 done
 
-# Special case: docs/knowledge/ would create knowledge/knowledge/ nesting — merge or rename
+# Special case: docs/knowledge/ → knowledge/concepts/ (NOT knowledge/knowledge/)
+# This MUST run after the loop above. The loop explicitly excludes 'knowledge'
+# so this block is the only place docs/knowledge/ is handled.
+# Result: knowledge/concepts/ (quick-reference entries), never knowledge/knowledge/.
 if [ -d "docs/knowledge" ]; then
   if [ -d "knowledge/concepts" ]; then
     echo "⚠️  docs/knowledge/ detected but knowledge/concepts/ already exists — merging."
@@ -570,11 +644,20 @@ fi
 
 #### 1f.2. Obsidian wiki link pass
 
-**Trigger:** Run this step if either of the following is true:
-1. Migration ran in Step 1f.1 during this session (migration just completed), OR
-2. The KG config entry has no `wiki_pass_complete: true` flag AND the configured path is already `knowledge/` (prior migration detected — first upgrade to v0.3.3)
+**Trigger:** Run this step if `wiki_pass_complete` is not `true` in the KG config entry.
+Re-running `/kmgraph:init` is the supported way to trigger the wiki pass at any time —
+no separate command needed.
 
-If neither condition is true, skip this step entirely (`wiki_pass_complete` is already set).
+```bash
+WIKI_DONE=$(jq -r --arg kg "$kg_name" '.graphs[$kg].wiki_pass_complete // false' \
+  ~/.claude/kg-config.json 2>/dev/null)
+if [ "$WIKI_DONE" = "true" ]; then
+  echo "ℹ️  Wiki pass already complete — skipping. Re-run /kmgraph:init to force recheck."
+  # exit_step
+fi
+```
+
+If `WIKI_DONE` is `true`, skip this step entirely.
 
 **Pre-pass: Build ADR number → filename map**
 
@@ -927,16 +1010,34 @@ Parameters:
 - `{KG_PATH}` = resolved KG path (from Step 1.4)
 - `{CLAUDE_PLUGIN_ROOT}` = plugin root path (environment variable available in this context)
 
-### Step 1.6.5: Content migration offer (new install only)
+### Step 1.6.5: me.md and rules.md backfill offer
 
-After scaffolding `me.md` and `rules.md`, offer to populate them from existing CLAUDE.md files:
+Run this step whenever `me.md` contains only template placeholder text — on new installs,
+after content migration, and on re-runs of `/kmgraph:init`. Skip only if `me.md` already
+has substantial content (user has populated it manually).
 
+**Trigger check:**
+```bash
+ME_CONTENT=$(cat "{KG_PATH}/me.md" 2>/dev/null)
+ME_IS_TEMPLATE=$(echo "$ME_CONTENT" | grep -c "<!-- What is this project" || true)
+[ "$ME_IS_TEMPLATE" -eq 0 ] && echo "me.md has been populated — skipping backfill offer." && exit_step
 ```
-me.md and rules.md have been created. Would you like help populating them
-from your existing CLAUDE.md?
+
+Before offering backfill, explain what these files are:
+```
+me.md and rules.md have been created in knowledge/.
+
+  me.md    — your identity and working style for this project. AI tools read this
+             to understand your role, preferences, and constraints before acting.
+
+  rules.md — project conventions and behavioral rules. Commit format, branch naming,
+             tool preferences, approval gates. AI tools follow these automatically.
+
+Both files are templates right now. Would you like help populating them from your
+existing CLAUDE.md?
 
   1. Yes — show me what would move where (review before writing)
-  2. No — I'll fill them in manually
+  2. No — I'll fill them in manually (edit knowledge/me.md and knowledge/rules.md)
 ```
 
 **If Yes:**
@@ -961,7 +1062,8 @@ from your existing CLAUDE.md?
 - Never delete content from source files without user confirmation.
 - Never auto-write to `~/.claude/CLAUDE.md` — only suggest; user executes manually or approves per-write.
 - If source file does not exist, skip silently.
-- **Skip this step** if `me.md` already has substantial content (more than the template placeholder text) — the user has already populated it manually.
+- **Skip this step** if `me.md` already has substantial content — detected by checking for the presence of the `<!-- What is this project` comment string. If absent, the user has populated the file.
+- **Always run** on migration completion and on re-runs, not just new installs.
 
 **Personal KG case:** When initializing the personal KG (Step 1.8.5), run the same offer using `~/.claude/CLAUDE.md` as source and `~/.kmgraph/me.md` / `~/.kmgraph/rules.md` as targets. Also offer to migrate relevant entries from `~/.claude/projects/.../memory/MEMORY.md` (user-type memories: role, preferences, expertise) to personal `me.md`.
 
@@ -1047,6 +1149,44 @@ fi
 
 ---
 
+### Step 1.6.8: Wiki link pass (idempotent)
+
+Run the Obsidian wiki link pass on the newly initialized KG. This converts bare
+`ADR-NNN`, `ENH-NNN`, `#NNN` (GitHub issues), and `Lessons_Learned_X` references
+into `[[wiki links]]` across all files in `lessons-learned/`, `decisions/`,
+`sessions/`, and `knowledge/concepts/`.
+
+**Trigger:** Run if `wiki_pass_complete` is not `true` in the KG config entry.
+This step is idempotent — re-running `/kmgraph:init` at any time will re-check
+and run the pass if not yet complete.
+
+```bash
+WIKI_DONE=$(jq -r --arg kg "$kg_name" '.graphs[$kg].wiki_pass_complete // false' \
+  ~/.claude/kg-config.json 2>/dev/null)
+if [ "$WIKI_DONE" = "true" ]; then
+  echo "ℹ️  Wiki pass already complete — skipping."
+  # exit_step
+fi
+```
+
+If `WIKI_DONE` is `false` or absent, offer:
+```
+Wiki link pass available — converts bare ADR-NNN, ENH-NNN, #NNN, and lesson
+filename references to [[wiki links]] across your knowledge files.
+
+  1. Run wiki pass now
+  2. Skip — I'll run it later by re-running /kmgraph:init
+```
+
+If the user selects 1, execute the full wiki link pass logic from Step 1f.2
+(ADR map build, NO-SUBSTITUTE zones, substitutions a–d, atomic write-back,
+`wiki_pass_complete: true` flag write).
+
+**`--dry-run` mode:** If `/kmgraph:init` was invoked with `--dry-run`, print
+what would change per file without writing anything and do not set the flag.
+
+---
+
 ### Step 1.7: Update .gitignore (if git repo exists)
 
 ```bash
@@ -1129,6 +1269,24 @@ Examples of personal lessons:
    cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/me.md" "$HOME/.kmgraph/me.md"
    [ -f "$HOME/.kmgraph/rules.md" ] && echo "rules.md already exists — skipping scaffold." || \
      cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/rules.md" "$HOME/.kmgraph/rules.md"
+   # triggers.md — optional, project-specific trigger extensions only
+   # Most projects do not need this file. Create it only if you have project-specific
+   # rules that should fire at different phases than your user-level triggers.
+   # If created, entries extend (never replace) ~/.kmgraph/triggers.md.
+   if [ ! -f "{KG_PATH}/triggers.md" ]; then
+     cat > "{KG_PATH}/triggers.md" << 'EOF'
+# Triggers — Project-Level Extensions (Optional)
+#
+# This file extends ~/.kmgraph/triggers.md. Entries here are additive.
+# User-level triggers always apply. Only add entries for project-specific overrides.
+#
+# Example — narrow a user trigger:
+# ## After writing an implementation plan
+# - Apply: rules.md § Plan Protocol > Parallelism Analysis
+#   Condition: skip if plan has fewer than 3 tasks (this project always has short plans)
+EOF
+     echo "ℹ️  triggers.md stub created at {KG_PATH}/triggers.md (optional — see file for usage)"
+   fi
    [ -f "$HOME/.kmgraph/kg-index-global.md" ] && echo "kg-index-global.md already exists — skipping scaffold." || \
      cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-index-global.md" "$HOME/.kmgraph/kg-index-global.md"
    ```

@@ -148,12 +148,18 @@ knowledge-graph/
 
 | Directory    | In git | Distributed | Purpose                          |
 |--------------|--------|-------------|----------------------------------|
-| `commands/`  | ✅     | ✅          | Plugin commands                  |
-| `skills/`    | ✅     | ✅          | Plugin skills                    |
+| `commands/`  | ✅     | ✅          | Claude Code plugin commands — not applicable to other platforms |
+| `skills/`    | ✅     | ✅          | Claude Code plugin skills — not applicable to other platforms  |
+| `agents/`    | ✅     | ✅          | Claude Code subagents — not applicable to other platforms      |
+| `hooks/`     | ✅     | ✅          | Claude Code session hooks — not applicable to other platforms  |
 | `core/`      | ✅     | ✅          | Platform-agnostic templates      |
 | `scripts/`   | ✅     | ✅          | Hook scripts                     |
 | `docs/`      | ✅     | ❌          | Plugin developer knowledge graph |
 | `tests/`     | ✅     | ❌          | Internal test suite              |
+
+> **Note:** The `commands/`, `skills/`, `agents/`, and `hooks/` directories are loaded exclusively
+> by the Claude Code plugin system. All cross-platform functionality is provided by the MCP server
+> (`mcp-server/`) as `kg_*` tools.
 
 ---
 
