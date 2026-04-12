@@ -518,6 +518,12 @@ To migrate manually: move files from docs/{decisions,lessons-learned,...}/ to kn
 
 Before prompting, read every available source to build recommendations:
 
+**MANDATORY: Check for each platform file at `{PROJECT_ROOT}` and log its presence before extracting anything.** Print a "Sources found" line before the dry run:
+```
+Sources found: CLAUDE.md ✓  GEMINI.md ✓  .cursorrules –  AGENTS.md –  README.md ✓  package.json ✓  (+ 3 ADRs, 12 lessons, 2 sessions)
+```
+Do not skip this line. If a platform file exists but was not checked, that is a bug.
+
 | Source | What to extract |
 |--------|----------------|
 | `CLAUDE.md` (project + global) | Platform preferences, always/never rules, tool directives, workflow constraints |
@@ -532,8 +538,15 @@ Before prompting, read every available source to build recommendations:
 | KG decisions (`decisions/`) | ADRs with architectural rules |
 | KG sessions | Working style, communication patterns |
 | Existing partial `me.md` / `rules.md` | Preserve any content already filled in |
+| `rules.md` (just seeded, if applicable) | Derive trigger phase mappings for `triggers.md` |
 
 For each source found, note: filename → extracted content → which target file it informs (`me.md`, `rules.md`, or `triggers.md`).
+
+**For `triggers.md` specifically:** map each section heading in `rules.md` to a trigger phase. Example mapping:
+- `§ Plan Protocol` → "After writing an implementation plan — Apply: rules.md § Plan Protocol"
+- `§ Git Workflow` → "Before committing — Apply: rules.md § Git Workflow"
+- `§ Knowledge Capture` → "When making an architecture decision — Apply: rules.md § Knowledge Capture > When to Capture"
+- Any enforcement/guardrail section → add as a project-specific trigger with the section name
 
 ---
 
@@ -568,21 +581,41 @@ rules.md  ({KG_PATH}/rules.md)
   └─────────────────────────────────────────────────────────────────────┘
 
 triggers.md  ({KG_PATH}/triggers.md)
-  Sources: template defaults + [any phase-based lessons found]
+  Sources: rules.md sections + template defaults + [any phase-based lessons found]
   ┌─────────────────────────────────────────────────────────────────────┐
-  │ [pre-populated trigger entries]                                     │
+  │ [trigger entries derived from rules.md section headings,           │
+  │  each citing its rules.md source — not generic template defaults]   │
   │  ...                                                                │
   └─────────────────────────────────────────────────────────────────────┘
 
-── Platform files that would be updated ───────────────────────────────────
+── Platform files found ────────────────────────────────────────────────────
 
-CLAUDE.md  (rules moving to rules.md would be removed from here)
+**MANDATORY — do not skip this section.** For every platform file that exists at {PROJECT_ROOT},
+show it here with its proposed update. If no platform files exist, print:
+  (no platform config files found at {PROJECT_ROOT})
+
+For each platform file found, show:
+  1. What cross-reference comment would be added (always): `# See also: knowledge/rules.md`
+  2. Any content that overlaps with the newly created rules.md (user must explicitly approve removal)
+
+Format per file:
+
+CLAUDE.md  ✓ found at {PROJECT_ROOT}/CLAUDE.md
   ┌─────────────────────────────────────────────────────────────────────┐
-  │ [updated CLAUDE.md with cross-reference to rules.md added,         │
-  │  any duplicated content removed]                                    │
+  │ [proposed addition near top of file:]                               │
+  │ # See also: knowledge/rules.md — project conventions live there     │
+  │                                                                     │
+  │ [overlapping content detected (if any):]                            │
+  │   Line 14-18: "Never start implementation without Proceed"          │
+  │   → Already captured in rules.md § Git Workflow — remove? [y/n]    │
   └─────────────────────────────────────────────────────────────────────┘
 
-[repeat for GEMINI.md, .cursorrules, etc. if any content would move]
+GEMINI.md  ✓ found at {PROJECT_ROOT}/GEMINI.md
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │ [same format]                                                       │
+  └─────────────────────────────────────────────────────────────────────┘
+
+[repeat for .cursorrules, AGENTS.md, .github/copilot-instructions.md if found]
 
 ── Nothing has been written. These are recommendations only. ──────────────
 All content can be edited before applying, and changed again at any time
