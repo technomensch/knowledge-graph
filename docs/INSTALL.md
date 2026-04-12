@@ -83,6 +83,24 @@ The installer sets up:
 
 ---
 
+## Upgrade Checks
+
+When running `/kmgraph:init` on an existing installation, the wizard inspects your setup and reports what it finds:
+
+| Check | What it looks for |
+|-------|-------------------|
+| **a. Directories** | Missing subdirectories (`knowledge/`, `decisions/`, `sessions/`, etc.) |
+| **b. Config fields** | Missing fields in `~/.claude/kg-config.json` introduced in newer versions |
+| **c. Templates** | Template files that have been updated or added since your install |
+| **d. Platform split** | Claude-specific tool directives in `knowledge/rules.md` that belong in `CLAUDE.md` |
+| **e. Wiki pass** | Bare `ADR-NNN`, `ENH-NNN`, `#NNN`, and lesson filename references not yet converted to `[[wiki links]]` — runs once per KG, skipped on re-run if already complete |
+
+:::note Re-running the wizard
+`/kmgraph:init` is safe to re-run at any time. It skips steps already complete and only offers items still pending for your install.
+:::
+
+---
+
 ## Next Steps
 
 After installation, users can:

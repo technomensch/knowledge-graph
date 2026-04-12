@@ -153,6 +153,11 @@ The inspector runs four checks in order and reports what it finds before asking 
 | **b. Config fields** | Missing fields in `~/.claude/kg-config.json` introduced in newer versions |
 | **c. Templates** | Template files that have been updated or added since your install |
 | **d. Platform split** | Claude-specific tool directives in `knowledge/rules.md` that belong in `CLAUDE.md` |
+| **e. Wiki pass** | Bare `ADR-NNN`, `ENH-NNN`, `#NNN`, and lesson filename references not yet converted to `[[wiki links]]` — runs once per KG, skipped on re-run if already complete |
+
+> **Re-running the wizard:** `/kmgraph:init` is safe to re-run at any time. It skips
+> steps already complete (wiki pass, platform config, post-commit hook) and only
+> offers items that are still pending for your install.
 
 ---
 
