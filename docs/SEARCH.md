@@ -82,4 +82,4 @@ If a search index already exists, sync-all refreshes it automatically with no pr
 
 - **How to tell it is active**: search results show `(FTS5)` — this means the index was used
 - **How to re-enable after declining**: run `kg_fts5_rebuild` directly
-- **How to revert**: delete the `.fts5.db` file from the knowledge graph root folder
+- **How to revert**: delete `~/.kmgraph/index/projects/<kgName>.db` (project KG) or `~/.kmgraph/index/personal.db` (personal KG). Run `kg_fts5_rebuild` to recreate.
