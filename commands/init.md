@@ -83,6 +83,43 @@ fi
 
 Proceed to the FTS5 rebuild check (Step 1f) below.
 
+#### 1f.0. FTS5 Index Location Migration Consent
+
+Check whether the old `~/.claude/kg-fts5/` index exists and whether the user has already consented to migration:
+
+```bash
+KG_NAME="{kg_name}"
+OLD_DB="$HOME/.claude/kg-fts5/${KG_NAME}.db"
+FTS5_MIGRATED=$(jq -r ".graphs[\"${KG_NAME}\"].fts5_index_migrated // false" "$HOME/.claude/kg-config.json" 2>/dev/null)
+
+if [ -f "$OLD_DB" ] && [ "$FTS5_MIGRATED" != "true" ]; then
+  printf '\nKMGraph — Search Index Location Change\n\n'
+  printf 'Your search index is moving from:\n'
+  printf '  ~/.claude/kg-fts5/          (Claude Code only)\n'
+  printf 'to:\n'
+  printf '  ~/.kmgraph/index/           (works across all AI tools)\n\n'
+  printf 'Your knowledge base is NOT affected — only the search cache moves.\n'
+  printf 'Search falls back to linear scan until you rebuild (seconds).\n'
+  printf 'The old directory is NOT deleted — remove it manually after confirming.\n\n'
+  printf 'Proceed?  1. Yes   2. No (skip, linear scan continues to work)\n'
+  read -r CONSENT
+  if [ "$CONSENT" = "1" ]; then
+    # Write consent marker — prevents prompt from reappearing on subsequent init runs
+    jq ".graphs[\"${KG_NAME}\"].fts5_index_migrated = true" "$HOME/.claude/kg-config.json" > /tmp/kg-config-tmp.json \
+      && mv /tmp/kg-config-tmp.json "$HOME/.claude/kg-config.json"
+    printf '✓ Index location updated. Run kg_fts5_rebuild or /kmgraph:sync-all to rebuild.\n'
+  else
+    printf 'Skipped. Search continues via linear scan until you choose to migrate.\n'
+  fi
+fi
+```
+
+**Constraints:**
+- Do NOT auto-rebuild on Yes — log only; user triggers rebuild explicitly
+- Do NOT delete old DB — user removes `~/.claude/kg-fts5/` manually after confirming
+- Idempotency: On Yes, write `fts5_index_migrated: true` to the active graph's entry in `~/.claude/kg-config.json` (done by the jq command above). On subsequent `/kmgraph:init` runs, the `FTS5_MIGRATED` check skips the prompt.
+- On No: do NOT write the marker — prompt reappears on next init (correct behavior)
+
 #### 1f.1. Project-local path migration (docs/ → knowledge/)
 
 **E15 — Stale path pre-check:** Before evaluating migration triggers, verify the configured path exists on disk:
