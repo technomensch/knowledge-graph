@@ -423,6 +423,59 @@ export function searchFts5(
 // ---------------------------------------------------------------------------
 
 /**
+ * Registers the `kg_fts5_status` MCP tool.
+ * Returns { exists: boolean, db_path: string, kgType: string } — read-only probe,
+ * never creates directories.
+ */
+export function registerFts5StatusTool(server: McpServer): void {
+  server.tool(
+    "kg_fts5_status",
+    "Check whether the FTS5 search index exists for the active knowledge graph. " +
+      "Returns { exists, db_path, kgType }. Read-only — does not create or modify the index.",
+    {},
+    async () => {
+      try {
+        const config = readConfig();
+        const activeName = config.active;
+        if (!activeName) {
+          return {
+            content: [{
+              type: "text" as const,
+              text: JSON.stringify({ exists: false, db_path: null, kgType: null, error: "No active KG" }),
+            }],
+          };
+        }
+        const graph = config.graphs[activeName];
+        const kgType = graph?.type ?? "project-local";
+        // resolveDbPath normally creates dirs — for status we compute the path without creating anything
+        let dbPath: string;
+        if (kgType === "personal") {
+          dbPath = path.join(os.homedir(), ".kmgraph", "index", "personal.db");
+        } else {
+          dbPath = path.join(os.homedir(), ".kmgraph", "index", "projects", `${activeName}.db`);
+        }
+        const exists = fs.existsSync(dbPath);
+        return {
+          content: [{
+            type: "text" as const,
+            text: JSON.stringify({ exists, db_path: dbPath, kgType }),
+          }],
+        };
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        return {
+          content: [{
+            type: "text" as const,
+            text: `Error checking FTS5 status: ${message}`,
+          }],
+          isError: true,
+        };
+      }
+    }
+  );
+}
+
+/**
  * Registers the `kg_fts5_rebuild` MCP tool.
  */
 export function registerFts5Tool(server: McpServer): void {

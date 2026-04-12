@@ -45,6 +45,7 @@ exports.initDb = initDb;
 exports.indexFile = indexFile;
 exports.rebuildIndex = rebuildIndex;
 exports.searchFts5 = searchFts5;
+exports.registerFts5StatusTool = registerFts5StatusTool;
 exports.registerFts5Tool = registerFts5Tool;
 const zod_1 = require("zod");
 const fs = __importStar(require("fs"));
@@ -277,12 +278,12 @@ function indexFile(db, filePath, kgPath) {
  * - Removes index rows for files that no longer exist on disk.
  * - Skips files that haven't changed.
  */
-function rebuildIndex(kgPath, kgName) {
+function rebuildIndex(kgPath, kgName, kgType = "project-local") {
     if (!fts5Available) {
         throw new Error("FTS5 search engine not available. Restart Claude Code to complete the upgrade installation.");
     }
     const start = Date.now();
-    const dbPath = getFTS5DbPath(kgName);
+    const dbPath = resolveDbPath(kgName, kgType);
     const db = new Database(dbPath);
     try {
         initDb(db);
@@ -367,6 +368,55 @@ function searchFts5(dbPath, query, kgPath) {
 // MCP tool registration
 // ---------------------------------------------------------------------------
 /**
+ * Registers the `kg_fts5_status` MCP tool.
+ * Returns { exists: boolean, db_path: string, kgType: string } — read-only probe,
+ * never creates directories.
+ */
+function registerFts5StatusTool(server) {
+    server.tool("kg_fts5_status", "Check whether the FTS5 search index exists for the active knowledge graph. " +
+        "Returns { exists, db_path, kgType }. Read-only — does not create or modify the index.", {}, async () => {
+        try {
+            const config = (0, utils_js_1.readConfig)();
+            const activeName = config.active;
+            if (!activeName) {
+                return {
+                    content: [{
+                            type: "text",
+                            text: JSON.stringify({ exists: false, db_path: null, kgType: null, error: "No active KG" }),
+                        }],
+                };
+            }
+            const graph = config.graphs[activeName];
+            const kgType = graph?.type ?? "project-local";
+            // resolveDbPath normally creates dirs — for status we compute the path without creating anything
+            let dbPath;
+            if (kgType === "personal") {
+                dbPath = path.join(os.homedir(), ".kmgraph", "index", "personal.db");
+            }
+            else {
+                dbPath = path.join(os.homedir(), ".kmgraph", "index", "projects", `${activeName}.db`);
+            }
+            const exists = fs.existsSync(dbPath);
+            return {
+                content: [{
+                        type: "text",
+                        text: JSON.stringify({ exists, db_path: dbPath, kgType }),
+                    }],
+            };
+        }
+        catch (err) {
+            const message = err instanceof Error ? err.message : String(err);
+            return {
+                content: [{
+                        type: "text",
+                        text: `Error checking FTS5 status: ${message}`,
+                    }],
+                isError: true,
+            };
+        }
+    });
+}
+/**
  * Registers the `kg_fts5_rebuild` MCP tool.
  */
 function registerFts5Tool(server) {
@@ -425,7 +475,10 @@ function registerFts5Tool(server) {
                     isError: true,
                 };
             }
-            const result = rebuildIndex(resolvedPath, resolvedName);
+            // Determine kgType for the resolved graph
+            const graphEntry = config.graphs[resolvedName];
+            const resolvedType = graphEntry?.type ?? "project-local";
+            const result = rebuildIndex(resolvedPath, resolvedName, resolvedType);
             // Update config to mark FTS5 as enabled, remove declined flag
             if (config.active && config.graphs[config.active]) {
                 const graph = config.graphs[config.active];
