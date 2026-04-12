@@ -163,6 +163,19 @@ For each item in `upgrades[]`, show a preview entry:
   ```
   Compute the diff using a simple line-by-line comparison (no external `diff` dependency required).
 
+- **Section h (scaffold missing root files):** for each missing file, show the source template path and destination:
+  ```
+  [preview] Would seed: me.md
+    Source: ${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/me.md
+    Dest:   {KG_PATH}/me.md
+    Note:   gitignored — fill in your identity after seeding
+
+  [preview] Would seed: rules.md
+    Source: ${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/rules.md
+    Dest:   {KG_PATH}/rules.md
+    Note:   fill in your project conventions after seeding
+  ```
+
 - **Section d (platform-split):** for each flagged line from `rules.md`, show its line number, the line content, the target heading in `CLAUDE.md` it would be appended under, and the archive path that would be created:
   ```
   [preview] rules.md platform-split:
@@ -488,6 +501,45 @@ To migrate manually: move files from docs/{decisions,lessons-learned,...}/ to kn
 - Only deletes when real DB at `~/.kmgraph/index/projects/{kg_name}.db` is confirmed
 - Always prompts — never auto-deletes
 - Adds `**/.fts5.db` and `**/.fts5.db-journal` to `.gitignore` on cleanup (idempotent)
+
+#### h. Scaffold missing root files (me.md / rules.md)
+
+**Purpose:** Seed `me.md` and/or `rules.md` from plugin templates when absent. These files are foundational — without them, identity and rule-based behaviors don't activate at session start.
+
+**Only runs if** one or both were flagged as missing in the initial inspection.
+
+**For `me.md` (missing):**
+
+Seed from template — `me.md` is always gitignored, so scaffolding it fresh is safe:
+
+```bash
+cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/me.md" "{KG_PATH}/me.md"
+echo "✅ me.md seeded — fill in your identity and working style."
+```
+
+**For `rules.md` (missing):**
+
+Seed from template (non-destructive — skip if file somehow appeared since detection):
+
+```bash
+if [ ! -f "{KG_PATH}/rules.md" ]; then
+  cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/rules.md" "{KG_PATH}/rules.md"
+  echo "✅ rules.md seeded — fill in your project conventions."
+else
+  echo "rules.md appeared since inspection — skipping."
+fi
+```
+
+**After seeding, print:**
+
+```
+These files are read at session start. Edit them now, or use /kmgraph:rules-capture
+to add rules incrementally as you work.
+```
+
+**If both files already exist:** skip this section silently.
+
+---
 
 #### g. Wiki pass
 
