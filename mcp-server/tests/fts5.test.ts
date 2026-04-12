@@ -245,7 +245,7 @@ describe("searchFts5", () => {
     // Build index
     rebuildIndex(kgRoot, "search-shape");
 
-    const dbPath = getFTS5DbPath("search-shape");
+    const dbPath = getProjectDbPath("search-shape");
     const results = searchFts5(dbPath, "authentication", kgRoot);
 
     expect(results.length).toBeGreaterThan(0);
@@ -276,7 +276,7 @@ describe("searchFts5", () => {
     writeMd(path.join(kgRoot, "knowledge"), "test.md", "# Test\nSome content.");
     rebuildIndex(kgRoot, "search-empty");
 
-    const dbPath = getFTS5DbPath("search-empty");
+    const dbPath = getProjectDbPath("search-empty");
 
     // Empty query — sanitizeFts5Query returns '""' which FTS5 handles
     // Should not throw
