@@ -575,11 +575,20 @@ fi
 
 #### 1f.2. Obsidian wiki link pass
 
-**Trigger:** Run this step if either of the following is true:
-1. Migration ran in Step 1f.1 during this session (migration just completed), OR
-2. The KG config entry has no `wiki_pass_complete: true` flag AND the configured path is already `knowledge/` (prior migration detected — first upgrade to v0.3.3)
+**Trigger:** Run this step if `wiki_pass_complete` is not `true` in the KG config entry.
+Re-running `/kmgraph:init` is the supported way to trigger the wiki pass at any time —
+no separate command needed.
 
-If neither condition is true, skip this step entirely (`wiki_pass_complete` is already set).
+```bash
+WIKI_DONE=$(jq -r --arg kg "$kg_name" '.graphs[$kg].wiki_pass_complete // false' \
+  ~/.claude/kg-config.json 2>/dev/null)
+if [ "$WIKI_DONE" = "true" ]; then
+  echo "ℹ️  Wiki pass already complete — skipping. Re-run /kmgraph:init to force recheck."
+  # exit_step
+fi
+```
+
+If `WIKI_DONE` is `true`, skip this step entirely.
 
 **Pre-pass: Build ADR number → filename map**
 
@@ -1068,6 +1077,44 @@ fi
 ```
 
 **Note:** This step runs on new installs only. Existing installs detect and migrate via the upgrade-inspector's section d check.
+
+---
+
+### Step 1.6.8: Wiki link pass (idempotent)
+
+Run the Obsidian wiki link pass on the newly initialized KG. This converts bare
+`ADR-NNN`, `ENH-NNN`, `#NNN` (GitHub issues), and `Lessons_Learned_X` references
+into `[[wiki links]]` across all files in `lessons-learned/`, `decisions/`,
+`sessions/`, and `knowledge/concepts/`.
+
+**Trigger:** Run if `wiki_pass_complete` is not `true` in the KG config entry.
+This step is idempotent — re-running `/kmgraph:init` at any time will re-check
+and run the pass if not yet complete.
+
+```bash
+WIKI_DONE=$(jq -r --arg kg "$kg_name" '.graphs[$kg].wiki_pass_complete // false' \
+  ~/.claude/kg-config.json 2>/dev/null)
+if [ "$WIKI_DONE" = "true" ]; then
+  echo "ℹ️  Wiki pass already complete — skipping."
+  # exit_step
+fi
+```
+
+If `WIKI_DONE` is `false` or absent, offer:
+```
+Wiki link pass available — converts bare ADR-NNN, ENH-NNN, #NNN, and lesson
+filename references to [[wiki links]] across your knowledge files.
+
+  1. Run wiki pass now
+  2. Skip — I'll run it later by re-running /kmgraph:init
+```
+
+If the user selects 1, execute the full wiki link pass logic from Step 1f.2
+(ADR map build, NO-SUBSTITUTE zones, substitutions a–d, atomic write-back,
+`wiki_pass_complete: true` flag write).
+
+**`--dry-run` mode:** If `/kmgraph:init` was invoked with `--dry-run`, print
+what would change per file without writing anything and do not set the flag.
 
 ---
 
