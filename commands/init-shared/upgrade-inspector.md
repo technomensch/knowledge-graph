@@ -502,42 +502,146 @@ To migrate manually: move files from docs/{decisions,lessons-learned,...}/ to kn
 - Always prompts — never auto-deletes
 - Adds `**/.fts5.db` and `**/.fts5.db-journal` to `.gitignore` on cleanup (idempotent)
 
-#### h. Scaffold missing root files (me.md / rules.md)
+#### h. Scaffold missing root files (me.md / rules.md / triggers.md)
 
-**Purpose:** Seed `me.md` and/or `rules.md` from plugin templates when absent. These files are foundational — without them, identity and rule-based behaviors don't activate at session start.
+**Purpose:** Seed `me.md`, `rules.md`, and/or `triggers.md` from plugin templates when absent, pre-populated with recommendations extracted from existing project and platform files. Presents as a dry run — nothing is written until the user approves. All originals are archived before any changes are made.
 
-**Only runs if** one or both were flagged as missing in the initial inspection.
+`triggers.md` is also handled here when it appears as a new template in section c — this section's interactive flow takes precedence over a silent copy.
 
-**For `me.md` (missing):**
+**Only runs if** one or more were flagged as missing in the initial inspection.
 
-Seed from template — `me.md` is always gitignored, so scaffolding it fresh is safe:
+---
+
+**Step 1 — Scan all sources**
+
+Before prompting, read every available source to build recommendations:
+
+| Source | What to extract |
+|--------|----------------|
+| `CLAUDE.md` (project + global) | Platform preferences, always/never rules, tool directives, workflow constraints |
+| `GEMINI.md` | Platform-specific preferences, style rules |
+| `.cursorrules` | Cursor conventions and constraints |
+| `AGENTS.md` | Agent/Codex instructions and conventions |
+| `.github/copilot-instructions.md` | Copilot rules |
+| `.continue/config.json` | Continue.dev preferences |
+| `README.md` | Project description, tech stack, goals |
+| `package.json` / `pyproject.toml` etc. | Tech stack, scripts, dependencies |
+| KG lessons-learned (`patterns/`, `process/`) | Recurring conventions, always/never patterns |
+| KG decisions (`decisions/`) | ADRs with architectural rules |
+| KG sessions | Working style, communication patterns |
+| Existing partial `me.md` / `rules.md` | Preserve any content already filled in |
+
+For each source found, note: filename → extracted content → which target file it informs (`me.md`, `rules.md`, or `triggers.md`).
+
+---
+
+**Step 2 — Present dry run**
+
+Display a full preview before writing anything. Format:
+
+```
+── Dry run: here's what would be created ──────────────────────────────────
+
+me.md  ({KG_PATH}/me.md)
+  Sources: README.md, CLAUDE.md, 3 session summaries
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │ # Identity — [project name]                                         │
+  │                                                                     │
+  │ ## Role                                                             │
+  │ [extracted role / project description from README]                  │
+  │                                                                     │
+  │ ## Working Style                                                    │
+  │ [patterns extracted from session summaries]                         │
+  │  ...                                                                │
+  └─────────────────────────────────────────────────────────────────────┘
+
+rules.md  ({KG_PATH}/rules.md)
+  Sources: CLAUDE.md § Platform Preferences, 4 lessons, ADR-005, ADR-012
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │ # Rules — [project name]                                            │
+  │                                                                     │
+  │ ## Git Workflow                                                      │
+  │ [extracted from lessons and ADRs]                                   │
+  │  ...                                                                │
+  └─────────────────────────────────────────────────────────────────────┘
+
+triggers.md  ({KG_PATH}/knowledge/triggers.md)
+  Sources: template defaults + [any phase-based lessons found]
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │ [pre-populated trigger entries]                                     │
+  │  ...                                                                │
+  └─────────────────────────────────────────────────────────────────────┘
+
+── Platform files that would be updated ───────────────────────────────────
+
+CLAUDE.md  (rules moving to rules.md would be removed from here)
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │ [updated CLAUDE.md with cross-reference to rules.md added,         │
+  │  any duplicated content removed]                                    │
+  └─────────────────────────────────────────────────────────────────────┘
+
+[repeat for GEMINI.md, .cursorrules, etc. if any content would move]
+
+── Nothing has been written. These are recommendations only. ──────────────
+All content can be edited before applying, and changed again at any time
+using /kmgraph:rules-capture and by editing the files directly.
+```
+
+---
+
+**Step 3 — Prompt to apply**
+
+```
+Apply these recommendations?
+  1. Apply all — archive originals, write all files as shown
+  2. Edit before applying — review each file section by section
+  3. Apply KG files only — write me.md / rules.md / triggers.md, skip platform file changes
+  4. Skip — I'll fill these in manually later
+```
+
+---
+
+**Step 4 — Archive then write (options 1, 2, or 3)**
+
+Before writing any file, create a timestamped archive of all originals that would be modified:
 
 ```bash
-cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/me.md" "{KG_PATH}/me.md"
-echo "✅ me.md seeded — fill in your identity and working style."
+ARCHIVE_DIR="{KG_PATH}/.kg-archive-$(date +%Y%m%d-%H%M%S)"
+mkdir -p "$ARCHIVE_DIR"
+# Archive any platform files that would be modified
+for f in CLAUDE.md GEMINI.md .cursorrules AGENTS.md .github/copilot-instructions.md; do
+  if [ -f "{PROJECT_ROOT}/$f" ]; then
+    cp "{PROJECT_ROOT}/$f" "$ARCHIVE_DIR/"
+    echo "  📦 Archived: $f → $ARCHIVE_DIR/$f"
+  fi
+done
+echo "{\"archived_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"trigger\": \"upgrade-inspector-section-h\"}" \
+  > "$ARCHIVE_DIR/manifest.json"
 ```
 
-**For `rules.md` (missing):**
-
-Seed from template (non-destructive — skip if file somehow appeared since detection):
-
-```bash
-if [ ! -f "{KG_PATH}/rules.md" ]; then
-  cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/rules.md" "{KG_PATH}/rules.md"
-  echo "✅ rules.md seeded — fill in your project conventions."
-else
-  echo "rules.md appeared since inspection — skipping."
-fi
-```
-
-**After seeding, print:**
+After the archive loop, print:
 
 ```
-These files are read at session start. Edit them now, or use /kmgraph:rules-capture
-to add rules incrementally as you work.
+✅ Originals archived at:
+   $ARCHIVE_DIR
+
+To rollback: run /kmgraph:migration list to see restore points, or restore manually:
+   cp "$ARCHIVE_DIR/<filename>" <original path>
 ```
 
-**If both files already exist:** skip this section silently.
+Then proceed to write the new files.
+
+Then write each file using the Edit tool (new files) or Edit tool (modifications to platform files).
+
+**If option 2 (edit before applying):** walk through each target file section by section, showing the proposed content and asking the user to confirm, modify, or skip each section before writing.
+
+**Safety rules:**
+- Archive is always taken before any write (mandatory — never skip)
+- Never delete content from platform files without archiving first
+- Platform file updates append a cross-reference comment (e.g., `# See also: knowledge/rules.md`) — they do not silently remove content unless the user explicitly approves removal in the dry run
+- If all three files already exist and no platform files need updating: skip this section silently
+
+**If all three files already exist:** skip this section silently.
 
 ---
 
