@@ -932,16 +932,34 @@ Parameters:
 - `{KG_PATH}` = resolved KG path (from Step 1.4)
 - `{CLAUDE_PLUGIN_ROOT}` = plugin root path (environment variable available in this context)
 
-### Step 1.6.5: Content migration offer (new install only)
+### Step 1.6.5: me.md and rules.md backfill offer
 
-After scaffolding `me.md` and `rules.md`, offer to populate them from existing CLAUDE.md files:
+Run this step whenever `me.md` contains only template placeholder text — on new installs,
+after content migration, and on re-runs of `/kmgraph:init`. Skip only if `me.md` already
+has substantial content (user has populated it manually).
 
+**Trigger check:**
+```bash
+ME_CONTENT=$(cat "{KG_PATH}/me.md" 2>/dev/null)
+ME_IS_TEMPLATE=$(echo "$ME_CONTENT" | grep -c "<!-- What is this project" || true)
+[ "$ME_IS_TEMPLATE" -eq 0 ] && echo "me.md has been populated — skipping backfill offer." && exit_step
 ```
-me.md and rules.md have been created. Would you like help populating them
-from your existing CLAUDE.md?
+
+Before offering backfill, explain what these files are:
+```
+me.md and rules.md have been created in knowledge/.
+
+  me.md    — your identity and working style for this project. AI tools read this
+             to understand your role, preferences, and constraints before acting.
+
+  rules.md — project conventions and behavioral rules. Commit format, branch naming,
+             tool preferences, approval gates. AI tools follow these automatically.
+
+Both files are templates right now. Would you like help populating them from your
+existing CLAUDE.md?
 
   1. Yes — show me what would move where (review before writing)
-  2. No — I'll fill them in manually
+  2. No — I'll fill them in manually (edit knowledge/me.md and knowledge/rules.md)
 ```
 
 **If Yes:**
@@ -966,7 +984,8 @@ from your existing CLAUDE.md?
 - Never delete content from source files without user confirmation.
 - Never auto-write to `~/.claude/CLAUDE.md` — only suggest; user executes manually or approves per-write.
 - If source file does not exist, skip silently.
-- **Skip this step** if `me.md` already has substantial content (more than the template placeholder text) — the user has already populated it manually.
+- **Skip this step** if `me.md` already has substantial content — detected by checking for the presence of the `<!-- What is this project` comment string. If absent, the user has populated the file.
+- **Always run** on migration completion and on re-runs, not just new installs.
 
 **Personal KG case:** When initializing the personal KG (Step 1.8.5), run the same offer using `~/.claude/CLAUDE.md` as source and `~/.kmgraph/me.md` / `~/.kmgraph/rules.md` as targets. Also offer to migrate relevant entries from `~/.claude/projects/.../memory/MEMORY.md` (user-type memories: role, preferences, expertise) to personal `me.md`.
 
