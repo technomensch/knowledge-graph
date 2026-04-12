@@ -31,11 +31,31 @@ export const FTS5_DB_FILENAME = ".fts5.db";
  * Returns the absolute path to the user-level FTS5 database for a given KG name.
  * Stored in ~/.claude/kg-fts5/<kgName>.db (outside project directories).
  * Creates the directory if it does not exist.
+ * @deprecated Use resolveDbPath(kgName, kgType) — DB now at ~/.kmgraph/index/
  */
 export function getFTS5DbPath(kgName: string): string {
   const dir = path.join(os.homedir(), ".claude", "kg-fts5");
   fs.mkdirSync(dir, { recursive: true });
   return path.join(dir, `${kgName}.db`);
+}
+
+export function getPersonalDbPath(): string {
+  const dir = path.join(os.homedir(), ".kmgraph", "index");
+  fs.mkdirSync(dir, { recursive: true });
+  return path.join(dir, "personal.db");
+}
+
+export function getProjectDbPath(kgName: string): string {
+  // TODO(v0.3.7): name collision risk — two repos with the same kgName share this file.
+  // Future: use a registry with stable content-hash IDs as filenames.
+  const dir = path.join(os.homedir(), ".kmgraph", "index", "projects");
+  fs.mkdirSync(dir, { recursive: true });
+  return path.join(dir, `${kgName}.db`);
+}
+
+export function resolveDbPath(kgName: string, kgType: string): string {
+  if (kgType === "personal") return getPersonalDbPath();
+  return getProjectDbPath(kgName);
 }
 
 /**
