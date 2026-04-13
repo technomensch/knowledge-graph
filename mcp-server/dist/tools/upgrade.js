@@ -66,23 +66,20 @@ function parseFrontmatter(filePath) {
 /**
  * Check a — verify required KG subdirectories exist.
  */
-function checkDirectories(kgPath) {
-    const required = [
-        "knowledge",
-        "lessons-learned",
-        "decisions",
-        "sessions",
-        "chat-history",
-        "tmp",
-    ];
-    const missing = required.filter((d) => !fs.existsSync(path.join(kgPath, d)));
+function checkDirectories(kgPath, graph) {
+    const standardDirs = ["knowledge", "lessons-learned", "decisions", "sessions", "tmp"];
+    const missing = standardDirs.filter((d) => !fs.existsSync(path.join(kgPath, d)));
+    const chatHistoryDir = (0, utils_js_1.getChatHistoryPath)(graph, kgPath);
+    if (!fs.existsSync(chatHistoryDir)) {
+        missing.push(`chat-history (${chatHistoryDir})`);
+    }
     if (missing.length === 0)
         return [];
     return [
         {
             category: "directories",
             description: `Missing directories: ${missing.join(", ")}`,
-            details: `Run with apply: ["directories"] to create them under ${kgPath}`,
+            details: `Run with apply: ["directories"] to create them`,
         },
     ];
 }
@@ -217,22 +214,20 @@ function checkPlatformSplit(kgPath) {
     };
 }
 // ── Apply helpers ────────────────────────────────────────────────────────────
-function applyDirectories(kgPath) {
-    const required = [
-        "knowledge",
-        "lessons-learned",
-        "decisions",
-        "sessions",
-        "chat-history",
-        "tmp",
-    ];
+function applyDirectories(kgPath, graph) {
+    const standardDirs = ["knowledge", "lessons-learned", "decisions", "sessions", "tmp"];
     const created = [];
-    for (const d of required) {
+    for (const d of standardDirs) {
         const full = path.join(kgPath, d);
         if (!fs.existsSync(full)) {
             fs.mkdirSync(full, { recursive: true });
             created.push(d);
         }
+    }
+    const chatHistoryDir = (0, utils_js_1.getChatHistoryPath)(graph, kgPath);
+    if (!fs.existsSync(chatHistoryDir)) {
+        fs.mkdirSync(chatHistoryDir, { recursive: true });
+        created.push(`chat-history (${chatHistoryDir})`);
     }
     return created.length > 0
         ? `Created directories: ${created.join(", ")}`
@@ -359,7 +354,7 @@ async function handleUpgrade(params) {
     const applyList = params.apply ?? [];
     if (applyList.length === 0) {
         const result = { upgrades: [], warnings: [] };
-        result.upgrades.push(...checkDirectories(kgPath));
+        result.upgrades.push(...checkDirectories(kgPath, config.graphs[config.active]));
         result.upgrades.push(...checkConfig(kgPath));
         result.upgrades.push(...checkTemplates(kgPath));
         const platformWarning = checkPlatformSplit(kgPath);
@@ -371,7 +366,7 @@ async function handleUpgrade(params) {
     for (const category of applyList) {
         switch (category) {
             case "directories":
-                results.push(`[directories] ${applyDirectories(kgPath)}`);
+                results.push(`[directories] ${applyDirectories(kgPath, config.graphs[config.active])}`);
                 break;
             case "config":
                 results.push(`[config] ${applyConfig()}`);

@@ -77,16 +77,13 @@ function registerConfigTools(server) {
         // Expand path
         const expandedPath = kgPath.replace(/^~/, os.homedir());
         // Create directory structure
-        const dirs = [
-            "knowledge",
-            "lessons-learned",
-            "decisions",
-            "sessions",
-            "chat-history",
-        ];
+        const dirs = ["knowledge", "lessons-learned", "decisions", "sessions"];
         for (const dir of dirs) {
             fs.mkdirSync(path.join(expandedPath, dir), { recursive: true });
         }
+        // chat-history uses configurable path (defaults to {kgPath}/chat-history)
+        const chatHistoryDir = (0, utils_js_1.getChatHistoryPath)({ name, path: kgPath, type, categories, createdAt: new Date().toISOString(), lastUsed: new Date().toISOString() }, expandedPath);
+        fs.mkdirSync(chatHistoryDir, { recursive: true });
         // Create category subdirectories
         for (const cat of categories) {
             fs.mkdirSync(path.join(expandedPath, "lessons-learned", cat.name), { recursive: true });

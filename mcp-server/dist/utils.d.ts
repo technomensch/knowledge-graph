@@ -11,6 +11,7 @@ export interface GraphConfig {
     categories: CategoryConfig[];
     createdAt: string;
     lastUsed: string;
+    chatHistoryPath?: string;
 }
 export interface SanitizationPattern {
     type: string;
@@ -30,6 +31,12 @@ export interface KgConfig {
 export declare function readConfig(): KgConfig;
 export declare function writeConfig(config: KgConfig): void;
 export declare function getActiveGraphPath(config: KgConfig): string | null;
+/**
+ * Resolve the chat-history directory for a graph.
+ * If chatHistoryPath is set in config, use it (expanding ~).
+ * Otherwise fall back to {expandedKgPath}/chat-history.
+ */
+export declare function getChatHistoryPath(graph: GraphConfig, expandedKgPath: string): string;
 export declare function getPluginRoot(): string;
 /**
  * Derive project root from KG path.

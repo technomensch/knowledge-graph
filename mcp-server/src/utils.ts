@@ -17,6 +17,7 @@ export interface GraphConfig {
   categories: CategoryConfig[];
   createdAt: string;
   lastUsed: string;
+  chatHistoryPath?: string;
 }
 
 export interface SanitizationPattern {
@@ -70,6 +71,18 @@ export function getActiveGraphPath(config: KgConfig): string | null {
   const graphPath = config.graphs[config.active].path;
   // Expand ~ to home directory
   return graphPath.replace(/^~/, os.homedir());
+}
+
+/**
+ * Resolve the chat-history directory for a graph.
+ * If chatHistoryPath is set in config, use it (expanding ~).
+ * Otherwise fall back to {expandedKgPath}/chat-history.
+ */
+export function getChatHistoryPath(graph: GraphConfig, expandedKgPath: string): string {
+  if (graph.chatHistoryPath) {
+    return graph.chatHistoryPath.replace(/^~/, os.homedir());
+  }
+  return path.join(expandedKgPath, "chat-history");
 }
 
 export function getPluginRoot(): string {

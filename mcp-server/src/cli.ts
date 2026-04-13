@@ -9,6 +9,7 @@ import {
   readConfig,
   writeConfig,
   getPluginRoot,
+  getChatHistoryPath,
   GraphConfig,
   CategoryConfig,
 } from "./utils.js";
@@ -120,16 +121,15 @@ async function runInit(): Promise<void> {
     console.log("  Creating knowledge graph...");
 
     // 5. Create directory structure
-    const dirs = [
-      "knowledge",
-      "lessons-learned",
-      "decisions",
-      "sessions",
-      "chat-history",
-    ];
+    const dirs = ["knowledge", "lessons-learned", "decisions", "sessions"];
     for (const dir of dirs) {
       fs.mkdirSync(path.join(expandedPath, dir), { recursive: true });
     }
+    // chat-history uses configurable path (defaults to {kgPath}/chat-history)
+    const now = new Date().toISOString();
+    const tempGraph: GraphConfig = { name, path: kgPath, type: kgType, categories, createdAt: now, lastUsed: now };
+    const chatHistoryDir = getChatHistoryPath(tempGraph, expandedPath);
+    fs.mkdirSync(chatHistoryDir, { recursive: true });
 
     // Create category subdirectories
     for (const cat of categories) {
@@ -196,7 +196,6 @@ async function runInit(): Promise<void> {
     }
 
     // 7. Write config
-    const now = new Date().toISOString();
     const graphConfig: GraphConfig = {
       name,
       path: kgPath,

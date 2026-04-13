@@ -129,16 +129,15 @@ async function runInit() {
         console.log("");
         console.log("  Creating knowledge graph...");
         // 5. Create directory structure
-        const dirs = [
-            "knowledge",
-            "lessons-learned",
-            "decisions",
-            "sessions",
-            "chat-history",
-        ];
+        const dirs = ["knowledge", "lessons-learned", "decisions", "sessions"];
         for (const dir of dirs) {
             fs.mkdirSync(path.join(expandedPath, dir), { recursive: true });
         }
+        // chat-history uses configurable path (defaults to {kgPath}/chat-history)
+        const now = new Date().toISOString();
+        const tempGraph = { name, path: kgPath, type: kgType, categories, createdAt: now, lastUsed: now };
+        const chatHistoryDir = (0, utils_js_1.getChatHistoryPath)(tempGraph, expandedPath);
+        fs.mkdirSync(chatHistoryDir, { recursive: true });
         // Create category subdirectories
         for (const cat of categories) {
             fs.mkdirSync(path.join(expandedPath, "lessons-learned", cat.name), {
@@ -194,7 +193,6 @@ async function runInit() {
             }
         }
         // 7. Write config
-        const now = new Date().toISOString();
         const graphConfig = {
             name,
             path: kgPath,
@@ -314,13 +312,13 @@ async function main() {
     const command = args[0];
     if (!command) {
         // Default: start MCP server
-        const { StdioServerTransport } = await Promise.resolve().then(() => __importStar(require("@modelcontextprotocol/sdk/server/stdio.js")));
-        const { McpServer } = await Promise.resolve().then(() => __importStar(require("@modelcontextprotocol/sdk/server/mcp.js")));
-        const { registerConfigTools } = await Promise.resolve().then(() => __importStar(require("./tools/config.js")));
-        const { registerSearchTool } = await Promise.resolve().then(() => __importStar(require("./tools/search.js")));
-        const { registerScaffoldTool } = await Promise.resolve().then(() => __importStar(require("./tools/scaffold.js")));
-        const { registerSanitizationTool } = await Promise.resolve().then(() => __importStar(require("./tools/sanitization.js")));
-        const { registerConfigResource, registerTemplatesResource } = await Promise.resolve().then(() => __importStar(require("./resources/index.js")));
+        const { StdioServerTransport } = await import("@modelcontextprotocol/sdk/server/stdio.js");
+        const { McpServer } = await import("@modelcontextprotocol/sdk/server/mcp.js");
+        const { registerConfigTools } = await import("./tools/config.js");
+        const { registerSearchTool } = await import("./tools/search.js");
+        const { registerScaffoldTool } = await import("./tools/scaffold.js");
+        const { registerSanitizationTool } = await import("./tools/sanitization.js");
+        const { registerConfigResource, registerTemplatesResource } = await import("./resources/index.js");
         const server = new McpServer({
             name: "knowledge-graph",
             version: SERVER_VERSION,

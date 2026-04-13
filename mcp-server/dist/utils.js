@@ -37,6 +37,7 @@ exports.CONFIG_PATH = void 0;
 exports.readConfig = readConfig;
 exports.writeConfig = writeConfig;
 exports.getActiveGraphPath = getActiveGraphPath;
+exports.getChatHistoryPath = getChatHistoryPath;
 exports.getPluginRoot = getPluginRoot;
 exports.getProjectRoot = getProjectRoot;
 exports.getAllGraphPaths = getAllGraphPaths;
@@ -76,6 +77,17 @@ function getActiveGraphPath(config) {
     const graphPath = config.graphs[config.active].path;
     // Expand ~ to home directory
     return graphPath.replace(/^~/, os.homedir());
+}
+/**
+ * Resolve the chat-history directory for a graph.
+ * If chatHistoryPath is set in config, use it (expanding ~).
+ * Otherwise fall back to {expandedKgPath}/chat-history.
+ */
+function getChatHistoryPath(graph, expandedKgPath) {
+    if (graph.chatHistoryPath) {
+        return graph.chatHistoryPath.replace(/^~/, os.homedir());
+    }
+    return path.join(expandedKgPath, "chat-history");
 }
 function getPluginRoot() {
     // When running as plugin: CLAUDE_PLUGIN_ROOT is set

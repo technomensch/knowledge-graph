@@ -7,6 +7,7 @@ import {
   readConfig,
   writeConfig,
   getPluginRoot,
+  getChatHistoryPath,
   KgConfig,
   GraphConfig,
   CategoryConfig,
@@ -59,16 +60,13 @@ export function registerConfigTools(server: McpServer): void {
       const expandedPath = kgPath.replace(/^~/, os.homedir());
 
       // Create directory structure
-      const dirs = [
-        "knowledge",
-        "lessons-learned",
-        "decisions",
-        "sessions",
-        "chat-history",
-      ];
+      const dirs = ["knowledge", "lessons-learned", "decisions", "sessions"];
       for (const dir of dirs) {
         fs.mkdirSync(path.join(expandedPath, dir), { recursive: true });
       }
+      // chat-history uses configurable path (defaults to {kgPath}/chat-history)
+      const chatHistoryDir = getChatHistoryPath({ name, path: kgPath, type, categories, createdAt: new Date().toISOString(), lastUsed: new Date().toISOString() }, expandedPath);
+      fs.mkdirSync(chatHistoryDir, { recursive: true });
 
       // Create category subdirectories
       for (const cat of categories) {
