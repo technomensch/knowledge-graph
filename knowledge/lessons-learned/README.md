@@ -146,4 +146,4 @@ See [core/examples/lessons-learned/](../../examples/lessons-learned/) for filled
 - [Check Gitignore Before Migration Cleanup](patterns/Lessons_Learned_Patterns_Check_Gitignore_Before_Migration_Cleanup.md)
 - [Contamination Grep False-Positive — Require Preference Verb Context](patterns/Lessons_Learned_Patterns_Contamination_Grep_False_Positive_—_Require_Preference_Verb_Context.md)
 - [CLI Version Strings Must Read from package.json at Runtime](patterns/Lessons_Learned_Patterns_Cli_Version_Strings_Must_Read_From_Package.json_At_Runtime.md)
-- [Platform-Agnostic Rule Timing via triggers.md](architecture/Lessons_Learned_Architecture_Platform_Agnostic_Rule_Timing_Via_Triggers.md.md)
+- [Platform-Agnostic Rule Timing via triggers.md](architecture/Lessons_Learned_Architecture_Platform_Agnostic_Rule_Timing_Via_Triggers.md)
