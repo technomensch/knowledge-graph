@@ -1,5 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-export type ApplyCategory = "directories" | "config" | "templates" | "platform-split";
+export type ApplyCategory = "directories" | "config" | "templates" | "platform-split" | "chat-history-migration";
 export interface HandleUpgradeParams {
     apply?: ApplyCategory[];
     confirm_platform_split?: boolean;

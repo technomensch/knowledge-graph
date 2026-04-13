@@ -209,7 +209,44 @@ function checkPlatformSplit(kgPath: string): WarningItem | null {
   };
 }
 
+/**
+ * Check e — detect chat-history migration opportunity.
+ * Offered when chatHistoryPath is configured, differs from the default location,
+ * and the default location exists with content.
+ */
+function checkChatHistoryMigration(kgPath: string, graph: GraphConfig): UpgradeItem[] {
+  if (!graph.chatHistoryPath) return [];
+  const configuredPath = graph.chatHistoryPath.replace(/^~/, os.homedir());
+  const defaultPath = path.join(kgPath, "chat-history");
+  if (configuredPath === defaultPath) return [];
+  if (!fs.existsSync(defaultPath)) return [];
+  const entries = fs.readdirSync(defaultPath);
+  if (entries.length === 0) return [];
+  return [
+    {
+      category: "chat-history-migration",
+      description: `Found ${entries.length} item(s) in ${defaultPath} that can be migrated to configured chatHistoryPath: ${configuredPath}`,
+      details: `Run with apply: ["chat-history-migration"] to move contents to the configured path.`,
+    },
+  ];
+}
+
 // ── Apply helpers ────────────────────────────────────────────────────────────
+
+function applyChatHistoryMigration(kgPath: string, graph: GraphConfig): string {
+  if (!graph.chatHistoryPath) return "chatHistoryPath not configured; nothing to migrate";
+  const configuredPath = graph.chatHistoryPath.replace(/^~/, os.homedir());
+  const defaultPath = path.join(kgPath, "chat-history");
+  if (configuredPath === defaultPath) return "chatHistoryPath matches default path; nothing to migrate";
+  if (!fs.existsSync(defaultPath)) return "Default chat-history directory does not exist; nothing to migrate";
+  const entries = fs.readdirSync(defaultPath);
+  if (entries.length === 0) return "Default chat-history directory is empty; nothing to migrate";
+  fs.mkdirSync(configuredPath, { recursive: true });
+  for (const entry of entries) {
+    fs.renameSync(path.join(defaultPath, entry), path.join(configuredPath, entry));
+  }
+  return `Migrated ${entries.length} item(s) from ${defaultPath} to ${configuredPath}`;
+}
 
 function applyDirectories(kgPath: string, graph: GraphConfig): string {
   const standardDirs = ["knowledge", "lessons-learned", "decisions", "sessions", "tmp"];
@@ -345,7 +382,7 @@ function applyPlatformSplit(kgPath: string): string {
 
 // ── Exported handler for direct testing ──────────────────────────────────────
 
-export type ApplyCategory = "directories" | "config" | "templates" | "platform-split";
+export type ApplyCategory = "directories" | "config" | "templates" | "platform-split" | "chat-history-migration";
 
 export interface HandleUpgradeParams {
   apply?: ApplyCategory[];
@@ -385,6 +422,7 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
     result.upgrades.push(...checkDirectories(kgPath, config.graphs[config.active!]));
     result.upgrades.push(...checkConfig(kgPath));
     result.upgrades.push(...checkTemplates(kgPath));
+    result.upgrades.push(...checkChatHistoryMigration(kgPath, config.graphs[config.active!]));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
     return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
@@ -409,6 +447,9 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
           results.push(`[platform-split] ${applyPlatformSplit(kgPath)}`);
         }
         break;
+      case "chat-history-migration":
+        results.push(`[chat-history-migration] ${applyChatHistoryMigration(kgPath, config.graphs[config.active!])}`);
+        break;
     }
   }
 
@@ -423,11 +464,11 @@ export function registerUpgradeTool(server: McpServer): void {
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
       apply: z
-        .array(z.enum(["directories", "config", "templates", "platform-split"]))
+        .array(z.enum(["directories", "config", "templates", "platform-split", "chat-history-migration"]))
         .optional()
         .default([])
         .describe(
-          'Categories to apply. Omit or pass [] to inspect only. Values: "directories", "config", "templates", "platform-split"'
+          'Categories to apply. Omit or pass [] to inspect only. Values: "directories", "config", "templates", "platform-split", "chat-history-migration"'
         ),
       confirm_platform_split: z
         .boolean()

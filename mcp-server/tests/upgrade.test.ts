@@ -267,6 +267,20 @@ describe("T-7: apply directories", () => {
       expect(fs.existsSync(path.join(kgRoot, dir))).toBe(true);
     }
   });
+
+  test("T-7b: with chatHistoryPath set, apply directories creates custom path not default", async () => {
+    const kgRoot = makeTempDir("t7b");
+    const customChatHistory = makeTempDir("t7b-chat");
+    fs.rmdirSync(customChatHistory); // remove so it is "missing"
+    tempDirs.push(kgRoot);
+    scaffoldKgPartial(kgRoot);
+    mockActiveKg(kgRoot, { chatHistoryPath: customChatHistory });
+
+    await handleUpgrade({ apply: ["directories"] });
+
+    expect(fs.existsSync(customChatHistory)).toBe(true);
+    expect(fs.existsSync(path.join(kgRoot, "chat-history"))).toBe(false);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -457,6 +471,21 @@ describe("T-15: explicit empty apply array is inspect-only", () => {
     // dirs should NOT have been created
     expect(fs.existsSync(path.join(kgRoot, "sessions"))).toBe(false);
     expect(fs.existsSync(path.join(kgRoot, "chat-history"))).toBe(false);
+  });
+
+  test("T-15b: with chatHistoryPath set, missing custom path reported (not default path)", async () => {
+    const kgRoot = makeTempDir("t15b");
+    const customChatHistory = path.join(os.tmpdir(), `t15b-custom-chat-${Date.now()}`);
+    tempDirs.push(kgRoot);
+    scaffoldKgPartial(kgRoot);
+    mockActiveKg(kgRoot, { chatHistoryPath: customChatHistory });
+
+    const result = await handleUpgrade({ apply: [] });
+    const parsed = parseResult(result);
+    const dirItem = parsed.upgrades.find((u) => u.category === "directories");
+    expect(dirItem).toBeDefined();
+    expect(dirItem!.description).toContain(customChatHistory);
+    expect(dirItem!.description).not.toContain("chat-history ("+path.join(kgRoot, "chat-history")+")");
   });
 });
 
@@ -988,6 +1017,135 @@ describe("T-35: binary CLAUDE.md with NUL bytes — platform-split apply does no
     }
     // If isError, the tool refused to proceed — also acceptable
     expect(result.content[0].text).toBeDefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// T-36: chatHistoryPath set, old dir has content → migration item offered
+// ---------------------------------------------------------------------------
+
+describe("T-36: chat-history-migration offered when old dir has content", () => {
+  test("migration upgrade item appears when chatHistoryPath differs and old dir has files", async () => {
+    const kgRoot = makeTempDir("t36");
+    const customPath = path.join(os.tmpdir(), `t36-custom-chat-${Date.now()}`);
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    // Put a file in the default chat-history location
+    fs.writeFileSync(path.join(kgRoot, "chat-history", "old-chat.md"), "# old", "utf-8");
+    mockActiveKg(kgRoot, { chatHistoryPath: customPath });
+
+    const result = await handleUpgrade({});
+    const parsed = parseResult(result);
+    const migItem = parsed.upgrades.find((u) => u.category === "chat-history-migration");
+    expect(migItem).toBeDefined();
+    expect(migItem!.description).toContain(customPath);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// T-37: chatHistoryPath set but old dir missing → no migration item
+// ---------------------------------------------------------------------------
+
+describe("T-37: no migration item when old chat-history dir is absent", () => {
+  test("migration NOT offered when default chat-history does not exist", async () => {
+    const kgRoot = makeTempDir("t37");
+    const customPath = path.join(os.tmpdir(), `t37-custom-chat-${Date.now()}`);
+    tempDirs.push(kgRoot);
+    // Create kg without chat-history dir
+    for (const dir of ["knowledge", "lessons-learned", "decisions", "sessions", "tmp"]) {
+      fs.mkdirSync(path.join(kgRoot, dir), { recursive: true });
+    }
+    mockActiveKg(kgRoot, { chatHistoryPath: customPath });
+
+    const result = await handleUpgrade({});
+    const parsed = parseResult(result);
+    const migItem = parsed.upgrades.find((u) => u.category === "chat-history-migration");
+    expect(migItem).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// T-38: chatHistoryPath matches default → no migration item
+// ---------------------------------------------------------------------------
+
+describe("T-38: no migration item when chatHistoryPath matches default", () => {
+  test("migration NOT offered when configured path equals default path", async () => {
+    const kgRoot = makeTempDir("t38");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "chat-history", "chat.md"), "# chat", "utf-8");
+    // chatHistoryPath explicitly set to the default location
+    mockActiveKg(kgRoot, { chatHistoryPath: path.join(kgRoot, "chat-history") });
+
+    const result = await handleUpgrade({});
+    const parsed = parseResult(result);
+    const migItem = parsed.upgrades.find((u) => u.category === "chat-history-migration");
+    expect(migItem).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// T-39: apply: ["chat-history-migration"] moves files to configured path
+// ---------------------------------------------------------------------------
+
+describe("T-39: apply chat-history-migration moves files", () => {
+  test("files moved from default chat-history to chatHistoryPath", async () => {
+    const kgRoot = makeTempDir("t39");
+    const customPath = path.join(os.tmpdir(), `t39-custom-chat-${Date.now()}`);
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "chat-history", "session.md"), "# session", "utf-8");
+    mockActiveKg(kgRoot, { chatHistoryPath: customPath });
+
+    const result = await handleUpgrade({ apply: ["chat-history-migration"] });
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).toContain("[chat-history-migration]");
+    expect(result.content[0].text).toContain("Migrated 1");
+
+    expect(fs.existsSync(path.join(customPath, "session.md"))).toBe(true);
+    expect(fs.existsSync(path.join(kgRoot, "chat-history", "session.md"))).toBe(false);
+
+    // cleanup
+    fs.rmSync(customPath, { recursive: true, force: true });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// T-40: apply: ["chat-history-migration"] with empty old dir → no-op message
+// ---------------------------------------------------------------------------
+
+describe("T-40: apply chat-history-migration with empty old dir is a no-op", () => {
+  test("no-op message returned when default chat-history is empty", async () => {
+    const kgRoot = makeTempDir("t40");
+    const customPath = path.join(os.tmpdir(), `t40-custom-chat-${Date.now()}`);
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot); // chat-history dir exists but is empty
+    mockActiveKg(kgRoot, { chatHistoryPath: customPath });
+
+    const result = await handleUpgrade({ apply: ["chat-history-migration"] });
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).toContain("empty");
+    expect(fs.existsSync(customPath)).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// T-41: apply: ["chat-history-migration"] without chatHistoryPath → no-op message
+// ---------------------------------------------------------------------------
+
+describe("T-41: apply chat-history-migration without chatHistoryPath configured", () => {
+  test("no-op message returned when chatHistoryPath is not set", async () => {
+    const kgRoot = makeTempDir("t41");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "chat-history", "session.md"), "# session", "utf-8");
+    mockActiveKg(kgRoot); // no chatHistoryPath override
+
+    const result = await handleUpgrade({ apply: ["chat-history-migration"] });
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).toContain("not configured");
+    // Original file untouched
+    expect(fs.existsSync(path.join(kgRoot, "chat-history", "session.md"))).toBe(true);
   });
 });
 

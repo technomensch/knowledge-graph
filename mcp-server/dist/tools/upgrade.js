@@ -213,7 +213,50 @@ function checkPlatformSplit(kgPath) {
         flaggedLines: flagged,
     };
 }
+/**
+ * Check e — detect chat-history migration opportunity.
+ * Offered when chatHistoryPath is configured, differs from the default location,
+ * and the default location exists with content.
+ */
+function checkChatHistoryMigration(kgPath, graph) {
+    if (!graph.chatHistoryPath)
+        return [];
+    const configuredPath = graph.chatHistoryPath.replace(/^~/, os.homedir());
+    const defaultPath = path.join(kgPath, "chat-history");
+    if (configuredPath === defaultPath)
+        return [];
+    if (!fs.existsSync(defaultPath))
+        return [];
+    const entries = fs.readdirSync(defaultPath);
+    if (entries.length === 0)
+        return [];
+    return [
+        {
+            category: "chat-history-migration",
+            description: `Found ${entries.length} item(s) in ${defaultPath} that can be migrated to configured chatHistoryPath: ${configuredPath}`,
+            details: `Run with apply: ["chat-history-migration"] to move contents to the configured path.`,
+        },
+    ];
+}
 // ── Apply helpers ────────────────────────────────────────────────────────────
+function applyChatHistoryMigration(kgPath, graph) {
+    if (!graph.chatHistoryPath)
+        return "chatHistoryPath not configured; nothing to migrate";
+    const configuredPath = graph.chatHistoryPath.replace(/^~/, os.homedir());
+    const defaultPath = path.join(kgPath, "chat-history");
+    if (configuredPath === defaultPath)
+        return "chatHistoryPath matches default path; nothing to migrate";
+    if (!fs.existsSync(defaultPath))
+        return "Default chat-history directory does not exist; nothing to migrate";
+    const entries = fs.readdirSync(defaultPath);
+    if (entries.length === 0)
+        return "Default chat-history directory is empty; nothing to migrate";
+    fs.mkdirSync(configuredPath, { recursive: true });
+    for (const entry of entries) {
+        fs.renameSync(path.join(defaultPath, entry), path.join(configuredPath, entry));
+    }
+    return `Migrated ${entries.length} item(s) from ${defaultPath} to ${configuredPath}`;
+}
 function applyDirectories(kgPath, graph) {
     const standardDirs = ["knowledge", "lessons-learned", "decisions", "sessions", "tmp"];
     const created = [];
@@ -357,6 +400,7 @@ async function handleUpgrade(params) {
         result.upgrades.push(...checkDirectories(kgPath, config.graphs[config.active]));
         result.upgrades.push(...checkConfig(kgPath));
         result.upgrades.push(...checkTemplates(kgPath));
+        result.upgrades.push(...checkChatHistoryMigration(kgPath, config.graphs[config.active]));
         const platformWarning = checkPlatformSplit(kgPath);
         if (platformWarning)
             result.warnings.push(platformWarning);
@@ -382,6 +426,9 @@ async function handleUpgrade(params) {
                     results.push(`[platform-split] ${applyPlatformSplit(kgPath)}`);
                 }
                 break;
+            case "chat-history-migration":
+                results.push(`[chat-history-migration] ${applyChatHistoryMigration(kgPath, config.graphs[config.active])}`);
+                break;
         }
     }
     return { content: [{ type: "text", text: results.join("\n\n") }] };
@@ -390,10 +437,10 @@ async function handleUpgrade(params) {
 function registerUpgradeTool(server) {
     server.tool("kg_upgrade", "Inspect and apply KMGraph upgrades for MCP-only installations", {
         apply: zod_1.z
-            .array(zod_1.z.enum(["directories", "config", "templates", "platform-split"]))
+            .array(zod_1.z.enum(["directories", "config", "templates", "platform-split", "chat-history-migration"]))
             .optional()
             .default([])
-            .describe('Categories to apply. Omit or pass [] to inspect only. Values: "directories", "config", "templates", "platform-split"'),
+            .describe('Categories to apply. Omit or pass [] to inspect only. Values: "directories", "config", "templates", "platform-split", "chat-history-migration"'),
         confirm_platform_split: zod_1.z
             .boolean()
             .optional()
