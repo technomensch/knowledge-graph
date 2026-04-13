@@ -59,7 +59,7 @@ knowledge/lessons-learned/debugging/
 # Session summaries (always private)
 docs/sessions/
 knowledge/sessions/
-# Chat exports (always private)
+# Chat exports (always private — root chat-history/ entry covers co-located path outside vault)
 docs/chat-history/
 knowledge/chat-history/
 # Implementation plans (local only)

@@ -203,16 +203,20 @@ git commit -m "docs(adr): ADR-003 connection pooling strategy"
 **Claude Code:**
 
 ```bash
-python3 core/scripts/extract_claude.py
-# Output: chat-history/YYYY-MM/YYYY-MM-DD-claude.md
+python3 core/scripts/extract_claude.py --output-dir /path/to/chat-history
+# Output: /path/to/chat-history/YYYY-MM/YYYY-MM-DD-claude.md
 ```
 
 **Gemini/Antigravity:**
 
 ```bash
-python3 core/scripts/extract_gemini.py
-# Output: chat-history/YYYY-MM/YYYY-MM-DD-gemini.md
+python3 core/scripts/extract_gemini.py --output-dir /path/to/chat-history
+# Output: /path/to/chat-history/YYYY-MM/YYYY-MM-DD-gemini.md
 ```
+
+> **Note:** `chat-history/` defaults to `{kg_path}/chat-history` but can be placed outside the vault
+> by setting `chatHistoryPath` in `~/.claude/kg-config.json`. This is recommended when using Obsidian
+> to avoid indexing large markdown files.
 
 ### Review and Extract Knowledge
 

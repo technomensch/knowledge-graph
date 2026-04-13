@@ -10,7 +10,7 @@
 | `lessons-learned/` | Solved problems and non-obvious discoveries |
 | `decisions/` | Architecture Decision Records (ADRs) |
 | `sessions/` | Session summaries and working notes |
-| `chat-history/` | Exported AI conversation history |
+| `chat-history/` | Exported AI conversation history (may live outside vault — see `chatHistoryPath` in kg-config.json) |
 
 ## Key Files
 

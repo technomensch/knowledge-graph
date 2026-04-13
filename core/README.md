@@ -105,12 +105,15 @@ Extract chat history from platform log files:
 ```bash
 # Extract from Claude Code
 python3 core/scripts/extract_claude.py \
-  --output chat-history/
+  --output /path/to/chat-history/
 
 # Extract from Gemini
 python3 core/scripts/extract_gemini.py \
-  --output chat-history/
+  --output /path/to/chat-history/
 ```
+
+> `chat-history/` defaults to `{kg_path}/chat-history`. Set `chatHistoryPath` in `kg-config.json` to
+> store it outside the vault (recommended for Obsidian users).
 
 ### Knowledge Sync
 
