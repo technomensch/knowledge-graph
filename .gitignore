@@ -23,8 +23,7 @@ env/
 # IDE
 .vscode/
 .idea/
-docs/.obsidian/
-.obsidian/
+**/.obsidian/
 *.swp
 *.swo
 *~
@@ -42,6 +41,10 @@ dist/
 !mcp-server/dist/
 build/
 *.tgz
+
+# FTS5 SQLite databases (generated artifacts)
+**/.fts5.db
+**/.fts5.db-journal
 
 # Docusaurus cache (generated at build time)
 .docusaurus/
@@ -66,8 +69,6 @@ docs/tmp/
 knowledge/tmp/
 # Personal identity file (always private)
 knowledge/me.md
-# FTS5 search index (local only, rebuilt on demand)
-**/.fts5.db
 # Note: architecture/ and patterns/ are committed for team sharing
 
 # Note: reference/, examples/, and templates/ are now committed for Docusaurus

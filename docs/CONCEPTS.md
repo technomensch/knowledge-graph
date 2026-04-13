@@ -125,6 +125,17 @@ Regular notes are freeform and often lost or forgotten. A knowledge graph adds s
 - **Git-linked** — Lessons connect back to actual code changes
 - **AI-integrated** — Key patterns sync to MEMORY.md for cross-session persistence
 
+### "What are `me.md` and `rules.md`?"
+
+`me.md` and `rules.md` are platform-agnostic files scaffolded by `kmgraph init` that give any AI assistant consistent context about who you are and how you work — without locking you to a single platform.
+
+- **`knowledge/rules.md`** — Project conventions for all contributors: branch naming, commit format, workflow rules. Committed to the repo. Each entry supports a `Why:` annotation (one-sentence rationale) and a `Source:` backlink to the lesson or ADR that created the rule.
+- **`knowledge/me.md`** — Your identity in this project: working style, domain expertise, communication preferences. Gitignored — each contributor keeps their own.
+
+Both files have personal-scope mirrors at `~/.kmgraph/rules.md` and `~/.kmgraph/me.md` for cross-project context. Platform config files (CLAUDE.md, .cursorrules, etc.) become thin shims pointing at these files. This pattern is inspired by Nick Milo's [Obsidian ACE framework](https://youtu.be/jbHB-rzKBAs?si=nJGsbkfa7FKTDeyB).
+
+See [Portable AI Identity](/guides/me-and-rules) for the full setup guide.
+
 ### "How do cross-references work?"
 
 Cross-references in the knowledge graph follow the Obsidian wiki link convention (`[[...]]`), which enables navigation in compatible editors:
@@ -225,5 +236,5 @@ MEMORY.md works best under 200 lines. When it grows beyond that threshold:
 </div>
 ---
 
-**Version**: 0.3.3-beta
-**Last Updated**: 2026-04-07
+**Version**: 0.3.6-beta
+**Last Updated**: 2026-04-11

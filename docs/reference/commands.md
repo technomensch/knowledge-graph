@@ -5,7 +5,7 @@ sidebar_label: Commands
 description: Every KMGraph slash command — category, description, and key flags
 ---
 
-**Version:** 0.3.3-beta | All commands use the `/kmgraph:` prefix in Claude Code. Other platforms access equivalent functionality through `kg_*` MCP tools — see [INSTALL.md](../INSTALL.md) for details.
+**Version:** 0.3.6-beta | All commands use the `/kmgraph:` prefix in Claude Code. Other platforms access equivalent functionality through `kg_*` MCP tools — see [INSTALL.md](../INSTALL.md) for details.
 
 <img src="/img/demos/session-summary.gif" alt="KMGraph session-summary demo — snapshot of captured lessons and open plans" width="800" />
 
@@ -40,6 +40,7 @@ description: Every KMGraph slash command — category, description, and key flag
 | [`/kmgraph:session-summary`](#session-summary) | Summarize the active session; supports lightweight mid-session snapshot mode | `--auto`, `--snapshot`, `--snapshot --git` |
 | [`/kmgraph:extract-chat`](#extract-chat) | Export Claude and Gemini chat logs to dated markdown files | `--today`, `--date=YYYY-MM-DD`, `--after=`, `--before=`, `--project=`, `-claude`, `-gemini`, `--output-dir=` |
 | [`/kmgraph:handoff`](#handoff) | Generate a multi-file handoff package (START-HERE, DOCUMENTATION-MAP, OPEN-ISSUES, etc.) | `--output-dir=`, `--skip-sessions` |
+| [`/kmgraph:rules-capture`](#rules-capture) | Detect and route a behavioral correction to `rules.md` or `me.md` (project or personal scope) | — |
 
 **Examples:**
 ```bash

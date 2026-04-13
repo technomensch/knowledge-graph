@@ -43,6 +43,15 @@ Or paste the universal installer above for the same automated experience.
 :::
 ---
 
+:::note[Not using Claude Code?]
+
+The `commands/`, `skills/`, `agents/`, and `hooks/` directories in this repo are loaded exclusively
+by the Claude Code plugin system. Do not copy these directories if using Cursor, Windsurf,
+Continue.dev, JetBrains, VS Code, or any other tool — they will not work outside the plugin system.
+All cross-platform functionality is provided through the MCP server as `kg_*` tools.
+
+:::
+
 ## Platform Capabilities
 
 Users can install on multiple platforms with varying automation levels:
@@ -67,8 +76,31 @@ The installer sets up:
 
 - **Configuration file** — `~/.claude/kg-config.json` (stores knowledge graph locations and metadata)
 - **Directory structure** — `knowledge/`, `lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`
+- **Identity files** — `knowledge/me.md` (contributor identity, gitignored), `knowledge/rules.md` (project conventions, committed), and `knowledge/triggers.md` (rule timing, when each rule applies). See [Portable AI Identity](guides/me-and-rules.md).
+- **Wiki links** — Cross-references throughout the KG are converted to Obsidian `[[wiki link]]` format, enabling graph view navigation in Obsidian and compatible editors
 - **MCP server** — Provides knowledge graph tools for non-Claude-Code platforms
 - **Templates** — Starter scaffolds for capturing lessons and decisions
+
+---
+
+## Upgrade Checks
+
+When running `/kmgraph:init` on an existing installation, the wizard inspects your setup and reports what it finds:
+
+| Check | What it looks for |
+|-------|-------------------|
+| **a. Directories** | Missing subdirectories (`knowledge/`, `decisions/`, `sessions/`, etc.) |
+| **b. Config fields** | Missing fields in `~/.claude/kg-config.json` introduced in newer versions |
+| **c. Templates** | Template files that have been updated or added since your install |
+| **d. Platform split** | Claude-specific tool directives in `knowledge/rules.md` that belong in `CLAUDE.md` |
+| **e. Wiki pass** | Bare `ADR-NNN`, `ENH-NNN`, `#NNN`, and lesson filename references not yet converted to `[[wiki links]]` — runs once per KG, skipped on re-run if already complete |
+| **f. Docs migration** | `docs/enhancements/` or `docs/issues/` subdirectories that should be moved into the knowledge graph structure |
+| **g. FTS5 cleanup** | Stale in-project FTS5 index files (`knowledge/fts5/`) left behind by older versions |
+| **h. Identity scaffold** | Missing `me.md`, `rules.md`, or `triggers.md` — presents a dry-run preview, scans existing platform files (CLAUDE.md, GEMINI.md, .cursorrules, etc.), README, ADRs, and sessions to pre-populate recommendations, then archives any originals before writing |
+
+:::note Re-running the wizard
+`/kmgraph:init` is safe to re-run at any time. It skips steps already complete and only offers items still pending for your install.
+:::
 
 ---
 

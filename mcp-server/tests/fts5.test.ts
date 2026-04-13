@@ -10,6 +10,9 @@ import {
   searchFts5,
   getDbPath,
   getFTS5DbPath,
+  getPersonalDbPath,
+  getProjectDbPath,
+  resolveDbPath,
   resolveContentRoot,
   FTS5_DB_FILENAME,
 } from "../src/tools/fts5.js";
@@ -242,7 +245,7 @@ describe("searchFts5", () => {
     // Build index
     rebuildIndex(kgRoot, "search-shape");
 
-    const dbPath = getFTS5DbPath("search-shape");
+    const dbPath = getProjectDbPath("search-shape");
     const results = searchFts5(dbPath, "authentication", kgRoot);
 
     expect(results.length).toBeGreaterThan(0);
@@ -273,7 +276,7 @@ describe("searchFts5", () => {
     writeMd(path.join(kgRoot, "knowledge"), "test.md", "# Test\nSome content.");
     rebuildIndex(kgRoot, "search-empty");
 
-    const dbPath = getFTS5DbPath("search-empty");
+    const dbPath = getProjectDbPath("search-empty");
 
     // Empty query — sanitizeFts5Query returns '""' which FTS5 handles
     // Should not throw
@@ -301,23 +304,22 @@ describe("corrupt database", () => {
 });
 
 // ---------------------------------------------------------------------------
-// TC-001: DB is created at ~/.claude/kg-fts5/{name}.db on first rebuild
+// TC-001: DB is created at ~/.kmgraph/index/ on first rebuild
 // ---------------------------------------------------------------------------
 
 describe("getFTS5DbPath", () => {
-  test("TC-001: DB created at ~/.claude/kg-fts5/{name}.db on first rebuild", () => {
+  test("TC-001: DB created at ~/.kmgraph/index/ on first rebuild", () => {
     const kgRoot = makeTempDir("tc-001-db-path");
     tempDirs.push(kgRoot);
     scaffoldKg(kgRoot);
 
     writeMd(path.join(kgRoot, "knowledge"), "test.md", "# Test\nContent");
 
-    // Rebuild should use getFTS5DbPath internally
+    // Rebuild should use resolveDbPath internally
     const result = rebuildIndex(kgRoot, "test-kg-001");
 
     // Verify DB path in result
-    expect(result.db_path).toContain(".claude");
-    expect(result.db_path).toContain("kg-fts5");
+    expect(result.db_path).toContain(".kmgraph/index");
     expect(result.db_path).toContain("test-kg-001.db");
 
     // Verify file actually exists
@@ -328,12 +330,11 @@ describe("getFTS5DbPath", () => {
     expect(result.db_path).toContain(homeDir);
   });
 
-  test("getFTS5DbPath creates ~/.claude/kg-fts5 directory if missing", () => {
+  test("getFTS5DbPath creates ~/.kmgraph/index directory if missing", () => {
     const dbPath = getFTS5DbPath("test-kg-dir-creation");
     const dirPath = path.dirname(dbPath);
 
     expect(fs.existsSync(dirPath)).toBe(true);
-    expect(dirPath).toContain("kg-fts5");
     expect(fs.statSync(dirPath).isDirectory()).toBe(true);
   });
 });
@@ -413,9 +414,9 @@ describe("Multiple KGs with separate DBs", () => {
     const result1 = rebuildIndex(projRoot1, "kg-instance-1");
     const result2 = rebuildIndex(projRoot2, "kg-instance-2");
 
-    // Both should have DB at ~/.claude/kg-fts5/
-    expect(result1.db_path).toContain("kg-fts5");
-    expect(result2.db_path).toContain("kg-fts5");
+    // Both should have DB at ~/.kmgraph/index/
+    expect(result1.db_path).toContain(".kmgraph/index");
+    expect(result2.db_path).toContain(".kmgraph/index");
 
     // But with different filenames
     expect(result1.db_path).not.toBe(result2.db_path);
@@ -464,7 +465,7 @@ describe("DB file location independence", () => {
     // DB should be in user's home, not in project
     expect(result.db_path).not.toContain(kgRoot);
     expect(result.db_path).toContain(os.homedir());
-    expect(result.db_path).toContain(".claude/kg-fts5");
+    expect(result.db_path).toContain(".kmgraph/index");
 
     // Verify by checking path structure
     const dbDir = path.dirname(result.db_path);
@@ -498,7 +499,7 @@ describe("DB file location independence", () => {
 // ---------------------------------------------------------------------------
 
 describe(".gitignore patterns", () => {
-  test("TC-009: .gitignore does not contain .fts5.db pattern (DB lives in ~/.claude/kg-fts5/)", () => {
+  test("TC-009: .gitignore does not contain .fts5.db or kg-fts5 patterns (DB lives in ~/.kmgraph/index/)", () => {
     const gitignorePath = path.join(
       process.cwd(),
       "..",
@@ -507,9 +508,51 @@ describe(".gitignore patterns", () => {
 
     const content = fs.readFileSync(gitignorePath, "utf-8");
 
-    // DB now lives at ~/.claude/kg-fts5/{name}.db — outside the project.
+    // DB now lives at ~/.kmgraph/index/ — outside the project.
     // No gitignore entry is needed or correct.
     expect(content).not.toContain(".fts5.db");
     expect(content).not.toContain("kg-fts5");
+
+    // ~/.kmgraph is a user-level directory and must NOT appear in .gitignore
+    expect(content).not.toContain(".kmgraph");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getPersonalDbPath
+// ---------------------------------------------------------------------------
+
+describe("getPersonalDbPath", () => {
+  it("returns ~/.kmgraph/index/personal.db", () => {
+    const result = getPersonalDbPath();
+    expect(result).toContain(path.join(".kmgraph", "index", "personal.db"));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getProjectDbPath
+// ---------------------------------------------------------------------------
+
+describe("getProjectDbPath", () => {
+  it("returns ~/.kmgraph/index/projects/<name>.db", () => {
+    const result = getProjectDbPath("my-kg");
+    expect(result).toContain(
+      path.join(".kmgraph", "index", "projects", "my-kg.db")
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// resolveDbPath
+// ---------------------------------------------------------------------------
+
+describe("resolveDbPath", () => {
+  it("routes personal to personal.db", () => {
+    expect(resolveDbPath("any", "personal")).toContain("personal.db");
+  });
+  it("routes project-local to projects/<name>.db", () => {
+    expect(resolveDbPath("my-kg", "project-local")).toContain(
+      path.join("projects", "my-kg.db")
+    );
   });
 });

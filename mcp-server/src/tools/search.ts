@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import { readConfig, getActiveGraphPath, getAllGraphPaths, walkDir } from "../utils.js";
-import { searchFts5, getFTS5DbPath } from "./fts5.js";
+import { searchFts5, resolveDbPath } from "./fts5.js";
 import type { SearchResult } from "./fts5.js";
 
 function searchFile(
@@ -65,7 +65,7 @@ function searchKg(
     return { results: [], usingFts5: false };
   }
 
-  const dbPath = getFTS5DbPath(kgName);
+  const dbPath = resolveDbPath(kgName, kgType);
   let results: SearchResult[];
   let usingFts5 = false;
 
