@@ -34,12 +34,18 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FTS5_DB_FILENAME = void 0;
+exports.getFTS5DbPath = getFTS5DbPath;
+exports.getPersonalDbPath = getPersonalDbPath;
+exports.getProjectDbPath = getProjectDbPath;
+exports.resolveDbPath = resolveDbPath;
+exports.resolveContentRoot = resolveContentRoot;
 exports.getDbPath = getDbPath;
 exports.sanitizeFts5Query = sanitizeFts5Query;
 exports.initDb = initDb;
 exports.indexFile = indexFile;
 exports.rebuildIndex = rebuildIndex;
 exports.searchFts5 = searchFts5;
+exports.registerFts5StatusTool = registerFts5StatusTool;
 exports.registerFts5Tool = registerFts5Tool;
 const zod_1 = require("zod");
 const fs = __importStar(require("fs"));
@@ -63,10 +69,63 @@ catch {
 // ---------------------------------------------------------------------------
 exports.FTS5_DB_FILENAME = ".fts5.db";
 // ---------------------------------------------------------------------------
+// Path helpers
+// ---------------------------------------------------------------------------
+/**
+ * Returns the absolute path to the user-level FTS5 database for a given KG name.
+ * Stored in ~/.claude/kg-fts5/<kgName>.db (outside project directories).
+ * Creates the directory if it does not exist.
+ * @deprecated Use resolveDbPath(kgName, "project-local") — DB now at ~/.kmgraph/index/
+ */
+function getFTS5DbPath(kgName) {
+    const dir = path.join(os.homedir(), ".claude", "kg-fts5");
+    fs.mkdirSync(dir, { recursive: true });
+    return path.join(dir, `${kgName}.db`);
+}
+function getPersonalDbPath() {
+    const dir = path.join(os.homedir(), ".kmgraph", "index");
+    fs.mkdirSync(dir, { recursive: true });
+    return path.join(dir, "personal.db");
+}
+function getProjectDbPath(kgName) {
+    // TODO(v0.3.7): name collision risk — two repos with the same kgName share this file.
+    // Future: use a registry with stable content-hash IDs as filenames.
+    const dir = path.join(os.homedir(), ".kmgraph", "index", "projects");
+    fs.mkdirSync(dir, { recursive: true });
+    return path.join(dir, `${kgName}.db`);
+}
+/**
+ * Central dispatcher: routes to personal.db or projects/<kgName>.db based on kgType.
+ * Note: kgName is ignored when kgType is "personal" (personal DB is a fixed singleton path).
+ */
+function resolveDbPath(kgName, kgType) {
+    if (kgType === "personal")
+        return getPersonalDbPath();
+    if (kgType === "project-local" || kgType === "project")
+        return getProjectDbPath(kgName);
+    // Unknown type — default to project-local with a console warning
+    console.warn(`resolveDbPath: unknown kgType "${kgType}", defaulting to project-local`);
+    return getProjectDbPath(kgName);
+}
+/**
+ * Resolves the content root for a KG path.
+ * If the KG contains a docs/lessons-learned subdirectory (v0.2+ layout),
+ * returns the docs/ directory so that lessons-learned, decisions, and sessions
+ * are found under docs/. Otherwise falls back to kgPath itself.
+ */
+function resolveContentRoot(kgPath) {
+    const docsLessons = path.join(kgPath, "docs", "lessons-learned");
+    if (fs.existsSync(docsLessons)) {
+        return path.join(kgPath, "docs");
+    }
+    return kgPath;
+}
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 /**
  * Returns the absolute path to the FTS5 database for a given KG root.
+ * @deprecated Use getFTS5DbPath(kgName) instead — stores DB in user-level cache.
  */
 function getDbPath(kgPath) {
     return path.join(kgPath, exports.FTS5_DB_FILENAME);
@@ -92,6 +151,10 @@ function sanitizeFts5Query(raw) {
  * not already exist.
  */
 function initDb(db) {
+    // WAL mode: safe for concurrent readers during rebuild
+    db.run("PRAGMA journal_mode=WAL;");
+    // Schema version stamp for future migration detection
+    db.run("PRAGMA user_version = 1;");
     db.exec(`
     CREATE VIRTUAL TABLE IF NOT EXISTS kg_entries USING fts5(
       file_path UNINDEXED,
@@ -219,20 +282,22 @@ function indexFile(db, filePath, kgPath) {
  * - Removes index rows for files that no longer exist on disk.
  * - Skips files that haven't changed.
  */
-function rebuildIndex(kgPath) {
+function rebuildIndex(kgPath, kgName, kgType = "project-local") {
     if (!fts5Available) {
         throw new Error("FTS5 search engine not available. Restart Claude Code to complete the upgrade installation.");
     }
     const start = Date.now();
-    const dbPath = getDbPath(kgPath);
+    const dbPath = resolveDbPath(kgName, kgType);
     const db = new Database(dbPath);
     try {
         initDb(db);
+        // Resolve content root: v0.2+ KGs store content under docs/
+        const contentRoot = resolveContentRoot(kgPath);
         // Collect all .md files from target subdirectories
         const searchDirs = ["knowledge", "lessons-learned", "decisions", "sessions"];
         const allFiles = [];
         for (const dir of searchDirs) {
-            const dirPath = path.join(kgPath, dir);
+            const dirPath = path.join(contentRoot, dir);
             allFiles.push(...(0, utils_js_1.walkDir)(dirPath, ".md"));
         }
         let indexed = 0;
@@ -307,6 +372,55 @@ function searchFts5(dbPath, query, kgPath) {
 // MCP tool registration
 // ---------------------------------------------------------------------------
 /**
+ * Registers the `kg_fts5_status` MCP tool.
+ * Returns { exists: boolean, db_path: string, kgType: string } — read-only probe,
+ * never creates directories.
+ */
+function registerFts5StatusTool(server) {
+    server.tool("kg_fts5_status", "Check whether the FTS5 search index exists for the active knowledge graph. " +
+        "Returns { exists, db_path, kgType }. Read-only — does not create or modify the index.", {}, async () => {
+        try {
+            const config = (0, utils_js_1.readConfig)();
+            const activeName = config.active;
+            if (!activeName) {
+                return {
+                    content: [{
+                            type: "text",
+                            text: JSON.stringify({ exists: false, db_path: null, kgType: null, error: "No active KG" }),
+                        }],
+                };
+            }
+            const graph = config.graphs[activeName];
+            const kgType = graph?.type ?? "project-local";
+            // resolveDbPath normally creates dirs — for status we compute the path without creating anything
+            let dbPath;
+            if (kgType === "personal") {
+                dbPath = path.join(os.homedir(), ".kmgraph", "index", "personal.db");
+            }
+            else {
+                dbPath = path.join(os.homedir(), ".kmgraph", "index", "projects", `${activeName}.db`);
+            }
+            const exists = fs.existsSync(dbPath);
+            return {
+                content: [{
+                        type: "text",
+                        text: JSON.stringify({ exists, db_path: dbPath, kgType }),
+                    }],
+            };
+        }
+        catch (err) {
+            const message = err instanceof Error ? err.message : String(err);
+            return {
+                content: [{
+                        type: "text",
+                        text: `Error checking FTS5 status: ${message}`,
+                    }],
+                isError: true,
+            };
+        }
+    });
+}
+/**
  * Registers the `kg_fts5_rebuild` MCP tool.
  */
 function registerFts5Tool(server) {
@@ -331,8 +445,12 @@ function registerFts5Tool(server) {
         try {
             const config = (0, utils_js_1.readConfig)();
             let resolvedPath;
+            let resolvedName;
             if (kgPath) {
                 resolvedPath = kgPath.replace(/^~/, os.homedir());
+                // Find the matching KG name from config, or derive from path basename
+                const matchedEntry = Object.entries(config.graphs || {}).find(([, g]) => g.path === resolvedPath);
+                resolvedName = matchedEntry ? matchedEntry[0] : path.basename(resolvedPath);
             }
             else {
                 const activePath = (0, utils_js_1.getActiveGraphPath)(config);
@@ -348,6 +466,7 @@ function registerFts5Tool(server) {
                     };
                 }
                 resolvedPath = activePath;
+                resolvedName = config.active;
             }
             if (!fs.existsSync(resolvedPath)) {
                 return {
@@ -360,7 +479,10 @@ function registerFts5Tool(server) {
                     isError: true,
                 };
             }
-            const result = rebuildIndex(resolvedPath);
+            // Determine kgType for the resolved graph
+            const graphEntry = config.graphs[resolvedName];
+            const resolvedType = graphEntry?.type ?? "project-local";
+            const result = rebuildIndex(resolvedPath, resolvedName, resolvedType);
             // Update config to mark FTS5 as enabled, remove declined flag
             if (config.active && config.graphs[config.active]) {
                 const graph = config.graphs[config.active];

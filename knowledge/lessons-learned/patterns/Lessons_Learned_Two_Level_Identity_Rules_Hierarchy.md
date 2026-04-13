@@ -14,10 +14,14 @@ git:
   issue: null
 
 sources:
-  - url: "https://www.youtube.com/watch?v=example"
-    title: "Nick Milo — AI OS Framework (Obsidian-ACE)"
+  - url: "https://youtu.be/jbHB-rzKBAs?si=nJGsbkfa7FKTDeyB"
+    title: "Nick Milo — Obsidian ACE Framework"
     accessed: "2026-04-09"
-    context: "Inspired the separation of identity from behavioral rules"
+    context: "Inspired the separation of identity from behavioral rules; platform files as thin shims"
+  - url: "https://youtu.be/sboNwYmH3AY?si=NC0woU_9KIigqSR2"
+    title: "Nick Milo — Building Your AI OS"
+    accessed: "2026-04-09"
+    context: "me.md as portable identity: 'here's who I am, how I think, how I want you to work with me'"
 
 tags: [identity, rules, hierarchy, context-files, agent-design, platform-portability, gitignore, me.md, rules.md, CLAUDE.md, shim]
 

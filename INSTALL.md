@@ -10,6 +10,14 @@ You are installing the **Knowledge Management Graph** — a system for capturing
 
 ---
 
+> **Note:** The `commands/`, `skills/`, `agents/`, and `hooks/` directories are loaded exclusively
+> by the Claude Code plugin system. If you are using Cursor, Windsurf, Continue.dev, JetBrains,
+> VS Code, or any other tool, do not copy these directories — they will not work outside the plugin
+> system. All cross-platform functionality is available through the MCP server as `kg_*` tools.
+> Non-Claude-Code users: skip to **Step 2B**.
+
+---
+
 ### Step 0: Verify Shell Access
 
 This installer requires shell access to your local directory. You'll need to grant
@@ -78,6 +86,36 @@ After cleanup, re-run the scan to confirm zero results, then proceed to Step 1.
 **Note:** Claude Code may cache the extension registry between sessions — restart Claude Code
 after uninstalling before verifying.
 
+**If using Claude Code — also check for manually-copied command files:**
+
+```bash
+echo "=== Manual command file conflicts (Claude Code only) ==="
+COMMANDS_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/commands"
+REPO_DIR="$(git rev-parse --show-toplevel 2>/dev/null || echo .)"
+conflicts=0
+for f in "$REPO_DIR/commands"/*.md; do
+  [ -f "$f" ] || continue
+  name=$(basename "$f" .md)
+  [ -f "$COMMANDS_DIR/$name.md" ] && echo "CONFLICT: $COMMANDS_DIR/$name.md" && conflicts=$((conflicts+1))
+done
+[ $conflicts -eq 0 ] && echo "None found"
+```
+
+**If output is empty → skip to Step 1.**
+
+**If conflicts found:**
+
+These files were manually copied without the `kmgraph:` namespace prefix and will conflict with your existing commands. They are safe to remove — the plugin install does not touch `~/.claude/commands/` and existing commands will not be affected.
+
+To fix:
+```bash
+# Remove each conflicting file (replace with actual paths from output above)
+rm ~/.claude/commands/<name>.md
+
+# Then install via the plugin system (commands are auto-namespaced as /kmgraph:*)
+claude plugin install kmgraph
+```
+
 ---
 
 ## Step 0.6: Upgrading from a Previous Version (Skip if first install)
@@ -115,6 +153,11 @@ The inspector runs four checks in order and reports what it finds before asking 
 | **b. Config fields** | Missing fields in `~/.claude/kg-config.json` introduced in newer versions |
 | **c. Templates** | Template files that have been updated or added since your install |
 | **d. Platform split** | Claude-specific tool directives in `knowledge/rules.md` that belong in `CLAUDE.md` |
+| **e. Wiki pass** | Bare `ADR-NNN`, `ENH-NNN`, `#NNN`, and lesson filename references not yet converted to `[[wiki links]]` — runs once per KG, skipped on re-run if already complete |
+
+> **Re-running the wizard:** `/kmgraph:init` is safe to re-run at any time. It skips
+> steps already complete (wiki pass, platform config, post-commit hook) and only
+> offers items that are still pending for your install.
 
 ---
 
@@ -129,6 +172,12 @@ Apply all, pick individually, or skip?
   3. Skip — my setup is already how I want it
 ```
 
+**To preview all changes at once before anything is written:** choose **option 0** at the Apply/Choose/Skip menu, or invoke the command with the `--preview` flag:
+```
+/kmgraph:init --preview
+```
+The preview shows dirs that would be created, config field diffs, template diffs (line-by-line), and section-d lines with their target location — then prints "X changes would be applied. Nothing was written." and returns to the Apply/Choose/Skip menu.
+
 **To preview each change individually:** choose option 2. Each upgrade item is presented as a separate yes/no prompt — you see what it will do before it runs.
 
 **For the platform-split migration (check d) specifically:** even after choosing "Apply all", the wizard shows you the exact lines it detected in `rules.md` and offers three options before touching any file:
@@ -139,13 +188,13 @@ Apply all, pick individually, or skip?
 ```
 Option **b** lets you review and act on your own — nothing is written.
 
-> **Note:** A full dry-run mode (preview all changes with a diff, no prompts, no writes) is planned for v0.3.6.
+> **Full dry-run mode** is available: run `/kmgraph:init --preview`, or choose **option 0** at the Apply/Choose/Skip menu. The preview shows exactly what would change for each item — no files are written until you choose option 1 or 2 and confirm.
 
 ---
 
 ### What gets backed up
 
-Before any content migration runs, the wizard archives the affected files to a timestamped restore point at `{KG_PATH}/.kg-archive-YYYYMMDD-HHMMSS/`. If anything goes wrong, you can restore manually from that directory. A formal `/kmgraph:migration rollback` command is planned for v0.3.6.
+Before any content migration runs, the wizard archives the affected files to a timestamped restore point at `{KG_PATH}/.kg-archive-YYYYMMDD-HHMMSS/`. If anything goes wrong, you can restore manually from that directory. Run `/kmgraph:migration rollback <id>` to restore from any archive. Use `/kmgraph:migration list` to see available restore points.
 
 ---
 
@@ -268,7 +317,7 @@ After installing, restart Claude Code. No further configuration is needed — km
 
 ### Step 2B: MCP IDE Installation (Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Claude Desktop)
 
-This path installs the MCP server, which provides 8 tools for knowledge management: `kg_config_init`, `kg_config_list`, `kg_config_switch`, `kg_config_add_category`, `kg_search`, `kg_scaffold`, `kg_check_sensitive`, and `kg_fts5_rebuild` (build or refresh a search index for faster, relevance-ranked results).
+This path installs the MCP server, which provides 8 tools for knowledge management: `kg_config_init`, `kg_config_list`, `kg_config_switch`, `kg_config_add_category`, `kg_search`, `kg_scaffold`, `kg_check_sensitive`, and `kg_fts5_rebuild` (build or refresh a search index for faster, relevance-ranked results). Builds a dual-DB index stored at `~/.kmgraph/index/personal.db` (personal KG) or `~/.kmgraph/index/projects/<name>.db` (project KG).
 
 #### 2B.1: Check Prerequisites
 

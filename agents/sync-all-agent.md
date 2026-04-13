@@ -202,20 +202,20 @@ If `--dry-run`: Show the comment that would be posted.
 
 ## Step 8: Refresh FTS5 Search Index
 
-Check for existing native search index:
+Call `kg_fts5_status` to check whether the search index exists for the active KG.
 
-**If `.fts5.db` exists in active KG root:**
+**If `exists === true`:**
 - Call `kg_fts5_rebuild` to refresh (no prompt, automatic)
 - Output: "FTS5 index: refreshed (N files updated, M skipped)"
 
-**If no `.fts5.db` AND user has not previously declined:**
-- Check `~/.claude/kg-config.json` for `fts5_declined` flag
+**If `exists === false` AND `fts5_declined` is not true:**
+- Check `~/.claude/kg-config.json` for `graphs[<activeName>].fts5_declined`
 - Unless `--auto`: ask "No search index found. Build FTS5 index for faster /kmgraph:recall? [y/n]"
 - If `--auto`: skip silently
 
-**If user previously declined:** Skip silently.
+**If `fts5_declined` is true:** Skip silently.
 
-If `--dry-run`: Report index status without rebuilding.
+If `--dry-run`: Report the `kg_fts5_status` result without rebuilding.
 
 ---
 

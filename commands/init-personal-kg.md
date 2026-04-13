@@ -130,6 +130,13 @@ Parameters:
 
 When deploying `me.md` to the personal KG, strip the "See also: ~/.kmgraph/me.md" line — it is a project-KG cross-reference that points to itself when deployed as the personal KG's own me.md.
 
+After `template-seed.md` completes, also scaffold `triggers.md` if it does not already exist:
+
+```bash
+[ -f "{KG_PATH}/triggers.md" ] || cp "{TEMPLATE_PATH}/knowledge/triggers.md" "{KG_PATH}/triggers.md"
+echo "✅ triggers.md scaffolded at {KG_PATH}/triggers.md"
+```
+
 ---
 
 ### Step 5: Register in config

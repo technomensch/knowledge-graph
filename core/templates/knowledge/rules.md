@@ -1,3 +1,7 @@
+---
+kmgraph_schema: 2
+---
+
 # Rules — [Project Name]
 
 <!-- Why/Source evidence backlink pattern -->
