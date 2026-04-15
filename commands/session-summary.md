@@ -46,6 +46,21 @@ Use the default (no flag) for typical single-session, single-branch work.
 
 ---
 
+## Level Routing Detection
+
+Before dispatching to any agent, detect the level signal from the user's invocation and resolve it to an explicit flag.
+
+**Invoke `gov-capture-routing` skill** to:
+1. Detect level signal from the user's message (NL patterns or explicit flags)
+2. Resolve `$level`, `$target_kg`, `$target_path`, `$restore_kg`
+3. Handle prompts if needed (named KG not found, no project KG configured, conflict resolution)
+
+The resolved flag (`--user`, `--project`, `--named=<kg>`, or `--active`) is then passed to the agent invocation in the Dispatch section below.
+
+**Pass-through with `--delegate`:** If `--delegate` is present, pass both the level flag AND `$target_kg` to the `session-documenter` invocation.
+
+---
+
 ## Dispatch
 
 Evaluate the flags provided:
