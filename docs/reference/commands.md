@@ -5,7 +5,7 @@ sidebar_label: Commands
 description: Every KMGraph slash command — category, description, and key flags
 ---
 
-**Version:** 0.3.6-beta | All commands use the `/kmgraph:` prefix in Claude Code. Other platforms access equivalent functionality through `kg_*` MCP tools — see [INSTALL.md](../INSTALL.md) for details.
+**Version:** 0.3.9-beta | All commands use the `/kmgraph:` prefix in Claude Code. Other platforms access equivalent functionality through `kg_*` MCP tools — see [INSTALL.md](../INSTALL.md) for details.
 
 <img src="/img/demos/session-summary.gif" alt="KMGraph session-summary demo — snapshot of captured lessons and open plans" width="800" />
 
@@ -17,8 +17,8 @@ description: Every KMGraph slash command — category, description, and key flag
 |---|---|---|
 | [`/kmgraph:init`](#init) | Initialize a new knowledge graph with wizard-based setup | — |
 | [`/kmgraph:status`](#status) | Display active KG health, file counts, and warnings | `--minimal`, `--json` |
-| [`/kmgraph:recall`](#recall) | Full-text search across lessons, ADRs, KG entries, sessions, and MEMORY.md | `--scope=all\|active\|personal-only`, `--format=detailed\|paths` |
-| [`/kmgraph:capture-lesson`](#capture-lesson) | Guided interview to document a problem solved, pattern discovered, or bug fixed | — |
+| [`/kmgraph:recall`](#recall) | Full-text search across lessons, ADRs, KG entries, sessions, and MEMORY.md | `--scope=all\|active\|personal-only`, `--user`, `--project`, `--named=<kg>`, `--format=detailed\|paths` |
+| [`/kmgraph:capture-lesson`](#capture-lesson) | Guided interview to document a problem solved, pattern discovered, or bug fixed | `--user`, `--project`, `--named=<kg>` |
 
 **Examples:**
 ```bash
@@ -35,9 +35,9 @@ description: Every KMGraph slash command — category, description, and key flag
 
 | Command | Description | Key flags |
 |---|---|---|
-| [`/kmgraph:capture-lesson`](#capture-lesson) | Document lessons learned with git metadata, duplicate detection, and optional KG extraction | — |
-| [`/kmgraph:create-adr`](#create-adr) | Create Architecture Decision Records with auto-numbering and index update | — |
-| [`/kmgraph:session-summary`](#session-summary) | Summarize the active session; supports lightweight mid-session snapshot mode | `--auto`, `--snapshot`, `--snapshot --git` |
+| [`/kmgraph:capture-lesson`](#capture-lesson) | Document lessons learned with git metadata, duplicate detection, and optional KG extraction | `--user`, `--project`, `--named=<kg>` |
+| [`/kmgraph:create-adr`](#create-adr) | Create Architecture Decision Records with auto-numbering and index update | `--user`, `--project`, `--named=<kg>` |
+| [`/kmgraph:session-summary`](#session-summary) | Summarize the active session; supports lightweight mid-session snapshot mode | `--auto`, `--snapshot`, `--snapshot --git`, `--user`, `--project`, `--named=<kg>` |
 | [`/kmgraph:extract-chat`](#extract-chat) | Export Claude and Gemini chat logs to dated markdown files | `--today`, `--date=YYYY-MM-DD`, `--after=`, `--before=`, `--project=`, `-claude`, `-gemini`, `--output-dir=` |
 | [`/kmgraph:handoff`](#handoff) | Generate a multi-file handoff package (START-HERE, DOCUMENTATION-MAP, OPEN-ISSUES, etc.) | `--output-dir=`, `--skip-sessions` |
 | [`/kmgraph:rules-capture`](#rules-capture) | Detect and route a behavioral correction to `rules.md` or `me.md` (project or personal scope) | — |
@@ -57,17 +57,19 @@ description: Every KMGraph slash command — category, description, and key flag
 
 | Command | Description | Key flags |
 |---|---|---|
-| [`/kmgraph:recall`](#recall) | Search all project memory systems; automatically includes personal KG when registered | `--scope=all\|active\|personal-only`, `--format=detailed\|paths` |
+| [`/kmgraph:recall`](#recall) | Search all project memory systems; automatically includes personal KG when registered | `--scope=all\|active\|personal-only`, `--user`, `--project`, `--named=<kg>`, `--format=detailed\|paths` |
 | [`/kmgraph:status`](#status) | High-level KG overview: file counts, last sync, MEMORY.md warnings | `--minimal`, `--json` |
 | [`/kmgraph:update-graph`](#update-graph) | Extract structured patterns from lessons and sync to knowledge graph entries | `--lesson=<file>`, `--auto`, `--interactive` |
-| [`/kmgraph:sync-all`](#sync-all) | Run the full sync pipeline: extract → update → MEMORY.md → plan → GitHub | `--auto`, `--dry-run` |
+| [`/kmgraph:sync-all`](#sync-all) | Run the full sync pipeline: extract → update → MEMORY.md → plan → GitHub | `--auto`, `--dry-run`, `--user`, `--project`, `--named=<kg>` |
 
 **Examples:**
 ```bash
 /kmgraph:recall "workflow patterns" --scope=personal-only
+/kmgraph:recall "auth patterns" --user
 /kmgraph:update-graph --auto
 /kmgraph:update-graph --lesson=Pattern_Discovery.md
 /kmgraph:sync-all --dry-run
+/kmgraph:sync-all --user
 ```
 
 ---
@@ -76,7 +78,7 @@ description: Every KMGraph slash command — category, description, and key flag
 
 | Command | Description | Key flags |
 |---|---|---|
-| [`/kmgraph:session-summary`](#session-summary) | Create or append a session summary; snapshot mode skips the review gate | `--auto`, `--snapshot` |
+| [`/kmgraph:session-summary`](#session-summary) | Create or append a session summary; snapshot mode skips the review gate | `--auto`, `--snapshot`, `--user`, `--project`, `--named=<kg>` |
 | [`/kmgraph:archive-memory`](#archive-memory) | Move stale MEMORY.md entries (default: >90 days) to MEMORY-archive.md | `--auto`, `--dry-run`, `--threshold=<days>` |
 | [`/kmgraph:restore-memory`](#restore-memory) | Restore archived entries back into active MEMORY.md | `--id=<N>`, `--list`, `--dry-run` |
 | [`/kmgraph:sync-all`](#sync-all) | Orchestrate full knowledge sync in one command | `--auto`, `--dry-run` |
@@ -151,6 +153,9 @@ These flags appear across multiple commands and share consistent behavior.
 | `--snapshot` | `session-summary` | Lightweight mid-session capture. Appends to today's session file without a review gate. Used automatically by `capture-lesson`, `create-adr`, and `start-issue-tracking` when the user opts in. |
 | `--targetKg` | MCP tools (`kg_capture`, `kg_search`) | Target a specific knowledge graph by name instead of the currently active KG. |
 | `--delegate` | Advanced usage | Signals that execution should be handed off to the agent layer rather than handled inline. Applies to thin-dispatcher commands that route to `agents/`. |
+| `--user` | `session-summary`, `create-adr`, `capture-lesson`, `recall`, `sync-all` | Route capture or search to the personal KG (`~/.kmgraph/`). Bypasses `kg_capture`; writes directly via the Write tool. Natural-language equivalent: "user level" / "for the user". |
+| `--project` | `session-summary`, `create-adr`, `capture-lesson`, `recall`, `sync-all` | Route to the current project's KG. Temporarily switches the active KG if it differs, then restores after capture. Natural-language equivalent: "for this project" / "project level". |
+| `--named=<kg>` | `session-summary`, `create-adr`, `capture-lesson`, `recall`, `sync-all` | Route to a specific named KG from `kg-config.json`. No KG switch. Natural-language equivalent: naming the KG directly (e.g., "career-ops"). |
 
 ---
 
