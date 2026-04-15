@@ -5,7 +5,7 @@ sidebar_label: Personal vs Project
 description: Understanding personal and project-scoped knowledge graphs
 ---
 
-<!-- Updated: 2026-04-11 -->
+<!-- Updated: 2026-04-15 -->
 
 Every knowledge graph belongs to one of two scopes: **project** or **personal**.
 
@@ -90,6 +90,28 @@ graph TB
     accTitle: Personal vs Project KG scopes
     accDescr: Two KG scopes — Personal stored at ~/.kmgraph/ and Project stored in ./knowledge/. Each scope includes me.md for identity and rules.md for behavioral conventions. Recall searches both automatically.
 ```
+
+### Routing Captures by Level
+
+All capture commands (`session-summary`, `create-adr`, `capture-lesson`, `sync-all`) and `recall` accept an explicit routing flag — or recognize equivalent natural language in the invocation message:
+
+| Signal | Resolves to | Behavior |
+|---|---|---|
+| `--user` / "user level" / "for the user" | Personal KG (`~/.kmgraph/`) | Writes directly; bypasses `kg_capture`; no KG switch |
+| `--project` / "for this project" / "project level" | Current project's KG | Temporarily switches active KG if it differs; restores after |
+| `--named=<kg>` / name of a KG (e.g., "career-ops") | Named KG from `kg-config.json` | Writes to named KG directly; no switch |
+| (no signal) | Active KG | Default behavior; every draft shows `Saving to: {path}` for confirmation |
+
+**Examples:**
+
+```bash
+/kmgraph:capture-lesson "user level"        # → ~/.kmgraph/lessons-learned/
+/kmgraph:create-adr --project               # → current project's knowledge/decisions/
+/kmgraph:session-summary --named=career-ops # → career-ops KG sessions/
+/kmgraph:recall "auth patterns" --user      # → search only ~/.kmgraph/
+```
+
+If a named KG isn't found, a fuzzy suggestion prompt appears. If the project has no configured KG, a setup prompt offers options to initialize or redirect the capture.
 
 ### Setup
 

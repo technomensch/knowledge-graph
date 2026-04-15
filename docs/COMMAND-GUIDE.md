@@ -277,7 +277,7 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 
 ### 🟢 `/kmgraph:capture-lesson`
 
-<!-- Updated: 2026-03-30 -->
+<!-- Updated: 2026-04-15 -->
 
 **Purpose**: Guided UX dispatcher for documenting lessons learned, problems solved, and patterns with git metadata tracking
 
@@ -309,7 +309,10 @@ Dispatches to the capture-lesson agent, which handles:
 
 **Example**:
 ```bash
-/kmgraph:capture-lesson
+/kmgraph:capture-lesson                        # → active KG
+/kmgraph:capture-lesson "user level"           # → personal KG (~/.kmgraph/)
+/kmgraph:capture-lesson --project              # → current project's KG
+/kmgraph:capture-lesson --named=career-ops     # → career-ops KG
 
 # Agent guides you through:
 # 1. What problem did you encounter?
@@ -323,6 +326,7 @@ Dispatches to the capture-lesson agent, which handles:
 - Capture while the problem is fresh (don't wait)
 - Include error messages verbatim
 - Note what DIDN'T work (helps future you)
+- Level routing: use "user level" for cross-project patterns; "for this project" for codebase-specific lessons. See [Personal vs Project KGs](../PERSONAL-V-PROJECT.md) for details.
 
 ---
 
@@ -377,7 +381,7 @@ Quick Commands:
 
 ### 🟢 `/kmgraph:recall`
 
-<!-- Updated: 2026-03-27 -->
+<!-- Updated: 2026-04-15 -->
 
 **Purpose**: Guided UX dispatcher for searching across all project memory systems (lessons, decisions, knowledge graph, sessions)
 
@@ -425,6 +429,20 @@ Dispatches to the recall agent, which searches:
 | `active` | Active KG only (original behavior) |
 | `all` | Active KG + all registered KGs (auto-default when personal KG exists) |
 | `personal-only` | Only KGs with `type: personal` |
+
+**Level routing** (v0.3.9-beta): Scope search to a specific KG without changing the active KG:
+
+| Flag / Natural Language | Searches |
+|---|---|
+| `--user` / "user level" | Only `~/.kmgraph/` |
+| `--project` / "for this project" | Only current project's KG |
+| `--named=<kg>` / KG name | Only the named KG |
+
+```bash
+/kmgraph:recall "auth patterns" --user          # personal KG only
+/kmgraph:recall "database timeout" --project    # current project only
+/kmgraph:recall "deployment" --named=devops-kg  # named KG only
+```
 
 **Search tips**:
 
@@ -539,9 +557,12 @@ Dispatches to the recall agent, which searches:
 
 **Example**:
 ```bash
-/kmgraph:session-summary
-/kmgraph:session-summary --auto        # Skip confirmation, save immediately
-/kmgraph:session-summary --snapshot    # Mid-session save without review gate — used by capture commands
+/kmgraph:session-summary                        # → active KG
+/kmgraph:session-summary --auto                 # Skip confirmation, save immediately
+/kmgraph:session-summary --snapshot             # Mid-session save without review gate
+/kmgraph:session-summary "user level"           # → personal KG (~/.kmgraph/sessions/)
+/kmgraph:session-summary --project              # → current project's KG sessions/
+/kmgraph:session-summary --named=career-ops     # → career-ops KG sessions/
 ```
 
 **Tips**:
@@ -554,7 +575,7 @@ Dispatches to the recall agent, which searches:
 
 ### 🟡 `/kmgraph:create-adr`
 
-<!-- Updated: 2026-03-30 -->
+<!-- Updated: 2026-04-15 -->
 
 **Purpose**: Create Architecture Decision Records with auto-filled git metadata, sequential numbering, and index auto-update
 
@@ -581,8 +602,10 @@ Dispatches to the recall agent, which searches:
 
 **Example**:
 ```bash
-/kmgraph:create-adr
-/kmgraph:create-adr Use PostgreSQL for primary database   # Pre-fills title, skips first prompt
+/kmgraph:create-adr                                             # → active KG
+/kmgraph:create-adr "Use PostgreSQL for primary database"       # Pre-fills title
+/kmgraph:create-adr "Prefer TypeScript strict mode" --user      # → personal KG decisions/
+/kmgraph:create-adr "Use Redis caching" --project               # → current project decisions/
 ```
 
 **Tips**:
