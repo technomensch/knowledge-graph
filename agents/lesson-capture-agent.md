@@ -10,6 +10,53 @@ Captures a single lesson from the live session into the active knowledge graph u
 
 ---
 
+## Level Routing (Phase -1)
+
+*Runs before all other phases. Resolves the target KG path from flags passed by the dispatcher.*
+
+### Accepted flags
+
+| Flag | Behavior |
+|---|---|
+| `--user` | Write to `~/.kmgraph/lessons-learned/` — bypass `kg_capture`, write directly via Write tool |
+| `--project` | Write to current repo's project KG lessons-learned/ — switch temporarily if needed, restore after |
+| `--named=<kg>` | Write to named KG lessons-learned/ — no switch |
+| `--active` | Write to active KG lessons-learned/ (default, current behavior) |
+
+These flags are set by the `capture-lesson` command dispatcher via `gov-capture-routing` skill. This agent never performs NL detection — flags only.
+
+### Path resolution
+
+1. Read flag (default: `--active`)
+2. Resolve `$target_path`:
+   - `--user` → `~/.kmgraph/lessons-learned/`
+   - `--project` → read `~/.claude/kg-config.json`, find graph matching current working directory → `{graph.path}/lessons-learned/`
+   - `--named=<kg>` → read `~/.claude/kg-config.json`, find graph by name → `{graph.path}/lessons-learned/`
+   - `--active` → `{active_kg_path}/lessons-learned/`
+3. Store `$restore_kg` = current active KG (only when `--project` triggers a switch)
+
+### Surface resolved target
+
+In the lesson draft, always show before any write:
+> "Saving to: `{$target_path}`"
+
+### Write behavior
+
+- `--user`: write directly via Write tool. Skip `kg_capture` entirely.
+- `--project` / `--named` / `--active`: use `kg_capture` to resolved path. If `kg_capture` MCP unavailable: surface error and stop.
+
+### Switch/restore for `--project`
+
+1. Record `$restore_kg` = current active KG
+2. Run `/kmgraph:switch {project_kg}`
+3. After capture: run `/kmgraph:switch {$restore_kg}`
+
+### Interaction with Phase 0 CWD Guard
+
+When `--user`, `--project`, or `--named` is explicitly set, skip the Phase 0 mismatch warning — routing intent is already explicit. Only show the CWD mismatch warning when `--active` (default) is used.
+
+---
+
 ## Phase 0: Active KG / CWD Guard
 
 Before any write, verify the active knowledge graph matches the current working directory.

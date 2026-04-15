@@ -11,6 +11,33 @@
 - ❌ No git writes (add, commit, push) until user approval
 - ❌ No Edit/Write to session files until user approves content
 
+## Level Routing
+
+*This agent is called by `session-summary-agent` (via `--delegate`). It receives routing flags from the caller — it never performs NL detection itself.*
+
+### Accepted flags
+
+| Flag | Behavior |
+|---|---|
+| `--user` | Write to `~/.kmgraph/sessions/` — bypass `kg_capture`, write directly via Write tool |
+| `--project` | Write to current repo's project KG sessions/ |
+| `--named=<kg>` | Write to named KG sessions/ |
+| `--active` | Write to active KG sessions/ (default) |
+
+Also accepts `$target_kg` (resolved absolute path) passed directly from caller — if present, use it as `$target_path` without re-resolving.
+
+### Write behavior
+
+- `--user`: write directly via Write tool. Skip `kg_capture` entirely.
+- `--project` / `--named` / `--active`: use `kg_capture` to resolved path. If `kg_capture` MCP unavailable: surface error and stop.
+
+### Surface resolved target
+
+In the generated summary draft, always show:
+> "Saving to: `{$target_path}`"
+
+---
+
 **Behavior:**
 
 1. **Input Phase:**

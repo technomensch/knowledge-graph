@@ -62,6 +62,19 @@ When a personal KG is registered, `recall` searches both project and personal KG
 
 ---
 
+## Level Routing Detection
+
+Before searching, detect the level signal from the user's invocation to scope the search.
+
+**Invoke `gov-capture-routing` skill** to:
+1. Detect level signal from the user's message (NL patterns or explicit flags)
+2. Resolve `$level` and `$target_kg`
+3. Map to search scope: `--user` → `~/.kmgraph/` only; `--project` → current repo KG only; `--named=<kg>` → named KG only; `--active` or no signal → all configured KGs (default)
+
+Pass the resolved level flag to the `recall-agent` invocation.
+
+---
+
 ## Parse and Dispatch
 
 Extract the user's query and any options from the command, then say:
