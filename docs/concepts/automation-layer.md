@@ -62,6 +62,8 @@ Skills listen for natural-language signals. They never execute commands automati
 | **adr-guide** | "I'm thinking of using", "should we use X or Y", "architectural decision" |
 | **capture-router** | "capture that", "remember that", "save that", "let's document this" |
 | **doc-update-router** | "update the docs", "update the changelog", "update the session summary" |
+| **stuck-work-escalation** | 3+ failed attempts on same problem, 30+ min without resolution, "still blocked", "tried everything" |
+| **docs-impact-scan** | "push to origin", "push and merge", "open PR", "create PR", "finishing up", "ready to push" |
 
 ## Hooks and their lifecycle events
 
