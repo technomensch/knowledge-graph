@@ -47,6 +47,8 @@ First-time users need these for basic operation:
 | `/kmgraph:status` | View active knowledge graph info and quick reference |
 | `/kmgraph:recall [query]` | Search across all memory systems (lessons, decisions, knowledge) (v0.2.1-beta refactored) |
 
+*→ [Full details in Command Guide](COMMAND-GUIDE.md#essential-commands)*
+
 ### 🟡 Intermediate (Once Comfortable)
 
 Active users use these for regular workflows:
@@ -63,6 +65,8 @@ Active users use these for regular workflows:
 | `/kmgraph:extract-chat` | Extract chat history from Claude and Gemini logs (`--today`, `--date`, `--after`, `--before`, `--project`) |
 | `/kmgraph:update-doc` | Update plugin/project docs (`--user-facing`) or KG content |
 
+*→ [Full details in Command Guide](COMMAND-GUIDE.md#intermediate-commands)*
+
 ### 🔴 Advanced (Power Features)
 
 Power users leverage these for complex workflows:
@@ -77,6 +81,8 @@ Power users leverage these for complex workflows:
 | `/kmgraph:restore-memory` | Restore archived MEMORY.md entries |
 | `/kmgraph:sync-all` | Automated full sync pipeline (4 steps → 1 command). Uses background file scanning when context-mode is installed. Refreshes search index automatically if built |
 | `/kmgraph:handoff` | Create comprehensive handoff documentation for transitions or onboarding |
+
+*→ [Full details in Command Guide](COMMAND-GUIDE.md#advanced-commands)*
 
 ---
 
