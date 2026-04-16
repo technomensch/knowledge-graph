@@ -93,6 +93,8 @@ Skills activate automatically based on conversation context. No invocation neede
 | `doc-update-router` | "update [doc name]", "update the session summary", "update the changelog" | Routes to `/kmgraph:update-doc --user-facing`, `/kmgraph:session-summary`, or `/kmgraph:create-adr` |
 | `capture-router` | "capture that" / "remember that" / "save that" | Auto-detects type+location, single confirmation before writing |
 | `gov-execute-plan` | "execute plan", implementation start, `docs/plans/*.md` mentioned | Zero-deviation 8-step execution protocol |
+| `stuck-work-escalation` | 3+ failed attempts, 30+ min stuck, same bug resisting fixes | Opus diagnosis gate → hypothesis logging → exit-path decision at 5 attempts |
+| `docs-impact-scan` | "push to origin", "push and merge", "open PR", "create PR", "finishing up", "ready to push" | Scans changed identifiers, validates affected docs list, dispatches `/kmgraph:update-doc --user-facing` for each |
 
 ---
 
