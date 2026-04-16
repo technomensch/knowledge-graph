@@ -2,8 +2,8 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.3.4-beta
-**Status:** Beta Release — Behavioral Rule Live-Capture, 4-Target rules/me System
+**Version:** 0.4.0-beta
+**Status:** Beta Release — Stuck-Work Escalation, Docs Impact Scan, Behavioral Rule Live-Capture
 
 Documentation: https://kmgraph.stayinginsync.info
 
@@ -83,7 +83,14 @@ See [Getting Started Guide](docs/GETTING-STARTED.md) for prerequisites and troub
 
 ---
 
-## v0.3.x Feature Highlights
+## v0.4.x Feature Highlights
+
+**v0.4.0-beta — 2026-04-16**
+
+- **`stuck-work-escalation` skill** — Auto-escalates stuck work at 3 attempts or 30 min: Opus diagnosis gate reviews all logged attempts and proposes a fresh hypothesis. At 5 attempts, forces a structured exit-path decision (Continue / Defer / Workaround / Descope / Rescope / User decision required) before any further work proceeds.
+- **`docs-impact-scan` skill** — Pre-PR docs discovery layer. Fires on "push to origin", "open PR", "create PR", "finishing up", and "ready to push". Reads `git diff main...HEAD`, extracts changed identifiers, greps scoped docs, always surfaces obvious files (README.md, INSTALL.md, CHANGELOG.md, COMMAND-GUIDE.md), checks KG patterns for learned corrections, validates the list with the user, then dispatches `/kmgraph:update-doc --user-facing` for each confirmed file.
+- **`--log-attempt` variant for `/kmgraph:meta-issue`** — Enforces a distinct hypothesis before each attempt; reminds the user to invoke `stuck-work-escalation` at attempt 3+.
+- **Exit-path fields in meta-issue attempt template** — Hypothesis, distinct-from-prior, success-criterion, and exit-path checklist added to every attempt scaffold.
 
 **v0.3.4-beta — 2026-04-10**
 
@@ -167,7 +174,11 @@ knowledge-graph/
 
 See [ROADMAP.md](ROADMAP.md) for detailed version history and development progress.
 
-**Current Release:** v0.3.4-beta (2026-04-10)
+**Current Release:** v0.4.0-beta (2026-04-16)
+- ✅ Stuck-work escalation — Opus diagnosis gate at 3 attempts, mandatory exit-path decision at 5
+- ✅ Docs impact scan — pre-PR docs discovery, KG pattern learning, update wizard dispatch
+- ✅ `--log-attempt` meta-issue variant with hypothesis enforcement
+- ✅ Exit-path fields in meta-issue attempt template
 - ✅ Behavioral rule live-capture — `rules-capture` skill + agent with 4-target routing
 - ✅ Obsidian wiki link pass with ADR collision detection and atomic writes
 - ✅ Draft-and-approve UX for lesson capture and ADR creation
@@ -180,6 +191,7 @@ See [ROADMAP.md](ROADMAP.md) for detailed version history and development progre
 - ⚠️ Beta status: API subject to breaking changes before v1.0.0 stable
 
 **Recent Versions:**
+- v0.4.0-beta (Apr 16): Stuck-work escalation skill, docs-impact-scan skill, --log-attempt meta-issue variant
 - v0.3.4-beta (Apr 10): Behavioral rule live-capture, rules-capture skill + agent, 4-target routing
 - v0.3.3-beta (Apr 10): Obsidian wiki links, ADR collision detection, atomic writes, personal KG pass
 - v0.3.2-beta (Apr 10): Draft-and-approve UX, init-shared modules, cross-branch collision detection
@@ -277,7 +289,7 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Phase:** Beta Release Cycle (v0.3.4-beta)
-**Next Milestone:** v0.4.x — Expanded wiki link coverage and knowledge graph improvements
+**Current Phase:** Beta Release Cycle (v0.4.0-beta)
+**Next Milestone:** v0.4.x — Expanded wiki link coverage and automated knowledge graph extraction improvements
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info

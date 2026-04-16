@@ -228,7 +228,8 @@ done
 |---|---|
 | **v0.2.x** | Check d may offer to move tool directives from `rules.md` → `CLAUDE.md`. Checks a/b/c may add missing dirs, config fields, and new templates. |
 | **v0.3.0–v0.3.4** | Check d only (if `rules.md` still has Claude-specific lines). All other checks are likely already satisfied. |
-| **v0.3.5** | No upgrade items expected for a clean v0.3.5 install. |
+| **v0.3.5–v0.3.9** | No upgrade items expected for a clean install in this range. |
+| **v0.4.0** | Check c offers an updated meta-issue attempt template (adds hypothesis, distinct-from-prior, success-criterion, and exit-path fields). New `stuck-work-escalation` and `docs-impact-scan` skills are auto-available after plugin reload — no upgrade action required. |
 
 After the wizard completes, your existing lessons, ADRs, sessions, and chat history are untouched.
 

@@ -60,6 +60,11 @@ mkdir docs/meta-issues/<issue-name>/attempts/001-<label>
 ```markdown
 # Attempt 001: <Label>
 
+**Attempt #:** 001
+**Hypothesis:** <The specific theory being tested — what is wrong and why>
+**Distinct from prior attempts:** First attempt
+**Success criterion:** <Exact condition that confirms this attempt worked>
+
 ## Hypothesis
 <What you believed was the root cause>
 
@@ -70,6 +75,10 @@ mkdir docs/meta-issues/<issue-name>/attempts/001-<label>
 1. Step one
 2. Step two
 ```
+
+:::tip
+Use `/kmgraph:meta-issue --log-attempt 001 "<hypothesis>"` to pre-populate the hypothesis field and ensure it is distinct from prior attempts. At attempt 3+, the command reminds the user to invoke the `stuck-work-escalation` skill.
+:::
 
 **`attempt-results.md`** — written after the attempt:
 
@@ -115,14 +124,20 @@ At the start of each new session working on this issue:
 **Learning:** <what was revealed>
 ```
 
-3. Create the next attempt directory before starting work:
+3. Create the next attempt with hypothesis enforcement:
 
 ```bash
-mkdir docs/meta-issues/<issue-name>/attempts/002-<label>
+/kmgraph:meta-issue --log-attempt 002 "<distinct hypothesis>"
 ```
+
+This creates the attempt directory, pre-populates the hypothesis field, and checks that the hypothesis differs from prior attempts. At attempt 3 or later, it also surfaces the `stuck-work-escalation` skill reminder.
 
 :::tip
 Write `solution-approach.md` before starting each attempt, and `attempt-results.md` immediately after. Delaying either reduces the quality of the retrospective.
+:::
+
+:::note
+**Escalation thresholds:** At 3 attempts (or 30 min), Opus diagnosis activates automatically. At 5 attempts, a mandatory exit-path decision is required before any further work proceeds. See the `stuck-work-escalation` skill for full details.
 :::
 
 ---

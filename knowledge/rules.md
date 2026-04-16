@@ -30,6 +30,14 @@ Update affected docs (README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, CONCE
 - **Why:** doc updates were missed after command and agent changes, leaving guides and CHEAT-SHEET inconsistent with actual behavior
 - **Source:** [ADR-013 Documentation Update Protocol](decisions/ADR-013-documentation-update-protocol.md)
 
+### Sidebar Update on Doc Rename or Move
+
+When a user-facing document is moved or renamed, update `sidebars.js` to reflect the new path.
+- The `id:` field is the path relative to `docs/` without the `.md` extension (e.g., `docs/guides/foo.md` → `id: 'guides/foo'`)
+- Also grep `docs/` for internal links pointing to the old path and update them
+- **Why:** a stale `id:` in `sidebars.js` causes Docusaurus to throw `Unknown doc ID` and breaks the build silently until the next deploy
+- **Invoke:** `sidebar-update` skill when a rename or move is detected
+
 ### Pre-PR Doc Verification
 
 Before creating a PR with doc changes: run `git diff HEAD~N -- docs/` for each changed file, check for formatting regressions (stray spaces, broken tables, removed blank lines, wrong agent names), then run `mkdocs build` and confirm no new warnings

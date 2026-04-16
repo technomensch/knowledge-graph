@@ -15,6 +15,7 @@ Initialize and manage meta-issue tracking for complex, multi-attempt problems th
 ```bash
 /kmgraph:meta-issue "Problem Title"
 /kmgraph:meta-issue --add-attempt 003 "Try connection pooling"
+/kmgraph:meta-issue --log-attempt NNN "Hypothesis description"
 /kmgraph:meta-issue --update-understanding "Root cause is network latency"
 /kmgraph:meta-issue --status
 ```
@@ -43,6 +44,18 @@ Create a meta-issue when a problem meets **2 or more** of these criteria:
 - Simple bugs with single fix
 - Standard feature implementation
 - One-off debugging sessions
+
+---
+
+## Stuck-Work Escalation (Auto-Trigger)
+
+The meta-issue command is also invoked automatically by the `stuck-work-escalation` skill. When escalation triggers:
+
+- **At 3 attempts (or 30 min):** Meta-issue is created automatically. Opus reviews all logged attempts and provides fresh diagnosis. All future attempts must be logged here with a hypothesis before starting.
+- **At 5 attempts:** Exit-path analysis is mandatory. The attempt template's exit-path section must be completed and presented to the user before any further work proceeds.
+- **Escalation cap:** Opus reviews a maximum of 3 rounds before forcing the exit-path decision regardless of attempt count.
+- **Counter reset:** If diagnosis genuinely shifts (new root cause identified), attempt counter resets — note the reset in `analysis/root-cause-evolution.md`.
+- **Scope:** Only applies to work with a definable success criterion (test passes, error gone, metric hit). Not exploratory or iterative work.
 
 ---
 
@@ -222,6 +235,20 @@ echo "**Plan:** [v2.3.1](../../plans/v2.3.1-connection-pooling.md)" >> "${meta_d
 
 ---
 
+## Command: Log Attempt with Hypothesis
+
+**Syntax:** `/kmgraph:meta-issue --log-attempt 003 "JWT expiry logic is the root cause"`
+
+Enforces that each attempt documents a distinct hypothesis before execution. Steps:
+
+1. Create attempt folder (same as `--add-attempt`)
+2. Pre-populate `solution-approach.md` hypothesis field with provided description
+3. Require confirmation that this hypothesis is distinct from prior attempts
+4. Update `implementation-log.md`
+5. If attempt count ≥ 3: remind user to invoke `stuck-work-escalation` skill if not already active
+
+---
+
 ## Command: Update Root Cause Understanding
 
 **Syntax:** `/kmgraph:meta-issue --update-understanding "Root cause is network latency"`
@@ -342,6 +369,10 @@ Session summaries reference meta-issue progress
 Meta-issue timeline includes session links
 Bidirectional documentation
 ```
+
+**With stuck-work-escalation skill:**
+Auto-invoked at 3 attempts. Supplies attempt log and root-cause evolution
+to Opus for diagnosis. Receives exit-path decision at 5 attempts.
 
 ---
 

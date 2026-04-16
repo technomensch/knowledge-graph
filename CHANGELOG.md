@@ -13,6 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## v0.4.0-beta (2026-04-16)
+
+### Added
+- **`stuck-work-escalation` skill** — Auto-escalates stuck work at 3 attempts or 30 min (Opus diagnosis gate) and forces a structured exit-path decision at 5 attempts. Extends meta-issue tracking with hypothesis logging and `--log-attempt` command variant.
+- **`docs-impact-scan` skill** — Pre-PR docs discovery layer. Reads `git diff main...HEAD`, extracts changed identifiers, greps scoped docs, always surfaces obvious files (README.md, INSTALL.md, CHANGELOG.md, COMMAND-GUIDE.md), checks KG patterns for learned corrections, validates the list with the user, then dispatches `/kmgraph:update-doc --user-facing` for each confirmed file.
+- **`--log-attempt` variant for `meta-issue`** — Enforces a distinct hypothesis before each attempt; reminds user to invoke stuck-work-escalation skill at attempt 3+.
+- **Exit-path fields in meta-issue attempt template** — Adds hypothesis, distinct-from-prior, success-criterion, and exit-path checklist to every attempt.
+
 ## v0.3.7-beta (2026-04-12)
 
 ### Bug Fixes
