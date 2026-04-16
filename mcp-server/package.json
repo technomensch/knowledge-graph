@@ -20,6 +20,7 @@
   },
   "overrides": {
     "handlebars": ">=4.7.9",
+    "hono": ">=4.12.12",
     "path-to-regexp": ">=8.4.0",
     "picomatch": ">=2.3.2"
   },
