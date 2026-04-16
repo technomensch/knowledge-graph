@@ -2,8 +2,8 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.4.0-beta
-**Status:** Beta Release — Stuck-Work Escalation, Docs Impact Scan, Behavioral Rule Live-Capture
+**Version:** 0.4.1-beta
+**Status:** Beta Release — Security patch: dependency vulnerability gate, hono + follow-redirects overrides
 
 Documentation: https://kmgraph.stayinginsync.info
 
@@ -84,6 +84,12 @@ See [Getting Started Guide](docs/GETTING-STARTED.md) for prerequisites and troub
 ---
 
 ## v0.4.x Feature Highlights
+
+**v0.4.1-beta — 2026-04-16**
+
+- **Dependency vulnerability gate** — Pre-PR rule and trigger that stops pushes on unacknowledged Dependabot alerts, presents a findings table, and requires explicit approval. Project `knowledge/rules.md` and `CLAUDE.md` are the acknowledged-risk register.
+- **hono override `>=4.12.12`** (mcp-server) — Forces upgrade from 4.12.8 via `@modelcontextprotocol/sdk` transitive chain.
+- **follow-redirects override `>=1.16.0`** (root) — Resolves auth header leak (GHSA-r4q5-vmmm-2653) in the Docusaurus → webpack-dev-server → http-proxy chain.
 
 **v0.4.0-beta — 2026-04-16**
 
@@ -174,7 +180,9 @@ knowledge-graph/
 
 See [ROADMAP.md](ROADMAP.md) for detailed version history and development progress.
 
-**Current Release:** v0.4.0-beta (2026-04-16)
+**Current Release:** v0.4.1-beta (2026-04-16)
+- ✅ Dependency vulnerability gate — pre-PR Dependabot check with findings table and approval gate
+- ✅ hono override >=4.12.12 + follow-redirects override >=1.16.0 — security patches
 - ✅ Stuck-work escalation — Opus diagnosis gate at 3 attempts, mandatory exit-path decision at 5
 - ✅ Docs impact scan — pre-PR docs discovery, KG pattern learning, update wizard dispatch
 - ✅ `--log-attempt` meta-issue variant with hypothesis enforcement
@@ -191,6 +199,7 @@ See [ROADMAP.md](ROADMAP.md) for detailed version history and development progre
 - ⚠️ Beta status: API subject to breaking changes before v1.0.0 stable
 
 **Recent Versions:**
+- v0.4.1-beta (Apr 16): Security patch — vulnerability gate, hono + follow-redirects dependency overrides
 - v0.4.0-beta (Apr 16): Stuck-work escalation skill, docs-impact-scan skill, --log-attempt meta-issue variant
 - v0.3.4-beta (Apr 10): Behavioral rule live-capture, rules-capture skill + agent, 4-target routing
 - v0.3.3-beta (Apr 10): Obsidian wiki links, ADR collision detection, atomic writes, personal KG pass
@@ -289,7 +298,7 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Phase:** Beta Release Cycle (v0.4.0-beta)
+**Current Phase:** Beta Release Cycle (v0.4.1-beta)
 **Next Milestone:** v0.4.x — Expanded wiki link coverage and automated knowledge graph extraction improvements
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info
