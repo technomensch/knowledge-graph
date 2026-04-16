@@ -1,6 +1,6 @@
 {
   "name": "knowledge-graph-plugin",
-  "version": "0.4.0-beta",
+  "version": "0.4.1-beta",
   "description": "Structured knowledge capture and cross-session memory for Claude Code projects.",
   "files": [
     ".claude-plugin/",
@@ -48,6 +48,9 @@
     "prism-react-renderer": "^2.3.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
+  },
+  "overrides": {
+    "follow-redirects": ">=1.16.0"
   },
   "dependencies": {
     "@docusaurus/plugin-client-redirects": "^3.9.2",

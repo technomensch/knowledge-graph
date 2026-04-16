@@ -13,6 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## v0.4.1-beta (2026-04-16)
+
+### Security
+
+- **Dependency vulnerability gate** — New rule and trigger in `~/.kmgraph/rules.md` and `triggers.md` enforcing a pre-PR vulnerability check. Stops all pushes on unacknowledged GitHub Dependabot alerts; presents a findings table and requires explicit approval before proceeding. Project `knowledge/rules.md` and `CLAUDE.md` serve as the acknowledged-risk register.
+- **hono override `>=4.12.12`** (mcp-server) — Forces hono upgrade from 4.12.8 to 4.12.12 via `@modelcontextprotocol/sdk` transitive chain. Mitigates cookie-handling alerts (#26, #25). Alert #33 (HTML injection, requires 4.12.14) documented as pending registry availability.
+- **follow-redirects override `>=1.16.0`** (root) — Forces follow-redirects upgrade from 1.15.11 to 1.16.0. Resolves auth header leak to cross-domain redirect targets (GHSA-r4q5-vmmm-2653) in the Docusaurus → webpack-dev-server → http-proxy transitive chain.
+- **Known vulnerability register expanded** — `knowledge/rules.md` known/ignored list updated from 4 to 6 entries; follow-redirects (#31) and dompurify (#32) confirmed as Docusaurus dev-only transitive deps and added to the acknowledged list.
+
 ## v0.4.0-beta (2026-04-16)
 
 ### Added
