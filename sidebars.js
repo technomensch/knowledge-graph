@@ -80,6 +80,25 @@ const sidebars = {
       label: '📚 Reference',
       collapsed: true,
       items: [
+        // Setup
+        {
+          type: 'category',
+          label: 'Setup',
+          collapsed: false,
+          items: [
+            {type: 'doc', id: 'CONFIGURATION', label: 'Configuration'},
+          ],
+        },
+        // Quick Reference
+        {
+          type: 'category',
+          label: 'Quick Reference',
+          collapsed: false,
+          items: [
+            {type: 'doc', id: 'CHEAT-SHEET', label: 'Cheat Sheet'},
+            {type: 'doc', id: 'FAQ', label: 'FAQ'},
+          ],
+        },
         // Automation Layer — the four plugin components
         {
           type: 'category',
@@ -93,25 +112,14 @@ const sidebars = {
             {type: 'doc', id: 'reference/templates', label: 'Templates'},
           ],
         },
-        // Quick Reference
+        // Architecture
         {
           type: 'category',
-          label: 'Quick Reference',
+          label: 'Architecture',
           collapsed: false,
           items: [
-            {type: 'doc', id: 'CHEAT-SHEET', label: 'Cheat Sheet'},
-            {type: 'doc', id: 'FAQ', label: 'FAQ'},
-          ],
-        },
-        // Setup & Architecture
-        {
-          type: 'category',
-          label: 'Setup & Architecture',
-          collapsed: false,
-          items: [
-            {type: 'doc', id: 'CONFIGURATION', label: 'Configuration'},
-            {type: 'doc', id: 'reference/PLATFORM-ADAPTATION', label: 'Platform Adaptation'},
             {type: 'doc', id: 'reference/ARCHITECTURE', label: 'Architecture'},
+            {type: 'doc', id: 'reference/PLATFORM-ADAPTATION', label: 'Platform Adaptation'},
             {type: 'doc', id: 'reference/SANITIZATION-CHECKLIST', label: 'Sanitization Checklist'},
           ],
         },
