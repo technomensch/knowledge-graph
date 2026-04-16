@@ -1,5 +1,10 @@
 # Attempt NNN: [Approach Name]
 
+**Attempt #:** [NNN]
+**Hypothesis:** [The specific theory being tested — what do you believe is wrong and why]
+**Distinct from prior attempts:** [How this hypothesis differs from previous ones]
+**Success criterion:** [Exact condition that would confirm this attempt worked]
+
 ## Solution Approach
 
 **Date Started:** YYYY-MM-DD
@@ -81,4 +86,20 @@
 
 **Rollback Plan:**
 [How to undo if this fails]
+
+---
+
+## Exit Path (if attempt fails)
+
+Complete this section if the attempt does not resolve the problem:
+
+**Recommended exit path:**
+- [ ] Continue — next hypothesis: [describe]
+- [ ] Defer — file issue, document blocker, move on
+- [ ] Workaround — ship degraded version with known limitation: [describe]
+- [ ] Descope — remove requirement entirely (surface to user)
+- [ ] Rescope — reframe the problem: [describe new framing]
+- [ ] User decision required — stop and escalate
+
+**Rationale:** [Why this exit path]
 

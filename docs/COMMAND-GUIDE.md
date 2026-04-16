@@ -887,6 +887,11 @@ With `--user-facing`:
    - Updates description with current best understanding
 4. **View status** (`--status`):
    - Shows all active meta-issues with attempt counts and current understanding
+5. **Log attempt with hypothesis** (`--log-attempt NNN "hypothesis"`):
+   - Enforces a distinct hypothesis before each attempt begins
+   - Pre-populates the attempt template's hypothesis field
+   - Reminds the user to invoke `stuck-work-escalation` at attempt 3+
+   - At 5 attempts, exit-path analysis becomes mandatory (see `stuck-work-escalation` skill)
 
 **Time**: 3-5 minutes for initialization
 
@@ -894,6 +899,7 @@ With `--user-facing`:
 ```bash
 /kmgraph:meta-issue "Authentication Redesign"
 /kmgraph:meta-issue --add-attempt 002 "OAuth2 with JWT"
+/kmgraph:meta-issue --log-attempt 003 "JWT expiry logic is the root cause"
 /kmgraph:meta-issue --update-understanding "Token expiry logic flawed"
 /kmgraph:meta-issue --status
 ```

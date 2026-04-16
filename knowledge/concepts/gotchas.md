@@ -39,5 +39,18 @@ Copy this template for each new gotcha:
 
 ## Add Your Gotchas Below
 
-<!-- Your gotchas go here -->
+## Skills Fire on Outcome Vocabulary, Not Process Vocabulary
+
+**Quick Reference:**
+- **Symptom:** A skill that should auto-trigger doesn't fire, even though the user's intent matches the skill's purpose.
+- **Root Cause:** Skill triggers are tuned to a single canonical phrase rather than the full vocabulary a user reaches for naturally ("draft a plan" vs. "write a plan" vs. "create a plan").
+- **Fix:** Add all natural phrasings as trigger phrases. Test coverage by listing 5 different ways a user would ask for the same thing — all 5 should trigger the skill.
+- **Prevention:** When writing a skill, enumerate at least 3–5 trigger variants covering outcome vocabulary ("draft," "write," "create," "build") rather than relying on one phrase.
+
+**Evidence:**
+[Lessons_Learned_Patterns_Skill_Auto_Triggers_Miss_Process_Vocabulary](../lessons-learned/patterns/Lessons_Learned_Patterns_Skill_Auto_Triggers_Miss_Process_Vocabulary_—_Only_Fire_On_Outcome_Vocabulary.md) — writing-plans skill failed to fire on "create a plan" and "draft a plan" variants; root cause: single trigger phrase, not a coverage set.
+
+**See Lesson:** [[Lessons_Learned_Patterns_Skill_Auto_Triggers_Miss_Process_Vocabulary_—_Only_Fire_On_Outcome_Vocabulary]]
+
+**Note:** The existing lesson covers the outcome vs. process vocabulary distinction. This gotcha entry adds the concrete test method: enumerate 5 natural phrasings and verify all trigger the skill.
 

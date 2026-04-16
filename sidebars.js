@@ -80,17 +80,49 @@ const sidebars = {
       label: '📚 Reference',
       collapsed: true,
       items: [
-        {type: 'doc', id: 'reference/commands', label: 'Commands'},
-        {type: 'doc', id: 'reference/skills', label: 'Skills'},
-        {type: 'doc', id: 'reference/agents', label: 'Agents'},
-        {type: 'doc', id: 'reference/hooks', label: 'Hooks'},
-        {type: 'doc', id: 'reference/templates', label: 'Templates'},
-        {type: 'doc', id: 'CHEAT-SHEET', label: 'Cheat Sheet'},
-        {type: 'doc', id: 'FAQ', label: 'FAQ'},
-        {type: 'doc', id: 'CONFIGURATION', label: 'Configuration'},
-        {type: 'doc', id: 'reference/ARCHITECTURE', label: 'Architecture'},
-        {type: 'doc', id: 'reference/PLATFORM-ADAPTATION', label: 'Platform Adaptation'},
-        {type: 'doc', id: 'reference/SANITIZATION-CHECKLIST', label: 'Sanitization Checklist'},
+        // Setup
+        {
+          type: 'category',
+          label: 'Setup',
+          collapsed: false,
+          items: [
+            {type: 'doc', id: 'CONFIGURATION', label: 'Configuration'},
+          ],
+        },
+        // Quick Reference
+        {
+          type: 'category',
+          label: 'Quick Reference',
+          collapsed: false,
+          items: [
+            {type: 'doc', id: 'CHEAT-SHEET', label: 'Cheat Sheet'},
+            {type: 'doc', id: 'FAQ', label: 'FAQ'},
+          ],
+        },
+        // Automation Layer — the four plugin components
+        {
+          type: 'category',
+          label: 'Automation Layer',
+          collapsed: false,
+          items: [
+            {type: 'doc', id: 'reference/commands', label: 'Commands'},
+            {type: 'doc', id: 'reference/skills', label: 'Skills'},
+            {type: 'doc', id: 'reference/agents', label: 'Agents'},
+            {type: 'doc', id: 'reference/hooks', label: 'Hooks'},
+            {type: 'doc', id: 'reference/templates', label: 'Templates'},
+          ],
+        },
+        // Architecture
+        {
+          type: 'category',
+          label: 'Architecture',
+          collapsed: false,
+          items: [
+            {type: 'doc', id: 'reference/ARCHITECTURE', label: 'Architecture'},
+            {type: 'doc', id: 'reference/PLATFORM-ADAPTATION', label: 'Platform Adaptation'},
+            {type: 'doc', id: 'reference/SANITIZATION-CHECKLIST', label: 'Sanitization Checklist'},
+          ],
+        },
       ],
     },
 
