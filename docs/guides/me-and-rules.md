@@ -1,7 +1,7 @@
 ---
 id: me-and-rules
 title: Portable AI Identity — me.md and rules.md
-sidebar_label: Portable AI Identity
+sidebar_label: Set up your identity files
 description: Set up platform-agnostic identity and behavioral rules that travel with you across any AI tool
 ---
 

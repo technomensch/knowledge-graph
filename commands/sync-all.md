@@ -39,6 +39,26 @@ description: Automated knowledge sync orchestrator — replaces 4-step manual pi
 
 ---
 
+## Level Routing Detection (Top-Level)
+
+`sync-all` resolves level routing ONCE at the top and passes the resolved flag to all sub-captures. Sub-captures must NOT perform their own NL detection — they use the flag passed from this orchestrator.
+
+**Invoke `gov-capture-routing` skill** to:
+1. Detect level signal from the user's invocation (NL patterns or explicit flags)
+2. Resolve `$level`, `$target_kg`, `$restore_kg`
+3. Handle prompts if needed (named KG not found, no project KG configured, conflict resolution)
+
+**Pass-down contract:** Every sub-capture invoked by `sync-all` receives the resolved flag explicitly:
+- `session-summary-agent` → pass `--{level}` + `$target_kg`
+- `lesson-capture-agent` → pass `--{level}` + `$target_kg`
+- Any other capture agents → pass `--{level}` + `$target_kg`
+
+Sub-captures that receive an explicit flag skip their own `gov-capture-routing` invocation.
+
+**Switch/restore:** If `--project` triggers a KG switch, the switch occurs before sub-captures begin. After all sub-captures complete, restore with `/kmgraph:switch {$restore_kg}`.
+
+---
+
 ## Execution
 
 ### Step 1: Parse Flags

@@ -26,6 +26,19 @@ allowed-tools: Bash, Read, Write, Edit, Glob, Grep, AskUserQuestion
 
 ---
 
+## Level Routing Detection
+
+Before any other steps, detect the level signal from the user's invocation and resolve it to an explicit flag.
+
+**Invoke `gov-capture-routing` skill** to:
+1. Detect level signal from the user's message (NL patterns or explicit flags)
+2. Resolve `$level`, `$target_kg`, `$target_path` (→ `{target_kg}/decisions/`), `$restore_kg`
+3. Handle prompts if needed (named KG not found, no project KG configured, conflict resolution)
+
+Pass the resolved flag (`--user`, `--project`, `--named=<kg>`, or `--active`) to the `create-adr-agent` invocation.
+
+---
+
 ## Step 0: Resolve Active KG Path
 
 **Read the active knowledge graph configuration:**

@@ -2,6 +2,33 @@
 
 **Purpose:** Receive a structured context payload from `rules-capture` skill, read the target rules file, check for duplicate/conflicting rules, draft the new rule in house style, display for approval, and write on confirmation. Never fires wizards — context payload is always pre-structured.
 
+## Level Routing
+
+*This agent receives routing flags from the dispatcher. It never performs NL detection itself.*
+
+### Accepted flags
+
+| Flag | Behavior |
+|---|---|
+| `--user` | Target personal rules files: `~/.kmgraph/rules.md` or `~/.kmgraph/me.md` |
+| `--project` | Target project rules files: `knowledge/rules.md` or `knowledge/me.md` |
+| `--named=<kg>` | Target the named KG's rules files |
+| `--active` | Use active KG (default, current behavior) |
+
+When a level flag is present and conflicts with the `scope` field in the payload (e.g., `--user` flag but `scope: "project-rule"`), the level flag takes precedence — update the effective scope to match.
+
+### Surface resolved target
+
+Always show before writing:
+> "Saving to: `{$target_file}`"
+
+### Write behavior
+
+- `--user`: write directly via Write tool (rules files are plain markdown). Skip `kg_capture`.
+- `--project` / `--named` / `--active`: write directly via Write/Edit tool to the resolved path (rules files are not session/ADR artifacts — `kg_capture` is not used here).
+
+---
+
 ## Input Contract
 
 This agent is only dispatched by `rules-capture` skill with a structured payload:
@@ -14,6 +41,7 @@ context:
   source_quote: "[exact user phrase]"
   session_context: "[1-2 sentence summary]"
   platform: "claude-code"             # from Phase 0 detection; omitted if unknown
+  level: "--active"           # routing flag: --user | --project | --named=<kg> | --active (default)
   agents_present: true                # from Phase 0 detection
 ```
 
