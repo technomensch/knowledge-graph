@@ -5,6 +5,12 @@
 
 ---
 
+## Before bumping the version / on any release
+
+- Apply: `rules.md § Version & Release > Version Files` — sync all 6 files before committing version bump
+- Gate: do not commit the version bump until all 6 files are updated; do not stop after package.json and plugin.json alone
+- Check: grep for the old version string across README.md and INSTALL.md to catch any missed occurrences
+
 ## When a user-facing document is moved or renamed
 
 - Apply: `rules.md § Version & Release > Sidebar Update on Doc Rename or Move`

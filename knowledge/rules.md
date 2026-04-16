@@ -8,8 +8,16 @@
 
 ### Version Files
 
-Sync all three version files before every push: `package.json`, `.claude-plugin/plugin.json`, `mcp-server/package.json`
-- **Why:** version files silently drifted out of sync during releases, causing inconsistent behavior between the plugin and MCP server
+On every release, sync ALL of the following — do not stop after version files alone:
+
+1. `package.json` (root)
+2. `.claude-plugin/plugin.json`
+3. `mcp-server/package.json` (independently versioned — bump only if mcp-server changed)
+4. `CHANGELOG.md` — add release entry
+5. `README.md` — version badge, feature highlights block, current release block, recent versions list, current phase line (footer)
+6. `INSTALL.md` — upgrade path table
+
+- **Why:** partial version sync (only package files) left README and INSTALL.md at old versions, requiring user to prompt repeatedly to get all files updated
 
 ### Changelog & Docs Feed
 

@@ -58,13 +58,7 @@ Heavy-lift task handlers that keep main context clean:
 
 - **Plans:** Plans are **LOCAL-ONLY and gitignored** (`docs/plans/` is in `.gitignore`). Work in `~/.claude/plans/` first, then copy to `docs/plans/` for local reference during implementation. **Do NOT attempt to commit plan files.** Only commit implementation work (code, tests, docs).
 - **Branches:** Push to origin, await user review (never auto-merge)
-- **Versions:** On every release, sync ALL of the following — do not stop after one or two:
-  1. `package.json` (root)
-  2. `.claude-plugin/plugin.json`
-  3. `mcp-server/package.json` (independently versioned — bump if mcp-server changed)
-  4. `CHANGELOG.md` — add release entry
-  5. `README.md` — version badge (line 5), feature highlights block, current release block, recent versions list, current phase line (footer)
-  6. `INSTALL.md` — upgrade path table
+- **Versions:** Sync package.json + plugin.json before pushing (mcp-server independent)
 - **Docs updates:** Update affected reference and guide pages when behavior changes
 
 ## Documentation Updates Workflow
