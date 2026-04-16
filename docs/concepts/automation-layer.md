@@ -64,6 +64,7 @@ Skills listen for natural-language signals. They never execute commands automati
 | **doc-update-router** | "update the docs", "update the changelog", "update the session summary" |
 | **stuck-work-escalation** | 3+ failed attempts on same problem, 30+ min without resolution, "still blocked", "tried everything" |
 | **docs-impact-scan** | "push to origin", "push and merge", "open PR", "create PR", "finishing up", "ready to push" |
+| **sidebar-update** | Doc file moved or renamed, `git mv docs/...`, "move [doc]", "rename [doc]" |
 
 ## Hooks and their lifecycle events
 

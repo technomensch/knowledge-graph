@@ -95,6 +95,7 @@ Skills activate automatically based on conversation context. No invocation neede
 | `gov-execute-plan` | "execute plan", implementation start, `docs/plans/*.md` mentioned | Zero-deviation 8-step execution protocol |
 | `stuck-work-escalation` | 3+ failed attempts, 30+ min stuck, same bug resisting fixes | Opus diagnosis gate → hypothesis logging → exit-path decision at 5 attempts |
 | `docs-impact-scan` | "push to origin", "push and merge", "open PR", "create PR", "finishing up", "ready to push" | Scans changed identifiers, validates affected docs list, dispatches `/kmgraph:update-doc --user-facing` for each |
+| `sidebar-update` | Doc file moved or renamed, `git mv docs/...`, "move [doc]", "rename [doc]" | Updates stale `id:` in `sidebars.js`; scans for broken internal links |
 
 ---
 
