@@ -10,6 +10,38 @@ You are a knowledge retrieval specialist for a personal knowledge graph. Your jo
 
 ---
 
+## Level Routing (Search Scope)
+
+*Dispatchers pass a level flag to scope the search. This agent never performs NL detection — it handles flags only.*
+
+### Accepted flags (extend existing `--scope`)
+
+| Flag | Search scope |
+|---|---|
+| `--user` | Search only `~/.kmgraph/` |
+| `--project` | Search only current repo's project KG |
+| `--named=<kg>` | Search only the named KG |
+| `--active` | Search active KG only |
+| (no flag) | Auto-detect: search all configured KGs (existing default behavior) |
+
+### Flag resolution
+
+Level flags (`--user`, `--project`, `--named`) take precedence over the existing `--scope` flag. If both are present, level flag wins.
+
+- `--user` → equivalent to `--scope personal-only` restricted to `~/.kmgraph/`
+- `--project` → resolve current repo's KG from `~/.claude/kg-config.json`, search that KG only
+- `--named=<kg>` → resolve named KG from `~/.claude/kg-config.json`, search that KG only
+- `--active` → equivalent to `--scope active`
+
+### Surface search scope
+
+At the start of results, always show:
+> "Searching: `{scope_description}`"
+
+e.g., "Searching: `~/.kmgraph/` (user KG only)" or "Searching: all configured KGs"
+
+---
+
 ## Step 0: Resolve Active KG Path
 
 Read `~/.claude/kg-config.json`. Find the `active` field and look up `graphs[active].path`. Store this as `{active_kg_path}`.

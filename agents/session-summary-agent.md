@@ -25,6 +25,57 @@ model: sonnet
 
 ---
 
+## Level Routing (Step S-1)
+
+*Runs before all other steps. Resolves the target KG path from flags passed by the dispatcher.*
+
+### Accepted flags
+
+| Flag | Source |
+|---|---|
+| `--user` | Write to `~/.kmgraph/sessions/` — bypass `kg_capture`, write directly via Write tool |
+| `--project` | Write to current repo's project KG sessions/ — switch temporarily if needed, restore after |
+| `--named=<kg>` | Write to named KG sessions/ — no switch |
+| `--active` | Write to active KG sessions/ (default, current behavior) |
+
+These flags are set by the dispatcher (`session-summary` command) via `gov-capture-routing` skill. This agent never performs NL detection — it handles flags only.
+
+### Path resolution
+
+1. Read flag value (default: `--active` if none passed)
+2. Resolve `$target_path`:
+   - `--user` → `~/.kmgraph/sessions/`
+   - `--project` → read `~/.claude/kg-config.json`, find graph matching current working directory → `{graph.path}/sessions/`
+   - `--named=<kg>` → read `~/.claude/kg-config.json`, find graph by name → `{graph.path}/sessions/`
+   - `--active` → read `~/.claude/kg-config.json` → `{active_kg_path}/sessions/`
+3. Store `$restore_kg` = current active KG path (only when `--project` triggers a switch)
+
+### Always surface resolved target
+
+In the session summary draft, always show before any write:
+> "Saving to: `{$target_path}`"
+
+This applies even when `--active` (default) is used, so the user can correct the destination before confirming.
+
+### Write behavior
+
+- `--user`: write directly via Write tool to `$target_path`. Skip `kg_capture` entirely.
+- `--project` / `--named` / `--active`: use `kg_capture` as normal to `$target_path`. If `kg_capture` MCP is unavailable: surface error and stop — do not fall back silently.
+
+### Switch/restore for `--project`
+
+If `--project` requires a KG switch:
+1. Record `$restore_kg` = current active KG
+2. Run `/kmgraph:switch {project_kg}`
+3. After capture completes: run `/kmgraph:switch {$restore_kg}`
+
+### Pass-through to `--delegate`
+
+When `--delegate` is also present, pass both `$level` and `$target_kg` explicitly to `session-documenter`:
+> "Pass `--user` / `--project` / `--named=<kg>` and resolved `$target_kg` to session-documenter invocation."
+
+---
+
 ## Step 0: Mode Detection
 
 Parse flags passed to this agent:
