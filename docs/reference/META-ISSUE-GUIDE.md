@@ -49,6 +49,22 @@ Convert your previous attempts into the meta-issue structure retroactively.
 
 ---
 
+## Escalation Thresholds
+
+KMGraph enforces structured escalation for stuck work via the `stuck-work-escalation` skill:
+
+| Threshold | What happens |
+|-----------|-------------|
+| **3 attempts or 30 min** | Meta-issue is created automatically. Opus reviews all logged attempts and provides fresh diagnosis. All subsequent attempts must use `--log-attempt` with a distinct hypothesis. |
+| **5 attempts** | Exit-path analysis is mandatory. The attempt template's exit-path section must be completed and presented to the user before any further work proceeds. |
+| **3 Opus rounds** | Maximum Opus involvement. After three rounds without resolution, exit-path decision is forced regardless of attempt count. |
+
+**Counter reset:** If root cause genuinely shifts (new diagnosis invalidates prior attempts), reset the attempt counter and log the reset in `analysis/root-cause-evolution.md`.
+
+**Scope:** Escalation thresholds apply only to work with a definable success criterion (test passes, error gone, metric hit). Not exploratory or iterative work.
+
+---
+
 ## Directory Structure
 
 ```
@@ -212,10 +228,17 @@ Each attempt has two files:
 - Configuration
 - Testing approach
 
+**New fields (added in v0.4.0):** The template now includes compact header fields for hypothesis tracking and a mandatory exit-path section at the bottom (filled only if the attempt fails).
+
 **Example:**
 
 ```markdown
 # Attempt 001: Caching Layer
+
+**Attempt #:** 001
+**Hypothesis:** High CPU suggests a processing bottleneck — caching will reduce redundant computation
+**Distinct from prior attempts:** First attempt
+**Success criterion:** 70%+ cache hit rate with ≥70% reduction in response time
 
 ## Hypothesis
 High CPU suggests processing bottleneck. Caching will reduce
@@ -230,6 +253,18 @@ redundant computation.
 3. TTL: 5 minutes
 
 [... detailed plan ...]
+
+## Exit Path (if attempt fails)
+
+**Recommended exit path:**
+- [x] Continue — next hypothesis: profile connection setup overhead
+- [ ] Defer
+- [ ] Workaround
+- [ ] Descope
+- [ ] Rescope
+- [ ] User decision required
+
+**Rationale:** Profiling revealed connection setup (47%) is the actual bottleneck — new hypothesis to test.
 ```
 
 ### attempt-results.md
@@ -296,7 +331,15 @@ mkdir docs/meta-issues/[issue-name]/attempts/{001-caching,002-queries}
 
 ### 3. Before Each New Attempt
 
-**Create attempt directory:**
+**Create attempt directory with hypothesis (recommended):**
+
+```bash
+/kmgraph:meta-issue --log-attempt 003 "Connection overhead is the bottleneck"
+```
+
+This enforces a distinct hypothesis before execution and pre-populates the attempt template. At attempt 3+, the command also reminds the user to invoke the `stuck-work-escalation` skill if not already active.
+
+**Or create manually:**
 
 ```bash
 mkdir docs/meta-issues/[issue-name]/attempts/003-pooling
@@ -504,3 +547,4 @@ See `core/examples/meta-issue/example-performance-saga/` for complete example:
 - **Templates:** [../templates/meta-issue/](../templates/meta-issue/)
 - **Workflows:** [WORKFLOWS.md#workflow-6-create-meta-issue](./WORKFLOWS.md#workflow-6-create-meta-issue)
 - **Architecture:** [ARCHITECTURE.md](./ARCHITECTURE.md)
+- **Stuck-work escalation:** See `skills/stuck-work-escalation/SKILL.md` for Opus gate, exit-path analysis, and counter reset rules
