@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## v0.4.2-beta (2026-04-18)
+
+### Fixed
+
+- **`triggers.md` missing from project KG scaffold** — `template-seed` seeded `rules.md` but omitted `triggers.md`. Fresh project KG inits now receive both files.
+- **`triggers.md` wrong path in personal KG creation** — `init.md` Step 1.8.5 targeted `{KG_PATH}/triggers.md` (copy-paste error) instead of `~/.kmgraph/triggers.md`. Personal KG creation now correctly seeds the user-level triggers file. Existing KGs missing `triggers.md` can recover by running `/kmgraph:init`.
+
 ## v0.4.1-beta (2026-04-16)
 
 ### Security
