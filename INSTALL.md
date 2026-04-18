@@ -231,6 +231,7 @@ done
 | **v0.3.5–v0.3.9** | No upgrade items expected for a clean install in this range. |
 | **v0.4.0** | Check c offers an updated meta-issue attempt template (adds hypothesis, distinct-from-prior, success-criterion, and exit-path fields). New `stuck-work-escalation` and `docs-impact-scan` skills are auto-available after plugin reload — no upgrade action required. |
 | **v0.4.1** | Security patch — no upgrade action required. Dependency overrides (`hono >=4.12.12`, `follow-redirects >=1.16.0`) are applied automatically on install. |
+| **v0.4.2** | Bug fix — `triggers.md` now seeded during init. Run `/kmgraph:init` to add `triggers.md` to any KG initialized before this version. |
 
 After the wizard completes, your existing lessons, ADRs, sessions, and chat history are untouched.
 

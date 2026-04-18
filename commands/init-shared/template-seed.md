@@ -27,6 +27,8 @@ cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-category-index.md" "{KG_PAT
 # Copy root-level files (skip if already exists to preserve teammate copies)
 [ -f "{KG_PATH}/rules.md" ] && echo "rules.md already exists — skipping scaffold (teammate copy preserved)." || \
   cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/rules.md" "{KG_PATH}/rules.md"
+[ -f "{KG_PATH}/triggers.md" ] && echo "triggers.md already exists — skipping scaffold." || \
+  cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/triggers.md" "{KG_PATH}/triggers.md"
 [ -f "{KG_PATH}/index.md" ] && echo "index.md already exists — skipping scaffold." || \
   cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-index.md" "{KG_PATH}/index.md"
 # me.md is always gitignored — safe to scaffold fresh
