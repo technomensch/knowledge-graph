@@ -2,8 +2,8 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.4.1-beta
-**Status:** Beta Release — Security patch: dependency vulnerability gate, hono + follow-redirects overrides
+**Version:** 0.4.2-beta
+**Status:** Beta Release — Bug fix: triggers.md now seeded during both project and personal KG init
 
 Documentation: https://kmgraph.stayinginsync.info
 
@@ -84,6 +84,10 @@ See [Getting Started Guide](docs/GETTING-STARTED.md) for prerequisites and troub
 ---
 
 ## v0.4.x Feature Highlights
+
+**v0.4.2-beta — 2026-04-18**
+
+- **`triggers.md` seeded during init** — Fixed two bugs where `triggers.md` (the platform-agnostic rule-timing companion to `rules.md`) was never created during fresh init. `template-seed` now includes it in the root scaffold copy block; personal KG creation now seeds `~/.kmgraph/triggers.md` from the template (previously targeted wrong path `{KG_PATH}/triggers.md`).
 
 **v0.4.1-beta — 2026-04-16**
 
@@ -180,7 +184,8 @@ knowledge-graph/
 
 See [ROADMAP.md](ROADMAP.md) for detailed version history and development progress.
 
-**Current Release:** v0.4.1-beta (2026-04-16)
+**Current Release:** v0.4.2-beta (2026-04-18)
+- ✅ triggers.md seeded during init — fixed missing scaffold in project KG and wrong-path bug in personal KG creation
 - ✅ Dependency vulnerability gate — pre-PR Dependabot check with findings table and approval gate
 - ✅ hono override >=4.12.12 + follow-redirects override >=1.16.0 — security patches
 - ✅ Stuck-work escalation — Opus diagnosis gate at 3 attempts, mandatory exit-path decision at 5
@@ -199,6 +204,7 @@ See [ROADMAP.md](ROADMAP.md) for detailed version history and development progre
 - ⚠️ Beta status: API subject to breaking changes before v1.0.0 stable
 
 **Recent Versions:**
+- v0.4.2-beta (Apr 18): Bug fix — triggers.md seeded during both project and personal KG init
 - v0.4.1-beta (Apr 16): Security patch — vulnerability gate, hono + follow-redirects dependency overrides
 - v0.4.0-beta (Apr 16): Stuck-work escalation skill, docs-impact-scan skill, --log-attempt meta-issue variant
 - v0.3.4-beta (Apr 10): Behavioral rule live-capture, rules-capture skill + agent, 4-target routing
@@ -298,7 +304,7 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Phase:** Beta Release Cycle (v0.4.1-beta)
+**Current Phase:** Beta Release Cycle (v0.4.2-beta)
 **Next Milestone:** v0.4.x — Expanded wiki link coverage and automated knowledge graph extraction improvements
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info
