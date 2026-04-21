@@ -1268,6 +1268,7 @@ Examples of personal lessons:
    cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-category-index.md" "$HOME/.kmgraph/knowledge/kg-category-index-global.md" 2>/dev/null || true
    # Root-level files — me.md, rules.md, kg-index-global.md → KG root (from user profile starters)
    cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/user/me.md" "$HOME/.kmgraph/me.md"
+   # Tier mapping setup — run immediately after me.md is seeded (see § Tier mapping setup below)
    [ -f "$HOME/.kmgraph/rules.md" ] && echo "rules.md already exists — skipping scaffold." || \
      cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/user/rules.md" "$HOME/.kmgraph/rules.md"
    [ -f "$HOME/.kmgraph/triggers.md" ] && echo "triggers.md already exists — skipping scaffold." || \
@@ -1275,6 +1276,39 @@ Examples of personal lessons:
    [ -f "$HOME/.kmgraph/kg-index-global.md" ] && echo "kg-index-global.md already exists — skipping scaffold." || \
      cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-index-global.md" "$HOME/.kmgraph/kg-index-global.md"
    ```
+
+#### § Tier mapping setup
+
+After seeding `me.md`, prompt the user to configure tier mappings:
+
+```
+Your me.md has been created at ~/.kmgraph/me.md. Let's configure which models to use for each task tier.
+
+Which platforms are you using? (select all that apply)
+  1. Claude (claude.ai / Claude Code)
+  2. Gemini (Gemini CLI / AI Studio)
+  3. Ollama (local, port 11434)
+  4. LM Studio (local, port 1234)
+  5. Skip — I'll configure this manually later
+```
+
+**For each selected cloud platform (1 or 2):** Pre-fill the default tier_map from the template — no prompts needed.
+
+**For Ollama (option 3):**
+1. Ask for host (default: `localhost`) and port (default: `11434`)
+2. Attempt discovery: `curl -s http://{host}:{port}/api/tags` (2s timeout)
+   - If success: display model list (paginated, 10 per page); ask user to assign one per tier
+   - If failure: print warning, offer manual entry
+3. Write the completed platform entry to `me.md` YAML frontmatter
+
+**For LM Studio (option 4):**
+1. Ask for host (default: `localhost`) and port (default: `1234`)
+2. Attempt discovery: `curl -s http://{host}:{port}/v1/models` (2s timeout)
+   - If success: display model list (paginated, 10 per page); ask user to assign one per tier
+   - If failure: print warning, offer manual entry
+3. Write the completed platform entry to `me.md` YAML frontmatter
+
+**Headless mode** (`CLAUDE_CODE_HEADLESS=1`): Skip all prompts. Write empty tier_map stubs. Log: `"Headless mode — tier mapping skipped. Edit ~/.kmgraph/me.md YAML frontmatter to configure."`
 
 4. Register in `~/.claude/kg-config.json`:
    ```json
