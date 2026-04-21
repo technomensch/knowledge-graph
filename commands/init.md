@@ -1259,18 +1259,19 @@ Examples of personal lessons:
 
 3. Copy templates:
    ```bash
-   # Category templates → knowledge/ subfolder
+   # Category templates → knowledge/templates/ subfolder
+   mkdir -p "$HOME/.kmgraph/knowledge/templates"
    for f in patterns.md gotchas.md concepts.md architecture.md workflows.md; do
-     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/$f" "$HOME/.kmgraph/knowledge/" 2>/dev/null || true
+     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/$f" "$HOME/.kmgraph/knowledge/templates/" 2>/dev/null || true
    done
    # kg-category-index deploys as kg-category-index-global.md at personal KG level
    cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-category-index.md" "$HOME/.kmgraph/knowledge/kg-category-index-global.md" 2>/dev/null || true
-   # Root-level files — me.md, rules.md, kg-index-global.md → KG root
-   cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/me.md" "$HOME/.kmgraph/me.md"
+   # Root-level files — me.md, rules.md, kg-index-global.md → KG root (from user profile starters)
+   cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/user/me.md" "$HOME/.kmgraph/me.md"
    [ -f "$HOME/.kmgraph/rules.md" ] && echo "rules.md already exists — skipping scaffold." || \
-     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/rules.md" "$HOME/.kmgraph/rules.md"
+     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/user/rules.md" "$HOME/.kmgraph/rules.md"
    [ -f "$HOME/.kmgraph/triggers.md" ] && echo "triggers.md already exists — skipping scaffold." || \
-     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/triggers.md" "$HOME/.kmgraph/triggers.md"
+     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/user/triggers.md" "$HOME/.kmgraph/triggers.md"
    [ -f "$HOME/.kmgraph/kg-index-global.md" ] && echo "kg-index-global.md already exists — skipping scaffold." || \
      cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-index-global.md" "$HOME/.kmgraph/kg-index-global.md"
    ```

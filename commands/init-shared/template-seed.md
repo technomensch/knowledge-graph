@@ -16,23 +16,24 @@ description: Shared template seed module — non-destructive copy of core/templa
 ### Copy templates
 
 ```bash
-# Copy KG templates
-cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/patterns.md" "{KG_PATH}/knowledge/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/gotchas.md" "{KG_PATH}/knowledge/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/concepts.md" "{KG_PATH}/knowledge/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/architecture.md" "{KG_PATH}/knowledge/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/workflows.md" "{KG_PATH}/knowledge/"
+# Copy KG content templates into knowledge/templates/ subdirectory
+mkdir -p "{KG_PATH}/knowledge/templates"
+cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/patterns.md" "{KG_PATH}/knowledge/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/gotchas.md" "{KG_PATH}/knowledge/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/concepts.md" "{KG_PATH}/knowledge/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/architecture.md" "{KG_PATH}/knowledge/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/workflows.md" "{KG_PATH}/knowledge/templates/"
 cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-category-index.md" "{KG_PATH}/knowledge/"
 
-# Copy root-level files (skip if already exists to preserve teammate copies)
+# Copy root-level profile files from project profile starters (skip if exists to preserve teammate copies)
 [ -f "{KG_PATH}/rules.md" ] && echo "rules.md already exists — skipping scaffold (teammate copy preserved)." || \
-  cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/rules.md" "{KG_PATH}/rules.md"
+  cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/project/rules.md" "{KG_PATH}/rules.md"
 [ -f "{KG_PATH}/triggers.md" ] && echo "triggers.md already exists — skipping scaffold." || \
-  cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/triggers.md" "{KG_PATH}/triggers.md"
+  cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/project/triggers.md" "{KG_PATH}/triggers.md"
 [ -f "{KG_PATH}/index.md" ] && echo "index.md already exists — skipping scaffold." || \
   cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-index.md" "{KG_PATH}/index.md"
 # me.md is always gitignored — safe to scaffold fresh
-cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/me.md" "{KG_PATH}/me.md"
+cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/project/me.md" "{KG_PATH}/me.md"
 
 # Copy lesson/ADR templates
 cp "{CLAUDE_PLUGIN_ROOT}/core/templates/lessons-learned/README.md" "{KG_PATH}/lessons-learned/"
@@ -55,7 +56,7 @@ fi
 Compare installed templates against the plugin's current templates. If newer versions exist, offer to update:
 
 ```bash
-template_dirs=("knowledge" "lessons-learned" "decisions" "sessions")
+template_dirs=("knowledge/templates" "lessons-learned" "decisions" "sessions")
 updates_available=()
 
 for tdir in "${template_dirs[@]}"; do

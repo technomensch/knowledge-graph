@@ -211,5 +211,27 @@ If root cause genuinely shifts (new diagnosis invalidates prior attempts), the a
 ---
 
 **Decision Made:** 2026-04-16
-**Last Updated:** 2026-04-16
+**Last Updated:** 2026-04-21
 **Status:** Proposed
+
+---
+
+## Amendments
+
+### 2026-04-21 — Persistent Attempt Counter (v0.5.0-beta)
+
+Stuck-Work attempt count is persisted in `~/.kmgraph/.stuck-work-state.json` keyed by session UUID. This survives context compaction. Counter resets on task completion or explicit session end.
+
+Schema:
+```json
+{
+  "session-uuid": {
+    "task": "short description",
+    "attempts": 3,
+    "last_tier": "powerful-tier",
+    "started_at": "2026-04-21T00:00:00Z"
+  }
+}
+```
+
+The `stuck-work-escalation` skill reads and writes this file. It declares `required_tier: powerful-tier` — this tier does not collapse; if powerful-tier is unavailable, the skill halts with an explicit error.

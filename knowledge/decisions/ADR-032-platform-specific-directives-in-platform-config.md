@@ -154,3 +154,9 @@ knowledge/
 
 **Decision Made:** 2026-04-11
 **Status:** Accepted
+
+---
+
+## Amendment — 2026-04-21 (Superseded in part by ADR-039)
+
+ADR-032 mandated `knowledge/platform/<platform>.md` as the primary home for platform-specific config. ADR-039 supersedes this in part: platform files are now **project-level overrides only**, not the primary config location. The primary config for platform and tier mapping lives in `me.md` YAML frontmatter (User Profile or Project Profile per ADR-039 terminology). See also ADR-041 (tier abstraction label system).
