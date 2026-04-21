@@ -215,6 +215,13 @@ This decision is mandatory for all releases starting with **v0.0.11-alpha** and 
 
 See [ADR-027](ADR-027-docusaurus-restructure-diataxis-docs-feed.md) for rationale.
 
+## Amendment — 2026-04-21 (MkDocs removed)
+
+The project has fully transitioned to Docusaurus. All references to `mkdocs build` in this ADR's checklists are superseded:
+
+- **Old:** `mkdocs build verification: zero warnings`
+- **New:** `npm run build` — zero errors required before PR
+
 ---
 
 **Created**: 2026-02-27

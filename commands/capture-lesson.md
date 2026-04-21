@@ -125,6 +125,10 @@ Once you have the user's answers, say:
 
 > "Looks like you just solved something worth keeping — let me capture that."
 
+#### Tier resolution
+
+Default tier: `standard-tier`. Read `me.md` YAML frontmatter (user profile first, project profile as override). Identify active platform; look up `tier_map[standard-tier]`. Apply collapse chain on failure (`powerful-tier → standard-tier → fast-tier`). Pass resolved model name as `--model [resolved]` to the subagent. If all tiers fail: halt with "No model available. Run /kmgraph:init to configure tier mappings."
+
 Then invoke `lesson-capture-agent`, passing the following pre-structured context:
 
 - **Problem statement** — from Step 1, question 1

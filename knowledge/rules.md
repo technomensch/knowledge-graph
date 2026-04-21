@@ -170,6 +170,28 @@ Do not use numbered headings in knowledge files — use plain headings (e.g., `#
 
 ---
 
+## Model Selection for Knowledge Graph Operations
+
+**Routing rule (ADR-038):** Route KG tasks by complexity to optimize latency and cost.
+
+| Task Category | Model | Rationale |
+|---------------|-------|-----------|
+| **Write/Capture** | fast-tier | Structured data entry with templates (ADRs, lessons, sessions, comments) — 3–5x faster, ~10% token cost |
+| **Search/Recall** | fast-tier | Index lookup, pointer generation — no synthesis required |
+| **Review/Validation** | standard-tier | Quality assessment (ADR review, lesson duplication detection, pattern matching) |
+| **Complex Judgment** | standard-tier/powerful-tier | Architectural design, conflict resolution, novel pattern discovery |
+
+**Implementation:**
+- Skills (`create-adr`, `capture-lesson`, etc.) default to fast-tier for write/capture operations
+- Agents use `gov-capture-routing` skill to resolve task type and route accordingly
+- Borderline tasks → route to standard-tier when unsure (safer than under-provisioning)
+
+**Why:** fast-tier is fully capable for template-based operations. Using standard-tier for form-filling wastes resources. A session with 5 ADRs + 3 lessons saves ~60% vs. standard-tier-all-the-way.
+
+**Source:** [[ADR-038-model-selection-rule-for-kg-tasks]]
+
+---
+
 ## Code Protection
 
 ### Protected Paths

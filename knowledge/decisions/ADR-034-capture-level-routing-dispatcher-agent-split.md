@@ -95,3 +95,30 @@ The conflict case (e.g., "save to user level for the knowledge-graph project") i
 - `~/.kmgraph/triggers.md` — "When capturing anything" trigger section
 - PR technomensch/knowledge-graph#91
 - ADR-017: Four-Layer Architecture Thin Commands (related: commands as thin dispatchers)
+
+---
+
+## Amendments
+
+### 2026-04-21 — Subagent Tier Inheritance (v0.5.0-beta)
+
+**Rule:** Parent dispatcher resolves tier → model once and passes the **resolved model name** (not the tier label) to the subagent. Subagents do not re-read `me.md`.
+
+**Rationale:** Prevents drift if `me.md` changes mid-session. Ensures predictable model assignment across the dispatcher → subagent boundary.
+
+**Exception:** Skills with `required_tier: <label>` in their frontmatter override this — the subagent re-resolves that tier independently against `me.md`. Primary use case: `stuck-work-escalation` declares `required_tier: powerful-tier` and halts (does not collapse) if powerful-tier is unavailable.
+
+**Rule location:** `~/.kmgraph/rules.md § Profile > Subagent Tier Inheritance`
+
+### 2026-04-21 — Dispatcher Tier Resolution Is Authoritative; Agent Frontmatter Must Not Override (v0.5.1-beta Phase 2 remediation)
+
+**Rule:** Agent frontmatter (`agents/*.md`) MUST NOT specify a `model:` field. The dispatcher owns invocation policy (see Decision above); an agent `model:` field overrides the resolved `--model [resolved]` flag silently, bypassing the entire tier resolution chain established in ADR-041.
+
+**Correct pattern:**
+- Dispatcher: reads `me.md`, resolves tier label → concrete model name, passes `--model [resolved]` to subagent
+- Agent: receives `--model [resolved]`, uses it; no `model:` in frontmatter
+
+**Incorrect pattern (eliminated in v0.5.1-beta):**
+- Agent frontmatter: `model: sonnet` — hardcodes a platform-specific model name, ignores dispatcher resolution
+
+**Scope:** Applied to all 8 agents in `agents/*.md`. The `model:` field was removed from all agent frontmatter as part of Phase 2 remediation. See also ADR-041 Amendment (2026-04-21).

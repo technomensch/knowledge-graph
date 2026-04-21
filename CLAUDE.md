@@ -91,7 +91,7 @@ grep -r "version" package.json .claude-plugin/plugin.json mcp-server/package.jso
 grep -r "/kmgraph:" commands/ agents/ skills/
 
 # Build & verify docs
-mkdocs build
+npm run build
 ```
 
 ## Platform Preferences (Claude Code)

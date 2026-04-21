@@ -155,7 +155,7 @@ Combined into four targets:
 | Personal | Me | `~/.kmgraph/me.md` | Personal KG (gitignored) |
 
 Signal examples per target:
-- `knowledge/rules.md`: "always run mkdocs build before PR", "never force-push", "from now on identify model per phase" — team process
+- `knowledge/rules.md`: "always run npm run build before PR", "never force-push", "from now on identify model per phase" — team process
 - `knowledge/me.md`: "in this project, I prefer to see diffs before you push", "remind me to check the hook after ECC installs" — personal workflow for this project
 - `~/.kmgraph/rules.md`: "don't use the term 'update' for files that need to be created" — cross-project process rule
 - `~/.kmgraph/me.md`: "no em dashes in any written content", "less technical jargon in confirmations" — identity/style across all projects

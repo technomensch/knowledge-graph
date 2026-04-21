@@ -10,11 +10,34 @@ from chat_extractor_base import get_output_path, format_timestamp, write_markdow
 
 CLAUDE_PROJECTS_DIR = os.path.expanduser("~/.claude/projects")
 
-def parse_metadata_from_file(file_path: str) -> tuple[Optional[str], int]:
-    """Parses the existing file to find the last message index and timestamp."""
+def _parse_ts(ts: str) -> Optional[float]:
+    """Parses an ISO 8601 timestamp string to a UTC epoch float, tolerating
+    truncated formats (no ms, no Z) as written by the extraction script and
+    full formats (with .msZ) as stored in Claude JSONL files."""
+    if not ts:
+        return None
+    for fmt in (
+        "%Y-%m-%dT%H:%M:%S.%fZ",
+        "%Y-%m-%dT%H:%M:%SZ",
+        "%Y-%m-%dT%H:%M:%S.%f",
+        "%Y-%m-%dT%H:%M:%S",
+    ):
+        try:
+            return datetime.strptime(ts, fmt).replace(tzinfo=None).timestamp()
+        except ValueError:
+            continue
+    return None
+
+
+def parse_metadata_from_file(file_path: str) -> tuple[Optional[float], int]:
+    """Parses the existing file to find the last message index and timestamp.
+
+    Returns last_ts as a UTC epoch float (not a string) so it can be compared
+    safely against JSONL timestamps regardless of formatting differences.
+    """
     if not os.path.exists(file_path):
         return None, 0
-    
+
     last_ts = None
     last_idx = 0
     try:
@@ -24,12 +47,13 @@ def parse_metadata_from_file(file_path: str) -> tuple[Optional[str], int]:
             size = f.tell()
             f.seek(max(0, size - 10240), os.SEEK_SET)
             tail = f.read()
-            
-            # Find last timestamp
-            ts_matches = re.findall(r'\*\*Timestamp:\*\* ([\d\-T:]+)', tail)
+
+            # Timestamps written by extraction script: "2026-04-21T17:40:50"
+            # Capture full match including optional fractional seconds and Z
+            ts_matches = re.findall(r'\*\*Timestamp:\*\* ([\d\-T:\.\+Z]+)', tail)
             if ts_matches:
-                last_ts = ts_matches[-1]
-            
+                last_ts = _parse_ts(ts_matches[-1])
+
             # Find last message index
             idx_matches = re.findall(r'### Message (\d+):', tail)
             if idx_matches:
@@ -173,12 +197,17 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
         
         last_ts, last_idx = parse_metadata_from_file(output_path)
         
-        if last_ts:
-            # Filter for truly new messages
+        if last_ts is not None:
+            # Filter for truly new messages. Compare as epoch floats so that
+            # JSONL timestamps ("2026-04-21T15:26:19.709Z") are not silently
+            # dropped when compared against file timestamps ("2026-04-21T17:40:50").
             filtered_sessions = []
             new_msg_count = 0
             for session in sessions:
-                new_msgs = [m for m in session['messages'] if m.get('timestamp') and m['timestamp'] > last_ts]
+                new_msgs = [
+                    m for m in session['messages']
+                    if m.get('timestamp') and (_parse_ts(m['timestamp']) or 0) > last_ts
+                ]
                 if new_msgs:
                     filtered_sessions.append({
                         **session,
@@ -204,7 +233,7 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                             global_msg_index += 1
                 results.append(f"Appended {new_msg_count} new messages to {filename}")
             else:
-                results.append(f"No new activity for {filename} (last sync: {last_ts})")
+                results.append(f"No new activity for {filename} (last sync: {datetime.utcfromtimestamp(last_ts).strftime('%Y-%m-%dT%H:%M:%SZ')})")
         else:
             # File exists but metadata parsing failed, or file is new
             file_exists = os.path.exists(output_path)
