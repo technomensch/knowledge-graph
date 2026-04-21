@@ -1,7 +1,6 @@
 ---
 name: recall-agent
 description: Searches the knowledge graph and memory systems for relevant lessons, decisions, and patterns. Use when the user asks about past work, previous decisions, or familiar problems.
-model: haiku
 ---
 
 # Recall Agent

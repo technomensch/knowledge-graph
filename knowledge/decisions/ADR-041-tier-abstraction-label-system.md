@@ -67,6 +67,7 @@ During Phase 2 rollout, the resolver accepts legacy model names as aliases and e
 | Opus, claude-opus-* | `powerful-tier` |
 | Gemini Flash, flash-* | `fast-tier` |
 | Gemini Pro, pro-* | `standard-tier` |
+| Gemini Ultra, Ultra, ultra-* | `powerful-tier` |
 
 ### me.md YAML Frontmatter Schema
 
@@ -124,7 +125,19 @@ Tier labels are platform-neutral vocabulary that any LLM ecosystem supports. Map
 
 ## Amendments
 
-*(none at time of writing)*
+### 2026-04-21 — Agent Frontmatter Must Not Specify `model:` (Phase 2 remediation)
+
+**Rule:** Agent frontmatter (agents/*.md) MUST NOT include a `model:` field. Hardcoding a platform-specific model name in frontmatter overrides any `--model [resolved]` flag passed by a dispatcher, making the entire tier resolution pipeline inert.
+
+**Correct pattern:** Omit `model:` from agent frontmatter entirely. Claude Code's default behavior when `model:` is absent is to inherit from the caller — exactly what tier resolution requires.
+
+**Rationale:** The entire premise of ADR-041 is that tier→model mapping is user-owned data in `me.md`, resolved at invocation time by the dispatcher. Frontmatter `model:` hardcodes a platform-specific model name into the agent file — the exact anti-pattern this ADR eliminates. ADR-034 establishes that dispatchers own invocation policy; frontmatter `model:` inverts that ownership.
+
+**Applied to:** All 8 agents in `agents/*.md` — `model:` field removed in v0.5.1-beta Phase 2 remediation commit.
+
+### 2026-04-21 — Gemini Ultra alias added to backwards compatibility alias map (N2 fix)
+
+**Change:** Added `Gemini Ultra, Ultra, ultra-*` → `powerful-tier` row to the alias map. The original alias table included Flash and Pro but omitted Ultra, creating an inconsistency with the tier table's Gemini column (which lists Ultra for `powerful-tier`).
 
 ---
 

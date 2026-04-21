@@ -51,9 +51,9 @@ Create a meta-issue when a problem meets **2 or more** of these criteria:
 
 The meta-issue command is also invoked automatically by the `stuck-work-escalation` skill. When escalation triggers:
 
-- **At 3 attempts (or 30 min):** Meta-issue is created automatically. Opus reviews all logged attempts and provides fresh diagnosis. All future attempts must be logged here with a hypothesis before starting.
+- **At 3 attempts (or 30 min):** Meta-issue is created automatically. powerful-tier reviews all logged attempts and provides fresh diagnosis. All future attempts must be logged here with a hypothesis before starting.
 - **At 5 attempts:** Exit-path analysis is mandatory. The attempt template's exit-path section must be completed and presented to the user before any further work proceeds.
-- **Escalation cap:** Opus reviews a maximum of 3 rounds before forcing the exit-path decision regardless of attempt count.
+- **Escalation cap:** powerful-tier reviews a maximum of 3 rounds before forcing the exit-path decision regardless of attempt count.
 - **Counter reset:** If diagnosis genuinely shifts (new root cause identified), attempt counter resets — note the reset in `analysis/root-cause-evolution.md`.
 - **Scope:** Only applies to work with a definable success criterion (test passes, error gone, metric hit). Not exploratory or iterative work.
 
@@ -372,7 +372,7 @@ Bidirectional documentation
 
 **With stuck-work-escalation skill:**
 Auto-invoked at 3 attempts. Supplies attempt log and root-cause evolution
-to Opus for diagnosis. Receives exit-path decision at 5 attempts.
+to powerful-tier for diagnosis. Receives exit-path decision at 5 attempts.
 
 ---
 

@@ -176,17 +176,17 @@ Do not use numbered headings in knowledge files — use plain headings (e.g., `#
 
 | Task Category | Model | Rationale |
 |---------------|-------|-----------|
-| **Write/Capture** | Haiku | Structured data entry with templates (ADRs, lessons, sessions, comments) — 3–5x faster, ~10% token cost |
-| **Search/Recall** | Haiku | Index lookup, pointer generation — no synthesis required |
-| **Review/Validation** | Sonnet | Quality assessment (ADR review, lesson duplication detection, pattern matching) |
-| **Complex Judgment** | Sonnet/Opus | Architectural design, conflict resolution, novel pattern discovery |
+| **Write/Capture** | fast-tier | Structured data entry with templates (ADRs, lessons, sessions, comments) — 3–5x faster, ~10% token cost |
+| **Search/Recall** | fast-tier | Index lookup, pointer generation — no synthesis required |
+| **Review/Validation** | standard-tier | Quality assessment (ADR review, lesson duplication detection, pattern matching) |
+| **Complex Judgment** | standard-tier/powerful-tier | Architectural design, conflict resolution, novel pattern discovery |
 
 **Implementation:**
-- Skills (`create-adr`, `capture-lesson`, etc.) default to Haiku for write/capture operations
+- Skills (`create-adr`, `capture-lesson`, etc.) default to fast-tier for write/capture operations
 - Agents use `gov-capture-routing` skill to resolve task type and route accordingly
-- Borderline tasks → route to Sonnet when unsure (safer than under-provisioning)
+- Borderline tasks → route to standard-tier when unsure (safer than under-provisioning)
 
-**Why:** Haiku is fully capable for template-based operations. Using Sonnet for form-filling wastes resources. A session with 5 ADRs + 3 lessons saves ~60% vs. Sonnet-all-the-way.
+**Why:** fast-tier is fully capable for template-based operations. Using standard-tier for form-filling wastes resources. A session with 5 ADRs + 3 lessons saves ~60% vs. standard-tier-all-the-way.
 
 **Source:** [[ADR-038-model-selection-rule-for-kg-tasks]]
 

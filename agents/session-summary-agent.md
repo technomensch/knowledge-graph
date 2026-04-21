@@ -1,7 +1,6 @@
 ---
 name: session-summary-agent
 description: Creates a lightweight summary of the current session — what was built, decided, and learned. Checks for open plans, draft ADRs, and uncaptured lessons before saving. Uses kg_capture for platform-agnostic writes.
-model: sonnet
 ---
 
 # Session Summary Agent
