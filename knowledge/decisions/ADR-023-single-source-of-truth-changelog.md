@@ -85,3 +85,9 @@ ln -s ../CHANGELOG.md docs/CHANGELOG.md
 
 **Supersedes:** Implicit dual-maintenance convention
 **Reviewed by:** Claude Sonnet 4.6
+
+---
+
+## Amendment — 2026-04-21 (MkDocs removed)
+
+The project has transitioned from MkDocs to Docusaurus. The `mkdocs-include-markdown-plugin` references in this ADR's Options B and C are historical — those mechanisms no longer apply. The symlink approach (Option A, the implemented solution) continues to work under Docusaurus unchanged.
