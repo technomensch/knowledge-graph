@@ -72,8 +72,15 @@ kmgraph_schema: 2
 <!-- Where plan files live and whether they are committed. -->
 <!-- Example: "Plans are local-only. Write to ~/.claude/plans/ first, then copy to docs/plans/ for working reference. Never commit plan files." -->
 
-- Plan location: ...
+- Plan location: write to `~/.claude/plans/` first, copy to `docs/plans/` for working reference — never commit plan files
 - Plan language: use "Create" for new files, "Update" for existing files — never use "Update" for files that don't exist yet
+- Skill overrides: `superpowers:writing-plans` defaults to `docs/superpowers/plans/` and `superpowers:brainstorming` defaults to `docs/superpowers/specs/`. Always override these:
+  - Plans → `docs/plans/` (never `docs/superpowers/plans/`)
+  - Specs → `docs/specs/` (never `docs/superpowers/specs/`)
+
+### Execution Mode Decision
+
+After `superpowers:writing-plans` produces the plan, **do not present the "Subagent-Driven or Inline?" choice interactively**. Apply `§ Parallelism Analysis` immediately and produce the per-task execution mode table. Present it as a recommendation — user confirms or adjusts, not chooses from scratch.
 
 ### Required Steps
 
@@ -82,6 +89,30 @@ kmgraph_schema: 2
 
 Every implementation plan must include these steps:
 1. ...
+
+### Parallelism Analysis
+
+> **When:** After writing a plan, before executing or implementing it
+
+Analyze task dependencies and output a concrete execution mode recommendation. Pre-decides the mode so execution is a confirmation, not a fresh decision.
+
+| Task | Mode | Model | Notes |
+|------|------|-------|-------|
+| Task 1: [name] | Subagent | Sonnet | |
+| Task 2: [name] | Inline | Haiku | Simple mechanical step |
+
+Follow the table with one line: **Overall strategy:** [why this mix was chosen]
+
+**Assignment heuristics:**
+- Tasks depending on prior task output → Inline (unless context-mode is active)
+- Self-contained, reversible tasks → Subagent candidates
+- Final integration, commit, and verification steps → Inline
+
+**Model heuristics (for the Model column):**
+- **Haiku** — mechanical/structured: scaffolding, boilerplate, templates, search/lookup, simple CRUD, KG write ops (ADRs, lessons, session summaries)
+- **Sonnet** — judgment-required: non-trivial logic, code review, analysis, refactoring, debugging, pattern matching, integration tasks
+- **Opus** — high-context/architectural: tasks that depend on output from multiple prior tasks, novel architectural decisions, conflict resolution across complex subsystems
+- **Default:** Sonnet for implementation tasks; Opus only when synthesizing large prior context or making novel architectural decisions
 
 ### Capture Checkpoints
 
