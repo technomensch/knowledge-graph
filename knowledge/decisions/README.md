@@ -4,8 +4,8 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 34
-**Last Updated:** 2026-04-15
+**Total ADRs:** 41
+**Last Updated:** 2026-04-21
 
 ---
 
@@ -17,6 +17,9 @@ Formal documentation of significant architecture decisions.
 
 ## All ADRs (Chronological)
 
+- [ADR-041: PreToolUse Hook Injection to Enforce User Rules During Superpowers Skill Execution](ADR-041-pretooluse-hook-injection-superpowers-rule-enforcement.md) — **Status:** Accepted — PreToolUse hook injects ~/.kmgraph/rules.md before brainstorming/writing-plans skills execute, ensuring file-location and execution-mode rules override skill defaults.
+- [ADR-038: Model Selection Rule for Knowledge Graph Tasks](ADR-038-model-selection-rule-for-kg-tasks.md) — **Status:** Accepted — Route Haiku for write/capture operations (ADRs, lessons, sessions); Sonnet for review; Opus for complex judgment.
+- [ADR-037: Default Graph-Usage Rules Seeded at Deployment](ADR-037-default-rules-for-graph-deployment.md) — **Status:** Proposed — Seed default meta-rules (ADR vs. memory, rules.md references) at graph init time.
 - [ADR-034: Capture Level Routing — Dispatcher/Agent Split with Shared gov-capture-routing Skill](ADR-034-capture-level-routing-dispatcher-agent-split.md) — **Status:** Accepted — Dispatchers resolve NL to explicit flags; agents handle flags only; gov-capture-routing skill is the single source of truth for all routing logic.
 - [ADR-031: Use Plural `Lessons_Learned_` Prefix for Lesson Filenames](ADR-031-lessons-learned-plural-prefix-naming.md) — **Status:** Accepted — Retroactively documents the `Lessons_Learned_` naming convention established in v0.2.1-beta; plural form is semantically correct and enforced by `capture.ts`.
 - [ADR-030: Migration Moves KMGraph-Named Subdirectories Only — Never the Entire docs/ Directory](ADR-030-migration-moves-named-subdirs-only-never-entire-docs.md) — **Status:** Accepted — Migration moves only KMGraph-named subdirs (`lessons-learned/`, `decisions/`, etc.) plus scaffold files; never the entire `docs/` directory.
@@ -33,6 +36,9 @@ Formal documentation of significant architecture decisions.
 - [ADR-030: Migration Moves KMGraph-Named Subdirectories Only](ADR-030-migration-moves-named-subdirs-only-never-entire-docs.md) — Named subdir list prevents collision with docs sites; explicit scope over blanket directory moves
 
 ### Process
+- [ADR-041: PreToolUse Hook Injection for Superpowers Rule Enforcement](ADR-041-pretooluse-hook-injection-superpowers-rule-enforcement.md) — PreToolUse hook injects rules.md before brainstorming/writing-plans; two-scope (plugin + user-wide)
+- [ADR-038: Model Selection Rule for Knowledge Graph Tasks](ADR-038-model-selection-rule-for-kg-tasks.md) — Route Haiku for write/capture; Sonnet for review; Opus for judgment
+- [ADR-037: Default Graph-Usage Rules Seeded at Deployment](ADR-037-default-rules-for-graph-deployment.md) — Seed meta-rules at init time
 - [ADR-029: Plan File Location in Knowledge Graph](ADR-029-plan-file-location-in-knowledge-graph.md) — Three-location plan structure: ENH folder, issue folder, or knowledge/plans/ fallback
 - [ADR-025: Do not commit `enabledPlugins` blocks](ADR-025-do-not-commit-enabledplugins-blocks.md) — Plugin settings scope hygiene for committed repos
 

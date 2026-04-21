@@ -133,9 +133,42 @@ When deploying `me.md` to the personal KG, strip the "See also: ~/.kmgraph/me.md
 After `template-seed.md` completes, also scaffold `triggers.md` if it does not already exist:
 
 ```bash
-[ -f "{KG_PATH}/triggers.md" ] || cp "{TEMPLATE_PATH}/knowledge/triggers.md" "{KG_PATH}/triggers.md"
+[ -f "{KG_PATH}/triggers.md" ] || cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/user/triggers.md" "{KG_PATH}/triggers.md"
 echo "✅ triggers.md scaffolded at {KG_PATH}/triggers.md"
 ```
+
+#### § Tier mapping setup
+
+After scaffolding `me.md`, prompt the user to configure tier mappings:
+
+```
+Your me.md has been created at {KG_PATH}/me.md. Let's configure which models to use for each task tier.
+
+Which platforms are you using? (select all that apply)
+  1. Claude (claude.ai / Claude Code)
+  2. Gemini (Gemini CLI / AI Studio)
+  3. Ollama (local, port 11434)
+  4. LM Studio (local, port 1234)
+  5. Skip — I'll configure this manually later
+```
+
+**For each selected cloud platform (1 or 2):** Pre-fill the default tier_map from the template — no prompts needed.
+
+**For Ollama (option 3):**
+1. Ask for host (default: `localhost`) and port (default: `11434`)
+2. Attempt discovery: `curl -s http://{host}:{port}/api/tags` (2s timeout)
+   - If success: display model list (paginated, 10 per page); ask user to assign one per tier
+   - If failure: print warning, offer manual entry
+3. Write the completed platform entry to `me.md` YAML frontmatter
+
+**For LM Studio (option 4):**
+1. Ask for host (default: `localhost`) and port (default: `1234`)
+2. Attempt discovery: `curl -s http://{host}:{port}/v1/models` (2s timeout)
+   - If success: display model list (paginated, 10 per page); ask user to assign one per tier
+   - If failure: print warning, offer manual entry
+3. Write the completed platform entry to `me.md` YAML frontmatter
+
+**Headless mode** (`CLAUDE_CODE_HEADLESS=1`): Skip all prompts. Write empty tier_map stubs. Log: `"Headless mode — tier mapping skipped. Edit {KG_PATH}/me.md YAML frontmatter to configure."`
 
 ---
 

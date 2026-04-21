@@ -37,6 +37,10 @@ Before any other steps, detect the level signal from the user's invocation and r
 
 Pass the resolved flag (`--user`, `--project`, `--named=<kg>`, or `--active`) to the `create-adr-agent` invocation.
 
+#### Tier resolution
+
+Default tier: `standard-tier`. Read `me.md` YAML frontmatter (user profile first, project profile as override). Identify active platform; look up `tier_map[standard-tier]`. Apply collapse chain on failure (`powerful-tier → standard-tier → fast-tier`). Pass resolved model name as `--model [resolved]` to the subagent. If all tiers fail: halt with "No model available. Run /kmgraph:init to configure tier mappings."
+
 ---
 
 ## Step 0: Resolve Active KG Path

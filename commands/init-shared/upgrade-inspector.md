@@ -183,12 +183,12 @@ For each item in `upgrades[]`, show a preview entry:
 - **Section h (scaffold missing root files):** for each missing file, show the source template path and destination:
   ```
   [preview] Would seed: me.md
-    Source: ${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/me.md
+    Source: ${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/project/me.md
     Dest:   {KG_PATH}/me.md
     Note:   gitignored — fill in your identity after seeding
 
   [preview] Would seed: rules.md
-    Source: ${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/rules.md
+    Source: ${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/project/rules.md
     Dest:   {KG_PATH}/rules.md
     Note:   fill in your project conventions after seeding
   ```
@@ -283,7 +283,7 @@ fi
 Compare installed templates against the plugin's current templates. If newer versions exist, offer to update:
 
 ```bash
-template_dirs=("knowledge" "lessons-learned" "decisions" "sessions")
+template_dirs=("knowledge/templates" "lessons-learned" "decisions" "sessions")
 updates_available=()
 
 for tdir in "${template_dirs[@]}"; do
@@ -705,3 +705,155 @@ Then write each file using the Edit tool (new files) or Edit tool (modifications
 - Only runs if `wiki_pass_complete` is not `true` in kg-config (the detection check above already verified this)
 - Sets `wiki_pass_complete: true` in kg-config on successful completion
 - Idempotent: re-running `/kmgraph:init` after completion skips this check silently
+
+#### i. Content template location migration (v0.5.0 — ADR-040)
+
+**Purpose:** Detect KGs where the five content templates (`patterns.md`, `gotchas.md`, `concepts.md`, `architecture.md`, `workflows.md`) were seeded directly under `knowledge/` (pre-v0.5.0 layout) and offer to move them to `knowledge/templates/` (v0.5.0+ layout).
+
+**Schema version gate (skip section i if already migrated):**
+
+```bash
+SCHEMA_VERSION=$(awk '/^---$/{if(in_front){in_front=0;exit}else{in_front=1;next}} in_front && /^kmgraph_schema:/{gsub(/[^0-9]/,"",$2);print $2;exit}' "{KG_PATH}/rules.md" 2>/dev/null)
+```
+
+If `$SCHEMA_VERSION` is a valid integer and `$SCHEMA_VERSION -ge 2`: skip section i silently (migration already reflected in schema version).
+
+**Detection:**
+
+```bash
+TEMPLATES_TO_MIGRATE=()
+for f in patterns.md gotchas.md concepts.md architecture.md workflows.md; do
+  if [ -f "{KG_PATH}/knowledge/$f" ] && [ ! -f "{KG_PATH}/knowledge/templates/$f" ]; then
+    TEMPLATES_TO_MIGRATE+=("$f")
+  fi
+done
+```
+
+If `TEMPLATES_TO_MIGRATE` is empty, skip this check silently.
+
+**If templates found at old location,** display and offer:
+
+```
+Found content templates at knowledge/ (pre-v0.5.0 layout):
+  knowledge/patterns.md
+  knowledge/concepts.md
+  ...
+
+These belong in knowledge/templates/ (v0.5.0+ layout). Options:
+  a. Migrate automatically — move to knowledge/templates/, create knowledge/templates/ if needed
+  b. Skip — I'll migrate manually
+```
+
+**If option (a) — auto-migrate:**
+
+```bash
+mkdir -p "{KG_PATH}/knowledge/templates"
+for f in "${TEMPLATES_TO_MIGRATE[@]}"; do
+  mv "{KG_PATH}/knowledge/$f" "{KG_PATH}/knowledge/templates/$f"
+  echo "Moved: knowledge/$f → knowledge/templates/$f"
+done
+echo "✅ Content template migration complete"
+```
+
+**Safety rules:**
+- Only moves files that exist at the old path AND are absent at the new path — never clobbers.
+- Uses `mv` — no data is lost.
+- Does not touch user-created KG entries (lessons, ADRs, patterns entries the user wrote).
+
+#### j. kmgraph-defaults block seed in rules.md (v0.5.0 — ADR-037)
+
+**Purpose:** Detect `rules.md` files missing the `<!-- kmgraph-defaults -->` ... `<!-- /kmgraph-defaults -->` block (introduced in v0.5.0) and offer to prepend it.
+
+**Schema version gate:** If `$SCHEMA_VERSION -ge 2` (computed in section i), skip section j silently.
+
+**Detection:**
+
+```bash
+HAS_DEFAULTS=$(grep -c '<!-- kmgraph-defaults -->' "{KG_PATH}/rules.md" 2>/dev/null)
+```
+
+If `$HAS_DEFAULTS` is `1` or greater, skip this check silently.
+
+**If block absent,** display and offer:
+
+```
+rules.md is missing the kmgraph-defaults block (added in v0.5.0).
+
+This block seeds basic Git workflow and version release rules that work across teams.
+It does not override anything you've already written.
+
+Options:
+  a. Prepend the defaults block to rules.md
+  b. Skip — I'll add it manually
+```
+
+**If option (a) — auto-prepend:**
+
+1. Archive `rules.md` first:
+   ```bash
+   ARCHIVE_DIR="{KG_PATH}/.kg-archive-$(date +%Y%m%d-%H%M%S)"
+   mkdir -p "$ARCHIVE_DIR"
+   cp "{KG_PATH}/rules.md" "$ARCHIVE_DIR/rules.md"
+   echo "{\"archived_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"trigger\": \"upgrade-inspector-section-j\"}" > "$ARCHIVE_DIR/manifest.json"
+   echo "✅ Archived rules.md → $ARCHIVE_DIR/rules.md"
+   ```
+
+2. Prepend the defaults block (from `core/templates/knowledge/templates/project/rules.md`, extracting only the `<!-- kmgraph-defaults -->` ... `<!-- /kmgraph-defaults -->` block):
+   ```bash
+   DEFAULTS_BLOCK=$(awk '/<!-- kmgraph-defaults -->/{found=1} found{print} /<!-- \/kmgraph-defaults -->/{exit}' \
+     "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/project/rules.md")
+   printf '%s\n\n' "$DEFAULTS_BLOCK" | cat - "{KG_PATH}/rules.md" > /tmp/rules-patched.md
+   mv /tmp/rules-patched.md "{KG_PATH}/rules.md"
+   echo "✅ kmgraph-defaults block prepended to rules.md"
+   ```
+
+**Safety rules:**
+- Archive is always taken before writing.
+- Prepend only — never replaces or removes existing user content.
+- Idempotent: detection gate skips if block already present.
+
+#### k. Platform block detection in rules.md (v0.5.0 — ADR-032 remediation)
+
+**Purpose:** Detect `rules.md` files that contain a `## Platform Preferences` or `## Platform` section, which indicates platform-specific directives that should be in the platform config file (e.g., `CLAUDE.md`) per ADR-032. This check is the successor to section d's contamination grep — section d targets tool-directive lines while section k targets the presence of a dedicated platform section heading.
+
+**Schema version gate:** If `$SCHEMA_VERSION -ge 2` (computed in section i), skip section k silently.
+
+**Detection:**
+
+```bash
+PLATFORM_SECTION=$(grep -n '^## Platform' "{KG_PATH}/rules.md" 2>/dev/null)
+```
+
+If `$PLATFORM_SECTION` is empty, skip this check silently.
+
+**If a platform section heading found,** display and offer:
+
+```
+rules.md contains a Platform section (line N):
+  "## Platform Preferences"
+
+Per ADR-032, platform-specific tool directives belong in the platform config (CLAUDE.md, GEMINI.md, etc.), not rules.md.
+
+Options:
+  a. Relocate automatically — same flow as section d (archive → move → remove from rules.md)
+  b. Skip — I'll handle manually
+```
+
+**If option (a):** delegate to the section d auto-relocate flow (read `commands/init-shared/knowledge-file-migrator.md`), passing the full section content as `{CONTAMINATION}`.
+
+After the platform section is relocated, offer the tier mapping walkthrough inline:
+
+```
+Your rules.md platform section has been moved to CLAUDE.md.
+
+Would you like to configure tier mappings in me.md now?
+  1. Yes — run tier mapping setup
+  2. Skip — I'll edit me.md manually later
+```
+
+**If option 1:** Run the tier mapping walkthrough exactly as specified in `commands/init.md § Tier mapping setup`. Target file: `{KG_PATH}/me.md` (or `~/.kmgraph/me.md` if personal KG). After completion, `me.md` will have a populated `platforms[]` block with `profile_schema: 1`.
+
+**Safety rules:**
+- Section d and k do not double-run: if section d already relocated the content in this session, the `$SCHEMA_VERSION` gate prevents section k from re-offering.
+- Archive is always taken before any write.
+- Tier mapping walkthrough is offered only after successful relocation — not independently by this section.
