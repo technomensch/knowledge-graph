@@ -839,6 +839,19 @@ Options:
 
 **If option (a):** delegate to the section d auto-relocate flow (read `commands/init-shared/knowledge-file-migrator.md`), passing the full section content as `{CONTAMINATION}`.
 
+After the platform section is relocated, offer the tier mapping walkthrough inline:
+
+```
+Your rules.md platform section has been moved to CLAUDE.md.
+
+Would you like to configure tier mappings in me.md now?
+  1. Yes — run tier mapping setup
+  2. Skip — I'll edit me.md manually later
+```
+
+**If option 1:** Run the tier mapping walkthrough exactly as specified in `commands/init.md § Tier mapping setup`. Target file: `{KG_PATH}/me.md` (or `~/.kmgraph/me.md` if personal KG). After completion, `me.md` will have a populated `platforms[]` block with `profile_schema: 1`.
+
 **Safety rules:**
 - Section d and k do not double-run: if section d already relocated the content in this session, the `$SCHEMA_VERSION` gate prevents section k from re-offering.
 - Archive is always taken before any write.
+- Tier mapping walkthrough is offered only after successful relocation — not independently by this section.
