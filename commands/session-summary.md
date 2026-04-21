@@ -61,6 +61,10 @@ The resolved flag (`--user`, `--project`, `--named=<kg>`, or `--active`) is then
 
 ---
 
+## Tier Resolution
+
+Default path: `standard-tier`. `--delegate` path (session-documenter): `powerful-tier`. Read `me.md` YAML frontmatter (user profile first, project profile as override). Identify active platform; look up `tier_map[required-tier]`. Apply collapse chain on failure (`powerful-tier → standard-tier → fast-tier`). Pass resolved model name as `--model [resolved]` to the subagent. If all tiers fail: halt with "No model available. Run /kmgraph:init to configure tier mappings."
+
 ## Dispatch
 
 Evaluate the flags provided:
