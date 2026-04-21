@@ -50,6 +50,17 @@
     ],
     "PreToolUse": [
       {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "comment": "Before superpowers:brainstorming or superpowers:writing-plans: inject ~/.kmgraph/rules.md file-location and execution-mode overrides so skill defaults are superseded",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/pre-skill-rules-inject.sh",
+            "timeout": 5
+          }
+        ]
+      },
+      {
         "matcher": "Bash",
         "hooks": [
           {
