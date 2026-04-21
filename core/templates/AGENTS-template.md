@@ -10,7 +10,7 @@ Template for creating new KMGraph agents. Copy this file and fill in each sectio
 ---
 name: {agent-name}
 description: {One-line description of what this agent does}
-model: {opus | sonnet | haiku}
+model: {powerful-tier | standard-tier | fast-tier}
 ---
 ```
 

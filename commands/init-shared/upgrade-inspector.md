@@ -764,6 +764,8 @@ echo "✅ Content template migration complete"
 
 **Purpose:** Detect `rules.md` files missing the `<!-- kmgraph-defaults -->` ... `<!-- /kmgraph-defaults -->` block (introduced in v0.5.0) and offer to prepend it.
 
+**Schema version gate:** If `$SCHEMA_VERSION -ge 2` (computed in section i), skip section j silently.
+
 **Detection:**
 
 ```bash

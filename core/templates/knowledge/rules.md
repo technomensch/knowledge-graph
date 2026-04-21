@@ -98,8 +98,8 @@ Analyze task dependencies and output a concrete execution mode recommendation. P
 
 | Task | Mode | Model | Notes |
 |------|------|-------|-------|
-| Task 1: [name] | Subagent | Sonnet | |
-| Task 2: [name] | Inline | Haiku | Simple mechanical step |
+| Task 1: [name] | Subagent | standard-tier | |
+| Task 2: [name] | Inline | fast-tier | Simple mechanical step |
 
 Follow the table with one line: **Overall strategy:** [why this mix was chosen]
 
@@ -108,11 +108,11 @@ Follow the table with one line: **Overall strategy:** [why this mix was chosen]
 - Self-contained, reversible tasks → Subagent candidates
 - Final integration, commit, and verification steps → Inline
 
-**Model heuristics (for the Model column):**
-- **Haiku** — mechanical/structured: scaffolding, boilerplate, templates, search/lookup, simple CRUD, KG write ops (ADRs, lessons, session summaries)
-- **Sonnet** — judgment-required: non-trivial logic, code review, analysis, refactoring, debugging, pattern matching, integration tasks
-- **Opus** — high-context/architectural: tasks that depend on output from multiple prior tasks, novel architectural decisions, conflict resolution across complex subsystems
-- **Default:** Sonnet for implementation tasks; Opus only when synthesizing large prior context or making novel architectural decisions
+**Tier heuristics (for the Model column — resolved via `me.md` `tier_map` at invocation time, per ADR-041):**
+- **fast-tier** — mechanical/structured: scaffolding, boilerplate, templates, search/lookup, simple CRUD, KG write ops (ADRs, lessons, session summaries)
+- **standard-tier** — judgment-required: non-trivial logic, code review, analysis, refactoring, debugging, pattern matching, integration tasks
+- **powerful-tier** — high-context/architectural: tasks that depend on output from multiple prior tasks, novel architectural decisions, conflict resolution across complex subsystems
+- **Default:** standard-tier for implementation tasks; powerful-tier only when synthesizing large prior context or making novel architectural decisions
 
 ### Capture Checkpoints
 
