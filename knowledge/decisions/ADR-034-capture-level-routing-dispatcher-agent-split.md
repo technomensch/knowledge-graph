@@ -95,3 +95,17 @@ The conflict case (e.g., "save to user level for the knowledge-graph project") i
 - `~/.kmgraph/triggers.md` — "When capturing anything" trigger section
 - PR technomensch/knowledge-graph#91
 - ADR-017: Four-Layer Architecture Thin Commands (related: commands as thin dispatchers)
+
+---
+
+## Amendments
+
+### 2026-04-21 — Subagent Tier Inheritance (v0.5.0-beta)
+
+**Rule:** Parent dispatcher resolves tier → model once and passes the **resolved model name** (not the tier label) to the subagent. Subagents do not re-read `me.md`.
+
+**Rationale:** Prevents drift if `me.md` changes mid-session. Ensures predictable model assignment across the dispatcher → subagent boundary.
+
+**Exception:** Skills with `required_tier: <label>` in their frontmatter override this — the subagent re-resolves that tier independently against `me.md`. Primary use case: `stuck-work-escalation` declares `required_tier: powerful-tier` and halts (does not collapse) if powerful-tier is unavailable.
+
+**Rule location:** `~/.kmgraph/rules.md § Profile > Subagent Tier Inheritance`
