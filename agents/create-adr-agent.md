@@ -169,6 +169,10 @@ If a title was passed as input, pre-fill question 1 and confirm it.
 6. **Rationale** — "Why was this decision made? Include alternatives considered." (bullets preferred)
 7. **Consequences** — "What are the consequences? Positive and negative impacts." (bullets preferred)
 8. **Related Lessons** — "Related to any existing lessons learned?" (optional, press Enter to skip)
+9. **Implementation Commit** — "Has this decision already been implemented? If yes, run `git log --oneline -5` and paste the commit hash. If not yet implemented, press Enter to skip (you'll back-fill this after the commit lands)."
+
+   - If hash provided: store as `$implements_ref = "[[<hash>]] — <commit subject from git log>"`
+   - If skipped: store as `$implements_ref = null`
 
 ---
 
@@ -272,7 +276,7 @@ git:
   commit: {full SHA}
   pr: {pr-number or null}
   issue: {issue-number or null}
-implements: null
+implements: {$implements_ref}
 related:
   adrs: []
   lessons: [{lesson filenames if provided}]
@@ -319,6 +323,13 @@ Update `{active_kg_path}/decisions/README.md`:
    - [ADR-{NNN}: {title}](ADR-{NNN}-{slug}.md) — **Status:** {status} — {one-line context summary}
    ```
 3. **By Category** — add under the correct category heading (Architecture / Process / Technology Choices). Create the section if it doesn't exist.
+
+---
+
+**If `$implements_ref` is null** (design-first ADR — not yet implemented):
+
+After the implementation commit lands, update the `implements` field:
+> "ADR-{NNN} is saved. Once you implement this decision, run `git log --oneline -1` and update `implements` in the ADR frontmatter with the commit hash."
 
 ---
 
