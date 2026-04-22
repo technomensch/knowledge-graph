@@ -33,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Docs
 
-- **ADR `implements` backfill** — All Accepted ADRs (014–043) now have non-null `implements` in `[[wiki-link]]` format per ADR-042.
+- **ADR `implements` backfill** — All Accepted ADRs that were null now have non-null `implements` per ADR-042. Newly backfilled ADRs (014–043) use `[[wiki-link]]` format; pre-existing non-null entries retain their original format. Proposed ADRs (035, 036, 037) remain null pending implementation.
 - **ADR-041 amended** — Alias map and validation gate marked as implemented (Phase 3 complete).
 
 ## v0.5.1-beta (2026-04-21)

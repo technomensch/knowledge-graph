@@ -32,13 +32,13 @@ Check if `$requested_tier` is a legacy model name rather than a tier label.
 | `Sonnet`, `sonnet`, `claude-sonnet-*` | `standard-tier` |
 | `Opus`, `opus`, `claude-opus-*` | `powerful-tier` |
 | `Gemini Flash`, `flash-*`, `gemini-flash-*` | `fast-tier` |
-| `Gemini Pro`, `gemini-pro-*` | `standard-tier` |
+| `Gemini Pro`, `pro-*`, `gemini-pro-*` | `standard-tier` |
 | `Gemini Ultra`, `Ultra`, `ultra-*`, `gemini-ultra-*` | `powerful-tier` |
 
 **If alias matched:**
 
 1. Resolve `$requested_tier` → tier label (e.g., `Haiku` → `fast-tier`)
-2. Emit this message **once per session** (track via `/tmp/.kg-tier-alias-warned-$(date +%Y-%m-%d)`):
+2. Emit this message **once per day** (tracked via `/tmp/.kg-tier-alias-warned-$(date +%Y-%m-%d)` — one flag file per calendar day; multiple sessions on the same day suppress after the first):
 
    > ⚠️ Model name `[legacy_name]` is deprecated — use tier label `[resolved_tier]` instead. Update your `me.md` tier_map or dispatcher invocation. Aliases will be removed in v0.6.0.
 
@@ -91,7 +91,13 @@ Store result as `$mapped_value`.
 
 #### R-3C: Collapse Chain
 
-Try tiers in order: `powerful-tier → standard-tier → fast-tier`, skipping the already-tried tier.
+**Direction: downward only.** Starting from `$requested_tier`, try progressively cheaper tiers. Never upgrade (never try a higher tier than what was requested).
+
+| If `$requested_tier` is | Try fallbacks in order |
+|---|---|
+| `powerful-tier` | `standard-tier` → `fast-tier` |
+| `standard-tier` | `fast-tier` only |
+| `fast-tier` | (none — halt immediately if empty) |
 
 For each fallback tier:
 - Look up `tier_map[$fallback_tier]`
@@ -108,14 +114,17 @@ Halt with:
 
 **This gate fires only here — never from file scanning, frontmatter inspection, or grep over arbitrary files.**
 
-Validate that `$mapped_value` looks like a real model identifier. A valid model ID:
-- Contains at least one hyphen or version number (e.g., `claude-sonnet-4-6`, `llama3.1:8b`, `gemini-pro`)
-- Is not a bare tier label (`fast-tier`, `standard-tier`, `powerful-tier`)
-- Is not a legacy alias name (already handled in R-1)
+Validate `$mapped_value` by applying these checks in order. Fail on the first match:
 
-**If validation fails** (value is suspicious — e.g., a bare word like `"sonnet"` or a tier label used as a model value):
+1. **Reject bare tier labels:** if `$mapped_value` is `fast-tier`, `standard-tier`, or `powerful-tier` → suspicious (tier label used as model value).
+2. **Reject bare alias names:** if `$mapped_value` case-insensitively matches any key in the R-1 alias map (e.g., `Haiku`, `Sonnet`, `Opus`, `Flash`, `Ultra`) → suspicious (alias used as model value).
+3. **Require structural marker:** if `$mapped_value` contains no hyphen (`-`), colon (`:`), or numeric suffix → suspicious (bare word with no version or type separator).
 
-Emit **once per session** (track via `/tmp/.kg-model-suspicious-$(date +%Y-%m-%d)`):
+A value that passes all three checks is treated as a valid model ID (e.g., `claude-sonnet-4-6`, `llama3.1:8b`, `gemini-pro-1.5`).
+
+**If any check triggers** (value is suspicious):
+
+Emit **once per day** (tracked via `/tmp/.kg-model-suspicious-$(date +%Y-%m-%d)`):
 
 > ⚠️ Tier `[$requested_tier]` maps to `[$mapped_value]` which may not be a valid model ID. Check your `me.md` tier_map. Continuing anyway — invocation may fail.
 
