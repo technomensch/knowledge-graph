@@ -5,8 +5,8 @@
 <meta name="generator" content="Docusaurus v3.9.2">
 <title data-rh="true">Architecture Decision Records (ADRs) | Knowledge Management Graph</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://technomensch.github.io/knowledge-graph/templates/decisions/"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Architecture Decision Records (ADRs) | Knowledge Management Graph"><meta data-rh="true" name="description" content="Navigation: Home &gt; Getting Started &gt; Manual Workflows &gt; Templates"><meta data-rh="true" property="og:description" content="Navigation: Home &gt; Getting Started &gt; Manual Workflows &gt; Templates"><link data-rh="true" rel="icon" href="/knowledge-graph/img/square.png"><link data-rh="true" rel="canonical" href="https://technomensch.github.io/knowledge-graph/templates/decisions/"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/templates/decisions/" hreflang="en"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/templates/decisions/" hreflang="x-default"><link rel="alternate" type="application/rss+xml" href="/knowledge-graph/docs-updates/rss.xml" title="KMGraph Docs Updates RSS Feed">
 <link rel="alternate" type="application/atom+xml" href="/knowledge-graph/docs-updates/atom.xml" title="KMGraph Docs Updates Atom Feed"><link rel="stylesheet" href="/knowledge-graph/assets/css/styles.295a293b.css">
-<script src="/knowledge-graph/assets/js/runtime~main.9dd970e1.js" defer="defer"></script>
-<script src="/knowledge-graph/assets/js/main.b0f20577.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/runtime~main.3fb34160.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/main.3376d0aa.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg style="display: none;"><defs>
@@ -50,14 +50,14 @@
 </ul>
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="field-guide">Field Guide<a href="#field-guide" class="hash-link" aria-label="Direct link to Field Guide" title="Direct link to Field Guide" translate="no">​</a></h2>
-<p>The ADR template uses manual markdown fields (no auto-fill commands yet):</p>
-<p><strong>Header Fields (all manual):</strong></p>
+<p>The ADR template fields are populated by the <code>/kmgraph:create-adr</code> wizard. Most fields are auto-populated; a few require user input during the wizard.</p>
+<p><strong>Header Fields:</strong></p>
 <ul>
-<li class=""><code>ADR-XXX</code> - Sequential number (e.g., ADR-001, ADR-002)</li>
+<li class=""><code>ADR-XXX</code> - Sequential number — auto-incremented by the wizard</li>
 <li class=""><code>Title</code> - Concise decision description</li>
-<li class=""><code>Date</code> - Date decision was made (format: 2024-01-15)</li>
+<li class=""><code>Date</code> - Date decision was made — auto-populated by the wizard</li>
 <li class=""><code>Status</code> - Current status (Proposed | Accepted | Deprecated | Superseded)</li>
-<li class=""><code>Implements</code> - Optional: Version or feature this applies to</li>
+<li class=""><code>Implementation Commit</code> - Auto-populated: the wizard captures the commit and subject line where this decision was implemented</li>
 <li class=""><code>Related</code> - Optional: Links to related ADRs, lessons, KG entries</li>
 </ul>
 <p><strong>Content Sections:</strong>
@@ -71,14 +71,15 @@ All sections are manually filled:</p>
 </ul>
 <p><strong>Troubleshooting:</strong></p>
 <ul>
-<li class="">ADRs are created manually — no auto-fill commands yet</li>
-<li class="">Replace all <code>[bracketed placeholders]</code> with your content</li>
-<li class="">For sequential numbering, check the highest existing ADR number and add 1</li>
+<li class="">Run <code>/kmgraph:create-adr</code> — the wizard handles numbering and metadata automatically</li>
+<li class="">If editing an existing ADR manually, replace all <code>[bracketed placeholders]</code> with your content</li>
 </ul>
 <p><strong>Examples:</strong>
 See <a class="" href="/knowledge-graph/examples/decisions/">core/examples/decisions/</a> for filled-out ADR examples.</p>
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="creating-a-new-adr">Creating a New ADR<a href="#creating-a-new-adr" class="hash-link" aria-label="Direct link to Creating a New ADR" title="Direct link to Creating a New ADR" translate="no">​</a></h2>
+<p>Run <code>/kmgraph:create-adr</code> — the wizard handles numbering, git metadata, and index updates automatically.</p>
+<p>For manual creation:</p>
 <ol>
 <li class=""><strong>Determine next number:</strong> Find the highest existing ADR number and increment</li>
 <li class=""><strong>Copy template:</strong> Use <a class="" href="/knowledge-graph/templates/decisions/ADR-template">ADR-template.md</a></li>
