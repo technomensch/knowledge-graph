@@ -75,7 +75,7 @@ Detect which flags the user passed:
 
 #### Tier resolution
 
-Default tier: `standard-tier`. Read `me.md` YAML frontmatter (user profile first, project profile as override). Identify active platform; look up `tier_map[standard-tier]`. Apply collapse chain on failure (`powerful-tier → standard-tier → fast-tier`). Pass resolved model name as `--model [resolved]` to the subagent. If all tiers fail: halt with "No model available. Run /kmgraph:init to configure tier mappings."
+Set `$requested_tier` = `standard-tier`. Invoke `ai-model-tier-resolver` module (`commands/init-shared/ai-model-tier-resolver.md`) with `$requested_tier` and `{KG_PATH}`. On success: pass `--model [$resolved_model]` to each subagent invocation.
 
 Spawn the `sync-all-agent` subagent with parsed flags:
 
