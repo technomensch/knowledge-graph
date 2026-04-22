@@ -149,6 +149,16 @@ Tier labels are platform-neutral vocabulary that any LLM ecosystem supports. Map
 
 **Status:** Alias map and validation gate are fully implemented. Sunset scheduled for v0.6.0 (alias removal + resolver cleanup).
 
+### 2026-04-21 — Phase 3 Opus Review Remediations Applied
+
+Three corrections applied to `ai-model-tier-resolver.md` following post-implementation review:
+
+1. **Alias map — `pro-*` added (M1):** Gemini Pro row expanded to include `pro-*` pattern (matching ADR-041 spec). Prior implementation used `gemini-pro-*` only, which under-matched the ADR's `pro-*` alias.
+
+2. **Collapse chain — downward-only (M2):** R-3C now explicitly specifies downward-only collapse (`powerful → standard → fast`). A request for `fast-tier` halts immediately if fast is unconfigured rather than upgrading to a more expensive tier.
+
+3. **Validation gate — ordered checks (M3):** R-4 now applies deny checks (bare tier labels, bare alias names) before the structural marker check. Eliminates the prior ambiguity where `fast-tier` could simultaneously satisfy both a positive and a negative check.
+
 ---
 
 **Decision Made:** 2026-04-21

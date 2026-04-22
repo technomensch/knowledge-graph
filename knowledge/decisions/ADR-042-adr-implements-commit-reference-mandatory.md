@@ -161,11 +161,21 @@ None
 
 ## Future Considerations
 
-1. **Update `create-adr` skill:** When status is Accepted, prompt: "What commit implements this decision? (`git log --oneline -5`)" and auto-fill `implements`. This closes the enforcement gap.
-2. **Retroactive compliance sweep:** Once the skill is updated, run a pass over ADRs 001–041 to fill in `implements` where possible.
+1. ~~**Update `create-adr` skill:** prompt for `implements` and auto-fill.~~ ✅ Done — v0.5.2-beta Phase 3.
+2. ~~**Retroactive compliance sweep:** fill in `implements` for ADRs 001–041.~~ ✅ Done — v0.5.2-beta Phase 3.
 
 ---
 
+## Amendments
+
+### 2026-04-21 — Enforcement implemented in `create-adr-agent` (v0.5.2-beta Phase 3)
+
+**Wizard enforcement:** `create-adr-agent.md` Phase 3 now includes question 9 — "Has this decision already been implemented?" Collects commit hash, stores as `$implements_ref = "[[<hash>]] — <subject>"` (or `null` for design-first ADRs). `{$implements_ref}` replaces hardcoded `null` in Phase 5 frontmatter. Phase 6 adds a back-fill reminder for design-first ADRs.
+
+**Context-passed path:** When `wizard_mode: false` (skill/dispatcher passes context directly), `$implements_ref` is populated from `payload.implements_ref` if present, otherwise defaults to `null`. Prevents blank frontmatter from automated capture flows.
+
+**Retroactive compliance:** All Accepted ADRs through ADR-043 have `implements` backfilled with `[[wiki-link]]` commit references or `non-git-tracked` notes. ADR-041 cross-branch collision resolved: pretooluse-hook ADR renumbered to ADR-043.
+
 **Decision Made:** 2026-04-22
-**Last Updated:** 2026-04-22
+**Last Updated:** 2026-04-21
 **Status:** Accepted
