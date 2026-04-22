@@ -1,8 +1,8 @@
 ---
 # ====================
 # YAML FRONTMATTER - Metadata for this ADR
-# NOTE: No auto-fill commands yet - future /kmgraph:create-adr will use this
-# Fields marked [FUTURE-AUTO] will be auto-filled when command is built
+# NOTE: Use /kmgraph:create-adr to create ADRs — auto-fill fields are populated by the wizard
+# Fields marked [AUTO] are populated automatically by the wizard
 # Fields marked [MANUAL] require you to fill them in
 # ====================
 
@@ -24,7 +24,7 @@ git:  # [FUTURE-AUTO] All git metadata detected automatically
   pr: [pr-number or null]  # PR number if branch named like "feature/123-title", otherwise null
   issue: [issue-number or null]  # Issue number if branch named like "issue/456-bug", otherwise null
 
-implements: [version or null]  # [MANUAL] Optional: Version or feature this applies to (e.g., "v2.0.0")
+implements: null  # [AUTO] Wizard captures the commit and subject line where this decision was implemented
 
 related:  # [MANUAL] Optional: Links to related ADRs, lessons, KG entries
   adrs: []  # List of related ADR numbers (e.g., [1, 3, 5])

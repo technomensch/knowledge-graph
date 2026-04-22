@@ -5,7 +5,7 @@ sidebar_label: Commands
 description: Every KMGraph slash command — category, description, and key flags
 ---
 
-**Version:** 0.3.9-beta | All commands use the `/kmgraph:` prefix in Claude Code. Other platforms access equivalent functionality through `kg_*` MCP tools — see [INSTALL.md](../INSTALL.md) for details.
+**Version:** 0.5.2 | All commands use the `/kmgraph:` prefix in Claude Code. Other platforms access equivalent functionality through `kg_*` MCP tools — see [INSTALL.md](../INSTALL.md) for details.
 
 <img src="/img/demos/session-summary.gif" alt="KMGraph session-summary demo — snapshot of captured lessons and open plans" width="800" />
 
@@ -15,7 +15,7 @@ description: Every KMGraph slash command — category, description, and key flag
 
 | Command | Description | Key flags |
 |---|---|---|
-| [`/kmgraph:init`](#init) | Initialize a new knowledge graph with wizard-based setup | — |
+| [`/kmgraph:init`](#init) | Initialize a new knowledge graph with wizard-based setup; discovers locally running Ollama and LM Studio instances and offers to configure them for tier mapping | — |
 | [`/kmgraph:status`](#status) | Display active KG health, file counts, and warnings | `--minimal`, `--json` |
 | [`/kmgraph:recall`](#recall) | Full-text search across lessons, ADRs, KG entries, sessions, and MEMORY.md | `--scope=all\|active\|personal-only`, `--user`, `--project`, `--named=<kg>`, `--format=detailed\|paths` |
 | [`/kmgraph:capture-lesson`](#capture-lesson) | Guided interview to document a problem solved, pattern discovered, or bug fixed | `--user`, `--project`, `--named=<kg>` |
@@ -36,7 +36,7 @@ description: Every KMGraph slash command — category, description, and key flag
 | Command | Description | Key flags |
 |---|---|---|
 | [`/kmgraph:capture-lesson`](#capture-lesson) | Document lessons learned with git metadata, duplicate detection, and optional KG extraction | `--user`, `--project`, `--named=<kg>` |
-| [`/kmgraph:create-adr`](#create-adr) | Create Architecture Decision Records with auto-numbering and index update | `--user`, `--project`, `--named=<kg>` |
+| [`/kmgraph:create-adr`](#create-adr) | Create Architecture Decision Records with auto-numbering, index update, and automatic capture of implementation commit + subject line | `--user`, `--project`, `--named=<kg>` |
 | [`/kmgraph:session-summary`](#session-summary) | Summarize the active session; supports lightweight mid-session snapshot mode | `--auto`, `--snapshot`, `--snapshot --git`, `--user`, `--project`, `--named=<kg>` |
 | [`/kmgraph:extract-chat`](#extract-chat) | Export Claude and Gemini chat logs to dated markdown files | `--today`, `--date=YYYY-MM-DD`, `--after=`, `--before=`, `--project=`, `-claude`, `-gemini`, `--output-dir=` |
 | [`/kmgraph:handoff`](#handoff) | Generate a multi-file handoff package (START-HERE, DOCUMENTATION-MAP, OPEN-ISSUES, etc.) | `--output-dir=`, `--skip-sessions` |
@@ -79,17 +79,11 @@ description: Every KMGraph slash command — category, description, and key flag
 | Command | Description | Key flags |
 |---|---|---|
 | [`/kmgraph:session-summary`](#session-summary) | Create or append a session summary; snapshot mode skips the review gate | `--auto`, `--snapshot`, `--user`, `--project`, `--named=<kg>` |
-| [`/kmgraph:archive-memory`](#archive-memory) | Move stale MEMORY.md entries (default: >90 days) to MEMORY-archive.md | `--auto`, `--dry-run`, `--threshold=<days>` |
-| [`/kmgraph:restore-memory`](#restore-memory) | Restore archived entries back into active MEMORY.md | `--id=<N>`, `--list`, `--dry-run` |
 | [`/kmgraph:sync-all`](#sync-all) | Orchestrate full knowledge sync in one command | `--auto`, `--dry-run` |
 
 **Examples:**
 ```bash
 /kmgraph:session-summary --auto
-/kmgraph:archive-memory --dry-run
-/kmgraph:archive-memory --threshold=180
-/kmgraph:restore-memory "Git Pre-Commit"
-/kmgraph:restore-memory --list
 ```
 
 ---
@@ -98,7 +92,7 @@ description: Every KMGraph slash command — category, description, and key flag
 
 | Command | Description | Key flags |
 |---|---|---|
-| [`/kmgraph:init`](#init) | Create a new KG with wizard; optionally backfills from existing project context | — |
+| [`/kmgraph:init`](#init) | Create a new KG with wizard; optionally backfills from existing project context; discovers locally running Ollama and LM Studio instances and offers to configure them for tier mapping | — |
 | [`/kmgraph:init-personal-kg`](#init-personal-kg) | Create a personal KG at `~/.kmgraph/` for cross-project lessons | — |
 | [`/kmgraph:add-category`](#add-category) | Add a new category directory and KG entry file to an existing knowledge graph | `--prefix <p>`, `--git ignore\|commit` |
 | [`/kmgraph:list`](#list) | List all configured knowledge graphs from `~/.claude/kg-config.json` | `--names-only`, `--json` |
