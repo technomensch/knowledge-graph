@@ -2,8 +2,8 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.4.2-beta
-**Status:** Beta Release — Bug fix: triggers.md now seeded during both project and personal KG init
+**Version:** 0.5.2-beta
+**Status:** Beta Release — Tier abstraction Phase 3: shared ai-model-tier-resolver module, alias map, validation gate
 
 Documentation: https://kmgraph.stayinginsync.info
 
@@ -83,7 +83,20 @@ See [Getting Started Guide](docs/GETTING-STARTED.md) for prerequisites and troub
 
 ---
 
-## v0.4.x Feature Highlights
+## v0.5.x Feature Highlights
+
+**v0.5.2-beta — 2026-04-21**
+
+- **Shared `ai-model-tier-resolver` module** — Extracted inline tier-resolution from 4 dispatchers into a single authoritative module (`commands/init-shared/ai-model-tier-resolver.md`). Single source of truth for alias map (S4) and validation gate (S5).
+- **Backwards-compat alias map (S4)** — Legacy model names (Haiku/Sonnet/Opus/Gemini Flash/Pro/Ultra) auto-resolve to tier labels with a once-per-session deprecation warning. Aliases sunset v0.6.0.
+- **Validation gate (S5)** — Warns on suspicious model ID values during dispatcher resolution only; never fires from file scanning. Continues rather than halts so downstream errors surface directly.
+- **Project `me.md` template** — Added commented `platforms[]` block with parity to user template. Users now see the override syntax without needing to look it up.
+- **ADR `implements` enforcement** — `create-adr-agent` wizard now prompts for implementation commit hash (question 9). `{$implements_ref}` wired into Phase 5 frontmatter; back-fill reminder added for design-first ADRs.
+- **ADR backfill (ADR-042 compliance)** — All Accepted ADRs (014–043) now have non-null `implements` in `[[wiki-link]]` format. ADR-041 cross-branch numbering collision resolved (pretooluse ADR renumbered 043).
+
+**v0.5.1-beta — 2026-04-21**
+
+- **Tier abstraction label system** — Three platform-agnostic tier labels (fast/standard/powerful) with me.md tier_map, collapse chain, and Phase 2 model rename pass across all agents, commands, and skills.
 
 **v0.4.2-beta — 2026-04-18**
 
@@ -204,16 +217,15 @@ See [ROADMAP.md](ROADMAP.md) for detailed version history and development progre
 - ⚠️ Beta status: API subject to breaking changes before v1.0.0 stable
 
 **Recent Versions:**
+- v0.5.2-beta (Apr 21): Shared ai-model-tier-resolver, alias map (S4), validation gate (S5), ADR implements enforcement
+- v0.5.1-beta (Apr 21): Tier abstraction label system — platform-agnostic fast/standard/powerful tiers
 - v0.4.2-beta (Apr 18): Bug fix — triggers.md seeded during both project and personal KG init
 - v0.4.1-beta (Apr 16): Security patch — vulnerability gate, hono + follow-redirects dependency overrides
 - v0.4.0-beta (Apr 16): Stuck-work escalation skill, docs-impact-scan skill, --log-attempt meta-issue variant
 - v0.3.4-beta (Apr 10): Behavioral rule live-capture, rules-capture skill + agent, 4-target routing
 - v0.3.3-beta (Apr 10): Obsidian wiki links, ADR collision detection, atomic writes, personal KG pass
-- v0.3.2-beta (Apr 10): Draft-and-approve UX, init-shared modules, cross-branch collision detection
-- v0.3.1-beta (Apr 10): init-shared module extraction, upgrade-inspector hardening
-- v0.3.0-beta (Apr 10): Default path `knowledge/`, guided migration, me.md/rules.md scaffold
 
-**Next:** v0.4.x — Expanded wiki link coverage (kebab-case lesson files), automated knowledge graph extraction improvements
+**Current Phase:** v0.5.x — Tier abstraction complete; next: v0.6.0 alias sunset and resolver cleanup
 
 ---
 

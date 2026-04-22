@@ -13,6 +13,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## v0.5.2-beta (2026-04-21)
+
+### Added
+
+- **Shared `ai-model-tier-resolver` module** — `commands/init-shared/ai-model-tier-resolver.md` is the single source of truth for all tier resolution logic (Steps R-1 through R-4). Eliminates 4-way duplication across dispatchers.
+- **Backwards-compat alias map (S4)** — Legacy model names (Haiku, Sonnet, Opus, Gemini Flash/Pro/Ultra) resolve to tier labels with a once-per-session deprecation warning. Aliases sunset in v0.6.0.
+- **Validation gate (S5)** — Step R-4 warns on suspicious model ID values at dispatcher resolution time only; never fires from file scanning. Continues rather than halts.
+- **Project `me.md` template** — Added commented `platforms[]` block for project-level tier override syntax.
+- **`create-adr-agent` implements enforcement** — Wizard question 9 collects the implementation commit hash; `{$implements_ref}` replaces hardcoded `null` in Phase 5 frontmatter. Back-fill reminder added to Phase 6 for design-first ADRs.
+
+### Fixed
+
+- **ADR-041 numbering collision** — Resolved cross-branch numbering conflict: pretooluse-hook ADR renumbered to ADR-043; tier-abstraction retains ADR-041.
+
+### Changed
+
+- **4 dispatchers refactored** — `session-summary`, `create-adr`, `capture-lesson`, `sync-all` now delegate tier resolution to `ai-model-tier-resolver` module.
+
+### Docs
+
+- **ADR `implements` backfill** — All Accepted ADRs (014–043) now have non-null `implements` in `[[wiki-link]]` format per ADR-042.
+- **ADR-041 amended** — Alias map and validation gate marked as implemented (Phase 3 complete).
+
+## v0.5.1-beta (2026-04-21)
+
+### Added
+
+- **Tier abstraction label system** — Three platform-agnostic tier labels (`fast-tier`, `standard-tier`, `powerful-tier`) with `me.md` tier_map, collapse chain, alias map, and Phase 2 model rename pass across all agents, commands, and skills (ADR-041).
+
 ## v0.4.2-beta (2026-04-18)
 
 ### Fixed
