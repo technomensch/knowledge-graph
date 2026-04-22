@@ -64,6 +64,10 @@ docs/chat-history/
 knowledge/chat-history/
 # Implementation plans (local only)
 docs/plans/
+# Superpowers docs (local only)
+docs/superpowers/
+# Specs (local only)
+docs/specs/
 # Scratch/temp files (always private)
 docs/tmp/
 knowledge/tmp/
@@ -73,3 +77,12 @@ knowledge/me.md
 
 # Note: reference/, examples/, and templates/ are now committed for Docusaurus
 .kg-archive-*/
+
+# Superpowers (local only)
+.superpowers/
+
+# Handoff packages (local only)
+handoff-packages/
+
+# Mintlify preview (local only)
+mintlify-preview/
