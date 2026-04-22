@@ -10,7 +10,7 @@ git:
   commit: 499360b99abc98559a51a6ae2ee1f706ebfd93af
   pr: null
   issue: null
-implements: null
+implements: "non-git-tracked — original branch v0.2.3.2-beta; migrated to knowledge/ in [[e523d8b3]]"
 related:
   adrs: []
   lessons:

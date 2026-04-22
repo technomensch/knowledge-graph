@@ -10,7 +10,7 @@ git:
   commit: null
   pr: null
   issue: null
-implements: v0.5.1-beta
+implements: "[[62a472cb]] — feat(release): v0.5.1-beta — tier abstraction label system"
 related:
   adrs: [34, 38, 39]
   lessons: []
