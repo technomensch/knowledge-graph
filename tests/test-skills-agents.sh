@@ -37,6 +37,12 @@ EXPECTED_SKILLS=(
   "adr-guide"
   "gov-execute-plan"
   "knowledge-graph-usage"
+  "capture-router"
+  "doc-update-router"
+  "docs-impact-scan"
+  "rules-capture"
+  "sidebar-update"
+  "stuck-work-escalation"
 )
 
 # Test 1: Skills directory exists
@@ -59,17 +65,17 @@ if [ -n "$SKILLS_DIR" ]; then
     fi
   done
   if [ $MISSING_SKILLS -eq 0 ]; then
-    pass "All 6 skill directories present"
+    pass "All 12 skill directories present"
   else
     fail "$MISSING_SKILLS skill director(ies) missing"
   fi
 
-  # Test 3: Exact count is 6
+  # Test 3: Exact count is 12
   ACTUAL_COUNT=$(find "$SKILLS_DIR" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')
-  if [ "$ACTUAL_COUNT" -eq 6 ]; then
-    pass "Exact skill count is 6"
+  if [ "$ACTUAL_COUNT" -eq 12 ]; then
+    pass "Exact skill count is 12"
   else
-    fail "Skill count is $ACTUAL_COUNT (expected 6)"
+    fail "Skill count is $ACTUAL_COUNT (expected 12)"
   fi
 
   # Test 4: No empty skill directories
@@ -167,6 +173,9 @@ EXPECTED_AGENTS=(
   "mcp-setup-agent"
   "sync-all-agent"
   "create-adr-agent"
+  "platform-sync-agent"
+  "recall-agent"
+  "rules-capture-agent"
 )
 
 # Test 10: Agents directory exists
@@ -191,17 +200,17 @@ for agent in "${EXPECTED_AGENTS[@]}"; do
   fi
 done
 if [ $MISSING_AGENTS -eq 0 ]; then
-  pass "All 8 agent files present"
+  pass "All 11 agent files present"
 else
   fail "$MISSING_AGENTS agent file(s) missing"
 fi
 
-# Test 12: Exact count is 8
+# Test 12: Exact count is 11
 ACTUAL_COUNT=$(find "$AGENTS_DIR" -name "*.md" -maxdepth 1 -type f | wc -l | tr -d ' ')
-if [ "$ACTUAL_COUNT" -eq 8 ]; then
-  pass "Exact agent count is 8"
+if [ "$ACTUAL_COUNT" -eq 11 ]; then
+  pass "Exact agent count is 11"
 else
-  fail "Agent count is $ACTUAL_COUNT (expected 8)"
+  fail "Agent count is $ACTUAL_COUNT (expected 11)"
 fi
 
 # Test 13: No empty agent files
@@ -219,7 +228,9 @@ else
 fi
 
 # Test 14: No deprecated /knowledge: namespace in agents
-DEPRECATED=$(grep -rn "/knowledge:" "$AGENTS_DIR" 2>/dev/null | grep -v "^Binary" || true)
+# platform-sync-agent.md is excluded: it documents /knowledge:* as a legacy token
+# that must NOT propagate — it cites it as a counter-example, not an active reference.
+DEPRECATED=$(grep -rn "/knowledge:" "$AGENTS_DIR" 2>/dev/null | grep -v "^Binary" | grep -v "platform-sync-agent.md" || true)
 if [ -z "$DEPRECATED" ]; then
   pass "No deprecated /knowledge: namespace in agents"
 else

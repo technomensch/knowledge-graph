@@ -13,6 +13,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## v0.5.2-beta (2026-04-21)
+
+### Added
+
+- **Shared `ai-model-tier-resolver` module** — `commands/init-shared/ai-model-tier-resolver.md` is the single source of truth for all tier resolution logic (Steps R-1 through R-4). Eliminates 4-way duplication across dispatchers.
+- **Backwards-compat alias map (S4)** — Legacy model names (Haiku, Sonnet, Opus, Gemini Flash/Pro/Ultra) resolve to tier labels with a once-per-session deprecation warning. Aliases sunset in v0.6.0.
+- **Validation gate (S5)** — Step R-4 warns on suspicious model ID values at dispatcher resolution time only; never fires from file scanning. Continues rather than halts.
+- **Project-level model overrides in `me.md`** — A `platforms[]` block can now be added to `knowledge/me.md` to override which AI models are used for this project, independent of personal defaults in `~/.kmgraph/me.md`.
+- **`create-adr` now records where and when decisions were implemented** — The wizard automatically captures the commit and subject line at the time the ADR is created, giving every accepted decision a traceable link back to the implementation. For design-first ADRs (not yet implemented), the wizard adds a back-fill reminder to the ADR.
+
+### Fixed
+
+- **ADR-041 numbering collision** — Resolved cross-branch numbering conflict: pretooluse-hook ADR renumbered to ADR-043; tier-abstraction retains ADR-041.
+
+### Changed
+
+- **4 dispatchers refactored** — `session-summary`, `create-adr`, `capture-lesson`, `sync-all` now delegate tier resolution to `ai-model-tier-resolver` module.
+
+### Removed
+
+- **`/kmgraph:archive-memory` and `/kmgraph:restore-memory`** — Both commands removed. MEMORY.md token management is no longer needed now that behavioral rules, identity, and working style live in `knowledge/me.md`, `knowledge/rules.md`, and `~/.kmgraph/me.md`. MEMORY.md is now a lightweight index pointing to those files.
+
+### Docs
+
+- **ADR `implements` backfill** — All Accepted ADRs that were null now have non-null `implements` per ADR-042. Newly backfilled ADRs (014–043) use `[[wiki-link]]` format; pre-existing non-null entries retain their original format. Proposed ADRs (035, 036, 037) remain null pending implementation.
+- **ADR-041 updated** — Marked the alias map and validation gate as complete now that Phase 3 is live.
+- **ADR template and field guide corrected** — The Implementation Commit field previously said "version or feature" which was wrong. It now correctly describes that the wizard auto-populates the commit reference. The field guide and troubleshooting section are updated to reflect that `/kmgraph:create-adr` is now available.
+- **Agents catalog updated** — `create-adr-agent` added to the agents reference table.
+- **Glossary expanded** — Added definitions for Tier Label, Tier Map, and Alias Map.
+- **Configuration guide updated** — New Model Tier Configuration section documents `platforms[]` and `tier_map` setup for personal and project-level overrides.
+
+
+## v0.5.1-beta (2026-04-21)
+
+### Added
+
+- **Tier abstraction label system** — Three platform-agnostic tier labels (`fast-tier`, `standard-tier`, `powerful-tier`) with `me.md` tier_map, collapse chain, alias map, and Phase 2 model rename pass across all agents, commands, and skills (ADR-041).
+
 ## v0.4.2-beta (2026-04-18)
 
 ### Fixed

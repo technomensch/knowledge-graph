@@ -10,7 +10,7 @@ git:
   commit: 2fae5c6
   pr: null
   issue: null
-implements: null
+implements: "[[36dc84cf]] — docs(adr): create ADR-038: Model Selection Rule for Knowledge Graph Tasks"
 related:
   adrs:
     - "[[ADR-037-default-rules-for-graph-deployment]]"

@@ -2,8 +2,8 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.4.2-beta
-**Status:** Beta Release — Bug fix: triggers.md now seeded during both project and personal KG init
+**Version:** 0.5.2
+**Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
 
@@ -42,11 +42,15 @@ Paste [INSTALL.md](INSTALL.md) into any AI assistant for automated setup on any 
 
 **Claude Code users:** Run `claude plugin install kmgraph` or load with `claude --plugin-dir /path/to/knowledge-graph`, then run `/kmgraph:init`.
 
-See [Getting Started Guide](docs/GETTING-STARTED.md) for prerequisites and troubleshooting.
+See the [Quickstart](docs/quickstart.mdx) for prerequisites and troubleshooting.
+
+## Upgrading
+
+Pull the latest version and run `/kmgraph:init` in any project that uses it. The upgrade wizard checks what has changed, previews any updates to existing files, and asks for confirmation before writing, or changing, anything. Existing knowledge graph content is never overwritten.
 
 ---
 
-## Commands (23 Total)
+## Commands
 
 **Quick Reference**: See [CHEAT-SHEET.md](docs/CHEAT-SHEET.md) for one-page quick reference guide
 **Detailed Guide**: See [COMMAND-GUIDE.md](docs/COMMAND-GUIDE.md) for comprehensive command documentation with learning paths
@@ -55,6 +59,7 @@ See [Getting Started Guide](docs/GETTING-STARTED.md) for prerequisites and troub
 
 - `/kmgraph:init` — Initialize new knowledge graph with wizard-based setup
 - `/kmgraph:capture-lesson` — Document lessons learned with git metadata tracking
+- `/kmgraph:create-adr` — Create an Architecture Decision Record with automatic implementation commit capture
 - `/kmgraph:status` — View active knowledge graph info and quick reference
 - `/kmgraph:recall` — Search across all memory systems (lessons, decisions, knowledge)
 
@@ -69,6 +74,7 @@ See [Getting Started Guide](docs/GETTING-STARTED.md) for prerequisites and troub
 - `/kmgraph:config-sanitization` — Interactive wizard for pre-commit hook setup
 - `/kmgraph:extract-chat` — Extract chat history from Claude and Gemini logs
 - `/kmgraph:update-doc` — Update plugin/project documentation (`--user-facing`) or KG content
+- `/kmgraph:init-personal-kg` — Initialize a personal knowledge graph at `~/.kmgraph/` shared across all projects
 
 ### 🔴 Advanced Commands (Power Features)
 
@@ -76,60 +82,40 @@ See [Getting Started Guide](docs/GETTING-STARTED.md) for prerequisites and troub
 - `/kmgraph:start-issue-tracking` — Initialize issue tracking with structured docs and Git branch
 - `/kmgraph:update-issue-plan` — Sync knowledge graph → plan → issue → GitHub
 - `/kmgraph:link-issue` — Manually link existing lesson or ADR to GitHub issue
-- `/kmgraph:archive-memory` — Archive stale MEMORY.md entries to prevent bloat
-- `/kmgraph:restore-memory` — Restore archived MEMORY.md entries
 - `/kmgraph:sync-all` — Automated full sync pipeline (4 steps → 1 command)
 - `/kmgraph:handoff` — Create comprehensive handoff documentation for transitions, context limits, or onboarding
 
 ---
 
-## v0.4.x Feature Highlights
+## v0.5.x Feature Highlights
 
-**v0.4.2-beta — 2026-04-18**
+**v0.5.x — 2026-04-21**
 
-- **`triggers.md` seeded during init** — Fixed two bugs where `triggers.md` (the platform-agnostic rule-timing companion to `rules.md`) was never created during fresh init. `template-seed` now includes it in the root scaffold copy block; personal KG creation now seeds `~/.kmgraph/triggers.md` from the template (previously targeted wrong path `{KG_PATH}/triggers.md`).
+- **Model configuration is now future-proof** — Instead of hardcoding specific model names in `me.md`, commands and agents now reference tier labels (`fast-tier`, `standard-tier`, `powerful-tier`). When a model gets updated or renamed, only one place needs to change. Getting started is straightforward: run `/kmgraph:init` and the wizard walks through tier mapping interactively, discovers any locally running Ollama or LM Studio instances automatically, and pre-populates `~/.kmgraph/me.md` with working defaults so no manual edits are needed. Upgrading works the same way — the upgrade wizard offers the same interactive walkthrough after relocating platform config. For full manual control, add a `platforms[]` block directly to `me.md`. Unrecognized model values surface a warning instead of silently failing.
+- **ADRs now record where and when decisions were implemented** — When creating an ADR, the wizard automatically captures the commit and subject line so there is always a traceable link back to the implementation. No more guessing when or where something was decided.
+- **Rules from `rules.md` are now enforced automatically** — A new PreToolUse hook checks `rules.md` before certain tools run, so behavioral rules don't have to be re-stated every session.
+- **New projects get better default rules out of the box** — The `rules.md` template now seeds parallelism analysis and skill override rules automatically during init, giving new knowledge graphs a more useful starting point.
+- **Bug fix: `extract-chat` was creating duplicate entries** — Timestamp comparison during dedup was broken, causing the same chat sessions to appear multiple times. Fixed.
+- **`archive-memory` and `restore-memory` removed** — Both commands are no longer needed. Behavioral rules, identity, and working style now live in dedicated files (`me.md`, `rules.md`, `triggers.md`), making memory modular. Each file stays focused and can be split further as the project grows, removing the need to archive and restore from a single large MEMORY.md.
 
-**v0.4.1-beta — 2026-04-16**
+**v0.4.x Feature Highlights** *(2026-04-16 to 2026-04-18)*
 
-- **Dependency vulnerability gate** — Pre-PR rule and trigger that stops pushes on unacknowledged Dependabot alerts, presents a findings table, and requires explicit approval. Project `knowledge/rules.md` and `CLAUDE.md` are the acknowledged-risk register.
-- **hono override `>=4.12.12`** (mcp-server) — Forces upgrade from 4.12.8 via `@modelcontextprotocol/sdk` transitive chain.
-- **follow-redirects override `>=1.16.0`** (root) — Resolves auth header leak (GHSA-r4q5-vmmm-2653) in the Docusaurus → webpack-dev-server → http-proxy chain.
+- **Stuck on a bug? The plugin now helps get unstuck** — After 3 attempts or 30 minutes on the same problem, the `stuck-work-escalation` skill kicks in, reviews what has been tried, and proposes a fresh approach. At 5 attempts it requires a decision before continuing — useful for avoiding rabbit holes.
+- **Docs are now checked automatically before a PR** — The `docs-impact-scan` skill runs before pushing and identifies which documentation files need updating based on what changed in the code. It then dispatches the update wizard for each confirmed file.
+- **Meta-issue tracking improved** — Each attempt on a complex problem now requires a distinct hypothesis before starting, making it easier to track what was tried and why.
+- **Security: stops pushes when known vulnerabilities are unacknowledged** — A pre-PR check now surfaces any open Dependabot alerts before a push goes through. Users see a findings table and must explicitly approve before proceeding.
+- **Dependency security patches** — Two transitive dependency vulnerabilities patched in the MCP server and docs toolchain. No user action required.
+- **Bug fix: `triggers.md` was missing after a fresh init** — Two bugs caused `triggers.md` to never be created during new project and personal KG setup. Both are fixed. If `triggers.md` is missing from an existing KG, re-running `/kmgraph:init` will create it.
 
-**v0.4.0-beta — 2026-04-16**
+**v0.3.x — Major Architectural Change** *(2026-04-10)*
 
-- **`stuck-work-escalation` skill** — Auto-escalates stuck work at 3 attempts or 30 min: Opus diagnosis gate reviews all logged attempts and proposes a fresh hypothesis. At 5 attempts, forces a structured exit-path decision (Continue / Defer / Workaround / Descope / Rescope / User decision required) before any further work proceeds.
-- **`docs-impact-scan` skill** — Pre-PR docs discovery layer. Fires on "push to origin", "open PR", "create PR", "finishing up", and "ready to push". Reads `git diff main...HEAD`, extracts changed identifiers, greps scoped docs, always surfaces obvious files (README.md, INSTALL.md, CHANGELOG.md, COMMAND-GUIDE.md), checks KG patterns for learned corrections, validates the list with the user, then dispatches `/kmgraph:update-doc --user-facing` for each confirmed file.
-- **`--log-attempt` variant for `/kmgraph:meta-issue`** — Enforces a distinct hypothesis before each attempt; reminds the user to invoke `stuck-work-escalation` at attempt 3+.
-- **Exit-path fields in meta-issue attempt template** — Hypothesis, distinct-from-prior, success-criterion, and exit-path checklist added to every attempt scaffold.
+> **Existing setups:** Migration to `knowledge/` is optional. Your `docs/`-based setup continues to work as-is. A guided wizard is available if you want to migrate.
 
-**v0.3.4-beta — 2026-04-10**
-
-- **`rules-capture` skill** — Detects implicit behavioral corrections ("always X", "never X", "from now on X", "I prefer X") mid-session and offers to write them to one of four authoritative targets: `knowledge/rules.md` (project rule), `knowledge/me.md` (project personal), `~/.kmgraph/rules.md` (personal rule), or `~/.kmgraph/me.md` (personal style). Suggestion appended inline with 4-target shortcut menu.
-- **`rules-capture-agent`** — Dedup check, house-style draft (Always/Never + Why/Source), Approve/Edit/Discard loop, atomic write, and MEMORY.md pointer stub.
-- **MEMORY.md feedback backfill** — `/kmgraph:init` upgrade flow now offers to migrate behavioral rules from MEMORY.md feedback entries into `knowledge/rules.md` with per-entry preview and confirmation.
-
-**v0.3.3-beta — 2026-04-10**
-
-- **Obsidian wiki link pass** — `/kmgraph:init` and `/kmgraph:init-personal-kg` automatically convert bare cross-references (`ENH-010`, `ADR-028`, `#123`, `Lessons_Learned_X`) to `[[wiki link]]` format for Obsidian graph navigation and backlink tracking
-- **ADR collision-safe links** — Pre-pass filename map ensures `[[ADR-028-full-title]]` is always emitted (never ambiguous bare `[[ADR-028]]`); collision detection warns and skips when two files share a number
-- **Atomic writes + idempotency** — Temp-file + rename pattern prevents truncation on crash; `wiki_pass_complete` config flag makes re-runs no-ops
-
-**v0.3.2-beta — 2026-04-10**
-
-- **Draft-and-approve UX** — Lesson capture and ADR creation now extract full context from the conversation, generate a complete draft silently, then present Approve / Edit / Discard flow — no wizard required
-- **init-shared module layer** — Five reusable shared modules extracted; `/kmgraph:init` and `/kmgraph:init-personal-kg` refactored to thin orchestrators
-- **Cross-branch collision detection** — ADR and ENH number collision checks across all branches before assignment
-
-**v0.3.1-beta — 2026-04-10**
-
-- **init-shared module layer** — Five reusable shared modules extracted into `commands/init-shared/`; `/kmgraph:init` and `/kmgraph:init-personal-kg` refactored to thin orchestrators eliminating duplicated scaffold, template-seed, FTS5-rebuild, config-write, and upgrade-inspector logic
-- **upgrade-inspector hardening** — Trimmed to only check verifiable steps; phantom parameter removed; `{preserve_active}` param restored
-
-**v0.3.0-beta — 2026-04-10**
-
-- **Default KG path → `knowledge/`** — New projects initialize at `./knowledge/` instead of `./docs/` to avoid collision with documentation site roots
-- **Guided migration** — Opt-in migration from `docs/`-based layouts with symlink guard, rollback, and cross-reference rewrite
-- **me.md + rules.md scaffold** — Identity and behavioral convention files scaffolded at init; `rules.md` supports `Why:` and `Source:` evidence backlinks
+- **Knowledge graph now lives at `knowledge/` by default** — New projects initialize at `./knowledge/` instead of `./docs/` to avoid conflicts with documentation site roots. Existing `docs/`-based setups can migrate with a guided wizard that handles symlinks, rollbacks, and cross-reference rewrites.
+- **`me.md` and `rules.md` are now scaffolded automatically** — These identity and convention files are created during init. Rules support optional `Why:` and `Source:` annotations so the reasoning behind each rule stays with the rule.
+- **Lesson capture and ADR creation no longer require a full wizard** — Both commands now draft the content silently from conversation context and present an Approve / Edit / Discard flow instead. Faster and less interruption.
+- **Behavioral rules now get captured mid-session** — When a correction is made ("always X", "never do Y again"), the `rules-capture` skill detects it and offers to write it to the right place — project rules, personal rules, or identity files. No more losing good workflow corrections at the end of a session.
+- **Obsidian users: cross-references now work as wiki links** — ADRs, lessons, and issues referenced in the knowledge graph are automatically converted to `[[wiki link]]` format so Obsidian graph navigation and backlinks work out of the box.
 
 ---
 
@@ -145,7 +131,8 @@ See [Getting Started Guide](docs/GETTING-STARTED.md) for prerequisites and troub
 knowledge-graph/
 ├── .claude-plugin/           # Plugin manifest
 ├── commands/                 # Commands (manual invocation)
-├── agents/                   # Subagents (knowledge-reviewer)
+├── agents/                   # Subagents
+├── skills/                   # Auto-triggered context providers
 ├── hooks/                    # SessionStart hooks
 ├── scripts/                  # Helper scripts
 ├── config/                   # Config templates
@@ -182,38 +169,11 @@ knowledge-graph/
 
 ## Development Status
 
+**Current Release:** v0.5.2 (2026-04-21)
+
+Actively developed and in daily use. Behavior may evolve between minor versions.
+
 See [ROADMAP.md](ROADMAP.md) for detailed version history and development progress.
-
-**Current Release:** v0.4.2-beta (2026-04-18)
-- ✅ triggers.md seeded during init — fixed missing scaffold in project KG and wrong-path bug in personal KG creation
-- ✅ Dependency vulnerability gate — pre-PR Dependabot check with findings table and approval gate
-- ✅ hono override >=4.12.12 + follow-redirects override >=1.16.0 — security patches
-- ✅ Stuck-work escalation — Opus diagnosis gate at 3 attempts, mandatory exit-path decision at 5
-- ✅ Docs impact scan — pre-PR docs discovery, KG pattern learning, update wizard dispatch
-- ✅ `--log-attempt` meta-issue variant with hypothesis enforcement
-- ✅ Exit-path fields in meta-issue attempt template
-- ✅ Behavioral rule live-capture — `rules-capture` skill + agent with 4-target routing
-- ✅ Obsidian wiki link pass with ADR collision detection and atomic writes
-- ✅ Draft-and-approve UX for lesson capture and ADR creation
-- ✅ init-shared module layer — thin command orchestrators with shared modules
-- ✅ `knowledge/` default path with guided migration from `docs/`-based layouts
-- ✅ me.md + rules.md scaffold with Why/Source evidence backlinks
-- ✅ Personal KG support with `/kmgraph:init-personal-kg`
-- ✅ FTS5 full-text search with native SQLite3 WASM
-- ✅ MCP server with full cross-platform support (Cursor, Windsurf, Continue.dev, JetBrains, VS Code)
-- ⚠️ Beta status: API subject to breaking changes before v1.0.0 stable
-
-**Recent Versions:**
-- v0.4.2-beta (Apr 18): Bug fix — triggers.md seeded during both project and personal KG init
-- v0.4.1-beta (Apr 16): Security patch — vulnerability gate, hono + follow-redirects dependency overrides
-- v0.4.0-beta (Apr 16): Stuck-work escalation skill, docs-impact-scan skill, --log-attempt meta-issue variant
-- v0.3.4-beta (Apr 10): Behavioral rule live-capture, rules-capture skill + agent, 4-target routing
-- v0.3.3-beta (Apr 10): Obsidian wiki links, ADR collision detection, atomic writes, personal KG pass
-- v0.3.2-beta (Apr 10): Draft-and-approve UX, init-shared modules, cross-branch collision detection
-- v0.3.1-beta (Apr 10): init-shared module extraction, upgrade-inspector hardening
-- v0.3.0-beta (Apr 10): Default path `knowledge/`, guided migration, me.md/rules.md scaffold
-
-**Next:** v0.4.x — Expanded wiki link coverage (kebab-case lesson files), automated knowledge graph extraction improvements
 
 ---
 
@@ -259,7 +219,7 @@ If commands aren't working or MCP tools are unavailable:
    ```bash
    ./tests/test-mcp-direct.sh
    ```
-   Should show 7 tools listed.
+   Should show 12 tools listed.
 
 2. **Check for errors:**
    - Restart Claude Code
@@ -283,8 +243,6 @@ If `/kmgraph:command` doesn't autocomplete:
 
 ### Common Issues
 
-**"Duplicate hooks file detected"** — Already fixed in v0.0.1-alpha
-
 **Templates not found** — Ensure `core/templates/` exists and plugin loaded from correct directory
 
 **Git metadata missing** — Commands must run from a git repository
@@ -293,7 +251,7 @@ If `/kmgraph:command` doesn't autocomplete:
 
 ## Contributing
 
-This plugin is under active development. Contributions welcome after Phase 5 (publication).
+This plugin is under active development. Contributions welcome — open an issue to discuss before submitting a PR.
 
 ---
 
@@ -304,7 +262,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Phase:** Beta Release Cycle (v0.4.2-beta)
-**Next Milestone:** v0.4.x — Expanded wiki link coverage and automated knowledge graph extraction improvements
+**Current Version:** v0.5.2 (2026-04-21)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info
