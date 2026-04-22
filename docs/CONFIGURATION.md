@@ -121,6 +121,71 @@ The knowledge graph is your project memory. Use it for:
 
 ---
 
+## Model Tier Configuration
+
+KMGraph uses platform-agnostic tier labels (`fast-tier`, `standard-tier`, `powerful-tier`) instead of hardcoded model names. This means model preferences survive model version changes and work across platforms.
+
+### Personal defaults — `~/.kmgraph/me.md`
+
+Add a `platforms[]` block to set default model tiers across all projects. The `profile_schema:` field pins the frontmatter format version so `upgrade-inspector` can migrate entries when the schema evolves; missing or outdated schema values trigger an offer-to-upgrade flow before any other profile work runs:
+
+```yaml
+---
+profile_schema: 1
+platforms:
+  - name: claude
+    tier_map:
+      fast-tier: claude-haiku-4-5-20251001
+      standard-tier: claude-sonnet-4-6
+      powerful-tier: claude-opus-4-7
+---
+```
+
+### Local models — Ollama and LM Studio
+
+Local platforms add `host` and `port` fields alongside `tier_map`. Ollama defaults to `localhost:11434`, LM Studio to `localhost:1234`:
+
+```yaml
+platforms:
+  - name: ollama
+    host: localhost
+    port: 11434
+    tier_map:
+      fast-tier: llama3.2:3b
+      standard-tier: llama3.1:8b
+      powerful-tier: llama3.1:70b
+  - name: lm-studio
+    host: localhost
+    port: 1234
+    tier_map:
+      fast-tier: Phi-3.5-mini-instruct
+      standard-tier: Meta-Llama-3.1-8B-Instruct
+      powerful-tier: Meta-Llama-3.1-70B-Instruct
+```
+
+### Project overrides — `knowledge/me.md`
+
+To use different models for a specific project, add a `platforms[]` block to `knowledge/me.md`. Project-level entries override personal defaults for that project only:
+
+```yaml
+platforms:
+  - platform: claude-code
+    tier_map:
+      fast-tier: claude-haiku-4-5-20251001
+      standard-tier: claude-sonnet-4-6
+      powerful-tier: claude-opus-4-7
+```
+
+`knowledge/me.md` is gitignored — tier overrides are per-contributor, not shared.
+
+### Tier collapse — when a mapped model is unreachable
+
+When a dispatch asks for a tier whose mapped model is missing or unreachable (local server offline, model not pulled, API error), the resolver falls back down the chain: `powerful-tier → standard-tier → fast-tier`. The first tier that resolves to a reachable model is used, and the collapse event is logged once per session. If `fast-tier` also fails, the resolver halts with an actionable error including remediation steps. Skills that must not downgrade, such as `stuck-work-escalation`, declare `required_tier: powerful-tier` in their frontmatter and halt rather than collapse.
+
+See [Set up your identity files](guides/me-and-rules.md) for the full `me.md` reference.
+
+---
+
 ## Privacy & Public Sharing
 
 **⚠️ IMPORTANT:** The knowledge graph may contain sensitive information.

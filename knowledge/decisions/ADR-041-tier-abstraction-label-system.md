@@ -7,10 +7,10 @@ author: technomensch
 email: mkitact@gmail.com
 git:
   branch: v0.5.0-beta-phase1-foundation
-  commit: null
+  commit: 62a472cbe07785e6d1e314f7bbadaa6f8243c349
   pr: null
   issue: null
-implements: v0.5.1-beta
+implements: "[[62a472cb]] — feat(release): v0.5.1-beta — tier abstraction label system"
 related:
   adrs: [34, 38, 39]
   lessons: []
@@ -138,6 +138,26 @@ Tier labels are platform-neutral vocabulary that any LLM ecosystem supports. Map
 ### 2026-04-21 — Gemini Ultra alias added to backwards compatibility alias map (N2 fix)
 
 **Change:** Added `Gemini Ultra, Ultra, ultra-*` → `powerful-tier` row to the alias map. The original alias table included Flash and Pro but omitted Ultra, creating an inconsistency with the tier table's Gemini column (which lists Ultra for `powerful-tier`).
+
+### 2026-04-21 — Alias Map and Validation Gate Implemented (v0.5.2-beta Phase 3)
+
+**Alias map:** Implemented in `commands/init-shared/ai-model-tier-resolver.md` (Step R-1). All 6 legacy aliases from the ADR table now resolve to tier labels with a once-per-session deprecation warning. Gemini Ultra alias (N2 fix) included.
+
+**Validation gate (S5):** Added as Step R-4 in ai-model-tier-resolver.md. Gate fires only during dispatcher resolution — never from file scanning, frontmatter inspection, or grep. Warns once per session on suspicious model ID values; does not halt, allowing downstream errors to surface directly.
+
+**DRY consolidation:** The 4 dispatchers that had inline tier-resolution paragraphs (session-summary, create-adr, capture-lesson, sync-all) now reference ai-model-tier-resolver.md. Single source of truth for all resolution logic.
+
+**Status:** Alias map and validation gate are fully implemented. Sunset scheduled for v0.6.0 (alias removal + resolver cleanup).
+
+### 2026-04-21 — Phase 3 Opus Review Remediations Applied
+
+Three corrections applied to `ai-model-tier-resolver.md` following post-implementation review:
+
+1. **Alias map — `pro-*` added (M1):** Gemini Pro row expanded to include `pro-*` pattern (matching ADR-041 spec). Prior implementation used `gemini-pro-*` only, which under-matched the ADR's `pro-*` alias.
+
+2. **Collapse chain — downward-only (M2):** R-3C now explicitly specifies downward-only collapse (`powerful → standard → fast`). A request for `fast-tier` halts immediately if fast is unconfigured rather than upgrading to a more expensive tier.
+
+3. **Validation gate — ordered checks (M3):** R-4 now applies deny checks (bare tier labels, bare alias names) before the structural marker check. Eliminates the prior ambiguity where `fast-tier` could simultaneously satisfy both a positive and a negative check.
 
 ---
 

@@ -1,6 +1,6 @@
 ---
-title: "ADR-041: PreToolUse Hook Injection to Enforce User Rules During Superpowers Skill Execution"
-number: 041
+title: "ADR-043: PreToolUse Hook Injection to Enforce User Rules During Superpowers Skill Execution"
+number: 043
 created: 2026-04-21T00:00:00Z
 status: Accepted
 author: technomensch
@@ -10,7 +10,7 @@ git:
   commit: df061cb8b4d7e7556b18a5d20b29b9a421678a0c
   pr: null
   issue: null
-implements: null
+implements: "[[e868a17d]] — feat(hooks): add PreToolUse skill hook to enforce user rules during superpowers execution"
 related:
   adrs: ["[[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file]]", "[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]]", "[[ADR-038-model-selection-rule-for-kg-tasks]]"]
   lessons: []
@@ -19,10 +19,11 @@ tags: [process, hooks, superpowers, rule-enforcement]
 category: process
 ---
 
-# ADR-041: PreToolUse Hook Injection to Enforce User Rules During Superpowers Skill Execution
+# ADR-043: PreToolUse Hook Injection to Enforce User Rules During Superpowers Skill Execution
 
 **Date:** 2026-04-21
 **Status:** Accepted
+**Note:** Renumbered from ADR-041 to resolve cross-branch numbering collision with ADR-041 (Tier Abstraction Label System).
 **Related:** [[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file]], [[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]], [[ADR-038-model-selection-rule-for-kg-tasks]]
 
 ---
@@ -153,5 +154,5 @@ Use a Claude Code PreToolUse hook on the Skill tool to inject `~/.kmgraph/rules.
 ---
 
 **Decision Made:** 2026-04-21
-**Last Updated:** 2026-04-21
+**Last Updated:** 2026-04-21 (renumbered from ADR-041 to ADR-043 — cross-branch collision resolution)
 **Status:** Accepted

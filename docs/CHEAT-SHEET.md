@@ -5,7 +5,7 @@ sidebar_label: Cheat Sheet
 description: Quick reference for common KMGraph workflows and commands
 ---
 
-**Version:** 0.3.6-beta | **Updated:** 2026-04-11
+**Version:** 0.5.2 | **Updated:** 2026-04-22
 
 > **Claude Code only:** The `/kmgraph:` prefix requires Claude Code with this plugin installed. Other IDEs access equivalent functionality through MCP tools.
 
@@ -17,12 +17,12 @@ One-page cheat sheet for the Knowledge Management Graph. For detailed documentat
 
 - **Start a new knowledge graph** → `/kmgraph:init`
 - **Create a cross-project personal KG** → `/kmgraph:init-personal-kg`
-- **Document what I just learned** → `/kmgraph:capture-lesson [topic]` (v0.2.1-beta refactored)
-- **Find something I documented before** → `/kmgraph:recall [query]` (v0.2.1-beta refactored)
+- **Document what I just learned** → `/kmgraph:capture-lesson [topic]`
+- **Find something I documented before** → `/kmgraph:recall [query]`
 - **See what's in my knowledge graph** → `/kmgraph:status`
 - **Track a complex bug across multiple attempts** → `/kmgraph:meta-issue`
 - **Set up team knowledge sharing** → `/kmgraph:config-sanitization`
-- **Summarize my current chat session** → `/kmgraph:session-summary` (v0.2.1-beta refactored)
+- **Summarize my current chat session** → `/kmgraph:session-summary`
 - **Extract my chat history** → `/kmgraph:extract-chat`
 - **Sync lessons to the knowledge graph** → `/kmgraph:update-graph`
 - **Check for sensitive data before sharing** → `/kmgraph:check-sensitive`
@@ -43,9 +43,9 @@ First-time users need these for basic operation:
 |---------|---------|
 | `/kmgraph:init` | Initialize a new knowledge graph with wizard-based setup |
 | `/kmgraph:init-personal-kg` | Create personal KG at `~/.kmgraph/` for cross-project lessons |
-| `/kmgraph:capture-lesson [topic]` | Document lessons learned with git metadata tracking (v0.2.1-beta refactored) |
+| `/kmgraph:capture-lesson [topic]` | Document lessons learned with git metadata tracking |
 | `/kmgraph:status` | View active knowledge graph info and quick reference |
-| `/kmgraph:recall [query]` | Search across all memory systems (lessons, decisions, knowledge) (v0.2.1-beta refactored) |
+| `/kmgraph:recall [query]` | Search across all memory systems (lessons, decisions, knowledge) |
 
 *→ [Full details in Command Guide](COMMAND-GUIDE.md#essential-commands)*
 
@@ -57,7 +57,7 @@ Active users use these for regular workflows:
 |---------|---------|
 | `/kmgraph:update-graph` | Extract knowledge graph entries from lessons. Uses background file reading for large batches when context-mode is installed |
 | `/kmgraph:add-category` | Add a new category to existing knowledge graph |
-| `/kmgraph:session-summary` | Create summary of current chat session; `--snapshot` for lightweight mid-session capture (v0.2.2-beta) |
+| `/kmgraph:session-summary` | Create summary of current chat session; `--snapshot` for lightweight mid-session capture |
 | `/kmgraph:list` | Display all configured knowledge graphs |
 | `/kmgraph:switch` | Change active knowledge graph |
 | `/kmgraph:check-sensitive` | Scan knowledge graph for potentially sensitive information |
@@ -77,8 +77,6 @@ Power users leverage these for complex workflows:
 | `/kmgraph:start-issue-tracking` | Initialize issue tracking with structured docs and Git branch |
 | `/kmgraph:update-issue-plan` | Sync knowledge graph → plan → issue → GitHub |
 | `/kmgraph:link-issue` | Manually link existing lesson or ADR to GitHub issue |
-| `/kmgraph:archive-memory` | Archive stale MEMORY.md entries to prevent bloat |
-| `/kmgraph:restore-memory` | Restore archived MEMORY.md entries |
 | `/kmgraph:sync-all` | Automated full sync pipeline (4 steps → 1 command). Uses background file scanning when context-mode is installed. Refreshes search index automatically if built |
 | `/kmgraph:handoff` | Create comprehensive handoff documentation for transitions or onboarding |
 
@@ -107,7 +105,7 @@ Skills activate automatically based on conversation context. No invocation neede
 
 ## Agents Quick Reference
 
-<!-- Updated: 2026-03-27 -->
+<!-- Updated: 2026-04-22 -->
 
 Heavy-lift task handlers. Usually invoked automatically by skills/commands.
 
@@ -276,5 +274,5 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 
 ---
 
-**Version**: 0.3.6-beta
-**Last Updated**: 2026-04-11
+**Version**: 0.5.2
+**Last Updated**: 2026-04-22

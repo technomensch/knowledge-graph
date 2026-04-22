@@ -10,7 +10,7 @@ git:
   commit: 56b96ea7a7c04b96c7d8e8c0f2d1e3a4
   pr: null
   issue: null
-implements: null
+implements: "non-git-tracked — original branch v0.0.8.7.3-alpha-fix-installer-page; migrated to knowledge/ in [[e523d8b3]]"
 related:
   adrs: []
   lessons:

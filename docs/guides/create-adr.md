@@ -1,3 +1,4 @@
+<!-- Updated: 2026-04-22 -->
 ---
 id: create-adr
 title: Create an Architecture Decision Record
@@ -24,7 +25,7 @@ Capture an architecture decision — a tech choice, design tradeoff, or structur
 /kmgraph:create-adr
 ```
 
-The wizard prompts for a title, status, decision summary, context, rationale, and consequences.
+The wizard prompts for a title, status, decision summary, context, rationale, consequences, and implementation commit reference.
 
 **2. Fill in the ADR fields**
 
@@ -36,6 +37,13 @@ The wizard prompts for a title, status, decision summary, context, rationale, an
 | **Decision** | The choice made, stated clearly |
 | **Rationale** | Why this option over the alternatives |
 | **Consequences** | Positive outcomes, negative tradeoffs, and mitigations |
+| **Implementation Commit** | N/A — wizard automatically populates the commit and subject line of the commit |
+
+**Design-first ADRs:** If the decision has not yet been implemented, the wizard accepts `null` for `implements` and adds a back-fill reminder to the ADR. Back-fill the field with the implementation commit hash once the work is merged:
+
+```bash
+/kmgraph:create-adr --amend ADR-NNN --implements <commit-hash>
+```
 
 **3. Link related lessons and issues**
 

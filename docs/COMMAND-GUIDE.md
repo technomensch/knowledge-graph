@@ -5,7 +5,7 @@ sidebar_label: Commands
 description: "Complete reference for all /kmgraph: slash commands"
 ---
 
-**Version:** 0.3.6-beta | **Updated:** 2026-04-11
+**Version:** 0.5.2 | **Updated:** 2026-04-22
 
 > **Claude Code only:** The `/kmgraph:` prefix requires Claude Code with this plugin installed. Other IDEs access equivalent functionality through MCP tools — see [INSTALL.md](INSTALL.md) for platform-specific setup.
 ## About Commands on Other Platforms
@@ -78,8 +78,6 @@ Commands work across platforms, but full automation is Claude Code-specific.
 - **Sync progress to plans and GitHub** → `/kmgraph:update-issue-plan`
 
 ### Memory Management
-- **Free up MEMORY.md token budget** → `/kmgraph:archive-memory`
-- **Bring back archived context** → `/kmgraph:restore-memory`
 - **Run the full sync pipeline in one command** → `/kmgraph:sync-all`
 
 
@@ -133,20 +131,13 @@ Commands work across platforms, but full automation is Claude Code-specific.
     - [🔴 `/kmgraph:start-issue-tracking`](#-kmgraphstart-issue-tracking) — Systematic issue tracking with Git branches
     - [🔴 `/kmgraph:update-issue-plan`](#-kmgraphupdate-issue-plan) — Sync progress with GitHub and plans
 
-=== "Memory Management"
-
-    Manage MEMORY.md size and archive old patterns.
-
-    - [🔴 `/kmgraph:archive-memory`](#-kmgrapharchive-memory) — Archive old patterns from MEMORY.md
-    - [🔴 `/kmgraph:restore-memory`](#-kmgraphrestore-memory) — Restore archived context
-
 ---
 
 ## Essential Commands
 
 ### 🟢 `/kmgraph:init`
 
-**Purpose**: Initialize a new knowledge graph with wizard-based setup
+**Purpose**: Set up a structured knowledge management system for the active project. Lessons, decisions, and patterns land in a searchable, git-tracked knowledge graph so nothing valuable gets lost between sessions.
 
 **When to use**:
 
@@ -162,8 +153,8 @@ Commands work across platforms, but full automation is Claude Code-specific.
 3. Asks for optional custom prefixes per category
 4. Creates directory structure (`knowledge/`, `lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`)
 5. Copies templates from the plugin
-6. **[NEW in v0.2.2-beta]** Offers to create a **personal KG** at `~/.kmgraph/` for cross-project lessons (see [`/kmgraph:init-personal-kg`](#-kmgraphinit-personal-kg))
-7. **[NEW in v0.0.10.2]** Optionally backfills from existing project context (README, CHANGELOG, lessons, decisions, chat history)
+6. Offers to create a **personal KG** at `~/.kmgraph/` for cross-project lessons (see [`/kmgraph:init-personal-kg`](#-kmgraphinit-personal-kg))
+7. Optionally backfills from existing project context (README, CHANGELOG, lessons, decisions, chat history)
 8. Optionally installs a git post-commit hook for lesson capture suggestions
 9. Updates `.gitignore` based on chosen git strategy
 10. Registers the KG in `~/.claude/kg-config.json` and sets it as active
@@ -199,13 +190,15 @@ The system presents candidates for your review before creating entries.
 
 **Next steps**: Run `/kmgraph:status` to verify setup
 
+**Model tier configuration**: As of v0.5.x, init also walks through the model tier system. Tier labels (`fast-tier`, `standard-tier`, `powerful-tier`) replace hardcoded model names (Haiku, Sonnet, Opus and their Gemini equivalents) so rules, commands, and agents stay stable across model version changes and platforms. During init, a `platforms[]` block is written to `knowledge/me.md` with a `tier_map` entry for each detected platform, binding each tier label to a concrete model name. Locally running Ollama (`localhost:11434`) and LM Studio (`localhost:1234`) instances are discovered automatically and offered as additional platforms, with host, port, and per-tier model selection captured in the walkthrough. An alias map translates legacy model names (Haiku, Sonnet, Opus, Flash, Pro) to tier labels for backwards compatibility, and unrecognized model names trigger a one-time prompt to assign the name to a tier before dispatch continues.
+
 ---
 
 ### 🟡 `/kmgraph:init-personal-kg`
 
 <!-- Updated: 2026-03-29 -->
 
-**Purpose**: Create or register a personal knowledge graph for cross-project lessons
+**Purpose**: Create a personal knowledge graph at `~/.kmgraph/` for lessons that apply across every project, not just the current one. `capture-lesson` gains a KG picker and `recall` searches both automatically.
 
 **When to use**:
 
@@ -279,7 +272,7 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 
 <!-- Updated: 2026-04-15 -->
 
-**Purpose**: Guided UX dispatcher for documenting lessons learned, problems solved, and patterns with git metadata tracking
+**Purpose**: Identifies lessons while context is still fresh and captures both the problem and how it was solved. By automatically linking lessons to relevant metadata, the record is searchable and reusable across future sessions and projects.
 
 > **Command refactored in v0.2.1-beta: 710 → 108 lines.** Execution logic delegated to `agents/` for platform portability. See [CONCEPTS.md § Four-Layer Architecture](CONCEPTS.md).
 
@@ -292,18 +285,20 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 
 **What it does**:
 
-Dispatches to the capture-lesson agent, which handles:
-
-1. **[NEW in v0.2.2-beta] Snapshot gate** — optionally takes a lightweight session snapshot before the capture dialog, preserving the "why" at the moment of discovery (see `/kmgraph:session-summary --snapshot`)
-2. Checks for duplicate/similar existing lessons (pre-flight search)
-3. Asks verification questions (topic, audience, scope)
-4. Auto-detects category from keywords (architecture, debugging, process, patterns)
-5. Gathers git metadata (branch, commit hash, PR, issue number) from YAML frontmatter
-6. Guides content gathering (problem, root cause, solution, prevention)
-7. Writes the lesson file using the template from `core/templates/`
+1. {OPTIONAL} Prompts to take a session snapshot before starting to preserve the context at the moment of discovery
+2. Checks for duplicate or similar existing lessons in the existing knowledge graph before proceeding
+3. Asks verification questions to confirm topic, audience, and scope
+4. Auto-detects the category from keywords in the lesson content
+5. Captures git context for the record — branch, commit, PR, and issue number automatically
+6. Wizard captures the following:
+- problem
+- root cause
+- solution
+- prevention
+7. Creates the lesson file from the standard template with all fields populated
 8. Updates category and chronological indexes
-9. Optionally triggers `/kmgraph:update-graph` to extract KG entries
-10. Optionally links to a GitHub Issue via `/kmgraph:link-issue`
+9. {OPTIONAL} Runs `/kmgraph:update-graph` to extract KG entries from the new lesson
+10. {OPTIONAL} Links to a GitHub Issue via `/kmgraph:link-issue`
 
 **Time**: 5-10 minutes (faster with practice)
 
@@ -332,7 +327,7 @@ Dispatches to the capture-lesson agent, which handles:
 
 ### 🟢 `/kmgraph:status`
 
-**Purpose**: Display active knowledge graph status, stats, and quick command reference
+**Purpose**: Show the health and contents of the active knowledge graph at a glance. File counts, sync timestamps, staleness warnings, and a quick command reference, all without leaving the conversation.
 
 **When to use**:
 
@@ -375,7 +370,7 @@ Quick Commands:
   /kmgraph:sync-all          — Run full sync pipeline
 ```
 
-**Tip**: Supports `--minimal` for a one-line summary and `--json` for machine-readable output.
+**Tips**: Use the flags `--minimal` for a one-line summary and `--json` for machine-readable output.
 
 ---
 
@@ -383,7 +378,7 @@ Quick Commands:
 
 <!-- Updated: 2026-04-15 -->
 
-**Purpose**: Guided UX dispatcher for searching across all project memory systems (lessons, decisions, knowledge graph, sessions)
+**Purpose**: Search across lessons, decisions, patterns, and sessions in one command. When a personal KG is registered, both knowledge graphs are searched automatically, with source labels on every result.
 
 > **Command refactored in v0.2.1-beta: 437 → 79 lines.** Execution logic delegated to `agents/` for platform portability. See [CONCEPTS.md § Four-Layer Architecture](CONCEPTS.md).
 
@@ -403,7 +398,7 @@ Dispatches to the recall agent, which searches:
 - Knowledge entries (patterns, gotchas, concepts)
 - Session summaries
 - MEMORY.md
-- **[NEW in v0.2.2-beta]** Personal KG (if registered) — automatically included when a personal KG exists
+- Personal KG (if registered) — automatically included when a personal KG exists
 
 **Multi-KG behavior**: When a personal KG is registered, `recall` searches both project and personal KGs by default. Results include a source label (`[project]` or `[personal]`) so origin is always clear.
 
@@ -422,7 +417,7 @@ Dispatches to the recall agent, which searches:
 # 3. Database Timeout Patterns — [personal: personal]
 ```
 
-**`--scope` parameter** (v0.2.2-beta):
+**`--scope` parameter**:
 
 | Value | Behavior |
 |---|---|
@@ -430,7 +425,7 @@ Dispatches to the recall agent, which searches:
 | `all` | Active KG + all registered KGs (auto-default when personal KG exists) |
 | `personal-only` | Only KGs with `type: personal` |
 
-**Level routing** (v0.3.9-beta): Scope search to a specific KG without changing the active KG:
+**Level routing**: Scope search to a specific KG without changing the active KG:
 
 | Flag / Natural Language | Searches |
 |---|---|
@@ -459,7 +454,7 @@ Dispatches to the recall agent, which searches:
 
 ### 🟡 `/kmgraph:update-graph`
 
-**Purpose**: Extract structured insights from lessons learned and sync to knowledge graph entries
+**Purpose**: Takes individual lessons learned and adds them directly into the knowledge graph's searchable index. Lessons hold the full narrative; `update-graph` makes patterns findable in seconds, not minutes.
 
 **When to use**:
 
@@ -499,7 +494,7 @@ Dispatches to the recall agent, which searches:
 
 ### 🟡 `/kmgraph:add-category`
 
-**Purpose**: Add a new category to an existing knowledge graph with optional custom prefix
+**Purpose**: Add a new category to the active knowledge graph. Creates the directory structure, index file, and git strategy in one step, so the new category is ready to capture lessons immediately.
 
 **When to use**:
 
@@ -532,7 +527,7 @@ Dispatches to the recall agent, which searches:
 
 ### 🟡 `/kmgraph:session-summary`
 
-**Purpose**: Create a summary of the current active chat session
+**Purpose**: Capture session context on demand and store it in a dated markdown file before it is lost. The dated file is a reliable record of what happened, so any future session can reference it.
 
 **When to use**:
 
@@ -551,7 +546,7 @@ Dispatches to the recall agent, which searches:
 6. Updates sessions README index
 7. Optionally triggers lesson capture and KG update
 
-**[NEW in v0.2.2-beta] Snapshot mode** (`--snapshot`): Lightweight mid-session capture. Runs before any capture command when the user opts in. Appends to today's session file (or creates one) without a user review gate. Optional git history (`--snapshot --git`). Used by `capture-lesson`, `create-adr`, and `start-issue-tracking` to preserve the "why" at the moment of discovery.
+**Snapshot mode** (`--snapshot`): Lightweight mid-session capture. Runs before any capture command when the user opts in. Appends to today's session file (or creates one) without a user review gate. Optional git history (`--snapshot --git`). Used by `capture-lesson`, `create-adr`, and `start-issue-tracking` to preserve the "why" at the moment of discovery.
 
 **Time**: Under 10 seconds (full mode); under 5 seconds (snapshot mode without git)
 
@@ -575,9 +570,9 @@ Dispatches to the recall agent, which searches:
 
 ### 🟡 `/kmgraph:create-adr`
 
-<!-- Updated: 2026-04-15 -->
+<!-- Updated: 2026-04-22 -->
 
-**Purpose**: Create Architecture Decision Records with auto-filled git metadata, sequential numbering, and index auto-update
+**Purpose**: Create strategic Architectural Decision Records (ADRs) that capture **why** decisions were made. Records are auto-populated with git metadata, sequential numbering, and the implementation commit, so the history is traceable without manual bookkeeping.
 
 **When to use**:
 
@@ -588,15 +583,24 @@ Dispatches to the recall agent, which searches:
 
 **What it does**:
 
-1. **[NEW in v0.2.2-beta] Snapshot gate** — optionally takes a lightweight session snapshot before the ADR dialog, preserving the "why" at the moment the decision was made (see `/kmgraph:session-summary --snapshot`)
-2. Resolves active KG path from `~/.claude/kg-config.json`
-3. Auto-increments ADR number (scans existing `ADR-NNN-*.md` files, uses highest + 1)
-4. Collects git metadata automatically (author, email, branch, commit SHA, PR/issue numbers)
-5. Interactive wizard: title, status (Proposed/Accepted/Deprecated/Superseded), category (Architecture/Process/Technology), context, decision, rationale, consequences, related lessons
-6. Generates filename (`ADR-{NNN}-{slug}.md`) and presents summary for user confirmation before writing
-7. Creates ADR file from `core/templates/decisions/ADR-template.md` with fully populated frontmatter
-8. Updates `decisions/README.md` — total count, chronological list, and by-category section
-9. Commits both files with a structured commit message
+1. {OPTIONAL} Before capturing ADR, prompt will ask whether or not to take a snapshot of the current session before starting to preserve an archive of the context behind the decision
+2. Reviews the current ADR items in the active knowledge graph
+3. Assigns the next ADR number automatically
+4. Captures git context for the record — author, branch, and PR/issue number automatically
+5. Wizard starts to capture the following:
+- title
+- status
+- category
+- context
+- decision
+- rationale
+- consequences
+- related lessons
+6. **[NEW in v0.5.2]** Asks if the decision has already been implemented — if yes, captures the current commit and subject line automatically; design-first ADRs get a back-fill reminder
+7. Shows a full summary for review before writing anything
+8. Creates the ADR file from the standard template with all fields populated
+9. Updates the decisions index (count, chronological list, by-category)
+10. Commits both files with a structured commit message
 
 **Time**: 5-15 minutes (depends on how much detail you provide)
 
@@ -619,7 +623,7 @@ Dispatches to the recall agent, which searches:
 
 ### 🟡 `/kmgraph:list`
 
-**Purpose**: Display all configured knowledge graphs from `~/.claude/kg-config.json`
+**Purpose**: Display all knowledge graph projects registered locally. Useful when working across multiple projects and the exact KG name needs to be identified before switching.
 
 **When to use**:
 
@@ -660,7 +664,7 @@ Total: 2 knowledge graph(s) configured
 
 ### 🟡 `/kmgraph:switch`
 
-**Purpose**: Change the active knowledge graph for all subsequent commands
+**Purpose**: Switch the active knowledge graph so all subsequent commands read from and write to the intended one.
 
 **When to use**:
 
@@ -694,7 +698,7 @@ Total: 2 knowledge graph(s) configured
 
 ### 🟡 `/kmgraph:check-sensitive`
 
-**Purpose**: Scan active knowledge graph for potentially sensitive information before public sharing
+**Purpose**: Scan the active knowledge graph for emails, API keys, and internal URLs before pushing to a shared repository. Flags findings with file name and line number for manual review.
 
 **When to use**:
 
@@ -729,7 +733,7 @@ Total: 2 knowledge graph(s) configured
 
 ### 🟡 `/kmgraph:config-sanitization`
 
-**Purpose**: Interactive wizard to set up pre-commit hooks for sensitive data detection
+**Purpose**: Run a one-time wizard to automatically flag sensitive data before every commit is saved. Configures scan patterns, custom regexes, and enforcement level in 2-3 minutes.
 
 **When to use**:
 
@@ -773,7 +777,7 @@ Test the hook:
 
 ### 🟡 `/kmgraph:extract-chat`
 
-**Purpose**: Extract chat history from Claude and Gemini local log sources
+**Purpose**: Extracts existing local chat history files and stores them within the project as markdown files. Results vary by model and platform; anything beyond Claude may require unsupported configuration.
 
 **When to use**:
 
@@ -820,7 +824,7 @@ Test the hook:
 
 ### 🟡 `/kmgraph:update-doc`
 
-**Purpose**: Update an existing documentation file — plugin/project documentation (`--user-facing`) or knowledge graph content
+**Purpose**: Maintains this project's user-facing documentation through a guided wizard. Intended primarily for contributors; adapting it to other projects is possible but not yet documented.
 
 **When to use**:
 
@@ -861,7 +865,7 @@ With `--user-facing`:
 
 ### 🔴 `/kmgraph:meta-issue`
 
-**Purpose**: Initialize and manage meta-issue tracking for complex multi-attempt problems
+**Purpose**: Create a structured workspace for problems that resist initial solutions. Tracks each attempt with its hypothesis and outcome so understanding evolves across attempts rather than starting blind each time.
 
 **When to use** (2 or more criteria should be met):
 
@@ -906,13 +910,15 @@ With `--user-facing`:
 
 > **Note**: Do NOT use meta-issue for simple bugs, standard features, or one-off debugging. Use `/kmgraph:capture-lesson` instead.
 
+**See also**: [Meta-Issue Guide](reference/META-ISSUE-GUIDE.md) — full guide covering directory structure, attempt templates, escalation thresholds, and worked examples. [Track a Multi-Attempt Issue](guides/track-meta-issue.md) — step-by-step walkthrough.
+
 ---
 
 ### 🔴 `/kmgraph:start-issue-tracking`
 
 <!-- Updated: 2026-03-30 -->
 
-**Purpose**: Initialize issue tracking for a specific problem or enhancement with structured documentation and Git branch creation
+**Purpose**: Document a bug or enhancement from identification through resolution, with git integration when a repository is present. Captures the context of an issue in structured templates for review and implementation.
 
 **When to use**:
 
@@ -925,8 +931,8 @@ With `--user-facing`:
 
 **What it does**:
 
-1. **[NEW in v0.2.2-beta] Snapshot gate** — optionally takes a session snapshot before the issue dialog
-2. **[NEW in v0.2.2-beta] Branch guard** — Step 1.0 now surfaces a ⚠️ warning when current branch ≠ main, priming the user before versioning decisions; Step 6.2 lesson capture prompt becomes strongly recommended when working on a non-main branch
+1. **Snapshot gate** — optionally takes a session snapshot before the issue dialog
+2. **Branch guard** — Step 1.0 now surfaces a ⚠️ warning when current branch ≠ main, priming the user before versioning decisions; Step 6.2 lesson capture prompt becomes strongly recommended when working on a non-main branch
 3. **Steps 1.1–1.4 ask one question at a time** — type (bug vs. enhancement), version impact, branch name, and plan filename are each asked independently, waiting for a response before the next question. No multi-question prompts.
 4. Scans chat history for recent proposals ("Would you like me to...")
 5. Runs git authority check and auto-detects version increment path
@@ -954,11 +960,13 @@ With `--user-facing`:
 - Uses the Dual-ID Policy: local IDs (`issue-N` or `ENH-NNN`) are independent from GitHub issue numbers (`#N`)
 - Always use `--body-file` flag (not manual summary) when creating the GitHub Issue
 
+**See also**: [Track Issues](TRACK-ISSUES.md) — full lifecycle walkthrough including git integration and the implementation freeze gate.
+
 ---
 
 ### 🔴 `/kmgraph:update-issue-plan`
 
-**Purpose**: Synchronize knowledge graph extraction with active plans and local/GitHub issue tracking
+**Purpose**: Keeps the knowledge graph, active plans, and GitHub issues in sync after new entries are extracted. The right command when formal issue plans are part of the workflow.
 
 **When to use**:
 
@@ -995,7 +1003,7 @@ With `--user-facing`:
 
 ### 🔴 `/kmgraph:link-issue`
 
-**Purpose**: Manually link an existing lesson or ADR to a GitHub Issue with bidirectional references
+**Purpose**: Link a lesson or ADR to a GitHub Issue after the fact. Writes the issue number into the file's frontmatter and posts a comment to the issue, so the KG and GitHub stay in sync.
 
 **When to use**:
 
@@ -1023,80 +1031,9 @@ With `--user-facing`:
 
 ---
 
-### 🔴 `/kmgraph:archive-memory`
-
-**Purpose**: Archive stale MEMORY.md entries to prevent bloat while preserving historical context
-
-**When to use**:
-
-- MEMORY.md approaching 1,500 token soft limit (warning from `/kmgraph:sync-all`)
-- MEMORY.md exceeds 2,000 token hard limit (blocked from adding new entries)
-- Periodic cleanup (recommended quarterly)
-- Before major project phase changes
-
-**What it does**:
-
-1. Calculates current MEMORY.md token count (word count × 1.3)
-2. Identifies stale entries using date-based staleness criteria (default: 90 days)
-3. Previews entries proposed for archival with token savings estimate
-4. Moves stale entries to `MEMORY-archive.md` (preserving content)
-5. Adds archive notice and log to both files
-6. Commits both files with descriptive message
-
-**Time**: 1-2 minutes
-
-**Example**:
-```bash
-/kmgraph:archive-memory
-/kmgraph:archive-memory --auto           # Skip confirmation
-/kmgraph:archive-memory --dry-run        # Preview without writing
-/kmgraph:archive-memory --threshold=180  # Custom staleness threshold (days)
-```
-
-**Tips**:
-
-- Token limits: 1,500 soft (warning) / 2,000 hard (block)
-- Archived entries can be restored with `/kmgraph:restore-memory`
-
----
-
-### 🔴 `/kmgraph:restore-memory`
-
-**Purpose**: Restore archived MEMORY.md entries from MEMORY-archive.md back into active memory
-
-**When to use**:
-
-- Need to reference archived knowledge for current work
-- Working on a problem related to a previously archived solution
-- Rebuilding context from a previous project phase
-- Token budget has been freed up and historical context is needed
-
-**What it does**:
-
-1. Parses all archived entries with IDs, titles, dates, and token sizes
-2. Supports fuzzy search by title, ID-based selection, or interactive list
-3. Previews entry content and calculates post-restoration token count
-4. Checks token limits before restoring (blocks if would exceed 2,000 token hard limit)
-5. Inserts entry into the appropriate MEMORY.md section
-6. Updates archive log with restoration timestamp (entry content remains in archive for history)
-7. Commits both files
-
-**Time**: 1-2 minutes
-
-**Example**:
-```bash
-/kmgraph:restore-memory                    # Interactive mode (show list, select)
-/kmgraph:restore-memory "Git Pre-Commit"  # Fuzzy search by title
-/kmgraph:restore-memory --id=5            # Restore by archive ID
-/kmgraph:restore-memory --list            # Show all archived entries
-/kmgraph:restore-memory --dry-run         # Preview without writing
-```
-
----
-
 ### 🔴 `/kmgraph:sync-all`
 
-**Purpose**: Automated knowledge sync orchestrator — replaces 4-step manual pipeline with 1 command
+**Purpose**: The catch-up command when lessons have been captured but the pipeline has not run. Replaces four manual steps in a single pass: update-graph, plan sync, issue update, and GitHub posting.
 
 **When to use**:
 
@@ -1150,7 +1087,7 @@ Session:          2026-02-11 (enriched)
 
 ### 🔴 `/kmgraph:handoff`
 
-**Purpose**: Create comprehensive project handoff documentation for transitions, context limits, or onboarding
+**Purpose**: Create a complete snapshot of project state for continuation across sessions, models, or machines. Five documents capture everything the next session needs to orient without losing working context.
 
 **When to use**:
 
@@ -1516,5 +1453,5 @@ flowchart TD
 </div>
 ---
 
-**Version**: 0.3.6-beta
-**Updated**: 2026-04-11
+**Version**: 0.5.2
+**Updated**: 2026-04-22

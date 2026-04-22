@@ -10,7 +10,7 @@ git:
   commit: null
   pr: null
   issue: null
-implements: null
+implements: "[[1aa5c455]] — docs(adr): add ADR-039 profile terminology (mirrors user-level ADR-010)"
 related:
   adrs:
     - "[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]]"

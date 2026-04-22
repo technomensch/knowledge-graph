@@ -47,14 +47,14 @@ Formal documentation of significant architecture decisions.
 
 ## Field Guide
 
-The ADR template uses manual markdown fields (no auto-fill commands yet):
+The ADR template fields are populated by the `/kmgraph:create-adr` wizard. Most fields are auto-populated; a few require user input during the wizard.
 
-**Header Fields (all manual):**
-- `ADR-XXX` - Sequential number (e.g., ADR-001, ADR-002)
+**Header Fields:**
+- `ADR-XXX` - Sequential number — auto-incremented by the wizard
 - `Title` - Concise decision description
-- `Date` - Date decision was made (format: 2024-01-15)
+- `Date` - Date decision was made — auto-populated by the wizard
 - `Status` - Current status (Proposed | Accepted | Deprecated | Superseded)
-- `Implements` - Optional: Version or feature this applies to
+- `Implementation Commit` - Auto-populated: the wizard captures the commit and subject line where this decision was implemented
 - `Related` - Optional: Links to related ADRs, lessons, KG entries
 
 **Content Sections:**
@@ -66,9 +66,8 @@ All sections are manually filled:
 - **Related** - Links to implementation, lessons, KG entries
 
 **Troubleshooting:**
-- ADRs are created manually — no auto-fill commands yet
-- Replace all `[bracketed placeholders]` with your content
-- For sequential numbering, check the highest existing ADR number and add 1
+- Run `/kmgraph:create-adr` — the wizard handles numbering and metadata automatically
+- If editing an existing ADR manually, replace all `[bracketed placeholders]` with your content
 
 **Examples:**
 See [core/examples/decisions/](../../examples/decisions/) for filled-out ADR examples.
@@ -77,6 +76,9 @@ See [core/examples/decisions/](../../examples/decisions/) for filled-out ADR exa
 
 ## Creating a New ADR
 
+Run `/kmgraph:create-adr` — the wizard handles numbering, git metadata, and index updates automatically.
+
+For manual creation:
 1. **Determine next number:** Find the highest existing ADR number and increment
 2. **Copy template:** Use [ADR-template.md](ADR-template.md)
 3. **Fill all sections:** Context, Decision, Rationale, Consequences
