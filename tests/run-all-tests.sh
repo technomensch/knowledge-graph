@@ -41,6 +41,11 @@ SUITES=(
   "test-skills-agents.sh|Skills + Agents — structural validation|no"
   "test-hooks.sh|Hooks — SessionStart hook validation|no"
   "test-extraction.sh|Extraction — Python chat extraction scripts|no"
+  "test-tier-resolver-smoke.sh|v0.5.0 Tier Resolver — smoke tests|no"
+  "test-tier-resolver-edge.sh|v0.5.0 Tier Resolver — edge and negative cases|no"
+  "test-create-adr-implements.sh|v0.5.0 create-adr implements field validation|no"
+  "test-dispatcher-tier-refactor.sh|v0.5.0 Dispatcher tier-resolver refactor|no"
+  "test-v050-misc.sh|v0.5.0 Hooks + me.md template smoke tests|no"
 )
 
 # ── Pre-flight Checks ─────────────────────────────────────────────────────────

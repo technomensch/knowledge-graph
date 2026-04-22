@@ -1,5 +1,5 @@
 #!/bin/bash
-# test-commands.sh — Structural and syntax validation for all 25 slash commands
+# test-commands.sh — Structural and syntax validation for all 27 slash commands
 #
 # Commands are markdown files with YAML frontmatter and embedded bash scripts.
 # This test validates structure and syntax without needing to run Claude Code.
@@ -62,6 +62,8 @@ EXPECTED_COMMANDS=(
   "update-doc.md"
   "update-graph.md"
   "update-issue-plan.md"
+  "init-personal-kg.md"
+  "migration.md"
 )
 
 MISSING=0
@@ -73,19 +75,19 @@ for cmd in "${EXPECTED_COMMANDS[@]}"; do
 done
 
 if [ $MISSING -eq 0 ]; then
-  pass "All 25 expected command files present"
+  pass "All 27 expected command files present"
 else
   fail "$MISSING command file(s) missing (see above)"
 fi
 
-# Test 3: Exact count is 25
-ACTUAL_COUNT=$(find "$COMMANDS_DIR" -name "*.md" -type f | wc -l | tr -d ' ')
-if [ "$ACTUAL_COUNT" -eq 25 ]; then
-  pass "Exact command count is 25"
-elif [ "$ACTUAL_COUNT" -gt 25 ]; then
-  fail "More than 25 command files found ($ACTUAL_COUNT) — unexpected files?"
+# Test 3: Exact count is 27 (top-level only — init-shared/ modules are excluded)
+ACTUAL_COUNT=$(find "$COMMANDS_DIR" -maxdepth 1 -name "*.md" -type f | wc -l | tr -d ' ')
+if [ "$ACTUAL_COUNT" -eq 27 ]; then
+  pass "Exact command count is 27"
+elif [ "$ACTUAL_COUNT" -gt 27 ]; then
+  fail "More than 27 command files found ($ACTUAL_COUNT) — unexpected files?"
 else
-  fail "Fewer than 25 command files found ($ACTUAL_COUNT)"
+  fail "Fewer than 27 command files found ($ACTUAL_COUNT)"
 fi
 
 # Test 4: No zero-byte files
