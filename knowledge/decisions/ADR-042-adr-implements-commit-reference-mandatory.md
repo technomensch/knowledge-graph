@@ -10,7 +10,7 @@ git:
   commit: 62a472cbe07785e6d1e314f7bbadaa6f8243c349
   pr: null
   issue: null
-implements: "e0ccfe41 — docs(adr): create ADR-042; rule in ~/.kmgraph/rules.md applied 2026-04-22 (non-git-tracked)"
+implements: "[[e0ccfe41]] — docs(adr): create ADR-042; rule in ~/.kmgraph/rules.md applied 2026-04-22 (non-git-tracked)"
 related:
   adrs: []
   lessons: []
