@@ -152,6 +152,7 @@ Skip all 8 wizard questions. Use the passed payload to populate all fields:
 - rationale → from payload
 - consequences → from payload (leave as "None" if blank)
 - related_lessons → from payload (empty array if blank)
+- `$implements_ref` → from `payload.implements_ref` if present; otherwise `null`
 
 Proceed directly to Phase 3.5.
 
