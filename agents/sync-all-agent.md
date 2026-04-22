@@ -126,7 +126,7 @@ if [ -f "$memory_path" ]; then
 
   if [ "$memory_tokens" -gt 2000 ]; then
     echo "MEMORY.md exceeds hard limit: ~${memory_tokens}/2,000 tokens"
-    echo "Run /kmgraph:archive-memory before adding new entries"
+    echo "MEMORY.md token limit reached — consider reviewing and trimming entries manually"
     SKIP_MEMORY_SYNC=true
   elif [ "$memory_tokens" -gt 1500 ]; then
     echo "MEMORY.md approaching limit: ~${memory_tokens}/2,000 tokens"

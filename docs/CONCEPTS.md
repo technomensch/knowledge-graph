@@ -147,14 +147,6 @@ Cross-references in the knowledge graph follow the Obsidian wiki link convention
 
 These formats are automatically applied during knowledge graph initialization (see `/kmgraph:init` and `/kmgraph:init-personal-kg`). Once applied, cross-references become clickable links in Obsidian and other tools that support wiki link syntax.
 
-### "What happens when MEMORY.md gets too large?"
-
-MEMORY.md works best under 200 lines. When it grows beyond that threshold:
-
-1. Run `/kmgraph:archive-memory` to move older entries to `MEMORY-archive.md`
-2. Archived entries remain available for reference but no longer load into AI context
-3. Run `/kmgraph:restore-memory` to bring back any archived entry when needed
-
 ---
 
 ## Next Steps
@@ -236,5 +228,5 @@ MEMORY.md works best under 200 lines. When it grows beyond that threshold:
 </div>
 ---
 
-**Version**: 0.3.6-beta
+**Version**: 0.5.2
 **Last Updated**: 2026-04-11

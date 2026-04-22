@@ -332,7 +332,6 @@ A special file that persists the most important learnings and patterns into the 
 
 **Why it exists**: AI assistant context resets between sessions. MEMORY.md bridges that gap by ensuring key learnings persist across conversations.
 
-**Size management**: MEMORY.md works best under 200 lines. When it grows too large, the `/kmgraph:archive-memory` command moves older entries to `MEMORY-archive.md`. Archived entries can be restored with `/kmgraph:restore-memory`.
 
 **Plain English**: The AI assistant's long-term memory file — ensures important learnings survive between sessions.
 
@@ -540,6 +539,96 @@ A measurement of text size used by AI language models. One token is roughly equi
 **Plain English**: A measure of file size for AI reading — smaller files leave more room for conversation.
 
 ---
+## Tier Label
+
+:::tip[**What is it?**]
+
+A platform-agnostic name for a class of AI model — `fast-tier`, `standard-tier`, or `powerful-tier` — used in place of a specific model name.
+
+:::
+**Why it matters**: Model names change between versions and differ across platforms. Tier labels let rules, commands, and agents refer to "use the fast model" without hardcoding `claude-haiku-4-5-20251001`. When the model name changes, only the tier map needs updating — not every command.
+
+**How it resolves**: Each `me.md` includes a `tier_map` that translates tier labels to concrete model names for the active platform. The `ai-model-tier-resolver` module handles this lookup automatically.
+
+**Plain English**: A nickname for a model class ("fast", "standard", "powerful") that stays stable even as model names change.
+
+---
+
+## Tier Map
+
+:::tip[**What is it?**]
+
+A `tier_map` block in `me.md` that maps tier labels to concrete model names for the active platform.
+
+:::
+**Why it matters**: Different users may prefer different models for the same tier. The tier map is the single place to change which model gets used for "standard" work — all commands pick it up automatically.
+
+**Where it lives**: In the `platforms[]` block of `knowledge/me.md` (project-level) or `~/.kmgraph/me.md` (personal default). Project-level entries override personal defaults.
+
+**Plain English**: A lookup table that says "when a command asks for the standard model, use this one."
+
+---
+
+## Alias Map
+
+:::tip[**What is it?**]
+
+A backwards-compatibility table that translates legacy model names (e.g., `Haiku`, `Sonnet`, `Opus`) to their equivalent tier labels.
+
+:::
+**Why it matters**: Earlier versions of KMGraph used raw model names in `me.md`. The alias map lets those names continue to work while emitting a one-time deprecation warning, giving existing setups time to migrate to tier labels.
+
+**Sunset**: Legacy aliases are scheduled for removal in v0.6.0. Migrate `me.md` entries from model names to tier labels (`fast-tier`, `standard-tier`, `powerful-tier`) before then.
+
+**Plain English**: A translation layer that keeps old model name references working while nudging users toward the new tier label system.
+
+---
+
+## Tier Collapse
+
+:::tip[**What is it?**]
+
+A fallback chain the resolver follows when a tier's mapped model is missing or unreachable: `powerful-tier → standard-tier → fast-tier`.
+
+:::
+**Why it matters**: Local servers go offline, API keys expire, and model names change. Tier collapse keeps a session moving by picking the next-best reachable tier instead of halting on every transient failure. The collapse event is logged once per session so the degradation is visible without spamming the log.
+
+**When it halts**: If `fast-tier` also fails, the resolver stops with an actionable error. Skills that must not downgrade can opt out by declaring `required_tier: <label>` in their frontmatter; those skills halt rather than collapse. `stuck-work-escalation` is the primary opt-out case.
+
+**Plain English**: The "if the preferred model is unavailable, try the next one down" rule that keeps work flowing when infrastructure stumbles.
+
+---
+
+## User Profile / Project Profile
+
+:::tip[**What is it?**]
+
+Two collective scopes for the behavioral config files that shape the AI assistant. **User Profile** = `~/.kmgraph/me.md` + `~/.kmgraph/rules.md` + `~/.kmgraph/triggers.md`. **Project Profile** = `knowledge/me.md` + `knowledge/rules.md` + `knowledge/triggers.md`.
+
+:::
+**Why the distinction matters**: User Profile captures cross-project identity, rules, and tier preferences that travel with a contributor from repo to repo. Project Profile captures project-specific conventions and per-contributor identity for a single codebase. Together the two scopes form the **Full Profile Stack**, with project entries overriding user entries on conflict.
+
+**Read order**: `~/.kmgraph/me.md` → `~/.kmgraph/triggers.md` → `knowledge/me.md` → `knowledge/triggers.md`. Both `rules.md` files are loaded on demand only, to avoid context bloat.
+
+**Plain English**: "What I always want" (User Profile) vs. "what this project needs" (Project Profile), stacked so the project wins when they disagree.
+
+---
+
+## Unknown-Model Trigger
+
+:::tip[**What is it?**]
+
+The prompt flow that fires when a command or agent is invoked with a model name that does not resolve to any tier in the active `me.md` YAML frontmatter.
+
+:::
+**Why it matters**: Before tier abstraction, a typo or stale model name could silently dispatch the wrong model. The unknown-model trigger catches these at the boundary: it prompts for a tier assignment (plus host and port for local models), updates `me.md`, and then continues dispatch. After the first assignment the name resolves normally.
+
+**Where it lives**: A trigger entry in both the User Profile and Project Profile `triggers.md` templates. `Gate:` fires when the model name invoked does not resolve to any tier in `me.md`; `Apply:` points to `rules.md § Profile > Adding a model`.
+
+**Plain English**: "I don't recognize this model name — which tier should it belong to?" — asked once, remembered thereafter.
+
+---
+
 ## YAML Frontmatter
 
 :::tip[**What is it?**]

@@ -124,6 +124,139 @@ Last updated: [extracted from date in file, or "unknown"]
 
 ---
 
+## Step 2.5: Pre-flight Housekeeping Scan
+
+Run automatically after Step 2, before any content changes. Scan `$TARGET_FILE` for the following and report findings. If violations are found, ask: "Fix housekeeping issues before proceeding? (yes / skip / cancel)"
+
+**Version & date hygiene**
+```bash
+# Stale version header
+grep -n "^\*\*Version:\*\*" "$TARGET_FILE"
+
+# Stale Updated header
+grep -n "Updated:" "$TARGET_FILE"
+
+# Stale section comments
+grep -n "<!-- Updated:" "$TARGET_FILE"
+
+# [NEW in vX.X] badges — flag any from releases older than the current release series
+grep -n "\[NEW in v" "$TARGET_FILE"
+
+# Inline (vX.X-beta) annotations — same rule
+grep -n "(v[0-9]\+\.[0-9]\+-beta)" "$TARGET_FILE"
+
+# -beta in user-facing version strings
+grep -n "\*\*Version:\*\*.*-beta" "$TARGET_FILE"
+```
+
+**Link integrity**
+```bash
+# Extract all markdown links to local files and verify they exist
+grep -oE "\[([^\]]+)\]\(([^)]+\.md[^)]*)\)" "$TARGET_FILE"
+# For each resolved path: check file exists; report any that don't
+```
+
+**README-specific (run only when $TARGET_FILE is README.md)**
+```bash
+# Hard counts (stale by definition)
+grep -n "([0-9]\+ Total)\|([0-9]\+ tools)\|([0-9]\+ agents)\|([0-9]\+ commands)" "$TARGET_FILE"
+
+# Verify all commands listed exist in commands/
+grep -oE "/kmgraph:[a-z-]+" "$TARGET_FILE" | sort -u
+
+# Ancient resolved issue notices
+grep -n "Already fixed in v0\." "$TARGET_FILE"
+
+# Internal roadmap language
+grep -inE "Phase [0-9]+ \(|publication\)" "$TARGET_FILE"
+```
+
+**Voice & style**
+```bash
+# Second-person voice (flag for COMMAND-GUIDE.md)
+grep -inE "\b(you|your)\b" "$TARGET_FILE"
+
+# Em dashes
+grep -n " — " "$TARGET_FILE"
+```
+
+**Display findings summary before proceeding:**
+```
+Pre-flight scan: $TARGET_FILE
+
+✅ Version header current       (or ⚠️  Shows X.X — current is Y.Y)
+✅ Date headers current         (or ⚠️  N stale timestamps found)
+✅ Section comments current     (or ⚠️  N stale <!-- Updated: --> found)
+✅ No stale [NEW] badges        (or ⚠️  N badges from prior release series)
+✅ No hard counts               (or ⚠️  Found: "23 Total" at line N)
+✅ No broken internal links     (or ⚠️  N missing files)
+✅ No internal roadmap language (or ⚠️  Found at line N)
+
+Fix before proceeding? (yes / skip / cancel)
+```
+
+---
+
+## User-Facing Docs — Reference File List
+
+When running a full release docs pass (`--user-facing` with no specific file), work through this list. Tier 1 on every release; Tier 2 when related content changed; Tier 3 periodically.
+
+**Tier 1 — Every release**
+- `README.md`
+- `CHANGELOG.md`
+- `INSTALL.md`
+- `docs/quickstart.mdx`
+- `docs/CHEAT-SHEET.md`
+- `docs/COMMAND-GUIDE.md`
+- `docs/reference/commands.md`
+
+**Tier 2 — When related content changes**
+- `docs/CONFIGURATION.md`
+- `docs/GLOSSARY.md`
+- `docs/CONCEPTS.md`
+- `docs/reference/agents.md`
+- `docs/reference/skills.md`
+- `docs/reference/hooks.md`
+- `docs/reference/templates.md`
+- `docs/reference/ARCHITECTURE.md`
+- `docs/reference/PLATFORM-ADAPTATION.md`
+- `docs/reference/WORKFLOWS.md`
+- `docs/reference/META-ISSUE-GUIDE.md`
+- `docs/reference/PATTERNS-GUIDE.md`
+- `docs/reference/SANITIZATION-CHECKLIST.md`
+- `docs/guides/create-adr.md`
+- `docs/guides/me-and-rules.md`
+- `docs/guides/capture-from-bugfix.md`
+- `docs/guides/backfill-existing-notes.md`
+- `docs/guides/customize-hooks.md`
+- `docs/guides/customize-templates.md`
+- `docs/guides/integrate-notebooklm.md`
+- `docs/guides/integrate-notion.md`
+- `docs/guides/integrate-obsidian.md`
+- `docs/guides/migrate-claude-gemini.md`
+- `docs/guides/multi-kg-workflows.md`
+- `docs/guides/pattern-writing.md`
+- `docs/guides/sanitize-before-sharing.md`
+- `docs/guides/sync-across-machines.md`
+- `docs/guides/track-meta-issue.md`
+- `docs/guides/use-in-cursor.md`
+
+**Tier 3 — Periodic review**
+- `docs/FAQ.md`
+- `docs/PERSONAL-V-PROJECT.md`
+- `docs/SEARCH.md`
+- `docs/TRACK-ISSUES.md`
+- `docs/4-LAYERS.md`
+- `docs/4-PILLARS.md`
+- `docs/concepts/automation-layer.md`
+- `docs/concepts/why-kmgraph.md`
+- `docs/troubleshooting/index.md`
+- `docs/index.mdx`
+
+**Excluded** (not user-facing): `CLAUDE.md`, `GEMINI.md`, `CONTRIBUTING.md`, `ROADMAP.md`, `docs/specs/`, `docs/plans/`, `docs/templates/`
+
+---
+
 ## Step 3: Select Update Type
 
 ```
@@ -392,10 +525,25 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
 
 ## Checklist (Internal)
 
+**Routing**
 - [ ] File path resolved (`$TARGET_FILE` confirmed)
 - [ ] KG auto-detection checked against active KG path
 - [ ] Disambiguation dialog shown (if `--user-facing` was absent)
 - [ ] Correct path taken (user-facing wizard or KG content confirmation)
+
+**Pre-flight housekeeping (Step 2.5)**
+- [ ] Version header is current
+- [ ] Date headers (`Updated:`, `Last Updated:`) are current
+- [ ] All `<!-- Updated: -->` section comments are current
+- [ ] No stale `[NEW in vX.X]` badges from prior release series
+- [ ] No stale inline `(vX.X-beta)` version annotations
+- [ ] No hard counts (command totals, agent counts, tool counts)
+- [ ] No broken internal links
+- [ ] No internal roadmap language in user-facing copy
+- [ ] README-specific: no ancient resolved issue notices
+- [ ] Voice: no second-person in COMMAND-GUIDE.md; no em dashes
+
+**Content update**
 - [ ] Update type selected
 - [ ] Update content gathered from user
 - [ ] v0.0.7 standards validation run

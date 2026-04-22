@@ -139,6 +139,40 @@ Correctness over speed. If a change might break something, say so first.
 
 Two contributors on the same project have different `me.md` files. Committing one person's `me.md` would surface the wrong identity context for every other contributor. That's why it's gitignored.
 
+### Project-Level Tier Overrides — `platforms[]`
+
+An optional `platforms[]` block in `me.md` overrides the model tier mappings from `~/.kmgraph/me.md` for this project only. The `profile_schema:` field pins the frontmatter format version so the inspector can migrate entries when the schema evolves:
+
+```yaml
+---
+profile_schema: 1
+platforms:
+  - name: claude
+    tier_map:
+      fast-tier: claude-haiku-4-5-20251001
+      standard-tier: claude-sonnet-4-6
+      powerful-tier: claude-opus-4-7
+  - name: ollama
+    host: localhost
+    port: 11434
+    tier_map:
+      fast-tier: llama3.2:3b
+      standard-tier: llama3.1:8b
+      powerful-tier: llama3.1:70b
+  - name: lm-studio
+    host: localhost
+    port: 1234
+    tier_map:
+      fast-tier: Phi-3.5-mini-instruct
+      standard-tier: Meta-Llama-3.1-8B-Instruct
+      powerful-tier: Meta-Llama-3.1-70B-Instruct
+---
+```
+
+Useful when a project requires a specific model version regardless of personal defaults. Project-level entries take precedence over user-level entries on conflict. Local platforms add `host` and `port` fields pointing at a running Ollama or LM Studio instance; init discovers these automatically and prompts for the model list.
+
+**When a tier maps to an unreachable model**, the resolver falls back down the chain (`powerful-tier → standard-tier → fast-tier`) and logs the collapse once per session. If `fast-tier` is also unreachable, dispatch halts with a remediation prompt. Skills that must not downgrade declare `required_tier: <label>` in their frontmatter and halt instead of collapsing.
+
 ---
 
 ## `knowledge/triggers.md` — When Rules Apply
