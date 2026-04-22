@@ -139,6 +139,16 @@ Tier labels are platform-neutral vocabulary that any LLM ecosystem supports. Map
 
 **Change:** Added `Gemini Ultra, Ultra, ultra-*` → `powerful-tier` row to the alias map. The original alias table included Flash and Pro but omitted Ultra, creating an inconsistency with the tier table's Gemini column (which lists Ultra for `powerful-tier`).
 
+### 2026-04-21 — Alias Map and Validation Gate Implemented (v0.5.2-beta Phase 3)
+
+**Alias map:** Implemented in `commands/init-shared/ai-model-tier-resolver.md` (Step R-1). All 6 legacy aliases from the ADR table now resolve to tier labels with a once-per-session deprecation warning. Gemini Ultra alias (N2 fix) included.
+
+**Validation gate (S5):** Added as Step R-4 in ai-model-tier-resolver.md. Gate fires only during dispatcher resolution — never from file scanning, frontmatter inspection, or grep. Warns once per session on suspicious model ID values; does not halt, allowing downstream errors to surface directly.
+
+**DRY consolidation:** The 4 dispatchers that had inline tier-resolution paragraphs (session-summary, create-adr, capture-lesson, sync-all) now reference ai-model-tier-resolver.md. Single source of truth for all resolution logic.
+
+**Status:** Alias map and validation gate are fully implemented. Sunset scheduled for v0.6.0 (alias removal + resolver cleanup).
+
 ---
 
 **Decision Made:** 2026-04-21
