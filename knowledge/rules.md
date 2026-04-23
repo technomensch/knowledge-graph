@@ -46,6 +46,11 @@ When a user-facing document is moved or renamed, update `sidebars.js` to reflect
 - **Why:** a stale `id:` in `sidebars.js` causes Docusaurus to throw `Unknown doc ID` and breaks the build silently until the next deploy
 - **Invoke:** `sidebar-update` skill when a rename or move is detected
 
+### Pre-Push / Pre-Merge User-Facing Doc Sync
+
+Before pushing to origin OR before creating/completing a merge, run `/kmgraph:update-doc --user-facing` to verify that all user-facing docs (README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, CONCEPTS, INSTALL.md) reflect the changes on the branch.
+- **Why:** commands, behavior changes, and new features were shipped without corresponding doc updates, leaving guides inconsistent with actual behavior until a follow-up pass was required
+
 ### Pre-PR Doc Verification
 
 Before creating a PR with doc changes: run `git diff HEAD~N -- docs/` for each changed file, check for formatting regressions (stray spaces, broken tables, removed blank lines, wrong agent names), then run `mkdocs build` and confirm no new warnings

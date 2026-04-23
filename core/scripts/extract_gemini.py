@@ -17,7 +17,7 @@ except ImportError:
 # Common English words to filter out binary noise
 COMMON_WORDS = {' the ', ' you ', ' and ', ' that ', ' have ', ' for ', ' not ', ' with ', ' this ', ' from '}
 
-from chat_extractor_base import get_output_path, format_timestamp, write_markdown_header, write_message_block
+from chat_extractor_base import get_output_path, format_timestamp, write_markdown_header, write_message_block, split_file_if_oversized
 
 GEMINI_TMP_DIR = os.path.expanduser("~/.gemini/tmp")
 GEMINI_CONV_DIR = os.path.expanduser("~/.gemini/antigravity/conversations")
@@ -243,7 +243,11 @@ def extract_all_gemini(limit=None, date_filter=None, after_date=None, before_dat
                 
                 if session_index < len(sessions):
                     f.write("\n---\n\n")
-            
+
+        split_parts = split_file_if_oversized(output_path)
+        if split_parts:
+            results.append(f"Merged {len(sessions)} sessions ({total_items} items) into {filename} — split into {len(split_parts)} parts in {date}/ subfolder")
+        else:
             results.append(f"Merged {len(sessions)} sessions ({total_items} items) into {filename}")
             
     return results

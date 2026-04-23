@@ -322,6 +322,7 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 - Include error messages verbatim
 - Note what DIDN'T work (helps future you)
 - Level routing: use "user level" for cross-project patterns; "for this project" for codebase-specific lessons. See [Personal vs Project KGs](../PERSONAL-V-PROJECT.md) for details.
+- If the active KG differs from the project's own KG, the command stops before writing and asks which graph to use
 
 ---
 
@@ -618,6 +619,7 @@ Dispatches to the recall agent, which searches:
 - Use Proposed status for decisions still under review; Accepted for decisions already implemented
 - Link to related lessons in Step 3.8 — creates bidirectional traceability
 - If a snapshot was taken earlier in the session, the ADR's Context section can draw from it
+- If the active KG differs from the project's own KG, the wizard stops before writing and asks which graph to use
 
 ---
 
@@ -790,7 +792,8 @@ Test the hook:
 1. Determines output directory (active KG's `chat-history/` by default, or custom path)
 2. Scans Claude logs (`~/.claude/projects/` for `.jsonl` files) and/or Gemini logs (`~/.gemini/tmp/`, `~/.gemini/antigravity/conversations/` for `.json`/`.pb` files)
 3. Merges sessions by date into `YYYY-MM-DD-claude.md` and/or `YYYY-MM-DD-gemini.md`
-4. Supports incremental append — re-running adds new sessions without overwriting
+4. If a daily file exceeds 900 KB or 30,000 lines, automatically splits into numbered parts (`-part1.md`, `-part2.md`, …) inside a `YYYY-MM-DD/` subfolder to prevent Obsidian rendering failures
+5. Supports incremental append — re-running adds new sessions without overwriting; appends target the last part file if the day was previously split
 
 **Time**: Under 30 seconds
 
@@ -819,6 +822,7 @@ Test the hook:
 - Optional `blackboxprotobuf` Python library enables Gemini protobuf file support
 - Date ranges use natural language: `YYYY-MM-DD through YYYY-MM-DD` or `YYYY-MM-DD to YYYY-MM-DD`
 - Gemini date filtering: passthrough implemented; underlying Gemini extraction may have known limitations
+- Large days auto-split into a `YYYY-MM-DD/` subfolder with numbered part files; each part is a valid standalone markdown file readable in Obsidian
 
 ---
 
