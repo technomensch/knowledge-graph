@@ -195,6 +195,27 @@ python3 ${CLAUDE_PLUGIN_ROOT}/core/scripts/run_extraction.py --source $source_fl
 
 ---
 
+## Large File Splitting
+
+Obsidian crashes on files larger than ~1 MB or ~34,000 lines. When a daily output file exceeds either threshold, it is automatically split into numbered part files inside a `YYYY-MM-DD/` subfolder:
+
+**Normal output (under limit):**
+```
+chat-history/YYYY-MM/YYYY-MM-DD-claude.md
+```
+
+**Split output (over limit):**
+```
+chat-history/YYYY-MM-DD/YYYY-MM-DD-claude-part1.md
+chat-history/YYYY-MM-DD/YYYY-MM-DD-claude-part2.md
+```
+
+Each part file is a valid standalone markdown document with its own header (annotated `— Part N`). Splits occur at message block boundaries so no message is cut mid-block.
+
+Incremental appends automatically target the last part file. If appending causes the last part to exceed the limit, a new part is created.
+
+---
+
 ## Incremental Append Behavior
 
 **Script behavior:**
