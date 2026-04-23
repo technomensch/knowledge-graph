@@ -22,6 +22,33 @@ Pass the resolved flag (`--user`, `--project`, `--named=<kg>`, or `--active`) to
 
 ---
 
+## Project KG Guardrail
+
+**STOP before any write if the active KG does not match the current project's KG.**
+
+After routing resolves `$target_kg`, detect the project root and its KG:
+
+```bash
+project_root=$(git rev-parse --show-toplevel 2>/dev/null)
+project_kg="${project_root}/knowledge"
+```
+
+If `$project_kg` **exists** AND its resolved path **differs** from `$target_kg`, and the user did not explicitly pass `--user` or `--named=<kg>`:
+
+> "The active KG is **[active_kg_name]** (`$target_kg`), but this project has its own KG at `{project_kg}/`.
+>
+> Which graph should receive this lesson?
+>
+> **[1]** Project KG — `{project_kg}/lessons-learned/`
+> **[2]** Active KG — `{active_kg_name}` (`$target_kg/lessons-learned/`)
+> **[3]** Cancel"
+
+Wait for user selection. Update `$target_kg` and `$target_path` to the chosen graph before continuing. Do **not** dispatch to `lesson-capture-agent` until the user has chosen.
+
+If `$project_kg` does not exist, or paths match, or user explicitly specified a target, continue without prompting.
+
+---
+
 ## Syntax Detection
 
 **Create new lesson:**

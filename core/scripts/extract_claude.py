@@ -6,7 +6,7 @@ import glob
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 import re
-from chat_extractor_base import get_output_path, format_timestamp, write_markdown_header, write_message_block
+from chat_extractor_base import get_output_path, format_timestamp, write_markdown_header, write_message_block, split_file_if_oversized
 
 CLAUDE_PROJECTS_DIR = os.path.expanduser("~/.claude/projects")
 
@@ -231,7 +231,11 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                                 msg.get('thinking')
                             )
                             global_msg_index += 1
-                results.append(f"Appended {new_msg_count} new messages to {filename}")
+                split_parts = split_file_if_oversized(output_path)
+                if split_parts:
+                    results.append(f"Appended to {filename} — split into {len(split_parts)} parts in {date}/ subfolder")
+                else:
+                    results.append(f"Appended {new_msg_count} new messages to {filename}")
             else:
                 results.append(f"No new activity for {filename} (last sync: {datetime.utcfromtimestamp(last_ts).strftime('%Y-%m-%dT%H:%M:%SZ')})")
         else:
@@ -272,8 +276,12 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                     if session_index < len(sessions):
                         f.write("\n---\n\n")
 
-            # Accurate output message
-            if file_has_content:
+            # Check size limits and split if needed
+            split_parts = split_file_if_oversized(output_path)
+            if split_parts:
+                action = "Overwrote" if file_has_content else "Created"
+                results.append(f"{action} {filename}: split into {len(split_parts)} parts in {date}/ subfolder{backup_msg}")
+            elif file_has_content:
                 results.append(f"Overwrote {filename} with {total_messages} messages{backup_msg}")
             else:
                 results.append(f"Created {filename} with {total_messages} messages")
