@@ -64,6 +64,33 @@ mkdir -p {active_kg_path}/decisions/
 
 ---
 
+## Project KG Guardrail
+
+**STOP before any write if the active KG does not match the current project's KG.**
+
+After resolving `{active_kg_path}`, detect the project root and its KG:
+
+```bash
+project_root=$(git rev-parse --show-toplevel 2>/dev/null)
+project_kg="${project_root}/knowledge"
+```
+
+If `$project_kg` **exists** AND its resolved path **differs** from `{active_kg_path}`:
+
+> "The active KG is **[active_kg_name]** (`{active_kg_path}`), but this project has its own KG at `{project_kg}/`.
+>
+> Which graph should receive this ADR?
+>
+> **[1]** Project KG — `{project_kg}/decisions/`
+> **[2]** Active KG — `{active_kg_name}` (`{active_kg_path}/decisions/`)
+> **[3]** Cancel"
+
+Wait for user selection. Update `{active_kg_path}` to the chosen graph's root before continuing. Do **not** proceed to the Snapshot Gate until the user has chosen.
+
+If `$project_kg` does not exist, or paths match, continue without prompting.
+
+---
+
 ## Snapshot Gate
 
 *Runs before Step 1 — context preservation before the ADR dialog.*

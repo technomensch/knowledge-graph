@@ -13,6 +13,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## v0.5.3 (2026-04-23)
+
+### Added
+
+- **`extract-chat` large-day auto-split** — Days with exports exceeding 900 KB or 30,000 lines are automatically split into `YYYY-MM-DD/` subfolders (e.g., `chat-history/2026-04-23/part-1.md`). Prevents Obsidian from refusing to open oversized daily files. Part boundaries respect message boundaries.
+- **`update-profile` skill** — New auto-triggered skill for guided updates to user profile files (`me.md`) (ADR-045).
+- **`update-doc` Tier 1 continuation prompt (Step 7b)** — After completing a `--user-facing` update on any Tier 1 doc, the command now prompts to continue with remaining Tier 1 files, preventing README.md and CHANGELOG.md from being skipped when individual files are targeted.
+
+### Fixed
+
+- **`create-adr` and `capture-lesson` KG-mismatch guardrails** — Both commands now detect and block writes when the active KG does not match the current working directory.
+
+### Changed
+
+- **`knowledge/rules.md` doc-sync gate** — Added rule requiring `/kmgraph:update-doc --user-facing` before push or merge when user-facing docs have changed.
+
+---
+
 ## v0.5.2-beta (2026-04-21)
 
 ### Added
