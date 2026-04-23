@@ -199,7 +199,7 @@ Fix before proceeding? (yes / skip / cancel)
 
 ## User-Facing Docs — Reference File List
 
-When running a full release docs pass (`--user-facing` with no specific file), work through this list. Tier 1 on every release; Tier 2 when related content changed; Tier 3 periodically.
+When running a full release docs pass (`--user-facing` with no specific file), work through this list immediately. When a specific Tier 1 file is updated, Step 7b prompts to continue with the rest. Tier 1 on every release; Tier 2 when related content changed; Tier 3 periodically.
 
 **Tier 1 — Every release**
 - `README.md`
@@ -520,6 +520,28 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
 ✅ Updated: $TARGET_FILE
    Committed: docs(user-facing): update [filename] — [brief description]
 ```
+
+---
+
+## Step 7b: Tier 1 Continuation Prompt
+
+**Run after Step 7 when `--user-facing` was active and a specific file was provided.**
+
+Check whether `$TARGET_FILE` appears in the Tier 1 list. If it does, prompt:
+
+```
+$TARGET_FILE is a Tier 1 doc. Continue with remaining Tier 1 files?
+
+Remaining:
+[list each Tier 1 file not yet updated this session]
+
+(yes / skip)
+```
+
+- **yes:** Repeat Steps 2–7b for each remaining Tier 1 file in order.
+- **skip:** Exit. Remind the user: "Remaining Tier 1 files were skipped — run `/kmgraph:update-doc --user-facing` with no file to sweep them."
+
+If `$TARGET_FILE` is not in the Tier 1 list, exit normally without this prompt.
 
 ---
 

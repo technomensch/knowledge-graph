@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.5.2
+**Version:** 0.5.3
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -89,7 +89,14 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 
 ## v0.5.x Feature Highlights
 
-**v0.5.x — 2026-04-21**
+**v0.5.3 — 2026-04-23**
+
+- **`extract-chat` now handles large export days automatically** — Prior to this update, lengthy chat-history files were causing Obsidian indexing to crash the vault.  After this update, exports exceeding 900 KB or 30,000 lines are split into `YYYY-MM-DD/`files. Boundaries respect message boundaries so no message is split mid-content.
+- **`update-doc` no longer silently skips README and CHANGELOG** — After updating any Tier 1 doc with `--user-facing`, the command now prompts to continue with remaining Tier 1 files in order. Previously, targeting a specific file bypassed the full release sweep entirely.
+- **KG-mismatch guardrails added to `create-adr` and `capture-lesson`** — Both commands now block writes when the active knowledge graph does not match the current working directory, preventing accidental cross-project entries.
+- **New `update-profile` skill** — Auto-triggered when updating user profile files (`me.md`), guiding the update through a structured prompt flow (ADR-045).
+
+**v0.5.2 — 2026-04-21**
 
 - **Model configuration is now future-proof** — Instead of hardcoding specific model names in `me.md`, commands and agents now reference tier labels (`fast-tier`, `standard-tier`, `powerful-tier`). When a model gets updated or renamed, only one place needs to change. Getting started is straightforward: run `/kmgraph:init` and the wizard walks through tier mapping interactively, discovers any locally running Ollama or LM Studio instances automatically, and pre-populates `~/.kmgraph/me.md` with working defaults so no manual edits are needed. Upgrading works the same way — the upgrade wizard offers the same interactive walkthrough after relocating platform config. For full manual control, add a `platforms[]` block directly to `me.md`. Unrecognized model values surface a warning instead of silently failing.
 - **ADRs now record where and when decisions were implemented** — When creating an ADR, the wizard automatically captures the commit and subject line so there is always a traceable link back to the implementation. No more guessing when or where something was decided.
@@ -169,7 +176,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.5.2 (2026-04-21)
+**Current Release:** v0.5.3 (2026-04-23)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -262,6 +269,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.5.2 (2026-04-21)
+**Current Version:** v0.5.3 (2026-04-23)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info
