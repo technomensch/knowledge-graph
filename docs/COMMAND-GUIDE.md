@@ -5,6 +5,9 @@ sidebar_label: Commands
 description: "Complete reference for all /kmgraph: slash commands"
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 **Version:** 0.5.2 | **Updated:** 2026-04-22
 
 > **Claude Code only:** The `/kmgraph:` prefix requires Claude Code with this plugin installed. Other IDEs access equivalent functionality through MCP tools — see [INSTALL.md](INSTALL.md) for platform-specific setup.
@@ -17,16 +20,6 @@ These commands are designed as reference documentation for any LLM:
 - **No-tool LLMs:** Commands serve as workflow documentation — follow steps manually
 
 Commands work across platforms, but full automation is Claude Code-specific.
-
----
-
-> ⚠️ **DEPRECATED PATTERN (v0.2.1-beta):** Thick commands (200+ lines) are no longer the standard pattern.
->
-> **New pattern:** Thin dispatchers (80-150 lines) + execution logic in agents/. See [CONCEPTS.md § Four-Layer Architecture](CONCEPTS.md) for overview.
->
-> **Why changed:** Reduces duplication, improves maintainability, enables platform portability.
->
-> **Migration:** Old thick-command pattern remains functional but deprecated. New commands should use thin-dispatcher + agent pattern.
 
 ---
 
@@ -87,49 +80,57 @@ Commands work across platforms, but full automation is Claude Code-specific.
 
 ## Browse Commands by Category
 
-=== "Setup & Configuration"
+<Tabs>
+  <TabItem value="setup" label="Setup & Configuration">
 
-    Get the knowledge graph running and configure how it works.
+Get the knowledge graph running and configure how it works.
 
-    - [🟢 `/kmgraph:init`](#-kmgraphinit) — Initialize a new knowledge graph
-    - [🟡 `/kmgraph:init-personal-kg`](#-kmgraphinit-personal-kg) — Create personal KG for cross-project lessons
-    - [🟡 `/kmgraph:list`](#-kmgraphlist) — View all configured knowledge graphs
-    - [🟡 `/kmgraph:switch`](#-kmgraphswitch) — Switch to a different knowledge graph
-    - [🟡 `/kmgraph:add-category`](#-kmgraphadd-category) — Add custom categories
-    - [🟡 `/kmgraph:config-sanitization`](#-kmgraphconfig-sanitization) — Set up safety features for team sharing
+- [🟢 `/kmgraph:init`](#-kmgraphinit) — Initialize a new knowledge graph
+- [🟡 `/kmgraph:init-personal-kg`](#-kmgraphinit-personal-kg) — Create personal KG for cross-project lessons
+- [🟡 `/kmgraph:list`](#-kmgraphlist) — View all configured knowledge graphs
+- [🟡 `/kmgraph:switch`](#-kmgraphswitch) — Switch to a different knowledge graph
+- [🟡 `/kmgraph:add-category`](#-kmgraphadd-category) — Add custom categories
+- [🟡 `/kmgraph:config-sanitization`](#-kmgraphconfig-sanitization) — Set up safety features for team sharing
 
-=== "Capture & Document"
+  </TabItem>
+  <TabItem value="capture" label="Capture & Document">
 
-    Document lessons, capture history, and summarize sessions.
+Document lessons, capture history, and summarize sessions.
 
-    - [🟢 `/kmgraph:capture-lesson`](#-kmgraphcapture-lesson) — Capture problems solved and patterns discovered
-    - [🟡 `/kmgraph:extract-chat`](#-kmgraphextract-chat) — Export chat history to markdown
-    - [🟡 `/kmgraph:session-summary`](#-kmgraphsession-summary) — Summarize important work sessions
+- [🟢 `/kmgraph:capture-lesson`](#-kmgraphcapture-lesson) — Capture problems solved and patterns discovered
+- [🟡 `/kmgraph:extract-chat`](#-kmgraphextract-chat) — Export chat history to markdown
+- [🟡 `/kmgraph:session-summary`](#-kmgraphsession-summary) — Summarize important work sessions
 
-=== "Search & Sync"
+  </TabItem>
+  <TabItem value="search-sync" label="Search & Sync">
 
-    Find knowledge and keep the graph synchronized.
+Find knowledge and keep the graph synchronized.
 
-    - [🟢 `/kmgraph:status`](#-kmgraphstatus) — Check current knowledge graph status
-    - [🟢 `/kmgraph:recall`](#-kmgraphrecall) — Search across all knowledge entries
-    - [🟡 `/kmgraph:update-graph`](#-kmgraphupdate-graph) — Extract lessons into knowledge graph
-    - [🟡 `/kmgraph:update-doc`](#-kmgraphupdate-doc) — Update documentation with changes
-    - [🔴 `/kmgraph:sync-all`](#-kmgraphsync-all) — Run complete synchronization pipeline
+- [🟢 `/kmgraph:status`](#-kmgraphstatus) — Check current knowledge graph status
+- [🟢 `/kmgraph:recall`](#-kmgraphrecall) — Search across all knowledge entries
+- [🟡 `/kmgraph:update-graph`](#-kmgraphupdate-graph) — Extract lessons into knowledge graph
+- [🟡 `/kmgraph:update-doc`](#-kmgraphupdate-doc) — Update documentation with changes
+- [🔴 `/kmgraph:sync-all`](#-kmgraphsync-all) — Run complete synchronization pipeline
 
-=== "Team & Sharing"
+  </TabItem>
+  <TabItem value="team" label="Team & Sharing">
 
-    Share knowledge safely with team members.
+Share knowledge safely with team members.
 
-    - [🟡 `/kmgraph:check-sensitive`](#-kmgraphcheck-sensitive) — Scan for sensitive data before sharing
-    - [🔴 `/kmgraph:link-issue`](#-kmgraphlink-issue) — Connect lessons to GitHub issues
+- [🟡 `/kmgraph:check-sensitive`](#-kmgraphcheck-sensitive) — Scan for sensitive data before sharing
+- [🔴 `/kmgraph:link-issue`](#-kmgraphlink-issue) — Connect lessons to GitHub issues
 
-=== "Advanced Issues"
+  </TabItem>
+  <TabItem value="advanced" label="Advanced Issues">
 
-    Track complex, multi-attempt problems systematically.
+Track complex, multi-attempt problems systematically.
 
-    - [🔴 `/kmgraph:meta-issue`](#-kmgraphmeta-issue) — Track multi-attempt bugs and features
-    - [🔴 `/kmgraph:start-issue-tracking`](#-kmgraphstart-issue-tracking) — Systematic issue tracking with Git branches
-    - [🔴 `/kmgraph:update-issue-plan`](#-kmgraphupdate-issue-plan) — Sync progress with GitHub and plans
+- [🔴 `/kmgraph:meta-issue`](#-kmgraphmeta-issue) — Track multi-attempt bugs and features
+- [🔴 `/kmgraph:start-issue-tracking`](#-kmgraphstart-issue-tracking) — Systematic issue tracking with Git branches
+- [🔴 `/kmgraph:update-issue-plan`](#-kmgraphupdate-issue-plan) — Sync progress with GitHub and plans
+
+  </TabItem>
+</Tabs>
 
 ---
 

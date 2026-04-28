@@ -120,6 +120,7 @@ const sidebars = {
           items: [
             {type: 'doc', id: 'reference/ARCHITECTURE', label: 'Architecture'},
             {type: 'doc', id: 'reference/PLATFORM-ADAPTATION', label: 'Platform Adaptation'},
+            {type: 'doc', id: 'reference/tier-resolver', label: 'Model Tier Resolver'},
             {type: 'doc', id: 'reference/SANITIZATION-CHECKLIST', label: 'Sanitization Checklist'},
           ],
         },

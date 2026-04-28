@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.5.3
+**Version:** 0.5.4
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -88,6 +88,10 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 ---
 
 ## v0.5.x Feature Highlights
+
+**v0.5.4 — 2026-04-28**
+
+- **Profile files auto-load at every SessionStart** — `me.md` and `triggers.md` (both personal `~/.kmgraph/` and project `knowledge/` scopes) are now injected into session context automatically by the SessionStart hook. Workflow-phase triggers fire reliably even after context compaction. `rules.md` files are not auto-injected — they load on demand via trigger pointers, so rules can grow without paying a permanent context tax.
 
 **v0.5.3 — 2026-04-23**
 
@@ -176,7 +180,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.5.3 (2026-04-23)
+**Current Release:** v0.5.4 (2026-04-28)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -269,6 +273,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.5.3 (2026-04-23)
+**Current Version:** v0.5.4 (2026-04-28)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info

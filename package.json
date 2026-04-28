@@ -1,6 +1,6 @@
 {
   "name": "knowledge-graph-plugin",
-  "version": "0.5.2",
+  "version": "0.5.4",
   "description": "Structured knowledge capture and cross-session memory for Claude Code projects.",
   "files": [
     ".claude-plugin/",
@@ -40,9 +40,9 @@
     "deploy": "docusaurus deploy"
   },
   "devDependencies": {
-    "@docusaurus/core": "^3.9.2",
-    "@docusaurus/preset-classic": "^3.9.2",
-    "@docusaurus/theme-mermaid": "^3.9.2",
+    "@docusaurus/core": "^3.10.0",
+    "@docusaurus/preset-classic": "^3.10.0",
+    "@docusaurus/theme-mermaid": "^3.10.0",
     "@mdx-js/react": "^3.0.0",
     "clsx": "^2.0.0",
     "prism-react-renderer": "^2.3.0",
@@ -50,10 +50,13 @@
     "react-dom": "^18.0.0"
   },
   "overrides": {
-    "follow-redirects": ">=1.16.0"
+    "follow-redirects": ">=1.16.0",
+    "serialize-javascript": ">=7.0.5",
+    "dompurify": ">=3.4.0"
   },
   "dependencies": {
-    "@docusaurus/plugin-client-redirects": "^3.9.2",
+    "@docusaurus/plugin-client-redirects": "^3.10.0",
+    "@mermaid-js/layout-elk": "^0.1.9",
     "@orama/plugin-docusaurus-v3": "^3.1.18",
     "docusaurus-plugin-typedoc": "^1.4.2",
     "plugin-image-zoom": "^1.2.0",

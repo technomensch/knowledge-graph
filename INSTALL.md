@@ -234,6 +234,8 @@ done
 | **v0.4.2** | Bug fix — `triggers.md` now seeded during init. Run `/kmgraph:init` to add `triggers.md` to any KG initialized before this version. |
 | **v0.5.1** | Tier abstraction — run `/kmgraph:upgrade` to add `platforms[]` tier_map to your `me.md` (fast/standard/powerful tier labels for platform-agnostic model selection). |
 | **v0.5.2** | Shared tier resolver — no upgrade action required. `ai-model-tier-resolver` module is auto-used by all dispatchers after plugin reload. Run `/kmgraph:init` to add the `platforms[]` example block to your project `me.md` if missing. |
+| **v0.5.3** | No upgrade action required. `extract-chat` large-day auto-split and `update-doc` fixes are automatic after plugin reload. |
+| **v0.5.4** | Profile auto-load — no upgrade action required. `me.md` and `triggers.md` are now injected at SessionStart automatically. No config changes needed. |
 
 After the wizard completes, your existing lessons, ADRs, sessions, and chat history are untouched.
 
