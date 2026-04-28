@@ -1,10 +1,11 @@
-<!-- Updated: 2026-04-22 -->
 ---
 id: create-adr
 title: Create an Architecture Decision Record
 sidebar_label: Create an ADR
 description: How to document an architecture decision with context, rationale, and consequences
 ---
+
+<!-- Updated: 2026-04-22 -->
 
 # Create an Architecture Decision Record
 
