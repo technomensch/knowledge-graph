@@ -90,7 +90,7 @@ These items were identified during the v0.0.6-docs-restructure planning session 
   - **Implementation Record** section — deviations, merged PR, fix plans spawned
 - 🔲 **ENH-011**: Duplicate check in `capture-lesson` before creating new entry — search graph for similar lessons first; first practical test of `rules.md` surfacing
 
-**See:** [docs/plans/v0.3.0-beta.md](docs/plans/v0.3.0-beta.md) and ADR-028
+**See:** [docs/plans/v0.3.0-beta.md](v0.3.0-beta.md) and ADR-028
 
 ---
 

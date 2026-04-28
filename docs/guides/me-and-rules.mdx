@@ -41,6 +41,8 @@ Run `/kmgraph:init`. The wizard reads existing config files and drafts the three
 
 For cross-project personal identity (rules and style that apply across all projects), run `/kmgraph:init-personal-kg`. It creates `~/.kmgraph/me.md`, `~/.kmgraph/rules.md`, and `~/.kmgraph/triggers.md`.
 
+The `me.md` and `triggers.md` files are automatically loaded into session context at each SessionStart. Workflow-phase triggers fire reliably even after context compaction; specific `rules.md` sections load on demand by anchor reference (e.g., `rules.md § Approval Gates`).
+
 ---
 
 ## Before / after
