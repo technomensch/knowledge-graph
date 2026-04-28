@@ -4,8 +4,8 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 45
-**Last Updated:** 2026-04-23
+**Total ADRs:** 46
+**Last Updated:** 2026-04-28
 
 ---
 
@@ -17,6 +17,7 @@ Formal documentation of significant architecture decisions.
 
 ## All ADRs (Chronological)
 
+- [ADR-046: Introduce concept+setup hybrid page type and document how-to guide pattern separately from narrative guides](ADR-046-concept-setup-hybrid-page-type-and-how-to-guide-pattern.md) — **Status:** Accepted — Adds style guide section 4g for Goal/Prerequisites/Steps/Verify how-to pattern; retains 4a for narrative guides; names concept+setup hybrid as a distinct third type.
 - [ADR-045: Implement Profile Update Functionality as a Skill, Not a Command](ADR-045-update-profile-skill-not-command.md) — **Status:** Accepted — Skill over command: zero doc-update cost, natural language activation; platform-agnostic command deferred to future roadmap when non-CC usage grows.
 - [ADR-044: Split Oversized Daily Chat History Files for Obsidian Compatibility](ADR-044-split-oversized-chat-history-files.md) — **Status:** Accepted — When a daily chat history file exceeds 900 KB or 30,000 lines, split into numbered parts in a YYYY-MM-DD/ subfolder; get_output_path reroutes transparently.
 - [ADR-043: PreToolUse Hook Injection to Enforce User Rules During Superpowers Skill Execution](ADR-043-pretooluse-hook-injection-superpowers-rule-enforcement.md) — **Status:** Accepted — PreToolUse hook injects ~/.kmgraph/rules.md before brainstorming/writing-plans skills execute, ensuring file-location and execution-mode rules override skill defaults. (Renumbered from ADR-041 — cross-branch collision.)
@@ -35,6 +36,7 @@ Formal documentation of significant architecture decisions.
 ## By Category
 
 ### Architecture
+- [ADR-046](ADR-046-concept-setup-hybrid-page-type-and-how-to-guide-pattern.md) — Introduce concept+setup hybrid page type and document how-to guide pattern separately from narrative guides
 - [ADR-045](ADR-045-update-profile-skill-not-command.md) — Implement Profile Update Functionality as a Skill, Not a Command
 - [ADR-044](ADR-044-split-oversized-chat-history-files.md) — Split Oversized Daily Chat History Files for Obsidian Compatibility
 - [ADR-034: Capture Level Routing — Dispatcher/Agent Split](ADR-034-capture-level-routing-dispatcher-agent-split.md) — Dispatchers resolve NL → flags; agents handle flags only; gov-capture-routing is single source of truth; user-level bypasses kg_capture
@@ -132,3 +134,4 @@ ADRs follow a lightweight format:
 - [Real Examples](../../examples/decisions/) - Filled-out ADRs
 - [Pattern Guide](../../docs/PATTERNS-GUIDE.md) - Writing quality tips
 - [triggers.md — Platform-Agnostic Rule Timing Companion File](ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file.md)
+- [ADR-046: Introduce concept+setup hybrid page type and document how-to guide pattern separately from narrative guides](ADR-046-adr-046-introduce-conceptsetup-hybrid-page-type-and-document-how-to-guide-pattern-separately-from-narrative-guides.md)
