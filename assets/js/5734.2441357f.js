@@ -1,1 +1,0 @@
-(self.webpackChunkknowledge_graph_plugin=self.webpackChunkknowledge_graph_plugin||[]).push([[5734],{5734(){}}]);
