@@ -30,6 +30,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - COMMAND-GUIDE: all MkDocs tab syntax replaced with Docusaurus components
 - STYLE-GUIDE: added section 4g — how-to guide pattern (Goal / Prerequisites / Steps / Verify)
 
+### Security
+- Docusaurus upgraded 3.9.2 → 3.10.0
+- `serialize-javascript` forced to >=7.0.5 via npm override (HIGH: RCE via RegExp/Date)
+- `dompurify` forced to >=3.4.0 via npm override (moderate: FORBID_TAGS/template bypass)
+- mcp-server: `hono` and `@hono/node-server` updated to patched versions (2 moderate → 0)
+- Remaining known issue: `uuid <14.0.0` (moderate, 22 Dependabot alerts) — awaiting uuid@14 upstream release; not exploitable in this context (mermaid/sockjs do not pass caller-controlled buffers)
+
 ## v0.5.3 (2026-04-23)
 
 ### Added
