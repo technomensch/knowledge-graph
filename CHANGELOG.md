@@ -13,6 +13,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.5.4] — 2026-04-28
+
+### Added
+- SessionStart hook now injects the routing layer (`me.md` and `triggers.md`, both
+  personal and project scopes) into session context automatically. Workflow phase
+  triggers fire reliably after compaction; specific rule sections load on demand
+  via trigger pointers. `rules.md` files are NOT auto-injected — they load on
+  demand by anchor reference, so rules can grow without paying a permanent
+  context tax.
+
+### Docs
+- `me-and-rules` guide rewritten with Project/Personal tabbed sections, third-person voice,
+  and Docusaurus-native tab components
+- `tier-resolver` extracted to dedicated reference page; wired into sidebar
+- COMMAND-GUIDE: all MkDocs tab syntax replaced with Docusaurus components
+- STYLE-GUIDE: added section 4g — how-to guide pattern (Goal / Prerequisites / Steps / Verify)
+
 ## v0.5.3 (2026-04-23)
 
 ### Added

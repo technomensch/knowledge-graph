@@ -4,8 +4,8 @@
 
 Comprehensive catalog of all lessons-learned documents.
 
-**Total Lessons:** 6
-**Last Updated:** 2026-04-17
+**Total Lessons:** 7
+**Last Updated:** 2026-04-28
 
 ---
 
@@ -28,11 +28,12 @@ Comprehensive catalog of all lessons-learned documents.
 
 ---
 
-### Patterns Lessons (3 total)
+### Patterns Lessons (4 total)
 
 - [KMGraph Fingerprint Detection Before Migration](patterns/Lessons_Learned_KMGraph_Fingerprint_Detection_Before_Migration.md) — Use KMGraph-specific subdirectories as identity sentinels before triggering migration prompts; path name alone is insufficient
 - [Template Source Files Should Encode Role, Not Deployed Output Name](patterns/Lessons_Learned_Template_Source_Naming_Role_Not_Output.md) — Name templates by role (kg-index.md, kg-category-index.md); deploy-time copy commands map role names to output filenames; prevents silent overwrites
 - [Two-Level Identity and Rules Hierarchy for AI Agents](patterns/Lessons_Learned_Two_Level_Identity_Rules_Hierarchy.md) — Separate identity (me.md, gitignored) from rules (rules.md, committed); make platform files thin shims to eliminate rule drift
+- [Routing-Layer-Only Profile Injection Pattern](patterns/Lessons_Learned_Routing_Layer_Injection_Pattern.md) — Inject me.md and triggers.md at every SessionStart via _inject_profile helper; rules.md is excluded (on-demand only); personal injection must precede early-exit guards
 
 **Tags:** #patterns
 
@@ -49,6 +50,7 @@ Comprehensive catalog of all lessons-learned documents.
 ## Chronological Index
 
 **2026**
+- [2026-04-28] - [Routing-Layer-Only Profile Injection Pattern](patterns/Lessons_Learned_Routing_Layer_Injection_Pattern.md) - Inject me.md and triggers.md at SessionStart; rules.md excluded (on-demand); personal injection must precede early-exit guards
 - [2026-04-17] - [Batch Worker Model Selection And Token Tracking](process/Lessons_Learned_Batch_Worker_Model_Selection_And_Token_Tracking.md) - Use Sonnet not Haiku for batch job evaluation; add --output-format json to claude -p for token usage capture
 - [2026-04-12] - [Upgrade Path Missing FTS5 Stale File Cleanup](process/Lessons_Learned_Upgrade_Path_Missing_FTS5_Stale_File_Cleanup.md) - Migration left stale in-project .fts5.db files (41MB); no cleanup step in upgrader caused V8 crash in Obsidian
 - [2026-04-09] - [KMGraph Fingerprint Detection Before Migration](patterns/Lessons_Learned_KMGraph_Fingerprint_Detection_Before_Migration.md) - Fingerprint detection pattern for migration triggers using KMGraph-specific subdirectories
@@ -66,10 +68,11 @@ Comprehensive catalog of all lessons-learned documents.
 - [Upgrade Path Missing FTS5 Stale File Cleanup](process/Lessons_Learned_Upgrade_Path_Missing_FTS5_Stale_File_Cleanup.md) — #fts5 #upgrade #migration #cleanup #stale-files #installer #obsidian #v8-crash #gitignore
 - [Batch Worker Model Selection And Token Tracking](process/Lessons_Learned_Batch_Worker_Model_Selection_And_Token_Tracking.md) — #batch #claude-cli #model-selection #token-tracking #career-ops
 
-**#patterns** (3 lessons)
+**#patterns** (4 lessons)
 - [KMGraph Fingerprint Detection Before Migration](patterns/Lessons_Learned_KMGraph_Fingerprint_Detection_Before_Migration.md) — #fingerprint #migration #detection #init #false-positive
 - [Template Source Files Should Encode Role, Not Deployed Output Name](patterns/Lessons_Learned_Template_Source_Naming_Role_Not_Output.md) — #templates #naming #core-templates #init #collision #overwrite #file-naming
 - [Two-Level Identity and Rules Hierarchy for AI Agents](patterns/Lessons_Learned_Two_Level_Identity_Rules_Hierarchy.md) — #identity #rules #hierarchy #context-files #agent-design #platform-portability #shim
+- [Routing-Layer-Only Profile Injection Pattern](patterns/Lessons_Learned_Routing_Layer_Injection_Pattern.md) — #session-start #hooks #profile-injection #context-compaction #me.md #triggers.md #routing-layer #bash-helper #provenance-delimiters
 
 **#debugging** (1 lesson)
 - [Plugin Cache Not Synced From Local Repo](debugging/Lessons_Learned_Debugging_Plugin_Cache_Not_Synced_From_Local_Repo.md) — #plugin-cache #reload-plugins #local-development #commands
