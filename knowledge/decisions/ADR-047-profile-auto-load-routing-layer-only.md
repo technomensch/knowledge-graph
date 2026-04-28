@@ -7,8 +7,8 @@ author: technomensch
 email: 917847+technomensch@users.noreply.github.com
 git:
   branch: v0.5.4-profile-autoload
-  commit: null
-  pr: null
+  commit: ecc9d7b9
+  pr: "104"
   issue: null
 implements: "v0.5.4 — Profile Auto-Load"
 related:
