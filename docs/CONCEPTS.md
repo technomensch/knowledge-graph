@@ -134,6 +134,8 @@ Regular notes are freeform and often lost or forgotten. A knowledge graph adds s
 
 Both files have personal-scope mirrors at `~/.kmgraph/rules.md` and `~/.kmgraph/me.md` for cross-project context. Platform config files (CLAUDE.md, .cursorrules, etc.) become thin shims pointing at these files. This pattern is inspired by Nick Milo's [Obsidian ACE framework](https://youtu.be/jbHB-rzKBAs?si=nJGsbkfa7FKTDeyB).
 
+`me.md` and `triggers.md` (both personal and project scopes) are automatically injected into session context at each SessionStart. `rules.md` is not auto-injected — specific sections load on demand when workflow-phase triggers fire.
+
 See [Portable AI Identity](/guides/me-and-rules) for the full setup guide.
 
 ### "How do cross-references work?"

@@ -115,6 +115,30 @@ if [ "$NEEDS_INSTALL" = true ] || [ "$NEEDS_BUILD" = true ]; then
 fi
 
 # ─────────────────────────────────────────────────────────────
+# SECTION 1.5: Personal Routing Layer Injection
+# Injects ~/.kmgraph/{me,triggers}.md into session context
+# BEFORE any early exit, so personal routing survives even when no
+# project KG is configured. Defines _inject_profile helper used
+# again in Section 3.75 for project-scope files.
+# ─────────────────────────────────────────────────────────────
+
+PERSONAL_KG_DIR="$HOME/.kmgraph"
+
+_inject_profile() {
+    local filepath="$1"
+    local label="$2"
+    [ -f "$filepath" ] || return 0
+    echo -e "${BLUE}── $label ──${NC}"
+    echo "===== BEGIN $label ====="
+    cat "$filepath"
+    echo "===== END $label ====="
+    echo ""
+}
+
+_inject_profile "$PERSONAL_KG_DIR/me.md"       "~/.kmgraph/me.md (personal identity + rule index)"
+_inject_profile "$PERSONAL_KG_DIR/triggers.md" "~/.kmgraph/triggers.md (personal workflow phase router)"
+
+# ─────────────────────────────────────────────────────────────
 # SECTION 2: KG Configuration Validation (from check-memory.sh)
 # ─────────────────────────────────────────────────────────────
 
@@ -311,6 +335,16 @@ if command -v node &> /dev/null && [ -f "$CONFIG_PATH" ]; then
         fi
     fi
 fi
+
+# ─────────────────────────────────────────────────────────────
+# SECTION 3.75: Project Routing Layer Injection
+# Injects $KG_PATH/{me,triggers}.md into session context. Reuses
+# _inject_profile helper defined in Section 1.5. Project routing
+# loads AFTER personal routing so it overrides on conflict.
+# ─────────────────────────────────────────────────────────────
+
+_inject_profile "$KG_PATH/me.md"       "knowledge/me.md (project identity)"
+_inject_profile "$KG_PATH/triggers.md" "knowledge/triggers.md (project triggers)"
 
 # ─────────────────────────────────────────────────────────────
 # SECTION 4: MEMORY.md Status (from check-memory.sh)

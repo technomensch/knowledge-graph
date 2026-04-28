@@ -334,7 +334,7 @@ For example: Internal architecture reorganized; no changes from your perspective
 - Explicitly call out commands whose behavior, name, or invocation changed
 - Explicitly flag changes that are purely behind the scenes — do not omit them; include an info block to confirm nothing changed for the user
 - Use plain English; avoid technical terms that are not already defined in Section 3 of this guide
-- Use MkDocs `!!! info "Headline"` admonitions rather than plain bullet points
+- Use Docusaurus `:::info[Headline]` admonitions rather than plain bullet points
 - Sub-bullets, code blocks, or nested headers are permitted inside the admonition block
 - Each block is a complete thought and stands alone without requiring the reader to check the technical sections below
 
@@ -364,6 +364,58 @@ The internal search index format changed; search results are unchanged from your
 ```
 
 **Citation**: `[Nielsen2015]` — plain language reduces cognitive load; changelog readers are users, not implementers. `[GoogleDevDocs]` — "State the purpose before the details."
+
+---
+
+### 4g. How-to guide pattern
+
+Apply to: step-by-step how-to guides in `docs/guides/` (e.g. `capture-from-bugfix.md`, `create-adr.md`).
+
+```markdown
+## Goal
+
+[One-sentence outcome statement — what the reader will accomplish.]
+
+## Prerequisites
+
+- [Requirement 1]
+- [Requirement 2]
+
+## Steps
+
+**1. [Action title]**
+
+[Explanation + code block if needed]
+
+**2. [Action title]**
+
+[Explanation + code block if needed]
+
+## Verify
+
+[How to confirm it worked]
+
+## Related (optional)
+
+- [Link to related guide 1]
+- [Link to related guide 2]
+```
+
+#### Rules for how-to guides
+
+- **Voice**: Use imperative mood ("Run", "Fill in", "Add"). Never use third-person or descriptive language in step titles. `[MicrosoftMSTP]`
+- **Headings**: Use sentence case for all H2 headings (`## Goal`, `## Steps`, `## Verify`). No punctuation at end of headings.
+- **Goal subsection**: Must be a single outcome sentence describing what the reader accomplishes — not a description of what the section covers. Never write "This section explains..." or "Learn how to..."
+- **Prerequisites subsection**: List all requirements before the reader can proceed. Include version constraints, initialization steps, or setup configurations.
+- **Steps subsection**: Sequential numbered actions with concise titles. Each step includes explanation and optional code block. Lead with the action, not the context.
+- **Verify subsection**: Required for every how-to guide. Provide concrete confirmation steps — how does the reader know the task succeeded? Include example output if applicable.
+- **Related subsection**: Optional but recommended. Link to companion guides, conceptual explanations, or related tasks.
+
+#### Citation notes
+
+This pattern is distinct from 4a (narrative guides with broader scope and exploratory pathways). Do not mix narrative structure with task-based how-to structure within a single document.
+
+**Citation**: `[DiataxisFramework]` how-to guide structure (Diataxis defines how-tos as focused, goal-oriented instructions); `[MicrosoftMSTP]` imperative mood for task instructions.
 
 ---
 
@@ -453,9 +505,9 @@ Use blockquote syntax with a bold label. Works on GitHub and any markdown render
 
 **When to use**: Raw markdown files, GitHub previews, or when maximum compatibility is needed.
 
-#### Format 2: MkDocs Admonitions (MkDocs-Enhanced)
+#### Format 2: Docusaurus Admonitions
 
-Use MkDocs admonition syntax for richer styling on the documentation site.
+Use Docusaurus admonition syntax for richer styling on the documentation site.
 
 ```markdown
 :::note[Note]
@@ -495,7 +547,7 @@ Additional context or related resources.
 - Use admonitions for main documentation sections and learning paths
 - All callout text must include accompanying text — never rely on formatting alone to convey meaning (WCAG 2.1)
 
-**Citation**: Google Dev Docs style guide, Material for MkDocs admonition support, WCAG 2.1 1.1.1 Non-text Content.
+**Citation**: Google Dev Docs style guide, Docusaurus admonition support, WCAG 2.1 1.1.1 Non-text Content.
 
 ---
 
