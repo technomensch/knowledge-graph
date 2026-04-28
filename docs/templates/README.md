@@ -9,9 +9,9 @@ This is the **canonical source** for all KMGraph templates. Edit templates here.
 | Location | Purpose | Committed? |
 |----------|---------|------------|
 | `core/templates/` | Canonical source (this folder) | ✅ Yes |
-| `docs/templates/` | Build-time copy for MkDocs | ❌ No (gitignored) |
+| `docs/templates/` | Build-time copy for the docs site | ❌ No (gitignored) |
 
-`docs/templates/` is generated automatically by `docs/hooks.py` during `mkdocs serve` or `mkdocs build`. It is ephemeral — deleted and recreated on every build.
+`docs/templates/` is generated automatically during the docs build. It is ephemeral — deleted and recreated on every build.
 
 **Do not edit files in `docs/templates/`.** Changes there will be overwritten on the next build.
 
