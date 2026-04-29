@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.5.5] — 2026-04-29
+
+### Fixed
+- Stop hook session flag now keyed on `{kg-name}-{date}` instead of `{PPID}-{date}`. The previous scheme produced ~150 stale `/tmp` flag files per session and the dedup check never matched.
+
 ## [0.5.4] — 2026-04-28
 
 ### Added

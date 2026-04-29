@@ -17,7 +17,7 @@
 - Rules were captured to `knowledge/rules.md` or `knowledge/me.md` this session: surface "N rule(s) captured this session — run `/kmgraph:recall` to review rules.md for drift or conflicts."
 
 **Block Conditions:**
-- Stop hook coordination flag exists: `/tmp/.kg-session-summarized-{PPID}-{date}` — if present, do NOT prompt (Stop hook already fired; avoid double-prompting)
+- Stop hook coordination flag exists: `/tmp/.kg-session-summarized-{kg-name}-{date}` — if present, do NOT prompt (Stop hook already fired; avoid double-prompting)
 
 **ECC Compatibility Note:** This skill is coordinated with the Stop hook to prevent duplicate prompting. On Claude Code, the /tmp flag mechanism is used for inter-process coordination. On other ECC platforms, equivalent synchronization mechanisms (environment variables, shared state, or hook phase detection) should be used to prevent re-prompting if the Stop hook has already triggered this workflow.
 
