@@ -73,10 +73,23 @@ kmgraph_schema: 2
 <!-- Example: "Plans are local-only. Write to ~/.claude/plans/ first, then copy to docs/plans/ for working reference. Never commit plan files." -->
 
 - Plan location: write to `~/.claude/plans/` first, copy to `docs/plans/` for working reference — never commit plan files
+- Plan file routing override: if a `### Plan File Routing` section exists in this `rules.md` or the active project's `rules.md`, that routing takes precedence over `docs/plans/` for any plan with a matching parent artifact (ENH, issue, etc.)
 - Plan language: use "Create" for new files, "Update" for existing files — never use "Update" for files that don't exist yet
 - Skill overrides: `superpowers:writing-plans` defaults to `docs/superpowers/plans/` and `superpowers:brainstorming` defaults to `docs/superpowers/specs/`. Always override these:
   - Plans → `docs/plans/` (never `docs/superpowers/plans/`)
   - Specs → `docs/specs/` (never `docs/superpowers/specs/`)
+
+### Plan File Routing
+
+<!-- Optional: define project-specific plan locations for plans linked to KG artifacts. -->
+<!-- If defined here, these paths override the default docs/plans/ location.            -->
+<!-- Leave blank or remove this section entirely if all plans use docs/plans/.          -->
+
+<!-- Example (uncomment and adapt):
+- ENH parent  → `knowledge/ENH-NNN/vX-plan.md`
+- Issue / bug → `knowledge/issues/issue-NNN/vX-plan.md`
+- Misc        → `knowledge/plans/vX-plan.md`
+-->
 
 ### Execution Mode Decision
 
