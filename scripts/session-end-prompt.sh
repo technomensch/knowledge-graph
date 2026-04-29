@@ -13,9 +13,11 @@ NC='\033[0m'
 
 # ─────────────────────────────────────────────────────────────
 # Session flag: avoid double-prompting within same session
+# Keyed on active KG name + date for per-project isolation.
 # ─────────────────────────────────────────────────────────────
 
-FLAG_PATH="/tmp/.kg-session-summarized-${PPID}-$(date +%Y%m%d)"
+ACTIVE_KG="$(grep -o '"active"[[:space:]]*:[[:space:]]*"[^"]*"' "$CONFIG_PATH" 2>/dev/null | sed 's/.*"\([^"]*\)".*/\1/')"
+FLAG_PATH="/tmp/.kg-session-summarized-${ACTIVE_KG:-default}-$(date +%Y%m%d)"
 
 if [ -f "$FLAG_PATH" ]; then
     exit 0
@@ -39,8 +41,6 @@ fi
 if [ ! -f "$CONFIG_PATH" ]; then
     exit 0
 fi
-
-ACTIVE_KG="$(grep -o '"active"[[:space:]]*:[[:space:]]*"[^"]*"' "$CONFIG_PATH" | sed 's/.*"\([^"]*\)".*/\1/')"
 
 if [ -z "$ACTIVE_KG" ]; then
     exit 0
