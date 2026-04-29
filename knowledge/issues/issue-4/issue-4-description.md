@@ -1,9 +1,10 @@
 ---
 id: issue-4
 type: Bug
-status: deferred
+status: in-progress
 github-issue: "#106"
-branch: none
+branch: v0.5.5-fix-session-flag-dedup
+plan: docs/plans/v0.5.5-fix-session-flag-dedup.md
 created: 2026-04-28
 ---
 

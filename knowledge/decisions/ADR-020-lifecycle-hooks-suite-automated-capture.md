@@ -55,7 +55,9 @@ All scripts must comply with the hook security model:
 
 ### Session-End Double-Fire Prevention
 
-`session-end-prompt.sh` writes a PPID-scoped flag file at `/tmp/.kg-session-summarized-{PPID}-{YYYYMMDD}`. If the flag exists, the script exits silently. The flag is scoped to the parent process ID so it is session-specific — multiple terminal windows don't interfere. Flag files older than 24h are cleaned up on each run to prevent `/tmp/` accumulation.
+`session-end-prompt.sh` writes a flag file at `/tmp/.kg-session-summarized-{kg-name}-{YYYYMMDD}`. If the flag exists, the script exits silently. The flag is scoped to the active KG name and date — two sessions on the same project share one flag (first Stop hook wins), and different projects get independent flags. Flag files older than 24h are cleaned up on each run to prevent `/tmp/` accumulation.
+
+> **Amendment (v0.5.5):** The original design used `{PPID}-{YYYYMMDD}` as the flag key. Because `$PPID` resolves to a different value for each subprocess invocation in Claude Code, this caused ~150 flag files per session and the dedup check never matched. Changed to `{kg-name}-{YYYYMMDD}` in v0.5.5 (PR #108, closes issue #106).
 
 ### Lesson-Worthy Signal Detection
 

@@ -9,6 +9,8 @@
 
 ---
 
+- Gate: check `rules.md § Plan Protocol > Plan File Routing` (in this file or the active project's `rules.md`) before defaulting to `docs/plans/` — use the matching artifact path if one is defined
+
 ## After writing an implementation plan
 
 - Apply: `rules.md § Plan Protocol > Parallelism Analysis`
