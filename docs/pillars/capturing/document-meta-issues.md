@@ -214,14 +214,6 @@ After closing, confirm `README.md` status field reads `Resolved`, `Abandoned`, o
 
 ---
 
-## Next steps
-
-- Review the worked example at `core/examples/meta-issue/example-performance-saga/`
-- Use `/kmgraph:recall` to search across meta-issues and lessons when starting a related problem
-- Consider creating an ADR if the resolution produced a reusable architecture decision
-
----
-
 ## Escalation Thresholds Reference
 
 KMGraph enforces structured escalation for stuck work via the `stuck-work-escalation` skill:
@@ -240,6 +232,8 @@ For the exit-path template and full escalation logic, see the `stuck-work-escala
 
 ## Related
 
-- [Capture Lessons Learned](./capture-lessons-learned.md)
-- [Architecture Decisions](./architecture-decisions.md)
-- [What to Capture](./what-to-capture.md)
+- [Capture Lessons Learned](./capture-lessons-learned.md) — capture the lesson once the meta-issue resolves
+- [Architecture Decisions](./architecture-decisions.md) — if the resolution produced a reusable design choice
+- [What to Capture](./what-to-capture.md) — choosing between a lesson, ADR, or meta-issue
+- Review the worked example at `core/examples/meta-issue/example-performance-saga/`
+- Use `/kmgraph:recall` to search across meta-issues and lessons when starting a related problem
