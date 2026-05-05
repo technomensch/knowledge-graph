@@ -32,6 +32,16 @@
 <li class=""><code>4-PILLARS.md</code> and <code>4-LAYERS.md</code> moved to <code>docs/concepts/</code> as proper concept pages</li>
 <li class=""><code>COMMAND-GUIDE.md</code> moved to <code>docs/reference/command-guide.md</code></li>
 <li class=""><code>CONCEPTS.md</code> decomposed into four focused concept pages</li>
+<li class=""><code>capture-from-bugfix.md</code> merged into <code>capture-lessons-learned.md</code> — one canonical capture page</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="page-structure-alignment">Page structure alignment<a href="https://technomensch.github.io/knowledge-graph/docs-updates/2026/05/05/site-restructure-v2#page-structure-alignment" class="hash-link" aria-label="Direct link to Page structure alignment" title="Direct link to Page structure alignment" translate="no">​</a></h2>
+<p>All 24 pillar pages were aligned to a consistent internal structure:</p>
+<ul>
+<li class="">Blockquote framing question immediately after H1</li>
+<li class=""><code>## Goal</code>, <code>## Prerequisites</code>, <code>## Steps</code>, <code>## Verify</code> boilerplate removed — content folded into conceptual H2s</li>
+<li class="">Heavy reference material moved to <code>## Reference</code> appendices (after <code>---</code>)</li>
+<li class=""><code>## Related</code> last on every page, with descriptive em-dash link labels</li>
+<li class=""><code>search-the-graph.md</code> rewritten from a prose essay to a structured H2 page</li>
 </ul>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="what-didnt-change">What didn't change<a href="https://technomensch.github.io/knowledge-graph/docs-updates/2026/05/05/site-restructure-v2#what-didnt-change" class="hash-link" aria-label="Direct link to What didn't change" title="Direct link to What didn't change" translate="no">​</a></h2>
 <p>Command syntax, MCP tools, plugin behavior — none of that changed. This is a navigation and organization update only.</p>]]></content:encoded>
