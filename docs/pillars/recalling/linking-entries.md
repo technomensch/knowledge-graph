@@ -7,6 +7,8 @@ description: How to connect related KG entries so recall surfaces the right clus
 
 # Linking Entries
 
+> "How do I connect related entries so they surface together?"
+
 Knowledge graph entries are more useful when connected. A lesson about a bug is more findable if it links to the ADR that caused the design decision behind the bug.
 
 ## How to add links

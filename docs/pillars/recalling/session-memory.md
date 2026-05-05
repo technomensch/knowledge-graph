@@ -7,6 +7,8 @@ description: How KMGraph automatically surfaces relevant knowledge at the start 
 
 # Session Memory
 
+> "How does KMGraph know what to surface?"
+
 KMGraph doesn't wait for you to search. At the start of every Claude session, it injects the context most likely to be relevant — automatically.
 
 ## How it works
@@ -33,7 +35,16 @@ At session start, the SessionStart hook reads `MEMORY.md` and loads it into cont
 
 Run `/kmgraph:update-graph` after capturing new lessons. This extracts entries from your session notes and updates the MEMORY.md index so future sessions benefit.
 
-## Archiving and restoring session memory
+## Related
+
+- [Search the Graph](./search-the-graph.md) — active search when passive injection misses something
+- [Linking Entries](./linking-entries.md) — connecting related entries so recall pulls the right cluster
+
+---
+
+## Reference
+
+### Archiving and restoring
 
 **When:** MEMORY.md is approaching the token budget limit (~1,500 tokens / ~200 lines) or archived knowledge needs to be retrieved.
 
@@ -84,8 +95,3 @@ grep "^### " memory/MEMORY-archive.md
 | MEMORY.md > 1,500 tokens | Archive oldest entries |
 | Working on a related problem | Restore relevant archived entry |
 | Entry > 90 days old, not needed | Leave archived |
-
-## Related
-
-- [Search the Graph](./search-the-graph.md) — active search when passive injection misses something
-- [Linking Entries](./linking-entries.md) — connecting related entries so recall pulls the right cluster
