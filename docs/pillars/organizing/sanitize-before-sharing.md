@@ -7,21 +7,11 @@ description: Remove sensitive data from the knowledge graph before sharing with 
 
 # Sanitize Before Sharing
 
-This guide walks through scanning a knowledge graph for sensitive data and cleaning it before sharing with teammates or publishing publicly.
+> "I want to share my knowledge graph. How do I make sure no sensitive data goes with it?"
 
-## Goal
+This guide walks through scanning a knowledge graph for sensitive data and cleaning it before sharing with teammates or publishing publicly. You need an active knowledge graph (`/kmgraph:status`) and KMGraph v0.0.6 or later.
 
-Remove credentials, personal information, internal infrastructure details, and company-specific data from the knowledge graph so it can be shared safely without leaking secrets or private context.
-
-## Prerequisites
-
-- An active knowledge graph (run `/kmgraph:status` to confirm)
-- KMGraph v0.0.6 or later
-- Write access to `kg-config.json` in the knowledge graph root
-
-## Steps
-
-### 1. Run the automated scan
+## Run the scan
 
 The `/kmgraph:check-sensitive` command scans all knowledge graph files for known sensitive patterns.
 
@@ -42,7 +32,7 @@ The command checks for:
 
 The output lists each match by file, line number, and pattern category.
 
-### 2. Fix findings
+## Fix findings
 
 **Option A — Automatic fix (recommended for bulk replacements)**
 
@@ -73,7 +63,7 @@ Open each flagged file and apply replacements by hand. Use standard placeholders
 | Internal hostnames | `<internal-host>` |
 | Absolute paths | `~/<relative-path>` or `./path` |
 
-### 3. Configure sanitization rules in `kg-config.json`
+## Configure custom rules
 
 The `kg-config.json` file in the knowledge graph root controls which patterns are checked and what `--fix` substitutes. Add or extend the `sanitization` block:
 
@@ -110,7 +100,7 @@ The `kg-config.json` file in the knowledge graph root controls which patterns ar
 
 Run `/kmgraph:check-sensitive` again after editing `kg-config.json` to confirm custom patterns are picked up.
 
-### 4. Install the pre-commit hook
+## Install the pre-commit hook
 
 The pre-commit hook auto-blocks commits that contain sensitive patterns, catching issues before they reach the remote.
 

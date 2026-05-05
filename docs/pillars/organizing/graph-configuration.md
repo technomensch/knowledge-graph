@@ -7,6 +7,8 @@ description: How to configure categories, storage paths, and KG structure.
 
 # Graph Configuration
 
+> "How do I set up or customize the graph structure?"
+
 KMGraph is designed to be configured once at init and then extended gradually as your project grows. This page covers the structural configuration decisions: where files live, how categories work, and how to adapt the graph to an existing project.
 
 ## What Gets Configured at Init

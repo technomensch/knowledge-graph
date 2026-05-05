@@ -7,6 +7,8 @@ description: Understanding personal and project-scoped knowledge graphs
 
 # Personal vs. Project
 
+> "Where should this knowledge live — in my project or my personal graph?"
+
 Every knowledge graph belongs to one of two scopes: **project** or **personal**.
 
 ## Project KG
@@ -122,6 +124,6 @@ See [Multi-KG Workflows](./multi-kg-workflows.md) for advanced configuration and
 
 ## Related
 
-- [Graph Configuration](./graph-configuration.md)
-- [Multi-KG Workflows](./multi-kg-workflows.md)
-- [Your AI Profile](../portability/your-ai-profile.mdx)
+- [Graph Configuration](./graph-configuration.md) — categories, storage paths, and kg-config.json
+- [Multi-KG Workflows](./multi-kg-workflows.md) — managing multiple graphs side by side
+- [Your AI Profile](../portability/your-ai-profile.mdx) — setting up me.md and rules.md
