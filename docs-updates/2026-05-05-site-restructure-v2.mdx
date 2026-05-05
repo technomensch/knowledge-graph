@@ -1,0 +1,46 @@
+---
+title: "Docs restructured around five user skill pillars"
+authors: [technomensch]
+tags: [docs, ux, navigation, restructure]
+date: 2026-05-05
+---
+
+The KMGraph documentation site has been reorganized from a flat guides taxonomy into five skill-based pillars. Navigation now mirrors what users are actually trying to do.
+
+<!-- truncate -->
+
+## Why the change
+
+The previous structure organized content by feature area — Guides, Reference, Concepts. This forced users to know what KMGraph calls things before they could find what they needed. Someone who just fixed a bug and wants to save it had to navigate to "Guides" → "Lesson Capture" rather than finding a section that just says "I solved something."
+
+The new structure is organized around five questions users actually ask themselves.
+
+## Five pillars
+
+Each pillar is a top-level sidebar section with a one-line user question:
+
+| Pillar | Question |
+|---|---|
+| **Capturing** | I solved something. How do I save it? |
+| **Recalling** | I think I've solved this before. |
+| **Organizing** | How do I keep this from becoming a junk drawer? |
+| **Portability** | I use multiple AI tools. Make them share knowledge. |
+| **Tailoring** | I want this to fit my workflow. |
+
+## Landing page
+
+The home page now leads with a pillar card grid immediately after the install hero — five clickable cards, each with its user question, so first-time visitors can self-route to the right section without reading the full docs.
+
+## Content changes
+
+- All guides moved from `docs/guides/` into the appropriate pillar
+- `META-ISSUE-GUIDE.md` and `PATTERNS-GUIDE.md` merged into the Capturing pillar pages
+- `WORKFLOWS.md` archive/restore content merged into Recalling → Session Memory
+- `me-and-rules.mdx` split: AI profile → Portability; session memory → Recalling
+- `4-PILLARS.md` and `4-LAYERS.md` moved to `docs/concepts/` as proper concept pages
+- `COMMAND-GUIDE.md` moved to `docs/reference/command-guide.md`
+- `CONCEPTS.md` decomposed into four focused concept pages
+
+## What didn't change
+
+Command syntax, MCP tools, plugin behavior — none of that changed. This is a navigation and organization update only.
