@@ -50,7 +50,7 @@ Run `/kmgraph:update-graph` after capturing new lessons. This extracts entries f
 
 **Claude Code equivalent:** `/kmgraph:archive-memory` and `/kmgraph:restore-memory`
 
-### Part A: Archive Stale Entries
+### Part A: Archive stale entries
 
 **1. Check current size:**
 
@@ -76,7 +76,7 @@ git add memory/MEMORY*.md
 git commit -m "docs(memory): archive stale entries (~X tokens freed)"
 ```
 
-### Part B: Restore Archived Entries
+### Part B: Restore archived entries
 
 **1. View archived entries:**
 
@@ -88,7 +88,7 @@ grep "^### " memory/MEMORY-archive.md
 
 **3. Mark the restoration** in the archive log and commit both files.
 
-### Decision Guide
+### Decision guide
 
 | Situation | Action |
 |---|---|

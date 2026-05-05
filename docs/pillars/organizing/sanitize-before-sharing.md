@@ -111,7 +111,7 @@ chmod +x .git/hooks/pre-commit
 
 The hook reads the same patterns from `kg-config.json`. Patterns with `"severity": "block"` will abort the commit; `"severity": "warn"` patterns print a warning but allow the commit through.
 
-## Verify
+## Confirm the scan passes
 
 After applying fixes, re-run the scan to confirm a clean result:
 
@@ -146,6 +146,4 @@ generic placeholders. Patterns and lessons remain intact.
 
 ## Related
 
-- See [Sanitization Checklist](../reference/SANITIZATION-CHECKLIST.md) for an exhaustive category-by-category reference, including scan commands for each pattern type
-- Use `/kmgraph:config-sanitization` to run the interactive wizard that configures `kg-config.json` sanitization rules
-- Consider running `/kmgraph:check-sensitive` as part of CI to enforce cleanliness on every push
+- [Sanitization Checklist](../reference/SANITIZATION-CHECKLIST.md) — exhaustive category-by-category reference with scan commands for each pattern type

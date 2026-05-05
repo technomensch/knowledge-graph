@@ -11,7 +11,7 @@ description: How skills, agents, hooks, and auto-capture trigger keywords work t
 
 KMGraph runs a layer of automation that fires without explicit commands. This page explains how skills, agents, and hooks coordinate to capture knowledge at the right moments without interrupting your workflow.
 
-## Three Components
+## Three components
 
 The automation layer has three components that work at different points in the development workflow:
 
@@ -21,7 +21,7 @@ The automation layer has three components that work at different points in the d
 | **Skills** | When natural-language patterns match in conversation | Surfaces suggestions and pre-fills command context |
 | **Agents** | When a command delegates heavy-lift work | Runs isolated sub-processes that do not crowd the main context |
 
-## How They Connect
+## How they connect
 
 ```mermaid
 sequenceDiagram

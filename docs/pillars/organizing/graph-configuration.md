@@ -11,7 +11,7 @@ description: How to configure categories, storage paths, and KG structure.
 
 KMGraph is designed to be configured once at init and then extended gradually as your project grows. This page covers the structural configuration decisions: where files live, how categories work, and how to adapt the graph to an existing project.
 
-## What Gets Configured at Init
+## What gets configured at init
 
 When you run `kg_config_init`, KMGraph scaffolds the core directory structure under your chosen storage path:
 
@@ -32,7 +32,7 @@ The init command writes a `kg-config.json` file that records:
 
 You do not need to touch `kg-config.json` directly for routine use. The `kg_config_*` commands manage it for you.
 
-## Adding Categories
+## Adding categories
 
 Categories are subdirectories within `lessons-learned/`, `decisions/`, or `knowledge/`. Create them when a new topic area emerges — not upfront.
 
@@ -60,7 +60,7 @@ vim ~/.claude/commands/knowledge-capture.md
 
 Categories are intentional — let them emerge from actual entries rather than pre-planning a full taxonomy.
 
-## Project vs. Personal Storage Paths
+## Project vs. personal storage paths
 
 KMGraph supports both project-scoped and personal knowledge graphs. The storage path determines which type you are working with.
 
@@ -75,7 +75,7 @@ KMGraph supports both project-scoped and personal knowledge graphs. The storage 
 
 See [Personal vs. Project](./personal-vs-project.md) for a full comparison and guidance on when to use each.
 
-## Integrating with an Existing Project
+## Integrating with an existing project
 
 If you are adding KMGraph to an established project that already has a `docs/` directory, avoid collisions by choosing an alternate storage path at init.
 
@@ -109,7 +109,7 @@ Once the KG is initialized, create entries that reference your existing docs rat
 - **Related Lesson:** [[lessons-learned/security/oauth-implementation.md]]
 ```
 
-## Customizing Templates
+## Customizing templates
 
 Document templates control the structure of new lessons, ADRs, and knowledge entries. Edit them to match your team's conventions:
 
@@ -120,7 +120,7 @@ vim core/templates/decisions/ADR-template.md
 
 Template changes affect new documents only — existing entries are not modified.
 
-## Ongoing Customization
+## Ongoing customization
 
 After init, the most common configuration tasks are:
 

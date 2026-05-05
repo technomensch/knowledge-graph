@@ -48,10 +48,6 @@ This enables the AI assistant to query the KG via Obsidian's API, which supports
 | **Templater** | Use KMGraph templates directly inside Obsidian |
 | **Graph Analysis** | Visualize connections between lessons, ADRs, and patterns |
 
-## Verify
-
-Open the Obsidian graph view. Each lesson should appear as a node. Linked ADRs and lessons should be connected by edges.
-
 ## Related
 
 - [Integrate with NotebookLM](./integrate-notebooklm.md) — AI-powered Q&A over the knowledge graph
