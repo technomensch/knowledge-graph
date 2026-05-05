@@ -255,26 +255,27 @@ Checklist for each new/updated entry:
 
 ---
 
-### Step 8: Check Project Memory Sync Requirements
+### Step 8: Flag Governance-Worthy Content
 
-After each entry is created/updated, check if MEMORY.md should be updated:
+After each entry is created/updated, check whether the lesson contains governance-worthy content:
 
-**Triggers for memory update:**
+**Governance triggers (detect, do not write):**
 - New gotcha pattern (common pitfall/failure mode)
 - New best practice (proven technique)
 - New common failure pattern (repeated error with fix)
 - Workflow enhancement (change to existing process)
 - Architecture decision (structural decision affecting governance)
 
-**Do NOT update memory for:** one-time project-specific patterns, informational concepts without process impact.
+**If any trigger matches**, append this plain-language note to the agent output — do NOT write to any file:
 
-**Token limits before writing:**
-```bash
-memory_words=$(wc -w < ~/.claude/projects/.../memory/MEMORY.md)
-memory_tokens=$((memory_words * 13 / 10))
-# Soft limit: 1,500 tokens (warning)
-# Hard limit: 2,000 tokens (block new entries)
 ```
+Looks like this lesson might be worth saving as a guideline.
+Bring it up at the end of your session to capture it.
+```
+
+**Do NOT flag:** one-time project-specific patterns, informational concepts without process impact.
+
+**No file writes occur in this step.** Governance capture is handled by rules-capture at session wrap.
 
 ---
 
