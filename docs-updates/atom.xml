@@ -2,11 +2,47 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://technomensch.github.io/knowledge-graph/docs-updates</id>
     <title>KMGraph Docs Updates</title>
-    <updated>2026-04-09T00:00:00.000Z</updated>
+    <updated>2026-05-05T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://technomensch.github.io/knowledge-graph/docs-updates"/>
     <subtitle>Knowledge Management Graph Blog</subtitle>
     <icon>https://technomensch.github.io/knowledge-graph/img/square.png</icon>
+    <entry>
+        <title type="html"><![CDATA[Docs restructured around five user skill pillars]]></title>
+        <id>https://technomensch.github.io/knowledge-graph/docs-updates/2026/05/05/site-restructure-v2</id>
+        <link href="https://technomensch.github.io/knowledge-graph/docs-updates/2026/05/05/site-restructure-v2"/>
+        <updated>2026-05-05T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[The KMGraph documentation site has been reorganized from a flat guides taxonomy into five skill-based pillars. Navigation now mirrors what users are actually trying to do.]]></summary>
+        <content type="html"><![CDATA[<p>The KMGraph documentation site has been reorganized from a flat guides taxonomy into five skill-based pillars. Navigation now mirrors what users are actually trying to do.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="why-the-change">Why the change<a href="https://technomensch.github.io/knowledge-graph/docs-updates/2026/05/05/site-restructure-v2#why-the-change" class="hash-link" aria-label="Direct link to Why the change" title="Direct link to Why the change" translate="no">​</a></h2>
+<p>The previous structure organized content by feature area — Guides, Reference, Concepts. This forced users to know what KMGraph calls things before they could find what they needed. Someone who just fixed a bug and wants to save it had to navigate to "Guides" → "Lesson Capture" rather than finding a section that just says "I solved something."</p>
+<p>The new structure is organized around five questions users actually ask themselves.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="five-pillars">Five pillars<a href="https://technomensch.github.io/knowledge-graph/docs-updates/2026/05/05/site-restructure-v2#five-pillars" class="hash-link" aria-label="Direct link to Five pillars" title="Direct link to Five pillars" translate="no">​</a></h2>
+<p>Each pillar is a top-level sidebar section with a one-line user question:</p>
+<table><thead><tr><th>Pillar</th><th>Question</th></tr></thead><tbody><tr><td><strong>Capturing</strong></td><td>I solved something. How do I save it?</td></tr><tr><td><strong>Recalling</strong></td><td>I think I've solved this before.</td></tr><tr><td><strong>Organizing</strong></td><td>How do I keep this from becoming a junk drawer?</td></tr><tr><td><strong>Portability</strong></td><td>I use multiple AI tools. Make them share knowledge.</td></tr><tr><td><strong>Tailoring</strong></td><td>I want this to fit my workflow.</td></tr></tbody></table>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="landing-page">Landing page<a href="https://technomensch.github.io/knowledge-graph/docs-updates/2026/05/05/site-restructure-v2#landing-page" class="hash-link" aria-label="Direct link to Landing page" title="Direct link to Landing page" translate="no">​</a></h2>
+<p>The home page now leads with a pillar card grid immediately after the install hero — five clickable cards, each with its user question, so first-time visitors can self-route to the right section without reading the full docs.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="content-changes">Content changes<a href="https://technomensch.github.io/knowledge-graph/docs-updates/2026/05/05/site-restructure-v2#content-changes" class="hash-link" aria-label="Direct link to Content changes" title="Direct link to Content changes" translate="no">​</a></h2>
+<ul>
+<li class="">All guides moved from <code>docs/guides/</code> into the appropriate pillar</li>
+<li class=""><code>META-ISSUE-GUIDE.md</code> and <code>PATTERNS-GUIDE.md</code> merged into the Capturing pillar pages</li>
+<li class=""><code>WORKFLOWS.md</code> archive/restore content merged into Recalling → Session Memory</li>
+<li class=""><code>me-and-rules.mdx</code> split: AI profile → Portability; session memory → Recalling</li>
+<li class=""><code>4-PILLARS.md</code> and <code>4-LAYERS.md</code> moved to <code>docs/concepts/</code> as proper concept pages</li>
+<li class=""><code>COMMAND-GUIDE.md</code> moved to <code>docs/reference/command-guide.md</code></li>
+<li class=""><code>CONCEPTS.md</code> decomposed into four focused concept pages</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="what-didnt-change">What didn't change<a href="https://technomensch.github.io/knowledge-graph/docs-updates/2026/05/05/site-restructure-v2#what-didnt-change" class="hash-link" aria-label="Direct link to What didn't change" title="Direct link to What didn't change" translate="no">​</a></h2>
+<p>Command syntax, MCP tools, plugin behavior — none of that changed. This is a navigation and organization update only.</p>]]></content>
+        <author>
+            <name>Marc Kaplan</name>
+            <uri>https://github.com/technomensch</uri>
+        </author>
+        <category label="docs" term="docs"/>
+        <category label="ux" term="ux"/>
+        <category label="navigation" term="navigation"/>
+        <category label="restructure" term="restructure"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Home page redesigned - clearer audience, context grid, demo GIF]]></title>
         <id>https://technomensch.github.io/knowledge-graph/docs-updates/2026/04/09/homepage-rewrite</id>

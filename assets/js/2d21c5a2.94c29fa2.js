@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkknowledge_graph_plugin=self.webpackChunkknowledge_graph_plugin||[]).push([[9159],{54140(e){e.exports=JSON.parse('{"authors":[{"name":"Marc Kaplan","url":"https://github.com/technomensch","imageURL":"https://github.com/technomensch.png","key":"technomensch","page":null,"count":4}]}')}}]);
