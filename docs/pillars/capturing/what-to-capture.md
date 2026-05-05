@@ -9,7 +9,7 @@ description: How to choose between lessons, ADRs, patterns, and meta-issues.
 
 KMGraph has four entry types. Each answers a different question.
 
-## Decision Guide
+## Decision guide
 
 | If you're thinking... | Use |
 |---|---|
@@ -50,7 +50,7 @@ Example: "Always write the failing test before investigating the root cause — 
 
 Example: "Repeated context loss between sessions — multiple bugs stem from assuming prior session knowledge."
 
-## When In Doubt
+## When in doubt
 
 Start with a Lesson. You can always promote it to a pattern or meta-issue later.
 
