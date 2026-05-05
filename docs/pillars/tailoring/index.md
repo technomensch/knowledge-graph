@@ -17,3 +17,8 @@ KMGraph ships with sensible defaults. This pillar covers how to adjust hooks, te
 - [Customize Templates](./customize-templates.md) — overriding default lesson and ADR templates
 - [Customize Hooks](./customize-hooks.md) — adding or modifying SessionStart, PostToolUse, and Stop hooks
 - [Automation Layer](./automation-layer.md) — understanding what runs automatically and why
+
+## Related
+
+- [Your AI Profile](../portability/your-ai-profile.mdx) — who you are across tools
+- [Capturing](../capturing/index.md) — the workflows these hooks and templates support

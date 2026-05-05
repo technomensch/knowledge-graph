@@ -59,7 +59,7 @@ This enables the AI assistant to query the KG via Obsidian's API, which supports
 
 Open the Obsidian graph view. Each lesson should appear as a node. Linked ADRs and lessons should be connected by edges.
 
-## Next steps
+## Related
 
 - [Integrate with NotebookLM](./integrate-notebooklm.md) — AI-powered Q&A over the knowledge graph
 - [Integrate with Notion](./integrate-notion.md) — team-browsable mirror with database filtering

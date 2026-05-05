@@ -82,7 +82,7 @@ On a second machine, run:
 
 The lesson should appear.
 
-## Next steps
+## Related
 
 - [Multi-KG workflows](../organizing/multi-kg-workflows.md) — managing project-local, personal, and cowork KGs
 - [Sanitize before sharing](../organizing/sanitize-before-sharing.md) — remove sensitive data before pushing to a shared remote

@@ -15,7 +15,7 @@ Four sources inject at session start (via the SessionStart hook):
 
 1. **MEMORY.md** — a lightweight index of pointers to your KG entries. Claude Code reads this at the start of every session. The full entries stay in your knowledge graph; MEMORY.md is the scannable table of contents the AI reads first.
 
-2. **me.md** — your AI profile. Describes your role, working style, expertise, and preferences so the AI calibrates its responses without you re-explaining every session. See [Your AI Profile](../portability/your-ai-profile.md) for setup and full details.
+2. **me.md** — your AI profile. Describes your role, working style, expertise, and preferences so the AI calibrates its responses without you re-explaining every session. See [Your AI Profile](../portability/your-ai-profile.mdx) for setup and full details.
 
 3. **rules.md** — behavioral instructions for the AI. "Always run tests before pushing." "Never auto-merge." Rules are loaded via the platform shim (CLAUDE.md, .cursorrules) so every tool on the project reads the same rules.
 

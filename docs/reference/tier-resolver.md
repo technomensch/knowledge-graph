@@ -81,5 +81,5 @@ Project-level `knowledge/me.md` entries take precedence over `~/.kmgraph/me.md` 
 
 ## Related
 
-- [me.md and rules.md](../pillars/portability/your-ai-profile.md) — Where the `platforms[]` block lives
+- [me.md and rules.md](../pillars/portability/your-ai-profile.mdx) — Where the `platforms[]` block lives
 - [Platform Adaptation](PLATFORM-ADAPTATION.md) — IDE-level platform integration

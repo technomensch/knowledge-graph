@@ -74,8 +74,8 @@ To supersede an existing decision:
 
 ## Next steps
 
-- [Write a pattern entry](./capture-patterns.md) for patterns uncovered during the decision process
-- [Track a meta-issue](./document-meta-issues.md) if the decision spawned a multi-session implementation
+- [Capture Patterns](./capture-patterns.md) for patterns uncovered during the decision process
+- [Document Meta-Issues](./document-meta-issues.md) if the decision spawned a multi-session implementation
 - [Reference — ADR index](../../decisions/) for all existing decisions
 
 ---

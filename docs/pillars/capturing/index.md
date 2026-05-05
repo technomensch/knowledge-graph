@@ -19,3 +19,9 @@ KMGraph gives every insight a home. When you fix a bug, make an architecture cal
 - [Capture Patterns](./capture-patterns.md) — writing reusable solutions from lessons
 - [Document Meta-Issues](./document-meta-issues.md) — tracking multi-attempt investigations
 - [Capture From a Bugfix](./capture-from-bugfix.md) — the fastest path from fix to lesson
+
+## Related
+
+- [What to Capture](./what-to-capture.md) — lessons vs. ADRs vs. patterns: the decision guide
+- [Recalling](../recalling/index.md) — finding what you've already captured
+- [Four Content Types](../../concepts/four-content-types.md) — understanding the knowledge model

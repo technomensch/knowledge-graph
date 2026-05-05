@@ -93,7 +93,7 @@ Use mcp__notebooklm__notebook_query with query="test" to confirm sources are ind
 
 The response should cite specific lessons from the knowledge graph.
 
-## Next steps
+## Related
 
 - [Integrate with Obsidian](./integrate-obsidian.md) — graph view browsing
 - [Integrate with Notion](./integrate-notion.md) — team database mirror
