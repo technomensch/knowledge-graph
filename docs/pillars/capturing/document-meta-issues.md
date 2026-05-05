@@ -220,12 +220,6 @@ After closing, confirm `README.md` status field reads `Resolved`, `Abandoned`, o
 - Use `/kmgraph:recall` to search across meta-issues and lessons when starting a related problem
 - Consider creating an ADR if the resolution produced a reusable architecture decision
 
-## Related
-
-- [Capture Lessons Learned](./capture-lessons-learned.md)
-- [Architecture Decisions](./architecture-decisions.md)
-- [What to Capture](./what-to-capture.md)
-
 ---
 
 ## Escalation Thresholds Reference
@@ -243,3 +237,9 @@ KMGraph enforces structured escalation for stuck work via the `stuck-work-escala
 **Scope:** Escalation thresholds apply only to work with a definable success criterion (test passes, error gone, metric hit). Not exploratory or iterative work.
 
 For the exit-path template and full escalation logic, see the `stuck-work-escalation` skill (`skills/stuck-work-escalation/SKILL.md`).
+
+## Related
+
+- [Capture Lessons Learned](./capture-lessons-learned.md)
+- [Architecture Decisions](./architecture-decisions.md)
+- [What to Capture](./what-to-capture.md)

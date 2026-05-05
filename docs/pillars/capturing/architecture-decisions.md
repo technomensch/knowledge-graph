@@ -72,11 +72,11 @@ To supersede an existing decision:
 2. Update the old ADR's status to `Superseded by ADR-NNN`
 3. Add a link in both documents
 
-## Next steps
+## Related
 
-- [Capture Patterns](./capture-patterns.md) for patterns uncovered during the decision process
-- [Document Meta-Issues](./document-meta-issues.md) if the decision spawned a multi-session implementation
-- [Reference — ADR index](../../decisions/) for all existing decisions
+- [Capture Patterns](./capture-patterns.md) — for patterns uncovered during the decision process
+- [Document Meta-Issues](./document-meta-issues.md) — if the decision spawned a multi-session investigation
+- [What to Capture](./what-to-capture.md) — choosing between ADRs, lessons, and patterns
 
 ---
 

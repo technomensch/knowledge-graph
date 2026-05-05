@@ -181,19 +181,6 @@ Use the wiki-link format `[[relative/path.md]]` for all internal references. Abs
 
 ---
 
-## Next steps
-
-- Run `/kmgraph:update-graph` to extract the new pattern into `MEMORY.md` so it is available at the next session start.
-- If the pattern influenced an architecture decision, create a companion ADR with `/kmgraph:create-adr` and link it in the pattern's `Cross-References`.
-
-## Related
-
-- [Capture Lessons Learned](./capture-lessons-learned.md)
-- [Architecture Decisions](./architecture-decisions.md)
-- [What to Capture](./what-to-capture.md)
-
----
-
 ## STAR Format
 
 Structure knowledge narratives to answer:
@@ -299,3 +286,13 @@ Related to some other docs.
 - **Related Lesson:** [[debugging/validation-regression.md]]
 - **ADR:** [[ADR-008-validation-strategy.md]]
 ```
+
+---
+
+## Related
+
+- [Capture Lessons Learned](./capture-lessons-learned.md) — the foundational capture flow
+- [Architecture Decisions](./architecture-decisions.md) — when a pattern influences a design choice
+- [What to Capture](./what-to-capture.md) — deciding which entry type fits
+- Run `/kmgraph:update-graph` to extract the new pattern into `MEMORY.md` so it is available at the next session start.
+- If the pattern influenced an architecture decision, create a companion ADR with `/kmgraph:create-adr` and link it in the pattern's `Cross-References`.

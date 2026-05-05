@@ -5,7 +5,7 @@ sidebar_label: Customize Templates
 description: How to modify the lesson, ADR, session, and other templates to match project conventions
 ---
 
-# Customize Knowledge Entry Templates
+# Customize Templates
 
 ## Goal
 

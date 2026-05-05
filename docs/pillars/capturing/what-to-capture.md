@@ -9,7 +9,7 @@ description: How to choose between lessons, ADRs, patterns, and meta-issues.
 
 KMGraph has four entry types. Each answers a different question.
 
-## Decision guide
+## Decision Guide
 
 | If you're thinking... | Use |
 |---|---|
@@ -50,13 +50,13 @@ Example: "Always write the failing test before investigating the root cause — 
 
 Example: "Repeated context loss between sessions — multiple bugs stem from assuming prior session knowledge."
 
-## When in doubt
+## When In Doubt
 
 Start with a Lesson. You can always promote it to a pattern or meta-issue later.
 
 ## Related
 
-- [Capture Lessons Learned](./capture-lessons-learned.md)
-- [Architecture Decisions](./architecture-decisions.md)
-- [Capture Patterns](./capture-patterns.md)
-- [Document Meta-Issues](./document-meta-issues.md)
+- [Capture Lessons Learned](./capture-lessons-learned.md) — the core capture flow
+- [Architecture Decisions](./architecture-decisions.md) — recording design choices with rationale
+- [Capture Patterns](./capture-patterns.md) — generalizing a solution for reuse
+- [Document Meta-Issues](./document-meta-issues.md) — tracking multi-attempt investigations

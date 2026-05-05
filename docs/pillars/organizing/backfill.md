@@ -5,7 +5,7 @@ sidebar_label: Backfill
 description: Import existing README, CHANGELOG, and chat history into the knowledge graph
 ---
 
-# Backfill from Existing Project Notes
+# Backfill
 
 ## Goal
 

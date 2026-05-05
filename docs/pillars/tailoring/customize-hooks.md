@@ -5,7 +5,7 @@ sidebar_label: Customize Hooks
 description: How to configure, extend, or disable the KMGraph lifecycle hooks
 ---
 
-# Customize or Disable Hooks
+# Customize Hooks
 
 ## Goal
 

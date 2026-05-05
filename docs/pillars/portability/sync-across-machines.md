@@ -1,7 +1,7 @@
 ---
 id: sync-across-machines
 title: Sync a Knowledge Graph Across Machines
-sidebar_label: Sync across machines
+sidebar_label: Sync Across Machines
 description: How to share a personal or project knowledge graph between multiple development machines
 ---
 
@@ -84,5 +84,5 @@ The lesson should appear.
 
 ## Related
 
-- [Multi-KG workflows](../organizing/multi-kg-workflows.md) — managing project-local, personal, and cowork KGs
-- [Sanitize before sharing](../organizing/sanitize-before-sharing.md) — remove sensitive data before pushing to a shared remote
+- [Multi-KG Workflows](../organizing/multi-kg-workflows.md) — managing project-local, personal, and cowork KGs
+- [Sanitize Before Sharing](../organizing/sanitize-before-sharing.md) — remove sensitive data before pushing to a shared remote
