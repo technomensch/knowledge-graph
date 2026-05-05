@@ -7,11 +7,11 @@ description: How to use project-local, personal, and cowork knowledge graphs sid
 
 # Multi-KG Workflows
 
-## Goal
+> "I have knowledge that spans multiple projects. How do I manage more than one graph?"
 
-Capture and retrieve knowledge across multiple knowledge graphs — a project-local KG for project-specific decisions, a personal KG for reusable patterns across all projects, and optionally a cowork KG for team-shared knowledge.
+KMGraph supports multiple knowledge graphs — project-local, personal, and cowork — each capturing a different scope of knowledge. KMGraph must be initialized (`/kmgraph:init`) and git configured before using multiple KGs.
 
-## KG Types
+## KG types
 
 | Type | Storage location | Shared with |
 |---|---|---|
@@ -20,22 +20,13 @@ Capture and retrieve knowledge across multiple knowledge graphs — a project-lo
 | `cowork` | Configurable shared path | Team (synced via shared git remote) |
 | `custom` | Any path | Configured per instance |
 
-## Prerequisites
-
-- KMGraph initialized (`/kmgraph:init`)
-- Git configured (recommended for sync)
-
-## Steps
-
-### View active knowledge graphs
+## View and switch
 
 ```bash
 /kmgraph:list
 ```
 
 Shows all configured KGs and which is currently active.
-
-### Switch the active KG
 
 ```bash
 /kmgraph:switch personal
@@ -45,7 +36,9 @@ Shows all configured KGs and which is currently active.
 
 All capture and recall commands operate on the active KG.
 
-### Initialize a personal KG
+Run `/kmgraph:status` to confirm the active KG and entry count, or `/kmgraph:list` to see all registered KGs.
+
+## Set up a personal KG
 
 ```bash
 /kmgraph:init-personal-kg
@@ -53,7 +46,7 @@ All capture and recall commands operate on the active KG.
 
 Creates `~/.kmgraph/` and registers it. Use this for patterns that apply across all projects.
 
-### Configure a cowork KG
+## Set up a cowork KG
 
 Edit `~/.claude/kg-config.json`:
 
@@ -71,8 +64,6 @@ Edit `~/.claude/kg-config.json`:
 
 Then switch to it: `/kmgraph:switch cowork`
 
-### Configure git strategy per KG
-
 `gitStrategy` controls what happens to entries after capture:
 
 | Value | Behavior |
@@ -83,26 +74,18 @@ Then switch to it: `/kmgraph:switch cowork`
 
 Set per-KG in `kg-config.json` under the `graphs[name]` block.
 
-### Capture to a specific KG without switching
+## Capture without switching
 
 ```bash
 /kmgraph:capture-lesson --targetKg personal
 /kmgraph:capture-lesson --targetKg project-local
 ```
 
-### Search across all KGs
+## Search across all KGs
 
 ```bash
 /kmgraph:recall --all "search terms"
 ```
-
-## Verify
-
-```bash
-/kmgraph:status
-```
-
-Shows which KG is active and its entry count. Run `/kmgraph:list` to verify all KGs are registered.
 
 ## Related
 

@@ -7,18 +7,11 @@ description: Import existing README, CHANGELOG, and chat history into the knowle
 
 # Backfill
 
-## Goal
+> "I have existing notes. How do I get them into the graph?"
 
-Seed the knowledge graph from documentation and chat history that already exists, so the graph starts populated rather than empty.
+Seed the knowledge graph from documentation and chat history that already exists, so the graph starts populated rather than empty. KMGraph must be initialized (`/kmgraph:init`) with existing project notes in README, CHANGELOG, or chat history.
 
-## Prerequisites
-
-- KMGraph initialized (`/kmgraph:init`)
-- Existing project notes in one or more of: README, CHANGELOG, existing lessons, Claude/Gemini chat history
-
-## Steps
-
-### Option A — Backfill during init
+## During init
 
 When running `/kmgraph:init`, accept the optional backfill prompt:
 
@@ -33,7 +26,7 @@ Select `y`. The backfill automatically processes:
 - Existing `docs/decisions/` ADRs
 - Chat history exports (if present)
 
-### Option B — Backfill after init
+## After init
 
 ```bash
 /kmgraph:update-graph --auto --sync-all
@@ -41,7 +34,9 @@ Select `y`. The backfill automatically processes:
 
 This processes all existing lessons silently in one pass without per-lesson prompts. Existing lessons and decisions are never modified — only the search index and graph entries are updated.
 
-### Option C — Extract from chat history
+Confirm with `/kmgraph:status` (entry count) and `/kmgraph:recall "topic"` (search works).
+
+## From chat history
 
 Export chat history from Claude Code or Gemini CLI first:
 
@@ -53,18 +48,6 @@ The command locates chat logs, extracts lessons and decisions, and presents them
 
 ```bash
 /kmgraph:extract-chat --delegate knowledge-extractor
-```
-
-## Verify
-
-```bash
-/kmgraph:status
-```
-
-The entry count should reflect the backfilled content. Then test search:
-
-```bash
-/kmgraph:recall "topic from your existing notes"
 ```
 
 ## Related
