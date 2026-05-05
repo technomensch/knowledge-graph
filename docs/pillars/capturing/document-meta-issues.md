@@ -217,3 +217,21 @@ After closing, confirm `README.md` status field reads `Resolved`, `Abandoned`, o
 - Review the worked example at `core/examples/meta-issue/example-performance-saga/`
 - Use `/kmgraph:recall` to search across meta-issues and lessons when starting a related problem
 - Consider creating an ADR if the resolution produced a reusable architecture decision
+
+---
+
+## Escalation Thresholds Reference
+
+KMGraph enforces structured escalation for stuck work via the `stuck-work-escalation` skill:
+
+| Threshold | What happens |
+|---|---|
+| **3 attempts or 30 min** | Meta-issue is created automatically. Opus reviews all logged attempts and provides fresh diagnosis. All subsequent attempts must use `--log-attempt` with a distinct hypothesis. |
+| **5 attempts** | Exit-path analysis is mandatory. The attempt template's exit-path section must be completed and presented to the user before any further work proceeds. |
+| **3 Opus rounds** | Maximum Opus involvement. After three rounds without resolution, exit-path decision is forced regardless of attempt count. |
+
+**Counter reset:** If root cause genuinely shifts (new diagnosis invalidates prior attempts), reset the attempt counter and log the reset in `analysis/root-cause-evolution.md`.
+
+**Scope:** Escalation thresholds apply only to work with a definable success criterion (test passes, error gone, metric hit). Not exploratory or iterative work.
+
+For the exit-path template and full escalation logic, see the `stuck-work-escalation` skill (`skills/stuck-work-escalation/SKILL.md`).

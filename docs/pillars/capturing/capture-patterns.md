@@ -185,4 +185,111 @@ Use the wiki-link format `[[relative/path.md]]` for all internal references. Abs
 
 - Run `/kmgraph:update-graph` to extract the new pattern into `MEMORY.md` so it is available at the next session start.
 - If the pattern influenced an architecture decision, create a companion ADR with `/kmgraph:create-adr` and link it in the pattern's `Cross-References`.
-- Review the [PATTERNS-GUIDE](../reference/PATTERNS-GUIDE.md) for the full lesson and ADR templates, the review checklist, and examples of common mistakes.
+
+---
+
+## STAR Format
+
+Structure knowledge narratives to answer:
+
+- **Situation:** What was the context?
+- **Task:** What needed to be done?
+- **Action:** What did you do?
+- **Result:** What happened?
+
+---
+
+## Review Checklist
+
+Before finalizing a pattern (or any knowledge entry):
+
+**Content:**
+- [ ] Title is descriptive and searchable
+- [ ] Problem/context clearly explained
+- [ ] Solution includes enough detail to replicate
+- [ ] Key insights explicitly stated
+- [ ] Examples included (code, config, diagrams)
+
+**Structure:**
+- [ ] Follows template for document type
+- [ ] Sections in logical order
+- [ ] Headers used for navigation
+- [ ] Lists/bullets for scanability
+
+**Connections:**
+- [ ] Cross-references to related knowledge
+- [ ] Keywords/tags for search
+- [ ] Category appropriate
+- [ ] Links use correct format (`[[relative/path.md]]`)
+
+**Quality:**
+- [ ] Written for future-you (6 months later)
+- [ ] Specific enough to be useful
+- [ ] Concise enough to be readable
+- [ ] Free of sensitive data
+
+---
+
+## Common Mistakes
+
+### 1. Too abstract
+
+**Weak:**
+```markdown
+# Lesson: Performance Optimization
+We optimized the system and it got faster.
+```
+
+**Strong:**
+```markdown
+# Lesson: Database Query N+1 Problem
+Reduced API response time from 5s to 300ms by converting
+15 sequential queries to a single JOIN query.
+```
+
+### 2. Missing context
+
+**Weak:**
+```markdown
+Changed max_connections to 100.
+```
+
+**Strong:**
+```markdown
+Increased PostgreSQL max_connections from 50 to 100.
+
+**Why:** 5 app instances * 20 pool size = 100 connections needed.
+**Impact:** Eliminated "too many connections" errors.
+```
+
+### 3. No replication steps
+
+**Weak:**
+```markdown
+Fixed the bug by adding validation.
+```
+
+**Strong:**
+```markdown
+**Fix:**
+1. Add validation schema in `config/validation.js`
+2. Import in request handler: `const { validate } = require('./validation')`
+3. Call before processing: `if (!validate(req.body)) return 400`
+4. Add test in `tests/validation.test.js`
+```
+
+### 4. Weak cross-references
+
+**Weak:**
+```markdown
+Related to some other docs.
+```
+
+**Strong:**
+```markdown
+## Cross-References
+- **Pattern:** [[patterns.md#input-validation]]
+- **Gotcha:** [[gotchas.md#validation-bypass]]
+- **Related Lesson:** [[debugging/validation-regression.md]]
+- **ADR:** [[ADR-008-validation-strategy.md]]
+```
