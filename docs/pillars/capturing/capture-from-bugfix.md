@@ -5,7 +5,7 @@ sidebar_label: Capture from a Bugfix
 description: How to document a debugging breakthrough as a reusable lesson while context is fresh
 ---
 
-# Capture a Lesson from a Bug Fix
+# Capture from a Bugfix
 
 ## Goal
 

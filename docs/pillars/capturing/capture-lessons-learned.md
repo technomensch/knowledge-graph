@@ -36,12 +36,8 @@ Capture when:
 
 Don't wait until the end of the week — capture while the context is fresh.
 
-## What's next
-
-Not sure what type of entry to create? See [What to Capture](./what-to-capture.md) for a guide on choosing between lessons, decisions, patterns, and meta-issues.
-
 ## Related
 
-- [What to Capture](./what-to-capture.md)
-- [Capture from a Bugfix](./capture-from-bugfix.md)
-- [Architecture Decisions](./architecture-decisions.md)
+- [What to Capture](./what-to-capture.md) — choose between lessons, ADRs, patterns, and meta-issues
+- [Capture from a Bugfix](./capture-from-bugfix.md) — fastest path from a fix to a structured entry
+- [Architecture Decisions](./architecture-decisions.md) — when the fix changes a design choice

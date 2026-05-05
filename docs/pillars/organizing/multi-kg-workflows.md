@@ -106,6 +106,6 @@ Shows which KG is active and its entry count. Run `/kmgraph:list` to verify all 
 
 ## Related
 
-- [Sync across machines](../portability/sync-across-machines.md) — keep KGs in sync on multiple machines
-- [Sanitize before sharing](./sanitize-before-sharing.md) — scrub sensitive data from a shared KG
+- [Sync Across Machines](../portability/sync-across-machines.md) — keep KGs in sync on multiple machines
+- [Sanitize Before Sharing](./sanitize-before-sharing.md) — scrub sensitive data from a shared KG
 - [Graph Configuration](./graph-configuration.md) — full `kg-config.json` schema

@@ -1,11 +1,11 @@
 ---
 id: migrate-claude-gemini
-title: Migrate Between Claude and Gemini
+title: Migrate Claude ↔ Gemini
 sidebar_label: Migrate Claude ↔ Gemini
 description: How to carry knowledge graph context when switching between Claude Code and Gemini CLI
 ---
 
-# Migrate Between Claude and Gemini
+# Migrate Claude ↔ Gemini
 
 ## Goal
 
