@@ -1,7 +1,7 @@
 ---
-id: SEARCH
-title: How Search Works
-sidebar_label: How Search Works
+id: search-the-graph
+title: Search the Graph
+sidebar_label: Search the Graph
 description: Full-text search with FTS5, local indexing, and multi-KG support
 ---
 
