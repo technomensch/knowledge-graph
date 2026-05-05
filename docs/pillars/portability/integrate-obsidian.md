@@ -7,17 +7,10 @@ description: Browse the knowledge graph as an Obsidian vault with zero additiona
 
 # Integrate with Obsidian
 
-## Goal
-
-Use Obsidian as a read/browse interface for the knowledge graph — graph view, backlinks, and tag filtering over captured lessons, ADRs, and patterns.
-
-## Prerequisites
-
-- KMGraph initialized with a populated knowledge graph
-- [Obsidian](https://obsidian.md/) installed
+> "How do I browse my knowledge graph in Obsidian?"
 
 :::note
-KMGraph stores all entries as plain markdown. Obsidian reads markdown natively. No conversion, no plugin, and no sync step is needed for read access. This guide covers three levels: instant vault (zero install), improved vault (community plugin), and future primary-store mode (deferred).
+KMGraph stores all entries as plain markdown. Obsidian reads markdown natively. No conversion, no plugin, and no sync step is needed for read access. This guide covers three levels: instant vault (zero install), improved vault (community plugin), and future primary-store mode (deferred). You need KMGraph initialized with a populated knowledge graph and Obsidian installed.
 :::
 
 ## Option A — Instant vault (zero install)

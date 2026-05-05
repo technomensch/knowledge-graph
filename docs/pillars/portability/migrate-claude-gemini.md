@@ -7,18 +7,11 @@ description: How to carry knowledge graph context when switching between Claude 
 
 # Migrate Claude ↔ Gemini
 
-## Goal
+> "I'm switching AI tools. How do I bring my knowledge graph with me?"
 
-Continue working with the same knowledge graph after switching from Claude Code to Gemini CLI (or vice versa), without losing captured lessons, ADRs, or MEMORY.md context.
+The knowledge graph is platform-agnostic markdown — switching from Claude Code to Gemini CLI (or back) requires only a sync and a re-registration step. You need a populated knowledge graph on the source platform and KMGraph installed on the target (see [Installation](/INSTALL)).
 
-## Prerequisites
-
-- A knowledge graph already populated on the source platform
-- KMGraph installed on the target platform (see [Installation](/INSTALL))
-
-## Steps
-
-### 1. Sync MEMORY.md on the source platform
+## Sync MEMORY.md first
 
 Before switching, update the MEMORY.md with the latest session context:
 
@@ -28,7 +21,7 @@ Before switching, update the MEMORY.md with the latest session context:
 
 This writes a summary to `docs/sessions/` and updates MEMORY.md pointers. Commit and push.
 
-### 2. Export chat history (optional but recommended)
+## Export chat history
 
 ```bash
 /kmgraph:extract-chat
@@ -36,11 +29,11 @@ This writes a summary to `docs/sessions/` and updates MEMORY.md pointers. Commit
 
 Extracts any lessons from the departing session that haven't been formally captured yet.
 
-### 3. On the target platform, point to the same knowledge graph
+## Point to the same graph
 
 The knowledge graph is platform-agnostic markdown. If it is in the project directory, `git pull` is all that is needed. If it is a personal KG at `~/.kmgraph/`, pull that repo too.
 
-### 4. Register the KG on the target platform
+## Register on the target platform
 
 **For Claude Code (target):**
 ```bash
@@ -52,7 +45,7 @@ The knowledge graph is platform-agnostic markdown. If it is in the project direc
 
 Copy the contents of `core/templates/AGENTS-template.md` into your project's `AGENTS.md` or `GEMINI.md`. The template loads the KMGraph workflow instructions for non-Claude-Code platforms.
 
-### 5. Verify recall works
+## Verify recall works
 
 ```bash
 /kmgraph:recall "a lesson from the previous platform"

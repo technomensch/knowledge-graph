@@ -7,23 +7,15 @@ description: Export the knowledge graph into a NotebookLM notebook for AI-powere
 
 # Integrate with NotebookLM
 
-## Goal
+> "How do I query my knowledge graph with NotebookLM's AI research tools?"
 
-Export the local knowledge graph into a NotebookLM notebook so the captured lessons, ADRs, and patterns can be queried with NotebookLM's AI research surface — including cross-document synthesis and audio overview generation.
-
-## Prerequisites
-
-- KMGraph initialized with a populated knowledge graph
-- NotebookLM MCP server configured (`mcp__notebooklm__*` tools available)
-- Authenticated: run `nlm login` in the terminal if not already authenticated
+Export the local knowledge graph into a NotebookLM notebook so captured lessons, ADRs, and patterns can be queried with cross-document synthesis. You need KMGraph initialized with a populated knowledge graph, the NotebookLM MCP server configured, and `nlm login` run in the terminal.
 
 :::note
 This guide covers **exporting** the local KG as sources into NotebookLM. NotebookLM becomes a secondary query interface. KMGraph continues to write to local markdown. A NotebookLM-as-primary-store mode is deferred to a future release.
 :::
 
-## Steps
-
-### 1. Create a NotebookLM notebook
+## Create a notebook
 
 ```
 Use mcp__notebooklm__notebook_create to create a notebook named "KMGraph — [Project Name]".
@@ -31,7 +23,7 @@ Use mcp__notebooklm__notebook_create to create a notebook named "KMGraph — [Pr
 
 Note the notebook ID.
 
-### 2. Add lessons as sources
+## Add lessons
 
 For each lesson category you want to query, add the files as text sources:
 
@@ -48,13 +40,13 @@ NotebookLM notebook [ID] using mcp__notebooklm__source_add with source_type=text
 Use the file content as the text field.
 ```
 
-### 3. Add ADRs and patterns
+## Add ADRs and patterns
 
 ```
 Read all .md files in docs/decisions/ and add each as a source to notebook [ID].
 ```
 
-### 4. Query the knowledge graph via NotebookLM
+## Query the graph
 
 ```
 Use mcp__notebooklm__notebook_query with notebook_id=[ID] and query=
@@ -63,7 +55,9 @@ Use mcp__notebooklm__notebook_query with notebook_id=[ID] and query=
 
 NotebookLM synthesizes across all sources and cites the specific lessons it used.
 
-### 5. Generate an audio overview (optional)
+Confirm with `mcp__notebooklm__notebook_query` using `query="test"` — the response should cite specific lessons.
+
+## Generate an audio overview
 
 ```
 Use mcp__notebooklm__studio_create with artifact_type=audio and notebook_id=[ID].
@@ -84,14 +78,6 @@ Use mcp__notebooklm__source_add to add the new lesson file to notebook [ID].
 ```
 
 Or periodically refresh the entire notebook by deleting and re-importing (for large graphs).
-
-## Verify
-
-```
-Use mcp__notebooklm__notebook_query with query="test" to confirm sources are indexed.
-```
-
-The response should cite specific lessons from the knowledge graph.
 
 ## Related
 

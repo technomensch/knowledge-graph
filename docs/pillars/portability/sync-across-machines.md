@@ -7,23 +7,15 @@ description: How to share a personal or project knowledge graph between multiple
 
 # Sync a Knowledge Graph Across Machines
 
-## Goal
+> "My knowledge graph is on one machine. How do I get it on all of them?"
 
-Access the same knowledge graph on multiple machines — a home workstation and a laptop, for example — without manual file copying.
+Access the same knowledge graph on multiple machines without manual file copying. You need KMGraph initialized on at least one machine and a git remote accessible from all machines.
 
-## Prerequisites
-
-- KMGraph initialized on at least one machine
-- A Git remote accessible from all machines (GitHub, GitLab, or self-hosted)
-- For personal KGs: the graph lives at `~/.kmgraph/` — initialize a git repo there
-
-## Steps
-
-### Project KG (stored in the project directory)
+## Project KG
 
 Project KGs sync automatically with the project's git remote. No additional setup is needed beyond `git pull` on each machine.
 
-### Personal KG (stored at `~/.kmgraph/`)
+## Personal KG
 
 **On the source machine:**
 
@@ -60,7 +52,9 @@ cd ~/.kmgraph && git pull
 git add . && git commit -m "chore: sync captures" && git push
 ```
 
-### Automating sync
+Confirm with `/kmgraph:recall "a lesson you captured on the first machine"` — it should appear.
+
+## Automating sync
 
 Add a post-commit hook to auto-push personal KG entries:
 
@@ -71,16 +65,6 @@ git push origin main --quiet
 ```
 
 Make it executable: `chmod +x .git/hooks/post-commit`
-
-## Verify
-
-On a second machine, run:
-
-```bash
-/kmgraph:recall "a lesson you captured on the first machine"
-```
-
-The lesson should appear.
 
 ## Related
 
