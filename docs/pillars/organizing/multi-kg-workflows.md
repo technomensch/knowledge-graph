@@ -1,7 +1,7 @@
 ---
 id: multi-kg-workflows
 title: Multi-KG Workflows
-sidebar_label: Multi-KG workflows
+sidebar_label: Multi-KG Workflows
 description: How to use project-local, personal, and cowork knowledge graphs side by side
 ---
 

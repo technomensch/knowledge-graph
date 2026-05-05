@@ -1,7 +1,7 @@
 ---
-id: backfill-existing-notes
-title: Backfill from Existing Project Notes
-sidebar_label: Backfill existing notes
+id: backfill
+title: Backfill
+sidebar_label: Backfill
 description: Import existing README, CHANGELOG, and chat history into the knowledge graph
 ---
 
