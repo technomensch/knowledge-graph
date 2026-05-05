@@ -10,7 +10,7 @@ Extract structured insights from lessons-learned documents and sync them to the 
 
 ## Description
 
-Delegates to the `knowledge-extractor` agent (KG Entry Extraction Mode) to read lessons, extract structured entries, create/update KG entries with bidirectional links, preserve git metadata, and sync to MEMORY.md when governance criteria are met.
+Delegates to the `knowledge-extractor` agent (KG Entry Extraction Mode) to read lessons, extract structured entries, create/update KG entries with bidirectional links, and preserve git metadata. When governance-worthy content is detected, flags it in output for capture at session wrap.
 
 **When to use:**
 - After creating/updating lesson-learned documents
@@ -89,7 +89,7 @@ The agent executes the full extraction pipeline:
 5. Create or update knowledge entries
 6. Update cross-references (bidirectional links)
 7. Verify entry quality
-8. Check project memory sync requirements
+8. Flag governance-worthy content in output
 
 ### Step 3: Display Results
 
@@ -132,7 +132,7 @@ Display the output exactly as returned by the agent. Do not reformat.
 Knowledge entries LEVERAGE lessons, not REPLACE them:
 - **Knowledge Graph** = Quick index (5-10 seconds)
 - **Lesson-Learned** = Deep understanding (5-10 minutes)
-- **MEMORY.md** = Persistent governance context
+- **Session wrap** = Governance capture point (rules-capture + triggers)
 - Together = Efficient onboarding + comprehensive learning
 
 ---
@@ -150,4 +150,4 @@ Knowledge entries LEVERAGE lessons, not REPLACE them:
 **Version:** 3.0 (Refactored to thin dispatcher + knowledge-extractor KG Entry Extraction Mode)
 **Purpose:** Keep knowledge graph synchronized with lessons-learned via extraction and linking
 **Architecture:** LEVERAGE lessons (not replace) - quick ref + deep dive + persistent context together
-**Success Criteria:** All recent lessons have corresponding quick-reference knowledge entries with valid bidirectional links + MEMORY.md updates when governance criteria met
+**Success Criteria:** All recent lessons have corresponding quick-reference knowledge entries with valid bidirectional links. Governance-worthy lessons are flagged in output for capture at session wrap.
