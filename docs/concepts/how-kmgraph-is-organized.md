@@ -1,7 +1,7 @@
 ---
-id: layers-four
-title: Four-Layer Architecture
-sidebar_label: Four-Layer Architecture
+id: how-kmgraph-is-organized
+title: How KMGraph Is Organized
+sidebar_label: How KMGraph Is Organized
 description: "KMGraph's four-layer architecture separating concerns: Context, Logic, Lifecycle, and Data"
 ---
 
