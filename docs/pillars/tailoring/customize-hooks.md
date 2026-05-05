@@ -7,14 +7,9 @@ description: How to configure, extend, or disable the KMGraph lifecycle hooks
 
 # Customize Hooks
 
-## Goal
+> "I want KMGraph to automatically do X. How do I wire that up?"
 
-Change which hooks run automatically, add custom behavior to lifecycle events, or disable hooks that are unwanted.
-
-## Prerequisites
-
-- KMGraph installed with hooks configured (`hooks/hooks.json` present)
-- Claude Code (hooks are a Claude Code-specific feature)
+KMGraph registers shell scripts with Claude Code's lifecycle events — you can add, disable, or replace any of them. You need KMGraph installed with `hooks/hooks.json` present (Claude Code only).
 
 ## How hooks work
 
@@ -30,15 +25,13 @@ KMGraph registers shell scripts with Claude Code's lifecycle events via `hooks/h
 
 The master script `scripts/hooks-master.sh` routes each event to sub-scripts in `scripts/`.
 
-## Steps
-
-### View the current hook configuration
+## View the configuration
 
 ```bash
 cat hooks/hooks.json
 ```
 
-### Disable a specific hook behavior
+## Disable a specific hook
 
 To disable the post-tool lesson check (which prompts to capture lessons after certain tool uses), comment it out in `scripts/hooks-master.sh`:
 
@@ -47,7 +40,7 @@ To disable the post-tool lesson check (which prompts to capture lessons after ce
 # source "${SCRIPT_DIR}/post-tool-lesson-check.sh"
 ```
 
-### Add custom behavior to a lifecycle event
+## Add custom behavior
 
 Create a new script in `scripts/` and add a `source` call in `hooks-master.sh` at the appropriate event branch:
 
@@ -56,7 +49,9 @@ Create a new script in `scripts/` and add a `source` call in `hooks-master.sh` a
 source "${SCRIPT_DIR}/my-custom-hook.sh"
 ```
 
-### Disable all hooks
+After changes, start a new Claude Code session — the `SessionStart` hook output confirms the configuration took effect.
+
+## Disable all hooks
 
 Remove or rename `hooks/hooks.json`:
 
@@ -66,7 +61,7 @@ mv hooks/hooks.json hooks/hooks.json.disabled
 
 Reload Claude Code for the change to take effect.
 
-### Re-enable hooks
+## Re-enable hooks
 
 ```bash
 mv hooks/hooks.json.disabled hooks/hooks.json
@@ -82,10 +77,6 @@ mv hooks/hooks.json.disabled hooks/hooks.json
 | `session-end-prompt.sh` | Prompts for session summary on Stop | Yes |
 | `plan-mirror.sh` | Mirrors plan files from `~/.claude/plans/` to `docs/plans/` | Yes |
 | `notification-dispatch.sh` | Sends webhook notifications | Yes (if webhook not configured) |
-
-## Verify
-
-After changes, start a new Claude Code session and check that the hook behavior matches expectations. The `SessionStart` hook output appears at session start.
 
 ## Related
 

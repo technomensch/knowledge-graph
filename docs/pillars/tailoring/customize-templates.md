@@ -7,14 +7,9 @@ description: How to modify the lesson, ADR, session, and other templates to matc
 
 # Customize Templates
 
-## Goal
+> "The default templates don't match my team's conventions. How do I change them?"
 
-Adapt the bundled templates to match team conventions — add required fields, remove unused ones, or change the default structure for lessons, ADRs, and session summaries.
-
-## Prerequisites
-
-- KMGraph installed
-- Templates copied to `docs/templates/` (auto-copied at init, or manually: `cp -r core/templates/. docs/templates/`)
+Edit the bundled templates to add required fields, remove unused ones, or change the default structure for lessons, ADRs, and session summaries. Templates are auto-copied to `docs/templates/` at init, or manually: `cp -r core/templates/. docs/templates/`.
 
 ## How templates work
 
@@ -35,25 +30,25 @@ All templates live in `core/templates/`. When the MCP server or a command create
 | Knowledge entry | `core/templates/knowledge/entry-template.md` | `/kmgraph:update-graph` |
 | Meta-issue | `core/templates/meta-issue/meta-issue-template.md` | `/kmgraph:start-issue-tracking` |
 
-## Steps
-
-### 1. Copy the template to a working location
+## Copy the template
 
 ```bash
 cp core/templates/lessons-learned/lesson-template.md docs/templates/my-lesson-template.md
 ```
 
-### 2. Edit the template
+## Edit the template
 
 Open the copy and add, remove, or rename fields. The YAML frontmatter fields are recognized by KMGraph. Custom fields in the body are preserved but not indexed.
 
-### 3. Point the command to the custom template
+## Use the custom template
 
 ```bash
 /kmgraph:capture-lesson --template docs/templates/my-lesson-template.md
 ```
 
-### 4. Make it the default (optional)
+Confirm by running a capture command — the custom fields should appear in the output file.
+
+## Set as default
 
 In `kg-config.json`, add a `templateOverrides` block:
 
@@ -71,10 +66,6 @@ In `kg-config.json`, add a `templateOverrides` block:
 - **Add a "Severity" field** to lessons for triage prioritization
 - **Remove unused frontmatter** (e.g., `sprint`, `project`) to reduce noise
 - **Change the default category** from `debugging` to a project-specific category
-
-## Verify
-
-Run a capture command and confirm the custom fields appear in the output file.
 
 ## Related
 
