@@ -1,78 +1,76 @@
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
   docs: [
-    // ── Home ──────────────────────────────────────────────────────────────
-    {type: 'doc', id: 'index', label: '🏠 Home'},
+    {type: 'doc', id: 'index',     label: '🏠 Home'},
+    {type: 'doc', id: 'quickstart', label: '⚡ Quickstart (5 min)'},
+    {type: 'doc', id: 'INSTALL',   label: '📦 Installation'},
+    {type: 'doc', id: 'reference/command-guide', label: '📋 Commands'},
 
-    // ── Quickstart ────────────────────────────────────────────────────────
-    {type: 'doc', id: 'quickstart', label: '🚀 Quickstart (5 min)'},
-    {type: 'doc', id: 'INSTALL', label: 'Installation'},
-    {type: 'doc', id: 'COMMAND-GUIDE', label: '📖 Command Guide'},
+    {type: 'html', value: '<hr class="sidebar-divider" style="margin:8px 16px;" />'},
 
-    // ── Tutorials ─────────────────────────────────────────────────────────
-    // Phase 4/5: tutorial pages created in those phases
-    // {
-    //   type: 'category',
-    //   label: '📖 Tutorials',
-    //   items: [
-    //     'tutorials/first-lesson',
-    //     'tutorials/first-recall',
-    //     'tutorials/first-session-wrap',
-    //   ],
-    // },
-
-    // ── How-to Guides ─────────────────────────────────────────────────────
+    // ── Pillars ───────────────────────────────────────────────────────────
     {
       type: 'category',
-      label: '🍳 How-to Guides',
-      collapsed: true,
+      label: '📥 Capturing',
+      collapsed: false,
       items: [
-        {
-          type: 'category',
-          label: 'Build your graph',
-          collapsed: false,
-          items: [
-            {type: 'doc', id: 'guides/me-and-rules', label: 'Set up your identity files'},
-            {type: 'doc', id: 'guides/backfill-existing-notes', label: 'Backfill existing notes'},
-            {type: 'doc', id: 'guides/capture-from-bugfix', label: 'Capture a bug'},
-            {type: 'doc', id: 'guides/create-adr', label: 'Capture a decision'},
-            {type: 'doc', id: 'guides/track-meta-issue', label: 'Track a meta-issue'},
-          ],
-        },
-        {
-          type: 'category',
-          label: 'Customize your graph',
-          collapsed: false,
-          items: [
-            {type: 'doc', id: 'guides/customize-templates', label: 'Customize templates'},
-            {type: 'doc', id: 'guides/customize-hooks', label: 'Customize hooks'},
-          ],
-        },
-        {
-          type: 'category',
-          label: 'Advanced',
-          collapsed: false,
-          items: [
-            {type: 'doc', id: 'guides/sanitize-before-sharing', label: 'Sanitize before sharing'},
-            {type: 'doc', id: 'guides/multi-kg-workflows', label: 'Multi-KG workflows'},
-            {type: 'doc', id: 'guides/sync-across-machines', label: 'Sync across machines'},
-            {type: 'doc', id: 'guides/pattern-writing', label: 'Pattern writing'},
-          ],
-        },
-        {
-          type: 'category',
-          label: 'Cross-Platform',
-          collapsed: false,
-          items: [
-            {type: 'doc', id: 'guides/use-in-cursor', label: 'Use in Cursor/Windsurf/VS Code'},
-            {type: 'doc', id: 'guides/migrate-claude-gemini', label: 'Migrate Claude ↔ Gemini'},
-            {type: 'doc', id: 'guides/integrate-notion', label: 'Integrate with Notion'},
-            {type: 'doc', id: 'guides/integrate-obsidian', label: 'Integrate with Obsidian'},
-            {type: 'doc', id: 'guides/integrate-notebooklm', label: 'Integrate with NotebookLM'},
-          ],
-        },
+        {type: 'doc', id: 'pillars/capturing/capture-lessons-learned', label: 'Capture Lessons Learned'},
+        {type: 'doc', id: 'pillars/capturing/capture-from-bugfix',     label: 'Capture from a Bugfix'},
+        {type: 'doc', id: 'pillars/capturing/architecture-decisions',  label: 'Architecture Decisions'},
+        {type: 'doc', id: 'pillars/capturing/capture-patterns',        label: 'Capture Patterns'},
+        {type: 'doc', id: 'pillars/capturing/document-meta-issues',    label: 'Document Meta-Issues'},
+        {type: 'doc', id: 'pillars/capturing/what-to-capture',         label: 'What to Capture'},
       ],
     },
+    {
+      type: 'category',
+      label: '🔍 Recalling',
+      collapsed: false,
+      items: [
+        {type: 'doc', id: 'pillars/recalling/search-the-graph',  label: 'Search the Graph'},
+        {type: 'doc', id: 'pillars/recalling/session-memory',    label: 'Session Memory'},
+        {type: 'doc', id: 'pillars/recalling/linking-entries',   label: 'Linking Entries'},
+      ],
+    },
+    {
+      type: 'category',
+      label: '🗂️ Organizing',
+      collapsed: false,
+      items: [
+        {type: 'doc', id: 'pillars/organizing/personal-vs-project',    label: 'Personal vs. Project'},
+        {type: 'doc', id: 'pillars/organizing/multi-kg-workflows',     label: 'Multi-KG Workflows'},
+        {type: 'doc', id: 'pillars/organizing/graph-configuration',    label: 'Graph Configuration'},
+        {type: 'doc', id: 'pillars/organizing/backfill',               label: 'Backfill'},
+        {type: 'doc', id: 'pillars/organizing/sanitize-before-sharing',label: 'Sanitize Before Sharing'},
+      ],
+    },
+    {
+      type: 'category',
+      label: '🌐 Portability',
+      collapsed: false,
+      items: [
+        {type: 'doc', id: 'pillars/portability/your-ai-profile',       label: 'Your AI Profile'},
+        {type: 'doc', id: 'pillars/portability/sync-across-machines',  label: 'Sync Across Machines'},
+        {type: 'doc', id: 'pillars/portability/use-in-cursor',         label: 'Use in Cursor'},
+        {type: 'doc', id: 'pillars/portability/migrate-claude-gemini', label: 'Migrate Claude to Gemini'},
+        {type: 'doc', id: 'pillars/portability/integrate-notebooklm',  label: 'Integrate NotebookLM'},
+        {type: 'doc', id: 'pillars/portability/integrate-notion',      label: 'Integrate Notion'},
+        {type: 'doc', id: 'pillars/portability/integrate-obsidian',    label: 'Integrate Obsidian'},
+      ],
+    },
+    {
+      type: 'category',
+      label: '⚙️ Tailoring',
+      collapsed: false,
+      items: [
+        {type: 'doc', id: 'pillars/tailoring/customize-hooks',     label: 'Customize Hooks'},
+        {type: 'doc', id: 'pillars/tailoring/customize-templates', label: 'Customize Templates'},
+        {type: 'doc', id: 'pillars/tailoring/custom-rules',        label: 'Custom Rules'},
+        {type: 'doc', id: 'pillars/tailoring/automation-layer',    label: 'Automation Layer'},
+      ],
+    },
+
+    {type: 'html', value: '<hr class="sidebar-divider" style="margin:8px 16px;" />'},
 
     // ── Reference ─────────────────────────────────────────────────────────
     {
@@ -80,83 +78,42 @@ const sidebars = {
       label: '📚 Reference',
       collapsed: true,
       items: [
-        // Setup
-        {
-          type: 'category',
-          label: 'Setup',
-          collapsed: false,
-          items: [
-            {type: 'doc', id: 'CONFIGURATION', label: 'Configuration'},
-          ],
-        },
-        // Quick Reference
-        {
-          type: 'category',
-          label: 'Quick Reference',
-          collapsed: false,
-          items: [
-            {type: 'doc', id: 'CHEAT-SHEET', label: 'Cheat Sheet'},
-            {type: 'doc', id: 'FAQ', label: 'FAQ'},
-          ],
-        },
-        // Automation Layer — the four plugin components
-        {
-          type: 'category',
-          label: 'Automation Layer',
-          collapsed: false,
-          items: [
-            {type: 'doc', id: 'reference/commands', label: 'Commands'},
-            {type: 'doc', id: 'reference/skills', label: 'Skills'},
-            {type: 'doc', id: 'reference/agents', label: 'Agents'},
-            {type: 'doc', id: 'reference/hooks', label: 'Hooks'},
-            {type: 'doc', id: 'reference/templates', label: 'Templates'},
-          ],
-        },
-        // Architecture
-        {
-          type: 'category',
-          label: 'Architecture',
-          collapsed: false,
-          items: [
-            {type: 'doc', id: 'reference/ARCHITECTURE', label: 'Architecture'},
-            {type: 'doc', id: 'reference/PLATFORM-ADAPTATION', label: 'Platform Adaptation'},
-            {type: 'doc', id: 'reference/tier-resolver', label: 'Model Tier Resolver'},
-            {type: 'doc', id: 'reference/SANITIZATION-CHECKLIST', label: 'Sanitization Checklist'},
-          ],
-        },
+        {type: 'doc', id: 'reference/commands',                label: 'Commands'},
+        {type: 'doc', id: 'reference/hooks',                   label: 'Hooks'},
+        {type: 'doc', id: 'reference/agents',                  label: 'Agents'},
+        {type: 'doc', id: 'reference/skills',                  label: 'Skills'},
+        {type: 'doc', id: 'reference/templates',               label: 'Templates'},
+        {type: 'doc', id: 'reference/ARCHITECTURE',            label: 'Architecture'},
+        {type: 'doc', id: 'reference/PLATFORM-ADAPTATION',     label: 'Platform Adaptation'},
+        {type: 'doc', id: 'reference/tier-resolver',           label: 'Model Tier Resolver'},
+        {type: 'doc', id: 'reference/SANITIZATION-CHECKLIST',  label: 'Sanitization Checklist'},
+        {type: 'doc', id: 'CHEAT-SHEET',                       label: 'Cheat Sheet'},
+        {type: 'doc', id: 'FAQ',                               label: 'FAQ'},
       ],
     },
 
     // ── Concepts ──────────────────────────────────────────────────────────
     {
       type: 'category',
-      label: '🧠 Concepts',
+      label: '💡 Concepts',
       collapsed: true,
       items: [
-        {type: 'doc', id: 'CONCEPTS', label: 'Overview'},
-        {type: 'doc', id: 'concepts/why-kmgraph', label: 'Why KMGraph?'},
-        {type: 'doc', id: 'pillars-four', label: 'Four Pillars'},
-        {type: 'doc', id: 'layers-four', label: 'Four-Layer Architecture'},
-        {type: 'doc', id: 'PERSONAL-V-PROJECT', label: 'Personal vs Project'},
-        {type: 'doc', id: 'SEARCH', label: 'How Search Works'},
-        {type: 'doc', id: 'concepts/automation-layer', label: 'Automation Layer'},
+        {type: 'doc', id: 'concepts/why-kmgraph',                  label: 'Why KMGraph'},
+        {type: 'doc', id: 'concepts/what-is-a-knowledge-graph',    label: 'What Is a Knowledge Graph'},
+        {type: 'doc', id: 'concepts/four-content-types',           label: 'Four Content Types'},
+        {type: 'doc', id: 'concepts/how-kmgraph-is-organized',     label: 'How KMGraph Is Organized'},
       ],
     },
 
-    // ── Troubleshooting ───────────────────────────────────────────────────
-    {type: 'doc', id: 'troubleshooting/troubleshooting', label: '🛠 Troubleshooting'},
+    {type: 'html', value: '<hr class="sidebar-divider" style="margin:8px 16px;" />'},
 
-    // ── Changelog ─────────────────────────────────────────────────────────
+    {type: 'doc', id: 'troubleshooting/troubleshooting', label: '🔧 Troubleshooting'},
     {
       type: 'link',
       label: '📓 Changelog',
       href: 'https://github.com/technomensch/knowledge-graph/blob/main/CHANGELOG.md',
     },
-
-    // ── Glossary ──────────────────────────────────────────────────────────
-    {type: 'doc', id: 'GLOSSARY', label: '🔤 Glossary'},
-
-    // ── Contributing ──────────────────────────────────────────────────────
+    {type: 'doc', id: 'GLOSSARY', label: '📖 Glossary'},
     {
       type: 'category',
       label: '🤝 Contributing',
@@ -164,7 +121,6 @@ const sidebars = {
       items: [
         {type: 'doc', id: 'STYLE-GUIDE', label: 'Style Guide'},
         {type: 'doc', id: 'contributing/docs-updates-workflow', label: 'Docs Updates Workflow'},
-        // NAVIGATION-INDEX removed in Phase 4 (deleted)
       ],
     },
   ],
