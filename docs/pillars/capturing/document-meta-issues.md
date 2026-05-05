@@ -11,19 +11,7 @@ description: Use meta-issue tracking for complex problems that span multiple ses
 
 A **meta-issue** is structured documentation for a problem that requires three or more solution attempts, has an evolving root-cause understanding, and needs a record of what was tried and what was learned across sessions or branches.
 
----
-
-## Prerequisites
-
-- KMGraph installed and active KG configured (`/kmgraph:status`)
-- Git repository present (optional — git-dependent steps are skipped automatically when no repo is detected)
-- At least one prior attempt at the problem already made, or a problem clearly requiring multiple attempts
-
----
-
-## Steps
-
-### 1. Start tracking
+## 1. Start tracking
 
 Run the command from the project root:
 
@@ -51,7 +39,7 @@ If no git repository is detected, branch strategy prompts and the Git Integratio
 
 ---
 
-### 2. Document the first (or retroactive) attempt
+## 2. Document the first (or retroactive) attempt
 
 For each prior attempt, create a numbered subdirectory and fill in both files:
 
@@ -105,7 +93,7 @@ Use `/kmgraph:meta-issue --log-attempt 001 "<hypothesis>"` to pre-populate the h
 
 ---
 
-### 3. Update across sessions
+## 3. Update across sessions
 
 At the start of each new session working on this issue:
 
@@ -146,7 +134,7 @@ Write `solution-approach.md` before starting each attempt, and `attempt-results.
 
 ---
 
-### 4. Link lessons and ADRs
+## 4. Link lessons and ADRs
 
 After a significant attempt (whether it succeeds or fails), capture the learning:
 
@@ -176,7 +164,7 @@ To link an existing lesson or ADR to a GitHub issue:
 
 ---
 
-### 5. Close the meta-issue
+## 5. Close the meta-issue
 
 A meta-issue is closed when one of three conditions is met:
 
@@ -201,22 +189,17 @@ Then extract final lessons:
 /kmgraph:capture-lesson
 ```
 
----
+## Related
 
-## Verify
-
-After setup, confirm the scaffold exists:
-
-```bash
-ls docs/meta-issues/<issue-name>/
-# README.md  description.md  implementation-log.md  test-cases.md  attempts/
-```
-
-After closing, confirm `README.md` status field reads `Resolved`, `Abandoned`, or `Superseded`, and that at least one lesson is linked.
+- [Capture Lessons Learned](./capture-lessons-learned.md) — capture the lesson once the meta-issue resolves
+- [Architecture Decisions](./architecture-decisions.md) — if the resolution produced a reusable design choice
+- [What to Capture](./what-to-capture.md) — choosing between a lesson, ADR, or meta-issue
 
 ---
 
-## Escalation Thresholds Reference
+## Reference
+
+### Escalation thresholds
 
 KMGraph enforces structured escalation for stuck work via the `stuck-work-escalation` skill:
 
@@ -231,11 +214,3 @@ KMGraph enforces structured escalation for stuck work via the `stuck-work-escala
 **Scope:** Escalation thresholds apply only to work with a definable success criterion (test passes, error gone, metric hit). Not exploratory or iterative work.
 
 For the exit-path template and full escalation logic, see the `stuck-work-escalation` skill (`skills/stuck-work-escalation/SKILL.md`).
-
-## Related
-
-- [Capture Lessons Learned](./capture-lessons-learned.md) — capture the lesson once the meta-issue resolves
-- [Architecture Decisions](./architecture-decisions.md) — if the resolution produced a reusable design choice
-- [What to Capture](./what-to-capture.md) — choosing between a lesson, ADR, or meta-issue
-- Review the worked example at `core/examples/meta-issue/example-performance-saga/`
-- Use `/kmgraph:recall` to search across meta-issues and lessons when starting a related problem

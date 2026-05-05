@@ -11,7 +11,7 @@ description: How to structure a reusable pattern entry in the knowledge graph
 
 A pattern generalizes a solved problem into a named, reusable solution. Use it when the same class of problem can recur — not just to document a single incident.
 
-## Patterns vs. Lessons
+## Patterns vs. lessons
 
 | Dimension | Lesson | Pattern |
 |---|---|---|
