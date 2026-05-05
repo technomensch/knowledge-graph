@@ -89,7 +89,7 @@ Parameters:
 The agent executes the full 8-step pipeline:
 1. Scan for new/modified lessons
 2. Extract knowledge graph entries
-3. Check MEMORY.md sync requirements
+3. Check governance signal status
 4. Link to active plan
 5. Update local issue
 6. Auto-update session summary
@@ -105,7 +105,7 @@ Knowledge Sync Complete
 -----------------------
 Lessons scanned:  3 (2 new, 1 modified)
 KG entries:       2 created, 1 updated
-MEMORY.md:        Updated (1 new pattern)
+Governance:       1 signal flagged (review at session wrap)
 Plan linked:      v2.0 (Step 2 → Prefix Naming lesson)
 Local issue:      issue-42 (updated)
 GitHub:           [ISSUE_ID] (comment posted)
@@ -164,7 +164,7 @@ If GitHub CLI (`gh`) is not installed or no remote is configured:
 
 This command is idempotent — running it multiple times produces the same result:
 - Existing KG entries are updated, not duplicated
-- MEMORY.md checks for existing content before adding
+- Governance signals are checked before flagging (no duplicate flags per lesson)
 - GitHub comments include timestamps to prevent duplicate posts
 - Plan links are checked before adding
 
