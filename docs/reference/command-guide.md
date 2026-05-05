@@ -1387,11 +1387,11 @@ flowchart TD
   Real samples
 </div>
 
-## Next Steps
+## Related
 
 <div class="grid cards" markdown>
 
-- **[Getting Started](GETTING-STARTED.md)**
+- **[Quickstart](../quickstart.mdx)**
 
   Installation, first lesson, and setup verification.
 
@@ -1412,7 +1412,7 @@ flowchart TD
 ### **Getting started**
 <div class="grid cards" markdown>
 
-- [Getting Started Guide](GETTING-STARTED.md)
+- [Quickstart](../quickstart.mdx)
 
   Installation, first lesson, setup verification (5 min)
 
