@@ -48,4 +48,4 @@ Currently, Tier 2 and Tier 3 users must check the [GitHub releases page](https:/
 ## 9. Related Documentation
 
 - [Getting Started](GETTING-STARTED.md) - Initial setup and initialization.
-- [Concepts](CONCEPTS.md) - Canonical definitions of terms used in the Knowledge Graph.
+- [Concepts](concepts/why-kmgraph.md) - Canonical definitions of terms used in the Knowledge Graph.

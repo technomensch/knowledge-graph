@@ -54,7 +54,7 @@ These rules cannot be overridden without an explicit versioned decision (ADR). E
 
 ### 1.1 Third-person voice in comprehensive documentation
 
-Apply to: `CONCEPTS.md`, `COMMAND-GUIDE.md`, `GETTING-STARTED.md`, `NAVIGATION-INDEX.md`.
+Apply to: `concepts/how-kmgraph-is-organized.md`, `reference/command-guide.md`, `GETTING-STARTED.md`.
 
 - ✅ "The system extracts metadata automatically."
 - ✅ "The command creates a lesson file in the active category."
@@ -142,10 +142,9 @@ Choose the correct voice for each document type. Mixing voices within a document
 
 | Document | Voice | Example |
 |----------|-------|---------|
-| `CONCEPTS.md` | Third-person | "The system captures git metadata automatically." |
-| `COMMAND-GUIDE.md` | Third-person | "The command creates a lesson file in the active category." |
+| `concepts/how-kmgraph-is-organized.md` | Third-person | "The system captures git metadata automatically." |
+| `reference/command-guide.md` | Third-person | "The command creates a lesson file in the active category." |
 | `GETTING-STARTED.md` | Third-person | "The initialization wizard prompts for project name." |
-| `NAVIGATION-INDEX.md` | Third-person | "The index organizes documentation into four access paths." |
 | `CHEAT-SHEET.md` | Imperative or neutral | "Run `/kmgraph:init`." or "This command initializes..." |
 | `STYLE-GUIDE.md` (this document) | Imperative | "Use third-person voice." |
 | Code comments and examples | Any style | Exception to all voice rules. |
@@ -207,7 +206,7 @@ Apply the correct structural pattern for each document type. Predictable structu
 
 ### 4a. Guide page pattern
 
-Apply to: `GETTING-STARTED.md`, `CONFIGURATION.md`, `WORKFLOWS.md`, and similar task-oriented guides.
+Apply to: `GETTING-STARTED.md`, `CONFIGURATION.md`, and similar task-oriented guides.
 
 ```markdown
 # [Title]
@@ -229,7 +228,7 @@ Apply to: `GETTING-STARTED.md`, `CONFIGURATION.md`, `WORKFLOWS.md`, and similar 
 
 ### 4b. Command page pattern
 
-Apply to: individual command entries in `COMMAND-GUIDE.md`.
+Apply to: individual command entries in `reference/command-guide.md`.
 
 ```markdown
 ### 🟢 `/kmgraph:[command-name]`
@@ -263,7 +262,7 @@ Difficulty badges: 🟢 Essential / 🟡 Intermediate / 🔴 Advanced.
 
 ### 4c. Concept entry pattern
 
-Apply to: term definitions in `CONCEPTS.md`.
+Apply to: term definitions in `concepts/how-kmgraph-is-organized.md`.
 
 ```markdown
 ### [Term]
@@ -369,7 +368,7 @@ The internal search index format changed; search results are unchanged from your
 
 ### 4g. How-to guide pattern
 
-Apply to: step-by-step how-to guides in `docs/guides/` (e.g. `capture-from-bugfix.md`, `create-adr.md`).
+Apply to: step-by-step how-to guides in `docs/guides/` (e.g. `capture-lessons-learned.md`, `create-adr.md`).
 
 ```markdown
 ## Goal
@@ -537,7 +536,7 @@ Additional context or related resources.
 :::
 ```
 
-**When to use**: Comprehensive documentation files (COMMAND-GUIDE.md, CONCEPTS.md, GETTING-STARTED.md) where site rendering matters.
+**When to use**: Comprehensive documentation files (`reference/command-guide.md`, `concepts/how-kmgraph-is-organized.md`, `GETTING-STARTED.md`) where site rendering matters.
 
 #### Guidelines
 
@@ -565,7 +564,7 @@ Additional context or related resources.
 
 ### 7.1 Internal links
 
-- Use relative paths: `[Command Guide](COMMAND-GUIDE.md)`, `[Pattern Writing Guide](reference/PATTERNS-GUIDE.md)`
+- Use relative paths: `[Command Guide](reference/command-guide.md)`, `[Pattern Writing Guide](pillars/capturing/capture-patterns.md)`
 - Never use absolute file system paths (`/Users/…`)
 - Every document must have a "Related Documentation" section linking to at least 2 other documents
 - Cross-references should be bidirectional: if doc A links to doc B, doc B should link back to doc A
@@ -690,8 +689,8 @@ Run this checklist before marking documentation complete or committing a new or 
 ## 10. Related Documentation
 
 **Authoring references**:
-- [Concepts Guide](CONCEPTS.md) — Canonical definitions of all terms used in this guide
-- [Command Reference](COMMAND-GUIDE.md) — Example of the correct command page pattern in practice
+- [Concepts Guide](concepts/how-kmgraph-is-organized.md) — Canonical definitions of all terms used in this guide
+- [Command Reference](reference/command-guide.md) — Example of the correct command page pattern in practice
 - [Getting Started](GETTING-STARTED.md) — Example of the correct guide page pattern in practice
 
 **Templates**:
@@ -700,10 +699,35 @@ Run this checklist before marking documentation complete or committing a new or 
 - [Documentation Template](templates/documentation/doc-template.md) — Starting scaffold for general documentation
 
 **Contributor workflows**:
-- [Manual Workflows](reference/WORKFLOWS.md) — Workflow for contributing without Claude Code
+- [Session Memory](pillars/recalling/session-memory.md) — Workflow for archiving and restoring context without Claude Code
 
 ---
 
 **Created**: 2026-02-20
 **Version**: 1.0
 **Applies to**: v0.0.7-alpha and later
+
+---
+
+## Wayfinding
+
+Every pillar landing page and guide page that leads naturally to another skill must include a cross-pillar link.
+
+### Format
+
+Use a "What's next" or "Related" block at the bottom of any page that has a natural continuation:
+
+```markdown
+## What's next
+
+Ready to find what you captured? See [Recalling](../recalling/search-the-graph.md) — the point of capturing is finding it later.
+
+Need to keep the graph tidy as it grows? See [Organizing](../organizing/personal-vs-project.md).
+```
+
+### Rules
+
+1. Every pillar landing links to at least 2 sibling pillars with a one-sentence reason — not just "see also."
+2. The reason must answer "why would I go there next?" — not just describe what the page covers.
+3. Reference pages (`reference/`) are linked *from* pillar content but do not link back into the learning sequence.
+4. Do not add wayfinding to reference pages.

@@ -57,5 +57,5 @@ Skills provide suggestions. Commands execute actions. A skill surfaces `/kmgraph
 ## Related
 
 - [Agents Catalog](agents) — Heavy-lift handlers triggered by skills
-- [Command Guide](/COMMAND-GUIDE) — Full command reference
+- [Command Guide](/knowledge-graph/reference/command-guide) — Full command reference
 - [Concepts — Automation Layer](/concepts/why-kmgraph) — How skills, agents, and hooks fit together

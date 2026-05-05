@@ -11,93 +11,89 @@ import styles from '@site/src/css/home.module.css';
 
 <div className={styles.homePage}>
 
+<img
+  src="/knowledge-graph/img/Staying_in_Sync_Banner_Dark.png"
+  alt="KMGraph - Using an AI coding assistant? KMGraph is for you."
+  className={styles.headerImage}
+/>
+
+<div className={styles.valueGrid}>
+  <div className={styles.valueCard}>
+    <strong>Lessons Learned</strong>
+    Every bug fix and breakthrough, captured and searchable.
+  </div>
+  <div className={styles.valueCard}>
+    <strong>Decisions</strong>
+    What you chose and why, so you never re-litigate the same call.
+  </div>
+  <div className={styles.valueCard}>
+    <strong>Institutional Knowledge</strong>
+    A local, portable repo that follows you across every tool.
+  </div>
+</div>
+
+<div className={styles.pillarHeaderRow}>
+  <div className={styles.pillarHeaderLeft}>
+    <h2>Choose your starting point</h2>
+    <p>Start with the skill that matches where you are right now.</p>
+  </div>
+  <div className={styles.pillarHeaderRight}>
+    <span className={styles.nudgeLine1}>Not sure where to start?</span>
+    <a href="/knowledge-graph/quickstart" className={styles.nudgeLine2}>Try the 5-minute quickstart.</a>
+  </div>
+</div>
+
+<div className={styles.pillarGrid}>
+  <a href="/knowledge-graph/pillars/capturing/capture-lessons-learned" className={styles.pillarCard}>
+    <div className={styles.pillarIcon}>📥</div>
+    <div className={styles.pillarName}>Capturing</div>
+    <div className={styles.pillarQuestion}>"I solved something. How do I save it?"</div>
+    <div className={styles.pillarCta}>Explore →</div>
+  </a>
+  <a href="/knowledge-graph/pillars/recalling/search-the-graph" className={styles.pillarCard}>
+    <div className={styles.pillarIcon}>🔍</div>
+    <div className={styles.pillarName}>Recalling</div>
+    <div className={styles.pillarQuestion}>"I think I've solved this before."</div>
+    <div className={styles.pillarCta}>Explore →</div>
+  </a>
+  <a href="/knowledge-graph/pillars/organizing/personal-vs-project" className={styles.pillarCard}>
+    <div className={styles.pillarIcon}>🗂️</div>
+    <div className={styles.pillarName}>Organizing</div>
+    <div className={styles.pillarQuestion}>"How do I keep this from becoming a junk drawer?"</div>
+    <div className={styles.pillarCta}>Explore →</div>
+  </a>
+  <a href="/knowledge-graph/pillars/portability/your-ai-profile" className={styles.pillarCard}>
+    <div className={styles.pillarIcon}>🌐</div>
+    <div className={styles.pillarName}>Portability</div>
+    <div className={styles.pillarQuestion}>"I use multiple AI tools. Make them share knowledge."</div>
+    <div className={styles.pillarCta}>Explore →</div>
+  </a>
+  <a href="/knowledge-graph/pillars/tailoring/customize-hooks" className={styles.pillarCard}>
+    <div className={styles.pillarIcon}>⚙️</div>
+    <div className={styles.pillarName}>Tailoring</div>
+    <div className={styles.pillarQuestion}>"I want this to fit my workflow."</div>
+    <div className={styles.pillarCta}>Explore →</div>
+  </a>
+</div>
+
+<div className={styles.demoSection}>
+  <p className={styles.demoLabel}>See it in action - capturing a lesson at the end of a session:</p>
   <img
-    src="/knowledge-graph/img/Staying_in_Sync_Banner_Dark.png"
-    alt="KMGraph - Using an AI coding assistant? KMGraph is for you."
-    className={styles.headerImage}
+    src="/knowledge-graph/img/demos/capture-lesson.gif"
+    alt="KMGraph capture-lesson demo"
+    className={styles.demoGif}
   />
+</div>
 
-  <div className={styles.contextGrid}>
-    <div className={styles.contextItem}>
-      <strong>Between sessions</strong>
-      <span>Day-to-day, week-to-week - context survives session resets</span>
-    </div>
-    <div className={styles.contextItem}>
-      <strong>Between models</strong>
-      <span>Claude, Gemini, Codex, and more - same knowledge, any AI</span>
-    </div>
-    <div className={styles.contextItem}>
-      <strong>Between tools</strong>
-      <span>VS Code, Cursor, CLI, Antigravity - one repo, everywhere</span>
-    </div>
-    <div className={styles.contextItem}>
-      <strong>Between teammates</strong>
-      <span>Stored on GitHub - shared automatically with your team</span>
-    </div>
-  </div>
-
-  <ul className={styles.storesList}>
-    <li>Remembers your <strong>lessons learned</strong> from every bug and breakthrough</li>
-    <li>Tracks the <strong>decisions you made</strong> - and the rationale behind them</li>
-    <li><strong>Institutional knowledge</strong> - in a local, platform-agnostic repo that follows you everywhere</li>
-  </ul>
-
-  <div className={styles.audienceSection}>
-    <p className={styles.audienceLabel}>Built for everyone building with AI:</p>
-    <div className={styles.badges}>
-      <span className={styles.badge}>Developer</span>
-      <span className={styles.badge}>Vibe-Coder</span>
-      <span className={styles.badge}>Prompt Engineer</span>
-      <span className={styles.badge}>Open-Source Maintainer</span>
-      <span className={styles.badge}>Small Agile Team</span>
-    </div>
-  </div>
-
-  <div className={styles.demoSection}>
-    <p className={styles.demoLabel}>See it in action - capturing a lesson at the end of a session:</p>
-    <img
-      src="/knowledge-graph/img/demos/capture-lesson.gif"
-      alt="KMGraph capture-lesson demo"
-      className={styles.demoGif}
-    />
-  </div>
-
-  <div className={styles.hero}>
-    <code className={styles.heroCode}>claude --plugin-dir /path/to/knowledge-graph</code>
-    <p className={styles.heroSubtext}>
-      Then run <code>/kmgraph:init</code> - first lesson captured in under 5 minutes.
-    </p>
-  </div>
-
-  <div className={styles.cards}>
-    <div className={styles.card}>
-      <h3>🚀 Quickstart</h3>
-      <p>Install, init, and capture your first lesson in 5 minutes.</p>
-      <a href="/knowledge-graph/quickstart" className="button button--primary button--sm">Get started →</a>
-    </div>
-    <div className={styles.card}>
-      <h3>📋 Browse Commands</h3>
-      <p>Every slash command, MCP tool, and skill - one reference page.</p>
-      <a href="/knowledge-graph/reference/commands" className="button button--secondary button--sm">Browse →</a>
-    </div>
-    <div className={styles.card}>
-      <h3>🧠 How It Works</h3>
-      <p>The problem KMGraph solves, when to use it, and how knowledge is stored.</p>
-      <a href="/knowledge-graph/concepts/why-kmgraph" className="button button--secondary button--sm">Read more →</a>
-    </div>
-    <div className={styles.card}>
-      <h3>⚡ Cheat Sheet</h3>
-      <p>One-page quick reference - the commands you use every day.</p>
-      <a href="/knowledge-graph/CHEAT-SHEET" className="button button--secondary button--sm">Open →</a>
-    </div>
-  </div>
-
-  <div className={styles.beta}>
+<div className={styles.hero}>
+  <code className={styles.heroCode}>claude --plugin-dir /path/to/knowledge-graph</code>
+  <p className={styles.heroSubtext}>
+    Then run <code>/kmgraph:init</code> - first lesson captured in under 5 minutes.
+  </p>
+</div>
 
 :::tip[Now in Beta]
 KMGraph is in beta and actively seeking feedback. Reports and feature requests are welcome via the [issue tracker](https://github.com/technomensch/knowledge-graph/issues).
 :::
-
-  </div>
 
 </div>

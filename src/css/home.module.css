@@ -223,3 +223,133 @@
     white-space: normal;
   }
 }
+
+/* ── Value cards (3-column, replaces contextGrid) ────────────────── */
+.valueGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.valueCard {
+  background: var(--ifm-card-background-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--ifm-color-emphasis-700);
+  line-height: 1.5;
+}
+
+.valueCard strong {
+  color: var(--ifm-font-color-base);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* ── Pillar header row ───────────────────────────────────────────── */
+.pillarHeaderRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.pillarHeaderLeft h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ifm-font-color-base);
+  margin-bottom: 5px;
+  margin-top: 0;
+}
+
+.pillarHeaderLeft p {
+  font-size: 0.78rem;
+  color: var(--ifm-color-emphasis-600);
+  margin: 0;
+}
+
+.pillarHeaderRight {
+  text-align: right;
+}
+
+.nudgeLine1 {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ifm-font-color-base);
+  margin-bottom: 5px;
+}
+
+.nudgeLine2 {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--ifm-color-primary);
+}
+
+/* ── Pillar grid (5-col accent cards) ───────────────────────────── */
+.pillarGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 36px;
+}
+
+.pillarCard {
+  background: linear-gradient(135deg, #1e1730, #1a1a2e);
+  border: 1px solid rgba(124, 92, 252, 0.33);
+  border-radius: 15px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s, background 0.15s;
+  text-decoration: none;
+}
+
+.pillarCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(124, 92, 252, 0.2);
+  border-color: #7c5cfc;
+  text-decoration: none;
+}
+
+[data-theme='light'] .pillarCard {
+  background: linear-gradient(135deg, #f3f0ff, #eeeaff);
+  border-color: #c9b8ff;
+}
+
+[data-theme='light'] .pillarCard:hover {
+  border-color: #7c5cfc;
+  background: linear-gradient(135deg, #ece5ff, #e6e0ff);
+}
+
+.pillarIcon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.pillarName {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ifm-font-color-base);
+}
+
+.pillarQuestion {
+  font-style: italic;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--ifm-color-emphasis-600);
+  flex: 1;
+}
+
+.pillarCta {
+  font-size: 0.72rem;
+  color: var(--ifm-color-primary);
+  margin-top: 2px;
+}
