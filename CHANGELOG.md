@@ -13,6 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.5.7] — 2026-05-05
+
+### Fixed
+- `superpowers:writing-plans` and `superpowers:brainstorming` no longer offer "Which approach?" execution options after saving a plan — PreToolUse hook now injects an Execution Handoff Override block that hard-blocks that prompt
+- `superpowers:executing-plans` and `superpowers:finishing-a-development-branch` no longer auto-push or open PRs without explicit user approval — PR Gate Override block added to hook injection
+- Added Stop hook safety net (`stop-plan-gate.sh`) that re-injects the approval gate reminder at turn end when a plan was just written
+- Deleted dead shadow skills (`~/.claude/skills/writing-plans.md`, `~/.claude/skills/gov-plan-gate.md`) — personal-directory skills cannot override plugin-namespaced skills in Claude Code
+- `sync-all-agent`: removed MEMORY.md size check (Step 2.5) and sync protocol (Step 3); replaced with governance signal status check
+- `knowledge-graph-usage` skill: updated sync-all description to reflect governance signal model
+
+### Added
+- `skills/gov-plan-gate/SKILL.md` promoted to kmgraph plugin — appears as `kmgraph:gov-plan-gate` in the available-skills index, covering both planning and execution gate types
+- Amended ADR-004 with v2 fix documentation (root cause analysis of prior failed fix + lesson learned)
+
 ## [0.5.6] — 2026-05-05
 
 ### Changed
