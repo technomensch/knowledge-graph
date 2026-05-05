@@ -55,7 +55,7 @@ Choose a noun phrase that describes the technique, not the symptom:
 
 The name is the primary search key. It must be recognizable out of context.
 
-## The pattern template
+## Template
 
 ```markdown
 ## [Pattern Name]
