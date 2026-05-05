@@ -44,5 +44,5 @@ Most agents are invoked automatically. To delegate a heavy operation explicitly:
 ## Related
 
 - [Skills Catalog](skills) — Auto-triggered context providers that invoke agents
-- [Command Guide](/COMMAND-GUIDE) — Full command reference
-- [Concepts — Four-Layer Architecture](/layers-four) — How agents fit the architecture
+- [Command Guide](/knowledge-graph/reference/command-guide) — Full command reference
+- [Concepts — How KMGraph Is Organized](/knowledge-graph/concepts/how-kmgraph-is-organized) — How agents fit the architecture

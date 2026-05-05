@@ -79,7 +79,7 @@ This guide focuses on **platform capabilities and usage patterns** after install
 - Manual category README updates
 - No automated pipelines (`/kmgraph:sync-all` equivalent)
 
-**Workaround:** Use manual workflows from [WORKFLOWS.md](./WORKFLOWS.md) + Cursor Composer for assistance
+**Workaround:** Use manual workflows from [session memory](../pillars/recalling/session-memory.md) + Cursor Composer for assistance
 
 ---
 
@@ -102,7 +102,7 @@ This guide focuses on **platform capabilities and usage patterns** after install
 - Manual lesson creation and search
 - No ADR automation
 
-**Workaround:** Use manual workflows from [WORKFLOWS.md](./WORKFLOWS.md)
+**Workaround:** Use manual workflows from [session memory](../pillars/recalling/session-memory.md)
 
 ---
 
@@ -126,7 +126,7 @@ This guide focuses on **platform capabilities and usage patterns** after install
 - No bidirectional MEMORY.md sync
 - Manual category README updates
 
-**Workaround:** Use manual workflows from [WORKFLOWS.md](./WORKFLOWS.md)
+**Workaround:** Use manual workflows from [session memory](../pillars/recalling/session-memory.md)
 
 ---
 
@@ -178,7 +178,7 @@ This guide focuses on **platform capabilities and usage patterns** after install
 - No MCP support
 - No git metadata automation
 
-**Workaround:** Use manual workflows from [WORKFLOWS.md](./WORKFLOWS.md); Aider helps write content
+**Workaround:** Use manual workflows from [session memory](../pillars/recalling/session-memory.md); Aider helps write content
 
 ---
 
@@ -300,14 +300,14 @@ Knowledge is portable — the same `docs/` directory works with all platforms. A
 - [Getting Started](../GETTING-STARTED.md) — Claude Code setup guide
 
 **Core Concepts & Reference**:
-- [Concepts Guide](../CONCEPTS.md) — Plain-English term explanations
-- [Configuration](../CONFIGURATION.md) — Post-install customization
-- [Command Guide](../COMMAND-GUIDE.md) — All commands (Claude Code users)
+- [Concepts Guide](../concepts/why-kmgraph.md) — Plain-English term explanations
+- [Configuration](../pillars/organizing/graph-configuration.md) — Post-install customization
+- [Command Guide](command-guide.md) — All commands (Claude Code users)
 
 **Guides**:
 - [Architecture Guide](./ARCHITECTURE.md) — System design overview
-- [Patterns Guide](./PATTERNS-GUIDE.md) — Writing quality lessons and ADRs
-- [Manual Workflows](./WORKFLOWS.md) — Step-by-step processes for all platforms
+- [Patterns Guide](../pillars/capturing/capture-patterns.md) — Writing quality lessons and ADRs
+- [Manual Workflows](../pillars/recalling/session-memory.md) — Step-by-step processes for all platforms
 
 **Resources**:
 - [Templates](../templates/) — Starter scaffolds for all document types

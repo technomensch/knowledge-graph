@@ -157,6 +157,5 @@ These flags appear across multiple commands and share consistent behavior.
 
 - [Getting Started](../GETTING-STARTED.md) — Installation and first lesson (5 min)
 - [Cheat Sheet](../CHEAT-SHEET.md) — One-page quick reference
-- [Concepts Guide](../CONCEPTS.md) — Plain-English definitions of every term and pattern
-- [Workflows](WORKFLOWS.md) — Step-by-step guides for all workflow types
+- [Concepts Guide](../concepts/why-kmgraph.md) — Plain-English definitions of every term and pattern
 - [Platform Adaptation](PLATFORM-ADAPTATION.md) — Cursor, Windsurf, Continue, VS Code, Aider

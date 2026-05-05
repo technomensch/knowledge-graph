@@ -37,7 +37,7 @@ This page shows a preview of the installer. To actually install, **copy and past
 :::tip[Claude Code Quick Start]
 
 Claude Code users can follow a manual setup walkthrough instead:
-→ [Claude Code Setup Guide](GETTING-STARTED.md)
+→ [Quickstart](quickstart.mdx)
 Or paste the universal installer above for the same automated experience.
 
 :::
@@ -58,7 +58,7 @@ Users can install on multiple platforms with varying automation levels:
 
 | Platform | Automation | How to Install |
 |----------|-----------|-----------------|
-| **Claude Code** | Full automation | Paste installer (recommended) or follow [Getting Started](GETTING-STARTED.md) |
+| **Claude Code** | Full automation | Paste installer (recommended) or follow [Quickstart](quickstart.mdx) |
 | **Cursor** | Medium (MCP tools) | Paste installer; MCP server handles data layer |
 | **Windsurf** | Medium (MCP tools) | Paste installer; MCP server handles data layer |
 | **Continue.dev** | Medium (MCP tools) | Paste installer; MCP server handles data layer |
@@ -76,7 +76,7 @@ The installer sets up:
 
 - **Configuration file** — `~/.claude/kg-config.json` (stores knowledge graph locations and metadata)
 - **Directory structure** — `knowledge/`, `lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`
-- **Identity files** — `knowledge/me.md` (contributor identity, gitignored), `knowledge/rules.md` (project conventions, committed), and `knowledge/triggers.md` (rule timing, when each rule applies). See [Portable AI Identity](guides/me-and-rules.md).
+- **Identity files** — `knowledge/me.md` (contributor identity, gitignored), `knowledge/rules.md` (project conventions, committed), and `knowledge/triggers.md` (rule timing, when each rule applies). See [Your AI Profile](pillars/portability/your-ai-profile.mdx).
 - **Wiki links** — Cross-references throughout the KG are converted to Obsidian `[[wiki link]]` format, enabling graph view navigation in Obsidian and compatible editors
 - **MCP server** — Provides knowledge graph tools for non-Claude-Code platforms
 - **Templates** — Starter scaffolds for capturing lessons and decisions
@@ -113,7 +113,7 @@ After installation, users can:
 3. **Search knowledge** — Find lessons and patterns across sessions
 4. **Sync knowledge** — Automatically extract and organize captured content
 
-See [Getting Started](GETTING-STARTED.md) for detailed walkthroughs.
+See [Quickstart](quickstart.mdx) for detailed walkthroughs.
 
 ---
 

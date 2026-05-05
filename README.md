@@ -53,7 +53,7 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 ## Commands
 
 **Quick Reference**: See [CHEAT-SHEET.md](docs/CHEAT-SHEET.md) for one-page quick reference guide
-**Detailed Guide**: See [COMMAND-GUIDE.md](docs/COMMAND-GUIDE.md) for comprehensive command documentation with learning paths
+**Detailed Guide**: See [Command Guide](docs/reference/command-guide.md) for comprehensive command documentation with learning paths
 
 ### 🟢 Essential Commands (Start Here)
 
