@@ -1,7 +1,7 @@
 ---
-id: create-adr
-title: Create an Architecture Decision Record
-sidebar_label: Create an ADR
+id: architecture-decisions
+title: Architecture Decisions
+sidebar_label: Architecture Decisions
 description: How to document an architecture decision with context, rationale, and consequences
 ---
 

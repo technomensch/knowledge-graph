@@ -1,7 +1,7 @@
 ---
 id: capture-from-bugfix
-title: Capture a Lesson from a Bug Fix
-sidebar_label: Capture from a bug fix
+title: Capture from a Bugfix
+sidebar_label: Capture from a Bugfix
 description: How to document a debugging breakthrough as a reusable lesson while context is fresh
 ---
 
