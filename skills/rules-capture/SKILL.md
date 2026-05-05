@@ -303,6 +303,24 @@ context:
   agents_present: true                # from detection result; always include
 ```
 
+### 5. Check for trigger pairing
+
+After the rule is written, classify whether it is phase-specific or unconditional:
+
+**Phase-specific indicators** (any of these in the rule text):
+- "before [action]", "after [action]", "when [event]", "at [phase]", "during [workflow]"
+
+**If phase-specific:** Surface this prompt to the user:
+
+> "Should this only apply in certain situations — like before pushing, or at the start of a session? Or does it always apply?"
+
+- If the user describes a specific situation: write a corresponding entry to `triggers.md` (project-level: `knowledge/triggers.md`, user-level: `~/.kmgraph/triggers.md`) in the same capture flow. Match the level (project/user) to where the rule was written.
+- If the user says "always" or equivalent: proceed without a trigger entry.
+
+**If unconditional** ("always", "never", applies universally): skip this step silently — no trigger entry needed.
+
+**User-facing language rule:** Never mention `triggers.md`, `rules.md`, or any file name in the prompt. Describe behavior and situations only.
+
 ## Do NOT
 
 - Ask clarifying questions before showing the suggestion (suggestion comes first)
