@@ -77,4 +77,4 @@ Setup takes under 5 minutes for Claude Code installs. Other platforms may requir
 
 ---
 
-*Back to [home](/) · [Get started](/GETTING-STARTED) · [Browse commands](/COMMAND-GUIDE)*
+*Back to [home](/) · [Get started](/GETTING-STARTED) · [Browse commands](/knowledge-graph/reference/command-guide)*
