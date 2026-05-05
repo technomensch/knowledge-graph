@@ -16,7 +16,6 @@ const sidebars = {
       collapsed: false,
       items: [
         {type: 'doc', id: 'pillars/capturing/capture-lessons-learned', label: 'Capture Lessons Learned'},
-        {type: 'doc', id: 'pillars/capturing/capture-from-bugfix',     label: 'Capture from a Bugfix'},
         {type: 'doc', id: 'pillars/capturing/architecture-decisions',  label: 'Architecture Decisions'},
         {type: 'doc', id: 'pillars/capturing/capture-patterns',        label: 'Capture Patterns'},
         {type: 'doc', id: 'pillars/capturing/document-meta-issues',    label: 'Document Meta-Issues'},
