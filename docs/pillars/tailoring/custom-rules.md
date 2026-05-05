@@ -7,6 +7,8 @@ description: How to define behavioral rules for your AI assistant and the situat
 
 # Custom Rules
 
+> "How do I make the AI follow my conventions without repeating them every session?"
+
 A rule is a behavioral instruction for your AI assistant. A trigger is the situation where it fires. Together, they let you encode your working conventions so the AI follows them automatically — without you repeating them every session.
 
 ## What a rule looks like
