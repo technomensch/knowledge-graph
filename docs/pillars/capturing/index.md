@@ -18,7 +18,6 @@ KMGraph gives every insight a home. When you fix a bug, make an architecture cal
 - [Architecture Decisions](./architecture-decisions.md) — creating and maintaining ADRs
 - [Capture Patterns](./capture-patterns.md) — writing reusable solutions from lessons
 - [Document Meta-Issues](./document-meta-issues.md) — tracking multi-attempt investigations
-- [Capture From a Bugfix](./capture-from-bugfix.md) — the fastest path from fix to lesson
 
 ## Related
 

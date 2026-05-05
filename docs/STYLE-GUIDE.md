@@ -368,7 +368,7 @@ The internal search index format changed; search results are unchanged from your
 
 ### 4g. How-to guide pattern
 
-Apply to: step-by-step how-to guides in `docs/guides/` (e.g. `capture-from-bugfix.md`, `create-adr.md`).
+Apply to: step-by-step how-to guides in `docs/guides/` (e.g. `capture-lessons-learned.md`, `create-adr.md`).
 
 ```markdown
 ## Goal
