@@ -7,23 +7,15 @@ description: Mirror the local knowledge graph into a Notion database for team br
 
 # Integrate with Notion
 
-## Goal
+> "How do I share my knowledge graph with teammates who use Notion?"
 
-Mirror captured lessons and ADRs into a Notion database so the knowledge graph is browsable by teammates who use Notion, without requiring them to install KMGraph.
-
-## Prerequisites
-
-- KMGraph initialized with a populated knowledge graph
-- Notion MCP server configured in Claude Code (`mcp__claude_ai_Notion__*` tools available)
-- A Notion workspace with permission to create databases
+Mirror captured lessons and ADRs into a Notion database so teammates can browse the knowledge graph without installing KMGraph. You need KMGraph initialized with a populated knowledge graph, the Notion MCP server configured, and a Notion workspace with permission to create databases.
 
 :::note
 This guide covers **mirroring** local KG entries into Notion as a read-friendly browsing surface. It does not make Notion the primary store — KMGraph still writes to local markdown files. A pluggable Notion backend is deferred to a future release.
 :::
 
-## Steps
-
-### 1. Create a Notion database for lessons
+## Create a lessons database
 
 In Claude Code with Notion MCP available:
 
@@ -39,7 +31,7 @@ Use notion-create-database to create a "KMGraph Lessons" database with these pro
 
 Note the database ID from the response.
 
-### 2. Mirror lessons to Notion
+## Mirror lessons
 
 For each lesson file in `docs/lessons-learned/`, create a Notion page:
 
@@ -58,11 +50,13 @@ Read all .md files in docs/lessons-learned/debugging/ and create a Notion page
 for each one in database [ID].
 ```
 
-### 3. Mirror ADRs to Notion
+Confirm by opening the Notion database in a browser — each lesson should appear as a page with properties populated.
+
+## Mirror ADRs
 
 Create a separate "KMGraph ADRs" database with properties: Title, Status, Decision, Date. Mirror `docs/decisions/*.md` the same way.
 
-### 4. Search the Notion mirror
+## Search the mirror
 
 ```
 Use notion-search to find "Redis timeout" across the KMGraph Lessons database.
@@ -71,10 +65,6 @@ Use notion-search to find "Redis timeout" across the KMGraph Lessons database.
 ## Keeping the mirror current
 
 After each `/kmgraph:capture-lesson`, run the mirror step for the new file. Or add a `PostToolUse` hook that auto-mirrors captures to Notion (see [Customize hooks](../tailoring/customize-hooks.md)).
-
-## Verify
-
-Open the Notion database in a browser. Each lesson should appear as a page with the correct properties populated.
 
 ## Related
 
