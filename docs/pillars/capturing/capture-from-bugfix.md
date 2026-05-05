@@ -7,26 +7,19 @@ description: How to document a debugging breakthrough as a reusable lesson while
 
 # Capture from a Bugfix
 
-## Goal
+> "The bug is fixed. How do I save it before I forget?"
 
-Document a debugging breakthrough immediately after solving it, so the solution is searchable in future sessions instead of being lost in a chat thread.
+You've identified the root cause. Run the capture command now, before the context fades.
 
-## Prerequisites
-
-- KMGraph initialized (`/kmgraph:init`)
-- A solved bug with the root cause identified
-
-## Steps
-
-**1. Run the capture command immediately after solving**
+## The command
 
 ```bash
 /kmgraph:capture-lesson
 ```
 
-The command prompts for a title, description, and category. Choose `debugging` for bug investigations.
+The command prompts for a title, description, and category. Choose `debugging` for bug investigations. If git is enabled, the lesson captures the current branch, commit hash, and any linked issue number automatically. Confirm with `/kmgraph:recall "keywords"` — the lesson should appear in results. If not, run `/kmgraph:update-graph` to extract patterns.
 
-**2. Fill in the lesson fields**
+## What to fill in
 
 | Field | What to write |
 |---|---|
@@ -37,11 +30,7 @@ The command prompts for a title, description, and category. Choose `debugging` f
 | **Prevention** | How to avoid it next time |
 | **Tags** | Technology names, error codes, affected modules |
 
-**3. Let git metadata attach automatically**
-
-If git is enabled, the lesson captures the current branch, commit hash, and any linked issue number. No action needed.
-
-**4. Use `--snapshot` when context is rich**
+## Attach context
 
 If the debugging session involved many steps, add a session snapshot first:
 
@@ -50,14 +39,6 @@ If the debugging session involved many steps, add a session snapshot first:
 ```
 
 This preserves the full session context alongside the lesson.
-
-## Verify
-
-```bash
-/kmgraph:recall "the bug title or keywords"
-```
-
-The lesson should appear in results. If not, run `/kmgraph:update-graph` to extract patterns.
 
 ## Related
 
