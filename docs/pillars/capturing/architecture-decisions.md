@@ -79,3 +79,57 @@ To supersede an existing decision:
 - [Write a pattern entry](/guides/pattern-writing) for patterns uncovered during the decision process
 - [Track a meta-issue](/guides/track-meta-issue) if the decision spawned a multi-session implementation
 - [Reference — ADR index](/decisions/) for all existing decisions
+
+---
+
+## Template
+
+Full ADR template for manual use or reference:
+
+```markdown
+# ADR-NNN: [Decision Title]
+
+**Status:** Accepted/Rejected/Deprecated/Superseded
+**Date:** YYYY-MM-DD
+**Authors:** [Names/roles]
+
+## Context
+[Forces at play, why decision needed. Include constraints: technical, organizational, time.]
+
+## Options Considered
+
+### Option 1: [Name]
+**Pros:** ...
+**Cons:** ...
+**Verdict:** ✅ Chosen / ❌ Rejected / ⚠️ Works but...
+
+### Option 2: [Name]
+**Pros:** ...
+**Cons:** ...
+**Verdict:** ...
+
+## Decision
+
+[Which option was chosen and why — what values or priorities drove the choice.]
+
+## Consequences
+
+**Positive:**
+- ...
+
+**Negative:**
+- ...
+
+**Mitigations:**
+- ...
+
+## Review
+
+Revisit if:
+- [Condition that would invalidate this decision]
+
+## Related
+- **Lesson:** [[path/to/lesson.md]]
+- **Pattern:** [[path/to/pattern.md]]
+- **ADR:** [[path/to/related-adr.md]]
+```
