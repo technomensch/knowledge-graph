@@ -56,14 +56,13 @@ find ${kg_path}/lessons-learned -name "*.md" -newer .claude/last-sync-timestamp 
 find ${kg_path}/lessons-learned -name "*.md" -mtime -1
 ```
 
-**Context-mode optimization:** If available, combine scan and MEMORY.md size check:
+**Context-mode optimization:** If available, combine scans:
 
 ```
 ctx_batch_execute(commands: [
   { label: "scan-lessons", command: "find ${kg_path}/lessons-learned -name '*.md' -mtime -1" },
-  { label: "scan-sessions", command: "find ${kg_path}/sessions -name '*.md' -mtime -1" },
-  { label: "memory-size", command: "wc -w < ${memory_path}" }
-], queries: ["new lessons found", "MEMORY.md token count"])
+  { label: "scan-sessions", command: "find ${kg_path}/sessions -name '*.md' -mtime -1" }
+], queries: ["new lessons found"])
 ```
 
 If no new lessons found, also check for:
@@ -113,43 +112,13 @@ If `--dry-run`: Show what would be created/updated but do not write.
 
 ---
 
-## Step 2.5: MEMORY.md Size Check
+## Step 3: Check Governance Signal Status
 
-Before syncing to MEMORY.md, check size limits:
+Check whether update-graph flagged governance signals this session that have not yet been captured via rules-capture.
 
-```bash
-memory_path=~/.claude/projects/$(basename $(pwd))/memory/MEMORY.md
+If governance signals were flagged and no rules were captured: note for session-wrap to surface the plain-language prompt to the user.
 
-if [ -f "$memory_path" ]; then
-  memory_words=$(wc -w < "$memory_path")
-  memory_tokens=$((memory_words * 13 / 10))
-
-  if [ "$memory_tokens" -gt 2000 ]; then
-    echo "MEMORY.md exceeds hard limit: ~${memory_tokens}/2,000 tokens"
-    echo "MEMORY.md token limit reached — consider reviewing and trimming entries manually"
-    SKIP_MEMORY_SYNC=true
-  elif [ "$memory_tokens" -gt 1500 ]; then
-    echo "MEMORY.md approaching limit: ~${memory_tokens}/2,000 tokens"
-    SKIP_MEMORY_SYNC=false
-  else
-    SKIP_MEMORY_SYNC=false
-  fi
-else
-  SKIP_MEMORY_SYNC=false
-fi
-```
-
----
-
-## Step 3: Check MEMORY.md Sync (ADR-011 Protocol)
-
-If new patterns, gotchas, or best practices were discovered:
-1. Check size limits (Step 2.5) — skip if hard limit exceeded
-2. Check if MEMORY.md already has the information
-3. If not and within limits, append to appropriate section
-4. Verify token count after update
-
-If `--dry-run`: Report what would be synced to MEMORY.md.
+If `--dry-run`: Report governance signal status without any action.
 
 ---
 
@@ -227,7 +196,7 @@ Knowledge Sync Complete
 -----------------------
 Lessons scanned:  N (X new, Y modified)
 KG entries:       X created, Y updated
-MEMORY.md:        Updated (N new patterns) | Skipped (over limit) | No changes
+Governance:       N signal(s) flagged (review at session wrap) | No signals
 Plan linked:      [plan name] ([task] linked) | No active plan
 Local issue:      [issue-id] (updated) | None found
 GitHub:           #[N] (comment posted) | Skipped (no remote)
@@ -248,7 +217,7 @@ DRY RUN — No changes made
 
 This agent is idempotent — running multiple times produces the same result:
 - Existing KG entries are updated, not duplicated
-- MEMORY.md checks for existing content before adding
+- Governance signals are checked before flagging (no duplicate flags per lesson)
 - GitHub comments include timestamps to prevent duplicate posts
 - Plan links are checked before adding
 

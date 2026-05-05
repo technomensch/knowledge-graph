@@ -247,7 +247,7 @@ Context: User just completed /kmgraph:capture-lesson
 Proactive suggestion:
 "✅ Lesson captured! Extract insights to Knowledge Graph?"
 - Recommended: /kmgraph:update-graph (extracts patterns/gotchas/concepts)
-- Full pipeline: /kmgraph:sync-all (extraction + MEMORY.md + GitHub)
+- Full pipeline: /kmgraph:sync-all (extraction + governance check + GitHub)
 - Later: Skip for now, run manually later
 
 Why now: Fresh context enables better extraction. The knowledge-reviewer
