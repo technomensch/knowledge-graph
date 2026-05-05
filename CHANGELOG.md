@@ -13,6 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.5.6] — 2026-05-05
+
+### Changed
+- `update-graph` (knowledge-extractor Step 8): removed MEMORY.md write logic; governance-worthy content now emits a plain-language flag in output only — no file writes
+- `rules-capture` skill: added trigger pairing check after rule write — phase-specific rules prompt user in plain language; unconditional rules skip silently
+- `session-wrap` skill: replaced technical file-name language in governance signal with plain-language prompts; added second signal for sessions where governance was flagged but no rules were captured
+- `sync-all`, `update-doc`, `status`, `init`: audited and removed stale governance-role MEMORY.md references
+
+### Fixed
+- Pinned `handlebars >=4.7.9` via overrides to resolve CVE-2026-33937 (Docusaurus build-chain dependency)
+
+### Added
+- ADR-048: documents governance capture routing decision (update-graph → session-wrap as action point)
+
 ## [0.5.5] — 2026-04-29
 
 ### Fixed
