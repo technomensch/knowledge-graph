@@ -248,7 +248,7 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 ## Need More Help?
 
 - **Want detailed examples?** → [Command Guide](reference/command-guide.md) — All commands with full documentation
-- **New to the system?** → [Getting Started](GETTING-STARTED.md) — Setup and first lesson walkthrough
+- **New to the system?** → [Quickstart](quickstart.mdx) — Setup and first lesson walkthrough
 - **Understanding terminology?** → [Concepts Guide](concepts/why-kmgraph.md) — Definitions of all key terms
 - **Using other platforms?** → [Platform Adaptation](reference/PLATFORM-ADAPTATION.md) — Cursor, Windsurf, Continue setup
 - **Configuring settings?** → [Configuration Guide](pillars/organizing/graph-configuration.md) — Post-install options and workflows
@@ -258,9 +258,9 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 ## Related Documentation
 
 **Getting started**:
-- [Getting Started Guide](GETTING-STARTED.md) — Installation, setup wizard, first lesson (5 min)
+- [Quickstart](quickstart.mdx) — Installation, setup wizard, first lesson (5 min)
 - [Installation](INSTALL.md) — Universal installer for all platforms and LLMs
-- [Configuration Guide](CONFIGURATION.md) — Sanitization, team workflows, MCP server configuration
+- [Configuration Guide](pillars/organizing/graph-configuration.md) — Categories, storage paths, and KG structure
 
 **Learning**:
 - [Command Reference Guide](reference/command-guide.md) — Complete command documentation with examples and learning path

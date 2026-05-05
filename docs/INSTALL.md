@@ -37,7 +37,7 @@ This page shows a preview of the installer. To actually install, **copy and past
 :::tip[Claude Code Quick Start]
 
 Claude Code users can follow a manual setup walkthrough instead:
-→ [Claude Code Setup Guide](GETTING-STARTED.md)
+→ [Quickstart](quickstart.mdx)
 Or paste the universal installer above for the same automated experience.
 
 :::
@@ -58,7 +58,7 @@ Users can install on multiple platforms with varying automation levels:
 
 | Platform | Automation | How to Install |
 |----------|-----------|-----------------|
-| **Claude Code** | Full automation | Paste installer (recommended) or follow [Getting Started](GETTING-STARTED.md) |
+| **Claude Code** | Full automation | Paste installer (recommended) or follow [Quickstart](quickstart.mdx) |
 | **Cursor** | Medium (MCP tools) | Paste installer; MCP server handles data layer |
 | **Windsurf** | Medium (MCP tools) | Paste installer; MCP server handles data layer |
 | **Continue.dev** | Medium (MCP tools) | Paste installer; MCP server handles data layer |
@@ -113,7 +113,7 @@ After installation, users can:
 3. **Search knowledge** — Find lessons and patterns across sessions
 4. **Sync knowledge** — Automatically extract and organize captured content
 
-See [Getting Started](GETTING-STARTED.md) for detailed walkthroughs.
+See [Quickstart](quickstart.mdx) for detailed walkthroughs.
 
 ---
 
