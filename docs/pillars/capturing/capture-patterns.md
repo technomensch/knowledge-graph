@@ -1,7 +1,7 @@
 ---
-id: pattern-writing
-title: Write a High-Quality Pattern Entry
-sidebar_label: Pattern writing
+id: capture-patterns
+title: Capture Patterns
+sidebar_label: Capture Patterns
 description: How to structure a reusable pattern entry in the knowledge graph
 ---
 

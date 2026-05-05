@@ -1,7 +1,7 @@
 ---
-id: track-meta-issue
-title: Track a Multi-Attempt Issue
-sidebar_label: Track a meta-issue
+id: document-meta-issues
+title: Document Meta-Issues
+sidebar_label: Document Meta-Issues
 description: Use meta-issue tracking for complex problems that span multiple sessions or branches
 ---
 
