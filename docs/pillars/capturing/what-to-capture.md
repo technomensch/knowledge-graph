@@ -7,6 +7,8 @@ description: How to choose between lessons, ADRs, patterns, and meta-issues.
 
 # What to Capture
 
+> "I have something to save. Which entry type do I use?"
+
 KMGraph has four entry types. Each answers a different question.
 
 ## Decision guide

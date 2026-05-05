@@ -7,18 +7,11 @@ description: How to document an architecture decision with context, rationale, a
 
 # Architecture Decisions
 
-## Goal
+> "We made a design choice. How do we record it so it's not relitigated six months later?"
 
-Capture an architecture decision — a tech choice, design tradeoff, or structural change — with enough context that it can be understood months later without asking the person who made it.
+An ADR (Architecture Decision Record) captures a tech choice or design tradeoff with enough context to understand it months later without asking the person who made it. You'll create one when you've made (or are actively considering) an architecture decision.
 
-## Prerequisites
-
-- KMGraph initialized (`/kmgraph:init`)
-- An architecture decision that has been made (or is being actively considered)
-
-## Steps
-
-**1. Run the ADR command**
+## The command
 
 ```bash
 /kmgraph:create-adr
@@ -26,7 +19,9 @@ Capture an architecture decision — a tech choice, design tradeoff, or structur
 
 The wizard prompts for a title, status, decision summary, context, rationale, consequences, and implementation commit reference.
 
-**2. Fill in the ADR fields**
+Verify with `/kmgraph:recall "ADR keywords"` — the ADR should appear and the file should exist in `docs/decisions/`.
+
+## What to fill in
 
 | Field | What to write |
 |---|---|
@@ -44,7 +39,7 @@ The wizard prompts for a title, status, decision summary, context, rationale, co
 /kmgraph:create-adr --amend ADR-NNN --implements <commit-hash>
 ```
 
-**3. Link related lessons and issues**
+## Link and index
 
 After creation, link the ADR to related lessons:
 
@@ -52,17 +47,7 @@ After creation, link the ADR to related lessons:
 /kmgraph:link-issue --adr ADR-NNN --lesson path/to/lesson.md
 ```
 
-**4. Add to the decisions index**
-
 ADRs are auto-indexed in `docs/decisions/`. No manual step needed if using the command.
-
-## Verify
-
-```bash
-/kmgraph:recall "ADR title or decision keywords"
-```
-
-The ADR should appear. Check `docs/decisions/` to confirm the file was created.
 
 ## Updating an ADR
 

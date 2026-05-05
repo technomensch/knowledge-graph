@@ -7,6 +7,8 @@ description: Use meta-issue tracking for complex problems that span multiple ses
 
 # Document Meta-Issues
 
+> "I've tried this three times and I'm stuck. How do I stop losing context between attempts?"
+
 A **meta-issue** is structured documentation for a problem that requires three or more solution attempts, has an evolving root-cause understanding, and needs a record of what was tried and what was learned across sessions or branches.
 
 ---

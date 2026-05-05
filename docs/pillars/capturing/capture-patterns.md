@@ -7,11 +7,9 @@ description: How to structure a reusable pattern entry in the knowledge graph
 
 # Capture Patterns
 
-## Goal
+> "I keep solving the same class of problem. How do I turn that into something reusable?"
 
-Produce a pattern entry that any team member can apply without revisiting the original problem. A well-formed pattern generalizes a solved problem into a named, reusable solution — it is not a retelling of a single incident.
-
----
+A pattern generalizes a solved problem into a named, reusable solution. Use it when the same class of problem can recur — not just to document a single incident.
 
 ## Patterns vs. Lessons
 
@@ -28,19 +26,7 @@ A lesson is raw material. A pattern is the distillation. Use `/kmgraph:capture-l
 - Lesson: "CI builds failed because the connection pool was exhausted by parallel runners."
 - Pattern: **Connection Pooling** — maintain a shared pool of reusable connections; do not allocate one connection per request.
 
----
-
-## Prerequisites
-
-- The user has a configured knowledge graph (`/kmgraph:status` shows an active graph).
-- The pattern has been observed at least once and has a clear problem–solution pair.
-- The user can state the pattern name in a noun phrase (e.g., "Retry with Exponential Backoff").
-
----
-
-## Steps
-
-### 1. Identify whether the entry qualifies as a pattern
+## The command
 
 A pattern entry is appropriate when all of the following are true:
 
@@ -50,7 +36,17 @@ A pattern entry is appropriate when all of the following are true:
 
 If any condition fails, create a lesson instead.
 
-### 2. Name the pattern
+You've observed the problem at least once and can name the solution in a noun phrase — then run:
+
+```bash
+/kmgraph:capture-lesson --category patterns
+```
+
+When prompted, provide the pattern name as the title and paste the filled template as the body. The command will write the entry to the active knowledge graph and index it for full-text search.
+
+Confirm with `/kmgraph:recall [pattern name]` — the entry should appear.
+
+## Name the pattern
 
 Choose a noun phrase that describes the technique, not the symptom:
 
@@ -59,7 +55,7 @@ Choose a noun phrase that describes the technique, not the symptom:
 
 The name is the primary search key. It must be recognizable out of context.
 
-### 3. Fill in the pattern template
+## The pattern template
 
 ```markdown
 ## [Pattern Name]
@@ -84,17 +80,7 @@ The name is the primary search key. It must be recognizable out of context.
 
 Every field is required. A missing "When to use" section is the most common reason a pattern becomes useless six months later.
 
-### 4. Capture the pattern
-
-Run the capture command, specifying the `patterns` category:
-
-```bash
-/kmgraph:capture-lesson --category patterns
-```
-
-When prompted, provide the pattern name as the title and paste the filled template as the body. The command will write the entry to the active knowledge graph and index it for full-text search.
-
-### 5. Link the originating lesson
+## Link the lesson
 
 If the pattern was derived from a specific lesson, open that lesson file and add a cross-reference in its `Cross-References` section:
 
@@ -103,25 +89,19 @@ If the pattern was derived from a specific lesson, open that lesson file and add
 - **Pattern:** [[patterns/connection-pooling.md]]
 ```
 
-Bidirectional linking is required for the graph traversal in `/kmgraph:recall` to surface the connection.
+Bidirectional linking is required for the graph traversal in `/kmgraph:recall` to surface the connection. Maintain links in both directions: in the **pattern file**, list every lesson that instantiates or informs the pattern under `Cross-References`; in each **lesson file**, list the derived pattern under its `Cross-References` section. Use the wiki-link format `[[relative/path.md]]` for all internal references — absolute URLs and bare filenames are not indexed by the graph traversal engine.
+
+## Related
+
+- [Capture Lessons Learned](./capture-lessons-learned.md) — the foundational capture flow
+- [Architecture Decisions](./architecture-decisions.md) — when a pattern influences a design choice
+- [What to Capture](./what-to-capture.md) — deciding which entry type fits
 
 ---
 
-## Verify
+## Reference
 
-After capture, confirm the entry is searchable and well-formed:
-
-1. Run `/kmgraph:recall [pattern name]` — the new entry should appear in results.
-2. Open the captured file and check:
-   - All five template fields are present and non-empty.
-   - "When to use" has at least two specific trigger conditions.
-   - "Cross-References" links resolve to real files.
-   - The pattern name appears in the file's heading (used by graph indexing).
-3. If the originating lesson exists, open it and confirm the back-link is in place.
-
----
-
-## Good pattern vs. weak pattern
+### Good pattern vs. weak pattern
 
 **Weak pattern entry:**
 
@@ -166,22 +146,7 @@ application instances borrow from and return to the pool.
 
 The strong version names a specific condition, states a testable solution, gives numeric guidance, and links to the evidence.
 
----
-
-## Linking patterns to related lessons
-
-Patterns and lessons form a two-way reference network. Maintain links in both directions:
-
-- In the **pattern file**: list every lesson that instantiates or informs the pattern under `Cross-References`.
-- In each **lesson file**: list the derived pattern under its `Cross-References` section.
-
-This enables `/kmgraph:recall` and `/kmgraph:update-graph` to traverse the network and surface related knowledge automatically.
-
-Use the wiki-link format `[[relative/path.md]]` for all internal references. Absolute URLs and bare filenames are not indexed by the graph traversal engine.
-
----
-
-## STAR Format
+### STAR format
 
 Structure knowledge narratives to answer:
 
@@ -190,9 +155,7 @@ Structure knowledge narratives to answer:
 - **Action:** What did you do?
 - **Result:** What happened?
 
----
-
-## Review Checklist
+### Review checklist
 
 Before finalizing a pattern (or any knowledge entry):
 
@@ -221,11 +184,9 @@ Before finalizing a pattern (or any knowledge entry):
 - [ ] Concise enough to be readable
 - [ ] Free of sensitive data
 
----
+### Common mistakes
 
-## Common Mistakes
-
-### 1. Too abstract
+#### 1. Too abstract
 
 **Weak:**
 ```markdown
@@ -240,7 +201,7 @@ Reduced API response time from 5s to 300ms by converting
 15 sequential queries to a single JOIN query.
 ```
 
-### 2. Missing context
+#### 2. Missing context
 
 **Weak:**
 ```markdown
@@ -255,7 +216,7 @@ Increased PostgreSQL max_connections from 50 to 100.
 **Impact:** Eliminated "too many connections" errors.
 ```
 
-### 3. No replication steps
+#### 3. No replication steps
 
 **Weak:**
 ```markdown
@@ -271,7 +232,7 @@ Fixed the bug by adding validation.
 4. Add test in `tests/validation.test.js`
 ```
 
-### 4. Weak cross-references
+#### 4. Weak cross-references
 
 **Weak:**
 ```markdown
@@ -286,11 +247,3 @@ Related to some other docs.
 - **Related Lesson:** [[debugging/validation-regression.md]]
 - **ADR:** [[ADR-008-validation-strategy.md]]
 ```
-
----
-
-## Related
-
-- [Capture Lessons Learned](./capture-lessons-learned.md) — the foundational capture flow
-- [Architecture Decisions](./architecture-decisions.md) — when a pattern influences a design choice
-- [What to Capture](./what-to-capture.md) — deciding which entry type fits
