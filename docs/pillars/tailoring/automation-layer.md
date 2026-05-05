@@ -7,7 +7,7 @@ description: How skills, agents, hooks, and auto-capture trigger keywords work t
 
 # The Automation Layer
 
-KMGraph runs a layer of automation that fires without explicit commands. This page explains what that automation consists of, when each piece fires, and how the parts work together.
+KMGraph runs a layer of automation that fires without explicit commands. This page explains how skills, agents, and hooks coordinate to capture knowledge at the right moments without interrupting your workflow.
 
 ## Three components
 

@@ -39,3 +39,9 @@ Don't wait until the end of the week — capture while the context is fresh.
 ## What's next
 
 Not sure what type of entry to create? See [What to Capture](./what-to-capture.md) for a guide on choosing between lessons, decisions, patterns, and meta-issues.
+
+## Related
+
+- [What to Capture](./what-to-capture.md)
+- [Capture from a Bugfix](./capture-from-bugfix.md)
+- [Architecture Decisions](./architecture-decisions.md)

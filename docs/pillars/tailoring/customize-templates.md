@@ -76,7 +76,7 @@ In `kg-config.json`, add a `templateOverrides` block:
 
 Run a capture command and confirm the custom fields appear in the output file.
 
-## Next steps
+## Related
 
-- [Reference — Templates](/reference/templates) — full template catalog (Phase 6)
-- [Customize hooks](/knowledge-graph/pillars/tailoring/customize-hooks) — automate template selection based on context
+- [Customize hooks](./customize-hooks.md) — automate template selection based on context
+- [Custom rules](./custom-rules.md) — define how templates apply to different content types

@@ -69,5 +69,5 @@ The entry count should reflect the backfilled content. Then test search:
 
 ## Next steps
 
-- [Recall a past decision](/quickstart#step-4--recall-it) — search the now-populated graph
-- [Sync across machines](/knowledge-graph/pillars/portability/sync-across-machines) — share the populated graph
+- [Recall a past decision](../../quickstart.md#step-4--recall-it) — search the now-populated graph
+- [Sync across machines](../portability/sync-across-machines.md) — share the populated graph

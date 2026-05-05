@@ -5,25 +5,19 @@ sidebar_label: Sanitize Before Sharing
 description: Remove sensitive data from the knowledge graph before sharing with teammates or making it public
 ---
 
-# Sanitize a KG Before Sharing
+# Sanitize Before Sharing
 
 This guide walks through scanning a knowledge graph for sensitive data and cleaning it before sharing with teammates or publishing publicly.
-
----
 
 ## Goal
 
 Remove credentials, personal information, internal infrastructure details, and company-specific data from the knowledge graph so it can be shared safely without leaking secrets or private context.
-
----
 
 ## Prerequisites
 
 - An active knowledge graph (run `/kmgraph:status` to confirm)
 - KMGraph v0.0.6 or later
 - Write access to `kg-config.json` in the knowledge graph root
-
----
 
 ## Steps
 
@@ -126,8 +120,6 @@ chmod +x .git/hooks/pre-commit
 ```
 
 The hook reads the same patterns from `kg-config.json`. Patterns with `"severity": "block"` will abort the commit; `"severity": "warn"` patterns print a warning but allow the commit through.
-
----
 
 ## Verify
 

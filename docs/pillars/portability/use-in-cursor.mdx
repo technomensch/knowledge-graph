@@ -96,11 +96,7 @@ Alternatively, add to `.vscode/settings.json`:
   </TabItem>
   <TabItem value="jetbrains" label="JetBrains">
 
-In JetBrains settings → Tools → AI Assistant → MCP Servers, add:
-
-- **Name:** `kmgraph`
-- **Command:** `node`
-- **Args:** `/path/to/knowledge-graph/mcp-server/dist/index.js`
+In JetBrains settings → Tools → AI Assistant → MCP Servers, add a new server with name `kmgraph`, command `node`, and args `/path/to/knowledge-graph/mcp-server/dist/index.js`.
 
   </TabItem>
   <TabItem value="continue" label="Continue.dev">
@@ -152,5 +148,5 @@ All `kg_*` tools are available: `kg_capture`, `kg_search`, `kg_config_init`, `kg
 
 ## Next steps
 
-- [Platform Adaptation reference](/reference/PLATFORM-ADAPTATION) — full IDE compatibility matrix
-- [Migrate between Claude and Gemini](/guides/migrate-claude-gemini) — switching platforms with KG continuity
+- [Platform Adaptation reference](../../reference/PLATFORM-ADAPTATION.md) — full IDE compatibility matrix
+- [Migrate between Claude and Gemini](./migrate-claude-gemini.md) — switching platforms with KG continuity

@@ -145,4 +145,9 @@ Each layer depends only on the layer below it. Skills never call MCP tools direc
 | **Automation reliability** | The Lifecycle Layer guarantees critical actions run on every session, independent of conversational flow. |
 | **Testability** | Layers can be tested in isolation. Mock the Data Layer to test Logic. Mock Logic to test Context. |
 
-For detailed command dispatching and execution examples, see [Command Reference](reference/command-guide.md). For system design and data flow diagrams, see [Architecture Guide](reference/ARCHITECTURE.md).
+For detailed command dispatching and execution examples, see [Command Reference](../reference/command-guide.md). For system design and data flow diagrams, see [Architecture Guide](../reference/ARCHITECTURE.md).
+
+## Related
+
+- [Four content types](./four-content-types.md) — lessons, decisions, patterns, and session summaries
+- [Why KMGraph?](./why-kmgraph.md) — the problem KMGraph solves

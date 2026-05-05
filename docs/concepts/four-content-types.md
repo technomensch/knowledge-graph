@@ -145,3 +145,9 @@ flowchart LR
 "2024-01-15 Database Migration Session" — records what was built, what was decided, what was learned, and what comes next.
 
 :::
+
+## Related
+
+- [What is a knowledge graph?](./what-is-a-knowledge-graph.md) — the graph structure and how KMGraph implements it
+- [How KMGraph is organized](./how-kmgraph-is-organized.md) — the layered architecture around the graph
+- [Why KMGraph?](./why-kmgraph.md) — the problem KMGraph solves

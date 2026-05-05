@@ -5,6 +5,8 @@ sidebar_label: Document Meta-Issues
 description: Use meta-issue tracking for complex problems that span multiple sessions or branches
 ---
 
+# Document Meta-Issues
+
 A **meta-issue** is structured documentation for a problem that requires three or more solution attempts, has an evolving root-cause understanding, and needs a record of what was tried and what was learned across sessions or branches.
 
 ---
@@ -217,6 +219,12 @@ After closing, confirm `README.md` status field reads `Resolved`, `Abandoned`, o
 - Review the worked example at `core/examples/meta-issue/example-performance-saga/`
 - Use `/kmgraph:recall` to search across meta-issues and lessons when starting a related problem
 - Consider creating an ADR if the resolution produced a reusable architecture decision
+
+## Related
+
+- [Capture Lessons Learned](./capture-lessons-learned.md)
+- [Architecture Decisions](./architecture-decisions.md)
+- [What to Capture](./what-to-capture.md)
 
 ---
 

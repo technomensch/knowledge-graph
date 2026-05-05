@@ -87,7 +87,7 @@ mv hooks/hooks.json.disabled hooks/hooks.json
 
 After changes, start a new Claude Code session and check that the hook behavior matches expectations. The `SessionStart` hook output appears at session start.
 
-## Next steps
+## Related
 
-- [Reference — Hooks](/reference/hooks) — full lifecycle event reference (Phase 6)
-- [Customize templates](/knowledge-graph/pillars/tailoring/customize-templates) — modify the knowledge entry templates
+- [Customize templates](./customize-templates.md) — modify the knowledge entry templates
+- [Custom rules](./custom-rules.md) — define enforcement rules at the shell level

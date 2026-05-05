@@ -95,6 +95,6 @@ The response should cite specific lessons from the knowledge graph.
 
 ## Next steps
 
-- [Integrate with Obsidian](/knowledge-graph/pillars/portability/integrate-obsidian) — graph view browsing
-- [Integrate with Notion](/knowledge-graph/pillars/portability/integrate-notion) — team database mirror
-- [Sanitize before sharing](/knowledge-graph/pillars/organizing/sanitize-before-sharing) — review before uploading to any cloud service
+- [Integrate with Obsidian](./integrate-obsidian.md) — graph view browsing
+- [Integrate with Notion](./integrate-notion.md) — team database mirror
+- [Sanitize before sharing](../organizing/sanitize-before-sharing.md) — review before uploading to any cloud service

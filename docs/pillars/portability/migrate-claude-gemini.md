@@ -68,5 +68,5 @@ Copy the contents of `core/templates/AGENTS-template.md` into your project's `AG
 
 ## Next steps
 
-- [Use in Cursor/Windsurf/VS Code](/knowledge-graph/pillars/portability/use-in-cursor) — IDE-specific setup
-- [Platform Adaptation reference](/reference/PLATFORM-ADAPTATION) — full compatibility matrix
+- [Use in Cursor/Windsurf/VS Code](./use-in-cursor.mdx) — IDE-specific setup
+- [Platform Adaptation reference](../../reference/PLATFORM-ADAPTATION.md) — full compatibility matrix
