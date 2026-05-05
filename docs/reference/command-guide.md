@@ -227,7 +227,7 @@ After setup:
 # Active KG unchanged
 ```
 
-**Related**: See [Personal vs Project Knowledge](CONCEPTS.md#personal-vs-project-knowledge) for when to use each.
+**Related**: See [Personal vs Project Knowledge](../pillars/organizing/personal-vs-project.md) for when to use each.
 
 ---
 
@@ -275,7 +275,7 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 
 **Purpose**: Identifies lessons while context is still fresh and captures both the problem and how it was solved. By automatically linking lessons to relevant metadata, the record is searchable and reusable across future sessions and projects.
 
-> **Command refactored in v0.2.1-beta: 710 → 108 lines.** Execution logic delegated to `agents/` for platform portability. See [CONCEPTS.md § Four-Layer Architecture](CONCEPTS.md).
+> **Command refactored in v0.2.1-beta: 710 → 108 lines.** Execution logic delegated to `agents/` for platform portability. See [CONCEPTS.md § Four-Layer Architecture](../concepts/why-kmgraph.md).
 
 **When to use**:
 
@@ -382,7 +382,7 @@ Quick Commands:
 
 **Purpose**: Search across lessons, decisions, patterns, and sessions in one command. When a personal KG is registered, both knowledge graphs are searched automatically, with source labels on every result.
 
-> **Command refactored in v0.2.1-beta: 437 → 79 lines.** Execution logic delegated to `agents/` for platform portability. See [CONCEPTS.md § Four-Layer Architecture](CONCEPTS.md).
+> **Command refactored in v0.2.1-beta: 437 → 79 lines.** Execution logic delegated to `agents/` for platform portability. See [CONCEPTS.md § Four-Layer Architecture](../concepts/why-kmgraph.md).
 
 **When to use**:
 
@@ -1367,7 +1367,7 @@ flowchart TD
 
   One-page quick reference
 
-- [Concepts](CONCEPTS.md)
+- [Concepts](../concepts/why-kmgraph.md)
 
   Term definitions
 </div>
@@ -1399,7 +1399,7 @@ flowchart TD
 
   One-page cheat sheet with all commands at a glance.
 
-- **[Concepts Guide](CONCEPTS.md)**
+- **[Concepts Guide](../concepts/why-kmgraph.md)**
 
   Plain-English explanations of all key terms and patterns.
 
@@ -1432,7 +1432,7 @@ flowchart TD
 
   One-page cheat sheet for common tasks
 
-- [Concepts Guide](CONCEPTS.md)
+- [Concepts Guide](../concepts/why-kmgraph.md)
 
   Plain-English definitions of every term and pattern
 

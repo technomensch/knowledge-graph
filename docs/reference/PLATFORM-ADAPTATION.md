@@ -300,9 +300,9 @@ Knowledge is portable — the same `docs/` directory works with all platforms. A
 - [Getting Started](../GETTING-STARTED.md) — Claude Code setup guide
 
 **Core Concepts & Reference**:
-- [Concepts Guide](../CONCEPTS.md) — Plain-English term explanations
+- [Concepts Guide](../concepts/why-kmgraph.md) — Plain-English term explanations
 - [Configuration](../CONFIGURATION.md) — Post-install customization
-- [Command Guide](../COMMAND-GUIDE.md) — All commands (Claude Code users)
+- [Command Guide](command-guide.md) — All commands (Claude Code users)
 
 **Guides**:
 - [Architecture Guide](./ARCHITECTURE.md) — System design overview

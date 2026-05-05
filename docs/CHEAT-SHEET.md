@@ -9,7 +9,7 @@ description: Quick reference for common KMGraph workflows and commands
 
 > **Claude Code only:** The `/kmgraph:` prefix requires Claude Code with this plugin installed. Other IDEs access equivalent functionality through MCP tools.
 
-One-page cheat sheet for the Knowledge Management Graph. For detailed documentation, see [Command Guide](COMMAND-GUIDE.md).
+One-page cheat sheet for the Knowledge Management Graph. For detailed documentation, see [Command Guide](reference/command-guide.md).
 
 ---
 
@@ -120,7 +120,7 @@ Heavy-lift task handlers. Usually invoked automatically by skills/commands.
 | create-adr-agent | ADR creation wizard | Via `/kmgraph:create-adr` command |
 | knowledge-reviewer | Quality review for lessons and ADRs | Via `/kmgraph:update-graph` command |
 
-See [Concepts Guide](CONCEPTS.md) § Four-Layer Architecture for full agent overview and when each operates.
+See [Concepts Guide](concepts/why-kmgraph.md) § Four-Layer Architecture for full agent overview and when each operates.
 
 ---
 
@@ -247,9 +247,9 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 
 ## Need More Help?
 
-- **Want detailed examples?** → [Command Guide](COMMAND-GUIDE.md) — All commands with full documentation
+- **Want detailed examples?** → [Command Guide](reference/command-guide.md) — All commands with full documentation
 - **New to the system?** → [Getting Started](GETTING-STARTED.md) — Setup and first lesson walkthrough
-- **Understanding terminology?** → [Concepts Guide](CONCEPTS.md) — Definitions of all key terms
+- **Understanding terminology?** → [Concepts Guide](concepts/why-kmgraph.md) — Definitions of all key terms
 - **Using other platforms?** → [Platform Adaptation](reference/PLATFORM-ADAPTATION.md) — Cursor, Windsurf, Continue setup
 - **Configuring settings?** → [Configuration Guide](CONFIGURATION.md) — Post-install options and workflows
 
@@ -263,8 +263,8 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 - [Configuration Guide](CONFIGURATION.md) — Sanitization, team workflows, MCP server configuration
 
 **Learning**:
-- [Command Reference Guide](COMMAND-GUIDE.md) — Complete command documentation with examples and learning path
-- [Concepts Guide](CONCEPTS.md) — Plain-English definitions and explanations of all key terms
+- [Command Reference Guide](reference/command-guide.md) — Complete command documentation with examples and learning path
+- [Concepts Guide](concepts/why-kmgraph.md) — Plain-English definitions and explanations of all key terms
 - [Examples](examples/) — Real-world lesson, ADR, and KG entry examples
 
 **Advanced topics**:
