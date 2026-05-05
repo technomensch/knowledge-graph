@@ -79,4 +79,4 @@ Run a capture command and confirm the custom fields appear in the output file.
 ## Next steps
 
 - [Reference — Templates](/reference/templates) — full template catalog (Phase 6)
-- [Customize hooks](/guides/customize-hooks) — automate template selection based on context
+- [Customize hooks](/knowledge-graph/pillars/tailoring/customize-hooks) — automate template selection based on context

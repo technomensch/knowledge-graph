@@ -11,17 +11,19 @@ KMGraph doesn't wait for you to search. At the start of every Claude session, it
 
 ## How it works
 
-Three sources inject at session start (via the SessionStart hook):
+Four sources inject at session start (via the SessionStart hook):
 
-1. **MEMORY.md** — your auto-memory index. Claude Code reads this file at the start of every session. KMGraph writes a pointer to each KG entry here so they're surfaced passively.
+1. **MEMORY.md** — a lightweight index of pointers to your KG entries. Claude Code reads this at the start of every session. The full entries stay in your knowledge graph; MEMORY.md is the scannable table of contents the AI reads first.
 
-2. **me.md** — your identity file. Describes your working style, expertise, and preferences so the AI calibrates its responses without you explaining it each session.
+2. **me.md** — your AI profile. Describes your role, working style, expertise, and preferences so the AI calibrates its responses without you re-explaining every session. See [Your AI Profile](../portability/your-ai-profile.md) for setup and full details.
 
-3. **triggers.md** — declares when specific rules apply. Example: "Before pushing, always run X." The trigger fires the rule at the right moment.
+3. **rules.md** — behavioral instructions for the AI. "Always run tests before pushing." "Never auto-merge." Rules are loaded via the platform shim (CLAUDE.md, .cursorrules) so every tool on the project reads the same rules.
+
+4. **triggers.md** — declares *when* specific rules apply. Example: "Before pushing, always run X." The trigger fires the rule at the right moment rather than loading every rule into every message.
 
 ## What MEMORY.md contains
 
-MEMORY.md is an index — it holds one-line pointers to KG entries, not the entries themselves. This keeps it scannable. The full entry is in your knowledge graph; MEMORY.md is the table of contents the AI reads first.
+MEMORY.md is a **lightweight index** — it holds one-line pointers to your KG entries, not the entries themselves. This keeps it under the token budget. The full content lives in your knowledge graph files; MEMORY.md is what the AI skims at session start to know what knowledge is available.
 
 ## What gets injected
 

@@ -76,8 +76,8 @@ To supersede an existing decision:
 
 ## Next steps
 
-- [Write a pattern entry](/guides/pattern-writing) for patterns uncovered during the decision process
-- [Track a meta-issue](/guides/track-meta-issue) if the decision spawned a multi-session implementation
+- [Write a pattern entry](/knowledge-graph/pillars/capturing/capture-patterns) for patterns uncovered during the decision process
+- [Track a meta-issue](/knowledge-graph/pillars/capturing/document-meta-issues) if the decision spawned a multi-session implementation
 - [Reference — ADR index](/decisions/) for all existing decisions
 
 ---

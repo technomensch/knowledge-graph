@@ -84,5 +84,5 @@ The lesson should appear.
 
 ## Next steps
 
-- [Multi-KG workflows](/guides/multi-kg-workflows) — managing project-local, personal, and cowork KGs
-- [Sanitize before sharing](/guides/sanitize-before-sharing) — remove sensitive data before pushing to a shared remote
+- [Multi-KG workflows](/knowledge-graph/pillars/organizing/multi-kg-workflows) — managing project-local, personal, and cowork KGs
+- [Sanitize before sharing](/knowledge-graph/pillars/organizing/sanitize-before-sharing) — remove sensitive data before pushing to a shared remote

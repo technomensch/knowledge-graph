@@ -297,7 +297,7 @@ See [SANITIZATION-CHECKLIST.md](./SANITIZATION-CHECKLIST.md) for complete guide.
 
 - Copy `core/` to project
 - Use templates manually
-- Follow workflows in `core/docs/WORKFLOWS.md`
+- Follow workflows in `../pillars/recalling/session-memory.md`
 - Optionally use MCP server
 
 ### MCP Server (Universal Access)
@@ -339,7 +339,7 @@ Any MCP-compatible platform can access.
 
 ## Related
 
-- **Patterns Guide:** [PATTERNS-GUIDE.md](./PATTERNS-GUIDE.md)
-- **Workflows:** [WORKFLOWS.md](./WORKFLOWS.md)
+- **Patterns Guide:** [PATTERNS-GUIDE.md](../pillars/capturing/capture-patterns.md)
+- **Workflows:** [WORKFLOWS.md](../pillars/recalling/session-memory.md)
 - **Platform Adaptation:** [PLATFORM-ADAPTATION.md](./PLATFORM-ADAPTATION.md)
 - **Examples:** [../examples/](../examples/)

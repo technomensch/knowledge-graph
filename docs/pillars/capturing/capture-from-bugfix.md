@@ -62,5 +62,5 @@ The lesson should appear in results. If not, run `/kmgraph:update-graph` to extr
 ## Next steps
 
 - [Capture the pipeline diagram explained](/quickstart#the-capture-pipeline)
-- [Write a pattern entry](/guides/pattern-writing) if the bug reveals a reusable pattern
-- [Create an ADR](/guides/create-adr) if the fix changes architecture
+- [Write a pattern entry](/knowledge-graph/pillars/capturing/capture-patterns) if the bug reveals a reusable pattern
+- [Create an ADR](/knowledge-graph/pillars/capturing/architecture-decisions) if the fix changes architecture
