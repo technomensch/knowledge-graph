@@ -1,6 +1,6 @@
 {
   "name": "knowledge-graph-plugin",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "description": "Structured knowledge capture and cross-session memory for Claude Code projects.",
   "files": [
     ".claude-plugin/",
@@ -52,7 +52,8 @@
   "overrides": {
     "follow-redirects": ">=1.16.0",
     "serialize-javascript": ">=7.0.5",
-    "dompurify": ">=3.4.0"
+    "dompurify": ">=3.4.0",
+    "handlebars": ">=4.7.9"
   },
   "dependencies": {
     "@docusaurus/plugin-client-redirects": "^3.10.0",

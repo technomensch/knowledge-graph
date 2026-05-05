@@ -70,7 +70,7 @@ Resolved file: $TARGET_FILE
 
 2. Knowledge graph content
    Content created using the plugin
-   (lessons, KG entries, ADRs, session summaries, MEMORY.md)
+   (lessons, KG entries, ADRs, session summaries)
    → Confirm to update KG content
 
 3. Cancel

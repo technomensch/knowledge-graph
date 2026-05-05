@@ -485,16 +485,17 @@ if [ -n "$MEMORY_FILE" ]; then
   fi
 fi
 
-# i. MEMORY.md feedback-entry backfill offer (upgrade only)
+# i. Legacy feedback-entry backfill offer (upgrade only)
 # Run only when upgrading an existing KG that has rules.md scaffold or content.
-# Scans project MEMORY.md for feedback-type entries not already mirrored in rules.md.
+# Scans project MEMORY.md for feedback-type entries previously stored there (legacy)
+# that have not yet been migrated to rules.md.
 
 if [ -n "$MEMORY_FILE" ] && [ -f "knowledge/rules.md" ]; then
   # Identify feedback entries: lines containing "[→ rules.md]" marker or entries
   # whose content is not already present in rules.md (keyword overlap check).
   # Display each candidate and offer to migrate:
   #
-  #   Found N feedback rule(s) in MEMORY.md not yet in knowledge/rules.md:
+  #   Found N legacy feedback rule(s) in MEMORY.md not yet migrated to knowledge/rules.md:
   #
   #   1. "Never delete branches without explicit user approval" [→ rules.md]
   #   2. "Always open the plan file in the editor after writing it" [→ rules.md]
@@ -509,7 +510,7 @@ if [ -n "$MEMORY_FILE" ] && [ -f "knowledge/rules.md" ]; then
   # Do NOT remove the MEMORY.md entry — leave it as a pointer with [→ rules.md] already appended.
   # Do NOT auto-write without per-entry confirmation.
   echo ""
-  echo "  Checking MEMORY.md for unmirrored behavioral rules..."
+  echo "  Checking MEMORY.md for legacy behavioral rules not yet migrated to rules.md..."
   # [Implementation: parse $MEMORY_FILE for lines containing '[→ rules.md]' or
   #  lines under a 'feedback' section; cross-check against knowledge/rules.md content;
   #  surface any that appear absent; offer migration per entry]
@@ -521,8 +522,9 @@ fi
 # - If MEMORY.md does not exist or path cannot be found, skip block silently.
 # - Draft format must match existing knowledge/rules.md house style:
 #   "- [Always/Never] [directive]" with optional "  - Why:" and "  - Source:" sub-bullets.
-# Note: feedback-type MEMORY.md entries (behavioral corrections → project rules.md) are
-# handled here. Step 1.6.5 covers only user-type entries (role, preferences → personal me.md).
+# Note: feedback-type MEMORY.md entries are a legacy migration path — MEMORY.md is no longer
+# the active governance store. New behavioral rules go directly to rules.md via rules-capture.
+# Step 1.6.5 covers only user-type entries (role, preferences → personal me.md).
 
 # f. Clear migration flag
 jq 'del(.graphs["'"$kg_name"'"].migration_in_progress)' \
