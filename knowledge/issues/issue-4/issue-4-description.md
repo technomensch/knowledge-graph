@@ -1,11 +1,13 @@
 ---
 id: issue-4
 type: Bug
-status: in-progress
+status: resolved
 github-issue: "#106"
 branch: v0.5.5-fix-session-flag-dedup
 plan: docs/plans/v0.5.5-fix-session-flag-dedup.md
 created: 2026-04-28
+resolved: 2026-04-29
+fix-commits: ["667e7a87", "fb37e2ea"]
 ---
 
 # Issue-4: Stop Hook /tmp Flag Accumulates Per-Subprocess Instead of Per-Session
@@ -49,3 +51,11 @@ Discovered during v0.5.4 session wrap-up (2026-04-28). Branch `v0.5.4-profile-au
 
 - `session-wrap` skill — the double-prompt prevention mechanism this flag supports
 - ADR-020 — lifecycle hooks suite
+
+## Resolution
+
+**Resolved 2026-04-29** via branch `v0.5.5-fix-session-flag-dedup` (commits `667e7a87`, `fb37e2ea`).
+
+Implemented option 3 from the proposed fix: key the flag on `{kg-name}-{date}` with no PID component. `$CLAUDE_SESSION_ID` was not available in the hook environment. The date+kg-name key is stable across all subprocesses within a session and provides per-KG granularity when multiple KGs are active on the same day.
+
+ADR-020 amended to document the flag key change.
