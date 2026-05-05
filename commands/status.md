@@ -213,4 +213,4 @@ Output:
 
 - `/kmgraph:list` — View all configured KGs
 - `/kmgraph:switch` — Change active KG
-- `/kmgraph:sync-all` — Sync KG with MEMORY.md
+- `/kmgraph:sync-all` — Sync KG and review governance signals
