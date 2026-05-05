@@ -707,3 +707,28 @@ Run this checklist before marking documentation complete or committing a new or 
 **Created**: 2026-02-20
 **Version**: 1.0
 **Applies to**: v0.0.7-alpha and later
+
+---
+
+## Wayfinding
+
+Every pillar landing page and guide page that leads naturally to another skill must include a cross-pillar link.
+
+### Format
+
+Use a "What's next" or "Related" block at the bottom of any page that has a natural continuation:
+
+```markdown
+## What's next
+
+Ready to find what you captured? See [Recalling](../recalling/search-the-graph.md) — the point of capturing is finding it later.
+
+Need to keep the graph tidy as it grows? See [Organizing](../organizing/personal-vs-project.md).
+```
+
+### Rules
+
+1. Every pillar landing links to at least 2 sibling pillars with a one-sentence reason — not just "see also."
+2. The reason must answer "why would I go there next?" — not just describe what the page covers.
+3. Reference pages (`reference/`) are linked *from* pillar content but do not link back into the learning sequence.
+4. Do not add wayfinding to reference pages.
