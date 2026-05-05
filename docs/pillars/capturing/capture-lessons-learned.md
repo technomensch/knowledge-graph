@@ -55,3 +55,36 @@ This preserves the full session context alongside the lesson.
 - [What to Capture](./what-to-capture.md) — choose between lessons, ADRs, patterns, and meta-issues
 - [Architecture Decisions](./architecture-decisions.md) — when the fix changes a design choice
 - [Capture Patterns](./capture-patterns.md) — if the bug reveals a reusable pattern
+
+---
+
+## Template
+
+Full lesson template for manual use or reference:
+
+```markdown
+# [Short descriptive title — names the root cause]
+
+**Tags:** [technology, error-code, module]
+**Date:** YYYY-MM-DD
+
+## Problem
+
+[What the bug or situation looked like from the outside.]
+
+## Root Cause
+
+[The actual cause — be specific.]
+
+## Solution
+
+[Exactly what fixed it.]
+
+## Prevention
+
+[How to avoid this next time.]
+
+## Related
+- **ADR:** [[path/to/related-adr.md]]
+- **Pattern:** [[path/to/related-pattern.md]]
+```
