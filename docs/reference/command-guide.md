@@ -1,7 +1,7 @@
 ---
-id: COMMAND-GUIDE
+id: command-guide
 title: Command Guide
-sidebar_label: Commands
+sidebar_label: Command Guide
 description: "Complete reference for all /kmgraph: slash commands"
 ---
 

@@ -1,7 +1,7 @@
 ---
 id: customize-templates
-title: Customize Knowledge Entry Templates
-sidebar_label: Customize templates
+title: Customize Templates
+sidebar_label: Customize Templates
 description: How to modify the lesson, ADR, session, and other templates to match project conventions
 ---
 

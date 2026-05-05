@@ -1,7 +1,7 @@
 ---
-id: pillars-four
-title: Four Pillars
-sidebar_label: Four Pillars
+id: four-content-types
+title: Four Content Types
+sidebar_label: Four Content Types
 description: "Four distinct knowledge types: Lessons, Patterns, Decisions, and Gotchas"
 ---
 

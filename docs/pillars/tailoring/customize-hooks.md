@@ -1,7 +1,7 @@
 ---
 id: customize-hooks
-title: Customize or Disable Hooks
-sidebar_label: Customize hooks
+title: Customize Hooks
+sidebar_label: Customize Hooks
 description: How to configure, extend, or disable the KMGraph lifecycle hooks
 ---
 
