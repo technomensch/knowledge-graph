@@ -1,7 +1,7 @@
 ---
-id: PERSONAL-V-PROJECT
-title: Personal vs Project KGs
-sidebar_label: Personal vs Project
+id: personal-vs-project
+title: Personal vs. Project
+sidebar_label: Personal vs. Project
 description: Understanding personal and project-scoped knowledge graphs
 ---
 

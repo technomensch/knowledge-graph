@@ -1,7 +1,7 @@
 ---
 id: sanitize-before-sharing
-title: Sanitize a KG Before Sharing
-sidebar_label: Sanitize before sharing
+title: Sanitize Before Sharing
+sidebar_label: Sanitize Before Sharing
 description: Remove sensitive data from the knowledge graph before sharing with teammates or making it public
 ---
 
