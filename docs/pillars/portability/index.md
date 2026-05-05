@@ -19,4 +19,8 @@ Your knowledge graph is plain Markdown — it works everywhere. This pillar cove
 - [Integrate Obsidian](./integrate-obsidian.md) — bidirectional sync with Obsidian
 - [Integrate Notion](./integrate-notion.md) — connecting KMGraph to Notion
 - [Integrate NotebookLM](./integrate-notebooklm.md) — using NotebookLM as a knowledge layer
-- [Use in Cursor](./use-in-cursor.md) — Cursor setup and MCP configuration
+- [Use in Cursor](./use-in-cursor.mdx) — Cursor setup and MCP configuration
+
+## Related
+
+- [Recalling](../recalling/index.md) — searching and retrieving knowledge across sessions and platforms

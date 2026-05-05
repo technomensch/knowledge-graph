@@ -70,7 +70,7 @@ Use notion-search to find "Redis timeout" across the KMGraph Lessons database.
 
 ## Keeping the mirror current
 
-After each `/kmgraph:capture-lesson`, run the mirror step for the new file. Or add a `PostToolUse` hook that auto-mirrors captures to Notion (see [Customize hooks](/knowledge-graph/pillars/tailoring/customize-hooks)).
+After each `/kmgraph:capture-lesson`, run the mirror step for the new file. Or add a `PostToolUse` hook that auto-mirrors captures to Notion (see [Customize hooks](../tailoring/customize-hooks.md)).
 
 ## Verify
 
@@ -78,5 +78,5 @@ Open the Notion database in a browser. Each lesson should appear as a page with 
 
 ## Next steps
 
-- [Integrate with Obsidian](/knowledge-graph/pillars/portability/integrate-obsidian) — browse the KG in Obsidian vault view
-- [Sanitize before sharing](/knowledge-graph/pillars/organizing/sanitize-before-sharing) — ensure no sensitive data is mirrored
+- [Integrate with Obsidian](./integrate-obsidian.md) — browse the KG in Obsidian vault view
+- [Sanitize before sharing](../organizing/sanitize-before-sharing.md) — ensure no sensitive data is mirrored

@@ -53,3 +53,10 @@ Example: "Repeated context loss between sessions — multiple bugs stem from ass
 ## When in doubt
 
 Start with a Lesson. You can always promote it to a pattern or meta-issue later.
+
+## Related
+
+- [Capture Lessons Learned](./capture-lessons-learned.md)
+- [Architecture Decisions](./architecture-decisions.md)
+- [Capture Patterns](./capture-patterns.md)
+- [Document Meta-Issues](./document-meta-issues.md)

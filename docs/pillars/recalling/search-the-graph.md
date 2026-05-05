@@ -5,6 +5,8 @@ sidebar_label: Search the Graph
 description: Full-text search with FTS5, local indexing, and multi-KG support
 ---
 
+# Search the Graph
+
 When a search is run, kmgraph needs to match the query against everything in the knowledge graph. There are two ways to do this. The first is to open each file one by one and check whether the query appears — straightforward, but slower as the knowledge graph grows, and results are sorted by where the match appeared in the file rather than how relevant the file is. The second is to maintain a search index: a compact catalog built from all the files that can be queried directly. The index returns results ranked by relevance — files that closely match the query float to the top. The index is optional and kept current automatically.
 
 The diagram below compares search without and with the index.
@@ -83,3 +85,8 @@ If a search index already exists, sync-all refreshes it automatically with no pr
 - **How to tell it is active**: search results show `(FTS5)` — this means the index was used
 - **How to re-enable after declining**: run `kg_fts5_rebuild` directly
 - **How to revert**: delete `~/.kmgraph/index/projects/<kgName>.db` (project KG) or `~/.kmgraph/index/personal.db` (personal KG). Run `kg_fts5_rebuild` to recreate.
+
+## Related
+
+- [Session Memory](./session-memory.md) — how KMGraph automatically surfaces relevant knowledge at session start
+- [Linking Entries](./linking-entries.md) — connecting related entries so recall pulls the right cluster

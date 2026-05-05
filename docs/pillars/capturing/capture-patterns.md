@@ -5,7 +5,7 @@ sidebar_label: Capture Patterns
 description: How to structure a reusable pattern entry in the knowledge graph
 ---
 
-# Write a High-Quality Pattern Entry
+# Capture Patterns
 
 ## Goal
 
@@ -185,6 +185,12 @@ Use the wiki-link format `[[relative/path.md]]` for all internal references. Abs
 
 - Run `/kmgraph:update-graph` to extract the new pattern into `MEMORY.md` so it is available at the next session start.
 - If the pattern influenced an architecture decision, create a companion ADR with `/kmgraph:create-adr` and link it in the pattern's `Cross-References`.
+
+## Related
+
+- [Capture Lessons Learned](./capture-lessons-learned.md)
+- [Architecture Decisions](./architecture-decisions.md)
+- [What to Capture](./what-to-capture.md)
 
 ---
 

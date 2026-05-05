@@ -5,9 +5,7 @@ sidebar_label: Architecture Decisions
 description: How to document an architecture decision with context, rationale, and consequences
 ---
 
-<!-- Updated: 2026-04-22 -->
-
-# Create an Architecture Decision Record
+# Architecture Decisions
 
 ## Goal
 
@@ -76,9 +74,9 @@ To supersede an existing decision:
 
 ## Next steps
 
-- [Write a pattern entry](/knowledge-graph/pillars/capturing/capture-patterns) for patterns uncovered during the decision process
-- [Track a meta-issue](/knowledge-graph/pillars/capturing/document-meta-issues) if the decision spawned a multi-session implementation
-- [Reference — ADR index](/decisions/) for all existing decisions
+- [Write a pattern entry](./capture-patterns.md) for patterns uncovered during the decision process
+- [Track a meta-issue](./document-meta-issues.md) if the decision spawned a multi-session implementation
+- [Reference — ADR index](../../decisions/) for all existing decisions
 
 ---
 

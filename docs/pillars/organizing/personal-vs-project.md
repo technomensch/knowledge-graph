@@ -5,11 +5,11 @@ sidebar_label: Personal vs. Project
 description: Understanding personal and project-scoped knowledge graphs
 ---
 
-<!-- Updated: 2026-04-15 -->
+# Personal vs. Project
 
 Every knowledge graph belongs to one of two scopes: **project** or **personal**.
 
-### Project KG
+## Project KG
 
 A project KG lives inside a project's directory at `./knowledge/`. It contains knowledge specific to that project:
 
@@ -19,7 +19,7 @@ A project KG lives inside a project's directory at `./knowledge/`. It contains k
 
 **Best for**: Anything that only makes sense in the context of one project.
 
-### Personal KG
+## Personal KG
 
 A personal KG lives at `~/.kmgraph/` and is accessible from any project. It contains cross-project patterns and lessons:
 
@@ -30,7 +30,7 @@ A personal KG lives at `~/.kmgraph/` and is accessible from any project. It cont
 
 **Best for**: Knowledge that would apply identically in your next project.
 
-### Identity and Rules Files
+## Identity and rules files
 
 Each scope also scaffolds two special files:
 
@@ -43,7 +43,7 @@ Each scope also scaffolds two special files:
 
 These files are the platform-agnostic foundation that all AI platform config files (CLAUDE.md, .cursorrules, etc.) point to. See [Portable AI Identity](../portability/your-ai-profile.md) for the full setup guide.
 
-### How They Work Together
+## How they work together
 
 | Behavior | Detail |
 |---|---|
@@ -52,7 +52,7 @@ These files are the platform-agnostic foundation that all AI platform config fil
 | **SessionStart hook** | Surfaces recent personal KG lessons alongside project lessons. |
 | **Active KG** | Unchanged by personal KG setup — project KG stays active for new captures by default. |
 
-### When to Use Personal vs Project
+## When to use personal vs project
 
 | Situation | Save to |
 |---|---|
@@ -62,7 +62,7 @@ These files are the platform-agnostic foundation that all AI platform config fil
 | "I always prefer feature flags over config files" | Personal KG |
 | "This MCP registration quirk affects all IDEs" | Personal KG |
 
-### Scope Diagram
+## Scope diagram
 
 ```mermaid
 %%{init: {'theme': 'neutral'}}%%
@@ -91,7 +91,7 @@ graph TB
     accDescr: Two KG scopes — Personal stored at ~/.kmgraph/ and Project stored in ./knowledge/. Each scope includes me.md for identity and rules.md for behavioral conventions. Recall searches both automatically.
 ```
 
-### Routing Captures by Level
+## Routing captures by level
 
 All capture commands (`session-summary`, `create-adr`, `capture-lesson`, `sync-all`) and `recall` accept an explicit routing flag — or recognize equivalent natural language in the invocation message:
 
@@ -113,9 +113,15 @@ All capture commands (`session-summary`, `create-adr`, `capture-lesson`, `sync-a
 
 If a named KG isn't found, a fuzzy suggestion prompt appears. If the project has no configured KG, a setup prompt offers options to initialize or redirect the capture.
 
-### Setup
+## Setup
 
 - **During init**: `/kmgraph:init` offers to create a personal KG at the end of setup
 - **Standalone**: `/kmgraph:init-personal-kg` creates and registers the personal KG at any time
 
-See [Multi-KG Workflows](/knowledge-graph/pillars/organizing/multi-kg-workflows) for advanced configuration and [Portable AI Identity](../portability/your-ai-profile.md) for setting up `me.md` and `rules.md`.
+See [Multi-KG Workflows](./multi-kg-workflows.md) for advanced configuration and [Portable AI Identity](../portability/your-ai-profile.mdx) for setting up `me.md` and `rules.md`.
+
+## Related
+
+- [Graph Configuration](./graph-configuration.md)
+- [Multi-KG Workflows](./multi-kg-workflows.md)
+- [Portable AI Identity](../portability/your-ai-profile.mdx)

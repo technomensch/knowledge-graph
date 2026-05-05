@@ -75,6 +75,12 @@ When the library grows large, the built-in MCP server provides structured read a
 
 Setup takes under 5 minutes for Claude Code installs. Other platforms may require additional configuration time. KMGraph is compatible with Claude Code, Cursor, Windsurf, and any MCP-compatible IDE.
 
+## Related
+
+- [What is a knowledge graph?](./what-is-a-knowledge-graph.md) — the graph structure and how KMGraph implements it
+- [Four content types](./four-content-types.md) — lessons, decisions, patterns, and session summaries
+- [How KMGraph is organized](./how-kmgraph-is-organized.md) — the layered architecture
+
 ---
 
 *Back to [home](/) · [Get started](/GETTING-STARTED) · [Browse commands](/knowledge-graph/reference/command-guide)*
