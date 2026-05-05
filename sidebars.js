@@ -12,6 +12,7 @@ const sidebars = {
     {
       type: 'category',
       label: '📥 Capturing',
+      link: { type: 'doc', id: 'pillars/capturing/index' },
       collapsed: false,
       items: [
         {type: 'doc', id: 'pillars/capturing/capture-lessons-learned', label: 'Capture Lessons Learned'},
@@ -25,6 +26,7 @@ const sidebars = {
     {
       type: 'category',
       label: '🔍 Recalling',
+      link: { type: 'doc', id: 'pillars/recalling/index' },
       collapsed: false,
       items: [
         {type: 'doc', id: 'pillars/recalling/search-the-graph',  label: 'Search the Graph'},
@@ -35,6 +37,7 @@ const sidebars = {
     {
       type: 'category',
       label: '🗂️ Organizing',
+      link: { type: 'doc', id: 'pillars/organizing/index' },
       collapsed: false,
       items: [
         {type: 'doc', id: 'pillars/organizing/personal-vs-project',    label: 'Personal vs. Project'},
@@ -47,6 +50,7 @@ const sidebars = {
     {
       type: 'category',
       label: '🌐 Portability',
+      link: { type: 'doc', id: 'pillars/portability/index' },
       collapsed: false,
       items: [
         {type: 'doc', id: 'pillars/portability/your-ai-profile',       label: 'Your AI Profile'},
@@ -61,6 +65,7 @@ const sidebars = {
     {
       type: 'category',
       label: '⚙️ Tailoring',
+      link: { type: 'doc', id: 'pillars/tailoring/index' },
       collapsed: false,
       items: [
         {type: 'doc', id: 'pillars/tailoring/customize-hooks',     label: 'Customize Hooks'},

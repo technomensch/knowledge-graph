@@ -9,7 +9,7 @@ description: All bundled knowledge entry templates in KMGraph — lesson, ADR, s
 
 KMGraph ships a set of bundled templates in `core/templates/`. Every template is protected — do not modify files under `core/` without explicit permission. To customize templates for a project, copy the relevant file into the project's knowledge graph directory.
 
-For customization guidance, see [guides/customize-templates.md](../guides/customize-templates.md).
+For customization guidance, see [Customize Templates](../pillars/tailoring/customize-templates.md).
 
 ---
 
@@ -100,4 +100,4 @@ Meta-issue templates live under `core/templates/meta-issue/`. They are scaffolde
 
 ## Customization
 
-To override a template for a specific project, copy the file from `core/templates/` into the project knowledge graph directory and edit it there. The `core/` tree is not modified during normal use. See [guides/customize-templates.md](../guides/customize-templates.md) for step-by-step instructions.
+To override a template for a specific project, copy the file from `core/templates/` into the project knowledge graph directory and edit it there. The `core/` tree is not modified during normal use. See [Customize Templates](../pillars/tailoring/customize-templates.md) for step-by-step instructions.

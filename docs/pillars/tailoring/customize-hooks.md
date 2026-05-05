@@ -90,4 +90,4 @@ After changes, start a new Claude Code session and check that the hook behavior 
 ## Next steps
 
 - [Reference — Hooks](/reference/hooks) — full lifecycle event reference (Phase 6)
-- [Customize templates](/guides/customize-templates) — modify the knowledge entry templates
+- [Customize templates](/knowledge-graph/pillars/tailoring/customize-templates) — modify the knowledge entry templates

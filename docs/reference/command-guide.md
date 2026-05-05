@@ -275,7 +275,7 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 
 **Purpose**: Identifies lessons while context is still fresh and captures both the problem and how it was solved. By automatically linking lessons to relevant metadata, the record is searchable and reusable across future sessions and projects.
 
-> **Command refactored in v0.2.1-beta: 710 → 108 lines.** Execution logic delegated to `agents/` for platform portability. See [CONCEPTS.md § Four-Layer Architecture](../concepts/why-kmgraph.md).
+> **Command refactored in v0.2.1-beta: 710 → 108 lines.** Execution logic delegated to `agents/` for platform portability. See [CONCEPTS.md § Four-Layer Architecture](../concepts/how-kmgraph-is-organized.md).
 
 **When to use**:
 
@@ -382,7 +382,7 @@ Quick Commands:
 
 **Purpose**: Search across lessons, decisions, patterns, and sessions in one command. When a personal KG is registered, both knowledge graphs are searched automatically, with source labels on every result.
 
-> **Command refactored in v0.2.1-beta: 437 → 79 lines.** Execution logic delegated to `agents/` for platform portability. See [CONCEPTS.md § Four-Layer Architecture](../concepts/why-kmgraph.md).
+> **Command refactored in v0.2.1-beta: 437 → 79 lines.** Execution logic delegated to `agents/` for platform portability. See [CONCEPTS.md § Four-Layer Architecture](../concepts/how-kmgraph-is-organized.md).
 
 **When to use**:
 
@@ -915,7 +915,7 @@ With `--user-facing`:
 
 > **Note**: Do NOT use meta-issue for simple bugs, standard features, or one-off debugging. Use `/kmgraph:capture-lesson` instead.
 
-**See also**: [Meta-Issue Guide](reference/META-ISSUE-GUIDE.md) — full guide covering directory structure, attempt templates, escalation thresholds, and worked examples. [Track a Multi-Attempt Issue](guides/track-meta-issue.md) — step-by-step walkthrough.
+**See also**: [Meta-Issue Guide](../pillars/capturing/document-meta-issues.md) — full guide covering directory structure, attempt templates, escalation thresholds, and worked examples. [Track a Multi-Attempt Issue](../pillars/capturing/document-meta-issues.md) — step-by-step walkthrough.
 
 ---
 
@@ -1374,7 +1374,7 @@ flowchart TD
 
 ### **Writing better entries**
 <div class="grid cards" markdown>
-- [Patterns Guide](reference/PATTERNS-GUIDE.md)
+- [Patterns Guide](../pillars/capturing/capture-patterns.md)
 
   Quality standards
 
@@ -1420,7 +1420,7 @@ flowchart TD
 
   Universal installer for all platforms (paste-friendly)
 
-- [Configuration Guide](CONFIGURATION.md)
+- [Configuration Guide](../pillars/organizing/graph-configuration.md)
 
   Post-install setup: sanitization, team workflows, MCP server
 </div>
@@ -1444,7 +1444,7 @@ flowchart TD
 ### **Advanced**
 <div class="grid cards" markdown>
 
-- [Workflows](reference/WORKFLOWS.md)
+- [Workflows](../pillars/organizing/multi-kg-workflows.md)
 
   Step-by-step guides for all 9 workflow types (non-Claude platforms)
 

@@ -94,7 +94,7 @@ The router presents a single confirmation before writing. No silent writes.
 ## Disabling automation
 
 Any hook or skill can be disabled independently. See:
-- [Customize hooks](/guides/customize-hooks) — disable individual hook scripts or all hooks
+- [Customize hooks](/knowledge-graph/pillars/tailoring/customize-hooks) — disable individual hook scripts or all hooks
 - Skills cannot be fully disabled but can be ignored; they only surface suggestions
 
 ## Related

@@ -47,7 +47,7 @@ First-time users need these for basic operation:
 | `/kmgraph:status` | View active knowledge graph info and quick reference |
 | `/kmgraph:recall [query]` | Search across all memory systems (lessons, decisions, knowledge) |
 
-*→ [Full details in Command Guide](COMMAND-GUIDE.md#essential-commands)*
+*→ [Full details in Command Guide](reference/command-guide.md#essential-commands)*
 
 ### 🟡 Intermediate (Once Comfortable)
 
@@ -65,7 +65,7 @@ Active users use these for regular workflows:
 | `/kmgraph:extract-chat` | Extract chat history from Claude and Gemini logs (`--today`, `--date`, `--after`, `--before`, `--project`); large days auto-split into `YYYY-MM-DD/` subfolder |
 | `/kmgraph:update-doc` | Update plugin/project docs (`--user-facing`) or KG content |
 
-*→ [Full details in Command Guide](COMMAND-GUIDE.md#intermediate-commands)*
+*→ [Full details in Command Guide](reference/command-guide.md#intermediate-commands)*
 
 ### 🔴 Advanced (Power Features)
 
@@ -80,7 +80,7 @@ Power users leverage these for complex workflows:
 | `/kmgraph:sync-all` | Automated full sync pipeline (4 steps → 1 command). Uses background file scanning when context-mode is installed. Refreshes search index automatically if built |
 | `/kmgraph:handoff` | Create comprehensive handoff documentation for transitions or onboarding |
 
-*→ [Full details in Command Guide](COMMAND-GUIDE.md#advanced-commands)*
+*→ [Full details in Command Guide](reference/command-guide.md#advanced-commands)*
 
 ---
 
@@ -251,7 +251,7 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 - **New to the system?** → [Getting Started](GETTING-STARTED.md) — Setup and first lesson walkthrough
 - **Understanding terminology?** → [Concepts Guide](concepts/why-kmgraph.md) — Definitions of all key terms
 - **Using other platforms?** → [Platform Adaptation](reference/PLATFORM-ADAPTATION.md) — Cursor, Windsurf, Continue setup
-- **Configuring settings?** → [Configuration Guide](CONFIGURATION.md) — Post-install options and workflows
+- **Configuring settings?** → [Configuration Guide](pillars/organizing/graph-configuration.md) — Post-install options and workflows
 
 ---
 
@@ -268,7 +268,7 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 - [Examples](examples/) — Real-world lesson, ADR, and KG entry examples
 
 **Advanced topics**:
-- [Workflows](reference/WORKFLOWS.md) — Step-by-step guides for manual workflows
+- [Workflows](pillars/recalling/session-memory.md) — Step-by-step guides for manual workflows
 - [Platform Adaptation](reference/PLATFORM-ADAPTATION.md) — Integration for Cursor, Windsurf, Continue, VS Code, Aider
 - [Style Guide](STYLE-GUIDE.md) — Documentation authoring standards and best practices
 

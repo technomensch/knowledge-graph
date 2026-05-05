@@ -61,5 +61,5 @@ Open the Obsidian graph view. Each lesson should appear as a node. Linked ADRs a
 
 ## Next steps
 
-- [Integrate with NotebookLM](/guides/integrate-notebooklm) — AI-powered Q&A over the knowledge graph
-- [Integrate with Notion](/guides/integrate-notion) — team-browsable mirror with database filtering
+- [Integrate with NotebookLM](/knowledge-graph/pillars/portability/integrate-notebooklm) — AI-powered Q&A over the knowledge graph
+- [Integrate with Notion](/knowledge-graph/pillars/portability/integrate-notion) — team-browsable mirror with database filtering

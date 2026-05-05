@@ -146,4 +146,4 @@ Avoid restructuring the directory layout after the KG is in use. Moving files br
 ## Related
 
 - [Personal vs. Project](./personal-vs-project.md) — where each type of config lives
-- [Customize Hooks](../tailoring/customize-hooks.md) — the automation config in CONFIGURATION.md
+- [Customize Hooks](../tailoring/customize-hooks.md) — hook-level automation configuration

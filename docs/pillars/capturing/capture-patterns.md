@@ -48,7 +48,7 @@ A pattern entry is appropriate when all of the following are true:
 - The solution is transferable without deep rework.
 - The insight is not obvious from standard documentation.
 
-If any condition fails, create a lesson instead (see [PATTERNS-GUIDE](../reference/PATTERNS-GUIDE.md)).
+If any condition fails, create a lesson instead.
 
 ### 2. Name the pattern
 
