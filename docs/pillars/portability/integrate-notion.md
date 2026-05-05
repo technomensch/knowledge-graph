@@ -76,7 +76,7 @@ After each `/kmgraph:capture-lesson`, run the mirror step for the new file. Or a
 
 Open the Notion database in a browser. Each lesson should appear as a page with the correct properties populated.
 
-## Next steps
+## Related
 
 - [Integrate with Obsidian](./integrate-obsidian.md) — browse the KG in Obsidian vault view
 - [Sanitize before sharing](../organizing/sanitize-before-sharing.md) — ensure no sensitive data is mirrored

@@ -41,7 +41,7 @@ Each scope also scaffolds two special files:
 | `~/.kmgraph/rules.md` | Personal | N/A local | Cross-project behavioral rules |
 | `~/.kmgraph/me.md` | Personal | N/A local | Cross-project personal identity and preferences |
 
-These files are the platform-agnostic foundation that all AI platform config files (CLAUDE.md, .cursorrules, etc.) point to. See [Portable AI Identity](../portability/your-ai-profile.md) for the full setup guide.
+These files are the platform-agnostic foundation that all AI platform config files (CLAUDE.md, .cursorrules, etc.) point to. See [Your AI Profile](../portability/your-ai-profile.mdx) for the full setup guide.
 
 ## How they work together
 
@@ -118,10 +118,10 @@ If a named KG isn't found, a fuzzy suggestion prompt appears. If the project has
 - **During init**: `/kmgraph:init` offers to create a personal KG at the end of setup
 - **Standalone**: `/kmgraph:init-personal-kg` creates and registers the personal KG at any time
 
-See [Multi-KG Workflows](./multi-kg-workflows.md) for advanced configuration and [Portable AI Identity](../portability/your-ai-profile.mdx) for setting up `me.md` and `rules.md`.
+See [Multi-KG Workflows](./multi-kg-workflows.md) for advanced configuration and [Your AI Profile](../portability/your-ai-profile.mdx) for setting up `me.md` and `rules.md`.
 
 ## Related
 
 - [Graph Configuration](./graph-configuration.md)
 - [Multi-KG Workflows](./multi-kg-workflows.md)
-- [Portable AI Identity](../portability/your-ai-profile.mdx)
+- [Your AI Profile](../portability/your-ai-profile.mdx)

@@ -104,8 +104,8 @@ Set per-KG in `kg-config.json` under the `graphs[name]` block.
 
 Shows which KG is active and its entry count. Run `/kmgraph:list` to verify all KGs are registered.
 
-## Next steps
+## Related
 
 - [Sync across machines](../portability/sync-across-machines.md) — keep KGs in sync on multiple machines
 - [Sanitize before sharing](./sanitize-before-sharing.md) — scrub sensitive data from a shared KG
-- [Configuration reference](./graph-configuration.md) — full `kg-config.json` schema
+- [Graph Configuration](./graph-configuration.md) — full `kg-config.json` schema

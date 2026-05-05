@@ -66,7 +66,7 @@ Copy the contents of `core/templates/AGENTS-template.md` into your project's `AG
 - MEMORY.md is human-readable markdown — the target platform can load it directly
 - Full automation (slash commands, hooks) is Claude Code-exclusive; other platforms use the MCP tools or manual workflow
 
-## Next steps
+## Related
 
 - [Use in Cursor/Windsurf/VS Code](./use-in-cursor.mdx) — IDE-specific setup
 - [Platform Adaptation reference](../../reference/PLATFORM-ADAPTATION.md) — full compatibility matrix

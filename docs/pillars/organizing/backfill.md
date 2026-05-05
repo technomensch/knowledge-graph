@@ -67,7 +67,7 @@ The entry count should reflect the backfilled content. Then test search:
 /kmgraph:recall "topic from your existing notes"
 ```
 
-## Next steps
+## Related
 
-- [Recall a past decision](../../quickstart.md#step-4--recall-it) — search the now-populated graph
-- [Sync across machines](../portability/sync-across-machines.md) — share the populated graph
+- [Quickstart](../../quickstart.mdx#step-4--recall-it) — search the now-populated graph
+- [Sync Across Machines](../portability/sync-across-machines.md) — share the populated graph

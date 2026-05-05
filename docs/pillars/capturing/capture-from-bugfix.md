@@ -59,8 +59,8 @@ This preserves the full session context alongside the lesson.
 
 The lesson should appear in results. If not, run `/kmgraph:update-graph` to extract patterns.
 
-## Next steps
+## Related
 
-- [Capture the pipeline diagram explained](../../quickstart.mdx#the-capture-pipeline)
-- [Write a pattern entry](./capture-patterns.md) if the bug reveals a reusable pattern
-- [Create an ADR](./architecture-decisions.md) if the fix changes architecture
+- [Quickstart](../../quickstart.mdx#the-capture-pipeline)
+- [Capture Patterns](./capture-patterns.md) if the bug reveals a reusable pattern
+- [Architecture Decisions](./architecture-decisions.md) if the fix changes architecture

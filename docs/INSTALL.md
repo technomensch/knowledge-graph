@@ -76,7 +76,7 @@ The installer sets up:
 
 - **Configuration file** — `~/.claude/kg-config.json` (stores knowledge graph locations and metadata)
 - **Directory structure** — `knowledge/`, `lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`
-- **Identity files** — `knowledge/me.md` (contributor identity, gitignored), `knowledge/rules.md` (project conventions, committed), and `knowledge/triggers.md` (rule timing, when each rule applies). See [Your AI Profile](pillars/portability/your-ai-profile.md).
+- **Identity files** — `knowledge/me.md` (contributor identity, gitignored), `knowledge/rules.md` (project conventions, committed), and `knowledge/triggers.md` (rule timing, when each rule applies). See [Your AI Profile](pillars/portability/your-ai-profile.mdx).
 - **Wiki links** — Cross-references throughout the KG are converted to Obsidian `[[wiki link]]` format, enabling graph view navigation in Obsidian and compatible editors
 - **MCP server** — Provides knowledge graph tools for non-Claude-Code platforms
 - **Templates** — Starter scaffolds for capturing lessons and decisions

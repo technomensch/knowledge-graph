@@ -154,7 +154,7 @@ generic placeholders. Patterns and lessons remain intact.
 
 ---
 
-## Next steps
+## Related
 
 - See [Sanitization Checklist](../reference/SANITIZATION-CHECKLIST.md) for an exhaustive category-by-category reference, including scan commands for each pattern type
 - Use `/kmgraph:config-sanitization` to run the interactive wizard that configures `kg-config.json` sanitization rules

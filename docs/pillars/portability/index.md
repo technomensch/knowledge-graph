@@ -24,3 +24,4 @@ Your knowledge graph is plain Markdown — it works everywhere. This pillar cove
 ## Related
 
 - [Recalling](../recalling/index.md) — searching and retrieving knowledge across sessions and platforms
+- [Organizing](../organizing/index.md) — keeping your knowledge graph structured
