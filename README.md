@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.5.5
+**Version:** 0.5.7.1
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -180,7 +180,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.5.5 (2026-04-29)
+**Current Release:** v0.5.7.1 (2026-05-13)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -273,6 +273,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.5.5 (2026-04-29)
+**Current Version:** v0.5.7.1 (2026-05-13)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info
