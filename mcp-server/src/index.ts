@@ -12,7 +12,7 @@ import { registerVersionTool } from "./tools/version.js";
 
 const server = new McpServer({
   name: "knowledge-graph",
-  version: "0.3.6-beta",
+  version: "0.3.10",
 });
 
 // Register tools (11 core tools)

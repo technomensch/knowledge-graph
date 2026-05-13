@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.5.7.1] — 2026-05-13
+
+### Fixed
+- Resolved 16 Dependabot alerts (HIGH + medium severity) via npm `overrides` in root `package.json` and `mcp-server/package.json`. All vulnerabilities are in transitive dependencies; no direct dependency versions changed.
+  - Root: added `fast-uri >=3.1.2`, `@babel/plugin-transform-modules-systemjs >=7.29.4`, `mermaid >=11.15.0`, `uuid >=11.1.1`
+  - mcp-server: bumped `hono >=4.12.12` → `>=4.12.18`, added `fast-uri >=3.1.2`, `ip-address >=10.1.1`
+- Fixed version drift in `mcp-server/src/index.ts`: hardcoded `"0.3.6-beta"` corrected to `"0.3.10"` to match `mcp-server/package.json`.
+
+Closes #38, #39, #40, #41, #42, #43, #44, #45, #46, #47, #48, #49, #50, #51, #52, #53
+
 ## [0.5.7] — 2026-05-05
 
 ### Fixed
