@@ -836,5 +836,5 @@ Ideas for community-driven enhancements:
 
 ---
 
-*Last updated: 2026-03-29*
-*Plugin Version: 0.2.2-beta (In Progress)*
+*Last updated: 2026-05-13*
+*Plugin Version: 0.5.7.1*
