@@ -167,6 +167,8 @@ Then invoke `lesson-capture-agent`, passing the following pre-structured context
 
 The agent handles all execution: duplicate check, category detection, git metadata, file formatting, writing, index update, search rebuild, and commit offer.
 
+After the agent returns, extract the draft content and display it verbatim in your main-thread response before asking save/edit/cancel. Do not rely on the tool result being visible to the user.
+
 **Output Format:** Generated lesson files use Obsidian wiki link syntax for cross-references: `[[filename-without-extension]]` for lessons, `[[ADR-028-rules-md-scaffolding]]` for full ADR filenames (never abbreviated), and standard markdown `[#NNN](url)` for external GitHub issues and PRs. Never use wiki links for external URLs.
 
 ---
