@@ -1,6 +1,8 @@
 # Rules — knowledge-graph
 
-> Quick navigation: [Version & Release](#version--release) · [Git Workflow](#git-workflow) · [Development Workflow](#development-workflow) · [Knowledge Capture](#knowledge-capture) · [Code Protection](#code-protection) · [Tool Preferences](#tool-preferences) · [File Paths & Directory Map](#file-paths--directory-map)
+> Quick navigation: [Version & Release](#version--release) · [Git Workflow](#git-workflow) · [Development Workflow](#development-workflow) · [Knowledge Capture](#knowledge-capture) · [Model Selection](#model-selection-for-knowledge-graph-operations) · [Code Protection](#code-protection) · [Tool Preferences](#tool-preferences) · [File Paths & Directory Map](#file-paths--directory-map)
+>
+> **Development Workflow** includes: [Bug/Enhancement Triage](#bug--enhancement-triage) · [Plan File Sync](#plan-file-sync) · [Plugin Cache](#plugin-cache--local-testing) · [Init Command Parity](#init-command-parity) · [Hook Safety](#hook-safety)
 
 ---
 
@@ -108,6 +110,28 @@ After any cherry-pick: verify source branch state before continuing work on eith
 ---
 
 ## Development Workflow
+
+### Bug / Enhancement Triage
+
+When a bug or enhancement is discovered mid-session, ask the user which path applies — do not auto-detect:
+
+- **Path 1 — Capture as issue/enhancement:** No active plan or the fix is out of scope. Create silently via `/kmgraph:start-issue-tracking`. Surface the result (GH issue link or local ENH file preview) immediately after.
+- **Path 2 — Add to current plan:** Active plan exists, task not yet started. Add a new task to the plan. Sync both copies immediately (`~/.claude/plans/` and `docs/plans/` must be identical after every edit).
+- **Path 3 — Implement + update plan:** Branch exists, work in progress. Implement the fix now, then update the plan file to document what was added so the PR body stays accurate. Sync both copies.
+
+**Always ask** — never auto-route. One question: "Path 1 (issue), Path 2 (add to plan), or Path 3 (implement now)?"
+
+### Plan File Sync
+
+`~/.claude/plans/<name>.md` and `docs/plans/<name>.md` must always be identical. After any edit to either copy, sync immediately:
+
+```bash
+cp ~/.claude/plans/<name>.md /path/to/repo/docs/plans/<name>.md
+```
+
+Verify with `wc -l` on both files. A line count mismatch means they are out of sync.
+
+- **Why:** Plans diverged during v0.5.8 planning when Task 10/11 were appended to `docs/plans/` in a session but not reflected back to `~/.claude/plans/`. When discovered, the copies had to be manually reconciled.
 
 ### Plugin Cache & Local Testing
 

@@ -132,3 +132,51 @@ Identified in chat session 2026-04-16 (L3340–3342) — rule extended from less
 
 **Related:** [[Lessons_Learned_Patterns_Single_Source_Of_Truth_DRY_Documentation]]
 
+---
+
+## Per-Platform-Copy Distribution (Browser Extension Analogy)
+
+**Quick Reference:**
+- **Problem:** Multi-platform plugin distribution pulls toward a mono-repo that is harder to maintain and harder for users to understand per-platform installation paths.
+- **Solution:** Accept the per-platform-copy model. Each platform target gets its own manifest/config file in the repository. The analogy: browser extensions ship per-browser, not via a single universal installer. Users install the copy for their platform.
+- **When to Use:** Deciding distribution architecture for a plugin that must target multiple AI platforms (Claude Code, Cursor, Gemini, Codex, Copilot CLI, etc.); evaluating whether to use a mono-repo for multi-platform manifests.
+
+**Evidence:**
+Session 2026-05-13 — Key decision: per-platform-copy accepted for multi-platform expansion. Mono-repo complexity rejected.
+
+**See Lesson:** No dedicated lesson file — derived from session 2026-05-13 multi-platform expansion brainstorming.
+
+**Related:** [[Multi-Platform MCP Auto-Registration Scope]]
+
+---
+
+## In-Band Version Check with Burst Cadence
+
+**Quick Reference:**
+- **Problem:** Users on stale plugin versions have no visibility into updates; polling too aggressively is noisy; silent failure is better than hard-blocking users.
+- **Solution:** Check the npm registry for a newer version on MCP server startup. Warn 3 times (burst cadence), then silence for 1 hour. Silent-fail if the registry is unreachable. Never block the user from using the tool.
+- **When to Use:** Adding update notifications to any MCP server or long-running tool server; implementing version drift warnings; designing non-intrusive update nudges.
+
+**Evidence:**
+Session 2026-05-13 — Decision adopted from context-mode burst cadence pattern. Applied to kmgraph MCP server npm publishing plan.
+
+**See Lesson:** No dedicated lesson file — derived from session 2026-05-13 multi-platform expansion brainstorming.
+
+**Related:** [[Version Drift Gotcha — MCP Server Hardcoded Version]]
+
+---
+
+## Tiered Testing with Honest Platform Coverage Docs
+
+**Quick Reference:**
+- **Problem:** When shipping for many platforms, claiming full support when only one platform is self-tested creates trust debt and false documentation.
+- **Solution:** Use tiered testing: self-tested (Claude Code), CI-validated (manifest schema), community-needed (other platforms). Document tiers honestly in the install guide. Use `claude-plugin-validator` + `ajv-cli` in GitHub Actions for manifest validation.
+- **When to Use:** Adding platform manifests for platforms you cannot personally test; writing INSTALL.md for a multi-platform tool; designing CI for manifest validation.
+
+**Evidence:**
+Session 2026-05-13 — Approach C selected for multi-platform expansion build strategy.
+
+**See Lesson:** No dedicated lesson file — derived from session 2026-05-13 multi-platform expansion brainstorming.
+
+**Related:** [[Per-Platform-Copy Distribution (Browser Extension Analogy)]]
+
