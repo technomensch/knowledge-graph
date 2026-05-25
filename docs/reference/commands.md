@@ -142,8 +142,8 @@ These flags appear across multiple commands and share consistent behavior.
 
 | Flag | Commands | Behavior |
 |---|---|---|
-| `--auto` | `update-graph`, `session-summary`, `sync-all`, `update-issue-plan`, `archive-memory` | Skip confirmation prompts; silent/non-interactive mode. Safe for use when called from another command. |
-| `--dry-run` | `sync-all`, `archive-memory`, `restore-memory` | Preview changes without writing any files. Useful for verifying scope before committing. |
+| `--auto` | `update-graph`, `session-summary`, `sync-all`, `update-issue-plan` | Skip confirmation prompts; silent/non-interactive mode. Safe for use when called from another command. |
+| `--dry-run` | `sync-all` | Preview changes without writing any files. Useful for verifying scope before committing. |
 | `--snapshot` | `session-summary` | Lightweight mid-session capture. Appends to today's session file without a review gate. Used automatically by `capture-lesson`, `create-adr`, and `start-issue-tracking` when the user opts in. |
 | `--targetKg` | MCP tools (`kg_capture`, `kg_search`) | Target a specific knowledge graph by name instead of the currently active KG. |
 | `--delegate` | Advanced usage | Signals that execution should be handed off to the agent layer rather than handled inline. Applies to thin-dispatcher commands that route to `agents/`. |
