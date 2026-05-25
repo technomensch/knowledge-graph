@@ -36,6 +36,7 @@ EXPECTED_SKILLS=(
   "session-wrap"
   "adr-guide"
   "gov-execute-plan"
+  "gov-plan-gate"
   "knowledge-graph-usage"
   "capture-router"
   "doc-update-router"
@@ -43,6 +44,7 @@ EXPECTED_SKILLS=(
   "rules-capture"
   "sidebar-update"
   "stuck-work-escalation"
+  "update-profile"
 )
 
 # Test 1: Skills directory exists
@@ -65,17 +67,17 @@ if [ -n "$SKILLS_DIR" ]; then
     fi
   done
   if [ $MISSING_SKILLS -eq 0 ]; then
-    pass "All 12 skill directories present"
+    pass "All 14 skill directories present"
   else
     fail "$MISSING_SKILLS skill director(ies) missing"
   fi
 
-  # Test 3: Exact count is 12
+  # Test 3: Exact count is 14
   ACTUAL_COUNT=$(find "$SKILLS_DIR" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')
-  if [ "$ACTUAL_COUNT" -eq 12 ]; then
-    pass "Exact skill count is 12"
+  if [ "$ACTUAL_COUNT" -eq 14 ]; then
+    pass "Exact skill count is 14"
   else
-    fail "Skill count is $ACTUAL_COUNT (expected 12)"
+    fail "Skill count is $ACTUAL_COUNT (expected 14)"
   fi
 
   # Test 4: No empty skill directories

@@ -13,7 +13,7 @@ Shows:
 - Categories and git strategy
 - Last sync timestamp
 - File counts (lessons, KG entries, ADRs, sessions)
-- Warnings (stale MEMORY.md, missing config, path not found)
+- Warnings (stale profile files, missing config, path not found)
 - Quick command reference
 
 ## Output Format
@@ -103,31 +103,33 @@ else
 fi
 ```
 
-### Step 5: Check MEMORY.md Staleness
+### Step 5: Check Profile File Staleness
+
+Profile files (`~/.kmgraph/rules.md` and `~/.kmgraph/me.md`) are the authoritative
+behavioral stores. MEMORY.md is an index/pointer file only — its age is not a
+meaningful signal. Warn if either profile file hasn't been touched in >30 days.
 
 ```bash
-# Try to find MEMORY.md
-memory_path=$(find "$HOME/.claude/projects" -name "MEMORY.md" 2>/dev/null | head -1)
+profile_warnings=""
+current_time=$(date +%s)
 
-if [ -f "$memory_path" ]; then
-  # Check last modified time
+for profile_path in "$HOME/.kmgraph/rules.md" "$HOME/.kmgraph/me.md"; do
+  [ -f "$profile_path" ] || continue
+
   if [[ "$OSTYPE" == "darwin"* ]]; then
-    file_time=$(stat -f %m "$memory_path")
+    file_time=$(stat -f %m "$profile_path")
   else
-    file_time=$(stat -c %Y "$memory_path")
+    file_time=$(stat -c %Y "$profile_path")
   fi
 
-  current_time=$(date +%s)
   days_old=$(( (current_time - file_time) / 86400 ))
 
-  if [ $days_old -gt 7 ]; then
-    memory_warning="⚠️  MEMORY.md is stale (last updated $days_old days ago)"
-  else
-    memory_warning=""
+  if [ "$days_old" -gt 30 ]; then
+    label=$(basename "$profile_path")
+    profile_warnings="${profile_warnings}⚠️  ~/.kmgraph/${label} is stale (last updated ${days_old} days ago)
+"
   fi
-else
-  memory_warning=""
-fi
+done
 ```
 
 ### Step 6: Display
@@ -149,9 +151,9 @@ if [ ! -d "$kg_path" ]; then
   echo ""
 fi
 
-if [ -n "$memory_warning" ]; then
-  echo "$memory_warning"
-  echo "   Consider running /kmgraph:sync-all"
+if [ -n "$profile_warnings" ]; then
+  printf '%s' "$profile_warnings"
+  echo "   Profile files are the authoritative behavioral store. Review and refresh as needed."
   echo ""
 fi
 
@@ -203,7 +205,7 @@ Output:
     "sessions": 8
   },
   "warnings": {
-    "memoryStale": true,
+    "profileFilesStale": false,
     "pathMissing": false
   }
 }

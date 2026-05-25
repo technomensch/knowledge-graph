@@ -17,7 +17,7 @@ description: Every KMGraph slash command — category, description, and key flag
 |---|---|---|
 | [`/kmgraph:init`](#init) | Initialize a new knowledge graph with wizard-based setup; discovers locally running Ollama and LM Studio instances and offers to configure them for tier mapping | — |
 | [`/kmgraph:status`](#status) | Display active KG health, file counts, and warnings | `--minimal`, `--json` |
-| [`/kmgraph:recall`](#recall) | Full-text search across lessons, ADRs, KG entries, sessions, and MEMORY.md | `--scope=all\|active\|personal-only`, `--user`, `--project`, `--named=<kg>`, `--format=detailed\|paths` |
+| [`/kmgraph:recall`](#recall) | Full-text search across lessons, ADRs, KG entries, sessions, and the authoritative profile files (`~/.kmgraph/rules.md`, `~/.kmgraph/me.md`, `knowledge/rules.md`, `knowledge/me.md`) | `--scope=all\|active\|personal-only`, `--user`, `--project`, `--named=<kg>`, `--format=detailed\|paths` |
 | [`/kmgraph:capture-lesson`](#capture-lesson) | Guided interview to document a problem solved, pattern discovered, or bug fixed | `--user`, `--project`, `--named=<kg>` |
 
 **Examples:**
@@ -142,8 +142,8 @@ These flags appear across multiple commands and share consistent behavior.
 
 | Flag | Commands | Behavior |
 |---|---|---|
-| `--auto` | `update-graph`, `session-summary`, `sync-all`, `update-issue-plan`, `archive-memory` | Skip confirmation prompts; silent/non-interactive mode. Safe for use when called from another command. |
-| `--dry-run` | `sync-all`, `archive-memory`, `restore-memory` | Preview changes without writing any files. Useful for verifying scope before committing. |
+| `--auto` | `update-graph`, `session-summary`, `sync-all`, `update-issue-plan` | Skip confirmation prompts; silent/non-interactive mode. Safe for use when called from another command. |
+| `--dry-run` | `sync-all` | Preview changes without writing any files. Useful for verifying scope before committing. |
 | `--snapshot` | `session-summary` | Lightweight mid-session capture. Appends to today's session file without a review gate. Used automatically by `capture-lesson`, `create-adr`, and `start-issue-tracking` when the user opts in. |
 | `--targetKg` | MCP tools (`kg_capture`, `kg_search`) | Target a specific knowledge graph by name instead of the currently active KG. |
 | `--delegate` | Advanced usage | Signals that execution should be handed off to the agent layer rather than handled inline. Applies to thin-dispatcher commands that route to `agents/`. |

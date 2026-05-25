@@ -518,45 +518,32 @@ Before finalizing a knowledge entry:
 
 ### What is MEMORY.md?
 
-A special file that syncs your most important patterns to Claude's persistent memory.
+An index file that links to your active behavioral rules and identity profiles. MEMORY.md itself contains no behavioral content — it points to profile files where actual rules, preferences, and context live.
 
 **Location**: `/MEMORY.md` in your knowledge graph root
 
+### Profile Files (Authoritative Content)
+
+Behavioral content and rules are stored in profile files, not MEMORY.md:
+
+- **Cross-project**: `~/.kmgraph/rules.md`, `~/.kmgraph/me.md`
+- **Project-specific**: `knowledge/rules.md`, `knowledge/me.md`
+
+MEMORY.md indexes these files and auto-populates at session start via hooks.
+
 ### How It Works
 
-1. You capture lessons and patterns over time
-2. Run `/kmgraph:update-graph` (extracts patterns from lessons)
-3. Top patterns written to `MEMORY.md`
-4. Claude reads `MEMORY.md` at session start
-5. Claude "remembers" your patterns automatically
+1. Store behavioral rules and identity in profile files (rules.md, me.md)
+2. Run `/kmgraph:sync-all` to update the knowledge graph
+3. MEMORY.md auto-indexes active profile files at session start
+4. Claude reads the index and loads profile content automatically
 
-### MEMORY.md Lifecycle
+### Maintenance
 
-**Active** (`MEMORY.md`):
-- Current, frequently-used patterns
-- Target: <200 lines (keeps Claude context efficient)
-- Updated by `/kmgraph:update-graph`
-
-**Archived** (`MEMORY-archive.md`):
-- Older patterns, still valid but less used
-- Moved by `/kmgraph:archive-memory`
-- Retrievable via `/kmgraph:restore-memory`
-
-### Managing MEMORY.md
-
-**When to archive**:
-- MEMORY.md exceeds 200 lines
-- Patterns become less relevant over time
-- New project phase (archive old patterns)
-
-**When to restore**:
-- Need archived pattern again
-- Returning to previous project phase
-- Team member needs historical context
-
-**Commands**:
-- `/kmgraph:archive-memory` - Move entries to archive
-- `/kmgraph:restore-memory` - Bring back archived entries
+For knowledge graph health checks and index updates:
+- Use `/kmgraph:status` to see current state
+- Use `/kmgraph:sync-all` to rebuild indexes and sync all profile files
+- Use `/kmgraph:switch` to change active knowledge graphs
 
 See [Command Guide](../../docs/COMMAND-GUIDE.md) for details.
 

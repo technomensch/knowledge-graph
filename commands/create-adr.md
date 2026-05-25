@@ -41,6 +41,8 @@ Pass the resolved flag (`--user`, `--project`, `--named=<kg>`, or `--active`) to
 
 Set `$requested_tier` = `standard-tier`. Invoke `ai-model-tier-resolver` module (`commands/init-shared/ai-model-tier-resolver.md`) with `$requested_tier` and `{KG_PATH}`. On success: pass `--model [$resolved_model]` to the subagent.
 
+After the agent returns, extract the draft content and display it verbatim in your main-thread response before asking save/edit/cancel. Do not rely on the tool result being visible to the user.
+
 ---
 
 ## Step 0: Resolve Active KG Path

@@ -347,109 +347,44 @@ _inject_profile "$KG_PATH/me.md"       "knowledge/me.md (project identity)"
 _inject_profile "$KG_PATH/triggers.md" "knowledge/triggers.md (project triggers)"
 
 # ─────────────────────────────────────────────────────────────
-# SECTION 4: MEMORY.md Status (from check-memory.sh)
+# SECTION 4: Profile File Staleness (post-MEMORY.md cascade)
+# Authoritative behavioral stores are now profile files. MEMORY.md
+# is an index/pointer file only and is not surfaced here.
+# Warn if either personal profile file hasn't been touched in >30 days.
 # ─────────────────────────────────────────────────────────────
 
-MEMORY_FOUND=false
-MEMORY_PATH=""
+_check_profile_staleness() {
+    local filepath="$1"
+    local label="$2"
+    [ -f "$filepath" ] || return 0
 
-PROJECT_HASH_DIR=$(find "$HOME/.claude/projects" -type d -name "memory" 2>/dev/null | head -1)
-if [ -n "$PROJECT_HASH_DIR" ]; then
-    POTENTIAL_MEMORY="$PROJECT_HASH_DIR/MEMORY.md"
-    if [ -f "$POTENTIAL_MEMORY" ]; then
-        if grep -q "$ACTIVE_KG" "$POTENTIAL_MEMORY" 2>/dev/null || grep -q "$(basename "$KG_PATH")" "$POTENTIAL_MEMORY" 2>/dev/null; then
-            MEMORY_FOUND=true
-            MEMORY_PATH="$POTENTIAL_MEMORY"
-        fi
-    fi
-fi
-
-if [ "$MEMORY_FOUND" = false ] && [ -f "$KG_PATH/MEMORY.md" ]; then
-    MEMORY_FOUND=true
-    MEMORY_PATH="$KG_PATH/MEMORY.md"
-fi
-
-if [ "$MEMORY_FOUND" = false ]; then
-    echo -e "${YELLOW}ℹ️  No MEMORY.md found for active KG: $ACTIVE_KG${NC}"
-    echo "   Consider creating one with /kmgraph:capture-lesson --auto-sync"
-    exit 0
-fi
-
-# Check MEMORY.md staleness (last modified > 7 days ago)
-if [ -f "$MEMORY_PATH" ]; then
-    CURRENT_TIME=$(date +%s)
+    local current_time file_time days_old
+    current_time=$(date +%s)
     if [[ "$OSTYPE" == "darwin"* ]]; then
-        FILE_TIME=$(stat -f %m "$MEMORY_PATH")
+        file_time=$(stat -f %m "$filepath")
     else
-        FILE_TIME=$(stat -c %Y "$MEMORY_PATH")
+        file_time=$(stat -c %Y "$filepath")
     fi
-    DAYS_OLD=$(( (CURRENT_TIME - FILE_TIME) / 86400 ))
+    days_old=$(( (current_time - file_time) / 86400 ))
 
-    if [ $DAYS_OLD -gt 7 ]; then
-        echo -e "${YELLOW}⚠️  MEMORY.md is stale (last updated $DAYS_OLD days ago)${NC}"
-        echo "   Consider running /kmgraph:sync-all to update cross-session memory."
-    else
-        echo -e "${GREEN}✅ Knowledge Graph: $ACTIVE_KG (memory synced $DAYS_OLD days ago)${NC}"
+    if [ "$days_old" -gt 30 ]; then
+        echo -e "${YELLOW}⚠️  $label is stale (last updated $days_old days ago)${NC}"
+        echo "   Path: $filepath"
+        echo "   Profile files are the authoritative behavioral store — consider reviewing."
+        echo ""
     fi
-fi
+}
+
+_check_profile_staleness "$HOME/.kmgraph/rules.md" "~/.kmgraph/rules.md"
+_check_profile_staleness "$HOME/.kmgraph/me.md"    "~/.kmgraph/me.md"
 
 # ─────────────────────────────────────────────────────────────
-# SECTION 5: MEMORY.md Diff (from memory-diff-check.sh)
+# SECTION 5: Profile file diffs are not surfaced in SessionStart.
+# Profile files (`~/.kmgraph/{rules,me}.md`, `{project}/knowledge/{rules,me}.md`)
+# are the authoritative behavioral stores. They are read directly by the
+# rules-capture pipeline and platform shims; surfacing diffs here adds noise
+# without changing routing behavior. MEMORY.md diff surfacing has been removed
+# as part of the post-migration cascade fix (ENH-014).
 # ─────────────────────────────────────────────────────────────
-
-DIFF_MEMORY_PATH="$HOME/.claude/projects/$(basename "$(pwd)")/memory/MEMORY.md"
-
-if [ -f "$DIFF_MEMORY_PATH" ] && command -v git &> /dev/null; then
-    DIFF_MEMORY_DIR=$(dirname "$DIFF_MEMORY_PATH")
-    if git -C "$DIFF_MEMORY_DIR" rev-parse --git-dir > /dev/null 2>&1; then
-        LAST_COMMIT_DATE=$(git -C "$DIFF_MEMORY_DIR" log -1 --format=%ct -- MEMORY.md 2>/dev/null)
-        if [ -n "$LAST_COMMIT_DATE" ]; then
-            CURRENT_TIME=$(date +%s)
-            HOURS_SINCE=$(( (CURRENT_TIME - LAST_COMMIT_DATE) / 3600 ))
-            if [ "$HOURS_SINCE" -le 168 ]; then
-                DIFF_OUTPUT=$(git -C "$DIFF_MEMORY_DIR" diff HEAD -- MEMORY.md 2>/dev/null)
-                if [ -n "$DIFF_OUTPUT" ]; then
-                    ADDED_LINES=$(echo "$DIFF_OUTPUT" | grep '^+' | grep -v '^+++' | wc -l | tr -d ' ')
-                    REMOVED_LINES=$(echo "$DIFF_OUTPUT" | grep '^-' | grep -v '^---' | wc -l | tr -d ' ')
-                    if [ "$ADDED_LINES" -gt 0 ] || [ "$REMOVED_LINES" -gt 0 ]; then
-                        ADDED_ENTRIES=$(echo "$DIFF_OUTPUT" | grep '^+### ' | sed 's/^+### //' | head -5)
-                        REMOVED_ENTRIES=$(echo "$DIFF_OUTPUT" | grep '^-### ' | sed 's/^-### //' | head -5)
-                        ADDED_COUNT=$(echo "$ADDED_ENTRIES" | grep -c '^' 2>/dev/null || echo 0)
-                        REMOVED_COUNT=$(echo "$REMOVED_ENTRIES" | grep -c '^' 2>/dev/null || echo 0)
-                        echo -e "${BLUE}📝 MEMORY.md changes (since last session):${NC}"
-                        if [ "$ADDED_COUNT" -gt 0 ]; then
-                            echo -e "   ${GREEN}+ $ADDED_COUNT new entries:${NC}"
-                            echo "$ADDED_ENTRIES" | while read -r entry; do
-                                [ -n "$entry" ] && echo "     • $entry"
-                            done
-                        fi
-                        if [ "$REMOVED_COUNT" -gt 0 ]; then
-                            echo -e "   ${RED}- $REMOVED_COUNT removed/archived:${NC}"
-                            echo "$REMOVED_ENTRIES" | while read -r entry; do
-                                [ -n "$entry" ] && echo "     • $entry"
-                            done
-                        fi
-                        OLD_SIZE=$(git -C "$DIFF_MEMORY_DIR" show HEAD:MEMORY.md 2>/dev/null | wc -w | tr -d ' ')
-                        NEW_SIZE=$(wc -w < "$DIFF_MEMORY_PATH" | tr -d ' ')
-                        if [ -n "$OLD_SIZE" ] && [ -n "$NEW_SIZE" ]; then
-                            OLD_TOKENS=$((OLD_SIZE * 13 / 10))
-                            NEW_TOKENS=$((NEW_SIZE * 13 / 10))
-                            TOKEN_DIFF=$((NEW_TOKENS - OLD_TOKENS))
-                            if [ "$TOKEN_DIFF" -gt 50 ] || [ "$TOKEN_DIFF" -lt -50 ]; then
-                                echo ""
-                                if [ "$TOKEN_DIFF" -gt 0 ]; then
-                                    echo -e "   Size: ~${NEW_TOKENS}/2,000 tokens ${YELLOW}(+${TOKEN_DIFF})${NC}"
-                                else
-                                    echo -e "   Size: ~${NEW_TOKENS}/2,000 tokens ${GREEN}(${TOKEN_DIFF})${NC}"
-                                fi
-                            fi
-                        fi
-                        echo ""
-                    fi
-                fi
-            fi
-        fi
-    fi
-fi
 
 exit 0
