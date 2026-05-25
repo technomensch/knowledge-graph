@@ -195,35 +195,38 @@ else
 fi
 
 echo ""
-echo "── Section 4: MEMORY.md status ─────────────────────────────────"
+echo "── Section 4: Profile file staleness ───────────────────────────"
 
-# Test 6: Stale MEMORY.md detected (>7 days old)
-MEMORY_PATH="$TEST_KG_DIR/MEMORY.md"
-echo "# MEMORY" > "$MEMORY_PATH"
-# Backdate the file by 10 days
+# Test 6: Stale ~/.kmgraph/rules.md triggers warning
+# Temporarily create a stale fake rules.md in a fake HOME
+FAKE_HOME="$TEST_DIR/fake-home"
+FAKE_KMGRAPH="$FAKE_HOME/.kmgraph"
+FAKE_CLAUDE_DIR="$FAKE_HOME/.claude"
+mkdir -p "$FAKE_KMGRAPH" "$FAKE_CLAUDE_DIR"
+echo "# rules" > "$FAKE_KMGRAPH/rules.md"
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  touch -t "$(date -v-10d +%Y%m%d%H%M)" "$MEMORY_PATH"
+  touch -t "$(date -v-35d +%Y%m%d%H%M)" "$FAKE_KMGRAPH/rules.md"
 else
-  touch -d "10 days ago" "$MEMORY_PATH"
+  touch -d "35 days ago" "$FAKE_KMGRAPH/rules.md"
 fi
+# Hook resolves config from $HOME/.claude/kg-config.json — put it in fake home too
+cp "$TEST_CONFIG" "$FAKE_CLAUDE_DIR/kg-config.json"
 
-cp "$TEST_CONFIG" "$REAL_CONFIG"
-OUTPUT=$(bash "$HOOKS_MASTER" 2>&1 || true)
+OUTPUT=$(HOME="$FAKE_HOME" bash "$HOOKS_MASTER" 2>&1 || true)
 if echo "$OUTPUT" | grep -qiE "stale|days ago"; then
-  pass "Stale MEMORY.md (10 days old) — outputs stale warning"
+  pass "Stale ~/.kmgraph/rules.md (35 days old) — outputs stale warning"
 else
-  fail "Stale MEMORY.md should trigger warning (got: $(echo "$OUTPUT" | tail -5))"
+  fail "Stale profile file should trigger warning (got: $(echo "$OUTPUT" | tail -5))"
 fi
 
-# Test 7: Fresh MEMORY.md shows synced status
-touch "$MEMORY_PATH"  # Reset to current time
+# Test 7: Fresh ~/.kmgraph/rules.md produces no staleness warning
+touch "$FAKE_KMGRAPH/rules.md"  # Reset to current time
 
-cp "$TEST_CONFIG" "$REAL_CONFIG"
-OUTPUT=$(bash "$HOOKS_MASTER" 2>&1 || true)
-if echo "$OUTPUT" | grep -qiE "synced|0 days ago|memory synced"; then
-  pass "Fresh MEMORY.md — outputs 'memory synced' status"
+OUTPUT=$(HOME="$FAKE_HOME" bash "$HOOKS_MASTER" 2>&1 || true)
+if ! echo "$OUTPUT" | grep -qiE "stale|days ago"; then
+  pass "Fresh ~/.kmgraph/rules.md — no staleness warning shown"
 else
-  fail "Fresh MEMORY.md should show synced status (got: $(echo "$OUTPUT" | tail -5))"
+  fail "Fresh profile file should not show staleness warning (got: $(echo "$OUTPUT" | tail -5))"
 fi
 
 echo ""
