@@ -13,6 +13,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.5.8] — 2026-05-25
+
+### Fixed
+- `pre-skill-rules-inject.sh` now reads the active project's `knowledge/rules.md` via `$CLAUDE_PROJECT_DIR` and injects its `### Plan File Location` and `### Plan File Routing` sections. Previously only the global `~/.kmgraph/rules.md` was injected, so project-specific naming conventions (e.g. career-prism's `v{ver}-{description}.md`) never reached the model.
+- Promoted the mirror-copy step and the project plan-naming convention from soft advisory text into a dedicated `--- Plan File Routing & Mirror Copy (HARD BLOCK — supersedes skill) ---` block, structurally identical to the working `Execution Handoff Override`. The model now obeys both rules as reliably as it obeys the existing block.
+- Restored v0.5.7 hook contents to the canonical `scripts/pre-skill-rules-inject.sh` and added `scripts/stop-plan-gate.sh` to the repo. The v0.5.7 commits never reached `main`; the CHANGELOG entry shipped but the code did not. New installs of v0.5.8 are the first to actually receive both fixes.
+- Dispatcher commands (`session-summary`, `capture-lesson`, `create-adr`) now relay subagent draft content in the main-thread response before prompting save/edit/cancel.
+- Fixed MEMORY.md cascade (ENH-014): `rules-capture-agent` was routing all behavioral captures to MEMORY.md instead of profile files (`~/.kmgraph/rules.md`, `~/.kmgraph/me.md`, `knowledge/rules.md`, `knowledge/me.md`). SessionStart hook no longer checks MEMORY.md staleness; cross-platform sync prompt now fires on profile file edits instead of MEMORY.md edits. Phantom `archive-memory`/`restore-memory` command references removed from help, docs, and skills. Marketplace description updated.
+
+### Added
+- `tests/test-pre-skill-rules-inject.sh` — 9-test suite covering project-rules extraction, HARD BLOCK structure, scoped capture, and `CLAUDE_PROJECT_DIR` fallbacks
+
 ## [0.5.7.1] — 2026-05-13
 
 ### Fixed
