@@ -87,6 +87,8 @@ Say: "Let me pull together what we worked on today..."
 
 Then invoke the `session-summary-agent`, passing `--title` and `--auto` if provided.
 
+After the agent returns, extract the draft content and display it verbatim in your main-thread response before asking save/edit/cancel. Do not rely on the tool result being visible to the user.
+
 ---
 
 **Version:** 2.0 (Refactored: 2026-03-27) — thin dispatcher; logic lives in session-summary-agent and session-documenter

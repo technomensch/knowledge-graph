@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "comment": "Master hook: validate KG config, display recent lessons, and notify of MEMORY.md changes",
+            "comment": "Master hook: validate KG config, display recent lessons, and check profile file staleness",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/hooks-master.sh",
             "timeout": 60
           }

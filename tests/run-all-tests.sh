@@ -47,6 +47,7 @@ SUITES=(
   "test-create-adr-implements.sh|v0.5.0 create-adr implements field validation|no"
   "test-dispatcher-tier-refactor.sh|v0.5.0 Dispatcher tier-resolver refactor|no"
   "test-v050-misc.sh|v0.5.0 Hooks + me.md template smoke tests|no"
+  "test-pre-skill-rules-inject.sh|PreToolUse Skill hook — project rules + hard blocks|no"
 )
 
 # ── Pre-flight Checks ─────────────────────────────────────────────────────────
