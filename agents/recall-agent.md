@@ -90,7 +90,12 @@ For multi-word topics, split into individual keywords for scoring (e.g. "CI/CD p
 | `knowledge` | knowledge/ only |
 | `sessions` | sessions/ only |
 
-Also search `~/.claude/projects/*/memory/MEMORY.md` if the query type is `all`.
+Also search the authoritative profile files when `--type=all` (default):
+
+- Personal scope (cross-project): `~/.kmgraph/rules.md`, `~/.kmgraph/me.md` — match against personal behavioral rules and identity/style preferences
+- Project scope (active KG): `{project}/knowledge/rules.md`, `{project}/knowledge/me.md` — match against project-specific rules and the user's preferences in this project
+
+These four files are the authoritative behavioral stores (post-MEMORY.md migration). The legacy `~/.claude/projects/*/memory/MEMORY.md` file is an index/pointer file only and should not be searched as a content source.
 
 ---
 

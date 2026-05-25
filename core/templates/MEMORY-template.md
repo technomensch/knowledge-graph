@@ -1,95 +1,41 @@
-# Project Memory - [Project Name]
+# Memory Index — [Project Name]
 
-Persistent governance context and critical patterns loaded into every session.
-
----
-
-## Core Governance Patterns
-
-[Add your project's governance patterns here]
-
-### Pattern Name
-
-**Key Pattern:**
-- [Bullet 1]
-- [Bullet 2]
-
-**See:** [Link to full documentation]
+A lightweight table of contents loaded at session start. Pointers only — content lives in the authoritative files below.
 
 ---
 
-## Project Structure & Patterns
+## Authoritative behavioral stores
 
-### Documentation Tiers
+All behavioral rules and preferences are written directly to these four files. Do NOT write content into this MEMORY.md — it is a pointer/index file only.
 
-- **Directory 1**: [Purpose]
-- **Directory 2**: [Purpose]
-
-### Key Files
-
-- `File1.md`: [Purpose]
-- `File2.md`: [Purpose]
+| Scope | Rules/Behavior | Identity/Preferences |
+|---|---|---|
+| Personal (cross-project) | `~/.kmgraph/rules.md` | `~/.kmgraph/me.md` |
+| Project-specific | `knowledge/rules.md` | `knowledge/me.md` |
 
 ---
 
-## Version Context
+## Pointers
 
-**Current Version:** [Version Number]
-**Latest Completed Work:** [Description]
-**Key Learning:** [Recent insight]
+Add one-line pointers below as lessons, ADRs, or KG entries land. Each entry links to a file in the knowledge graph — the full content stays there.
 
----
+### Recent lessons
 
-## Workflow Skills & Their Purpose
+- [Pointer description](path/to/lesson.md) — one-line summary `[→ lessons-learned]`
 
-| Skill | Purpose | See File |
-|-------|---------|----------|
-| `/skill-name` | [Purpose] | [file.md] |
+### Active decisions
 
----
+- [Pointer description](decisions/ADR-NNN.md) — one-line summary `[→ ADR]`
 
-## Common Failure Patterns & Fixes
+### Open plans
 
-### Pattern Name
-
-| Failure | Root Cause | Fix |
-|---------|-----------|-----|
-| [Symptom] | [Cause] | [Solution] |
+- [Plan name](docs/plans/v{ver}-{description}.md) — current status `[→ plan]`
 
 ---
 
-## Best Practices
+## Usage notes
 
-### Before Starting Work
-- [ ] [Checkpoint 1]
-- [ ] [Checkpoint 2]
-
-### During Implementation
-- [ ] [Checkpoint 1]
-- [ ] [Checkpoint 2]
-
-### Before Committing
-- [ ] [Checkpoint 1]
-- [ ] [Checkpoint 2]
-
----
-
-## References & Links
-
-**Core Documentation:**
-- [Link to key doc]
-
-**Active Planning:**
-- [Link to current plan]
-
----
-
-## Usage Notes
-
-- **Update frequency:** When new patterns/governance emerge
-- **Max lines:** 200 (truncates after 200)
-- **Sync with KG:** Run `/kmgraph:update-graph` Step 7 for bidirectional sync
-- **Purpose:** Provide persistent context across sessions
-
-> **Warning:** This file is truncated after 200 lines. Keep concise; move detailed content to separate topic files and link from here.
+- **Purpose:** Scannable index loaded at session start so the AI knows what knowledge exists. Reads underlying files when their content becomes relevant.
+- **Update behavior:** New rules go to the four profile files above via `/kmgraph:rules-capture`. Pointers here are added when an entry warrants top-of-mind visibility.
+- **What this file is NOT:** A content store. Never write behavioral rules, preferences, or knowledge directly here. Use the authoritative files.
 

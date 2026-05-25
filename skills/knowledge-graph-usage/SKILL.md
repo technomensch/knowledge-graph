@@ -286,28 +286,9 @@ Why now: Prevents re-solving known problems. Search takes 10 seconds,
 solving from scratch takes hours. Always search first.
 ```
 
-**After archiving entries (NEW - v0.0.4):**
-```
-Context: User ran /kmgraph:archive-memory to free token budget
-Context: User asks about a topic that was recently archived
-Context: User needs to reference archived knowledge for current work
-
-Restoration workflow:
-1. Check if entry is in archive: "/kmgraph:restore-memory --list"
-2. Restore by name: "/kmgraph:restore-memory \"Entry Name\""
-3. Restore by ID: "/kmgraph:restore-memory --id=5"
-4. Preview before writing: All restorations show preview + token impact
-
-Decision criteria:
-- Restore if: Currently working on related problem, need context for active task
-- Keep archived if: Historical reference only, not currently relevant
-- Token budget: Only restore if < 1,500 tokens in MEMORY.md
-
-Why now: Restoration should be need-driven. Archive freed space for active
-knowledge; only restore when archived context becomes active again.
-```
-
 For detailed workflow patterns with timing, command combinations, and optimization strategies, see **`references/command-workflows.md`**.
+
+**Note on MEMORY.md:** MEMORY.md is an index/pointer file only — it lists pointers to behavioral rules and preferences that live in the authoritative profile files (`~/.kmgraph/rules.md`, `~/.kmgraph/me.md`, `knowledge/rules.md`, `knowledge/me.md`). Token budget is not a meaningful metric for an index file; the AI reads it at session start to know what knowledge is available, then loads the underlying files as needed.
 
 ## Capture Patterns
 

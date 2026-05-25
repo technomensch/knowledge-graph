@@ -1,7 +1,7 @@
 {
   "name": "kmgraph",
   "version": "0.5.7.1",
-  "description": "Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects. Includes KG entries, ADRs, meta-issue tracking, chat extraction, and MEMORY.md bidirectional sync.",
+  "description": "Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects. Includes KG entries, ADRs, meta-issue tracking, chat extraction, and profile-file rule capture.",
   "author": {
     "name": "technomensch",
     "url": "https://github.com/technomensch",

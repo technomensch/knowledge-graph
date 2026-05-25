@@ -344,63 +344,26 @@ Write the rule to the target file:
 - For `.cursor/rules/*.mdc`: append to end of file, after any YAML frontmatter block
 - For all other targets: append to the appropriate section
 
-**MEMORY.md pointer stub — scope-aware destination:**
+**Write target — scope-aware destination (authoritative profile files):**
 
-| scope | Stub destination |
-|-------|-----------------|
-| project-rule | `~/.claude/projects/{project}/memory/MEMORY.md` |
-| project-me | `~/.claude/projects/{project}/memory/MEMORY.md` |
-| personal-rule | `~/.claude/memory/MEMORY.md` |
-| personal-me | `~/.claude/memory/MEMORY.md` |
-| platform-specific | `~/.claude/projects/{project}/memory/MEMORY.md` |
-| agents | `~/.claude/projects/{project}/memory/MEMORY.md` |
+| scope | Write destination | Section to append under |
+|-------|-------------------|-------------------------|
+| project-rule | `{project}/knowledge/rules.md` | Appropriate section (Always / Never / Project Conventions) |
+| project-me | `{project}/knowledge/me.md` | End of file (append) |
+| personal-rule | `~/.kmgraph/rules.md` | Appropriate section (Always / Never / Universal Rules) |
+| personal-me | `~/.kmgraph/me.md` | End of file (append) |
+| platform-specific | `~/.kmgraph/rules.md` | `## Platform-Specific Rules` (or platform sub-section) |
+| agents | `{project}/knowledge/rules.md` | `## Agents` section |
 
-If the destination MEMORY.md does not exist, create it with this minimal header before appending:
-```markdown
-# Memory Index
+Use the Edit tool against the resolved target file. Append under the appropriate section heading (create the heading if absent). MEMORY.md is no longer written by this agent — it is an index/pointer file managed elsewhere.
 
-All behavioral rules are authoritative in `knowledge/rules.md` and `knowledge/me.md` — check there first.
-
----
-```
-
-Exact stub formats (must match existing `[→ rules.md]` convention):
-```markdown
-# For project-rule → ~/.claude/projects/{project}/memory/MEMORY.md:
-- [Rule: {title}](knowledge/rules.md) — {one-line summary} `[→ rules.md]`
-
-# For project-me → ~/.claude/projects/{project}/memory/MEMORY.md:
-- [Rule: {title}](knowledge/me.md) — {one-line summary} `[→ me.md]`
-
-# For personal-rule → ~/.claude/memory/MEMORY.md:
-- [Rule: {title}](~/.kmgraph/rules.md) — {one-line summary} `[→ personal-rules.md]`
-
-# For personal-me → ~/.claude/memory/MEMORY.md:
-- [Rule: {title}](~/.kmgraph/me.md) — {one-line summary} `[→ personal-me.md]`
-
-# For platform-specific → ~/.claude/projects/{project}/memory/MEMORY.md:
-# (adjust path label per actual platform file — examples below)
-# (AGENTS.md uses the `agents` scope row below — not listed here.)
-- [Rule: {title}](CLAUDE.md) — {one-line summary} `[→ CLAUDE.md]`
-- [Rule: {title}](GEMINI.md) — {one-line summary} `[→ GEMINI.md]`
-- [Rule: {title}](.windsurfrules) — {one-line summary} `[→ .windsurfrules]`
-- [Rule: {title}](.github/copilot-instructions.md) — {one-line summary} `[→ copilot-instructions.md]`
-- [Rule: {title}](.cursor/rules/project-preferences.mdc) — {one-line summary} `[→ .cursor/rules]`
-- [Rule: {title}](.rules) — {one-line summary} `[→ .rules]`
-
-# For agents → ~/.claude/projects/{project}/memory/MEMORY.md:
-- [Rule: {title}](AGENTS.md) — {one-line summary} `[→ AGENTS.md]`
-```
-
-**Path resolution note:** "project-level" memory is the auto-memory directory at `~/.claude/projects/{encoded-project-path}/memory/MEMORY.md` (e.g. `~/.claude/projects/-Users-mkaplan-GitHub-knowledge-graph/memory/MEMORY.md`). The agent must resolve this from the current working directory, not hardcode it.
+**Path resolution note:** `{project}` is the active KG project root, resolved from the current working directory by walking up to find `.git/` or using cwd if not in a git repo. Never hardcode encoded `~/.claude/projects/` paths — those are Claude's internal auto-memory directory and not the rule write target.
 
 Confirm: "Rule saved to {target_file}."
 
 ## Phase 6: Concurrency guard
 
 **Single-session:** The skill fires at most once per correction per session, and the agent write is synchronous — no second suggestion fires until the agent completes and control returns. This is sufficient for a single Claude Code session.
-
-**Multi-session (known limitation):** Two Claude Code sessions open on the same repo (e.g. multi-worktree) could race on the same MEMORY.md file. To mitigate: before the Phase 5 Write call, check the file's mtime against the value recorded at Phase 1 Read. If mtime changed, re-read the file and retry the write once. If still changed after retry, abort and surface: "MEMORY.md was modified by another process — please retry." This mtime check applies to MEMORY.md stub writes only (target rule files are less likely to race).
 
 ## Constraints
 

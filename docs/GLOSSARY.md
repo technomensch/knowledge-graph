@@ -317,23 +317,28 @@ Expose knowledge graph as MCP resources:
 
 :::tip[**What is it?**]
 
-A special file that persists the most important learnings and patterns into the AI assistant's long-term context. Claude reads MEMORY.md at the start of every session.
+A lightweight index/pointer file that lists pointers to KMGraph's authoritative knowledge sources. Claude reads MEMORY.md at the start of every session to know what knowledge is available, then loads the underlying files as needed.
 
 :::
-**Location**: `/MEMORY.md` at the root of the knowledge graph directory.
+**Location**: `~/.claude/projects/{project}/memory/MEMORY.md` (Claude's auto-memory directory).
+
+**Three-layer model** — MEMORY.md indexes pointers to these authoritative stores:
+
+| Scope | Rules/Behavior | Identity/Preferences |
+|---|---|---|
+| Personal (cross-project) | `~/.kmgraph/rules.md` | `~/.kmgraph/me.md` |
+| Project-specific | `{project}/knowledge/rules.md` | `{project}/knowledge/me.md` |
 
 **How it works**:
 
-1. Lessons and patterns accumulate over time
-2. The `/kmgraph:update-graph` command extracts the most important insights
-3. Key patterns are written to MEMORY.md
-4. Claude loads MEMORY.md at the start of each session
-5. Claude "remembers" documented patterns without being reminded
+1. Behavioral rules and preferences are written to the four profile files above by `/kmgraph:rules-capture` and direct edits
+2. MEMORY.md holds one-line pointers to those files — it does NOT store content directly
+3. Claude loads MEMORY.md at the start of each session as a table of contents
+4. Claude reads the underlying profile files (and lesson, ADR, KG entries) when their content is relevant
 
-**Why it exists**: AI assistant context resets between sessions. MEMORY.md bridges that gap by ensuring key learnings persist across conversations.
+**Why it exists**: AI assistant context resets between sessions. MEMORY.md is the scannable index Claude reads first so it knows what knowledge exists; the authoritative content lives in the profile files and the knowledge graph.
 
-
-**Plain English**: The AI assistant's long-term memory file — ensures important learnings survive between sessions.
+**Plain English**: A table of contents the AI reads at session start to know what knowledge is available. Content lives elsewhere — never write rules directly to MEMORY.md.
 
 ---
 ## Meta-Issue
