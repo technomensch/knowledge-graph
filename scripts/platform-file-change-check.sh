@@ -33,7 +33,7 @@ FILE_BASE="$(basename "$FILE_PATH")"
 # Check against platform config whitelist using case
 MATCHED=false
 case "$FILE_BASE" in
-    "CLAUDE.md"|"GEMINI.md"|"MEMORY.md"|"AGENTS.md"|".cursorrules"|".windsurfrules"|"copilot-instructions.md"|".aider.conf.yml")
+    "CLAUDE.md"|"GEMINI.md"|"AGENTS.md"|".cursorrules"|".windsurfrules"|"copilot-instructions.md"|".aider.conf.yml"|"rules.md"|"me.md")
         MATCHED=true
         ;;
 esac

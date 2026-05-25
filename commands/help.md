@@ -77,8 +77,6 @@ Output in this format:
   /kmgraph:start-issue-tracking  Initialize structured issue tracking with Git branch
   /kmgraph:update-issue-plan     Sync progress to plans and GitHub
   /kmgraph:link-issue        Link lessons or ADRs to GitHub Issues
-  /kmgraph:archive-memory    Archive stale MEMORY.md entries
-  /kmgraph:restore-memory    Restore archived MEMORY.md entries
   /kmgraph:sync-all          Run the full sync pipeline in one command
 
 📄 Documentation

@@ -485,35 +485,56 @@ if [ -n "$MEMORY_FILE" ]; then
   fi
 fi
 
-# i. Legacy feedback-entry backfill offer (upgrade only)
+# i. Legacy feedback-entry backfill offer (upgrade only) — IDEMPOTENT
 # Run only when upgrading an existing KG that has rules.md scaffold or content.
 # Scans project MEMORY.md for feedback-type entries previously stored there (legacy)
 # that have not yet been migrated to rules.md.
+#
+# Idempotency: a marker comment is written to the top of knowledge/rules.md once
+# the user has accepted or declined this migration. If the marker exists, skip
+# the migration block entirely — the user is not re-prompted on every init.
+
+MIGRATION_MARKER="<!-- memory-migration: done -->"
 
 if [ -n "$MEMORY_FILE" ] && [ -f "knowledge/rules.md" ]; then
-  # Identify feedback entries: lines containing "[→ rules.md]" marker or entries
-  # whose content is not already present in rules.md (keyword overlap check).
-  # Display each candidate and offer to migrate:
-  #
-  #   Found N legacy feedback rule(s) in MEMORY.md not yet migrated to knowledge/rules.md:
-  #
-  #   1. "Never delete branches without explicit user approval" [→ rules.md]
-  #   2. "Always open the plan file in the editor after writing it" [→ rules.md]
-  #
-  #   Migrate these to knowledge/rules.md? [y/a/s]
-  #     y = yes, this one   a = yes, all   s = skip all
-  #
-  # For each entry confirmed:
-  #   - Draft in house style (Always/Never bullet with Why: line from memory entry body)
-  #   - Show draft and ask: Approve / Edit / Skip
-  #   - On approve: append to the correct section in knowledge/rules.md
-  # Do NOT remove the MEMORY.md entry — leave it as a pointer with [→ rules.md] already appended.
-  # Do NOT auto-write without per-entry confirmation.
-  echo ""
-  echo "  Checking MEMORY.md for legacy behavioral rules not yet migrated to rules.md..."
-  # [Implementation: parse $MEMORY_FILE for lines containing '[→ rules.md]' or
-  #  lines under a 'feedback' section; cross-check against knowledge/rules.md content;
-  #  surface any that appear absent; offer migration per entry]
+  # Skip if marker already present
+  if grep -qF "$MIGRATION_MARKER" "knowledge/rules.md" 2>/dev/null; then
+    echo ""
+    echo "  MEMORY.md → rules.md migration marker present — skipping migration offer."
+  else
+    # Identify feedback entries: lines containing "[→ rules.md]" marker or entries
+    # whose content is not already present in rules.md (keyword overlap check).
+    # Display each candidate and offer to migrate:
+    #
+    #   Found N legacy feedback rule(s) in MEMORY.md not yet migrated to knowledge/rules.md:
+    #
+    #   1. "Never delete branches without explicit user approval" [→ rules.md]
+    #   2. "Always open the plan file in the editor after writing it" [→ rules.md]
+    #
+    #   Migrate these to knowledge/rules.md? [y/a/s]
+    #     y = yes, this one   a = yes, all   s = skip all
+    #
+    # For each entry confirmed:
+    #   - Draft in house style (Always/Never bullet with Why: line from memory entry body)
+    #   - Show draft and ask: Approve / Edit / Skip
+    #   - On approve: append to the correct section in knowledge/rules.md
+    # Do NOT remove the MEMORY.md entry — leave it as a pointer with [→ rules.md] already appended.
+    # Do NOT auto-write without per-entry confirmation.
+    echo ""
+    echo "  Checking MEMORY.md for legacy behavioral rules not yet migrated to rules.md..."
+    # [Implementation: parse $MEMORY_FILE for lines containing '[→ rules.md]' or
+    #  lines under a 'feedback' section; cross-check against knowledge/rules.md content;
+    #  surface any that appear absent; offer migration per entry]
+
+    # Once the user has responded to the migration prompt (accept any/all or skip all),
+    # write the marker so this block does not re-prompt on the next init/upgrade.
+    # The marker is written even when the user declines — the offer was made; they answered.
+    if ! grep -qF "$MIGRATION_MARKER" "knowledge/rules.md" 2>/dev/null; then
+      # Insert marker as the first line of the file
+      printf '%s\n' "$MIGRATION_MARKER" | cat - "knowledge/rules.md" > "knowledge/rules.md.tmp" \
+        && mv "knowledge/rules.md.tmp" "knowledge/rules.md"
+    fi
+  fi
 fi
 
 # Safety rules for block (i):
@@ -522,6 +543,9 @@ fi
 # - If MEMORY.md does not exist or path cannot be found, skip block silently.
 # - Draft format must match existing knowledge/rules.md house style:
 #   "- [Always/Never] [directive]" with optional "  - Why:" and "  - Source:" sub-bullets.
+# - Idempotency: write the `<!-- memory-migration: done -->` marker at the top of
+#   knowledge/rules.md after the user has accepted or declined the migration offer,
+#   so this block does not re-prompt on subsequent init/upgrade runs.
 # Note: feedback-type MEMORY.md entries are a legacy migration path — MEMORY.md is no longer
 # the active governance store. New behavioral rules go directly to rules.md via rules-capture.
 # Step 1.6.5 covers only user-type entries (role, preferences → personal me.md).

@@ -335,7 +335,7 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 
 - Verify setup after running `/kmgraph:init`
 - See recent lessons at a glance
-- Check MEMORY.md staleness
+- Check profile file staleness (`~/.kmgraph/rules.md`, `~/.kmgraph/me.md`)
 - Quick health check on the knowledge graph
 
 **What it shows**:
@@ -344,7 +344,7 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 - Categories and git strategy
 - Last sync timestamp
 - File counts (lessons, KG entries, ADRs, sessions)
-- Warnings (stale MEMORY.md, missing paths)
+- Warnings (stale profile files, missing paths)
 - Quick command reference for common next steps
 
 **Time**: Instant
@@ -399,7 +399,7 @@ Dispatches to the recall agent, which searches:
 - Architecture decisions (ADRs)
 - Knowledge entries (patterns, gotchas, concepts)
 - Session summaries
-- MEMORY.md
+- Profile files (`~/.kmgraph/rules.md`, `~/.kmgraph/me.md`, `knowledge/rules.md`, `knowledge/me.md`)
 - Personal KG (if registered) — automatically included when a personal KG exists
 
 **Multi-KG behavior**: When a personal KG is registered, `recall` searches both project and personal KGs by default. Results include a source label (`[project]` or `[personal]`) so origin is always clear.
@@ -472,8 +472,7 @@ Dispatches to the recall agent, which searches:
 3. Checks if a matching KG entry already exists in `knowledge/patterns.md` (or similar)
 4. Creates new entries or updates existing ones with bidirectional links
 5. Runs data integrity audit on each new entry
-6. Checks MEMORY.md size and syncs new patterns if within token limits
-7. Commits KG and MEMORY.md changes together
+6. Commits KG changes
 
 **Time**: 1-5 minutes depending on number of lessons
 
@@ -1043,7 +1042,7 @@ With `--user-facing`:
 **When to use**:
 
 - After significant work sessions to consolidate everything
-- Weekly deep sync to ensure KG, MEMORY.md, plans, and GitHub are aligned
+- Weekly deep sync to ensure KG, plans, and GitHub are aligned
 - Before major milestones or project phase changes
 - As a catch-up sync if you've been capturing lessons without syncing
 
@@ -1051,11 +1050,10 @@ With `--user-facing`:
 
 1. **Scans** for new or modified lessons in `{active_kg_path}/lessons-learned/`
 2. **Extracts** KG entries from lessons (delegates to `/kmgraph:update-graph`)
-3. **Checks** MEMORY.md size and syncs new patterns (respects token limits)
-4. **Links** to active implementation plan if relevant
-5. **Updates** local issue with KG references and progress notes
-6. **Enriches** today's session summary with KG insights
-7. **Generates** GitHub Issue comment draft and asks for single confirmation before posting
+3. **Links** to active implementation plan if relevant
+4. **Updates** local issue with KG references and progress notes
+5. **Enriches** today's session summary with KG insights
+6. **Generates** GitHub Issue comment draft and asks for single confirmation before posting
 
 **Time**: 1-5 minutes depending on volume
 
@@ -1072,7 +1070,6 @@ Knowledge Sync Complete
 -----------------------
 Lessons scanned:  3 (2 new, 1 modified)
 KG entries:       2 created, 1 updated
-MEMORY.md:        Updated (1 new pattern)
 Plan linked:      v2.0 (Step 2 → Prefix Naming lesson)
 Local issue:      issue-42 (updated)
 GitHub:           #45 (comment posted)
@@ -1158,7 +1155,6 @@ Reading time: ~30-45 minutes for complete orientation
 2. **`/kmgraph:update-graph`**
    - Extracts patterns from existing lessons
    - Updates knowledge entries
-   - Syncs to MEMORY.md
    - Use: Daily or weekly to consolidate
 
 3. **`/kmgraph:sync-all`**
@@ -1216,22 +1212,6 @@ Reading time: ~30-45 minutes for complete orientation
 
 ---
 
-### Memory: archive vs restore
-
-**MEMORY.md lifecycle management**:
-
-1. **`/kmgraph:archive-memory`**
-   - Moves stale entries (>90 days old by default) to `MEMORY-archive.md`
-   - Frees token budget for new entries
-   - Recommended when approaching 1,500 token soft limit
-
-2. **`/kmgraph:restore-memory`**
-   - Brings archived entries back to active MEMORY.md
-   - Fuzzy search or ID-based selection
-   - Checks token limits before restoring
-
----
-
 ## Troubleshooting
 
 ### "Command not found"
@@ -1256,19 +1236,6 @@ Reading time: ~30-45 minutes for complete orientation
 1. Run `/kmgraph:init` to create your first KG
 2. Run `/kmgraph:list` to see available KGs
 3. Run `/kmgraph:switch` to activate an existing KG
-
----
-
-### "MEMORY.md is too large"
-
-**Problem**: MEMORY.md over 1,500 tokens, slowing down sessions or blocking new entries
-
-**Solutions**:
-
-1. Run `/kmgraph:archive-memory` to archive old entries
-2. Review archived entries: Check `MEMORY-archive.md`
-3. Restore if needed: `/kmgraph:restore-memory`
-4. Adjust threshold: `/kmgraph:archive-memory --threshold=60` for more aggressive archival
 
 ---
 
@@ -1328,7 +1295,7 @@ This section covers implementation specifics for users who want to understand ho
 
 When the [context-mode plugin](https://github.com/steventcramer/context-mode) is installed alongside kmgraph:
 
-- `sync-all` uses `ctx_batch_execute` to combine lesson scanning and MEMORY.md size checks in a single sandboxed background process
+- `sync-all` uses `ctx_batch_execute` to combine lesson scanning and KG extraction in a single sandboxed background process
 - `update-graph` uses `ctx_execute_file` for sandboxed file reads when processing 10 or more lessons; falls back to the knowledge-extractor subagent for large batches without context-mode, or reads directly for small batches
 - Detection: kmgraph checks for `mcp__plugin_context-mode_context-mode__ctx_batch_execute` at runtime; no configuration required; zero breaking change if context-mode is absent
 
