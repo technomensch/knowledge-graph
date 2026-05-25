@@ -292,8 +292,44 @@ This pattern is consistent with the ADR's broader principle — the user should 
 ---
 
 **Decision Made:** 2026-04-09
-**Last Updated:** 2026-04-09 (added kg-index.md as third scaffolded file; content migration offer moved in-scope; "See what's new" UX added for verify/upgrade option; switched from static version changelog to state-derived upgrade reporting)
+**Last Updated:** 2026-05-25 (Amendment: Rules File Scale Pattern added)
 **Status:** Proposed
+
+---
+
+## Amendment — 2026-05-25: Rules File Scale Pattern
+
+As `~/.kmgraph/rules.md` grows beyond ~120 lines, mixing behavioral rules (workflow, communication, approval gates) with plan-protocol rules (execution modes, validation checklists, stuck-work escalation) in a single file creates injection noise — all rules appear in all contexts regardless of relevance.
+
+**Observation:** A recommendation-trigger pattern has been identified (ENH-016): when a rules file exceeds ~120 lines OR contains two or more clearly separable logical domains, the system recommends splitting into focused files.
+
+**Example split pattern:**
+- `rules.md` — behavioral rules only (git workflow, communication, approval gates, knowledge capture, profile structure)
+- `plan-rules.md` — plan-protocol rules only (branch placement, file location, execution modes, validation, stuck-work escalation, model selection)
+
+**Critical constraint:** Any split requires updating ALL reference files that consume the original `~/.kmgraph/rules.md`:
+
+1. **Platform config files:**
+   - `~/.claude/CLAUDE.md` (user-global baseline)
+   - `~/.gemini/GEMINI.md` (if using Gemini CLI)
+   - `.cursorrules` (if using Cursor)
+   - `CLAUDE.md` in each project repo
+
+2. **Hook and automation scripts:**
+   - `scripts/pre-skill-rules-inject.sh` — reads rules.md per skill branch; must be updated to read both files or split smartly
+   - `scripts/hooks-master.sh` — if it references the original path
+
+3. **Documentation:**
+   - `MEMORY.md` index files (user-level and per-project) — update pointers
+   - `knowledge/rules.md` / project rules files — document the split and when each is used
+
+**Recovery tool:** The `platform-sync-agent` skill exists to propagate changes across platform config files and hook scripts after a split. Use it to automate the cross-reference update.
+
+**Decision:** Do not split proactively. Split only when the file exceeds the ~120-line threshold AND the user explicitly requests it, OR when the split becomes the most maintainable option during a rules-related amendment (ENH-016 tracks the recommendation-trigger implementation).
+
+**See:** `knowledge/enhancements/ENH-016/ENH-016-specification.md` for the full recommendation-trigger protocol.
+
+**Shipping constraint discovered during implementation (2026-05-25):** The shipped hook must use conditional fallback logic when reading split files. Hardcoding `plan-rules.md` paths in the hook breaks injection for users who haven't split — the sections silently fail to load. Pattern: `[ -f "$PLAN_RULES" ] || PLAN_RULES="$RULES"` before any `_extract_section` call. See ENH-016 spec "Shipping Constraint" section.
 
 ---
 
