@@ -41,6 +41,9 @@ category: process
 - In scope: all kmgraph marketplace users who also use superpowers
 - Out of scope: modifying third-party skill content (superpowers CLAUDE.md explicitly prohibits project-specific changes)
 
+**v0.5.9 Expansion (ENH-015 — Decision Governance Protocol):**
+v0.5.9 significantly expands the hook's scope beyond the original brainstorming/writing-plans rule injection. The hook now implements a full 7-branch case statement with HARD BLOCKs and governance gates.
+
 ---
 
 ## Decision
@@ -55,6 +58,24 @@ Use a Claude Code PreToolUse hook on the Skill tool to inject `~/.kmgraph/rules.
 1. **PreToolUse hook:** Fires when Skill tool is called; script inspects the skill name and injects rules if it matches brainstorming/writing-plans
 2. **Marketplace-safe script:** Gracefully no-ops if `~/.kmgraph/rules.md` does not exist; reads user's own rules dynamically; exits 0 always
 3. **Model heuristics addition:** Add per-task model selection guidance to `~/.kmgraph/rules.md` and to the default `rules.md` init template so injected content is complete
+
+**v0.5.9 Extension — 7-branch case statement:**
+
+The hook's `pre-skill-rules-inject.sh` is rewritten to a case-statement architecture with 7 branches:
+
+1. **planning** (`superpowers:writing-plans`): injects RECALL_HARD_BLOCK (two-query: topic + architectural domain), ACTIVE_KG_HARD_BLOCK (14-day recency), plan-file embedding (File Location, Parallelism, Approval Gates), Ad-Hoc Updates, Plugin Cache, Capture Checkpoints sections from plan-rules.md
+2. **brainstorming** (`superpowers:brainstorming`): injects Brainstorm Recall HARD BLOCK — "invoke kmgraph:recall skill (via Skill tool) before recommending"
+3. **execution** (`superpowers:subagent-driven-development`): injects Execution Handoff Override + Plan File Routing; contains ADR cascade gate (checks `/tmp/kmgraph-adr-captured-*.flag`); if flag exists, blocks dispatch and prompts ADR capture first
+4. **finishing** (`superpowers:finishing-up`): removes ADR cascade flag on session completion
+5. **debugging** (`superpowers:systematic-debugging`): injects Debug Recall HARD BLOCK — "invoke recall before proposing first hypothesis"
+6. **review-request** (`superpowers:requesting-code-review`): injects Review Context Injection HARD BLOCK — "invoke recall on each modified file path before dispatching reviewer"
+7. **fallback**: exits 0 (no injection) for unrecognized skill names
+
+**Design constraint — dispatch branch unreachable:**
+`superpowers:subagent-driven-development` maps to `SKILL_TYPE="execution"` in the case statement. A separate `dispatch` branch cannot fire. The ADR cascade gate lives INSIDE the `execution` branch, not in a separate `dispatch` branch.
+
+**HARD BLOCK syntax:**
+All HARD BLOCKs use "invoke the kmgraph:recall skill (via Skill tool)" — NOT `/kmgraph:recall` slash-command syntax, which does not work in hook injection context.
 
 ---
 
@@ -114,6 +135,7 @@ Use a Claude Code PreToolUse hook on the Skill tool to inject `~/.kmgraph/rules.
 
 1. **Machine-local user-scope:** `~/.claude/settings.json` hook must be re-installed on each machine
 2. **Truncation risk:** Rules files exceeding 8KB will be partially injected
+3. **No hard gate for post-plan validation:** PostToolUse:Write hook (Task M) provides advisory enforcement only — it fires after the plan file is written and outputs a checklist reminder, but cannot block writes. A PreToolUse:Write hard gate (future scope) would require a pattern that only blocks finalization writes where the checklist has `❌` items, not mid-draft saves.
 
 ### Neutral
 
@@ -140,6 +162,12 @@ Use a Claude Code PreToolUse hook on the Skill tool to inject `~/.kmgraph/rules.
 - After hook is installed: `superpowers:brainstorming` saves specs to `docs/specs/` without prompting
 - After hook is installed: execution mode is pre-decided (not presented interactively)
 - Hook script exits 0 cleanly when `~/.kmgraph/rules.md` is absent
+- v0.5.9: `pre-skill-rules-inject.sh` planning branch injects RECALL_HARD_BLOCK with two queries before any plan content
+- v0.5.9: brainstorm/debug/review branches each inject their respective HARD BLOCKs
+- v0.5.9: execution branch contains ADR cascade gate; does NOT have a separate `dispatch` branch
+- v0.5.9: planning branch injects Ad-Hoc Updates, Plugin Cache, Capture Checkpoints from plan-rules.md (Task K)
+- v0.5.9: `superpowers:writing-plans` output contains "Plan Recall (HARD BLOCK" before "Execution Handoff Override" (verified by test suite — test-decision-governance.sh, 19 tests)
+- All HARD BLOCKs use "invoke kmgraph:recall skill (via Skill tool)" — not slash-command syntax
 
 **Review Date:** 2026-07-21
 
@@ -150,9 +178,11 @@ Use a Claude Code PreToolUse hook on the Skill tool to inject `~/.kmgraph/rules.
 - **[[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file]]:** Defines triggers.md as the timing companion; this ADR implements the enforcement mechanism for the superpowers skill triggers
 - **[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]]:** Establishes rules.md as the authoritative source; this ADR ensures it is actually loaded before skills execute
 - **[[ADR-038-model-selection-rule-for-kg-tasks]]:** Model selection for KG ops; model heuristics addition extends this to cover plan execution task types
+- **[[ENH-015-decision-governance-protocol]]:** The feature this ADR implements; contains full Platform Delivery Matrix, Known Gaps, and Amendment Deliverables
+- **[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]]:** rules.md split shipping constraint — the rules-registry in `core/rules-registry/` follows the same principle for canonical rule text
 
 ---
 
 **Decision Made:** 2026-04-21
-**Last Updated:** 2026-04-21 (renumbered from ADR-041 to ADR-043 — cross-branch collision resolution)
+**Last Updated:** 2026-05-25 (v0.5.9 expansion — 7-branch case statement, RECALL_HARD_BLOCK, dispatch branch constraint, Gap 2 future scope documented)
 **Status:** Accepted

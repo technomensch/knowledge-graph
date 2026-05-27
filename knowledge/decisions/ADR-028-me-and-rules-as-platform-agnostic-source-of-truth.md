@@ -292,7 +292,7 @@ This pattern is consistent with the ADR's broader principle — the user should 
 ---
 
 **Decision Made:** 2026-04-09
-**Last Updated:** 2026-05-25 (Amendment: Rules File Scale Pattern added)
+**Last Updated:** 2026-05-25 (Amendment: Decision Governance Protocol + Open Questions capture added)
 **Status:** Proposed
 
 ---
@@ -330,6 +330,23 @@ As `~/.kmgraph/rules.md` grows beyond ~120 lines, mixing behavioral rules (workf
 **See:** `knowledge/enhancements/ENH-016/ENH-016-specification.md` for the full recommendation-trigger protocol.
 
 **Shipping constraint discovered during implementation (2026-05-25):** The shipped hook must use conditional fallback logic when reading split files. Hardcoding `plan-rules.md` paths in the hook breaks injection for users who haven't split — the sections silently fail to load. Pattern: `[ -f "$PLAN_RULES" ] || PLAN_RULES="$RULES"` before any `_extract_section` call. See ENH-016 spec "Shipping Constraint" section.
+
+---
+
+## Amendment — 2026-05-25: Decision Governance Protocol + Open Questions Capture
+
+Established during v0.5.9 ENH-015 design session.
+
+**Background agent pattern for ADR/ENH creation:** When a decision or enhancement crystallizes during a brainstorming session, ADR drafting and ENH spec capture fire as non-blocking background fast-agents. The brainstorm flow continues uninterrupted. When agents complete, the model presents a review-or-save prompt: "Review before saving, or save now? Files at `knowledge/decisions/ADR-NNN.md` and `knowledge/enhancements/ENH-NNN/`". If "save now": files already written, user reviews outside session at listed paths. If "review first": content surfaced inline for approve/edit/skip per item.
+
+**Open Questions section (required in all ADRs):** All ADR template instances must include an "Open Questions" section. This is the single write path for:
+- Unresolved action items surfaced during brainstorming
+- Opus review feedback that requires follow-up
+- Items that cannot be resolved within the current session
+
+**Session summary deduplication:** The `session-wrap` skill reads all ADRs and ENHs created or modified this session, extracts their "Open Questions" sections, and emits a deduplicated "Open Items" list in the session summary. No direct writes to the session summary "Open Items" section are permitted — structural single-source guarantees dedup. Items scoped to one decision remain in that ADR/ENH permanently; the session summary is the aggregated view for the current session only.
+
+**See:** `knowledge/enhancements/ENH-015/ENH-015-specification.md` for full deliverable list including `skills/session-wrap/SKILL.md` extension (Deliverable 7).
 
 ---
 
