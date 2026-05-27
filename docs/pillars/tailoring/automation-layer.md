@@ -60,6 +60,7 @@ Skills listen for natural-language signals. They never execute commands automati
 |---|---|
 | **lesson-capture** | "figured it out", "solved it", "the fix was", "turns out the issue was" |
 | **kg-recall** | "have we done this before", "did we solve this", "what was the pattern for" |
+| **brainstorm-recall** | `superpowers:brainstorming` invoked — fires before `adr-guide` to surface prior art |
 | **session-wrap** | "I'm wrapping up", "stopping for the day", context limit approaching |
 | **adr-guide** | "I'm thinking of using", "should we use X or Y", "architectural decision" |
 | **capture-router** | "capture that", "remember that", "save that", "let's document this" |

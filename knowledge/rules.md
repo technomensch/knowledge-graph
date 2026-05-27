@@ -56,7 +56,7 @@ Before pushing to origin OR before creating/completing a merge, run `/kmgraph:up
 
 ### Pre-PR Doc Verification
 
-Before creating a PR with doc changes: run `git diff HEAD~N -- docs/` for each changed file, check for formatting regressions (stray spaces, broken tables, removed blank lines, wrong agent names), then run `mkdocs build` and confirm no new warnings
+Before creating a PR with doc changes: run `git diff HEAD~N -- docs/` for each changed file, check for formatting regressions (stray spaces, broken tables, removed blank lines, wrong agent names), then run `npm run build` and confirm no new warnings
 - **Why:** agent-written doc content caused silent regressions (broken tables, stray whitespace) that only showed after push; catching them pre-PR avoids review iteration
 
 ---
