@@ -294,7 +294,7 @@ function rebuildIndex(kgPath, kgName, kgType = "project-local") {
         // Resolve content root: v0.2+ KGs store content under docs/
         const contentRoot = resolveContentRoot(kgPath);
         // Collect all .md files from target subdirectories
-        const searchDirs = ["knowledge", "lessons-learned", "decisions", "sessions"];
+        const searchDirs = ["knowledge", "lessons-learned", "decisions", "sessions", "chat-history"];
         const allFiles = [];
         for (const dir of searchDirs) {
             const dirPath = path.join(contentRoot, dir);

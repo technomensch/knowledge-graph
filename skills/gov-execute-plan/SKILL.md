@@ -47,6 +47,26 @@ Enter choice (C / S / X):
 
 This check runs once per item, before the first edit for that item.
 
+**Prerequisite Check — In-Plan Cascade Review:**
+Before executing, check for ADR capture flag:
+
+```bash
+ADR_FLAG="/tmp/kmgraph-adr-captured-$(date +%Y-%m-%d).flag"
+```
+
+If flag EXISTS:
+1. Review the plan tasks below.
+2. Ask the user: "A new decision was captured this session. Do any plan tasks need revision before executing?"
+3. Wait for user response before proceeding.
+4. If tasks need revision: update the plan, then continue.
+5. If no revision needed: proceed.
+
+If flag ABSENT: skip this check and proceed normally.
+
+> **Detection mechanism:** flag file written by `adr-guide` after successful ADR creation. Day-scoped via `$(date +%Y-%m-%d)` — consistent with existing `kmgraph-plan-gate` pattern. No model self-tracking required.
+
+> **Subagent fallback:** If `gov-execute-plan` is somehow invoked as a subagent with the flag present (parent failed to gate), output: "Parent must resolve in-plan cascade before dispatching subagents. HALT." Do not attempt to prompt the user — subagents have no interaction channel.
+
 **Protocol Steps:**
 1. **State Initialization** — Output STRICT EXECUTION MODE banner before any action
 2. **Literal Mapping** — Quote each plan instruction before executing (literal mapping, no assumptions)

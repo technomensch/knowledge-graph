@@ -39,6 +39,7 @@ Grep for major.minor prefix (e.g., `0\.2\.`) not the exact prior version string 
 Update affected docs (README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, CONCEPTS, INSTALL.md) when behavior changes
 - **Why:** doc updates were missed after command and agent changes, leaving guides and CHEAT-SHEET inconsistent with actual behavior
 - **Source:** [ADR-013 Documentation Update Protocol](decisions/ADR-013-documentation-update-protocol.md)
+- kmgraph affected pages to check: README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, CONCEPTS, GLOSSARY, and any pillar page whose described behavior changes
 
 ### Sidebar Update on Doc Rename or Move
 
@@ -267,3 +268,25 @@ Do not use numbered headings in knowledge files — use plain headings (e.g., `#
 | `commands/init-shared/` | Shared parameterized modules called by init.md and init-personal-kg.md | yes |
 | `knowledge/ENH-NNN/` | Plans and specs for a specific enhancement (ADR-029) | selective |
 | `knowledge/plans/` | Misc plans with no ENH/issue parent (ADR-029) | selective |
+
+## Plan Protocol
+
+### Recall in Plan Mode
+
+When plan mode is active (native `/plan` command, `superpowers:writing-plans`, or any
+automated planning tool such as Ultraplan), invoke the `kmgraph:recall` skill with TWO
+queries before making any plan recommendations:
+1. The specific plan topic
+2. The architectural domain of the change (rules, deployment, platform, cross-LLM, etc.)
+
+Running only the topic query misses architectural ADRs and ENHs that constrain the work.
+
+**Recall results take priority — reason about findings before recommending:**
+- If recall surfaces a rejected approach, examine WHY it was rejected and whether that reason is still applicable.
+- If still applicable: do not propose the approach; if unavoidable, explain why no workaround exists.
+- If no longer applicable: may propose it, but must document why the old rejection no longer holds AND lay out full cascade impact on the project.
+- If it is the only viable option: propose it, but lay out complete ramifications and cascade effects across all affected systems, skills, decisions, and docs.
+- If recall finds nothing: write "No prior art found for [topic]." and proceed.
+
+Include findings under a "## Prior Art" section at the top of the plan.
+Do not skip — plan recommendations made without context contradict existing decisions.

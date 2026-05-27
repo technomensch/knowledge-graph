@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.5.7.1
+**Version:** 0.5.9
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -88,6 +88,16 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 ---
 
 ## v0.5.x Feature Highlights
+
+**v0.5.9 — 2026-05-27**
+
+- **Decision governance protocol enforced at hook level** — `pre-skill-rules-inject.sh` now hard-blocks brainstorming and planning without a prior knowledge-graph recall. Two recall queries are required before any plan is written (topic + architectural domain). Recall misses are logged to `/tmp/kmgraph-recall-miss-*.log` for audit. Remote-session compatibility: embedded-rules block is written directly into plan files so Ultraplan and other non-hook contexts carry the enforcement.
+- **New `brainstorm-recall` skill** — Fires before `adr-guide` and invokes `kmgraph:recall` before any recommendation. Results appear under a "Prior Art" heading so past decisions surface before new ones are made.
+- **`gov-execute-plan` cascade gate** — When a new ADR is captured mid-session, execution is paused before the next plan task so the user can review cascade impact. ADR flag is day-scoped and cleaned at branch finish.
+- **Chat-history now searchable** — `mcp-server/src/tools/fts5.ts` adds `chat-history` to `searchDirs`; exported chat logs are indexed and reachable via `kg_search`.
+- **Session-documenter Relay Contract** — Draft session summaries are now displayed verbatim before save/edit/cancel options. No silent summarization.
+- **Post-plan validation checklist** — A PostToolUse:Write hook fires after any `plans/*.md` write and outputs an advisory validation checklist.
+- **Canonical rules registry** — `core/rules-registry/` stores authoritative rule text; all deployment surfaces (templates, profile files) copy from here.
 
 **v0.5.4 — 2026-04-28**
 
@@ -180,7 +190,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.5.7.1 (2026-05-13)
+**Current Release:** v0.5.9 (2026-05-27)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -273,6 +283,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.5.7.1 (2026-05-13)
+**Current Version:** v0.5.9 (2026-05-27)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info

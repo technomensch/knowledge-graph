@@ -1,5 +1,5 @@
 #!/bin/bash
-# test-skills-agents.sh — Structural validation for all 6 skills and 8 agents
+# test-skills-agents.sh — Structural validation for all skills and agents
 #
 # Skills: auto-triggered context providers in skills/
 # Agents: heavy-lift task handlers in agents/
@@ -45,6 +45,7 @@ EXPECTED_SKILLS=(
   "sidebar-update"
   "stuck-work-escalation"
   "update-profile"
+  "brainstorm-recall"
 )
 
 # Test 1: Skills directory exists
@@ -67,17 +68,17 @@ if [ -n "$SKILLS_DIR" ]; then
     fi
   done
   if [ $MISSING_SKILLS -eq 0 ]; then
-    pass "All 14 skill directories present"
+    pass "All 15 skill directories present"
   else
     fail "$MISSING_SKILLS skill director(ies) missing"
   fi
 
   # Test 3: Exact count is 14
   ACTUAL_COUNT=$(find "$SKILLS_DIR" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')
-  if [ "$ACTUAL_COUNT" -eq 14 ]; then
-    pass "Exact skill count is 14"
+  if [ "$ACTUAL_COUNT" -eq 15 ]; then
+    pass "Exact skill count is 15"
   else
-    fail "Skill count is $ACTUAL_COUNT (expected 14)"
+    fail "Skill count is $ACTUAL_COUNT (expected 15)"
   fi
 
   # Test 4: No empty skill directories

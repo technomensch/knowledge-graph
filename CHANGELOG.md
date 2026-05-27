@@ -13,26 +13,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
-## [0.5.9] — Unreleased
+## [0.5.9] — 2026-05-27
 
 ### Added
 - `brainstorm-recall` skill: invokes kmgraph:recall skill (via Skill tool) before any recommendation; presents results under "Prior Art" heading; fires before `adr-guide`
 - `gov-execute-plan` in-plan cascade gate: prompts plan-task review when a new ADR was captured this session, before execution begins
 - `core/rules-registry/recall-in-planning.md`: canonical recall-in-planning rule text (single source of truth for all deployment surfaces)
 - `core/templates/decisions/ADR-template.md`: `search_aliases` frontmatter field + `## Open Questions` section
+- `scripts/post-plan-validate-checklist.sh`: PostToolUse:Write advisory hook that outputs a post-plan validation checklist after any `plans/*.md` write
+- `hooks/hooks.json`: PostToolUse:Write hook wired to `post-plan-validate-checklist.sh`
 
 ### Changed
 - `adr-guide`: added supersede-vs-net-new check, project-wide cascade step (Step 4a), and in-plan cascade advisory (Step 4b)
 - `pre-skill-rules-inject.sh`: split brainstorming into dedicated skill-type branch; added Brainstorm Recall HARD BLOCK; added fallback vars for non-split rules files
-- `pre-skill-rules-inject.sh` planning branch: requires recall (two queries) before any plan-writing; Active KG Context block surfaces recent ADRs/ENHs; plan-file embedded-rules block for remote-session compatibility; recall miss logged to `/tmp/kmgraph-recall-miss-*.log`
+- `pre-skill-rules-inject.sh` planning branch: requires recall (two queries) before any plan-writing; Active KG Context block surfaces recent ADRs/ENHs; plan-file embedded-rules block for remote-session compatibility; recall miss logged to `/tmp/kmgraph-recall-miss-*.log`; now also injects Ad-Hoc Plan Updates and Execution/Gating sections from `~/.kmgraph/plan-rules.md`
+- `superpowers:writing-plans` SKILL.md (plugin cache): added Plan Recall HARD BLOCK to enforce recall before plan writing in remote-session contexts
 - `skills/kg-recall/SKILL.md`: corrected dispatch description (was: direct to recall-agent; now: via gov-capture-routing → recall-agent); added platform degradation path for non-Claude environments; added compliance-failure clause
 - `core/rules-registry/`: new canonical rule text registry; deployment surfaces source from here
 - `core/templates/knowledge/templates/project/rules.md` + `user/rules.md`: seeded with "Recall in Plan Mode" rule
 - `~/.kmgraph/plan-rules.md`: "Recall in Plan Mode" rule added
 - `skills/session-wrap/SKILL.md`: added Open Items scan (aggregates Open Questions from session ADRs/ENHs)
-- `hooks-master.sh`: staleness check now skips non-existent split rule files
+- `hooks-master.sh`: staleness check now passes label argument and guards against non-existent split rule files
 - `knowledge/rules.md`: added kmgraph-specific docs page list under User-Facing Docs Updates
 - Plan template: added required "Docs Updates (Grouped)" section
+- `agents/session-documenter.md`: added Relay Contract block requiring draft content be displayed verbatim before save/edit/cancel options
+- `mcp-server/src/tools/fts5.ts`: added `chat-history` to `searchDirs` so chat exports are indexed and searchable via `kg_search`
+- `commands/start-issue-tracking.md`: added semver examples to version-impact question for clarity
 
 ## [0.5.8] — 2026-05-25
 

@@ -48,6 +48,7 @@ SUITES=(
   "test-dispatcher-tier-refactor.sh|v0.5.0 Dispatcher tier-resolver refactor|no"
   "test-v050-misc.sh|v0.5.0 Hooks + me.md template smoke tests|no"
   "test-pre-skill-rules-inject.sh|PreToolUse Skill hook — project rules + hard blocks|no"
+  "test-decision-governance.sh|Decision Governance — brainstorm-recall + adr-guide + gov-execute-plan|no"
 )
 
 # ── Pre-flight Checks ─────────────────────────────────────────────────────────

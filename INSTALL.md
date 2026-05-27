@@ -237,6 +237,11 @@ done
 | **v0.5.3** | No upgrade action required. `extract-chat` large-day auto-split and `update-doc` fixes are automatic after plugin reload. |
 | **v0.5.4** | Profile auto-load — no upgrade action required. `me.md` and `triggers.md` are now injected at SessionStart automatically. No config changes needed. |
 | **v0.5.5** | Bug fix — no upgrade action required. Stop hook dedup flag is now keyed on `{kg-name}-{date}` instead of `{PPID}-{date}`. Stale PPID-format flags from prior sessions are cleaned automatically on the next hook run. |
+| **v0.5.6** | No upgrade action required. `sync-all`, `rules-capture`, and `session-wrap` behavioral changes are automatic after plugin reload. |
+| **v0.5.7** | No upgrade action required. PreToolUse hook overrides (Execution Handoff, PR Gate) and Stop hook safety net are automatic after plugin reload. |
+| **v0.5.7.1** | Security patch — no upgrade action required. Dependabot dependency overrides applied automatically on install. |
+| **v0.5.8** | No upgrade action required. Project-specific plan-routing rules, dispatcher relay, and MEMORY.md cascade fix are automatic after plugin reload. |
+| **v0.5.9** | No upgrade action required. Decision governance recall enforcement, `brainstorm-recall` skill, and post-plan validation checklist are automatic after plugin reload. Optionally run `/kmgraph:upgrade` to add the "Recall in Plan Mode" rule to your `~/.kmgraph/plan-rules.md` if you have a split rules file. |
 
 After the wizard completes, your existing lessons, ADRs, sessions, and chat history are untouched.
 
