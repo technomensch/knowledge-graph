@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `core/rules-registry/review-audit-protocol.md`, `core/templates/.../governance-rules.md`, `~/.kmgraph/governance-rules.md`, `scripts/pre-skill-rules-inject.sh`: HALT ambiguity — Step 4 was interpreted as stop-per-finding with bare "proceed?"; clarified to ONE halt after complete audit trail; decision blocks now require finding description, severity, recommended action, and decision options
 
 ### Knowledge Graph
+- issue-7: Bash permission prompt UX bug tracked — solution designed for v0.6.0 (`knowledge/issues/issue-7/`)
 - ADR-049: Review Audit Protocol — Post-Plan/Pre-Push Review Governance (Accepted; branch updated to `v0.5.9.1-review-audit-protocol`)
 - ENH-019 spec committed (deferred, no implementation in this release)
 
