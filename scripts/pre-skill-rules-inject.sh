@@ -156,7 +156,7 @@ For post-plan, pre-push, or explicit full review/audit:
 3. Complete full review pass without interruption — dispatch background agents for investigation; do NOT wait mid-pass
 4. After pass: present findings list; ask "Run recall? [all / select / skip]" — batch into one call
 5. Display all results inline (not collapsed)
-6. Present audit trail table + decision prompt per finding — HALT until user resolves all findings
+6. Present COMPLETE audit trail table covering ALL findings at once — HALT ONCE. For each finding include: description, severity, recommended action, decision options. Do NOT stop mid-review per finding. Do NOT ask bare "proceed?" questions. Every halt must present finding context + recommendation.
 --- End Review Audit Protocol ---'
   ROUTING_HARD_BLOCK=""
 

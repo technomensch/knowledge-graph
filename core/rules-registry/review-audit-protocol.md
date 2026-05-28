@@ -24,7 +24,7 @@ Does NOT fire for:
 
 ### Step 1: Complete review pass without interruption
 
-Perform the full review pass top-to-bottom without stopping. For each finding that warrants investigation, dispatch a background agent (`cavecrew-investigator` or appropriate subagent type) as you go. Do NOT stop to discuss, implement, or wait for agent results mid-pass.
+Perform the full review pass top-to-bottom without stopping. For each finding that warrants investigation, dispatch a background agent (`cavecrew-investigator` or appropriate subagent type) as you go. Do NOT stop to discuss, implement, or wait for agent results mid-pass. Do NOT ask 'proceed?' mid-review.
 
 ### Step 2: Batched recall gate (after pass completes)
 
@@ -38,9 +38,23 @@ Batch all selected findings into a single recall call. Do not run recall per-fin
 
 Show agent investigation reports and recall results inline in the conversation. Do not collapse, summarize into headings only, or redirect to external files. Full content visible.
 
-### Step 4: Present audit trail table and decision prompt — HALT
+### Step 4: Present complete audit trail — HALT ONCE
 
-Display the audit trail table (format below) and the decision prompt for each finding. Stop and wait for user decisions. Do not proceed to implementation until the user resolves all findings.
+After all agent reports and recall results are displayed, present the COMPLETE audit trail table covering ALL findings. This is a single halt, not one per finding.
+
+For each finding, present a structured decision block:
+
+---
+**Finding [N]: [one-line description]**
+**Severity:** [critical / high / medium / low]
+**Detail:** [what was found — specific file:line or behavior]
+**Recommended action:** [specific fix or recommendation]
+**Decision:** fix now / ignore / track / dig deeper / discuss
+---
+
+HALT after the full table. Wait for the user to respond with a decision for each finding before implementing anything.
+
+Do NOT stop mid-review to ask about individual findings. Do NOT ask bare "proceed?" questions. Every halt must include the finding description and recommended action.
 
 ---
 

@@ -15,10 +15,10 @@ Does NOT fire for casual inspection ("does this look right?", "review this file"
 
 ### Protocol
 
-1. **Complete review pass without interruption.** For each finding needing investigation, dispatch a background agent as you go. Do NOT stop to discuss, implement, or wait for results mid-pass.
+1. **Complete review pass without interruption.** For each finding needing investigation, dispatch a background agent as you go. Do NOT stop to discuss, implement, or wait for results mid-pass. Do NOT ask "proceed?" mid-review.
 2. **Batched recall gate** (after pass): present findings list, ask: *"Run recall to check for prior context? [all / select / skip]"* — batch all selected findings into one recall call.
 3. **Display results inline** — agent reports and recall results shown inline, not collapsed.
-4. **Present audit trail table + decision prompt per finding — HALT.** Stop and wait for user decisions before any implementation.
+4. **Present COMPLETE audit trail — HALT ONCE.** After displaying all results, present the full audit trail table covering ALL findings at once. For each finding, include a structured decision block: finding description, severity, recommended action, and decision options. HALT after the full table — do NOT stop mid-review per finding. Do NOT ask bare "proceed?" questions.
 
 ### Decision Options (per finding)
 
