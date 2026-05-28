@@ -197,6 +197,23 @@ Pre-v0.5.9: only File Location, Parallelism, Approval Gates, RECALL_HARD_BLOCK, 
 - **kg-recall:** Triggers on retrospective questions ("have we", "did we"). Rule 1 triggers on prospective ("should we"). Complementary, no conflict.
 - **gov-execute-plan zero-deviation constraint:** In-plan cascade check fires as a prerequisite gate BEFORE execution begins — not during. Does not conflict with zero-deviation enforcement.
 
+## Related ENHs / Known Gaps
+
+### ENH-020 — Preventive Cascade Template + Profile Ecosystem Docs
+
+**Status:** Deferred
+
+The cascade rules in ENH-015 fire _post-decision_ (after the user confirms "proceed"), not _pre-implementation_. ENH-020 closes this gap by adding a preventive cascade evaluation step that fires before implementation begins.
+
+**What ENH-020 adds:**
+- Pre-implementation scope classification prompt
+- Profile file ecosystem reference document
+- Initialization impact matrix
+
+Until ENH-020 is implemented, the review-audit-protocol rule (`core/rules-registry/review-audit-protocol.md`) includes a cascade check stub that defers to ENH-015 and ENH-020.
+
+See: `knowledge/enhancements/ENH-020/ENH-020-specification.md`
+
 ## Not In Scope
 
 - Modifying `superpowers:writing-plans` or `superpowers:brainstorming` skill files directly — these are third-party; all enforcement is via the hook layer (`pre-skill-rules-inject.sh`)

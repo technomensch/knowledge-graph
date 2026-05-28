@@ -6,7 +6,7 @@ status: Accepted
 author: technomensch
 email: 917847+technomensch@users.noreply.github.com
 git:
-  branch: v0.5.9-decision-governance
+  branch: v0.5.9.1-review-audit-protocol
   commit: ad7f015188b11392a42a1f37c746a20915ddb915
   pr: null
   issue: null

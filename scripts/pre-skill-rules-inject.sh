@@ -51,7 +51,10 @@ case "$SKILL_NAME" in
   superpowers:systematic-debugging|systematic-debugging)
     SKILL_TYPE="debugging"
     ;;
-  superpowers:requesting-code-review|requesting-code-review)
+  superpowers:requesting-code-review|requesting-code-review|\
+  caveman:caveman-review|\
+  pr-review-toolkit:*|\
+  code-review)
     SKILL_TYPE="review-request"
     ;;
   superpowers:finishing-a-development-branch|superpowers:finish-branch|\
@@ -97,6 +100,23 @@ if [[ -f "$KMGRAPH_TRIGGERS" ]]; then
   ' "$KMGRAPH_TRIGGERS" 2>/dev/null || true)
 fi
 
+# For review skills, override SKILL_TRIGGER with review-specific gates from triggers.md
+if [[ "$SKILL_TYPE" == "review-request" ]] && [[ -f "$KMGRAPH_TRIGGERS" ]]; then
+  REVIEW_AUDIT_TRIGGER=$(awk '
+    /When performing a post-plan, pre-push/ { in_section=1 }
+    in_section && /^## / && !/When performing a post-plan/ { in_section=0 }
+    in_section { print }
+  ' "$KMGRAPH_TRIGGERS" 2>/dev/null || true)
+  REVIEW_FINDING_TRIGGER=$(awk '
+    /Before surfacing a finding during a review/ { in_section=1 }
+    in_section && /^## / && !/Before surfacing a finding/ { in_section=0 }
+    in_section { print }
+  ' "$KMGRAPH_TRIGGERS" 2>/dev/null || true)
+  SKILL_TRIGGER="${REVIEW_AUDIT_TRIGGER}
+
+${REVIEW_FINDING_TRIGGER}"
+fi
+
 RECALL_HARD_BLOCK=""
 ACTIVE_KG_BLOCK=""
 PLAN_EMBED_BLOCK=""
@@ -120,11 +140,24 @@ Do not skip recall even for familiar-looking bugs — prior context prevents re-
   ROUTING_HARD_BLOCK=""
 
 elif [[ "$SKILL_TYPE" == "review-request" ]]; then
-  OVERRIDE_BLOCK='--- Review Context Injection (HARD BLOCK — supersedes skill) ---
-Before dispatching the reviewer, invoke the kmgraph:recall skill (via Skill tool) with each modified file path or its concept as input.
-Pass surfaced ADRs and lessons as REQUIRED review context in the reviewer dispatch payload.
-Do not dispatch a cold reviewer — a reviewer unaware of ADR constraints may approve violations.
---- End Review Context ---'
+  OVERRIDE_BLOCK='--- Review Audit Protocol (HARD BLOCK — supersedes skill) ---
+Before dispatching any reviewer or surfacing any finding:
+
+1. ADR Pre-Check — search knowledge/decisions/ and ~/.kmgraph/decisions/ for ADRs covering the topic.
+   - Match found + fully addressed: suppress finding; cite the ADR
+   - Match found + new evidence: surface finding with explicit ADR reference
+   - No match: surface normally
+
+2. Review Context — invoke kmgraph:recall with each modified file path or concept as input.
+   Pass surfaced ADRs and lessons as REQUIRED context in the reviewer dispatch payload.
+   Do not dispatch a cold reviewer — a reviewer unaware of ADR constraints may approve violations.
+
+For post-plan, pre-push, or explicit full review/audit:
+3. Complete full review pass without interruption — dispatch background agents for investigation; do NOT wait mid-pass
+4. After pass: present findings list; ask "Run recall? [all / select / skip]" — batch into one call
+5. Display all results inline (not collapsed)
+6. Present audit trail table + decision prompt per finding — HALT until user resolves all findings
+--- End Review Audit Protocol ---'
   ROUTING_HARD_BLOCK=""
 
 elif [[ "$SKILL_TYPE" == "finishing" ]]; then
