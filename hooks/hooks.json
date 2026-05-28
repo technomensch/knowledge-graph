@@ -15,11 +15,11 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Write|Edit",
+        "matcher": "Write|Edit|Bash",
         "hooks": [
           {
             "type": "command",
-            "comment": "After file writes: check for lesson-worthy signals and prompt capture",
+            "comment": "After file writes or Bash: check for lesson-worthy signals and prompt capture",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-tool-lesson-check.sh",
             "timeout": 10
           }
@@ -48,12 +48,23 @@
         ]
       },
       {
-        "matcher": "Write",
+        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
-            "comment": "After writing a plan file: output Post-Plan Validation Checklist as advisory reminder",
+            "comment": "After writing or editing a plan file: output Post-Plan Validation Checklist as advisory reminder",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/post-plan-validate-checklist.sh",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "comment": "After writing a rules file: check if line count exceeds split threshold and recommend split",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/rules-size-check.sh",
             "timeout": 5
           }
         ]
