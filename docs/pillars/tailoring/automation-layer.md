@@ -79,6 +79,9 @@ Skills listen for natural-language signals. They never execute commands automati
 | `platform-file-change-check.sh` | PostToolUse | Detects changes to CLAUDE.md / AGENTS.md |
 | `plan-mirror.sh` | PostToolUse | Mirrors plan files from `~/.claude/plans/` to `docs/plans/` |
 | `pre-commit-knowledge-gate.sh` | PreToolUse (git commit) | Prompts for knowledge capture before commit |
+| `pre-skill-rules-inject.sh` | PreToolUse (Skill) | Injects rules overrides; hard-blocks brainstorm/plan without recall; enforces PR gate |
+| `stop-plan-gate.sh` | Stop | Re-surfaces plan approval gate at session end when a plan was written |
+| `post-plan-validate-checklist.sh` | PostToolUse (Write) | Advisory checklist after writing any `plans/*.md` file |
 | `notification-dispatch.sh` | Notification | Sends webhook (opt-in — requires `webhookUrl`) |
 
 ## The capture-router: type detection from content signals
