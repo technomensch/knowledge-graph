@@ -54,3 +54,22 @@ User: "Alright, I've pushed this to the branch. Wrapping up for today."
 - No technical jargon about "dispatching", "agents", or internal file paths
 - Single, clear question per prompt
 - Treat the session summary as optional but valuable
+
+---
+
+### Open Items Scan
+
+After writing the session summary, scan all ADRs and ENHs created or modified this session:
+
+```bash
+git diff --name-only HEAD~20 -- knowledge/decisions/ knowledge/enhancements/ 2>/dev/null \
+  | head -20
+```
+
+For each file found, extract the `## Open Questions` section (if present).
+
+Deduplicate across all files (same question text = one entry).
+
+Emit a final `## Open Items` section in the session summary with all extracted questions.
+
+**Single write path enforced:** Do NOT write open items directly to the session summary during the session. Only the session-wrap skill reads and aggregates them at wrap time.

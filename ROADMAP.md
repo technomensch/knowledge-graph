@@ -73,6 +73,25 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 
 ---
 
+## v0.5.9 (In Progress)
+
+**Status**: 🔄 In Progress — Decision Governance Protocol (ENH-015)
+**Branch**: `v0.5.9-decision-governance`
+
+### In Progress
+
+- 🔲 **ENH-015**: Implement Decision Governance Protocol. Introduce `brainstorm-recall` skill, extend `adr-guide` with cascade check and Open Questions, introduce in-plan cascade gate in `gov-execute-plan`, rewrite `pre-skill-rules-inject.sh` with platform split and fallback variables, and integrate Open Items extraction in `session-wrap`.
+
+---
+
+## v0.6.x (Deferred)
+
+### Hardening
+
+- 🔲 **ENH-018**: Rules file H2 structure hardening — promote H3s to H2s in rules split files (`plan-rules.md`, `governance-rules.md`), update quick navigation headers, update init wizard to scaffold H2 structure, add upgrade-inspector detection + migration offer for existing users. Spec: `knowledge/enhancements/ENH-018/ENH-018-specification.md`. Plan: `~/.claude/plans/ENH-018-rules-h2-structure-hardening.md`.
+
+---
+
 ## v0.3.0-beta (Planned)
 
 **Status**: 📋 Planned — KG Default Path Migration + Plan Metadata Standards
@@ -814,7 +833,9 @@ Ideas for community-driven enhancements:
 | v0.0.10.4-alpha | MCP node_modules auto-install fix | 2026-03-01 | ✅ Released |
 | v0.2.0-beta | Layered architecture restructuring | 2026-03-16 | ✅ Released |
 | v0.2.1-beta | MCP write tools, agent portability, AGENTS-template | 2026-03-27 | ✅ Released |
-| v0.2.2-beta | Personal KG, session snapshot on capture, FTS5 upgrade fix | 2026-03-29 | 🔄 In Progress |
+| v0.2.2-beta | Personal KG, session snapshot on capture, FTS5 upgrade fix | 2026-03-29 | ✅ Released |
+| v0.5.8 | Rules-inject project-rules extraction, MEMORY.md cascade fixes | 2026-05-25 | ✅ Released |
+| v0.5.9 | Decision Governance Protocol (ENH-015) | 2026-05-27 | 🔄 In Progress |
 | v1.0.0 | Stable release with alpha feedback | Q2 2026 | Planning |
 | v1.1.0 | Performance + UX improvements | Q3 2026 | Roadmap |
 | v1.2.0 | Cross-platform adapters | Q4 2026 | Roadmap |
@@ -836,5 +857,5 @@ Ideas for community-driven enhancements:
 
 ---
 
-*Last updated: 2026-05-13*
-*Plugin Version: 0.5.7.1*
+*Last updated: 2026-05-27*
+*Plugin Version: 0.5.9*

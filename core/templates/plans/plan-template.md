@@ -84,6 +84,18 @@ tags: []
 
 ---
 
+## Docs Updates (Grouped)
+
+> Required section. Accumulate ALL Docusaurus page changes here.
+> Do not scatter doc edits across task steps.
+> Follow the existing page style guide for each page before editing.
+
+| Page | Change | Style guide ref |
+|------|--------|----------------|
+| | | |
+
+---
+
 ## Verification
 
 1. **[Test name]**: [What to do and what to expect]

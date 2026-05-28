@@ -39,6 +39,7 @@ Grep for major.minor prefix (e.g., `0\.2\.`) not the exact prior version string 
 Update affected docs (README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, CONCEPTS, INSTALL.md) when behavior changes
 - **Why:** doc updates were missed after command and agent changes, leaving guides and CHEAT-SHEET inconsistent with actual behavior
 - **Source:** [ADR-013 Documentation Update Protocol](decisions/ADR-013-documentation-update-protocol.md)
+- kmgraph affected pages to check: README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, CONCEPTS, GLOSSARY, and any pillar page whose described behavior changes
 
 ### Sidebar Update on Doc Rename or Move
 
@@ -55,7 +56,7 @@ Before pushing to origin OR before creating/completing a merge, run `/kmgraph:up
 
 ### Pre-PR Doc Verification
 
-Before creating a PR with doc changes: run `git diff HEAD~N -- docs/` for each changed file, check for formatting regressions (stray spaces, broken tables, removed blank lines, wrong agent names), then run `mkdocs build` and confirm no new warnings
+Before creating a PR with doc changes: run `git diff HEAD~N -- docs/` for each changed file, check for formatting regressions (stray spaces, broken tables, removed blank lines, wrong agent names), then run `npm run build` and confirm no new warnings
 - **Why:** agent-written doc content caused silent regressions (broken tables, stray whitespace) that only showed after push; catching them pre-PR avoids review iteration
 
 ---
@@ -115,11 +116,15 @@ After any cherry-pick: verify source branch state before continuing work on eith
 
 When a bug or enhancement is discovered mid-session, ask the user which path applies — do not auto-detect:
 
-- **Path 1 — Capture as issue/enhancement:** No active plan or the fix is out of scope. Create silently via `/kmgraph:start-issue-tracking`. Surface the result (GH issue link or local ENH file preview) immediately after.
+- **Path F — Fork to new conversation:** Bug is complex or unclear, needs investigation, and would derail the current session. Open a separate chat/terminal to investigate. Continue current session unblocked.
+- **Path 1 — Capture as issue/enhancement:** Fix is out of scope or clear enough to file without immediate investigation. Create silently via `/kmgraph:start-issue-tracking`. Surface the result (GH issue link or local ENH file preview) immediately after.
 - **Path 2 — Add to current plan:** Active plan exists, task not yet started. Add a new task to the plan. Sync both copies immediately (`~/.claude/plans/` and `docs/plans/` must be identical after every edit).
 - **Path 3 — Implement + update plan:** Branch exists, work in progress. Implement the fix now, then update the plan file to document what was added so the PR body stays accurate. Sync both copies.
 
-**Always ask** — never auto-route. One question: "Path 1 (issue), Path 2 (add to plan), or Path 3 (implement now)?"
+**Always ask** — never auto-route. One question: "Path F (fork), Path 1 (issue), Path 2 (add to plan), or Path 3 (implement now)?"
+
+- **Path F vs Path 1:** Path F = root cause unclear, investigation needed now but not here; Path 1 = clear enough to file, no immediate investigation needed
+- **Source:** [[ADR-013-mid-execution-discovery-protocol]] (user-level `~/.kmgraph/decisions/`)
 
 ### Plan File Sync
 
@@ -263,3 +268,25 @@ Do not use numbered headings in knowledge files — use plain headings (e.g., `#
 | `commands/init-shared/` | Shared parameterized modules called by init.md and init-personal-kg.md | yes |
 | `knowledge/ENH-NNN/` | Plans and specs for a specific enhancement (ADR-029) | selective |
 | `knowledge/plans/` | Misc plans with no ENH/issue parent (ADR-029) | selective |
+
+## Plan Protocol
+
+### Recall in Plan Mode
+
+When plan mode is active (native `/plan` command, `superpowers:writing-plans`, or any
+automated planning tool such as Ultraplan), invoke the `kmgraph:recall` skill with TWO
+queries before making any plan recommendations:
+1. The specific plan topic
+2. The architectural domain of the change (rules, deployment, platform, cross-LLM, etc.)
+
+Running only the topic query misses architectural ADRs and ENHs that constrain the work.
+
+**Recall results take priority — reason about findings before recommending:**
+- If recall surfaces a rejected approach, examine WHY it was rejected and whether that reason is still applicable.
+- If still applicable: do not propose the approach; if unavoidable, explain why no workaround exists.
+- If no longer applicable: may propose it, but must document why the old rejection no longer holds AND lay out full cascade impact on the project.
+- If it is the only viable option: propose it, but lay out complete ramifications and cascade effects across all affected systems, skills, decisions, and docs.
+- If recall finds nothing: write "No prior art found for [topic]." and proceed.
+
+Include findings under a "## Prior Art" section at the top of the plan.
+Do not skip — plan recommendations made without context contradict existing decisions.

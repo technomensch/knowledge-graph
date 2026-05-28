@@ -33,6 +33,8 @@ related:  # [MANUAL] Optional: Links to related ADRs, lessons, KG entries
 
 tags: []  # [MANUAL] Custom tags for searching (e.g., [database, architecture, postgresql])
 
+search_aliases: []  # Fill at creation: terms a future planner would search to find this ADR
+
 category: [architecture|process|technology]  # [MANUAL] Decision category
 # - architecture: System design, component structure, patterns
 # - process: Development workflow, team processes, procedures
@@ -195,3 +197,9 @@ category: [architecture|process|technology]  # [MANUAL] Decision category
 **Last Updated:** YYYY-MM-DD
 **Status:** [Current status]
 
+---
+
+## Open Questions
+
+<!-- Capture unresolved questions here during drafting. session-wrap reads this section. -->
+<!-- Format: - Question text (raised by: context) -->

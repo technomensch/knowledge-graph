@@ -375,8 +375,10 @@ _check_profile_staleness() {
     fi
 }
 
-_check_profile_staleness "$HOME/.kmgraph/rules.md" "~/.kmgraph/rules.md"
-_check_profile_staleness "$HOME/.kmgraph/me.md"    "~/.kmgraph/me.md"
+for profile_file in "$HOME/.kmgraph/rules.md" "$HOME/.kmgraph/plan-rules.md" "$HOME/.kmgraph/governance-rules.md"; do
+  [ -f "$profile_file" ] && _check_profile_staleness "$profile_file" "~/.kmgraph/$(basename "$profile_file")"
+done
+_check_profile_staleness "$HOME/.kmgraph/me.md" "~/.kmgraph/me.md"
 
 # ─────────────────────────────────────────────────────────────
 # SECTION 5: Profile file diffs are not surfaced in SessionStart.
