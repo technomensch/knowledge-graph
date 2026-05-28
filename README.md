@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.5.7.1
+**Version:** 0.5.9
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -88,6 +88,42 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 ---
 
 ## v0.5.x Feature Highlights
+
+**v0.5.9 — 2026-05-27**
+
+- **Decision governance protocol enforced at hook level** — `pre-skill-rules-inject.sh` now hard-blocks brainstorming and planning without a prior knowledge-graph recall. Two recall queries are required before any plan is written (topic + architectural domain). Recall misses are logged to `/tmp/kmgraph-recall-miss-*.log` for audit. Remote-session compatibility: embedded-rules block is written directly into plan files so Ultraplan and other non-hook contexts carry the enforcement.
+- **New `brainstorm-recall` skill** — Fires before `adr-guide` and invokes `kmgraph:recall` before any recommendation. Results appear under a "Prior Art" heading so past decisions surface before new ones are made.
+- **`gov-execute-plan` cascade gate** — When a new ADR is captured mid-session, execution is paused before the next plan task so the user can review cascade impact. ADR flag is day-scoped and cleaned at branch finish.
+- **Chat-history now searchable** — `mcp-server/src/tools/fts5.ts` adds `chat-history` to `searchDirs`; exported chat logs are indexed and reachable via `kg_search`.
+- **Session-documenter Relay Contract** — Draft session summaries are now displayed verbatim before save/edit/cancel options. No silent summarization.
+- **Post-plan validation checklist** — A PostToolUse:Write hook fires after any `plans/*.md` write and outputs an advisory validation checklist.
+- **Canonical rules registry** — `core/rules-registry/` stores authoritative rule text; all deployment surfaces (templates, profile files) copy from here.
+
+**v0.5.8 — 2026-05-25**
+
+- **Project-specific plan routing now reaches the model** — `pre-skill-rules-inject.sh` reads the active project's `knowledge/rules.md` and injects its `Plan File Location` and `Plan File Routing` rules before any planning skill runs. Project naming conventions (e.g. `v{ver}-{description}.md`) are now enforced instead of silently ignored.
+- **Mirror-copy and naming rules promoted to HARD BLOCK** — The plan file routing and mirror-copy steps are now structurally identical to the PR Gate Override, so the model obeys them as reliably as the other hard blocks.
+- **Dispatcher commands now show drafts before saving** — `session-summary`, `capture-lesson`, and `create-adr` relay the full subagent draft to the main thread before presenting save/edit/cancel options. No more invisible writes.
+- **Behavioral rules now route to profile files, not MEMORY.md (ENH-014)** — `rules-capture-agent` was silently writing all behavioral captures to MEMORY.md. Fixed: rules now go to `~/.kmgraph/rules.md`, `knowledge/rules.md`, or `me.md` depending on scope. Phantom `archive-memory`/`restore-memory` references removed throughout.
+
+**v0.5.7.1 — 2026-05-13**
+
+- **Security: 16 Dependabot alerts resolved** — All HIGH and medium vulnerabilities in transitive dependencies patched via `npm overrides`. No direct dependency versions changed. No user action required.
+
+**v0.5.7 — 2026-05-05**
+
+- **Planning skills no longer offer unsolicited execution choices** — `superpowers:writing-plans` and `superpowers:brainstorming` no longer ask "Which approach?" after saving a plan. The PreToolUse hook hard-blocks that prompt; the plan is saved and control returns to the user.
+- **Execution skills no longer auto-push or open PRs** — `superpowers:executing-plans` and `superpowers:finishing-a-development-branch` now stop and wait for explicit approval before any `git push` or `gh pr create`.
+- **Stop hook safety net added** — `stop-plan-gate.sh` re-surfaces the plan approval gate at session end when a plan was written, catching cases where the hook injection was bypassed mid-session.
+- **`gov-plan-gate` promoted to plugin skill** — Available as `kmgraph:gov-plan-gate` in the skills index, covering both planning and execution gate types.
+
+**v0.5.6 — 2026-05-05**
+
+- **Behavioral capture routing cleaned up** — `update-graph`, `rules-capture`, `session-wrap`, `sync-all`, and related commands no longer write to or check MEMORY.md for governance signals. Governance-worthy content surfaces as plain-language prompts only; the user decides what to capture and where.
+
+**v0.5.5 — 2026-04-29**
+
+- **Stop hook dedup fix** — Session flag files are now keyed on `{kg-name}-{date}` instead of `{PPID}-{date}`. The old scheme generated ~150 stale `/tmp` flags per session and the dedup check never matched, causing repeated prompts.
 
 **v0.5.4 — 2026-04-28**
 
@@ -180,7 +216,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.5.7.1 (2026-05-13)
+**Current Release:** v0.5.9 (2026-05-27)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -273,6 +309,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.5.7.1 (2026-05-13)
+**Current Version:** v0.5.9 (2026-05-27)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info

@@ -54,7 +54,10 @@ Hooks with a `matcher` field fire only when the tool name (and optionally the to
 | `platform-file-change-check.sh` | `PostToolUse` | `Write\|Edit` | Yes | Detects writes to platform config files (`CLAUDE.md`, `GEMINI.md`, `.cursorrules`, `copilot-instructions.md`, etc.); prompts the user to consider syncing other platform files via `/kmgraph:setup-platform` |
 | `plan-mirror.sh` | `PostToolUse` | `Write` | Yes | Detects writes to `~/.claude/plans/`; copies the file to `docs/plans/` in the active KG project root; exits silently if the target directory does not exist |
 | `pre-commit-knowledge-gate.sh` | `PreToolUse` | `Bash.*git commit` | Yes | Intercepts plain `git commit` calls (skips `--amend` and `--no-verify`); checks staged files for lesson-worthy source types (`src/`, `*.ts`, `*.py`, `*.sh`, etc.); advisory prompt only — does not block the commit |
+| `pre-skill-rules-inject.sh` | `PreToolUse` | `Skill` | Yes | Fires before any superpowers skill invocation; injects `~/.kmgraph/rules.md` overrides into skill context; hard-blocks brainstorming and planning without a prior recall query; enforces PR gate for execution and finishing skills |
 | `session-end-prompt.sh` | `Stop` | (all) | Yes | Checks for open plan tasks, draft/proposed ADRs, and recent lesson-worthy commits without a captured lesson; displays a summary prompt; uses a `/tmp` flag to suppress duplicate output within the same session |
+| `stop-plan-gate.sh` | `Stop` | (all) | Yes | Re-injects the plan approval gate reminder at session end when a plan was written this session; uses a daily flag file to suppress duplicates |
+| `post-plan-validate-checklist.sh` | `PostToolUse` | `Write` | Yes | After writing any `plans/*.md` file, outputs an advisory post-plan validation checklist; exits silently for non-plan writes |
 | `notification-dispatch.sh` | `Notification` | (all) | No (opt-in) | Forwards the notification text to a configured `webhookUrl` in `kg-config.json`; exits silently if `webhookUrl` is absent; network failures never block the hook |
 
 ## Enabled vs Disabled by Default
@@ -65,7 +68,7 @@ All scripts are registered in `hooks.json` and active by default, with one excep
 |---|---|---|
 | `notification-dispatch.sh` | Disabled (no-op) | Add `"webhookUrl": "https://..."` to `~/.claude/kg-config.json` |
 
-The other six scripts are always active once KMGraph is installed. Individual hooks can be removed from `hooks.json` to disable them permanently, or their timeout values can be adjusted to control how long each script may run before the harness terminates it.
+The other eight scripts are always active once KMGraph is installed. Individual hooks can be removed from `hooks.json` to disable them permanently, or their timeout values can be adjusted to control how long each script may run before the harness terminates it.
 
 ## Script Locations
 

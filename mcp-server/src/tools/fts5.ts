@@ -319,7 +319,7 @@ export function rebuildIndex(kgPath: string, kgName: string, kgType = "project-l
     const contentRoot = resolveContentRoot(kgPath);
 
     // Collect all .md files from target subdirectories
-    const searchDirs = ["knowledge", "lessons-learned", "decisions", "sessions"];
+    const searchDirs = ["knowledge", "lessons-learned", "decisions", "sessions", "chat-history"];
     const allFiles: string[] = [];
 
     for (const dir of searchDirs) {

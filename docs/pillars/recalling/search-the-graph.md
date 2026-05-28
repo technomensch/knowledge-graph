@@ -39,6 +39,8 @@ The first time `/kmgraph:sync-all` is run, it asks once whether to build the ind
 
 To build the index at any time without running sync-all, call `kg_fts5_rebuild` from the MCP tool panel.
 
+The index covers all knowledge graph entries including exported chat logs (`knowledge/chat-history/`) — chat exports are searchable alongside lessons, ADRs, and sessions.
+
 - **How to tell it is active**: search results show `(FTS5)` — this means the index was used
 - **How to re-enable after declining**: run `kg_fts5_rebuild` directly
 

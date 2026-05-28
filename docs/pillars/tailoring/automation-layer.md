@@ -60,6 +60,7 @@ Skills listen for natural-language signals. They never execute commands automati
 |---|---|
 | **lesson-capture** | "figured it out", "solved it", "the fix was", "turns out the issue was" |
 | **kg-recall** | "have we done this before", "did we solve this", "what was the pattern for" |
+| **brainstorm-recall** | `superpowers:brainstorming` invoked — fires before `adr-guide` to surface prior art |
 | **session-wrap** | "I'm wrapping up", "stopping for the day", context limit approaching |
 | **adr-guide** | "I'm thinking of using", "should we use X or Y", "architectural decision" |
 | **capture-router** | "capture that", "remember that", "save that", "let's document this" |
@@ -78,6 +79,9 @@ Skills listen for natural-language signals. They never execute commands automati
 | `platform-file-change-check.sh` | PostToolUse | Detects changes to CLAUDE.md / AGENTS.md |
 | `plan-mirror.sh` | PostToolUse | Mirrors plan files from `~/.claude/plans/` to `docs/plans/` |
 | `pre-commit-knowledge-gate.sh` | PreToolUse (git commit) | Prompts for knowledge capture before commit |
+| `pre-skill-rules-inject.sh` | PreToolUse (Skill) | Injects rules overrides; hard-blocks brainstorm/plan without recall; enforces PR gate |
+| `stop-plan-gate.sh` | Stop | Re-surfaces plan approval gate at session end when a plan was written |
+| `post-plan-validate-checklist.sh` | PostToolUse (Write) | Advisory checklist after writing any `plans/*.md` file |
 | `notification-dispatch.sh` | Notification | Sends webhook (opt-in — requires `webhookUrl`) |
 
 ## The capture-router: type detection from content signals
