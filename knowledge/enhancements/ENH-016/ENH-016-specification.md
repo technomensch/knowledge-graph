@@ -1,7 +1,7 @@
 # ENH-016: Rules File Auto-Split Recommendation
 
 **Status:** Planned
-**Version:** TBD (post-v0.5.9)
+**Version:** v0.5.9.1
 **Created:** 2026-05-25
 
 ## Problem
