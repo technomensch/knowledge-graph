@@ -59,7 +59,7 @@ Implement a formal review audit protocol with the following locked behaviors:
 
 **Cascade check stub:** Before any `fix now` action, ask: does this affect initialization scripts, user profile files, or existing graphs? User-local or project-wide? Full cascade protocol deferred to ENH-015 and ENH-020 (pending creation — see plan task 1.1).
 
-**Halt pattern:** HALT after findings are displayed; resume only after user provides a decision per finding.
+**Halt pattern:** HALT ONCE after the complete audit trail table is displayed — a single halt covering all findings, not one halt per finding. Each decision block must include: finding description, severity, recommended action, and the five decision options. Bare "proceed?" prompts without context are explicitly prohibited.
 
 **Final report:** An audit trail table recording ALL findings regardless of resolution — permanent record required at the end of every audit.
 
