@@ -20,7 +20,7 @@ if [ "$TOOL_NAME" = "Bash" ]; then
     COMMAND="$(printf '%s' "$INPUT" | jq -r '.tool_input.command // ""' 2>/dev/null || true)"
 
     # Suppress on git commit (has its own pre-commit knowledge gate)
-    if echo "$COMMAND" | grep -q "git commit"; then
+    if echo "$COMMAND" | grep -qE '(^|;|&&|\|\|)[[:space:]]*git commit([[:space:]]|$)'; then
         exit 0
     fi
 
