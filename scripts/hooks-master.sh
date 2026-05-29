@@ -381,6 +381,37 @@ done
 _check_profile_staleness "$HOME/.kmgraph/me.md" "~/.kmgraph/me.md"
 
 # ─────────────────────────────────────────────────────────────
+# ENH-016: Rules file auto-split recommendation
+# If rules.md exceeds 120 lines AND has 2+ separable ## domains,
+# recommend splitting. Weekly suppression via flag file.
+# ─────────────────────────────────────────────────────────────
+_check_rules_split_threshold() {
+    local filepath="$HOME/.kmgraph/rules.md"
+    [ -f "$filepath" ] || return 0
+
+    local line_count
+    line_count=$(wc -l < "$filepath")
+    [ "$line_count" -gt 120 ] || return 0
+
+    local domain_count
+    domain_count=$(grep -c '^## ' "$filepath" 2>/dev/null || true)
+    domain_count=${domain_count:-0}
+    [ "$domain_count" -ge 2 ] || return 0
+
+    local week_tag dismiss_flag
+    week_tag=$(date +%Y-%V)
+    dismiss_flag="$HOME/.kmgraph/.split-dismissed-${week_tag}"
+    [ -f "$dismiss_flag" ] && return 0
+
+    echo -e "${YELLOW}⚠️  rules.md has grown to ${line_count} lines across ${domain_count} domains.${NC}"
+    echo "   Consider splitting into separate files (e.g., rules.md + plan-rules.md)."
+    echo "   To suppress for this week: touch ~/.kmgraph/.split-dismissed-${week_tag}"
+    echo ""
+}
+
+_check_rules_split_threshold
+
+# ─────────────────────────────────────────────────────────────
 # SECTION 5: Profile file diffs are not surfaced in SessionStart.
 # Profile files (`~/.kmgraph/{rules,me}.md`, `{project}/knowledge/{rules,me}.md`)
 # are the authoritative behavioral stores. They are read directly by the
