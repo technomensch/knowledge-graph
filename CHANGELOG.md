@@ -13,6 +13,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.5.9.1] — 2026-05-28 (rev 2)
+
+### Added
+- `core/rules-registry/review-audit-protocol.md`: canonical rule source for post-plan/pre-push review governance — full protocol (4 steps), 5 decision options, cascade check stub, audit trail table format
+- `core/templates/knowledge/templates/user/governance-rules.md`: genericized governance-rules template for distributed users (strips personal ENH refs)
+- `knowledge/enhancements/ENH-020/`: spec for Preventive Cascade Template + Profile Ecosystem Docs (status: deferred; extends ENH-015)
+- `scripts/rules-size-check.sh`: PostToolUse hook — fires after writing rules files; recommends split when >120 lines AND 2+ separable domains; weekly suppression via flag file
+- ENH-016 line-count check in `scripts/hooks-master.sh`: SessionStart split recommendation for `~/.kmgraph/rules.md` exceeding threshold
+
+### Changed
+- `hooks/hooks.json`: post-plan-validate-checklist matcher extended from `Write` to `Write|Edit`; lesson-check matcher extended from `Write|Edit` to `Write|Edit|Bash`; new `rules-size-check.sh` PostToolUse hook added
+- `scripts/post-plan-validate-checklist.sh`: added idempotency gate (session-scoped flag file per plan path) to suppress checklist spam on iterative edits
+- `scripts/post-tool-lesson-check.sh`: Bash-tool path added — detects lesson signals in Bash output (requires 2+ of: bug/resolved/workaround); suppresses on `git commit`
+- `scripts/pre-skill-rules-inject.sh`: review skill matchers added (`caveman:caveman-review`, `pr-review-toolkit:*`, `code-review`); Review Audit Protocol HARD BLOCK injected; review-specific trigger sections extracted from triggers.md
+- ENH-016 status updated: Planned → In Progress
+- ENH-015: added "Related ENHs / Known Gaps" section cross-referencing ENH-020
+
+### Fixed
+- `core/rules-registry/review-audit-protocol.md`, `core/templates/.../governance-rules.md`, `~/.kmgraph/governance-rules.md`, `scripts/pre-skill-rules-inject.sh`: HALT ambiguity — Step 4 was interpreted as stop-per-finding with bare "proceed?"; clarified to ONE halt after complete audit trail; decision blocks now require finding description, severity, recommended action, and decision options
+
+### Knowledge Graph
+- issue-7: Bash permission prompt UX bug tracked — solution designed for v0.6.0 (`knowledge/issues/issue-7/`)
+- ADR-049: Review Audit Protocol — Post-Plan/Pre-Push Review Governance (Accepted; branch updated to `v0.5.9.1-review-audit-protocol`)
+- ENH-019 spec committed (deferred, no implementation in this release)
+
 ## [0.5.9] — 2026-05-27
 
 ### Added
