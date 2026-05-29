@@ -394,7 +394,8 @@ _check_rules_split_threshold() {
     [ "$line_count" -gt 120 ] || return 0
 
     local domain_count
-    domain_count=$(grep -c '^## ' "$filepath" 2>/dev/null || echo 0)
+    domain_count=$(grep -c '^## ' "$filepath" 2>/dev/null || true)
+    domain_count=${domain_count:-0}
     [ "$domain_count" -ge 2 ] || return 0
 
     local week_tag dismiss_flag

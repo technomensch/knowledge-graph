@@ -21,7 +21,7 @@ elif command -v md5sum &>/dev/null; then
 else
     PLAN_HASH=$(printf '%s' "$FILE_PATH" | cksum | cut -d' ' -f1)
 fi
-FLAG_FILE="/tmp/kmgraph-plan-check-${PLAN_HASH}"
+FLAG_FILE="/tmp/kmgraph-plan-check-${PLAN_HASH}-$(date +%Y%m%d)"
 if [ -f "$FLAG_FILE" ]; then
     exit 0
 fi

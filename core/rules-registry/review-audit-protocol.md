@@ -24,7 +24,7 @@ Does NOT fire for:
 
 ### Step 1: Complete review pass without interruption
 
-Perform the full review pass top-to-bottom without stopping. For each finding that warrants investigation, dispatch a background agent (`cavecrew-investigator` or appropriate subagent type) as you go. Do NOT stop to discuss, implement, or wait for agent results mid-pass. Do NOT ask 'proceed?' mid-review.
+Perform the full review pass top-to-bottom without stopping. For each finding that warrants investigation, dispatch a background read-only subagent as you go. Do NOT stop to discuss, implement, or wait for agent results mid-pass. Do NOT ask 'proceed?' mid-review.
 
 ### Step 2: Batched recall gate (after pass completes)
 

@@ -24,7 +24,8 @@ esac
 LINE_COUNT=$(wc -l < "$FILE_PATH")
 [ "$LINE_COUNT" -gt 120 ] || exit 0
 
-DOMAIN_COUNT=$(grep -c '^## ' "$FILE_PATH" 2>/dev/null || echo 0)
+DOMAIN_COUNT=$(grep -c '^## ' "$FILE_PATH" 2>/dev/null || true)
+DOMAIN_COUNT=${DOMAIN_COUNT:-0}
 [ "$DOMAIN_COUNT" -ge 2 ] || exit 0
 
 # Weekly suppression gate
@@ -36,10 +37,6 @@ MSG="rules.md has grown to ${LINE_COUNT} lines across ${DOMAIN_COUNT} domains.
 Consider splitting into separate files (e.g., rules.md + plan-rules.md).
 To suppress for this week: touch ~/.kmgraph/.split-dismissed-${WEEK_TAG}"
 
-if command -v jq &>/dev/null; then
-    jq -n --arg msg "$MSG" '{"systemMessage": $msg}'
-else
-    echo -e "${YELLOW}⚠️  ${MSG}${NC}"
-fi
+jq -n --arg msg "$MSG" '{"systemMessage": $msg}'
 
 exit 0

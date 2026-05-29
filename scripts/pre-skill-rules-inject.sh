@@ -115,6 +115,10 @@ if [[ "$SKILL_TYPE" == "review-request" ]] && [[ -f "$KMGRAPH_TRIGGERS" ]]; then
   SKILL_TRIGGER="${REVIEW_AUDIT_TRIGGER}
 
 ${REVIEW_FINDING_TRIGGER}"
+
+  if [[ -z "${REVIEW_AUDIT_TRIGGER}" ]] || [[ -z "${REVIEW_FINDING_TRIGGER}" ]]; then
+    echo "⚠️  pre-skill-rules-inject: review trigger sections missing from triggers.md — OVERRIDE_BLOCK may be incomplete" >&2
+  fi
 fi
 
 RECALL_HARD_BLOCK=""
