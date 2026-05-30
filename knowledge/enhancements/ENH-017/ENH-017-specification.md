@@ -2,6 +2,7 @@
 id: ENH-017
 type: Enhancement
 status: tracked
+version_target: v0.5.10
 github-issue: null
 branch: none
 created: 2026-05-27

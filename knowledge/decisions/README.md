@@ -4,8 +4,8 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 46
-**Last Updated:** 2026-04-28
+**Total ADRs:** 47
+**Last Updated:** 2026-05-30
 
 ---
 
@@ -17,6 +17,7 @@ Formal documentation of significant architecture decisions.
 
 ## All ADRs (Chronological)
 
+- [ADR-050: Pre-Push Composite Gate + Inline Recommendation Gate](ADR-050-pre-push-composite-gate-inline-recommendation-gate.md) — **Status:** Accepted — Wires pre-push version-sync (Gate 2) and docs-impact-scan completion flag (Gate 3) as advisory PreToolUse Bash hooks; wires UserPromptSubmit hook for inline recommendation recall/ADR-precheck/cascade gate with per-session PID debounce.
 - [ADR-046: Introduce concept+setup hybrid page type and document how-to guide pattern separately from narrative guides](ADR-046-concept-setup-hybrid-page-type-and-how-to-guide-pattern.md) — **Status:** Accepted — Adds style guide section 4g for Goal/Prerequisites/Steps/Verify how-to pattern; retains 4a for narrative guides; names concept+setup hybrid as a distinct third type.
 - [ADR-045: Implement Profile Update Functionality as a Skill, Not a Command](ADR-045-update-profile-skill-not-command.md) — **Status:** Accepted — Skill over command: zero doc-update cost, natural language activation; platform-agnostic command deferred to future roadmap when non-CC usage grows.
 - [ADR-044: Split Oversized Daily Chat History Files for Obsidian Compatibility](ADR-044-split-oversized-chat-history-files.md) — **Status:** Accepted — When a daily chat history file exceeds 900 KB or 30,000 lines, split into numbered parts in a YYYY-MM-DD/ subfolder; get_output_path reroutes transparently.

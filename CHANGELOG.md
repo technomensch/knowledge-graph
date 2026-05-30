@@ -13,6 +13,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.5.9.3] — 2026-05-30
+
+### Added
+- **issue-8 Gate 1:** `scripts/plan-docs-xref-check.sh` — PostToolUse `Write|Edit` hook fires after plan file writes; checks for required `## Docs Impact` heading (ADR-013 constant); injects advisory `systemMessage` if absent; per-file-content-hash idempotency prevents re-injection on unchanged content
+- **issue-8 Gate 2 + Gate 3:** `scripts/pre-push-gate.sh` — PreToolUse `Bash` hook fires on `git push`; Gate 2 checks version drift between `package.json` and `.claude-plugin/plugin.json`; Gate 3 checks for `docs-impact-scan` per-commit completion flag (`/tmp/kmgraph-docs-scan-<branch>-<sha>.flag`); output via `hookSpecificOutput.additionalContext`
+- **issue-9:** `scripts/recommendation-gate.sh` — UserPromptSubmit hook detects inline recommendation-seeking prompts via ERE regex; injects recall/ADR-precheck/cascade/root-cause preamble sourced from `~/.kmgraph/triggers.md`; per-session PID debounce fires once per Claude Code process
+- `skills/docs-impact-scan/SKILL.md` Step 8 extended — writes per-commit completion flag on scan completion (satisfies Gate 3 pre-push check)
+- `knowledge/issues/issue-8/`, `knowledge/issues/issue-9/` — issue tracking dirs with spec, solution-approach, implementation-log
+- **ADR-050:** Documents pre-push composite gate (Gates 2 + 3) and inline recommendation gate design, output contracts, debounce rationale, and ENH-016 fallback pattern
+- "Before producing an inline recommendation" section added to `~/.kmgraph/triggers.md` and `core/templates/knowledge/triggers.md` (DRY source for recommendation-gate.sh)
+
+### Changed
+- `hooks/hooks.json` — three new hook entries: UserPromptSubmit (recommendation-gate.sh), PostToolUse Write|Edit (plan-docs-xref-check.sh), PreToolUse Bash (pre-push-gate.sh)
+- **ADR-036** status: Proposed → Accepted; pre-push Gate 3 wiring documented; flag formula specified
+- **ADR-013** — `## Docs Impact` heading pinned as the required constant; Gate 1 automation referenced
+- **ADR-021** — wired Gate 1 and Gate 2 cross-references added; recommendation-gate.sh DRY sourcing noted
+
+### Related
+- ADR-013, ADR-021, ADR-036, ADR-050, issue-8, issue-9
+
 ## [0.5.9.2] — 2026-05-30
 
 ### Fixed
