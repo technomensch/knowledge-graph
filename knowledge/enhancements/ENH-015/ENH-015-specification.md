@@ -159,6 +159,8 @@ Hook fires on Skill tool invocations only. `superpowers:writing-plans` invocatio
 ### Gap 2 — Post-Plan Validation Checklist (partial fix in v0.5.9; hard gate future scope)
 v0.5.9 adds Task M: PostToolUse:Write hook that fires after plan files are written and outputs the Post-Plan Validation Checklist as an advisory reminder. This is model self-enforcement, not a hard gate.
 
+**Tracked bug:** [[issue-6]] — GitHub #125 (v0.5.9.2): plan-rules.md falsely described the hook as a blocking gate; corrected to advisory. Layer 3 (gov-execute-plan pre-flight gate) deferred to v0.6.0.
+
 **Future scope (v0.6.0 candidate):** A PreToolUse:Write hook could provide a true hard gate with the following pattern to avoid blocking mid-draft saves:
 - Only block if the plan file **already exists** (not a first write)
 - AND the previous version already had a `## Post-Plan Validation Checklist` section
