@@ -5,7 +5,7 @@ status: tracked
 github-issue: "#125"
 branch: v0.5.9.2-fix-gh-issue-create
 created: 2026-05-28
-related-adrs: [ADR-043, ADR-049, ENH-015]
+related-adrs: [ADR-043, ADR-049]
 related-enhs: [ENH-015]
 ---
 
