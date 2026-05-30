@@ -21,7 +21,7 @@ TRIGGERS_FILE="${HOME}/.kmgraph/triggers.md"
 MIN_PROMPT_LEN=40
 
 # Detection regex (ERE, case-insensitive)
-DETECT_REGEX='(what (could|should|can) we do|how (should|do|would) (we|i|you) (approach|handle|fix|solve)|what (is|'"'"'?s) the best (way|approach)|should we\b|any (ideas|recommendations|thoughts) (on|about)|what are (the|my) options|how to best)'
+DETECT_REGEX='(what (could|should|can) we do|how (should|do|would) (we|i|you) (approach|handle|fix|solve)|what( is|'"'"'?s) the best (way|approach)|should we\b|any (ideas|recommendations|thoughts) (on|about)|what are (the|my) options|how to best)'
 
 # Hardcoded fallback preamble (used when triggers.md absent or section missing)
 FALLBACK_PREAMBLE='Before producing this recommendation:
