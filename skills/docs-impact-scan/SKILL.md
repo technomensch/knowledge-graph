@@ -75,15 +75,34 @@ Source: docs-impact-scan correction (YYYY-MM-DD)
 
 Call `/kmgraph:update-doc --user-facing [file]` for each file in the confirmed list, one at a time in sequence.
 
-### Step 8 — Summary
+### Step 8 — Write completion flag and summarize
 
-After all updates complete:
+Write the per-commit docs-impact-scan completion flag before reporting. The pre-push gate (`pre-push-gate.sh` Gate 3) checks this flag to confirm the scan ran at the current commit.
+
+Run these commands (or instruct the user to run `! <cmd>` if Bash is unavailable):
+
+```bash
+BRANCH=$(git branch --show-current 2>/dev/null | tr '/' '-')
+SHA=$(git rev-parse --short HEAD 2>/dev/null)
+if [ -n "$BRANCH" ]; then
+  touch "/tmp/kmgraph-docs-scan-${BRANCH}-${SHA}.flag"
+else
+  touch "/tmp/kmgraph-docs-scan-${SHA}.flag"
+fi
+```
+
+Flag filename formula: `/tmp/kmgraph-docs-scan-<branch>-<sha>.flag` where `<branch>` is the sanitized branch name (slashes replaced with `-`) and `<sha>` is the short HEAD commit hash. Detached-HEAD fallback: SHA-only flag name. The flag auto-invalidates on every new commit and across branches.
+
+Then report the completed docs:
 
 ```
 Docs updated (N files):
 ✓ README.md
 ✓ COMMAND-GUIDE.md
 ✓ docs/reference/skills.md
+
+Completion flag written: /tmp/kmgraph-docs-scan-<branch>-<sha>.flag
+(Pre-push gate cleared for this commit.)
 ```
 
 ---
