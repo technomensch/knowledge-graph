@@ -5,8 +5,8 @@
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">Command Guide | Knowledge Management Graph</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://technomensch.github.io/knowledge-graph/reference/command-guide"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Command Guide | Knowledge Management Graph"><meta data-rh="true" name="description" content="Complete reference for all /kmgraph: slash commands"><meta data-rh="true" property="og:description" content="Complete reference for all /kmgraph: slash commands"><link data-rh="true" rel="icon" href="/knowledge-graph/img/square.png"><link data-rh="true" rel="canonical" href="https://technomensch.github.io/knowledge-graph/reference/command-guide"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/reference/command-guide" hreflang="en"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/reference/command-guide" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Command Guide","item":"https://technomensch.github.io/knowledge-graph/reference/command-guide"}]}</script><link rel="alternate" type="application/rss+xml" href="/knowledge-graph/docs-updates/rss.xml" title="KMGraph Docs Updates RSS Feed">
 <link rel="alternate" type="application/atom+xml" href="/knowledge-graph/docs-updates/atom.xml" title="KMGraph Docs Updates Atom Feed"><link rel="stylesheet" href="/knowledge-graph/assets/css/styles.1ec0cbb2.css">
-<script src="/knowledge-graph/assets/js/runtime~main.c26ff2b9.js" defer="defer"></script>
-<script src="/knowledge-graph/assets/js/main.a4453c3b.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/runtime~main.677e9cd4.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/main.418f71c8.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -768,8 +768,9 @@ When you enable backfill, the system extracts existing knowledge from your proje
 <li class="">Auto-detects issue type from keywords (bug vs. enhancement)</li>
 <li class="">Creates directory structure with documentation templates (description, solution approach, test cases, implementation log)</li>
 <li class="">Generates an implementation plan with safety headers and atomic approval protocol</li>
+<li class=""><strong>Step 5.0: Creates a GitHub Issue</strong> via <code>gh issue create --body-file</code> from the issue description; writes the returned issue number back to spec frontmatter (<code>github-issue</code> field auto-populated)</li>
 <li class="">Creates a Git feature branch (<code>issue/{N}-{slug}</code>)</li>
-<li class="">Optionally creates a draft PR on GitHub with <code>--body-file</code> populated from solution approach</li>
+<li class="">Optionally creates a draft PR on GitHub with <code>--body-file</code> populated from solution approach and <code>Closes #N</code> referencing the issue created in Step 5.0</li>
 <li class=""><strong>Step 6.2 (lesson capture) is a mandatory gate</strong> — must receive a response before continuing. When working on a non-main branch, this step is strongly recommended.</li>
 <li class=""><strong>Step 6.4 (ROADMAP + CHANGELOG update) is a mandatory gate</strong> — must receive a response confirming ROADMAP and CHANGELOG entries have been considered before the command completes.</li>
 <li class="">Links to knowledge graph and prompts for lesson capture</li>
@@ -781,7 +782,7 @@ When you enable backfill, the system extracts existing knowledge from your proje
 <p><strong>Tips</strong>:</p>
 <ul>
 <li class="">Uses the Dual-ID Policy: local IDs (<code>issue-N</code> or <code>ENH-NNN</code>) are independent from GitHub issue numbers (<code>#N</code>)</li>
-<li class="">Always use <code>--body-file</code> flag (not manual summary) when creating the GitHub Issue</li>
+<li class="">GitHub Issue creation is automatic at Step 5.0 — <code>gh issue create --body-file</code> runs before branch creation; <code>github-issue</code> frontmatter is written back immediately</li>
 </ul>
 <p><strong>See also</strong>: <a class="" href="/knowledge-graph/TRACK-ISSUES">Track Issues</a> — full lifecycle walkthrough including git integration and the implementation freeze gate.</p>
 <hr>
