@@ -943,8 +943,9 @@ With `--user-facing`:
 6. Auto-detects issue type from keywords (bug vs. enhancement)
 7. Creates directory structure with documentation templates (description, solution approach, test cases, implementation log)
 8. Generates an implementation plan with safety headers and atomic approval protocol
-9. Creates a Git feature branch (`issue/{N}-{slug}`)
-10. Optionally creates a draft PR on GitHub with `--body-file` populated from solution approach
+9. **Step 5.0: Creates a GitHub Issue** via `gh issue create --body-file` from the issue description; writes the returned issue number back to spec frontmatter (`github-issue` field auto-populated)
+10. Creates a Git feature branch (`issue/{N}-{slug}`)
+11. Optionally creates a draft PR on GitHub with `--body-file` populated from solution approach and `Closes #N` referencing the issue created in Step 5.0
 11. **Step 6.2 (lesson capture) is a mandatory gate** — must receive a response before continuing. When working on a non-main branch, this step is strongly recommended.
 12. **Step 6.4 (ROADMAP + CHANGELOG update) is a mandatory gate** — must receive a response confirming ROADMAP and CHANGELOG entries have been considered before the command completes.
 13. Links to knowledge graph and prompts for lesson capture
@@ -962,7 +963,7 @@ With `--user-facing`:
 **Tips**:
 
 - Uses the Dual-ID Policy: local IDs (`issue-N` or `ENH-NNN`) are independent from GitHub issue numbers (`#N`)
-- Always use `--body-file` flag (not manual summary) when creating the GitHub Issue
+- GitHub Issue creation is automatic at Step 5.0 — `gh issue create --body-file` runs before branch creation; `github-issue` frontmatter is written back immediately
 
 **See also**: [Track Issues](TRACK-ISSUES.md) — full lifecycle walkthrough including git integration and the implementation freeze gate.
 
