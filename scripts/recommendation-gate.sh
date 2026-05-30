@@ -18,11 +18,10 @@ set -euo pipefail
 # ── Constants ────────────────────────────────────────────────────────────────
 
 TRIGGERS_FILE="${HOME}/.kmgraph/triggers.md"
-FLAG_FILE="/tmp/kmgraph-rec-gate-$$.flag"
 MIN_PROMPT_LEN=40
 
 # Detection regex (ERE, case-insensitive)
-DETECT_REGEX='(what (could|should|can) we do|how (should|do|would) (we|i|you) (approach|handle|fix|solve)|what'"'"'?s the best (way|approach)|should we |any (ideas|recommendations|thoughts) (on|about)|what are (the|my) options|how to best)'
+DETECT_REGEX='(what (could|should|can) we do|how (should|do|would) (we|i|you) (approach|handle|fix|solve)|what (is|'"'"'?s) the best (way|approach)|should we\b|any (ideas|recommendations|thoughts) (on|about)|what are (the|my) options|how to best)'
 
 # Hardcoded fallback preamble (used when triggers.md absent or section missing)
 FALLBACK_PREAMBLE='Before producing this recommendation:
@@ -35,6 +34,20 @@ Do not recommend before these run.'
 # ── Read stdin ────────────────────────────────────────────────────────────────
 
 INPUT=$(cat)
+
+# ── Stable per-session debounce flag ─────────────────────────────────────────
+# Use session_id from hook JSON for a stable per-session key.
+# $$ is the hook subprocess PID — freshly spawned per invocation, not stable.
+
+SESSION_ID=""
+if command -v jq &>/dev/null; then
+  SESSION_ID=$(printf '%s' "$INPUT" | jq -r '.session_id // ""' 2>/dev/null || true)
+fi
+if [ -n "$SESSION_ID" ]; then
+  FLAG_FILE="/tmp/kmgraph-rec-gate-${SESSION_ID}.flag"
+else
+  FLAG_FILE="/tmp/kmgraph-rec-gate-${PPID}.flag"
+fi
 
 # ── Parse prompt text ─────────────────────────────────────────────────────────
 
@@ -75,8 +88,8 @@ PREAMBLE=""
 
 if [ -f "$TRIGGERS_FILE" ]; then
   PREAMBLE=$(awk '
-    /Before producing an inline recommendation/ { in_section=1 }
-    in_section && /^## / && !/Before producing an inline recommendation/ { in_section=0 }
+    /Before producing an inline recommendation/ { in_section=1; next }
+    in_section && /^## / { in_section=0 }
     in_section { print }
   ' "$TRIGGERS_FILE" 2>/dev/null || true)
 fi
