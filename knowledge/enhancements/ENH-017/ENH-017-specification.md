@@ -36,3 +36,7 @@ Replace Step 1.2 question with:
 - "WIP update" renamed to "WIP append" for clarity
 - "Patch" now explicitly covers fix or enhancement (not just fix)
 - Identified during v0.5.9 ENH tracking session 2026-05-27
+
+## Related
+
+- [[issue-5]] — GitHub #124 — sibling bug in same command file (`start-issue-tracking`); issue-5 fixes Step 5 (`gh issue create`); ENH-017 improves Step 1.2 UX — implement on separate branch to avoid merge conflict

@@ -13,6 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.5.9.2] — 2026-05-30
+
+### Fixed
+- **issue-5 (#124):** `start-issue-tracking` Step 5 now calls `gh issue create` (Step 5.0) before branch creation. Returned issue URL is parsed for the issue number, which is written back to spec frontmatter (`github-issue` field). Draft PR is updated to include `Closes #N`. Previously, `github-issue` was always `null` or `"TBD"` — every ENH and issue since `v0.0.5-alpha` was unsynced to GitHub.
+- **issue-6 (#125):** `plan-rules.md` false "blocking gate" claim corrected — post-plan validation checklist hook is advisory only (PostToolUse cannot block in Claude Code). `scripts/post-plan-validate-checklist.sh` header updated to clarify advisory intent. Blocking enforcement deferred to v0.6.0 per ENH-015 Gap 2. (User-local `~/.kmgraph/plan-rules.md` fix only — no behavior change for marketplace users.)
+
+### Related
+- ADR-024, ADR-043, ADR-049, ENH-015, ENH-017
+
 ## [0.5.9.1] — 2026-05-28 (rev 2)
 
 ### Added

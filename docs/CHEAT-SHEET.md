@@ -74,7 +74,7 @@ Power users leverage these for complex workflows:
 | Command | Purpose |
 |---------|---------|
 | `/kmgraph:meta-issue` | Initialize meta-issue tracking for complex multi-attempt problems |
-| `/kmgraph:start-issue-tracking` | Initialize issue tracking with structured docs and Git branch |
+| `/kmgraph:start-issue-tracking` | Initialize issue tracking with structured docs, auto-creates GitHub Issue (Step 5.0), and Git branch |
 | `/kmgraph:update-issue-plan` | Sync knowledge graph → plan → issue → GitHub |
 | `/kmgraph:link-issue` | Manually link existing lesson or ADR to GitHub issue |
 | `/kmgraph:sync-all` | Automated full sync pipeline (4 steps → 1 command). Uses background file scanning when context-mode is installed. Refreshes search index automatically if built |

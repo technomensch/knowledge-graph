@@ -180,6 +180,7 @@ All HARD BLOCKs use "invoke the kmgraph:recall skill (via Skill tool)" — NOT `
 - **[[ADR-038-model-selection-rule-for-kg-tasks]]:** Model selection for KG ops; model heuristics addition extends this to cover plan execution task types
 - **[[ENH-015-decision-governance-protocol]]:** The feature this ADR implements; contains full Platform Delivery Matrix, Known Gaps, and Amendment Deliverables
 - **[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]]:** rules.md split shipping constraint — the rules-registry in `core/rules-registry/` follows the same principle for canonical rule text
+- **[[issue-6]]:** GitHub #125 — bug: plan-rules.md falsely described PostToolUse checklist hook as a blocking gate; fixed in v0.5.9.2 (advisory intent clarified; Layer 3 hard gate deferred per this ADR's Gap 2 pattern)
 
 ---
 

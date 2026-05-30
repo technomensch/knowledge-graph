@@ -242,6 +242,7 @@ done
 | **v0.5.7.1** | Security patch — no upgrade action required. Dependabot dependency overrides applied automatically on install. |
 | **v0.5.8** | No upgrade action required. Project-specific plan-routing rules, dispatcher relay, and MEMORY.md cascade fix are automatic after plugin reload. |
 | **v0.5.9** | No upgrade action required. Decision governance recall enforcement, `brainstorm-recall` skill, and post-plan validation checklist are automatic after plugin reload. Optionally run `/kmgraph:upgrade` to add the "Recall in Plan Mode" rule to your `~/.kmgraph/plan-rules.md` if you have a split rules file. |
+| **v0.5.9.2** | No upgrade action required. `start-issue-tracking` Step 5.0 (`gh issue create`) is automatic after plugin reload. `github-issue` frontmatter is now auto-populated in new issue/ENH specs. Existing specs with `github-issue: null` are not retroactively updated — create GitHub issues manually for those if needed. |
 
 After the wizard completes, your existing lessons, ADRs, sessions, and chat history are untouched.
 
