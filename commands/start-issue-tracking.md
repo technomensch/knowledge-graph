@@ -366,6 +366,49 @@ Every generated plan MUST include this **Safety Header** and **Atomic Approval P
 
 **CONDITIONAL:** Only execute this step if `{git_available} = true`. If the project has no Git repository, skip this step entirely — no branch is needed and no Git commands should run.
 
+### 5.0: Create GitHub Issue
+
+After documentation is generated (Step 4), create the GitHub issue immediately so the
+issue number can be captured and written to the spec frontmatter before branch creation.
+
+Determine label based on `{issue_type}`:
+- Bug → `--label bug`
+- Enhancement → `--label enhancement`
+- Refactor / Hardening → `--label enhancement`
+- All other types → `--label enhancement` (default fallback)
+
+```bash
+ISSUE_URL=$(gh issue create \
+  --title "[{issue_type}] {issue_title}" \
+  --body-file {active_kg_path}/issues/issue-N/issue-N-description.md \
+  --label {label})
+[ -n "$ISSUE_URL" ] || { echo "ERROR: gh issue create failed — check gh auth and remote"; exit 1; }
+GITHUB_ISSUE_NUM=$(basename "${ISSUE_URL}")
+echo "GitHub Issue created: #${GITHUB_ISSUE_NUM} — ${ISSUE_URL}"
+```
+
+Write issue number back to spec frontmatter immediately:
+
+For bugs/issues (`{active_kg_path}/issues/issue-N/issue-N-description.md`):
+```bash
+SPEC={active_kg_path}/issues/issue-N/issue-N-description.md
+sed -i.bak -E "s/github-issue: (null|\"TBD\"|\"#N\")/github-issue: \"#${GITHUB_ISSUE_NUM}\"/" \
+  "${SPEC}" && rm "${SPEC}.bak"
+grep -E "github-issue: \"#[0-9]+\"" "${SPEC}" || \
+  { echo "ERROR: write-back failed — issue #${GITHUB_ISSUE_NUM} created on GitHub. Update frontmatter manually."; exit 1; }
+```
+
+For enhancements (`{active_kg_path}/enhancements/ENH-NNN/ENH-NNN-specification.md`):
+```bash
+SPEC={active_kg_path}/enhancements/ENH-NNN/ENH-NNN-specification.md
+sed -i.bak -E "s/github-issue: (null|\"TBD\"|\"#N\")/github-issue: \"#${GITHUB_ISSUE_NUM}\"/" \
+  "${SPEC}" && rm "${SPEC}.bak"
+grep -E "github-issue: \"#[0-9]+\"" "${SPEC}" || \
+  { echo "ERROR: write-back failed — issue #${GITHUB_ISSUE_NUM} created on GitHub. Update frontmatter manually."; exit 1; }
+```
+
+Store `{github_issue_num}` for use in Step 5.2.
+
 ### 5.1: Create Feature Branch
 
 Create the branch with a descriptive name derived from the issue number and slug:
@@ -390,8 +433,11 @@ git branch --show-current
 
 Optionally create a draft PR on GitHub:
 ```bash
-gh pr create --draft --title "[Bug] Brief descriptive title" \
-  --body-file {active_kg_path}/issues/issue-N/solution-approach.md
+gh pr create --draft \
+  --title "[{issue_type}] {issue_title}" \
+  --body "$(cat {active_kg_path}/issues/issue-N/solution-approach.md)
+
+Closes #{github_issue_num}"
 ```
 
 ---
@@ -444,7 +490,7 @@ The `solution-approach.md` MUST link to the resulting lesson or updated entry in
 **Local Issue #N: [Type] Descriptive Title**
 - Status: 🔴 ACTIVE (LOCKED)
 - Branch: v[Major.Minor.Patch]-[issue N]-brief-slug   ← omit if {git_available} = false
-- GitHub Issue: #[N] (Reopened/Created)               ← omit if {git_available} = false
+- GitHub Issue: #[N] — created at Step 5.0 (gh issue create)   ← omit if {git_available} = false
 
 **Files Created:**
 - {active_kg_path}/issues/issue-N/issue-N-description.md

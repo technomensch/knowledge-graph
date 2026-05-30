@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.5.9
+**Version:** 0.5.9.2
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -88,6 +88,11 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 ---
 
 ## v0.5.x Feature Highlights
+
+**v0.5.9.2 — 2026-05-30**
+
+- **`start-issue-tracking` now auto-creates GitHub Issue** — Step 5.0 calls `gh issue create --body-file` before branch creation; returned issue number is written back to spec frontmatter (`github-issue` field). Draft PR is updated to include `Closes #N`.
+- **Post-plan validation checklist advisory clarification** — `plan-rules.md` false "blocking gate" claim corrected; checklist hook is advisory only (PostToolUse cannot block in Claude Code). Hard-gate enforcement deferred to v0.6.0 (ENH-015 Gap 2).
 
 **v0.5.9 — 2026-05-27**
 
@@ -216,7 +221,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.5.9 (2026-05-27)
+**Current Release:** v0.5.9.2 (2026-05-30)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -309,6 +314,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.5.9 (2026-05-27)
+**Current Version:** v0.5.9.2 (2026-05-30)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info

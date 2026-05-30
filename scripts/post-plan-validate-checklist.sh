@@ -3,6 +3,8 @@
 #
 # Fires after writing or editing a plan file; outputs Post-Plan Validation Checklist
 # as an advisory reminder. Does not block — PostToolUse is advisory only.
+# Blocking enforcement deferred to v0.6.0 — see ENH-015 Gap 2.
+# Do not attempt to enforce blocking behavior here.
 # Idempotency: suppresses repeat triggers on the same plan file within a session.
 
 set -euo pipefail
