@@ -382,21 +382,30 @@ ISSUE_URL=$(gh issue create \
   --title "[{issue_type}] {issue_title}" \
   --body-file {active_kg_path}/issues/issue-N/issue-N-description.md \
   --label {label})
+[ -n "$ISSUE_URL" ] || { echo "ERROR: gh issue create failed — check gh auth and remote"; exit 1; }
 GITHUB_ISSUE_NUM=$(basename "${ISSUE_URL}")
 echo "GitHub Issue created: #${GITHUB_ISSUE_NUM} — ${ISSUE_URL}"
 ```
 
 Write issue number back to spec frontmatter immediately:
 
+For bugs/issues (`{active_kg_path}/issues/issue-N/issue-N-description.md`):
 ```bash
-sed -i.bak -E "s/github-issue: (null|\"TBD\")/github-issue: \"#${GITHUB_ISSUE_NUM}\"/" \
-  {active_kg_path}/issues/issue-N/issue-N-description.md && \
-  rm {active_kg_path}/issues/issue-N/issue-N-description.md.bak
-grep "github-issue: \"#" {active_kg_path}/issues/issue-N/issue-N-description.md || \
+SPEC={active_kg_path}/issues/issue-N/issue-N-description.md
+sed -i.bak -E "s/github-issue: (null|\"TBD\"|\"#N\")/github-issue: \"#${GITHUB_ISSUE_NUM}\"/" \
+  "${SPEC}" && rm "${SPEC}.bak"
+grep -E "github-issue: \"#[0-9]+\"" "${SPEC}" || \
   { echo "ERROR: write-back failed — issue #${GITHUB_ISSUE_NUM} created on GitHub. Update frontmatter manually."; exit 1; }
 ```
 
-For enhancements: spec path is `{active_kg_path}/enhancements/ENH-NNN/ENH-NNN-specification.md`
+For enhancements (`{active_kg_path}/enhancements/ENH-NNN/ENH-NNN-specification.md`):
+```bash
+SPEC={active_kg_path}/enhancements/ENH-NNN/ENH-NNN-specification.md
+sed -i.bak -E "s/github-issue: (null|\"TBD\"|\"#N\")/github-issue: \"#${GITHUB_ISSUE_NUM}\"/" \
+  "${SPEC}" && rm "${SPEC}.bak"
+grep -E "github-issue: \"#[0-9]+\"" "${SPEC}" || \
+  { echo "ERROR: write-back failed — issue #${GITHUB_ISSUE_NUM} created on GitHub. Update frontmatter manually."; exit 1; }
+```
 
 Store `{github_issue_num}` for use in Step 5.2.
 
