@@ -68,6 +68,17 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "comment": "After writing or editing a plan file: check for required ## Docs Impact section (issue-8 Gate 1)",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/plan-docs-xref-check.sh",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -90,6 +101,30 @@
             "comment": "Before git commit: check if lesson-worthy changes are undocumented",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/pre-commit-knowledge-gate.sh",
             "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "comment": "Before git push: version-sync check (Gate 2) and docs-impact-scan completion flag check (Gate 3) — issue-8",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/pre-push-gate.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "comment": "Before inline recommendation responses: inject recall/ADR-precheck/cascade preamble once per session (issue-9)",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/recommendation-gate.sh",
+            "timeout": 5
           }
         ]
       }

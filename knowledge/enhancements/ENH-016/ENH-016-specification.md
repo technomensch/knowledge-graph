@@ -159,3 +159,7 @@ This is a required constraint for any ENH-016 implementation, not an optional op
 - Forcing a split at install time
 - Seeding `~/.kmgraph/plan-rules.md` during `/kmgraph:init`
 - Defining a canonical split structure — user defines their own
+
+## Related
+
+- issue-8: Docs Update Enforcement Meta-Issue (ENH-016 multi-file fallback pattern required by issue-8 fix)
