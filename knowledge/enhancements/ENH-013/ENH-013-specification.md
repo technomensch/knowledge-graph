@@ -5,7 +5,7 @@ type: Refactor
 status: deferred
 github-issue: ""
 branch: none
-version-target: ""
+version-target: "v0.5.11"
 created: 2026-05-21
 tags: [enhancement, skills, kg-recall, ux, slash-commands]
 ---

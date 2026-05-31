@@ -121,6 +121,16 @@ Making final docs-update a separate branch enforces release discipline. It canno
 
 ---
 
+## Amendment — 2026-05-30 (Gate 1 automation — v0.5.9.3)
+
+**`## Docs Impact` heading constant:** All plan files must include a `## Docs Impact` section. This exact heading string is the pinned constant — `plan-docs-xref-check.sh` (Gate 1) and plan templates both reference this ADR for the canonical heading. Do not rename it; changes here require updating the script check.
+
+**Gate 1 automation:** `scripts/plan-docs-xref-check.sh` (PostToolUse `Write|Edit` hook) fires after any plan file write/edit. It checks for the `## Docs Impact` heading (exact string `^## Docs Impact$`). If absent, it injects an advisory `systemMessage` reminder. This is an **advisory layer** atop the manual checklist — not a replacement. Per-file-content-hash idempotency prevents re-injection on unchanged content.
+
+**Output contract:** PostToolUse → `systemMessage`. Always `exit 0`. See ADR-050 for the full gate design contract.
+
+---
+
 ## Implementation for v0.0.11+
 
 ### Master Plan File (Created Before Feature Branches)
@@ -186,6 +196,7 @@ Add to GitHub PR template for feature branches:
 - **ADR-002**: Commands vs skills architecture (determines which doc sections update)
 - **ADR-008**: Third-person language standard (applies to all documentation)
 - **ADR-009**: Three-tier installation architecture (informs INSTALL.md updates)
+- issue-8: Docs Update Enforcement Meta-Issue (centralizes this ADR + ADR-021 + ADR-036)
 
 ## Lessons Learned
 
