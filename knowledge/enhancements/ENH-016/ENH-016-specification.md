@@ -154,6 +154,12 @@ Same pattern applies to `scripts/hooks-master.sh` staleness checks — use a loo
 
 This is a required constraint for any ENH-016 implementation, not an optional optimization.
 
+### rules-capture Sub-File Routing (v0.5.10 planned)
+
+When `personal-rule` routing is selected, scan `~/.kmgraph/` for `*rules*.md` files. Route by content keyword match against filename stems. Fallback to `~/.kmgraph/rules.md` when no match.
+
+**Implementation:** Tracked in `v0.5.10-ux-session-handoff` plan as Task 15.
+
 ## Not In Scope
 
 - Forcing a split at install time

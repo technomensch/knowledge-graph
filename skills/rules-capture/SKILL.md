@@ -151,7 +151,7 @@ Combined into four targets:
 |-------|------|-----------|------------|
 | Project | Rule | `knowledge/rules.md` | Yes (team-wide) |
 | Project | Me | `knowledge/me.md` | No (gitignored, user-specific) |
-| Personal | Rule | `~/.kmgraph/rules.md` | Personal KG |
+| Personal | Rule | `~/.kmgraph/rules.md` (or sub-file — see sub-file detection below) | Personal KG |
 | Personal | Me | `~/.kmgraph/me.md` | Personal KG (gitignored) |
 
 Signal examples per target:
@@ -206,6 +206,13 @@ Without asking the user anything, classify scope and draft a one-line preview of
   2. If no hard signal, run Pass 2 soft signals — if any match, ask one clarifying question before routing
   3. If neither pass fires, classify as universal
 - Apply Axis 1 (scope) and Axis 2 (type) classification using the existing four-target table
+- **If `personal-rule`:** Scan `~/.kmgraph/` for files matching `*rules*.md` (excluding `rules.md` itself). For each sub-file found, score the captured rule text against the filename stem:
+  - Stem contains "plan": match keywords plan, branch, task, execution, spec, ADR
+  - Stem contains "govern": match keywords gate, hook, enforcement, compliance, approval
+  - Other stems: match the stem word literally
+  - High confidence (one clear match): auto-route to that sub-file
+  - Ambiguous (multiple matches or no match): present user a disambiguation list of detected sub-files + "default (rules.md)"
+  - No sub-files found: fall back to `~/.kmgraph/rules.md`
 - Combine all three axes to determine the suggested target:
   - Platform-specific rule with detected platform (non-unknown): suggest the platform's native config file (e.g., `CLAUDE.md`)
   - Platform-specific rule with `platform = unknown`: suggest `knowledge/rules.md` with a `platform-rule` shortcut
@@ -277,7 +284,7 @@ When `platform = unknown` and rule is platform-specific, replace `platform` with
 - **"agents"** → flip target to `AGENTS.md`, dispatch to agent
 - **"platform-rule"** → ask "Which platform file should I write to?" — accept user's answer, flip target to that file, dispatch to agent
 - **"project-me"** → flip target to `knowledge/me.md`, dispatch to agent
-- **"personal-rule"** → flip target to `~/.kmgraph/rules.md`, dispatch to agent
+- **"personal-rule"** → Triggers sub-file detection; may show disambiguation prompt before dispatch. Flip target to resolved sub-file (or `~/.kmgraph/rules.md`), dispatch to agent
 - **"personal-me"** → flip target to `~/.kmgraph/me.md`, dispatch to agent
 - **"no"** / silence → drop, do not re-prompt for the same correction this session
 - Natural language override always works: "make it project me.md", "user rules", "nope", "skip", "put it in my personal me", "write it to CLAUDE.md", "put it in AGENTS.md"
@@ -292,6 +299,8 @@ context:
                                       #   knowledge/rules.md
                                       #   knowledge/me.md
                                       #   ~/.kmgraph/rules.md
+                                      #   ~/.kmgraph/plan-rules.md       (personal-rule sub-file example)
+                                      #   ~/.kmgraph/governance-rules.md (personal-rule sub-file example)
                                       #   ~/.kmgraph/me.md
                                       #   CLAUDE.md, GEMINI.md, .windsurfrules, etc.  (platform-specific)
                                       #   AGENTS.md

@@ -199,11 +199,13 @@ Ask only this question and wait for the answer before proceeding:
 ### 1.2: Version Impact
 Ask only this question and wait for the answer before proceeding:
 
-> "Version impact?
-> - New minor (e.g., v0.5.x → v0.6.0) — new feature or significant behavior change
-> - Patch (e.g., v0.5.8 → v0.5.9) — small fix or enhancement on a released version
-> - WIP append — added to a version branch already in progress
-> - Hotfix (e.g., v0.5.8 → v0.5.8.1) — urgent fix to a released version"
+> "Version impact — what version increment does this require?
+> - **New minor** (e.g., v0.5.x → v0.6.0) — a new feature or significant behavior change. Bumps the third segment, resets lower segments.
+> - **Patch** (e.g., v0.5.8 → v0.5.9) — a small fix *or* a small enhancement on an already-released version. Bumps the patch segment. (Patch is not bug-only — enhancements that don't change major behavior also belong here.)
+> - **WIP append** — folded into a version branch already in progress; no new version number is minted. Use when the work ships as part of an unreleased branch.
+> - **Hotfix** (e.g., v0.5.8 → v0.5.8.1) — an urgent fix to an already-released version. Adds/bumps a fourth segment.
+>
+> (This project uses a pre-1.0 four-segment scheme — `major.minor.patch.hotfix`. There is no 'major' / v1.0.0 increment yet; if your change feels major, choose **New minor**.)"
 
 **WAIT FOR USER ANSWER. Do not ask 1.3 until answer is received.**
 

@@ -58,6 +58,8 @@ This command generates a complete handoff package consolidating all work, issues
 
 **Reading time:** 5 minutes
 
+**Pairing with a session summary:** If a session summary was created in the same session, set the `continues_from` field in START-HERE.md to its repo-relative path instead of duplicating "what was built" content. When `continues_from` is set, the "What Was Completed" section collapses to: *"See `continues_from` summary for completed work. This handoff covers unfinished work only."* The session summary itself does not reference the handoff (asymmetric, one-way coupling — see ADR-051).
+
 ### 2. DOCUMENTATION-MAP.md
 
 **Master file inventory:**
@@ -156,6 +158,7 @@ git status --porcelain
 
 **Last Updated:** [timestamp]
 **Created for branch:** $current_branch
+**Continues from:** [optional — repo-relative path to session summary if sub-work was completed this session, e.g. knowledge/sessions/2026-06/2026-06-07-session-summary.md. Omit if no paired summary.]
 
 ---
 

@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.5.9.3
+**Version:** 0.5.10
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -88,6 +88,11 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 ---
 
 ## v0.5.x Feature Highlights
+
+**v0.5.10 — 2026-06-07**
+
+- **`start-issue-tracking` Step 1.2 version-impact UX improved (ENH-017)** — Version impact prompt now explains each increment with semver implications, clarifies that Patch covers fix *or* enhancement, and guards the "major/v1.0.0 not yet valid" edge case.
+- **Session/handoff `continues_from` coupling (ENH-021)** — Handoffs may now reference a paired session summary via an optional `continues_from` field (handoff frontmatter + START-HERE header), eliminating duplicated "what was built" content at session end. Asymmetric one-way coupling — the summary never references the handoff. See ADR-051.
 
 **v0.5.9.2 — 2026-05-30**
 
@@ -221,7 +226,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.5.9.2 (2026-05-30)
+**Current Release:** v0.5.10 (2026-06-07)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -314,6 +319,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.5.9.2 (2026-05-30)
+**Current Version:** v0.5.10 (2026-06-07)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info

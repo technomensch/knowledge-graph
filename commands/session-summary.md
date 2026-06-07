@@ -23,6 +23,8 @@ Auto-detects session scope, includes recent git history, and presents a single c
 before saving — no multi-step interrogation. Checks for open plan steps, draft ADRs, and
 uncaptured lessons before finalizing.
 
+**Pairing with a handoff:** If you also create a handoff this session, point the handoff's `continues_from` field at this summary's path rather than duplicating completed-work content. The summary itself does not reference the handoff (asymmetric, one-way coupling — see ADR-051).
+
 ---
 
 ## Usage
