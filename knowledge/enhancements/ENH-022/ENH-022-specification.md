@@ -1,10 +1,11 @@
 ---
 id: ENH-022
-title: "Template Directory Disambiguation — knowledge/concepts vs core/templates"
+title: "Template Directory Disambiguation — core/templates vs all knowledge/ live pairs"
 status: proposed
 priority: medium
 version_target: v0.5.12
 created: 2026-05-29
+updated: 2026-06-07
 related:
   adrs: [40, 9, 28]
   lessons: ["Lessons_Learned_Template_Source_Naming_Role_Not_Output"]
@@ -17,31 +18,58 @@ tags: [templates, naming, directory-structure, disambiguation, init, upgrade]
 **Priority:** Medium
 **Version Target:** v0.5.12
 **Created:** 2026-05-29
+**Updated:** 2026-06-07 — scope broadened from concepts-only to all four core/templates ↔ knowledge/ pairs
 
 ---
 
 ## Problem Statement
 
-Two template-like directories exist in the repository, and their roles are not
-distinguishable by name alone:
+`core/templates/` contains frozen distribution scaffolds that `/init` copies into
+a user's `knowledge/` directory at install time. After install, the user's
+`knowledge/` subdirectories contain live working files — but they are
+structurally indistinguishable from the source they were copied from.
 
-| Directory | Role | Mutability | Git status |
-|---|---|---|---|
-| `core/templates/` | Canonical distribution scaffolds for every new KG install (consumed by `/init`, `init-personal-kg`, `template-seed`, `scaffold`, `upgrade`) | PROTECTED — never edited directly | Tracked, frozen |
-| `knowledge/concepts/` | Project-specific working knowledge files for THIS repo's own KG | Mutable working copy | Tracked, freely edited |
+This is not a `knowledge/concepts/` problem. It is a **whole-graph structural
+disambiguation problem** affecting all four paired directories:
 
-The files inside `knowledge/concepts/` (`concepts.md`, `patterns.md`,
-`gotchas.md`, `workflows.md`, `architecture.md`) look like template stubs
-because they share names and shape with the seed templates in
-`core/templates/`. A reader cannot tell from the path whether a file is:
+| `core/templates/` (frozen source) | `knowledge/` (live copy after init) | Same name? |
+|---|---|---|
+| `core/templates/decisions/` | `knowledge/decisions/` | Yes |
+| `core/templates/lessons-learned/` | `knowledge/lessons-learned/` | Yes |
+| `core/templates/sessions/` | `knowledge/sessions/` | Yes |
+| `core/templates/knowledge/` | `knowledge/concepts/` | **No — hardcoded rename** |
 
-- a distribution template that must not be hand-edited, or
+A reader cannot tell from a path whether they are looking at:
+- a frozen distribution scaffold that must never be hand-edited, or
 - a live working knowledge file that is meant to be edited.
 
-This is the same class of confusion ADR-040 solved at the `knowledge/` root
-(separating live profile files from template starters by moving templates into
-`knowledge/templates/`). The `knowledge/concepts/` vs `core/templates/`
-boundary is the remaining instance of the same ambiguity.
+### The Special Case in `init.md`
+
+`core/templates/knowledge/` is the one pair with a **hardcoded asymmetric name**
+in `commands/init.md` (line 383):
+
+> `docs/knowledge/` → moved to `knowledge/concepts/` to avoid
+> `knowledge/knowledge/` nesting confusion.
+
+This was a pragmatic workaround — not a principled disambiguation. It created
+the `concepts/` naming (which doesn't appear on the source side at all), making
+the source→destination mapping invisible unless you read `init.md` carefully.
+The other three pairs share identical names on both sides, creating a different
+form of the same confusion: same name, opposite roles.
+
+### Origin
+
+ENH-022 is a follow-on from **ADR-040** (v0.4.3-beta, 2026-04-21), which
+resolved the root-level `knowledge/` confusion by moving template starters into
+`knowledge/templates/`. ADR-040 fixed the root but left the
+`core/templates/` ↔ `knowledge/` boundary unresolved. The same structural
+ambiguity that ADR-040 solved at the root persists across all four pairs.
+
+The **Lesson: Template Source Files Should Encode Role, Not Deployed Output
+Name** (2026-04-09, v0.3.0-beta) independently documented the same pattern:
+source filenames/paths should encode role; init copy commands map role → output.
+Both that lesson and ADR-040 predict that the current structure will mislead
+contributors and new users.
 
 ---
 
@@ -51,53 +79,65 @@ boundary is the remaining instance of the same ambiguity.
   point to copy vs. a live example to read — undermining the "learn by reading
   the repo's own KG" onboarding path.
 - **Contributors** risk editing the wrong file: hand-editing a `core/templates/`
-  scaffold (PROTECTED, breaks `/init` output) or treating a
-  `knowledge/concepts/` working file as a frozen template.
-- **Upgrading users** who already ran `/init` have `concepts/` (or, post
-  ADR-040, `templates/`) directories on disk; any rename here must not silently
-  break or duplicate their existing layout.
+  scaffold (PROTECTED, breaks `/init` output) or treating a live `knowledge/`
+  working file as a frozen template.
+- **Upgrading users** who already ran `/init` have live `knowledge/` directories
+  on disk; any rename to those directories requires a confirmed migration step
+  (ADR-040 precedent: prompt, never silently move; declining must keep the
+  install functional).
+- **Consistency gap:** Three pairs share identical names across the boundary;
+  one (`knowledge/`) uses an asymmetric name (`concepts/`). No pair signals its
+  role structurally. The fix must apply consistently — a patchwork rename of
+  only `concepts/` leaves the three identical-name pairs ambiguous.
 
 ---
 
 ## Proposed Approaches (to evaluate during brainstorm)
 
-> No approach is selected yet. The brainstorm (see v0.5.12 plan) must choose one
-> and harden this spec before any implementation task is written.
+> No approach is selected yet. The brainstorm must choose one and apply it
+> consistently across all four pairs. The brainstorm (see v0.5.12 plan) must
+> harden this spec before any implementation task is written.
 
-1. **Rename project side only** — `knowledge/concepts/` → `knowledge/concepts-proj/`
-   (or `-proj-temp`), leaving `core/templates/` untouched. Smallest blast radius
-   on the PROTECTED side; touches the 6 code references to `knowledge/concepts`.
+Each approach must answer: does it apply to all four pairs or just `concepts/`?
+A partial fix that leaves three pairs ambiguous is not acceptable.
 
-2. **Rename core side only** — `core/templates/` → `core/core-templates/`
-   (or `-core-temp`). Makes the distribution role explicit, but `core/templates/`
-   is PROTECTED and far more entrenched (15 source/code references + 15 docs
-   references), so this is the highest-cost option.
+1. **Rename project side only** — suffix all `knowledge/` live dirs to signal
+   "live": e.g., `knowledge/concepts-live/`, `knowledge/decisions-live/`,
+   `knowledge/lessons-learned-live/`, `knowledge/sessions-live/`. Leaves
+   `core/templates/` PROTECTED and untouched. Blast radius: ~6 code refs for
+   `concepts/` + additional refs for the three other dirs; upgrade migration
+   needed for all four.
 
-3. **Rename both sides with paired suffixes** — e.g. `core/core-templates/` and
-   `knowledge/concepts-proj/` (or the user's `-core-temp` / `-proj-temp` idea).
-   Maximum clarity, maximum blast radius, two protected-area changes.
+2. **Rename core side only** — prefix `core/templates/` subdirs to signal
+   "scaffold": e.g., `core/templates/scaffold-decisions/`,
+   `core/templates/scaffold-lessons-learned/`, etc. Makes the distribution
+   role explicit; touches 15+ code refs + 15 docs refs; highest cost because
+   `core/templates/` is PROTECTED.
 
-4. **No rename — documentation only** — add a `README.md` to each directory
-   stating its role (neither directory currently has one), plus a GLOSSARY entry
-   and an ARCHITECTURE note. This is ADR-040's explicitly *rejected* "Option B"
-   for the root case, but is the only zero-migration option here.
+3. **Rename both sides with paired naming** — e.g., `core/templates/scaffold-*/`
+   and `knowledge/*-live/`. Maximum clarity, maximum blast radius, both
+   PROTECTED and live sides change.
 
-5. **Split `knowledge/concepts/`** into `knowledge/concepts/` (genuine concept
-   notes for this project) + a separate location for any mutable project-level
-   template stubs — separating working knowledge from template-shaped content.
-   Note: ADR-040 already established `knowledge/templates/` for seeded template
-   starters, so this option must be reconciled with ADR-040 to avoid a third
-   overlapping "templates" location.
+4. **No rename — documentation only** — add a `README.md` to `core/templates/`
+   and to each `knowledge/` subdirectory stating its role, plus GLOSSARY and
+   ARCHITECTURE notes. ADR-040's explicitly rejected "Option B" for the root
+   case; the only zero-migration option. Must be applied to all four pairs to
+   have any effect.
+
+5. **Structural split of `knowledge/concepts/` only** — separate genuine
+   concept notes from mutable template-shaped content. Note: ADR-040 already
+   established `knowledge/templates/` for seeded starters; this option must be
+   reconciled to avoid a third overlapping "templates" location. Does NOT
+   address the three identical-name pairs.
 
 ---
 
 ## Cascading Impact
 
-Reference counts below exclude `.kg-archive-*/`, `.docusaurus/` build artifacts,
-`chat-history/`, and `docs/plans/` (gitignored local plans). Many of the
-remaining "matches" for `knowledge/concepts` are example lesson files that merely
-contain the literal path as prose, not code dependencies — those are listed
-separately because they need text edits, not logic changes.
+Reference counts below exclude `.kg-archive-*/`, `.docusaurus/` build
+artifacts, `chat-history/`, and `docs/plans/` (gitignored local plans). Many
+matches for `knowledge/concepts` in example lesson files are prose references
+(text edits only, not logic changes) — listed separately.
 
 ### `knowledge/concepts/` — code/logic references (6 files)
 
@@ -115,6 +155,12 @@ separately because they need text edits, not logic changes.
   SessionStart_Automation, Effective_LLM_Constraints, Relative_File_Paths)
 - Mirrored copies under `docs/examples/lessons-learned/process/`
 - `docs/reference/templates.md`
+
+### `knowledge/decisions/`, `knowledge/lessons-learned/`, `knowledge/sessions/`
+
+Reference counts for these three pairs **not yet audited** — scope expansion
+identified 2026-06-07. Brainstorm must include a grep audit of all three before
+approach selection.
 
 ### `core/templates/` — code/logic references (15 files; PROTECTED, higher risk)
 
@@ -140,35 +186,52 @@ MCP server: `mcp-server/src/tools/scaffold.ts`, `mcp-server/src/tools/upgrade.ts
 ### Notable hot files
 
 - `commands/init.md`, `init-shared/upgrade-inspector.md`, and
-  `mcp-server/src/resources/index.ts` reference **both** directories — any rename
-  touching either side hits these.
+  `mcp-server/src/resources/index.ts` reference **both** directories — any
+  rename touching either side hits these.
 - `init-personal-kg.md` historically used a hardcoded `for f in ...` template
-  loop (per the Template-Source-Naming lesson) — any rename must update the loop,
-  not just the directory path.
+  loop (per the Template-Source-Naming lesson) — any rename must update the
+  loop, not just the directory path.
+- `commands/init.md` line 383 contains the **hardcoded `knowledge/concepts/`
+  special case** — any rename of `knowledge/concepts/` must update this
+  special-case logic, not just a string replace.
 
 ---
 
 ## Upgrade / Migration Impact
 
-- **Existing installs** seeded by older versions have a `knowledge/concepts/`
-  directory (and, post-ADR-040, `knowledge/templates/`). Renaming the project
-  side means `upgrade` must detect the old directory and offer a confirmed move
-  (ADR-040 precedent: prompt, never silently move; declining must keep the install
-  functional).
+- **Existing installs** seeded by older versions have `knowledge/concepts/`,
+  `knowledge/decisions/`, `knowledge/lessons-learned/`, and `knowledge/sessions/`
+  directories on disk. Renaming any of these requires `upgrade` to detect the
+  old directory and offer a confirmed move (ADR-040 precedent: prompt, never
+  silently move; declining must keep the install functional). Four directories =
+  four migration steps if the project side is renamed.
 - **`core/templates/` is the install source.** Renaming it changes what `/init`,
   `template-seed`, `scaffold` (`kg_scaffold`), and `upgrade` (`kg_upgrade`) copy
-  *from*. This is internal to the distribution, so it does not strictly break
-  end-user on-disk layout — but every consumer path and the MCP server's compiled
-  resource map must be updated atomically or `/init` breaks.
+  from. Every consumer path and the MCP server's compiled resource map must be
+  updated atomically or `/init` breaks.
 - **Three-tier installs (ADR-009):** Tier 3 template-only users copy
   `core/templates/` manually; a rename here is a documented breaking change for
   their copy instructions (INSTALL.md, `docs/INSTALL.md`).
 - **Migration script:** Brainstorm must decide whether `kg_upgrade` /
-  `upgrade-inspector` need a new migration step (likely yes if the project side
-  is renamed; likely no if approach 4/documentation-only is chosen).
+  `upgrade-inspector` need new migration steps. Likely yes for any project-side
+  rename; likely no for documentation-only (approach 4).
 - **Version sync:** `package.json`, `.claude-plugin/plugin.json`, and
   `mcp-server/package.json` must stay in sync if the MCP server's resource map
   changes (it references both directories).
+
+---
+
+## Open Questions for Brainstorm
+
+1. Should all four pairs be renamed consistently, or is `concepts/` special
+   enough (due to the asymmetric name) to treat separately?
+2. Do `decisions/`, `lessons-learned/`, and `sessions/` actually cause the same
+   confusion in practice — or does shared naming make them *clearer* (same name
+   = same content type)?
+3. Grep audit required: what are the reference counts for the three identical-
+   name pairs before approach selection?
+4. Does approach 5 (split `knowledge/concepts/`) conflict with ADR-040's
+   `knowledge/templates/`, and if so, which takes precedence?
 
 ---
 
@@ -181,14 +244,14 @@ into `knowledge/templates/`, and it explicitly:
 
 - **Rejected flat-file prefixes** (its "Option A" — `user-example-me.md` style)
   as "fragile and verbose" — relevant to this ENH's suffix approaches (1–3).
-- **Rejected README-only** (its "Option B") as a "cosmetic fix, not structural" —
-  relevant to this ENH's approach 4.
+- **Rejected README-only** (its "Option B") as a "cosmetic fix, not structural"
+  — relevant to this ENH's approach 4.
 - **Preferred structural separation via directories** and an `upgrade` migration
   step with user confirmation — the template this ENH should likely follow.
 
 Supporting context:
-- **ADR-009** (Three-Tier Installation) — `core/templates/` is the Tier 3 install
-  source; rename = documented breaking change for manual installers.
+- **ADR-009** (Three-Tier Installation) — `core/templates/` is the Tier 3
+  install source; rename = documented breaking change for manual installers.
 - **ADR-028** (me.md/rules.md as source of truth) — templates seed live files.
 - **Lesson: Template Source Files Should Encode Role, Not Deployed Output Name**
   — directly on point: source filenames/paths should encode role; init copy
@@ -201,5 +264,9 @@ Supporting context:
 
 **Brainstorm required before implementation — see v0.5.12 plan**
 (`v0.5.12-template-disambiguation`). The plan is intentionally a DRAFT with no
-execution tasks until the brainstorm selects an approach and hardens this spec
-(suffix choice, breaking-change classification, migration-script decision).
+execution tasks until the brainstorm:
+1. Runs the grep audit on the three unaudited pairs (decisions, lessons-learned, sessions)
+2. Answers the open questions above
+3. Selects an approach that applies consistently across all four pairs
+4. Hardens this spec (suffix/prefix choice, breaking-change classification,
+   migration-script decision for each affected directory)
