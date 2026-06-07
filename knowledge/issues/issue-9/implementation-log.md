@@ -12,3 +12,7 @@ file: implementation-log
 - Created scripts/recommendation-gate.sh (Task 1.2)
 - Wired UserPromptSubmit hook in hooks.json (Task 1.3)
 - Created combined ADR covering inline-recommendation gate + pre-push composite gate (Task 4.4)
+
+## Verification (2026-06-07)
+
+All 8 acceptance criteria verified against scripts/recommendation-gate.sh. Debounce uses session_id from hook JSON (more stable than PID fallback in spec). Status updated to resolved.

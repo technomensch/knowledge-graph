@@ -13,6 +13,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.5.10] — 2026-06-07
+
+### Added
+- **ENH-021:** Optional `continues_from` field added to handoff documents (START-HERE.md header block + session-style handoff YAML frontmatter). When set, the "What Was Completed" section collapses to a one-liner pointing at the paired session summary — eliminates duplicated "what was built" content at session end. Asymmetric one-way coupling: handoff → summary only; summary never references the handoff.
+- **ADR-051:** Documents the session-summary/handoff asymmetric coupling decision — why not consolidate (lifecycle/tense/trigger conflicts), coupling direction, field location (handoff only), intended consumers (recall/FTS5/future resume), optionality.
+- `commands/session-summary.md` — pairing guidance note added (if creating a handoff, point its `continues_from` here)
+
+### Changed
+- **ENH-017:** `start-issue-tracking` Step 1.2 version-impact prompt rewritten — bold labels, explicit "fix *or* enhancement" note for Patch, WIP append states no version is minted, pre-1.0 major/v1.0.0 guard added
+- `docs/reference/command-guide.md` — `/kmgraph:handoff` entry updated with `continues_from` pairing tip
+- `docs/GLOSSARY.md` — Session Summary entry updated with asymmetric coupling explanation
+
+### Related
+- ENH-017, ENH-021, ADR-051, ADR-026, ADR-049
+
 ## [0.5.9.3] — 2026-05-30
 
 ### Added

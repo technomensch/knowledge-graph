@@ -1139,6 +1139,7 @@ Reading time: ~30-45 minutes for complete orientation
 - Creates dated directory: `handoff-packages/YYYY-MM-DD/` by default
 - Files can be shared via zip or archived for future reference
 - Perfect companion to `/kmgraph:session-summary` for comprehensive handoff
+- **Pairing with a session summary:** If you ran `/kmgraph:session-summary` in the same session, set the optional `continues_from` field in START-HERE.md to its path instead of re-describing completed work. The "What Was Completed" section collapses to a one-liner pointing at the summary (asymmetric coupling — see ADR-051).
 
 ---
 

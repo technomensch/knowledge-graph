@@ -1,10 +1,10 @@
 ---
 id: ENH-017
 type: Enhancement
-status: tracked
+status: implemented
 version_target: v0.5.10
 github-issue: null
-branch: none
+branch: v0.5.10-ux-session-handoff
 created: 2026-05-27
 ---
 
