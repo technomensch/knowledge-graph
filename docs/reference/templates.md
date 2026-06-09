@@ -33,7 +33,7 @@ For customization guidance, see [Customize Templates](../pillars/tailoring/custo
 
 | File | Purpose | Key Fields | Created by |
 |---|---|---|---|
-| `sessions/session-template.md` | Summarizes a work session: what was done, decisions made, next steps | `Date` [AUTO], `Type` [MANUAL], `Duration` [MANUAL], `Status` [MANUAL] | `/kmgraph:session-summary` |
+| `sessions/session-template.md` | Two-part session record: a current-state snapshot (Current State, Open Issues, Session History, Session Findings) and a timestamped narrative log (append-only) | `title` [AUTO], `date` [AUTO], `branch` [AUTO], `as_of_commit` [AUTO], `last_updated` [AUTO], `tags` [AUTO] | `/kmgraph:session-summary` |
 
 ---
 

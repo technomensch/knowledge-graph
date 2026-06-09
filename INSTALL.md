@@ -244,6 +244,8 @@ done
 | **v0.5.9** | No upgrade action required. Decision governance recall enforcement, `brainstorm-recall` skill, and post-plan validation checklist are automatic after plugin reload. Optionally run `/kmgraph:upgrade` to add the "Recall in Plan Mode" rule to your `~/.kmgraph/plan-rules.md` if you have a split rules file. |
 | **v0.5.9.2** | No upgrade action required. `start-issue-tracking` Step 5.0 (`gh issue create`) is automatic after plugin reload. `github-issue` frontmatter is now auto-populated in new issue/ENH specs. Existing specs with `github-issue: null` are not retroactively updated — create GitHub issues manually for those if needed. |
 | **v0.5.9.3** | No upgrade action required. Three new advisory hooks (plan docs-impact check, pre-push version-sync, pre-push docs-scan gate, inline recommendation gate) are automatic after plugin reload. Optionally add `## Docs Impact` sections to existing plan files to silence the Gate 1 advisory. |
+| **v0.5.10** | No upgrade action required. `start-issue-tracking` Step 1.2 improved UX and `continues_from` handoff field are automatic after plugin reload. |
+| **v0.5.10.1** | No upgrade action required. Session summary operational sections, zone structure, one-file-per-day enforcement, and reduced handoff package are automatic after plugin reload. Run `/reload-plugins` to activate. Note: `--skip-sessions` flag for `/kmgraph:handoff` has been removed (SESSION-COMPILATION no longer generated). |
 
 After the wizard completes, your existing lessons, ADRs, sessions, and chat history are untouched.
 

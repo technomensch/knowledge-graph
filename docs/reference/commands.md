@@ -39,7 +39,7 @@ description: Every KMGraph slash command — category, description, and key flag
 | [`/kmgraph:create-adr`](#create-adr) | Create Architecture Decision Records with auto-numbering, index update, and automatic capture of implementation commit + subject line | `--user`, `--project`, `--named=<kg>` |
 | [`/kmgraph:session-summary`](#session-summary) | Summarize the active session; supports lightweight mid-session snapshot mode | `--auto`, `--snapshot`, `--snapshot --git`, `--user`, `--project`, `--named=<kg>` |
 | [`/kmgraph:extract-chat`](#extract-chat) | Export Claude and Gemini chat logs to dated markdown files | `--today`, `--date=YYYY-MM-DD`, `--after=`, `--before=`, `--project=`, `-claude`, `-gemini`, `--output-dir=` |
-| [`/kmgraph:handoff`](#handoff) | Generate a multi-file handoff package (START-HERE, DOCUMENTATION-MAP, OPEN-ISSUES, etc.) | `--output-dir=`, `--skip-sessions` |
+| [`/kmgraph:handoff`](#handoff) | Generate a handoff package (thin START-HERE pointer, DOCUMENTATION-MAP, ARCHITECTURE-SNAPSHOT) | `--output-dir=` |
 | [`/kmgraph:rules-capture`](#rules-capture) | Detect and route a behavioral correction to `rules.md` or `me.md` (project or personal scope) | — |
 
 **Examples:**
@@ -122,7 +122,7 @@ description: Every KMGraph slash command — category, description, and key flag
 | [`/kmgraph:meta-issue`](#meta-issue) | Track complex multi-attempt problems with attempt folders and root-cause evolution | `--add-attempt <N> "<desc>"`, `--update-understanding "<text>"`, `--status` |
 | [`/kmgraph:update-issue-plan`](#update-issue-plan) | Sync KG extraction with active plans and post a progress comment to GitHub Issues | `--auto`, `--pr=<N>` |
 | [`/kmgraph:link-issue`](#link-issue) | Manually link an existing lesson or ADR to a GitHub Issue with bidirectional references | `--issue <N>`, `--pr <N>` |
-| [`/kmgraph:handoff`](#handoff) | Generate a full handoff package before transitions, context resets, or onboarding | `--output-dir=`, `--skip-sessions` |
+| [`/kmgraph:handoff`](#handoff) | Generate a handoff package before transitions, context resets, or onboarding | `--output-dir=` |
 
 **Examples:**
 ```bash

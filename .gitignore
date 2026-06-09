@@ -58,7 +58,10 @@ docs/lessons-learned/debugging/
 knowledge/lessons-learned/debugging/
 # Session summaries (always private)
 docs/sessions/
-knowledge/sessions/
+knowledge/sessions/*
+!knowledge/sessions/session-template.md
+# Playwright MCP browser data
+.playwright-mcp/
 # Chat exports (always private)
 docs/chat-history/
 knowledge/chat-history/

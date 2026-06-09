@@ -1,7 +1,7 @@
 ---
 id: issue-9
 type: Bug
-status: in-progress
+status: resolved
 branch: v0.5.9.3-docs-enforcement-protocol-gap
 created: 2026-05-30
 related-adrs: [ADR-049, ADR-043]
@@ -25,14 +25,14 @@ A `UserPromptSubmit` hook fires before Claude answers. It detects recommendation
 
 ## Acceptance Criteria
 
-- [ ] recommendation-gate.sh detects recommendation-phrasing prompts (case-insensitive regex)
-- [ ] Minimum ~40-char threshold: short clarifying prompts do not trigger
-- [ ] Per-session PID debounce: injects on first match, silent for remainder of session
-- [ ] Output is systemMessage (UserPromptSubmit event)
-- [ ] Preamble sourced from triggers.md when present; hardcoded fallback when absent
-- [ ] Non-matching prompt → silent; no crash
-- [ ] Absent triggers.md → fallback text, no error
-- [ ] Always exit 0
+- [x] recommendation-gate.sh detects recommendation-phrasing prompts (case-insensitive regex)
+- [x] Minimum ~40-char threshold: short clarifying prompts do not trigger
+- [x] Per-session PID debounce: injects on first match, silent for remainder of session
+- [x] Output is systemMessage (UserPromptSubmit event)
+- [x] Preamble sourced from triggers.md when present; hardcoded fallback when absent
+- [x] Non-matching prompt → silent; no crash
+- [x] Absent triggers.md → fallback text, no error
+- [x] Always exit 0
 
 ## Related
 

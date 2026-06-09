@@ -541,11 +541,10 @@ Dispatches to the recall agent, which searches:
 
 1. Auto-detects session scope from conversation context since last summary
 2. Classifies session type (feature development, debugging, planning, research)
-3. Generates summary with: goals, problems solved, files touched, commits, lessons, next steps
-4. Handles duplicate detection — offers to update existing or create new summary
-5. Saves to `{active_kg_path}/sessions/YYYY-MM/YYYY-MM-DD_description.md`
-6. Updates sessions README index
-7. Optionally triggers lesson capture and KG update
+3. Generates two zones: an Operational Snapshot (Current State, Open Issues, Session History, Session Findings) overwritten on each run, and an Accumulated Narrative appended chronologically
+4. One file per day per branch — subsequent runs update the same file; Operational Snapshot sections are overwritten, narrative blocks are timestamped and preserved
+5. Saves to `{active_kg_path}/sessions/YYYY-MM-DD-{branch-slug}.md`
+6. Optionally triggers lesson capture and KG update
 
 **Snapshot mode** (`--snapshot`): Lightweight mid-session capture. Runs before any capture command when the user opts in. Appends to today's session file (or creates one) without a user review gate. Optional git history (`--snapshot --git`). Used by `capture-lesson`, `create-adr`, and `start-issue-tracking` to preserve the "why" at the moment of discovery.
 
@@ -565,7 +564,7 @@ Dispatches to the recall agent, which searches:
 
 - Captures git commits automatically — no need to list them manually
 - Auto-suggests summary when context approaches ~180K tokens
-- If a session summary was saved earlier in the session (via a capture gate), wrap-up only adds closing context
+- Run before creating a handoff — START-HERE.md auto-detects today's summary and links it via `continues_from`
 
 ---
 
@@ -1102,43 +1101,40 @@ Session:          2026-02-11 (enriched)
 
 **What it creates**:
 
-1. **START-HERE.md** — Current session state, active branch, next steps
+1. **START-HERE.md** — Thin pointer: branch, commit, auto-detected link to today's session summary
 2. **DOCUMENTATION-MAP.md** — File inventory with purpose annotations
-3. **SESSION-COMPILATION.md** — Recent session summaries linked chronologically
-4. **OPEN-ISSUES.md** — Unresolved issues, PRs, and pending work
-5. **ARCHITECTURE-SNAPSHOT.md** — Current codebase structure and key decisions
+3. **ARCHITECTURE-SNAPSHOT.md** — Current codebase structure and key decisions
 
-**Time**: 2-5 minutes depending on project size
+Operational state (current branch, open issues, in-progress work) lives in the linked session summary — not in the handoff package. Run `/kmgraph:session-summary` first if you want that context captured.
+
+**Time**: 1-2 minutes
 
 **Example**:
 ```bash
 /kmgraph:handoff
 /kmgraph:handoff --output-dir=./backup/
-/kmgraph:handoff --skip-sessions     # Faster, smaller output
 ```
 
 **Output**:
 ```
 ✅ Handoff package created!
 
-Location: ./handoff-packages/2026-02-27
+Location: ./handoff-packages/2026-06-09
 
 Files:
-- START-HERE.md               — 85 lines
+- START-HERE.md               — 8 lines
 - DOCUMENTATION-MAP.md        — 156 lines
-- SESSION-COMPILATION.md      — 234 lines
-- OPEN-ISSUES.md              — 67 lines
 - ARCHITECTURE-SNAPSHOT.md    — 189 lines
 
-Total: ~731 lines of documentation
-Reading time: ~30-45 minutes for complete orientation
+Total: ~353 lines of documentation
+Reading time: ~20 minutes for complete orientation
 ```
 
 **Tips**:
 
 - Creates dated directory: `handoff-packages/YYYY-MM-DD/` by default
+- START-HERE.md auto-detects today's session summary and sets `continues_from` — run `/kmgraph:session-summary` first for best results
 - Files can be shared via zip or archived for future reference
-- Perfect companion to `/kmgraph:session-summary` for comprehensive handoff
 
 ---
 
