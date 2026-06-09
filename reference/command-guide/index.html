@@ -5,8 +5,8 @@
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">Command Guide | Knowledge Management Graph</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://technomensch.github.io/knowledge-graph/reference/command-guide"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Command Guide | Knowledge Management Graph"><meta data-rh="true" name="description" content="Complete reference for all /kmgraph: slash commands"><meta data-rh="true" property="og:description" content="Complete reference for all /kmgraph: slash commands"><link data-rh="true" rel="icon" href="/knowledge-graph/img/square.png"><link data-rh="true" rel="canonical" href="https://technomensch.github.io/knowledge-graph/reference/command-guide"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/reference/command-guide" hreflang="en"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/reference/command-guide" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Command Guide","item":"https://technomensch.github.io/knowledge-graph/reference/command-guide"}]}</script><link rel="alternate" type="application/rss+xml" href="/knowledge-graph/docs-updates/rss.xml" title="KMGraph Docs Updates RSS Feed">
 <link rel="alternate" type="application/atom+xml" href="/knowledge-graph/docs-updates/atom.xml" title="KMGraph Docs Updates Atom Feed"><link rel="stylesheet" href="/knowledge-graph/assets/css/styles.1ec0cbb2.css">
-<script src="/knowledge-graph/assets/js/runtime~main.677e9cd4.js" defer="defer"></script>
-<script src="/knowledge-graph/assets/js/main.fbbff477.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/runtime~main.90be8857.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/main.4937389e.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -477,10 +477,9 @@ When you enable backfill, the system extracts existing knowledge from your proje
 <ol>
 <li class="">Auto-detects session scope from conversation context since last summary</li>
 <li class="">Classifies session type (feature development, debugging, planning, research)</li>
-<li class="">Generates summary with: goals, problems solved, files touched, commits, lessons, next steps</li>
-<li class="">Handles duplicate detection — offers to update existing or create new summary</li>
-<li class="">Saves to <code>{active_kg_path}/sessions/YYYY-MM/YYYY-MM-DD_description.md</code></li>
-<li class="">Updates sessions README index</li>
+<li class="">Generates two zones: an Operational Snapshot (Current State, Open Issues, Session History, Session Findings) overwritten on each run, and an Accumulated Narrative appended chronologically</li>
+<li class="">One file per day per branch — subsequent runs update the same file; Operational Snapshot sections are overwritten, narrative blocks are timestamped and preserved</li>
+<li class="">Saves to <code>{active_kg_path}/sessions/YYYY-MM-DD-{branch-slug}.md</code></li>
 <li class="">Optionally triggers lesson capture and KG update</li>
 </ol>
 <p><strong>Snapshot mode</strong> (<code>--snapshot</code>): Lightweight mid-session capture. Runs before any capture command when the user opts in. Appends to today&#x27;s session file (or creates one) without a user review gate. Optional git history (<code>--snapshot --git</code>). Used by <code>capture-lesson</code>, <code>create-adr</code>, and <code>start-issue-tracking</code> to preserve the &quot;why&quot; at the moment of discovery.</p>
@@ -491,7 +490,7 @@ When you enable backfill, the system extracts existing knowledge from your proje
 <ul>
 <li class="">Captures git commits automatically — no need to list them manually</li>
 <li class="">Auto-suggests summary when context approaches ~180K tokens</li>
-<li class="">If a session summary was saved earlier in the session (via a capture gate), wrap-up only adds closing context</li>
+<li class="">Run before creating a handoff — START-HERE.md auto-detects today&#x27;s summary and links it via <code>continues_from</code></li>
 </ul>
 <hr>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphcreate-adr">🟡 <code>/kmgraph:create-adr</code><a href="#-kmgraphcreate-adr" class="hash-link" aria-label="Direct link to -kmgraphcreate-adr" title="Direct link to -kmgraphcreate-adr" translate="no">​</a></h3>
@@ -881,22 +880,21 @@ When you enable backfill, the system extracts existing knowledge from your proje
 </ul>
 <p><strong>What it creates</strong>:</p>
 <ol>
-<li class=""><strong>START-HERE.md</strong> — Current session state, active branch, next steps</li>
+<li class=""><strong>START-HERE.md</strong> — Thin pointer: branch, commit, auto-detected link to today&#x27;s session summary</li>
 <li class=""><strong>DOCUMENTATION-MAP.md</strong> — File inventory with purpose annotations</li>
-<li class=""><strong>SESSION-COMPILATION.md</strong> — Recent session summaries linked chronologically</li>
-<li class=""><strong>OPEN-ISSUES.md</strong> — Unresolved issues, PRs, and pending work</li>
 <li class=""><strong>ARCHITECTURE-SNAPSHOT.md</strong> — Current codebase structure and key decisions</li>
 </ol>
-<p><strong>Time</strong>: 2-5 minutes depending on project size</p>
+<p>Operational state (current branch, open issues, in-progress work) lives in the linked session summary — not in the handoff package. Run <code>/kmgraph:session-summary</code> first if you want that context captured.</p>
+<p><strong>Time</strong>: 1-2 minutes</p>
 <p><strong>Example</strong>:</p>
-<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:handoff</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:handoff --output-dir=./backup/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:handoff --skip-sessions     # Faster, smaller output</span><br></div></code></pre></div></div>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:handoff</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:handoff --output-dir=./backup/</span><br></div></code></pre></div></div>
 <p><strong>Output</strong>:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">✅ Handoff package created!</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Location: ./handoff-packages/2026-02-27</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Files:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">- START-HERE.md               — 85 lines</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">- DOCUMENTATION-MAP.md        — 156 lines</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">- SESSION-COMPILATION.md      — 234 lines</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">- OPEN-ISSUES.md              — 67 lines</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">- ARCHITECTURE-SNAPSHOT.md    — 189 lines</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Total: ~731 lines of documentation</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Reading time: ~30-45 minutes for complete orientation</span><br></div></code></pre></div></div>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">✅ Handoff package created!</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Location: ./handoff-packages/2026-06-09</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Files:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">- START-HERE.md               — 8 lines</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">- DOCUMENTATION-MAP.md        — 156 lines</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">- ARCHITECTURE-SNAPSHOT.md    — 189 lines</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Total: ~353 lines of documentation</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Reading time: ~20 minutes for complete orientation</span><br></div></code></pre></div></div>
 <p><strong>Tips</strong>:</p>
 <ul>
 <li class="">Creates dated directory: <code>handoff-packages/YYYY-MM-DD/</code> by default</li>
+<li class="">START-HERE.md auto-detects today&#x27;s session summary and sets <code>continues_from</code> — run <code>/kmgraph:session-summary</code> first for best results</li>
 <li class="">Files can be shared via zip or archived for future reference</li>
-<li class="">Perfect companion to <code>/kmgraph:session-summary</code> for comprehensive handoff</li>
 </ul>
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="command-comparison">Command Comparison<a href="#command-comparison" class="hash-link" aria-label="Direct link to Command Comparison" title="Direct link to Command Comparison" translate="no">​</a></h2>
