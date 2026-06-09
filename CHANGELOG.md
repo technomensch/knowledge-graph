@@ -35,6 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.5.10] — 2026-06-07
 
+> **Release note**: v0.5.10 and v0.5.10.1 were developed on the same branch and co-released in [PR #131](https://github.com/technomensch/knowledge-graph/pull/131). No separate v0.5.10 PR was opened.
+
 ### Added
 - **ENH-021:** Optional `continues_from` field added to handoff documents (START-HERE.md header block + session-style handoff YAML frontmatter). When set, the "What Was Completed" section collapses to a one-liner pointing at the paired session summary — eliminates duplicated "what was built" content at session end. Asymmetric one-way coupling: handoff → summary only; summary never references the handoff.
 - **ADR-051:** Documents the session-summary/handoff asymmetric coupling decision — why not consolidate (lifecycle/tense/trigger conflicts), coupling direction, field location (handoff only), intended consumers (recall/FTS5/future resume), optionality.
