@@ -273,7 +273,7 @@ Block all further steps until the user confirms or switches. Do not proceed with
 Before gathering context, check if a session file already exists for today's branch:
 
 ```bash
-active_kg=$(jq -r '.graphs[] | select(.active == true) | .path' ~/.claude/kg-config.json)
+active_kg=$(jq -r '.graphs[.active].path' ~/.claude/kg-config.json)
 session_dir="${active_kg}/sessions"
 branch_slug=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')
 today=$(date +%Y-%m-%d)
@@ -404,7 +404,7 @@ git rev-parse --abbrev-ref HEAD
 git rev-parse --short HEAD
 git status --porcelain
 ls -t docs/plans/*.md 2>/dev/null | head -1
-jq -r '.graphs[] | select(.active == true) | .name' ~/.claude/kg-config.json
+jq -r '.graphs[.active].name' ~/.claude/kg-config.json
 ```
 
 **For Open Issues:**
@@ -417,7 +417,7 @@ grep -rl "status: draft\|status: proposed" knowledge/decisions/ knowledge/enhanc
 
 **For Session History:**
 ```bash
-active_kg=$(jq -r '.graphs[] | select(.active == true) | .path' ~/.claude/kg-config.json)
+active_kg=$(jq -r '.graphs[.active].path' ~/.claude/kg-config.json)
 find "${active_kg}/sessions" -name "*.md" -not -name "README.md" -not -name "*template*" -type f 2>/dev/null | sort | tail -3
 ```
 

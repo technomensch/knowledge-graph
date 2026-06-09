@@ -122,7 +122,7 @@ Wrap-up: session summary already populated; final run adds closing context only
 - [ ] Hooks (PostToolUse lesson check, Stop hook) also offer snapshot-first behavior before capture prompts
 - [ ] Session summary skill (`session-wrap`) is aware of whether a snapshot was taken this session
 
-### Functional — Accumulation Behavior (Not Implemented — Core Gap)
+### Functional — Accumulation Behavior (Implemented v0.5.10.1)
 
 - [x] **One-file-per-day enforcement in full-session path:** Before writing, session-summary-agent checks for an existing summary for today's date on the current branch; if found, appends/synthesizes into it rather than creating a new file. Implemented via Step 1.5 + unified filename `YYYY-MM-DD-{branch-slug}.md` (v0.5.10.1).
 - [x] **Contradiction and reversal tracking:** When appending to an existing summary, the agent adds explicit notes about decisions or approaches that changed: "Earlier this session X was decided; after investigation Y was chosen instead because Z." Implemented in narrative append block format (v0.5.10.1).
