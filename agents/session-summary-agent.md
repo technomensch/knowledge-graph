@@ -103,13 +103,19 @@ Go directly to [Snapshot Mode](#snapshot-mode) below. Skip Steps 1–9.
 
 Read `~/.claude/kg-config.json` → active KG path → `{active_kg_path}/sessions/`.
 
-Check if a session file for today already exists:
+Derive unified filename:
 ```bash
 today=$(date +%Y-%m-%d)
-ls {active_kg_path}/sessions/ | grep "^$today"
+branch_slug=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')
+target_filename="${today}-${branch_slug}.md"
 ```
 
-Store `{snapshot_exists} = true/false` and `{existing_snapshot_path}` if found.
+Check if a session file for today's branch already exists:
+```bash
+ls {active_kg_path}/sessions/ | grep "^${today}-${branch_slug}"
+```
+
+Store `{snapshot_exists} = true/false`, `{target_filename}`, and `{existing_snapshot_path}` if found.
 
 ### S2: Gather lightweight context
 
@@ -149,20 +155,28 @@ Write a compact snapshot block:
 
 ### S4: Write or append
 
+Use `{target_filename}` derived in S1 (`YYYY-MM-DD-{branch-slug}.md`).
+
 **If `{snapshot_exists}` is false:** Create a new session file:
 ```markdown
 ---
-title: "Session Snapshot — [Date]"
+title: "[YYYY-MM-DD]-[branch-slug]"
 date: [YYYY-MM-DD]
 branch: [current branch]
+as_of_commit: [short-hash]
+last_updated: [YYYY-MM-DD HH:MM]
 tags: [session, snapshot]
 ---
-# Session Snapshot — [Date]
+
+═══════════════════════════════════════════════
+## Operational Snapshot (point-in-time, as-of [short-hash])
+═══════════════════════════════════════════════
+*These sections are overwritten every run. They describe NOW, not history.*
 
 [snapshot block from S3]
 ```
 
-**If `{snapshot_exists}` is true:** Append the snapshot block to the existing file.
+**If `{snapshot_exists}` is true:** Update YAML header fields (`as_of_commit`, `last_updated`), then append the snapshot block under the Operational Snapshot zone.
 
 Deduplication before appending:
 - Commit hashes already in the file → skip those lines from the new block
@@ -177,9 +191,12 @@ Call `kg_capture` with:
   "content": "[full snapshot content]",
   "type": "session",
   "metadata": {
-    "title": "Session Snapshot — [Date]",
+    "title": "[YYYY-MM-DD]-[branch-slug]",
     "tags": ["session", "snapshot", "[branch]"],
-    "git": { "branch": "[branch]" }
+    "git": {
+      "branch": "[branch]",
+      "commit_short": "[short-hash]"
+    }
   }
 }
 ```
@@ -248,6 +265,29 @@ Compare the active graph's project root against the current working directory. I
 > "Hold on — the active knowledge graph is for [project name]. Do you want to switch to the knowledge graph for [current project] before continuing?"
 
 Block all further steps until the user confirms or switches. Do not proceed with a mismatched KG.
+
+---
+
+## Step 1.5: One-File-Per-Day Check
+
+Before gathering context, check if a session file already exists for today's branch:
+
+```bash
+active_kg=$(jq -r '.graphs[] | select(.active == true) | .path' ~/.claude/kg-config.json)
+session_dir="${active_kg}/sessions"
+branch_slug=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')
+today=$(date +%Y-%m-%d)
+existing=$(find "$session_dir" -name "${today}-${branch_slug}.md" 2>/dev/null | head -1)
+```
+
+**If `$existing` is found:**
+- Load as base document; operational sections (Current State, Open Issues, Session History) will be overwritten in Step 6
+- Session Findings will be appended+deduped (skip rows with identical descriptions)
+- Accumulated Narrative blocks will be appended only — never overwritten
+- Store `{session_file_mode} = append`, `{existing_session_path} = $existing`
+
+**If not found:**
+- Store `{session_file_mode} = new`
 
 ---
 
@@ -349,10 +389,148 @@ If found:
 
 ## Step 6: Draft Session Summary
 
-Compose a summary with these sections:
+Derive the unified filename and gather operational section data first:
+
+```bash
+branch_slug=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')
+today=$(date +%Y-%m-%d)
+session_filename="${today}-${branch_slug}.md"
+commit_short=$(git rev-parse --short HEAD)
+```
+
+**For Current State:**
+```bash
+git rev-parse --abbrev-ref HEAD
+git rev-parse --short HEAD
+git status --porcelain
+ls -t docs/plans/*.md 2>/dev/null | head -1
+jq -r '.graphs[] | select(.active == true) | .name' ~/.claude/kg-config.json
+```
+
+**For Open Issues:**
+```bash
+gh issue list --state open --json number,title 2>/dev/null
+gh pr list --state open --json number,title,headRefName 2>/dev/null
+ls docs/plans/*.md 2>/dev/null
+grep -rl "status: draft\|status: proposed" knowledge/decisions/ knowledge/enhancements/ 2>/dev/null | head -5
+```
+
+**For Session History:**
+```bash
+active_kg=$(jq -r '.graphs[] | select(.active == true) | .path' ~/.claude/kg-config.json)
+find "${active_kg}/sessions" -name "*.md" -not -name "README.md" -not -name "*template*" -type f 2>/dev/null | sort | tail -3
+```
+
+**For Start-of-Session Reading:**
+```bash
+active_plan=$(ls -t docs/plans/*.md 2>/dev/null | head -1)
+branch=$(git rev-parse --abbrev-ref HEAD)
+enh_id=$(echo "$branch" | grep -o 'ENH-[0-9]*' | head -1)
+git diff --name-only main...HEAD 2>/dev/null | grep -v '^docs/plans/' | head -10
+```
+
+Compose the summary using this zone-structured template:
 
 ```markdown
-# Session Summary — [Date]
+---
+title: "[YYYY-MM-DD]-[branch-slug]"
+date: [YYYY-MM-DD]
+branch: [current branch]
+as_of_commit: [short-hash]
+last_updated: [YYYY-MM-DD HH:MM]
+tags: [session]
+---
+
+# Session Summary — [Date] — [branch-slug]
+
+## Start-of-Session Reading (Required)
+
+Before writing code or making changes, read everything below.
+Skipping any item means starting work without full context.
+
+**External files:**
+- [ ] `[active_plan_path]`
+      WHY: current implementation step and acceptance criteria.
+      Without it you will not know where to start or what done looks like.
+[If ENH spec found from branch name or plan frontmatter:]
+- [ ] `knowledge/enhancements/[ENH-NNN]/[ENH-NNN]-specification.md`
+      WHY: defines the behavior being implemented.
+      Without it you will implement the wrong thing.
+[For each key file modified this session (git diff --name-only main...HEAD | head -10):]
+- [ ] `[file path]` ← modified this session
+      WHY: changed this session; read before editing.
+
+**Read within this summary:**
+- [ ] `## Current State` — branch, commit, uncommitted changes, in-progress work
+- [ ] `## Open Issues` — blockers, open PRs, pending decisions
+- [ ] `## Session History` — last 3 sessions and what changed
+[If Session Findings section will be non-empty:]
+- [ ] `## Session Findings` — errors and spec bugs found this session
+
+*Omit this entire section if no active plan, no ENH spec, no modified files, and no operational sections present.*
+
+═══════════════════════════════════════════════
+## Operational Snapshot (point-in-time, as-of [short-hash])
+═══════════════════════════════════════════════
+*These sections are overwritten every run. They describe NOW, not history.*
+
+## Current State
+
+- **Branch:** [current branch]
+- **Commit:** [short-hash] — [latest commit message]
+- **Uncommitted changes:** [git status --porcelain summary, or "clean"]
+- **In-progress work:** [active plan path — `[path]`]
+- **Next steps:** [first unchecked step from active plan, or "See active plan"]
+- **Active KG:** [KG name from kg-config.json]
+
+## Open Issues
+
+### GitHub Issues (open)
+[gh issue list output — number + title, or "None found"]
+
+### Open PRs
+[gh pr list output — number + title + branch, or "None found"]
+
+### Active Plans
+[ls docs/plans/*.md — filenames, or "None found"]
+
+### Pending Decisions
+[grep results for draft/proposed in decisions/ and enhancements/, or "None found"]
+
+### Deferred Tasks
+[deferred items from active plan, or "None found"]
+
+### Plans in Progress
+- [Plan name] — [N] unchecked steps
+
+### Pending Decisions (ADRs)
+- [ADR name] — Status: Proposed
+
+### Potential Lessons Not Yet Captured
+- [Commit message] — Consider capturing as lesson
+
+## Session History
+
+[Last 3 session files — paths + title from frontmatter. References only, no content re-compilation.]
+- `[path/YYYY-MM-DD-branch.md]` — [title]
+
+[If fewer than 3 exist, list what's available]
+
+## Session Findings
+
+[If any errors, gaps, or spec bugs were discovered during ANY command run this session — test runs, audits, handoff generation, command tests:]
+
+| Finding | Severity | Source | Follow-up |
+|---|---|---|---|
+| [brief description] | [HIGH/MED/LOW] | [command/file] | [action] |
+
+[Omit this entire section if no findings. Append+dedup rows within the day — skip rows with identical descriptions.]
+
+═══════════════════════════════════════════════
+## Accumulated Narrative (append-only, newest first)
+═══════════════════════════════════════════════
+
+### Update — [HH:MM] (as-of [short-hash]) — triggered by: [manual|lesson|ADR|compaction]
 
 ## Session Type
 
@@ -362,23 +540,18 @@ Compose a summary with these sections:
 
 [3-5 bullet points from recent commits, conversation context, and context-mode events (if available)]
 
-## Open Items
+## Decisions Made
 
-### Plans in Progress
-- [Plan name] — [N] unchecked steps
+[Key decisions from this session]
 
-### Pending Decisions
-- [ADR name] — Status: Proposed
+## Problems Solved
 
-### Potential Lessons Not Yet Captured
-- [Commit message] — Consider capturing as lesson
+[Bugs fixed, blockers resolved]
 
-## Git Context
+## Contradictions/Reversals
 
-- Branch: [current branch]
-- Commits: [count] in last session
-- Files changed: [summary from git diff --stat]
-- Latest commit: [hash] — [message]
+[If applicable: "Earlier X was decided; after Y, chose Z because…"]
+[Omit if no contradictions this session.]
 ```
 
 ---
@@ -403,6 +576,8 @@ Allow inline edits. If user adds context, re-draft and re-present with the same 
 
 ## Step 8: Capture via `kg_capture` MCP Tool
 
+Use `{session_filename}` derived in Step 6 as the `title` — this ensures the MCP server creates or updates the file as `YYYY-MM-DD-{branch-slug}.md` (unified with snapshot mode).
+
 Once approved, call `kg_capture`:
 
 ```json
@@ -410,7 +585,7 @@ Once approved, call `kg_capture`:
   "content": "[Full markdown summary from Step 6]",
   "type": "session",
   "metadata": {
-    "title": "[Session Type] Session",
+    "title": "[YYYY-MM-DD]-[branch-slug]",
     "tags": ["session", "[type]", "[branch-name]"],
     "git": {
       "branch": "[current branch]",
@@ -420,18 +595,29 @@ Once approved, call `kg_capture`:
 }
 ```
 
+**Zone write rules:**
+
+| Zone | Sections | Rule |
+|---|---|---|
+| Header | YAML `as_of_commit`, `last_updated`, `title` | Overwrite every run |
+| Gate | Start-of-Session Reading | Overwrite every run |
+| Operational | Current State, Open Issues, Session History | Overwrite every run |
+| Operational | Session Findings | Append+dedup within day (skip rows with identical descriptions) |
+| Narrative | Accumulated blocks | Append-only, timestamped; never overwrite |
+
+**If `{session_file_mode} = append`** (file exists from Step 1.5):
+- Overwrite Header + Gate + Operational zones
+- Append+dedup Session Findings rows
+- Append new `### Update — HH:MM` block to Accumulated Narrative
+- Call with `"version": "append"` in metadata
+
+**If `{session_file_mode} = new`**: Call kg_capture without version flag.
+
 **Handle responses:**
 
 **Success (status: "created"):**
 
 > "✅ Session saved: **[relativePath]** — logged for future reference"
-
-**Conflict error (duplicate session for same date):**
-
-> "A session already exists for today. Append new content to it, or overwrite? (append / overwrite / cancel)"
-
-If append: call with `"version": "append"` in metadata.
-If overwrite: call with `version: "v1.1"` to update.
 
 **KG_MISMATCH error:**
 

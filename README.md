@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.5.10
+**Version:** 0.5.10.1
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -88,6 +88,13 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 ---
 
 ## v0.5.x Feature Highlights
+
+**v0.5.10.1 — 2026-06-09**
+
+- **Session summary operational sections (ENH-002 partial)** — `/kmgraph:session-summary` now generates five structured sections: Start-of-Session Reading gate, Current State, Open Issues, Session History (thin references), and Session Findings (errors/findings from any command run this session). Operational sections overwrite each run; narrative blocks append-only and timestamped.
+- **One-file-per-day enforcement** — Step 1.5 added to full-session path; filename unified to `YYYY-MM-DD-{branch-slug}.md` across snapshot and full modes. No more duplicate files per day.
+- **Handoff package reduced** — SESSION-COMPILATION.md and OPEN-ISSUES.md removed; START-HERE.md is now a thin pointer that auto-detects today's session summary. Package is DOCUMENTATION-MAP + ARCHITECTURE-SNAPSHOT + thin START-HERE.
+- **Stale path fixes** — All `decisions/` and `lessons-learned/` references in handoff corrected to `knowledge/decisions/` and `knowledge/lessons-learned/`.
 
 **v0.5.10 — 2026-06-07**
 
@@ -226,7 +233,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.5.10 (2026-06-07)
+**Current Release:** v0.5.10.1 (2026-06-09)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -319,6 +326,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.5.10 (2026-06-07)
+**Current Version:** v0.5.10.1 (2026-06-09)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info

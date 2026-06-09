@@ -5,7 +5,7 @@ status: proposed
 priority: medium
 version_target: v0.5.12
 created: 2026-05-29
-updated: 2026-06-07
+updated: 2026-06-08
 related:
   adrs: [40, 9, 28]
   lessons: ["Lessons_Learned_Template_Source_Naming_Role_Not_Output"]
@@ -195,13 +195,29 @@ Supporting:
 
 ## Plan Note
 
-**Brainstorm sign-off required before implementation.** Approach is selected;
-brainstorm must confirm:
-1. Grep audit of `decisions/`, `lessons-learned/`, `sessions/` reference counts
-   (not yet audited — scoped in 2026-06-07 expansion)
+**✅ Brainstorm complete (2026-06-08) — all 6 items confirmed. Ready for implementation.**
+Previously: approach is selected; brainstorm must confirm:
+1. ✅ Grep audit complete (2026-06-08) — confirmed consumer list:
+   - **Commands (10):** `init.md`, `init-personal-kg.md`, `create-doc.md`, `meta-issue.md`, `add-category.md`, `setup-platform.md`, `create-adr.md`, `handoff.md`, `init-shared/template-seed.md`, `init-shared/upgrade-inspector.md`
+   - **Agents (2):** `rules-capture-agent.md`, `create-adr-agent.md`
+   - **MCP server (3):** `scaffold.ts`, `upgrade.ts`, `resources/index.ts`
+   - **Docs (15):** confirmed — matches spec's blast radius list exactly
+   - Noise excluded: `docs/plans/`, `knowledge/chat-history/`, `knowledge/sessions/`, `knowledge/decisions/` — historical references, not actionable consumers
+   - Spec's 15+15+3 count verified. No missed consumers.
 2. Atomicity plan — confirm all 15+15 files identified; no consumer missed
-3. `init.md` line 383 logic rewrite design (not a string replace)
-4. `init-personal-kg.md` loop logic update design
-5. Tier 3 INSTALL.md breaking-change wording
+3. ✅ `init.md` line 383 — string replace only (2026-06-08). The "special case" block
+   (`docs/knowledge/ → knowledge/concepts/`) is a legacy migration block unrelated to
+   `core/templates/` — do NOT touch. The actual `core/templates/` references in init.md
+   (lines 1291–1303) are all `cp` commands: path-prefix string replace only.
+   No logic rewrite needed; `knowledge/` → `concepts/` output mapping is already explicit.
+4. ✅ `init-personal-kg.md` — string replace only (2026-06-08). The spec's "hardcoded
+   `for f in ...` loop" is actually in `init-shared/template-seed.md` line 63 and
+   `init-shared/upgrade-inspector.md` lines 97–109/290. `init-personal-kg.md` line 136
+   is a single `cp` command. All cases: path-prefix string replace, loop logic unchanged.
+5. ✅ Tier 3 breaking-change wording confirmed (2026-06-08) — see v0.5.12 plan
+   "Tier 3 Breaking-Change Wording" section. Write into INSTALL.md + docs/INSTALL.md
+   + CHANGELOG.md during implementation.
+6. ✅ PROTECTED-code permission granted (2026-06-08) — explicit user permission granted
+   to modify `commands/` and rename `core/templates/` for v0.5.12 implementation.
 
 See `~/.claude/plans/v0.5.12-template-disambiguation.md`.
