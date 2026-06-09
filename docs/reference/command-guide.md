@@ -1102,44 +1102,40 @@ Session:          2026-02-11 (enriched)
 
 **What it creates**:
 
-1. **START-HERE.md** — Current session state, active branch, next steps
+1. **START-HERE.md** — Thin pointer: branch, commit, auto-detected link to today's session summary
 2. **DOCUMENTATION-MAP.md** — File inventory with purpose annotations
-3. **SESSION-COMPILATION.md** — Recent session summaries linked chronologically
-4. **OPEN-ISSUES.md** — Unresolved issues, PRs, and pending work
-5. **ARCHITECTURE-SNAPSHOT.md** — Current codebase structure and key decisions
+3. **ARCHITECTURE-SNAPSHOT.md** — Current codebase structure and key decisions
 
-**Time**: 2-5 minutes depending on project size
+Operational state (current branch, open issues, in-progress work) lives in the linked session summary — not in the handoff package. Run `/kmgraph:session-summary` first if you want that context captured.
+
+**Time**: 1-2 minutes
 
 **Example**:
 ```bash
 /kmgraph:handoff
 /kmgraph:handoff --output-dir=./backup/
-/kmgraph:handoff --skip-sessions     # Faster, smaller output
 ```
 
 **Output**:
 ```
 ✅ Handoff package created!
 
-Location: ./handoff-packages/2026-02-27
+Location: ./handoff-packages/2026-06-09
 
 Files:
-- START-HERE.md               — 85 lines
+- START-HERE.md               — 8 lines
 - DOCUMENTATION-MAP.md        — 156 lines
-- SESSION-COMPILATION.md      — 234 lines
-- OPEN-ISSUES.md              — 67 lines
 - ARCHITECTURE-SNAPSHOT.md    — 189 lines
 
-Total: ~731 lines of documentation
-Reading time: ~30-45 minutes for complete orientation
+Total: ~353 lines of documentation
+Reading time: ~20 minutes for complete orientation
 ```
 
 **Tips**:
 
 - Creates dated directory: `handoff-packages/YYYY-MM-DD/` by default
+- START-HERE.md auto-detects today's session summary and sets `continues_from` — run `/kmgraph:session-summary` first for best results
 - Files can be shared via zip or archived for future reference
-- Perfect companion to `/kmgraph:session-summary` for comprehensive handoff
-- **Pairing with a session summary:** If you ran `/kmgraph:session-summary` in the same session, set the optional `continues_from` field in START-HERE.md to its path instead of re-describing completed work. The "What Was Completed" section collapses to a one-liner pointing at the summary (asymmetric coupling — see ADR-051).
 
 ---
 

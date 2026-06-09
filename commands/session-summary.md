@@ -21,7 +21,12 @@ Document the current Claude Code session before context limits or at major miles
 
 Auto-detects session scope, includes recent git history, and presents a single confirmation
 before saving — no multi-step interrogation. Checks for open plan steps, draft ADRs, and
-uncaptured lessons before finalizing.
+uncaptured lessons before finalizing. Generates Current State and Open Issues operational sections
+on every run.
+
+**One file per day per branch.** Subsequent runs on the same branch update the same file: operational
+sections (Current State, Open Issues, Session History) are overwritten; Session Findings append+dedup
+within the day; narrative blocks are append-only and timestamped.
 
 **Pairing with a handoff:** If you also create a handoff this session, point the handoff's `continues_from` field at this summary's path rather than duplicating completed-work content. The summary itself does not reference the handoff (asymmetric, one-way coupling — see ADR-051).
 
@@ -93,5 +98,60 @@ After the agent returns, extract the draft content and display it verbatim in yo
 
 ---
 
-**Version:** 2.0 (Refactored: 2026-03-27) — thin dispatcher; logic lives in session-summary-agent and session-documenter
+## Output Sections
+
+Every session summary includes:
+
+| Section | Zone | Write rule |
+|---|---|---|
+| **Start-of-Session Reading (Required)** | Gate | Overwrite each run; omit if nothing to read |
+| **Current State** | Operational | Overwrite each run |
+| **Open Issues** | Operational | Overwrite each run |
+| **Session History** | Operational | Overwrite each run |
+| **Session Findings** | Operational | Append+dedup within day; omit if empty |
+| **Accumulated Narrative** | Narrative | Append-only, timestamped blocks |
+
+The Operational Snapshot zone is bounded by `═══` dividers and labeled `as-of {commit}`.
+The Accumulated Narrative zone is append-only — narrative blocks are never overwritten.
+
+**Example structure:**
+
+```markdown
+---
+title: "2026-06-09-v0.5.10.1-session-summary-ops"
+date: 2026-06-09
+branch: v0.5.10.1-session-summary-ops
+as_of_commit: 3d9fd52c
+last_updated: 2026-06-09 14:30
+tags: [session]
+---
+
+# Session Summary — 2026-06-09 — v0.5.10.1-session-summary-ops
+
+## Start-of-Session Reading (Required)
+- [ ] `docs/plans/v0.5.10.1-session-summary-ops.md`
+      WHY: current step and acceptance criteria.
+- [ ] `## Current State` — branch, commit, uncommitted changes
+
+═══════════════════════════════════════════════
+## Operational Snapshot (point-in-time, as-of 3d9fd52c)
+═══════════════════════════════════════════════
+*These sections are overwritten every run. They describe NOW, not history.*
+
+## Current State
+## Open Issues
+## Session History
+## Session Findings
+
+═══════════════════════════════════════════════
+## Accumulated Narrative (append-only, newest first)
+═══════════════════════════════════════════════
+
+### Update — 14:30 (as-of 3d9fd52c) — triggered by: manual
+## What Was Built / Fixed / Learned
+```
+
+---
+
+**Version:** 2.1 (2026-06-09) — operational sections + zone structure (ENH-002 partial)
 **Related:** /kmgraph:capture-lesson, /kmgraph:recall
