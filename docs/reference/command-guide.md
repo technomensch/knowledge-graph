@@ -541,11 +541,10 @@ Dispatches to the recall agent, which searches:
 
 1. Auto-detects session scope from conversation context since last summary
 2. Classifies session type (feature development, debugging, planning, research)
-3. Generates summary with: goals, problems solved, files touched, commits, lessons, next steps
-4. Handles duplicate detection — offers to update existing or create new summary
-5. Saves to `{active_kg_path}/sessions/YYYY-MM/YYYY-MM-DD_description.md`
-6. Updates sessions README index
-7. Optionally triggers lesson capture and KG update
+3. Generates two zones: an Operational Snapshot (Current State, Open Issues, Session History, Session Findings) overwritten on each run, and an Accumulated Narrative appended chronologically
+4. One file per day per branch — subsequent runs update the same file; Operational Snapshot sections are overwritten, narrative blocks are timestamped and preserved
+5. Saves to `{active_kg_path}/sessions/YYYY-MM-DD-{branch-slug}.md`
+6. Optionally triggers lesson capture and KG update
 
 **Snapshot mode** (`--snapshot`): Lightweight mid-session capture. Runs before any capture command when the user opts in. Appends to today's session file (or creates one) without a user review gate. Optional git history (`--snapshot --git`). Used by `capture-lesson`, `create-adr`, and `start-issue-tracking` to preserve the "why" at the moment of discovery.
 
@@ -565,7 +564,7 @@ Dispatches to the recall agent, which searches:
 
 - Captures git commits automatically — no need to list them manually
 - Auto-suggests summary when context approaches ~180K tokens
-- If a session summary was saved earlier in the session (via a capture gate), wrap-up only adds closing context
+- Run before creating a handoff — START-HERE.md auto-detects today's summary and links it via `continues_from`
 
 ---
 
