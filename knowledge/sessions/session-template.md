@@ -86,7 +86,7 @@ None found.
 ## Session History
 
 <!-- Last 3 sessions — paths + title from frontmatter. References only. -->
-- `knowledge/sessions/YYYY-MM/YYYY-MM-DD-{branch}.md` — {title}
+- `knowledge/sessions/YYYY-MM-DD-{branch}.md` — {title}
 
 ## Session Findings
 

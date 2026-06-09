@@ -113,16 +113,16 @@ Handoff package will be created in: $output_dir
 ```bash
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 current_commit=$(git rev-parse --short HEAD)
-active_kg=$(jq -r '.graphs[] | select(.active == true) | .path' ~/.claude/kg-config.json)
-session_dir="${active_kg}/sessions/$(date +%Y-%m)"
+active_kg=$(jq -r '.graphs[.active].path' ~/.claude/kg-config.json)
+session_dir="${active_kg}/sessions"
 today=$(date +%Y-%m-%d)
 branch_slug=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')
 
-# Try date+branch-slug match first
+# Try date+branch-slug match first (most precise)
 summary_file=$(find "$session_dir" -name "${today}*${branch_slug}*.md" 2>/dev/null | head -1)
-# Fall back to any today file that isn't a handoff
+# Fall back to any today-prefixed file (sessions dir only contains session files)
 if [ -z "$summary_file" ]; then
-  summary_file=$(find "$session_dir" -name "${today}*.md" ! -name "*handoff*" 2>/dev/null | head -1)
+  summary_file=$(find "$session_dir" -name "${today}*.md" 2>/dev/null | head -1)
 fi
 ```
 
@@ -133,7 +133,7 @@ fi
 
 **Branch:** $current_branch
 **Commit:** $current_commit
-**Continues from:** [repo-relative path to today's session summary, e.g. knowledge/sessions/2026-06/2026-06-09-v0.5.10.1-session-summary-ops.md]
+**Continues from:** [repo-relative path to today's session summary, e.g. knowledge/sessions/2026-06-09-v0.5.10.1-session-summary-ops.md]
 [If no summary found: "No session summary found for today — run /kmgraph:session-summary for current state."]
 
 ---
