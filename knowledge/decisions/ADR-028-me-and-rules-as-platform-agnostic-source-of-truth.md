@@ -329,6 +329,8 @@ As `~/.kmgraph/rules.md` grows beyond ~120 lines, mixing behavioral rules (workf
 
 **See:** `knowledge/enhancements/ENH-016/ENH-016-specification.md` for the full recommendation-trigger protocol.
 
+**rules-capture sub-file routing (v0.5.10):** The `rules-capture` skill will be updated in v0.5.10 (Task 15) to detect sub-files in `~/.kmgraph/` matching `*rules*.md` and route captured rules to the most specific sub-file based on content keyword matching. See ENH-016 for the routing spec.
+
 **Shipping constraint discovered during implementation (2026-05-25):** The shipped hook must use conditional fallback logic when reading split files. Hardcoding `plan-rules.md` paths in the hook breaks injection for users who haven't split — the sections silently fail to load. Pattern: `[ -f "$PLAN_RULES" ] || PLAN_RULES="$RULES"` before any `_extract_section` call. See ENH-016 spec "Shipping Constraint" section.
 
 ---

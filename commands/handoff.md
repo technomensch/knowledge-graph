@@ -13,10 +13,8 @@ Create a comprehensive handoff package for project transitions, context limit pr
 This command generates a complete handoff package consolidating all work, issues, and progress into structured documentation for AI assistants or new developers.
 
 **Package Contents:**
-- **START-HERE.md** — Current session state, active branch, what's in progress
+- **START-HERE.md** — Thin pointer: branch, commit, link to session summary for current state
 - **DOCUMENTATION-MAP.md** — File inventory with purpose annotations
-- **SESSION-COMPILATION.md** — Recent session summaries linked chronologically
-- **OPEN-ISSUES.md** — Unresolved issues, open PRs, pending reviews
 - **ARCHITECTURE-SNAPSHOT.md** — Current codebase structure and key decisions (from ADRs)
 
 **Purpose:** Enable seamless knowledge transfer and preparation for context window limits.
@@ -35,12 +33,10 @@ This command generates a complete handoff package consolidating all work, issues
 ```bash
 /kmgraph:handoff
 /kmgraph:handoff --output-dir=<custom-path>
-/kmgraph:handoff --skip-sessions
 ```
 
 **Parameters:**
 - `--output-dir=<path>` (optional): Custom output directory (default: `./handoff-packages/YYYY-MM-DD/`)
-- `--skip-sessions` (optional): Exclude session compilation (faster, smaller output)
 - `--force` (optional): Overwrite existing handoff package for today
 
 ---
@@ -49,14 +45,14 @@ This command generates a complete handoff package consolidating all work, issues
 
 ### 1. START-HERE.md
 
-**Current state snapshot:**
+**Thin pointer file:**
 - Active branch and commit hash
-- Work in progress (last 3 commits)
-- Current session context
-- Next steps and blockers
-- Active knowledge graphs and recent lessons
+- `continues_from` — repo-relative path to today's session summary (auto-detected)
+- Two-line orientation: where to find current state, where to find project structure
 
-**Reading time:** 5 minutes
+**Reading time:** 1 minute
+
+Operational state (current branch, open issues, in-progress work) lives in the linked session summary. START-HERE.md is a navigation aid, not a state dump.
 
 ### 2. DOCUMENTATION-MAP.md
 
@@ -68,34 +64,14 @@ This command generates a complete handoff package consolidating all work, issues
 - `docs/` — User-facing documentation structure
 - `mcp-server/` — Cross-platform server components
 - `core/` — Protected templates and examples
-- `decisions/` — Architecture Decision Records (ADRs)
-- `lessons-learned/` — Lessons and patterns by category
+- `knowledge/decisions/` — Architecture Decision Records (ADRs)
+- `knowledge/lessons-learned/` — Lessons and patterns by category
 
 **Format:** Structured table with file, purpose, status, and last updated
 
 **Reading time:** 10 minutes
 
-### 3. SESSION-COMPILATION.md
-
-**Recent work history:**
-- Last 5 session summaries (from `docs/sessions/`)
-- Commits created in each session
-- Key decisions made
-- Lessons learned and patterns discovered
-
-**Reading time:** 15 minutes (skip to sections of interest)
-
-### 4. OPEN-ISSUES.md
-
-**Current blockers and pending work:**
-- Open GitHub issues and PRs
-- Pending code reviews
-- Known limitations or TODO items
-- Deferred tasks (marked in plans/)
-
-**Reading time:** 5-10 minutes
-
-### 5. ARCHITECTURE-SNAPSHOT.md
+### 3. ARCHITECTURE-SNAPSHOT.md
 
 **Codebase structure and philosophy:**
 - Directory tree with annotations
@@ -133,20 +109,21 @@ Handoff package will be created in: $output_dir
 
 ### Step 2: Generate START-HERE.md
 
-**Collect current state:**
+**Auto-detect today's session summary:**
 ```bash
-# Get active branch
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 current_commit=$(git rev-parse --short HEAD)
+active_kg=$(jq -r '.graphs[.active].path' ~/.claude/kg-config.json)
+session_dir="${active_kg}/sessions"
+today=$(date +%Y-%m-%d)
+branch_slug=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')
 
-# Get last 3 commits
-recent_commits=$(git log --oneline -3)
-
-# Get file count changes
-files_changed=$(git diff --name-only main...HEAD | wc -l)
-
-# Check for uncommitted changes
-git status --porcelain
+# Try date+branch-slug match first (most precise)
+summary_file=$(find "$session_dir" -name "${today}*${branch_slug}*.md" 2>/dev/null | head -1)
+# Fall back to any today-prefixed file (sessions dir only contains session files)
+if [ -z "$summary_file" ]; then
+  summary_file=$(find "$session_dir" -name "${today}*.md" 2>/dev/null | head -1)
+fi
 ```
 
 **Create START-HERE.md:**
@@ -154,47 +131,15 @@ git status --porcelain
 ```markdown
 # Start Here — Project Handoff
 
-**Last Updated:** [timestamp]
-**Created for branch:** $current_branch
+**Branch:** $current_branch
+**Commit:** $current_commit
+**Continues from:** [repo-relative path to today's session summary, e.g. knowledge/sessions/2026-06-09-v0.5.10.1-session-summary-ops.md]
+[If no summary found: "No session summary found for today — run /kmgraph:session-summary for current state."]
 
 ---
 
-## Current State
-
-**Active Branch:** $current_branch
-**Current Commit:** $current_commit
-**Files Modified:** $files_changed
-
-### Recent Work (Last 3 Commits)
-
-$recent_commits
-
-### In Progress
-
-[Detect from docs/plans/ active plan file]
-
-### Next Steps
-
-[Infer from active plan or open issues]
-
-### Active Knowledge Graphs
-
-[List from ~/.claude/kg-config.json active KG]
-
-### Recent Lessons
-
-[List last 3 lessons from active KG's lessons-learned/]
-
----
-
-## Quick Navigation
-
-- **Setup & Installation:** docs/INSTALL.md
-- **Commands Reference:** docs/reference/commands.md
-- **Quickstart:** docs/quickstart.md
-- **Architecture:** decisions/ (ADRs)
-- **Lessons learned:** lessons-learned/ (by category)
-- **Session history:** docs/sessions/
+For current state, open issues, and in-progress work: read the session summary linked above.
+For project structure and architecture: see DOCUMENTATION-MAP.md and ARCHITECTURE-SNAPSHOT.md in this package.
 ```
 
 ---
@@ -216,10 +161,10 @@ ls -1 agents/*.md
 jq '.hooks[] | .trigger' hooks/hooks.json 2>/dev/null
 
 # Document decisions
-ls -1 decisions/ADR-*.md | wc -l
+ls -1 knowledge/decisions/ADR-*.md | wc -l
 
-# Document lessons
-find lessons-learned -name "*.md" -type f | wc -l
+# Document lessons (exclude README/template/index files)
+find knowledge/lessons-learned -name "*.md" -not -name "README.md" -not -name "*template*" -not -name "*index*" -type f | wc -l
 ```
 
 **Create DOCUMENTATION-MAP.md:**
@@ -238,8 +183,8 @@ find lessons-learned -name "*.md" -type f | wc -l
 | Commands (`commands/`) | [count] | Slash commands (/kmgraph:...) |
 | Skills (`skills/`) | [count] | Auto-triggered context providers |
 | Agents (`agents/`) | [count] | Subagent definitions |
-| ADRs (`decisions/`) | [count] | Architecture decisions |
-| Lessons (`lessons-learned/`) | [count] | Lessons by category |
+| ADRs (`knowledge/decisions/`) | [count] | Architecture decisions |
+| Lessons (`knowledge/lessons-learned/`) | [count] | Lessons by category |
 | User Docs (`docs/`) | [count] | MkDocs Material site |
 
 ---
@@ -270,13 +215,13 @@ PROTECTED: Do NOT modify without explicit permission.
 | knowledge-extractor | Parse large files for KG extraction | Read-only (approval-gated writes) |
 | session-documenter | Git archaeology for summaries | Approval-gated commits/pushes |
 
-### decisions/ — Architecture Decision Records
-Directory: `decisions/`
+### knowledge/decisions/ — Architecture Decision Records
+Directory: `knowledge/decisions/`
 Current ADRs: [count]
 
 [List all ADRs with status and category]
 
-### lessons-learned/ — Knowledge Base by Category
+### knowledge/lessons-learned/ — Knowledge Base by Category
 
 | Category | Count | Latest | Purpose |
 |---|---|---|---|
@@ -326,110 +271,7 @@ Allowed modifications without permission:
 
 ---
 
-### Step 4: Generate SESSION-COMPILATION.md
-
-**Collect recent sessions:**
-```bash
-# Find docs/sessions/ directory
-session_dir="docs/sessions"
-
-# List last 5 session files by date
-ls -1tr $session_dir/*/*.md 2>/dev/null | tail -5
-```
-
-**Create SESSION-COMPILATION.md:**
-
-```markdown
-# Session Compilation
-
-**Compilation Date:** [timestamp]
-**Branch:** [current-branch]
-
----
-
-## Summary
-
-Last 5 sessions and key decisions:
-
-[For each session file, extract:]
-- Date and title
-- Type (Feature, Bug Fix, Refactoring, Planning, Documentation)
-- Key commits created (hash + message)
-- Decisions made
-- Lessons learned
-- Next steps
-
----
-
-[Include chronologically ordered summaries from last 5 sessions]
-
----
-
-## Patterns Discovered Across Sessions
-
-[Scan recent sessions for recurring patterns, decisions, or learnings]
-```
-
----
-
-### Step 5: Generate OPEN-ISSUES.md
-
-**Scan for open issues:**
-```bash
-# GitHub issues (if available)
-gh issue list --state open --json title,body,number 2>/dev/null
-
-# Open pull requests
-gh pr list --state open --json title,headRefName,number 2>/dev/null
-
-# Check docs/plans/ for active plans
-ls docs/plans/*.md 2>/dev/null | head -3
-
-# Check for TODO comments
-grep -r "TODO\|FIXME\|XXX\|HACK" commands/ skills/ agents/ 2>/dev/null | head -5
-```
-
-**Create OPEN-ISSUES.md:**
-
-```markdown
-# Open Issues & Pending Work
-
-**Last Updated:** [timestamp]
-
----
-
-## GitHub Issues
-
-[List all open issues with descriptions]
-
----
-
-## Open Pull Requests
-
-[List all open PRs with branches and status]
-
----
-
-## Active Plans
-
-[List active implementation plans from docs/plans/]
-
----
-
-## Known TODOs
-
-[Scan codebase for TODO/FIXME comments and list top 5]
-
----
-
-## Deferred Tasks
-
-[List tasks marked as deferred or future in plans]
-```
-
----
-
-### Step 6: Generate ARCHITECTURE-SNAPSHOT.md
+### Step 4: Generate ARCHITECTURE-SNAPSHOT.md
 
 **Create ARCHITECTURE-SNAPSHOT.md:**
 
@@ -468,9 +310,11 @@ knowledge-graph/
 │   ├── plans/            — Implementation plans (gitignored)
 │   ├── sessions/         — Session summaries (gitignored)
 │   └── chat-history/     — Extracted chat logs (gitignored)
-├── decisions/            — Architecture Decision Records (ADRs)
-├── lessons-learned/      — Lessons by category
-├── knowledge/            — Quick-reference knowledge graph
+├── knowledge/            — Knowledge graph (sessions, decisions, lessons, enhancements)
+│   ├── decisions/        — Architecture Decision Records (ADRs)
+│   ├── lessons-learned/  — Lessons by category
+│   ├── sessions/         — Session summaries
+│   └── enhancements/     — Enhancement specs (ENH-NNN/)
 ├── CLAUDE.md             — Project conventions and rules
 ├── .claude/              — Claude Code configuration
 ├── README.md             — Project overview
@@ -554,7 +398,7 @@ Types: `feat` | `fix` | `docs` | `refactor` | `chore` | `perf` | `style` | `test
 
 ---
 
-### Step 7: Verify Output
+### Step 5: Verify Output
 
 **Confirm all files created:**
 ```bash
@@ -571,20 +415,17 @@ Location: $output_dir
 Files:
 - START-HERE.md                    — [X] lines
 - DOCUMENTATION-MAP.md             — [X] lines
-- SESSION-COMPILATION.md           — [X] lines
-- OPEN-ISSUES.md                   — [X] lines
 - ARCHITECTURE-SNAPSHOT.md         — [X] lines
 
 Total: ~[XX] lines of documentation
 
-Reading time: ~30-45 minutes for complete orientation
-Quick reference: ~15 minutes (START-HERE + DOCUMENTATION-MAP)
+Reading time: ~20 minutes for complete orientation
+Quick reference: ~5 minutes (START-HERE → session summary link)
 
 Next steps:
-1. Review START-HERE.md for current context
+1. Read START-HERE.md — follow the continues_from link to the session summary for current state
 2. Skim DOCUMENTATION-MAP.md for file locations
-3. Read SESSION-COMPILATION.md for recent decisions
-4. Check OPEN-ISSUES.md for blockers
+3. Read ARCHITECTURE-SNAPSHOT.md for codebase structure and ADRs
 
 Handoff ready for sharing or archival!
 ```
@@ -623,11 +464,11 @@ Next Steps: Document COMMAND-GUIDE.md updates, verify token reduction
 
 ## See Also
 
-- `/kmgraph:session-summary` — Document individual sessions
+- `/kmgraph:session-summary` — Document individual sessions (operational state lives here)
 - `/kmgraph:recall` — Search across captured knowledge
-- `docs/sessions/` — Chronological session history
-- `decisions/` — Architecture Decision Records
-- `lessons-learned/` — Lessons by category
+- `{active KG}/sessions/` — Chronological session history
+- `knowledge/decisions/` — Architecture Decision Records
+- `knowledge/lessons-learned/` — Lessons by category
 
 ---
 

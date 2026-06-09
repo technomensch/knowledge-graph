@@ -470,6 +470,8 @@ A markdown document that captures the highlights of a work session — what was 
 
 **Plain English**: Meeting minutes for a work session, generated from the conversation.
 
+**Pairing with a handoff**: Session summaries are permanent and retrospective; handoff documents are ephemeral and forward-looking. When both are created in the same session, the handoff can reference the summary via an optional `continues_from` field rather than duplicating completed-work content. The summary itself never references the handoff (asymmetric, one-way coupling).
+
 ---
 ## Sync Pipeline
 

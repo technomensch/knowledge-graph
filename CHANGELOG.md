@@ -13,6 +13,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.5.10.1] — 2026-06-09
+
+### Changed
+- **Session summary operational sections (ENH-002 partial)** — `/kmgraph:session-summary` now generates five structured sections on every run:
+  - **Start-of-Session Reading (Required)** — gate listing active plan, ENH spec(s), modified files, and self-references to operational sections; omitted when nothing to read
+  - **Current State** — branch, commit, uncommitted changes, in-progress work, active KG (renamed + expanded from `## Git Context`)
+  - **Open Issues** — GitHub issues/PRs, active plans, pending decisions, deferred tasks (renamed + expanded from `## Open Items`)
+  - **Session History** — thin references to last 3 sessions (new; no re-compilation)
+  - **Session Findings** — errors/gaps/spec bugs from any command run this session; append+dedup within day; omitted from output when empty (new)
+- **One-file-per-day enforcement** — Step 1.5 added to full-session path: checks for existing `YYYY-MM-DD-{branch-slug}.md` before Step 1; if found, opens in append mode. Filename unified across snapshot and full modes — root cause of duplicate-file-per-day symptom fixed.
+- **Zone structure** — Session summaries now use three zones: Gate (Start-of-Session Reading), Operational Snapshot (overwrite each run), and Accumulated Narrative (append-only, timestamped). Zone dividers with `as-of {hash}` framing. YAML frontmatter adds `as_of_commit` and `last_updated` fields refreshed on every run. Contradiction/reversal tracking added to narrative append blocks.
+- **Handoff package reduced** — SESSION-COMPILATION.md and OPEN-ISSUES.md removed from handoff output. START-HERE.md is now a thin pointer file: branch, commit, auto-detected `continues_from` link to today's session summary. Package now contains three files: DOCUMENTATION-MAP, ARCHITECTURE-SNAPSHOT, thin START-HERE.
+- **`--skip-sessions` flag removed** — controlled SESSION-COMPILATION generation which no longer exists.
+- **Stale path fixes in handoff** — All bare `decisions/` references corrected to `knowledge/decisions/`; all `lessons-learned/` to `knowledge/lessons-learned/`. Lessons count now excludes README/template/index files. Directory tree in ARCHITECTURE-SNAPSHOT updated to show actual structure.
+- `knowledge/sessions/session-template.md` — replaced with zone-structured template
+- `mcp-server` — hono override bumped `>=4.12.18` → `>=4.12.23` (Dependabot #129)
+
+### Related
+- ENH-002 (partial — snapshot gate items remain), ADR-051
+
+## [0.5.10] — 2026-06-07
+
+### Added
+- **ENH-021:** Optional `continues_from` field added to handoff documents (START-HERE.md header block + session-style handoff YAML frontmatter). When set, the "What Was Completed" section collapses to a one-liner pointing at the paired session summary — eliminates duplicated "what was built" content at session end. Asymmetric one-way coupling: handoff → summary only; summary never references the handoff.
+- **ADR-051:** Documents the session-summary/handoff asymmetric coupling decision — why not consolidate (lifecycle/tense/trigger conflicts), coupling direction, field location (handoff only), intended consumers (recall/FTS5/future resume), optionality.
+- `commands/session-summary.md` — pairing guidance note added (if creating a handoff, point its `continues_from` here)
+
+### Changed
+- **ENH-017:** `start-issue-tracking` Step 1.2 version-impact prompt rewritten — bold labels, explicit "fix *or* enhancement" note for Patch, WIP append states no version is minted, pre-1.0 major/v1.0.0 guard added
+- `docs/reference/command-guide.md` — `/kmgraph:handoff` entry updated with `continues_from` pairing tip
+- `docs/GLOSSARY.md` — Session Summary entry updated with asymmetric coupling explanation
+
+### Related
+- ENH-017, ENH-021, ADR-051, ADR-026, ADR-049
+
 ## [0.5.9.3] — 2026-05-30
 
 ### Added
