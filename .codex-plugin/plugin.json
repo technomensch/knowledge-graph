@@ -1,0 +1,60 @@
+{
+  "name": "kmgraph",
+  "version": "0.5.10.2",
+  "description": "Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects. Includes KG entries, ADRs, meta-issue tracking, chat extraction, and profile-file rule capture.",
+  "author": {
+    "name": "technomensch",
+    "email": "technomensch@stayinginsync.info",
+    "url": "https://github.com/technomensch"
+  },
+  "homepage": "https://github.com/technomensch/knowledge-graph",
+  "repository": "https://github.com/technomensch/knowledge-graph",
+  "license": "MIT",
+  "keywords": [
+    "kmgraph",
+    "knowledge",
+    "knowledge-graph",
+    "knowledge-management",
+    "knowledge-capture",
+    "structured-knowledge",
+    "cross-session-memory",
+    "chat-extraction",
+    "lessons-learned",
+    "memory",
+    "documentation",
+    "governance",
+    "meta-issue",
+    "adr",
+    "codex",
+    "ai-workflow",
+    "cross-platform",
+    "mcp",
+    "obsidian",
+    "session-memory",
+    "context-persistence",
+    "ai-memory",
+    "agent-memory",
+    "pkm",
+    "second-brain",
+    "decision-tracking",
+    "developer-workflow",
+    "claude-code",
+    "mcp-server"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.codex-plugin/mcp.json",
+  "interface": {
+    "displayName": "KMGraph",
+    "shortDescription": "Structured knowledge capture and cross-session memory for AI-assisted development.",
+    "longDescription": "KMGraph provides structured knowledge capture, lesson-learned documentation, and cross-session memory for AI-assisted development projects. Includes knowledge graph entries, ADRs, meta-issue tracking, chat history extraction, and profile-file behavioral memory — all searchable across sessions.",
+    "developerName": "technomensch",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "websiteURL": "https://github.com/technomensch/knowledge-graph",
+    "defaultPrompt": [
+      "Use /kmgraph:recall to search past decisions before making a new one.",
+      "Use /kmgraph:capture-lesson to document what we just learned.",
+      "Use /kmgraph:session-summary to wrap up this session."
+    ]
+  }
+}
