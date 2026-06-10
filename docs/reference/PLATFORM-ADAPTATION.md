@@ -28,6 +28,7 @@ This guide focuses on **platform capabilities and usage patterns** after install
 | Platform | Automation Level | MCP Support | Commands |
 |----------|-----------------|-------------|----------|
 | **Claude Code** | Full | ✅ | 22 commands |
+| **Codex CLI** | Full | ✅ | 22 commands + skills |
 | **Cursor** | Medium | ✅ (via MCP) | None (use MCP tools) |
 | **Windsurf** | Medium | ✅ (via MCP) | None (use MCP tools) |
 | **Continue.dev** | Medium | ✅ (via MCP) | Custom slash commands |
@@ -55,6 +56,30 @@ This guide focuses on **platform capabilities and usage patterns** after install
 - Git metadata auto-capture on every operation
 
 **For installation:** See [GETTING-STARTED.md](../GETTING-STARTED.md) or paste [INSTALL.md](../INSTALL.md).
+
+---
+
+## Codex CLI (Native — Full Automation)
+
+**Status:** ✅ Fully supported (marketplace install)
+
+**Automation:** Full — all 22 commands, skills, and MCP tools available
+
+**Install:**
+```bash
+codex plugin marketplace add technomensch/knowledge-graph
+codex plugin add kmgraph@knowledge-management-graph
+```
+
+**Features:**
+- 22 commands: `/kmgraph:capture-lesson`, `/kmgraph:recall`, `/kmgraph:create-adr`, etc.
+- Skills auto-triggered from `skills/` directory
+- MCP server (`kg_*` tools) available in Codex sessions
+- Same `kmgraph@knowledge-management-graph` plugin ID as Claude marketplace
+
+**Note:** Skills and MCP tools are shared with Claude Code — no separate configuration needed. Run `/kmgraph:init` in a Codex session to initialize the knowledge graph.
+
+**For installation:** See [INSTALL.md](../INSTALL.md) or use the commands above.
 
 ---
 

@@ -11,7 +11,7 @@ Users can install the Knowledge Management Graph using a **universal installer**
 
 ## How It Works
 
-The universal installer detects the platform (Claude Code, Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Aider, or other AI assistants), configures the appropriate components, and initializes a knowledge graph automatically.
+The universal installer detects the platform (Claude Code, Codex CLI, Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Aider, or other AI assistants), configures the appropriate components, and initializes a knowledge graph automatically.
 
 **Installation takes approximately 5 minutes.**
 
@@ -41,6 +41,19 @@ Claude Code users can follow a manual setup walkthrough instead:
 Or paste the universal installer above for the same automated experience.
 
 :::
+
+## For Codex CLI Users
+
+:::tip[Codex Marketplace Install]
+
+```bash
+codex plugin marketplace add technomensch/knowledge-graph
+codex plugin add kmgraph@knowledge-management-graph
+```
+
+Skills and MCP tools activate immediately after install — no further configuration needed.
+
+:::
 ---
 
 :::note[Not using Claude Code?]
@@ -59,6 +72,7 @@ Users can install on multiple platforms with varying automation levels:
 | Platform | Automation | How to Install |
 |----------|-----------|-----------------|
 | **Claude Code** | Full automation | Paste installer (recommended) or follow [Quickstart](quickstart.mdx) |
+| **Codex CLI** | Full automation | `codex plugin marketplace add technomensch/knowledge-graph` then `codex plugin add kmgraph@knowledge-management-graph` |
 | **Cursor** | Medium (MCP tools) | Paste installer; MCP server handles data layer |
 | **Windsurf** | Medium (MCP tools) | Paste installer; MCP server handles data layer |
 | **Continue.dev** | Medium (MCP tools) | Paste installer; MCP server handles data layer |
