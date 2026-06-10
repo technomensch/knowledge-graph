@@ -1,0 +1,20 @@
+{
+  "name": "knowledge-management-graph",
+  "interface": {
+    "displayName": "KMGraph — Knowledge Management Graph"
+  },
+  "plugins": [
+    {
+      "name": "kmgraph",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
