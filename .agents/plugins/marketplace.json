@@ -7,8 +7,8 @@
     {
       "name": "kmgraph",
       "source": {
-        "source": "local",
-        "path": "./"
+        "source": "url",
+        "url": "./"
       },
       "policy": {
         "installation": "AVAILABLE",
