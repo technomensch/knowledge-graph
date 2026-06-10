@@ -26,6 +26,16 @@ claude --plugin-dir /path/to/knowledge-graph
 Verify the plugin loaded: type `/km` and the autocomplete menu should show `kmgraph` commands.
 
   </TabItem>
+  <TabItem value="codex" label="Codex CLI">
+
+```bash
+codex plugin marketplace add technomensch/knowledge-graph
+codex plugin add kmgraph@knowledge-management-graph
+```
+
+Skills and MCP tools activate immediately. Run `/kmgraph:init` in a Codex session to initialize a knowledge graph.
+
+  </TabItem>
   <TabItem value="cursor" label="Cursor / Windsurf / VS Code">
 
 Paste the contents of [INSTALL.md](INSTALL.md) into your AI assistant. The installer detects the platform, configures the MCP server, and initializes the knowledge graph automatically.

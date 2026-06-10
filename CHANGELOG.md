@@ -13,6 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.5.10.2] — 2026-06-10
+
+### Added
+- **Codex CLI marketplace support** — Plugin now installable via `codex plugin marketplace add technomensch/knowledge-graph` + `codex plugin add kmgraph@knowledge-management-graph`. Three new files: `.codex-plugin/plugin.json` (manifest), `.codex-plugin/mcp.json` (MCP server config), `.agents/plugins/marketplace.json` (Codex marketplace registry). Existing `.claude-plugin/` structure untouched. Both platforms use `kmgraph@knowledge-management-graph` as the plugin ID.
+
+### Fixed
+- **shell-quote critical vulnerability** — `shell-quote <=1.8.3` (transitive via `@docusaurus/core` → `webpack-dev-server` → `launch-editor`) pinned to `>=1.8.4` via npm `overrides`. Closes Dependabot alert #63.
+
 ## [0.5.10.1] — 2026-06-09
 
 ### Changed
