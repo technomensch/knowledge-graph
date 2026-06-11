@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.5.10.2
+**Version:** 0.5.10.3
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -90,6 +90,10 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 ---
 
 ## v0.5.x Feature Highlights
+
+**v0.5.10.3 — 2026-06-11**
+
+- **MCP server bundled with esbuild for git-clone installs** — MCP server now includes pre-built dist bundle (esbuild output) so `git clone` and local `--plugin-dir` installs bypass the build step. Installation speed improved; no longer requires Node.js/npm build environment for simple deployments.
 
 **v0.5.10.2 — 2026-06-10**
 
@@ -240,7 +244,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.5.10.2 (2026-06-10)
+**Current Release:** v0.5.10.3 (2026-06-11)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -342,6 +346,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.5.10.2 (2026-06-10)
+**Current Version:** v0.5.10.3 (2026-06-11)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info
