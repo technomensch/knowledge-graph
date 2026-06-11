@@ -79,6 +79,17 @@ codex plugin add kmgraph@knowledge-management-graph
 
 **Note:** Skills and MCP tools are shared with Claude Code — no separate configuration needed. Run `/kmgraph:init` in a Codex session to initialize the knowledge graph.
 
+**Troubleshooting (Stale Cache After Update):**
+
+If you update the plugin source but skills or tools don't reflect the changes, clear the Codex plugin cache:
+
+```bash
+rm -rf ~/.codex/plugins/cache/knowledge-management-graph/kmgraph/
+codex plugin uninstall kmgraph
+codex plugin marketplace add technomensch/knowledge-graph
+codex plugin add kmgraph@knowledge-management-graph
+```
+
 **For installation:** See [INSTALL.md](../INSTALL.md) or use the commands above.
 
 ---

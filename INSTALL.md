@@ -350,6 +350,19 @@ Skills and MCP tools activate immediately after install. **After installation, g
 
 > **Note:** If you also use Claude Code, the same knowledge graph and MCP server are shared — no separate configuration needed.
 
+#### If Stale After Update
+
+If you update the plugin and commands or tools appear stale, clear the local plugin cache:
+
+```bash
+rm -rf ~/.codex/plugins/cache/knowledge-management-graph/kmgraph/
+codex plugin uninstall kmgraph
+codex plugin marketplace add technomensch/knowledge-graph
+codex plugin add kmgraph@knowledge-management-graph
+```
+
+Then restart Codex.
+
 ---
 
 ### Step 2B: MCP IDE Installation (Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Claude Desktop)

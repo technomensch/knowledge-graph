@@ -318,6 +318,15 @@ If `/kmgraph:command` doesn't autocomplete:
 
 **Git metadata missing** — Commands must run from a git repository
 
+**Codex CLI: Commands appear stale after update** — Clear the plugin cache:
+```bash
+rm -rf ~/.codex/plugins/cache/knowledge-management-graph/kmgraph/
+codex plugin uninstall kmgraph
+codex plugin marketplace add technomensch/knowledge-graph
+codex plugin add kmgraph@knowledge-management-graph
+```
+Then restart Codex. (Same underlying issue as ADR-006 in Claude Code.)
+
 ---
 
 ## Contributing
