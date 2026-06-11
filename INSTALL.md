@@ -246,6 +246,7 @@ done
 | **v0.5.9.3** | No upgrade action required. Three new advisory hooks (plan docs-impact check, pre-push version-sync, pre-push docs-scan gate, inline recommendation gate) are automatic after plugin reload. Optionally add `## Docs Impact` sections to existing plan files to silence the Gate 1 advisory. |
 | **v0.5.10** | No upgrade action required. `start-issue-tracking` Step 1.2 improved UX and `continues_from` handoff field are automatic after plugin reload. |
 | **v0.5.10.1** | No upgrade action required. Session summary operational sections, zone structure, one-file-per-day enforcement, and reduced handoff package are automatic after plugin reload. Run `/reload-plugins` to activate. Note: `--skip-sessions` flag for `/kmgraph:handoff` has been removed (SESSION-COMPILATION no longer generated). |
+| **v0.5.10.2** | Codex CLI marketplace support added — no upgrade action required for existing Claude Code installs. Codex users: run `codex plugin marketplace add technomensch/knowledge-graph` then `codex plugin add kmgraph@knowledge-management-graph`. Security: `shell-quote` dependency pinned to `>=1.8.4` automatically on `npm install`. |
 
 After the wizard completes, your existing lessons, ADRs, sessions, and chat history are untouched.
 
@@ -260,6 +261,9 @@ Check which AI coding environment is active by running these detection commands:
 # Check for Claude Code
 which claude 2>/dev/null && echo "PLATFORM=claude-code"
 
+# Check for Codex CLI
+which codex 2>/dev/null && echo "PLATFORM=codex"
+
 # Check for platform-specific directories
 [ -d ".cursor" ] && echo "PLATFORM=cursor"
 [ -d ".windsurf" ] && echo "PLATFORM=windsurf"
@@ -273,6 +277,7 @@ which claude 2>/dev/null && echo "PLATFORM=claude-code"
 ```
 
 **If Claude Code is detected**, go to **Step 2A** (fast path).
+**If Codex CLI is detected**, go to **Step 2A-Codex** (marketplace path).
 **If any MCP-capable IDE is detected** (Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Claude Desktop), go to **Step 2B** (MCP path).
 **If no IDE is detected**, ask the user which platform they use. If it supports MCP, go to **Step 2B**. Otherwise, go to **Step 2C** (template-only path).
 
@@ -329,6 +334,34 @@ claude plugin install context-mode
 ```
 
 After installing, restart Claude Code. No further configuration is needed — kmgraph detects context-mode automatically.
+
+---
+
+### Step 2A-Codex: Codex CLI Marketplace Installation
+
+Codex supports full plugin installation with all 22 commands, skills, and MCP tools via the marketplace.
+
+```bash
+codex plugin marketplace add technomensch/knowledge-graph
+codex plugin add kmgraph@knowledge-management-graph
+```
+
+Skills and MCP tools activate immediately after install. **After installation, go to Step 3.**
+
+> **Note:** If you also use Claude Code, the same knowledge graph and MCP server are shared — no separate configuration needed.
+
+#### If Stale After Update
+
+If you update the plugin and commands or tools appear stale, clear the local plugin cache:
+
+```bash
+rm -rf ~/.codex/plugins/cache/knowledge-management-graph/kmgraph/
+codex plugin uninstall kmgraph
+codex plugin marketplace add technomensch/knowledge-graph
+codex plugin add kmgraph@knowledge-management-graph
+```
+
+Then restart Codex.
 
 ---
 

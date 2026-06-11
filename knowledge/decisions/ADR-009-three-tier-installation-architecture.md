@@ -17,7 +17,7 @@ The plugin aims to serve users across different platforms and installation prefe
 
 ### Problem
 
-1. **Platform diversity:** Claude Code, MCP IDEs (Cursor, Windsurf, etc.), generic template users
+1. **Platform diversity:** Full-automation platforms (Claude Code, Codex CLI), MCP IDEs (Cursor, Windsurf, etc.), generic template users
 2. **Capability gaps:** Tier 2/3 users lack automatic updates and full feature access
 3. **Installation complexity:** Different paths for different user types
 4. **Documentation unclear:** Which installation path for which users?
@@ -35,15 +35,16 @@ The plugin aims to serve users across different platforms and installation prefe
 
 Three-tier installation with explicit trade-offs:
 
-### Tier 1: Claude Code (Full Feature Set)
+### Tier 1: Claude Code & Codex CLI (Full Feature Set)
 
 **Characteristics:**
-- Installation: Claude Code marketplace → `claude plugin install`
-- Platform: Claude Code IDE only
-- Update path: Automatic via `claude plugin update`
+- **Claude Code:** Marketplace → `claude plugin install`; updates via `claude plugin update`
+- **Codex CLI:** Marketplace → `codex plugin add kmgraph@knowledge-management-graph`; updates via `codex plugin upgrade`
+- Platforms: Claude Code IDE, Codex CLI
+- Update path: Automatic (with cache-clear workaround — see [ADR-006](ADR-006-document-cache-clear-upgrade-workaround.md))
 - Features: ✅ All commands, ✅ All skills, ✅ All MCP tools, ✅ Auto-updates
 
-**Who:** Primary Claude Code users wanting full integration
+**Who:** Users on full-automation platforms wanting complete integration
 
 ### Tier 2: MCP IDEs (Limited Auto-Update)
 
@@ -76,6 +77,7 @@ Three-tier installation with explicit trade-offs:
 3. **Clear upgrade path:** Users understand what they gain by moving tiers
 4. **Sustainable:** Three tiers easier to maintain than attempting one-size-fits-all
 5. **Mintlify standard:** Follows established pattern for LLM-executable installation
+6. **Cross-platform parity:** Tier 1 groups both Claude Code and Codex CLI as equivalent full-automation platforms with identical feature coverage
 
 ### Alternatives Considered
 
@@ -132,11 +134,13 @@ Three-tier installation with explicit trade-offs:
 **INSTALL.md Structure:**
 ```
 1. Platform Detection Wizard
-   - "What IDE are you using?"
+   - "What platform are you using?"
    - Recommends appropriate tier
 
-2. Tier 1: Claude Code Marketplace
-   - Steps to install and verify
+2. Tier 1: Full-Automation (Claude Code & Codex CLI)
+   - Claude Code marketplace steps
+   - Codex CLI marketplace steps
+   - Cache-clear workaround reference
 
 3. Tier 2: MCP IDEs
    - Steps to clone, configure MCP server

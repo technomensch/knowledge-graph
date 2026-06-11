@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.5.10.1
+**Version:** 0.5.10.2
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -38,9 +38,11 @@ A Claude Code plugin that provides:
 
 ## Quick Install
 
-Paste [INSTALL.md](INSTALL.md) into any AI assistant for automated setup on any platform — Claude Code, Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Aider, or local LLMs.
+Paste [INSTALL.md](INSTALL.md) into any AI assistant for automated setup on any platform — Claude Code, Codex CLI, Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Aider, or local LLMs.
 
 **Claude Code users:** Run `claude plugin install kmgraph` or load with `claude --plugin-dir /path/to/knowledge-graph`, then run `/kmgraph:init`.
+
+**Codex CLI users:** Run `codex plugin marketplace add technomensch/knowledge-graph` then `codex plugin add kmgraph@knowledge-management-graph`.
 
 See the [Quickstart](docs/quickstart.mdx) for prerequisites and troubleshooting.
 
@@ -88,6 +90,11 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 ---
 
 ## v0.5.x Feature Highlights
+
+**v0.5.10.2 — 2026-06-10**
+
+- **Codex CLI marketplace support** — Plugin now installable via `codex plugin marketplace add technomensch/knowledge-graph` + `codex plugin add kmgraph@knowledge-management-graph`. Both Claude and Codex use `kmgraph@knowledge-management-graph` as the plugin ID. Additive — existing Claude Code integration unchanged.
+- **shell-quote security fix** — Critical vulnerability (Dependabot #63) resolved via npm override pinning `shell-quote >=1.8.4`.
 
 **v0.5.10.1 — 2026-06-09**
 
@@ -233,7 +240,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.5.10.1 (2026-06-09)
+**Current Release:** v0.5.10.2 (2026-06-10)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -311,6 +318,15 @@ If `/kmgraph:command` doesn't autocomplete:
 
 **Git metadata missing** — Commands must run from a git repository
 
+**Codex CLI: Commands appear stale after update** — Clear the plugin cache:
+```bash
+rm -rf ~/.codex/plugins/cache/knowledge-management-graph/kmgraph/
+codex plugin uninstall kmgraph
+codex plugin marketplace add technomensch/knowledge-graph
+codex plugin add kmgraph@knowledge-management-graph
+```
+Then restart Codex. (Same underlying issue as ADR-006 in Claude Code.)
+
 ---
 
 ## Contributing
@@ -326,6 +342,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.5.10.1 (2026-06-09)
+**Current Version:** v0.5.10.2 (2026-06-10)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info

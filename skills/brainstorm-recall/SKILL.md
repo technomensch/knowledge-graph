@@ -1,3 +1,8 @@
+---
+name: brainstorm-recall
+description: Consult the knowledge graph before any recommendation is made during brainstorming.
+---
+
 # Skill: brainstorm-recall
 
 **Purpose:** Ensure the knowledge graph is consulted before any recommendation is made. Fires before `adr-guide` on the same trigger surface.
