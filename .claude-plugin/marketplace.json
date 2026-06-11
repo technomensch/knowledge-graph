@@ -1,7 +1,7 @@
 {
   "name": "knowledge-management-graph",
   "version": "1.0.2",
-  "description": "Marketplace for the Knowledge Management Graph \u2014 structured knowledge capture and cross-session memory for Claude Code projects.",
+  "description": "Marketplace for the Knowledge Management Graph",
   "owner": {
     "name": "technomensch",
     "url": "https://github.com/technomensch",
@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "kmgraph",
-      "version": "0.5.9",
+      "version": "0.5.10.2",
       "description": "Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects. Includes KG entries, ADRs, meta-issue tracking, chat extraction, and profile-file behavioral memory.",
       "source": "./",
       "author": {
@@ -19,21 +19,28 @@
       },
       "repository": "https://github.com/technomensch/knowledge-graph",
       "license": "MIT",
-      "keywords": [
-        "kmgraph",
-        "knowledge",
-        "knowledge-graph",
-        "knowledge-management",
-        "knowledge-capture",
-        "structured-knowledge",
-        "cross-session-memory",
-        "chat-extraction",
-        "lessons-learned",
-        "memory",
-        "documentation",
-        "governance",
-        "meta-issue",
-        "adr"
+       "keywords": [
+                    "kmgraph",
+                    "knowledge",
+                    "knowledge-graph",
+                    "knowledge-management",
+                    "knowledge-capture",
+                    "structured-knowledge",
+                    "cross-session-memory",
+                    "chat-extraction",
+                    "lessons-learned",
+                    "memory",
+                    "documentation",
+                    "governance",
+                    "meta-issue",
+                    "adr",
+                    "codex",
+                    "ai-workflow",
+                    "cross-platform",
+                    "mcp",
+                    "obsidian",
+                    "issue-tracking"
+
       ]
     }
   ]

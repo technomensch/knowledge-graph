@@ -17,6 +17,8 @@ Claude Code's plugin update mechanism does not invalidate the plugin cache when 
 
 This is a confirmed platform bug with multiple open issues against Claude Code (#14061, #15642, #19197, #29074). There is no timeline for an upstream fix.
 
+The same stale-cache issue exists in Codex CLI, where versioned plugins are cached at `~/.codex/plugins/cache/$MARKETPLACE/$PLUGIN/$VERSION/` and do not clear on update (GitHub issue openai/codex#21138). Codex has been tested as a second full-automation tier with identical cache behavior.
+
 Three mitigation options were considered for the kmgraph plugin:
 
 1. **Do nothing** — rely on users discovering the issue organically
@@ -29,17 +31,29 @@ A fourth option — patching the cache directory automatically during SessionSta
 
 **Option 3 (documentation) is accepted for v0.1.0-beta.** Option 2 (hook-based version check) is deferred to the next release cycle.
 
-The GETTING-STARTED.md Troubleshooting section will include a prominent `!!! warning` admonition with:
-- The exact `rm -rf` command to clear the cache
-- Steps to reinstall via `/plugin` UI
-- A note to reconnect the MCP server after reinstalling
+The GETTING-STARTED.md Troubleshooting section will include a prominent `!!! warning` admonition with cache-clear workarounds for both Claude Code and Codex CLI (both full-automation tier platforms).
+
+**Claude Code:**
+```bash
+rm -rf ~/.claude/plugins/cache/stayinginsync-knowledge-graph/
+```
+Then reinstall via `/plugin` UI: uninstall kmgraph, reinstall from marketplace, and reconnect the MCP server.
+
+**Codex CLI:**
+```bash
+rm -rf ~/.codex/plugins/cache/knowledge-management-graph/kmgraph/
+codex plugin uninstall kmgraph
+codex plugin marketplace add technomensch/knowledge-graph
+codex plugin add kmgraph@knowledge-management-graph
+```
 
 ## Rationale
 
 - **Immediate:** Documentation is deployable now without additional implementation risk
-- **Effective:** The `rm -rf` workaround is reliable and confirmed working
-- **Conservative:** Avoids writing to Claude Code's internal cache directory from plugin code
-- **Traceable:** Links to upstream Claude Code issues so users can monitor for an official fix
+- **Effective:** The `rm -rf` workaround is reliable and confirmed working across both full-automation platforms (Claude Code and Codex CLI)
+- **Conservative:** Avoids writing to either platform's internal cache directory from plugin code
+- **Traceable:** Links to upstream issues (Claude Code #29074, Codex #21138) so users can monitor for official fixes
+- **Equivalent tiers:** Both Claude Code and Codex CLI provide full automation with identical cache behavior
 
 ## Consequences
 

@@ -1,3 +1,8 @@
+---
+name: lesson-capture
+description: Auto-capture lessons when user solves bugs, makes breakthroughs, identifies patterns, or completes debugging sessions.
+---
+
 # Skill: lesson-capture
 
 **Purpose:** Auto-capture lessons when user solves complex bugs, makes breakthroughs, identifies patterns, or completes debugging sessions.

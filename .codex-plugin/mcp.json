@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "kmgraph": {
+      "command": "node",
+      "args": ["./mcp-server/dist/index.js"],
+      "cwd": "."
+    }
+  }
+}

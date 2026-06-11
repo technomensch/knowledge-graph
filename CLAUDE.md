@@ -50,13 +50,13 @@ Heavy-lift task handlers that keep main context clean:
 ## Mandatory Plan Steps (include in every implementation plan)
 
 1. Create branch from correct parent
-2. Create `docs/plans/{filename}.md` (copy from `~/.claude/plans/`)
+2. Create `knowledge/plans/{filename}.md` (copy from `~/.claude/plans/`)
 3. [implementation steps]
 4. Commit, push, PR, merge
 
 ## Key Workflows
 
-- **Plans:** Plans are **LOCAL-ONLY and gitignored** (`docs/plans/` is in `.gitignore`). Work in `~/.claude/plans/` first, then copy to `docs/plans/` for local reference during implementation. **Do NOT attempt to commit plan files.** Only commit implementation work (code, tests, docs).
+- **Plans:** Plans are **LOCAL-ONLY and gitignored** (`knowledge/plans/` is in `.gitignore`). Work in `~/.claude/plans/` first, then copy to `knowledge/plans/` for local reference during implementation. **Do NOT attempt to commit plan files.** Only commit implementation work (code, tests, docs).
 - **Branches:** Push to origin, await user review (never auto-merge)
 - **Versions:** Sync package.json + plugin.json before pushing (mcp-server independent)
 - **Docs updates:** Update affected reference and guide pages when behavior changes
@@ -110,9 +110,9 @@ Claude Code-specific tool directives. This section is the authoritative home for
 
 ### Search Scope Restrictions
 
-Never run namespace grep scans over `docs/plans/` or `.jsonl` chat history files
+Never run namespace grep scans over `knowledge/plans/` or `.jsonl` chat history files
 - **Why:** scanning these paths pulls thousands of tokens of non-executable plan text, hitting context limits before reaching actual command files
 
 ## Active Work
 
-Check `git branch` for current work in progress. Plans live locally in `~/.claude/plans/` (not git-synced) and are copied to `docs/plans/` for working reference only.
+Check `git branch` for current work in progress. Plans live locally in `~/.claude/plans/` (not git-synced) and are copied to `knowledge/plans/` for working reference only.

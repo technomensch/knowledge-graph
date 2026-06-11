@@ -140,9 +140,24 @@ Verify with `wc -l` on both files. A line count mismatch means they are out of s
 
 ### Plugin Cache & Local Testing
 
-Local `commands/` or `core/` changes are not live during testing; copy files to `~/.claude/plugins/cache/stayinginsync-knowledge-graph/kmgraph/{version}/` then run `/reload-plugins`
-- If a plan includes edits to `commands/`, `skills/`, `agents/`, or `core/templates/`, add a final step: copy changed files to the plugin cache and run `/reload-plugins` (exclude `.SynologyWorkingDirectory` from any copy operations)
-- **Why:** `/reload-plugins` serves from cache, not the local repo; local fixes had no effect until the cache path was discovered during v0.3.0-beta testing
+Local `commands/` or `core/` changes are not live during testing; copy files to the appropriate plugin cache then reload.
+
+**Claude Code:**
+```bash
+cp -r /path/to/knowledge-graph/commands/ ~/.claude/plugins/cache/stayinginsync-knowledge-graph/kmgraph/{version}/
+/reload-plugins
+```
+
+**Codex CLI:**
+```bash
+rm -rf ~/.codex/plugins/cache/knowledge-management-graph/kmgraph/
+codex plugin uninstall kmgraph
+codex plugin marketplace add technomensch/knowledge-graph
+codex plugin add kmgraph@knowledge-management-graph
+```
+
+- If a plan includes edits to `commands/`, `skills/`, `agents/`, or `core/templates/`, add a final step: use the commands above to sync cache and reload (exclude `.SynologyWorkingDirectory` from any copy operations)
+- **Why:** plugin systems serve from cache, not the local repo; local fixes had no effect until the cache path was discovered during v0.3.0-beta testing
 - **Source:** [Plugin Cache Not Synced From Local Repo](lessons-learned/debugging/Lessons_Learned_Debugging_Plugin_Cache_Not_Synced_From_Local_Repo.md)
 
 ### Init Command Parity

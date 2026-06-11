@@ -1,3 +1,8 @@
+---
+name: rules-capture
+description: Detect implicit mid-session behavioral corrections ("always X", "never Y", "from now on Z") and offer to write them to rule files.
+---
+
 # Skill: rules-capture
 
 **Purpose:** Detect implicit mid-session behavioral corrections and preferences — phrases the user issues without asking to "capture" anything — and offer to write them to the authoritative rule files (`knowledge/rules.md` or `~/.kmgraph/me.md`), writing directly to the authoritative profile files.
