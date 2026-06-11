@@ -1,3 +1,8 @@
+---
+name: doc-update-router
+description: Route explicit doc-update requests to the correct command, ensuring standards validation and changelog enforcement.
+---
+
 # Skill: doc-update-router
 
 **Purpose:** Intercept explicit doc-update requests and route to the correct command. Prevents doc edits from bypassing the `/kmgraph:update-doc` wizard, standards validation, and changelog enforcement.
