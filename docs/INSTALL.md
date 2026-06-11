@@ -54,6 +54,21 @@ codex plugin add kmgraph@knowledge-management-graph
 Skills and MCP tools activate immediately after install — no further configuration needed.
 
 :::
+
+:::note[Troubleshooting: Stale Cache After Update]
+
+If you update the plugin source but skills or tools don't reflect the changes, Codex may be using a cached version. Clear the plugin cache:
+
+```bash
+rm -rf ~/.codex/plugins/cache/knowledge-management-graph/kmgraph/
+codex plugin uninstall kmgraph
+codex plugin marketplace add technomensch/knowledge-graph
+codex plugin add kmgraph@knowledge-management-graph
+```
+
+This resolves issues where tools are out of date or skills don't appear after an update.
+
+:::
 ---
 
 :::note[Not using Claude Code?]

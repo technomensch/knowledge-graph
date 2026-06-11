@@ -1,7 +1,7 @@
 ---
-title: "Claude Code Plugin Cache Does Not Refresh After Update"
+title: "Plugin Cache Does Not Refresh After Update (Claude Code & Codex CLI)"
 category: process
-tags: [claude-code, plugin, cache, update, mcp, version]
+tags: [claude-code, codex-cli, plugin, cache, update, mcp, version, full-automation]
 created: 2026-03-03
 author: technomensch
 git_branch: v0.0.3-github-docs
@@ -9,46 +9,58 @@ severity: medium
 status: workaround-documented
 ---
 
-# Claude Code Plugin Cache Does Not Refresh After Update
+# Plugin Cache Does Not Refresh After Update (Claude Code & Codex CLI)
 
 ## Problem
 
-After running `claude plugin update` or using the "Update Now" button in the Claude Code plugin UI, the plugin continues to run from the old cached version. The version displayed in the Installed tab does not change, and new commands, skills, or hook changes from the updated version are not loaded.
+After running `claude plugin update` (Claude Code) or `codex plugin upgrade` (Codex CLI), the plugin continues to run from the old cached version. The version displayed in the Installed plugins section does not change, and new commands, skills, or hook changes from the updated version are not loaded.
 
-Additionally, the MCP server may show a `failed` status and require manual reconnection after an update.
+Additionally, the MCP server (Claude Code only) may show a `failed` status and require manual reconnection after an update.
 
 ## Root Cause
 
-Claude Code caches installed plugins in a versioned directory:
+Both Claude Code and Codex CLI cache installed plugins in versioned directories:
 
+**Claude Code:**
 ```
 ~/.claude/plugins/cache/{marketplace-name}/{plugin-name}/{version}/
 ```
 
-When `claude plugin update` runs, it:
-1. Updates `installed_plugins.json` with the new version number
-2. Updates the marketplace metadata
-3. **Does NOT re-download or replace the actual plugin files in the cache directory**
+**Codex CLI:**
+```
+~/.codex/plugins/cache/{marketplace-name}/{plugin-name}/{version}/
+```
 
-The physical cache directory (named after the original installed version) remains unchanged. `CLAUDE_PLUGIN_ROOT` continues to point to the stale path.
+When `claude plugin update` or `codex plugin upgrade` runs, both platforms:
+1. Update metadata with the new version number
+2. Update marketplace information
+3. **Do NOT re-download or replace the actual plugin files in the cache directory**
 
-This is a known Claude Code bug with multiple open issues:
+The physical cache directory (named after the original installed version) remains unchanged. `CLAUDE_PLUGIN_ROOT` (Claude Code) or equivalent path (Codex) continues to point to the stale version.
+
+This is a known platform bug on both implementations:
+
+**Claude Code issues:**
 - [#19197](https://github.com/anthropics/claude-code/issues/19197) — update doesn't re-download files when version changes
 - [#15642](https://github.com/anthropics/claude-code/issues/15642) — CLAUDE_PLUGIN_ROOT points to stale version after update
 - [#14061](https://github.com/anthropics/claude-code/issues/14061) — /plugin update does not invalidate cache
 - [#29074](https://github.com/anthropics/claude-code/issues/29074) — Cache not cleared on reinstall
 
+**Codex CLI issue:**
+- [openai/codex#21138](https://github.com/openai/codex/issues/21138) — Plugin cache not invalidated on upgrade
+
 ## Symptoms
 
-- Installed tab shows old version number (e.g., `0.0.10-alpha`) after updating to a newer release
+- Installed plugins section shows old version number (e.g., `0.0.10-alpha`) after updating to a newer release
 - New commands or skills added in the update are not available
-- Discover tab shows a version older than what is in the GitHub repo
-- MCP server shows `failed` status after update
+- Marketplace shows a version older than what is in the GitHub repo
+- (Claude Code only) MCP server shows `failed` status after update
 
 ## Workaround
 
-**Step 1: Clear the plugin cache**
+### Claude Code
 
+**Step 1: Clear the plugin cache**
 ```bash
 rm -rf ~/.claude/plugins/cache/stayinginsync-knowledge-graph/
 ```
@@ -67,11 +79,26 @@ claude plugin install stayinginsync/knowledge-graph
 
 After reinstalling, open `/plugin` → Installed → kmgraph → MCP Server → Reconnect.
 
+### Codex CLI
+
+**Step 1: Clear the plugin cache**
+```bash
+rm -rf ~/.codex/plugins/cache/knowledge-management-graph/kmgraph/
+```
+
+**Step 2: Reinstall the plugin**
+```bash
+codex plugin uninstall kmgraph
+codex plugin marketplace add technomensch/knowledge-graph
+codex plugin add kmgraph@knowledge-management-graph
+```
+
 ## Prevention
 
-None available within the plugin — this is a platform-level limitation. Document the workaround prominently and instruct users to use the cache-clear method for all version upgrades until Anthropic resolves the upstream issue.
+None available within the plugin — this is a platform-level limitation in both Claude Code and Codex CLI. Document the workaround prominently and instruct users to use the cache-clear method for all version upgrades until the platforms resolve the upstream issues.
 
 ## Related
 
-- [ADR-006](../decisions/ADR-006-document-cache-clear-upgrade-workaround.md) — Decision to document workaround rather than implement in-plugin mitigation
+- [ADR-006: Document Cache-Clear as Official Upgrade Path](../decisions/ADR-006-document-cache-clear-upgrade-workaround.md) — Decision to document workaround for both Claude Code and Codex CLI
+- [ADR-009: Three-Tier Installation Architecture](../decisions/ADR-009-three-tier-installation-architecture.md) — Tier 1 groups both Claude Code and Codex CLI as full-automation platforms
 - [GETTING-STARTED.md Troubleshooting](../GETTING-STARTED.md#plugin-update-does-not-take-effect) — User-facing instructions
