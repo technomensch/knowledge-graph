@@ -59,7 +59,7 @@ Implement explicit allowlist via `package.json` with three tiers:
 ### Excluded (Must Not Include)
 
 - `.git/`, `.git/**` — Version control history
-- `node_modules/`, `dist/` (build) — Build artifacts
+- `node_modules/`, `dist/` (build) — Build artifacts (**exception:** see WASM runtime amendment below)
 - `.claude/` — Plugin local configuration
 - `docs/plans/` — Implementation plans (gitignored)
 - `.env`, `.env.local` — Credentials
@@ -174,9 +174,23 @@ Implement explicit allowlist via `package.json` with three tiers:
 
 ---
 
+## Amendment: Bundled WASM Runtime Exception (v0.5.10.3)
+
+**Date:** 2026-06-11
+
+The `node_modules/` exclusion above has one carved-out exception: `mcp-server/dist/node_modules/node-sqlite3-wasm/` is committed to git and included in distributions.
+
+**Why:** esbuild cannot inline WASM binaries — they must be present on disk at a path resolvable by Node's `require()`. Marketplace installs (Claude Code, Codex CLI) clone via git without running `npm install`, so the WASM runtime must be committed alongside the bundle. See [ADR-015](ADR-015-node-sqlite3-wasm-for-fts5-search.md) (WASM dependency) and [ADR-016](ADR-016-graceful-fallback-optional-mcp-dependencies.md) (esbuild bundling requirement).
+
+**Size budget revision:** The `<500KB` criterion in the Validation section applies to non-binary assets. The committed WASM runtime (~500KB) and esbuild bundles (~2.3MB) are required build artifacts for Tier-1 installs and are excluded from the size budget scope.
+
+---
+
 ## Related Decisions
 
 - **[ADR-002: Commands vs Skills Architecture](ADR-002-commands-vs-skills-architecture.md)** — Determines what command/skill files to include
+- **[ADR-015: node-sqlite3-wasm for FTS5 Search](ADR-015-node-sqlite3-wasm-for-fts5-search.md)** — WASM binary dependency
+- **[ADR-016: Graceful Fallback for Optional MCP Dependencies](ADR-016-graceful-fallback-optional-mcp-dependencies.md)** — esbuild bundling requirement
 
 ---
 
@@ -197,5 +211,5 @@ Implement explicit allowlist via `package.json` with three tiers:
 ---
 
 **Decision Made:** 2026-02-17
-**Last Updated:** 2026-02-22
+**Last Updated:** 2026-06-11
 **Status:** Accepted

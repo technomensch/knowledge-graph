@@ -52,6 +52,27 @@ Every new IDE where KMGraph is used requires a separate, explicit registration s
 
 **Automation target (v0.2.1 Item D):** Automate MCP registration as part of `/kmgraph:init` and `/kmgraph:setup-platform`. When a `kg_*` tool call fails because the server is not registered, detect this and offer to register it rather than silently falling back.
 
+---
+
+## Binary Deployment: Unbundled vs. Bundled Distribution
+
+**New issue (v0.5.10.3):** The MCP server binary is output by bare `tsc` compilation, which produces unbundled code containing `require()` calls to npm packages. This breaks marketplace installs where the git clone runs without `npm install`:
+
+**Symptom:** `Cannot find module '@modelcontextprotocol/sdk/server/mcp.js'` on marketplace install
+
+**Root cause:** 
+- `mcp-server/dist/index.js` imports from `@modelcontextprotocol/sdk` via `require()`
+- Marketplace install clones the repo but skips `npm install` in the server directory
+- `node_modules` is not in git; the binary cannot resolve its dependencies
+
+**Solution (Pending v0.5.10.3):** Build with esbuild to create a self-contained bundle that includes all dependencies. The bundled binary works on any install (development, git clone, marketplace) without post-clone package installation.
+
+**Distinction from registration issue:** 
+- **Registration:** Binary exists but is unknown to the IDE's tool namespace
+- **Bundling:** Binary cannot load its own dependencies due to bare tsc output
+
+Both must be solved for full end-to-end marketplace functionality.
+
 ## References
 
 - v0.2.1 backlog meta-issue (Item D: MCP auto-registration on first use)
