@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.5.10.3] — 2026-06-11
+
+### Fixed
+- **MCP server fails on marketplace install** — `mcp-server/dist/index.js` was a bare `tsc` output requiring `node_modules/` at runtime. Neither Claude Code nor Codex installs `node_modules/` (both clone from git). Every marketplace user hit `Cannot find module '@modelcontextprotocol/sdk/server/mcp.js'`. Fixed by bundling with esbuild into a self-contained `dist/index.js`: `@modelcontextprotocol/sdk` and `zod` inlined; `node-sqlite3-wasm` (WASM binary) externalized and committed alongside the bundle at `dist/node_modules/`. Launch paths in `plugin.json` and `mcp.json` unchanged. Closes #133.
+
 ## [0.5.10.2] — 2026-06-10
 
 ### Added
