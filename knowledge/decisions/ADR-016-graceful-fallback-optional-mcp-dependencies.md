@@ -203,10 +203,22 @@ This pattern applies retroactively: the hash check in `hooks-master.sh` handles 
 
 ---
 
+## Distribution & Bundling Requirements
+
+**Critical:** This pattern assumes the MCP server binary is fully functional in the deployment context. As of v0.5.10.3, bare `tsc` compilation without bundling **breaks marketplace installs** because:
+
+1. `mcp-server/dist/index.js` is unbundled output — it contains `require()` calls to `@modelcontextprotocol/sdk`
+2. Marketplace installs clone the git repo without running `npm install` in the server directory
+3. Result: `Cannot find module '@modelcontextprotocol/sdk/server/mcp.js'` on every marketplace-sourced install
+4. Workaround: Use esbuild to create a self-contained bundle that includes all `node_modules` dependencies
+
+**Implication for this ADR:** The hash check and try/require patterns work correctly for **development installs** (where users run `npm install` locally) and for **plugin platforms that execute post-install hooks** (e.g., Claude Code's SessionStart hook). However, **marketplace binary distributions require esbuild bundling**, not bare tsc output. See [v0.5.10.3 tracking](#todo-link).
+
 ## Future Considerations
 
 1. **Claude Code native upgrade hooks:** If Claude Code ever provides a post-upgrade lifecycle hook, that would be the better place to trigger `npm install` than the hash check. Revisit this ADR when such a mechanism becomes available.
 2. **Generalizing the pattern:** If multiple optional features are added, consider a shared `loadOptionalDep(packageName, className)` utility that encapsulates the `try/require` + boolean flag pattern.
+3. **esbuild bundling for marketplace:** All marketplace-sourced binaries must be built with esbuild to bundle dependencies. Update the MCP server build pipeline to output both a development version (for plugin platforms with hooks) and a marketplace binary (esbuild bundled).
 
 ---
 

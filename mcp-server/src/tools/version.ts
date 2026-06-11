@@ -1,8 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
-// Read version from package.json at runtime (not hardcoded)
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const pkg = require("../../package.json") as { version: string };
+declare const __SERVER_VERSION__: string;
+const pkg = { version: typeof __SERVER_VERSION__ !== "undefined" ? __SERVER_VERSION__ : "0.0.0" };
 
 const SCHEMA_VERSION = 2;
 

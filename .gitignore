@@ -39,6 +39,12 @@ chat-history/
 # Build artifacts
 dist/
 !mcp-server/dist/
+# Bundled wasm runtime — committed so git-clone installs work without npm install
+# Must appear AFTER dist/ and node_modules/ rules (last matching rule wins)
+!mcp-server/dist/node_modules/
+!mcp-server/dist/node_modules/**
+!mcp-server/dist/node_modules/**/dist/
+!mcp-server/dist/node_modules/**/dist/**
 build/
 *.tgz
 

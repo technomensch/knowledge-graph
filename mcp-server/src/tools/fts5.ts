@@ -5,9 +5,9 @@ import * as path from "path";
 import * as os from "os";
 import { readConfig, writeConfig, getActiveGraphPath, walkDir } from "../utils.js";
 
-// Graceful fallback: node-sqlite3-wasm may be absent on first run after upgrade.
-// The SessionStart hook will install it and prompt users to restart Claude Code.
-// Until then, FTS5 functions return empty results and kg_search falls back to linear scan.
+// Graceful fallback: node-sqlite3-wasm is bundled in dist/node_modules/ for marketplace installs
+// (v0.5.10.3+). This try/catch covers edge cases: partial clone, corrupted dist, or dev runs
+// via bare tsc. FTS5 functions return empty results and kg_search falls back to linear scan.
 let Database: any;
 let fts5Available = false;
 try {
