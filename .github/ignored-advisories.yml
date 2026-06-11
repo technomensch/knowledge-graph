@@ -1,0 +1,17 @@
+# Known vulnerabilities accepted as unfixable at this time.
+# Format per ADR-005 (vulnerability gate protocol).
+# Each entry: ghsa_id, reason, blocked_by, added_date
+
+ignored_advisories:
+  - ghsa_id: GHSA-w7jw-789q-3m8p
+    cve_id: CVE-2026-9277
+    package: shell-quote
+    severity: critical
+    reason: >
+      Transitive dependency via @docusaurus/core → webpack-dev-server →
+      launch-editor → shell-quote. No fix available upstream; blocked by
+      Docusaurus not upgrading webpack-dev-server. Not directly exploitable
+      in this project (no user-controlled .op object tokens passed to quote()).
+    blocked_by: "@docusaurus/core (webpack-dev-server transitive)"
+    added_date: "2026-06-11"
+    review_date: "2026-09-11"
