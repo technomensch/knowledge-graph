@@ -97,6 +97,32 @@ codex plugin add kmgraph@knowledge-management-graph
 
 None available within the plugin — this is a platform-level limitation in both Claude Code and Codex CLI. Document the workaround prominently and instruct users to use the cache-clear method for all version upgrades until the platforms resolve the upstream issues.
 
+---
+
+## Distinguishing Stale Cache from Unbundled Binary Issues
+
+**Two separate failure modes** have different root causes and fixes:
+
+### Stale Cache (This Issue)
+- **Symptom:** Plugin shows old version number after update; new features unavailable
+- **Root cause:** Platform cache directory not invalidated; old files still cached
+- **Trigger:** Using `claude plugin update` or `codex plugin upgrade`
+- **Fix:** Manual `rm -rf` of cache directory + reinstall
+
+### Missing Module / Unbundled Binary (v0.5.10.3)
+- **Symptom:** `Cannot find module '@modelcontextprotocol/sdk/server/mcp.js'`
+- **Root cause:** Binary is bare tsc output with unbundled deps; marketplace install has no node_modules
+- **Trigger:** Fresh marketplace install without post-install hook running `npm install`
+- **Fix:** esbuild bundling to create self-contained binary
+
+**Example sequence:**
+1. User installs kmgraph v0.5.9 from marketplace → unbundled binary fails (issue #2)
+2. User manually installs v0.5.10.3 with esbuild fix via git clone → works
+3. User runs `claude plugin update` → binary is cached stale (issue #1), shows old version
+4. User clears cache and reinstalls → works again
+
+Both issues must be solved together for a reliable upgrade experience.
+
 ## Related
 
 - [ADR-006: Document Cache-Clear as Official Upgrade Path](../decisions/ADR-006-document-cache-clear-upgrade-workaround.md) — Decision to document workaround for both Claude Code and Codex CLI
