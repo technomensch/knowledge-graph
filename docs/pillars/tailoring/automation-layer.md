@@ -69,12 +69,14 @@ Skills listen for natural-language signals. They never execute commands automati
 | **docs-impact-scan** | "push to origin", "push and merge", "open PR", "create PR", "finishing up", "ready to push" |
 | **sidebar-update** | Doc file moved or renamed, `git mv docs/...`, "move [doc]", "rename [doc]" |
 
+The docs-impact-scan skill runs an eight-step pre-push workflow — diff scan, docs grep, user confirmation, and update-doc dispatch. See [Docs Impact Scan](./docs-impact-scan.md) for the full workflow and pre-push gate details.
+
 ## Hooks and their lifecycle events
 
 | Hook script | Fires on | Default |
 |---|---|---|
 | `hooks-master.sh` (router) | All events | Enabled |
-| `session-end-prompt.sh` | Stop | Prompts for session summary |
+| `session-end-prompt.sh` | Stop | Prompts for session summary; Codex CLI-compatible (emits JSON decision on stdout via `trap EXIT`) |
 | `post-tool-lesson-check.sh` | PostToolUse | Prompts for lesson capture after certain tools |
 | `platform-file-change-check.sh` | PostToolUse | Detects changes to CLAUDE.md / AGENTS.md |
 | `plan-mirror.sh` | PostToolUse | Mirrors plan files from `~/.claude/plans/` to `docs/plans/` |

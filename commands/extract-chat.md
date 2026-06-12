@@ -1,10 +1,12 @@
 ---
-description: Extract chat history from Claude and Gemini local log sources
+description: Extract chat history from Claude, Gemini, and Codex CLI local log sources
 ---
+
+<!-- Updated: 2026-06-12 -->
 
 # Extract Chat History
 
-Automates the extraction of chat history from local Claude (.jsonl) and Gemini (.json/.pb) log files.
+Automates the extraction of chat history from local Claude (.jsonl), Gemini (.json/.pb), and Codex CLI (.jsonl) log files.
 
 ---
 
@@ -24,25 +26,37 @@ This parses chat logs and extracts insights without consuming your main context,
 
 ```bash
 /kmgraph:extract-chat [-claude | -gemini]
+/kmgraph:extract-chat --source codex
+/kmgraph:extract-chat --source all
 /kmgraph:extract-chat --output-dir=<path>
 /kmgraph:extract-chat -claude --output-dir=<custom-path>
 /kmgraph:extract-chat -claude 2026-02-20 through 2026-02-21
 /kmgraph:extract-chat --today
 /kmgraph:extract-chat --project=knowledge-graph
+/kmgraph:extract-chat --source codex --after=2026-01-01
 ```
 
 ---
 
 ## Options
 
-- `-claude`: Extract only Claude Code session history
-- `-gemini`: Extract only Antigravity/Gemini session history
-- (no option): Extract all available history
+**Source selection:**
+- `-claude`: Extract only Claude Code session history (shorthand for `--source claude`)
+- `-gemini`: Extract only Antigravity/Gemini session history (shorthand for `--source gemini`)
+- `--source codex`: Extract only Codex CLI sessions from `~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl`; outputs `YYYY-MM-DD-codex.md`
+- `--source all`: Extract Claude and Gemini sessions; does **not** include Codex (use `--source codex` explicitly)
+- (no option): Extract all available Claude and Gemini history (same as `--source all`)
+
+**Output:**
 - `--output-dir=<path>`: Override output directory (default: active KG's chat-history/)
+
+**Date filtering:**
 - `--today`: Extract only today's sessions (convenience flag)
 - `--date=YYYY-MM-DD`: Extract only sessions from a specific date
 - `--after=YYYY-MM-DD`: Extract sessions from this date onwards (inclusive)
 - `--before=YYYY-MM-DD`: Extract sessions up to and including this date
+
+**Filtering:**
 - `--project=<fragment>`: Filter to sessions from a specific project (path fragment match against `~/.claude/projects/<name>/`)
 
 ---
@@ -70,6 +84,18 @@ The workflow runs the centralized Python extraction script located at `${CLAUDE_
 **Protobuf support:**
 - Requires `blackboxprotobuf` library (optional)
 - Falls back to JSON-only if protobuf library not installed
+
+### Codex CLI Extraction
+
+1. **Scans:** `~/.codex/sessions/YYYY/MM/DD/` for `rollout-*.jsonl` files
+2. **Parses:** UTC timestamps in each turn, converted to local date and time
+3. **Merges:** By local date into `YYYY-MM-DD-codex.md`
+4. **Output:** `{output_dir}/YYYY-MM-DD-codex.md`
+
+**Notes:**
+- Codex is not included in `--source all` pending date-semantics validation across platforms — use `--source codex` explicitly
+- System injection turns (internal Codex context) are filtered out of the output
+- Large file splitting and incremental append behavior apply the same as Claude/Gemini extraction
 
 ---
 
@@ -103,11 +129,14 @@ mkdir -p "$output_dir"
 ```bash
 # Parse user input
 case "$input" in
-  *-claude*)
+  *-claude* | *--source\ claude*)
     source_flag="claude"
     ;;
-  *-gemini*)
+  *-gemini* | *--source\ gemini*)
     source_flag="gemini"
+    ;;
+  *--source\ codex*)
+    source_flag="codex"
     ;;
   *)
     source_flag="all"
@@ -189,6 +218,26 @@ python3 ${CLAUDE_PLUGIN_ROOT}/core/scripts/run_extraction.py --source $source_fl
 ---
 
 ## Conversation 2: Another Topic (HH:MM - HH:MM)
+
+[...]
+```
+
+### Codex History Files
+
+```markdown
+# Chat History: YYYY-MM-DD (Codex)
+
+## Session 1 (HH:MM - HH:MM)
+
+**User:**
+[Message content]
+
+**Assistant:**
+[Response content]
+
+---
+
+## Session 2 (HH:MM - HH:MM)
 
 [...]
 ```
@@ -279,13 +328,21 @@ When multiple knowledge graphs are configured:
 ### Problem: No chat history found
 
 **Solution:**
-- Verify Claude/Gemini log directories exist:
+- Verify log directories exist:
   ```bash
   ls ~/.claude/projects/
   ls ~/.gemini/tmp/
+  ls ~/.codex/sessions/
   ```
-- Check if you've used Claude Code or Gemini recently
+- Check if the relevant tool has been used recently
 - Logs may be cleared on app updates
+
+### Problem: Codex extraction returns no sessions
+
+**Solution:**
+- Verify the sessions directory structure: `~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl`
+- Check that `--source codex` was used (Codex is not included in `--source all`)
+- Confirm Codex CLI has been used since the directory was created
 
 ### Problem: Protobuf extraction fails
 
@@ -416,6 +473,34 @@ Extracting Claude history (project filter: knowledge-graph)...
 Saved to: {active_kg_path}/chat-history/2026-02-21-claude.md
 ```
 
+### Example 7: Extract Codex CLI sessions
+
+```bash
+/kmgraph:extract-chat --source codex
+```
+
+**Output:**
+```
+Extracting Codex CLI history...
+✅ Codex: Found 4 sessions (2026-06-12)
+
+Saved to: {active_kg_path}/chat-history/2026-06-12-codex.md
+```
+
+### Example 8: Extract Codex sessions from a date onwards
+
+```bash
+/kmgraph:extract-chat --source codex --after=2026-01-01
+```
+
+**Output:**
+```
+Extracting Codex CLI history (from 2026-01-01)...
+✅ Codex: Found sessions for 12 dates
+
+Saved to: {active_kg_path}/chat-history/2026-01-*.codex.md (12 files)
+```
+
 ---
 
 ## Non-Claude Code Usage
@@ -438,6 +523,7 @@ Saved to: {active_kg_path}/chat-history/2026-02-21-claude.md
 ---
 
 **Created:** 2026-02-12
-**Version:** 1.0 (Plugin version with OUTPUT_DIR fix)
+**Updated:** 2026-06-12
+**Version:** 1.1 (Added Codex CLI extraction — ENH-024)
 **Integration:** Works with active KG, `/kmgraph:recall`, session summaries
 **Related Skills:** /kmgraph:session-summary, /kmgraph:capture-lesson

@@ -789,12 +789,19 @@ Test the hook:
 **What it does**:
 
 1. Determines output directory (active KG's `chat-history/` by default, or custom path)
-2. Scans Claude logs (`~/.claude/projects/` for `.jsonl` files) and/or Gemini logs (`~/.gemini/tmp/`, `~/.gemini/antigravity/conversations/` for `.json`/`.pb` files)
-3. Merges sessions by date into `YYYY-MM-DD-claude.md` and/or `YYYY-MM-DD-gemini.md`
+2. Scans Claude logs (`~/.claude/projects/` for `.jsonl` files), Gemini logs (`~/.gemini/tmp/`, `~/.gemini/antigravity/conversations/` for `.json`/`.pb` files), and/or Codex CLI sessions (`~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl`)
+3. Merges sessions by date into `YYYY-MM-DD-claude.md`, `YYYY-MM-DD-gemini.md`, and/or `YYYY-MM-DD-codex.md`
 4. If a daily file exceeds 900 KB or 30,000 lines, automatically splits into numbered parts (`-part1.md`, `-part2.md`, …) inside a `YYYY-MM-DD/` subfolder to prevent Obsidian rendering failures
 5. Supports incremental append — re-running adds new sessions without overwriting; appends target the last part file if the day was previously split
 
 **Time**: Under 30 seconds
+
+**Source flags**:
+
+- `-claude` — Extract only Claude sessions
+- `-gemini` — Extract only Gemini sessions
+- `--source codex` — Extract only Codex CLI sessions from `~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl`; outputs `YYYY-MM-DD-codex.md`
+- `--source all` — Extract Claude and Gemini sessions; does not include Codex yet, use `--source codex` explicitly
 
 **Date filtering options**:
 
@@ -809,10 +816,12 @@ Test the hook:
 /kmgraph:extract-chat                                          # Extract all (Claude + Gemini)
 /kmgraph:extract-chat -claude                                  # Extract only Claude
 /kmgraph:extract-chat -gemini                                  # Extract only Gemini
+/kmgraph:extract-chat --source codex                          # Extract only Codex CLI sessions
 /kmgraph:extract-chat --output-dir=/custom/path               # Custom output location
 /kmgraph:extract-chat --today                                  # Today only
 /kmgraph:extract-chat -claude 2026-02-20 through 2026-02-21   # Date range
 /kmgraph:extract-chat --project=knowledge-graph               # Specific project only
+/kmgraph:extract-chat --source codex --after 2026-01-01       # Codex sessions from a date onwards
 ```
 
 **Tips**:

@@ -24,10 +24,11 @@ This writes a summary to `docs/sessions/` and updates MEMORY.md pointers. Commit
 ## Export chat history
 
 ```bash
-/kmgraph:extract-chat
+/kmgraph:extract-chat          # Claude + Gemini history
+/kmgraph:extract-chat --source codex   # Codex CLI history (if applicable)
 ```
 
-Extracts any lessons from the departing session that haven't been formally captured yet.
+Extracts session history from the departing platform into the active KG's `chat-history/` directory, making it available for `/kmgraph:recall` and lesson extraction on the target platform.
 
 ## Point to the same graph
 
@@ -58,6 +59,7 @@ Copy the contents of `core/templates/AGENTS-template.md` into your project's `AG
 - MCP tools (`kg_*`) work the same on any MCP-enabled IDE
 - MEMORY.md is human-readable markdown — the target platform can load it directly
 - Full automation (slash commands, hooks) is Claude Code-exclusive; other platforms use the MCP tools or manual workflow
+- Codex CLI chat history can be extracted with `--source codex`; see [`/kmgraph:extract-chat`](/knowledge-graph/commands/extract-chat) for the full source flag reference
 
 ## Related
 

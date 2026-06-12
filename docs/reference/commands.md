@@ -5,7 +5,7 @@ sidebar_label: Commands
 description: Every KMGraph slash command — category, description, and key flags
 ---
 
-**Version:** 0.5.2 | All commands use the `/kmgraph:` prefix in Claude Code. Other platforms access equivalent functionality through `kg_*` MCP tools — see [INSTALL.md](../INSTALL.md) for details.
+**Version:** 0.5.10.5 | All commands use the `/kmgraph:` prefix in Claude Code. Other platforms access equivalent functionality through `kg_*` MCP tools — see [INSTALL.md](../INSTALL.md) for details.
 
 <img src="/img/demos/session-summary.gif" alt="KMGraph session-summary demo — snapshot of captured lessons and open plans" width="800" />
 
@@ -38,7 +38,7 @@ description: Every KMGraph slash command — category, description, and key flag
 | [`/kmgraph:capture-lesson`](#capture-lesson) | Document lessons learned with git metadata, duplicate detection, and optional KG extraction | `--user`, `--project`, `--named=<kg>` |
 | [`/kmgraph:create-adr`](#create-adr) | Create Architecture Decision Records with auto-numbering, index update, and automatic capture of implementation commit + subject line | `--user`, `--project`, `--named=<kg>` |
 | [`/kmgraph:session-summary`](#session-summary) | Summarize the active session; supports lightweight mid-session snapshot mode | `--auto`, `--snapshot`, `--snapshot --git`, `--user`, `--project`, `--named=<kg>` |
-| [`/kmgraph:extract-chat`](#extract-chat) | Export Claude and Gemini chat logs to dated markdown files | `--today`, `--date=YYYY-MM-DD`, `--after=`, `--before=`, `--project=`, `-claude`, `-gemini`, `--output-dir=` |
+| [`/kmgraph:extract-chat`](#extract-chat) | Export Claude and Gemini chat logs to dated markdown files; extract Codex CLI sessions with `--source codex` (outputs `YYYY-MM-DD-codex.md`; not included in `--source all` yet) | `--today`, `--date=YYYY-MM-DD`, `--after=`, `--before=`, `--project=`, `--source claude\|gemini\|codex\|all`, `--output-dir=` |
 | [`/kmgraph:handoff`](#handoff) | Generate a handoff package (thin START-HERE pointer, DOCUMENTATION-MAP, ARCHITECTURE-SNAPSHOT) | `--output-dir=` |
 | [`/kmgraph:rules-capture`](#rules-capture) | Detect and route a behavioral correction to `rules.md` or `me.md` (project or personal scope) | — |
 

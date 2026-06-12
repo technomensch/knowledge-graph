@@ -55,7 +55,7 @@ Hooks with a `matcher` field fire only when the tool name (and optionally the to
 | `plan-mirror.sh` | `PostToolUse` | `Write` | Yes | Detects writes to `~/.claude/plans/`; copies the file to `docs/plans/` in the active KG project root; exits silently if the target directory does not exist |
 | `pre-commit-knowledge-gate.sh` | `PreToolUse` | `Bash.*git commit` | Yes | Intercepts plain `git commit` calls (skips `--amend` and `--no-verify`); checks staged files for lesson-worthy source types (`src/`, `*.ts`, `*.py`, `*.sh`, etc.); advisory prompt only — does not block the commit |
 | `pre-skill-rules-inject.sh` | `PreToolUse` | `Skill` | Yes | Fires before any superpowers skill invocation; injects `~/.kmgraph/rules.md` overrides into skill context; hard-blocks brainstorming and planning without a prior recall query; enforces PR gate for execution and finishing skills |
-| `session-end-prompt.sh` | `Stop` | (all) | Yes | Checks for open plan tasks, draft/proposed ADRs, and recent lesson-worthy commits without a captured lesson; displays a summary prompt; uses a `/tmp` flag to suppress duplicate output within the same session |
+| `session-end-prompt.sh` | `Stop` | (all) | Yes | Checks for open plan tasks, draft/proposed ADRs, and recent lesson-worthy commits without a captured lesson; displays a summary prompt to stderr; emits `{"decision": "continue"}` JSON to stdout via `trap EXIT` for Codex CLI compatibility; uses a `/tmp` flag to suppress duplicate output within the same session |
 | `stop-plan-gate.sh` | `Stop` | (all) | Yes | Re-injects the plan approval gate reminder at session end when a plan was written this session; uses a daily flag file to suppress duplicates |
 | `post-plan-validate-checklist.sh` | `PostToolUse` | `Write` | Yes | After writing any `plans/*.md` file, outputs an advisory post-plan validation checklist; exits silently for non-plan writes |
 | `notification-dispatch.sh` | `Notification` | (all) | No (opt-in) | Forwards the notification text to a configured `webhookUrl` in `kg-config.json`; exits silently if `webhookUrl` is absent; network failures never block the hook |
@@ -82,3 +82,14 @@ All hook scripts reside in `scripts/` relative to the plugin root. Additional sc
 | `1` | Blocking error — used only by `hooks-master.sh` for unrecoverable config failures |
 
 `PreToolUse` hooks that exit `0` allow the tool call to proceed. A non-zero exit from a `PreToolUse` hook blocks the tool call; KMGraph's `pre-commit-knowledge-gate.sh` always exits `0` because it is advisory only.
+
+## Codex CLI Compatibility
+
+The Codex CLI Stop hook parser requires a JSON object on stdout to determine session continuation. KMGraph's `Stop` hook scripts route all human-readable output to stderr and use a `trap EXIT` to guarantee the JSON decision token reaches stdout on every exit path — including early exits and errors:
+
+```bash
+# Emit JSON on every exit — required by Codex CLI Stop hook parser on all exit paths
+trap 'echo "{\"decision\": \"continue\"}"' EXIT
+```
+
+This pattern ensures the hook never silently swallows the required JSON, regardless of how the script exits. Claude Code ignores stdout from `Stop` hooks, so this change is backward-compatible.
