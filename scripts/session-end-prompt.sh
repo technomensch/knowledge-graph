@@ -4,6 +4,9 @@
 
 CONFIG_PATH="$HOME/.claude/kg-config.json"
 
+# Emit JSON on every exit — required by Codex CLI Stop hook parser on all exit paths
+trap 'echo "{\"decision\": \"continue\"}"' EXIT
+
 # Color codes
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
@@ -141,24 +144,24 @@ HAS_ITEMS=false
 [ -n "$LESSON_MSG" ] && HAS_ITEMS=true
 
 if [ "$HAS_ITEMS" = true ]; then
-    echo ""
-    echo -e "${BLUE}Before you go —${NC}"
-    echo ""
-    [ -n "$OPEN_PLAN_MSG" ] && echo -e "${YELLOW}$OPEN_PLAN_MSG${NC}"
-    [ -n "$DRAFT_ADR_MSG" ] && echo -e "${YELLOW}$DRAFT_ADR_MSG${NC}"
-    [ -n "$LESSON_MSG" ] && echo -e "${YELLOW}$LESSON_MSG${NC}"
-    echo ""
+    echo "" >&2
+    echo -e "${BLUE}Before you go —${NC}" >&2
+    echo "" >&2
+    [ -n "$OPEN_PLAN_MSG" ] && echo -e "${YELLOW}$OPEN_PLAN_MSG${NC}" >&2
+    [ -n "$DRAFT_ADR_MSG" ] && echo -e "${YELLOW}$DRAFT_ADR_MSG${NC}" >&2
+    [ -n "$LESSON_MSG" ] && echo -e "${YELLOW}$LESSON_MSG${NC}" >&2
+    echo "" >&2
     if [ "$SNAPSHOT_TODAY" = true ]; then
-        echo "You have a session snapshot from today — run /kmgraph:session-summary to complete the wrap-up."
+        echo "You have a session snapshot from today — run /kmgraph:session-summary to complete the wrap-up." >&2
     else
-        echo "Run /kmgraph:session-summary to document this session."
+        echo "Run /kmgraph:session-summary to document this session." >&2
     fi
-    echo ""
+    echo "" >&2
 else
     if [ "$SNAPSHOT_TODAY" = true ]; then
-        echo -e "${GREEN}✅ Session snapshot taken. Run /kmgraph:session-summary to finalize the wrap-up.${NC}"
+        echo -e "${GREEN}✅ Session snapshot taken. Run /kmgraph:session-summary to finalize the wrap-up.${NC}" >&2
     else
-        echo -e "${GREEN}✅ Good stopping point. /kmgraph:session-summary if you'd like a summary.${NC}"
+        echo -e "${GREEN}✅ Good stopping point. /kmgraph:session-summary if you'd like a summary.${NC}" >&2
     fi
 fi
 
