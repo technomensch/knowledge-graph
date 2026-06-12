@@ -10,7 +10,7 @@ from datetime import datetime
 
 def main():
     parser = argparse.ArgumentParser(description="Extract Chat History from Local Sources")
-    parser.add_argument("--source", choices=['all', 'claude', 'gemini'], default='all', help="Source to extract from")
+    parser.add_argument("--source", choices=['all', 'claude', 'gemini', 'codex'], default='all', help="Source to extract from (codex not included in 'all' until validated)")
     parser.add_argument("--limit", type=int, default=None, help="Limit number of samples for testing")
     parser.add_argument("--output-dir", type=str, default=None, help="Override output directory (default: auto-detect from active KG)")
 
@@ -41,12 +41,18 @@ def main():
     # Import AFTER setting environment variable
     from extract_claude import extract_claude_sessions
     from extract_gemini import extract_all_gemini
+    from extract_codex import extract_codex_sessions
     from chat_extractor_base import get_output_path
 
     # Interactive prompt for --today if file exists (only if running in terminal)
     if args.today and sys.stdin.isatty():
         date_str = args.date
-        filename = f"{date_str}-claude.md" if args.source in ['all', 'claude'] else f"{date_str}-gemini.md"
+        if args.source in ['all', 'claude']:
+            filename = f"{date_str}-claude.md"
+        elif args.source == 'codex':
+            filename = f"{date_str}-codex.md"
+        else:
+            filename = f"{date_str}-gemini.md"
         output_path = get_output_path(filename)
 
         if os.path.exists(output_path):
@@ -63,7 +69,12 @@ def main():
     elif args.today and not sys.stdin.isatty():
         # Non-interactive mode: just show info and proceed
         date_str = args.date
-        filename = f"{date_str}-claude.md" if args.source in ['all', 'claude'] else f"{date_str}-gemini.md"
+        if args.source in ['all', 'claude']:
+            filename = f"{date_str}-claude.md"
+        elif args.source == 'codex':
+            filename = f"{date_str}-codex.md"
+        else:
+            filename = f"{date_str}-gemini.md"
         output_path = get_output_path(filename)
         if os.path.exists(output_path):
             file_size = os.path.getsize(output_path)
@@ -96,7 +107,18 @@ def main():
         )
         results.extend(gemini_res)
 
-        
+    if args.source == 'codex':
+        print("Processing Codex CLI sessions...")
+        codex_res = extract_codex_sessions(
+            date_filter=args.date,
+            after_date=args.after,
+            before_date=args.before,
+            project_filter=args.project,
+            incremental=args.incremental,
+            limit=args.limit,
+        )
+        results.extend(codex_res)
+
     print("-" * 40)
     print("Extraction Complete.")
     print(f"Total sessions processed: {len(results)}")

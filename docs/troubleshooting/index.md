@@ -68,7 +68,7 @@ If the binary is missing, rebuild it:
 cd mcp-server && npm install && npm run build
 ```
 
-> **Note (v0.5.10.3+):** The MCP server is now pre-bundled and committed to `mcp-server/dist/`. Marketplace installs (Claude Code, Codex CLI) should have the binary without running `npm install`. The rebuild command above is only needed for local development or manual git-clone installs that modify the server source.
+> **Note (v0.5.10.5+):** The MCP server is now pre-bundled and committed to `mcp-server/dist/`. Marketplace installs (Claude Code, Codex CLI) should have the binary without running `npm install`. The rebuild command above is only needed for local development or manual git-clone installs that modify the server source.
 
 ---
 

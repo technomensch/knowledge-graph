@@ -31489,7 +31489,8 @@ function registerConfigTools(server) {
         "lessons-learned",
         "decisions",
         "sessions",
-        "chat-history"
+        "chat-history",
+        "tmp"
       ];
       for (const dir of dirs) {
         fs2.mkdirSync(path2.join(expandedPath, dir), { recursive: true });
@@ -31508,11 +31509,10 @@ function registerConfigTools(server) {
           "gotchas.md",
           "concepts.md",
           "architecture.md",
-          "workflows.md",
-          "index.md"
+          "workflows.md"
         ];
         for (const t of knowledgeTemplates) {
-          const src = path2.join(templateSrc, "knowledge", t);
+          const src = path2.join(templateSrc, "knowledge", "templates", t);
           const dest = path2.join(expandedPath, "knowledge", t);
           if (fs2.existsSync(src) && !fs2.existsSync(dest)) {
             fs2.copyFileSync(src, dest);
@@ -31540,6 +31540,19 @@ function registerConfigTools(server) {
         const sessDest = path2.join(expandedPath, "sessions", "session-template.md");
         if (fs2.existsSync(sessSrc) && !fs2.existsSync(sessDest)) {
           fs2.copyFileSync(sessSrc, sessDest);
+        }
+        const rootScaffolds = ["me.md", "rules.md", "kg-index.md", "triggers.md"];
+        for (const f of rootScaffolds) {
+          const src = path2.join(templateSrc, "knowledge", f);
+          const dest = path2.join(expandedPath, f);
+          if (fs2.existsSync(src) && !fs2.existsSync(dest)) {
+            fs2.copyFileSync(src, dest);
+          }
+        }
+        const catIndexSrc = path2.join(templateSrc, "knowledge", "kg-category-index.md");
+        const catIndexDest = path2.join(expandedPath, "knowledge", "kg-category-index.md");
+        if (fs2.existsSync(catIndexSrc) && !fs2.existsSync(catIndexDest)) {
+          fs2.copyFileSync(catIndexSrc, catIndexDest);
         }
       }
       const now = (/* @__PURE__ */ new Date()).toISOString();

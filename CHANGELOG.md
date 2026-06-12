@@ -13,6 +13,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.5.10.5] — 2026-06-12
+
+### Added
+- **extract-chat: Codex CLI chat history extraction** — New `--source codex` option extracts Codex CLI sessions from `~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl`
+- Filters platform-injected context blocks (AGENTS.md, environment_context, permissions); retains only real user/assistant turns
+- Per-session header includes `cwd` and `git.branch` from `session_meta`
+- `--project` filter matches `session_meta.cwd` substring
+- Not included in `--source all` yet — use `--source codex` explicitly until cross-platform date semantics validated
+- Implements ENH-024
+
+## [0.5.10.4] — 2026-06-12
+
+### Fixed
+- **MCP server: `kg_config_init` template path was one level too shallow** — All knowledge templates silently skipped on init. Path corrected from `core/templates/knowledge/` to `core/templates/knowledge/templates/`.
+- **MCP server: stale `index.md` removed from knowledge template list** — File does not exist; prevented successful scaffold.
+- **MCP server: root scaffold files never copied to KG root** — `me.md`, `rules.md`, `kg-index.md`, `triggers.md` were not copied to KG root; `kg-category-index.md` was not copied to `knowledge/` subdir
+- **MCP server: `tmp/` directory missing from scaffold dirs array** — Directory structure incomplete on init.
+- **Hooks: Stop hook (`session-end-prompt.sh`) now emits valid JSON on stdout** — Previous plain-text output caused `hook returned invalid stop hook JSON` error on every invocation when invoked via Codex CLI. Hook now emits `{"decision": "continue"}` via `trap EXIT` to satisfy Codex CLI Stop hook JSON contract.
+
 ## [0.5.10.3] — 2026-06-11
 
 ### Fixed

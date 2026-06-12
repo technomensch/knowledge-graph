@@ -74,7 +74,7 @@ mv hooks/hooks.json.disabled hooks/hooks.json
 | `post-tool-lesson-check.sh` | Prompts for lesson capture after solving | Yes |
 | `platform-file-change-check.sh` | Detects changes to CLAUDE.md / AGENTS.md | Yes |
 | `pre-commit-knowledge-gate.sh` | Blocks commits that skip knowledge capture | Yes (reduces automation) |
-| `session-end-prompt.sh` | Prompts for session summary on Stop | Yes |
+| `session-end-prompt.sh` | Prompts for session summary on Stop; Codex CLI-compatible | Yes |
 | `plan-mirror.sh` | Mirrors plan files from `~/.claude/plans/` to `docs/plans/` | Yes |
 | `notification-dispatch.sh` | Sends webhook notifications | Yes (if webhook not configured) |
 
