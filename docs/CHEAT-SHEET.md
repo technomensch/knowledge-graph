@@ -62,7 +62,7 @@ Active users use these for regular workflows:
 | `/kmgraph:switch` | Change active knowledge graph |
 | `/kmgraph:check-sensitive` | Scan knowledge graph for potentially sensitive information |
 | `/kmgraph:config-sanitization` | Interactive wizard for pre-commit hook setup |
-| `/kmgraph:extract-chat` | Extract chat history from Claude and Gemini logs (`--today`, `--date`, `--after`, `--before`, `--project`); large days auto-split into `YYYY-MM-DD/` subfolder |
+| `/kmgraph:extract-chat` | Extract chat history from Claude, Gemini, and Codex logs (`--today`, `--date`, `--after`, `--before`, `--project`); large days auto-split into `YYYY-MM-DD/` subfolder |
 | `/kmgraph:update-doc` | Update plugin/project docs (`--user-facing`) or KG content |
 
 *→ [Full details in Command Guide](reference/command-guide.md#intermediate-commands)*
