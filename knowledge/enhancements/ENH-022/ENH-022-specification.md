@@ -3,7 +3,7 @@ id: ENH-022
 title: "Template Directory Disambiguation — rename core/templates/ to core/default-templates/"
 status: proposed
 priority: medium
-version_target: v0.5.12
+version_target: v0.5.10.6
 created: 2026-05-29
 updated: 2026-06-08
 related:
@@ -16,7 +16,7 @@ tags: [templates, naming, directory-structure, disambiguation, init, upgrade]
 
 **Status:** Proposed — approach selected, awaiting brainstorm sign-off and impl plan
 **Priority:** Medium
-**Version Target:** v0.5.12
+**Version Target:** v0.5.10.6
 **Created:** 2026-05-29
 **Updated:** 2026-06-07 — approach locked in; scope broadened to all four pairs; blast radius detailed
 
@@ -151,7 +151,7 @@ ships inside the plugin distribution, not the user's project. Nothing in their
 **Tier 3 (manual installers, ADR-009):** **Breaking change.** Their copy
 instructions reference `core/templates/<dir>/`. Required actions:
 - Update `INSTALL.md` and `docs/INSTALL.md` copy instructions
-- Document in `CHANGELOG.md` under the v0.5.12 release entry as a breaking change
+- Document in `CHANGELOG.md` under the v0.5.10.6 release entry as a breaking change
 - Note the old path and new path explicitly
 
 ### Version sync required
@@ -214,10 +214,10 @@ Previously: approach is selected; brainstorm must confirm:
    `for f in ...` loop" is actually in `init-shared/template-seed.md` line 63 and
    `init-shared/upgrade-inspector.md` lines 97–109/290. `init-personal-kg.md` line 136
    is a single `cp` command. All cases: path-prefix string replace, loop logic unchanged.
-5. ✅ Tier 3 breaking-change wording confirmed (2026-06-08) — see v0.5.12 plan
+5. ✅ Tier 3 breaking-change wording confirmed (2026-06-08) — see v0.5.10.6 plan
    "Tier 3 Breaking-Change Wording" section. Write into INSTALL.md + docs/INSTALL.md
    + CHANGELOG.md during implementation.
 6. ✅ PROTECTED-code permission granted (2026-06-08) — explicit user permission granted
-   to modify `commands/` and rename `core/templates/` for v0.5.12 implementation.
+   to modify `commands/` and rename `core/templates/` for v0.5.10.6 implementation.
 
-See `~/.claude/plans/v0.5.12-template-disambiguation.md`.
+See `~/.claude/plans/v0.5.10.6-template-disambiguation.md`.

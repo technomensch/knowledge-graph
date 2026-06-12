@@ -94,6 +94,7 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 **v0.5.10.5 — 2026-06-12**
 
 - **`extract-chat` adds Codex CLI source** — `/kmgraph:extract-chat` now accepts `--source codex` to extract chat history from Codex CLI sessions. Pass `--source codex` (or omit `--source` and select Codex from the interactive prompt) to index Codex conversation logs alongside existing Claude and Gemini sources.
+- **Docs-impact-scan guide page published** — New [Docs-Impact-Scan Guide](docs/pillars/tailoring/docs-impact-scan.md) documents the 8-step pre-push workflow that automatically discovers and updates affected documentation. This feature (previously undocumented except in ADRs) now has a dedicated user-facing guide.
 
 **v0.5.10.3 — 2026-06-11**
 
@@ -119,7 +120,7 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 **v0.5.9.2 — 2026-05-30**
 
 - **`start-issue-tracking` now auto-creates GitHub Issue** — Step 5.0 calls `gh issue create --body-file` before branch creation; returned issue number is written back to spec frontmatter (`github-issue` field). Draft PR is updated to include `Closes #N`.
-- **Post-plan validation checklist advisory clarification** — `plan-rules.md` false "blocking gate" claim corrected; checklist hook is advisory only (PostToolUse cannot block in Claude Code). Hard-gate enforcement deferred to v0.6.0 (ENH-015 Gap 2).
+- **Post-plan validation checklist advisory clarification** — `plan-rules.md` false "blocking gate" claim corrected; checklist hook is advisory only (PostToolUse cannot block in Claude Code). Hard-gate enforcement deferred to v0.7.0 (ENH-015 Gap 2).
 
 **v0.5.9 — 2026-05-27**
 

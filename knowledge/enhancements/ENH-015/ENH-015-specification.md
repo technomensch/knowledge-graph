@@ -159,9 +159,9 @@ Hook fires on Skill tool invocations only. `superpowers:writing-plans` invocatio
 ### Gap 2 — Post-Plan Validation Checklist (partial fix in v0.5.9; hard gate future scope)
 v0.5.9 adds Task M: PostToolUse:Write hook that fires after plan files are written and outputs the Post-Plan Validation Checklist as an advisory reminder. This is model self-enforcement, not a hard gate.
 
-**Tracked bug:** [[issue-6]] — GitHub #125 (v0.5.9.2): plan-rules.md falsely described the hook as a blocking gate; corrected to advisory. Layer 3 (gov-execute-plan pre-flight gate) deferred to v0.6.0.
+**Tracked bug:** [[issue-6]] — GitHub #125 (v0.5.9.2): plan-rules.md falsely described the hook as a blocking gate; corrected to advisory. Layer 3 (kmg-execute-plan pre-flight gate) deferred to v0.7.0.
 
-**Future scope (v0.6.0 candidate):** A PreToolUse:Write hook could provide a true hard gate with the following pattern to avoid blocking mid-draft saves:
+**Future scope (v0.7.0 candidate):** A PreToolUse:Write hook could provide a true hard gate with the following pattern to avoid blocking mid-draft saves:
 - Only block if the plan file **already exists** (not a first write)
 - AND the previous version already had a `## Post-Plan Validation Checklist` section
 - AND the incoming content has any `❌` items in that section
@@ -177,7 +177,7 @@ Pre-v0.5.9: only File Location, Parallelism, Approval Gates, RECALL_HARD_BLOCK, 
 
 | Rule | Claude Code (hook) | plan-rules.md | Gemini | Copilot/Codex |
 |------|--------------------|---------------|--------|---------------|
-| Recall before planning | ✅ HARD BLOCK injected | ✅ documented | ✅ Task C | NOT DELIVERED (v0.6.0) |
+| Recall before planning | ✅ HARD BLOCK injected | ✅ documented | ✅ Task C | NOT DELIVERED (v0.7.0) |
 | Two-query pattern | ✅ HARD BLOCK | ✅ documented | ✅ | NOT DELIVERED |
 | Recall miss instrumentation | ✅ hook log | ✅ documented | ⚠️ advisory only | NOT DELIVERED |
 | Post-Plan Checklist gate | ⚠️ advisory (PostToolUse) | ✅ documented | ⚠️ advisory only | NOT DELIVERED |
@@ -220,5 +220,5 @@ See: `knowledge/enhancements/ENH-020/ENH-020-specification.md`
 
 - Modifying `superpowers:writing-plans` or `superpowers:brainstorming` skill files directly — these are third-party; all enforcement is via the hook layer (`pre-skill-rules-inject.sh`)
 - Replacing `superpowers:brainstorming` — brainstorm-recall works alongside it
-- Multi-platform skill name collision risk: when v0.6.0 implements Gemini/Copilot/Codex skill loading, bare-name discovery (no `kmgraph:` namespace) may collide with user personal skills. Deferred to v0.6.0.
+- Multi-platform skill name collision risk: **addressed in v0.6.0** via `kmg-` prefix normalization (all skill/command names prefixed — bare-name collision eliminated).
 - Pure conversational planning enforcement: when a model answers a planning question WITHOUT invoking any skill at all, no hook fires. This is an architecture-level limitation — hooks only fire on Skill tool invocations.
