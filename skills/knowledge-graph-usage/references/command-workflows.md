@@ -627,11 +627,13 @@ Mental checklist:
 
 ```bash
 # Extract chat history from recent sessions
-/kmgraph:extract-chat
+/kmgraph:extract-chat              # Claude + Gemini
+/kmgraph:extract-chat --source codex   # Codex CLI only
 
 # Processes:
 # - Claude chat logs (if available)
 # - Gemini conversation logs
+# - Codex CLI sessions (--source codex required)
 # - Saves to docs/chat-history/
 ```
 
