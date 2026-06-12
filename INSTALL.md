@@ -247,6 +247,7 @@ done
 | **v0.5.10** | No upgrade action required. `start-issue-tracking` Step 1.2 improved UX and `continues_from` handoff field are automatic after plugin reload. |
 | **v0.5.10.1** | No upgrade action required. Session summary operational sections, zone structure, one-file-per-day enforcement, and reduced handoff package are automatic after plugin reload. Run `/reload-plugins` to activate. Note: `--skip-sessions` flag for `/kmgraph:handoff` has been removed (SESSION-COMPILATION no longer generated). |
 | **v0.5.10.2** | Codex CLI marketplace support added — no upgrade action required for existing Claude Code installs. Codex users: run `codex plugin marketplace add technomensch/knowledge-graph` then `codex plugin add kmgraph@knowledge-management-graph`. Security: `shell-quote` dependency pinned to `>=1.8.4` automatically on `npm install`. |
+| **v0.5.10.3–v0.5.10.5** | No upgrade action required. Bug fixes and improvements are automatic after plugin reload. |
 
 After the wizard completes, your existing lessons, ADRs, sessions, and chat history are untouched.
 
