@@ -23,6 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Not included in `--source all` yet — use `--source codex` explicitly until cross-platform date semantics validated
 - Implements ENH-024
 
+### Docs
+- **Docs-Impact-Scan Guide** — New `docs/pillars/tailoring/docs-impact-scan.md` documents the 8-step pre-push workflow that scans git diffs, discovers affected documentation, and dispatches updates. Previously undocumented except in internal ADRs; now has dedicated user-facing guide. See ADR-052.
+
 ## [0.5.10.4] — 2026-06-12
 
 ### Fixed
@@ -106,7 +109,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **issue-5 (#124):** `start-issue-tracking` Step 5 now calls `gh issue create` (Step 5.0) before branch creation. Returned issue URL is parsed for the issue number, which is written back to spec frontmatter (`github-issue` field). Draft PR is updated to include `Closes #N`. Previously, `github-issue` was always `null` or `"TBD"` — every ENH and issue since `v0.0.5-alpha` was unsynced to GitHub.
-- **issue-6 (#125):** `plan-rules.md` false "blocking gate" claim corrected — post-plan validation checklist hook is advisory only (PostToolUse cannot block in Claude Code). `scripts/post-plan-validate-checklist.sh` header updated to clarify advisory intent. Blocking enforcement deferred to v0.6.0 per ENH-015 Gap 2. (User-local `~/.kmgraph/plan-rules.md` fix only — no behavior change for marketplace users.)
+- **issue-6 (#125):** `plan-rules.md` false "blocking gate" claim corrected — post-plan validation checklist hook is advisory only (PostToolUse cannot block in Claude Code). `scripts/post-plan-validate-checklist.sh` header updated to clarify advisory intent. Blocking enforcement deferred to v0.7.0 per ENH-015 Gap 2. (User-local `~/.kmgraph/plan-rules.md` fix only — no behavior change for marketplace users.)
 
 ### Related
 - ADR-024, ADR-043, ADR-049, ENH-015, ENH-017
@@ -132,7 +135,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `core/rules-registry/review-audit-protocol.md`, `core/templates/.../governance-rules.md`, `~/.kmgraph/governance-rules.md`, `scripts/pre-skill-rules-inject.sh`: HALT ambiguity — Step 4 was interpreted as stop-per-finding with bare "proceed?"; clarified to ONE halt after complete audit trail; decision blocks now require finding description, severity, recommended action, and decision options
 
 ### Knowledge Graph
-- issue-7: Bash permission prompt UX bug tracked — solution designed for v0.6.0 (`knowledge/issues/issue-7/`)
+- issue-7: Bash permission prompt UX bug tracked — solution designed for v0.7.0 (`knowledge/issues/issue-7/`)
 - ADR-049: Review Audit Protocol — Post-Plan/Pre-Push Review Governance (Accepted; branch updated to `v0.5.9.1-review-audit-protocol`)
 - ENH-019 spec committed (deferred, no implementation in this release)
 
@@ -265,7 +268,7 @@ Closes #38, #39, #40, #41, #42, #43, #44, #45, #46, #47, #48, #49, #50, #51, #52
 ### Added
 
 - **Shared `ai-model-tier-resolver` module** — `commands/init-shared/ai-model-tier-resolver.md` is the single source of truth for all tier resolution logic (Steps R-1 through R-4). Eliminates 4-way duplication across dispatchers.
-- **Backwards-compat alias map (S4)** — Legacy model names (Haiku, Sonnet, Opus, Gemini Flash/Pro/Ultra) resolve to tier labels with a once-per-session deprecation warning. Aliases sunset in v0.6.0.
+- **Backwards-compat alias map (S4)** — Legacy model names (Haiku, Sonnet, Opus, Gemini Flash/Pro/Ultra) resolve to tier labels with a once-per-session deprecation warning. Aliases sunset in v0.7.0.
 - **Validation gate (S5)** — Step R-4 warns on suspicious model ID values at dispatcher resolution time only; never fires from file scanning. Continues rather than halts.
 - **Project-level model overrides in `me.md`** — A `platforms[]` block can now be added to `knowledge/me.md` to override which AI models are used for this project, independent of personal defaults in `~/.kmgraph/me.md`.
 - **`create-adr` now records where and when decisions were implemented** — The wizard automatically captures the commit and subject line at the time the ADR is created, giving every accepted decision a traceable link back to the implementation. For design-first ADRs (not yet implemented), the wizard adds a back-fill reminder to the ADR.

@@ -7,7 +7,7 @@ branch: v0.5.9.1-review-audit-protocol
 created: 2026-05-28
 related-adrs: [ADR-049]
 related-enhs: [ENH-020]
-target-release: v0.6.0
+target-release: v0.7.0
 ---
 
 # Issue-7: Bash Permission Prompt Provides No Context — Indistinguishable from Review Audit HALT
