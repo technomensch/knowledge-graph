@@ -17,6 +17,7 @@ KMGraph ships with sensible defaults. This pillar covers how to adjust hooks, te
 - [Customize Templates](./customize-templates.md) — overriding default lesson and ADR templates
 - [Customize Hooks](./customize-hooks.md) — adding or modifying SessionStart, PostToolUse, and Stop hooks
 - [Automation Layer](./automation-layer.md) — understanding what runs automatically and why
+- [Docs Impact Scan](./docs-impact-scan.md) — how the pre-push skill discovers and updates affected docs before every push
 
 ## Related
 

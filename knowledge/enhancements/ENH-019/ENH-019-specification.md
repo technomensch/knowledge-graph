@@ -5,7 +5,7 @@ status: deferred
 github-issue: "TBD"
 branch: "none"
 created: 2026-05-27
-target-release: "TBD (consider for v0.6.0)"
+target-release: "TBD (consider for v0.7.0)"
 ---
 
 # ENH-019: kmgraph Usage Analytics & Stats Dashboard
@@ -53,7 +53,7 @@ Potential candidates (to be validated against real usage — see Research Guidan
 
 ## Research Guidance for Brainstorm Session
 
-**Before the brainstorm session, run `/kmgraph:kg-recall` to search prior chat history for:**
+**Before the brainstorm session, run `/kmgraph:kmg-auto-recall` to search prior chat history for:**
 - Sessions where users asked "what have I captured", "how much have I used this", or similar introspective questions
 - Any feedback about visibility into kmgraph activity
 - Real examples of what information users wanted but couldn't get
@@ -65,15 +65,15 @@ Search queries to use:
 
 These real-world examples should drive which stats fields are prioritized.
 
-## Relation to v0.6.0
+## Relation to v0.7.0
 
-This ENH was identified during v0.5.9 work. Before committing to include it in v0.6.0:
+This ENH was identified during v0.5.9 work. v0.6.0 is reserved for `kmg-` prefix normalization. Before committing to include it in v0.7.0:
 
-1. Review `docs/plans/v0.6.0-multi-platform-expansion.md` — the primary 0.6.0 plan — to assess fit.
-2. The multi-platform focus of 0.6.0 (8 platforms, npm publish, marketplace submissions) means this feature would need to work cross-platform from day one if shipped in that release.
+1. Review `docs/plans/v0.7.0-multi-platform-expansion.md` — the primary 0.7.0 plan — to assess fit.
+2. The multi-platform focus of 0.7.0 (8 platforms, npm publish, marketplace submissions) means this feature would need to work cross-platform from day one if shipped in that release.
 3. Cross-platform stats require the storage/capture questions above to be answered first.
 
-**Recommendation:** Hold this ENH until after the 0.6.0 brainstorm session. If the brainstorm concludes the implementation is lightweight and platform-agnostic, it can be folded in. If not, target 0.6.1 or later.
+**Recommendation:** Hold this ENH until after the 0.7.0 brainstorm session. If the brainstorm concludes the implementation is lightweight and platform-agnostic, it can be folded in. If not, target 0.7.1 or later.
 
 ## Files
 
