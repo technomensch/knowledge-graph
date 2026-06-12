@@ -58,7 +58,7 @@ Collapse is logged once per session. Skills may declare `required_tier: <label>`
 
 ### Backwards Compatibility Alias Map
 
-During Phase 2 rollout, the resolver accepts legacy model names as aliases and emits a once-per-session deprecation warning. Aliases are removed in v0.6.0. A sed pass converts repo-owned references; aliases are the safety net for user-owned content we cannot rewrite.
+During Phase 2 rollout, the resolver accepts legacy model names as aliases and emits a once-per-session deprecation warning. Aliases are removed in v0.7.0. A sed pass converts repo-owned references; aliases are the safety net for user-owned content we cannot rewrite.
 
 | Legacy name | Resolves to |
 |---|---|
@@ -111,7 +111,7 @@ Tier labels are platform-neutral vocabulary that any LLM ecosystem supports. Map
 
 **Negative:**
 - Phase 2 rename pass required across all rules, skills, commands
-- Backwards compat alias map adds resolver complexity (temporary, sunset v0.6.0)
+- Backwards compat alias map adds resolver complexity (temporary, sunset v0.7.0)
 - Users must run init walkthrough to configure tier mappings for local platforms
 
 ---
@@ -147,7 +147,7 @@ Tier labels are platform-neutral vocabulary that any LLM ecosystem supports. Map
 
 **DRY consolidation:** The 4 dispatchers that had inline tier-resolution paragraphs (session-summary, create-adr, capture-lesson, sync-all) now reference ai-model-tier-resolver.md. Single source of truth for all resolution logic.
 
-**Status:** Alias map and validation gate are fully implemented. Sunset scheduled for v0.6.0 (alias removal + resolver cleanup).
+**Status:** Alias map and validation gate are fully implemented. Sunset scheduled for v0.7.0 (alias removal + resolver cleanup). v0.6.0 is reserved for kmg-prefix normalization.
 
 ### 2026-04-21 — Phase 3 Opus Review Remediations Applied
 
