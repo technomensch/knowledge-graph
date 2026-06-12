@@ -65,6 +65,7 @@ export function registerConfigTools(server: McpServer): void {
         "decisions",
         "sessions",
         "chat-history",
+        "tmp",
       ];
       for (const dir of dirs) {
         fs.mkdirSync(path.join(expandedPath, dir), { recursive: true });
@@ -90,10 +91,9 @@ export function registerConfigTools(server: McpServer): void {
           "concepts.md",
           "architecture.md",
           "workflows.md",
-          "index.md",
         ];
         for (const t of knowledgeTemplates) {
-          const src = path.join(templateSrc, "knowledge", t);
+          const src = path.join(templateSrc, "knowledge", "templates", t);
           const dest = path.join(expandedPath, "knowledge", t);
           if (fs.existsSync(src) && !fs.existsSync(dest)) {
             fs.copyFileSync(src, dest);
@@ -127,6 +127,23 @@ export function registerConfigTools(server: McpServer): void {
         const sessDest = path.join(expandedPath, "sessions", "session-template.md");
         if (fs.existsSync(sessSrc) && !fs.existsSync(sessDest)) {
           fs.copyFileSync(sessSrc, sessDest);
+        }
+
+        // Copy root scaffold files (me.md, rules.md, kg-index.md, triggers.md)
+        const rootScaffolds = ["me.md", "rules.md", "kg-index.md", "triggers.md"];
+        for (const f of rootScaffolds) {
+          const src = path.join(templateSrc, "knowledge", f);
+          const dest = path.join(expandedPath, f);
+          if (fs.existsSync(src) && !fs.existsSync(dest)) {
+            fs.copyFileSync(src, dest);
+          }
+        }
+
+        // Copy kg-category-index.md to knowledge/ subdir
+        const catIndexSrc = path.join(templateSrc, "knowledge", "kg-category-index.md");
+        const catIndexDest = path.join(expandedPath, "knowledge", "kg-category-index.md");
+        if (fs.existsSync(catIndexSrc) && !fs.existsSync(catIndexDest)) {
+          fs.copyFileSync(catIndexSrc, catIndexDest);
         }
       }
 
