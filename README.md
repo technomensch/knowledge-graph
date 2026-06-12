@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.5.10.3
+**Version:** 0.5.10.5
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -74,7 +74,7 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 - `/kmgraph:switch` — Change active knowledge graph
 - `/kmgraph:check-sensitive` — Scan knowledge graph for potentially sensitive information
 - `/kmgraph:config-sanitization` — Interactive wizard for pre-commit hook setup
-- `/kmgraph:extract-chat` — Extract chat history from Claude and Gemini logs
+- `/kmgraph:extract-chat` — Extract chat history from Claude, Gemini, and Codex CLI logs (`--source codex` for Codex sessions)
 - `/kmgraph:update-doc` — Update plugin/project documentation (`--user-facing`) or KG content
 - `/kmgraph:init-personal-kg` — Initialize a personal knowledge graph at `~/.kmgraph/` shared across all projects
 
@@ -90,6 +90,10 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 ---
 
 ## v0.5.x Feature Highlights
+
+**v0.5.10.5 — 2026-06-12**
+
+- **`extract-chat` adds Codex CLI source** — `/kmgraph:extract-chat` now accepts `--source codex` to extract chat history from Codex CLI sessions. Pass `--source codex` (or omit `--source` and select Codex from the interactive prompt) to index Codex conversation logs alongside existing Claude and Gemini sources.
 
 **v0.5.10.3 — 2026-06-11**
 
@@ -122,7 +126,7 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 - **Decision governance protocol enforced at hook level** — `pre-skill-rules-inject.sh` now hard-blocks brainstorming and planning without a prior knowledge-graph recall. Two recall queries are required before any plan is written (topic + architectural domain). Recall misses are logged to `/tmp/kmgraph-recall-miss-*.log` for audit. Remote-session compatibility: embedded-rules block is written directly into plan files so Ultraplan and other non-hook contexts carry the enforcement.
 - **New `brainstorm-recall` skill** — Fires before `adr-guide` and invokes `kmgraph:recall` before any recommendation. Results appear under a "Prior Art" heading so past decisions surface before new ones are made.
 - **`gov-execute-plan` cascade gate** — When a new ADR is captured mid-session, execution is paused before the next plan task so the user can review cascade impact. ADR flag is day-scoped and cleaned at branch finish.
-- **Chat-history now searchable** — `mcp-server/src/tools/fts5.ts` adds `chat-history` to `searchDirs`; exported chat logs are indexed and reachable via `kg_search`.
+- **Chat-history now searchable** — `mcp-server/src/tools/fts5.ts` adds `chat-history` to `searchDirs`; exported chat logs (Claude, Gemini, Codex CLI) are indexed and reachable via `kg_search`.
 - **Session-documenter Relay Contract** — Draft session summaries are now displayed verbatim before save/edit/cancel options. No silent summarization.
 - **Post-plan validation checklist** — A PostToolUse:Write hook fires after any `plans/*.md` write and outputs an advisory validation checklist.
 - **Canonical rules registry** — `core/rules-registry/` stores authoritative rule text; all deployment surfaces (templates, profile files) copy from here.
@@ -244,7 +248,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.5.10.3 (2026-06-11)
+**Current Release:** v0.5.10.5 (2026-06-12)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -346,6 +350,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.5.10.3 (2026-06-11)
+**Current Version:** v0.5.10.5 (2026-06-12)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info
