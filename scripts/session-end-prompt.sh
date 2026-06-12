@@ -4,6 +4,9 @@
 
 CONFIG_PATH="$HOME/.claude/kg-config.json"
 
+# Emit JSON on every exit — required by Codex CLI Stop hook parser on all exit paths
+trap 'echo "{\"decision\": \"continue\"}"' EXIT
+
 # Color codes
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
@@ -164,9 +167,5 @@ fi
 
 # Create session flag to avoid double-prompting
 touch "$FLAG_PATH"
-
-# Output JSON to stdout — required by Codex CLI Stop hook parser
-# Claude Code reads this as context; human output above is visible via stderr
-echo '{"decision": "continue"}'
 
 exit 0
