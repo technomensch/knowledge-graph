@@ -94,7 +94,7 @@ Want me to configure all of them?
 
 | Platform | File | Content source |
 |---|---|---|
-| Gemini CLI | `GEMINI.md` in project root | `${CLAUDE_PLUGIN_ROOT}/core/templates/AGENTS-template.md` |
+| Gemini CLI | `GEMINI.md` in project root | `${CLAUDE_PLUGIN_ROOT}/core/default-templates/AGENTS-template.md` |
 | Cursor | `.cursorrules` | Project conventions + KMGraph behaviors subset |
 | Windsurf | `.windsurfrules` | Same as `.cursorrules` |
 | Continue.dev | `.continue/config.json` prompt section | KMGraph behaviors subset |
@@ -111,7 +111,7 @@ For each approved platform:
 
 **Writing Gemini CLI (`GEMINI.md`):**
 ```
-Action: Read ${CLAUDE_PLUGIN_ROOT}/core/templates/AGENTS-template.md
+Action: Read ${CLAUDE_PLUGIN_ROOT}/core/default-templates/AGENTS-template.md
 Action: Write contents to GEMINI.md in the current project root
 ```
 

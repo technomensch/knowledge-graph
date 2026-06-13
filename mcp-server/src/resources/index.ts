@@ -51,21 +51,21 @@ export function registerConfigResource(server: McpServer): void {
 }
 
 /**
- * kg://templates/{name} — Exposes template files from core/templates/.
+ * kg://templates/{name} — Exposes template files from core/default-templates/.
  * Clients can discover available templates and read their contents.
  * Template names map to paths:
- *   "lesson"          → core/templates/lessons-learned/lesson-template.md
- *   "adr"             → core/templates/decisions/ADR-template.md
- *   "session"         → core/templates/sessions/session-template.md
- *   "memory"          → core/templates/MEMORY-template.md
- *   "patterns"        → core/templates/knowledge/patterns.md
- *   "gotchas"         → core/templates/knowledge/gotchas.md
- *   "concepts"        → core/templates/knowledge/concepts.md
- *   "architecture"    → core/templates/knowledge/architecture.md
- *   "workflows"       → core/templates/knowledge/workflows.md
- *   "index"           → core/templates/knowledge/index.md
- *   "entry"           → core/templates/knowledge/entry-template.md
- *   "meta-issue"      → core/templates/meta-issue/README.md
+ *   "lesson"          → core/default-templates/lessons-learned/lesson-template.md
+ *   "adr"             → core/default-templates/decisions/ADR-template.md
+ *   "session"         → core/default-templates/sessions/session-template.md
+ *   "memory"          → core/default-templates/MEMORY-template.md
+ *   "patterns"        → core/default-templates/knowledge/patterns.md
+ *   "gotchas"         → core/default-templates/knowledge/gotchas.md
+ *   "concepts"        → core/default-templates/knowledge/concepts.md
+ *   "architecture"    → core/default-templates/knowledge/architecture.md
+ *   "workflows"       → core/default-templates/knowledge/workflows.md
+ *   "index"           → core/default-templates/knowledge/index.md
+ *   "entry"           → core/default-templates/knowledge/entry-template.md
+ *   "meta-issue"      → core/default-templates/meta-issue/README.md
  */
 
 interface TemplateMapping {
@@ -75,71 +75,71 @@ interface TemplateMapping {
 
 const TEMPLATE_MAP: Record<string, TemplateMapping> = {
   lesson: {
-    path: "core/templates/lessons-learned/lesson-template.md",
+    path: "core/default-templates/lessons-learned/lesson-template.md",
     description: "Lesson-learned template with git metadata frontmatter",
   },
   adr: {
-    path: "core/templates/decisions/ADR-template.md",
+    path: "core/default-templates/decisions/ADR-template.md",
     description: "Architecture Decision Record template",
   },
   session: {
-    path: "core/templates/sessions/session-template.md",
+    path: "core/default-templates/sessions/session-template.md",
     description: "Session summary template",
   },
   memory: {
-    path: "core/templates/MEMORY-template.md",
+    path: "core/default-templates/MEMORY-template.md",
     description: "Starter MEMORY.md template for new projects",
   },
   patterns: {
-    path: "core/templates/knowledge/patterns.md",
+    path: "core/default-templates/knowledge/patterns.md",
     description: "Knowledge graph patterns template",
   },
   gotchas: {
-    path: "core/templates/knowledge/gotchas.md",
+    path: "core/default-templates/knowledge/gotchas.md",
     description: "Knowledge graph gotchas template",
   },
   concepts: {
-    path: "core/templates/knowledge/concepts.md",
+    path: "core/default-templates/knowledge/concepts.md",
     description: "Knowledge graph concepts template",
   },
   architecture: {
-    path: "core/templates/knowledge/architecture.md",
+    path: "core/default-templates/knowledge/architecture.md",
     description: "Knowledge graph architecture template",
   },
   workflows: {
-    path: "core/templates/knowledge/workflows.md",
+    path: "core/default-templates/knowledge/workflows.md",
     description: "Knowledge graph workflows template",
   },
   index: {
-    path: "core/templates/knowledge/index.md",
+    path: "core/default-templates/knowledge/index.md",
     description: "Knowledge graph master navigation hub template",
   },
   entry: {
-    path: "core/templates/knowledge/entry-template.md",
+    path: "core/default-templates/knowledge/entry-template.md",
     description: "Template for new KG entries",
   },
   "meta-issue": {
-    path: "core/templates/meta-issue/README.md",
+    path: "core/default-templates/meta-issue/README.md",
     description: "Meta-issue navigation hub template",
   },
   "meta-issue-description": {
-    path: "core/templates/meta-issue/description.md",
+    path: "core/default-templates/meta-issue/description.md",
     description: "Meta-issue living document template",
   },
   "meta-issue-log": {
-    path: "core/templates/meta-issue/implementation-log.md",
+    path: "core/default-templates/meta-issue/implementation-log.md",
     description: "Meta-issue attempt timeline template",
   },
   "meta-issue-tests": {
-    path: "core/templates/meta-issue/test-cases.md",
+    path: "core/default-templates/meta-issue/test-cases.md",
     description: "Meta-issue validation criteria template",
   },
   "lessons-readme": {
-    path: "core/templates/lessons-learned/README.md",
+    path: "core/default-templates/lessons-learned/README.md",
     description: "Lessons-learned master index template",
   },
   "decisions-readme": {
-    path: "core/templates/decisions/README.md",
+    path: "core/default-templates/decisions/README.md",
     description: "ADR index template",
   },
 };

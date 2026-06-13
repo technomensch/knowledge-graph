@@ -133,7 +133,7 @@ When deploying `me.md` to the personal KG, strip the "See also: ~/.kmgraph/me.md
 After `template-seed.md` completes, also scaffold `triggers.md` if it does not already exist:
 
 ```bash
-[ -f "{KG_PATH}/triggers.md" ] || cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/user/triggers.md" "{KG_PATH}/triggers.md"
+[ -f "{KG_PATH}/triggers.md" ] || cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/knowledge/templates/user/triggers.md" "{KG_PATH}/triggers.md"
 echo "✅ triggers.md scaffolded at {KG_PATH}/triggers.md"
 ```
 

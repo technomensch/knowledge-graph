@@ -248,7 +248,7 @@ Current ADRs: [count]
 ⚠️ These directories require explicit user permission before modification:
 
 - **commands/** — LLM execution prompts; changes break slash command functionality
-- **core/templates/** — Structured formats with YAML frontmatter for parsing
+- **core/default-templates/** — Structured formats with YAML frontmatter for parsing
 
 Allowed modifications without permission:
 - Documentation files (*.md)
@@ -344,7 +344,7 @@ knowledge-graph/
 
 **🔒 PROTECTED DIRECTORIES** (require explicit permission):
 - **commands/** — Contains LLM execution prompts; changes break slash commands
-- **core/templates/** — Structured YAML formats; changes break parsing
+- **core/default-templates/** — Structured YAML formats; changes break parsing
 
 **✅ Allowed Modifications** (no permission needed):
 - Documentation files (*.md)

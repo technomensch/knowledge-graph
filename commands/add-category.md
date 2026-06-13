@@ -46,7 +46,7 @@ mkdir -p "$kg_path/lessons-learned/$category"
 
 ```bash
 if [ ! -f "$kg_path/knowledge/${category}.md" ]; then
-  cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/entry-template.md" \
+  cp "${CLAUDE_PLUGIN_ROOT}/core/default-templates/knowledge/entry-template.md" \
      "$kg_path/knowledge/${category}.md"
 fi
 ```

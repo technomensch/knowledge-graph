@@ -337,7 +337,7 @@ Proceed? (yes / change details / cancel)
 **Read the base template:**
 
 ```
-Action: Read ${CLAUDE_PLUGIN_ROOT}/core/templates/decisions/ADR-template.md
+Action: Read ${CLAUDE_PLUGIN_ROOT}/core/default-templates/decisions/ADR-template.md
 ```
 
 **Populate template with gathered data, replacing all placeholder fields:**
@@ -482,7 +482,7 @@ Let me ask a few questions:
 - [ ] Context, decision, rationale, and consequences gathered
 - [ ] Filename follows `ADR-{NNN}-{slug}.md` pattern
 - [ ] User confirmed summary before file creation
-- [ ] Template read from `core/templates/decisions/ADR-template.md`
+- [ ] Template read from `core/default-templates/decisions/ADR-template.md`
 - [ ] YAML frontmatter fully populated (all `[FUTURE-AUTO]` fields filled)
 - [ ] All template placeholder text replaced with actual content
 - [ ] `decisions/README.md` total count updated

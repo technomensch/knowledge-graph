@@ -94,7 +94,7 @@ WIKI_DONE=$(jq -r '.graphs["{kg_name}"].wiki_pass_complete // false' ~/.claude/k
 [ "$WIKI_DONE" != "true" ] && \
   upgrades+=("Wiki pass available: convert bare ADR-NNN, ENH-NNN, #NNN, and lesson filename references to [[wiki links]] across knowledge files")
 
-# New templates (files in plugin core/templates not yet in KG)
+# New templates (files in plugin core/default-templates not yet in KG)
 # IMPORTANT: The following filenames must NEVER be added to upgrades[] by this loop,
 # regardless of whether they exist at the template destination path.
 # They are handled by dedicated scaffold checks above (section h) with interactive flows.
@@ -106,7 +106,7 @@ WIKI_DONE=$(jq -r '.graphs["{kg_name}"].wiki_pass_complete // false' ~/.claude/k
 #   index-personal.md — personal KG only, handled separately
 scaffold_covered=("kg-index.md" "me.md" "rules.md" "index-personal.md" "triggers.md")
 for tdir in knowledge lessons-learned decisions sessions; do
-  for template in "${CLAUDE_PLUGIN_ROOT}/core/templates/$tdir/"*; do
+  for template in "${CLAUDE_PLUGIN_ROOT}/core/default-templates/$tdir/"*; do
     tname=$(basename "$template")
     skip=false
     for covered in "${scaffold_covered[@]}"; do
@@ -183,12 +183,12 @@ For each item in `upgrades[]`, show a preview entry:
 - **Section h (scaffold missing root files):** for each missing file, show the source template path and destination:
   ```
   [preview] Would seed: me.md
-    Source: ${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/project/me.md
+    Source: ${CLAUDE_PLUGIN_ROOT}/core/default-templates/knowledge/templates/project/me.md
     Dest:   {KG_PATH}/me.md
     Note:   gitignored — fill in your identity after seeding
 
   [preview] Would seed: rules.md
-    Source: ${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/project/rules.md
+    Source: ${CLAUDE_PLUGIN_ROOT}/core/default-templates/knowledge/templates/project/rules.md
     Dest:   {KG_PATH}/rules.md
     Note:   fill in your project conventions after seeding
   ```
@@ -287,7 +287,7 @@ template_dirs=("knowledge/templates" "lessons-learned" "decisions" "sessions")
 updates_available=()
 
 for tdir in "${template_dirs[@]}"; do
-  for template in "${CLAUDE_PLUGIN_ROOT}/core/templates/$tdir/"*; do
+  for template in "${CLAUDE_PLUGIN_ROOT}/core/default-templates/$tdir/"*; do
     dest="{KG_PATH}/$tdir/$(basename $template)"
     if [ -f "$dest" ]; then
       if ! diff -q "$template" "$dest" > /dev/null 2>&1; then
@@ -798,10 +798,10 @@ Options:
    echo "✅ Archived rules.md → $ARCHIVE_DIR/rules.md"
    ```
 
-2. Prepend the defaults block (from `core/templates/knowledge/templates/project/rules.md`, extracting only the `<!-- kmgraph-defaults -->` ... `<!-- /kmgraph-defaults -->` block):
+2. Prepend the defaults block (from `core/default-templates/knowledge/templates/project/rules.md`, extracting only the `<!-- kmgraph-defaults -->` ... `<!-- /kmgraph-defaults -->` block):
    ```bash
    DEFAULTS_BLOCK=$(awk '/<!-- kmgraph-defaults -->/{found=1} found{print} /<!-- \/kmgraph-defaults -->/{exit}' \
-     "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/project/rules.md")
+     "${CLAUDE_PLUGIN_ROOT}/core/default-templates/knowledge/templates/project/rules.md")
    printf '%s\n\n' "$DEFAULTS_BLOCK" | cat - "{KG_PATH}/rules.md" > /tmp/rules-patched.md
    mv /tmp/rules-patched.md "{KG_PATH}/rules.md"
    echo "✅ kmgraph-defaults block prepended to rules.md"

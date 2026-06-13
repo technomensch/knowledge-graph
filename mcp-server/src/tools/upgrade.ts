@@ -99,7 +99,7 @@ function checkConfig(kgPath: string): UpgradeItem[] {
 }
 
 /**
- * Check c — compare core/templates files against deployed KG files.
+ * Check c — compare core/default-templates files against deployed KG files.
  * Returns items for files that differ or are missing.
  */
 function checkTemplates(kgPath: string): UpgradeItem[] {

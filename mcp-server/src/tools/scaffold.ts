@@ -13,7 +13,7 @@ export function registerScaffoldTool(server: McpServer): void {
       template: z
         .string()
         .describe(
-          "Template path relative to core/templates/ (e.g., 'lessons-learned/lesson-template.md')"
+          "Template path relative to core/default-templates/ (e.g., 'lessons-learned/lesson-template.md')"
         ),
       variables: z
         .record(z.string(), z.string())
