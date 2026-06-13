@@ -69,6 +69,22 @@ codex plugin add kmgraph@knowledge-management-graph
 This resolves issues where tools are out of date or skills don't appear after an update.
 
 :::
+
+:::note[Node/PATH requirement]
+
+kmgraph hook scripts require `node` to be on the PATH visible to the Codex process. If hooks silently fail after install, confirm `node` is accessible from the shell that launches Codex — not just your login shell.
+
+- **nvm users:** source `nvm` before launching Codex, or add it to your shell's `rc` file so it loads for non-login shells
+- **fnm / volta users:** these work reliably when their shims are on the system PATH (default install)
+- **Homebrew / system Node:** typically works without changes
+
+:::
+
+:::note[Hook trust required]
+
+Codex skips plugin-bundled hooks until you explicitly trust them. After install, run `/hooks` inside a Codex session to review and trust the kmgraph hook definitions. New or modified hooks must be re-trusted whenever the hook file changes.
+
+:::
 ---
 
 :::note[Not using Claude Code?]
