@@ -123,7 +123,6 @@ _starters_to_move=()
 [ -f "{KG_PATH}/lessons-learned/lesson-template.md" ] && _starters_to_move+=("lessons-learned/lesson-template.md")
 [ -f "{KG_PATH}/decisions/ADR-template.md" ]          && _starters_to_move+=("decisions/ADR-template.md")
 [ -f "{KG_PATH}/sessions/session-template.md" ]       && _starters_to_move+=("sessions/session-template.md")
-[ -f "{KG_PATH}/knowledge/entry-template.md" ]        && _starters_to_move+=("knowledge/entry-template.md")
 if [ ${#_starters_to_move[@]} -gt 0 ]; then
   upgrades+=("starter-relocation|Move ${#_starters_to_move[@]} starter(s) from live dirs → knowledge/templates/|${_starters_to_move[*]}")
 fi
@@ -135,6 +134,7 @@ if [ -d "{KG_PATH}/knowledge/knowledge" ]; then
     [ -f "$_kf" ] || continue
     _fname=$(basename "$_kf")
     _src="${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/${_fname}"
+    [ -f "$_src" ] || _src="${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/${_fname}"
     if [ ! -f "$_src" ] || ! diff -q "$_kf" "$_src" > /dev/null 2>&1; then
       _modified_kk+=("$_fname")
     fi
@@ -900,8 +900,14 @@ if [ ${#_starters_to_move[@]} -gt 0 ]; then
   mkdir -p "${ARCHIVE_DIR}/starters" "{KG_PATH}/knowledge/templates"
   echo "{\"archived_at\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"trigger\":\"starter-relocation\"}" > "${ARCHIVE_DIR}/manifest.json"
   for _f in "${_starters_to_move[@]}"; do
+    _dest="{KG_PATH}/knowledge/templates/$(basename "${_f}")"
     cp "{KG_PATH}/${_f}" "${ARCHIVE_DIR}/starters/$(basename "${_f}")"
-    mv "{KG_PATH}/${_f}" "{KG_PATH}/knowledge/templates/$(basename "${_f}")"
+    if [ ! -f "$_dest" ]; then
+      mv "{KG_PATH}/${_f}" "$_dest"
+    else
+      rm "{KG_PATH}/${_f}"
+      echo "  Note: $(basename ${_f}) already in knowledge/templates/ — removed live-dir copy"
+    fi
   done
   echo "✓ Starters relocated to knowledge/templates/ (archive: ${ARCHIVE_DIR})"
 fi
@@ -922,7 +928,7 @@ fi
 **Apply — unmodified starters (auto-merge):**
 
 ```bash
-if _match_upgrade "knowledge-knowledge-merge"; then
+if [[ " ${upgrades[*]} " =~ "knowledge-knowledge-merge" ]]; then
   ARCHIVE_DIR="{KG_PATH}/.kg-archive-$(date +%Y%m%d-%H%M%S)"
   mkdir -p "${ARCHIVE_DIR}/knowledge-knowledge" "{KG_PATH}/knowledge/concepts"
   cp -r "{KG_PATH}/knowledge/knowledge/." "${ARCHIVE_DIR}/knowledge-knowledge/"
@@ -936,7 +942,11 @@ fi
 **Apply — modified files (warn only):**
 
 ```bash
-if _match_upgrade "knowledge-knowledge-modified"; then
+if [[ " ${upgrades[*]} " =~ "knowledge-knowledge-modified" ]]; then
+  ARCHIVE_DIR="{KG_PATH}/.kg-archive-$(date +%Y%m%d-%H%M%S)"
+  mkdir -p "${ARCHIVE_DIR}/knowledge-knowledge"
+  cp -r "{KG_PATH}/knowledge/knowledge/." "${ARCHIVE_DIR}/knowledge-knowledge/"
+  echo "{\"archived_at\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"trigger\":\"knowledge-knowledge-modified\"}" > "${ARCHIVE_DIR}/manifest.json"
   echo "⚠️  knowledge/knowledge/ contains modified files: ${_modified_kk[*]}"
   echo "    Archived to ${ARCHIVE_DIR}. Review and move into knowledge/concepts/ manually."
 fi

@@ -61,7 +61,10 @@ template_dirs=("knowledge/templates" "lessons-learned" "decisions" "sessions")
 updates_available=()
 
 for tdir in "${template_dirs[@]}"; do
-  for template in "{CLAUDE_PLUGIN_ROOT}/core/default-templates/$tdir/"*; do
+  # knowledge/templates deploy dir maps to concepts/templates/ in plugin source (renamed in v0.5.10.7)
+  _src_tdir="${tdir}"
+  [ "${tdir}" = "knowledge/templates" ] && _src_tdir="concepts/templates"
+  for template in "{CLAUDE_PLUGIN_ROOT}/core/default-templates/${_src_tdir}/"*; do
     dest="{KG_PATH}/$tdir/$(basename $template)"
     if [ -f "$dest" ]; then
       if ! diff -q "$template" "$dest" > /dev/null 2>&1; then
