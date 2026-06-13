@@ -32397,31 +32397,31 @@ var init_resources = __esm({
         description: "Starter MEMORY.md template for new projects"
       },
       patterns: {
-        path: "core/default-templates/knowledge/patterns.md",
+        path: "core/default-templates/concepts/patterns.md",
         description: "Knowledge graph patterns template"
       },
       gotchas: {
-        path: "core/default-templates/knowledge/gotchas.md",
+        path: "core/default-templates/concepts/gotchas.md",
         description: "Knowledge graph gotchas template"
       },
       concepts: {
-        path: "core/default-templates/knowledge/concepts.md",
+        path: "core/default-templates/concepts/concepts.md",
         description: "Knowledge graph concepts template"
       },
       architecture: {
-        path: "core/default-templates/knowledge/architecture.md",
+        path: "core/default-templates/concepts/architecture.md",
         description: "Knowledge graph architecture template"
       },
       workflows: {
-        path: "core/default-templates/knowledge/workflows.md",
+        path: "core/default-templates/concepts/workflows.md",
         description: "Knowledge graph workflows template"
       },
       index: {
-        path: "core/default-templates/knowledge/index.md",
+        path: "core/default-templates/concepts/index.md",
         description: "Knowledge graph master navigation hub template"
       },
       entry: {
-        path: "core/default-templates/knowledge/entry-template.md",
+        path: "core/default-templates/concepts/entry-template.md",
         description: "Template for new KG entries"
       },
       "meta-issue": {

@@ -18,31 +18,32 @@ description: Shared template seed module — non-destructive copy of core/defaul
 ```bash
 # Copy KG content templates into knowledge/templates/ subdirectory
 mkdir -p "{KG_PATH}/knowledge/templates"
-cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/knowledge/templates/patterns.md" "{KG_PATH}/knowledge/templates/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/knowledge/templates/gotchas.md" "{KG_PATH}/knowledge/templates/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/knowledge/templates/concepts.md" "{KG_PATH}/knowledge/templates/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/knowledge/templates/architecture.md" "{KG_PATH}/knowledge/templates/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/knowledge/templates/workflows.md" "{KG_PATH}/knowledge/templates/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/knowledge/kg-category-index.md" "{KG_PATH}/knowledge/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/patterns.md" "{KG_PATH}/knowledge/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/gotchas.md" "{KG_PATH}/knowledge/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/concepts.md" "{KG_PATH}/knowledge/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/architecture.md" "{KG_PATH}/knowledge/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/workflows.md" "{KG_PATH}/knowledge/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/kg-category-index.md" "{KG_PATH}/knowledge/"
 
 # Copy root-level profile files from project profile starters (skip if exists to preserve teammate copies)
 [ -f "{KG_PATH}/rules.md" ] && echo "rules.md already exists — skipping scaffold (teammate copy preserved)." || \
-  cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/knowledge/templates/project/rules.md" "{KG_PATH}/rules.md"
+  cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/project/rules.md" "{KG_PATH}/rules.md"
 [ -f "{KG_PATH}/triggers.md" ] && echo "triggers.md already exists — skipping scaffold." || \
-  cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/knowledge/templates/project/triggers.md" "{KG_PATH}/triggers.md"
+  cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/project/triggers.md" "{KG_PATH}/triggers.md"
 [ -f "{KG_PATH}/index.md" ] && echo "index.md already exists — skipping scaffold." || \
-  cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/knowledge/kg-index.md" "{KG_PATH}/index.md"
+  cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/kg-index.md" "{KG_PATH}/index.md"
 # me.md is always gitignored — safe to scaffold fresh
-cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/knowledge/templates/project/me.md" "{KG_PATH}/me.md"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/project/me.md" "{KG_PATH}/me.md"
 
-# Copy lesson/ADR templates
+# READMEs stay in their live dirs (orientation files, not starters)
 cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/lessons-learned/README.md" "{KG_PATH}/lessons-learned/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/lessons-learned/lesson-template.md" "{KG_PATH}/lessons-learned/"
 cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/decisions/README.md" "{KG_PATH}/decisions/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/decisions/ADR-template.md" "{KG_PATH}/decisions/"
 
-# Copy session template
-cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/sessions/session-template.md" "{KG_PATH}/sessions/"
+# Starter templates deploy to knowledge/templates/ (ADR-040), never into live dirs
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/lessons-learned/lesson-template.md" "{KG_PATH}/knowledge/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/decisions/ADR-template.md" "{KG_PATH}/knowledge/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/sessions/session-template.md" "{KG_PATH}/knowledge/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/entry-template.md" "{KG_PATH}/knowledge/templates/"
 
 # Copy MEMORY template if not exists
 if [ ! -f "~/.claude/projects/$(basename $(pwd))/memory/MEMORY.md" ]; then
