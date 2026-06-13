@@ -30410,7 +30410,7 @@ function registerConfigTools(server2) {
         );
       }
       const pluginRoot = getPluginRoot();
-      const templateSrc = path2.join(pluginRoot, "core", "templates");
+      const templateSrc = path2.join(pluginRoot, "core", "default-templates");
       if (fs2.existsSync(templateSrc)) {
         const knowledgeTemplates = [
           "patterns.md",
@@ -31197,9 +31197,9 @@ function registerScaffoldTool(server2) {
     },
     async ({ template, variables, outputPath }) => {
       const pluginRoot = getPluginRoot();
-      const templatePath = path5.join(pluginRoot, "core", "templates", template);
+      const templatePath = path5.join(pluginRoot, "core", "default-templates", template);
       if (!fs5.existsSync(templatePath)) {
-        const templatesDir = path5.join(pluginRoot, "core", "templates");
+        const templatesDir = path5.join(pluginRoot, "core", "default-templates");
         let available = "Template directory not found.";
         if (fs5.existsSync(templatesDir)) {
           const files = listTemplates(templatesDir, templatesDir);
@@ -31939,7 +31939,7 @@ function checkConfig(kgPath) {
 }
 function checkTemplates(kgPath) {
   const pluginRoot = getPluginRoot();
-  const templateRoot = path9.join(pluginRoot, "core", "templates");
+  const templateRoot = path9.join(pluginRoot, "core", "default-templates");
   if (!fs9.existsSync(templateRoot)) return [];
   const results = [];
   const mappings = [
@@ -32067,7 +32067,7 @@ function applyConfig() {
 }
 function applyTemplates(kgPath) {
   const pluginRoot = getPluginRoot();
-  const templateRoot = path9.join(pluginRoot, "core", "templates");
+  const templateRoot = path9.join(pluginRoot, "core", "default-templates");
   if (!fs9.existsSync(templateRoot)) return "Template root not found; skipped";
   const mappings = [
     {

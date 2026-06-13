@@ -142,7 +142,7 @@ async function runInit(): Promise<void> {
 
     // 6. Copy templates from plugin
     const pluginRoot = getPluginRoot();
-    const templateSrc = path.join(pluginRoot, "core", "templates");
+    const templateSrc = path.join(pluginRoot, "core", "default-templates");
 
     let templatesCopied = 0;
     if (fs.existsSync(templateSrc)) {

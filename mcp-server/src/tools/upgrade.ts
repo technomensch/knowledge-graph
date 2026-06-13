@@ -104,7 +104,7 @@ function checkConfig(kgPath: string): UpgradeItem[] {
  */
 function checkTemplates(kgPath: string): UpgradeItem[] {
   const pluginRoot = getPluginRoot();
-  const templateRoot = path.join(pluginRoot, "core", "templates");
+  const templateRoot = path.join(pluginRoot, "core", "default-templates");
   if (!fs.existsSync(templateRoot)) return [];
 
   const results: UpgradeItem[] = [];
@@ -263,7 +263,7 @@ function applyConfig(): string {
 
 function applyTemplates(kgPath: string): string {
   const pluginRoot = getPluginRoot();
-  const templateRoot = path.join(pluginRoot, "core", "templates");
+  const templateRoot = path.join(pluginRoot, "core", "default-templates");
   if (!fs.existsSync(templateRoot)) return "Template root not found; skipped";
 
   const mappings: Array<{ templateSub: string; kgSub: string; files: string[] }> = [

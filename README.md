@@ -328,7 +328,7 @@ If `/kmgraph:command` doesn't autocomplete:
 
 ### Common Issues
 
-**Templates not found** — Ensure `core/templates/` exists and plugin loaded from correct directory
+**Templates not found** — Ensure `core/default-templates/` exists and plugin loaded from correct directory
 
 **Git metadata missing** — Commands must run from a git repository
 

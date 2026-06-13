@@ -547,21 +547,21 @@ REPO_PATH="./knowledge-graph"
 
 # Knowledge templates
 for f in patterns.md gotchas.md concepts.md architecture.md workflows.md index.md; do
-  [ -f "$REPO_PATH/core/templates/knowledge/$f" ] && cp "$REPO_PATH/core/templates/knowledge/$f" "$KG_PATH/knowledge/"
+  [ -f "$REPO_PATH/core/default-templates/knowledge/$f" ] && cp "$REPO_PATH/core/default-templates/knowledge/$f" "$KG_PATH/knowledge/"
 done
 
 # Lesson templates
 for f in README.md lesson-template.md; do
-  [ -f "$REPO_PATH/core/templates/lessons-learned/$f" ] && cp "$REPO_PATH/core/templates/lessons-learned/$f" "$KG_PATH/lessons-learned/"
+  [ -f "$REPO_PATH/core/default-templates/lessons-learned/$f" ] && cp "$REPO_PATH/core/default-templates/lessons-learned/$f" "$KG_PATH/lessons-learned/"
 done
 
 # ADR templates
 for f in README.md ADR-template.md; do
-  [ -f "$REPO_PATH/core/templates/decisions/$f" ] && cp "$REPO_PATH/core/templates/decisions/$f" "$KG_PATH/decisions/"
+  [ -f "$REPO_PATH/core/default-templates/decisions/$f" ] && cp "$REPO_PATH/core/default-templates/decisions/$f" "$KG_PATH/decisions/"
 done
 
 # Session template
-[ -f "$REPO_PATH/core/templates/sessions/session-template.md" ] && cp "$REPO_PATH/core/templates/sessions/session-template.md" "$KG_PATH/sessions/"
+[ -f "$REPO_PATH/core/default-templates/sessions/session-template.md" ] && cp "$REPO_PATH/core/default-templates/sessions/session-template.md" "$KG_PATH/sessions/"
 ```
 
 #### 2C.4: Create Configuration
@@ -835,7 +835,7 @@ See [COMMAND-GUIDE.md](docs/COMMAND-GUIDE.md) for complete command reference.
 - Run the init step again if needed
 
 **Templates not copied:**
-- Verify the repo was cloned successfully: `ls knowledge-graph/core/templates/`
+- Verify the repo was cloned successfully: `ls knowledge-graph/core/default-templates/`
 - Copy templates manually if needed
 
 ---

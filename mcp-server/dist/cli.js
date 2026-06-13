@@ -31502,7 +31502,7 @@ function registerConfigTools(server) {
         );
       }
       const pluginRoot = getPluginRoot();
-      const templateSrc = path2.join(pluginRoot, "core", "templates");
+      const templateSrc = path2.join(pluginRoot, "core", "default-templates");
       if (fs2.existsSync(templateSrc)) {
         const knowledgeTemplates = [
           "patterns.md",
@@ -32018,9 +32018,9 @@ function registerScaffoldTool(server) {
     },
     async ({ template, variables, outputPath }) => {
       const pluginRoot = getPluginRoot();
-      const templatePath = path5.join(pluginRoot, "core", "templates", template);
+      const templatePath = path5.join(pluginRoot, "core", "default-templates", template);
       if (!fs5.existsSync(templatePath)) {
-        const templatesDir = path5.join(pluginRoot, "core", "templates");
+        const templatesDir = path5.join(pluginRoot, "core", "default-templates");
         let available = "Template directory not found.";
         if (fs5.existsSync(templatesDir)) {
           const files = listTemplates(templatesDir, templatesDir);
@@ -32561,7 +32561,7 @@ async function runInit() {
       });
     }
     const pluginRoot = getPluginRoot();
-    const templateSrc = path8.join(pluginRoot, "core", "templates");
+    const templateSrc = path8.join(pluginRoot, "core", "default-templates");
     let templatesCopied = 0;
     if (fs8.existsSync(templateSrc)) {
       const knowledgeTemplates = [

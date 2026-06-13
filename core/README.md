@@ -131,11 +131,11 @@ All document types have standardized templates:
 
 | Template | Location | Use Case |
 |----------|----------|----------|
-| Lesson Learned | `core/templates/lessons-learned/` | Problem-solving journeys |
-| ADR | `core/templates/decisions/` | Architectural decisions |
-| KG Entry | `core/templates/knowledge/` | Quick-reference concepts |
-| Session Summary | `core/templates/sessions/` | Work session snapshots |
-| Meta-Issue | `core/templates/meta-issue/` | Complex multi-attempt problems |
+| Lesson Learned | `core/default-templates/lessons-learned/` | Problem-solving journeys |
+| ADR | `core/default-templates/decisions/` | Architectural decisions |
+| KG Entry | `core/default-templates/knowledge/` | Quick-reference concepts |
+| Session Summary | `core/default-templates/sessions/` | Work session snapshots |
+| Meta-Issue | `core/default-templates/meta-issue/` | Complex multi-attempt problems |
 
 See [core/docs/PATTERNS-GUIDE.md](./docs/PATTERNS-GUIDE.md) for template usage.
 
