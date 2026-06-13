@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.5.10.5
+**Version:** 0.5.10.6
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -90,6 +90,11 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 ---
 
 ## v0.5.x Feature Highlights
+
+**v0.5.10.6 — 2026-06-12**
+
+- **Codex CLI lifecycle hooks** — kmgraph hook suite now delivered to Codex CLI sessions via `.codex-plugin/hooks/hooks.json`. Hooks: SessionStart, PostToolUse (shell), PreToolUse (shell), UserPromptSubmit, Stop. Requires Codex ≥ post-PR-19705 with `plugin_hooks` flag; run `/hooks` in Codex to trust after install.
+- **Pre-push gate: README version check** — Gate 2 now also flags when the current version is missing from `README.md`, matching the existing CHANGELOG advisory.
 
 **v0.5.10.5 — 2026-06-12**
 
