@@ -98,7 +98,7 @@ Never paraphrase or summarize code blocks in `/commands/`. Command prompt text m
 
 ---
 
-### 1.5 Never modify `/commands/` or `core/templates/` without explicit permission
+### 1.5 Never modify `/commands/` or `core/default-templates/` without explicit permission
 
 These directories contain LLM execution prompts and structured parsing templates. Changes break functionality.
 
@@ -112,7 +112,7 @@ These directories contain LLM execution prompts and structured parsing templates
 
 Never write specific counts for collections that grow between releases.
 
-Apply to any reference to `commands/`, `skills/`, `agents/`, `hooks/`, `core/templates/`, `mcp-server/src/tools/`, or any directory whose contents change between releases.
+Apply to any reference to `commands/`, `skills/`, `agents/`, `hooks/`, `core/default-templates/`, `mcp-server/src/tools/`, or any directory whose contents change between releases.
 
 | Disallowed | Allowed |
 |---|---|
@@ -282,7 +282,7 @@ Apply to: term definitions in `concepts/how-kmgraph-is-organized.md`.
 
 ### 4d. Lesson Learned pattern
 
-Lessons follow the template in `core/templates/lessons-learned/lesson-template.md`. Refer contributors to that template. Do not duplicate the structure here.
+Lessons follow the template in `core/default-templates/lessons-learned/lesson-template.md`. Refer contributors to that template. Do not duplicate the structure here.
 
 **Citation**: `[DiataxisFramework]` — reference documents describe structure, not process.
 
@@ -290,7 +290,7 @@ Lessons follow the template in `core/templates/lessons-learned/lesson-template.m
 
 ### 4e. ADR pattern
 
-ADRs follow the template in `core/templates/decisions/ADR-template.md`. Refer contributors to that template.
+ADRs follow the template in `core/default-templates/decisions/ADR-template.md`. Refer contributors to that template.
 
 **Citation**: `[DiataxisFramework]` — reference documents describe structure, not process.
 

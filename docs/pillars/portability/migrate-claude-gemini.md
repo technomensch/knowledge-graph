@@ -44,7 +44,7 @@ The knowledge graph is platform-agnostic markdown. If it is in the project direc
 
 **For Gemini CLI (target):**
 
-Copy the contents of `core/templates/AGENTS-template.md` into your project's `AGENTS.md` or `GEMINI.md`. The template loads the KMGraph workflow instructions for non-Claude-Code platforms.
+Copy the contents of `core/default-templates/AGENTS-template.md` into your project's `AGENTS.md` or `GEMINI.md`. The template loads the KMGraph workflow instructions for non-Claude-Code platforms.
 
 ## Verify recall works
 

@@ -13,6 +13,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.5.10.7] — 2026-06-13
+
+### Changed
+- **`core/templates/` renamed to `core/default-templates/`** — Disambiguates the frozen distribution source from the live `knowledge/` directories it seeds. All internal consumers updated; live `knowledge/` directories untouched.
+
+### Breaking Change
+**Tier 3 manual installers only:** Update copy instructions: `core/templates/<dir>/` → `core/default-templates/<dir>/`. Plugin/marketplace users (Tier 1/2) unaffected — path is internal to the plugin distribution.
+
+Closes ENH-022.
+
+---
+
 ## [0.5.10.6] — 2026-06-12
 
 ### Added

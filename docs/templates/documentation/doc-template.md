@@ -87,7 +87,7 @@ Description of what the example demonstrates.
 - [Pattern Writing](../../PATTERNS-GUIDE.md) — Writing effective entries
 
 **Resources**:
-- [Templates](../../core/templates/) — Starting scaffolds
+- [Templates](../../core/default-templates/) — Starting scaffolds
 - [Examples](../../core/examples/) — Real-world samples
 
 ---

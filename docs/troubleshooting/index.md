@@ -74,11 +74,11 @@ cd mcp-server && npm install && npm run build
 
 ## Templates are not found
 
-Verify that `core/templates/` exists in the project directory and that templates were copied:
+Verify that `core/default-templates/` exists in the project directory and that templates were copied:
 
 ```bash
-ls core/templates/
-cp -r core/templates/. docs/templates/
+ls core/default-templates/
+cp -r core/default-templates/. docs/templates/
 ```
 
 ---

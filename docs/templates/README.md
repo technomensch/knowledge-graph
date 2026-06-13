@@ -8,7 +8,7 @@ This is the **canonical source** for all KMGraph templates. Edit templates here.
 
 | Location | Purpose | Committed? |
 |----------|---------|------------|
-| `core/templates/` | Canonical source (this folder) | ✅ Yes |
+| `core/default-templates/` | Canonical source (this folder) | ✅ Yes |
 | `docs/templates/` | Build-time copy for the docs site | ❌ No (gitignored) |
 
 `docs/templates/` is generated automatically during the docs build. It is ephemeral — deleted and recreated on every build.

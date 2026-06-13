@@ -263,7 +263,7 @@ A structured document that captures a problem-solving experience — what the pr
 4. **Prevention** — How to avoid the same problem in the future
 5. **Key Takeaways** — Concise lessons for quick reference
 
-**How to create one**: Claude Code users run `/kmgraph:capture-lesson`. Manual users copy the lesson template from `core/templates/lessons-learned/lesson-template.md` and fill in each section.
+**How to create one**: Claude Code users run `/kmgraph:capture-lesson`. Manual users copy the lesson template from `core/default-templates/lessons-learned/lesson-template.md` and fill in each section.
 
 **When to write one**: After solving any non-trivial problem. The best time to document is immediately after solving the problem, while details are fresh.
 
@@ -274,7 +274,7 @@ A structured document that captures a problem-solving experience — what the pr
 ```bash
 # Manual (No Automation)
 # 1. Copy template
-cp core/templates/lessons-learned/lesson-template.md \
+cp core/default-templates/lessons-learned/lesson-template.md \
    docs/lessons-learned/process/my-lesson.md
 
 # 2. Fill in sections
@@ -399,7 +399,7 @@ The `core/` directory contains the knowledge graph system in a form that works w
 
 :::
 **What it includes**:
-- `core/templates/` — Blank templates for lessons, ADRs, knowledge entries, and sessions
+- `core/default-templates/` — Blank templates for lessons, ADRs, knowledge entries, and sessions
 - `core/examples/` — Filled-out examples demonstrating proper usage
 - `core/docs/` — Guides for manual workflows, patterns, and platform adaptation
 - `core/scripts/` — Python scripts for standalone operations
@@ -464,7 +464,7 @@ A markdown document that captures the highlights of a work session — what was 
 :::
 **When to create**: After a significant work session, particularly one involving architecture discussions, major debugging efforts, or important decisions.
 
-**How to create**: The `/kmgraph:session-summary` command generates a summary from the current conversation. Manual users can copy the session template from `core/templates/sessions/session-template.md`.
+**How to create**: The `/kmgraph:session-summary` command generates a summary from the current conversation. Manual users can copy the session template from `core/default-templates/sessions/session-template.md`.
 
 **Sections included**: Overview, key accomplishments, decisions made, lessons learned, and next steps.
 
@@ -512,7 +512,7 @@ bash
 A pre-formatted markdown file that provides the structure for a new lesson, ADR, knowledge entry, or session summary. Templates include placeholder fields that indicate what information belongs in each section.
 
 :::
-**Location**: `core/templates/` directory, organized by type:
+**Location**: `core/default-templates/` directory, organized by type:
 
 - `lessons-learned/lesson-template.md` — For documenting problems solved
 - `decisions/ADR-template.md` — For recording important decisions

@@ -185,4 +185,4 @@ This design resolves all five questions. Implementation proceeds to:
 ## Open Items (post sign-off)
 
 - [ ] Confirm: shortcut vocabulary — `platform` as a keyword doesn't conflict with existing shortcut set (`yes`, `project-me`, `personal-rule`, `personal-me`, `no`)?
-- [ ] Protected files needing follow-up (require explicit permission to modify): `commands/init.md` (remove `knowledge/platform/` scaffolding step), `commands/init-shared/upgrade-inspector.md` (update relocation target from `knowledge/platform/claude.md` → `CLAUDE.md`), `core/templates/knowledge/rules.md` (update guidance comment)
+- [ ] Protected files needing follow-up (require explicit permission to modify): `commands/init.md` (remove `knowledge/platform/` scaffolding step), `commands/init-shared/upgrade-inspector.md` (update relocation target from `knowledge/platform/claude.md` → `CLAUDE.md`), `core/default-templates/knowledge/rules.md` (update guidance comment)

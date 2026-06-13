@@ -315,8 +315,8 @@ Customize document templates for your workflow:
 
 ```bash
 # Edit templates (changes affect NEW documents only)
-vim core/templates/lessons-learned/lesson-template.md
-vim core/templates/decisions/ADR-template.md
+vim core/default-templates/lessons-learned/lesson-template.md
+vim core/default-templates/decisions/ADR-template.md
 ```
 
 ### Categories
