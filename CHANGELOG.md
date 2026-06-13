@@ -17,9 +17,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **`core/templates/` renamed to `core/default-templates/`** — Disambiguates the frozen distribution source from the live `knowledge/` directories it seeds. All internal consumers updated; live `knowledge/` directories untouched.
+- **`core/default-templates/knowledge/` renamed to `core/default-templates/concepts/`** — Eliminates the `knowledge/knowledge/` deploy nesting that occurred when the inner subdir shared a name with the deploy target. All consumer refs updated (init, init-personal-kg, add-category, upgrade-inspector, MCP resources).
+- **Starter templates deploy to `knowledge/templates/`** — `lesson-template.md`, `ADR-template.md`, `session-template.md`, and `entry-template.md` now seed to `knowledge/templates/` at init instead of into the live `lessons-learned/`, `decisions/`, and `sessions/` dirs (ADR-040). READMEs remain in their live dirs.
+
+### Migration (existing installs)
+Run `/kmgraph:init` (option 1 — Verify/upgrade). The upgrade inspector auto-detects and migrates:
+- **`starter-relocation`** — Starters found in live dirs are moved to `knowledge/templates/` (archive-before-write).
+- **`knowledge/knowledge/` merge** — If the old nested dir exists, unmodified files are merged into `knowledge/concepts/`; modified files are archived and flagged for manual review.
 
 ### Breaking Change
-**Tier 3 manual installers only:** Update copy instructions: `core/templates/<dir>/` → `core/default-templates/<dir>/`. Plugin/marketplace users (Tier 1/2) unaffected — path is internal to the plugin distribution.
+**Tier 3 manual installers only:** Two path updates required:
+- `core/templates/<dir>/` → `core/default-templates/<dir>/`
+- `core/default-templates/knowledge/` → `core/default-templates/concepts/`
+
+Plugin/marketplace users (Tier 1/2) unaffected — these paths are internal to the plugin distribution.
 
 Closes ENH-022.
 

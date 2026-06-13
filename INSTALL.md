@@ -248,7 +248,7 @@ done
 | **v0.5.10.1** | No upgrade action required. Session summary operational sections, zone structure, one-file-per-day enforcement, and reduced handoff package are automatic after plugin reload. Run `/reload-plugins` to activate. Note: `--skip-sessions` flag for `/kmgraph:handoff` has been removed (SESSION-COMPILATION no longer generated). |
 | **v0.5.10.2** | Codex CLI marketplace support added — no upgrade action required for existing Claude Code installs. Codex users: run `codex plugin marketplace add technomensch/knowledge-graph` then `codex plugin add kmgraph@knowledge-management-graph`. Security: `shell-quote` dependency pinned to `>=1.8.4` automatically on `npm install`. |
 | **v0.5.10.3–v0.5.10.6** | No upgrade action required. Bug fixes and improvements are automatic after plugin reload. |
-| **v0.5.10.7** | **⚠️ Breaking change (Tier 3 manual installers only):** `core/templates/` renamed to `core/default-templates/`. Update any copy instructions: `core/templates/<dir>/` → `core/default-templates/<dir>/`. Plugin/marketplace users (Tier 1/2) unaffected — this path is internal to the plugin distribution; your `knowledge/` directory is untouched. |
+| **v0.5.10.7** | **⚠️ Breaking change (Tier 3 manual installers only):** Two renames in the plugin distribution. (1) `core/templates/` → `core/default-templates/`. (2) `core/default-templates/knowledge/` → `core/default-templates/concepts/`. Update any copy instructions that reference these paths. Plugin/marketplace users (Tier 1/2) unaffected — these paths are internal to the plugin distribution; your `knowledge/` directory is untouched. Existing installs: run `/kmgraph:init` (option 1 — Verify/upgrade) to auto-migrate starters and any `knowledge/knowledge/` nesting. |
 
 After the wizard completes, your existing lessons, ADRs, sessions, and chat history are untouched.
 
@@ -547,7 +547,7 @@ REPO_PATH="./knowledge-graph"
 
 # Knowledge templates
 for f in patterns.md gotchas.md concepts.md architecture.md workflows.md index.md; do
-  [ -f "$REPO_PATH/core/default-templates/knowledge/$f" ] && cp "$REPO_PATH/core/default-templates/knowledge/$f" "$KG_PATH/knowledge/"
+  [ -f "$REPO_PATH/core/default-templates/concepts/$f" ] && cp "$REPO_PATH/core/default-templates/concepts/$f" "$KG_PATH/knowledge/"
 done
 
 # Lesson templates

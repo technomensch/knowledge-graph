@@ -9,7 +9,7 @@ description: How to modify the lesson, ADR, session, and other templates to matc
 
 > "The default templates don't match my team's conventions. How do I change them?"
 
-Edit the bundled templates to add required fields, remove unused ones, or change the default structure for lessons, ADRs, and session summaries. Templates are auto-copied to `docs/templates/` at init, or manually: `cp -r core/default-templates/. docs/templates/`.
+Edit the bundled templates to add required fields, remove unused ones, or change the default structure for lessons, ADRs, and session summaries. At `/kmgraph:init`, starter templates (lesson, ADR, session, entry) are seeded to `knowledge/templates/` in your live knowledge graph; content structure templates (patterns, gotchas, concepts, architecture, workflows) go to `knowledge/templates/` as well.
 
 ## Default templates vs your live knowledge files
 
@@ -38,7 +38,7 @@ All templates live in `core/default-templates/`. When the MCP server or a comman
 | Architecture Decision Record | `core/default-templates/decisions/ADR-template.md` | `/kmgraph:create-adr` |
 | Session summary | `core/default-templates/sessions/session-template.md` | `/kmgraph:session-summary` |
 | MEMORY.md | `core/default-templates/MEMORY-template.md` | `/kmgraph:init` |
-| Knowledge entry | `core/default-templates/knowledge/entry-template.md` | `/kmgraph:update-graph` |
+| Knowledge entry | `core/default-templates/concepts/entry-template.md` | `/kmgraph:update-graph` |
 | Meta-issue | `core/default-templates/meta-issue/meta-issue-template.md` | `/kmgraph:start-issue-tracking` |
 
 ## Copy the template

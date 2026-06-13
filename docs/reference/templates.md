@@ -15,40 +15,42 @@ For customization guidance, see [Customize Templates](../pillars/tailoring/custo
 
 ## Lessons Learned
 
-| File | Purpose | Key Fields | Created by |
-|---|---|---|---|
-| `lessons-learned/lesson-template.md` | Documents a single lesson: what happened, root cause, and fix | `title`, `created` [AUTO], `author` [AUTO], `git.*` [AUTO], `tags`, `severity`, `category` | `/kmgraph:capture-lesson` |
+| File | Purpose | Key Fields | Created by | Deploys to |
+|---|---|---|---|---|
+| `lessons-learned/lesson-template.md` | Documents a single lesson: what happened, root cause, and fix | `title`, `created` [AUTO], `author` [AUTO], `git.*` [AUTO], `tags`, `severity`, `category` | `/kmgraph:capture-lesson` | `knowledge/templates/lesson-template.md` |
 
 ---
 
 ## Architecture Decisions (ADRs)
 
-| File | Purpose | Key Fields | Created by |
-|---|---|---|---|
-| `decisions/ADR-template.md` | Records an architectural decision with status, context, and consequences | `title`, `number`, `created`, `status`, `author`, `email` | `/kmgraph:create-adr` |
+| File | Purpose | Key Fields | Created by | Deploys to |
+|---|---|---|---|---|
+| `decisions/ADR-template.md` | Records an architectural decision with status, context, and consequences | `title`, `number`, `created`, `status`, `author`, `email` | `/kmgraph:create-adr` | `knowledge/templates/ADR-template.md` |
 
 ---
 
 ## Sessions
 
-| File | Purpose | Key Fields | Created by |
-|---|---|---|---|
-| `sessions/session-template.md` | Two-part session record: a current-state snapshot (Current State, Open Issues, Session History, Session Findings) and a timestamped narrative log (append-only) | `title` [AUTO], `date` [AUTO], `branch` [AUTO], `as_of_commit` [AUTO], `last_updated` [AUTO], `tags` [AUTO] | `/kmgraph:session-summary` |
+| File | Purpose | Key Fields | Created by | Deploys to |
+|---|---|---|---|---|
+| `sessions/session-template.md` | Two-part session record: a current-state snapshot (Current State, Open Issues, Session History, Session Findings) and a timestamped narrative log (append-only) | `title` [AUTO], `date` [AUTO], `branch` [AUTO], `as_of_commit` [AUTO], `last_updated` [AUTO], `tags` [AUTO] | `/kmgraph:session-summary` | `knowledge/templates/session-template.md` |
 
 ---
 
 ## Knowledge Graph Entries
 
-These templates live under `core/default-templates/knowledge/` and provide per-category structures for the knowledge graph. Most entries are auto-generated from lessons via `/kmgraph:update-graph`; use these templates when creating entries directly.
+These templates live under `core/default-templates/concepts/` and provide per-category structures for the knowledge graph. Most entries are auto-generated from lessons via `/kmgraph:update-graph`; use these templates when creating entries directly.
 
 | File | Category | Purpose | Created by |
 |---|---|---|---|
-| `knowledge/entry-template.md` | General | Base template for any standalone KG entry | Manual / `/kmgraph:update-graph` |
-| `knowledge/architecture.md` | Architecture | Architectural components, design decisions, trade-offs | `/kmgraph:update-graph` |
-| `knowledge/concepts.md` | Concepts | Domain terminology and core abstractions | `/kmgraph:update-graph` |
-| `knowledge/gotchas.md` | Gotchas | Pitfalls and anti-patterns; symptom → root cause → fix | `/kmgraph:update-graph` |
-| `knowledge/patterns.md` | Patterns | Reusable solutions discovered from lessons | `/kmgraph:update-graph` |
-| `knowledge/workflows.md` | Workflows | Standard operating procedures and repeatable processes | `/kmgraph:update-graph` |
+| `concepts/entry-template.md` | General | Base template for any standalone KG entry | Manual / `/kmgraph:update-graph` |
+| `concepts/templates/architecture.md` | Architecture | Architectural components, design decisions, trade-offs | `/kmgraph:update-graph` |
+| `concepts/templates/concepts.md` | Concepts | Domain terminology and core abstractions | `/kmgraph:update-graph` |
+| `concepts/templates/gotchas.md` | Gotchas | Pitfalls and anti-patterns; symptom → root cause → fix | `/kmgraph:update-graph` |
+| `concepts/templates/patterns.md` | Patterns | Reusable solutions discovered from lessons | `/kmgraph:update-graph` |
+| `concepts/templates/workflows.md` | Workflows | Standard operating procedures and repeatable processes | `/kmgraph:update-graph` |
+
+> All paths above are relative to `core/default-templates/`. At init, these files are seeded to `knowledge/templates/` in your live knowledge graph.
 
 ---
 
