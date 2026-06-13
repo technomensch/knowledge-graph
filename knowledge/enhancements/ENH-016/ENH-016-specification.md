@@ -166,6 +166,17 @@ When `personal-rule` routing is selected, scan `~/.kmgraph/` for `*rules*.md` fi
 - Seeding `~/.kmgraph/plan-rules.md` during `/kmgraph:init`
 - Defining a canonical split structure — user defines their own
 
+## Implementation Status
+
+### Advisory Version Checks in `scripts/pre-push-gate.sh`
+
+| Check | Status | Version | Details |
+|---|---|---|---|
+| CHANGELOG version presence | ✓ Implemented | v0.5.10.0+ | Advisory only; skips silently if CHANGELOG.md absent |
+| README version presence | ✓ Implemented | v0.5.10.6 | Advisory only; skips silently if README.md absent |
+
+Both checks follow the same pattern: append to FINDINGS with advisory message (no execution block). Implemented in `scripts/pre-push-gate.sh` lines 70-86.
+
 ## Related
 
 - issue-8: Docs Update Enforcement Meta-Issue (ENH-016 multi-file fallback pattern required by issue-8 fix)

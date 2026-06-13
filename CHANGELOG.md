@@ -13,6 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.5.10.6] — 2026-06-12
+
+### Added
+- **Codex CLI lifecycle hooks** — Delivers kmgraph hook suite to Codex CLI via `.codex-plugin/hooks/hooks.json` (auto-discovered by Codex plugin runtime). Hooks: `SessionStart` (hooks-master), `PostToolUse` shell (post-tool-lesson-check), `PreToolUse` shell (pre-push-gate), `UserPromptSubmit` (recommendation-gate), `Stop` (session-end-prompt). Requires Codex ≥ post-PR-19705 with `plugin_hooks` flag enabled; user must run `/hooks` to trust after install.
+
+### Docs
+- **INSTALL.md** — Added Node/PATH requirement note and hook trust-gate note under the Codex CLI section.
+
+### Not delivered (pending Codex upstream fix)
+- PostToolUse `Write|Edit`-matched hooks deferred pending [openai/codex#16732](https://github.com/openai/codex/issues/16732) — `apply_patch` does not emit PostToolUse events.
+
 ## [0.5.10.5] — 2026-06-12
 
 ### Added

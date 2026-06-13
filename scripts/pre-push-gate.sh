@@ -75,6 +75,15 @@ if [ -f "$PKG_JSON" ] && [ -f "$PLUGIN_JSON" ] && command -v jq &>/dev/null; the
 "
     fi
   fi
+
+  # Advisory: README should reference the version being pushed
+  README="${REPO_ROOT}/README.md"
+  if [ -n "$PKG_VER" ] && [ -f "$README" ]; then
+    if ! grep -qF "$PKG_VER" "$README" 2>/dev/null; then
+      FINDINGS="${FINDINGS}README ADVISORY: version ${PKG_VER} not found in README.md. Update the version reference before pushing.
+"
+    fi
+  fi
 fi
 
 # ── Gate 3: docs-impact-scan completion flag ──────────────────────────────────
