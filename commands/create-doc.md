@@ -162,7 +162,7 @@ Title:       [document title]
 Description: [brief description]
 Audience:    [audience or "General"]
 Location:    [target path/FILENAME.md]
-Template:    core/templates/documentation/doc-template.md
+Template:    core/default-templates/documentation/doc-template.md
 
 Cross-references: [Default: suggest-only | --update-refs: auto-inject]
 
@@ -178,7 +178,7 @@ Proceed? (yes / change details / cancel)
 **Read the base template:**
 
 ```
-Action: Read ${CLAUDE_PLUGIN_ROOT}/core/templates/documentation/doc-template.md
+Action: Read ${CLAUDE_PLUGIN_ROOT}/core/default-templates/documentation/doc-template.md
 ```
 
 **Populate the template with gathered information:**
@@ -306,7 +306,7 @@ Pre-populate with standard cross-references:
 - [Concepts Guide](../../docs/CONCEPTS.md) — Plain-English term explanations
 
 **Resources**:
-- [Templates](../../core/templates/) — Starting scaffolds for new documents
+- [Templates](../../core/default-templates/) — Starting scaffolds for new documents
 ```
 
 Adjust relative paths based on target location depth.
@@ -481,7 +481,7 @@ Proceed? (yes / change details / cancel)
 - [ ] Duplicate detection completed
 - [ ] Document type, title, description, and location confirmed by user
 - [ ] Filename follows naming convention (UPPERCASE-HYPHENATED.md)
-- [ ] Template read from `core/templates/documentation/doc-template.md`
+- [ ] Template read from `core/default-templates/documentation/doc-template.md`
 - [ ] YAML frontmatter populated (title, type, created, author)
 - [ ] Third-person voice enforced throughout
 - [ ] Section 508 heading hierarchy is sequential (no skipped levels)

@@ -260,7 +260,7 @@ Proceed? (yes / change details / cancel)
 
 ## Phase 5: Create ADR File via `kg_capture`
 
-Read the base template from `${CLAUDE_PLUGIN_ROOT}/core/templates/decisions/ADR-template.md`.
+Read the base template from `${CLAUDE_PLUGIN_ROOT}/core/default-templates/decisions/ADR-template.md`.
 
 Populate all frontmatter fields:
 

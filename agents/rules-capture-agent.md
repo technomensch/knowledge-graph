@@ -367,7 +367,7 @@ Confirm: "Rule saved to {target_file}."
 
 ## Constraints
 
-- Never write to `commands/` or `core/templates/`
+- Never write to `commands/` or `core/default-templates/`
 - Never write without user approval (Phase 4 is mandatory)
 - Use atomic write (full file in single Write call) — never append-only to avoid partial-write corruption
 - Never show more than one dedup/conflict prompt — surface all conflicts together

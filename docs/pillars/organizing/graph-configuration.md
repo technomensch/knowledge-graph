@@ -114,8 +114,8 @@ Once the KG is initialized, create entries that reference your existing docs rat
 Document templates control the structure of new lessons, ADRs, and knowledge entries. Edit them to match your team's conventions:
 
 ```bash
-vim core/templates/lessons-learned/lesson-template.md
-vim core/templates/decisions/ADR-template.md
+vim core/default-templates/lessons-learned/lesson-template.md
+vim core/default-templates/decisions/ADR-template.md
 ```
 
 Template changes affect new documents only — existing entries are not modified.
@@ -127,7 +127,7 @@ After init, the most common configuration tasks are:
 1. **Adding a new category** — `/kmgraph:add-category`
 2. **Switching the active KG** — `/kmgraph:switch` (for multi-KG setups)
 3. **Listing all configured KGs** — `/kmgraph:list`
-4. **Editing templates** — directly in `core/templates/`
+4. **Editing templates** — directly in `core/default-templates/`
 
 Avoid restructuring the directory layout after the KG is in use. Moving files breaks cross-references and FTS5 index entries. If you need to reorganize, use `kg_fts5_rebuild` after the move.
 

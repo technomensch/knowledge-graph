@@ -13,7 +13,7 @@ export function registerScaffoldTool(server: McpServer): void {
       template: z
         .string()
         .describe(
-          "Template path relative to core/templates/ (e.g., 'lessons-learned/lesson-template.md')"
+          "Template path relative to core/default-templates/ (e.g., 'lessons-learned/lesson-template.md')"
         ),
       variables: z
         .record(z.string(), z.string())
@@ -27,12 +27,12 @@ export function registerScaffoldTool(server: McpServer): void {
     },
     async ({ template, variables, outputPath }) => {
       const pluginRoot = getPluginRoot();
-      const templatePath = path.join(pluginRoot, "core", "templates", template);
+      const templatePath = path.join(pluginRoot, "core", "default-templates", template);
 
       // Validate template exists
       if (!fs.existsSync(templatePath)) {
         // List available templates
-        const templatesDir = path.join(pluginRoot, "core", "templates");
+        const templatesDir = path.join(pluginRoot, "core", "default-templates");
         let available = "Template directory not found.";
         if (fs.existsSync(templatesDir)) {
           const files = listTemplates(templatesDir, templatesDir);

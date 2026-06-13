@@ -72,13 +72,37 @@ cd mcp-server && npm install && npm run build
 
 ---
 
+## Upgrading to v0.5.10.7 (starter relocation + concepts/ rename)
+
+v0.5.10.7 renamed `core/default-templates/knowledge/` to `core/default-templates/concepts/` and moved starter templates from live dirs into `knowledge/templates/`. Running `/kmgraph:init` (option 1 — Verify/upgrade) applies both migrations automatically.
+
+**If you prefer to migrate manually:**
+
+*Starter relocation — move starters out of live dirs:*
+```bash
+mkdir -p /path/to/kg/knowledge/templates
+for f in lessons-learned/lesson-template.md decisions/ADR-template.md sessions/session-template.md knowledge/entry-template.md; do
+  [ -f "/path/to/kg/$f" ] && mv "/path/to/kg/$f" "/path/to/kg/knowledge/templates/$(basename "$f")"
+done
+```
+
+*`knowledge/knowledge/` merge (only if this nested dir exists):*
+```bash
+# If the dir exists and files are unmodified vs. plugin source, merge:
+mv /path/to/kg/knowledge/knowledge/*.md /path/to/kg/knowledge/concepts/
+rmdir /path/to/kg/knowledge/knowledge
+# Archive first if files have been edited — they represent your customizations.
+```
+
+---
+
 ## Templates are not found
 
-Verify that `core/templates/` exists in the project directory and that templates were copied:
+Verify that `core/default-templates/` exists in the project directory and that templates were copied:
 
 ```bash
-ls core/templates/
-cp -r core/templates/. docs/templates/
+ls core/default-templates/
+cp -r core/default-templates/. docs/templates/
 ```
 
 ---

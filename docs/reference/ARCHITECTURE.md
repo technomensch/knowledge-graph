@@ -171,7 +171,7 @@ project/
 
 ```bash
 # 1. Copy template
-cp core/templates/lessons-learned/lesson-template.md \
+cp core/default-templates/lessons-learned/lesson-template.md \
    docs/lessons-learned/process/my-lesson.md
 
 # 2. Fill in sections

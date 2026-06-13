@@ -1,5 +1,5 @@
 ---
-description: Shared template seed module — non-destructive copy of core/templates/ into a KG directory
+description: Shared template seed module — non-destructive copy of core/default-templates/ into a KG directory
 ---
 
 ## Module: template-seed
@@ -9,7 +9,7 @@ description: Shared template seed module — non-destructive copy of core/templa
 | Parameter | Description |
 |---|---|
 | `{KG_PATH}` | Absolute path to the knowledge graph root directory |
-| `{CLAUDE_PLUGIN_ROOT}` | Absolute path to the plugin root (source of core/templates/) |
+| `{CLAUDE_PLUGIN_ROOT}` | Absolute path to the plugin root (source of core/default-templates/) |
 
 ---
 
@@ -18,35 +18,36 @@ description: Shared template seed module — non-destructive copy of core/templa
 ```bash
 # Copy KG content templates into knowledge/templates/ subdirectory
 mkdir -p "{KG_PATH}/knowledge/templates"
-cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/patterns.md" "{KG_PATH}/knowledge/templates/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/gotchas.md" "{KG_PATH}/knowledge/templates/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/concepts.md" "{KG_PATH}/knowledge/templates/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/architecture.md" "{KG_PATH}/knowledge/templates/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/workflows.md" "{KG_PATH}/knowledge/templates/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-category-index.md" "{KG_PATH}/knowledge/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/patterns.md" "{KG_PATH}/knowledge/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/gotchas.md" "{KG_PATH}/knowledge/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/concepts.md" "{KG_PATH}/knowledge/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/architecture.md" "{KG_PATH}/knowledge/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/workflows.md" "{KG_PATH}/knowledge/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/kg-category-index.md" "{KG_PATH}/knowledge/"
 
 # Copy root-level profile files from project profile starters (skip if exists to preserve teammate copies)
 [ -f "{KG_PATH}/rules.md" ] && echo "rules.md already exists — skipping scaffold (teammate copy preserved)." || \
-  cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/project/rules.md" "{KG_PATH}/rules.md"
+  cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/project/rules.md" "{KG_PATH}/rules.md"
 [ -f "{KG_PATH}/triggers.md" ] && echo "triggers.md already exists — skipping scaffold." || \
-  cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/project/triggers.md" "{KG_PATH}/triggers.md"
+  cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/project/triggers.md" "{KG_PATH}/triggers.md"
 [ -f "{KG_PATH}/index.md" ] && echo "index.md already exists — skipping scaffold." || \
-  cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-index.md" "{KG_PATH}/index.md"
+  cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/kg-index.md" "{KG_PATH}/index.md"
 # me.md is always gitignored — safe to scaffold fresh
-cp "{CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/project/me.md" "{KG_PATH}/me.md"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/project/me.md" "{KG_PATH}/me.md"
 
-# Copy lesson/ADR templates
-cp "{CLAUDE_PLUGIN_ROOT}/core/templates/lessons-learned/README.md" "{KG_PATH}/lessons-learned/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/templates/lessons-learned/lesson-template.md" "{KG_PATH}/lessons-learned/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/templates/decisions/README.md" "{KG_PATH}/decisions/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/templates/decisions/ADR-template.md" "{KG_PATH}/decisions/"
+# READMEs stay in their live dirs (orientation files, not starters)
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/lessons-learned/README.md" "{KG_PATH}/lessons-learned/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/decisions/README.md" "{KG_PATH}/decisions/"
 
-# Copy session template
-cp "{CLAUDE_PLUGIN_ROOT}/core/templates/sessions/session-template.md" "{KG_PATH}/sessions/"
+# Starter templates deploy to knowledge/templates/ (ADR-040), never into live dirs
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/lessons-learned/lesson-template.md" "{KG_PATH}/knowledge/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/decisions/ADR-template.md" "{KG_PATH}/knowledge/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/sessions/session-template.md" "{KG_PATH}/knowledge/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/entry-template.md" "{KG_PATH}/knowledge/templates/"
 
 # Copy MEMORY template if not exists
 if [ ! -f "~/.claude/projects/$(basename $(pwd))/memory/MEMORY.md" ]; then
-  echo "Note: MEMORY.md template available at {CLAUDE_PLUGIN_ROOT}/core/templates/MEMORY-template.md"
+  echo "Note: MEMORY.md template available at {CLAUDE_PLUGIN_ROOT}/core/default-templates/MEMORY-template.md"
   echo "Copy manually if needed for new projects."
 fi
 ```
@@ -60,7 +61,10 @@ template_dirs=("knowledge/templates" "lessons-learned" "decisions" "sessions")
 updates_available=()
 
 for tdir in "${template_dirs[@]}"; do
-  for template in "{CLAUDE_PLUGIN_ROOT}/core/templates/$tdir/"*; do
+  # knowledge/templates deploy dir maps to concepts/templates/ in plugin source (renamed in v0.5.10.7)
+  _src_tdir="${tdir}"
+  [ "${tdir}" = "knowledge/templates" ] && _src_tdir="concepts/templates"
+  for template in "{CLAUDE_PLUGIN_ROOT}/core/default-templates/${_src_tdir}/"*; do
     dest="{KG_PATH}/$tdir/$(basename $template)"
     if [ -f "$dest" ]; then
       if ! diff -q "$template" "$dest" > /dev/null 2>&1; then

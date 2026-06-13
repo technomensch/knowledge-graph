@@ -1288,19 +1288,19 @@ Examples of personal lessons:
    # Category templates → knowledge/templates/ subfolder
    mkdir -p "$HOME/.kmgraph/knowledge/templates"
    for f in patterns.md gotchas.md concepts.md architecture.md workflows.md; do
-     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/$f" "$HOME/.kmgraph/knowledge/templates/" 2>/dev/null || true
+     cp "${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/$f" "$HOME/.kmgraph/knowledge/templates/" 2>/dev/null || true
    done
    # kg-category-index deploys as kg-category-index-global.md at personal KG level
-   cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-category-index.md" "$HOME/.kmgraph/knowledge/kg-category-index-global.md" 2>/dev/null || true
+   cp "${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/kg-category-index.md" "$HOME/.kmgraph/knowledge/kg-category-index-global.md" 2>/dev/null || true
    # Root-level files — me.md, rules.md, kg-index-global.md → KG root (from user profile starters)
-   cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/user/me.md" "$HOME/.kmgraph/me.md"
+   cp "${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/user/me.md" "$HOME/.kmgraph/me.md"
    # Tier mapping setup — run immediately after me.md is seeded (see § Tier mapping setup below)
    [ -f "$HOME/.kmgraph/rules.md" ] && echo "rules.md already exists — skipping scaffold." || \
-     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/user/rules.md" "$HOME/.kmgraph/rules.md"
+     cp "${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/user/rules.md" "$HOME/.kmgraph/rules.md"
    [ -f "$HOME/.kmgraph/triggers.md" ] && echo "triggers.md already exists — skipping scaffold." || \
-     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/user/triggers.md" "$HOME/.kmgraph/triggers.md"
+     cp "${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/user/triggers.md" "$HOME/.kmgraph/triggers.md"
    [ -f "$HOME/.kmgraph/kg-index-global.md" ] && echo "kg-index-global.md already exists — skipping scaffold." || \
-     cp "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/kg-index-global.md" "$HOME/.kmgraph/kg-index-global.md"
+     cp "${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/kg-index-global.md" "$HOME/.kmgraph/kg-index-global.md"
    ```
 
 #### § Tier mapping setup
@@ -1556,7 +1556,7 @@ It should respond with a description of KMGraph's capture and recall capabilitie
 
 | Platform | File | Content source |
 |---|---|---|
-| Gemini CLI | `GEMINI.md` in project root | `core/templates/AGENTS-template.md` |
+| Gemini CLI | `GEMINI.md` in project root | `core/default-templates/AGENTS-template.md` |
 | Cursor | `.cursorrules` | Project conventions + KMGraph behaviors subset |
 | Windsurf | `.windsurfrules` | Same as `.cursorrules` |
 | Continue.dev | `.continue/config.json` prompt section | KMGraph behaviors subset |
@@ -1598,7 +1598,7 @@ For each approved platform, write the appropriate file using the content source 
 # Prepend pointer line then append template content
 echo "For full context, read knowledge/rules.md and knowledge/me.md before acting." > "$(pwd)/GEMINI.md"
 echo "" >> "$(pwd)/GEMINI.md"
-cat "${CLAUDE_PLUGIN_ROOT}/core/templates/AGENTS-template.md" >> "$(pwd)/GEMINI.md"
+cat "${CLAUDE_PLUGIN_ROOT}/core/default-templates/AGENTS-template.md" >> "$(pwd)/GEMINI.md"
 
 # Cursor / Windsurf — write pointer line + KMGraph behaviors subset
 # Continue.dev — inject pointer line + prompt section into .continue/config.json

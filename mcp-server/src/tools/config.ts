@@ -81,7 +81,7 @@ export function registerConfigTools(server: McpServer): void {
 
       // Copy templates from plugin
       const pluginRoot = getPluginRoot();
-      const templateSrc = path.join(pluginRoot, "core", "templates");
+      const templateSrc = path.join(pluginRoot, "core", "default-templates");
 
       if (fs.existsSync(templateSrc)) {
         // Copy knowledge templates

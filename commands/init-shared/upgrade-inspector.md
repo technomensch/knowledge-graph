@@ -94,7 +94,7 @@ WIKI_DONE=$(jq -r '.graphs["{kg_name}"].wiki_pass_complete // false' ~/.claude/k
 [ "$WIKI_DONE" != "true" ] && \
   upgrades+=("Wiki pass available: convert bare ADR-NNN, ENH-NNN, #NNN, and lesson filename references to [[wiki links]] across knowledge files")
 
-# New templates (files in plugin core/templates not yet in KG)
+# New templates (files in plugin core/default-templates not yet in KG)
 # IMPORTANT: The following filenames must NEVER be added to upgrades[] by this loop,
 # regardless of whether they exist at the template destination path.
 # They are handled by dedicated scaffold checks above (section h) with interactive flows.
@@ -106,7 +106,7 @@ WIKI_DONE=$(jq -r '.graphs["{kg_name}"].wiki_pass_complete // false' ~/.claude/k
 #   index-personal.md — personal KG only, handled separately
 scaffold_covered=("kg-index.md" "me.md" "rules.md" "index-personal.md" "triggers.md")
 for tdir in knowledge lessons-learned decisions sessions; do
-  for template in "${CLAUDE_PLUGIN_ROOT}/core/templates/$tdir/"*; do
+  for template in "${CLAUDE_PLUGIN_ROOT}/core/default-templates/$tdir/"*; do
     tname=$(basename "$template")
     skip=false
     for covered in "${scaffold_covered[@]}"; do
@@ -117,6 +117,34 @@ for tdir in knowledge lessons-learned decisions sessions; do
     [ ! -f "$dest" ] && upgrades+=("New template: $tdir/$tname") || true
   done
 done
+
+# Starter relocation check (v0.5.10.7 — ENH-022 Problem 3)
+_starters_to_move=()
+[ -f "{KG_PATH}/lessons-learned/lesson-template.md" ] && _starters_to_move+=("lessons-learned/lesson-template.md")
+[ -f "{KG_PATH}/decisions/ADR-template.md" ]          && _starters_to_move+=("decisions/ADR-template.md")
+[ -f "{KG_PATH}/sessions/session-template.md" ]       && _starters_to_move+=("sessions/session-template.md")
+if [ ${#_starters_to_move[@]} -gt 0 ]; then
+  upgrades+=("starter-relocation|Move ${#_starters_to_move[@]} starter(s) from live dirs → knowledge/templates/|${_starters_to_move[*]}")
+fi
+
+# knowledge/knowledge/ migration check (v0.5.10.7 — ENH-022 Problem 2)
+if [ -d "{KG_PATH}/knowledge/knowledge" ]; then
+  _modified_kk=()
+  for _kf in "{KG_PATH}/knowledge/knowledge/"*.md; do
+    [ -f "$_kf" ] || continue
+    _fname=$(basename "$_kf")
+    _src="${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/${_fname}"
+    [ -f "$_src" ] || _src="${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/${_fname}"
+    if [ ! -f "$_src" ] || ! diff -q "$_kf" "$_src" > /dev/null 2>&1; then
+      _modified_kk+=("$_fname")
+    fi
+  done
+  if [ ${#_modified_kk[@]} -gt 0 ]; then
+    upgrades+=("knowledge-knowledge-modified|knowledge/knowledge/ has modified files — manual merge required|${_modified_kk[*]}")
+  else
+    upgrades+=("knowledge-knowledge-merge|Merge knowledge/knowledge/ (unmodified starters) → knowledge/concepts/ and remove dir|")
+  fi
+fi
 ```
 
 **IMPORTANT — Filter before presenting:** Before displaying the upgrades list or the "nothing to upgrade" message, remove any item from `upgrades[]` whose basename matches any of the following scaffold-only filenames:
@@ -183,12 +211,12 @@ For each item in `upgrades[]`, show a preview entry:
 - **Section h (scaffold missing root files):** for each missing file, show the source template path and destination:
   ```
   [preview] Would seed: me.md
-    Source: ${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/project/me.md
+    Source: ${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/project/me.md
     Dest:   {KG_PATH}/me.md
     Note:   gitignored — fill in your identity after seeding
 
   [preview] Would seed: rules.md
-    Source: ${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/project/rules.md
+    Source: ${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/project/rules.md
     Dest:   {KG_PATH}/rules.md
     Note:   fill in your project conventions after seeding
   ```
@@ -287,7 +315,7 @@ template_dirs=("knowledge/templates" "lessons-learned" "decisions" "sessions")
 updates_available=()
 
 for tdir in "${template_dirs[@]}"; do
-  for template in "${CLAUDE_PLUGIN_ROOT}/core/templates/$tdir/"*; do
+  for template in "${CLAUDE_PLUGIN_ROOT}/core/default-templates/$tdir/"*; do
     dest="{KG_PATH}/$tdir/$(basename $template)"
     if [ -f "$dest" ]; then
       if ! diff -q "$template" "$dest" > /dev/null 2>&1; then
@@ -798,10 +826,10 @@ Options:
    echo "✅ Archived rules.md → $ARCHIVE_DIR/rules.md"
    ```
 
-2. Prepend the defaults block (from `core/templates/knowledge/templates/project/rules.md`, extracting only the `<!-- kmgraph-defaults -->` ... `<!-- /kmgraph-defaults -->` block):
+2. Prepend the defaults block (from `core/default-templates/concepts/templates/project/rules.md`, extracting only the `<!-- kmgraph-defaults -->` ... `<!-- /kmgraph-defaults -->` block):
    ```bash
    DEFAULTS_BLOCK=$(awk '/<!-- kmgraph-defaults -->/{found=1} found{print} /<!-- \/kmgraph-defaults -->/{exit}' \
-     "${CLAUDE_PLUGIN_ROOT}/core/templates/knowledge/templates/project/rules.md")
+     "${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/project/rules.md")
    printf '%s\n\n' "$DEFAULTS_BLOCK" | cat - "{KG_PATH}/rules.md" > /tmp/rules-patched.md
    mv /tmp/rules-patched.md "{KG_PATH}/rules.md"
    echo "✅ kmgraph-defaults block prepended to rules.md"
@@ -857,3 +885,74 @@ Would you like to configure tier mappings in me.md now?
 - Section d and k do not double-run: if section d already relocated the content in this session, the `$SCHEMA_VERSION` gate prevents section k from re-offering.
 - Archive is always taken before any write.
 - Tier mapping walkthrough is offered only after successful relocation — not independently by this section.
+
+#### l. Starter relocation (v0.5.10.7 — ENH-022 Problem 3)
+
+**Purpose:** Move starter template files from live dirs to `knowledge/templates/` (ADR-040).
+
+**Detection:** `_starters_to_move[]` populated in the detection phase above.
+
+**Apply (archive-before-write):**
+
+```bash
+if [ ${#_starters_to_move[@]} -gt 0 ]; then
+  ARCHIVE_DIR="{KG_PATH}/.kg-archive-$(date +%Y%m%d-%H%M%S)"
+  mkdir -p "${ARCHIVE_DIR}/starters" "{KG_PATH}/knowledge/templates"
+  echo "{\"archived_at\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"trigger\":\"starter-relocation\"}" > "${ARCHIVE_DIR}/manifest.json"
+  for _f in "${_starters_to_move[@]}"; do
+    _dest="{KG_PATH}/knowledge/templates/$(basename "${_f}")"
+    cp "{KG_PATH}/${_f}" "${ARCHIVE_DIR}/starters/$(basename "${_f}")"
+    if [ ! -f "$_dest" ]; then
+      mv "{KG_PATH}/${_f}" "$_dest"
+    else
+      rm "{KG_PATH}/${_f}"
+      echo "  Note: $(basename ${_f}) already in knowledge/templates/ — removed live-dir copy"
+    fi
+  done
+  echo "✓ Starters relocated to knowledge/templates/ (archive: ${ARCHIVE_DIR})"
+fi
+```
+
+**Safety rules:**
+- Archive created before any move.
+- Only `*-template.md` files move; README files in live dirs are unaffected.
+
+---
+
+#### m. knowledge/knowledge/ migration (v0.5.10.7 — ENH-022 Problem 2)
+
+**Purpose:** Detect and clean up the legacy `knowledge/knowledge/` nesting artifact from pre-v0.5.10.7 installs.
+
+**Detection:** `_modified_kk[]` and `knowledge-knowledge-merge` / `knowledge-knowledge-modified` populated in the detection phase above.
+
+**Apply — unmodified starters (auto-merge):**
+
+```bash
+if [[ " ${upgrades[*]} " =~ "knowledge-knowledge-merge" ]]; then
+  ARCHIVE_DIR="{KG_PATH}/.kg-archive-$(date +%Y%m%d-%H%M%S)"
+  mkdir -p "${ARCHIVE_DIR}/knowledge-knowledge" "{KG_PATH}/knowledge/concepts"
+  cp -r "{KG_PATH}/knowledge/knowledge/." "${ARCHIVE_DIR}/knowledge-knowledge/"
+  echo "{\"archived_at\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"trigger\":\"knowledge-knowledge-merge\"}" > "${ARCHIVE_DIR}/manifest.json"
+  mv "{KG_PATH}/knowledge/knowledge/"*.md "{KG_PATH}/knowledge/concepts/" 2>/dev/null || true
+  rmdir "{KG_PATH}/knowledge/knowledge" 2>/dev/null || true
+  echo "✓ knowledge/knowledge/ merged into knowledge/concepts/ and removed"
+fi
+```
+
+**Apply — modified files (warn only):**
+
+```bash
+if [[ " ${upgrades[*]} " =~ "knowledge-knowledge-modified" ]]; then
+  ARCHIVE_DIR="{KG_PATH}/.kg-archive-$(date +%Y%m%d-%H%M%S)"
+  mkdir -p "${ARCHIVE_DIR}/knowledge-knowledge"
+  cp -r "{KG_PATH}/knowledge/knowledge/." "${ARCHIVE_DIR}/knowledge-knowledge/"
+  echo "{\"archived_at\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"trigger\":\"knowledge-knowledge-modified\"}" > "${ARCHIVE_DIR}/manifest.json"
+  echo "⚠️  knowledge/knowledge/ contains modified files: ${_modified_kk[*]}"
+  echo "    Archived to ${ARCHIVE_DIR}. Review and move into knowledge/concepts/ manually."
+fi
+```
+
+**Safety rules:**
+- Archive created before any move.
+- Modified files are never auto-moved — warn only, user must resolve manually.
+- `rmdir` is safe: only removes the dir when empty after the move.

@@ -162,6 +162,20 @@ See [Quickstart](quickstart.mdx) for detailed walkthroughs.
 
 ---
 
+## Breaking Changes
+
+### v0.5.10.7 — `core/templates/` renamed (Tier 3 manual installers only)
+
+**Affected:** Tier 3 manual installers (ADR-009) who reference `core/templates/` directly in copy instructions or custom scripts.
+
+**Change:** `core/templates/` renamed to `core/default-templates/`.
+
+**Action required:** Update any copy instructions: `core/templates/<dir>/` → `core/default-templates/<dir>/`.
+
+Plugin/marketplace users (Tier 1/2): no action required — this path is internal to the plugin distribution; your `knowledge/` directory is untouched.
+
+---
+
 ## Having Issues?
 
 - **Installation failed?** Paste the full error message into the installer file's troubleshooting section

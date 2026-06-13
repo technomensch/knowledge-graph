@@ -247,7 +247,8 @@ done
 | **v0.5.10** | No upgrade action required. `start-issue-tracking` Step 1.2 improved UX and `continues_from` handoff field are automatic after plugin reload. |
 | **v0.5.10.1** | No upgrade action required. Session summary operational sections, zone structure, one-file-per-day enforcement, and reduced handoff package are automatic after plugin reload. Run `/reload-plugins` to activate. Note: `--skip-sessions` flag for `/kmgraph:handoff` has been removed (SESSION-COMPILATION no longer generated). |
 | **v0.5.10.2** | Codex CLI marketplace support added — no upgrade action required for existing Claude Code installs. Codex users: run `codex plugin marketplace add technomensch/knowledge-graph` then `codex plugin add kmgraph@knowledge-management-graph`. Security: `shell-quote` dependency pinned to `>=1.8.4` automatically on `npm install`. |
-| **v0.5.10.3–v0.5.10.5** | No upgrade action required. Bug fixes and improvements are automatic after plugin reload. |
+| **v0.5.10.3–v0.5.10.6** | No upgrade action required. Bug fixes and improvements are automatic after plugin reload. |
+| **v0.5.10.7** | **⚠️ Breaking change (Tier 3 manual installers only):** Two renames in the plugin distribution. (1) `core/templates/` → `core/default-templates/`. (2) `core/default-templates/knowledge/` → `core/default-templates/concepts/`. Update any copy instructions that reference these paths. Plugin/marketplace users (Tier 1/2) unaffected — these paths are internal to the plugin distribution; your `knowledge/` directory is untouched. Existing installs: run `/kmgraph:init` (option 1 — Verify/upgrade) to auto-migrate starters and any `knowledge/knowledge/` nesting. |
 
 After the wizard completes, your existing lessons, ADRs, sessions, and chat history are untouched.
 
@@ -546,21 +547,21 @@ REPO_PATH="./knowledge-graph"
 
 # Knowledge templates
 for f in patterns.md gotchas.md concepts.md architecture.md workflows.md index.md; do
-  [ -f "$REPO_PATH/core/templates/knowledge/$f" ] && cp "$REPO_PATH/core/templates/knowledge/$f" "$KG_PATH/knowledge/"
+  [ -f "$REPO_PATH/core/default-templates/concepts/$f" ] && cp "$REPO_PATH/core/default-templates/concepts/$f" "$KG_PATH/knowledge/"
 done
 
 # Lesson templates
 for f in README.md lesson-template.md; do
-  [ -f "$REPO_PATH/core/templates/lessons-learned/$f" ] && cp "$REPO_PATH/core/templates/lessons-learned/$f" "$KG_PATH/lessons-learned/"
+  [ -f "$REPO_PATH/core/default-templates/lessons-learned/$f" ] && cp "$REPO_PATH/core/default-templates/lessons-learned/$f" "$KG_PATH/lessons-learned/"
 done
 
 # ADR templates
 for f in README.md ADR-template.md; do
-  [ -f "$REPO_PATH/core/templates/decisions/$f" ] && cp "$REPO_PATH/core/templates/decisions/$f" "$KG_PATH/decisions/"
+  [ -f "$REPO_PATH/core/default-templates/decisions/$f" ] && cp "$REPO_PATH/core/default-templates/decisions/$f" "$KG_PATH/decisions/"
 done
 
 # Session template
-[ -f "$REPO_PATH/core/templates/sessions/session-template.md" ] && cp "$REPO_PATH/core/templates/sessions/session-template.md" "$KG_PATH/sessions/"
+[ -f "$REPO_PATH/core/default-templates/sessions/session-template.md" ] && cp "$REPO_PATH/core/default-templates/sessions/session-template.md" "$KG_PATH/sessions/"
 ```
 
 #### 2C.4: Create Configuration
@@ -834,7 +835,7 @@ See [COMMAND-GUIDE.md](docs/COMMAND-GUIDE.md) for complete command reference.
 - Run the init step again if needed
 
 **Templates not copied:**
-- Verify the repo was cloned successfully: `ls knowledge-graph/core/templates/`
+- Verify the repo was cloned successfully: `ls knowledge-graph/core/default-templates/`
 - Copy templates manually if needed
 
 ---

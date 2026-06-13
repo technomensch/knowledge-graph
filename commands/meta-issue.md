@@ -137,19 +137,19 @@ mkdir -p "$meta_dir"/{related-issues,attempts,analysis}
 ```bash
 # Core files
 for file in README description implementation-log test-cases; do
-  cp "${CLAUDE_PLUGIN_ROOT}/core/templates/meta-issue/${file}.md" \
+  cp "${CLAUDE_PLUGIN_ROOT}/core/default-templates/meta-issue/${file}.md" \
      "$meta_dir/${file}.md"
   # Customize with metadata
 done
 
 # Analysis files
 for file in root-cause-evolution timeline lessons-learned; do
-  cp "${CLAUDE_PLUGIN_ROOT}/core/templates/meta-issue/analysis/${file}.md" \
+  cp "${CLAUDE_PLUGIN_ROOT}/core/default-templates/meta-issue/analysis/${file}.md" \
      "$meta_dir/analysis/${file}.md"
 done
 
 # Related issues
-cp "${CLAUDE_PLUGIN_ROOT}/core/templates/meta-issue/related-issues/github-links.md" \
+cp "${CLAUDE_PLUGIN_ROOT}/core/default-templates/meta-issue/related-issues/github-links.md" \
    "$meta_dir/related-issues/github-links.md"
 ```
 
@@ -166,7 +166,7 @@ cp "${CLAUDE_PLUGIN_ROOT}/core/templates/meta-issue/related-issues/github-links.
 
 ```bash
 mkdir -p "$meta_dir/attempts/001-baseline"
-cp "${CLAUDE_PLUGIN_ROOT}/core/templates/meta-issue/attempt-template/"* \
+cp "${CLAUDE_PLUGIN_ROOT}/core/default-templates/meta-issue/attempt-template/"* \
    "$meta_dir/attempts/001-baseline/"
 ```
 
@@ -224,7 +224,7 @@ cp "${CLAUDE_PLUGIN_ROOT}/core/templates/meta-issue/attempt-template/"* \
 mkdir -p "${meta_dir}/attempts/003-connection-pooling"
 
 # Copy templates
-cp "${CLAUDE_PLUGIN_ROOT}/core/templates/meta-issue/attempt-template/"* \
+cp "${CLAUDE_PLUGIN_ROOT}/core/default-templates/meta-issue/attempt-template/"* \
    "${meta_dir}/attempts/003-connection-pooling/"
 
 # Update implementation-log.md

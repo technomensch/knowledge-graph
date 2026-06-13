@@ -31502,7 +31502,7 @@ function registerConfigTools(server) {
         );
       }
       const pluginRoot = getPluginRoot();
-      const templateSrc = path2.join(pluginRoot, "core", "templates");
+      const templateSrc = path2.join(pluginRoot, "core", "default-templates");
       if (fs2.existsSync(templateSrc)) {
         const knowledgeTemplates = [
           "patterns.md",
@@ -32009,7 +32009,7 @@ function registerScaffoldTool(server) {
     "Create a file from a template with variable substitution",
     {
       template: external_exports.string().describe(
-        "Template path relative to core/templates/ (e.g., 'lessons-learned/lesson-template.md')"
+        "Template path relative to core/default-templates/ (e.g., 'lessons-learned/lesson-template.md')"
       ),
       variables: external_exports.record(external_exports.string(), external_exports.string()).default({}).describe(
         "Variables to substitute in template (e.g., {title: 'My Lesson', date: '2026-02-13'})"
@@ -32018,9 +32018,9 @@ function registerScaffoldTool(server) {
     },
     async ({ template, variables, outputPath }) => {
       const pluginRoot = getPluginRoot();
-      const templatePath = path5.join(pluginRoot, "core", "templates", template);
+      const templatePath = path5.join(pluginRoot, "core", "default-templates", template);
       if (!fs5.existsSync(templatePath)) {
-        const templatesDir = path5.join(pluginRoot, "core", "templates");
+        const templatesDir = path5.join(pluginRoot, "core", "default-templates");
         let available = "Template directory not found.";
         if (fs5.existsSync(templatesDir)) {
           const files = listTemplates(templatesDir, templatesDir);
@@ -32381,71 +32381,71 @@ var init_resources = __esm({
     init_utils();
     TEMPLATE_MAP = {
       lesson: {
-        path: "core/templates/lessons-learned/lesson-template.md",
+        path: "core/default-templates/lessons-learned/lesson-template.md",
         description: "Lesson-learned template with git metadata frontmatter"
       },
       adr: {
-        path: "core/templates/decisions/ADR-template.md",
+        path: "core/default-templates/decisions/ADR-template.md",
         description: "Architecture Decision Record template"
       },
       session: {
-        path: "core/templates/sessions/session-template.md",
+        path: "core/default-templates/sessions/session-template.md",
         description: "Session summary template"
       },
       memory: {
-        path: "core/templates/MEMORY-template.md",
+        path: "core/default-templates/MEMORY-template.md",
         description: "Starter MEMORY.md template for new projects"
       },
       patterns: {
-        path: "core/templates/knowledge/patterns.md",
+        path: "core/default-templates/concepts/patterns.md",
         description: "Knowledge graph patterns template"
       },
       gotchas: {
-        path: "core/templates/knowledge/gotchas.md",
+        path: "core/default-templates/concepts/gotchas.md",
         description: "Knowledge graph gotchas template"
       },
       concepts: {
-        path: "core/templates/knowledge/concepts.md",
+        path: "core/default-templates/concepts/concepts.md",
         description: "Knowledge graph concepts template"
       },
       architecture: {
-        path: "core/templates/knowledge/architecture.md",
+        path: "core/default-templates/concepts/architecture.md",
         description: "Knowledge graph architecture template"
       },
       workflows: {
-        path: "core/templates/knowledge/workflows.md",
+        path: "core/default-templates/concepts/workflows.md",
         description: "Knowledge graph workflows template"
       },
       index: {
-        path: "core/templates/knowledge/index.md",
+        path: "core/default-templates/concepts/index.md",
         description: "Knowledge graph master navigation hub template"
       },
       entry: {
-        path: "core/templates/knowledge/entry-template.md",
+        path: "core/default-templates/concepts/entry-template.md",
         description: "Template for new KG entries"
       },
       "meta-issue": {
-        path: "core/templates/meta-issue/README.md",
+        path: "core/default-templates/meta-issue/README.md",
         description: "Meta-issue navigation hub template"
       },
       "meta-issue-description": {
-        path: "core/templates/meta-issue/description.md",
+        path: "core/default-templates/meta-issue/description.md",
         description: "Meta-issue living document template"
       },
       "meta-issue-log": {
-        path: "core/templates/meta-issue/implementation-log.md",
+        path: "core/default-templates/meta-issue/implementation-log.md",
         description: "Meta-issue attempt timeline template"
       },
       "meta-issue-tests": {
-        path: "core/templates/meta-issue/test-cases.md",
+        path: "core/default-templates/meta-issue/test-cases.md",
         description: "Meta-issue validation criteria template"
       },
       "lessons-readme": {
-        path: "core/templates/lessons-learned/README.md",
+        path: "core/default-templates/lessons-learned/README.md",
         description: "Lessons-learned master index template"
       },
       "decisions-readme": {
-        path: "core/templates/decisions/README.md",
+        path: "core/default-templates/decisions/README.md",
         description: "ADR index template"
       }
     };
@@ -32561,7 +32561,7 @@ async function runInit() {
       });
     }
     const pluginRoot = getPluginRoot();
-    const templateSrc = path8.join(pluginRoot, "core", "templates");
+    const templateSrc = path8.join(pluginRoot, "core", "default-templates");
     let templatesCopied = 0;
     if (fs8.existsSync(templateSrc)) {
       const knowledgeTemplates = [
