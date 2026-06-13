@@ -1,8 +1,15 @@
-# ENH-016: Rules File Auto-Split Recommendation
+---
+title: "ENH-016: Rules File Auto-Split Recommendation"
+number: 016
+status: implemented
+version_target: "v0.5.9.1"
+github_issue: null
+created: 2026-05-25
+related_adrs: ["ADR-028"]
+related_enhs: ["ENH-010", "ENH-014", "ENH-015"]
+---
 
-**Status:** In Progress
-**Version:** v0.5.9.1
-**Created:** 2026-05-25
+# ENH-016: Rules File Auto-Split Recommendation
 
 ## Problem
 

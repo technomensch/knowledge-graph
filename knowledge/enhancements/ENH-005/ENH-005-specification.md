@@ -1,11 +1,12 @@
 ---
-title: FTS5 Database Relocation to User-Level Cache
-enhancement_id: ENH-005
+title: "ENH-005: FTS5 Database Relocation to User-Level Cache"
+number: 005
+status: proposed
+version_target: "v0.2.2"
 github_issue: 46
-version: 0.2.2
-status: Proposed
 created: 2026-03-30
-author: mkaplan
+related_adrs: ["ADR-011"]
+related_enhs: []
 ---
 
 # ENH-005: FTS5 Database Relocation to User-Level Cache

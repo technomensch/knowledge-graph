@@ -1,10 +1,12 @@
 ---
 title: "ENH-004: session-summary optional context-mode event DB integration"
-local-id: ENH-004
-type: enhancement
-status: proposed
+number: 004
+status: implemented
+version_target: "v0.2.2"
+github_issue: null
 created: 2026-03-29
-version-target: 0.2.2
+related_adrs: []
+related_enhs: []
 ---
 
 # ENH-004: session-summary — Optional context-mode Event DB Integration

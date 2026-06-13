@@ -1,13 +1,12 @@
 ---
-id: ENH-014
 title: "ENH-014: Audit and fix MEMORY.md cascade — update all commands/skills/agents/hooks to use profile files"
-type: Bug / Architecture Fix
+number: 014
 status: implemented
-priority: high
-discovered: 2026-05-22
-linked-plan: v0.5.8-fix-plan-rules-injection.md (Task 11)
-audited-by: Claude Opus 4.7 (two-pass verification, 2026-05-22)
-implementation-note: "Shipped in v0.5.8 commit c10d0805. KG previously marked 'Planned/High' — stale entry corrected."
+version_target: "v0.5.8"
+github_issue: null
+created: 2026-05-22
+related_adrs: []
+related_enhs: []
 ---
 
 # ENH-014: Audit and fix MEMORY.md cascade

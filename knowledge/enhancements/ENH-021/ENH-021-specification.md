@@ -1,11 +1,12 @@
 ---
-id: ENH-021
-title: Session Summary + Handoff Asymmetric Coupling via `continues_from`
+title: "ENH-021: Session Summary + Handoff Asymmetric Coupling via `continues_from`"
+number: 021
 status: implemented
-version_target: v0.5.10
-priority: medium
+version_target: "v0.5.10"
+github_issue: null
 created: 2026-05-28
-branch: v0.5.10-ux-session-handoff
+related_adrs: ["ADR-049", "ADR-050", "ADR-051"]
+related_enhs: ["ENH-020"]
 ---
 
 # ENH-021: Session Summary + Handoff Asymmetric Coupling via `continues_from`

@@ -1,10 +1,12 @@
 ---
-title: User-Level Global Knowledge Graphs
-enhancement_id: ENH-001
-version: 0.2.2
-status: Proposed
+title: "ENH-001: User-Level Global Knowledge Graphs"
+number: 001
+status: implemented
+version_target: "v0.2.2"
+github_issue: null
 created: 2026-03-27
-author: mkaplan
+related_adrs: []
+related_enhs: []
 ---
 
 # ENH-001: User-Level Global Knowledge Graphs

@@ -1,9 +1,15 @@
-# ENH-015: Decision Governance Protocol
+---
+title: "ENH-015: Decision Governance Protocol"
+number: 015
+status: implemented
+version_target: "v0.5.9"
+github_issue: null
+created: 2026-05-25
+related_adrs: ["ADR-043", "ADR-049"]
+related_enhs: ["ENH-016", "ENH-020"]
+---
 
-**Status:** In Planning — implementation ready
-**Version:** v0.5.9
-**Branch:** v0.5.9-decision-governance
-**Created:** 2026-05-25
+# ENH-015: Decision Governance Protocol
 
 ## Problem
 

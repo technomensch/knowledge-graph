@@ -1,11 +1,12 @@
 ---
-id: ENH-018
-type: Enhancement
+title: "ENH-018: Rules File H2 Structure Hardening"
+number: 018
 status: deferred
-version: v0.6.x (next available minor)
-branch: none (deferred — will branch from main)
+version_target: null
+github_issue: null
 created: 2026-05-27
-related-adrs: []
+related_adrs: []
+related_enhs: []
 ---
 
 # ENH-018: Rules File H2 Structure Hardening

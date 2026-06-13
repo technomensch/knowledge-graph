@@ -1,11 +1,13 @@
 ---
-title: Session Snapshot on Capture
-enhancement_id: ENH-002
+title: "ENH-002: Session Snapshot on Capture"
+number: 002
+status: partially-implemented
+version_target: "v0.2.2"
 github_issue: 41
-version: 0.2.2
-status: Partially Implemented — snapshot gate items remain; operational sections + zone structure done (v0.5.10.1)
 created: 2026-03-28
-author: mkaplan
+related_adrs: ["ADR-022", "ADR-026"]
+related_enhs: ["ENH-001"]
+notes: "Snapshot gate items remain; operational sections + zone structure done (v0.5.10.1)"
 ---
 
 # ENH-002: Session Snapshot on Capture
@@ -143,6 +145,18 @@ Per-zone write rules for the zone-structured session summary template:
 | Operational | Session Findings | Append+dedup within day; omit from output when empty |
 | Narrative | Accumulated Narrative blocks | Append-only, timestamped; never overwritten |
 
+### Functional — Cross-Branch Daily Consolidation
+
+- [ ] **One file per calendar day across all branches:** When multiple branches are worked on the same calendar day (e.g., v0.5.10.4 and v0.5.10.5 both active on 2026-06-12), the session summary consolidation produces ONE file per day, not one per branch per day. The filename is `YYYY-MM-DD-consolidated.md` (or equivalent pattern indicating multi-branch consolidation).
+- [ ] **Branch list in consolidated file:** The consolidated file tracks which branches contributed to the day's sessions in the YAML frontmatter or a dedicated branches list section, enabling reconstruction of what work happened on which branch.
+- [ ] **Content merge during consolidation:** When consolidating multiple per-branch session summaries from the same day, the consolidated file must merge operational sections (Current State, Open Issues, Session History, Session Findings) by taking the most recent state, not duplicating entries across branches.
+
+### Functional — Temporal State Resolution During Consolidation
+
+- [ ] **Plan → done resolution:** When consolidating multiple session entries for the same day, if an earlier entry says "plan to do X" and a later entry says "X was completed," keep only the "X was completed" state with full context of what was done. Never show both the intent and the outcome for the same item in the final consolidated file.
+- [ ] **Final-state document contract:** The consolidated session summary reads as a final-state-of-day document, not as a stream of events. A reader should understand what the state of work is NOW (at end of day), not what the sequence of intentions was.
+- [ ] **Contradiction tracking retained:** Reversals and contradictions within a day (e.g., "Earlier X was planned; Y was discovered; X was abandoned in favor of Z") are preserved in the Accumulated Narrative section with timestamps, but the Operational Snapshot sections (Current State, Open Issues) show only the final resolved state.
+
 ### Non-Functional
 
 - [ ] Snapshot without git completes in under 10 seconds
@@ -150,6 +164,7 @@ Per-zone write rules for the zone-structured session summary template:
 - [ ] Append mode does not duplicate content already in the session summary
 - [ ] Behavior is identical regardless of which capture command triggered it
 - [ ] Accumulated summary remains readable as a single coherent document (timestamped update blocks, not raw appended fragments)
+- [ ] Cross-branch consolidation completes in under 30 seconds (3–5 branch summaries)
 
 ## Affected Components
 
@@ -183,7 +198,6 @@ The second area is the core unimplemented gap. Work on the snapshot gate is bloc
 - Automatic (no-prompt) snapshots — always user-confirmed
 - Snapshot gate hooks (PostToolUse lesson check, Stop hook, session-end-prompt.sh) — not yet implemented; tracked in Affected Components table
 - User-level KG integration (ENH-001 scope)
-- Cross-branch summary aggregation (each branch gets its own daily file)
 
 **Note:** Changing the session summary content schema — including operational sections (Current State, Open Issues, Session History, Session Findings), zone structure (Operational Snapshot divider, Accumulated Narrative divider), and zone write rules — IS in scope for this enhancement and has been implemented in v0.5.10.1.
 

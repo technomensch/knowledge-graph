@@ -1,8 +1,12 @@
 ---
 title: "ENH-011: Duplicate Check in capture-lesson Before Creating New Entry"
-date: 2026-04-09
-branch: main
-tags: [enhancement, capture-lesson, duplicate-check, rules-md, v0.3.0-beta]
+number: 011
+status: implemented
+version_target: "v0.3.0-beta"
+github_issue: null
+created: 2026-04-09
+related_adrs: []
+related_enhs: ["ENH-010"]
 ---
 # ENH-011: Duplicate Check in capture-lesson Before Creating New Entry
 

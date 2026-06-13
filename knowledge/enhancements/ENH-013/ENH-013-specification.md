@@ -1,13 +1,12 @@
 ---
-id: ENH-013
 title: "ENH-013: Rename kg-recall Skill to Reduce Slash Command UI Confusion"
-type: Refactor
+number: 013
 status: deferred
-github-issue: ""
-branch: none
-version-target: "v0.5.11"
+version_target: "v0.5.11"
+github_issue: null
 created: 2026-05-21
-tags: [enhancement, skills, kg-recall, ux, slash-commands]
+related_adrs: []
+related_enhs: []
 ---
 
 # ENH-013: Rename kg-recall Skill to Reduce Slash Command UI Confusion
