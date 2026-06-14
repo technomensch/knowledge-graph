@@ -1,7 +1,7 @@
 # ADR-019: Write Guard via Agent Instructions (v0.2.0) vs Data Layer (v0.2.1)
 
 **Date:** 2026-03-27
-**Status:** Accepted
+**Status:** Accepted (amended v0.5.10.8 — see § Amendment)
 **Implements:** v0.2.0-beta — Active KG / Project Directory Alignment
 **Related:** [ADR-017](ADR-017-four-layer-architecture-thin-commands.md), [ADR-001](ADR-001-centralized-multi-kg-configuration.md)
 
@@ -176,5 +176,27 @@ Before writing any file:
 ---
 
 **Decision Made:** 2026-03-27
-**Last Updated:** 2026-03-27
-**Status:** Accepted
+**Last Updated:** 2026-06-14
+**Status:** Accepted (amended v0.5.10.8 — see § Amendment)
+
+---
+
+## Amendment — v0.5.10.8 (2026-06-14)
+
+**Phase 2 status confirmed shipped:** `mcp-server/src/tools/capture.ts` implements the
+data-layer CWD guard at lines 252-266. `lesson-capture-agent.md` and
+`session-summary-agent.md` delegate all writes to `kg_capture`. The model-dependent
+agent-instruction guard has been superseded for these paths.
+
+**Remaining gap:** `commands/extract-chat.md`, `commands/sync-all.md`,
+`commands/update-graph.md` do not call `kg_capture` — they write via Python or direct
+filesystem tools. The "non-agent write paths" gap remains open for these commands.
+
+**v0.5.10.8 partial fix:** Added model-layer Step 0 guard to `extract-chat.md` (mirrors
+`capture.ts:252-266` semantics; skip on explicit `--output-dir`/`--project`).
+Cross-platform (Claude, Gemini, Codex). Model-dependent.
+
+**ENH-026** tracks: sync-all/update-graph Step 0 guards, `run_extraction.py` bypass-proof
+CWD check, full unguarded-path audit, and ADR supersession.
+
+**Review date updated:** Reassess when ENH-026 ships; mark this ADR Superseded at that point.
