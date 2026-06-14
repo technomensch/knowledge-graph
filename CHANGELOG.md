@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.5.10.8] — 2026-06-14
+
+### Fixed
+- **`extract-chat` KG write guard (Step 0)** — Adds a pre-extraction alignment check that compares the active knowledge graph's project root against the current working directory. On mismatch, surfaces a stop-and-ask prompt (switch / proceed / cancel) before any `mkdir` or Python extraction runs. Guard is skipped when `--output-dir` or `--project` is present (explicit destination = unambiguous intent). Cross-platform: works on Claude, Gemini, and Codex. Closes the non-agent write path gap documented in ADR-019. Deferred to ENH-026: same guard for `sync-all`/`update-graph`, and bypass-proof enforcement in `run_extraction.py`.
+
+---
+
 ## [0.5.10.7] — 2026-06-13
 
 ### Changed

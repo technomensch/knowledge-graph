@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.5.10.6
+**Version:** 0.5.10.8
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -90,6 +90,14 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 ---
 
 ## v0.5.x Feature Highlights
+
+**v0.5.10.8 — 2026-06-14**
+
+- **`extract-chat` KG write guard** — New Step 0 alignment check compares the active KG's project root against the current working directory before extraction. On mismatch: stop-and-ask prompt (switch / proceed / cancel). Skipped when `--output-dir` or `--project` is explicit. Cross-platform (Claude, Gemini, Codex).
+
+**v0.5.10.7 — 2026-06-13**
+
+- **`core/templates/` renamed to `core/default-templates/`** — Disambiguates frozen distribution scaffolds from live `knowledge/` directories. All internal consumers updated. Closes ENH-022.
 
 **v0.5.10.6 — 2026-06-12**
 
@@ -254,7 +262,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.5.10.5 (2026-06-12)
+**Current Release:** v0.5.10.8 (2026-06-14)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -356,6 +364,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.5.10.5 (2026-06-12)
+**Current Version:** v0.5.10.8 (2026-06-14)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info
