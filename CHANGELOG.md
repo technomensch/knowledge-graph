@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.5.11] — 2026-06-14
+
+### Security
+- **mcp-server: esbuild HIGH vulnerability resolved** — `npm audit fix` upgrades esbuild to patched version. No functional changes; build output verified.
+
+---
+
 ## [0.5.10.8] — 2026-06-14
 
 ### Fixed

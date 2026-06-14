@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.5.10.8
+**Version:** 0.5.11
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -90,6 +90,10 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 ---
 
 ## v0.5.x Feature Highlights
+
+**v0.5.11 — 2026-06-14**
+
+- **Security: esbuild HIGH vulnerability resolved** — `npm audit fix` in mcp-server; no functional changes.
 
 **v0.5.10.8 — 2026-06-14**
 
@@ -262,7 +266,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.5.10.8 (2026-06-14)
+**Current Release:** v0.5.11 (2026-06-14)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
