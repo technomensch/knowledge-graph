@@ -249,6 +249,7 @@ done
 | **v0.5.10.2** | Codex CLI marketplace support added — no upgrade action required for existing Claude Code installs. Codex users: run `codex plugin marketplace add technomensch/knowledge-graph` then `codex plugin add kmgraph@knowledge-management-graph`. Security: `shell-quote` dependency pinned to `>=1.8.4` automatically on `npm install`. |
 | **v0.5.10.3–v0.5.10.6** | No upgrade action required. Bug fixes and improvements are automatic after plugin reload. |
 | **v0.5.10.7** | **⚠️ Breaking change (Tier 3 manual installers only):** Two renames in the plugin distribution. (1) `core/templates/` → `core/default-templates/`. (2) `core/default-templates/knowledge/` → `core/default-templates/concepts/`. Update any copy instructions that reference these paths. Plugin/marketplace users (Tier 1/2) unaffected — these paths are internal to the plugin distribution; your `knowledge/` directory is untouched. Existing installs: run `/kmgraph:init` (option 1 — Verify/upgrade) to auto-migrate starters and any `knowledge/knowledge/` nesting. |
+| **v0.5.10.8–v0.5.11** | No upgrade action required. Security fix (esbuild HIGH in mcp-server) is automatic after plugin reload. |
 
 After the wizard completes, your existing lessons, ADRs, sessions, and chat history are untouched.
 
