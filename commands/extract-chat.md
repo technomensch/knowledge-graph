@@ -113,7 +113,11 @@ Otherwise, run the following check **before** creating any directories or runnin
    ```bash
    active_kg=$(jq -r '.active' ~/.claude/kg-config.json)
    kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.claude/kg-config.json)
+   kg_path="${kg_path/#\~/$HOME}"
    ```
+   The tilde expansion is required: `jq` returns the raw JSON string (e.g. `~/GitHub/foo`),
+   but `pwd` returns an absolute path. Without expansion the comparison always fails for
+   tilde-stored KG paths.
 
 2. Derive the project root from `kg_path`. If `kg_path` ends in `/docs`, the project root is
    its parent directory; otherwise the project root IS `kg_path`. (Mirrors `getProjectRoot`
@@ -145,7 +149,7 @@ Otherwise, run the following check **before** creating any directories or runnin
    >
    > Reply 1, 2, or 3.
 
-   - Option 1: Run `/kmgraph:switch` for the current project's KG (if configured), then re-resolve output dir in Step 1 using the newly active KG.
+   - Option 1: Run `/kmgraph:switch` for the current project's KG (if configured), then re-resolve output dir in Step 1 using the newly active KG. **If the current project has no KG registered in `~/.claude/kg-config.json`**, tell the user and offer `/kmgraph:init` to create one — or fall back to option 2 or 3.
    - Option 2: Continue to Step 1 using the current active KG unchanged.
    - Option 3: Abort. Do not run extraction.
 
