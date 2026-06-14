@@ -101,6 +101,64 @@ The workflow runs the centralized Python extraction script located at `${CLAUDE_
 
 ## Execution Steps
 
+### Step 0: Active KG / Working Directory Guard
+
+**Skip this step entirely** if an explicit destination flag is present in the user's invocation:
+`--output-dir` or `--project`. When the user has named a target, intent is unambiguous —
+proceed directly to Step 1.
+
+Otherwise, run the following check **before** creating any directories or running extraction:
+
+1. Read the active KG name and path:
+   ```bash
+   active_kg=$(jq -r '.active' ~/.claude/kg-config.json)
+   kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.claude/kg-config.json)
+   kg_path="${kg_path/#\~/$HOME}"
+   ```
+   The tilde expansion is required: `jq` returns the raw JSON string (e.g. `~/GitHub/foo`),
+   but `pwd` returns an absolute path. Without expansion the comparison always fails for
+   tilde-stored KG paths.
+
+2. Derive the project root from `kg_path`. If `kg_path` ends in `/docs`, the project root is
+   its parent directory; otherwise the project root IS `kg_path`. (Mirrors `getProjectRoot`
+   in `mcp-server/src/utils.ts`.)
+   ```bash
+   if [[ "$kg_path" == */docs ]]; then
+     project_root="${kg_path%/docs}"
+   else
+     project_root="$kg_path"
+   fi
+   ```
+
+3. Compare the project root against the current working directory. A **match** is when `pwd`
+   equals `project_root` OR `pwd` starts with `project_root/` (allows subdirectories).
+   ```bash
+   cwd=$(pwd)
+   # Match if cwd == project_root OR cwd starts with project_root/
+   ```
+
+4. **If mismatch — STOP. Do not run `mkdir` or the extraction script. Ask the user:**
+
+   > Hold on — the active knowledge graph is **{active_kg}** (project root: `{project_root}`),
+   > but you are working in `{cwd}`. Chat history would be written to `{kg_path}/chat-history/`.
+   >
+   > Choose:
+   > 1. Switch the active KG to this project's graph, then extract here
+   > 2. Extract to **{active_kg}** (`{kg_path}/chat-history/`) anyway
+   > 3. Cancel
+   >
+   > Reply 1, 2, or 3.
+
+   - Option 1: Run `/kmgraph:switch` for the current project's KG (if configured), then re-resolve output dir in Step 1 using the newly active KG. **If the current project has no KG registered in `~/.claude/kg-config.json`**, tell the user and offer `/kmgraph:init` to create one — or fall back to option 2 or 3.
+   - Option 2: Continue to Step 1 using the current active KG unchanged.
+   - Option 3: Abort. Do not run extraction.
+
+   **Do not proceed until the user explicitly responds.**
+
+5. **If match:** Continue to Step 1.
+
+---
+
 ### Step 1: Determine Output Directory
 
 **Default behavior (no --output-dir):**
