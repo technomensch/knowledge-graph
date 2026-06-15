@@ -4,8 +4,8 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 51
-**Last Updated:** 2026-06-07
+**Total ADRs:** 52
+**Last Updated:** 2026-06-15
 
 ---
 
@@ -17,6 +17,7 @@ Formal documentation of significant architecture decisions.
 
 ## All ADRs (Chronological)
 
+- [ADR-053: `kmg-` Prefix as Canonical Cross-Platform Skill and Command Naming Convention](ADR-053-kmg-prefix-cross-platform-naming.md) — **Status:** Accepted — Breaking change: all 15 skills and 25 commands prefixed with `kmg-` for cross-platform collision avoidance (Claude Code + Codex). Migration table provided. Supersedes ENH-013 standalone rename; implements v0.6.0.
 - [ADR-051: Session Summary / Handoff Asymmetric Coupling via continues_from](ADR-051-session-summary-handoff-asymmetric-coupling.md) — **Status:** Accepted — Adds optional `continues_from` frontmatter field to handoff documents; when set, the "what was completed" section collapses to a one-liner pointing at the session summary. Asymmetric one-way coupling: handoff → summary only.
 - [ADR-050: Pre-Push Composite Gate + Inline Recommendation Gate](ADR-050-pre-push-composite-gate-inline-recommendation-gate.md) — **Status:** Accepted — Wires pre-push version-sync (Gate 2) and docs-impact-scan completion flag (Gate 3) as advisory PreToolUse Bash hooks; wires UserPromptSubmit hook for inline recommendation recall/ADR-precheck/cascade gate with per-session PID debounce.
 - [ADR-046: Introduce concept+setup hybrid page type and document how-to guide pattern separately from narrative guides](ADR-046-concept-setup-hybrid-page-type-and-how-to-guide-pattern.md) — **Status:** Accepted — Adds style guide section 4g for Goal/Prerequisites/Steps/Verify how-to pattern; retains 4a for narrative guides; names concept+setup hybrid as a distinct third type.
