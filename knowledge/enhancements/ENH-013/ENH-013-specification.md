@@ -84,9 +84,9 @@ Minimal change — rename the skill directory and update any internal references
 
 ## Status
 
-**In Progress** — v0.6.0 target. Branch: `v0.5.11-kg-recall-rename` (will be retargeted).
+**In Progress** — v0.6.0 target. Branch: `v0.6.0-kg-recall-rename`.
 
 Phase 0 (mcp-server security fix) complete — commit b579c177.
-Phases 1–5 (rename, docs, version sync, commit/PR) pending.
+ENH-013 absorbed into full kmg- prefix normalization (ADR-053). Phase plans in `knowledge/enhancements/ENH-013/v0.6.0-phase-*.md` (not yet written).
 
-**Selected option:** A (`auto-recall`) — approved in implementation plan.
+**Selected option:** A, final name `kmg-auto-recall` — `kmg-` prefix per ADR-053, `auto-` suffix per ENH-013 intent.

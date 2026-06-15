@@ -119,7 +119,7 @@ Original intent (platforms have different constraints, need different handling) 
 ```
 kmgraph:capture-lesson     → kmgraph:kmg-capture-lesson
 kmgraph:session-summary    → kmgraph:kmg-session-summary
-kmgraph:kg-recall          → kmgraph:kmg-recall
+kmgraph:kg-recall          → kmgraph:kmg-auto-recall  # internal skill; was not user-invocable
 ```
 
 **Tool:** Users can apply search-and-replace manually or (optionally) a migration helper command can be provided in v0.6.1.
