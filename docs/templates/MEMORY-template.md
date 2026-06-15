@@ -1,3 +1,10 @@
+---
+title: Memory Template
+category:
+  uri: templates
+slug: templates-memory-template
+---
+
 # Project Memory - [Project Name]
 
 Persistent governance context and critical patterns loaded into every session.

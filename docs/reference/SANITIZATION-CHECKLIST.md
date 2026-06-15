@@ -1,8 +1,9 @@
 ---
-id: SANITIZATION-CHECKLIST
 title: Sanitization Checklist
-sidebar_label: Sanitization Checklist
-description: "Safety checklist before sharing knowledge publicly"
+category:
+  uri: reference
+position: 10
+slug: reference-sanitization-checklist
 ---
 
 # Sanitization Checklist

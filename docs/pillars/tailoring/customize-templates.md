@@ -1,8 +1,11 @@
 ---
-id: customize-templates
 title: Customize Templates
-sidebar_label: Customize Templates
-description: How to modify the lesson, ADR, session, and other templates to match project conventions
+category:
+  uri: tailoring
+position: 2
+slug: pillars-tailoring-customize-templates
+parent:
+  uri: pillars-tailoring-index
 ---
 
 # Customize Templates

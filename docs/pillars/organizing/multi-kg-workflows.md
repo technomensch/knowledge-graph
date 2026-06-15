@@ -1,8 +1,11 @@
 ---
-id: multi-kg-workflows
 title: Multi-KG Workflows
-sidebar_label: Multi-KG Workflows
-description: How to use project-local, personal, and cowork knowledge graphs side by side
+category:
+  uri: organizing
+position: 2
+slug: pillars-organizing-multi-kg-workflows
+parent:
+  uri: pillars-organizing-index
 ---
 
 # Multi-KG Workflows

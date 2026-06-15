@@ -1,8 +1,11 @@
 ---
-id: search-the-graph
 title: Search the Graph
-sidebar_label: Search the Graph
-description: Full-text search with FTS5, local indexing, and multi-KG support
+category:
+  uri: recalling
+position: 1
+slug: pillars-recalling-search-the-graph
+parent:
+  uri: pillars-recalling-index
 ---
 
 # Search the Graph

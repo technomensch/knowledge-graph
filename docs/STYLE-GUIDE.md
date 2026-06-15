@@ -1,8 +1,9 @@
 ---
-id: STYLE-GUIDE
 title: Style Guide
-sidebar_label: Style Guide
-description: Writing conventions, documentation standards, and pattern documentation
+category:
+  uri: overview
+position: 9
+slug: style-guide
 ---
 
 Authoring standards for contributors writing or reviewing documentation for the Knowledge Management Graph.

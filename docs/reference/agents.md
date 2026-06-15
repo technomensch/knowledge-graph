@@ -1,8 +1,9 @@
 ---
-id: agents
 title: Agents Catalog
-sidebar_label: Agents
-description: Every subagent in KMGraph — what it does, when it runs, and how to invoke it
+category:
+  uri: reference
+position: 4
+slug: reference-agents
 ---
 
 # Agents Catalog

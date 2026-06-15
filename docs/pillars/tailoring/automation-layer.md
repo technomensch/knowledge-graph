@@ -1,8 +1,11 @@
 ---
-id: automation-layer
 title: The Automation Layer
-sidebar_label: Automation Layer
-description: How skills, agents, hooks, and auto-capture trigger keywords work together in KMGraph
+category:
+  uri: tailoring
+position: 4
+slug: pillars-tailoring-automation-layer
+parent:
+  uri: pillars-tailoring-index
 ---
 
 # The Automation Layer

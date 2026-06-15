@@ -1,8 +1,9 @@
 ---
-id: four-content-types
 title: Four Content Types
-sidebar_label: Four Content Types
-description: "Four distinct knowledge types: Lessons, Patterns, Decisions, and Gotchas"
+category:
+  uri: concepts
+position: 3
+slug: concepts-four-content-types
 ---
 
 The knowledge graph system organizes information into four distinct types, each optimized for a different purpose. Together, these pillars form a comprehensive institutional memory.

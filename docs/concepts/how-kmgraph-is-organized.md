@@ -1,8 +1,9 @@
 ---
-id: how-kmgraph-is-organized
 title: How KMGraph Is Organized
-sidebar_label: How KMGraph Is Organized
-description: "KMGraph's four-layer architecture separating concerns: Context, Logic, Lifecycle, and Data"
+category:
+  uri: concepts
+position: 4
+slug: concepts-how-kmgraph-is-organized
 ---
 
 # How KMGraph Is Organized

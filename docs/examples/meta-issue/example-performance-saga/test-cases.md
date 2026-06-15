@@ -1,3 +1,10 @@
+---
+title: Test Cases
+category:
+  uri: examples
+slug: examples-meta-issue-example-performance-saga-test-cases
+---
+
 <!-- THIS IS AN EXAMPLE — Replace with your project's meta-issues -->
 
 # Test Cases: Performance Optimization

@@ -1,3 +1,10 @@
+---
+title: Entry Template
+category:
+  uri: templates
+slug: templates-knowledge-entry-template
+---
+
 <!--
 KNOWLEDGE GRAPH ENTRY TEMPLATE
 This template is filled manually when creating standalone KG entries.

@@ -1,8 +1,11 @@
 ---
-id: architecture-decisions
 title: Architecture Decisions
-sidebar_label: Architecture Decisions
-description: How to document an architecture decision with context, rationale, and consequences
+category:
+  uri: capturing
+position: 2
+slug: pillars-capturing-architecture-decisions
+parent:
+  uri: pillars-capturing-index
 ---
 
 # Architecture Decisions

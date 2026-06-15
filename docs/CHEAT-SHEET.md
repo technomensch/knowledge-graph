@@ -1,8 +1,9 @@
 ---
-id: CHEAT-SHEET
 title: Cheat Sheet
-sidebar_label: Cheat Sheet
-description: Quick reference for common KMGraph workflows and commands
+category:
+  uri: overview
+position: 4
+slug: cheat-sheet
 ---
 
 **Version:** 0.5.2 | **Updated:** 2026-04-22

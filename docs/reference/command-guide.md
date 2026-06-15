@@ -1,8 +1,9 @@
 ---
-id: command-guide
 title: Command Guide
-sidebar_label: Command Guide
-description: "Complete reference for all /kmgraph: slash commands"
+category:
+  uri: reference
+position: 1
+slug: reference-command-guide
 ---
 
 import Tabs from '@theme/Tabs';

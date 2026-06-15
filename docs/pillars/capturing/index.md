@@ -1,8 +1,9 @@
 ---
-id: index
 title: Capturing
-sidebar_label: Overview
-description: How to save what you learn — lessons, decisions, patterns, and complex investigations.
+category:
+  uri: capturing
+position: 1
+slug: pillars-capturing-index
 ---
 
 # Capturing

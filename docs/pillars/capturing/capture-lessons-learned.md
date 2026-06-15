@@ -1,8 +1,11 @@
 ---
-id: capture-lessons-learned
 title: Capture Lessons Learned
-sidebar_label: Capture Lessons Learned
-description: How to turn a bug fix or breakthrough into a durable, searchable KG entry.
+category:
+  uri: capturing
+position: 1
+slug: pillars-capturing-capture-lessons-learned
+parent:
+  uri: pillars-capturing-index
 ---
 
 # Capture Lessons Learned

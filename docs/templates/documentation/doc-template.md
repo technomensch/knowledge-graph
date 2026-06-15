@@ -1,8 +1,9 @@
 ---
-title: "[Document Title]"
-type: "[guide | concept | tutorial | explanation | reference | faq | custom]"
-created: "[YYYY-MM-DDThh:mm:ssZ]"
-author: "[AUTO: git config user.name]"
+title: '[Document Title]'
+type: '[guide | concept | tutorial | explanation | reference | faq | custom]'
+category:
+  uri: templates
+slug: templates-documentation-doc-template
 ---
 
 # [Document Title]

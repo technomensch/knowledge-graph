@@ -1,3 +1,10 @@
+---
+title: Implementation Log
+category:
+  uri: templates
+slug: templates-meta-issue-implementation-log
+---
+
 # Implementation Log
 
 Chronological record of all attempts to solve this problem.

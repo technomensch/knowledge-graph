@@ -1,8 +1,11 @@
 ---
-id: integrate-notion
 title: Integrate with Notion
-sidebar_label: Integrate with Notion
-description: Mirror the local knowledge graph into a Notion database for team browsing
+category:
+  uri: portability
+position: 6
+slug: pillars-portability-integrate-notion
+parent:
+  uri: pillars-portability-index
 ---
 
 # Integrate with Notion

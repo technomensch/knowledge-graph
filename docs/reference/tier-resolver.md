@@ -1,8 +1,9 @@
 ---
-id: tier-resolver
 title: Model Tier Resolver
-sidebar_label: Model Tier Resolver
-description: "Configure per-project model tier mappings in me.md to override personal defaults"
+category:
+  uri: reference
+position: 9
+slug: reference-tier-resolver
 ---
 
 # Model Tier Resolver

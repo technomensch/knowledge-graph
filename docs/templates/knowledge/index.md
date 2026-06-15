@@ -1,3 +1,10 @@
+---
+title: Index
+category:
+  uri: templates
+slug: templates-knowledge-index
+---
+
 # Knowledge Graph - Master Index
 
 Navigate all knowledge graph entries by category.

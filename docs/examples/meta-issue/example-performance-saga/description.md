@@ -1,3 +1,10 @@
+---
+title: Description
+category:
+  uri: examples
+slug: examples-meta-issue-example-performance-saga-description
+---
+
 <!-- THIS IS AN EXAMPLE — Replace with your project's meta-issues -->
 
 # Living Description: Performance Optimization Saga

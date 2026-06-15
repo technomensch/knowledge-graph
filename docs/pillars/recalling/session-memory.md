@@ -1,8 +1,11 @@
 ---
-id: session-memory
 title: Session Memory
-sidebar_label: Session Memory
-description: How KMGraph automatically surfaces relevant knowledge at the start of each session.
+category:
+  uri: recalling
+position: 2
+slug: pillars-recalling-session-memory
+parent:
+  uri: pillars-recalling-index
 ---
 
 # Session Memory

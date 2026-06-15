@@ -1,8 +1,9 @@
 ---
-id: why-kmgraph
 title: Why KMGraph?
-sidebar_label: Why KMGraph?
-description: The problem KMGraph solves, who it helps, and when to reach for it
+category:
+  uri: concepts
+position: 1
+slug: concepts-why-kmgraph
 ---
 
 # Why KMGraph?

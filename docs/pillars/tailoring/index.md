@@ -1,8 +1,9 @@
 ---
-id: index
 title: Tailoring
-sidebar_label: Overview
-description: How to customize KMGraph to fit your workflow — hooks, templates, and rules.
+category:
+  uri: tailoring
+position: 1
+slug: pillars-tailoring-index
 ---
 
 # Tailoring

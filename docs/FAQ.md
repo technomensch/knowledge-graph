@@ -1,8 +1,9 @@
 ---
-id: FAQ
 title: FAQ
-sidebar_label: FAQ
-description: Frequently asked questions and troubleshooting
+category:
+  uri: overview
+position: 5
+slug: faq
 ---
 
 This guide provides answers to common questions about using and maintaining the Knowledge Management Graph.

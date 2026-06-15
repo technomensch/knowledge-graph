@@ -1,8 +1,11 @@
 ---
-id: integrate-obsidian
 title: Integrate with Obsidian
-sidebar_label: Integrate with Obsidian
-description: Browse the knowledge graph as an Obsidian vault with zero additional configuration
+category:
+  uri: portability
+position: 7
+slug: pillars-portability-integrate-obsidian
+parent:
+  uri: pillars-portability-index
 ---
 
 # Integrate with Obsidian

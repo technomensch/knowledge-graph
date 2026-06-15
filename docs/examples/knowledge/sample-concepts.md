@@ -1,3 +1,10 @@
+---
+title: Sample Concepts
+category:
+  uri: examples
+slug: examples-knowledge-sample-concepts
+---
+
 # Core Concepts
 
 <!-- THIS IS AN EXAMPLE — Replace with your project's concepts -->

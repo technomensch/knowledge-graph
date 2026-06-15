@@ -1,8 +1,11 @@
 ---
-id: sync-across-machines
 title: Sync a Knowledge Graph Across Machines
-sidebar_label: Sync Across Machines
-description: How to share a personal or project knowledge graph between multiple development machines
+category:
+  uri: portability
+position: 2
+slug: pillars-portability-sync-across-machines
+parent:
+  uri: pillars-portability-index
 ---
 
 # Sync a Knowledge Graph Across Machines

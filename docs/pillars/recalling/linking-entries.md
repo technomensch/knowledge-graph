@@ -1,8 +1,11 @@
 ---
-id: linking-entries
 title: Linking Entries
-sidebar_label: Linking Entries
-description: How to connect related KG entries so recall surfaces the right cluster.
+category:
+  uri: recalling
+position: 3
+slug: pillars-recalling-linking-entries
+parent:
+  uri: pillars-recalling-index
 ---
 
 # Linking Entries

@@ -1,3 +1,10 @@
+---
+title: Sample Patterns
+category:
+  uri: examples
+slug: examples-knowledge-sample-patterns
+---
+
 # Design Patterns Catalog
 
 <!-- THIS IS AN EXAMPLE — Replace with your project's patterns -->

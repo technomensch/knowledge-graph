@@ -1,8 +1,9 @@
 ---
-id: ARCHITECTURE
 title: Architecture
-sidebar_label: Architecture
-description: "System architecture and core concepts for the knowledge graph"
+category:
+  uri: reference
+position: 7
+slug: reference-architecture
 ---
 
 # Knowledge Graph Architecture

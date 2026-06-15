@@ -1,8 +1,11 @@
 ---
-id: graph-configuration
 title: Graph Configuration
-sidebar_label: Graph Configuration
-description: How to configure categories, storage paths, and KG structure.
+category:
+  uri: organizing
+position: 3
+slug: pillars-organizing-graph-configuration
+parent:
+  uri: pillars-organizing-index
 ---
 
 # Graph Configuration

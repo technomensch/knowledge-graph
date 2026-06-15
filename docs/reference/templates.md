@@ -1,8 +1,9 @@
 ---
-id: templates
 title: Templates Reference
-sidebar_label: Templates
-description: All bundled knowledge entry templates in KMGraph — lesson, ADR, session, MEMORY, and more
+category:
+  uri: reference
+position: 6
+slug: reference-templates
 ---
 
 # Templates Reference

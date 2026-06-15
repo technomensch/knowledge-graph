@@ -1,8 +1,11 @@
 ---
-id: capture-patterns
 title: Capture Patterns
-sidebar_label: Capture Patterns
-description: How to structure a reusable pattern entry in the knowledge graph
+category:
+  uri: capturing
+position: 3
+slug: pillars-capturing-capture-patterns
+parent:
+  uri: pillars-capturing-index
 ---
 
 # Capture Patterns

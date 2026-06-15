@@ -1,8 +1,11 @@
 ---
-id: custom-rules
 title: Custom Rules
-sidebar_label: Custom Rules
-description: How to define behavioral rules for your AI assistant and the situations where they apply.
+category:
+  uri: tailoring
+position: 3
+slug: pillars-tailoring-custom-rules
+parent:
+  uri: pillars-tailoring-index
 ---
 
 # Custom Rules

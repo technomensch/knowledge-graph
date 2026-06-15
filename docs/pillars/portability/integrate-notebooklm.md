@@ -1,8 +1,11 @@
 ---
-id: integrate-notebooklm
 title: Integrate with NotebookLM
-sidebar_label: Integrate with NotebookLM
-description: Export the knowledge graph into a NotebookLM notebook for AI-powered Q&A over captured lessons
+category:
+  uri: portability
+position: 5
+slug: pillars-portability-integrate-notebooklm
+parent:
+  uri: pillars-portability-index
 ---
 
 # Integrate with NotebookLM

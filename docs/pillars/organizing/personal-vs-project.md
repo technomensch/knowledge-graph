@@ -1,8 +1,11 @@
 ---
-id: personal-vs-project
 title: Personal vs. Project
-sidebar_label: Personal vs. Project
-description: Understanding personal and project-scoped knowledge graphs
+category:
+  uri: organizing
+position: 1
+slug: pillars-organizing-personal-vs-project
+parent:
+  uri: pillars-organizing-index
 ---
 
 # Personal vs. Project

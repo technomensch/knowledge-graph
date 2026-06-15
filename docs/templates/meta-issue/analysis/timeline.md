@@ -1,3 +1,10 @@
+---
+title: Timeline
+category:
+  uri: templates
+slug: templates-meta-issue-analysis-timeline
+---
+
 # Timeline
 
 Chronological history of the investigation.

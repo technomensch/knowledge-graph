@@ -1,8 +1,9 @@
 ---
-id: GLOSSARY
 title: Glossary
-sidebar_label: Glossary
-description: Definitions of key KMGraph concepts and terminology
+category:
+  uri: overview
+position: 6
+slug: glossary
 ---
 
 This glossary provides plain-English definitions for key terms and concepts used throughout the Knowledge Management Graph documentation.

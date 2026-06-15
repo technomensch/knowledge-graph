@@ -1,8 +1,9 @@
 ---
-id: skills
 title: Skills Catalog
-sidebar_label: Skills
-description: Every auto-triggered skill in KMGraph — trigger keywords, what it suggests, and when it fires
+category:
+  uri: reference
+position: 5
+slug: reference-skills
 ---
 
 # Skills Catalog

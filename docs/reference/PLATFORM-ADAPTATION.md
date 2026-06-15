@@ -1,8 +1,9 @@
 ---
-id: PLATFORM-ADAPTATION
 title: Platform Adaptation
-sidebar_label: Platform Adaptation
-description: "Integration guide for different IDEs and LLMs"
+category:
+  uri: reference
+position: 8
+slug: reference-platform-adaptation
 ---
 
 # Platform Adaptation Guide

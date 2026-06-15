@@ -1,8 +1,9 @@
 ---
-id: index
 title: Portability
-sidebar_label: Overview
-description: How to use your knowledge graph across multiple AI tools, IDEs, and platforms.
+category:
+  uri: portability
+position: 1
+slug: pillars-portability-index
 ---
 
 # Portability

@@ -1,8 +1,11 @@
 ---
-id: document-meta-issues
 title: Document Meta-Issues
-sidebar_label: Document Meta-Issues
-description: Use meta-issue tracking for complex problems that span multiple sessions or branches
+category:
+  uri: capturing
+position: 4
+slug: pillars-capturing-document-meta-issues
+parent:
+  uri: pillars-capturing-index
 ---
 
 # Document Meta-Issues

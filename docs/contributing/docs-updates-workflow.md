@@ -1,8 +1,9 @@
 ---
-id: docs-updates-workflow
 title: Documentation Updates Workflow
-sidebar_label: Docs Updates Workflow
-description: How to publish a docs-only branch as a post in the docs-updates feed
+category:
+  uri: contributing
+position: 1
+slug: contributing-docs-updates-workflow
 ---
 
 # Documentation Updates Workflow

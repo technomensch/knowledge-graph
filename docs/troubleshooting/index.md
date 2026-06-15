@@ -1,8 +1,9 @@
 ---
-id: troubleshooting
 title: Troubleshooting
-sidebar_label: Troubleshooting
-description: Solutions to common KMGraph setup and runtime issues
+category:
+  uri: troubleshooting
+position: 1
+slug: troubleshooting-index
 ---
 
 # Troubleshooting

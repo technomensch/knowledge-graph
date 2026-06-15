@@ -1,3 +1,10 @@
+---
+title: Root Cause Evolution
+category:
+  uri: templates
+slug: templates-meta-issue-analysis-root-cause-evolution
+---
+
 # Root Cause Evolution
 
 How our understanding of the root cause changed over time.

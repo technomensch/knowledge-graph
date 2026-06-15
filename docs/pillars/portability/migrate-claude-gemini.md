@@ -1,8 +1,11 @@
 ---
-id: migrate-claude-gemini
 title: Migrate Claude ↔ Gemini
-sidebar_label: Migrate Claude ↔ Gemini
-description: How to carry knowledge graph context when switching between Claude Code and Gemini CLI
+category:
+  uri: portability
+position: 4
+slug: pillars-portability-migrate-claude-gemini
+parent:
+  uri: pillars-portability-index
 ---
 
 # Migrate Claude ↔ Gemini

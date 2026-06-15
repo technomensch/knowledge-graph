@@ -1,8 +1,9 @@
 ---
-id: hooks
 title: Hooks Reference
-sidebar_label: Hooks
-description: Lifecycle events and shell scripts that automate knowledge capture in KMGraph
+category:
+  uri: reference
+position: 3
+slug: reference-hooks
 ---
 
 # Hooks Reference

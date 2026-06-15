@@ -1,8 +1,11 @@
 ---
-id: what-to-capture
 title: What to Capture
-sidebar_label: What to Capture
-description: How to choose between lessons, ADRs, patterns, and meta-issues.
+category:
+  uri: capturing
+position: 5
+slug: pillars-capturing-what-to-capture
+parent:
+  uri: pillars-capturing-index
 ---
 
 # What to Capture

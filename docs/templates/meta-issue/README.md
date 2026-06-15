@@ -1,3 +1,10 @@
+---
+title: Readme
+category:
+  uri: templates
+slug: templates-meta-issue-readme
+---
+
 # Meta-Issue: [Problem Title]
 
 **Navigation**: [Home](../../index.md) > [Getting Started](../../GETTING-STARTED.md) > [Manual Workflows](../../WORKFLOWS.md) > Templates

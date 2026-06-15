@@ -1,8 +1,11 @@
 ---
-id: backfill
 title: Backfill
-sidebar_label: Backfill
-description: Import existing README, CHANGELOG, and chat history into the knowledge graph
+category:
+  uri: organizing
+position: 4
+slug: pillars-organizing-backfill
+parent:
+  uri: pillars-organizing-index
 ---
 
 # Backfill

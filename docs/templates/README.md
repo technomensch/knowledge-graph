@@ -1,3 +1,10 @@
+---
+title: Readme
+category:
+  uri: templates
+slug: templates-readme
+---
+
 # Templates — Source Directory
 
 This is the **canonical source** for all KMGraph templates. Edit templates here.

@@ -1,8 +1,9 @@
 ---
-id: index
 title: Organizing
-sidebar_label: Overview
-description: How to structure your knowledge graph so it stays useful as it grows.
+category:
+  uri: organizing
+position: 1
+slug: pillars-organizing-index
 ---
 
 # Organizing

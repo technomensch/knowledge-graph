@@ -1,8 +1,11 @@
 ---
-id: docs-impact-scan
 title: Docs Impact Scan
-sidebar_label: Docs Impact Scan
-description: How KMGraph automatically discovers and updates affected documentation before every push using the docs-impact-scan pre-push workflow
+category:
+  uri: tailoring
+position: 5
+slug: pillars-tailoring-docs-impact-scan
+parent:
+  uri: pillars-tailoring-index
 ---
 
 # Docs Impact Scan
