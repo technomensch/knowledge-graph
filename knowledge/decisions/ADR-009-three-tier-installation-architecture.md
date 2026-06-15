@@ -38,7 +38,7 @@ Three-tier installation with explicit trade-offs:
 - **Claude Code:** Marketplace → `claude plugin install`; updates via `claude plugin update`
 - **Codex CLI:** Marketplace → `codex plugin add kmgraph@knowledge-management-graph`; updates via `codex plugin upgrade`
 - Platforms: Claude Code IDE, Codex CLI
-- Update path: Automatic (with cache-clear workaround — see [ADR-006](ADR-006-document-cache-clear-upgrade-workaround.md))
+- Update path: Automatic (with cache-clear workaround — see [ADR-054](ADR-054-document-cache-clear-upgrade-workaround.md))
 - Features: ✅ All commands, ✅ All skills, ✅ All MCP tools, ✅ Auto-updates
 
 **Who:** Users on full-automation platforms wanting complete integration

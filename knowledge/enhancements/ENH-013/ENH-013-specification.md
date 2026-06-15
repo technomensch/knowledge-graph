@@ -8,10 +8,11 @@ created: 2026-05-21
 related_adrs:
   - ADR-053
 related_enhs: []
-note: "Absorbed into v0.6.0 kmg- prefix normalization. Skill will be renamed to kmg-auto-recall (not auto-recall alone) per ADR-053 cross-platform naming convention."
 ---
 
 # ENH-013: Rename kg-recall Skill to Reduce Slash Command UI Confusion
+
+> **v0.6.0 scope note:** Absorbed into full kmg- prefix normalization (ADR-053). Final name is `kmg-auto-recall` — `kmg-` prefix per ADR-053 cross-platform convention, `auto-` per ENH-013 intent to signal internal/auto-trigger behavior.
 
 ## Problem
 
