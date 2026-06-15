@@ -4,7 +4,7 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 53
+**Total ADRs:** 54
 **Last Updated:** 2026-06-15
 
 ---
@@ -17,6 +17,7 @@ Formal documentation of significant architecture decisions.
 
 ## All ADRs (Chronological)
 
+- [ADR-054: Document Cache-Clear as Official Upgrade Path for Claude Code Plugin](ADR-054-document-cache-clear-upgrade-workaround.md) — **Status:** Accepted — Documents cache-clear as the official workaround for stale plugin metadata after updates (Claude Code + Codex). Renumbered from ADR-006 (collision).
 - [ADR-053: `kmg-` Prefix as Canonical Cross-Platform Skill and Command Naming Convention](ADR-053-kmg-prefix-cross-platform-naming.md) — **Status:** Accepted — Breaking change: all 15 skills and 25 commands prefixed with `kmg-` for cross-platform collision avoidance (Claude Code + Codex). Migration table provided. Supersedes ENH-013 standalone rename; implements v0.6.0.
 - [ADR-051: Session Summary / Handoff Asymmetric Coupling via continues_from](ADR-051-session-summary-handoff-asymmetric-coupling.md) — **Status:** Accepted — Adds optional `continues_from` frontmatter field to handoff documents; when set, the "what was completed" section collapses to a one-liner pointing at the session summary. Asymmetric one-way coupling: handoff → summary only.
 - [ADR-050: Pre-Push Composite Gate + Inline Recommendation Gate](ADR-050-pre-push-composite-gate-inline-recommendation-gate.md) — **Status:** Accepted — Wires pre-push version-sync (Gate 2) and docs-impact-scan completion flag (Gate 3) as advisory PreToolUse Bash hooks; wires UserPromptSubmit hook for inline recommendation recall/ADR-precheck/cascade gate with per-session PID debounce.
