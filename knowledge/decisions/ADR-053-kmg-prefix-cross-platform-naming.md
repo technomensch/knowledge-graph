@@ -34,9 +34,73 @@ MCP tool names (`kg_*`) are unchanged — they are already namespaced by convent
 
 ## Consequences
 
-- **Breaking change** for all existing users: every `/kmgraph:` invocation changes
-- Migration table published in CHANGELOG.md v0.6.0 entry
-- Personal rules/triggers files referencing old names must be updated manually
+| Platform | Before | After |
+|---|---|---|
+| Claude Code | `/kmgraph:recall` | `/kmgraph:kmg-recall` |
+| Codex | `recall` | `kmg-recall` |
+
+---
+
+## Rationale
+
+### Lineage (Precedent from Earlier Decisions)
+
+**ADR-003 (2026-02-16): File Prefix Pattern**  
+Established that prefixing is reversible, scalable, and effective for collision avoidance. Temporary `knowledge-` prefix proved the pattern works.
+
+**ADR-010 (2026-02-21): Full Namespace Rename**  
+Demonstrated that breaking name changes are acceptable when:
+- Documented in CHANGELOG with migration table
+- Justified by clear benefit (collision avoidance, publisher identity)
+- Scope is complete (not partial renames that confuse users)
+- Migration path is clear for users
+
+**ADR-028 (live): me.md + rules.md as Platform-Agnostic Source of Truth**  
+Established principle: identity and behavioral rules must be portable across platforms. Platform-specific configs diverge from a shared source of truth — ADR-053 applies the same portability logic to naming.
+
+**ADR-032 (superseded by v0.3.5-beta fixup): Platform-Specific Directives**  
+Original intent (platforms have different constraints, need different handling) informs ADR-053. Mechanism was superseded (`knowledge/platform/` reversed in favor of `CLAUDE.md`). Cited here for the principle only, not the mechanism.
+
+### Why `kmg-` Prefix Solves Both Problems
+
+1. **Collision-free on Codex:** Bare name `kmg-recall` is globally unique (only kmgraph provides it)
+2. **Consistent across platforms:** Users see `kmg-*` on both Claude Code and Codex — familiar pattern
+3. **Publisher identity:** Clear that the command/skill belongs to kmgraph
+4. **Scalable:** Pattern works for future Codex integrations, other CLI tools, or new platforms
+
+---
+
+## Scope
+
+**Affected items (v0.6.0):**
+- 15 skills (directory names + SKILL.md `name:` fields)
+- 25 top-level commands (file names)
+- 7 init-shared subcommands (directory + file names)
+- Cross-references in ~20 files (skills, agents, rules, triggers, docs, examples)
+
+**Not affected:**
+- Historical entries in CHANGELOG.md, sessions/, lessons-learned/ (left as-is for audit trail)
+- MCP tool names (remain `kg_*` — MCP namespace is independent)
+- Scripts in `scripts/` directory (no user-facing references)
+
+---
+
+## Breaking Change & Migration
+
+**User impact:** Personal rules, triggers, aliases referencing old names must be updated.
+
+**Migration provided:** CHANGELOG.md includes complete search-and-replace table (47 renames: 15 skills + 25 commands + 7 init-shared, old → new).
+
+**Example:**
+```
+kmgraph:capture-lesson     → kmgraph:kmg-capture-lesson
+kmgraph:session-summary    → kmgraph:kmg-session-summary
+kmgraph:kg-recall          → kmgraph:kmg-auto-recall  # internal skill; was not user-invocable
+```
+
+**Tool:** Users can apply search-and-replace manually or (optionally) a migration helper command can be provided in v0.6.1.
+
+---
 
 ## Implementation
 

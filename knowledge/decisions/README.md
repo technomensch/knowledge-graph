@@ -4,7 +4,7 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 52
+**Total ADRs:** 53
 **Last Updated:** 2026-06-15
 
 ---
