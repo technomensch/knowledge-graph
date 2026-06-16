@@ -31,7 +31,7 @@ codex plugin marketplace add technomensch/knowledge-graph
 codex plugin add kmgraph@knowledge-management-graph
 ```
 
-Skills and MCP tools activate immediately. Run `/kmgraph:init` to initialize.
+Skills and MCP tools activate immediately. Run `/kmgraph:kmg-init` to initialize.
 
 **Cursor / Windsurf / VS Code**
 
@@ -61,7 +61,7 @@ Copy `core/default-templates/` into your project. Follow the template READMEs to
 ## Step 2 — Initialize
 
 ```bash
-/kmgraph:init
+/kmgraph:kmg-init
 ```
 
 The wizard asks for:
@@ -76,7 +76,7 @@ Init also scaffolds `knowledge/me.md` (your identity and working style, gitignor
 ## Step 3 — Capture Your First Lesson
 
 ```bash
-/kmgraph:capture-lesson
+/kmgraph:kmg-capture-lesson
 ```
 
 Describe what you just learned or solved. The command structures it into a markdown file with categories, tags, and git metadata.
@@ -86,7 +86,7 @@ Describe what you just learned or solved. The command structures it into a markd
 ## Step 4 — Recall It
 
 ```bash
-/kmgraph:recall "what you captured"
+/kmgraph:kmg-recall "what you captured"
 ```
 
 Full-text search across all captured lessons, decisions, and patterns.
@@ -96,7 +96,7 @@ Full-text search across all captured lessons, decisions, and patterns.
 ## Step 5 — Check Status
 
 ```bash
-/kmgraph:status
+/kmgraph:kmg-status
 ```
 
 Shows the active knowledge graph, entry count, and recent captures.
@@ -107,12 +107,12 @@ Shows the active knowledge graph, entry count, and recent captures.
 
 ```mermaid
 graph LR
-    A["Capture\n/kmgraph:capture-lesson"] --> B["Extract\n/kmgraph:update-graph"]
-    B --> C["Sync\n/kmgraph:sync-all"]
-    C --> D["Summarize\n/kmgraph:session-summary"]
+    A["Capture\n/kmgraph:kmg-capture-lesson"] --> B["Extract\n/kmgraph:kmg-update-graph"]
+    B --> C["Sync\n/kmgraph:kmg-sync-all"]
+    C --> D["Summarize\n/kmgraph:kmg-session-summary"]
 ```
 
-Use `/kmgraph:sync-all` at the end of a session to run all four steps in one command.
+Use `/kmgraph:kmg-sync-all` at the end of a session to run all four steps in one command.
 
 ---
 

@@ -26,7 +26,7 @@ The scan runs in eight steps:
 | 4 | Query the active knowledge graph for learned correction patterns (e.g., "when X changes, also check Y") |
 | 5 | Present the combined list to the developer for confirmation — add, remove, or approve |
 | 6 | Offer to save any manually-added files as learned patterns to the KG for future runs |
-| 7 | Dispatch `/kmgraph:update-doc --user-facing [file]` for each confirmed file, in sequence |
+| 7 | Dispatch `/kmgraph:kmg-update-doc --user-facing [file]` for each confirmed file, in sequence |
 | 8 | Write a completion flag to `/tmp/` — the pre-push gate checks this flag before allowing push |
 
 ```mermaid
@@ -71,7 +71,7 @@ sequenceDiagram
     Note over Skill: trigger phrase detected
     Skill->>Dev: Scan diff → present affected docs list
     Dev->>Skill: Confirm or edit list
-    Skill->>Docs: /kmgraph:update-doc --user-facing for each file
+    Skill->>Docs: /kmgraph:kmg-update-doc --user-facing for each file
     Docs->>Dev: Each doc updated
     Skill->>Gate: Write /tmp/kmgraph-docs-scan-<branch>-<sha>.flag
     Dev->>Dev: git push proceeds
@@ -90,7 +90,7 @@ The skill fires automatically when any of these phrases appear in conversation:
 | "open PR" / "create PR" | PR creation signals |
 | "finishing up" / "ready to push" | End-of-session signals |
 
-The skill does not fire on targeted mid-session doc file updates — use `/kmgraph:update-doc` directly for those.
+The skill does not fire on targeted mid-session doc file updates — use `/kmgraph:kmg-update-doc` directly for those.
 
 ## When docs are already updated
 

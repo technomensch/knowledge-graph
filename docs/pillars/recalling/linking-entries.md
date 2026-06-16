@@ -42,7 +42,7 @@ If you have multiple knowledge graphs (project + personal), cross-KG references 
 
 ## Using links in recall
 
-When you run `/kmgraph:recall`, results include the entry content. If you see a related link, follow it manually — the recall command doesn't traverse links automatically. The value is in knowing the connections exist.
+When you run `/kmgraph:kmg-recall`, results include the entry content. If you see a related link, follow it manually — the recall command doesn't traverse links automatically. The value is in knowing the connections exist.
 
 ## Related
 

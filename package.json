@@ -1,6 +1,6 @@
 {
   "name": "knowledge-graph-plugin",
-  "version": "0.5.11",
+  "version": "0.6.0",
   "description": "Structured knowledge capture and cross-session memory for Claude Code projects.",
   "files": [
     ".claude-plugin/",

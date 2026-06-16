@@ -13,7 +13,7 @@ slug: reference-command-guide
 
 These commands are designed as reference documentation for any LLM:
 
-- **Claude Code:** Invoke as slash commands (e.g., `/kmgraph:capture-lesson`)
+- **Claude Code:** Invoke as slash commands (e.g., `/kmgraph:kmg-capture-lesson`)
 - **Other platforms:** Copy the command prompt into your LLM. Substitute `${CLAUDE_PLUGIN_ROOT}` with your actual project path
 - **No-tool LLMs:** Commands serve as workflow documentation — follow steps manually
 
@@ -36,40 +36,40 @@ Commands work across platforms, but full automation is Claude Code-specific.
 ## I Want To...
 
 ### Getting Started
-- **Set up a new knowledge graph** → `/kmgraph:init`
-- **See what's in my knowledge graph** → `/kmgraph:status`
-- **Document what I just learned** → `/kmgraph:capture-lesson`
-- **Find something I documented before** → `/kmgraph:recall "search query"`
+- **Set up a new knowledge graph** → `/kmgraph:kmg-init`
+- **See what's in my knowledge graph** → `/kmgraph:kmg-status`
+- **Document what I just learned** → `/kmgraph:kmg-capture-lesson`
+- **Find something I documented before** → `/kmgraph:kmg-recall "search query"`
 
 ### Daily Use
-- **Sync lessons to the knowledge graph** → `/kmgraph:update-graph`
-- **Summarize this conversation** → `/kmgraph:session-summary`
-- **Add a new category (e.g., security, ml-ops)** → `/kmgraph:add-category`
-- **See my chat history** → `/kmgraph:extract-chat`
-- **Update plugin documentation** → `/kmgraph:update-doc --user-facing`
+- **Sync lessons to the knowledge graph** → `/kmgraph:kmg-update-graph`
+- **Summarize this conversation** → `/kmgraph:kmg-session-summary`
+- **Add a new category (e.g., security, ml-ops)** → `/kmgraph:kmg-add-category`
+- **See my chat history** → `/kmgraph:kmg-extract-chat`
+- **Update plugin documentation** → `/kmgraph:kmg-update-doc --user-facing`
 
 ### Team Collaboration
-- **Share knowledge safely** → `/kmgraph:config-sanitization`
-- **Check for sensitive data before sharing** → `/kmgraph:check-sensitive`
-- **Link lessons to GitHub issues** → `/kmgraph:link-issue`
+- **Share knowledge safely** → `/kmgraph:kmg-config-sanitization`
+- **Check for sensitive data before sharing** → `/kmgraph:kmg-check-sensitive`
+- **Link lessons to GitHub issues** → `/kmgraph:kmg-link-issue`
 
 ### Project Transitions & Onboarding
-- **Create comprehensive handoff documentation** → `/kmgraph:handoff`
-- **Set up for new developer** → `/kmgraph:setup-platform`
+- **Create comprehensive handoff documentation** → `/kmgraph:kmg-handoff`
+- **Set up for new developer** → `/kmgraph:kmg-setup-platform`
 
 > **Note**: The term "issues" in this guide refers to GitHub Issues — a platform feature for tracking bugs, feature requests, and enhancements. This is distinct from "knowledge graph issues" (meta-issues) or "lessons learned issues" (problems documented in the KG).
 
 ### Working with Multiple Knowledge Graphs
-- **View all configured knowledge graphs** → `/kmgraph:list`
-- **Switch to a different knowledge graph** → `/kmgraph:switch`
+- **View all configured knowledge graphs** → `/kmgraph:kmg-list`
+- **Switch to a different knowledge graph** → `/kmgraph:kmg-switch`
 
 ### Complex Problem Tracking
-- **Track a multi-attempt bug** → `/kmgraph:meta-issue`
-- **Start structured issue tracking with documentation and Git branch** → `/kmgraph:start-issue-tracking`
-- **Sync progress to plans and GitHub** → `/kmgraph:update-issue-plan`
+- **Track a multi-attempt bug** → `/kmgraph:kmg-meta-issue`
+- **Start structured issue tracking with documentation and Git branch** → `/kmgraph:kmg-start-issue-tracking`
+- **Sync progress to plans and GitHub** → `/kmgraph:kmg-update-issue-plan`
 
 ### Memory Management
-- **Run the full sync pipeline in one command** → `/kmgraph:sync-all`
+- **Run the full sync pipeline in one command** → `/kmgraph:kmg-sync-all`
 
 
 
@@ -82,51 +82,51 @@ Commands work across platforms, but full automation is Claude Code-specific.
 
 Get the knowledge graph running and configure how it works.
 
-- [🟢 `/kmgraph:init`](#-kmgraphinit) — Initialize a new knowledge graph
-- [🟡 `/kmgraph:init-personal-kg`](#-kmgraphinit-personal-kg) — Create personal KG for cross-project lessons
-- [🟡 `/kmgraph:list`](#-kmgraphlist) — View all configured knowledge graphs
-- [🟡 `/kmgraph:switch`](#-kmgraphswitch) — Switch to a different knowledge graph
-- [🟡 `/kmgraph:add-category`](#-kmgraphadd-category) — Add custom categories
-- [🟡 `/kmgraph:config-sanitization`](#-kmgraphconfig-sanitization) — Set up safety features for team sharing
+- [🟢 `/kmgraph:kmg-init`](#-kmgraphinit) — Initialize a new knowledge graph
+- [🟡 `/kmgraph:kmg-init-personal-kg`](#-kmgraphinit-personal-kg) — Create personal KG for cross-project lessons
+- [🟡 `/kmgraph:kmg-list`](#-kmgraphlist) — View all configured knowledge graphs
+- [🟡 `/kmgraph:kmg-switch`](#-kmgraphswitch) — Switch to a different knowledge graph
+- [🟡 `/kmgraph:kmg-add-category`](#-kmgraphadd-category) — Add custom categories
+- [🟡 `/kmgraph:kmg-config-sanitization`](#-kmgraphconfig-sanitization) — Set up safety features for team sharing
 
 #### Capture & Document
 
 Document lessons, capture history, and summarize sessions.
 
-- [🟢 `/kmgraph:capture-lesson`](#-kmgraphcapture-lesson) — Capture problems solved and patterns discovered
-- [🟡 `/kmgraph:extract-chat`](#-kmgraphextract-chat) — Export chat history to markdown
-- [🟡 `/kmgraph:session-summary`](#-kmgraphsession-summary) — Summarize important work sessions
+- [🟢 `/kmgraph:kmg-capture-lesson`](#-kmgraphcapture-lesson) — Capture problems solved and patterns discovered
+- [🟡 `/kmgraph:kmg-extract-chat`](#-kmgraphextract-chat) — Export chat history to markdown
+- [🟡 `/kmgraph:kmg-session-summary`](#-kmgraphsession-summary) — Summarize important work sessions
 
 #### Search & Sync
 
 Find knowledge and keep the graph synchronized.
 
-- [🟢 `/kmgraph:status`](#-kmgraphstatus) — Check current knowledge graph status
-- [🟢 `/kmgraph:recall`](#-kmgraphrecall) — Search across all knowledge entries
-- [🟡 `/kmgraph:update-graph`](#-kmgraphupdate-graph) — Extract lessons into knowledge graph
-- [🟡 `/kmgraph:update-doc`](#-kmgraphupdate-doc) — Update documentation with changes
-- [🔴 `/kmgraph:sync-all`](#-kmgraphsync-all) — Run complete synchronization pipeline
+- [🟢 `/kmgraph:kmg-status`](#-kmgraphstatus) — Check current knowledge graph status
+- [🟢 `/kmgraph:kmg-recall`](#-kmgraphrecall) — Search across all knowledge entries
+- [🟡 `/kmgraph:kmg-update-graph`](#-kmgraphupdate-graph) — Extract lessons into knowledge graph
+- [🟡 `/kmgraph:kmg-update-doc`](#-kmgraphupdate-doc) — Update documentation with changes
+- [🔴 `/kmgraph:kmg-sync-all`](#-kmgraphsync-all) — Run complete synchronization pipeline
 
 #### Team & Sharing
 
 Share knowledge safely with team members.
 
-- [🟡 `/kmgraph:check-sensitive`](#-kmgraphcheck-sensitive) — Scan for sensitive data before sharing
-- [🔴 `/kmgraph:link-issue`](#-kmgraphlink-issue) — Connect lessons to GitHub issues
+- [🟡 `/kmgraph:kmg-check-sensitive`](#-kmgraphcheck-sensitive) — Scan for sensitive data before sharing
+- [🔴 `/kmgraph:kmg-link-issue`](#-kmgraphlink-issue) — Connect lessons to GitHub issues
 
 #### Advanced Issues
 
 Track complex, multi-attempt problems systematically.
 
-- [🔴 `/kmgraph:meta-issue`](#-kmgraphmeta-issue) — Track multi-attempt bugs and features
-- [🔴 `/kmgraph:start-issue-tracking`](#-kmgraphstart-issue-tracking) — Systematic issue tracking with Git branches
-- [🔴 `/kmgraph:update-issue-plan`](#-kmgraphupdate-issue-plan) — Sync progress with GitHub and plans
+- [🔴 `/kmgraph:kmg-meta-issue`](#-kmgraphmeta-issue) — Track multi-attempt bugs and features
+- [🔴 `/kmgraph:kmg-start-issue-tracking`](#-kmgraphstart-issue-tracking) — Systematic issue tracking with Git branches
+- [🔴 `/kmgraph:kmg-update-issue-plan`](#-kmgraphupdate-issue-plan) — Sync progress with GitHub and plans
 
 ---
 
 ## Essential Commands
 
-### 🟢 `/kmgraph:init`
+### 🟢 `/kmgraph:kmg-init`
 
 **Purpose**: Set up a structured knowledge management system for the active project. Lessons, decisions, and patterns land in a searchable, git-tracked knowledge graph so nothing valuable gets lost between sessions.
 
@@ -144,7 +144,7 @@ Track complex, multi-attempt problems systematically.
 3. Asks for optional custom prefixes per category
 4. Creates directory structure (`knowledge/`, `lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`)
 5. Copies templates from the plugin
-6. Offers to create a **personal KG** at `~/.kmgraph/` for cross-project lessons (see [`/kmgraph:init-personal-kg`](#-kmgraphinit-personal-kg))
+6. Offers to create a **personal KG** at `~/.kmgraph/` for cross-project lessons (see [`/kmgraph:kmg-init-personal-kg`](#-kmgraphinit-personal-kg))
 7. Optionally backfills from existing project context (README, CHANGELOG, lessons, decisions, chat history)
 8. Optionally installs a git post-commit hook for lesson capture suggestions
 9. Updates `.gitignore` based on chosen git strategy
@@ -154,7 +154,7 @@ Track complex, multi-attempt problems systematically.
 
 **Example**:
 ```bash
-/kmgraph:init
+/kmgraph:kmg-init
 
 # Claude asks:
 # - What should this knowledge graph be called?
@@ -177,15 +177,15 @@ When you enable backfill, the system extracts existing knowledge from your proje
 
 The system presents candidates for your review before creating entries.
 
-**After backfill**: If backfill was used, the knowledge graph now contains a full set of imported content. This is a good time to build the search index so all that content is immediately searchable by relevance. Run `/kmgraph:sync-all` and accept the index prompt, or call `kg_fts5_rebuild` directly from the MCP tool panel.
+**After backfill**: If backfill was used, the knowledge graph now contains a full set of imported content. This is a good time to build the search index so all that content is immediately searchable by relevance. Run `/kmgraph:kmg-sync-all` and accept the index prompt, or call `kg_fts5_rebuild` directly from the MCP tool panel.
 
-**Next steps**: Run `/kmgraph:status` to verify setup
+**Next steps**: Run `/kmgraph:kmg-status` to verify setup
 
 **Model tier configuration**: As of v0.5.x, init also walks through the model tier system. Tier labels (`fast-tier`, `standard-tier`, `powerful-tier`) replace hardcoded model names (Haiku, Sonnet, Opus and their Gemini equivalents) so rules, commands, and agents stay stable across model version changes and platforms. During init, a `platforms[]` block is written to `knowledge/me.md` with a `tier_map` entry for each detected platform, binding each tier label to a concrete model name. Locally running Ollama (`localhost:11434`) and LM Studio (`localhost:1234`) instances are discovered automatically and offered as additional platforms, with host, port, and per-tier model selection captured in the walkthrough. An alias map translates legacy model names (Haiku, Sonnet, Opus, Flash, Pro) to tier labels for backwards compatibility, and unrecognized model names trigger a one-time prompt to assign the name to a tier before dispatch continues.
 
 ---
 
-### 🟡 `/kmgraph:init-personal-kg`
+### 🟡 `/kmgraph:kmg-init-personal-kg`
 
 
 
@@ -193,7 +193,7 @@ The system presents candidates for your review before creating entries.
 
 **When to use**:
 
-- After running `/kmgraph:init` and skipping the personal KG offer
+- After running `/kmgraph:kmg-init` and skipping the personal KG offer
 - When you want a dedicated place for workflow lessons, cross-project gotchas, and personal ADRs that apply across all projects, not just the current one
 
 **What it does**:
@@ -205,12 +205,12 @@ The system presents candidates for your review before creating entries.
 5. Does **not** change the active KG — project KG remains active
 
 After setup:
-- `/kmgraph:capture-lesson` shows a **KG picker** when ≥2 KGs are registered
-- `/kmgraph:recall` searches both project and personal KGs automatically
+- `/kmgraph:kmg-capture-lesson` shows a **KG picker** when ≥2 KGs are registered
+- `/kmgraph:kmg-recall` searches both project and personal KGs automatically
 
 **Example**:
 ```bash
-/kmgraph:init-personal-kg
+/kmgraph:kmg-init-personal-kg
 
 # Claude creates ~/.kmgraph/
 # Registers "personal" KG (type: personal) in config
@@ -223,7 +223,7 @@ After setup:
 
 ## Cross-Reference Formatting (Wiki Links)
 
-When you run `/kmgraph:init` (Step 1f.2) or `/kmgraph:init-personal-kg` (Step 8.1), the system automatically converts cross-references in your knowledge graph to Obsidian wiki link format for seamless navigation in compatible editors.
+When you run `/kmgraph:kmg-init` (Step 1f.2) or `/kmgraph:kmg-init-personal-kg` (Step 8.1), the system automatically converts cross-references in your knowledge graph to Obsidian wiki link format for seamless navigation in compatible editors.
 
 ### Supported Formats
 
@@ -232,12 +232,12 @@ The wiki pass applies these auto-linkification patterns:
 - **Enhancements**: `[[ENH-NNN]]` (e.g., `[[ENH-010]]`)
 - **Architecture Decisions**: `[[ADR-NNN-full-title]]` (e.g., `[[ADR-028-postgres-over-mongodb]]`)
 - **Lessons Learned**: `[[Lessons_Learned_X]]` (e.g., `[[Lessons_Learned_5]]`)
-- **GitHub Issues**: `[#NNN](url)` format (automatically applied when linking via `/kmgraph:link-issue`)
+- **GitHub Issues**: `[#NNN](url)` format (automatically applied when linking via `/kmgraph:kmg-link-issue`)
 
 ### When Links Are Applied
 
-- During initial `/kmgraph:init` setup (Step 1f.2: "Apply Obsidian wiki link formatting to cross-references")
-- During `/kmgraph:init-personal-kg` (Step 8.1: "Applying wiki pass to personal KG")
+- During initial `/kmgraph:kmg-init` setup (Step 1f.2: "Apply Obsidian wiki link formatting to cross-references")
+- During `/kmgraph:kmg-init-personal-kg` (Step 8.1: "Applying wiki pass to personal KG")
 - Only once — controlled by the `wiki_pass_complete` config flag to avoid re-running on subsequent setups
 
 ### Preview Changes with --dry-run
@@ -245,7 +245,7 @@ The wiki pass applies these auto-linkification patterns:
 To preview what links will be created without applying them:
 
 ```bash
-/kmgraph:init --dry-run
+/kmgraph:kmg-init --dry-run
 ```
 
 The `--dry-run` mode shows which files will be modified and what cross-references will be converted, without writing any changes.
@@ -259,7 +259,7 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 
 ---
 
-### 🟢 `/kmgraph:capture-lesson`
+### 🟢 `/kmgraph:kmg-capture-lesson`
 
 
 
@@ -288,17 +288,17 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 - prevention
 7. Creates the lesson file from the standard template with all fields populated
 8. Updates category and chronological indexes
-9. `{OPTIONAL}` Runs `/kmgraph:update-graph` to extract KG entries from the new lesson
-10. `{OPTIONAL}` Links to a GitHub Issue via `/kmgraph:link-issue`
+9. `{OPTIONAL}` Runs `/kmgraph:kmg-update-graph` to extract KG entries from the new lesson
+10. `{OPTIONAL}` Links to a GitHub Issue via `/kmgraph:kmg-link-issue`
 
 **Time**: 5-10 minutes (faster with practice)
 
 **Example**:
 ```bash
-/kmgraph:capture-lesson                        # → active KG
-/kmgraph:capture-lesson "user level"           # → personal KG (~/.kmgraph/)
-/kmgraph:capture-lesson --project              # → current project's KG
-/kmgraph:capture-lesson --named=career-ops     # → career-ops KG
+/kmgraph:kmg-capture-lesson                        # → active KG
+/kmgraph:kmg-capture-lesson "user level"           # → personal KG (~/.kmgraph/)
+/kmgraph:kmg-capture-lesson --project              # → current project's KG
+/kmgraph:kmg-capture-lesson --named=career-ops     # → career-ops KG
 
 # Agent guides you through:
 # 1. What problem did you encounter?
@@ -317,13 +317,13 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 
 ---
 
-### 🟢 `/kmgraph:status`
+### 🟢 `/kmgraph:kmg-status`
 
 **Purpose**: Show the health and contents of the active knowledge graph at a glance. File counts, sync timestamps, staleness warnings, and a quick command reference, all without leaving the conversation.
 
 **When to use**:
 
-- Verify setup after running `/kmgraph:init`
+- Verify setup after running `/kmgraph:kmg-init`
 - See recent lessons at a glance
 - Check profile file staleness (`~/.kmgraph/rules.md`, `~/.kmgraph/me.md`)
 - Quick health check on the knowledge graph
@@ -357,16 +357,16 @@ Stats:
   Sessions: 8
 
 Quick Commands:
-  /kmgraph:capture-lesson    — Document a lesson
-  /kmgraph:recall "query"    — Search across all KG
-  /kmgraph:sync-all          — Run full sync pipeline
+  /kmgraph:kmg-capture-lesson    — Document a lesson
+  /kmgraph:kmg-recall "query"    — Search across all KG
+  /kmgraph:kmg-sync-all          — Run full sync pipeline
 ```
 
 **Tips**: Use the flags `--minimal` for a one-line summary and `--json` for machine-readable output.
 
 ---
 
-### 🟢 `/kmgraph:recall`
+### 🟢 `/kmgraph:kmg-recall`
 
 
 
@@ -398,9 +398,9 @@ Dispatches to the recall agent, which searches:
 
 **Example**:
 ```bash
-/kmgraph:recall "database timeout"
-/kmgraph:recall "auth patterns" --scope=all
-/kmgraph:recall "workflow patterns" --scope=personal-only
+/kmgraph:kmg-recall "database timeout"
+/kmgraph:kmg-recall "auth patterns" --scope=all
+/kmgraph:kmg-recall "workflow patterns" --scope=personal-only
 
 # Multi-KG result format:
 # Lessons Learned (3 matches)
@@ -426,17 +426,17 @@ Dispatches to the recall agent, which searches:
 | `--named=<kg>` / KG name | Only the named KG |
 
 ```bash
-/kmgraph:recall "auth patterns" --user          # personal KG only
-/kmgraph:recall "database timeout" --project    # current project only
-/kmgraph:recall "deployment" --named=devops-kg  # named KG only
+/kmgraph:kmg-recall "auth patterns" --user          # personal KG only
+/kmgraph:kmg-recall "database timeout" --project    # current project only
+/kmgraph:kmg-recall "deployment" --named=devops-kg  # named KG only
 ```
 
 **Search tips**:
 
 - Use specific terms ("PostgreSQL timeout" > "database")
 - Try synonyms if nothing found
-- Search by date: `/kmgraph:recall "2024-01"`
-- Search by category: `/kmgraph:recall "architecture"`
+- Search by date: `/kmgraph:kmg-recall "2024-01"`
+- Search by category: `/kmgraph:kmg-recall "architecture"`
 - Output formats: default (summary), `--format=paths` (file list), `--format=detailed` (full context)
 - Scope override: `--scope=active` to restrict to project KG only
 
@@ -444,7 +444,7 @@ Dispatches to the recall agent, which searches:
 
 ## Intermediate Commands
 
-### 🟡 `/kmgraph:update-graph`
+### 🟡 `/kmgraph:kmg-update-graph`
 
 **Purpose**: Takes individual lessons learned and adds them directly into the knowledge graph's searchable index. Lessons hold the full narrative; `update-graph` makes patterns findable in seconds, not minutes.
 
@@ -468,22 +468,22 @@ Dispatches to the recall agent, which searches:
 
 **Example**:
 ```bash
-/kmgraph:update-graph
-/kmgraph:update-graph --lesson=Pattern_Discovery.md    # Process specific lesson
-/kmgraph:update-graph --auto                          # Skip prompts, silent mode
-/kmgraph:update-graph --interactive                    # Review each entry before saving
+/kmgraph:kmg-update-graph
+/kmgraph:kmg-update-graph --lesson=Pattern_Discovery.md    # Process specific lesson
+/kmgraph:kmg-update-graph --auto                          # Skip prompts, silent mode
+/kmgraph:kmg-update-graph --interactive                    # Review each entry before saving
 ```
 
 **Tips**:
 
-- `--auto` flag is useful when called from other commands (e.g., after `/kmgraph:capture-lesson`)
+- `--auto` flag is useful when called from other commands (e.g., after `/kmgraph:kmg-capture-lesson`)
 - `--interactive` flag lets you review and edit each extracted entry before saving
 
 **Cleaner conversations**: When the context-mode plugin is installed and there are 10 or more lessons to process, `update-graph` reads the lesson files in a background process instead of inline. This keeps the conversation cleaner without changing any results. Falls back automatically if context-mode is not installed.
 
 ---
 
-### 🟡 `/kmgraph:add-category`
+### 🟡 `/kmgraph:kmg-add-category`
 
 **Purpose**: Add a new category to the active knowledge graph. Creates the directory structure, index file, and git strategy in one step, so the new category is ready to capture lessons immediately.
 
@@ -507,16 +507,16 @@ Dispatches to the recall agent, which searches:
 
 **Example**:
 ```bash
-/kmgraph:add-category
-/kmgraph:add-category security
-/kmgraph:add-category ml-ops --prefix ml- --git ignore
+/kmgraph:kmg-add-category
+/kmgraph:kmg-add-category security
+/kmgraph:kmg-add-category ml-ops --prefix ml- --git ignore
 ```
 
-**Next steps**: Capture lessons in the new category with `/kmgraph:capture-lesson`
+**Next steps**: Capture lessons in the new category with `/kmgraph:kmg-capture-lesson`
 
 ---
 
-### 🟡 `/kmgraph:session-summary`
+### 🟡 `/kmgraph:kmg-session-summary`
 
 **Purpose**: Capture session context on demand and store it in a dated markdown file before it is lost. The dated file is a reliable record of what happened, so any future session can reference it.
 
@@ -542,12 +542,12 @@ Dispatches to the recall agent, which searches:
 
 **Example**:
 ```bash
-/kmgraph:session-summary                        # → active KG
-/kmgraph:session-summary --auto                 # Skip confirmation, save immediately
-/kmgraph:session-summary --snapshot             # Mid-session save without review gate
-/kmgraph:session-summary "user level"           # → personal KG (~/.kmgraph/sessions/)
-/kmgraph:session-summary --project              # → current project's KG sessions/
-/kmgraph:session-summary --named=career-ops     # → career-ops KG sessions/
+/kmgraph:kmg-session-summary                        # → active KG
+/kmgraph:kmg-session-summary --auto                 # Skip confirmation, save immediately
+/kmgraph:kmg-session-summary --snapshot             # Mid-session save without review gate
+/kmgraph:kmg-session-summary "user level"           # → personal KG (~/.kmgraph/sessions/)
+/kmgraph:kmg-session-summary --project              # → current project's KG sessions/
+/kmgraph:kmg-session-summary --named=career-ops     # → career-ops KG sessions/
 ```
 
 **Tips**:
@@ -558,7 +558,7 @@ Dispatches to the recall agent, which searches:
 
 ---
 
-### 🟡 `/kmgraph:create-adr`
+### 🟡 `/kmgraph:kmg-create-adr`
 
 
 
@@ -596,10 +596,10 @@ Dispatches to the recall agent, which searches:
 
 **Example**:
 ```bash
-/kmgraph:create-adr                                             # → active KG
-/kmgraph:create-adr "Use PostgreSQL for primary database"       # Pre-fills title
-/kmgraph:create-adr "Prefer TypeScript strict mode" --user      # → personal KG decisions/
-/kmgraph:create-adr "Use Redis caching" --project               # → current project decisions/
+/kmgraph:kmg-create-adr                                             # → active KG
+/kmgraph:kmg-create-adr "Use PostgreSQL for primary database"       # Pre-fills title
+/kmgraph:kmg-create-adr "Prefer TypeScript strict mode" --user      # → personal KG decisions/
+/kmgraph:kmg-create-adr "Use Redis caching" --project               # → current project decisions/
 ```
 
 **Tips**:
@@ -612,7 +612,7 @@ Dispatches to the recall agent, which searches:
 
 ---
 
-### 🟡 `/kmgraph:list`
+### 🟡 `/kmgraph:kmg-list`
 
 **Purpose**: Display all knowledge graph projects registered locally. Useful when working across multiple projects and the exact KG name needs to be identified before switching.
 
@@ -653,7 +653,7 @@ Total: 2 knowledge graph(s) configured
 
 ---
 
-### 🟡 `/kmgraph:switch`
+### 🟡 `/kmgraph:kmg-switch`
 
 **Purpose**: Switch the active knowledge graph so all subsequent commands read from and write to the intended one.
 
@@ -675,26 +675,26 @@ Total: 2 knowledge graph(s) configured
 
 **Example**:
 ```bash
-/kmgraph:switch my-project
-/kmgraph:switch ai-research
-/kmgraph:switch cowork-devops --force    # Skip missing path warning
+/kmgraph:kmg-switch my-project
+/kmgraph:kmg-switch ai-research
+/kmgraph:kmg-switch cowork-devops --force    # Skip missing path warning
 ```
 
 **Tips**:
 
 - All subsequent knowledge commands operate on the newly active KG
-- Use `/kmgraph:list` first to see available options
+- Use `/kmgraph:kmg-list` first to see available options
 
 ---
 
-### 🟡 `/kmgraph:check-sensitive`
+### 🟡 `/kmgraph:kmg-check-sensitive`
 
 **Purpose**: Scan the active knowledge graph for emails, API keys, and internal URLs before pushing to a shared repository. Flags findings with file name and line number for manual review.
 
 **When to use**:
 
 - Before pushing knowledge graph files to a public or shared repository
-- As a manual check alongside `/kmgraph:config-sanitization` hooks
+- As a manual check alongside `/kmgraph:kmg-config-sanitization` hooks
 - Periodic audit of KG content
 
 **What it does**:
@@ -708,7 +708,7 @@ Total: 2 knowledge graph(s) configured
 
 **Example**:
 ```bash
-/kmgraph:check-sensitive
+/kmgraph:kmg-check-sensitive
 
 # Output:
 # ⚠️  Potential sensitive data found:
@@ -722,7 +722,7 @@ Total: 2 knowledge graph(s) configured
 
 ---
 
-### 🟡 `/kmgraph:config-sanitization`
+### 🟡 `/kmgraph:kmg-config-sanitization`
 
 **Purpose**: Run a one-time wizard to automatically flag sensitive data before every commit is saved. Configures scan patterns, custom regexes, and enforcement level in 2-3 minutes.
 
@@ -743,7 +743,7 @@ Total: 2 knowledge graph(s) configured
 
 **Example**:
 ```bash
-/kmgraph:config-sanitization
+/kmgraph:kmg-config-sanitization
 
 # Wizard asks:
 # 1. What should be scanned for? (checkboxes for email, API keys, names, URLs)
@@ -766,7 +766,7 @@ Test the hook:
 
 ---
 
-### 🟡 `/kmgraph:extract-chat`
+### 🟡 `/kmgraph:kmg-extract-chat`
 
 **Purpose**: Extracts existing local chat history files and stores them within the project as markdown files. Results vary by model and platform; anything beyond Claude may require unsupported configuration.
 
@@ -804,20 +804,20 @@ Test the hook:
 
 **Example**:
 ```bash
-/kmgraph:extract-chat                                          # Extract all (Claude + Gemini)
-/kmgraph:extract-chat -claude                                  # Extract only Claude
-/kmgraph:extract-chat -gemini                                  # Extract only Gemini
-/kmgraph:extract-chat --source codex                          # Extract only Codex CLI sessions
-/kmgraph:extract-chat --output-dir=/custom/path               # Custom output location
-/kmgraph:extract-chat --today                                  # Today only
-/kmgraph:extract-chat -claude 2026-02-20 through 2026-02-21   # Date range
-/kmgraph:extract-chat --project=knowledge-graph               # Specific project only
-/kmgraph:extract-chat --source codex --after 2026-01-01       # Codex sessions from a date onwards
+/kmgraph:kmg-extract-chat                                          # Extract all (Claude + Gemini)
+/kmgraph:kmg-extract-chat -claude                                  # Extract only Claude
+/kmgraph:kmg-extract-chat -gemini                                  # Extract only Gemini
+/kmgraph:kmg-extract-chat --source codex                          # Extract only Codex CLI sessions
+/kmgraph:kmg-extract-chat --output-dir=/custom/path               # Custom output location
+/kmgraph:kmg-extract-chat --today                                  # Today only
+/kmgraph:kmg-extract-chat -claude 2026-02-20 through 2026-02-21   # Date range
+/kmgraph:kmg-extract-chat --project=knowledge-graph               # Specific project only
+/kmgraph:kmg-extract-chat --source codex --after 2026-01-01       # Codex sessions from a date onwards
 ```
 
 **Tips**:
 
-- Extracted files are automatically searchable via `/kmgraph:recall`
+- Extracted files are automatically searchable via `/kmgraph:kmg-recall`
 - Optional `blackboxprotobuf` Python library enables Gemini protobuf file support
 - Date ranges use natural language: `YYYY-MM-DD through YYYY-MM-DD` or `YYYY-MM-DD to YYYY-MM-DD`
 - Gemini date filtering: passthrough implemented; underlying Gemini extraction may have known limitations
@@ -825,7 +825,7 @@ Test the hook:
 
 ---
 
-### 🟡 `/kmgraph:update-doc`
+### 🟡 `/kmgraph:kmg-update-doc`
 
 **Purpose**: Maintains this project's user-facing documentation through a guided wizard. Intended primarily for contributors; adapting it to other projects is possible but not yet documented.
 
@@ -851,9 +851,9 @@ With `--user-facing`:
 
 **Example**:
 ```bash
-/kmgraph:update-doc COMMAND-GUIDE.md --user-facing   # Update plugin documentation wizard
-/kmgraph:update-doc README.md --user-facing           # Update README with new feature info
-/kmgraph:update-doc some-lesson.md                    # Disambiguation dialog for KG content
+/kmgraph:kmg-update-doc COMMAND-GUIDE.md --user-facing   # Update plugin documentation wizard
+/kmgraph:kmg-update-doc README.md --user-facing           # Update README with new feature info
+/kmgraph:kmg-update-doc some-lesson.md                    # Disambiguation dialog for KG content
 ```
 
 **Tips**:
@@ -866,7 +866,7 @@ With `--user-facing`:
 
 ## Advanced Commands
 
-### 🔴 `/kmgraph:meta-issue`
+### 🔴 `/kmgraph:kmg-meta-issue`
 
 **Purpose**: Create a structured workspace for problems that resist initial solutions. Tracks each attempt with its hypothesis and outcome so understanding evolves across attempts rather than starting blind each time.
 
@@ -880,7 +880,7 @@ With `--user-facing`:
 
 **What it does**:
 
-1. **Initialize** (`/kmgraph:meta-issue "Problem Title"`):
+1. **Initialize** (`/kmgraph:kmg-meta-issue "Problem Title"`):
    - Prompts for domain, scope, severity, expected attempts
    - Creates structured directory under `{active_kg_path}/issues/[meta-issue-name]/`
    - Populates core files: README, description, implementation-log, test-cases
@@ -904,20 +904,20 @@ With `--user-facing`:
 
 **Example**:
 ```bash
-/kmgraph:meta-issue "Authentication Redesign"
-/kmgraph:meta-issue --add-attempt 002 "OAuth2 with JWT"
-/kmgraph:meta-issue --log-attempt 003 "JWT expiry logic is the root cause"
-/kmgraph:meta-issue --update-understanding "Token expiry logic flawed"
-/kmgraph:meta-issue --status
+/kmgraph:kmg-meta-issue "Authentication Redesign"
+/kmgraph:kmg-meta-issue --add-attempt 002 "OAuth2 with JWT"
+/kmgraph:kmg-meta-issue --log-attempt 003 "JWT expiry logic is the root cause"
+/kmgraph:kmg-meta-issue --update-understanding "Token expiry logic flawed"
+/kmgraph:kmg-meta-issue --status
 ```
 
-> **Note**: Do NOT use meta-issue for simple bugs, standard features, or one-off debugging. Use `/kmgraph:capture-lesson` instead.
+> **Note**: Do NOT use meta-issue for simple bugs, standard features, or one-off debugging. Use `/kmgraph:kmg-capture-lesson` instead.
 
 **See also**: [Meta-Issue Guide](../pillars/capturing/document-meta-issues.md) — full guide covering directory structure, attempt templates, escalation thresholds, and worked examples. [Track a Multi-Attempt Issue](../pillars/capturing/document-meta-issues.md) — step-by-step walkthrough.
 
 ---
 
-### 🔴 `/kmgraph:start-issue-tracking`
+### 🔴 `/kmgraph:kmg-start-issue-tracking`
 
 
 
@@ -954,9 +954,9 @@ With `--user-facing`:
 
 **Example**:
 ```bash
-/kmgraph:start-issue-tracking
-/kmgraph:start-issue-tracking CLI flag parsing fails on quoted args
-/kmgraph:start-issue-tracking Add token usage display
+/kmgraph:kmg-start-issue-tracking
+/kmgraph:kmg-start-issue-tracking CLI flag parsing fails on quoted args
+/kmgraph:kmg-start-issue-tracking Add token usage display
 ```
 
 **Tips**:
@@ -968,13 +968,13 @@ With `--user-facing`:
 
 ---
 
-### 🔴 `/kmgraph:update-issue-plan`
+### 🔴 `/kmgraph:kmg-update-issue-plan`
 
 **Purpose**: Keeps the knowledge graph, active plans, and GitHub issues in sync after new entries are extracted. The right command when formal issue plans are part of the workflow.
 
 **When to use**:
 
-- After extracting new KG entries with `/kmgraph:update-graph`
+- After extracting new KG entries with `/kmgraph:kmg-update-graph`
 - When implementation plan needs to reflect new insights
 - Before committing governance-related changes
 - When progress needs to be posted to a GitHub Issue
@@ -983,7 +983,7 @@ With `--user-facing`:
 
 **What it does**:
 
-1. **Knowledge extraction**: Runs `/kmgraph:update-graph` to extract patterns
+1. **Knowledge extraction**: Runs `/kmgraph:kmg-update-graph` to extract patterns
 2. **Plan sync**: Updates the active implementation plan with a "Lessons Learned Integration" section
 3. **Local issue update**: Appends progress and new verification requirements to local issue docs
 4. **GitHub sync**: Maps local issue ID to GitHub Issue number, posts a knowledge sync comment, and updates PR description with related lessons
@@ -993,9 +993,9 @@ With `--user-facing`:
 
 **Example**:
 ```bash
-/kmgraph:update-issue-plan
-/kmgraph:update-issue-plan --auto       # Skip prompts
-/kmgraph:update-issue-plan --pr=42      # Sync to specific PR
+/kmgraph:kmg-update-issue-plan
+/kmgraph:kmg-update-issue-plan --auto       # Skip prompts
+/kmgraph:kmg-update-issue-plan --pr=42      # Sync to specific PR
 ```
 
 **Tips**:
@@ -1005,7 +1005,7 @@ With `--user-facing`:
 
 ---
 
-### 🔴 `/kmgraph:link-issue`
+### 🔴 `/kmgraph:kmg-link-issue`
 
 **Purpose**: Link a lesson or ADR to a GitHub Issue after the fact. Writes the issue number into the file's frontmatter and posts a comment to the issue, so the KG and GitHub stay in sync.
 
@@ -1029,13 +1029,13 @@ With `--user-facing`:
 
 **Example**:
 ```bash
-/kmgraph:link-issue docs/lessons-learned/process/my-lesson.md --issue 42
-/kmgraph:link-issue docs/decisions/ADR-005.md --issue 38 --pr 40
+/kmgraph:kmg-link-issue docs/lessons-learned/process/my-lesson.md --issue 42
+/kmgraph:kmg-link-issue docs/decisions/ADR-005.md --issue 38 --pr 40
 ```
 
 ---
 
-### 🔴 `/kmgraph:sync-all`
+### 🔴 `/kmgraph:kmg-sync-all`
 
 **Purpose**: The catch-up command when lessons have been captured but the pipeline has not run. Replaces four manual steps in a single pass: update-graph, plan sync, issue update, and GitHub posting.
 
@@ -1049,7 +1049,7 @@ With `--user-facing`:
 **What it does**:
 
 1. **Scans** for new or modified lessons in `{active_kg_path}/lessons-learned/`
-2. **Extracts** KG entries from lessons (delegates to `/kmgraph:update-graph`)
+2. **Extracts** KG entries from lessons (delegates to `/kmgraph:kmg-update-graph`)
 3. **Links** to active implementation plan if relevant
 4. **Updates** local issue with KG references and progress notes
 5. **Enriches** today's session summary with KG insights
@@ -1059,9 +1059,9 @@ With `--user-facing`:
 
 **Example**:
 ```bash
-/kmgraph:sync-all
-/kmgraph:sync-all --auto       # Skip GitHub posting confirmation
-/kmgraph:sync-all --dry-run    # Preview without changes
+/kmgraph:kmg-sync-all
+/kmgraph:kmg-sync-all --auto       # Skip GitHub posting confirmation
+/kmgraph:kmg-sync-all --dry-run    # Preview without changes
 ```
 
 **Output**:
@@ -1087,7 +1087,7 @@ Session:          2026-02-11 (enriched)
 
 ---
 
-### 🔴 `/kmgraph:handoff`
+### 🔴 `/kmgraph:kmg-handoff`
 
 **Purpose**: Create a complete snapshot of project state for continuation across sessions, models, or machines. Five documents capture everything the next session needs to orient without losing working context.
 
@@ -1105,14 +1105,14 @@ Session:          2026-02-11 (enriched)
 2. **DOCUMENTATION-MAP.md** — File inventory with purpose annotations
 3. **ARCHITECTURE-SNAPSHOT.md** — Current codebase structure and key decisions
 
-Operational state (current branch, open issues, in-progress work) lives in the linked session summary — not in the handoff package. Run `/kmgraph:session-summary` first if you want that context captured.
+Operational state (current branch, open issues, in-progress work) lives in the linked session summary — not in the handoff package. Run `/kmgraph:kmg-session-summary` first if you want that context captured.
 
 **Time**: 1-2 minutes
 
 **Example**:
 ```bash
-/kmgraph:handoff
-/kmgraph:handoff --output-dir=./backup/
+/kmgraph:kmg-handoff
+/kmgraph:kmg-handoff --output-dir=./backup/
 ```
 
 **Output**:
@@ -1133,7 +1133,7 @@ Reading time: ~20 minutes for complete orientation
 **Tips**:
 
 - Creates dated directory: `handoff-packages/YYYY-MM-DD/` by default
-- START-HERE.md auto-detects today's session summary and sets `continues_from` — run `/kmgraph:session-summary` first for best results
+- START-HERE.md auto-detects today's session summary and sets `continues_from` — run `/kmgraph:kmg-session-summary` first for best results
 - Files can be shared via zip or archived for future reference
 
 ---
@@ -1144,17 +1144,17 @@ Reading time: ~20 minutes for complete orientation
 
 **Three ways to save learnings**:
 
-1. **`/kmgraph:capture-lesson`**
+1. **`/kmgraph:kmg-capture-lesson`**
    - Creates a NEW lesson file
    - Guided interview process
    - Use: When documenting new learnings
 
-2. **`/kmgraph:update-graph`**
+2. **`/kmgraph:kmg-update-graph`**
    - Extracts patterns from existing lessons
    - Updates knowledge entries
    - Use: Daily or weekly to consolidate
 
-3. **`/kmgraph:sync-all`**
+3. **`/kmgraph:kmg-sync-all`**
    - Full 4-step pipeline (capture → update → sync → link)
    - Comprehensive sync across KG, plans, issues, and GitHub
    - Use: Weekly deep sync or before sharing
@@ -1171,17 +1171,17 @@ Reading time: ~20 minutes for complete orientation
 
 **Three ways to view knowledge**:
 
-1. **`/kmgraph:status`**
+1. **`/kmgraph:kmg-status`**
    - High-level overview of active KG
    - File counts, warnings, recent activity
    - Use: Daily check-in, health check
 
-2. **`/kmgraph:recall`**
+2. **`/kmgraph:kmg-recall`**
    - Deep full-text search across all memory systems
    - Find specific content by keyword
    - Use: Looking for something specific
 
-3. **`/kmgraph:list`**
+3. **`/kmgraph:kmg-list`**
    - Shows all configured KGs (if multiple)
    - Metadata only (names, paths, categories)
    - Use: Switching between projects
@@ -1192,12 +1192,12 @@ Reading time: ~20 minutes for complete orientation
 
 **Two levels of issue tracking**:
 
-1. **`/kmgraph:start-issue-tracking`**
+1. **`/kmgraph:kmg-start-issue-tracking`**
    - For individual bugs or enhancements
    - Creates a single issue directory, implementation plan, and Git branch
    - Standard workflow for most tracked work
 
-2. **`/kmgraph:meta-issue`**
+2. **`/kmgraph:kmg-meta-issue`**
    - For complex problems requiring 3+ solution attempts
    - Creates a richer directory structure with attempt folders and root-cause evolution
    - Tracks how understanding changes over time
@@ -1220,7 +1220,7 @@ Reading time: ~20 minutes for complete orientation
 1. Verify plugin installed: Check Claude Code > Extensions
 2. Restart Claude Code
 3. Update plugin: Check for updates in marketplace
-4. Check active KG: Run `/kmgraph:status`
+4. Check active KG: Run `/kmgraph:kmg-status`
 
 ---
 
@@ -1230,15 +1230,15 @@ Reading time: ~20 minutes for complete orientation
 
 **Solutions**:
 
-1. Run `/kmgraph:init` to create your first KG
-2. Run `/kmgraph:list` to see available KGs
-3. Run `/kmgraph:switch` to activate an existing KG
+1. Run `/kmgraph:kmg-init` to create your first KG
+2. Run `/kmgraph:kmg-list` to see available KGs
+3. Run `/kmgraph:kmg-switch` to activate an existing KG
 
 ---
 
 ### "No chat history found"
 
-**Problem**: `/kmgraph:extract-chat` finds no logs
+**Problem**: `/kmgraph:kmg-extract-chat` finds no logs
 
 **Solutions**:
 
@@ -1262,14 +1262,14 @@ Reading time: ~20 minutes for complete orientation
 pip install blackboxprotobuf
 
 # Or skip protobuf files (JSON extraction still works)
-/kmgraph:extract-chat -gemini  # Will warn about .pb files
+/kmgraph:kmg-extract-chat -gemini  # Will warn about .pb files
 ```
 
 ---
 
 ### "Git branch creation fails"
 
-**Problem**: `/kmgraph:start-issue-tracking` can't create a branch
+**Problem**: `/kmgraph:kmg-start-issue-tracking` can't create a branch
 
 **Solutions**:
 ```bash

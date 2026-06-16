@@ -15,7 +15,7 @@ This glossary provides plain-English definitions for key terms and concepts used
 > The currently selected knowledge graph when multiple graphs exist in the system configuration.
 **Why it matters**: Users working across multiple projects may maintain separate knowledge graphs for each one (e.g., one for a web app, another for an infrastructure project). Commands operate on whichever graph is currently active.
 
-**How to manage**: The `/kmgraph:list` command displays all configured graphs. The `/kmgraph:switch` command changes the active selection.
+**How to manage**: The `/kmgraph:kmg-list` command displays all configured graphs. The `/kmgraph:kmg-switch` command changes the active selection.
 
 **Plain English**: The "currently open notebook" when multiple notebooks exist.
 
@@ -85,9 +85,9 @@ This creates a knowledge graph where:
 | **patterns** | Reusable design patterns, best practices | "Retry Pattern for API Calls" |
 | **debugging** | Troubleshooting, bug fixes, root cause analysis | "Solving Memory Leak in Node.js" |
 
-**Custom categories**: The `/kmgraph:add-category` command allows adding project-specific categories beyond the four defaults.
+**Custom categories**: The `/kmgraph:kmg-add-category` command allows adding project-specific categories beyond the four defaults.
 
-**Auto-detection**: When using the `/kmgraph:capture-lesson` command, the system suggests a category based on keywords in the lesson title and content. The suggestion can be accepted or overridden.
+**Auto-detection**: When using the `/kmgraph:kmg-capture-lesson` command, the system suggests a category based on keywords in the lesson title and content. The suggestion can be accepted or overridden.
 
 **Plain English**: Filing cabinet labels that organize lessons by topic.
 
@@ -155,7 +155,7 @@ function detectCategory(title, description) {
 
 **Why it matters**: Git metadata creates a breadcrumb trail from documentation back to code. When reviewing a lesson months later, the linked commit and PR provide direct access to the actual code changes.
 
-**How it works**: When running inside a git repository, the `/kmgraph:capture-lesson` command automatically detects and records these fields. No manual entry is required.
+**How it works**: When running inside a git repository, the `/kmgraph:kmg-capture-lesson` command automatically detects and records these fields. No manual entry is required.
 
 **Plain English**: A breadcrumb trail connecting lessons back to actual code changes.
 
@@ -173,7 +173,7 @@ function detectCategory(title, description) {
 > 👍 **What is it?**
 >
 > A tracking item on GitHub used to report bugs, request features, or plan enhancements. In the knowledge graph context, "issue" refers specifically to GitHub Issues — not general problems or troubleshooting concerns.
-**Relationship to knowledge graph**: Lessons and ADRs can be linked to GitHub issues via the `/kmgraph:link-issue` command, creating bidirectional traceability between documentation and project management.
+**Relationship to knowledge graph**: Lessons and ADRs can be linked to GitHub issues via the `/kmgraph:kmg-link-issue` command, creating bidirectional traceability between documentation and project management.
 
 **Disambiguation**: When the documentation mentions "issues," it refers to GitHub Issues (bug reports or feature requests), not to "issues" in the general sense of problems or difficulties.
 
@@ -214,7 +214,7 @@ function detectCategory(title, description) {
 > 📘 **Note**
 >
 > `2024-01-15T14:30:00Z` = January 15, 2024 at 2:30 PM UTC
-**In templates**: Date fields use this format. The `/kmgraph:capture-lesson` command fills timestamps automatically. Manual users can use the date-only form: `2024-01-15`.
+**In templates**: Date fields use this format. The `/kmgraph:kmg-capture-lesson` command fills timestamps automatically. Manual users can use the date-only form: `2024-01-15`.
 
 **Plain English**: Year-Month-Day format that computers and humans both read consistently.
 
@@ -232,7 +232,7 @@ function detectCategory(title, description) {
 4. **Prevention** — How to avoid the same problem in the future
 5. **Key Takeaways** — Concise lessons for quick reference
 
-**How to create one**: Claude Code users run `/kmgraph:capture-lesson`. Manual users copy the lesson template from `core/default-templates/lessons-learned/lesson-template.md` and fill in each section.
+**How to create one**: Claude Code users run `/kmgraph:kmg-capture-lesson`. Manual users copy the lesson template from `core/default-templates/lessons-learned/lesson-template.md` and fill in each section.
 
 **When to write one**: After solving any non-trivial problem. The best time to document is immediately after solving the problem, while details are fresh.
 
@@ -251,7 +251,7 @@ function detectCategory(title, description) {
 >
 > # Automated (Claude Code)
 > # Single command does all steps
-> /kmgraph:capture-lesson
+> /kmgraph:kmg-capture-lesson
 > ```
 ---
 ## MCP Server
@@ -292,7 +292,7 @@ function detectCategory(title, description) {
 
 **How it works**:
 
-1. Behavioral rules and preferences are written to the four profile files above by `/kmgraph:rules-capture` and direct edits
+1. Behavioral rules and preferences are written to the four profile files above by `/kmgraph:kmg-rules-capture` and direct edits
 2. MEMORY.md holds one-line pointers to those files — it does NOT store content directly
 3. Claude loads MEMORY.md at the start of each session as a table of contents
 4. Claude reads the underlying profile files (and lesson, ADR, KG entries) when their content is relevant
@@ -333,7 +333,7 @@ function detectCategory(title, description) {
 > The `knowledge:` prefix that appears before every command name, grouping all knowledge graph commands under a single namespace.
 > 📘 **Note**
 >
-> `/kmgraph:capture-lesson`, `/kmgraph:status`, `/kmgraph:recall` — all share the `kmgraph:` prefix.
+> `/kmgraph:kmg-capture-lesson`, `/kmgraph:kmg-status`, `/kmgraph:kmg-recall` — all share the `kmgraph:` prefix.
 **Why namespaces exist**: Claude Code plugins can each register their own commands. Namespaces prevent naming collisions when multiple plugins are installed. The `knowledge:` prefix clearly identifies commands belonging to the Knowledge Management Graph.
 
 > 👍 **Common mistake**:**
@@ -363,7 +363,7 @@ function detectCategory(title, description) {
 > 👍 **What is it?**
 >
 > An automated check that runs every time a `git commit` is attempted. In the knowledge graph context, pre-commit hooks scan for sensitive data (API keys, passwords, credentials) before allowing a commit to proceed.
-**How to set up**: The `/kmgraph:config-sanitization` command provides a wizard-based setup for configuring pre-commit hooks.
+**How to set up**: The `/kmgraph:kmg-config-sanitization` command provides a wizard-based setup for configuring pre-commit hooks.
 
 **What it catches**: API keys, passwords, tokens, email addresses, internal URLs, and other patterns that should not be committed to a shared repository.
 
@@ -384,8 +384,8 @@ function detectCategory(title, description) {
 - Company-specific or customer-specific data
 
 **Two levels of protection**:
-1. **Manual scan**: The `/kmgraph:check-sensitive` command scans all knowledge graph files and reports findings for review.
-2. **Automated prevention**: The `/kmgraph:config-sanitization` command sets up pre-commit hooks that block commits containing sensitive patterns.
+1. **Manual scan**: The `/kmgraph:kmg-check-sensitive` command scans all knowledge graph files and reports findings for review.
+2. **Automated prevention**: The `/kmgraph:kmg-config-sanitization` command sets up pre-commit hooks that block commits containing sensitive patterns.
 
 **Why it matters**: Knowledge graphs are most valuable when shared with team members. Sanitization ensures that sharing does not accidentally expose credentials or private information.
 
@@ -405,7 +405,7 @@ function detectCategory(title, description) {
 > A markdown document that captures the highlights of a work session — what was accomplished, what decisions were made, what was learned, and what remains for next time.
 **When to create**: After a significant work session, particularly one involving architecture discussions, major debugging efforts, or important decisions.
 
-**How to create**: The `/kmgraph:session-summary` command generates a summary from the current conversation. Manual users can copy the session template from `core/default-templates/sessions/session-template.md`.
+**How to create**: The `/kmgraph:kmg-session-summary` command generates a summary from the current conversation. Manual users can copy the session template from `core/default-templates/sessions/session-template.md`.
 
 **Sections included**: Overview, key accomplishments, decisions made, lessons learned, and next steps.
 
@@ -424,7 +424,7 @@ function detectCategory(title, description) {
 3. **Sync** — Update MEMORY.md with new patterns
 4. **Summarize** — Create a session summary
 
-**How to run**: The `/kmgraph:sync-all` command orchestrates all four steps automatically. Individual steps can also be run separately for more control.
+**How to run**: The `/kmgraph:kmg-sync-all` command orchestrates all four steps automatically. Individual steps can also be run separately for more control.
 
 **When to use**: At major milestones, end-of-week reviews, or before sharing knowledge with the team. Daily use typically involves only Step 1 (capture) and Step 2 (extract).
 
@@ -433,7 +433,7 @@ function detectCategory(title, description) {
 **Example:**
 ```
 bash
-/kmgraph:sync-all
+/kmgraph:kmg-sync-all
 
 # Orchestrates:
 # 1. Capture lesson (if applicable)
@@ -464,7 +464,7 @@ bash
 
 **How to use (manual workflow)**: Copy the template, fill in `[MANUAL]` fields, write content in the body sections, save, and commit.
 
-**How to use (Claude Code)**: Run the corresponding command (e.g., `/kmgraph:capture-lesson`). The command fills `[AUTO]` fields and guides the user through `[MANUAL]` fields interactively.
+**How to use (Claude Code)**: Run the corresponding command (e.g., `/kmgraph:kmg-capture-lesson`). The command fills `[AUTO]` fields and guides the user through `[MANUAL]` fields interactively.
 
 **Plain English**: A fill-in-the-blank form that ensures every entry has the right structure.
 

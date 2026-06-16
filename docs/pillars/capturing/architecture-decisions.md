@@ -17,12 +17,12 @@ An ADR (Architecture Decision Record) captures a tech choice or design tradeoff 
 ## The command
 
 ```bash
-/kmgraph:create-adr
+/kmgraph:kmg-create-adr
 ```
 
 The wizard prompts for a title, status, decision summary, context, rationale, consequences, and implementation commit reference.
 
-Verify with `/kmgraph:recall "ADR keywords"` — the ADR should appear and the file should exist in `docs/decisions/`.
+Verify with `/kmgraph:kmg-recall "ADR keywords"` — the ADR should appear and the file should exist in `docs/decisions/`.
 
 ## What to fill in
 
@@ -39,7 +39,7 @@ Verify with `/kmgraph:recall "ADR keywords"` — the ADR should appear and the f
 **Design-first ADRs:** If the decision has not yet been implemented, the wizard accepts `null` for `implements` and adds a back-fill reminder to the ADR. Back-fill the field with the implementation commit hash once the work is merged:
 
 ```bash
-/kmgraph:create-adr --amend ADR-NNN --implements <commit-hash>
+/kmgraph:kmg-create-adr --amend ADR-NNN --implements <commit-hash>
 ```
 
 ## Link and index
@@ -47,7 +47,7 @@ Verify with `/kmgraph:recall "ADR keywords"` — the ADR should appear and the f
 After creation, link the ADR to related lessons:
 
 ```bash
-/kmgraph:link-issue --adr ADR-NNN --lesson path/to/lesson.md
+/kmgraph:kmg-link-issue --adr ADR-NNN --lesson path/to/lesson.md
 ```
 
 ADRs are auto-indexed in `docs/decisions/`. No manual step needed if using the command.

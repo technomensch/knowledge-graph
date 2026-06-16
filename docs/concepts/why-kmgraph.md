@@ -24,7 +24,7 @@ The knowledge lives in the project directory alongside the code. It is version-c
 
 ## The Outcome
 
-Captured knowledge is accessible in any session. Switching from Claude to Cursor to Gemini does not mean starting over. Onboarding a new teammate means giving them the knowledge graph. Running a sprint retrospective means `/kmgraph:recall` rather than trying to reconstruct three weeks of decisions from memory.
+Captured knowledge is accessible in any session. Switching from Claude to Cursor to Gemini does not mean starting over. Onboarding a new teammate means giving them the knowledge graph. Running a sprint retrospective means `/kmgraph:kmg-recall` rather than trying to reconstruct three weeks of decisions from memory.
 
 ## When Would I Use This?
 

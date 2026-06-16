@@ -117,7 +117,7 @@ The installer sets up:
 
 ## Upgrade Checks
 
-When running `/kmgraph:init` on an existing installation, the wizard inspects your setup and reports what it finds:
+When running `/kmgraph:kmg-init` on an existing installation, the wizard inspects your setup and reports what it finds:
 
 | Check | What it looks for |
 |-------|-------------------|
@@ -132,7 +132,7 @@ When running `/kmgraph:init` on an existing installation, the wizard inspects yo
 
 > 📘 **Re-running the wizard**
 >
-> `/kmgraph:init` is safe to re-run at any time. It skips steps already complete and only offers items still pending for your install.
+> `/kmgraph:kmg-init` is safe to re-run at any time. It skips steps already complete and only offers items still pending for your install.
 
 ---
 

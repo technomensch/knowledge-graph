@@ -19,7 +19,7 @@ The knowledge graph is platform-agnostic markdown — switching from Claude Code
 Before switching, update the MEMORY.md with the latest session context:
 
 ```bash
-/kmgraph:session-summary
+/kmgraph:kmg-session-summary
 ```
 
 This writes a summary to `docs/sessions/` and updates MEMORY.md pointers. Commit and push.
@@ -27,11 +27,11 @@ This writes a summary to `docs/sessions/` and updates MEMORY.md pointers. Commit
 ## Export chat history
 
 ```bash
-/kmgraph:extract-chat          # Claude + Gemini history
-/kmgraph:extract-chat --source codex   # Codex CLI history (if applicable)
+/kmgraph:kmg-extract-chat          # Claude + Gemini history
+/kmgraph:kmg-extract-chat --source codex   # Codex CLI history (if applicable)
 ```
 
-Extracts session history from the departing platform into the active KG's `chat-history/` directory, making it available for `/kmgraph:recall` and lesson extraction on the target platform.
+Extracts session history from the departing platform into the active KG's `chat-history/` directory, making it available for `/kmgraph:kmg-recall` and lesson extraction on the target platform.
 
 ## Point to the same graph
 
@@ -41,7 +41,7 @@ The knowledge graph is platform-agnostic markdown. If it is in the project direc
 
 **For Claude Code (target):**
 ```bash
-/kmgraph:init
+/kmgraph:kmg-init
 # Select "Use existing KG"
 ```
 
@@ -52,7 +52,7 @@ Copy the contents of `core/default-templates/AGENTS-template.md` into your proje
 ## Verify recall works
 
 ```bash
-/kmgraph:recall "a lesson from the previous platform"
+/kmgraph:kmg-recall "a lesson from the previous platform"
 # On Gemini: paste the kg_search tool call format from AGENTS.md
 ```
 
@@ -62,7 +62,7 @@ Copy the contents of `core/default-templates/AGENTS-template.md` into your proje
 - MCP tools (`kg_*`) work the same on any MCP-enabled IDE
 - MEMORY.md is human-readable markdown — the target platform can load it directly
 - Full automation (slash commands, hooks) is Claude Code-exclusive; other platforms use the MCP tools or manual workflow
-- Codex CLI chat history can be extracted with `--source codex`; see [`/kmgraph:extract-chat`](/knowledge-graph/commands/extract-chat) for the full source flag reference
+- Codex CLI chat history can be extracted with `--source codex`; see [`/kmgraph:kmg-extract-chat`](/knowledge-graph/commands/extract-chat) for the full source flag reference
 
 ## Related
 

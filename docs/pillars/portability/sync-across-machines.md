@@ -40,9 +40,9 @@ git clone git@github.com:yourname/personal-kg.git ~/.kmgraph
 Then register the KG with KMGraph:
 
 ```bash
-/kmgraph:init-personal-kg
+/kmgraph:kmg-init-personal-kg
 # or
-/kmgraph:switch personal
+/kmgraph:kmg-switch personal
 ```
 
 **Ongoing sync:**
@@ -55,7 +55,7 @@ cd ~/.kmgraph && git pull
 git add . && git commit -m "chore: sync captures" && git push
 ```
 
-Confirm with `/kmgraph:recall "a lesson you captured on the first machine"` — it should appear.
+Confirm with `/kmgraph:kmg-recall "a lesson you captured on the first machine"` — it should appear.
 
 ## Automating sync
 

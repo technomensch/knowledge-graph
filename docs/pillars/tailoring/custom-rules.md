@@ -50,7 +50,7 @@ Good rules are:
 
 ## Capturing rules
 
-Run `/kmgraph:rules-capture` to add a new rule. The skill prompts you for the rule text and whether it applies in specific situations — then routes it to the right file automatically.
+Run `/kmgraph:kmg-rules-capture` to add a new rule. The skill prompts you for the rule text and whether it applies in specific situations — then routes it to the right file automatically.
 
 ## Related
 
