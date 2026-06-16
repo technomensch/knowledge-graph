@@ -1,6 +1,3 @@
----
-description: Shared tier resolution module — resolves a tier label (or legacy model alias) to a concrete model name via me.md tier_map, with alias deprecation warnings and collapse chain.
----
 
 ## Module: ai-model-tier-resolver
 

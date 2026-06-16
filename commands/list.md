@@ -1,6 +1,3 @@
----
-description: Display all configured knowledge graphs from ~/.claude/kg-config.json
----
 
 # /kmgraph:list — List All Knowledge Graphs
 

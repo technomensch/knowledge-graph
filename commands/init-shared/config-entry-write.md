@@ -1,6 +1,3 @@
----
-description: Shared config entry write module — writes or backfills a KG entry in kg-config.json
----
 
 ## Module: config-entry-write
 

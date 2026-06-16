@@ -1,15 +1,7 @@
 ---
-title: "ADR-013: Documentation Update Protocol for Multi-Branch Releases"
-number: 013
-created: 2026-02-27T00:00:00Z
-status: "Accepted"
-author: "technomensch"
-category: "process"
-tags: ["documentation", "release-management", "process"]
-decision: "Establish two-layer documentation update protocol mandatory for all multi-branch feature releases"
-related:
-  adrs: [001, 002, 008]
-  lessons: ["documentation-update-triggers-multibranchfeatures.md"]
+title: 'ADR-013: Documentation Update Protocol for Multi-Branch Releases'
+category:
+  uri: uri-that-does-not-map-to-process
 ---
 
 # ADR-013: Documentation Update Protocol for Multi-Branch Releases

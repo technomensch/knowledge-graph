@@ -1,22 +1,7 @@
 ---
-title: "ADR-045: Implement Profile Update Functionality as a Skill, Not a Command"
-number: 45
-created: 2026-04-23T00:00:00Z
-status: Accepted
-author: technomensch
-email: 917847+technomensch@users.noreply.github.com
-git:
-  branch: v0.5.3-hotfix-extract-chat-history
-  commit: b3dea47f
-  pr: null
-  issue: null
-implements: null
-related:
-  adrs: []
-  lessons: []
-  kg_entries: []
-tags: [profile, skill, command, platform-agnostic, user-profile]
-category: architecture
+title: 'ADR-045: Implement Profile Update Functionality as a Skill, Not a Command'
+category:
+  uri: uri-that-does-not-map-to-architecture
 ---
 
 # ADR-045: Implement Profile Update Functionality as a Skill, Not a Command

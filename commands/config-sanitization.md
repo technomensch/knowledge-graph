@@ -1,6 +1,3 @@
----
-description: Interactive wizard to set up pre-commit hooks for sensitive data detection
----
 
 # /kmgraph:configure-sanitization — Setup Sanitization Hooks
 

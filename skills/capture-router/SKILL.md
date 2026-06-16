@@ -1,7 +1,3 @@
----
-name: capture-router
-description: Route "capture that" / "remember that" requests to the correct destination (memory, lesson, or ADR) via auto-detection.
----
 
 # Skill: capture-router
 

@@ -1,7 +1,3 @@
----
-description: Create a summary of the current active chat session
-allowed-tools: Read, Glob, Grep, Bash, Write, Edit, mcp__kmgraph__kg_fts5_rebuild
----
 
 # session-summary
 

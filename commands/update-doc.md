@@ -1,7 +1,3 @@
----
-description: Update an existing documentation file — plugin/project documentation (--user-facing) or knowledge graph content
-allowed-tools: Bash, Read, Write, Edit, Glob, Grep, AskUserQuestion
----
 
 # Update Documentation
 

@@ -1,7 +1,3 @@
----
-description: Document lessons learned, problems solved, and patterns with git metadata tracking
-allowed-tools: Bash, Read, Write, Edit, Glob, Grep, kg_search, kg_fts5_rebuild
----
 
 # Document Lessons Learned
 

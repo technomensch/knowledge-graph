@@ -1,7 +1,3 @@
----
-name: session-wrap
-description: Prompt for session summary when user stops work, approaches context limits, or when uncaptured lessons or draft decisions are detected.
----
 
 # Skill: session-wrap
 

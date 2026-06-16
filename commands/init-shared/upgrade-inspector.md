@@ -1,6 +1,3 @@
----
-description: Shared upgrade inspector module — detects missing dirs, templates, and config fields for an existing KG
----
 
 ## Module: upgrade-inspector
 

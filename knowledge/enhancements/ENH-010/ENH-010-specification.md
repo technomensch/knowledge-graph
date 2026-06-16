@@ -1,12 +1,7 @@
 ---
-title: "ENH-010: v0.3.0-beta — Default KG Path Change, Migration Step, and me.md/rules.md Scaffold"
-number: 010
-status: implemented
-version_target: "v0.3.0-beta"
-github_issue: null
-created: 2026-04-09
-related_adrs: ["ADR-028", "ADR-029"]
-related_enhs: ["ENH-011"]
+title: >-
+  ENH-010: v0.3.0-beta — Default KG Path Change, Migration Step, and
+  me.md/rules.md Scaffold
 ---
 # ENH-010: v0.3.0-beta — Default KG Path Change, Migration Step, and me.md/rules.md Scaffold
 

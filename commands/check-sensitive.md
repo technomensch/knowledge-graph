@@ -1,6 +1,3 @@
----
-description: Scan active knowledge graph for potentially sensitive information before public sharing
----
 
 # /kmgraph:check-sensitive — Scan for Sensitive Data
 

@@ -1,7 +1,3 @@
----
-name: sidebar-update
-description: Use when a user-facing documentation file (guide, reference, concept page, etc.) is being moved, renamed, or has just been moved or renamed. Detects the stale sidebar entry and updates sidebars.js to match the new path.
----
 
 ## When This Applies
 

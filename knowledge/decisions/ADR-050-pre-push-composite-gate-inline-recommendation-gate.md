@@ -1,22 +1,7 @@
 ---
-title: "ADR-050: Pre-Push Composite Gate + Inline Recommendation Gate"
-number: 050
-created: 2026-05-30T00:00:00Z
-status: Accepted
-author: mkaplan
-email: mkitact@gmail.com
-git:
-  branch: v0.5.9.3-docs-enforcement-protocol-gap
-  commit: TBD
-  pr: null
-  issue: null
-implements: v0.5.9.3
-related:
-  adrs: [012, 013, 021, 036, 043, 049]
-  lessons: []
-  kg_entries: []
-tags: [hooks, governance, pre-push, recommendation, UserPromptSubmit, advisory]
-category: governance
+title: 'ADR-050: Pre-Push Composite Gate + Inline Recommendation Gate'
+category:
+  uri: uri-that-does-not-map-to-governance
 ---
 
 # ADR-050: Pre-Push Composite Gate + Inline Recommendation Gate

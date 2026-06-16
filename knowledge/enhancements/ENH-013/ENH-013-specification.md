@@ -1,12 +1,5 @@
 ---
-title: "ENH-013: Rename kg-recall Skill to Reduce Slash Command UI Confusion"
-number: 013
-status: deferred
-version_target: "v0.5.11"
-github_issue: null
-created: 2026-05-21
-related_adrs: []
-related_enhs: []
+title: 'ENH-013: Rename kg-recall Skill to Reduce Slash Command UI Confusion'
 ---
 
 # ENH-013: Rename kg-recall Skill to Reduce Slash Command UI Confusion

@@ -1,21 +1,9 @@
 ---
-title: "ADR-026: Snapshot Gate Invokes session-summary-agent, Not a Lightweight Temp Capture"
-number: 026
-created: 2026-04-06T00:00:00Z
-status: Accepted
-author: mkaplan
-git:
-  branch: v0.2.3.2-beta
-  commit: ea685f2b
-  pr: null
-  issue: 41
-implements: ENH-002
-related:
-  adrs: [20]
-  lessons: []
-  kg_entries: []
-tags: [snapshot-gate, session-summary, capture-lesson, ux]
-category: process
+title: >-
+  ADR-026: Snapshot Gate Invokes session-summary-agent, Not a Lightweight Temp
+  Capture
+category:
+  uri: uri-that-does-not-map-to-process
 ---
 
 # ADR-026: Snapshot Gate Invokes session-summary-agent, Not a Lightweight Temp Capture

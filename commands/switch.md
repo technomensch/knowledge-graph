@@ -1,6 +1,3 @@
----
-description: Change the active knowledge graph. Subsequent skills will operate on the selected KG.
----
 
 # /kmgraph:switch — Change Active Knowledge Graph
 

@@ -1,7 +1,3 @@
----
-description: Create or register a personal knowledge graph for cross-project lessons
-allowed-tools: Bash, Read, Write, kg_fts5_rebuild
----
 
 ## Execution Rules
 

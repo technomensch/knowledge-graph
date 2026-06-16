@@ -1,17 +1,7 @@
 ---
-title: "Plugin Settings Scope Consistency"
-category: patterns
-tags:
-  - plugin-development
-  - claude-code
-  - scope-consistency
-  - settings-management
-created: 2026-04-06
-branch: v0.2.3.2-beta
-commit: 499360b99abc98559a51a6ae2ee1f706ebfd93af
-commit_short: 499360b9
-author: technomensch
-source: "knowledge/sessions/2026-04/2026-04-07-session-snapshot-2026-04-06.md"
+title: Plugin Settings Scope Consistency
+category:
+  uri: uri-that-does-not-map-to-patterns
 ---
 
 # Plugin Settings Scope Consistency

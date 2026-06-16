@@ -1,6 +1,5 @@
 ---
 title: Solution Approach — ENH-006
-enhancement_id: ENH-006
 ---
 
 # Solution Approach: ENH-006

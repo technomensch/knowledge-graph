@@ -1,8 +1,3 @@
----
-id: issue-7
-file: solution-approach
-status: designed
----
 
 # Issue-7 Solution Approach
 

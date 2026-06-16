@@ -1,7 +1,3 @@
----
-name: platform-sync-agent
-description: Syncs relevant portions of platform config files (CLAUDE.md, GEMINI.md, .cursorrules, etc.) when one is updated. Understands which content belongs in each platform's file — not a full copy, but a targeted sync of applicable sections.
----
 
 # Platform Sync Agent
 

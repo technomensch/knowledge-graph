@@ -1,7 +1,3 @@
----
-name: rules-capture
-description: Detect implicit mid-session behavioral corrections ("always X", "never Y", "from now on Z") and offer to write them to rule files.
----
 
 # Skill: rules-capture
 

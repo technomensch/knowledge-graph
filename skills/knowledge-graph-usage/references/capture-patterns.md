@@ -1,7 +1,5 @@
 ---
 title: Detailed Capture Patterns for Knowledge Graph
-version: 1.0.0
-last_updated: 2026-02-16
 ---
 
 # Detailed Capture Patterns

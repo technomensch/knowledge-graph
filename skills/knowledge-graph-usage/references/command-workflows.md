@@ -1,7 +1,5 @@
 ---
 title: Command Workflows for Knowledge Management Graph
-version: 1.0.0
-last_updated: 2026-02-16
 ---
 
 # Command Workflows

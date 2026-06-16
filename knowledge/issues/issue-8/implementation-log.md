@@ -1,7 +1,3 @@
----
-id: issue-8
-file: implementation-log
----
 
 # Issue-8 Implementation Log
 

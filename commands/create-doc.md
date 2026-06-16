@@ -1,7 +1,3 @@
----
-description: Scaffold new documentation files with v0.0.7 language standards, Section 508 compliance, and optional cross-reference auto-update
-allowed-tools: Bash, Read, Write, Edit, Glob, Grep, AskUserQuestion
----
 
 # Create Documentation
 

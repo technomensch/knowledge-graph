@@ -1,12 +1,7 @@
 ---
-title: "Plugin Cache Does Not Refresh After Update (Claude Code & Codex CLI)"
-category: process
-tags: [claude-code, codex-cli, plugin, cache, update, mcp, version, full-automation]
-created: 2026-03-03
-author: technomensch
-git_branch: v0.0.3-github-docs
-severity: medium
-status: workaround-documented
+title: Plugin Cache Does Not Refresh After Update (Claude Code & Codex CLI)
+category:
+  uri: uri-that-does-not-map-to-process
 ---
 
 # Plugin Cache Does Not Refresh After Update (Claude Code & Codex CLI)

@@ -1,22 +1,7 @@
 ---
-title: "ADR-036: docs-impact-scan Skill — Pre-PR Docs Discovery Layer"
-number: 036
-created: 2026-04-16T00:00:00Z
-status: Accepted
-author: mkaplan
-email: mkitact@gmail.com
-git:
-  branch: v0.5.9.3-docs-enforcement-protocol-gap
-  commit: TBD
-  pr: null
-  issue: null
-implements: v0.5.9.3
-related:
-  adrs: [013, 021, 050]
-  lessons: []
-  kg_entries: []
-tags: [docs, release-process, skills, update-doc, pre-pr, discovery]
-category: process
+title: 'ADR-036: docs-impact-scan Skill — Pre-PR Docs Discovery Layer'
+category:
+  uri: uri-that-does-not-map-to-process
 ---
 
 # ADR-036: docs-impact-scan Skill — Pre-PR Docs Discovery Layer

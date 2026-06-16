@@ -1,6 +1,3 @@
----
-description: Extract chat history from Claude, Gemini, and Codex CLI local log sources
----
 
 <!-- Updated: 2026-06-12 -->
 

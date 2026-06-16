@@ -1,10 +1,10 @@
 ---
-title: "Lesson: Use Sonnet (Not Haiku) for Batch Job Evaluation Workers — And Capture Token Usage via --output-format json"
-date: 2026-04-17
+title: >-
+  Lesson: Use Sonnet (Not Haiku) for Batch Job Evaluation Workers — And Capture
+  Token Usage via --output-format json
 type: lesson
-category: process
-tags: [batch, claude-cli, model-selection, token-tracking, career-ops]
-version: 1.0
+category:
+  uri: uri-that-does-not-map-to-process
 ---
 
 # Lesson: Use Sonnet for Batch Job Evaluation Workers + Token Tracking via JSON Output

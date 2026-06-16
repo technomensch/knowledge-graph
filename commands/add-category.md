@@ -1,6 +1,3 @@
----
-description: Add a new category to an existing knowledge graph with optional custom prefix
----
 
 # /kmgraph:add-category — Add Category to Knowledge Graph
 

@@ -1,8 +1,3 @@
----
-name: Knowledge Graph Usage
-description: This skill orients the system to the four-layer architecture (context, logic, lifecycle, data) and how each layer coordinates knowledge capture, retrieval, and synchronization. Skill recognizes knowledge capture opportunities, provides command reference for manual interactive use, and guides understanding of how skills and hooks automate triggering.
-version: 2.0.0
----
 
 # Knowledge Graph Usage Guidance
 

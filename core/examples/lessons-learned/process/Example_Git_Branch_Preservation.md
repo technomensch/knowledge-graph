@@ -1,19 +1,7 @@
 ---
-title: "Lesson: Git Branch Governance Without Deletion"
-created: 2026-01-28T14:30:00Z
-author: "Example User"
-git:
-  branch: null
-  commit: null
-  pr: null
-  issue: null
-sources:
-  - url: "https://nvie.com/posts/a-successful-git-branching-model/"
-    title: "A Successful Git Branching Model (Gitflow)"
-    accessed: "2026-01-28"
-    context: "Comparing standard ephemeral branching with historical preservation needs"
-tags: ["#git", "#workflow", "#governance", "#branches", "#audit-trail"]
-category: process
+title: 'Lesson: Git Branch Governance Without Deletion'
+category:
+  uri: uri-that-does-not-map-to-process
 ---
 
 # Lesson Learned: Git Branch Governance Without Deletion

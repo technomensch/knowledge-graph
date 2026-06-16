@@ -1,7 +1,3 @@
----
-description: Detect installed AI coding tools and configure KMGraph for each one — useful when you install a new AI tool after initial setup
-allowed-tools: Bash, Read, Write, Edit, Glob, Grep, AskUserQuestion
----
 
 # Configure AI Platforms for KMGraph
 

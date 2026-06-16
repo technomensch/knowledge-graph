@@ -1,7 +1,3 @@
----
-name: gov-execute-plan
-description: Enforce zero-deviation plan execution with strict constraints on file editing, verification, and checkpoints.
----
 
 # Skill: gov-execute-plan
 

@@ -1,9 +1,5 @@
 ---
 title: Progress Log — ENH-005 FTS5 Database Relocation
-enhancement_id: ENH-005
-github_issue: 46
-status: Proposed
-created: 2026-03-30
 ---
 
 # Progress Log: ENH-005 FTS5 Database Relocation

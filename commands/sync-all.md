@@ -1,6 +1,3 @@
----
-description: Automated knowledge sync orchestrator — replaces 4-step manual pipeline with 1 command
----
 
 # Knowledge Sync All
 

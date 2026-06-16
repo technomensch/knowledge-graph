@@ -1,22 +1,9 @@
 ---
-title: "ADR-035: Stuck-Work Escalation — Auto-Trigger Meta-Issue with Opus Gate and Exit-Path Decision"
-number: 035
-created: 2026-04-16T00:00:00Z
-status: Proposed
-author: mkaplan
-email: mkitact@gmail.com
-git:
-  branch: v0.4.0-stuck-work-escalation
-  commit: TBD
-  pr: null
-  issue: null
-implements: null
-related:
-  adrs: [8]
-  lessons: []
-  kg_entries: []
-tags: [meta-issue, escalation, debugging, stuck-work, opus, process]
-category: process
+title: >-
+  ADR-035: Stuck-Work Escalation — Auto-Trigger Meta-Issue with Opus Gate and
+  Exit-Path Decision
+category:
+  uri: uri-that-does-not-map-to-process
 ---
 
 # ADR-035: Stuck-Work Escalation — Auto-Trigger Meta-Issue with Opus Gate and Exit-Path Decision

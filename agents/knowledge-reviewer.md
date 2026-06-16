@@ -1,9 +1,3 @@
----
-name: knowledge-reviewer
-description: Reviews knowledge graph entries for quality, completeness, and proper bidirectional linking. Use when creating or updating KG entries to ensure they meet quality standards.
-color: cyan
-model: sonnet
----
 
 # Knowledge Graph Entry Reviewer
 

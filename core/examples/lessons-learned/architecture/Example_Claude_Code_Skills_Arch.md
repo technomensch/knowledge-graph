@@ -1,19 +1,7 @@
 ---
-title: "Lesson: Platform Skill Discovery Architecture"
-created: 2025-12-28T14:00:00Z
-author: "Example User"
-git:
-  branch: null
-  commit: null
-  pr: null
-  issue: null
-sources:
-  - url: "https://docs.anthropic.com/en/docs/welcome"
-    title: "Anthropic Claude Documentation"
-    accessed: "2025-12-28"
-    context: "Researching skill discovery behavior and directory scanning"
-tags: ["#claude-code", "#skills", "#architecture", "#discovery"]
-category: architecture
+title: 'Lesson: Platform Skill Discovery Architecture'
+category:
+  uri: uri-that-does-not-map-to-architecture
 ---
 
 # Lesson Learned: Platform Skill Discovery Architecture

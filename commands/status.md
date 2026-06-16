@@ -1,6 +1,3 @@
----
-description: Display active knowledge graph status, stats, and quick command reference
----
 
 # /kmgraph:status — Knowledge Graph Status Dashboard
 

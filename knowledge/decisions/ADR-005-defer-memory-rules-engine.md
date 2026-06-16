@@ -1,8 +1,5 @@
 ---
-title: "ADR-005: Defer MEMORY.md Auto-Sync Rules Engine to v0.0.5"
-status: Accepted
-date: 2026-02-16
-deciders: technomensch, Claude Sonnet 4.5
+title: 'ADR-005: Defer MEMORY.md Auto-Sync Rules Engine to v0.0.5'
 ---
 
 # ADR-005: Defer MEMORY.md Auto-Sync Rules Engine to v0.0.5

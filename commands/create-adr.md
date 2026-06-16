@@ -1,7 +1,3 @@
----
-description: Create Architecture Decision Records with auto-filled git metadata, sequential numbering, and index auto-update
-allowed-tools: Bash, Read, Write, Edit, Glob, Grep, AskUserQuestion
----
 
 # Create Architecture Decision Record
 

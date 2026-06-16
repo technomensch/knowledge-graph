@@ -1,7 +1,3 @@
----
-name: sync-all-agent
-description: Executes the full knowledge sync pipeline — scans lessons, extracts KG entries, links to plans/issues, drafts GitHub comments, and refreshes search index. Called by the sync-all thin dispatcher.
----
 
 # Sync All Agent
 

@@ -1,6 +1,3 @@
----
-description: Shared template seed module — non-destructive copy of core/default-templates/ into a KG directory
----
 
 ## Module: template-seed
 

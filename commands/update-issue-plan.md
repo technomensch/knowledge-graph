@@ -1,6 +1,3 @@
----
-description: Synchronize Knowledge Graph extraction with active plans and local/GitHub issue tracking
----
 
 # Governance Synchronization Workflow
 

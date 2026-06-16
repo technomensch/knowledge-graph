@@ -1,7 +1,3 @@
----
-name: docs-impact-scan
-description: Use when the user is about to push to origin, open a PR, create a PR, merge changes, or says "push and merge", "push and merge with admin", "push to origin", "finishing up", or "ready to push". Scans for all user-facing docs affected by the current branch's changes before any update wizard runs.
----
 
 ## When This Applies
 

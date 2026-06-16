@@ -1,15 +1,7 @@
 ---
-title: "Capture Router — Auto-Detect Type and Location from Content Signals"
-category: patterns
-tags: [capture, routing, auto-detect, memory, friction, ux]
-created: 2026-03-30
-git:
-  branch: v0.2.3-beta
-  commit: 4071bfe8b79dd767d36a854eafa81cd2dc4d6dd4
-  commit_short: 4071bfe8
-  author: Marc K
-  email: 917847+technomensch@users.noreply.github.com
-related: [ENH-008, doc-update-router]
+title: Capture Router — Auto-Detect Type and Location from Content Signals
+category:
+  uri: uri-that-does-not-map-to-patterns
 ---
 
 ## Problem

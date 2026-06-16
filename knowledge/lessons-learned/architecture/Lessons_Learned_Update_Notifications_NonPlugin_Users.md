@@ -1,16 +1,9 @@
 ---
-title: "Lesson: Update Notifications for Non-Plugin Users — Version Sync and MCP Discovery Gap"
-created: 2026-02-21T00:00:00Z
-author: technomensch
-email: 917847+technomensch@users.noreply.github.com
-git:
-  branch: main
-  commit: 9c9d7dc78eb551f98e542c4244390bdf0918812e
-  pr: null
-  issue: null
-sources: []
-tags: [architecture, versioning, mcp, update-notifications, plugin-distribution, tier2, tier3]
-category: architecture
+title: >-
+  Lesson: Update Notifications for Non-Plugin Users — Version Sync and MCP
+  Discovery Gap
+category:
+  uri: uri-that-does-not-map-to-architecture
 ---
 
 # Lesson Learned: Update Notifications for Non-Plugin Users — Version Sync and MCP Discovery Gap

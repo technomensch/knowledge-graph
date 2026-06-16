@@ -1,7 +1,3 @@
----
-name: doc-update-router
-description: Route explicit doc-update requests to the correct command, ensuring standards validation and changelog enforcement.
----
 
 # Skill: doc-update-router
 

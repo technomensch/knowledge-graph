@@ -1,7 +1,3 @@
----
-name: update-profile
-description: Detect when the user asks to update their profile and route changes to all three profile files (me.md + rules.md + triggers.md) as a unit.
----
 
 # Skill: update-profile
 

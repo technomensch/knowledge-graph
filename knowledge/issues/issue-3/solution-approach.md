@@ -1,7 +1,5 @@
 ---
-id: issue-3-solution
 type: Hardening
-status: OPEN
 ---
 
 # Solution Approach: issue-3

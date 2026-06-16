@@ -1,22 +1,7 @@
 ---
-title: "ADR-029: Plan File Location in Knowledge Graph"
-number: 029
-created: 2026-04-09T21:15:00Z
-status: Accepted
-author: technomensch
-email: 917847+technomensch@users.noreply.github.com
-git:
-  branch: main
-  commit: c25e8c05f439ecdab98c4277bb5f4a1a058f6916
-  pr: null
-  issue: null
-implements: v0.3.0-beta
-related:
-  adrs: [14, 28]
-  lessons: []
-  kg_entries: []
-tags: [plans, knowledge-graph, file-location, workflow, pre-implementation]
-category: process
+title: 'ADR-029: Plan File Location in Knowledge Graph'
+category:
+  uri: uri-that-does-not-map-to-process
 ---
 
 # ADR-029: Plan File Location in Knowledge Graph

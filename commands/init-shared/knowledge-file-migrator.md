@@ -1,6 +1,3 @@
----
-description: Shared migration module — archives rules.md and relocates Claude-specific lines to the platform's native config file
----
 
 ## Module: knowledge-file-migrator
 

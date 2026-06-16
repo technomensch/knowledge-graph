@@ -1,7 +1,3 @@
----
-description: Search across project memory systems (lessons, decisions, knowledge graph, sessions)
-allowed-tools: Agent
----
 
 # Knowledge Recall
 

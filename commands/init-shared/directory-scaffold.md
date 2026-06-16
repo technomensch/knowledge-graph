@@ -1,6 +1,3 @@
----
-description: Shared directory scaffold module — creates the standard KG directory tree
----
 
 ## Module: directory-scaffold
 

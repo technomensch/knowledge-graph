@@ -1,11 +1,7 @@
 ---
-title: "Migration Must Rewrite Cross-References — Not Just Move Files"
-category: patterns
-tags: ["migration", "cross-references", "markdown", "path-rewrite", "commands"]
-created: 2026-04-10
-branch: v0.3.1-init-shared-refactor
-commit: 7bd20bd6
-author: technomensch
+title: Migration Must Rewrite Cross-References — Not Just Move Files
+category:
+  uri: uri-that-does-not-map-to-patterns
 ---
 
 ## Problem

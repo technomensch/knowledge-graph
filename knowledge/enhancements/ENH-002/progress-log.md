@@ -1,9 +1,5 @@
 ---
 title: Progress Log — ENH-002 Session Snapshot on Capture
-enhancement_id: ENH-002
-github_issue: 41
-status: Partially Implemented
-created: 2026-03-28
 ---
 
 # Progress Log: ENH-002 Session Snapshot on Capture

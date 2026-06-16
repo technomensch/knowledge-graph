@@ -1,12 +1,5 @@
 ---
-id: issue-8
 type: Enhancement
-status: in-progress
-branch: v0.5.9.3-docs-enforcement-protocol-gap
-created: 2026-05-30
-related-adrs: [ADR-013, ADR-021, ADR-036]
-related-enhs: [ENH-015]
-target-release: v0.5.9.3
 ---
 
 # Issue-8: Docs Update Enforcement 3-Gate Fix

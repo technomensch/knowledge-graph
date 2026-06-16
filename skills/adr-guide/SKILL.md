@@ -1,7 +1,3 @@
----
-name: adr-guide
-description: Auto-surface ADR creation when user makes architectural decisions or chooses between technical approaches.
----
 
 # Skill: adr-guide
 

@@ -1,23 +1,7 @@
 ---
-title: "Lesson: Relative File Path Hygiene"
-created: 2026-01-07T14:20:00Z
-author: "Example User"
-git:
-  branch: null
-  commit: null
-  pr: null
-  issue: null
-sources:
-  - url: "https://keepachangelog.com/en/1.0.0/"
-    title: "Keep a Changelog"
-    accessed: "2026-01-07"
-    context: "Standardizing the versioning documentation format"
-  - url: "https://semver.org/spec/v2.0.0.html"
-    title: "Semantic Versioning 2.0.0"
-    accessed: "2026-01-07"
-    context: "Defining version increment logic for multi-user environments"
-tags: ["#portability", "#paths", "#documentation", "#best-practices"]
-category: process
+title: 'Lesson: Relative File Path Hygiene'
+category:
+  uri: uri-that-does-not-map-to-process
 ---
 
 # Lesson Learned: Relative File Path Hygiene

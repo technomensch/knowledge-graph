@@ -1,7 +1,3 @@
----
-description: Display help for any knowledge graph command — shows purpose, usage, examples, and tips pulled directly from COMMAND-GUIDE.md
-allowed-tools: Read, Glob
----
 
 # Knowledge Graph Help
 

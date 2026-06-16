@@ -1,7 +1,3 @@
----
-name: brainstorm-recall
-description: Consult the knowledge graph before any recommendation is made during brainstorming.
----
 
 # Skill: brainstorm-recall
 

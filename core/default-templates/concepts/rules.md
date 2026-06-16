@@ -1,6 +1,3 @@
----
-kmgraph_schema: 2
----
 
 # Rules — [Project Name]
 

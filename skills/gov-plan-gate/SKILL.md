@@ -1,7 +1,3 @@
----
-name: gov-plan-gate
-description: Enforce user approval gates after planning completes — require explicit "Proceed" or "Start" before implementation, and explicit approval before push or PR.
----
 
 # Skill: gov-plan-gate
 

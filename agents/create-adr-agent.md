@@ -1,7 +1,3 @@
----
-name: create-adr-agent
-description: Creates Architecture Decision Records — interactive wizard with auto-numbered files, git metadata, template population, and index updates. Uses kg_capture MCP tool for platform-agnostic writes.
----
 
 # Create ADR Agent
 

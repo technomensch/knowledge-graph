@@ -1,13 +1,7 @@
 ---
-title: "Check Gitignore Before Migration Cleanup"
-created: 2026-04-09T23:20:13.446Z
-updated: 2026-04-09T23:20:13.446Z
-author: technomensch
-git:
-  branch: v0.3.0-beta
-  commit: 1f70f3a5
-tags: [gitignore, migration, fts5, wizard, file-existence, cleanup, init, destructive-action]
-category: patterns
+title: Check Gitignore Before Migration Cleanup
+category:
+  uri: uri-that-does-not-map-to-patterns
 ---
 ## Problem
 

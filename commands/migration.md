@@ -1,6 +1,3 @@
----
-description: List migration restore points and roll back knowledge graph files to a previous archived state
----
 
 ## Execution Rules
 

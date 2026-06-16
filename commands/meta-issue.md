@@ -1,6 +1,3 @@
----
-description: Initialize and manage meta-issue tracking for complex multi-attempt problems
----
 
 # Meta-Issue Tracking
 

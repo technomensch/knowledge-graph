@@ -1,8 +1,3 @@
----
-name: stuck-work-escalation
-description: Use when a bug, failing test, blocked plan task, integration failure, or reproducibility issue has resisted 3+ distinct fix attempts or 30+ minutes of effort. Activates powerful-tier diagnosis, enforces hypothesis logging, and drives to a structured exit-path decision.
-required_tier: powerful-tier
----
 
 Before starting, read `~/.kmgraph/rules.md` — Plan Protocol § Stuck-Work Escalation for thresholds, scope rules, and exit paths.
 

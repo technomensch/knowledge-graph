@@ -1,12 +1,5 @@
 ---
-title: "ENH-008: capture-router — Context-Aware Capture with Single Confirmation"
-number: 008
-status: proposed
-version_target: "v0.2.3"
-github_issue: null
-created: 2026-03-30
-related_adrs: []
-related_enhs: []
+title: 'ENH-008: capture-router — Context-Aware Capture with Single Confirmation'
 ---
 
 # ENH-008: capture-router Skill

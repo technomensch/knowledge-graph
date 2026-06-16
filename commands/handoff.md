@@ -1,6 +1,3 @@
----
-description: Create comprehensive project handoff documentation for transitions or context limits
----
 
 # /kmgraph:handoff
 

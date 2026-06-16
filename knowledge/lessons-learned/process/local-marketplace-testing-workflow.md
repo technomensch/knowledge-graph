@@ -1,12 +1,7 @@
 ---
-title: "Lesson: Local Marketplace Testing - Two-Location Sync Required"
-created: 2026-02-16T18:30:00Z
-author: technomensch
-git:
-  branch: v0.0.2-alpha
-  commit: 2bc7920
-tags: [process, testing, marketplace, plugin-development, workflow]
-category: process
+title: 'Lesson: Local Marketplace Testing - Two-Location Sync Required'
+category:
+  uri: uri-that-does-not-map-to-process
 ---
 
 # Lesson: Local Marketplace Testing - Two-Location Sync Required

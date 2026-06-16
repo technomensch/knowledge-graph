@@ -1,12 +1,5 @@
 ---
-id: issue-5
 type: Bug
-status: tracked
-github-issue: "#124"
-branch: v0.5.9.2-fix-gh-issue-create
-created: 2026-05-28
-related-adrs: [ADR-024]
-related-enhs: [ENH-017]
 ---
 
 # Issue-5: `start-issue-tracking` Never Calls `gh issue create`

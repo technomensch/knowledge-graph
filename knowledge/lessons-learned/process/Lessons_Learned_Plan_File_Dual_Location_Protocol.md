@@ -1,17 +1,7 @@
 ---
-title: "Lesson: Plan File Dual-Location Protocol"
-created: 2026-03-01T12:00:00Z
-author: Claude Sonnet 4.6
-email: noreply@anthropic.com
-git:
-  branch: v0.0.8.7.3-alpha-fix-installer-page
-  commit: 56b96ea7a7c04b96c7d8e8c0f2d1e3a4
-tags:
-  - workflow
-  - protocol
-  - planning
-  - claude-code
-category: process
+title: 'Lesson: Plan File Dual-Location Protocol'
+category:
+  uri: uri-that-does-not-map-to-process
 ---
 
 # Lesson: Plan File Dual-Location Protocol

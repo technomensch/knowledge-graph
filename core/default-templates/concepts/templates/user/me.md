@@ -1,34 +1,3 @@
----
-profile_schema: 1
-platforms:
-  - name: claude
-    tier_map:
-      fast-tier: claude-haiku-4-5-20251001
-      standard-tier: claude-sonnet-4-6
-      powerful-tier: claude-opus-4-7
-  # Uncomment and fill in if using Gemini:
-  # - name: gemini
-  #   tier_map:
-  #     fast-tier: gemini-flash
-  #     standard-tier: gemini-pro
-  #     powerful-tier: gemini-ultra
-  # Uncomment and fill in if using Ollama:
-  # - name: ollama
-  #   host: localhost
-  #   port: 11434
-  #   tier_map:
-  #     fast-tier: ""
-  #     standard-tier: ""
-  #     powerful-tier: ""
-  # Uncomment and fill in if using LM Studio:
-  # - name: lm-studio
-  #   host: localhost
-  #   port: 1234
-  #   tier_map:
-  #     fast-tier: ""
-  #     standard-tier: ""
-  #     powerful-tier: ""
----
 
 # Identity — [Your Name]
 

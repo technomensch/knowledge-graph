@@ -1,6 +1,3 @@
----
-description: Shared FTS5 rebuild module — offers to build/rebuild the search index for a KG
----
 
 ## Module: fts5-rebuild
 

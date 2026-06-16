@@ -1,7 +1,3 @@
----
-description: Initialize issue tracking for a specific problem or enhancement with structured documentation and Git branch creation
-allowed-tools: Bash, Read, Write, Edit, Glob, Grep
----
 
 # Start Issue Tracking
 

@@ -1,27 +1,7 @@
 ---
-title: "Lesson: Complete Knowledge System Implementation"
-created: 2026-01-02T15:48:00Z
-author: "Example User"
-git:
-  branch: null
-  commit: null
-  pr: null
-  issue: null
-sources:
-  - url: "https://github.com/joelparkerhenderson/architecture-decision-record"
-    title: "Architecture Decision Record GitHub Repository"
-    accessed: "2026-01-02"
-    context: "Research for industry-standard ADR templates"
-  - url: "https://ericmjl.github.io/notes/blog_drafts/building-a-great-personal-knowledge-graph-with-obsidian/"
-    title: "Building Personal Knowledge Graph with Obsidian"
-    accessed: "2026-01-02"
-    context: "Inspiration for bidirectional linking and knowledge graph structure"
-  - url: "https://www.mintlify.com/blog/ai-documentation-trends-whats-changing-in-2025"
-    title: "AI Documentation Trends 2025"
-    accessed: "2026-01-02"
-    context: "Alignment with modern AI development documentation patterns"
-tags: ["#knowledge-management", "#memory-system", "#automation", "#workflow"]
-category: patterns
+title: 'Lesson: Complete Knowledge System Implementation'
+category:
+  uri: uri-that-does-not-map-to-patterns
 ---
 
 # Lesson Learned: Complete Knowledge System Implementation

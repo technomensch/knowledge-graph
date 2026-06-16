@@ -1,23 +1,7 @@
 ---
-title: "Lesson: Knowledge Extraction Workflow"
-created: 2025-12-12T10:30:00Z
-author: "Example User"
-git:
-  branch: null
-  commit: null
-  pr: null
-  issue: null
-sources:
-  - url: "https://github.blog/changelog/2024-12-06-copilot-chat-now-has-a-64k-context-window-with-openai-gpt-4o/"
-    title: "GitHub Copilot Context Window Updates"
-    accessed: "2025-12-30"
-    context: "Understanding context pressure and the need for history preservation"
-  - url: "https://www.datastudios.org/post/microsoft-copilot-context-window-token-limits-memory-policy-and-2025-rules"
-    title: "Microsoft Copilot Context and Memory Policy"
-    accessed: "2025-12-30"
-    context: "Verification of token limit constraints across different AI platforms"
-tags: ["#workflow", "#knowledge-management", "#chat-extraction", "#automation"]
-category: process
+title: 'Lesson: Knowledge Extraction Workflow'
+category:
+  uri: uri-that-does-not-map-to-process
 ---
 
 # Lesson Learned: Knowledge Extraction Workflow

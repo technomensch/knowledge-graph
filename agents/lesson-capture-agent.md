@@ -1,7 +1,3 @@
----
-name: lesson-capture-agent
-description: Captures a single lesson learned from the current session — problem, solution, context, and git metadata. Uses kg_capture MCP tool for platform-agnostic writes.
----
 
 # Lesson Capture Agent
 

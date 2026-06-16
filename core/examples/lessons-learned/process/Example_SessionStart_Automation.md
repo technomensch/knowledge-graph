@@ -1,19 +1,7 @@
 ---
-title: "Lesson: Hook-Based Session Automation"
-created: 2026-01-03T11:00:00Z
-author: "Example User"
-git:
-  branch: null
-  commit: null
-  pr: null
-  issue: null
-sources:
-  - url: "https://git-scm.com/docs/githooks"
-    title: "Git Hooks Documentation"
-    accessed: "2026-01-03"
-    context: "Reference for implementing post-commit trigger logic"
-tags: ["#automation", "#hooks", "#workflow", "#knowledge-management"]
-category: process
+title: 'Lesson: Hook-Based Session Automation'
+category:
+  uri: uri-that-does-not-map-to-process
 ---
 
 # Lesson Learned: Hook-Based Session Automation

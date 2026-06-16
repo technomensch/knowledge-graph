@@ -1,6 +1,3 @@
----
-description: Manually link existing lesson or ADR to a GitHub issue with bidirectional references
----
 
 # /kmgraph:link-issue — Link Lesson to GitHub Issue
 
