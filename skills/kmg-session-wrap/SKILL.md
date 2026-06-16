@@ -1,5 +1,5 @@
 
-# Skill: session-wrap
+# Skill: kmg-session-wrap
 
 **Purpose:** Prompt for session summary when user indicates they're stopping work, approaching context limits, reaching milestones, or when open plan items, draft decisions, or uncaptured lessons are detected.
 

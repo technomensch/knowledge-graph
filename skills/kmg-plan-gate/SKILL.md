@@ -1,5 +1,5 @@
 
-# Skill: gov-plan-gate
+# Skill: kmg-plan-gate
 
 **Purpose:** Enforce user approval gates after superpowers planning and execution skills complete — require explicit "Proceed" or "Start" before implementation begins, and explicit approval before any push or PR.
 

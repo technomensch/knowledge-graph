@@ -1,5 +1,5 @@
 
-# Skill: gov-execute-plan
+# Skill: kmg-execute-plan
 
 **Purpose:** Enforce zero-deviation plan execution when user invokes plan implementation.
 

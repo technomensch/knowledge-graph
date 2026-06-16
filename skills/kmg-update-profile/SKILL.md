@@ -1,5 +1,5 @@
 
-# Skill: update-profile
+# Skill: kmg-update-profile
 
 **Purpose:** Detect when the user asks to update their profile and route changes to all three profile files (me.md + rules.md + triggers.md) as a unit — not rules.md alone.
 

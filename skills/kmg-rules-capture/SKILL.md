@@ -1,5 +1,5 @@
 
-# Skill: rules-capture
+# Skill: kmg-rules-capture
 
 **Purpose:** Detect implicit mid-session behavioral corrections and preferences — phrases the user issues without asking to "capture" anything — and offer to write them to the authoritative rule files (`knowledge/rules.md` or `~/.kmgraph/me.md`), writing directly to the authoritative profile files.
 

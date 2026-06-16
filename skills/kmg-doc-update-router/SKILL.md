@@ -1,5 +1,5 @@
 
-# Skill: doc-update-router
+# Skill: kmg-doc-update-router
 
 **Purpose:** Intercept explicit doc-update requests and route to the correct command. Prevents doc edits from bypassing the `/kmgraph:update-doc` wizard, standards validation, and changelog enforcement.
 

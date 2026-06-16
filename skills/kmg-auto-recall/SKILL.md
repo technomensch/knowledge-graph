@@ -1,5 +1,5 @@
 
-# Skill: kg-recall
+# Skill: kmg-auto-recall
 
 **Purpose:** Auto-invoke knowledge graph search when user asks about project history, past decisions, or previously solved problems.
 

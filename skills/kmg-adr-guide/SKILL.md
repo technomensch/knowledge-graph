@@ -1,5 +1,5 @@
 
-# Skill: adr-guide
+# Skill: kmg-adr-guide
 
 **Purpose:** Auto-surface ADR creation when user makes architectural decisions or chooses between technical approaches. Dispatches to the `create-adr-agent` for the full creation workflow.
 

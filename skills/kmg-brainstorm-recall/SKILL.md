@@ -1,5 +1,5 @@
 
-# Skill: brainstorm-recall
+# Skill: kmg-brainstorm-recall
 
 **Purpose:** Ensure the knowledge graph is consulted before any recommendation is made. Fires before `adr-guide` on the same trigger surface.
 
