@@ -14,9 +14,9 @@ parent:
 
 Export the local knowledge graph into a NotebookLM notebook so captured lessons, ADRs, and patterns can be queried with cross-document synthesis. You need KMGraph initialized with a populated knowledge graph, the NotebookLM MCP server configured, and `nlm login` run in the terminal.
 
-:::note
-This guide covers **exporting** the local KG as sources into NotebookLM. NotebookLM becomes a secondary query interface. KMGraph continues to write to local markdown. A NotebookLM-as-primary-store mode is deferred to a future release.
-:::
+> 📘 **Note**
+>
+> This guide covers **exporting** the local KG as sources into NotebookLM. NotebookLM becomes a secondary query interface. KMGraph continues to write to local markdown. A NotebookLM-as-primary-store mode is deferred to a future release.
 
 ## Create a notebook
 

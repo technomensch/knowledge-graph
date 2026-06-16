@@ -10,11 +10,9 @@ This glossary provides plain-English definitions for key terms and concepts used
 
 ## Active Knowledge Graph (Active KG)
 
-:::tip[**What is it?**]
-
-The currently selected knowledge graph when multiple graphs exist in the system configuration.
-
-:::
+> 👍 **What is it?**
+>
+> The currently selected knowledge graph when multiple graphs exist in the system configuration.
 **Why it matters**: Users working across multiple projects may maintain separate knowledge graphs for each one (e.g., one for a web app, another for an infrastructure project). Commands operate on whichever graph is currently active.
 
 **How to manage**: The `/kmgraph:list` command displays all configured graphs. The `/kmgraph:switch` command changes the active selection.
@@ -24,49 +22,39 @@ The currently selected knowledge graph when multiple graphs exist in the system 
 ---
 ## ADR (Architecture Decision Record)
 
-:::tip[**What is it?**]
-
-A structured document that captures an important technical decision along with the context, alternatives considered, and reasoning.
-
-:::
+> 👍 **What is it?**
+>
+> A structured document that captures an important technical decision along with the context, alternatives considered, and reasoning.
 **Format**: Each ADR follows a standard template with sections for Status, Context, Decision, and Consequences. ADRs are numbered sequentially (ADR-001, ADR-002, etc.).
 
 **When to write one**: When a decision is significant enough that a future team member might ask "why was this done this way?" — choosing a technology, defining an API contract, selecting a deployment strategy.
 
-:::note
-
-"ADR-007: Use Markdown for Knowledge Storage" — records why markdown was chosen over a database, wiki, or proprietary format.
-
-:::
+> 📘 **Note**
+>
+> "ADR-007: Use Markdown for Knowledge Storage" — records why markdown was chosen over a database, wiki, or proprietary format.
 **Plain English**: A written "decision receipt" that preserves not just what was decided, but why.
 
 ---
 ## Bidirectional Links
 
-:::tip[**What is it?**]
-
-Cross-references that connect two documents in both directions. When Document A links to Document B, Document B also links back to Document A.
-
-:::
+> 👍 **What is it?**
+>
+> Cross-references that connect two documents in both directions. When Document A links to Document B, Document B also links back to Document A.
 **Why it matters**: Bidirectional links create a navigable web of knowledge. Starting from any entry, related information is always one click away.
 
-:::note[Bidirectional Links Examples]
-
-A lesson about database timeouts links to a pattern entry about connection pooling. The connection pooling pattern links back to the timeout lesson. Starting from either document leads to the other.
-
-::::example[**In NEW lesson**]
+> 📘 **Bidirectional Links Examples**
+>
+> A lesson about database timeouts links to a pattern entry about connection pooling. The connection pooling pattern links back to the timeout lesson. Starting from either document leads to the other.example[**In NEW lesson**]
 
 - lessons-learned/process/git-workflow.md
 - **Pattern:** [[patterns.md#branch-preservation]]
 
 ::::
 
-::::example[**In EXISTING pattern**]
-
-- knowledge/patterns.md
-- **Related Lesson:** [[lessons-learned/process/git-workflow.md]]
-
-::::
+> 📘 **In EXISTING pattern**
+>
+> - knowledge/patterns.md
+> - **Related Lesson:** [[lessons-learned/process/git-workflow.md]]
 
 :::
 This creates a knowledge graph where:
@@ -87,11 +75,9 @@ This creates a knowledge graph where:
 ---
 ## Category
 
-:::tip[**What is it?**]
-
-A classification label that groups lessons by topic. The system includes four default categories:
-
-:::
+> 👍 **What is it?**
+>
+> A classification label that groups lessons by topic. The system includes four default categories:
 | Category | Description | Example Lesson |
 |---|---|---|
 | **architecture** | System design, component structure, integration | "Microservices vs. Monolith Decision" |
@@ -127,11 +113,9 @@ function detectCategory(title, description) {
 ---
 ## Cross-References
 
-:::tip[**What is it?**]
-
-Links between knowledge artifacts that create connections across the knowledge graph. Cross-references appear in a dedicated section of each document.
-
-:::
+> 👍 **What is it?**
+>
+> Links between knowledge artifacts that create connections across the knowledge graph. Cross-references appear in a dedicated section of each document.
 **Types of cross-references**:
 - Lesson → Pattern (lesson discovered this pattern)
 - Pattern → Lesson (pattern was documented in this lesson)
@@ -142,28 +126,24 @@ Links between knowledge artifacts that create connections across the knowledge g
 
 **Plain English**: Hyperlinks between related documents that make the "graph" in knowledge graph.
 
-:::note
-
-```markdown
-# Example Lesson Learned
-
-## Cross-References
-
-- **Pattern:** [[patterns.md#multi-tier-synchronization]]
-- **ADR:** [[ADR-007-dual-format-docs.md]]
-- **Related Lesson:** [[architecture/Example_Three_Tier_Sync.md]]
-- **Gotcha:** [[gotchas.md#absolute-path-regression]]
-```
-
-:::
+> 📘 **Note**
+>
+> ```markdown
+> # Example Lesson Learned
+>
+> ## Cross-References
+>
+> - **Pattern:** [[patterns.md#multi-tier-synchronization]]
+> - **ADR:** [[ADR-007-dual-format-docs.md]]
+> - **Related Lesson:** [[architecture/Example_Three_Tier_Sync.md]]
+> - **Gotcha:** [[gotchas.md#absolute-path-regression]]
+> ```
 ---
 ## Git Metadata
 
-:::tip[**What is it?**]
-
-Information about code changes automatically captured when a lesson or ADR is created. Git metadata connects documentation to the actual code that prompted each learning.
-
-:::
+> 👍 **What is it?**
+>
+> Information about code changes automatically captured when a lesson or ADR is created. Git metadata connects documentation to the actual code that prompted each learning.
 **Fields captured**:
 
 | Field | Description | Example |
@@ -179,41 +159,35 @@ Information about code changes automatically captured when a lesson or ADR is cr
 
 **Plain English**: A breadcrumb trail connecting lessons back to actual code changes.
 
-:::note
-
-```markdown
-**Branch:** v1.0.0-add-validation
-**Commit:** a1b2c3d
-**Issue:** #42
-**Category:** process
-```
-
-:::
+> 📘 **Note**
+>
+> ```markdown
+> **Branch:** v1.0.0-add-validation
+> **Commit:** a1b2c3d
+> **Issue:** #42
+> **Category:** process
+> ```
 ---
 ## GitHub Issue
 
-:::tip[**What is it?**]
-
-A tracking item on GitHub used to report bugs, request features, or plan enhancements. In the knowledge graph context, "issue" refers specifically to GitHub Issues — not general problems or troubleshooting concerns.
-
-:::
+> 👍 **What is it?**
+>
+> A tracking item on GitHub used to report bugs, request features, or plan enhancements. In the knowledge graph context, "issue" refers specifically to GitHub Issues — not general problems or troubleshooting concerns.
 **Relationship to knowledge graph**: Lessons and ADRs can be linked to GitHub issues via the `/kmgraph:link-issue` command, creating bidirectional traceability between documentation and project management.
 
 **Disambiguation**: When the documentation mentions "issues," it refers to GitHub Issues (bug reports or feature requests), not to "issues" in the general sense of problems or difficulties.
 
 **Plain English**: A GitHub tracking ticket (bug report or feature request) that can be linked to lessons and decisions.
 
-:::note
-
-Every lesson/ADR created via automation includes git context:
-```markdown
-**Branch:** v1.0.0-add-validation
-**Commit:** a1b2c3d
-**Issue:** #42
-**Category:** process
-```
-
-:::
+> 📘 **Note**
+>
+> Every lesson/ADR created via automation includes git context:
+> ```markdown
+> **Branch:** v1.0.0-add-validation
+> **Commit:** a1b2c3d
+> **Issue:** #42
+> **Category:** process
+> ```
 **Why track git metadata?**
 - Find relevant code changes (`git log --grep="[ISSUE_ID]"`)
 - Understand what was being worked on
@@ -223,11 +197,9 @@ Every lesson/ADR created via automation includes git context:
 ---
 ## ISO 8601
 
-:::tip[**What is it?**]
-
-An international standard for representing dates and times in an unambiguous format: `YYYY-MM-DDTHH:MM:SSZ`.
-
-:::
+> 👍 **What is it?**
+>
+> An international standard for representing dates and times in an unambiguous format: `YYYY-MM-DDTHH:MM:SSZ`.
 **Why this format**: Standard date formats like "01/02/2024" are ambiguous (January 2nd or February 1st?). ISO 8601 eliminates ambiguity and sorts correctly in file systems.
 
 **How to read it**:
@@ -239,11 +211,9 @@ An international standard for representing dates and times in an unambiguous for
 | `HH:MM:SS` | Hours:Minutes:Seconds (24-hour) | `14:30:00` |
 | `Z` | UTC timezone indicator | — |
 
-:::note
-
-`2024-01-15T14:30:00Z` = January 15, 2024 at 2:30 PM UTC
-
-:::
+> 📘 **Note**
+>
+> `2024-01-15T14:30:00Z` = January 15, 2024 at 2:30 PM UTC
 **In templates**: Date fields use this format. The `/kmgraph:capture-lesson` command fills timestamps automatically. Manual users can use the date-only form: `2024-01-15`.
 
 **Plain English**: Year-Month-Day format that computers and humans both read consistently.
@@ -251,11 +221,9 @@ An international standard for representing dates and times in an unambiguous for
 ---
 ## Lesson Learned
 
-:::tip[**What is it?**]
-
-A structured document that captures a problem-solving experience — what the problem was, what caused it, how it was solved, and how to prevent it in the future.
-
-:::
+> 👍 **What is it?**
+>
+> A structured document that captures a problem-solving experience — what the problem was, what caused it, how it was solved, and how to prevent it in the future.
 **Structure**: Each lesson follows a template with these sections:
 
 1. **Problem** — What went wrong or what needed to be figured out
@@ -270,31 +238,27 @@ A structured document that captures a problem-solving experience — what the pr
 
 **Plain English**: A structured "here's what happened and how it was fixed" document.
 
-:::note
-
-```bash
-# Manual (No Automation)
-# 1. Copy template
-cp core/default-templates/lessons-learned/lesson-template.md \
-   docs/lessons-learned/process/my-lesson.md
-
-# 2. Fill in sections
-vim docs/lessons-learned/process/my-lesson.md
-
-# Automated (Claude Code)
-# Single command does all steps
-/kmgraph:capture-lesson
-```
-
-:::
+> 📘 **Note**
+>
+> ```bash
+> # Manual (No Automation)
+> # 1. Copy template
+> cp core/default-templates/lessons-learned/lesson-template.md \
+>    docs/lessons-learned/process/my-lesson.md
+>
+> # 2. Fill in sections
+> vim docs/lessons-learned/process/my-lesson.md
+>
+> # Automated (Claude Code)
+> # Single command does all steps
+> /kmgraph:capture-lesson
+> ```
 ---
 ## MCP Server
 
-:::tip[**What is it?**]
-
-MCP stands for **Model Context Protocol** — an open standard that allows AI assistants to access external tools and data sources. The knowledge graph includes an MCP server that exposes knowledge data as searchable resources.
-
-:::
+> 👍 **What is it?**
+>
+> MCP stands for **Model Context Protocol** — an open standard that allows AI assistants to access external tools and data sources. The knowledge graph includes an MCP server that exposes knowledge data as searchable resources.
 **Why it matters**: The MCP server allows any MCP-compatible AI assistant (not just Claude Code) to search and read knowledge graph entries. This makes the knowledge graph accessible from multiple platforms.
 
 **What it provides**:
@@ -305,22 +269,18 @@ MCP stands for **Model Context Protocol** — an open standard that allows AI as
 
 **Plain English**: A universal adapter that lets any compatible AI assistant access the knowledge graph.
 
-:::note
-
-Expose knowledge graph as MCP resources:
-- `resource://knowledge/patterns`
-- `resource://knowledge/lessons`
-- `tool://knowledge/search`
-
-:::
+> 📘 **Note**
+>
+> Expose knowledge graph as MCP resources:
+> - `resource://knowledge/patterns`
+> - `resource://knowledge/lessons`
+> - `tool://knowledge/search`
 ---
 ## MEMORY.md
 
-:::tip[**What is it?**]
-
-A lightweight index/pointer file that lists pointers to KMGraph's authoritative knowledge sources. Claude reads MEMORY.md at the start of every session to know what knowledge is available, then loads the underlying files as needed.
-
-:::
+> 👍 **What is it?**
+>
+> A lightweight index/pointer file that lists pointers to KMGraph's authoritative knowledge sources. Claude reads MEMORY.md at the start of every session to know what knowledge is available, then loads the underlying files as needed.
 **Location**: `~/.claude/projects/{project}/memory/MEMORY.md` (Claude's auto-memory directory).
 
 **Three-layer model** — MEMORY.md indexes pointers to these authoritative stores:
@@ -344,11 +304,9 @@ A lightweight index/pointer file that lists pointers to KMGraph's authoritative 
 ---
 ## Meta-Issue
 
-:::tip[**What is it?**]
-
-A structured tracking system for complex problems that require multiple attempts to solve. Unlike a single lesson, a meta-issue documents an entire investigation across days or weeks.
-
-:::
+> 👍 **What is it?**
+>
+> A structured tracking system for complex problems that require multiple attempts to solve. Unlike a single lesson, a meta-issue documents an entire investigation across days or weeks.
 **When to use**: When a problem has not been resolved after two or three attempts and the root cause understanding keeps evolving.
 
 **Structure**: A meta-issue lives in its own directory:
@@ -359,46 +317,36 @@ A structured tracking system for complex problems that require multiple attempts
 - `test-cases.md` — How to verify the problem is truly fixed
 - `timeline.md` — Chronological record of events
 
-:::note
-
-Application performance degrades over three weeks.
-Attempt 1: add caching (did not resolve).
-Attempt 2: optimize queries (partial improvement).
-Attempt 3: implement connection pooling (resolved). The meta-issue tracks all three attempts and what each one revealed.
-
-:::
+> 📘 **Note**
+>
+> Application performance degrades over three weeks.
+> Attempt 1: add caching (did not resolve).
+> Attempt 2: optimize queries (partial improvement).
+> Attempt 3: implement connection pooling (resolved). The meta-issue tracks all three attempts and what each one revealed.
 **Plain English**: A detective's case file for problems that take multiple attempts to solve.
 
 ---
 ## Namespace Prefix
 
-:::tip[**What is it?**]
-
-The `knowledge:` prefix that appears before every command name, grouping all knowledge graph commands under a single namespace.
-
-:::
-:::note
-
-`/kmgraph:capture-lesson`, `/kmgraph:status`, `/kmgraph:recall` — all share the `kmgraph:` prefix.
-
-:::
+> 👍 **What is it?**
+>
+> The `knowledge:` prefix that appears before every command name, grouping all knowledge graph commands under a single namespace.
+> 📘 **Note**
+>
+> `/kmgraph:capture-lesson`, `/kmgraph:status`, `/kmgraph:recall` — all share the `kmgraph:` prefix.
 **Why namespaces exist**: Claude Code plugins can each register their own commands. Namespaces prevent naming collisions when multiple plugins are installed. The `knowledge:` prefix clearly identifies commands belonging to the Knowledge Management Graph.
 
-:::tip[**Common mistake**:]
-
-Using a hyphen instead of a colon. The correct syntax is `/kmgraph:command` (colon), not `/kmgraph -command` (hyphen).
-
-:::
+> 👍 **Common mistake**:**
+>
+> Using a hyphen instead of a colon. The correct syntax is `/kmgraph:command` (colon), not `/kmgraph -command` (hyphen).
 **Plain English**: A label that groups all knowledge graph commands together and prevents name conflicts with other plugins.
 
 ---
 ## Platform-Agnostic Core
 
-:::tip[**What is it?**]
-
-The `core/` directory contains the knowledge graph system in a form that works with any AI assistant or no AI assistant at all. Templates, examples, documentation, and scripts in `core/` have no Claude Code dependency.
-
-:::
+> 👍 **What is it?**
+>
+> The `core/` directory contains the knowledge graph system in a form that works with any AI assistant or no AI assistant at all. Templates, examples, documentation, and scripts in `core/` have no Claude Code dependency.
 **What it includes**:
 - `core/default-templates/` — Blank templates for lessons, ADRs, knowledge entries, and sessions
 - `core/examples/` — Filled-out examples demonstrating proper usage
@@ -412,11 +360,9 @@ The `core/` directory contains the knowledge graph system in a form that works w
 ---
 ## Pre-Commit Hook
 
-:::tip[**What is it?**]
-
-An automated check that runs every time a `git commit` is attempted. In the knowledge graph context, pre-commit hooks scan for sensitive data (API keys, passwords, credentials) before allowing a commit to proceed.
-
-:::
+> 👍 **What is it?**
+>
+> An automated check that runs every time a `git commit` is attempted. In the knowledge graph context, pre-commit hooks scan for sensitive data (API keys, passwords, credentials) before allowing a commit to proceed.
 **How to set up**: The `/kmgraph:config-sanitization` command provides a wizard-based setup for configuring pre-commit hooks.
 
 **What it catches**: API keys, passwords, tokens, email addresses, internal URLs, and other patterns that should not be committed to a shared repository.
@@ -428,11 +374,9 @@ An automated check that runs every time a `git commit` is attempted. In the know
 ---
 ## Sanitization
 
-:::tip[**What is it?**]
-
-The process of detecting and removing sensitive information from knowledge graph content before sharing publicly or with a team.
-
-:::
+> 👍 **What is it?**
+>
+> The process of detecting and removing sensitive information from knowledge graph content before sharing publicly or with a team.
 **What gets detected**:
 - API keys, passwords, authentication tokens
 - Email addresses, personal names, phone numbers
@@ -447,22 +391,18 @@ The process of detecting and removing sensitive information from knowledge graph
 
 **Plain English**: Cleaning up secrets and private data before sharing knowledge with others.
 
-:::note
-
-- Personal information (emails, names, phone numbers)
-- Authentication (API keys, passwords, tokens)
-- Infrastructure (internal IPs, URLs, database strings)
-- Company/customer-specific data
-
-:::
+> 📘 **Note**
+>
+> - Personal information (emails, names, phone numbers)
+> - Authentication (API keys, passwords, tokens)
+> - Infrastructure (internal IPs, URLs, database strings)
+> - Company/customer-specific data
 ---
 ## Session Summary
 
-:::tip[**What is it?**]
-
-A markdown document that captures the highlights of a work session — what was accomplished, what decisions were made, what was learned, and what remains for next time.
-
-:::
+> 👍 **What is it?**
+>
+> A markdown document that captures the highlights of a work session — what was accomplished, what decisions were made, what was learned, and what remains for next time.
 **When to create**: After a significant work session, particularly one involving architecture discussions, major debugging efforts, or important decisions.
 
 **How to create**: The `/kmgraph:session-summary` command generates a summary from the current conversation. Manual users can copy the session template from `core/default-templates/sessions/session-template.md`.
@@ -476,11 +416,9 @@ A markdown document that captures the highlights of a work session — what was 
 ---
 ## Sync Pipeline
 
-:::tip[**What is it?**]
-
-A multi-step process that captures, extracts, and synchronizes knowledge across the system. The full pipeline runs four operations in sequence:
-
-:::
+> 👍 **What is it?**
+>
+> A multi-step process that captures, extracts, and synchronizes knowledge across the system. The full pipeline runs four operations in sequence:
 1. **Capture** — Document a lesson from recent work
 2. **Extract** — Pull key insights into knowledge graph entries
 3. **Sync** — Update MEMORY.md with new patterns
@@ -508,11 +446,9 @@ bash
 ---
 ## Template
 
-:::tip[**What is it?**]
-
-A pre-formatted markdown file that provides the structure for a new lesson, ADR, knowledge entry, or session summary. Templates include placeholder fields that indicate what information belongs in each section.
-
-:::
+> 👍 **What is it?**
+>
+> A pre-formatted markdown file that provides the structure for a new lesson, ADR, knowledge entry, or session summary. Templates include placeholder fields that indicate what information belongs in each section.
 **Location**: `core/default-templates/` directory, organized by type:
 
 - `lessons-learned/lesson-template.md` — For documenting problems solved
@@ -535,11 +471,9 @@ A pre-formatted markdown file that provides the structure for a new lesson, ADR,
 ---
 ## Token Count
 
-:::tip[**What is it?**]
-
-A measurement of text size used by AI language models. One token is roughly equivalent to 4 characters or 0.75 words in English.
-
-:::
+> 👍 **What is it?**
+>
+> A measurement of text size used by AI language models. One token is roughly equivalent to 4 characters or 0.75 words in English.
 **Why it matters for knowledge graphs**: AI assistants have a limited context window (the amount of text processed in a single session). MEMORY.md must stay concise — under 200 lines — to avoid consuming too much of the available context.
 
 **Practical impact**: Keeping MEMORY.md lean ensures the AI assistant has room for the current conversation while still retaining knowledge graph context.
@@ -549,11 +483,9 @@ A measurement of text size used by AI language models. One token is roughly equi
 ---
 ## Tier Label
 
-:::tip[**What is it?**]
-
-A platform-agnostic name for a class of AI model — `fast-tier`, `standard-tier`, or `powerful-tier` — used in place of a specific model name.
-
-:::
+> 👍 **What is it?**
+>
+> A platform-agnostic name for a class of AI model — `fast-tier`, `standard-tier`, or `powerful-tier` — used in place of a specific model name.
 **Why it matters**: Model names change between versions and differ across platforms. Tier labels let rules, commands, and agents refer to "use the fast model" without hardcoding `claude-haiku-4-5-20251001`. When the model name changes, only the tier map needs updating — not every command.
 
 **How it resolves**: Each `me.md` includes a `tier_map` that translates tier labels to concrete model names for the active platform. The `ai-model-tier-resolver` module handles this lookup automatically.
@@ -564,11 +496,9 @@ A platform-agnostic name for a class of AI model — `fast-tier`, `standard-tier
 
 ## Tier Map
 
-:::tip[**What is it?**]
-
-A `tier_map` block in `me.md` that maps tier labels to concrete model names for the active platform.
-
-:::
+> 👍 **What is it?**
+>
+> A `tier_map` block in `me.md` that maps tier labels to concrete model names for the active platform.
 **Why it matters**: Different users may prefer different models for the same tier. The tier map is the single place to change which model gets used for "standard" work — all commands pick it up automatically.
 
 **Where it lives**: In the `platforms[]` block of `knowledge/me.md` (project-level) or `~/.kmgraph/me.md` (personal default). Project-level entries override personal defaults.
@@ -579,11 +509,9 @@ A `tier_map` block in `me.md` that maps tier labels to concrete model names for 
 
 ## Alias Map
 
-:::tip[**What is it?**]
-
-A backwards-compatibility table that translates legacy model names (e.g., `Haiku`, `Sonnet`, `Opus`) to their equivalent tier labels.
-
-:::
+> 👍 **What is it?**
+>
+> A backwards-compatibility table that translates legacy model names (e.g., `Haiku`, `Sonnet`, `Opus`) to their equivalent tier labels.
 **Why it matters**: Earlier versions of KMGraph used raw model names in `me.md`. The alias map lets those names continue to work while emitting a one-time deprecation warning, giving existing setups time to migrate to tier labels.
 
 **Sunset**: Legacy aliases are scheduled for removal in v0.6.0. Migrate `me.md` entries from model names to tier labels (`fast-tier`, `standard-tier`, `powerful-tier`) before then.
@@ -594,11 +522,9 @@ A backwards-compatibility table that translates legacy model names (e.g., `Haiku
 
 ## Tier Collapse
 
-:::tip[**What is it?**]
-
-A fallback chain the resolver follows when a tier's mapped model is missing or unreachable: `powerful-tier → standard-tier → fast-tier`.
-
-:::
+> 👍 **What is it?**
+>
+> A fallback chain the resolver follows when a tier's mapped model is missing or unreachable: `powerful-tier → standard-tier → fast-tier`.
 **Why it matters**: Local servers go offline, API keys expire, and model names change. Tier collapse keeps a session moving by picking the next-best reachable tier instead of halting on every transient failure. The collapse event is logged once per session so the degradation is visible without spamming the log.
 
 **When it halts**: If `fast-tier` also fails, the resolver stops with an actionable error. Skills that must not downgrade can opt out by declaring `required_tier: <label>` in their frontmatter; those skills halt rather than collapse. `stuck-work-escalation` is the primary opt-out case.
@@ -609,11 +535,9 @@ A fallback chain the resolver follows when a tier's mapped model is missing or u
 
 ## User Profile / Project Profile
 
-:::tip[**What is it?**]
-
-Two collective scopes for the behavioral config files that shape the AI assistant. **User Profile** = `~/.kmgraph/me.md` + `~/.kmgraph/rules.md` + `~/.kmgraph/triggers.md`. **Project Profile** = `knowledge/me.md` + `knowledge/rules.md` + `knowledge/triggers.md`.
-
-:::
+> 👍 **What is it?**
+>
+> Two collective scopes for the behavioral config files that shape the AI assistant. **User Profile** = `~/.kmgraph/me.md` + `~/.kmgraph/rules.md` + `~/.kmgraph/triggers.md`. **Project Profile** = `knowledge/me.md` + `knowledge/rules.md` + `knowledge/triggers.md`.
 **Why the distinction matters**: User Profile captures cross-project identity, rules, and tier preferences that travel with a contributor from repo to repo. Project Profile captures project-specific conventions and per-contributor identity for a single codebase. Together the two scopes form the **Full Profile Stack**, with project entries overriding user entries on conflict.
 
 **Read order**: `~/.kmgraph/me.md` → `~/.kmgraph/triggers.md` → `knowledge/me.md` → `knowledge/triggers.md`. Both `rules.md` files are loaded on demand only, to avoid context bloat.
@@ -624,11 +548,9 @@ Two collective scopes for the behavioral config files that shape the AI assistan
 
 ## Unknown-Model Trigger
 
-:::tip[**What is it?**]
-
-The prompt flow that fires when a command or agent is invoked with a model name that does not resolve to any tier in the active `me.md` YAML frontmatter.
-
-:::
+> 👍 **What is it?**
+>
+> The prompt flow that fires when a command or agent is invoked with a model name that does not resolve to any tier in the active `me.md` YAML frontmatter.
 **Why it matters**: Before tier abstraction, a typo or stale model name could silently dispatch the wrong model. The unknown-model trigger catches these at the boundary: it prompts for a tier assignment (plus host and port for local models), updates `me.md`, and then continues dispatch. After the first assignment the name resolves normally.
 
 **Where it lives**: A trigger entry in both the User Profile and Project Profile `triggers.md` templates. `Gate:` fires when the model name invoked does not resolve to any tier in `me.md`; `Apply:` points to `rules.md § Profile > Adding a model`.
@@ -639,11 +561,9 @@ The prompt flow that fires when a command or agent is invoked with a model name 
 
 ## YAML Frontmatter
 
-:::tip[**What is it?**]
-
-A block of structured metadata at the top of a markdown file, enclosed between two `---` lines. Frontmatter stores machine-readable information about the document (title, date, tags, category, etc.) separately from the human-readable content below.
-
-:::
+> 👍 **What is it?**
+>
+> A block of structured metadata at the top of a markdown file, enclosed between two `---` lines. Frontmatter stores machine-readable information about the document (title, date, tags, category, etc.) separately from the human-readable content below.
 **Why it exists**: Frontmatter enables searching by date, author, category, or tag without parsing the entire document. Automation tools read frontmatter to organize and index entries.
 
 **How to fill it**: Fields marked `[AUTO]` are filled by commands automatically. Fields marked `[MANUAL]` require input from the user. The template comments explain each field.

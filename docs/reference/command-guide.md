@@ -6,9 +6,6 @@ position: 1
 slug: reference-command-guide
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
 **Version:** 0.5.2 | **Updated:** 2026-04-22
 
 > **Claude Code only:** The `/kmgraph:` prefix requires Claude Code with this plugin installed. Other IDEs access equivalent functionality through MCP tools — see [INSTALL.md](INSTALL.md) for platform-specific setup.
@@ -81,8 +78,7 @@ Commands work across platforms, but full automation is Claude Code-specific.
 
 ## Browse Commands by Category
 
-<Tabs>
-  <TabItem value="setup" label="Setup & Configuration">
+#### Setup & Configuration
 
 Get the knowledge graph running and configure how it works.
 
@@ -93,8 +89,7 @@ Get the knowledge graph running and configure how it works.
 - [🟡 `/kmgraph:add-category`](#-kmgraphadd-category) — Add custom categories
 - [🟡 `/kmgraph:config-sanitization`](#-kmgraphconfig-sanitization) — Set up safety features for team sharing
 
-  </TabItem>
-  <TabItem value="capture" label="Capture & Document">
+#### Capture & Document
 
 Document lessons, capture history, and summarize sessions.
 
@@ -102,8 +97,7 @@ Document lessons, capture history, and summarize sessions.
 - [🟡 `/kmgraph:extract-chat`](#-kmgraphextract-chat) — Export chat history to markdown
 - [🟡 `/kmgraph:session-summary`](#-kmgraphsession-summary) — Summarize important work sessions
 
-  </TabItem>
-  <TabItem value="search-sync" label="Search & Sync">
+#### Search & Sync
 
 Find knowledge and keep the graph synchronized.
 
@@ -113,25 +107,20 @@ Find knowledge and keep the graph synchronized.
 - [🟡 `/kmgraph:update-doc`](#-kmgraphupdate-doc) — Update documentation with changes
 - [🔴 `/kmgraph:sync-all`](#-kmgraphsync-all) — Run complete synchronization pipeline
 
-  </TabItem>
-  <TabItem value="team" label="Team & Sharing">
+#### Team & Sharing
 
 Share knowledge safely with team members.
 
 - [🟡 `/kmgraph:check-sensitive`](#-kmgraphcheck-sensitive) — Scan for sensitive data before sharing
 - [🔴 `/kmgraph:link-issue`](#-kmgraphlink-issue) — Connect lessons to GitHub issues
 
-  </TabItem>
-  <TabItem value="advanced" label="Advanced Issues">
+#### Advanced Issues
 
 Track complex, multi-attempt problems systematically.
 
 - [🔴 `/kmgraph:meta-issue`](#-kmgraphmeta-issue) — Track multi-attempt bugs and features
 - [🔴 `/kmgraph:start-issue-tracking`](#-kmgraphstart-issue-tracking) — Systematic issue tracking with Git branches
 - [🔴 `/kmgraph:update-issue-plan`](#-kmgraphupdate-issue-plan) — Sync progress with GitHub and plans
-
-  </TabItem>
-</Tabs>
 
 ---
 
@@ -198,7 +187,7 @@ The system presents candidates for your review before creating entries.
 
 ### 🟡 `/kmgraph:init-personal-kg`
 
-<!-- Updated: 2026-03-29 -->
+
 
 **Purpose**: Create a personal knowledge graph at `~/.kmgraph/` for lessons that apply across every project, not just the current one. `capture-lesson` gains a KG picker and `recall` searches both automatically.
 
@@ -272,7 +261,7 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 
 ### 🟢 `/kmgraph:capture-lesson`
 
-<!-- Updated: 2026-04-15 -->
+
 
 **Purpose**: Identifies lessons while context is still fresh and captures both the problem and how it was solved. By automatically linking lessons to relevant metadata, the record is searchable and reusable across future sessions and projects.
 
@@ -287,7 +276,7 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 
 **What it does**:
 
-1. {OPTIONAL} Prompts to take a session snapshot before starting to preserve the context at the moment of discovery
+1. `{OPTIONAL}` Prompts to take a session snapshot before starting to preserve the context at the moment of discovery
 2. Checks for duplicate or similar existing lessons in the existing knowledge graph before proceeding
 3. Asks verification questions to confirm topic, audience, and scope
 4. Auto-detects the category from keywords in the lesson content
@@ -299,8 +288,8 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 - prevention
 7. Creates the lesson file from the standard template with all fields populated
 8. Updates category and chronological indexes
-9. {OPTIONAL} Runs `/kmgraph:update-graph` to extract KG entries from the new lesson
-10. {OPTIONAL} Links to a GitHub Issue via `/kmgraph:link-issue`
+9. `{OPTIONAL}` Runs `/kmgraph:update-graph` to extract KG entries from the new lesson
+10. `{OPTIONAL}` Links to a GitHub Issue via `/kmgraph:link-issue`
 
 **Time**: 5-10 minutes (faster with practice)
 
@@ -379,7 +368,7 @@ Quick Commands:
 
 ### 🟢 `/kmgraph:recall`
 
-<!-- Updated: 2026-04-15 -->
+
 
 **Purpose**: Search across lessons, decisions, patterns, and sessions in one command. When a personal KG is registered, both knowledge graphs are searched automatically, with source labels on every result.
 
@@ -571,7 +560,7 @@ Dispatches to the recall agent, which searches:
 
 ### 🟡 `/kmgraph:create-adr`
 
-<!-- Updated: 2026-04-22 -->
+
 
 **Purpose**: Create strategic Architectural Decision Records (ADRs) that capture **why** decisions were made. Records are auto-populated with git metadata, sequential numbering, and the implementation commit, so the history is traceable without manual bookkeeping.
 
@@ -584,7 +573,7 @@ Dispatches to the recall agent, which searches:
 
 **What it does**:
 
-1. {OPTIONAL} Before capturing ADR, prompt will ask whether or not to take a snapshot of the current session before starting to preserve an archive of the context behind the decision
+1. `{OPTIONAL}` Before capturing ADR, prompt will ask whether or not to take a snapshot of the current session before starting to preserve an archive of the context behind the decision
 2. Reviews the current ADR items in the active knowledge graph
 3. Assigns the next ADR number automatically
 4. Captures git context for the record — author, branch, and PR/issue number automatically
@@ -930,7 +919,7 @@ With `--user-facing`:
 
 ### 🔴 `/kmgraph:start-issue-tracking`
 
-<!-- Updated: 2026-03-30 -->
+
 
 **Purpose**: Document a bug or enhancement from identification through resolution, with git integration when a repository is present. Captures the context of an issue in structured templates for review and implementation.
 
@@ -1337,7 +1326,6 @@ flowchart TD
 ## Related Documentation
 
 ### **Quick help**
-<div class="grid cards" markdown>
 - [Cheat Sheet](CHEAT-SHEET.md)
 
   One-page quick reference
@@ -1345,10 +1333,8 @@ flowchart TD
 - [Concepts](../concepts/why-kmgraph.md)
 
   Term definitions
-</div>
 
 ### **Writing better entries**
-<div class="grid cards" markdown>
 - [Patterns Guide](../pillars/capturing/capture-patterns.md)
 
   Quality standards
@@ -1360,13 +1346,11 @@ flowchart TD
 - [Examples](examples/)
 
   Real samples
-</div>
 
 ## Related
 
-<div class="grid cards" markdown>
 
-- **[Quickstart](../quickstart.mdx)**
+- **[Quickstart](../quickstart)**
 
   Installation, first lesson, and setup verification.
 
@@ -1378,16 +1362,14 @@ flowchart TD
 
   Plain-English explanations of all key terms and patterns.
 
-</div>
 
 ---
 
 ## Related Documentation
 
 ### **Getting started**
-<div class="grid cards" markdown>
 
-- [Quickstart](../quickstart.mdx)
+- [Quickstart](../quickstart)
 
   Installation, first lesson, setup verification (5 min)
 
@@ -1398,10 +1380,8 @@ flowchart TD
 - [Configuration Guide](../pillars/organizing/graph-configuration.md)
 
   Post-install setup: sanitization, team workflows, MCP server
-</div>
 
 ### **Learning resources**
-<div class="grid cards" markdown>
 
 - [Quick Reference](CHEAT-SHEET.md)
 
@@ -1414,10 +1394,8 @@ flowchart TD
 - [Examples](examples/)
 
   Real-world completed examples of lessons, ADRs, and KG entries
-</div>
 
 ### **Advanced**
-<div class="grid cards" markdown>
 
 - [Workflows](../pillars/organizing/multi-kg-workflows.md)
 
@@ -1430,7 +1408,6 @@ flowchart TD
 - [Style Guide](STYLE-GUIDE.md)
 
   Documentation authoring standards and conventions
-</div>
 ---
 
 **Version**: 0.5.2

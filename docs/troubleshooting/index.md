@@ -36,9 +36,9 @@ Remove-Item -Recurse -Force "$env:USERPROFILE\.claude\plugins\cache\stayinginsyn
 
 Then follow the same `/plugin uninstall` → `/plugin install` steps above.
 
-:::tip
-The marketplace may still show the older version number after `/plugin update stayinginsync`. That is expected — continue with the reinstall.
-:::
+> 👍 **Tip**
+>
+> The marketplace may still show the older version number after `/plugin update stayinginsync`. That is expected — continue with the reinstall.
 
 ---
 

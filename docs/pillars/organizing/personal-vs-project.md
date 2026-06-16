@@ -46,7 +46,7 @@ Each scope also scaffolds two special files:
 | `~/.kmgraph/rules.md` | Personal | N/A local | Cross-project behavioral rules |
 | `~/.kmgraph/me.md` | Personal | N/A local | Cross-project personal identity and preferences |
 
-These files are the platform-agnostic foundation that all AI platform config files (CLAUDE.md, .cursorrules, etc.) point to. See [Your AI Profile](../portability/your-ai-profile.mdx) for the full setup guide.
+These files are the platform-agnostic foundation that all AI platform config files (CLAUDE.md, .cursorrules, etc.) point to. See [Your AI Profile](../portability/your-ai-profile) for the full setup guide.
 
 ## How they work together
 
@@ -70,7 +70,6 @@ These files are the platform-agnostic foundation that all AI platform config fil
 ## Scope diagram
 
 ```mermaid
-%%{init: {'theme': 'neutral'}}%%
 graph TB
     subgraph Personal ["🧑 Personal KG (~/.kmgraph/)"]
         PM["me.md — cross-project identity (local)"]
@@ -92,8 +91,6 @@ graph TB
     Recall -->|searches both| Personal
     Recall -->|searches both| Project
 
-    accTitle: Personal vs Project KG scopes
-    accDescr: Two KG scopes — Personal stored at ~/.kmgraph/ and Project stored in ./knowledge/. Each scope includes me.md for identity and rules.md for behavioral conventions. Recall searches both automatically.
 ```
 
 ## Routing captures by level
@@ -123,10 +120,10 @@ If a named KG isn't found, a fuzzy suggestion prompt appears. If the project has
 - **During init**: `/kmgraph:init` offers to create a personal KG at the end of setup
 - **Standalone**: `/kmgraph:init-personal-kg` creates and registers the personal KG at any time
 
-See [Multi-KG Workflows](./multi-kg-workflows.md) for advanced configuration and [Your AI Profile](../portability/your-ai-profile.mdx) for setting up `me.md` and `rules.md`.
+See [Multi-KG Workflows](./multi-kg-workflows.md) for advanced configuration and [Your AI Profile](../portability/your-ai-profile) for setting up `me.md` and `rules.md`.
 
 ## Related
 
 - [Graph Configuration](./graph-configuration.md) — categories, storage paths, and kg-config.json
 - [Multi-KG Workflows](./multi-kg-workflows.md) — managing multiple graphs side by side
-- [Your AI Profile](../portability/your-ai-profile.mdx) — setting up me.md and rules.md
+- [Your AI Profile](../portability/your-ai-profile) — setting up me.md and rules.md

@@ -4,94 +4,48 @@ category:
   uri: overview
 position: 1
 slug: index
+content:
+  excerpt: KMGraph gives your AI coding assistant a persistent memory — capturing lessons, decisions, and patterns across every session.
 ---
 
+# Knowledge Management Graph
 
-<div className={styles.homePage}>
+**Using an AI coding assistant? KMGraph gives it a persistent memory.**
 
-<img
-  src="/knowledge-graph/img/Staying_in_Sync_Banner_Dark.png"
-  alt="KMGraph - Using an AI coding assistant? KMGraph is for you."
-  className={styles.headerImage}
-/>
+Capture lessons, decisions, and patterns across every session — searchable, portable, and synced across tools.
 
-<div className={styles.valueGrid}>
-  <div className={styles.valueCard}>
-    <strong>Lessons Learned</strong>
-    Every bug fix and breakthrough, captured and searchable.
-  </div>
-  <div className={styles.valueCard}>
-    <strong>Decisions</strong>
-    What you chose and why, so you never re-litigate the same call.
-  </div>
-  <div className={styles.valueCard}>
-    <strong>Institutional Knowledge</strong>
-    A local, portable repo that follows you across every tool.
-  </div>
-</div>
+---
 
-<div className={styles.pillarHeaderRow}>
-  <div className={styles.pillarHeaderLeft}>
-    <h2>Choose your starting point</h2>
-    <p>Start with the skill that matches where you are right now.</p>
-  </div>
-  <div className={styles.pillarHeaderRight}>
-    <span className={styles.nudgeLine1}>Not sure where to start?</span>
-    <a href="/knowledge-graph/quickstart" className={styles.nudgeLine2}>Try the 5-minute quickstart.</a>
-  </div>
-</div>
+## Choose Your Starting Point
 
-<div className={styles.pillarGrid}>
-  <a href="/knowledge-graph/pillars/capturing/capture-lessons-learned" className={styles.pillarCard}>
-    <div className={styles.pillarIcon}>📥</div>
-    <div className={styles.pillarName}>Capturing</div>
-    <div className={styles.pillarQuestion}>"I solved something. How do I save it?"</div>
-    <div className={styles.pillarCta}>Explore →</div>
-  </a>
-  <a href="/knowledge-graph/pillars/recalling/search-the-graph" className={styles.pillarCard}>
-    <div className={styles.pillarIcon}>🔍</div>
-    <div className={styles.pillarName}>Recalling</div>
-    <div className={styles.pillarQuestion}>"I think I've solved this before."</div>
-    <div className={styles.pillarCta}>Explore →</div>
-  </a>
-  <a href="/knowledge-graph/pillars/organizing/personal-vs-project" className={styles.pillarCard}>
-    <div className={styles.pillarIcon}>🗂️</div>
-    <div className={styles.pillarName}>Organizing</div>
-    <div className={styles.pillarQuestion}>"How do I keep this from becoming a junk drawer?"</div>
-    <div className={styles.pillarCta}>Explore →</div>
-  </a>
-  <a href="/knowledge-graph/pillars/portability/your-ai-profile" className={styles.pillarCard}>
-    <div className={styles.pillarIcon}>🌐</div>
-    <div className={styles.pillarName}>Portability</div>
-    <div className={styles.pillarQuestion}>"I use multiple AI tools. Make them share knowledge."</div>
-    <div className={styles.pillarCta}>Explore →</div>
-  </a>
-  <a href="/knowledge-graph/pillars/tailoring/customize-hooks" className={styles.pillarCard}>
-    <div className={styles.pillarIcon}>⚙️</div>
-    <div className={styles.pillarName}>Tailoring</div>
-    <div className={styles.pillarQuestion}>"I want this to fit my workflow."</div>
-    <div className={styles.pillarCta}>Explore →</div>
-  </a>
-</div>
+| Pillar | When to use it |
+|---|---|
+| 📥 **[Capturing](pillars-capturing-index)** | "I solved something. How do I save it?" |
+| 🔍 **[Recalling](pillars-recalling-index)** | "I think I've solved this before." |
+| 🗂️ **[Organizing](pillars-organizing-index)** | "How do I keep this from becoming a junk drawer?" |
+| 🌐 **[Portability](pillars-portability-index)** | "I use multiple AI tools. Make them share knowledge." |
+| ⚙️ **[Tailoring](pillars-tailoring-index)** | "I want this to fit my workflow." |
 
-<div className={styles.demoSection}>
-  <p className={styles.demoLabel}>See it in action - capturing a lesson at the end of a session:</p>
-  <img
-    src="/knowledge-graph/img/demos/capture-lesson.gif"
-    alt="KMGraph capture-lesson demo"
-    className={styles.demoGif}
-  />
-</div>
+Not sure where to start? Try the **[5-minute Quickstart](quickstart)**.
 
-<div className={styles.hero}>
-  <code className={styles.heroCode}>claude --plugin-dir /path/to/knowledge-graph</code>
-  <p className={styles.heroSubtext}>
-    Then run <code>/kmgraph:init</code> - first lesson captured in under 5 minutes.
-  </p>
-</div>
+---
 
-:::tip[Now in Beta]
-KMGraph is in beta and actively seeking feedback. Reports and feature requests are welcome via the [issue tracker](https://github.com/technomensch/knowledge-graph/issues).
-:::
+## What KMGraph Captures
 
-</div>
+- **Lessons Learned** — Every bug fix and breakthrough, captured and searchable
+- **Decisions** — What you chose and why, so you never re-litigate the same call
+- **Institutional Knowledge** — A local, portable repo that follows you across every tool
+
+---
+
+## Get Started
+
+```bash
+claude --plugin-dir /path/to/knowledge-graph
+```
+
+Then run `/kmgraph:init` — first lesson captured in under 5 minutes.
+
+> 👍 **Now in Beta**
+>
+> KMGraph is actively seeking feedback. Reports and feature requests welcome via the [issue tracker](https://github.com/technomensch/knowledge-graph/issues).

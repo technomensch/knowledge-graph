@@ -54,5 +54,5 @@ Run `/kmgraph:rules-capture` to add a new rule. The skill prompts you for the ru
 
 ## Related
 
-- [Your AI Profile](../portability/your-ai-profile.mdx) — identity vs. behavior: what goes where
+- [Your AI Profile](../portability/your-ai-profile) — identity vs. behavior: what goes where
 - [Customize Hooks](./customize-hooks.md) — automate rule enforcement at the shell level

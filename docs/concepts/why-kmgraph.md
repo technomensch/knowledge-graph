@@ -31,7 +31,6 @@ Captured knowledge is accessible in any session. Switching from Claude to Cursor
 Knowledge capture fits naturally into everyday development:
 
 ```mermaid
-%%{init: { 'flowchart': { 'useMaxWidth': true }, 'theme': 'neutral' }}%%
 graph LR
     subgraph Trigger["⚡ The Moment"]
         A["🐞 Debugging<br/>breakthrough"]
@@ -64,8 +63,6 @@ graph LR
     G --> J
     G --> K
 
-    accTitle: When to Use the Knowledge Graph
-    accDescr: Three-phase journey flow showing six trigger moments feeding into knowledge capture, which enables four future benefits.
 ```
 
 ## How It Works

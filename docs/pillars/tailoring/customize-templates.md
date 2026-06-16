@@ -29,9 +29,9 @@ Two directories look similar but serve different roles:
 
 All templates live in `core/default-templates/`. When the MCP server or a command creates a new entry, it reads the template from that directory. Editing files in `core/default-templates/` changes all future entries of that type.
 
-:::warning
-`core/default-templates/` is a PROTECTED directory. Per project conventions, do not commit changes to `core/default-templates/` without explicit team review. Keep customizations in `docs/templates/` for project-local overrides.
-:::
+> 🚧 **Warning**
+>
+> `core/default-templates/` is a PROTECTED directory. Per project conventions, do not commit changes to `core/default-templates/` without explicit team review. Keep customizations in `docs/templates/` for project-local overrides.
 
 ## Available templates
 

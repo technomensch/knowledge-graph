@@ -36,9 +36,9 @@ docs/meta-issues/<issue-name>/
         └── attempt-results.md     # Written AFTER the attempt
 ```
 
-:::note
-If no git repository is detected, branch strategy prompts and the Git Integration section are omitted automatically (v0.2.3.4-beta+).
-:::
+> 📘 **Note**
+>
+> If no git repository is detected, branch strategy prompts and the Git Integration section are omitted automatically (v0.2.3.4-beta+).
 
 ---
 
@@ -71,9 +71,9 @@ mkdir docs/meta-issues/<issue-name>/attempts/001-<label>
 2. Step two
 ```
 
-:::tip
-Use `/kmgraph:meta-issue --log-attempt 001 "<hypothesis>"` to pre-populate the hypothesis field and ensure it is distinct from prior attempts. At attempt 3+, the command reminds the user to invoke the `stuck-work-escalation` skill.
-:::
+> 👍 **Tip**
+>
+> Use `/kmgraph:meta-issue --log-attempt 001 "<hypothesis>"` to pre-populate the hypothesis field and ensure it is distinct from prior attempts. At attempt 3+, the command reminds the user to invoke the `stuck-work-escalation` skill.
 
 **`attempt-results.md`** — written after the attempt:
 
@@ -127,13 +127,13 @@ At the start of each new session working on this issue:
 
 This creates the attempt directory, pre-populates the hypothesis field, and checks that the hypothesis differs from prior attempts. At attempt 3 or later, it also surfaces the `stuck-work-escalation` skill reminder.
 
-:::tip
-Write `solution-approach.md` before starting each attempt, and `attempt-results.md` immediately after. Delaying either reduces the quality of the retrospective.
-:::
+> 👍 **Tip**
+>
+> Write `solution-approach.md` before starting each attempt, and `attempt-results.md` immediately after. Delaying either reduces the quality of the retrospective.
 
-:::note
-**Escalation thresholds:** At 3 attempts (or 30 min), Opus diagnosis activates automatically. At 5 attempts, a mandatory exit-path decision is required before any further work proceeds. See the `stuck-work-escalation` skill for full details.
-:::
+> 📘 **Note**
+>
+> **Escalation thresholds:** At 3 attempts (or 30 min), Opus diagnosis activates automatically. At 5 attempts, a mandatory exit-path decision is required before any further work proceeds. See the `stuck-work-escalation` skill for full details.
 
 ---
 

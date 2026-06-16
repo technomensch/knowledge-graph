@@ -14,9 +14,9 @@ parent:
 
 Mirror captured lessons and ADRs into a Notion database so teammates can browse the knowledge graph without installing KMGraph. You need KMGraph initialized with a populated knowledge graph, the Notion MCP server configured, and a Notion workspace with permission to create databases.
 
-:::note
-This guide covers **mirroring** local KG entries into Notion as a read-friendly browsing surface. It does not make Notion the primary store — KMGraph still writes to local markdown files. A pluggable Notion backend is deferred to a future release.
-:::
+> 📘 **Note**
+>
+> This guide covers **mirroring** local KG entries into Notion as a read-friendly browsing surface. It does not make Notion the primary store — KMGraph still writes to local markdown files. A pluggable Notion backend is deferred to a future release.
 
 ## Create a lessons database
 

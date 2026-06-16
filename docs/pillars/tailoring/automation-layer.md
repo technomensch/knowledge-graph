@@ -51,8 +51,6 @@ sequenceDiagram
     Note over Hook: PostToolUse fires after write
     Hook->>Dev: Confirm capture + suggest /kmgraph:update-graph
 
-    accTitle: KMGraph automation layer sequence
-    accDescr: Sequence showing hooks firing at session start and after tool use, a skill detecting a breakthrough and suggesting capture, the command writing to the knowledge graph directly or via an agent, and the PostToolUse hook confirming.
 ```
 
 ## Skills and their trigger keywords

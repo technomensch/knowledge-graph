@@ -20,82 +20,68 @@ The universal installer detects the platform (Claude Code, Codex CLI, Cursor, Wi
 
 ## Get the Installer
 
-:::warning[Important: Use the Raw File]
-
-This page shows a preview of the installer. To actually install, **copy and paste the raw markdown file** into an AI assistant.
-**[→ Get the raw installer file](https://raw.githubusercontent.com/technomensch/knowledge-graph/main/INSTALL.md)**
-- Click the link above
-- Select all text (Ctrl+A / Cmd+A)
-- Copy to clipboard (Ctrl+C / Cmd+C)
-- Paste into Claude, ChatGPT, Cursor, or any AI assistant
-- Follow the assistant's instructions
-
-:::
+> 🚧 **Important: Use the Raw File**
+>
+> This page shows a preview of the installer. To actually install, **copy and paste the raw markdown file** into an AI assistant.
+> **[→ Get the raw installer file](https://raw.githubusercontent.com/technomensch/knowledge-graph/main/INSTALL.md)**
+> - Click the link above
+> - Select all text (Ctrl+A / Cmd+A)
+> - Copy to clipboard (Ctrl+C / Cmd+C)
+> - Paste into Claude, ChatGPT, Cursor, or any AI assistant
+> - Follow the assistant's instructions
 ---
 
 ## For Claude Code Users
 
-:::tip[Claude Code Quick Start]
-
-Claude Code users can follow a manual setup walkthrough instead:
-→ [Quickstart](quickstart.mdx)
-Or paste the universal installer above for the same automated experience.
-
-:::
+> 👍 **Claude Code Quick Start**
+>
+> Claude Code users can follow a manual setup walkthrough instead:
+> → [Quickstart](quickstart)
+> Or paste the universal installer above for the same automated experience.
 
 ## For Codex CLI Users
 
-:::tip[Codex Marketplace Install]
+> 👍 **Codex Marketplace Install**
+>
+> ```bash
+> codex plugin marketplace add technomensch/knowledge-graph
+> codex plugin add kmgraph@knowledge-management-graph
+> ```
+>
+> Skills and MCP tools activate immediately after install — no further configuration needed.
 
-```bash
-codex plugin marketplace add technomensch/knowledge-graph
-codex plugin add kmgraph@knowledge-management-graph
-```
+> 📘 **Troubleshooting: Stale Cache After Update**
+>
+> If you update the plugin source but skills or tools don't reflect the changes, Codex may be using a cached version. Clear the plugin cache:
+>
+> ```bash
+> rm -rf ~/.codex/plugins/cache/knowledge-management-graph/kmgraph/
+> codex plugin uninstall kmgraph
+> codex plugin marketplace add technomensch/knowledge-graph
+> codex plugin add kmgraph@knowledge-management-graph
+> ```
+>
+> This resolves issues where tools are out of date or skills don't appear after an update.
 
-Skills and MCP tools activate immediately after install — no further configuration needed.
+> 📘 **Node/PATH requirement**
+>
+> kmgraph hook scripts require `node` to be on the PATH visible to the Codex process. If hooks silently fail after install, confirm `node` is accessible from the shell that launches Codex — not just your login shell.
+>
+> - **nvm users:** source `nvm` before launching Codex, or add it to your shell's `rc` file so it loads for non-login shells
+> - **fnm / volta users:** these work reliably when their shims are on the system PATH (default install)
+> - **Homebrew / system Node:** typically works without changes
 
-:::
-
-:::note[Troubleshooting: Stale Cache After Update]
-
-If you update the plugin source but skills or tools don't reflect the changes, Codex may be using a cached version. Clear the plugin cache:
-
-```bash
-rm -rf ~/.codex/plugins/cache/knowledge-management-graph/kmgraph/
-codex plugin uninstall kmgraph
-codex plugin marketplace add technomensch/knowledge-graph
-codex plugin add kmgraph@knowledge-management-graph
-```
-
-This resolves issues where tools are out of date or skills don't appear after an update.
-
-:::
-
-:::note[Node/PATH requirement]
-
-kmgraph hook scripts require `node` to be on the PATH visible to the Codex process. If hooks silently fail after install, confirm `node` is accessible from the shell that launches Codex — not just your login shell.
-
-- **nvm users:** source `nvm` before launching Codex, or add it to your shell's `rc` file so it loads for non-login shells
-- **fnm / volta users:** these work reliably when their shims are on the system PATH (default install)
-- **Homebrew / system Node:** typically works without changes
-
-:::
-
-:::note[Hook trust required]
-
-Codex skips plugin-bundled hooks until you explicitly trust them. After install, run `/hooks` inside a Codex session to review and trust the kmgraph hook definitions. New or modified hooks must be re-trusted whenever the hook file changes.
-
-:::
+> 📘 **Hook trust required**
+>
+> Codex skips plugin-bundled hooks until you explicitly trust them. After install, run `/hooks` inside a Codex session to review and trust the kmgraph hook definitions. New or modified hooks must be re-trusted whenever the hook file changes.
 ---
 
-:::note[Not using Claude Code?]
-
-The `commands/`, `skills/`, `agents/`, and `hooks/` directories in this repo are loaded exclusively
-by the Claude Code plugin system. Do not copy these directories if using Cursor, Windsurf,
-Continue.dev, JetBrains, VS Code, or any other tool — they will not work outside the plugin system.
-All cross-platform functionality is provided through the MCP server as `kg_*` tools.
-
-:::
+> 📘 **Not using Claude Code?**
+>
+> The `commands/`, `skills/`, `agents/`, and `hooks/` directories in this repo are loaded exclusively
+> by the Claude Code plugin system. Do not copy these directories if using Cursor, Windsurf,
+> Continue.dev, JetBrains, VS Code, or any other tool — they will not work outside the plugin system.
+> All cross-platform functionality is provided through the MCP server as `kg_*` tools.
 
 ## Platform Capabilities
 
@@ -103,7 +89,7 @@ Users can install on multiple platforms with varying automation levels:
 
 | Platform | Automation | How to Install |
 |----------|-----------|-----------------|
-| **Claude Code** | Full automation | Paste installer (recommended) or follow [Quickstart](quickstart.mdx) |
+| **Claude Code** | Full automation | Paste installer (recommended) or follow [Quickstart](quickstart) |
 | **Codex CLI** | Full automation | `codex plugin marketplace add technomensch/knowledge-graph` then `codex plugin add kmgraph@knowledge-management-graph` |
 | **Cursor** | Medium (MCP tools) | Paste installer; MCP server handles data layer |
 | **Windsurf** | Medium (MCP tools) | Paste installer; MCP server handles data layer |
@@ -122,7 +108,7 @@ The installer sets up:
 
 - **Configuration file** — `~/.claude/kg-config.json` (stores knowledge graph locations and metadata)
 - **Directory structure** — `knowledge/`, `lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`
-- **Identity files** — `knowledge/me.md` (contributor identity, gitignored), `knowledge/rules.md` (project conventions, committed), and `knowledge/triggers.md` (rule timing, when each rule applies). See [Your AI Profile](pillars/portability/your-ai-profile.mdx).
+- **Identity files** — `knowledge/me.md` (contributor identity, gitignored), `knowledge/rules.md` (project conventions, committed), and `knowledge/triggers.md` (rule timing, when each rule applies). See [Your AI Profile](pillars/portability/your-ai-profile).
 - **Wiki links** — Cross-references throughout the KG are converted to Obsidian `[[wiki link]]` format, enabling graph view navigation in Obsidian and compatible editors
 - **MCP server** — Provides knowledge graph tools for non-Claude-Code platforms
 - **Templates** — Starter scaffolds for capturing lessons and decisions
@@ -144,9 +130,9 @@ When running `/kmgraph:init` on an existing installation, the wizard inspects yo
 | **g. FTS5 cleanup** | Stale in-project FTS5 index files (`knowledge/fts5/`) left behind by older versions |
 | **h. Identity scaffold** | Missing `me.md`, `rules.md`, or `triggers.md` — presents a dry-run preview, scans existing platform files (CLAUDE.md, GEMINI.md, .cursorrules, etc.), README, ADRs, and sessions to pre-populate recommendations, then archives any originals before writing |
 
-:::note Re-running the wizard
-`/kmgraph:init` is safe to re-run at any time. It skips steps already complete and only offers items still pending for your install.
-:::
+> 📘 **Re-running the wizard**
+>
+> `/kmgraph:init` is safe to re-run at any time. It skips steps already complete and only offers items still pending for your install.
 
 ---
 
@@ -159,7 +145,7 @@ After installation, users can:
 3. **Search knowledge** — Find lessons and patterns across sessions
 4. **Sync knowledge** — Automatically extract and organize captured content
 
-See [Quickstart](quickstart.mdx) for detailed walkthroughs.
+See [Quickstart](quickstart) for detailed walkthroughs.
 
 ---
 

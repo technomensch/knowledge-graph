@@ -55,5 +55,5 @@ The command locates chat logs, extracts lessons and decisions, and presents them
 
 ## Related
 
-- [Quickstart](../../quickstart.mdx#step-4--recall-it) — search the now-populated graph
+- [Quickstart](../../quickstart#step-4--recall-it) — search the now-populated graph
 - [Sync Across Machines](../portability/sync-across-machines.md) — share the populated graph

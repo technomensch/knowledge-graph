@@ -107,7 +107,7 @@ Skills activate automatically based on conversation context. No invocation neede
 
 ## Agents Quick Reference
 
-<!-- Updated: 2026-04-22 -->
+
 
 Heavy-lift task handlers. Usually invoked automatically by skills/commands.
 
@@ -250,7 +250,7 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 ## Need More Help?
 
 - **Want detailed examples?** → [Command Guide](reference/command-guide.md) — All commands with full documentation
-- **New to the system?** → [Quickstart](quickstart.mdx) — Setup and first lesson walkthrough
+- **New to the system?** → [Quickstart](quickstart) — Setup and first lesson walkthrough
 - **Understanding terminology?** → [Concepts Guide](concepts/why-kmgraph.md) — Definitions of all key terms
 - **Using other platforms?** → [Platform Adaptation](reference/PLATFORM-ADAPTATION.md) — Cursor, Windsurf, Continue setup
 - **Configuring settings?** → [Configuration Guide](pillars/organizing/graph-configuration.md) — Post-install options and workflows
@@ -260,7 +260,7 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 ## Related Documentation
 
 **Getting started**:
-- [Quickstart](quickstart.mdx) — Installation, setup wizard, first lesson (5 min)
+- [Quickstart](quickstart) — Installation, setup wizard, first lesson (5 min)
 - [Installation](INSTALL.md) — Universal installer for all platforms and LLMs
 - [Configuration Guide](pillars/organizing/graph-configuration.md) — Categories, storage paths, and KG structure
 

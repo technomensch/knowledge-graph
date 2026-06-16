@@ -46,8 +46,6 @@ flowchart TD
     K --> L[Step 8: Write completion flag\n/tmp/kmgraph-docs-scan-branch-sha.flag]
     L --> M([Gate 3 passes · git push proceeds])
 
-    accTitle: docs-impact-scan eight-step workflow
-    accDescr: Flowchart showing the eight steps from trigger phrase detection through diff scanning, identifier extraction, docs grep, KG pattern query, user confirmation, update-doc dispatch, and completion flag write.
 ```
 
 ## The pre-push gate
@@ -79,8 +77,6 @@ sequenceDiagram
     Dev->>Dev: git push proceeds
     Gate->>Gate: Flag found → Gate 3 passes
 
-    accTitle: docs-impact-scan pre-push flow
-    accDescr: Sequence showing the skill triggering on a push phrase, scanning the diff, presenting docs to the developer, dispatching update-doc for each file, writing the completion flag, and the pre-push gate passing on flag check.
 ```
 
 ## Trigger phrases
@@ -111,9 +107,9 @@ Source: docs-impact-scan correction (YYYY-MM-DD)
 
 These patterns accumulate over time, making the scan progressively more accurate for the specific project's documentation layout.
 
-:::tip[Same branch, before push]
-Docs updates commit to the feature branch — not a separate docs-update branch. The completion flag is keyed to the current branch and commit SHA, so updates must land before the push that triggers Gate 3.
-:::
+> 👍 **Same branch, before push**
+>
+> Docs updates commit to the feature branch — not a separate docs-update branch. The completion flag is keyed to the current branch and commit SHA, so updates must land before the push that triggers Gate 3.
 
 ## Related
 

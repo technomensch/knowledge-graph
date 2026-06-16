@@ -66,5 +66,5 @@ Copy the contents of `core/default-templates/AGENTS-template.md` into your proje
 
 ## Related
 
-- [Use in Cursor/Windsurf/VS Code](./use-in-cursor.mdx) — IDE-specific setup
+- [Use in Cursor/Windsurf/VS Code](./use-in-cursor) — IDE-specific setup
 - [Platform Adaptation reference](../../reference/PLATFORM-ADAPTATION.md) — full compatibility matrix

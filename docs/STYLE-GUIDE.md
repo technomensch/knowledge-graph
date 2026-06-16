@@ -309,21 +309,15 @@ Each version section opens with a `### TL;DR` subsection, followed by the standa
 ```markdown
 ### TL;DR
 
-:::info[Short plain-English headline describing a user-visible change.]
-
-Brief plain-English explanatory text providing context.
-
-:::
-:::info[Short plain-English headline for a workflow that is now automated.]
-
-Brief plain-English explanatory text on what the user no longer needs to do manually.
-
-:::
-:::info[Short plain-English headline explicitly flagging a behind-the-scenes change.]
-
-For example: Internal architecture reorganized; no changes from your perspective.
-
-:::
+> 📘 **Short plain-English headline describing a user-visible change.**
+>
+> Brief plain-English explanatory text providing context.
+> 📘 **Short plain-English headline for a workflow that is now automated.**
+>
+> Brief plain-English explanatory text on what the user no longer needs to do manually.
+> 📘 **Short plain-English headline explicitly flagging a behind-the-scenes change.**
+>
+> For example: Internal architecture reorganized; no changes from your perspective.
 ```
 
 #### Rules for `### TL;DR`
@@ -349,16 +343,12 @@ Place `### TL;DR` immediately after the `## [version] - date` heading, before al
 
 ### TL;DR
 
-:::info[Zero-friction MCP setup.]
-
-If the KMGraph MCP server isn't connected, the assistant will now offer to automatically configure it for Gemini CLI, Cursor, Windsurf, Continue.dev, or VS Code. No manual JSON editing required.
-
-:::
-:::info[Behind the scenes only:]
-
-The internal search index format changed; search results are unchanged from your perspective.
-
-:::
+> 📘 **Zero-friction MCP setup.**
+>
+> If the KMGraph MCP server isn't connected, the assistant will now offer to automatically configure it for Gemini CLI, Cursor, Windsurf, Continue.dev, or VS Code. No manual JSON editing required.
+> 📘 **Behind the scenes only:**
+>
+> The internal search index format changed; search results are unchanged from your perspective.
 ### Added
 - New `kg_capture` MCP write tool
 ```
@@ -510,31 +500,21 @@ Use blockquote syntax with a bold label. Works on GitHub and any markdown render
 Use Docusaurus admonition syntax for richer styling on the documentation site.
 
 ```markdown
-:::note[Note]
-
-Informational context the reader should know.
-
-:::
-:::tip[Pro Tip]
-
-Actionable optimization or shortcut.
-
-:::
-:::warning[Common Pitfall]
-
-Risk of data loss or a breaking change.
-
-:::
-:::danger[Important]
-
-A must-know requirement before proceeding.
-
-:::
-:::info[For Your Information]
-
-Additional context or related resources.
-
-:::
+> 📘 **Note**
+>
+> Informational context the reader should know.
+> 👍 **Pro Tip**
+>
+> Actionable optimization or shortcut.
+> 🚧 **Common Pitfall**
+>
+> Risk of data loss or a breaking change.
+> ❗ **Important**
+>
+> A must-know requirement before proceeding.
+> 📘 **For Your Information**
+>
+> Additional context or related resources.
 ```
 
 **When to use**: Comprehensive documentation files (`reference/command-guide.md`, `concepts/how-kmgraph-is-organized.md`, `GETTING-STARTED.md`) where site rendering matters.

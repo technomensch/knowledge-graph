@@ -11,7 +11,6 @@ The issue tracking process documents a problem or enhancement from identificatio
 The diagram below shows the full issue tracking flow, including the git presence gate introduced in v0.2.3.4-beta.
 
 ```mermaid
-%%{init: { 'flowchart': { 'useMaxWidth': true }, 'theme': 'neutral' }}%%
 flowchart TD
     A([/kmgraph:start-issue-tracking]) --> B{Git repo\ndetected?}
     B -- Yes --> C[Branch strategy\nselected and recorded]
@@ -25,8 +24,6 @@ flowchart TD
     H --> J([Issue closed])
     I --> J
 
-    accTitle: Issue tracking process with git presence gate
-    accDescr: Flowchart showing start-issue-tracking command flow, git presence gate at Step 1.0, issue document creation, implementation tracking, and conditional git integration or omission steps at completion.
 ```
 
 The git presence check runs once at Step 1.0 using `git rev-parse --is-inside-work-tree`. The result is applied at every subsequent step that would otherwise invoke a git subcommand.

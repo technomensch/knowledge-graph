@@ -12,9 +12,9 @@ parent:
 
 > "How do I browse my knowledge graph in Obsidian?"
 
-:::note
-KMGraph stores all entries as plain markdown. Obsidian reads markdown natively. No conversion, no plugin, and no sync step is needed for read access. This guide covers three levels: instant vault (zero install), improved vault (community plugin), and future primary-store mode (deferred). You need KMGraph initialized with a populated knowledge graph and Obsidian installed.
-:::
+> 📘 **Note**
+>
+> KMGraph stores all entries as plain markdown. Obsidian reads markdown natively. No conversion, no plugin, and no sync step is needed for read access. This guide covers three levels: instant vault (zero install), improved vault (community plugin), and future primary-store mode (deferred). You need KMGraph initialized with a populated knowledge graph and Obsidian installed.
 
 ## Option A — Instant vault (zero install)
 
@@ -28,9 +28,9 @@ All lessons, ADRs, patterns, and session summaries are immediately browsable. Ob
 
 This is read-only in the sense that Obsidian will not corrupt KMGraph structure — you can edit files in Obsidian and they remain valid KMGraph markdown.
 
-:::tip[Wiki links are automatic]
-Starting in v0.3.3, `kmgraph init` converts all cross-references to Obsidian `[[wiki link]]` format automatically. `ADR-028`, `ENH-010`, `Lessons_Learned_X`, and GitHub issue references are all converted on first init or upgrade. This means Obsidian's graph view shows real connections between lessons, decisions, and enhancements without any manual linking.
-:::
+> 👍 **Wiki links are automatic**
+>
+> Starting in v0.3.3, `kmgraph init` converts all cross-references to Obsidian `[[wiki link]]` format automatically. `ADR-028`, `ENH-010`, `Lessons_Learned_X`, and GitHub issue references are all converted on first init or upgrade. This means Obsidian's graph view shows real connections between lessons, decisions, and enhancements without any manual linking.
 
 ## Option B — Bidirectional sync with an MCP bridge
 
