@@ -5,23 +5,23 @@
 
 **Version:** 1.0 (Created: 2026-02-20)
 
-**Note:** This command creates general documentation (Guides, Concepts, Tutorials, etc.). For Lessons Learned, use `/kmgraph:capture-lesson`. For Architecture Decision Records, use `/kmgraph:create-adr`.
+**Note:** This command creates general documentation (Guides, Concepts, Tutorials, etc.). For Lessons Learned, use `/kmgraph:kmg-capture-lesson`. For Architecture Decision Records, use `/kmgraph:kmg-create-adr`.
 
 ---
 
 ## Syntax Detection
 
 ```
-/kmgraph:create-doc
-/kmgraph:create-doc <topic>
-/kmgraph:create-doc <topic> --update-refs
-/kmgraph:create-doc --update-refs
+/kmgraph:kmg-create-doc
+/kmgraph:kmg-create-doc <topic>
+/kmgraph:kmg-create-doc <topic> --update-refs
+/kmgraph:kmg-create-doc --update-refs
 ```
 
 **Examples:**
-- `/kmgraph:create-doc` → Interactive wizard (all prompts)
-- `/kmgraph:create-doc platform adaptation guide` → Pre-fills topic from argument
-- `/kmgraph:create-doc troubleshooting guide --update-refs` → Create and auto-update cross-references in existing files
+- `/kmgraph:kmg-create-doc` → Interactive wizard (all prompts)
+- `/kmgraph:kmg-create-doc platform adaptation guide` → Pre-fills topic from argument
+- `/kmgraph:kmg-create-doc troubleshooting guide --update-refs` → Create and auto-update cross-references in existing files
 
 **Flag Behavior:**
 - **Default (no flag):** Lists existing files that likely need cross-reference updates, but does NOT modify them.
@@ -88,7 +88,7 @@ What type of document are you creating?
 6. FAQ           — Frequently Asked Questions
 7. Custom        — Enter a custom document type
 
-(Note: Lessons use /kmgraph:capture-lesson | ADRs use /kmgraph:create-adr)
+(Note: Lessons use /kmgraph:kmg-capture-lesson | ADRs use /kmgraph:kmg-create-adr)
 ```
 
 **Wait for user selection.**
@@ -356,7 +356,7 @@ grep -rl "## Related" docs/ core/docs/ 2>/dev/null
 3. docs/CONCEPTS.md — Contains "Related Documentation" section
 
 To automatically inject links, re-run with --update-refs:
-/kmgraph:create-doc [topic] --update-refs
+/kmgraph:kmg-create-doc [topic] --update-refs
 
 Or manually add the following link to each file's Related Documentation section:
 - [[Document Title]]([relative path]) — [brief description]
@@ -427,7 +427,7 @@ Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
 
 ### Example 1: Basic wizard flow
 
-**User types:** `/kmgraph:create-doc`
+**User types:** `/kmgraph:kmg-create-doc`
 
 **Assistant responds:**
 
@@ -446,12 +446,12 @@ What type of document are you creating?
 6. FAQ           — Frequently Asked Questions
 7. Custom        — Enter a custom type
 
-(Note: Lessons → /kmgraph:capture-lesson | ADRs → /kmgraph:create-adr)
+(Note: Lessons → /kmgraph:kmg-capture-lesson | ADRs → /kmgraph:kmg-create-adr)
 ```
 
 ### Example 2: With topic and flag
 
-**User types:** `/kmgraph:create-doc error handling guide --update-refs`
+**User types:** `/kmgraph:kmg-create-doc error handling guide --update-refs`
 
 **Assistant responds:**
 
@@ -492,13 +492,13 @@ Proceed? (yes / change details / cancel)
 
 ## Related Commands
 
-- `/kmgraph:capture-lesson` — Document lessons learned and solved problems
-- `/kmgraph:create-adr` — Create Architecture Decision Records
-- `/kmgraph:recall` — Search existing documentation and knowledge
-- `/kmgraph:sync-all` — Full knowledge pipeline sync
+- `/kmgraph:kmg-capture-lesson` — Document lessons learned and solved problems
+- `/kmgraph:kmg-create-adr` — Create Architecture Decision Records
+- `/kmgraph:kmg-recall` — Search existing documentation and knowledge
+- `/kmgraph:kmg-sync-all` — Full knowledge pipeline sync
 
 ---
 
 **Created:** 2026-02-20
 **Version:** 1.0
-**Usage:** Type `/kmgraph:create-doc` to scaffold a new documentation file
+**Usage:** Type `/kmgraph:kmg-create-doc` to scaffold a new documentation file

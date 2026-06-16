@@ -1,20 +1,20 @@
 
 # Configure AI Platforms for KMGraph
 
-**Purpose:** Detect which AI coding tools are installed on this machine and write the appropriate config files so they know how to use the knowledge graph. Run this when you install a new AI tool after the initial `/kmgraph:init` setup.
+**Purpose:** Detect which AI coding tools are installed on this machine and write the appropriate config files so they know how to use the knowledge graph. Run this when you install a new AI tool after the initial `/kmgraph:kmg-init` setup.
 
 ---
 
 ## Syntax Detection
 
 ```
-/kmgraph:setup-platform
-/kmgraph:setup-platform <platform>
+/kmgraph:kmg-setup-platform
+/kmgraph:kmg-setup-platform <platform>
 ```
 
 **Examples:**
-- `/kmgraph:setup-platform` → Detect and configure all installed platforms
-- `/kmgraph:setup-platform gemini` → Configure Gemini CLI only
+- `/kmgraph:kmg-setup-platform` → Detect and configure all installed platforms
+- `/kmgraph:kmg-setup-platform gemini` → Configure Gemini CLI only
 
 ---
 
@@ -29,7 +29,7 @@ Extract:
 - Active KG's `path` field → KG path
 - Active KG's `platforms` array → already-configured platforms (skip these, or note "already configured")
 
-If no config exists: ask the user to run `/kmgraph:init` first.
+If no config exists: ask the user to run `/kmgraph:kmg-init` first.
 
 ---
 
@@ -200,6 +200,6 @@ Final config shape for the active KG entry:
 
 ## Related Commands
 
-- `/kmgraph:init` — Initialize a knowledge graph (includes platform detection at setup time)
-- `/kmgraph:status` — Check current knowledge graph status
-- `/kmgraph:switch` — Change the active knowledge graph
+- `/kmgraph:kmg-init` — Initialize a knowledge graph (includes platform detection at setup time)
+- `/kmgraph:kmg-status` — Check current knowledge graph status
+- `/kmgraph:kmg-switch` — Change the active knowledge graph

@@ -51,7 +51,7 @@ When a user-facing document is moved or renamed, update `sidebars.js` to reflect
 
 ### Pre-Push / Pre-Merge User-Facing Doc Sync
 
-Before pushing to origin OR before creating/completing a merge, run `/kmgraph:update-doc --user-facing` to verify that all user-facing docs (README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, CONCEPTS, INSTALL.md) reflect the changes on the branch.
+Before pushing to origin OR before creating/completing a merge, run `/kmgraph:kmg-update-doc --user-facing` to verify that all user-facing docs (README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, CONCEPTS, INSTALL.md) reflect the changes on the branch.
 - **Why:** commands, behavior changes, and new features were shipped without corresponding doc updates, leaving guides inconsistent with actual behavior until a follow-up pass was required
 
 ### Pre-PR Doc Verification
@@ -117,7 +117,7 @@ After any cherry-pick: verify source branch state before continuing work on eith
 When a bug or enhancement is discovered mid-session, ask the user which path applies — do not auto-detect:
 
 - **Path F — Fork to new conversation:** Bug is complex or unclear, needs investigation, and would derail the current session. Open a separate chat/terminal to investigate. Continue current session unblocked.
-- **Path 1 — Capture as issue/enhancement:** Fix is out of scope or clear enough to file without immediate investigation. Create silently via `/kmgraph:start-issue-tracking`. Surface the result (GH issue link or local ENH file preview) immediately after.
+- **Path 1 — Capture as issue/enhancement:** Fix is out of scope or clear enough to file without immediate investigation. Create silently via `/kmgraph:kmg-start-issue-tracking`. Surface the result (GH issue link or local ENH file preview) immediately after.
 - **Path 2 — Add to current plan:** Active plan exists, task not yet started. Add a new task to the plan. Sync both copies immediately (`~/.claude/plans/` and `docs/plans/` must be identical after every edit).
 - **Path 3 — Implement + update plan:** Branch exists, work in progress. Implement the fix now, then update the plan file to document what was added so the PR body stays accurate. Sync both copies.
 
@@ -181,7 +181,7 @@ After installing everything-claude-code (ECC): verify KMGraph's `SessionStart` h
 
 ### Search Before Creating (DRY)
 
-Before capturing a new lesson via `/kmgraph:capture-lesson`, search the graph for similar existing lessons — update an existing lesson rather than creating a duplicate
+Before capturing a new lesson via `/kmgraph:kmg-capture-lesson`, search the graph for similar existing lessons — update an existing lesson rather than creating a duplicate
 - **Source:** [Single Source Of Truth DRY Documentation](lessons-learned/patterns/Lessons_Learned_Single_Source_Of_Truth_DRY_Documentation.md)
 
 ### Plan-First Rule
@@ -199,7 +199,7 @@ Plans stored in `knowledge/` are searchable via `kg_search` and visible in the O
 
 ### Capture Checkpoints
 
-Add `/kmgraph:capture-lesson` or `/kmgraph:create-adr` step after each phase of a plan that produces a decision or learning
+Add `/kmgraph:kmg-capture-lesson` or `/kmgraph:kmg-create-adr` step after each phase of a plan that produces a decision or learning
 
 ### Cross-Reference Format
 
@@ -214,8 +214,8 @@ Do not use numbered headings in knowledge files — use plain headings (e.g., `#
 
 ### Cadence & Routing
 
-- Run `/kmgraph:sync-all` at the end of each significant work session
-- Feature/enhancement suggestions: use `/kmgraph:start-issue-tracking` for standalone deferred work; for active plans, offer to add as a new phase rather than creating an informal suggestion
+- Run `/kmgraph:kmg-sync-all` at the end of each significant work session
+- Feature/enhancement suggestions: use `/kmgraph:kmg-start-issue-tracking` for standalone deferred work; for active plans, offer to add as a new phase rather than creating an informal suggestion
 
 ---
 
@@ -289,7 +289,7 @@ Do not use numbered headings in knowledge files — use plain headings (e.g., `#
 ### Recall in Plan Mode
 
 When plan mode is active (native `/plan` command, `superpowers:writing-plans`, or any
-automated planning tool such as Ultraplan), invoke the `kmgraph:recall` skill with TWO
+automated planning tool such as Ultraplan), invoke the `kmgraph:kmg-recall` skill with TWO
 queries before making any plan recommendations:
 1. The specific plan topic
 2. The architectural domain of the change (rules, deployment, platform, cross-LLM, etc.)

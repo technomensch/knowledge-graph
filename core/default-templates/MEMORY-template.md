@@ -36,6 +36,6 @@ Add one-line pointers below as lessons, ADRs, or KG entries land. Each entry lin
 ## Usage notes
 
 - **Purpose:** Scannable index loaded at session start so the AI knows what knowledge exists. Reads underlying files when their content becomes relevant.
-- **Update behavior:** New rules go to the four profile files above via `/kmgraph:rules-capture`. Pointers here are added when an entry warrants top-of-mind visibility.
+- **Update behavior:** New rules go to the four profile files above via `/kmgraph:kmg-rules-capture`. Pointers here are added when an entry warrants top-of-mind visibility.
 - **What this file is NOT:** A content store. Never write behavioral rules, preferences, or knowledge directly here. Use the authoritative files.
 

@@ -5,22 +5,22 @@
 
 **Version:** 1.0 (Created: 2026-02-21)
 
-**Note:** This command updates existing files. To scaffold a new document, use `/kmgraph:create-doc`. To update a knowledge graph lesson, use `/kmgraph:capture-lesson`. To update an ADR, use `/kmgraph:create-adr`.
+**Note:** This command updates existing files. To scaffold a new document, use `/kmgraph:kmg-create-doc`. To update a knowledge graph lesson, use `/kmgraph:kmg-capture-lesson`. To update an ADR, use `/kmgraph:kmg-create-adr`.
 
 ---
 
 ## Syntax
 
 ```
-/kmgraph:update-doc <file>
-/kmgraph:update-doc <file> --user-facing
+/kmgraph:kmg-update-doc <file>
+/kmgraph:kmg-update-doc <file> --user-facing
 ```
 
 **Examples:**
-- `/kmgraph:update-doc COMMAND-GUIDE.md --user-facing` → Update plugin documentation wizard
-- `/kmgraph:update-doc README.md --user-facing` → Update README with new feature information
-- `/kmgraph:update-doc some-lesson.md` → Disambiguation dialog, then confirm KG content update
-- `/kmgraph:update-doc docs/CHEAT-SHEET.md --user-facing` → Update cheat sheet syntax block
+- `/kmgraph:kmg-update-doc COMMAND-GUIDE.md --user-facing` → Update plugin documentation wizard
+- `/kmgraph:kmg-update-doc README.md --user-facing` → Update README with new feature information
+- `/kmgraph:kmg-update-doc some-lesson.md` → Disambiguation dialog, then confirm KG content update
+- `/kmgraph:kmg-update-doc docs/CHEAT-SHEET.md --user-facing` → Update cheat sheet syntax block
 
 ---
 
@@ -62,7 +62,7 @@ Resolved file: $TARGET_FILE
 1. Plugin documentation (user-facing)
    Docs that ship with the plugin for end users
    (README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, etc.)
-   → Re-run with: /kmgraph:update-doc <file> --user-facing
+   → Re-run with: /kmgraph:kmg-update-doc <file> --user-facing
 
 2. Knowledge graph content
    Content created using the plugin
@@ -425,7 +425,7 @@ If updating documentation introduces a breaking change to documented patterns, A
    - **Ask user approval:** "This section has been deprecated since v0.X.0. Is it safe to archive to docs/deprecated/? Any concerns from users?"
    - If approved: move to `docs/deprecated/` archive folder
    - Commit: `docs(cleanup): archive [section] to docs/deprecated/ (removal scheduled v0.X+2.0)`
-   - **Create tracking:** Use `/kmgraph:start-issue-tracking` to document removal rationale and get final approval for removal phase
+   - **Create tracking:** Use `/kmgraph:kmg-start-issue-tracking` to document removal rationale and get final approval for removal phase
 
 3. **Removal phase** (v0.X+2.0+) — **Requires explicit user approval**
    - Review archived section; confirm no remaining references or user questions
@@ -535,7 +535,7 @@ Remaining:
 ```
 
 - **yes:** Repeat Steps 2–7b for each remaining Tier 1 file in order.
-- **skip:** Exit. Remind the user: "Remaining Tier 1 files were skipped — run `/kmgraph:update-doc --user-facing` with no file to sweep them."
+- **skip:** Exit. Remind the user: "Remaining Tier 1 files were skipped — run `/kmgraph:kmg-update-doc --user-facing` with no file to sweep them."
 
 If `$TARGET_FILE` is not in the Tier 1 list, exit normally without this prompt.
 

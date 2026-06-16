@@ -1,7 +1,7 @@
 
 # Skill: kmg-doc-update-router
 
-**Purpose:** Intercept explicit doc-update requests and route to the correct command. Prevents doc edits from bypassing the `/kmgraph:update-doc` wizard, standards validation, and changelog enforcement.
+**Purpose:** Intercept explicit doc-update requests and route to the correct command. Prevents doc edits from bypassing the `/kmgraph:kmg-update-doc` wizard, standards validation, and changelog enforcement.
 
 **Trigger Patterns (match any):**
 - "update [filename or doc name]" — e.g., "update quickstart.md", "update the command guide"
@@ -18,16 +18,16 @@
 **Routing Logic (check in this order):**
 
 1. If intent includes "session summary" / "current session" / "today's session":
-   → Dispatch to `session-summary-agent` (or `/kmgraph:session-summary` on Claude Code)
+   → Dispatch to `session-summary-agent` (or `/kmgraph:kmg-session-summary` on Claude Code)
 
 2. If intent includes "changelog":
-   → Dispatch to document update handler with CHANGELOG.md (or `/kmgraph:update-doc --user-facing CHANGELOG.md` on Claude Code)
+   → Dispatch to document update handler with CHANGELOG.md (or `/kmgraph:kmg-update-doc --user-facing CHANGELOG.md` on Claude Code)
 
 3. If intent includes "adr":
-   → Dispatch to ADR creation handler (or `/kmgraph:create-adr` on Claude Code)
+   → Dispatch to ADR creation handler (or `/kmgraph:kmg-create-adr` on Claude Code)
 
 4. If a doc filename or name can be resolved from the intent:
-   → Dispatch to document update handler with {resolved_path} (or `/kmgraph:update-doc --user-facing {resolved_path}` on Claude Code)
+   → Dispatch to document update handler with {resolved_path} (or `/kmgraph:kmg-update-doc --user-facing {resolved_path}` on Claude Code)
 
 5. If intent is ambiguous (e.g., "update the docs"):
    → Ask: "Which doc would you like to update?"

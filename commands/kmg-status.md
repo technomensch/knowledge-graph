@@ -1,5 +1,5 @@
 
-# /kmgraph:status — Knowledge Graph Status Dashboard
+# /kmgraph:kmg-status — Knowledge Graph Status Dashboard
 
 Display active knowledge graph information, statistics, and quick command reference.
 
@@ -32,11 +32,11 @@ Stats:
   Sessions: 8
 
 Quick Commands:
-  /kmgraph:capture-lesson    — Document a lesson
-  /kmgraph:recall "query"    — Search across all KG
-  /kmgraph:sync-all          — Run full sync pipeline
-  /kmgraph:update-graph      — Extract KG entries from lessons
-  /kmgraph:session-summary   — Summarize this session
+  /kmgraph:kmg-capture-lesson    — Document a lesson
+  /kmgraph:kmg-recall "query"    — Search across all KG
+  /kmgraph:kmg-sync-all          — Run full sync pipeline
+  /kmgraph:kmg-update-graph      — Extract KG entries from lessons
+  /kmgraph:kmg-session-summary   — Summarize this session
 ```
 
 ## Implementation
@@ -49,7 +49,7 @@ CONFIG_PATH="$HOME/.claude/kg-config.json"
 if [ ! -f "$CONFIG_PATH" ]; then
   echo "No knowledge graphs configured."
   echo ""
-  echo "Get started with: /kmgraph:init"
+  echo "Get started with: /kmgraph:kmg-init"
   exit 0
 fi
 ```
@@ -63,9 +63,9 @@ if [ "$active" == "null" ]; then
   echo "No active knowledge graph."
   echo ""
   echo "Available graphs:"
-  /kmgraph:list --names-only
+  /kmgraph:kmg-list --names-only
   echo ""
-  echo "Activate one with: /kmgraph:switch <name>"
+  echo "Activate one with: /kmgraph:kmg-switch <name>"
   exit 0
 fi
 ```
@@ -162,11 +162,11 @@ echo "  Sessions: $session_count"
 echo ""
 
 echo "Quick Commands:"
-echo "  /kmgraph:capture-lesson    — Document a lesson"
-echo "  /kmgraph:recall \"query\"    — Search across all KG"
-echo "  /kmgraph:sync-all          — Run full sync pipeline"
-echo "  /kmgraph:update-graph      — Extract KG entries from lessons"
-echo "  /kmgraph:session-summary   — Summarize this session"
+echo "  /kmgraph:kmg-capture-lesson    — Document a lesson"
+echo "  /kmgraph:kmg-recall \"query\"    — Search across all KG"
+echo "  /kmgraph:kmg-sync-all          — Run full sync pipeline"
+echo "  /kmgraph:kmg-update-graph      — Extract KG entries from lessons"
+echo "  /kmgraph:kmg-session-summary   — Summarize this session"
 ```
 
 ## Turbo Mode
@@ -174,7 +174,7 @@ echo "  /kmgraph:session-summary   — Summarize this session"
 Minimal output:
 
 ```bash
-/kmgraph:status --minimal
+/kmgraph:kmg-status --minimal
 ```
 
 Output:
@@ -185,7 +185,7 @@ my-project: 12 lessons, 28 KG entries, 5 ADRs
 JSON output:
 
 ```bash
-/kmgraph:status --json
+/kmgraph:kmg-status --json
 ```
 
 Output:
@@ -210,6 +210,6 @@ Output:
 
 ## See Also
 
-- `/kmgraph:list` — View all configured KGs
-- `/kmgraph:switch` — Change active KG
-- `/kmgraph:sync-all` — Sync KG and review governance signals
+- `/kmgraph:kmg-list` — View all configured KGs
+- `/kmgraph:kmg-switch` — Change active KG
+- `/kmgraph:kmg-sync-all` — Sync KG and review governance signals

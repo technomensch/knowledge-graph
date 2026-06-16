@@ -133,7 +133,7 @@ Manual (4 steps):
 4. git commit + update MEMORY.md
 
 Automated (1 step):
-/kmgraph:sync-all
+/kmgraph:kmg-sync-all
   → Runs all 4 steps with single confirmation
 ```
 

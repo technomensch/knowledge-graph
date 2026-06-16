@@ -20,11 +20,11 @@ Delegates to the `knowledge-extractor` agent (KG Entry Extraction Mode) to read 
 ## Usage
 
 ```bash
-/kmgraph:update-graph
-/kmgraph:update-graph --lesson=Pattern_Discovery.md
-/kmgraph:update-graph --auto
-/kmgraph:update-graph --category=architecture
-/kmgraph:update-graph --sync-all
+/kmgraph:kmg-update-graph
+/kmgraph:kmg-update-graph --lesson=Pattern_Discovery.md
+/kmgraph:kmg-update-graph --auto
+/kmgraph:kmg-update-graph --category=architecture
+/kmgraph:kmg-update-graph --sync-all
 ```
 
 **Parameters:**
@@ -37,11 +37,11 @@ Delegates to the `knowledge-extractor` agent (KG Entry Extraction Mode) to read 
 
 **Examples:**
 ```bash
-/kmgraph:update-graph
-/kmgraph:update-graph --lesson=Three_Tier_Sync_Pattern.md
-/kmgraph:update-graph --auto --sync-all
-/kmgraph:update-graph --lesson=Pattern.md --edit-entry  # Review before saving
-/kmgraph:update-graph --lesson=Pattern.md --auto        # Called from capture-lesson
+/kmgraph:kmg-update-graph
+/kmgraph:kmg-update-graph --lesson=Three_Tier_Sync_Pattern.md
+/kmgraph:kmg-update-graph --auto --sync-all
+/kmgraph:kmg-update-graph --lesson=Pattern.md --edit-entry  # Review before saving
+/kmgraph:kmg-update-graph --lesson=Pattern.md --auto        # Called from capture-lesson
 ```
 
 ---
@@ -136,10 +136,10 @@ Knowledge entries LEVERAGE lessons, not REPLACE them:
 
 ## Related Commands
 
-- `/kmgraph:capture-lesson` - Document new lessons learned
-- `/kmgraph:recall` - Search across all KG systems
-- `/kmgraph:sync-all` - Full knowledge sync pipeline (calls this command)
-- `/kmgraph:update-issue-plan` - Sync KG -> plan -> issue -> GitHub
+- `/kmgraph:kmg-capture-lesson` - Document new lessons learned
+- `/kmgraph:kmg-recall` - Search across all KG systems
+- `/kmgraph:kmg-sync-all` - Full knowledge sync pipeline (calls this command)
+- `/kmgraph:kmg-update-issue-plan` - Sync KG -> plan -> issue -> GitHub
 
 ---
 

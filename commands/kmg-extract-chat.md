@@ -12,7 +12,7 @@ Automates the extraction of chat history from local Claude (.jsonl), Gemini (.js
 For multi-session history extraction (10+ sessions or 100+ KB chat logs), consider delegating to the `knowledge-extractor` subagent:
 
 ```bash
-/kmgraph:extract-chat --delegate knowledge-extractor
+/kmgraph:kmg-extract-chat --delegate knowledge-extractor
 ```
 
 This parses chat logs and extracts insights without consuming your main context, ideal for backfilling knowledge graphs from large chat histories.
@@ -22,15 +22,15 @@ This parses chat logs and extracts insights without consuming your main context,
 ## Usage
 
 ```bash
-/kmgraph:extract-chat [-claude | -gemini]
-/kmgraph:extract-chat --source codex
-/kmgraph:extract-chat --source all
-/kmgraph:extract-chat --output-dir=<path>
-/kmgraph:extract-chat -claude --output-dir=<custom-path>
-/kmgraph:extract-chat -claude 2026-02-20 through 2026-02-21
-/kmgraph:extract-chat --today
-/kmgraph:extract-chat --project=knowledge-graph
-/kmgraph:extract-chat --source codex --after=2026-01-01
+/kmgraph:kmg-extract-chat [-claude | -gemini]
+/kmgraph:kmg-extract-chat --source codex
+/kmgraph:kmg-extract-chat --source all
+/kmgraph:kmg-extract-chat --output-dir=<path>
+/kmgraph:kmg-extract-chat -claude --output-dir=<custom-path>
+/kmgraph:kmg-extract-chat -claude 2026-02-20 through 2026-02-21
+/kmgraph:kmg-extract-chat --today
+/kmgraph:kmg-extract-chat --project=knowledge-graph
+/kmgraph:kmg-extract-chat --source codex --after=2026-01-01
 ```
 
 ---
@@ -146,7 +146,7 @@ Otherwise, run the following check **before** creating any directories or runnin
    >
    > Reply 1, 2, or 3.
 
-   - Option 1: Run `/kmgraph:switch` for the current project's KG (if configured), then re-resolve output dir in Step 1 using the newly active KG. **If the current project has no KG registered in `~/.claude/kg-config.json`**, tell the user and offer `/kmgraph:init` to create one — or fall back to option 2 or 3.
+   - Option 1: Run `/kmgraph:kmg-switch` for the current project's KG (if configured), then re-resolve output dir in Step 1 using the newly active KG. **If the current project has no KG registered in `~/.claude/kg-config.json`**, tell the user and offer `/kmgraph:kmg-init` to create one — or fall back to option 2 or 3.
    - Option 2: Continue to Step 1 using the current active KG unchanged.
    - Option 3: Abort. Do not run extraction.
 
@@ -331,11 +331,11 @@ Incremental appends automatically target the last part file. If appending causes
 **Example:**
 ```bash
 # First run (morning)
-/kmgraph:extract-chat -claude
+/kmgraph:kmg-extract-chat -claude
 # Creates: 2026-02-12-claude.md (2 sessions)
 
 # Second run (evening)
-/kmgraph:extract-chat -claude
+/kmgraph:kmg-extract-chat -claude
 # Appends to: 2026-02-12-claude.md (now 5 sessions total)
 ```
 
@@ -345,7 +345,7 @@ Incremental appends automatically target the last part file. If appending causes
 
 When using the default output directory (active KG):
 1. Extracts to `{active_kg_path}/chat-history/`
-2. Files are automatically included in `/kmgraph:recall` searches
+2. Files are automatically included in `/kmgraph:kmg-recall` searches
 3. Session summaries can reference chat history
 4. Chat history can be analyzed for lesson extraction
 
@@ -355,7 +355,7 @@ When using the default output directory (active KG):
 
 When multiple knowledge graphs are configured:
 - Operates on the **active** KG from `~/.claude/kg-config.json`
-- Use `/kmgraph:switch` to change active KG before extraction
+- Use `/kmgraph:kmg-switch` to change active KG before extraction
 - Each KG maintains its own chat-history/
 - Use `--output-dir` to extract to specific KG manually
 
@@ -407,7 +407,7 @@ When multiple knowledge graphs are configured:
 pip install blackboxprotobuf
 
 # Or skip protobuf files (JSON extraction still works)
-/kmgraph:extract-chat -gemini  # Will warn about .pb files
+/kmgraph:kmg-extract-chat -gemini  # Will warn about .pb files
 ```
 
 ### Problem: Permission denied
@@ -425,7 +425,7 @@ chmod 755 {active_kg_path}/chat-history/
 ### Problem: Output directory not found
 
 **Solution:**
-- Ensure active KG is configured: `/kmgraph:status`
+- Ensure active KG is configured: `/kmgraph:kmg-status`
 - Verify KG path exists: `ls {active_kg_path}`
 - Use `--output-dir` with absolute path as workaround
 
@@ -436,7 +436,7 @@ chmod 755 {active_kg_path}/chat-history/
 ### Example 1: Extract all history to active KG
 
 ```bash
-/kmgraph:extract-chat
+/kmgraph:kmg-extract-chat
 ```
 
 **Output:**
@@ -453,7 +453,7 @@ Saved to:
 ### Example 2: Extract only Claude history
 
 ```bash
-/kmgraph:extract-chat -claude
+/kmgraph:kmg-extract-chat -claude
 ```
 
 **Output:**
@@ -467,7 +467,7 @@ Saved to: {active_kg_path}/chat-history/2026-02-12-claude.md
 ### Example 3: Extract to custom directory
 
 ```bash
-/kmgraph:extract-chat --output-dir=/Users/name/archive/chat-logs
+/kmgraph:kmg-extract-chat --output-dir=/Users/name/archive/chat-logs
 ```
 
 **Output:**
@@ -484,7 +484,7 @@ Saved to:
 ### Example 4: Extract a date range
 
 ```bash
-/kmgraph:extract-chat -claude 2026-02-20 through 2026-02-21
+/kmgraph:kmg-extract-chat -claude 2026-02-20 through 2026-02-21
 ```
 
 **Output:**
@@ -500,7 +500,7 @@ Saved to:
 ### Example 5: Extract today only
 
 ```bash
-/kmgraph:extract-chat --today
+/kmgraph:kmg-extract-chat --today
 ```
 
 **Output:**
@@ -517,7 +517,7 @@ Saved to:
 ### Example 6: Extract sessions for a specific project
 
 ```bash
-/kmgraph:extract-chat --project=knowledge-graph
+/kmgraph:kmg-extract-chat --project=knowledge-graph
 ```
 
 **Output:**
@@ -531,7 +531,7 @@ Saved to: {active_kg_path}/chat-history/2026-02-21-claude.md
 ### Example 7: Extract Codex CLI sessions
 
 ```bash
-/kmgraph:extract-chat --source codex
+/kmgraph:kmg-extract-chat --source codex
 ```
 
 **Output:**
@@ -545,7 +545,7 @@ Saved to: {active_kg_path}/chat-history/2026-06-12-codex.md
 ### Example 8: Extract Codex sessions from a date onwards
 
 ```bash
-/kmgraph:extract-chat --source codex --after=2026-01-01
+/kmgraph:kmg-extract-chat --source codex --after=2026-01-01
 ```
 
 **Output:**
@@ -580,5 +580,5 @@ Saved to: {active_kg_path}/chat-history/2026-01-*.codex.md (12 files)
 **Created:** 2026-02-12
 **Updated:** 2026-06-12
 **Version:** 1.1 (Added Codex CLI extraction — ENH-024)
-**Integration:** Works with active KG, `/kmgraph:recall`, session summaries
-**Related Skills:** /kmgraph:session-summary, /kmgraph:capture-lesson
+**Integration:** Works with active KG, `/kmgraph:kmg-recall`, session summaries
+**Related Skills:** /kmgraph:kmg-session-summary, /kmgraph:kmg-capture-lesson

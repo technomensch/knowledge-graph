@@ -20,7 +20,7 @@ Does **not** apply to exploratory or iterative work (prompt tuning, CSS iteratio
 > **Tier note:** This skill declares `required_tier: powerful-tier`. It does not collapse to a lower tier — if powerful-tier is unavailable, the skill halts with an explicit error rather than running on a lower-capability model.
 
 1. **Create meta-issue** (if not already open):
-   `/kmgraph:meta-issue "[Problem Title]"`
+   `/kmgraph:kmg-meta-issue "[Problem Title]"`
 
 2. **Compile attempt log** — read all prior attempts from meta-issue or conversation. For each attempt, confirm a distinct hypothesis was tested (not a retry of the same fix).
 
@@ -31,7 +31,7 @@ Does **not** apply to exploratory or iterative work (prompt tuning, CSS iteratio
    powerful-tier reviews and provides fresh diagnosis and next hypothesis.
 
 4. **Log next attempt** with powerful-tier-recommended hypothesis:
-   `/kmgraph:meta-issue --log-attempt NNN "[hypothesis]"`
+   `/kmgraph:kmg-meta-issue --log-attempt NNN "[hypothesis]"`
 
 5. **powerful-tier involvement continues** — powerful-tier reviews each subsequent attempt result before the next attempt begins. Maximum 3 powerful-tier rounds before forcing exit-path analysis (step below).
 

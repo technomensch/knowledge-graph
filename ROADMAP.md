@@ -6,7 +6,7 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 
 ### Architectural (version-bump territory)
 
-- **Pluggable knowledge graph storage backends** — Notion, Obsidian, and NotebookLM as primary stores instead of local markdown. Requires `/kmgraph:init` wizard updates, MCP server config schema additions, and per-backend adapter modules. Captured because the docs-restructure plan adds integration guides for these tools but cannot change the storage layer in scope.
+- **Pluggable knowledge graph storage backends** — Notion, Obsidian, and NotebookLM as primary stores instead of local markdown. Requires `/kmgraph:kmg-init` wizard updates, MCP server config schema additions, and per-backend adapter modules. Captured because the docs-restructure plan adds integration guides for these tools but cannot change the storage layer in scope.
 - **Contributor commands vs user commands — surface area separation** — `update-doc`, `create-doc`, and the `doc-update-router` skill exist to update the KMGraph project's own docs site. Today they ship to every end user, conflating two audiences. Future work: move to a separate plugin (`kmgraph-contrib`?), gate by a `.kmgraph-contributor` marker file, or use a `commands/contributing/` subdirectory with conditional registration.
 - **Hierarchical skill invocation pattern** — Future support for `/kmgraph:[category]/[skill-name]` notation to navigate skill hierarchy (currently flat). Requires Claude Code plugin evolution or workaround pattern (ADR-002).
 - **`--all-graphs` flag for kg_capture MCP tool** — Enable multi-KG capture operations: write to all registered KGs in single operation. Currently requires separate calls per KG (ADR-006).
@@ -44,7 +44,7 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 
 ### UX / Ergonomics
 
-- **Skill aliases / short commands** (Low priority) — Allow `/kmgraph:cl` as alias for `/kmgraph:capture-lesson` etc., configurable in kg-config.json. Deferred: marginal UX gain vs configuration complexity; autocomplete already handles this.
+- **Skill aliases / short commands** (Low priority) — Allow `/kmgraph:cl` as alias for `/kmgraph:kmg-capture-lesson` etc., configurable in kg-config.json. Deferred: marginal UX gain vs configuration complexity; autocomplete already handles this.
 - **Backup before destructive operations** (Medium priority) — `switch` and `init` should auto-snapshot current state before category deletion or KG removal (`cp -r` to `~/.claude/kg-backups/`). Deferred: users should use git for versioning; this is insurance against user error only.
 - **Archival / superseding KG entries** (Low priority) — Mark entries as `status: superseded`, archive to `archive/` subdirectory, search includes archived content. Useful for mature KGs where patterns evolve. Deferred: adds lifecycle complexity before core usage patterns are established.
 
@@ -58,7 +58,7 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 
 - **Additional MCP tools** (Medium priority) — Port skill operations to MCP for cross-platform portability:
   - `kg_git_metadata` — capture branch, commit, author, PR, issue (currently bash in skills)
-  - `kg_link_issue` — update YAML frontmatter + post GitHub comment (currently `/kmgraph:link-issue`)
+  - `kg_link_issue` — update YAML frontmatter + post GitHub comment (currently `/kmgraph:kmg-link-issue`)
   - `kg_extract_chat` — wrap Python extraction scripts with structured results
   - Deferred: skills already implement these; MCP layer adds value after v1.0 proves adoption.
 
@@ -73,14 +73,45 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 
 ---
 
-## v0.5.9 (In Progress)
+## v0.5.11 (Released: 2026-06-14)
 
-**Status**: 🔄 In Progress — Decision Governance Protocol (ENH-015)
+**Status**: ✅ Complete — Security Fix
+**PR**: #145
+
+### Completed
+- ✅ **Security Fix**: esbuild HIGH CVE (v0.21.x → v0.23.x)
+
+---
+
+## v0.5.10 (Released: 2026-06-14)
+
+**Status**: ✅ Complete — Codex CLI Expansion + ENH-021
+**Branches**: `v0.5.10` through `v0.5.10.8`
+
+### Completed
+- ✅ **ENH-021**: `continues_from` field in handoffs for multi-session continuity (ADR-051)
+- ✅ **Codex CLI Support (v0.5.10.1–v0.5.10.7)**: Marketplace plugin installation, esbuild bundling, installation fixes, chat extraction, lifecycle hooks integration
+- ✅ **v0.5.10.7 (2026-06-13)**: Template disambiguation (breaking change) — clarified template layer semantics
+- ✅ **v0.5.10.8 (2026-06-14)**: `kg-write-guard` extract-chat fixes — chat parsing robustness
+
+---
+
+## v0.5.9 (Released: 2026-05-27)
+
+**Status**: ✅ Complete — Decision Governance Protocol (ENH-015)
 **Branch**: `v0.5.9-decision-governance`
 
-### In Progress
+### Completed
+- ✅ **ENH-015**: Decision Governance Protocol. Introduced `brainstorm-recall` skill, extended `adr-guide` with cascade check and Open Questions, introduced in-plan cascade gate in `gov-execute-plan`, rewrote `pre-skill-rules-inject.sh` with platform split and fallback variables, and integrated Open Items extraction in `session-wrap`.
 
-- 🔲 **ENH-015**: Implement Decision Governance Protocol. Introduce `brainstorm-recall` skill, extend `adr-guide` with cascade check and Open Questions, introduce in-plan cascade gate in `gov-execute-plan`, rewrite `pre-skill-rules-inject.sh` with platform split and fallback variables, and integrate Open Items extraction in `session-wrap`.
+---
+
+## v0.6.0 (🔲 In Planning)
+
+### Planned
+- 🔲 **`update` command**: Platform-agnostic upgrade triggering for MCP server and plugin updates
+- 🔲 **ENH-018**: Rules file H2 structure hardening — promote H3s to H2s in rules split files, update init wizard to scaffold H2 structure, add upgrade-inspector detection + migration offer
+- 🔲 **Platform-agnostic init feedback**: Enhanced init wizard with better cross-platform output formatting
 
 ---
 
@@ -251,7 +282,7 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 - ✅ **Skills System (5 providers)**: `lesson-capture`, `kg-recall`, `session-wrap`, `adr-guide`, `gov-execute-plan`
 - ✅ **Subagents (2)**: `knowledge-extractor` (read-only, approval-gated), `session-documenter` (conventional commits)
 - ✅ **KG Backfill in Init**: Optional Step 1.10 — scan existing context before first use
-- ✅ **Handoff Command**: `/kmgraph:handoff` generates 5-document transition package
+- ✅ **Handoff Command**: `/kmgraph:kmg-handoff` generates 5-document transition package
 - ✅ **Delegation Patterns**: `extract-chat`, `session-summary`, `update-graph` updated with subagent guidance
 - ✅ **Documentation**: CLAUDE.md updated; GETTING-STARTED, COMMAND-GUIDE, CHEAT-SHEET expanded
 - ✅ **Navigation**: CHANGELOG moved to top nav; LinkedIn icon added to header
@@ -492,19 +523,19 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 ### Scope: Validation Fixes + Issue Tracking Command
 
 #### Changes
-- ✅ `/kmgraph:start-issue-tracking` — Full issue initialization workflow (19th command)
+- ✅ `/kmgraph:kmg-start-issue-tracking` — Full issue initialization workflow (19th command)
   - Ported from optimize-my-resume, sanitized for cross-project portability
   - LLM-platform-agnostic (no Claude-specific API calls)
   - Auto-detects: parent branch, version from git, issue type, next issue number
   - Smart defaults reduce prompts to 1 (issue description)
   - Creates issue directory structure under `{active_kg_path}/issues/`
   - Generates issue.md with metadata, git branch, KG sync
-  - Integrates with `/kmgraph:update-issue-plan` and `/kmgraph:link-issue`
+  - Integrates with `/kmgraph:kmg-update-issue-plan` and `/kmgraph:kmg-link-issue`
 - ✅ Fixed `.gitignore` inline comment bug (silently prevented 3 paths from being ignored)
 - ✅ Removed orphaned `mcp-server/.claude-plugin/` artifact directory
 - ✅ Removed root-level `node_modules/` with no root `package.json`
 - ✅ Standardized command frontmatter (removed `name` field from 3 commands)
-- ✅ Fixed dangling `/kmgraph:start-issue-tracking` references in `update-issue-plan.md`
+- ✅ Fixed dangling `/kmgraph:kmg-start-issue-tracking` references in `update-issue-plan.md`
 - ✅ Fixed first `SessionStart` hook entry missing `comment` field
 - ✅ Fixed session-summary template not fenced in code block
 - ✅ Confirmed: `SessionStart` hook event name is valid and working
@@ -529,13 +560,13 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 
 #### Phase 1: Skill Enhancement + Command Hooks
 - ✅ Enhanced knowledge-graph-usage skill with autonomous triggering
-  - After lesson capture: Suggest `/kmgraph:update-graph` immediately
+  - After lesson capture: Suggest `/kmgraph:kmg-update-graph` immediately
   - After commits: Detect fix/debug/pattern keywords, suggest capture
-  - Before problem-solving: Suggest `/kmgraph:recall` to check existing knowledge
+  - Before problem-solving: Suggest `/kmgraph:kmg-recall` to check existing knowledge
 - ✅ Updated capture-lesson Step 4.6 with structured choice UI
 - ✅ Enhanced update-graph with `--edit-entry` flag and structured quality feedback
 - ✅ Created post-commit hook template (core/examples-hooks/)
-- ✅ Added hook installation to `/kmgraph:init` wizard (optional, default: no)
+- ✅ Added hook installation to `/kmgraph:kmg-init` wizard (optional, default: no)
 
 #### Phase 2: Context Enhancement + Duplicate Detection
 - ✅ Added recent-lessons.sh SessionStart hook (displays lessons from last 7 days)
@@ -640,7 +671,7 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 - Implemented progressive disclosure pattern
 
 #### Phase 3: Capture Lesson with Command ✅
-- Used /kmgraph:capture-lesson on plugin itself
+- Used /kmgraph:kmg-capture-lesson on plugin itself
 - Validated git metadata capture
 - Updated master index automatically
 - Committed with proper message format
@@ -835,7 +866,10 @@ Ideas for community-driven enhancements:
 | v0.2.1-beta | MCP write tools, agent portability, AGENTS-template | 2026-03-27 | ✅ Released |
 | v0.2.2-beta | Personal KG, session snapshot on capture, FTS5 upgrade fix | 2026-03-29 | ✅ Released |
 | v0.5.8 | Rules-inject project-rules extraction, MEMORY.md cascade fixes | 2026-05-25 | ✅ Released |
-| v0.5.9 | Decision Governance Protocol (ENH-015) | 2026-05-27 | 🔄 In Progress |
+| v0.5.9 | Decision Governance Protocol (ENH-015) | 2026-05-27 | ✅ Released |
+| v0.5.10 | Codex CLI expansion, ENH-021 continues_from, template disambiguation | 2026-06-14 | ✅ Released |
+| v0.5.11 | Security fix (esbuild HIGH CVE) | 2026-06-14 | ✅ Released |
+| v0.6.0 | Platform-agnostic upgrade `update` command, rules H2 hardening, init feedback | Planned | 🔲 In Planning |
 | v1.0.0 | Stable release with alpha feedback | Q2 2026 | Planning |
 | v1.1.0 | Performance + UX improvements | Q3 2026 | Roadmap |
 | v1.2.0 | Cross-platform adapters | Q4 2026 | Roadmap |
@@ -857,5 +891,5 @@ Ideas for community-driven enhancements:
 
 ---
 
-*Last updated: 2026-05-27*
-*Plugin Version: 0.5.9*
+*Last updated: 2026-06-16*
+*Plugin Version: 0.5.11*

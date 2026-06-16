@@ -8,9 +8,9 @@ This workflow ensures that insights extracted from the Knowledge Graph are prope
 ## Usage
 
 ```bash
-/kmgraph:update-issue-plan
-/kmgraph:update-issue-plan --auto           # Skip confirmation prompts
-/kmgraph:update-issue-plan --pr=<number>    # Sync to specific PR
+/kmgraph:kmg-update-issue-plan
+/kmgraph:kmg-update-issue-plan --auto           # Skip confirmation prompts
+/kmgraph:kmg-update-issue-plan --pr=<number>    # Sync to specific PR
 ```
 
 **Parameters:**
@@ -21,7 +21,7 @@ This workflow ensures that insights extracted from the Knowledge Graph are prope
 
 ## Step 1: Institutional Knowledge Extraction
 
-1. **Trigger:** Run `/kmgraph:update-graph`.
+1. **Trigger:** Run `/kmgraph:kmg-update-graph`.
 2. **Analysis:** Review the extracted patterns or lessons.
 3. **Identification:** Identify the **Primary Lesson** that prompted this sync (e.g., "Active Enforcement Failure").
 
@@ -54,7 +54,7 @@ This workflow ensures that insights extracted from the Knowledge Graph are prope
 3. **Decision Gate:**
    - If the new insight represents a *separate* scope or a new bug:
      - **STOP:** Ask user: **"A new discovery has been made: [Description]. Should I create a new local issue for this, or continue updating [Current ID]?"**
-     - If yes, initialize the new issue via `/kmgraph:start-issue-tracking`.
+     - If yes, initialize the new issue via `/kmgraph:kmg-start-issue-tracking`.
 
 **Update format:**
 ```markdown
@@ -210,16 +210,16 @@ If GitHub CLI (`gh`) is not installed or no remote is configured:
 When multiple knowledge graphs are configured:
 - Reads active KG from `~/.claude/kg-config.json`
 - Plans and issues stored in `{active_kg_path}/plans/` and `{active_kg_path}/issues/`
-- Use `/kmgraph:switch` to change active KG before syncing
+- Use `/kmgraph:kmg-switch` to change active KG before syncing
 
 ---
 
 ## Integration with Other Skills
 
-- `/kmgraph:update-graph` — Triggers Step 1 (knowledge extraction)
-- `/kmgraph:sync-all` — Calls this skill as part of full sync pipeline
-- `/kmgraph:capture-lesson` — Lessons sync here for plan integration
-- `/kmgraph:start-issue-tracking` — Creates new issues from decision gates
+- `/kmgraph:kmg-update-graph` — Triggers Step 1 (knowledge extraction)
+- `/kmgraph:kmg-sync-all` — Calls this skill as part of full sync pipeline
+- `/kmgraph:kmg-capture-lesson` — Lessons sync here for plan integration
+- `/kmgraph:kmg-start-issue-tracking` — Creates new issues from decision gates
 
 ---
 
@@ -227,10 +227,10 @@ When multiple knowledge graphs are configured:
 
 ```bash
 # 1. Extract insights from lesson
-/kmgraph:update-graph
+/kmgraph:kmg-update-graph
 
 # 2. Sync to plan and issues
-/kmgraph:update-issue-plan
+/kmgraph:kmg-update-issue-plan
 
 # Output:
 # Governance Sync Summary Table

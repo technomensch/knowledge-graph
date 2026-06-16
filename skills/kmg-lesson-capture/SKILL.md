@@ -31,7 +31,7 @@ When triggered:
 
 2. **Note:** When dispatching to lesson capture, the lesson-capture-agent includes a snapshot gate that offers to preserve session context first. This is presented to the user inside the agent flow — do not add a separate snapshot prompt here.
 
-   **ECC Compatibility:** The slash command syntax (`/kmgraph:capture-lesson`) is Claude Code–specific. On other ECC platforms, the lesson-capture-agent is dispatched directly via agent invocation without a command namespace.
+   **ECC Compatibility:** The slash command syntax (`/kmgraph:kmg-capture-lesson`) is Claude Code–specific. On other ECC platforms, the lesson-capture-agent is dispatched directly via agent invocation without a command namespace.
 
 3. **Dispatch to lesson-capture-agent** with the pre-structured context as a named payload:
 

@@ -43,7 +43,7 @@ Read `~/.claude/kg-config.json`. Find the `active` field and look up `graphs[act
 
 If the config file does not exist or no active graph is set:
 
-> I don't see a knowledge graph configured yet. Run `/kmgraph:init` to get started.
+> I don't see a knowledge graph configured yet. Run `/kmgraph:kmg-init` to get started.
 
 Stop here.
 
@@ -198,7 +198,7 @@ If nothing is found after searching all scoped directories:
 
 > I didn't find anything on "[topic]" in the knowledge graph yet.
 >
-> If you've solved this before and it wasn't captured, `/kmgraph:capture-lesson` can add it now. You could also try broader keywords or check a different type with `--type=all`.
+> If you've solved this before and it wasn't captured, `/kmgraph:kmg-capture-lesson` can add it now. You could also try broader keywords or check a different type with `--type=all`.
 
 ---
 
@@ -229,6 +229,6 @@ If nothing is found after searching all scoped directories:
 
 ## Integration Hints
 
-- If recall surfaces 0 results, suggest `/kmgraph:capture-lesson`.
-- If user asks about "today's work" and no session summary exists, suggest `/kmgraph:session-summary`.
-- If results are found and user wants to extract insights, suggest `/kmgraph:update-graph`.
+- If recall surfaces 0 results, suggest `/kmgraph:kmg-capture-lesson`.
+- If user asks about "today's work" and no session summary exists, suggest `/kmgraph:kmg-session-summary`.
+- If results are found and user wants to extract insights, suggest `/kmgraph:kmg-update-graph`.

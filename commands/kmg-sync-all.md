@@ -8,9 +8,9 @@
 ## Usage
 
 ```bash
-/kmgraph:sync-all
-/kmgraph:sync-all --auto           # Skip confirmation for GitHub posting
-/kmgraph:sync-all --dry-run        # Show what would sync without making changes
+/kmgraph:kmg-sync-all
+/kmgraph:kmg-sync-all --auto           # Skip confirmation for GitHub posting
+/kmgraph:kmg-sync-all --dry-run        # Show what would sync without making changes
 ```
 
 **Parameters:**
@@ -23,15 +23,15 @@
 
 **Before (4 manual steps):**
 ```
-1. /kmgraph:capture-lesson        → Capture lesson in {active_kg_path}/lessons-learned/
-2. /kmgraph:update-graph           → Extract KG entries to {active_kg_path}/knowledge/
-3. /kmgraph:update-issue-plan      → Sync to plan and local issue
+1. /kmgraph:kmg-capture-lesson        → Capture lesson in {active_kg_path}/lessons-learned/
+2. /kmgraph:kmg-update-graph           → Extract KG entries to {active_kg_path}/knowledge/
+3. /kmgraph:kmg-update-issue-plan      → Sync to plan and local issue
 4. Manual GitHub comment             → Post progress to GitHub issue
 ```
 
 **After (1 step):**
 ```
-/kmgraph:sync-all                  → All 4 steps automated, 1 confirmation
+/kmgraph:kmg-sync-all                  → All 4 steps automated, 1 confirmation
 ```
 
 ---
@@ -52,7 +52,7 @@
 
 Sub-captures that receive an explicit flag skip their own `gov-capture-routing` invocation.
 
-**Switch/restore:** If `--project` triggers a KG switch, the switch occurs before sub-captures begin. After all sub-captures complete, restore with `/kmgraph:switch {$restore_kg}`.
+**Switch/restore:** If `--project` triggers a KG switch, the switch occurs before sub-captures begin. After all sub-captures complete, restore with `/kmgraph:kmg-switch {$restore_kg}`.
 
 ---
 
@@ -124,7 +124,7 @@ Display the summary exactly as returned by the agent. Do not reformat or add add
 
 When multiple knowledge graphs are configured:
 - Operates on the **active** KG from `~/.claude/kg-config.json`
-- Use `/kmgraph:switch` to change active KG before syncing
+- Use `/kmgraph:kmg-switch` to change active KG before syncing
 - Supports selective sync: `--category=architecture` to sync only architecture lessons
 
 ---
@@ -143,16 +143,16 @@ If GitHub CLI (`gh`) is not installed or no remote is configured:
 ## Integration
 
 ### Trigger Points
-- After `/kmgraph:capture-lesson` completes (auto-suggest)
-- After significant work sessions (via `/kmgraph:session-summary`)
+- After `/kmgraph:kmg-capture-lesson` completes (auto-suggest)
+- After significant work sessions (via `/kmgraph:kmg-session-summary`)
 - Before committing governance-related changes
 - Manual invocation for catch-up sync
 
 ### Integrates With
-- `/kmgraph:update-graph` — KG extraction logic (via sync-all-agent)
-- `/kmgraph:update-issue-plan` — Plan/issue linking (via sync-all-agent)
-- `/kmgraph:capture-lesson` — Lesson source
-- `/kmgraph:session-summary` — Session enrichment
+- `/kmgraph:kmg-update-graph` — KG extraction logic (via sync-all-agent)
+- `/kmgraph:kmg-update-issue-plan` — Plan/issue linking (via sync-all-agent)
+- `/kmgraph:kmg-capture-lesson` — Lesson source
+- `/kmgraph:kmg-session-summary` — Session enrichment
 - Project-specific governance skills (if present)
 
 ---

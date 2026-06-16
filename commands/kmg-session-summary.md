@@ -31,10 +31,10 @@ within the day; narrative blocks are append-only and timestamped.
 ## Usage
 
 ```bash
-/kmgraph:session-summary
-/kmgraph:session-summary --title="Memory System Design"
-/kmgraph:session-summary --auto
-/kmgraph:session-summary --delegate
+/kmgraph:kmg-session-summary
+/kmgraph:kmg-session-summary --title="Memory System Design"
+/kmgraph:kmg-session-summary --auto
+/kmgraph:kmg-session-summary --delegate
 ```
 
 ---
@@ -150,4 +150,4 @@ tags: [session]
 ---
 
 **Version:** 2.1 (2026-06-09) — operational sections + zone structure (ENH-002 partial)
-**Related:** /kmgraph:capture-lesson, /kmgraph:recall
+**Related:** /kmgraph:kmg-capture-lesson, /kmgraph:kmg-recall

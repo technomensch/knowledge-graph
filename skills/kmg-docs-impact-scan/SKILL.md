@@ -69,7 +69,7 @@ Source: docs-impact-scan correction (YYYY-MM-DD)
 
 ### Step 7 — Dispatch updates
 
-Call `/kmgraph:update-doc --user-facing [file]` for each file in the confirmed list, one at a time in sequence.
+Call `/kmgraph:kmg-update-doc --user-facing [file]` for each file in the confirmed list, one at a time in sequence.
 
 ### Step 8 — Write completion flag and summarize
 

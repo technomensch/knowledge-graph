@@ -44,7 +44,7 @@ Check if `$requested_tier` is a legacy model name rather than a tier label.
 **If no alias matched and `$requested_tier` is not a valid tier label:**
 
 Halt with:
-> "Unknown tier or model name: `[$requested_tier]`. Use `fast-tier`, `standard-tier`, or `powerful-tier`. Run `/kmgraph:init` to configure tier mappings."
+> "Unknown tier or model name: `[$requested_tier]`. Use `fast-tier`, `standard-tier`, or `powerful-tier`. Run `/kmgraph:kmg-init` to configure tier mappings."
 
 ---
 
@@ -67,12 +67,12 @@ Find the platform entry in `platforms[]` matching the active platform name.
 **If no `platforms[]` block found in either me.md:**
 
 Halt with:
-> "No tier mappings configured. Run `/kmgraph:init` (or `/kmgraph:upgrade`) to set up tier mappings for your platform."
+> "No tier mappings configured. Run `/kmgraph:kmg-init` (or `/kmgraph:upgrade`) to set up tier mappings for your platform."
 
 **If active platform not found in `platforms[]`:**
 
 Halt with:
-> "No tier mapping for platform `[platform_name]`. Run `/kmgraph:init` to add it."
+> "No tier mapping for platform `[platform_name]`. Run `/kmgraph:kmg-init` to add it."
 
 ---
 
@@ -103,7 +103,7 @@ For each fallback tier:
 If all three tiers are empty:
 
 Halt with:
-> "No model available. Run `/kmgraph:init` to configure tier mappings."
+> "No model available. Run `/kmgraph:kmg-init` to configure tier mappings."
 
 ---
 

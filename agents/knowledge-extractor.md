@@ -37,8 +37,8 @@
    - Only then proceed to write to knowledge graph
 
 **Used By:**
-- `/kmgraph:init` backfill option (v0.0.10.2)
-- `/kmgraph:update-graph` — KG Entry Extraction Mode (v0.2.1)
+- `/kmgraph:kmg-init` backfill option (v0.0.10.2)
+- `/kmgraph:kmg-update-graph` — KG Entry Extraction Mode (v0.2.1)
 - Heavy read operations where main context would be consumed
 - Session compilation workflows
 
@@ -54,7 +54,7 @@ Subagent: Writes approved items to knowledge graph
 
 ## Init-Backfill Mode
 
-**Trigger:** User runs `/kmgraph:init` on a pre-existing project and selects "backfill from existing context" (y/n prompt).
+**Trigger:** User runs `/kmgraph:kmg-init` on a pre-existing project and selects "backfill from existing context" (y/n prompt).
 
 **Input:**
 - List of files to parse:
@@ -90,7 +90,7 @@ Subagent: Writes approved items to knowledge graph
 
 ## KG Entry Extraction Mode
 
-**Trigger:** Delegated from `/kmgraph:update-graph` command. This mode handles the full extraction-to-write pipeline for turning lessons into knowledge graph entries.
+**Trigger:** Delegated from `/kmgraph:kmg-update-graph` command. This mode handles the full extraction-to-write pipeline for turning lessons into knowledge graph entries.
 
 **Input Contract:**
 

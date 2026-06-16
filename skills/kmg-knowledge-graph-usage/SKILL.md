@@ -106,7 +106,7 @@ Avoid capturing:
 
 **Search strategy:**
 1. Extract key terms from the topic (problem domain, technology, pattern name)
-2. Recall search via recall-agent (automatic or explicit with `/kmgraph:recall "key terms"`)
+2. Recall search via recall-agent (automatic or explicit with `/kmgraph:kmg-recall "key terms"`)
 3. Review search results for similar content
 
 **If similar lesson found:**
@@ -149,48 +149,48 @@ Commands remain available for explicit, interactive use. They operate on all fou
 
 ### Capture and Organization
 
-**`/kmgraph:capture-lesson [title]`**
+**`/kmgraph:kmg-capture-lesson [title]`**
 - Interactive lesson capture with git metadata tracking
 - Available for manual use when automation doesn't trigger
 - Dispatches to lesson-capture-agent
 
-**`/kmgraph:session-summary`**
+**`/kmgraph:kmg-session-summary`**
 - Create summary of current session interactively
 - Available for manual use at any time
 - Dispatches to session-summary-agent
 
-**`/kmgraph:sync-all`**
+**`/kmgraph:kmg-sync-all`**
 - Full orchestration pipeline in one command
 - Extract → capture → update graph
 - Dispatches multiple agents in sequence
 
 ### Search and Recall
 
-**`/kmgraph:recall "query"`**
+**`/kmgraph:kmg-recall "query"`**
 - Explicit search across all knowledge
 - Manual trigger for recall-agent
 - Useful when automation doesn't suggest search
 
-**`/kmgraph:status`**
+**`/kmgraph:kmg-status`**
 - View KG config, stats, recent activity
 - Non-dispatching information command
 
 ### Configuration
 
-**`/kmgraph:init [name]`**
+**`/kmgraph:kmg-init [name]`**
 - Create new knowledge graph
 - Configure categories and git strategy
 - One-time setup command
 
-**`/kmgraph:switch [name]`**
+**`/kmgraph:kmg-switch [name]`**
 - Change active KG
 - Routes subsequent commands to selected graph
 
-**`/kmgraph:check-sensitive`**
+**`/kmgraph:kmg-check-sensitive`**
 - Scan for sensitive data before sharing
 - Manual security check before commits/pushes
 
-**`/kmgraph:configure-sanitization`**
+**`/kmgraph:kmg-config-sanitization`**
 - Set up pre-commit hooks for data protection
 - One-time security configuration
 
@@ -200,35 +200,35 @@ Commands remain available for explicit, interactive use. They operate on all fou
 
 **After debugging session:**
 ```
-1. /kmgraph:capture-lesson debugging-session-title
+1. /kmgraph:kmg-capture-lesson debugging-session-title
 2. Document problem, root cause, solution, prevention
 3. Tag with relevant categories
 ```
 
 **During recurring problem:**
 ```
-1. /kmgraph:meta-issue 123
+1. /kmgraph:kmg-meta-issue 123
 2. Document current attempt and findings
 3. Update issue plan as investigation progresses
 ```
 
 **End of productive session:**
 ```
-1. /kmgraph:session-summary
+1. /kmgraph:kmg-session-summary
 2. Review and refine generated summary
 3. Links to lessons captured during session
 ```
 
 **When facing familiar problem:**
 ```
-1. /kmgraph:recall "problem description"
+1. /kmgraph:kmg-recall "problem description"
 2. Review relevant lessons and decisions
 3. Apply documented solution or adapt approach
 ```
 
 **Periodic knowledge consolidation:**
 ```
-1. /kmgraph:sync-all
+1. /kmgraph:kmg-sync-all
    - Extracts recent chats
    - Captures lessons from extracted content
    - Updates knowledge graph with insights
@@ -237,12 +237,12 @@ Commands remain available for explicit, interactive use. They operate on all fou
 
 **After lesson capture (NEW - v0.0.3):**
 ```
-Context: User just completed /kmgraph:capture-lesson
+Context: User just completed /kmgraph:kmg-capture-lesson
 
 Proactive suggestion:
 "✅ Lesson captured! Extract insights to Knowledge Graph?"
-- Recommended: /kmgraph:update-graph (extracts patterns/gotchas/concepts)
-- Full pipeline: /kmgraph:sync-all (extraction + governance check + GitHub)
+- Recommended: /kmgraph:kmg-update-graph (extracts patterns/gotchas/concepts)
+- Full pipeline: /kmgraph:kmg-sync-all (extraction + governance check + GitHub)
 - Later: Skip for now, run manually later
 
 Why now: Fresh context enables better extraction. The knowledge-reviewer
@@ -257,7 +257,7 @@ Proactive suggestion:
 "💡 Lesson-worthy commit detected: [hash] - [message]
 
 This looks like knowledge worth capturing. Consider:
-- /kmgraph:capture-lesson — Document while context is fresh
+- /kmgraph:kmg-capture-lesson — Document while context is fresh
 - Within 30 minutes is optimal for quality
 
 Keywords detected: [fix/debug/pattern/etc]"
@@ -272,7 +272,7 @@ Context: User describes a problem; sounds familiar or recurring
 
 Proactive suggestion:
 "Before solving, check if we've seen this before:
-- /kmgraph:recall \"[extracted keywords]\"
+- /kmgraph:kmg-recall \"[extracted keywords]\"
 - Might save time if similar pattern exists
 
 Would you like me to search existing lessons first?"
@@ -340,8 +340,8 @@ This enables:
 ### GitHub Integration
 
 Link lessons to tracked work:
-- Use `/kmgraph:link-issue` for bidirectional references
-- Use `/kmgraph:meta-issue` for complex recurring issues
+- Use `/kmgraph:kmg-link-issue` for bidirectional references
+- Use `/kmgraph:kmg-meta-issue` for complex recurring issues
 - Track investigation progress within issue context
 - Enable team visibility into problem-solving process
 
@@ -361,21 +361,21 @@ Recognize these patterns during conversation and suggest appropriate commands:
 
 **After complex debugging:**
 - User statement: "Finally figured it out", "That was tricky", "Took me hours"
-- Suggest: `/kmgraph:capture-lesson debugging-[topic]`
+- Suggest: `/kmgraph:kmg-capture-lesson debugging-[topic]`
 
 **During recurring issue discussion:**
 - User statement: "This keeps happening", "Same problem again", "Third time this week"
-- Suggest: `/kmgraph:meta-issue [number]` if tracked, or capture-lesson if not
+- Suggest: `/kmgraph:kmg-meta-issue [number]` if tracked, or capture-lesson if not
 
 **End of productive session:**
 - Multiple problems solved in one session
 - Significant progress on complex feature
 - Important decisions made
-- Suggest: `/kmgraph:session-summary`
+- Suggest: `/kmgraph:kmg-session-summary`
 
 **When user references past work:**
 - User statement: "We solved this before", "Remember when we fixed...", "Last time we..."
-- Suggest: `/kmgraph:recall "query"` to find previous solution
+- Suggest: `/kmgraph:kmg-recall "query"` to find previous solution
 
 **Architecture or design discussion:**
 - Multiple options discussed with trade-offs
@@ -389,7 +389,7 @@ Before solving problems, check if knowledge already exists:
 
 **Familiar-sounding problem:**
 - Search KG before starting fresh investigation
-- Use `/kmgraph:recall` to find relevant lessons
+- Use `/kmgraph:kmg-recall` to find relevant lessons
 - Present existing solutions or patterns
 
 **User mentions past work:**
@@ -414,7 +414,7 @@ For comprehensive guidance on specific topics:
 ### Command Documentation
 
 For detailed command syntax and options:
-- Use `/kmgraph:status` for quick reference and current KG info
+- Use `/kmgraph:kmg-status` for quick reference and current KG info
 - Check README.md for complete command documentation
 - See examples/ directory for real-world usage patterns
 
@@ -440,8 +440,8 @@ For detailed command syntax and options:
 ### Privacy and Security
 
 Before sharing knowledge:
-- Run `/kmgraph:check-sensitive` to scan for sensitive data
-- Configure sanitization hooks with `/kmgraph:configure-sanitization`
+- Run `/kmgraph:kmg-check-sensitive` to scan for sensitive data
+- Configure sanitization hooks with `/kmgraph:kmg-config-sanitization`
 - Review lessons for company-private information
 - Use selective git strategy to keep personal notes private
 - Remove or redact sensitive details before committing

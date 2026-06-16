@@ -1,13 +1,13 @@
 
-# /kmgraph:link-issue — Link Lesson to GitHub Issue
+# /kmgraph:kmg-link-issue — Link Lesson to GitHub Issue
 
 Manually link an existing lesson-learned or ADR to a GitHub issue, creating bidirectional references.
 
 ## Syntax
 
 ```bash
-/kmgraph:link-issue knowledge/lessons-learned/process/my-lesson.md --issue 42
-/kmgraph:link-issue knowledge/decisions/ADR-005.md --issue 38 --pr 40
+/kmgraph:kmg-link-issue knowledge/lessons-learned/process/my-lesson.md --issue 42
+/kmgraph:kmg-link-issue knowledge/decisions/ADR-005.md --issue 38 --pr 40
 ```
 
 ## What This Does
@@ -36,7 +36,7 @@ fi
 # Check issue number provided
 if [ -z "$issue_num" ]; then
   echo "Error: Missing issue number"
-  echo "Usage: /kmgraph:link-issue <file> --issue <num> [--pr <num>]"
+  echo "Usage: /kmgraph:kmg-link-issue <file> --issue <num> [--pr <num>]"
   exit 1
 fi
 ```
@@ -153,10 +153,10 @@ Error: File not found: knowledge/lessons-learned/nonexistent.md
 ### No Issue Number
 ```
 Error: Missing issue number
-Usage: /kmgraph:link-issue <file> --issue <num> [--pr <num>]
+Usage: /kmgraph:kmg-link-issue <file> --issue <num> [--pr <num>]
 ```
 
 ## See Also
 
-- `/kmgraph:capture-lesson` — Create new lesson with automatic git metadata
-- `/kmgraph:update-issue-plan` — Sync KG to plan and GitHub issue
+- `/kmgraph:kmg-capture-lesson` — Create new lesson with automatic git metadata
+- `/kmgraph:kmg-update-issue-plan` — Sync KG to plan and GitHub issue

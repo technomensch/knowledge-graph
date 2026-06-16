@@ -1,7 +1,7 @@
 
-# /kmgraph:switch — Change Active Knowledge Graph
+# /kmgraph:kmg-switch — Change Active Knowledge Graph
 
-Switch between configured knowledge graphs. All subsequent skill operations (`/kmgraph:capture-lesson`, `/kmgraph:recall`, etc.) will use the selected KG.
+Switch between configured knowledge graphs. All subsequent skill operations (`/kmgraph:kmg-capture-lesson`, `/kmgraph:kmg-recall`, etc.) will use the selected KG.
 
 ## What This Does
 
@@ -10,9 +10,9 @@ Updates the `active` field in `~/.claude/kg-config.json` to the specified knowle
 ## Syntax
 
 ```bash
-/kmgraph:switch my-project
-/kmgraph:switch ai-research
-/kmgraph:switch cowork-devops
+/kmgraph:kmg-switch my-project
+/kmgraph:kmg-switch ai-research
+/kmgraph:kmg-switch cowork-devops
 ```
 
 ## When to Use
@@ -32,7 +32,7 @@ CONFIG_PATH="$HOME/.claude/kg-config.json"
 # Check if config exists
 if [ ! -f "$CONFIG_PATH" ]; then
   echo "Error: No knowledge graphs configured."
-  echo "Run /kmgraph:init to create your first knowledge graph."
+  echo "Run /kmgraph:kmg-init to create your first knowledge graph."
   exit 1
 fi
 
@@ -42,10 +42,10 @@ target_kg="$1"
 if [ -z "$target_kg" ]; then
   echo "Error: Missing knowledge graph name."
   echo ""
-  echo "Usage: /kmgraph:switch <kg-name>"
+  echo "Usage: /kmgraph:kmg-switch <kg-name>"
   echo ""
   echo "Available knowledge graphs:"
-  /kmgraph:list --names-only
+  /kmgraph:kmg-list --names-only
   exit 1
 fi
 ```
@@ -60,9 +60,9 @@ if [ "$kg_exists" != "true" ]; then
   echo "Error: Knowledge graph '$target_kg' not found."
   echo ""
   echo "Available knowledge graphs:"
-  /kmgraph:list --names-only
+  /kmgraph:kmg-list --names-only
   echo ""
-  echo "Create a new one with: /kmgraph:init"
+  echo "Create a new one with: /kmgraph:kmg-init"
   exit 1
 fi
 ```
@@ -122,9 +122,9 @@ echo ""
 echo "All subsequent knowledge operations will use this graph."
 echo ""
 echo "Quick commands:"
-echo "  /kmgraph:status          — View KG stats"
-echo "  /kmgraph:capture-lesson  — Document a lesson"
-echo "  /kmgraph:recall \"query\"   — Search this KG"
+echo "  /kmgraph:kmg-status          — View KG stats"
+echo "  /kmgraph:kmg-capture-lesson  — Document a lesson"
+echo "  /kmgraph:kmg-recall \"query\"   — Search this KG"
 ```
 
 ## Edge Cases
@@ -132,14 +132,14 @@ echo "  /kmgraph:recall \"query\"   — Search this KG"
 ### No config file
 ```
 Error: No knowledge graphs configured.
-Run /kmgraph:init to create your first knowledge graph.
+Run /kmgraph:kmg-init to create your first knowledge graph.
 ```
 
 ### Missing argument
 ```
 Error: Missing knowledge graph name.
 
-Usage: /kmgraph:switch <kg-name>
+Usage: /kmgraph:kmg-switch <kg-name>
 
 Available knowledge graphs:
   my-project (active)
@@ -156,7 +156,7 @@ Available knowledge graphs:
   ai-research
   cowork-devops
 
-Create a new one with: /kmgraph:init
+Create a new one with: /kmgraph:kmg-init
 ```
 
 ### KG path doesn't exist
@@ -188,7 +188,7 @@ Already using knowledge graph: my-project
 Skip confirmation for missing paths:
 
 ```bash
-/kmgraph:switch my-project --force
+/kmgraph:kmg-switch my-project --force
 ```
 
 This will switch even if the path doesn't exist, useful for:
@@ -199,32 +199,32 @@ This will switch even if the path doesn't exist, useful for:
 ## Integration with Other Skills
 
 After switching:
-- `/kmgraph:capture-lesson` writes to the newly active KG
-- `/kmgraph:recall` searches the newly active KG
-- `/kmgraph:update-graph` extracts to the newly active KG
-- `/kmgraph:status` shows stats for the newly active KG
+- `/kmgraph:kmg-capture-lesson` writes to the newly active KG
+- `/kmgraph:kmg-recall` searches the newly active KG
+- `/kmgraph:kmg-update-graph` extracts to the newly active KG
+- `/kmgraph:kmg-status` shows stats for the newly active KG
 - All other knowledge operations target the newly active KG
 
 ## Multi-KG Workflow Example
 
 ```bash
 # Morning: Work on project documentation
-/kmgraph:switch my-project
-/kmgraph:capture-lesson   # Documents project-specific lesson
+/kmgraph:kmg-switch my-project
+/kmgraph:kmg-capture-lesson   # Documents project-specific lesson
 
 # Afternoon: Research AI patterns across projects
-/kmgraph:switch ai-research
-/kmgraph:recall "transformer architecture"  # Searches global AI KG
-/kmgraph:capture-lesson   # Documents reusable AI pattern
+/kmgraph:kmg-switch ai-research
+/kmgraph:kmg-recall "transformer architecture"  # Searches global AI KG
+/kmgraph:kmg-capture-lesson   # Documents reusable AI pattern
 
 # Evening: Return to project
-/kmgraph:switch my-project
-/kmgraph:sync-all   # Syncs project KG
+/kmgraph:kmg-switch my-project
+/kmgraph:kmg-sync-all   # Syncs project KG
 ```
 
 ## See Also
 
-- `/kmgraph:list` — View all configured KGs
-- `/kmgraph:init` — Create a new KG
-- `/kmgraph:status` — View active KG stats
-- `/kmgraph:add-category` — Add categories to active KG
+- `/kmgraph:kmg-list` — View all configured KGs
+- `/kmgraph:kmg-init` — Create a new KG
+- `/kmgraph:kmg-status` — View active KG stats
+- `/kmgraph:kmg-add-category` — Add categories to active KG

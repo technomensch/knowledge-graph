@@ -1,5 +1,5 @@
 
-# /kmgraph:list — List All Knowledge Graphs
+# /kmgraph:kmg-list — List All Knowledge Graphs
 
 Display all configured knowledge graphs with their locations, categories, git strategies, and active status.
 
@@ -53,7 +53,7 @@ CONFIG_PATH="$HOME/.claude/kg-config.json"
 if [ ! -f "$CONFIG_PATH" ]; then
   echo "No knowledge graphs configured."
   echo ""
-  echo "Get started with: /kmgraph:init"
+  echo "Get started with: /kmgraph:kmg-init"
   exit 0
 fi
 ```
@@ -158,14 +158,14 @@ format_date() {
 ```
 No knowledge graphs configured.
 
-Get started with: /kmgraph:init
+Get started with: /kmgraph:kmg-init
 ```
 
 ### Empty config (no graphs)
 ```
 No knowledge graphs configured.
 
-Get started with: /kmgraph:init
+Get started with: /kmgraph:kmg-init
 ```
 
 ### No active KG set
@@ -178,7 +178,7 @@ Knowledge Graphs:
    Last used: 2026-02-13 15:45
 
 ⚠️  No active knowledge graph set.
-    Use /kmgraph:switch <name> to activate one.
+    Use /kmgraph:kmg-switch <name> to activate one.
 
 Total: 1 knowledge graph(s) configured
 ```
@@ -197,7 +197,7 @@ Knowledge Graphs:
 ```
 ⚠️  Active knowledge graph path does not exist: /Users/name/projects/my-app/docs/
     The project may have been moved or deleted.
-    Use /kmgraph:switch to change to a different KG.
+    Use /kmgraph:kmg-switch to change to a different KG.
 ```
 
 ## Turbo Mode
@@ -205,7 +205,7 @@ Knowledge Graphs:
 Show only active KG:
 
 ```bash
-/kmgraph:list --active-only
+/kmgraph:kmg-list --active-only
 ```
 
 Output:
@@ -219,7 +219,7 @@ Git: selective
 Show only names (for scripting):
 
 ```bash
-/kmgraph:list --names-only
+/kmgraph:kmg-list --names-only
 ```
 
 Output:
@@ -231,9 +231,9 @@ cowork-devops
 
 ## Integration with Other Skills
 
-- `/kmgraph:init` creates new entries shown here
-- `/kmgraph:switch` changes which one is marked "active"
-- `/kmgraph:status` shows detailed stats for active KG
+- `/kmgraph:kmg-init` creates new entries shown here
+- `/kmgraph:kmg-switch` changes which one is marked "active"
+- `/kmgraph:kmg-status` shows detailed stats for active KG
 - All other skills operate on the "active" KG shown here
 
 ## Machine-Readable Output
@@ -241,7 +241,7 @@ cowork-devops
 For scripting/automation, add `--json` flag:
 
 ```bash
-/kmgraph:list --json
+/kmgraph:kmg-list --json
 ```
 
 Output:
@@ -266,7 +266,7 @@ Output:
 
 ## See Also
 
-- `/kmgraph:init` — Create a new knowledge graph
-- `/kmgraph:switch` — Change active KG
-- `/kmgraph:status` — View detailed stats for active KG
-- `/kmgraph:add-category` — Add categories to existing KG
+- `/kmgraph:kmg-init` — Create a new knowledge graph
+- `/kmgraph:kmg-switch` — Change active KG
+- `/kmgraph:kmg-status` — View detailed stats for active KG
+- `/kmgraph:kmg-add-category` — Add categories to existing KG

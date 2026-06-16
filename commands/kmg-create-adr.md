@@ -5,20 +5,20 @@
 
 **Version:** 1.0 (Created: 2026-02-20)
 
-**Note:** This command creates Architecture Decision Records. For Lessons Learned, use `/kmgraph:capture-lesson`. For general documentation, use `/kmgraph:create-doc`.
+**Note:** This command creates Architecture Decision Records. For Lessons Learned, use `/kmgraph:kmg-capture-lesson`. For general documentation, use `/kmgraph:kmg-create-doc`.
 
 ---
 
 ## Syntax Detection
 
 ```
-/kmgraph:create-adr
-/kmgraph:create-adr <title>
+/kmgraph:kmg-create-adr
+/kmgraph:kmg-create-adr <title>
 ```
 
 **Examples:**
-- `/kmgraph:create-adr` → Interactive wizard (all prompts)
-- `/kmgraph:create-adr Use PostgreSQL for primary database` → Pre-fills title from argument
+- `/kmgraph:kmg-create-adr` → Interactive wizard (all prompts)
+- `/kmgraph:kmg-create-adr Use PostgreSQL for primary database` → Pre-fills title from argument
 
 ---
 
@@ -100,7 +100,7 @@ Ask:
 >
 > [y] Run session summary   [u] Update existing   [n] Skip   [?] What does this do?"
 
-If `?`: explain that this runs `/kmgraph:session-summary` in snapshot mode — a lightweight variant that records what was worked on, open plan items, and file changes without requiring a full wrap-up. The result is written to disk and used to enrich the ADR's Context section.
+If `?`: explain that this runs `/kmgraph:kmg-session-summary` in snapshot mode — a lightweight variant that records what was worked on, open plan items, and file changes without requiring a full wrap-up. The result is written to disk and used to enrich the ADR's Context section.
 
 If `y`:
 > "Include git history in the session summary? (adds ~5-15 sec)
@@ -418,7 +418,7 @@ Entry format:
 
 **Update the "Creating a New ADR" section** to reference the new command:
 ```markdown
-Run `/kmgraph:create-adr` — the command handles numbering, metadata, and index updates automatically.
+Run `/kmgraph:kmg-create-adr` — the command handles numbering, metadata, and index updates automatically.
 ```
 
 Only add this line if it is not already present.
@@ -448,7 +448,7 @@ Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
 
 ## Example Invocation
 
-**User types:** `/kmgraph:create-adr`
+**User types:** `/kmgraph:kmg-create-adr`
 
 **Assistant responds:**
 
@@ -490,13 +490,13 @@ Let me ask a few questions:
 
 ## Related Commands
 
-- `/kmgraph:capture-lesson` — Document lessons learned (ADR link offered after capture)
-- `/kmgraph:create-doc` — Scaffold general documentation files
-- `/kmgraph:recall` — Search existing ADRs and lessons
-- `/kmgraph:link-issue` — Link an existing ADR to a GitHub issue
+- `/kmgraph:kmg-capture-lesson` — Document lessons learned (ADR link offered after capture)
+- `/kmgraph:kmg-create-doc` — Scaffold general documentation files
+- `/kmgraph:kmg-recall` — Search existing ADRs and lessons
+- `/kmgraph:kmg-link-issue` — Link an existing ADR to a GitHub issue
 
 ---
 
 **Created:** 2026-02-20
 **Version:** 1.0
-**Usage:** Type `/kmgraph:create-adr` to create a new Architecture Decision Record
+**Usage:** Type `/kmgraph:kmg-create-adr` to create a new Architecture Decision Record

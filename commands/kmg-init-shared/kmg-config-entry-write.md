@@ -78,7 +78,7 @@ GRAPHS_WITHOUT_TYPE=$(jq -r '.graphs | to_entries[] | select(.value.type == null
 if [ -n "$GRAPHS_WITHOUT_TYPE" ]; then
   echo "⚠️  Some registered KGs are missing a type field (defaulted to project-local):"
   echo "$GRAPHS_WITHOUT_TYPE"
-  echo "   If any of these should be a personal KG, run /kmgraph:init-personal-kg to re-register correctly."
+  echo "   If any of these should be a personal KG, run /kmgraph:kmg-init-personal-kg to re-register correctly."
 fi
 ```
 

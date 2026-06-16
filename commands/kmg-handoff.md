@@ -1,5 +1,5 @@
 
-# /kmgraph:handoff
+# /kmgraph:kmg-handoff
 
 Create a comprehensive handoff package for project transitions, context limit preparation, or new developer onboarding.
 
@@ -28,8 +28,8 @@ This command generates a complete handoff package consolidating all work, issues
 ## Usage
 
 ```bash
-/kmgraph:handoff
-/kmgraph:handoff --output-dir=<custom-path>
+/kmgraph:kmg-handoff
+/kmgraph:kmg-handoff --output-dir=<custom-path>
 ```
 
 **Parameters:**
@@ -131,7 +131,7 @@ fi
 **Branch:** $current_branch
 **Commit:** $current_commit
 **Continues from:** [repo-relative path to today's session summary, e.g. knowledge/sessions/2026-06-09-v0.5.10.1-session-summary-ops.md]
-[If no summary found: "No session summary found for today — run /kmgraph:session-summary for current state."]
+[If no summary found: "No session summary found for today — run /kmgraph:kmg-session-summary for current state."]
 
 ---
 
@@ -199,11 +199,11 @@ PROTECTED: Do NOT modify without explicit permission.
 
 | Skill | Trigger | Purpose |
 |---|---|---|
-| lesson-capture | Bug solved, breakthrough made | Suggests /kmgraph:capture-lesson |
-| kg-recall | History question, past decision | Guides knowledge graph search |
-| session-wrap | Session end, context limit | Prompts /kmgraph:session-summary |
-| adr-guide | Architecture decision | Suggests /kmgraph:create-adr |
-| gov-execute-plan | "execute plan" or docs/plans/*.md | Enforces zero-deviation protocol |
+| lesson-capture | Bug solved, breakthrough made | Suggests /kmgraph:kmg-capture-lesson |
+| kmg-auto-recall | History question, past decision | Guides knowledge graph search |
+| session-wrap | Session end, context limit | Prompts /kmgraph:kmg-session-summary |
+| adr-guide | Architecture decision | Suggests /kmgraph:kmg-create-adr |
+| kmg-execute-plan | "execute plan" or docs/plans/*.md | Enforces zero-deviation protocol |
 
 ### agents/ — Subagents
 
@@ -371,7 +371,7 @@ Co-Authored-By: Claude [Model] <noreply@anthropic.com>
 Types: `feat` | `fix` | `docs` | `refactor` | `chore` | `perf` | `style` | `test` | `build` | `ci` | `revert`
 
 ### Skills & Agents
-- Skills: Lowercase, kebab-case (e.g., lesson-capture, kg-recall)
+- Skills: Lowercase, kebab-case (e.g., kmg-lesson-capture, kmg-auto-recall)
 - Agents: CamelCase (e.g., KnowledgeExtractor, SessionDocumenter)
 
 ---
@@ -461,8 +461,8 @@ Next Steps: Document COMMAND-GUIDE.md updates, verify token reduction
 
 ## See Also
 
-- `/kmgraph:session-summary` — Document individual sessions (operational state lives here)
-- `/kmgraph:recall` — Search across captured knowledge
+- `/kmgraph:kmg-session-summary` — Document individual sessions (operational state lives here)
+- `/kmgraph:kmg-recall` — Search across captured knowledge
 - `{active KG}/sessions/` — Chronological session history
 - `knowledge/decisions/` — Architecture Decision Records
 - `knowledge/lessons-learned/` — Lessons by category

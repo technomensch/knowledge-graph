@@ -10,11 +10,11 @@ Initialize and manage meta-issue tracking for complex, multi-attempt problems th
 ## Usage
 
 ```bash
-/kmgraph:meta-issue "Problem Title"
-/kmgraph:meta-issue --add-attempt 003 "Try connection pooling"
-/kmgraph:meta-issue --log-attempt NNN "Hypothesis description"
-/kmgraph:meta-issue --update-understanding "Root cause is network latency"
-/kmgraph:meta-issue --status
+/kmgraph:kmg-meta-issue "Problem Title"
+/kmgraph:kmg-meta-issue --add-attempt 003 "Try connection pooling"
+/kmgraph:kmg-meta-issue --log-attempt NNN "Hypothesis description"
+/kmgraph:kmg-meta-issue --update-understanding "Root cause is network latency"
+/kmgraph:kmg-meta-issue --status
 ```
 
 ---
@@ -88,7 +88,7 @@ meta-issue-name/
 
 ## Command: Initialize Meta-Issue
 
-**Syntax:** `/kmgraph:meta-issue "Problem Title"`
+**Syntax:** `/kmgraph:kmg-meta-issue "Problem Title"`
 
 ### Step 1: Prompt for Metadata
 
@@ -204,7 +204,7 @@ cp "${CLAUDE_PLUGIN_ROOT}/core/default-templates/meta-issue/attempt-template/"* 
 
 ## Command: Add New Attempt
 
-**Syntax:** `/kmgraph:meta-issue --add-attempt 003 "Try connection pooling"`
+**Syntax:** `/kmgraph:kmg-meta-issue --add-attempt 003 "Try connection pooling"`
 
 ### SOP 1: Creating New Attempt Folder
 
@@ -234,7 +234,7 @@ echo "**Plan:** [v2.3.1](../../plans/v2.3.1-connection-pooling.md)" >> "${meta_d
 
 ## Command: Log Attempt with Hypothesis
 
-**Syntax:** `/kmgraph:meta-issue --log-attempt 003 "JWT expiry logic is the root cause"`
+**Syntax:** `/kmgraph:kmg-meta-issue --log-attempt 003 "JWT expiry logic is the root cause"`
 
 Enforces that each attempt documents a distinct hypothesis before execution. Steps:
 
@@ -248,7 +248,7 @@ Enforces that each attempt documents a distinct hypothesis before execution. Ste
 
 ## Command: Update Root Cause Understanding
 
-**Syntax:** `/kmgraph:meta-issue --update-understanding "Root cause is network latency"`
+**Syntax:** `/kmgraph:kmg-meta-issue --update-understanding "Root cause is network latency"`
 
 ### SOP 2: Documenting Root Cause Evolution
 
@@ -282,7 +282,7 @@ Changed strategy from query optimization to connection pooling/caching
 
 ## Command: Meta-Issue Status
 
-**Syntax:** `/kmgraph:meta-issue --status`
+**Syntax:** `/kmgraph:kmg-meta-issue --status`
 
 **Output:**
 ```
@@ -347,20 +347,20 @@ When KG entry updates with meta-issue evidence:
 
 ## Integration with Other Skills
 
-**With /kmgraph:capture-lesson:**
+**With /kmgraph:kmg-capture-lesson:**
 ```
 After resolving meta-issue → Create lesson from analysis/lessons-learned.md
 Link lesson back to meta-issue for evidence
 ```
 
-**With /kmgraph:update-graph:**
+**With /kmgraph:kmg-update-graph:**
 ```
 Extract patterns from meta-issue attempts
 Auto-detect when meta-issue has reusable insights
 Suggest KG sync when 3+ belief shifts documented
 ```
 
-**With /kmgraph:session-summary:**
+**With /kmgraph:kmg-session-summary:**
 ```
 Session summaries reference meta-issue progress
 Meta-issue timeline includes session links
@@ -377,7 +377,7 @@ to powerful-tier for diagnosis. Receives exit-path decision at 5 attempts.
 
 When multiple knowledge graphs are configured:
 - Meta-issues stored in active KG: `{active_kg_path}/issues/`
-- Use `/kmgraph:switch` to change active KG before creating meta-issue
+- Use `/kmgraph:kmg-switch` to change active KG before creating meta-issue
 - Each KG can track its own domain-specific meta-issues
 
 ---
@@ -410,7 +410,7 @@ cat attempts/003-connection-pooling/attempt-results.md
 cat analysis/root-cause-evolution.md
 
 # Suggest next attempt based on pattern
-/kmgraph:recall "performance latency"
+/kmgraph:kmg-recall "performance latency"
 ```
 
 ---
@@ -420,7 +420,7 @@ cat analysis/root-cause-evolution.md
 ### Example 1: Initialize new meta-issue
 
 ```bash
-/kmgraph:meta-issue "Authentication Redesign"
+/kmgraph:kmg-meta-issue "Authentication Redesign"
 ```
 
 **Output:**
@@ -442,7 +442,7 @@ Created:
 ### Example 2: Add attempt
 
 ```bash
-/kmgraph:meta-issue --add-attempt 002 "OAuth2 with JWT"
+/kmgraph:kmg-meta-issue --add-attempt 002 "OAuth2 with JWT"
 ```
 
 **Output:**
@@ -460,7 +460,7 @@ Updated: implementation-log.md (new entry)
 ### Example 3: Update understanding
 
 ```bash
-/kmgraph:meta-issue --update-understanding "Token expiry logic flawed, not session management"
+/kmgraph:kmg-meta-issue --update-understanding "Token expiry logic flawed, not session management"
 ```
 
 **Output:**
@@ -480,4 +480,4 @@ Updated: description.md (current understanding section)
 **Created:** 2026-02-12
 **Version:** 1.0 (Plugin version)
 **Based On:** ADR-008 Meta-Issue Tracking Pattern
-**Related Skills:** /kmgraph:capture-lesson, /kmgraph:update-graph, /kmgraph:session-summary
+**Related Skills:** /kmgraph:kmg-capture-lesson, /kmgraph:kmg-update-graph, /kmgraph:kmg-session-summary

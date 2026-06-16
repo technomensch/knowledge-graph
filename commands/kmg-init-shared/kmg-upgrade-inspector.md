@@ -60,7 +60,7 @@ echo "$CONFIGURED_PATH" | grep -qE '/docs/?$' && \
 # Archive path convention (for Task A rollback command in v0.3.6):
 # Archives created by knowledge-file-migrator are at: {KG_PATH}/.kg-archive-YYYYMMDD-HHMMSS/
 # Each archive contains the backed-up files + manifest.json
-# Use /kmgraph:migration list (v0.3.6) to enumerate restore points.
+# Use /kmgraph:kmg-migration list (v0.3.6) to enumerate restore points.
 
 # docs/ knowledge content migration check (v0.3.5 — legacy layout cleanup)
 # Applies when KG has been migrated to knowledge/ but docs/ subdirs still contain files
@@ -240,7 +240,7 @@ Apply all, pick individually, or skip?
   3. Skip — my setup is already how I want it
 ```
 
-**Implementation note:** The preview is a display-only pass over the same inspection data already collected — no new filesystem checks are needed. The `--preview` flag can be passed as an argument to `/kmgraph:init` to jump directly to the preview without showing the menu first: if the command is invoked with `--preview`, run the inspection, show the preview, and then show the Apply/Choose/Skip menu (without option 0, since preview has already run).
+**Implementation note:** The preview is a display-only pass over the same inspection data already collected — no new filesystem checks are needed. The `--preview` flag can be passed as an argument to `/kmgraph:kmg-init` to jump directly to the preview without showing the menu first: if the command is invoked with `--preview`, run the inspection, show the preview, and then show the Apply/Choose/Skip menu (without option 0, since preview has already run).
 
 If the user picks option 2 (choose individually), present each item as a separate yes/no prompt before running it.
 
@@ -298,7 +298,7 @@ GRAPHS_WITHOUT_TYPE=$(jq -r '.graphs | to_entries[] | select(.value.type == null
 if [ -n "$GRAPHS_WITHOUT_TYPE" ]; then
   echo "⚠️  Some registered KGs are missing a type field (defaulted to project-local):"
   echo "$GRAPHS_WITHOUT_TYPE"
-  echo "   If any of these should be a personal KG, run /kmgraph:init-personal-kg to re-register correctly."
+  echo "   If any of these should be a personal KG, run /kmgraph:kmg-init-personal-kg to re-register correctly."
 fi
 ```
 
@@ -354,7 +354,7 @@ SCHEMA_VERSION=$(awk '/^---$/{if(in_front){in_front=0;exit}else{in_front=1;next}
 
 If `$SCHEMA_VERSION` is a valid integer and `$SCHEMA_VERSION -ge 2`:
 - Skip section d entirely — print nothing, add no upgrade item.
-- This prevents re-offering platform-split migration on every `/kmgraph:init` run after migration has already completed.
+- This prevents re-offering platform-split migration on every `/kmgraph:kmg-init` run after migration has already completed.
 
 If `$SCHEMA_VERSION` is absent, empty, or non-numeric: treat as absent — proceed with the contamination grep below.
 
@@ -514,7 +514,7 @@ These belong in knowledge/ (current layout). Options:
 
    Files moved to knowledge/. Archive available at: {KG_PATH}/.kg-archive-YYYYMMDD-HHMMSS/
    Empty source dirs removed from docs/.
-   To rollback: run `/kmgraph:migration rollback <id>` to restore. Use `/kmgraph:migration list` to see restore points.
+   To rollback: run `/kmgraph:kmg-migration rollback <id>` to restore. Use `/kmgraph:kmg-migration list` to see restore points.
    ```
 
 **If option (b) — skip:**
@@ -659,7 +659,7 @@ GEMINI.md  ✓ found at {PROJECT_ROOT}/GEMINI.md
 
 ── Nothing has been written. These are recommendations only. ──────────────
 All content can be edited before applying, and changed again at any time
-using /kmgraph:rules-capture and by editing the files directly.
+using /kmgraph:kmg-rules-capture and by editing the files directly.
 ```
 
 ---
@@ -700,7 +700,7 @@ After the archive loop, print:
 ✅ Originals archived at:
    $ARCHIVE_DIR
 
-To rollback: run /kmgraph:migration list to see restore points, or restore manually:
+To rollback: run /kmgraph:kmg-migration list to see restore points, or restore manually:
    cp "$ARCHIVE_DIR/<filename>" <original path>
 ```
 
@@ -729,7 +729,7 @@ Then write each file using the Edit tool (new files) or Edit tool (modifications
 **Constraints:**
 - Only runs if `wiki_pass_complete` is not `true` in kg-config (the detection check above already verified this)
 - Sets `wiki_pass_complete: true` in kg-config on successful completion
-- Idempotent: re-running `/kmgraph:init` after completion skips this check silently
+- Idempotent: re-running `/kmgraph:kmg-init` after completion skips this check silently
 
 #### i. Content template location migration (v0.5.0 — ADR-040)
 

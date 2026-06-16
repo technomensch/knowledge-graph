@@ -7,7 +7,7 @@ Search across all project memory systems to find relevant knowledge, lessons, de
 
 ## When to Use
 
-Run `/kmgraph:recall` any time you want to check what the project has already documented before answering a question, solving a problem, or making a decision. Good prompts:
+Run `/kmgraph:kmg-recall` any time you want to check what the project has already documented before answering a question, solving a problem, or making a decision. Good prompts:
 
 - "Have we solved this before?"
 - "What did we decide about X?"
@@ -18,11 +18,11 @@ Run `/kmgraph:recall` any time you want to check what the project has already do
 ## Usage
 
 ```bash
-/kmgraph:recall <topic>
-/kmgraph:recall <topic> --type=<lessons|decisions|knowledge|sessions|all>
-/kmgraph:recall <topic> --format=<summary|paths|detailed>
-/kmgraph:recall <topic> --limit=<number>
-/kmgraph:recall <topic> --scope=<active|all|personal-only>
+/kmgraph:kmg-recall <topic>
+/kmgraph:kmg-recall <topic> --type=<lessons|decisions|knowledge|sessions|all>
+/kmgraph:kmg-recall <topic> --format=<summary|paths|detailed>
+/kmgraph:kmg-recall <topic> --limit=<number>
+/kmgraph:kmg-recall <topic> --scope=<active|all|personal-only>
 ```
 
 **Parameters:**
@@ -34,13 +34,13 @@ Run `/kmgraph:recall` any time you want to check what the project has already do
 
 **Examples:**
 ```bash
-/kmgraph:recall skills architecture
-/kmgraph:recall deployment --type=lessons
-/kmgraph:recall version control --format=paths
-/kmgraph:recall dual format --format=detailed
-/kmgraph:recall CI/CD pipelines --type=lessons --limit=5
-/kmgraph:recall auth patterns --scope=all
-/kmgraph:recall workflow best practices --scope=personal-only
+/kmgraph:kmg-recall skills architecture
+/kmgraph:kmg-recall deployment --type=lessons
+/kmgraph:kmg-recall version control --format=paths
+/kmgraph:kmg-recall dual format --format=detailed
+/kmgraph:kmg-recall CI/CD pipelines --type=lessons --limit=5
+/kmgraph:kmg-recall auth patterns --scope=all
+/kmgraph:kmg-recall workflow best practices --scope=personal-only
 ```
 
 ---
@@ -88,6 +88,6 @@ The agent handles all search execution, ranking, and result formatting.
 ---
 
 **Related commands:**
-- `/kmgraph:capture-lesson` — Document new lessons learned
-- `/kmgraph:update-graph` — Extract insights from lessons to KG
-- `/kmgraph:status` — Show active KG info
+- `/kmgraph:kmg-capture-lesson` — Document new lessons learned
+- `/kmgraph:kmg-update-graph` — Extract insights from lessons to KG
+- `/kmgraph:kmg-status` — Show active KG info

@@ -1,14 +1,14 @@
 
-# /kmgraph:add-category — Add Category to Knowledge Graph
+# /kmgraph:kmg-add-category — Add Category to Knowledge Graph
 
 Add a new category to the active knowledge graph with optional custom prefix and git strategy.
 
 ## Syntax
 
 ```bash
-/kmgraph:add-category
-/kmgraph:add-category security
-/kmgraph:add-category ml-ops --prefix ml- --git ignore
+/kmgraph:kmg-add-category
+/kmgraph:kmg-add-category security
+/kmgraph:kmg-add-category ml-ops --prefix ml- --git ignore
 ```
 
 ## What This Does
@@ -67,5 +67,5 @@ fi
 
 ## See Also
 
-- `/kmgraph:init` — Initialize new KG
-- `/kmgraph:list` — View all KGs and their categories
+- `/kmgraph:kmg-init` — Initialize new KG
+- `/kmgraph:kmg-list` — View all KGs and their categories

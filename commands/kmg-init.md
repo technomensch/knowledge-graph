@@ -3,7 +3,7 @@
 
 All bash/shell checks in this command are **implementation guidance only** — run them silently as internal steps. Never show bash commands, shell code, or raw command output to the user. Present only plain-English results, prompts, and status messages.
 
-# /kmgraph:init — Knowledge Graph Initialization Wizard
+# /kmgraph:kmg-init — Knowledge Graph Initialization Wizard
 
 Initialize a new knowledge graph with interactive wizard that guides you through location selection, category setup, and git strategy configuration.
 
@@ -104,7 +104,7 @@ if [ -f "$OLD_DB" ] && [ "$FTS5_MIGRATED" != "true" ]; then
     # Write consent marker — prevents prompt from reappearing on subsequent init runs
     jq ".graphs[\"${KG_NAME}\"].fts5_index_migrated = true" "$HOME/.claude/kg-config.json" > /tmp/kg-config-tmp.json \
       && mv /tmp/kg-config-tmp.json "$HOME/.claude/kg-config.json"
-    printf '✓ Index location updated. Run kg_fts5_rebuild or /kmgraph:sync-all to rebuild.\n'
+    printf '✓ Index location updated. Run kg_fts5_rebuild or /kmgraph:kmg-sync-all to rebuild.\n'
   else
     printf 'Skipped. Search continues via linear scan until you choose to migrate.\n'
   fi
@@ -114,7 +114,7 @@ fi
 **Constraints:**
 - Do NOT auto-rebuild on Yes — log only; user triggers rebuild explicitly
 - Do NOT delete old DB — user removes `~/.claude/kg-fts5/` manually after confirming
-- Idempotency: On Yes, write `fts5_index_migrated: true` to the active graph's entry in `~/.claude/kg-config.json` (done by the jq command above). On subsequent `/kmgraph:init` runs, the `FTS5_MIGRATED` check skips the prompt.
+- Idempotency: On Yes, write `fts5_index_migrated: true` to the active graph's entry in `~/.claude/kg-config.json` (done by the jq command above). On subsequent `/kmgraph:kmg-init` runs, the `FTS5_MIGRATED` check skips the prompt.
 - On No: do NOT write the marker — prompt reappears on next init (correct behavior)
 
 #### 1f.0b. Stale in-project FTS5 file cleanup
@@ -130,7 +130,7 @@ KG_ROOT="{project_root}"  # root of the git repo containing the KG
 REAL_DB="$HOME/.kmgraph/index/projects/${kg_name}.db"
 if [ ! -f "$REAL_DB" ]; then
   echo "ℹ️  Skipping stale FTS5 cleanup — new-location DB not found at $REAL_DB."
-  echo "   Run /kmgraph:sync-all to build it first, then re-run /kmgraph:init."
+  echo "   Run /kmgraph:kmg-sync-all to build it first, then re-run /kmgraph:kmg-init."
   # exit_step
 fi
 
@@ -198,7 +198,7 @@ if [ ! -d "$CONFIGURED_PATH" ]; then
   echo "   This may be due to a project rename or directory move."
   echo ""
   echo "   Options:"
-  echo "     1. Update the path — re-run /kmgraph:init to reconfigure"
+  echo "     1. Update the path — re-run /kmgraph:kmg-init to reconfigure"
   echo "     2. Skip — leave config as-is"
   # Do not proceed with migration trigger evaluation if the path is missing.
 fi
@@ -300,7 +300,7 @@ if [ "$MIGRATION_IN_PROGRESS" = "true" ]; then
     ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
   mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
 
-  echo "✅ Rollback complete. KG restored to docs/. Run /kmgraph:status to verify."
+  echo "✅ Rollback complete. KG restored to docs/. Run /kmgraph:kmg-status to verify."
   # Exit — do not proceed with forward migration
 fi
 ```
@@ -319,7 +319,7 @@ KG_PATH_ENDS_DOCS=$(echo "$CONFIGURED_PATH" | grep -E '/docs/?$')
 if [ "$KG_TYPE" = "project-local" ] && [ -n "$KG_PATH_ENDS_DOCS" ] && [ -d "$CONFIGURED_PATH/lessons-learned" ]; then
   echo "Your knowledge graph is stored in docs/ — the new recommended location is knowledge/."
   echo ""
-  echo "Move it now? This is reversible — if anything goes wrong, run /kmgraph:init again to roll back."
+  echo "Move it now? This is reversible — if anything goes wrong, run /kmgraph:kmg-init again to roll back."
   echo "  1. Yes — move KMGraph subdirs to knowledge/, update config and all cross-references"
   echo "  2. No — keep in docs/ (no changes)"
 fi
@@ -478,7 +478,7 @@ if [ -n "$MEMORY_FILE" ]; then
   if [ -n "$STALE" ]; then
     echo "⚠️  Stale docs/ references found in your MEMORY.md ($MEMORY_FILE):"
     echo "$STALE"
-    echo "   Update manually or re-run /kmgraph:init after editing."
+    echo "   Update manually or re-run /kmgraph:kmg-init after editing."
   fi
 fi
 
@@ -572,12 +572,12 @@ KG_ENTRY_COUNT=$(find "knowledge/knowledge" -name "*.md" ! -name "*template*" 2>
 if [ "$LESSON_COUNT" -gt 0 ] && [ "$KG_ENTRY_COUNT" -eq 0 ]; then
   echo "⚠️  $LESSON_COUNT lessons migrated but no KG entries exist yet."
   echo ""
-  echo "  Run /kmgraph:update-graph to extract patterns from your lessons?"
+  echo "  Run /kmgraph:kmg-update-graph to extract patterns from your lessons?"
   echo "  This populates knowledge/ with structured entries for fast recall."
   echo ""
   echo "    1. Yes — run update-graph now"
   echo "    2. Skip — I'll run it later"
-  # If Yes: invoke /kmgraph:update-graph --auto --sync-all
+  # If Yes: invoke /kmgraph:kmg-update-graph --auto --sync-all
 fi
 
 # h. Content migration offer — populate me.md and rules.md from existing CLAUDE.md
@@ -641,7 +641,7 @@ if [ -f "knowledge/rules.md" ]; then
   fi
 fi
 
-# i. Personal KG prompt — offer to run /kmgraph:init at user level if not already set up
+# i. Personal KG prompt — offer to run /kmgraph:kmg-init at user level if not already set up
 PERSONAL_KG_EXISTS=$(jq -r '.graphs | to_entries[] | select(.value.type == "personal") | .key' ~/.claude/kg-config.json 2>/dev/null)
 if [ -z "$PERSONAL_KG_EXISTS" ]; then
   echo ""
@@ -649,9 +649,9 @@ if [ -z "$PERSONAL_KG_EXISTS" ]; then
   echo "  A personal KG at ~/.kmgraph/ captures cross-project lessons"
   echo "  and conventions that apply everywhere, not just this project."
   echo ""
-  echo "    1. Yes — run /kmgraph:init-personal-kg now"
-  echo "    2. Skip — I'll set it up later with /kmgraph:init-personal-kg"
-  # If Yes: invoke /kmgraph:init-personal-kg
+  echo "    1. Yes — run /kmgraph:kmg-init-personal-kg now"
+  echo "    2. Skip — I'll set it up later with /kmgraph:kmg-init-personal-kg"
+  # If Yes: invoke /kmgraph:kmg-init-personal-kg
   # After personal KG is set up, run the content migration offer for the personal level:
   #   Source: ~/.claude/CLAUDE.md
   #   Targets: ~/.kmgraph/me.md, ~/.kmgraph/rules.md
@@ -668,14 +668,14 @@ fi
 #### 1f.2. Obsidian wiki link pass
 
 **Trigger:** Run this step if `wiki_pass_complete` is not `true` in the KG config entry.
-Re-running `/kmgraph:init` is the supported way to trigger the wiki pass at any time —
+Re-running `/kmgraph:kmg-init` is the supported way to trigger the wiki pass at any time —
 no separate command needed.
 
 ```bash
 WIKI_DONE=$(jq -r --arg kg "$kg_name" '.graphs[$kg].wiki_pass_complete // false' \
   ~/.claude/kg-config.json 2>/dev/null)
 if [ "$WIKI_DONE" = "true" ]; then
-  echo "ℹ️  Wiki pass already complete — skipping. Re-run /kmgraph:init to force recheck."
+  echo "ℹ️  Wiki pass already complete — skipping. Re-run /kmgraph:kmg-init to force recheck."
   # exit_step
 fi
 ```
@@ -753,7 +753,7 @@ jq '.graphs["'"$kg_name"'"].wiki_pass_complete = true' \
 mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
 ```
 
-**`--dry-run` mode (optional):** If `--dry-run` was passed to `/kmgraph:init`, print what would change per file without writing anything and do not set the `wiki_pass_complete` flag.
+**`--dry-run` mode (optional):** If `--dry-run` was passed to `/kmgraph:kmg-init`, print what would change per file without writing anything and do not set the `wiki_pass_complete` flag.
 
 #### 1f. FTS5 index check
 
@@ -803,7 +803,7 @@ Parameters:
 
 #### 1g. Knowledge extraction check
 
-The `knowledge/` directory holds structured patterns, concepts, and gotchas extracted from lessons. It is populated by `/kmgraph:update-graph` and is never populated automatically. Check whether extraction has been run:
+The `knowledge/` directory holds structured patterns, concepts, and gotchas extracted from lessons. It is populated by `/kmgraph:kmg-update-graph` and is never populated automatically. Check whether extraction has been run:
 
 ```bash
 LESSON_COUNT=$(find "$KG_ROOT/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
@@ -812,13 +812,13 @@ KG_COUNT=$(find "$KG_ROOT/knowledge" -name "*.md" ! -name "*template*" 2>/dev/nu
 if [ "$LESSON_COUNT" -gt 0 ] && [ "$KG_COUNT" -eq 0 ]; then
   echo "⚠️  knowledge/ is empty — $LESSON_COUNT lessons exist but patterns have never been extracted."
   echo ""
-  echo "  Run /kmgraph:update-graph now to populate structured KG entries?"
+  echo "  Run /kmgraph:kmg-update-graph now to populate structured KG entries?"
   echo "    1. Yes — extract patterns from existing lessons"
   echo "    2. Skip for now"
 fi
 ```
 
-If the user selects **Yes**, run `/kmgraph:update-graph --auto --sync-all`. The `--auto` flag skips per-lesson prompts (consent was given by answering Yes here) and `--sync-all` processes all lessons with missing entries in one pass. If the user selects **Skip**, continue — `update-graph` can be run at any time.
+If the user selects **Yes**, run `/kmgraph:kmg-update-graph --auto --sync-all`. The `--auto` flag skips per-lesson prompts (consent was given by answering Yes here) and `--sync-all` processes all lessons with missing entries in one pass. If the user selects **Skip**, continue — `update-graph` can be run at any time.
 
 #### 1h. Output verification summary
 
@@ -848,7 +848,7 @@ TOTAL_MB=$((TOTAL_KB / 1024))
 ```
 
 - If total > 10 MB: print the following (substituting the actual MB value):
-  > Note: Migration archives are taking up `X` MB. Run `/kmgraph:migration purge --older-than 30` to clean up.
+  > Note: Migration archives are taking up `X` MB. Run `/kmgraph:kmg-migration purge --older-than 30` to clean up.
 - If total ≤ 10 MB or no archive directories exist: silent (no output).
 
 ---
@@ -1036,7 +1036,7 @@ Parameters:
 ### Step 1.6.5: me.md and rules.md backfill offer
 
 Run this step whenever `me.md` contains only template placeholder text — on new installs,
-after content migration, and on re-runs of `/kmgraph:init`. Skip only if `me.md` already
+after content migration, and on re-runs of `/kmgraph:kmg-init`. Skip only if `me.md` already
 has substantial content (user has populated it manually).
 
 **Trigger check:**
@@ -1099,7 +1099,7 @@ existing CLAUDE.md?
 Install post-commit hook for lesson suggestions? [y/N]
 
 This hook will detect lesson-worthy commits (fix, debug, implement, refactor,
-pattern, architecture) and suggest running /kmgraph:capture-lesson.
+pattern, architecture) and suggest running /kmgraph:kmg-capture-lesson.
 
 Default: No (opt-in for alpha release)
 ```
@@ -1180,7 +1180,7 @@ into `[[wiki links]]` across all files in `lessons-learned/`, `decisions/`,
 `sessions/`, and `knowledge/concepts/`.
 
 **Trigger:** Run if `wiki_pass_complete` is not `true` in the KG config entry.
-This step is idempotent — re-running `/kmgraph:init` at any time will re-check
+This step is idempotent — re-running `/kmgraph:kmg-init` at any time will re-check
 and run the pass if not yet complete.
 
 ```bash
@@ -1198,14 +1198,14 @@ Wiki link pass available — converts bare ADR-NNN, ENH-NNN, #NNN, and lesson
 filename references to [[wiki links]] across your knowledge files.
 
   1. Run wiki pass now
-  2. Skip — I'll run it later by re-running /kmgraph:init
+  2. Skip — I'll run it later by re-running /kmgraph:kmg-init
 ```
 
 If the user selects 1, execute the full wiki link pass logic from Step 1f.2
 (ADR map build, NO-SUBSTITUTE zones, substitutions a–d, atomic write-back,
 `wiki_pass_complete: true` flag write).
 
-**`--dry-run` mode:** If `/kmgraph:init` was invoked with `--dry-run`, print
+**`--dry-run` mode:** If `/kmgraph:kmg-init` was invoked with `--dry-run`, print
 what would change per file without writing anything and do not set the flag.
 
 ---
@@ -1265,7 +1265,7 @@ Examples of personal lessons:
   • "TypeScript strict mode gotchas"
 
 1. Yes — create personal KG at ~/.kmgraph/
-2. No — skip for now (can create later with /kmgraph:init-personal-kg)
+2. No — skip for now (can create later with /kmgraph:kmg-init-personal-kg)
 ```
 
 **If Yes:**
@@ -1356,7 +1356,7 @@ Which platforms are you using? (select all that apply)
 
 6. Confirm:
    > "✅ Personal KG created at `~/.kmgraph/`
-   > Capture cross-project lessons with `/kmgraph:capture-lesson` — you'll be asked which KG to save to."
+   > Capture cross-project lessons with `/kmgraph:kmg-capture-lesson` — you'll be asked which KG to save to."
 
 7. Content migration offer for personal KG:
 
@@ -1401,7 +1401,7 @@ Which platforms are you using? (select all that apply)
    If `LESSON_COUNT` and `ADR_COUNT` are both 0: skip silently (normal for a fresh personal KG).
 
 **If No (to the overall personal KG offer):**
-   > "No problem. Run `/kmgraph:init-personal-kg` any time to set this up later."
+   > "No problem. Run `/kmgraph:kmg-init-personal-kg` any time to set this up later."
 
 ---
 
@@ -1429,14 +1429,14 @@ Directory Structure:
   rules.md             — Project rules and conventions
 
 Next steps:
-  /kmgraph:status          — View KG info and quick reference
-  /kmgraph:capture-lesson  — Document your first lesson
-  /kmgraph:recall "query"  — Search across KG
+  /kmgraph:kmg-status          — View KG info and quick reference
+  /kmgraph:kmg-capture-lesson  — Document your first lesson
+  /kmgraph:kmg-recall "query"  — Search across KG
 
 Templates copied to $KG_PATH
 Examples available at ${CLAUDE_PLUGIN_ROOT}/core/examples/ (not copied by default)
 
-⚠️  Privacy reminder: Review sensitive data with /kmgraph:check-sensitive before pushing to public repos.
+⚠️  Privacy reminder: Review sensitive data with /kmgraph:kmg-check-sensitive before pushing to public repos.
 ⚠️  Note: chat-history/, sessions/, tmp/, and me.md are always gitignored (never committed to version control)
 
 💡 Quarterly review recommended: me.md and rules.md change slowly but do change — review for drift and bloat every few months.
@@ -1484,7 +1484,7 @@ Review these entries in your KG and edit as needed.
 Backfill skipped. The knowledge graph starts empty and grows as you document lessons
 and decisions during development.
 
-Start with: /kmgraph:capture-lesson to document your first learning.
+Start with: /kmgraph:kmg-capture-lesson to document your first learning.
 ```
 
 ### Step 1.11: Configure AI Platform Files (Optional)
@@ -1671,7 +1671,7 @@ The updated config entry schema:
 Skip wizard with flags:
 
 ```bash
-/kmgraph:init --name my-project --location ./knowledge/ --categories architecture,process,patterns --git selective
+/kmgraph:kmg-init --name my-project --location ./knowledge/ --categories architecture,process,patterns --git selective
 ```
 
 **Parameters**:
@@ -1683,10 +1683,10 @@ Skip wizard with flags:
 
 ## Integration with Other Skills
 
-- `/kmgraph:list` will show this KG
-- `/kmgraph:switch` can change to/from this KG
-- `/kmgraph:status` will reference this KG if active
-- `/kmgraph:capture-lesson` will write to this KG
+- `/kmgraph:kmg-list` will show this KG
+- `/kmgraph:kmg-switch` can change to/from this KG
+- `/kmgraph:kmg-status` will reference this KG if active
+- `/kmgraph:kmg-capture-lesson` will write to this KG
 - All other skills operate on this KG once active
 
 ## Files Created
@@ -1716,7 +1716,7 @@ $KG_PATH/
 ├── sessions/                🔒 ALWAYS GITIGNORED
 │   └── session-template.md  (session summary template)
 ├── chat-history/            🔒 ALWAYS GITIGNORED
-│   (for /kmgraph:extract-chat output — local use only)
+│   (for /kmgraph:kmg-extract-chat output — local use only)
 └── tmp/                     🔒 ALWAYS GITIGNORED (scratch space)
 ```
 
@@ -1751,7 +1751,7 @@ $KG_PATH/
 
 ## See Also
 
-- `/kmgraph:list` — View all configured KGs
-- `/kmgraph:switch` — Change active KG
-- `/kmgraph:add-category` — Add categories to existing KG
-- `/kmgraph:status` — View active KG info and stats
+- `/kmgraph:kmg-list` — View all configured KGs
+- `/kmgraph:kmg-switch` — Change active KG
+- `/kmgraph:kmg-add-category` — Add categories to existing KG
+- `/kmgraph:kmg-status` — View active KG info and stats

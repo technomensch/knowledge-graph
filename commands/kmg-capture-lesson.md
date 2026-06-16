@@ -48,17 +48,17 @@ If `$project_kg` does not exist, or paths match, or user explicitly specified a 
 ## Syntax Detection
 
 **Create new lesson:**
-- `/kmgraph:capture-lesson` — guided Q&A, then capture
-- `/kmgraph:capture-lesson <topic>` — same, with topic pre-filled
+- `/kmgraph:kmg-capture-lesson` — guided Q&A, then capture
+- `/kmgraph:kmg-capture-lesson <topic>` — same, with topic pre-filled
 
 **Update existing lesson:**
-- `/kmgraph:capture-lesson update <filename>` — jump to Step 0
+- `/kmgraph:kmg-capture-lesson update <filename>` — jump to Step 0
 
 ---
 
 ## Step 0: Update an Existing Lesson
 
-*Entered when the user invokes `/kmgraph:capture-lesson update <filename>`.*
+*Entered when the user invokes `/kmgraph:kmg-capture-lesson update <filename>`.*
 
 1. Locate the file at `{active_kg_path}/lessons-learned/<filename>`. If not found, ask the user for the correct path.
 2. Read the file and extract: current version, last-updated date.
@@ -90,7 +90,7 @@ Ask:
 >
 > [y] Run session summary   [n] Skip   [?] What does this do?"
 
-If `?`: explain that this runs `/kmgraph:session-summary` in snapshot mode — a lightweight variant that records what was worked on, open plan items, and file changes without requiring a full wrap-up. The result is written to disk and used to enrich the lesson's context field.
+If `?`: explain that this runs `/kmgraph:kmg-session-summary` in snapshot mode — a lightweight variant that records what was worked on, open plan items, and file changes without requiring a full wrap-up. The result is written to disk and used to enrich the lesson's context field.
 
 If `y`:
 > "Include git history in the session summary? (adds ~5-15 sec)
@@ -171,6 +171,6 @@ After the agent returns, extract the draft content and display it verbatim in yo
 
 ## Related Commands
 
-- `/kmgraph:update-graph` — extract insights from a lesson into the knowledge graph
-- `/kmgraph:sync-all` — batch sync all lessons
-- `/kmgraph:create-adr` — create a standalone architectural decision record
+- `/kmgraph:kmg-update-graph` — extract insights from a lesson into the knowledge graph
+- `/kmgraph:kmg-sync-all` — batch sync all lessons
+- `/kmgraph:kmg-create-adr` — create a standalone architectural decision record

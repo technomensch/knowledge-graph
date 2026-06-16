@@ -34,7 +34,7 @@ Detailed workflow patterns for different knowledge graph usage scenarios, with c
 #### Step 1: Initialize Knowledge Graph
 
 ```bash
-/kmgraph:init my-project
+/kmgraph:kmg-init my-project
 ```
 
 **Interactive Wizard:**
@@ -99,7 +99,7 @@ EOF
 
 ```bash
 # View status
-/kmgraph:status
+/kmgraph:kmg-status
 
 # Expected output:
 # ✅ Active KG: my-project
@@ -111,7 +111,7 @@ EOF
 #### Step 5: Capture First Lesson
 
 ```bash
-/kmgraph:capture-lesson initial-setup
+/kmgraph:kmg-capture-lesson initial-setup
 ```
 
 **Document:**
@@ -162,7 +162,7 @@ EOF
 
 ```bash
 # After resolving the bug
-/kmgraph:capture-lesson debugging-session-title
+/kmgraph:kmg-capture-lesson debugging-session-title
 
 # Document while fresh:
 # - What was the symptom?
@@ -181,7 +181,7 @@ git add [fixed-files]
 git commit -m "fix: resolve issue description"
 
 # Capture the lesson (automatically records commit hash)
-/kmgraph:capture-lesson debugging-issue-name
+/kmgraph:kmg-capture-lesson debugging-issue-name
 
 # Lesson now has git metadata linking to the fix commit
 ```
@@ -194,7 +194,7 @@ git commit -m "fix: resolve issue description"
 
 ```bash
 # After decision is made and initial implementation started
-/kmgraph:capture-lesson architecture-decision-title
+/kmgraph:kmg-capture-lesson architecture-decision-title
 
 # Document:
 # - What options were considered?
@@ -213,7 +213,7 @@ git commit -m "fix: resolve issue description"
 
 ```bash
 # When pattern is working and tested
-/kmgraph:capture-lesson pattern-name
+/kmgraph:kmg-capture-lesson pattern-name
 
 # Document:
 # - What problem does this solve?
@@ -282,7 +282,7 @@ Mental checklist:
 #### Step 2: Create Session Summary
 
 ```bash
-/kmgraph:session-summary
+/kmgraph:kmg-session-summary
 ```
 
 **Generated Summary Includes:**
@@ -305,7 +305,7 @@ Mental checklist:
 
 **Check if lessons were captured:**
 ```bash
-/kmgraph:status
+/kmgraph:kmg-status
 
 # If lessons were captured during session, they'll be linked automatically
 # If not, consider capturing significant learnings now
@@ -368,7 +368,7 @@ Mental checklist:
 **Before starting fresh investigation:**
 
 ```bash
-/kmgraph:recall "problem description"
+/kmgraph:kmg-recall "problem description"
 
 # Search for:
 # - Similar problems solved before
@@ -405,7 +405,7 @@ Mental checklist:
 
 ```bash
 # After solution is verified
-/kmgraph:capture-lesson problem-description
+/kmgraph:kmg-capture-lesson problem-description
 
 # Include:
 # - Problem and symptoms
@@ -419,7 +419,7 @@ Mental checklist:
 
 ```bash
 # If tracked in GitHub
-/kmgraph:link-issue lesson-id issue-number
+/kmgraph:kmg-link-issue lesson-id issue-number
 
 # Creates bidirectional link:
 # - Lesson references GitHub issue
@@ -476,7 +476,7 @@ Mental checklist:
 
 ```bash
 # Create meta-issue for tracking
-/kmgraph:meta-issue 123
+/kmgraph:kmg-meta-issue 123
 
 # Document in meta-issue:
 # - Pattern description
@@ -504,7 +504,7 @@ Mental checklist:
 
 ```bash
 # When problem recurs or initial attempts fail
-/kmgraph:meta-issue 123
+/kmgraph:kmg-meta-issue 123
 
 # GitHub issue #123 is now tracked as meta-issue
 ```
@@ -576,7 +576,7 @@ Mental checklist:
 
 ```bash
 # Once resolved
-/kmgraph:capture-lesson meta-issue-resolution
+/kmgraph:kmg-capture-lesson meta-issue-resolution
 
 # Include:
 # - Full investigation history
@@ -625,8 +625,8 @@ Mental checklist:
 
 ```bash
 # Extract chat history from recent sessions
-/kmgraph:extract-chat              # Claude + Gemini
-/kmgraph:extract-chat --source codex   # Codex CLI only
+/kmgraph:kmg-extract-chat              # Claude + Gemini
+/kmgraph:kmg-extract-chat --source codex   # Codex CLI only
 
 # Processes:
 # - Claude chat logs (if available)
@@ -653,7 +653,7 @@ ls docs/chat-history/
 
 ```bash
 # For each significant learning not yet captured
-/kmgraph:capture-lesson topic-from-chat
+/kmgraph:kmg-capture-lesson topic-from-chat
 
 # Fill in:
 # - Context from chat
@@ -665,7 +665,7 @@ ls docs/chat-history/
 
 ```bash
 # Consolidate lessons into knowledge graph
-/kmgraph:update-graph
+/kmgraph:kmg-update-graph
 
 # Processes lessons-learned/:
 # - Extracts patterns
@@ -698,12 +698,12 @@ cat docs/knowledge/architecture.md
 
 ```bash
 # Single command for complete pipeline
-/kmgraph:sync-all
+/kmgraph:kmg-sync-all
 
 # Equivalent to:
-# 1. /kmgraph:extract-chat
+# 1. /kmgraph:kmg-extract-chat
 # 2. Auto-capture lessons from chats
-# 3. /kmgraph:update-graph
+# 3. /kmgraph:kmg-update-graph
 # 4. Generate session summaries
 ```
 
@@ -754,12 +754,12 @@ cat docs/knowledge/architecture.md
 **For specific problems:**
 
 ```bash
-/kmgraph:recall "specific problem description"
+/kmgraph:kmg-recall "specific problem description"
 
 # Examples:
-/kmgraph:recall "database connection timeout"
-/kmgraph:recall "React useEffect infinite loop"
-/kmgraph:recall "Docker build cache"
+/kmgraph:kmg-recall "database connection timeout"
+/kmgraph:kmg-recall "React useEffect infinite loop"
+/kmgraph:kmg-recall "Docker build cache"
 ```
 
 **Search Scope:**
@@ -807,7 +807,7 @@ cat docs/knowledge/concepts.md
 **For quick reference:**
 
 ```bash
-/kmgraph:status
+/kmgraph:kmg-status
 
 # Shows:
 # - Active KG info
@@ -827,14 +827,14 @@ cat docs/knowledge/concepts.md
 **Examples:**
 ```bash
 # Good queries:
-/kmgraph:recall "PostgreSQL connection pool exhausted"
-/kmgraph:recall "Next.js SSR hydration mismatch"
-/kmgraph:recall "AWS Lambda cold start optimization"
+/kmgraph:kmg-recall "PostgreSQL connection pool exhausted"
+/kmgraph:kmg-recall "Next.js SSR hydration mismatch"
+/kmgraph:kmg-recall "AWS Lambda cold start optimization"
 
 # Vague queries (less effective):
-/kmgraph:recall "database problem"
-/kmgraph:recall "React issue"
-/kmgraph:recall "deployment"
+/kmgraph:kmg-recall "database problem"
+/kmgraph:kmg-recall "React issue"
+/kmgraph:kmg-recall "deployment"
 ```
 
 ### When Search Returns Nothing
@@ -878,7 +878,7 @@ cat docs/knowledge/concepts.md
 **During KG initialization:**
 
 ```bash
-/kmgraph:init team-project
+/kmgraph:kmg-init team-project
 
 # Git strategy: Selective
 # - Commit: architecture, patterns, process
@@ -964,7 +964,7 @@ Architectural decisions documented in:
 ```bash
 # Set up local KG
 git clone [repo]
-/kmgraph:switch team-project
+/kmgraph:kmg-switch team-project
 
 # Browse knowledge graph
 cat docs/knowledge/index.md
@@ -972,8 +972,8 @@ cat docs/knowledge/architecture.md
 cat docs/knowledge/patterns.md
 
 # Search for specific topics
-/kmgraph:recall "getting started"
-/kmgraph:recall "local development setup"
+/kmgraph:kmg-recall "getting started"
+/kmgraph:kmg-recall "local development setup"
 ```
 
 ---
@@ -996,10 +996,10 @@ git clone [repo-url]
 cd [project]
 
 # Switch to project KG
-/kmgraph:switch [project-name]
+/kmgraph:kmg-switch [project-name]
 
 # Verify activation
-/kmgraph:status
+/kmgraph:kmg-status
 ```
 
 #### Step 2: Read Knowledge Graph Index
@@ -1059,9 +1059,9 @@ cat docs/knowledge/gotchas.md
 
 ```bash
 # As questions arise
-/kmgraph:recall "how to deploy"
-/kmgraph:recall "local database setup"
-/kmgraph:recall "running tests"
+/kmgraph:kmg-recall "how to deploy"
+/kmgraph:kmg-recall "local database setup"
+/kmgraph:kmg-recall "running tests"
 ```
 
 ### Onboarding Checklist
@@ -1074,8 +1074,8 @@ cat docs/knowledge/gotchas.md
 - [ ] README.md (project overview)
 
 **Setup Validation:**
-- [ ] KG activated with `/kmgraph:status`
-- [ ] Can search knowledge with `/kmgraph:recall`
+- [ ] KG activated with `/kmgraph:kmg-status`
+- [ ] Can search knowledge with `/kmgraph:kmg-recall`
 - [ ] Local development environment working
 - [ ] Tests passing
 
@@ -1100,7 +1100,7 @@ cat docs/knowledge/gotchas.md
 #### Step 1: Review Statistics
 
 ```bash
-/kmgraph:status
+/kmgraph:kmg-status
 
 # Check:
 # - Total lessons count
@@ -1126,7 +1126,7 @@ find docs/lessons-learned -name "*.md" -mtime +180
 
 ```bash
 # Scan for sensitive information
-/kmgraph:check-sensitive
+/kmgraph:kmg-check-sensitive
 
 # Review matches for:
 # - API keys or tokens
@@ -1139,7 +1139,7 @@ find docs/lessons-learned -name "*.md" -mtime +180
 
 ```bash
 # Look for similar lessons
-/kmgraph:recall "similar topic"
+/kmgraph:kmg-recall "similar topic"
 
 # Check for:
 # - Duplicate content
@@ -1151,7 +1151,7 @@ find docs/lessons-learned -name "*.md" -mtime +180
 
 ```bash
 # Re-consolidate lessons
-/kmgraph:update-graph
+/kmgraph:kmg-update-graph
 
 # Review generated:
 # - docs/knowledge/patterns.md
@@ -1194,7 +1194,7 @@ rm docs/lessons-learned/obsolete-lesson.md
 
 **Metrics to Track:**
 - Lesson capture rate (per week/month)
-- Search usage (how often `/kmgraph:recall` used)
+- Search usage (how often `/kmgraph:kmg-recall` used)
 - Knowledge reuse (citations in code/PRs)
 - Team satisfaction (developer surveys)
 
@@ -1211,39 +1211,39 @@ rm docs/lessons-learned/obsolete-lesson.md
 
 | Workflow | When | Duration | Frequency | Key Commands |
 |----------|------|----------|-----------|--------------|
-| First-Time Setup | New project | 10-15 min | Once | `/kmgraph:init` |
-| Daily Development | Regular coding | 5-30 min | 1-3x/day | `/kmgraph:capture-lesson` |
-| End-of-Session | After productive sessions | 5-10 min | 1-2x/day | `/kmgraph:session-summary` |
-| Problem-Solving | Facing specific problem | Varies | As needed | `/kmgraph:recall`, `/kmgraph:capture-lesson` |
-| Complex Investigation | Multi-attempt problems | Multiple sessions | 1-2x/month | `/kmgraph:meta-issue` |
-| Periodic Consolidation | Knowledge maintenance | 30-60 min | Weekly/bi-weekly | `/kmgraph:sync-all` |
-| Knowledge Search | Finding past knowledge | 2-10 min | Multiple/day | `/kmgraph:recall` |
+| First-Time Setup | New project | 10-15 min | Once | `/kmgraph:kmg-init` |
+| Daily Development | Regular coding | 5-30 min | 1-3x/day | `/kmgraph:kmg-capture-lesson` |
+| End-of-Session | After productive sessions | 5-10 min | 1-2x/day | `/kmgraph:kmg-session-summary` |
+| Problem-Solving | Facing specific problem | Varies | As needed | `/kmgraph:kmg-recall`, `/kmgraph:kmg-capture-lesson` |
+| Complex Investigation | Multi-attempt problems | Multiple sessions | 1-2x/month | `/kmgraph:kmg-meta-issue` |
+| Periodic Consolidation | Knowledge maintenance | 30-60 min | Weekly/bi-weekly | `/kmgraph:kmg-sync-all` |
+| Knowledge Search | Finding past knowledge | 2-10 min | Multiple/day | `/kmgraph:kmg-recall` |
 | Team Collaboration | Sharing with team | Continuous | Continuous | Selective git strategy |
-| Project Onboarding | Starting on project | 30-60 min | Once | `/kmgraph:switch`, read knowledge graph |
-| Review & Maintenance | Quality assurance | 1-2 hours | Monthly/quarterly | `/kmgraph:check-sensitive`, review stats |
+| Project Onboarding | Starting on project | 30-60 min | Once | `/kmgraph:kmg-switch`, read knowledge graph |
+| Review & Maintenance | Quality assurance | 1-2 hours | Monthly/quarterly | `/kmgraph:kmg-check-sensitive`, review stats |
 
 ## Quick Reference by Situation
 
 **"I just solved a complex bug"**
-→ `/kmgraph:capture-lesson debugging-[issue]`
+→ `/kmgraph:kmg-capture-lesson debugging-[issue]`
 
 **"Made an architectural decision"**
-→ `/kmgraph:capture-lesson architecture-[decision]`
+→ `/kmgraph:kmg-capture-lesson architecture-[decision]`
 
 **"End of productive day"**
-→ `/kmgraph:session-summary`
+→ `/kmgraph:kmg-session-summary`
 
 **"Facing familiar problem"**
-→ `/kmgraph:recall "[problem description]"`
+→ `/kmgraph:kmg-recall "[problem description]"`
 
 **"Same issue third time"**
-→ `/kmgraph:meta-issue [number]`
+→ `/kmgraph:kmg-meta-issue [number]`
 
 **"Weekly review time"**
-→ `/kmgraph:sync-all`
+→ `/kmgraph:kmg-sync-all`
 
 **"New project setup"**
-→ `/kmgraph:init [name]`
+→ `/kmgraph:kmg-init [name]`
 
 **"Joining existing project"**
 → Read `docs/knowledge/index.md`
@@ -1252,7 +1252,7 @@ rm docs/lessons-learned/obsolete-lesson.md
 → Commit architecture/patterns/, gitignore debugging/
 
 **"Monthly maintenance"**
-→ `/kmgraph:check-sensitive`, review stats
+→ `/kmgraph:kmg-check-sensitive`, review stats
 
 ---
 
@@ -1273,7 +1273,7 @@ rm docs/lessons-learned/obsolete-lesson.md
 - More efficient than constant updates
 
 **Automation:**
-- Use `/kmgraph:sync-all` for full pipeline
+- Use `/kmgraph:kmg-sync-all` for full pipeline
 - Configure git hooks for validation
 - Automate sensitive data checks
 - Schedule periodic reviews

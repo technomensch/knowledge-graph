@@ -1,7 +1,7 @@
 
 # Skill: kmg-brainstorm-recall
 
-**Purpose:** Ensure the knowledge graph is consulted before any recommendation is made. Fires before `adr-guide` on the same trigger surface.
+**Purpose:** Ensure the knowledge graph is consulted before any recommendation is made. Fires before `kmg-adr-guide` on the same trigger surface.
 
 **Trigger Keywords:**
 - "should we"
@@ -13,7 +13,7 @@
 - "how should we"
 - When `superpowers:brainstorming` is invoked via Skill tool
 
-**Precedence:** This skill fires BEFORE `adr-guide`. If both trigger, run recall first, then allow adr-guide to proceed.
+**Precedence:** This skill fires BEFORE `kmg-adr-guide`. If both trigger, run recall first, then allow adr-guide to proceed.
 
 > **Enforcement note (ENH-015):** "Fires before" is not just a prose claim — it is enforced by the `pre-skill-rules-inject.sh` HARD BLOCK added in Task 6b. The hook injects the Brainstorm Recall block into context before the skill executes, making the recall step mandatory regardless of which skills auto-trigger. See `knowledge/enhancements/ENH-015/ENH-015-specification.md` §"Existing Skill Conflicts Resolved" for the full precedence rationale. The skill trigger overlap with `adr-guide` is intentional — ENH-015 documents why separate skills are correct (different lifecycle phases) and why merging produces unreliable auto-invocation.
 
@@ -22,7 +22,7 @@
 1. **Extract the topic** from the user's question or the brainstorming context (1–5 words).
 
 2. **Run recall** before answering:
-   Invoke the kmgraph:recall skill (via Skill tool) with the extracted topic as input.
+   Invoke the kmgraph:kmg-recall skill (via Skill tool) with the extracted topic as input.
 
 3. **Present prior art** under a "Prior Art" heading before your recommendation:
    - Relevant ADRs found
@@ -38,7 +38,7 @@
 
 **Integration:**
 - Works alongside `superpowers:brainstorming` — does not replace it
-- Recall results feed into `adr-guide` if a decision crystallizes from the brainstorm
+- Recall results feed into `kmg-adr-guide` if a decision crystallizes from the brainstorm
 
 **Background agent dispatch (non-blocking):**
 

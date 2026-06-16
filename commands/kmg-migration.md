@@ -3,7 +3,7 @@
 
 All bash/shell checks in this command are **implementation guidance only** — run them silently as internal steps. Never show bash commands, shell code, or raw command output to the user. Present only plain-English results, prompts, and status messages.
 
-# /kmgraph:migration — Migration Management
+# /kmgraph:kmg-migration — Migration Management
 
 Inspect and restore knowledge graph archives created by the knowledge-file-migrator. Supports two subcommands: `list` and `rollback`.
 
@@ -15,19 +15,19 @@ Before any subcommand executes, verify that an active knowledge graph is configu
 KG_CONFIG="$HOME/.claude/kg-config.json"
 
 if [ ! -f "$KG_CONFIG" ]; then
-  abort "No active knowledge graph found. Run \`/kmgraph:init\` first."
+  abort "No active knowledge graph found. Run \`/kmgraph:kmg-init\` first."
 fi
 
 ACTIVE_KG=$(jq -r '.active // empty' "$KG_CONFIG")
 if [ -z "$ACTIVE_KG" ]; then
-  abort "No active knowledge graph found. Run \`/kmgraph:init\` first."
+  abort "No active knowledge graph found. Run \`/kmgraph:kmg-init\` first."
 fi
 
 KG_PATH=$(jq -r --arg name "$ACTIVE_KG" '.graphs[$name].path // empty' "$KG_CONFIG")
 KG_TYPE=$(jq -r --arg name "$ACTIVE_KG" '.graphs[$name].type // empty' "$KG_CONFIG")
 
 if [ -z "$KG_PATH" ] || [ ! -d "$KG_PATH" ]; then
-  abort "No active knowledge graph found. Run \`/kmgraph:init\` first."
+  abort "No active knowledge graph found. Run \`/kmgraph:kmg-init\` first."
 fi
 ```
 
@@ -35,7 +35,7 @@ fi
 
 ## Subcommand: `list`
 
-Usage: `/kmgraph:migration list`
+Usage: `/kmgraph:kmg-migration list`
 
 ### Steps
 
@@ -96,7 +96,7 @@ Do not crash or silently skip rows with missing manifests.
 
 ## Subcommand: `rollback`
 
-Usage: `/kmgraph:migration rollback <id> [--include-platform-config]`
+Usage: `/kmgraph:kmg-migration rollback <id> [--include-platform-config]`
 
 Where `<id>` is the timestamp string from the manifest (e.g., `20260411-143022`).
 
@@ -114,7 +114,7 @@ elif [ -d "$HOME/.kmgraph/.kg-archive-${ID}" ]; then
   ARCHIVE_DIR="$HOME/.kmgraph/.kg-archive-${ID}"
   ROLLBACK_SCOPE="personal"
 else
-  abort "Archive not found: .kg-archive-${ID}. Run \`/kmgraph:migration list\` to see available restore points."
+  abort "Archive not found: .kg-archive-${ID}. Run \`/kmgraph:kmg-migration list\` to see available restore points."
 fi
 
 MANIFEST="$ARCHIVE_DIR/manifest.json"
@@ -273,7 +273,7 @@ Require explicit confirmation before removing any lines from the platform config
 ### Step 6 — Completion message
 
 ```
-Restore complete. Archive at .kg-archive-<id>/ preserved (run /kmgraph:migration purge <id> to delete).
+Restore complete. Archive at .kg-archive-<id>/ preserved (run /kmgraph:kmg-migration purge <id> to delete).
 ```
 
 Print which files were restored and from where, followed by the above completion message.
@@ -283,9 +283,9 @@ Print which files were restored and from where, followed by the above completion
 ## Subcommand: `purge`
 
 Usage:
-- `/kmgraph:migration purge --list`
-- `/kmgraph:migration purge --older-than <days>`
-- `/kmgraph:migration purge --id <id>`
+- `/kmgraph:kmg-migration purge --list`
+- `/kmgraph:kmg-migration purge --older-than <days>`
+- `/kmgraph:kmg-migration purge --id <id>`
 
 Deletes one or more migration archives. **Never auto-deletes without user confirmation.**
 
@@ -304,7 +304,7 @@ TOTAL_MB=$((TOTAL_KB / 1024))
 ```
 
 If total exceeds 10 MB, print:
-> Note: Migration archives are taking up `X` MB total. Run `/kmgraph:migration purge --older-than 30` to clean up.
+> Note: Migration archives are taking up `X` MB total. Run `/kmgraph:kmg-migration purge --older-than 30` to clean up.
 
 If total is ≤ 10 MB or no archives remain, this check is silent.
 
@@ -312,7 +312,7 @@ If total is ≤ 10 MB or no archives remain, this check is silent.
 
 ### `--list` variant
 
-Usage: `/kmgraph:migration purge --list`
+Usage: `/kmgraph:kmg-migration purge --list`
 
 Show all archives from both project and personal scopes. Output the same formatted table as `migration list`:
 
@@ -325,7 +325,7 @@ If no archives found in either scope, print:
 
 ### `--older-than <days>` variant
 
-Usage: `/kmgraph:migration purge --older-than <days>`
+Usage: `/kmgraph:kmg-migration purge --older-than <days>`
 
 If `--older-than` is omitted, default to **30 days**.
 
@@ -374,7 +374,7 @@ Print count of archives deleted and space freed. Apply post-purge size warning i
 
 ### `--id <id>` variant
 
-Usage: `/kmgraph:migration purge --id <id>`
+Usage: `/kmgraph:kmg-migration purge --id <id>`
 
 Where `<id>` is the timestamp string from the manifest (e.g., `20260411-143022`).
 
@@ -392,7 +392,7 @@ elif [ -d "$HOME/.kmgraph/.kg-archive-${ID}" ]; then
   ARCHIVE_DIR="$HOME/.kmgraph/.kg-archive-${ID}"
   PURGE_SCOPE="personal"
 else
-  abort "Archive not found: .kg-archive-${ID}. Run \`/kmgraph:migration purge --list\` to see available archives."
+  abort "Archive not found: .kg-archive-${ID}. Run \`/kmgraph:kmg-migration purge --list\` to see available archives."
 fi
 
 MANIFEST="$ARCHIVE_DIR/manifest.json"

@@ -16,10 +16,10 @@
 
 ## Do NOT trigger on
 
-- "capture a lesson" → handled by `lesson-capture` skill
-- "create an ADR" → handled by `adr-guide` skill
-- "update the doc" / "update [filename]" → handled by `doc-update-router` skill
-- Implicit behavioral corrections without "capture that" vocabulary ("always X", "never X", "from now on X", "don't do X" as a standing rule) → handled by `rules-capture` skill
+- "capture a lesson" → handled by `kmg-lesson-capture` skill
+- "create an ADR" → handled by `kmg-adr-guide` skill
+- "update the doc" / "update [filename]" → handled by `kmg-doc-update-router` skill
+- Implicit behavioral corrections without "capture that" vocabulary ("always X", "never X", "from now on X", "don't do X" as a standing rule) → handled by `kmg-rules-capture` skill
 
 ## Execution Flow
 
@@ -48,8 +48,8 @@ Apply detection logic in this order:
 | Correction, preference, "don't do X", "always/never", behavior rule | **Rule/Me** | Route to `rules-capture-agent` with `source_quote` and `session_context`; do not write FEEDBACK file |
 | Ongoing work, deadline, stakeholder, in-progress state, task | **Project (memory)** | Project | Always project-level |
 | External system pointer, URL, tool name + location, reference | **Reference (memory)** | Reference | Always project-level |
-| Bug solved, pattern learned, "next time", "I learned", insight | **Lesson** | N/A | Dispatch to `/kmgraph:capture-lesson` |
-| Trade-off, "we decided", "because of", architecture choice, rationale | **ADR** | N/A | Dispatch to `/kmgraph:create-adr` |
+| Bug solved, pattern learned, "next time", "I learned", insight | **Lesson** | N/A | Dispatch to `/kmgraph:kmg-capture-lesson` |
+| Trade-off, "we decided", "because of", architecture choice, rationale | **ADR** | N/A | Dispatch to `/kmgraph:kmg-create-adr` |
 
 **Location detection (memory types only):**
 - If content references this repo, specific files, KMGraph behavior → **project-level** (~/.claude/projects/{project}/memory/)
@@ -109,8 +109,8 @@ Does that sound right, or should this go somewhere else?
 | Feedback (user) | `~/.claude/memory/` | Write `FEEDBACK-{id}.md` or append to feedback file |
 | Project (project) | `~/.claude/projects/{project}/memory/` | Write `PROJECT-{id}.md` or append to project memory file |
 | Reference (project) | `~/.claude/projects/{project}/memory/` | Write `REFERENCE-{id}.md` or append to reference file |
-| Lesson | Dispatch to `/kmgraph:capture-lesson` | Command handles full capture workflow |
-| ADR | Dispatch to `/kmgraph:create-adr` | Command handles full ADR workflow |
+| Lesson | Dispatch to `/kmgraph:kmg-capture-lesson` | Command handles full capture workflow |
+| ADR | Dispatch to `/kmgraph:kmg-create-adr` | Command handles full ADR workflow |
 
 ## User-Facing Language
 
@@ -128,7 +128,7 @@ This skill does NOT conflict with:
 - `adr-guide` — fires on decision context; capture-router fires on "capture that"
 - `doc-update-router` — fires on "update docs"; capture-router fires on "capture/remember/save that"
 
-Each has distinct trigger vocabulary. If user says "capture that lesson" → capture-router fires, detects it's a lesson, dispatches to `/kmgraph:capture-lesson`.
+Each has distinct trigger vocabulary. If user says "capture that lesson" → capture-router fires, detects it's a lesson, dispatches to `/kmgraph:kmg-capture-lesson`.
 
 ## Natural Language & ECC Compatibility
 

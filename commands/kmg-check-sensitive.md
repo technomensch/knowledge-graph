@@ -1,5 +1,5 @@
 
-# /kmgraph:check-sensitive — Scan for Sensitive Data
+# /kmgraph:kmg-check-sensitive — Scan for Sensitive Data
 
 Scan the active knowledge graph for potentially sensitive information using regex patterns from config or defaults.
 
@@ -14,8 +14,8 @@ Scans all markdown files in active KG for:
 ## Syntax
 
 ```bash
-/kmgraph:check-sensitive
-/kmgraph:check-sensitive --fix-suggestions
+/kmgraph:kmg-check-sensitive
+/kmgraph:kmg-check-sensitive --fix-suggestions
 ```
 
 ## Implementation
@@ -103,4 +103,4 @@ Run with --fix-suggestions to see recommended fixes.
 
 ## See Also
 
-- `/kmgraph:configure-sanitization` — Set up automated pre-commit scanning
+- `/kmgraph:kmg-config-sanitization` — Set up automated pre-commit scanning

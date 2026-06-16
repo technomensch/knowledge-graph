@@ -66,7 +66,7 @@ If flag ABSENT: skip this check and proceed normally.
 
 > **Detection mechanism:** flag file written by `adr-guide` after successful ADR creation. Day-scoped via `$(date +%Y-%m-%d)` — consistent with existing `kmgraph-plan-gate` pattern. No model self-tracking required.
 
-> **Subagent fallback:** If `gov-execute-plan` is somehow invoked as a subagent with the flag present (parent failed to gate), output: "Parent must resolve in-plan cascade before dispatching subagents. HALT." Do not attempt to prompt the user — subagents have no interaction channel.
+> **Subagent fallback:** If `kmg-execute-plan` is somehow invoked as a subagent with the flag present (parent failed to gate), output: "Parent must resolve in-plan cascade before dispatching subagents. HALT." Do not attempt to prompt the user — subagents have no interaction channel.
 
 **Protocol Steps:**
 1. **State Initialization** — Output STRICT EXECUTION MODE banner before any action
@@ -78,7 +78,7 @@ If flag ABSENT: skip this check and proceed normally.
 7. **Completion Verification** — Quote each success criterion and verify it. Output completion status.
 8. **Commit Gate** — After all tasks complete, create conventional commit with issue reference.
 
-**Source:** Adapted from `.agent/workflows/gov-execute-plan.md`
+**Source:** Adapted from `.agent/workflows/gov-execute-plan.md` (now kmg-execute-plan)
 
 **Key Constraint:** "No improvements" — even if you spot bugs, better implementations, or missing error handling, DO NOT FIX unless explicitly in the plan.
 

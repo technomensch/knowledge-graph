@@ -64,7 +64,7 @@ When triggered, guide the user toward documenting the decision as an Architectur
    The agent uses `context_provided: true` to skip its interactive wizard and go directly to draft generation.
 
 5. **Step 4a — Project-wide cascade:**
-   After extracting the decision, invoke the `kmgraph:recall` skill (via Skill tool) with the decision topic as input, then grep for other ADRs, skills, commands, docs referencing the affected concept. Present a list: `[file] — [action required]`. If nothing found, state it explicitly.
+   After extracting the decision, invoke the `kmgraph:kmg-recall` skill (via Skill tool) with the decision topic as input, then grep for other ADRs, skills, commands, docs referencing the affected concept. Present a list: `[file] — [action required]`. If nothing found, state it explicitly.
 
 6. **Step 4b — In-plan cascade advisory:**
    If an active plan exists (check `docs/plans/` for recently modified plan files), output:
@@ -82,7 +82,7 @@ When triggered, guide the user toward documenting the decision as an Architectur
 **Dispatch:**
 When the user agrees to create an ADR, spawn the `create-adr-agent` subagent with the full context payload defined in Behavior step 4 above.
 
-After `create-adr-agent` completes successfully and the ADR file is confirmed written, touch a flag file so `gov-execute-plan` can detect ADR capture without model self-tracking:
+After `create-adr-agent` completes successfully and the ADR file is confirmed written, touch a flag file so `kmg-execute-plan` can detect ADR capture without model self-tracking:
 ```bash
 touch "/tmp/kmgraph-adr-captured-$(date +%Y-%m-%d).flag"
 ```
@@ -107,4 +107,4 @@ Want me to create the ADR from this?"
 
 If the user agrees, dispatch to `create-adr-agent` with the full context payload.
 
-**v0.2.1 Decision Note:** Agent dispatch was chosen over the previous `/kmgraph:create-adr` command suggestion because the ADR creation workflow (7 phases, 8 user prompts, git metadata, template population, index management) benefits from dedicated agent handling. The `create-adr` command's thin refactor to dispatch to this agent is deferred to v0.2.2.
+**v0.2.1 Decision Note:** Agent dispatch was chosen over the previous `/kmgraph:kmg-create-adr` command suggestion because the ADR creation workflow (7 phases, 8 user prompts, git metadata, template population, index management) benefits from dedicated agent handling. The `create-adr` command's thin refactor to dispatch to this agent is deferred to v0.2.2.

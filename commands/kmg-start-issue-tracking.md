@@ -8,14 +8,14 @@
 ## Command Syntax
 
 ```
-/kmgraph:start-issue-tracking
-/kmgraph:start-issue-tracking <brief-description>
+/kmgraph:kmg-start-issue-tracking
+/kmgraph:kmg-start-issue-tracking <brief-description>
 ```
 
 **Examples:**
-- `/kmgraph:start-issue-tracking`
-- `/kmgraph:start-issue-tracking CLI flag parsing fails on quoted args`
-- `/kmgraph:start-issue-tracking Add token usage display`
+- `/kmgraph:kmg-start-issue-tracking`
+- `/kmgraph:kmg-start-issue-tracking CLI flag parsing fails on quoted args`
+- `/kmgraph:kmg-start-issue-tracking Add token usage display`
 
 ---
 
@@ -49,7 +49,7 @@ Single prompt: "Create issue/5-slug from main as [Bug/Enhancement], push? (y/n)"
 
 ## When to Use This Command
 
-Use `/kmgraph:start-issue-tracking` when:
+Use `/kmgraph:kmg-start-issue-tracking` when:
 - You've identified a bug that needs to be fixed
 - You're planning a new feature or enhancement
 - You want to document a problem before solving it
@@ -61,7 +61,7 @@ Use `/kmgraph:start-issue-tracking` when:
 
 **Do NOT use for:**
 - Simple typo fixes or trivial changes
-- Work that's already complete (use `/kmgraph:capture-lesson` instead)
+- Work that's already complete (use `/kmgraph:kmg-capture-lesson` instead)
 - General documentation updates (use standard Git workflow)
 
 ---
@@ -81,7 +81,7 @@ Use `/kmgraph:start-issue-tracking` when:
    >
    > [y] Run session summary   [n] Skip   [?] What does this do?"
 
-   If `?`: explain that this runs `/kmgraph:session-summary` in snapshot mode — a lightweight variant that records what was worked on, open plan items, and file changes without requiring a full wrap-up. The result is written to disk and used to enrich the issue's context.
+   If `?`: explain that this runs `/kmgraph:kmg-session-summary` in snapshot mode — a lightweight variant that records what was worked on, open plan items, and file changes without requiring a full wrap-up. The result is written to disk and used to enrich the issue's context.
 
    If `y`: ask "Include git history? (adds ~5-15 sec) [y] Yes   [n] No — conversation + files only"
 
@@ -451,7 +451,7 @@ Add entry to `docs/issue-tracker.md`.
 
 > "This issue was identified during active implementation on **[current_branch]**. Capturing a lesson before starting is strongly recommended — it preserves the context of how you found this while it's fresh.
 >
-> Run `/kmgraph:capture-lesson` now? **(yes / defer to plan)**"
+> Run `/kmgraph:kmg-capture-lesson` now? **(yes / defer to plan)**"
 
 **MANDATORY GATE: Do not proceed to Step 7 until the user responds to this question. "yes" and "defer to plan" are both valid answers. Silence is not a valid answer — wait.**
 
@@ -459,19 +459,19 @@ If deferred: add a task to the implementation plan: "Capture lesson: [issue desc
 
 **If `{active_work_guard_triggered}` is false** (issue identified from main or a clean state):
 
-> "We just identified [the problem]. Should I run `/kmgraph:capture-lesson` now to sync this pattern to the Knowledge Graph before we start the fix? **(yes / no)**"
+> "We just identified [the problem]. Should I run `/kmgraph:kmg-capture-lesson` now to sync this pattern to the Knowledge Graph before we start the fix? **(yes / no)**"
 
 **MANDATORY GATE: Do not proceed to Step 7 until the user responds to this question. "yes" and "no" are both valid answers. Silence is not a valid answer — wait.**
 
 If yes, run it. If no, ensure a task is added to the plan to update the KG after implementation.
 
 ### 6.3: Link Solution Approach
-The `solution-approach.md` MUST link to the resulting lesson or updated entry in the Knowledge Graph. Use `/kmgraph:link-issue` to create bidirectional references.
+The `solution-approach.md` MUST link to the resulting lesson or updated entry in the Knowledge Graph. Use `/kmgraph:kmg-link-issue` to create bidirectional references.
 
 ### 6.4: Release Documentation Hook
 **Mandatory Question:** Present this question and wait for a user response:
 
-> "Would you like me to run **`/kmgraph:update-issue-plan`** now to synchronize the ROADMAP and CHANGELOG before I stage and push these initialization files? **(yes / no)**"
+> "Would you like me to run **`/kmgraph:kmg-update-issue-plan`** now to synchronize the ROADMAP and CHANGELOG before I stage and push these initialization files? **(yes / no)**"
 
 **MANDATORY GATE: Do not proceed to Step 7 until the user responds to this question. "yes" and "no" are both valid answers. Silence is not a valid answer — wait.**
 
@@ -512,8 +512,8 @@ The `solution-approach.md` MUST link to the resulting lesson or updated entry in
 ```
 Next actions:
   → To implement now:     say "Execute Step 1" or start implementation
-  → To update progress:   /kmgraph:update-issue-plan
-  → To capture learning:  /kmgraph:capture-lesson
+  → To update progress:   /kmgraph:kmg-update-issue-plan
+  → To capture learning:  /kmgraph:kmg-capture-lesson
   → To defer:             issue is flagged status: deferred
 ```
 
@@ -545,7 +545,7 @@ Merge to main when complete
 ```
 User identifies issue
   ↓
-/kmgraph:start-issue-tracking (creates docs)
+/kmgraph:kmg-start-issue-tracking (creates docs)
   ↓
 Docs committed to Git in feature branch
   ↓
@@ -566,7 +566,7 @@ Updates progress in issue docs
 
 **Input:**
 ```
-/kmgraph:start-issue-tracking CLI flag parsing fails on quoted args
+/kmgraph:kmg-start-issue-tracking CLI flag parsing fails on quoted args
 ```
 
 **Output:**
@@ -579,7 +579,7 @@ Updates progress in issue docs
 
 **Input:**
 ```
-/kmgraph:start-issue-tracking Add token usage display
+/kmgraph:kmg-start-issue-tracking Add token usage display
 ```
 
 **Output:**
@@ -593,16 +593,16 @@ Updates progress in issue docs
 ## Integration with Other Commands
 
 **Before starting work:**
-- `/kmgraph:start-issue-tracking` ← Initialize tracking
+- `/kmgraph:kmg-start-issue-tracking` ← Initialize tracking
 
 **During work:**
-- `/kmgraph:update-issue-plan` ← Sync plan progress and update GitHub issue
-- `/kmgraph:link-issue` ← Link lessons or ADRs to the issue
+- `/kmgraph:kmg-update-issue-plan` ← Sync plan progress and update GitHub issue
+- `/kmgraph:kmg-link-issue` ← Link lessons or ADRs to the issue
 - Standard Git commits referencing issue number
 
 **After completion:**
-- `/kmgraph:capture-lesson` ← Document what was learned
-- `/kmgraph:meta-issue` ← Escalate to meta-issue if problem recurs
+- `/kmgraph:kmg-capture-lesson` ← Document what was learned
+- `/kmgraph:kmg-meta-issue` ← Escalate to meta-issue if problem recurs
 - Update issue status to ✅ RESOLVED
 
 ---
@@ -679,5 +679,5 @@ git checkout -b fix/issue-N-description
 
 ---
 
-**Usage:** Type `/kmgraph:start-issue-tracking` when you identify a bug or want to plan an enhancement
-**Integration:** Works with `/kmgraph:update-issue-plan`, `/kmgraph:capture-lesson`, `/kmgraph:link-issue`, and `/kmgraph:meta-issue`
+**Usage:** Type `/kmgraph:kmg-start-issue-tracking` when you identify a bug or want to plan an enhancement
+**Integration:** Works with `/kmgraph:kmg-update-issue-plan`, `/kmgraph:kmg-capture-lesson`, `/kmgraph:kmg-link-issue`, and `/kmgraph:kmg-meta-issue`

@@ -3,7 +3,7 @@
 
 All bash/shell checks in this command are **implementation guidance only** — run them silently as internal steps. Never show bash commands, shell code, or raw command output to the user. Present only plain-English results, prompts, and status messages.
 
-# /kmgraph:init-personal-kg
+# /kmgraph:kmg-init-personal-kg
 
 Create a personal knowledge graph at `~/.kmgraph/` (platform-neutral default path) for capturing
 lessons, patterns, and ADRs that apply across multiple projects.
@@ -12,9 +12,9 @@ lessons, patterns, and ADRs that apply across multiple projects.
 
 ## When to Use
 
-- After `/kmgraph:init` (skipped the personal KG offer)
+- After `/kmgraph:kmg-init` (skipped the personal KG offer)
 - When you want a dedicated place for workflow lessons, cross-project gotchas, and personal ADRs
-- When `/kmgraph:capture-lesson` asks "Save to project KG or personal KG?" but no personal KG exists yet
+- When `/kmgraph:kmg-capture-lesson` asks "Save to project KG or personal KG?" but no personal KG exists yet
 
 ---
 
@@ -26,8 +26,8 @@ lessons, patterns, and ADRs that apply across multiple projects.
 4. Builds FTS5 search index
 5. Does NOT change the active KG — your project KG remains active
 
-After setup, `/kmgraph:capture-lesson` shows a KG picker when saving lessons, and
-`/kmgraph:recall` searches both project and personal KGs automatically.
+After setup, `/kmgraph:kmg-capture-lesson` shows a KG picker when saving lessons, and
+`/kmgraph:kmg-recall` searches both project and personal KGs automatically.
 
 ---
 
@@ -201,9 +201,9 @@ What changed:
   • Active KG unchanged: still "[current active KG]"
 
 How to use:
-  • /kmgraph:capture-lesson — saves to project KG by default; pick "personal" for cross-project lessons
-  • /kmgraph:recall "query" — now searches both project and personal KGs automatically
-  • /kmgraph:switch personal — make personal KG active (advanced; usually not needed)
+  • /kmgraph:kmg-capture-lesson — saves to project KG by default; pick "personal" for cross-project lessons
+  • /kmgraph:kmg-recall "query" — now searches both project and personal KGs automatically
+  • /kmgraph:kmg-switch personal — make personal KG active (advanced; usually not needed)
 ```
 
 ---
@@ -351,7 +351,7 @@ If both counts are 0: skip silently (normal for a fresh personal KG).
 
 ## Related Commands
 
-- `/kmgraph:init` — Full KG initialization wizard (includes personal KG offer)
-- `/kmgraph:capture-lesson` — Capture lessons; shows KG picker when multiple KGs registered
-- `/kmgraph:recall` — Search across project and personal KGs
-- `/kmgraph:switch` — Change active KG
+- `/kmgraph:kmg-init` — Full KG initialization wizard (includes personal KG offer)
+- `/kmgraph:kmg-capture-lesson` — Capture lessons; shows KG picker when multiple KGs registered
+- `/kmgraph:kmg-recall` — Search across project and personal KGs
+- `/kmgraph:kmg-switch` — Change active KG
