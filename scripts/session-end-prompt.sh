@@ -4,8 +4,9 @@
 
 CONFIG_PATH="$HOME/.claude/kg-config.json"
 
-# Emit JSON on every exit — required by Codex CLI Stop hook parser on all exit paths
-trap 'echo "{\"decision\": \"continue\"}"' EXIT
+# Claude Code Stop hooks require hookSpecificOutput format; Codex requires {"decision":"continue"}.
+# Gemini has no Stop hook. Select output by CLAUDECODE env var (set only by Claude Code).
+trap '[[ -n "${CLAUDECODE:-}" ]] && echo "{\"hookSpecificOutput\": {\"hookEventName\": \"Stop\"}}" || echo "{\"decision\": \"continue\"}"' EXIT
 
 # Color codes
 RED='\033[0;31m'
