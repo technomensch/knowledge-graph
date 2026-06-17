@@ -52,9 +52,9 @@
     "capabilities": ["Read", "Write"],
     "websiteURL": "https://github.com/technomensch/knowledge-graph",
     "defaultPrompt": [
-      "Use /kmgraph:recall to search past decisions before making a new one.",
-      "Use /kmgraph:capture-lesson to document what we just learned.",
-      "Use /kmgraph:session-summary to wrap up this session."
+      "Use /kmgraph:kmg-recall to search past decisions before making a new one.",
+      "Use /kmgraph:kmg-capture-lesson to document what we just learned.",
+      "Use /kmgraph:kmg-session-summary to wrap up this session."
     ]
   }
 }

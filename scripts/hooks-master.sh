@@ -144,7 +144,7 @@ _inject_profile "$PERSONAL_KG_DIR/triggers.md" "~/.kmgraph/triggers.md (personal
 
 if [ ! -f "$CONFIG_PATH" ]; then
     echo -e "${BLUE}ℹ️  No knowledge graph configured.${NC}"
-    echo "   Run /kmgraph:init to get started."
+    echo "   Run /kmgraph:kmg-init to get started."
     exit 0
 fi
 
@@ -152,7 +152,7 @@ ACTIVE_KG=$(grep -o '"active"[[:space:]]*:[[:space:]]*"[^"]*"' "$CONFIG_PATH" | 
 
 if [ -z "$ACTIVE_KG" ]; then
     echo -e "${YELLOW}⚠️  No active knowledge graph set in config.${NC}"
-    echo "   Run /kmgraph:list and /kmgraph:switch to activate a KG."
+    echo "   Run /kmgraph:kmg-list and /kmgraph:kmg-switch to activate a KG."
     exit 1
 fi
 
@@ -168,7 +168,7 @@ KG_PATH="${KG_PATH/#\~/$HOME}"
 if [ ! -d "$KG_PATH" ]; then
     echo -e "${RED}⚠️  Active KG path does not exist: $KG_PATH${NC}"
     echo "   KG: $ACTIVE_KG"
-    echo "   Run /kmgraph:init or /kmgraph:switch to fix configuration."
+    echo "   Run /kmgraph:kmg-init or /kmgraph:kmg-switch to fix configuration."
     exit 1
 fi
 
@@ -238,7 +238,7 @@ if [ "$KG_TYPE" = "project-local" ]; then
                 echo -e "${YELLOW}⚠️  Active KG '${ACTIVE_KG}' is set for a different project.${NC}"
                 echo "   Active KG project: $EXPECTED_PROJECT_ROOT"
                 echo "   Current directory: $CWD"
-                echo "   Run /kmgraph:switch to change the active KG for this project."
+                echo "   Run /kmgraph:kmg-switch to change the active KG for this project."
                 echo ""
             fi
             ;;
@@ -276,7 +276,7 @@ if [ -d "$LESSONS_DIR" ]; then
                 echo "     $rel_path"
             done
             echo ""
-            echo -e "${GREEN}Tip:${NC} Use ${BLUE}/kmgraph:recall \"query\"${NC} to search lessons"
+            echo -e "${GREEN}Tip:${NC} Use ${BLUE}/kmgraph:kmg-recall \"query\"${NC} to search lessons"
             echo ""
         fi
     fi
@@ -329,7 +329,7 @@ if command -v node &> /dev/null && [ -f "$CONFIG_PATH" ]; then
                 if [ "$GLOBAL_COUNT" -gt 3 ]; then
                     echo "   … and $((GLOBAL_COUNT - 3)) more"
                 fi
-                echo -e "   Use ${BLUE}/kmgraph:recall \"query\" --scope=personal-only${NC} to search personal KG"
+                echo -e "   Use ${BLUE}/kmgraph:kmg-recall \"query\" --scope=personal-only${NC} to search personal KG"
                 echo ""
             fi
         fi

@@ -61,6 +61,13 @@ Update any personal rules, triggers, or config files that reference old skill/co
 | `kmgraph:update-graph` | `kmgraph:kmg-update-graph` |
 | `kmgraph:update-issue-plan` | `kmgraph:kmg-update-issue-plan` |
 | `kmgraph:update-profile` | `kmgraph:kmg-update-profile` |
+| `kmgraph:init-shared:ai-model-tier-resolver` | `kmgraph:init-shared:kmg-ai-model-tier-resolver` |
+| `kmgraph:init-shared:config-entry-write` | `kmgraph:init-shared:kmg-config-entry-write` |
+| `kmgraph:init-shared:directory-scaffold` | `kmgraph:init-shared:kmg-directory-scaffold` |
+| `kmgraph:init-shared:fts5-rebuild` | `kmgraph:init-shared:kmg-fts5-rebuild` |
+| `kmgraph:init-shared:knowledge-file-migrator` | `kmgraph:init-shared:kmg-knowledge-file-migrator` |
+| `kmgraph:init-shared:template-seed` | `kmgraph:init-shared:kmg-template-seed` |
+| `kmgraph:init-shared:upgrade-inspector` | `kmgraph:init-shared:kmg-upgrade-inspector` |
 
 **MCP tool names (`kg_*`) are unchanged.**
 

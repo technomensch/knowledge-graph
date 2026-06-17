@@ -110,13 +110,13 @@ if [ -n "$SKILLS_DIR" ]; then
   echo ""
   echo "── Skill content checks ────────────────────────────────────────"
 
-  # Test 6: lesson-capture references /kmgraph:capture-lesson
+  # Test 6: lesson-capture references /kmgraph:kmg-capture-lesson
   if [ -d "$SKILLS_DIR/lesson-capture" ]; then
     CONTENT=$(cat "$SKILLS_DIR/lesson-capture"/* 2>/dev/null)
-    if echo "$CONTENT" | grep -q "capture-lesson\|kmgraph"; then
-      pass "lesson-capture skill references /kmgraph:capture-lesson"
+    if echo "$CONTENT" | grep -q "kmg-capture-lesson\|kmgraph"; then
+      pass "lesson-capture skill references /kmgraph:kmg-capture-lesson"
     else
-      fail "lesson-capture skill should reference capture-lesson command"
+      fail "lesson-capture skill should reference kmg-capture-lesson command"
     fi
   else
     fail "lesson-capture skill directory not found"
@@ -134,25 +134,25 @@ if [ -n "$SKILLS_DIR" ]; then
     fail "kg-recall skill directory not found"
   fi
 
-  # Test 8: session-wrap references /kmgraph:session-summary
+  # Test 8: session-wrap references /kmgraph:kmg-session-summary
   if [ -d "$SKILLS_DIR/session-wrap" ]; then
     CONTENT=$(cat "$SKILLS_DIR/session-wrap"/* 2>/dev/null)
-    if echo "$CONTENT" | grep -q "session-summary\|kmgraph"; then
-      pass "session-wrap skill references /kmgraph:session-summary"
+    if echo "$CONTENT" | grep -q "kmg-session-summary\|kmgraph"; then
+      pass "session-wrap skill references /kmgraph:kmg-session-summary"
     else
-      fail "session-wrap skill should reference session-summary command"
+      fail "session-wrap skill should reference kmg-session-summary command"
     fi
   else
     fail "session-wrap skill directory not found"
   fi
 
-  # Test 9: adr-guide references /kmgraph:create-adr
+  # Test 9: adr-guide references /kmgraph:kmg-create-adr
   if [ -d "$SKILLS_DIR/adr-guide" ]; then
     CONTENT=$(cat "$SKILLS_DIR/adr-guide"/* 2>/dev/null)
-    if echo "$CONTENT" | grep -q "create-adr\|kmgraph"; then
-      pass "adr-guide skill references /kmgraph:create-adr"
+    if echo "$CONTENT" | grep -q "kmg-create-adr\|kmgraph"; then
+      pass "adr-guide skill references /kmgraph:kmg-create-adr"
     else
-      fail "adr-guide skill should reference create-adr command"
+      fail "adr-guide skill should reference kmg-create-adr command"
     fi
   else
     fail "adr-guide skill directory not found"
