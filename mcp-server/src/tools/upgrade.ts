@@ -112,9 +112,9 @@ function checkTemplates(kgPath: string): UpgradeItem[] {
   // Subdirectory mappings: template subdir → kg subdir
   const mappings: Array<{ templateSub: string; kgSub: string; files: string[] }> = [
     {
-      templateSub: "knowledge",
-      kgSub: "knowledge",
-      files: ["patterns.md", "gotchas.md", "concepts.md", "architecture.md", "workflows.md", "index.md"],
+      templateSub: "concepts",
+      kgSub: "concepts",
+      files: ["entry-template.md", "kg-category-index.md"],
     },
     {
       templateSub: "lessons-learned",
@@ -268,9 +268,9 @@ function applyTemplates(kgPath: string): string {
 
   const mappings: Array<{ templateSub: string; kgSub: string; files: string[] }> = [
     {
-      templateSub: "knowledge",
-      kgSub: "knowledge",
-      files: ["patterns.md", "gotchas.md", "concepts.md", "architecture.md", "workflows.md", "index.md"],
+      templateSub: "concepts",
+      kgSub: "concepts",
+      files: ["entry-template.md", "kg-category-index.md"],
     },
     {
       templateSub: "lessons-learned",
