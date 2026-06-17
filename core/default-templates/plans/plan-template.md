@@ -66,7 +66,7 @@ tags: []
 
 **Phase 1 Completion Checklist:**
 - [ ] [Task]
-- [ ] `/kmgraph:capture-lesson` — [what to capture if non-obvious]
+- [ ] `/kmgraph:kmg-capture-lesson` — [what to capture if non-obvious]
 
 ---
 

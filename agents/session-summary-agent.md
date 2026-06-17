@@ -61,8 +61,8 @@ This applies even when `--active` (default) is used, so the user can correct the
 
 If `--project` requires a KG switch:
 1. Record `$restore_kg` = current active KG
-2. Run `/kmgraph:switch {project_kg}`
-3. After capture completes: run `/kmgraph:switch {$restore_kg}`
+2. Run `/kmgraph:kmg-switch {project_kg}`
+3. After capture completes: run `/kmgraph:kmg-switch {$restore_kg}`
 
 ### Pass-through to `--delegate`
 

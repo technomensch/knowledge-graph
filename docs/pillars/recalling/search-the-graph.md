@@ -12,7 +12,7 @@ parent:
 
 > "I know I captured this somewhere. How do I find it?"
 
-Run `/kmgraph:recall` to search. KMGraph supports two search paths — file-walk (default) and indexed (optional, faster).
+Run `/kmgraph:kmg-recall` to search. KMGraph supports two search paths — file-walk (default) and indexed (optional, faster).
 
 ## How search works
 
@@ -38,7 +38,7 @@ Without an index, kmgraph reads each file in the knowledge graph sequentially an
 
 The index is off by default and takes about a second to build. Once enabled, it stays current automatically — no maintenance required.
 
-The first time `/kmgraph:sync-all` is run, it asks once whether to build the index. Answer yes and the index builds automatically. After that, every `sync-all` run keeps it current with no prompts. If no index exists and the user has not previously declined, sync-all asks once — the preference is remembered and users are never asked again regardless of the answer.
+The first time `/kmgraph:kmg-sync-all` is run, it asks once whether to build the index. Answer yes and the index builds automatically. After that, every `sync-all` run keeps it current with no prompts. If no index exists and the user has not previously declined, sync-all asks once — the preference is remembered and users are never asked again regardless of the answer.
 
 To build the index at any time without running sync-all, call `kg_fts5_rebuild` from the MCP tool panel.
 

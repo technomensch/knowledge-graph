@@ -72,7 +72,7 @@ Apply to: `concepts/how-kmgraph-is-organized.md`, `reference/command-guide.md`, 
 
 Apply to: `CHEAT-SHEET.md`.
 
-- ✅ "Run `/kmgraph:init` to initialize."
+- ✅ "Run `/kmgraph:kmg-init` to initialize."
 - ✅ "This command initializes the knowledge graph."
 - ❌ Mix of imperative and third-person within the same document.
 
@@ -146,7 +146,7 @@ Choose the correct voice for each document type. Mixing voices within a document
 | `concepts/how-kmgraph-is-organized.md` | Third-person | "The system captures git metadata automatically." |
 | `reference/command-guide.md` | Third-person | "The command creates a lesson file in the active category." |
 | `GETTING-STARTED.md` | Third-person | "The initialization wizard prompts for project name." |
-| `CHEAT-SHEET.md` | Imperative or neutral | "Run `/kmgraph:init`." or "This command initializes..." |
+| `CHEAT-SHEET.md` | Imperative or neutral | "Run `/kmgraph:kmg-init`." or "This command initializes..." |
 | `STYLE-GUIDE.md` (this document) | Imperative | "Use third-person voice." |
 | Code comments and examples | Any style | Exception to all voice rules. |
 

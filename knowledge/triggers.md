@@ -21,12 +21,12 @@
 ## Before pushing to origin
 
 - Apply: `rules.md § Version & Release > Pre-Push / Pre-Merge User-Facing Doc Sync`
-- Gate: **STOP** — run `/kmgraph:update-doc --user-facing` before any `git push` and confirm user-facing docs (README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, CONCEPTS, INSTALL.md) reflect all changes on this branch
+- Gate: **STOP** — run `/kmgraph:kmg-update-doc --user-facing` before any `git push` and confirm user-facing docs (README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, CONCEPTS, INSTALL.md) reflect all changes on this branch
 - This applies to all pushes — even small PRs can change command behavior, flags, or remove commands
 - Do not run `git push` until doc sync is confirmed
 
 ## Before creating a PR
 
 - Apply: `rules.md § Version & Release > Pre-Push / Pre-Merge User-Facing Doc Sync`
-- Gate: **STOP** — confirm `/kmgraph:update-doc --user-facing` has been run on this branch before opening the PR
+- Gate: **STOP** — confirm `/kmgraph:kmg-update-doc --user-facing` has been run on this branch before opening the PR
 - Do not open the PR until docs are confirmed current

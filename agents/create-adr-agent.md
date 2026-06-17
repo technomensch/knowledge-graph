@@ -45,8 +45,8 @@ In the ADR draft, always show before any write:
 ### Switch/restore for `--project`
 
 1. Record `$restore_kg` = current active KG
-2. Run `/kmgraph:switch {project_kg}`
-3. After capture: run `/kmgraph:switch {$restore_kg}`
+2. Run `/kmgraph:kmg-switch {project_kg}`
+3. After capture: run `/kmgraph:kmg-switch {$restore_kg}`
 
 ### Interaction with Phase 0 CWD Guard
 

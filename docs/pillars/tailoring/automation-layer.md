@@ -41,15 +41,15 @@ sequenceDiagram
     Dev->>Dev: Solves a bug (conversation continues)
 
     Note over Skill: lesson-capture detects "figured it out"
-    Skill->>Dev: Suggest /kmgraph:capture-lesson
+    Skill->>Dev: Suggest /kmgraph:kmg-capture-lesson
 
-    Dev->>Command: /kmgraph:capture-lesson
+    Dev->>Command: /kmgraph:kmg-capture-lesson
     Command->>Agent: --delegate knowledge-extractor (if large)
     Agent->>KG: Write lesson (approval-gated)
     Command->>KG: Write lesson (direct, if small)
 
     Note over Hook: PostToolUse fires after write
-    Hook->>Dev: Confirm capture + suggest /kmgraph:update-graph
+    Hook->>Dev: Confirm capture + suggest /kmgraph:kmg-update-graph
 
 ```
 

@@ -64,9 +64,9 @@ Do NOT stop mid-review to ask about individual findings. Do NOT ask bare "procee
 |--------|---------|----------|
 | `fix now` | Fix immediately | Run cascade check stub first (see below); agent implements; review resumes after fix |
 | `ignore` | Dismiss intentionally | Record in audit trail with reason; review continues |
-| `track` | Route to issue tracking | Invoke `/kmgraph:start-issue-tracking`; review resumes |
+| `track` | Route to issue tracking | Invoke `/kmgraph:kmg-start-issue-tracking`; review resumes |
 | `dig deeper` | Investigate further | Agent investigates; return to finding after report |
-| `discuss` | Open focused discussion | Take session snapshot first (`/kmgraph:session-summary --snapshot`); then discuss; resume review after |
+| `discuss` | Open focused discussion | Take session snapshot first (`/kmgraph:kmg-session-summary --snapshot`); then discuss; resume review after |
 
 ---
 

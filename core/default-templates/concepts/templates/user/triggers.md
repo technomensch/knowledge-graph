@@ -27,4 +27,4 @@
 
 - Gate: do not close session until sync-all has run
 - Apply: `rules.md § Knowledge Capture`
-- Run: `/kmgraph:sync-all`
+- Run: `/kmgraph:kmg-sync-all`

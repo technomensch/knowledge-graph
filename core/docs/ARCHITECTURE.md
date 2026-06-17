@@ -110,7 +110,7 @@ The knowledge graph uses **four complementary knowledge systems**, each optimize
 2. **Extract:** Pull key insights into Knowledge Graph for quick reference
 3. **Sync:** Update project memory (MEMORY.md) with new knowledge
 
-**Automation:** The `/kmgraph:sync-all` command orchestrates this entire flow.
+**Automation:** The `/kmgraph:kmg-sync-all` command orchestrates this entire flow.
 
 ---
 
@@ -187,7 +187,7 @@ git commit -m "docs: add lesson on my-topic"
 
 ```bash
 # Single command does all steps
-/kmgraph:capture-lesson
+/kmgraph:kmg-capture-lesson
 
 # Prompts for:
 # - Topic
@@ -205,7 +205,7 @@ git commit -m "docs: add lesson on my-topic"
 ### Full Pipeline (Sync-All)
 
 ```bash
-/kmgraph:sync-all
+/kmgraph:kmg-sync-all
 
 # Orchestrates:
 # 1. Capture lesson (if applicable)

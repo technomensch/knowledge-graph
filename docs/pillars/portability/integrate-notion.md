@@ -67,7 +67,7 @@ Use notion-search to find "Redis timeout" across the KMGraph Lessons database.
 
 ## Keeping the mirror current
 
-After each `/kmgraph:capture-lesson`, run the mirror step for the new file. Or add a `PostToolUse` hook that auto-mirrors captures to Notion (see [Customize hooks](../tailoring/customize-hooks.md)).
+After each `/kmgraph:kmg-capture-lesson`, run the mirror step for the new file. Or add a `PostToolUse` hook that auto-mirrors captures to Notion (see [Customize hooks](../tailoring/customize-hooks.md)).
 
 ## Related
 

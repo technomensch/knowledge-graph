@@ -12,7 +12,7 @@ parent:
 
 > "The default templates don't match my team's conventions. How do I change them?"
 
-Edit the bundled templates to add required fields, remove unused ones, or change the default structure for lessons, ADRs, and session summaries. At `/kmgraph:init`, starter templates (lesson, ADR, session, entry) are seeded to `knowledge/templates/` in your live knowledge graph; content structure templates (patterns, gotchas, concepts, architecture, workflows) go to `knowledge/templates/` as well.
+Edit the bundled templates to add required fields, remove unused ones, or change the default structure for lessons, ADRs, and session summaries. At `/kmgraph:kmg-init`, starter templates (lesson, ADR, session, entry) are seeded to `knowledge/templates/` in your live knowledge graph; content structure templates (patterns, gotchas, concepts, architecture, workflows) go to `knowledge/templates/` as well.
 
 ## Default templates vs your live knowledge files
 
@@ -20,10 +20,10 @@ Two directories look similar but serve different roles:
 
 | Directory | Role | Editable? |
 |---|---|---|
-| `core/default-templates/` | Frozen out-of-box source — ships inside the plugin, seeded into your project at `/kmgraph:init` time | PROTECTED — do not edit directly |
+| `core/default-templates/` | Frozen out-of-box source — ships inside the plugin, seeded into your project at `/kmgraph:kmg-init` time | PROTECTED — do not edit directly |
 | `knowledge/decisions/`, `knowledge/lessons-learned/`, `knowledge/sessions/`, `knowledge/concepts/` | Your live, editable knowledge files — created from the defaults at init, then yours to modify freely | Yes |
 
-`core/default-templates/` is the distribution source. After `/kmgraph:init` runs, the files you work with every day live under `knowledge/` — they are copies, not the originals. Editing `core/default-templates/` changes what future `/init` runs produce; it does not affect your existing `knowledge/` files.
+`core/default-templates/` is the distribution source. After `/kmgraph:kmg-init` runs, the files you work with every day live under `knowledge/` — they are copies, not the originals. Editing `core/default-templates/` changes what future `/init` runs produce; it does not affect your existing `knowledge/` files.
 
 ## How templates work
 
@@ -37,12 +37,12 @@ All templates live in `core/default-templates/`. When the MCP server or a comman
 
 | Template | File | Used by |
 |---|---|---|
-| Lesson learned | `core/default-templates/lessons-learned/lesson-template.md` | `/kmgraph:capture-lesson` |
-| Architecture Decision Record | `core/default-templates/decisions/ADR-template.md` | `/kmgraph:create-adr` |
-| Session summary | `core/default-templates/sessions/session-template.md` | `/kmgraph:session-summary` |
-| MEMORY.md | `core/default-templates/MEMORY-template.md` | `/kmgraph:init` |
-| Knowledge entry | `core/default-templates/concepts/entry-template.md` | `/kmgraph:update-graph` |
-| Meta-issue | `core/default-templates/meta-issue/meta-issue-template.md` | `/kmgraph:start-issue-tracking` |
+| Lesson learned | `core/default-templates/lessons-learned/lesson-template.md` | `/kmgraph:kmg-capture-lesson` |
+| Architecture Decision Record | `core/default-templates/decisions/ADR-template.md` | `/kmgraph:kmg-create-adr` |
+| Session summary | `core/default-templates/sessions/session-template.md` | `/kmgraph:kmg-session-summary` |
+| MEMORY.md | `core/default-templates/MEMORY-template.md` | `/kmgraph:kmg-init` |
+| Knowledge entry | `core/default-templates/concepts/entry-template.md` | `/kmgraph:kmg-update-graph` |
+| Meta-issue | `core/default-templates/meta-issue/meta-issue-template.md` | `/kmgraph:kmg-start-issue-tracking` |
 
 ## Copy the template
 
@@ -57,7 +57,7 @@ Open the copy and add, remove, or rename fields. The YAML frontmatter fields are
 ## Use the custom template
 
 ```bash
-/kmgraph:capture-lesson --template docs/templates/my-lesson-template.md
+/kmgraph:kmg-capture-lesson --template docs/templates/my-lesson-template.md
 ```
 
 Confirm by running a capture command — the custom fields should appear in the output file.

@@ -22,11 +22,11 @@ A knowledge management tool: Claude Code extension + cross-platform MCP server.
 
 Auto-triggered context providers that enhance agent behavior:
 
-- **lesson-capture** — Suggests `/kmgraph:capture-lesson` when bugs are solved or breakthroughs made
-- **kg-recall** — Guides knowledge graph search when asking about project history or past decisions
-- **session-wrap** — Prompts `/kmgraph:session-summary` when stopping work or approaching context limits
-- **adr-guide** — Suggests `/kmgraph:create-adr` when making architecture decisions
-- **gov-execute-plan** — Enforces zero-deviation plan execution protocol with strict constraints
+- **lesson-capture** — Suggests `/kmgraph:kmg-capture-lesson` when bugs are solved or breakthroughs made
+- **kmg-auto-recall** — Guides knowledge graph search when asking about project history or past decisions
+- **session-wrap** — Prompts `/kmgraph:kmg-session-summary` when stopping work or approaching context limits
+- **adr-guide** — Suggests `/kmgraph:kmg-create-adr` when making architecture decisions
+- **kmg-execute-plan** — Enforces zero-deviation plan execution protocol with strict constraints
 
 ## Subagents
 

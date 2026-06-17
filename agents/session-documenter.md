@@ -78,7 +78,7 @@ In the generated summary draft, always show:
 - Awaits user approval before push
 
 **Used By:**
-- `/kmgraph:session-summary` command (with approval gates)
+- `/kmgraph:kmg-session-summary` command (with approval gates)
 - SessionStart hooks (if configured for automatic summaries)
 - End-of-branch workflows before merge
 

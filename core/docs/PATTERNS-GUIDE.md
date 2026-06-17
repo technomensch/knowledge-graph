@@ -534,16 +534,16 @@ MEMORY.md indexes these files and auto-populates at session start via hooks.
 ### How It Works
 
 1. Store behavioral rules and identity in profile files (rules.md, me.md)
-2. Run `/kmgraph:sync-all` to update the knowledge graph
+2. Run `/kmgraph:kmg-sync-all` to update the knowledge graph
 3. MEMORY.md auto-indexes active profile files at session start
 4. Claude reads the index and loads profile content automatically
 
 ### Maintenance
 
 For knowledge graph health checks and index updates:
-- Use `/kmgraph:status` to see current state
-- Use `/kmgraph:sync-all` to rebuild indexes and sync all profile files
-- Use `/kmgraph:switch` to change active knowledge graphs
+- Use `/kmgraph:kmg-status` to see current state
+- Use `/kmgraph:kmg-sync-all` to rebuild indexes and sync all profile files
+- Use `/kmgraph:kmg-switch` to change active knowledge graphs
 
 See [Command Guide](../../docs/COMMAND-GUIDE.md) for details.
 

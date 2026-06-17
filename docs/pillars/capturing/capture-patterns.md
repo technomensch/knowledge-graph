@@ -23,7 +23,7 @@ A pattern generalizes a solved problem into a named, reusable solution. Use it w
 | Name | Descriptive title | A noun phrase that names the technique |
 | Reuse | Documents what happened | Guides future decisions |
 
-A lesson is raw material. A pattern is the distillation. Use `/kmgraph:capture-lesson --category patterns` when the insight applies beyond the incident that produced it.
+A lesson is raw material. A pattern is the distillation. Use `/kmgraph:kmg-capture-lesson --category patterns` when the insight applies beyond the incident that produced it.
 
 **Example:**
 - Lesson: "CI builds failed because the connection pool was exhausted by parallel runners."
@@ -42,12 +42,12 @@ If any condition fails, create a lesson instead.
 You've observed the problem at least once and can name the solution in a noun phrase — then run:
 
 ```bash
-/kmgraph:capture-lesson --category patterns
+/kmgraph:kmg-capture-lesson --category patterns
 ```
 
 When prompted, provide the pattern name as the title and paste the filled template as the body. The command will write the entry to the active knowledge graph and index it for full-text search.
 
-Confirm with `/kmgraph:recall [pattern name]` — the entry should appear.
+Confirm with `/kmgraph:kmg-recall [pattern name]` — the entry should appear.
 
 ## Name the pattern
 
@@ -92,7 +92,7 @@ If the pattern was derived from a specific lesson, open that lesson file and add
 - **Pattern:** [[patterns/connection-pooling.md]]
 ```
 
-Bidirectional linking is required for the graph traversal in `/kmgraph:recall` to surface the connection. Maintain links in both directions: in the **pattern file**, list every lesson that instantiates or informs the pattern under `Cross-References`; in each **lesson file**, list the derived pattern under its `Cross-References` section. Use the wiki-link format `[[relative/path.md]]` for all internal references — absolute URLs and bare filenames are not indexed by the graph traversal engine.
+Bidirectional linking is required for the graph traversal in `/kmgraph:kmg-recall` to surface the connection. Maintain links in both directions: in the **pattern file**, list every lesson that instantiates or informs the pattern under `Cross-References`; in each **lesson file**, list the derived pattern under its `Cross-References` section. Use the wiki-link format `[[relative/path.md]]` for all internal references — absolute URLs and bare filenames are not indexed by the graph traversal engine.
 
 ## Related
 

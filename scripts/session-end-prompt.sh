@@ -152,16 +152,16 @@ if [ "$HAS_ITEMS" = true ]; then
     [ -n "$LESSON_MSG" ] && echo -e "${YELLOW}$LESSON_MSG${NC}" >&2
     echo "" >&2
     if [ "$SNAPSHOT_TODAY" = true ]; then
-        echo "You have a session snapshot from today — run /kmgraph:session-summary to complete the wrap-up." >&2
+        echo "You have a session snapshot from today — run /kmgraph:kmg-session-summary to complete the wrap-up." >&2
     else
-        echo "Run /kmgraph:session-summary to document this session." >&2
+        echo "Run /kmgraph:kmg-session-summary to document this session." >&2
     fi
     echo "" >&2
 else
     if [ "$SNAPSHOT_TODAY" = true ]; then
-        echo -e "${GREEN}✅ Session snapshot taken. Run /kmgraph:session-summary to finalize the wrap-up.${NC}" >&2
+        echo -e "${GREEN}✅ Session snapshot taken. Run /kmgraph:kmg-session-summary to finalize the wrap-up.${NC}" >&2
     else
-        echo -e "${GREEN}✅ Good stopping point. /kmgraph:session-summary if you'd like a summary.${NC}" >&2
+        echo -e "${GREEN}✅ Good stopping point. /kmgraph:kmg-session-summary if you'd like a summary.${NC}" >&2
     fi
 fi
 

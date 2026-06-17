@@ -126,7 +126,7 @@ If you have an existing KMGraph installation, **do not follow the full install s
 
 **Claude Code users:**
 ```
-/kmgraph:init
+/kmgraph:kmg-init
 ```
 The wizard detects your existing knowledge graph and presents an upgrade menu:
 ```
@@ -155,7 +155,7 @@ The inspector runs four checks in order and reports what it finds before asking 
 | **d. Platform split** | Claude-specific tool directives in `knowledge/rules.md` that belong in `CLAUDE.md` |
 | **e. Wiki pass** | Bare `ADR-NNN`, `ENH-NNN`, `#NNN`, and lesson filename references not yet converted to `[[wiki links]]` — runs once per KG, skipped on re-run if already complete |
 
-> **Re-running the wizard:** `/kmgraph:init` is safe to re-run at any time. It skips
+> **Re-running the wizard:** `/kmgraph:kmg-init` is safe to re-run at any time. It skips
 > steps already complete (wiki pass, platform config, post-commit hook) and only
 > offers items that are still pending for your install.
 
@@ -174,7 +174,7 @@ Apply all, pick individually, or skip?
 
 **To preview all changes at once before anything is written:** choose **option 0** at the Apply/Choose/Skip menu, or invoke the command with the `--preview` flag:
 ```
-/kmgraph:init --preview
+/kmgraph:kmg-init --preview
 ```
 The preview shows dirs that would be created, config field diffs, template diffs (line-by-line), and section-d lines with their target location — then prints "X changes would be applied. Nothing was written." and returns to the Apply/Choose/Skip menu.
 
@@ -188,13 +188,13 @@ The preview shows dirs that would be created, config field diffs, template diffs
 ```
 Option **b** lets you review and act on your own — nothing is written.
 
-> **Full dry-run mode** is available: run `/kmgraph:init --preview`, or choose **option 0** at the Apply/Choose/Skip menu. The preview shows exactly what would change for each item — no files are written until you choose option 1 or 2 and confirm.
+> **Full dry-run mode** is available: run `/kmgraph:kmg-init --preview`, or choose **option 0** at the Apply/Choose/Skip menu. The preview shows exactly what would change for each item — no files are written until you choose option 1 or 2 and confirm.
 
 ---
 
 ### What gets backed up
 
-Before any content migration runs, the wizard archives the affected files to a timestamped restore point at `{KG_PATH}/.kg-archive-YYYYMMDD-HHMMSS/`. If anything goes wrong, you can restore manually from that directory. Run `/kmgraph:migration rollback <id>` to restore from any archive. Use `/kmgraph:migration list` to see available restore points.
+Before any content migration runs, the wizard archives the affected files to a timestamped restore point at `{KG_PATH}/.kg-archive-YYYYMMDD-HHMMSS/`. If anything goes wrong, you can restore manually from that directory. Run `/kmgraph:kmg-migration rollback <id>` to restore from any archive. Use `/kmgraph:kmg-migration list` to see available restore points.
 
 ---
 
@@ -231,9 +231,9 @@ done
 | **v0.3.5–v0.3.9** | No upgrade items expected for a clean install in this range. |
 | **v0.4.0** | Check c offers an updated meta-issue attempt template (adds hypothesis, distinct-from-prior, success-criterion, and exit-path fields). New `stuck-work-escalation` and `docs-impact-scan` skills are auto-available after plugin reload — no upgrade action required. |
 | **v0.4.1** | Security patch — no upgrade action required. Dependency overrides (`hono >=4.12.12`, `follow-redirects >=1.16.0`) are applied automatically on install. |
-| **v0.4.2** | Bug fix — `triggers.md` now seeded during init. Run `/kmgraph:init` to add `triggers.md` to any KG initialized before this version. |
+| **v0.4.2** | Bug fix — `triggers.md` now seeded during init. Run `/kmgraph:kmg-init` to add `triggers.md` to any KG initialized before this version. |
 | **v0.5.1** | Tier abstraction — run `/kmgraph:upgrade` to add `platforms[]` tier_map to your `me.md` (fast/standard/powerful tier labels for platform-agnostic model selection). |
-| **v0.5.2** | Shared tier resolver — no upgrade action required. `ai-model-tier-resolver` module is auto-used by all dispatchers after plugin reload. Run `/kmgraph:init` to add the `platforms[]` example block to your project `me.md` if missing. |
+| **v0.5.2** | Shared tier resolver — no upgrade action required. `ai-model-tier-resolver` module is auto-used by all dispatchers after plugin reload. Run `/kmgraph:kmg-init` to add the `platforms[]` example block to your project `me.md` if missing. |
 | **v0.5.3** | No upgrade action required. `extract-chat` large-day auto-split and `update-doc` fixes are automatic after plugin reload. |
 | **v0.5.4** | Profile auto-load — no upgrade action required. `me.md` and `triggers.md` are now injected at SessionStart automatically. No config changes needed. |
 | **v0.5.5** | Bug fix — no upgrade action required. Stop hook dedup flag is now keyed on `{kg-name}-{date}` instead of `{PPID}-{date}`. Stale PPID-format flags from prior sessions are cleaned automatically on the next hook run. |
@@ -245,10 +245,10 @@ done
 | **v0.5.9.2** | No upgrade action required. `start-issue-tracking` Step 5.0 (`gh issue create`) is automatic after plugin reload. `github-issue` frontmatter is now auto-populated in new issue/ENH specs. Existing specs with `github-issue: null` are not retroactively updated — create GitHub issues manually for those if needed. |
 | **v0.5.9.3** | No upgrade action required. Three new advisory hooks (plan docs-impact check, pre-push version-sync, pre-push docs-scan gate, inline recommendation gate) are automatic after plugin reload. Optionally add `## Docs Impact` sections to existing plan files to silence the Gate 1 advisory. |
 | **v0.5.10** | No upgrade action required. `start-issue-tracking` Step 1.2 improved UX and `continues_from` handoff field are automatic after plugin reload. |
-| **v0.5.10.1** | No upgrade action required. Session summary operational sections, zone structure, one-file-per-day enforcement, and reduced handoff package are automatic after plugin reload. Run `/reload-plugins` to activate. Note: `--skip-sessions` flag for `/kmgraph:handoff` has been removed (SESSION-COMPILATION no longer generated). |
+| **v0.5.10.1** | No upgrade action required. Session summary operational sections, zone structure, one-file-per-day enforcement, and reduced handoff package are automatic after plugin reload. Run `/reload-plugins` to activate. Note: `--skip-sessions` flag for `/kmgraph:kmg-handoff` has been removed (SESSION-COMPILATION no longer generated). |
 | **v0.5.10.2** | Codex CLI marketplace support added — no upgrade action required for existing Claude Code installs. Codex users: run `codex plugin marketplace add technomensch/knowledge-graph` then `codex plugin add kmgraph@knowledge-management-graph`. Security: `shell-quote` dependency pinned to `>=1.8.4` automatically on `npm install`. |
 | **v0.5.10.3–v0.5.10.6** | No upgrade action required. Bug fixes and improvements are automatic after plugin reload. |
-| **v0.5.10.7** | **⚠️ Breaking change (Tier 3 manual installers only):** Two renames in the plugin distribution. (1) `core/templates/` → `core/default-templates/`. (2) `core/default-templates/knowledge/` → `core/default-templates/concepts/`. Update any copy instructions that reference these paths. Plugin/marketplace users (Tier 1/2) unaffected — these paths are internal to the plugin distribution; your `knowledge/` directory is untouched. Existing installs: run `/kmgraph:init` (option 1 — Verify/upgrade) to auto-migrate starters and any `knowledge/knowledge/` nesting. |
+| **v0.5.10.7** | **⚠️ Breaking change (Tier 3 manual installers only):** Two renames in the plugin distribution. (1) `core/templates/` → `core/default-templates/`. (2) `core/default-templates/knowledge/` → `core/default-templates/concepts/`. Update any copy instructions that reference these paths. Plugin/marketplace users (Tier 1/2) unaffected — these paths are internal to the plugin distribution; your `knowledge/` directory is untouched. Existing installs: run `/kmgraph:kmg-init` (option 1 — Verify/upgrade) to auto-migrate starters and any `knowledge/knowledge/` nesting. |
 | **v0.5.10.8–v0.5.11** | No upgrade action required. Security fix (esbuild HIGH in mcp-server) is automatic after plugin reload. |
 
 After the wizard completes, your existing lessons, ADRs, sessions, and chat history are untouched.
@@ -649,7 +649,7 @@ The knowledge graph config is stored at `~/.claude/kg-config.json`.
 
 Run the initialization command:
 ```
-/kmgraph:init
+/kmgraph:kmg-init
 ```
 
 This will prompt for KG name, location, and categories. Follow the wizard.
@@ -708,7 +708,7 @@ The knowledge graph is ready. Encourage the user to try it immediately:
 Try capturing your first lesson now. Think of a problem you recently solved — a bug fix,
 a configuration issue, or a design decision. Run:
 
-/kmgraph:capture-lesson
+/kmgraph:kmg-capture-lesson
 
 The wizard will walk you through documenting it.
 ```
@@ -808,11 +808,11 @@ If you don't have shell access, follow these steps manually:
 
 Commands are available as reference documentation. Copy their content into your LLM:
 
-- `/kmgraph:init` — Initialize a new knowledge graph
-- `/kmgraph:capture-lesson` — Capture a lesson learned
-- `/kmgraph:recall` — Search across all knowledge
-- `/kmgraph:session-summary` — Generate session summary
-- `/kmgraph:create-adr` — Create architecture decision record
+- `/kmgraph:kmg-init` — Initialize a new knowledge graph
+- `/kmgraph:kmg-capture-lesson` — Capture a lesson learned
+- `/kmgraph:kmg-recall` — Search across all knowledge
+- `/kmgraph:kmg-session-summary` — Generate session summary
+- `/kmgraph:kmg-create-adr` — Create architecture decision record
 
 See [COMMAND-GUIDE.md](docs/COMMAND-GUIDE.md) for complete command reference.
 

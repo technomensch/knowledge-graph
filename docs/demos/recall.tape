@@ -17,7 +17,7 @@ Sleep 500ms
 Enter
 Sleep 300ms
 
-Type "echo '> /kmgraph:recall connection pooling'"
+Type "echo '> /kmgraph:kmg-recall connection pooling'"
 Sleep 300ms
 Enter
 Sleep 800ms

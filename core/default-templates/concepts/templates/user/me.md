@@ -2,7 +2,7 @@
 # Identity — [Your Name]
 
 > User-level profile. Active across all projects that have KMGraph installed.
-> Fill in after running /kmgraph:init-personal-kg.
+> Fill in after running /kmgraph:kmg-init-personal-kg.
 > This file is gitignored — it stays local to your machine.
 
 ## Role

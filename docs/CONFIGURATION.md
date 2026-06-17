@@ -399,7 +399,7 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 
 - **[Capture Your First Lesson](GETTING-STARTED.md#step-4-capture-the-first-lesson)**
 
-  Document what you've learned with `/kmgraph:capture-lesson` while details are fresh.
+  Document what you've learned with `/kmgraph:kmg-capture-lesson` while details are fresh.
 
 - **[Study Real Examples](examples/)**
 

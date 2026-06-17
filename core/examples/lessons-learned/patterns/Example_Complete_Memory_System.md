@@ -117,7 +117,7 @@ Implemented complete system with four complementary knowledge types:
 
 ## Automation & Workflows
 
-### `/kmgraph:capture-lesson`
+### `/kmgraph:kmg-capture-lesson`
 
 Automates lesson creation:
 1. Prompt for topic and category
@@ -127,7 +127,7 @@ Automates lesson creation:
 5. Commit with standard message
 6. Link to related knowledge
 
-### `/kmgraph:create-adr`
+### `/kmgraph:kmg-create-adr`
 
 Automates ADR creation:
 1. Generate next ADR number
@@ -136,11 +136,11 @@ Automates ADR creation:
 4. Commit with standard message
 5. Link from related lessons
 
-### `/kmgraph:recall`
+### `/kmgraph:kmg-recall`
 
 Searches all knowledge systems:
 ```bash
-/kmgraph:recall "validation issue"
+/kmgraph:kmg-recall "validation issue"
 
 Results:
 - Lessons: "Input Validation Debugging" (process/, 2024-08-15)
@@ -149,7 +149,7 @@ Results:
 - Session: "Validation Refactoring Session" (2024-08-22)
 ```
 
-### `/kmgraph:sync-all`
+### `/kmgraph:kmg-sync-all`
 
 Complete pipeline automation:
 1. Capture lesson (if applicable)
@@ -281,7 +281,7 @@ After implementing complete system:
 **Phase 2:** Added automation (/lesson-learned, /create-adr)
 **Phase 3:** Added Knowledge Graph extraction
 **Phase 4:** Added session summaries
-**Phase 5:** Added /kmgraph:sync-all pipeline
+**Phase 5:** Added /kmgraph:kmg-sync-all pipeline
 **Phase 6:** Integrated with MEMORY.md bidirectional sync
 
 Each phase built on previous, validating architecture.
@@ -313,9 +313,9 @@ Sources consulted while solving this problem:
 - [ADR-005: Memory System Architecture](../../decisions/ADR-005-example.md) — Core decision to adopt this patterns.
 
 **Workflows:**
-- `/kmgraph:capture-lesson` - Standardized lesson extraction.
-- `/kmgraph:create-adr` - Architectural record keeping.
-- `/kmgraph:recall` - Unified search interface.
+- `/kmgraph:kmg-capture-lesson` - Standardized lesson extraction.
+- `/kmgraph:kmg-create-adr` - Architectural record keeping.
+- `/kmgraph:kmg-recall` - Unified search interface.
 
 ---
 

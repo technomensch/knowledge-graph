@@ -82,7 +82,7 @@ For each new/modified lesson:
 3. Check if entry already exists in `{kg_path}/knowledge/` (grep for pattern name)
 4. Create or update entry with bidirectional links
 
-**Delegates to:** `/kmgraph:update-graph` extraction logic (Steps 2-7 of the update-graph workflow).
+**Delegates to:** `/kmgraph:kmg-update-graph` extraction logic (Steps 2-7 of the update-graph workflow).
 
 **Entry format:**
 
@@ -174,7 +174,7 @@ Call `kg_fts5_status` to check whether the search index exists for the active KG
 
 **If `exists === false` AND `fts5_declined` is not true:**
 - Check `~/.claude/kg-config.json` for `graphs[<activeName>].fts5_declined`
-- Unless `--auto`: ask "No search index found. Build FTS5 index for faster /kmgraph:recall? [y/n]"
+- Unless `--auto`: ask "No search index found. Build FTS5 index for faster /kmgraph:kmg-recall? [y/n]"
 - If `--auto`: skip silently
 
 **If `fts5_declined` is true:** Skip silently.

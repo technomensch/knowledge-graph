@@ -17,7 +17,7 @@ Sleep 500ms
 Enter
 Sleep 300ms
 
-Type "echo '> /kmgraph:capture-lesson'"
+Type "echo '> /kmgraph:kmg-capture-lesson'"
 Sleep 300ms
 Enter
 Sleep 600ms

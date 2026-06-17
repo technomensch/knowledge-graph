@@ -157,8 +157,8 @@ Read the full target file based on `target_file` in the payload:
 - `~/.kmgraph/me.md` → read from absolute path
 
 If the target file does not exist (original targets):
-- `knowledge/rules.md` or `knowledge/me.md`: "Target file not found. Run /kmgraph:init first, or I can scaffold it now."
-- `~/.kmgraph/rules.md` or `me.md`: "Personal KG not initialized. Run /kmgraph:init-personal-kg first."
+- `knowledge/rules.md` or `knowledge/me.md`: "Target file not found. Run /kmgraph:kmg-init first, or I can scaffold it now."
+- `~/.kmgraph/rules.md` or `me.md`: "Personal KG not initialized. Run /kmgraph:kmg-init-personal-kg first."
 
 **New platform file targets (read from project root):**
 - `CLAUDE.md` → read from project root

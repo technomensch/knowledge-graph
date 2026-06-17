@@ -26,7 +26,7 @@ rm -rf ~/.claude/plugins/cache/stayinginsync-knowledge-graph
 /reload-plugins
 ```
 
-Then fully quit and relaunch Claude Code, restart the MCP server (`/mcp restart kmgraph`), and verify with `/kmgraph:init` (select option 1 — Verify/upgrade).
+Then fully quit and relaunch Claude Code, restart the MCP server (`/mcp restart kmgraph`), and verify with `/kmgraph:kmg-init` (select option 1 — Verify/upgrade).
 
 **Windows (PowerShell):**
 
@@ -45,7 +45,7 @@ Then follow the same `/plugin uninstall` → `/plugin install` steps above.
 ## Commands do not appear in Claude Code autocomplete
 
 - Verify the plugin is loaded: start Claude Code with `claude --plugin-dir /path/to/knowledge-graph`
-- Commands use a colon, not a hyphen: `/kmgraph:init` (correct), `/knowledge-init` (incorrect)
+- Commands use a colon, not a hyphen: `/kmgraph:kmg-init` (correct), `/knowledge-init` (incorrect)
 - Restart Claude Code completely if commands still do not appear after the above
 
 ---
@@ -75,7 +75,7 @@ cd mcp-server && npm install && npm run build
 
 ## Upgrading to v0.5.10.7 (starter relocation + concepts/ rename)
 
-v0.5.10.7 renamed `core/default-templates/knowledge/` to `core/default-templates/concepts/` and moved starter templates from live dirs into `knowledge/templates/`. Running `/kmgraph:init` (option 1 — Verify/upgrade) applies both migrations automatically.
+v0.5.10.7 renamed `core/default-templates/knowledge/` to `core/default-templates/concepts/` and moved starter templates from live dirs into `knowledge/templates/`. Running `/kmgraph:kmg-init` (option 1 — Verify/upgrade) applies both migrations automatically.
 
 **If you prefer to migrate manually:**
 
