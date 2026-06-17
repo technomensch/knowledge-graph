@@ -52,7 +52,7 @@ When a model name is invoked that does not resolve to any tier in me.md:
 ### Recall in Plan Mode
 
 When plan mode is active (native `/plan` command, `superpowers:writing-plans`, or any
-automated planning tool such as Ultraplan), invoke the `kmgraph:recall` skill with TWO
+automated planning tool such as Ultraplan), invoke the `kmgraph:kmg-recall` skill with TWO
 queries before making any plan recommendations:
 1. The specific plan topic
 2. The architectural domain of the change (rules, deployment, platform, cross-LLM, etc.)

@@ -1,10 +1,7 @@
 ---
-title: "ADR-034: Capture Level Routing — Dispatcher/Agent Split with Shared gov-capture-routing Skill"
-date: 2026-04-15
-status: Accepted
-deciders: [technomensch]
-implements: v0.3.9-beta
-tags: [architecture, capture, routing, governance, skills, agents, commands]
+title: >-
+  ADR-034: Capture Level Routing — Dispatcher/Agent Split with Shared
+  gov-capture-routing Skill
 ---
 
 # ADR-034: Capture Level Routing — Dispatcher/Agent Split with Shared gov-capture-routing Skill

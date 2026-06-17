@@ -1,19 +1,8 @@
 ---
-title: "Lesson: Three-Tier Configuration Synchronization"
-created: 2026-01-12T16:00:00Z
-author: "Example User"
-git:
-  branch: null
-  commit: null
-  pr: null
-  issue: null
-sources:
-  - url: "https://microservices.io/patterns/data/shared-database.html"
-    title: "Shared Database Pattern"
-    accessed: "2026-01-13"
-    context: "Analogy for shared configuration across multiple consumers"
-tags: ["#synchronization", "#configuration", "#modularity", "#documentation"]
-category: architecture
+title: 'Lesson: Three-Tier Configuration Synchronization'
+category:
+  uri: examples
+slug: examples-lessons-learned-architecture-example-three-tier-sync
 ---
 
 # Lesson Learned: Three-Tier Configuration Synchronization

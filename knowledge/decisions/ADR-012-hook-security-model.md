@@ -1,9 +1,7 @@
 ---
-title: "ADR-012: Hook Security Model"
-status: accepted
-created: 2026-02-27
-category: architecture
-tags: [security, hooks, shell-scripts, session-start]
+title: 'ADR-012: Hook Security Model'
+category:
+  uri: uri-that-does-not-map-to-architecture
 ---
 
 # ADR-012: Hook Security Model

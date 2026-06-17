@@ -1,11 +1,5 @@
 ---
-title: "Post-Migration Content Migration Offer — Scaffold is Not Enough"
-date: 2026-04-10
-version: v1.0
-last-updated: 2026-04-10
-tags: [migration, me-md, rules-md, content-migration, backfill, scaffold, init]
-git-branch: v0.3.0-beta
-git-author: technomensch
+title: Post-Migration Content Migration Offer — Scaffold is Not Enough
 ---
 
 # Post-Migration Content Migration Offer — Scaffold is Not Enough

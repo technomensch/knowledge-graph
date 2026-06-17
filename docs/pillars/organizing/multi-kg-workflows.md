@@ -1,15 +1,18 @@
 ---
-id: multi-kg-workflows
 title: Multi-KG Workflows
-sidebar_label: Multi-KG Workflows
-description: How to use project-local, personal, and cowork knowledge graphs side by side
+category:
+  uri: organizing
+position: 2
+slug: pillars-organizing-multi-kg-workflows
+parent:
+  uri: pillars-organizing-index
 ---
 
 # Multi-KG Workflows
 
 > "I have knowledge that spans multiple projects. How do I manage more than one graph?"
 
-KMGraph supports multiple knowledge graphs — project-local, personal, and cowork — each capturing a different scope of knowledge. KMGraph must be initialized (`/kmgraph:init`) and git configured before using multiple KGs.
+KMGraph supports multiple knowledge graphs — project-local, personal, and cowork — each capturing a different scope of knowledge. KMGraph must be initialized (`/kmgraph:kmg-init`) and git configured before using multiple KGs.
 
 ## KG types
 
@@ -23,25 +26,25 @@ KMGraph supports multiple knowledge graphs — project-local, personal, and cowo
 ## View and switch
 
 ```bash
-/kmgraph:list
+/kmgraph:kmg-list
 ```
 
 Shows all configured KGs and which is currently active.
 
 ```bash
-/kmgraph:switch personal
-/kmgraph:switch project-local
-/kmgraph:switch cowork
+/kmgraph:kmg-switch personal
+/kmgraph:kmg-switch project-local
+/kmgraph:kmg-switch cowork
 ```
 
 All capture and recall commands operate on the active KG.
 
-Run `/kmgraph:status` to confirm the active KG and entry count, or `/kmgraph:list` to see all registered KGs.
+Run `/kmgraph:kmg-status` to confirm the active KG and entry count, or `/kmgraph:kmg-list` to see all registered KGs.
 
 ## Set up a personal KG
 
 ```bash
-/kmgraph:init-personal-kg
+/kmgraph:kmg-init-personal-kg
 ```
 
 Creates `~/.kmgraph/` and registers it. Use this for patterns that apply across all projects.
@@ -62,7 +65,7 @@ Edit `~/.claude/kg-config.json`:
 }
 ```
 
-Then switch to it: `/kmgraph:switch cowork`
+Then switch to it: `/kmgraph:kmg-switch cowork`
 
 `gitStrategy` controls what happens to entries after capture:
 
@@ -77,14 +80,14 @@ Set per-KG in `kg-config.json` under the `graphs[name]` block.
 ## Capture without switching
 
 ```bash
-/kmgraph:capture-lesson --targetKg personal
-/kmgraph:capture-lesson --targetKg project-local
+/kmgraph:kmg-capture-lesson --targetKg personal
+/kmgraph:kmg-capture-lesson --targetKg project-local
 ```
 
 ## Search across all KGs
 
 ```bash
-/kmgraph:recall --all "search terms"
+/kmgraph:kmg-recall --all "search terms"
 ```
 
 ## Related

@@ -1,5 +1,5 @@
 ---
-title: "ENH-004 Solution Approach"
+title: ENH-004 Solution Approach
 ---
 
 # ENH-004 Solution Approach

@@ -1,7 +1,3 @@
----
-name: mcp-setup-agent
-description: Detects IDE environment and auto-configures MCP server registration when kg_* tools fail. Enables knowledge graph operations across platforms without manual setup.
----
 
 # MCP Setup Agent
 

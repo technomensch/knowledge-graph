@@ -1,8 +1,11 @@
 ---
-id: docs-impact-scan
 title: Docs Impact Scan
-sidebar_label: Docs Impact Scan
-description: How KMGraph automatically discovers and updates affected documentation before every push using the docs-impact-scan pre-push workflow
+category:
+  uri: tailoring
+position: 5
+slug: pillars-tailoring-docs-impact-scan
+parent:
+  uri: pillars-tailoring-index
 ---
 
 # Docs Impact Scan
@@ -23,7 +26,7 @@ The scan runs in eight steps:
 | 4 | Query the active knowledge graph for learned correction patterns (e.g., "when X changes, also check Y") |
 | 5 | Present the combined list to the developer for confirmation — add, remove, or approve |
 | 6 | Offer to save any manually-added files as learned patterns to the KG for future runs |
-| 7 | Dispatch `/kmgraph:update-doc --user-facing [file]` for each confirmed file, in sequence |
+| 7 | Dispatch `/kmgraph:kmg-update-doc --user-facing [file]` for each confirmed file, in sequence |
 | 8 | Write a completion flag to `/tmp/` — the pre-push gate checks this flag before allowing push |
 
 ```mermaid
@@ -43,8 +46,6 @@ flowchart TD
     K --> L[Step 8: Write completion flag\n/tmp/kmgraph-docs-scan-branch-sha.flag]
     L --> M([Gate 3 passes · git push proceeds])
 
-    accTitle: docs-impact-scan eight-step workflow
-    accDescr: Flowchart showing the eight steps from trigger phrase detection through diff scanning, identifier extraction, docs grep, KG pattern query, user confirmation, update-doc dispatch, and completion flag write.
 ```
 
 ## The pre-push gate
@@ -70,14 +71,12 @@ sequenceDiagram
     Note over Skill: trigger phrase detected
     Skill->>Dev: Scan diff → present affected docs list
     Dev->>Skill: Confirm or edit list
-    Skill->>Docs: /kmgraph:update-doc --user-facing for each file
+    Skill->>Docs: /kmgraph:kmg-update-doc --user-facing for each file
     Docs->>Dev: Each doc updated
     Skill->>Gate: Write /tmp/kmgraph-docs-scan-<branch>-<sha>.flag
     Dev->>Dev: git push proceeds
     Gate->>Gate: Flag found → Gate 3 passes
 
-    accTitle: docs-impact-scan pre-push flow
-    accDescr: Sequence showing the skill triggering on a push phrase, scanning the diff, presenting docs to the developer, dispatching update-doc for each file, writing the completion flag, and the pre-push gate passing on flag check.
 ```
 
 ## Trigger phrases
@@ -91,7 +90,7 @@ The skill fires automatically when any of these phrases appear in conversation:
 | "open PR" / "create PR" | PR creation signals |
 | "finishing up" / "ready to push" | End-of-session signals |
 
-The skill does not fire on targeted mid-session doc file updates — use `/kmgraph:update-doc` directly for those.
+The skill does not fire on targeted mid-session doc file updates — use `/kmgraph:kmg-update-doc` directly for those.
 
 ## When docs are already updated
 
@@ -108,9 +107,9 @@ Source: docs-impact-scan correction (YYYY-MM-DD)
 
 These patterns accumulate over time, making the scan progressively more accurate for the specific project's documentation layout.
 
-:::tip[Same branch, before push]
-Docs updates commit to the feature branch — not a separate docs-update branch. The completion flag is keyed to the current branch and commit SHA, so updates must land before the push that triggers Gate 3.
-:::
+> 👍 **Same branch, before push**
+>
+> Docs updates commit to the feature branch — not a separate docs-update branch. The completion flag is keyed to the current branch and commit SHA, so updates must land before the push that triggers Gate 3.
 
 ## Related
 

@@ -1,3 +1,10 @@
+---
+title: Test Cases
+category:
+  uri: templates
+slug: templates-meta-issue-test-cases
+---
+
 # Test Cases & Validation
 
 Scenarios that must pass for this problem to be considered solved.

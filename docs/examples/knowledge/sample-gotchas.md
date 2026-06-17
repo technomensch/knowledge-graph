@@ -1,3 +1,10 @@
+---
+title: Sample Gotchas
+category:
+  uri: examples
+slug: examples-knowledge-sample-gotchas
+---
+
 # Common Gotchas & Solutions
 
 <!-- THIS IS AN EXAMPLE — Replace with your project's gotchas -->

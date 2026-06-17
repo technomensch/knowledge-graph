@@ -1,8 +1,3 @@
----
-id: issue-7
-file: test-cases
-status: defined
----
 
 # Issue-7 Test Cases
 

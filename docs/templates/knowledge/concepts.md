@@ -1,3 +1,10 @@
+---
+title: Concepts
+category:
+  uri: templates
+slug: templates-knowledge-concepts
+---
+
 # Knowledge Graph - Concepts
 
 Quick-reference architectural concepts and terminology.

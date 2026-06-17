@@ -1,43 +1,7 @@
 ---
-# ====================
-# YAML FRONTMATTER - Metadata for this lesson
-# Fields marked [AUTO] are filled by /kmgraph:capture-lesson command
-# Fields marked [MANUAL] require you to fill them in
-# ====================
-
-title: "Lesson: [Title]"  # [MANUAL] Short descriptive title (e.g., "Lesson: Database Connection Pooling")
-
-created: YYYY-MM-DDTHH:MM:SSZ  # [AUTO] Timestamp when lesson was created (ISO 8601 format: 2024-01-15T14:30:00Z)
-
-author: [Your Name]  # [AUTO] Filled from git config user.name
-
-email: [Your Email]  # [AUTO] Filled from git config user.email
-
-git:  # [AUTO] All git metadata detected automatically
-  branch: [branch-name]  # Current git branch (e.g., feature/add-pooling)
-  commit: [commit-hash]  # Latest commit SHA (e.g., a1b2c3d)
-  pr: [pr-number or null]  # PR number if branch named like "feature/123-title", otherwise null
-  issue: [issue-number or null]  # Issue number if branch named like "issue/456-bug", otherwise null
-
-sources:  # [MANUAL] External articles/docs consulted (optional, delete if not used)
-  - url: "https://example.com/article"  # Full URL to source
-    title: "Article Title"  # Title of article/documentation
-    accessed: "YYYY-MM-DD"  # Date you accessed it (format: 2024-01-15)
-    context: "Used for [specific insight]"  # Why you referenced this source
-
-tags: []  # [MANUAL] Custom tags for searching (e.g., [database, performance, postgresql])
-
-category: [architecture|process|patterns|debugging]  # [AUTO-SUGGEST] Command suggests, you can override
-# - architecture: System design, component structure
-# - process: Workflow improvements, tools, procedures
-# - patterns: Reusable design patterns, best practices
-# - debugging: Troubleshooting, bug fixes, investigations
-
-related:  # [MANUAL] Optional: Links to related ADRs, enhancements, issues, and lessons
-  adrs: []          # e.g. ["[[ADR-028-rules-md-scaffolding]]"]
-  enhancements: []  # e.g. ["[[ENH-010]]"]
-  issues: []        # e.g. ["[#123](GITHUB_ISSUES_URL/123)"]
-  lessons: []       # e.g. ["[[Lessons_Learned_Plan_File_Dual_Location_Protocol]]"]
+title: 'Lesson: [Title]'
+category:
+  uri: uri-that-does-not-map-to-architecture|process|patterns|debugging
 ---
 
 # Lesson Learned: [Title]

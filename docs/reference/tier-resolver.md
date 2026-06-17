@@ -1,8 +1,9 @@
 ---
-id: tier-resolver
 title: Model Tier Resolver
-sidebar_label: Model Tier Resolver
-description: "Configure per-project model tier mappings in me.md to override personal defaults"
+category:
+  uri: reference
+position: 9
+slug: reference-tier-resolver
 ---
 
 # Model Tier Resolver
@@ -81,5 +82,5 @@ Project-level `knowledge/me.md` entries take precedence over `~/.kmgraph/me.md` 
 
 ## Related
 
-- [me.md and rules.md](../pillars/portability/your-ai-profile.mdx) — Where the `platforms[]` block lives
+- [me.md and rules.md](../pillars/portability/your-ai-profile) — Where the `platforms[]` block lives
 - [Platform Adaptation](PLATFORM-ADAPTATION.md) — IDE-level platform integration

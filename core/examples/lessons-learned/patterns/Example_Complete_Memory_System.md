@@ -1,27 +1,7 @@
 ---
-title: "Lesson: Complete Knowledge System Implementation"
-created: 2026-01-02T15:48:00Z
-author: "Example User"
-git:
-  branch: null
-  commit: null
-  pr: null
-  issue: null
-sources:
-  - url: "https://github.com/joelparkerhenderson/architecture-decision-record"
-    title: "Architecture Decision Record GitHub Repository"
-    accessed: "2026-01-02"
-    context: "Research for industry-standard ADR templates"
-  - url: "https://ericmjl.github.io/notes/blog_drafts/building-a-great-personal-knowledge-graph-with-obsidian/"
-    title: "Building Personal Knowledge Graph with Obsidian"
-    accessed: "2026-01-02"
-    context: "Inspiration for bidirectional linking and knowledge graph structure"
-  - url: "https://www.mintlify.com/blog/ai-documentation-trends-whats-changing-in-2025"
-    title: "AI Documentation Trends 2025"
-    accessed: "2026-01-02"
-    context: "Alignment with modern AI development documentation patterns"
-tags: ["#knowledge-management", "#memory-system", "#automation", "#workflow"]
-category: patterns
+title: 'Lesson: Complete Knowledge System Implementation'
+category:
+  uri: uri-that-does-not-map-to-patterns
 ---
 
 # Lesson Learned: Complete Knowledge System Implementation
@@ -137,7 +117,7 @@ Implemented complete system with four complementary knowledge types:
 
 ## Automation & Workflows
 
-### `/kmgraph:capture-lesson`
+### `/kmgraph:kmg-capture-lesson`
 
 Automates lesson creation:
 1. Prompt for topic and category
@@ -147,7 +127,7 @@ Automates lesson creation:
 5. Commit with standard message
 6. Link to related knowledge
 
-### `/kmgraph:create-adr`
+### `/kmgraph:kmg-create-adr`
 
 Automates ADR creation:
 1. Generate next ADR number
@@ -156,11 +136,11 @@ Automates ADR creation:
 4. Commit with standard message
 5. Link from related lessons
 
-### `/kmgraph:recall`
+### `/kmgraph:kmg-recall`
 
 Searches all knowledge systems:
 ```bash
-/kmgraph:recall "validation issue"
+/kmgraph:kmg-recall "validation issue"
 
 Results:
 - Lessons: "Input Validation Debugging" (process/, 2024-08-15)
@@ -169,7 +149,7 @@ Results:
 - Session: "Validation Refactoring Session" (2024-08-22)
 ```
 
-### `/kmgraph:sync-all`
+### `/kmgraph:kmg-sync-all`
 
 Complete pipeline automation:
 1. Capture lesson (if applicable)
@@ -301,7 +281,7 @@ After implementing complete system:
 **Phase 2:** Added automation (/lesson-learned, /create-adr)
 **Phase 3:** Added Knowledge Graph extraction
 **Phase 4:** Added session summaries
-**Phase 5:** Added /kmgraph:sync-all pipeline
+**Phase 5:** Added /kmgraph:kmg-sync-all pipeline
 **Phase 6:** Integrated with MEMORY.md bidirectional sync
 
 Each phase built on previous, validating architecture.
@@ -333,9 +313,9 @@ Sources consulted while solving this problem:
 - [ADR-005: Memory System Architecture](../../decisions/ADR-005-example.md) — Core decision to adopt this patterns.
 
 **Workflows:**
-- `/kmgraph:capture-lesson` - Standardized lesson extraction.
-- `/kmgraph:create-adr` - Architectural record keeping.
-- `/kmgraph:recall` - Unified search interface.
+- `/kmgraph:kmg-capture-lesson` - Standardized lesson extraction.
+- `/kmgraph:kmg-create-adr` - Architectural record keeping.
+- `/kmgraph:kmg-recall` - Unified search interface.
 
 ---
 

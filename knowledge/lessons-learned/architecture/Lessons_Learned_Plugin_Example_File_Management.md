@@ -1,16 +1,7 @@
 ---
-title: "Lesson: Plugin Example File Management — Why You Can't Gate the Download"
-created: 2026-02-21T00:00:00Z
-author: technomensch
-email: 917847+technomensch@users.noreply.github.com
-git:
-  branch: main
-  commit: 9c9d7dc78eb551f98e542c4244390bdf0918812e
-  pr: null
-  issue: null
-sources: []
-tags: [architecture, plugin-distribution, git, examples, install]
-category: architecture
+title: 'Lesson: Plugin Example File Management — Why You Can''t Gate the Download'
+category:
+  uri: uri-that-does-not-map-to-architecture
 ---
 
 # Lesson Learned: Plugin Example File Management — Why You Can't Gate the Download

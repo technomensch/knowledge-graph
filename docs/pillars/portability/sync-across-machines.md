@@ -1,8 +1,11 @@
 ---
-id: sync-across-machines
 title: Sync a Knowledge Graph Across Machines
-sidebar_label: Sync Across Machines
-description: How to share a personal or project knowledge graph between multiple development machines
+category:
+  uri: portability
+position: 2
+slug: pillars-portability-sync-across-machines
+parent:
+  uri: pillars-portability-index
 ---
 
 # Sync a Knowledge Graph Across Machines
@@ -37,9 +40,9 @@ git clone git@github.com:yourname/personal-kg.git ~/.kmgraph
 Then register the KG with KMGraph:
 
 ```bash
-/kmgraph:init-personal-kg
+/kmgraph:kmg-init-personal-kg
 # or
-/kmgraph:switch personal
+/kmgraph:kmg-switch personal
 ```
 
 **Ongoing sync:**
@@ -52,7 +55,7 @@ cd ~/.kmgraph && git pull
 git add . && git commit -m "chore: sync captures" && git push
 ```
 
-Confirm with `/kmgraph:recall "a lesson you captured on the first machine"` — it should appear.
+Confirm with `/kmgraph:kmg-recall "a lesson you captured on the first machine"` — it should appear.
 
 ## Automating sync
 

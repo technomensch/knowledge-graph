@@ -1,8 +1,9 @@
 ---
-id: index
 title: Tailoring
-sidebar_label: Overview
-description: How to customize KMGraph to fit your workflow — hooks, templates, and rules.
+category:
+  uri: tailoring
+position: 1
+slug: pillars-tailoring-index
 ---
 
 # Tailoring
@@ -21,5 +22,5 @@ KMGraph ships with sensible defaults. This pillar covers how to adjust hooks, te
 
 ## Related
 
-- [Your AI Profile](../portability/your-ai-profile.mdx) — who you are across tools
+- [Your AI Profile](../portability/your-ai-profile) — who you are across tools
 - [Capturing](../capturing/index.md) — the workflows these hooks and templates support

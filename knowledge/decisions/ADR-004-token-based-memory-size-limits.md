@@ -1,8 +1,5 @@
 ---
-title: "ADR-004: Token-Based MEMORY.md Size Limits"
-status: Accepted
-date: 2026-02-16
-deciders: technomensch, Claude Sonnet 4.5
+title: 'ADR-004: Token-Based MEMORY.md Size Limits'
 ---
 
 # ADR-004: Token-Based MEMORY.md Size Limits

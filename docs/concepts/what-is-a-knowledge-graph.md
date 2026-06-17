@@ -1,8 +1,9 @@
 ---
-id: what-is-a-knowledge-graph
 title: What Is a Knowledge Graph
-sidebar_label: What Is a Knowledge Graph
-description: The concept behind knowledge graphs and why KMGraph uses one.
+category:
+  uri: concepts
+position: 2
+slug: concepts-what-is-a-knowledge-graph
 ---
 
 # What Is a Knowledge Graph

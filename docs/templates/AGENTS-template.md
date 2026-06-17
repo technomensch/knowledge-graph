@@ -1,3 +1,10 @@
+---
+title: Agents Template
+category:
+  uri: templates
+slug: templates-agents-template
+---
+
 # Agent Template
 
 Template for creating new KMGraph agents. Copy this file and fill in each section.

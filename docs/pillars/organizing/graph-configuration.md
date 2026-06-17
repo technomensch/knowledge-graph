@@ -1,8 +1,11 @@
 ---
-id: graph-configuration
 title: Graph Configuration
-sidebar_label: Graph Configuration
-description: How to configure categories, storage paths, and KG structure.
+category:
+  uri: organizing
+position: 3
+slug: pillars-organizing-graph-configuration
+parent:
+  uri: pillars-organizing-index
 ---
 
 # Graph Configuration
@@ -39,7 +42,7 @@ Categories are subdirectories within `lessons-learned/`, `decisions/`, or `knowl
 ### Using the command
 
 ```bash
-/kmgraph:add-category
+/kmgraph:kmg-add-category
 ```
 
 This prompts for the category name, creates the directory, adds a `README.md`, and registers the category in `kg-config.json`.
@@ -124,9 +127,9 @@ Template changes affect new documents only — existing entries are not modified
 
 After init, the most common configuration tasks are:
 
-1. **Adding a new category** — `/kmgraph:add-category`
-2. **Switching the active KG** — `/kmgraph:switch` (for multi-KG setups)
-3. **Listing all configured KGs** — `/kmgraph:list`
+1. **Adding a new category** — `/kmgraph:kmg-add-category`
+2. **Switching the active KG** — `/kmgraph:kmg-switch` (for multi-KG setups)
+3. **Listing all configured KGs** — `/kmgraph:kmg-list`
 4. **Editing templates** — directly in `core/default-templates/`
 
 Avoid restructuring the directory layout after the KG is in use. Moving files breaks cross-references and FTS5 index entries. If you need to reorganize, use `kg_fts5_rebuild` after the move.

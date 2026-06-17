@@ -17,7 +17,7 @@ Sleep 400ms
 Enter
 Sleep 300ms
 
-Type "echo '> /kmgraph:init'"
+Type "echo '> /kmgraph:kmg-init'"
 Sleep 300ms
 Enter
 Sleep 500ms
@@ -125,13 +125,13 @@ Enter
 Type "echo 'Next steps:'"
 Sleep 200ms
 Enter
-Type "echo '  /kmgraph:status         — View KG info and quick reference'"
+Type "echo '  /kmgraph:kmg-status         — View KG info and quick reference'"
 Sleep 150ms
 Enter
-Type "echo '  /kmgraph:capture-lesson — Document your first lesson'"
+Type "echo '  /kmgraph:kmg-capture-lesson — Document your first lesson'"
 Sleep 150ms
 Enter
-Type "echo '  /kmgraph:recall query   — Search across KG'"
+Type "echo '  /kmgraph:kmg-recall query   — Search across KG'"
 Sleep 500ms
 Enter
 

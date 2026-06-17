@@ -1,11 +1,8 @@
 ---
-title: "v0.2.1 Backlog — kg_capture MCP Tool, sync-all/update-graph Refactor, Skill Modernization, MCP Auto-Registration"
-local-id: issue-1
-github-id: 39
+title: >-
+  v0.2.1 Backlog — kg_capture MCP Tool, sync-all/update-graph Refactor, Skill
+  Modernization, MCP Auto-Registration
 type: meta-issue
-status: open
-version-target: 0.2.1-beta
-created: 2026-03-27
 parent: v0.2.0-beta-layered-architecture
 ---
 

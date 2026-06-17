@@ -1,12 +1,5 @@
 ---
-title: "ENH-009: start-issue-tracking — mode gate + pre-flight working-tree check"
-number: 009
-status: implemented
-version_target: "v0.2.3.4-beta"
-github_issue: 58
-created: 2026-04-07
-related_adrs: []
-related_enhs: []
+title: 'ENH-009: start-issue-tracking — mode gate + pre-flight working-tree check'
 ---
 
 # ENH-009: start-issue-tracking — mode gate + pre-flight working-tree check

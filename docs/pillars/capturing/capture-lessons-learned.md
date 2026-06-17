@@ -1,8 +1,11 @@
 ---
-id: capture-lessons-learned
 title: Capture Lessons Learned
-sidebar_label: Capture Lessons Learned
-description: How to turn a bug fix or breakthrough into a durable, searchable KG entry.
+category:
+  uri: capturing
+position: 1
+slug: pillars-capturing-capture-lessons-learned
+parent:
+  uri: pillars-capturing-index
 ---
 
 # Capture Lessons Learned
@@ -14,10 +17,10 @@ This is the most common KMGraph action. When you fix a bug, reach a breakthrough
 ## The command
 
 ```
-/kmgraph:capture-lesson
+/kmgraph:kmg-capture-lesson
 ```
 
-Run this at the end of any session where something clicked. Claude will ask you a few questions and write a structured entry to your knowledge graph. If git is enabled, branch, commit hash, and any linked issue number attach automatically. Confirm with `/kmgraph:recall "keywords"` — the entry should appear.
+Run this at the end of any session where something clicked. Claude will ask you a few questions and write a structured entry to your knowledge graph. If git is enabled, branch, commit hash, and any linked issue number attach automatically. Confirm with `/kmgraph:kmg-recall "keywords"` — the entry should appear.
 
 ## What to fill in
 
@@ -45,7 +48,7 @@ Don't wait until the end of the week — capture while the context is fresh.
 If the debugging session involved many steps, add a session snapshot first:
 
 ```bash
-/kmgraph:capture-lesson --snapshot
+/kmgraph:kmg-capture-lesson --snapshot
 ```
 
 This preserves the full session context alongside the lesson.

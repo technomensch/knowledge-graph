@@ -1,8 +1,11 @@
 ---
-id: personal-vs-project
 title: Personal vs. Project
-sidebar_label: Personal vs. Project
-description: Understanding personal and project-scoped knowledge graphs
+category:
+  uri: organizing
+position: 1
+slug: pillars-organizing-personal-vs-project
+parent:
+  uri: pillars-organizing-index
 ---
 
 # Personal vs. Project
@@ -43,14 +46,14 @@ Each scope also scaffolds two special files:
 | `~/.kmgraph/rules.md` | Personal | N/A local | Cross-project behavioral rules |
 | `~/.kmgraph/me.md` | Personal | N/A local | Cross-project personal identity and preferences |
 
-These files are the platform-agnostic foundation that all AI platform config files (CLAUDE.md, .cursorrules, etc.) point to. See [Your AI Profile](../portability/your-ai-profile.mdx) for the full setup guide.
+These files are the platform-agnostic foundation that all AI platform config files (CLAUDE.md, .cursorrules, etc.) point to. See [Your AI Profile](../portability/your-ai-profile) for the full setup guide.
 
 ## How they work together
 
 | Behavior | Detail |
 |---|---|
-| **`/kmgraph:recall`** | Searches both KGs automatically when a personal KG is registered. Results show `[project]` or `[personal]` source labels. |
-| **`/kmgraph:capture-lesson`** | Shows a KG picker when ≥2 KGs are registered. Only one prompt per session (choice remembered). |
+| **`/kmgraph:kmg-recall`** | Searches both KGs automatically when a personal KG is registered. Results show `[project]` or `[personal]` source labels. |
+| **`/kmgraph:kmg-capture-lesson`** | Shows a KG picker when ≥2 KGs are registered. Only one prompt per session (choice remembered). |
 | **SessionStart hook** | Surfaces recent personal KG lessons alongside project lessons. |
 | **Active KG** | Unchanged by personal KG setup — project KG stays active for new captures by default. |
 
@@ -67,7 +70,6 @@ These files are the platform-agnostic foundation that all AI platform config fil
 ## Scope diagram
 
 ```mermaid
-%%{init: {'theme': 'neutral'}}%%
 graph TB
     subgraph Personal ["🧑 Personal KG (~/.kmgraph/)"]
         PM["me.md — cross-project identity (local)"]
@@ -85,12 +87,10 @@ graph TB
         PJ3["Codebase-specific patterns"]
     end
 
-    Recall["🔍 /kmgraph:recall"]
+    Recall["🔍 /kmgraph:kmg-recall"]
     Recall -->|searches both| Personal
     Recall -->|searches both| Project
 
-    accTitle: Personal vs Project KG scopes
-    accDescr: Two KG scopes — Personal stored at ~/.kmgraph/ and Project stored in ./knowledge/. Each scope includes me.md for identity and rules.md for behavioral conventions. Recall searches both automatically.
 ```
 
 ## Routing captures by level
@@ -107,23 +107,23 @@ All capture commands (`session-summary`, `create-adr`, `capture-lesson`, `sync-a
 **Examples:**
 
 ```bash
-/kmgraph:capture-lesson "user level"        # → ~/.kmgraph/lessons-learned/
-/kmgraph:create-adr --project               # → current project's knowledge/decisions/
-/kmgraph:session-summary --named=career-ops # → career-ops KG sessions/
-/kmgraph:recall "auth patterns" --user      # → search only ~/.kmgraph/
+/kmgraph:kmg-capture-lesson "user level"        # → ~/.kmgraph/lessons-learned/
+/kmgraph:kmg-create-adr --project               # → current project's knowledge/decisions/
+/kmgraph:kmg-session-summary --named=career-ops # → career-ops KG sessions/
+/kmgraph:kmg-recall "auth patterns" --user      # → search only ~/.kmgraph/
 ```
 
 If a named KG isn't found, a fuzzy suggestion prompt appears. If the project has no configured KG, a setup prompt offers options to initialize or redirect the capture.
 
 ## Setup
 
-- **During init**: `/kmgraph:init` offers to create a personal KG at the end of setup
-- **Standalone**: `/kmgraph:init-personal-kg` creates and registers the personal KG at any time
+- **During init**: `/kmgraph:kmg-init` offers to create a personal KG at the end of setup
+- **Standalone**: `/kmgraph:kmg-init-personal-kg` creates and registers the personal KG at any time
 
-See [Multi-KG Workflows](./multi-kg-workflows.md) for advanced configuration and [Your AI Profile](../portability/your-ai-profile.mdx) for setting up `me.md` and `rules.md`.
+See [Multi-KG Workflows](./multi-kg-workflows.md) for advanced configuration and [Your AI Profile](../portability/your-ai-profile) for setting up `me.md` and `rules.md`.
 
 ## Related
 
 - [Graph Configuration](./graph-configuration.md) — categories, storage paths, and kg-config.json
 - [Multi-KG Workflows](./multi-kg-workflows.md) — managing multiple graphs side by side
-- [Your AI Profile](../portability/your-ai-profile.mdx) — setting up me.md and rules.md
+- [Your AI Profile](../portability/your-ai-profile) — setting up me.md and rules.md

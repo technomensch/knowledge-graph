@@ -1,8 +1,11 @@
 ---
-id: custom-rules
 title: Custom Rules
-sidebar_label: Custom Rules
-description: How to define behavioral rules for your AI assistant and the situations where they apply.
+category:
+  uri: tailoring
+position: 3
+slug: pillars-tailoring-custom-rules
+parent:
+  uri: pillars-tailoring-index
 ---
 
 # Custom Rules
@@ -47,9 +50,9 @@ Good rules are:
 
 ## Capturing rules
 
-Run `/kmgraph:rules-capture` to add a new rule. The skill prompts you for the rule text and whether it applies in specific situations — then routes it to the right file automatically.
+Run `/kmgraph:kmg-rules-capture` to add a new rule. The skill prompts you for the rule text and whether it applies in specific situations — then routes it to the right file automatically.
 
 ## Related
 
-- [Your AI Profile](../portability/your-ai-profile.mdx) — identity vs. behavior: what goes where
+- [Your AI Profile](../portability/your-ai-profile) — identity vs. behavior: what goes where
 - [Customize Hooks](./customize-hooks.md) — automate rule enforcement at the shell level

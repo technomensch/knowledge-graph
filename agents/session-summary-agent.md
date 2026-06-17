@@ -1,7 +1,3 @@
----
-name: session-summary-agent
-description: Creates a lightweight summary of the current session — what was built, decided, and learned. Checks for open plans, draft ADRs, and uncaptured lessons before saving. Uses kg_capture for platform-agnostic writes.
----
 
 # Session Summary Agent
 
@@ -65,8 +61,8 @@ This applies even when `--active` (default) is used, so the user can correct the
 
 If `--project` requires a KG switch:
 1. Record `$restore_kg` = current active KG
-2. Run `/kmgraph:switch {project_kg}`
-3. After capture completes: run `/kmgraph:switch {$restore_kg}`
+2. Run `/kmgraph:kmg-switch {project_kg}`
+3. After capture completes: run `/kmgraph:kmg-switch {$restore_kg}`
 
 ### Pass-through to `--delegate`
 

@@ -1,8 +1,11 @@
 ---
-id: customize-hooks
 title: Customize Hooks
-sidebar_label: Customize Hooks
-description: How to configure, extend, or disable the KMGraph lifecycle hooks
+category:
+  uri: tailoring
+position: 1
+slug: pillars-tailoring-customize-hooks
+parent:
+  uri: pillars-tailoring-index
 ---
 
 # Customize Hooks

@@ -1,8 +1,3 @@
----
-id: ENH-020
-file: test-cases
-status: stub
----
 
 # ENH-020 Test Cases
 

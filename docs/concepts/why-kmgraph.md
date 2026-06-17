@@ -1,8 +1,9 @@
 ---
-id: why-kmgraph
 title: Why KMGraph?
-sidebar_label: Why KMGraph?
-description: The problem KMGraph solves, who it helps, and when to reach for it
+category:
+  uri: concepts
+position: 1
+slug: concepts-why-kmgraph
 ---
 
 # Why KMGraph?
@@ -23,14 +24,13 @@ The knowledge lives in the project directory alongside the code. It is version-c
 
 ## The Outcome
 
-Captured knowledge is accessible in any session. Switching from Claude to Cursor to Gemini does not mean starting over. Onboarding a new teammate means giving them the knowledge graph. Running a sprint retrospective means `/kmgraph:recall` rather than trying to reconstruct three weeks of decisions from memory.
+Captured knowledge is accessible in any session. Switching from Claude to Cursor to Gemini does not mean starting over. Onboarding a new teammate means giving them the knowledge graph. Running a sprint retrospective means `/kmgraph:kmg-recall` rather than trying to reconstruct three weeks of decisions from memory.
 
 ## When Would I Use This?
 
 Knowledge capture fits naturally into everyday development:
 
 ```mermaid
-%%{init: { 'flowchart': { 'useMaxWidth': true }, 'theme': 'neutral' }}%%
 graph LR
     subgraph Trigger["⚡ The Moment"]
         A["🐞 Debugging<br/>breakthrough"]
@@ -63,8 +63,6 @@ graph LR
     G --> J
     G --> K
 
-    accTitle: When to Use the Knowledge Graph
-    accDescr: Three-phase journey flow showing six trigger moments feeding into knowledge capture, which enables four future benefits.
 ```
 
 ## How It Works

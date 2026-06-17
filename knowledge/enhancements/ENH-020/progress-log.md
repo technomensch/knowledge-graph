@@ -1,7 +1,3 @@
----
-id: ENH-020
-file: progress-log
----
 
 # ENH-020 Progress Log
 

@@ -1,3 +1,10 @@
+---
+title: Patterns
+category:
+  uri: templates
+slug: templates-knowledge-patterns
+---
+
 # Knowledge Graph - Patterns
 
 Quick-reference patterns discovered from lessons learned.

@@ -1,13 +1,7 @@
 ---
-title: "Platform-Agnostic Rule Timing via triggers.md"
-created: 2026-04-12T15:49:04.066Z
-updated: 2026-04-12T15:49:04.066Z
-author: technomensch
-git:
-  branch: v0.3.7
-  commit: 68f81d92f7d6e9a7012486be2bf41b4fa35adc0b
-tags: [triggers-md, rules-md, platform-portability, timing, plan-protocol, parallelism-analysis, cross-platform]
-category: architecture
+title: Platform-Agnostic Rule Timing via triggers.md
+category:
+  uri: uri-that-does-not-map-to-architecture
 ---
 ## Problem
 

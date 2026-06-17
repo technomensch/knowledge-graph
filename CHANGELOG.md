@@ -1,11 +1,75 @@
----
-hide_table_of_contents: true
-displayed_sidebar: null
----
 
 # Changelog
 
 All notable changes to the Knowledge Plugin will be documented in this file.
+
+## [0.6.0] — 2026-06-16
+
+### Breaking Changes
+
+**All skill and command names now use `kmg-` prefix.**
+
+kmgraph skills and commands have been renamed with a `kmg-` prefix to ensure
+collision-free invocation in Codex (which uses bare names without a plugin namespace)
+and consistent naming across all supported platforms. See ADR-053.
+
+**Claude Code:** `/kmgraph:recall` → `/kmgraph:kmg-recall`  
+**Codex:** `recall` → `kmg-recall`
+
+#### Migration: Search-and-Replace Guide
+
+Update any personal rules, triggers, or config files that reference old skill/command names:
+
+| Old | New |
+|---|---|
+| `kmgraph:adr-guide` | `kmgraph:kmg-adr-guide` |
+| `kmgraph:brainstorm-recall` | `kmgraph:kmg-brainstorm-recall` |
+| `kmgraph:capture-lesson` | `kmgraph:kmg-capture-lesson` |
+| `kmgraph:capture-router` | `kmgraph:kmg-capture-router` |
+| `kmgraph:check-sensitive` | `kmgraph:kmg-check-sensitive` |
+| `kmgraph:config-sanitization` | `kmgraph:kmg-config-sanitization` |
+| `kmgraph:create-adr` | `kmgraph:kmg-create-adr` |
+| `kmgraph:create-doc` | `kmgraph:kmg-create-doc` |
+| `kmgraph:doc-update-router` | `kmgraph:kmg-doc-update-router` |
+| `kmgraph:docs-impact-scan` | `kmgraph:kmg-docs-impact-scan` |
+| `kmgraph:extract-chat` | `kmgraph:kmg-extract-chat` |
+| `kmgraph:gov-execute-plan` | `kmgraph:kmg-execute-plan` |
+| `kmgraph:gov-plan-gate` | `kmgraph:kmg-plan-gate` |
+| `kmgraph:handoff` | `kmgraph:kmg-handoff` |
+| `kmgraph:help` | `kmgraph:kmg-help` |
+| `kmgraph:init` | `kmgraph:kmg-init` |
+| `kmgraph:init-personal-kg` | `kmgraph:kmg-init-personal-kg` |
+| `kmgraph:kg-recall` | `kmgraph:kmg-auto-recall` |
+| `kmgraph:knowledge-graph-usage` | `kmgraph:kmg-knowledge-graph-usage` |
+| `kmgraph:lesson-capture` | `kmgraph:kmg-lesson-capture` |
+| `kmgraph:link-issue` | `kmgraph:kmg-link-issue` |
+| `kmgraph:list` | `kmgraph:kmg-list` |
+| `kmgraph:meta-issue` | `kmgraph:kmg-meta-issue` |
+| `kmgraph:migration` | `kmgraph:kmg-migration` |
+| `kmgraph:recall` | `kmgraph:kmg-recall` |
+| `kmgraph:rules-capture` | `kmgraph:kmg-rules-capture` |
+| `kmgraph:session-summary` | `kmgraph:kmg-session-summary` |
+| `kmgraph:session-wrap` | `kmgraph:kmg-session-wrap` |
+| `kmgraph:setup-platform` | `kmgraph:kmg-setup-platform` |
+| `kmgraph:sidebar-update` | `kmgraph:kmg-sidebar-update` |
+| `kmgraph:start-issue-tracking` | `kmgraph:kmg-start-issue-tracking` |
+| `kmgraph:status` | `kmgraph:kmg-status` |
+| `kmgraph:stuck-work-escalation` | `kmgraph:kmg-stuck-work-escalation` |
+| `kmgraph:switch` | `kmgraph:kmg-switch` |
+| `kmgraph:sync-all` | `kmgraph:kmg-sync-all` |
+| `kmgraph:update-doc` | `kmgraph:kmg-update-doc` |
+| `kmgraph:update-graph` | `kmgraph:kmg-update-graph` |
+| `kmgraph:update-issue-plan` | `kmgraph:kmg-update-issue-plan` |
+| `kmgraph:update-profile` | `kmgraph:kmg-update-profile` |
+| `kmgraph:init-shared:ai-model-tier-resolver` | `kmgraph:init-shared:kmg-ai-model-tier-resolver` |
+| `kmgraph:init-shared:config-entry-write` | `kmgraph:init-shared:kmg-config-entry-write` |
+| `kmgraph:init-shared:directory-scaffold` | `kmgraph:init-shared:kmg-directory-scaffold` |
+| `kmgraph:init-shared:fts5-rebuild` | `kmgraph:init-shared:kmg-fts5-rebuild` |
+| `kmgraph:init-shared:knowledge-file-migrator` | `kmgraph:init-shared:kmg-knowledge-file-migrator` |
+| `kmgraph:init-shared:template-seed` | `kmgraph:init-shared:kmg-template-seed` |
+| `kmgraph:init-shared:upgrade-inspector` | `kmgraph:init-shared:kmg-upgrade-inspector` |
+
+**MCP tool names (`kg_*`) are unchanged.**
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).

@@ -1,6 +1,5 @@
 ---
 title: ENH-001 Progress Log
-enhancement_id: ENH-001
 ---
 
 # ENH-001 Progress Log: User-Level Global Knowledge Graphs

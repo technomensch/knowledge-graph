@@ -1,13 +1,7 @@
 ---
-title: "Handoff Spec Must Cover All Artifact Shapes"
-created: 2026-06-07T16:48:16.676Z
-updated: 2026-06-07T16:48:16.676Z
-author: technomensch
-git:
-  branch: v0.5.10-ux-session-handoff
-  commit: a8dd1739fedf1f18e73e4f97eae24d71a0261c52
-tags: [spec-writing, handoff, artifact-shapes, ENH-021, templates]
-category: process
+title: Handoff Spec Must Cover All Artifact Shapes
+category:
+  uri: uri-that-does-not-map-to-process
 ---
 ## Problem
 

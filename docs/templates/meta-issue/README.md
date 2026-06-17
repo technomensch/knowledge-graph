@@ -1,3 +1,10 @@
+---
+title: Readme
+category:
+  uri: templates
+slug: templates-meta-issue-readme
+---
+
 # Meta-Issue: [Problem Title]
 
 **Navigation**: [Home](../../index.md) > [Getting Started](../../GETTING-STARTED.md) > [Manual Workflows](../../WORKFLOWS.md) > Templates
@@ -64,7 +71,7 @@
 2. **Update understanding:** Edit `analysis/root-cause-evolution.md` when beliefs shift
 3. **Log progress:** Update `implementation-log.md` with each attempt
 4. **Extract lessons:** Create lessons-learned when patterns emerge
-5. **Sync to KG:** Run `/kmgraph:update-graph` to extract insights
+5. **Sync to KG:** Run `/kmgraph:kmg-update-graph` to extract insights
 
 ---
 

@@ -1,18 +1,7 @@
 ---
-title: "Lesson: Two CHANGELOG Files Exist — Both Must Be Updated on Every Release"
-created: 2026-03-28T00:00:00Z
-author: Claude Sonnet 4.6
-email: noreply@anthropic.com
-git:
-  branch: v0.2.1-beta-mcp-write-and-portability
-  commit: ac1ac7be
-tags:
-  - changelog
-  - release
-  - documentation
-  - process
-  - kmgraph
-category: process
+title: 'Lesson: Two CHANGELOG Files Exist — Both Must Be Updated on Every Release'
+category:
+  uri: uri-that-does-not-map-to-process
 ---
 
 # Lesson: Two CHANGELOG Files Exist — Both Must Be Updated on Every Release

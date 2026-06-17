@@ -1,10 +1,7 @@
 ---
-title: "Test Lesson: MCP Server Configuration"
-date: 2026-01-15
-category: architecture
-tags: [mcp, configuration, testing]
-git_commit: abc1234
-git_branch: main
+title: 'Test Lesson: MCP Server Configuration'
+category:
+  uri: uri-that-does-not-map-to-architecture
 ---
 
 # Test Lesson: MCP Server Configuration

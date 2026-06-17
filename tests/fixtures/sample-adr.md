@@ -1,8 +1,5 @@
 ---
-id: ADR-001
-title: "Use TypeScript for MCP Server"
-status: Accepted
-date: 2026-01-10
+title: Use TypeScript for MCP Server
 ---
 
 # ADR-001: Use TypeScript for MCP Server

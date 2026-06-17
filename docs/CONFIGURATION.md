@@ -1,9 +1,9 @@
 ---
-id: CONFIGURATION
 title: Configuration
-sidebar_label: Configuration
-description: Configure KMGraph for your workspace, IDE, and personal KG
-unlisted: true
+category:
+  uri: overview
+position: 8
+slug: configuration
 ---
 
 This guide covers configuring and customizing the Knowledge Management Graph after installation.
@@ -396,11 +396,10 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 
 ## Next Steps
 
-<div class="grid cards" markdown>
 
 - **[Capture Your First Lesson](GETTING-STARTED.md#step-4-capture-the-first-lesson)**
 
-  Document what you've learned with `/kmgraph:capture-lesson` while details are fresh.
+  Document what you've learned with `/kmgraph:kmg-capture-lesson` while details are fresh.
 
 - **[Study Real Examples](examples/)**
 
@@ -410,14 +409,12 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 
   Understand system design, patterns, and how to build custom workflows.
 
-</div>
 
 ---
 
 ## Related Documentation
 
 ### **Getting started**
-<div class="grid cards" markdown>
 
 - [Getting Started Guide](GETTING-STARTED.md)
 
@@ -430,10 +427,8 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 - [Quick Reference](CHEAT-SHEET.md)
 
   One-page cheat sheet for common tasks
-  </div>
 
 ### **Learning**
-<div class="grid cards" markdown>
 
 - [Concepts Guide](CONCEPTS.md)
 
@@ -446,10 +441,8 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 - [Pattern Writing Guide](reference/PATTERNS-GUIDE.md)
 
   How to write high-quality entries
-  </div>
 
 ### **Advanced**
-<div class="grid cards" markdown>
 
 - [Architecture Guide](reference/ARCHITECTURE.md)
 
@@ -470,7 +463,6 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 - [Templates](templates/)
 
   Starting scaffolds for lessons, ADRs, and KG entries
-</div>
 ---
 
 **Need help?** Check the [examples](examples/) or adapt the templates to your workflow.

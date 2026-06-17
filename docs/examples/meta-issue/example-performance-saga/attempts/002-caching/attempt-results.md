@@ -1,3 +1,10 @@
+---
+title: Attempt Results
+category:
+  uri: examples
+slug: examples-meta-issue-example-performance-saga-attempts-002-caching-attempt-results
+---
+
 <!-- THIS IS AN EXAMPLE — Replace with your project's meta-issues -->
 
 # Attempt 002 Results: Database Query Optimization

@@ -12,7 +12,7 @@
 #
 # Gate 3 — docs-impact-scan completion flag:
 #   Checks for /tmp/kmgraph-docs-scan-<branch>-<sha>.flag written by the
-#   kmgraph:docs-impact-scan skill (Step 8). Injects reminder when absent.
+#   kmgraph:kmg-docs-impact-scan skill (Step 8). Injects reminder when absent.
 #   Detached-HEAD fallback: SHA-only flag name.
 #
 # Output channel: hookSpecificOutput.additionalContext (PreToolUse event).
@@ -101,7 +101,7 @@ else
 fi
 
 if [ -n "$SCAN_FLAG" ] && [ ! -f "$SCAN_FLAG" ]; then
-  FINDINGS="${FINDINGS}STOP: docs-impact-scan has not run on this branch at this commit. Invoke the kmgraph:docs-impact-scan skill before pushing, or confirm no user-facing docs are affected.
+  FINDINGS="${FINDINGS}STOP: docs-impact-scan has not run on this branch at this commit. Invoke the kmgraph:kmg-docs-impact-scan skill before pushing, or confirm no user-facing docs are affected.
 "
 fi
 

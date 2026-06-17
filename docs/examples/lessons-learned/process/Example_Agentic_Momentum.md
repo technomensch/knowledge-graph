@@ -1,19 +1,8 @@
 ---
-title: "Lesson: Agentic Momentum & Failure of Subjective Validation"
-created: 2026-01-29T18:30:00Z
-author: "Example User"
-git:
-  branch: null
-  commit: null
-  pr: null
-  issue: null
-sources:
-  - url: "https://openai.com/index/practices-for-governing-agentic-ai/"
-    title: "Practices for Governing Agentic AI"
-    accessed: "2026-01-29"
-    context: "Theoretical context for managing agent autonomous drift"
-tags: ["#governance", "#ai-drift", "#validation", "#logic-redundancy"]
-category: process
+title: 'Lesson: Agentic Momentum & Failure of Subjective Validation'
+category:
+  uri: examples
+slug: examples-lessons-learned-process-example-agentic-momentum
 ---
 
 # Lesson Learned: Agentic Momentum & The Failure of Subjective Validation

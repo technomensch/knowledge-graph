@@ -1,8 +1,9 @@
 ---
-id: four-content-types
 title: Four Content Types
-sidebar_label: Four Content Types
-description: "Four distinct knowledge types: Lessons, Patterns, Decisions, and Gotchas"
+category:
+  uri: concepts
+position: 3
+slug: concepts-four-content-types
 ---
 
 The knowledge graph system organizes information into four distinct types, each optimized for a different purpose. Together, these pillars form a comprehensive institutional memory.
@@ -13,8 +14,6 @@ Different knowledge types need different structures:
 
 ```mermaid
 graph LR
-    accTitle: Four Content Types Knowledge Flow
-    accDescr: Horizontal flow showing the four pillars side by side - Capture records new knowledge, Recall surfaces prior knowledge on demand, Synthesize distills patterns across entries, and Persist stores durable artifacts on disk.
     Capture["Capture<br/>Record lessons and decisions"] --> Recall["Recall<br/>Surface prior knowledge"]
     Recall --> Synthesize["Synthesize<br/>Distill patterns across entries"]
     Synthesize --> Persist["Persist<br/>Store durable artifacts"]
@@ -28,7 +27,6 @@ graph LR
 All four content types work together to create a comprehensive institutional memory system:
 
 ```mermaid
-%%{init: { 'flowchart': { 'useMaxWidth': true }, 'theme': 'neutral' }}%%
 graph TD
     A["📚 Lessons Learned<br/>What was the problem &amp; solution?"]
     B["🏛️ Architecture Decisions<br/>Why was this choice made?"]
@@ -41,8 +39,6 @@ graph TD
     B -->|referenced by| C
     C -->|links back to| A
 
-    accTitle: Knowledge Graph Four Content Types
-    accDescr: Relationship diagram showing how Lessons Learned provide evidence for Architecture Decisions and extract to Knowledge Entries. Decisions are referenced by Entries, which link back to Lessons. Session Summaries document what was accomplished.
 ```
 
 ---
@@ -52,7 +48,6 @@ graph TD
 **What it is**: Detailed documentation of problems solved and how the solutions were reached.
 
 ```mermaid
-%%{init: { 'flowchart': { 'useMaxWidth': true }, 'theme': 'neutral' }}%%
 flowchart LR
     %% 1. Main Flow
     Problem[Identified Problem] --> Fixed[Fixed]
@@ -85,11 +80,9 @@ flowchart LR
 
 **Plain English**: A detective's case file for every problem solved.
 
-:::note
-
-"Lesson: Fixing PostgreSQL Connection Timeouts" — documents the problem, root cause, solution steps, and prevention strategies.
-
-:::
+> 📘 **Note**
+>
+> "Lesson: Fixing PostgreSQL Connection Timeouts" — documents the problem, root cause, solution steps, and prevention strategies.
 ---
 
 #### Pillar 2: Architecture Decision Records (ADRs)
@@ -105,11 +98,9 @@ flowchart LR
 
 **Plain English**: A written record of "why this choice was made" so the reasoning is never lost.
 
-:::note
-
-"ADR-003: Choosing PostgreSQL Over MongoDB" — records the context, options considered, decision made, and expected consequences.
-
-:::
+> 📘 **Note**
+>
+> "ADR-003: Choosing PostgreSQL Over MongoDB" — records the context, options considered, decision made, and expected consequences.
 ---
 
 #### Pillar 3: Knowledge Entries
@@ -140,11 +131,9 @@ flowchart LR
 
 **Plain English**: Meeting minutes for work sessions.
 
-:::note
-
-"2024-01-15 Database Migration Session" — records what was built, what was decided, what was learned, and what comes next.
-
-:::
+> 📘 **Note**
+>
+> "2024-01-15 Database Migration Session" — records what was built, what was decided, what was learned, and what comes next.
 
 ## Related
 

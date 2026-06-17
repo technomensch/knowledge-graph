@@ -12,7 +12,7 @@ Set Padding 20
 Set Framerate 24
 Set PlaybackSpeed 1.0
 
-Type "echo '> /kmgraph:status'"
+Type "echo '> /kmgraph:kmg-status'"
 Sleep 300ms
 Enter
 Sleep 600ms
@@ -67,19 +67,19 @@ Enter
 Type "echo 'Quick Commands:'"
 Sleep 150ms
 Enter
-Type "echo '  /kmgraph:capture-lesson   — Document a lesson'"
+Type "echo '  /kmgraph:kmg-capture-lesson   — Document a lesson'"
 Sleep 150ms
 Enter
-Type "echo '  /kmgraph:recall query    — Search across all KG'"
+Type "echo '  /kmgraph:kmg-recall query    — Search across all KG'"
 Sleep 150ms
 Enter
-Type "echo '  /kmgraph:sync-all         — Run full sync pipeline'"
+Type "echo '  /kmgraph:kmg-sync-all         — Run full sync pipeline'"
 Sleep 150ms
 Enter
-Type "echo '  /kmgraph:update-graph     — Extract KG entries from lessons'"
+Type "echo '  /kmgraph:kmg-update-graph     — Extract KG entries from lessons'"
 Sleep 150ms
 Enter
-Type "echo '  /kmgraph:session-summary  — Summarize this session'"
+Type "echo '  /kmgraph:kmg-session-summary  — Summarize this session'"
 Sleep 500ms
 Enter
 

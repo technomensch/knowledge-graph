@@ -1,3 +1,10 @@
+---
+title: Workflows
+category:
+  uri: templates
+slug: templates-knowledge-workflows
+---
+
 # Knowledge Graph - Workflows
 
 Quick-reference workflows and standard operating procedures.

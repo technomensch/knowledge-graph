@@ -1,8 +1,9 @@
 ---
-id: how-kmgraph-is-organized
 title: How KMGraph Is Organized
-sidebar_label: How KMGraph Is Organized
-description: "KMGraph's four-layer architecture separating concerns: Context, Logic, Lifecycle, and Data"
+category:
+  uri: concepts
+position: 4
+slug: concepts-how-kmgraph-is-organized
 ---
 
 # How KMGraph Is Organized
@@ -10,7 +11,6 @@ description: "KMGraph's four-layer architecture separating concerns: Context, Lo
 KMGraph separates responsibilities into four layers. Each layer handles one concern, and layers communicate in a single direction: Context feeds Logic, Logic triggers Lifecycle, and Lifecycle calls Data. This separation keeps each layer independently testable, replaceable, and portable across platforms.
 
 ```mermaid
-%%{init: { 'flowchart': { 'useMaxWidth': true }, 'theme': 'neutral' }}%%
 flowchart TD
     subgraph Context ["Context Layer"]
         direction TB
@@ -44,8 +44,6 @@ flowchart TD
     Logic --> Lifecycle
     Lifecycle --> Data
 
-    accTitle: Four-Layer Architecture
-    accDescr: Flow diagram showing data moving from Context Layer (Skills) to Logic Layer (Agents) to Lifecycle Layer (Hooks) to Data Layer (MCP tools).
 ```
 
 ### Context Layer — Skills
@@ -54,8 +52,6 @@ Skills are auto-triggered context providers. They watch for specific moments in 
 
 ```mermaid
 graph TB
-    accTitle: KMGraph Four-Layer Stack
-    accDescr: Vertical stack of the four KMGraph layers from top to bottom - Context Layer holding skills that detect moments, Logic Layer holding agents that process decisions, Lifecycle Layer holding hooks that fire on system events, and Data Layer holding MCP tools that persist and search knowledge.
     Context["Context Layer<br/>Skills detect moments and dispatch"]
     Logic["Logic Layer<br/>Agents own execution and decisions"]
     Lifecycle["Lifecycle Layer<br/>Hooks fire on system events"]

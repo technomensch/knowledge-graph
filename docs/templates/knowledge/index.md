@@ -1,3 +1,10 @@
+---
+title: Index
+category:
+  uri: templates
+slug: templates-knowledge-index
+---
+
 # Knowledge Graph - Master Index
 
 Navigate all knowledge graph entries by category.
@@ -92,5 +99,5 @@ Navigate all knowledge graph entries by category.
 5. Update this index
 
 **To search:**
-Use `/kmgraph:recall "query"` to search across all KG files.
+Use `/kmgraph:kmg-recall "query"` to search across all KG files.
 

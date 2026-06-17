@@ -1,3 +1,10 @@
+---
+title: Sample Patterns
+category:
+  uri: examples
+slug: examples-knowledge-sample-patterns
+---
+
 # Design Patterns Catalog
 
 <!-- THIS IS AN EXAMPLE — Replace with your project's patterns -->
@@ -133,7 +140,7 @@ Manual (4 steps):
 4. git commit + update MEMORY.md
 
 Automated (1 step):
-/kmgraph:sync-all
+/kmgraph:kmg-sync-all
   → Runs all 4 steps with single confirmation
 ```
 

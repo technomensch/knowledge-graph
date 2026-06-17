@@ -1,3 +1,10 @@
+---
+title: Lessons Learned
+category:
+  uri: templates
+slug: templates-meta-issue-analysis-lessons-learned
+---
+
 # Lessons Learned (Meta-Issue)
 
 Reusable insights from this investigation.

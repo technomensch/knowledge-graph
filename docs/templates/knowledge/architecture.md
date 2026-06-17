@@ -1,3 +1,10 @@
+---
+title: Architecture
+category:
+  uri: templates
+slug: templates-knowledge-architecture
+---
+
 # Knowledge Graph - Architecture
 
 Quick-reference architectural decisions and system design patterns.

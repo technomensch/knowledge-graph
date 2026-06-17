@@ -1,22 +1,7 @@
 ---
-title: "ADR-042: ADR `implements` Field — Mandatory Implementation Commit Reference"
-number: 42
-created: 2026-04-22T00:00:00Z
-status: Accepted
-author: technomensch
-email: 917847+technomensch@users.noreply.github.com
-git:
-  branch: v0.5.2-beta-phase3-tier-resolver
-  commit: 62a472cbe07785e6d1e314f7bbadaa6f8243c349
-  pr: null
-  issue: null
-implements: "[[e0ccfe41]] — docs(adr): create ADR-042; rule in ~/.kmgraph/rules.md applied 2026-04-22 (non-git-tracked)"
-related:
-  adrs: []
-  lessons: []
-  kg_entries: []
-tags: [process, adr, knowledge-capture, commit-traceability]
-category: process
+title: 'ADR-042: ADR `implements` Field — Mandatory Implementation Commit Reference'
+category:
+  uri: uri-that-does-not-map-to-process
 ---
 
 # ADR-042: ADR `implements` Field — Mandatory Implementation Commit Reference

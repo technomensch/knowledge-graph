@@ -1,8 +1,5 @@
 ---
-title: "ADR-009: Three-Tier Installation Architecture"
-status: Accepted
-date: 2026-02-20
-deciders: technomensch, Claude Opus 4.6
+title: 'ADR-009: Three-Tier Installation Architecture'
 ---
 
 # ADR-009: Three-Tier Installation Architecture

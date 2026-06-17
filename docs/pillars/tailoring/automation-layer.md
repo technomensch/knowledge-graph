@@ -1,8 +1,11 @@
 ---
-id: automation-layer
 title: The Automation Layer
-sidebar_label: Automation Layer
-description: How skills, agents, hooks, and auto-capture trigger keywords work together in KMGraph
+category:
+  uri: tailoring
+position: 4
+slug: pillars-tailoring-automation-layer
+parent:
+  uri: pillars-tailoring-index
 ---
 
 # The Automation Layer
@@ -38,18 +41,16 @@ sequenceDiagram
     Dev->>Dev: Solves a bug (conversation continues)
 
     Note over Skill: lesson-capture detects "figured it out"
-    Skill->>Dev: Suggest /kmgraph:capture-lesson
+    Skill->>Dev: Suggest /kmgraph:kmg-capture-lesson
 
-    Dev->>Command: /kmgraph:capture-lesson
+    Dev->>Command: /kmgraph:kmg-capture-lesson
     Command->>Agent: --delegate knowledge-extractor (if large)
     Agent->>KG: Write lesson (approval-gated)
     Command->>KG: Write lesson (direct, if small)
 
     Note over Hook: PostToolUse fires after write
-    Hook->>Dev: Confirm capture + suggest /kmgraph:update-graph
+    Hook->>Dev: Confirm capture + suggest /kmgraph:kmg-update-graph
 
-    accTitle: KMGraph automation layer sequence
-    accDescr: Sequence showing hooks firing at session start and after tool use, a skill detecting a breakthrough and suggesting capture, the command writing to the knowledge graph directly or via an agent, and the PostToolUse hook confirming.
 ```
 
 ## Skills and their trigger keywords

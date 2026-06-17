@@ -1,8 +1,5 @@
 ---
-title: "ADR-003: Abandon Shadow Commands; Use File Prefix"
-status: Accepted
-date: 2026-02-16
-deciders: technomensch, Claude Sonnet 4.5
+title: 'ADR-003: Abandon Shadow Commands; Use File Prefix'
 ---
 
 # ADR-003: Abandon Shadow Commands; Use File Prefix

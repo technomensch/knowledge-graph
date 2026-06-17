@@ -1,9 +1,7 @@
 ---
-title: "ADR-030: Migration Moves KMGraph-Named Subdirectories Only — Never the Entire docs/ Directory"
-date: 2026-04-10
-status: Accepted
-branch: v0.3.0-beta
-tags: [migration, init, docs-path, knowledge-path, safety]
+title: >-
+  ADR-030: Migration Moves KMGraph-Named Subdirectories Only — Never the Entire
+  docs/ Directory
 ---
 
 # ADR-030: Migration Moves KMGraph-Named Subdirectories Only — Never the Entire docs/ Directory

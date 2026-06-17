@@ -1,7 +1,3 @@
----
-name: lesson-capture-agent
-description: Captures a single lesson learned from the current session — problem, solution, context, and git metadata. Uses kg_capture MCP tool for platform-agnostic writes.
----
 
 # Lesson Capture Agent
 
@@ -47,8 +43,8 @@ In the lesson draft, always show before any write:
 ### Switch/restore for `--project`
 
 1. Record `$restore_kg` = current active KG
-2. Run `/kmgraph:switch {project_kg}`
-3. After capture: run `/kmgraph:switch {$restore_kg}`
+2. Run `/kmgraph:kmg-switch {project_kg}`
+3. After capture: run `/kmgraph:kmg-switch {$restore_kg}`
 
 ### Interaction with Phase 0 CWD Guard
 
@@ -236,7 +232,7 @@ If ≥2 KGs:
 
 3. Wait for user choice. Store the chosen KG name as `{target_kg}`.
 
-4. **Session memory:** Remember `{target_kg}` for the duration of this session to avoid re-prompting on subsequent captures. Only re-prompt if the user explicitly changes KG via `/kmgraph:switch`.
+4. **Session memory:** Remember `{target_kg}` for the duration of this session to avoid re-prompting on subsequent captures. Only re-prompt if the user explicitly changes KG via `/kmgraph:kmg-switch`.
 
 ---
 
@@ -268,7 +264,7 @@ Once user approves, call the `kg_capture` MCP tool:
 
 **Success (status: "created"):**
 
-> "✅ Lesson captured: **[relativePath]** in **[target KG name]** — immediately searchable via `/kmgraph:recall`"
+> "✅ Lesson captured: **[relativePath]** in **[target KG name]** — immediately searchable via `/kmgraph:kmg-recall`"
 
 **KG_MISMATCH error:**
 

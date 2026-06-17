@@ -1,3 +1,10 @@
+---
+title: Attempt Results
+category:
+  uri: examples
+slug: examples-meta-issue-example-performance-saga-attempts-001-baseline-attempt-results
+---
+
 <!-- THIS IS AN EXAMPLE — Replace with your project's meta-issues -->
 
 # Attempt 001 Results: Caching Layer

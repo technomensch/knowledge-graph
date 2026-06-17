@@ -1,8 +1,11 @@
 ---
-id: document-meta-issues
 title: Document Meta-Issues
-sidebar_label: Document Meta-Issues
-description: Use meta-issue tracking for complex problems that span multiple sessions or branches
+category:
+  uri: capturing
+position: 4
+slug: pillars-capturing-document-meta-issues
+parent:
+  uri: pillars-capturing-index
 ---
 
 # Document Meta-Issues
@@ -16,7 +19,7 @@ A **meta-issue** is structured documentation for a problem that requires three o
 Run the command from the project root:
 
 ```bash
-/kmgraph:start-issue-tracking
+/kmgraph:kmg-start-issue-tracking
 ```
 
 The command prompts for a short issue name (kebab-case), then scaffolds the meta-issue directory:
@@ -33,9 +36,9 @@ docs/meta-issues/<issue-name>/
         └── attempt-results.md     # Written AFTER the attempt
 ```
 
-:::note
-If no git repository is detected, branch strategy prompts and the Git Integration section are omitted automatically (v0.2.3.4-beta+).
-:::
+> 📘 **Note**
+>
+> If no git repository is detected, branch strategy prompts and the Git Integration section are omitted automatically (v0.2.3.4-beta+).
 
 ---
 
@@ -68,9 +71,9 @@ mkdir docs/meta-issues/<issue-name>/attempts/001-<label>
 2. Step two
 ```
 
-:::tip
-Use `/kmgraph:meta-issue --log-attempt 001 "<hypothesis>"` to pre-populate the hypothesis field and ensure it is distinct from prior attempts. At attempt 3+, the command reminds the user to invoke the `stuck-work-escalation` skill.
-:::
+> 👍 **Tip**
+>
+> Use `/kmgraph:kmg-meta-issue --log-attempt 001 "<hypothesis>"` to pre-populate the hypothesis field and ensure it is distinct from prior attempts. At attempt 3+, the command reminds the user to invoke the `stuck-work-escalation` skill.
 
 **`attempt-results.md`** — written after the attempt:
 
@@ -119,18 +122,18 @@ At the start of each new session working on this issue:
 3. Create the next attempt with hypothesis enforcement:
 
 ```bash
-/kmgraph:meta-issue --log-attempt 002 "<distinct hypothesis>"
+/kmgraph:kmg-meta-issue --log-attempt 002 "<distinct hypothesis>"
 ```
 
 This creates the attempt directory, pre-populates the hypothesis field, and checks that the hypothesis differs from prior attempts. At attempt 3 or later, it also surfaces the `stuck-work-escalation` skill reminder.
 
-:::tip
-Write `solution-approach.md` before starting each attempt, and `attempt-results.md` immediately after. Delaying either reduces the quality of the retrospective.
-:::
+> 👍 **Tip**
+>
+> Write `solution-approach.md` before starting each attempt, and `attempt-results.md` immediately after. Delaying either reduces the quality of the retrospective.
 
-:::note
-**Escalation thresholds:** At 3 attempts (or 30 min), Opus diagnosis activates automatically. At 5 attempts, a mandatory exit-path decision is required before any further work proceeds. See the `stuck-work-escalation` skill for full details.
-:::
+> 📘 **Note**
+>
+> **Escalation thresholds:** At 3 attempts (or 30 min), Opus diagnosis activates automatically. At 5 attempts, a mandatory exit-path decision is required before any further work proceeds. See the `stuck-work-escalation` skill for full details.
 
 ---
 
@@ -139,7 +142,7 @@ Write `solution-approach.md` before starting each attempt, and `attempt-results.
 After a significant attempt (whether it succeeds or fails), capture the learning:
 
 ```bash
-/kmgraph:capture-lesson
+/kmgraph:kmg-capture-lesson
 ```
 
 Reference the meta-issue from the lesson file:
@@ -151,7 +154,7 @@ Reference the meta-issue from the lesson file:
 For architecture decisions that emerged from the investigation:
 
 ```bash
-/kmgraph:create-adr
+/kmgraph:kmg-create-adr
 ```
 
 Link back from the ADR body to the meta-issue README for traceability.
@@ -159,7 +162,7 @@ Link back from the ADR body to the meta-issue README for traceability.
 To link an existing lesson or ADR to a GitHub issue:
 
 ```bash
-/kmgraph:link-issue
+/kmgraph:kmg-link-issue
 ```
 
 ---
@@ -186,7 +189,7 @@ In all cases, update `README.md` with final status and resolution summary:
 Then extract final lessons:
 
 ```bash
-/kmgraph:capture-lesson
+/kmgraph:kmg-capture-lesson
 ```
 
 ## Related

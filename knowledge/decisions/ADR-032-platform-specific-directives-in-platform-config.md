@@ -1,32 +1,9 @@
 ---
-title: "ADR-032: Platform-Specific Tool Directives Belong in knowledge/platform/<platform>.md"
-
-number: 032
-
-created: 2026-04-11T00:00:00Z
-
-status: Superseded
-
-author: technomensch
-
-email: 917847+technomensch@users.noreply.github.com
-
-git:
-  branch: v0.3.5-beta
-  commit: null
-  pr: null
-  issue: null
-
-implements: v0.3.5-beta
-
-related:
-  adrs: [ADR-028, ADR-017, ADR-021]
-  lessons: []
-  kg_entries: []
-
-tags: [platform-portability, rules-md, tool-preferences, claude, architecture, v0.3.5-beta]
-
-category: architecture
+title: >-
+  ADR-032: Platform-Specific Tool Directives Belong in
+  knowledge/platform/<platform>.md
+category:
+  uri: uri-that-does-not-map-to-architecture
 ---
 # ADR-032: Platform-Specific Tool Directives Belong in `knowledge/platform/<platform>.md`
 

@@ -1,22 +1,25 @@
 ---
-id: sanitize-before-sharing
 title: Sanitize Before Sharing
-sidebar_label: Sanitize Before Sharing
-description: Remove sensitive data from the knowledge graph before sharing with teammates or making it public
+category:
+  uri: organizing
+position: 5
+slug: pillars-organizing-sanitize-before-sharing
+parent:
+  uri: pillars-organizing-index
 ---
 
 # Sanitize Before Sharing
 
 > "I want to share my knowledge graph. How do I make sure no sensitive data goes with it?"
 
-This guide walks through scanning a knowledge graph for sensitive data and cleaning it before sharing with teammates or publishing publicly. You need an active knowledge graph (`/kmgraph:status`) and KMGraph v0.0.6 or later.
+This guide walks through scanning a knowledge graph for sensitive data and cleaning it before sharing with teammates or publishing publicly. You need an active knowledge graph (`/kmgraph:kmg-status`) and KMGraph v0.0.6 or later.
 
 ## Run the scan
 
-The `/kmgraph:check-sensitive` command scans all knowledge graph files for known sensitive patterns.
+The `/kmgraph:kmg-check-sensitive` command scans all knowledge graph files for known sensitive patterns.
 
 ```bash
-/kmgraph:check-sensitive
+/kmgraph:kmg-check-sensitive
 ```
 
 The command checks for:
@@ -37,7 +40,7 @@ The output lists each match by file, line number, and pattern category.
 **Option A — Automatic fix (recommended for bulk replacements)**
 
 ```bash
-/kmgraph:check-sensitive --fix
+/kmgraph:kmg-check-sensitive --fix
 ```
 
 The `--fix` flag replaces detected values with safe placeholders in-place:
@@ -94,11 +97,11 @@ The `kg-config.json` file in the knowledge graph root controls which patterns ar
 
 **Severity levels:**
 
-- `block` — `/kmgraph:check-sensitive` exits non-zero; pre-commit hook blocks the commit
+- `block` — `/kmgraph:kmg-check-sensitive` exits non-zero; pre-commit hook blocks the commit
 - `warn` — reported but does not block
 - `info` — logged only; no user-visible alert
 
-Run `/kmgraph:check-sensitive` again after editing `kg-config.json` to confirm custom patterns are picked up.
+Run `/kmgraph:kmg-check-sensitive` again after editing `kg-config.json` to confirm custom patterns are picked up.
 
 ## Install the pre-commit hook
 
@@ -116,7 +119,7 @@ The hook reads the same patterns from `kg-config.json`. Patterns with `"severity
 After applying fixes, re-run the scan to confirm a clean result:
 
 ```bash
-/kmgraph:check-sensitive
+/kmgraph:kmg-check-sensitive
 ```
 
 Expected output when clean:

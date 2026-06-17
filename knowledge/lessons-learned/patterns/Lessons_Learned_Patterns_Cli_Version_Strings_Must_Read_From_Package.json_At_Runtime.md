@@ -1,9 +1,7 @@
 ---
-title: "CLI Version Strings Must Read from package.json at Runtime"
-created: 2026-04-11T20:02:20.263Z
-updated: 2026-04-11T20:02:20.263Z
-tags: [versioning, mcp-server, cli, package-json, drift, v0.3.5]
-category: patterns
+title: CLI Version Strings Must Read from package.json at Runtime
+category:
+  uri: uri-that-does-not-map-to-patterns
 ---
 # Lesson: CLI Version Strings Must Read from package.json at Runtime
 

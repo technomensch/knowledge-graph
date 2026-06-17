@@ -1,12 +1,5 @@
 ---
-title: "ENH-001: User-Level Global Knowledge Graphs"
-number: 001
-status: implemented
-version_target: "v0.2.2"
-github_issue: null
-created: 2026-03-27
-related_adrs: []
-related_enhs: []
+title: 'ENH-001: User-Level Global Knowledge Graphs'
 ---
 
 # ENH-001: User-Level Global Knowledge Graphs

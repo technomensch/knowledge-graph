@@ -1,7 +1,3 @@
----
-name: platform-sync-agent
-description: Syncs relevant portions of platform config files (CLAUDE.md, GEMINI.md, .cursorrules, etc.) when one is updated. Understands which content belongs in each platform's file — not a full copy, but a targeted sync of applicable sections.
----
 
 # Platform Sync Agent
 
@@ -83,8 +79,8 @@ For each configured target platform, produce a proposal that contains ONLY the c
 
 **GEMINI.md:**
 - Translate Claude Code-specific phrasing into generic LLM behavior instructions.
-- Replace `/kmgraph:capture-lesson` with "offer to capture a lesson" or "suggest recording this as a lesson."
-- Replace `/kmgraph:session-summary` with "offer to create a session summary."
+- Replace `/kmgraph:kmg-capture-lesson` with "offer to capture a lesson" or "suggest recording this as a lesson."
+- Replace `/kmgraph:kmg-session-summary` with "offer to create a session summary."
 - Replace `kg_search` with "search the knowledge graph" (keep MCP tool names if Gemini uses MCP).
 - Keep MCP tool names (`kg_*`) if Gemini is configured with the MCP server.
 - Omit hooks, skills, and slash command mechanics entirely.
@@ -225,7 +221,7 @@ Wait for approval before creating.
 
 These examples illustrate the classification logic. Use them as reference, not as an exhaustive list.
 
-**CLAUDE.md adds:** `Always run /kmgraph:capture-lesson after fixing bugs`
+**CLAUDE.md adds:** `Always run /kmgraph:kmg-capture-lesson after fixing bugs`
 - GEMINI.md: translate to "When a bug is fixed, offer to capture a lesson"
 - .cursorrules: skip (not a coding convention)
 - .windsurfrules: skip
@@ -279,6 +275,6 @@ These examples illustrate the classification logic. Use them as reference, not a
 
 ## Integration Hints
 
-- If the user is doing a bulk setup of platform files for the first time, suggest `/kmgraph:setup-platform` for generating initial content.
+- If the user is doing a bulk setup of platform files for the first time, suggest `/kmgraph:kmg-setup-platform` for generating initial content.
 - If the user asks "are my platform files in sync?", offer to read all configured platform files and produce a drift report.
 - If only one platform is configured, simplify the flow — skip the per-platform approval loop and just show the single proposal.

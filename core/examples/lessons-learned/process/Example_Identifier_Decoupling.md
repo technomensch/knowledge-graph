@@ -1,19 +1,7 @@
 ---
-title: "Lesson: Identifier Decoupling (The Serial ID Drift)"
-created: 2026-01-29T09:00:00Z
-author: "Example User"
-git:
-  branch: null
-  commit: null
-  pr: null
-  issue: null
-sources:
-  - url: "https://en.wikipedia.org/wiki/System_of_record"
-    title: "System of Record (Wikipedia)"
-    accessed: "2026-01-29"
-    context: "Defining the boundary between local and external platform identifiers"
-tags: ["#identifiers", "#decoupling", "#drift", "#best-practices"]
-category: process
+title: 'Lesson: Identifier Decoupling (The Serial ID Drift)'
+category:
+  uri: uri-that-does-not-map-to-process
 ---
 
 # Lesson Learned: Identifier Decoupling (The Serial ID Drift)

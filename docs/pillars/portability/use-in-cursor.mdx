@@ -1,12 +1,14 @@
 ---
-id: use-in-cursor
-title: Use KMGraph in Cursor, Windsurf, VS Code, and JetBrains
-sidebar_label: Use in Cursor/Windsurf/VS Code
-description: How to install and use KMGraph with MCP-compatible IDEs beyond Claude Code
+title: 'Use KMGraph in Cursor, Windsurf, VS Code, and JetBrains'
+category:
+  uri: portability
+position: 3
+slug: pillars-portability-use-in-cursor
+parent:
+  uri: pillars-portability-index
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+
 
 # Use KMGraph in Cursor, Windsurf, VS Code, and JetBrains
 
@@ -26,8 +28,7 @@ The server binary is at `mcp-server/dist/index.js`.
 
 ## Step 2 — Register the MCP server in your IDE
 
-<Tabs groupId="ide">
-  <TabItem value="cursor" label="Cursor" default>
+#### Cursor
 
 Open `.cursor/mcp.json` (create if absent):
 
@@ -47,8 +48,7 @@ Open `.cursor/mcp.json` (create if absent):
 
 Restart Cursor. The `kg_*` tools appear in the MCP tools panel.
 
-  </TabItem>
-  <TabItem value="windsurf" label="Windsurf">
+#### Windsurf
 
 Open `.windsurf/mcp.json`:
 
@@ -63,8 +63,7 @@ Open `.windsurf/mcp.json`:
 }
 ```
 
-  </TabItem>
-  <TabItem value="vscode" label="VS Code">
+#### VS Code
 
 Run the VS Code installer script:
 
@@ -87,13 +86,11 @@ Alternatively, add to `.vscode/settings.json`:
 }
 ```
 
-  </TabItem>
-  <TabItem value="jetbrains" label="JetBrains">
+#### JetBrains
 
 In JetBrains settings → Tools → AI Assistant → MCP Servers, add a new server with name `kmgraph`, command `node`, and args `/path/to/knowledge-graph/mcp-server/dist/index.js`.
 
-  </TabItem>
-  <TabItem value="continue" label="Continue.dev">
+#### Continue.dev
 
 In `.continue/config.json`:
 
@@ -108,9 +105,6 @@ In `.continue/config.json`:
   ]
 }
 ```
-
-  </TabItem>
-</Tabs>
 
 ## Step 3 — Initialize the knowledge graph
 

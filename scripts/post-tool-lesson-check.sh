@@ -37,7 +37,7 @@ if [ "$TOOL_NAME" = "Bash" ]; then
     fi
 
     echo -e "${YELLOW}📝 That looks like it might be worth keeping.${NC}"
-    echo "   /kmgraph:capture-lesson — capture what you just solved (includes optional session snapshot)"
+    echo "   /kmgraph:kmg-capture-lesson — capture what you just solved (includes optional session snapshot)"
     exit 0
 fi
 
@@ -73,6 +73,6 @@ esac
 
 # Surface prompt
 echo -e "${YELLOW}📝 That looks like it might be worth keeping.${NC}"
-echo "   /kmgraph:capture-lesson — capture what you just solved (includes optional session snapshot)"
+echo "   /kmgraph:kmg-capture-lesson — capture what you just solved (includes optional session snapshot)"
 
 exit 0

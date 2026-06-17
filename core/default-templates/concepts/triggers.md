@@ -23,7 +23,7 @@
 - Apply: `rules.md § Architectural Proposals > Cascading Impact Analysis`
 - Apply: `rules.md § Review Protocol > ADR Pre-Check Before Surfacing a Finding`
 - Required before answering:
-  1. Invoke `kmgraph:recall` on the topic — show results under "Prior Art"
+  1. Invoke `kmgraph:kmg-recall` on the topic — show results under "Prior Art"
   2. ADR pre-check — search `knowledge/decisions/` for covering ADRs
   3. Note cascade / blast-radius of proposed options
   4. Root-cause gate — determine root cause vs symptom; if symptom-only, surface root cause first
@@ -40,4 +40,4 @@
 
 ## At session end
 
-- Apply: `rules.md § Knowledge Capture > Cadence & Routing` (run /kmgraph:sync-all)
+- Apply: `rules.md § Knowledge Capture > Cadence & Routing` (run /kmgraph:kmg-sync-all)

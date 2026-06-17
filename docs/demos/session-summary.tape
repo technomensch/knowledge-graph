@@ -12,7 +12,7 @@ Set Padding 20
 Set Framerate 24
 Set PlaybackSpeed 1.0
 
-Type "echo '> /kmgraph:session-summary'"
+Type "echo '> /kmgraph:kmg-session-summary'"
 Sleep 300ms
 Enter
 Sleep 500ms

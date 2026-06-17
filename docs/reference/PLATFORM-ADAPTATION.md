@@ -1,8 +1,9 @@
 ---
-id: PLATFORM-ADAPTATION
 title: Platform Adaptation
-sidebar_label: Platform Adaptation
-description: "Integration guide for different IDEs and LLMs"
+category:
+  uri: reference
+position: 8
+slug: reference-platform-adaptation
 ---
 
 # Platform Adaptation Guide
@@ -48,7 +49,7 @@ This guide focuses on **platform capabilities and usage patterns** after install
 **Automation:** Full — all 22 commands, hooks, agents, and MCP tools available
 
 **Features:**
-- 22 commands: `/kmgraph:capture-lesson`, `/kmgraph:recall`, `/kmgraph:create-adr`, etc.
+- 22 commands: `/kmgraph:kmg-capture-lesson`, `/kmgraph:kmg-recall`, `/kmgraph:kmg-create-adr`, etc.
 - SessionStart hooks: check-memory, recent-lessons, memory-diff-check
 - Subagents for automated review
 - MEMORY.md bidirectional sync with archive/restore
@@ -72,12 +73,12 @@ codex plugin add kmgraph@knowledge-management-graph
 ```
 
 **Features:**
-- 22 commands: `/kmgraph:capture-lesson`, `/kmgraph:recall`, `/kmgraph:create-adr`, etc.
+- 22 commands: `/kmgraph:kmg-capture-lesson`, `/kmgraph:kmg-recall`, `/kmgraph:kmg-create-adr`, etc.
 - Skills auto-triggered from `skills/` directory
 - MCP server (`kg_*` tools) available in Codex sessions
 - Same `kmgraph@knowledge-management-graph` plugin ID as Claude marketplace
 
-**Note:** Skills and MCP tools are shared with Claude Code — no separate configuration needed. Run `/kmgraph:init` in a Codex session to initialize the knowledge graph.
+**Note:** Skills and MCP tools are shared with Claude Code — no separate configuration needed. Run `/kmgraph:kmg-init` in a Codex session to initialize the knowledge graph.
 
 **Troubleshooting (Stale Cache After Update):**
 
@@ -113,7 +114,7 @@ codex plugin add kmgraph@knowledge-management-graph
 - No automated git metadata tracking
 - No bidirectional MEMORY.md sync
 - Manual category README updates
-- No automated pipelines (`/kmgraph:sync-all` equivalent)
+- No automated pipelines (`/kmgraph:kmg-sync-all` equivalent)
 
 **Workaround:** Use manual workflows from [session memory](../pillars/recalling/session-memory.md) + Cursor Composer for assistance
 
@@ -195,7 +196,7 @@ codex plugin add kmgraph@knowledge-management-graph
 **Limitations:**
 - No Claude Code commands (22 commands are Claude Code-specific)
 - No SessionStart hooks
-- No automated pipeline (`/kmgraph:sync-all` equivalent)
+- No automated pipeline (`/kmgraph:kmg-sync-all` equivalent)
 
 ---
 

@@ -1,8 +1,9 @@
 ---
-id: index
 title: Recalling
-sidebar_label: Overview
-description: How to find what you've already learned — search, session memory, and linked entries.
+category:
+  uri: recalling
+position: 1
+slug: pillars-recalling-index
 ---
 
 # Recalling

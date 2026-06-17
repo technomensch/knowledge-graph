@@ -1,8 +1,11 @@
 ---
-id: integrate-notion
 title: Integrate with Notion
-sidebar_label: Integrate with Notion
-description: Mirror the local knowledge graph into a Notion database for team browsing
+category:
+  uri: portability
+position: 6
+slug: pillars-portability-integrate-notion
+parent:
+  uri: pillars-portability-index
 ---
 
 # Integrate with Notion
@@ -11,9 +14,9 @@ description: Mirror the local knowledge graph into a Notion database for team br
 
 Mirror captured lessons and ADRs into a Notion database so teammates can browse the knowledge graph without installing KMGraph. You need KMGraph initialized with a populated knowledge graph, the Notion MCP server configured, and a Notion workspace with permission to create databases.
 
-:::note
-This guide covers **mirroring** local KG entries into Notion as a read-friendly browsing surface. It does not make Notion the primary store — KMGraph still writes to local markdown files. A pluggable Notion backend is deferred to a future release.
-:::
+> 📘 **Note**
+>
+> This guide covers **mirroring** local KG entries into Notion as a read-friendly browsing surface. It does not make Notion the primary store — KMGraph still writes to local markdown files. A pluggable Notion backend is deferred to a future release.
 
 ## Create a lessons database
 
@@ -64,7 +67,7 @@ Use notion-search to find "Redis timeout" across the KMGraph Lessons database.
 
 ## Keeping the mirror current
 
-After each `/kmgraph:capture-lesson`, run the mirror step for the new file. Or add a `PostToolUse` hook that auto-mirrors captures to Notion (see [Customize hooks](../tailoring/customize-hooks.md)).
+After each `/kmgraph:kmg-capture-lesson`, run the mirror step for the new file. Or add a `PostToolUse` hook that auto-mirrors captures to Notion (see [Customize hooks](../tailoring/customize-hooks.md)).
 
 ## Related
 

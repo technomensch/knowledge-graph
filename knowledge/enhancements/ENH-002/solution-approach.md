@@ -1,9 +1,5 @@
 ---
 title: Solution Approach — ENH-002 Session Snapshot on Capture
-enhancement_id: ENH-002
-github_issue: 41
-status: Draft
-created: 2026-03-28
 ---
 
 # Solution Approach: ENH-002 Session Snapshot on Capture

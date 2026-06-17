@@ -1,19 +1,7 @@
 ---
-title: "Lesson: AI Constraint Enforcement Strategies"
-created: 2026-01-28T16:00:00Z
-author: "Example User"
-git:
-  branch: null
-  commit: null
-  pr: null
-  issue: null
-sources:
-  - url: "https://learnprompting.org/docs/reliability/constraints"
-    title: "Reliability and Constraint Satisfaction in LLMs"
-    accessed: "2026-01-29"
-    context: "Understanding why agents ignore negative constraints"
-tags: ["#llm-engineering", "#enforcement", "#guardrails", "#validation"]
-category: process
+title: 'Lesson: AI Constraint Enforcement Strategies'
+category:
+  uri: uri-that-does-not-map-to-process
 ---
 
 # Lesson Learned: AI Constraint Enforcement Strategies

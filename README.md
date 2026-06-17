@@ -40,7 +40,7 @@ A Claude Code plugin that provides:
 
 Paste [INSTALL.md](INSTALL.md) into any AI assistant for automated setup on any platform — Claude Code, Codex CLI, Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Aider, or local LLMs.
 
-**Claude Code users:** Run `claude plugin install kmgraph` or load with `claude --plugin-dir /path/to/knowledge-graph`, then run `/kmgraph:init`.
+**Claude Code users:** Run `claude plugin install kmgraph` or load with `claude --plugin-dir /path/to/knowledge-graph`, then run `/kmgraph:kmg-init`.
 
 **Codex CLI users:** Run `codex plugin marketplace add technomensch/knowledge-graph` then `codex plugin add kmgraph@knowledge-management-graph`.
 
@@ -48,7 +48,7 @@ See the [Quickstart](docs/quickstart.mdx) for prerequisites and troubleshooting.
 
 ## Upgrading
 
-Pull the latest version and run `/kmgraph:init` in any project that uses it. The upgrade wizard checks what has changed, previews any updates to existing files, and asks for confirmation before writing, or changing, anything. Existing knowledge graph content is never overwritten.
+Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it. The upgrade wizard checks what has changed, previews any updates to existing files, and asks for confirmation before writing, or changing, anything. Existing knowledge graph content is never overwritten.
 
 ---
 
@@ -59,33 +59,33 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 
 ### 🟢 Essential Commands (Start Here)
 
-- `/kmgraph:init` — Initialize new knowledge graph with wizard-based setup
-- `/kmgraph:capture-lesson` — Document lessons learned with git metadata tracking
-- `/kmgraph:create-adr` — Create an Architecture Decision Record with automatic implementation commit capture
-- `/kmgraph:status` — View active knowledge graph info and quick reference
-- `/kmgraph:recall` — Search across all memory systems (lessons, decisions, knowledge)
+- `/kmgraph:kmg-init` — Initialize new knowledge graph with wizard-based setup
+- `/kmgraph:kmg-capture-lesson` — Document lessons learned with git metadata tracking
+- `/kmgraph:kmg-create-adr` — Create an Architecture Decision Record with automatic implementation commit capture
+- `/kmgraph:kmg-status` — View active knowledge graph info and quick reference
+- `/kmgraph:kmg-recall` — Search across all memory systems (lessons, decisions, knowledge)
 
 ### 🟡 Intermediate Commands (Once Comfortable)
 
-- `/kmgraph:update-graph` — Extract knowledge graph entries from lessons
-- `/kmgraph:add-category` — Add a new category to existing knowledge graph
-- `/kmgraph:session-summary` — Create summary of current chat session
-- `/kmgraph:list` — Display all configured knowledge graphs
-- `/kmgraph:switch` — Change active knowledge graph
-- `/kmgraph:check-sensitive` — Scan knowledge graph for potentially sensitive information
-- `/kmgraph:config-sanitization` — Interactive wizard for pre-commit hook setup
-- `/kmgraph:extract-chat` — Extract chat history from Claude, Gemini, and Codex CLI logs (`--source codex` for Codex sessions)
-- `/kmgraph:update-doc` — Update plugin/project documentation (`--user-facing`) or KG content
-- `/kmgraph:init-personal-kg` — Initialize a personal knowledge graph at `~/.kmgraph/` shared across all projects
+- `/kmgraph:kmg-update-graph` — Extract knowledge graph entries from lessons
+- `/kmgraph:kmg-add-category` — Add a new category to existing knowledge graph
+- `/kmgraph:kmg-session-summary` — Create summary of current chat session
+- `/kmgraph:kmg-list` — Display all configured knowledge graphs
+- `/kmgraph:kmg-switch` — Change active knowledge graph
+- `/kmgraph:kmg-check-sensitive` — Scan knowledge graph for potentially sensitive information
+- `/kmgraph:kmg-config-sanitization` — Interactive wizard for pre-commit hook setup
+- `/kmgraph:kmg-extract-chat` — Extract chat history from Claude, Gemini, and Codex CLI logs (`--source codex` for Codex sessions)
+- `/kmgraph:kmg-update-doc` — Update plugin/project documentation (`--user-facing`) or KG content
+- `/kmgraph:kmg-init-personal-kg` — Initialize a personal knowledge graph at `~/.kmgraph/` shared across all projects
 
 ### 🔴 Advanced Commands (Power Features)
 
-- `/kmgraph:meta-issue` — Initialize meta-issue tracking for complex multi-attempt problems
-- `/kmgraph:start-issue-tracking` — Initialize issue tracking with structured docs and Git branch
-- `/kmgraph:update-issue-plan` — Sync knowledge graph → plan → issue → GitHub
-- `/kmgraph:link-issue` — Manually link existing lesson or ADR to GitHub issue
-- `/kmgraph:sync-all` — Automated full sync pipeline (4 steps → 1 command)
-- `/kmgraph:handoff` — Create comprehensive handoff documentation for transitions, context limits, or onboarding
+- `/kmgraph:kmg-meta-issue` — Initialize meta-issue tracking for complex multi-attempt problems
+- `/kmgraph:kmg-start-issue-tracking` — Initialize issue tracking with structured docs and Git branch
+- `/kmgraph:kmg-update-issue-plan` — Sync knowledge graph → plan → issue → GitHub
+- `/kmgraph:kmg-link-issue` — Manually link existing lesson or ADR to GitHub issue
+- `/kmgraph:kmg-sync-all` — Automated full sync pipeline (4 steps → 1 command)
+- `/kmgraph:kmg-handoff` — Create comprehensive handoff documentation for transitions, context limits, or onboarding
 
 ---
 
@@ -110,7 +110,7 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 
 **v0.5.10.5 — 2026-06-12**
 
-- **`extract-chat` adds Codex CLI source** — `/kmgraph:extract-chat` now accepts `--source codex` to extract chat history from Codex CLI sessions. Pass `--source codex` (or omit `--source` and select Codex from the interactive prompt) to index Codex conversation logs alongside existing Claude and Gemini sources.
+- **`extract-chat` adds Codex CLI source** — `/kmgraph:kmg-extract-chat` now accepts `--source codex` to extract chat history from Codex CLI sessions. Pass `--source codex` (or omit `--source` and select Codex from the interactive prompt) to index Codex conversation logs alongside existing Claude and Gemini sources.
 - **Docs-impact-scan guide page published** — New [Docs-Impact-Scan Guide](docs/pillars/tailoring/docs-impact-scan.md) documents the 8-step pre-push workflow that automatically discovers and updates affected documentation. This feature (previously undocumented except in ADRs) now has a dedicated user-facing guide.
 
 **v0.5.10.3 — 2026-06-11**
@@ -124,7 +124,7 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 
 **v0.5.10.1 — 2026-06-09**
 
-- **Session summary operational sections (ENH-002 partial)** — `/kmgraph:session-summary` now generates five structured sections: Start-of-Session Reading gate, Current State, Open Issues, Session History (thin references), and Session Findings (errors/findings from any command run this session). Operational sections overwrite each run; narrative blocks append-only and timestamped.
+- **Session summary operational sections (ENH-002 partial)** — `/kmgraph:kmg-session-summary` now generates five structured sections: Start-of-Session Reading gate, Current State, Open Issues, Session History (thin references), and Session Findings (errors/findings from any command run this session). Operational sections overwrite each run; narrative blocks append-only and timestamped.
 - **One-file-per-day enforcement** — Step 1.5 added to full-session path; filename unified to `YYYY-MM-DD-{branch-slug}.md` across snapshot and full modes. No more duplicate files per day.
 - **Handoff package reduced** — SESSION-COMPILATION.md and OPEN-ISSUES.md removed; START-HERE.md is now a thin pointer that auto-detects today's session summary. Package is DOCUMENTATION-MAP + ARCHITECTURE-SNAPSHOT + thin START-HERE.
 - **Stale path fixes** — All `decisions/` and `lessons-learned/` references in handoff corrected to `knowledge/decisions/` and `knowledge/lessons-learned/`.
@@ -142,8 +142,8 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 **v0.5.9 — 2026-05-27**
 
 - **Decision governance protocol enforced at hook level** — `pre-skill-rules-inject.sh` now hard-blocks brainstorming and planning without a prior knowledge-graph recall. Two recall queries are required before any plan is written (topic + architectural domain). Recall misses are logged to `/tmp/kmgraph-recall-miss-*.log` for audit. Remote-session compatibility: embedded-rules block is written directly into plan files so Ultraplan and other non-hook contexts carry the enforcement.
-- **New `brainstorm-recall` skill** — Fires before `adr-guide` and invokes `kmgraph:recall` before any recommendation. Results appear under a "Prior Art" heading so past decisions surface before new ones are made.
-- **`gov-execute-plan` cascade gate** — When a new ADR is captured mid-session, execution is paused before the next plan task so the user can review cascade impact. ADR flag is day-scoped and cleaned at branch finish.
+- **New `brainstorm-recall` skill** — Fires before `kmg-adr-guide` and invokes `kmgraph:kmg-recall` before any recommendation. Results appear under a "Prior Art" heading so past decisions surface before new ones are made.
+- **`kmg-execute-plan` cascade gate** — When a new ADR is captured mid-session, execution is paused before the next plan task so the user can review cascade impact. ADR flag is day-scoped and cleaned at branch finish.
 - **Chat-history now searchable** — `mcp-server/src/tools/fts5.ts` adds `chat-history` to `searchDirs`; exported chat logs (Claude, Gemini, Codex CLI) are indexed and reachable via `kg_search`.
 - **Session-documenter Relay Contract** — Draft session summaries are now displayed verbatim before save/edit/cancel options. No silent summarization.
 - **Post-plan validation checklist** — A PostToolUse:Write hook fires after any `plans/*.md` write and outputs an advisory validation checklist.
@@ -165,7 +165,7 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 - **Planning skills no longer offer unsolicited execution choices** — `superpowers:writing-plans` and `superpowers:brainstorming` no longer ask "Which approach?" after saving a plan. The PreToolUse hook hard-blocks that prompt; the plan is saved and control returns to the user.
 - **Execution skills no longer auto-push or open PRs** — `superpowers:executing-plans` and `superpowers:finishing-a-development-branch` now stop and wait for explicit approval before any `git push` or `gh pr create`.
 - **Stop hook safety net added** — `stop-plan-gate.sh` re-surfaces the plan approval gate at session end when a plan was written, catching cases where the hook injection was bypassed mid-session.
-- **`gov-plan-gate` promoted to plugin skill** — Available as `kmgraph:gov-plan-gate` in the skills index, covering both planning and execution gate types.
+- **`kmg-plan-gate` promoted to plugin skill** — Available as `kmgraph:kmg-plan-gate` in the skills index, covering both planning and execution gate types.
 
 **v0.5.6 — 2026-05-05**
 
@@ -188,7 +188,7 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 
 **v0.5.2 — 2026-04-21**
 
-- **Model configuration is now future-proof** — Instead of hardcoding specific model names in `me.md`, commands and agents now reference tier labels (`fast-tier`, `standard-tier`, `powerful-tier`). When a model gets updated or renamed, only one place needs to change. Getting started is straightforward: run `/kmgraph:init` and the wizard walks through tier mapping interactively, discovers any locally running Ollama or LM Studio instances automatically, and pre-populates `~/.kmgraph/me.md` with working defaults so no manual edits are needed. Upgrading works the same way — the upgrade wizard offers the same interactive walkthrough after relocating platform config. For full manual control, add a `platforms[]` block directly to `me.md`. Unrecognized model values surface a warning instead of silently failing.
+- **Model configuration is now future-proof** — Instead of hardcoding specific model names in `me.md`, commands and agents now reference tier labels (`fast-tier`, `standard-tier`, `powerful-tier`). When a model gets updated or renamed, only one place needs to change. Getting started is straightforward: run `/kmgraph:kmg-init` and the wizard walks through tier mapping interactively, discovers any locally running Ollama or LM Studio instances automatically, and pre-populates `~/.kmgraph/me.md` with working defaults so no manual edits are needed. Upgrading works the same way — the upgrade wizard offers the same interactive walkthrough after relocating platform config. For full manual control, add a `platforms[]` block directly to `me.md`. Unrecognized model values surface a warning instead of silently failing.
 - **ADRs now record where and when decisions were implemented** — When creating an ADR, the wizard automatically captures the commit and subject line so there is always a traceable link back to the implementation. No more guessing when or where something was decided.
 - **Rules from `rules.md` are now enforced automatically** — A new PreToolUse hook checks `rules.md` before certain tools run, so behavioral rules don't have to be re-stated every session.
 - **New projects get better default rules out of the box** — The `rules.md` template now seeds parallelism analysis and skill override rules automatically during init, giving new knowledge graphs a more useful starting point.
@@ -202,7 +202,7 @@ Pull the latest version and run `/kmgraph:init` in any project that uses it. The
 - **Meta-issue tracking improved** — Each attempt on a complex problem now requires a distinct hypothesis before starting, making it easier to track what was tried and why.
 - **Security: stops pushes when known vulnerabilities are unacknowledged** — A pre-PR check now surfaces any open Dependabot alerts before a push goes through. Users see a findings table and must explicitly approve before proceeding.
 - **Dependency security patches** — Two transitive dependency vulnerabilities patched in the MCP server and docs toolchain. No user action required.
-- **Bug fix: `triggers.md` was missing after a fresh init** — Two bugs caused `triggers.md` to never be created during new project and personal KG setup. Both are fixed. If `triggers.md` is missing from an existing KG, re-running `/kmgraph:init` will create it.
+- **Bug fix: `triggers.md` was missing after a fresh init** — Two bugs caused `triggers.md` to never be created during new project and personal KG setup. Both are fixed. If `triggers.md` is missing from an existing KG, re-running `/kmgraph:kmg-init` will create it.
 
 **v0.3.x — Major Architectural Change** *(2026-04-10)*
 

@@ -1,3 +1,10 @@
+---
+title: Readme
+category:
+  uri: templates
+slug: templates-decisions-readme
+---
+
 # Architecture Decision Records (ADRs)
 
 **Navigation**: [Home](../../index.md) > [Getting Started](../../GETTING-STARTED.md) > [Manual Workflows](../../WORKFLOWS.md) > Templates
@@ -47,7 +54,7 @@ Formal documentation of significant architecture decisions.
 
 ## Field Guide
 
-The ADR template fields are populated by the `/kmgraph:create-adr` wizard. Most fields are auto-populated; a few require user input during the wizard.
+The ADR template fields are populated by the `/kmgraph:kmg-create-adr` wizard. Most fields are auto-populated; a few require user input during the wizard.
 
 **Header Fields:**
 - `ADR-XXX` - Sequential number — auto-incremented by the wizard
@@ -66,7 +73,7 @@ All sections are manually filled:
 - **Related** - Links to implementation, lessons, KG entries
 
 **Troubleshooting:**
-- Run `/kmgraph:create-adr` — the wizard handles numbering and metadata automatically
+- Run `/kmgraph:kmg-create-adr` — the wizard handles numbering and metadata automatically
 - If editing an existing ADR manually, replace all `[bracketed placeholders]` with your content
 
 **Examples:**
@@ -76,7 +83,7 @@ See [core/examples/decisions/](../../examples/decisions/) for filled-out ADR exa
 
 ## Creating a New ADR
 
-Run `/kmgraph:create-adr` — the wizard handles numbering, git metadata, and index updates automatically.
+Run `/kmgraph:kmg-create-adr` — the wizard handles numbering, git metadata, and index updates automatically.
 
 For manual creation:
 1. **Determine next number:** Find the highest existing ADR number and increment

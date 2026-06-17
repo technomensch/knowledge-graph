@@ -1,22 +1,7 @@
 ---
-title: "ADR-040: Restructure Knowledge Templates into Subdirectory"
-number: 040
-created: 2026-04-21T00:00:00Z
-status: Accepted
-author: technomensch
-email: mkitact@gmail.com
-git:
-  branch: main
-  commit: a1aaaad9
-  pr: null
-  issue: null
-implements: v0.4.3-beta
-related:
-  adrs: [9, 28, 32, 33, 37, 39]
-  lessons: []
-  kg_entries: []
-tags: [templates, knowledge, directory-structure, init, upgrade]
-category: architecture
+title: 'ADR-040: Restructure Knowledge Templates into Subdirectory'
+category:
+  uri: uri-that-does-not-map-to-architecture
 ---
 
 # ADR-040: Restructure Knowledge Templates into Subdirectory

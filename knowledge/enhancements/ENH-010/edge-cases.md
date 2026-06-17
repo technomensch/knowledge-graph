@@ -1,7 +1,5 @@
 ---
-title: "ENH-010 Edge Cases — v0.3.0-beta"
-date: 2026-04-09
-tags: [edge-cases, v0.3.0-beta, ENH-010, init, migration, scaffold]
+title: ENH-010 Edge Cases — v0.3.0-beta
 ---
 # ENH-010 Edge Cases — v0.3.0-beta
 
