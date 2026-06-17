@@ -2,9 +2,13 @@
 # recommendation-gate.sh — UserPromptSubmit hook
 #
 # Fires on every user prompt submission. Detects recommendation-seeking
-# phrasing and injects a systemMessage preamble that gates the response
-# behind recall, ADR pre-check, blast-radius analysis, and root-cause
-# diagnosis before Claude produces inline recommendations.
+# phrasing and injects additionalContext (hookSpecificOutput) that gates
+# the response behind recall, ADR pre-check, blast-radius analysis, and
+# root-cause diagnosis before the model produces inline recommendations.
+#
+# Output: hookSpecificOutput.additionalContext — correct contract for
+# UserPromptSubmit across Claude Code, Codex CLI, and Gemini CLI.
+# systemMessage is a TUI-only warning surface, not model context injection.
 #
 # Debounce: per-session PID flag at /tmp/kmgraph-rec-gate-$$.flag
 # ensures the preamble is injected at most once per Claude session.
@@ -98,12 +102,12 @@ if [ -z "$PREAMBLE" ]; then
   PREAMBLE="$FALLBACK_PREAMBLE"
 fi
 
-# ── Emit systemMessage ────────────────────────────────────────────────────────
+# ── Emit UserPromptSubmit additionalContext ───────────────────────────────────
 
 if command -v jq &>/dev/null; then
-  jq -n --arg msg "$PREAMBLE" '{"systemMessage": $msg}'
+  jq -n --arg msg "$PREAMBLE" '{"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": $msg}}'
 else
-  printf '{"systemMessage": "%s"}\n' \
+  printf '{"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": "%s"}}\n' \
     "$(printf '%s' "$PREAMBLE" | sed 's/"/\\"/g; s/$/\\n/' | tr -d '\n' | sed 's/\\n$//')"
 fi
 
