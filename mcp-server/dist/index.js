@@ -31948,9 +31948,9 @@ function checkTemplates(kgPath) {
   const results = [];
   const mappings = [
     {
-      templateSub: "knowledge",
-      kgSub: "knowledge",
-      files: ["patterns.md", "gotchas.md", "concepts.md", "architecture.md", "workflows.md", "index.md"]
+      templateSub: "concepts",
+      kgSub: "concepts",
+      files: ["entry-template.md", "kg-category-index.md"]
     },
     {
       templateSub: "lessons-learned",
@@ -32075,9 +32075,9 @@ function applyTemplates(kgPath) {
   if (!fs9.existsSync(templateRoot)) return "Template root not found; skipped";
   const mappings = [
     {
-      templateSub: "knowledge",
-      kgSub: "knowledge",
-      files: ["patterns.md", "gotchas.md", "concepts.md", "architecture.md", "workflows.md", "index.md"]
+      templateSub: "concepts",
+      kgSub: "concepts",
+      files: ["entry-template.md", "kg-category-index.md"]
     },
     {
       templateSub: "lessons-learned",
