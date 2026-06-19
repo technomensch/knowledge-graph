@@ -31,7 +31,7 @@ function makeTempDir(prefix: string): string {
 
 function scaffoldKg(root: string): void {
   for (const dir of [
-    "knowledge",
+    "templates",        // was "knowledge"
     "lessons-learned",
     "decisions",
     "sessions",
@@ -788,7 +788,7 @@ describe("T-28: symlinked lessons-learned/ — inspect does not crash", () => {
     const kgRoot = makeTempDir("t28");
     tempDirs.push(kgRoot);
     // Create all dirs except lessons-learned, then symlink it
-    for (const dir of ["knowledge", "decisions", "sessions", "chat-history", "tmp"]) {
+    for (const dir of ["templates", "decisions", "sessions", "chat-history", "tmp"]) {
       fs.mkdirSync(path.join(kgRoot, dir), { recursive: true });
     }
     const target = fs.mkdtempSync(path.join(os.tmpdir(), "symlink-target-"));
@@ -1122,5 +1122,42 @@ describe("T-40: two native platform files present — inspect does not crash", (
     const parsed = parseResult(result);
     expect(Array.isArray(parsed.upgrades)).toBe(true);
     expect(Array.isArray(parsed.warnings)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// T-41: checkDirectories requires templates/, not knowledge/
+// ---------------------------------------------------------------------------
+
+describe("T-41: checkDirectories requires templates/, not knowledge/", () => {
+  test("templates/ reported missing when absent; no 'knowledge' in missing list", async () => {
+    const kgRoot = makeTempDir("t41");
+    tempDirs.push(kgRoot);
+    // Create all required dirs EXCEPT templates/ — no knowledge/ dir to avoid
+    // triggering the stray-knowledge-dir check in the same scenario
+    for (const dir of ["lessons-learned", "decisions", "sessions", "chat-history", "tmp"]) {
+      fs.mkdirSync(path.join(kgRoot, dir), { recursive: true });
+    }
+    mockActiveKg(kgRoot);
+
+    const result = await handleUpgrade({});
+    const parsed = parseResult(result);
+    const dirItem = parsed.upgrades.find((u) => u.category === "directories");
+    expect(dirItem).toBeDefined();
+    // description = "Missing directories: templates"
+    expect(dirItem!.description).toContain("templates");
+    expect(dirItem!.description).not.toContain("knowledge");
+  });
+
+  test("no directories item when all required dirs including templates/ exist", async () => {
+    const kgRoot = makeTempDir("t41b");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot); // includes templates/ after Task 1 fix
+    mockActiveKg(kgRoot);
+
+    const result = await handleUpgrade({});
+    const parsed = parseResult(result);
+    const dirItem = parsed.upgrades.find((u) => u.category === "directories");
+    expect(dirItem).toBeUndefined();
   });
 });

@@ -51,7 +51,7 @@ function parseFrontmatter(filePath: string): Record<string, string> {
  */
 function checkDirectories(kgPath: string): UpgradeItem[] {
   const required = [
-    "knowledge",
+    "templates",        // was "knowledge" — project/knowledge/knowledge/ is nonsensical
     "lessons-learned",
     "decisions",
     "sessions",
@@ -214,7 +214,7 @@ function checkPlatformSplit(kgPath: string): WarningItem | null {
 
 function applyDirectories(kgPath: string): string {
   const required = [
-    "knowledge",
+    "templates",        // was "knowledge" — project/knowledge/knowledge/ is nonsensical
     "lessons-learned",
     "decisions",
     "sessions",
