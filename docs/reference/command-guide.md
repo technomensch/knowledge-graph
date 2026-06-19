@@ -1284,6 +1284,29 @@ git checkout -b issue/N-description
 ```
 
 ---
+## MCP Tool: `kg_upgrade`
+
+Available on all platforms (Codex, Gemini CLI, Cursor, etc.). Inspects and applies upgrades to an existing KMGraph installation.
+
+**Inspect** (no args): returns a JSON object with `upgrades` and `warnings` arrays.
+
+**Apply**: pass `apply: ["category", ...]` to apply one or more categories.
+
+| Category | What it does |
+|---|---|
+| `directories` | Creates missing required subdirectories (`templates/`, `decisions/`, `sessions/`, `chat-history/`, `tmp/`) |
+| `config` | Backfills missing fields in `~/.claude/kg-config.json` introduced in newer versions |
+| `templates` | Deploys missing or outdated template files — content templates go to `templates/`, index files to `concepts/`, READMEs stay in live dirs |
+| `starter-relocation` | Moves starter files (e.g., `ADR-template.md`) from live dirs into `templates/` (ENH-022 migration) |
+| `stray-knowledge-dir` | Project-local KGs only: merges known template files from a stray `knowledge/` subdir into `concepts/` and removes it |
+| `platform-split` | Removes Claude Code–specific tool directives from `knowledge/rules.md` (requires `confirm_platform_split: true`) |
+
+**`version-update` item** (inspect-only, not an apply category): reported when `lastAppliedVersion` stored in the KG config is older than the installed MCP server version. The item's `details` field lists the concrete apply categories to run. After any successful apply, `lastAppliedVersion` is written back automatically.
+
+**Startup Protocol**: `AGENTS.md` and `GEMINI.md` instruct Codex and Gemini CLI to call `kg_upgrade` inspect at the start of each session. Errors (e.g., no KG configured) are suppressed — upgrades are only surfaced when relevant.
+
+---
+
 ## Technical Details
 
 This section covers implementation specifics for users who want to understand how features work internally.

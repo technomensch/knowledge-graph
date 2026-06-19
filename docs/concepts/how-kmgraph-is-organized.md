@@ -121,6 +121,32 @@ MCP (Model Context Protocol) tools handle all persistence, search, and retrieval
 
 **Location:** `mcp-server/` directory (TypeScript/Node.js implementation).
 
+### KG Directory Structure
+
+Each knowledge graph is a directory on disk. The standard layout (as of v0.6.4 / ENH-022):
+
+```
+{kg_path}/
+  concepts/           ← index files (entry-template.md, kg-category-index.md)
+  decisions/          ← ADRs and architecture decisions (README.md stays here)
+  lessons-learned/    ← lesson entries (README.md stays here)
+  sessions/           ← session summaries (real sessions only)
+  templates/          ← ALL starter and content templates (new in ENH-022)
+    ADR-template.md
+    lesson-template.md
+    session-template.md
+    entry-template.md  ← reference copy
+    architecture.md    ← content templates
+    concepts.md
+    gotchas.md
+    patterns.md
+    workflows.md
+  chat-history/       ← extracted chat logs
+  tmp/                ← scratch space (gitignored)
+```
+
+**Why `templates/` is separate:** Starters and content templates in live directories (`decisions/ADR-template.md`, `sessions/session-template.md`) created confusion — AI assistants sometimes treated them as real entries. Moving them to `templates/` makes the intent unambiguous. The `kg_upgrade` `starter-relocation` category migrates existing installs automatically.
+
 ### How the Layers Interact
 
 A typical flow moves through all four layers in sequence:

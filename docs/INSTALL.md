@@ -134,6 +134,16 @@ When running `/kmgraph:kmg-init` on an existing installation, the wizard inspect
 >
 > `/kmgraph:kmg-init` is safe to re-run at any time. It skips steps already complete and only offers items still pending for your install.
 
+### Upgrading on Codex or Gemini CLI
+
+On platforms without the Claude Code wizard, upgrades are handled via the `kg_upgrade` MCP tool:
+
+1. Update the plugin (e.g., `codex plugin marketplace add technomensch/knowledge-graph` to pull the latest)
+2. Start a new session — the **Startup Protocol** in `AGENTS.md` / `GEMINI.md` automatically calls `kg_upgrade` inspect
+3. Review the reported items and confirm before applying
+
+If no upgrade items are reported, your installation is up to date. If `kg_upgrade` returns an error (no KG configured), the Startup Protocol suppresses it — no action needed.
+
 ---
 
 ## Next Steps

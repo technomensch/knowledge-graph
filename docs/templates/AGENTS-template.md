@@ -11,6 +11,14 @@ Template for creating new KMGraph agents. Copy this file and fill in each sectio
 
 ---
 
+## Startup Protocol
+
+At the start of each session, call `kg_upgrade` (no `apply` arg) to inspect for pending upgrades.
+If `kg_upgrade` returns an error (e.g., no knowledge graph configured), stay silent — do not surface the error to the user.
+If upgrades are reported, summarize them and ask before applying.
+
+---
+
 ## Metadata
 
 ```yaml
