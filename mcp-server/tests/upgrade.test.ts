@@ -1305,3 +1305,102 @@ describe("T-46: applyStarterRelocation moves starters to templates/", () => {
     expect(fs.readFileSync(path.join(kgRoot, "templates", "ADR-template.md"), "utf-8")).toBe("# Modified by user\n");
   });
 });
+
+// ---------------------------------------------------------------------------
+// T-47: checkStrayKnowledgeDir detects knowledge/ on project-local KG
+// ---------------------------------------------------------------------------
+
+describe("T-47: checkStrayKnowledgeDir detects knowledge/ on project-local KG", () => {
+  test("reports stray-knowledge-dir when knowledge/ subdir exists on project-local KG", async () => {
+    const kgRoot = makeTempDir("t47");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    fs.mkdirSync(path.join(kgRoot, "knowledge"), { recursive: true });
+    mockActiveKg(kgRoot, { type: "project-local" });
+
+    const result = await handleUpgrade({});
+    const parsed = parseResult(result);
+    const item = parsed.upgrades.find((u) => u.category === "stray-knowledge-dir");
+    expect(item).toBeDefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// T-48: checkStrayKnowledgeDir skips knowledge/ on personal KG
+// ---------------------------------------------------------------------------
+
+describe("T-48: checkStrayKnowledgeDir skips knowledge/ on personal KG", () => {
+  test("no stray-knowledge-dir item when type=personal even if knowledge/ exists", async () => {
+    const kgRoot = makeTempDir("t48");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    fs.mkdirSync(path.join(kgRoot, "knowledge"), { recursive: true });
+    mockActiveKg(kgRoot, { type: "personal" });
+
+    const result = await handleUpgrade({});
+    const parsed = parseResult(result);
+    const item = parsed.upgrades.find((u) => u.category === "stray-knowledge-dir");
+    expect(item).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// T-49: applyStrayKnowledgeDir moves unmodified template files to concepts/
+// ---------------------------------------------------------------------------
+
+describe("T-49: applyStrayKnowledgeDir moves unmodified template files to concepts/", () => {
+  test("known template file moves to concepts/, unknown files left alone, dir removed if empty", async () => {
+    const kgRoot = makeTempDir("t49");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    fs.mkdirSync(path.join(kgRoot, "knowledge"), { recursive: true });
+    fs.mkdirSync(path.join(kgRoot, "concepts"), { recursive: true });
+
+    // Setup mock plugin root with canonical source
+    const mockPluginRoot = makeTempDir("t49-plugin");
+    tempDirs.push(mockPluginRoot);
+    const srcDir = path.join(mockPluginRoot, "core", "default-templates", "concepts", "templates");
+    fs.mkdirSync(srcDir, { recursive: true });
+    const content = "# Architecture template\n";
+    fs.writeFileSync(path.join(srcDir, "architecture.md"), content, "utf-8");
+    const { getPluginRoot } = jest.requireMock("../src/utils.js") as { getPluginRoot: jest.Mock };
+    getPluginRoot.mockReturnValue(mockPluginRoot);
+
+    // Place unmodified copy of architecture.md in stray dir
+    fs.writeFileSync(path.join(kgRoot, "knowledge", "architecture.md"), content, "utf-8");
+
+    mockActiveKg(kgRoot, { type: "project-local" });
+    await handleUpgrade({ apply: ["stray-knowledge-dir"] });
+
+    // architecture.md moved to concepts/
+    expect(fs.existsSync(path.join(kgRoot, "concepts", "architecture.md"))).toBe(true);
+    // stray dir removed (was empty after move)
+    expect(fs.existsSync(path.join(kgRoot, "knowledge"))).toBe(false);
+  });
+
+  test("modified template file skipped; stray dir not removed when file remains", async () => {
+    const kgRoot = makeTempDir("t49b");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    fs.mkdirSync(path.join(kgRoot, "knowledge"), { recursive: true });
+    fs.mkdirSync(path.join(kgRoot, "concepts"), { recursive: true });
+
+    const mockPluginRoot = makeTempDir("t49b-plugin");
+    tempDirs.push(mockPluginRoot);
+    const srcDir = path.join(mockPluginRoot, "core", "default-templates", "concepts", "templates");
+    fs.mkdirSync(srcDir, { recursive: true });
+    fs.writeFileSync(path.join(srcDir, "architecture.md"), "# canonical\n", "utf-8");
+    const { getPluginRoot } = jest.requireMock("../src/utils.js") as { getPluginRoot: jest.Mock };
+    getPluginRoot.mockReturnValue(mockPluginRoot);
+
+    // User-modified version in stray dir
+    fs.writeFileSync(path.join(kgRoot, "knowledge", "architecture.md"), "# my custom version\n", "utf-8");
+
+    mockActiveKg(kgRoot, { type: "project-local" });
+    const result = await handleUpgrade({ apply: ["stray-knowledge-dir"] });
+    const text = result.content[0].text;
+    expect(text).toContain("modified");
+    // stray dir still exists (file not moved)
+    expect(fs.existsSync(path.join(kgRoot, "knowledge"))).toBe(true);
+  });
+});

@@ -409,6 +409,80 @@ function applyStarterRelocation(kgPath: string): string {
   return parts.join(". ") || "No starters to relocate";
 }
 
+function checkStrayKnowledgeDir(kgPath: string, kgType: string | undefined): UpgradeItem[] {
+  if (kgType !== "project-local") return [];
+  const strayDir = path.join(kgPath, "knowledge");
+  if (!fs.existsSync(strayDir)) return [];
+  return [{
+    category: "stray-knowledge-dir",
+    description: "knowledge/ subdirectory exists inside kgPath (nonsensical nesting from pre-v0.5.0 init)",
+    details: `Found: ${strayDir}\nApply stray-knowledge-dir to merge known template files into concepts/ and remove the dir.`,
+  }];
+}
+
+// Files that belong in concepts/ if found in the stray knowledge/ dir
+const STRAY_KNOWLEDGE_TEMPLATE_FILES = [
+  "architecture.md",
+  "concepts.md",
+  "gotchas.md",
+  "patterns.md",
+  "workflows.md",
+];
+
+function applyStrayKnowledgeDir(kgPath: string): string {
+  const strayDir = path.join(kgPath, "knowledge");
+  if (!fs.existsSync(strayDir)) return "No stray knowledge/ dir found; skipped";
+
+  const pluginRoot = getPluginRoot();
+  const sourceDir = path.join(pluginRoot, "core", "default-templates", "concepts", "templates");
+  const destConcepts = path.join(kgPath, "concepts");
+  fs.mkdirSync(destConcepts, { recursive: true });
+
+  const moved: string[] = [];
+  const skipped: string[] = [];
+  const ignored: string[] = [];
+
+  for (const entry of fs.readdirSync(strayDir)) {
+    const src = path.join(strayDir, entry);
+    if (!fs.statSync(src).isFile()) continue;
+
+    if (!STRAY_KNOWLEDGE_TEMPLATE_FILES.includes(entry)) {
+      // Not a known template file — do not touch (could be user content)
+      ignored.push(entry);
+      continue;
+    }
+
+    const canonicalSrc = path.join(sourceDir, entry);
+    if (fs.existsSync(canonicalSrc)) {
+      const srcContent = fs.readFileSync(src, "utf-8");
+      const canonContent = fs.readFileSync(canonicalSrc, "utf-8");
+      if (srcContent !== canonContent) {
+        // ADR-040: user modified — warn, do not auto-overwrite
+        skipped.push(`${entry} (modified — manual review required before moving to concepts/)`);
+        continue;
+      }
+    }
+
+    const dest = path.join(destConcepts, entry);
+    fs.copyFileSync(src, dest);
+    fs.unlinkSync(src);
+    moved.push(entry);
+  }
+
+  // Remove stray dir only if empty (ignored/skipped files may still be in it)
+  const remaining = fs.readdirSync(strayDir);
+  if (remaining.length === 0) {
+    fs.rmdirSync(strayDir);
+  }
+
+  const parts: string[] = [];
+  if (moved.length > 0) parts.push(`Moved to concepts/: ${moved.join(", ")}`);
+  if (skipped.length > 0) parts.push(`Skipped (modified): ${skipped.join(", ")}`);
+  if (ignored.length > 0) parts.push(`Ignored (not template files): ${ignored.join(", ")}`);
+  if (remaining.length > 0) parts.push(`knowledge/ not removed — ${remaining.length} item(s) remain`);
+  return parts.join(". ") || "Nothing to move";
+}
+
 function applyPlatformSplit(kgPath: string): string {
   // Remove platform-specific lines from rules.md and bump schema version
   const rulesPath = path.join(kgPath, "knowledge", "rules.md");
@@ -450,7 +524,7 @@ function applyPlatformSplit(kgPath: string): string {
 // ── Exported handler for direct testing ──────────────────────────────────────
 
 // "version-update" is inspect-only — NOT an apply category; do not add it here
-export type ApplyCategory = "directories" | "config" | "templates" | "platform-split" | "starter-relocation";
+export type ApplyCategory = "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir";
 
 export interface HandleUpgradeParams {
   apply?: ApplyCategory[];
@@ -475,6 +549,8 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
 
   const rawPath = config.graphs[config.active].path;
   const kgPath = rawPath.replace(/^~/, os.homedir());
+  const graphRecord = config.graphs[config.active] as unknown as Record<string, unknown>;
+  const kgType = graphRecord.type as string | undefined;
 
   if (!fs.existsSync(kgPath)) {
     return {
@@ -491,6 +567,7 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
     result.upgrades.push(...checkConfig(kgPath));
     result.upgrades.push(...checkTemplates(kgPath));
     result.upgrades.push(...checkStarterRelocation(kgPath));
+    result.upgrades.push(...checkStrayKnowledgeDir(kgPath, kgType));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
     return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
@@ -510,6 +587,9 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
         break;
       case "starter-relocation":
         results.push(`[starter-relocation] ${applyStarterRelocation(kgPath)}`);
+        break;
+      case "stray-knowledge-dir":
+        results.push(`[stray-knowledge-dir] ${applyStrayKnowledgeDir(kgPath)}`);
         break;
       case "platform-split":
         if (!params.confirm_platform_split) {
@@ -532,7 +612,7 @@ export function registerUpgradeTool(server: McpServer): void {
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
       apply: z
-        .array(z.enum(["directories", "config", "templates", "platform-split", "starter-relocation"]))
+        .array(z.enum(["directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"]))
         .optional()
         .default([])
         .describe(
