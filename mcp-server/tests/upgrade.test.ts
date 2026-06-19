@@ -1195,3 +1195,58 @@ describe("T-42: checkTemplates detects missing content templates", () => {
     expect(names.some((n) => n.includes("workflows.md"))).toBe(true);
   });
 });
+
+// ---------------------------------------------------------------------------
+// T-43: applyTemplates deploys starters to templates/ not live dirs
+// ---------------------------------------------------------------------------
+
+describe("T-43: applyTemplates deploys starters to templates/ not live dirs", () => {
+  test("lesson-template.md appears in templates/, not in lessons-learned/", async () => {
+    const kgRoot = makeTempDir("t43");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+
+    const mockPluginRoot = makeTempDir("t43-plugin");
+    tempDirs.push(mockPluginRoot);
+    const srcDir = path.join(mockPluginRoot, "core", "default-templates", "lessons-learned");
+    fs.mkdirSync(srcDir, { recursive: true });
+    fs.writeFileSync(path.join(srcDir, "lesson-template.md"), "# Lesson Template\n", "utf-8");
+    const { getPluginRoot } = jest.requireMock("../src/utils.js") as { getPluginRoot: jest.Mock };
+    getPluginRoot.mockReturnValue(mockPluginRoot);
+
+    mockActiveKg(kgRoot);
+    await handleUpgrade({ apply: ["templates"] });
+
+    expect(fs.existsSync(path.join(kgRoot, "templates", "lesson-template.md"))).toBe(true);
+    expect(fs.existsSync(path.join(kgRoot, "lessons-learned", "lesson-template.md"))).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// T-44: applyTemplates deploys content templates to templates/
+// ---------------------------------------------------------------------------
+
+describe("T-44: applyTemplates deploys content templates to templates/", () => {
+  test("all 5 content templates appear in templates/", async () => {
+    const kgRoot = makeTempDir("t44");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+
+    const mockPluginRoot = makeTempDir("t44-plugin");
+    tempDirs.push(mockPluginRoot);
+    const srcDir = path.join(mockPluginRoot, "core", "default-templates", "concepts", "templates");
+    fs.mkdirSync(srcDir, { recursive: true });
+    for (const f of ["architecture.md", "concepts.md", "gotchas.md", "patterns.md", "workflows.md"]) {
+      fs.writeFileSync(path.join(srcDir, f), `# ${f}\n`, "utf-8");
+    }
+    const { getPluginRoot } = jest.requireMock("../src/utils.js") as { getPluginRoot: jest.Mock };
+    getPluginRoot.mockReturnValue(mockPluginRoot);
+
+    mockActiveKg(kgRoot);
+    await handleUpgrade({ apply: ["templates"] });
+
+    for (const f of ["architecture.md", "concepts.md", "gotchas.md", "patterns.md", "workflows.md"]) {
+      expect(fs.existsSync(path.join(kgRoot, "templates", f))).toBe(true);
+    }
+  });
+});
