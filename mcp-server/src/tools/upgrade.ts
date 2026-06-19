@@ -111,24 +111,49 @@ function checkTemplates(kgPath: string): UpgradeItem[] {
 
   // Subdirectory mappings: template subdir → kg subdir
   const mappings: Array<{ templateSub: string; kgSub: string; files: string[] }> = [
+    // Index files — stay in concepts/
     {
       templateSub: "concepts",
       kgSub: "concepts",
       files: ["entry-template.md", "kg-category-index.md"],
     },
+    // Content templates — go to templates/ (was missing entirely)
+    {
+      templateSub: "concepts/templates",
+      kgSub: "templates",
+      files: ["architecture.md", "concepts.md", "gotchas.md", "patterns.md", "workflows.md"],
+    },
+    // entry-template.md also deployed to templates/ as starter reference (ENH-022)
+    {
+      templateSub: "concepts",
+      kgSub: "templates",
+      files: ["entry-template.md"],
+    },
+    // READMEs stay in live dirs
     {
       templateSub: "lessons-learned",
       kgSub: "lessons-learned",
-      files: ["README.md", "lesson-template.md"],
+      files: ["README.md"],
     },
     {
       templateSub: "decisions",
       kgSub: "decisions",
-      files: ["README.md", "ADR-template.md"],
+      files: ["README.md"],
+    },
+    // Starters go to templates/ (not live dirs)
+    {
+      templateSub: "lessons-learned",
+      kgSub: "templates",
+      files: ["lesson-template.md"],
+    },
+    {
+      templateSub: "decisions",
+      kgSub: "templates",
+      files: ["ADR-template.md"],
     },
     {
       templateSub: "sessions",
-      kgSub: "sessions",
+      kgSub: "templates",
       files: ["session-template.md"],
     },
   ];

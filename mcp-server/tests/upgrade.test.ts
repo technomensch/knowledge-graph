@@ -1161,3 +1161,37 @@ describe("T-41: checkDirectories requires templates/, not knowledge/", () => {
     expect(dirItem).toBeUndefined();
   });
 });
+
+// ---------------------------------------------------------------------------
+// T-42: checkTemplates detects missing content templates
+// ---------------------------------------------------------------------------
+
+describe("T-42: checkTemplates detects missing content templates", () => {
+  test("reports 5 missing content templates when templates/ dir is empty", async () => {
+    const kgRoot = makeTempDir("t42");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot); // creates templates/ dir (empty) and other dirs
+
+    // Mock plugin root with ONLY concepts/templates/ source files
+    // (other source dirs absent → checkTemplates skips them via existsSync guard)
+    const mockPluginRoot = makeTempDir("t42-plugin");
+    tempDirs.push(mockPluginRoot);
+    const srcDir = path.join(mockPluginRoot, "core", "default-templates", "concepts", "templates");
+    fs.mkdirSync(srcDir, { recursive: true });
+    for (const f of ["architecture.md", "concepts.md", "gotchas.md", "patterns.md", "workflows.md"]) {
+      fs.writeFileSync(path.join(srcDir, f), `# ${f} template\n`, "utf-8");
+    }
+    const { getPluginRoot } = jest.requireMock("../src/utils.js") as { getPluginRoot: jest.Mock };
+    getPluginRoot.mockReturnValue(mockPluginRoot);
+
+    mockActiveKg(kgRoot);
+    const result = await handleUpgrade({});
+    const parsed = parseResult(result);
+    // Only concepts/templates/* source exists → exactly those 5 are reported missing
+    const templateItems = parsed.upgrades.filter((u) => u.category === "templates");
+    expect(templateItems.length).toBe(5);
+    const names = templateItems.map((u) => u.description);
+    expect(names.some((n) => n.includes("architecture.md"))).toBe(true);
+    expect(names.some((n) => n.includes("workflows.md"))).toBe(true);
+  });
+});
