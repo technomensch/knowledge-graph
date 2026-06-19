@@ -1250,3 +1250,58 @@ describe("T-44: applyTemplates deploys content templates to templates/", () => {
     }
   });
 });
+
+// ---------------------------------------------------------------------------
+// T-45: checkStarterRelocation detects starters in live dirs
+// ---------------------------------------------------------------------------
+
+describe("T-45: checkStarterRelocation detects starters in live dirs", () => {
+  test("reports starter-relocation when ADR-template.md is in decisions/", async () => {
+    const kgRoot = makeTempDir("t45");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "decisions", "ADR-template.md"), "# ADR Template\n", "utf-8");
+    mockActiveKg(kgRoot);
+
+    const result = await handleUpgrade({});
+    const parsed = parseResult(result);
+    const item = parsed.upgrades.find((u) => u.category === "starter-relocation");
+    expect(item).toBeDefined();
+    expect(item!.description).toContain("1 starter");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// T-46: applyStarterRelocation moves starters to templates/
+// ---------------------------------------------------------------------------
+
+describe("T-46: applyStarterRelocation moves starters to templates/", () => {
+  test("ADR-template.md moved from decisions/ to templates/; not in decisions/ after", async () => {
+    const kgRoot = makeTempDir("t46");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "decisions", "ADR-template.md"), "# ADR Template\n", "utf-8");
+    mockActiveKg(kgRoot);
+
+    await handleUpgrade({ apply: ["starter-relocation"] });
+
+    expect(fs.existsSync(path.join(kgRoot, "templates", "ADR-template.md"))).toBe(true);
+    expect(fs.existsSync(path.join(kgRoot, "decisions", "ADR-template.md"))).toBe(false);
+  });
+
+  test("does not overwrite different content already in templates/ — skips with warning", async () => {
+    const kgRoot = makeTempDir("t46b");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "decisions", "ADR-template.md"), "# Old Version\n", "utf-8");
+    fs.writeFileSync(path.join(kgRoot, "templates", "ADR-template.md"), "# Modified by user\n", "utf-8");
+    mockActiveKg(kgRoot);
+
+    const result = await handleUpgrade({ apply: ["starter-relocation"] });
+    const text = result.content[0].text;
+    expect(text).toContain("Skipped");
+    // Both files preserved
+    expect(fs.existsSync(path.join(kgRoot, "decisions", "ADR-template.md"))).toBe(true);
+    expect(fs.readFileSync(path.join(kgRoot, "templates", "ADR-template.md"), "utf-8")).toBe("# Modified by user\n");
+  });
+});

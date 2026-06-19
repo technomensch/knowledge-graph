@@ -356,6 +356,59 @@ function applyTemplates(kgPath: string): string {
     : "No templates to deploy";
 }
 
+function checkStarterRelocation(kgPath: string): UpgradeItem[] {
+  const starters = [
+    { dir: "decisions", file: "ADR-template.md" },
+    { dir: "lessons-learned", file: "lesson-template.md" },
+    { dir: "sessions", file: "session-template.md" },
+  ];
+  const found = starters.filter(({ dir, file }) =>
+    fs.existsSync(path.join(kgPath, dir, file))
+  );
+  if (found.length === 0) return [];
+  return [{
+    category: "starter-relocation",
+    description: `${found.length} starter file(s) in live dirs should move to templates/`,
+    details: found.map(({ dir, file }) => `  ${dir}/${file} → templates/${file}`).join("\n"),
+  }];
+}
+
+function applyStarterRelocation(kgPath: string): string {
+  const starters = [
+    { dir: "decisions", file: "ADR-template.md" },
+    { dir: "lessons-learned", file: "lesson-template.md" },
+    { dir: "sessions", file: "session-template.md" },
+  ];
+  fs.mkdirSync(path.join(kgPath, "templates"), { recursive: true });
+  const moved: string[] = [];
+  const skipped: string[] = [];
+  for (const { dir, file } of starters) {
+    const src = path.join(kgPath, dir, file);
+    const dest = path.join(kgPath, "templates", file);
+    if (!fs.existsSync(src)) continue;
+    // ADR-040: never silently overwrite user-modified files
+    if (fs.existsSync(dest)) {
+      const srcContent = fs.readFileSync(src, "utf-8");
+      const destContent = fs.readFileSync(dest, "utf-8");
+      if (srcContent !== destContent) {
+        skipped.push(`${dir}/${file} (already exists in templates/ with different content — manual review required)`);
+        continue;
+      }
+      // Identical content: remove live-dir copy, dest already correct
+      fs.unlinkSync(src);
+      moved.push(`${dir}/${file} (duplicate removed)`);
+      continue;
+    }
+    fs.copyFileSync(src, dest);
+    fs.unlinkSync(src);
+    moved.push(`${dir}/${file} → templates/${file}`);
+  }
+  const parts: string[] = [];
+  if (moved.length > 0) parts.push(`Relocated: ${moved.join(", ")}`);
+  if (skipped.length > 0) parts.push(`Skipped: ${skipped.join(", ")}`);
+  return parts.join(". ") || "No starters to relocate";
+}
+
 function applyPlatformSplit(kgPath: string): string {
   // Remove platform-specific lines from rules.md and bump schema version
   const rulesPath = path.join(kgPath, "knowledge", "rules.md");
@@ -396,7 +449,8 @@ function applyPlatformSplit(kgPath: string): string {
 
 // ── Exported handler for direct testing ──────────────────────────────────────
 
-export type ApplyCategory = "directories" | "config" | "templates" | "platform-split";
+// "version-update" is inspect-only — NOT an apply category; do not add it here
+export type ApplyCategory = "directories" | "config" | "templates" | "platform-split" | "starter-relocation";
 
 export interface HandleUpgradeParams {
   apply?: ApplyCategory[];
@@ -436,6 +490,7 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
     result.upgrades.push(...checkDirectories(kgPath));
     result.upgrades.push(...checkConfig(kgPath));
     result.upgrades.push(...checkTemplates(kgPath));
+    result.upgrades.push(...checkStarterRelocation(kgPath));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
     return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
@@ -452,6 +507,9 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
         break;
       case "templates":
         results.push(`[templates] ${applyTemplates(kgPath)}`);
+        break;
+      case "starter-relocation":
+        results.push(`[starter-relocation] ${applyStarterRelocation(kgPath)}`);
         break;
       case "platform-split":
         if (!params.confirm_platform_split) {
@@ -474,7 +532,7 @@ export function registerUpgradeTool(server: McpServer): void {
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
       apply: z
-        .array(z.enum(["directories", "config", "templates", "platform-split"]))
+        .array(z.enum(["directories", "config", "templates", "platform-split", "starter-relocation"]))
         .optional()
         .default([])
         .describe(
