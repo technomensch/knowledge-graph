@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import { readConfig, writeConfig, getPluginRoot } from "../utils.js";
+import { handleVersion } from "./version.js";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -521,6 +522,29 @@ function applyPlatformSplit(kgPath: string): string {
   return `Platform-split applied. Removed ${removed.length} line(s). kmgraph_schema set to 2.\n${removed.slice(0, 5).join("\n")}`;
 }
 
+function checkVersionMismatch(
+  installedVersion: string,
+  kgType: string | undefined,
+  config: ReturnType<typeof readConfig>
+): UpgradeItem[] {
+  const graphRecord = config.graphs[config.active!] as unknown as Record<string, unknown>;
+  const lastApplied = graphRecord.lastAppliedVersion as string | undefined;
+  if (!lastApplied || lastApplied === installedVersion) return [];
+  return [{
+    category: "version-update",
+    description: `Installed v${installedVersion} > last applied v${lastApplied} — run apply to update`,
+    details: `Apply categories: directories, templates, starter-relocation${kgType === "project-local" ? ", stray-knowledge-dir" : ""}`,
+  }];
+}
+
+function updateLastAppliedVersion(installedVersion: string): void {
+  // Fresh read to avoid clobbering field additions made by applyConfig() in the same apply run
+  const config = readConfig();
+  const graph = config.graphs[config.active!] as unknown as Record<string, unknown>;
+  graph.lastAppliedVersion = installedVersion;
+  writeConfig(config);
+}
+
 // ── Exported handler for direct testing ──────────────────────────────────────
 
 // "version-update" is inspect-only — NOT an apply category; do not add it here
@@ -538,6 +562,8 @@ export interface HandleUpgradeResult {
 }
 
 export async function handleUpgrade(params: HandleUpgradeParams): Promise<HandleUpgradeResult> {
+  // Under Jest/ts-jest __SERVER_VERSION__ is undefined → installedVersion = "0.0.0"
+  const installedVersion = handleVersion().installed;
   const config = readConfig();
 
   if (!config.active || !config.graphs[config.active]) {
@@ -568,6 +594,7 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
     result.upgrades.push(...checkTemplates(kgPath));
     result.upgrades.push(...checkStarterRelocation(kgPath));
     result.upgrades.push(...checkStrayKnowledgeDir(kgPath, kgType));
+    result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
     return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
@@ -599,6 +626,11 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
         }
         break;
     }
+  }
+
+  // Write lastAppliedVersion sentinel after any successful apply
+  if (applyList.length > 0) {
+    updateLastAppliedVersion(installedVersion);
   }
 
   return { content: [{ type: "text" as const, text: results.join("\n\n") }] };

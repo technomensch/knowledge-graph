@@ -17,6 +17,7 @@ export interface GraphConfig {
   categories: CategoryConfig[];
   createdAt: string;
   lastUsed: string;
+  lastAppliedVersion?: string;
 }
 
 export interface SanitizationPattern {

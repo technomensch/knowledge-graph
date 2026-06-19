@@ -1404,3 +1404,90 @@ describe("T-49: applyStrayKnowledgeDir moves unmodified template files to concep
     expect(fs.existsSync(path.join(kgRoot, "knowledge"))).toBe(true);
   });
 });
+
+// ---------------------------------------------------------------------------
+// T-50: checkVersionMismatch detects installed > lastApplied
+// ---------------------------------------------------------------------------
+
+describe("T-50: checkVersionMismatch detects installed > lastApplied", () => {
+  // Under Jest, __SERVER_VERSION__ is undefined → handleVersion().installed = "0.0.0"
+  const getInstalledVersion = () => handleVersion().installed; // "0.0.0" under Jest
+
+  test("reports version-update item when lastAppliedVersion is stale", async () => {
+    const kgRoot = makeTempDir("t50");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot, { lastAppliedVersion: "0.0.0-old" }); // any value != installed
+
+    const result = await handleUpgrade({});
+    const parsed = parseResult(result);
+    const item = parsed.upgrades.find((u) => u.category === "version-update");
+    expect(item).toBeDefined();
+    expect(item!.description).toContain("0.0.0-old");
+  });
+
+  test("no version-update item when lastAppliedVersion matches installed", async () => {
+    const kgRoot = makeTempDir("t50b");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot, { lastAppliedVersion: getInstalledVersion() }); // "0.0.0" under Jest
+
+    const result = await handleUpgrade({});
+    const parsed = parseResult(result);
+    const item = parsed.upgrades.find((u) => u.category === "version-update");
+    expect(item).toBeUndefined();
+  });
+
+  test("no version-update item when lastAppliedVersion absent (first install)", async () => {
+    const kgRoot = makeTempDir("t50c");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot, {}); // no lastAppliedVersion field
+
+    const result = await handleUpgrade({});
+    const parsed = parseResult(result);
+    const item = parsed.upgrades.find((u) => u.category === "version-update");
+    expect(item).toBeUndefined(); // absent = first install, not a mismatch
+  });
+});
+
+// ---------------------------------------------------------------------------
+// T-51: lastAppliedVersion written to config after apply
+// ---------------------------------------------------------------------------
+
+describe("T-51: lastAppliedVersion written to config after apply", () => {
+  test("lastAppliedVersion updated in config after apply: ['directories']", async () => {
+    const kgRoot = makeTempDir("t51");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot, { lastAppliedVersion: "0.0.0-old" });
+
+    // Capture what writeConfig is called with
+    let writtenConfig: ReturnType<typeof readConfig> | undefined;
+    (writeConfig as jest.Mock).mockImplementation((cfg) => { writtenConfig = cfg; });
+
+    await handleUpgrade({ apply: ["directories"] });
+
+    expect(writtenConfig).toBeDefined();
+    const lastApplied = (writtenConfig!.graphs[writtenConfig!.active!] as unknown as Record<string, unknown>).lastAppliedVersion;
+    expect(lastApplied).toBe(handleVersion().installed); // "0.0.0" under Jest
+  });
+});
+
+describe("T-51b: lastAppliedVersion does not clobber applyConfig side effects", () => {
+  test("apply: ['config', 'directories'] — both applyConfig and lastAppliedVersion persist", async () => {
+    const kgRoot = makeTempDir("t51b");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot, { lastAppliedVersion: "0.0.0-old" });
+
+    let writtenConfig: ReturnType<typeof readConfig> | undefined;
+    (writeConfig as jest.Mock).mockImplementation((cfg) => { writtenConfig = cfg; });
+
+    await handleUpgrade({ apply: ["config", "directories"] });
+
+    expect(writtenConfig).toBeDefined();
+    const lastApplied = (writtenConfig!.graphs[writtenConfig!.active!] as unknown as Record<string, unknown>).lastAppliedVersion;
+    expect(lastApplied).toBe(handleVersion().installed);
+  });
+});
