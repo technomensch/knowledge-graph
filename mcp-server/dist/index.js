@@ -31887,6 +31887,28 @@ function registerCaptureTool(server2) {
 var fs9 = __toESM(require("fs"));
 var path9 = __toESM(require("path"));
 var os6 = __toESM(require("os"));
+
+// src/tools/version.ts
+var pkg = { version: true ? "0.3.10" : "0.0.0" };
+var SCHEMA_VERSION = 2;
+function handleVersion() {
+  return { installed: pkg.version, schema: SCHEMA_VERSION };
+}
+function registerVersionTool(server2) {
+  server2.tool(
+    "kg_version",
+    "Get installed KMGraph version and schema level",
+    {},
+    async () => {
+      const result = handleVersion();
+      return {
+        content: [{ type: "text", text: JSON.stringify(result) }]
+      };
+    }
+  );
+}
+
+// src/tools/upgrade.ts
 function parseFrontmatter(filePath) {
   if (!fs9.existsSync(filePath)) return {};
   const lines = fs9.readFileSync(filePath, "utf-8").split("\n");
@@ -31904,7 +31926,8 @@ function parseFrontmatter(filePath) {
 }
 function checkDirectories(kgPath) {
   const required2 = [
-    "knowledge",
+    "templates",
+    // was "knowledge" — project/knowledge/knowledge/ is nonsensical
     "lessons-learned",
     "decisions",
     "sessions",
@@ -31947,24 +31970,49 @@ function checkTemplates(kgPath) {
   if (!fs9.existsSync(templateRoot)) return [];
   const results = [];
   const mappings = [
+    // Index files — stay in concepts/
     {
       templateSub: "concepts",
       kgSub: "concepts",
       files: ["entry-template.md", "kg-category-index.md"]
     },
+    // Content templates — go to templates/ (was missing entirely)
+    {
+      templateSub: "concepts/templates",
+      kgSub: "templates",
+      files: ["architecture.md", "concepts.md", "gotchas.md", "patterns.md", "workflows.md"]
+    },
+    // entry-template.md also deployed to templates/ as starter reference (ENH-022)
+    {
+      templateSub: "concepts",
+      kgSub: "templates",
+      files: ["entry-template.md"]
+    },
+    // READMEs stay in live dirs
     {
       templateSub: "lessons-learned",
       kgSub: "lessons-learned",
-      files: ["README.md", "lesson-template.md"]
+      files: ["README.md"]
     },
     {
       templateSub: "decisions",
       kgSub: "decisions",
-      files: ["README.md", "ADR-template.md"]
+      files: ["README.md"]
+    },
+    // Starters go to templates/ (not live dirs)
+    {
+      templateSub: "lessons-learned",
+      kgSub: "templates",
+      files: ["lesson-template.md"]
+    },
+    {
+      templateSub: "decisions",
+      kgSub: "templates",
+      files: ["ADR-template.md"]
     },
     {
       templateSub: "sessions",
-      kgSub: "sessions",
+      kgSub: "templates",
       files: ["session-template.md"]
     }
   ];
@@ -32028,7 +32076,8 @@ function checkPlatformSplit(kgPath) {
 }
 function applyDirectories(kgPath) {
   const required2 = [
-    "knowledge",
+    "templates",
+    // was "knowledge" — project/knowledge/knowledge/ is nonsensical
     "lessons-learned",
     "decisions",
     "sessions",
@@ -32074,24 +32123,49 @@ function applyTemplates(kgPath) {
   const templateRoot = path9.join(pluginRoot, "core", "default-templates");
   if (!fs9.existsSync(templateRoot)) return "Template root not found; skipped";
   const mappings = [
+    // Index files — stay in concepts/
     {
       templateSub: "concepts",
       kgSub: "concepts",
       files: ["entry-template.md", "kg-category-index.md"]
     },
+    // Content templates — go to templates/ (was missing entirely)
+    {
+      templateSub: "concepts/templates",
+      kgSub: "templates",
+      files: ["architecture.md", "concepts.md", "gotchas.md", "patterns.md", "workflows.md"]
+    },
+    // entry-template.md also deployed to templates/ as starter reference (ENH-022)
+    {
+      templateSub: "concepts",
+      kgSub: "templates",
+      files: ["entry-template.md"]
+    },
+    // READMEs stay in live dirs
     {
       templateSub: "lessons-learned",
       kgSub: "lessons-learned",
-      files: ["README.md", "lesson-template.md"]
+      files: ["README.md"]
     },
     {
       templateSub: "decisions",
       kgSub: "decisions",
-      files: ["README.md", "ADR-template.md"]
+      files: ["README.md"]
+    },
+    // Starters go to templates/ (not live dirs)
+    {
+      templateSub: "lessons-learned",
+      kgSub: "templates",
+      files: ["lesson-template.md"]
+    },
+    {
+      templateSub: "decisions",
+      kgSub: "templates",
+      files: ["ADR-template.md"]
     },
     {
       templateSub: "sessions",
-      kgSub: "sessions",
+      kgSub: "templates",
       files: ["session-template.md"]
     }
   ];
@@ -32108,6 +32182,115 @@ function applyTemplates(kgPath) {
     }
   }
   return copied.length > 0 ? `Deployed templates: ${copied.join(", ")}` : "No templates to deploy";
+}
+function checkStarterRelocation(kgPath) {
+  const starters = [
+    { dir: "decisions", file: "ADR-template.md" },
+    { dir: "lessons-learned", file: "lesson-template.md" },
+    { dir: "sessions", file: "session-template.md" }
+  ];
+  const found = starters.filter(
+    ({ dir, file: file2 }) => fs9.existsSync(path9.join(kgPath, dir, file2))
+  );
+  if (found.length === 0) return [];
+  return [{
+    category: "starter-relocation",
+    description: `${found.length} starter file(s) in live dirs should move to templates/`,
+    details: found.map(({ dir, file: file2 }) => `  ${dir}/${file2} \u2192 templates/${file2}`).join("\n")
+  }];
+}
+function applyStarterRelocation(kgPath) {
+  const starters = [
+    { dir: "decisions", file: "ADR-template.md" },
+    { dir: "lessons-learned", file: "lesson-template.md" },
+    { dir: "sessions", file: "session-template.md" }
+  ];
+  fs9.mkdirSync(path9.join(kgPath, "templates"), { recursive: true });
+  const moved = [];
+  const skipped = [];
+  for (const { dir, file: file2 } of starters) {
+    const src = path9.join(kgPath, dir, file2);
+    const dest = path9.join(kgPath, "templates", file2);
+    if (!fs9.existsSync(src)) continue;
+    if (fs9.existsSync(dest)) {
+      const srcContent = fs9.readFileSync(src, "utf-8");
+      const destContent = fs9.readFileSync(dest, "utf-8");
+      if (srcContent !== destContent) {
+        skipped.push(`${dir}/${file2} (already exists in templates/ with different content \u2014 manual review required)`);
+        continue;
+      }
+      fs9.unlinkSync(src);
+      moved.push(`${dir}/${file2} (duplicate removed)`);
+      continue;
+    }
+    fs9.copyFileSync(src, dest);
+    fs9.unlinkSync(src);
+    moved.push(`${dir}/${file2} \u2192 templates/${file2}`);
+  }
+  const parts = [];
+  if (moved.length > 0) parts.push(`Relocated: ${moved.join(", ")}`);
+  if (skipped.length > 0) parts.push(`Skipped: ${skipped.join(", ")}`);
+  return parts.join(". ") || "No starters to relocate";
+}
+function checkStrayKnowledgeDir(kgPath, kgType) {
+  if (kgType !== "project-local") return [];
+  const strayDir = path9.join(kgPath, "knowledge");
+  if (!fs9.existsSync(strayDir)) return [];
+  return [{
+    category: "stray-knowledge-dir",
+    description: "knowledge/ subdirectory exists inside kgPath (nonsensical nesting from pre-v0.5.0 init)",
+    details: `Found: ${strayDir}
+Apply stray-knowledge-dir to merge known template files into concepts/ and remove the dir.`
+  }];
+}
+var STRAY_KNOWLEDGE_TEMPLATE_FILES = [
+  "architecture.md",
+  "concepts.md",
+  "gotchas.md",
+  "patterns.md",
+  "workflows.md"
+];
+function applyStrayKnowledgeDir(kgPath) {
+  const strayDir = path9.join(kgPath, "knowledge");
+  if (!fs9.existsSync(strayDir)) return "No stray knowledge/ dir found; skipped";
+  const pluginRoot = getPluginRoot();
+  const sourceDir = path9.join(pluginRoot, "core", "default-templates", "concepts", "templates");
+  const destConcepts = path9.join(kgPath, "concepts");
+  fs9.mkdirSync(destConcepts, { recursive: true });
+  const moved = [];
+  const skipped = [];
+  const ignored = [];
+  for (const entry of fs9.readdirSync(strayDir)) {
+    const src = path9.join(strayDir, entry);
+    if (!fs9.statSync(src).isFile()) continue;
+    if (!STRAY_KNOWLEDGE_TEMPLATE_FILES.includes(entry)) {
+      ignored.push(entry);
+      continue;
+    }
+    const canonicalSrc = path9.join(sourceDir, entry);
+    if (fs9.existsSync(canonicalSrc)) {
+      const srcContent = fs9.readFileSync(src, "utf-8");
+      const canonContent = fs9.readFileSync(canonicalSrc, "utf-8");
+      if (srcContent !== canonContent) {
+        skipped.push(`${entry} (modified \u2014 manual review required before moving to concepts/)`);
+        continue;
+      }
+    }
+    const dest = path9.join(destConcepts, entry);
+    fs9.copyFileSync(src, dest);
+    fs9.unlinkSync(src);
+    moved.push(entry);
+  }
+  const remaining = fs9.readdirSync(strayDir);
+  if (remaining.length === 0) {
+    fs9.rmdirSync(strayDir);
+  }
+  const parts = [];
+  if (moved.length > 0) parts.push(`Moved to concepts/: ${moved.join(", ")}`);
+  if (skipped.length > 0) parts.push(`Skipped (modified): ${skipped.join(", ")}`);
+  if (ignored.length > 0) parts.push(`Ignored (not template files): ${ignored.join(", ")}`);
+  if (remaining.length > 0) parts.push(`knowledge/ not removed \u2014 ${remaining.length} item(s) remain`);
+  return parts.join(". ") || "Nothing to move";
 }
 function applyPlatformSplit(kgPath) {
   const rulesPath = path9.join(kgPath, "knowledge", "rules.md");
@@ -32138,7 +32321,24 @@ function applyPlatformSplit(kgPath) {
   return `Platform-split applied. Removed ${removed.length} line(s). kmgraph_schema set to 2.
 ${removed.slice(0, 5).join("\n")}`;
 }
+function checkVersionMismatch(installedVersion, kgType, config2) {
+  const graphRecord = config2.graphs[config2.active];
+  const lastApplied = graphRecord.lastAppliedVersion;
+  if (!lastApplied || lastApplied === installedVersion) return [];
+  return [{
+    category: "version-update",
+    description: `Installed v${installedVersion} > last applied v${lastApplied} \u2014 run apply to update`,
+    details: `Apply categories: directories, templates, starter-relocation${kgType === "project-local" ? ", stray-knowledge-dir" : ""}`
+  }];
+}
+function updateLastAppliedVersion(installedVersion) {
+  const config2 = readConfig();
+  const graph = config2.graphs[config2.active];
+  graph.lastAppliedVersion = installedVersion;
+  writeConfig(config2);
+}
 async function handleUpgrade(params) {
+  const installedVersion = handleVersion().installed;
   const config2 = readConfig();
   if (!config2.active || !config2.graphs[config2.active]) {
     return {
@@ -32148,6 +32348,8 @@ async function handleUpgrade(params) {
   }
   const rawPath = config2.graphs[config2.active].path;
   const kgPath = rawPath.replace(/^~/, os6.homedir());
+  const graphRecord = config2.graphs[config2.active];
+  const kgType = graphRecord.type;
   if (!fs9.existsSync(kgPath)) {
     return {
       content: [{ type: "text", text: `Error: KG path not found: ${kgPath}` }],
@@ -32160,6 +32362,9 @@ async function handleUpgrade(params) {
     result.upgrades.push(...checkDirectories(kgPath));
     result.upgrades.push(...checkConfig(kgPath));
     result.upgrades.push(...checkTemplates(kgPath));
+    result.upgrades.push(...checkStarterRelocation(kgPath));
+    result.upgrades.push(...checkStrayKnowledgeDir(kgPath, kgType));
+    result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config2));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
     return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
@@ -32176,6 +32381,12 @@ async function handleUpgrade(params) {
       case "templates":
         results.push(`[templates] ${applyTemplates(kgPath)}`);
         break;
+      case "starter-relocation":
+        results.push(`[starter-relocation] ${applyStarterRelocation(kgPath)}`);
+        break;
+      case "stray-knowledge-dir":
+        results.push(`[stray-knowledge-dir] ${applyStrayKnowledgeDir(kgPath)}`);
+        break;
       case "platform-split":
         if (!params.confirm_platform_split) {
           results.push("[platform-split] WARNING: platform-split migration removes content from rules.md. Pass confirm_platform_split: true to proceed.");
@@ -32185,6 +32396,9 @@ async function handleUpgrade(params) {
         break;
     }
   }
+  if (applyList.length > 0) {
+    updateLastAppliedVersion(installedVersion);
+  }
   return { content: [{ type: "text", text: results.join("\n\n") }] };
 }
 function registerUpgradeTool(server2) {
@@ -32192,7 +32406,7 @@ function registerUpgradeTool(server2) {
     "kg_upgrade",
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
-      apply: external_exports3.array(external_exports3.enum(["directories", "config", "templates", "platform-split"])).optional().default([]).describe(
+      apply: external_exports3.array(external_exports3.enum(["directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"])).optional().default([]).describe(
         'Categories to apply. Omit or pass [] to inspect only. Values: "directories", "config", "templates", "platform-split"'
       ),
       confirm_platform_split: external_exports3.boolean().optional().default(false).describe(
@@ -32201,26 +32415,6 @@ function registerUpgradeTool(server2) {
     },
     async ({ apply, confirm_platform_split }) => {
       return handleUpgrade({ apply, confirm_platform_split });
-    }
-  );
-}
-
-// src/tools/version.ts
-var pkg = { version: true ? "0.3.10" : "0.0.0" };
-var SCHEMA_VERSION = 2;
-function handleVersion() {
-  return { installed: pkg.version, schema: SCHEMA_VERSION };
-}
-function registerVersionTool(server2) {
-  server2.tool(
-    "kg_version",
-    "Get installed KMGraph version and schema level",
-    {},
-    async () => {
-      const result = handleVersion();
-      return {
-        content: [{ type: "text", text: JSON.stringify(result) }]
-      };
     }
   );
 }

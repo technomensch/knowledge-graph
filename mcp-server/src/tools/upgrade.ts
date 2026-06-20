@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import { readConfig, writeConfig, getPluginRoot } from "../utils.js";
+import { handleVersion } from "./version.js";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -51,7 +52,7 @@ function parseFrontmatter(filePath: string): Record<string, string> {
  */
 function checkDirectories(kgPath: string): UpgradeItem[] {
   const required = [
-    "knowledge",
+    "templates",        // was "knowledge" — project/knowledge/knowledge/ is nonsensical
     "lessons-learned",
     "decisions",
     "sessions",
@@ -111,24 +112,49 @@ function checkTemplates(kgPath: string): UpgradeItem[] {
 
   // Subdirectory mappings: template subdir → kg subdir
   const mappings: Array<{ templateSub: string; kgSub: string; files: string[] }> = [
+    // Index files — stay in concepts/
     {
       templateSub: "concepts",
       kgSub: "concepts",
       files: ["entry-template.md", "kg-category-index.md"],
     },
+    // Content templates — go to templates/ (was missing entirely)
+    {
+      templateSub: "concepts/templates",
+      kgSub: "templates",
+      files: ["architecture.md", "concepts.md", "gotchas.md", "patterns.md", "workflows.md"],
+    },
+    // entry-template.md also deployed to templates/ as starter reference (ENH-022)
+    {
+      templateSub: "concepts",
+      kgSub: "templates",
+      files: ["entry-template.md"],
+    },
+    // READMEs stay in live dirs
     {
       templateSub: "lessons-learned",
       kgSub: "lessons-learned",
-      files: ["README.md", "lesson-template.md"],
+      files: ["README.md"],
     },
     {
       templateSub: "decisions",
       kgSub: "decisions",
-      files: ["README.md", "ADR-template.md"],
+      files: ["README.md"],
+    },
+    // Starters go to templates/ (not live dirs)
+    {
+      templateSub: "lessons-learned",
+      kgSub: "templates",
+      files: ["lesson-template.md"],
+    },
+    {
+      templateSub: "decisions",
+      kgSub: "templates",
+      files: ["ADR-template.md"],
     },
     {
       templateSub: "sessions",
-      kgSub: "sessions",
+      kgSub: "templates",
       files: ["session-template.md"],
     },
   ];
@@ -214,7 +240,7 @@ function checkPlatformSplit(kgPath: string): WarningItem | null {
 
 function applyDirectories(kgPath: string): string {
   const required = [
-    "knowledge",
+    "templates",        // was "knowledge" — project/knowledge/knowledge/ is nonsensical
     "lessons-learned",
     "decisions",
     "sessions",
@@ -267,24 +293,49 @@ function applyTemplates(kgPath: string): string {
   if (!fs.existsSync(templateRoot)) return "Template root not found; skipped";
 
   const mappings: Array<{ templateSub: string; kgSub: string; files: string[] }> = [
+    // Index files — stay in concepts/
     {
       templateSub: "concepts",
       kgSub: "concepts",
       files: ["entry-template.md", "kg-category-index.md"],
     },
+    // Content templates — go to templates/ (was missing entirely)
+    {
+      templateSub: "concepts/templates",
+      kgSub: "templates",
+      files: ["architecture.md", "concepts.md", "gotchas.md", "patterns.md", "workflows.md"],
+    },
+    // entry-template.md also deployed to templates/ as starter reference (ENH-022)
+    {
+      templateSub: "concepts",
+      kgSub: "templates",
+      files: ["entry-template.md"],
+    },
+    // READMEs stay in live dirs
     {
       templateSub: "lessons-learned",
       kgSub: "lessons-learned",
-      files: ["README.md", "lesson-template.md"],
+      files: ["README.md"],
     },
     {
       templateSub: "decisions",
       kgSub: "decisions",
-      files: ["README.md", "ADR-template.md"],
+      files: ["README.md"],
+    },
+    // Starters go to templates/ (not live dirs)
+    {
+      templateSub: "lessons-learned",
+      kgSub: "templates",
+      files: ["lesson-template.md"],
+    },
+    {
+      templateSub: "decisions",
+      kgSub: "templates",
+      files: ["ADR-template.md"],
     },
     {
       templateSub: "sessions",
-      kgSub: "sessions",
+      kgSub: "templates",
       files: ["session-template.md"],
     },
   ];
@@ -304,6 +355,133 @@ function applyTemplates(kgPath: string): string {
   return copied.length > 0
     ? `Deployed templates: ${copied.join(", ")}`
     : "No templates to deploy";
+}
+
+function checkStarterRelocation(kgPath: string): UpgradeItem[] {
+  const starters = [
+    { dir: "decisions", file: "ADR-template.md" },
+    { dir: "lessons-learned", file: "lesson-template.md" },
+    { dir: "sessions", file: "session-template.md" },
+  ];
+  const found = starters.filter(({ dir, file }) =>
+    fs.existsSync(path.join(kgPath, dir, file))
+  );
+  if (found.length === 0) return [];
+  return [{
+    category: "starter-relocation",
+    description: `${found.length} starter file(s) in live dirs should move to templates/`,
+    details: found.map(({ dir, file }) => `  ${dir}/${file} → templates/${file}`).join("\n"),
+  }];
+}
+
+function applyStarterRelocation(kgPath: string): string {
+  const starters = [
+    { dir: "decisions", file: "ADR-template.md" },
+    { dir: "lessons-learned", file: "lesson-template.md" },
+    { dir: "sessions", file: "session-template.md" },
+  ];
+  fs.mkdirSync(path.join(kgPath, "templates"), { recursive: true });
+  const moved: string[] = [];
+  const skipped: string[] = [];
+  for (const { dir, file } of starters) {
+    const src = path.join(kgPath, dir, file);
+    const dest = path.join(kgPath, "templates", file);
+    if (!fs.existsSync(src)) continue;
+    // ADR-040: never silently overwrite user-modified files
+    if (fs.existsSync(dest)) {
+      const srcContent = fs.readFileSync(src, "utf-8");
+      const destContent = fs.readFileSync(dest, "utf-8");
+      if (srcContent !== destContent) {
+        skipped.push(`${dir}/${file} (already exists in templates/ with different content — manual review required)`);
+        continue;
+      }
+      // Identical content: remove live-dir copy, dest already correct
+      fs.unlinkSync(src);
+      moved.push(`${dir}/${file} (duplicate removed)`);
+      continue;
+    }
+    fs.copyFileSync(src, dest);
+    fs.unlinkSync(src);
+    moved.push(`${dir}/${file} → templates/${file}`);
+  }
+  const parts: string[] = [];
+  if (moved.length > 0) parts.push(`Relocated: ${moved.join(", ")}`);
+  if (skipped.length > 0) parts.push(`Skipped: ${skipped.join(", ")}`);
+  return parts.join(". ") || "No starters to relocate";
+}
+
+function checkStrayKnowledgeDir(kgPath: string, kgType: string | undefined): UpgradeItem[] {
+  if (kgType !== "project-local") return [];
+  const strayDir = path.join(kgPath, "knowledge");
+  if (!fs.existsSync(strayDir)) return [];
+  return [{
+    category: "stray-knowledge-dir",
+    description: "knowledge/ subdirectory exists inside kgPath (nonsensical nesting from pre-v0.5.0 init)",
+    details: `Found: ${strayDir}\nApply stray-knowledge-dir to merge known template files into concepts/ and remove the dir.`,
+  }];
+}
+
+// Files that belong in concepts/ if found in the stray knowledge/ dir
+const STRAY_KNOWLEDGE_TEMPLATE_FILES = [
+  "architecture.md",
+  "concepts.md",
+  "gotchas.md",
+  "patterns.md",
+  "workflows.md",
+];
+
+function applyStrayKnowledgeDir(kgPath: string): string {
+  const strayDir = path.join(kgPath, "knowledge");
+  if (!fs.existsSync(strayDir)) return "No stray knowledge/ dir found; skipped";
+
+  const pluginRoot = getPluginRoot();
+  const sourceDir = path.join(pluginRoot, "core", "default-templates", "concepts", "templates");
+  const destConcepts = path.join(kgPath, "concepts");
+  fs.mkdirSync(destConcepts, { recursive: true });
+
+  const moved: string[] = [];
+  const skipped: string[] = [];
+  const ignored: string[] = [];
+
+  for (const entry of fs.readdirSync(strayDir)) {
+    const src = path.join(strayDir, entry);
+    if (!fs.statSync(src).isFile()) continue;
+
+    if (!STRAY_KNOWLEDGE_TEMPLATE_FILES.includes(entry)) {
+      // Not a known template file — do not touch (could be user content)
+      ignored.push(entry);
+      continue;
+    }
+
+    const canonicalSrc = path.join(sourceDir, entry);
+    if (fs.existsSync(canonicalSrc)) {
+      const srcContent = fs.readFileSync(src, "utf-8");
+      const canonContent = fs.readFileSync(canonicalSrc, "utf-8");
+      if (srcContent !== canonContent) {
+        // ADR-040: user modified — warn, do not auto-overwrite
+        skipped.push(`${entry} (modified — manual review required before moving to concepts/)`);
+        continue;
+      }
+    }
+
+    const dest = path.join(destConcepts, entry);
+    fs.copyFileSync(src, dest);
+    fs.unlinkSync(src);
+    moved.push(entry);
+  }
+
+  // Remove stray dir only if empty (ignored/skipped files may still be in it)
+  const remaining = fs.readdirSync(strayDir);
+  if (remaining.length === 0) {
+    fs.rmdirSync(strayDir);
+  }
+
+  const parts: string[] = [];
+  if (moved.length > 0) parts.push(`Moved to concepts/: ${moved.join(", ")}`);
+  if (skipped.length > 0) parts.push(`Skipped (modified): ${skipped.join(", ")}`);
+  if (ignored.length > 0) parts.push(`Ignored (not template files): ${ignored.join(", ")}`);
+  if (remaining.length > 0) parts.push(`knowledge/ not removed — ${remaining.length} item(s) remain`);
+  return parts.join(". ") || "Nothing to move";
 }
 
 function applyPlatformSplit(kgPath: string): string {
@@ -344,9 +522,33 @@ function applyPlatformSplit(kgPath: string): string {
   return `Platform-split applied. Removed ${removed.length} line(s). kmgraph_schema set to 2.\n${removed.slice(0, 5).join("\n")}`;
 }
 
+function checkVersionMismatch(
+  installedVersion: string,
+  kgType: string | undefined,
+  config: ReturnType<typeof readConfig>
+): UpgradeItem[] {
+  const graphRecord = config.graphs[config.active!] as unknown as Record<string, unknown>;
+  const lastApplied = graphRecord.lastAppliedVersion as string | undefined;
+  if (!lastApplied || lastApplied === installedVersion) return [];
+  return [{
+    category: "version-update",
+    description: `Installed v${installedVersion} > last applied v${lastApplied} — run apply to update`,
+    details: `Apply categories: directories, templates, starter-relocation${kgType === "project-local" ? ", stray-knowledge-dir" : ""}`,
+  }];
+}
+
+function updateLastAppliedVersion(installedVersion: string): void {
+  // Fresh read to avoid clobbering field additions made by applyConfig() in the same apply run
+  const config = readConfig();
+  const graph = config.graphs[config.active!] as unknown as Record<string, unknown>;
+  graph.lastAppliedVersion = installedVersion;
+  writeConfig(config);
+}
+
 // ── Exported handler for direct testing ──────────────────────────────────────
 
-export type ApplyCategory = "directories" | "config" | "templates" | "platform-split";
+// "version-update" is inspect-only — NOT an apply category; do not add it here
+export type ApplyCategory = "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir";
 
 export interface HandleUpgradeParams {
   apply?: ApplyCategory[];
@@ -360,6 +562,8 @@ export interface HandleUpgradeResult {
 }
 
 export async function handleUpgrade(params: HandleUpgradeParams): Promise<HandleUpgradeResult> {
+  // Under Jest/ts-jest __SERVER_VERSION__ is undefined → installedVersion = "0.0.0"
+  const installedVersion = handleVersion().installed;
   const config = readConfig();
 
   if (!config.active || !config.graphs[config.active]) {
@@ -371,6 +575,8 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
 
   const rawPath = config.graphs[config.active].path;
   const kgPath = rawPath.replace(/^~/, os.homedir());
+  const graphRecord = config.graphs[config.active] as unknown as Record<string, unknown>;
+  const kgType = graphRecord.type as string | undefined;
 
   if (!fs.existsSync(kgPath)) {
     return {
@@ -386,6 +592,9 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
     result.upgrades.push(...checkDirectories(kgPath));
     result.upgrades.push(...checkConfig(kgPath));
     result.upgrades.push(...checkTemplates(kgPath));
+    result.upgrades.push(...checkStarterRelocation(kgPath));
+    result.upgrades.push(...checkStrayKnowledgeDir(kgPath, kgType));
+    result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
     return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
@@ -403,6 +612,12 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
       case "templates":
         results.push(`[templates] ${applyTemplates(kgPath)}`);
         break;
+      case "starter-relocation":
+        results.push(`[starter-relocation] ${applyStarterRelocation(kgPath)}`);
+        break;
+      case "stray-knowledge-dir":
+        results.push(`[stray-knowledge-dir] ${applyStrayKnowledgeDir(kgPath)}`);
+        break;
       case "platform-split":
         if (!params.confirm_platform_split) {
           results.push("[platform-split] WARNING: platform-split migration removes content from rules.md. Pass confirm_platform_split: true to proceed.");
@@ -411,6 +626,11 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
         }
         break;
     }
+  }
+
+  // Write lastAppliedVersion sentinel after any successful apply
+  if (applyList.length > 0) {
+    updateLastAppliedVersion(installedVersion);
   }
 
   return { content: [{ type: "text" as const, text: results.join("\n\n") }] };
@@ -424,7 +644,7 @@ export function registerUpgradeTool(server: McpServer): void {
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
       apply: z
-        .array(z.enum(["directories", "config", "templates", "platform-split"]))
+        .array(z.enum(["directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"]))
         .optional()
         .default([])
         .describe(

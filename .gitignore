@@ -48,10 +48,6 @@ dist/
 build/
 *.tgz
 
-# FTS5 SQLite databases (generated artifacts)
-**/.fts5.db
-**/.fts5.db-journal
-
 # Docusaurus cache (generated at build time)
 .docusaurus/
 
