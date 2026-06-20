@@ -389,7 +389,7 @@ Options:
 
 **If option (a) — auto-relocate (bulk):**
 
-→ Execute shared module: Read `commands/init-shared/knowledge-file-migrator.md` and follow it exactly.
+→ Execute shared module: Read `commands/kmg-init-shared/kmg-knowledge-file-migrator.md` and follow it exactly.
 Parameters:
 - `{KG_PATH}` = `{KG_PATH}`
 - `{KG_TYPE}` = `{KG_TYPE}`
@@ -864,7 +864,7 @@ Options:
   b. Skip — I'll handle manually
 ```
 
-**If option (a):** delegate to the section d auto-relocate flow (read `commands/init-shared/knowledge-file-migrator.md`), passing the full section content as `{CONTAMINATION}`.
+**If option (a):** delegate to the section d auto-relocate flow (read `commands/kmg-init-shared/kmg-knowledge-file-migrator.md`), passing the full section content as `{CONTAMINATION}`.
 
 After the platform section is relocated, offer the tier mapping walkthrough inline:
 
