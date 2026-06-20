@@ -250,3 +250,17 @@ Two additions to the existing upgrade-inspector check sequence:
 **✅ Brainstorm complete (2026-06-12)** — full scope established. Web research conducted (2026-06-12). Prior brainstorm (2026-06-08) was path-rename only; this session expanded scope to cover starter consolidation, `knowledge/knowledge/` removal, and upgrade-inspector migration.
 
 See `~/.claude/plans/v0.5.10.7-template-disambiguation.md`.
+
+---
+
+## Scope Addition — v0.6.4 (2026-06-19)
+
+**Cross-platform upgrade triggering** added to ENH-022 scope.
+
+**Problem:** Codex has no wizard or hook system — `kg_upgrade` never fires automatically after install. Original ENH-022 scope only addressed *what* the upgrade does, not *how it gets triggered on platforms without a wizard*.
+
+**Solution:** Version sentinel (`lastAppliedVersion` per graph in config) + session-start instruction in `core/default-templates/AGENTS-template.md`. `kg_upgrade` inspect surfaces a `version-update` item when installed version > stored version.
+
+**Decision:** ADR-055 — version sentinel chosen over MCP startup notification (avoids per-call noise) and AGENTS.md instruction alone (no signal for when upgrades are needed).
+
+**Key constraint:** `absent lastAppliedVersion` = first install, not mismatch. No upgrade prompt on clean installs.
