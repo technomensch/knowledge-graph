@@ -1296,8 +1296,8 @@ Available on all platforms (Codex, Gemini CLI, Cursor, etc.). Inspects and appli
 |---|---|
 | `directories` | Creates missing required subdirectories (`templates/`, `decisions/`, `sessions/`, `chat-history/`, `tmp/`) |
 | `config` | Backfills missing fields in `~/.claude/kg-config.json` introduced in newer versions |
-| `templates` | Deploys missing or outdated template files — content templates go to `templates/`, index files to `concepts/`, READMEs stay in live dirs |
-| `starter-relocation` | Moves starter files (e.g., `ADR-template.md`) from live dirs into `templates/` (ENH-022 migration) |
+| `templates` | Deploys template files to new destinations — skips any dest file that already exists with different content (user content preserved, reported as "Skipped (user content)"); silently skips identical files |
+| `starter-relocation` | Moves starter files (e.g., `ADR-template.md`) from live dirs into `templates/` (ENH-022 migration) — always runs before `templates` when both are applied in the same call |
 | `stray-knowledge-dir` | Project-local KGs only: merges known template files from a stray `knowledge/` subdir into `concepts/` and removes it |
 | `platform-split` | Removes Claude Code–specific tool directives from `knowledge/rules.md` (requires `confirm_platform_split: true`) |
 
