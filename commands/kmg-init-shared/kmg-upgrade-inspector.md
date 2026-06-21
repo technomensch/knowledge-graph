@@ -25,7 +25,7 @@
 ACTIVE=$(jq -r '.active' ~/.claude/kg-config.json 2>/dev/null)
 ```
 
-If `$ACTIVE` ≠ `{kg_name}`: temporarily switch active to `{kg_name}` using `kg_config_switch` tool, call `kg_upgrade` (and run any `kg_upgrade apply` for this wizard), then restore the original active graph by switching back to `$ACTIVE` — **unless** `{preserve_active}` is `false`, in which case follow the wizard's normal active-graph behavior. (The module's `{preserve_active}` parameter governs whether the active KG is changed after upgrade; Step 0 must not silently leave a different graph active than the wizard intends.) If you cannot switch (tool unavailable), set `_mcp_checked=false` and skip to bash detection.
+If `$ACTIVE` ≠ `{kg_name}`: temporarily switch active to `{kg_name}` using `kg_config_switch` tool before calling `kg_upgrade`, then after the upgrade call: if `{preserve_active}` is `true`, restore `$ACTIVE` (leave the original active graph unchanged); if `{preserve_active}` is `false`, leave `{kg_name}` active (the wizard's normal behavior). If you cannot switch (tool unavailable), skip to bash detection without setting any per-category flags.
 
 **Step 0b — Call kg_upgrade (inspect mode, no args).**
 
@@ -46,14 +46,19 @@ The tool returns:
 
 **Parse `upgrades[]`:**
 - For each entry: add its `description` to the wizard's pending items display.
-- If `category` is one of `"directories"`, `"config"`, `"templates"`, `"starter-relocation"`, `"stray-knowledge-dir"`: add `category` to `_mcp_apply[]`.
-- If `category` is `"version-update"`: display the description as an informational item but do NOT add to `_mcp_apply[]` — it is inspect-only and cannot be applied via `kg_upgrade apply`.
+- For each entry with `category` in `["directories", "config", "templates", "starter-relocation", "stray-knowledge-dir"]`: add the deduplicated `category` value to `_mcp_apply[]` (dedup: only add if not already present) and set its per-category tracking flag in your context:
+  - `"directories"` → `_mcp_covered_directories=true`
+  - `"config"` → `_mcp_covered_config=true`
+  - `"templates"` → `_mcp_covered_templates=true`
+  - `"starter-relocation"` → `_mcp_covered_starter_relocation=true`
+  - `"stray-knowledge-dir"` → `_mcp_covered_stray_knowledge_dir=true`
+- If `category` is `"version-update"`: display the description as an informational item but do NOT add to `_mcp_apply[]` and do NOT set a tracking flag — it is inspect-only and cannot be applied via `kg_upgrade apply`.
+
+These per-category flags are **LLM-tracked state variables** — they are tracked in your context across bash block invocations in this module, not as shell variables. Each guarded bash block below begins with a prose instruction ("Only run if `_mcp_covered_X` is not set") that is the actual gate.
 
 **`warnings[]`** (e.g. `platform-split`): display as advisory notes in the wizard, not as actionable upgrade items. Route through section d's existing wizard flow, not `kg_upgrade apply`.
 
-**Set `_mcp_checked=true`.** This flag tells the bash detection block to skip the five overlapping sections (a, b, c, l, m).
-
-**If `kg_upgrade` call fails** (MCP server unavailable, tool error): set `_mcp_checked=false`. Display: `⚠️ kg_upgrade unavailable — falling back to local checks for structural items.` Continue to bash detection block; sections a, b, c, l, m run as before.
+**If `kg_upgrade` call fails** (MCP server unavailable, tool error): do not set any per-category flags. Display: `⚠️ kg_upgrade unavailable — falling back to local checks for structural items.` Continue to bash detection block; sections a, b, c, l, m run as before.
 
 ---
 
@@ -64,12 +69,10 @@ The tool returns:
 upgrades=()
 
 # Section (a): Directory structure detection
-# Skipped when kg_upgrade covered this in Step 0
-if [ "$_mcp_checked" != "true" ]; then
-  for dir in knowledge lessons-learned decisions sessions chat-history tmp; do
-    [ ! -d "{KG_PATH}/$dir" ] && upgrades+=("Missing directory: $dir/")
-  done
-fi
+# Only run if _mcp_covered_directories is not set (kg_upgrade did not cover this in Step 0)
+for dir in knowledge lessons-learned decisions sessions chat-history tmp; do
+  [ ! -d "{KG_PATH}/$dir" ] && upgrades+=("Missing directory: $dir/")
+done
 
 # Index reorganization — knowledge/index.md renamed to kg-category-index.md; new root kg-index.md created
 # Note: kg-index.md and index.md are treated as equivalent root nav files — if either exists, skip.
@@ -137,64 +140,60 @@ WIKI_DONE=$(jq -r '.graphs["{kg_name}"].wiki_pass_complete // false' ~/.claude/k
   upgrades+=("Wiki pass available: convert bare ADR-NNN, ENH-NNN, #NNN, and lesson filename references to [[wiki links]] across knowledge files")
 
 # Section (c): Template update detection
-# Skipped when kg_upgrade covered this in Step 0
-if [ "$_mcp_checked" != "true" ]; then
-  # New templates (files in plugin core/default-templates not yet in KG)
-  # IMPORTANT: The following filenames must NEVER be added to upgrades[] by this loop,
-  # regardless of whether they exist at the template destination path.
-  # They are handled by dedicated scaffold checks above (section h) with interactive flows.
-  # Do not add them as "New template:" items under any circumstances:
-  #   kg-index.md  — covered by index check above (deploys as index.md or kg-index.md)
-  #   me.md        — covered by section h (interactive backfill)
-  #   rules.md     — covered by section h (interactive backfill)
-  #   triggers.md  — covered by section h (interactive backfill, deploys to KG root)
-  #   index-personal.md — personal KG only, handled separately
-  scaffold_covered=("kg-index.md" "me.md" "rules.md" "index-personal.md" "triggers.md")
-  for tdir in knowledge lessons-learned decisions sessions; do
-    for template in "${CLAUDE_PLUGIN_ROOT}/core/default-templates/$tdir/"*; do
-      tname=$(basename "$template")
-      skip=false
-      for covered in "${scaffold_covered[@]}"; do
-        [ "$tname" = "$covered" ] && skip=true && break
-      done
-      [ "$skip" = "true" ] && continue
-      dest="{KG_PATH}/$tdir/$tname"
-      [ ! -f "$dest" ] && upgrades+=("New template: $tdir/$tname") || true
+# Only run if _mcp_covered_templates is not set (kg_upgrade did not cover this in Step 0)
+# New templates (files in plugin core/default-templates not yet in KG)
+# IMPORTANT: The following filenames must NEVER be added to upgrades[] by this loop,
+# regardless of whether they exist at the template destination path.
+# They are handled by dedicated scaffold checks above (section h) with interactive flows.
+# Do not add them as "New template:" items under any circumstances:
+#   kg-index.md  — covered by index check above (deploys as index.md or kg-index.md)
+#   me.md        — covered by section h (interactive backfill)
+#   rules.md     — covered by section h (interactive backfill)
+#   triggers.md  — covered by section h (interactive backfill, deploys to KG root)
+#   index-personal.md — personal KG only, handled separately
+scaffold_covered=("kg-index.md" "me.md" "rules.md" "index-personal.md" "triggers.md")
+for tdir in knowledge lessons-learned decisions sessions; do
+  for template in "${CLAUDE_PLUGIN_ROOT}/core/default-templates/$tdir/"*; do
+    tname=$(basename "$template")
+    skip=false
+    for covered in "${scaffold_covered[@]}"; do
+      [ "$tname" = "$covered" ] && skip=true && break
     done
+    [ "$skip" = "true" ] && continue
+    dest="{KG_PATH}/$tdir/$tname"
+    [ ! -f "$dest" ] && upgrades+=("New template: $tdir/$tname") || true
   done
+done
+
+# Section (l): Starter relocation
+# Only run if _mcp_covered_starter_relocation is not set (kg_upgrade did not cover this in Step 0)
+# Starter relocation check (v0.5.10.7 — ENH-022 Problem 3)
+_starters_to_move=()
+[ -f "{KG_PATH}/lessons-learned/lesson-template.md" ] && _starters_to_move+=("lessons-learned/lesson-template.md")
+[ -f "{KG_PATH}/decisions/ADR-template.md" ]          && _starters_to_move+=("decisions/ADR-template.md")
+[ -f "{KG_PATH}/sessions/session-template.md" ]       && _starters_to_move+=("sessions/session-template.md")
+if [ ${#_starters_to_move[@]} -gt 0 ]; then
+  upgrades+=("starter-relocation|Move ${#_starters_to_move[@]} starter(s) from live dirs → knowledge/templates/|${_starters_to_move[*]}")
 fi
 
-# Section (l): Starter relocation — skipped when kg_upgrade covered this in Step 0
-if [ "$_mcp_checked" != "true" ]; then
-  # Starter relocation check (v0.5.10.7 — ENH-022 Problem 3)
-  _starters_to_move=()
-  [ -f "{KG_PATH}/lessons-learned/lesson-template.md" ] && _starters_to_move+=("lessons-learned/lesson-template.md")
-  [ -f "{KG_PATH}/decisions/ADR-template.md" ]          && _starters_to_move+=("decisions/ADR-template.md")
-  [ -f "{KG_PATH}/sessions/session-template.md" ]       && _starters_to_move+=("sessions/session-template.md")
-  if [ ${#_starters_to_move[@]} -gt 0 ]; then
-    upgrades+=("starter-relocation|Move ${#_starters_to_move[@]} starter(s) from live dirs → knowledge/templates/|${_starters_to_move[*]}")
-  fi
-fi
-
-# Section (m): stray-knowledge-dir migration — skipped when kg_upgrade covered this in Step 0
-if [ "$_mcp_checked" != "true" ]; then
-  # knowledge/knowledge/ migration check (v0.5.10.7 — ENH-022 Problem 2)
-  if [ -d "{KG_PATH}/knowledge/knowledge" ]; then
-    _modified_kk=()
-    for _kf in "{KG_PATH}/knowledge/knowledge/"*.md; do
-      [ -f "$_kf" ] || continue
-      _fname=$(basename "$_kf")
-      _src="${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/${_fname}"
-      [ -f "$_src" ] || _src="${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/${_fname}"
-      if [ ! -f "$_src" ] || ! diff -q "$_kf" "$_src" > /dev/null 2>&1; then
-        _modified_kk+=("$_fname")
-      fi
-    done
-    if [ ${#_modified_kk[@]} -gt 0 ]; then
-      upgrades+=("knowledge-knowledge-modified|knowledge/knowledge/ has modified files — manual merge required|${_modified_kk[*]}")
-    else
-      upgrades+=("knowledge-knowledge-merge|Merge knowledge/knowledge/ (unmodified starters) → knowledge/concepts/ and remove dir|")
+# Section (m): stray-knowledge-dir migration
+# Only run if _mcp_covered_stray_knowledge_dir is not set (kg_upgrade did not cover this in Step 0)
+# knowledge/knowledge/ migration check (v0.5.10.7 — ENH-022 Problem 2)
+if [ -d "{KG_PATH}/knowledge/knowledge" ]; then
+  _modified_kk=()
+  for _kf in "{KG_PATH}/knowledge/knowledge/"*.md; do
+    [ -f "$_kf" ] || continue
+    _fname=$(basename "$_kf")
+    _src="${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/${_fname}"
+    [ -f "$_src" ] || _src="${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/${_fname}"
+    if [ ! -f "$_src" ] || ! diff -q "$_kf" "$_src" > /dev/null 2>&1; then
+      _modified_kk+=("$_fname")
     fi
+  done
+  if [ ${#_modified_kk[@]} -gt 0 ]; then
+    upgrades+=("knowledge-knowledge-modified|knowledge/knowledge/ has modified files — manual merge required|${_modified_kk[*]}")
+  else
+    upgrades+=("knowledge-knowledge-merge|Merge knowledge/knowledge/ (unmodified starters) → knowledge/concepts/ and remove dir|")
   fi
 fi
 ```
@@ -310,7 +309,7 @@ Call `kg_upgrade apply: [<_mcp_apply contents>]`.
 Example: if Step 0 found `directories` and `templates` pending:
 `kg_upgrade apply: ["directories", "templates"]`
 
-Then continue to apply wizard-only items (d, e, f, g, h, i, j, k) via their existing bash logic. (Sections a, b, c, l, m are guarded by `_mcp_checked` — no double-apply.)
+Then continue to apply wizard-only items (d, e, f, g, h, i, j, k) via their existing bash logic. (Sections a, b, c, l, m are each guarded by their per-category flag — no double-apply.)
 
 ---
 
@@ -320,49 +319,47 @@ Then perform these checks in order:
 
 Verify all expected directories exist. Create any that are missing:
 
-```bash
-# Section (a) apply: skipped when kg_upgrade applied "directories" in Step 0
-if [ "$_mcp_checked" != "true" ]; then
-  expected_dirs=(knowledge lessons-learned decisions sessions chat-history)
-  for dir in "${expected_dirs[@]}"; do
-    if [ ! -d "{KG_PATH}/$dir" ]; then
-      mkdir -p "{KG_PATH}/$dir"
-      echo "✅ Created missing directory: $dir/"
-    fi
-  done
+**Only run the bash block below if `_mcp_covered_directories` is not set** (i.e., `"directories"` was not in Step 0's `upgrades[]` — kg_upgrade did not apply directory creation):
 
-  # Check category subdirectories
-  for category in "{categories[@]}"; do
-    if [ ! -d "{KG_PATH}/lessons-learned/$category" ]; then
-      mkdir -p "{KG_PATH}/lessons-learned/$category"
-      echo "✅ Created missing category directory: lessons-learned/$category/"
-    fi
-  done
-fi
+```bash
+expected_dirs=(knowledge lessons-learned decisions sessions chat-history)
+for dir in "${expected_dirs[@]}"; do
+  if [ ! -d "{KG_PATH}/$dir" ]; then
+    mkdir -p "{KG_PATH}/$dir"
+    echo "✅ Created missing directory: $dir/"
+  fi
+done
+
+# Check category subdirectories
+for category in "{categories[@]}"; do
+  if [ ! -d "{KG_PATH}/lessons-learned/$category" ]; then
+    mkdir -p "{KG_PATH}/lessons-learned/$category"
+    echo "✅ Created missing category directory: lessons-learned/$category/"
+  fi
+done
 ```
 
 #### b. Config field check
 
 Check for config fields introduced in newer versions. Add defaults for any missing fields without overwriting existing values:
 
-```bash
-# Section (b) apply: skipped when kg_upgrade applied "config" in Step 0
-if [ "$_mcp_checked" != "true" ]; then
-  # Fields that may be missing from older installs:
-  # - platforms: [] (added in v0.2.0)
-  # - autoSwitch: false (added in v0.2.0)
-  # - notification: { webhookUrl: "" } (added in v0.2.0)
-  # - type: "project-local" (added in v0.2.2 — required for multi-KG support)
+**Only run the bash block below if `_mcp_covered_config` is not set** (i.e., `"config"` was not in Step 0's `upgrades[]` — kg_upgrade did not apply config field defaults):
 
-  jq '
-    .graphs["{kg_name}"] |=
-      if .platforms == null then .platforms = [] else . end |
-      if .autoSwitch == null then .autoSwitch = false else . end |
-      if .notification == null then .notification = { "webhookUrl": "" } else . end |
-      if .type == null then .type = "{KG_TYPE}" else . end
-  ' ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
-  mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
-fi
+```bash
+# Fields that may be missing from older installs:
+# - platforms: [] (added in v0.2.0)
+# - autoSwitch: false (added in v0.2.0)
+# - notification: { webhookUrl: "" } (added in v0.2.0)
+# - type: "project-local" (added in v0.2.2 — required for multi-KG support)
+
+jq '
+  .graphs["{kg_name}"] |=
+    if .platforms == null then .platforms = [] else . end |
+    if .autoSwitch == null then .autoSwitch = false else . end |
+    if .notification == null then .notification = { "webhookUrl": "" } else . end |
+    if .type == null then .type = "{KG_TYPE}" else . end
+' ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
 ```
 
 **After the migration, check for graphs still missing `type`** (e.g., if the user has multiple registered KGs from v0.2.1):
@@ -381,25 +378,24 @@ fi
 
 Compare installed templates against the plugin's current templates. If newer versions exist, offer to update:
 
-```bash
-# Section (c) apply: skipped when kg_upgrade applied "templates" in Step 0
-if [ "$_mcp_checked" != "true" ]; then
-  template_dirs=("knowledge/templates" "lessons-learned" "decisions" "sessions")
-  updates_available=()
+**Only run the bash block below if `_mcp_covered_templates` is not set** (i.e., `"templates"` was not in Step 0's `upgrades[]` — kg_upgrade did not apply template updates):
 
-  for tdir in "${template_dirs[@]}"; do
-    for template in "${CLAUDE_PLUGIN_ROOT}/core/default-templates/$tdir/"*; do
-      dest="{KG_PATH}/$tdir/$(basename $template)"
-      if [ -f "$dest" ]; then
-        if ! diff -q "$template" "$dest" > /dev/null 2>&1; then
-          updates_available+=("$tdir/$(basename $template)")
-        fi
-      else
-        updates_available+=("$tdir/$(basename $template) (new)")
+```bash
+template_dirs=("knowledge/templates" "lessons-learned" "decisions" "sessions")
+updates_available=()
+
+for tdir in "${template_dirs[@]}"; do
+  for template in "${CLAUDE_PLUGIN_ROOT}/core/default-templates/$tdir/"*; do
+    dest="{KG_PATH}/$tdir/$(basename $template)"
+    if [ -f "$dest" ]; then
+      if ! diff -q "$template" "$dest" > /dev/null 2>&1; then
+        updates_available+=("$tdir/$(basename $template)")
       fi
-    done
+    else
+      updates_available+=("$tdir/$(basename $template) (new)")
+    fi
   done
-fi
+done
 ```
 
 If updates are available, present them:
