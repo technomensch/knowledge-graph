@@ -32170,18 +32170,31 @@ function applyTemplates(kgPath) {
     }
   ];
   const copied = [];
+  const skipped = [];
   for (const { templateSub, kgSub, files } of mappings) {
     for (const file2 of files) {
       const src = path9.join(templateRoot, templateSub, file2);
       const dest = path9.join(kgPath, kgSub, file2);
       if (fs9.existsSync(src)) {
         fs9.mkdirSync(path9.dirname(dest), { recursive: true });
+        if (fs9.existsSync(dest)) {
+          const srcContent = fs9.readFileSync(src, "utf-8");
+          const destContent = fs9.readFileSync(dest, "utf-8");
+          if (srcContent !== destContent) {
+            skipped.push(`${kgSub}/${file2} (user content detected \u2014 manual review required)`);
+            continue;
+          }
+          continue;
+        }
         fs9.copyFileSync(src, dest);
         copied.push(`${kgSub}/${file2}`);
       }
     }
   }
-  return copied.length > 0 ? `Deployed templates: ${copied.join(", ")}` : "No templates to deploy";
+  const parts = [];
+  if (copied.length > 0) parts.push(`Deployed: ${copied.join(", ")}`);
+  if (skipped.length > 0) parts.push(`Skipped (user content): ${skipped.join(", ")}`);
+  return parts.length > 0 ? parts.join(" | ") : "No templates to deploy";
 }
 function checkStarterRelocation(kgPath) {
   const starters = [
@@ -32357,6 +32370,19 @@ async function handleUpgrade(params) {
     };
   }
   const applyList = params.apply ?? [];
+  const APPLY_ORDER = [
+    "directories",
+    "config",
+    "starter-relocation",
+    // must run BEFORE templates
+    "templates",
+    "stray-knowledge-dir",
+    "platform-split",
+    "version-update"
+  ];
+  const sortedApplyList = [...applyList].sort(
+    (a, b) => APPLY_ORDER.indexOf(a) - APPLY_ORDER.indexOf(b)
+  );
   if (applyList.length === 0) {
     const result = { upgrades: [], warnings: [] };
     result.upgrades.push(...checkDirectories(kgPath));
@@ -32370,7 +32396,7 @@ async function handleUpgrade(params) {
     return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
   }
   const results = [];
-  for (const category of applyList) {
+  for (const category of sortedApplyList) {
     switch (category) {
       case "directories":
         results.push(`[directories] ${applyDirectories(kgPath)}`);
