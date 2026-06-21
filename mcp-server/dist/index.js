@@ -32187,8 +32187,9 @@ function applyTemplates(kgPath) {
       if (fs9.existsSync(src)) {
         fs9.mkdirSync(path9.dirname(dest), { recursive: true });
         if (fs9.existsSync(dest)) {
-          const srcContent = fs9.readFileSync(src, "utf-8");
-          const destContent = fs9.readFileSync(dest, "utf-8");
+          const normalize = (s) => s.replace(/\r\n/g, "\n");
+          const srcContent = normalize(fs9.readFileSync(src, "utf-8"));
+          const destContent = normalize(fs9.readFileSync(dest, "utf-8"));
           if (srcContent !== destContent) {
             skipped.push(`${kgSub}/${file2} (user content detected \u2014 manual review required)`);
             continue;
@@ -32386,8 +32387,8 @@ async function handleUpgrade(params) {
     const result = { upgrades: [], warnings: [] };
     result.upgrades.push(...checkDirectories(kgPath));
     result.upgrades.push(...checkConfig(kgPath));
-    result.upgrades.push(...checkTemplates(kgPath));
     result.upgrades.push(...checkStarterRelocation(kgPath));
+    result.upgrades.push(...checkTemplates(kgPath));
     result.upgrades.push(...checkStrayKnowledgeDir(kgPath, kgType));
     result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config2));
     const platformWarning = checkPlatformSplit(kgPath);

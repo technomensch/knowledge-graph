@@ -358,8 +358,9 @@ function applyTemplates(kgPath: string): string {
       if (fs.existsSync(src)) {
         fs.mkdirSync(path.dirname(dest), { recursive: true });
         if (fs.existsSync(dest)) {
-          const srcContent = fs.readFileSync(src, "utf-8");
-          const destContent = fs.readFileSync(dest, "utf-8");
+          const normalize = (s: string) => s.replace(/\r\n/g, "\n");
+          const srcContent = normalize(fs.readFileSync(src, "utf-8"));
+          const destContent = normalize(fs.readFileSync(dest, "utf-8"));
           if (srcContent !== destContent) {
             skipped.push(`${kgSub}/${file} (user content detected — manual review required)`);
             continue;
@@ -615,8 +616,8 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
     const result: InspectResult = { upgrades: [], warnings: [] };
     result.upgrades.push(...checkDirectories(kgPath));
     result.upgrades.push(...checkConfig(kgPath));
-    result.upgrades.push(...checkTemplates(kgPath));
     result.upgrades.push(...checkStarterRelocation(kgPath));
+    result.upgrades.push(...checkTemplates(kgPath));
     result.upgrades.push(...checkStrayKnowledgeDir(kgPath, kgType));
     result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config));
     const platformWarning = checkPlatformSplit(kgPath);
