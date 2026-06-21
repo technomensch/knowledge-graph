@@ -173,7 +173,7 @@ _starters_to_move=()
 [ -f "{KG_PATH}/decisions/ADR-template.md" ]          && _starters_to_move+=("decisions/ADR-template.md")
 [ -f "{KG_PATH}/sessions/session-template.md" ]       && _starters_to_move+=("sessions/session-template.md")
 if [ ${#_starters_to_move[@]} -gt 0 ]; then
-  upgrades+=("starter-relocation|Move ${#_starters_to_move[@]} starter(s) from live dirs → knowledge/templates/|${_starters_to_move[*]}")
+  upgrades+=("starter-relocation|Move ${#_starters_to_move[@]} starter(s) from live dirs → templates/|${_starters_to_move[*]}")
 fi
 
 # Section (m): stray-knowledge-dir migration
@@ -967,19 +967,19 @@ Would you like to configure tier mappings in me.md now?
 ```bash
 if [ ${#_starters_to_move[@]} -gt 0 ]; then
   ARCHIVE_DIR="{KG_PATH}/.kg-archive-$(date +%Y%m%d-%H%M%S)"
-  mkdir -p "${ARCHIVE_DIR}/starters" "{KG_PATH}/knowledge/templates"
+  mkdir -p "${ARCHIVE_DIR}/starters" "{KG_PATH}/templates"
   echo "{\"archived_at\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"trigger\":\"starter-relocation\"}" > "${ARCHIVE_DIR}/manifest.json"
   for _f in "${_starters_to_move[@]}"; do
-    _dest="{KG_PATH}/knowledge/templates/$(basename "${_f}")"
+    _dest="{KG_PATH}/templates/$(basename "${_f}")"
     cp "{KG_PATH}/${_f}" "${ARCHIVE_DIR}/starters/$(basename "${_f}")"
     if [ ! -f "$_dest" ]; then
       mv "{KG_PATH}/${_f}" "$_dest"
     else
       rm "{KG_PATH}/${_f}"
-      echo "  Note: $(basename ${_f}) already in knowledge/templates/ — removed live-dir copy"
+      echo "  Note: $(basename ${_f}) already in templates/ — removed live-dir copy"
     fi
   done
-  echo "✓ Starters relocated to knowledge/templates/ (archive: ${ARCHIVE_DIR})"
+  echo "✓ Starters relocated to templates/ (archive: ${ARCHIVE_DIR})"
 fi
 ```
 

@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.6.8
+**Version:** 0.6.9
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -90,6 +90,10 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 ---
 
 ## v0.6.x Feature Highlights
+
+**v0.6.9 — 2026-06-21**
+
+- **Inspector starter-relocation path fix** — `kmg-upgrade-inspector` now writes relocated starters to `{KG_PATH}/templates/` (was `{KG_PATH}/knowledge/templates/`, causing double-nesting on `knowledge/`-rooted KGs). `rules-size-check.sh` executable bit corrected.
 
 **v0.6.8 — 2026-06-21**
 
@@ -312,6 +316,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.6.8 (2026-06-21)
+**Current Version:** v0.6.9 (2026-06-21)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info

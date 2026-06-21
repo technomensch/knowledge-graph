@@ -3,6 +3,17 @@
 
 All notable changes to the Knowledge Plugin will be documented in this file.
 
+## [0.6.9] — 2026-06-21
+
+### Fixed
+
+- **Inspector starter-relocation path bug** — `kmg-upgrade-inspector` apply block wrote relocated starter templates to `{KG_PATH}/knowledge/templates/` (double-nested) instead of `{KG_PATH}/templates/`. On KGs whose root is itself a `knowledge/` directory (e.g. `tidal-docs`), this produced `knowledge/knowledge/templates/` and left `templates/` empty, causing `kg_upgrade` to re-report the starters as missing after relocation.
+- **`rules-size-check.sh` missing executable bit** — script was stored as `100644` in git; corrected to `100755`.
+
+### Internal
+
+- Stop hook (`scripts/session-end-prompt.sh`) verified correct — no code change; regression test passes in both Claude Code and Codex contexts.
+
 ## [0.6.8] — 2026-06-21
 
 ### Security
