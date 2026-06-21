@@ -83,13 +83,13 @@ Parameters:
 
 #### Option 3: Re-initialize
 
-Proceed to the existing re-initialization flow (archive first, then wizard).
+Proceed to the re-initialization flow below (archive first, then wizard).
 
 #### Option 4: Cancel
 
 Exit immediately. Do not create or modify any files. Confirm to the user: "No changes made."
 
-**If option 2 selected (re-initialize):**
+**Re-initialization flow (Option 3):**
 
 1. Archive all existing content before touching anything:
    ```bash

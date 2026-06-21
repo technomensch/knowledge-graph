@@ -882,11 +882,6 @@ TOTAL_MB=$((TOTAL_KB / 1024))
 
 ---
 
-### Options 3–4
-
-- **Option 3 (Re-initialize):** Run the full wizard but pre-populate answers from the existing config. Warn that this will reset categories and git strategy. Do NOT delete existing lessons or decisions.
-- **Option 4 (Cancel):** Exit with no changes.
-
 ---
 
 ## Wizard Steps (New KG)
