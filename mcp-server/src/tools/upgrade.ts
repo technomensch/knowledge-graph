@@ -341,20 +341,32 @@ function applyTemplates(kgPath: string): string {
   ];
 
   const copied: string[] = [];
+  const skipped: string[] = [];
   for (const { templateSub, kgSub, files } of mappings) {
     for (const file of files) {
       const src = path.join(templateRoot, templateSub, file);
       const dest = path.join(kgPath, kgSub, file);
       if (fs.existsSync(src)) {
         fs.mkdirSync(path.dirname(dest), { recursive: true });
+        if (fs.existsSync(dest)) {
+          const srcContent = fs.readFileSync(src, "utf-8");
+          const destContent = fs.readFileSync(dest, "utf-8");
+          if (srcContent !== destContent) {
+            skipped.push(`${kgSub}/${file} (user content detected — manual review required)`);
+            continue;
+          }
+          // Identical: already up to date, skip silently
+          continue;
+        }
         fs.copyFileSync(src, dest);
         copied.push(`${kgSub}/${file}`);
       }
     }
   }
-  return copied.length > 0
-    ? `Deployed templates: ${copied.join(", ")}`
-    : "No templates to deploy";
+  const parts: string[] = [];
+  if (copied.length > 0) parts.push(`Deployed: ${copied.join(", ")}`);
+  if (skipped.length > 0) parts.push(`Skipped (user content): ${skipped.join(", ")}`);
+  return parts.length > 0 ? parts.join(" | ") : "No templates to deploy";
 }
 
 function checkStarterRelocation(kgPath: string): UpgradeItem[] {
@@ -586,6 +598,18 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
   }
 
   const applyList = params.apply ?? [];
+  const APPLY_ORDER = [
+    "directories",
+    "config",
+    "starter-relocation",   // must run BEFORE templates
+    "templates",
+    "stray-knowledge-dir",
+    "platform-split",
+    "version-update",
+  ];
+  const sortedApplyList = [...applyList].sort(
+    (a, b) => APPLY_ORDER.indexOf(a) - APPLY_ORDER.indexOf(b)
+  );
 
   if (applyList.length === 0) {
     const result: InspectResult = { upgrades: [], warnings: [] };
@@ -601,7 +625,7 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
   }
 
   const results: string[] = [];
-  for (const category of applyList) {
+  for (const category of sortedApplyList) {
     switch (category) {
       case "directories":
         results.push(`[directories] ${applyDirectories(kgPath)}`);
