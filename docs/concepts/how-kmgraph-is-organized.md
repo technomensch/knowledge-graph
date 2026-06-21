@@ -123,7 +123,7 @@ MCP (Model Context Protocol) tools handle all persistence, search, and retrieval
 
 ### KG Directory Structure
 
-Each knowledge graph is a directory on disk. The standard layout (as of v0.6.4 / ENH-022):
+Each knowledge graph is a directory on disk. The standard layout (as of v0.6.7 / ENH-022):
 
 ```
 {kg_path}/
@@ -145,7 +145,7 @@ Each knowledge graph is a directory on disk. The standard layout (as of v0.6.4 /
   tmp/                ← scratch space (gitignored)
 ```
 
-**Why `templates/` is separate:** Starters and content templates in live directories (`decisions/ADR-template.md`, `sessions/session-template.md`) created confusion — AI assistants sometimes treated them as real entries. Moving them to `templates/` makes the intent unambiguous. The `kg_upgrade` `starter-relocation` category migrates existing installs automatically.
+**Why `templates/` is separate:** Starters and content templates in live directories (`decisions/ADR-template.md`, `sessions/session-template.md`) created confusion — AI assistants sometimes treated them as real entries. Moving them to `templates/` makes the intent unambiguous. The `kg_upgrade` `starter-relocation` category migrates existing installs automatically. Existing files with user content are never overwritten — `kg_upgrade` reports them as "Skipped (user content)" for manual review (v0.6.7+).
 
 ### How the Layers Interact
 

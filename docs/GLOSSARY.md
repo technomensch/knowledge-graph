@@ -514,7 +514,7 @@ bash
 > A backwards-compatibility table that translates legacy model names (e.g., `Haiku`, `Sonnet`, `Opus`) to their equivalent tier labels.
 **Why it matters**: Earlier versions of KMGraph used raw model names in `me.md`. The alias map lets those names continue to work while emitting a one-time deprecation warning, giving existing setups time to migrate to tier labels.
 
-**Sunset**: Legacy aliases are scheduled for removal in v0.6.0. Migrate `me.md` entries from model names to tier labels (`fast-tier`, `standard-tier`, `powerful-tier`) before then.
+**Sunset**: Legacy aliases were removed in v0.6.0. Migrate any remaining `me.md` entries from raw model names to tier labels (`fast-tier`, `standard-tier`, `powerful-tier`).
 
 **Plain English**: A translation layer that keeps old model name references working while nudging users toward the new tier label system.
 

@@ -161,6 +161,18 @@ See [Quickstart](quickstart) for detailed walkthroughs.
 
 ## Breaking Changes
 
+### v0.6.0 — `kmg-` prefix required for all skill and command names
+
+**Affected:** All users with personal rules, triggers, hooks, or config files that reference kmgraph skill or command names.
+
+**Change:** All skills and commands now require the `kmg-` prefix (e.g., `kmgraph:recall` → `kmgraph:kmg-recall`, `kmgraph:capture-lesson` → `kmgraph:kmg-capture-lesson`). MCP tool names (`kg_*`) are unchanged.
+
+**Action required:** Search your `~/.kmgraph/` files, project `CLAUDE.md`, and any custom hooks for old skill/command names and update them. Full rename table in [CHANGELOG.md](../CHANGELOG.md).
+
+Plugin/marketplace users: the new names are already used in all shipped files. Only custom personal rules and local configs need updating.
+
+---
+
 ### v0.5.10.7 — `core/templates/` renamed (Tier 3 manual installers only)
 
 **Affected:** Tier 3 manual installers (ADR-009) who reference `core/templates/` directly in copy instructions or custom scripts.

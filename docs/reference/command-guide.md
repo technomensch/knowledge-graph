@@ -586,7 +586,7 @@ Dispatches to the recall agent, which searches:
 - rationale
 - consequences
 - related lessons
-6. **[NEW in v0.5.2]** Asks if the decision has already been implemented — if yes, captures the current commit and subject line automatically; design-first ADRs get a back-fill reminder
+6. Asks if the decision has already been implemented — if yes, captures the current commit and subject line automatically; design-first ADRs get a back-fill reminder
 7. Shows a full summary for review before writing anything
 8. Creates the ADR file from the standard template with all fields populated
 9. Updates the decisions index (count, chronological list, by-category)
