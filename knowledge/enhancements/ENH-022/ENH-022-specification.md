@@ -203,11 +203,11 @@ Two additions to the existing upgrade-inspector check sequence:
 - [ ] `template-seed.md` and `upgrade-inspector.md` path loops updated
 
 **Current installs — upgrade-inspector**
-- [ ] Section (i) extended: detects 4 starters in live dirs → offers move to `knowledge/templates/`
-- [ ] New check: detects `knowledge/knowledge/` → offers merge into `knowledge/concepts/`
-- [ ] Both migrations use archive-before-write
-- [ ] Both migrations use Preview | Apply all | Choose individually | Skip menu
-- [ ] Modified files in `knowledge/knowledge/` trigger warn-don't-overwrite path
+- [x] Section (l): detects 4 starters in live dirs → offers move to `knowledge/templates/` (implemented in kmg-upgrade-inspector.md as section l)
+- [x] Section (m): detects `knowledge/knowledge/` → offers merge into `knowledge/concepts/` (implemented in kmg-upgrade-inspector.md as section m)
+- [x] Both migrations use archive-before-write
+- [x] Both migrations use Preview | Apply all | Choose individually | Skip menu
+- [x] Modified files in `knowledge/knowledge/` trigger warn-don't-overwrite path
 
 **MCP server**
 - [ ] `scaffold.ts`, `upgrade.ts`, `resources/index.ts` updated to `core/default-templates/`
@@ -240,6 +240,32 @@ Two additions to the existing upgrade-inspector check sequence:
 **ADR-009** — Tier 3 breakage is documented and accepted; rename = documented breaking change for manual installers.
 
 **ADR-028** — templates seed live files.
+
+---
+
+## Scope Addition — v0.6.5 (2026-06-20)
+
+**Init ↔ kg_upgrade wiring** added to ENH-022 scope.
+
+**Problem:** `kmg-upgrade-inspector.md` ran its own bash checks for structural upgrade detection (directories, templates, starter-relocation, stray-knowledge-dir). `kg_upgrade` (MCP tool) covers the same checks. The two paths drifted: new checks added to `kg_upgrade` (v0.6.4) were invisible in the init wizard until manually duplicated.
+
+**Solution:** `kmg-upgrade-inspector.md` Step 0 calls `kg_upgrade` inspect, incorporates its items into the wizard's upgrade list, and routes apply for MCP-covered items through `kg_upgrade apply`. Bash fallback retained for when MCP server is unavailable.
+
+**Acceptance criteria:**
+
+- [ ] `kmg-init.md` stale module path refs fixed (line 45 + fts5-rebuild, directory-scaffold, template-seed, config-entry-write): all now use `commands/kmg-init-shared/kmg-*`
+- [ ] `kmg-init-personal-kg.md` stale module path refs fixed (5 refs): mirrors `kmg-init.md`; both inits call same shared modules at `commands/kmg-init-shared/kmg-*`
+- [ ] Step 0 exists in `kmg-upgrade-inspector.md` before the bash detection block
+- [ ] Step 0 calls `kg_upgrade` (no args = inspect mode); each entry in `upgrades[].description` surfaced in wizard; `upgrades[].category` routed to `_mcp_apply[]` (excluding `version-update`)
+- [ ] `_mcp_apply[]` contains only valid apply enum values; `version-update` excluded; `platform-split` excluded
+- [ ] Bash sections a, b, c, l, m guarded by `_mcp_checked=true` — skipped when MCP call succeeded
+- [ ] Apply block calls `kg_upgrade apply: [_mcp_apply]` before wizard-only apply logic; no invalid categories passed
+- [ ] Fallback: if `kg_upgrade` unavailable, `_mcp_checked=false`, bash sections a/b/c/l/m run as before; no silent failures
+- [ ] Active-graph guard: if `{kg_name}` ≠ active graph, switch before calling `kg_upgrade` and restore after
+- [ ] Smoke test: run `/kmgraph:kmg-init` on an existing KG → Option 1 → wizard shows kg_upgrade items alongside wizard-only items
+- [ ] Future-proof: adding a new check to `kg_upgrade` surfaces in init wizard without changing `kmg-upgrade-inspector.md`
+
+**Related:** Meta-issue `Lessons_Learned_Architecture_Meta_Issue:_Init_↔_Kg_Upgrade_Upgrade_Check_Drift.md` — status updated to Resolved.
 
 **Lesson: Template Source Files Should Encode Role, Not Deployed Output Name** — source filenames/paths should encode role; init copy commands map role → output.
 
