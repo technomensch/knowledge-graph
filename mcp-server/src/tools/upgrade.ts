@@ -25,6 +25,15 @@ interface InspectResult {
   warnings: WarningItem[];
 }
 
+const APPLY_ORDER = [
+  "directories",
+  "config",
+  "starter-relocation",   // must run BEFORE templates
+  "templates",
+  "stray-knowledge-dir",
+  "platform-split",
+];
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
@@ -598,15 +607,6 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
   }
 
   const applyList = params.apply ?? [];
-  const APPLY_ORDER = [
-    "directories",
-    "config",
-    "starter-relocation",   // must run BEFORE templates
-    "templates",
-    "stray-knowledge-dir",
-    "platform-split",
-    "version-update",
-  ];
   const sortedApplyList = [...applyList].sort(
     (a, b) => APPLY_ORDER.indexOf(a) - APPLY_ORDER.indexOf(b)
   );
