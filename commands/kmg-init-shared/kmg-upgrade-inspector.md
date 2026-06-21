@@ -958,7 +958,7 @@ Would you like to configure tier mappings in me.md now?
 
 #### l. Starter relocation (v0.5.10.7 — ENH-022 Problem 3)
 
-**Purpose:** Move starter template files from live dirs to `knowledge/templates/` (ADR-040).
+**Purpose:** Move starter template files from live dirs to `templates/` (ADR-040).
 
 **Detection:** `_starters_to_move[]` populated in the detection phase above.
 
