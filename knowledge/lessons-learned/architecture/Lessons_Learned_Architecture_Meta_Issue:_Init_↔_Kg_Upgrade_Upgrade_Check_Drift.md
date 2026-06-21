@@ -1,7 +1,7 @@
 ---
 title: "Meta-Issue: init ↔ kg_upgrade upgrade-check drift"
 created: 2026-06-20T16:37:22.249Z
-updated: 2026-06-20T18:00:00.000Z
+updated: 2026-06-20T20:00:00.000Z
 git:
   branch: v0.6.4-fix-upgrade-template-paths
 tags: [meta-issue, architectural-gap, init, kg_upgrade, ENH-022, ADR-055, v0.6.4, upgrade-detection, drift]
@@ -10,7 +10,7 @@ category: architecture
 # Meta-Issue: init ↔ kg_upgrade Upgrade-Check Drift
 
 **Type:** meta-issue
-**Status:** Partially resolved — upgrade.ts bugs fixed in v0.6.4; init drift remains open
+**Status:** ✅ Resolved in v0.6.5 — upgrade.ts bugs fixed in v0.6.4; init ↔ kg_upgrade wiring landed in v0.6.5
 **Discovered:** 2026-06-20
 **Related:** ENH-022, ADR-055, v0.6.4 branch
 
@@ -59,15 +59,17 @@ A string-spread bug in the `apply` switch (spreading a string instead of an arra
 
 ---
 
-## Resolution in v0.6.4
+## Resolution
 
-The three `upgrade.ts` root-cause bugs are fixed on branch `v0.6.4-fix-upgrade-template-paths` (commits `7d07ed96`, `3d230b2f`, `91dbdcd6`, `325cc560`). The "wire init → kg_upgrade" decision was **deferred**: instead, ADR-055 added a version-sentinel approach to trigger `kg_upgrade` automatically on Codex and Gemini after install, bypassing the init wizard entirely for those platforms.
+**v0.6.4:** The three `upgrade.ts` root-cause bugs are fixed on branch `v0.6.4-fix-upgrade-template-paths` (commits `7d07ed96`, `3d230b2f`, `91dbdcd6`, `325cc560`). The "wire init → kg_upgrade" decision was **deferred**: instead, ADR-055 added a version-sentinel approach to trigger `kg_upgrade` automatically on Codex and Gemini after install, bypassing the init wizard entirely for those platforms.
 
-The init ↔ kg_upgrade drift gap remains open for Claude Code (Claude Code has a proper hook/wizard path that the sentinel approach doesn't cover).
+The init ↔ kg_upgrade drift gap remained open for Claude Code (Claude Code has a proper hook/wizard path that the sentinel approach doesn't cover).
+
+**v0.6.5:** Init wiring implemented. `kmg-upgrade-inspector.md` Step 0 calls `kg_upgrade` inspect; results surfaced in wizard; apply routed through `kg_upgrade apply`. Bash fallback retained. Broken path ref in `kmg-init.md` line 45 fixed. ENH-022 spec updated.
 
 ---
 
-## Proposed Fix (Outstanding)
+## Proposed Fix (Implemented in v0.6.5)
 
 Wire `/kmgraph:kmg-init` to call `kg_upgrade` (no args) as part of its "See what's new" path, and surface the MCP tool's results directly. Remove or deprecate the parallel bash checks over time. Makes `kg_upgrade` the single source of truth for upgrade detection across all platforms.
 
@@ -85,6 +87,6 @@ Discovered 2026-06-20 during v0.6.4 testing — 4th attempt at surfacing ENH-022
 
 - [x] Fix three root-cause bugs in upgrade.ts (done in v0.6.4)
 - [x] Decide Codex/Gemini upgrade trigger — version sentinel chosen (ADR-055), deferred init wiring
-- [ ] Create ENH tracking the init ↔ kg_upgrade drift gap (or add sub-task to ENH-022)
-- [ ] Wire init → kg_upgrade for Claude Code in a follow-on branch
-- [ ] Update ADR-055 or create new ADR if the fix introduces a dependency on MCP availability at init time
+- [x] Create ENH tracking the init ↔ kg_upgrade drift gap (added as ENH-022 v0.6.5 scope addition — Task 3)
+- [x] Wire init → kg_upgrade for Claude Code (done in v0.6.5 Task 2; broken path ref in kmg-init.md fixed in Task 1)
+- [ ] Update ADR-055 or create new ADR if the wiring introduces a dependency on MCP availability at init time

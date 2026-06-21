@@ -42,7 +42,7 @@ What would you like to do?
 
 ### Option 1: See What's New
 
-**→ Execute shared module:** Read `commands/init-shared/upgrade-inspector.md` and follow it exactly.
+**→ Execute shared module:** Read `commands/kmg-init-shared/kmg-upgrade-inspector.md` and follow it exactly.
 Parameters:
 - `{KG_PATH}` = resolved path for this KG (from `~/.claude/kg-config.json` entry for the matched KG)
 - `{kg_name}` = name key of the matched KG in kg-config.json
@@ -796,7 +796,7 @@ if [ "$DIRS_AT_ROOT" -eq 0 ] && [ "$DIRS_AT_DOCS" -gt 0 ]; then
 fi
 ```
 
-**→ Execute shared module:** Read `commands/init-shared/fts5-rebuild.md` and follow it exactly.
+**→ Execute shared module:** Read `commands/kmg-init-shared/kmg-fts5-rebuild.md` and follow it exactly.
 Parameters:
 - `{KG_PATH}` = resolved KG path (confirmed correct from the check above)
 - `{kg_name}` = name key of this KG in kg-config.json
@@ -1021,14 +1021,14 @@ if [ -d "$KG_PATH" ]; then
 fi
 ```
 
-**→ Execute shared module:** Read `commands/init-shared/directory-scaffold.md` and follow it exactly.
+**→ Execute shared module:** Read `commands/kmg-init-shared/kmg-directory-scaffold.md` and follow it exactly.
 Parameters:
 - `{KG_PATH}` = resolved KG path (from Step 1.4)
 - `{categories}` = categories array collected in Step 1.2
 
 ### Step 1.6: Copy templates
 
-**→ Execute shared module:** Read `commands/init-shared/template-seed.md` and follow it exactly.
+**→ Execute shared module:** Read `commands/kmg-init-shared/kmg-template-seed.md` and follow it exactly.
 Parameters:
 - `{KG_PATH}` = resolved KG path (from Step 1.4)
 - `{CLAUDE_PLUGIN_ROOT}` = plugin root path (environment variable available in this context)
@@ -1239,7 +1239,7 @@ fi
 
 ### Step 1.8: Write config entry
 
-**→ Execute shared module:** Read `commands/init-shared/config-entry-write.md` and follow it exactly.
+**→ Execute shared module:** Read `commands/kmg-init-shared/kmg-config-entry-write.md` and follow it exactly.
 Parameters:
 - `{KG_PATH}` = resolved KG path (from Step 1.4)
 - `{kg_name}` = KG name collected in Step 1.2

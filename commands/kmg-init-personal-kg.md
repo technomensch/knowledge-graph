@@ -35,7 +35,7 @@ After setup, `/kmgraph:kmg-capture-lesson` shows a KG picker when saving lessons
 
 ### Step 1: Check for existing personal KG
 
-**→ Execute shared module:** Read `commands/init-shared/upgrade-inspector.md` and follow it exactly.
+**→ Execute shared module:** Read `commands/kmg-init-shared/kmg-upgrade-inspector.md` and follow it exactly.
 Parameters:
 - `{KG_PATH}` = resolved personal KG path
 - `{kg_name}` = "personal"
@@ -110,7 +110,7 @@ Store resolved path as `{personal_kg_path}`.
 
 ### Step 3: Create directory structure
 
-**→ Execute shared module:** Read `commands/init-shared/directory-scaffold.md` and follow it exactly.
+**→ Execute shared module:** Read `commands/kmg-init-shared/kmg-directory-scaffold.md` and follow it exactly.
 Parameters:
 - `{KG_PATH}` = resolved personal KG path
 - `{categories}` = ["architecture", "debugging", "patterns", "process"]
@@ -119,7 +119,7 @@ Parameters:
 
 ### Step 4: Copy templates
 
-**→ Execute shared module:** Read `commands/init-shared/template-seed.md` and follow it exactly.
+**→ Execute shared module:** Read `commands/kmg-init-shared/kmg-template-seed.md` and follow it exactly.
 Parameters:
 - `{KG_PATH}` = resolved personal KG path
 - `{CLAUDE_PLUGIN_ROOT}` = plugin root path
@@ -170,7 +170,7 @@ Which platforms are you using? (select all that apply)
 
 ### Step 5: Register in config
 
-**→ Execute shared module:** Read `commands/init-shared/config-entry-write.md` and follow it exactly.
+**→ Execute shared module:** Read `commands/kmg-init-shared/kmg-config-entry-write.md` and follow it exactly.
 Parameters:
 - `{KG_PATH}` = resolved personal KG path
 - `{kg_name}` = "personal"
@@ -184,7 +184,7 @@ Parameters:
 
 ### Step 6: Build FTS5 index
 
-**→ Execute shared module:** Read `commands/init-shared/fts5-rebuild.md` and follow it exactly.
+**→ Execute shared module:** Read `commands/kmg-init-shared/kmg-fts5-rebuild.md` and follow it exactly.
 Parameters:
 - `{KG_PATH}` = resolved personal KG path
 - `{kg_name}` = "personal"

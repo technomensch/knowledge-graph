@@ -139,3 +139,4 @@ ADRs follow a lightweight format:
 - [Pattern Guide](../../docs/PATTERNS-GUIDE.md) - Writing quality tips
 - [triggers.md — Platform-Agnostic Rule Timing Companion File](ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file.md)
 - [ADR-046: Introduce concept+setup hybrid page type and document how-to guide pattern separately from narrative guides](ADR-046-adr-046-introduce-conceptsetup-hybrid-page-type-and-document-how-to-guide-pattern-separately-from-narrative-guides.md)
+- [Cross-platform upgrade triggering: version sentinel over startup notification](ADR-055-cross-platform-upgrade-triggering-version-sentinel-over-startup-notification.md)

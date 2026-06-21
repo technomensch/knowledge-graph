@@ -15,13 +15,61 @@
 
 ---
 
+### Step 0: Verify active graph, then call kg_upgrade inspect
+
+**Step 0a — Verify active graph matches wizard target.**
+
+`kg_upgrade` always operates on the config's active graph. Before calling it, confirm `{kg_name}` equals the active graph:
+
+```bash
+ACTIVE=$(jq -r '.active' ~/.claude/kg-config.json 2>/dev/null)
+```
+
+If `$ACTIVE` ≠ `{kg_name}`: temporarily switch active to `{kg_name}` using `kg_config_switch` tool before calling `kg_upgrade`, then after the upgrade call: if `{preserve_active}` is `true`, restore `$ACTIVE` (leave the original active graph unchanged); if `{preserve_active}` is `false`, leave `{kg_name}` active (the wizard's normal behavior). If you cannot switch (tool unavailable), skip to bash detection without setting any per-category flags.
+
+**Step 0b — Call kg_upgrade (inspect mode, no args).**
+
+Call `kg_upgrade` with no arguments. This is read-only; no changes are written.
+
+The tool returns:
+```json
+{
+  "upgrades": [
+    { "category": "directories", "description": "Missing required directories: templates/" },
+    { "category": "version-update", "description": "v0.6.4 → v0.6.5 available" }
+  ],
+  "warnings": [
+    { "category": "platform-split", "description": "...", "flaggedLines": ["..."] }
+  ]
+}
+```
+
+**Parse `upgrades[]`:**
+- For each entry: add its `description` to the wizard's pending items display.
+- For each entry with `category` in `["directories", "config", "templates", "starter-relocation", "stray-knowledge-dir"]`: add the deduplicated `category` value to `_mcp_apply[]` (dedup: only add if not already present) and set its per-category tracking flag in your context:
+  - `"directories"` → `_mcp_covered_directories=true`
+  - `"config"` → `_mcp_covered_config=true`
+  - `"templates"` → `_mcp_covered_templates=true`
+  - `"starter-relocation"` → `_mcp_covered_starter_relocation=true`
+  - `"stray-knowledge-dir"` → `_mcp_covered_stray_knowledge_dir=true`
+- If `category` is `"version-update"`: display the description as an informational item but do NOT add to `_mcp_apply[]` and do NOT set a tracking flag — it is inspect-only and cannot be applied via `kg_upgrade apply`.
+
+These per-category flags are **LLM-tracked state variables** — they are tracked in your context across bash block invocations in this module, not as shell variables. Each guarded bash block below begins with a prose instruction ("Only run if `_mcp_covered_X` is not set") that is the actual gate.
+
+**`warnings[]`** (e.g. `platform-split`): display as advisory notes in the wizard, not as actionable upgrade items. Route through section d's existing wizard flow, not `kg_upgrade apply`.
+
+**If `kg_upgrade` call fails** (MCP server unavailable, tool error): do not set any per-category flags. Display: `⚠️ kg_upgrade unavailable — falling back to local checks for structural items.` Continue to bash detection block; sections a, b, c, l, m run as before.
+
+---
+
 **Before running any checks or making any changes**, inspect the KG's actual state and report only what is missing or upgradeable for this specific install:
 
 ```bash
 # Inspect what's actually missing or upgradeable
 upgrades=()
 
-# Missing directories
+# Section (a): Directory structure detection
+# Only run if _mcp_covered_directories is not set (kg_upgrade did not cover this in Step 0)
 for dir in knowledge lessons-learned decisions sessions chat-history tmp; do
   [ ! -d "{KG_PATH}/$dir" ] && upgrades+=("Missing directory: $dir/")
 done
@@ -91,6 +139,8 @@ WIKI_DONE=$(jq -r '.graphs["{kg_name}"].wiki_pass_complete // false' ~/.claude/k
 [ "$WIKI_DONE" != "true" ] && \
   upgrades+=("Wiki pass available: convert bare ADR-NNN, ENH-NNN, #NNN, and lesson filename references to [[wiki links]] across knowledge files")
 
+# Section (c): Template update detection
+# Only run if _mcp_covered_templates is not set (kg_upgrade did not cover this in Step 0)
 # New templates (files in plugin core/default-templates not yet in KG)
 # IMPORTANT: The following filenames must NEVER be added to upgrades[] by this loop,
 # regardless of whether they exist at the template destination path.
@@ -115,6 +165,8 @@ for tdir in knowledge lessons-learned decisions sessions; do
   done
 done
 
+# Section (l): Starter relocation
+# Only run if _mcp_covered_starter_relocation is not set (kg_upgrade did not cover this in Step 0)
 # Starter relocation check (v0.5.10.7 — ENH-022 Problem 3)
 _starters_to_move=()
 [ -f "{KG_PATH}/lessons-learned/lesson-template.md" ] && _starters_to_move+=("lessons-learned/lesson-template.md")
@@ -124,6 +176,8 @@ if [ ${#_starters_to_move[@]} -gt 0 ]; then
   upgrades+=("starter-relocation|Move ${#_starters_to_move[@]} starter(s) from live dirs → knowledge/templates/|${_starters_to_move[*]}")
 fi
 
+# Section (m): stray-knowledge-dir migration
+# Only run if _mcp_covered_stray_knowledge_dir is not set (kg_upgrade did not cover this in Step 0)
 # knowledge/knowledge/ migration check (v0.5.10.7 — ENH-022 Problem 2)
 if [ -d "{KG_PATH}/knowledge/knowledge" ]; then
   _modified_kk=()
@@ -246,11 +300,26 @@ If the user picks option 2 (choose individually), present each item as a separat
 
 If the user picks option 3 (skip), exit with no changes.
 
+**Apply MCP-covered items first** (when `_mcp_apply[]` is non-empty):
+
+Call `kg_upgrade apply: [<_mcp_apply contents>]`.
+
+`_mcp_apply[]` may only contain values from the valid apply enum: `"directories"`, `"config"`, `"templates"`, `"starter-relocation"`, `"stray-knowledge-dir"`. Never include `"version-update"` or `"platform-split"` — these will cause Zod validation to reject the entire call.
+
+Example: if Step 0 found `directories` and `templates` pending:
+`kg_upgrade apply: ["directories", "templates"]`
+
+Then continue to apply wizard-only items (d, e, f, g, h, i, j, k) via their existing bash logic. (Sections a, b, c, l, m are each guarded by their per-category flag — no double-apply.)
+
+---
+
 Then perform these checks in order:
 
 #### a. Directory structure check
 
 Verify all expected directories exist. Create any that are missing:
+
+**Only run the bash block below if `_mcp_covered_directories` is not set** (i.e., `"directories"` was not in Step 0's `upgrades[]` — kg_upgrade did not apply directory creation):
 
 ```bash
 expected_dirs=(knowledge lessons-learned decisions sessions chat-history)
@@ -273,6 +342,8 @@ done
 #### b. Config field check
 
 Check for config fields introduced in newer versions. Add defaults for any missing fields without overwriting existing values:
+
+**Only run the bash block below if `_mcp_covered_config` is not set** (i.e., `"config"` was not in Step 0's `upgrades[]` — kg_upgrade did not apply config field defaults):
 
 ```bash
 # Fields that may be missing from older installs:
@@ -306,6 +377,8 @@ fi
 #### c. Template update check
 
 Compare installed templates against the plugin's current templates. If newer versions exist, offer to update:
+
+**Only run the bash block below if `_mcp_covered_templates` is not set** (i.e., `"templates"` was not in Step 0's `upgrades[]` — kg_upgrade did not apply template updates):
 
 ```bash
 template_dirs=("knowledge/templates" "lessons-learned" "decisions" "sessions")
@@ -389,7 +462,7 @@ Options:
 
 **If option (a) — auto-relocate (bulk):**
 
-→ Execute shared module: Read `commands/init-shared/knowledge-file-migrator.md` and follow it exactly.
+→ Execute shared module: Read `commands/kmg-init-shared/kmg-knowledge-file-migrator.md` and follow it exactly.
 Parameters:
 - `{KG_PATH}` = `{KG_PATH}`
 - `{KG_TYPE}` = `{KG_TYPE}`
@@ -864,7 +937,7 @@ Options:
   b. Skip — I'll handle manually
 ```
 
-**If option (a):** delegate to the section d auto-relocate flow (read `commands/init-shared/knowledge-file-migrator.md`), passing the full section content as `{CONTAMINATION}`.
+**If option (a):** delegate to the section d auto-relocate flow (read `commands/kmg-init-shared/kmg-knowledge-file-migrator.md`), passing the full section content as `{CONTAMINATION}`.
 
 After the platform section is relocated, offer the tier mapping walkthrough inline:
 
