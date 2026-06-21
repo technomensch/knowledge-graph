@@ -122,111 +122,18 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 
 ---
 
-## v0.5.x Feature Highlights
+**v0.5.x Feature Highlights** *(2026-04-21 to 2026-06-14)*
 
-**v0.5.11 — 2026-06-14**
+- **Codex CLI support** — Plugin now installable via Codex marketplace; full hook suite (`SessionStart`, `PreToolUse`, `PostToolUse`, `Stop`), MCP tools, and `extract-chat` all work on Codex CLI alongside Claude Code.
+- **`kg_upgrade` MCP tool** — Non-Claude platforms can run `kg_upgrade inspect` and `apply` via the Startup Protocol in `AGENTS.md` / `GEMINI.md`, eliminating the need for the Claude Code wizard on Codex and Gemini CLI.
+- **Decision governance at hook level** — `pre-skill-rules-inject.sh` blocks brainstorming and planning without a prior knowledge-graph recall. Two recall queries required before any plan is written; misses logged to `/tmp/kmgraph-recall-miss-*.log`.
+- **Session summary overhaul (ENH-002)** — Five structured sections, one file per day, append-only narrative blocks, operational sections overwrite each run. `session-documenter` relay contract: draft shown verbatim before save.
+- **Profile files auto-load at SessionStart** — `me.md` and `triggers.md` (personal + project scopes) injected automatically; `rules.md` loads on demand to avoid context tax.
+- **Behavioral rules route to profile files** — `rules-capture` writes to `~/.kmgraph/rules.md`, `knowledge/rules.md`, or `me.md` by scope. MEMORY.md no longer used for governance signals.
+- **MCP server pre-bundled** — `mcp-server/dist/` committed; `git clone` installs skip the build step.
+- **Security** — 16 Dependabot alerts resolved (v0.5.7.1); esbuild HIGH vuln resolved (v0.5.11); `shell-quote` CVE patched (v0.5.10.2).
 
-- **Security: esbuild HIGH vulnerability resolved** — `npm audit fix` in mcp-server; no functional changes.
-
-**v0.5.10.8 — 2026-06-14**
-
-- **`extract-chat` KG write guard** — New Step 0 alignment check compares the active KG's project root against the current working directory before extraction. On mismatch: stop-and-ask prompt (switch / proceed / cancel). Skipped when `--output-dir` or `--project` is explicit. Cross-platform (Claude, Gemini, Codex).
-
-**v0.5.10.7 — 2026-06-13**
-
-- **`core/templates/` renamed to `core/default-templates/`** — Disambiguates frozen distribution scaffolds from live `knowledge/` directories. All internal consumers updated. Closes ENH-022.
-
-**v0.5.10.6 — 2026-06-12**
-
-- **Codex CLI lifecycle hooks** — kmgraph hook suite now delivered to Codex CLI sessions via `.codex-plugin/hooks/hooks.json`. Hooks: SessionStart, PostToolUse (shell), PreToolUse (shell), UserPromptSubmit, Stop. Requires Codex ≥ post-PR-19705 with `plugin_hooks` flag; run `/hooks` in Codex to trust after install.
-- **Pre-push gate: README version check** — Gate 2 now also flags when the current version is missing from `README.md`, matching the existing CHANGELOG advisory.
-
-**v0.5.10.5 — 2026-06-12**
-
-- **`extract-chat` adds Codex CLI source** — `/kmgraph:kmg-extract-chat` now accepts `--source codex` to extract chat history from Codex CLI sessions. Pass `--source codex` (or omit `--source` and select Codex from the interactive prompt) to index Codex conversation logs alongside existing Claude and Gemini sources.
-- **Docs-impact-scan guide page published** — New [Docs-Impact-Scan Guide](docs/pillars/tailoring/docs-impact-scan.md) documents the 8-step pre-push workflow that automatically discovers and updates affected documentation. This feature (previously undocumented except in ADRs) now has a dedicated user-facing guide.
-
-**v0.5.10.3 — 2026-06-11**
-
-- **MCP server bundled with esbuild for git-clone installs** — MCP server now includes pre-built dist bundle (esbuild output) so `git clone` and local `--plugin-dir` installs bypass the build step. Installation speed improved; no longer requires Node.js/npm build environment for simple deployments.
-
-**v0.5.10.2 — 2026-06-10**
-
-- **Codex CLI marketplace support** — Plugin now installable via `codex plugin marketplace add technomensch/knowledge-graph` + `codex plugin add kmgraph@knowledge-management-graph`. Both Claude and Codex use `kmgraph@knowledge-management-graph` as the plugin ID. Additive — existing Claude Code integration unchanged.
-- **shell-quote security fix** — Critical vulnerability (Dependabot #63) resolved via npm override pinning `shell-quote >=1.8.4`.
-
-**v0.5.10.1 — 2026-06-09**
-
-- **Session summary operational sections (ENH-002 partial)** — `/kmgraph:kmg-session-summary` now generates five structured sections: Start-of-Session Reading gate, Current State, Open Issues, Session History (thin references), and Session Findings (errors/findings from any command run this session). Operational sections overwrite each run; narrative blocks append-only and timestamped.
-- **One-file-per-day enforcement** — Step 1.5 added to full-session path; filename unified to `YYYY-MM-DD-{branch-slug}.md` across snapshot and full modes. No more duplicate files per day.
-- **Handoff package reduced** — SESSION-COMPILATION.md and OPEN-ISSUES.md removed; START-HERE.md is now a thin pointer that auto-detects today's session summary. Package is DOCUMENTATION-MAP + ARCHITECTURE-SNAPSHOT + thin START-HERE.
-- **Stale path fixes** — All `decisions/` and `lessons-learned/` references in handoff corrected to `knowledge/decisions/` and `knowledge/lessons-learned/`.
-
-**v0.5.10 — 2026-06-07**
-
-- **`start-issue-tracking` Step 1.2 version-impact UX improved (ENH-017)** — Version impact prompt now explains each increment with semver implications, clarifies that Patch covers fix *or* enhancement, and guards the "major/v1.0.0 not yet valid" edge case.
-- **Session/handoff `continues_from` coupling (ENH-021)** — Handoffs may now reference a paired session summary via an optional `continues_from` field (handoff frontmatter + START-HERE header), eliminating duplicated "what was built" content at session end. Asymmetric one-way coupling — the summary never references the handoff. See ADR-051.
-
-**v0.5.9.2 — 2026-05-30**
-
-- **`start-issue-tracking` now auto-creates GitHub Issue** — Step 5.0 calls `gh issue create --body-file` before branch creation; returned issue number is written back to spec frontmatter (`github-issue` field). Draft PR is updated to include `Closes #N`.
-- **Post-plan validation checklist advisory clarification** — `plan-rules.md` false "blocking gate" claim corrected; checklist hook is advisory only (PostToolUse cannot block in Claude Code). Hard-gate enforcement deferred to v0.7.0 (ENH-015 Gap 2).
-
-**v0.5.9 — 2026-05-27**
-
-- **Decision governance protocol enforced at hook level** — `pre-skill-rules-inject.sh` now hard-blocks brainstorming and planning without a prior knowledge-graph recall. Two recall queries are required before any plan is written (topic + architectural domain). Recall misses are logged to `/tmp/kmgraph-recall-miss-*.log` for audit. Remote-session compatibility: embedded-rules block is written directly into plan files so Ultraplan and other non-hook contexts carry the enforcement.
-- **New `brainstorm-recall` skill** — Fires before `kmg-adr-guide` and invokes `kmgraph:kmg-recall` before any recommendation. Results appear under a "Prior Art" heading so past decisions surface before new ones are made.
-- **`kmg-execute-plan` cascade gate** — When a new ADR is captured mid-session, execution is paused before the next plan task so the user can review cascade impact. ADR flag is day-scoped and cleaned at branch finish.
-- **Chat-history now searchable** — `mcp-server/src/tools/fts5.ts` adds `chat-history` to `searchDirs`; exported chat logs (Claude, Gemini, Codex CLI) are indexed and reachable via `kg_search`.
-- **Session-documenter Relay Contract** — Draft session summaries are now displayed verbatim before save/edit/cancel options. No silent summarization.
-- **Post-plan validation checklist** — A PostToolUse:Write hook fires after any `plans/*.md` write and outputs an advisory validation checklist.
-- **Canonical rules registry** — `core/rules-registry/` stores authoritative rule text; all deployment surfaces (templates, profile files) copy from here.
-
-**v0.5.8 — 2026-05-25**
-
-- **Project-specific plan routing now reaches the model** — `pre-skill-rules-inject.sh` reads the active project's `knowledge/rules.md` and injects its `Plan File Location` and `Plan File Routing` rules before any planning skill runs. Project naming conventions (e.g. `v{ver}-{description}.md`) are now enforced instead of silently ignored.
-- **Mirror-copy and naming rules promoted to HARD BLOCK** — The plan file routing and mirror-copy steps are now structurally identical to the PR Gate Override, so the model obeys them as reliably as the other hard blocks.
-- **Dispatcher commands now show drafts before saving** — `session-summary`, `capture-lesson`, and `create-adr` relay the full subagent draft to the main thread before presenting save/edit/cancel options. No more invisible writes.
-- **Behavioral rules now route to profile files, not MEMORY.md (ENH-014)** — `rules-capture-agent` was silently writing all behavioral captures to MEMORY.md. Fixed: rules now go to `~/.kmgraph/rules.md`, `knowledge/rules.md`, or `me.md` depending on scope. Phantom `archive-memory`/`restore-memory` references removed throughout.
-
-**v0.5.7.1 — 2026-05-13**
-
-- **Security: 16 Dependabot alerts resolved** — All HIGH and medium vulnerabilities in transitive dependencies patched via `npm overrides`. No direct dependency versions changed. No user action required.
-
-**v0.5.7 — 2026-05-05**
-
-- **Planning skills no longer offer unsolicited execution choices** — `superpowers:writing-plans` and `superpowers:brainstorming` no longer ask "Which approach?" after saving a plan. The PreToolUse hook hard-blocks that prompt; the plan is saved and control returns to the user.
-- **Execution skills no longer auto-push or open PRs** — `superpowers:executing-plans` and `superpowers:finishing-a-development-branch` now stop and wait for explicit approval before any `git push` or `gh pr create`.
-- **Stop hook safety net added** — `stop-plan-gate.sh` re-surfaces the plan approval gate at session end when a plan was written, catching cases where the hook injection was bypassed mid-session.
-- **`kmg-plan-gate` promoted to plugin skill** — Available as `kmgraph:kmg-plan-gate` in the skills index, covering both planning and execution gate types.
-
-**v0.5.6 — 2026-05-05**
-
-- **Behavioral capture routing cleaned up** — `update-graph`, `rules-capture`, `session-wrap`, `sync-all`, and related commands no longer write to or check MEMORY.md for governance signals. Governance-worthy content surfaces as plain-language prompts only; the user decides what to capture and where.
-
-**v0.5.5 — 2026-04-29**
-
-- **Stop hook dedup fix** — Session flag files are now keyed on `{kg-name}-{date}` instead of `{PPID}-{date}`. The old scheme generated ~150 stale `/tmp` flags per session and the dedup check never matched, causing repeated prompts.
-
-**v0.5.4 — 2026-04-28**
-
-- **Profile files auto-load at every SessionStart** — `me.md` and `triggers.md` (both personal `~/.kmgraph/` and project `knowledge/` scopes) are now injected into session context automatically by the SessionStart hook. Workflow-phase triggers fire reliably even after context compaction. `rules.md` files are not auto-injected — they load on demand via trigger pointers, so rules can grow without paying a permanent context tax.
-
-**v0.5.3 — 2026-04-23**
-
-- **`extract-chat` now handles large export days automatically** — Prior to this update, lengthy chat-history files were causing Obsidian indexing to crash the vault.  After this update, exports exceeding 900 KB or 30,000 lines are split into `YYYY-MM-DD/`files. Boundaries respect message boundaries so no message is split mid-content.
-- **`update-doc` no longer silently skips README and CHANGELOG** — After updating any Tier 1 doc with `--user-facing`, the command now prompts to continue with remaining Tier 1 files in order. Previously, targeting a specific file bypassed the full release sweep entirely.
-- **KG-mismatch guardrails added to `create-adr` and `capture-lesson`** — Both commands now block writes when the active knowledge graph does not match the current working directory, preventing accidental cross-project entries.
-- **New `update-profile` skill** — Auto-triggered when updating user profile files (`me.md`), guiding the update through a structured prompt flow (ADR-045).
-
-**v0.5.2 — 2026-04-21**
-
-- **Model configuration is now future-proof** — Instead of hardcoding specific model names in `me.md`, commands and agents now reference tier labels (`fast-tier`, `standard-tier`, `powerful-tier`). When a model gets updated or renamed, only one place needs to change. Getting started is straightforward: run `/kmgraph:kmg-init` and the wizard walks through tier mapping interactively, discovers any locally running Ollama or LM Studio instances automatically, and pre-populates `~/.kmgraph/me.md` with working defaults so no manual edits are needed. Upgrading works the same way — the upgrade wizard offers the same interactive walkthrough after relocating platform config. For full manual control, add a `platforms[]` block directly to `me.md`. Unrecognized model values surface a warning instead of silently failing.
-- **ADRs now record where and when decisions were implemented** — When creating an ADR, the wizard automatically captures the commit and subject line so there is always a traceable link back to the implementation. No more guessing when or where something was decided.
-- **Rules from `rules.md` are now enforced automatically** — A new PreToolUse hook checks `rules.md` before certain tools run, so behavioral rules don't have to be re-stated every session.
-- **New projects get better default rules out of the box** — The `rules.md` template now seeds parallelism analysis and skill override rules automatically during init, giving new knowledge graphs a more useful starting point.
-- **Bug fix: `extract-chat` was creating duplicate entries** — Timestamp comparison during dedup was broken, causing the same chat sessions to appear multiple times. Fixed.
-- **`archive-memory` and `restore-memory` removed** — Both commands are no longer needed. Behavioral rules, identity, and working style now live in dedicated files (`me.md`, `rules.md`, `triggers.md`), making memory modular. Each file stays focused and can be split further as the project grows, removing the need to archive and restore from a single large MEMORY.md.
+*Full per-version detail in [CHANGELOG.md](CHANGELOG.md).*
 
 **v0.4.x Feature Highlights** *(2026-04-16 to 2026-04-18)*
 
