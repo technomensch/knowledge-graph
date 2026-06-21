@@ -7,7 +7,7 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ### Security
 
-- **hono HIGH vulnerability resolved** — `npm audit fix` in mcp-server patches hono path traversal, CORS, cookie, and header-handling CVEs. No functional changes. 19 moderate vulnerabilities (jest/ts-jest) remain; require major version bumps deferred to a future release.
+- **hono HIGH vulnerability resolved** — `npm audit fix` in mcp-server patches hono path traversal, CORS, cookie, and header-handling CVEs. No functional changes. ts-jest incidentally bumped 29.4.6 → 29.4.11 (devDependency, not shipped). 19 moderate vulnerabilities (jest/ts-jest) remain; which require major version bumps, deferred to a future release.
 
 ## [0.6.0] — 2026-06-16
 
