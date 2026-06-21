@@ -77,6 +77,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.6.7] — 2026-06-21
+
+### Fixed
+- **`applyTemplates()` ADR-040 guard** — Existing dest files are now checked before overwrite. If content differs from the distro source, the file is skipped and reported as "Skipped (user content): … (user content detected — manual review required)". If content is identical, the file is skipped silently. Previously, `applyTemplates()` called `fs.copyFileSync` unconditionally, overwriting user-modified READMEs (e.g., a 50-ADR `decisions/README.md`). Mirrors the guard already present in `applyStarterRelocation()`. Closes ENH-029 Bug 1.
+- **Apply order enforced via `APPLY_ORDER` sort** — When `apply` contains both `starter-relocation` and `templates`, `starter-relocation` now always runs first regardless of the caller-supplied order. Previously, templates could run first and deploy starters to `templates/`, causing `applyStarterRelocation()` to find content-mismatched files and silently skip. Closes ENH-029 Bug 3.
+- **CRLF normalization in content compare** — `applyTemplates()` now normalizes `\r\n` → `\n` before comparing src and dest. Prevents CRLF dest files (e.g., from Windows or `core.autocrlf`) from being falsely flagged as user content.
+- **Inspect output order matches apply execution order** — `kg_upgrade` inspect now lists `starter-relocation` before `templates`, matching the enforced apply sequence.
+
+---
+
+## [0.6.6] — 2026-06-21
+
+### Fixed
+- **Mandatory STOP gate in `kmg-init` existing-KG branch** — Adds a visually prominent all-caps STOP block immediately after the existing-KG detection condition. Prevents LLMs from skipping the numbered menu and bypassing the upgrade-inspector under forward momentum. Closes ENH-028.
+- **`kmg-init-personal-kg` parity** — Same STOP gate added to the personal-KG init command (ADR-053 parity requirement).
+
+---
+
 ## [0.5.11] — 2026-06-14
 
 ### Security
