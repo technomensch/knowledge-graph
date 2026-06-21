@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.6.7
+**Version:** 0.6.8
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -90,6 +90,10 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 ---
 
 ## v0.6.x Feature Highlights
+
+**v0.6.8 — 2026-06-21**
+
+- **Security: hono HIGH vulnerability resolved** — `npm audit fix` in mcp-server patches hono path traversal, CORS, cookie-merging, and header-handling CVEs. No functional changes.
 
 **v0.6.7 — 2026-06-21**
 
@@ -308,6 +312,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.6.7 (2026-06-21)
+**Current Version:** v0.6.8 (2026-06-21)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info
