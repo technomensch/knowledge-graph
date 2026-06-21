@@ -14,12 +14,13 @@ On every release, sync ALL of the following — do not stop after version files 
 
 1. `package.json` (root)
 2. `.claude-plugin/plugin.json`
-3. `mcp-server/package.json` (independently versioned — bump only if mcp-server changed)
-4. `CHANGELOG.md` — add release entry
-5. `README.md` — version badge, feature highlights block, current release block, recent versions list, current phase line (footer)
-6. `INSTALL.md` — upgrade path table
+3. `.codex-plugin/plugin.json`
+4. `mcp-server/package.json` (independently versioned — bump only if mcp-server changed)
+5. `CHANGELOG.md` — add release entry
+6. `README.md` — version badge, feature highlights block, current release block, recent versions list, current phase line (footer)
+7. `INSTALL.md` — upgrade path table
 
-- **Why:** partial version sync (only package files) left README and INSTALL.md at old versions, requiring user to prompt repeatedly to get all files updated
+- **Why:** partial version sync (only package files) left README and INSTALL.md at old versions, requiring user to prompt repeatedly to get all files updated; `.codex-plugin/plugin.json` was also missed, causing Codex marketplace to show stale version after release
 
 ### Changelog & Docs Feed
 
