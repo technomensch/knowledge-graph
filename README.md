@@ -89,6 +89,39 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 
 ---
 
+## v0.6.x Feature Highlights
+
+**v0.6.7 — 2026-06-21**
+
+- **`kg_upgrade apply templates` no longer overwrites user content** — `applyTemplates()` now checks each dest file before writing. Existing files with different content are skipped and reported as "Skipped (user content): … (manual review required)". Previously, user-modified READMEs (e.g., a 50-ADR `decisions/README.md`) were silently overwritten. Closes ENH-029 Bug 1.
+- **Apply order enforced automatically** — When `apply` includes both `starter-relocation` and `templates`, `starter-relocation` now always runs first regardless of call order. Prevents a race where templates would deploy starters before relocation could move them. Closes ENH-029 Bug 3.
+
+**v0.6.6 — 2026-06-21**
+
+- **Mandatory STOP gate in `kmg-init` existing-KG branch** — LLMs could previously skip the upgrade menu and proceed directly to FTS5/wiki steps when forward momentum was high. A hard STOP block now forces the numbered menu to appear before any upgrade path continues. Closes ENH-028.
+
+**v0.6.5 — 2026-06-21**
+
+- **`kmg-init` now wires directly into `kg_upgrade` inspect** — The upgrade wizard calls the `kg_upgrade` MCP tool at the existing-KG detection step instead of running its own parallel checks. Eliminates the drift where init and `kg_upgrade` could disagree on what needed upgrading. Closes ENH-022 wiring scope.
+
+**v0.6.4 — 2026-06-20**
+
+- **`kg_upgrade` apply categories fully implemented** — `applyTemplates()` now deploys all template files to correct destinations (`templates/`, `concepts/`). `applyStarterRelocation()` moves starters from live dirs to `templates/`. `applyStrayKnowledgeDir()` merges the legacy `knowledge/knowledge/` subdir. `checkDirectories()` detects and `applyDirectories()` creates all required subdirs.
+
+**v0.6.2 — 2026-06-17**
+
+- **`kg_upgrade` template mapping corrected** — `checkTemplates()` was mapping template files to `knowledge/` instead of `concepts/`. Fixed to use the correct post-ENH-022 path.
+
+**v0.6.1 — 2026-06-17**
+
+- **Recommendation-gate hook: platform-aware output schema** — `recommendation-gate.sh` updated to use `hookSpecificOutput` schema for platform-aware Stop hook output. Fixes formatting on non-Claude platforms.
+
+**v0.6.0 — 2026-06-16** *(Breaking: skill/command rename)*
+
+- **All skill and command names now require `kmg-` prefix** — `kmgraph:recall` → `kmgraph:kmg-recall`, `kmgraph:capture-lesson` → `kmgraph:kmg-capture-lesson`, etc. MCP tool names (`kg_*`) unchanged. Full rename table in [CHANGELOG.md](CHANGELOG.md). Closes ADR-053.
+
+---
+
 ## v0.5.x Feature Highlights
 
 **v0.5.11 — 2026-06-14**

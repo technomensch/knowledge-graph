@@ -95,6 +95,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.6.5] — 2026-06-21
+
+### Changed
+- **`kmg-init` wires directly into `kg_upgrade` inspect** — The upgrade wizard now calls the `kg_upgrade` MCP tool at the existing-KG detection step instead of running parallel checks in the init command itself. Eliminates the drift where init and `kg_upgrade` could disagree on what needed upgrading. Closes ENH-022 wiring scope.
+
+---
+
+## [0.6.4] — 2026-06-20
+
+### Fixed
+- **`kg_upgrade` apply categories fully implemented** — `applyTemplates()` now deploys all template files to correct destinations (`templates/` for starters and content templates, `concepts/` for index files). `applyStarterRelocation()` moves starter files from live dirs to `templates/`. `applyStrayKnowledgeDir()` merges the legacy `knowledge/knowledge/` subdir into `concepts/`. `checkDirectories()` / `applyDirectories()` detect and create all required subdirectories.
+
+---
+
+## [0.6.2] — 2026-06-17
+
+### Fixed
+- **`kg_upgrade` template mapping corrected** — `checkTemplates()` was mapping template files to `knowledge/` instead of `concepts/`. Fixed to use the correct post-ENH-022 destination path.
+
+---
+
+## [0.6.1] — 2026-06-17
+
+### Fixed
+- **Recommendation-gate hook: platform-aware output schema** — `recommendation-gate.sh` updated to emit `hookSpecificOutput` schema for Stop hooks, enabling platform-aware formatting on non-Claude platforms.
+
+---
+
 ## [0.5.11] — 2026-06-14
 
 ### Security
