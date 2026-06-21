@@ -35,7 +35,41 @@ After setup, `/kmgraph:kmg-capture-lesson` shows a KG picker when saving lessons
 
 ### Step 1: Check for existing personal KG
 
-**→ Execute shared module:** Read `commands/kmg-init-shared/kmg-upgrade-inspector.md` and follow it exactly.
+Check if a personal knowledge graph already exists: look up `~/.claude/kg-config.json` for any entry with `type: "personal"` at the target path (`~/.kmgraph/` by default).
+
+**If NO existing personal KG is found:** skip this step and proceed to Step 2 (directory scaffolding).
+
+**If an existing personal KG IS found:**
+
+> ⚠️ **STOP — EXISTING PERSONAL KG DETECTED**
+>
+> A personal knowledge graph already exists at [path].
+>
+> **You MUST present the menu below before proceeding.**
+> **Do NOT run any initialization, scaffolding, FTS5, or wiki steps yet.**
+> **Wait for the user to select an option.**
+
+Present this menu to the user:
+
+```
+A personal knowledge graph already exists at [path].
+
+What would you like to do?
+
+1. See what's new   — run upgrade inspector (recommended)
+2. Check for issues — run upgrade inspector
+3. Re-initialize    ⚠️  destructive; resets templates and structure
+4. Cancel — the existing personal KG is already set up
+
+Enter option (1/2/3/4):
+```
+
+**Do not proceed past this point until the user has entered a selection.**
+
+#### Options 1 or 2: Run Upgrade Inspector (MANDATORY)
+
+**→ You MUST execute this shared module. Read `commands/kmg-init-shared/kmg-upgrade-inspector.md` and follow it exactly before running any other step.**
+
 Parameters:
 - `{KG_PATH}` = resolved personal KG path
 - `{kg_name}` = "personal"
@@ -45,9 +79,17 @@ Parameters:
 
 **Cross-project platform-split check (section d):** Section d auto-routes to `~/.claude/CLAUDE.md § Platform Preferences` for personal KGs via the `{KG_TYPE}` = "personal" passed above — no extra parameters needed.
 
-**After upgrade-inspector completes (Option 1), always continue to Step 8 (content migration) and Step 9 (evidence seeding).** These run independently of the template upgrade check — an up-to-date template install does not mean me.md/rules.md have been populated.
+**After upgrade-inspector completes, always continue to Step 8 (content migration) and Step 9 (evidence seeding).** These run independently of the template upgrade check — an up-to-date template install does not mean me.md/rules.md have been populated.
 
-**If option 2 selected (re-initialize):**
+#### Option 3: Re-initialize
+
+Proceed to the re-initialization flow below (archive first, then wizard).
+
+#### Option 4: Cancel
+
+Exit immediately. Do not create or modify any files. Confirm to the user: "No changes made."
+
+**Re-initialization flow (Option 3):**
 
 1. Archive all existing content before touching anything:
    ```bash

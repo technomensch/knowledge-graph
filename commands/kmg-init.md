@@ -26,7 +26,21 @@ Creates a complete knowledge graph structure with:
 
 ## Pre-Wizard: Existing KG Detection
 
-Before starting the wizard, check if a knowledge graph already exists for this project in `~/.claude/kg-config.json`. If the current working directory matches an existing KG's path (or is a parent/child of one), present this menu instead of jumping straight to the wizard:
+Check if a knowledge graph already exists for this project: look up `~/.claude/kg-config.json` for any entry whose path matches (or is a parent/child of) the current working directory.
+
+**If NO existing KG is found:** skip this section entirely and proceed to the wizard (Step 1 below).
+
+**If an existing KG IS found:**
+
+> ⚠️ **STOP — EXISTING KG DETECTED**
+>
+> A knowledge graph named "[name]" already exists at [path].
+>
+> **You MUST present the menu below before proceeding.**
+> **Do NOT run any initialization, scaffolding, FTS5, or wiki steps yet.**
+> **Wait for the user to select an option.**
+
+Present this menu to the user:
 
 ```
 A knowledge graph named "[name]" already exists in the config and is set as active.
@@ -34,20 +48,35 @@ It's [type] at [path] with categories: [list].
 
 What would you like to do?
 
-1. See what's new — review improvements in this version, then decide what to apply
-2. Create a new, separate knowledge graph (different name/location)
-3. Re-initialize "[name]" (reset categories, git strategy, etc.)
+1. See what's new   — run upgrade inspector (recommended)
+2. Check for issues — run upgrade inspector
+3. Re-initialize "[name]"  ⚠️  destructive; resets categories, git strategy, etc.
 4. Cancel — the existing KG is already set up
+
+Enter option (1/2/3/4):
 ```
 
-### Option 1: See What's New
+**Do not proceed past this point until the user has entered a selection.**
 
-**→ Execute shared module:** Read `commands/kmg-init-shared/kmg-upgrade-inspector.md` and follow it exactly.
+### Option 1 or 2: Run Upgrade Inspector (MANDATORY)
+
+**→ You MUST execute this shared module. Read `commands/kmg-init-shared/kmg-upgrade-inspector.md` and follow it exactly before running any other step.**
+
 Parameters:
 - `{KG_PATH}` = resolved path for this KG (from `~/.claude/kg-config.json` entry for the matched KG)
 - `{kg_name}` = name key of the matched KG in kg-config.json
 - `{KG_TYPE}` = type field from the KG config entry ("project-local" or "personal")
 - `{categories}` = categories array from the KG config entry
+
+After the upgrade-inspector completes, continue to section 1d (Platform config check) and 1f (legacy migration) below.
+
+### Option 3: Re-initialize
+
+Proceed to the re-initialization flow (existing behavior — archive first, then wizard).
+
+### Option 4: Cancel
+
+Exit immediately. Do not create or modify any files. Confirm to the user: "No changes made."
 
 #### 1d. Platform config check
 
@@ -852,12 +881,6 @@ TOTAL_MB=$((TOTAL_KB / 1024))
 - If total ≤ 10 MB or no archive directories exist: silent (no output).
 
 ---
-
-### Options 2–4
-
-- **Option 2 (Create new):** Proceed to the full wizard (Step 1 below) with a different name.
-- **Option 3 (Re-initialize):** Run the full wizard but pre-populate answers from the existing config. Warn that this will reset categories and git strategy. Do NOT delete existing lessons or decisions.
-- **Option 4 (Cancel):** Exit with no changes.
 
 ---
 
