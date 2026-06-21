@@ -28,6 +28,17 @@ On every release, sync ALL of the following — do not stop after version files 
 - **Why:** during v0.2.1-beta, root CHANGELOG.md was updated but docs/CHANGELOG.md was forgotten, leaving the public docs site showing a changelog that stopped at v0.1.2-beta
 - **Source:** [Dual Changelog Both Must Be Updated](lessons-learned/process/Lessons_Learned_Dual_Changelog_Both_Must_Be_Updated.md)
 
+### README Version-Section Lifecycle
+
+When advancing to a new `v0.X.x` generation (e.g., v0.5.x → v0.6.x), condense the previous generation's Feature Highlights section to a summary block:
+- Replace all individual sub-version entries with 6–8 bullets covering the generation's key themes
+- Add a date-range header: `**v0.(X-1).x Feature Highlights** *(YYYY-MM-DD to YYYY-MM-DD)*`
+- Close with: `*Full per-version detail in [CHANGELOG.md](CHANGELOG.md).*`
+- Keep the new current generation fully expanded (individual version entries)
+- Pattern reference: see how `v0.4.x` and `v0.3.x` are formatted in README.md
+
+- **Why:** v0.5.x was left fully expanded when v0.6.x launched — ~100 lines of sub-version detail that belongs in CHANGELOG only. Required manual correction after user noticed.
+
 ### Footer Version Grep
 
 Grep for major.minor prefix (e.g., `0\.2\.`) not the exact prior version string — footers may use a shorter format and silently miss an exact-version grep

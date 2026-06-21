@@ -5,6 +5,12 @@
 
 ---
 
+## When advancing to a new v0.X.x generation (minor version bump)
+
+- Apply: `rules.md § Version & Release > README Version-Section Lifecycle`
+- Gate: condense the previous generation's Feature Highlights section to a summary block **before committing the version bump**
+- Check: old generation section should have a date-range header, 6–8 summary bullets, and a CHANGELOG link — not individual sub-version entries
+
 ## Before bumping the version / on any release
 
 - Apply: `rules.md § Version & Release > Version Files` — sync all 6 files before committing version bump
