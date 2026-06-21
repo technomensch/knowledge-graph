@@ -1,6 +1,6 @@
 {
   "name": "@knowledge-graph-plugin/mcp-server",
-  "version": "0.6.8",
+  "version": "0.6.9",
   "description": "MCP server for Knowledge Management Graph — cross-platform data layer for knowledge capture, search, and management",
   "main": "dist/index.js",
   "bin": {

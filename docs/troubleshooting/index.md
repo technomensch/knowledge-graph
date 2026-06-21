@@ -99,9 +99,9 @@ v0.5.10.7 renamed `core/default-templates/knowledge/` to `core/default-templates
 
 *Starter relocation — move starters out of live dirs:*
 ```bash
-mkdir -p /path/to/kg/knowledge/templates
+mkdir -p /path/to/kg/templates
 for f in lessons-learned/lesson-template.md decisions/ADR-template.md sessions/session-template.md knowledge/entry-template.md; do
-  [ -f "/path/to/kg/$f" ] && mv "/path/to/kg/$f" "/path/to/kg/knowledge/templates/$(basename "$f")"
+  [ -f "/path/to/kg/$f" ] && mv "/path/to/kg/$f" "/path/to/kg/templates/$(basename "$f")"
 done
 ```
 
