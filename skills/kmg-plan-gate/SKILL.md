@@ -1,3 +1,7 @@
+---
+name: kmg-plan-gate
+description: Enforce user approval gates after superpowers planning and execution skills complete
+---
 
 # Skill: kmg-plan-gate
 

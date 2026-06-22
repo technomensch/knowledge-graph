@@ -6,7 +6,7 @@ CONFIG_PATH="$HOME/.claude/kg-config.json"
 
 # Claude Code Stop hooks require hookSpecificOutput format; Codex requires {"decision":"continue"}.
 # Gemini has no Stop hook. Select output by CLAUDECODE env var (set only by Claude Code).
-trap '[[ -n "${CLAUDECODE:-}" ]] && echo "{\"hookSpecificOutput\": {\"hookEventName\": \"Stop\"}}" || echo "{\"decision\": \"continue\"}"' EXIT
+trap 'if [ -n "${CLAUDECODE:-}" ]; then echo "{\"hookSpecificOutput\": {\"hookEventName\": \"Stop\"}}"; else echo "{\"decision\": \"continue\"}"; fi' EXIT
 
 # Color codes
 RED='\033[0;31m'
@@ -115,7 +115,7 @@ fi
 LESSON_MSG=""
 LESSONS_DIR="$KG_PROJECT_ROOT/knowledge/lessons-learned"
 
-if command -v git &>/dev/null && [ -d "$KG_PROJECT_ROOT/.git" ]; then
+if command -v git >/dev/null 2>&1 && [ -d "$KG_PROJECT_ROOT/.git" ]; then
     RECENT_COMMITS="$(git -C "$KG_PROJECT_ROOT" log -5 --format="%s" 2>/dev/null)"
     LESSON_KEYWORD_FOUND=false
 
@@ -146,11 +146,11 @@ HAS_ITEMS=false
 
 if [ "$HAS_ITEMS" = true ]; then
     echo "" >&2
-    echo -e "${BLUE}Before you go —${NC}" >&2
+    printf '%b\n' "${BLUE}Before you go —${NC}" >&2
     echo "" >&2
-    [ -n "$OPEN_PLAN_MSG" ] && echo -e "${YELLOW}$OPEN_PLAN_MSG${NC}" >&2
-    [ -n "$DRAFT_ADR_MSG" ] && echo -e "${YELLOW}$DRAFT_ADR_MSG${NC}" >&2
-    [ -n "$LESSON_MSG" ] && echo -e "${YELLOW}$LESSON_MSG${NC}" >&2
+    [ -n "$OPEN_PLAN_MSG" ] && printf '%b\n' "${YELLOW}$OPEN_PLAN_MSG${NC}" >&2
+    [ -n "$DRAFT_ADR_MSG" ] && printf '%b\n' "${YELLOW}$DRAFT_ADR_MSG${NC}" >&2
+    [ -n "$LESSON_MSG" ] && printf '%b\n' "${YELLOW}$LESSON_MSG${NC}" >&2
     echo "" >&2
     if [ "$SNAPSHOT_TODAY" = true ]; then
         echo "You have a session snapshot from today — run /kmgraph:kmg-session-summary to complete the wrap-up." >&2
@@ -160,9 +160,9 @@ if [ "$HAS_ITEMS" = true ]; then
     echo "" >&2
 else
     if [ "$SNAPSHOT_TODAY" = true ]; then
-        echo -e "${GREEN}✅ Session snapshot taken. Run /kmgraph:kmg-session-summary to finalize the wrap-up.${NC}" >&2
+        printf '%b\n' "${GREEN}✅ Session snapshot taken. Run /kmgraph:kmg-session-summary to finalize the wrap-up.${NC}" >&2
     else
-        echo -e "${GREEN}✅ Good stopping point. /kmgraph:kmg-session-summary if you'd like a summary.${NC}" >&2
+        printf '%b\n' "${GREEN}✅ Good stopping point. /kmgraph:kmg-session-summary if you'd like a summary.${NC}" >&2
     fi
 fi
 

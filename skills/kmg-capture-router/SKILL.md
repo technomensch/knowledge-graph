@@ -1,3 +1,7 @@
+---
+name: kmg-capture-router
+description: Route capture-that / remember-that requests to the correct destination via auto-detection
+---
 
 # Skill: kmg-capture-router
 

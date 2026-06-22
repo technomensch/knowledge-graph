@@ -1,3 +1,7 @@
+---
+name: kmg-knowledge-graph-usage
+description: Provide orientation to the Knowledge Graph system architecture and guidance for knowledge capture
+---
 
 # Knowledge Graph Usage Guidance
 

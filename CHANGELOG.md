@@ -3,6 +3,13 @@
 
 All notable changes to the Knowledge Plugin will be documented in this file.
 
+## [0.6.10] — 2026-06-22
+
+### Fixed
+
+- **Skills broken in Codex (all 15)** — All `SKILL.md` files were missing YAML frontmatter, causing Codex to reject them with `⚠ missing YAML frontmatter delimited by ---`. Added `name` + `description` frontmatter block to all 15 skills. Skills are now fully functional in Codex.
+- **Stop hook POSIX incompatibility** — `session-end-prompt.sh` used two bash-only constructs (`[[` in EXIT trap, `&>` redirection) that fail when invoked under `sh`. Replaced with POSIX equivalents (`[`, `>/dev/null 2>&1`). Hook now passes `sh -n` and runs correctly under `sh`.
+
 ## [0.6.9] — 2026-06-21
 
 ### Fixed

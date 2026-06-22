@@ -1,3 +1,7 @@
+---
+name: kmg-docs-impact-scan
+description: Fires on pre-ship signals to scan for docs affected by code changes
+---
 
 ## When This Applies
 

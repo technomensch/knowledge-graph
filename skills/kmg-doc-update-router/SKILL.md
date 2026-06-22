@@ -1,3 +1,7 @@
+---
+name: kmg-doc-update-router
+description: Intercept explicit doc-update requests and route to the correct command
+---
 
 # Skill: kmg-doc-update-router
 

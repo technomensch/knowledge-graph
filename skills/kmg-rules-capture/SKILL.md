@@ -1,3 +1,7 @@
+---
+name: kmg-rules-capture
+description: Detect implicit mid-session behavioral corrections and route to the correct rules file
+---
 
 # Skill: kmg-rules-capture
 

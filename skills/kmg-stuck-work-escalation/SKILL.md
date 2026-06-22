@@ -1,3 +1,7 @@
+---
+name: kmg-stuck-work-escalation
+description: Escalate stuck work using the Plan Protocol thresholds before switching tactics
+---
 
 Before starting, read `~/.kmgraph/rules.md` — Plan Protocol § Stuck-Work Escalation for thresholds, scope rules, and exit paths.
 
