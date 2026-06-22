@@ -1,3 +1,7 @@
+---
+name: kmg-session-wrap
+description: Prompt for session summary when user indicates they are stopping work or approaching context limits
+---
 
 # Skill: kmg-session-wrap
 

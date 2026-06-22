@@ -1,3 +1,7 @@
+---
+name: kmg-brainstorm-recall
+description: Ensure the knowledge graph is consulted before any recommendation is made
+---
 
 # Skill: kmg-brainstorm-recall
 

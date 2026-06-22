@@ -1,3 +1,7 @@
+---
+name: kmg-update-profile
+description: Detect when the user asks to update their profile and route changes to all three profile files
+---
 
 # Skill: kmg-update-profile
 

@@ -1,3 +1,7 @@
+---
+name: kmg-execute-plan
+description: Enforce zero-deviation plan execution when user invokes plan implementation
+---
 
 # Skill: kmg-execute-plan
 

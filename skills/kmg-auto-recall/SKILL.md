@@ -1,3 +1,7 @@
+---
+name: kmg-auto-recall
+description: Auto-invoke knowledge graph search when user asks about project history, past decisions, or previously solved problems
+---
 
 # Skill: kmg-auto-recall
 

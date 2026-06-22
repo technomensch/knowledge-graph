@@ -1,3 +1,7 @@
+---
+name: kmg-sidebar-update
+description: Fires when a docs file is moved or renamed to keep sidebar navigation in sync
+---
 
 ## When This Applies
 

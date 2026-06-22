@@ -1,3 +1,7 @@
+---
+name: kmg-lesson-capture
+description: Auto-capture lessons when user solves complex bugs, makes breakthroughs, or completes debugging sessions
+---
 
 # Skill: kmg-lesson-capture
 
