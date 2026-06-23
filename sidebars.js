@@ -111,7 +111,7 @@ const sidebars = {
 
     {type: 'html', value: '<hr class="sidebar-divider" style="margin:8px 16px;" />'},
 
-    {type: 'doc', id: 'troubleshooting/troubleshooting', label: '🔧 Troubleshooting'},
+    {type: 'doc', id: 'troubleshooting/index', label: '🔧 Troubleshooting'},
     {
       type: 'link',
       label: '📓 Changelog',
