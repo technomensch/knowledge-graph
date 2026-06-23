@@ -1,0 +1,1150 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-reference/command-guide" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.10.1">
+<title data-rh="true">Command Guide | Knowledge Management Graph</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://technomensch.github.io/knowledge-graph/reference/reference-command-guide"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Command Guide | Knowledge Management Graph"><meta data-rh="true" name="description" content="Version 2026-04-22"><meta data-rh="true" property="og:description" content="Version 2026-04-22"><link data-rh="true" rel="icon" href="/knowledge-graph/img/square.png"><link data-rh="true" rel="canonical" href="https://technomensch.github.io/knowledge-graph/reference/reference-command-guide"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/reference/reference-command-guide" hreflang="en"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/reference/reference-command-guide" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"📋 Commands","item":"https://technomensch.github.io/knowledge-graph/reference/reference-command-guide"}]}</script><link rel="alternate" type="application/rss+xml" href="/knowledge-graph/docs-updates/rss.xml" title="KMGraph Docs Updates RSS Feed">
+<link rel="alternate" type="application/atom+xml" href="/knowledge-graph/docs-updates/atom.xml" title="KMGraph Docs Updates Atom Feed"><link rel="stylesheet" href="/knowledge-graph/assets/css/styles.0b853dc6.css">
+<script src="/knowledge-graph/assets/js/runtime~main.969abfb0.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/main.714579a6.js" defer="defer"></script>
+</head>
+<body>
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||"dark"),document.documentElement.setAttribute("data-theme-choice",t||"dark")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/knowledge-graph/"><div class="navbar__logo"><img src="/knowledge-graph/img/avatar.png" alt="Staying in Sync" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/knowledge-graph/img/avatar.png" alt="Staying in Sync" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate">KMGraph</b></a><a class="navbar__item navbar__link" href="/knowledge-graph/quickstart">Getting Started</a><a class="navbar__item navbar__link" href="/knowledge-graph/CONCEPTS">Concepts</a><a class="navbar__item navbar__link" href="/knowledge-graph/COMMAND-GUIDE">Commands</a><a class="navbar__item navbar__link" href="/knowledge-graph/CONFIGURATION">Configuration</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/technomensch/knowledge-graph" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link header-github-link" aria-label="GitHub repository"></a><a href="https://www.linkedin.com/in/marckaplan/" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link header-linkedin-link" aria-label="LinkedIn profile"></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="system mode" aria-label="Switch between dark and light mode (currently system mode)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"><div>Loading Search...</div></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><aside class="theme-doc-sidebar-container docSidebarContainer_YfHR"><div class="sidebarViewport_aRkj"><div class="sidebar_njMd"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_SIkG"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/knowledge-graph/index"><span title="🏠 Home" class="linkLabel_WmDU">🏠 Home</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/knowledge-graph/quickstart"><span title="⚡ Quickstart (5 min)" class="linkLabel_WmDU">⚡ Quickstart (5 min)</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/knowledge-graph/install"><span title="📦 Installation" class="linkLabel_WmDU">📦 Installation</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" href="/knowledge-graph/reference/reference-command-guide"><span title="📋 Commands" class="linkLabel_WmDU">📋 Commands</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><hr class="sidebar-divider" style="margin:8px 16px;"></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist" href="/knowledge-graph/pillars/capturing/pillars-capturing-index"><span title="📥 Capturing" class="categoryLinkLabel_W154">📥 Capturing</span></a><button aria-label="Collapse sidebar category &#x27;📥 Capturing&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/capturing/pillars-capturing-capture-lessons-learned"><span title="Capture Lessons Learned" class="linkLabel_WmDU">Capture Lessons Learned</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/capturing/pillars-capturing-architecture-decisions"><span title="Architecture Decisions" class="linkLabel_WmDU">Architecture Decisions</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/capturing/pillars-capturing-capture-patterns"><span title="Capture Patterns" class="linkLabel_WmDU">Capture Patterns</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/capturing/pillars-capturing-document-meta-issues"><span title="Document Meta-Issues" class="linkLabel_WmDU">Document Meta-Issues</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/capturing/pillars-capturing-what-to-capture"><span title="What to Capture" class="linkLabel_WmDU">What to Capture</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist" href="/knowledge-graph/pillars/recalling/pillars-recalling-index"><span title="🔍 Recalling" class="categoryLinkLabel_W154">🔍 Recalling</span></a><button aria-label="Collapse sidebar category &#x27;🔍 Recalling&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/recalling/pillars-recalling-search-the-graph"><span title="Search the Graph" class="linkLabel_WmDU">Search the Graph</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/recalling/pillars-recalling-session-memory"><span title="Session Memory" class="linkLabel_WmDU">Session Memory</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/recalling/pillars-recalling-linking-entries"><span title="Linking Entries" class="linkLabel_WmDU">Linking Entries</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist" href="/knowledge-graph/pillars/organizing/pillars-organizing-index"><span title="🗂️ Organizing" class="categoryLinkLabel_W154">🗂️ Organizing</span></a><button aria-label="Collapse sidebar category &#x27;🗂️ Organizing&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/organizing/pillars-organizing-personal-vs-project"><span title="Personal vs. Project" class="linkLabel_WmDU">Personal vs. Project</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/organizing/pillars-organizing-multi-kg-workflows"><span title="Multi-KG Workflows" class="linkLabel_WmDU">Multi-KG Workflows</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/organizing/pillars-organizing-graph-configuration"><span title="Graph Configuration" class="linkLabel_WmDU">Graph Configuration</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/organizing/pillars-organizing-backfill"><span title="Backfill" class="linkLabel_WmDU">Backfill</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/organizing/pillars-organizing-sanitize-before-sharing"><span title="Sanitize Before Sharing" class="linkLabel_WmDU">Sanitize Before Sharing</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist" href="/knowledge-graph/pillars/portability/pillars-portability-index"><span title="🌐 Portability" class="categoryLinkLabel_W154">🌐 Portability</span></a><button aria-label="Collapse sidebar category &#x27;🌐 Portability&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/portability/pillars-portability-your-ai-profile"><span title="Your AI Profile" class="linkLabel_WmDU">Your AI Profile</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/portability/pillars-portability-sync-across-machines"><span title="Sync Across Machines" class="linkLabel_WmDU">Sync Across Machines</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/portability/pillars-portability-use-in-cursor"><span title="Use in Cursor" class="linkLabel_WmDU">Use in Cursor</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/portability/pillars-portability-migrate-claude-gemini"><span title="Migrate Claude to Gemini" class="linkLabel_WmDU">Migrate Claude to Gemini</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/portability/pillars-portability-integrate-notebooklm"><span title="Integrate NotebookLM" class="linkLabel_WmDU">Integrate NotebookLM</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/portability/pillars-portability-integrate-notion"><span title="Integrate Notion" class="linkLabel_WmDU">Integrate Notion</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/portability/pillars-portability-integrate-obsidian"><span title="Integrate Obsidian" class="linkLabel_WmDU">Integrate Obsidian</span></a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist" href="/knowledge-graph/pillars/tailoring/pillars-tailoring-index"><span title="⚙️ Tailoring" class="categoryLinkLabel_W154">⚙️ Tailoring</span></a><button aria-label="Collapse sidebar category &#x27;⚙️ Tailoring&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/tailoring/pillars-tailoring-customize-hooks"><span title="Customize Hooks" class="linkLabel_WmDU">Customize Hooks</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/tailoring/pillars-tailoring-customize-templates"><span title="Customize Templates" class="linkLabel_WmDU">Customize Templates</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/tailoring/pillars-tailoring-custom-rules"><span title="Custom Rules" class="linkLabel_WmDU">Custom Rules</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/knowledge-graph/pillars/tailoring/pillars-tailoring-automation-layer"><span title="Automation Layer" class="linkLabel_WmDU">Automation Layer</span></a></li></ul></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><hr class="sidebar-divider" style="margin:8px 16px;"></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/knowledge-graph/reference/reference-commands"><span title="📚 Reference" class="categoryLinkLabel_W154">📚 Reference</span></a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/knowledge-graph/concepts/concepts-why-kmgraph"><span title="💡 Concepts" class="categoryLinkLabel_W154">💡 Concepts</span></a></div></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1"><hr class="sidebar-divider" style="margin:8px 16px;"></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/knowledge-graph/troubleshooting/troubleshooting-index"><span title="🔧 Troubleshooting" class="linkLabel_WmDU">🔧 Troubleshooting</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a href="https://github.com/technomensch/knowledge-graph/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer" class="menu__link menuExternalLink_NmtK"><span title="📓 Changelog" class="linkLabel_WmDU">📓 Changelog</span><svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/knowledge-graph/glossary"><span title="📖 Glossary" class="linkLabel_WmDU">📖 Glossary</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/knowledge-graph/style-guide"><span title="🤝 Contributing" class="categoryLinkLabel_W154">🤝 Contributing</span></a></div></li></ul></nav></div></div></aside><main class="docMainContainer_TBSr"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_Z_bl" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">📋 Commands</span></li></ul></nav><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>Command Guide</h1></header><p><strong>Version:</strong> 0.5.2 | <strong>Updated:</strong> 2026-04-22</p>
+<blockquote>
+<p><strong>Claude Code only:</strong> The <code>/kmgraph:</code> prefix requires Claude Code with this plugin installed. Other IDEs access equivalent functionality through MCP tools — see <a class="" href="/knowledge-graph/install">INSTALL.md</a> for platform-specific setup.</p>
+</blockquote>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="about-commands-on-other-platforms">About Commands on Other Platforms<a href="#about-commands-on-other-platforms" class="hash-link" aria-label="Direct link to About Commands on Other Platforms" title="Direct link to About Commands on Other Platforms" translate="no">​</a></h2>
+<p>These commands are designed as reference documentation for any LLM:</p>
+<ul>
+<li class=""><strong>Claude Code:</strong> Invoke as slash commands (e.g., <code>/kmgraph:kmg-capture-lesson</code>)</li>
+<li class=""><strong>Other platforms:</strong> Copy the command prompt into your LLM. Substitute <code>${CLAUDE_PLUGIN_ROOT}</code> with your actual project path</li>
+<li class=""><strong>No-tool LLMs:</strong> Commands serve as workflow documentation — follow steps manually</li>
+</ul>
+<p>Commands work across platforms, but full automation is Claude Code-specific.</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="quick-navigation">Quick Navigation<a href="#quick-navigation" class="hash-link" aria-label="Direct link to Quick Navigation" title="Direct link to Quick Navigation" translate="no">​</a></h2>
+<ul>
+<li class=""><a href="#i-want-to" class="">I Want To...</a> — Task-based command finder</li>
+<li class=""><a href="#essential-commands" class="">Essential Commands</a> — Start here</li>
+<li class=""><a href="#intermediate-commands" class="">Intermediate Commands</a> — Daily use</li>
+<li class=""><a href="#advanced-commands" class="">Advanced Commands</a> — Power features</li>
+<li class=""><a href="#command-comparison" class="">Command Comparison</a> — When to use which</li>
+<li class=""><a href="#troubleshooting" class="">Troubleshooting</a> — Common problems and fixes</li>
+<li class=""><a href="#related-documentation" class="">Related Documentation</a> — Links to other guides</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="i-want-to">I Want To...<a href="#i-want-to" class="hash-link" aria-label="Direct link to I Want To..." title="Direct link to I Want To..." translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="getting-started">Getting Started<a href="#getting-started" class="hash-link" aria-label="Direct link to Getting Started" title="Direct link to Getting Started" translate="no">​</a></h3>
+<ul>
+<li class=""><strong>Set up a new knowledge graph</strong> → <code>/kmgraph:kmg-init</code></li>
+<li class=""><strong>See what&#x27;s in my knowledge graph</strong> → <code>/kmgraph:kmg-status</code></li>
+<li class=""><strong>Document what I just learned</strong> → <code>/kmgraph:kmg-capture-lesson</code></li>
+<li class=""><strong>Find something I documented before</strong> → <code>/kmgraph:kmg-recall &quot;search query&quot;</code></li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="daily-use">Daily Use<a href="#daily-use" class="hash-link" aria-label="Direct link to Daily Use" title="Direct link to Daily Use" translate="no">​</a></h3>
+<ul>
+<li class=""><strong>Sync lessons to the knowledge graph</strong> → <code>/kmgraph:kmg-update-graph</code></li>
+<li class=""><strong>Summarize this conversation</strong> → <code>/kmgraph:kmg-session-summary</code></li>
+<li class=""><strong>Add a new category (e.g., security, ml-ops)</strong> → <code>/kmgraph:kmg-add-category</code></li>
+<li class=""><strong>See my chat history</strong> → <code>/kmgraph:kmg-extract-chat</code></li>
+<li class=""><strong>Update plugin documentation</strong> → <code>/kmgraph:kmg-update-doc --user-facing</code></li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="team-collaboration">Team Collaboration<a href="#team-collaboration" class="hash-link" aria-label="Direct link to Team Collaboration" title="Direct link to Team Collaboration" translate="no">​</a></h3>
+<ul>
+<li class=""><strong>Share knowledge safely</strong> → <code>/kmgraph:kmg-config-sanitization</code></li>
+<li class=""><strong>Check for sensitive data before sharing</strong> → <code>/kmgraph:kmg-check-sensitive</code></li>
+<li class=""><strong>Link lessons to GitHub issues</strong> → <code>/kmgraph:kmg-link-issue</code></li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="project-transitions--onboarding">Project Transitions &amp; Onboarding<a href="#project-transitions--onboarding" class="hash-link" aria-label="Direct link to Project Transitions &amp; Onboarding" title="Direct link to Project Transitions &amp; Onboarding" translate="no">​</a></h3>
+<ul>
+<li class=""><strong>Create comprehensive handoff documentation</strong> → <code>/kmgraph:kmg-handoff</code></li>
+<li class=""><strong>Set up for new developer</strong> → <code>/kmgraph:kmg-setup-platform</code></li>
+</ul>
+<blockquote>
+<p><strong>Note</strong>: The term &quot;issues&quot; in this guide refers to GitHub Issues — a platform feature for tracking bugs, feature requests, and enhancements. This is distinct from &quot;knowledge graph issues&quot; (meta-issues) or &quot;lessons learned issues&quot; (problems documented in the KG).</p>
+</blockquote>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="working-with-multiple-knowledge-graphs">Working with Multiple Knowledge Graphs<a href="#working-with-multiple-knowledge-graphs" class="hash-link" aria-label="Direct link to Working with Multiple Knowledge Graphs" title="Direct link to Working with Multiple Knowledge Graphs" translate="no">​</a></h3>
+<ul>
+<li class=""><strong>View all configured knowledge graphs</strong> → <code>/kmgraph:kmg-list</code></li>
+<li class=""><strong>Switch to a different knowledge graph</strong> → <code>/kmgraph:kmg-switch</code></li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="complex-problem-tracking">Complex Problem Tracking<a href="#complex-problem-tracking" class="hash-link" aria-label="Direct link to Complex Problem Tracking" title="Direct link to Complex Problem Tracking" translate="no">​</a></h3>
+<ul>
+<li class=""><strong>Track a multi-attempt bug</strong> → <code>/kmgraph:kmg-meta-issue</code></li>
+<li class=""><strong>Start structured issue tracking with documentation and Git branch</strong> → <code>/kmgraph:kmg-start-issue-tracking</code></li>
+<li class=""><strong>Sync progress to plans and GitHub</strong> → <code>/kmgraph:kmg-update-issue-plan</code></li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="memory-management">Memory Management<a href="#memory-management" class="hash-link" aria-label="Direct link to Memory Management" title="Direct link to Memory Management" translate="no">​</a></h3>
+<ul>
+<li class=""><strong>Run the full sync pipeline in one command</strong> → <code>/kmgraph:kmg-sync-all</code></li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="browse-commands-by-category">Browse Commands by Category<a href="#browse-commands-by-category" class="hash-link" aria-label="Direct link to Browse Commands by Category" title="Direct link to Browse Commands by Category" translate="no">​</a></h2>
+<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="setup--configuration">Setup &amp; Configuration<a href="#setup--configuration" class="hash-link" aria-label="Direct link to Setup &amp; Configuration" title="Direct link to Setup &amp; Configuration" translate="no">​</a></h4>
+<p>Get the knowledge graph running and configure how it works.</p>
+<ul>
+<li class=""><a href="#-kmgraphinit" class="">🟢 <code>/kmgraph:kmg-init</code></a> — Initialize a new knowledge graph</li>
+<li class=""><a href="#-kmgraphinit-personal-kg" class="">🟡 <code>/kmgraph:kmg-init-personal-kg</code></a> — Create personal KG for cross-project lessons</li>
+<li class=""><a href="#-kmgraphlist" class="">🟡 <code>/kmgraph:kmg-list</code></a> — View all configured knowledge graphs</li>
+<li class=""><a href="#-kmgraphswitch" class="">🟡 <code>/kmgraph:kmg-switch</code></a> — Switch to a different knowledge graph</li>
+<li class=""><a href="#-kmgraphadd-category" class="">🟡 <code>/kmgraph:kmg-add-category</code></a> — Add custom categories</li>
+<li class=""><a href="#-kmgraphconfig-sanitization" class="">🟡 <code>/kmgraph:kmg-config-sanitization</code></a> — Set up safety features for team sharing</li>
+</ul>
+<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="capture--document">Capture &amp; Document<a href="#capture--document" class="hash-link" aria-label="Direct link to Capture &amp; Document" title="Direct link to Capture &amp; Document" translate="no">​</a></h4>
+<p>Document lessons, capture history, and summarize sessions.</p>
+<ul>
+<li class=""><a href="#-kmgraphcapture-lesson" class="">🟢 <code>/kmgraph:kmg-capture-lesson</code></a> — Capture problems solved and patterns discovered</li>
+<li class=""><a href="#-kmgraphextract-chat" class="">🟡 <code>/kmgraph:kmg-extract-chat</code></a> — Export chat history to markdown</li>
+<li class=""><a href="#-kmgraphsession-summary" class="">🟡 <code>/kmgraph:kmg-session-summary</code></a> — Summarize important work sessions</li>
+</ul>
+<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="search--sync">Search &amp; Sync<a href="#search--sync" class="hash-link" aria-label="Direct link to Search &amp; Sync" title="Direct link to Search &amp; Sync" translate="no">​</a></h4>
+<p>Find knowledge and keep the graph synchronized.</p>
+<ul>
+<li class=""><a href="#-kmgraphstatus" class="">🟢 <code>/kmgraph:kmg-status</code></a> — Check current knowledge graph status</li>
+<li class=""><a href="#-kmgraphrecall" class="">🟢 <code>/kmgraph:kmg-recall</code></a> — Search across all knowledge entries</li>
+<li class=""><a href="#-kmgraphupdate-graph" class="">🟡 <code>/kmgraph:kmg-update-graph</code></a> — Extract lessons into knowledge graph</li>
+<li class=""><a href="#-kmgraphupdate-doc" class="">🟡 <code>/kmgraph:kmg-update-doc</code></a> — Update documentation with changes</li>
+<li class=""><a href="#-kmgraphsync-all" class="">🔴 <code>/kmgraph:kmg-sync-all</code></a> — Run complete synchronization pipeline</li>
+</ul>
+<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="team--sharing">Team &amp; Sharing<a href="#team--sharing" class="hash-link" aria-label="Direct link to Team &amp; Sharing" title="Direct link to Team &amp; Sharing" translate="no">​</a></h4>
+<p>Share knowledge safely with team members.</p>
+<ul>
+<li class=""><a href="#-kmgraphcheck-sensitive" class="">🟡 <code>/kmgraph:kmg-check-sensitive</code></a>   — Scan for sensitive data before sharing</li>
+<li class=""><a href="#-kmgraphlink-issue" class="">🔴 <code>/kmgraph:kmg-link-issue</code></a> — Connect lessons to GitHub issues</li>
+</ul>
+<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="advanced-issues">Advanced Issues<a href="#advanced-issues" class="hash-link" aria-label="Direct link to Advanced Issues" title="Direct link to Advanced Issues" translate="no">​</a></h4>
+<p>Track complex, multi-attempt problems systematically.</p>
+<ul>
+<li class=""><a href="#-kmgraphmeta-issue" class="">🔴 <code>/kmgraph:kmg-meta-issue</code></a> — Track multi-attempt bugs and features</li>
+<li class=""><a href="#-kmgraphstart-issue-tracking" class="">🔴 <code>/kmgraph:kmg-start-issue-tracking</code></a> — Systematic issue tracking with Git branches</li>
+<li class=""><a href="#-kmgraphupdate-issue-plan" class="">🔴 <code>/kmgraph:kmg-update-issue-plan</code></a> — Sync progress with GitHub and plans</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="essential-commands">Essential Commands<a href="#essential-commands" class="hash-link" aria-label="Direct link to Essential Commands" title="Direct link to Essential Commands" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-init">🟢 <code>/kmgraph:kmg-init</code><a href="#-kmgraphkmg-init" class="hash-link" aria-label="Direct link to -kmgraphkmg-init" title="Direct link to -kmgraphkmg-init" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: Set up a structured knowledge management system for the active project. Lessons, decisions, and patterns land in a searchable, git-tracked knowledge graph so nothing valuable gets lost between sessions.</p>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li class="">First time setup on any project</li>
+<li class="">Starting a new project that needs its own knowledge graph</li>
+<li class="">Creating a separate KG for different work (e.g., personal vs. team)</li>
+<li class=""><strong>After a plugin update</strong> — verify/upgrade existing KG to current version</li>
+</ul>
+<p><strong>What it does</strong>:</p>
+<ol>
+<li class="">Asks for KG name and storage location (project-local, personal, or custom path)</li>
+<li class="">Prompts for category selection (architecture, process, patterns, debugging, or custom)</li>
+<li class="">Asks for optional custom prefixes per category</li>
+<li class="">Creates directory structure (<code>knowledge/</code>, <code>lessons-learned/</code>, <code>decisions/</code>, <code>sessions/</code>, <code>chat-history/</code>)</li>
+<li class="">Copies templates from the plugin</li>
+<li class="">Offers to create a <strong>personal KG</strong> at <code>~/.kmgraph/</code> for cross-project lessons (see <a href="#-kmgraphinit-personal-kg" class=""><code>/kmgraph:kmg-init-personal-kg</code></a>)</li>
+<li class="">Optionally backfills from existing project context (README, CHANGELOG, lessons, decisions, chat history)</li>
+<li class="">Optionally installs a git post-commit hook for lesson capture suggestions</li>
+<li class="">Updates <code>.gitignore</code> based on chosen git strategy</li>
+<li class="">Registers the KG in <code>~/.claude/kg-config.json</code> and sets it as active</li>
+</ol>
+<p><strong>Time</strong>: 2-3 minutes</p>
+<p><strong>Example</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-init</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Claude asks:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># - What should this knowledge graph be called?</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># - Where should it be stored? (project-local / personal / custom)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># - Which categories do you want to include?</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># - Would you like to backfill from existing project context? (y/N)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">#   (If yes: scans README, CHANGELOG, lessons-learned/, decisions/, chat-history/)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># - Install post-commit hook? (y/n)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># - Git strategy for each category? (commit/ignore)</span><br></div></code></pre></div></div>
+<p><strong>Backfill Feature</strong>:
+When you enable backfill, the system extracts existing knowledge from your project:</p>
+<ul>
+<li class=""><strong>README.md</strong> — Project overview and key concepts</li>
+<li class=""><strong>CHANGELOG.md</strong> — Released features and changes</li>
+<li class=""><strong>lessons-learned/</strong> — Existing lessons (if any)</li>
+<li class=""><strong>decisions/</strong> — Architecture Decision Records</li>
+<li class=""><strong>chat-history/</strong> — Extracted chat logs</li>
+</ul>
+<p>The system presents candidates for your review before creating entries.</p>
+<p><strong>After backfill</strong>: If backfill was used, the knowledge graph now contains a full set of imported content. This is a good time to build the search index so all that content is immediately searchable by relevance. Run <code>/kmgraph:kmg-sync-all</code> and accept the index prompt, or call <code>kg_fts5_rebuild</code> directly from the MCP tool panel.</p>
+<p><strong>Next steps</strong>: Run <code>/kmgraph:kmg-status</code> to verify setup</p>
+<p><strong>Model tier configuration</strong>: As of v0.5.x, init also walks through the model tier system. Tier labels (<code>fast-tier</code>, <code>standard-tier</code>, <code>powerful-tier</code>) replace hardcoded model names (Haiku, Sonnet, Opus and their Gemini equivalents) so rules, commands, and agents stay stable across model version changes and platforms. During init, a <code>platforms[]</code> block is written to <code>knowledge/me.md</code> with a <code>tier_map</code> entry for each detected platform, binding each tier label to a concrete model name. Locally running Ollama (<code>localhost:11434</code>) and LM Studio (<code>localhost:1234</code>) instances are discovered automatically and offered as additional platforms, with host, port, and per-tier model selection captured in the walkthrough. An alias map translates legacy model names (Haiku, Sonnet, Opus, Flash, Pro) to tier labels for backwards compatibility, and unrecognized model names trigger a one-time prompt to assign the name to a tier before dispatch continues.</p>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-init-personal-kg">🟡 <code>/kmgraph:kmg-init-personal-kg</code><a href="#-kmgraphkmg-init-personal-kg" class="hash-link" aria-label="Direct link to -kmgraphkmg-init-personal-kg" title="Direct link to -kmgraphkmg-init-personal-kg" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: Create a personal knowledge graph at <code>~/.kmgraph/</code> for lessons that apply across every project, not just the current one. <code>capture-lesson</code> gains a KG picker and <code>recall</code> searches both automatically.</p>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li class="">After running <code>/kmgraph:kmg-init</code> and skipping the personal KG offer</li>
+<li class="">When you want a dedicated place for workflow lessons, cross-project gotchas, and personal ADRs that apply across all projects, not just the current one</li>
+</ul>
+<p><strong>What it does</strong>:</p>
+<ol>
+<li class="">Creates <code>~/.kmgraph/</code> with standard directory structure</li>
+<li class="">Registers it as <code>type: &quot;personal&quot;</code> with name <code>&quot;personal&quot;</code> in <code>~/.claude/kg-config.json</code></li>
+<li class="">Copies knowledge templates (patterns, gotchas, concepts)</li>
+<li class="">Builds FTS5 search index for the new KG</li>
+<li class="">Does <strong>not</strong> change the active KG — project KG remains active</li>
+</ol>
+<p>After setup:</p>
+<ul>
+<li class=""><code>/kmgraph:kmg-capture-lesson</code> shows a <strong>KG picker</strong> when ≥2 KGs are registered</li>
+<li class=""><code>/kmgraph:kmg-recall</code> searches both project and personal KGs automatically</li>
+</ul>
+<p><strong>Example</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-init-personal-kg</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Claude creates ~/.kmgraph/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Registers &quot;personal&quot; KG (type: personal) in config</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Active KG unchanged</span><br></div></code></pre></div></div>
+<p><strong>Related</strong>: See <a class="" href="/knowledge-graph/pillars/organizing/pillars-organizing-personal-vs-project">Personal vs Project Knowledge</a> for when to use each.</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="cross-reference-formatting-wiki-links">Cross-Reference Formatting (Wiki Links)<a href="#cross-reference-formatting-wiki-links" class="hash-link" aria-label="Direct link to Cross-Reference Formatting (Wiki Links)" title="Direct link to Cross-Reference Formatting (Wiki Links)" translate="no">​</a></h2>
+<p>When you run <code>/kmgraph:kmg-init</code> (Step 1f.2) or <code>/kmgraph:kmg-init-personal-kg</code> (Step 8.1), the system automatically converts cross-references in your knowledge graph to Obsidian wiki link format for seamless navigation in compatible editors.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="supported-formats">Supported Formats<a href="#supported-formats" class="hash-link" aria-label="Direct link to Supported Formats" title="Direct link to Supported Formats" translate="no">​</a></h3>
+<p>The wiki pass applies these auto-linkification patterns:</p>
+<ul>
+<li class=""><strong>Enhancements</strong>: <code>[[ENH-NNN]]</code> (e.g., <code>[[ENH-010]]</code>)</li>
+<li class=""><strong>Architecture Decisions</strong>: <code>[[ADR-NNN-full-title]]</code> (e.g., <code>[[ADR-028-postgres-over-mongodb]]</code>)</li>
+<li class=""><strong>Lessons Learned</strong>: <code>[[Lessons_Learned_X]]</code> (e.g., <code>[[Lessons_Learned_5]]</code>)</li>
+<li class=""><strong>GitHub Issues</strong>: <code>[#NNN](url)</code> format (automatically applied when linking via <code>/kmgraph:kmg-link-issue</code>)</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="when-links-are-applied">When Links Are Applied<a href="#when-links-are-applied" class="hash-link" aria-label="Direct link to When Links Are Applied" title="Direct link to When Links Are Applied" translate="no">​</a></h3>
+<ul>
+<li class="">During initial <code>/kmgraph:kmg-init</code> setup (Step 1f.2: &quot;Apply Obsidian wiki link formatting to cross-references&quot;)</li>
+<li class="">During <code>/kmgraph:kmg-init-personal-kg</code> (Step 8.1: &quot;Applying wiki pass to personal KG&quot;)</li>
+<li class="">Only once — controlled by the <code>wiki_pass_complete</code> config flag to avoid re-running on subsequent setups</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="preview-changes-with---dry-run">Preview Changes with --dry-run<a href="#preview-changes-with---dry-run" class="hash-link" aria-label="Direct link to Preview Changes with --dry-run" title="Direct link to Preview Changes with --dry-run" translate="no">​</a></h3>
+<p>To preview what links will be created without applying them:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-init --dry-run</span><br></div></code></pre></div></div>
+<p>The <code>--dry-run</code> mode shows which files will be modified and what cross-references will be converted, without writing any changes.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="scope--limitations">Scope &amp; Limitations<a href="#scope--limitations" class="hash-link" aria-label="Direct link to Scope &amp; Limitations" title="Direct link to Scope &amp; Limitations" translate="no">​</a></h3>
+<ul>
+<li class=""><strong>5 legacy lesson files</strong> without the <code>Lessons_Learned_</code> prefix are excluded from auto-linking (e.g., <code>lesson-1.md</code>, <code>debug-tip.md</code>). Manual cross-references to these files still work — they are fully searchable and accessible.</li>
+<li class="">Lesson files created <em>after</em> v0.3.3 automatically follow the <code>Lessons_Learned_X</code> naming convention and are auto-linked.</li>
+</ul>
+<p><strong>Related</strong>: For naming conventions and documentation structure, see <a class="" href="/knowledge-graph/style-guide">Style Guide</a>.</p>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-capture-lesson">🟢 <code>/kmgraph:kmg-capture-lesson</code><a href="#-kmgraphkmg-capture-lesson" class="hash-link" aria-label="Direct link to -kmgraphkmg-capture-lesson" title="Direct link to -kmgraphkmg-capture-lesson" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: Identifies lessons while context is still fresh and captures both the problem and how it was solved. By automatically linking lessons to relevant metadata, the record is searchable and reusable across future sessions and projects.</p>
+<blockquote>
+<p><strong>Command refactored in v0.2.1-beta: 710 → 108 lines.</strong> Execution logic delegated to <code>agents/</code> for platform portability. See <a class="" href="/knowledge-graph/concepts/concepts-how-kmgraph-is-organized">CONCEPTS.md § Four-Layer Architecture</a>.</p>
+</blockquote>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li class="">Just solved a problem</li>
+<li class="">Discovered a reusable pattern</li>
+<li class="">Fixed a tricky bug worth remembering</li>
+<li class="">Learned something that future you will need</li>
+</ul>
+<p><strong>What it does</strong>:</p>
+<ol>
+<li class=""><code>{OPTIONAL}</code> Prompts to take a session snapshot before starting to preserve the context at the moment of discovery</li>
+<li class="">Checks for duplicate or similar existing lessons in the existing knowledge graph before proceeding</li>
+<li class="">Asks verification questions to confirm topic, audience, and scope</li>
+<li class="">Auto-detects the category from keywords in the lesson content</li>
+<li class="">Captures git context for the record — branch, commit, PR, and issue number automatically</li>
+<li class="">Wizard captures the following:</li>
+</ol>
+<ul>
+<li class="">problem</li>
+<li class="">root cause</li>
+<li class="">solution</li>
+<li class="">prevention</li>
+</ul>
+<ol start="7">
+<li class="">Creates the lesson file from the standard template with all fields populated</li>
+<li class="">Updates category and chronological indexes</li>
+<li class=""><code>{OPTIONAL}</code> Runs <code>/kmgraph:kmg-update-graph</code> to extract KG entries from the new lesson</li>
+<li class=""><code>{OPTIONAL}</code> Links to a GitHub Issue via <code>/kmgraph:kmg-link-issue</code></li>
+</ol>
+<p><strong>Time</strong>: 5-10 minutes (faster with practice)</p>
+<p><strong>Example</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-capture-lesson                        # → active KG</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-capture-lesson &quot;user level&quot;           # → personal KG (~/.kmgraph/)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-capture-lesson --project              # → current project&#x27;s KG</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-capture-lesson --named=career-ops     # → career-ops KG</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Agent guides you through:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># 1. What problem did you encounter?</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># 2. What was the root cause?</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># 3. How did you solve it?</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># 4. How can this be prevented?</span><br></div></code></pre></div></div>
+<p><strong>Tips</strong>:</p>
+<ul>
+<li class="">Capture while the problem is fresh (don&#x27;t wait)</li>
+<li class="">Include error messages verbatim</li>
+<li class="">Note what DIDN&#x27;T work (helps future you)</li>
+<li class="">Level routing: use &quot;user level&quot; for cross-project patterns; &quot;for this project&quot; for codebase-specific lessons. See <a class="" href="/knowledge-graph/PERSONAL-V-PROJECT.md">Personal vs Project KGs</a> for details.</li>
+<li class="">If the active KG differs from the project&#x27;s own KG, the command stops before writing and asks which graph to use</li>
+</ul>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-status">🟢 <code>/kmgraph:kmg-status</code><a href="#-kmgraphkmg-status" class="hash-link" aria-label="Direct link to -kmgraphkmg-status" title="Direct link to -kmgraphkmg-status" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: Show the health and contents of the active knowledge graph at a glance. File counts, sync timestamps, staleness warnings, and a quick command reference, all without leaving the conversation.</p>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li class="">Verify setup after running <code>/kmgraph:kmg-init</code></li>
+<li class="">See recent lessons at a glance</li>
+<li class="">Check profile file staleness (<code>~/.kmgraph/rules.md</code>, <code>~/.kmgraph/me.md</code>)</li>
+<li class="">Quick health check on the knowledge graph</li>
+</ul>
+<p><strong>What it shows</strong>:</p>
+<ul>
+<li class="">Active KG name and file path</li>
+<li class="">Categories and git strategy</li>
+<li class="">Last sync timestamp</li>
+<li class="">File counts (lessons, KG entries, ADRs, sessions)</li>
+<li class="">Warnings (stale profile files, missing paths)</li>
+<li class="">Quick command reference for common next steps</li>
+</ul>
+<p><strong>Time</strong>: Instant</p>
+<p><strong>Example output</strong>:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">Knowledge Graph Status</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">━━━━━━━━━━━━━━━━━━━━━</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Active KG: my-project</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Location:  /Users/name/projects/my-app/docs/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Categories: architecture, process, patterns, debugging</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Git: selective (architecture/patterns committed, process/debugging gitignored)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Last sync: 2026-02-12 15:45</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Stats:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  Lessons: 12 (3 new since last sync)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  KG Entries: 28 patterns, 6 concepts, 4 gotchas</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  ADRs: 5</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  Sessions: 8</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Quick Commands:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  /kmgraph:kmg-capture-lesson    — Document a lesson</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  /kmgraph:kmg-recall &quot;query&quot;    — Search across all KG</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  /kmgraph:kmg-sync-all          — Run full sync pipeline</span><br></div></code></pre></div></div>
+<p><strong>Tips</strong>: Use the flags <code>--minimal</code> for a one-line summary and <code>--json</code> for machine-readable output.</p>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-recall">🟢 <code>/kmgraph:kmg-recall</code><a href="#-kmgraphkmg-recall" class="hash-link" aria-label="Direct link to -kmgraphkmg-recall" title="Direct link to -kmgraphkmg-recall" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: Search across lessons, decisions, patterns, and sessions in one command. When a personal KG is registered, both knowledge graphs are searched automatically, with source labels on every result.</p>
+<blockquote>
+<p><strong>Command refactored in v0.2.1-beta: 437 → 79 lines.</strong> Execution logic delegated to <code>agents/</code> for platform portability. See <a class="" href="/knowledge-graph/concepts/concepts-how-kmgraph-is-organized">CONCEPTS.md § Four-Layer Architecture</a>.</p>
+</blockquote>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li class="">&quot;I solved this before...&quot;</li>
+<li class="">Looking for a specific pattern or solution</li>
+<li class="">Need to find a past architectural decision</li>
+<li class="">Searching for context on a topic</li>
+</ul>
+<p><strong>What it searches</strong>:</p>
+<p>Dispatches to the recall agent, which searches:</p>
+<ul>
+<li class="">Lessons learned (full text)</li>
+<li class="">Architecture decisions (ADRs)</li>
+<li class="">Knowledge entries (patterns, gotchas, concepts)</li>
+<li class="">Session summaries</li>
+<li class="">Profile files (<code>~/.kmgraph/rules.md</code>, <code>~/.kmgraph/me.md</code>, <code>knowledge/rules.md</code>, <code>knowledge/me.md</code>)</li>
+<li class="">Personal KG (if registered) — automatically included when a personal KG exists</li>
+</ul>
+<p><strong>Multi-KG behavior</strong>: When a personal KG is registered, <code>recall</code> searches both project and personal KGs by default. Results include a source label (<code>[project]</code> or <code>[personal]</code>) so origin is always clear.</p>
+<p><strong>Time</strong>: 1-2 seconds (single KG); 2-4 seconds (multi-KG with FTS5)</p>
+<p><strong>Example</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-recall &quot;database timeout&quot;</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-recall &quot;auth patterns&quot; --scope=all</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-recall &quot;workflow patterns&quot; --scope=personal-only</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Multi-KG result format:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Lessons Learned (3 matches)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># 1. Debugging PostgreSQL Connection Timeouts — [project: my-project]</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># 2. Connection Pool Best Practices — [project: my-project]</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># 3. Database Timeout Patterns — [personal: personal]</span><br></div></code></pre></div></div>
+<p><strong><code>--scope</code> parameter</strong>:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Value</th><th>Behavior</th></tr></thead><tbody><tr><td><code>active</code></td><td>Active KG only (original behavior)</td></tr><tr><td><code>all</code></td><td>Active KG + all registered KGs (auto-default when personal KG exists)</td></tr><tr><td><code>personal-only</code></td><td>Only KGs with <code>type: personal</code></td></tr></tbody></table>
+<p><strong>Level routing</strong>: Scope search to a specific KG without changing the active KG:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Flag / Natural Language</th><th>Searches</th></tr></thead><tbody><tr><td><code>--user</code> / &quot;user level&quot;</td><td>Only <code>~/.kmgraph/</code></td></tr><tr><td><code>--project</code> / &quot;for this project&quot;</td><td>Only current project&#x27;s KG</td></tr><tr><td><code>--named=&lt;kg&gt;</code> / KG name</td><td>Only the named KG</td></tr></tbody></table>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-recall &quot;auth patterns&quot; --user          # personal KG only</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-recall &quot;database timeout&quot; --project    # current project only</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-recall &quot;deployment&quot; --named=devops-kg  # named KG only</span><br></div></code></pre></div></div>
+<p><strong>Search tips</strong>:</p>
+<ul>
+<li class="">Use specific terms (&quot;PostgreSQL timeout&quot; &gt; &quot;database&quot;)</li>
+<li class="">Try synonyms if nothing found</li>
+<li class="">Search by date: <code>/kmgraph:kmg-recall &quot;2024-01&quot;</code></li>
+<li class="">Search by category: <code>/kmgraph:kmg-recall &quot;architecture&quot;</code></li>
+<li class="">Output formats: default (summary), <code>--format=paths</code> (file list), <code>--format=detailed</code> (full context)</li>
+<li class="">Scope override: <code>--scope=active</code> to restrict to project KG only</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="intermediate-commands">Intermediate Commands<a href="#intermediate-commands" class="hash-link" aria-label="Direct link to Intermediate Commands" title="Direct link to Intermediate Commands" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-update-graph">🟡 <code>/kmgraph:kmg-update-graph</code><a href="#-kmgraphkmg-update-graph" class="hash-link" aria-label="Direct link to -kmgraphkmg-update-graph" title="Direct link to -kmgraphkmg-update-graph" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: Takes individual lessons learned and adds them directly into the knowledge graph&#x27;s searchable index. Lessons hold the full narrative; <code>update-graph</code> makes patterns findable in seconds, not minutes.</p>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li class="">After creating or updating lesson-learned documents</li>
+<li class="">When discovering new patterns or best practices</li>
+<li class="">Before completing complex work sessions</li>
+<li class="">Daily or weekly consolidation of captured knowledge</li>
+</ul>
+<p><strong>What it does</strong>:</p>
+<ol>
+<li class="">Identifies new or modified lessons (since last sync or last 24 hours)</li>
+<li class="">Reads each lesson and extracts: title, problem, solution, when-to-use triggers</li>
+<li class="">Checks if a matching KG entry already exists in <code>knowledge/patterns.md</code> (or similar)</li>
+<li class="">Creates new entries or updates existing ones with bidirectional links</li>
+<li class="">Runs data integrity audit on each new entry</li>
+<li class="">Commits KG changes</li>
+</ol>
+<p><strong>Time</strong>: 1-5 minutes depending on number of lessons</p>
+<p><strong>Example</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-update-graph</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-update-graph --lesson=Pattern_Discovery.md    # Process specific lesson</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-update-graph --auto                          # Skip prompts, silent mode</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-update-graph --interactive                    # Review each entry before saving</span><br></div></code></pre></div></div>
+<p><strong>Tips</strong>:</p>
+<ul>
+<li class=""><code>--auto</code> flag is useful when called from other commands (e.g., after <code>/kmgraph:kmg-capture-lesson</code>)</li>
+<li class=""><code>--interactive</code> flag lets you review and edit each extracted entry before saving</li>
+</ul>
+<p><strong>Cleaner conversations</strong>: When the context-mode plugin is installed and there are 10 or more lessons to process, <code>update-graph</code> reads the lesson files in a background process instead of inline. This keeps the conversation cleaner without changing any results. Falls back automatically if context-mode is not installed.</p>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-add-category">🟡 <code>/kmgraph:kmg-add-category</code><a href="#-kmgraphkmg-add-category" class="hash-link" aria-label="Direct link to -kmgraphkmg-add-category" title="Direct link to -kmgraphkmg-add-category" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: Add a new category to the active knowledge graph. Creates the directory structure, index file, and git strategy in one step, so the new category is ready to capture lessons immediately.</p>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li class="">Need to track a new domain (e.g., security, ml-ops, devops)</li>
+<li class="">Team-specific categorization needed beyond defaults</li>
+<li class="">Organizing lessons into more granular groups</li>
+</ul>
+<p><strong>What it does</strong>:</p>
+<ol>
+<li class="">Prompts for category name (or accepts from command argument)</li>
+<li class="">Asks for optional prefix (e.g., &quot;sec-&quot; for security lessons)</li>
+<li class="">Asks for git strategy (commit or ignore)</li>
+<li class="">Creates <code>lessons-learned/[category]/</code> directory</li>
+<li class="">Creates <code>knowledge/[category].md</code> KG entry file from template</li>
+<li class="">Updates <code>kg-config.json</code> with the new category</li>
+<li class="">Updates <code>.gitignore</code> if git strategy is &quot;ignore&quot;</li>
+</ol>
+<p><strong>Time</strong>: Under 1 minute</p>
+<p><strong>Example</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-add-category</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-add-category security</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-add-category ml-ops --prefix ml- --git ignore</span><br></div></code></pre></div></div>
+<p><strong>Next steps</strong>: Capture lessons in the new category with <code>/kmgraph:kmg-capture-lesson</code></p>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-session-summary">🟡 <code>/kmgraph:kmg-session-summary</code><a href="#-kmgraphkmg-session-summary" class="hash-link" aria-label="Direct link to -kmgraphkmg-session-summary" title="Direct link to -kmgraphkmg-session-summary" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: Capture session context on demand and store it in a dated markdown file before it is lost. The dated file is a reliable record of what happened, so any future session can reference it.</p>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li class="">Before context limits are reached (~180K tokens)</li>
+<li class="">At major milestones during long sessions</li>
+<li class="">Before handing work to another developer</li>
+<li class="">End of a productive work session to preserve context</li>
+</ul>
+<p><strong>What it does</strong>:</p>
+<ol>
+<li class="">Auto-detects session scope from conversation context since last summary</li>
+<li class="">Classifies session type (feature development, debugging, planning, research)</li>
+<li class="">Generates two zones: an Operational Snapshot (Current State, Open Issues, Session History, Session Findings) overwritten on each run, and an Accumulated Narrative appended chronologically</li>
+<li class="">One file per day per branch — subsequent runs update the same file; Operational Snapshot sections are overwritten, narrative blocks are timestamped and preserved</li>
+<li class="">Saves to <code>{active_kg_path}/sessions/YYYY-MM-DD-{branch-slug}.md</code></li>
+<li class="">Optionally triggers lesson capture and KG update</li>
+</ol>
+<p><strong>Snapshot mode</strong> (<code>--snapshot</code>): Lightweight mid-session capture. Runs before any capture command when the user opts in. Appends to today&#x27;s session file (or creates one) without a user review gate. Optional git history (<code>--snapshot --git</code>). Used by <code>capture-lesson</code>, <code>create-adr</code>, and <code>start-issue-tracking</code> to preserve the &quot;why&quot; at the moment of discovery.</p>
+<p><strong>Time</strong>: Under 10 seconds (full mode); under 5 seconds (snapshot mode without git)</p>
+<p><strong>Example</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-session-summary                        # → active KG</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-session-summary --auto                 # Skip confirmation, save immediately</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-session-summary --snapshot             # Mid-session save without review gate</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-session-summary &quot;user level&quot;           # → personal KG (~/.kmgraph/sessions/)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-session-summary --project              # → current project&#x27;s KG sessions/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-session-summary --named=career-ops     # → career-ops KG sessions/</span><br></div></code></pre></div></div>
+<p><strong>Tips</strong>:</p>
+<ul>
+<li class="">Captures git commits automatically — no need to list them manually</li>
+<li class="">Auto-suggests summary when context approaches ~180K tokens</li>
+<li class="">Run before creating a handoff — START-HERE.md auto-detects today&#x27;s summary and links it via <code>continues_from</code></li>
+</ul>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-create-adr">🟡 <code>/kmgraph:kmg-create-adr</code><a href="#-kmgraphkmg-create-adr" class="hash-link" aria-label="Direct link to -kmgraphkmg-create-adr" title="Direct link to -kmgraphkmg-create-adr" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: Create strategic Architectural Decision Records (ADRs) that capture <strong>why</strong> decisions were made. Records are auto-populated with git metadata, sequential numbering, and the implementation commit, so the history is traceable without manual bookkeeping.</p>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li class="">Making a significant architecture, process, or technology decision</li>
+<li class="">Choosing between competing approaches and want to document the rationale</li>
+<li class="">After a decision has already been made and needs to be formally recorded</li>
+<li class="">When a lesson learned reveals a decision that should be captured as an ADR</li>
+</ul>
+<p><strong>What it does</strong>:</p>
+<ol>
+<li class=""><code>{OPTIONAL}</code> Before capturing ADR, prompt will ask whether or not to take a snapshot of the current session before starting to preserve an archive of the context behind the decision</li>
+<li class="">Reviews the current ADR items in the active knowledge graph</li>
+<li class="">Assigns the next ADR number automatically</li>
+<li class="">Captures git context for the record — author, branch, and PR/issue number automatically</li>
+<li class="">Wizard starts to capture the following:</li>
+</ol>
+<ul>
+<li class="">title</li>
+<li class="">status</li>
+<li class="">category</li>
+<li class="">context</li>
+<li class="">decision</li>
+<li class="">rationale</li>
+<li class="">consequences</li>
+<li class="">related lessons</li>
+</ul>
+<ol start="6">
+<li class="">Asks if the decision has already been implemented — if yes, captures the current commit and subject line automatically; design-first ADRs get a back-fill reminder</li>
+<li class="">Shows a full summary for review before writing anything</li>
+<li class="">Creates the ADR file from the standard template with all fields populated</li>
+<li class="">Updates the decisions index (count, chronological list, by-category)</li>
+<li class="">Commits both files with a structured commit message</li>
+</ol>
+<p><strong>Time</strong>: 5-15 minutes (depends on how much detail you provide)</p>
+<p><strong>Example</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-create-adr                                             # → active KG</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-create-adr &quot;Use PostgreSQL for primary database&quot;       # Pre-fills title</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-create-adr &quot;Prefer TypeScript strict mode&quot; --user      # → personal KG decisions/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-create-adr &quot;Use Redis caching&quot; --project               # → current project decisions/</span><br></div></code></pre></div></div>
+<p><strong>Tips</strong>:</p>
+<ul>
+<li class="">Pass a title as an argument to skip the first wizard prompt</li>
+<li class="">Use Proposed status for decisions still under review; Accepted for decisions already implemented</li>
+<li class="">Link to related lessons in Step 3.8 — creates bidirectional traceability</li>
+<li class="">If a snapshot was taken earlier in the session, the ADR&#x27;s Context section can draw from it</li>
+<li class="">If the active KG differs from the project&#x27;s own KG, the wizard stops before writing and asks which graph to use</li>
+</ul>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-list">🟡 <code>/kmgraph:kmg-list</code><a href="#-kmgraphkmg-list" class="hash-link" aria-label="Direct link to -kmgraphkmg-list" title="Direct link to -kmgraphkmg-list" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: Display all knowledge graph projects registered locally. Useful when working across multiple projects and the exact KG name needs to be identified before switching.</p>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li class="">View all available knowledge graphs</li>
+<li class="">Check which KG is currently active</li>
+<li class="">Review KG configurations before switching</li>
+<li class="">Verify a new KG was created successfully</li>
+</ul>
+<p><strong>What it shows</strong>:</p>
+<ul>
+<li class="">All configured knowledge graphs with numbered list</li>
+<li class="">Active KG highlighted</li>
+<li class="">Location paths, categories, git strategy, last used timestamp</li>
+<li class="">Total count</li>
+</ul>
+<p><strong>Time</strong>: Instant</p>
+<p><strong>Example output</strong>:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">Knowledge Graphs:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">1. my-project (active) — /Users/name/projects/my-app/docs/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">   Categories: architecture, process, patterns</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">   Git: selective (architecture/patterns committed, process gitignored)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">   Last used: 2026-02-13 15:45</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">2. ai-research — ~/.claude/knowledge-graphs/ai-research/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">   Categories: architecture, process, ml-patterns (custom)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">   Git: all committed</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">   Last used: 2026-02-10 12:00</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Total: 2 knowledge graph(s) configured</span><br></div></code></pre></div></div>
+<p><strong>Tip</strong>: Use <code>--names-only</code> for scripting or <code>--json</code> for machine-readable output.</p>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-switch">🟡 <code>/kmgraph:kmg-switch</code><a href="#-kmgraphkmg-switch" class="hash-link" aria-label="Direct link to -kmgraphkmg-switch" title="Direct link to -kmgraphkmg-switch" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: Switch the active knowledge graph so all subsequent commands read from and write to the intended one.</p>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li class="">Switch between different project knowledge graphs</li>
+<li class="">Change to a topic-based KG for cross-project patterns</li>
+<li class="">Return to a previously used KG</li>
+</ul>
+<p><strong>What it does</strong>:</p>
+<ol>
+<li class="">Validates the target KG exists in config</li>
+<li class="">Verifies KG path exists on disk (warns if missing, allows override)</li>
+<li class="">Updates the <code>active</code> field in <code>~/.claude/kg-config.json</code></li>
+<li class="">Updates <code>lastUsed</code> timestamp</li>
+<li class="">Reports previous and new active KG</li>
+</ol>
+<p><strong>Time</strong>: Instant</p>
+<p><strong>Example</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-switch my-project</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-switch ai-research</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-switch cowork-devops --force    # Skip missing path warning</span><br></div></code></pre></div></div>
+<p><strong>Tips</strong>:</p>
+<ul>
+<li class="">All subsequent knowledge commands operate on the newly active KG</li>
+<li class="">Use <code>/kmgraph:kmg-list</code> first to see available options</li>
+</ul>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-check-sensitive">🟡 <code>/kmgraph:kmg-check-sensitive</code><a href="#-kmgraphkmg-check-sensitive" class="hash-link" aria-label="Direct link to -kmgraphkmg-check-sensitive" title="Direct link to -kmgraphkmg-check-sensitive" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: Scan the active knowledge graph for emails, API keys, and internal URLs before pushing to a shared repository. Flags findings with file name and line number for manual review.</p>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li class="">Before pushing knowledge graph files to a public or shared repository</li>
+<li class="">As a manual check alongside <code>/kmgraph:kmg-config-sanitization</code> hooks</li>
+<li class="">Periodic audit of KG content</li>
+</ul>
+<p><strong>What it does</strong>:</p>
+<ol>
+<li class="">Loads scan patterns from <code>.claude/sanitization-config.json</code> (or uses defaults)</li>
+<li class="">Scans all markdown files in the active KG for: email addresses, API keys/tokens, URLs</li>
+<li class="">Reports findings with file name, line number, and matched content</li>
+<li class="">Optionally shows fix suggestions with <code>--fix-suggestions</code> flag</li>
+</ol>
+<p><strong>Time</strong>: Under 5 seconds</p>
+<p><strong>Example</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-check-sensitive</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Output:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># ⚠️  Potential sensitive data found:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">#</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># - patterns.md:42 — email: user@example.com</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># - debugging-auth.md:15 — URL: https://api.internal.company.com</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># - lesson-template.md:8 — api-key: API_KEY=abc123def456</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">#</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Review these entries before pushing to public repository.</span><br></div></code></pre></div></div>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-config-sanitization">🟡 <code>/kmgraph:kmg-config-sanitization</code><a href="#-kmgraphkmg-config-sanitization" class="hash-link" aria-label="Direct link to -kmgraphkmg-config-sanitization" title="Direct link to -kmgraphkmg-config-sanitization" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: Run a one-time wizard to automatically flag sensitive data before every commit is saved. Configures scan patterns, custom regexes, and enforcement level in 2-3 minutes.</p>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li class="">One-time setup per repository for automated security scanning</li>
+<li class="">When team members need consistent sanitization enforcement</li>
+</ul>
+<p><strong>What it does</strong>:</p>
+<ol>
+<li class="">Prompts for scan patterns (emails, API keys, personal names, internal URLs)</li>
+<li class="">Collects custom regex patterns specific to your project</li>
+<li class="">Asks for action on match (warn or block commit)</li>
+<li class="">Installs a pre-commit hook script to <code>.git/hooks/pre-commit</code></li>
+<li class="">Creates <code>.claude/sanitization-config.json</code> with selected configuration</li>
+</ol>
+<p><strong>Time</strong>: 2-3 minutes</p>
+<p><strong>Example</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-config-sanitization</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Wizard asks:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># 1. What should be scanned for? (checkboxes for email, API keys, names, URLs)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># 2. Any custom patterns? (e.g., &quot;ACME Corp&quot;, &quot;internal\.company\.com&quot;)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># 3. What should happen when found? (1. Warn  2. Block)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># → Installs hook and creates config</span><br></div></code></pre></div></div>
+<p><strong>Output</strong>:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">✅ Pre-commit sanitization hook installed!</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Scan patterns: emails, API keys, custom patterns (2)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Action: Block commits with sensitive data</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Test the hook:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  git add docs/knowledge/patterns.md</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  git commit -m &quot;test&quot;</span><br></div></code></pre></div></div>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-extract-chat">🟡 <code>/kmgraph:kmg-extract-chat</code><a href="#-kmgraphkmg-extract-chat" class="hash-link" aria-label="Direct link to -kmgraphkmg-extract-chat" title="Direct link to -kmgraphkmg-extract-chat" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: Extracts existing local chat history files and stores them within the project as markdown files. Results vary by model and platform; anything beyond Claude may require unsupported configuration.</p>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li class="">Preserve chat history for reference or knowledge extraction</li>
+<li class="">End of day archival of important conversations</li>
+<li class="">When logs might be cleared by app updates</li>
+</ul>
+<p><strong>What it does</strong>:</p>
+<ol>
+<li class=""><strong>(Step 0) Checks active KG alignment</strong> — Compares the active KG&#x27;s project root against the current working directory. On mismatch, stops and asks: switch active KG / proceed to active KG anyway / cancel. Skipped when <code>--output-dir</code> or <code>--project</code> is present.</li>
+<li class="">Determines output directory (active KG&#x27;s <code>chat-history/</code> by default, or custom path)</li>
+<li class="">Scans Claude logs (<code>~/.claude/projects/</code> for <code>.jsonl</code> files), Gemini logs (<code>~/.gemini/tmp/</code>, <code>~/.gemini/antigravity/conversations/</code> for <code>.json</code>/<code>.pb</code> files), and/or Codex CLI sessions (<code>~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl</code>)</li>
+<li class="">Merges sessions by date into <code>YYYY-MM-DD-claude.md</code>, <code>YYYY-MM-DD-gemini.md</code>, and/or <code>YYYY-MM-DD-codex.md</code></li>
+<li class="">If a daily file exceeds 900 KB or 30,000 lines, automatically splits into numbered parts (<code>-part1.md</code>, <code>-part2.md</code>, …) inside a <code>YYYY-MM-DD/</code> subfolder to prevent Obsidian rendering failures</li>
+<li class="">Supports incremental append — re-running adds new sessions without overwriting; appends target the last part file if the day was previously split</li>
+</ol>
+<p><strong>Time</strong>: Under 30 seconds</p>
+<p><strong>Source flags</strong>:</p>
+<ul>
+<li class=""><code>-claude</code> — Extract only Claude sessions</li>
+<li class=""><code>-gemini</code> — Extract only Gemini sessions</li>
+<li class=""><code>--source codex</code> — Extract only Codex CLI sessions from <code>~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl</code>; outputs <code>YYYY-MM-DD-codex.md</code></li>
+<li class=""><code>--source all</code> — Extract Claude and Gemini sessions; does not include Codex yet, use <code>--source codex</code> explicitly</li>
+</ul>
+<p><strong>Date filtering options</strong>:</p>
+<ul>
+<li class=""><code>--today</code> — Extract only today&#x27;s sessions</li>
+<li class=""><code>--date=YYYY-MM-DD</code> — Extract only sessions from a specific date</li>
+<li class=""><code>--after=YYYY-MM-DD</code> — Extract sessions from this date onwards (inclusive)</li>
+<li class=""><code>--before=YYYY-MM-DD</code> — Extract sessions up to and including this date</li>
+<li class=""><code>--project=&lt;fragment&gt;</code> — Filter to sessions from a specific project (path fragment match)</li>
+</ul>
+<p><strong>Example</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-extract-chat                                          # Extract all (Claude + Gemini)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-extract-chat -claude                                  # Extract only Claude</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-extract-chat -gemini                                  # Extract only Gemini</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-extract-chat --source codex                          # Extract only Codex CLI sessions</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-extract-chat --output-dir=/custom/path               # Custom output location</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-extract-chat --today                                  # Today only</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-extract-chat -claude 2026-02-20 through 2026-02-21   # Date range</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-extract-chat --project=knowledge-graph               # Specific project only</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-extract-chat --source codex --after 2026-01-01       # Codex sessions from a date onwards</span><br></div></code></pre></div></div>
+<p><strong>Tips</strong>:</p>
+<ul>
+<li class="">Extracted files are automatically searchable via <code>/kmgraph:kmg-recall</code></li>
+<li class="">Optional <code>blackboxprotobuf</code> Python library enables Gemini protobuf file support</li>
+<li class="">Date ranges use natural language: <code>YYYY-MM-DD through YYYY-MM-DD</code> or <code>YYYY-MM-DD to YYYY-MM-DD</code></li>
+<li class="">Gemini date filtering: passthrough implemented; underlying Gemini extraction may have known limitations</li>
+<li class="">Large days auto-split into a <code>YYYY-MM-DD/</code> subfolder with numbered part files; each part is a valid standalone markdown file readable in Obsidian</li>
+</ul>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-update-doc">🟡 <code>/kmgraph:kmg-update-doc</code><a href="#-kmgraphkmg-update-doc" class="hash-link" aria-label="Direct link to -kmgraphkmg-update-doc" title="Direct link to -kmgraphkmg-update-doc" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: Maintains this project&#x27;s user-facing documentation through a guided wizard. Intended primarily for contributors; adapting it to other projects is possible but not yet documented.</p>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li class="">A plugin feature changed and COMMAND-GUIDE, CHEAT-SHEET, or README needs updating</li>
+<li class="">Adding a new command entry to user-facing docs</li>
+<li class="">Ensuring documentation follows v0.0.7 language standards (third-person, Section 508)</li>
+</ul>
+<p><strong>What it does</strong>:</p>
+<p>Without <code>--user-facing</code>: shows a disambiguation dialog to distinguish plugin documentation from KG content.</p>
+<p>With <code>--user-facing</code>:</p>
+<ol>
+<li class="">Reads target file and displays current sections and version</li>
+<li class="">Asks what type of update (add command entry, update existing entry, add section, update metadata, validate only)</li>
+<li class="">Runs v0.0.7 standards validation (third-person voice, heading hierarchy, table headers, link text)</li>
+<li class="">Shows diff preview before writing</li>
+<li class="">Applies changes and commits with standards-compliant message</li>
+</ol>
+<p><strong>Time</strong>: 2-5 minutes</p>
+<p><strong>Example</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-update-doc COMMAND-GUIDE.md --user-facing   # Update plugin documentation wizard</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-update-doc README.md --user-facing           # Update README with new feature info</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-update-doc some-lesson.md                    # Disambiguation dialog for KG content</span><br></div></code></pre></div></div>
+<p><strong>Tips</strong>:</p>
+<ul>
+<li class="">Always use <code>--user-facing</code> for plugin/project docs (README, COMMAND-GUIDE, CHEAT-SHEET, etc.)</li>
+<li class="">Without <code>--user-facing</code>, a dialog clarifies whether the target is plugin docs or KG content</li>
+<li class="">Standards validation runs automatically — violations are flagged before writing</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="advanced-commands">Advanced Commands<a href="#advanced-commands" class="hash-link" aria-label="Direct link to Advanced Commands" title="Direct link to Advanced Commands" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-meta-issue">🔴 <code>/kmgraph:kmg-meta-issue</code><a href="#-kmgraphkmg-meta-issue" class="hash-link" aria-label="Direct link to -kmgraphkmg-meta-issue" title="Direct link to -kmgraphkmg-meta-issue" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: Create a structured workspace for problems that resist initial solutions. Tracks each attempt with its hypothesis and outcome so understanding evolves across attempts rather than starting blind each time.</p>
+<p><strong>When to use</strong> (2 or more criteria should be met):</p>
+<ul>
+<li class="">3+ solution attempts already tried or expected</li>
+<li class="">Root cause understanding has shifted 2+ times</li>
+<li class="">Problem spans multiple project versions</li>
+<li class="">High complexity requiring coordination across systems</li>
+<li class="">Significant learning value for future similar problems</li>
+</ul>
+<p><strong>What it does</strong>:</p>
+<ol>
+<li class=""><strong>Initialize</strong> (<code>/kmgraph:kmg-meta-issue &quot;Problem Title&quot;</code>):
+<ul>
+<li class="">Prompts for domain, scope, severity, expected attempts</li>
+<li class="">Creates structured directory under <code>{active_kg_path}/issues/[meta-issue-name]/</code></li>
+<li class="">Populates core files: README, description, implementation-log, test-cases</li>
+<li class="">Creates analysis files: root-cause-evolution, timeline, lessons-learned</li>
+<li class="">Links to knowledge graph</li>
+</ul>
+</li>
+<li class=""><strong>Add attempt</strong> (<code>--add-attempt 003 &quot;Try connection pooling&quot;</code>):
+<ul>
+<li class="">Creates numbered attempt folder with solution approach and results templates</li>
+<li class="">Updates implementation log</li>
+</ul>
+</li>
+<li class=""><strong>Update understanding</strong> (<code>--update-understanding &quot;Root cause is network latency&quot;</code>):
+<ul>
+<li class="">Records belief shifts with timestamp and evidence</li>
+<li class="">Updates description with current best understanding</li>
+</ul>
+</li>
+<li class=""><strong>View status</strong> (<code>--status</code>):
+<ul>
+<li class="">Shows all active meta-issues with attempt counts and current understanding</li>
+</ul>
+</li>
+<li class=""><strong>Log attempt with hypothesis</strong> (<code>--log-attempt NNN &quot;hypothesis&quot;</code>):
+<ul>
+<li class="">Enforces a distinct hypothesis before each attempt begins</li>
+<li class="">Pre-populates the attempt template&#x27;s hypothesis field</li>
+<li class="">Reminds the user to invoke <code>stuck-work-escalation</code> at attempt 3+</li>
+<li class="">At 5 attempts, exit-path analysis becomes mandatory (see <code>stuck-work-escalation</code> skill)</li>
+</ul>
+</li>
+</ol>
+<p><strong>Time</strong>: 3-5 minutes for initialization</p>
+<p><strong>Example</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-meta-issue &quot;Authentication Redesign&quot;</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-meta-issue --add-attempt 002 &quot;OAuth2 with JWT&quot;</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-meta-issue --log-attempt 003 &quot;JWT expiry logic is the root cause&quot;</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-meta-issue --update-understanding &quot;Token expiry logic flawed&quot;</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-meta-issue --status</span><br></div></code></pre></div></div>
+<blockquote>
+<p><strong>Note</strong>: Do NOT use meta-issue for simple bugs, standard features, or one-off debugging. Use <code>/kmgraph:kmg-capture-lesson</code> instead.</p>
+</blockquote>
+<p><strong>See also</strong>: <a class="" href="/knowledge-graph/pillars/capturing/pillars-capturing-document-meta-issues">Meta-Issue Guide</a> — full guide covering directory structure, attempt templates, escalation thresholds, and worked examples. <a class="" href="/knowledge-graph/pillars/capturing/pillars-capturing-document-meta-issues">Track a Multi-Attempt Issue</a> — step-by-step walkthrough.</p>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-start-issue-tracking">🔴 <code>/kmgraph:kmg-start-issue-tracking</code><a href="#-kmgraphkmg-start-issue-tracking" class="hash-link" aria-label="Direct link to -kmgraphkmg-start-issue-tracking" title="Direct link to -kmgraphkmg-start-issue-tracking" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: Document a bug or enhancement from identification through resolution, with git integration when a repository is present. Captures the context of an issue in structured templates for review and implementation.</p>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li class="">Identified a bug that needs structured tracking</li>
+<li class="">Planning a new feature or enhancement</li>
+<li class="">Documenting a problem before solving it</li>
+<li class="">Creating a developer handoff with full context</li>
+</ul>
+<blockquote>
+<p><strong>Note</strong>: The term &quot;issue&quot; here refers to a GitHub Issue — a platform feature for tracking bugs and feature requests/enhancements.</p>
+</blockquote>
+<p><strong>What it does</strong>:</p>
+<ol>
+<li class=""><strong>Snapshot gate</strong> — optionally takes a session snapshot before the issue dialog</li>
+<li class=""><strong>Branch guard</strong> — Step 1.0 now surfaces a ⚠️ warning when current branch ≠ main, priming the user before versioning decisions; Step 6.2 lesson capture prompt becomes strongly recommended when working on a non-main branch</li>
+<li class=""><strong>Steps 1.1–1.4 ask one question at a time</strong> — type (bug vs. enhancement), version impact, branch name, and plan filename are each asked independently, waiting for a response before the next question. No multi-question prompts.</li>
+<li class="">Scans chat history for recent proposals (&quot;Would you like me to...&quot;)</li>
+<li class="">Runs git authority check and auto-detects version increment path</li>
+<li class="">Auto-detects issue type from keywords (bug vs. enhancement)</li>
+<li class="">Creates directory structure with documentation templates (description, solution approach, test cases, implementation log)</li>
+<li class="">Generates an implementation plan with safety headers and atomic approval protocol</li>
+<li class=""><strong>Step 5.0: Creates a GitHub Issue</strong> via <code>gh issue create --body-file</code> from the issue description; writes the returned issue number back to spec frontmatter (<code>github-issue</code> field auto-populated)</li>
+<li class="">Creates a Git feature branch (<code>issue/{N}-{slug}</code>)</li>
+<li class="">Optionally creates a draft PR on GitHub with <code>--body-file</code> populated from solution approach and <code>Closes #N</code> referencing the issue created in Step 5.0</li>
+<li class=""><strong>Step 6.2 (lesson capture) is a mandatory gate</strong> — must receive a response before continuing. When working on a non-main branch, this step is strongly recommended.</li>
+<li class=""><strong>Step 6.4 (ROADMAP + CHANGELOG update) is a mandatory gate</strong> — must receive a response confirming ROADMAP and CHANGELOG entries have been considered before the command completes.</li>
+<li class="">Links to knowledge graph and prompts for lesson capture</li>
+<li class="">Engages implementation freeze — stops before any code changes</li>
+</ol>
+<p><strong>Time</strong>: 5-10 minutes</p>
+<p><strong>Example</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-start-issue-tracking</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-start-issue-tracking CLI flag parsing fails on quoted args</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-start-issue-tracking Add token usage display</span><br></div></code></pre></div></div>
+<p><strong>Tips</strong>:</p>
+<ul>
+<li class="">Uses the Dual-ID Policy: local IDs (<code>issue-N</code> or <code>ENH-NNN</code>) are independent from GitHub issue numbers (<code>#N</code>)</li>
+<li class="">GitHub Issue creation is automatic at Step 5.0 — <code>gh issue create --body-file</code> runs before branch creation; <code>github-issue</code> frontmatter is written back immediately</li>
+</ul>
+<p><strong>See also</strong>: <a class="" href="/knowledge-graph/track-issues">Track Issues</a> — full lifecycle walkthrough including git integration and the implementation freeze gate.</p>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-update-issue-plan">🔴 <code>/kmgraph:kmg-update-issue-plan</code><a href="#-kmgraphkmg-update-issue-plan" class="hash-link" aria-label="Direct link to -kmgraphkmg-update-issue-plan" title="Direct link to -kmgraphkmg-update-issue-plan" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: Keeps the knowledge graph, active plans, and GitHub issues in sync after new entries are extracted. The right command when formal issue plans are part of the workflow.</p>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li class="">After extracting new KG entries with <code>/kmgraph:kmg-update-graph</code></li>
+<li class="">When implementation plan needs to reflect new insights</li>
+<li class="">Before committing governance-related changes</li>
+<li class="">When progress needs to be posted to a GitHub Issue</li>
+</ul>
+<blockquote>
+<p><strong>Note</strong>: References to &quot;issues&quot; here mean GitHub Issues — platform-level bug reports or feature requests.</p>
+</blockquote>
+<p><strong>What it does</strong>:</p>
+<ol>
+<li class=""><strong>Knowledge extraction</strong>: Runs <code>/kmgraph:kmg-update-graph</code> to extract patterns</li>
+<li class=""><strong>Plan sync</strong>: Updates the active implementation plan with a &quot;Lessons Learned Integration&quot; section</li>
+<li class=""><strong>Local issue update</strong>: Appends progress and new verification requirements to local issue docs</li>
+<li class=""><strong>GitHub sync</strong>: Maps local issue ID to GitHub Issue number, posts a knowledge sync comment, and updates PR description with related lessons</li>
+<li class=""><strong>Governance audit</strong>: Outputs a summary table showing sync status across all components</li>
+</ol>
+<p><strong>Time</strong>: 2-5 minutes</p>
+<p><strong>Example</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-update-issue-plan</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-update-issue-plan --auto       # Skip prompts</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-update-issue-plan --pr=42      # Sync to specific PR</span><br></div></code></pre></div></div>
+<p><strong>Tips</strong>:</p>
+<ul>
+<li class="">Works fully offline — GitHub steps gracefully degrade if <code>gh</code> CLI is not installed</li>
+<li class="">Decision gates will prompt before creating new issues for out-of-scope discoveries</li>
+</ul>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-link-issue">🔴 <code>/kmgraph:kmg-link-issue</code><a href="#-kmgraphkmg-link-issue" class="hash-link" aria-label="Direct link to -kmgraphkmg-link-issue" title="Direct link to -kmgraphkmg-link-issue" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: Link a lesson or ADR to a GitHub Issue after the fact. Writes the issue number into the file&#x27;s frontmatter and posts a comment to the issue, so the KG and GitHub stay in sync.</p>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li class="">A lesson was captured but not linked to its relevant GitHub Issue</li>
+<li class="">An ADR should reference the GitHub Issue that prompted the decision</li>
+<li class="">Building traceability between knowledge and tracked work</li>
+</ul>
+<blockquote>
+<p><strong>Note</strong>: &quot;Issue&quot; here refers to a GitHub Issue — which could be a bug report or a feature request/enhancement.</p>
+</blockquote>
+<p><strong>What it does</strong>:</p>
+<ol>
+<li class="">Validates the file exists and issue number is provided</li>
+<li class="">Updates YAML frontmatter in the lesson/ADR with issue and PR metadata</li>
+<li class="">Posts a comment to the GitHub Issue with a link to the lesson (if <code>gh</code> CLI available)</li>
+<li class="">Updates the related KG entry with the issue reference</li>
+<li class="">Reports bidirectional link status</li>
+</ol>
+<p><strong>Time</strong>: Under 1 minute</p>
+<p><strong>Example</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-link-issue docs/lessons-learned/process/my-lesson.md --issue 42</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-link-issue docs/decisions/ADR-005.md --issue 38 --pr 40</span><br></div></code></pre></div></div>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-sync-all">🔴 <code>/kmgraph:kmg-sync-all</code><a href="#-kmgraphkmg-sync-all" class="hash-link" aria-label="Direct link to -kmgraphkmg-sync-all" title="Direct link to -kmgraphkmg-sync-all" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: The catch-up command when lessons have been captured but the pipeline has not run. Replaces four manual steps in a single pass: update-graph, plan sync, issue update, and GitHub posting.</p>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li class="">After significant work sessions to consolidate everything</li>
+<li class="">Weekly deep sync to ensure KG, plans, and GitHub are aligned</li>
+<li class="">Before major milestones or project phase changes</li>
+<li class="">As a catch-up sync if you&#x27;ve been capturing lessons without syncing</li>
+</ul>
+<p><strong>What it does</strong>:</p>
+<ol>
+<li class=""><strong>Scans</strong> for new or modified lessons in <code>{active_kg_path}/lessons-learned/</code></li>
+<li class=""><strong>Extracts</strong> KG entries from lessons (delegates to <code>/kmgraph:kmg-update-graph</code>)</li>
+<li class=""><strong>Links</strong> to active implementation plan if relevant</li>
+<li class=""><strong>Updates</strong> local issue with KG references and progress notes</li>
+<li class=""><strong>Enriches</strong> today&#x27;s session summary with KG insights</li>
+<li class=""><strong>Generates</strong> GitHub Issue comment draft and asks for single confirmation before posting</li>
+</ol>
+<p><strong>Time</strong>: 1-5 minutes depending on volume</p>
+<p><strong>Example</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-sync-all</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-sync-all --auto       # Skip GitHub posting confirmation</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-sync-all --dry-run    # Preview without changes</span><br></div></code></pre></div></div>
+<p><strong>Output</strong>:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">Knowledge Sync Complete</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">-----------------------</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Lessons scanned:  3 (2 new, 1 modified)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">KG entries:       2 created, 1 updated</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Plan linked:      v2.0 (Step 2 → Prefix Naming lesson)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Local issue:      issue-42 (updated)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">GitHub:           #45 (comment posted)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Session:          2026-02-11 (enriched)</span><br></div></code></pre></div></div>
+<p><strong>Tips</strong>:</p>
+<ul>
+<li class="">Idempotent — safe to run multiple times (existing entries updated, not duplicated)</li>
+<li class="">GitHub integration is optional — works fully offline if <code>gh</code> CLI is not installed</li>
+</ul>
+<p><strong>Cleaner conversations</strong>: When the context-mode plugin is installed, <code>sync-all</code> runs file scans in a background process so the results do not fill the conversation. Falls back automatically if context-mode is not installed. No configuration required.</p>
+<p><strong>Search index</strong>: Each run of <code>sync-all</code> automatically refreshes the search index if one has been built. On the first run after upgrading, <code>sync-all</code> will ask once whether to build the index. The preference is remembered.</p>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-kmgraphkmg-handoff">🔴 <code>/kmgraph:kmg-handoff</code><a href="#-kmgraphkmg-handoff" class="hash-link" aria-label="Direct link to -kmgraphkmg-handoff" title="Direct link to -kmgraphkmg-handoff" translate="no">​</a></h3>
+<p><strong>Purpose</strong>: Create a complete snapshot of project state for continuation across sessions, models, or machines. Five documents capture everything the next session needs to orient without losing working context.</p>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li class="">Before transitioning project to another developer</li>
+<li class="">Preparing for context window limits (&gt;180K tokens)</li>
+<li class="">Completing a major release cycle</li>
+<li class="">Creating documentation for AI assistant handoffs</li>
+<li class="">Before taking a long break</li>
+</ul>
+<p><strong>What it creates</strong>:</p>
+<ol>
+<li class=""><strong>START-HERE.md</strong> — Thin pointer: branch, commit, auto-detected link to today&#x27;s session summary</li>
+<li class=""><strong>DOCUMENTATION-MAP.md</strong> — File inventory with purpose annotations</li>
+<li class=""><strong>ARCHITECTURE-SNAPSHOT.md</strong> — Current codebase structure and key decisions</li>
+</ol>
+<p>Operational state (current branch, open issues, in-progress work) lives in the linked session summary — not in the handoff package. Run <code>/kmgraph:kmg-session-summary</code> first if you want that context captured.</p>
+<p><strong>Time</strong>: 1-2 minutes</p>
+<p><strong>Example</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-handoff</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-handoff --output-dir=./backup/</span><br></div></code></pre></div></div>
+<p><strong>Output</strong>:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">✅ Handoff package created!</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Location: ./handoff-packages/2026-06-09</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Files:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">- START-HERE.md               — 8 lines</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">- DOCUMENTATION-MAP.md        — 156 lines</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">- ARCHITECTURE-SNAPSHOT.md    — 189 lines</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Total: ~353 lines of documentation</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Reading time: ~20 minutes for complete orientation</span><br></div></code></pre></div></div>
+<p><strong>Tips</strong>:</p>
+<ul>
+<li class="">Creates dated directory: <code>handoff-packages/YYYY-MM-DD/</code> by default</li>
+<li class="">START-HERE.md auto-detects today&#x27;s session summary and sets <code>continues_from</code> — run <code>/kmgraph:kmg-session-summary</code> first for best results</li>
+<li class="">Files can be shared via zip or archived for future reference</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="command-comparison">Command Comparison<a href="#command-comparison" class="hash-link" aria-label="Direct link to Command Comparison" title="Direct link to Command Comparison" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="capture-vs-update-vs-sync">Capture vs Update vs Sync<a href="#capture-vs-update-vs-sync" class="hash-link" aria-label="Direct link to Capture vs Update vs Sync" title="Direct link to Capture vs Update vs Sync" translate="no">​</a></h3>
+<p><strong>Three ways to save learnings</strong>:</p>
+<ol>
+<li class="">
+<p><strong><code>/kmgraph:kmg-capture-lesson</code></strong></p>
+<ul>
+<li class="">Creates a NEW lesson file</li>
+<li class="">Guided interview process</li>
+<li class="">Use: When documenting new learnings</li>
+</ul>
+</li>
+<li class="">
+<p><strong><code>/kmgraph:kmg-update-graph</code></strong></p>
+<ul>
+<li class="">Extracts patterns from existing lessons</li>
+<li class="">Updates knowledge entries</li>
+<li class="">Use: Daily or weekly to consolidate</li>
+</ul>
+</li>
+<li class="">
+<p><strong><code>/kmgraph:kmg-sync-all</code></strong></p>
+<ul>
+<li class="">Full 4-step pipeline (capture → update → sync → link)</li>
+<li class="">Comprehensive sync across KG, plans, issues, and GitHub</li>
+<li class="">Use: Weekly deep sync or before sharing</li>
+</ul>
+</li>
+</ol>
+<p><strong>When to use which</strong>:</p>
+<ul>
+<li class="">Just solved a problem → <code>capture-lesson</code></li>
+<li class="">End of day/week → <code>update-graph</code></li>
+<li class="">Major milestone → <code>sync-all</code></li>
+</ul>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="status-vs-recall-vs-list">Status vs Recall vs List<a href="#status-vs-recall-vs-list" class="hash-link" aria-label="Direct link to Status vs Recall vs List" title="Direct link to Status vs Recall vs List" translate="no">​</a></h3>
+<p><strong>Three ways to view knowledge</strong>:</p>
+<ol>
+<li class="">
+<p><strong><code>/kmgraph:kmg-status</code></strong></p>
+<ul>
+<li class="">High-level overview of active KG</li>
+<li class="">File counts, warnings, recent activity</li>
+<li class="">Use: Daily check-in, health check</li>
+</ul>
+</li>
+<li class="">
+<p><strong><code>/kmgraph:kmg-recall</code></strong></p>
+<ul>
+<li class="">Deep full-text search across all memory systems</li>
+<li class="">Find specific content by keyword</li>
+<li class="">Use: Looking for something specific</li>
+</ul>
+</li>
+<li class="">
+<p><strong><code>/kmgraph:kmg-list</code></strong></p>
+<ul>
+<li class="">Shows all configured KGs (if multiple)</li>
+<li class="">Metadata only (names, paths, categories)</li>
+<li class="">Use: Switching between projects</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issue-tracking-meta-issue-vs-start-issue-tracking">Issue Tracking: meta-issue vs start-issue-tracking<a href="#issue-tracking-meta-issue-vs-start-issue-tracking" class="hash-link" aria-label="Direct link to Issue Tracking: meta-issue vs start-issue-tracking" title="Direct link to Issue Tracking: meta-issue vs start-issue-tracking" translate="no">​</a></h3>
+<p><strong>Two levels of issue tracking</strong>:</p>
+<ol>
+<li class="">
+<p><strong><code>/kmgraph:kmg-start-issue-tracking</code></strong></p>
+<ul>
+<li class="">For individual bugs or enhancements</li>
+<li class="">Creates a single issue directory, implementation plan, and Git branch</li>
+<li class="">Standard workflow for most tracked work</li>
+</ul>
+</li>
+<li class="">
+<p><strong><code>/kmgraph:kmg-meta-issue</code></strong></p>
+<ul>
+<li class="">For complex problems requiring 3+ solution attempts</li>
+<li class="">Creates a richer directory structure with attempt folders and root-cause evolution</li>
+<li class="">Tracks how understanding changes over time</li>
+</ul>
+</li>
+</ol>
+<p><strong>When to use which</strong>:</p>
+<ul>
+<li class="">Standard bug or feature → <code>start-issue-tracking</code></li>
+<li class="">Multi-attempt investigation → <code>meta-issue</code></li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="troubleshooting">Troubleshooting<a href="#troubleshooting" class="hash-link" aria-label="Direct link to Troubleshooting" title="Direct link to Troubleshooting" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="command-not-found">&quot;Command not found&quot;<a href="#command-not-found" class="hash-link" aria-label="Direct link to &quot;Command not found&quot;" title="Direct link to &quot;Command not found&quot;" translate="no">​</a></h3>
+<p><strong>Problem</strong>: Claude doesn&#x27;t recognize <code>/kmgraph:...</code> command</p>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li class="">Verify plugin installed: Check Claude Code &gt; Extensions</li>
+<li class="">Restart Claude Code</li>
+<li class="">Update plugin: Check for updates in marketplace</li>
+<li class="">Check active KG: Run <code>/kmgraph:kmg-status</code></li>
+</ol>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="no-active-knowledge-graph">&quot;No active knowledge graph&quot;<a href="#no-active-knowledge-graph" class="hash-link" aria-label="Direct link to &quot;No active knowledge graph&quot;" title="Direct link to &quot;No active knowledge graph&quot;" translate="no">​</a></h3>
+<p><strong>Problem</strong>: Commands fail with &quot;no active KG&quot;</p>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li class="">Run <code>/kmgraph:kmg-init</code> to create your first KG</li>
+<li class="">Run <code>/kmgraph:kmg-list</code> to see available KGs</li>
+<li class="">Run <code>/kmgraph:kmg-switch</code> to activate an existing KG</li>
+</ol>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="no-chat-history-found">&quot;No chat history found&quot;<a href="#no-chat-history-found" class="hash-link" aria-label="Direct link to &quot;No chat history found&quot;" title="Direct link to &quot;No chat history found&quot;" translate="no">​</a></h3>
+<p><strong>Problem</strong>: <code>/kmgraph:kmg-extract-chat</code> finds no logs</p>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li class="">Verify log directories exist:
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">ls ~/.claude/projects/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">ls ~/.gemini/tmp/</span><br></div></code></pre></div></div>
+</li>
+<li class="">Check if you&#x27;ve used Claude Code or Gemini recently</li>
+<li class="">Logs may be cleared on app updates</li>
+</ol>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="protobuf-extraction-fails">&quot;Protobuf extraction fails&quot;<a href="#protobuf-extraction-fails" class="hash-link" aria-label="Direct link to &quot;Protobuf extraction fails&quot;" title="Direct link to &quot;Protobuf extraction fails&quot;" translate="no">​</a></h3>
+<p><strong>Problem</strong>: Gemini <code>.pb</code> files can&#x27;t be read</p>
+<p><strong>Solutions</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Install optional dependency</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">pip install blackboxprotobuf</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Or skip protobuf files (JSON extraction still works)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-extract-chat -gemini  # Will warn about .pb files</span><br></div></code></pre></div></div>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="git-branch-creation-fails">&quot;Git branch creation fails&quot;<a href="#git-branch-creation-fails" class="hash-link" aria-label="Direct link to &quot;Git branch creation fails&quot;" title="Direct link to &quot;Git branch creation fails&quot;" translate="no">​</a></h3>
+<p><strong>Problem</strong>: <code>/kmgraph:kmg-start-issue-tracking</code> can&#x27;t create a branch</p>
+<p><strong>Solutions</strong>:</p>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Check current branch</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">git branch</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Make sure you&#x27;re on main/develop</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">git checkout main</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Try again</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">git checkout -b issue/N-description</span><br></div></code></pre></div></div>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="mcp-tool-kg_upgrade">MCP Tool: <code>kg_upgrade</code><a href="#mcp-tool-kg_upgrade" class="hash-link" aria-label="Direct link to mcp-tool-kg_upgrade" title="Direct link to mcp-tool-kg_upgrade" translate="no">​</a></h2>
+<p>Available on all platforms (Codex, Gemini CLI, Cursor, etc.). Inspects and applies upgrades to an existing KMGraph installation.</p>
+<p><strong>Inspect</strong> (no args): returns a JSON object with <code>upgrades</code> and <code>warnings</code> arrays.</p>
+<p><strong>Apply</strong>: pass <code>apply: [&quot;category&quot;, ...]</code> to apply one or more categories.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Category</th><th>What it does</th></tr></thead><tbody><tr><td><code>directories</code></td><td>Creates missing required subdirectories (<code>templates/</code>, <code>decisions/</code>, <code>sessions/</code>, <code>chat-history/</code>, <code>tmp/</code>)</td></tr><tr><td><code>config</code></td><td>Backfills missing fields in <code>~/.claude/kg-config.json</code> introduced in newer versions</td></tr><tr><td><code>templates</code></td><td>Deploys template files to new destinations — skips any dest file that already exists with different content (user content preserved, reported as &quot;Skipped (user content)&quot;); silently skips identical files</td></tr><tr><td><code>starter-relocation</code></td><td>Moves starter files (e.g., <code>ADR-template.md</code>) from live dirs into <code>templates/</code> (ENH-022 migration) — always runs before <code>templates</code> when both are applied in the same call</td></tr><tr><td><code>stray-knowledge-dir</code></td><td>Project-local KGs only: merges known template files from a stray <code>knowledge/</code> subdir into <code>concepts/</code> and removes it</td></tr><tr><td><code>platform-split</code></td><td>Removes Claude Code–specific tool directives from <code>knowledge/rules.md</code> (requires <code>confirm_platform_split: true</code>)</td></tr></tbody></table>
+<p><strong><code>version-update</code> item</strong> (inspect-only, not an apply category): reported when <code>lastAppliedVersion</code> stored in the KG config is older than the installed MCP server version. The item&#x27;s <code>details</code> field lists the concrete apply categories to run. After any successful apply, <code>lastAppliedVersion</code> is written back automatically.</p>
+<p><strong>Startup Protocol</strong>: <code>AGENTS.md</code> and <code>GEMINI.md</code> instruct Codex and Gemini CLI to call <code>kg_upgrade</code> inspect at the start of each session. Errors (e.g., no KG configured) are suppressed — upgrades are only surfaced when relevant.</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="technical-details">Technical Details<a href="#technical-details" class="hash-link" aria-label="Direct link to Technical Details" title="Direct link to Technical Details" translate="no">​</a></h2>
+<p>This section covers implementation specifics for users who want to understand how features work internally.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="context-mode-integration">Context-Mode Integration<a href="#context-mode-integration" class="hash-link" aria-label="Direct link to Context-Mode Integration" title="Direct link to Context-Mode Integration" translate="no">​</a></h3>
+<p>When the <a href="https://github.com/steventcramer/context-mode" target="_blank" rel="noopener noreferrer" class="">context-mode plugin</a> is installed alongside kmgraph:</p>
+<ul>
+<li class=""><code>sync-all</code> uses <code>ctx_batch_execute</code> to combine lesson scanning and KG extraction in a single sandboxed background process</li>
+<li class=""><code>update-graph</code> uses <code>ctx_execute_file</code> for sandboxed file reads when processing 10 or more lessons; falls back to the knowledge-extractor subagent for large batches without context-mode, or reads directly for small batches</li>
+<li class="">Detection: kmgraph checks for <code>mcp__plugin_context-mode_context-mode__ctx_batch_execute</code> at runtime; no configuration required; zero breaking change if context-mode is absent</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="search-index-implementation">Search Index Implementation<a href="#search-index-implementation" class="hash-link" aria-label="Direct link to Search Index Implementation" title="Direct link to Search Index Implementation" translate="no">​</a></h3>
+<p>The diagram below shows how <code>kg_search</code> decides which search method to use.</p>
+<!-- -->
+<p><code>kg_search</code> checks for a search index first. If the index exists, it queries the index and returns BM25-ranked results with an index label. If the index does not exist or encounters an error, <code>kg_search</code> falls back to reading files sequentially. The caller receives the same result format either way.</p>
+<ul>
+<li class="">Index format: SQLite database using FTS5 (Full-Text Search version 5) extension</li>
+<li class="">Ranking: BM25 — the same relevance algorithm used by most search engines</li>
+<li class="">Stemming: porter stemmer — &quot;searching&quot; matches &quot;search&quot;, &quot;decisions&quot; matches &quot;decision&quot;</li>
+<li class="">Rebuild strategy: incremental — only re-indexes files whose modification time changed</li>
+<li class="">Storage: <code>{kg-root}/.fts5.db</code> — gitignored, local only, rebuilt on demand</li>
+<li class="">Package: <code>node-sqlite3-wasm</code> (WASM-based SQLite, no native compilation required)</li>
+<li class="">Fallback: if the index is corrupt or missing, <code>kg_search</code> silently uses file-scan</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="related-documentation">Related Documentation<a href="#related-documentation" class="hash-link" aria-label="Direct link to Related Documentation" title="Direct link to Related Documentation" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="quick-help"><strong>Quick help</strong><a href="#quick-help" class="hash-link" aria-label="Direct link to quick-help" title="Direct link to quick-help" translate="no">​</a></h3>
+<ul>
+<li class="">
+<p><a class="" href="/knowledge-graph/cheat-sheet">Cheat Sheet</a></p>
+<p>One-page quick reference</p>
+</li>
+<li class="">
+<p><a class="" href="/knowledge-graph/concepts/concepts-why-kmgraph">Concepts</a></p>
+<p>Term definitions</p>
+</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="writing-better-entries"><strong>Writing better entries</strong><a href="#writing-better-entries" class="hash-link" aria-label="Direct link to writing-better-entries" title="Direct link to writing-better-entries" translate="no">​</a></h3>
+<ul>
+<li class="">
+<p><a class="" href="/knowledge-graph/pillars/capturing/pillars-capturing-capture-patterns">Patterns Guide</a></p>
+<p>Quality standards</p>
+</li>
+<li class="">
+<p><a class="" href="/knowledge-graph/reference/templates/">Templates</a></p>
+<p>Structured formats</p>
+</li>
+<li class="">
+<p><a class="" href="/knowledge-graph/reference/examples/">Examples</a></p>
+<p>Real samples</p>
+</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="related">Related<a href="#related" class="hash-link" aria-label="Direct link to Related" title="Direct link to Related" translate="no">​</a></h2>
+<ul>
+<li class="">
+<p><strong><a class="" href="/knowledge-graph/quickstart">Quickstart</a></strong></p>
+<p>Installation, first lesson, and setup verification.</p>
+</li>
+<li class="">
+<p><strong><a class="" href="/knowledge-graph/cheat-sheet">Quick Reference</a></strong></p>
+<p>One-page cheat sheet with all commands at a glance.</p>
+</li>
+<li class="">
+<p><strong><a class="" href="/knowledge-graph/concepts/concepts-why-kmgraph">Concepts Guide</a></strong></p>
+<p>Plain-English explanations of all key terms and patterns.</p>
+</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="related-documentation-1">Related Documentation<a href="#related-documentation-1" class="hash-link" aria-label="Direct link to Related Documentation" title="Direct link to Related Documentation" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="getting-started-1"><strong>Getting started</strong><a href="#getting-started-1" class="hash-link" aria-label="Direct link to getting-started-1" title="Direct link to getting-started-1" translate="no">​</a></h3>
+<ul>
+<li class="">
+<p><a class="" href="/knowledge-graph/quickstart">Quickstart</a></p>
+<p>Installation, first lesson, setup verification (5 min)</p>
+</li>
+<li class="">
+<p><a class="" href="/knowledge-graph/install">Installation</a></p>
+<p>Universal installer for all platforms (paste-friendly)</p>
+</li>
+<li class="">
+<p><a class="" href="/knowledge-graph/pillars/organizing/pillars-organizing-graph-configuration">Configuration Guide</a></p>
+<p>Post-install setup: sanitization, team workflows, MCP server</p>
+</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="learning-resources"><strong>Learning resources</strong><a href="#learning-resources" class="hash-link" aria-label="Direct link to learning-resources" title="Direct link to learning-resources" translate="no">​</a></h3>
+<ul>
+<li class="">
+<p><a class="" href="/knowledge-graph/cheat-sheet">Quick Reference</a></p>
+<p>One-page cheat sheet for common tasks</p>
+</li>
+<li class="">
+<p><a class="" href="/knowledge-graph/concepts/concepts-why-kmgraph">Concepts Guide</a></p>
+<p>Plain-English definitions of every term and pattern</p>
+</li>
+<li class="">
+<p><a class="" href="/knowledge-graph/reference/examples/">Examples</a></p>
+<p>Real-world completed examples of lessons, ADRs, and KG entries</p>
+</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="advanced"><strong>Advanced</strong><a href="#advanced" class="hash-link" aria-label="Direct link to advanced" title="Direct link to advanced" translate="no">​</a></h3>
+<ul>
+<li class="">
+<p><a class="" href="/knowledge-graph/pillars/organizing/pillars-organizing-multi-kg-workflows">Workflows</a></p>
+<p>Step-by-step guides for all 9 workflow types (non-Claude platforms)</p>
+</li>
+<li class="">
+<p><a class="" href="/knowledge-graph/reference/reference-platform-adaptation">Platform Adaptation</a></p>
+<p>Integration details for Cursor, Windsurf, Continue, VS Code, Aider</p>
+</li>
+<li class="">
+<p><a class="" href="/knowledge-graph/style-guide">Style Guide</a></p>
+<p>Documentation authoring standards and conventions</p>
+</li>
+</ul>
+<hr>
+<p><strong>Version</strong>: 0.5.2
+<strong>Updated</strong>: 2026-04-22</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_WFHX"><a href="https://github.com/technomensch/knowledge-graph/edit/main/docs/reference/command-guide.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_JAkA"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/knowledge-graph/install"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">📦 Installation</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/knowledge-graph/pillars/capturing/pillars-capturing-index"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Capturing</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#about-commands-on-other-platforms" class="table-of-contents__link toc-highlight">About Commands on Other Platforms</a></li><li><a href="#quick-navigation" class="table-of-contents__link toc-highlight">Quick Navigation</a></li><li><a href="#i-want-to" class="table-of-contents__link toc-highlight">I Want To...</a><ul><li><a href="#getting-started" class="table-of-contents__link toc-highlight">Getting Started</a></li><li><a href="#daily-use" class="table-of-contents__link toc-highlight">Daily Use</a></li><li><a href="#team-collaboration" class="table-of-contents__link toc-highlight">Team Collaboration</a></li><li><a href="#project-transitions--onboarding" class="table-of-contents__link toc-highlight">Project Transitions &amp; Onboarding</a></li><li><a href="#working-with-multiple-knowledge-graphs" class="table-of-contents__link toc-highlight">Working with Multiple Knowledge Graphs</a></li><li><a href="#complex-problem-tracking" class="table-of-contents__link toc-highlight">Complex Problem Tracking</a></li><li><a href="#memory-management" class="table-of-contents__link toc-highlight">Memory Management</a></li></ul></li><li><a href="#browse-commands-by-category" class="table-of-contents__link toc-highlight">Browse Commands by Category</a></li><li><a href="#essential-commands" class="table-of-contents__link toc-highlight">Essential Commands</a><ul><li><a href="#-kmgraphkmg-init" class="table-of-contents__link toc-highlight">🟢 <code>/kmgraph:kmg-init</code></a></li><li><a href="#-kmgraphkmg-init-personal-kg" class="table-of-contents__link toc-highlight">🟡 <code>/kmgraph:kmg-init-personal-kg</code></a></li></ul></li><li><a href="#cross-reference-formatting-wiki-links" class="table-of-contents__link toc-highlight">Cross-Reference Formatting (Wiki Links)</a><ul><li><a href="#supported-formats" class="table-of-contents__link toc-highlight">Supported Formats</a></li><li><a href="#when-links-are-applied" class="table-of-contents__link toc-highlight">When Links Are Applied</a></li><li><a href="#preview-changes-with---dry-run" class="table-of-contents__link toc-highlight">Preview Changes with --dry-run</a></li><li><a href="#scope--limitations" class="table-of-contents__link toc-highlight">Scope &amp; Limitations</a></li><li><a href="#-kmgraphkmg-capture-lesson" class="table-of-contents__link toc-highlight">🟢 <code>/kmgraph:kmg-capture-lesson</code></a></li><li><a href="#-kmgraphkmg-status" class="table-of-contents__link toc-highlight">🟢 <code>/kmgraph:kmg-status</code></a></li><li><a href="#-kmgraphkmg-recall" class="table-of-contents__link toc-highlight">🟢 <code>/kmgraph:kmg-recall</code></a></li></ul></li><li><a href="#intermediate-commands" class="table-of-contents__link toc-highlight">Intermediate Commands</a><ul><li><a href="#-kmgraphkmg-update-graph" class="table-of-contents__link toc-highlight">🟡 <code>/kmgraph:kmg-update-graph</code></a></li><li><a href="#-kmgraphkmg-add-category" class="table-of-contents__link toc-highlight">🟡 <code>/kmgraph:kmg-add-category</code></a></li><li><a href="#-kmgraphkmg-session-summary" class="table-of-contents__link toc-highlight">🟡 <code>/kmgraph:kmg-session-summary</code></a></li><li><a href="#-kmgraphkmg-create-adr" class="table-of-contents__link toc-highlight">🟡 <code>/kmgraph:kmg-create-adr</code></a></li><li><a href="#-kmgraphkmg-list" class="table-of-contents__link toc-highlight">🟡 <code>/kmgraph:kmg-list</code></a></li><li><a href="#-kmgraphkmg-switch" class="table-of-contents__link toc-highlight">🟡 <code>/kmgraph:kmg-switch</code></a></li><li><a href="#-kmgraphkmg-check-sensitive" class="table-of-contents__link toc-highlight">🟡 <code>/kmgraph:kmg-check-sensitive</code></a></li><li><a href="#-kmgraphkmg-config-sanitization" class="table-of-contents__link toc-highlight">🟡 <code>/kmgraph:kmg-config-sanitization</code></a></li><li><a href="#-kmgraphkmg-extract-chat" class="table-of-contents__link toc-highlight">🟡 <code>/kmgraph:kmg-extract-chat</code></a></li><li><a href="#-kmgraphkmg-update-doc" class="table-of-contents__link toc-highlight">🟡 <code>/kmgraph:kmg-update-doc</code></a></li></ul></li><li><a href="#advanced-commands" class="table-of-contents__link toc-highlight">Advanced Commands</a><ul><li><a href="#-kmgraphkmg-meta-issue" class="table-of-contents__link toc-highlight">🔴 <code>/kmgraph:kmg-meta-issue</code></a></li><li><a href="#-kmgraphkmg-start-issue-tracking" class="table-of-contents__link toc-highlight">🔴 <code>/kmgraph:kmg-start-issue-tracking</code></a></li><li><a href="#-kmgraphkmg-update-issue-plan" class="table-of-contents__link toc-highlight">🔴 <code>/kmgraph:kmg-update-issue-plan</code></a></li><li><a href="#-kmgraphkmg-link-issue" class="table-of-contents__link toc-highlight">🔴 <code>/kmgraph:kmg-link-issue</code></a></li><li><a href="#-kmgraphkmg-sync-all" class="table-of-contents__link toc-highlight">🔴 <code>/kmgraph:kmg-sync-all</code></a></li><li><a href="#-kmgraphkmg-handoff" class="table-of-contents__link toc-highlight">🔴 <code>/kmgraph:kmg-handoff</code></a></li></ul></li><li><a href="#command-comparison" class="table-of-contents__link toc-highlight">Command Comparison</a><ul><li><a href="#capture-vs-update-vs-sync" class="table-of-contents__link toc-highlight">Capture vs Update vs Sync</a></li><li><a href="#status-vs-recall-vs-list" class="table-of-contents__link toc-highlight">Status vs Recall vs List</a></li><li><a href="#issue-tracking-meta-issue-vs-start-issue-tracking" class="table-of-contents__link toc-highlight">Issue Tracking: meta-issue vs start-issue-tracking</a></li></ul></li><li><a href="#troubleshooting" class="table-of-contents__link toc-highlight">Troubleshooting</a><ul><li><a href="#command-not-found" class="table-of-contents__link toc-highlight">&quot;Command not found&quot;</a></li><li><a href="#no-active-knowledge-graph" class="table-of-contents__link toc-highlight">&quot;No active knowledge graph&quot;</a></li><li><a href="#no-chat-history-found" class="table-of-contents__link toc-highlight">&quot;No chat history found&quot;</a></li><li><a href="#protobuf-extraction-fails" class="table-of-contents__link toc-highlight">&quot;Protobuf extraction fails&quot;</a></li><li><a href="#git-branch-creation-fails" class="table-of-contents__link toc-highlight">&quot;Git branch creation fails&quot;</a></li></ul></li><li><a href="#mcp-tool-kg_upgrade" class="table-of-contents__link toc-highlight">MCP Tool: <code>kg_upgrade</code></a></li><li><a href="#technical-details" class="table-of-contents__link toc-highlight">Technical Details</a><ul><li><a href="#context-mode-integration" class="table-of-contents__link toc-highlight">Context-Mode Integration</a></li><li><a href="#search-index-implementation" class="table-of-contents__link toc-highlight">Search Index Implementation</a></li></ul></li><li><a href="#related-documentation" class="table-of-contents__link toc-highlight">Related Documentation</a><ul><li><a href="#quick-help" class="table-of-contents__link toc-highlight"><strong>Quick help</strong></a></li><li><a href="#writing-better-entries" class="table-of-contents__link toc-highlight"><strong>Writing better entries</strong></a></li></ul></li><li><a href="#related" class="table-of-contents__link toc-highlight">Related</a></li><li><a href="#related-documentation-1" class="table-of-contents__link toc-highlight">Related Documentation</a><ul><li><a href="#getting-started-1" class="table-of-contents__link toc-highlight"><strong>Getting started</strong></a></li><li><a href="#learning-resources" class="table-of-contents__link toc-highlight"><strong>Learning resources</strong></a></li><li><a href="#advanced" class="table-of-contents__link toc-highlight"><strong>Advanced</strong></a></li></ul></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Docs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/quickstart">Getting Started</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/COMMAND-GUIDE">Command Guide</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/CHEAT-SHEET">Cheat Sheet</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/FAQ">FAQ</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/technomensch/knowledge-graph" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://www.linkedin.com/in/marckaplan/" target="_blank" rel="noopener noreferrer" class="footer__link-item">LinkedIn<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://buymeacoffee.com/technomensch" target="_blank" rel="noopener noreferrer" class="footer__link-item">Buy Me a Coffee<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="margin-bottom--sm"><a href="https://github.com/technomensch/knowledge-graph" rel="noopener noreferrer" class="footerLogoLink_BH7S"><img src="/knowledge-graph/img/banner.jpeg" alt="Staying in Sync" class="footer__logo themedComponent_mlkZ themedComponent--light_NVdE" width="160"><img src="/knowledge-graph/img/banner.jpeg" alt="Staying in Sync" class="footer__logo themedComponent_mlkZ themedComponent--dark_xIcU" width="160"></a></div><div class="footer__copyright">Staying in Sync</div></div></div></footer></div>
+</body>
+</html>

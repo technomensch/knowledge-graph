@@ -45,10 +45,6 @@
 </ul>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="what-didnt-change">What didn't change<a href="https://technomensch.github.io/knowledge-graph/docs-updates/2026/05/05/site-restructure-v2#what-didnt-change" class="hash-link" aria-label="Direct link to What didn't change" title="Direct link to What didn't change" translate="no">​</a></h2>
 <p>Command syntax, MCP tools, plugin behavior — none of that changed. This is a navigation and organization update only.</p>]]></content:encoded>
-            <category>docs</category>
-            <category>ux</category>
-            <category>navigation</category>
-            <category>restructure</category>
         </item>
         <item>
             <title><![CDATA[Home page redesigned - clearer audience, context grid, demo GIF]]></title>
@@ -68,9 +64,6 @@
 <p><strong>What it stores</strong> - three plain-language bullets mapping directly to the tricolon: lessons learned, decisions, and institutional knowledge.</p>
 <p><strong>Audience badges</strong> - explicit audience callout: Developer · Vibe-Coder · Prompt Engineer · Open-Source Maintainer · Small Agile Team.</p>
 <p><strong>Demo GIF</strong> - <code>capture-lesson</code> demo now shown on the home page so visitors see the tool in action before being asked to install it.</p>]]></content:encoded>
-            <category>docs</category>
-            <category>ux</category>
-            <category>homepage</category>
         </item>
         <item>
             <title><![CDATA[Documentation restructured — Diátaxis IA, search, demos]]></title>
@@ -100,9 +93,6 @@
 <li class=""><code>CHANGELOG-DOCS-ONLY.md</code> → seeded into this <code>docs-updates/</code> feed</li>
 <li class=""><code>_test-layout.md</code>, <code>DEPLOYMENT-SITEMAP.md</code>, <code>NAVIGATION-INDEX.md</code> — orphaned, removed</li>
 </ul>]]></content:encoded>
-            <category>docs</category>
-            <category>ux</category>
-            <category>docusaurus</category>
         </item>
         <item>
             <title><![CDATA[Homepage visuals, UX improvements, and doc fixes]]></title>
@@ -128,9 +118,6 @@
 <li class=""><strong>Accessibility Fixes</strong>: Added <code>accTitle</code> and <code>accDescr</code> to all new diagrams for Section 508 compliance.</li>
 <li class=""><strong>Typo Fix</strong>: Corrected missing space in <code>index.md</code> Outcome card.</li>
 </ul>]]></content:encoded>
-            <category>visuals</category>
-            <category>ux</category>
-            <category>accessibility</category>
         </item>
     </channel>
 </rss>

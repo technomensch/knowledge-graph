@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-examples/lessons-learned/process/Example_Chat_History_Workflow" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.10.1">
+<title data-rh="true">Lesson: Knowledge Extraction Workflow | Knowledge Management Graph</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://technomensch.github.io/knowledge-graph/examples/lessons-learned/process/examples-lessons-learned-process-example-chat-history-workflow"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Lesson: Knowledge Extraction Workflow | Knowledge Management Graph"><meta data-rh="true" name="description" content="Problem"><meta data-rh="true" property="og:description" content="Problem"><link data-rh="true" rel="icon" href="/knowledge-graph/img/square.png"><link data-rh="true" rel="canonical" href="https://technomensch.github.io/knowledge-graph/examples/lessons-learned/process/examples-lessons-learned-process-example-chat-history-workflow"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/examples/lessons-learned/process/examples-lessons-learned-process-example-chat-history-workflow" hreflang="en"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/examples/lessons-learned/process/examples-lessons-learned-process-example-chat-history-workflow" hreflang="x-default"><link rel="alternate" type="application/rss+xml" href="/knowledge-graph/docs-updates/rss.xml" title="KMGraph Docs Updates RSS Feed">
+<link rel="alternate" type="application/atom+xml" href="/knowledge-graph/docs-updates/atom.xml" title="KMGraph Docs Updates Atom Feed"><link rel="stylesheet" href="/knowledge-graph/assets/css/styles.0b853dc6.css">
+<script src="/knowledge-graph/assets/js/runtime~main.969abfb0.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/main.714579a6.js" defer="defer"></script>
+</head>
+<body>
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||"dark"),document.documentElement.setAttribute("data-theme-choice",t||"dark")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/knowledge-graph/"><div class="navbar__logo"><img src="/knowledge-graph/img/avatar.png" alt="Staying in Sync" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/knowledge-graph/img/avatar.png" alt="Staying in Sync" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate">KMGraph</b></a><a class="navbar__item navbar__link" href="/knowledge-graph/quickstart">Getting Started</a><a class="navbar__item navbar__link" href="/knowledge-graph/CONCEPTS">Concepts</a><a class="navbar__item navbar__link" href="/knowledge-graph/COMMAND-GUIDE">Commands</a><a class="navbar__item navbar__link" href="/knowledge-graph/CONFIGURATION">Configuration</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/technomensch/knowledge-graph" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link header-github-link" aria-label="GitHub repository"></a><a href="https://www.linkedin.com/in/marckaplan/" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link header-linkedin-link" aria-label="LinkedIn profile"></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="system mode" aria-label="Switch between dark and light mode (currently system mode)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"><div>Loading Search...</div></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><main class="docMainContainer_TBSr docMainContainerEnhanced_lQrH"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>Lesson Learned: Knowledge Extraction Workflow</h1></header>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="problem">Problem<a href="#problem" class="hash-link" aria-label="Direct link to Problem" title="Direct link to Problem" translate="no">​</a></h2>
+<p>Valuable problem-solving conversations and debugging sessions in AI chat interfaces were lost after sessions ended. This caused:</p>
+<ul>
+<li class="">Repeated work solving the same problems</li>
+<li class="">Loss of context about &quot;why&quot; decisions were made</li>
+<li class="">Inability to reference past solutions</li>
+<li class="">No audit trail of evolution over time</li>
+<li class="">Knowledge trapped in platform-specific databases</li>
+</ul>
+<p><strong>Specific incident:</strong> Spent 3 hours debugging a configuration sync issue. Solved it successfully. Two months later, encountered nearly identical issue. No record of previous solution. Spent another 2 hours re-solving the same problem.</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="root-cause">Root Cause<a href="#root-cause" class="hash-link" aria-label="Direct link to Root Cause" title="Direct link to Root Cause" translate="no">​</a></h2>
+<p><strong>Platform design:</strong> Chat platforms store conversations in proprietary databases optimized for:</p>
+<ul>
+<li class="">Real-time conversation (not long-term retrieval)</li>
+<li class="">Platform-specific format (JSONL, Protobuf, SQLite)</li>
+<li class="">Local storage (not versioned in git)</li>
+<li class="">Session-based access (hard to search across sessions)</li>
+</ul>
+<p><strong>What was needed:</strong></p>
+<ul>
+<li class="">Plain text format (markdown) for readability</li>
+<li class="">Git-tracked for versioning and history</li>
+<li class="">Searchable across all past sessions</li>
+<li class="">Portable across platforms</li>
+</ul>
+<p><strong>The gap:</strong> No automated pipeline from &quot;chat happened&quot; → &quot;knowledge captured&quot;</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="solution-implemented">Solution Implemented<a href="#solution-implemented" class="hash-link" aria-label="Direct link to Solution Implemented" title="Direct link to Solution Implemented" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="two-part-workflow">Two-Part Workflow<a href="#two-part-workflow" class="hash-link" aria-label="Direct link to Two-Part Workflow" title="Direct link to Two-Part Workflow" translate="no">​</a></h3>
+<p><strong>Part 1: Automated Chat Extraction</strong></p>
+<p>Created extraction script (<code>extract_chat.py</code>) that:</p>
+<ol>
+<li class="">
+<p><strong>Locates platform log files:</strong></p>
+<ul>
+<li class="">Claude Code: <code>~/.claude/logs/*.jsonl</code></li>
+<li class="">Gemini: <code>~/.gemini/logs/*.pb</code> or <code>.json</code></li>
+<li class="">Other platforms: configurable paths</li>
+</ul>
+</li>
+<li class="">
+<p><strong>Parses platform-specific formats:</strong></p>
+<ul>
+<li class="">JSONL → Extract user/assistant messages</li>
+<li class="">Protobuf → Decode binary format</li>
+<li class="">Handles multiple format versions</li>
+</ul>
+</li>
+<li class="">
+<p><strong>Outputs clean markdown:</strong></p>
+<div class="language-markdown codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-markdown codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token title important punctuation" style="color:rgb(248, 248, 242)">#</span><span class="token title important"> Chat Session: 2024-10-05</span><span class="token plain"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token title important punctuation" style="color:rgb(248, 248, 242)">##</span><span class="token title important"> USER:</span><span class="token plain"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">[message]</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token title important punctuation" style="color:rgb(248, 248, 242)">##</span><span class="token title important"> ASSISTANT:</span><span class="token plain"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">[response]</span><br></div></code></pre></div></div>
+</li>
+<li class="">
+<p><strong>Organizes by date:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">chat-history/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">└── 2024-10/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">    ├── 2024-10-05-claude.md</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">    ├── 2024-10-05-gemini.md</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">    └── 2024-10-12-claude.md</span><br></div></code></pre></div></div>
+</li>
+</ol>
+<p><strong>Part 2: Manual Knowledge Extraction</strong></p>
+<p>After extracting chat to markdown:</p>
+<ol>
+<li class=""><strong>Review</strong> session for valuable insights</li>
+<li class=""><strong>Identify</strong> lessons, patterns, gotchas</li>
+<li class=""><strong>Extract</strong> to appropriate knowledge system:
+<ul>
+<li class="">Detailed problem-solving → Lesson learned</li>
+<li class="">Architectural choice → ADR</li>
+<li class="">Quick insight → Knowledge graph entry</li>
+</ul>
+</li>
+<li class=""><strong>Link</strong> chat session in cross-references</li>
+</ol>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="automation-with-extract-chat-workflow">Automation with <code>/extract-chat</code> Workflow<a href="#automation-with-extract-chat-workflow" class="hash-link" aria-label="Direct link to automation-with-extract-chat-workflow" title="Direct link to automation-with-extract-chat-workflow" translate="no">​</a></h3>
+<p>Created workflow that automates the entire pipeline:</p>
+<div class="language-yaml codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-yaml codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token punctuation" style="color:rgb(248, 248, 242)">---</span><span class="token plain"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token key atrule">description</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"> Extract chat history and optionally create knowledge artifacts</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">---</span><span class="token plain"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token comment" style="color:rgb(98, 114, 164)"># Extract Chat History</span><span class="token plain"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token comment" style="color:rgb(98, 114, 164)">## Step 1: Run Extraction</span><span class="token plain"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> Automatically detects platform (Claude</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> Gemini)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> Finds latest chat session</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> Extracts to `chat</span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain">history/YYYY</span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain">MM/YYYY</span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain">MM</span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain">DD</span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain">platform.md`</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token comment" style="color:rgb(98, 114, 164)">## Step 2: Review Output</span><span class="token plain"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> Agent shows extracted content</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> User confirms quality</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token comment" style="color:rgb(98, 114, 164)">## Step 3: (Optional) Create Knowledge Artifacts</span><span class="token plain"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> If session contains valuable lessons</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> </span><span class="token key atrule">offer to create</span><span class="token punctuation" style="color:rgb(248, 248, 242)">:</span><span class="token plain"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> Lesson learned document</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> Knowledge graph entries</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token punctuation" style="color:rgb(248, 248, 242)">-</span><span class="token plain"> Session summary</span><br></div></code></pre></div></div>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="replication-steps">Replication Steps<a href="#replication-steps" class="hash-link" aria-label="Direct link to Replication Steps" title="Direct link to Replication Steps" translate="no">​</a></h2>
+<p>To implement chat extraction in your project:</p>
+<ol>
+<li class="">
+<p><strong>Identify your platforms:</strong></p>
+<ul>
+<li class="">What chat tools do you use?</li>
+<li class="">Where do they store logs?</li>
+<li class="">What format (JSONL, JSON, Protobuf, SQLite)?</li>
+</ul>
+</li>
+<li class="">
+<p><strong>Create extraction script:</strong></p>
+<div class="language-python codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-python codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token comment" style="color:rgb(98, 114, 164)"># extract_chat.py</span><span class="token plain"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token operator">-</span><span class="token plain"> Parse platform log </span><span class="token builtin" style="color:rgb(189, 147, 249)">format</span><span class="token plain"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token operator">-</span><span class="token plain"> Extract conversations</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token operator">-</span><span class="token plain"> Output to markdown</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token operator">-</span><span class="token plain"> Organize by date</span><br></div></code></pre></div></div>
+</li>
+<li class="">
+<p><strong>Set up directory structure:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">chat-history/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">├── .gitkeep         # Track folder</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">└── YYYY-MM/         # Monthly organization</span><br></div></code></pre></div></div>
+</li>
+<li class="">
+<p><strong>Add to .gitignore (optional):</strong></p>
+<div class="language-gitignore codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-gitignore codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Option A: Track all chat history</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># (nothing in gitignore)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Option B: Track folder, ignore contents</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">chat-history/*</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">!chat-history/.gitkeep</span><br></div></code></pre></div></div>
+</li>
+<li class="">
+<p><strong>Create workflow/skill:</strong></p>
+<ul>
+<li class="">Invoke extraction script</li>
+<li class="">Show output</li>
+<li class="">Offer knowledge capture</li>
+</ul>
+</li>
+<li class="">
+<p><strong>Document the process:</strong></p>
+<ul>
+<li class="">Add to README: &quot;How to extract chat&quot;</li>
+<li class="">Create quick reference</li>
+<li class="">Show examples</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="lessons-learned">Lessons Learned<a href="#lessons-learned" class="hash-link" aria-label="Direct link to Lessons Learned" title="Direct link to Lessons Learned" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="what-worked-well">What Worked Well<a href="#what-worked-well" class="hash-link" aria-label="Direct link to What Worked Well" title="Direct link to What Worked Well" translate="no">​</a></h3>
+<ul>
+<li class=""><strong>Automated extraction:</strong> No manual copy-paste means it actually gets done</li>
+<li class=""><strong>Git-tracked history:</strong> Can search, diff, blame across all conversations</li>
+<li class=""><strong>Platform-agnostic output:</strong> Markdown works everywhere</li>
+<li class=""><strong>Monthly organization:</strong> Easy to find &quot;conversations from 3 months ago&quot;</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="what-didnt-work">What Didn&#x27;t Work<a href="#what-didnt-work" class="hash-link" aria-label="Direct link to What Didn&#x27;t Work" title="Direct link to What Didn&#x27;t Work" translate="no">​</a></h3>
+<ul>
+<li class=""><strong>Full automation of knowledge extraction:</strong> Tried to auto-detect lessons — too noisy</li>
+<li class=""><strong>Immediate extraction:</strong> Extracting during session interrupts flow</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="key-insights">Key Insights<a href="#key-insights" class="hash-link" aria-label="Direct link to Key Insights" title="Direct link to Key Insights" translate="no">​</a></h3>
+<ol>
+<li class=""><strong>Automate capture, manual curation:</strong> Scripts should extract everything, humans decide what&#x27;s valuable</li>
+<li class=""><strong>Optimize for later search:</strong> Future-you will want to grep, not open proprietary DB</li>
+<li class=""><strong>Extraction vs. extraction-with-processing:</strong> Separate concerns (get raw data, then process)</li>
+<li class=""><strong>End of session is best time:</strong> Extract when closing, not during active work</li>
+</ol>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="two-phase-approach">Two-Phase Approach<a href="#two-phase-approach" class="hash-link" aria-label="Direct link to Two-Phase Approach" title="Direct link to Two-Phase Approach" translate="no">​</a></h3>
+<p><strong>Phase 1 (Automated): Extraction</strong></p>
+<ul>
+<li class="">Run at end of session (or next day)</li>
+<li class="">Get everything into markdown</li>
+<li class="">No judgments about value</li>
+</ul>
+<p><strong>Phase 2 (Manual): Curation</strong></p>
+<ul>
+<li class="">Review extracted chat</li>
+<li class="">Identify valuable insights</li>
+<li class="">Extract to knowledge systems</li>
+<li class="">Link chat as source</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="metrics">Metrics<a href="#metrics" class="hash-link" aria-label="Direct link to Metrics" title="Direct link to Metrics" translate="no">​</a></h2>
+<p>After implementing this workflow:</p>
+<ul>
+<li class=""><strong>Time to extract:</strong> ~30 seconds (was: manual copy-paste, rarely done)</li>
+<li class=""><strong>Extraction frequency:</strong> After every significant session (was: almost never)</li>
+<li class=""><strong>Knowledge artifacts created:</strong> 3-4 per week (was: ~1 per month)</li>
+<li class=""><strong>Problem re-occurrence:</strong> Reduced ~60% (measured by &quot;we solved this before&quot; moments)</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="external-references">External References<a href="#external-references" class="hash-link" aria-label="Direct link to External References" title="Direct link to External References" translate="no">​</a></h2>
+<p>Sources consulted while solving this problem:</p>
+<ul>
+<li class="">
+<p><strong><a href="https://github.blog/changelog/2024-12-06-copilot-chat-now-has-a-64k-context-window-with-openai-gpt-4o/" target="_blank" rel="noopener noreferrer" class="">GitHub Copilot Context Window Updates</a></strong> — Accessed: 2025-12-30</p>
+<ul>
+<li class="">Context: Provided baseline for understanding when AI performance degrades due to context length.</li>
+<li class="">Key insight: Even with large windows, &quot;chat compaction&quot; or &quot;history fading&quot; can cause silent data loss if not captured.</li>
+</ul>
+</li>
+<li class="">
+<p><strong><a href="https://www.datastudios.org/post/microsoft-copilot-context-window-token-limits-memory-policy-and-2025-rules" target="_blank" rel="noopener noreferrer" class="">Microsoft Copilot Context and Memory Policy</a></strong> — Accessed: 2025-12-30</p>
+<ul>
+<li class="">Context: Comparative analysis of how different LLM providers handle long-running conversation history.</li>
+</ul>
+</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="related-documentation">Related Documentation<a href="#related-documentation" class="hash-link" aria-label="Direct link to Related Documentation" title="Direct link to Related Documentation" translate="no">​</a></h2>
+<p><strong>Knowledge Graph:</strong></p>
+<ul>
+<li class=""><a class="" href="/knowledge-graph/examples/knowledge/concepts.md#automation-strategy">Automation Strategy</a> — Framework for automating history capture.</li>
+<li class=""><a class="" href="/knowledge-graph/examples/knowledge/patterns.md#automated-orchestrator">Automated Orchestrator</a> — The pattern behind the <code>/extract-chat</code> command.</li>
+</ul>
+<p><strong>Scripts:</strong></p>
+<ul>
+<li class=""><code>core/scripts/extract_claude.py</code> - Local Claude history extractor.</li>
+<li class=""><code>core/scripts/extract_gemini.py</code> - Local Gemini history extractor.</li>
+</ul>
+<p><strong>Workflows:</strong></p>
+<ul>
+<li class=""><code>/extract-chat</code> - The primary entry point for this process.</li>
+</ul>
+<hr>
+<p><strong>Version:</strong> 1.0
+<strong>Created:</strong> 2025-12-30
+<strong>Last Updated:</strong> 2026-02-13</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_WFHX"><a href="https://github.com/technomensch/knowledge-graph/edit/main/docs/examples/lessons-learned/process/Example_Chat_History_Workflow.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_JAkA"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#problem" class="table-of-contents__link toc-highlight">Problem</a></li><li><a href="#root-cause" class="table-of-contents__link toc-highlight">Root Cause</a></li><li><a href="#solution-implemented" class="table-of-contents__link toc-highlight">Solution Implemented</a><ul><li><a href="#two-part-workflow" class="table-of-contents__link toc-highlight">Two-Part Workflow</a></li><li><a href="#automation-with-extract-chat-workflow" class="table-of-contents__link toc-highlight">Automation with <code>/extract-chat</code> Workflow</a></li></ul></li><li><a href="#replication-steps" class="table-of-contents__link toc-highlight">Replication Steps</a></li><li><a href="#lessons-learned" class="table-of-contents__link toc-highlight">Lessons Learned</a><ul><li><a href="#what-worked-well" class="table-of-contents__link toc-highlight">What Worked Well</a></li><li><a href="#what-didnt-work" class="table-of-contents__link toc-highlight">What Didn&#39;t Work</a></li><li><a href="#key-insights" class="table-of-contents__link toc-highlight">Key Insights</a></li><li><a href="#two-phase-approach" class="table-of-contents__link toc-highlight">Two-Phase Approach</a></li></ul></li><li><a href="#metrics" class="table-of-contents__link toc-highlight">Metrics</a></li><li><a href="#external-references" class="table-of-contents__link toc-highlight">External References</a></li><li><a href="#related-documentation" class="table-of-contents__link toc-highlight">Related Documentation</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Docs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/quickstart">Getting Started</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/COMMAND-GUIDE">Command Guide</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/CHEAT-SHEET">Cheat Sheet</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/FAQ">FAQ</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/technomensch/knowledge-graph" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://www.linkedin.com/in/marckaplan/" target="_blank" rel="noopener noreferrer" class="footer__link-item">LinkedIn<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://buymeacoffee.com/technomensch" target="_blank" rel="noopener noreferrer" class="footer__link-item">Buy Me a Coffee<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="margin-bottom--sm"><a href="https://github.com/technomensch/knowledge-graph" rel="noopener noreferrer" class="footerLogoLink_BH7S"><img src="/knowledge-graph/img/banner.jpeg" alt="Staying in Sync" class="footer__logo themedComponent_mlkZ themedComponent--light_NVdE" width="160"><img src="/knowledge-graph/img/banner.jpeg" alt="Staying in Sync" class="footer__logo themedComponent_mlkZ themedComponent--dark_xIcU" width="160"></a></div><div class="footer__copyright">Staying in Sync</div></div></div></footer></div>
+</body>
+</html>
