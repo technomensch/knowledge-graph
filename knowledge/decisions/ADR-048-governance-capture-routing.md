@@ -1,7 +1,9 @@
 ---
-title: >-
-  Governance Capture Routing — update-graph flag-only, session-wrap as action
-  point
+id: ADR-048
+title: Governance Capture Routing — update-graph flag-only, session-wrap as action point
+status: Accepted
+date: 2026-05-05
+implements: "d9b0e523 — feat(agents): replace Step 8 MEMORY.md write with governance flag output"
 ---
 
 # ADR-048: Governance Capture Routing

@@ -1,7 +1,12 @@
 ---
-title: Plugin Cache Does Not Refresh After Update (Claude Code & Codex CLI)
-category:
-  uri: uri-that-does-not-map-to-process
+title: "Plugin Cache Does Not Refresh After Update (Claude Code & Codex CLI)"
+category: process
+tags: [claude-code, codex-cli, plugin, cache, update, mcp, version, full-automation]
+created: 2026-03-03
+author: technomensch
+git_branch: v0.0.3-github-docs
+severity: medium
+status: workaround-documented
 ---
 
 # Plugin Cache Does Not Refresh After Update (Claude Code & Codex CLI)
@@ -120,6 +125,6 @@ Both issues must be solved together for a reliable upgrade experience.
 
 ## Related
 
-- [ADR-054: Document Cache-Clear as Official Upgrade Path](../decisions/ADR-054-document-cache-clear-upgrade-workaround.md) — Decision to document workaround for both Claude Code and Codex CLI
+- [ADR-006: Document Cache-Clear as Official Upgrade Path](../decisions/ADR-006-document-cache-clear-upgrade-workaround.md) — Decision to document workaround for both Claude Code and Codex CLI
 - [ADR-009: Three-Tier Installation Architecture](../decisions/ADR-009-three-tier-installation-architecture.md) — Tier 1 groups both Claude Code and Codex CLI as full-automation platforms
 - [GETTING-STARTED.md Troubleshooting](../GETTING-STARTED.md#plugin-update-does-not-take-effect) — User-facing instructions

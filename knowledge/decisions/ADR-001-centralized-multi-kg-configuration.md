@@ -1,5 +1,8 @@
 ---
-title: 'ADR-001: Centralized Multi-KG Configuration'
+title: "ADR-001: Centralized Multi-KG Configuration"
+status: Accepted
+date: 2026-02-15
+deciders: technomensch, Claude Sonnet 4.5
 ---
 
 # ADR-001: Centralized Multi-KG Configuration

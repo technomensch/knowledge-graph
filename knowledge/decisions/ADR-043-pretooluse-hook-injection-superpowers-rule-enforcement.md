@@ -1,9 +1,22 @@
 ---
-title: >-
-  ADR-043: PreToolUse Hook Injection to Enforce User Rules During Superpowers
-  Skill Execution
-category:
-  uri: uri-that-does-not-map-to-process
+title: "ADR-043: PreToolUse Hook Injection to Enforce User Rules During Superpowers Skill Execution"
+number: 043
+created: 2026-04-21T00:00:00Z
+status: Accepted
+author: technomensch
+email: 917847+technomensch@users.noreply.github.com
+git:
+  branch: v0.5.0-beta
+  commit: df061cb8b4d7e7556b18a5d20b29b9a421678a0c
+  pr: null
+  issue: null
+implements: "[[e868a17d]] — feat(hooks): add PreToolUse skill hook to enforce user rules during superpowers execution"
+related:
+  adrs: ["[[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file]]", "[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]]", "[[ADR-038-model-selection-rule-for-kg-tasks]]"]
+  lessons: []
+  kg_entries: []
+tags: [process, hooks, superpowers, rule-enforcement]
+category: process
 ---
 
 # ADR-043: PreToolUse Hook Injection to Enforce User Rules During Superpowers Skill Execution

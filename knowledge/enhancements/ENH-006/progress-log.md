@@ -1,5 +1,6 @@
 ---
 title: Progress Log — ENH-006
+enhancement_id: ENH-006
 ---
 
 # Progress Log: ENH-006

@@ -1,6 +1,8 @@
 ---
-title: '[Document Title]'
-type: '[guide | concept | tutorial | explanation | reference | faq | custom]'
+title: "[Document Title]"
+type: "[guide | concept | tutorial | explanation | reference | faq | custom]"
+created: "[YYYY-MM-DDThh:mm:ssZ]"
+author: "[AUTO: git config user.name]"
 ---
 
 # [Document Title]

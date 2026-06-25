@@ -1,7 +1,16 @@
 ---
-title: 'Lesson: Commands vs Skills Architecture Research'
-category:
-  uri: uri-that-does-not-map-to-architecture
+title: "Lesson: Commands vs Skills Architecture Research"
+created: 2026-02-16T00:00:00Z
+author: technomensch
+email: 917847+technomensch@users.noreply.github.com
+git:
+  branch: main
+  commit: 37f7e544e5b3b2f1c9a7d5e3f1b9a7c5e3f1b9a7
+  pr: null
+  issue: null
+sources: []
+tags: [architecture, plugin-design, commands, skills, automation]
+category: architecture
 ---
 
 # Lesson Learned: Commands vs Skills Architecture Research

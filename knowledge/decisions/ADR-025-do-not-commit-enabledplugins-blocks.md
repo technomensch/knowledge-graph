@@ -1,7 +1,23 @@
 ---
-title: 'ADR-025: Do not commit `enabledPlugins` blocks in `.claude/settings.json`'
-category:
-  uri: uri-that-does-not-map-to-process
+title: "ADR-025: Do not commit `enabledPlugins` blocks in `.claude/settings.json`"
+number: 025
+created: 2026-04-06T00:00:00Z
+status: Accepted
+author: technomensch
+email: 917847+technomensch@users.noreply.github.com
+git:
+  branch: v0.2.3.2-beta
+  commit: 499360b99abc98559a51a6ae2ee1f706ebfd93af
+  pr: null
+  issue: null
+implements: "non-git-tracked — original branch v0.2.3.2-beta; migrated to knowledge/ in [[e523d8b3]]"
+related:
+  adrs: []
+  lessons:
+    - Lessons_Learned_Plugin_Settings_Scope_Consistency.md
+  kg_entries: []
+tags: [process]
+category: process
 ---
 
 # ADR-025: Do not commit `enabledPlugins` blocks in `.claude/settings.json`

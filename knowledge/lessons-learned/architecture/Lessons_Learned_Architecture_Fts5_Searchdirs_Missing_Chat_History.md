@@ -1,7 +1,13 @@
 ---
-title: FTS5 SearchDirs Missing Chat History
-category:
-  uri: uri-that-does-not-map-to-architecture
+title: "FTS5 SearchDirs Missing Chat History"
+created: 2026-05-27T17:54:30.473Z
+updated: 2026-05-27T17:54:30.473Z
+author: technomensch
+git:
+  branch: main
+  commit: 39798b982fe46fdc99ef3744c0c94f09f1264278
+tags: [fts5, search, chat-history, indexing, searchDirs, silent-failure, extract-chat]
+category: architecture
 ---
 ## Problem
 

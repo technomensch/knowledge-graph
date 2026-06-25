@@ -7,6 +7,14 @@ displayed_sidebar: null
 
 All notable changes to the Knowledge Plugin will be documented in this file.
 
+## [0.6.12] — 2026-06-25
+
+### Fixed
+
+- **Homepage visual regression** — `docs/index.mdx` was replaced with a plain markdown table during readme.com prep (`170a9657`). The P1 restore (`a9e52262`) fixed 4 Tabs files but missed the homepage. Restored the full JSX layout: banner image, CSS value-cards grid, pillar cards with hover effects, `hide_title`/`hide_table_of_contents` frontmatter, and `home.module.css` import.
+- **ENH/ADR/issue frontmatter stripped** — Commit `22972a33` ("strip frontmatter from agents, commands, and test fixtures") over-reached into `knowledge/`, removing structured YAML metadata from 155 files including 56 ADRs, 28 ENH specifications, and issue/handoff/analysis files. Restored from `22972a33~1`. The `git:` block (`branch`, `commit`, `pr`, `issue`) and `implements` field in ADR frontmatter are load-bearing and governed by ADR-042.
+- **Template frontmatter stripped** — `knowledge/decisions/ADR-template.md` and `core/default-templates/decisions/ADR-template.md` (plus `lesson-template.md`, `doc-template.md`, `rules.md`, `me.md` templates) also stripped by `22972a33`. Restored full commented YAML schema with `[FUTURE-AUTO]`/`[MANUAL]` field annotations.
+
 ## [0.6.10] — 2026-06-22
 
 ### Fixed

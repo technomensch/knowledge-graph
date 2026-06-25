@@ -1,9 +1,18 @@
 ---
-title: >-
-  Lesson: Single Source of Truth (DRY) for Documentation — Avoid Concept
-  Duplication
-category:
-  uri: uri-that-does-not-map-to-patterns
+title: "Lesson: Single Source of Truth (DRY) for Documentation — Avoid Concept Duplication"
+created: 2026-03-28T00:00:00Z
+author: Claude Sonnet 4.6
+email: noreply@anthropic.com
+git:
+  branch: v0.2.1-beta-mcp-write-and-portability
+  commit: 2b06634b
+tags:
+  - documentation
+  - architecture
+  - dry
+  - single-source-of-truth
+  - kmgraph
+category: patterns
 ---
 
 # Lesson: Single Source of Truth (DRY) for Documentation — Avoid Concept Duplication

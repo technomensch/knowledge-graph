@@ -1,7 +1,17 @@
 ---
-title: Upgrade Path Missing FTS5 Stale File Cleanup
-category:
-  uri: uri-that-does-not-map-to-process
+title: "Upgrade Path Missing FTS5 Stale File Cleanup"
+created: 2026-04-12T00:00:00Z
+author: technomensch
+email: 917847+technomensch@users.noreply.github.com
+category: process
+tags: [fts5, upgrade, migration, cleanup, stale-files, installer, obsidian, v8-crash, gitignore]
+git:
+  branch: v0.3.7
+  commit: 9387b147139808be7c993b8fcfb4fba7772f6574
+  commit_short: 9387b147
+  pr: null
+  issue: null
+sources: []
 ---
 
 # Upgrade Path Missing FTS5 Stale File Cleanup

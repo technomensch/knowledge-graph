@@ -155,6 +155,3 @@ See [core/examples/lessons-learned/](../../examples/lessons-learned/) for filled
 - [Platform-Agnostic Rule Timing via triggers.md](architecture/Lessons_Learned_Architecture_Platform_Agnostic_Rule_Timing_Via_Triggers.md)
 - [FTS5 SearchDirs Missing Chat History](architecture/Lessons_Learned_Architecture_Fts5_Searchdirs_Missing_Chat_History.md)
 - [Handoff Spec Must Cover All Artifact Shapes](process/Lessons_Learned_Process_Handoff_Spec_Must_Cover_All_Artifact_Shapes.md)
-- [Codex upgrade trigger: version sentinel + AGENTS-template.md as canonical source](process/Lessons_Learned_Process_Codex_Upgrade_Trigger:_Version_Sentinel_+_Agents_Template.md_As_Canonical_Source.md)
-- [ENH-FUTURE: Cross-platform automatic capture-type identification](process/Lessons_Learned_Process_Enh_Future:_Cross_Platform_Automatic_Capture_Type_Identification.md)
-- [Meta-Issue: init ↔ kg_upgrade upgrade-check drift](architecture/Lessons_Learned_Architecture_Meta_Issue:_Init_↔_Kg_Upgrade_Upgrade_Check_Drift.md)

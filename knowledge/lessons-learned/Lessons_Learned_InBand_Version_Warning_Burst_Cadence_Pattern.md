@@ -1,7 +1,14 @@
 ---
-title: In-Band Version Warning with Burst Cadence Pattern
-category:
-  uri: uri-that-does-not-map-to-patterns
+title: "In-Band Version Warning with Burst Cadence Pattern"
+date: 2026-04-18
+category: patterns
+tags: [plugin-development, version-management, ux, mcp, upgrade-nudge, burst-cadence]
+git:
+  branch: main
+  commit: 4e513ae82b97f2a3bde2138aecfbec3edb26cdf5
+  commit_short: 4e513ae8
+  author: Marc K
+  email: 917847+technomensch@users.noreply.github.com
 ---
 
 ## Problem

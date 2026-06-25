@@ -1,7 +1,11 @@
 ---
-title: Shell Boolean Guard — Exit Code Trap with $var && cmd
-category:
-  uri: uri-that-does-not-map-to-patterns
+title: "Shell Boolean Guard — Exit Code Trap with $var && cmd"
+category: patterns
+tags: ["bash", "shell", "exit-code", "boolean", "guard"]
+created: 2026-04-10
+branch: v0.3.1-init-shared-refactor
+commit: 7bd20bd6
+author: technomensch
 ---
 
 ## Problem

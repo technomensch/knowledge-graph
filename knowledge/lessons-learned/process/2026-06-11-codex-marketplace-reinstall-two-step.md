@@ -1,7 +1,15 @@
 ---
-title: 'Lesson: Codex Plugin Marketplace Registration Persists After Uninstall'
-category:
-  uri: uri-that-does-not-map-to-process
+title: "Lesson: Codex Plugin Marketplace Registration Persists After Uninstall"
+created: 2026-06-11T00:00:00Z
+author: technomensch
+email: mkitact@gmail.com
+git:
+  branch: v0.5.10.3-fix-mcp-bundle
+  commit: 92b52a99
+  pr: "#135"
+  issue: "#133"
+tags: [process, codex, marketplace, installation, troubleshooting]
+category: process
 ---
 
 # Lesson Learned: Codex Plugin Marketplace Registration Persists After Uninstall

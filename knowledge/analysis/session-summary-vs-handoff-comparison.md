@@ -1,7 +1,9 @@
 ---
-title: 'Session Summaries vs. Handoff Documents: Design Decisions and Overlap'
-category:
-  uri: uri-that-does-not-map-to-architecture
+title: "Session Summaries vs. Handoff Documents: Design Decisions and Overlap"
+date: 2026-05-29
+category: architecture
+tags: [session-summary, handoff, knowledge-graph, context-transfer, documentation]
+status: Complete
 ---
 
 # Session Summaries vs. Handoff Documents

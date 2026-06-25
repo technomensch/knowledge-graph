@@ -1,3 +1,8 @@
+---
+id: ENH-020
+file: solution-approach
+status: stub
+---
 
 # ENH-020 Solution Approach
 

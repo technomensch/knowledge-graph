@@ -1,7 +1,21 @@
 ---
-title: 'Lesson: Routing-Layer-Only Profile Injection Pattern'
-category:
-  uri: uri-that-does-not-map-to-patterns
+title: "Lesson: Routing-Layer-Only Profile Injection Pattern"
+
+created: 2026-04-28T00:00:00Z
+
+author: technomensch
+
+email: 917847+technomensch@users.noreply.github.com
+
+git:
+  branch: v0.5.4-profile-autoload
+  commit: 76706161dc18be958188b54a276faecb62e59709
+  pr: null
+  issue: null
+
+tags: [session-start, hooks, profile-injection, context-compaction, me.md, triggers.md, routing-layer, bash-helper, provenance-delimiters]
+
+category: patterns
 ---
 
 # Lesson Learned: Routing-Layer-Only Profile Injection Pattern

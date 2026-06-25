@@ -1,5 +1,6 @@
 ---
 title: Test Cases — ENH-006
+enhancement_id: ENH-006
 ---
 
 # Test Cases: ENH-006

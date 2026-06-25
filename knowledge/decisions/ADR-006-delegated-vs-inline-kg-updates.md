@@ -1,5 +1,8 @@
 ---
-title: 'ADR-006: Delegated vs Inline KG Update Architecture'
+title: "ADR-006: Delegated vs Inline KG Update Architecture"
+status: Accepted
+date: 2026-02-16
+deciders: technomensch, Claude Sonnet 4.5
 ---
 
 # ADR-006: Delegated vs Inline KG Update Architecture

@@ -1,7 +1,13 @@
 ---
-title: Git Presence Gate in Commands
-category:
-  uri: uri-that-does-not-map-to-patterns
+title: "Git Presence Gate in Commands"
+created: 2026-04-07T12:20:10.610Z
+updated: 2026-04-07T12:20:10.610Z
+author: Marc K
+git:
+  branch: v0.2.3.4-issue-2-start-issue-tracking-no-git
+  commit: bd4b3b34e610b7c69f49bdee8093783798792fd2
+tags: [git, guard, defensive-programming, commands, non-git]
+category: patterns
 ---
 # Git Presence Gate in Commands
 

@@ -7,10 +7,7 @@ git:
   commit: 2bc7920
 tags: [process, testing, marketplace, plugin-development, workflow]
 category: process
-version: "1.1"
-last_updated: 2026-06-17
 ---
-<!-- v1.1 Change: added --plugin-dir option, discovery source -->
 
 # Lesson: Local Marketplace Testing - Two-Location Sync Required
 
@@ -107,16 +104,7 @@ rsync -av --delete \
 
    # Option B: Rsync (faster, only copies changes)
    rsync -av --delete . /Users/mkaplan/Documents/GitHub/local-marketplace/plugins/knowledge-graph-plugin/
-
-   # Option C: --plugin-dir (fastest — bypasses cache entirely, no sync step needed)
-   claude --plugin-dir /Users/mkaplan/GitHub/kmgraph-readme
-   # Edit source files → changes load immediately on next Claude Code start
-   # No rsync required between edits
    ```
-
-> **When to use each option:**
-> - Option C (`--plugin-dir`): fastest for validating behavior changes — loads directly from source, no cache involved
-> - Options A/B (rsync): required when validating the actual install/upgrade path a real user would experience
 
 3. **Restart Claude Code** or reload plugins
 
@@ -149,8 +137,6 @@ chmod +x sync-to-marketplace.sh
 ## Prevention
 
 ### Workflow Checklist
-
-> **Shortcut:** If you only need to test behavior (not the install path), use `claude --plugin-dir <dev-repo>` and skip steps 2–3 entirely.
 
 Before testing plugin changes locally:
 
@@ -209,17 +195,6 @@ See related lesson: [Plugin Namespace Visibility - Shadow Command Failure](../de
 - Development location: `/Users/mkaplan/Documents/GitHub/knowledge-graph-plugin/`
 - Marketplace cache: `/Users/mkaplan/Documents/GitHub/local-marketplace/plugins/knowledge-graph-plugin/`
 - Marketplace config: `.claude-plugin/marketplace.json`
-
-## Discovery Source
-
-> **Note:** The `--plugin-dir` finding (2026-06-17) **supersedes the rsync-only recommendation** for behavior testing. The original lesson described rsync as the only local testing path; `--plugin-dir` is now the preferred method for iterative development. Rsync remains correct only when validating actual install/upgrade flows. Update any personal workflows or checklists referencing the rsync-only approach.
-
-- **Found:** 2026-06-17, during v0.6.0-kmg-prefix-normalization branch review
-- **Validated:** Web search confirmed `--plugin-dir` flag still active in 2026; cache behavior unchanged
-- **Sources:**
-  - [Local plugin cache not invalidated when source files change — Issue #28492](https://github.com/anthropics/claude-code/issues/28492)
-  - [Plugin cache: CLAUDE_PLUGIN_ROOT points to stale version after update — Issue #15642](https://github.com/anthropics/claude-code/issues/15642)
-  - [Local Development — Claude Skills Guide](https://jeffallan.github.io/claude-skills/guides/local-development/)
 
 ## Related Lessons
 

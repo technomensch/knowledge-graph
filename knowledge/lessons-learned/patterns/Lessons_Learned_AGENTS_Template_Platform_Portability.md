@@ -1,9 +1,14 @@
 ---
-title: >-
-  AGENTS-template.md Enables Full KMGraph Workflow on Non-Claude Platforms
-  Without MCP
-category:
-  uri: uri-that-does-not-map-to-patterns
+title: "AGENTS-template.md Enables Full KMGraph Workflow on Non-Claude Platforms Without MCP"
+date: 2026-03-27
+author: technomensch
+email: 917847+technomensch@users.noreply.github.com
+git:
+  branch: v0.2.0-beta-layered-architecture
+  commit: a09611b50725a5c2141c178f0de7067dd9b41b1b
+  commit_short: a09611b5
+tags: [platform-portability, agents-template, gemini, antigravity, mcp-optional, graceful-degradation]
+category: patterns
 ---
 
 ## Problem

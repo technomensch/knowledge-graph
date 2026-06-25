@@ -1,5 +1,9 @@
 ---
-title: CLOSED — recall + context-mode FTS5 integration
+title: "CLOSED — recall + context-mode FTS5 integration"
+status: closed
+identified: 2026-03-16
+closed: 2026-03-29
+resolution: already-resolved
 ---
 
 # CLOSED: recall + context-mode FTS5 Integration

@@ -1,5 +1,12 @@
 ---
-title: 'ENH-018: Rules File H2 Structure Hardening'
+title: "ENH-018: Rules File H2 Structure Hardening"
+number: 018
+status: deferred
+version_target: null
+github_issue: null
+created: 2026-05-27
+related_adrs: []
+related_enhs: []
 ---
 
 # ENH-018: Rules File H2 Structure Hardening

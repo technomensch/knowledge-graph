@@ -1,3 +1,8 @@
+---
+id: issue-9
+file: solution-approach
+status: designed
+---
 
 # Issue-9 Solution Approach
 

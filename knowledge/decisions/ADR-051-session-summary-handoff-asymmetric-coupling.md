@@ -1,7 +1,22 @@
 ---
-title: 'ADR-051: Session Summary / Handoff Asymmetric Coupling via continues_from'
-category:
-  uri: uri-that-does-not-map-to-process
+title: "ADR-051: Session Summary / Handoff Asymmetric Coupling via continues_from"
+number: 051
+created: 2026-06-07T00:00:00Z
+status: Accepted
+author: technomensch
+email: 917847+technomensch@users.noreply.github.com
+git:
+  branch: v0.5.10-ux-session-handoff
+  commit: d58462d2
+  pr: null
+  issue: null
+implements: v0.5.10
+related:
+  adrs: [26, 49, 50]
+  lessons: []
+  kg_entries: []
+tags: [session-summary, handoff, continues_from, coupling, context-transfer]
+category: process
 ---
 
 # ADR-051: Session Summary / Handoff Asymmetric Coupling via `continues_from`

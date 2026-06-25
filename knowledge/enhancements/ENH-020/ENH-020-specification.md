@@ -1,5 +1,12 @@
 ---
-title: 'ENH-020: Preventive Cascade Template + Profile Ecosystem Docs'
+title: "ENH-020: Preventive Cascade Template + Profile Ecosystem Docs"
+number: 020
+status: deferred
+version_target: null
+github_issue: null
+created: 2026-05-28
+related_adrs: []
+related_enhs: ["ENH-015"]
 ---
 
 # ENH-020: Preventive Cascade Template + Profile Ecosystem Docs

@@ -1,5 +1,8 @@
 ---
-title: 'ADR-007: Distribution Hygiene via package.json Files Allowlist'
+title: "ADR-007: Distribution Hygiene via package.json Files Allowlist"
+status: Accepted
+date: 2026-02-17
+deciders: technomensch, Claude Sonnet 4.5
 ---
 
 # ADR-007: Distribution Hygiene via package.json Files Allowlist

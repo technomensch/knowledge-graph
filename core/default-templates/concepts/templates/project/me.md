@@ -1,3 +1,21 @@
+---
+profile_schema: 1
+# Project-level platforms[] overrides user-level on conflict for this project only.
+# Uncomment and fill in only the entries you want to override from your user me.md.
+# platforms:
+#   - name: claude
+#     tier_map:
+#       fast-tier: claude-haiku-4-5-20251001
+#       standard-tier: claude-sonnet-4-6
+#       powerful-tier: claude-opus-4-7
+#   # - name: ollama
+#   #   host: localhost
+#   #   port: 11434
+#   #   tier_map:
+#   #     fast-tier: ""
+#   #     standard-tier: ""
+#   #     powerful-tier: ""
+---
 
 # Identity — [Project Name]
 

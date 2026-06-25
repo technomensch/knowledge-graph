@@ -1,7 +1,13 @@
 ---
-title: Parallel Opus Review Before Release
-category:
-  uri: uri-that-does-not-map-to-process
+title: "Parallel Opus Review Before Release"
+created: 2026-04-12T00:07:58.415Z
+updated: 2026-04-12T00:07:58.415Z
+author: technomensch
+git:
+  branch: v0.3.6
+  commit: 636ca49171f1be908f076f9eb09784a294ad316c
+tags: [release, code-review, parallel-agents, multi-workstream, pre-release, subagents, opus, quality-gate]
+category: process
 ---
 ## Problem
 

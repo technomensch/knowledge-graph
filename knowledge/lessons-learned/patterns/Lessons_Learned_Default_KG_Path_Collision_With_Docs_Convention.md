@@ -1,5 +1,13 @@
 ---
-title: 'Lesson: Default KG Path Collision With Docs Convention'
+title: "Lesson: Default KG Path Collision With Docs Convention"
+date: 2026-04-10
+version: v1.0
+last-updated: 2026-04-10
+tags: [patterns, default-path, cli-design, conventions]
+git-branch: v0.3.0-beta
+git-author: technomensch
+related-adr: ADR-028
+related-enhancement: ENH-010
 ---
 
 # Default KG Path Collision With Docs Convention

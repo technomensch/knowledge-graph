@@ -1,7 +1,22 @@
 ---
-title: 'ADR-050: Pre-Push Composite Gate + Inline Recommendation Gate'
-category:
-  uri: uri-that-does-not-map-to-governance
+title: "ADR-050: Pre-Push Composite Gate + Inline Recommendation Gate"
+number: 050
+created: 2026-05-30T00:00:00Z
+status: Accepted
+author: mkaplan
+email: mkitact@gmail.com
+git:
+  branch: v0.5.9.3-docs-enforcement-protocol-gap
+  commit: TBD
+  pr: null
+  issue: null
+implements: v0.5.9.3
+related:
+  adrs: [012, 013, 021, 036, 043, 049]
+  lessons: []
+  kg_entries: []
+tags: [hooks, governance, pre-push, recommendation, UserPromptSubmit, advisory]
+category: governance
 ---
 
 # ADR-050: Pre-Push Composite Gate + Inline Recommendation Gate
@@ -50,7 +65,7 @@ The ADR-049 Review Audit Protocol and the recall/ADR-pre-check HARD BLOCKs in `p
   - Auto-invalidates per commit and per branch — no cross-commit or cross-branch false positives
 - If absent: inject "run docs-impact-scan before pushing" advisory
 
-**Output contract (PreToolUse):** `hookSpecificOutput.additionalContext` — not `systemMessage`. `systemMessage` is a TUI-only warning surface (not model context injection); `additionalContext` injects into the model's context for PreToolUse, PostToolUse, and UserPromptSubmit alike.
+**Output contract (PreToolUse):** `hookSpecificOutput.additionalContext` — not `systemMessage`. The distinction is required: `systemMessage` is for PostToolUse/UserPromptSubmit; `additionalContext` is for PreToolUse to inject into the tool call's context.
 
 **Advisory-injection model:** All gates inject a blocking instruction into Claude's context rather than returning a non-zero exit code. `exit 0` always. This preserves marketplace safety (ADR-012 contract). Hard-deny enforcement remains deferred (issue-6 lineage).
 
@@ -64,7 +79,7 @@ The ADR-049 Review Audit Protocol and the recall/ADR-pre-check HARD BLOCKs in `p
 
 **Preamble sourcing (ADR-021 DRY):** `recommendation-gate.sh` extracts the "Before producing an inline recommendation" section from `~/.kmgraph/triggers.md` via awk. Hardcoded fallback when `triggers.md` is absent or the section is not found (ENH-016 pattern). The trigger language is also added to the shipped `core/templates/knowledge/triggers.md`.
 
-**Output contract (UserPromptSubmit):** `hookSpecificOutput.additionalContext` — correct channel for this event type across Claude Code, Codex CLI, and Gemini CLI. **Amendment (v0.6.1, 2026-06-17):** Originally implemented as `systemMessage`, which was valid at the time of writing (ADR-050 2026-05-30). Claude Code subsequently changed the `UserPromptSubmit` output contract to require `hookSpecificOutput.hookEventName + additionalContext`; Codex CLI and Gemini CLI use the same schema. `systemMessage` on these platforms is a TUI-only warning surface, not model context injection. `recommendation-gate.sh` updated accordingly.
+**Output contract (UserPromptSubmit):** `systemMessage` — correct channel for this event type.
 
 **Relationship to ADR-049:** ADR-049 establishes the Review Audit Protocol for skill-gated workflows. This ADR extends the same gates to inline recommendation conversations that bypass Skill invocation. ADR-049 remains authoritative for skill-gated flows; ADR-050 covers the complementary gap.
 
@@ -118,5 +133,5 @@ The ADR-049 Review Audit Protocol and the recall/ADR-pre-check HARD BLOCKs in `p
 ---
 
 **Decision Made:** 2026-05-30
-**Last Updated:** 2026-06-17
+**Last Updated:** 2026-05-30
 **Status:** Accepted

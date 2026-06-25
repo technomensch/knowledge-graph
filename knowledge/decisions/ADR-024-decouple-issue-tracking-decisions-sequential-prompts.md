@@ -1,9 +1,22 @@
 ---
-title: >-
-  ADR-024: Decouple Issue Tracking Decisions into Four Independent Sequential
-  Prompts
-category:
-  uri: uri-that-does-not-map-to-process
+title: "ADR-024: Decouple Issue Tracking Decisions into Four Independent Sequential Prompts"
+number: 024
+created: 2026-03-30T00:00:00Z
+status: Accepted
+author: technomensch
+email: 917847+technomensch@users.noreply.github.com
+git:
+  branch: v0.2.2-beta
+  commit: 9a2f62601069a73d504bba67d1b41e5a281658b0
+  pr: null
+  issue: null
+implements: v0.2.2-beta
+related:
+  adrs: []
+  lessons: []
+  kg_entries: [docs/enhancements/ENH-006/]
+tags: [process, command-ux, issue-tracking]
+category: process
 ---
 
 # ADR-024: Decouple Issue Tracking Decisions into Four Independent Sequential Prompts
