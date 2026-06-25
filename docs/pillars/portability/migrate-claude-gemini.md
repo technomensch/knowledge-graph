@@ -1,11 +1,5 @@
 ---
 title: Migrate Claude ↔ Gemini
-category:
-  uri: portability
-position: 4
-slug: pillars-portability-migrate-claude-gemini
-parent:
-  uri: pillars-portability-index
 ---
 
 # Migrate Claude ↔ Gemini

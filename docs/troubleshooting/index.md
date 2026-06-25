@@ -1,9 +1,5 @@
 ---
 title: Troubleshooting
-category:
-  uri: troubleshooting
-position: 1
-slug: troubleshooting-index
 ---
 
 # Troubleshooting

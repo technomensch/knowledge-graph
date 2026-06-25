@@ -1,8 +1,5 @@
 ---
 title: Patterns
-category:
-  uri: templates
-slug: templates-knowledge-patterns
 ---
 
 # Knowledge Graph - Patterns

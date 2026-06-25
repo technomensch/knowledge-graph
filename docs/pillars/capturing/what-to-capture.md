@@ -1,11 +1,5 @@
 ---
 title: What to Capture
-category:
-  uri: capturing
-position: 5
-slug: pillars-capturing-what-to-capture
-parent:
-  uri: pillars-capturing-index
 ---
 
 # What to Capture

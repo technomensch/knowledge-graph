@@ -1,8 +1,5 @@
 ---
 title: Gotchas
-category:
-  uri: templates
-slug: templates-knowledge-gotchas
 ---
 
 # Knowledge Graph - Gotchas

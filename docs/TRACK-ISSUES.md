@@ -1,9 +1,5 @@
 ---
 title: Track Issues
-category:
-  uri: overview
-position: 7
-slug: track-issues
 ---
 
 The issue tracking process documents a problem or enhancement from identification through resolution. The `/kmgraph:kmg-start-issue-tracking` command drives this process. Beginning with v0.2.3.4-beta, the command gates all git-dependent steps on repository presence — when no git repository is detected, branch strategy and git integration steps are omitted automatically.

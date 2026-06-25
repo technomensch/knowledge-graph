@@ -1,8 +1,5 @@
 ---
 title: Solution Approach
-category:
-  uri: templates
-slug: templates-meta-issue-attempt-template-solution-approach
 ---
 
 # Attempt NNN: [Approach Name]

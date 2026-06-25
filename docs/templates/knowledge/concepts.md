@@ -1,8 +1,5 @@
 ---
 title: Concepts
-category:
-  uri: templates
-slug: templates-knowledge-concepts
 ---
 
 # Knowledge Graph - Concepts

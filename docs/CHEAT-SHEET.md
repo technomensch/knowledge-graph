@@ -1,9 +1,5 @@
 ---
 title: Cheat Sheet
-category:
-  uri: overview
-position: 4
-slug: cheat-sheet
 ---
 
 **Version:** 0.5.2 | **Updated:** 2026-04-22

@@ -1,9 +1,5 @@
 ---
 title: Style Guide
-category:
-  uri: overview
-position: 9
-slug: style-guide
 ---
 
 Authoring standards for contributors writing or reviewing documentation for the Knowledge Management Graph.

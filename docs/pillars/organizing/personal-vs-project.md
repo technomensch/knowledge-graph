@@ -1,11 +1,5 @@
 ---
 title: Personal vs. Project
-category:
-  uri: organizing
-position: 1
-slug: pillars-organizing-personal-vs-project
-parent:
-  uri: pillars-organizing-index
 ---
 
 # Personal vs. Project

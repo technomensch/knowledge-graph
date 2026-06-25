@@ -1,8 +1,5 @@
 ---
 title: Attempt Results
-category:
-  uri: templates
-slug: templates-meta-issue-attempt-template-attempt-results
 ---
 
 # Attempt NNN: Results

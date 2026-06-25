@@ -1,12 +1,12 @@
 ---
+id: quickstart
 title: Quickstart
-category:
-  uri: overview
-position: 2
-slug: quickstart
-content:
-  excerpt: Install KMGraph, initialize a knowledge graph, and capture your first lesson — in under 5 minutes.
+sidebar_label: Quickstart (5 min)
+description: Install KMGraph and capture your first lesson in under 5 minutes
 ---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # Quickstart
 
@@ -16,49 +16,65 @@ Install KMGraph, initialize a knowledge graph, and capture your first lesson —
 
 ## Step 1 — Install
 
-**Claude Code**
+<Tabs groupId="platform">
+  <TabItem value="claude-code" label="Claude Code" default>
 
 ```bash
 claude --plugin-dir /path/to/knowledge-graph
 ```
 
-Verify: type `/km` — autocomplete should show `kmgraph` commands.
+Verify the plugin loaded: type `/km` and the autocomplete menu should show `kmgraph` commands.
 
-**Codex CLI**
+  </TabItem>
+  <TabItem value="codex" label="Codex CLI">
 
 ```bash
 codex plugin marketplace add technomensch/knowledge-graph
 codex plugin add kmgraph@knowledge-management-graph
 ```
 
-Skills and MCP tools activate immediately. Run `/kmgraph:kmg-init` to initialize.
+Skills and MCP tools activate immediately. Run `/kmgraph:kmg-init` in a Codex session to initialize a knowledge graph.
 
-**Cursor / Windsurf / VS Code**
+  </TabItem>
+  <TabItem value="cursor" label="Cursor / Windsurf / VS Code">
 
-Paste the contents of [INSTALL.md](install) into your AI assistant. The installer detects the platform, configures the MCP server, and initializes the knowledge graph automatically.
+Paste the contents of [INSTALL.md](INSTALL.md) into your AI assistant. The installer detects the platform, configures the MCP server, and initializes the knowledge graph automatically.
 
 Requires an assistant with terminal and file system access.
 
-**Generic MCP**
+  </TabItem>
+  <TabItem value="mcp" label="Generic MCP">
 
 ```bash
+# Build the MCP server
 cd mcp-server && npm install && npm run build
-# Register in your IDE's MCP config — point to: mcp-server/dist/index.js
+
+# Register in your IDE's MCP config
+# Point to: mcp-server/dist/index.js
 ```
 
-See [Platform Adaptation](reference-platform-adaptation) for IDE-specific registration steps.
+See [Platform Adaptation](/reference/PLATFORM-ADAPTATION) for IDE-specific registration steps.
 
-**Any platform (manual)**
+  </TabItem>
+  <TabItem value="manual" label="Any platform (manual)">
 
-Copy `core/default-templates/` into your project. Follow the template READMEs to manually create lessons, ADRs, and session summaries without automation.
+Copy `core/default-templates/` into your project. Follow the template READMEs to manually create lessons, ADRs, and session summaries without any automation.
 
-> 🚧 **Do not copy `commands/`, `skills/`, or `agents/`**
->
-> These directories are Claude Code plugin-specific and will not function outside the Claude Code plugin system.
+:::warning[Do not copy `commands/`, `skills/`, or `agents/`]
+
+These directories are Claude Code plugin-specific and will not function outside the Claude Code
+plugin system.
+
+:::
+
+  </TabItem>
+</Tabs>
 
 ---
 
 ## Step 2 — Initialize
+
+<img src={require('@site/static/img/demos/init.gif').default} alt="KMGraph init demo — wizard creates knowledge graph structure" />
 
 ```bash
 /kmgraph:kmg-init
@@ -69,11 +85,13 @@ The wizard asks for:
 - **Git tracking** — enable for automatic branch/commit metadata on every capture
 - **KG type** — `project-local` (default) stores in the project; `personal` stores at `~/.kmgraph/` and is shared across all projects
 
-Init also scaffolds `knowledge/me.md` (your identity and working style, gitignored) and `knowledge/rules.md` (project conventions, committed). These give any AI platform consistent context without platform-specific rewrites.
+Init also scaffolds `knowledge/me.md` (your identity and working style, gitignored) and `knowledge/rules.md` (project conventions, committed). These give any AI platform consistent context without platform-specific rewrites. See [Your AI Profile](pillars/portability/your-ai-profile.mdx).
 
 ---
 
-## Step 3 — Capture Your First Lesson
+## Step 3 — Capture your first lesson
+
+<img src={require('@site/static/img/demos/capture-lesson.gif').default} alt="KMGraph capture-lesson demo — structured lesson saved with git metadata" />
 
 ```bash
 /kmgraph:kmg-capture-lesson
@@ -83,7 +101,9 @@ Describe what you just learned or solved. The command structures it into a markd
 
 ---
 
-## Step 4 — Recall It
+## Step 4 — Recall it
+
+<img src={require('@site/static/img/demos/recall.gif').default} alt="KMGraph recall demo — full-text search returns matching lessons" />
 
 ```bash
 /kmgraph:kmg-recall "what you captured"
@@ -93,23 +113,29 @@ Full-text search across all captured lessons, decisions, and patterns.
 
 ---
 
-## Step 5 — Check Status
+## Step 5 — Check status
+
+<img src={require('@site/static/img/demos/status.gif').default} alt="KMGraph status demo — shows entry counts and last capture time" />
 
 ```bash
-/kmgraph:kmg-status
+/kmgraph:status
 ```
 
 Shows the active knowledge graph, entry count, and recent captures.
 
 ---
 
-## The Capture Pipeline
+## The capture pipeline
 
 ```mermaid
+%%{init: { 'flowchart': { 'useMaxWidth': true }, 'theme': 'neutral' }}%%
 graph LR
-    A["Capture\n/kmgraph:kmg-capture-lesson"] --> B["Extract\n/kmgraph:kmg-update-graph"]
-    B --> C["Sync\n/kmgraph:kmg-sync-all"]
-    C --> D["Summarize\n/kmgraph:kmg-session-summary"]
+    A["📝 Capture<br/>/kmgraph:kmg-capture-lesson"] --> B["📊 Extract<br/>/kmgraph:kmg-update-graph"]
+    B --> C["🔄 Sync<br/>/kmgraph:kmg-sync-all"]
+    C --> D["💾 Summarize<br/>/kmgraph:kmg-session-summary"]
+
+    accTitle: Knowledge Capture Pipeline
+    accDescr: Four-step workflow: Capture lessons feeds into Extract patterns, which feeds into Sync across graphs, which feeds into Summarize session.
 ```
 
 Use `/kmgraph:kmg-sync-all` at the end of a session to run all four steps in one command.
@@ -120,14 +146,18 @@ Use `/kmgraph:kmg-sync-all` at the end of a session to run all four steps in one
 
 ### Stale Plugin Cache
 
-**Claude Code**
+If you see outdated commands or features, the plugin cache may be stale. Clear it and reinstall:
+
+<Tabs groupId="platform">
+  <TabItem value="claude-code" label="Claude Code">
 
 ```bash
 rm -rf ~/.claude/plugins/cache/stayinginsync-knowledge-graph/kmgraph/
 /reload-plugins
 ```
 
-**Codex CLI**
+  </TabItem>
+  <TabItem value="codex" label="Codex CLI">
 
 ```bash
 rm -rf ~/.codex/plugins/cache/knowledge-management-graph/kmgraph/
@@ -136,11 +166,14 @@ codex plugin marketplace add technomensch/knowledge-graph
 codex plugin add kmgraph@knowledge-management-graph
 ```
 
+  </TabItem>
+</Tabs>
+
 ---
 
 ## Related
 
-- **[Capturing](pillars-capturing-capture-lessons-learned)** — Save a lesson, ADR, or pattern from your current session
-- **[Command Guide](reference-command-guide)** — Complete command reference with examples and learning path
-- **[Concepts](concepts-why-kmgraph)** — How the knowledge graph is structured and why
-- **[Cheat Sheet](cheat-sheet)** — All commands at a glance
+- **[Capturing](pillars/capturing/capture-lessons-learned)** — Save a lesson, ADR, or pattern from your current session
+- **[Command Guide](reference/command-guide)** — Complete command reference with examples and learning path
+- **[Concepts](concepts/why-kmgraph)** — How the knowledge graph is structured and why
+- **[Cheat Sheet](CHEAT-SHEET)** — All commands at a glance

@@ -1,11 +1,5 @@
 ---
 title: Linking Entries
-category:
-  uri: recalling
-position: 3
-slug: pillars-recalling-linking-entries
-parent:
-  uri: pillars-recalling-index
 ---
 
 # Linking Entries

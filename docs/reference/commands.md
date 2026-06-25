@@ -1,9 +1,5 @@
 ---
 title: Commands Reference
-category:
-  uri: reference
-position: 2
-slug: reference-commands
 ---
 
 **Version:** 0.5.10.5 | All commands use the `/kmgraph:` prefix in Claude Code. Other platforms access equivalent functionality through `kg_*` MCP tools — see [INSTALL.md](../INSTALL.md) for details.

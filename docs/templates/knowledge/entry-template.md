@@ -1,8 +1,5 @@
 ---
 title: Entry Template
-category:
-  uri: templates
-slug: templates-knowledge-entry-template
 ---
 
 <!--

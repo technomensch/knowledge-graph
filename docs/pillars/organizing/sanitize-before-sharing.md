@@ -1,11 +1,5 @@
 ---
 title: Sanitize Before Sharing
-category:
-  uri: organizing
-position: 5
-slug: pillars-organizing-sanitize-before-sharing
-parent:
-  uri: pillars-organizing-index
 ---
 
 # Sanitize Before Sharing

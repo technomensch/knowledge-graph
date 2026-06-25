@@ -1,9 +1,5 @@
 ---
 title: How KMGraph Is Organized
-category:
-  uri: concepts
-position: 4
-slug: concepts-how-kmgraph-is-organized
 ---
 
 # How KMGraph Is Organized

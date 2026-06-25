@@ -1,9 +1,5 @@
 ---
 title: Command Guide
-category:
-  uri: reference
-position: 1
-slug: reference-command-guide
 ---
 
 **Version:** 0.5.2 | **Updated:** 2026-04-22

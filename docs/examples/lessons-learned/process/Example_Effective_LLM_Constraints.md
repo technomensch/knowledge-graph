@@ -1,8 +1,5 @@
 ---
 title: 'Lesson: AI Constraint Enforcement Strategies'
-category:
-  uri: examples
-slug: examples-lessons-learned-process-example-effective-llm-constraints
 ---
 
 # Lesson Learned: AI Constraint Enforcement Strategies

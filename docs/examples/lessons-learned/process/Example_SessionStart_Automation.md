@@ -1,8 +1,5 @@
 ---
 title: 'Lesson: Hook-Based Session Automation'
-category:
-  uri: examples
-slug: examples-lessons-learned-process-example-sessionstart-automation
 ---
 
 # Lesson Learned: Hook-Based Session Automation

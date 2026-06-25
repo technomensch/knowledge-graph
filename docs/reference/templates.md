@@ -1,9 +1,5 @@
 ---
 title: Templates Reference
-category:
-  uri: reference
-position: 6
-slug: reference-templates
 ---
 
 # Templates Reference

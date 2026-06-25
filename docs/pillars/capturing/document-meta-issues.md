@@ -1,11 +1,5 @@
 ---
 title: Document Meta-Issues
-category:
-  uri: capturing
-position: 4
-slug: pillars-capturing-document-meta-issues
-parent:
-  uri: pillars-capturing-index
 ---
 
 # Document Meta-Issues

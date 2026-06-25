@@ -1,8 +1,5 @@
 ---
 title: Plan Reference
-category:
-  uri: templates
-slug: templates-meta-issue-attempt-template-plan-reference
 ---
 
 # Attempt NNN: Plan Reference

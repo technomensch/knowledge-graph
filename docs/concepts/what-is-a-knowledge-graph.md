@@ -1,9 +1,5 @@
 ---
 title: What Is a Knowledge Graph
-category:
-  uri: concepts
-position: 2
-slug: concepts-what-is-a-knowledge-graph
 ---
 
 # What Is a Knowledge Graph

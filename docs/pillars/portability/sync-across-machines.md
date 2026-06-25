@@ -1,11 +1,5 @@
 ---
 title: Sync a Knowledge Graph Across Machines
-category:
-  uri: portability
-position: 2
-slug: pillars-portability-sync-across-machines
-parent:
-  uri: pillars-portability-index
 ---
 
 # Sync a Knowledge Graph Across Machines

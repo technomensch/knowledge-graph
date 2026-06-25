@@ -1,9 +1,5 @@
 ---
 title: Hooks Reference
-category:
-  uri: reference
-position: 3
-slug: reference-hooks
 ---
 
 # Hooks Reference

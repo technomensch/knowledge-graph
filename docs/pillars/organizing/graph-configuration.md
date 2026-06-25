@@ -1,11 +1,5 @@
 ---
 title: Graph Configuration
-category:
-  uri: organizing
-position: 3
-slug: pillars-organizing-graph-configuration
-parent:
-  uri: pillars-organizing-index
 ---
 
 # Graph Configuration

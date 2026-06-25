@@ -1,11 +1,5 @@
 ---
 title: Capture Patterns
-category:
-  uri: capturing
-position: 3
-slug: pillars-capturing-capture-patterns
-parent:
-  uri: pillars-capturing-index
 ---
 
 # Capture Patterns

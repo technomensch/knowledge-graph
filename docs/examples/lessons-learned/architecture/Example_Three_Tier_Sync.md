@@ -1,8 +1,5 @@
 ---
 title: 'Lesson: Three-Tier Configuration Synchronization'
-category:
-  uri: examples
-slug: examples-lessons-learned-architecture-example-three-tier-sync
 ---
 
 # Lesson Learned: Three-Tier Configuration Synchronization

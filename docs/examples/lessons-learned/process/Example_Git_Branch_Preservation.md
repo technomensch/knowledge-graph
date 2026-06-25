@@ -1,8 +1,5 @@
 ---
 title: 'Lesson: Git Branch Governance Without Deletion'
-category:
-  uri: examples
-slug: examples-lessons-learned-process-example-git-branch-preservation
 ---
 
 # Lesson Learned: Git Branch Governance Without Deletion

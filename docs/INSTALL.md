@@ -1,9 +1,5 @@
 ---
 title: Installation
-category:
-  uri: overview
-position: 3
-slug: install
 ---
 
 Users can install the Knowledge Management Graph using a **universal installer** — a single markdown file that any AI assistant can execute for automated setup.

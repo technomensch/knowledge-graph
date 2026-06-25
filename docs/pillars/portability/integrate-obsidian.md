@@ -1,11 +1,5 @@
 ---
 title: Integrate with Obsidian
-category:
-  uri: portability
-position: 7
-slug: pillars-portability-integrate-obsidian
-parent:
-  uri: pillars-portability-index
 ---
 
 # Integrate with Obsidian

@@ -1,8 +1,5 @@
 ---
 title: Root Cause Evolution
-category:
-  uri: templates
-slug: templates-meta-issue-analysis-root-cause-evolution
 ---
 
 # Root Cause Evolution

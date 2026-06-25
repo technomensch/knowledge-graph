@@ -1,11 +1,5 @@
 ---
 title: Integrate with NotebookLM
-category:
-  uri: portability
-position: 5
-slug: pillars-portability-integrate-notebooklm
-parent:
-  uri: pillars-portability-index
 ---
 
 # Integrate with NotebookLM

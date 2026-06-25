@@ -1,11 +1,5 @@
 ---
 title: Session Memory
-category:
-  uri: recalling
-position: 2
-slug: pillars-recalling-session-memory
-parent:
-  uri: pillars-recalling-index
 ---
 
 # Session Memory

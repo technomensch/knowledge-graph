@@ -1,8 +1,5 @@
 ---
 title: 'Lesson: Complete Knowledge System Implementation'
-category:
-  uri: examples
-slug: examples-lessons-learned-patterns-example-complete-memory-system
 ---
 
 # Lesson Learned: Complete Knowledge System Implementation

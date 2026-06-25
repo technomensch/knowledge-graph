@@ -1,11 +1,5 @@
 ---
 title: Search the Graph
-category:
-  uri: recalling
-position: 1
-slug: pillars-recalling-search-the-graph
-parent:
-  uri: pillars-recalling-index
 ---
 
 # Search the Graph

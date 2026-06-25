@@ -1,8 +1,5 @@
 ---
 title: 'Lesson: [Title]'
-category:
-  uri: templates
-slug: templates-lessons-learned-lesson-template
 ---
 
 # Lesson Learned: [Title]
