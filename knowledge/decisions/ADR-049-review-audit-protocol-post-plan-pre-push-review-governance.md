@@ -1,7 +1,31 @@
 ---
-title: 'ADR-049: Review Audit Protocol — Post-Plan/Pre-Push Review Governance'
-category:
-  uri: uri-that-does-not-map-to-process
+title: "ADR-049: Review Audit Protocol — Post-Plan/Pre-Push Review Governance"
+number: 049
+created: "2026-05-28T00:00:00Z"
+status: Accepted
+author: technomensch
+email: 917847+technomensch@users.noreply.github.com
+git:
+  branch: v0.5.9.1-review-audit-protocol
+  commit: ad7f015188b11392a42a1f37c746a20915ddb915
+  pr: null
+  issue: null
+implements: null
+related:
+  adrs:
+    - "[[ADR-043-pretooluse-hook-injection-superpowers-rule-enforcement]]"
+    - "[[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file]]"
+  lessons: []
+  kg_entries:
+    - ENH-015
+    - ENH-020 (pending)
+  issues:
+    - "[[issue-6]]  — Bug: post-plan validation not enforced (advisory-only hook, static stub); GitHub #125"
+tags:
+  - process
+  - governance
+  - review
+category: process
 ---
 
 # ADR-049: Review Audit Protocol — Post-Plan/Pre-Push Review Governance

@@ -1,7 +1,24 @@
 ---
-title: 'ADR-014: Maintain Dual Plan File Locations'
-category:
-  uri: uri-that-does-not-map-to-process
+title: "ADR-014: Maintain Dual Plan File Locations"
+number: 014
+created: 2026-03-01T12:00:00Z
+status: Accepted
+author: Claude Sonnet 4.6
+email: noreply@anthropic.com
+git:
+  branch: v0.0.8.7.3-alpha-fix-installer-page
+  commit: 56b96ea7a7c04b96c7d8e8c0f2d1e3a4
+  pr: null
+  issue: null
+implements: "non-git-tracked — original branch v0.0.8.7.3-alpha-fix-installer-page; migrated to knowledge/ in [[e523d8b3]]"
+related:
+  adrs: []
+  lessons:
+    - lessons-learned/process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md
+  kg_entries: []
+tags:
+  - process
+category: process
 ---
 
 # ADR-014: Maintain Dual Plan File Locations

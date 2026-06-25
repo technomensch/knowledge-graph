@@ -1,7 +1,32 @@
 ---
-title: 'ADR-031: Use Plural `Lessons_Learned_` Prefix for Lesson Filenames'
-category:
-  uri: uri-that-does-not-map-to-architecture
+title: "ADR-031: Use Plural `Lessons_Learned_` Prefix for Lesson Filenames"
+
+number: 031
+
+created: 2026-04-10T00:00:00Z
+
+status: Accepted
+
+author: technomensch
+
+email: 917847+technomensch@users.noreply.github.com
+
+git:
+  branch: v0.3.2-capture-draft-approve
+  commit: b6520875df11a6d243db2df1f52d58f71e9610bf
+  pr: null
+  issue: null
+
+implements: v0.2.1-beta
+
+related:
+  adrs: []
+  lessons: []
+  kg_entries: []
+
+tags: [naming, lessons-learned, conventions, capture, mcp]
+
+category: architecture
 ---
 
 # ADR-031: Use Plural `Lessons_Learned_` Prefix for Lesson Filenames

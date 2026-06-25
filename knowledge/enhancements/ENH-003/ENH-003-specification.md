@@ -1,5 +1,12 @@
 ---
-title: 'ENH-003: doc-update-router skill'
+title: "ENH-003: doc-update-router skill"
+number: 003
+status: implemented
+version_target: "v0.2.2"
+github_issue: null
+created: 2026-03-29
+related_adrs: []
+related_enhs: []
 ---
 
 # ENH-003: doc-update-router — Extensible Routing Skill for Doc Updates

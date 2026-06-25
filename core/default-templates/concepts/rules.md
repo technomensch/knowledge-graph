@@ -1,3 +1,6 @@
+---
+kmgraph_schema: 2
+---
 
 # Rules — [Project Name]
 
@@ -126,7 +129,7 @@ Follow the table with one line: **Overall strategy:** [why this mix was chosen]
 
 ### Capture Checkpoints
 
-- Add a `/kmgraph:kmg-capture-lesson` or `/kmgraph:kmg-create-adr` step after each phase that produces a decision or learning
+- Add a `/kmgraph:capture-lesson` or `/kmgraph:create-adr` step after each phase that produces a decision or learning
 - Tick plan checkboxes after each phase completes, not at the end
 
 ---
@@ -147,7 +150,7 @@ Follow the table with one line: **Overall strategy:** [why this mix was chosen]
 
 1. Always update the plan before executing, not after. If work is done without a plan entry, add it retroactively and note that it was added after the fact.
 
-2. Before capturing a new lesson via `/kmgraph:kmg-capture-lesson`, search the graph for similar existing lessons. Update an existing lesson rather than creating a duplicate.
+2. Before capturing a new lesson via `/kmgraph:capture-lesson`, search the graph for similar existing lessons. Update an existing lesson rather than creating a duplicate.
 
 <!-- Additional project-specific rules: -->
 

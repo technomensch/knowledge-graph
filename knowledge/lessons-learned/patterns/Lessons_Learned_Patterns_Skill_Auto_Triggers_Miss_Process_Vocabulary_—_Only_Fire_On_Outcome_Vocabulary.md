@@ -1,7 +1,13 @@
 ---
-title: Skill Auto-Triggers Miss Process Vocabulary — Only Fire on Outcome Vocabulary
-category:
-  uri: uri-that-does-not-map-to-patterns
+title: "Skill Auto-Triggers Miss Process Vocabulary — Only Fire on Outcome Vocabulary"
+created: 2026-03-30T13:58:57.789Z
+updated: 2026-03-30T13:58:57.789Z
+author: technomensch
+git:
+  branch: v0.2.2-beta
+  commit: 9a2f626063b6b3d5f3b3b3b3b3b3b3b3b3b3b3b3
+tags: [kmgraph, skill-triggers, lesson-capture, adr-guide, UX, process-vocabulary, auto-trigger]
+category: patterns
 ---
 ## Problem
 

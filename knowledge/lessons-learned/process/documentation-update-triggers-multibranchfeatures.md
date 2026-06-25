@@ -1,7 +1,15 @@
 ---
-title: Documentation Update Triggers in Multi-Branch Feature Development
-category:
-  uri: uri-that-does-not-map-to-process
+title: "Documentation Update Triggers in Multi-Branch Feature Development"
+category: "process"
+date: 2026-02-27
+tags:
+  - release-management
+  - multi-branch-workflow
+  - documentation
+  - portfolio-quality
+status: "Discovered"
+source: "v0.0.10 Feature Development Series"
+context: "4 serialized branches (v0.0.10.0-10.3) completed without triggering comprehensive documentation updates, discovered only in hindsight"
 ---
 
 # Documentation Update Triggers in Multi-Branch Feature Development

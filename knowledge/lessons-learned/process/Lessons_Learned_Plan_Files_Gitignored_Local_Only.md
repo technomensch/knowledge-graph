@@ -1,7 +1,17 @@
 ---
-title: 'Lesson: Plan Files Are Gitignored — Local-Only Working Copies'
-category:
-  uri: uri-that-does-not-map-to-process
+title: "Lesson: Plan Files Are Gitignored — Local-Only Working Copies"
+created: 2026-03-28T00:00:00Z
+author: Claude Sonnet 4.6
+email: noreply@anthropic.com
+git:
+  branch: v0.2.1-beta-mcp-write-and-portability
+  commit: 2b06634b
+tags:
+  - workflow
+  - planning
+  - git
+  - kmgraph
+category: process
 ---
 
 # Lesson: Plan Files Are Gitignored — Local-Only Working Copies

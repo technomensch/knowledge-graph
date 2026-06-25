@@ -1,7 +1,12 @@
 ---
-title: >-
-  ENH-012: Rules and Identity File Hardening — Platform Split for Tool
-  Directives
+title: "ENH-012: Rules and Identity File Hardening — Platform Split for Tool Directives"
+number: 012
+status: implemented
+version_target: "v0.3.5-beta"
+github_issue: null
+created: 2026-04-11
+related_adrs: ["ADR-028", "ADR-032"]
+related_enhs: []
 ---
 # ENH-012: Rules and Identity File Hardening — Platform Split for Tool Directives
 

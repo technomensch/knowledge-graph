@@ -1,5 +1,8 @@
 ---
-title: 'ADR-008: Third-Person Language Standard for User-Facing Docs'
+title: "ADR-008: Third-Person Language Standard for User-Facing Docs"
+status: Accepted
+date: 2026-02-20
+deciders: technomensch, Claude Opus 4.6
 ---
 
 # ADR-008: Third-Person Language Standard for User-Facing Docs

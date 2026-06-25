@@ -1,5 +1,8 @@
 ---
-title: 'ADR-002: Commands vs Skills Architecture'
+title: "ADR-002: Commands vs Skills Architecture"
+status: Accepted
+date: 2026-02-16
+deciders: technomensch, Claude Sonnet 4.5
 ---
 
 # ADR-002: Commands vs Skills Architecture

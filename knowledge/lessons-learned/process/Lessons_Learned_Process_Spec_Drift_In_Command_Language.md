@@ -1,7 +1,13 @@
 ---
-title: Spec Drift In Command Language
-category:
-  uri: uri-that-does-not-map-to-process
+title: "Spec Drift In Command Language"
+created: 2026-04-07T01:48:30.478Z
+updated: 2026-04-07T01:48:30.478Z
+author: technomensch
+git:
+  branch: v0.2.3.2-beta
+  commit: 0c0c73f2b6e1d3a5c9f4e7b2d8a1c6e0f3b5d7a9
+tags: [spec-drift, command-language, snapshot-gate, consistency, process]
+category: process
 ---
 ## Problem
 

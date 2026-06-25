@@ -1,5 +1,9 @@
 ---
 title: Solution Approach — ENH-005 FTS5 Database Relocation
+enhancement_id: ENH-005
+github_issue: 46
+status: Draft
+created: 2026-03-30
 ---
 
 # Solution Approach: ENH-005 FTS5 Database Relocation

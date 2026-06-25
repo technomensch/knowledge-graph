@@ -1,9 +1,26 @@
 ---
-title: >-
-  ADR-047: Profile Auto-Load — Inject Routing Layer Only (me.md + triggers.md),
-  Not rules.md
-category:
-  uri: uri-that-does-not-map-to-architecture
+title: "ADR-047: Profile Auto-Load — Inject Routing Layer Only (me.md + triggers.md), Not rules.md"
+number: 047
+created: 2026-04-28T00:00:00Z
+status: Accepted
+author: technomensch
+email: 917847+technomensch@users.noreply.github.com
+git:
+  branch: v0.5.4-profile-autoload
+  commit: ecc9d7b9
+  pr: "104"
+  issue: null
+implements: "v0.5.4 — Profile Auto-Load"
+related:
+  adrs:
+    - "[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]]"
+    - "[[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file]]"
+    - "[[ADR-020-lifecycle-hooks-suite-automated-capture]]"
+    - "[[ADR-045-update-profile-skill-not-command]]"
+  lessons: []
+  kg_entries: []
+tags: [hooks, session-start, profile, context-loading, routing-layer]
+category: architecture
 ---
 
 # ADR-047: Profile Auto-Load — Inject Routing Layer Only (me.md + triggers.md), Not rules.md

@@ -1,5 +1,12 @@
 ---
+id: issue-6
 type: Bug
+status: tracked
+github-issue: "#125"
+branch: v0.5.9.2-fix-gh-issue-create
+created: 2026-05-28
+related-adrs: [ADR-043, ADR-049]
+related-enhs: [ENH-015]
 ---
 
 # Issue-6: Post-Plan Validation Checklist Not Enforced — Advisory-Only Hook, Static Stub

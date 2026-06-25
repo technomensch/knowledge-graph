@@ -1,3 +1,7 @@
+---
+id: issue-7
+file: implementation-log
+---
 
 # Issue-7 Implementation Log
 

@@ -1,5 +1,8 @@
 ---
-title: 'ADR-010: Plugin Namespace Rename: knowledge → kg-sis'
+title: "ADR-010: Plugin Namespace Rename: knowledge → kg-sis"
+status: Accepted
+date: 2026-02-21
+deciders: technomensch, Claude Opus 4.6
 ---
 
 # ADR-010: Plugin Namespace Rename: knowledge → kg-sis

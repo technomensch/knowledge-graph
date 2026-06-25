@@ -1,7 +1,15 @@
 ---
-title: 'Lesson: git log origin/* Shows Stale Data Without git fetch'
-category:
-  uri: uri-that-does-not-map-to-process
+title: "Lesson: git log origin/* Shows Stale Data Without git fetch"
+created: 2026-06-11T00:00:00Z
+author: technomensch
+email: mkitact@gmail.com
+git:
+  branch: v0.5.10.3-fix-mcp-bundle
+  commit: 92b52a99
+  pr: "#134, #135"
+  issue: null
+tags: [process, git, remote-tracking, troubleshooting, diagnostics]
+category: process
 ---
 
 # Lesson Learned: git log origin/* Shows Stale Data Without git fetch

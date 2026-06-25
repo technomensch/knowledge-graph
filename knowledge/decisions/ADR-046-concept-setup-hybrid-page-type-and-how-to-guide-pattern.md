@@ -1,9 +1,14 @@
 ---
-title: >-
-  ADR-046: Introduce concept+setup hybrid page type and document how-to guide
-  pattern separately from narrative guides
-number: 38
-created: 2026-04-28T00:00:00.000Z
+title: "ADR-046: Introduce concept+setup hybrid page type and document how-to guide pattern separately from narrative guides"
+status: Proposed
+date: 2026-04-28
+deciders: technomensch
+tags: [architecture, documentation, style-guide]
+---
+---
+title: "ADR-046: Introduce concept+setup hybrid page type and document how-to guide pattern separately from narrative guides"
+number: 046
+created: 2026-04-28T00:00:00Z
 status: Accepted
 author: technomensch
 email: 917847+technomensch@users.noreply.github.com
@@ -17,10 +22,7 @@ related:
   adrs: []
   lessons: []
   kg_entries: []
-tags:
-  - architecture
-  - documentation
-  - style-guide
+tags: [architecture, documentation, style-guide]
 category: architecture
 ---
 

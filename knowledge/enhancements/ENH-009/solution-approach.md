@@ -1,5 +1,7 @@
 ---
+id: ENH-009-solution
 type: Hardening
+status: OPEN
 ---
 
 # Solution Approach: ENH-009

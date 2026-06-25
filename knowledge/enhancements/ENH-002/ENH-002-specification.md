@@ -1,5 +1,13 @@
 ---
-title: 'ENH-002: Session Snapshot on Capture'
+title: "ENH-002: Session Snapshot on Capture"
+number: 002
+status: partially-implemented
+version_target: "v0.2.2"
+github_issue: 41
+created: 2026-03-28
+related_adrs: ["ADR-022", "ADR-026"]
+related_enhs: ["ENH-001"]
+notes: "Snapshot gate items remain; operational sections + zone structure done (v0.5.10.1)"
 ---
 
 # ENH-002: Session Snapshot on Capture

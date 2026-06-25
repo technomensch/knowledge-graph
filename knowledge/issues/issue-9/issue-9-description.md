@@ -1,5 +1,12 @@
 ---
+id: issue-9
 type: Bug
+status: resolved
+branch: v0.5.9.3-docs-enforcement-protocol-gap
+created: 2026-05-30
+related-adrs: [ADR-049, ADR-043]
+related-enhs: [ENH-021]
+target-release: v0.5.9.3
 ---
 
 # Issue-9: Inline Recommendation Protocol Gap

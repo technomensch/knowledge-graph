@@ -1,5 +1,6 @@
 ---
 title: User-Level Global KG — Test Cases & Acceptance Criteria
+enhancement_id: ENH-001
 ---
 
 # Test Cases: User-Level Global Knowledge Graphs

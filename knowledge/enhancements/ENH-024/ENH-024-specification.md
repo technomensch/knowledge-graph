@@ -1,5 +1,12 @@
 ---
-title: 'ENH-024: Add Codex CLI Chat History Extraction Support'
+title: "ENH-024: Add Codex CLI Chat History Extraction Support"
+number: 024
+status: implemented
+version_target: "v0.5.10.5"
+github_issue: null
+created: 2026-06-12
+related_adrs: ["ADR-044"]
+related_enhs: []
 ---
 
 # ENH-024: Add Codex CLI Chat History Extraction Support

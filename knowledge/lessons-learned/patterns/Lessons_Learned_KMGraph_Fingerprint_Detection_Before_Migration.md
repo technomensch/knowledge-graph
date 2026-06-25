@@ -1,7 +1,21 @@
 ---
-title: 'Lesson: KMGraph Fingerprint Detection Before Migration'
-category:
-  uri: uri-that-does-not-map-to-patterns
+title: "Lesson: KMGraph Fingerprint Detection Before Migration"
+
+created: 2026-04-09T00:00:00Z
+
+author: technomensch
+
+email: 917847+technomensch@users.noreply.github.com
+
+git:
+  branch: v0.3.0-beta
+  commit: a6aa52f96da7318e1395ac6c02e686f3a7006700
+  pr: null
+  issue: null
+
+tags: [migration, detection, fingerprint, init, false-positive, docs-folder, patterns]
+
+category: patterns
 ---
 
 # Lesson Learned: KMGraph Fingerprint Detection Before Migration

@@ -1,7 +1,25 @@
 ---
-title: 'ADR-037: Default Graph-Usage Rules Seeded at Deployment'
-category:
-  uri: uri-that-does-not-map-to-process
+title: "ADR-037: Default Graph-Usage Rules Seeded at Deployment"
+number: 037
+created: 2026-04-20T00:00:00Z
+status: Proposed
+author: technomensch
+email: mkitact@gmail.com
+git:
+  branch: main
+  commit: 4e513ae8
+  pr: null
+  issue: null
+implements: null
+related:
+  adrs:
+    - "[[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file]]"
+    - "[[ADR-034-capture-level-routing-dispatcher-agent-split]]"
+    - "[[user:ADR-007-memory-thin-pointers-adr-first]]"
+  lessons: []
+  kg_entries: []
+tags: [process, deployment, init, rules, defaults, graph-governance]
+category: process
 ---
 
 # ADR-037: Default Graph-Usage Rules Seeded at Deployment

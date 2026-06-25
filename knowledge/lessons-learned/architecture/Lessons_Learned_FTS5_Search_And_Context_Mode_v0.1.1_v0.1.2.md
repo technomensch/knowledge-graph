@@ -1,7 +1,38 @@
 ---
-title: 'Lesson: Native FTS5 Search and Context-Mode Integration (v0.1.1 + v0.1.2)'
-category:
-  uri: uri-that-does-not-map-to-architecture
+title: "Lesson: Native FTS5 Search and Context-Mode Integration (v0.1.1 + v0.1.2)"
+
+created: 2026-03-16T00:00:00Z
+
+author: technomensch
+email: 917847+technomensch@users.noreply.github.com
+
+git:
+  branch: v0.0.4-github-docs
+  commit: b8544784b78d17fd2bb8372375184194dc6d9038
+  pr: 35
+  issue: null
+
+sources:
+  - url: "https://www.npmjs.com/package/node-sqlite3-wasm"
+    title: "node-sqlite3-wasm — npm"
+    accessed: "2026-03-16"
+    context: "Confirmed FTS5 + BM25 support, synchronous API, no native compilation"
+  - url: "https://www.npmjs.com/package/sql.js"
+    title: "sql.js — npm"
+    accessed: "2026-03-16"
+    context: "Evaluated as FTS5 candidate — rejected because sql.js compiles with FTS3 only"
+  - url: "https://www.npmjs.com/package/better-sqlite3"
+    title: "better-sqlite3 — npm"
+    accessed: "2026-03-16"
+    context: "Evaluated as FTS5 candidate — rejected because it requires native C++ compilation"
+  - url: "https://sqlite.org/fts5.html"
+    title: "SQLite FTS5 Extension"
+    accessed: "2026-03-16"
+    context: "Reference for FTS5 virtual table syntax and BM25 ranking"
+
+tags: [fts5, search, sqlite, wasm, context-mode, zero-config, upgrade, graceful-fallback, typescript, mcp-server]
+
+category: architecture
 ---
 
 # Lesson Learned: Native FTS5 Search and Context-Mode Integration (v0.1.1 + v0.1.2)

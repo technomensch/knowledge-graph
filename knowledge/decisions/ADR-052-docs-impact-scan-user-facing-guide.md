@@ -1,7 +1,22 @@
 ---
-title: 'ADR-052: docs-impact-scan User-Facing Guide Page'
-category:
-  uri: uri-that-does-not-map-to-documentation
+title: "ADR-052: docs-impact-scan User-Facing Guide Page"
+number: 052
+created: 2026-06-12T00:00:00Z
+status: Accepted
+author: mkaplan
+email: mkitact@gmail.com
+git:
+  branch: v0.5.10.5-codex-chat-extraction
+  commit: TBD
+  pr: null
+  issue: null
+implements: v0.5.10.5
+related:
+  adrs: [036, 050]
+  lessons: []
+  kg_entries: []
+tags: [docs, tailoring, docs-impact-scan, pre-push, governance]
+category: documentation
 ---
 
 # ADR-052: docs-impact-scan User-Facing Guide Page

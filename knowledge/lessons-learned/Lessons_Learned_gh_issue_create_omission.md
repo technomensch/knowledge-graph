@@ -1,5 +1,13 @@
 ---
-title: gh issue create omission in start-issue-tracking Step 5
+title: "gh issue create omission in start-issue-tracking Step 5"
+date: 2026-05-30
+version: 1.0
+tags:
+  - github-cli
+  - issue-tracking
+  - start-issue-tracking
+  - workflow-gap
+  - frontmatter
 ---
 
 # Lesson: gh issue create omission in start-issue-tracking Step 5

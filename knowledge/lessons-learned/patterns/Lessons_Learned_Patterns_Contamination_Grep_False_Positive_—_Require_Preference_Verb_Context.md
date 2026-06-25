@@ -1,7 +1,9 @@
 ---
-title: Contamination Grep False-Positive — Require Preference Verb Context
-category:
-  uri: uri-that-does-not-map-to-patterns
+title: "Contamination Grep False-Positive — Require Preference Verb Context"
+created: 2026-04-11T20:02:15.769Z
+updated: 2026-04-11T20:02:15.769Z
+tags: [upgrade-inspector, grep, false-positive, data-loss, migration, rules-md, v0.3.5]
+category: patterns
 ---
 # Lesson: Contamination Grep False-Positive — Require Preference Verb Context
 

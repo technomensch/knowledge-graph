@@ -1,5 +1,5 @@
 ---
-title: ENH-003 Progress Log
+title: "ENH-003 Progress Log"
 ---
 
 # ENH-003 Progress Log
