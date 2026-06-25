@@ -1,8 +1,12 @@
 ---
+id: your-ai-profile
 title: Your AI Profile
+sidebar_label: Your AI Profile
+description: How to set up and maintain your identity file so AI assistants know who you are across every tool.
 ---
 
-
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # Your AI Profile
 
@@ -46,7 +50,7 @@ Behavioral rules ("always run tests before pushing") belong in `rules.md`, not `
 
 Your profile lives at `~/.kmgraph/me.md` (personal, cross-project) or `knowledge/me.md` (project-specific override, gitignored).
 
-Run `/kmgraph:kmg-init` to create the initial profile interactively, or edit the file directly.
+Run `/kmgraph:init` to create the initial profile interactively, or edit the file directly.
 
 For cross-project personal identity (rules and style that apply across all projects), run `/kmgraph:kmg-init-personal-kg`. It creates `~/.kmgraph/me.md`, `~/.kmgraph/rules.md`, and `~/.kmgraph/triggers.md`.
 
@@ -54,7 +58,8 @@ For cross-project personal identity (rules and style that apply across all proje
 
 When both files exist, the project file takes precedence. This lets you have global defaults and per-project overrides.
 
-#### Project (knowledge/me.md)
+<Tabs groupId="kg-scope">
+<TabItem value="project" label="Project (knowledge/me.md)">
 
 Each contributor keeps their own copy — it's gitignored. It covers your role on this project, your areas of strength, and what's new to you in this codebase.
 
@@ -76,7 +81,8 @@ Correctness over speed. If a change might break something, say so first.
 
 Two contributors on the same project will have different files. Committing one person's file would give every other contributor the wrong context.
 
-#### Personal (~/.kmgraph/me.md)
+</TabItem>
+<TabItem value="personal" label="Personal (~/.kmgraph/me.md)">
 
 Cross-project identity: the communication style, expertise, and preferences that stay consistent regardless of which project is active. Created once with `/kmgraph:kmg-init-personal-kg`.
 
@@ -99,6 +105,9 @@ Primary languages: TypeScript, Python, Go.
 
 Preferences that never change between projects belong here; codebase-specific context belongs in `knowledge/me.md`.
 
+</TabItem>
+</Tabs>
+
 ## Cross-platform portability
 
 Because `me.md` is plain Markdown, it works on any platform that reads KMGraph. Claude Code, Gemini CLI, Cursor — they all load the same profile. You configure it once and every AI tool benefits.
@@ -117,6 +126,7 @@ CLAUDE.md               ← shim: "read knowledge/rules.md and me.md"
 One profile update. Every platform served.
 
 ```mermaid
+%%{init: { 'flowchart': { 'useMaxWidth': true }, 'theme': 'neutral' }}%%
 flowchart TB
     subgraph platforms ["Platform Config — thin shims"]
         direction LR
@@ -143,6 +153,8 @@ flowchart TB
     R -. project overrides .-> PR
     M -. project overrides .-> PM
 
+    accTitle: Platform shim pattern
+    accDescr: All platform config files point to two foundation files in knowledge/ — rules.md and me.md. Project scope overrides personal scope defaults in ~/.kmgraph/.
 ```
 
 ## Model tier configuration
