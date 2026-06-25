@@ -75,7 +75,7 @@ title: Readme
 ## Learn More
 
 **Concepts & Guides**:
-- [Concepts Guide](../../CONCEPTS.md#meta-issue) - Term explanations
+- [Concepts Guide](../../concepts/index.md) - Term explanations
 - [META-ISSUE-GUIDE.md](../../META-ISSUE-GUIDE.md) - Full meta-issue guide
 
 **Resources**:

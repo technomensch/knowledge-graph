@@ -124,7 +124,7 @@ See [core/examples/lessons-learned/](../../examples/lessons-learned/) for filled
 ## Learn More
 
 **Understanding fields**:
-- [Concepts Guide](../../CONCEPTS.md#yaml-frontmatter) - YAML field explanations
+- [Concepts Guide](../../concepts/index.md) - YAML field explanations
 - [lesson-template.md](lesson-template.md) - See inline field comments
 
 **See examples**:
@@ -133,4 +133,4 @@ See [core/examples/lessons-learned/](../../examples/lessons-learned/) for filled
 
 **How to capture**:
 - [Manual Workflow](../../WORKFLOWS.md#workflow-1-create-lesson-learned) - Step-by-step
-- [Command Guide](../../COMMAND-GUIDE.md#essential-commands) - Automated (Claude Code)
+- [Command Guide](../../reference/command-guide.md) - Automated (Claude Code)

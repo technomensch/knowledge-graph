@@ -416,7 +416,7 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 
   Installation and setup walkthrough
 
-- [Command Reference](COMMAND-GUIDE.md)
+- [Command Reference](reference/command-guide.md)
 
   All commands with detailed examples
 
@@ -426,7 +426,7 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 
 ### **Learning**
 
-- [Concepts Guide](CONCEPTS.md)
+- [Concepts Guide](concepts/index.md)
 
   Plain-English definitions of all terms and patterns
 

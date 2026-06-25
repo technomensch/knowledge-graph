@@ -112,7 +112,7 @@ ADRs follow a lightweight format:
 ## Learn More
 
 **Concepts & Guides**:
-- [Concepts Guide](../../CONCEPTS.md#adr-architecture-decision-record) - Term explanations
+- [Concepts Guide](../../concepts/index.md) - Term explanations
 - [ADR template](ADR-template.md) - Starting scaffold
 
 **Resources**:
