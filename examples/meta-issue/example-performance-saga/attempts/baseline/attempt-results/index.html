@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-examples/meta-issue/example-performance-saga/attempts/baseline/attempt-results" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.10.1">
+<title data-rh="true">Attempt Results | Knowledge Management Graph</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://technomensch.github.io/knowledge-graph/examples/meta-issue/example-performance-saga/attempts/baseline/attempt-results"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Attempt Results | Knowledge Management Graph"><meta data-rh="true" name="description" content="Date: 2024-09-07"><meta data-rh="true" property="og:description" content="Date: 2024-09-07"><link data-rh="true" rel="icon" href="/knowledge-graph/img/square.png"><link data-rh="true" rel="canonical" href="https://technomensch.github.io/knowledge-graph/examples/meta-issue/example-performance-saga/attempts/baseline/attempt-results"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/examples/meta-issue/example-performance-saga/attempts/baseline/attempt-results" hreflang="en"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/examples/meta-issue/example-performance-saga/attempts/baseline/attempt-results" hreflang="x-default"><link rel="alternate" type="application/rss+xml" href="/knowledge-graph/docs-updates/rss.xml" title="KMGraph Docs Updates RSS Feed">
+<link rel="alternate" type="application/atom+xml" href="/knowledge-graph/docs-updates/atom.xml" title="KMGraph Docs Updates Atom Feed"><link rel="stylesheet" href="/knowledge-graph/assets/css/styles.11118f84.css">
+<script src="/knowledge-graph/assets/js/runtime~main.3e5cb433.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/main.5654c8b3.js" defer="defer"></script>
+</head>
+<body>
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||"dark"),document.documentElement.setAttribute("data-theme-choice",t||"dark")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/knowledge-graph/"><div class="navbar__logo"><img src="/knowledge-graph/img/avatar.png" alt="Staying in Sync" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/knowledge-graph/img/avatar.png" alt="Staying in Sync" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate">KMGraph</b></a><a class="navbar__item navbar__link" href="/knowledge-graph/quickstart">Getting Started</a><a class="navbar__item navbar__link" href="/knowledge-graph/CONCEPTS">Concepts</a><a class="navbar__item navbar__link" href="/knowledge-graph/COMMAND-GUIDE">Commands</a><a class="navbar__item navbar__link" href="/knowledge-graph/CONFIGURATION">Configuration</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/technomensch/knowledge-graph" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link header-github-link" aria-label="GitHub repository"></a><a href="https://www.linkedin.com/in/marckaplan/" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link header-linkedin-link" aria-label="LinkedIn profile"></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="system mode" aria-label="Switch between dark and light mode (currently system mode)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"><div>Loading Search...</div></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><main class="docMainContainer_TBSr docMainContainerEnhanced_lQrH"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>Attempt 001 Results: Caching Layer</h1></header>
+<p><strong>Date:</strong> 2024-09-07<br>
+<strong>Status:</strong> ❌ Failed - No meaningful improvement<br>
+<strong>Decision:</strong> Revert changes, investigate actual bottleneck</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="executive-summary">Executive Summary<a href="#executive-summary" class="hash-link" aria-label="Direct link to Executive Summary" title="Direct link to Executive Summary" translate="no">​</a></h2>
+<p>Caching implementation worked correctly (85% hit rate) but produced only 2% performance improvement. Analysis revealed processing was NOT the bottleneck - connection overhead was the actual issue.</p>
+<p><strong>Key Finding:</strong> Don&#x27;t assume the bottleneck - profile first.</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="performance-results">Performance Results<a href="#performance-results" class="hash-link" aria-label="Direct link to Performance Results" title="Direct link to Performance Results" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="quantitative-metrics">Quantitative Metrics<a href="#quantitative-metrics" class="hash-link" aria-label="Direct link to Quantitative Metrics" title="Direct link to Quantitative Metrics" translate="no">​</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Metric</th><th>Before</th><th>After</th><th>Change</th><th>Target</th><th>Status</th></tr></thead><tbody><tr><td>Avg Response Time</td><td>5,200ms</td><td>5,100ms</td><td>-2%</td><td>&lt;1,000ms</td><td>❌ Failing</td></tr><tr><td>P95 Response Time</td><td>8,500ms</td><td>8,400ms</td><td>-1%</td><td>&lt;1,500ms</td><td>❌ Failing</td></tr><tr><td>Memory Usage</td><td>4.2GB</td><td>4.5GB</td><td>+7%</td><td>&lt;512MB</td><td>❌ Failing (worse)</td></tr><tr><td>CPU Usage</td><td>100%</td><td>100%</td><td>0%</td><td>&lt;40%</td><td>❌ Failing</td></tr><tr><td>Error Rate</td><td>32%</td><td>31%</td><td>-1%</td><td>&lt;1%</td><td>❌ Failing</td></tr></tbody></table>
+<p><strong>Result:</strong> All targets still failing. Minimal improvement, memory worse.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="cache-specific-metrics">Cache-Specific Metrics<a href="#cache-specific-metrics" class="hash-link" aria-label="Direct link to Cache-Specific Metrics" title="Direct link to Cache-Specific Metrics" translate="no">​</a></h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Metric</th><th>Value</th><th>Assessment</th></tr></thead><tbody><tr><td>Cache Hit Rate</td><td>85%</td><td>✅ Excellent (target: 70%)</td></tr><tr><td>Cache Miss Rate</td><td>15%</td><td>✅ As expected</td></tr><tr><td>Cache Size</td><td>850 entries avg</td><td>✅ Within limits</td></tr><tr><td>Cache Memory</td><td>45MB data + 200MB overhead</td><td>⚠️ Significant overhead</td></tr><tr><td>Evictions</td><td>15 over 10min</td><td>✅ Low eviction rate</td></tr></tbody></table>
+<p><strong>Cache performed well</strong>, but didn&#x27;t impact overall performance.</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="load-test-results">Load Test Results<a href="#load-test-results" class="hash-link" aria-label="Direct link to Load Test Results" title="Direct link to Load Test Results" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="test-configuration">Test Configuration<a href="#test-configuration" class="hash-link" aria-label="Direct link to Test Configuration" title="Direct link to Test Configuration" translate="no">​</a></h3>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">Concurrent users: 100</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Total requests: 1,000</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Ramp-up time: 10 seconds</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Duration: ~2 minutes</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="detailed-results">Detailed Results<a href="#detailed-results" class="hash-link" aria-label="Direct link to Detailed Results" title="Direct link to Detailed Results" translate="no">​</a></h3>
+<p><strong>Before Caching:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">Total requests: 1,000</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Successful: 680 (68%)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Failed: 320 (32%)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Response times:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  Min:  2,100ms</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  Avg:  5,200ms</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  Max: 12,800ms</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  P50:  4,800ms</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  P95:  8,500ms</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  P99: 10,200ms</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Resource usage:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  Memory: 4.2GB peak, 3.8GB avg</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  CPU: 100% sustained</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  Network: 15MB/s</span><br></div></code></pre></div></div>
+<p><strong>After Caching:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">Total requests: 1,000</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Successful: 690 (69%)  ← Marginal improvement</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Failed: 310 (31%)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Response times:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  Min:  2,050ms  ← Slight improvement</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  Avg:  5,100ms  ← 2% better</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  Max: 12,600ms</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  P50:  4,750ms</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  P95:  8,400ms</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  P99: 10,100ms</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Resource usage:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  Memory: 4.5GB peak, 4.1GB avg  ← WORSE (cache overhead)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  CPU: 100% sustained            ← NO CHANGE</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  Network: 15MB/s</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Cache stats:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  Hits: 850 (85%)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  Misses: 150 (15%)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  Evictions: 15</span><br></div></code></pre></div></div>
+<p><strong>Verdict:</strong> Cache working but no meaningful performance improvement.</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="profiling-analysis">Profiling Analysis<a href="#profiling-analysis" class="hash-link" aria-label="Direct link to Profiling Analysis" title="Direct link to Profiling Analysis" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="pre-cache-profile">Pre-Cache Profile<a href="#pre-cache-profile" class="hash-link" aria-label="Direct link to Pre-Cache Profile" title="Direct link to Pre-Cache Profile" translate="no">​</a></h3>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">Request breakdown (5,200ms avg):</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">- Unknown overhead: ~5,000ms</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">- Processing: ~200ms</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">(Detailed profiling not done initially - mistake!)</span><br></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="post-cache-profile">Post-Cache Profile<a href="#post-cache-profile" class="hash-link" aria-label="Direct link to Post-Cache Profile" title="Direct link to Post-Cache Profile" translate="no">​</a></h3>
+<p><strong>With detailed timing added:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">Request breakdown (5,100ms avg):</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">1. Connection setup: 2,400ms (47%)  ← NEW FINDING!</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">2. Query execution: 2,000ms (39%)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">3. Processing: 700ms (14%)          ← What cache targeted</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">4. Network/other: 0ms (0%)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Total: 5,100ms</span><br></div></code></pre></div></div>
+<p><strong>Critical Insight:</strong></p>
+<ul>
+<li class="">Processing was <strong>14% of total time</strong></li>
+<li class="">Cache reduced processing from 700ms to ~100ms (for cache hits)</li>
+<li class="">But this saved only 600ms out of 5,100ms total (12% max possible improvement)</li>
+<li class="">Actual improvement: 100ms (2%) due to 85% hit rate</li>
+</ul>
+<p><strong>Math:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">Savings per cache hit: 600ms</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Cache hit rate: 85%</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Average savings: 600ms * 85% = 510ms</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Remaining time: 4,490ms (still way over target)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Actual measured: 5,100ms (vs expected 4,690ms)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Difference: Cache overhead and measurement variance</span><br></div></code></pre></div></div>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="root-cause-analysis">Root Cause Analysis<a href="#root-cause-analysis" class="hash-link" aria-label="Direct link to Root Cause Analysis" title="Direct link to Root Cause Analysis" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="why-cache-didnt-help">Why Cache Didn&#x27;t Help<a href="#why-cache-didnt-help" class="hash-link" aria-label="Direct link to Why Cache Didn&#x27;t Help" title="Direct link to Why Cache Didn&#x27;t Help" translate="no">​</a></h3>
+<p><strong>Analogy:</strong> Optimizing the paint job on a car when the engine is broken.</p>
+<p><strong>The real bottlenecks:</strong></p>
+<ol>
+<li class=""><strong>Connection setup (2,400ms):</strong> Creating new DB connection per request</li>
+<li class=""><strong>Query execution (2,000ms):</strong> Queries slow + connection overhead</li>
+</ol>
+<p><strong>What cache optimized:</strong>
+3. Processing (700ms → 100ms for hits): Only 14% of total time</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="profiling-breakdown">Profiling Breakdown<a href="#profiling-breakdown" class="hash-link" aria-label="Direct link to Profiling Breakdown" title="Direct link to Profiling Breakdown" translate="no">​</a></h3>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">Timeline of a single request (before caching):</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">0ms                 Request received</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">|</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">2,400ms             Connection established  ← 47% of time!</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">|</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">4,400ms             Query completed          ← 38% of time!</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">|</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">5,100ms             Processing done          ← 14% of time</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">|</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">5,200ms             Response sent</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">BOTTLENECK: Steps 0-4,400ms (86% of time)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">OPTIMIZED: Steps 4,400-5,100ms (14% of time)</span><br></div></code></pre></div></div>
+<p><strong>Cache couldn&#x27;t help with connection or query time - those happen regardless of cache.</strong></p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="failure-mode-analysis">Failure Mode Analysis<a href="#failure-mode-analysis" class="hash-link" aria-label="Direct link to Failure Mode Analysis" title="Direct link to Failure Mode Analysis" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="type-of-failure">Type of Failure<a href="#type-of-failure" class="hash-link" aria-label="Direct link to Type of Failure" title="Direct link to Type of Failure" translate="no">​</a></h3>
+<p><strong>Category:</strong> Optimized wrong component<br>
+<strong>Severity:</strong> Low (didn&#x27;t make things worse, just didn&#x27;t help)<br>
+<strong>Recovery:</strong> Easy (revert changes)</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="why-we-chose-wrong-approach">Why We Chose Wrong Approach<a href="#why-we-chose-wrong-approach" class="hash-link" aria-label="Direct link to Why We Chose Wrong Approach" title="Direct link to Why We Chose Wrong Approach" translate="no">​</a></h3>
+<ol>
+<li class="">
+<p><strong>Assumed without profiling:</strong></p>
+<ul>
+<li class="">Saw high CPU → assumed processing bottleneck</li>
+<li class="">Didn&#x27;t measure time breakdown</li>
+</ul>
+</li>
+<li class="">
+<p><strong>Correlation ≠ causation:</strong></p>
+<ul>
+<li class="">CPU high because connections/queries thrashing</li>
+<li class="">Not because processing was expensive</li>
+</ul>
+</li>
+<li class="">
+<p><strong>Confirmation bias:</strong></p>
+<ul>
+<li class="">Code LOOKED complex → assumed it was slow</li>
+<li class="">Didn&#x27;t verify with data</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="lessons-learned">Lessons Learned<a href="#lessons-learned" class="hash-link" aria-label="Direct link to Lessons Learned" title="Direct link to Lessons Learned" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="technical-lessons">Technical Lessons<a href="#technical-lessons" class="hash-link" aria-label="Direct link to Technical Lessons" title="Direct link to Technical Lessons" translate="no">​</a></h3>
+<ol>
+<li class="">
+<p><strong>✅ Profile before optimizing:</strong></p>
+<ul>
+<li class="">Don&#x27;t assume bottleneck</li>
+<li class="">Measure actual time breakdown</li>
+<li class="">Use profiling tools</li>
+</ul>
+</li>
+<li class="">
+<p><strong>✅ High CPU has many causes:</strong></p>
+<ul>
+<li class="">Processing</li>
+<li class="">I/O wait</li>
+<li class="">Connection overhead  ← This was it</li>
+<li class="">Context switching</li>
+</ul>
+</li>
+<li class="">
+<p><strong>✅ Cache can&#x27;t fix everything:</strong></p>
+<ul>
+<li class="">Only helps if same computation repeated</li>
+<li class="">Can&#x27;t bypass required I/O</li>
+<li class="">Can&#x27;t reduce connection overhead</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="process-lessons">Process Lessons<a href="#process-lessons" class="hash-link" aria-label="Direct link to Process Lessons" title="Direct link to Process Lessons" translate="no">​</a></h3>
+<ol>
+<li class="">
+<p><strong>✅ Metrics prevented waste:</strong></p>
+<ul>
+<li class="">Clear failure after 1 week</li>
+<li class="">Didn&#x27;t continue failed approach</li>
+<li class="">Objective data for decision</li>
+</ul>
+</li>
+<li class="">
+<p><strong>✅ Failed attempts have value:</strong></p>
+<ul>
+<li class="">Ruled out processing as issue</li>
+<li class="">Identified actual bottleneck via profiling</li>
+<li class="">Created reusable cache implementation</li>
+</ul>
+</li>
+<li class="">
+<p><strong>⚠️ Should have profiled first:</strong></p>
+<ul>
+<li class="">Could have saved 7 days</li>
+<li class="">Would have targeted right issue</li>
+<li class="">Lesson: invest in measurement tools early</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="artifacts-created">Artifacts Created<a href="#artifacts-created" class="hash-link" aria-label="Direct link to Artifacts Created" title="Direct link to Artifacts Created" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="code-kept">Code (Kept)<a href="#code-kept" class="hash-link" aria-label="Direct link to Code (Kept)" title="Direct link to Code (Kept)" translate="no">​</a></h3>
+<ul>
+<li class=""><code>src/utils/cache-manager.js</code> - Reusable cache implementation</li>
+<li class=""><code>tests/cache-manager.test.js</code> - Comprehensive test suite</li>
+<li class=""><code>src/middleware/cache-metrics.js</code> - Monitoring middleware</li>
+</ul>
+<p><strong>Status:</strong> Stored in <code>utils/</code> for future use (not integrated)</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="code-reverted">Code (Reverted)<a href="#code-reverted" class="hash-link" aria-label="Direct link to Code (Reverted)" title="Direct link to Code (Reverted)" translate="no">​</a></h3>
+<ul>
+<li class="">Integration into request handler</li>
+<li class="">Cache middleware in main flow</li>
+<li class="">Configuration changes</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="documentation">Documentation<a href="#documentation" class="hash-link" aria-label="Direct link to Documentation" title="Direct link to Documentation" translate="no">​</a></h3>
+<ul>
+<li class="">This results document</li>
+<li class="">Profiling data (stored in <code>profiling/001-cache-attempt/</code>)</li>
+<li class="">Test results (see <code>test-results/001-caching.json</code>)</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="next-steps">Next Steps<a href="#next-steps" class="hash-link" aria-label="Direct link to Next Steps" title="Direct link to Next Steps" translate="no">​</a></h2>
+<p>Based on profiling findings:</p>
+<ol>
+<li class="">
+<p><strong>✅ Immediate:</strong> Investigate connection setup (2,400ms)</p>
+<ul>
+<li class="">Why new connection per request?</li>
+<li class="">Can we reuse connections (pooling)?</li>
+</ul>
+</li>
+<li class="">
+<p><strong>✅ High Priority:</strong> Optimize queries (2,000ms)</p>
+<ul>
+<li class="">Which queries are slow?</li>
+<li class="">Missing indexes?</li>
+<li class="">N+1 query patterns?</li>
+</ul>
+</li>
+<li class="">
+<p><strong>⏸️ Deferred:</strong> Processing optimization</p>
+<ul>
+<li class="">Only 700ms baseline</li>
+<li class="">Not the bottleneck</li>
+<li class="">Cache available if needed later</li>
+</ul>
+</li>
+</ol>
+<p><strong>Next attempt:</strong> Focus on connection management and query optimization.</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="recommendations">Recommendations<a href="#recommendations" class="hash-link" aria-label="Direct link to Recommendations" title="Direct link to Recommendations" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="for-this-project">For This Project<a href="#for-this-project" class="hash-link" aria-label="Direct link to For This Project" title="Direct link to For This Project" translate="no">​</a></h3>
+<ul>
+<li class=""><strong>Do NOT</strong> integrate caching yet (wrong priority)</li>
+<li class=""><strong>DO</strong> focus on connection pooling</li>
+<li class=""><strong>DO</strong> optimize slow queries</li>
+<li class=""><strong>MAYBE</strong> revisit caching after solving primary bottlenecks</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="for-future-projects">For Future Projects<a href="#for-future-projects" class="hash-link" aria-label="Direct link to For Future Projects" title="Direct link to For Future Projects" translate="no">​</a></h3>
+<ul>
+<li class=""><strong>Profile FIRST, optimize second</strong></li>
+<li class=""><strong>Invest in profiling tools early</strong> (pays for itself)</li>
+<li class=""><strong>Don&#x27;t trust intuition about bottlenecks</strong> (measure!)</li>
+<li class=""><strong>Failed attempts have value</strong> (learning + ruled out hypothesis)</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="related">Related<a href="#related" class="hash-link" aria-label="Direct link to Related" title="Direct link to Related" translate="no">​</a></h2>
+<ul>
+<li class=""><strong>Solution Approach:</strong> <a class="" href="/knowledge-graph/examples/meta-issue/example-performance-saga/attempts/baseline/solution-approach">solution-approach.md</a></li>
+<li class=""><strong>Test Cases:</strong> <a class="" href="/knowledge-graph/examples/meta-issue/example-performance-saga/attempts/test-cases.md">../test-cases.md</a></li>
+<li class=""><strong>Implementation Log:</strong> <a class="" href="/knowledge-graph/examples/meta-issue/example-performance-saga/attempts/implementation-log.md">../implementation-log.md</a></li>
+<li class=""><strong>Next Attempt:</strong> <a class="" href="/knowledge-graph/examples/meta-issue/example-performance-saga/attempts/002-query-optimization/">../002-query-optimization/</a></li>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_WFHX"><a href="https://github.com/technomensch/knowledge-graph/edit/main/docs/examples/meta-issue/example-performance-saga/attempts/001-baseline/attempt-results.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_JAkA"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#executive-summary" class="table-of-contents__link toc-highlight">Executive Summary</a></li><li><a href="#performance-results" class="table-of-contents__link toc-highlight">Performance Results</a><ul><li><a href="#quantitative-metrics" class="table-of-contents__link toc-highlight">Quantitative Metrics</a></li><li><a href="#cache-specific-metrics" class="table-of-contents__link toc-highlight">Cache-Specific Metrics</a></li></ul></li><li><a href="#load-test-results" class="table-of-contents__link toc-highlight">Load Test Results</a><ul><li><a href="#test-configuration" class="table-of-contents__link toc-highlight">Test Configuration</a></li><li><a href="#detailed-results" class="table-of-contents__link toc-highlight">Detailed Results</a></li></ul></li><li><a href="#profiling-analysis" class="table-of-contents__link toc-highlight">Profiling Analysis</a><ul><li><a href="#pre-cache-profile" class="table-of-contents__link toc-highlight">Pre-Cache Profile</a></li><li><a href="#post-cache-profile" class="table-of-contents__link toc-highlight">Post-Cache Profile</a></li></ul></li><li><a href="#root-cause-analysis" class="table-of-contents__link toc-highlight">Root Cause Analysis</a><ul><li><a href="#why-cache-didnt-help" class="table-of-contents__link toc-highlight">Why Cache Didn&#39;t Help</a></li><li><a href="#profiling-breakdown" class="table-of-contents__link toc-highlight">Profiling Breakdown</a></li></ul></li><li><a href="#failure-mode-analysis" class="table-of-contents__link toc-highlight">Failure Mode Analysis</a><ul><li><a href="#type-of-failure" class="table-of-contents__link toc-highlight">Type of Failure</a></li><li><a href="#why-we-chose-wrong-approach" class="table-of-contents__link toc-highlight">Why We Chose Wrong Approach</a></li></ul></li><li><a href="#lessons-learned" class="table-of-contents__link toc-highlight">Lessons Learned</a><ul><li><a href="#technical-lessons" class="table-of-contents__link toc-highlight">Technical Lessons</a></li><li><a href="#process-lessons" class="table-of-contents__link toc-highlight">Process Lessons</a></li></ul></li><li><a href="#artifacts-created" class="table-of-contents__link toc-highlight">Artifacts Created</a><ul><li><a href="#code-kept" class="table-of-contents__link toc-highlight">Code (Kept)</a></li><li><a href="#code-reverted" class="table-of-contents__link toc-highlight">Code (Reverted)</a></li><li><a href="#documentation" class="table-of-contents__link toc-highlight">Documentation</a></li></ul></li><li><a href="#next-steps" class="table-of-contents__link toc-highlight">Next Steps</a></li><li><a href="#recommendations" class="table-of-contents__link toc-highlight">Recommendations</a><ul><li><a href="#for-this-project" class="table-of-contents__link toc-highlight">For This Project</a></li><li><a href="#for-future-projects" class="table-of-contents__link toc-highlight">For Future Projects</a></li></ul></li><li><a href="#related" class="table-of-contents__link toc-highlight">Related</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Docs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/quickstart">Getting Started</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/COMMAND-GUIDE">Command Guide</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/CHEAT-SHEET">Cheat Sheet</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/FAQ">FAQ</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/technomensch/knowledge-graph" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://www.linkedin.com/in/marckaplan/" target="_blank" rel="noopener noreferrer" class="footer__link-item">LinkedIn<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://buymeacoffee.com/technomensch" target="_blank" rel="noopener noreferrer" class="footer__link-item">Buy Me a Coffee<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="margin-bottom--sm"><a href="https://github.com/technomensch/knowledge-graph" rel="noopener noreferrer" class="footerLogoLink_BH7S"><img src="/knowledge-graph/img/banner.jpeg" alt="Staying in Sync" class="footer__logo themedComponent_mlkZ themedComponent--light_NVdE" width="160"><img src="/knowledge-graph/img/banner.jpeg" alt="Staying in Sync" class="footer__logo themedComponent_mlkZ themedComponent--dark_xIcU" width="160"></a></div><div class="footer__copyright">Staying in Sync</div></div></div></footer></div>
+</body>
+</html>

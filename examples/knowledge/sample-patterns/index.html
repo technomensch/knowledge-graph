@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-examples/knowledge/sample-patterns" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.10.1">
+<title data-rh="true">Sample Patterns | Knowledge Management Graph</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://technomensch.github.io/knowledge-graph/examples/knowledge/sample-patterns"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Sample Patterns | Knowledge Management Graph"><meta data-rh="true" name="description" content="Last Updated: 2026-02-13"><meta data-rh="true" property="og:description" content="Last Updated: 2026-02-13"><link data-rh="true" rel="icon" href="/knowledge-graph/img/square.png"><link data-rh="true" rel="canonical" href="https://technomensch.github.io/knowledge-graph/examples/knowledge/sample-patterns"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/examples/knowledge/sample-patterns" hreflang="en"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/examples/knowledge/sample-patterns" hreflang="x-default"><link rel="alternate" type="application/rss+xml" href="/knowledge-graph/docs-updates/rss.xml" title="KMGraph Docs Updates RSS Feed">
+<link rel="alternate" type="application/atom+xml" href="/knowledge-graph/docs-updates/atom.xml" title="KMGraph Docs Updates Atom Feed"><link rel="stylesheet" href="/knowledge-graph/assets/css/styles.11118f84.css">
+<script src="/knowledge-graph/assets/js/runtime~main.3e5cb433.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/main.5654c8b3.js" defer="defer"></script>
+</head>
+<body>
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||"dark"),document.documentElement.setAttribute("data-theme-choice",t||"dark")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/knowledge-graph/"><div class="navbar__logo"><img src="/knowledge-graph/img/avatar.png" alt="Staying in Sync" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/knowledge-graph/img/avatar.png" alt="Staying in Sync" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate">KMGraph</b></a><a class="navbar__item navbar__link" href="/knowledge-graph/quickstart">Getting Started</a><a class="navbar__item navbar__link" href="/knowledge-graph/CONCEPTS">Concepts</a><a class="navbar__item navbar__link" href="/knowledge-graph/COMMAND-GUIDE">Commands</a><a class="navbar__item navbar__link" href="/knowledge-graph/CONFIGURATION">Configuration</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/technomensch/knowledge-graph" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link header-github-link" aria-label="GitHub repository"></a><a href="https://www.linkedin.com/in/marckaplan/" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link header-linkedin-link" aria-label="LinkedIn profile"></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="system mode" aria-label="Switch between dark and light mode (currently system mode)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"><div>Loading Search...</div></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><main class="docMainContainer_TBSr docMainContainerEnhanced_lQrH"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>Design Patterns Catalog</h1></header>
+<p><strong>Last Updated:</strong> 2026-02-13
+<strong>Entries:</strong> 12</p>
+<p>This file contains example patterns from a real project, generalized for demonstration purposes. Use these as templates for documenting your own project&#x27;s patterns.</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="quick-navigation">Quick Navigation<a href="#quick-navigation" class="hash-link" aria-label="Direct link to Quick Navigation" title="Direct link to Quick Navigation" translate="no">​</a></h2>
+<ul>
+<li class=""><a href="#multi-tier-synchronization" class="">Multi-Tier Synchronization</a> - Three-tier modular synchronization protocol</li>
+<li class=""><a href="#bidirectional-memory-sync" class="">Bidirectional Memory Sync</a> - Automated memory updates during knowledge discovery</li>
+<li class=""><a href="#smart-defaults" class="">Smart Defaults</a> - Auto-detect context to replace multiple prompts</li>
+<li class=""><a href="#automated-orchestrator" class="">Automated Orchestrator</a> - Replacing multi-step manual processes with single-command pipelines</li>
+<li class=""><a href="#meta-issue-tracking" class="">Meta-Issue Tracking</a> - Structured documentation for complex multi-attempt problems</li>
+<li class=""><a href="#four-pillar-memory" class="">Four-Pillar Memory</a> - Multi-system knowledge capture architecture</li>
+<li class=""><a href="#project-memory-system" class="">Project Memory System</a> - Persistent governance memory for AI agents</li>
+<li class=""><a href="#category-auto-detection" class="">Category Auto-Detection</a> - Keyword-based organization</li>
+<li class=""><a href="#template-driven-docs" class="">Template-Driven Docs</a> - Standardized document creation</li>
+<li class=""><a href="#identifier-decoupling" class="">Identifier Decoupling</a> - Mapping local persistence to platform drift</li>
+<li class=""><a href="#positive-constraint-framing" class="">Positive Constraint Framing</a> - Avoiding Pink Elephant Problem via affirmative commands</li>
+<li class=""><a href="#functional-directory-structure" class="">Functional Directory Structure</a> - Intent-based directory naming</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="documentation--synchronization-patterns">Documentation &amp; Synchronization Patterns<a href="#documentation--synchronization-patterns" class="hash-link" aria-label="Direct link to Documentation &amp; Synchronization Patterns" title="Direct link to Documentation &amp; Synchronization Patterns" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="multi-tier-synchronization">Multi-Tier Synchronization<a href="#multi-tier-synchronization" class="hash-link" aria-label="Direct link to Multi-Tier Synchronization" title="Direct link to Multi-Tier Synchronization" translate="no">​</a></h3>
+<p><strong>Problem:</strong> Updating modular files in isolation risks incomplete synchronization across different interfaces</p>
+<p><strong>Solution:</strong> Verify three-tier synchronization is complete: Module ↔ Gold Master ↔ Optimized Entrypoint (works in any direction)</p>
+<p><strong>When to use:</strong> Before committing changes to modular config files, master documentation, or optimized entry points for different platforms</p>
+<p><strong>Quick Reference:</strong></p>
+<ul>
+<li class=""><strong>Module</strong> (<code>config-modules/*/</code>): Source of truth, authoritative rules</li>
+<li class=""><strong>Gold Master</strong> (<code>PROJECT-CONFIG.md</code>): Complete synchronized copy (used for full system context)</li>
+<li class=""><strong>Optimized Entrypoint</strong> (<code>Platform-Specific-Config.md</code>): Token-efficient version with modular references</li>
+</ul>
+<p><strong>Verification Checklist (works regardless of which tier was edited first):</strong></p>
+<ol>
+<li class="">Identify which file(s) changed (MODULAR, GOLD MASTER, or OPTIMIZED ENTRYPOINT)</li>
+<li class="">Verify MODULE and GOLD MASTER have identical rule logic</li>
+<li class="">Verify OPTIMIZED ENTRYPOINT correctly references or mirrors GOLD MASTER</li>
+<li class="">Search for ALL terminology variations (exact, lowercase, snake_case, camelCase) across all three tiers</li>
+<li class="">Test with ACTUAL interface (not just assumption) to confirm changes propagate</li>
+</ol>
+<p><strong>Why It Matters:</strong></p>
+<ul>
+<li class="">Different interfaces read from different prompt sources</li>
+<li class="">Incomplete sync across tiers causes user-visible bugs</li>
+<li class="">Platform-specific implementations may use different config sources</li>
+</ul>
+<p><strong>Cross-References:</strong></p>
+<ul>
+<li class=""><strong>Related:</strong> [<a href="#template-driven-docs" class="">Template-Driven Docs</a>]</li>
+<li class=""><strong>Pattern Type:</strong> Synchronization, Documentation</li>
+</ul>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="bidirectional-memory-sync">Bidirectional Memory Sync<a href="#bidirectional-memory-sync" class="hash-link" aria-label="Direct link to Bidirectional Memory Sync" title="Direct link to Bidirectional Memory Sync" translate="no">​</a></h3>
+<p><strong>Problem:</strong> Knowledge graph entries become stale or out of sync with project memory/context files</p>
+<p><strong>Solution:</strong> Automated memory updates during knowledge discovery - when KG entries change, project memory is automatically updated</p>
+<p><strong>When to use:</strong> Any project with persistent cross-session context (MEMORY.md, project context files, etc.)</p>
+<p><strong>Quick Reference:</strong></p>
+<ul>
+<li class="">When lesson is created → Update KG → Update MEMORY.md</li>
+<li class="">Bidirectional flow ensures both systems stay synchronized</li>
+<li class="">Automation prevents manual drift</li>
+<li class="">Keeps persistent context fresh across sessions</li>
+</ul>
+<p><strong>Implementation Notes:</strong></p>
+<ul>
+<li class="">Trigger sync on KG entry creation/update</li>
+<li class="">Update memory sections related to new knowledge</li>
+<li class="">Maintain links between KG and memory entries</li>
+<li class="">Single command pipeline eliminates manual steps</li>
+</ul>
+<p><strong>Cross-References:</strong></p>
+<ul>
+<li class=""><strong>Related:</strong> [<a href="#four-pillar-memory" class="">Four-Pillar Memory</a>]</li>
+<li class=""><strong>Pattern Type:</strong> Automation, Knowledge Management</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="workflow-automation-patterns">Workflow Automation Patterns<a href="#workflow-automation-patterns" class="hash-link" aria-label="Direct link to Workflow Automation Patterns" title="Direct link to Workflow Automation Patterns" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="smart-defaults">Smart Defaults<a href="#smart-defaults" class="hash-link" aria-label="Direct link to Smart Defaults" title="Direct link to Smart Defaults" translate="no">​</a></h3>
+<p><strong>Problem:</strong> Multiple confirmation prompts slow down focused work</p>
+<p><strong>Solution:</strong> Auto-detect context to replace multiple prompts with single confirmation</p>
+<p><strong>When to use:</strong> Automating workflows with predictable defaults (file paths, categorization, commit messages)</p>
+<p><strong>Quick Reference:</strong></p>
+<ul>
+<li class=""><strong>Before:</strong> 5 prompts (category? path? commit? link? sync?)</li>
+<li class=""><strong>After:</strong> 1 confirmation (auto-detected context, user confirms entire operation)</li>
+<li class="">Reduces cognitive load during active development</li>
+<li class="">Preserves user control with single gate</li>
+</ul>
+<p><strong>Implementation Pattern:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">1. Auto-detect session type from git context</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">2. Infer category from keywords in description</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">3. Propose complete operation with all defaults shown</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">4. Single user confirmation</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">5. Execute full pipeline</span><br></div></code></pre></div></div>
+<p><strong>Cross-References:</strong></p>
+<ul>
+<li class=""><strong>Related:</strong> [<a href="#automated-orchestrator" class="">Automated Orchestrator</a>]</li>
+<li class=""><strong>Pattern Type:</strong> UX, Automation</li>
+</ul>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="automated-orchestrator">Automated Orchestrator<a href="#automated-orchestrator" class="hash-link" aria-label="Direct link to Automated Orchestrator" title="Direct link to Automated Orchestrator" translate="no">​</a></h3>
+<p><strong>Problem:</strong> Multi-step manual processes are tedious and error-prone</p>
+<p><strong>Solution:</strong> Replace manual pipeline with single-command automation</p>
+<p><strong>When to use:</strong> Repetitive workflows requiring multiple sequential steps (knowledge sync, deployment, validation pipelines)</p>
+<p><strong>Quick Reference:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">Manual (4 steps):</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">1. /capture-lesson</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">2. /update-graph  </span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">3. /update-issue-plan</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">4. git commit + update MEMORY.md</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Automated (1 step):</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-sync-all</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  → Runs all 4 steps with single confirmation</span><br></div></code></pre></div></div>
+<p><strong>Benefits:</strong></p>
+<ul>
+<li class="">Reduces 4-step workflow to 1 command</li>
+<li class="">Ensures no steps are skipped</li>
+<li class="">Atomic operation (all or nothing)</li>
+<li class="">Single confirmation point</li>
+</ul>
+<p><strong>Cross-References:</strong></p>
+<ul>
+<li class=""><strong>Related:</strong> [<a href="#smart-defaults" class="">Smart Defaults</a>]</li>
+<li class=""><strong>Pattern Type:</strong> Automation, Workflow</li>
+</ul>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="meta-issue-tracking">Meta-Issue Tracking<a href="#meta-issue-tracking" class="hash-link" aria-label="Direct link to Meta-Issue Tracking" title="Direct link to Meta-Issue Tracking" translate="no">​</a></h3>
+<p><strong>Problem:</strong> Complex problems span multiple versions and require 3+ solution attempts with evolving understanding. Single-issue tracking doesn&#x27;t capture root cause evolution or cross-attempt patterns.</p>
+<p><strong>Solution:</strong> Create structured meta-issue directory with core files (README, description, implementation-log, test-cases) and numbered attempt folders</p>
+<p><strong>When to use:</strong></p>
+<ul>
+<li class="">Problem requires 3+ solution attempts</li>
+<li class="">Root cause understanding evolves across attempts</li>
+<li class="">Need to track &quot;what we tried&quot; and &quot;what we learned&quot;</li>
+<li class="">Standard issue tracking feels insufficient</li>
+</ul>
+<p><strong>Quick Reference:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">meta-issue/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">├── README.md              # Navigation hub</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">├── description.md         # Living document (updated as understanding evolves)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">├── implementation-log.md  # Timeline of all attempts</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">├── test-cases.md          # Validation criteria</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">└── attempts/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">    ├── 001-baseline/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">    │   ├── solution-approach.md</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">    │   └── attempt-results.md</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">    ├── 002-caching/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">    │   ├── solution-approach.md</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">    │   └── attempt-results.md</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">    └── 003-pooling/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">        ├── solution-approach.md</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">        └── attempt-results.md</span><br></div></code></pre></div></div>
+<p><strong>Cross-References:</strong></p>
+<ul>
+<li class=""><strong>Related:</strong> [<a href="#four-pillar-memory" class="">Four-Pillar Memory</a>]</li>
+<li class=""><strong>Pattern Type:</strong> Documentation, Problem-Solving</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="memory--knowledge-management-patterns">Memory &amp; Knowledge Management Patterns<a href="#memory--knowledge-management-patterns" class="hash-link" aria-label="Direct link to Memory &amp; Knowledge Management Patterns" title="Direct link to Memory &amp; Knowledge Management Patterns" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="four-pillar-memory">Four-Pillar Memory<a href="#four-pillar-memory" class="hash-link" aria-label="Direct link to Four-Pillar Memory" title="Direct link to Four-Pillar Memory" translate="no">​</a></h3>
+<p><strong>Problem:</strong> Knowledge loss across sessions and difficulty retrieving previously-solved problems</p>
+<p><strong>Solution:</strong> Four complementary systems for different knowledge types</p>
+<p><strong>When to use:</strong> Any project requiring persistent knowledge across sessions</p>
+<p><strong>Quick Reference:</strong></p>
+<ol>
+<li class=""><strong>Lessons Learned</strong> - Detailed problem-solving journeys (narrative)</li>
+<li class=""><strong>ADRs</strong> - Formal architectural decisions (structured)</li>
+<li class=""><strong>Knowledge Graph</strong> - Quick-reference concepts/patterns (scannable)</li>
+<li class=""><strong>Session Summaries</strong> - Work context snapshots (historical)</li>
+</ol>
+<p><strong>The LEVERAGE Principle:</strong></p>
+<ul>
+<li class="">KG = Quick reference (5-10 seconds to understand &quot;what&quot;)</li>
+<li class="">Lessons = Deep dive (5-10 minutes to understand &quot;how&quot; and &quot;why&quot;)</li>
+<li class="">KG links to lessons for context</li>
+<li class="">Lessons extract to KG for future quick access</li>
+</ul>
+<p><strong>Cross-References:</strong></p>
+<ul>
+<li class=""><strong>Related:</strong> [<a href="#project-memory-system" class="">Project Memory System</a>]</li>
+<li class=""><strong>Pattern Type:</strong> Architecture, Knowledge Management</li>
+</ul>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="project-memory-system">Project Memory System<a href="#project-memory-system" class="hash-link" aria-label="Direct link to Project Memory System" title="Direct link to Project Memory System" translate="no">​</a></h3>
+<p><strong>Problem:</strong> AI agents lose context across sessions, requiring repeated explanations</p>
+<p><strong>Solution:</strong> Persistent governance memory integrated with platform memory systems (e.g., Claude Code MEMORY.md)</p>
+<p><strong>When to use:</strong> Projects with AI-assisted development requiring consistent context</p>
+<p><strong>Quick Reference:</strong></p>
+<ul>
+<li class="">Structured memory file in platform-specific location</li>
+<li class="">Sections for: Architecture, Patterns, Gotchas, Current State</li>
+<li class="">Bidirectionally synced with Knowledge Graph</li>
+<li class="">Auto-updated during knowledge pipeline execution</li>
+<li class="">Survives session restarts</li>
+</ul>
+<p><strong>Implementation Notes:</strong></p>
+<ul>
+<li class="">Platform-specific paths (e.g., <code>~/.claude/projects/[hash]/memory/MEMORY.md</code>)</li>
+<li class="">Discovery mechanism to locate existing memory</li>
+<li class="">Fallback creation if not found</li>
+<li class="">Integration with sync pipeline</li>
+</ul>
+<p><strong>Cross-References:</strong></p>
+<ul>
+<li class=""><strong>Related:</strong> [<a href="#four-pillar-memory" class="">Four-Pillar Memory</a>], [<a href="#bidirectional-memory-sync" class="">Bidirectional Memory Sync</a>]</li>
+<li class=""><strong>Pattern Type:</strong> Architecture, Persistence</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="organization--structure-patterns">Organization &amp; Structure Patterns<a href="#organization--structure-patterns" class="hash-link" aria-label="Direct link to Organization &amp; Structure Patterns" title="Direct link to Organization &amp; Structure Patterns" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="category-auto-detection">Category Auto-Detection<a href="#category-auto-detection" class="hash-link" aria-label="Direct link to Category Auto-Detection" title="Direct link to Category Auto-Detection" translate="no">​</a></h3>
+<p><strong>Problem:</strong> Manual categorization is tedious and error-prone</p>
+<p><strong>Solution:</strong> Keyword-based mapping with user confirmation</p>
+<p><strong>When to use:</strong> Creating lessons learned, organizing content, filing documentation</p>
+<p><strong>Quick Reference:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">Keywords → Category:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">&quot;architecture&quot;, &quot;design&quot; → architecture/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">&quot;bug&quot;, &quot;debug&quot;, &quot;error&quot; → debugging/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">&quot;workflow&quot;, &quot;process&quot;   → process/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">&quot;pattern&quot;, &quot;template&quot;   → patterns/</span><br></div></code></pre></div></div>
+<p><strong>Implementation:</strong></p>
+<ol>
+<li class="">Scan title/description for keywords</li>
+<li class="">Map to category via keyword dictionary</li>
+<li class="">Propose category to user</li>
+<li class="">User confirms or overrides</li>
+<li class="">File in correct location</li>
+</ol>
+<p><strong>Cross-References:</strong></p>
+<ul>
+<li class=""><strong>Related:</strong> [<a href="#smart-defaults" class="">Smart Defaults</a>]</li>
+<li class=""><strong>Pattern Type:</strong> Automation, Organization</li>
+</ul>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="template-driven-docs">Template-Driven Docs<a href="#template-driven-docs" class="hash-link" aria-label="Direct link to Template-Driven Docs" title="Direct link to Template-Driven Docs" translate="no">​</a></h3>
+<p><strong>Problem:</strong> Inconsistent structure and missing sections in documentation</p>
+<p><strong>Solution:</strong> Standard templates for recurring document types</p>
+<p><strong>When to use:</strong> Any recurring document type requiring consistent structure (ADRs, lessons, sessions, issues)</p>
+<p><strong>Quick Reference:</strong></p>
+<ul>
+<li class="">Reduces cognitive load (familiar structure)</li>
+<li class="">Ensures completeness (no missing sections)</li>
+<li class="">Accelerates creation (fill-in-the-blank)</li>
+<li class="">Templates in <code>templates/</code> directory</li>
+<li class="">Scaffolding commands create from templates</li>
+</ul>
+<p><strong>Standard Templates:</strong></p>
+<ul>
+<li class=""><code>lesson-template.md</code> - Problem → Root Cause → Solution → Replication</li>
+<li class=""><code>ADR-template.md</code> - Context → Options → Decision → Consequences</li>
+<li class=""><code>session-template.md</code> - Overview → Built → Decided → Learned</li>
+<li class=""><code>issue-template.md</code> - Description → Acceptance Criteria → Plan</li>
+</ul>
+<p><strong>Cross-References:</strong></p>
+<ul>
+<li class=""><strong>Related:</strong> [<a href="#multi-tier-synchronization" class="">Multi-Tier Synchronization</a>]</li>
+<li class=""><strong>Pattern Type:</strong> Documentation, Standardization</li>
+</ul>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="identifier-decoupling">Identifier Decoupling<a href="#identifier-decoupling" class="hash-link" aria-label="Direct link to Identifier Decoupling" title="Direct link to Identifier Decoupling" translate="no">​</a></h3>
+<p><strong>Problem:</strong> Local context (folders/branches) drifts from platform serial numbering (GitHub Issues), causing confusing renames</p>
+<p><strong>Solution:</strong> Map local persistent IDs to platform serial IDs instead of attempting to align them</p>
+<p><strong>When to use:</strong> Project management across local and cloud platforms</p>
+<p><strong>Quick Reference:</strong></p>
+<ul>
+<li class=""><strong>Local ID:</strong> <code>issue-85</code> (Logical, persistent, used for file paths/branches)</li>
+<li class=""><strong>Platform ID:</strong> <code>[ISSUE_ID]</code> (Serial, drifts, used for tracking)</li>
+<li class=""><strong>Policy:</strong> Never rename local assets to match platform drift. Always maintain a mapping matrix in metadata.</li>
+</ul>
+<p><strong>Why This Matters:</strong></p>
+<ul>
+<li class="">Platform IDs can change (deleted issues, issue number reuse)</li>
+<li class="">Local paths need stability (git branches, file references)</li>
+<li class="">Mapping preserves both without coupling</li>
+</ul>
+<p><strong>Cross-References:</strong></p>
+<ul>
+<li class=""><strong>Related:</strong> [<a href="#project-memory-system" class="">Project Memory System</a>]</li>
+<li class=""><strong>Pattern Type:</strong> Architecture, Data Management</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="prompt-engineering--ai-patterns">Prompt Engineering &amp; AI Patterns<a href="#prompt-engineering--ai-patterns" class="hash-link" aria-label="Direct link to Prompt Engineering &amp; AI Patterns" title="Direct link to Prompt Engineering &amp; AI Patterns" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="positive-constraint-framing">Positive Constraint Framing<a href="#positive-constraint-framing" class="hash-link" aria-label="Direct link to Positive Constraint Framing" title="Direct link to Positive Constraint Framing" translate="no">​</a></h3>
+<p><strong>Problem:</strong> Negative instructions (&quot;Don&#x27;t do X&quot;, &quot;Never skip Y&quot;) can prime the model to do the opposite behavior (Pink Elephant Problem)</p>
+<p><strong>Solution:</strong> Reframe all constraints as affirmative commands</p>
+<p><strong>When to use:</strong> Writing any instructions for AI agents, system prompts, or behavioral requirements</p>
+<p><strong>Quick Reference:</strong></p>
+<ul>
+<li class=""><strong>❌ Instead of:</strong> &quot;DO NOT output items in wrong order&quot;</li>
+<li class=""><strong>✅ Use:</strong> &quot;All items MUST be in chronological order&quot;</li>
+<li class=""><strong>❌ Instead of:</strong> &quot;NEVER skip the validation step&quot;</li>
+<li class=""><strong>✅ Use:</strong> &quot;Validation step MUST appear before output&quot;</li>
+</ul>
+<p><strong>Why It Works:</strong></p>
+<ul>
+<li class="">Negative language primes opposite behavior (research-backed)</li>
+<li class="">Positive framing improves compliance measurably</li>
+<li class="">LLMs process affirmative instructions more reliably</li>
+<li class="">Applies to all instruction layers</li>
+</ul>
+<p><strong>Cross-References:</strong></p>
+<ul>
+<li class=""><strong>Related:</strong> [<a href="#smart-defaults" class="">Smart Defaults</a>]</li>
+<li class=""><strong>Pattern Type:</strong> Prompt Engineering, LLM Constraints</li>
+</ul>
+<hr>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="functional-directory-structure">Functional Directory Structure<a href="#functional-directory-structure" class="hash-link" aria-label="Direct link to Functional Directory Structure" title="Direct link to Functional Directory Structure" translate="no">​</a></h3>
+<p><strong>Problem:</strong> Generic named directories (e.g., &quot;shared&quot;, &quot;misc&quot;) obscure intent and lead to dumping ground behavior</p>
+<p><strong>Solution:</strong> Name directories by their functional phase or role in the pipeline</p>
+<p><strong>When to use:</strong> Organizing project structure, refactoring for clarity</p>
+<p><strong>Quick Reference:</strong></p>
+<ul>
+<li class=""><strong>Bad:</strong> <code>/shared/</code> (ambiguous, mixed concerns)</li>
+<li class=""><strong>Good:</strong> <code>/pipelines/</code> (explicit functional role)</li>
+<li class=""><strong>Bad:</strong> <code>/utils/</code> (vague, becomes a junk drawer)</li>
+<li class=""><strong>Good:</strong> <code>/validators/</code> or <code>/transformers/</code> (clear purpose)</li>
+<li class=""><strong>Rule:</strong> If you have to ask &quot;what goes here?&quot;, the name is wrong</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">Before:                     After:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">shared/                     pipelines/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  validation.py               validation-pipeline.py</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  helpers.py                  orchestrator.py</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  utils.py                  </span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">utils/                      transformers/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  format.py                   output-formatter.py</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">misc/                       validators/</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  check.py                    schema-validator.py</span><br></div></code></pre></div></div>
+<p><strong>Cross-References:</strong></p>
+<ul>
+<li class=""><strong>Related:</strong> [<a href="#template-driven-docs" class="">Template-Driven Docs</a>]</li>
+<li class=""><strong>Pattern Type:</strong> Architecture, Organization</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="usage-patterns">Usage Patterns<a href="#usage-patterns" class="hash-link" aria-label="Direct link to Usage Patterns" title="Direct link to Usage Patterns" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="when-to-create-each-document-type">When to Create Each Document Type<a href="#when-to-create-each-document-type" class="hash-link" aria-label="Direct link to When to Create Each Document Type" title="Direct link to When to Create Each Document Type" translate="no">​</a></h3>
+<p><strong>Lesson Learned:</strong></p>
+<ul>
+<li class="">After solving non-trivial problem</li>
+<li class="">When discovering surprising behavior</li>
+<li class="">To document complex troubleshooting journey</li>
+<li class="">Template: Narrative, problem → solution → replication</li>
+</ul>
+<p><strong>ADR:</strong></p>
+<ul>
+<li class="">Before making significant architectural decision</li>
+<li class="">To formalize decision from lesson learned</li>
+<li class="">When choosing between technologies/patterns</li>
+<li class="">Template: Context → options → decision → consequences</li>
+</ul>
+<p><strong>Knowledge Entry:</strong></p>
+<ul>
+<li class="">Extract quick-reference from lessons/ADRs</li>
+<li class="">Define core concept for project</li>
+<li class="">Document common gotcha</li>
+<li class="">Template: Summary → details → cross-refs</li>
+</ul>
+<p><strong>Session Summary:</strong></p>
+<ul>
+<li class="">Before context limits</li>
+<li class="">After completing major feature</li>
+<li class="">At end of debugging session</li>
+<li class="">Template: Overview → built → decided → learned</li>
+</ul>
+<p><strong>Cross-References:</strong></p>
+<ul>
+<li class=""><strong>Pattern Type:</strong> Workflow, Best Practices</li>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_WFHX"><a href="https://github.com/technomensch/knowledge-graph/edit/main/docs/examples/knowledge/sample-patterns.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_JAkA"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#quick-navigation" class="table-of-contents__link toc-highlight">Quick Navigation</a></li><li><a href="#documentation--synchronization-patterns" class="table-of-contents__link toc-highlight">Documentation &amp; Synchronization Patterns</a><ul><li><a href="#multi-tier-synchronization" class="table-of-contents__link toc-highlight">Multi-Tier Synchronization</a></li><li><a href="#bidirectional-memory-sync" class="table-of-contents__link toc-highlight">Bidirectional Memory Sync</a></li></ul></li><li><a href="#workflow-automation-patterns" class="table-of-contents__link toc-highlight">Workflow Automation Patterns</a><ul><li><a href="#smart-defaults" class="table-of-contents__link toc-highlight">Smart Defaults</a></li><li><a href="#automated-orchestrator" class="table-of-contents__link toc-highlight">Automated Orchestrator</a></li><li><a href="#meta-issue-tracking" class="table-of-contents__link toc-highlight">Meta-Issue Tracking</a></li></ul></li><li><a href="#memory--knowledge-management-patterns" class="table-of-contents__link toc-highlight">Memory &amp; Knowledge Management Patterns</a><ul><li><a href="#four-pillar-memory" class="table-of-contents__link toc-highlight">Four-Pillar Memory</a></li><li><a href="#project-memory-system" class="table-of-contents__link toc-highlight">Project Memory System</a></li></ul></li><li><a href="#organization--structure-patterns" class="table-of-contents__link toc-highlight">Organization &amp; Structure Patterns</a><ul><li><a href="#category-auto-detection" class="table-of-contents__link toc-highlight">Category Auto-Detection</a></li><li><a href="#template-driven-docs" class="table-of-contents__link toc-highlight">Template-Driven Docs</a></li><li><a href="#identifier-decoupling" class="table-of-contents__link toc-highlight">Identifier Decoupling</a></li></ul></li><li><a href="#prompt-engineering--ai-patterns" class="table-of-contents__link toc-highlight">Prompt Engineering &amp; AI Patterns</a><ul><li><a href="#positive-constraint-framing" class="table-of-contents__link toc-highlight">Positive Constraint Framing</a></li><li><a href="#functional-directory-structure" class="table-of-contents__link toc-highlight">Functional Directory Structure</a></li></ul></li><li><a href="#usage-patterns" class="table-of-contents__link toc-highlight">Usage Patterns</a><ul><li><a href="#when-to-create-each-document-type" class="table-of-contents__link toc-highlight">When to Create Each Document Type</a></li></ul></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Docs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/quickstart">Getting Started</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/COMMAND-GUIDE">Command Guide</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/CHEAT-SHEET">Cheat Sheet</a></li><li class="footer__item"><a class="footer__link-item" href="/knowledge-graph/FAQ">FAQ</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/technomensch/knowledge-graph" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://www.linkedin.com/in/marckaplan/" target="_blank" rel="noopener noreferrer" class="footer__link-item">LinkedIn<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://buymeacoffee.com/technomensch" target="_blank" rel="noopener noreferrer" class="footer__link-item">Buy Me a Coffee<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="margin-bottom--sm"><a href="https://github.com/technomensch/knowledge-graph" rel="noopener noreferrer" class="footerLogoLink_BH7S"><img src="/knowledge-graph/img/banner.jpeg" alt="Staying in Sync" class="footer__logo themedComponent_mlkZ themedComponent--light_NVdE" width="160"><img src="/knowledge-graph/img/banner.jpeg" alt="Staying in Sync" class="footer__logo themedComponent_mlkZ themedComponent--dark_xIcU" width="160"></a></div><div class="footer__copyright">Staying in Sync</div></div></div></footer></div>
+</body>
+</html>
