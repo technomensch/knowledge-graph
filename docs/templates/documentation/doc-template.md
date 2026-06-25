@@ -78,8 +78,8 @@ Description of what the example demonstrates.
 - [Installation Guide](../../GETTING-STARTED.md) — First-time setup
 
 **Reference**:
-- [Command Reference](../../COMMAND-GUIDE.md) — All commands with examples
-- [Concepts Guide](../../CONCEPTS.md) — Plain-English term explanations
+- [Command Reference](../../reference/command-guide.md) — All commands with examples
+- [Concepts Guide](../../concepts/index.md) — Plain-English term explanations
 
 **Guides**:
 - [Pattern Writing](../../PATTERNS-GUIDE.md) — Writing effective entries

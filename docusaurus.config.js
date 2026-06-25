@@ -104,8 +104,8 @@ const config = {
         },
         items: [
           {to: '/quickstart', label: 'Getting Started', position: 'left'},
-          {to: '/CONCEPTS', label: 'Concepts', position: 'left'},
-          {to: '/COMMAND-GUIDE', label: 'Commands', position: 'left'},
+          {to: '/concepts/', label: 'Concepts', position: 'left'},
+          {to: '/reference/command-guide', label: 'Commands', position: 'left'},
           {to: '/CONFIGURATION', label: 'Configuration', position: 'left'},
           {
             href: 'https://github.com/technomensch/knowledge-graph',
@@ -134,7 +134,7 @@ const config = {
             title: 'Docs',
             items: [
               {label: 'Getting Started', to: '/quickstart'},
-              {label: 'Command Guide', to: '/COMMAND-GUIDE'},
+              {label: 'Command Guide', to: '/reference/command-guide'},
               {label: 'Cheat Sheet', to: '/CHEAT-SHEET'},
               {label: 'FAQ', to: '/FAQ'},
             ],

@@ -7,6 +7,12 @@ displayed_sidebar: null
 
 All notable changes to the Knowledge Plugin will be documented in this file.
 
+## [0.6.13] — 2026-06-25
+
+### Fixed
+
+- **Broken navbar/footer links** — `/CONCEPTS` and `/COMMAND-GUIDE` have been 404 since `CONCEPTS.md` was deleted (`1897d5a1`) and `COMMAND-GUIDE.md` was moved to `docs/reference/command-guide.md` (`192590c2`). No fix pass updated `docusaurus.config.js`. Repaired by creating `docs/concepts/index.md` (new concepts landing page) and repointing both nav items. Also fixed 7 stale file-level references to the old paths in template docs.
+
 ## [0.6.12] — 2026-06-25
 
 ### Fixed
