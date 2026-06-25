@@ -1,11 +1,5 @@
 ---
 title: Customize Templates
-category:
-  uri: tailoring
-position: 2
-slug: pillars-tailoring-customize-templates
-parent:
-  uri: pillars-tailoring-index
 ---
 
 # Customize Templates

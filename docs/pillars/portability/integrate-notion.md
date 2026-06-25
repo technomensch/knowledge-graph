@@ -1,11 +1,5 @@
 ---
 title: Integrate with Notion
-category:
-  uri: portability
-position: 6
-slug: pillars-portability-integrate-notion
-parent:
-  uri: pillars-portability-index
 ---
 
 # Integrate with Notion

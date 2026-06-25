@@ -1,9 +1,5 @@
 ---
 title: FAQ
-category:
-  uri: overview
-position: 5
-slug: faq
 ---
 
 This guide provides answers to common questions about using and maintaining the Knowledge Management Graph.

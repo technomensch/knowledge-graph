@@ -1,9 +1,5 @@
 ---
 title: Sanitization Checklist
-category:
-  uri: reference
-position: 10
-slug: reference-sanitization-checklist
 ---
 
 # Sanitization Checklist

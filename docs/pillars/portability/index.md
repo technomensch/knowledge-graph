@@ -1,9 +1,5 @@
 ---
 title: Portability
-category:
-  uri: portability
-position: 1
-slug: pillars-portability-index
 ---
 
 # Portability

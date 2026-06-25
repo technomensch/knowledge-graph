@@ -1,11 +1,5 @@
 ---
 title: The Automation Layer
-category:
-  uri: tailoring
-position: 4
-slug: pillars-tailoring-automation-layer
-parent:
-  uri: pillars-tailoring-index
 ---
 
 # The Automation Layer

@@ -1,8 +1,5 @@
 ---
 title: Readme
-category:
-  uri: templates
-slug: templates-meta-issue-readme
 ---
 
 # Meta-Issue: [Problem Title]

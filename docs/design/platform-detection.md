@@ -1,9 +1,5 @@
 ---
 title: Platform Detection
-category:
-  uri: design
-position: 1
-slug: design-platform-detection
 ---
 
 # Design: Platform Detection for `rules-capture`

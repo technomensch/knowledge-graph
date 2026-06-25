@@ -1,8 +1,5 @@
 ---
 title: Index
-category:
-  uri: templates
-slug: templates-knowledge-index
 ---
 
 # Knowledge Graph - Master Index

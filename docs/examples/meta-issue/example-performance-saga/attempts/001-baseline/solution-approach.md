@@ -1,8 +1,5 @@
 ---
 title: Solution Approach
-category:
-  uri: examples
-slug: examples-meta-issue-example-performance-saga-attempts-001-baseline-solution-approach
 ---
 
 <!-- THIS IS AN EXAMPLE — Replace with your project's meta-issues -->

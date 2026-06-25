@@ -1,11 +1,5 @@
 ---
 title: Custom Rules
-category:
-  uri: tailoring
-position: 3
-slug: pillars-tailoring-custom-rules
-parent:
-  uri: pillars-tailoring-index
 ---
 
 # Custom Rules

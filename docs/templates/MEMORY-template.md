@@ -1,8 +1,5 @@
 ---
 title: Memory Template
-category:
-  uri: templates
-slug: templates-memory-template
 ---
 
 # Project Memory - [Project Name]

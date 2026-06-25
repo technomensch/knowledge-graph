@@ -1,8 +1,5 @@
 ---
 title: Readme
-category:
-  uri: templates
-slug: templates-lessons-learned-readme
 ---
 
 # Lessons Learned - Master Index

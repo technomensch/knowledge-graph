@@ -1,8 +1,5 @@
 ---
 title: Implementation Log
-category:
-  uri: templates
-slug: templates-meta-issue-implementation-log
 ---
 
 # Implementation Log

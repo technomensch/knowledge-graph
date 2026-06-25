@@ -1,9 +1,5 @@
 ---
 title: Organizing
-category:
-  uri: organizing
-position: 1
-slug: pillars-organizing-index
 ---
 
 # Organizing

@@ -1,8 +1,5 @@
 ---
 title: Sample Concepts
-category:
-  uri: examples
-slug: examples-knowledge-sample-concepts
 ---
 
 # Core Concepts

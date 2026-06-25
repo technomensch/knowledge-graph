@@ -1,8 +1,5 @@
 ---
 title: 'ADR-XXX: [Title of Decision]'
-category:
-  uri: templates
-slug: templates-decisions-adr-template
 ---
 
 # ADR-XXX: [Title of Decision]

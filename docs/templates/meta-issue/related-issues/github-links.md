@@ -1,8 +1,5 @@
 ---
 title: Github Links
-category:
-  uri: templates
-slug: templates-meta-issue-related-issues-github-links
 ---
 
 # Related GitHub Issues

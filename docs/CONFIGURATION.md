@@ -1,9 +1,5 @@
 ---
 title: Configuration
-category:
-  uri: overview
-position: 8
-slug: configuration
 ---
 
 This guide covers configuring and customizing the Knowledge Management Graph after installation.

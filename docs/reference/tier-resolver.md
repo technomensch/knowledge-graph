@@ -1,9 +1,5 @@
 ---
 title: Model Tier Resolver
-category:
-  uri: reference
-position: 9
-slug: reference-tier-resolver
 ---
 
 # Model Tier Resolver

@@ -1,9 +1,5 @@
 ---
 title: Why KMGraph?
-category:
-  uri: concepts
-position: 1
-slug: concepts-why-kmgraph
 ---
 
 # Why KMGraph?

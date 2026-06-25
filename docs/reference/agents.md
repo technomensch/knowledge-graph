@@ -1,9 +1,5 @@
 ---
 title: Agents Catalog
-category:
-  uri: reference
-position: 4
-slug: reference-agents
 ---
 
 # Agents Catalog

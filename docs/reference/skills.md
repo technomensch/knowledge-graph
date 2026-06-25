@@ -1,9 +1,5 @@
 ---
 title: Skills Catalog
-category:
-  uri: reference
-position: 5
-slug: reference-skills
 ---
 
 # Skills Catalog

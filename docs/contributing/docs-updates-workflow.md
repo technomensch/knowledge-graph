@@ -1,9 +1,5 @@
 ---
 title: Documentation Updates Workflow
-category:
-  uri: contributing
-position: 1
-slug: contributing-docs-updates-workflow
 ---
 
 # Documentation Updates Workflow

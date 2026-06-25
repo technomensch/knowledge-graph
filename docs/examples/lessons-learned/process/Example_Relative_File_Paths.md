@@ -1,8 +1,5 @@
 ---
 title: 'Lesson: Relative File Path Hygiene'
-category:
-  uri: examples
-slug: examples-lessons-learned-process-example-relative-file-paths
 ---
 
 # Lesson Learned: Relative File Path Hygiene

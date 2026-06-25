@@ -1,8 +1,5 @@
 ---
 title: 'Lesson: Agentic Momentum & Failure of Subjective Validation'
-category:
-  uri: examples
-slug: examples-lessons-learned-process-example-agentic-momentum
 ---
 
 # Lesson Learned: Agentic Momentum & The Failure of Subjective Validation

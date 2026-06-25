@@ -1,8 +1,5 @@
 ---
 title: Description
-category:
-  uri: templates
-slug: templates-meta-issue-description
 ---
 
 # Problem Description (Living Document)

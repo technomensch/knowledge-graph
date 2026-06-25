@@ -1,11 +1,5 @@
 ---
 title: Architecture Decisions
-category:
-  uri: capturing
-position: 2
-slug: pillars-capturing-architecture-decisions
-parent:
-  uri: pillars-capturing-index
 ---
 
 # Architecture Decisions

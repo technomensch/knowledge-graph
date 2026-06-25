@@ -1,11 +1,5 @@
 ---
 title: Docs Impact Scan
-category:
-  uri: tailoring
-position: 5
-slug: pillars-tailoring-docs-impact-scan
-parent:
-  uri: pillars-tailoring-index
 ---
 
 # Docs Impact Scan

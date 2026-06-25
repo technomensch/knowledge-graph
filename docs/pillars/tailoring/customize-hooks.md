@@ -1,11 +1,5 @@
 ---
 title: Customize Hooks
-category:
-  uri: tailoring
-position: 1
-slug: pillars-tailoring-customize-hooks
-parent:
-  uri: pillars-tailoring-index
 ---
 
 # Customize Hooks

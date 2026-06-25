@@ -1,8 +1,5 @@
 ---
 title: Implementation Log
-category:
-  uri: examples
-slug: examples-meta-issue-example-performance-saga-implementation-log
 ---
 
 <!-- THIS IS AN EXAMPLE — Replace with your project's meta-issues -->

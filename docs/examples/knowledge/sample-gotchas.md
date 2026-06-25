@@ -1,8 +1,5 @@
 ---
 title: Sample Gotchas
-category:
-  uri: examples
-slug: examples-knowledge-sample-gotchas
 ---
 
 # Common Gotchas & Solutions

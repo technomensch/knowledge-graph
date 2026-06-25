@@ -1,9 +1,5 @@
 ---
 title: Tailoring
-category:
-  uri: tailoring
-position: 1
-slug: pillars-tailoring-index
 ---
 
 # Tailoring

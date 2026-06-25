@@ -1,8 +1,5 @@
 ---
 title: 'Lesson: Platform Skill Discovery Architecture'
-category:
-  uri: examples
-slug: examples-lessons-learned-architecture-example-claude-code-skills-arch
 ---
 
 # Lesson Learned: Platform Skill Discovery Architecture

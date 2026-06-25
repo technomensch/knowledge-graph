@@ -1,9 +1,6 @@
 ---
 title: '[Document Title]'
 type: '[guide | concept | tutorial | explanation | reference | faq | custom]'
-category:
-  uri: templates
-slug: templates-documentation-doc-template
 ---
 
 # [Document Title]

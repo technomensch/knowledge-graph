@@ -1,11 +1,5 @@
 ---
 title: Capture Lessons Learned
-category:
-  uri: capturing
-position: 1
-slug: pillars-capturing-capture-lessons-learned
-parent:
-  uri: pillars-capturing-index
 ---
 
 # Capture Lessons Learned

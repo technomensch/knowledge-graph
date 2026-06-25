@@ -1,9 +1,5 @@
 ---
 title: Capturing
-category:
-  uri: capturing
-position: 1
-slug: pillars-capturing-index
 ---
 
 # Capturing

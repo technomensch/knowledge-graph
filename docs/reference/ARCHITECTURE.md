@@ -1,9 +1,5 @@
 ---
 title: Architecture
-category:
-  uri: reference
-position: 7
-slug: reference-architecture
 ---
 
 # Knowledge Graph Architecture

@@ -1,8 +1,5 @@
 ---
 title: 'Lesson: Knowledge Extraction Workflow'
-category:
-  uri: examples
-slug: examples-lessons-learned-process-example-chat-history-workflow
 ---
 
 # Lesson Learned: Knowledge Extraction Workflow

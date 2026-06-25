@@ -1,8 +1,5 @@
 ---
 title: 'Lesson: Identifier Decoupling (The Serial ID Drift)'
-category:
-  uri: examples
-slug: examples-lessons-learned-process-example-identifier-decoupling
 ---
 
 # Lesson Learned: Identifier Decoupling (The Serial ID Drift)

@@ -1,11 +1,5 @@
 ---
 title: Multi-KG Workflows
-category:
-  uri: organizing
-position: 2
-slug: pillars-organizing-multi-kg-workflows
-parent:
-  uri: pillars-organizing-index
 ---
 
 # Multi-KG Workflows

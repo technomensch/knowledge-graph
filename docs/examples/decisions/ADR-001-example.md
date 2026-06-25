@@ -1,8 +1,5 @@
 ---
 title: Adr 001 Example
-category:
-  uri: examples
-slug: examples-decisions-adr-001-example
 ---
 
 <!-- THIS IS AN EXAMPLE — Replace with your project's ADRs -->

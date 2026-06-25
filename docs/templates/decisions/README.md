@@ -1,8 +1,5 @@
 ---
 title: Readme
-category:
-  uri: templates
-slug: templates-decisions-readme
 ---
 
 # Architecture Decision Records (ADRs)

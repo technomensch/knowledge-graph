@@ -1,8 +1,5 @@
 ---
 title: Agents Template
-category:
-  uri: templates
-slug: templates-agents-template
 ---
 
 # Agent Template

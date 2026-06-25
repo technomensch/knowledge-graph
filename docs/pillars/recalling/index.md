@@ -1,9 +1,5 @@
 ---
 title: Recalling
-category:
-  uri: recalling
-position: 1
-slug: pillars-recalling-index
 ---
 
 # Recalling

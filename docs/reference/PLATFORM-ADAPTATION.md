@@ -1,9 +1,5 @@
 ---
 title: Platform Adaptation
-category:
-  uri: reference
-position: 8
-slug: reference-platform-adaptation
 ---
 
 # Platform Adaptation Guide

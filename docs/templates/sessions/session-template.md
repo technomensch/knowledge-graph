@@ -1,8 +1,5 @@
 ---
 title: Session Template
-category:
-  uri: templates
-slug: templates-sessions-session-template
 ---
 
 <!--

@@ -1,11 +1,5 @@
 ---
 title: Backfill
-category:
-  uri: organizing
-position: 4
-slug: pillars-organizing-backfill
-parent:
-  uri: pillars-organizing-index
 ---
 
 # Backfill
