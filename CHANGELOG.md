@@ -7,6 +7,12 @@ displayed_sidebar: null
 
 All notable changes to the Knowledge Plugin will be documented in this file.
 
+## [0.6.14] — 2026-06-28
+
+### Fixed
+
+- **FTS5 and grep search miss `concepts/` directory** — `searchDirs` in `fts5.ts` and `search.ts` hardcoded a fixed list of subdirectories that did not include `concepts/`, added to the scaffold in v0.6.13. All files under `concepts/` were invisible to `kg_fts5_rebuild` and `/kmgraph:kmg-recall`. Fixed by indexing `concepts/` from `kgPath` directly (not `contentRoot`) so it works correctly on both flat and v0.2+ docs-layout KGs. Also aligned the grep fallback list in `search.ts` to mirror the FTS5 scanner (added `chat-history`).
+
 ## [0.6.13] — 2026-06-25
 
 ### Fixed
