@@ -31840,7 +31840,7 @@ function searchKg(kgPath, kgName, kgType, query) {
   }
   if (!usingFts5) {
     results = [];
-    const searchDirs = ["knowledge", "lessons-learned", "decisions", "sessions"];
+    const searchDirs = ["knowledge", "concepts", "lessons-learned", "decisions", "sessions"];
     for (const dir of searchDirs) {
       const dirPath = path4.join(kgPath, dir);
       const files = walkDir(dirPath, ".md");
