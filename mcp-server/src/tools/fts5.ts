@@ -319,13 +319,15 @@ export function rebuildIndex(kgPath: string, kgName: string, kgType = "project-l
     const contentRoot = resolveContentRoot(kgPath);
 
     // Collect all .md files from target subdirectories
-    const searchDirs = ["knowledge", "lessons-learned", "decisions", "sessions", "chat-history"];
+    // concepts/ is always top-level (kgPath), even on v0.2+ docs-layout KGs
+    const contentDirs = ["knowledge", "lessons-learned", "decisions", "sessions", "chat-history"];
     const allFiles: string[] = [];
 
-    for (const dir of searchDirs) {
+    for (const dir of contentDirs) {
       const dirPath = path.join(contentRoot, dir);
       allFiles.push(...walkDir(dirPath, ".md"));
     }
+    allFiles.push(...walkDir(path.join(kgPath, "concepts"), ".md"));
 
     let indexed = 0;
     let skipped = 0;
