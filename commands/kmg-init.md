@@ -631,6 +631,31 @@ fi
 #   4. Rewrite CLAUDE.md to pointer: "For full context, read knowledge/rules.md and knowledge/me.md before acting."
 #   5. If user aborts, restore from CLAUDE.md.bak and delete it
 
+# Offer to create CLAUDE.md if completely absent
+if [ ! -f "$(pwd)/CLAUDE.md" ]; then
+  echo ""
+  echo "No CLAUDE.md found at project root."
+  read -r -p "Create one with KMGraph platform preferences? (Recommended) [Y/n]: " _claude_create_resp
+  _claude_create_resp="${_claude_create_resp:-Y}"
+  if [[ "$_claude_create_resp" =~ ^[Yy]$ ]]; then
+    cat > "$(pwd)/CLAUDE.md" << 'CLAUDEEOF'
+# Project Instructions
+
+## Platform Preferences (Claude Code)
+
+### File and Content Search
+- File search: use Glob and Grep tools — not Bash `find` or `grep`
+- Content search: use Grep tool — not `rg` or `grep` in Bash
+
+### Knowledge Graph
+- KMGraph is installed at `knowledge/`. Rules in `knowledge/rules.md`, identity in `knowledge/me.md`.
+- Run `/kmgraph:kmg-recall` before answering questions about project history or past decisions.
+- Run `/kmgraph:kmg-capture-lesson` after solving bugs or making architectural decisions.
+CLAUDEEOF
+    echo "✅ Created CLAUDE.md with KMGraph preferences."
+  fi
+fi
+
 # h.2. Evidence seeding — scan for Why/Source candidates after rules.md is populated
 # Only runs if rules.md was just written (either from CLAUDE.md or scaffolded)
 if [ -f "knowledge/rules.md" ]; then
