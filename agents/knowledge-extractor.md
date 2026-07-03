@@ -2,7 +2,20 @@
 
 **Role:** Parse large chat history files, lesson documents, and session logs to extract structured insights and relationships for the knowledge graph. Prevents the main context window from being consumed by 2000+ line source files. Also handles the full KG entry extraction pipeline when delegated from `update-graph`.
 
-**Operating Mode:** Read-only by default — only reads and returns structured output. Writes nothing until the user explicitly approves the extracted content.
+**Operating Mode:** Read-only by default — only reads and returns structured output. Writes nothing until the user explicitly approves the extracted content. (update-graph mode — in init-backfill mode the coordinator handles approval and writes)
+
+## Mode-Based Behavior
+
+This agent operates in two modes determined by the invocation context:
+
+| Mode | Trigger | Write tools | Approval gate |
+|---|---|---|---|
+| **init-backfill** | Invoked with `mode="init-backfill"` or coordinator message includes "init-backfill" | ❌ Not used | ❌ Not used |
+| **update-graph** | Invoked from `kmg-update-graph` or with no mode specified | ✅ Active | ✅ Active |
+
+**In init-backfill mode:** Extract candidates and return structured list to coordinator. STOP at step 7. Do not write. Do not wait for approval — the coordinator handles both.
+
+**In update-graph mode:** Run the full pipeline: extract → present → await approval → write.
 
 **Tools Allowed:**
 - `Read` — Read source files, config, KG files
@@ -32,6 +45,9 @@
    - Present for user review before any writes
 
 4. **Approval Gate:**
+
+> **Applies to update-graph mode only.** In init-backfill mode this gate does not apply — see Mode-Based Behavior above.
+
    - Wait for explicit user approval of extracted content
    - User can edit, reject, or accept each extracted item
    - Only then proceed to write to knowledge graph
@@ -72,9 +88,8 @@ Subagent: Writes approved items to knowledge graph
 
 **Constraint:**
 - Remains **read-only** during extraction
-- Awaits explicit user approval of each item before writing to KG
-- User can edit, reject, or accept extracted content
-- Does NOT write to KG until approval received
+- In **update-graph mode**: awaits explicit user approval; does not write until approved. In **init-backfill mode**: returns candidate list only — coordinator handles approval and writes.
+- User can edit, reject, or accept extracted content (update-graph mode only)
 
 **Behavior:**
 1. Read README.md -> extract architecture overview, key concepts
@@ -82,9 +97,15 @@ Subagent: Writes approved items to knowledge graph
 3. Scan lessons-learned/ -> extract existing lessons, categorize by type
 4. Scan decisions/ -> extract ADRs, architectural choices
 5. Scan chat-history/ -> extract patterns, lessons, insights
-6. Consolidate findings -> present candidates to user with source refs
-7. Wait for user approval (edit, reject, accept)
-8. Only then write approved items to active knowledge graph
+6. Present extracted insights as a structured candidate list — grouped by type (lesson, ADR, pattern, gotcha)
+
+**If init-backfill mode:**
+7. Return candidate list to coordinator session.
+8. STOP — do not write. The coordinator confirms with the user and writes approved files directly.
+
+**If update-graph mode:**
+7. Wait for user approval (edit, reject, accept each candidate)
+8. Write approved items to active knowledge graph using Edit/Write tools
 
 ---
 

@@ -13,14 +13,14 @@
 ### Copy templates
 
 ```bash
-# Copy KG content templates into knowledge/templates/ subdirectory
-mkdir -p "{KG_PATH}/knowledge/templates"
-cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/patterns.md" "{KG_PATH}/knowledge/templates/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/gotchas.md" "{KG_PATH}/knowledge/templates/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/concepts.md" "{KG_PATH}/knowledge/templates/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/architecture.md" "{KG_PATH}/knowledge/templates/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/workflows.md" "{KG_PATH}/knowledge/templates/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/kg-category-index.md" "{KG_PATH}/knowledge/"
+# Copy KG content templates into templates/ subdirectory
+mkdir -p "{KG_PATH}/templates"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/patterns.md" "{KG_PATH}/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/gotchas.md" "{KG_PATH}/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/concepts.md" "{KG_PATH}/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/architecture.md" "{KG_PATH}/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/workflows.md" "{KG_PATH}/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/kg-category-index.md" "{KG_PATH}/concepts/"
 
 # Copy root-level profile files from project profile starters (skip if exists to preserve teammate copies)
 [ -f "{KG_PATH}/rules.md" ] && echo "rules.md already exists — skipping scaffold (teammate copy preserved)." || \
@@ -36,11 +36,11 @@ cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/project/me.md
 cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/lessons-learned/README.md" "{KG_PATH}/lessons-learned/"
 cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/decisions/README.md" "{KG_PATH}/decisions/"
 
-# Starter templates deploy to knowledge/templates/ (ADR-040), never into live dirs
-cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/lessons-learned/lesson-template.md" "{KG_PATH}/knowledge/templates/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/decisions/ADR-template.md" "{KG_PATH}/knowledge/templates/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/sessions/session-template.md" "{KG_PATH}/knowledge/templates/"
-cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/entry-template.md" "{KG_PATH}/knowledge/templates/"
+# Starter templates deploy to templates/ (ADR-040), never into live dirs
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/lessons-learned/lesson-template.md" "{KG_PATH}/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/decisions/ADR-template.md" "{KG_PATH}/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/sessions/session-template.md" "{KG_PATH}/templates/"
+cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/entry-template.md" "{KG_PATH}/templates/"
 
 # Copy MEMORY template if not exists
 if [ ! -f "~/.claude/projects/$(basename $(pwd))/memory/MEMORY.md" ]; then
@@ -54,13 +54,13 @@ fi
 Compare installed templates against the plugin's current templates. If newer versions exist, offer to update:
 
 ```bash
-template_dirs=("knowledge/templates" "lessons-learned" "decisions" "sessions")
+template_dirs=("templates" "lessons-learned" "decisions" "sessions")
 updates_available=()
 
 for tdir in "${template_dirs[@]}"; do
   # knowledge/templates deploy dir maps to concepts/templates/ in plugin source (renamed in v0.5.10.7)
   _src_tdir="${tdir}"
-  [ "${tdir}" = "knowledge/templates" ] && _src_tdir="concepts/templates"
+  [ "${tdir}" = "templates" ] && _src_tdir="concepts/templates"
   for template in "{CLAUDE_PLUGIN_ROOT}/core/default-templates/${_src_tdir}/"*; do
     dest="{KG_PATH}/$tdir/$(basename $template)"
     if [ -f "$dest" ]; then

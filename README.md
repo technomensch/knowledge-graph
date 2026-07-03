@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.6.14
+**Version:** 0.6.15
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -90,6 +90,15 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 ---
 
 ## v0.6.x Feature Highlights
+
+**v0.6.15 — 2026-07-02**
+
+- **Init completeness fixes** — Fresh init now creates `concepts/` and `templates/` (not legacy `knowledge/`), scaffolds `triggers.md`, and deploys `kg-category-index.md` to `concepts/`. All template copy targets corrected.
+- **Step 1.10 source detection** — Backfill offer fires correctly when `chat-history/`, `plans/`, `research/`, or `specs/` exist, even without a `CLAUDE.md`. Source paths detected via if/elif precedence and passed to the extractor.
+- **CLAUDE.md creation offer** — When no `CLAUDE.md` exists at project root, init now offers to create one with KMGraph platform preferences (standalone guard, real user input, existing files never touched).
+- **Extractor approval gate scoped to update-graph mode** — `knowledge-extractor` in init-backfill mode returns candidates only; coordinator handles approval and writes. Full write pipeline preserved for update-graph mode.
+- **Concepts removed from top navbar** — Concepts is now sidebar-only; top navbar shows Getting Started, Commands, Configuration only.
+- **Backfill troubleshooting docs** — New `## Troubleshooting` section in the backfill guide covers manual recovery for all platforms.
 
 **v0.6.10 — 2026-06-22**
 

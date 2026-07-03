@@ -631,6 +631,31 @@ fi
 #   4. Rewrite CLAUDE.md to pointer: "For full context, read knowledge/rules.md and knowledge/me.md before acting."
 #   5. If user aborts, restore from CLAUDE.md.bak and delete it
 
+# Offer to create CLAUDE.md if completely absent
+if [ ! -f "$(pwd)/CLAUDE.md" ]; then
+  echo ""
+  echo "No CLAUDE.md found at project root."
+  read -r -p "Create one with KMGraph platform preferences? (Recommended) [Y/n]: " _claude_create_resp
+  _claude_create_resp="${_claude_create_resp:-Y}"
+  if [[ "$_claude_create_resp" =~ ^[Yy]$ ]]; then
+    cat > "$(pwd)/CLAUDE.md" << 'CLAUDEEOF'
+# Project Instructions
+
+## Platform Preferences (Claude Code)
+
+### File and Content Search
+- File search: use Glob and Grep tools — not Bash `find` or `grep`
+- Content search: use Grep tool — not `rg` or `grep` in Bash
+
+### Knowledge Graph
+- KMGraph is installed at `knowledge/`. Rules in `knowledge/rules.md`, identity in `knowledge/me.md`.
+- Run `/kmgraph:kmg-recall` before answering questions about project history or past decisions.
+- Run `/kmgraph:kmg-capture-lesson` after solving bugs or making architectural decisions.
+CLAUDEEOF
+    echo "✅ Created CLAUDE.md with KMGraph preferences."
+  fi
+fi
+
 # h.2. Evidence seeding — scan for Why/Source candidates after rules.md is populated
 # Only runs if rules.md was just written (either from CLAUDE.md or scaffolded)
 if [ -f "knowledge/rules.md" ]; then
@@ -1468,28 +1493,50 @@ Examples available at ${CLAUDE_PLUGIN_ROOT}/core/examples/ (not copied by defaul
 
 ### Step 1.10: Optional Backfill from Existing Project
 
+**SCOPE:** This step is NOT gated on CLAUDE.md presence. Do NOT skip it because CLAUDE.md
+is absent — CLAUDE.md absence is checked in Step 1.6.5, which is a different concern.
+Run Step 1.10 whenever the project has existing content directories to scan.
+
+**Detect which sources are present (record the matched path for each):**
+```bash
+sources=()
+if [ -d "knowledge/chat-history" ]; then
+  sources+=("knowledge/chat-history/")
+elif [ -d "chat-history" ]; then
+  sources+=("chat-history/")
+fi
+if [ -d "knowledge/plans" ]; then
+  sources+=("knowledge/plans/")
+elif [ -d "plans" ]; then
+  sources+=("plans/")
+fi
+[ -d "research" ] && sources+=("research/")
+[ -d "specs" ] && sources+=("specs/")
+[ -f "README.md" ] && sources+=("README.md")
+[ -f "CHANGELOG.md" ] && sources+=("CHANGELOG.md")
+```
+
+If `${#sources[@]} -eq 0`: skip this step silently — no content to scan.
+
 **Prompt user:**
 ```
-If initializing in a pre-existing project with chat history, source files, or documentation:
+Would you like to backfill the knowledge graph from existing project content? [y/N]
 
-Would you like to backfill the knowledge graph from existing project context? [y/N]
+Found these sources to scan:
+  [list each entry in sources[] on its own line with •]
 
-This will parse:
-  • README.md (architecture overview)
-  • CHANGELOG.md / docs/CHANGELOG.md (decision history)
-  • Files in knowledge/lessons-learned/ or knowledge/decisions/ (existing knowledge)
-  • Chat history files in knowledge/chat-history/ (if present)
-
-The knowledge-extractor subagent will suggest new lessons and knowledge entries
-for your review before writing them to the KG.
+The knowledge-extractor subagent will return lesson and decision candidates.
+You review and approve before anything is written.
 ```
 
 **If yes:**
-- Invoke `knowledge-extractor` subagent in "init-backfill" mode
-- Pass list of files to parse (README, CHANGELOG, knowledge/lessons-learned/, knowledge/decisions/, knowledge/chat-history/)
-- Present extracted lesson candidates to user for review
-- Write approved items to knowledge graph
-- Output summary of backfilled entries
+1. Invoke `knowledge-extractor` subagent in **"init-backfill" mode** — pass mode="init-backfill" explicitly
+2. Pass the `sources[]` array to the subagent (actual matched paths)
+3. Subagent returns a structured candidate list (lessons, ADRs, patterns, gotchas) — it does NOT write
+4. Present candidates to user for review; user selects which to approve
+5. Show explicit confirmation: "I will write N files to the knowledge graph. Confirm? [y/N]"
+6. On user confirmation: coordinator writes approved candidates directly
+7. Output summary of written entries
 
 ```
 ✅ Backfill complete!

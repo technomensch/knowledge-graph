@@ -104,7 +104,6 @@ const config = {
         },
         items: [
           {to: '/quickstart', label: 'Getting Started', position: 'left'},
-          {to: '/concepts/', label: 'Concepts', position: 'left'},
           {to: '/reference/command-guide', label: 'Commands', position: 'left'},
           {to: '/CONFIGURATION', label: 'Configuration', position: 'left'},
           {

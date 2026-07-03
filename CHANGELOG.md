@@ -7,6 +7,24 @@ displayed_sidebar: null
 
 All notable changes to the Knowledge Plugin will be documented in this file.
 
+## [0.6.15] — 2026-07-02
+
+### Fixed
+
+- **Init directory scaffold** — Fresh init now creates `concepts/` and `templates/` instead of legacy `knowledge/` subdirectory. `knowledge/knowledge/` no longer created on `knowledge/`-rooted KGs. `kg-category-index.md` deployed to `concepts/`; all content and starter templates deployed to `templates/`. Fixes ENH-031 Bug 2 + 4.
+- **`triggers.md` scaffolded on init** — `kmg-directory-scaffold` now creates `triggers.md` with a `[ ! -f ]` idempotency guard. Fixes ENH-031 Bug 4.
+- **Step 1.10 backfill source detection** — Backfill offer no longer gated on CLAUDE.md presence. Source detection now uses if/elif precedence (`knowledge/chat-history` vs `chat-history`, `knowledge/plans` vs `plans`) and standalone checks for `research/`, `specs/`, `README.md`, `CHANGELOG.md`. Matched paths passed as array to extractor. Fixes ENH-031 Bug 1.
+- **CLAUDE.md creation offer** — When no CLAUDE.md exists at project root, init offers to create one with KMGraph platform preferences. Standalone `if [ ! -f ]` guard; gated on real user input (default Y); existing CLAUDE.md never touched. Fixes ENH-031 Bug 3.
+- **Extractor approval gate scoped to init-backfill mode** — `knowledge-extractor` in init-backfill mode extracts candidates and returns them to coordinator without writing or waiting for approval. Update-graph mode retains full write pipeline. Fixes ENH-032.
+
+### Changed
+
+- **Concepts removed from top navbar** — Concepts is accessible via sidebar only. Top navbar: Getting Started, Commands, Configuration, GitHub, LinkedIn.
+
+### Docs
+
+- **Backfill troubleshooting guide** — New `## Troubleshooting` section in `docs/pillars/organizing/backfill.md` covers manual backfill recovery for all platforms (skipped init, no candidates found, mid-run failure).
+
 ## [0.6.14] — 2026-06-28
 
 ### Fixed
