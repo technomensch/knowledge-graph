@@ -230,7 +230,7 @@ python3 ${CLAUDE_PLUGIN_ROOT}/core/scripts/run_extraction.py --source $source_fl
 
 **The Python script:**
 - Reads `KG_OUTPUT_DIR` environment variable
-- Falls back to script directory if not set (for non-plugin use)
+- Raises `RuntimeError` at import time if neither `KG_OUTPUT_DIR` nor `--output-dir` is set — chat extraction must not silently write into the plugin's own directory
 - Uses `--output-dir` CLI arg if provided (highest priority)
 
 ---

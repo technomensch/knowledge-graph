@@ -8,9 +8,16 @@ import glob
 from datetime import datetime
 
 # Allow override via environment variable (set by skills) or CLI arg (set by run_extraction.py)
-# Falls back to script directory for non-plugin use
-OUTPUT_DIR = os.environ.get('KG_OUTPUT_DIR',
-                             os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ""))
+_env_output_dir = os.environ.get('KG_OUTPUT_DIR')
+if _env_output_dir:
+    OUTPUT_DIR = _env_output_dir
+else:
+    raise RuntimeError(
+        "KG_OUTPUT_DIR is not set. Chat extraction must not silently write "
+        "into the plugin's own directory. Set KG_OUTPUT_DIR (or pass "
+        "--output-dir to run_extraction.py, which sets it) before importing "
+        "chat_extractor_base."
+    )
 
 # Obsidian crashes above ~1 MB or ~34 K lines; use headroom thresholds
 FILE_SIZE_LIMIT = 900_000   # bytes (~900 KB)

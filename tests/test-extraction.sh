@@ -137,6 +137,21 @@ fi
 
 echo ""
 
+# Test 8: Missing KG_OUTPUT_DIR fails loudly instead of silently defaulting
+OUTPUT=$(HOME="$FAKE_HOME" python3 -c "
+import sys
+sys.path.insert(0, '$REPO_ROOT/core/scripts')
+import chat_extractor_base
+" 2>&1; echo "EXIT:$?")
+EXIT_CODE=$(echo "$OUTPUT" | grep "EXIT:" | sed 's/EXIT://')
+if [ "$EXIT_CODE" != "0" ] && echo "$OUTPUT" | grep -q "KG_OUTPUT_DIR is not set"; then
+  pass "chat_extractor_base fails loudly when KG_OUTPUT_DIR is unset"
+else
+  fail "expected RuntimeError mentioning KG_OUTPUT_DIR, got: $(echo "$OUTPUT" | head -3)"
+fi
+
+echo ""
+
 # ── Summary ──────────────────────────────────────────────────────────────────
 
 echo "═══════════════════════════════════════════════════════════════"
