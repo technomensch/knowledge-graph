@@ -248,21 +248,27 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                     new_msg_count += len(new_msgs)
 
             if filtered_sessions:
+                # Flatten across all filtered source files and sort by true
+                # timestamp, same as the fresh-write branch, so a newly
+                # discovered subagent file's messages interleave correctly
+                # rather than appending as one contiguous same-file block.
+                flat_new_msgs = [m for s in filtered_sessions for m in s['messages']]
+                flat_new_msgs.sort(key=lambda m: _parse_ts(m.get('timestamp')) or 0)
+
                 with open(output_path, 'a', encoding='utf-8') as f:
                     # Write a separator if it's new activity on the same day
                     f.write(f"\n\n---\n## [Incremental Update: {datetime.now().strftime('%H:%M:%S')}]\n\n")
 
                     global_msg_index = last_idx + 1
-                    for session in filtered_sessions:
-                        for msg in session['messages']:
-                            write_message_block(
-                                f, global_msg_index, msg['role'],
-                                format_timestamp(msg['timestamp']),
-                                msg.get('content'),
-                                msg.get('thinking'),
-                                uuid=msg.get('uuid'),
-                            )
-                            global_msg_index += 1
+                    for msg in flat_new_msgs:
+                        write_message_block(
+                            f, global_msg_index, msg['role'],
+                            format_timestamp(msg['timestamp']),
+                            msg.get('content'),
+                            msg.get('thinking'),
+                            uuid=msg.get('uuid'),
+                        )
+                        global_msg_index += 1
                 split_parts = split_file_if_oversized(output_path)
                 if split_parts:
                     results.append(f"Appended to {filename} — split into {len(split_parts)} parts in {date}/ subfolder")
@@ -288,26 +294,31 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                 backup_msg = ""
 
             total_messages = sum(s['count'] for s in sessions)
+
+            # Flatten all source-file "sessions" into one chronological stream.
+            # A source file's own boundary no longer determines write order —
+            # true message timestamps do, so subagent messages interleave
+            # correctly with the main thread instead of appearing as a
+            # separate trailing block.
+            all_msgs_for_date = []
+            for session in sessions:
+                all_msgs_for_date.append(session['messages'])
+            flat_messages = [m for msgs in all_msgs_for_date for m in msgs]
+            flat_messages.sort(key=lambda m: _parse_ts(m.get('timestamp')) or 0)
+
             with open(output_path, 'w', encoding='utf-8') as f:
                 write_markdown_header(f, "Claude Code", total_messages, date)
 
                 global_msg_index = 1
-                for session_index, session in enumerate(sessions, 1):
-                    if len(sessions) > 1:
-                        f.write(f"## Session {session_index} (Started: {session['ts_str']})\n\n")
-
-                    for msg in session['messages']:
-                        write_message_block(
-                            f, global_msg_index, msg['role'],
-                            format_timestamp(msg['timestamp']),
-                            msg.get('content'),
-                            msg.get('thinking'),
-                            uuid=msg.get('uuid'),
-                        )
-                        global_msg_index += 1
-
-                    if session_index < len(sessions):
-                        f.write("\n---\n\n")
+                for msg in flat_messages:
+                    write_message_block(
+                        f, global_msg_index, msg['role'],
+                        format_timestamp(msg['timestamp']),
+                        msg.get('content'),
+                        msg.get('thinking'),
+                        uuid=msg.get('uuid'),
+                    )
+                    global_msg_index += 1
 
             # Check size limits and split if needed
             split_parts = split_file_if_oversized(output_path)

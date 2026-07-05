@@ -63,7 +63,16 @@ else
   fail "incremental re-run expected 8 total messages, got $COUNT_2 -- THIS IS THE BUG (subagent/main cross-file timestamp comparison drops messages)"
 fi
 
-echo "── Pass 3: split-file dedup (ADR-044) ──"
+echo "── Pass 3: verify chronological interleaving ──"
+ORDER=$(grep -oE '<!-- uuid: [^[:space:]]+ -->' "$OUTPUT_FILE" | sed -E 's/<!-- uuid: ([^[:space:]]+) -->/\1/')
+EXPECTED=$'main-001\nmain-002\nsub-001\nsub-002\nmain-003\nmain-004\nmain-005\nmain-006'
+if [ "$ORDER" = "$EXPECTED" ]; then
+  pass "messages interleave chronologically across main thread and subagent"
+else
+  fail "expected chronological interleave, got: $ORDER"
+fi
+
+echo "── Pass 4: split-file dedup (ADR-044) ──"
 # Pre-create a split scenario for the same date: sub-002's uuid lives ONLY
 # in part1, part2 holds a distinct uuid. get_output_path() would append new
 # content to part2 (the last part) -- parse_seen_uuids must still see sub-002
