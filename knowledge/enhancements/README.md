@@ -15,9 +15,9 @@ Formal tracking of proposed and resolved enhancements for this project.
 - [ENH-039: Rule-injection scripts hardcode personal split-file names instead of discovering them](ENH-039/ENH-039-specification.md) — **Status:** 🟡 Proposed
 - [ENH-038: kmg-extract-chat message loss and format-drift across Claude, Gemini, and Codex sources](ENH-038/ENH-038-specification.md) — **Status:** 🟡 Proposed
 - [ENH-037: README indexes for enhancements/ and issues/, cross-referenced with decisions/](ENH-037/ENH-037-specification.md) — **Status:** 🟡 Proposed
-- [ENH-035: Chat-history-to-KG backfill extractor (standalone)](ENH-035/ENH-035-specification.md) — **Status:** 🟡 Proposed
-- [ENH-034: Capture-pipeline command naming and grouping](ENH-034/ENH-034-specification.md) — **Status:** 🟡 Proposed
-- [ENH-033: Repo-context auto-detection for `kmg-update-doc` / `kmg-create-doc`](ENH-033/ENH-033-specification.md) — **Status:** 🟡 Proposed
+- [ENH-035: Chat-history-to-KG backfill extractor (standalone)](ENH-035/ENH-035-specification.md) — **Status:** 🟡 Proposed — Governed by [ADR-058](../decisions/ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md)
+- [ENH-034: Capture-pipeline command naming and grouping](ENH-034/ENH-034-specification.md) — **Status:** 🟡 Proposed — Governed by [ADR-058](../decisions/ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md)
+- [ENH-033: Repo-context auto-detection for `kmg-update-doc` / `kmg-create-doc`](ENH-033/ENH-033-specification.md) — **Status:** 🟡 Proposed — Governed by [ADR-056](../decisions/ADR-056-reject-plugin-split-for-contributor-only-doc-commands.md)
 - [ENH-030: KG Remove / Unregister Command](ENH-030/ENH-030-specification.md) — **Status:** 🟡 Proposed
 
 ---
@@ -28,10 +28,10 @@ Formal tracking of proposed and resolved enhancements for this project.
 - [ENH-039: Rule-injection scripts hardcode personal split-file names instead of discovering them](ENH-039/ENH-039-specification.md) — **Status:** 🟡 Proposed
 - [ENH-038: kmg-extract-chat message loss and format-drift across Claude, Gemini, and Codex sources](ENH-038/ENH-038-specification.md) — **Status:** 🟡 Proposed
 - [ENH-037: README indexes for enhancements/ and issues/, cross-referenced with decisions/](ENH-037/ENH-037-specification.md) — **Status:** 🟡 Proposed
-- [ENH-036: `kmg-capture-router` as the sole detection engine — 5 detection skills consolidated to 2](ENH-036/ENH-036-specification.md) — **Status:** ⚪ Withdrawn
-- [ENH-035: Chat-history-to-KG backfill extractor (standalone)](ENH-035/ENH-035-specification.md) — **Status:** 🟡 Proposed
-- [ENH-034: Capture-pipeline command naming and grouping](ENH-034/ENH-034-specification.md) — **Status:** 🟡 Proposed
-- [ENH-033: Repo-context auto-detection for `kmg-update-doc` / `kmg-create-doc`](ENH-033/ENH-033-specification.md) — **Status:** 🟡 Proposed
+- [ENH-036: `kmg-capture-router` as the sole detection engine — 5 detection skills consolidated to 2](ENH-036/ENH-036-specification.md) — **Status:** ⚪ Withdrawn — Governed by [ADR-057](../decisions/ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth.md), [ADR-058](../decisions/ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md)
+- [ENH-035: Chat-history-to-KG backfill extractor (standalone)](ENH-035/ENH-035-specification.md) — **Status:** 🟡 Proposed — Governed by [ADR-058](../decisions/ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md)
+- [ENH-034: Capture-pipeline command naming and grouping](ENH-034/ENH-034-specification.md) — **Status:** 🟡 Proposed — Governed by [ADR-058](../decisions/ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md)
+- [ENH-033: Repo-context auto-detection for `kmg-update-doc` / `kmg-create-doc`](ENH-033/ENH-033-specification.md) — **Status:** 🟡 Proposed — Governed by [ADR-056](../decisions/ADR-056-reject-plugin-split-for-contributor-only-doc-commands.md)
 - [ENH-032: Knowledge-Extractor Approval Gate Blocks Coordinator Relay](ENH-032/ENH-032-specification.md) — **Status:** ✅ Resolved in v0.6.15
 - [ENH-031: Init Completeness — Backfill, triggers.md, and CLAUDE.md Gaps](ENH-031/ENH-031-specification.md) — **Status:** ✅ Resolved in v0.6.15
 - [ENH-030: KG Remove / Unregister Command](ENH-030/ENH-030-specification.md) — **Status:** 🟡 Proposed
