@@ -11,7 +11,7 @@ Formal tracking of proposed and resolved enhancements for this project.
 
 ## Open ENHs
 
-- [ENH-040: Remove chat-history/*.md from kg_search / kg_fts5_rebuild indexing scope](ENH-040/ENH-040-specification.md) — **Status:** 🟡 Proposed
+- [ENH-040: Remove chat-history/*.md from kg_search / kg_fts5_rebuild indexing scope](ENH-040/ENH-040-specification.md) — **Status:** 🟡 Proposed — Governed by [ADR-060](../decisions/ADR-060-narrow-kg-search-scope-away-from-raw-chat-history.md)
 - [ENH-039: Rule-injection scripts hardcode personal split-file names instead of discovering them](ENH-039/ENH-039-specification.md) — **Status:** 🟡 Proposed
 - [ENH-038: kmg-extract-chat message loss and format-drift across Claude, Gemini, and Codex sources](ENH-038/ENH-038-specification.md) — **Status:** 🟡 Proposed
 - [ENH-037: README indexes for enhancements/ and issues/, cross-referenced with decisions/](ENH-037/ENH-037-specification.md) — **Status:** 🟡 Proposed
@@ -24,7 +24,7 @@ Formal tracking of proposed and resolved enhancements for this project.
 
 ## All ENHs (Chronological)
 
-- [ENH-040: Remove chat-history/*.md from kg_search / kg_fts5_rebuild indexing scope](ENH-040/ENH-040-specification.md) — **Status:** 🟡 Proposed
+- [ENH-040: Remove chat-history/*.md from kg_search / kg_fts5_rebuild indexing scope](ENH-040/ENH-040-specification.md) — **Status:** 🟡 Proposed — Governed by [ADR-060](../decisions/ADR-060-narrow-kg-search-scope-away-from-raw-chat-history.md)
 - [ENH-039: Rule-injection scripts hardcode personal split-file names instead of discovering them](ENH-039/ENH-039-specification.md) — **Status:** 🟡 Proposed
 - [ENH-038: kmg-extract-chat message loss and format-drift across Claude, Gemini, and Codex sources](ENH-038/ENH-038-specification.md) — **Status:** 🟡 Proposed
 - [ENH-037: README indexes for enhancements/ and issues/, cross-referenced with decisions/](ENH-037/ENH-037-specification.md) — **Status:** 🟡 Proposed
