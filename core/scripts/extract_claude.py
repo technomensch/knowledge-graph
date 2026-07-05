@@ -209,23 +209,14 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
         if before_date:
             sessions_by_date = {k: v for k, v in sessions_by_date.items() if k <= before_date}
 
-    # Apply incremental mode (skip if file exists and has recent content)
-    if incremental:
-        filtered_dates = {}
-        for date, sessions in sessions_by_date.items():
-            filename = f"{date}-claude.md"
-            output_path = get_output_path(filename)
-            if not os.path.exists(output_path):
-                filtered_dates[date] = sessions
-            else:
-                # Check if file is recent (modified in last hour)
-                file_time = os.path.getmtime(output_path)
-                age_seconds = datetime.now().timestamp() - file_time
-                if age_seconds > 3600:  # Older than 1 hour
-                    filtered_dates[date] = sessions
-                else:
-                    results.append(f"Skipped {filename} (already current, modified {int(age_seconds/60)} min ago)")
-        sessions_by_date = filtered_dates
+    # Note: incremental mode used to skip a date entirely if its output file's
+    # mtime was under an hour old, on the assumption that a recent mtime meant
+    # the file was already synced. That assumption is false for an active
+    # session (new messages can land within the same hour), and it silently
+    # dropped real incremental syncs run twice inside an hour. The write-files
+    # loop below now performs correct per-message uuid dedup (parse_seen_uuids)
+    # regardless of file age, and already reports "No new activity" when there
+    # is genuinely nothing new — so no separate recency-based skip is needed.
 
     # Write files
     for date, sessions in sessions_by_date.items():
