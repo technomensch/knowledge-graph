@@ -1,0 +1,7 @@
+{"sessionId":"test-session","projectHash":"abc123","startTime":"2026-05-13T21:00:00.000Z","lastUpdated":"2026-05-13T21:00:00.000Z","kind":"main"}
+{"id":"turn-001","timestamp":"2026-05-13T21:00:10.000Z","type":"user","content":[{"text":"install the test extension"}]}
+{"$set":{"lastUpdated":"2026-05-13T21:00:11.000Z"}}
+{"id":"turn-002","timestamp":"2026-05-13T21:00:15.000Z","type":"gemini","content":""}
+{"$set":{"lastUpdated":"2026-05-13T21:00:20.000Z"}}
+{"id":"turn-002","timestamp":"2026-05-13T21:00:20.000Z","type":"gemini","content":"","toolCalls":[{"id":"tc1","name":"install_extension","result":[{"functionResponse":{"response":{"output":"Installed successfully."}}}],"status":"success","resultDisplay":"Extension installed and enabled."}]}
+{"id":"turn-002","timestamp":"2026-05-13T21:00:25.000Z","type":"gemini","content":"The extension has been installed and is ready to use."}

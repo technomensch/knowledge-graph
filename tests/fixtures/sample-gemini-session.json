@@ -1,0 +1,7 @@
+{
+  "startTime": "2026-04-01T10:00:00.000Z",
+  "messages": [
+    {"type": "user", "content": "hello gemini", "timestamp": "2026-04-01T10:00:05.000Z"},
+    {"type": "gemini", "content": "hello, how can I help?", "timestamp": "2026-04-01T10:00:10.000Z"}
+  ]
+}
