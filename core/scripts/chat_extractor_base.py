@@ -181,9 +181,11 @@ def split_file_if_oversized(output_path):
     return created
 
 
-def write_message_block(f, index, role, timestamp, content, thinking=None, tool_calls=None):
+def write_message_block(f, index, role, timestamp, content, thinking=None, tool_calls=None, uuid=None):
     """Writes a single message block to the markdown file."""
     f.write(f"### Message {index}: {role.capitalize()}\n\n")
+    if uuid:
+        f.write(f"<!-- uuid: {uuid} -->\n")
     f.write(f"**Timestamp:** {timestamp}\n\n")
     
     if thinking:

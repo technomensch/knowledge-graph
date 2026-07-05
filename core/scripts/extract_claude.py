@@ -62,6 +62,44 @@ def parse_metadata_from_file(file_path: str) -> tuple[Optional[float], int]:
         print(f"Warning: Could not parse metadata from {file_path}: {e}")
     return last_ts, last_idx
 
+
+def parse_seen_uuids(file_path: str) -> set[str]:
+    """Returns the set of message uuids already written for this date,
+    read from the `<!-- uuid: ... -->` markers written by write_message_block.
+
+    ADR-044: a date's history may be split across `{stem}-part*.md` files in a
+    `YYYY-MM-DD/` subfolder (split_file_if_oversized, chat_extractor_base.py:96),
+    and get_output_path() returns only the LAST part. Scanning that single path
+    would miss uuids written to earlier parts, causing them to be re-appended as
+    duplicates on the next incremental run. Union across every part instead.
+    """
+    from chat_extractor_base import OUTPUT_DIR  # already imported at module top; shown for clarity
+
+    paths = []
+    filename = os.path.basename(file_path)
+    date_m = re.match(r'(\d{4}-\d{2}-\d{2})', filename)
+    if date_m:
+        split_dir = os.path.join(OUTPUT_DIR, date_m.group(1))
+        if os.path.isdir(split_dir):
+            stem = filename[:-3]  # strip .md, matches get_output_path()
+            # strip any trailing -partN so we glob the whole family, not one part
+            stem = re.sub(r'-part\d+$', '', stem)
+            paths = sorted(glob.glob(os.path.join(split_dir, f'{stem}-part*.md')))
+    if not paths:
+        paths = [file_path]  # single flat file (no split subfolder)
+
+    seen = set()
+    for p in paths:
+        if not os.path.exists(p):
+            continue
+        with open(p, 'r', encoding='utf-8') as f:
+            for line in f:
+                m = re.match(r'<!-- uuid: (\S+) -->', line)
+                if m:
+                    seen.add(m.group(1))
+    return seen
+
+
 def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                              before_date=None, project_filter=None, incremental=False):
     """
@@ -121,9 +159,10 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                                 text = ''.join(i.get('text', '') for i in content_list if isinstance(i, dict))
                                 if text.strip():
                                     messages.append({
-                                        'role': 'user', 
-                                        'content': text, 
-                                        'timestamp': obj.get('timestamp')
+                                        'role': 'user',
+                                        'content': text,
+                                        'timestamp': obj.get('timestamp'),
+                                        'uuid': obj.get('uuid'),
                                     })
                             elif obj.get('type') == 'assistant' and 'message' in obj:
                                 content_list = obj['message'].get('content', [])
@@ -134,10 +173,11 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                                         if 'text' in item: text = item['text']
                                 if thinking or text:
                                     messages.append({
-                                        'role': 'assistant', 
-                                        'thinking': thinking, 
-                                        'content': text, 
-                                        'timestamp': obj.get('timestamp')
+                                        'role': 'assistant',
+                                        'thinking': thinking,
+                                        'content': text,
+                                        'timestamp': obj.get('timestamp'),
+                                        'uuid': obj.get('uuid'),
                                     })
                         except json.JSONDecodeError: continue
             except Exception as e:
@@ -196,17 +236,17 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
         output_path = get_output_path(filename)
         
         last_ts, last_idx = parse_metadata_from_file(output_path)
-        
+
         if last_ts is not None:
-            # Filter for truly new messages. Compare as epoch floats so that
-            # JSONL timestamps ("2026-04-21T15:26:19.709Z") are not silently
-            # dropped when compared against file timestamps ("2026-04-21T17:40:50").
+            # Filter for truly new messages using per-message uuid dedup
+            # (not a cross-file timestamp cutoff — see parse_seen_uuids).
+            seen_uuids = parse_seen_uuids(output_path)
             filtered_sessions = []
             new_msg_count = 0
             for session in sessions:
                 new_msgs = [
                     m for m in session['messages']
-                    if m.get('timestamp') and (_parse_ts(m['timestamp']) or 0) > last_ts
+                    if m.get('uuid') not in seen_uuids
                 ]
                 if new_msgs:
                     filtered_sessions.append({
@@ -215,20 +255,21 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                         'count': len(new_msgs)
                     })
                     new_msg_count += len(new_msgs)
-            
+
             if filtered_sessions:
                 with open(output_path, 'a', encoding='utf-8') as f:
                     # Write a separator if it's new activity on the same day
                     f.write(f"\n\n---\n## [Incremental Update: {datetime.now().strftime('%H:%M:%S')}]\n\n")
-                    
+
                     global_msg_index = last_idx + 1
                     for session in filtered_sessions:
                         for msg in session['messages']:
                             write_message_block(
-                                f, global_msg_index, msg['role'], 
-                                format_timestamp(msg['timestamp']), 
-                                msg.get('content'), 
-                                msg.get('thinking')
+                                f, global_msg_index, msg['role'],
+                                format_timestamp(msg['timestamp']),
+                                msg.get('content'),
+                                msg.get('thinking'),
+                                uuid=msg.get('uuid'),
                             )
                             global_msg_index += 1
                 split_parts = split_file_if_oversized(output_path)
@@ -269,7 +310,8 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                             f, global_msg_index, msg['role'],
                             format_timestamp(msg['timestamp']),
                             msg.get('content'),
-                            msg.get('thinking')
+                            msg.get('thinking'),
+                            uuid=msg.get('uuid'),
                         )
                         global_msg_index += 1
 
