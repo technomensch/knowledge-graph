@@ -776,7 +776,7 @@ Test the hook:
 
 1. **(Step 0) Checks active KG alignment** — Compares the active KG's project root against the current working directory. On mismatch, stops and asks: switch active KG / proceed to active KG anyway / cancel. Skipped when `--output-dir` or `--project` is present.
 2. Determines output directory (active KG's `chat-history/` by default, or custom path)
-2. Scans Claude logs (`~/.claude/projects/` for `.jsonl` files), Gemini logs (`~/.gemini/tmp/`, `~/.gemini/antigravity/conversations/` for `.json`/`.pb` files), and/or Codex CLI sessions (`~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl`)
+2. Scans Claude logs (`~/.claude/projects/` for `.jsonl` files), Gemini logs (`~/.gemini/tmp/` for `session-*.json` [pre-0.42.0] and `session-*.jsonl` [0.42.0+, streaming format], plus `~/.gemini/antigravity/conversations/` for `.pb` files), and/or Codex CLI sessions (`~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl`)
 3. Merges sessions by date into `YYYY-MM-DD-claude.md`, `YYYY-MM-DD-gemini.md`, and/or `YYYY-MM-DD-codex.md`
 4. If a daily file exceeds 900 KB or 30,000 lines, automatically splits into numbered parts (`-part1.md`, `-part2.md`, …) inside a `YYYY-MM-DD/` subfolder to prevent Obsidian rendering failures
 5. Supports incremental append — re-running adds new sessions without overwriting; appends target the last part file if the day was previously split

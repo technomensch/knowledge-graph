@@ -1,0 +1,4 @@
+{"type":"user","uuid":"main-001","timestamp":"2026-07-03T09:00:00Z","message":{"role":"user","content":[{"type":"text","text":"Investigate the extractor bug."}]}}
+{"type":"assistant","uuid":"main-002","timestamp":"2026-07-03T09:00:05Z","message":{"role":"assistant","content":[{"type":"text","text":"Dispatching a subagent to read the code."}]}}
+{"type":"user","uuid":"main-003","timestamp":"2026-07-03T09:10:00Z","message":{"role":"user","content":[{"type":"text","text":"What did the subagent find?"}]}}
+{"type":"assistant","uuid":"main-004","timestamp":"2026-07-03T09:10:05Z","message":{"role":"assistant","content":[{"type":"text","text":"It found the incremental filter compares against a single last_ts."}]}}

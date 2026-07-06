@@ -3,12 +3,26 @@ import argparse
 import re
 import json
 import glob
+import hashlib
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 import re
 from chat_extractor_base import get_output_path, format_timestamp, write_markdown_header, write_message_block, split_file_if_oversized
 
 CLAUDE_PROJECTS_DIR = os.path.expanduser("~/.claude/projects")
+
+
+def _dedup_key(uuid, timestamp, content) -> str:
+    """Every real Claude Code JSONL record carries a uuid, but if one is
+    ever absent, falling back to `None` as the dedup key would make the
+    message look "new" on every incremental run forever (None not in
+    seen_uuids is always True) -- silently duplicating it indefinitely.
+    Hash timestamp+content instead, so a uuid-less message still gets a
+    stable identity across runs.
+    """
+    if uuid:
+        return uuid
+    return hashlib.sha256(f"{timestamp}:{content}".encode('utf-8')).hexdigest()[:16]
 
 def _parse_ts(ts: str) -> Optional[float]:
     """Parses an ISO 8601 timestamp string to a UTC epoch float, tolerating
@@ -61,6 +75,44 @@ def parse_metadata_from_file(file_path: str) -> tuple[Optional[float], int]:
     except Exception as e:
         print(f"Warning: Could not parse metadata from {file_path}: {e}")
     return last_ts, last_idx
+
+
+def parse_seen_uuids(file_path: str) -> set[str]:
+    """Returns the set of message uuids already written for this date,
+    read from the `<!-- uuid: ... -->` markers written by write_message_block.
+
+    ADR-044: a date's history may be split across `{stem}-part*.md` files in a
+    `YYYY-MM-DD/` subfolder (split_file_if_oversized, chat_extractor_base.py:96),
+    and get_output_path() returns only the LAST part. Scanning that single path
+    would miss uuids written to earlier parts, causing them to be re-appended as
+    duplicates on the next incremental run. Union across every part instead.
+    """
+    from chat_extractor_base import OUTPUT_DIR  # already imported at module top; shown for clarity
+
+    paths = []
+    filename = os.path.basename(file_path)
+    date_m = re.match(r'(\d{4}-\d{2}-\d{2})', filename)
+    if date_m:
+        split_dir = os.path.join(OUTPUT_DIR, date_m.group(1))
+        if os.path.isdir(split_dir):
+            stem = filename[:-3]  # strip .md, matches get_output_path()
+            # strip any trailing -partN so we glob the whole family, not one part
+            stem = re.sub(r'-part\d+$', '', stem)
+            paths = sorted(glob.glob(os.path.join(split_dir, f'{stem}-part*.md')))
+    if not paths:
+        paths = [file_path]  # single flat file (no split subfolder)
+
+    seen = set()
+    for p in paths:
+        if not os.path.exists(p):
+            continue
+        with open(p, 'r', encoding='utf-8') as f:
+            for line in f:
+                m = re.match(r'<!-- uuid: (\S+) -->', line)
+                if m:
+                    seen.add(m.group(1))
+    return seen
+
 
 def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                              before_date=None, project_filter=None, incremental=False):
@@ -121,9 +173,10 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                                 text = ''.join(i.get('text', '') for i in content_list if isinstance(i, dict))
                                 if text.strip():
                                     messages.append({
-                                        'role': 'user', 
-                                        'content': text, 
-                                        'timestamp': obj.get('timestamp')
+                                        'role': 'user',
+                                        'content': text,
+                                        'timestamp': obj.get('timestamp'),
+                                        'uuid': _dedup_key(obj.get('uuid'), obj.get('timestamp'), text),
                                     })
                             elif obj.get('type') == 'assistant' and 'message' in obj:
                                 content_list = obj['message'].get('content', [])
@@ -134,10 +187,11 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                                         if 'text' in item: text = item['text']
                                 if thinking or text:
                                     messages.append({
-                                        'role': 'assistant', 
-                                        'thinking': thinking, 
-                                        'content': text, 
-                                        'timestamp': obj.get('timestamp')
+                                        'role': 'assistant',
+                                        'thinking': thinking,
+                                        'content': text,
+                                        'timestamp': obj.get('timestamp'),
+                                        'uuid': _dedup_key(obj.get('uuid'), obj.get('timestamp'), text or thinking),
                                     })
                         except json.JSONDecodeError: continue
             except Exception as e:
@@ -169,23 +223,14 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
         if before_date:
             sessions_by_date = {k: v for k, v in sessions_by_date.items() if k <= before_date}
 
-    # Apply incremental mode (skip if file exists and has recent content)
-    if incremental:
-        filtered_dates = {}
-        for date, sessions in sessions_by_date.items():
-            filename = f"{date}-claude.md"
-            output_path = get_output_path(filename)
-            if not os.path.exists(output_path):
-                filtered_dates[date] = sessions
-            else:
-                # Check if file is recent (modified in last hour)
-                file_time = os.path.getmtime(output_path)
-                age_seconds = datetime.now().timestamp() - file_time
-                if age_seconds > 3600:  # Older than 1 hour
-                    filtered_dates[date] = sessions
-                else:
-                    results.append(f"Skipped {filename} (already current, modified {int(age_seconds/60)} min ago)")
-        sessions_by_date = filtered_dates
+    # Note: incremental mode used to skip a date entirely if its output file's
+    # mtime was under an hour old, on the assumption that a recent mtime meant
+    # the file was already synced. That assumption is false for an active
+    # session (new messages can land within the same hour), and it silently
+    # dropped real incremental syncs run twice inside an hour. The write-files
+    # loop below now performs correct per-message uuid dedup (parse_seen_uuids)
+    # regardless of file age, and already reports "No new activity" when there
+    # is genuinely nothing new — so no separate recency-based skip is needed.
 
     # Write files
     for date, sessions in sessions_by_date.items():
@@ -196,17 +241,17 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
         output_path = get_output_path(filename)
         
         last_ts, last_idx = parse_metadata_from_file(output_path)
-        
+
         if last_ts is not None:
-            # Filter for truly new messages. Compare as epoch floats so that
-            # JSONL timestamps ("2026-04-21T15:26:19.709Z") are not silently
-            # dropped when compared against file timestamps ("2026-04-21T17:40:50").
+            # Filter for truly new messages using per-message uuid dedup
+            # (not a cross-file timestamp cutoff — see parse_seen_uuids).
+            seen_uuids = parse_seen_uuids(output_path)
             filtered_sessions = []
             new_msg_count = 0
             for session in sessions:
                 new_msgs = [
                     m for m in session['messages']
-                    if m.get('timestamp') and (_parse_ts(m['timestamp']) or 0) > last_ts
+                    if m.get('uuid') not in seen_uuids
                 ]
                 if new_msgs:
                     filtered_sessions.append({
@@ -215,22 +260,29 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                         'count': len(new_msgs)
                     })
                     new_msg_count += len(new_msgs)
-            
+
             if filtered_sessions:
+                # Flatten across all filtered source files and sort by true
+                # timestamp, same as the fresh-write branch, so a newly
+                # discovered subagent file's messages interleave correctly
+                # rather than appending as one contiguous same-file block.
+                flat_new_msgs = [m for s in filtered_sessions for m in s['messages']]
+                flat_new_msgs.sort(key=lambda m: _parse_ts(m.get('timestamp')) or 0)
+
                 with open(output_path, 'a', encoding='utf-8') as f:
                     # Write a separator if it's new activity on the same day
                     f.write(f"\n\n---\n## [Incremental Update: {datetime.now().strftime('%H:%M:%S')}]\n\n")
-                    
+
                     global_msg_index = last_idx + 1
-                    for session in filtered_sessions:
-                        for msg in session['messages']:
-                            write_message_block(
-                                f, global_msg_index, msg['role'], 
-                                format_timestamp(msg['timestamp']), 
-                                msg.get('content'), 
-                                msg.get('thinking')
-                            )
-                            global_msg_index += 1
+                    for msg in flat_new_msgs:
+                        write_message_block(
+                            f, global_msg_index, msg['role'],
+                            format_timestamp(msg['timestamp']),
+                            msg.get('content'),
+                            msg.get('thinking'),
+                            uuid=msg.get('uuid'),
+                        )
+                        global_msg_index += 1
                 split_parts = split_file_if_oversized(output_path)
                 if split_parts:
                     results.append(f"Appended to {filename} — split into {len(split_parts)} parts in {date}/ subfolder")
@@ -256,25 +308,31 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                 backup_msg = ""
 
             total_messages = sum(s['count'] for s in sessions)
+
+            # Flatten all source-file "sessions" into one chronological stream.
+            # A source file's own boundary no longer determines write order —
+            # true message timestamps do, so subagent messages interleave
+            # correctly with the main thread instead of appearing as a
+            # separate trailing block.
+            all_msgs_for_date = []
+            for session in sessions:
+                all_msgs_for_date.append(session['messages'])
+            flat_messages = [m for msgs in all_msgs_for_date for m in msgs]
+            flat_messages.sort(key=lambda m: _parse_ts(m.get('timestamp')) or 0)
+
             with open(output_path, 'w', encoding='utf-8') as f:
                 write_markdown_header(f, "Claude Code", total_messages, date)
 
                 global_msg_index = 1
-                for session_index, session in enumerate(sessions, 1):
-                    if len(sessions) > 1:
-                        f.write(f"## Session {session_index} (Started: {session['ts_str']})\n\n")
-
-                    for msg in session['messages']:
-                        write_message_block(
-                            f, global_msg_index, msg['role'],
-                            format_timestamp(msg['timestamp']),
-                            msg.get('content'),
-                            msg.get('thinking')
-                        )
-                        global_msg_index += 1
-
-                    if session_index < len(sessions):
-                        f.write("\n---\n\n")
+                for msg in flat_messages:
+                    write_message_block(
+                        f, global_msg_index, msg['role'],
+                        format_timestamp(msg['timestamp']),
+                        msg.get('content'),
+                        msg.get('thinking'),
+                        uuid=msg.get('uuid'),
+                    )
+                    global_msg_index += 1
 
             # Check size limits and split if needed
             split_parts = split_file_if_oversized(output_path)

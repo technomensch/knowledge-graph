@@ -95,6 +95,7 @@ The conflict case (e.g., "save to user level for the knowledge-graph project") i
 - `~/.kmgraph/triggers.md` — "When capturing anything" trigger section
 - PR technomensch/knowledge-graph#91
 - ADR-017: Four-Layer Architecture Thin Commands (related: commands as thin dispatchers)
+- **Resolution (see [ADR-057](ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth.md)):** this ADR unified write *destination* routing across capture skills. ADR-057 later identified that the corresponding *detection/trigger* layer never received an equivalent unified design — it grew piecemeal across 5 independent skills.
 
 ---
 

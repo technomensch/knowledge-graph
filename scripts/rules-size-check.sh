@@ -34,7 +34,7 @@ DISMISS_FLAG="$HOME/.kmgraph/.split-dismissed-${WEEK_TAG}"
 [ -f "$DISMISS_FLAG" ] && exit 0
 
 MSG="rules.md has grown to ${LINE_COUNT} lines across ${DOMAIN_COUNT} domains.
-Consider splitting into separate files (e.g., rules.md + plan-rules.md).
+Consider splitting into separate files (see rules.md § Rules File Management for the convention).
 To suppress for this week: touch ~/.kmgraph/.split-dismissed-${WEEK_TAG}"
 
 jq -n --arg msg "$MSG" '{"systemMessage": $msg}'

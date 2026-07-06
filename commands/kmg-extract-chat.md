@@ -3,7 +3,7 @@
 
 # Extract Chat History
 
-Automates the extraction of chat history from local Claude (.jsonl), Gemini (.json/.pb), and Codex CLI (.jsonl) log files.
+Automates the extraction of chat history from local Claude (.jsonl), Gemini (.json/.jsonl/.pb), and Codex CLI (.jsonl) log files.
 
 ---
 
@@ -74,7 +74,7 @@ The workflow runs the centralized Python extraction script located at `${CLAUDE_
 
 ### Gemini Extraction
 
-1. **Scans:** `~/.gemini/tmp/` and `~/.gemini/antigravity/conversations/` for session logs (.json/.pb files)
+1. **Scans:** `~/.gemini/tmp/` for session logs — both `session-*.json` (pre-0.42.0, single JSON object per file) and `session-*.jsonl` (0.42.0+, line-delimited streaming format; the Gemini CLI switched formats mid-session on 2026-05-13) — plus `~/.gemini/antigravity/conversations/` for `.pb` files
 2. **Merges:** By date into `YYYY-MM-DD-gemini.md`
 3. **Output:** `{output_dir}/YYYY-MM-DD-gemini.md`
 
@@ -230,7 +230,7 @@ python3 ${CLAUDE_PLUGIN_ROOT}/core/scripts/run_extraction.py --source $source_fl
 
 **The Python script:**
 - Reads `KG_OUTPUT_DIR` environment variable
-- Falls back to script directory if not set (for non-plugin use)
+- Raises `RuntimeError` at import time if neither `KG_OUTPUT_DIR` nor `--output-dir` is set — chat extraction must not silently write into the plugin's own directory
 - Uses `--output-dir` CLI arg if provided (highest priority)
 
 ---

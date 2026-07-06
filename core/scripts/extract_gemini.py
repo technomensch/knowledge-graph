@@ -82,6 +82,111 @@ def extract_gemini_json_sessions(limit=None):
             
     return all_json_sessions
 
+def extract_gemini_stream_sessions(limit=None):
+    """Returns a list of recent sessions from the post-2026-05-13 streaming
+    .jsonl session format (line-delimited: one header line, then per-turn
+    events interleaved with {"$set": ...} checkpoint patches). Turns sharing
+    the same `id` are progressively completed writes — the last occurrence
+    wins. A `type:"gemini"` turn whose final content is still empty falls
+    back to resultDisplay (top-level, then toolCalls[].resultDisplay) rather
+    than emitting a blank message.
+    """
+    all_stream_sessions = []
+    jsonl_files = glob.glob(os.path.join(GEMINI_TMP_DIR, "**", "session-*.jsonl"), recursive=True)
+    if limit:
+        jsonl_files = jsonl_files[:limit]
+
+    for jsonl_path in jsonl_files:
+        try:
+            turns_by_id = {}
+            turn_order = []
+            session_start = None
+
+            with open(jsonl_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        obj = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+
+                    if 'id' not in obj:
+                        # Header line or a {"$set": ...} checkpoint patch — no turn id.
+                        if session_start is None and obj.get('startTime'):
+                            session_start = obj['startTime']
+                        continue
+
+                    turn_id = obj['id']
+                    if turn_id not in turns_by_id:
+                        turn_order.append(turn_id)
+                    turns_by_id[turn_id] = obj  # last occurrence wins
+
+            if session_start:
+                dt = datetime.fromisoformat(session_start.replace("Z", "+00:00"))
+                session_date = dt.strftime("%Y-%m-%d")
+                session_ts = dt.strftime("%H%M%S")
+            else:
+                match = re.search(r"session-(\d{4}-\d{2}-\d{2})", os.path.basename(jsonl_path))
+                session_date = match.group(1) if match else "Unknown-Date"
+                session_ts = "000000"
+
+            messages = []
+            skipped_empty = 0
+            for turn_id in turn_order:
+                turn = turns_by_id[turn_id]
+                turn_type = turn.get('type')
+
+                if turn_type == 'user':
+                    content_list = turn.get('content', [])
+                    if isinstance(content_list, list):
+                        text = ''.join(i.get('text', '') for i in content_list if isinstance(i, dict))
+                    else:
+                        text = content_list or ''
+                    if text.strip():
+                        messages.append({
+                            'role': 'user',
+                            'content': text,
+                            'timestamp': turn.get('timestamp'),
+                        })
+                elif turn_type == 'gemini':
+                    text = turn.get('content') or ''
+                    if not text:
+                        text = turn.get('resultDisplay') or ''
+                    if not text:
+                        for tc in turn.get('toolCalls', []):
+                            if tc.get('resultDisplay'):
+                                text = tc['resultDisplay']
+                                break
+                    if text:
+                        messages.append({
+                            'role': 'assistant',
+                            'thinking': '',
+                            'content': text,
+                            'tool_calls': turn.get('toolCalls', []),
+                            'timestamp': turn.get('timestamp'),
+                        })
+                    else:
+                        skipped_empty += 1
+
+            if skipped_empty:
+                print(f"Warning: {jsonl_path} — {skipped_empty} gemini turn(s) had no content, resultDisplay, or toolCalls text; skipped")
+
+            if messages:
+                all_stream_sessions.append({
+                    'date': session_date,
+                    'ts': session_ts,
+                    'messages': messages,
+                    'count': len(messages),
+                    'method': 'Gemini (Stream)'
+                })
+
+        except Exception as e:
+            print(f"Error processing stream {jsonl_path}: {e}")
+
+    return all_stream_sessions
+
 def extract_gemini_pb_sessions(limit=None):
     """Returns a list of archived sessions from Protobuf files using blackboxprotobuf or fallback."""
     all_pb_sessions = []
@@ -182,12 +287,13 @@ def extract_all_gemini(limit=None, date_filter=None, after_date=None, before_dat
     results = []
 
     json_sessions = extract_gemini_json_sessions(limit=limit)
+    stream_sessions = extract_gemini_stream_sessions(limit=limit)
     pb_sessions = extract_gemini_pb_sessions(limit=limit)
 
     from collections import defaultdict
     sessions_by_date = defaultdict(list)
 
-    for s in json_sessions + pb_sessions:
+    for s in json_sessions + stream_sessions + pb_sessions:
         sessions_by_date[s['date']].append(s)
 
     # Apply date filtering (mirrors Claude extraction logic)

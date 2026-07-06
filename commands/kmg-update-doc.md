@@ -203,7 +203,7 @@ When running a full release docs pass (`--user-facing` with no specific file), w
 - `INSTALL.md`
 - `docs/quickstart.mdx`
 - `docs/CHEAT-SHEET.md`
-- `docs/COMMAND-GUIDE.md`
+- `docs/reference/command-guide.md`
 - `docs/reference/commands.md`
 
 **Tier 2 — When related content changes**

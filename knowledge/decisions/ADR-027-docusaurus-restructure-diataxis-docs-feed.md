@@ -298,6 +298,7 @@ The `CHANGELOG.md` and `docs-updates/` feed have non-overlapping scopes by defin
 
 1. **Pluggable storage backends** — Notion, Obsidian, NotebookLM as primary KG stores instead of local markdown. Requires changes to `/kmgraph:init`, MCP server config schema, and backend adapters. Version-bump territory. Integration *guides* are in scope for this restructure; storage layer changes are not.
 2. **Contributor vs user command surface area** — `update-doc`, `create-doc`, and `doc-update-router` are KMGraph project contributor tools, not end-user tools. Today they ship to every user. Future: separate via `kmgraph-contrib` plugin, a marker file, or a `commands/contributing/` subdirectory with conditional registration.
+   - **Resolution (see [ADR-056](ADR-056-reject-plugin-split-for-contributor-only-doc-commands.md)):** This deferred item was resolved by ADR-056, which rejected the plugin-split (and marker-file / subdirectory) options in favor of repo-context auto-detection. Implementation is tracked in [ENH-033](../enhancements/ENH-033/ENH-033-specification.md).
 3. **STYLE-GUIDE.md slim-down** — Currently 633 lines; audience is contributors only. Deferred per user direction.
 
 ---

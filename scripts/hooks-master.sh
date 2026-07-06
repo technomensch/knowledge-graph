@@ -375,7 +375,12 @@ _check_profile_staleness() {
     fi
 }
 
-for profile_file in "$HOME/.kmgraph/rules.md" "$HOME/.kmgraph/plan-rules.md" "$HOME/.kmgraph/governance-rules.md"; do
+_kmgraph_profile_files=("$HOME/.kmgraph/rules.md")
+for f in "$HOME"/.kmgraph/*.md; do
+  [ -f "$f" ] || continue
+  grep -qE '^> Sourced from ~/\.kmgraph/.*\.md split' "$f" 2>/dev/null && _kmgraph_profile_files+=("$f")
+done
+for profile_file in "${_kmgraph_profile_files[@]}"; do
   [ -f "$profile_file" ] && _check_profile_staleness "$profile_file" "~/.kmgraph/$(basename "$profile_file")"
 done
 _check_profile_staleness "$HOME/.kmgraph/me.md" "~/.kmgraph/me.md"
@@ -404,7 +409,7 @@ _check_rules_split_threshold() {
     [ -f "$dismiss_flag" ] && return 0
 
     echo -e "${YELLOW}⚠️  rules.md has grown to ${line_count} lines across ${domain_count} domains.${NC}"
-    echo "   Consider splitting into separate files (e.g., rules.md + plan-rules.md)."
+    echo "   Consider splitting into separate files (see § Rules File Management for the splitting convention)."
     echo "   To suppress for this week: touch ~/.kmgraph/.split-dismissed-${week_tag}"
     echo ""
 }

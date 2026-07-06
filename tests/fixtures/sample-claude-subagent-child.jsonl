@@ -1,0 +1,2 @@
+{"type":"user","uuid":"sub-001","timestamp":"2026-07-03T09:00:10Z","message":{"role":"user","content":[{"type":"text","text":"Read core/scripts/extract_claude.py and summarize the incremental filter."}]}}
+{"type":"assistant","uuid":"sub-002","timestamp":"2026-07-03T09:00:20Z","message":{"role":"assistant","content":[{"type":"text","text":"The incremental filter reads one last_ts from the tail of the output file and drops any message at or before it, across all source files for that date."}]}}

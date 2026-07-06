@@ -4,8 +4,8 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 51
-**Last Updated:** 2026-06-07
+**Total ADRs:** 56
+**Last Updated:** 2026-07-05
 
 ---
 
@@ -17,6 +17,11 @@ Formal documentation of significant architecture decisions.
 
 ## All ADRs (Chronological)
 
+- [ADR-060: Narrow kg_search scope away from raw chat-history — let context-mode own session recall](ADR-060-narrow-kg-search-scope-away-from-raw-chat-history.md) — **Status:** Proposed — Re-evaluated context-mode (v1.0.169) against kmgraph now that context-mode ships full session-continuity + RRF/proximity/fuzzy-ranked search. Decision: stop indexing raw `chat-history/*.md` in `kg_search`/`kg_fts5_rebuild` — context-mode owns ephemeral session/decision recall, kmgraph owns durable curated artifacts (ADRs/lessons/enhancements) only. Does not change ADR-001's multi-KG active-pointer model. Implemented by [ENH-040](../enhancements/ENH-040/ENH-040-specification.md).
+- [ADR-059: Plans must not hardcode derivable counts — derive at run time](ADR-059-no-hardcoded-derivable-counts-in-plans.md) — **Status:** Accepted — Caught live in the v0.6.16 plan: `knowledge/enhancements/` count drifted 36→37→38 within one planning session as ENH-037 and ENH-038 were both created mid-session. Decision: plans must never hardcode a computed file/folder/entry count as a fixed expectation — phrase it as "derived at run time from `<command>`" instead. Rule-only change to `~/.kmgraph/plan-authoring-rules.md`; motivated by this user's actual multi-platform concurrent-session operating mode (Claude/Codex/Gemini on the same repo), not a hypothetical.
+- [ADR-058: Command/skill naming and scope decisions require an upfront check, not ad-hoc creation](ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md) — **Status:** Accepted — A design session found 5 naming/scope confusions. A second opinion confirmed they are different failure modes (doc drift, scope leakage, architectural accretion, a missing feature) sharing one process gap: no upfront naming/scope check for new commands/skills/docstrings. Decision: establish a three-question check (audience / collision / accuracy) in CONTRIBUTING + the ADR-guide surface. Cites ADR-056 and ADR-057 as evidence (does not re-decide them); governs child [ENH-033](../enhancements/ENH-033/ENH-033-specification.md)/[034](../enhancements/ENH-034/ENH-034-specification.md)/[035](../enhancements/ENH-035/ENH-035-specification.md)/[036](../enhancements/ENH-036/ENH-036-specification.md) (all ready now). Target v0.7.0.
+- [ADR-057: Detection layer requires unified design, not piecemeal growth](ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth.md) — **Status:** Accepted — 5 independent capture-trigger skills (lesson-capture, adr-guide, rules-capture, update-profile, capture-router) traced to accreted, undesigned growth. Decision: consolidate detection/classification into one shared skill; keep drafting agents separate. Originally deferred pending the parent auto-capture pipeline design — 2026-07-03 amendment found no real dependency; consolidation ENH is ready to spec now.
+- [ADR-056: Reject plugin-split for contributor-only doc commands; fix via repo-context auto-detection](ADR-056-reject-plugin-split-for-contributor-only-doc-commands.md) — **Status:** Accepted — Rejects a `kmgraph-contrib` plugin (and marker-file / subdirectory options) for `kmg-update-doc`/`kmg-create-doc`; the real defect is imposed house style, not packaging. Resolves ADR-027's deferred item via behavioral auto-detection ([ENH-033](../enhancements/ENH-033/ENH-033-specification.md)) plus severity-dot labeling.
 - [ADR-051: Session Summary / Handoff Asymmetric Coupling via continues_from](ADR-051-session-summary-handoff-asymmetric-coupling.md) — **Status:** Accepted — Adds optional `continues_from` frontmatter field to handoff documents; when set, the "what was completed" section collapses to a one-liner pointing at the session summary. Asymmetric one-way coupling: handoff → summary only.
 - [ADR-050: Pre-Push Composite Gate + Inline Recommendation Gate](ADR-050-pre-push-composite-gate-inline-recommendation-gate.md) — **Status:** Accepted — Wires pre-push version-sync (Gate 2) and docs-impact-scan completion flag (Gate 3) as advisory PreToolUse Bash hooks; wires UserPromptSubmit hook for inline recommendation recall/ADR-precheck/cascade gate with per-session PID debounce.
 - [ADR-046: Introduce concept+setup hybrid page type and document how-to guide pattern separately from narrative guides](ADR-046-concept-setup-hybrid-page-type-and-how-to-guide-pattern.md) — **Status:** Accepted — Adds style guide section 4g for Goal/Prerequisites/Steps/Verify how-to pattern; retains 4a for narrative guides; names concept+setup hybrid as a distinct third type.
@@ -38,6 +43,8 @@ Formal documentation of significant architecture decisions.
 ## By Category
 
 ### Architecture
+- [ADR-057: Detection layer requires unified design, not piecemeal growth](ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth.md) — 5 capture-trigger skills grew accreted/undesigned; consolidate detection/classification into one shared skill, keep drafting agents separate; consolidation ENH ready to spec (deferral reasoning corrected 2026-07-03)
+- [ADR-056: Reject plugin-split for contributor-only doc commands](ADR-056-reject-plugin-split-for-contributor-only-doc-commands.md) — Keep single-plugin architecture; fix imposed-house-style bug via repo-context auto-detection (ENH-033) + labeling instead of a `kmgraph-contrib` split
 - [ADR-046](ADR-046-concept-setup-hybrid-page-type-and-how-to-guide-pattern.md) — Introduce concept+setup hybrid page type and document how-to guide pattern separately from narrative guides
 - [ADR-045](ADR-045-update-profile-skill-not-command.md) — Implement Profile Update Functionality as a Skill, Not a Command
 - [ADR-044](ADR-044-split-oversized-chat-history-files.md) — Split Oversized Daily Chat History Files for Obsidian Compatibility
@@ -46,6 +53,7 @@ Formal documentation of significant architecture decisions.
 - [ADR-030: Migration Moves KMGraph-Named Subdirectories Only](ADR-030-migration-moves-named-subdirs-only-never-entire-docs.md) — Named subdir list prevents collision with docs sites; explicit scope over blanket directory moves
 
 ### Process
+- [ADR-058: Command/skill naming and scope decisions require an upfront check](ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md) — Five naming/scope findings share one process gap (not one technical bug); establish a three-question upfront check (audience / collision / accuracy) in CONTRIBUTING + ADR-guide; governance layer above ADR-056/ADR-057; governs ENH-033/034/035/036; target v0.7.0
 - [ADR-043: PreToolUse Hook Injection for Superpowers Rule Enforcement](ADR-043-pretooluse-hook-injection-superpowers-rule-enforcement.md) — PreToolUse hook injects rules.md before brainstorming/writing-plans; two-scope (plugin + user-wide). Renumbered from ADR-041.
 - [ADR-042: ADR `implements` Field — Mandatory Implementation Commit Reference](ADR-042-adr-implements-commit-reference-mandatory.md) — Mandatory `implements` YAML field for all ADRs; design-first and ad hoc workflows defined; rule at user level
 - [ADR-041: Tier Abstraction Label System for Model Selection](ADR-041-tier-abstraction-label-system.md) — Three tier labels abstract model names; alias map (S4) and validation gate (S5) implemented in v0.5.2-beta

@@ -22,11 +22,6 @@
 set -euo pipefail
 
 KMGRAPH_RULES="${HOME}/.kmgraph/rules.md"
-KMGRAPH_PLAN_RULES="${HOME}/.kmgraph/plan-rules.md"
-KMGRAPH_GOVERNANCE_RULES="${HOME}/.kmgraph/governance-rules.md"
-# Fallback to rules.md if split files absent (non-split users)
-[ -f "$KMGRAPH_PLAN_RULES" ] || KMGRAPH_PLAN_RULES="$KMGRAPH_RULES"
-[ -f "$KMGRAPH_GOVERNANCE_RULES" ] || KMGRAPH_GOVERNANCE_RULES="$KMGRAPH_RULES"
 KMGRAPH_TRIGGERS="${HOME}/.kmgraph/triggers.md"
 PROJECT_RULES="${CLAUDE_PROJECT_DIR:-}/knowledge/rules.md"
 
@@ -80,9 +75,32 @@ _extract_section() {
   ' "$file" 2>/dev/null || true
 }
 
-PARALLELISM_SECTION=$(_extract_section "$KMGRAPH_PLAN_RULES" "^### Parallelism Analysis")
-FILE_LOCATION_SECTION=$(_extract_section "$KMGRAPH_PLAN_RULES" "^### File Location")
-APPROVAL_GATE_SECTION=$(_extract_section "$KMGRAPH_GOVERNANCE_RULES" "^### Approval Gates")
+# Scans ~/.kmgraph/*.md for a file that (a) was produced by a rules.md
+# split — directly, or via a re-split of an already-split file (e.g.
+# plan-rules.md -> plan-authoring-rules.md + plan-execution-rules.md; the
+# marker then cites the intermediate file, not rules.md itself, so the
+# match below does not hardcode the literal source filename) — and
+# (b) contains the given section header. Echoes the matching file path,
+# or returns 1 if none found — callers fall back to ~/.kmgraph/rules.md
+# on failure.
+_kmgraph_find_split_file() {
+  local section_header="$1" f
+  for f in "$HOME"/.kmgraph/*.md; do
+    [ -f "$f" ] || continue
+    grep -qE '^> Sourced from ~/\.kmgraph/.*\.md split' "$f" 2>/dev/null || continue
+    grep -q "^${section_header}" "$f" 2>/dev/null && { echo "$f"; return 0; }
+  done
+  return 1
+}
+
+PARALLELISM_SOURCE=$(_kmgraph_find_split_file "### Parallelism Analysis") || PARALLELISM_SOURCE="$KMGRAPH_RULES"
+PARALLELISM_SECTION=$(_extract_section "$PARALLELISM_SOURCE" "^### Parallelism Analysis")
+
+FILE_LOCATION_SOURCE=$(_kmgraph_find_split_file "### File Location") || FILE_LOCATION_SOURCE="$KMGRAPH_RULES"
+FILE_LOCATION_SECTION=$(_extract_section "$FILE_LOCATION_SOURCE" "^### File Location")
+
+APPROVAL_GATE_SOURCE=$(_kmgraph_find_split_file "### Approval Gates") || APPROVAL_GATE_SOURCE="$KMGRAPH_RULES"
+APPROVAL_GATE_SECTION=$(_extract_section "$APPROVAL_GATE_SOURCE" "^### Approval Gates")
 
 PROJECT_PLAN_LOCATION=""
 PROJECT_PLAN_ROUTING=""
@@ -226,9 +244,11 @@ The plan must explicitly acknowledge or supersede each item listed.
 > 3. Check platform delivery surface before specifying target file.
 <!-- /embedded-rules -->'
 
-  if [[ -f "${KMGRAPH_PLAN_RULES}" ]]; then
-    ADHOC_BLOCK=$(awk '/^### Ad-Hoc Plan Updates/,/^### /' "${KMGRAPH_PLAN_RULES}" | sed '$d' | head -c 400)
-    CAPTURE_BLOCK=$(awk '/^### Execution, Implementation,  & Gating/,/^### /' "${KMGRAPH_PLAN_RULES}" | sed '$d' | head -c 400)
+  ADHOC_SOURCE=$(_kmgraph_find_split_file "### Ad-Hoc Plan Updates") || ADHOC_SOURCE="$KMGRAPH_RULES"
+  EXEC_SOURCE=$(_kmgraph_find_split_file "### Execution, Implementation,  & Gating") || EXEC_SOURCE="$KMGRAPH_RULES"
+  if [[ -f "${ADHOC_SOURCE}" ]]; then
+    ADHOC_BLOCK=$(awk '/^### Ad-Hoc Plan Updates/,/^### /' "${ADHOC_SOURCE}" | sed '$d' | head -c 400)
+    CAPTURE_BLOCK=$(awk '/^### Execution, Implementation,  & Gating/,/^### /' "${EXEC_SOURCE}" | sed '$d' | head -c 400)
   fi
 
   OVERRIDE_BLOCK='--- Execution Handoff Override (HARD BLOCK — supersedes skill) ---
