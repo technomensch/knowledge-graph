@@ -30,7 +30,8 @@ fi
 touch "$FLAG_FILE"
 
 MSG='--- Post-Plan Validation Checklist (advisory) ---
-Plan file written. Verify against ~/.kmgraph/plan-rules.md:
+Plan file written. Verify against your personal plan-authoring rules
+(~/.kmgraph/rules.md, or its split files — see § Rules File Management):
   [ ] Branch placement stated explicitly
   [ ] Required steps present (branch, copy, impl, commit/push/PR)
   [ ] Parallelism table row count matches task count
@@ -38,7 +39,6 @@ Plan file written. Verify against ~/.kmgraph/plan-rules.md:
   [ ] Plugin cache sync step present if skills/templates changed
   [ ] Capture Checkpoints present after Opus review step
   [ ] Acceptance Criteria covers all gap fixes
-Full rule list: ~/.kmgraph/plan-rules.md
 --- End Checklist ---'
 
 if command -v jq &>/dev/null; then
