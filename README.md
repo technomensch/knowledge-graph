@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.6.15
+**Version:** 0.6.16
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -90,6 +90,13 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 ---
 
 ## v0.6.x Feature Highlights
+
+**v0.6.16 — 2026-07-06**
+
+- **Extractor message loss and format-drift fixed** — Claude incremental extraction no longer drops subagent messages; per-message `uuid` dedup (split-file-aware) replaces a buggy single cross-file timestamp cutoff. Gemini gains a new streaming `.jsonl` parser for its post-2026-05-13 session format alongside the existing `.json` path.
+- **`chat_extractor_base.py` fails loudly instead of silently writing into the plugin's own directory** when `KG_OUTPUT_DIR` is unset.
+- **Enhancements/Issues README indexes** — `knowledge/enhancements/README.md` and `knowledge/issues/README.md` now exist and cross-reference `knowledge/decisions/README.md`; matching starter templates ship in `core/default-templates/`.
+- **Shared scripts discover personal rules-file splits by content marker**, not a hardcoded filename — any future personal `~/.kmgraph/rules.md` split (any name, any boundary) needs no script change.
 
 **v0.6.15 — 2026-07-02**
 
@@ -330,6 +337,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.6.10 (2026-06-22)
+**Current Version:** v0.6.16 (2026-07-06)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info
