@@ -106,6 +106,16 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 
 ---
 
+## v0.6.16 (🚧 In Progress: 2026-07-05)
+
+### Fixes
+
+- 🔲 **ENH-038**: `kmg-extract-chat` message loss and format-drift across Claude/Gemini/Codex — Claude incremental cross-file uuid dedup (split-file-aware, see ADR-044), chronological flatten-and-sort across main-thread/subagent files, Gemini streaming `.jsonl` parser path, Codex audit. Spec: `knowledge/enhancements/ENH-038/ENH-038-specification.md`. Plan: `knowledge/plans/v0.6.16-fix-extract-chat-subagents.md`.
+- 🔲 **ENH-037**: README indexes for `knowledge/enhancements/` and `knowledge/issues/`, plus matching `core/default-templates/` scaffolds. Spec: `knowledge/enhancements/ENH-037/ENH-037-specification.md`.
+- 🔲 **ENH-039**: Rule-injection scripts (`hooks-master.sh`, `post-plan-validate-checklist.sh`, `pre-skill-rules-inject.sh`, `rules-size-check.sh`) hardcode personal rules-file split names instead of discovering them. Spec: `knowledge/enhancements/ENH-039/ENH-039-specification.md`.
+
+---
+
 ## v0.6.0 (🔲 In Planning)
 
 ### Planned

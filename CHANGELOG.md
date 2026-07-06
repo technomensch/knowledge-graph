@@ -7,6 +7,21 @@ displayed_sidebar: null
 
 All notable changes to the Knowledge Plugin will be documented in this file.
 
+## [Unreleased] — v0.6.16 in progress
+
+### Fixed
+
+- **Extractor message loss and format-drift (ENH-038)** — `extract_claude.py` incremental mode dropped subagent messages timestamped earlier than a single cross-file `last_ts` cutoff; replaced with per-message `uuid` dedup (split-file-aware per ADR-044). Same-day multi-file sessions now flatten and sort into one chronological stream instead of per-file `## Session N` blocks. `extract_gemini.py` gains a new streaming `.jsonl` parser path for the post-2026-05-13 Antigravity/Gemini CLI session format (previous parser only read pre-05-13 single-object `.json` files, silently missing ~2 months of history).
+- **Silent output-directory fallback (ENH-038)** — `chat_extractor_base.py` now raises `RuntimeError` instead of silently defaulting to the plugin's own install directory when `KG_OUTPUT_DIR` is unset.
+
+### Added
+
+- **Enhancements/Issues README indexes (ENH-037)** — `knowledge/enhancements/README.md` and `knowledge/issues/README.md` populated; matching starter templates added to `core/default-templates/enhancements/` and `core/default-templates/issues/` for fresh installs.
+
+### Fixed (scripts)
+
+- **Hardcoded personal rules-file split names (ENH-039)** — `hooks-master.sh`, `post-plan-validate-checklist.sh`, `pre-skill-rules-inject.sh`, `rules-size-check.sh` discover split rules filenames instead of assuming `plan-rules.md`/`governance-rules.md`.
+
 ## [0.6.15] — 2026-07-02
 
 ### Fixed
