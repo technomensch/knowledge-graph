@@ -3,12 +3,26 @@ import argparse
 import re
 import json
 import glob
+import hashlib
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 import re
 from chat_extractor_base import get_output_path, format_timestamp, write_markdown_header, write_message_block, split_file_if_oversized
 
 CLAUDE_PROJECTS_DIR = os.path.expanduser("~/.claude/projects")
+
+
+def _dedup_key(uuid, timestamp, content) -> str:
+    """Every real Claude Code JSONL record carries a uuid, but if one is
+    ever absent, falling back to `None` as the dedup key would make the
+    message look "new" on every incremental run forever (None not in
+    seen_uuids is always True) -- silently duplicating it indefinitely.
+    Hash timestamp+content instead, so a uuid-less message still gets a
+    stable identity across runs.
+    """
+    if uuid:
+        return uuid
+    return hashlib.sha256(f"{timestamp}:{content}".encode('utf-8')).hexdigest()[:16]
 
 def _parse_ts(ts: str) -> Optional[float]:
     """Parses an ISO 8601 timestamp string to a UTC epoch float, tolerating
@@ -162,7 +176,7 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                                         'role': 'user',
                                         'content': text,
                                         'timestamp': obj.get('timestamp'),
-                                        'uuid': obj.get('uuid'),
+                                        'uuid': _dedup_key(obj.get('uuid'), obj.get('timestamp'), text),
                                     })
                             elif obj.get('type') == 'assistant' and 'message' in obj:
                                 content_list = obj['message'].get('content', [])
@@ -177,7 +191,7 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                                         'thinking': thinking,
                                         'content': text,
                                         'timestamp': obj.get('timestamp'),
-                                        'uuid': obj.get('uuid'),
+                                        'uuid': _dedup_key(obj.get('uuid'), obj.get('timestamp'), text or thinking),
                                     })
                         except json.JSONDecodeError: continue
             except Exception as e:
