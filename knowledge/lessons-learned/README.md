@@ -155,3 +155,4 @@ See [core/examples/lessons-learned/](../../examples/lessons-learned/) for filled
 - [Platform-Agnostic Rule Timing via triggers.md](architecture/Lessons_Learned_Architecture_Platform_Agnostic_Rule_Timing_Via_Triggers.md)
 - [FTS5 SearchDirs Missing Chat History](architecture/Lessons_Learned_Architecture_Fts5_Searchdirs_Missing_Chat_History.md)
 - [Handoff Spec Must Cover All Artifact Shapes](process/Lessons_Learned_Process_Handoff_Spec_Must_Cover_All_Artifact_Shapes.md)
+- [Bulk Frontmatter Strip Over-Reached Into knowledge dir — Restore via git checkout pre-strip](process/Lessons_Learned_Process_Bulk_Frontmatter_Strip_Over_Reached_Into_Knowledge_Dir_—_Restore_Via_Git_Checkout_Pre_Strip.md)
