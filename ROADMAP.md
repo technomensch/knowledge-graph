@@ -106,13 +106,22 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 
 ---
 
-## v0.6.16 (🚧 In Progress: 2026-07-05)
+## v0.6.16 (✅ Released: 2026-07-06)
 
 ### Fixes
 
-- 🔲 **ENH-038**: `kmg-extract-chat` message loss and format-drift across Claude/Gemini/Codex — Claude incremental cross-file uuid dedup (split-file-aware, see ADR-044), chronological flatten-and-sort across main-thread/subagent files, Gemini streaming `.jsonl` parser path, Codex audit. Spec: `knowledge/enhancements/ENH-038/ENH-038-specification.md`. Plan: `knowledge/plans/v0.6.16-fix-extract-chat-subagents.md`.
-- 🔲 **ENH-037**: README indexes for `knowledge/enhancements/` and `knowledge/issues/`, plus matching `core/default-templates/` scaffolds. Spec: `knowledge/enhancements/ENH-037/ENH-037-specification.md`.
-- 🔲 **ENH-039**: Rule-injection scripts (`hooks-master.sh`, `post-plan-validate-checklist.sh`, `pre-skill-rules-inject.sh`, `rules-size-check.sh`) hardcode personal rules-file split names instead of discovering them. Spec: `knowledge/enhancements/ENH-039/ENH-039-specification.md`.
+- ✅ **ENH-038**: `kmg-extract-chat` message loss and format-drift across Claude/Gemini/Codex — Claude incremental cross-file uuid dedup (split-file-aware, see ADR-044), chronological flatten-and-sort across main-thread/subagent files, Gemini streaming `.jsonl` parser path, Codex audit. Spec: `knowledge/enhancements/ENH-038/ENH-038-specification.md`. Plan: `knowledge/plans/v0.6.16-fix-extract-chat-subagents.md`.
+- ✅ **ENH-037**: README indexes for `knowledge/enhancements/` and `knowledge/issues/`, plus matching `core/default-templates/` scaffolds. Spec: `knowledge/enhancements/ENH-037/ENH-037-specification.md`.
+- ✅ **ENH-039**: Rule-injection scripts (`hooks-master.sh`, `post-plan-validate-checklist.sh`, `pre-skill-rules-inject.sh`, `rules-size-check.sh`) hardcode personal rules-file split names instead of discovering them. Spec: `knowledge/enhancements/ENH-039/ENH-039-specification.md`.
+
+---
+
+## v0.6.17 (🚧 In Progress: 2026-07-07)
+
+### Fixes
+
+- 🔲 **ENH-043**: `kmg-extract-chat`'s v0.6.16 uuid-dedup fix can't retroactively repair chat-history files the pre-fix code already wrote (486 of 2,801 extractable subagent messages missing across full project history, 96% task-dispatch prompts). Adds `--rebuild` to force a clean overwrite/flatten pass, then a one-time repair run against every affected date. Spec: `knowledge/enhancements/ENH-043/ENH-043-specification.md`. Plan: `knowledge/plans/v0.6.17-fix-extract-chat-rebuild.md`.
+- 🔲 **ENH-044**: Gemini extractor has no project-scoping — `--project` silently ignored, merging unrelated projects' sessions into the active project's output. Adds `project_filter` support mirroring the Claude extractor's existing pattern. Spec: `knowledge/enhancements/ENH-044/ENH-044-specification.md`.
 
 ---
 

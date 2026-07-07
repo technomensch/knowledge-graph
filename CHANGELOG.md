@@ -7,7 +7,14 @@ displayed_sidebar: null
 
 All notable changes to the Knowledge Plugin will be documented in this file.
 
-## [Unreleased] — v0.6.16 in progress
+## [Unreleased] — v0.6.17 in progress
+
+### Fixed
+
+- **Extractor rebuild mode (ENH-043)** — the v0.6.16 uuid-dedup fix could not retroactively repair chat-history files written by the pre-fix code (486 of 2,801 extractable subagent messages, 96% of them task-dispatch prompts, were missing across the project's full history — incremental dedup treats any uuid already on disk as permanently synced, so a normal re-run could never self-heal it). Added `--rebuild` to force a clean overwrite/flatten pass regardless of existing output state, then ran a one-time repair against every affected date.
+- **Gemini extractor had no project-scoping (ENH-044)** — `extract_gemini.py` ignored `--project` entirely, silently merging unrelated projects' sessions into the active project's chat-history output. Added `project_filter` support mirroring the Claude extractor's existing pattern.
+
+## [0.6.16] — 2026-07-06
 
 ### Fixed
 
