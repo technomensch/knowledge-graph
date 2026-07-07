@@ -115,7 +115,8 @@ def parse_seen_uuids(file_path: str) -> set[str]:
 
 
 def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
-                             before_date=None, project_filter=None, incremental=False):
+                             before_date=None, project_filter=None, incremental=False,
+                             rebuild=False):
     """
     Scans Claude project directories for jsonl files and extracts them.
 
@@ -126,6 +127,13 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
         before_date: Extract only sessions on or before this date (YYYY-MM-DD, inclusive)
         project_filter: Filter to sessions from a specific project (path fragment match)
         incremental: Skip extraction if file already exists and is current
+        rebuild: Force the overwrite/flatten branch for every date in scope,
+            ignoring any existing output file's parsed last_ts/seen_uuids.
+            Use to repair output written by an older, buggy version of this
+            script (uuid-dedup treats already-written content as permanent,
+            so a normal incremental run can never self-heal it — see ENH-043).
+            Takes precedence over `incremental` when both are set (rebuild is
+            the more destructive, more intentional operation, so it wins).
 
     Returns a list of processing results.
     """
@@ -238,9 +246,26 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
         sessions.sort(key=lambda x: x['ts_str'])
         
         filename = f"{date}-claude.md"
+
+        if rebuild:
+            # Clear any stale split subfolder BEFORE resolving output_path, so
+            # get_output_path() routes to the flat-file location instead of a
+            # soon-to-be-deleted split part inside {OUTPUT_DIR}/{date}/.
+            from chat_extractor_base import OUTPUT_DIR, clear_split_subfolder
+            clear_split_subfolder(OUTPUT_DIR, date)
+
         output_path = get_output_path(filename)
-        
-        last_ts, last_idx = parse_metadata_from_file(output_path)
+
+        if rebuild:
+            # --rebuild takes precedence over --incremental: forcing
+            # last_ts=None here routes unconditionally to the overwrite/flatten
+            # branch below. --incremental only ever influences the append
+            # branch that rebuild deliberately bypasses (and in fact the write
+            # loop never consults `incremental` for branching at all), so when
+            # both flags are passed, rebuild deterministically wins.
+            last_ts, last_idx = None, 0
+        else:
+            last_ts, last_idx = parse_metadata_from_file(output_path)
 
         if last_ts is not None:
             # Filter for truly new messages using per-message uuid dedup
