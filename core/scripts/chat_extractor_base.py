@@ -68,6 +68,20 @@ def get_output_path(filename):
     # 3. Fallback to root
     return os.path.join(OUTPUT_DIR, filename)
 
+def clear_split_subfolder(output_dir: str, date: str) -> None:
+    """Removes an existing {output_dir}/{date}/ split-part subfolder, if any.
+
+    get_output_path() checks for this subfolder first and, if present,
+    always routes to the last part file inside it -- so a rebuild that
+    writes a fresh flat file at the date's normal location would be
+    silently shadowed by a stale split subfolder on the next call unless
+    that subfolder is cleared first.
+    """
+    split_dir = os.path.join(output_dir, date)
+    if os.path.isdir(split_dir):
+        import shutil
+        shutil.rmtree(split_dir)
+
 def format_timestamp(ts_str):
     """
     Standardize timestamp format to ISO 8601-like or readable string.
