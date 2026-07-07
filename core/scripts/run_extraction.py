@@ -21,6 +21,7 @@ def main():
     parser.add_argument("--before", type=str, default=None, help="Extract only sessions on or before this date (YYYY-MM-DD)")
     parser.add_argument("--project", type=str, default=None, help="Filter to sessions from a specific project (path fragment match against ~/.claude/projects/<name>/)")
     parser.add_argument("--incremental", action="store_true", help="Only extract new sessions (skip if file already exists and is current)")
+    parser.add_argument("--rebuild", action="store_true", help="Force overwrite/flatten every date in scope, ignoring existing output state (repairs pre-fix corrupted files — see ENH-043)")
 
     args = parser.parse_args()
 
@@ -93,7 +94,8 @@ def main():
             after_date=args.after,
             before_date=args.before,
             project_filter=args.project,
-            incremental=args.incremental
+            incremental=args.incremental,
+            rebuild=args.rebuild
         )
         results.extend(claude_res)
         
