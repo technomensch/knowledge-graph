@@ -1,0 +1,4 @@
+{"type":"user","uuid":"rebuild-001","timestamp":"2026-07-03T09:00:00Z","message":{"role":"user","content":[{"type":"text","text":"Start the investigation."}]}}
+{"type":"assistant","uuid":"rebuild-002","timestamp":"2026-07-03T09:00:05Z","message":{"role":"assistant","content":[{"type":"text","text":"Starting now."}]}}
+{"type":"user","uuid":"rebuild-003","timestamp":"2026-07-03T09:10:00Z","message":{"role":"user","content":[{"type":"text","text":"What did you find?"}]}}
+{"type":"assistant","uuid":"rebuild-004","timestamp":"2026-07-03T09:10:05Z","message":{"role":"assistant","content":[{"type":"text","text":"Found the root cause."}]}}
