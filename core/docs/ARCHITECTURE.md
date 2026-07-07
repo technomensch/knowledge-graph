@@ -268,12 +268,7 @@ Archive lessons older than 2 years (still searchable, just organized).
 
 ### What to Sanitize
 
-- Personal information (emails, names, phone numbers)
-- Authentication (API keys, passwords, tokens)
-- Infrastructure (internal IPs, URLs, database strings)
-- Company/customer-specific data
-
-See [SANITIZATION-CHECKLIST.md](./SANITIZATION-CHECKLIST.md) for complete guide.
+See the [Sanitization glossary entry](../../docs/GLOSSARY.md#sanitization) for the categories of sensitive data that get detected, and [SANITIZATION-CHECKLIST.md](./SANITIZATION-CHECKLIST.md) for the complete guide.
 
 ---
 
