@@ -152,7 +152,65 @@ Otherwise, run the following check **before** creating any directories or runnin
 
    **Do not proceed until the user explicitly responds.**
 
-5. **If match:** Continue to Step 1.
+5. **If match:** Continue to Step 0.5.
+
+---
+
+### Step 0.5: First-Run Repair Check (ENH-043)
+
+**Skip this step entirely** if any of `--date`, `--after`, `--before`, `--project`, `--output-dir`, or `--rebuild` is present in the user's invocation — a targeted run shouldn't trigger a global repair check. Proceed directly to Step 1.
+
+Otherwise, check whether this is the first extraction run since the plugin crossed the version that fixed a past message-loss bug in the Claude extractor:
+
+1. Read the installed plugin version (`.claude-plugin/plugin.json`'s `.version`) and the version last stamped after a successful run (`read_last_extract_version(chat_history)` from `chat_extractor_base.py`, default `"0.0.0"` if never stamped).
+2. **If installed version < 0.6.17, or stamped version ≥ 0.6.17:** skip this check entirely (either a pre-fix install, or already handled) — continue to Step 1.
+3. Otherwise, run:
+   ```bash
+   python3 ${CLAUDE_PLUGIN_ROOT}/core/scripts/check_extraction_health.py --dates-only "$chat_history" --source-root ~/.claude/projects
+   ```
+   Each line is `YYYY-MM-DD<TAB>repairable` or `YYYY-MM-DD<TAB>needs-backup`. **If there is no output at all:** history is clean — call `write_last_extract_version(chat_history, installed_version)` and continue to Step 1 silently, no message shown.
+4. **If any dates are listed**, count `N` (total lines) and `R` (lines marked `repairable`). Show this notice:
+
+   > Heads up — I checked your extracted Claude chat history and **{N} days** look incomplete. An older version of this extractor dropped some messages before a fix shipped; those files were never rebuilt. I can **repair {R} of them right now** from session logs still on your machine. The other **{N-R} days** have no source logs left locally and would need a backup to recover.
+   >
+   > Want me to: **(1)** repair the {R} I can now · **(2)** tell me more first · **(3)** check for a backup · **(4)** skip?
+
+5. **On (2) tell me more:** show the fuller explanation, then re-offer the same four options:
+
+   > An earlier version of this tool had a bug: when a conversation used background "sub-agent" helpers, some of those messages could be dropped from the saved history — and once a file was saved that way, normal re-runs couldn't fix it on their own. The latest update fixes this and can now rebuild the affected days cleanly.
+   >
+   > Separately: Claude Code itself periodically rotates out old session logs on its own — that's not something this tool or you did wrong, it just means the raw source for some older days may no longer exist on this machine. If it doesn't, a backup of `~/.claude/projects/` from around that time (Time Machine, Backblaze, etc.) is the only way to recover those days.
+   >
+   > Want me to: **(1)** repair the {R} I can now · **(3)** check for a backup · **(4)** skip?
+
+6. **On (1) repair now:** run `--rebuild` scoped to just the dates marked `repairable`:
+   ```bash
+   for date in <repairable dates>; do
+     python3 ${CLAUDE_PLUGIN_ROOT}/core/scripts/run_extraction.py --source claude --date "$date" --rebuild
+   done
+   ```
+   Report each result line back to the user. If `N-R > 0` (some dates still need a backup), move to step 7's backup offer for the remainder. Otherwise proceed to step 8.
+
+7. **On (3) check for a backup:** tell the user the exact folder to look for — derive `<repo-name>` from the actual project path (do not hardcode `knowledge-graph`):
+
+   > Look for a backup of `~/.claude/projects/-Users-<you>-GitHub-<repo-name>/` from around the affected dates — Time Machine, Backblaze, or any full-disk backup would have it. If you find one, tell me the restored path and I'll check what it covers.
+
+   Once given a path, re-run the health check against it and report which of the remaining dates it actually covers:
+   ```bash
+   python3 ${CLAUDE_PLUGIN_ROOT}/core/scripts/check_extraction_health.py --dates-only "$chat_history" --source-root "<restored-path>"
+   ```
+   Then offer to repair those dates from the restored path:
+   ```bash
+   python3 ${CLAUDE_PLUGIN_ROOT}/core/scripts/run_extraction.py --source claude --date "$date" --rebuild --claude-projects-dir "<restored-path>"
+   ```
+
+8. **On (4) skip, or after any repair pass completes:** call `write_last_extract_version(chat_history, installed_version)` so this check doesn't re-fire on future runs, then continue to Step 1.
+
+**Gemini gets a separate, different notice — not this flow.** When `--source gemini` or `--source all` is used (and Step 0.5 wasn't otherwise skipped per its own condition above), print this one-line note before extraction runs, then continue normally:
+
+> Your Gemini history may mix in other projects' conversations (a known scoping gap, ENH-044). Re-run with `--project=<name>` for clean, scoped output going forward.
+
+No backup guidance for Gemini — nothing is lost, so recovery framing would be misleading; the fix is forward-looking (`--project` scoping on the next run), not a rebuild of past output.
 
 ---
 

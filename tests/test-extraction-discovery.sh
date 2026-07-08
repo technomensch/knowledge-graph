@@ -1,6 +1,6 @@
 #!/bin/bash
 # test-extraction-discovery.sh — synthetic dry-run safety net for ENH-043's
-# corrupted-file discovery (core/scripts/find_corrupted_chat_files.py).
+# extraction health check (core/scripts/check_extraction_health.py).
 # Proves the scanner flags stale-header-count and leftover-Session-N files,
 # does NOT flag clean files, and skips .backup siblings — all against
 # synthetic fixtures, so discovery is no longer only ever exercised against
@@ -9,7 +9,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-DISCOVERY_SCRIPT="$REPO_ROOT/core/scripts/find_corrupted_chat_files.py"
+DISCOVERY_SCRIPT="$REPO_ROOT/core/scripts/check_extraction_health.py"
 
 PASS=0
 FAIL=0

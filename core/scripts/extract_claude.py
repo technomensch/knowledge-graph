@@ -116,7 +116,7 @@ def parse_seen_uuids(file_path: str) -> set[str]:
 
 def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                              before_date=None, project_filter=None, incremental=False,
-                             rebuild=False):
+                             rebuild=False, claude_projects_dir=None):
     """
     Scans Claude project directories for jsonl files and extracts them.
 
@@ -134,12 +134,16 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
             so a normal incremental run can never self-heal it — see ENH-043).
             Takes precedence over `incremental` when both are set (rebuild is
             the more destructive, more intentional operation, so it wins).
+        claude_projects_dir: Override the Claude session-log source directory
+            instead of ~/.claude/projects — e.g. a restored backup, when the
+            live logs have been rotated out (see ENH-043).
 
     Returns a list of processing results.
     """
     results = []
     # Find all project directories
-    project_dirs = glob.glob(os.path.join(CLAUDE_PROJECTS_DIR, "*"))
+    projects_dir = claude_projects_dir or CLAUDE_PROJECTS_DIR
+    project_dirs = glob.glob(os.path.join(projects_dir, "*"))
 
     # Filter project directories by path fragment if --project provided
     if project_filter:
