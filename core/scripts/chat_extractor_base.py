@@ -244,6 +244,10 @@ def write_last_extract_version(chat_history: str, version: str) -> None:
     """Stamps the installed plugin version after a run, so the next run can
     tell whether it has already crossed a given fix version (see
     read_last_extract_version)."""
+    # Step 0.5 (first-run repair check) can call this before Step 1 has run
+    # mkdir on the chat-history dir, and a clean/fresh install may have no
+    # chat-history dir yet. Create it so the stamp write never crashes.
+    os.makedirs(chat_history, exist_ok=True)
     state_path = os.path.join(chat_history, ".kmg-extract-state.json")
     with open(state_path, "w", encoding="utf-8") as f:
         json.dump({"last_extract_plugin_version": version}, f)

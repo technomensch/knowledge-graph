@@ -160,10 +160,18 @@ Otherwise, run the following check **before** creating any directories or runnin
 
 **Skip this step entirely** if any of `--date`, `--after`, `--before`, `--project`, `--output-dir`, or `--rebuild` is present in the user's invocation — a targeted run shouldn't trigger a global repair check. Proceed directly to Step 1.
 
-Otherwise, check whether this is the first extraction run since the plugin crossed the version that fixed a past message-loss bug in the Claude extractor:
+Otherwise, check whether this is the first extraction run since the plugin crossed the version that fixed a past message-loss bug in the Claude extractor.
+
+First resolve the chat-history directory from the (possibly just-switched, per Step 0) active KG — this is the same resolution Step 1 performs, but Step 0.5 runs *before* Step 1, so `chat_history` must be resolved here or every `read_last_extract_version` / `write_last_extract_version` / health-check call below would reference an undefined path (and would miss a Step 0 Option-1 KG switch):
+```bash
+active_kg=$(jq -r '.active' ~/.claude/kg-config.json)
+kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.claude/kg-config.json)
+kg_path="${kg_path/#\~/$HOME}"
+chat_history="${kg_path}/chat-history"
+```
 
 1. Read the installed plugin version (`.claude-plugin/plugin.json`'s `.version`) and the version last stamped after a successful run (`read_last_extract_version(chat_history)` from `chat_extractor_base.py`, default `"0.0.0"` if never stamped).
-2. **If installed version < 0.6.17, or stamped version ≥ 0.6.17:** skip this check entirely (either a pre-fix install, or already handled) — continue to Step 1.
+2. Compare versions **numerically, not as strings** — split each on `.` into integer components and compare component-by-component (so `0.6.9 < 0.6.17` and `0.6.17 < 0.6.20` are evaluated correctly; a naive string comparison gets both wrong, e.g. `"0.6.9" > "0.6.17"` lexically). **If installed version < 0.6.17, or stamped version ≥ 0.6.17:** skip this check entirely (either a pre-fix install, or already handled) — continue to Step 1.
 3. Otherwise, run:
    ```bash
    python3 ${CLAUDE_PLUGIN_ROOT}/core/scripts/check_extraction_health.py --dates-only "$chat_history" --source-root ~/.claude/projects
@@ -175,7 +183,7 @@ Otherwise, check whether this is the first extraction run since the plugin cross
    >
    > Want me to: **(1)** repair the {R} I can now · **(2)** tell me more first · **(3)** check for a backup · **(4)** skip?
 
-5. **On (2) tell me more:** show the fuller explanation, then re-offer the same four options:
+5. **On (2) tell me more:** show the fuller explanation, then re-offer the remaining three options (option (2) is intentionally dropped — the explanation has already been shown, so re-offering it would let the user bounce on (2) forever without the version stamp ever being written):
 
    > An earlier version of this tool had a bug: when a conversation used background "sub-agent" helpers, some of those messages could be dropped from the saved history — and once a file was saved that way, normal re-runs couldn't fix it on their own. The latest update fixes this and can now rebuild the affected days cleanly.
    >
@@ -204,7 +212,9 @@ Otherwise, check whether this is the first extraction run since the plugin cross
    python3 ${CLAUDE_PLUGIN_ROOT}/core/scripts/run_extraction.py --source claude --date "$date" --rebuild --claude-projects-dir "<restored-path>"
    ```
 
-8. **On (4) skip, or after any repair pass completes:** call `write_last_extract_version(chat_history, installed_version)` so this check doesn't re-fire on future runs, then continue to Step 1.
+   **When the backup interaction concludes — whether the user recovered dates, found no backup, or declined to look — proceed to step 8** so the version stamp is always written. Do not leave this path without reaching step 8, or the notice will re-fire on every future run.
+
+8. **On (4) skip, or after any repair or backup pass completes (including a (3) path that recovered nothing):** call `write_last_extract_version(chat_history, installed_version)` so this check doesn't re-fire on future runs, then continue to Step 1.
 
 **Gemini gets a separate, different notice — not this flow.** When `--source gemini` or `--source all` is used (and Step 0.5 wasn't otherwise skipped per its own condition above), print this one-line note before extraction runs, then continue normally:
 
