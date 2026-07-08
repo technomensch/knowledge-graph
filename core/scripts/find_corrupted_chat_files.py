@@ -20,8 +20,19 @@ def check_file(path):
         text = f.read()
     header_m = re.search(r'\*\*Total Messages:\*\*\s*(\d+)', text)
     header_count = int(header_m.group(1)) if header_m else None
-    actual_count = len(re.findall(r'^### Message', text, re.MULTILINE))
-    session_blocks = len(re.findall(r'^## Session \d+', text, re.MULTILINE))
+    # Require the exact structural pattern write_message_block() emits
+    # ("### Message N: User"/"### Message N: Assistant") rather than a bare
+    # "### Message" prefix, which also matches quoted/example doc text like
+    # "### Message N: Role" appearing inside real conversation content about
+    # this very extractor's output format.
+    actual_count = len(re.findall(r'^### Message \d+: (?:User|Assistant)', text, re.MULTILINE))
+    # Require the exact legacy signature the pre-fix code emitted
+    # ("## Session N (Started: HHMMSS)", 6-digit numeric time) rather than a
+    # bare "## Session N" prefix, which also matches quoted doc-template
+    # examples like "## Session 1: Project Name (HH:MM - HH:MM)" or heading
+    # names like "## Session Findings"/"## Session Type" that happen to
+    # start the same way but aren't the old per-file corruption format.
+    session_blocks = len(re.findall(r'^## Session \d+ \(Started: \d{6}\)', text, re.MULTILINE))
     return header_count, actual_count, session_blocks
 
 
