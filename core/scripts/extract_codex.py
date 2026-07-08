@@ -192,13 +192,15 @@ def extract_codex_sessions(
         filename = f"{date}-codex.md"
         output_path = get_output_path(filename)
 
-        if incremental and os.path.exists(output_path):
-            age = datetime.now().timestamp() - os.path.getmtime(output_path)
-            if age <= 3600:
-                results.append(
-                    f"Skipped {filename} (already current, modified {int(age / 60)} min ago)"
-                )
-                continue
+        # Note: incremental mode used to skip a date entirely if its output
+        # file's mtime was under an hour old, on the assumption that a recent
+        # mtime meant the file was already synced -- the exact anti-pattern
+        # already identified and removed from extract_claude.py in 22c7559d
+        # (v0.6.16). That assumption is false for an active session, and it
+        # silently dropped real incremental syncs run twice inside an hour.
+        # Unlike Claude's extractor, this writer always fully overwrites the
+        # output file (no append/dedup path), so there is no replacement
+        # logic needed -- removing the skip alone is a complete, safe fix.
 
         total_messages = sum(s["count"] for s in sessions)
 
