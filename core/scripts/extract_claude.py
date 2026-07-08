@@ -240,6 +240,17 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
     # regardless of file age, and already reports "No new activity" when there
     # is genuinely nothing new — so no separate recency-based skip is needed.
 
+    if rebuild and date_filter and date_filter not in sessions_by_date:
+        existing_path = get_output_path(f"{date_filter}-claude.md")
+        if os.path.exists(existing_path):
+            results.append(
+                f"WARNING: --rebuild found 0 source sessions for {date_filter} "
+                f"(project_filter={project_filter!r}) -- existing output was left "
+                f"untouched. If your local ~/.claude/projects/ session logs for this "
+                f"date have been rotated/deleted and no backup exists, this date's "
+                f"original conversation content cannot be recovered."
+            )
+
     # Write files
     for date, sessions in sessions_by_date.items():
         # Sort sessions by timestamp within the day

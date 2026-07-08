@@ -273,6 +273,38 @@ else
   fail "zero-match --project unexpectedly wrote an output file"
 fi
 
+# ── Gap 6: --rebuild warns explicitly when source is gone but output already exists ──
+echo "── Gap 6: --rebuild warns when source is gone but output already exists ──"
+rm -rf "$OUTPUT_DIR"; mkdir -p "$OUTPUT_DIR/2026-07"
+cat > "$OUTPUT_FILE" <<'EOF'
+# Complete Chat Session Export
+**Total Messages:** 1
+
+### Message 1: User
+<!-- uuid: orphan-001 -->
+**Timestamp:** 2026-07-03T09:00:00
+
+**Content:**
+
+orphaned content, source no longer exists
+
+---
+EOF
+EMPTY_PROJECT_DIR="$FAKE_HOME/.claude/projects/-Users-test-empty-project"
+mkdir -p "$EMPTY_PROJECT_DIR"
+NOSOURCE_LOG=$(HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
+  --source claude --output-dir "$OUTPUT_DIR" --date "$DATE" --project=test-empty-project --rebuild 2>&1)
+if echo "$NOSOURCE_LOG" | grep -q "WARNING:.*0 source sessions for $DATE"; then
+  pass "rebuild warns explicitly when source is gone but output file already exists"
+else
+  fail "expected a WARNING about missing source, got: $NOSOURCE_LOG"
+fi
+if grep -q "orphaned content" "$OUTPUT_FILE"; then
+  pass "existing output is left untouched when source is unavailable (not deleted/blanked)"
+else
+  fail "existing output was modified even though no source was found"
+fi
+
 echo ""
 echo "REBUILD-MODE: $PASS passed, $FAIL failed (total: $((PASS + FAIL)))"
 [ $FAIL -eq 0 ] && exit 0 || exit 1
