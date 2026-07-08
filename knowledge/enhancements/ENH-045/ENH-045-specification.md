@@ -1,6 +1,6 @@
 # ENH-045: Codex extractor still has the incremental mtime-skip bug already removed from Claude
 
-**Status:** 🟡 Proposed
+**Status:** ✅ Resolved in v0.6.17
 **Discovered:** 2026-07-08
 **Governed by:** none (bug-fix, not a new command/skill/docstring — ADR-058's naming/scope check does not apply)
 **Related:** `core/scripts/extract_codex.py`, `core/scripts/extract_claude.py` (the sibling fix this mirrors, commit `22c7559d`), [ENH-038](../ENH-038/ENH-038-specification.md) (its Task 14 Codex audit — scope note below), [ENH-043](../ENH-043/ENH-043-specification.md) (the Claude rebuild-mode work this is being folded alongside), branch `v0.6.17-fix-extract-chat-rebuild`, plan `knowledge/plans/v0.6.17-fix-extract-chat-rebuild.md`
@@ -54,6 +54,6 @@ Remove the mtime-skip block from `extract_codex_sessions`, mirroring `22c7559d`'
 
 ## Acceptance Criteria
 
-- [ ] The mtime-skip block is removed from `extract_codex_sessions`.
-- [ ] A test proves an `--incremental` run against a Codex output file modified less than an hour ago still re-extracts (does not silently skip) when new source content exists for that date.
-- [ ] Existing Codex extraction tests (if any) still pass — no regression to non-incremental behavior.
+- [x] The mtime-skip block is removed from `extract_codex_sessions`. Verified via direct read of `extract_codex.py:195` (commit `27a49f26`).
+- [x] A test proves an `--incremental` run against a Codex output file modified less than an hour ago still re-extracts (does not silently skip) when new source content exists for that date. Verified via `tests/test-extraction-codex-incremental.sh` (3/3 pass, commit `97059c99`).
+- [x] Existing Codex extraction tests (if any) still pass — no regression to non-incremental behavior. `tests/test-extraction.sh` (8/8) confirmed no regression.
