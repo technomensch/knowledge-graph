@@ -22,11 +22,16 @@ from chat_extractor_base import get_output_path, format_timestamp, write_markdow
 GEMINI_TMP_DIR = os.path.expanduser("~/.gemini/tmp")
 GEMINI_CONV_DIR = os.path.expanduser("~/.gemini/antigravity/conversations")
 
-def extract_gemini_json_sessions(limit=None):
+def extract_gemini_json_sessions(limit=None, project_filter=None):
     """Returns a list of recent sessions from JSON files."""
     all_json_sessions = []
-    # Recursively find session-*.json files
-    json_files = glob.glob(os.path.join(GEMINI_TMP_DIR, "**", "session-*.json"), recursive=True)
+    project_dirs = glob.glob(os.path.join(GEMINI_TMP_DIR, "*"))
+    if project_filter:
+        project_dirs = [d for d in project_dirs
+                        if project_filter.lower() in os.path.basename(d).lower()]
+    json_files = []
+    for project_dir in project_dirs:
+        json_files.extend(glob.glob(os.path.join(project_dir, "**", "session-*.json"), recursive=True))
     if limit:
         json_files = json_files[:limit]
     
@@ -82,7 +87,7 @@ def extract_gemini_json_sessions(limit=None):
             
     return all_json_sessions
 
-def extract_gemini_stream_sessions(limit=None):
+def extract_gemini_stream_sessions(limit=None, project_filter=None):
     """Returns a list of recent sessions from the post-2026-05-13 streaming
     .jsonl session format (line-delimited: one header line, then per-turn
     events interleaved with {"$set": ...} checkpoint patches). Turns sharing
@@ -92,7 +97,13 @@ def extract_gemini_stream_sessions(limit=None):
     than emitting a blank message.
     """
     all_stream_sessions = []
-    jsonl_files = glob.glob(os.path.join(GEMINI_TMP_DIR, "**", "session-*.jsonl"), recursive=True)
+    project_dirs = glob.glob(os.path.join(GEMINI_TMP_DIR, "*"))
+    if project_filter:
+        project_dirs = [d for d in project_dirs
+                        if project_filter.lower() in os.path.basename(d).lower()]
+    jsonl_files = []
+    for project_dir in project_dirs:
+        jsonl_files.extend(glob.glob(os.path.join(project_dir, "**", "session-*.jsonl"), recursive=True))
     if limit:
         jsonl_files = jsonl_files[:limit]
 
@@ -187,8 +198,17 @@ def extract_gemini_stream_sessions(limit=None):
 
     return all_stream_sessions
 
-def extract_gemini_pb_sessions(limit=None):
-    """Returns a list of archived sessions from Protobuf files using blackboxprotobuf or fallback."""
+def extract_gemini_pb_sessions(limit=None, project_filter=None):
+    """Returns a list of archived sessions from Protobuf files using blackboxprotobuf or fallback.
+
+    project_filter is accepted for signature parity with the .json/.jsonl
+    paths (extract_all_gemini calls all three uniformly) but not yet applied
+    here: .pb files live flat under GEMINI_CONV_DIR with no per-project
+    subdirectory to filter on, unlike GEMINI_TMP_DIR's per-project layout —
+    see ENH-044's Explicitly Out of Scope section. Filtering .pb by project
+    would need a different mechanism (e.g. a field inside the decoded
+    payload), not yet implemented.
+    """
     all_pb_sessions = []
     pb_files = glob.glob(os.path.join(GEMINI_CONV_DIR, "*.pb"))
     if limit:
@@ -282,13 +302,13 @@ def extract_gemini_pb_sessions(limit=None):
 
     return all_pb_sessions
 
-def extract_all_gemini(limit=None, date_filter=None, after_date=None, before_date=None):
+def extract_all_gemini(limit=None, date_filter=None, after_date=None, before_date=None, project_filter=None):
     """Main controller to aggregate all Gemini sessions and write merged daily files."""
     results = []
 
-    json_sessions = extract_gemini_json_sessions(limit=limit)
-    stream_sessions = extract_gemini_stream_sessions(limit=limit)
-    pb_sessions = extract_gemini_pb_sessions(limit=limit)
+    json_sessions = extract_gemini_json_sessions(limit=limit, project_filter=project_filter)
+    stream_sessions = extract_gemini_stream_sessions(limit=limit, project_filter=project_filter)
+    pb_sessions = extract_gemini_pb_sessions(limit=limit, project_filter=project_filter)
 
     from collections import defaultdict
     sessions_by_date = defaultdict(list)

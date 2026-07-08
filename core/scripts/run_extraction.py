@@ -22,6 +22,7 @@ def main():
     parser.add_argument("--project", type=str, default=None, help="Filter to sessions from a specific project (path fragment match against ~/.claude/projects/<name>/)")
     parser.add_argument("--incremental", action="store_true", help="Only extract new sessions (skip if file already exists and is current)")
     parser.add_argument("--rebuild", action="store_true", help="Force overwrite/flatten every date in scope, ignoring existing output state (repairs pre-fix corrupted files — see ENH-043)")
+    parser.add_argument("--claude-projects-dir", type=str, default=None, help="Override the Claude session-log source directory (e.g. a restored backup) instead of ~/.claude/projects — see ENH-043")
 
     args = parser.parse_args()
 
@@ -95,7 +96,8 @@ def main():
             before_date=args.before,
             project_filter=args.project,
             incremental=args.incremental,
-            rebuild=args.rebuild
+            rebuild=args.rebuild,
+            claude_projects_dir=args.claude_projects_dir
         )
         results.extend(claude_res)
         
@@ -105,7 +107,8 @@ def main():
             limit=args.limit,
             date_filter=args.date,
             after_date=args.after,
-            before_date=args.before
+            before_date=args.before,
+            project_filter=args.project
         )
         results.extend(gemini_res)
 
