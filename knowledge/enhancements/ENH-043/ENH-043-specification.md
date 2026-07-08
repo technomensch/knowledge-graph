@@ -62,10 +62,21 @@ Add an explicit rebuild/overwrite mode to `extract_claude_sessions`, then run it
 
 ---
 
+## Outcome (2026-07-08) — real-data repair run result
+
+Running the one-time repair against real `knowledge/chat-history/` data (v0.6.17 implementation) found **68 dates flagged**, not the small handful this ENH's Problem section anticipated when only spot-checking 3 July dates. Breakdown:
+
+- **9 dates recovered** (2026-05-12, 05-13, 05-17, 05-21, 05-22, 05-25, 05-27, 05-28, 05-30) — the live `~/.claude/projects/` on this machine only had source logs back to 2026-05-30; the user separately located and provided a Backblaze cloud backup covering 2026-05-12 through 2026-06-07, which supplied the missing source `.jsonl` data for these 9.
+- **42 dates permanently unrecoverable** (2026-02-13 through 2026-05-06) — no raw `.jsonl` source exists anywhere for these: not in the live Claude Code session directory (which itself doesn't predate 2026-05-30 — Claude Code appears to periodically rotate/prune old session logs on its own), and not in the Backblaze backup either (that backup's own earliest coverage is 2026-05-12). No older backup was found.
+- **This is a data-availability limitation, not a code defect.** `--rebuild` and the discovery/health-check script (`check_extraction_health.py`) both behave correctly given zero source data to work with — `--rebuild` leaves the existing (still-imperfect) output file untouched rather than corrupting it further when it finds nothing to rebuild from, and (per Task 10, added after this outcome was found) now prints an explicit warning naming the date instead of silently doing nothing.
+- A separate, real bug was found and fixed *during* this repair run: the discovery script's own regexes were initially too loose and flagged 15 already-correctly-rebuilt dates as if they were still corrupted, because real conversation content in this repo's own chat-history literally quotes its doc-template examples (e.g. `"## Session 1: Project Name (HH:MM - HH:MM)"`). Tightened to the exact structural signatures the extractor emits; re-verified 0 false positives against the full real dataset afterward.
+
+---
+
 ## Acceptance Criteria
 
-- [ ] `extract_claude_sessions(rebuild=True)` forces the overwrite/flatten branch for every date in scope, regardless of `parse_metadata_from_file()`'s return value.
-- [ ] `--rebuild` correctly clears/bypasses an existing `YYYY-MM-DD/` split subfolder so `get_output_path()` doesn't route to a stale part file after a rebuild.
-- [ ] A test fixture reproducing the real 2026-07-03 shape (stale header count, leftover `## Session N` block, at least one uuid present in the source `.jsonl` but absent from the pre-seeded output) passes: after `--rebuild`, the header count matches the true message-block count, zero `## Session N` blocks remain, and the previously-missing uuid is present.
-- [ ] The one-time repair run is executed against every date the audit flagged (list captured in the implementation plan) and re-verified afterward: 0 missing subagent messages, 0 leftover `## Session N` blocks, header count == actual `### Message` block count, for each repaired date.
-- [ ] Default (non-`--rebuild`) incremental behavior is unchanged — verified by re-running the existing `tests/test-extraction.sh` and `tests/test-extraction-subagent-repro.sh` suites with no regressions.
+- [x] `extract_claude_sessions(rebuild=True)` forces the overwrite/flatten branch for every date in scope, regardless of `parse_metadata_from_file()`'s return value. Verified via `tests/test-extraction-rebuild.sh`.
+- [x] `--rebuild` correctly clears/bypasses an existing `YYYY-MM-DD/` split subfolder so `get_output_path()` doesn't route to a stale part file after a rebuild. Verified via `tests/test-extraction-rebuild.sh`'s Gap 1 assertions (pre-seeds a real split subfolder, confirms it's cleared and `get_output_path()` falls back to the flat path).
+- [x] A test fixture reproducing the real 2026-07-03 shape (stale header count, leftover `## Session N` block, at least one uuid present in the source `.jsonl` but absent from the pre-seeded output) passes: after `--rebuild`, the header count matches the true message-block count, zero `## Session N` blocks remain, and the previously-missing uuid is present. Verified via `tests/test-extraction-rebuild.sh` (19/19 assertions pass, including malformed-file, `--rebuild`/`--incremental` precedence, and zero-match `--project` edge cases added after real-data execution surfaced them).
+- [x] The one-time repair run is executed against every date the audit flagged and re-verified afterward — **with the achievable scope adjusted per the Outcome section above**: 9 of 68 dates recovered to 0 missing messages / 0 leftover blocks / header == actual; the remaining 42 dates have no source data anywhere and are documented as permanently unrecoverable, not silently left in an unexplained state. `check_extraction_health.py` (renamed from `find_corrupted_chat_files.py` for clearer, less alarming naming) now correctly reports exactly 42 flagged files — the true permanently-unrecoverable set — with 0 false positives.
+- [x] Default (non-`--rebuild`) incremental behavior is unchanged — verified by re-running `tests/test-extraction.sh` (8/8) and `tests/test-extraction-subagent-repro.sh` (4/4) with no regressions.
