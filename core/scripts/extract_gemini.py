@@ -6,6 +6,7 @@ import os
 import json
 import glob
 import re
+import time
 from datetime import datetime
 try:
     import blackboxprotobuf
@@ -198,6 +199,49 @@ def extract_gemini_stream_sessions(limit=None, project_filter=None):
 
     return all_stream_sessions
 
+def _find_epoch_hint(obj, now=None):
+    """Heuristically searches a schemaless-decoded protobuf structure (a
+    dict/list tree from blackboxprotobuf.decode_message) for a plausible
+    Unix-epoch timestamp, so a .pb session's date can be derived from its own
+    content instead of the file's mtime.
+
+    File mtime is unreliable whenever the .pb file has been copied, moved, or
+    restored from a backup after the conversation actually happened -- the OS
+    updates mtime to the copy/restore time, silently mis-dating real content
+    (ENH-046). There is no .proto schema available for these files (decoded
+    schemaless via blackboxprotobuf), so this can't identify a specific
+    "timestamp" field by name -- it looks for any integer value that plausibly
+    represents an epoch (seconds or milliseconds) within roughly the last 10
+    years, the same best-effort heuristic style already used by
+    find_content_strings() in this file for message text. Returns the
+    earliest plausible value found (a session's start time is a safer choice
+    than a later "last updated" field also present in the same structure), or
+    None if nothing plausible is found -- callers should fall back to mtime.
+    """
+    if now is None:
+        now = time.time()
+    window_start = now - (10 * 365 * 86400)
+    window_end = now + 86400  # small forward slack for clock skew
+    candidates = []
+
+    def walk(o):
+        if isinstance(o, dict):
+            for v in o.values():
+                walk(v)
+        elif isinstance(o, list):
+            for item in o:
+                walk(item)
+        elif isinstance(o, bool):
+            return  # bool is an int subclass in Python; not a timestamp
+        elif isinstance(o, int):
+            if window_start < o < window_end:
+                candidates.append(float(o))
+            elif window_start < (o / 1000) < window_end:
+                candidates.append(o / 1000)
+
+    walk(obj)
+    return min(candidates) if candidates else None
+
 def extract_gemini_pb_sessions(limit=None, project_filter=None):
     """Returns a list of archived sessions from Protobuf files using blackboxprotobuf or fallback.
 
@@ -217,12 +261,16 @@ def extract_gemini_pb_sessions(limit=None, project_filter=None):
     
     for pb_path in pb_files:
         try:
-            # Get file mod time
+            # File mtime is the last-resort date source -- unreliable
+            # whenever this .pb file has been copied, moved, or restored
+            # from a backup after the conversation happened (ENH-046). Used
+            # only if no plausible timestamp can be found inside the decoded
+            # content itself, below.
             mtime = os.path.getmtime(pb_path)
             dt_mtime = datetime.fromtimestamp(mtime)
             file_date = dt_mtime.strftime("%Y-%m-%d")
             file_ts_str = dt_mtime.strftime("%H%M%S")
-            
+
             # Try to decode with blackboxprotobuf first
             try:
                 if HAS_BBP:
@@ -257,10 +305,21 @@ def extract_gemini_pb_sessions(limit=None, project_filter=None):
 
                     decoded_segments = find_content_strings(message)
                     if decoded_segments:
-                        # Success with BBP
+                        # Prefer a timestamp found inside the decoded content
+                        # over file mtime -- mtime reflects when this .pb
+                        # file was last touched on disk (copy/restore/sync),
+                        # not when the conversation happened (ENH-046).
+                        epoch_hint = _find_epoch_hint(message)
+                        if epoch_hint is not None:
+                            dt_content = datetime.fromtimestamp(epoch_hint)
+                            entry_date = dt_content.strftime("%Y-%m-%d")
+                            entry_ts = dt_content.strftime("%H%M%S")
+                        else:
+                            entry_date = file_date
+                            entry_ts = file_ts_str
                         all_pb_sessions.append({
-                            'date': file_date,
-                            'ts': file_ts_str,
+                            'date': entry_date,
+                            'ts': entry_ts,
                             'segments': decoded_segments,
                             'count': len(decoded_segments),
                             'method': 'Gemini (Protobuf Decode)'
