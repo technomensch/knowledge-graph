@@ -120,8 +120,8 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 
 ### Fixes
 
-- 🔲 **ENH-043**: `kmg-extract-chat`'s v0.6.16 uuid-dedup fix can't retroactively repair chat-history files the pre-fix code already wrote (486 of 2,801 extractable subagent messages missing across full project history, 96% task-dispatch prompts). Adds `--rebuild` to force a clean overwrite/flatten pass, then a one-time repair run against every affected date. Spec: `knowledge/enhancements/ENH-043/ENH-043-specification.md`. Plan: `knowledge/plans/v0.6.17-fix-extract-chat-rebuild.md`.
-- 🔲 **ENH-044**: Gemini extractor has no project-scoping — `--project` silently ignored, merging unrelated projects' sessions into the active project's output. Adds `project_filter` support mirroring the Claude extractor's existing pattern. Spec: `knowledge/enhancements/ENH-044/ENH-044-specification.md`.
+- ✅ **ENH-043** (now tracked under umbrella [ENH-038](knowledge/enhancements/ENH-038/ENH-038-specification.md)): `kmg-extract-chat`'s v0.6.16 uuid-dedup fix can't retroactively repair chat-history files the pre-fix code already wrote (486 of 2,801 extractable subagent messages missing across full project history, 96% task-dispatch prompts). Added `--rebuild` to force a clean overwrite/flatten pass, then ran a one-time repair (9 of 68 flagged dates recovered, 42 permanently unrecoverable — no source data). Spec: `knowledge/issues/chat-extraction-reliability-saga/attempts/ENH-043/specification.md`. Plan: `knowledge/plans/v0.6.17-fix-extract-chat-rebuild.md`.
+- 🔲 **ENH-044** (now tracked under umbrella [ENH-038](knowledge/enhancements/ENH-038/ENH-038-specification.md)): Gemini extractor has no project-scoping — `--project` silently ignored, merging unrelated projects' sessions into the active project's output. Adds `project_filter` support mirroring the Claude extractor's existing pattern. Spec: `knowledge/issues/chat-extraction-reliability-saga/attempts/ENH-044/specification.md`.
 
 ---
 

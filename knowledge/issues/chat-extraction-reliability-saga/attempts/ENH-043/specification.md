@@ -3,7 +3,7 @@
 **Status:** 🟡 Proposed
 **Discovered:** 2026-07-06
 **Governed by:** none (bug-fix, not a new command/skill/docstring — ADR-058's naming/scope check does not apply)
-**Related:** `core/scripts/extract_claude.py`, `core/scripts/chat_extractor_base.py`, [ENH-038](../ENH-038/ENH-038-specification.md) (the original message-loss finding this ENH's fix built on), branch `v0.6.16-update-claude-extract-chat-for-sub-agents` (merged, PR #160), plan `knowledge/plans/v0.6.16-fix-extract-chat-subagents.md`
+**Related:** `core/scripts/extract_claude.py`, `core/scripts/chat_extractor_base.py`, [ENH-038](../ENH-038/specification.md) (the original message-loss finding this ENH's fix built on), branch `v0.6.16-update-claude-extract-chat-for-sub-agents` (merged, PR #160), plan `knowledge/plans/v0.6.16-fix-extract-chat-subagents.md`
 
 ---
 

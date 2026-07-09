@@ -3,7 +3,7 @@
 **Status:** 🟡 Proposed
 **Discovered:** 2026-07-06
 **Governed by:** none (bug-fix, not a new command/skill/docstring — ADR-058's naming/scope check does not apply)
-**Related:** `core/scripts/extract_gemini.py`, `core/scripts/run_extraction.py`, [ENH-038](../ENH-038/ENH-038-specification.md) (the Gemini `.jsonl` streaming-format fix this bug was found while validating — that fix does work correctly, this is a separate, distinct defect), branch `v0.6.16-update-claude-extract-chat-for-sub-agents` (already merged), plan `knowledge/plans/v0.6.17-fix-extract-chat-rebuild.md` (this ENH's fix is being folded into that in-progress plan as an additional task, per explicit user instruction, rather than its own branch)
+**Related:** `core/scripts/extract_gemini.py`, `core/scripts/run_extraction.py`, [ENH-038](../ENH-038/specification.md) (the Gemini `.jsonl` streaming-format fix this bug was found while validating — that fix does work correctly, this is a separate, distinct defect), branch `v0.6.16-update-claude-extract-chat-for-sub-agents` (already merged), plan `knowledge/plans/v0.6.17-fix-extract-chat-rebuild.md` (this ENH's fix is being folded into that in-progress plan as an additional task, per explicit user instruction, rather than its own branch)
 
 ---
 

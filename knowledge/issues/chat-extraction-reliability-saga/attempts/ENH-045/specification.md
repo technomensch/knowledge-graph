@@ -3,7 +3,7 @@
 **Status:** ✅ Resolved in v0.6.17
 **Discovered:** 2026-07-08
 **Governed by:** none (bug-fix, not a new command/skill/docstring — ADR-058's naming/scope check does not apply)
-**Related:** `core/scripts/extract_codex.py`, `core/scripts/extract_claude.py` (the sibling fix this mirrors, commit `22c7559d`), [ENH-038](../ENH-038/ENH-038-specification.md) (its Task 14 Codex audit — scope note below), [ENH-043](../ENH-043/ENH-043-specification.md) (the Claude rebuild-mode work this is being folded alongside), branch `v0.6.17-fix-extract-chat-rebuild`, plan `knowledge/plans/v0.6.17-fix-extract-chat-rebuild.md`
+**Related:** `core/scripts/extract_codex.py`, `core/scripts/extract_claude.py` (the sibling fix this mirrors, commit `22c7559d`), [ENH-038](../ENH-038/specification.md) (its Task 14 Codex audit — scope note below), [ENH-043](../ENH-043/specification.md) (the Claude rebuild-mode work this is being folded alongside), branch `v0.6.17-fix-extract-chat-rebuild`, plan `knowledge/plans/v0.6.17-fix-extract-chat-rebuild.md`
 
 ---
 

@@ -3,7 +3,7 @@
 **Status:** ✅ Resolved in v0.6.17
 **Discovered:** 2026-07-08
 **Governed by:** none (bug-fix, not a new command/skill/docstring — ADR-058's naming/scope check does not apply)
-**Related:** `core/scripts/extract_gemini.py`, [ENH-044](../ENH-044/ENH-044-specification.md) (same file/subsystem, different bug — project-scoping vs. this ENH's date-derivation reliability), [ENH-043](../ENH-043/ENH-043-specification.md) (this session's sibling extraction-pipeline hardening work), branch `v0.6.17-fix-extract-chat-rebuild`, plan `knowledge/plans/v0.6.17-fix-extract-chat-rebuild.md`
+**Related:** `core/scripts/extract_gemini.py`, [ENH-044](../ENH-044/specification.md) (same file/subsystem, different bug — project-scoping vs. this ENH's date-derivation reliability), [ENH-043](../ENH-043/specification.md) (this session's sibling extraction-pipeline hardening work), branch `v0.6.17-fix-extract-chat-rebuild`, plan `knowledge/plans/v0.6.17-fix-extract-chat-rebuild.md`
 
 ---
 

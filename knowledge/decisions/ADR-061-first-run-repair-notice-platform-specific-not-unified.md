@@ -15,9 +15,10 @@ related:
   adrs: []
   lessons: []
   kg_entries:
-    - knowledge/enhancements/ENH-043/ENH-043-specification.md
-    - knowledge/enhancements/ENH-044/ENH-044-specification.md
-    - knowledge/enhancements/ENH-045/ENH-045-specification.md
+    - knowledge/enhancements/ENH-038/ENH-038-specification.md
+    - knowledge/issues/chat-extraction-reliability-saga/attempts/ENH-043/specification.md
+    - knowledge/issues/chat-extraction-reliability-saga/attempts/ENH-044/specification.md
+    - knowledge/issues/chat-extraction-reliability-saga/attempts/ENH-045/specification.md
 tags: [ux-design, extraction, backup-recovery, error-recovery, v0.6.17]
 category: architecture
 ---
