@@ -78,18 +78,19 @@ Fix ENH-047 (per-message date derivation); re-baseline extraction; revisit Attem
 
 ## Attempt 005: Gemini `--project` filter silently ignored (v0.6.17, ENH-044)
 
-**Status:** Not started (Proposed)
+**Status:** Completed (shipped) — mislabeled "Not started" here until 2026-07-09, when drafting the ENH-047 fix plan found it was already implemented and committed; corrected.
 **ENH:** [ENH-038 umbrella](../../enhancements/ENH-038/ENH-038-specification.md) / [full spec](attempts/ENH-044/specification.md)
 **Discovered:** 2026-07-06, while manually validating ENH-038's Gemini `.jsonl` fix
+**Related:** commit `bf1cb51c` (fix), `1b2269cf` (test)
 
-**Approach (proposed, not yet implemented):**
-Add a `project_filter` param to all three Gemini per-format extraction functions and thread it through `extract_all_gemini`/`run_extraction.py`, mirroring the Claude extractor's existing fragment-match pattern.
+**Approach:**
+Added a `project_filter` param to all three Gemini per-format extraction functions and threaded it through `extract_all_gemini`/`run_extraction.py`, mirroring the Claude extractor's existing fragment-match pattern.
 
 **Outcome:**
-Confirmed real contamination: a `career-prism` session merged into `knowledge-graph`'s `2026-05-13-gemini.md` output despite `--project=knowledge-graph` being passed; four foreign date-files created with no knowledge-graph content at all. Fix not yet shipped.
+Confirmed real contamination pre-fix: a `career-prism` session merged into `knowledge-graph`'s `2026-05-13-gemini.md` output despite `--project=knowledge-graph` being passed; four foreign date-files created with no knowledge-graph content at all. Fixed and tested (`tests/test-extraction-gemini-project-filter.sh`); only the spec's own status line/acceptance criteria were never flipped to match — closeout folded into the ENH-047 fix plan.
 
 **Key Learning:**
-Gemini's extractor had no project-scoping step at all — unlike Claude, which already filtered project directories by fragment match before globbing.
+Gemini's extractor had no project-scoping step at all — unlike Claude, which already filtered project directories by fragment match before globbing. Separately: a shipped fix's own spec can silently go stale (status left at "Proposed" after the code landed) — worth a status-line check whenever revisiting an ENH during later work, not just trusting the doc.
 
 ---
 
@@ -131,12 +132,12 @@ Backup/restore scenarios (mtime changes on copy) are a recurring class of date-d
 ## Statistics
 
 **By Outcome:**
-- Completed & Successful: 3 (ENH-038, ENH-045, ENH-046)
+- Completed & Successful: 4 (ENH-038, ENH-044, ENH-045, ENH-046)
 - In Progress: 1 (ENH-043)
-- Not Started: 1 (ENH-044)
+- Not Started: 0
 - Completed & Failed (root-caused, led to further work): 2 (dogfooding Attempts 3 & 4)
 - Abandoned: 0
-- **Unfixed, open:** ENH-044, ENH-047
+- **Unfixed, open:** ENH-047 (ENH-044 is shipped; only its spec closeout is open)
 
 ---
 

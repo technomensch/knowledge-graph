@@ -26,9 +26,9 @@
 Extraction of Claude Code chat history into `knowledge/chat-history/` keeps losing or misfiling messages. What began (in v0.6.16) as a subagent message-loss bug has, across several sessions, turned out to be a cluster of independent defects in the extraction pipeline rather than a single fault — culminating (v0.6.17, dogfooding) in the discovery that a whole session `.jsonl` is date-bucketed by its first message's timestamp, so any session spanning multiple calendar days misfiles its later-day content under the start date.
 
 **Current Status:**
-- **Attempts:** 4 investigative rounds logged (see implementation-log.md)
-- **Latest Understanding:** Root cause of the newest symptom = first-timestamp-only date derivation in `extract_claude_sessions()` (ENH-047), distinct from the incremental-append/rebuild defect (ENH-043) and the subagent-loss defect (ENH-038).
-- **Next Steps:** Fix ENH-047 date-bucketing; re-baseline extraction; revisit Attempt-1's "wrong session captured" symptom once bucketing is corrected.
+- **Attempts:** 7 rounds logged (see implementation-log.md)
+- **Latest Understanding:** Root cause of the newest symptom = first-timestamp-only date derivation in `extract_claude_sessions()` (ENH-047), distinct from the incremental-append/rebuild defect (ENH-043) and the subagent-loss defect (ENH-038). ENH-044 (Gemini project-scoping) is already implemented and tested, not outstanding — only its spec closeout remains.
+- **Next Steps:** Fix ENH-047 date-bucketing (plan: `~/.claude/plans/v0.6.17-fix-extract-chat-multiday-bucketing.md`); close out ENH-044's spec alongside it; re-baseline extraction; revisit Attempt-1's "wrong session captured" symptom once bucketing is corrected.
 
 ---
 
@@ -40,7 +40,7 @@ Full detail for each: [implementation-log.md](implementation-log.md). Original p
 2. **ENH-043 (v0.6.17)** — In progress — rebuild mode for permanently-corrupted pre-fix output (Claude); real-data repair run found 68 flagged dates (9 recovered / 42 unrecoverable / rest false-positives from over-loose regex, since tightened).
 3. **Dogfooding Attempt 1 (2026-07-08)** — Failed — `--today` extraction captured an unrelated short session; message #1 content was not from today's real conversation.
 4. **Dogfooding Attempt 2 (2026-07-08)** — Failed, root-caused → **ENH-047** — `--today` returned 36 of 3,114 real messages; multi-day session bucketing defect confirmed with real data (Claude). Unfixed.
-5. **ENH-044 (v0.6.17)** — Not started — Gemini `--project` filter silently ignored; confirmed real cross-project contamination. Unfixed.
+5. **ENH-044 (v0.6.17)** — Implemented & tested (`bf1cb51c` fix, `1b2269cf` test) — Gemini `--project` filter silently ignored; confirmed real cross-project contamination. Fix shipped; spec status/ACs never flipped (found stale 2026-07-09 while drafting the ENH-047 fix plan) — closeout only, folded into that plan.
 6. **ENH-045 (v0.6.17)** — Fixed — Codex incremental mtime-skip bug, mirrored from the Claude fix in ENH-038.
 7. **ENH-046 (v0.6.17)** — Fixed — Gemini `.pb` sessions dated by file mtime instead of content; `_find_epoch_hint()` heuristic added.
 
@@ -68,7 +68,7 @@ The umbrella requirement: `kmg-extract-chat` must extract every real message, un
 
 - Two dogfooding extraction runs on real 2026-07-08 data both failed to return expected message counts (Attempts 3 & 4 in implementation-log.md) — these failures are what surfaced ENH-047.
 - ENH-043's repair could not recover 42 of 68 flagged historical dates — not a code failure, a data-availability limit (source logs no longer exist anywhere, including the located backup).
-- ENH-044 and ENH-047 fixes have not been attempted yet (proposed, not implemented).
+- ENH-047's fix has not been attempted yet (proposed, not implemented). (ENH-044 *is* implemented — see correction above; this file previously said otherwise.)
 
 ## Why the Second Fix Attempt (ENH-043) Didn't Fully Solve Reliability
 
@@ -80,13 +80,13 @@ So: ENH-043 succeeded at its own, narrower scope; the saga's *overall* reliabili
 
 ## Outstanding
 
-- **ENH-044** (Gemini cross-project contamination) — not started.
 - **ENH-047** (Claude multi-day date-bucketing) — root-caused, not fixed. This is the highest-impact open item — it silently hides the majority of a multi-day session's messages from any date-filtered extraction.
+- **ENH-044 spec closeout** (not a code fix — the fix already shipped; only the spec's status line/acceptance criteria and one documentation gap, the hashed-directory-name limitation, remain).
 - **Dogfooding Attempt 1's "wrong session captured" symptom** — noted, not yet root-caused; revisit once ENH-047 ships and extraction is re-baselined.
 
 ## Revert or Continue?
 
-**Continue — no revert warranted.** Every shipped fix (ENH-038, 043, 045, 046) is additive, independently tested, and verified against real data with no known regression; nothing shipped is making extraction worse than before this saga started. The open items (ENH-044, ENH-047) are unimplemented proposals, not bad commits — there is nothing to roll back. Recommended path: implement ENH-047 first (highest impact, root-caused, straightforward per-message fix), then ENH-044, then re-run dogfooding to check whether Attempt 1's "wrong session" symptom persists.
+**Continue — no revert warranted.** Every shipped fix (ENH-038, 043, 044, 045, 046) is additive, independently tested, and verified against real data with no known regression; nothing shipped is making extraction worse than before this saga started. The only unimplemented proposal is ENH-047 — nothing to roll back there either. Recommended path: implement ENH-047 (highest impact, root-caused, straightforward per-message fix), close out ENH-044's spec/status alongside it, then re-run dogfooding to check whether Attempt 1's "wrong session" symptom persists. See `~/.claude/plans/v0.6.17-fix-extract-chat-multiday-bucketing.md` for the plan covering both.
 
 ---
 
@@ -114,7 +114,7 @@ See [related-issues/github-links.md](related-issues/github-links.md).
 - [ENH-038 umbrella](../../enhancements/ENH-038/ENH-038-specification.md) — single tracking ENH for this whole feature area (was 6 numbers, consolidated 2026-07-09)
 - [attempts/ENH-038/specification.md](attempts/ENH-038/specification.md) — original subagent message-loss + Gemini format-drift + Codex audit
 - [attempts/ENH-043/specification.md](attempts/ENH-043/specification.md) — rebuild mode / incremental-append dedup permanence
-- [attempts/ENH-044/specification.md](attempts/ENH-044/specification.md) — Gemini `project_filter` contamination fix (unfixed)
+- [attempts/ENH-044/specification.md](attempts/ENH-044/specification.md) — Gemini `project_filter` contamination fix (implemented & tested, `bf1cb51c`/`1b2269cf`; spec closeout pending)
 - [attempts/ENH-045/specification.md](attempts/ENH-045/specification.md) — Codex incremental mtime-skip fix
 - [attempts/ENH-046/specification.md](attempts/ENH-046/specification.md) — Gemini `.pb` date-derivation defect
 - [attempts/ENH-047/specification.md](attempts/ENH-047/specification.md) — multi-day date-bucketing defect (unfixed)

@@ -21,7 +21,7 @@ Going forward, any new defect found in chat-history extraction (Claude, Gemini, 
 |---|---|---|---|
 | Subagent message loss + Gemini format-drift + Codex audit | Claude / Gemini / Codex | ✅ Fixed (v0.6.16) | [attempts/ENH-038/specification.md](../../issues/chat-extraction-reliability-saga/attempts/ENH-038/specification.md) |
 | No rebuild mode; pre-fix output stays permanently corrupted | Claude | ✅ Fixed (v0.6.17); 9/68 flagged dates recovered, 42 permanently unrecoverable (no source data) | [attempts/ENH-043/specification.md](../../issues/chat-extraction-reliability-saga/attempts/ENH-043/specification.md) |
-| `--project` filter silently ignored, cross-project contamination | Gemini | 🟡 Proposed | [attempts/ENH-044/specification.md](../../issues/chat-extraction-reliability-saga/attempts/ENH-044/specification.md) |
+| `--project` filter silently ignored, cross-project contamination | Gemini | ✅ Implemented & tested (`bf1cb51c`/`1b2269cf`); spec-closeout pending | [attempts/ENH-044/specification.md](../../issues/chat-extraction-reliability-saga/attempts/ENH-044/specification.md) |
 | Incremental mtime-skip bug (never ported from Claude's fix) | Codex | ✅ Fixed (v0.6.17) | [attempts/ENH-045/specification.md](../../issues/chat-extraction-reliability-saga/attempts/ENH-045/specification.md) |
 | `.pb` sessions dated by file mtime, not content | Gemini | ✅ Fixed (v0.6.17) | [attempts/ENH-046/specification.md](../../issues/chat-extraction-reliability-saga/attempts/ENH-046/specification.md) |
 | Whole session file dated by first message; multi-day sessions misfile | Claude | 🟡 Proposed, unfixed | [attempts/ENH-047/specification.md](../../issues/chat-extraction-reliability-saga/attempts/ENH-047/specification.md) |
@@ -30,7 +30,8 @@ Going forward, any new defect found in chat-history extraction (Claude, Gemini, 
 
 ## Outstanding Work
 
-- ENH-044 (Gemini project-scoping) and ENH-047 (Claude multi-day bucketing) remain unfixed — see their linked specs for full Proposed Behavior / Acceptance Criteria.
+- ENH-047 (Claude multi-day bucketing) remains unfixed — see its linked spec for full Proposed Behavior / Acceptance Criteria.
+- ENH-044 (Gemini project-scoping) is implemented and tested (`bf1cb51c`/`1b2269cf`) but its spec's status line/acceptance criteria were never flipped — closeout only, not re-implementation.
 - Once both ship, re-baseline extraction and revisit the still-unresolved "wrong session captured" symptom noted in the meta-issue's Attempt 003.
 
 ---

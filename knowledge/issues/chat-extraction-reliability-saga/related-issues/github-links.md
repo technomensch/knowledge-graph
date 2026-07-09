@@ -24,7 +24,7 @@ All six bugs below are tracked under one umbrella: [ENH-038](../../../enhancemen
 
 ### ENH-044: Gemini `--project` filter silently ignored
 - **File:** [../attempts/ENH-044/specification.md](../attempts/ENH-044/specification.md)
-- **Relationship:** Cross-project contamination — confirmed real (`career-prism` merged into `knowledge-graph` output). **Unfixed.**
+- **Relationship:** Cross-project contamination — confirmed real (`career-prism` merged into `knowledge-graph` output). **Implemented & tested** (`bf1cb51c`/`1b2269cf`); spec status/ACs were left stale until 2026-07-09, closeout folded into the ENH-047 fix plan.
 - **Attempts Referenced:** Attempt 005.
 
 ### ENH-045: Codex incremental mtime-skip bug
@@ -68,5 +68,5 @@ All six bugs below are tracked under one umbrella: [ENH-038](../../../enhancemen
 
 ## Continuous Tracking
 
-- Update this file when a PR opens for the ENH-044 or ENH-047 fix (both still unfixed).
+- Update this file when a PR opens for the ENH-047 fix (ENH-044 is already shipped, closeout only).
 - Keep the per-bug status table in [ENH-038's spec](../../../enhancements/ENH-038/ENH-038-specification.md) in sync with these files.
