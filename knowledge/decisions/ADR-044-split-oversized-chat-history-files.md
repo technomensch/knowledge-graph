@@ -149,6 +149,10 @@ When a daily output file exceeds **900 KB** or **30,000 lines**, automatically s
 
 - **[[ADR-043-pretooluse-hook-injection-superpowers-rule-enforcement]]:** Hook enforcement context for same branch
 
+## Related Work (Added Later)
+
+- **[Chat-Extraction Reliability Saga](../issues/chat-extraction-reliability-saga/README.md)** (2026-07): this ADR's split-file mechanism (`get_output_path()`, `split_file_if_oversized()`) had to be made compatible with ENH-038's uuid-dedup fix (dedup was scanning only the last split part, not all of them). ENH-047 (multi-day date-bucketing, unfixed as of 2026-07-09) must also be verified against a split-day fixture for the same reason.
+
 ---
 
 **Decision Made:** 2026-04-23

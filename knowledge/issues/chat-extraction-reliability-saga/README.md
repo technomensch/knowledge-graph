@@ -118,6 +118,7 @@ See [related-issues/github-links.md](related-issues/github-links.md).
 - [attempts/ENH-045/specification.md](attempts/ENH-045/specification.md) — Codex incremental mtime-skip fix
 - [attempts/ENH-046/specification.md](attempts/ENH-046/specification.md) — Gemini `.pb` date-derivation defect
 - [attempts/ENH-047/specification.md](attempts/ENH-047/specification.md) — multi-day date-bucketing defect (unfixed)
+- [ADR-044](../../decisions/ADR-044-split-oversized-chat-history-files.md) — **pre-existing spec, predates this saga (2026-04-23).** Governs when/how a daily output file gets split into `-part1.md`/`-part2.md`/… (900 KB / 30,000-line threshold, for Obsidian compatibility). ENH-038's fix had to be made compatible with this (uuid-dedup must union across all split parts, not just the last one). ENH-047's still-unfixed fan-out-by-date fix must also stay compatible with it — see the compatibility note in its spec.
 - [ADR-061](../../decisions/ADR-061-first-run-repair-notice-platform-specific-not-unified.md) — platform-specific first-run notice design decision (same branch — see "Related Design Work" above)
 
 ---

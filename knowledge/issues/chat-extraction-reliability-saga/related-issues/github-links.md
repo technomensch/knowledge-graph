@@ -42,6 +42,12 @@ All six bugs below are tracked under one umbrella: [ENH-038](../../../enhancemen
 - **Relationship:** Newest and most impactful defect in this saga — whole session file dated by its first message. **Unfixed.**
 - **Attempts Referenced:** Attempt 004.
 
+## Pre-Existing Specs (Predate This Saga)
+
+### ADR-044: Split oversized daily chat-history files (2026-04-23)
+- **File:** [../../../decisions/ADR-044-split-oversized-chat-history-files.md](../../../decisions/ADR-044-split-oversized-chat-history-files.md)
+- **Relationship:** Original spec for when/how a daily output file gets split into `-part1.md`/`-part2.md`/… (900 KB / 30,000-line threshold). Not part of this saga's bug list, but every fix here that touches `chat_extractor_base.py`'s output-path/dedup logic must stay compatible with it. ENH-038 found and fixed an incompatibility (dedup scanning only the last split part); ENH-047 (still unfixed) must be verified against a split-day fixture for the same reason.
+
 ---
 
 ## Pull Requests
