@@ -46,6 +46,50 @@ Full detail for each: [implementation-log.md](implementation-log.md). Original p
 
 ---
 
+## Requirements
+
+The umbrella requirement: `kmg-extract-chat` must extract every real message, under its correct date, for every source (Claude/Gemini/Codex), with no silent loss. Per-bug requirements (full acceptance criteria) live in each spec under `attempts/ENH-0NN/specification.md`:
+
+| Bug | Requirement |
+|---|---|
+| ENH-038 | No subagent message loss; correct chronological interleaving; Gemini parses its streaming format; Codex verified clean |
+| ENH-043 | A rebuild mode must exist and successfully repair pre-fix-corrupted output |
+| ENH-044 | `--project` must actually scope Gemini output — no cross-project contamination |
+| ENH-045 | Codex incremental mode must not silently skip runs based on file age |
+| ENH-046 | Gemini `.pb` sessions must date from content, not file mtime (backup/restore safe) |
+| ENH-047 | Every message must file under its **own** date, even in sessions spanning multiple days |
+
+## What Has Worked
+
+- ENH-038, ENH-045, ENH-046 — shipped, tested, verified against real data. No known regressions.
+- ENH-043 — the rebuild mechanism itself works correctly; real-data run recovered 9 of 68 flagged dates.
+
+## What Has Failed
+
+- Two dogfooding extraction runs on real 2026-07-08 data both failed to return expected message counts (Attempts 3 & 4 in implementation-log.md) — these failures are what surfaced ENH-047.
+- ENH-043's repair could not recover 42 of 68 flagged historical dates — not a code failure, a data-availability limit (source logs no longer exist anywhere, including the located backup).
+- ENH-044 and ENH-047 fixes have not been attempted yet (proposed, not implemented).
+
+## Why the Second Fix Attempt (ENH-043) Didn't Fully Solve Reliability
+
+ENH-043 (the rebuild mode) was the second fix in this saga, built directly on ENH-038. It did what it set out to do — force a clean re-flatten of corrupted output — and worked as designed. It did **not**, however, fully solve "extraction is reliable," for two reasons discovered only after it shipped:
+1. **A different, upstream bug (ENH-047) was still live.** ENH-043 fixes how already-written output gets repaired; it does nothing for the date a message is filed under in the first place. Dogfooding after ENH-043 shipped still returned only 36 of 3,114 real messages, because ENH-047's bucketing bug determines the date before ENH-043's logic ever runs.
+2. **Historical repair has a hard ceiling.** 42 of 68 corrupted dates have no source data left on any machine or backup — no fix, however correct, can recover data that no longer exists anywhere.
+
+So: ENH-043 succeeded at its own, narrower scope; the saga's *overall* reliability goal remained unmet because a second, independent defect (ENH-047) sat upstream of it, undiscovered until real-world dogfooding.
+
+## Outstanding
+
+- **ENH-044** (Gemini cross-project contamination) — not started.
+- **ENH-047** (Claude multi-day date-bucketing) — root-caused, not fixed. This is the highest-impact open item — it silently hides the majority of a multi-day session's messages from any date-filtered extraction.
+- **Dogfooding Attempt 1's "wrong session captured" symptom** — noted, not yet root-caused; revisit once ENH-047 ships and extraction is re-baselined.
+
+## Revert or Continue?
+
+**Continue — no revert warranted.** Every shipped fix (ENH-038, 043, 045, 046) is additive, independently tested, and verified against real data with no known regression; nothing shipped is making extraction worse than before this saga started. The open items (ENH-044, ENH-047) are unimplemented proposals, not bad commits — there is nothing to roll back. Recommended path: implement ENH-047 first (highest impact, root-caused, straightforward per-message fix), then ENH-044, then re-run dogfooding to check whether Attempt 1's "wrong session" symptom persists.
+
+---
+
 ## Key Insights
 
 - Different symptoms ("messages missing," "wrong session," "only 36 of 3,114") map to **different root causes** in the same subsystem — do not assume one fix covers all.
