@@ -139,4 +139,4 @@ Given the asymmetry above, the fix must optimize for "never leak foreign content
 
 **Decision Made:** 2026-07-10
 **Last Updated:** 2026-07-10
-**Status:** Accepted — pending user "Proceed" before Task 6 implementation
+**Status:** Accepted — implemented (`126d98ce`), tested (`faa393d6`), verified against real data
