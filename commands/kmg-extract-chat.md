@@ -82,6 +82,8 @@ The workflow runs the centralized Python extraction script located at `${CLAUDE_
 - Requires `blackboxprotobuf` library (optional)
 - Falls back to JSON-only if protobuf library not installed
 
+**`--project` scoping and `.pb`/hash-named directories (fail-closed, ADR-062):** `.pb` files under `~/.gemini/antigravity/conversations/` carry no per-project path — nothing can positively attribute one to a project. Hash-named directories under `~/.gemini/tmp/` (opaque names matching `^[0-9a-f]{16,}$`) can't fragment-match a human-readable `--project` string either. So whenever `--project=<name>` is set, **all** `.pb` sessions and **all** hash-named-directory sessions are excluded from output — never leaked in as unattributed guesses — with a visible skip notice (count + reason) printed every time, never silently. Unscoped extraction (no `--project`) is unaffected and includes everything as before. See [ADR-062](../knowledge/decisions/ADR-062-gemini-pb-project-scoping-fail-closed.md).
+
 ### Codex CLI Extraction
 
 1. **Scans:** `~/.codex/sessions/YYYY/MM/DD/` for `rollout-*.jsonl` files

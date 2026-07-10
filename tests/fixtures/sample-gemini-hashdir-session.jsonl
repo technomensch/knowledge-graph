@@ -1,0 +1,3 @@
+{"sessionId":"hashdir-session","projectHash":"hash-opaque","startTime":"2026-07-01T13:00:00.000Z","lastUpdated":"2026-07-01T13:00:00.000Z","kind":"main"}
+{"id":"hd-turn-1","timestamp":"2026-07-01T13:00:10.000Z","type":"user","content":[{"text":"This is HASHDIR unattributable content marker."}]}
+{"id":"hd-turn-2","timestamp":"2026-07-01T13:00:15.000Z","type":"gemini","content":"Acknowledged, hash-dir session."}
