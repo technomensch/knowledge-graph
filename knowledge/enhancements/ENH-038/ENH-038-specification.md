@@ -21,18 +21,18 @@ Going forward, any new defect found in chat-history extraction (Claude, Gemini, 
 |---|---|---|---|
 | Subagent message loss + Gemini format-drift + Codex audit | Claude / Gemini / Codex | ✅ Fixed (v0.6.16) | [attempts/ENH-038/specification.md](../../issues/chat-extraction-reliability-saga/attempts/ENH-038/specification.md) |
 | No rebuild mode; pre-fix output stays permanently corrupted | Claude | ✅ Fixed (v0.6.17); 9/68 flagged dates recovered, 42 permanently unrecoverable (no source data) | [attempts/ENH-043/specification.md](../../issues/chat-extraction-reliability-saga/attempts/ENH-043/specification.md) |
-| `--project` filter silently ignored, cross-project contamination | Gemini | ✅ Implemented & tested (`bf1cb51c`/`1b2269cf`); spec-closeout pending | [attempts/ENH-044/specification.md](../../issues/chat-extraction-reliability-saga/attempts/ENH-044/specification.md) |
+| `--project` filter silently ignored, cross-project contamination | Gemini | 🟡 Partially fixed, **NOT resolved** — `.json`/`.jsonl` scoping shipped (`bf1cb51c`/`1b2269cf`, verified real-data), but the `.pb` path is still unscoped (93 real unfiltered `.pb` files; leak masked only where `blackboxprotobuf` is absent) and hash-named dirs are unhandled. Contamination vector remains open. | [attempts/ENH-044/specification.md](../../issues/chat-extraction-reliability-saga/attempts/ENH-044/specification.md) |
 | Incremental mtime-skip bug (never ported from Claude's fix) | Codex | ✅ Fixed (v0.6.17) | [attempts/ENH-045/specification.md](../../issues/chat-extraction-reliability-saga/attempts/ENH-045/specification.md) |
 | `.pb` sessions dated by file mtime, not content | Gemini | ✅ Fixed (v0.6.17) | [attempts/ENH-046/specification.md](../../issues/chat-extraction-reliability-saga/attempts/ENH-046/specification.md) |
-| Whole session file dated by first message; multi-day sessions misfile | Claude | 🟡 Proposed, unfixed | [attempts/ENH-047/specification.md](../../issues/chat-extraction-reliability-saga/attempts/ENH-047/specification.md) |
+| Whole session file dated by first message; multi-day sessions misfile | Claude | ✅ Fixed (v0.6.17) | [attempts/ENH-047/specification.md](../../issues/chat-extraction-reliability-saga/attempts/ENH-047/specification.md) |
 
 ---
 
 ## Outstanding Work
 
-- ENH-047 (Claude multi-day bucketing) remains unfixed — see its linked spec for full Proposed Behavior / Acceptance Criteria.
-- ENH-044 (Gemini project-scoping) is implemented and tested (`bf1cb51c`/`1b2269cf`) but its spec's status line/acceptance criteria were never flipped — closeout only, not re-implementation.
-- Once both ship, re-baseline extraction and revisit the still-unresolved "wrong session captured" symptom noted in the meta-issue's Attempt 003.
+- ~~ENH-047 (Claude multi-day bucketing)~~ — **✅ Fixed (v0.6.17, 2026-07-10).** Per-message UTC-date bucketing shipped, tested (16/16 including the mandatory ADR-044 split-day interaction), and verified against real data (987/987 exact parity across 4 dates).
+- ENH-044 (Gemini project-scoping) is **only partially fixed and NOT resolved.** The `.json`/`.jsonl` scoping shipped (`bf1cb51c`/`1b2269cf`) and is verified against real data, but real-data testing (2026-07-09) found the `.pb` path has no project scoping at all (accepts `project_filter` but ignores it — 93 real unfiltered `.pb` files), so cross-project contamination is still possible; hash-named `~/.gemini/tmp/` dirs are also unhandled. Committed ≠ fixed — this needed a real `.pb`-scoping fix, not a spec closeout. Fail-closed decision recorded (ADR-062), code shipped (`126d98ce`); test/closeout in progress. Tracked in `~/.claude/plans/v0.6.17-fix-extract-chat-multiday-bucketing.md`.
+- Once ENH-044 is genuinely closed out, re-baseline extraction and revisit the still-unresolved "wrong session captured" symptom noted in the meta-issue's Attempt 003.
 
 ---
 

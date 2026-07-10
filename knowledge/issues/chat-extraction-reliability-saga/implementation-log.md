@@ -2,8 +2,8 @@
 
 Chronological record of all attempts to solve chat-extraction reliability.
 
-**Total Attempts:** 7
-**Last Updated:** 2026-07-09
+**Total Attempts:** 8
+**Last Updated:** 2026-07-10
 
 ---
 
@@ -78,19 +78,19 @@ Fix ENH-047 (per-message date derivation); re-baseline extraction; revisit Attem
 
 ## Attempt 005: Gemini `--project` filter silently ignored (v0.6.17, ENH-044)
 
-**Status:** Completed (shipped) — mislabeled "Not started" here until 2026-07-09, when drafting the ENH-047 fix plan found it was already implemented and committed; corrected.
+**Status:** PARTIALLY FIXED — `.json`/`.jsonl` scoping shipped, but `.pb` path still unscoped → contamination still possible — OPEN
 **ENH:** [ENH-038 umbrella](../../enhancements/ENH-038/ENH-038-specification.md) / [full spec](attempts/ENH-044/specification.md)
 **Discovered:** 2026-07-06, while manually validating ENH-038's Gemini `.jsonl` fix
 **Related:** commit `bf1cb51c` (fix), `1b2269cf` (test)
 
 **Approach:**
-Added a `project_filter` param to all three Gemini per-format extraction functions and threaded it through `extract_all_gemini`/`run_extraction.py`, mirroring the Claude extractor's existing fragment-match pattern.
+Added a `project_filter` param to `.json` and `.jsonl` per-format extraction functions and threaded it through `extract_all_gemini`/`run_extraction.py`, mirroring the Claude extractor's existing fragment-match pattern. The `.pb` path (`extract_gemini_pb_sessions`) was left untouched; it accepts but ignores `project_filter`.
 
 **Outcome:**
-Confirmed real contamination pre-fix: a `career-prism` session merged into `knowledge-graph`'s `2026-05-13-gemini.md` output despite `--project=knowledge-graph` being passed; four foreign date-files created with no knowledge-graph content at all. Fixed and tested (`tests/test-extraction-gemini-project-filter.sh`); only the spec's own status line/acceptance criteria were never flipped to match — closeout folded into the ENH-047 fix plan.
+`.json`/`.jsonl` contamination confirmed pre-fix and verified fixed: a `career-prism` session merged into `knowledge-graph`'s `2026-05-13-gemini.md` output despite `--project=knowledge-graph` being passed; four foreign date-files created with no knowledge-graph content at all. Fixed and tested (`tests/test-extraction-gemini-project-filter.sh`). **BUT** real-data testing on 2026-07-09 found `.pb` path applies no project filtering at all — `extract_gemini_pb_sessions` accepts `project_filter` argument but ignores it. 93 real unfiltered `.pb` files exist under `~/.gemini/antigravity/conversations/`; cross-project contamination via `.pb` is masked only on machines where optional `blackboxprotobuf` dependency is absent. Hash-named `~/.gemini/tmp/` directories also can't fragment-match a human-readable `--project`, so they're unhandled. Therefore ENH-044 **remains OPEN**; real `.pb`-scoping fix planned (not just spec closeout).
 
 **Key Learning:**
-Gemini's extractor had no project-scoping step at all — unlike Claude, which already filtered project directories by fragment match before globbing. Separately: a shipped fix's own spec can silently go stale (status left at "Proposed" after the code landed) — worth a status-line check whenever revisiting an ENH during later work, not just trusting the doc.
+Partial fixes that scope one format but miss others create a false sense of completion and are easy to forget about, especially when one format is optional-dependency-gated. Worth validating a fix against **all** supported input formats.
 
 ---
 
@@ -129,15 +129,34 @@ Backup/restore scenarios (mtime changes on copy) are a recurring class of date-d
 
 ---
 
+## Attempt 008: Per-message date bucketing fix (v0.6.17, ENH-047)
+
+**Status:** Completed (shipped)
+**Full spec:** [ENH-047/specification.md](attempts/ENH-047/specification.md)
+**Discovered:** 2026-07-08 (Attempt 004); fixed 2026-07-10
+**Related:** commits `665c6fed` (fix), `1f7c6112`/`fa78aba2` (tests); plan `~/.claude/plans/v0.6.17-fix-extract-chat-multiday-bucketing.md`
+
+**Approach:**
+Rewrote `extract_claude_sessions()`'s collection loop to derive each message's own UTC date from its own `timestamp`, bucketing messages per `(file, date)` instead of once per file. Untimestamped messages carry forward the nearest preceding timestamped record's date; leading untimestamped records are buffered until the first real date is known, then backfilled — a naive single-pass carry-forward can't resolve those correctly. Downstream grouping/date-filter/rebuild/incremental/split logic consumes the same entry shape unchanged.
+
+**Outcome:**
+`tests/test-extraction-multiday.sh` (16/16) covers fan-out, single-date-filter correctness, the no-timestamp fallback, and the mandatory ADR-044 split-day interaction (pre-seeded split subfolder, cross-part uuid-dedup union verified — the exact ENH-038 regression class, confirmed non-vacuous by tracing what the pre-fix code would have done against the same fixture). No regressions: `test-extraction.sh` (8/8), `test-extraction-subagent-repro.sh` (4/4), `test-extraction-rebuild.sh` (19/19). Real-data verification against live `~/.claude/projects/` logs found exact parity on all 4 dates checked (2026-07-06: 310, 2026-07-07: 234, 2026-07-08: 294, 2026-07-09: 149; total 987/987), including 25 real multi-day session files in that window now correctly bucketed.
+
+**Key Learning:**
+The task reviewer caught a hardcoded literal (`"3"` instead of the already-computed `$DAY3_COUNT`) in the new test that would have violated ADR-059's no-hardcoded-derivable-counts rule if left in — fixed same-task. Confirms this saga's task-review loop catches exactly the failure class (silent hardcoding creeping into otherwise-derived tests) the lessons-learned doc already flags as a recurring risk.
+
+---
+
 ## Statistics
 
 **By Outcome:**
-- Completed & Successful: 4 (ENH-038, ENH-044, ENH-045, ENH-046)
+- Completed & Successful (fully fixed): 4 (ENH-038, ENH-045, ENH-046, ENH-047)
 - In Progress: 1 (ENH-043)
+- Partially Fixed, Open (needs real fix): 1 (ENH-044 — `.json`/`.jsonl` scoped, `.pb` path still leaks)
 - Not Started: 0
 - Completed & Failed (root-caused, led to further work): 2 (dogfooding Attempts 3 & 4)
 - Abandoned: 0
-- **Unfixed, open:** ENH-047 (ENH-044 is shipped; only its spec closeout is open)
+- **Unfixed, open:** ENH-044's `.pb`/hash-dir contamination vector (in progress, `~/.claude/plans/v0.6.17-fix-extract-chat-multiday-bucketing.md`)
 
 ---
 
@@ -148,8 +167,7 @@ Backup/restore scenarios (mtime changes on copy) are a recurring class of date-d
 - Forced overwrite/rebuild mode + real-data repair (ENH-043)
 
 **What hasn't been tried:**
-- Per-message (rather than per-session) date derivation (ENH-047 — the fix for the newest defect)
-- Root-causing the `--today` "wrong session" selection (Attempt 3)
+- Root-causing the `--today` "wrong session" selection (Attempt 3) — still outstanding, revisit now that ENH-047 is fixed
 
 **Recurring failures:**
 - Each fix addressed one symptom while a different root cause in the same subsystem remained — the pipeline had multiple independent defects.

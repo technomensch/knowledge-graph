@@ -1,6 +1,6 @@
 # ENH-047: Claude extractor dates a whole session file by its first message, misfiling multi-day sessions under their start date
 
-**Status:** 🟡 Proposed
+**Status:** ✅ Resolved (v0.6.17)
 **Discovered:** 2026-07-08
 **Governed by:** none (bug-fix, not a new command/skill/docstring — ADR-058's naming/scope check does not apply)
 **Related:** `core/scripts/extract_claude.py`, [ENH-046](../ENH-046/specification.md) (same failure class — date-derivation reliability — but in the Gemini extractor, dated by file mtime rather than by conversation content), [ENH-043](../ENH-043/specification.md) (same file/subsystem, this session's extraction-pipeline hardening work, but a different root cause: incremental-append uuid-dedup permanence, not date derivation), [ENH-038](../ENH-038/specification.md) (original subagent message-loss finding), [ADR-044](../../../../decisions/ADR-044-split-oversized-chat-history-files.md) (pre-existing spec this fix must stay compatible with — see note below), branch `v0.6.17-fix-extract-chat-rebuild`
@@ -77,7 +77,8 @@ This is distinct from ENH-043. ENH-043's defect is that the incremental-append p
 - Derive each message's date bucket from **that message's own `timestamp`**, not from the session file's first timestamped record. A session `.jsonl` that spans multiple calendar days must fan its messages out across multiple date-bucketed output files, one per real calendar day.
 - Preserve existing per-message ordering and uuid-dedup semantics within each resulting date bucket.
 - A single-date filter (`--today`, `--date=YYYY-MM-DD`) must return the messages that actually occurred on that date, irrespective of which session file (or session start date) they belong to.
-- Messages that genuinely have no `timestamp` should fall back to a defined, documented rule (e.g. the nearest preceding timestamped message's date, or the file's start date) rather than being silently dropped or misfiled.
+- **No-timestamp fallback rule (implemented):** a message with no parseable `timestamp` inherits the date of the **nearest preceding timestamped message within the same file** (carry-forward). If no timestamped message precedes it (the file opens with untimestamped records), those leading records are **buffered until the first real date is derived, then backfilled** to that date — a single streaming pass cannot know the fallback date before that point. A file with **zero** timestamped messages emits nothing, matching prior behavior for that edge (no date is derivable).
+- Date derivation uses the **UTC** calendar date (`datetime.fromisoformat(ts.replace("Z","+00:00")).strftime("%Y-%m-%d")`) — unchanged from the pre-fix convention, just applied per-message instead of once per file.
 
 ---
 
@@ -103,8 +104,8 @@ This is distinct from ENH-043. ENH-043's defect is that the incremental-append p
 
 ## Acceptance Criteria
 
-- [ ] A raw `.jsonl` session file whose messages span multiple calendar days is split so that each message lands in the output file for **its own** date, not the session's start date.
-- [ ] Re-running the failing real-world command (`--source claude --project=knowledge-graph --today` on 2026-07-08) surfaces the ~3,114 real messages that actually occurred that day, not 36. In particular the 2,916 messages from the three large files that today bucket under 2026-07-06 appear under their correct dates.
-- [ ] A single-date filter (`--today` / `--date=YYYY-MM-DD`) returns exactly the messages timestamped on that date, verified against a fixture with known per-day counts.
-- [ ] Messages with no `timestamp` follow the documented fallback rule and are neither dropped nor misfiled.
-- [ ] A regression test (`tests/test-extraction-multiday.sh` or equivalent) encodes the multi-day fixture and passes; existing extraction tests still pass with no regressions.
+- [x] A raw `.jsonl` session file whose messages span multiple calendar days is split so that each message lands in the output file for **its own** date, not the session's start date. Verified: `tests/test-extraction-multiday.sh` Steps 2-3 (16/16 pass) — a 2-day fixture fans out into `2026-06-01-claude.md`/`2026-06-03-claude.md`, each with exactly its own day's messages.
+- [x] **(Rewritten 2026-07-10 — the original wording hardcoded an unreproducible one-time run; see Task 4 Step 2b.)** Re-running date-filtered extraction against real data surfaces the messages that actually occurred on each date, derived at run time — not a fixed historical snapshot. Verified against live `~/.claude/projects/-Users-mkaplan-GitHub-knowledge-graph/` data on 2026-07-10: an independent ground-truth script (same UTC-date derivation, no shared code with the extractor's write/incremental path) matched the extractor's output **exactly on all 4 dates checked** (2026-07-06: 310, 2026-07-07: 234, 2026-07-08: 294, 2026-07-09: 149; total 987/987), including 25 real multi-day session files in that window whose later-day content is now correctly bucketed. *(Historical example of the original defect, retained for context: on 2026-07-08 pre-fix, `--today` returned 36 of 3,114 real messages because three large files bucketed 2,916 messages under `2026-07-06` instead of their true dates — this was the discovery run, not the pass/fail assertion.)*
+- [x] A single-date filter (`--today` / `--date=YYYY-MM-DD`) returns exactly the messages timestamped on that date, verified against a fixture with known per-day counts. Verified: `tests/test-extraction-multiday.sh` Step 3 — `--date=2026-06-03` returns exactly that date's messages, zero `2026-06-01` leakage.
+- [x] Messages with no `timestamp` follow the documented fallback rule and are neither dropped nor misfiled. Verified: `tests/test-extraction-multiday.sh` Steps 2-3 — an untimestamped record placed after a `2026-06-03` record correctly carries forward to `2026-06-03`.
+- [x] A regression test (`tests/test-extraction-multiday.sh`) encodes the multi-day fixture and passes (16/16), including the mandatory ADR-044 split-day interaction (pre-seeded split subfolder, cross-part uuid-dedup union verified — the exact ENH-038 regression class); existing extraction tests (`test-extraction.sh` 8/8, `test-extraction-subagent-repro.sh` 4/4, `test-extraction-rebuild.sh` 19/19) still pass with no regressions.
