@@ -5,6 +5,7 @@ Base utilities for Chat History Extraction
 import os
 import re
 import glob
+import json
 from datetime import datetime
 
 # Allow override via environment variable (set by skills) or CLI arg (set by run_extraction.py)
@@ -67,6 +68,20 @@ def get_output_path(filename):
 
     # 3. Fallback to root
     return os.path.join(OUTPUT_DIR, filename)
+
+def clear_split_subfolder(output_dir: str, date: str) -> None:
+    """Removes an existing {output_dir}/{date}/ split-part subfolder, if any.
+
+    get_output_path() checks for this subfolder first and, if present,
+    always routes to the last part file inside it -- so a rebuild that
+    writes a fresh flat file at the date's normal location would be
+    silently shadowed by a stale split subfolder on the next call unless
+    that subfolder is cleared first.
+    """
+    split_dir = os.path.join(output_dir, date)
+    if os.path.isdir(split_dir):
+        import shutil
+        shutil.rmtree(split_dir)
 
 def format_timestamp(ts_str):
     """
@@ -208,3 +223,31 @@ def write_message_block(f, index, role, timestamp, content, thinking=None, tool_
          f.write("\n")
 
     f.write("---\n\n")
+
+
+def read_last_extract_version(chat_history: str) -> str:
+    """Returns the plugin version stamped after the last successful extraction
+    run against this chat-history directory, or "0.0.0" if never stamped.
+    Used by commands/kmg-extract-chat.md's first-run repair check (ENH-043)
+    to detect whether this is the first run since crossing a fix version."""
+    state_path = os.path.join(chat_history, ".kmg-extract-state.json")
+    if not os.path.exists(state_path):
+        return "0.0.0"
+    try:
+        with open(state_path, encoding="utf-8") as f:
+            return json.load(f).get("last_extract_plugin_version", "0.0.0")
+    except (OSError, ValueError):
+        return "0.0.0"
+
+
+def write_last_extract_version(chat_history: str, version: str) -> None:
+    """Stamps the installed plugin version after a run, so the next run can
+    tell whether it has already crossed a given fix version (see
+    read_last_extract_version)."""
+    # Step 0.5 (first-run repair check) can call this before Step 1 has run
+    # mkdir on the chat-history dir, and a clean/fresh install may have no
+    # chat-history dir yet. Create it so the stamp write never crashes.
+    os.makedirs(chat_history, exist_ok=True)
+    state_path = os.path.join(chat_history, ".kmg-extract-state.json")
+    with open(state_path, "w", encoding="utf-8") as f:
+        json.dump({"last_extract_plugin_version": version}, f)

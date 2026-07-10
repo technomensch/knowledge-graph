@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.6.16
+**Version:** 0.6.17
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -90,6 +90,14 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 ---
 
 ## v0.6.x Feature Highlights
+
+**v0.6.17 — 2026-07-10**
+
+- **Claude extractor multi-day session misfiling fixed (ENH-047)** — each message now derives its own date bucket from its own timestamp instead of the whole session inheriting its first message's date, so `/clear`/context-compaction sessions spanning multiple days file correctly under `--today`/`--date=`.
+- **Gemini extractor gains fail-closed project scoping (ENH-044)** — `--project` now excludes `.pb` files and hash-named `~/.gemini/tmp/` directories that can't be positively attributed to the requested project, with a visible skip notice, instead of silently leaking other projects' conversations into the KG.
+- **Codex extractor's incremental mtime-skip bug removed (ENH-045)** — matches the same fix already shipped for Claude in v0.6.16; running `--incremental` twice within an hour no longer silently no-ops.
+- **Gemini `.pb` sessions dated from content, not file mtime (ENH-046)** — survives copy/move/restore-from-backup without misdating.
+- **`--rebuild` flag added for forced clean re-extraction (ENH-043)** — repairs chat-history files written before the v0.6.16 uuid-dedup fix; one-time repair pass recovered 9 of 68 flagged dates (42 pre-2026-05-30 dates permanently unrecoverable, no source data exists).
 
 **v0.6.16 — 2026-07-06**
 
@@ -337,6 +345,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.6.16 (2026-07-06)
+**Current Version:** v0.6.17 (2026-07-10)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info

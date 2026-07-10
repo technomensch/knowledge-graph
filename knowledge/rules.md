@@ -126,7 +126,7 @@ After any cherry-pick: verify source branch state before continuing work on eith
 
 ### Bug / Enhancement Triage
 
-When a bug or enhancement is discovered mid-session, ask the user which path applies — do not auto-detect:
+When a bug or enhancement is discovered mid-session, **first check whether an open ENH already covers the same feature area** (search `knowledge/enhancements/` by subsystem/keyword, not just by exact bug match) — if one exists, append the new finding to it as a new row/section rather than filing a new ENH number. Only if no open ENH covers the feature area, ask the user which path applies — do not auto-detect:
 
 - **Path F — Fork to new conversation:** Bug is complex or unclear, needs investigation, and would derail the current session. Open a separate chat/terminal to investigate. Continue current session unblocked.
 - **Path 1 — Capture as issue/enhancement:** Fix is out of scope or clear enough to file without immediate investigation. Create silently via `/kmgraph:kmg-start-issue-tracking`. Surface the result (GH issue link or local ENH file preview) immediately after.
@@ -136,6 +136,8 @@ When a bug or enhancement is discovered mid-session, ask the user which path app
 **Always ask** — never auto-route. One question: "Path F (fork), Path 1 (issue), Path 2 (add to plan), or Path 3 (implement now)?"
 
 - **Path F vs Path 1:** Path F = root cause unclear, investigation needed now but not here; Path 1 = clear enough to file, no immediate investigation needed
+- **Same-feature-area check:** before filing under Path 1, search `knowledge/enhancements/` for an existing open ENH on the same subsystem/feature — append there instead of creating a new number.
+  - **Why:** the chat-extraction reliability saga spawned 6 separate ENH numbers (038/043/044/045/046/047) for one feature area (`kmg-extract-chat`) because each new bug got its own number on discovery instead of being checked against already-open work — user flagged this as unacceptable and the 6 were consolidated into one umbrella ENH-038 (2026-07-09).
 - **Source:** [[ADR-013-mid-execution-discovery-protocol]] (user-level `~/.kmgraph/decisions/`)
 
 ### Plan File Sync

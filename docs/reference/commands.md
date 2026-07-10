@@ -35,7 +35,7 @@ title: Commands Reference
 | [`/kmgraph:kmg-capture-lesson`](#capture-lesson) | Document lessons learned with git metadata, duplicate detection, and optional KG extraction | `--user`, `--project`, `--named=<kg>` |
 | [`/kmgraph:kmg-create-adr`](#create-adr) | Create Architecture Decision Records with auto-numbering, index update, and automatic capture of implementation commit + subject line | `--user`, `--project`, `--named=<kg>` |
 | [`/kmgraph:kmg-session-summary`](#session-summary) | Summarize the active session; supports lightweight mid-session snapshot mode | `--auto`, `--snapshot`, `--snapshot --git`, `--user`, `--project`, `--named=<kg>` |
-| [`/kmgraph:kmg-extract-chat`](#extract-chat) | Export Claude and Gemini chat logs to dated markdown files; extract Codex CLI sessions with `--source codex` (outputs `YYYY-MM-DD-codex.md`; not included in `--source all` yet) | `--today`, `--date=YYYY-MM-DD`, `--after=`, `--before=`, `--project=`, `--source claude\|gemini\|codex\|all`, `--output-dir=` |
+| [`/kmgraph:kmg-extract-chat`](#extract-chat) | Export Claude and Gemini chat logs to dated markdown files; extract Codex CLI sessions with `--source codex` (outputs `YYYY-MM-DD-codex.md`; not included in `--source all` yet) | `--today`, `--date=YYYY-MM-DD`, `--after=`, `--before=`, `--project=`, `--source claude\|gemini\|codex\|all`, `--output-dir=`, `--rebuild`, `--incremental`, `--claude-projects-dir=` |
 | [`/kmgraph:kmg-handoff`](#handoff) | Generate a handoff package (thin START-HERE pointer, DOCUMENTATION-MAP, ARCHITECTURE-SNAPSHOT) | `--output-dir=` |
 | [`/kmgraph:kmg-rules-capture`](#rules-capture) | Detect and route a behavioral correction to `rules.md` or `me.md` (project or personal scope) | — |
 

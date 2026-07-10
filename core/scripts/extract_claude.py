@@ -115,7 +115,8 @@ def parse_seen_uuids(file_path: str) -> set[str]:
 
 
 def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
-                             before_date=None, project_filter=None, incremental=False):
+                             before_date=None, project_filter=None, incremental=False,
+                             rebuild=False, claude_projects_dir=None):
     """
     Scans Claude project directories for jsonl files and extracts them.
 
@@ -126,12 +127,23 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
         before_date: Extract only sessions on or before this date (YYYY-MM-DD, inclusive)
         project_filter: Filter to sessions from a specific project (path fragment match)
         incremental: Skip extraction if file already exists and is current
+        rebuild: Force the overwrite/flatten branch for every date in scope,
+            ignoring any existing output file's parsed last_ts/seen_uuids.
+            Use to repair output written by an older, buggy version of this
+            script (uuid-dedup treats already-written content as permanent,
+            so a normal incremental run can never self-heal it — see ENH-043).
+            Takes precedence over `incremental` when both are set (rebuild is
+            the more destructive, more intentional operation, so it wins).
+        claude_projects_dir: Override the Claude session-log source directory
+            instead of ~/.claude/projects — e.g. a restored backup, when the
+            live logs have been rotated out (see ENH-043).
 
     Returns a list of processing results.
     """
     results = []
     # Find all project directories
-    project_dirs = glob.glob(os.path.join(CLAUDE_PROJECTS_DIR, "*"))
+    projects_dir = claude_projects_dir or CLAUDE_PROJECTS_DIR
+    project_dirs = glob.glob(os.path.join(projects_dir, "*"))
 
     # Filter project directories by path fragment if --project provided
     if project_filter:
@@ -150,34 +162,57 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
             if os.path.getsize(jsonl_path) == 0:
                 continue
                 
-            messages = []
-            session_date = None
-            session_ts_str = None
-            
+            # Per-message date bucketing (ENH-047): a session .jsonl can span
+            # multiple real calendar days (resumed via /clear or context
+            # compaction). Bucketing the whole file by only its first
+            # timestamp misfiles every later-day message under the start
+            # date. Each message gets its own date instead, carried forward
+            # from the nearest preceding timestamped record when a message
+            # has no parseable timestamp of its own. Leading untimestamped
+            # records (no preceding timestamped record yet in this file) are
+            # buffered until the first real date is derived, then backfilled
+            # to that date -- a single streaming pass can't know the
+            # fallback date before that point.
+            messages_by_date: Dict[str, list] = {}
+            date_ts_str: Dict[str, str] = {}
+            pending_untimestamped = []
+            current_date = None
+
             try:
                 with open(jsonl_path, 'r') as f:
                     for line in f:
                         try:
                             obj = json.loads(line)
-                            
-                            # Capture timestamp for filename from the first message with one
-                            if not session_date and obj.get('timestamp'):
+
+                            msg_date = None
+                            msg_ts_str = None
+                            if obj.get('timestamp'):
                                 try:
                                     dt = datetime.fromisoformat(obj['timestamp'].replace("Z", "+00:00"))
-                                    session_date = dt.strftime("%Y-%m-%d")
-                                    session_ts_str = dt.strftime("%H%M%S")
+                                    msg_date = dt.strftime("%Y-%m-%d")
+                                    msg_ts_str = dt.strftime("%H%M%S")
                                 except: pass
 
+                            if msg_date:
+                                current_date = msg_date
+                                existing_ts = date_ts_str.get(current_date)
+                                if existing_ts is None or msg_ts_str < existing_ts:
+                                    date_ts_str[current_date] = msg_ts_str
+                                if pending_untimestamped:
+                                    messages_by_date.setdefault(current_date, []).extend(pending_untimestamped)
+                                    pending_untimestamped = []
+
+                            parsed_msg = None
                             if obj.get('type') == 'user' and 'message' in obj:
                                 content_list = obj['message'].get('content', [])
                                 text = ''.join(i.get('text', '') for i in content_list if isinstance(i, dict))
                                 if text.strip():
-                                    messages.append({
+                                    parsed_msg = {
                                         'role': 'user',
                                         'content': text,
                                         'timestamp': obj.get('timestamp'),
                                         'uuid': _dedup_key(obj.get('uuid'), obj.get('timestamp'), text),
-                                    })
+                                    }
                             elif obj.get('type') == 'assistant' and 'message' in obj:
                                 content_list = obj['message'].get('content', [])
                                 thinking, text = '', ''
@@ -186,26 +221,37 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                                         if 'thinking' in item: thinking = item['thinking']
                                         if 'text' in item: text = item['text']
                                 if thinking or text:
-                                    messages.append({
+                                    parsed_msg = {
                                         'role': 'assistant',
                                         'thinking': thinking,
                                         'content': text,
                                         'timestamp': obj.get('timestamp'),
                                         'uuid': _dedup_key(obj.get('uuid'), obj.get('timestamp'), text or thinking),
-                                    })
+                                    }
+
+                            if parsed_msg is None:
+                                continue
+
+                            if current_date:
+                                messages_by_date.setdefault(current_date, []).append(parsed_msg)
+                            else:
+                                pending_untimestamped.append(parsed_msg)
                         except json.JSONDecodeError: continue
             except Exception as e:
                 print(f"Error reading {jsonl_path}: {e}")
                 continue
 
-            if messages and session_date:
-                # Sort messages
-                messages.sort(key=lambda x: x.get('timestamp', ''))
+            # A file with zero timestamped records never resolves
+            # pending_untimestamped into any date bucket -- nothing is
+            # emitted for it, preserving prior behavior (a file with no
+            # derivable session_date was never appended either).
+            for bucket_date, bucket_messages in messages_by_date.items():
+                bucket_messages.sort(key=lambda m: m.get('timestamp') or '')
                 all_sessions.append({
-                    'date': session_date,
-                    'ts_str': session_ts_str or "000000",
-                    'messages': messages,
-                    'count': len(messages)
+                    'date': bucket_date,
+                    'ts_str': date_ts_str.get(bucket_date) or "000000",
+                    'messages': bucket_messages,
+                    'count': len(bucket_messages)
                 })
 
     # Group by date
@@ -232,15 +278,43 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
     # regardless of file age, and already reports "No new activity" when there
     # is genuinely nothing new — so no separate recency-based skip is needed.
 
+    if rebuild and date_filter and date_filter not in sessions_by_date:
+        existing_path = get_output_path(f"{date_filter}-claude.md")
+        if os.path.exists(existing_path):
+            results.append(
+                f"WARNING: --rebuild found 0 source sessions for {date_filter} "
+                f"(project_filter={project_filter!r}) -- existing output was left "
+                f"untouched. If your local ~/.claude/projects/ session logs for this "
+                f"date have been rotated/deleted and no backup exists, this date's "
+                f"original conversation content cannot be recovered."
+            )
+
     # Write files
     for date, sessions in sessions_by_date.items():
         # Sort sessions by timestamp within the day
         sessions.sort(key=lambda x: x['ts_str'])
         
         filename = f"{date}-claude.md"
+
+        if rebuild:
+            # Clear any stale split subfolder BEFORE resolving output_path, so
+            # get_output_path() routes to the flat-file location instead of a
+            # soon-to-be-deleted split part inside {OUTPUT_DIR}/{date}/.
+            from chat_extractor_base import OUTPUT_DIR, clear_split_subfolder
+            clear_split_subfolder(OUTPUT_DIR, date)
+
         output_path = get_output_path(filename)
-        
-        last_ts, last_idx = parse_metadata_from_file(output_path)
+
+        if rebuild:
+            # --rebuild takes precedence over --incremental: forcing
+            # last_ts=None here routes unconditionally to the overwrite/flatten
+            # branch below. --incremental only ever influences the append
+            # branch that rebuild deliberately bypasses (and in fact the write
+            # loop never consults `incremental` for branching at all), so when
+            # both flags are passed, rebuild deterministically wins.
+            last_ts, last_idx = None, 0
+        else:
+            last_ts, last_idx = parse_metadata_from_file(output_path)
 
         if last_ts is not None:
             # Filter for truly new messages using per-message uuid dedup

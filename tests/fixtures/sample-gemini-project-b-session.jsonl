@@ -1,0 +1,3 @@
+{"sessionId":"proj-b","projectHash":"hash-b","startTime":"2026-07-01T11:00:00.000Z","lastUpdated":"2026-07-01T11:00:00.000Z","kind":"main"}
+{"id":"b-turn-1","timestamp":"2026-07-01T11:00:10.000Z","type":"user","content":[{"text":"This is project B content, unrelated to A."}]}
+{"id":"b-turn-2","timestamp":"2026-07-01T11:00:15.000Z","type":"gemini","content":"Acknowledged, project B."}

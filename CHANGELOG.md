@@ -7,7 +7,17 @@ displayed_sidebar: null
 
 All notable changes to the Knowledge Plugin will be documented in this file.
 
-## [Unreleased] — v0.6.16 in progress
+## [0.6.17] — 2026-07-10
+
+### Fixed
+
+- **Claude extractor misfiled multi-day sessions under their start date (ENH-047)** — `extract_claude_sessions()` derived a whole session file's date bucket from only its first timestamped message, so any session resumed across multiple calendar days (via `/clear` or context-compaction) had every later-day message misfiled under the start date — invisible to `--today`/`--date=` filters. Each message now derives its own date from its own timestamp; untimestamped messages carry forward the nearest preceding date, with leading untimestamped records buffered until the first real date is known. Verified against real project history: exact parity between independently-derived and extracted per-date message counts across a 3-week window, including 25 real multi-day session files.
+- **Gemini extractor had no project-scoping (ENH-044)** — `extract_gemini.py` ignored `--project` entirely, silently merging unrelated projects' sessions into the active project's chat-history output. Added `project_filter` support mirroring the Claude extractor's existing pattern for `.json`/`.jsonl` sessions. A second real-data pass then found this didn't close the whole vector: `.pb` files and hash-named `~/.gemini/tmp/` directories carry no per-project signal at all, so they were still unscoped. Closed fail-closed — when `--project` is set, anything that can't be positively attributed to the requested project is excluded, with a visible skip notice (never silent), rather than risk leaking a foreign project's private conversation into this project's committed, searchable knowledge graph.
+- **Codex extractor never dropped the incremental mtime-skip anti-pattern (ENH-045)** — the same "skip if output file modified within the last hour" bug already removed from the Claude extractor in v0.6.16 was never ported to Codex, so running `--incremental` twice within an hour silently did nothing even with new content available. Removed.
+- **Gemini `.pb` sessions dated by file mtime instead of content (ENH-046)** — unreliable whenever a `.pb` archive is copied, moved, or restored from backup after the conversation happened. Added a heuristic scan for a plausible embedded timestamp in the decoded payload, preferred over file mtime when found.
+- **Extractor rebuild mode (ENH-043)** — the v0.6.16 uuid-dedup fix could not retroactively repair chat-history files written by the pre-fix code (486 of 2,801 extractable subagent messages, 96% of them task-dispatch prompts, were missing across the project's full history — incremental dedup treats any uuid already on disk as permanently synced, so a normal re-run could never self-heal it). Added `--rebuild` to force a clean overwrite/flatten pass regardless of existing output state, then ran a one-time repair against every affected date (68 flagged, 9 recovered from a located backup, 42 permanently unrecoverable — no source data exists anywhere for dates before 2026-05-30).
+
+## [0.6.16] — 2026-07-06
 
 ### Fixed
 

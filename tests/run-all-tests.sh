@@ -42,6 +42,7 @@ SUITES=(
   "test-hooks.sh|Hooks — SessionStart hook validation|no"
   "test-stop-hook.sh|Stop hook flag — kg-name+date dedup|no"
   "test-extraction.sh|Extraction — Python chat extraction scripts|no"
+  "test-extraction-multiday.sh|Extraction — multi-day fan-out + ADR-044 split-day dedup (ENH-047)|no"
   "test-tier-resolver-smoke.sh|v0.5.0 Tier Resolver — smoke tests|no"
   "test-tier-resolver-edge.sh|v0.5.0 Tier Resolver — edge and negative cases|no"
   "test-create-adr-implements.sh|v0.5.0 create-adr implements field validation|no"
