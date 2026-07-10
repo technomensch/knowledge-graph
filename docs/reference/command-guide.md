@@ -796,7 +796,13 @@ Test the hook:
 - `--date=YYYY-MM-DD` — Extract only sessions from a specific date
 - `--after=YYYY-MM-DD` — Extract sessions from this date onwards (inclusive)
 - `--before=YYYY-MM-DD` — Extract sessions up to and including this date
-- `--project=<fragment>` — Filter to sessions from a specific project (path fragment match)
+- `--project=<fragment>` — Filter to sessions from a specific project (path fragment match). Gemini `.pb` files and hash-named `~/.gemini/tmp/` directories cannot be attributed to a project by name, so they are excluded (not included) whenever `--project` is set, with a visible skip notice.
+
+**Repair and source-override flags**:
+
+- `--rebuild` — Force a clean overwrite/flatten pass for every date in scope, ignoring existing output state. Repairs files written by pre-fix extractor code where normal incremental runs cannot self-heal (dedup treats any uuid already on disk as permanently synced). Not the default mode — use for one-time repair, not routine extraction.
+- `--incremental` — Only extract new sessions; skip a date if its output is already current.
+- `--claude-projects-dir=<path>` — Override the Claude session-log source directory (e.g. a restored backup) instead of `~/.claude/projects/`.
 
 **Example**:
 ```bash
@@ -816,7 +822,7 @@ Test the hook:
 - Extracted files are automatically searchable via `/kmgraph:kmg-recall`
 - Optional `blackboxprotobuf` Python library enables Gemini protobuf file support
 - Date ranges use natural language: `YYYY-MM-DD through YYYY-MM-DD` or `YYYY-MM-DD to YYYY-MM-DD`
-- Gemini date filtering: passthrough implemented; underlying Gemini extraction may have known limitations
+- Gemini `--project` scoping is fail-closed for `.pb` files and hash-named directories (see above) — a project's own `.pb` sessions are excluded from scoped output rather than risk leaking a foreign project's content in; this is by design, not a bug
 - Large days auto-split into a `YYYY-MM-DD/` subfolder with numbered part files; each part is a valid standalone markdown file readable in Obsidian
 
 ---
