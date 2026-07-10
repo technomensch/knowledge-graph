@@ -210,12 +210,13 @@ else
   fail "day3-003-fallback was not appended anywhere -- new message lost"
 fi
 
-# (d) no message loss or duplication: exactly 3 unique day-3 uuids total
+# (d) no message loss: exactly DAY3_COUNT unique day-3 uuids total (duplication
+# itself is caught by the exact-count checks above, not by this dedup'd count)
 TOTAL_DAY3_MARKERS=$(cat "$PART1" "$PART2" 2>/dev/null | grep -oE '<!-- uuid: day3-[^[:space:]]+ -->' | sort -u | wc -l | tr -d ' ')
-if [ "$TOTAL_DAY3_MARKERS" = "3" ]; then
-  pass "no message loss or duplication: exactly 3 unique day-3 uuids across both parts"
+if [ "$TOTAL_DAY3_MARKERS" = "$DAY3_COUNT" ]; then
+  pass "no message loss: exactly $DAY3_COUNT unique day-3 uuids across both parts"
 else
-  fail "expected 3 unique day-3 uuids across both parts, got $TOTAL_DAY3_MARKERS"
+  fail "expected $DAY3_COUNT unique day-3 uuids across both parts, got $TOTAL_DAY3_MARKERS"
 fi
 
 echo ""
