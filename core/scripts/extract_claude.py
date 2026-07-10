@@ -162,34 +162,57 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
             if os.path.getsize(jsonl_path) == 0:
                 continue
                 
-            messages = []
-            session_date = None
-            session_ts_str = None
-            
+            # Per-message date bucketing (ENH-047): a session .jsonl can span
+            # multiple real calendar days (resumed via /clear or context
+            # compaction). Bucketing the whole file by only its first
+            # timestamp misfiles every later-day message under the start
+            # date. Each message gets its own date instead, carried forward
+            # from the nearest preceding timestamped record when a message
+            # has no parseable timestamp of its own. Leading untimestamped
+            # records (no preceding timestamped record yet in this file) are
+            # buffered until the first real date is derived, then backfilled
+            # to that date -- a single streaming pass can't know the
+            # fallback date before that point.
+            messages_by_date: Dict[str, list] = {}
+            date_ts_str: Dict[str, str] = {}
+            pending_untimestamped = []
+            current_date = None
+
             try:
                 with open(jsonl_path, 'r') as f:
                     for line in f:
                         try:
                             obj = json.loads(line)
-                            
-                            # Capture timestamp for filename from the first message with one
-                            if not session_date and obj.get('timestamp'):
+
+                            msg_date = None
+                            msg_ts_str = None
+                            if obj.get('timestamp'):
                                 try:
                                     dt = datetime.fromisoformat(obj['timestamp'].replace("Z", "+00:00"))
-                                    session_date = dt.strftime("%Y-%m-%d")
-                                    session_ts_str = dt.strftime("%H%M%S")
+                                    msg_date = dt.strftime("%Y-%m-%d")
+                                    msg_ts_str = dt.strftime("%H%M%S")
                                 except: pass
 
+                            if msg_date:
+                                current_date = msg_date
+                                existing_ts = date_ts_str.get(current_date)
+                                if existing_ts is None or msg_ts_str < existing_ts:
+                                    date_ts_str[current_date] = msg_ts_str
+                                if pending_untimestamped:
+                                    messages_by_date.setdefault(current_date, []).extend(pending_untimestamped)
+                                    pending_untimestamped = []
+
+                            parsed_msg = None
                             if obj.get('type') == 'user' and 'message' in obj:
                                 content_list = obj['message'].get('content', [])
                                 text = ''.join(i.get('text', '') for i in content_list if isinstance(i, dict))
                                 if text.strip():
-                                    messages.append({
+                                    parsed_msg = {
                                         'role': 'user',
                                         'content': text,
                                         'timestamp': obj.get('timestamp'),
                                         'uuid': _dedup_key(obj.get('uuid'), obj.get('timestamp'), text),
-                                    })
+                                    }
                             elif obj.get('type') == 'assistant' and 'message' in obj:
                                 content_list = obj['message'].get('content', [])
                                 thinking, text = '', ''
@@ -198,26 +221,37 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                                         if 'thinking' in item: thinking = item['thinking']
                                         if 'text' in item: text = item['text']
                                 if thinking or text:
-                                    messages.append({
+                                    parsed_msg = {
                                         'role': 'assistant',
                                         'thinking': thinking,
                                         'content': text,
                                         'timestamp': obj.get('timestamp'),
                                         'uuid': _dedup_key(obj.get('uuid'), obj.get('timestamp'), text or thinking),
-                                    })
+                                    }
+
+                            if parsed_msg is None:
+                                continue
+
+                            if current_date:
+                                messages_by_date.setdefault(current_date, []).append(parsed_msg)
+                            else:
+                                pending_untimestamped.append(parsed_msg)
                         except json.JSONDecodeError: continue
             except Exception as e:
                 print(f"Error reading {jsonl_path}: {e}")
                 continue
 
-            if messages and session_date:
-                # Sort messages
-                messages.sort(key=lambda x: x.get('timestamp', ''))
+            # A file with zero timestamped records never resolves
+            # pending_untimestamped into any date bucket -- nothing is
+            # emitted for it, preserving prior behavior (a file with no
+            # derivable session_date was never appended either).
+            for bucket_date, bucket_messages in messages_by_date.items():
+                bucket_messages.sort(key=lambda m: m.get('timestamp') or '')
                 all_sessions.append({
-                    'date': session_date,
-                    'ts_str': session_ts_str or "000000",
-                    'messages': messages,
-                    'count': len(messages)
+                    'date': bucket_date,
+                    'ts_str': date_ts_str.get(bucket_date) or "000000",
+                    'messages': bucket_messages,
+                    'count': len(bucket_messages)
                 })
 
     # Group by date
