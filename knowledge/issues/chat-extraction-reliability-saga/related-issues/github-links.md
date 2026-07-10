@@ -24,7 +24,7 @@ All six bugs below are tracked under one umbrella: [ENH-038](../../../enhancemen
 
 ### ENH-044: Gemini `--project` filter silently ignored
 - **File:** [../attempts/ENH-044/specification.md](../attempts/ENH-044/specification.md)
-- **Relationship:** Cross-project contamination — confirmed real (`career-prism` merged into `knowledge-graph` output). **Implemented & tested** (`bf1cb51c`/`1b2269cf`); spec status/ACs were left stale until 2026-07-09, closeout folded into the ENH-047 fix plan.
+- **Relationship:** Cross-project contamination — confirmed real (`career-prism` merged into `knowledge-graph` output). **Fixed (v0.6.17).** `.json`/`.jsonl` scoping shipped first (`bf1cb51c`/`1b2269cf`); real-data testing then found `.pb`/hash-named-directory contamination was still possible, closed fail-closed per [ADR-062](../../../decisions/ADR-062-gemini-pb-project-scoping-fail-closed.md) (`126d98ce`/`faa393d6`), re-verified against real data.
 - **Attempts Referenced:** Attempt 005.
 
 ### ENH-045: Codex incremental mtime-skip bug
@@ -46,7 +46,13 @@ All six bugs below are tracked under one umbrella: [ENH-038](../../../enhancemen
 
 ### ADR-044: Split oversized daily chat-history files (2026-04-23)
 - **File:** [../../../decisions/ADR-044-split-oversized-chat-history-files.md](../../../decisions/ADR-044-split-oversized-chat-history-files.md)
-- **Relationship:** Original spec for when/how a daily output file gets split into `-part1.md`/`-part2.md`/… (900 KB / 30,000-line threshold). Not part of this saga's bug list, but every fix here that touches `chat_extractor_base.py`'s output-path/dedup logic must stay compatible with it. ENH-038 found and fixed an incompatibility (dedup scanning only the last split part); ENH-047 (still unfixed) must be verified against a split-day fixture for the same reason.
+- **Relationship:** Original spec for when/how a daily output file gets split into `-part1.md`/`-part2.md`/… (900 KB / 30,000-line threshold). Not part of this saga's bug list, but every fix here that touches `chat_extractor_base.py`'s output-path/dedup logic must stay compatible with it. ENH-038 found and fixed an incompatibility (dedup scanning only the last split part); ENH-047 was verified against a split-day fixture for the same reason (`tests/test-extraction-multiday.sh` Step 4).
+
+## Decisions Produced By This Saga
+
+### ADR-062: Gemini .pb/hash-dir project scoping fails closed (2026-07-10)
+- **File:** [../../../decisions/ADR-062-gemini-pb-project-scoping-fail-closed.md](../../../decisions/ADR-062-gemini-pb-project-scoping-fail-closed.md)
+- **Relationship:** Records the fail-closed decision that closed ENH-044's remaining `.pb`/hash-dir contamination vector — leaking foreign content in is a trust-boundary violation, excluding unattributable own content is benign and recoverable.
 
 ---
 
@@ -68,5 +74,5 @@ All six bugs below are tracked under one umbrella: [ENH-038](../../../enhancemen
 
 ## Continuous Tracking
 
-- Update this file when a PR opens for the ENH-047 fix (ENH-044 is already shipped, closeout only).
+- Update this file when a PR opens (both ENH-047 and ENH-044 are now fully resolved on this branch, unpushed).
 - Keep the per-bug status table in [ENH-038's spec](../../../enhancements/ENH-038/ENH-038-specification.md) in sync with these files.

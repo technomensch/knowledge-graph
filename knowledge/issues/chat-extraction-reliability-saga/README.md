@@ -27,8 +27,8 @@ Extraction of Claude Code chat history into `knowledge/chat-history/` keeps losi
 
 **Current Status:**
 - **Attempts:** 7 rounds logged (see implementation-log.md)
-- **Latest Understanding:** ENH-047 (first-timestamp-only date derivation in `extract_claude_sessions()`) is **✅ Fixed (v0.6.17)** — per-message UTC-date bucketing implemented, tested (16/16, including the mandatory ADR-044 split-day interaction), and verified against real data (exact parity 987/987 across 4 dates, 25 real multi-day files correctly handled). Distinct from the incremental-append/rebuild defect (ENH-043) and the subagent-loss defect (ENH-038). ENH-044 (Gemini project-scoping) is **PARTIALLY fixed, NOT resolved**: `.json`/`.jsonl` scoping shipped (`bf1cb51c`/`1b2269cf`) but `.pb` path has no scoping (and hash-named `~/.gemini/tmp/` dirs unhandled), so cross-project contamination still possible — OPEN.
-- **Next Steps:** Finish ENH-044's `.pb`/hash-dir contamination-vector closeout (plan: `~/.claude/plans/v0.6.17-fix-extract-chat-multiday-bucketing.md`, in progress); re-baseline extraction; revisit Attempt-1's "wrong session captured" symptom now that bucketing is corrected.
+- **Latest Understanding:** ENH-047 (first-timestamp-only date derivation in `extract_claude_sessions()`) is **✅ Fixed (v0.6.17)** — per-message UTC-date bucketing implemented, tested (16/16, including the mandatory ADR-044 split-day interaction), and verified against real data (exact parity 987/987 across 4 dates, 25 real multi-day files correctly handled). Distinct from the incremental-append/rebuild defect (ENH-043) and the subagent-loss defect (ENH-038). ENH-044 (Gemini project-scoping) is **✅ Fixed (v0.6.17)** — `.json`/`.jsonl` scoping shipped first (`bf1cb51c`/`1b2269cf`), then a real-data test found the `.pb`/hash-dir contamination vector was still open; fixed fail-closed (ADR-062, `126d98ce`/`faa393d6`) and re-verified against real data.
+- **Next Steps:** Re-baseline extraction now that both ENH-047 and ENH-044 are resolved; revisit Attempt-1's "wrong session captured" symptom, still not root-caused.
 
 ---
 
@@ -40,7 +40,7 @@ Full detail for each: [implementation-log.md](implementation-log.md). Original p
 2. **ENH-043 (v0.6.17)** — In progress — rebuild mode for permanently-corrupted pre-fix output (Claude); real-data repair run found 68 flagged dates (9 recovered / 42 unrecoverable / rest false-positives from over-loose regex, since tightened).
 3. **Dogfooding Attempt 1 (2026-07-08)** — Failed — `--today` extraction captured an unrelated short session; message #1 content was not from today's real conversation.
 4. **Dogfooding Attempt 2 (2026-07-08)** — Failed, root-caused → **ENH-047** — `--today` returned 36 of 3,114 real messages; multi-day session bucketing defect confirmed with real data (Claude). **Fixed (v0.6.17)** — see Attempt 8 in implementation-log.md.
-5. **ENH-044 (v0.6.17)** — PARTIALLY FIXED (`.json`/`.jsonl` scoping shipped; `.pb` path still unscoped) — Gemini `--project` filter partially implemented. `.json`/`.jsonl` scoping verified working (`bf1cb51c` fix, `1b2269cf` test), but `.pb` path and hash-named `~/.gemini/tmp/` directories accept but ignore `project_filter`. Real cross-project contamination still possible via `.pb` files — OPEN. Real fix planned (not just spec closeout).
+5. **ENH-044 (v0.6.17)** — Fixed — Gemini `--project` filter. `.json`/`.jsonl` scoping shipped first (`bf1cb51c` fix, `1b2269cf` test), then real-data testing found `.pb`/hash-named-directory contamination was still possible; fixed fail-closed (ADR-062, `126d98ce` fix, `faa393d6` test) and re-verified against real `~/.gemini/` data — the previously-confirmed `career-prism` contamination no longer appears.
 6. **ENH-045 (v0.6.17)** — Fixed — Codex incremental mtime-skip bug, mirrored from the Claude fix in ENH-038.
 7. **ENH-046 (v0.6.17)** — Fixed — Gemini `.pb` sessions dated by file mtime instead of content; `_find_epoch_hint()` heuristic added.
 
@@ -54,21 +54,21 @@ The umbrella requirement: `kmg-extract-chat` must extract every real message, un
 |---|---|
 | ENH-038 | No subagent message loss; correct chronological interleaving; Gemini parses its streaming format; Codex verified clean |
 | ENH-043 | A rebuild mode must exist and successfully repair pre-fix-corrupted output |
-| ENH-044 | `--project` must actually scope Gemini output — no cross-project contamination |
+| ENH-044 | `--project` must actually scope Gemini output — no cross-project contamination — ✅ met |
 | ENH-045 | Codex incremental mode must not silently skip runs based on file age |
 | ENH-046 | Gemini `.pb` sessions must date from content, not file mtime (backup/restore safe) |
 | ENH-047 | Every message must file under its **own** date, even in sessions spanning multiple days — ✅ met |
 
 ## What Has Worked
 
-- ENH-038, ENH-045, ENH-046 — shipped, tested, verified against real data. No known regressions.
+- ENH-038, ENH-044, ENH-045, ENH-046, ENH-047 — all shipped, tested, verified against real data. No known regressions.
 - ENH-043 — the rebuild mechanism itself works correctly; real-data run recovered 9 of 68 flagged dates.
 
 ## What Has Failed
 
 - Two dogfooding extraction runs on real 2026-07-08 data both failed to return expected message counts (Attempts 3 & 4 in implementation-log.md) — these failures are what surfaced ENH-047, since fixed.
 - ENH-043's repair could not recover 42 of 68 flagged historical dates — not a code failure, a data-availability limit (source logs no longer exist anywhere, including the located backup).
-- ENH-044 is PARTIALLY implemented/OPEN — see correction above; this file previously incorrectly claimed it was fully implemented.
+- ENH-044's first fix (`.json`/`.jsonl` scoping) was incomplete — real-data testing later found the `.pb`/hash-dir vector still leaked. This file previously (incorrectly, twice) claimed ENH-044 was fully fixed before it actually was; now genuinely resolved.
 
 ## Why the Second Fix Attempt (ENH-043) Didn't Fully Solve Reliability
 
@@ -81,12 +81,13 @@ So: ENH-043 succeeded at its own, narrower scope; the saga's *overall* reliabili
 ## Outstanding
 
 - ~~**ENH-047** (Claude multi-day date-bucketing)~~ — **✅ Fixed (v0.6.17).** Was the highest-impact open item; per-message UTC-date bucketing shipped, tested, and verified against real data.
-- **ENH-044 `.pb`/hash-dir cross-project contamination fix** (a CODE fix, not just spec closeout — `.json`/`.jsonl` scoping shipped but `.pb` path still leaks unfiltered sessions + hash-named `~/.gemini/tmp/` dirs unhandled). In progress.
-- **Dogfooding Attempt 1's "wrong session captured" symptom** — noted, not yet root-caused; revisit once ENH-047 ships and extraction is re-baselined.
+- ~~**ENH-044** (Gemini `.pb`/hash-dir cross-project contamination)~~ — **✅ Fixed (v0.6.17).** Fail-closed exclusion shipped and verified against real data.
+- **Dogfooding Attempt 1's "wrong session captured" symptom** — noted, not yet root-caused; the sole remaining open item in this saga. Revisit now that extraction is fully fixed and can be re-baselined.
+- ENH-043's spec status line was never flipped from 🟡 Proposed to ✅ Resolved despite its code/tests being done — belongs to the *original* v0.6.17 plan's still-outstanding Task 8, not this saga's current closeout scope.
 
 ## Revert or Continue?
 
-**Continue — no revert warranted.** Every fully-shipped fix (ENH-038, 043, 045, 046, 047) is additive, independently tested, and verified against real data with no known regression; nothing shipped is making extraction worse than before this saga started. ENH-044 is partially fixed (`.json`/`.jsonl` scoping works but `.pb` path still leaks) — the remaining `.pb`/hash-dir contamination-vector fix is in progress, not a revert candidate either. See `~/.claude/plans/v0.6.17-fix-extract-chat-multiday-bucketing.md` for the plan covering both fixes.
+**Continue — no revert warranted.** Every shipped fix in this saga (ENH-038, 044, 045, 046, 047) is additive, independently tested, and verified against real data with no known regression; nothing shipped is making extraction worse than before this saga started. ENH-043's code is done too (only its spec status line lags, a different plan's leftover task). Next: re-baseline extraction now that both major bugs are closed, and root-cause the one remaining loose end — Attempt 1's "wrong session captured" symptom.
 
 ---
 

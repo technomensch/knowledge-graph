@@ -78,19 +78,19 @@ Fix ENH-047 (per-message date derivation); re-baseline extraction; revisit Attem
 
 ## Attempt 005: Gemini `--project` filter silently ignored (v0.6.17, ENH-044)
 
-**Status:** PARTIALLY FIXED — `.json`/`.jsonl` scoping shipped, but `.pb` path still unscoped → contamination still possible — OPEN
+**Status:** Completed (shipped) — `.json`/`.jsonl` scoping (`bf1cb51c`), then fail-closed `.pb`/hash-dir scoping (`126d98ce`) after real-data testing found the first fix incomplete
 **ENH:** [ENH-038 umbrella](../../enhancements/ENH-038/ENH-038-specification.md) / [full spec](attempts/ENH-044/specification.md)
 **Discovered:** 2026-07-06, while manually validating ENH-038's Gemini `.jsonl` fix
-**Related:** commit `bf1cb51c` (fix), `1b2269cf` (test)
+**Related:** commits `bf1cb51c`/`1b2269cf` (`.json`/`.jsonl` fix+test), `ADR-062` (fail-closed decision), `126d98ce`/`faa393d6` (`.pb`/hash-dir fix+test); plan `knowledge/plans/v0.6.17-fix-extract-chat-multiday-bucketing.md`
 
 **Approach:**
-Added a `project_filter` param to `.json` and `.jsonl` per-format extraction functions and threaded it through `extract_all_gemini`/`run_extraction.py`, mirroring the Claude extractor's existing fragment-match pattern. The `.pb` path (`extract_gemini_pb_sessions`) was left untouched; it accepts but ignores `project_filter`.
+Added a `project_filter` param to `.json` and `.jsonl` per-format extraction functions and threaded it through `extract_all_gemini`/`run_extraction.py`, mirroring the Claude extractor's existing fragment-match pattern. The `.pb` path (`extract_gemini_pb_sessions`) initially accepted but ignored `project_filter`. Real-data testing (2026-07-09/10) found this incomplete — `.pb` files carry no per-project path signal at all — so a second fix (ADR-062, fail-closed exclusion) was recorded and shipped: when `project_filter` is set, all `.pb` sessions and hash-named `~/.gemini/tmp/` directories that can't be positively attributed to the project are excluded, with a visible skip notice.
 
 **Outcome:**
-`.json`/`.jsonl` contamination confirmed pre-fix and verified fixed: a `career-prism` session merged into `knowledge-graph`'s `2026-05-13-gemini.md` output despite `--project=knowledge-graph` being passed; four foreign date-files created with no knowledge-graph content at all. Fixed and tested (`tests/test-extraction-gemini-project-filter.sh`). **BUT** real-data testing on 2026-07-09 found `.pb` path applies no project filtering at all — `extract_gemini_pb_sessions` accepts `project_filter` argument but ignores it. 93 real unfiltered `.pb` files exist under `~/.gemini/antigravity/conversations/`; cross-project contamination via `.pb` is masked only on machines where optional `blackboxprotobuf` dependency is absent. Hash-named `~/.gemini/tmp/` directories also can't fragment-match a human-readable `--project`, so they're unhandled. Therefore ENH-044 **remains OPEN**; real `.pb`-scoping fix planned (not just spec closeout).
+`.json`/`.jsonl` contamination confirmed pre-fix and verified fixed: a `career-prism` session merged into `knowledge-graph`'s `2026-05-13-gemini.md` output despite `--project=knowledge-graph` being passed; four foreign date-files created with no knowledge-graph content at all. Fixed and tested (`tests/test-extraction-gemini-project-filter.sh`). Real-data testing on 2026-07-09 then found the `.pb` path applied no project filtering at all — masked only because `blackboxprotobuf` was absent on this machine. Fixed fail-closed (`126d98ce`) and re-verified against real data (2026-07-10): all 9 real hash-named directories and all 93 real `.pb` files correctly skipped with a visible notice, and the previously-confirmed `career-prism` contamination no longer appears. **ENH-044 is now fully resolved.**
 
 **Key Learning:**
-Partial fixes that scope one format but miss others create a false sense of completion and are easy to forget about, especially when one format is optional-dependency-gated. Worth validating a fix against **all** supported input formats.
+Partial fixes that scope one format but miss others create a false sense of completion and are easy to forget about, especially when one format is optional-dependency-gated (the `.pb` gap was masked by an absent optional dependency, not by correct behavior). Worth validating a fix against **all** supported input formats, not just the one that was easiest to reproduce contamination for.
 
 ---
 
@@ -150,13 +150,13 @@ The task reviewer caught a hardcoded literal (`"3"` instead of the already-compu
 ## Statistics
 
 **By Outcome:**
-- Completed & Successful (fully fixed): 4 (ENH-038, ENH-045, ENH-046, ENH-047)
-- In Progress: 1 (ENH-043)
-- Partially Fixed, Open (needs real fix): 1 (ENH-044 — `.json`/`.jsonl` scoped, `.pb` path still leaks)
+- Completed & Successful (fully fixed): 5 (ENH-038, ENH-044, ENH-045, ENH-046, ENH-047)
+- In Progress: 1 (ENH-043 — code/tests done; spec status line itself not yet flipped, see note below)
+- Partially Fixed, Open: 0
 - Not Started: 0
 - Completed & Failed (root-caused, led to further work): 2 (dogfooding Attempts 3 & 4)
 - Abandoned: 0
-- **Unfixed, open:** ENH-044's `.pb`/hash-dir contamination vector (in progress, `~/.claude/plans/v0.6.17-fix-extract-chat-multiday-bucketing.md`)
+- **Unfixed, open (code):** none — ENH-038/044/045/046/047 are all fully resolved. ENH-043's code work is also done (rebuild mode shipped, tested, real-data repair run completed with its 42/68-unrecoverable data-availability ceiling documented) but its spec's own status line was never flipped from 🟡 Proposed to Resolved — that's the *original* v0.6.17 plan's still-outstanding Task 8 (a different plan than the one that closed out ENH-047/044), out of scope for this saga's current closeout pass.
 
 ---
 

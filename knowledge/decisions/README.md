@@ -4,8 +4,8 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 57
-**Last Updated:** 2026-07-08
+**Total ADRs:** 58
+**Last Updated:** 2026-07-10
 
 ---
 
@@ -17,6 +17,7 @@ Formal documentation of significant architecture decisions.
 
 ## All ADRs (Chronological)
 
+- [ADR-062: Gemini .pb/hash-named directory project scoping fails closed, not open](ADR-062-gemini-pb-project-scoping-fail-closed.md) — **Status:** Accepted — real-data testing found ENH-044's `.json`/`.jsonl` `--project` fix (v0.6.17) didn't close the whole contamination vector: `.pb` files carry no per-project path signal, so 93 real `.pb` files and 9 hash-named directories were still unscoped (masked on this machine only by an absent optional dependency). Decision: fail closed — exclude anything unattributable to the requested project, with a visible skip notice, rather than risk leaking a foreign project's private conversation into this project's committed, searchable knowledge graph. A future payload-decoded project signal could recover excluded content later, explicitly deferred. Implemented under umbrella [ENH-038](../enhancements/ENH-038/ENH-038-specification.md) / [ENH-044](../issues/chat-extraction-reliability-saga/attempts/ENH-044/specification.md).
 - [ADR-061: First-run repair notice must be platform-specific, not one unified mechanism](ADR-061-first-run-repair-notice-platform-specific-not-unified.md) — **Status:** Accepted — v0.6.17's `--rebuild` feature (ENH-043) needed a way to tell users their chat-history might be affected. A first design pass proposed one uniform notice for Claude/Gemini/Codex; rejected after finding the three platforms have genuinely different failure modes (data loss vs. contamination vs. staleness). Decision: platform-specific notices with different remedies — Claude gets a layered notice + concrete backup-recovery guidance + new `--claude-projects-dir`/`--source-root` flags; Gemini gets a corrective `--project`-scoping note; Codex is out of scope, filed separately as [ENH-045](../issues/chat-extraction-reliability-saga/attempts/ENH-045/specification.md) (now tracked under umbrella [ENH-038](../enhancements/ENH-038/ENH-038-specification.md)).
 - [ADR-060: Narrow kg_search scope away from raw chat-history — let context-mode own session recall](ADR-060-narrow-kg-search-scope-away-from-raw-chat-history.md) — **Status:** Proposed — Re-evaluated context-mode (v1.0.169) against kmgraph now that context-mode ships full session-continuity + RRF/proximity/fuzzy-ranked search. Decision: stop indexing raw `chat-history/*.md` in `kg_search`/`kg_fts5_rebuild` — context-mode owns ephemeral session/decision recall, kmgraph owns durable curated artifacts (ADRs/lessons/enhancements) only. Does not change ADR-001's multi-KG active-pointer model. Implemented by [ENH-040](../enhancements/ENH-040/ENH-040-specification.md).
 - [ADR-059: Plans must not hardcode derivable counts — derive at run time](ADR-059-no-hardcoded-derivable-counts-in-plans.md) — **Status:** Accepted — Caught live in the v0.6.16 plan: `knowledge/enhancements/` count drifted 36→37→38 within one planning session as ENH-037 and ENH-038 were both created mid-session. Decision: plans must never hardcode a computed file/folder/entry count as a fixed expectation — phrase it as "derived at run time from `<command>`" instead. Rule-only change to `~/.kmgraph/plan-authoring-rules.md`; motivated by this user's actual multi-platform concurrent-session operating mode (Claude/Codex/Gemini on the same repo), not a hypothetical.
