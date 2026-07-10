@@ -4,8 +4,16 @@
 
 Tracking of investigated bugs, defects, and meta-issues for this project.
 
-**Total Issues:** 9
-**Last Updated:** 2026-07-05
+**Total Issues:** 9 numbered issues, plus named meta-issues (see below)
+**Last Updated:** 2026-07-10
+
+---
+
+## Named Meta-Issues
+
+- [kg-config-silent-overwrite: `~/.claude/kg-config.json` Silently Overwritten With a Test Fixture](kg-config-silent-overwrite/README.md) — **Status:** 🔴 Investigating — Severity: High. Real KG registrations replaced by a lone `test-kg` fixture entry, silently, root cause unknown; could affect any user of this plugin, not just this machine.
+- [chat-extraction-reliability-saga](chat-extraction-reliability-saga/README.md) — **Status:** ✅ Resolved — tracked under umbrella [ENH-038](../enhancements/ENH-038/ENH-038-specification.md)
+- [sessionstart-hook-path-saga](sessionstart-hook-path-saga/) — see its own README for status
 
 ---
 
