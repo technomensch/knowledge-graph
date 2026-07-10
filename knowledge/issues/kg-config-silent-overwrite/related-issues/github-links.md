@@ -13,3 +13,10 @@
 This issue is not related to the chat-extraction-reliability-saga (`knowledge/issues/chat-extraction-reliability-saga/`) — different subsystem (kmgraph's own config/MCP server vs. the chat-history extractors) — do not conflate the two.
 
 No ENH or PR filed yet — those follow once the fix itself is implemented.
+
+---
+
+## Related ADRs
+
+- **[ADR-012](../../decisions/ADR-012-hook-security-model.md)** — Hook security model. States hook scripts must make "no modifications to files outside the active KG path" and must be idempotent. `test-hooks.sh`/`test-stop-hook.sh`'s direct `cp`/`rm -f` against the real `~/.claude/kg-config.json` violates this constraint. The fix (env-var config-path override) restores compliance with an existing decision rather than introducing new policy.
+- **[ADR-020](../../decisions/ADR-020-lifecycle-hooks-suite-automated-capture.md)** — Governs `hooks-master.sh` (the SessionStart hook these tests exercise) and documents the v0.5.5 amendment (PPID → kg-name+date flag key, issue #106, PR #108, commit `35348c3b`) that touched `test-stop-hook.sh` on 2026-04-29. That commit's purpose was fixing session-end dedup logic — the real-config clobber pattern rode along incidentally, not as a deliberate design choice.

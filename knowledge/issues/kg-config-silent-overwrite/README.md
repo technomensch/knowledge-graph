@@ -3,7 +3,7 @@
 **Domain:** data-loss / tooling / mcp-server
 **Severity:** High — silent, undetected data loss in a file the whole plugin depends on for KG routing; unknown root cause; unknown blast radius (could affect any user/machine running this plugin, not just this one)
 **Created:** 2026-07-10
-**Status:** 🟢 Root-caused — fix not yet implemented. Tracked publicly at [GitHub #163](https://github.com/technomensch/knowledge-graph/issues/163).
+**Status:** 🟢 Root-caused, provenance confirmed (not abandoned code) — fix not yet implemented. Tracked publicly at [GitHub #163](https://github.com/technomensch/knowledge-graph/issues/163).
 
 ---
 
@@ -37,6 +37,25 @@ Discovered 2026-07-10 while investigating why `kg_search`/`kg_recall` weren't fi
 - **Is this live in production? Yes, in the sense that matters:** no `.npmignore`/`files` field/`.gitattributes export-ignore` excludes `tests/` from what ships with the repo. Confirmed directly: this machine's actual installed plugin cache (`~/.claude/plugins/cache/stayinginsync-knowledge-graph/kmgraph/0.6.16/tests/`) contains these exact files, pulled straight from the repo. No postinstall script, CI workflow, or hook auto-runs them, so ordinary end users of the *installed plugin* are not automatically exposed just by using it. **However**, `tests/run-all-tests.sh` — the standard aggregate test runner — explicitly lists both scripts in its suite (`"test-hooks.sh|Hooks — SessionStart hook validation|no"`, `"test-stop-hook.sh|Stop hook flag — kg-name+date dedup|no"`), so any contributor running the normal full test suite before a PR hits this every time.
 - **Blast radius (corrected — this is not a one-time historical event):** this is a live, currently unpatched bug on `main`, exposed every single time any contributor runs the standard test suite, on any machine, since 2026-03-03 (`test-hooks.sh`) / 2026-04-29 (`test-stop-hook.sh`). Every contributor to this repo, on every machine, on every test run since those dates, has been one interrupted `Ctrl-C`/killed-process away from silently losing their real `~/.claude/kg-config.json` — a repeated, ongoing exposure window, not a single incident. Ordinary installed-plugin end users are not automatically exposed (nothing auto-runs these scripts), but anyone who clones the repo to contribute, or who manually pokes at `tests/` in their plugin cache, is.
 - User's own registrations are not a priority to recover (locally recreatable) — the priority (now satisfied) was finding the root cause; next is deciding on and shipping a fix.
+
+---
+
+## Historical Context / Provenance (added 2026-07-10, after root cause)
+
+**Question:** Is `hooks-master.sh` / the test suite that exercises it abandoned code, or something actively maintained with real intent behind it? Answer determines whether the fix should be a minimal patch or should honor the original design.
+
+**Answer: Not abandoned. Both sides are live, deliberate, and still in active use.**
+
+- `scripts/hooks-master.sh` — the SessionStart hook itself. Per [ADR-020](../../decisions/ADR-020-lifecycle-hooks-suite-automated-capture.md): "remains separate and unchanged" since v0.0.9, still the current session-start config/health-check/auto-switch mechanism. Not legacy.
+- `tests/test-hooks.sh` / `tests/test-stop-hook.sh` — introduced deliberately, not as scratch/throwaway scripts:
+  - `test-hooks.sh`: commit `094e74434`, `test(beta-prep): add comprehensive pre-beta test suite (v0.0.11-alpha) #29` — a 113-test suite built specifically to validate the codebase before the beta release.
+  - `test-stop-hook.sh`: commit `35348c3b`, `fix(hooks): v0.5.5` — added/updated to verify the ADR-020-amendment fix for issue #106 (Stop-hook flag dedup keying bug). Real bug, real fix, real regression test.
+  - Both are still enumerated in `tests/run-all-tests.sh` today and still identical between `main` and this branch — actively exercised by any contributor running the standard suite, not orphaned.
+- **Governing ADR:** [ADR-012](../../decisions/ADR-012-hook-security-model.md) already states the constraint these tests violate — hook scripts must make "no modifications to files outside the active KG path" and must be idempotent. The clobber-and-restore pattern was never a sanctioned design; it's a violation of an existing decision that slipped through because `hooks-master.sh` had no path override to sandbox against.
+
+**Implication for the fix:** since neither side is dead code, the fix should restore the *intended* behavior (real config-path sandboxing per ADR-012) rather than patch around symptoms (e.g., just hardening the `trap` cleanup). This also means the fix must preserve what `test-hooks.sh`/`test-stop-hook.sh` are actually validating — SessionStart hook config resolution and Stop-hook dedup keying — not just stop them from touching the real file.
+
+**Distribution note (2026-07-10):** this repo itself is locked down (no other collaborators have write access, no unauthorized commits here). However, the user confirms several clones of this repo exist externally. Since the vulnerable code has been live and unpatched on `main` since 2026-03-03/2026-04-29, **any clone taken on or after those dates carries the bug**, independent of this repo's own access controls. This raises the fix from "protect this repo" to "ship a fix and consider whether cloned copies need any advisory," since clones won't auto-receive a `main` fix.
 
 ---
 
