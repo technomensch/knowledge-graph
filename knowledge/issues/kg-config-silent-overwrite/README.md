@@ -3,7 +3,7 @@
 **Domain:** data-loss / tooling / mcp-server
 **Severity:** High — silent, undetected data loss in a file the whole plugin depends on for KG routing; unknown root cause; unknown blast radius (could affect any user/machine running this plugin, not just this one)
 **Created:** 2026-07-10
-**Status:** Investigating
+**Status:** 🟢 Root-caused — fix not yet implemented
 
 ---
 
@@ -28,8 +28,15 @@ Discovered 2026-07-10 while investigating why `kg_search`/`kg_recall` weren't fi
 - If the root cause is in the kmgraph plugin or its MCP server (not something local/one-off to this machine), **any user who has this plugin installed could have their real KG registrations silently clobbered** the same way, with no indication anything went wrong until they notice search/recall isn't finding content.
 
 **Current Status:**
-- Root cause: **unknown**. Not yet established whether this is a kmgraph MCP server bug (e.g., a test harness writing to the real config path instead of a sandboxed one), a Claude Code session side-effect, or something else on this machine.
-- User's own registrations are not a priority to recover (locally recreatable) — the priority is finding and closing the root cause before it silently repeats, here or for other users.
+- **Root cause CONFIRMED (2026-07-10):** `scripts/hooks-master.sh:12` hardcodes `CONFIG_PATH="$HOME/.claude/kg-config.json"` with no environment-variable override. Two bash test scripts that exercise this hook — `tests/test-hooks.sh` and `tests/test-stop-hook.sh` — therefore have no way to sandbox it, and instead temporarily overwrite the REAL config file in place (`cp "$TEST_CONFIG" "$REAL_CONFIG"`, and in one case `rm -f "$REAL_CONFIG"` outright to test the "no config" scenario), relying on a single `trap cleanup EXIT` to restore from a backup afterward. If that trap ever doesn't fire cleanly (script killed, terminal closed, process group killed, any non-graceful termination), the real file is left permanently in whatever test-fixture state it was clobbered to. The surviving `test-kg` entry's shape (name, placeholder `2026-01-01T00:00:00.000Z` timestamps) matches fixtures constructed inline in `test-hooks.sh` and `tests/fixtures/valid-config.json` exactly.
+- **Not the cause:** the kmgraph MCP server's TypeScript test suite (`mcp-server/tests/*.test.ts`) properly mocks `readConfig`/`writeConfig` (jest.mock) in the files that touch config (`capture.test.ts`, `upgrade.test.ts`), and the MCP server itself supports a `KG_CONFIG_PATH` env override that `tests/test-mcp-edge-cases.sh`/`test-mcp-resources.sh` correctly use to sandbox their runs. `fts5.test.ts`'s `rebuildIndex()` calls don't touch `kg-config.json` at all. This session's own `kg_fts5_rebuild` MCP tool call did write back to the real config (adding an `fts5: true` flag to the already-present `test-kg` entry) but did not cause the original wipe — that had already happened before this session's first read.
+- **When introduced / current status on `main` (confirmed via git, 2026-07-10):**
+  - `tests/test-hooks.sh`'s risky pattern: introduced 2026-03-03 (`094e74434`).
+  - `tests/test-stop-hook.sh`'s risky pattern: introduced 2026-04-29 (`35348c3b`).
+  - Both **still present, unpatched, on `main`** as of the latest commit touching either file (`824b3968`, 2026-05-25) — confirmed identical between `main` and this branch (`git diff main -- tests/test-hooks.sh` is empty). This is not historical drift; it is live on `main` today.
+- **Is this live in production? Yes, in the sense that matters:** no `.npmignore`/`files` field/`.gitattributes export-ignore` excludes `tests/` from what ships with the repo. Confirmed directly: this machine's actual installed plugin cache (`~/.claude/plugins/cache/stayinginsync-knowledge-graph/kmgraph/0.6.16/tests/`) contains these exact files, pulled straight from the repo. No postinstall script, CI workflow, or hook auto-runs them, so ordinary end users of the *installed plugin* are not automatically exposed just by using it. **However**, `tests/run-all-tests.sh` — the standard aggregate test runner — explicitly lists both scripts in its suite (`"test-hooks.sh|Hooks — SessionStart hook validation|no"`, `"test-stop-hook.sh|Stop hook flag — kg-name+date dedup|no"`), so any contributor running the normal full test suite before a PR hits this every time.
+- **Blast radius (corrected — this is not a one-time historical event):** this is a live, currently unpatched bug on `main`, exposed every single time any contributor runs the standard test suite, on any machine, since 2026-03-03 (`test-hooks.sh`) / 2026-04-29 (`test-stop-hook.sh`). Every contributor to this repo, on every machine, on every test run since those dates, has been one interrupted `Ctrl-C`/killed-process away from silently losing their real `~/.claude/kg-config.json` — a repeated, ongoing exposure window, not a single incident. Ordinary installed-plugin end users are not automatically exposed (nothing auto-runs these scripts), but anyone who clones the repo to contribute, or who manually pokes at `tests/` in their plugin cache, is.
+- User's own registrations are not a priority to recover (locally recreatable) — the priority (now satisfied) was finding the root cause; next is deciding on and shipping a fix.
 
 ---
 
@@ -74,11 +81,13 @@ Some MCP kmgraph tool call made during this session (`kg_fts5_status`, `kg_fts5_
 
 ## Next Steps
 
-1. Locate the kmgraph MCP server's source (not just the cached plugin commands) and audit every code path that writes to `kg-config.json`, specifically test/fixture setup and teardown code, for any that could target the real user config path instead of an isolated one.
-2. Check whether `kg_fts5_status`/`kg_fts5_rebuild`'s actual implementation (not just their tool descriptions) touch `kg-config.json` under any condition.
-3. Determine exact time window: is there any log (MCP server logs, plugin logs) narrowing down when the overwrite happened today, versus just "sometime before 13:14:45"?
-4. If the root cause is confirmed to be in shipped plugin/MCP-server code (not a one-off local fluke), treat as a release-blocking bug — assess how many installed users could be silently affected and what remediation (patch + user-facing advisory) is needed.
-5. Once root cause is understood and fixed (or confirmed to be a local one-off), re-register this project's KG via `/kmgraph:kmg-init`.
+**Root cause confirmed — remaining work is deciding and shipping a fix, not further investigation.**
+
+1. **Give `hooks-master.sh` an environment-variable config-path override**, mirroring the pattern the MCP server (`mcp-server/src/utils.ts`) already uses correctly: `CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.claude/kg-config.json}"` instead of the current hardcoded literal at `scripts/hooks-master.sh:12`.
+2. **Update `tests/test-hooks.sh` and `tests/test-stop-hook.sh`** to set `KG_CONFIG_PATH="$TEST_CONFIG"` when invoking the hook, removing every `cp "$TEST_CONFIG" "$REAL_CONFIG"` / `rm -f "$REAL_CONFIG"` call against the real file entirely — sandboxing at the source instead of clobber-and-restore.
+3. As defense in depth (belt-and-suspenders, in case a similar pattern appears elsewhere later): make the backup/restore safer regardless — write the backup, then restore via `trap` on `EXIT INT TERM`, not `EXIT` alone, and consider an atomic write pattern (write to a temp file, then rename) for the real-path restore step so a killed process can't leave the real file half-written either.
+4. Decide whether this needs a user-facing advisory: anyone who has run `tests/test-hooks.sh`/`test-stop-hook.sh` locally and had it interrupted may have silently lost real KG registrations the same way, with no error ever surfaced.
+5. Once a fix lands and is verified (deliberately interrupt a test run mid-clobber and confirm the real config survives), re-register this project's KG via `/kmgraph:kmg-init`.
 
 ---
 

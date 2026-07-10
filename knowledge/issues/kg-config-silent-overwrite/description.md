@@ -2,17 +2,17 @@
 
 **Created:** 2026-07-10
 **Last Updated:** 2026-07-10
-**Current Status:** Investigating
+**Current Status:** Root-caused — fix not yet implemented
 
 ---
 
 ## Current Understanding
 
-**Root Cause (Current Belief):** Unknown. No hypothesis confirmed yet.
+**Root Cause (Confirmed):** `scripts/hooks-master.sh:12` hardcodes `CONFIG_PATH="$HOME/.claude/kg-config.json"`, with no environment-variable override. Two bash test scripts that exercise this hook (`tests/test-hooks.sh`, `tests/test-stop-hook.sh`) have no way to sandbox it as a result, and instead directly `cp`/`rm -f` the real config file in place — repeatedly, at multiple points in each script — relying on a single `trap cleanup EXIT` to restore a backup afterward. If that trap doesn't fire cleanly for any reason, the real file is left in whatever fixture state it was clobbered to.
 
-**Confidence Level:** None — pure discovery stage, no root cause investigation performed yet.
+**Confidence Level:** High — confirmed directly against source (`scripts/hooks-master.sh`, `tests/test-hooks.sh`, `tests/test-stop-hook.sh`, `tests/fixtures/valid-config.json`), not inferred. The surviving `test-kg` entry's exact shape (name, `2026-01-01T00:00:00.000Z` placeholder timestamps) matches these test fixtures precisely.
 
-**Evidence:** See `README.md`'s "Evidence Gathered So Far" section (kept in one place to avoid duplication while this issue is young).
+**Evidence:** See `README.md`'s "Current Status" section for the full confirmed chain, including what was ruled out (the MCP server's own TypeScript test suite, and this session's own `kg_fts5_rebuild` call, neither of which caused the original wipe).
 
 ---
 
