@@ -1,0 +1,6 @@
+{"type":"user","uuid":"day1-001","timestamp":"2026-06-01T09:00:00Z","message":{"role":"user","content":[{"type":"text","text":"Day one, message one."}]}}
+{"type":"assistant","uuid":"day1-002","timestamp":"2026-06-01T09:00:05Z","message":{"role":"assistant","content":[{"type":"text","text":"Day one, response one."}]}}
+{"type":"user","uuid":"day1-003","timestamp":"2026-06-01T09:10:00Z","message":{"role":"user","content":[{"type":"text","text":"Day one, message two."}]}}
+{"type":"user","uuid":"day3-001","timestamp":"2026-06-03T14:00:00Z","message":{"role":"user","content":[{"type":"text","text":"Day three, message one."}]}}
+{"type":"assistant","uuid":"day3-002","timestamp":"2026-06-03T14:00:05Z","message":{"role":"assistant","content":[{"type":"text","text":"Day three, response one."}]}}
+{"type":"user","uuid":"day3-003-fallback","message":{"role":"user","content":[{"type":"text","text":"Day three, fallback message with no timestamp of its own."}]}}
