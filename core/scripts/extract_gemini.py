@@ -23,13 +23,34 @@ from chat_extractor_base import get_output_path, format_timestamp, write_markdow
 GEMINI_TMP_DIR = os.path.expanduser("~/.gemini/tmp")
 GEMINI_CONV_DIR = os.path.expanduser("~/.gemini/antigravity/conversations")
 
+_HASH_DIR_RE = re.compile(r'^[0-9a-f]{16,}$')
+
+def _filter_project_dirs(project_dirs, project_filter):
+    """Fail-closed project-directory scoping (ADR-062): when project_filter
+    is set, only directories whose basename fragment-matches it are kept.
+    Hash-named directories (opaque SHA-like names under ~/.gemini/tmp/) can
+    never fragment-match a human-readable --project string, so they are
+    always excluded once a filter is active. That exclusion is flagged with
+    a visible skip notice, never silent -- it's a permanent scoping gap for
+    that directory (its content becomes invisible to any --project-scoped
+    run), not an ordinary non-match against a differently-named project.
+    """
+    if not project_filter:
+        return project_dirs
+    matched = [d for d in project_dirs if project_filter.lower() in os.path.basename(d).lower()]
+    hash_excluded = [d for d in project_dirs
+                      if d not in matched and _HASH_DIR_RE.match(os.path.basename(d))]
+    if hash_excluded:
+        noun = "directory" if len(hash_excluded) == 1 else "directories"
+        print(f"Skipped {len(hash_excluded)} hash-named ~/.gemini/tmp/ {noun} -- "
+              f"cannot be attributed to project {project_filter!r} by name (fail-closed scoping, ADR-062)")
+    return matched
+
 def extract_gemini_json_sessions(limit=None, project_filter=None):
     """Returns a list of recent sessions from JSON files."""
     all_json_sessions = []
     project_dirs = glob.glob(os.path.join(GEMINI_TMP_DIR, "*"))
-    if project_filter:
-        project_dirs = [d for d in project_dirs
-                        if project_filter.lower() in os.path.basename(d).lower()]
+    project_dirs = _filter_project_dirs(project_dirs, project_filter)
     json_files = []
     for project_dir in project_dirs:
         json_files.extend(glob.glob(os.path.join(project_dir, "**", "session-*.json"), recursive=True))
@@ -99,9 +120,7 @@ def extract_gemini_stream_sessions(limit=None, project_filter=None):
     """
     all_stream_sessions = []
     project_dirs = glob.glob(os.path.join(GEMINI_TMP_DIR, "*"))
-    if project_filter:
-        project_dirs = [d for d in project_dirs
-                        if project_filter.lower() in os.path.basename(d).lower()]
+    project_dirs = _filter_project_dirs(project_dirs, project_filter)
     jsonl_files = []
     for project_dir in project_dirs:
         jsonl_files.extend(glob.glob(os.path.join(project_dir, "**", "session-*.jsonl"), recursive=True))
@@ -245,16 +264,24 @@ def _find_epoch_hint(obj, now=None):
 def extract_gemini_pb_sessions(limit=None, project_filter=None):
     """Returns a list of archived sessions from Protobuf files using blackboxprotobuf or fallback.
 
-    project_filter is accepted for signature parity with the .json/.jsonl
-    paths (extract_all_gemini calls all three uniformly) but not yet applied
-    here: .pb files live flat under GEMINI_CONV_DIR with no per-project
-    subdirectory to filter on, unlike GEMINI_TMP_DIR's per-project layout —
-    see ENH-044's Explicitly Out of Scope section. Filtering .pb by project
-    would need a different mechanism (e.g. a field inside the decoded
-    payload), not yet implemented.
+    Project scoping (ADR-062, fail-closed): .pb files live flat under
+    GEMINI_CONV_DIR with no per-project subdirectory, unlike GEMINI_TMP_DIR's
+    per-project layout for .json/.jsonl -- nothing can positively attribute a
+    .pb file to a project. So whenever project_filter is set, ALL .pb
+    sessions are excluded: leaking another project's private conversation
+    into this project's committed, searchable knowledge graph is a
+    trust-boundary violation that's hard to undo, while under-collecting a
+    project's own .pb content is benign and recoverable later (e.g. by a
+    future payload-decoded project signal, deliberately not built here).
+    The exclusion is always reported, never silent.
     """
     all_pb_sessions = []
     pb_files = glob.glob(os.path.join(GEMINI_CONV_DIR, "*.pb"))
+    if project_filter:
+        if pb_files:
+            print(f"Skipped {len(pb_files)} .pb session(s) -- not attributable to "
+                  f"project {project_filter!r} (fail-closed scoping, ADR-062)")
+        return all_pb_sessions
     if limit:
         pb_files = pb_files[:limit]
     print(f"DEBUG: Found {len(pb_files)} PB files in {GEMINI_CONV_DIR}")
