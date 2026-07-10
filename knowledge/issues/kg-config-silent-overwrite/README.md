@@ -3,7 +3,7 @@
 **Domain:** data-loss / tooling / mcp-server
 **Severity:** High — silent, undetected data loss in a file the whole plugin depends on for KG routing; unknown root cause; unknown blast radius (could affect any user/machine running this plugin, not just this one)
 **Created:** 2026-07-10
-**Status:** 🟢 Root-caused — fix not yet implemented
+**Status:** 🟢 Root-caused — fix not yet implemented. Tracked publicly at [GitHub #163](https://github.com/technomensch/knowledge-graph/issues/163).
 
 ---
 
