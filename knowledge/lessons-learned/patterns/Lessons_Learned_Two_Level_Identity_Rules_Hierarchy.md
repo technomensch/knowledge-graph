@@ -169,6 +169,7 @@ knowledge/me.md          ← contributor identity (gitignored)
 
 **Other Lessons:**
 - [Single Source of Truth / DRY Documentation](./Lessons_Learned_Single_Source_Of_Truth_DRY_Documentation.md) - Related principle applied to docs
+- [Fix Ownership Follows the Root-Cause KG, Not the Code's Location](./Lessons_Learned_Patterns_Fix_Ownership_Follows_Root_Cause_KG_Not_Code_Location.md) - Extends this two-level hierarchy from identity/rules files to bug/fix ownership for shared plugin code
 
 **Session:**
 - [2026-04-09 v0.3.0-beta Implementation Snapshot](../sessions/2026-04/2026-04-09-v0.3.0-beta-implementation-snapshot.md)
