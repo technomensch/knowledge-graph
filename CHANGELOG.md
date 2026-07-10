@@ -7,7 +7,7 @@ displayed_sidebar: null
 
 All notable changes to the Knowledge Plugin will be documented in this file.
 
-## [Unreleased] — v0.6.17 in progress
+## [0.6.17] — 2026-07-10
 
 ### Fixed
 
