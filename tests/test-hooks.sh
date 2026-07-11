@@ -22,18 +22,11 @@ fail() { echo "  ❌ FAIL: $1"; FAIL=$((FAIL + 1)); }
 TEST_DIR=$(mktemp -d)
 TEST_CONFIG="$TEST_DIR/kg-config.json"
 TEST_KG_DIR="$TEST_DIR/test-kg"
-REAL_CONFIG="$HOME/.claude/kg-config.json"
-REAL_CONFIG_BACKUP="$TEST_DIR/kg-config.backup.json"
 
 cleanup() {
   rm -rf "$TEST_DIR"
-  if [ -f "$REAL_CONFIG_BACKUP" ]; then
-    mv "$REAL_CONFIG_BACKUP" "$REAL_CONFIG"
-  fi
 }
-trap cleanup EXIT
-
-[ -f "$REAL_CONFIG" ] && cp "$REAL_CONFIG" "$REAL_CONFIG_BACKUP"
+trap cleanup EXIT INT TERM
 
 echo "═══════════════════════════════════════════════════════════════"
 echo "TEST SUITE: SessionStart Hook (hooks-master.sh)"
@@ -54,19 +47,16 @@ fi
 
 # Helper: run hook with custom config path
 run_hook() {
-  # Override CONFIG_PATH and PLUGIN_ROOT via environment patching
-  # hooks-master.sh uses hardcoded CONFIG_PATH="$HOME/.claude/kg-config.json"
-  # We need to put the test config there temporarily
-  cp "$TEST_CONFIG" "$REAL_CONFIG" 2>/dev/null || true
-  OUTPUT=$(bash "$HOOKS_MASTER" 2>&1 || true)
+  # hooks-master.sh honors a KG_CONFIG_PATH override (falls back to the real config path).
+  # Point it at the sandboxed test config — never touches the real file.
+  OUTPUT=$(KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" 2>&1 || true)
   EXIT_CODE=$?
   echo "$OUTPUT"
   return $EXIT_CODE
 }
 
 run_hook_exit_code() {
-  cp "$TEST_CONFIG" "$REAL_CONFIG" 2>/dev/null || true
-  bash "$HOOKS_MASTER" > /dev/null 2>&1
+  KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" > /dev/null 2>&1
   echo $?
 }
 
@@ -75,13 +65,8 @@ run_hook_exit_code() {
 echo "── Section 2: Config validation ────────────────────────────────"
 
 # Test 1: No config file — exits 0 with "No knowledge graph configured"
-rm -f "$REAL_CONFIG"
-cat > "$TEST_CONFIG" << 'EOF'
-NOCONFIG
-EOF
-# Actually — remove the real config and run
-rm -f "$REAL_CONFIG"
-OUTPUT=$(bash "$HOOKS_MASTER" 2>&1 || true)
+NONEXISTENT_CONFIG="$TEST_DIR/nonexistent-config.json"
+OUTPUT=$(KG_CONFIG_PATH="$NONEXISTENT_CONFIG" bash "$HOOKS_MASTER" 2>&1 || true)
 EXIT_CODE=$?
 if echo "$OUTPUT" | grep -qiE "No knowledge graph|no knowledge graph configured"; then
   pass "No config file — outputs 'No knowledge graph configured'"
@@ -98,8 +83,7 @@ fi
 cat > "$TEST_CONFIG" << 'EOF'
 {"version":"1.0.0","active":null,"graphs":{},"sanitization":{"enabled":false,"patterns":[],"action":"warn"}}
 EOF
-cp "$TEST_CONFIG" "$REAL_CONFIG"
-OUTPUT=$(bash "$HOOKS_MASTER" 2>&1 || true)
+OUTPUT=$(KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" 2>&1 || true)
 EXIT_CODE=$?
 if echo "$OUTPUT" | grep -qiE "No active|active.*knowledge graph"; then
   pass "No active KG — outputs warning"
@@ -125,9 +109,8 @@ cat > "$TEST_CONFIG" << EOF
   "sanitization": {"enabled":false,"patterns":[],"action":"warn"}
 }
 EOF
-cp "$TEST_CONFIG" "$REAL_CONFIG"
 set +e
-OUTPUT=$(bash "$HOOKS_MASTER" 2>&1)
+OUTPUT=$(KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" 2>&1)
 EXIT_CODE=$?
 set -e
 if echo "$OUTPUT" | grep -qiE "does not exist|path.*not.*exist|not exist"; then
@@ -160,8 +143,7 @@ cat > "$TEST_CONFIG" << EOF
   "sanitization": {"enabled":false,"patterns":[],"action":"warn"}
 }
 EOF
-cp "$TEST_CONFIG" "$REAL_CONFIG"
-OUTPUT=$(bash "$HOOKS_MASTER" 2>&1 || true)
+OUTPUT=$(KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" 2>&1 || true)
 EXIT_CODE=$?
 if [ $EXIT_CODE -eq 0 ]; then
   pass "Valid config and existing KG — exits 0"
@@ -186,8 +168,7 @@ EOF
 # Touch to current time (within 7 days)
 touch "$LESSON_FILE"
 
-cp "$TEST_CONFIG" "$REAL_CONFIG"
-OUTPUT=$(bash "$HOOKS_MASTER" 2>&1 || true)
+OUTPUT=$(KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" 2>&1 || true)
 if echo "$OUTPUT" | grep -qiE "Recent Lesson|lesson|recent"; then
   pass "Recent lessons section displayed when lesson exists"
 else
@@ -209,10 +190,9 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 else
   touch -d "35 days ago" "$FAKE_KMGRAPH/rules.md"
 fi
-# Hook resolves config from $HOME/.claude/kg-config.json — put it in fake home too
-cp "$TEST_CONFIG" "$FAKE_CLAUDE_DIR/kg-config.json"
-
-OUTPUT=$(HOME="$FAKE_HOME" bash "$HOOKS_MASTER" 2>&1 || true)
+# HOME is faked for the ~/.kmgraph/rules.md staleness path; KG_CONFIG_PATH sandboxes
+# the config independently (belt-and-suspenders — either alone would suffice here).
+OUTPUT=$(HOME="$FAKE_HOME" KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" 2>&1 || true)
 if echo "$OUTPUT" | grep -qiE "stale|days ago"; then
   pass "Stale ~/.kmgraph/rules.md (35 days old) — outputs stale warning"
 else
@@ -222,7 +202,7 @@ fi
 # Test 7: Fresh ~/.kmgraph/rules.md produces no staleness warning
 touch "$FAKE_KMGRAPH/rules.md"  # Reset to current time
 
-OUTPUT=$(HOME="$FAKE_HOME" bash "$HOOKS_MASTER" 2>&1 || true)
+OUTPUT=$(HOME="$FAKE_HOME" KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" 2>&1 || true)
 if ! echo "$OUTPUT" | grep -qiE "stale|days ago"; then
   pass "Fresh ~/.kmgraph/rules.md — no staleness warning shown"
 else

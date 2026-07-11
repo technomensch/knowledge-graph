@@ -68,11 +68,12 @@ All six bugs below are tracked under one umbrella: [ENH-038](../../../enhancemen
 ## Branches
 
 - `v0.6.16-update-claude-extract-chat-for-sub-agents` (merged) — ENH-038.
-- `v0.6.17-fix-extract-chat-rebuild` (current) — ENH-043 / ENH-044 / ENH-045 / ENH-046 / ENH-047.
+- `v0.6.17-fix-extract-chat-rebuild` (merged, PR #162, `8c56070a`, 2026-07-10) — ENH-043 / ENH-044 / ENH-045 / ENH-046 / ENH-047.
+- `v0.6.18-*` (not yet branched) — post-merge regression findings (rebuild data-loss, Gemini fail-open hex-dir leak, etc.) — see meta-issue README "Post-Merge Regression Findings" section.
 
 ---
 
 ## Continuous Tracking
 
-- Update this file when a PR opens (both ENH-047 and ENH-044 are now fully resolved on this branch, unpushed).
+- v0.6.17 merged 2026-07-10. Post-merge Fable review of the merged diff (same day) found 6 new findings, targeted for v0.6.18 — see meta-issue README.
 - Keep the per-bug status table in [ENH-038's spec](../../../enhancements/ENH-038/ENH-038-specification.md) in sync with these files.

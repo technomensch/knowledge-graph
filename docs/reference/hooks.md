@@ -71,6 +71,20 @@ The other eight scripts are always active once KMGraph is installed. Individual 
 
 All hook scripts reside in `scripts/` relative to the plugin root. Additional scripts in that directory (`fuzzy-search-archive.sh`, `install-vscode.sh`, `prepare-mcp.sh`, `validate-plugin.sh`) are invoked by installer and CLI commands, not by the hook system.
 
+## Config Path Resolution
+
+Every hook script that reads `kg-config.json` resolves its path via
+`${KG_CONFIG_PATH:-$HOME/.claude/kg-config.json}` — an exported `KG_CONFIG_PATH`
+environment variable is honored if set, otherwise the script falls back to the default
+`~/.claude/kg-config.json`. This mirrors the override the MCP server (`mcp-server/src/utils.ts`)
+already uses. It applies to `hooks-master.sh`, `session-end-prompt.sh`,
+`post-tool-lesson-check.sh`, `plan-mirror.sh`, and `notification-dispatch.sh`.
+
+For ordinary use, `hooks.json` invokes every script with no environment overrides, so hooks
+resolve the real config path exactly as before — this override exists for test sandboxing
+(see `tests/README.md`) and for any workflow that intentionally points KMGraph at an
+alternate config file.
+
 ## Exit Code Conventions
 
 | Exit code | Meaning |

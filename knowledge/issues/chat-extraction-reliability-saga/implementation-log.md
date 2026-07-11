@@ -2,8 +2,8 @@
 
 Chronological record of all attempts to solve chat-extraction reliability.
 
-**Total Attempts:** 8
-**Last Updated:** 2026-07-10
+**Total Attempts:** 9
+**Last Updated:** 2026-07-11
 
 ---
 
@@ -147,16 +147,45 @@ The task reviewer caught a hardcoded literal (`"3"` instead of the already-compu
 
 ---
 
+## Attempt 009: Post-merge regression fixes (v0.6.18, this branch, 2026-07-11)
+
+**Status:** Completed (shipped, this branch)
+**Related:** branch `v0.6.18-fix-extraction-regressions`, plan `knowledge/plans/v0.6.18-fix-extraction-regressions.md` (Opus-drafted, Fable-reviewed 3 rounds)
+**Discovered:** 2026-07-10, via a post-merge Fable review of the full merged v0.6.17 diff (`git diff 3f36f8ca...8c56070a`) — the first time this saga's shipped code, not just its plan, was independently reviewed
+
+**Approach:**
+Six independent findings, fixed in one pass since all touch the same two files (`extract_claude.py`, `extract_gemini.py`) and their shared base (`chat_extractor_base.py`):
+1. New `write_atomic()` (temp-file + `os.replace`) and `backup_aside()` (rename to timestamped, dot-hidden sibling, retention-capped at 3) helpers in `chat_extractor_base.py`, replacing `clear_split_subfolder`'s pre-write `shutil.rmtree` entirely.
+2. Rebuild/overwrite branches in `extract_claude.py` rerouted through both helpers — backup-before-write for the primary target (so consecutive reruns each get a distinct backup, not one shared slot), backup-after-write for stale split dirs/duplicate flat copies elsewhere (since those aren't touched by the primary write and can safely wait).
+3. `extract_gemini.py`'s `_filter_project_dirs` reordered to detect hash dirs before substring matching, closing the fail-open leak; `_HASH_DIR_RE` made case-insensitive.
+4. `_find_epoch_hint` bounded (`MAX_SESSION_SPAN_DAYS=7`, anchored on `max(candidates)`), and three previously-silent mtime-fallback paths now emit loud, counted warnings.
+5. New fixture + test step for the leading-untimestamped backfill path.
+6. `run_extraction.py` warns explicitly when `--rebuild` is requested for a source that doesn't support it.
+
+**A genuine design ambiguity surfaced mid-implementation** (not resolved by silently picking one option): the plan's numbered fix-shape steps said to `backup_aside` the split dir and duplicate flat copies *after* the write succeeds, but didn't explicitly address the *primary* output path's own pre-existing content — yet the plan's own Verification section required "a second distinct backup" on a second consecutive rebuild run, which only works if the primary path is backed up *before* being overwritten. Flagged to the user as a HALT; resolved as backup-before-write for the primary path specifically, backup-after-write for everything else — this is what actually shipped, and it's what made the plan's own verification pass.
+
+**A second ambiguity surfaced during verification itself**, not before: fixing Finding 4's `min()`-outlier bug (bounding candidate timestamps to `MAX_SESSION_SPAN_DAYS=7`) broke a pre-existing test (`test-extraction-gemini-pb-timestamp-hint.sh` case 6) that assumed a 150-day gap between two legitimate timestamp candidates was normal. Rather than guessing, checked real evidence on this machine: the max internal timestamp span across all real `~/.gemini/tmp/` session files was ~29 minutes, zero files over 1 day. The 7-day bound was generous relative to observed reality, not overly strict — updated the old test's expectation to a realistic 3-day gap and added a new case explicitly proving the outlier-rejection behavior, rather than loosening the fix to accommodate an untested hypothetical.
+
+**Outcome:**
+All 6 findings fixed and verified: static grep checks (rmtree removed from the live rebuild path, `os.replace` present), a live behavioral run (seeded a stale split dir, ran `--rebuild` twice — first run backed up the split dir, second run produced a **second, distinct** backup of the first run's flat file, neither destroying the other), unit tests for the Gemini fail-open fix and the epoch-hint outlier bound, the new Step 5 backfill test, and warning-string checks for Finding 6. Full extraction suite: 9 files, 79 assertions, **0 failures** — including the pre-existing 16 multiday assertions (no regression from the write-path refactor) and 6 gemini-pb-timestamp-hint assertions (1 updated, 1 added) plus the 3 new multiday Step 5 assertions.
+
+**Key Learning:**
+Two lessons, both about not silently resolving ambiguity: (1) a plan's prose fix-shape and its own Verification section can quietly disagree — when they do, the verification section is often the more reliable disambiguator, since it encodes the actual required *outcome* rather than a step-by-step description that may have skipped a case. (2) When a code fix breaks a pre-existing test, check real evidence before deciding whether the fix or the test is wrong — in this case real machine data supported the fix's assumption, but the reverse could just as easily have been true, and guessing either way would have been the wrong process even if it landed on the right answer by luck.
+
+**Post-verification real-data dogfooding (2026-07-11) found and fixed one more bug.** After the synthetic-fixture verification above, real production `--rebuild`/incremental runs were executed against this repo's actual `knowledge/chat-history/` (Claude and Gemini both) to prove Finding 1+2's fix against real content, not just fixtures. This surfaced a genuinely new, previously-unknown bug: 6 real chat-history dates already have split subfolders on disk (from an older extractor version) using a `-part-01.md` naming (hyphenated, zero-padded) that neither `split_file_if_oversized` (`chat_extractor_base.py`) nor `parse_seen_uuids` (`extract_claude.py`) recognized — both assumed a `-part1.md` format. Fixed by aligning current code to the real format (also fixing a latent >9-part sort-order bug the old scheme had). Fixing the first occurrence alone caused two test regressions (`test-extraction-multiday.sh`, `test-extraction-subagent-repro.sh`) from the second, missed occurrence in `extract_claude.py` — caught by re-running the full suite, not assumed fixed after one file. Full detail and the flagged future-validation checkpoint (Finding 1's real-data proof is still structurally incomplete — no real split date has surviving source logs to rebuild from): see meta-issue README's Outstanding section.
+
+---
+
 ## Statistics
 
 **By Outcome:**
-- Completed & Successful (fully fixed): 5 (ENH-038, ENH-044, ENH-045, ENH-046, ENH-047)
+- Completed & Successful (fully fixed): 6 (ENH-038, ENH-044, ENH-045, ENH-046, ENH-047, post-merge regression fixes v0.6.18)
 - In Progress: 1 (ENH-043 — code/tests done; spec status line itself not yet flipped, see note below)
 - Partially Fixed, Open: 0
 - Not Started: 0
 - Completed & Failed (root-caused, led to further work): 2 (dogfooding Attempts 3 & 4)
 - Abandoned: 0
-- **Unfixed, open (code):** none — ENH-038/044/045/046/047 are all fully resolved. ENH-043's code work is also done (rebuild mode shipped, tested, real-data repair run completed with its 42/68-unrecoverable data-availability ceiling documented) but its spec's own status line was never flipped from 🟡 Proposed to Resolved — that's the *original* v0.6.17 plan's still-outstanding Task 8 (a different plan than the one that closed out ENH-047/044), out of scope for this saga's current closeout pass.
+- **Unfixed, open (code):** none — ENH-038/044/045/046/047 and the 6 v0.6.18 post-merge findings are all fully resolved. ENH-043's code work is also done (rebuild mode shipped, tested, real-data repair run completed with its 42/68-unrecoverable data-availability ceiling documented) but its spec's own status line was never flipped from 🟡 Proposed to Resolved — that's the *original* v0.6.17 plan's still-outstanding Task 8 (a different plan than the one that closed out ENH-047/044), out of scope for this saga's current closeout pass.
 
 ---
 
@@ -165,9 +194,10 @@ The task reviewer caught a hardcoded literal (`"3"` instead of the already-compu
 **What's been tried:**
 - Per-message uuid dedup (ENH-038)
 - Forced overwrite/rebuild mode + real-data repair (ENH-043)
+- Atomic writes + rename-aside backups, replacing destructive pre-write deletes (post-merge fixes, v0.6.18)
 
 **What hasn't been tried:**
-- Root-causing the `--today` "wrong session" selection (Attempt 3) — still outstanding, revisit now that ENH-047 is fixed
+- Root-causing the `--today` "wrong session" selection (Attempt 3) — still outstanding, revisit now that ENH-047 and the v0.6.18 post-merge findings are both fixed
 
 **Recurring failures:**
 - Each fix addressed one symptom while a different root cause in the same subsystem remained — the pipeline had multiple independent defects.

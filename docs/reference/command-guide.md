@@ -800,7 +800,7 @@ Test the hook:
 
 **Repair and source-override flags**:
 
-- `--rebuild` — Force a clean overwrite/flatten pass for every date in scope, ignoring existing output state. Repairs files written by pre-fix extractor code where normal incremental runs cannot self-heal (dedup treats any uuid already on disk as permanently synced). Not the default mode — use for one-time repair, not routine extraction.
+- `--rebuild` — Force a clean overwrite/flatten pass for every date in scope, ignoring existing output state. Repairs files written by pre-fix extractor code where normal incremental runs cannot self-heal (dedup treats any uuid already on disk as permanently synced). Not the default mode — use for one-time repair, not routine extraction. Claude-only; `--source gemini`/`codex` prints a warning and is otherwise ignored. Prior content at a rebuilt date is backed up aside (dot-hidden, timestamped, never deleted before the new content is confirmed written), not destroyed.
 - `--incremental` — Only extract new sessions; skip a date if its output is already current.
 - `--claude-projects-dir=<path>` — Override the Claude session-log source directory (e.g. a restored backup) instead of `~/.claude/projects/`.
 

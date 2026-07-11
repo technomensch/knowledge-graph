@@ -10,9 +10,9 @@
 - **Filed:** 2026-07-10, after root cause and blast radius were confirmed.
 - **Content:** root cause, timeline/blast-radius, and recommended fix — mirrors this meta-issue's README at time of filing.
 
-This issue is not related to the chat-extraction-reliability-saga (`knowledge/issues/chat-extraction-reliability-saga/`) — different subsystem (kmgraph's own config/MCP server vs. the chat-history extractors) — do not conflate the two.
+This issue is **not root-cause-related** to the chat-extraction-reliability-saga (`knowledge/issues/chat-extraction-reliability-saga/`) — different subsystem (kmgraph's own config/MCP server vs. the chat-history extractors). **Shipping-wise**, they are now combined: both fixes were merged onto one branch, `v0.6.18-fix-extraction-regressions`, per an explicit user decision on 2026-07-10 to ship as a single PR/release rather than two. Do not conflate the *causes*; do treat them as one *release*.
 
-No ENH or PR filed yet — those follow once the fix itself is implemented.
+This issue's fix (`ac70b490`, "fix(hooks): sandbox test config path via KG_CONFIG_PATH env override") is code-complete on that branch. No standalone PR was filed for it — it ships as part of whatever PR opens for `v0.6.18-fix-extraction-regressions`.
 
 ---
 

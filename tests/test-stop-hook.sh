@@ -17,22 +17,15 @@ fail() { echo "  ❌ FAIL: $1"; FAIL=$((FAIL + 1)); }
 
 TEST_DIR=$(mktemp -d)
 TEST_CONFIG="$TEST_DIR/kg-config.json"
-REAL_CONFIG="$HOME/.claude/kg-config.json"
-REAL_CONFIG_BACKUP="$TEST_DIR/kg-config.backup.json"
 TODAY="$(date +%Y%m%d)"
 
 cleanup() {
   rm -rf "$TEST_DIR"
-  if [ -f "$REAL_CONFIG_BACKUP" ]; then
-    mv "$REAL_CONFIG_BACKUP" "$REAL_CONFIG"
-  fi
   rm -f "/tmp/.kg-session-summarized-test-kg-${TODAY}"
   rm -f "/tmp/.kg-session-summarized-other-kg-${TODAY}"
   rm -f "/tmp/.kg-session-summarized-default-${TODAY}"
 }
-trap cleanup EXIT
-
-[ -f "$REAL_CONFIG" ] && cp "$REAL_CONFIG" "$REAL_CONFIG_BACKUP"
+trap cleanup EXIT INT TERM
 
 echo "═══════════════════════════════════════════════════════════════"
 echo "TEST SUITE: Stop Hook (session-end-prompt.sh)"
@@ -73,7 +66,6 @@ make_config() {
   "sanitization": {"enabled":false,"patterns":[],"action":"warn"}
 }
 EOF
-  cp "$TEST_CONFIG" "$REAL_CONFIG"
 }
 
 echo "── Section 1: Flag creation ─────────────────────────────────────"
@@ -81,7 +73,7 @@ echo "── Section 1: Flag creation ──────────────
 # Test 1: Flag is created with kg-name-date pattern (not PPID-date)
 make_config "test-kg"
 rm -f "/tmp/.kg-session-summarized-test-kg-${TODAY}"
-bash "$STOP_HOOK" > /dev/null 2>&1 || true
+KG_CONFIG_PATH="$TEST_CONFIG" bash "$STOP_HOOK" > /dev/null 2>&1 || true
 
 EXPECTED_FLAG="/tmp/.kg-session-summarized-test-kg-${TODAY}"
 if [ -f "$EXPECTED_FLAG" ]; then
@@ -94,7 +86,7 @@ fi
 # Use realpath to resolve /tmp symlink on macOS (/tmp → /private/tmp)
 TMP_REAL="$(realpath /tmp 2>/dev/null || echo /tmp)"
 # Clear any pre-existing today flags so the count is environment-independent
-find "$TMP_REAL" -maxdepth 1 -name ".kg-session-summarized-*-${TODAY}" -delete 2>/dev/null; bash "$STOP_HOOK" > /dev/null 2>&1 || true
+find "$TMP_REAL" -maxdepth 1 -name ".kg-session-summarized-*-${TODAY}" -delete 2>/dev/null; KG_CONFIG_PATH="$TEST_CONFIG" bash "$STOP_HOOK" > /dev/null 2>&1 || true
 TOTAL_FLAGS=$(find "$TMP_REAL" -maxdepth 1 -name ".kg-session-summarized-*-${TODAY}" 2>/dev/null | wc -l | tr -d ' ')
 if [ "$TOTAL_FLAGS" -eq 1 ]; then
   pass "Exactly one flag created — no PPID-based extras"
@@ -112,7 +104,7 @@ if [ ! -f "$EXPECTED_FLAG" ]; then
   fail "precondition: test-kg flag missing before dedup check"
 fi
 set +e
-OUTPUT=$(bash "$STOP_HOOK" 2>&1)
+OUTPUT=$(KG_CONFIG_PATH="$TEST_CONFIG" bash "$STOP_HOOK" 2>&1)
 EXIT_CODE=$?
 set -e
 if [ $EXIT_CODE -eq 0 ]; then
@@ -132,7 +124,7 @@ echo "── Section 3: Per-project isolation ───────────�
 # Test 5 & 6: Different KG name produces different flags; original unaffected
 make_config "other-kg"
 rm -f "/tmp/.kg-session-summarized-other-kg-${TODAY}"
-bash "$STOP_HOOK" > /dev/null 2>&1 || true
+KG_CONFIG_PATH="$TEST_CONFIG" bash "$STOP_HOOK" > /dev/null 2>&1 || true
 
 OTHER_FLAG="/tmp/.kg-session-summarized-other-kg-${TODAY}"
 if [ -f "$OTHER_FLAG" ]; then
@@ -152,10 +144,10 @@ echo ""
 echo "── Section 4: No-config fallback ────────────────────────────────"
 
 # Test 7: When no config exists, hook exits 0 gracefully
-rm -f "$REAL_CONFIG"
+NONEXISTENT_CONFIG="$TEST_DIR/nonexistent-config.json"
 rm -f "/tmp/.kg-session-summarized-default-${TODAY}"
 set +e
-OUTPUT=$(bash "$STOP_HOOK" 2>&1)
+OUTPUT=$(KG_CONFIG_PATH="$NONEXISTENT_CONFIG" bash "$STOP_HOOK" 2>&1)
 EXIT_CODE=$?
 set -e
 if [ $EXIT_CODE -eq 0 ]; then
@@ -176,10 +168,9 @@ echo "── Section 5: Default fallback (active key null) ───────
 cat > "$TEST_CONFIG" << 'NULLEOF'
 {"version":"1.0.0","active":null,"graphs":{},"sanitization":{"enabled":false,"patterns":[],"action":"warn"}}
 NULLEOF
-cp "$TEST_CONFIG" "$REAL_CONFIG"
 rm -f "/tmp/.kg-session-summarized-default-${TODAY}"
 set +e
-OUTPUT=$(bash "$STOP_HOOK" 2>&1)
+OUTPUT=$(KG_CONFIG_PATH="$TEST_CONFIG" bash "$STOP_HOOK" 2>&1)
 EXIT_CODE=$?
 set -e
 if [ $EXIT_CODE -eq 0 ]; then

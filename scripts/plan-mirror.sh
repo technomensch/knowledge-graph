@@ -2,7 +2,7 @@
 # plan-mirror.sh - PostToolUse hook: auto-mirror plans from ~/.claude/plans/ to active KG docs/plans/
 # Security: no eval, no network, all variables quoted, subshells quoted
 
-CONFIG_PATH="$HOME/.claude/kg-config.json"
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.claude/kg-config.json}"
 CLAUDE_PLANS_DIR="$HOME/.claude/plans"
 
 # Color codes

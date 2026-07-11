@@ -2,7 +2,7 @@
 # session-end-prompt.sh - Stop hook: remind user to wrap up before ending session
 # Security: no eval, no network, all variables quoted, subshells quoted
 
-CONFIG_PATH="$HOME/.claude/kg-config.json"
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.claude/kg-config.json}"
 
 # Claude Code Stop hooks require hookSpecificOutput format; Codex requires {"decision":"continue"}.
 # Gemini has no Stop hook. Select output by CLAUDECODE env var (set only by Claude Code).

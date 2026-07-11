@@ -7,7 +7,7 @@ import hashlib
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 import re
-from chat_extractor_base import get_output_path, format_timestamp, write_markdown_header, write_message_block, split_file_if_oversized
+from chat_extractor_base import get_output_path, format_timestamp, write_markdown_header, write_message_block, split_file_if_oversized, write_atomic, backup_aside, OUTPUT_DIR
 
 CLAUDE_PROJECTS_DIR = os.path.expanduser("~/.claude/projects")
 
@@ -96,8 +96,11 @@ def parse_seen_uuids(file_path: str) -> set[str]:
         split_dir = os.path.join(OUTPUT_DIR, date_m.group(1))
         if os.path.isdir(split_dir):
             stem = filename[:-3]  # strip .md, matches get_output_path()
-            # strip any trailing -partN so we glob the whole family, not one part
-            stem = re.sub(r'-part\d+$', '', stem)
+            # strip any trailing -part-NN so we glob the whole family, not one
+            # part (hyphenated, zero-padded -- matches split_file_if_oversized's
+            # naming in chat_extractor_base.py, aligned to real pre-existing
+            # split files discovered via real-data dogfooding, 2026-07-11)
+            stem = re.sub(r'-part-\d+$', '', stem)
             paths = sorted(glob.glob(os.path.join(split_dir, f'{stem}-part*.md')))
     if not paths:
         paths = [file_path]  # single flat file (no split subfolder)
@@ -295,15 +298,22 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
         sessions.sort(key=lambda x: x['ts_str'])
         
         filename = f"{date}-claude.md"
+        split_dir = os.path.join(OUTPUT_DIR, date)
 
         if rebuild:
-            # Clear any stale split subfolder BEFORE resolving output_path, so
-            # get_output_path() routes to the flat-file location instead of a
-            # soon-to-be-deleted split part inside {OUTPUT_DIR}/{date}/.
-            from chat_extractor_base import OUTPUT_DIR, clear_split_subfolder
-            clear_split_subfolder(OUTPUT_DIR, date)
-
-        output_path = get_output_path(filename)
+            # Resolve the flat output path directly -- do NOT call
+            # get_output_path() here, since a stale {date}/ split subfolder
+            # (if any) is still live at this point and get_output_path()
+            # would route into it (it always prefers an existing split
+            # dir's last part). The old split content, and any stray flat
+            # copies elsewhere, are backed aside AFTER the fresh write
+            # succeeds below -- never deleted before it.
+            year_month = date[:7]
+            output_dir_for_date = os.path.join(OUTPUT_DIR, year_month)
+            os.makedirs(output_dir_for_date, exist_ok=True)
+            output_path = os.path.join(output_dir_for_date, filename)
+        else:
+            output_path = get_output_path(filename)
 
         if rebuild:
             # --rebuild takes precedence over --incremental: forcing
@@ -343,20 +353,29 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                 flat_new_msgs = [m for s in filtered_sessions for m in s['messages']]
                 flat_new_msgs.sort(key=lambda m: _parse_ts(m.get('timestamp')) or 0)
 
-                with open(output_path, 'a', encoding='utf-8') as f:
-                    # Write a separator if it's new activity on the same day
-                    f.write(f"\n\n---\n## [Incremental Update: {datetime.now().strftime('%H:%M:%S')}]\n\n")
+                # Wrap the append in write_atomic too: read the existing
+                # content, append the new block in memory, then swap the
+                # whole thing in atomically -- a crash mid-append can no
+                # longer leave a partial trailing block (append content is
+                # small, so reading it all into memory first is cheap).
+                with open(output_path, 'r', encoding='utf-8') as existing_f:
+                    existing_content = existing_f.read()
 
-                    global_msg_index = last_idx + 1
-                    for msg in flat_new_msgs:
+                def _write_appended(f, _existing=existing_content, _msgs=flat_new_msgs, _start=last_idx + 1):
+                    f.write(_existing)
+                    f.write(f"\n\n---\n## [Incremental Update: {datetime.now().strftime('%H:%M:%S')}]\n\n")
+                    idx = _start
+                    for msg in _msgs:
                         write_message_block(
-                            f, global_msg_index, msg['role'],
+                            f, idx, msg['role'],
                             format_timestamp(msg['timestamp']),
                             msg.get('content'),
                             msg.get('thinking'),
                             uuid=msg.get('uuid'),
                         )
-                        global_msg_index += 1
+                        idx += 1
+
+                write_atomic(output_path, _write_appended)
                 split_parts = split_file_if_oversized(output_path)
                 if split_parts:
                     results.append(f"Appended to {filename} — split into {len(split_parts)} parts in {date}/ subfolder")
@@ -365,21 +384,23 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
             else:
                 results.append(f"No new activity for {filename} (last sync: {datetime.utcfromtimestamp(last_ts).strftime('%Y-%m-%dT%H:%M:%SZ')})")
         else:
-            # File exists but metadata parsing failed, or file is new
+            # File exists but metadata parsing failed, is new, or --rebuild
+            # forced this branch.
             file_exists = os.path.exists(output_path)
             file_has_content = file_exists and os.path.getsize(output_path) > 0
 
-            # Create backup if we're about to overwrite existing content
+            # Back up the PRIMARY target's existing content BEFORE writing
+            # over it -- never destroy the old good state until the new
+            # state is confirmed written. backup_aside() renames (not
+            # copies) it aside to a timestamped, dot-prefixed sibling, so a
+            # second consecutive run (e.g. two --rebuild passes on the same
+            # date) gets its own distinct backup instead of clobbering a
+            # single shared ".backup" slot.
+            backup_msg = ""
             if file_has_content:
-                backup_path = output_path + ".backup"
-                try:
-                    import shutil
-                    shutil.copy2(output_path, backup_path)
-                    backup_msg = f" (backup saved to {os.path.basename(backup_path)})"
-                except Exception as e:
-                    backup_msg = f" (backup failed: {e})"
-            else:
-                backup_msg = ""
+                backed_up_path = backup_aside(output_path)
+                if backed_up_path:
+                    backup_msg = f" (backup saved to {os.path.basename(backed_up_path)})"
 
             total_messages = sum(s['count'] for s in sessions)
 
@@ -394,19 +415,39 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
             flat_messages = [m for msgs in all_msgs_for_date for m in msgs]
             flat_messages.sort(key=lambda m: _parse_ts(m.get('timestamp')) or 0)
 
-            with open(output_path, 'w', encoding='utf-8') as f:
-                write_markdown_header(f, "Claude Code", total_messages, date)
-
-                global_msg_index = 1
-                for msg in flat_messages:
+            def _write_fresh(f, _msgs=flat_messages, _total=total_messages, _date=date):
+                write_markdown_header(f, "Claude Code", _total, _date)
+                idx = 1
+                for msg in _msgs:
                     write_message_block(
-                        f, global_msg_index, msg['role'],
+                        f, idx, msg['role'],
                         format_timestamp(msg['timestamp']),
                         msg.get('content'),
                         msg.get('thinking'),
                         uuid=msg.get('uuid'),
                     )
-                    global_msg_index += 1
+                    idx += 1
+
+            write_atomic(output_path, _write_fresh)
+
+            if rebuild:
+                # Now that the fresh flat file is confirmed written, back
+                # aside anything old that could otherwise shadow or
+                # duplicate it: any stray flat copy of this filename found
+                # elsewhere in the tree (mirrors get_output_path()'s walk
+                # step, applied manually here since output_path was
+                # resolved explicitly above, not via get_output_path()),
+                # and the stale {date}/ split subfolder itself. Neither is
+                # touched until this point, so a failure during the write
+                # above would have left both fully intact.
+                for root, dirs, files in os.walk(OUTPUT_DIR):
+                    dirs[:] = [d for d in dirs if not d.startswith('.') and d != 'scripts']
+                    if filename in files:
+                        stray_path = os.path.join(root, filename)
+                        if os.path.abspath(stray_path) != os.path.abspath(output_path):
+                            backup_aside(stray_path)
+                if os.path.isdir(split_dir):
+                    backup_aside(split_dir)
 
             # Check size limits and split if needed
             split_parts = split_file_if_oversized(output_path)

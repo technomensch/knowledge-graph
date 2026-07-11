@@ -79,13 +79,13 @@ echo "── Pass 4: split-file dedup (ADR-044) ──"
 # in part1 and skip it, not re-append it into part2.
 SPLIT_DIR="$OUTPUT_DIR/2026-07-03"
 mkdir -p "$SPLIT_DIR"
-cat > "$SPLIT_DIR/2026-07-03-claude-part1.md" <<'EOF'
+cat > "$SPLIT_DIR/2026-07-03-claude-part-01.md" <<'EOF'
 # Complete Chat Session Export — Part 1
 ### Message 1: User
 <!-- uuid: sub-002 -->
 **Timestamp:** 2026-07-03T09:00:20
 EOF
-cat > "$SPLIT_DIR/2026-07-03-claude-part2.md" <<'EOF'
+cat > "$SPLIT_DIR/2026-07-03-claude-part-02.md" <<'EOF'
 # Complete Chat Session Export — Part 2
 ### Message 2: User
 <!-- uuid: main-006 -->
@@ -96,7 +96,7 @@ HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
   --source claude --output-dir "$OUTPUT_DIR" --date "$DATE" --incremental \
   > "$TEST_DIR/pass3.log" 2>&1 || true
 
-COUNT_PART2=$(grep -c '<!-- uuid: sub-002 -->' "$SPLIT_DIR/2026-07-03-claude-part2.md" 2>/dev/null) || COUNT_PART2=0
+COUNT_PART2=$(grep -c '<!-- uuid: sub-002 -->' "$SPLIT_DIR/2026-07-03-claude-part-02.md" 2>/dev/null) || COUNT_PART2=0
 if [ "$COUNT_PART2" = "0" ]; then
   pass "split-file dedup: sub-002 (seen in part1) not re-appended to part2"
 else

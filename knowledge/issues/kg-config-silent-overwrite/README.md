@@ -3,7 +3,8 @@
 **Domain:** data-loss / tooling / mcp-server
 **Severity:** High — silent, undetected data loss in a file the whole plugin depends on for KG routing; unknown root cause; unknown blast radius (could affect any user/machine running this plugin, not just this one)
 **Created:** 2026-07-10
-**Status:** 🟢 Root-caused, provenance confirmed (not abandoned code) — fix not yet implemented. Tracked publicly at [GitHub #163](https://github.com/technomensch/knowledge-graph/issues/163).
+**Status:** 🟢 Root-caused, provenance confirmed (not abandoned code), plan drafted (Opus) and triple-reviewed (Fable, 3 rounds — scope widened from 2 to 5 hook scripts, verification hardened) — fix not yet implemented. Tracked publicly at [GitHub #163](https://github.com/technomensch/knowledge-graph/issues/163).
+**Target version:** `v0.6.18` (folded back in, 2026-07-10 — briefly split to `v0.6.19` when this and the chat-extraction post-merge regressions were treated as separate releases; user then chose to ship both as one combined branch/PR instead of two. The `v0.6.19` fix commit (`ac70b490`, "fix(hooks): sandbox test config path via KG_CONFIG_PATH env override") was merged onto `v0.6.18-fix-extraction-regressions`; the standalone `v0.6.19-fix-kg-config-silent-overwrite` branch/worktree was retired.) Fix is code-complete on this branch — see [related-issues/github-links.md](related-issues/github-links.md).
 
 ---
 

@@ -2,7 +2,7 @@
 # post-tool-lesson-check.sh - PostToolUse hook: detect lesson-worthy signals after Write/Edit/Bash
 # Security: no eval, no network, all variables quoted, subshells quoted
 
-CONFIG_PATH="$HOME/.claude/kg-config.json"
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.claude/kg-config.json}"
 
 # Color codes
 YELLOW='\033[1;33m'

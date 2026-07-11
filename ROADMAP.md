@@ -116,12 +116,24 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 
 ---
 
-## v0.6.17 (🚧 In Progress: 2026-07-07)
+## v0.6.17 (✅ Released: 2026-07-10, PR #162, `8c56070a`)
 
 ### Fixes
 
 - ✅ **ENH-043** (now tracked under umbrella [ENH-038](knowledge/enhancements/ENH-038/ENH-038-specification.md)): `kmg-extract-chat`'s v0.6.16 uuid-dedup fix can't retroactively repair chat-history files the pre-fix code already wrote (486 of 2,801 extractable subagent messages missing across full project history, 96% task-dispatch prompts). Added `--rebuild` to force a clean overwrite/flatten pass, then ran a one-time repair (9 of 68 flagged dates recovered, 42 permanently unrecoverable — no source data). Spec: `knowledge/issues/chat-extraction-reliability-saga/attempts/ENH-043/specification.md`. Plan: `knowledge/plans/v0.6.17-fix-extract-chat-rebuild.md`.
 - ✅ **ENH-044** (now tracked under umbrella [ENH-038](knowledge/enhancements/ENH-038/ENH-038-specification.md)): Gemini extractor had no project-scoping — `--project` silently ignored, merging unrelated projects' sessions into the active project's output. Added `project_filter` support mirroring the Claude extractor's existing pattern (`bf1cb51c`, tested in `1b2269cf`). Spec status/ACs were left stale after shipping (found and corrected 2026-07-09); closeout only remains. Spec: `knowledge/issues/chat-extraction-reliability-saga/attempts/ENH-044/specification.md`.
+- ✅ **ENH-045** (umbrella [ENH-038](knowledge/enhancements/ENH-038/ENH-038-specification.md)): Codex extractor incremental mtime-skip bug, mirrored from Claude's v0.6.16 fix. Spec: `knowledge/issues/chat-extraction-reliability-saga/attempts/ENH-045/specification.md`.
+- ✅ **ENH-046** (umbrella [ENH-038](knowledge/enhancements/ENH-038/ENH-038-specification.md)): Gemini `.pb` sessions dated by file mtime instead of content; `_find_epoch_hint()` heuristic added. Spec: `knowledge/issues/chat-extraction-reliability-saga/attempts/ENH-046/specification.md`.
+- ✅ **ENH-047** (umbrella [ENH-038](knowledge/enhancements/ENH-038/ENH-038-specification.md)): whole Claude session file was date-bucketed by its first message; multi-day sessions misfiled later-day content under the start date. Per-message UTC date bucketing shipped. Spec: `knowledge/issues/chat-extraction-reliability-saga/attempts/ENH-047/specification.md`.
+
+---
+
+## v0.6.18 (🚧 In Progress: 2026-07-10)
+
+### Fixes
+
+- 🔲 **kg-config-silent-overwrite** (✅ code complete, `ac70b490`, not yet merged to `main`): `hooks-master.sh`, `session-end-prompt.sh`, `post-tool-lesson-check.sh`, `plan-mirror.sh`, `notification-dispatch.sh` hardcoded `~/.claude/kg-config.json` with no sandboxing path, forcing `tests/test-hooks.sh`/`tests/test-stop-hook.sh` to clobber the real global config in place. Added `KG_CONFIG_PATH` env override to all five scripts, matching the MCP server's existing pattern; both test scripts rewritten to sandbox via the env var instead of touching the real file. Restores [ADR-012](knowledge/decisions/ADR-012-hook-security-model.md) compliance. Closes #163. Issue: `knowledge/issues/kg-config-silent-overwrite/`. Merged onto this branch by explicit user decision to ship as one combined release rather than two.
+- 🔲 **Post-merge chat-extraction regression findings** (umbrella [ENH-038](knowledge/enhancements/ENH-038/ENH-038-specification.md), planned — not yet implemented): a post-merge Fable review of the merged v0.6.17 diff found 6 real correctness/data-loss bugs in shipped code — most severe a `--rebuild`+`--project`/interrupt data-loss pattern (no backup before `shutil.rmtree`) and a fail-open substring-match leak in Gemini's ADR-062 fail-closed project scoping. Full findings: `knowledge/issues/chat-extraction-reliability-saga/README.md` § "Post-Merge Regression Findings". Plan: `knowledge/plans/v0.6.18-fix-extraction-regressions.md` (Opus-drafted, triple-reviewed by Fable).
 
 ---
 

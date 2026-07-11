@@ -2,7 +2,7 @@
 # notification-dispatch.sh - Notification hook: forward KG events to configured webhook
 # Security: no eval, all variables quoted, subshells quoted; network failures never block
 
-CONFIG_PATH="$HOME/.claude/kg-config.json"
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.claude/kg-config.json}"
 
 # If config does not exist, exit silently
 if [ ! -f "$CONFIG_PATH" ]; then

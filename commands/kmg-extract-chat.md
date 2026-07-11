@@ -56,6 +56,9 @@ This parses chat logs and extracts insights without consuming your main context,
 **Filtering:**
 - `--project=<fragment>`: Filter to sessions from a specific project (path fragment match against `~/.claude/projects/<name>/`)
 
+**Rebuild:**
+- `--rebuild`: Force a clean overwrite/flatten of every date in scope, ignoring existing incremental state — repairs pre-fix corrupted output (ENH-043). **Claude-only.** `--rebuild --source gemini` or `--source codex` prints a warning and is otherwise ignored; `--rebuild --source all` (or the default, no `--source`) only rebuilds the Claude portion — Gemini remains incremental (in practice this matters little, since Gemini's extractor already fully overwrites each date's output on every normal run). Prior content at a rebuilt date — including an existing split `YYYY-MM-DD/` subfolder — is backed up aside (dot-hidden, timestamped, up to 3 most recent kept), never deleted before the new content is confirmed written.
+
 ---
 
 ## How it works
@@ -81,8 +84,9 @@ The workflow runs the centralized Python extraction script located at `${CLAUDE_
 **Protobuf support:**
 - Requires `blackboxprotobuf` library (optional)
 - Falls back to JSON-only if protobuf library not installed
+- **`.pb` session dating (ENH-046):** with `blackboxprotobuf` installed, a `.pb` session is dated from a plausible timestamp found inside its own decoded content, not the file's mtime (mtime is unreliable for a `.pb` file that's been copied, moved, or restored from backup after the conversation happened). Whenever content-based dating isn't available for a session — the library isn't installed, decoding fails, or no plausible timestamp is found in the decoded content — extraction prints a loud, counted warning and falls back to file mtime; it does not fail silently.
 
-**`--project` scoping and `.pb`/hash-named directories (fail-closed, ADR-062):** `.pb` files under `~/.gemini/antigravity/conversations/` carry no per-project path — nothing can positively attribute one to a project. Hash-named directories under `~/.gemini/tmp/` (opaque names matching `^[0-9a-f]{16,}$`) can't fragment-match a human-readable `--project` string either. So whenever `--project=<name>` is set, **all** `.pb` sessions and **all** hash-named-directory sessions are excluded from output — never leaked in as unattributed guesses — with a visible skip notice (count + reason) printed every time, never silently. Unscoped extraction (no `--project`) is unaffected and includes everything as before. See [ADR-062](../knowledge/decisions/ADR-062-gemini-pb-project-scoping-fail-closed.md).
+**`--project` scoping and `.pb`/hash-named directories (fail-closed, ADR-062):** `.pb` files under `~/.gemini/antigravity/conversations/` carry no per-project path — nothing can positively attribute one to a project. Hash-named directories under `~/.gemini/tmp/` (opaque names matching `^[0-9a-fA-F]{16,}$`, case-insensitive) are detected and excluded *before* any `--project` substring match runs, so a hex-valued `--project` filter can never accidentally fragment-match one into the results. So whenever `--project=<name>` is set, **all** `.pb` sessions and **all** hash-named-directory sessions are excluded from output — never leaked in as unattributed guesses — with a visible skip notice (count + reason) printed every time, never silently. Unscoped extraction (no `--project`) is unaffected and includes everything as before. See [ADR-062](../knowledge/decisions/ADR-062-gemini-pb-project-scoping-fail-closed.md).
 
 ### Codex CLI Extraction
 
@@ -380,13 +384,15 @@ chat-history/YYYY-MM/YYYY-MM-DD-claude.md
 
 **Split output (over limit):**
 ```
-chat-history/YYYY-MM-DD/YYYY-MM-DD-claude-part1.md
-chat-history/YYYY-MM-DD/YYYY-MM-DD-claude-part2.md
+chat-history/YYYY-MM-DD/YYYY-MM-DD-claude-part-01.md
+chat-history/YYYY-MM-DD/YYYY-MM-DD-claude-part-02.md
 ```
 
 Each part file is a valid standalone markdown document with its own header (annotated `— Part N`). Splits occur at message block boundaries so no message is cut mid-block.
 
 Incremental appends automatically target the last part file. If appending causes the last part to exceed the limit, a new part is created.
+
+**`--rebuild` and split content:** a `--rebuild` of a date that already has a split `YYYY-MM-DD/` subfolder does not delete that subfolder before writing the fresh flat file. The old split content is renamed aside to a dot-hidden, timestamped backup (invisible to normal file routing, so it never shadows the new output) once the fresh write is confirmed complete, not before — the old good state is never destroyed ahead of a successful replacement. Up to 3 most recent backups per date are kept; older ones are pruned automatically.
 
 ---
 
