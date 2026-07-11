@@ -1,9 +1,9 @@
 # Meta-Issue: Chat-Extraction Reliability Saga
 
 **Domain:** data / debugging
-**Scope:** v0.6.16 → v0.6.17 (ongoing); all three extractors (Claude, Gemini, Codex) as of the 2026-07-09 umbrella consolidation
+**Scope:** v0.6.16 → v0.6.18 (ongoing); all three extractors (Claude, Gemini, Codex) as of the 2026-07-09 umbrella consolidation. v0.6.17 merged 2026-07-10 (PR #162); post-merge review findings pushed the saga's active scope to v0.6.18.
 **Created:** 2026-07-08
-**Status:** Investigating
+**Status:** Investigating — v0.6.17 merged (PR #162, `8c56070a`, 2026-07-10), but a post-merge Fable review the same day found real correctness bugs in the shipped code (see "Post-Merge Regression Findings" below). Targeted for `v0.6.18`. **Note:** the unrelated `kg-config-silent-overwrite` fix (`ac70b490`) was merged onto this same branch (`v0.6.18-fix-extraction-regressions`) per an explicit user decision on 2026-07-10 to ship both as one combined release rather than two — different root cause/subsystem, same branch and version number now. See `knowledge/issues/kg-config-silent-overwrite/`.
 **Tracked under:** single umbrella [ENH-038](../../enhancements/ENH-038/ENH-038-specification.md) — this saga was previously split across six ENH numbers (038/043/044/045/046/047); consolidated 2026-07-09 because one feature area ("extract chat history reliably") should not be scattered across six disconnected files. Each bug's full original spec is preserved under `attempts/ENH-0NN/specification.md`.
 **Current Understanding:** Messages go missing/misfiled through several independent defects across all three extractors; the latest and most impactful is that a whole Claude session file is date-bucketed by its first message, so multi-day sessions misfile all later-day content under their start date.
 
@@ -46,6 +46,23 @@ Full detail for each: [implementation-log.md](implementation-log.md). Original p
 
 ---
 
+## Post-Merge Regression Findings (2026-07-10, Fable review — targeted for v0.6.18)
+
+After PR #162 merged v0.6.17 to `main` (`8c56070a`), an independent Fable-model review of the full merged diff (`git diff 3f36f8ca...8c56070a`) — done specifically because no reviewer had looked at the diff itself before merge (only a plan-level Opus/Fable review had happened, earlier in this saga, on the multi-day-bucketing plan) — found real correctness bugs already live in the shipped code. None of these are regressions in what shipped as *fixed*; they're either pre-existing gaps the shipped fixes didn't fully close, or new code paths (`--rebuild`) that carry their own risk. Most severe first:
+
+1. **`--rebuild` + `--project` (or an interrupt) on a split date can permanently destroy content, no backup.** `core/scripts/chat_extractor_base.py:26-29` (`clear_split_subfolder` → `shutil.rmtree`) runs before the fresh write, with no backup — unlike the flat-file overwrite path, which does create a `.backup` (`extract_claude.py:~347`). Two concrete scenarios: (a) `--rebuild --project X` on a date whose split parts contain project Y's messages — the split dir is `rmtree`'d, the fresh file is rebuilt from project X's sources only, and Y's content for that date is gone with no backup; (b) interrupted between the `rmtree` and the write — split parts gone, nothing written, recoverable only if the source `.jsonl` still exists (ENH-043 exists precisely because sources rotate and often don't). **Same shape as the kg-config-silent-overwrite incident** (`../kg-config-silent-overwrite/`) — clobber-before-write with no atomic guard, on a repo that has now hit this pattern twice in one day.
+2. **Single `.backup` slot gets clobbered on a second interrupted run.** `extract_claude.py:~344-352`: run 1 backs up the good pre-fix file, gets interrupted mid-write leaving a truncated file; run 2's `copy2` overwrites the *good* backup with the truncated one. No atomic temp-file+rename anywhere in the write path.
+3. **Gemini fail-closed scoping (ADR-062) fails open for hex-named `--project` values.** `extract_gemini.py:~442` (`_filter_project_dirs`): fragment/substring match runs *before* hash-dir detection, so a `--project` value made of hex chars (e.g. `ace`, `cafe`, `dead`) substring-matches a hash-named directory and includes its unattributable content — the exact leak ADR-062 exists to prevent. Also: hash dirs in uppercase hex or other formats miss `_HASH_DIR_RE` and are excluded *silently*, contradicting ADR-062's "never silent" design claim.
+4. **ENH-046 (`.pb` content-dating) is inert without `blackboxprotobuf` installed.** The epoch hint is only applied inside the `HAS_BBP` decode branch (`extract_gemini.py:~586`); the raw-bytes fallback branch still dates by mtime — silently, on any machine without the optional dependency (confirmed: this session's own test environment lacks it). Also, `_find_epoch_hint`'s `min()` over all plausible ints in a 10-year window means one spurious in-range integer mis-dates the whole session, preferred over a correct mtime.
+5. **Test gap: ENH-047's leading-untimestamped edge case is never exercised.** `tests/fixtures/sample-claude-multiday-session.jsonl`'s only untimestamped record comes *after* timestamped ones, so the `pending_untimestamped` backfill path (`extract_claude.py:~271-273`) is dead code in the test suite. Logic looks correct by inspection (backfills to the first *following* date; an all-untimestamped file emits nothing, matching prior behavior) but is unverified.
+6. **`--rebuild` is silently ignored for `--source gemini`/`codex`.** `run_extraction.py:633-651` threads `rebuild` only to the Claude path; no warning surfaces for other sources.
+
+**Verified correct in the same review** (no action needed): ENH-045 (Codex mtime-skip fix) is equivalent-and-complete to the Claude fix it mirrors; ENH-047's core date-boundary math is UTC-consistent throughout; rebuild-precedence over incremental mode is real and correct; the new test suite is notably better than happy-path-only (vacuous-pass guards, timezone-safe date derivation, a pinned-limitation tripwire for the 42 unrecoverable dates).
+
+**Next steps:** open dedicated attempts (likely ENH-048 through ENH-05x, or append to this saga per the same-feature-area convention) for findings 1–6, prioritized by severity. Findings 1–2 (rebuild data-loss) are the most urgent — same failure class as `kg-config-silent-overwrite`, meaning this repo now has two independent confirmed instances of "clobber real data before ensuring the write succeeds" in one day, which itself may be worth a standalone lesson/pattern entry once both are fixed.
+
+---
+
 ## Requirements
 
 The umbrella requirement: `kmg-extract-chat` must extract every real message, under its correct date, for every source (Claude/Gemini/Codex), with no silent loss. Per-bug requirements (full acceptance criteria) live in each spec under `attempts/ENH-0NN/specification.md`:
@@ -82,12 +99,13 @@ So: ENH-043 succeeded at its own, narrower scope; the saga's *overall* reliabili
 
 - ~~**ENH-047** (Claude multi-day date-bucketing)~~ — **✅ Fixed (v0.6.17).** Was the highest-impact open item; per-message UTC-date bucketing shipped, tested, and verified against real data.
 - ~~**ENH-044** (Gemini `.pb`/hash-dir cross-project contamination)~~ — **✅ Fixed (v0.6.17).** Fail-closed exclusion shipped and verified against real data.
-- **Dogfooding Attempt 1's "wrong session captured" symptom** — noted, not yet root-caused; the sole remaining open item in this saga. Revisit now that extraction is fully fixed and can be re-baselined.
+- **Dogfooding Attempt 1's "wrong session captured" symptom** — noted, not yet root-caused; revisit once the post-merge regression findings below are closed.
 - ENH-043's spec status line was never flipped from 🟡 Proposed to ✅ Resolved despite its code/tests being done — belongs to the *original* v0.6.17 plan's still-outstanding Task 8, not this saga's current closeout scope.
+- **Post-merge regression findings (new, 2026-07-10)** — 6 findings from the post-merge Fable review (see section above), targeted for `v0.6.18`. Most urgent: findings 1–2 (`--rebuild` data-loss, no backup before `rmtree`/no atomic write) and finding 3 (Gemini fail-open hex-substring leak in ADR-062's own fail-closed control).
 
 ## Revert or Continue?
 
-**Continue — no revert warranted.** Every shipped fix in this saga (ENH-038, 044, 045, 046, 047) is additive, independently tested, and verified against real data with no known regression; nothing shipped is making extraction worse than before this saga started. ENH-043's code is done too (only its spec status line lags, a different plan's leftover task). Next: re-baseline extraction now that both major bugs are closed, and root-cause the one remaining loose end — Attempt 1's "wrong session captured" symptom.
+**Continue — no revert warranted.** Every shipped fix in this saga (ENH-038, 044, 045, 046, 047) is additive, independently tested, and verified against real data with no known regression in the *scenarios each fix targeted*. The post-merge review found separate, real bugs (see above) — not regressions caused by the fixes, but pre-existing/adjacent gaps (rebuild's missing backup, the fail-closed control's incomplete hex-dir handling) that a plan-only review (no diff review) missed before merge. Next: fix the v0.6.18 findings above, then re-baseline extraction and root-cause the one remaining loose end — Attempt 1's "wrong session captured" symptom.
 
 ---
 
