@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.6.17
+**Version:** 0.6.18
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -90,6 +90,14 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 ---
 
 ## v0.6.x Feature Highlights
+
+**v0.6.18 — 2026-07-11**
+
+- **Chat-extraction `--rebuild` write path made crash-safe** — atomic writes (temp-file + rename) and rename-aside backups (never delete) replace a pre-write `shutil.rmtree` and a single clobberable `.backup` slot; two consecutive `--rebuild` runs now each get their own distinct backup instead of destroying the last good copy.
+- **Gemini's fail-closed `--project` scoping (ADR-062) fixed to actually fail closed** — hash-named directory detection now runs before substring matching, closing a leak where a hex-valued `--project` filter could match and include an unattributable directory.
+- **`.pb` content-dating no longer silently degrades to file mtime** — every fallback path (dependency absent, decode failure, empty content) now surfaces a visible warning; outlier timestamps are bounded to a realistic session window instead of an unbounded 10-year search.
+- **`kg-config.json` no longer at risk from the test suite** — hook scripts honor a `KG_CONFIG_PATH` override, so sandboxed tests no longer clobber the real global config file in place. Closes #163.
+- New [ADR-063](knowledge/decisions/ADR-063-never-destroy-known-good-state-before-confirmed-write.md) records the shared "never destroy known-good state before the replacement is confirmed written" principle behind both fixes above.
 
 **v0.6.17 — 2026-07-10**
 
@@ -345,6 +353,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.6.17 (2026-07-10)
+**Current Version:** v0.6.18 (2026-07-11)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info
