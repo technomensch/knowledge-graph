@@ -152,7 +152,7 @@ echo "── Gap 1: --rebuild clears a stale YYYY-MM-DD/ split subfolder ──"
 rm -rf "$OUTPUT_DIR"; mkdir -p "$OUTPUT_DIR/2026-07-03"
 # Seed a split subfolder (get_output_path routes here FIRST when it exists),
 # with NO flat file present — simulating a previously oversized/split date.
-cat > "$OUTPUT_DIR/2026-07-03/2026-07-03-claude-part1.md" <<'EOF'
+cat > "$OUTPUT_DIR/2026-07-03/2026-07-03-claude-part-01.md" <<'EOF'
 # Complete Chat Session Export — Part 1
 
 **Total Messages:** 1
@@ -167,7 +167,7 @@ stale split content
 
 ---
 EOF
-cat > "$OUTPUT_DIR/2026-07-03/2026-07-03-claude-part2.md" <<'EOF'
+cat > "$OUTPUT_DIR/2026-07-03/2026-07-03-claude-part-02.md" <<'EOF'
 # Complete Chat Session Export — Part 2
 
 ### Message 2: Assistant

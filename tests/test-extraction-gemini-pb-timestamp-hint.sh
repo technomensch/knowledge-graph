@@ -55,12 +55,31 @@ structure_empty = {"1": "just a string", "2": [1.5, "another string"]}
 hint_empty = _find_epoch_hint(structure_empty, now=now)
 results.append(("no_plausible_timestamp_returns_none", hint_empty is None))
 
-# 6. When multiple plausible values exist, the earliest is chosen (session
-#    start time is a safer bet than a later "last updated" field).
-newer_epoch = now - 50 * 86400
-structure_multi = {"1": int(old_epoch), "2": int(newer_epoch)}
+# 6. When multiple plausible values exist within a realistic single-session
+#    window, the earliest is chosen (session start time is a safer bet than
+#    a later "last updated" field) -- updated for v0.6.18 Fix 4's
+#    MAX_SESSION_SPAN_DAYS=7 outlier-rejection bound (ENH-046 follow-up:
+#    _find_epoch_hint's old unbounded min() could be fooled by a single
+#    spurious in-range integer landing far from the real cluster). The gap
+#    here (3 days) is well within the anchor window, so the earlier value
+#    is still the correct pick.
+newer_epoch = now - 3 * 86400
+structure_multi = {"1": int(now - 6 * 86400), "2": int(newer_epoch)}
 hint_multi = _find_epoch_hint(structure_multi, now=now)
-results.append(("earliest_plausible_value_chosen", hint_multi is not None and abs(hint_multi - old_epoch) < 2))
+results.append(("earliest_plausible_value_chosen", hint_multi is not None and abs(hint_multi - (now - 6 * 86400)) < 2))
+
+# 7. A candidate far outside a realistic session window (150 days before the
+#    newest candidate) is now treated as a spurious non-timestamp integer,
+#    not the real session start -- real-data check (2026-07-11, this
+#    branch) found the max internal timestamp span across all real Gemini
+#    session files on a live machine was ~29 minutes, zero files over 1
+#    day, so a 150-day internal gap does not match any observed real
+#    pattern. The most recent plausible value is chosen instead.
+outlier_old_epoch = now - 200 * 86400
+structure_outlier = {"1": int(outlier_old_epoch), "2": int(newer_epoch)}
+hint_outlier = _find_epoch_hint(structure_outlier, now=now)
+results.append(("distant_outlier_rejected_in_favor_of_recent_cluster",
+                 hint_outlier is not None and abs(hint_outlier - newer_epoch) < 2))
 
 for name, ok in results:
     print(f"{name}:{'OK' if ok else 'FAIL'}")

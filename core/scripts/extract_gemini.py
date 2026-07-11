@@ -23,7 +23,7 @@ from chat_extractor_base import get_output_path, format_timestamp, write_markdow
 GEMINI_TMP_DIR = os.path.expanduser("~/.gemini/tmp")
 GEMINI_CONV_DIR = os.path.expanduser("~/.gemini/antigravity/conversations")
 
-_HASH_DIR_RE = re.compile(r'^[0-9a-f]{16,}$')
+_HASH_DIR_RE = re.compile(r'^[0-9a-fA-F]{16,}$')
 
 def _filter_project_dirs(project_dirs, project_filter):
     """Fail-closed project-directory scoping (ADR-062): when project_filter
@@ -34,15 +34,23 @@ def _filter_project_dirs(project_dirs, project_filter):
     a visible skip notice, never silent -- it's a permanent scoping gap for
     that directory (its content becomes invisible to any --project-scoped
     run), not an ordinary non-match against a differently-named project.
+
+    Hash-dir detection runs BEFORE the substring match (not after) so a
+    hex-valued --project filter can never fragment-match a hash-named
+    directory into `matched` -- a hash dir is always excluded once
+    detected, never included by coincidence. _HASH_DIR_RE is
+    case-insensitive so uppercase-hex directory names are recognized and
+    reported too, instead of silently missing both the match and the
+    skip-notice path.
     """
     if not project_filter:
         return project_dirs
-    matched = [d for d in project_dirs if project_filter.lower() in os.path.basename(d).lower()]
-    hash_excluded = [d for d in project_dirs
-                      if d not in matched and _HASH_DIR_RE.match(os.path.basename(d))]
-    if hash_excluded:
-        noun = "directory" if len(hash_excluded) == 1 else "directories"
-        print(f"Skipped {len(hash_excluded)} hash-named ~/.gemini/tmp/ {noun} -- "
+    hash_dirs = [d for d in project_dirs if _HASH_DIR_RE.match(os.path.basename(d))]
+    non_hash = [d for d in project_dirs if d not in hash_dirs]
+    matched = [d for d in non_hash if project_filter.lower() in os.path.basename(d).lower()]
+    if hash_dirs:
+        noun = "directory" if len(hash_dirs) == 1 else "directories"
+        print(f"Skipped {len(hash_dirs)} hash-named ~/.gemini/tmp/ {noun} -- "
               f"cannot be attributed to project {project_filter!r} by name (fail-closed scoping, ADR-062)")
     return matched
 
@@ -259,7 +267,30 @@ def _find_epoch_hint(obj, now=None):
                 candidates.append(o / 1000)
 
     walk(obj)
-    return min(candidates) if candidates else None
+    if not candidates:
+        return None
+    if len(candidates) >= 2:
+        # A single conversation's internal timestamps realistically span
+        # hours, not years -- a candidate MAX_SESSION_SPAN_DAYS before the
+        # most recent one is almost certainly a non-timestamp integer (a
+        # count/id field), not the real session start. Anchor on the
+        # newest plausible value and discard lone early outliers before
+        # taking min() of what survives, so one spurious in-range integer
+        # can no longer mis-date the whole session arbitrarily early.
+        # Known residual limitation: this anchor is itself spoofable by a
+        # single spurious *recent* integer, which can discard the genuine
+        # (older) session-start candidate -- worst case the derived date is
+        # off by at least the excess beyond MAX_SESSION_SPAN_DAYS, unbounded
+        # within the 10-year search window. A schema-aware .pb timestamp
+        # decoder is the real fix and is out of scope here.
+        MAX_SESSION_SPAN_DAYS = 7
+        anchor = max(candidates)
+        cutoff = anchor - (MAX_SESSION_SPAN_DAYS * 86400)
+        survivors = [c for c in candidates if c >= cutoff]
+        if not survivors:
+            return None
+        return min(survivors)
+    return min(candidates)
 
 def extract_gemini_pb_sessions(limit=None, project_filter=None):
     """Returns a list of archived sessions from Protobuf files using blackboxprotobuf or fallback.
@@ -285,7 +316,19 @@ def extract_gemini_pb_sessions(limit=None, project_filter=None):
     if limit:
         pb_files = pb_files[:limit]
     print(f"DEBUG: Found {len(pb_files)} PB files in {GEMINI_CONV_DIR}")
-    
+
+    if not HAS_BBP and pb_files:
+        # Every .pb file will fall to the raw-heuristic (mtime) path below --
+        # print the actionable warning once, up front, before that fallback
+        # runs, instead of letting it happen silently (ENH-046 regression:
+        # the whole point of content-based dating is defeated with no signal).
+        print(f"WARNING: {len(pb_files)} .pb session(s) will be dated by file mtime -- "
+              f"blackboxprotobuf not installed, so ENH-046 content-based dating is "
+              f"unavailable. Dates are unreliable for copied/restored files. "
+              f"pip install blackboxprotobuf to enable.")
+
+    decode_fallback_count = 0
+
     for pb_path in pb_files:
         try:
             # File mtime is the last-resort date source -- unreliable
@@ -342,6 +385,12 @@ def extract_gemini_pb_sessions(limit=None, project_filter=None):
                             entry_date = dt_content.strftime("%Y-%m-%d")
                             entry_ts = dt_content.strftime("%H%M%S")
                         else:
+                            # Decode succeeded and content was found, but no
+                            # plausible timestamp was in it -- lighter,
+                            # per-file notice so this bbp-installed-but-no-hint
+                            # case isn't silent either (still mtime-dated).
+                            print(f"NOTE: {os.path.basename(pb_path)} decoded but no "
+                                  f"plausible timestamp found in content -- dated by file mtime.")
                             entry_date = file_date
                             entry_ts = file_ts_str
                         all_pb_sessions.append({
@@ -352,10 +401,18 @@ def extract_gemini_pb_sessions(limit=None, project_filter=None):
                             'method': 'Gemini (Protobuf Decode)'
                         })
                         continue # Skip fallback
+                    else:
+                        # decoded_segments came back empty -- falls through
+                        # to the raw-heuristic (mtime) fallback below with
+                        # no loud signal otherwise, defeating ENH-046.
+                        decode_fallback_count += 1
             except Exception as e_bbp:
                 print(f"DEBUG: BBP failed for {pb_path}: {e_bbp}")
+                if HAS_BBP:
+                    decode_fallback_count += 1
 
-            # Fallback path (if BBP failed or not installed)
+            # Fallback path (if BBP failed or not installed, decode raised,
+            # or decoded_segments came back empty -- see counts above).
             clean_strings = []
             try:
                 with open(pb_path, 'rb') as f:
@@ -385,6 +442,18 @@ def extract_gemini_pb_sessions(limit=None, project_filter=None):
 
         except Exception as e:
             print(f"Error processing PB {pb_path}: {e}")
+
+    if HAS_BBP and decode_fallback_count > 0:
+        # blackboxprotobuf IS installed, but this many files still ended up
+        # mtime-dated via the raw-heuristic fallback (decode raised, or
+        # decoded content was empty) -- loud, counted signal instead of the
+        # DEBUG-only log these paths used to have. Distinct from the
+        # decoded-but-no-timestamp-found case, which gets its own per-file
+        # NOTE above (that case decodes fine, so it never reaches here).
+        noun = "session" if decode_fallback_count == 1 else "sessions"
+        print(f"WARNING: {decode_fallback_count} .pb {noun} dated by file mtime -- "
+              f"content decode failed or yielded no extractable content. Dates are "
+              f"unreliable for copied/restored files.")
 
     return all_pb_sessions
 

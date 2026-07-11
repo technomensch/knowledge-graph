@@ -1,6 +1,6 @@
 # ENH-046: Gemini `.pb` extractor dated sessions by file mtime, not conversation content
 
-**Status:** ✅ Resolved in v0.6.17
+**Status:** ✅ Resolved in v0.6.17; **two gaps found and closed in v0.6.18** (see item below) — the fix could still silently degrade to mtime in three code paths, and its outlier heuristic was itself spoofable
 **Discovered:** 2026-07-08
 **Governed by:** none (bug-fix, not a new command/skill/docstring — ADR-058's naming/scope check does not apply)
 **Related:** `core/scripts/extract_gemini.py`, [ENH-044](../ENH-044/specification.md) (same file/subsystem, different bug — project-scoping vs. this ENH's date-derivation reliability), [ENH-043](../ENH-043/specification.md) (this session's sibling extraction-pipeline hardening work), branch `v0.6.17-fix-extract-chat-rebuild`, plan `knowledge/plans/v0.6.17-fix-extract-chat-rebuild.md`
@@ -23,6 +23,13 @@ Added `_find_epoch_hint(obj, now=None)` — a heuristic scanner over the schemal
 
 `extract_gemini_pb_sessions()` now calls this after a successful `blackboxprotobuf` decode and, when a plausible timestamp is found, uses it (converted to local date/time) as the session's `date`/`ts` instead of file mtime. When multiple plausible values are found in the same structure (e.g. a "start time" and a later "last updated" field both existing somewhere in the decoded tree), the earliest is chosen, since a session's start time is a safer proxy for "when did this conversation happen" than a later update marker also present in the same payload. File mtime remains the fallback — now explicitly documented in code as unreliable for copied/restored files — used only when no plausible in-content timestamp can be found (e.g. `blackboxprotobuf` isn't installed, decode fails, or the decoded structure genuinely contains no value in the plausible range).
 
+### v0.6.18 follow-up: two gaps closed (post-merge review, 2026-07-10/11)
+
+A post-merge review of the merged v0.6.17 diff found this fix was incomplete in two ways:
+
+1. **Silent mtime degradation in three paths, not just "dependency absent."** The original fix only prevented silent degradation on the happy path (BBP installed, decode succeeds, timestamp found). Two more paths reached the same mtime-dated raw-heuristic fallback with only a `DEBUG:`-level log: BBP's `decode_message` raising an exception, and `decoded_segments` (the extracted text content) coming back empty. Both silently defeated ENH-046's whole point with no signal. **Fixed:** a loud, counted warning now covers all cases that can reach mtime-dating — dependency absent (upfront, actionable, suggests `pip install blackboxprotobuf`), decode-raised or empty-segments (aggregate warning after the batch completes), and decoded-but-no-hint-found (light per-file note).
+2. **`_find_epoch_hint`'s `min()` was itself spoofable.** A single spurious in-range integer (a count/id field that happened to land in the plausible 10-year window) could become the "earliest" candidate and mis-date the whole session arbitrarily early — the exact unreliability class ENH-046 was built to close, reintroduced by the heuristic's own logic. **Fixed:** added `MAX_SESSION_SPAN_DAYS=7` bound — anchor on `max(candidates)`, discard anything more than 7 days before it, return `min()` of what survives. **Real-data check** (this machine's `~/.gemini/tmp/` session files) found the max internal timestamp span across all real sessions was ~29 minutes, zero files over 1 day — the 7-day bound is generous relative to observed reality. Known residual limitation, documented rather than silently left: the `max()` anchor is itself spoofable by a spurious *recent* integer, which could discard a genuine older start beyond the 7-day window — accepted as out of scope; a schema-aware `.pb` timestamp decoder would be the real fix. A pre-existing test (`test-extraction-gemini-pb-timestamp-hint.sh` case 6) assumed a 150-day gap between legitimate candidates was normal; updated to a realistic 3-day gap, plus a new case explicitly proving the outlier-rejection behavior.
+
 ---
 
 ## Explicitly Out of Scope
@@ -37,8 +44,8 @@ Added `_find_epoch_hint(obj, now=None)` — a heuristic scanner over the schemal
 
 | File | Role |
 |---|---|
-| `core/scripts/extract_gemini.py` | Modify — add `_find_epoch_hint()` heuristic; `extract_gemini_pb_sessions()` prefers its result over file mtime on the successful-decode path |
-| `tests/test-extraction-gemini-pb-timestamp-hint.sh` | New — unit-tests `_find_epoch_hint()` directly against synthetic decoded-structure shapes (nested epoch-seconds, epoch-milliseconds, implausible small ints, bools, no-match, multiple-candidates-picks-earliest). `blackboxprotobuf` is an optional dependency not installed in every environment (confirmed absent on this machine), so this cannot round-trip a real `.pb` file through the actual BBP decoder — it tests the heuristic function in isolation instead. |
+| `core/scripts/extract_gemini.py` | Modify — add `_find_epoch_hint()` heuristic; `extract_gemini_pb_sessions()` prefers its result over file mtime on the successful-decode path. **v0.6.18:** loud warnings added for all silent-fallback paths; `MAX_SESSION_SPAN_DAYS=7` outlier bound added to `_find_epoch_hint`. |
+| `tests/test-extraction-gemini-pb-timestamp-hint.sh` | New — unit-tests `_find_epoch_hint()` directly against synthetic decoded-structure shapes (nested epoch-seconds, epoch-milliseconds, implausible small ints, bools, no-match, multiple-candidates-picks-earliest). `blackboxprotobuf` is an optional dependency not installed in every environment (confirmed absent on this machine), so this cannot round-trip a real `.pb` file through the actual BBP decoder — it tests the heuristic function in isolation instead. **v0.6.18:** case 6 updated to a realistic 3-day gap (was 150 days, contradicted by real-data check); new case 7 added proving distant-outlier rejection. |
 
 ---
 
@@ -52,3 +59,5 @@ Added `_find_epoch_hint(obj, now=None)` — a heuristic scanner over the schemal
 - [x] When multiple plausible values exist, the earliest is chosen. Verified.
 - [x] `extract_gemini_pb_sessions()` uses the content-derived date when `_find_epoch_hint()` finds one, falling back to mtime only otherwise — verified by direct code read (full end-to-end `.pb`-file round-trip through the real `blackboxprotobuf` decoder is not verified in this environment, since the optional dependency isn't installed here; a follow-up on a machine with `blackboxprotobuf` available would strengthen this, not currently blocking since the heuristic function itself and its call-site wiring are both directly verified).
 - [x] No regression to existing Gemini extraction — all other test suites (`test-extraction.sh`, `test-extraction-gemini-project-filter.sh`, etc.) still pass.
+- [x] **(v0.6.18)** All silent mtime-fallback paths (dependency absent, decode raised, decoded segments empty, no plausible hint found) surface a visible, counted or per-file signal — verified by tracing all three call sites and confirming each prints before falling back.
+- [x] **(v0.6.18)** `_find_epoch_hint` rejects a lone outlier candidate more than `MAX_SESSION_SPAN_DAYS` (7) before the newest candidate, returning the min of the recent cluster instead. Verified: unit test with a 9-years-ago outlier plus two recent candidates returns the recent min. Real-data check confirmed the bound is generous relative to observed session-file timestamp spans on this machine (max 29 minutes, zero files over 1 day).

@@ -3,8 +3,8 @@
 How our understanding of the root cause changed over time.
 
 **Created:** 2026-07-08
-**Last Updated:** 2026-07-08
-**Total Belief Shifts:** 2
+**Last Updated:** 2026-07-11
+**Total Belief Shifts:** 3
 
 ---
 
@@ -49,12 +49,33 @@ Reframed the saga from "one extraction bug" to "a cluster of independent defects
 
 ---
 
+## Belief Shift #3 (2026-07-11)
+
+**Previous Understanding:**
+"Reliability" meant getting every message filed under its correct date, from the correct project — the ENH-038/043/044/045/046/047 wave of fixes (message loss, dedup permanence, scoping, mtime skip, content-dating, date bucketing) covered the full defect surface once all six shipped and were verified against real data.
+
+**New Understanding:**
+Reliability also has a **write-path-safety** dimension and a **scoping-direction** dimension that no prior fix in this saga had touched, because none of the prior fixes were reviewed against the actual merged diff — only against their own plans. A post-merge Fable review of the full v0.6.17 diff found: (1) the rebuild/overwrite write path could destroy old good content before a new write was confirmed (`shutil.rmtree` before write, single clobberable `.backup` slot, no atomic write) — a data-loss class distinct from anything "date derivation" or "scoping" describes; (2) ADR-062's fail-closed Gemini scoping control could fail **open** under a specific input shape (a hex `--project` value substring-matching a hash dir) purely because of check *ordering*, not any flaw in the control's stated design.
+
+**Evidence:**
+- Post-merge Fable review, `git diff 3f36f8ca...8c56070a`, 2026-07-10 (see [implementation-log.md Attempt 009](../implementation-log.md#attempt-009-post-merge-regression-fixes-v0618-this-branch-2026-07-11) and the meta-issue README's "Post-Merge Regression Findings" section).
+- Live behavioral proof: seeding a stale split dir and running `--rebuild` twice showed the pre-fix code's `rmtree` would have destroyed it outright; the post-fix code backed it up instead, with a second distinct backup on the second run.
+- Unit proof: a hex `--project` filter substring-matching a hash dir was included (fail-open) pre-fix, excluded (fail-closed, with notice) post-fix.
+
+**Impact:**
+"Extraction is reliable" now explicitly includes: correct date/project attribution (v0.6.17's scope) **and** never destroying existing good output as a side effect of fixing or rebuilding it (v0.6.18's scope). The latter is not specific to this subsystem — it's the same principle independently found the same day in the sibling `kg-config-silent-overwrite` issue, now promoted to its own cross-cutting ADR rather than left as a per-subsystem pattern.
+
+**Confidence:** High (reproduced live; both findings unit- and behaviorally-verified; zero regressions across the full 79-assertion suite).
+
+---
+
 ## Pattern Analysis
 
 **How Understanding Evolved:**
 1. **Packaging phase:** blamed marketplace plugin version staleness.
 2. **Attribution phase:** found the wrong session's content was being extracted.
 3. **Mechanism phase:** pinned the concrete first-timestamp-only date-bucketing defect (ENH-047).
+4. **Write-safety phase (v0.6.18):** found that "reliable extraction" also requires never destroying existing good output before a replacement is confirmed written, and that a fail-closed control's stated intent doesn't guarantee its actual behavior — check ordering matters. Surfaced only once the *shipped diff*, not just the plan, was independently reviewed.
 
 **Key Turning Points:**
 - Dogfooding Attempt 1's mismatched message #1 → Belief Shift #1.

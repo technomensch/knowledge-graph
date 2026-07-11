@@ -138,5 +138,17 @@ Given the asymmetry above, the fix must optimize for "never leak foreign content
 ---
 
 **Decision Made:** 2026-07-10
-**Last Updated:** 2026-07-10
-**Status:** Accepted — implemented (`126d98ce`), tested (`faa393d6`), verified against real data
+**Last Updated:** 2026-07-11
+**Status:** Accepted — implemented (`126d98ce`), tested (`faa393d6`), verified against real data; regression found and closed 2026-07-11 (see Amendment below)
+
+---
+
+## Amendment — v0.6.18 (2026-07-11)
+
+**Regression found and closed, not a design flaw.** A post-merge review of the merged v0.6.17 diff found that `_filter_project_dirs`'s *implementation* did not actually achieve this ADR's fail-closed decision in one case: the substring match (`matched`) was computed **before** checking which directories were hash-named, so a hex-valued `--project` filter (e.g. `--project=26f8`) could substring-match a hash-named directory and sweep it into `matched` — **included**, the exact fail-*open* outcome this ADR decided against. Additionally, `_HASH_DIR_RE` was lowercase-only, so an uppercase-hex hash dir that didn't happen to substring-match the filter missed both the match check and the hash-exclusion check, and was dropped with **no skip notice** — contradicting this ADR's "never silent" requirement (§ Core Components, item 2).
+
+This is a regression in *implementation ordering*, not a reconsideration of the decision itself — the intended policy (fail closed, never silent) is unchanged; the check order that implemented it was wrong. Fixed by reordering: hash-dir detection now runs first and unconditionally, before any substring match, so a hash dir can never land in `matched` regardless of the filter's value; `_HASH_DIR_RE` broadened to case-insensitive so uppercase-hex dirs are recognized and reported.
+
+**No change to this ADR's Decision, Rationale, or Alternatives sections** — the fail-closed policy stands exactly as decided. This amendment records that a real deviation existed in the shipped code and has been closed, for anyone reading this ADR to understand why "fixed" doesn't mean "never had a bug."
+
+Full detail: `knowledge/issues/chat-extraction-reliability-saga/README.md` § "Post-Merge Regression Findings", finding 3; `attempts/ENH-044/specification.md` item 7.

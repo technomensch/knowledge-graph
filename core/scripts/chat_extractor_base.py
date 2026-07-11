@@ -69,19 +69,71 @@ def get_output_path(filename):
     # 3. Fallback to root
     return os.path.join(OUTPUT_DIR, filename)
 
-def clear_split_subfolder(output_dir: str, date: str) -> None:
-    """Removes an existing {output_dir}/{date}/ split-part subfolder, if any.
+def write_atomic(output_path, write_fn):
+    """Writes output_path atomically: write_fn(f) writes into a pid-tagged
+    temp file, then os.replace() swaps it into place. A crash before the
+    replace leaves the original untouched; a crash after leaves the
+    complete new file. Never leaves a truncated target. On any exception
+    during write_fn, the temp file is unlinked and the exception re-raised
+    -- no partial state left behind either way."""
+    tmp_path = output_path + f".tmp-{os.getpid()}"
+    try:
+        with open(tmp_path, 'w', encoding='utf-8') as f:
+            write_fn(f)
+    except Exception:
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+        raise
+    os.replace(tmp_path, output_path)
 
-    get_output_path() checks for this subfolder first and, if present,
-    always routes to the last part file inside it -- so a rebuild that
-    writes a fresh flat file at the date's normal location would be
-    silently shadowed by a stale split subfolder on the next call unless
-    that subfolder is cleared first.
-    """
-    split_dir = os.path.join(output_dir, date)
-    if os.path.isdir(split_dir):
-        import shutil
-        shutil.rmtree(split_dir)
+
+def backup_aside(path_or_dir, retention=3):
+    """Renames an existing file or {date}/ split subfolder aside to a
+    timestamped, dot-prefixed sibling instead of deleting it -- so the old
+    good state survives until the new state is confirmed written. Rename
+    (not copy) is atomic and cheap. The pid + collision-counter suffix
+    guarantees back-to-back same-second reruns never collide, so a second
+    interrupted run can never clobber the first backup (the single-slot
+    loss this helper replaces). Dot-prefixed names are invisible to
+    get_output_path()'s os.walk (skips d.startswith('.')) and to the
+    ^\\d{4}-\\d{2}-\\d{2}$ split-folder match, so backups never shadow or
+    get re-picked-up as live output -- stays ADR-044 compatible. Keeps the
+    `retention` most recent backups per path, pruning older ones, so
+    rebuilds don't accumulate unbounded backup copies in a git-committed
+    store."""
+    if not os.path.exists(path_or_dir):
+        return None
+
+    basename = os.path.basename(path_or_dir.rstrip(os.sep))
+    parent = os.path.dirname(path_or_dir.rstrip(os.sep))
+    is_split_dir = re.match(r'^\d{4}-\d{2}-\d{2}$', basename) is not None
+
+    prefix = f".{basename}.bak-"
+
+    ts = datetime.now().strftime('%Y%m%dT%H%M%S') + f"-{os.getpid()}"
+    target = os.path.join(parent, f".{basename}.bak-{ts}")
+
+    counter = 0
+    while os.path.exists(target):
+        counter += 1
+        target = os.path.join(parent, f".{basename}.bak-{ts}-{counter}")
+
+    os.rename(path_or_dir, target)
+
+    # Retention prune: keep the `retention` most recent backups matching this prefix
+    siblings = sorted(
+        (e for e in os.listdir(parent) if e.startswith(prefix)),
+        reverse=True,
+    )
+    for stale in siblings[retention:]:
+        stale_path = os.path.join(parent, stale)
+        if os.path.isdir(stale_path):
+            import shutil
+            shutil.rmtree(stale_path)
+        else:
+            os.remove(stale_path)
+
+    return target
 
 def format_timestamp(ts_str):
     """
@@ -146,10 +198,17 @@ def split_file_if_oversized(output_path):
     parent_name = os.path.basename(parent_dir)
 
     if re.match(r'\d{4}-\d{2}-\d{2}$', parent_name):
-        # Already inside a split subfolder — split from current part number
-        split_dir = parent_dir
-        stem = re.sub(r'-part\d+\.md$', '', filename)
-        part_match = re.search(r'-part(\d+)\.md$', filename)
+        # Already inside a split subfolder — split from current part number.
+        # Part filenames use a hyphenated, zero-padded number
+        # (-part-01.md, not -part1.md) -- zero-padding keeps alphabetical
+        # sort equal to numeric sort past 9 parts (a plain "-part1.md" scheme
+        # would otherwise sort "part10" before "part2"). This matches the
+        # real, pre-existing split files already on disk from earlier
+        # extractor versions -- discovered via real-data dogfooding
+        # (2026-02-13, 02-20, 02-21, 03-19, 03-25, 04-07 all predate this
+        # fix and already use this exact format), not invented here.
+        stem = re.sub(r'-part-\d+\.md$', '', filename)
+        part_match = re.search(r'-part-(\d+)\.md$', filename)
         start_part = int(part_match.group(1)) if part_match else 1
     else:
         date_m = re.match(r'(\d{4}-\d{2}-\d{2})', filename)
@@ -194,7 +253,7 @@ def split_file_if_oversized(output_path):
             f'\\1 — Part {i}',
             header, count=1
         )
-        part_path = os.path.join(split_dir, f'{stem}-part{i}.md')
+        part_path = os.path.join(split_dir, f'{stem}-part-{i:02d}.md')
         with open(part_path, 'w', encoding='utf-8') as f:
             f.write(part_header + ''.join(chunk))
         created.append(part_path)

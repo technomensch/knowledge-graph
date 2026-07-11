@@ -26,6 +26,20 @@ def main():
 
     args = parser.parse_args()
 
+    # --rebuild is Claude-only (it exists specifically to repair the
+    # ENH-047 date-bucketing corruption that was unique to the Claude
+    # extractor -- see extract_claude.py). Warn explicitly instead of
+    # silently no-op'ing for sources that don't support it.
+    if args.rebuild:
+        if args.source == 'gemini':
+            print("WARNING: --rebuild is only supported for --source claude; ignored for gemini.")
+        elif args.source == 'codex':
+            print("WARNING: --rebuild is only supported for --source claude; ignored for codex.")
+        elif args.source == 'all':
+            print("NOTE: --rebuild only applies to the Claude portion of --source all; "
+                  "Gemini remains incremental (see extract_gemini.py's full-overwrite-per-run "
+                  "behavior, which already rebuilds each date it touches on every normal run).")
+
     # Handle --today convenience flag
     if args.today:
         args.date = datetime.now().strftime("%Y-%m-%d")

@@ -137,7 +137,7 @@ echo "── Step 4 (MANDATORY): ADR-044 split-day interaction ──"
 SPLIT_OUT="$TEST_DIR/output-split"
 mkdir -p "$SPLIT_OUT/2026-06-03"
 
-cat > "$SPLIT_OUT/2026-06-03/2026-06-03-claude-part1.md" <<'EOF'
+cat > "$SPLIT_OUT/2026-06-03/2026-06-03-claude-part-01.md" <<'EOF'
 # Complete Chat Session Export — Part 1
 
 **Total Messages:** 1
@@ -153,7 +153,7 @@ Day three, message one.
 ---
 EOF
 
-cat > "$SPLIT_OUT/2026-06-03/2026-06-03-claude-part2.md" <<'EOF'
+cat > "$SPLIT_OUT/2026-06-03/2026-06-03-claude-part-02.md" <<'EOF'
 # Complete Chat Session Export — Part 2
 
 ### Message 2: Assistant
@@ -171,7 +171,7 @@ EOF
 PRE_PATH=$(HOME="$FAKE_HOME" KG_OUTPUT_DIR="$SPLIT_OUT" python3 -c \
   "import sys; sys.path.insert(0, '$REPO_ROOT/core/scripts'); from chat_extractor_base import get_output_path; print(get_output_path('2026-06-03-claude.md'))")
 case "$PRE_PATH" in
-  *"/2026-06-03/2026-06-03-claude-part2.md") pass "precondition: get_output_path reroutes into the split subfolder's last part" ;;
+  *"/2026-06-03/2026-06-03-claude-part-02.md") pass "precondition: get_output_path reroutes into the split subfolder's last part" ;;
   *) fail "precondition failed: get_output_path did not reroute into split part2 (got $PRE_PATH)" ;;
 esac
 
@@ -186,8 +186,8 @@ else
   fail "a stray flat 2026-06-03-claude.md was created alongside the split subfolder"
 fi
 
-PART1="$SPLIT_OUT/2026-06-03/2026-06-03-claude-part1.md"
-PART2="$SPLIT_OUT/2026-06-03/2026-06-03-claude-part2.md"
+PART1="$SPLIT_OUT/2026-06-03/2026-06-03-claude-part-01.md"
+PART2="$SPLIT_OUT/2026-06-03/2026-06-03-claude-part-02.md"
 
 # (b) already-seen uuids from part1 AND part2 are not re-appended
 COUNT_DAY3_001=$(cat "$PART1" "$PART2" 2>/dev/null | grep -c '<!-- uuid: day3-001 -->' || true)
@@ -217,6 +217,49 @@ if [ "$TOTAL_DAY3_MARKERS" = "$DAY3_COUNT" ]; then
   pass "no message loss: exactly $DAY3_COUNT unique day-3 uuids across both parts"
 else
   fail "expected $DAY3_COUNT unique day-3 uuids across both parts, got $TOTAL_DAY3_MARKERS"
+fi
+
+# ── Step 5: leading-untimestamped backfill path (Fix 5, v0.6.18) ─────────────
+# A separate fixture, kept distinct from the Step 2–4 fixture above so those
+# derived counts stay stable. This one STARTS with untimestamped records (no
+# "timestamp" key at all), forcing them into pending_untimestamped before any
+# date has been derived, then backfills them to the first timestamped
+# record's date once it arrives -- the one branch the main fixture (which
+# starts with a timestamped record) never exercises.
+echo "── Step 5: leading-untimestamped backfill ──"
+LEADING_FIXTURE="$FIXTURES_DIR/sample-claude-leading-untimestamped.jsonl"
+LEADING_COUNT=$(grep -c '"uuid":"lead-' "$LEADING_FIXTURE")
+
+LEADING_PROJECT_DIR="$FAKE_HOME/.claude/projects/-Users-test-leading-project"
+mkdir -p "$LEADING_PROJECT_DIR"
+cp "$LEADING_FIXTURE" "$LEADING_PROJECT_DIR/main-session.jsonl"
+
+LEADING_OUT="$TEST_DIR/output-leading"
+mkdir -p "$LEADING_OUT"
+
+HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
+  --source claude --output-dir "$LEADING_OUT" \
+  > "$TEST_DIR/leading.log" 2>&1 || true
+
+LEADING_FILE=$(find "$LEADING_OUT" -name "2026-06-10-claude.md" | head -1)
+
+if [ -n "$LEADING_FILE" ]; then
+  pass "output file created for 2026-06-10 (first timestamped record's date)"
+
+  LEADING_ACTUAL=$(grep -c '^### Message' "$LEADING_FILE" 2>/dev/null || echo 0)
+  if [ "$LEADING_ACTUAL" = "$LEADING_COUNT" ]; then
+    pass "2026-06-10 output has all $LEADING_COUNT messages, none dropped"
+  else
+    fail "2026-06-10 expected $LEADING_COUNT messages, got $LEADING_ACTUAL"
+  fi
+
+  if grep -q '<!-- uuid: lead-001 -->' "$LEADING_FILE" && grep -q '<!-- uuid: lead-002 -->' "$LEADING_FILE"; then
+    pass "leading untimestamped records (lead-001, lead-002) backfilled to 2026-06-10"
+  else
+    fail "leading untimestamped records missing from 2026-06-10 output -- backfill path broken"
+  fi
+else
+  fail "no output file created for 2026-06-10 -- leading-untimestamped fixture produced nothing"
 fi
 
 echo ""
