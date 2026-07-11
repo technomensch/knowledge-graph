@@ -1,6 +1,6 @@
 # ENH-038: Extract-chat-history reliability (umbrella)
 
-**Status:** ✅ Resolved (v0.6.17) — all 6 tracked bugs fixed; see per-bug status table below. (ENH-043's own spec status line still reads 🟡 Proposed despite its code/tests being complete — a leftover flip-the-status task from the *original* v0.6.17 plan, not this umbrella's own outstanding work.)
+**Status:** 🔄 In Progress (v0.6.18) — all 6 v0.6.17 bugs fixed and merged; 6 new post-merge regression findings discovered 2026-07-10 (see rows below), planned, not yet implemented. (ENH-043's own spec status line still reads 🟡 Proposed despite its code/tests being complete — a leftover flip-the-status task from the *original* v0.6.17 plan, not this umbrella's own outstanding work.)
 **Discovered:** 2026-07-03 (first finding); umbrella consolidation 2026-07-09
 **Governed by:** none (bug-fix/extractor-parity work, not a new command/skill/docstring — ADR-058's naming/scope check does not apply)
 **Full narrative, root-cause evolution, test cases, and per-bug detail:** [`knowledge/issues/chat-extraction-reliability-saga/`](../../issues/chat-extraction-reliability-saga/README.md)
@@ -25,12 +25,18 @@ Going forward, any new defect found in chat-history extraction (Claude, Gemini, 
 | Incremental mtime-skip bug (never ported from Claude's fix) | Codex | ✅ Fixed (v0.6.17) | [attempts/ENH-045/specification.md](../../issues/chat-extraction-reliability-saga/attempts/ENH-045/specification.md) |
 | `.pb` sessions dated by file mtime, not content | Gemini | ✅ Fixed (v0.6.17) | [attempts/ENH-046/specification.md](../../issues/chat-extraction-reliability-saga/attempts/ENH-046/specification.md) |
 | Whole session file dated by first message; multi-day sessions misfile | Claude | ✅ Fixed (v0.6.17) | [attempts/ENH-047/specification.md](../../issues/chat-extraction-reliability-saga/attempts/ENH-047/specification.md) |
+| `--rebuild` on a split date destroys content before write is confirmed (no backup) | Claude | 🔲 Planned (v0.6.18) | [chat-extraction-reliability-saga/README.md § Post-Merge Regression Findings, Finding 1](../../issues/chat-extraction-reliability-saga/README.md) |
+| Single `.backup` slot clobbered on second interrupted run; no atomic write | Claude | 🔲 Planned (v0.6.18) | [same, Finding 2](../../issues/chat-extraction-reliability-saga/README.md) |
+| ADR-062 fail-closed scoping fails open for hex-named `--project` values | Gemini | 🔲 Planned (v0.6.18) | [same, Finding 3](../../issues/chat-extraction-reliability-saga/README.md) |
+| ENH-046 `.pb` content-dating inert without optional `blackboxprotobuf` dependency | Gemini | 🔲 Planned (v0.6.18) | [same, Finding 4](../../issues/chat-extraction-reliability-saga/README.md) |
+| Leading-untimestamped ENH-047 backfill path never exercised by tests | Claude | 🔲 Planned (v0.6.18) | [same, Finding 5](../../issues/chat-extraction-reliability-saga/README.md) |
+| `--rebuild` silently ignored for `--source gemini`/`codex` | Gemini / Codex | 🔲 Planned (v0.6.18) | [same, Finding 6](../../issues/chat-extraction-reliability-saga/README.md) |
 
 ---
 
 ## Outstanding Work
 
-All 6 tracked bugs are fixed as of 2026-07-10. Two loose ends remain, neither of them code:
+All 6 v0.6.17 bugs are fixed as of 2026-07-10. A post-merge review the same day found 6 new findings (rows above), planned for v0.6.18, not yet implemented — see `knowledge/plans/v0.6.18-fix-extraction-regressions.md`. Two other loose ends remain, neither of them code:
 
 - **ENH-043's spec status line** was never flipped from 🟡 Proposed to ✅ Resolved despite its rebuild-mode code and tests being complete — that's the *original* v0.6.17 plan's still-outstanding Task 8, a different plan than the one that closed out ENH-047/044.
 - **Re-baseline extraction and revisit the "wrong session captured" symptom** noted in the meta-issue's Attempt 003 — the one genuinely unresolved investigative thread left in this saga.

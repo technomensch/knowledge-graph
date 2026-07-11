@@ -18,6 +18,10 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 If you cloned this repository before 0.6.18 and ran `tests/test-hooks.sh` or `tests/test-stop-hook.sh` locally (this bug has been live and unpatched on `main` since 2026-03-03 / 2026-04-29 respectively), and that run was ever interrupted (Ctrl-C, killed terminal, killed process), you may have silently lost your real KG registrations in `~/.claude/kg-config.json` with no error ever surfaced. Check for an unexpected lone `test-kg` entry with placeholder `2026-01-01T00:00:00.000Z` timestamps — if found, your real registrations were overwritten. Re-register via `/kmgraph:kmg-init`.
 
+### Pending (planned for this same 0.6.18 release, not yet implemented)
+
+- **6 post-merge chat-extraction regression findings** (umbrella [ENH-038](knowledge/enhancements/ENH-038/ENH-038-specification.md)) — a post-merge Fable review of the merged v0.6.17 diff found: (1) `--rebuild` on a split date can destroy content before the new write is confirmed, no backup; (2) a single `.backup` slot gets clobbered on a second interrupted run, no atomic write; (3) Gemini's ADR-062 fail-closed `--project` scoping fails open for hex-named project values; (4) ENH-046 `.pb` content-dating is inert without the optional `blackboxprotobuf` dependency; (5) ENH-047's leading-untimestamped backfill path is untested; (6) `--rebuild` silently no-ops for `--source gemini`/`codex`. Full detail: `knowledge/issues/chat-extraction-reliability-saga/README.md` § "Post-Merge Regression Findings". This entry will be replaced with the final shipped description once implemented.
+
 ## [0.6.17] — 2026-07-10
 
 ### Fixed
