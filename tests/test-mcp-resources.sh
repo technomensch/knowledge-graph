@@ -18,18 +18,11 @@ fail() { echo "  ❌ FAIL: $1"; FAIL=$((FAIL + 1)); }
 
 TEST_DIR=$(mktemp -d)
 TEST_CONFIG="$TEST_DIR/kg-config.json"
-REAL_CONFIG="$HOME/.claude/kg-config.json"
-REAL_CONFIG_BACKUP="$TEST_DIR/kg-config.backup.json"
 
 cleanup() {
-  if [ -f "$REAL_CONFIG_BACKUP" ]; then
-    mv "$REAL_CONFIG_BACKUP" "$REAL_CONFIG"
-  fi
   rm -rf "$TEST_DIR"
 }
-trap cleanup EXIT
-
-[ -f "$REAL_CONFIG" ] && cp "$REAL_CONFIG" "$REAL_CONFIG_BACKUP"
+trap cleanup EXIT INT TERM
 
 echo "═══════════════════════════════════════════════════════════════"
 echo "TEST SUITE: MCP Resources (2 resources)"

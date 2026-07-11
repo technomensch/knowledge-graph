@@ -211,9 +211,9 @@ Tests `core/scripts/run_extraction.py` with a simulated Claude session fixture.
 ## Test Isolation
 
 All integration tests:
-- Create an isolated temp directory (`mktemp -d`) with `trap cleanup EXIT`
-- Override `~/.claude/kg-config.json` via `KG_CONFIG_PATH` env var
-- Back up and restore the real config on completion
+- Create an isolated temp directory (`mktemp -d`) with `trap cleanup EXIT INT TERM`
+- Override `~/.claude/kg-config.json` via `KG_CONFIG_PATH` env var — the real config is
+  never read or written by any test
 - Set `CLAUDE_PLUGIN_ROOT` to the repo root for template access
 
 ---
@@ -264,8 +264,11 @@ ls -la mcp-server/dist/index.js
 ```
 
 **Hook tests failing — config path:**
-`hooks-master.sh` reads `$HOME/.claude/kg-config.json` directly. Tests temporarily replace
-this file and restore it on cleanup. Ensure no other process writes to that file during tests.
+`hooks-master.sh`, `session-end-prompt.sh`, and the other lifecycle hooks resolve their config
+path via `${KG_CONFIG_PATH:-$HOME/.claude/kg-config.json}`. Tests set `KG_CONFIG_PATH` to point
+at a sandboxed temp config — the real file is never touched. If a hook test fails, check that
+`KG_CONFIG_PATH` is actually being exported into the `bash "$HOOKS_MASTER"` / `bash "$STOP_HOOK"`
+invocation, not just set in the surrounding shell.
 
 **Python extraction test failing:**
 ```bash

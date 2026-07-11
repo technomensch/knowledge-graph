@@ -7,6 +7,17 @@ displayed_sidebar: null
 
 All notable changes to the Knowledge Plugin will be documented in this file.
 
+## [0.6.19] — 2026-07-10
+
+### Fixed
+
+- **Hook scripts hardcoded `~/.claude/kg-config.json` with no sandboxing path, forcing test scripts to clobber the real global config in place** — `hooks-master.sh`, `session-end-prompt.sh`, `post-tool-lesson-check.sh`, `plan-mirror.sh`, and `notification-dispatch.sh` all resolved their config path via a literal `$HOME/.claude/kg-config.json` with no override. Because of this, `tests/test-hooks.sh` and `tests/test-stop-hook.sh` could only sandbox the SessionStart/Stop hooks under test by directly `cp`/`rm -f`-ing the user's real config file, protected only by a `trap cleanup EXIT` restore. Any non-graceful interruption (killed process, closed terminal) left the real file permanently overwritten with test-fixture data, silently — this happened to a real user's config on 2026-07-10. All five scripts now resolve their config path via `${KG_CONFIG_PATH:-$HOME/.claude/kg-config.json}`, matching the pattern the MCP server (`mcp-server/src/utils.ts`) already used; both test scripts (and four MCP test files carrying the same now-dead backup/restore pattern) were rewritten to sandbox via `KG_CONFIG_PATH` instead of touching the real file at all. Restores compliance with [ADR-012](knowledge/decisions/ADR-012-hook-security-model.md)'s existing hook security model. Closes #163.
+- **Behavior change, surfaced explicitly (not silent):** hooks now honor the `KG_CONFIG_PATH` environment variable, matching the MCP server. Users who do not export `KG_CONFIG_PATH` see no change. Users who already export it (e.g. per `.claude/settings.local.json`) will now have all five lifecycle hooks resolve against that same path instead of the default `~/.claude/kg-config.json`.
+
+### ⚠️ Data-loss advisory for pre-0.6.19 clones
+
+If you cloned this repository before 0.6.19 and ran `tests/test-hooks.sh` or `tests/test-stop-hook.sh` locally (this bug has been live and unpatched on `main` since 2026-03-03 / 2026-04-29 respectively), and that run was ever interrupted (Ctrl-C, killed terminal, killed process), you may have silently lost your real KG registrations in `~/.claude/kg-config.json` with no error ever surfaced. Check for an unexpected lone `test-kg` entry with placeholder `2026-01-01T00:00:00.000Z` timestamps — if found, your real registrations were overwritten. Re-register via `/kmgraph:kmg-init`.
+
 ## [0.6.17] — 2026-07-10
 
 ### Fixed

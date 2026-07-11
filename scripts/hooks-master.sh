@@ -9,7 +9,7 @@
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PLUGIN_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-CONFIG_PATH="$HOME/.claude/kg-config.json"
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.claude/kg-config.json}"
 
 # Color codes for output
 RED='\033[0;31m'
