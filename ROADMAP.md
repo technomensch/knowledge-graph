@@ -139,7 +139,7 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 
 ## v0.6.18 — Post-Release Patches (🔲 In Progress: 2026-07-11)
 
-Branch: `v0.0.6.18-misc-patches`
+Branch: `v0.6.18-misc-patches`
 
 ### Planned
 - 🔲 Fix `getProjectRoot()` KG_MISMATCH false positive (issue-10)
