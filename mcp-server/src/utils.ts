@@ -58,6 +58,16 @@ export function readConfig(): KgConfig {
   // ~/.claude/. Without this, users who never migrated get DEFAULT_CONFIG and
   // the config-location upgrade never becomes reachable. Never written here —
   // migration is handled explicitly by kg_upgrade's config-location category.
+  //
+  // Only applies when using the default resolution path. An explicit
+  // KG_CONFIG_PATH override means the user opted into a custom location: a
+  // missing custom path must yield a fresh/empty config, NOT a silent inherit
+  // from an unrelated legacy file. This matches checkConfigLocation() /
+  // applyConfigLocation() in tools/upgrade.ts, which both skip legacy-location
+  // logic entirely when KG_CONFIG_PATH is set.
+  if (process.env.KG_CONFIG_PATH) {
+    return { ...DEFAULT_CONFIG };
+  }
   const legacyPath = path.join(process.env.HOME || os.homedir(), ".claude", "kg-config.json");
   if (fs.existsSync(legacyPath)) {
     const raw = fs.readFileSync(legacyPath, "utf-8");

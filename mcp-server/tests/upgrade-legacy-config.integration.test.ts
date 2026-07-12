@@ -41,9 +41,11 @@ describe("handleUpgrade with config only at legacy ~/.claude path (integration)"
     const kgRoot = makeTempDir("kg");
     scaffoldKg(kgRoot);
 
-    // New path (CONFIG_PATH) points somewhere that does not exist → forces legacy fallback.
-    const newPath = path.join(makeTempDir("newloc"), "kg-config.json");
-    process.env.KG_CONFIG_PATH = newPath;
+    // Default resolution path (no KG_CONFIG_PATH override): CONFIG_PATH resolves to
+    // $HOME/.kmgraph/kg-config.json (does not exist) → read-only legacy fallback applies.
+    // The legacy fallback only fires when KG_CONFIG_PATH is unset, matching
+    // checkConfigLocation()/applyConfigLocation() which skip legacy logic when it is set.
+    delete process.env.KG_CONFIG_PATH;
     process.env.HOME = home;
 
     // Only the legacy config exists, with a valid active KG.
@@ -72,8 +74,14 @@ describe("handleUpgrade with config only at legacy ~/.claude path (integration)"
       "utf-8"
     );
 
+    // Under jest, os.homedir() ignores $HOME (returns the real home), so mock it to
+    // the temp home. That keeps readConfig()'s CONFIG_PATH (which uses raw os.homedir())
+    // under the temp tree so the real dev-machine config cannot leak in and the
+    // read-only legacy fallback (only active when KG_CONFIG_PATH is unset) fires.
     jest.resetModules();
+    jest.doMock("os", () => ({ ...jest.requireActual("os"), homedir: () => home }));
     const { handleUpgrade } = require("../src/tools/upgrade.js") as typeof import("../src/tools/upgrade.js");
+    jest.dontMock("os");
 
     const result = await handleUpgrade({});
 

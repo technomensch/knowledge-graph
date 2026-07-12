@@ -38,9 +38,23 @@ describe("readConfig legacy fallback", () => {
     return require("../src/utils.js") as typeof import("../src/utils.js");
   }
 
-  it("returns the legacy ~/.claude config when only the legacy path exists (the bug)", () => {
-    const home = makeTempDir("home");
-    const newPath = path.join(makeTempDir("newloc"), "kg-config.json"); // does NOT exist
+  // Default-path variant: no KG_CONFIG_PATH override, so CONFIG_PATH resolves to
+  // os.homedir()/.kmgraph/kg-config.json and the legacy path to $HOME/.claude/.
+  // Under jest, os.homedir() ignores $HOME (returns the real home), so we mock it
+  // to the temp home to keep the real dev-machine config from leaking in. This is
+  // the only scenario in which the read-only legacy fallback applies.
+  function loadReadConfigDefaultPath(home: string) {
+    delete process.env.KG_CONFIG_PATH;
+    process.env.HOME = home;
+    jest.resetModules();
+    jest.doMock("os", () => ({ ...jest.requireActual("os"), homedir: () => home }));
+    const utils = require("../src/utils.js") as typeof import("../src/utils.js");
+    jest.dontMock("os");
+    return utils;
+  }
+
+  it("returns the legacy ~/.claude config when only the legacy path exists and KG_CONFIG_PATH is unset", () => {
+    const home = makeTempDir("home"); // $HOME/.kmgraph/kg-config.json does NOT exist
     const legacyDir = path.join(home, ".claude");
     fs.mkdirSync(legacyDir, { recursive: true });
     const legacyConfig = {
@@ -60,7 +74,7 @@ describe("readConfig legacy fallback", () => {
     };
     fs.writeFileSync(path.join(legacyDir, "kg-config.json"), JSON.stringify(legacyConfig), "utf-8");
 
-    const { readConfig } = loadReadConfig(newPath, home);
+    const { readConfig } = loadReadConfigDefaultPath(home);
     const cfg = readConfig();
 
     expect(cfg.active).toBe("legacy-kg");
@@ -85,6 +99,27 @@ describe("readConfig legacy fallback", () => {
 
     const { readConfig } = loadReadConfig(newPath, home);
     expect(readConfig().active).toBe("new-kg");
+  });
+
+  it("returns DEFAULT_CONFIG when KG_CONFIG_PATH is set to a nonexistent path, even if legacy exists", () => {
+    // Explicit KG_CONFIG_PATH override in play: readConfig() must NOT silently inherit
+    // an unrelated ~/.claude/kg-config.json. A missing custom path means fresh/empty
+    // config, matching checkConfigLocation()/applyConfigLocation() which skip legacy
+    // logic entirely when KG_CONFIG_PATH is set.
+    const home = makeTempDir("home");
+    const newPath = path.join(makeTempDir("newloc"), "kg-config.json"); // does NOT exist
+    const legacyDir = path.join(home, ".claude");
+    fs.mkdirSync(legacyDir, { recursive: true });
+    fs.writeFileSync(path.join(legacyDir, "kg-config.json"), JSON.stringify({
+      version: "1.0.0", active: "legacy-kg",
+      graphs: { "legacy-kg": { name: "legacy-kg", path: "/some/kg/path", type: "project-local", categories: [], createdAt: new Date().toISOString(), lastUsed: new Date().toISOString() } },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    }), "utf-8");
+
+    const { readConfig } = loadReadConfig(newPath, home); // sets KG_CONFIG_PATH
+    const cfg = readConfig();
+    expect(cfg.active).toBeNull();
+    expect(cfg.graphs).toEqual({});
   });
 
   it("returns DEFAULT_CONFIG (active: null) when neither path exists", () => {
