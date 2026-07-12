@@ -7,6 +7,15 @@ displayed_sidebar: null
 
 All notable changes to the Knowledge Plugin will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+- **`getProjectRoot()` KG_MISMATCH false positive for non-`/docs` KG content dirs** — generalized to strip any trailing path segment, not just `/docs`. Closes issue-10.
+- **`kg-config.json` default location was Claude-only** (`~/.claude/`) — now defaults to platform-neutral `~/.kmgraph/`, with a non-destructive `kg_upgrade apply ["config-location"]` migration path for existing installs. `KG_CONFIG_PATH` env var override unchanged.
+- **`mcp-server/package.json` version drift** — was `0.6.15` while `package.json`/`.claude-plugin/plugin.json` read `0.6.18`; synced.
+- **Stale status labels across 11 ADR/ENH/ROADMAP/GitHub-issue entries** corrected to match already-shipped reality (see `knowledge/analysis/outstanding-items-inventory-2026-07-11.md`); new ROADMAP "Outstanding Action Items" section added to track everything the sweep found that isn't yet closed.
+- **ENH specs missing GitHub-issue links** (issue-11) — scan-based structural invariant added: any `knowledge/issues/`/`knowledge/enhancements/` folder lacking a synced `github_issue` gets flagged, independent of which command created it (closes the bypass path that let ~18 ENH specs go untracked). See `knowledge/issues/issue-11/`.
+
 ## [0.6.18] — 2026-07-10
 
 ### Fixed

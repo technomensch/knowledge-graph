@@ -137,6 +137,19 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 
 ---
 
+## v0.6.18 — Post-Release Patches (🔲 In Progress: 2026-07-11)
+
+Branch: `v0.0.6.18-misc-patches`
+
+### Planned
+- 🔲 Fix `getProjectRoot()` KG_MISMATCH false positive (issue-10)
+- 🔲 Migrate `kg-config.json` default location to platform-neutral `~/.kmgraph/`
+- 🔲 Sync `mcp-server/package.json` version to `0.6.18`
+- 🔲 Flip 11 stale status labels + add ROADMAP "Outstanding Action Items" tracking section
+- 🔲 Scan-based GitHub-issue-sync invariant for `issues/`/`enhancements/` (issue-11)
+
+---
+
 ## v0.6.0 (🔲 In Planning)
 
 ### Planned
