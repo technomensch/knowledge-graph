@@ -528,6 +528,9 @@ function applyStrayKnowledgeDir(kgPath: string): string {
 }
 
 function applyConfigLocation(): string {
+  // Match checkConfigLocation(): an explicit KG_CONFIG_PATH override means the
+  // legacy-location migration is not in play — skip entirely.
+  if (process.env.KG_CONFIG_PATH) return "KG_CONFIG_PATH override set; config-location migration skipped";
   const homeDir = process.env.HOME || os.homedir();
   const oldPath = path.join(homeDir, ".claude", "kg-config.json");
   const newPath = path.join(homeDir, ".kmgraph", "kg-config.json");
@@ -709,7 +712,7 @@ export function registerUpgradeTool(server: McpServer): void {
         .optional()
         .default([])
         .describe(
-          'Categories to apply. Omit or pass [] to inspect only. Values: "directories", "config", "templates", "platform-split"'
+          'Categories to apply. Omit or pass [] to inspect only. Values: "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"'
         ),
       confirm_platform_split: z
         .boolean()

@@ -49,11 +49,21 @@ const DEFAULT_CONFIG: KgConfig = {
 };
 
 export function readConfig(): KgConfig {
-  if (!fs.existsSync(CONFIG_PATH)) {
-    return { ...DEFAULT_CONFIG };
+  // Primary: the platform-neutral location (or KG_CONFIG_PATH override).
+  if (fs.existsSync(CONFIG_PATH)) {
+    const raw = fs.readFileSync(CONFIG_PATH, "utf-8");
+    return JSON.parse(raw) as KgConfig;
   }
-  const raw = fs.readFileSync(CONFIG_PATH, "utf-8");
-  return JSON.parse(raw) as KgConfig;
+  // Read-only legacy fallback: pre-v0.6 installs kept kg-config.json under
+  // ~/.claude/. Without this, users who never migrated get DEFAULT_CONFIG and
+  // the config-location upgrade never becomes reachable. Never written here —
+  // migration is handled explicitly by kg_upgrade's config-location category.
+  const legacyPath = path.join(process.env.HOME || os.homedir(), ".claude", "kg-config.json");
+  if (fs.existsSync(legacyPath)) {
+    const raw = fs.readFileSync(legacyPath, "utf-8");
+    return JSON.parse(raw) as KgConfig;
+  }
+  return { ...DEFAULT_CONFIG };
 }
 
 export function writeConfig(config: KgConfig): void {
