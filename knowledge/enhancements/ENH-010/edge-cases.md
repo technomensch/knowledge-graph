@@ -238,6 +238,6 @@ Identified 2026-04-10 via Opus audit. Two were fixed in v0.3.0-beta (E-beta-1, E
 
 - [[ENH-010-specification]] — enhancement spec
 - [[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]] — architecture decision
-- [[ADR-030-shared-module-pattern-for-slash-command-deduplication]] — init-shared refactor + migration amendment
+- [[ADR-064-shared-module-pattern-for-slash-command-deduplication]] — init-shared refactor + migration amendment
 - `docs/plans/v0.3.0-beta.md` — implementation plan with mitigations (Phase 4 added 2026-04-10)
 - Chat history references: `docs/chat-history/2026-02/2026-02-17-claude.md`, v0.0.6-alpha ROADMAP entry
