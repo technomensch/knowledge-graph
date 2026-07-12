@@ -3,7 +3,7 @@
 **Status:** 🟡 Proposed
 **Discovered:** 2026-07-01
 **Governed by:** [ADR-058](../../decisions/ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md)
-**Related:** [ADR-053](../../decisions/ADR-053-kmg-prefix-cross-platform-naming.md) (the June `kmg-` rename whose blast radius bounds this ENH's scope), [ADR-057](../../decisions/ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth.md) (the DETECT-layer subset of the same cluster), `docs/reference/command-guide.md`, `docs/reference/commands.md`, `commands/kmg-update-graph.md`, `commands/kmg-update-issue-plan.md`
+**Related:** [ADR-053](../../decisions/ADR-053-kmg-prefix-cross-platform-naming.md) (the June `kmg-` rename whose blast radius bounds this ENH's scope), [ADR-057](../../decisions/ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth.md) (the DETECT-layer subset of the same cluster), [ENH-026](../ENH-026/ENH-026-specification.md) (KG Write Guard — its `commands/kmg-update-graph.md` guard should wait for this ENH's Option A/B rename decision, validated 2026-07-11), [ENH-042](../ENH-042/ENH-042-specification.md) (release-doc-sync reconciliation — its fix references `kmg-update-graph`/`kmg-execute-plan`/`kmg-update-doc.md` by name; hold its implementation until this ENH's Option A/B decision lands, validated 2026-07-11 — kept as a separate ENH since it's sync-logic + a new enforcement gate, not naming/IA), `docs/reference/command-guide.md`, `docs/reference/commands.md`, `commands/kmg-update-graph.md`, `commands/kmg-update-issue-plan.md`
 
 ---
 

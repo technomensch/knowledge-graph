@@ -3,6 +3,7 @@
 **Status:** Proposed
 **Version:** TBD
 **Parent:** ADR-029 (plan file location), ENH-015 (decision governance / brainstorm-recall)
+**Related:** [issue-11](../../issues/issue-11/issue-11-description.md) (cross-linked, not merged, 2026-07-11) — documents the same root cause from a different angle: specs captured via this ENH's bypass path also miss GitHub-issue creation and the Step 6.4 ROADMAP/CHANGELOG sync gate, not just KG linkage. Confirmed casualties: ENH-024 onward.
 
 ---
 
