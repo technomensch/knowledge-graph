@@ -1491,3 +1491,59 @@ describe("T-51b: lastAppliedVersion does not clobber applyConfig side effects", 
     expect(lastApplied).toBe(handleVersion().installed);
   });
 });
+
+describe("config-location category", () => {
+  const ORIGINAL_ENV = process.env.KG_CONFIG_PATH;
+  const ORIGINAL_HOME = process.env.HOME;
+  let fakeHome: string;
+
+  beforeEach(() => {
+    fakeHome = makeTempDir("config-location-home");
+    tempDirs.push(fakeHome);
+    process.env.HOME = fakeHome; // os.homedir() reads $HOME on POSIX — no mock needed
+    delete process.env.KG_CONFIG_PATH;
+  });
+
+  afterEach(() => {
+    if (ORIGINAL_HOME === undefined) delete process.env.HOME;
+    else process.env.HOME = ORIGINAL_HOME;
+    if (ORIGINAL_ENV === undefined) delete process.env.KG_CONFIG_PATH;
+    else process.env.KG_CONFIG_PATH = ORIGINAL_ENV;
+  });
+
+  it("reports config-location item when old path exists and new path does not", () => {
+    const oldDir = path.join(fakeHome, ".claude");
+    fs.mkdirSync(oldDir, { recursive: true });
+    fs.writeFileSync(path.join(oldDir, "kg-config.json"), "{}", "utf-8");
+
+    const kgRoot = makeTempDir("kg");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    return handleUpgrade({}).then((result) => {
+      const parsed = JSON.parse(result.content[0].text);
+      const item = parsed.upgrades.find((u: { category: string }) => u.category === "config-location");
+      expect(item).toBeDefined();
+    });
+  });
+
+  it("apply config-location copies old file to new path without deleting old file", async () => {
+    const oldDir = path.join(fakeHome, ".claude");
+    fs.mkdirSync(oldDir, { recursive: true });
+    const oldFile = path.join(oldDir, "kg-config.json");
+    fs.writeFileSync(oldFile, JSON.stringify({ version: "1.0.0", active: null, graphs: {} }), "utf-8");
+
+    const kgRoot = makeTempDir("kg");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const result = await handleUpgrade({ apply: ["config-location"] as never });
+    const newFile = path.join(fakeHome, ".kmgraph", "kg-config.json");
+
+    expect(fs.existsSync(newFile)).toBe(true);
+    expect(fs.existsSync(oldFile)).toBe(true); // old file untouched — ADR-063
+    expect(fs.readFileSync(newFile, "utf-8")).toBe(fs.readFileSync(oldFile, "utf-8"));
+  });
+});

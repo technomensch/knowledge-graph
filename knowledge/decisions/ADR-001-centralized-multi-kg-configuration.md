@@ -35,6 +35,14 @@ The knowledge-graph plugin is designed to support multiple independent knowledge
 
 Implement centralized configuration via `~/.claude/kg-config.json` with:
 
+> **Update (2026-07-11):** Default config location changed to `~/.kmgraph/kg-config.json`
+> (platform-neutral — `~/.claude/` is Claude Code-specific and unreachable by
+> Gemini/Codex/Copilot). `KG_CONFIG_PATH` env var overrides the default when set.
+> Existing installs migrate via `kg_upgrade` apply `["config-location"]` (copies
+> the file; the old `~/.claude/kg-config.json` is left in place, not deleted).
+> See ADR-028 for the precedent (personal KG home migration) and
+> `docs/specs/2026-07-11-kg-config-location-refactor-design.md` for full analysis.
+
 ### Core Components
 
 1. **Active pointer:** Single `"active"` field specifying the currently active KG name

@@ -92,7 +92,7 @@ title: Commands Reference
 | [`/kmgraph:kmg-init`](#init) | Create a new KG with wizard; optionally backfills from existing project context; discovers locally running Ollama and LM Studio instances and offers to configure them for tier mapping | — |
 | [`/kmgraph:kmg-init-personal-kg`](#init-personal-kg) | Create a personal KG at `~/.kmgraph/` for cross-project lessons | — |
 | [`/kmgraph:kmg-add-category`](#add-category) | Add a new category directory and KG entry file to an existing knowledge graph | `--prefix <p>`, `--git ignore\|commit` |
-| [`/kmgraph:kmg-list`](#list) | List all configured knowledge graphs from `~/.claude/kg-config.json` | `--names-only`, `--json` |
+| [`/kmgraph:kmg-list`](#list) | List all configured knowledge graphs from `~/.kmgraph/kg-config.json` | `--names-only`, `--json` |
 | [`/kmgraph:kmg-switch`](#switch) | Change the active knowledge graph | `--force` |
 | [`/kmgraph:kmg-config-sanitization`](#config-sanitization) | Install a pre-commit hook for sensitive-data detection with interactive pattern wizard | — |
 | [`/kmgraph:kmg-check-sensitive`](#check-sensitive) | Scan active KG files for emails, API keys, and internal URLs before sharing | `--fix-suggestions` |
