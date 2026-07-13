@@ -105,6 +105,17 @@ if [ -n "$SCAN_FLAG" ] && [ ! -f "$SCAN_FLAG" ]; then
 "
 fi
 
+# ── Gate 4: github-issue-sync invariant (issue-11) ────────────────────────────
+
+SYNC_CHECK="${REPO_ROOT}/scripts/check-github-issue-sync.sh"
+if [ -x "$SYNC_CHECK" ]; then
+  SYNC_FINDINGS=$("$SYNC_CHECK" --findings 2>/dev/null || true)
+  if [ -n "$SYNC_FINDINGS" ]; then
+    FINDINGS="${FINDINGS}${SYNC_FINDINGS}
+"
+  fi
+fi
+
 # ── Emit ──────────────────────────────────────────────────────────────────────
 
 [ -z "$FINDINGS" ] && exit 0
