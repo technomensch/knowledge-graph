@@ -1,5 +1,67 @@
 # Knowledge Management Graph — Roadmap
 
+## Prioritized Next (working list — captured 2026-07-13)
+
+A filtered, ranked view onto the sections below — not a replacement for them. Every item in the roadmap is accounted for in one tier here; re-rank/prune as items land. The categorized backlog further down stays the source of truth for full detail.
+
+### Tier 1 — Active / Do Next
+
+- **issue-11 — Scan-based GitHub-issue-sync invariant.** The one remaining item on the branch you're on right now (`v0.6.18-misc-patches`). Everything else can wait behind finishing the branch you're already mid-way through.
+- **ENH-040 — Stop indexing `chat-history/*.md` in `kg_search`/`kg_fts5_rebuild`.** ADR-060 already decided chat history shouldn't be searchable content, but the code never caught up — confirmed still indexed as of this sweep. Every search a user runs is quietly polluted by raw chat transcripts until this lands. Cheap, high-frequency fix.
+- **ENH-041 — Broken nav breadcrumb in ~11 README scaffold files.** Root cause: ADR-027 deleted `GETTING-STARTED.md` but nothing updated the breadcrumbs pointing at it. Purely mechanical find/replace, visible to anyone who scaffolds a new project.
+- **ENH-002 — Refile as a new GitHub issue.** Issue #41 is closed, but only a wording fix shipped — the real feature (agent `--snapshot` mode, flag file, hooks, dedicated branch) never got built. The tracker is actively lying about this being done. Filing a fresh issue costs nothing and stops future trust in a false "closed" signal.
+- **"Wrong session captured"** — live, unresolved bug in the chat-extraction-reliability saga: the extractor sometimes grabs the wrong session. A correctness bug in the core capture path — captured knowledge can silently be from the wrong conversation.
+- **Docs-updates feed → site nav link.** The feed (`/knowledge-graph/docs-updates/`) plus RSS/Atom endpoints already exist and work — none are linked from navbar or footer. Wiring, not development.
+- **ADR-037 — seed default graph-usage rules block at `/kmgraph:init`.** Decision was made that new KGs should ship with a baseline rules block; the seeding step was never added to the init scaffold. Small, closes a gap between decision and reality.
+- **session-summary-agent plans-path bug.** The agent scans `docs/plans/` for active plans, but the real convention is `~/.claude/plans/` copied into `knowledge/plans/`. Silently looking in the wrong place — untracked, no ENH filed yet.
+- **ENH-023 remainder — "Protected files guard" injection.** Most of ENH-023 already shipped; this is the last piece — injecting a protected-files check into `pre-skill-rules-inject.sh` so paths like `commands/`/`core/templates/` can't be silently modified by a skill.
+
+### Tier 2 — Blocked on one decision (ENH-034)
+
+- **ENH-034 — Command rename decision (Option A/B still open).** Whether `kmg-update-graph`→`kmg-ingest-graph` and `kmg-update-issue-plan`→`kmg-propagate-issue-plan`. The single decision two other pieces of work are stuck behind — resolving it unlocks both items below.
+- **ENH-026 remainder — KG Write Guard.** `kmg-sync-all` guard + `run_extraction.py` bypass-proof check + ADR-019 supersession. A write-path integrity control preventing bad/bypassed writes to the KG. The `kmg-update-graph` half is already done; held pending ENH-034 because the guard needs the final command names.
+- **ENH-042 — Release-doc-sync mechanism.** Three disconnected mechanisms currently try to keep README/version/ROADMAP/CHANGELOG in sync and drift apart because nothing forces them to agree. Gets more expensive to untangle the longer it's left. Also held pending ENH-034.
+
+### Tier 3 — Decision-debt (no code needed, just make a call)
+
+- **ADR-046 — concept+setup hybrid page type.** File has duplicated frontmatter blocks and conflicting Proposed/Accepted status — unclear if it was ever executed in the docs site. Needs one look to confirm shipped vs. needs revision.
+- **ENH-006 — sequential-prompts/skill-trigger-gap.** Mostly superseded, but its Step 6.4 (a ROADMAP/CHANGELOG sync gate) is still load-bearing — it caught a real sync gap recently via a generic fallback rather than its intended mechanism, since plans now go through `superpowers:brainstorming`→`writing-plans` instead of `kmg-start-issue-tracking`. Fix: add an explicit ROADMAP/CHANGELOG-sync row to the Post-Plan Validation Checklist.
+- **Multiple same-day session UUIDs never deduplicated.** Unclear whether ENH-047's date-bucketing fix already incidentally solved this — needs a quick check against real data.
+- **Command-surface reduction — should `kmg-update-issue-plan` be a hook instead of a command?** Untracked, no ENH filed. Needs its own brainstorm before it can be scoped.
+- **ENH-025 / ENH-035 — overlapping backfill-extractor specs.** Building against either before reconciling into one spec risks building the wrong thing twice.
+- **ROADMAP.md / CHANGELOG.md structural reconciliation.** Chronological ordering broken in both (stale in-progress markers, out-of-order version restarts after a stray divider). Related to ENH-042 but is one-time cleanup rather than drift prevention — decide whether to bundle with ENH-042 or handle separately.
+
+### Tier 4 — Parked, reviewed, deliberately not now
+
+- **Pluggable KG storage backends (Notion/Obsidian/NotebookLM as primary stores).** Needs `/kmgraph:kmg-init` wizard changes, MCP config schema additions, and a full adapter layer per backend. Largest blast radius on the roadmap; demand is speculative. Version-bump territory — don't start casually.
+- **Contributor commands vs user commands separation.** `update-doc`/`create-doc`/`doc-update-router` maintain this project's own docs site but ship to every end user. Real problem; the fix itself is an open design question needing its own decision first.
+- **Hierarchical skill invocation (`/kmgraph:[category]/[skill]`).** Blocked on Claude Code plugin capabilities not yet available (ADR-002) — can't build until the platform supports it.
+- **`--all-graphs` flag for `kg_capture`.** Multi-KG capture in one call instead of per-KG calls. Convenience, not correctness — a working path exists today.
+- **MEMORY.md auto-sync rules engine + smart summarization.** Both self-gated: the rules engine needs real-world MEMORY.md patterns from live usage before it can be designed well; summarization is lower priority until the rules engine exists. Correctly parked.
+- **MEMORY.md scope narrowing.** Once `me.md`/`rules.md` fully absorb static identity/rules content, MEMORY.md's job shrinks to session-derived discoveries and pointers — evaluate necessity then. Check-back-later item.
+- **All 9 documentation-polish items** (STYLE-GUIDE.md slim-down, `docusaurus-plugin-remote-content` for CHANGELOG pull, `docusaurus-theme-github-codeblock`, Markprompt/LLM Q&A search, interactive decision-tree component, notification-dispatch setup guide, CONCEPTS.md reordering, CONCEPTS.md length reduction, CONCEPTS.md accessibility fixes). Legitimate polish, none urgent; Markprompt explicitly waits on Algolia usage data. Candidate for a dedicated docs-polish pass post-v1.0.
+- **4 ADR placeholders** (storage backends, contributor command separation, docs-updates feed via blog plugin, update-notifications/version-sync mechanism). Follow their parent items above — write once the underlying decision is made.
+- **Skill aliases.** Autocomplete already handles this well enough — marginal gain vs. config complexity. Correctly cut.
+- **Backup before destructive operations.** Real safety net, but git already provides this insurance; would be a second, redundant layer for user error specifically.
+- **Archival/superseding KG entries.** Useful once KGs mature, but adds lifecycle complexity before core usage patterns are established. Revisit when a KG actually needs it.
+- **Per-project config overrides.** Targets team collaboration at scale — multi-KG already covers project-local KGs today; solving a problem not yet had as a solo maintainer.
+- **Cross-repo knowledge graphs.** Pattern already usable/documentable today; just needs usage examples written up — a docs task, not a build task, and not urgent.
+- **Additional MCP tools** (`kg_git_metadata`, `kg_link_issue`, `kg_extract_chat` ported to MCP). Deferred on purpose — skills already do this today; porting pays off once non-Claude-Code adoption materializes post-v1.0.
+- **Web UI for KG browsing** (D3.js/Cytoscape.js + Lunr.js). Large effort; markdown already judged readable enough at current scale.
+- **Plugin marketplace integration.** Tagged "High — post-v1.0" — correctly sequenced after v1.0, not low-priority. Should be first thing queued once v1.0 ships, not started early.
+- **ENH-030 — KG Remove/Unregister command.** No such command exists today. Real gap, but nothing's hit it yet — fine to leave until it causes actual friction.
+- **ENH-027 — Superpowers Brainstorming Spec → KG Linkage.** Valuable for continuity, but an enhancement to an already-working manual path, not a fix for something broken.
+- **ENH-033 — repo-context auto-detection for `kmg-update-doc`/`kmg-create-doc`.** Convenience, not correctness — safe to defer.
+- **Real-data-validation checkpoint for `--rebuild`'s backup-vs-destroy behavior.** Explicitly pending a trigger condition (a real split-eligible date occurring) — nothing to build until then.
+
+### Reviewed, out of backlog scope entirely (not action items)
+
+- **Known Limitations (v1.0)** — 6 documented, accepted constraints with stated mitigations. Deliberate non-goals, not deferred work.
+- **Community Contributions Welcome** — 5 aspirational ideas for if/when someone shows up wanting to build them. Not on the maintainer to schedule.
+- **v1.0.0 planned bullets, LLM Provider Adapters, Integration Tests & CI, Template Customization System** — already explicitly scoped to v1.0/post-v1.0 with stated reasons ("Why not v1.0" given for each). Roadmap already made the call correctly; no re-triage needed.
+
+---
+
 ## Future / Deferred (captured 2026-04-07 during docs-restructure planning)
 
 These items were identified during the v0.0.6-docs-restructure planning session and explicitly deferred. None are scheduled to a specific release yet — promote to enhancement issues when they reach the queue.
