@@ -1,7 +1,7 @@
 ---
 title: "ENH-005: FTS5 Database Relocation to User-Level Cache"
 number: 005
-status: proposed
+status: resolved
 version_target: "v0.2.2"
 github_issue: 46
 created: 2026-03-30
@@ -90,3 +90,11 @@ After ENH-005:
 - **Fix 1 (v0.2.2-beta):** FTS5 index not rebuilt after upgrade — partially addressed; ENH-005 is the structural fix
 - **Fix 2 (v0.2.2-beta):** KG path validation in init — ENH-005 content root auto-detection subsumes this
 - **context-mode `db-base.ts`:** `/tmp/{PID}.db` pattern — inspiration for separating DB from project dir
+
+## Post-Implementation Note (2026-07-12)
+
+The relocation described above shipped as proposed in v0.2.3-beta (commit `3284c4ff`/`767e068b`), landing the DB at `~/.claude/kg-fts5/{name}.db` exactly as this spec's "Proposed Behavior" states. `getFTS5DbPath()` in `mcp-server/src/tools/fts5.ts` still implements that original path and remains in the codebase.
+
+**However, the location moved again after this spec was written**, as part of the same platform-neutral `~/.kmgraph/` migration that later relocated `kg-config.json` (see the `docs/specs/2026-07-11-kg-config-location-refactor-design.md` spec and commit `654c13fb`). Commit `59a5c4b6`/`ea099bc4` ("route rebuildIndex to ~/.kmgraph/index/ via kgType") introduced `getPersonalDbPath()` → `~/.kmgraph/index/personal.db` and `getProjectDbPath()` → `~/.kmgraph/index/projects/{name}.db`, dispatched via `resolveDbPath(kgName, kgType)`. `getFTS5DbPath()` was marked `@deprecated` in its JSDoc at that point but not deleted.
+
+**Current live path (as of 2026-07-12): `~/.kmgraph/index/`, not `~/.claude/kg-fts5/`.** Anything re-verifying this spec's core goal ("DB lives outside the project directory, at a user-level cache") should check `getPersonalDbPath()`/`getProjectDbPath()`/`resolveDbPath()`, not the deprecated `getFTS5DbPath()` — the deprecated function's continued presence in the file makes a naive `grep -n "kg-fts5"` check misleadingly still pass. Found during a re-verification pass for `knowledge/plans/v0.6.18.c4-status_flip_cleanup.md`'s Task 2, which originally cited the deprecated path/function; the plan has been corrected accordingly. Goal itself remains satisfied — this is a citation/evidence correction, not a reopening of the enhancement.

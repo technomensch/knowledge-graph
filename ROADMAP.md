@@ -15,8 +15,7 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 
 - **MEMORY.md auto-sync rules engine** — YAML-based pattern matching to automate sync decisions (e.g., "gotcha" → "Common Failure Patterns", "best practice" → "Best Practices"). Requires real-world MEMORY.md patterns from live usage before implementation (ADR-005).
 - **MEMORY.md smart summarization** — LLM-powered entry consolidation to merge similar entries and reduce token bloat. Lower priority until rules engine is operational (ADR-005).
-- **`me.md` as canonical identity home** — v0.3.0-beta introduces `knowledge/me.md` (project) and `~/.kmgraph/me.md` (personal) as the authoritative home for user identity, working style, and domain expertise. MEMORY.md retains session-derived memories; `me.md` holds intentional static identity. Init will offer to migrate user-type memory entries into `me.md` during setup. See ADR-028.
-- **`rules.md` as canonical rules home** — v0.3.0-beta introduces `knowledge/rules.md` as the single source of truth for behavioral rules, replacing scattered rules in CLAUDE.md, memory files, and platform config files. CLAUDE.md and platform files become thin shims that point to `rules.md`. See ADR-028.
+
 - **MEMORY.md scope narrowing** — Once `me.md` and `rules.md` absorb static identity and rules content, MEMORY.md scope narrows to: session-derived discoveries, temporary working context, and pointers to external resources. Long-term: evaluate whether MEMORY.md becomes redundant for well-maintained KGs.
 
 ### Navigation / discoverability
@@ -52,7 +51,7 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 
 - **Per-project config overrides** (Medium priority) — Allow `.claude/kg-local.json` at project root to commit shared category definitions for teams. Read hierarchy: project-local → global → defaults. Deferred: multi-KG already supports project-local KGs; this targets team collaboration at scale.
 - **Cross-repo knowledge graphs** (Medium priority) — Share KG entries across multiple repos via global topic-based KGs at `~/.claude/knowledge-graphs/<topic>/`. Deferred: pattern already documentable; needs usage examples in PLATFORM-ADAPTATION.md.
-- **Config schema migration** (High — activate when v1.1 introduces breaking changes) — Add `"version"` field to kg-config.json, auto-migrate on `kg_config_init`. No breaking changes yet; implement when v1.1 ships.
+
 
 ### MCP / Platform Extensibility
 
@@ -70,6 +69,41 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 
 - **Plugin marketplace integration** (High — post-v1.0 launch) — Submit to official Claude Code plugin directory; auto-update mechanism; version compatibility matrix.
   - Requirements: sanitization checks pass, examples generalized, docs comprehensive, MCP tested on macOS + Linux, README has install instructions, CHANGELOG current.
+
+### Outstanding Action Items (tracked 2026-07-11 — see knowledge/analysis/outstanding-items-inventory-2026-07-11.md)
+
+Full detail, file:line evidence, and verdicts for every item below: `knowledge/analysis/outstanding-items-inventory-2026-07-11.md`. Batch A items (status-label corrections) are already closed out above/via this same commit — not repeated here.
+
+**Next branch focus — command cluster:**
+- ENH-034 — Capture-pipeline command naming and grouping (targeted renames `kmg-update-graph`→`kmg-ingest-graph`?, `kmg-update-issue-plan`→`kmg-propagate-issue-plan`?; Option A/B decision still open)
+- ENH-026 (remainder) — KG Write Guard: `kmg-sync-all` guard + `run_extraction.py` bypass-proof check + ADR-019 supersession. The `kmg-update-graph` piece is already done; held pending ENH-034's naming decision (cross-linked in both specs)
+- ENH-042 — Three disconnected release-doc-sync mechanisms leave README/version/ROADMAP/CHANGELOG chronically out of sync; held pending ENH-034 (cross-linked in both specs)
+- Command-surface reduction / whether `kmg-update-issue-plan` should be a hook instead of a command — untracked, no ENH yet; needs its own brainstorm before scoping
+
+**Docs/nav scaffold parity:**
+- ENH-041 — Broken nav breadcrumb baked into ~11 README scaffold files (root cause: ADR-027 deleted GETTING-STARTED.md)
+
+**Small governance/process gaps:**
+- ADR-037 — seed default graph-usage rules block at `/kmgraph:init` (not yet seeded in any scaffold)
+- `session-summary-agent` scans `docs/plans/` for active plans, but the real convention is `~/.claude/plans/` copied to `knowledge/plans/` — untracked, no ENH filed yet
+- ENH-023 (remainder) — "Protected files guard" injection in `pre-skill-rules-inject.sh` not yet added (the rest of ENH-023 is already done)
+
+**Needs its own dedicated brainstorm/ADR before scheduling:**
+- ENH-025 / ENH-035 — overlapping backfill-extractor specs; reconcile into one spec before any implementation
+- `ROADMAP.md` / `CHANGELOG.md` structural reconciliation — chronological ordering broken in both (e.g. stale `v0.2.2-beta (In Progress: 2026-03-29)` marker here; CHANGELOG's stray `## [Released]` divider after which versions restart out of order)
+
+**Unclear — needs a human call before triaging further:**
+- ADR-046 — concept+setup hybrid page type (file has duplicated frontmatter blocks, Proposed vs Accepted; unclear whether executed in the docs site)
+- ENH-006 — sequential-prompts/skill-trigger-gap complaints, written pre-`kmg-` rename. **New evidence (2026-07-11, live during c0 planning):** its Step 6.4 ROADMAP/CHANGELOG sync gate (generalized into `kmg-execute-plan`) fired correctly and caught a real sync gap on this branch — NOT superseded, still load-bearing. But it's defined against `kmg-start-issue-tracking`'s own numbered steps, and this branch's plans (c1-c4) went through `superpowers:brainstorming`→`writing-plans` instead, which has no "Step 6.4" of its own — the check fell back to a generic grep rather than its literal meaning. Real gap: reconcile by adding an explicit ROADMAP/CHANGELOG-sync row to the Post-Plan Validation Checklist so non-`start-issue-tracking` plans get the same gate natively, instead of relying on `kmg-execute-plan`'s generalized fallback.
+- Multiple same-day session UUIDs never merged/deduplicated — unclear whether ENH-047's date-bucketing fix incidentally subsumed this
+
+**Other still-outstanding (not yet batched):**
+- ENH-040 — remove `chat-history/*.md` from `kg_search`/`kg_fts5_rebuild` indexing scope (ADR-060); confirmed still indexed in code as of this sweep
+- ENH-030 — KG Remove/Unregister command (no such command/tool exists yet)
+- ENH-027 — Superpowers Brainstorming Spec → KG Linkage
+- ENH-033 — repo-context auto-detection for `kmg-update-doc`/`kmg-create-doc`
+- "Wrong session captured" — live, unresolved session-selection bug in chat-extraction-reliability-saga (the oldest open thread in that saga)
+- Real-data-validation checkpoint for `--rebuild`'s backup-vs-destroy behavior on a real split-eligible date — pending trigger condition, no code needed until it occurs
 
 ---
 
@@ -154,7 +188,7 @@ Branch: `v0.6.18-misc-patches`
 
 ### Planned
 - 🔲 **`update` command**: Platform-agnostic upgrade triggering for MCP server and plugin updates
-- 🔲 **ENH-018**: Rules file H2 structure hardening — promote H3s to H2s in rules split files, update init wizard to scaffold H2 structure, add upgrade-inspector detection + migration offer
+
 - 🔲 **Platform-agnostic init feedback**: Enhanced init wizard with better cross-platform output formatting
 
 ---
@@ -163,7 +197,7 @@ Branch: `v0.6.18-misc-patches`
 
 ### Hardening
 
-- 🔲 **ENH-018**: Rules file H2 structure hardening — promote H3s to H2s in rules split files (`plan-rules.md`, `governance-rules.md`), update quick navigation headers, update init wizard to scaffold H2 structure, add upgrade-inspector detection + migration offer for existing users. Spec: `knowledge/enhancements/ENH-018/ENH-018-specification.md`. Plan: `~/.claude/plans/ENH-018-rules-h2-structure-hardening.md`.
+
 
 ---
 
