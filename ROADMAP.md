@@ -176,69 +176,75 @@ Full detail, file:line evidence, and verdicts for every item below: `knowledge/a
 Branch: `v0.6.18-misc-patches`
 
 ### Planned
-- 🔲 Fix `getProjectRoot()` KG_MISMATCH false positive (issue-10)
-- 🔲 Migrate `kg-config.json` default location to platform-neutral `~/.kmgraph/`
-- 🔲 Sync `mcp-server/package.json` version to `0.6.18`
-- 🔲 Flip 11 stale status labels + add ROADMAP "Outstanding Action Items" tracking section
+- ✅ Fix `getProjectRoot()` KG_MISMATCH false positive (issue-10) — commit `78957a88`
+- ✅ Migrate `kg-config.json` default location to platform-neutral `~/.kmgraph/` — commit `654c13fb`
+- ✅ Sync `mcp-server/package.json` version to `0.6.18` — commit `e05ffef1`
+- ✅ Flip 11 stale status labels + add ROADMAP "Outstanding Action Items" tracking section
 - 🔲 Scan-based GitHub-issue-sync invariant for `issues/`/`enhancements/` (issue-11)
 
 ---
 
-## v0.6.0 (🔲 In Planning)
+## v0.6.0 (✅ Released)
 
-### Planned
-- 🔲 **`update` command**: Platform-agnostic upgrade triggering for MCP server and plugin updates
+**Status**: ✅ Complete — kmg- Prefix Normalization
 
-- 🔲 **Platform-agnostic init feedback**: Enhanced init wizard with better cross-platform output formatting
-
----
-
-## v0.6.x (Deferred)
-
-### Hardening
-
-
+### Completed
+- ✅ **ADR-053**: kmg- prefix normalization across all commands and skills
 
 ---
 
-## v0.3.0-beta (Planned)
+## v0.3.0-beta (✅ Released: 2026-04-10)
 
-**Status**: 📋 Planned — KG Default Path Migration + Plan Metadata Standards
+**Status**: ✅ Complete — KG Default Path Migration + Plan Metadata Standards
 **Branch**: `v0.3.0-beta`
 
-### Planned
+### Completed
 
-- 🔲 Change default KG location from `docs/` to `knowledge/` + opt-in migration for existing `docs/`-based installs (Phase 1 + 2)
-- 🔲 Scaffold `knowledge/me.md`, `knowledge/rules.md`, `knowledge/index.md` on new installs (Phase 3A)
-- 🔲 Content migration offer (Step 1.6.5) — init prompts to populate `me.md`/`rules.md` from existing `CLAUDE.md` and memory files (Phase 3B)
-- 🔲 `knowledge/index.md` as graph entry point — directory map, wiki-linked pillars, AI agent guidance (Phase 3C)
-- 🔲 Plan file metadata standards — standard plan template at `core/templates/plans/plan-template.md`:
+- ✅ Change default KG location from `docs/` to `knowledge/` + opt-in migration for existing `docs/`-based installs (Phase 1 + 2)
+- ✅ Scaffold `knowledge/me.md`, `knowledge/rules.md`, `knowledge/index.md` on new installs (Phase 3A)
+- ✅ Content migration offer (Step 1.6.5) — init prompts to populate `me.md`/`rules.md` from existing `CLAUDE.md` and memory files (Phase 3B)
+- ✅ `knowledge/index.md` as graph entry point — directory map, wiki-linked pillars, AI agent guidance (Phase 3C)
+- ✅ Plan file metadata standards — standard plan template at `core/templates/plans/plan-template.md`:
   - **Implemented in version** field (filled post-implementation)
   - **Plan lineage** — parent plan ref for bugfix/hotfix plans; related fix plans list for feature plans
   - **Implementation Record** section — deviations, merged PR, fix plans spawned
-- 🔲 **ENH-011**: Duplicate check in `capture-lesson` before creating new entry — search graph for similar lessons first; first practical test of `rules.md` surfacing
+- ✅ **ENH-011**: Duplicate check in `capture-lesson` before creating new entry — search graph for similar lessons first; first practical test of `rules.md` surfacing
 
 **See:** [docs/plans/v0.3.0-beta.md](v0.3.0-beta.md) and ADR-028
 
 ---
 
-## v0.3.1-beta (Planned)
+## v0.3.1-beta (✅ Released: 2026-04-10)
 
-**Status**: 📋 Planned — Obsidian Wiki Link Formatting
-**Branch**: `v0.3.1-beta` (branches from `v0.3.0-beta` after merge)
+**Status**: ✅ Complete — Obsidian Wiki Link Formatting
+**Branch**: `v0.3.1-beta` (branched from `v0.3.0-beta` after merge)
 
-### Planned
+### Completed
 
-- 🔲 Obsidian wiki link pass (Step 1f.2) — post-migration conversion of bare ENH/ADR/issue refs to `[[wiki]]` links (Phase 4A)
-- 🔲 All core templates and content-generating commands/agents emit `[[wiki]]` links for internal cross-references (Phase 4B + 4C)
+- ✅ Obsidian wiki link pass (Step 1f.2) — post-migration conversion of bare ENH/ADR/issue refs to `[[wiki]]` links (Phase 4A)
+- ✅ All core templates and content-generating commands/agents emit `[[wiki]]` links for internal cross-references (Phase 4B + 4C)
+- ✅ `init-shared/` module layer — five reusable shared modules extracted into `commands/init-shared/` (`directory-scaffold`, `template-seed`, `fts5-rebuild`, `config-entry-write`, `upgrade-inspector`); `/kmgraph:init` and `/kmgraph:init-personal-kg` refactored to thin orchestrators calling these modules (ADR-031)
 
 **See:** [docs/plans/v0.3.1-beta-obsidian-wiki-links.md](docs/plans/v0.3.1-beta-obsidian-wiki-links.md)
 
 ---
 
-## v0.2.2-beta (In Progress: 2026-03-29)
+## v0.3.2-beta (✅ Released: 2026-04-10)
 
-**Status**: 🔄 In Progress — Personal KG + Session Snapshot on Capture
+**Status**: ✅ Complete — Draft-and-Approve UX for Capture Skills
+
+### Completed
+
+- ✅ Draft-and-approve UX for `lesson-capture` — skill extracts full context from conversation and passes a structured payload to `lesson-capture-agent`, which drafts silently and presents **Approve / Edit / Discard** (wizard path preserved for direct invocation)
+- ✅ Draft-and-approve UX for `adr-guide` — skill extracts all 7 ADR fields from conversation, pre-fills a summary, and passes context to `create-adr-agent` for the same **Approve / Edit / Discard** flow, skipping the 8-question wizard
+- ✅ Session snapshot on capture approval — approving a lesson or ADR fires `session-summary-agent --snapshot` non-blocking
+- ✅ Cross-branch ADR/ENH number collision guard — `create-adr-agent` and `start-issue-tracking` both re-check `git log --all` for the next number before assigning, bumping and re-checking until clean
+
+---
+
+## v0.2.2-beta (Released: 2026-03-29)
+
+**Status**: ✅ Complete — Personal KG + Session Snapshot on Capture
 **Branch**: `v0.2.2-beta`
 
 ### Completed
@@ -799,9 +805,9 @@ Branch: `v0.6.18-misc-patches`
 
 ---
 
-## v1.0.0 (Planned: Q2 2026)
+## v1.0.0 (Planned)
 
-**Status**: Planning
+**Status**: Planning — no target quarter committed as of 2026-07-12 (original "Q2 2026" estimate has elapsed with work not yet started)
 **Focus**: Stable release — community feedback incorporated, marketplace launch
 
 ### Planned
@@ -943,12 +949,18 @@ Ideas for community-driven enhancements:
 | v0.2.0-beta | Layered architecture restructuring | 2026-03-16 | ✅ Released |
 | v0.2.1-beta | MCP write tools, agent portability, AGENTS-template | 2026-03-27 | ✅ Released |
 | v0.2.2-beta | Personal KG, session snapshot on capture, FTS5 upgrade fix | 2026-03-29 | ✅ Released |
+| v0.3.0-beta | KG default path migration (`docs/`→`knowledge/`), plan metadata standards | 2026-04-10 | ✅ Released |
+| v0.3.1-beta | Obsidian wiki link formatting, `init-shared/` module layer (ADR-031) | 2026-04-10 | ✅ Released |
+| v0.3.2-beta | Draft-and-approve UX for lesson/ADR capture skills | 2026-04-10 | ✅ Released |
 | v0.5.8 | Rules-inject project-rules extraction, MEMORY.md cascade fixes | 2026-05-25 | ✅ Released |
 | v0.5.9 | Decision Governance Protocol (ENH-015) | 2026-05-27 | ✅ Released |
 | v0.5.10 | Codex CLI expansion, ENH-021 continues_from, template disambiguation | 2026-06-14 | ✅ Released |
 | v0.5.11 | Security fix (esbuild HIGH CVE) | 2026-06-14 | ✅ Released |
-| v0.6.0 | Platform-agnostic upgrade `update` command, rules H2 hardening, init feedback | Planned | 🔲 In Planning |
-| v1.0.0 | Stable release with alpha feedback | Q2 2026 | Planning |
+| v0.6.0 | kmg- prefix normalization (ADR-053) | | ✅ Released |
+| v0.6.16 | Chat-extraction message loss/format-drift fixes (ENH-038), enhancements/issues README indexes | 2026-07-06 | ✅ Released |
+| v0.6.17 | Multi-day session date-bucketing (ENH-047), Gemini project-scoping (ENH-044), extractor `--rebuild` mode (ENH-043) | 2026-07-10 | ✅ Released |
+| v0.6.18 | Post-merge extraction regression fixes (data-loss/security), hook `KG_CONFIG_PATH` compliance (ADR-012) | 2026-07-10 | ✅ Released |
+| v1.0.0 | Stable release with alpha feedback | (unscheduled) | Planning |
 | v1.1.0 | Performance + UX improvements | Q3 2026 | Roadmap |
 | v1.2.0 | Cross-platform adapters | Q4 2026 | Roadmap |
 | v2.0.0 | Web UI + advanced automation | 2027 | Vision |
@@ -969,5 +981,5 @@ Ideas for community-driven enhancements:
 
 ---
 
-*Last updated: 2026-06-16*
-*Plugin Version: 0.5.11*
+*Last updated: 2026-07-12*
+*Plugin Version: 0.6.18*
