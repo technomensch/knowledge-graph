@@ -44,11 +44,19 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 
 // src/utils.ts
 function readConfig() {
-  if (!fs.existsSync(CONFIG_PATH)) {
+  if (fs.existsSync(CONFIG_PATH)) {
+    const raw = fs.readFileSync(CONFIG_PATH, "utf-8");
+    return JSON.parse(raw);
+  }
+  if (process.env.KG_CONFIG_PATH) {
     return { ...DEFAULT_CONFIG };
   }
-  const raw = fs.readFileSync(CONFIG_PATH, "utf-8");
-  return JSON.parse(raw);
+  const legacyPath = path.join(process.env.HOME || os.homedir(), ".claude", "kg-config.json");
+  if (fs.existsSync(legacyPath)) {
+    const raw = fs.readFileSync(legacyPath, "utf-8");
+    return JSON.parse(raw);
+  }
+  return { ...DEFAULT_CONFIG };
 }
 function writeConfig(config2) {
   const dir = path.dirname(CONFIG_PATH);
@@ -100,7 +108,7 @@ var init_utils = __esm({
     fs = __toESM(require("fs"));
     path = __toESM(require("path"));
     os = __toESM(require("os"));
-    CONFIG_PATH = process.env.KG_CONFIG_PATH || path.join(os.homedir(), ".claude", "kg-config.json");
+    CONFIG_PATH = process.env.KG_CONFIG_PATH || path.join(os.homedir(), ".kmgraph", "kg-config.json");
     DEFAULT_CONFIG = {
       version: "1.0.0",
       active: null,
@@ -31457,8 +31465,38 @@ var init_mcp = __esm({
 // src/tools/config.ts
 var config_exports = {};
 __export(config_exports, {
+  handleConfigSwitch: () => handleConfigSwitch,
   registerConfigTools: () => registerConfigTools
 });
+function handleConfigSwitch(params) {
+  const { name } = params;
+  const config2 = readConfig();
+  if (!config2.graphs[name]) {
+    const available = Object.keys(config2.graphs).join(", ");
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Error: Knowledge graph '${name}' not found. Available: ${available || "none"}`
+        }
+      ],
+      isError: true
+    };
+  }
+  const prev = config2.active;
+  config2.active = name;
+  config2.graphs[name].lastUsed = (/* @__PURE__ */ new Date()).toISOString();
+  writeConfig(config2);
+  return {
+    content: [
+      {
+        type: "text",
+        text: `Switched from '${prev}' to '${name}'
+Location: ${config2.graphs[name].path}`
+      }
+    ]
+  };
+}
 function registerConfigTools(server) {
   server.tool(
     "kg_config_init",
@@ -31629,34 +31667,7 @@ ${lines.join("\n\n")}`
     {
       name: external_exports.string().describe("Name of the knowledge graph to activate")
     },
-    async ({ name }) => {
-      const config2 = readConfig();
-      if (!config2.graphs[name]) {
-        const available = Object.keys(config2.graphs).join(", ");
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Error: Knowledge graph '${name}' not found. Available: ${available || "none"}`
-            }
-          ],
-          isError: true
-        };
-      }
-      const prev = config2.active;
-      config2.active = name;
-      config2.graphs[name].lastUsed = (/* @__PURE__ */ new Date()).toISOString();
-      writeConfig(config2);
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Switched from '${prev}' to '${name}'
-Location: ${config2.graphs[name].path}`
-          }
-        ]
-      };
-    }
+    async ({ name }) => handleConfigSwitch({ name })
   );
   server.tool(
     "kg_config_add_category",
@@ -31840,7 +31851,7 @@ function searchKg(kgPath, kgName, kgType, query) {
   }
   if (!usingFts5) {
     results = [];
-    const searchDirs = ["knowledge", "concepts", "lessons-learned", "decisions", "sessions"];
+    const searchDirs = ["knowledge", "concepts", "lessons-learned", "decisions", "sessions", "chat-history"];
     for (const dir of searchDirs) {
       const dirPath = path4.join(kgPath, dir);
       const files = walkDir(dirPath, ".md");
