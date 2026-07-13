@@ -14,6 +14,35 @@ description: Enforce zero-deviation plan execution when user invokes plan implem
 - Reference to `docs/plans/*.md` file in conversation
 - Any mention of explicit plan-based execution
 
+**Platform Guard (checked before anything else below):**
+This skill is scoped to Gemini running in Antigravity — it was written as a drift-guardrail
+for that platform specifically (Gemini would go off-rails/tangent without a heavy strict-mode
+protocol). It is NOT intended for Claude Code or any other ECC platform.
+
+Before surfacing the STRICT EXECUTION MODE banner, determine whether the current session is
+running under Gemini/Antigravity:
+- If the runtime does not self-identify as Gemini/Antigravity (e.g., this is a Claude Code
+  session): do NOT surface the banner or run the 8-step protocol below. Instead output:
+
+  ```
+  kmg-execute-plan is scoped to Gemini/Antigravity sessions only (it was written as a
+  drift-guardrail for that platform). This session is running under a different platform —
+  use superpowers:executing-plans or superpowers:subagent-driven-development instead, per
+  the plan file's own "REQUIRED SUB-SKILL" header.
+  ```
+
+  Then stop — do not proceed to any step below.
+- If the runtime is Gemini/Antigravity: proceed exactly as documented below, unchanged.
+
+No confirmed platform/runtime marker was found in this repo to detect "is this
+Gemini/Antigravity" directly (see issue-12 for the investigation). Fallback heuristic:
+Claude Code sessions can self-identify as Claude Code; treat "self-identifies as Claude Code"
+(or any other non-Gemini/Antigravity ECC platform) as the exclusion trigger — asymmetric by
+design, since a false negative (occasionally not firing for a genuine Gemini/Antigravity
+session) is far cheaper than the false positive this guard exists to prevent (firing wrongly
+inside Claude Code and driving an entire plan execution under the wrong protocol, as happened
+live during this branch's own c0 execution).
+
 **Behavior:**
 When triggered, surface the STRICT EXECUTION MODE banner and enforce the 8-step protocol:
 
@@ -25,7 +54,12 @@ Forbidden: Improvements, assumptions, gap-filling, unauthorized fixes
 ═══════════════════════════════════════════════════════════════
 ```
 
-**ECC Compatibility Note:** The banner above uses generic tool categories (file read/edit/write, shell) to maintain portability across ECC platforms. On Claude Code, these map to Read, Edit, Write, and Bash tools. On other platforms, the underlying MCP or native tool implementations are used automatically. The constraint semantics remain identical: no authorization changes outside the plan.
+**ECC Compatibility Note:** This skill is intentionally scoped to Gemini/Antigravity sessions,
+where it originated as a drift guardrail (`.agent/workflows/gov-execute-plan.md`). On Claude
+Code and other ECC platforms, this skill should not fire at all — see the Platform Guard
+above. If ported to a new platform in the future where an equivalent guardrail is genuinely
+needed, treat this file as a template to adapt for that platform, not a skill to broaden in
+place to cover multiple platforms at once.
 
 **Prerequisite Check — Step 6.4 Sync Verification:**
 Before implementing any ENH or issue in scope, verify that Step 6.4 (ROADMAP + CHANGELOG sync) was completed for each item. This check fires at implementation start, not at issue-tracking completion.
