@@ -12,6 +12,52 @@ import {
   CategoryConfig,
 } from "../utils.js";
 
+// ── Exported handler for direct testing ──────────────────────────────────────
+
+export interface HandleConfigSwitchParams {
+  name: string;
+}
+
+export interface HandleConfigSwitchResult {
+  [x: string]: unknown;
+  content: Array<{ type: "text"; text: string }>;
+  isError?: true;
+}
+
+export function handleConfigSwitch(
+  params: HandleConfigSwitchParams
+): HandleConfigSwitchResult {
+  const { name } = params;
+  const config = readConfig();
+
+  if (!config.graphs[name]) {
+    const available = Object.keys(config.graphs).join(", ");
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: `Error: Knowledge graph '${name}' not found. Available: ${available || "none"}`,
+        },
+      ],
+      isError: true,
+    };
+  }
+
+  const prev = config.active;
+  config.active = name;
+  config.graphs[name].lastUsed = new Date().toISOString();
+  writeConfig(config);
+
+  return {
+    content: [
+      {
+        type: "text" as const,
+        text: `Switched from '${prev}' to '${name}'\nLocation: ${config.graphs[name].path}`,
+      },
+    ],
+  };
+}
+
 export function registerConfigTools(server: McpServer): void {
   // ── kg_config_init ──────────────────────────────────────────────
   server.tool(
@@ -217,36 +263,7 @@ export function registerConfigTools(server: McpServer): void {
     {
       name: z.string().describe("Name of the knowledge graph to activate"),
     },
-    async ({ name }) => {
-      const config = readConfig();
-
-      if (!config.graphs[name]) {
-        const available = Object.keys(config.graphs).join(", ");
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: `Error: Knowledge graph '${name}' not found. Available: ${available || "none"}`,
-            },
-          ],
-          isError: true,
-        };
-      }
-
-      const prev = config.active;
-      config.active = name;
-      config.graphs[name].lastUsed = new Date().toISOString();
-      writeConfig(config);
-
-      return {
-        content: [
-          {
-            type: "text" as const,
-            text: `Switched from '${prev}' to '${name}'\nLocation: ${config.graphs[name].path}`,
-          },
-        ],
-      };
-    }
+    async ({ name }) => handleConfigSwitch({ name })
   );
 
   // ── kg_config_add_category ──────────────────────────────────────
