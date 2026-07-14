@@ -19,8 +19,9 @@ On every release, sync ALL of the following — do not stop after version files 
 5. `CHANGELOG.md` — add release entry
 6. `README.md` — version badge, feature highlights block, current release block, recent versions list, current phase line (footer)
 7. `INSTALL.md` — upgrade path table
+8. `.claude-plugin/marketplace.json` — embedded `plugins[].version` field (not the file's own top-level `version`, which is an unrelated marketplace-schema version)
 
-- **Why:** partial version sync (only package files) left README and INSTALL.md at old versions, requiring user to prompt repeatedly to get all files updated; `.codex-plugin/plugin.json` was also missed, causing Codex marketplace to show stale version after release
+- **Why:** partial version sync (only package files) left README and INSTALL.md at old versions, requiring user to prompt repeatedly to get all files updated; `.codex-plugin/plugin.json` was also missed, causing Codex marketplace to show stale version after release. `.claude-plugin/marketplace.json`'s embedded plugin version was later found stuck at 0.5.10.3 while every other file had advanced to 0.6.18 — it had been kept in sync at past releases but was never added to this checklist, so nothing caught the drift for several versions.
 
 ### Changelog & Docs Feed
 
