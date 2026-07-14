@@ -5,8 +5,8 @@
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">Command Guide | Knowledge Management Graph</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://technomensch.github.io/knowledge-graph/reference/command-guide"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Command Guide | Knowledge Management Graph"><meta data-rh="true" name="description" content="Version 2026-04-22"><meta data-rh="true" property="og:description" content="Version 2026-04-22"><link data-rh="true" rel="icon" href="/knowledge-graph/img/square.png"><link data-rh="true" rel="canonical" href="https://technomensch.github.io/knowledge-graph/reference/command-guide"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/reference/command-guide" hreflang="en"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/reference/command-guide" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"📋 Commands","item":"https://technomensch.github.io/knowledge-graph/reference/command-guide"}]}</script><link rel="alternate" type="application/rss+xml" href="/knowledge-graph/docs-updates/rss.xml" title="KMGraph Docs Updates RSS Feed">
 <link rel="alternate" type="application/atom+xml" href="/knowledge-graph/docs-updates/atom.xml" title="KMGraph Docs Updates Atom Feed"><link rel="stylesheet" href="/knowledge-graph/assets/css/styles.212119a5.css">
-<script src="/knowledge-graph/assets/js/runtime~main.10c492c5.js" defer="defer"></script>
-<script src="/knowledge-graph/assets/js/main.9e7f4504.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/runtime~main.83937d4a.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/main.fe2d8618.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -144,7 +144,7 @@
 <li class="">Optionally backfills from existing project context (README, CHANGELOG, lessons, decisions, chat history)</li>
 <li class="">Optionally installs a git post-commit hook for lesson capture suggestions</li>
 <li class="">Updates <code>.gitignore</code> based on chosen git strategy</li>
-<li class="">Registers the KG in <code>~/.claude/kg-config.json</code> and sets it as active</li>
+<li class="">Registers the KG in <code>~/.kmgraph/kg-config.json</code> and sets it as active</li>
 </ol>
 <p><strong>Time</strong>: 2-3 minutes</p>
 <p><strong>Example</strong>:</p>
@@ -173,7 +173,7 @@ When you enable backfill, the system extracts existing knowledge from your proje
 <p><strong>What it does</strong>:</p>
 <ol>
 <li class="">Creates <code>~/.kmgraph/</code> with standard directory structure</li>
-<li class="">Registers it as <code>type: &quot;personal&quot;</code> with name <code>&quot;personal&quot;</code> in <code>~/.claude/kg-config.json</code></li>
+<li class="">Registers it as <code>type: &quot;personal&quot;</code> with name <code>&quot;personal&quot;</code> in <code>~/.kmgraph/kg-config.json</code></li>
 <li class="">Copies knowledge templates (patterns, gotchas, concepts)</li>
 <li class="">Builds FTS5 search index for the new KG</li>
 <li class="">Does <strong>not</strong> change the active KG — project KG remains active</li>
@@ -525,7 +525,7 @@ When you enable backfill, the system extracts existing knowledge from your proje
 <ol>
 <li class="">Validates the target KG exists in config</li>
 <li class="">Verifies KG path exists on disk (warns if missing, allows override)</li>
-<li class="">Updates the <code>active</code> field in <code>~/.claude/kg-config.json</code></li>
+<li class="">Updates the <code>active</code> field in <code>~/.kmgraph/kg-config.json</code></li>
 <li class="">Updates <code>lastUsed</code> timestamp</li>
 <li class="">Reports previous and new active KG</li>
 </ol>
@@ -1033,7 +1033,7 @@ When you enable backfill, the system extracts existing knowledge from your proje
 
 
 
-<table><thead><tr><th>Category</th><th>What it does</th></tr></thead><tbody><tr><td><code>directories</code></td><td>Creates missing required subdirectories (<code>templates/</code>, <code>decisions/</code>, <code>sessions/</code>, <code>chat-history/</code>, <code>tmp/</code>)</td></tr><tr><td><code>config</code></td><td>Backfills missing fields in <code>~/.claude/kg-config.json</code> introduced in newer versions</td></tr><tr><td><code>templates</code></td><td>Deploys template files to new destinations — skips any dest file that already exists with different content (user content preserved, reported as &quot;Skipped (user content)&quot;); silently skips identical files</td></tr><tr><td><code>starter-relocation</code></td><td>Moves starter files (e.g., <code>ADR-template.md</code>) from live dirs into <code>templates/</code> (ENH-022 migration) — always runs before <code>templates</code> when both are applied in the same call</td></tr><tr><td><code>stray-knowledge-dir</code></td><td>Project-local KGs only: merges known template files from a stray <code>knowledge/</code> subdir into <code>concepts/</code> and removes it</td></tr><tr><td><code>platform-split</code></td><td>Removes Claude Code–specific tool directives from <code>knowledge/rules.md</code> (requires <code>confirm_platform_split: true</code>)</td></tr></tbody></table>
+<table><thead><tr><th>Category</th><th>What it does</th></tr></thead><tbody><tr><td><code>directories</code></td><td>Creates missing required subdirectories (<code>templates/</code>, <code>decisions/</code>, <code>sessions/</code>, <code>chat-history/</code>, <code>tmp/</code>)</td></tr><tr><td><code>config</code></td><td>Backfills missing fields in <code>~/.kmgraph/kg-config.json</code> introduced in newer versions</td></tr><tr><td><code>templates</code></td><td>Deploys template files to new destinations — skips any dest file that already exists with different content (user content preserved, reported as &quot;Skipped (user content)&quot;); silently skips identical files</td></tr><tr><td><code>starter-relocation</code></td><td>Moves starter files (e.g., <code>ADR-template.md</code>) from live dirs into <code>templates/</code> (ENH-022 migration) — always runs before <code>templates</code> when both are applied in the same call</td></tr><tr><td><code>stray-knowledge-dir</code></td><td>Project-local KGs only: merges known template files from a stray <code>knowledge/</code> subdir into <code>concepts/</code> and removes it</td></tr><tr><td><code>platform-split</code></td><td>Removes Claude Code–specific tool directives from <code>knowledge/rules.md</code> (requires <code>confirm_platform_split: true</code>)</td></tr></tbody></table>
 <p><strong><code>version-update</code> item</strong> (inspect-only, not an apply category): reported when <code>lastAppliedVersion</code> stored in the KG config is older than the installed MCP server version. The item&#x27;s <code>details</code> field lists the concrete apply categories to run. After any successful apply, <code>lastAppliedVersion</code> is written back automatically.</p>
 <p><strong>Startup Protocol</strong>: <code>AGENTS.md</code> and <code>GEMINI.md</code> instruct Codex and Gemini CLI to call <code>kg_upgrade</code> inspect at the start of each session. Errors (e.g., no KG configured) are suppressed — upgrades are only surfaced when relevant.</p>
 <hr>
