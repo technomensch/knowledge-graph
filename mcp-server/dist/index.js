@@ -30293,7 +30293,7 @@ var os2 = __toESM(require("os"));
 var fs = __toESM(require("fs"));
 var path = __toESM(require("path"));
 var os = __toESM(require("os"));
-var CONFIG_PATH = process.env.KG_CONFIG_PATH || path.join(os.homedir(), ".claude", "kg-config.json");
+var CONFIG_PATH = process.env.KG_CONFIG_PATH || path.join(os.homedir(), ".kmgraph", "kg-config.json");
 var DEFAULT_CONFIG = {
   version: "1.0.0",
   active: null,
@@ -30305,11 +30305,19 @@ var DEFAULT_CONFIG = {
   }
 };
 function readConfig() {
-  if (!fs.existsSync(CONFIG_PATH)) {
+  if (fs.existsSync(CONFIG_PATH)) {
+    const raw = fs.readFileSync(CONFIG_PATH, "utf-8");
+    return JSON.parse(raw);
+  }
+  if (process.env.KG_CONFIG_PATH) {
     return { ...DEFAULT_CONFIG };
   }
-  const raw = fs.readFileSync(CONFIG_PATH, "utf-8");
-  return JSON.parse(raw);
+  const legacyPath = path.join(process.env.HOME || os.homedir(), ".claude", "kg-config.json");
+  if (fs.existsSync(legacyPath)) {
+    const raw = fs.readFileSync(legacyPath, "utf-8");
+    return JSON.parse(raw);
+  }
+  return { ...DEFAULT_CONFIG };
 }
 function writeConfig(config2) {
   const dir = path.dirname(CONFIG_PATH);
@@ -30329,10 +30337,7 @@ function getPluginRoot() {
   return process.env.CLAUDE_PLUGIN_ROOT || path.resolve(__dirname, "..", "..");
 }
 function getProjectRoot(kgPath) {
-  if (kgPath.endsWith("/docs")) {
-    return path.dirname(kgPath);
-  }
-  return kgPath;
+  return path.dirname(kgPath);
 }
 function getAllGraphPaths(config2, types) {
   return Object.entries(config2.graphs).filter(([, graph]) => {
@@ -30362,6 +30367,35 @@ function walkDir(dir, ext = ".md") {
 }
 
 // src/tools/config.ts
+function handleConfigSwitch(params) {
+  const { name } = params;
+  const config2 = readConfig();
+  if (!config2.graphs[name]) {
+    const available = Object.keys(config2.graphs).join(", ");
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Error: Knowledge graph '${name}' not found. Available: ${available || "none"}`
+        }
+      ],
+      isError: true
+    };
+  }
+  const prev = config2.active;
+  config2.active = name;
+  config2.graphs[name].lastUsed = (/* @__PURE__ */ new Date()).toISOString();
+  writeConfig(config2);
+  return {
+    content: [
+      {
+        type: "text",
+        text: `Switched from '${prev}' to '${name}'
+Location: ${config2.graphs[name].path}`
+      }
+    ]
+  };
+}
 function registerConfigTools(server2) {
   server2.tool(
     "kg_config_init",
@@ -30532,34 +30566,7 @@ ${lines.join("\n\n")}`
     {
       name: external_exports3.string().describe("Name of the knowledge graph to activate")
     },
-    async ({ name }) => {
-      const config2 = readConfig();
-      if (!config2.graphs[name]) {
-        const available = Object.keys(config2.graphs).join(", ");
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Error: Knowledge graph '${name}' not found. Available: ${available || "none"}`
-            }
-          ],
-          isError: true
-        };
-      }
-      const prev = config2.active;
-      config2.active = name;
-      config2.graphs[name].lastUsed = (/* @__PURE__ */ new Date()).toISOString();
-      writeConfig(config2);
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Switched from '${prev}' to '${name}'
-Location: ${config2.graphs[name].path}`
-          }
-        ]
-      };
-    }
+    async ({ name }) => handleConfigSwitch({ name })
   );
   server2.tool(
     "kg_config_add_category",
@@ -30776,12 +30783,13 @@ function rebuildIndex(kgPath, kgName, kgType = "project-local") {
   try {
     initDb(db);
     const contentRoot = resolveContentRoot(kgPath);
-    const searchDirs = ["knowledge", "concepts", "lessons-learned", "decisions", "sessions", "chat-history"];
+    const contentDirs = ["knowledge", "lessons-learned", "decisions", "sessions", "chat-history"];
     const allFiles = [];
-    for (const dir of searchDirs) {
+    for (const dir of contentDirs) {
       const dirPath = path3.join(contentRoot, dir);
       allFiles.push(...walkDir(dirPath, ".md"));
     }
+    allFiles.push(...walkDir(path3.join(kgPath, "concepts"), ".md"));
     let indexed = 0;
     let skipped = 0;
     for (const filePath of allFiles) {
@@ -31026,7 +31034,7 @@ function searchKg(kgPath, kgName, kgType, query) {
   }
   if (!usingFts5) {
     results = [];
-    const searchDirs = ["knowledge", "concepts", "lessons-learned", "decisions", "sessions"];
+    const searchDirs = ["knowledge", "concepts", "lessons-learned", "decisions", "sessions", "chat-history"];
     for (const dir of searchDirs) {
       const dirPath = path4.join(kgPath, dir);
       const files = walkDir(dirPath, ".md");
@@ -31910,6 +31918,8 @@ function registerVersionTool(server2) {
 
 // src/tools/upgrade.ts
 var APPLY_ORDER = [
+  "config-location",
+  // must run before anything else reads config from the new path
   "directories",
   "config",
   "starter-relocation",
@@ -32266,6 +32276,20 @@ function checkStrayKnowledgeDir(kgPath, kgType) {
 Apply stray-knowledge-dir to merge known template files into concepts/ and remove the dir.`
   }];
 }
+function checkConfigLocation() {
+  if (process.env.KG_CONFIG_PATH) return [];
+  const homeDir = process.env.HOME || os6.homedir();
+  const oldPath = path9.join(homeDir, ".claude", "kg-config.json");
+  const newPath = path9.join(homeDir, ".kmgraph", "kg-config.json");
+  if (!fs9.existsSync(oldPath) || fs9.existsSync(newPath)) return [];
+  return [
+    {
+      category: "config-location",
+      description: `kg-config.json still at legacy path: ${oldPath}`,
+      details: `Run with apply: ["config-location"] to copy it to the platform-neutral location: ${newPath}. Old file is left in place.`
+    }
+  ];
+}
 var STRAY_KNOWLEDGE_TEMPLATE_FILES = [
   "architecture.md",
   "concepts.md",
@@ -32314,6 +32338,17 @@ function applyStrayKnowledgeDir(kgPath) {
   if (ignored.length > 0) parts.push(`Ignored (not template files): ${ignored.join(", ")}`);
   if (remaining.length > 0) parts.push(`knowledge/ not removed \u2014 ${remaining.length} item(s) remain`);
   return parts.join(". ") || "Nothing to move";
+}
+function applyConfigLocation() {
+  if (process.env.KG_CONFIG_PATH) return "KG_CONFIG_PATH override set; config-location migration skipped";
+  const homeDir = process.env.HOME || os6.homedir();
+  const oldPath = path9.join(homeDir, ".claude", "kg-config.json");
+  const newPath = path9.join(homeDir, ".kmgraph", "kg-config.json");
+  if (!fs9.existsSync(oldPath)) return "No legacy kg-config.json found; skipped";
+  if (fs9.existsSync(newPath)) return "Platform-neutral kg-config.json already exists; skipped";
+  fs9.mkdirSync(path9.dirname(newPath), { recursive: true });
+  fs9.copyFileSync(oldPath, newPath);
+  return `Copied kg-config.json to ${newPath} (legacy file at ${oldPath} left untouched)`;
 }
 function applyPlatformSplit(kgPath) {
   const rulesPath = path9.join(kgPath, "knowledge", "rules.md");
@@ -32390,6 +32425,7 @@ async function handleUpgrade(params) {
     result.upgrades.push(...checkStarterRelocation(kgPath));
     result.upgrades.push(...checkTemplates(kgPath));
     result.upgrades.push(...checkStrayKnowledgeDir(kgPath, kgType));
+    result.upgrades.push(...checkConfigLocation());
     result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config2));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
@@ -32398,6 +32434,9 @@ async function handleUpgrade(params) {
   const results = [];
   for (const category of sortedApplyList) {
     switch (category) {
+      case "config-location":
+        results.push(`[config-location] ${applyConfigLocation()}`);
+        break;
       case "directories":
         results.push(`[directories] ${applyDirectories(kgPath)}`);
         break;
@@ -32432,8 +32471,8 @@ function registerUpgradeTool(server2) {
     "kg_upgrade",
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
-      apply: external_exports3.array(external_exports3.enum(["directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"])).optional().default([]).describe(
-        'Categories to apply. Omit or pass [] to inspect only. Values: "directories", "config", "templates", "platform-split"'
+      apply: external_exports3.array(external_exports3.enum(["config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"])).optional().default([]).describe(
+        'Categories to apply. Omit or pass [] to inspect only. Values: "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"'
       ),
       confirm_platform_split: external_exports3.boolean().optional().default(false).describe(
         "Must be true to apply platform-split migration (removes content from rules.md)"

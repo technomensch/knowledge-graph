@@ -7,6 +7,18 @@ displayed_sidebar: null
 
 All notable changes to the Knowledge Plugin will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+- **`getProjectRoot()` KG_MISMATCH false positive for non-`/docs` KG content dirs** — generalized to strip any trailing path segment, not just `/docs`. Closes issue-10.
+- **`kg-config.json` default location was Claude-only** (`~/.claude/`) — now defaults to platform-neutral `~/.kmgraph/`, with a non-destructive `kg_upgrade apply ["config-location"]` migration path for existing installs. `KG_CONFIG_PATH` env var override unchanged.
+- **`mcp-server/package.json` version drift** — was `0.6.15` while `package.json`/`.claude-plugin/plugin.json` read `0.6.18`; synced.
+- **Stale status labels across 11 ADR/ENH/ROADMAP/GitHub-issue entries** corrected to match already-shipped reality (see `knowledge/analysis/outstanding-items-inventory-2026-07-11.md`); new ROADMAP "Outstanding Action Items" section added to track everything the sweep found that isn't yet closed.
+- **ENH specs missing GitHub-issue links** (issue-11) — scan-based structural invariant added: any `knowledge/issues/`/`knowledge/enhancements/` folder lacking a synced `github_issue` gets flagged, independent of which command created it (closes the bypass path that let ~18 ENH specs go untracked). See `knowledge/issues/issue-11/`.
+- **`kg_config_switch`'s logic lived only inside the `server.tool()` callback**, so the existing test file reimplemented the switch logic inline instead of exercising the real handler — a bug in the actual code path could have gone undetected. Extracted `handleConfigSwitch()` in `mcp-server/src/tools/config.ts`, mirroring `handleUpgrade()`'s existing exported-handler pattern, and rewrote the tests to call it directly; `mcp-server/dist/` rebuilt to match.
+- **ROADMAP.md version-history drift** — v0.3.0-beta/v0.3.1-beta shown "(Planned)" despite both shipping 2026-04-10 (with v0.3.2-beta missing entirely); 3 already-shipped v0.6.18 Post-Release Patches checkboxes left unchecked; v1.0.0's "Planned: Q2 2026" date already elapsed. Found and corrected via a recall sweep cross-checking ROADMAP claims against CHANGELOG.md and actual repo state, independent of the Batch A status-flip cleanup above.
+- **`skills/kmg-execute-plan/SKILL.md` had no precondition stopping it from firing in Claude Code** (issue-12) — it was written as a Gemini/Antigravity-only drift guardrail, but competed with `superpowers:executing-plans`/`subagent-driven-development`, the mechanism plan files actually require via their own header. Added a platform-guard precondition that refuses to fire outside Gemini/Antigravity sessions and redirects to the correct skill instead. Discovered live during this branch's own plan execution.
+
 ## [0.6.18] — 2026-07-10
 
 ### Fixed

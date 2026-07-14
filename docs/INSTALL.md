@@ -102,7 +102,7 @@ Users can install on multiple platforms with varying automation levels:
 
 The installer sets up:
 
-- **Configuration file** — `~/.claude/kg-config.json` (stores knowledge graph locations and metadata)
+- **Configuration file** — `~/.kmgraph/kg-config.json` (default location; stores knowledge graph locations and metadata; set `KG_CONFIG_PATH` env var to override)
 - **Directory structure** — `knowledge/`, `lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`
 - **Identity files** — `knowledge/me.md` (contributor identity, gitignored), `knowledge/rules.md` (project conventions, committed), and `knowledge/triggers.md` (rule timing, when each rule applies). See [Your AI Profile](pillars/portability/your-ai-profile).
 - **Wiki links** — Cross-references throughout the KG are converted to Obsidian `[[wiki link]]` format, enabling graph view navigation in Obsidian and compatible editors
@@ -118,7 +118,7 @@ When running `/kmgraph:kmg-init` on an existing installation, the wizard inspect
 | Check | What it looks for |
 |-------|-------------------|
 | **a. Directories** | Missing subdirectories (`knowledge/`, `decisions/`, `sessions/`, etc.) |
-| **b. Config fields** | Missing fields in `~/.claude/kg-config.json` introduced in newer versions |
+| **b. Config fields** | Missing fields in `~/.kmgraph/kg-config.json` introduced in newer versions; existing installs migrate via `kg_upgrade apply ["config-location"]` |
 | **c. Templates** | Template files that have been updated or added since your install |
 | **d. Platform split** | Claude-specific tool directives in `knowledge/rules.md` that belong in `CLAUDE.md` |
 | **e. Wiki pass** | Bare `ADR-NNN`, `ENH-NNN`, `#NNN`, and lesson filename references not yet converted to `[[wiki links]]` — runs once per KG, skipped on re-run if already complete |

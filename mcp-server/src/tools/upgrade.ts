@@ -26,6 +26,7 @@ interface InspectResult {
 }
 
 const APPLY_ORDER = [
+  "config-location",   // must run before anything else reads config from the new path
   "directories",
   "config",
   "starter-relocation",   // must run BEFORE templates
@@ -443,6 +444,26 @@ function checkStrayKnowledgeDir(kgPath: string, kgType: string | undefined): Upg
   }];
 }
 
+/**
+ * Check e — flag a kg-config.json still at the legacy ~/.claude/ location
+ * when the platform-neutral ~/.kmgraph/ location hasn't been migrated to yet.
+ * Skipped entirely when KG_CONFIG_PATH env var is set (explicit override in play).
+ */
+function checkConfigLocation(): UpgradeItem[] {
+  if (process.env.KG_CONFIG_PATH) return [];
+  const homeDir = process.env.HOME || os.homedir();
+  const oldPath = path.join(homeDir, ".claude", "kg-config.json");
+  const newPath = path.join(homeDir, ".kmgraph", "kg-config.json");
+  if (!fs.existsSync(oldPath) || fs.existsSync(newPath)) return [];
+  return [
+    {
+      category: "config-location",
+      description: `kg-config.json still at legacy path: ${oldPath}`,
+      details: `Run with apply: ["config-location"] to copy it to the platform-neutral location: ${newPath}. Old file is left in place.`,
+    },
+  ];
+}
+
 // Files that belong in concepts/ if found in the stray knowledge/ dir
 const STRAY_KNOWLEDGE_TEMPLATE_FILES = [
   "architecture.md",
@@ -504,6 +525,20 @@ function applyStrayKnowledgeDir(kgPath: string): string {
   if (ignored.length > 0) parts.push(`Ignored (not template files): ${ignored.join(", ")}`);
   if (remaining.length > 0) parts.push(`knowledge/ not removed — ${remaining.length} item(s) remain`);
   return parts.join(". ") || "Nothing to move";
+}
+
+function applyConfigLocation(): string {
+  // Match checkConfigLocation(): an explicit KG_CONFIG_PATH override means the
+  // legacy-location migration is not in play — skip entirely.
+  if (process.env.KG_CONFIG_PATH) return "KG_CONFIG_PATH override set; config-location migration skipped";
+  const homeDir = process.env.HOME || os.homedir();
+  const oldPath = path.join(homeDir, ".claude", "kg-config.json");
+  const newPath = path.join(homeDir, ".kmgraph", "kg-config.json");
+  if (!fs.existsSync(oldPath)) return "No legacy kg-config.json found; skipped";
+  if (fs.existsSync(newPath)) return "Platform-neutral kg-config.json already exists; skipped";
+  fs.mkdirSync(path.dirname(newPath), { recursive: true });
+  fs.copyFileSync(oldPath, newPath);
+  return `Copied kg-config.json to ${newPath} (legacy file at ${oldPath} left untouched)`;
 }
 
 function applyPlatformSplit(kgPath: string): string {
@@ -570,7 +605,7 @@ function updateLastAppliedVersion(installedVersion: string): void {
 // ── Exported handler for direct testing ──────────────────────────────────────
 
 // "version-update" is inspect-only — NOT an apply category; do not add it here
-export type ApplyCategory = "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir";
+export type ApplyCategory = "config-location" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir";
 
 export interface HandleUpgradeParams {
   apply?: ApplyCategory[];
@@ -619,6 +654,7 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
     result.upgrades.push(...checkStarterRelocation(kgPath));
     result.upgrades.push(...checkTemplates(kgPath));
     result.upgrades.push(...checkStrayKnowledgeDir(kgPath, kgType));
+    result.upgrades.push(...checkConfigLocation());
     result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
@@ -628,6 +664,9 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
   const results: string[] = [];
   for (const category of sortedApplyList) {
     switch (category) {
+      case "config-location":
+        results.push(`[config-location] ${applyConfigLocation()}`);
+        break;
       case "directories":
         results.push(`[directories] ${applyDirectories(kgPath)}`);
         break;
@@ -669,11 +708,11 @@ export function registerUpgradeTool(server: McpServer): void {
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
       apply: z
-        .array(z.enum(["directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"]))
+        .array(z.enum(["config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"]))
         .optional()
         .default([])
         .describe(
-          'Categories to apply. Omit or pass [] to inspect only. Values: "directories", "config", "templates", "platform-split"'
+          'Categories to apply. Omit or pass [] to inspect only. Values: "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"'
         ),
       confirm_platform_split: z
         .boolean()

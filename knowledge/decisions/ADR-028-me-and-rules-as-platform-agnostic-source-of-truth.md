@@ -1,13 +1,13 @@
 ---
 title: "ADR-028: me.md + rules.md as Platform-Agnostic Source of Truth"
-status: Proposed
+status: Accepted
 date: 2026-04-09
 tags: [adr, identity, rules, platform-portability, me-md, rules-md, source-of-truth, v0.3.0-beta]
 ---
 # ADR-028: me.md + rules.md as Platform-Agnostic Source of Truth for Identity and Behavioral Rules
 
 **Date:** 2026-04-09
-**Status:** Proposed
+**Status:** Accepted
 **Implements:** v0.3.0-beta
 **Related:** ADR-001 (centralized KG config), ADR-017 (four-layer architecture), ADR-021 (single source of truth)
 

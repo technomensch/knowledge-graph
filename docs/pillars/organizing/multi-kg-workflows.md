@@ -45,7 +45,7 @@ Creates `~/.kmgraph/` and registers it. Use this for patterns that apply across 
 
 ## Set up a cowork KG
 
-Edit `~/.claude/kg-config.json`:
+Edit `~/.kmgraph/kg-config.json`:
 
 ```json
 {

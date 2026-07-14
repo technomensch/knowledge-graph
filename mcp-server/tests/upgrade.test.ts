@@ -1491,3 +1491,121 @@ describe("T-51b: lastAppliedVersion does not clobber applyConfig side effects", 
     expect(lastApplied).toBe(handleVersion().installed);
   });
 });
+
+describe("config-location category", () => {
+  const ORIGINAL_ENV = process.env.KG_CONFIG_PATH;
+  const ORIGINAL_HOME = process.env.HOME;
+  let fakeHome: string;
+
+  beforeEach(() => {
+    fakeHome = makeTempDir("config-location-home");
+    tempDirs.push(fakeHome);
+    process.env.HOME = fakeHome; // os.homedir() reads $HOME on POSIX — no mock needed
+    delete process.env.KG_CONFIG_PATH;
+  });
+
+  afterEach(() => {
+    if (ORIGINAL_HOME === undefined) delete process.env.HOME;
+    else process.env.HOME = ORIGINAL_HOME;
+    if (ORIGINAL_ENV === undefined) delete process.env.KG_CONFIG_PATH;
+    else process.env.KG_CONFIG_PATH = ORIGINAL_ENV;
+  });
+
+  it("reports config-location item when old path exists and new path does not", () => {
+    const oldDir = path.join(fakeHome, ".claude");
+    fs.mkdirSync(oldDir, { recursive: true });
+    fs.writeFileSync(path.join(oldDir, "kg-config.json"), "{}", "utf-8");
+
+    const kgRoot = makeTempDir("kg");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    return handleUpgrade({}).then((result) => {
+      const parsed = JSON.parse(result.content[0].text);
+      const item = parsed.upgrades.find((u: { category: string }) => u.category === "config-location");
+      expect(item).toBeDefined();
+    });
+  });
+
+  it("apply config-location copies old file to new path without deleting old file", async () => {
+    const oldDir = path.join(fakeHome, ".claude");
+    fs.mkdirSync(oldDir, { recursive: true });
+    const oldFile = path.join(oldDir, "kg-config.json");
+    fs.writeFileSync(oldFile, JSON.stringify({ version: "1.0.0", active: null, graphs: {} }), "utf-8");
+
+    const kgRoot = makeTempDir("kg");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const result = await handleUpgrade({ apply: ["config-location"] as never });
+    const newFile = path.join(fakeHome, ".kmgraph", "kg-config.json");
+
+    expect(fs.existsSync(newFile)).toBe(true);
+    expect(fs.existsSync(oldFile)).toBe(true); // old file untouched — ADR-063
+    expect(fs.readFileSync(newFile, "utf-8")).toBe(fs.readFileSync(oldFile, "utf-8"));
+  });
+
+  it("checkConfigLocation (inspect) skips when KG_CONFIG_PATH is set", async () => {
+    process.env.KG_CONFIG_PATH = path.join(fakeHome, "custom", "kg-config.json");
+    // Old file present, new file absent — would normally surface a config-location item.
+    const oldDir = path.join(fakeHome, ".claude");
+    fs.mkdirSync(oldDir, { recursive: true });
+    fs.writeFileSync(path.join(oldDir, "kg-config.json"), "{}", "utf-8");
+
+    const kgRoot = makeTempDir("kg");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const result = await handleUpgrade({});
+    const parsed = JSON.parse(result.content[0].text);
+    const item = parsed.upgrades.find((u: { category: string }) => u.category === "config-location");
+    expect(item).toBeUndefined();
+  });
+
+  it("apply config-location skips (no-op) when KG_CONFIG_PATH is set", async () => {
+    process.env.KG_CONFIG_PATH = path.join(fakeHome, "custom", "kg-config.json");
+    const oldDir = path.join(fakeHome, ".claude");
+    fs.mkdirSync(oldDir, { recursive: true });
+    fs.writeFileSync(path.join(oldDir, "kg-config.json"), "{}", "utf-8");
+
+    const kgRoot = makeTempDir("kg");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const result = await handleUpgrade({ apply: ["config-location"] as never });
+    const newFile = path.join(fakeHome, ".kmgraph", "kg-config.json");
+
+    expect(result.content[0].text).toContain("KG_CONFIG_PATH override set");
+    // Migration must not have run — new default-location file was not created.
+    expect(fs.existsSync(newFile)).toBe(false);
+  });
+
+  it("apply config-location twice in a row — second call is a clean no-op", async () => {
+    const oldDir = path.join(fakeHome, ".claude");
+    fs.mkdirSync(oldDir, { recursive: true });
+    const oldFile = path.join(oldDir, "kg-config.json");
+    fs.writeFileSync(oldFile, JSON.stringify({ version: "1.0.0", active: null, graphs: {} }), "utf-8");
+
+    const kgRoot = makeTempDir("kg");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const first = await handleUpgrade({ apply: ["config-location"] as never });
+    expect(first.content[0].text).toContain("Copied kg-config.json");
+
+    const newFile = path.join(fakeHome, ".kmgraph", "kg-config.json");
+    const afterFirst = fs.readFileSync(newFile, "utf-8");
+
+    const second = await handleUpgrade({ apply: ["config-location"] as never });
+    expect(second.isError).toBeUndefined();
+    expect(second.content[0].text).toContain("already exists");
+    // Second call must not alter the migrated file or delete the legacy one.
+    expect(fs.readFileSync(newFile, "utf-8")).toBe(afterFirst);
+    expect(fs.existsSync(oldFile)).toBe(true);
+  });
+});

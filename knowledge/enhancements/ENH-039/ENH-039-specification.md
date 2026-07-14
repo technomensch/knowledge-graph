@@ -1,6 +1,6 @@
 # ENH-039: Rule-injection scripts hardcode personal split-file names instead of discovering them
 
-**Status:** 🟡 Proposed
+**Status:** ✅ Resolved
 **Discovered:** 2026-07-04
 **Governed by:** none (script robustness fix, not a new command/skill/docstring — ADR-058's naming/scope check does not apply)
 **Related:** `scripts/hooks-master.sh`, `scripts/post-plan-validate-checklist.sh`, `scripts/pre-skill-rules-inject.sh`, `scripts/rules-size-check.sh`, `~/.kmgraph/rules.md § Rules File Management`, branch `v0.6.16-update-claude-extract-chat-for-sub-agents`

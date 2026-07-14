@@ -4,8 +4,8 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 59
-**Last Updated:** 2026-07-11
+**Total ADRs:** 60
+**Last Updated:** 2026-07-12
 
 ---
 
@@ -17,6 +17,7 @@ Formal documentation of significant architecture decisions.
 
 ## All ADRs (Chronological)
 
+- [ADR-064: Shared Module Pattern for Slash Command Deduplication](ADR-064-shared-module-pattern-for-slash-command-deduplication.md) — **Status:** Accepted — Duplicated init command logic extracted into five parameterized shared modules under `commands/kmg-init-shared/`; parent commands invoke modules by name with explicit parameter contracts. (Restored 2026-07-12 from archive — original was overwritten by ADR numbering collision on 2026-04-10.)
 - [ADR-063: Never destroy known-good state before the replacement is confirmed written](ADR-063-never-destroy-known-good-state-before-confirmed-write.md) — **Status:** Accepted — two unrelated subsystems (chat-extraction's `--rebuild` path, and the separate `kg-config-silent-overwrite` bash-hook incident) independently hit the identical anti-pattern on the same day: destroying existing state (`shutil.rmtree`, `cp`/`rm -f` over a real config file) before a replacement was confirmed written, protected only by best-effort cleanup that a non-graceful interruption could bypass. Decision: never destroy old state until the new state exists and is confirmed complete — atomic write (temp file + rename/replace) plus rename-aside (not delete) for anything that must eventually be cleared. Implemented on `v0.6.18-fix-extraction-regressions` (chat-extraction side) and the merged sibling `v0.6.19-fix-kg-config-silent-overwrite` work (kg-config side).
 - [ADR-062: Gemini .pb/hash-named directory project scoping fails closed, not open](ADR-062-gemini-pb-project-scoping-fail-closed.md) — **Status:** Accepted — real-data testing found ENH-044's `.json`/`.jsonl` `--project` fix (v0.6.17) didn't close the whole contamination vector: `.pb` files carry no per-project path signal, so 93 real `.pb` files and 9 hash-named directories were still unscoped (masked on this machine only by an absent optional dependency). Decision: fail closed — exclude anything unattributable to the requested project, with a visible skip notice, rather than risk leaking a foreign project's private conversation into this project's committed, searchable knowledge graph. A future payload-decoded project signal could recover excluded content later, explicitly deferred. Implemented under umbrella [ENH-038](../enhancements/ENH-038/ENH-038-specification.md) / [ENH-044](../issues/chat-extraction-reliability-saga/attempts/ENH-044/specification.md). **Amended 2026-07-11:** a post-merge review found the implementation didn't fully achieve this decision — check ordering let a hex `--project` filter fail open on a hash-named directory; closed (policy unchanged, ordering fixed).
 - [ADR-061: First-run repair notice must be platform-specific, not one unified mechanism](ADR-061-first-run-repair-notice-platform-specific-not-unified.md) — **Status:** Accepted — v0.6.17's `--rebuild` feature (ENH-043) needed a way to tell users their chat-history might be affected. A first design pass proposed one uniform notice for Claude/Gemini/Codex; rejected after finding the three platforms have genuinely different failure modes (data loss vs. contamination vs. staleness). Decision: platform-specific notices with different remedies — Claude gets a layered notice + concrete backup-recovery guidance + new `--claude-projects-dir`/`--source-root` flags; Gemini gets a corrective `--project`-scoping note; Codex is out of scope, filed separately as [ENH-045](../issues/chat-extraction-reliability-saga/attempts/ENH-045/specification.md) (now tracked under umbrella [ENH-038](../enhancements/ENH-038/ENH-038-specification.md)).
@@ -46,6 +47,7 @@ Formal documentation of significant architecture decisions.
 ## By Category
 
 ### Architecture
+- [ADR-064: Shared Module Pattern for Slash Command Deduplication](ADR-064-shared-module-pattern-for-slash-command-deduplication.md) — Parameterized shared modules under `commands/kmg-init-shared/` replace duplicated instruction blocks across init commands; explicit parameter contract tables enforce interfaces
 - [ADR-057: Detection layer requires unified design, not piecemeal growth](ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth.md) — 5 capture-trigger skills grew accreted/undesigned; consolidate detection/classification into one shared skill, keep drafting agents separate; consolidation ENH ready to spec (deferral reasoning corrected 2026-07-03)
 - [ADR-056: Reject plugin-split for contributor-only doc commands](ADR-056-reject-plugin-split-for-contributor-only-doc-commands.md) — Keep single-plugin architecture; fix imposed-house-style bug via repo-context auto-detection (ENH-033) + labeling instead of a `kmgraph-contrib` split
 - [ADR-046](ADR-046-concept-setup-hybrid-page-type-and-how-to-guide-pattern.md) — Introduce concept+setup hybrid page type and document how-to guide pattern separately from narrative guides

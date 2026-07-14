@@ -287,7 +287,7 @@ git commit -m "docs: knowledge graph export"
 
 **1. Organize existing docs** — move to the standard directory structure.
 
-**2. Initialize config** — run `node mcp-server/dist/cli.js init` or paste INSTALL.md to set up `~/.claude/kg-config.json`.
+**2. Initialize config** — run `node mcp-server/dist/cli.js init` or paste INSTALL.md to set up `~/.kmgraph/kg-config.json`.
 
 **3. Add git metadata retroactively** if needed:
 

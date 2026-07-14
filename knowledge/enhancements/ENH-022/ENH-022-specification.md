@@ -1,7 +1,7 @@
 ---
 title: "ENH-022: Template Directory Disambiguation — core/default-templates/, starter consolidation, knowledge/knowledge/ removal"
 number: 022
-status: proposed
+status: resolved
 version_target: "v0.5.10.7"
 github_issue: null
 created: 2026-05-29
@@ -11,7 +11,7 @@ related_enhs: []
 
 # ENH-022: Template Directory Disambiguation
 
-**Status:** Proposed — brainstorm complete 2026-06-12, ready for implementation plan
+**Status:** Resolved — implemented (core/templates/ renamed to core/default-templates/; no bare templates/ dir remains)
 **Priority:** Medium
 **Version Target:** v0.5.10.7
 **Created:** 2026-05-29

@@ -3,7 +3,7 @@
 **Status:** 🟡 Proposed
 **Discovered:** 2026-07-06
 **Governed by:** none (process/governance gap, not a new command/skill/docstring — ADR-058's naming/scope check does not apply)
-**Related:** `commands/kmg-update-doc.md`, `knowledge/plans/v0.6.16-fix-extract-chat-subagents.md` (kmg-execute-plan's Step 6.4 prerequisite check), `~/.kmgraph/rules.md` (CLAUDE.md's "Sync package.json + plugin.json before pushing" rule), `README.md`, `ROADMAP.md`, `CHANGELOG.md`, `package.json`, `.claude-plugin/plugin.json`, [ENH-041](../ENH-041/ENH-041-specification.md) (same-session sibling finding, same ADR-027-drift root cause for one contributing bug)
+**Related:** `commands/kmg-update-doc.md`, `knowledge/plans/v0.6.16-fix-extract-chat-subagents.md` (kmg-execute-plan's Step 6.4 prerequisite check), `~/.kmgraph/rules.md` (CLAUDE.md's "Sync package.json + plugin.json before pushing" rule), `README.md`, `ROADMAP.md`, `CHANGELOG.md`, `package.json`, `.claude-plugin/plugin.json`, [ENH-041](../ENH-041/ENH-041-specification.md) (same-session sibling finding, same ADR-027-drift root cause for one contributing bug), [ENH-034](../ENH-034/ENH-034-specification.md) (validated 2026-07-11: this ENH's proposed fix references `kmg-update-graph`, `kmg-execute-plan`, and `kmg-update-doc.md` by name — hold implementation until ENH-034's Option A/B rename decision lands, so the reconciliation work targets post-rename names rather than needing a second edit pass; deliberately kept as a separate ENH, not merged, since ENH-034 is naming/IA work and this ENH is sync-logic reconciliation + a new pre-push enforcement gate — different risk profiles, different commits)
 
 ---
 

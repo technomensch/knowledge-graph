@@ -1,7 +1,7 @@
 ---
 title: "ENH-018: Rules File H2 Structure Hardening"
 number: 018
-status: deferred
+status: resolved
 version_target: null
 github_issue: null
 created: 2026-05-27

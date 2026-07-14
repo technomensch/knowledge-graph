@@ -3,6 +3,7 @@
 **Status:** Proposed
 **Version:** TBD (post-v0.5.10.8)
 **Parent:** ADR-019 (write guard design), v0.5.10.8 (extract-chat patch)
+**Related:** [ENH-034](../ENH-034/ENH-034-specification.md) — validated 2026-07-11: `kmg-update-graph` is an open (undecided) rename candidate in ENH-034 (Option B, held pending ENH-035/036 stabilizing). Do not land this ENH's guard on `commands/kmg-update-graph.md` until ENH-034's Option A/B decision is made — if Option B lands first, the guard should be added to the renamed file (`kmg-ingest-graph.md` or whatever name is chosen) instead, to avoid a second edit pass. The `commands/kmg-sync-all.md` and `core/scripts/run_extraction.py` portions of this ENH have no such conflict — `kmg-sync-all` is explicitly NOT a rename candidate in ENH-034 (kept as the pipeline orchestrator) — and can proceed independently of ENH-034's timeline.
 
 ---
 

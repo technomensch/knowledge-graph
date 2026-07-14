@@ -1,6 +1,6 @@
 ---
 title: "triggers.md — Platform-Agnostic Rule Timing Companion File"
-status: Proposed
+status: Accepted
 date: 2026-04-12
 deciders: technomensch
 tags: [triggers-md, rules-md, platform-portability, timing, cross-platform, plan-protocol, parallelism-analysis]

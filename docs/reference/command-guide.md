@@ -144,7 +144,7 @@ Track complex, multi-attempt problems systematically.
 7. Optionally backfills from existing project context (README, CHANGELOG, lessons, decisions, chat history)
 8. Optionally installs a git post-commit hook for lesson capture suggestions
 9. Updates `.gitignore` based on chosen git strategy
-10. Registers the KG in `~/.claude/kg-config.json` and sets it as active
+10. Registers the KG in `~/.kmgraph/kg-config.json` and sets it as active
 
 **Time**: 2-3 minutes
 
@@ -195,7 +195,7 @@ The system presents candidates for your review before creating entries.
 **What it does**:
 
 1. Creates `~/.kmgraph/` with standard directory structure
-2. Registers it as `type: "personal"` with name `"personal"` in `~/.claude/kg-config.json`
+2. Registers it as `type: "personal"` with name `"personal"` in `~/.kmgraph/kg-config.json`
 3. Copies knowledge templates (patterns, gotchas, concepts)
 4. Builds FTS5 search index for the new KG
 5. Does **not** change the active KG — project KG remains active
@@ -663,7 +663,7 @@ Total: 2 knowledge graph(s) configured
 
 1. Validates the target KG exists in config
 2. Verifies KG path exists on disk (warns if missing, allows override)
-3. Updates the `active` field in `~/.claude/kg-config.json`
+3. Updates the `active` field in `~/.kmgraph/kg-config.json`
 4. Updates `lastUsed` timestamp
 5. Reports previous and new active KG
 
@@ -1297,7 +1297,7 @@ Available on all platforms (Codex, Gemini CLI, Cursor, etc.). Inspects and appli
 | Category | What it does |
 |---|---|
 | `directories` | Creates missing required subdirectories (`templates/`, `decisions/`, `sessions/`, `chat-history/`, `tmp/`) |
-| `config` | Backfills missing fields in `~/.claude/kg-config.json` introduced in newer versions |
+| `config` | Backfills missing fields in `~/.kmgraph/kg-config.json` introduced in newer versions |
 | `templates` | Deploys template files to new destinations — skips any dest file that already exists with different content (user content preserved, reported as "Skipped (user content)"); silently skips identical files |
 | `starter-relocation` | Moves starter files (e.g., `ADR-template.md`) from live dirs into `templates/` (ENH-022 migration) — always runs before `templates` when both are applied in the same call |
 | `stray-knowledge-dir` | Project-local KGs only: merges known template files from a stray `knowledge/` subdir into `concepts/` and removes it |

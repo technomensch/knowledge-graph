@@ -63,7 +63,7 @@ All scripts are registered in `hooks.json` and active by default, with one excep
 
 | Script | Default state | How to activate |
 |---|---|---|
-| `notification-dispatch.sh` | Disabled (no-op) | Add `"webhookUrl": "https://..."` to `~/.claude/kg-config.json` |
+| `notification-dispatch.sh` | Disabled (no-op) | Add `"webhookUrl": "https://..."` to `~/.kmgraph/kg-config.json` |
 
 The other eight scripts are always active once KMGraph is installed. Individual hooks can be removed from `hooks.json` to disable them permanently, or their timeout values can be adjusted to control how long each script may run before the harness terminates it.
 
@@ -74,9 +74,9 @@ All hook scripts reside in `scripts/` relative to the plugin root. Additional sc
 ## Config Path Resolution
 
 Every hook script that reads `kg-config.json` resolves its path via
-`${KG_CONFIG_PATH:-$HOME/.claude/kg-config.json}` — an exported `KG_CONFIG_PATH`
+`${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}` — an exported `KG_CONFIG_PATH`
 environment variable is honored if set, otherwise the script falls back to the default
-`~/.claude/kg-config.json`. This mirrors the override the MCP server (`mcp-server/src/utils.ts`)
+`~/.kmgraph/kg-config.json`. This mirrors the override the MCP server (`mcp-server/src/utils.ts`)
 already uses. It applies to `hooks-master.sh`, `session-end-prompt.sh`,
 `post-tool-lesson-check.sh`, `plan-mirror.sh`, and `notification-dispatch.sh`.
 

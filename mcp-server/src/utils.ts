@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 
-export const CONFIG_PATH = process.env.KG_CONFIG_PATH || path.join(os.homedir(), ".claude", "kg-config.json");
+export const CONFIG_PATH = process.env.KG_CONFIG_PATH || path.join(os.homedir(), ".kmgraph", "kg-config.json");
 
 export interface CategoryConfig {
   name: string;
@@ -49,11 +49,31 @@ const DEFAULT_CONFIG: KgConfig = {
 };
 
 export function readConfig(): KgConfig {
-  if (!fs.existsSync(CONFIG_PATH)) {
+  // Primary: the platform-neutral location (or KG_CONFIG_PATH override).
+  if (fs.existsSync(CONFIG_PATH)) {
+    const raw = fs.readFileSync(CONFIG_PATH, "utf-8");
+    return JSON.parse(raw) as KgConfig;
+  }
+  // Read-only legacy fallback: pre-v0.6 installs kept kg-config.json under
+  // ~/.claude/. Without this, users who never migrated get DEFAULT_CONFIG and
+  // the config-location upgrade never becomes reachable. Never written here —
+  // migration is handled explicitly by kg_upgrade's config-location category.
+  //
+  // Only applies when using the default resolution path. An explicit
+  // KG_CONFIG_PATH override means the user opted into a custom location: a
+  // missing custom path must yield a fresh/empty config, NOT a silent inherit
+  // from an unrelated legacy file. This matches checkConfigLocation() /
+  // applyConfigLocation() in tools/upgrade.ts, which both skip legacy-location
+  // logic entirely when KG_CONFIG_PATH is set.
+  if (process.env.KG_CONFIG_PATH) {
     return { ...DEFAULT_CONFIG };
   }
-  const raw = fs.readFileSync(CONFIG_PATH, "utf-8");
-  return JSON.parse(raw) as KgConfig;
+  const legacyPath = path.join(process.env.HOME || os.homedir(), ".claude", "kg-config.json");
+  if (fs.existsSync(legacyPath)) {
+    const raw = fs.readFileSync(legacyPath, "utf-8");
+    return JSON.parse(raw) as KgConfig;
+  }
+  return { ...DEFAULT_CONFIG };
 }
 
 export function writeConfig(config: KgConfig): void {
@@ -80,14 +100,11 @@ export function getPluginRoot(): string {
 }
 
 /**
- * Derive project root from KG path.
- * If path ends in /docs, parent is project root; otherwise path itself is root.
+ * Derive project root from KG path: the parent of the KG's content directory,
+ * whatever that directory is named.
  */
 export function getProjectRoot(kgPath: string): string {
-  if (kgPath.endsWith('/docs')) {
-    return path.dirname(kgPath);
-  }
-  return kgPath;
+  return path.dirname(kgPath);
 }
 
 /**

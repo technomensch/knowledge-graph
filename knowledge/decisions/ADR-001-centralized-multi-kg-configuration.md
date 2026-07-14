@@ -35,6 +35,14 @@ The knowledge-graph plugin is designed to support multiple independent knowledge
 
 Implement centralized configuration via `~/.claude/kg-config.json` with:
 
+> **Update (2026-07-11):** Default config location changed to `~/.kmgraph/kg-config.json`
+> (platform-neutral — `~/.claude/` is Claude Code-specific and unreachable by
+> Gemini/Codex/Copilot). `KG_CONFIG_PATH` env var overrides the default when set.
+> Existing installs migrate via `kg_upgrade` apply `["config-location"]` (copies
+> the file; the old `~/.claude/kg-config.json` is left in place, not deleted).
+> See ADR-028 for the precedent (personal KG home migration) and
+> `docs/specs/2026-07-11-kg-config-location-refactor-design.md` for full analysis.
+
 ### Core Components
 
 1. **Active pointer:** Single `"active"` field specifying the currently active KG name
@@ -178,6 +186,12 @@ Implement centralized configuration via `~/.claude/kg-config.json` with:
 
 ---
 
+## Known Issues
+
+- **[Issue-10: kg_capture KG_MISMATCH false positive when KG path doesn't end in /docs](../issues/issue-10/issue-10-description.md)** (2026-07-11, open) — `getProjectRoot()` only strips a trailing `/docs` segment when deriving the project root from a KG's configured path; any KG whose content directory is named something else (e.g. this repo's own `knowledge/`) gets its full content-dir path treated as the mismatch-check root, so legitimate calls from the actual project root (one directory up) are rejected. Bug in the implementation of this ADR's active-pointer model, not a config error — flagged here since it affects every KG not laid out as `<project>/docs`.
+
+---
+
 **Decision Made:** 2026-02-15
-**Last Updated:** 2026-02-22
+**Last Updated:** 2026-07-11
 **Status:** Accepted
