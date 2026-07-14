@@ -228,17 +228,12 @@ done
 |---|---|
 | **v0.2.x** | Check d may offer to move tool directives from `rules.md` → `CLAUDE.md`. Checks a/b/c may add missing dirs, config fields, and new templates. |
 | **v0.3.0–v0.3.4** | Check d only (if `rules.md` still has Claude-specific lines). All other checks are likely already satisfied. |
-| **v0.3.5–v0.3.9** | No upgrade items expected for a clean install in this range. |
-| **v0.4.0** | Check c offers an updated meta-issue attempt template (adds hypothesis, distinct-from-prior, success-criterion, and exit-path fields). New `stuck-work-escalation` and `docs-impact-scan` skills are auto-available after plugin reload — no upgrade action required. |
+| **v0.3.5–v0.4.0** | No upgrade action required for a clean install in this range. Bug fixes, template/skill additions automatic after plugin reload. |
 | **v0.4.1** | Security patch — no upgrade action required. Dependency overrides (`hono >=4.12.12`, `follow-redirects >=1.16.0`) are applied automatically on install. |
 | **v0.4.2** | Bug fix — `triggers.md` now seeded during init. Run `/kmgraph:kmg-init` to add `triggers.md` to any KG initialized before this version. |
 | **v0.5.1** | Tier abstraction — run `/kmgraph:upgrade` to add `platforms[]` tier_map to your `me.md` (fast/standard/powerful tier labels for platform-agnostic model selection). |
 | **v0.5.2** | Shared tier resolver — no upgrade action required. `ai-model-tier-resolver` module is auto-used by all dispatchers after plugin reload. Run `/kmgraph:kmg-init` to add the `platforms[]` example block to your project `me.md` if missing. |
-| **v0.5.3** | No upgrade action required. `extract-chat` large-day auto-split and `update-doc` fixes are automatic after plugin reload. |
-| **v0.5.4** | Profile auto-load — no upgrade action required. `me.md` and `triggers.md` are now injected at SessionStart automatically. No config changes needed. |
-| **v0.5.5** | Bug fix — no upgrade action required. Stop hook dedup flag is now keyed on `{kg-name}-{date}` instead of `{PPID}-{date}`. Stale PPID-format flags from prior sessions are cleaned automatically on the next hook run. |
-| **v0.5.6** | No upgrade action required. `sync-all`, `rules-capture`, and `session-wrap` behavioral changes are automatic after plugin reload. |
-| **v0.5.7** | No upgrade action required. PreToolUse hook overrides (Execution Handoff, PR Gate) and Stop hook safety net are automatic after plugin reload. |
+| **v0.5.3–v0.5.7** | No upgrade action required. Bug fixes and behavioral improvements (extract-chat, update-doc, profile auto-load, Stop hook dedup keying, sync-all/rules-capture/session-wrap, PreToolUse hook overrides) are automatic after plugin reload. |
 | **v0.5.7.1** | Security patch — no upgrade action required. Dependabot dependency overrides applied automatically on install. |
 | **v0.5.8** | No upgrade action required. Project-specific plan-routing rules, dispatcher relay, and MEMORY.md cascade fix are automatic after plugin reload. |
 | **v0.5.9** | No upgrade action required. Decision governance recall enforcement, `brainstorm-recall` skill, and post-plan validation checklist are automatic after plugin reload. Optionally run `/kmgraph:upgrade` to add the "Recall in Plan Mode" rule to your `~/.kmgraph/plan-rules.md` if you have a split rules file. |
@@ -251,9 +246,7 @@ done
 | **v0.5.10.7** | **⚠️ Breaking change (Tier 3 manual installers only):** Two renames in the plugin distribution. (1) `core/templates/` → `core/default-templates/`. (2) `core/default-templates/knowledge/` → `core/default-templates/concepts/`. Update any copy instructions that reference these paths. Plugin/marketplace users (Tier 1/2) unaffected — these paths are internal to the plugin distribution; your `knowledge/` directory is untouched. Existing installs: run `/kmgraph:kmg-init` (option 1 — Verify/upgrade) to auto-migrate starters and any `knowledge/knowledge/` nesting. |
 | **v0.5.10.8–v0.5.11** | No upgrade action required. Security fix (esbuild HIGH in mcp-server) is automatic after plugin reload. |
 | **v0.6.0** | Breaking change: all skill/command names now require the `kmg-` prefix. Search and replace `kmgraph:` to `kmgraph:kmg-` in existing personal `rules.md`, `triggers.md`, and config files. See ADR-053 for the full migration guide. |
-| **v0.6.5–v0.6.7** | No upgrade action required. Improvements to init wizard directory scaffolding, upgrade inspector, and POSIX hook compatibility are automatic after plugin reload. |
-| **v0.6.8–v0.6.15** | No upgrade action required. Bug fixes (security patches, extractor improvements, template handling, FTS5 indexing) and init refinements are automatic after plugin reload. |
-| **v0.6.16–v0.6.17** | No upgrade action required. Extractor message-loss and format-drift fixes, gemini project-scoping improvements, and rebuild-safety enhancements are automatic after plugin reload. |
+| **v0.6.5–v0.6.17** | No upgrade action required. Bug fixes and improvements (init wizard directory scaffolding, upgrade inspector, POSIX hook compatibility, template handling, FTS5 indexing) and chat-extraction reliability fixes (message-loss, format-drift, gemini project-scoping, rebuild safety) are automatic after plugin reload. |
 | **v0.6.18** | Behavior change (not silent): lifecycle hooks (`session-start`, `session-end`, etc.) now honor the `KG_CONFIG_PATH` environment variable override (defaults to `~/.claude/kg-config.json` if unset). Data-loss fix: hook scripts previously could overwrite the real global config during test runs; now fully sandboxed via env var. No upgrade action required; behavior change is automatic after plugin reload. **⚠️ Advisory:** if you ran `tests/test-hooks.sh` or `tests/test-stop-hook.sh` before this version and the process was interrupted, check your `~/.claude/kg-config.json` for unexpected `test-kg` entries with placeholder timestamps — re-register your graphs via `/kmgraph:kmg-init` if needed. |
 
 After the wizard completes, your existing lessons, ADRs, sessions, and chat history are untouched.
