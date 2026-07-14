@@ -179,7 +179,8 @@ Branch: `v0.6.18-misc-patches`
 - ✅ Migrate `kg-config.json` default location to platform-neutral `~/.kmgraph/` — commit `654c13fb`
 - ✅ Sync `mcp-server/package.json` version to `0.6.18` — commit `e05ffef1`
 - ✅ Flip 11 stale status labels + add ROADMAP "Outstanding Action Items" tracking section
-- 🔲 Scan-based GitHub-issue-sync invariant for `issues/`/`enhancements/` (issue-11)
+- ✅ Scan-based GitHub-issue-sync invariant for `issues/`/`enhancements/` (issue-11) — commit `84f1f499`
+- ✅ Scope `kmg-execute-plan` to Gemini/Antigravity only (issue-12) — commit `4e397e60`
 
 ---
 

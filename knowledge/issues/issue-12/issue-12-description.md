@@ -2,7 +2,7 @@
 id: issue-12
 type: Hardening
 status: tracked
-github-issue: "#N"
+github-issue: "#166"
 branch: v0.6.18-misc-patches (deferred — additional commit on the existing shared branch once planned)
 created: 2026-07-12
 related-adrs: []
