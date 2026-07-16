@@ -94,10 +94,13 @@ if [ -f "$KG_ROOT/.fts5.db" ]; then
     # a fresh index will be rebuilt at the new location on next use.
     echo "ℹ️  Search index at $KG_ROOT/.fts5.db is gitignored (local state) — leaving in place."
   else
-    # Not gitignored — this is a legacy stray file. Migrate to user cache.
-    mkdir -p "$HOME/.claude/kg-fts5"
-    mv "$KG_ROOT/.fts5.db" "$HOME/.claude/kg-fts5/$kg_name.db"
-    echo "✅ Legacy search index migrated to user cache."
+    # Not gitignored — this is a legacy stray file. It is a rebuildable search
+    # cache (not knowledge); the server's live index is ~/.kmgraph/index/ and is
+    # rebuilt on demand. Remove the stray rather than moving it to the deprecated
+    # ~/.claude/kg-fts5/ location, which the server no longer reads and which would
+    # falsely trigger the index-migration consent prompt below.
+    rm -f "$KG_ROOT/.fts5.db"
+    echo "✅ Removed legacy stray search index — a fresh index rebuilds at ~/.kmgraph/index/ on next sync."
     # Remove the .fts5.db gitignore rule only if it was a legacy stray (not intentional)
     if [ -f "$KG_ROOT/.gitignore" ]; then
       grep -v "^\*\*/\.fts5\.db$" "$KG_ROOT/.gitignore" > "$KG_ROOT/.gitignore.tmp"
