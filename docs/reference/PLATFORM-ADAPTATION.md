@@ -221,7 +221,7 @@ codex plugin add kmgraph@knowledge-management-graph
 **Automation:** Low (manual prompting)
 
 **Usage pattern:**
-- Copilot indexes workspace automatically — ensure knowledge docs are in `docs/`
+- Copilot indexes workspace automatically — ensure knowledge docs are in `knowledge/`
 - Reference knowledge via `@workspace` queries: `@workspace What patterns are in knowledge/concepts/patterns.md?`
 - Use `#file:knowledge/lessons-learned/` references in prompts
 

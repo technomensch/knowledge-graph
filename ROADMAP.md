@@ -342,6 +342,7 @@ Ideas for community-driven enhancements:
 | v0.6.16 | Chat-extraction message loss/format-drift fixes (ENH-038), enhancements/issues README indexes | 2026-07-06 | ✅ Released |
 | v0.6.17 | Multi-day session date-bucketing (ENH-047), Gemini project-scoping (ENH-044), extractor `--rebuild` mode (ENH-043) | 2026-07-10 | ✅ Released |
 | v0.6.18 | Post-merge extraction regression fixes (data-loss/security), hook `KG_CONFIG_PATH` compliance (ADR-012) | 2026-07-10 | ✅ Released |
+| v0.6.19 | Config-path split-brain fix (issue-14/#171, `~/.kmgraph` migration), personal-KG FTS5 index routing fix (issue-15/#172), docs-site broken-link + `docs/`→`knowledge/` path corrections | 2026-07-16 | ✅ Released |
 | v1.0.0 | Stable release with alpha feedback | (unscheduled) | Planning |
 | v1.1.0 | Performance + UX improvements | Q3 2026 | Roadmap |
 | v1.2.0 | Cross-platform adapters | Q4 2026 | Roadmap |
