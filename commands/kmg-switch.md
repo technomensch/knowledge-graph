@@ -5,7 +5,7 @@ Switch between configured knowledge graphs. All subsequent skill operations (`/k
 
 ## What This Does
 
-Updates the `active` field in `~/.claude/kg-config.json` to the specified knowledge graph name.
+Updates the `active` field in `~/.kmgraph/kg-config.json` to the specified knowledge graph name.
 
 ## Syntax
 
@@ -27,7 +27,12 @@ Updates the `active` field in `~/.claude/kg-config.json` to the specified knowle
 ### Step 1: Validate inputs
 
 ```bash
-CONFIG_PATH="$HOME/.claude/kg-config.json"
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
 
 # Check if config exists
 if [ ! -f "$CONFIG_PATH" ]; then
@@ -53,6 +58,13 @@ fi
 ### Step 2: Verify KG exists in config
 
 ```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
+
 # Check if target KG exists
 kg_exists=$(jq -r ".graphs | has(\"$target_kg\")" "$CONFIG_PATH")
 
@@ -70,6 +82,13 @@ fi
 ### Step 3: Verify KG path exists
 
 ```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
+
 # Get KG path
 kg_path=$(jq -r ".graphs[\"$target_kg\"].path" "$CONFIG_PATH")
 
@@ -91,6 +110,13 @@ fi
 ### Step 4: Update active KG in config
 
 ```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
+
 # Get current active KG (for reporting)
 current_active=$(jq -r '.active' "$CONFIG_PATH")
 
@@ -103,6 +129,13 @@ mv "$CONFIG_PATH.tmp" "$CONFIG_PATH"
 ### Step 5: Report success
 
 ```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
+
 # Get KG details for confirmation
 kg_data=$(jq -r ".graphs[\"$target_kg\"]" "$CONFIG_PATH")
 kg_path=$(echo "$kg_data" | jq -r '.path')
