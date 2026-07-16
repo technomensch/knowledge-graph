@@ -56,7 +56,7 @@ Copy the contents of `core/default-templates/AGENTS-template.md` into your proje
 - MCP tools (`kg_*`) work the same on any MCP-enabled IDE
 - MEMORY.md is human-readable markdown — the target platform can load it directly
 - Full automation (slash commands, hooks) is Claude Code-exclusive; other platforms use the MCP tools or manual workflow
-- Codex CLI chat history can be extracted with `--source codex`; see [`/kmgraph:kmg-extract-chat`](/knowledge-graph/commands/extract-chat) for the full source flag reference
+- Codex CLI chat history can be extracted with `--source codex`; see [`/kmgraph:kmg-extract-chat`](/knowledge-graph/reference/command-guide#-kmgraphextract-chat) for the full source flag reference
 
 ## Related
 

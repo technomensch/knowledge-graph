@@ -308,7 +308,7 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 - Capture while the problem is fresh (don't wait)
 - Include error messages verbatim
 - Note what DIDN'T work (helps future you)
-- Level routing: use "user level" for cross-project patterns; "for this project" for codebase-specific lessons. See [Personal vs Project KGs](../PERSONAL-V-PROJECT.md) for details.
+- Level routing: use "user level" for cross-project patterns; "for this project" for codebase-specific lessons. See [Personal vs Project KGs](../pillars/organizing/personal-vs-project) for details.
 - If the active KG differs from the project's own KG, the command stops before writing and asks which graph to use
 
 ---
@@ -1368,7 +1368,7 @@ flowchart TD
 
   Structured formats
 
-- [Examples](examples/)
+- Examples (`examples/`)
 
   Real samples
 
@@ -1416,7 +1416,7 @@ flowchart TD
 
   Plain-English definitions of every term and pattern
 
-- [Examples](examples/)
+- Examples (`examples/`)
 
   Real-world completed examples of lessons, ADRs, and KG entries
 

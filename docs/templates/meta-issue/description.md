@@ -48,8 +48,8 @@ title: Description
 [What we first believed was the cause]
 
 **Tested in:**
-- [Attempt 001](attempts/001-baseline/)
-- [Attempt 002](attempts/002-approach/)
+- Attempt 001 (`attempts/001-baseline/`)
+- Attempt 002 (`attempts/002-approach/`)
 
 **Result:**
 [Initial hypothesis proved incorrect/incomplete because...]

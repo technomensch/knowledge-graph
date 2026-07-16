@@ -4,7 +4,7 @@ title: Platform Adaptation
 
 # Platform Adaptation Guide
 
-**Navigation**: [Home](../index.md) > [Getting Started](../GETTING-STARTED.md) > Platform Adaptation
+**Navigation**: [Home](/) > [Quickstart](../quickstart) > Platform Adaptation
 
 **Using the knowledge graph with different AI coding platforms**
 
@@ -52,7 +52,7 @@ This guide focuses on **platform capabilities and usage patterns** after install
 - ADR automation with bidirectional lesson linking
 - Git metadata auto-capture on every operation
 
-**For installation:** See [GETTING-STARTED.md](../GETTING-STARTED.md) or paste [INSTALL.md](../INSTALL.md).
+**For installation:** See [Quickstart](../quickstart) or paste [INSTALL.md](../INSTALL.md).
 
 ---
 
@@ -330,7 +330,7 @@ Knowledge is portable — the same `docs/` directory works with all platforms. A
 
 **Installation**:
 - [Universal Installer](../INSTALL.md) — Automated setup for all platforms
-- [Getting Started](../GETTING-STARTED.md) — Claude Code setup guide
+- [Quickstart](../quickstart) — Claude Code setup guide
 
 **Core Concepts & Reference**:
 - [Concepts Guide](../concepts/why-kmgraph.md) — Plain-English term explanations
@@ -344,4 +344,4 @@ Knowledge is portable — the same `docs/` directory works with all platforms. A
 
 **Resources**:
 - [Templates](../templates/) — Starter scaffolds for all document types
-- [Examples](../examples/) — Real-world samples to study
+- Examples (`examples/`) — Real-world samples to study

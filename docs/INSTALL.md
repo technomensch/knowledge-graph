@@ -163,7 +163,7 @@ See [Quickstart](quickstart) for detailed walkthroughs.
 
 **Change:** All skills and commands now require the `kmg-` prefix (e.g., `kmgraph:recall` → `kmgraph:kmg-recall`, `kmgraph:capture-lesson` → `kmgraph:kmg-capture-lesson`). MCP tool names (`kg_*`) are unchanged.
 
-**Action required:** Search your `~/.kmgraph/` files, project `CLAUDE.md`, and any custom hooks for old skill/command names and update them. Full rename table in [CHANGELOG.md](../CHANGELOG.md).
+**Action required:** Search your `~/.kmgraph/` files, project `CLAUDE.md`, and any custom hooks for old skill/command names and update them. Full rename table in [CHANGELOG.md](https://github.com/technomensch/knowledge-graph/blob/main/CHANGELOG.md).
 
 Plugin/marketplace users: the new names are already used in all shipped files. Only custom personal rules and local configs need updating.
 

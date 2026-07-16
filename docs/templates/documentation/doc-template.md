@@ -9,7 +9,7 @@ type: '[guide | concept | tutorial | explanation | reference | faq | custom]'
      ACCESSIBILITY: Heading levels must be sequential (H1 → H2 → H3). Do NOT skip levels.
      LINKS: All links must use descriptive text. Never use "click here" or "here" as link text. -->
 
-**Navigation**: [Home](../../index.md) > [Parent Section](../parent.md) > [Document Title]
+**Navigation**: Home > Parent Section (`../parent.md`) > [Document Title]
 
 <!-- TEMPLATE: Update the Navigation breadcrumb above with correct relative paths before using this template. -->
 
@@ -75,18 +75,18 @@ Description of what the example demonstrates.
      PATTERN: Group by topic. Include a brief description after each link. -->
 
 **Getting Started**:
-- [Installation Guide](../../GETTING-STARTED.md) — First-time setup
+- Installation Guide (Quickstart) — First-time setup
 
 **Reference**:
 - [Command Reference](../../reference/command-guide.md) — All commands with examples
 - [Concepts Guide](../../concepts/index.md) — Plain-English term explanations
 
 **Guides**:
-- [Pattern Writing](../../PATTERNS-GUIDE.md) — Writing effective entries
+- [Pattern Writing](https://github.com/technomensch/knowledge-graph/blob/main/core/docs/PATTERNS-GUIDE.md) — Writing effective entries
 
 **Resources**:
-- [Templates](../../core/default-templates/) — Starting scaffolds
-- [Examples](../../core/examples/) — Real-world samples
+- [Templates](https://github.com/technomensch/knowledge-graph/tree/main/core/default-templates) — Starting scaffolds
+- Examples (`core/examples/`) — Real-world samples
 
 ---
 

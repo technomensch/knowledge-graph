@@ -129,18 +129,18 @@ title: 'ADR-XXX: [Title of Decision]'
 
 ## Related Decisions
 
-- **[ADR-XXX](ADR-XXX-title.md):** [Relationship]
-- **[ADR-XXX](ADR-XXX-title.md):** [Relationship]
+- **ADR-XXX (`ADR-XXX-title.md`):** [Relationship]
+- **ADR-XXX (`ADR-XXX-title.md`):** [Relationship]
 
 ---
 
 ## Related Documentation
 
 **Knowledge Graph:**
-- [Link to KG entry](../knowledge/file.md#section) — [Context]
+- Link to KG entry (`../knowledge/file.md#section`) — [Context]
 
 **Lessons Learned:**
-- [Link to lesson](../lessons-learned/category/lesson.md) — [Context]
+- Link to lesson (`../lessons-learned/category/lesson.md`) — [Context]
 
 **Implementation:**
 - [Link to code, config, or documentation]

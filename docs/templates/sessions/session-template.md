@@ -127,17 +127,17 @@ def456g - fix(scope): commit message
 ## Related Resources
 
 **Plans:**
-- [Link to active plan](../../plans/plan-file.md)
+- Link to active plan (`../../plans/plan-file.md`)
 
 **Issues:**
-- [Link to local issue](../../issues/issue-file.md)
+- Link to local issue (`../../issues/issue-file.md`)
 - GitHub #XXX (if applicable)
 
 **Knowledge Graph:**
-- [Link to KG entry](../../knowledge/file.md#section)
+- Link to KG entry (`../../knowledge/file.md#section`)
 
 **Lessons Learned:**
-- [Link to lesson](../../lessons-learned/category/lesson.md)
+- Link to lesson (`../../lessons-learned/category/lesson.md`)
 
 ---
 

@@ -143,4 +143,4 @@ generic placeholders. Patterns and lessons remain intact.
 
 ## Related
 
-- [Sanitization Checklist](../reference/SANITIZATION-CHECKLIST.md) — exhaustive category-by-category reference with scan commands for each pattern type
+- [Sanitization Checklist](../../reference/SANITIZATION-CHECKLIST.md) — exhaustive category-by-category reference with scan commands for each pattern type

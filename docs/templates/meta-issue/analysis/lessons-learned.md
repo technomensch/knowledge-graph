@@ -24,7 +24,7 @@ Reusable insights from this investigation.
 [Trigger conditions for using this lesson]
 
 **Evidence:**
-- [Link to attempt](../attempts/NNN-name/)
+- Link to attempt (`../attempts/NNN-name/`)
 - [Data or observation]
 
 ---
@@ -58,7 +58,7 @@ Reusable insights from this investigation.
 - [Pattern 2] → Extract to KG
 
 **For Lessons Learned:**
-- [Lesson 1] → Create [../../lessons-learned/category/lesson.md](../../lessons-learned/category/)
+- [Lesson 1] → Create `../../lessons-learned/category/lesson.md`
 - [Lesson 2] → Create lesson
 
 ---

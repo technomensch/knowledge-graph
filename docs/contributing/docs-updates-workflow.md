@@ -106,5 +106,5 @@ Every docs-only branch produces exactly one feed post, regardless of how many fi
 
 ## Related
 
-- [ADR-027 — Docusaurus restructure and Diátaxis adoption](../decisions/ADR-027-docusaurus-restructure-diataxis-docs-feed.md)
+- [ADR-027 — Docusaurus restructure and Diátaxis adoption](https://github.com/technomensch/knowledge-graph/blob/main/knowledge/decisions/ADR-027-docusaurus-restructure-diataxis-docs-feed.md)
 - [STYLE-GUIDE.md](../STYLE-GUIDE.md)

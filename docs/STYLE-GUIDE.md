@@ -668,7 +668,7 @@ Run this checklist before marking documentation complete or committing a new or 
 **Authoring references**:
 - [Concepts Guide](concepts/how-kmgraph-is-organized.md) — Canonical definitions of all terms used in this guide
 - [Command Reference](reference/command-guide.md) — Example of the correct command page pattern in practice
-- [Getting Started](GETTING-STARTED.md) — Example of the correct guide page pattern in practice
+- [Quickstart](quickstart) — Example of the correct guide page pattern in practice
 
 **Templates**:
 - [Lesson Template](templates/lessons-learned/lesson-template.md) — Starting scaffold for Lesson Learned documents

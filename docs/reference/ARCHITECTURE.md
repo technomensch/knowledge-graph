@@ -334,4 +334,4 @@ Any MCP-compatible platform can access.
 - **Patterns Guide:** [PATTERNS-GUIDE.md](../pillars/capturing/capture-patterns.md)
 - **Workflows:** [WORKFLOWS.md](../pillars/recalling/session-memory.md)
 - **Platform Adaptation:** [PLATFORM-ADAPTATION.md](./PLATFORM-ADAPTATION.md)
-- **Examples:** [../examples/](../examples/)
+- **Examples:** `examples/`

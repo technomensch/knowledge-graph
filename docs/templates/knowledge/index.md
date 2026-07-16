@@ -64,17 +64,17 @@ Navigate all knowledge graph entries by category.
 ## By Date Added
 
 **[Current Month]**
-- [YYYY-MM-DD] — [Entry Name](file.md#section)
+- [YYYY-MM-DD] — Entry Name (`file.md#section`)
 
 ---
 
 ## By Evidence Source
 
 **Lessons Learned:**
-- [Lesson Title](../../lessons-learned/category/file.md) → [KG Entries it references]
+- Lesson Title (`../../lessons-learned/category/file.md`) → [KG Entries it references]
 
 **Architecture Decisions:**
-- [ADR Title](../../decisions/ADR-XXX.md) → [KG Entries it references]
+- ADR Title (`../../decisions/ADR-XXX.md`) → [KG Entries it references]
 
 ---
 

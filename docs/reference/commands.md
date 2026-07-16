@@ -152,7 +152,7 @@ These flags appear across multiple commands and share consistent behavior.
 
 ## Related Guides
 
-- [Getting Started](../GETTING-STARTED.md) — Installation and first lesson (5 min)
+- [Quickstart](../quickstart) — Installation and first lesson (5 min)
 - [Cheat Sheet](../CHEAT-SHEET.md) — One-page quick reference
 - [Concepts Guide](../concepts/why-kmgraph.md) — Plain-English definitions of every term and pattern
 - [Platform Adaptation](PLATFORM-ADAPTATION.md) — Cursor, Windsurf, Continue, VS Code, Aider
