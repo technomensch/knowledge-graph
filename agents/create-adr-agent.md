@@ -27,8 +27,8 @@ These flags are set by the `create-adr` command dispatcher via `gov-capture-rout
 1. Read flag (default: `--active`)
 2. Resolve `$target_path`:
    - `--user` → `~/.kmgraph/decisions/`
-   - `--project` → read `~/.claude/kg-config.json`, find graph matching current working directory → `{graph.path}/decisions/`
-   - `--named=<kg>` → read `~/.claude/kg-config.json`, find graph by name → `{graph.path}/decisions/`
+   - `--project` → read `~/.kmgraph/kg-config.json`, find graph matching current working directory → `{graph.path}/decisions/`
+   - `--named=<kg>` → read `~/.kmgraph/kg-config.json`, find graph by name → `{graph.path}/decisions/`
    - `--active` → `{active_kg_path}/decisions/`
 3. Store `$restore_kg` = current active KG (only when `--project` triggers a switch)
 
@@ -58,7 +58,7 @@ When `--user`, `--project`, or `--named` is explicitly set, skip the Phase 0 mis
 
 Before any work, verify the active knowledge graph matches the current working directory.
 
-1. Read `~/.claude/kg-config.json` — get the active KG name and its `path`.
+1. Read `~/.kmgraph/kg-config.json` — get the active KG name and its `path`.
 2. Derive the project root from the KG path: if the path ends in `/docs`, the parent directory is the project root; otherwise the path itself is the root.
 3. Compare the derived root against the current working directory (use `pwd`).
 

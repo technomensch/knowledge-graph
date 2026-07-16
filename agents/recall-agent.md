@@ -24,8 +24,8 @@ You are a knowledge retrieval specialist for a personal knowledge graph. Your jo
 Level flags (`--user`, `--project`, `--named`) take precedence over the existing `--scope` flag. If both are present, level flag wins.
 
 - `--user` → equivalent to `--scope personal-only` restricted to `~/.kmgraph/`
-- `--project` → resolve current repo's KG from `~/.claude/kg-config.json`, search that KG only
-- `--named=<kg>` → resolve named KG from `~/.claude/kg-config.json`, search that KG only
+- `--project` → resolve current repo's KG from `~/.kmgraph/kg-config.json`, search that KG only
+- `--named=<kg>` → resolve named KG from `~/.kmgraph/kg-config.json`, search that KG only
 - `--active` → equivalent to `--scope active`
 
 ### Surface search scope
@@ -39,7 +39,7 @@ e.g., "Searching: `~/.kmgraph/` (user KG only)" or "Searching: all configured KG
 
 ## Step 0: Resolve Active KG Path
 
-Read `~/.claude/kg-config.json`. Find the `active` field and look up `graphs[active].path`. Store this as `{active_kg_path}`.
+Read `~/.kmgraph/kg-config.json`. Find the `active` field and look up `graphs[active].path`. Store this as `{active_kg_path}`.
 
 If the config file does not exist or no active graph is set:
 

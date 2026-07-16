@@ -129,8 +129,8 @@ Subagent: Writes approved items to knowledge graph
 ### Step 1: Get Active KG Path
 
 ```bash
-active_kg=$(jq -r '.active' ~/.claude/kg-config.json)
-kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.claude/kg-config.json)
+active_kg=$(jq -r '.active' ~/.kmgraph/kg-config.json)
+kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.kmgraph/kg-config.json)
 ```
 
 Verify the active KG matches the current working directory. If mismatch:
