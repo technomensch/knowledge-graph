@@ -32478,7 +32478,7 @@ var path8 = __toESM(require("path"));
 var os6 = __toESM(require("os"));
 var readline = __toESM(require("readline"));
 init_utils();
-var SERVER_VERSION = true ? "0.3.10" : (() => {
+var SERVER_VERSION = true ? "0.6.19" : (() => {
   try {
     return null.version;
   } catch {
