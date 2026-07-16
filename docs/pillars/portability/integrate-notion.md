@@ -30,7 +30,7 @@ Note the database ID from the response.
 
 ## Mirror lessons
 
-For each lesson file in `docs/lessons-learned/`, create a Notion page:
+For each lesson file in `knowledge/lessons-learned/`, create a Notion page:
 
 ```
 Use notion-create-pages to add a page to database [ID] with:
@@ -43,7 +43,7 @@ Use notion-create-pages to add a page to database [ID] with:
 For bulk mirroring, ask the AI assistant to iterate over all lessons in a category:
 
 ```
-Read all .md files in docs/lessons-learned/debugging/ and create a Notion page
+Read all .md files in knowledge/lessons-learned/debugging/ and create a Notion page
 for each one in database [ID].
 ```
 
@@ -51,7 +51,7 @@ Confirm by opening the Notion database in a browser — each lesson should appea
 
 ## Mirror ADRs
 
-Create a separate "KMGraph ADRs" database with properties: Title, Status, Decision, Date. Mirror `docs/decisions/*.md` the same way.
+Create a separate "KMGraph ADRs" database with properties: Title, Status, Decision, Date. Mirror `knowledge/decisions/*.md` the same way.
 
 ## Search the mirror
 

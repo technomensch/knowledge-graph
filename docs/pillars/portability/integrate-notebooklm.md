@@ -26,13 +26,13 @@ For each lesson category you want to query, add the files as text sources:
 
 ```
 Use mcp__notebooklm__source_add with source_type=file and file_path pointing to
-docs/lessons-learned/debugging/my-lesson.md to add it to notebook [ID].
+knowledge/lessons-learned/debugging/my-lesson.md to add it to notebook [ID].
 ```
 
 For bulk import, ask the AI assistant to iterate:
 
 ```
-Read all .md files in docs/lessons-learned/ and add each as a source to
+Read all .md files in knowledge/lessons-learned/ and add each as a source to
 NotebookLM notebook [ID] using mcp__notebooklm__source_add with source_type=text.
 Use the file content as the text field.
 ```
@@ -40,7 +40,7 @@ Use the file content as the text field.
 ## Add ADRs and patterns
 
 ```
-Read all .md files in docs/decisions/ and add each as a source to notebook [ID].
+Read all .md files in knowledge/decisions/ and add each as a source to notebook [ID].
 ```
 
 ## Query the graph

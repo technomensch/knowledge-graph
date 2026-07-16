@@ -127,7 +127,7 @@ fi
 
 if echo "$COMMIT_MSG" | grep -iEq "$ADR_KEYWORDS"; then
     echo "🏛️  Architecture commit detected"
-    echo "   Consider: Create ADR in docs/decisions/"
+    echo "   Consider: Create ADR in knowledge/decisions/"
 fi
 
 if echo "$COMMIT_MSG" | grep -iEq "$GOTCHA_KEYWORDS"; then

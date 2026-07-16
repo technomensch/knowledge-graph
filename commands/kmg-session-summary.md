@@ -125,7 +125,7 @@ tags: [session]
 # Session Summary — 2026-06-09 — v0.5.10.1-session-summary-ops
 
 ## Start-of-Session Reading (Required)
-- [ ] `docs/plans/v0.5.10.1-session-summary-ops.md`
+- [ ] `knowledge/plans/v0.5.10.1-session-summary-ops.md`
       WHY: current step and acceptance criteria.
 - [ ] `## Current State` — branch, commit, uncommitted changes
 

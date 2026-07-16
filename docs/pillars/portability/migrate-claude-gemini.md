@@ -16,7 +16,7 @@ Before switching, update the MEMORY.md with the latest session context:
 /kmgraph:kmg-session-summary
 ```
 
-This writes a summary to `docs/sessions/` and updates MEMORY.md pointers. Commit and push.
+This writes a summary to `knowledge/sessions/` and updates MEMORY.md pointers. Commit and push.
 
 ## Export chat history
 

@@ -51,7 +51,7 @@ mkdir -p docs/knowledge-graph/{lessons-learned,decisions,knowledge,sessions}
 Create knowledge graph entries that reference your existing docs:
 
 ```markdown
-# In docs/knowledge/patterns.md
+# In knowledge/concepts/patterns.md
 
 ## Existing Authentication Pattern
 
@@ -92,7 +92,7 @@ The knowledge graph is your project memory. Use it for:
 
 **Team conventions:**
 ```markdown
-# In docs/knowledge/README.md
+# In knowledge/concepts/README.md
 
 ## Team Conventions
 
@@ -278,7 +278,7 @@ export KMGRAPH_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
 KMGRAPH_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
 ```
 
-> **Note:** `docs/sessions/` and `.env` are gitignored by default. Never commit a webhook URL to version control.
+> **Note:** `knowledge/sessions/` and `.env` are gitignored by default. Never commit a webhook URL to version control.
 
 **3. Verify it works**
 
@@ -288,7 +288,7 @@ After capturing your next lesson or ADR, you should receive a notification withi
 
 ```json
 {
-  "text": "📝 KMGraph: New lesson captured — 'JWT Timestamp Unit Mismatch' in docs/lessons-learned/"
+  "text": "📝 KMGraph: New lesson captured — 'JWT Timestamp Unit Mismatch' in knowledge/lessons-learned/"
 }
 ```
 
@@ -321,8 +321,8 @@ Add custom categories:
 
 ```bash
 # Create new category
-mkdir -p docs/lessons-learned/security
-touch docs/lessons-learned/security/README.md
+mkdir -p knowledge/lessons-learned/security
+touch knowledge/lessons-learned/security/README.md
 
 # Update auto-detection in skills
 vim .claude/skills/knowledge-capture.md

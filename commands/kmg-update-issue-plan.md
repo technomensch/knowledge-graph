@@ -90,8 +90,8 @@ If a PR exists for the current branch:
    ```markdown
    ## Related Lessons
 
-   - [Configuration Sync Implementation](docs/lessons-learned/architecture/config-sync.md) - Three-tier sync pattern
-   - [Error Handling Best Practices](docs/lessons-learned/process/error-handling.md) - Graceful degradation
+   - [Configuration Sync Implementation](knowledge/lessons-learned/architecture/config-sync.md) - Three-tier sync pattern
+   - [Error Handling Best Practices](knowledge/lessons-learned/process/error-handling.md) - Graceful degradation
    ```
 3. **Update PR description:** Append section via `gh pr edit [number] --body-file -`
 
@@ -176,11 +176,11 @@ When creating a PR (or updating an existing one):
 
 This PR implements patterns documented in the following lessons:
 
-- [Three-Tier Sync Implementation](docs/lessons-learned/architecture/three-tier-sync.md) (PR #[PR_ID], Issue #[ISSUE_ID])
+- [Three-Tier Sync Implementation](knowledge/lessons-learned/architecture/three-tier-sync.md) (PR #[PR_ID], Issue #[ISSUE_ID])
   - Category: architecture
   - Pattern: Multi-tier configuration synchronization
 
-- [Error Handling Best Practices](docs/lessons-learned/process/error-handling.md) (PR #[PR_ID], Issue #[ISSUE_ID])
+- [Error Handling Best Practices](knowledge/lessons-learned/process/error-handling.md) (PR #[PR_ID], Issue #[ISSUE_ID])
   - Category: process
   - Pattern: Graceful degradation with fallbacks
 ```

@@ -24,11 +24,11 @@ Contributors share the knowledge graph by granting access to the Git repository 
 
 ## 5. Recognizing a populated knowledge graph
 **What does a populated knowledge graph look like?**
-A populated knowledge graph contains detailed markdown files in the `docs/knowledge` layer, robust technical context in the `docs/decisions` layer (ADRs), and specific actionable insights in the `docs/lessons-learned/` directory.
+A populated knowledge graph contains detailed markdown files in the `knowledge/concepts` layer, robust technical context in the `knowledge/decisions` layer (ADRs), and specific actionable insights in the `knowledge/lessons-learned/` directory.
 
 ## 6. Uninstalling or resetting
 **How do contributors uninstall or reset the knowledge graph?**
-To completely reset, contributors delete the cloned repository folder from the local machine. To clear specific concepts or lessons while keeping the structure, contributors delete the markdown files within `docs/knowledge/` or `docs/lessons-learned/` and commit the removals.
+To completely reset, contributors delete the cloned repository folder from the local machine. To clear specific concepts or lessons while keeping the structure, contributors delete the markdown files within `knowledge/concepts/` or `knowledge/lessons-learned/` and commit the removals.
 
 ## 7. Removing example files
 

@@ -128,7 +128,7 @@ title: Commands Reference
 /kmgraph:kmg-meta-issue --add-attempt 002 "OAuth2 with JWT"
 /kmgraph:kmg-meta-issue --status
 /kmgraph:kmg-update-issue-plan --pr=42
-/kmgraph:kmg-link-issue docs/lessons-learned/process/my-lesson.md --issue 42
+/kmgraph:kmg-link-issue knowledge/lessons-learned/process/my-lesson.md --issue 42
 ```
 
 ---

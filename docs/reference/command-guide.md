@@ -637,7 +637,7 @@ Knowledge Graphs:
    Git: selective (architecture/patterns committed, process gitignored)
    Last used: 2026-02-13 15:45
 
-2. ai-research — ~/.claude/knowledge-graphs/ai-research/
+2. ai-research — ~/.kmgraph/knowledge-graphs/ai-research/
    Categories: architecture, process, ml-patterns (custom)
    Git: all committed
    Last used: 2026-02-10 12:00
@@ -756,7 +756,7 @@ Scan patterns: emails, API keys, custom patterns (2)
 Action: Block commits with sensitive data
 
 Test the hook:
-  git add docs/knowledge/patterns.md
+  git add knowledge/concepts/patterns.md
   git commit -m "test"
 ```
 
@@ -1031,8 +1031,8 @@ With `--user-facing`:
 
 **Example**:
 ```bash
-/kmgraph:kmg-link-issue docs/lessons-learned/process/my-lesson.md --issue 42
-/kmgraph:kmg-link-issue docs/decisions/ADR-005.md --issue 38 --pr 40
+/kmgraph:kmg-link-issue knowledge/lessons-learned/process/my-lesson.md --issue 42
+/kmgraph:kmg-link-issue knowledge/decisions/ADR-005.md --issue 38 --pr 40
 ```
 
 ---
