@@ -46,7 +46,7 @@ Detailed workflow patterns for different knowledge graph usage scenarios, with c
 **Outcome:**
 - Directory structure created in `./docs/`
 - Templates copied (lesson-template.md, ADR-template.md, etc.)
-- Config entry added to `~/.claude/kg-config.json`
+- Config entry added to `~/.kmgraph/kg-config.json`
 - KG set as active
 
 #### Step 2: Verify Structure
