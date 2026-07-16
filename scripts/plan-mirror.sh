@@ -2,7 +2,12 @@
 # plan-mirror.sh - PostToolUse hook: auto-mirror plans from ~/.claude/plans/ to active KG docs/plans/
 # Security: no eval, no network, all variables quoted, subshells quoted
 
-CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.claude/kg-config.json}"
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent (atomic, race-safe)
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
 CLAUDE_PLANS_DIR="$HOME/.claude/plans"
 
 # Color codes
