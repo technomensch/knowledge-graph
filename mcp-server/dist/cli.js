@@ -32648,7 +32648,7 @@ async function runInit() {
       `    Categories: ${categories.map((c) => c.name).join(", ")}`
     );
     console.log(`    Templates:  ${templatesCopied} copied`);
-    console.log(`    Config:     ~/.claude/kg-config.json`);
+    console.log(`    Config:     ~/.kmgraph/kg-config.json`);
     console.log("");
     console.log("  Ready to use. Try capturing your first lesson!");
     console.log("");
