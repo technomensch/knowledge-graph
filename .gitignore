@@ -70,6 +70,9 @@ knowledge/chat-history/
 # Implementation plans (local only)
 docs/plans/
 knowledge/plans/
+# Issue/enhancement-parented plan mirrors (local only, per ADR-029 routing)
+knowledge/issues/*/v*.c[0-9]*.md
+knowledge/enhancements/*/v*.c[0-9]*.md
 # Superpowers docs (local only)
 docs/superpowers/
 # Specs (local only)

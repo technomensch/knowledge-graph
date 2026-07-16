@@ -23,7 +23,7 @@ Scans all markdown files in active KG for:
 ### Step 1: Get Active KG Path
 
 ```bash
-kg_path=$(jq -r '.graphs[.active].path' ~/.claude/kg-config.json)
+kg_path=$(jq -r '.graphs[.active].path' ~/.kmgraph/kg-config.json)
 ```
 
 ### Step 2: Load Patterns

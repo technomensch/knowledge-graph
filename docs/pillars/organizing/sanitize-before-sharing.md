@@ -124,9 +124,9 @@ Scan complete. No sensitive patterns detected.
 
 Then do a final manual spot-check on files that contain real project data:
 
-- Lesson files in `docs/lessons-learned/`
-- ADRs in `docs/decisions/`
-- Session summaries in `docs/sessions/`
+- Lesson files in `knowledge/lessons-learned/`
+- ADRs in `knowledge/decisions/`
+- Session summaries in `knowledge/sessions/`
 - Any example configs or code snippets
 
 Add a brief privacy note to the repository README before publishing:
@@ -143,4 +143,4 @@ generic placeholders. Patterns and lessons remain intact.
 
 ## Related
 
-- [Sanitization Checklist](../reference/SANITIZATION-CHECKLIST.md) — exhaustive category-by-category reference with scan commands for each pattern type
+- [Sanitization Checklist](../../reference/SANITIZATION-CHECKLIST.md) — exhaustive category-by-category reference with scan commands for each pattern type

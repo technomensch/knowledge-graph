@@ -34,8 +34,14 @@ Git strategy (commit/ignore): ignore
 ### Create Directories
 
 ```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
 # Get active KG path from config
-kg_path=$(jq -r '.graphs[.active].path' ~/.claude/kg-config.json)
+kg_path=$(jq -r '.graphs[.active].path' "$CONFIG_PATH")
 mkdir -p "$kg_path/lessons-learned/$category"
 ```
 
@@ -51,9 +57,15 @@ fi
 ### Update Config
 
 ```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
 jq ".graphs[.active].categories += [{\"name\": \"$category\", \"prefix\": \"$prefix\", \"git\": \"$git_strategy\"}]" \
-   ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
-mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+   "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
+mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
 ```
 
 ### Update .gitignore

@@ -44,7 +44,7 @@ Quick Commands:
 ### Step 1: Check Config
 
 ```bash
-CONFIG_PATH="$HOME/.claude/kg-config.json"
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
 
 if [ ! -f "$CONFIG_PATH" ]; then
   echo "No knowledge graphs configured."
@@ -57,6 +57,8 @@ fi
 ### Step 2: Get Active KG
 
 ```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+
 active=$(jq -r '.active' "$CONFIG_PATH")
 
 if [ "$active" == "null" ]; then
@@ -73,6 +75,8 @@ fi
 ### Step 3: Load KG Details
 
 ```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+
 kg_data=$(jq -r ".graphs[\"$active\"]" "$CONFIG_PATH")
 kg_path=$(echo "$kg_data" | jq -r '.path')
 kg_path="${kg_path/#\~/$HOME}"  # Expand tilde

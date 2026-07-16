@@ -19,8 +19,8 @@ Would you like to backfill the knowledge graph from existing project context? [y
 Select `y`. The backfill automatically processes:
 - `README.md`
 - `CHANGELOG.md`
-- Existing `docs/lessons-learned/` entries
-- Existing `docs/decisions/` ADRs
+- Existing `knowledge/lessons-learned/` entries
+- Existing `knowledge/decisions/` ADRs
 - Chat history exports (if present)
 
 ## After init

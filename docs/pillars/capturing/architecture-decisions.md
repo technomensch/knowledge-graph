@@ -16,7 +16,7 @@ An ADR (Architecture Decision Record) captures a tech choice or design tradeoff 
 
 The wizard prompts for a title, status, decision summary, context, rationale, consequences, and implementation commit reference.
 
-Verify with `/kmgraph:kmg-recall "ADR keywords"` — the ADR should appear and the file should exist in `docs/decisions/`.
+Verify with `/kmgraph:kmg-recall "ADR keywords"` — the ADR should appear and the file should exist in `knowledge/decisions/`.
 
 ## What to fill in
 
@@ -44,7 +44,7 @@ After creation, link the ADR to related lessons:
 /kmgraph:kmg-link-issue --adr ADR-NNN --lesson path/to/lesson.md
 ```
 
-ADRs are auto-indexed in `docs/decisions/`. No manual step needed if using the command.
+ADRs are auto-indexed in `knowledge/decisions/`. No manual step needed if using the command.
 
 ## Updating an ADR
 

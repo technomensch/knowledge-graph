@@ -25,7 +25,7 @@ Call `kg_fts5_status`. Branch on the returned `exists` field:
 
 **If `exists === true`:** The index is present — no offer needed unless the user explicitly requests a rebuild.
 
-**If `FTS5_DECLINED` is true:** Skip silently (check `~/.claude/kg-config.json` for `.graphs["{kg_name}"].fts5_declined`).
+**If `FTS5_DECLINED` is true:** Skip silently (check `~/.kmgraph/kg-config.json` for `.graphs["{kg_name}"].fts5_declined`).
 
 If the user selects **Yes**, call `kg_fts5_rebuild`. **After the rebuild, validate the result:**
 

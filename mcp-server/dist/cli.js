@@ -32478,7 +32478,7 @@ var path8 = __toESM(require("path"));
 var os6 = __toESM(require("os"));
 var readline = __toESM(require("readline"));
 init_utils();
-var SERVER_VERSION = true ? "0.3.10" : (() => {
+var SERVER_VERSION = true ? "0.6.19" : (() => {
   try {
     return null.version;
   } catch {
@@ -32648,7 +32648,7 @@ async function runInit() {
       `    Categories: ${categories.map((c) => c.name).join(", ")}`
     );
     console.log(`    Templates:  ${templatesCopied} copied`);
-    console.log(`    Config:     ~/.claude/kg-config.json`);
+    console.log(`    Config:     ~/.kmgraph/kg-config.json`);
     console.log("");
     console.log("  Ready to use. Try capturing your first lesson!");
     console.log("");

@@ -4,7 +4,7 @@ title: Platform Adaptation
 
 # Platform Adaptation Guide
 
-**Navigation**: [Home](../index.md) > [Getting Started](../GETTING-STARTED.md) > Platform Adaptation
+**Navigation**: [Home](/) > [Quickstart](../quickstart) > Platform Adaptation
 
 **Using the knowledge graph with different AI coding platforms**
 
@@ -52,7 +52,7 @@ This guide focuses on **platform capabilities and usage patterns** after install
 - ADR automation with bidirectional lesson linking
 - Git metadata auto-capture on every operation
 
-**For installation:** See [GETTING-STARTED.md](../GETTING-STARTED.md) or paste [INSTALL.md](../INSTALL.md).
+**For installation:** See [Quickstart](../quickstart) or paste [INSTALL.md](../INSTALL.md).
 
 ---
 
@@ -102,9 +102,9 @@ codex plugin add kmgraph@knowledge-management-graph
 - Full search, lesson creation, and ADR scaffolding via MCP tools
 
 **Without MCP:**
-- Index `docs/knowledge/`, `docs/lessons-learned/`, `docs/decisions/` directories
+- Index `knowledge/concepts/`, `knowledge/lessons-learned/`, `knowledge/decisions/` directories
 - Use Cursor rules (`.cursorrules`) to guide lesson creation
-- Use `@docs/knowledge` to reference knowledge in Composer
+- Use `@knowledge/concepts` to reference knowledge in Composer
 
 **Limitations (without MCP):**
 - No automated git metadata tracking
@@ -150,7 +150,7 @@ codex plugin add kmgraph@knowledge-management-graph
 - `kg_scaffold` creates lessons from templates
 
 **Without MCP:**
-- Configure context providers to index `docs/knowledge/`, `docs/lessons-learned/`, `docs/decisions/`
+- Configure context providers to index `knowledge/concepts/`, `knowledge/lessons-learned/`, `knowledge/decisions/`
 - Create custom `/lesson` and `/recall` slash commands in `~/.continue/config.json`
 - Use `@knowledge` to reference docs in context
 
@@ -221,9 +221,9 @@ codex plugin add kmgraph@knowledge-management-graph
 **Automation:** Low (manual prompting)
 
 **Usage pattern:**
-- Copilot indexes workspace automatically — ensure knowledge docs are in `docs/`
-- Reference knowledge via `@workspace` queries: `@workspace What patterns are in docs/knowledge/patterns.md?`
-- Use `#file:docs/lessons-learned/` references in prompts
+- Copilot indexes workspace automatically — ensure knowledge docs are in `knowledge/`
+- Reference knowledge via `@workspace` queries: `@workspace What patterns are in knowledge/concepts/patterns.md?`
+- Use `#file:knowledge/lessons-learned/` references in prompts
 
 **Limitations:**
 - No skills/commands
@@ -330,7 +330,7 @@ Knowledge is portable — the same `docs/` directory works with all platforms. A
 
 **Installation**:
 - [Universal Installer](../INSTALL.md) — Automated setup for all platforms
-- [Getting Started](../GETTING-STARTED.md) — Claude Code setup guide
+- [Quickstart](../quickstart) — Claude Code setup guide
 
 **Core Concepts & Reference**:
 - [Concepts Guide](../concepts/why-kmgraph.md) — Plain-English term explanations
@@ -344,4 +344,4 @@ Knowledge is portable — the same `docs/` directory works with all platforms. A
 
 **Resources**:
 - [Templates](../templates/) — Starter scaffolds for all document types
-- [Examples](../examples/) — Real-world samples to study
+- Examples (`examples/`) — Real-world samples to study

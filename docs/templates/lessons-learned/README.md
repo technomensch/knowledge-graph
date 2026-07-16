@@ -4,7 +4,7 @@ title: Readme
 
 # Lessons Learned - Master Index
 
-**Navigation**: [Home](../../index.md) > [Getting Started](../../GETTING-STARTED.md) > [Manual Workflows](../../WORKFLOWS.md) > Templates
+**Navigation**: Home > Getting Started > Manual Workflows > Templates
 
 Comprehensive catalog of all lessons-learned documents.
 
@@ -50,7 +50,7 @@ Comprehensive catalog of all lessons-learned documents.
 ## Chronological Index
 
 **[Current Year]**
-- [YYYY-MM-DD] - [Lesson Title](category/Lessons_Learned_Title.md) - Brief description
+- [YYYY-MM-DD] - Lesson Title (`category/Lessons_Learned_Title.md`) - Brief description
 
 ---
 
@@ -108,7 +108,7 @@ The lesson template uses YAML frontmatter with [AUTO] and [MANUAL] field markers
 - If you see `[AUTO-SUGGEST]` — command provides a suggestion, but you can change it
 
 **Examples:**
-See [core/examples/lessons-learned/](../../examples/lessons-learned/) for filled-out lesson examples.
+See `core/examples/lessons-learned/` for filled-out lesson examples.
 
 ---
 
@@ -128,9 +128,9 @@ See [core/examples/lessons-learned/](../../examples/lessons-learned/) for filled
 - [lesson-template.md](lesson-template.md) - See inline field comments
 
 **See examples**:
-- [Real Examples](../../examples/lessons-learned/) - Filled-out lessons
-- [Pattern Guide](../../PATTERNS-GUIDE.md) - Writing quality tips
+- Real Examples (`examples/lessons-learned/`) - Filled-out lessons
+- [Pattern Guide](https://github.com/technomensch/knowledge-graph/blob/main/core/docs/PATTERNS-GUIDE.md) - Writing quality tips
 
 **How to capture**:
-- [Manual Workflow](../../WORKFLOWS.md#workflow-1-create-lesson-learned) - Step-by-step
+- Manual Workflow - Step-by-step
 - [Command Guide](../../reference/command-guide.md) - Automated (Claude Code)

@@ -42,15 +42,15 @@ This glossary provides plain-English definitions for key terms and concepts used
 >
 > A lesson about database timeouts links to a pattern entry about connection pooling. The connection pooling pattern links back to the timeout lesson. Starting from either document leads to the other.example[**In NEW lesson**]
 
-- lessons-learned/process/git-workflow.md
+- knowledge/lessons-learned/process/git-workflow.md
 - **Pattern:** [[patterns.md#branch-preservation]]
 
 ::::
 
 > 📘 **In EXISTING pattern**
 >
-> - knowledge/patterns.md
-> - **Related Lesson:** [[lessons-learned/process/git-workflow.md]]
+> - knowledge/concepts/patterns.md
+> - **Related Lesson:** [[knowledge/lessons-learned/process/git-workflow.md]]
 
 :::
 This creates a knowledge graph where:
@@ -228,7 +228,7 @@ function detectCategory(title, description) {
 4. **Prevention** — How to avoid the same problem in the future
 5. **Key Takeaways** — Concise lessons for quick reference
 
-**How to create one**: Claude Code users run `/kmgraph:kmg-capture-lesson`. Manual users copy the lesson template from `core/default-templates/lessons-learned/lesson-template.md` and fill in each section.
+**How to create one**: Claude Code users run `/kmgraph:kmg-capture-lesson`. Manual users copy the lesson template from `core/default-templates/knowledge/lessons-learned/lesson-template.md` and fill in each section.
 
 **When to write one**: After solving any non-trivial problem. The best time to document is immediately after solving the problem, while details are fresh.
 
@@ -239,11 +239,11 @@ function detectCategory(title, description) {
 > ```bash
 > # Manual (No Automation)
 > # 1. Copy template
-> cp core/default-templates/lessons-learned/lesson-template.md \
->    docs/lessons-learned/process/my-lesson.md
+> cp core/default-templates/knowledge/lessons-learned/lesson-template.md \
+>    knowledge/lessons-learned/process/my-lesson.md
 >
 > # 2. Fill in sections
-> vim docs/lessons-learned/process/my-lesson.md
+> vim knowledge/lessons-learned/process/my-lesson.md
 >
 > # Automated (Claude Code)
 > # Single command does all steps
@@ -460,7 +460,7 @@ bash
 
 **How to use (manual workflow)**: Copy the template, fill in `[MANUAL]` fields, write content in the body sections, save, and commit.
 
-**How to use (Claude Code)**: Run the corresponding command (e.g., `/kmgraph:kmg-capture-lesson`). The command fills `[AUTO]` fields and guides the user through `[MANUAL]` fields interactively.
+**How to use (Claude Code)**: Run the corresponding command (e.g., `/kmgraph:kmg-capture-lesson`). The command fills `[AUTO]` fields and guides the user through `[MANUAL]` fields interactively. Templates are located in `core/default-templates/knowledge/`.
 
 **Plain English**: A fill-in-the-blank form that ensures every entry has the right structure.
 

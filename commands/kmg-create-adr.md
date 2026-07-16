@@ -46,7 +46,7 @@ After the agent returns, extract the draft content and display it verbatim in yo
 **Read the active knowledge graph configuration:**
 
 ```bash
-# Read ~/.claude/kg-config.json
+# Read ~/.kmgraph/kg-config.json
 # Find "active" field
 # Get path from graphs[active].path
 ```
@@ -471,7 +471,7 @@ Let me ask a few questions:
 
 ## Checklist Before Creating ADR
 
-- [ ] Active KG path resolved from `~/.claude/kg-config.json`
+- [ ] Active KG path resolved from `~/.kmgraph/kg-config.json`
 - [ ] ADR number auto-incremented correctly (highest existing + 1)
 - [ ] Git metadata collected (author, email, branch, commit)
 - [ ] Title, status, and category confirmed by user

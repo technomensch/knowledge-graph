@@ -26,7 +26,7 @@ Use this template when creating a new KG entry manually.
 [Expanded explanation with context]
 
 **Evidence:**
-[Link to lesson learned](../../lessons-learned/category/lesson-file.md) — [Context]
+Link to lesson learned (`../../lessons-learned/category/lesson-file.md`) — [Context]
 - [Key finding]
 - [Supporting data or observation]
 
@@ -35,9 +35,9 @@ Use this template when creating a new KG entry manually.
 - [Source Title](https://docs.example.com) — [Brief context of what was learned]
 
 **Related:**
-- [Related KG entry](./file.md#section)
+- Related KG entry (`./file.md#section`)
 - [Related concept](./concepts.md#section)
-- [Related ADR](../../decisions/ADR-XXX.md)
+- Related ADR (`../../decisions/ADR-XXX.md`)
 
 **See Lesson:** [Full lesson with deep dive]
 

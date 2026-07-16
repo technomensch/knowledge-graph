@@ -31793,7 +31793,8 @@ async function handleCapture(request, targetKg) {
       let indexResult2 = {};
       try {
         const kgName = targetKg || config2.active || path8.basename(kgPath);
-        indexResult2 = rebuildIndex(kgPath, kgName);
+        const kgType = config2.graphs[kgName]?.type ?? "project-local";
+        indexResult2 = rebuildIndex(kgPath, kgName, kgType);
       } catch {
       }
       return { status: "updated", filePath: existing, relativePath: path8.relative(kgPath, existing), indexResult: indexResult2 };
@@ -31843,7 +31844,8 @@ async function handleCapture(request, targetKg) {
   let indexResult = {};
   try {
     const kgName = targetKg || config2.active || path8.basename(kgPath);
-    indexResult = rebuildIndex(kgPath, kgName);
+    const kgType = config2.graphs[kgName]?.type ?? "project-local";
+    indexResult = rebuildIndex(kgPath, kgName, kgType);
   } catch {
   }
   return {
@@ -31897,7 +31899,7 @@ var path9 = __toESM(require("path"));
 var os6 = __toESM(require("os"));
 
 // src/tools/version.ts
-var pkg = { version: true ? "0.3.10" : "0.0.0" };
+var pkg = { version: true ? "0.6.19" : "0.0.0" };
 var SCHEMA_VERSION = 2;
 function handleVersion() {
   return { installed: pkg.version, schema: SCHEMA_VERSION };
@@ -32487,7 +32489,7 @@ function registerUpgradeTool(server2) {
 // src/index.ts
 var server = new McpServer({
   name: "knowledge-graph",
-  version: "0.3.10"
+  version: true ? "0.6.19" : "0.0.0"
 });
 registerConfigTools(server);
 registerSearchTool(server);

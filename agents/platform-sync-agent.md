@@ -30,7 +30,7 @@ Read `{source_file}` in full. If a git diff is available for the file (`git diff
 
 ## Phase 1: Resolve Configured Platforms
 
-Read `~/.claude/kg-config.json`. Find the `active` field and look up `graphs[active]`.
+Read `~/.kmgraph/kg-config.json`. Find the `active` field and look up `graphs[active]`.
 
 Check for a `platforms` array in the active graph config. This tells you which platform files are configured for this project.
 

@@ -22,7 +22,13 @@
 `kg_upgrade` always operates on the config's active graph. Before calling it, confirm `{kg_name}` equals the active graph:
 
 ```bash
-ACTIVE=$(jq -r '.active' ~/.claude/kg-config.json 2>/dev/null)
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
+ACTIVE=$(jq -r '.active' "$CONFIG_PATH" 2>/dev/null)
 ```
 
 If `$ACTIVE` ≠ `{kg_name}`: temporarily switch active to `{kg_name}` using `kg_config_switch` tool before calling `kg_upgrade`, then after the upgrade call: if `{preserve_active}` is `true`, restore `$ACTIVE` (leave the original active graph unchanged); if `{preserve_active}` is `false`, leave `{kg_name}` active (the wizard's normal behavior). If you cannot switch (tool unavailable), skip to bash detection without setting any per-category flags.
@@ -65,6 +71,12 @@ These per-category flags are **LLM-tracked state variables** — they are tracke
 **Before running any checks or making any changes**, inspect the KG's actual state and report only what is missing or upgradeable for this specific install:
 
 ```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
 # Inspect what's actually missing or upgradeable
 upgrades=()
 
@@ -100,7 +112,7 @@ if [ -f "{KG_PATH}/rules.md" ]; then
 fi
 
 # Path migration available
-CONFIGURED_PATH=$(jq -r '.graphs["{kg_name}"].path' ~/.claude/kg-config.json)
+CONFIGURED_PATH=$(jq -r '.graphs["{kg_name}"].path' "$CONFIG_PATH")
 echo "$CONFIGURED_PATH" | grep -qE '/docs/?$' && \
   [ -d "$CONFIGURED_PATH/lessons-learned" ] && \
   upgrades+=("Migration available: move KMGraph content from docs/ to knowledge/")
@@ -135,7 +147,7 @@ if [ -f "$REAL_DB" ]; then
 fi
 
 # Wiki pass check
-WIKI_DONE=$(jq -r '.graphs["{kg_name}"].wiki_pass_complete // false' ~/.claude/kg-config.json 2>/dev/null)
+WIKI_DONE=$(jq -r '.graphs["{kg_name}"].wiki_pass_complete // false' "$CONFIG_PATH" 2>/dev/null)
 [ "$WIKI_DONE" != "true" ] && \
   upgrades+=("Wiki pass available: convert bare ADR-NNN, ENH-NNN, #NNN, and lesson filename references to [[wiki links]] across knowledge files")
 
@@ -346,6 +358,12 @@ Check for config fields introduced in newer versions. Add defaults for any missi
 **Only run the bash block below if `_mcp_covered_config` is not set** (i.e., `"config"` was not in Step 0's `upgrades[]` — kg_upgrade did not apply config field defaults):
 
 ```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
 # Fields that may be missing from older installs:
 # - platforms: [] (added in v0.2.0)
 # - autoSwitch: false (added in v0.2.0)
@@ -358,14 +376,20 @@ jq '
     if .autoSwitch == null then .autoSwitch = false else . end |
     if .notification == null then .notification = { "webhookUrl": "" } else . end |
     if .type == null then .type = "{KG_TYPE}" else . end
-' ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
-mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+' "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
+mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
 ```
 
 **After the migration, check for graphs still missing `type`** (e.g., if the user has multiple registered KGs from v0.2.1):
 
 ```bash
-GRAPHS_WITHOUT_TYPE=$(jq -r '.graphs | to_entries[] | select(.value.type == null) | .key' ~/.claude/kg-config.json)
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
+GRAPHS_WITHOUT_TYPE=$(jq -r '.graphs | to_entries[] | select(.value.type == null) | .key' "$CONFIG_PATH")
 if [ -n "$GRAPHS_WITHOUT_TYPE" ]; then
   echo "⚠️  Some registered KGs are missing a type field (defaulted to project-local):"
   echo "$GRAPHS_WITHOUT_TYPE"

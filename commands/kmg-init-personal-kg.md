@@ -21,7 +21,7 @@ lessons, patterns, and ADRs that apply across multiple projects.
 ## What This Does
 
 1. Creates `~/.kmgraph/` with standard directory structure
-2. Registers it in `~/.claude/kg-config.json` as `type: "personal"` with name `"personal"`
+2. Registers it in `~/.kmgraph/kg-config.json` as `type: "personal"` with name `"personal"`
 3. Copies knowledge templates (patterns, gotchas, concepts)
 4. Builds FTS5 search index
 5. Does NOT change the active KG — your project KG remains active
@@ -35,7 +35,7 @@ After setup, `/kmgraph:kmg-capture-lesson` shows a KG picker when saving lessons
 
 ### Step 1: Check for existing personal KG
 
-Check if a personal knowledge graph already exists: look up `~/.claude/kg-config.json` for any entry with `type: "personal"` at the target path (`~/.kmgraph/` by default).
+Check if a personal knowledge graph already exists: look up `~/.kmgraph/kg-config.json` for any entry with `type: "personal"` at the target path (`~/.kmgraph/` by default).
 
 **If NO existing personal KG is found:** skip this step and proceed to Step 2 (directory scaffolding).
 
@@ -239,7 +239,7 @@ Parameters:
 ✅ Personal KG ready at ~/.kmgraph/
 
 What changed:
-  • Registered as "personal" (type: personal) in ~/.claude/kg-config.json
+  • Registered as "personal" (type: personal) in ~/.kmgraph/kg-config.json
   • Active KG unchanged: still "[current active KG]"
 
 How to use:
@@ -356,9 +356,15 @@ Processing:
 Write `wiki_pass_complete: true` to the KG config entry:
 
 ```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
 jq '.graphs["personal"].wiki_pass_complete = true' \
-  ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
-mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+  "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
+mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
 ```
 
 If the personal KG has no content files yet (fresh install), exit cleanly with `0 files modified` — no error.

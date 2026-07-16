@@ -4,7 +4,7 @@ title: Readme
 
 # Meta-Issue: [Problem Title]
 
-**Navigation**: [Home](../../index.md) > [Getting Started](../../GETTING-STARTED.md) > [Manual Workflows](../../WORKFLOWS.md) > Templates
+**Navigation**: Home > Getting Started > Manual Workflows > Templates
 
 **Domain:** [architecture | performance | data | debugging]
 **Scope:** [version-range or "ongoing"]
@@ -19,8 +19,8 @@ title: Readme
 - [Problem Description](description.md) — Living document (updated as understanding evolves)
 - [Implementation Log](implementation-log.md) — All attempts chronologically
 - [Test Cases](test-cases.md) — Validation scenarios
-- [Attempts](attempts/) — Numbered folders with detailed results
-- [Analysis](analysis/) — Root cause evolution, timeline, lessons
+- Attempts (`attempt-template/`) — Numbered folders with detailed results
+- Analysis (`analysis/`) — Root cause evolution, timeline, lessons
 
 ---
 
@@ -40,8 +40,8 @@ title: Readme
 
 [Auto-populated from implementation-log.md]
 
-1. **[001-baseline](attempts/001-baseline/)** — [Status] — [Brief outcome]
-2. **[002-approach](attempts/002-approach/)** — [Status] — [Brief outcome]
+1. **001-baseline** (`attempts/001-baseline/`) — [Status] — [Brief outcome]
+2. **002-approach** (`attempts/002-approach/`) — [Status] — [Brief outcome]
 
 ---
 
@@ -49,16 +49,16 @@ title: Readme
 
 [Cross-references to KG entries and lessons]
 
-- [Pattern discovered](../../knowledge/patterns.md#pattern-name)
-- [Gotcha identified](../../knowledge/gotchas.md#gotcha-name)
-- [Lesson learned](../../lessons-learned/category/lesson.md)
+- Pattern discovered (`../../knowledge/patterns.md#pattern-name`)
+- Gotcha identified (`../../knowledge/gotchas.md#gotcha-name`)
+- Lesson learned (`../../lessons-learned/category/lesson.md`)
 
 ---
 
 ## Related Issues
 
 - [GitHub #XXX](related-issues/github-links.md) — [Context]
-- [Local issue-YYY](../issue-YYY.md) — [Context]
+- Local issue-YYY (`../issue-YYY.md`) — [Context]
 
 ---
 
@@ -76,7 +76,7 @@ title: Readme
 
 **Concepts & Guides**:
 - [Concepts Guide](../../concepts/index.md) - Term explanations
-- [META-ISSUE-GUIDE.md](../../META-ISSUE-GUIDE.md) - Full meta-issue guide
+- [META-ISSUE-GUIDE.md](https://github.com/technomensch/knowledge-graph/blob/main/core/docs/META-ISSUE-GUIDE.md) - Full meta-issue guide
 
 **Resources**:
-- [Real Examples](../../examples/meta-issues/) - Real-world samples
+- Real Examples (`examples/meta-issue/`) - Real-world samples

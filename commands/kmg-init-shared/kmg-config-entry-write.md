@@ -16,6 +16,13 @@
 ---
 
 ```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
+
 # Build config entry JSON
 config_entry=$(cat <<EOF
 {
@@ -41,13 +48,13 @@ EOF
 
 # If {preserve_active} is FALSE — set the active KG:
 jq ".graphs[\"{kg_name}\"] = $config_entry | .active = \"{kg_name}\"" \
-  ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+  "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
 
 # If {preserve_active} is TRUE — do NOT modify .active:
 jq ".graphs[\"{kg_name}\"] = $config_entry" \
-  ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
+  "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
 
-mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
 ```
 
 #### Config field check
@@ -55,6 +62,13 @@ mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
 Check for config fields introduced in newer versions. Add defaults for any missing fields without overwriting existing values:
 
 ```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
+
 # Fields that may be missing from older installs:
 # - platforms: [] (added in v0.2.0)
 # - autoSwitch: false (added in v0.2.0)
@@ -67,14 +81,21 @@ jq '
     if .autoSwitch == null then .autoSwitch = false else . end |
     if .notification == null then .notification = { "webhookUrl": "" } else . end |
     if .type == null then .type = "project-local" else . end
-' ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
-mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+' "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
+mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
 ```
 
 **After the migration, check for graphs still missing `type`** (e.g., if the user has multiple registered KGs from v0.2.1):
 
 ```bash
-GRAPHS_WITHOUT_TYPE=$(jq -r '.graphs | to_entries[] | select(.value.type == null) | .key' ~/.claude/kg-config.json)
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
+
+GRAPHS_WITHOUT_TYPE=$(jq -r '.graphs | to_entries[] | select(.value.type == null) | .key' "$CONFIG_PATH")
 if [ -n "$GRAPHS_WITHOUT_TYPE" ]; then
   echo "⚠️  Some registered KGs are missing a type field (defaulted to project-local):"
   echo "$GRAPHS_WITHOUT_TYPE"

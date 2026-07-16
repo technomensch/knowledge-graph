@@ -11,7 +11,7 @@ Initialize a new knowledge graph with interactive wizard that guides you through
 
 Creates a complete knowledge graph structure with:
 - Directory scaffolding (knowledge/, lessons-learned/, decisions/, sessions/)
-- Configuration entry in `~/.claude/kg-config.json`
+- Configuration entry in `~/.kmgraph/kg-config.json`
 - Category-specific subdirectories
 - Git strategy setup (.gitignore rules)
 - Sets new KG as "active" for subsequent operations
@@ -26,7 +26,7 @@ Creates a complete knowledge graph structure with:
 
 ## Pre-Wizard: Existing KG Detection
 
-Check if a knowledge graph already exists for this project: look up `~/.claude/kg-config.json` for any entry whose path matches (or is a parent/child of) the current working directory.
+Check if a knowledge graph already exists for this project: look up `~/.kmgraph/kg-config.json` for any entry whose path matches (or is a parent/child of) the current working directory.
 
 **If NO existing KG is found:** skip this section entirely and proceed to the wizard (Step 1 below).
 
@@ -63,7 +63,7 @@ Enter option (1/2/3/4):
 **→ You MUST execute this shared module. Read `commands/kmg-init-shared/kmg-upgrade-inspector.md` and follow it exactly before running any other step.**
 
 Parameters:
-- `{KG_PATH}` = resolved path for this KG (from `~/.claude/kg-config.json` entry for the matched KG)
+- `{KG_PATH}` = resolved path for this KG (from `~/.kmgraph/kg-config.json` entry for the matched KG)
 - `{kg_name}` = name key of the matched KG in kg-config.json
 - `{KG_TYPE}` = type field from the KG config entry ("project-local" or "personal")
 - `{categories}` = categories array from the KG config entry
@@ -94,10 +94,13 @@ if [ -f "$KG_ROOT/.fts5.db" ]; then
     # a fresh index will be rebuilt at the new location on next use.
     echo "ℹ️  Search index at $KG_ROOT/.fts5.db is gitignored (local state) — leaving in place."
   else
-    # Not gitignored — this is a legacy stray file. Migrate to user cache.
-    mkdir -p "$HOME/.claude/kg-fts5"
-    mv "$KG_ROOT/.fts5.db" "$HOME/.claude/kg-fts5/$kg_name.db"
-    echo "✅ Legacy search index migrated to user cache."
+    # Not gitignored — this is a legacy stray file. It is a rebuildable search
+    # cache (not knowledge); the server's live index is ~/.kmgraph/index/ and is
+    # rebuilt on demand. Remove the stray rather than moving it to the deprecated
+    # ~/.claude/kg-fts5/ location, which the server no longer reads and which would
+    # falsely trigger the index-migration consent prompt below.
+    rm -f "$KG_ROOT/.fts5.db"
+    echo "✅ Removed legacy stray search index — a fresh index rebuilds at ~/.kmgraph/index/ on next sync."
     # Remove the .fts5.db gitignore rule only if it was a legacy stray (not intentional)
     if [ -f "$KG_ROOT/.gitignore" ]; then
       grep -v "^\*\*/\.fts5\.db$" "$KG_ROOT/.gitignore" > "$KG_ROOT/.gitignore.tmp"
@@ -114,9 +117,16 @@ Proceed to the FTS5 rebuild check (Step 1f) below.
 Check whether the old `~/.claude/kg-fts5/` index exists and whether the user has already consented to migration:
 
 ```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
+
 KG_NAME="{kg_name}"
 OLD_DB="$HOME/.claude/kg-fts5/${KG_NAME}.db"
-FTS5_MIGRATED=$(jq -r ".graphs[\"${KG_NAME}\"].fts5_index_migrated // false" "$HOME/.claude/kg-config.json" 2>/dev/null)
+FTS5_MIGRATED=$(jq -r ".graphs[\"${KG_NAME}\"].fts5_index_migrated // false" "$CONFIG_PATH" 2>/dev/null)
 
 if [ -f "$OLD_DB" ] && [ "$FTS5_MIGRATED" != "true" ]; then
   printf '\nKMGraph — Search Index Location Change\n\n'
@@ -131,8 +141,8 @@ if [ -f "$OLD_DB" ] && [ "$FTS5_MIGRATED" != "true" ]; then
   read -r CONSENT
   if [ "$CONSENT" = "1" ]; then
     # Write consent marker — prevents prompt from reappearing on subsequent init runs
-    jq ".graphs[\"${KG_NAME}\"].fts5_index_migrated = true" "$HOME/.claude/kg-config.json" > /tmp/kg-config-tmp.json \
-      && mv /tmp/kg-config-tmp.json "$HOME/.claude/kg-config.json"
+    jq ".graphs[\"${KG_NAME}\"].fts5_index_migrated = true" "$CONFIG_PATH" > /tmp/kg-config-tmp.json \
+      && mv /tmp/kg-config-tmp.json "$CONFIG_PATH"
     printf '✓ Index location updated. Run kg_fts5_rebuild or /kmgraph:kmg-sync-all to rebuild.\n'
   else
     printf 'Skipped. Search continues via linear scan until you choose to migrate.\n'
@@ -143,7 +153,7 @@ fi
 **Constraints:**
 - Do NOT auto-rebuild on Yes — log only; user triggers rebuild explicitly
 - Do NOT delete old DB — user removes `~/.claude/kg-fts5/` manually after confirming
-- Idempotency: On Yes, write `fts5_index_migrated: true` to the active graph's entry in `~/.claude/kg-config.json` (done by the jq command above). On subsequent `/kmgraph:kmg-init` runs, the `FTS5_MIGRATED` check skips the prompt.
+- Idempotency: On Yes, write `fts5_index_migrated: true` to the active graph's entry in `~/.kmgraph/kg-config.json` (done by the jq command above). On subsequent `/kmgraph:kmg-init` runs, the `FTS5_MIGRATED` check skips the prompt.
 - On No: do NOT write the marker — prompt reappears on next init (correct behavior)
 
 #### 1f.0b. Stale in-project FTS5 file cleanup
@@ -220,7 +230,14 @@ fi
 **E15 — Stale path pre-check:** Before evaluating migration triggers, verify the configured path exists on disk:
 
 ```bash
-CONFIGURED_PATH=$(jq -r '.graphs["'"$kg_name"'"].path' ~/.claude/kg-config.json)
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
+
+CONFIGURED_PATH=$(jq -r '.graphs["'"$kg_name"'"].path' "$CONFIG_PATH")
 
 if [ ! -d "$CONFIGURED_PATH" ]; then
   echo "⚠️  Your configured KG path does not exist: $CONFIGURED_PATH"
@@ -236,8 +253,15 @@ fi
 **E3 — Recovery flag check:** If `migration_in_progress: true` is set in the config entry, display recovery options before continuing:
 
 ```bash
-MIGRATION_IN_PROGRESS=$(jq -r '.graphs["'"$kg_name"'"].migration_in_progress // false' ~/.claude/kg-config.json)
-ROLLBACK_IN_PROGRESS=$(jq -r '.graphs["'"$kg_name"'"].rollback_in_progress // false' ~/.claude/kg-config.json)
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
+
+MIGRATION_IN_PROGRESS=$(jq -r '.graphs["'"$kg_name"'"].migration_in_progress // false' "$CONFIG_PATH")
+ROLLBACK_IN_PROGRESS=$(jq -r '.graphs["'"$kg_name"'"].rollback_in_progress // false' "$CONFIG_PATH")
 
 if [ "$ROLLBACK_IN_PROGRESS" = "true" ]; then
   echo "⚠️  A previous rollback was interrupted."
@@ -263,8 +287,8 @@ if [ "$MIGRATION_IN_PROGRESS" = "true" ]; then
   # If user selects Rollback:
   # Set rollback flag before starting; clears both flags on completion
   jq '.graphs["'"$kg_name"'"].rollback_in_progress = true' \
-    ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
-  mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+    "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
+  mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
 
   # rb-a. Reverse root scaffold file moves
   for f in me.md rules.md kg-index.md; do
@@ -288,8 +312,8 @@ if [ "$MIGRATION_IN_PROGRESS" = "true" ]; then
   # rb-c. Restore kg-config.json path
   PROJECT_ROOT=$(pwd)
   jq ".graphs[\"$kg_name\"].path = \"$PROJECT_ROOT/docs\"" \
-    ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
-  mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+    "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
+  mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
 
   # rb-d. Reverse .gitignore rules
   if [ -f .gitignore ]; then
@@ -326,8 +350,8 @@ if [ "$MIGRATION_IN_PROGRESS" = "true" ]; then
 
   # rb-f. Clear both flags
   jq 'del(.graphs["'"$kg_name"'"].migration_in_progress) | del(.graphs["'"$kg_name"'"].rollback_in_progress)' \
-    ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
-  mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+    "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
+  mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
 
   echo "✅ Rollback complete. KG restored to docs/. Run /kmgraph:kmg-status to verify."
   # Exit — do not proceed with forward migration
@@ -342,7 +366,14 @@ fi
 Note: Migration applies to project-local KGs only. Personal KGs (`~/.kmgraph/`) use a fixed path and never have a `docs/` layout — they are intentionally excluded by the type check above.
 
 ```bash
-KG_TYPE=$(jq -r '.graphs["'"$kg_name"'"].type' ~/.claude/kg-config.json)
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
+
+KG_TYPE=$(jq -r '.graphs["'"$kg_name"'"].type' "$CONFIG_PATH")
 KG_PATH_ENDS_DOCS=$(echo "$CONFIGURED_PATH" | grep -E '/docs/?$')
 
 if [ "$KG_TYPE" = "project-local" ] && [ -n "$KG_PATH_ENDS_DOCS" ] && [ -d "$CONFIGURED_PATH/lessons-learned" ]; then
@@ -357,6 +388,13 @@ fi
 **Migration logic (if user selects Yes):**
 
 ```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
+
 # Portable in-place sed (macOS uses -i '', GNU/Linux uses -i)
 _sed_inplace() {
   if sed --version 2>/dev/null | grep -q GNU; then
@@ -371,8 +409,8 @@ mkdir -p knowledge/
 
 # b. Set atomic migration flag before moving files
 jq '.graphs["'"$kg_name"'"].migration_in_progress = true' \
-  ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
-mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+  "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
+mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
 
 # c. Archive KMGraph content from docs/ before moving (preserve for validation and recovery)
 ARCHIVE_DATE=$(date +%Y-%m-%d)
@@ -449,16 +487,16 @@ fi
 PROJECT_ROOT=$(pwd)
 OLD_PATH="$PROJECT_ROOT/docs"
 jq ".graphs[\"$kg_name\"].path = \"$PROJECT_ROOT/knowledge\"" \
-  ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
-mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+  "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
+mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
 
 # d2. Update sibling KG entries pointing to the same old path (exact match only)
 jq -r '.graphs | to_entries[] | select(.value.path == "'"$OLD_PATH"'") | .key' \
-  ~/.claude/kg-config.json | while read sibling; do
+  "$CONFIG_PATH" | while read sibling; do
   [ "$sibling" = "$kg_name" ] && continue
   jq ".graphs[\"$sibling\"].path = \"$PROJECT_ROOT/knowledge\"" \
-    ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
-  mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+    "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
+  mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
   echo "Updated sibling KG config path: $sibling → $PROJECT_ROOT/knowledge"
 done
 
@@ -578,8 +616,8 @@ fi
 
 # f. Clear migration flag
 jq 'del(.graphs["'"$kg_name"'"].migration_in_progress)' \
-  ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
-mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+  "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
+mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
 
 echo "✅ Graph moved to knowledge/. Config updated."
 echo ""
@@ -696,7 +734,7 @@ if [ -f "knowledge/rules.md" ]; then
 fi
 
 # i. Personal KG prompt — offer to run /kmgraph:kmg-init at user level if not already set up
-PERSONAL_KG_EXISTS=$(jq -r '.graphs | to_entries[] | select(.value.type == "personal") | .key' ~/.claude/kg-config.json 2>/dev/null)
+PERSONAL_KG_EXISTS=$(jq -r '.graphs | to_entries[] | select(.value.type == "personal") | .key' "$CONFIG_PATH" 2>/dev/null)
 if [ -z "$PERSONAL_KG_EXISTS" ]; then
   echo ""
   echo "  Your project KG is now at knowledge/ — want to set up a personal KG too?"
@@ -726,8 +764,15 @@ Re-running `/kmgraph:kmg-init` is the supported way to trigger the wiki pass at 
 no separate command needed.
 
 ```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
+
 WIKI_DONE=$(jq -r --arg kg "$kg_name" '.graphs[$kg].wiki_pass_complete // false' \
-  ~/.claude/kg-config.json 2>/dev/null)
+  "$CONFIG_PATH" 2>/dev/null)
 if [ "$WIKI_DONE" = "true" ]; then
   echo "ℹ️  Wiki pass already complete — skipping. Re-run /kmgraph:kmg-init to force recheck."
   # exit_step
@@ -802,9 +847,16 @@ Processing:
 Write `wiki_pass_complete: true` to the KG config entry:
 
 ```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
+
 jq '.graphs["'"$kg_name"'"].wiki_pass_complete = true' \
-  ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
-mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+  "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
+mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
 ```
 
 **`--dry-run` mode (optional):** If `--dry-run` was passed to `/kmgraph:kmg-init`, print what would change per file without writing anything and do not set the `wiki_pass_complete` flag.
@@ -818,7 +870,14 @@ The search index (`.fts5.db`) is local-only and gitignored — it does not survi
 The `kg_fts5_rebuild` tool indexes `lessons-learned/`, `decisions/`, `sessions/`, and `knowledge/` at the KG root. If those directories do not exist at the configured root but do exist at `{kgPath}/docs/`, the configured path is wrong — the rebuild will return 0 files and search will be broken.
 
 ```bash
-KG_ROOT=$(jq -r '.graphs["'"$kg_name"'"].path' ~/.claude/kg-config.json)
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
+
+KG_ROOT=$(jq -r '.graphs["'"$kg_name"'"].path' "$CONFIG_PATH")
 
 # Check for content directories at root
 DIRS_AT_ROOT=0
@@ -994,9 +1053,16 @@ What prefix should be used for lessons in this category?
 ### Step 1.1: Check if config exists
 
 ```bash
-if [ ! -f ~/.claude/kg-config.json ]; then
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
+
+if [ ! -f "$CONFIG_PATH" ]; then
     # First-time setup - create config with default structure
-    cat > ~/.claude/kg-config.json <<'EOF'
+    cat > "$CONFIG_PATH" <<'EOF'
 {
   "version": "1.0.0",
   "active": null,
@@ -1232,8 +1298,15 @@ This step is idempotent — re-running `/kmgraph:kmg-init` at any time will re-c
 and run the pass if not yet complete.
 
 ```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
+
 WIKI_DONE=$(jq -r --arg kg "$kg_name" '.graphs[$kg].wiki_pass_complete // false' \
-  ~/.claude/kg-config.json 2>/dev/null)
+  "$CONFIG_PATH" 2>/dev/null)
 if [ "$WIKI_DONE" = "true" ]; then
   echo "ℹ️  Wiki pass already complete — skipping."
   # exit_step
@@ -1381,7 +1454,7 @@ Which platforms are you using? (select all that apply)
 
 **Headless mode** (`CLAUDE_CODE_HEADLESS=1`): Skip all prompts. Write empty tier_map stubs. Log: `"Headless mode — tier mapping skipped. Edit ~/.kmgraph/me.md YAML frontmatter to configure."`
 
-4. Register in `~/.claude/kg-config.json`:
+4. Register in `~/.kmgraph/kg-config.json`:
    ```json
    "personal": {
      "name": "personal",
@@ -1681,14 +1754,21 @@ Output confirmation per platform:
 
 #### Config Registration
 
-After writing each platform file, register the platform name in `~/.claude/kg-config.json` under the active KG entry's `platforms` array. Use the canonical names: `"gemini"`, `"cursor"`, `"windsurf"`, `"continue"`, `"copilot"`, `"aider"`.
+After writing each platform file, register the platform name in `~/.kmgraph/kg-config.json` under the active KG entry's `platforms` array. Use the canonical names: `"gemini"`, `"cursor"`, `"windsurf"`, `"continue"`, `"copilot"`, `"aider"`.
 
 ```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
+# one-time migration: seed from the legacy ~/.claude location if the new path is absent
+if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
+  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
+fi
+
 # Add platform to the platforms array for the active KG
 # If the "platforms" field is absent, initialize it as an empty array first
 jq ".graphs[\"$kg_name\"].platforms = (.graphs[\"$kg_name\"].platforms // []) + [\"$platform_name\"]" \
-  ~/.claude/kg-config.json > ~/.claude/kg-config.json.tmp
-mv ~/.claude/kg-config.json.tmp ~/.claude/kg-config.json
+  "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
+mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
 ```
 
 Do not error if the `platforms`, `autoSwitch`, or `notification` fields are absent in an existing config entry — treat all missing fields as their defaults:

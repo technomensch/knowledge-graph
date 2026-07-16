@@ -169,17 +169,17 @@ project/
 ```bash
 # 1. Copy template
 cp core/default-templates/lessons-learned/lesson-template.md \
-   docs/lessons-learned/process/my-lesson.md
+   knowledge/lessons-learned/process/my-lesson.md
 
 # 2. Fill in sections
-vim docs/lessons-learned/process/my-lesson.md
+vim knowledge/lessons-learned/process/my-lesson.md
 
 # 3. Update category README
-vim docs/lessons-learned/process/README.md
+vim knowledge/lessons-learned/process/README.md
 # Add link to my-lesson.md
 
 # 4. Extract to knowledge graph (manual)
-vim docs/knowledge/patterns.md
+vim knowledge/concepts/patterns.md
 # Add pattern extracted from lesson
 
 # 5. Commit
@@ -334,4 +334,4 @@ Any MCP-compatible platform can access.
 - **Patterns Guide:** [PATTERNS-GUIDE.md](../pillars/capturing/capture-patterns.md)
 - **Workflows:** [WORKFLOWS.md](../pillars/recalling/session-memory.md)
 - **Platform Adaptation:** [PLATFORM-ADAPTATION.md](./PLATFORM-ADAPTATION.md)
-- **Examples:** [../examples/](../examples/)
+- **Examples:** `examples/`

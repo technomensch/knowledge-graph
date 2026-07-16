@@ -24,25 +24,25 @@ Contributors share the knowledge graph by granting access to the Git repository 
 
 ## 5. Recognizing a populated knowledge graph
 **What does a populated knowledge graph look like?**
-A populated knowledge graph contains detailed markdown files in the `docs/knowledge` layer, robust technical context in the `docs/decisions` layer (ADRs), and specific actionable insights in the `docs/lessons-learned/` directory.
+A populated knowledge graph contains detailed markdown files in the `knowledge/concepts` layer, robust technical context in the `knowledge/decisions` layer (ADRs), and specific actionable insights in the `knowledge/lessons-learned/` directory.
 
 ## 6. Uninstalling or resetting
 **How do contributors uninstall or reset the knowledge graph?**
-To completely reset, contributors delete the cloned repository folder from the local machine. To clear specific concepts or lessons while keeping the structure, contributors delete the markdown files within `docs/knowledge/` or `docs/lessons-learned/` and commit the removals.
+To completely reset, contributors delete the cloned repository folder from the local machine. To clear specific concepts or lessons while keeping the structure, contributors delete the markdown files within `knowledge/concepts/` or `knowledge/lessons-learned/` and commit the removals.
 
 ## 7. Removing example files
 
 **Can the `core/examples/` directory be deleted after installation?**
 
-The example files in `core/examples/` can be safely deleted — the plugin does not depend on them at runtime. However, because they are tracked in git, a `git pull` will restore them. Users who delete the examples should be aware that they may reappear after updating the plugin. A future release may move examples to an opt-in location; see [ADR-011](decisions/ADR-011-defer-update-notifications.md) for background.
+The example files in `core/examples/` can be safely deleted — the plugin does not depend on them at runtime. However, because they are tracked in git, a `git pull` will restore them. Users who delete the examples should be aware that they may reappear after updating the plugin. A future release may move examples to an opt-in location; see [ADR-011](https://github.com/technomensch/knowledge-graph/blob/main/knowledge/decisions/ADR-011-defer-update-notifications.md) for background.
 
 ## 8. Checking for plugin updates
 
 **How do Tier 2 (MCP IDE) and Tier 3 (template-only) users know when a new version is available?**
 
-Currently, Tier 2 and Tier 3 users must check the [GitHub releases page](https://github.com/technomensch/knowledge-graph/releases) manually to discover updates. A `kg_version` MCP tool and `--version` CLI flag are planned for a future release to provide version reporting from within the IDE. See [ADR-011](decisions/ADR-011-defer-update-notifications.md) for the full design decision.
+Currently, Tier 2 and Tier 3 users must check the [GitHub releases page](https://github.com/technomensch/knowledge-graph/releases) manually to discover updates. A `kg_version` MCP tool and `--version` CLI flag are planned for a future release to provide version reporting from within the IDE. See [ADR-011](https://github.com/technomensch/knowledge-graph/blob/main/knowledge/decisions/ADR-011-defer-update-notifications.md) for the full design decision.
 
 ## 9. Related Documentation
 
-- [Getting Started](GETTING-STARTED.md) - Initial setup and initialization.
+- [Quickstart](quickstart) - Initial setup and initialization.
 - [Concepts](concepts/why-kmgraph.md) - Canonical definitions of terms used in the Knowledge Graph.

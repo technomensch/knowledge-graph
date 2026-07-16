@@ -308,7 +308,7 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 - Capture while the problem is fresh (don't wait)
 - Include error messages verbatim
 - Note what DIDN'T work (helps future you)
-- Level routing: use "user level" for cross-project patterns; "for this project" for codebase-specific lessons. See [Personal vs Project KGs](../PERSONAL-V-PROJECT.md) for details.
+- Level routing: use "user level" for cross-project patterns; "for this project" for codebase-specific lessons. See [Personal vs Project KGs](../pillars/organizing/personal-vs-project) for details.
 - If the active KG differs from the project's own KG, the command stops before writing and asks which graph to use
 
 ---
@@ -637,7 +637,7 @@ Knowledge Graphs:
    Git: selective (architecture/patterns committed, process gitignored)
    Last used: 2026-02-13 15:45
 
-2. ai-research — ~/.claude/knowledge-graphs/ai-research/
+2. ai-research — ~/.kmgraph/knowledge-graphs/ai-research/
    Categories: architecture, process, ml-patterns (custom)
    Git: all committed
    Last used: 2026-02-10 12:00
@@ -756,7 +756,7 @@ Scan patterns: emails, API keys, custom patterns (2)
 Action: Block commits with sensitive data
 
 Test the hook:
-  git add docs/knowledge/patterns.md
+  git add knowledge/concepts/patterns.md
   git commit -m "test"
 ```
 
@@ -1031,8 +1031,8 @@ With `--user-facing`:
 
 **Example**:
 ```bash
-/kmgraph:kmg-link-issue docs/lessons-learned/process/my-lesson.md --issue 42
-/kmgraph:kmg-link-issue docs/decisions/ADR-005.md --issue 38 --pr 40
+/kmgraph:kmg-link-issue knowledge/lessons-learned/process/my-lesson.md --issue 42
+/kmgraph:kmg-link-issue knowledge/decisions/ADR-005.md --issue 38 --pr 40
 ```
 
 ---
@@ -1368,7 +1368,7 @@ flowchart TD
 
   Structured formats
 
-- [Examples](examples/)
+- Examples (`examples/`)
 
   Real samples
 
@@ -1416,7 +1416,7 @@ flowchart TD
 
   Plain-English definitions of every term and pattern
 
-- [Examples](examples/)
+- Examples (`examples/`)
 
   Real-world completed examples of lessons, ADRs, and KG entries
 

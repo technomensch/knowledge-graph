@@ -10,9 +10,11 @@ import { registerCaptureTool } from "./tools/capture.js";
 import { registerUpgradeTool } from "./tools/upgrade.js";
 import { registerVersionTool } from "./tools/version.js";
 
+declare const __SERVER_VERSION__: string;
+
 const server = new McpServer({
   name: "knowledge-graph",
-  version: "0.3.10",
+  version: typeof __SERVER_VERSION__ !== "undefined" ? __SERVER_VERSION__ : "0.0.0",
 });
 
 // Register tools (11 core tools)

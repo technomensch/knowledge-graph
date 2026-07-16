@@ -145,16 +145,16 @@ Sources consulted while solving this problem:
 ## Related Documentation
 
 **Knowledge Graph:**
-- [Link to KG entry](../../knowledge/file.md#section) — [Brief context]
+- Link to KG entry (`../../knowledge/file.md#section`) — [Brief context]
 
 **Architecture Decisions:**
-- [Link to ADR](../../decisions/ADR-XXX.md) — [Decision context]
+- Link to ADR (`../../decisions/ADR-XXX.md`) — [Decision context]
 
 **Other Lessons:**
-- [Link to related lesson](./category/Other_Lesson.md) — [Relation]
+- Link to related lesson (`./category/Other_Lesson.md`) — [Relation]
 
 **Meta-Issues:**
-- [Link to meta-issue](../../issues/meta-issue-name/) — [Context if part of larger investigation]
+- Link to meta-issue (`../../issues/meta-issue-name/`) — [Context if part of larger investigation]
 
 ---
 

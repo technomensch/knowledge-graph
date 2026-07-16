@@ -37,11 +37,11 @@ Check whether `mcp__plugin_context-mode_context-mode__ctx_batch_execute` is avai
 
 ## Step 1: Get Active KG + Scan for New/Modified Lessons
 
-Read `~/.claude/kg-config.json` to get the active KG name and path.
+Read `~/.kmgraph/kg-config.json` to get the active KG name and path.
 
 ```bash
-active_kg=$(jq -r '.active' ~/.claude/kg-config.json)
-kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.claude/kg-config.json)
+active_kg=$(jq -r '.active' ~/.kmgraph/kg-config.json)
+kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.kmgraph/kg-config.json)
 ```
 
 Scan for recently modified lessons:
@@ -173,7 +173,7 @@ Call `kg_fts5_status` to check whether the search index exists for the active KG
 - Output: "FTS5 index: refreshed (N files updated, M skipped)"
 
 **If `exists === false` AND `fts5_declined` is not true:**
-- Check `~/.claude/kg-config.json` for `graphs[<activeName>].fts5_declined`
+- Check `~/.kmgraph/kg-config.json` for `graphs[<activeName>].fts5_declined`
 - Unless `--auto`: ask "No search index found. Build FTS5 index for faster /kmgraph:kmg-recall? [y/n]"
 - If `--auto`: skip silently
 

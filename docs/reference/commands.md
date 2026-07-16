@@ -128,7 +128,7 @@ title: Commands Reference
 /kmgraph:kmg-meta-issue --add-attempt 002 "OAuth2 with JWT"
 /kmgraph:kmg-meta-issue --status
 /kmgraph:kmg-update-issue-plan --pr=42
-/kmgraph:kmg-link-issue docs/lessons-learned/process/my-lesson.md --issue 42
+/kmgraph:kmg-link-issue knowledge/lessons-learned/process/my-lesson.md --issue 42
 ```
 
 ---
@@ -152,7 +152,7 @@ These flags appear across multiple commands and share consistent behavior.
 
 ## Related Guides
 
-- [Getting Started](../GETTING-STARTED.md) — Installation and first lesson (5 min)
+- [Quickstart](../quickstart) — Installation and first lesson (5 min)
 - [Cheat Sheet](../CHEAT-SHEET.md) — One-page quick reference
 - [Concepts Guide](../concepts/why-kmgraph.md) — Plain-English definitions of every term and pattern
 - [Platform Adaptation](PLATFORM-ADAPTATION.md) — Cursor, Windsurf, Continue, VS Code, Aider

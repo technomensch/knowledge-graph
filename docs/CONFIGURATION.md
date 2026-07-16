@@ -4,7 +4,7 @@ title: Configuration
 
 This guide covers configuring and customizing the Knowledge Management Graph after installation.
 
-> **Installation instructions**: See [GETTING-STARTED.md](GETTING-STARTED.md) for installation steps.
+> **Installation instructions**: See [Quickstart](quickstart) for installation steps.
 
 ---
 
@@ -51,7 +51,7 @@ mkdir -p docs/knowledge-graph/{lessons-learned,decisions,knowledge,sessions}
 Create knowledge graph entries that reference your existing docs:
 
 ```markdown
-# In docs/knowledge/patterns.md
+# In knowledge/concepts/patterns.md
 
 ## Existing Authentication Pattern
 
@@ -92,7 +92,7 @@ The knowledge graph is your project memory. Use it for:
 
 **Team conventions:**
 ```markdown
-# In docs/knowledge/README.md
+# In knowledge/concepts/README.md
 
 ## Team Conventions
 
@@ -179,7 +179,7 @@ platforms:
 
 When a dispatch asks for a tier whose mapped model is missing or unreachable (local server offline, model not pulled, API error), the resolver falls back down the chain: `powerful-tier → standard-tier → fast-tier`. The first tier that resolves to a reachable model is used, and the collapse event is logged once per session. If `fast-tier` also fails, the resolver halts with an actionable error including remediation steps. Skills that must not downgrade, such as `stuck-work-escalation`, declare `required_tier: powerful-tier` in their frontmatter and halt rather than collapse.
 
-See [Set up your identity files](guides/me-and-rules.md) for the full `me.md` reference.
+See "Set up your identity files" (`me.md`) for the full reference.
 
 ---
 
@@ -278,7 +278,7 @@ export KMGRAPH_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
 KMGRAPH_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
 ```
 
-> **Note:** `docs/sessions/` and `.env` are gitignored by default. Never commit a webhook URL to version control.
+> **Note:** `knowledge/sessions/` and `.env` are gitignored by default. Never commit a webhook URL to version control.
 
 **3. Verify it works**
 
@@ -288,7 +288,7 @@ After capturing your next lesson or ADR, you should receive a notification withi
 
 ```json
 {
-  "text": "📝 KMGraph: New lesson captured — 'JWT Timestamp Unit Mismatch' in docs/lessons-learned/"
+  "text": "📝 KMGraph: New lesson captured — 'JWT Timestamp Unit Mismatch' in knowledge/lessons-learned/"
 }
 ```
 
@@ -321,8 +321,8 @@ Add custom categories:
 
 ```bash
 # Create new category
-mkdir -p docs/lessons-learned/security
-touch docs/lessons-learned/security/README.md
+mkdir -p knowledge/lessons-learned/security
+touch knowledge/lessons-learned/security/README.md
 
 # Update auto-detection in skills
 vim .claude/skills/knowledge-capture.md
@@ -393,11 +393,11 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 ## Next Steps
 
 
-- **[Capture Your First Lesson](GETTING-STARTED.md#step-4-capture-the-first-lesson)**
+- **[Capture Your First Lesson](quickstart#step-3--capture-your-first-lesson)**
 
   Document what you've learned with `/kmgraph:kmg-capture-lesson` while details are fresh.
 
-- **[Study Real Examples](examples/)**
+- **Study Real Examples** (`examples/`)
 
   Review completed examples of lessons learned, ADRs, and knowledge graph entries.
 
@@ -412,7 +412,7 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 
 ### **Getting started**
 
-- [Getting Started Guide](GETTING-STARTED.md)
+- [Quickstart](quickstart)
 
   Installation and setup walkthrough
 
@@ -430,11 +430,11 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 
   Plain-English definitions of all terms and patterns
 
-- [Examples](examples/)
+- Examples (`examples/`)
 
   Real-world lesson, ADR, and KG entry examples
 
-- [Pattern Writing Guide](reference/PATTERNS-GUIDE.md)
+- [Pattern Writing Guide](https://github.com/technomensch/knowledge-graph/blob/main/core/docs/PATTERNS-GUIDE.md)
 
   How to write high-quality entries
 
@@ -444,7 +444,7 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
 
   System design and how components work together
 
-- [Manual Workflows](reference/WORKFLOWS.md)
+- [Manual Workflows](pillars/recalling/session-memory.md)
 
   Step-by-step processes for non-Claude platforms
 
@@ -461,4 +461,4 @@ Quality > Quantity. 5 valuable lessons > 50 routine entries.
   Starting scaffolds for lessons, ADRs, and KG entries
 ---
 
-**Need help?** Check the [examples](examples/) or adapt the templates to your workflow.
+**Need help?** Check the examples (`examples/`) or adapt the templates to your workflow.

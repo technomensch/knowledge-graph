@@ -162,12 +162,12 @@ An entry passes review when:
 - [ ] **Actionability**: "When to use" is too vague - "When you have configuration" applies to everything
 
 ### Recommendations
-1. Update source lesson (docs/lessons-learned/architecture/three-tier-sync.md) to add KG cross-reference
+1. Update source lesson (knowledge/lessons-learned/architecture/three-tier-sync.md) to add KG cross-reference
 2. Rewrite "When to use": "When configuration must be split across: (1) modular source files, (2) aggregated master, (3) optimized UI interface"
 
 ### Files to Check
-- docs/lessons-learned/architecture/three-tier-sync.md:15 - Add KG entry reference
-- docs/knowledge/patterns.md:87 - Update "When to use" section
+- knowledge/lessons-learned/architecture/three-tier-sync.md:15 - Add KG entry reference
+- knowledge/concepts/patterns.md:87 - Update "When to use" section
 ```
 
 ---

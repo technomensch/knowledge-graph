@@ -79,7 +79,7 @@ done || echo "None found"
 | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) | Remove stale server entry |
 | `%APPDATA%/Claude/claude_desktop_config.json` (Windows) | Remove stale server entry |
 | `.vscode/mcp.json` (workspace) | Remove stale server entry |
-| `~/.claude/kg-config.json` | Update repo path if repo was renamed/moved |
+| `~/.kmgraph/kg-config.json` | Update repo path if repo was renamed/moved |
 
 After cleanup, re-run the scan to confirm zero results, then proceed to Step 1.
 
@@ -150,7 +150,7 @@ The inspector runs four checks in order and reports what it finds before asking 
 | Check | What it looks for |
 |-------|-------------------|
 | **a. Directories** | Missing subdirectories (`knowledge/`, `decisions/`, `sessions/`, etc.) |
-| **b. Config fields** | Missing fields in `~/.claude/kg-config.json` introduced in newer versions |
+| **b. Config fields** | Missing fields in `~/.kmgraph/kg-config.json` introduced in newer versions |
 | **c. Templates** | Template files that have been updated or added since your install |
 | **d. Platform split** | Claude-specific tool directives in `knowledge/rules.md` that belong in `CLAUDE.md` |
 | **e. Wiki pass** | Bare `ADR-NNN`, `ENH-NNN`, `#NNN`, and lesson filename references not yet converted to `[[wiki links]]` — runs once per KG, skipped on re-run if already complete |
@@ -247,7 +247,7 @@ done
 | **v0.5.10.8–v0.5.11** | No upgrade action required. Security fix (esbuild HIGH in mcp-server) is automatic after plugin reload. |
 | **v0.6.0** | Breaking change: all skill/command names now require the `kmg-` prefix. Search and replace `kmgraph:` to `kmgraph:kmg-` in existing personal `rules.md`, `triggers.md`, and config files. See ADR-053 for the full migration guide. |
 | **v0.6.5–v0.6.17** | No upgrade action required. Bug fixes and improvements (init wizard directory scaffolding, upgrade inspector, POSIX hook compatibility, template handling, FTS5 indexing) and chat-extraction reliability fixes (message-loss, format-drift, gemini project-scoping, rebuild safety) are automatic after plugin reload. |
-| **v0.6.18** | Behavior change (not silent): lifecycle hooks (`session-start`, `session-end`, etc.) now honor the `KG_CONFIG_PATH` environment variable override (defaults to `~/.claude/kg-config.json` if unset). Data-loss fix: hook scripts previously could overwrite the real global config during test runs; now fully sandboxed via env var. No upgrade action required; behavior change is automatic after plugin reload. **⚠️ Advisory:** if you ran `tests/test-hooks.sh` or `tests/test-stop-hook.sh` before this version and the process was interrupted, check your `~/.claude/kg-config.json` for unexpected `test-kg` entries with placeholder timestamps — re-register your graphs via `/kmgraph:kmg-init` if needed. |
+| **v0.6.18–v0.6.19** | No upgrade action required. `KG_CONFIG_PATH` hook behavior change (v0.6.18) and docs-site link fixes plus the completed `~/.kmgraph/` config-path migration across commands/agents/scripts (v0.6.19, no runtime behavior change beyond what v0.6.18 already introduced) are automatic after plugin reload. **⚠️ Advisory (v0.6.18):** if you ran `tests/test-hooks.sh` or `tests/test-stop-hook.sh` before v0.6.18 and the process was interrupted, check your `~/.claude/kg-config.json` for unexpected `test-kg` entries with placeholder timestamps — re-register your graphs via `/kmgraph:kmg-init` if needed. |
 
 After the wizard completes, your existing lessons, ADRs, sessions, and chat history are untouched.
 
@@ -566,8 +566,8 @@ done
 #### 2C.4: Create Configuration
 
 ```bash
-mkdir -p "$HOME/.claude"
-cat > "$HOME/.claude/kg-config.json" << 'CONFIGEOF'
+mkdir -p "$HOME/.kmgraph" 2>/dev/null
+cat > "$HOME/.kmgraph/kg-config.json" << 'CONFIGEOF'
 {
   "version": "1.0.0",
   "active": "KG_NAME",
@@ -634,7 +634,7 @@ Create a new file in `decisions/` following the `ADR-template.md` pattern.
 
 ## Configuration
 
-The knowledge graph config is stored at `~/.claude/kg-config.json`.
+The knowledge graph config is stored at `~/.kmgraph/kg-config.json`.
 ```
 
 **After creating the instructions file, go to Step 3 (Initialize Knowledge Graph).**
@@ -666,7 +666,7 @@ Call the kg_config_init tool with:
 The configuration was already created in Step 2C.4. Verify it exists:
 
 ```bash
-cat "$HOME/.claude/kg-config.json"
+cat "$HOME/.kmgraph/kg-config.json"
 ```
 
 ---
@@ -677,12 +677,12 @@ Run these checks to confirm everything is working:
 
 **Check config exists:**
 ```bash
-[ -f "$HOME/.claude/kg-config.json" ] && echo "CONFIG_OK" || echo "CONFIG_MISSING"
+[ -f "$HOME/.kmgraph/kg-config.json" ] && echo "CONFIG_OK" || echo "CONFIG_MISSING"
 ```
 
 **Check directory structure:**
 ```bash
-KG_PATH=$(node -e "const c=require('$HOME/.claude/kg-config.json'); const g=c.graphs[c.active]; console.log(g.path.replace(/^~/, require('os').homedir()))" 2>/dev/null || echo "")
+KG_PATH=$(node -e "const c=require('$HOME/.kmgraph/kg-config.json'); const g=c.graphs[c.active]; console.log(g.path.replace(/^~/, require('os').homedir()))" 2>/dev/null || echo "")
 [ -d "$KG_PATH/knowledge" ] && echo "DIRS_OK" || echo "DIRS_MISSING"
 [ -d "$KG_PATH/lessons-learned" ] && echo "LESSONS_OK" || echo "LESSONS_MISSING"
 [ -d "$KG_PATH/decisions" ] && echo "DECISIONS_OK" || echo "DECISIONS_MISSING"
@@ -830,7 +830,7 @@ See [COMMAND-GUIDE.md](docs/COMMAND-GUIDE.md) for complete command reference.
 - Check IDE-specific MCP documentation for additional setup steps
 
 **Config file not found:**
-- Verify `~/.claude/kg-config.json` exists
+- Verify `~/.kmgraph/kg-config.json` exists
 - Run the init step again if needed
 
 **Templates not copied:**

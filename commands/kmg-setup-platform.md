@@ -21,7 +21,7 @@
 ## Step 1: Read Active KG Config
 
 ```bash
-cat ~/.claude/kg-config.json
+cat ~/.kmgraph/kg-config.json
 ```
 
 Extract:
@@ -163,7 +163,7 @@ summary capabilities and mention the kg_search MCP tool.
 ## Step 7: Register Platforms in Config
 
 After writing each platform file, add the platform name to the `platforms` array in
-`~/.claude/kg-config.json` for the active KG:
+`~/.kmgraph/kg-config.json` for the active KG:
 
 ```bash
 # Platform names: "gemini", "cursor", "windsurf", "continue", "copilot", "aider"

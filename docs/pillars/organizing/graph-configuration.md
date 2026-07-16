@@ -13,7 +13,7 @@ KMGraph is designed to be configured once at init and then extended gradually as
 When you run `kg_config_init`, KMGraph scaffolds the core directory structure under your chosen storage path:
 
 ```
-knowledge/           ← project KG root (or .knowledge/, docs/knowledge/, etc.)
+knowledge/           ← project KG root (or .knowledge/, knowledge/concepts/, etc.)
 ├── lessons-learned/
 ├── decisions/
 ├── knowledge/
@@ -44,8 +44,8 @@ This prompts for the category name, creates the directory, adds a `README.md`, a
 ### Manual creation
 
 ```bash
-mkdir -p docs/lessons-learned/security
-touch docs/lessons-learned/security/README.md
+mkdir -p knowledge/lessons-learned/security
+touch knowledge/lessons-learned/security/README.md
 ```
 
 Then update the category detection keywords in your knowledge-capture skill if you want auto-routing:

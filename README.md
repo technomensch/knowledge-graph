@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.6.18
+**Version:** 0.6.19
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -90,6 +90,12 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 ---
 
 ## v0.6.x Feature Highlights
+
+**v0.6.19 — 2026-07-16**
+
+- **`kg-config.json` write-path split-brain fully closed** (issue-14, GH #171) — the last 37 files still hardcoding the pre-migration `~/.claude/kg-config.json` path (across commands, agents, hook scripts, docs, and the CLI) now resolve `~/.kmgraph/kg-config.json` consistently, verified end-to-end by a 13-row operational acceptance-test matrix across both the MCP-tool and command/prompt surfaces.
+- **Personal-KG search index routing fixed** (issue-15, GH #172) — captures into a personal KG now build the search index in the correct bucket instead of silently falling back to linear scan.
+- **28 broken docs-site links repaired** — dead redirects left over from the ADR-027 restructure, misc broken relative paths, and template placeholder links; issue-13 (GH #170) tracks the separate gap that let this class of regression go undetected for months.
 
 **v0.6.18 — 2026-07-11**
 
@@ -353,6 +359,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.6.18 (2026-07-11)
+**Current Version:** v0.6.19 (2026-07-16)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info

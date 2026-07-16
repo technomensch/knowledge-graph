@@ -263,7 +263,7 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 **Learning**:
 - [Command Reference Guide](reference/command-guide.md) — Complete command documentation with examples and learning path
 - [Concepts Guide](concepts/why-kmgraph.md) — Plain-English definitions and explanations of all key terms
-- [Examples](examples/) — Real-world lesson, ADR, and KG entry examples
+- Examples (`examples/`) — Real-world lesson, ADR, and KG entry examples
 
 **Advanced topics**:
 - [Workflows](pillars/recalling/session-memory.md) — Step-by-step guides for manual workflows

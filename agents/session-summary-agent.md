@@ -40,9 +40,9 @@ These flags are set by the dispatcher (`session-summary` command) via `gov-captu
 1. Read flag value (default: `--active` if none passed)
 2. Resolve `$target_path`:
    - `--user` → `~/.kmgraph/sessions/`
-   - `--project` → read `~/.claude/kg-config.json`, find graph matching current working directory → `{graph.path}/sessions/`
-   - `--named=<kg>` → read `~/.claude/kg-config.json`, find graph by name → `{graph.path}/sessions/`
-   - `--active` → read `~/.claude/kg-config.json` → `{active_kg_path}/sessions/`
+   - `--project` → read `~/.kmgraph/kg-config.json`, find graph matching current working directory → `{graph.path}/sessions/`
+   - `--named=<kg>` → read `~/.kmgraph/kg-config.json`, find graph by name → `{graph.path}/sessions/`
+   - `--active` → read `~/.kmgraph/kg-config.json` → `{active_kg_path}/sessions/`
 3. Store `$restore_kg` = current active KG path (only when `--project` triggers a switch)
 
 ### Always surface resolved target
@@ -97,7 +97,7 @@ Go directly to [Snapshot Mode](#snapshot-mode) below. Skip Steps 1–9.
 
 ### S1: Resolve output path
 
-Read `~/.claude/kg-config.json` → active KG path → `{active_kg_path}/sessions/`.
+Read `~/.kmgraph/kg-config.json` → active KG path → `{active_kg_path}/sessions/`.
 
 Derive unified filename:
 ```bash
@@ -254,7 +254,7 @@ ctxmode_available = ctxmode_db is not None
 
 ## Step 1: Active KG / CWD Guard
 
-Read `~/.claude/kg-config.json`. Extract `active` key and resolve the active graph's `path`.
+Read `~/.kmgraph/kg-config.json`. Extract `active` key and resolve the active graph's `path`.
 
 Compare the active graph's project root against the current working directory. If they do not match:
 
@@ -269,7 +269,7 @@ Block all further steps until the user confirms or switches. Do not proceed with
 Before gathering context, check if a session file already exists for today's branch:
 
 ```bash
-active_kg=$(jq -r '.graphs[.active].path' ~/.claude/kg-config.json)
+active_kg=$(jq -r '.graphs[.active].path' ~/.kmgraph/kg-config.json)
 session_dir="${active_kg}/sessions"
 branch_slug=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')
 today=$(date +%Y-%m-%d)
@@ -400,7 +400,7 @@ git rev-parse --abbrev-ref HEAD
 git rev-parse --short HEAD
 git status --porcelain
 ls -t docs/plans/*.md 2>/dev/null | head -1
-jq -r '.graphs[.active].name' ~/.claude/kg-config.json
+jq -r '.graphs[.active].name' ~/.kmgraph/kg-config.json
 ```
 
 **For Open Issues:**
@@ -413,7 +413,7 @@ grep -rl "status: draft\|status: proposed" knowledge/decisions/ knowledge/enhanc
 
 **For Session History:**
 ```bash
-active_kg=$(jq -r '.graphs[.active].path' ~/.claude/kg-config.json)
+active_kg=$(jq -r '.graphs[.active].path' ~/.kmgraph/kg-config.json)
 find "${active_kg}/sessions" -name "*.md" -not -name "README.md" -not -name "*template*" -type f 2>/dev/null | sort | tail -3
 ```
 

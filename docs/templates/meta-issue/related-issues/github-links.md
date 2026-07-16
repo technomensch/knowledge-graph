@@ -22,8 +22,8 @@ Links between this meta-issue and GitHub issues/PRs.
 **Status:** [Open | Closed]
 
 **Attempts Referenced:**
-- [Attempt 001](../attempts/001-baseline/)
-- [Attempt 002](../attempts/002-approach/)
+- Attempt 001 (`../attempts/001-baseline/`)
+- Attempt 002 (`../attempts/002-approach/`)
 
 ---
 
@@ -33,7 +33,7 @@ Links between this meta-issue and GitHub issues/PRs.
 
 **URL:** https://github.com/owner/repo/pull/YYY
 
-**Attempt:** [Link to attempt folder](../attempts/NNN-name/)
+**Attempt:** Link to attempt folder (`../attempts/NNN-name/`)
 
 **Outcome:** [Merged | Closed | Open]
 

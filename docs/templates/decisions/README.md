@@ -4,7 +4,7 @@ title: Readme
 
 # Architecture Decision Records (ADRs)
 
-**Navigation**: [Home](../../index.md) > [Getting Started](../../GETTING-STARTED.md) > [Manual Workflows](../../WORKFLOWS.md) > Templates
+**Navigation**: Home > Getting Started > Manual Workflows > Templates
 
 Formal documentation of significant architecture decisions.
 
@@ -23,20 +23,20 @@ Formal documentation of significant architecture decisions.
 
 [Auto-populated when ADRs are created]
 
-- [ADR-001: Title](ADR-001-title.md) — **Status:** Accepted — [Brief description]
+- ADR-001: Title (`ADR-001-title.md`) — **Status:** Accepted — [Brief description]
 
 ---
 
 ## By Category
 
 ### Architecture
-- [ADR-XXX](ADR-XXX-title.md) — [Topic]
+- ADR-XXX (`ADR-XXX-title.md`) — [Topic]
 
 ### Process
-- [ADR-XXX](ADR-XXX-title.md) — [Topic]
+- ADR-XXX (`ADR-XXX-title.md`) — [Topic]
 
 ### Technology Choices
-- [ADR-XXX](ADR-XXX-title.md) — [Topic]
+- ADR-XXX (`ADR-XXX-title.md`) — [Topic]
 
 ---
 
@@ -74,7 +74,7 @@ All sections are manually filled:
 - If editing an existing ADR manually, replace all `[bracketed placeholders]` with your content
 
 **Examples:**
-See [core/examples/decisions/](../../examples/decisions/) for filled-out ADR examples.
+See `core/examples/decisions/` for filled-out ADR examples.
 
 ---
 
@@ -116,5 +116,5 @@ ADRs follow a lightweight format:
 - [ADR template](ADR-template.md) - Starting scaffold
 
 **Resources**:
-- [Real Examples](../../examples/decisions/) - Filled-out ADRs
-- [Pattern Guide](../../PATTERNS-GUIDE.md) - Writing quality tips
+- Real Examples (`examples/decisions/`) - Filled-out ADRs
+- [Pattern Guide](https://github.com/technomensch/knowledge-graph/blob/main/core/docs/PATTERNS-GUIDE.md) - Writing quality tips

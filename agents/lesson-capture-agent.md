@@ -25,8 +25,8 @@ These flags are set by the `capture-lesson` command dispatcher via `gov-capture-
 1. Read flag (default: `--active`)
 2. Resolve `$target_path`:
    - `--user` → `~/.kmgraph/lessons-learned/`
-   - `--project` → read `~/.claude/kg-config.json`, find graph matching current working directory → `{graph.path}/lessons-learned/`
-   - `--named=<kg>` → read `~/.claude/kg-config.json`, find graph by name → `{graph.path}/lessons-learned/`
+   - `--project` → read `~/.kmgraph/kg-config.json`, find graph matching current working directory → `{graph.path}/lessons-learned/`
+   - `--named=<kg>` → read `~/.kmgraph/kg-config.json`, find graph by name → `{graph.path}/lessons-learned/`
    - `--active` → `{active_kg_path}/lessons-learned/`
 3. Store `$restore_kg` = current active KG (only when `--project` triggers a switch)
 
@@ -56,7 +56,7 @@ When `--user`, `--project`, or `--named` is explicitly set, skip the Phase 0 mis
 
 Before any write, verify the active knowledge graph matches the current working directory.
 
-1. Read `~/.claude/kg-config.json` — get the active KG name and its `path`.
+1. Read `~/.kmgraph/kg-config.json` — get the active KG name and its `path`.
 2. Derive the project root from the KG path: if the path ends in `/docs`, the parent directory is the project root; otherwise the path itself is the root.
 3. Compare the derived root against the current working directory (use `pwd`).
 
@@ -119,7 +119,7 @@ Check whether the dispatching skill passed a context payload (`context_provided:
 
 Before asking the user for context, check whether a session summary was written today:
 
-1. Read `~/.claude/kg-config.json` to get the active KG path.
+1. Read `~/.kmgraph/kg-config.json` to get the active KG path.
 2. Look for any file matching `{kgPath}/sessions/YYYY-MM/*` where the filename contains today's date (format: `YYYY-MM-DD`).
 3. If found, ask:
 
@@ -211,7 +211,7 @@ Present the draft and prompt:
 
 ## Phase 4.5: KG Destination (multi-KG only)
 
-**Only run this phase if ≥2 KGs are registered in `~/.claude/kg-config.json`.**
+**Only run this phase if ≥2 KGs are registered in `~/.kmgraph/kg-config.json`.**
 
 Count entries in `graphs`. If only one KG exists, skip this phase and write to the active KG.
 

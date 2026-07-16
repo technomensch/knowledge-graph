@@ -12,7 +12,7 @@ Inspect and restore knowledge graph archives created by the knowledge-file-migra
 Before any subcommand executes, verify that an active knowledge graph is configured:
 
 ```bash
-KG_CONFIG="$HOME/.claude/kg-config.json"
+KG_CONFIG="$HOME/.kmgraph/kg-config.json"
 
 if [ ! -f "$KG_CONFIG" ]; then
   abort "No active knowledge graph found. Run \`/kmgraph:kmg-init\` first."

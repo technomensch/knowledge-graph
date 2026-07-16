@@ -663,6 +663,6 @@ grep -ri "YourCompany" .
 
 ## Related
 
-- **Pre-Commit Hook:** [../examples-hooks/pre-commit-sanitization.sh](../examples-hooks/pre-commit-sanitization.sh)
-- **Examples:** Study sanitized examples in [../examples/](../examples/)
+- **Pre-Commit Hook:** [core/examples-hooks/pre-commit-sanitization.sh](https://github.com/technomensch/knowledge-graph/blob/main/core/examples-hooks/pre-commit-sanitization.sh)
+- **Examples:** Study sanitized examples in `examples/`
 - **Privacy Note:** Always include in README before sharing

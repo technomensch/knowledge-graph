@@ -30,7 +30,7 @@ Chronological history of the investigation.
 **YYYY-MM-DD: Investigation Started**
 - Created meta-issue tracking
 - Initial hypothesis: [What we first thought]
-- [Attempt 001](../attempts/001-baseline/) started
+- Attempt 001 (`../attempts/001-baseline/`) started
 
 **YYYY-MM-DD: Belief Shift #[ID]**
 - Previous: [Old belief]

@@ -1,6 +1,6 @@
 {
   "name": "@knowledge-graph-plugin/mcp-server",
-  "version": "0.6.18",
+  "version": "0.6.19",
   "description": "MCP server for Knowledge Management Graph — cross-platform data layer for knowledge capture, search, and management",
   "main": "dist/index.js",
   "bin": {
@@ -12,8 +12,8 @@
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "build:bundle": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=cjs --outfile=dist/index.js --external:node-sqlite3-wasm \"--define:__SERVER_VERSION__=\\\"0.3.10\\\"\"",
-    "build:cli": "esbuild src/cli.ts --bundle --platform=node --target=node20 --format=cjs --outfile=dist/cli.js --external:node-sqlite3-wasm \"--define:__SERVER_VERSION__=\\\"0.3.10\\\"\"",
+    "build:bundle": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=cjs --outfile=dist/index.js --external:node-sqlite3-wasm \"--define:__SERVER_VERSION__=\\\"$npm_package_version\\\"\"",
+    "build:cli": "esbuild src/cli.ts --bundle --platform=node --target=node20 --format=cjs --outfile=dist/cli.js --external:node-sqlite3-wasm \"--define:__SERVER_VERSION__=\\\"$npm_package_version\\\"\"",
     "build:copy-wasm": "node -e \"const fs=require('fs');fs.rmSync('dist/node_modules/node-sqlite3-wasm',{recursive:true,force:true});fs.cpSync('node_modules/node-sqlite3-wasm','dist/node_modules/node-sqlite3-wasm',{recursive:true});console.log('copied node-sqlite3-wasm -> dist/node_modules/')\"",
     "build": "npm run build:bundle && npm run build:cli && npm run build:copy-wasm",
     "start": "node dist/index.js",
