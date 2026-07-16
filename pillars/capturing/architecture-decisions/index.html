@@ -5,8 +5,8 @@
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">Architecture Decisions | Knowledge Management Graph</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://technomensch.github.io/knowledge-graph/pillars/capturing/architecture-decisions"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Architecture Decisions | Knowledge Management Graph"><meta data-rh="true" name="description" content="&quot;We made a design choice. How do we record it so it&#x27;s not relitigated six months later?&quot;"><meta data-rh="true" property="og:description" content="&quot;We made a design choice. How do we record it so it&#x27;s not relitigated six months later?&quot;"><link data-rh="true" rel="icon" href="/knowledge-graph/img/square.png"><link data-rh="true" rel="canonical" href="https://technomensch.github.io/knowledge-graph/pillars/capturing/architecture-decisions"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/pillars/capturing/architecture-decisions" hreflang="en"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/pillars/capturing/architecture-decisions" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"📥 Capturing","item":"https://technomensch.github.io/knowledge-graph/pillars/capturing/"},{"@type":"ListItem","position":2,"name":"Architecture Decisions","item":"https://technomensch.github.io/knowledge-graph/pillars/capturing/architecture-decisions"}]}</script><link rel="alternate" type="application/rss+xml" href="/knowledge-graph/docs-updates/rss.xml" title="KMGraph Docs Updates RSS Feed">
 <link rel="alternate" type="application/atom+xml" href="/knowledge-graph/docs-updates/atom.xml" title="KMGraph Docs Updates Atom Feed"><link rel="stylesheet" href="/knowledge-graph/assets/css/styles.212119a5.css">
-<script src="/knowledge-graph/assets/js/runtime~main.a9f6584a.js" defer="defer"></script>
-<script src="/knowledge-graph/assets/js/main.fe2d8618.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/runtime~main.186cfeec.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/main.91d994a0.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -20,7 +20,7 @@
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="the-command">The command<a href="#the-command" class="hash-link" aria-label="Direct link to The command" title="Direct link to The command" translate="no">​</a></h2>
 <div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-create-adr</span><br></div></code></pre></div></div>
 <p>The wizard prompts for a title, status, decision summary, context, rationale, consequences, and implementation commit reference.</p>
-<p>Verify with <code>/kmgraph:kmg-recall &quot;ADR keywords&quot;</code> — the ADR should appear and the file should exist in <code>docs/decisions/</code>.</p>
+<p>Verify with <code>/kmgraph:kmg-recall &quot;ADR keywords&quot;</code> — the ADR should appear and the file should exist in <code>knowledge/decisions/</code>.</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="what-to-fill-in">What to fill in<a href="#what-to-fill-in" class="hash-link" aria-label="Direct link to What to fill in" title="Direct link to What to fill in" translate="no">​</a></h2>
 
 
@@ -65,7 +65,7 @@
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="link-and-index">Link and index<a href="#link-and-index" class="hash-link" aria-label="Direct link to Link and index" title="Direct link to Link and index" translate="no">​</a></h2>
 <p>After creation, link the ADR to related lessons:</p>
 <div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-link-issue --adr ADR-NNN --lesson path/to/lesson.md</span><br></div></code></pre></div></div>
-<p>ADRs are auto-indexed in <code>docs/decisions/</code>. No manual step needed if using the command.</p>
+<p>ADRs are auto-indexed in <code>knowledge/decisions/</code>. No manual step needed if using the command.</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="updating-an-adr">Updating an ADR<a href="#updating-an-adr" class="hash-link" aria-label="Direct link to Updating an ADR" title="Direct link to Updating an ADR" translate="no">​</a></h2>
 <p>To supersede an existing decision:</p>
 <ol>

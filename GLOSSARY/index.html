@@ -5,8 +5,8 @@
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">Glossary | Knowledge Management Graph</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://technomensch.github.io/knowledge-graph/GLOSSARY"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Glossary | Knowledge Management Graph"><meta data-rh="true" name="description" content="This glossary provides plain-English definitions for key terms and concepts used throughout the Knowledge Management Graph documentation."><meta data-rh="true" property="og:description" content="This glossary provides plain-English definitions for key terms and concepts used throughout the Knowledge Management Graph documentation."><link data-rh="true" rel="icon" href="/knowledge-graph/img/square.png"><link data-rh="true" rel="canonical" href="https://technomensch.github.io/knowledge-graph/GLOSSARY"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/GLOSSARY" hreflang="en"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/GLOSSARY" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"📖 Glossary","item":"https://technomensch.github.io/knowledge-graph/GLOSSARY"}]}</script><link rel="alternate" type="application/rss+xml" href="/knowledge-graph/docs-updates/rss.xml" title="KMGraph Docs Updates RSS Feed">
 <link rel="alternate" type="application/atom+xml" href="/knowledge-graph/docs-updates/atom.xml" title="KMGraph Docs Updates Atom Feed"><link rel="stylesheet" href="/knowledge-graph/assets/css/styles.212119a5.css">
-<script src="/knowledge-graph/assets/js/runtime~main.a9f6584a.js" defer="defer"></script>
-<script src="/knowledge-graph/assets/js/main.fe2d8618.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/runtime~main.186cfeec.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/main.91d994a0.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -46,15 +46,15 @@
 <p>A lesson about database timeouts links to a pattern entry about connection pooling. The connection pooling pattern links back to the timeout lesson. Starting from either document leads to the other.example[<strong>In NEW lesson</strong>]</p>
 </blockquote>
 <ul>
-<li class="">lessons-learned/process/git-workflow.md</li>
+<li class="">knowledge/lessons-learned/process/git-workflow.md</li>
 <li class=""><strong>Pattern:</strong> [[patterns.md#branch-preservation]]</li>
 </ul>
 <p>::::</p>
 <blockquote>
 <p>📘 <strong>In EXISTING pattern</strong></p>
 <ul>
-<li class="">knowledge/patterns.md</li>
-<li class=""><strong>Related Lesson:</strong> [[lessons-learned/process/git-workflow.md]]</li>
+<li class="">knowledge/concepts/patterns.md</li>
+<li class=""><strong>Related Lesson:</strong> [[knowledge/lessons-learned/process/git-workflow.md]]</li>
 </ul>
 </blockquote>
 <p>:::
@@ -232,12 +232,12 @@ This creates a knowledge graph where:</p>
 <li class=""><strong>Prevention</strong> — How to avoid the same problem in the future</li>
 <li class=""><strong>Key Takeaways</strong> — Concise lessons for quick reference</li>
 </ol>
-<p><strong>How to create one</strong>: Claude Code users run <code>/kmgraph:kmg-capture-lesson</code>. Manual users copy the lesson template from <code>core/default-templates/lessons-learned/lesson-template.md</code> and fill in each section.</p>
+<p><strong>How to create one</strong>: Claude Code users run <code>/kmgraph:kmg-capture-lesson</code>. Manual users copy the lesson template from <code>core/default-templates/knowledge/lessons-learned/lesson-template.md</code> and fill in each section.</p>
 <p><strong>When to write one</strong>: After solving any non-trivial problem. The best time to document is immediately after solving the problem, while details are fresh.</p>
 <p><strong>Plain English</strong>: A structured &quot;here&#x27;s what happened and how it was fixed&quot; document.</p>
 <blockquote>
 <p>📘 <strong>Note</strong></p>
-<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Manual (No Automation)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># 1. Copy template</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">cp core/default-templates/lessons-learned/lesson-template.md \</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">   docs/lessons-learned/process/my-lesson.md</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># 2. Fill in sections</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">vim docs/lessons-learned/process/my-lesson.md</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Automated (Claude Code)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Single command does all steps</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-capture-lesson</span><br></div></code></pre></div></div>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Manual (No Automation)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># 1. Copy template</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">cp core/default-templates/knowledge/lessons-learned/lesson-template.md \</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">   knowledge/lessons-learned/process/my-lesson.md</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># 2. Fill in sections</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">vim knowledge/lessons-learned/process/my-lesson.md</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Automated (Claude Code)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Single command does all steps</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-capture-lesson</span><br></div></code></pre></div></div>
 </blockquote>
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="mcp-server">MCP Server<a href="#mcp-server" class="hash-link" aria-label="Direct link to MCP Server" title="Direct link to MCP Server" translate="no">​</a></h2>
@@ -439,7 +439,7 @@ Attempt 3: implement connection pooling (resolved). The meta-issue tracks all th
 <li class=""><code>[AUTO-SUGGEST]</code> — The system suggests a value; the user can accept or override</li>
 </ul>
 <p><strong>How to use (manual workflow)</strong>: Copy the template, fill in <code>[MANUAL]</code> fields, write content in the body sections, save, and commit.</p>
-<p><strong>How to use (Claude Code)</strong>: Run the corresponding command (e.g., <code>/kmgraph:kmg-capture-lesson</code>). The command fills <code>[AUTO]</code> fields and guides the user through <code>[MANUAL]</code> fields interactively.</p>
+<p><strong>How to use (Claude Code)</strong>: Run the corresponding command (e.g., <code>/kmgraph:kmg-capture-lesson</code>). The command fills <code>[AUTO]</code> fields and guides the user through <code>[MANUAL]</code> fields interactively. Templates are located in <code>core/default-templates/knowledge/</code>.</p>
 <p><strong>Plain English</strong>: A fill-in-the-blank form that ensures every entry has the right structure.</p>
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="token-count">Token Count<a href="#token-count" class="hash-link" aria-label="Direct link to Token Count" title="Direct link to Token Count" translate="no">​</a></h2>
