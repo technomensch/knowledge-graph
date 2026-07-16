@@ -81,12 +81,12 @@ Scan patterns: emails, API keys, custom patterns (2)
 Action: Block commits with sensitive data
 
 Test the hook:
-  git add docs/knowledge/patterns.md
+  git add knowledge/concepts/patterns.md
   git commit -m "test"
 
 If sensitive data is found, you'll see:
   ⚠️ Potential sensitive data found:
-  - docs/knowledge/patterns.md:42 — email: user@example.com
+  - knowledge/concepts/patterns.md:42 — email: user@example.com
 
 Remove or use .sanitization-ignore to bypass.
 ```
