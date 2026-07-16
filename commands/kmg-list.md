@@ -48,7 +48,7 @@ Total: 3 knowledge graphs configured
 ### Step 1: Check if config exists
 
 ```bash
-CONFIG_PATH="$HOME/.kmgraph/kg-config.json"
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
 
 if [ ! -f "$CONFIG_PATH" ]; then
   echo "No knowledge graphs configured."
@@ -61,6 +61,8 @@ fi
 ### Step 2: Read config
 
 ```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+
 # Read entire config
 config=$(cat "$CONFIG_PATH")
 
