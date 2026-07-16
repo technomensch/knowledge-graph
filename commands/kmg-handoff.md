@@ -110,7 +110,7 @@ Handoff package will be created in: $output_dir
 ```bash
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 current_commit=$(git rev-parse --short HEAD)
-active_kg=$(jq -r '.graphs[.active].path' ~/.claude/kg-config.json)
+active_kg=$(jq -r '.graphs[.active].path' ~/.kmgraph/kg-config.json)
 session_dir="${active_kg}/sessions"
 today=$(date +%Y-%m-%d)
 branch_slug=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')

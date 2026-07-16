@@ -236,7 +236,7 @@ Do not write any files or create any directories until the user confirms.
 First resolve the active KG path:
 ```bash
 # Read active KG path from config
-KG_PATH=$(python3 -c "import json; d=json.load(open('$HOME/.claude/kg-config.json')); print(d['graphs'][d['active']]['path'])" 2>/dev/null || echo ".")
+KG_PATH=$(python3 -c "import json; d=json.load(open('$HOME/.kmgraph/kg-config.json')); print(d['graphs'][d['active']]['path'])" 2>/dev/null || echo ".")
 
 # List existing issue documentation files
 ls -1 "$KG_PATH/issues/" 2>/dev/null | grep -E '^issue-[0-9]+' | sort -V
@@ -286,7 +286,7 @@ Is this mapping correct? (y/n)
 
 ### 3.1: For Bugs/Issues
 ```bash
-# {active_kg_path} = value resolved from ~/.claude/kg-config.json
+# {active_kg_path} = value resolved from ~/.kmgraph/kg-config.json
 mkdir -p {active_kg_path}/issues/issue-N/
 
 # Issue will contain:

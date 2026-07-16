@@ -41,7 +41,7 @@ Before any other step, locate the target file.
 - If no match is found, report an error and exit
 
 **KG content auto-detection:**
-- Read `~/.claude/kg-config.json` to get the active KG path
+- Read `~/.kmgraph/kg-config.json` to get the active KG path
 - If the resolved file path falls within the active KG directory, automatically pre-select option 2 (KG content) in the disambiguation dialog
 
 **Confirmed path stored as `$TARGET_FILE` for subsequent steps.**

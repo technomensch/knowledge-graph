@@ -91,7 +91,7 @@ fi
 
 ```bash
 # Search for KG entry referencing this lesson
-kg_path=$(jq -r '.graphs[.active].path' ~/.claude/kg-config.json)
+kg_path=$(jq -r '.graphs[.active].path' ~/.kmgraph/kg-config.json)
 
 kg_entry=$(grep -l "$(basename $file_path)" "$kg_path"/knowledge/*.md 2>/dev/null || true)
 

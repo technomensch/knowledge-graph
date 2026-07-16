@@ -44,7 +44,7 @@ Quick Commands:
 ### Step 1: Check Config
 
 ```bash
-CONFIG_PATH="$HOME/.claude/kg-config.json"
+CONFIG_PATH="$HOME/.kmgraph/kg-config.json"
 
 if [ ! -f "$CONFIG_PATH" ]; then
   echo "No knowledge graphs configured."

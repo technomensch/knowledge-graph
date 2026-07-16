@@ -114,8 +114,8 @@ Otherwise, run the following check **before** creating any directories or runnin
 
 1. Read the active KG name and path:
    ```bash
-   active_kg=$(jq -r '.active' ~/.claude/kg-config.json)
-   kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.claude/kg-config.json)
+   active_kg=$(jq -r '.active' ~/.kmgraph/kg-config.json)
+   kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.kmgraph/kg-config.json)
    kg_path="${kg_path/#\~/$HOME}"
    ```
    The tilde expansion is required: `jq` returns the raw JSON string (e.g. `~/GitHub/foo`),
@@ -152,7 +152,7 @@ Otherwise, run the following check **before** creating any directories or runnin
    >
    > Reply 1, 2, or 3.
 
-   - Option 1: Run `/kmgraph:kmg-switch` for the current project's KG (if configured), then re-resolve output dir in Step 1 using the newly active KG. **If the current project has no KG registered in `~/.claude/kg-config.json`**, tell the user and offer `/kmgraph:kmg-init` to create one — or fall back to option 2 or 3.
+   - Option 1: Run `/kmgraph:kmg-switch` for the current project's KG (if configured), then re-resolve output dir in Step 1 using the newly active KG. **If the current project has no KG registered in `~/.kmgraph/kg-config.json`**, tell the user and offer `/kmgraph:kmg-init` to create one — or fall back to option 2 or 3.
    - Option 2: Continue to Step 1 using the current active KG unchanged.
    - Option 3: Abort. Do not run extraction.
 
@@ -170,8 +170,8 @@ Otherwise, check whether this is the first extraction run since the plugin cross
 
 First resolve the chat-history directory from the (possibly just-switched, per Step 0) active KG — this is the same resolution Step 1 performs, but Step 0.5 runs *before* Step 1, so `chat_history` must be resolved here or every `read_last_extract_version` / `write_last_extract_version` / health-check call below would reference an undefined path (and would miss a Step 0 Option-1 KG switch):
 ```bash
-active_kg=$(jq -r '.active' ~/.claude/kg-config.json)
-kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.claude/kg-config.json)
+active_kg=$(jq -r '.active' ~/.kmgraph/kg-config.json)
+kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.kmgraph/kg-config.json)
 kg_path="${kg_path/#\~/$HOME}"
 chat_history="${kg_path}/chat-history"
 ```
@@ -235,8 +235,8 @@ No backup guidance for Gemini — nothing is lost, so recovery framing would be 
 **Default behavior (no --output-dir):**
 ```bash
 # Get active KG path from config
-active_kg=$(jq -r '.active' ~/.claude/kg-config.json)
-kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.claude/kg-config.json)
+active_kg=$(jq -r '.active' ~/.kmgraph/kg-config.json)
+kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.kmgraph/kg-config.json)
 
 # Use active KG's chat-history/ subdirectory
 output_dir="${kg_path}/chat-history"
@@ -430,7 +430,7 @@ When using the default output directory (active KG):
 ## Multi-KG Support
 
 When multiple knowledge graphs are configured:
-- Operates on the **active** KG from `~/.claude/kg-config.json`
+- Operates on the **active** KG from `~/.kmgraph/kg-config.json`
 - Use `/kmgraph:kmg-switch` to change active KG before extraction
 - Each KG maintains its own chat-history/
 - Use `--output-dir` to extract to specific KG manually

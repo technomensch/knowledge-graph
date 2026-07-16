@@ -123,7 +123,7 @@ Display the summary exactly as returned by the agent. Do not reformat or add add
 ## Multi-KG Support
 
 When multiple knowledge graphs are configured:
-- Operates on the **active** KG from `~/.claude/kg-config.json`
+- Operates on the **active** KG from `~/.kmgraph/kg-config.json`
 - Use `/kmgraph:kmg-switch` to change active KG before syncing
 - Supports selective sync: `--category=architecture` to sync only architecture lessons
 

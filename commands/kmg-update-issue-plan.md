@@ -208,7 +208,7 @@ If GitHub CLI (`gh`) is not installed or no remote is configured:
 ## Multi-KG Support
 
 When multiple knowledge graphs are configured:
-- Reads active KG from `~/.claude/kg-config.json`
+- Reads active KG from `~/.kmgraph/kg-config.json`
 - Plans and issues stored in `{active_kg_path}/plans/` and `{active_kg_path}/issues/`
 - Use `/kmgraph:kmg-switch` to change active KG before syncing
 
