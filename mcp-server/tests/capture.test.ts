@@ -117,7 +117,7 @@ describe("kg_capture — lesson write", () => {
     expect(content).toContain("tags: [auth, token]");
     expect(content).toContain("## Problem");
 
-    expect(rebuildIndex).toHaveBeenCalledWith(kgRoot, "test-kg");
+    expect(rebuildIndex).toHaveBeenCalledWith(kgRoot, "test-kg", "project-local");
   });
 });
 
@@ -383,7 +383,7 @@ describe("kg_capture — existingFile update-in-place", () => {
     expect(content).toContain("## Updated content");
     expect(content).not.toContain("Old content");
 
-    expect(rebuildIndex).toHaveBeenCalledWith(kgRoot, "test-kg");
+    expect(rebuildIndex).toHaveBeenCalledWith(kgRoot, "test-kg", "project-local");
   });
 
   test("returns IO_ERROR when existingFile path does not exist", async () => {
@@ -587,6 +587,10 @@ describe("kg_capture — targetKg (multi-KG)", () => {
     expect(ok.filePath.startsWith(globalRoot)).toBe(true);
     expect(ok.filePath.startsWith(projRoot)).toBe(false);
     expect(fs.existsSync(ok.filePath)).toBe(true);
+
+    // FTS5 index must be rebuilt for the "personal" bucket, not the
+    // project-local default — regression test for issue-15.
+    expect(rebuildIndex).toHaveBeenCalledWith(globalRoot, "personal", "personal");
   });
 
   test("skips CWD check when targetKg provided — writes even from mismatched CWD", async () => {

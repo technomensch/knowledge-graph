@@ -283,7 +283,8 @@ export async function handleCapture(
       let indexResult: Record<string, unknown> = {};
       try {
         const kgName = targetKg || config.active || path.basename(kgPath);
-        indexResult = rebuildIndex(kgPath, kgName) as unknown as Record<string, unknown>;
+        const kgType = config.graphs[kgName]?.type ?? "project-local";
+        indexResult = rebuildIndex(kgPath, kgName, kgType) as unknown as Record<string, unknown>;
       } catch { /* best-effort */ }
       return { status: "updated", filePath: existing, relativePath: path.relative(kgPath, existing), indexResult };
     } catch (err: unknown) {
@@ -344,7 +345,8 @@ export async function handleCapture(
   let indexResult: Record<string, unknown> = {};
   try {
     const kgName = targetKg || config.active || path.basename(kgPath);
-    indexResult = rebuildIndex(kgPath, kgName) as unknown as Record<string, unknown>;
+    const kgType = config.graphs[kgName]?.type ?? "project-local";
+    indexResult = rebuildIndex(kgPath, kgName, kgType) as unknown as Record<string, unknown>;
   } catch { /* absent if node-sqlite3-wasm not installed */ }
 
   return {
