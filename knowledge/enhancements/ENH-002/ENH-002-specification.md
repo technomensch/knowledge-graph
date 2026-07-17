@@ -206,3 +206,4 @@ The second area is the core unimplemented gap. Work on the snapshot gate is bloc
 - **ENH-001:** User-Level Global Knowledge Graphs (v0.2.2)
 - **ADR-022:** Branch creation commands must guard active work context-switch
 - **Session:** 2026-03-28 — conversation that identified this pattern
+- **ENH-043:** Session-Wrap Status-Alignment Verification (2026-07-17) — same subsystem (session-summary/session-wrap), adjacent but distinct scope: this ENH covers accumulation/append behavior across runs, ENH-043 covers verifying that outstanding-item status characterizations are still accurate before a summary is finalized. Linked, not merged.
