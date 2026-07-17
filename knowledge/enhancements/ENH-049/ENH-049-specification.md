@@ -1,6 +1,6 @@
 ---
-title: "ENH-044: Concurrent Multi-Repo/Multi-Tool Work with Different Active KGs"
-number: 044
+title: "ENH-049: Concurrent Multi-Repo/Multi-Tool Work with Different Active KGs"
+number: 049
 status: proposed
 version_target: null
 github_issue: 180
@@ -10,9 +10,9 @@ related_enhs: []
 notes: "Captures a real, current user pain point; deliberately not scoped/designed yet — see ADR-067 for the underlying open architectural question."
 ---
 
-# ENH-044: Concurrent Multi-Repo/Multi-Tool Work with Different Active KGs
+# ENH-049: Concurrent Multi-Repo/Multi-Tool Work with Different Active KGs
 
-**Local ID:** ENH-044 | **GitHub Issue:** #180
+**Local ID:** ENH-049 | **GitHub Issue:** #180
 
 ## Problem Statement
 
