@@ -80,3 +80,13 @@ Open — gap confirmed, no fix implemented yet. Needs its own scoping (likely: a
 condition in `kg-auto-recall`'s `SKILL.md`, or an extension to
 `pre-skill-rules-inject.sh`'s hard-block list, or a new lightweight mechanism entirely —
 not yet decided).
+
+## Related finding: a second, distinct instance of the same broader pattern
+
+A second, related-but-distinct instance of the same broader pattern (documented
+auto-triggers referenced by commands that don't actually exist/fire) was found on
+2026-07-17 — see [issue-18](../issue-18/issue-18-description.md) (GH #176). That gap
+involves the `gov-capture-routing` skill, referenced by 8+ commands/agents as an
+automatic level-routing step, which errors with "Unknown skill" when actually invoked.
+Same broader class as this issue, but a genuinely separate concrete mechanism — not a
+duplicate filing.
