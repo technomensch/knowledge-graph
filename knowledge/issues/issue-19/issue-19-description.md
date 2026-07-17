@@ -88,6 +88,17 @@ This needs its own scoped plan before implementation — open design questions i
   actually invoked earlier in the session, or can it only remind unconditionally?)
 - Whether it should be a hard block (fails the tool call until addressed) or an advisory
   reminder (surfaces a message but doesn't stop anything)
+- **Related, adjacent question (2026-07-17):** should an issue *update* (not just creation)
+  re-trigger a session-summary refresh? Answer worked out in conversation: NOT on every
+  issue-doc edit — `## Open Issues` in the session-summary format is a pointer/index (issue
+  number, title, status) that points at the doc for full context, not a duplicate of its
+  content, so routine content edits don't need to force a re-summarize. It SHOULD trigger
+  specifically when an update changes something the summary itself asserts directly —
+  concretely, a status or priority change (e.g. issue-18/#176 going from an implied
+  "broken, needs fixing" framing to an explicit "low-priority, non-destructive, no demand
+  signal" reassessment on the same day). Any future hook/trigger design for issue-tracking
+  should carry this distinction: fire on status/priority-assertion changes, not on every
+  touch to an issue file.
 
 None of these design questions are resolved here. This issue documents the gap only.
 
