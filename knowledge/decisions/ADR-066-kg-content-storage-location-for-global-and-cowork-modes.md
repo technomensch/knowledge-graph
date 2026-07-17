@@ -1,8 +1,9 @@
 ---
-title: "ADR-066: KG content-storage location for global-topic and cowork modes — decision pending"
+title: "ADR-066: KG content-storage location for global-topic and cowork modes"
 number: 066
-status: Proposed
+status: Accepted
 date: 2026-07-14
+resolved: 2026-07-17
 author: technomensch
 email: mkitact@gmail.com
 git:
@@ -10,19 +11,19 @@ git:
   commit: null
   pr: null
   issue: "#171 (surfaced during, but out of scope for, issue-14)"
-implements: null
+implements: "v0.6.20 (planned — decision made 2026-07-17, execution not yet started; see ~/.claude/plans/v0.6.20-storage-migration-completion.md)"
 related:
   adrs: [028, 001]
   lessons: []
   kg_entries: []
-tags: [storage, platform-agnostic, kg-location, cowork, init, split-brain, decision-pending]
+tags: [storage, platform-agnostic, kg-location, cowork, init, split-brain, resolved]
 category: architecture
 ---
 
-# ADR-066: KG content-storage location for global-topic and cowork modes — decision pending
+# ADR-066: KG content-storage location for global-topic and cowork modes
 
 **Date:** 2026-07-14
-**Status:** Proposed (context + open decision only — **no decision has been made**)
+**Status:** Accepted — resolved 2026-07-17 (decision only; implementation planned via v0.6.20, not yet started)
 
 ---
 
@@ -61,17 +62,22 @@ For reference, `cowork` is a KG **type/scope** meaning "team-shared, synced via 
 
 ## Decision
 
-**PENDING — not yet decided.** The following questions must be resolved before any implementation:
+**Resolved 2026-07-17**, in direct conversation, following independent research (web search confirming real Claude Cowork's actual product architecture) and a Fable-model code review verifying the current state of both `cli.ts` and `kmg-init.md`. Answering the four open questions in order:
 
-1. **Do the "global topic-based" and "cowork" storage modes still exist as first-class concepts?** `cli.ts` has already dropped them; `kmg-init.md` still offers them. Either they are deprecated (and `kmg-init.md` should be brought in line with `cli.ts`), or they are supported (and `cli.ts` is missing them) — the two init flows must be reconciled to one answer.
+1. **Do the "global topic-based" and "cowork" storage modes still exist as first-class concepts?**
+   **Cowork: no — stop offering it as a new-KG option.** Real Claude Cowork (Anthropic's desktop/web/mobile agentic product) has no plugin/slash-command extensibility surface — kmgraph's "cowork" KG type/scope was built on a premise that was never actually reachable through the real product. Existing `~/.claude/cowork-knowledge/` content on any real install is **never silently dropped**: the upgrade script must detect it, inform the user of the incompatibility, and offer to archive it (same `.kg-archive-<timestamp>/` pattern used elsewhere) — never auto-delete or silently reclassify it into another mode.
+   **Global-topic: yes — kept.**
 
-2. **If these modes are retained, does their content storage relocate from `~/.claude/` to `~/.kmgraph/`** (per ADR-028's platform-agnostic principle), or is `~/.claude/` intentionally correct for them (e.g. because "Claude Cowork" is genuinely Claude-Code-specific)?
+2. **Does content storage relocate from `~/.claude/` to `~/.kmgraph/`?**
+   Yes, for global-topic KGs: `~/.claude/knowledge-graphs/<name>/` → **`~/.kmgraph/knowledge-graphs/<name>/`** — no wrapper/umbrella folder. Fable-verified: the personal-KG index rebuild only walks a fixed, enumerated set of dirs at `~/.kmgraph/` root, so a sibling `knowledge-graphs/` folder has zero collision risk with personal KG content. `knowledge-graphs/` is already the umbrella; per-KG paths are stored individually in `kg-config.json`, so a hypothetical future second mode could claim its own sibling folder later with no disruption — no pre-built structure needed now. (This does **not** reopen ADR-028 — the personal KG's own placement directly at `~/.kmgraph/` root is untouched.)
 
-3. **If relocation is chosen, what is the migration path for existing installs** that already hold KG content under `~/.claude/knowledge-graphs/` or `~/.claude/cowork-knowledge/`? (ADR-063 — never destroy known-good state before a confirmed write — applies.)
+3. **Migration path for existing installs?**
+   Global-topic: reuse the existing one-time legacy-seed-and-copy pattern already used for `kg-config.json` — detect `~/.claude/knowledge-graphs/`, copy forward once. Cowork: detect-and-archive per point 1 above, honoring ADR-063 (never destroy known-good state before a confirmed write).
 
-4. **Which layer is authoritative** for the storage-mode list going forward — the MCP server (`cli.ts`) or the slash command (`kmg-init.md`) — so the two cannot diverge again?
+4. **Which layer is authoritative?**
+   The MCP server (`cli.ts`) — but it is **not already correct as-is** and must be fixed first: its "home" location option currently sets `kgPath = ~/.kmgraph` with no `<name>` subfolder, so using it today to create a second named KG would overlay the personal KG's own directories. Fix `cli.ts` (add a proper global-topic location option per point 2; purge `cowork` from its type menu and from `config.ts`'s type enum) before declaring it authoritative. Root-cause fix, not just "pick a winner": `commands/kmg-init.md` should delegate path computation to the MCP tool (`kg_config_init`/`kg_scaffold`) instead of duplicating the logic in its own bash case-statement, so the two surfaces structurally cannot diverge again. `kmg-init.md` keeps its richer UX (categories, git strategy, upgrade checks); it stops owning the storage-mode table.
 
-_No option has been selected. Consequences, migration design, and cascade impact are deferred until the decision above is made._
+**Implementation:** planned in full as the 13-task `v0.6.20-storage-migration-completion` plan (`~/.claude/plans/v0.6.20-storage-migration-completion.md`). Decision made; execution not yet started as of this writing.
 
 ## Related
 
