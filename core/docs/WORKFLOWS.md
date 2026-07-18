@@ -70,10 +70,10 @@ cp -r core/templates/. knowledge/templates/
 ```
 
 Templates available after copying:
-- `knowledge/templates/lessons-learned/lesson-template.md` — For problems solved
-- `knowledge/templates/decisions/ADR-template.md` — For important decisions
+- `knowledge/templates/lesson-template.md` — For problems solved
+- `knowledge/templates/ADR-template.md` — For important decisions
 - `knowledge/templates/entry-template.md` — For patterns and concepts
-- `knowledge/templates/sessions/session-template.md` — For work session summaries
+- `knowledge/templates/session-template.md` — For work session summaries
 
 > **What are templates?** See [Template](../../docs/CONCEPTS.md#template) in the Concepts Guide.
 
@@ -99,7 +99,7 @@ Templates available after copying:
 **2. Copy template with a meaningful filename:**
 
 ```bash
-cp knowledge/templates/lessons-learned/lesson-template.md \
+cp knowledge/templates/lesson-template.md \
    knowledge/lessons-learned/process/Database_Connection_Pooling.md
 ```
 
@@ -161,7 +161,7 @@ ls knowledge/decisions/ | grep "ADR-"
 **2. Copy template with numbered filename:**
 
 ```bash
-cp knowledge/templates/decisions/ADR-template.md \
+cp knowledge/templates/ADR-template.md \
    knowledge/decisions/ADR-003-connection-pooling.md
 ```
 
@@ -287,7 +287,7 @@ grep -A 5 "^## " knowledge/templates/gotchas.md
 
 ```bash
 mkdir -p knowledge/sessions/2024-10
-cp knowledge/templates/sessions/session-template.md \
+cp knowledge/templates/session-template.md \
    knowledge/sessions/2024-10/session-2024-10-15.md
 ```
 
@@ -372,7 +372,7 @@ cp core/templates/meta-issue/attempt-results-template.md \
 **5. Extract lesson when resolved:**
 
 ```bash
-cp knowledge/templates/lessons-learned/lesson-template.md \
+cp knowledge/templates/lesson-template.md \
    knowledge/lessons-learned/debugging/Performance_Degradation_Resolution.md
 ```
 
@@ -541,7 +541,7 @@ grep "^### " memory/MEMORY-archive.md
 Add to `~/.bashrc` or `~/.zshrc`:
 
 ```bash
-alias lesson='cp knowledge/templates/lessons-learned/lesson-template.md'
+alias lesson='cp knowledge/templates/lesson-template.md'
 alias kg-search='grep -r'
 alias kg-patterns='cat knowledge/templates/patterns.md'
 alias last-adr='ls knowledge/decisions/ | grep ADR | tail -1'

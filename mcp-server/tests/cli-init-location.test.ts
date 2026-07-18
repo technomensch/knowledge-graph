@@ -11,9 +11,9 @@ import { resolveInitLocation } from "../src/cli.js";
 // would overlay the personal KG's own directories at bare ~/.kmgraph/.
 
 describe("resolveInitLocation", () => {
-  test('choice "1" resolves to ./docs relative to cwd', () => {
+  test('choice "1" resolves to ./knowledge relative to cwd', () => {
     const resolved = resolveInitLocation("1", "my-kg");
-    expect(resolved).toBe(path.resolve("docs"));
+    expect(resolved).toBe(path.resolve("knowledge"));
   });
 
   test('choice "2" (home/personal) resolves to bare ~/.kmgraph with no name subfolder', () => {
@@ -38,8 +38,8 @@ describe("resolveInitLocation", () => {
     expect(resolveInitLocation("4", "my-kg")).toBeNull();
   });
 
-  test("unrecognized choice defaults to ./docs", () => {
+  test("unrecognized choice defaults to ./knowledge", () => {
     const resolved = resolveInitLocation("9", "my-kg");
-    expect(resolved).toBe(path.resolve("docs"));
+    expect(resolved).toBe(path.resolve("knowledge"));
   });
 });

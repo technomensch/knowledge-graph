@@ -46,7 +46,7 @@ export function resolveInitLocation(
 ): string | null {
   switch (locationChoice) {
     case "1":
-      return path.resolve("docs");
+      return path.resolve("knowledge");
     case "2":
       return path.join("~", ".kmgraph");
     case "3":
@@ -54,7 +54,7 @@ export function resolveInitLocation(
     case "4":
       return null;
     default:
-      return path.resolve("docs");
+      return path.resolve("knowledge");
   }
 }
 
@@ -86,7 +86,7 @@ async function runInit(): Promise<void> {
     // 2. Ask for storage location
     console.log("");
     console.log("  Where should the knowledge graph be stored?");
-    console.log("  1. Current directory (./docs/)");
+    console.log("  1. Current directory (./knowledge/)");
     console.log("  2. Home directory (~/.kmgraph/) — for your personal KG");
     console.log("  3. Global topic (~/.kmgraph/knowledge-graphs/<name>/) — a named KG not tied to any single project");
     console.log("  4. Custom path");

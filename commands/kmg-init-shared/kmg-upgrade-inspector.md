@@ -1129,36 +1129,48 @@ These belong at ~/.kmgraph/knowledge-graphs/<name>/ (current layout). Options:
 OLD_GT_DIR="$HOME/.claude/knowledge-graphs"
 NEW_GT_ROOT="$HOME/.kmgraph/knowledge-graphs"
 mkdir -p "$NEW_GT_ROOT"
+_gt_migrated=()
 for _gt in "$OLD_GT_DIR"/*/; do
   [ -d "$_gt" ] || continue
   _name=$(basename "$_gt")
   _dest="$NEW_GT_ROOT/$_name"
   if [ -d "$_dest" ]; then
     echo "  Skipped $_name — already exists at $_dest"
+    _gt_migrated+=("$_name")
     continue
   fi
-  cp -r "$_gt" "$_dest"
-  echo "✅ Copied $_name → $_dest"
+  if cp -r "$_gt" "$_dest"; then
+    echo "✅ Copied $_name → $_dest"
+    _gt_migrated+=("$_name")
+  else
+    echo "⚠️  Copy failed for $_name — kg-config.json will NOT be repointed for this graph."
+    rm -rf "$_dest" 2>/dev/null
+  fi
 done
 echo "Originals left in place at $OLD_GT_DIR — remove manually once you've confirmed the copies."
 ```
 
-After copying, update `kg-config.json` entries whose `path` points under the old location to the new one (per-graph, not a global rewrite):
+After copying, update `kg-config.json` entries for graphs that actually have content at the new location (either just copied, or already present) — never for a graph whose copy failed, since that would repoint config at content that isn't really there:
 
 ```bash
 CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
-if jq --arg old "$HOME/.claude/knowledge-graphs" --arg new "$HOME/.kmgraph/knowledge-graphs" '
-  .graphs |= with_entries(
-    if (.value.path // "") | startswith($old)
-    then .value.path = ($new + (.value.path[($old | length):]))
-    else . end
-  )
-' "$CONFIG_PATH" > "${CONFIG_PATH}.tmp" && [ -s "${CONFIG_PATH}.tmp" ] && jq empty "${CONFIG_PATH}.tmp" 2>/dev/null; then
-  mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
-  echo "✅ kg-config.json paths updated to ~/.kmgraph/knowledge-graphs/"
+if [ ${#_gt_migrated[@]} -eq 0 ]; then
+  echo "No graphs to repoint — kg-config.json left unchanged."
 else
-  rm -f "${CONFIG_PATH}.tmp"
-  echo "⚠️  kg-config.json update failed (jq error or invalid output) — original left untouched. Update paths manually if needed."
+  MIGRATED_JSON=$(printf '%s\n' "${_gt_migrated[@]}" | jq -R . | jq -s .)
+  if jq --arg old "$HOME/.claude/knowledge-graphs" --arg new "$HOME/.kmgraph/knowledge-graphs" --argjson names "$MIGRATED_JSON" '
+    .graphs |= with_entries(
+      if (.key as $k | $names | index($k)) and ((.value.path // "") | startswith($old))
+      then .value.path = ($new + (.value.path[($old | length):]))
+      else . end
+    )
+  ' "$CONFIG_PATH" > "${CONFIG_PATH}.tmp" && [ -s "${CONFIG_PATH}.tmp" ] && jq empty "${CONFIG_PATH}.tmp" 2>/dev/null; then
+    mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
+    echo "✅ kg-config.json paths updated for: ${_gt_migrated[*]}"
+  else
+    rm -f "${CONFIG_PATH}.tmp"
+    echo "⚠️  kg-config.json update failed (jq error or invalid output) — original left untouched. Update paths manually if needed."
+  fi
 fi
 ```
 
