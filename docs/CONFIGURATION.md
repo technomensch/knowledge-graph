@@ -39,13 +39,6 @@ mkdir -p .knowledge/
 # Use .knowledge/ instead of docs/ for knowledge graph
 ```
 
-Or integrate into existing structure:
-
-```bash
-# Add knowledge subdirectories to existing docs/
-mkdir -p docs/knowledge-graph/{lessons-learned,decisions,knowledge,sessions}
-```
-
 ### 2. Link Existing Documentation
 
 Create knowledge graph entries that reference your existing docs:

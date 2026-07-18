@@ -41,7 +41,7 @@ For detailed manual workflow steps after setup, see [core/docs/WORKFLOWS.md](./d
     {
       "name": "knowledge",
       "params": {
-        "folders": ["docs/knowledge", "docs/lessons-learned"]
+        "folders": ["knowledge/templates", "knowledge/lessons-learned"]
       }
     }
   ]
@@ -54,9 +54,9 @@ For detailed manual workflow steps after setup, see [core/docs/WORKFLOWS.md](./d
 // .cursor/settings.json
 {
   "cursor.includeDirectories": [
-    "docs/knowledge",
-    "docs/lessons-learned",
-    "docs/decisions"
+    "knowledge/templates",
+    "knowledge/lessons-learned",
+    "knowledge/decisions"
   ]
 }
 ```
@@ -66,12 +66,12 @@ For detailed manual workflow steps after setup, see [core/docs/WORKFLOWS.md](./d
 ```bash
 # In .aider.conf.yml
 read-only-paths:
-  - docs/knowledge/
-  - docs/lessons-learned/
-  - docs/decisions/
+  - knowledge/templates/
+  - knowledge/lessons-learned/
+  - knowledge/decisions/
 
 # Launch with knowledge context
-aider --read docs/knowledge/patterns.md
+aider --read knowledge/templates/patterns.md
 ```
 
 See [core/docs/PLATFORM-ADAPTATION.md](./docs/PLATFORM-ADAPTATION.md) for complete platform-specific guides.
@@ -119,8 +119,8 @@ Sync knowledge between systems (manual version of automated workflow):
 ```bash
 # After creating lesson, update knowledge graph
 python3 core/scripts/sync_knowledge.py \
-  --lesson docs/lessons-learned/process/my-lesson.md \
-  --update-kg docs/knowledge/patterns.md
+  --lesson knowledge/lessons-learned/process/my-lesson.md \
+  --update-kg knowledge/templates/patterns.md
 ```
 
 ---

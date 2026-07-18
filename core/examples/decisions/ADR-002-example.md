@@ -12,7 +12,7 @@
 
 Many projects using AI-assisted development maintain two complementary knowledge systems:
 
-1. **Knowledge Graph** (`docs/knowledge/*.md`) — Quick-reference index of patterns, concepts, and gotchas
+1. **Knowledge Graph** (`knowledge/templates/*.md`) — Quick-reference index of patterns, concepts, and gotchas
    - Fast lookups via grep/search
    - Discoverable, indexed, cross-referenced
    - Links to detailed lessons-learned files

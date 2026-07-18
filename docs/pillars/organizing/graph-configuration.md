@@ -63,7 +63,7 @@ KMGraph supports both project-scoped and personal knowledge graphs. The storage 
 
 | Type | Typical path | Committed to git? |
 |---|---|---|
-| Project KG | `knowledge/` or `docs/knowledge-graph/` | Yes |
+| Project KG | `knowledge/` | Yes |
 | Personal KG | `~/.kmgraph/` or `~/knowledge/` | No (local only) |
 
 **Project KGs** are checked into your repository. Lessons, ADRs, and patterns are shared with the team.
@@ -74,22 +74,14 @@ See [Personal vs. Project](./personal-vs-project.md) for a full comparison and g
 
 ## Integrating with an existing project
 
-If you are adding KMGraph to an established project that already has a `docs/` directory, avoid collisions by choosing an alternate storage path at init.
-
-**Option 1 — Separate root:**
+If you are adding KMGraph to an established project that already has a `docs/` directory, avoid collisions by choosing an alternate storage path at init:
 
 ```bash
 mkdir -p .knowledge/
 # Point kg-config.json storage_path to .knowledge/
 ```
 
-**Option 2 — Subdirectory within existing docs:**
-
-```bash
-mkdir -p docs/knowledge-graph/{lessons-learned,decisions,knowledge,sessions}
-```
-
-Either approach works. The key is that `storage_path` in `kg-config.json` is the single source of truth — all commands read from it.
+The key is that `storage_path` in `kg-config.json` is the single source of truth — all commands read from it.
 
 ### Linking to existing documentation
 

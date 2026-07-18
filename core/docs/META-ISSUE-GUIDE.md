@@ -367,11 +367,11 @@ Status: Deployed to production, monitoring stable
 
 ```bash
 cp docs/templates/lessons-learned/lesson-template.md \
-   docs/lessons-learned/debugging/Performance_Resolution.md
+   knowledge/lessons-learned/debugging/Performance_Resolution.md
 
 # Reference meta-issue
 echo "**Meta-Issue:** [[../../meta-issues/performance/]]" >> \
-  docs/lessons-learned/debugging/Performance_Resolution.md
+  knowledge/lessons-learned/debugging/Performance_Resolution.md
 ```
 
 ---

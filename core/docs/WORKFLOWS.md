@@ -47,18 +47,18 @@ This guide provides step-by-step workflows for using the knowledge graph system 
 
 ```bash
 # Create knowledge graph directories
-mkdir -p docs/{lessons-learned/{architecture,debugging,process,patterns},decisions,knowledge,sessions}
+mkdir -p knowledge/{lessons-learned/{architecture,debugging,process,patterns},decisions,templates,sessions}
 
 # Create placeholder READMEs
-for dir in docs/lessons-learned/*/; do
+for dir in knowledge/lessons-learned/*/; do
   echo -e "# Category\n\nLessons in this category:\n\n<!-- Add links as you create lessons -->" > "$dir/README.md"
 done
 
 # Create main knowledge graph files
-touch docs/knowledge/{patterns.md,concepts.md,gotchas.md}
+touch knowledge/templates/{patterns.md,concepts.md,gotchas.md}
 
 # Add to git
-git add docs/
+git add knowledge/
 git commit -m "docs: initialize knowledge graph structure"
 ```
 
@@ -66,14 +66,14 @@ git commit -m "docs: initialize knowledge graph structure"
 
 ```bash
 # Copy all templates to your project
-cp -r core/templates/. docs/templates/
+cp -r core/templates/. knowledge/templates/
 ```
 
 Templates available after copying:
-- `docs/templates/lessons-learned/lesson-template.md` — For problems solved
-- `docs/templates/decisions/ADR-template.md` — For important decisions
-- `docs/templates/knowledge/entry-template.md` — For patterns and concepts
-- `docs/templates/sessions/session-template.md` — For work session summaries
+- `knowledge/templates/lessons-learned/lesson-template.md` — For problems solved
+- `knowledge/templates/decisions/ADR-template.md` — For important decisions
+- `knowledge/templates/entry-template.md` — For patterns and concepts
+- `knowledge/templates/sessions/session-template.md` — For work session summaries
 
 > **What are templates?** See [Template](../../docs/CONCEPTS.md#template) in the Concepts Guide.
 
@@ -99,8 +99,8 @@ Templates available after copying:
 **2. Copy template with a meaningful filename:**
 
 ```bash
-cp docs/templates/lessons-learned/lesson-template.md \
-   docs/lessons-learned/process/Database_Connection_Pooling.md
+cp knowledge/templates/lessons-learned/lesson-template.md \
+   knowledge/lessons-learned/process/Database_Connection_Pooling.md
 ```
 
 **3. Fill in the template** — open the file and fill in `[MANUAL]` fields:
@@ -120,7 +120,7 @@ Then write the body — answer these four questions:
 - **Solution:** What fixed it (step by step)?
 - **Prevention:** How to avoid this in the future?
 
-**4. Update the category README** — open `docs/lessons-learned/process/README.md` and add a link:
+**4. Update the category README** — open `knowledge/lessons-learned/process/README.md` and add a link:
 
 ```markdown
 - [Database Connection Pooling](./Database_Connection_Pooling.md) - Fixing connection exhaustion
@@ -131,8 +131,8 @@ Then write the body — answer these four questions:
 **6. Commit:**
 
 ```bash
-git add docs/lessons-learned/process/Database_Connection_Pooling.md
-git add docs/lessons-learned/process/README.md
+git add knowledge/lessons-learned/process/Database_Connection_Pooling.md
+git add knowledge/lessons-learned/process/README.md
 git commit -m "docs: add lesson on database connection pooling"
 ```
 
@@ -153,7 +153,7 @@ git commit -m "docs: add lesson on database connection pooling"
 **1. Find the next ADR number:**
 
 ```bash
-ls docs/decisions/ | grep "ADR-"
+ls knowledge/decisions/ | grep "ADR-"
 # Example: ADR-001-dual-format-docs.md, ADR-002-skills-architecture.md
 # → Next number: ADR-003
 ```
@@ -161,8 +161,8 @@ ls docs/decisions/ | grep "ADR-"
 **2. Copy template with numbered filename:**
 
 ```bash
-cp docs/templates/decisions/ADR-template.md \
-   docs/decisions/ADR-003-connection-pooling.md
+cp knowledge/templates/decisions/ADR-template.md \
+   knowledge/decisions/ADR-003-connection-pooling.md
 ```
 
 **3. Fill in the template** — focus on these four sections:
@@ -171,7 +171,7 @@ cp docs/templates/decisions/ADR-template.md \
 - **Decision:** What was chosen and why?
 - **Consequences:** What are the expected positive and negative outcomes?
 
-**4. Update ADR index** — open `docs/decisions/README.md` and add:
+**4. Update ADR index** — open `knowledge/decisions/README.md` and add:
 
 ```markdown
 - [ADR-003: Connection Pooling Strategy](./ADR-003-connection-pooling.md) - Accepted
@@ -186,7 +186,7 @@ cp docs/templates/decisions/ADR-template.md \
 **6. Commit:**
 
 ```bash
-git add docs/decisions/ADR-003-connection-pooling.md
+git add knowledge/decisions/ADR-003-connection-pooling.md
 git commit -m "docs(adr): ADR-003 connection pooling strategy"
 ```
 
@@ -242,33 +242,33 @@ When creating a lesson from a chat, reference the source:
 
 ```bash
 # Search across all docs
-grep -r "connection pool" docs/
+grep -r "connection pool" knowledge/
 
 # Search with context (3 lines before/after match)
-grep -r -C 3 "connection pool" docs/
+grep -r -C 3 "connection pool" knowledge/
 ```
 
 ### Search by Category or Tag
 
 ```bash
 # Find all architecture lessons
-ls docs/lessons-learned/architecture/
+ls knowledge/lessons-learned/architecture/
 
 # Find all lessons tagged #performance
-grep -r "#performance" docs/lessons-learned/
+grep -r "#performance" knowledge/lessons-learned/
 ```
 
 ### Search Knowledge Graph Files
 
 ```bash
 # Browse all patterns (section headers)
-grep -A 5 "^## " docs/knowledge/patterns.md
+grep -A 5 "^## " knowledge/templates/patterns.md
 
 # Find specific pattern
-grep -A 10 "Connection Pooling" docs/knowledge/patterns.md
+grep -A 10 "Connection Pooling" knowledge/templates/patterns.md
 
 # All gotchas
-grep -A 5 "^## " docs/knowledge/gotchas.md
+grep -A 5 "^## " knowledge/templates/gotchas.md
 ```
 
 ---
@@ -286,9 +286,9 @@ grep -A 5 "^## " docs/knowledge/gotchas.md
 **1. Create session file organized by month:**
 
 ```bash
-mkdir -p docs/sessions/2024-10
-cp docs/templates/sessions/session-template.md \
-   docs/sessions/2024-10/session-2024-10-15.md
+mkdir -p knowledge/sessions/2024-10
+cp knowledge/templates/sessions/session-template.md \
+   knowledge/sessions/2024-10/session-2024-10-15.md
 ```
 
 **2. Fill in the four main sections:**
@@ -314,7 +314,7 @@ cp docs/templates/sessions/session-template.md \
 **3. Commit:**
 
 ```bash
-git add docs/sessions/2024-10/session-2024-10-15.md
+git add knowledge/sessions/2024-10/session-2024-10-15.md
 git commit -m "docs(session): session summary for 2024-10-15"
 ```
 
@@ -333,30 +333,30 @@ git commit -m "docs(session): session summary for 2024-10-15"
 **1. Create the meta-issue directory structure:**
 
 ```bash
-mkdir -p docs/meta-issues/performance-degradation/{attempts,analysis}
+mkdir -p knowledge/meta-issues/performance-degradation/{attempts,analysis}
 ```
 
 **2. Copy core files from templates:**
 
 ```bash
 cp core/templates/meta-issue/README-template.md \
-   docs/meta-issues/performance-degradation/README.md
+   knowledge/meta-issues/performance-degradation/README.md
 cp core/templates/meta-issue/description-template.md \
-   docs/meta-issues/performance-degradation/description.md
+   knowledge/meta-issues/performance-degradation/description.md
 cp core/templates/meta-issue/implementation-log-template.md \
-   docs/meta-issues/performance-degradation/implementation-log.md
+   knowledge/meta-issues/performance-degradation/implementation-log.md
 cp core/templates/meta-issue/test-cases-template.md \
-   docs/meta-issues/performance-degradation/test-cases.md
+   knowledge/meta-issues/performance-degradation/test-cases.md
 ```
 
 **3. Create first attempt directory:**
 
 ```bash
-mkdir docs/meta-issues/performance-degradation/attempts/001-caching
+mkdir knowledge/meta-issues/performance-degradation/attempts/001-caching
 cp core/templates/meta-issue/solution-approach-template.md \
-   docs/meta-issues/performance-degradation/attempts/001-caching/solution-approach.md
+   knowledge/meta-issues/performance-degradation/attempts/001-caching/solution-approach.md
 cp core/templates/meta-issue/attempt-results-template.md \
-   docs/meta-issues/performance-degradation/attempts/001-caching/attempt-results.md
+   knowledge/meta-issues/performance-degradation/attempts/001-caching/attempt-results.md
 ```
 
 **4. Document as the investigation progresses:**
@@ -372,8 +372,8 @@ cp core/templates/meta-issue/attempt-results-template.md \
 **5. Extract lesson when resolved:**
 
 ```bash
-cp docs/templates/lessons-learned/lesson-template.md \
-   docs/lessons-learned/debugging/Performance_Degradation_Resolution.md
+cp knowledge/templates/lessons-learned/lesson-template.md \
+   knowledge/lessons-learned/debugging/Performance_Degradation_Resolution.md
 ```
 
 Add cross-reference to the lesson:
@@ -401,7 +401,7 @@ See [META-ISSUE-GUIDE.md](./META-ISSUE-GUIDE.md) for a detailed guide.
 Implemented connection pooling with: pool size 20, idle timeout 30s, max wait 10s.
 ```
 
-**2. Add to `docs/knowledge/patterns.md`:**
+**2. Add to `knowledge/templates/patterns.md`:**
 
 ```markdown
 ## Connection Pooling Pattern
@@ -425,7 +425,7 @@ Implemented connection pooling with: pool size 20, idle timeout 30s, max wait 10
 
 ### Extract a Gotcha
 
-If the lesson reveals a common pitfall, add it to `docs/knowledge/gotchas.md`:
+If the lesson reveals a common pitfall, add it to `knowledge/templates/gotchas.md`:
 
 ```markdown
 ## CI Connection Exhaustion
@@ -451,7 +451,7 @@ multiplies connection usage.
 
 ```bash
 # Find lessons not modified in over a year
-find docs/lessons-learned -name "*.md" -mtime +365
+find knowledge/lessons-learned -name "*.md" -mtime +365
 ```
 
 For each stale lesson, ask:
@@ -463,7 +463,7 @@ For each stale lesson, ask:
 
 ```bash
 # Search for similar topics
-grep -r "connection pool" docs/lessons-learned/
+grep -r "connection pool" knowledge/lessons-learned/
 ```
 
 If multiple lessons cover the same topic, either consolidate into one comprehensive lesson or keep both and cross-reference them.
@@ -472,8 +472,8 @@ If multiple lessons cover the same topic, either consolidate into one comprehens
 
 ```bash
 # Move old sessions to archive
-mkdir -p docs/sessions/archive
-mv docs/sessions/2022-* docs/sessions/archive/
+mkdir -p knowledge/sessions/archive
+mv knowledge/sessions/2022-* knowledge/sessions/archive/
 ```
 
 ---
@@ -541,10 +541,10 @@ grep "^### " memory/MEMORY-archive.md
 Add to `~/.bashrc` or `~/.zshrc`:
 
 ```bash
-alias lesson='cp docs/templates/lessons-learned/lesson-template.md'
+alias lesson='cp knowledge/templates/lessons-learned/lesson-template.md'
 alias kg-search='grep -r'
-alias kg-patterns='cat docs/knowledge/patterns.md'
-alias last-adr='ls docs/decisions/ | grep ADR | tail -1'
+alias kg-patterns='cat knowledge/templates/patterns.md'
+alias last-adr='ls knowledge/decisions/ | grep ADR | tail -1'
 ```
 
 ### Editor Template Shortcuts

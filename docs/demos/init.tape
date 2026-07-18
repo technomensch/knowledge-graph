@@ -29,10 +29,10 @@ Sleep 400ms
 Enter
 Type "echo ''"
 Enter
-Type "echo '  1. Project-local (./docs/)'"
+Type "echo '  1. Project-local (./knowledge/)'"
 Sleep 200ms
 Enter
-Type "echo '  2. Global personal (~/.claude/knowledge-graphs/)'"
+Type "echo '  2. Global topic-based (~/.kmgraph/knowledge-graphs/)'"
 Sleep 200ms
 Enter
 Type "echo '  3. Custom path'"
