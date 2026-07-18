@@ -41,6 +41,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
   mod
 ));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // src/utils.ts
 function readConfig() {
@@ -31504,7 +31505,7 @@ function registerConfigTools(server) {
     {
       name: external_exports.string().min(1).describe("Unique name for this knowledge graph"),
       kgPath: external_exports.string().describe("Absolute path where KG should be created"),
-      type: external_exports.enum(["project-local", "personal", "cowork", "custom"]).default("project-local").describe("KG type"),
+      type: external_exports.enum(["project-local", "personal", "custom"]).default("project-local").describe("KG type"),
       categories: external_exports.array(
         external_exports.object({
           name: external_exports.string(),
@@ -32473,6 +32474,11 @@ var init_resources = __esm({
 });
 
 // src/cli.ts
+var cli_exports = {};
+__export(cli_exports, {
+  resolveInitLocation: () => resolveInitLocation
+});
+module.exports = __toCommonJS(cli_exports);
 var fs8 = __toESM(require("fs"));
 var path8 = __toESM(require("path"));
 var os6 = __toESM(require("os"));
@@ -32496,6 +32502,20 @@ function printHeader() {
   console.log("  ======================================");
   console.log("");
 }
+function resolveInitLocation(locationChoice, name) {
+  switch (locationChoice) {
+    case "1":
+      return path8.resolve("docs");
+    case "2":
+      return path8.join("~", ".kmgraph");
+    case "3":
+      return path8.join("~", ".kmgraph", "knowledge-graphs", name);
+    case "4":
+      return null;
+    default:
+      return path8.resolve("docs");
+  }
+}
 async function runInit() {
   const rl = readline.createInterface({
     input: process.stdin,
@@ -32518,43 +32538,34 @@ async function runInit() {
     console.log("");
     console.log("  Where should the knowledge graph be stored?");
     console.log("  1. Current directory (./docs/)");
-    console.log("  2. Home directory (~/.kmgraph/)");
-    console.log("  3. Custom path");
+    console.log("  2. Home directory (~/.kmgraph/) \u2014 for your personal KG");
+    console.log("  3. Global topic (~/.kmgraph/knowledge-graphs/<name>/) \u2014 a named KG not tied to any single project");
+    console.log("  4. Custom path");
     console.log("");
-    const locationChoice = await ask(rl, "  Choice [1/2/3]: ");
+    const locationChoice = await ask(rl, "  Choice [1/2/3/4]: ");
     let kgPath;
-    switch (locationChoice) {
-      case "1":
-        kgPath = path8.resolve("docs");
-        break;
-      case "2":
-        kgPath = path8.join("~", ".kmgraph");
-        break;
-      case "3": {
-        const customPath = await ask(rl, "  Enter path: ");
-        if (!customPath) {
-          console.error("Error: Path is required.");
-          process.exit(1);
-        }
-        kgPath = customPath;
-        break;
+    const resolved = resolveInitLocation(locationChoice, name);
+    if (resolved !== null) {
+      kgPath = resolved;
+    } else {
+      const customPath = await ask(rl, "  Enter path: ");
+      if (!customPath) {
+        console.error("Error: Path is required.");
+        process.exit(1);
       }
-      default:
-        kgPath = path8.resolve("docs");
+      kgPath = customPath;
     }
     console.log("");
     console.log("  Knowledge graph type:");
     console.log("  1. project-local (default) \u2014 tied to this project");
     console.log("  2. personal \u2014 shared across projects (your personal KG)");
-    console.log("  3. cowork \u2014 shared with team members");
-    console.log("  4. custom");
+    console.log("  3. custom");
     console.log("");
-    const typeChoice = await ask(rl, "  Choice [1/2/3/4]: ");
+    const typeChoice = await ask(rl, "  Choice [1/2/3]: ");
     const typeMap = {
       "1": "project-local",
       "2": "personal",
-      "3": "cowork",
-      "4": "custom"
+      "3": "custom"
     };
     const kgType = typeMap[typeChoice] || "project-local";
     const categories = [
@@ -32795,4 +32806,8 @@ async function main() {
 main().catch((error48) => {
   console.error("Fatal error:", error48);
   process.exit(1);
+});
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  resolveInitLocation
 });

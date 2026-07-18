@@ -35,6 +35,29 @@ function printHeader(): void {
 
 // ── Init Subcommand ──────────────────────────────────────────────────
 
+/**
+ * Resolves the storage-location menu choice to a KG path.
+ * Returns null for the custom-path choice ("4"), which the caller must
+ * resolve interactively since it requires an additional prompt.
+ */
+export function resolveInitLocation(
+  locationChoice: string,
+  name: string
+): string | null {
+  switch (locationChoice) {
+    case "1":
+      return path.resolve("docs");
+    case "2":
+      return path.join("~", ".kmgraph");
+    case "3":
+      return path.join("~", ".kmgraph", "knowledge-graphs", name);
+    case "4":
+      return null;
+    default:
+      return path.resolve("docs");
+  }
+}
+
 async function runInit(): Promise<void> {
   const rl = readline.createInterface({
     input: process.stdin,
@@ -64,30 +87,23 @@ async function runInit(): Promise<void> {
     console.log("");
     console.log("  Where should the knowledge graph be stored?");
     console.log("  1. Current directory (./docs/)");
-    console.log("  2. Home directory (~/.kmgraph/)");
-    console.log("  3. Custom path");
+    console.log("  2. Home directory (~/.kmgraph/) — for your personal KG");
+    console.log("  3. Global topic (~/.kmgraph/knowledge-graphs/<name>/) — a named KG not tied to any single project");
+    console.log("  4. Custom path");
     console.log("");
-    const locationChoice = await ask(rl, "  Choice [1/2/3]: ");
+    const locationChoice = await ask(rl, "  Choice [1/2/3/4]: ");
 
     let kgPath: string;
-    switch (locationChoice) {
-      case "1":
-        kgPath = path.resolve("docs");
-        break;
-      case "2":
-        kgPath = path.join("~", ".kmgraph");
-        break;
-      case "3": {
-        const customPath = await ask(rl, "  Enter path: ");
-        if (!customPath) {
-          console.error("Error: Path is required.");
-          process.exit(1);
-        }
-        kgPath = customPath;
-        break;
+    const resolved = resolveInitLocation(locationChoice, name);
+    if (resolved !== null) {
+      kgPath = resolved;
+    } else {
+      const customPath = await ask(rl, "  Enter path: ");
+      if (!customPath) {
+        console.error("Error: Path is required.");
+        process.exit(1);
       }
-      default:
-        kgPath = path.resolve("docs");
+      kgPath = customPath;
     }
 
     // 3. Ask for KG type
@@ -95,16 +111,14 @@ async function runInit(): Promise<void> {
     console.log("  Knowledge graph type:");
     console.log("  1. project-local (default) — tied to this project");
     console.log("  2. personal — shared across projects (your personal KG)");
-    console.log("  3. cowork — shared with team members");
-    console.log("  4. custom");
+    console.log("  3. custom");
     console.log("");
-    const typeChoice = await ask(rl, "  Choice [1/2/3/4]: ");
+    const typeChoice = await ask(rl, "  Choice [1/2/3]: ");
 
     const typeMap: Record<string, GraphConfig["type"]> = {
       "1": "project-local",
       "2": "personal",
-      "3": "cowork",
-      "4": "custom",
+      "3": "custom",
     };
     const kgType = typeMap[typeChoice] || "project-local";
 

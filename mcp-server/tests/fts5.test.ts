@@ -9,11 +9,9 @@ import {
   rebuildIndex,
   searchFts5,
   getDbPath,
-  getFTS5DbPath,
   getPersonalDbPath,
   getProjectDbPath,
   resolveDbPath,
-  resolveContentRoot,
   FTS5_DB_FILENAME,
 } from "../src/tools/fts5.js";
 
@@ -307,7 +305,7 @@ describe("corrupt database", () => {
 // TC-001: DB is created at ~/.kmgraph/index/ on first rebuild
 // ---------------------------------------------------------------------------
 
-describe("getFTS5DbPath", () => {
+describe("DB path resolution", () => {
   test("TC-001: DB created at ~/.kmgraph/index/ on first rebuild", () => {
     const kgRoot = makeTempDir("tc-001-db-path");
     tempDirs.push(kgRoot);
@@ -328,62 +326,6 @@ describe("getFTS5DbPath", () => {
     // Verify it's in the home directory, not in the project
     const homeDir = os.homedir();
     expect(result.db_path).toContain(homeDir);
-  });
-
-  test("getFTS5DbPath creates ~/.kmgraph/index directory if missing", () => {
-    const dbPath = getFTS5DbPath("test-kg-dir-creation");
-    const dirPath = path.dirname(dbPath);
-
-    expect(fs.existsSync(dirPath)).toBe(true);
-    expect(fs.statSync(dirPath).isDirectory()).toBe(true);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// TC-002: Content root auto-detection finds docs/ when docs/lessons-learned/ exists
-// ---------------------------------------------------------------------------
-
-describe("resolveContentRoot", () => {
-  test("TC-002: Auto-detects docs/ subdir when docs/lessons-learned/ exists", () => {
-    const kgRoot = makeTempDir("tc-002-content-root");
-    tempDirs.push(kgRoot);
-
-    // Create v0.2+ layout: docs/lessons-learned exists
-    fs.mkdirSync(path.join(kgRoot, "docs", "lessons-learned"), {
-      recursive: true,
-    });
-
-    const resolved = resolveContentRoot(kgRoot);
-
-    // Should return docs/ not kgRoot
-    expect(resolved).toBe(path.join(kgRoot, "docs"));
-    expect(resolved).not.toBe(kgRoot);
-  });
-
-  test("TC-003: Falls back to root when no docs/lessons-learned/ subdir", () => {
-    const kgRoot = makeTempDir("tc-003-content-root-fallback");
-    tempDirs.push(kgRoot);
-
-    // Create minimal structure (no docs/lessons-learned)
-    fs.mkdirSync(path.join(kgRoot, "knowledge"), { recursive: true });
-
-    const resolved = resolveContentRoot(kgRoot);
-
-    // Should fall back to kgRoot
-    expect(resolved).toBe(kgRoot);
-  });
-
-  test("resolveContentRoot uses correct path when docs/ exists but no lessons-learned", () => {
-    const kgRoot = makeTempDir("tc-003b-docs-exists-only");
-    tempDirs.push(kgRoot);
-
-    // Create docs/ but not docs/lessons-learned/
-    fs.mkdirSync(path.join(kgRoot, "docs"), { recursive: true });
-
-    const resolved = resolveContentRoot(kgRoot);
-
-    // Should still fall back to kgRoot
-    expect(resolved).toBe(kgRoot);
   });
 });
 

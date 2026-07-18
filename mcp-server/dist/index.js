@@ -30403,7 +30403,7 @@ function registerConfigTools(server2) {
     {
       name: external_exports3.string().min(1).describe("Unique name for this knowledge graph"),
       kgPath: external_exports3.string().describe("Absolute path where KG should be created"),
-      type: external_exports3.enum(["project-local", "personal", "cowork", "custom"]).default("project-local").describe("KG type"),
+      type: external_exports3.enum(["project-local", "personal", "custom"]).default("project-local").describe("KG type"),
       categories: external_exports3.array(
         external_exports3.object({
           name: external_exports3.string(),
@@ -30650,13 +30650,6 @@ function resolveDbPath(kgName, kgType) {
   console.warn(`resolveDbPath: unknown kgType "${kgType}", defaulting to project-local`);
   return getProjectDbPath(kgName);
 }
-function resolveContentRoot(kgPath) {
-  const docsLessons = path3.join(kgPath, "docs", "lessons-learned");
-  if (fs3.existsSync(docsLessons)) {
-    return path3.join(kgPath, "docs");
-  }
-  return kgPath;
-}
 function sanitizeFts5Query(raw) {
   let sanitized = raw.replace(/[":(){}[\]^~*+\\]/g, " ").replace(/\s+/g, " ").trim();
   if (!sanitized) return '""';
@@ -30782,11 +30775,10 @@ function rebuildIndex(kgPath, kgName, kgType = "project-local") {
   const db = new Database(dbPath);
   try {
     initDb(db);
-    const contentRoot = resolveContentRoot(kgPath);
     const contentDirs = ["knowledge", "lessons-learned", "decisions", "sessions", "chat-history"];
     const allFiles = [];
     for (const dir of contentDirs) {
-      const dirPath = path3.join(contentRoot, dir);
+      const dirPath = path3.join(kgPath, dir);
       allFiles.push(...walkDir(dirPath, ".md"));
     }
     allFiles.push(...walkDir(path3.join(kgPath, "concepts"), ".md"));

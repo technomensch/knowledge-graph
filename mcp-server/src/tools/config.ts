@@ -67,7 +67,7 @@ export function registerConfigTools(server: McpServer): void {
       name: z.string().min(1).describe("Unique name for this knowledge graph"),
       kgPath: z.string().describe("Absolute path where KG should be created"),
       type: z
-        .enum(["project-local", "personal", "cowork", "custom"])
+        .enum(["project-local", "personal", "custom"])
         .default("project-local")
         .describe("KG type"),
       categories: z
