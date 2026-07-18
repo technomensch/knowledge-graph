@@ -19,6 +19,7 @@ Tracking of investigated bugs, defects, and meta-issues for this project.
 
 ## All Issues (Chronological)
 
+- [issue-27: applyStrayKnowledgeDir Silently Overwrote Real KG Content — Actually Happened, Not Hypothetical](issue-27/issue-27-description.md) — **Status:** ✅ Resolved — same session, found live, fixed same day, regression test added
 - [issue-26: `commands/kmg-start-issue-tracking.md` References `docs/issue-tracker.md`, Which Does Not Exist](issue-26/issue-26-description.md) — **Status:** 🟡 Deferred (Track only) — same pattern as [issue-13](issue-13/issue-13-description.md), different surface
 - [issue-25: No Documented Authority for ENH-Spec vs. Issue-Tracking-Workflow (Enhancement Scope Overlap)](issue-25/issue-25-description.md) — **Status:** 🟡 Deferred (Track only) — surfaced while filing [ENH-051](../enhancements/ENH-051/ENH-051-specification.md)
 - [issue-9: Issue-9: Inline Recommendation Protocol Gap](issue-9/issue-9-description.md) — **Status:** (status not set) — graduated to [ADR-049](../decisions/ADR-049-review-audit-protocol-post-plan-pre-push-review-governance.md), [ADR-043](../decisions/ADR-043-pretooluse-hook-injection-superpowers-rule-enforcement.md), [ENH-021](../enhancements/ENH-021/ENH-021-specification.md)

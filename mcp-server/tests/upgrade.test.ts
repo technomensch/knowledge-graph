@@ -1403,6 +1403,47 @@ describe("T-49: applyStrayKnowledgeDir moves unmodified template files to concep
     // stray dir still exists (file not moved)
     expect(fs.existsSync(path.join(kgRoot, "knowledge"))).toBe(true);
   });
+
+  test("real accumulated content in concepts/ is never overwritten, even when the stray file is unmodified", async () => {
+    // Regression test: the stray file itself can be byte-identical to the
+    // canonical plugin template (i.e. it looks "safe to move" by the old
+    // logic) while concepts/ already holds unrelated real content under the
+    // same filename. Moving it must never silently destroy that content —
+    // this reproduces a real incident where concepts/patterns.md (146 lines
+    // of accumulated patterns) was overwritten by an unmodified blank
+    // knowledge/patterns.md stray file.
+    const kgRoot = makeTempDir("t49c");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    fs.mkdirSync(path.join(kgRoot, "knowledge"), { recursive: true });
+    fs.mkdirSync(path.join(kgRoot, "concepts"), { recursive: true });
+
+    const mockPluginRoot = makeTempDir("t49c-plugin");
+    tempDirs.push(mockPluginRoot);
+    const srcDir = path.join(mockPluginRoot, "core", "default-templates", "concepts", "templates");
+    fs.mkdirSync(srcDir, { recursive: true });
+    const canonical = "# Patterns\n\n(blank starter template)\n";
+    fs.writeFileSync(path.join(srcDir, "patterns.md"), canonical, "utf-8");
+    const { getPluginRoot } = jest.requireMock("../src/utils.js") as { getPluginRoot: jest.Mock };
+    getPluginRoot.mockReturnValue(mockPluginRoot);
+
+    // Stray file is unmodified — byte-identical to the canonical template.
+    fs.writeFileSync(path.join(kgRoot, "knowledge", "patterns.md"), canonical, "utf-8");
+    // concepts/patterns.md already holds real, unrelated, populated content.
+    const realContent = "# Patterns\n\n## Real Pattern One\nAccumulated over months.\n";
+    fs.writeFileSync(path.join(kgRoot, "concepts", "patterns.md"), realContent, "utf-8");
+
+    mockActiveKg(kgRoot, { type: "project-local" });
+    const result = await handleUpgrade({ apply: ["stray-knowledge-dir"] });
+    const text = result.content[0].text;
+
+    // Real content must survive untouched.
+    expect(fs.readFileSync(path.join(kgRoot, "concepts", "patterns.md"), "utf-8")).toBe(realContent);
+    // Reported as skipped, not silently moved.
+    expect(text).toContain("already exists with different content");
+    // Stray file left in place (not moved, not deleted) since it wasn't merged.
+    expect(fs.existsSync(path.join(kgRoot, "knowledge", "patterns.md"))).toBe(true);
+  });
 });
 
 // ---------------------------------------------------------------------------

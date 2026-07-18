@@ -32308,6 +32308,18 @@ function applyStrayKnowledgeDir(kgPath) {
       ignored.push(entry);
       continue;
     }
+    const dest = path9.join(destConcepts, entry);
+    if (fs9.existsSync(dest)) {
+      const srcContent = fs9.readFileSync(src, "utf-8");
+      const destContent = fs9.readFileSync(dest, "utf-8");
+      if (srcContent !== destContent) {
+        skipped.push(`${entry} (concepts/${entry} already exists with different content \u2014 manual review required, not moved)`);
+        continue;
+      }
+      fs9.unlinkSync(src);
+      moved.push(`${entry} (duplicate removed, concepts/${entry} unchanged)`);
+      continue;
+    }
     const canonicalSrc = path9.join(sourceDir, entry);
     if (fs9.existsSync(canonicalSrc)) {
       const srcContent = fs9.readFileSync(src, "utf-8");
@@ -32317,7 +32329,6 @@ function applyStrayKnowledgeDir(kgPath) {
         continue;
       }
     }
-    const dest = path9.join(destConcepts, entry);
     fs9.copyFileSync(src, dest);
     fs9.unlinkSync(src);
     moved.push(entry);

@@ -496,6 +496,26 @@ function applyStrayKnowledgeDir(kgPath: string): string {
       continue;
     }
 
+    const dest = path.join(destConcepts, entry);
+    if (fs.existsSync(dest)) {
+      // ADR-063: never destroy known-good state. The destination may already
+      // hold real accumulated content — check it before touching it at all,
+      // regardless of whether the stray file itself matches the canonical
+      // template (that check alone is not sufficient: a stray file that is
+      // an unmodified blank template will still silently wipe a populated
+      // destination file of the same name if this check is skipped).
+      const srcContent = fs.readFileSync(src, "utf-8");
+      const destContent = fs.readFileSync(dest, "utf-8");
+      if (srcContent !== destContent) {
+        skipped.push(`${entry} (concepts/${entry} already exists with different content — manual review required, not moved)`);
+        continue;
+      }
+      // Destination already has identical content — just remove the stray duplicate.
+      fs.unlinkSync(src);
+      moved.push(`${entry} (duplicate removed, concepts/${entry} unchanged)`);
+      continue;
+    }
+
     const canonicalSrc = path.join(sourceDir, entry);
     if (fs.existsSync(canonicalSrc)) {
       const srcContent = fs.readFileSync(src, "utf-8");
@@ -507,7 +527,6 @@ function applyStrayKnowledgeDir(kgPath: string): string {
       }
     }
 
-    const dest = path.join(destConcepts, entry);
     fs.copyFileSync(src, dest);
     fs.unlinkSync(src);
     moved.push(entry);
