@@ -440,7 +440,15 @@ function checkStrayKnowledgeDir(kgPath: string, kgType: string | undefined): Upg
   return [{
     category: "stray-knowledge-dir",
     description: "knowledge/ subdirectory exists inside kgPath (nonsensical nesting from pre-v0.5.0 init)",
-    details: `Found: ${strayDir}\nApply stray-knowledge-dir to merge known template files into concepts/ and remove the dir.`,
+    details:
+      `Found an old leftover folder: ${strayDir}\n\n` +
+      `This is a small mix-up from how this knowledge graph was originally set up — a few starter files ` +
+      `(patterns, gotchas, etc.) ended up nested one folder too deep instead of living in concepts/ where ` +
+      `they belong.\n\n` +
+      `Fixing this is safe: any file that's identical in both places just gets tidied up automatically. ` +
+      `If a file is genuinely different in both places, nothing gets touched — you'll see exactly which ` +
+      `files differ so you can look at them yourself and decide what to keep. Nothing is ever deleted or ` +
+      `overwritten without you saying so.`,
   }];
 }
 
@@ -496,18 +504,18 @@ function applyStrayKnowledgeDir(kgPath: string): string {
       continue;
     }
 
+    const srcContent = fs.readFileSync(src, "utf-8");
+
+    // ADR-063: never destroy known-good state, and never auto-resolve a real
+    // conflict on the tool's own judgment — this always reports for a human
+    // decision, even when the stray file is provably blank boilerplate. The
+    // tool's job is to explain what it found and why it stopped, not to act
+    // on the human's behalf.
     const dest = path.join(destConcepts, entry);
     if (fs.existsSync(dest)) {
-      // ADR-063: never destroy known-good state. The destination may already
-      // hold real accumulated content — check it before touching it at all,
-      // regardless of whether the stray file itself matches the canonical
-      // template (that check alone is not sufficient: a stray file that is
-      // an unmodified blank template will still silently wipe a populated
-      // destination file of the same name if this check is skipped).
-      const srcContent = fs.readFileSync(src, "utf-8");
       const destContent = fs.readFileSync(dest, "utf-8");
       if (srcContent !== destContent) {
-        skipped.push(`${entry} (concepts/${entry} already exists with different content — manual review required, not moved)`);
+        skipped.push(`${entry} (both knowledge/${entry} and concepts/${entry} contain different content — manual review required, neither touched)`);
         continue;
       }
       // Destination already has identical content — just remove the stray duplicate.
@@ -518,7 +526,6 @@ function applyStrayKnowledgeDir(kgPath: string): string {
 
     const canonicalSrc = path.join(sourceDir, entry);
     if (fs.existsSync(canonicalSrc)) {
-      const srcContent = fs.readFileSync(src, "utf-8");
       const canonContent = fs.readFileSync(canonicalSrc, "utf-8");
       if (srcContent !== canonContent) {
         // ADR-040: user modified — warn, do not auto-overwrite
@@ -540,7 +547,7 @@ function applyStrayKnowledgeDir(kgPath: string): string {
 
   const parts: string[] = [];
   if (moved.length > 0) parts.push(`Moved to concepts/: ${moved.join(", ")}`);
-  if (skipped.length > 0) parts.push(`Skipped (modified): ${skipped.join(", ")}`);
+  if (skipped.length > 0) parts.push(`Skipped (needs manual review): ${skipped.join(", ")}`);
   if (ignored.length > 0) parts.push(`Ignored (not template files): ${ignored.join(", ")}`);
   if (remaining.length > 0) parts.push(`knowledge/ not removed — ${remaining.length} item(s) remain`);
   return parts.join(". ") || "Nothing to move";

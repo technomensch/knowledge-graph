@@ -32266,8 +32266,11 @@ function checkStrayKnowledgeDir(kgPath, kgType) {
   return [{
     category: "stray-knowledge-dir",
     description: "knowledge/ subdirectory exists inside kgPath (nonsensical nesting from pre-v0.5.0 init)",
-    details: `Found: ${strayDir}
-Apply stray-knowledge-dir to merge known template files into concepts/ and remove the dir.`
+    details: `Found an old leftover folder: ${strayDir}
+
+This is a small mix-up from how this knowledge graph was originally set up \u2014 a few starter files (patterns, gotchas, etc.) ended up nested one folder too deep instead of living in concepts/ where they belong.
+
+Fixing this is safe: any file that's identical in both places just gets tidied up automatically. If a file is genuinely different in both places, nothing gets touched \u2014 you'll see exactly which files differ so you can look at them yourself and decide what to keep. Nothing is ever deleted or overwritten without you saying so.`
   }];
 }
 function checkConfigLocation() {
@@ -32308,12 +32311,12 @@ function applyStrayKnowledgeDir(kgPath) {
       ignored.push(entry);
       continue;
     }
+    const srcContent = fs9.readFileSync(src, "utf-8");
     const dest = path9.join(destConcepts, entry);
     if (fs9.existsSync(dest)) {
-      const srcContent = fs9.readFileSync(src, "utf-8");
       const destContent = fs9.readFileSync(dest, "utf-8");
       if (srcContent !== destContent) {
-        skipped.push(`${entry} (concepts/${entry} already exists with different content \u2014 manual review required, not moved)`);
+        skipped.push(`${entry} (both knowledge/${entry} and concepts/${entry} contain different content \u2014 manual review required, neither touched)`);
         continue;
       }
       fs9.unlinkSync(src);
@@ -32322,7 +32325,6 @@ function applyStrayKnowledgeDir(kgPath) {
     }
     const canonicalSrc = path9.join(sourceDir, entry);
     if (fs9.existsSync(canonicalSrc)) {
-      const srcContent = fs9.readFileSync(src, "utf-8");
       const canonContent = fs9.readFileSync(canonicalSrc, "utf-8");
       if (srcContent !== canonContent) {
         skipped.push(`${entry} (modified \u2014 manual review required before moving to concepts/)`);
@@ -32339,7 +32341,7 @@ function applyStrayKnowledgeDir(kgPath) {
   }
   const parts = [];
   if (moved.length > 0) parts.push(`Moved to concepts/: ${moved.join(", ")}`);
-  if (skipped.length > 0) parts.push(`Skipped (modified): ${skipped.join(", ")}`);
+  if (skipped.length > 0) parts.push(`Skipped (needs manual review): ${skipped.join(", ")}`);
   if (ignored.length > 0) parts.push(`Ignored (not template files): ${ignored.join(", ")}`);
   if (remaining.length > 0) parts.push(`knowledge/ not removed \u2014 ${remaining.length} item(s) remain`);
   return parts.join(". ") || "Nothing to move";

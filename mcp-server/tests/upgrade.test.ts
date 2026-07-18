@@ -1440,7 +1440,7 @@ describe("T-49: applyStrayKnowledgeDir moves unmodified template files to concep
     // Real content must survive untouched.
     expect(fs.readFileSync(path.join(kgRoot, "concepts", "patterns.md"), "utf-8")).toBe(realContent);
     // Reported as skipped, not silently moved.
-    expect(text).toContain("already exists with different content");
+    expect(text).toContain("contain different content");
     // Stray file left in place (not moved, not deleted) since it wasn't merged.
     expect(fs.existsSync(path.join(kgRoot, "knowledge", "patterns.md"))).toBe(true);
   });
