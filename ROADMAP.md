@@ -6,7 +6,7 @@ A filtered, ranked view onto the sections below — not a replacement for them. 
 
 ### Tier 1 — Active / Do Next
 
-- **v0.6.20 — Storage migration completion (ADR-066 execution).** Decision's made and the 13-task plan is drafted (`~/.claude/plans/v0.6.20-storage-migration-completion.md`), but nothing's started yet — no branch, no code touched. It resolves ADR-066 (cowork/global-topic KG storage) and finishes the `docs/`→`knowledge/` folder-migration sweep that an independent Fable audit found incomplete: 106 stale lines across 15 files, including `core/`.
+- **v0.6.20 — Storage migration completion (ADR-066 execution).** In progress on branch `v0.6.20-storage-migration-completion`: Tasks 1-7 of 13 complete (mcp-server ADR-066 fixes, upgrade-inspector cowork/global-topic handling, `kmg-init.md`/`kmg-list.md` cowork removal, the 13-file `docs/`→`knowledge/` folder-migration sweep, `INSTALL.md` advisory) — Opus-reviewed, two findings fixed. Remaining: `ROADMAP.md`/`package-lock.json` sync, version bump, supporting docs sweep, verification, push/PR.
 - **Process/tooling gaps found 2026-07-17 — all open, none designed or fixed yet:** issue-17/#175 (no recall trigger when the assistant needs mid-task clarification), issue-18/#176 (`gov-capture-routing` is referenced by 8+ commands but unreachable via the Skill tool — the file's real, just in the wrong location; full provenance in the issue doc), issue-19/#177 (no hook-level enforcement for issue-creation discipline; proposes a `PostToolUse` hook, not yet designed), issue-20/#179 (this session skipped its own Bug/Enhancement Triage rule — the same-feature-area check and Path F/1/2/3 routing question — for 4 filings before catching itself), ENH-048/#178 (session-wrap should verify outstanding items' status/priority is still accurate before closing out; linked to ENH-002), ENH-049/#180 (notes the need to work across multiple repos/tools concurrently with different active KGs, without yet designing a solution; cross-references ADR-067).
 - **issue-11 — Scan-based GitHub-issue-sync invariant.** The one item left on the branch you're already on (`v0.6.18-misc-patches`) — finish it before picking up anything else.
 - **ENH-040 — Stop indexing `chat-history/*.md` in `kg_search`/`kg_fts5_rebuild`.** ADR-060 decided chat history shouldn't be searchable, but the code never caught up — confirmed still indexed as of this sweep, so every search a user runs is quietly polluted by raw chat transcripts until this lands. Cheap fix, high-frequency payoff.
@@ -108,13 +108,13 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 ### UX / Ergonomics
 
 - **Skill aliases / short commands** (Low priority) — Allow `/kmgraph:cl` as alias for `/kmgraph:kmg-capture-lesson` etc., configurable in kg-config.json. Deferred: marginal UX gain vs configuration complexity; autocomplete already handles this.
-- **Backup before destructive operations** (Medium priority) — `switch` and `init` should auto-snapshot current state before category deletion or KG removal (`cp -r` to `~/.claude/kg-backups/`). Deferred: users should use git for versioning; this is insurance against user error only.
+- **Backup before destructive operations** (Medium priority) — `switch` and `init` should auto-snapshot current state before category deletion or KG removal (`cp -r` to `~/.kmgraph/kg-backups/`). Deferred: users should use git for versioning; this is insurance against user error only.
 - **Archival / superseding KG entries** (Low priority) — Mark entries as `status: superseded`, archive to `archive/` subdirectory, search includes archived content. Useful for mature KGs where patterns evolve. Deferred: adds lifecycle complexity before core usage patterns are established.
 
 ### Data / Storage
 
-- **Per-project config overrides** (Medium priority) — Allow `.claude/kg-local.json` at project root to commit shared category definitions for teams. Read hierarchy: project-local → global → defaults. Deferred: multi-KG already supports project-local KGs; this targets team collaboration at scale.
-- **Cross-repo knowledge graphs** (Medium priority) — Share KG entries across multiple repos via global topic-based KGs at `~/.claude/knowledge-graphs/<topic>/`. Deferred: pattern already documentable; needs usage examples in PLATFORM-ADAPTATION.md.
+- **Per-project config overrides** (Medium priority) — Allow `.kmgraph/kg-local.json` at project root to commit shared category definitions for teams. Read hierarchy: project-local → global → defaults. Deferred: multi-KG already supports project-local KGs; this targets team collaboration at scale.
+- **Cross-repo knowledge graphs** (Medium priority) — Share KG entries across multiple repos via global topic-based KGs at `~/.kmgraph/knowledge-graphs/<topic>/`. Deferred: pattern already documentable; needs usage examples in PLATFORM-ADAPTATION.md.
 
 
 ### MCP / Platform Extensibility
@@ -159,7 +159,7 @@ Full detail, file:line evidence, and verdicts for every item below: `knowledge/a
 - ENH-025 / ENH-035 — overlapping backfill-extractor specs; reconcile into one spec before any implementation
 - `ROADMAP.md` / `CHANGELOG.md` structural reconciliation — chronological ordering broken in both (e.g. stale `v0.2.2-beta (In Progress: 2026-03-29)` marker here; CHANGELOG's stray `## [Released]` divider after which versions restart out of order)
 - **ADR-067 (proposed) — mutable `.active` switch vs. context-derived KG resolution.** Raised 2026-07-15. Right now "which KG" resolves through a single mutable `.active` pointer that `kmg-switch` rewrites and every tool reads — global mutable state shared across sessions and projects, with a real cross-KG "bleed" risk from a stale pointer, concurrent sessions, or an active/cwd mismatch. Still open: keep the switch, derive the KG from context instead (project-root/cwd, context-mode style), or go hybrid — and how personal/global/cowork cross-project KGs fit into whichever answer wins. The blast radius is large, touching every `kg_*` tool and command, and would supersede `kmg-switch` (including its issue-14/c1 fix). Deferred past this session. Full context and the open decision: `knowledge/decisions/ADR-067-*.md` (proposed).
-- ~~ADR-066 (proposed) — KG *content*-storage location for global-topic/cowork modes.~~ **RESOLVED 2026-07-17** — moved out of this "needs a brainstorm" list because it got one: in conversation, plus independent web research and a Fable code review. Decision: cowork mode stops being offered for new KGs (existing content gets detected and archived, never silently dropped); global-topic mode stays, relocating `~/.claude/knowledge-graphs/<name>/` → `~/.kmgraph/knowledge-graphs/<name>/` (no wrapper folder); `cli.ts`/MCP server becomes authoritative for the storage-mode list once its own home-option bug is fixed. Full decision recorded in `knowledge/decisions/ADR-066-*.md` (status: Accepted). Implementation is planned but not started: `~/.claude/plans/v0.6.20-storage-migration-completion.md` (13 tasks — also completes the `docs/`→`knowledge/` folder-migration sweep an independent Fable audit found incomplete, 106 stale lines across 15 files).
+- ~~ADR-066 (proposed) — KG *content*-storage location for global-topic/cowork modes.~~ **RESOLVED 2026-07-17** — moved out of this "needs a brainstorm" list because it got one: in conversation, plus independent web research and a Fable code review. Decision: cowork mode stops being offered for new KGs (existing content gets detected and archived, never silently dropped); global-topic mode stays, relocating `~/.claude/knowledge-graphs/<name>/` → `~/.kmgraph/knowledge-graphs/<name>/` (no wrapper folder); `cli.ts`/MCP server becomes authoritative for the storage-mode list once its own home-option bug is fixed. Full decision recorded in `knowledge/decisions/ADR-066-*.md` (status: Accepted). Implementation in progress on `v0.6.20-storage-migration-completion` (Tasks 1-7 of 13 done as of this edit — see Tier 1 entry above): `~/.claude/plans/v0.6.20-storage-migration-completion.md` (13 tasks — also completes the `docs/`→`knowledge/` folder-migration sweep an independent Fable audit found incomplete, 106 stale lines across 15 files).
 
 **Unclear — needs a human call before triaging further:**
 - ADR-046 — concept+setup hybrid page type (file has duplicated frontmatter blocks, Proposed vs Accepted; unclear whether executed in the docs site)
@@ -176,7 +176,7 @@ Full detail, file:line evidence, and verdicts for every item below: `knowledge/a
 
 ---
 
-## v0.6.18 — Post-Release Patches (🔲 In Progress: 2026-07-11)
+## v0.6.18 — Post-Release Patches (✅ Released: 2026-07-10)
 
 Branch: `v0.6.18-misc-patches`
 
@@ -250,7 +250,7 @@ Test suite:
 
 ### Template Customization System
 **Priority**: Medium
-**Current State**: Users can override templates in project-local docs/templates/
+**Current State**: Users can override templates in project-local knowledge/templates/
 
 Enhancements:
 - Template inheritance (extend plugin template, override specific sections)

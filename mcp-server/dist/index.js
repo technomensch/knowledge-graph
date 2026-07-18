@@ -31891,7 +31891,7 @@ var path9 = __toESM(require("path"));
 var os6 = __toESM(require("os"));
 
 // src/tools/version.ts
-var pkg = { version: true ? "0.6.19" : "0.0.0" };
+var pkg = { version: true ? "0.6.20" : "0.0.0" };
 var SCHEMA_VERSION = 2;
 function handleVersion() {
   return { installed: pkg.version, schema: SCHEMA_VERSION };
@@ -32481,7 +32481,7 @@ function registerUpgradeTool(server2) {
 // src/index.ts
 var server = new McpServer({
   name: "knowledge-graph",
-  version: true ? "0.6.19" : "0.0.0"
+  version: true ? "0.6.20" : "0.0.0"
 });
 registerConfigTools(server);
 registerSearchTool(server);
