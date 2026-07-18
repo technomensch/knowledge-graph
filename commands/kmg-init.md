@@ -1094,8 +1094,11 @@ Use `AskUserQuestion` tool for each step. Collect:
 ### Step 1.4: Determine final path
 
 ```bash
-# Keep in sync with mcp-server/src/cli.ts:43 (resolveInitLocation) — same three
-# location choices, same resolved paths. If you change one, change the other.
+# The global-topic path below must match cli.ts:53 (resolveInitLocation, case "3") —
+# both currently hardcode "~/.kmgraph/knowledge-graphs/$name". cli.ts's own menu has a
+# different shape (4 choices; its "project-local" default is unrelated to this fix) —
+# this is NOT full parity between the two files, just the one path kept in sync by
+# convention. Structural fix (single source of truth) tracked as ENH-051.
 case $location_type in
   "project-local")
     KG_PATH="./knowledge/"

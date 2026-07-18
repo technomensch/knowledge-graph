@@ -1147,15 +1147,19 @@ After copying, update `kg-config.json` entries whose `path` points under the old
 
 ```bash
 CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
-jq --arg old "$HOME/.claude/knowledge-graphs" --arg new "$HOME/.kmgraph/knowledge-graphs" '
+if jq --arg old "$HOME/.claude/knowledge-graphs" --arg new "$HOME/.kmgraph/knowledge-graphs" '
   .graphs |= with_entries(
     if (.value.path // "") | startswith($old)
     then .value.path = ($new + (.value.path[($old | length):]))
     else . end
   )
-' "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
-mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
-echo "✅ kg-config.json paths updated to ~/.kmgraph/knowledge-graphs/"
+' "$CONFIG_PATH" > "${CONFIG_PATH}.tmp" && [ -s "${CONFIG_PATH}.tmp" ] && jq empty "${CONFIG_PATH}.tmp" 2>/dev/null; then
+  mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
+  echo "✅ kg-config.json paths updated to ~/.kmgraph/knowledge-graphs/"
+else
+  rm -f "${CONFIG_PATH}.tmp"
+  echo "⚠️  kg-config.json update failed (jq error or invalid output) — original left untouched. Update paths manually if needed."
+fi
 ```
 
 **If option (b) — skip:** leave both the legacy directory and `kg-config.json` unchanged.
