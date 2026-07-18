@@ -119,9 +119,13 @@ fi
 current_active=$(jq -r '.active' "$CONFIG_PATH")
 
 # Update active field and lastUsed timestamp
-jq ".active = \"$target_kg\" | .graphs[\"$target_kg\"].lastUsed = \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"" \
-  "$CONFIG_PATH" > "$CONFIG_PATH.tmp"
-mv "$CONFIG_PATH.tmp" "$CONFIG_PATH"
+if jq ".active = \"$target_kg\" | .graphs[\"$target_kg\"].lastUsed = \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"" \
+  "$CONFIG_PATH" > "$CONFIG_PATH.tmp" && [ -s "$CONFIG_PATH.tmp" ] && jq empty "$CONFIG_PATH.tmp" 2>/dev/null; then
+  mv "$CONFIG_PATH.tmp" "$CONFIG_PATH"
+else
+  rm -f "$CONFIG_PATH.tmp"
+  echo "⚠️  kg-config.json update failed (jq error or invalid output) — active KG left unchanged."
+fi
 ```
 
 ### Step 5: Report success

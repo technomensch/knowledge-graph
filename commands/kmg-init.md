@@ -140,8 +140,13 @@ if [ -f "$OLD_DB" ] && [ "$FTS5_MIGRATED" != "true" ]; then
   read -r CONSENT
   if [ "$CONSENT" = "1" ]; then
     # Write consent marker — prevents prompt from reappearing on subsequent init runs
-    jq ".graphs[\"${KG_NAME}\"].fts5_index_migrated = true" "$CONFIG_PATH" > /tmp/kg-config-tmp.json \
-      && mv /tmp/kg-config-tmp.json "$CONFIG_PATH"
+    if jq ".graphs[\"${KG_NAME}\"].fts5_index_migrated = true" "$CONFIG_PATH" > /tmp/kg-config-tmp.json \
+      && [ -s /tmp/kg-config-tmp.json ] && jq empty /tmp/kg-config-tmp.json 2>/dev/null; then
+      mv /tmp/kg-config-tmp.json "$CONFIG_PATH"
+    else
+      rm -f /tmp/kg-config-tmp.json
+      printf '⚠️  kg-config.json update failed (jq error or invalid output) — original left untouched.\n'
+    fi
     printf '✓ Index location updated. Run kg_fts5_rebuild or /kmgraph:kmg-sync-all to rebuild.\n'
   else
     printf 'Skipped. Search continues via linear scan until you choose to migrate.\n'

@@ -383,14 +383,18 @@ fi
 # - notification: { webhookUrl: "" } (added in v0.2.0)
 # - type: "project-local" (added in v0.2.2 — required for multi-KG support)
 
-jq '
+if jq '
   .graphs["{kg_name}"] |=
     if .platforms == null then .platforms = [] else . end |
     if .autoSwitch == null then .autoSwitch = false else . end |
     if .notification == null then .notification = { "webhookUrl": "" } else . end |
     if .type == null then .type = "{KG_TYPE}" else . end
-' "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
-mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
+' "$CONFIG_PATH" > "${CONFIG_PATH}.tmp" && [ -s "${CONFIG_PATH}.tmp" ] && jq empty "${CONFIG_PATH}.tmp" 2>/dev/null; then
+  mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
+else
+  rm -f "${CONFIG_PATH}.tmp"
+  echo "⚠️  kg-config.json update failed (jq error or invalid output) — original left untouched."
+fi
 ```
 
 **After the migration, check for graphs still missing `type`** (e.g., if the user has multiple registered KGs from v0.2.1):
@@ -937,9 +941,13 @@ Options:
    ```bash
    DEFAULTS_BLOCK=$(awk '/<!-- kmgraph-defaults -->/{found=1} found{print} /<!-- \/kmgraph-defaults -->/{exit}' \
      "${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/project/rules.md")
-   printf '%s\n\n' "$DEFAULTS_BLOCK" | cat - "{KG_PATH}/rules.md" > /tmp/rules-patched.md
-   mv /tmp/rules-patched.md "{KG_PATH}/rules.md"
-   echo "✅ kmgraph-defaults block prepended to rules.md"
+   if printf '%s\n\n' "$DEFAULTS_BLOCK" | cat - "{KG_PATH}/rules.md" > /tmp/rules-patched.md && [ -s /tmp/rules-patched.md ]; then
+     mv /tmp/rules-patched.md "{KG_PATH}/rules.md"
+     echo "✅ kmgraph-defaults block prepended to rules.md"
+   else
+     rm -f /tmp/rules-patched.md
+     echo "⚠️  rules.md prepend failed (empty or write error) — original left untouched (archived copy at $ARCHIVE_DIR/rules.md)."
+   fi
    ```
 
 **Safety rules:**

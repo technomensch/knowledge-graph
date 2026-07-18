@@ -362,9 +362,13 @@ mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
 if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
   cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
 fi
-jq '.graphs["personal"].wiki_pass_complete = true' \
-  "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
-mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
+if jq '.graphs["personal"].wiki_pass_complete = true' \
+  "$CONFIG_PATH" > "${CONFIG_PATH}.tmp" && [ -s "${CONFIG_PATH}.tmp" ] && jq empty "${CONFIG_PATH}.tmp" 2>/dev/null; then
+  mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
+else
+  rm -f "${CONFIG_PATH}.tmp"
+  echo "⚠️  kg-config.json update failed (jq error or invalid output) — original left untouched."
+fi
 ```
 
 If the personal KG has no content files yet (fresh install), exit cleanly with `0 files modified` — no error.
