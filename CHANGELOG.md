@@ -9,6 +9,25 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
+## [0.6.20] — 2026-07-18
+
+### Changed
+- **ADR-066 resolved: cowork KG mode retired, global-topic KG storage relocated.** Cowork mode no longer offered in new setups — real Claude Cowork has no plugin/slash-command extensibility, so it was never actually reachable through the product it targeted. Global-topic KGs (named, cross-project, not tied to any single repo) relocate from `~/.claude/knowledge-graphs/<name>/` to `~/.kmgraph/knowledge-graphs/<name>/`, no wrapper folder. `mcp-server/src/cli.ts` fixed first (its "home" option had no `<name>` subfolder, would have overlaid the personal KG) before being treated as authoritative; `cli.ts`'s `cowork` type purged from its own menu and from `config.ts`'s type enum, with new test coverage. `commands/kmg-init.md`'s wizard menu, path resolution, and git-strategy notes updated to match; `commands/kmg-list.md`/`commands/kmg-switch.md` example output updated. `fts5.ts`'s deprecated `getFTS5DbPath()` and `docs/`-as-content-root backward-compat read support removed as dead code.
+- **Upgrade inspector now detects and offers to archive existing `~/.claude/cowork-knowledge/` content** (copy-only, original left in place — never silently dropped, per ADR-063) and detects legacy `~/.claude/knowledge-graphs/` for a one-time copy-forward to the new location, updating matching `kg-config.json` paths.
+- **106-line folder-structure migration sweep** (independent Fable audit finding) — stale `docs/` KG-root references corrected to `knowledge/` across `core/docs/`, `core/README.md`, `core/examples/`, `skills/kmg-knowledge-graph-usage/references/command-workflows.md`, `docs/CONFIGURATION.md`, `docs/pillars/organizing/graph-configuration.md` and `multi-kg-workflows.md`, `docs/reference/command-guide.md`, `docs/demos/init.tape`, and `commands/kmg-switch.md`. Content-template paths corrected to the real current layout (`knowledge/templates/`) rather than a bare string swap — a naive replace would have reproduced the `knowledge/knowledge/` stray-directory bug ENH-022 already has cleanup tooling for. The `docs/knowledge-graph/` alternate-KG-root example removed entirely (confirmed stale, no longer supported).
+- **`ROADMAP.md`/`INSTALL.md` reconciliation** — fixed a v0.6.18 status contradiction (header said "In Progress," table already said "Released"), renamed two future-feature path proposals to platform-neutral equivalents, and updated the `INSTALL.md:250` upgrade advisory to check both the legacy and current `kg-config.json` locations.
+
+### Fixed
+- **Opus review of this branch's own commits found a real write-safety gap**, fixed before merge: the new global-topic relocation's `kg-config.json` rewrite had no guard against a `jq` failure — a failed parse would have truncated the temp file to empty, then unconditionally overwritten a valid config with it, violating this same change's own stated ADR-063 safety rule. Now verifies `jq` succeeded and produced valid, non-empty JSON before writing; on any failure, leaves the original untouched.
+- A sync-comment claiming `kmg-init.md` and `cli.ts` had "the same three location choices, same resolved paths" was false (`cli.ts` has four choices with diverging defaults) — corrected to describe only what's actually kept in sync.
+
+### Known gaps, tracked separately
+- **ENH-051** — `kg_config_init`/`kg_scaffold` still can't compute a KG path from a location choice; `cli.ts` and `kmg-init.md` each hand-maintain their own copy, kept in sync by convention/comment, not structurally. ADR-066 named the eventual fix; never built.
+- **issue-25** — no documented rule for which of two overlapping mechanisms (hand-written `ENH-NNN` spec vs. `/kmgraph:kmg-start-issue-tracking`) governs enhancement capture in this project.
+- **issue-26** — `commands/kmg-start-issue-tracking.md` references `docs/issue-tracker.md`, which git history confirms never existed.
+
+No GitHub issue closes with this release — ADR-066 was never filed as its own issue (only cross-referenced to #171 as out-of-scope-for-issue-14); referenced by ADR name in commits instead.
+
 ## [0.6.19] — 2026-07-16
 
 ### Fixed
