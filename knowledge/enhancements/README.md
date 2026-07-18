@@ -24,6 +24,7 @@ Formal tracking of proposed and resolved enhancements for this project.
 
 ## All ENHs (Chronological)
 
+- [ENH-051: Stop Hand-Duplicating KG Path Logic Between cli.ts and kmg-init.md](ENH-051/ENH-051-specification.md) — **Status:** 🟡 Deferred (Track only) — Governed by [ADR-066](../decisions/ADR-066-kg-content-storage-location-for-global-and-cowork-modes.md), [ADR-067](../decisions/ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md)
 - [ENH-041: Broken nav breadcrumb (GETTING-STARTED.md / WORKFLOWS.md) baked into every index README scaffold](ENH-041/ENH-041-specification.md) — **Status:** 🟡 Proposed
 - [ENH-040: Remove chat-history/*.md from kg_search / kg_fts5_rebuild indexing scope](ENH-040/ENH-040-specification.md) — **Status:** 🟡 Proposed — Governed by [ADR-060](../decisions/ADR-060-narrow-kg-search-scope-away-from-raw-chat-history.md)
 - [ENH-039: Rule-injection scripts hardcode personal split-file names instead of discovering them](ENH-039/ENH-039-specification.md) — **Status:** 🟡 Proposed

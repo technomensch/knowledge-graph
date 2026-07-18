@@ -19,6 +19,8 @@ Tracking of investigated bugs, defects, and meta-issues for this project.
 
 ## All Issues (Chronological)
 
+- [issue-26: `commands/kmg-start-issue-tracking.md` References `docs/issue-tracker.md`, Which Does Not Exist](issue-26/issue-26-description.md) — **Status:** 🟡 Deferred (Track only) — same pattern as [issue-13](issue-13/issue-13-description.md), different surface
+- [issue-25: No Documented Authority for ENH-Spec vs. Issue-Tracking-Workflow (Enhancement Scope Overlap)](issue-25/issue-25-description.md) — **Status:** 🟡 Deferred (Track only) — surfaced while filing [ENH-051](../enhancements/ENH-051/ENH-051-specification.md)
 - [issue-9: Issue-9: Inline Recommendation Protocol Gap](issue-9/issue-9-description.md) — **Status:** (status not set) — graduated to [ADR-049](../decisions/ADR-049-review-audit-protocol-post-plan-pre-push-review-governance.md), [ADR-043](../decisions/ADR-043-pretooluse-hook-injection-superpowers-rule-enforcement.md), [ENH-021](../enhancements/ENH-021/ENH-021-specification.md)
 - [issue-8: Issue-8: Docs Update Enforcement 3-Gate Fix](issue-8/issue-8-description.md) — **Status:** (status not set) — graduated to [ADR-013](../decisions/ADR-013-documentation-update-protocol.md), [ADR-021](../decisions/ADR-021-single-source-of-truth-dry-documentation.md), [ADR-036](../decisions/ADR-036-docs-impact-scan.md), [ENH-015](../enhancements/ENH-015/ENH-015-specification.md)
 - [issue-7: Issue-7: Bash Permission Prompt Provides No Context — Indistinguishable from Review Audit HALT](issue-7/issue-7-description.md) — **Status:** (status not set) — graduated to [ADR-049](../decisions/ADR-049-review-audit-protocol-post-plan-pre-push-review-governance.md), [ENH-020](../enhancements/ENH-020/ENH-020-specification.md)
