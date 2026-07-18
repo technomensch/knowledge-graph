@@ -4,8 +4,8 @@
 
 Formal tracking of proposed and resolved enhancements for this project.
 
-**Total ENHs:** 40
-**Last Updated:** 2026-07-05
+**Total ENHs:** 46
+**Last Updated:** 2026-07-18
 
 ---
 
@@ -24,6 +24,7 @@ Formal tracking of proposed and resolved enhancements for this project.
 
 ## All ENHs (Chronological)
 
+- [ENH-052: No pre-PR consistency check for the knowledge graph's own internal paperwork (README indexes, status frontmatter, backlinks, changelog/summary currency)](ENH-052/ENH-052-specification.md) — **Status:** 🟡 Deferred (Track only) — same underlying pattern as [issue-13](../issues/issue-13/issue-13-description.md), [ENH-042](ENH-042/ENH-042-specification.md), [issue-26](../issues/issue-26/issue-26-description.md)
 - [ENH-051: Stop Hand-Duplicating KG Path Logic Between cli.ts and kmg-init.md](ENH-051/ENH-051-specification.md) — **Status:** 🟡 Deferred (Track only) — Governed by [ADR-066](../decisions/ADR-066-kg-content-storage-location-for-global-and-cowork-modes.md), [ADR-067](../decisions/ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md)
 - [ENH-041: Broken nav breadcrumb (GETTING-STARTED.md / WORKFLOWS.md) baked into every index README scaffold](ENH-041/ENH-041-specification.md) — **Status:** 🟡 Proposed
 - [ENH-040: Remove chat-history/*.md from kg_search / kg_fts5_rebuild indexing scope](ENH-040/ENH-040-specification.md) — **Status:** 🟡 Proposed — Governed by [ADR-060](../decisions/ADR-060-narrow-kg-search-scope-away-from-raw-chat-history.md)

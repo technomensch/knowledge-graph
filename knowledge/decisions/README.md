@@ -4,8 +4,8 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 60
-**Last Updated:** 2026-07-12
+**Total ADRs:** 68
+**Last Updated:** 2026-07-18
 
 ---
 
@@ -17,6 +17,9 @@ Formal documentation of significant architecture decisions.
 
 ## All ADRs (Chronological)
 
+- [ADR-067: Mutable `.active` switch vs context-derived KG resolution — decision pending](ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md) — **Status:** Proposed — context + open decision only, explicitly deferred (not decided this session); related to [ADR-066](ADR-066-kg-content-storage-location-for-global-and-cowork-modes.md), governs [ENH-051](../enhancements/ENH-051/ENH-051-specification.md).
+- [ADR-066: KG content-storage location for global-topic and cowork modes](ADR-066-kg-content-storage-location-for-global-and-cowork-modes.md) — **Status:** Accepted — resolved 2026-07-17; decided cowork KG mode should be retired and global-topic KG storage relocated. Implemented on `v0.6.20-storage-migration-completion` (this branch) — cowork retirement, storage-location bugfixes, and the 12-file `docs/`→`knowledge/` folder-migration sweep all trace back to this decision.
+- [ADR-065: ROADMAP.md and CHANGELOG.md duplication — CHANGELOG is the single source of truth for shipped history](ADR-065-roadmap-changelog-duplication-changelog-is-source-of-truth.md) — **Status:** Accepted — CHANGELOG.md is authoritative for shipped history; ROADMAP.md covers forward-looking/unshipped work only.
 - [ADR-064: Shared Module Pattern for Slash Command Deduplication](ADR-064-shared-module-pattern-for-slash-command-deduplication.md) — **Status:** Accepted — Duplicated init command logic extracted into five parameterized shared modules under `commands/kmg-init-shared/`; parent commands invoke modules by name with explicit parameter contracts. (Restored 2026-07-12 from archive — original was overwritten by ADR numbering collision on 2026-04-10.)
 - [ADR-063: Never destroy known-good state before the replacement is confirmed written](ADR-063-never-destroy-known-good-state-before-confirmed-write.md) — **Status:** Accepted — two unrelated subsystems (chat-extraction's `--rebuild` path, and the separate `kg-config-silent-overwrite` bash-hook incident) independently hit the identical anti-pattern on the same day: destroying existing state (`shutil.rmtree`, `cp`/`rm -f` over a real config file) before a replacement was confirmed written, protected only by best-effort cleanup that a non-graceful interruption could bypass. Decision: never destroy old state until the new state exists and is confirmed complete — atomic write (temp file + rename/replace) plus rename-aside (not delete) for anything that must eventually be cleared. Implemented on `v0.6.18-fix-extraction-regressions` (chat-extraction side) and the merged sibling `v0.6.19-fix-kg-config-silent-overwrite` work (kg-config side).
 - [ADR-062: Gemini .pb/hash-named directory project scoping fails closed, not open](ADR-062-gemini-pb-project-scoping-fail-closed.md) — **Status:** Accepted — real-data testing found ENH-044's `.json`/`.jsonl` `--project` fix (v0.6.17) didn't close the whole contamination vector: `.pb` files carry no per-project path signal, so 93 real `.pb` files and 9 hash-named directories were still unscoped (masked on this machine only by an absent optional dependency). Decision: fail closed — exclude anything unattributable to the requested project, with a visible skip notice, rather than risk leaking a foreign project's private conversation into this project's committed, searchable knowledge graph. A future payload-decoded project signal could recover excluded content later, explicitly deferred. Implemented under umbrella [ENH-038](../enhancements/ENH-038/ENH-038-specification.md) / [ENH-044](../issues/chat-extraction-reliability-saga/attempts/ENH-044/specification.md). **Amended 2026-07-11:** a post-merge review found the implementation didn't fully achieve this decision — check ordering let a hex `--project` filter fail open on a hash-named directory; closed (policy unchanged, ordering fixed).
@@ -114,7 +117,7 @@ See [core/examples/decisions/](../../examples/decisions/) for filled-out ADR exa
 ## Creating a New ADR
 
 1. **Determine next number:** Find the highest existing ADR number and increment
-2. **Copy template:** Use [ADR-template.md](ADR-template.md)
+2. **Copy template:** Use [ADR-template.md](../templates/ADR-template.md)
 3. **Fill all sections:** Context, Decision, Rationale, Consequences
 4. **Link to evidence:** Reference lessons learned, KG entries, implementation
 5. **Update this index:** Add entry above
@@ -143,7 +146,7 @@ ADRs follow a lightweight format:
 
 **Concepts & Guides**:
 - [Concepts Guide](../../../docs/CONCEPTS.md#adr-architecture-decision-record) - Term explanations
-- [ADR template](ADR-template.md) - Starting scaffold
+- [ADR template](../templates/ADR-template.md) - Starting scaffold
 
 **Resources**:
 - [Real Examples](../../examples/decisions/) - Filled-out ADRs

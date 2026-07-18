@@ -39,6 +39,8 @@ Discovered while executing v0.6.20 Task 4 (branch `v0.6.20-storage-migration-com
 - **ADR-067 (Proposed, open)** — mutable `.active` switch vs. context-derived KG resolution. Adjacent, not overlapping: both concern "which layer decides where a KG lives," but ADR-067 is about *identifying the active graph*, this item is about *computing a new graph's storage path*. Must not assume ADR-067's outcome.
 - **ENH-022 (folder-structure migration)** — already touches `kg_config_init` and `kg_scaffold` (its spec notes both "still create old layout" issues, fixed incrementally across v0.5.10.7/v0.6.4 plans). Same tool surface, different concern. Cross-referenced so future edits to either tool check both specs.
 - **Deferred personal/project restructuring** (noted out-of-scope in the v0.6.20 plan, reopens ADR-028 if pursued, possibly tied to v7/npm-distribution planning) — not a filed item, so not a formal dependency. This item is compatible with and likely reduces the cost of that future restructuring (one server-side path function to change instead of two hand-maintained copies), but does not depend on it landing first.
+- [issue-25](../../issues/issue-25/issue-25-description.md) — surfaced while filing this enhancement; no documented rule for which of two overlapping mechanisms governs enhancement capture in this project.
+- [issue-26](../../issues/issue-26/issue-26-description.md) — found while executing `/kmgraph:kmg-start-issue-tracking` to redo this enhancement through the formal workflow after issue-25 was caught.
 
 ## Goals
 

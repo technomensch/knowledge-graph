@@ -144,7 +144,7 @@ See [core/examples/lessons-learned/](../../examples/lessons-learned/) for filled
 
 **Understanding fields**:
 - [Concepts Guide](../../../docs/CONCEPTS.md#yaml-frontmatter) - YAML field explanations
-- [lesson-template.md](lesson-template.md) - See inline field comments
+- [lesson-template.md](../templates/lesson-template.md) - See inline field comments
 
 **See examples**:
 - [Real Examples](../../examples/lessons-learned/) - Filled-out lessons

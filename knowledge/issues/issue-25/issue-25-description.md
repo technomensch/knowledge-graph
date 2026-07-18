@@ -33,3 +33,5 @@ Discovered live, in-session, on 2026-07-18. While filing what became ENH-051 (KG
 
 - No governing ADR currently exists for this split. A new ADR may be the right resolution vehicle (decision has real trade-offs: process weight vs. discoverability/enforcement), rather than a quick rules.md patch.
 - Loosely adjacent to ADR-058 ("naming-scope-upfront-check-for-new-commands-skills-docstrings") — same family of problem (undocumented scope boundaries between project mechanisms), different specific gap.
+- [ENH-051](../../enhancements/ENH-051/ENH-051-specification.md) — the enhancement being filed when this was found.
+- [issue-26](../issue-26/issue-26-description.md) — filed in the same session, same underlying "process/reference gap not caught until hit live" theme.
