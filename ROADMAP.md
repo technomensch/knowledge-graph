@@ -17,6 +17,7 @@ A filtered, ranked view onto the sections below — not a replacement for them. 
 - **ADR-037 — seed default graph-usage rules block at `/kmgraph:init`.** New KGs were supposed to ship with a baseline rules block, but the seeding step never made it into the init scaffold. Small fix — closes the gap between decision and reality.
 - **session-summary-agent plans-path bug.** The agent scans `docs/plans/` for active plans, but the real convention is `~/.claude/plans/` copied into `knowledge/plans/`. It's silently looking in the wrong place — untracked, no ENH filed yet.
 - **ENH-023 remainder — "Protected files guard" injection.** Most of ENH-023 already shipped; this is the last piece — injecting a protected-files check into `pre-skill-rules-inject.sh` so paths like `commands/`/`core/templates/` can't be silently modified by a skill.
+- **issue-28 — No dev-loop mechanism for locally rebuilt `mcp-server/dist/`.** Found while verifying issue-27's fix: live `kg_*` tool calls run whatever version is installed in the plugin cache, not this repo's own rebuild — passing tests can mask a fix that was never actually exercised live. No existing documented solution found; deferred (Track only), no ADR needed.
 
 ### Tier 2 — Blocked on one decision (ENH-034)
 

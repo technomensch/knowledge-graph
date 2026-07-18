@@ -4,8 +4,8 @@
 
 Tracking of investigated bugs, defects, and meta-issues for this project.
 
-**Total Issues:** 9 numbered issues, plus named meta-issues (see below)
-**Last Updated:** 2026-07-10
+**Total Issues:** 10 numbered issues, plus named meta-issues (see below)
+**Last Updated:** 2026-07-18
 
 ---
 
@@ -19,6 +19,7 @@ Tracking of investigated bugs, defects, and meta-issues for this project.
 
 ## All Issues (Chronological)
 
+- [issue-28: No Dev-Loop Mechanism Between a Locally Rebuilt `mcp-server/dist/` and Live `kg_*` Tool Calls](issue-28/issue-28-description.md) — **Status:** 🟡 Deferred (Track only) — found live while verifying [issue-27](issue-27/issue-27-description.md)'s fix; companion lesson: [Lessons_Learned_Debugging_MCP_Server_Rebuild_Not_Reflected_In_Live_Plugin_Tool_Calls](../lessons-learned/debugging/Lessons_Learned_Debugging_MCP_Server_Rebuild_Not_Reflected_In_Live_Plugin_Tool_Calls.md)
 - [issue-27: applyStrayKnowledgeDir Silently Overwrote Real KG Content — Actually Happened, Not Hypothetical](issue-27/issue-27-description.md) — **Status:** ✅ Resolved — same session, found live, fixed same day, regression test added
 - [issue-26: `commands/kmg-start-issue-tracking.md` References `docs/issue-tracker.md`, Which Does Not Exist](issue-26/issue-26-description.md) — **Status:** 🟡 Deferred (Track only) — same pattern as [issue-13](issue-13/issue-13-description.md), different surface
 - [issue-25: No Documented Authority for ENH-Spec vs. Issue-Tracking-Workflow (Enhancement Scope Overlap)](issue-25/issue-25-description.md) — **Status:** 🟡 Deferred (Track only) — surfaced while filing [ENH-051](../enhancements/ENH-051/ENH-051-specification.md)

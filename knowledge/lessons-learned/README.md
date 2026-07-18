@@ -4,8 +4,8 @@
 
 Comprehensive catalog of all lessons-learned documents.
 
-**Total Lessons:** 8
-**Last Updated:** 2026-07-10
+**Total Lessons:** 9
+**Last Updated:** 2026-07-18
 
 ---
 
@@ -40,8 +40,9 @@ Comprehensive catalog of all lessons-learned documents.
 
 ---
 
-### Debugging Lessons (1 total)
+### Debugging Lessons (2 total)
 
+- [MCP Server Rebuild Not Reflected In Live Plugin Tool Calls](debugging/Lessons_Learned_Debugging_MCP_Server_Rebuild_Not_Reflected_In_Live_Plugin_Tool_Calls.md) — Rebuilding `mcp-server/dist/` in the repo has no effect on live `kg_*` tool calls, which resolve through the installed plugin cache; only a direct stdio JSON-RPC call to the repo's own `dist/index.js` (with `CLAUDE_PLUGIN_ROOT` unset) exercises a fresh local fix
 - [Plugin Cache Not Synced From Local Repo](debugging/Lessons_Learned_Debugging_Plugin_Cache_Not_Synced_From_Local_Repo.md) — `/reload-plugins` loads from the marketplace cache, not the local repo; copy files manually into the cache before reloading to test local changes
 
 **Tags:** #debugging
@@ -51,6 +52,7 @@ Comprehensive catalog of all lessons-learned documents.
 ## Chronological Index
 
 **2026**
+- [2026-07-18] - [MCP Server Rebuild Not Reflected In Live Plugin Tool Calls](debugging/Lessons_Learned_Debugging_MCP_Server_Rebuild_Not_Reflected_In_Live_Plugin_Tool_Calls.md) - Rebuilding `mcp-server/dist/` locally does not change what live `kg_*` tool calls execute; caught via grep-diffing the fix string against the installed plugin cache's `dist/index.js`; workaround is a direct stdio JSON-RPC call to the repo's own build
 - [2026-07-10] - [Fix Ownership Follows the Root-Cause KG, Not the Code's Location](patterns/Lessons_Learned_Patterns_Fix_Ownership_Follows_Root_Cause_KG_Not_Code_Location.md) - When a shared-plugin-code bug's root cause is scoped to one KG's conventions, route fix tracking to that KG, not to wherever the code lives
 - [2026-04-28] - [Routing-Layer-Only Profile Injection Pattern](patterns/Lessons_Learned_Routing_Layer_Injection_Pattern.md) - Inject me.md and triggers.md at SessionStart; rules.md excluded (on-demand); personal injection must precede early-exit guards
 - [2026-04-17] - [Batch Worker Model Selection And Token Tracking](process/Lessons_Learned_Batch_Worker_Model_Selection_And_Token_Tracking.md) - Use Sonnet not Haiku for batch job evaluation; add --output-format json to claude -p for token usage capture
@@ -77,7 +79,8 @@ Comprehensive catalog of all lessons-learned documents.
 - [Routing-Layer-Only Profile Injection Pattern](patterns/Lessons_Learned_Routing_Layer_Injection_Pattern.md) — #session-start #hooks #profile-injection #context-compaction #me.md #triggers.md #routing-layer #bash-helper #provenance-delimiters
 - [Fix Ownership Follows the Root-Cause KG, Not the Code's Location](patterns/Lessons_Learned_Patterns_Fix_Ownership_Follows_Root_Cause_KG_Not_Code_Location.md) — #personal-kg #project-kg #two-level-hierarchy #enh-ownership #fix-routing #shared-plugin-code #root-cause #backfill
 
-**#debugging** (1 lesson)
+**#debugging** (2 lessons)
+- [MCP Server Rebuild Not Reflected In Live Plugin Tool Calls](debugging/Lessons_Learned_Debugging_MCP_Server_Rebuild_Not_Reflected_In_Live_Plugin_Tool_Calls.md) — #mcp-server #plugin-cache #local-development #dev-loop #dist-build #stdio-jsonrpc #CLAUDE_PLUGIN_ROOT
 - [Plugin Cache Not Synced From Local Repo](debugging/Lessons_Learned_Debugging_Plugin_Cache_Not_Synced_From_Local_Repo.md) — #plugin-cache #reload-plugins #local-development #commands
 
 ---
