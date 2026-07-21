@@ -113,36 +113,75 @@ The recurrence across four independent discoveries in a single session is itself
 the argument that a general enforcement mechanism, not another one-off fix, is
 warranted.
 
-## Proposed Direction (Sketch — Not Decided)
+## Direction Decided: Option B (Gates on `pre-push-gate.sh`), Not a Skill
 
-This is a **Proposed-status** spec: it names the gap and sketches candidate shapes
-for an enforcement mechanism, but deliberately does **not** commit to one design.
-Whoever picks this up owns the design decision. Candidate approaches:
+The three candidate directions this spec originally sketched (new skill / new
+pre-push gates / extend `kmg-docs-impact-scan`) are no longer an open question —
+**Option B was selected**, on evidence already sitting in this project's own
+decision history:
 
-1. **A new pre-PR "KG consistency" skill** (analogous to `kmg-docs-impact-scan`,
-   but self-referential to `knowledge/` rather than diff-driven over prose) that
-   audits index counts/dates, `status:` plausibility, and backlink symmetry, and
-   emits findings before push.
-2. **New gates on `scripts/pre-push-gate.sh`** — e.g. a Gate 5 that recomputes
-   each README's index count from the folder listing and compares it to the
-   declared "Total" / "Last Updated" header; a Gate 6 for backlink symmetry.
-   Mirrors the existing Gate 2 / Gate 4 pattern (advisory injection, exits 0).
-3. **Extending `kmg-docs-impact-scan`'s scope** to add index-freshness and
-   backlink checks as an additional finding category — reusing the existing
-   pre-push flag-file plumbing (Gate 3) rather than adding a parallel mechanism.
+- **ADR-043** (PreToolUse hook injection for rule enforcement): *"Previous fix
+  attempts via CLAUDE.md edits and ADRs failed because they depend on model
+  attention during skill execution — the skill's structured checklist
+  dominates."*
+- **ADR-050** (this exact tool's own origin): *"the `kmgraph:docs-impact-scan`
+  skill is not wired as a pre-push gate; a push can happen without the scan ever
+  running."* The fix chosen there was Gate 3 — wiring the skill's completion
+  into a `PreToolUse Bash` hook matched on `git push`, not making the skill
+  trigger on more phrases.
 
-Open design questions (for whoever implements, not resolved here):
+Both prior instances in this project found phrase-triggered skill enforcement
+unreliable and replaced it with a deterministic hook. Building "a smarter
+`kmg-docs-impact-scan`" (Option C) or "a new self-referential skill" (Option A)
+would repeat the documented failure mode rather than learn from it. **Gates 5
+and 6 are implemented directly in `scripts/pre-push-gate.sh`, mirroring the
+existing Gate 2 (advisory injection, always exits 0) pattern:**
 
-- Advisory (inject-and-continue, like today's gates) vs. blocking?
-- Which of the four index families (issues / enhancements / decisions /
-  lessons-learned) are in scope for v1, and is "status accuracy" even
-  mechanically checkable, or does it require human judgment (making it a prompt,
-  not a gate)?
-- Does backlink symmetry belong in the same mechanism as index-count freshness,
-  or are they separate checks with different failure modes?
-- Scope boundary vs. issue-13: this should explicitly note it does **not** cover
-  Docusaurus link integrity or `commands/*.md` references (issue-13 / issue-26's
-  domains) — those need their own mechanisms, per issue-26's scope distinction.
+- **Gate 5** — mechanically checkable, no judgment required: (a) each `knowledge/<area>/README.md`'s
+  declared "Total X" count vs. the real folder count (decisions, enhancements,
+  issues, lessons-learned); (b) for issue/ENH docs changed on the current
+  branch, whether every cross-reference to another issue/ENH is reciprocated by
+  a backlink in the referenced doc. Gate 2 was also extended in the same pass to
+  compare `package.json`'s version against `.codex-plugin/plugin.json` and
+  `.claude-plugin/marketplace.json`'s embedded plugin entry (previously only
+  checked against `.claude-plugin/plugin.json`), and to check
+  `mcp-server/package.json` when `mcp-server/src/` actually changed on the
+  branch (previously treated as unconditionally independent, which was itself
+  a source of drift this session).
+- **Gate 6** — a completion-flag check, same pattern as Gate 3, for the parts of
+  this spec's scope that genuinely require judgment and can't be checked in
+  bash: issue/enhancement `status:` accuracy, and session-summary/handoff
+  currency. See "Companion Skill Specification" below for what would satisfy
+  this flag.
+
+**Status of this implementation:** functionally tested via a simulated
+`PreToolUse` hook invocation against this repo's real data — Gates 5/6
+produced correct findings (see test-cases.md for the specific catches,
+including 9 real backlink gaps the manual audit had missed). The companion
+skill Gate 6 depends on, `skills/kmg-paperwork-audit/SKILL.md`, is built; its
+flag/gate integration was verified directly (wrote the flag, confirmed Gate 6
+cleared). Still open: the skill's judgment-based logic (Steps 2-3) hasn't been
+exercised against a real resolved/deferred item, and CHANGELOG-entry-currency
+remains unassigned to either mechanism. This ENH's `status:` stays `deferred`
+until those close — but the core mechanism (Gates 5/6 + companion skill) now
+exists and works, which the original sketch never committed to.
+
+Also confirmed, as an unplanned side-effect of this test: the live
+`PreToolUse` hook that governs this repo's actual pushes runs from the
+installed plugin cache (`${CLAUDE_PLUGIN_ROOT}`), not this working tree —
+meaning the Gates 5/6 just built won't actually protect a real push until
+that gap (tracked as `issue-28`, retitled and expanded with this evidence)
+is closed. Filing this ENH's mechanism doesn't yet mean it's live.
+
+Resolved (no longer open) design questions from the original sketch:
+- Advisory vs. blocking → advisory, matching every existing gate.
+- Which index families → all four (decisions, enhancements, issues,
+  lessons-learned).
+- Backlink symmetry vs. index-count freshness → same mechanism (Gate 5), scoped
+  to files changed on the current branch to keep the check cheap per push.
+- Scope boundary vs. issue-13 — preserved: Gate 5/6 do **not** cover Docusaurus
+  link integrity or `commands/*.md` references; those stay issue-13's and
+  issue-26's domains.
 
 ## Out of Scope
 

@@ -1,26 +1,67 @@
 # ENH-052: Acceptance Criteria
 
-Acceptance is defined against whatever mechanism a future implementer selects
-(skill, new pre-push gates, or an extension of `kmg-docs-impact-scan`). Design is
-open; these criteria constrain the *outcome*, not the shape.
+Direction decided: Option B (`scripts/pre-push-gate.sh` Gates 5/6). Status below
+reflects what's actually built vs. still open.
 
-- [ ] A pre-PR run detects when an index README's declared count/date
-      (e.g. `knowledge/enhancements/README.md`'s "Total ENHs" / "Last Updated")
-      no longer matches the actual folder listing, and reports it before push.
-- [ ] The check covers, at minimum, the enhancements and issues index families;
-      decisions and lessons-learned coverage is stated as in- or out-of-scope
-      explicitly, not left ambiguous.
-- [ ] Backlink symmetry: given a `related` edge A→N, the mechanism can report when
-      the expected N→A backlink is absent (or the design explicitly defers this to
-      a later phase, documented as such).
-- [ ] CHANGELOG entry currency is checked against the branch's actual final state,
-      not merely that the version *string* appears somewhere (the current Gate 2
-      behavior) — or the gap is explicitly documented as still-uncovered.
-- [ ] The implementation documents its scope boundary: it does **not** cover
-      Docusaurus link integrity (issue-13) or `commands/*.md` references (issue-26),
-      so those are not assumed covered by extension.
-- [ ] Advisory-vs-blocking behavior is an explicit, documented choice — consistent
-      with the existing `pre-push-gate.sh` convention (advisory, exits 0) unless a
-      deliberate decision is made to block.
-- [ ] The recurrence rationale is preserved: the mechanism is cross-referenced to
-      issue-13, ENH-042, and issue-26 as the same underlying pattern.
+- [x] A pre-PR run detects when an index README's declared count no longer
+      matches the actual folder listing, and reports it before push. **Gate 5,
+      implemented.** Message explicitly says entries are missing and must be
+      added, not that the count should be edited to match (caught as a real
+      wording bug during review and fixed).
+- [x] The check covers all four index families (decisions, enhancements,
+      issues, lessons-learned), not just a subset. **Implemented.**
+- [x] Backlink symmetry: given a cross-reference A→N in a doc changed on the
+      current branch, the mechanism reports when the expected N→A backlink is
+      absent. **Gate 5, implemented**, scoped to branch-changed issue/ENH docs
+      only (not a full-KG scan, for per-push cost reasons — documented, not an
+      oversight).
+- [ ] CHANGELOG entry currency checked against the branch's actual final
+      state, not just that the version string appears somewhere. **Not
+      implemented** — Gate 2's presence check is unchanged in this pass; this
+      remains open, likely belongs to the companion skill (judgment-required:
+      "does this entry reflect the branch's final commits" isn't a grep).
+- [x] Version-sync scope widened beyond the original two-file comparison.
+      **Implemented** (Gate 2 extended): now also checks
+      `.codex-plugin/plugin.json`, `.claude-plugin/marketplace.json`'s embedded
+      version, and conditionally `mcp-server/package.json` when
+      `mcp-server/src/` changed on the branch.
+- [x] Issue/enhancement `status:` accuracy is checked. **Implemented** —
+      `skills/kmg-paperwork-audit/SKILL.md`, Steps 2-3 (resolved-without-evidence
+      and deferred-but-implemented checks).
+- [x] Session-summary/handoff currency is checked. **Implemented** —
+      `skills/kmg-paperwork-audit/SKILL.md`, Step 4.
+- [x] The implementation documents its scope boundary: does **not** cover
+      Docusaurus link integrity (issue-13) or `commands/*.md` references
+      (issue-26). **Documented** in both the spec and the script's own
+      comments.
+- [x] Advisory-vs-blocking is an explicit choice. **Decided: advisory**,
+      matching every existing gate (Gates 5/6 always exit 0).
+- [x] Cross-referenced to issue-13, ENH-042, and issue-26. **Preserved**
+      throughout.
+
+## Verified
+
+- [x] Functional test of Gates 5/6 — simulated `PreToolUse` hook invocation
+      against this repo's real data. Caught the real, pre-existing
+      `issues/README.md`/`lessons-learned/README.md` count drift, the 6
+      github-issue-sync leaks, and 9 real backlink gaps the manual audit had
+      missed (older docs like `ENH-022`, `issue-11`, `ENH-050` never
+      backlinked from newer items referencing them).
+- [x] `kmg-paperwork-audit` skill built (`skills/kmg-paperwork-audit/SKILL.md`).
+      Flag/gate integration verified directly: wrote the completion flag by
+      hand using the skill's own documented snippet, re-ran the hook, confirmed
+      Gate 6's reminder cleared.
+
+## Still Open
+
+- [ ] CHANGELOG-entry-currency — still not mechanically or skill-checked;
+      remains genuinely open, not assigned to either Gate 5 or the skill yet.
+- [ ] The skill's own judgment-based logic (Steps 2-3's "does the diff support
+      this resolved claim") has only been integration-tested for the flag
+      mechanics, not exercised against a real resolved/deferred item to confirm
+      its actual judgment calls are reasonable — that requires running it for
+      real on a live case, not just confirming the flag file appears.
+- [ ] Bonus finding from this test pass, tracked in `issue-28` (not this ENH):
+      the live `PreToolUse` hook itself runs from the installed plugin cache
+      (currently `0.6.15`), same bug class as the `mcp-server`/`kg_upgrade`
+      case — confirmed hooks are affected too, not just MCP tool calls.

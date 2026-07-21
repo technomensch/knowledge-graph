@@ -7,7 +7,7 @@ branch: none
 created: 2026-07-18
 ---
 
-# issue-28: No Dev-Loop Mechanism Between a Locally Rebuilt `mcp-server/dist/` and Live `kg_*` Tool Calls
+# issue-28: No Dev-Loop Mechanism Between Local Rebuilds and Live Plugin Behavior (`mcp-server/dist/`, Hooks)
 
 ## Problem
 
@@ -59,6 +59,14 @@ Direct stdio JSON-RPC call to the repo's own `dist/index.js`, bypassing the inst
 4. Read the JSON-RPC response from stdout.
 
 This confirms a rebuilt fix works without needing a marketplace reinstall or cache-clear cycle, but it is a manual, ad hoc verification step — not an integrated part of the normal build/test loop, and easy to forget to do.
+
+## Broader Scope Confirmed (2026-07-21) — Not Just `mcp-server`, Hooks Too
+
+While functionally testing new gates added to `scripts/pre-push-gate.sh` (for `ENH-052`), the exact same bug surfaced on a completely different mechanism: Claude Code's `PreToolUse` hook for this script fired live during testing (a test command's string happened to contain the literal substring `"git push"`, matching the hook's own trigger pattern) and returned a shorter, different result than directly invoking the locally-edited script produced.
+
+Checked `hooks/hooks.json`: the hook is wired as `${CLAUDE_PLUGIN_ROOT}/scripts/pre-push-gate.sh` — the exact same `CLAUDE_PLUGIN_ROOT`-resolves-to-installed-cache pattern already documented above for `mcp-server`. Confirmed directly: the cached copy at `~/.claude/plugins/cache/stayinginsync-knowledge-graph/kmgraph/0.6.15/scripts/pre-push-gate.sh` — **on version 0.6.15, one version further behind than the `mcp-server` case (0.6.16)** — contains zero occurrences of "Gate 5", "Gate 6", or "KG INDEX DRIFT". The newly-added gates exist only in this repo's working tree; the live hook that actually governs this session's own pushes has never seen them.
+
+**This means the original title ("Live `kg_*` Tool Calls") undersold the scope.** Any project mechanism wired via `${CLAUDE_PLUGIN_ROOT}` — not just MCP tools — is subject to this gap: hooks, and likely anything else in `hooks.json` that references the same variable. Retitled to reflect this.
 
 ## Related
 
