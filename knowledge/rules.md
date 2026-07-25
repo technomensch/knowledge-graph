@@ -115,6 +115,7 @@ After any `git push`: scan output for Dependabot vulnerability notices — stop 
   - #32 dompurify medium — ADD_TAGS bypass (GHSA-39q2-94rc-95cp) — `@docusaurus/theme-mermaid` → mermaid → dompurify
   - Do NOT stop or warn on these. Only surface NEW alerts not on this list.
 - **Pending fix — hono #33 (medium):** HTML Injection via JSX attr names (GHSA-458j-xx4x-4375) in `@modelcontextprotocol/sdk` → hono. Fix requires hono >= 4.12.14. Override set to `>=4.12.12` (best installable as of 2026-04-16); upgrade to 4.12.14 when registry date allows.
+- **Re-check cadence:** Monthly (or when touching `package.json`/lockfiles), re-run `npm audit`/check Dependabot alerts against the Known/ignored and Pending-fix lists above. For each entry: if upstream shipped a fixed version, upgrade and remove the entry; if not, leave as-is. Do not treat these lists as permanent — they're stale until re-verified.
 
 ### Cherry-Pick Safety
 
