@@ -106,15 +106,16 @@ Push branches, await user review — never auto-merge, never delete branches, ne
 
 After any `git push`: scan output for Dependabot vulnerability notices — stop and surface to user before merging or deploying
 - **Why:** a vulnerability notice appeared in push output and was nearly missed; would have shipped vulnerable dependencies
-- **Known/ignored (6 — Docusaurus/build-tool transitive deps, dev-only, not runtime):**
+- **Known/ignored (8 — Docusaurus/build-tool transitive deps, dev-only, not runtime):**
   - #30 lodash-es HIGH — Code Injection via `_.template` (CVE-2026-4800) — webpack transitive
   - #27 serialize-javascript HIGH — RCE via RegExp.flags (GHSA-5c6j-r48x-rmvq) — webpack transitive
   - #29 lodash-es medium — Prototype Pollution via `_.unset`/`_.omit` (CVE-2026-2950) — webpack transitive
   - #28 serialize-javascript medium — CPU Exhaustion DoS (CVE-2026-34043) — webpack transitive
   - #31 follow-redirects medium — auth header leak (GHSA-r4q5-vmmm-2653) — `@docusaurus/core` → webpack-dev-server → http-proxy → follow-redirects
   - #32 dompurify medium — ADD_TAGS bypass (GHSA-39q2-94rc-95cp) — `@docusaurus/theme-mermaid` → mermaid → dompurify
+  - postcss HIGH — Path Traversal in source-map auto-loading (GHSA-r28c-9q8g-f849) — `@docusaurus/bundler` → `cssnano-preset-advanced` → `postcss`. Override attempted 2026-07-25: forcing `postcss >=8.5.18` cascaded into `@docusaurus/theme-common`/`theme-search-algolia` resolving to *other* vulnerable versions (2 vulns → 27). Reverted — fix must come from upstream Docusaurus, not a same-side override.
+  - brace-expansion HIGH — DoS via exponential/unbounded `{}` expansion (GHSA-3jxr-9vmj-r5cp, GHSA-mh99-v99m-4gvg) — three incompatible major-version consumers in the tree (`serve-handler` needs 1.x, root `orama`/`glob` chain needs 2.x, `typedoc` needs 5.x). Override attempted 2026-07-25: a flat version override collapses all three to one version, breaking the other two the same way the postcss override did (2 vulns → 27). Reverted — needs per-consumer nested overrides (untested) or an upstream bump.
   - Do NOT stop or warn on these. Only surface NEW alerts not on this list.
-- **Pending fix — hono #33 (medium):** HTML Injection via JSX attr names (GHSA-458j-xx4x-4375) in `@modelcontextprotocol/sdk` → hono. Fix requires hono >= 4.12.14. Override set to `>=4.12.12` (best installable as of 2026-04-16); upgrade to 4.12.14 when registry date allows.
 - **Re-check cadence:** Monthly (or when touching `package.json`/lockfiles), re-run `npm audit`/check Dependabot alerts against the Known/ignored and Pending-fix lists above. For each entry: if upstream shipped a fixed version, upgrade and remove the entry; if not, leave as-is. Do not treat these lists as permanent — they're stale until re-verified.
 
 ### Cherry-Pick Safety
