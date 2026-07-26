@@ -22,7 +22,6 @@ Creates a complete knowledge graph structure with:
 - **After a plugin update** — verify/upgrade existing KG to current version
 - Creating a new project-local knowledge graph
 - Setting up a topic-based personal knowledge graph
-- Creating a Claude Cowork knowledge space
 
 ## Pre-Wizard: Existing KG Detection
 
@@ -141,8 +140,13 @@ if [ -f "$OLD_DB" ] && [ "$FTS5_MIGRATED" != "true" ]; then
   read -r CONSENT
   if [ "$CONSENT" = "1" ]; then
     # Write consent marker — prevents prompt from reappearing on subsequent init runs
-    jq ".graphs[\"${KG_NAME}\"].fts5_index_migrated = true" "$CONFIG_PATH" > /tmp/kg-config-tmp.json \
-      && mv /tmp/kg-config-tmp.json "$CONFIG_PATH"
+    if jq ".graphs[\"${KG_NAME}\"].fts5_index_migrated = true" "$CONFIG_PATH" > /tmp/kg-config-tmp.json \
+      && [ -s /tmp/kg-config-tmp.json ] && jq empty /tmp/kg-config-tmp.json 2>/dev/null; then
+      mv /tmp/kg-config-tmp.json "$CONFIG_PATH"
+    else
+      rm -f /tmp/kg-config-tmp.json
+      printf '⚠️  kg-config.json update failed (jq error or invalid output) — original left untouched.\n'
+    fi
     printf '✓ Index location updated. Run kg_fts5_rebuild or /kmgraph:kmg-sync-all to rebuild.\n'
   else
     printf 'Skipped. Search continues via linear scan until you choose to migrate.\n'
@@ -976,9 +980,8 @@ TOTAL_MB=$((TOTAL_KB / 1024))
 Where should this knowledge graph be stored?
 
 1. Project-local (./knowledge/)
-2. Global topic-based (~/.claude/knowledge-graphs/[name]/)
-3. Claude Cowork (~/.claude/cowork-knowledge/[topic]/)
-4. Custom path
+2. Global topic-based (~/.kmgraph/knowledge-graphs/[name]/)
+3. Custom path
 ```
 
 **Recommendation**: Project-local for single-project use, personal for topic-based knowledge sharing across projects.
@@ -1033,7 +1036,6 @@ For each category, choose:
 **Recommendation**:
 - Public repos: Use selective (commit shareable patterns, gitignore personal notes)
 - Private repos: Commit all
-- Claude Cowork: Gitignore all (no repo to push to)
 
 ### Step 5: Custom Prefix (if custom categories added)
 
@@ -1080,7 +1082,7 @@ fi
 ### Step 1.2: Run wizard prompts
 
 Use `AskUserQuestion` tool for each step. Collect:
-- `location_type`: "project-local", "personal", "cowork", "custom"
+- `location_type`: "project-local", "personal", "custom"
 - `custom_path`: if location_type == "custom"
 - `kg_name`: alphanumeric + hyphens
 - `categories`: array of selected categories
@@ -1097,15 +1099,17 @@ Use `AskUserQuestion` tool for each step. Collect:
 ### Step 1.4: Determine final path
 
 ```bash
+# The global-topic path below must match cli.ts:53 (resolveInitLocation, case "3") —
+# both currently hardcode "~/.kmgraph/knowledge-graphs/$name". cli.ts's own menu has a
+# different shape (4 choices; its "project-local" default is unrelated to this fix) —
+# this is NOT full parity between the two files, just the one path kept in sync by
+# convention. Structural fix (single source of truth) tracked as ENH-051.
 case $location_type in
   "project-local")
     KG_PATH="./knowledge/"
     ;;
   "personal")
-    KG_PATH="$HOME/.claude/knowledge-graphs/$kg_name/"
-    ;;
-  "cowork")
-    KG_PATH="$HOME/.claude/cowork-knowledge/$kg_name/"
+    KG_PATH="$HOME/.kmgraph/knowledge-graphs/$kg_name/"
     ;;
   "custom")
     KG_PATH="$custom_path"
@@ -1364,7 +1368,7 @@ fi
 Parameters:
 - `{KG_PATH}` = resolved KG path (from Step 1.4)
 - `{kg_name}` = KG name collected in Step 1.2
-- `{KG_TYPE}` = type field — "project-local", "personal", or "cowork" (from `location_type` in Step 1.2)
+- `{KG_TYPE}` = type field — "project-local" or "personal" (from `location_type` in Step 1.2)
 - `{categories}` = categories array collected in Step 1.2
 - `{git_strategy}` = selected git strategy from Step 1.2
 - `{category_git_rules}` = per-category git rules map from Step 1.2 (if selective strategy)

@@ -343,8 +343,23 @@ Processing:
 3. Write back ONLY if content changed:
    ```bash
    # Atomic write — prevents truncation on crash
-   printf '%s' "$new_content" > "${file}.tmp"
-   mv "${file}.tmp" "${file}"
+   orig_size=$(wc -c < "$file")
+   if printf '%s' "$new_content" > "${file}.tmp" && [ -s "${file}.tmp" ]; then
+     tmp_size=$(wc -c < "${file}.tmp")
+     # Substitutions only ever add characters (wrapping references in [[...]]
+     # or links) — a legitimate write is never meaningfully shorter than the
+     # original. A size far below the original signals a truncated write
+     # (e.g. the process was killed mid-printf), not a valid substitution pass.
+     if [ "$tmp_size" -ge $(( orig_size * 9 / 10 )) ]; then
+       mv "${file}.tmp" "${file}"
+     else
+       rm -f "${file}.tmp"
+       echo "⚠️  Wiki-link write for $file looked truncated (${tmp_size} bytes vs ${orig_size} original) — skipped, original left untouched."
+     fi
+   else
+     rm -f "${file}.tmp"
+     echo "⚠️  Wiki-link write for $file failed — original left untouched."
+   fi
    ```
 
 **On completion:**
@@ -362,9 +377,13 @@ mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
 if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
   cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
 fi
-jq '.graphs["personal"].wiki_pass_complete = true' \
-  "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
-mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
+if jq '.graphs["personal"].wiki_pass_complete = true' \
+  "$CONFIG_PATH" > "${CONFIG_PATH}.tmp" && [ -s "${CONFIG_PATH}.tmp" ] && jq empty "${CONFIG_PATH}.tmp" 2>/dev/null; then
+  mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
+else
+  rm -f "${CONFIG_PATH}.tmp"
+  echo "⚠️  kg-config.json update failed (jq error or invalid output) — original left untouched."
+fi
 ```
 
 If the personal KG has no content files yet (fresh install), exit cleanly with `0 files modified` — no error.

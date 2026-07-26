@@ -65,5 +65,5 @@ Make it executable: `chmod +x .git/hooks/post-commit`
 
 ## Related
 
-- [Multi-KG Workflows](../organizing/multi-kg-workflows.md) — managing project-local, personal, and cowork KGs
+- [Multi-KG Workflows](../organizing/multi-kg-workflows.md) — managing project-local, personal, and global-topic KGs
 - [Sanitize Before Sharing](../organizing/sanitize-before-sharing.md) — remove sensitive data before pushing to a shared remote

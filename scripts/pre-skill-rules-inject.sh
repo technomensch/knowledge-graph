@@ -25,6 +25,16 @@ KMGRAPH_RULES="${HOME}/.kmgraph/rules.md"
 KMGRAPH_TRIGGERS="${HOME}/.kmgraph/triggers.md"
 PROJECT_RULES="${CLAUDE_PROJECT_DIR:-}/knowledge/rules.md"
 
+# Mirror-copy default target: knowledge/plans/ when the project has a
+# knowledge/ dir (per plan-authoring-rules.md § File Location), else
+# docs/plans/. A project's own '### Plan File Routing' rule still overrides
+# this default when defined.
+if [[ -d "${CLAUDE_PROJECT_DIR:-}/knowledge" ]]; then
+  MIRROR_DEFAULT_DIR="knowledge/plans/"
+else
+  MIRROR_DEFAULT_DIR="docs/plans/"
+fi
+
 INPUT=$(cat)
 SKILL_NAME=$(printf '%s' "$INPUT" | jq -r '.tool_input.skill // .tool_input.name // ""' 2>/dev/null || true)
 
@@ -273,9 +283,10 @@ These two steps are HARD requirements, not suggestions. Skipping either is a pro
    like \`YYYY-MM-DD-description.md\` unless the project rule explicitly says so.
 
 2. MIRROR COPY — after writing the plan to \`~/.claude/plans/<name>.md\`, you MUST run a copy
-   step that mirrors the plan into the active project's \`docs/plans/<name>.md\` (or the path
-   defined in the project's '### Plan File Routing' rule). This is not optional and must appear
-   as an explicit step in the plan execution, not a passing mention.
+   step that mirrors the plan into the active project's \`${MIRROR_DEFAULT_DIR}<name>.md\` (or the
+   path defined in the project's '### Plan File Routing' rule, which takes precedence over this
+   default). This is not optional and must appear as an explicit step in the plan execution, not
+   a passing mention.
 
 Rules:
 - Do NOT pick a filename that contradicts the project naming convention

@@ -366,12 +366,12 @@ Status: Deployed to production, monitoring stable
 ### 6. Extract Lesson When Resolved
 
 ```bash
-cp docs/templates/lessons-learned/lesson-template.md \
-   docs/lessons-learned/debugging/Performance_Resolution.md
+cp knowledge/templates/lesson-template.md \
+   knowledge/lessons-learned/debugging/Performance_Resolution.md
 
 # Reference meta-issue
 echo "**Meta-Issue:** [[../../meta-issues/performance/]]" >> \
-  docs/lessons-learned/debugging/Performance_Resolution.md
+  knowledge/lessons-learned/debugging/Performance_Resolution.md
 ```
 
 ---

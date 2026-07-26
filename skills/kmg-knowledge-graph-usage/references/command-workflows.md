@@ -38,13 +38,13 @@ Detailed workflow patterns for different knowledge graph usage scenarios, with c
 ```
 
 **Interactive Wizard:**
-1. **Location**: Choose project-local (`./docs/`)
+1. **Location**: Choose project-local (`./knowledge/`)
 2. **Categories**: Select default (architecture, process, patterns) + add any custom
 3. **Git Strategy**: Choose selective for team projects, all-commit for open source
 4. **Category Git Rules**: Commit shareable (architecture, patterns), gitignore personal (debugging)
 
 **Outcome:**
-- Directory structure created in `./docs/`
+- Directory structure created in `./knowledge/`
 - Templates copied (lesson-template.md, ADR-template.md, etc.)
 - Config entry added to `~/.kmgraph/kg-config.json`
 - KG set as active
@@ -52,30 +52,33 @@ Detailed workflow patterns for different knowledge graph usage scenarios, with c
 #### Step 2: Verify Structure
 
 ```bash
-ls -R docs/
+ls -R knowledge/
 ```
 
 **Expected Structure:**
 ```
-docs/
-├── knowledge/
+knowledge/
+├── templates/
 │   ├── patterns.md
 │   ├── gotchas.md
 │   ├── concepts.md
 │   ├── architecture.md
 │   ├── workflows.md
-│   └── index.md
+│   ├── lesson-template.md
+│   ├── ADR-template.md
+│   └── session-template.md
+├── index.md
+├── me.md
+├── rules.md
+├── triggers.md
 ├── lessons-learned/
 │   ├── README.md
-│   ├── lesson-template.md
 │   ├── architecture/
 │   ├── process/
 │   └── patterns/
 ├── decisions/
-│   ├── README.md
-│   └── ADR-template.md
+│   └── README.md
 ├── sessions/
-│   └── session-template.md
 └── chat-history/
 ```
 
@@ -83,15 +86,15 @@ docs/
 
 ```bash
 # Check current .gitignore
-cat .gitignore | grep docs/
+cat .gitignore | grep knowledge/
 
 # Add KG gitignore rules if not present
 cat >> .gitignore <<EOF
 
 # Knowledge Graph - selective strategy
-docs/lessons-learned/debugging/
-docs/sessions/
-docs/chat-history/
+knowledge/lessons-learned/debugging/
+knowledge/sessions/
+knowledge/chat-history/
 EOF
 ```
 
@@ -103,7 +106,7 @@ EOF
 
 # Expected output:
 # ✅ Active KG: my-project
-# 📍 Location: ./docs/
+# 📍 Location: ./knowledge/
 # 📂 Categories: architecture, process, patterns
 # 📝 Lessons: 0 | Decisions: 0 | Sessions: 0
 ```
@@ -632,7 +635,7 @@ Mental checklist:
 # - Claude chat logs (if available)
 # - Gemini conversation logs
 # - Codex CLI sessions (--source codex required)
-# - Saves to docs/chat-history/
+# - Saves to knowledge/chat-history/
 ```
 
 **Timing:** Run this after significant coding sessions.
@@ -641,7 +644,7 @@ Mental checklist:
 
 ```bash
 # Check what was extracted
-ls docs/chat-history/
+ls knowledge/chat-history/
 
 # Review for:
 # - Uncaptured lessons
@@ -669,9 +672,9 @@ ls docs/chat-history/
 
 # Processes lessons-learned/:
 # - Extracts patterns
-# - Updates docs/knowledge/patterns.md
-# - Updates docs/knowledge/gotchas.md
-# - Updates docs/knowledge/architecture.md
+# - Updates knowledge/templates/patterns.md
+# - Updates knowledge/templates/gotchas.md
+# - Updates knowledge/templates/architecture.md
 # - Preserves git metadata
 ```
 
@@ -681,9 +684,9 @@ ls docs/chat-history/
 
 ```bash
 # Review what was consolidated
-cat docs/knowledge/patterns.md
-cat docs/knowledge/gotchas.md
-cat docs/knowledge/architecture.md
+cat knowledge/templates/patterns.md
+cat knowledge/templates/gotchas.md
+cat knowledge/templates/architecture.md
 ```
 
 **Edit for:**
@@ -776,12 +779,12 @@ cat docs/knowledge/architecture.md
 
 ```bash
 # View lessons in category
-ls docs/lessons-learned/architecture/
-ls docs/lessons-learned/debugging/
-ls docs/lessons-learned/patterns/
+ls knowledge/lessons-learned/architecture/
+ls knowledge/lessons-learned/debugging/
+ls knowledge/lessons-learned/patterns/
 
 # Read specific lesson
-cat docs/lessons-learned/debugging/issue-name.md
+cat knowledge/lessons-learned/debugging/issue-name.md
 ```
 
 #### Strategy 3: Knowledge Graph Browse
@@ -790,16 +793,16 @@ cat docs/lessons-learned/debugging/issue-name.md
 
 ```bash
 # View consolidated patterns
-cat docs/knowledge/patterns.md
+cat knowledge/templates/patterns.md
 
 # View known gotchas
-cat docs/knowledge/gotchas.md
+cat knowledge/templates/gotchas.md
 
 # View architecture decisions
-cat docs/knowledge/architecture.md
+cat knowledge/templates/architecture.md
 
 # View concept definitions
-cat docs/knowledge/concepts.md
+cat knowledge/templates/concepts.md
 ```
 
 #### Strategy 4: Status Overview
@@ -849,12 +852,12 @@ cat docs/knowledge/concepts.md
 
 2. **Browse category:**
    ```bash
-   ls docs/lessons-learned/patterns/
+   ls knowledge/lessons-learned/patterns/
    ```
 
 3. **Check knowledge graph:**
    ```bash
-   cat docs/knowledge/patterns.md | grep -i "relevant term"
+   cat knowledge/templates/patterns.md | grep -i "relevant term"
    ```
 
 4. **Document after solving:**
@@ -917,9 +920,9 @@ git status
 
 ```bash
 # Commit shareable knowledge
-git add docs/lessons-learned/architecture/
-git add docs/lessons-learned/patterns/
-git add docs/knowledge/
+git add knowledge/lessons-learned/architecture/
+git add knowledge/lessons-learned/patterns/
+git add knowledge/templates/
 
 git commit -m "docs: add lessons from [topic] investigation"
 git push
@@ -933,12 +936,12 @@ git push
 ## Related Knowledge
 
 This PR implements the approach documented in:
-- [Lesson: API Design Pattern](docs/lessons-learned/architecture/api-design.md)
+- [Lesson: API Design Pattern](knowledge/lessons-learned/architecture/api-design.md)
 
 ## Decisions Made
 
 Architectural decisions documented in:
-- [Decision: Database Schema](docs/lessons-learned/architecture/db-schema.md)
+- [Decision: Database Schema](knowledge/lessons-learned/architecture/db-schema.md)
 ```
 
 ### Team Collaboration Best Practices
@@ -967,9 +970,9 @@ git clone [repo]
 /kmgraph:kmg-switch team-project
 
 # Browse knowledge graph
-cat docs/knowledge/index.md
-cat docs/knowledge/architecture.md
-cat docs/knowledge/patterns.md
+cat knowledge/index.md
+cat knowledge/templates/architecture.md
+cat knowledge/templates/patterns.md
 
 # Search for specific topics
 /kmgraph:kmg-recall "getting started"
@@ -1006,7 +1009,7 @@ cd [project]
 
 ```bash
 # Start with index
-cat docs/knowledge/index.md
+cat knowledge/index.md
 
 # Provides:
 # - Overview of knowledge structure
@@ -1020,7 +1023,7 @@ cat docs/knowledge/index.md
 
 ```bash
 # Read architecture decisions
-cat docs/knowledge/architecture.md
+cat knowledge/templates/architecture.md
 
 # Understand:
 # - System design
@@ -1033,7 +1036,7 @@ cat docs/knowledge/architecture.md
 
 ```bash
 # Read patterns documentation
-cat docs/knowledge/patterns.md
+cat knowledge/templates/patterns.md
 
 # Learn:
 # - Code patterns used
@@ -1046,7 +1049,7 @@ cat docs/knowledge/patterns.md
 
 ```bash
 # Read gotchas
-cat docs/knowledge/gotchas.md
+cat knowledge/templates/gotchas.md
 
 # Avoid:
 # - Known pitfalls
@@ -1067,10 +1070,10 @@ cat docs/knowledge/gotchas.md
 ### Onboarding Checklist
 
 **Essential Reading:**
-- [ ] docs/knowledge/index.md
-- [ ] docs/knowledge/architecture.md
-- [ ] docs/knowledge/patterns.md
-- [ ] docs/knowledge/gotchas.md
+- [ ] knowledge/index.md
+- [ ] knowledge/templates/architecture.md
+- [ ] knowledge/templates/patterns.md
+- [ ] knowledge/templates/gotchas.md
 - [ ] README.md (project overview)
 
 **Setup Validation:**
@@ -1113,7 +1116,7 @@ cat docs/knowledge/gotchas.md
 
 ```bash
 # Find old lessons
-find docs/lessons-learned -name "*.md" -mtime +180
+find knowledge/lessons-learned -name "*.md" -mtime +180
 
 # Review for:
 # - Outdated information
@@ -1154,19 +1157,19 @@ find docs/lessons-learned -name "*.md" -mtime +180
 /kmgraph:kmg-update-graph
 
 # Review generated:
-# - docs/knowledge/patterns.md
-# - docs/knowledge/gotchas.md
-# - docs/knowledge/architecture.md
+# - knowledge/templates/patterns.md
+# - knowledge/templates/gotchas.md
+# - knowledge/templates/architecture.md
 ```
 
 #### Step 6: Archive or Remove Obsolete
 
 ```bash
 # For truly obsolete content
-mv docs/lessons-learned/obsolete-lesson.md archive/
+mv knowledge/lessons-learned/obsolete-lesson.md archive/
 
 # Or delete if no historical value
-rm docs/lessons-learned/obsolete-lesson.md
+rm knowledge/lessons-learned/obsolete-lesson.md
 ```
 
 ### Maintenance Checklist
@@ -1246,7 +1249,7 @@ rm docs/lessons-learned/obsolete-lesson.md
 → `/kmgraph:kmg-init [name]`
 
 **"Joining existing project"**
-→ Read `docs/knowledge/index.md`
+→ Read `knowledge/index.md`
 
 **"Need to share knowledge"**
 → Commit architecture/patterns/, gitignore debugging/

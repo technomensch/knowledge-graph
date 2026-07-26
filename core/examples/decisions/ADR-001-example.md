@@ -148,8 +148,8 @@ agent-instructions.txt
 # Human-optimized (Markdown)
 README.md
 docs/guides/setup.md
-docs/lessons-learned/*.md
-docs/knowledge/patterns.md
+knowledge/lessons-learned/*.md
+knowledge/templates/patterns.md
 ```
 
 ### Template Examples

@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.6.19
+**Version:** 0.6.20
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -90,6 +90,13 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 ---
 
 ## v0.6.x Feature Highlights
+
+**v0.6.20 — 2026-07-18**
+
+- **ADR-066 resolved: cowork KG mode retired, global-topic KG storage relocated** — cowork mode is no longer offered for new setups (never actually reachable through real Claude Cowork's plugin surface); global-topic KGs relocate to `~/.kmgraph/knowledge-graphs/<name>/`. Upgrade inspector detects and offers to archive existing cowork content — never silently dropped.
+- **106-line folder-structure migration sweep** — stale `docs/` KG-root references corrected to `knowledge/` across core docs, examples, skills, and commands (independent Fable audit finding).
+- **issue-27 fixed: a real data-loss bug, caught live** — `applyStrayKnowledgeDir` was silently overwriting real KG content instead of checking the destination first; this repo's own KG lost content from it mid-session and was recovered via `git restore`. Destination-content check added; regression test included.
+- Two independent adversarial review passes (Opus, Fable) on this branch's own diff found and fixed additional write-safety gaps (unguarded `jq`-failure paths, truncated-write detection) before merge — see [CHANGELOG.md](CHANGELOG.md) for the full list.
 
 **v0.6.19 — 2026-07-16**
 
@@ -257,7 +264,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.5.11 (2026-06-14)
+**Current Release:** v0.6.20 (2026-07-18)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -359,6 +366,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.6.19 (2026-07-16)
+**Current Version:** v0.6.20 (2026-07-18)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info

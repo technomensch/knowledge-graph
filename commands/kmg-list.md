@@ -30,17 +30,12 @@ Knowledge Graphs:
    Git: selective (architecture/patterns committed, process gitignored)
    Last used: 2026-02-13 15:45
 
-2. ai-research — ~/.claude/knowledge-graphs/ai-research/
+2. ai-research — ~/.kmgraph/knowledge-graphs/ai-research/
    Categories: architecture, process, ml-patterns (custom)
    Git: all committed
    Last used: 2026-02-10 12:00
 
-3. cowork-devops — ~/.claude/cowork-knowledge/devops/
-   Categories: governance, debugging
-   Git: all gitignored
-   Last used: 2026-02-11 09:15
-
-Total: 3 knowledge graphs configured
+Total: 2 knowledge graphs configured
 ```
 
 ## Implementation
@@ -228,7 +223,6 @@ Output:
 ```
 my-project (active)
 ai-research
-cowork-devops
 ```
 
 ## Integration with Other Skills

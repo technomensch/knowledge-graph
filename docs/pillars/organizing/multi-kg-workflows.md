@@ -6,15 +6,15 @@ title: Multi-KG Workflows
 
 > "I have knowledge that spans multiple projects. How do I manage more than one graph?"
 
-KMGraph supports multiple knowledge graphs — project-local, personal, and cowork — each capturing a different scope of knowledge. KMGraph must be initialized (`/kmgraph:kmg-init`) and git configured before using multiple KGs.
+KMGraph supports multiple knowledge graphs — project-local, personal, and global-topic — each capturing a different scope of knowledge. KMGraph must be initialized (`/kmgraph:kmg-init`) and git configured before using multiple KGs.
 
 ## KG types
 
 | Type | Storage location | Shared with |
 |---|---|---|
-| `project-local` | `docs/` (in the project repo) | Anyone with repo access |
+| `project-local` | `knowledge/` (in the project repo) | Anyone with repo access |
 | `personal` | `~/.kmgraph/` | Only the individual (synced via personal git remote) |
-| `cowork` | Configurable shared path | Team (synced via shared git remote) |
+| Global-topic (named, non-project-tied) | `~/.kmgraph/knowledge-graphs/<name>/` | Configured per instance — git strategy is per-KG |
 | `custom` | Any path | Configured per instance |
 
 ## View and switch
@@ -28,7 +28,7 @@ Shows all configured KGs and which is currently active.
 ```bash
 /kmgraph:kmg-switch personal
 /kmgraph:kmg-switch project-local
-/kmgraph:kmg-switch cowork
+/kmgraph:kmg-switch ai-research
 ```
 
 All capture and recall commands operate on the active KG.
@@ -43,23 +43,23 @@ Run `/kmgraph:kmg-status` to confirm the active KG and entry count, or `/kmgraph
 
 Creates `~/.kmgraph/` and registers it. Use this for patterns that apply across all projects.
 
-## Set up a cowork KG
+## Set up a global-topic KG
 
-Edit `~/.kmgraph/kg-config.json`:
+For a named KG not tied to any single project (e.g. cross-project research notes), choose "Global topic-based" in the `/kmgraph:kmg-init` wizard, or register one directly by editing `~/.kmgraph/kg-config.json`:
 
 ```json
 {
   "graphs": {
-    "cowork": {
-      "type": "cowork",
-      "path": "/path/to/shared/kg",
+    "ai-research": {
+      "type": "personal",
+      "path": "~/.kmgraph/knowledge-graphs/ai-research/",
       "gitStrategy": "commit"
     }
   }
 }
 ```
 
-Then switch to it: `/kmgraph:kmg-switch cowork`
+Then switch to it: `/kmgraph:kmg-switch ai-research`
 
 `gitStrategy` controls what happens to entries after capture:
 

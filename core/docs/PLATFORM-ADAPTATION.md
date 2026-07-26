@@ -62,9 +62,9 @@ This guide focuses on **platform capabilities and usage patterns** after install
 - Full search, lesson creation, and ADR scaffolding via MCP tools
 
 **Without MCP:**
-- Index `docs/knowledge/`, `docs/lessons-learned/`, `docs/decisions/` directories
+- Index `knowledge/templates/`, `knowledge/lessons-learned/`, `knowledge/decisions/` directories
 - Use Cursor rules (`.cursorrules`) to guide lesson creation
-- Use `@docs/knowledge` to reference knowledge in Composer
+- Use `@knowledge/templates` to reference knowledge in Composer
 
 **Limitations (without MCP):**
 - No automated git metadata tracking
@@ -110,7 +110,7 @@ This guide focuses on **platform capabilities and usage patterns** after install
 - `kg_scaffold` creates lessons from templates
 
 **Without MCP:**
-- Configure context providers to index `docs/knowledge/`, `docs/lessons-learned/`, `docs/decisions/`
+- Configure context providers to index `knowledge/templates/`, `knowledge/lessons-learned/`, `knowledge/decisions/`
 - Create custom `/lesson` and `/recall` slash commands in `~/.continue/config.json`
 - Use `@knowledge` to reference docs in context
 
@@ -182,8 +182,8 @@ This guide focuses on **platform capabilities and usage patterns** after install
 
 **Usage pattern:**
 - Copilot indexes workspace automatically — ensure knowledge docs are in `docs/`
-- Reference knowledge via `@workspace` queries: `@workspace What patterns are in docs/knowledge/patterns.md?`
-- Use `#file:docs/lessons-learned/` references in prompts
+- Reference knowledge via `@workspace` queries: `@workspace What patterns are in knowledge/templates/patterns.md?`
+- Use `#file:knowledge/lessons-learned/` references in prompts
 
 **Limitations:**
 - No skills/commands

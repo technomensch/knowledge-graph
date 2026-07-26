@@ -12,14 +12,12 @@ Updates the `active` field in `~/.kmgraph/kg-config.json` to the specified knowl
 ```bash
 /kmgraph:kmg-switch my-project
 /kmgraph:kmg-switch ai-research
-/kmgraph:kmg-switch cowork-devops
 ```
 
 ## When to Use
 
 - Switch between different project knowledge graphs
 - Change to a topic-based KG for cross-project patterns
-- Activate a Claude Cowork KG for collaboration
 - Return to a previously used KG
 
 ## Implementation
@@ -121,9 +119,13 @@ fi
 current_active=$(jq -r '.active' "$CONFIG_PATH")
 
 # Update active field and lastUsed timestamp
-jq ".active = \"$target_kg\" | .graphs[\"$target_kg\"].lastUsed = \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"" \
-  "$CONFIG_PATH" > "$CONFIG_PATH.tmp"
-mv "$CONFIG_PATH.tmp" "$CONFIG_PATH"
+if jq ".active = \"$target_kg\" | .graphs[\"$target_kg\"].lastUsed = \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"" \
+  "$CONFIG_PATH" > "$CONFIG_PATH.tmp" && [ -s "$CONFIG_PATH.tmp" ] && jq empty "$CONFIG_PATH.tmp" 2>/dev/null; then
+  mv "$CONFIG_PATH.tmp" "$CONFIG_PATH"
+else
+  rm -f "$CONFIG_PATH.tmp"
+  echo "⚠️  kg-config.json update failed (jq error or invalid output) — active KG left unchanged."
+fi
 ```
 
 ### Step 5: Report success
@@ -177,7 +179,6 @@ Usage: /kmgraph:kmg-switch <kg-name>
 Available knowledge graphs:
   my-project (active)
   ai-research
-  cowork-devops
 ```
 
 ### KG doesn't exist
@@ -187,7 +188,6 @@ Error: Knowledge graph 'nonexistent' not found.
 Available knowledge graphs:
   my-project (active)
   ai-research
-  cowork-devops
 
 Create a new one with: /kmgraph:kmg-init
 ```

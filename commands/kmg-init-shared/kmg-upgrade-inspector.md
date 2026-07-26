@@ -208,6 +208,19 @@ if [ -d "{KG_PATH}/knowledge/knowledge" ]; then
     upgrades+=("knowledge-knowledge-merge|Merge knowledge/knowledge/ (unmodified starters) → knowledge/concepts/ and remove dir|")
   fi
 fi
+
+# Section (n): cowork-knowledge detection (v0.6.20 — ADR-066)
+COWORK_DIR="$HOME/.claude/cowork-knowledge"
+if [ -d "$COWORK_DIR" ] && [ -n "$(find "$COWORK_DIR" -type f 2>/dev/null | head -1)" ]; then
+  upgrades+=("cowork-archive|Archive incompatible cowork-knowledge content (ADR-066: real Claude Cowork has no plugin surface; cowork KG mode removed from new setups)|")
+fi
+
+# Section (o): global-topic KG relocation (v0.6.20 — ADR-066)
+OLD_GT_DIR="$HOME/.claude/knowledge-graphs"
+if [ -d "$OLD_GT_DIR" ] && [ -n "$(find "$OLD_GT_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | head -1)" ]; then
+  GT_NAMES=$(find "$OLD_GT_DIR" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | tr '\n' ',' | sed 's/,$//')
+  upgrades+=("global-topic-relocate|Copy-forward global-topic KG(s) to ~/.kmgraph/knowledge-graphs/: ${GT_NAMES}|")
+fi
 ```
 
 **IMPORTANT — Filter before presenting:** Before displaying the upgrades list or the "nothing to upgrade" message, remove any item from `upgrades[]` whose basename matches any of the following scaffold-only filenames:
@@ -370,14 +383,18 @@ fi
 # - notification: { webhookUrl: "" } (added in v0.2.0)
 # - type: "project-local" (added in v0.2.2 — required for multi-KG support)
 
-jq '
+if jq '
   .graphs["{kg_name}"] |=
     if .platforms == null then .platforms = [] else . end |
     if .autoSwitch == null then .autoSwitch = false else . end |
     if .notification == null then .notification = { "webhookUrl": "" } else . end |
     if .type == null then .type = "{KG_TYPE}" else . end
-' "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
-mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
+' "$CONFIG_PATH" > "${CONFIG_PATH}.tmp" && [ -s "${CONFIG_PATH}.tmp" ] && jq empty "${CONFIG_PATH}.tmp" 2>/dev/null; then
+  mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
+else
+  rm -f "${CONFIG_PATH}.tmp"
+  echo "⚠️  kg-config.json update failed (jq error or invalid output) — original left untouched."
+fi
 ```
 
 **After the migration, check for graphs still missing `type`** (e.g., if the user has multiple registered KGs from v0.2.1):
@@ -924,9 +941,13 @@ Options:
    ```bash
    DEFAULTS_BLOCK=$(awk '/<!-- kmgraph-defaults -->/{found=1} found{print} /<!-- \/kmgraph-defaults -->/{exit}' \
      "${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/project/rules.md")
-   printf '%s\n\n' "$DEFAULTS_BLOCK" | cat - "{KG_PATH}/rules.md" > /tmp/rules-patched.md
-   mv /tmp/rules-patched.md "{KG_PATH}/rules.md"
-   echo "✅ kmgraph-defaults block prepended to rules.md"
+   if printf '%s\n\n' "$DEFAULTS_BLOCK" | cat - "{KG_PATH}/rules.md" > /tmp/rules-patched.md && [ -s /tmp/rules-patched.md ]; then
+     mv /tmp/rules-patched.md "{KG_PATH}/rules.md"
+     echo "✅ kmgraph-defaults block prepended to rules.md"
+   else
+     rm -f /tmp/rules-patched.md
+     echo "⚠️  rules.md prepend failed (empty or write error) — original left untouched (archived copy at $ARCHIVE_DIR/rules.md)."
+   fi
    ```
 
 **Safety rules:**
@@ -1050,3 +1071,120 @@ fi
 - Archive created before any move.
 - Modified files are never auto-moved — warn only, user must resolve manually.
 - `rmdir` is safe: only removes the dir when empty after the move.
+
+---
+
+#### n. cowork-knowledge archive (v0.6.20 — ADR-066)
+
+**Purpose:** Detect legacy `~/.claude/cowork-knowledge/` content and offer to archive it. Real Claude Cowork has no plugin/slash-command extensibility — this KG mode was never actually reachable through the product it targeted. Cowork KG mode is removed from new setups; existing content is never silently dropped or auto-migrated (ADR-063).
+
+**Detection:** populated in the detection phase above (`cowork-archive` in `upgrades[]`).
+
+If found, display and offer:
+
+```
+Found cowork-knowledge content at ~/.claude/cowork-knowledge/:
+  N files
+
+This plugin's cowork KG mode is incompatible with real Claude Cowork (no reachable
+plugin surface) and has been removed from new setups. Your existing content is not
+deleted or migrated automatically.
+
+Options:
+  a. Archive — copy to {KG_PATH}/.kg-archive-YYYYMMDD-HHMMSS/cowork-knowledge/, leave original in place
+  b. Skip — leave cowork-knowledge/ untouched
+```
+
+**If option (a) — archive:**
+
+```bash
+ARCHIVE_DIR="{KG_PATH}/.kg-archive-$(date +%Y%m%d-%H%M%S)"
+mkdir -p "${ARCHIVE_DIR}/cowork-knowledge"
+cp -r "$HOME/.claude/cowork-knowledge/." "${ARCHIVE_DIR}/cowork-knowledge/"
+echo "{\"archived_at\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"source\":\"$HOME/.claude/cowork-knowledge\",\"trigger\":\"cowork-archive\"}" > "${ARCHIVE_DIR}/manifest.json"
+echo "✅ Archived cowork-knowledge → ${ARCHIVE_DIR}/cowork-knowledge/"
+echo "   Original left in place at $HOME/.claude/cowork-knowledge/ — remove manually once you've confirmed the archive."
+```
+
+**If option (b) — skip:** leave `~/.claude/cowork-knowledge/` unchanged.
+
+**Safety rules:**
+- Never deletes the original — copy-only (ADR-063: never destroy known-good state).
+- No auto-migration into global-topic mode — archiving is the only automated action.
+
+---
+
+#### o. Global-topic KG relocation (v0.6.20 — ADR-066)
+
+**Purpose:** Detect global-topic KGs still at the legacy `~/.claude/knowledge-graphs/<name>/` location and offer a one-time copy-forward to `~/.kmgraph/knowledge-graphs/<name>/` (no wrapper folder — per-KG paths are stored individually in `kg-config.json`, so this needs no pre-built umbrella).
+
+**Detection:** populated in the detection phase above (`global-topic-relocate` in `upgrades[]`).
+
+If found, display and offer:
+
+```
+Found global-topic KG(s) at the legacy location:
+  ~/.claude/knowledge-graphs/<name>/  (and any others found)
+
+These belong at ~/.kmgraph/knowledge-graphs/<name>/ (current layout). Options:
+  a. Copy forward — copy each to ~/.kmgraph/knowledge-graphs/<name>/, leave originals in place, update kg-config.json paths
+  b. Skip — I'll relocate manually
+```
+
+**If option (a) — copy forward:**
+
+```bash
+OLD_GT_DIR="$HOME/.claude/knowledge-graphs"
+NEW_GT_ROOT="$HOME/.kmgraph/knowledge-graphs"
+mkdir -p "$NEW_GT_ROOT"
+_gt_migrated=()
+for _gt in "$OLD_GT_DIR"/*/; do
+  [ -d "$_gt" ] || continue
+  _name=$(basename "$_gt")
+  _dest="$NEW_GT_ROOT/$_name"
+  if [ -d "$_dest" ]; then
+    echo "  Skipped $_name — already exists at $_dest"
+    _gt_migrated+=("$_name")
+    continue
+  fi
+  if cp -r "$_gt" "$_dest"; then
+    echo "✅ Copied $_name → $_dest"
+    _gt_migrated+=("$_name")
+  else
+    echo "⚠️  Copy failed for $_name — kg-config.json will NOT be repointed for this graph."
+    rm -rf "$_dest" 2>/dev/null
+  fi
+done
+echo "Originals left in place at $OLD_GT_DIR — remove manually once you've confirmed the copies."
+```
+
+After copying, update `kg-config.json` entries for graphs that actually have content at the new location (either just copied, or already present) — never for a graph whose copy failed, since that would repoint config at content that isn't really there:
+
+```bash
+CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
+if [ ${#_gt_migrated[@]} -eq 0 ]; then
+  echo "No graphs to repoint — kg-config.json left unchanged."
+else
+  MIGRATED_JSON=$(printf '%s\n' "${_gt_migrated[@]}" | jq -R . | jq -s .)
+  if jq --arg old "$HOME/.claude/knowledge-graphs" --arg new "$HOME/.kmgraph/knowledge-graphs" --argjson names "$MIGRATED_JSON" '
+    .graphs |= with_entries(
+      if (.key as $k | $names | index($k)) and ((.value.path // "") | startswith($old))
+      then .value.path = ($new + (.value.path[($old | length):]))
+      else . end
+    )
+  ' "$CONFIG_PATH" > "${CONFIG_PATH}.tmp" && [ -s "${CONFIG_PATH}.tmp" ] && jq empty "${CONFIG_PATH}.tmp" 2>/dev/null; then
+    mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
+    echo "✅ kg-config.json paths updated for: ${_gt_migrated[*]}"
+  else
+    rm -f "${CONFIG_PATH}.tmp"
+    echo "⚠️  kg-config.json update failed (jq error or invalid output) — original left untouched. Update paths manually if needed."
+  fi
+fi
+```
+
+**If option (b) — skip:** leave both the legacy directory and `kg-config.json` unchanged.
+
+**Safety rules:**
+- Copy-only — never deletes or moves the original (ADR-063).
+- Never overwrites an existing destination — skips per-KG if already present at the new path.
+- `kg-config.json` rewrite only touches `path` values under the old prefix, and only after the copy succeeds.

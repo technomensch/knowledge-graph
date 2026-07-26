@@ -6,7 +6,7 @@ version_target: "v0.5.10.7"
 github_issue: null
 created: 2026-05-29
 related_adrs: ["ADR-009", "ADR-028", "ADR-040"]
-related_enhs: []
+related_enhs: ["ENH-051"]
 ---
 
 # ENH-022: Template Directory Disambiguation
@@ -16,6 +16,7 @@ related_enhs: []
 **Version Target:** v0.5.10.7
 **Created:** 2026-05-29
 **Updated:** 2026-06-12 — full scope established via brainstorm; web research conducted
+**Related:** [ENH-051](../ENH-051/ENH-051-specification.md) — cites this ENH as the precedent for disambiguating duplicated path-resolution logic; backlinked 2026-07-26 (paperwork-audit backlink-symmetry check)
 
 ---
 

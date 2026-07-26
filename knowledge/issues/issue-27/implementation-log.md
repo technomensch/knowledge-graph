@@ -1,0 +1,7 @@
+# issue-27: Implementation Log
+
+**2026-07-18** — Found live, in-session, on branch `v0.6.20-storage-migration-completion`. Running `kg_upgrade apply: ["stray-knowledge-dir"]` against this repo's own KG (part of validating the branch's own upgrade-inspector work) overwrote 5 real files in `knowledge/concepts/` with blank templates. Caught immediately by checking `git status`/`git diff` right after the apply call, before doing anything else. Recovered via `git restore knowledge/concepts/ knowledge/knowledge/` — confirmed zero diff from `HEAD` after restore.
+
+Root cause traced to `mcp-server/src/tools/upgrade.ts`'s `applyStrayKnowledgeDir()` (read the actual source before touching anything further, not just the tool's summary output). Fixed same day: added the missing destination-existence-and-content check, mirroring the pattern already correct in `applyTemplates`/`applyStarterRelocation` in the same file. Added a regression test reproducing the exact scenario. `tsc --noEmit` clean, 147/147 tests pass, `dist/` rebuilt.
+
+Re-ran `kg_upgrade apply: ["directories", "starter-relocation", "templates"]` (the 3 categories already confirmed safe by source-code review) separately from `stray-knowledge-dir` — those three landed cleanly with no incident. `stray-knowledge-dir` re-run deferred until after this fix ships, to actually merge the (still-present, restored) stray `knowledge/knowledge/` files using the now-fixed code path.

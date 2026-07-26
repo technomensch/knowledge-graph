@@ -41,6 +41,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
   mod
 ));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // src/utils.ts
 function readConfig() {
@@ -25940,6 +25941,7 @@ var require_utils = __commonJS({
     var isHexPair = RegExp.prototype.test.bind(/^[\da-f]{2}$/iu);
     var isUnreserved = RegExp.prototype.test.bind(/^[\da-z\-._~]$/iu);
     var isPathCharacter = RegExp.prototype.test.bind(/^[\da-z\-._~!$&'()*+,;=:@/]$/iu);
+    var isQueryFragmentCharacter = RegExp.prototype.test.bind(/^[\da-z\-._~!$&'()*+,;=:@/?]$/iu);
     function stringArrayToHexStripped(input) {
       let acc = "";
       let code = 0;
@@ -26082,7 +26084,7 @@ var require_utils = __commonJS({
               continue;
             }
           } else if (input[0] === "/") {
-            if (input[1] === "." || input[1] === "/") {
+            if (input[1] === ".") {
               output.push("/");
               break;
             }
@@ -26164,10 +26166,30 @@ var require_utils = __commonJS({
       }
       return output;
     }
+    var BYTE_HEX = new Array(256);
+    {
+      const HEX_DIGITS = "0123456789ABCDEF";
+      for (let i = 0; i < 256; i++) {
+        BYTE_HEX[i] = "%" + HEX_DIGITS[i >> 4] + HEX_DIGITS[i & 15];
+      }
+    }
+    function isEscapeSafe(cp) {
+      return cp >= 48 && cp <= 57 || cp >= 65 && cp <= 90 || cp >= 97 && cp <= 122 || cp === 42 || cp === 43 || cp === 45 || cp === 46 || cp === 47 || cp === 64 || cp === 95;
+    }
+    function percentEncodeNonAscii(cp) {
+      if (cp < 2048) {
+        return BYTE_HEX[192 | cp >> 6] + BYTE_HEX[128 | cp & 63];
+      }
+      if (cp < 65536) {
+        return BYTE_HEX[224 | cp >> 12] + BYTE_HEX[128 | cp >> 6 & 63] + BYTE_HEX[128 | cp & 63];
+      }
+      return BYTE_HEX[240 | cp >> 18] + BYTE_HEX[128 | cp >> 12 & 63] + BYTE_HEX[128 | cp >> 6 & 63] + BYTE_HEX[128 | cp & 63];
+    }
     function normalizePathEncoding(input) {
       let output = "";
       for (let i = 0; i < input.length; i++) {
-        if (input[i] === "%" && i + 2 < input.length) {
+        const ch = input[i];
+        if (ch === "%" && i + 2 < input.length) {
           const hex3 = input.slice(i + 1, i + 3);
           if (isHexPair(hex3)) {
             const normalizedHex = hex3.toUpperCase();
@@ -26181,10 +26203,66 @@ var require_utils = __commonJS({
             continue;
           }
         }
-        if (isPathCharacter(input[i])) {
-          output += input[i];
+        if (isPathCharacter(ch)) {
+          output += ch;
         } else {
-          output += escape(input[i]);
+          const code = input.charCodeAt(i);
+          if (code < 128) {
+            output += isEscapeSafe(code) ? ch : BYTE_HEX[code];
+          } else if (code < 55296 || code > 57343) {
+            output += percentEncodeNonAscii(code);
+          } else if (code <= 56319 && i + 1 < input.length) {
+            const low = input.charCodeAt(i + 1);
+            if (low >= 56320 && low <= 57343) {
+              output += percentEncodeNonAscii(65536 + (code - 55296 << 10) + (low - 56320));
+              i++;
+            } else {
+              output += percentEncodeNonAscii(65533);
+            }
+          } else {
+            output += percentEncodeNonAscii(65533);
+          }
+        }
+      }
+      return output;
+    }
+    function normalizeQueryFragmentEncoding(input) {
+      let output = "";
+      for (let i = 0; i < input.length; i++) {
+        const ch = input[i];
+        if (ch === "%" && i + 2 < input.length) {
+          const hex3 = input.slice(i + 1, i + 3);
+          if (isHexPair(hex3)) {
+            const normalizedHex = hex3.toUpperCase();
+            const decoded = String.fromCharCode(parseInt(normalizedHex, 16));
+            if (isUnreserved(decoded)) {
+              output += decoded;
+            } else {
+              output += "%" + normalizedHex;
+            }
+            i += 2;
+            continue;
+          }
+        }
+        if (isQueryFragmentCharacter(ch)) {
+          output += ch;
+        } else {
+          const code = input.charCodeAt(i);
+          if (code < 128) {
+            output += isEscapeSafe(code) ? ch : BYTE_HEX[code];
+          } else if (code < 55296 || code > 57343) {
+            output += percentEncodeNonAscii(code);
+          } else if (code <= 56319 && i + 1 < input.length) {
+            const low = input.charCodeAt(i + 1);
+            if (low >= 56320 && low <= 57343) {
+              output += percentEncodeNonAscii(65536 + (code - 55296 << 10) + (low - 56320));
+              i++;
+            } else {
+              output += percentEncodeNonAscii(65533);
+            }
+          } else {
+            output += percentEncodeNonAscii(65533);
+          }
         }
       }
       return output;
@@ -26192,7 +26270,8 @@ var require_utils = __commonJS({
     function escapePreservingEscapes(input) {
       let output = "";
       for (let i = 0; i < input.length; i++) {
-        if (input[i] === "%" && i + 2 < input.length) {
+        const ch = input[i];
+        if (ch === "%" && i + 2 < input.length) {
           const hex3 = input.slice(i + 1, i + 3);
           if (isHexPair(hex3)) {
             output += "%" + hex3.toUpperCase();
@@ -26200,7 +26279,22 @@ var require_utils = __commonJS({
             continue;
           }
         }
-        output += escape(input[i]);
+        const code = input.charCodeAt(i);
+        if (code < 128) {
+          output += isEscapeSafe(code) ? ch : BYTE_HEX[code];
+        } else if (code < 55296 || code > 57343) {
+          output += percentEncodeNonAscii(code);
+        } else if (code <= 56319 && i + 1 < input.length) {
+          const low = input.charCodeAt(i + 1);
+          if (low >= 56320 && low <= 57343) {
+            output += percentEncodeNonAscii(65536 + (code - 55296 << 10) + (low - 56320));
+            i++;
+          } else {
+            output += percentEncodeNonAscii(65533);
+          }
+        } else {
+          output += percentEncodeNonAscii(65533);
+        }
       }
       return output;
     }
@@ -26234,6 +26328,7 @@ var require_utils = __commonJS({
       reescapeHostDelimiters,
       normalizePercentEncoding,
       normalizePathEncoding,
+      normalizeQueryFragmentEncoding,
       escapePreservingEscapes,
       removeDotSegments,
       isIPv4,
@@ -26458,7 +26553,7 @@ var require_schemes = __commonJS({
 var require_fast_uri = __commonJS({
   "node_modules/fast-uri/index.js"(exports2, module2) {
     "use strict";
-    var { normalizeIPv6, removeDotSegments, recomposeAuthority, normalizePercentEncoding, normalizePathEncoding, escapePreservingEscapes, reescapeHostDelimiters, isIPv4, nonSimpleDomain } = require_utils();
+    var { normalizeIPv6, removeDotSegments, recomposeAuthority, normalizePercentEncoding, normalizePathEncoding, normalizeQueryFragmentEncoding, escapePreservingEscapes, reescapeHostDelimiters, isIPv4, nonSimpleDomain } = require_utils();
     var { SCHEMES, getSchemeHandler } = require_schemes();
     function normalize(uri, options) {
       if (typeof uri === "string") {
@@ -26597,6 +26692,7 @@ var require_fast_uri = __commonJS({
       return uriTokens.join("");
     }
     var URI_PARSE = /^(?:([^#/:?]+):)?(?:\/\/((?:([^#/?@]*)@)?(\[[^#/?\]]+\]|[^#/:?]*)(?::(\d*))?))?([^#?]*)(?:\?([^#]*))?(?:#((?:.|[\n\r])*))?/u;
+    var AUTHORITY_PREFIX = /^(?:[^#/:?]+:)?\/\/([^/?#]*)/;
     function getParseError(parsed, matches) {
       if (matches[2] !== void 0 && parsed.path && parsed.path[0] !== "/") {
         return 'URI path must start with "/" when authority is present.';
@@ -26626,9 +26722,14 @@ var require_fast_uri = __commonJS({
           uri = "//" + uri;
         }
       }
+      const authorityMatch = uri.match(AUTHORITY_PREFIX);
+      if (authorityMatch !== null && authorityMatch[1].indexOf("\\") !== -1) {
+        parsed.error = "URI authority must not contain a literal backslash.";
+        malformedAuthorityOrPort = true;
+      }
       const matches = uri.match(URI_PARSE);
       if (matches) {
-        parsed.scheme = matches[1];
+        parsed.scheme = matches[1] === void 0 ? void 0 : matches[1].toLowerCase();
         parsed.userinfo = matches[3];
         parsed.host = matches[4];
         parsed.port = parseInt(matches[5], 10);
@@ -26669,7 +26770,7 @@ var require_fast_uri = __commonJS({
         if (!options.unicodeSupport && (!schemeHandler || !schemeHandler.unicodeSupport)) {
           if (parsed.host && (options.domainHost || schemeHandler && schemeHandler.domainHost) && isIP === false && nonSimpleDomain(parsed.host)) {
             try {
-              parsed.host = URL.domainToASCII(parsed.host.toLowerCase());
+              parsed.host = new URL("http://" + parsed.host).hostname;
             } catch (e) {
               parsed.error = parsed.error || "Host's domain name can not be converted to ASCII: " + e;
             }
@@ -26687,12 +26788,11 @@ var require_fast_uri = __commonJS({
           if (parsed.path) {
             parsed.path = normalizePathEncoding(parsed.path);
           }
+          if (parsed.query) {
+            parsed.query = normalizeQueryFragmentEncoding(parsed.query);
+          }
           if (parsed.fragment) {
-            try {
-              parsed.fragment = encodeURI(decodeURIComponent(parsed.fragment));
-            } catch {
-              parsed.error = parsed.error || "URI malformed";
-            }
+            parsed.fragment = normalizeQueryFragmentEncoding(parsed.fragment);
           }
         }
         if (schemeHandler && schemeHandler.parse) {
@@ -31504,7 +31604,7 @@ function registerConfigTools(server) {
     {
       name: external_exports.string().min(1).describe("Unique name for this knowledge graph"),
       kgPath: external_exports.string().describe("Absolute path where KG should be created"),
-      type: external_exports.enum(["project-local", "personal", "cowork", "custom"]).default("project-local").describe("KG type"),
+      type: external_exports.enum(["project-local", "personal", "custom"]).default("project-local").describe("KG type"),
       categories: external_exports.array(
         external_exports.object({
           name: external_exports.string(),
@@ -32473,12 +32573,17 @@ var init_resources = __esm({
 });
 
 // src/cli.ts
+var cli_exports = {};
+__export(cli_exports, {
+  resolveInitLocation: () => resolveInitLocation
+});
+module.exports = __toCommonJS(cli_exports);
 var fs8 = __toESM(require("fs"));
 var path8 = __toESM(require("path"));
 var os6 = __toESM(require("os"));
 var readline = __toESM(require("readline"));
 init_utils();
-var SERVER_VERSION = true ? "0.6.19" : (() => {
+var SERVER_VERSION = true ? "0.6.20" : (() => {
   try {
     return null.version;
   } catch {
@@ -32495,6 +32600,20 @@ function printHeader() {
   console.log("  Knowledge Management Graph \u2014 Setup Wizard");
   console.log("  ======================================");
   console.log("");
+}
+function resolveInitLocation(locationChoice, name) {
+  switch (locationChoice) {
+    case "1":
+      return path8.resolve("knowledge");
+    case "2":
+      return path8.join("~", ".kmgraph");
+    case "3":
+      return path8.join("~", ".kmgraph", "knowledge-graphs", name);
+    case "4":
+      return null;
+    default:
+      return path8.resolve("knowledge");
+  }
 }
 async function runInit() {
   const rl = readline.createInterface({
@@ -32517,44 +32636,35 @@ async function runInit() {
     }
     console.log("");
     console.log("  Where should the knowledge graph be stored?");
-    console.log("  1. Current directory (./docs/)");
-    console.log("  2. Home directory (~/.kmgraph/)");
-    console.log("  3. Custom path");
+    console.log("  1. Current directory (./knowledge/)");
+    console.log("  2. Home directory (~/.kmgraph/) \u2014 for your personal KG");
+    console.log("  3. Global topic (~/.kmgraph/knowledge-graphs/<name>/) \u2014 a named KG not tied to any single project");
+    console.log("  4. Custom path");
     console.log("");
-    const locationChoice = await ask(rl, "  Choice [1/2/3]: ");
+    const locationChoice = await ask(rl, "  Choice [1/2/3/4]: ");
     let kgPath;
-    switch (locationChoice) {
-      case "1":
-        kgPath = path8.resolve("docs");
-        break;
-      case "2":
-        kgPath = path8.join("~", ".kmgraph");
-        break;
-      case "3": {
-        const customPath = await ask(rl, "  Enter path: ");
-        if (!customPath) {
-          console.error("Error: Path is required.");
-          process.exit(1);
-        }
-        kgPath = customPath;
-        break;
+    const resolved = resolveInitLocation(locationChoice, name);
+    if (resolved !== null) {
+      kgPath = resolved;
+    } else {
+      const customPath = await ask(rl, "  Enter path: ");
+      if (!customPath) {
+        console.error("Error: Path is required.");
+        process.exit(1);
       }
-      default:
-        kgPath = path8.resolve("docs");
+      kgPath = customPath;
     }
     console.log("");
     console.log("  Knowledge graph type:");
     console.log("  1. project-local (default) \u2014 tied to this project");
     console.log("  2. personal \u2014 shared across projects (your personal KG)");
-    console.log("  3. cowork \u2014 shared with team members");
-    console.log("  4. custom");
+    console.log("  3. custom");
     console.log("");
-    const typeChoice = await ask(rl, "  Choice [1/2/3/4]: ");
+    const typeChoice = await ask(rl, "  Choice [1/2/3]: ");
     const typeMap = {
       "1": "project-local",
       "2": "personal",
-      "3": "cowork",
-      "4": "custom"
+      "3": "custom"
     };
     const kgType = typeMap[typeChoice] || "project-local";
     const categories = [
@@ -32795,4 +32905,8 @@ async function main() {
 main().catch((error48) => {
   console.error("Fatal error:", error48);
   process.exit(1);
+});
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  resolveInitLocation
 });

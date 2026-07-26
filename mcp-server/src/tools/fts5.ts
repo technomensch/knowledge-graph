@@ -27,18 +27,6 @@ export const FTS5_DB_FILENAME = ".fts5.db";
 // Path helpers
 // ---------------------------------------------------------------------------
 
-/**
- * Returns the absolute path to the user-level FTS5 database for a given KG name.
- * Stored in ~/.claude/kg-fts5/<kgName>.db (outside project directories).
- * Creates the directory if it does not exist.
- * @deprecated Use resolveDbPath(kgName, "project-local") — DB now at ~/.kmgraph/index/
- */
-export function getFTS5DbPath(kgName: string): string {
-  const dir = path.join(os.homedir(), ".claude", "kg-fts5");
-  fs.mkdirSync(dir, { recursive: true });
-  return path.join(dir, `${kgName}.db`);
-}
-
 export function getPersonalDbPath(): string {
   const dir = path.join(os.homedir(), ".kmgraph", "index");
   fs.mkdirSync(dir, { recursive: true });
@@ -63,20 +51,6 @@ export function resolveDbPath(kgName: string, kgType: string): string {
   // Unknown type — default to project-local with a console warning
   console.warn(`resolveDbPath: unknown kgType "${kgType}", defaulting to project-local`);
   return getProjectDbPath(kgName);
-}
-
-/**
- * Resolves the content root for a KG path.
- * If the KG contains a docs/lessons-learned subdirectory (v0.2+ layout),
- * returns the docs/ directory so that lessons-learned, decisions, and sessions
- * are found under docs/. Otherwise falls back to kgPath itself.
- */
-export function resolveContentRoot(kgPath: string): string {
-  const docsLessons = path.join(kgPath, "docs", "lessons-learned");
-  if (fs.existsSync(docsLessons)) {
-    return path.join(kgPath, "docs");
-  }
-  return kgPath;
 }
 
 // ---------------------------------------------------------------------------
@@ -109,7 +83,7 @@ export interface SearchResult {
 
 /**
  * Returns the absolute path to the FTS5 database for a given KG root.
- * @deprecated Use getFTS5DbPath(kgName) instead — stores DB in user-level cache.
+ * @deprecated Use resolveDbPath(kgName, kgType) instead — stores DB in user-level cache.
  */
 export function getDbPath(kgPath: string): string {
   return path.join(kgPath, FTS5_DB_FILENAME);
@@ -315,16 +289,12 @@ export function rebuildIndex(kgPath: string, kgName: string, kgType = "project-l
   try {
     initDb(db);
 
-    // Resolve content root: v0.2+ KGs store content under docs/
-    const contentRoot = resolveContentRoot(kgPath);
-
     // Collect all .md files from target subdirectories
-    // concepts/ is always top-level (kgPath), even on v0.2+ docs-layout KGs
     const contentDirs = ["knowledge", "lessons-learned", "decisions", "sessions", "chat-history"];
     const allFiles: string[] = [];
 
     for (const dir of contentDirs) {
-      const dirPath = path.join(contentRoot, dir);
+      const dirPath = path.join(kgPath, dir);
       allFiles.push(...walkDir(dirPath, ".md"));
     }
     allFiles.push(...walkDir(path.join(kgPath, "concepts"), ".md"));

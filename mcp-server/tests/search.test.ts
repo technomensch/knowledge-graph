@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { rebuildIndex, getFTS5DbPath, getProjectDbPath, searchFts5 } from "../src/tools/fts5.js";
+import { rebuildIndex, getProjectDbPath, searchFts5 } from "../src/tools/fts5.js";
 import { KgConfig } from "../src/utils.js";
 
 // ---------------------------------------------------------------------------

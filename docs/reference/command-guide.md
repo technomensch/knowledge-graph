@@ -673,7 +673,7 @@ Total: 2 knowledge graph(s) configured
 ```bash
 /kmgraph:kmg-switch my-project
 /kmgraph:kmg-switch ai-research
-/kmgraph:kmg-switch cowork-devops --force    # Skip missing path warning
+/kmgraph:kmg-switch ai-research --force    # Skip missing path warning
 ```
 
 **Tips**:
