@@ -2,7 +2,7 @@
 id: ENH-051
 type: Enhancement
 status: deferred
-github-issue: null
+github-issue: "#187"
 branch: none
 created: 2026-07-18
 related_adrs: ["ADR-066", "ADR-067"]

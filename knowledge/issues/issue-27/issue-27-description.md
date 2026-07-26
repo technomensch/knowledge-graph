@@ -2,7 +2,7 @@
 id: issue-27
 type: Bug
 status: resolved
-github-issue: null
+github-issue: "#191"
 branch: v0.6.20-storage-migration-completion
 created: 2026-07-18
 ---

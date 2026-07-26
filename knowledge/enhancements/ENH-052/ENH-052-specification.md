@@ -2,10 +2,10 @@
 id: ENH-052
 type: Hardening
 status: deferred
-github-issue: null
+github-issue: "#188"
 branch: none
 created: 2026-07-18
-related_issues: ["issue-13", "issue-26"]
+related_issues: ["issue-13", "issue-26", "issue-28"]
 related_enhs: ["ENH-042"]
 ---
 
@@ -104,6 +104,11 @@ instances hit different surfaces:
   file (`commands/kmg-start-issue-tracking.md`) references `docs/issue-tracker.md`,
   which never existed in git history; a surface (`commands/*.md`) that none of
   issue-13's three mechanisms even touch.
+- **[issue-28](../../issues/issue-28/issue-28-description.md)** — the gap this ENH's
+  own testing surfaced: Gates 5/6 exist in this working tree but the live
+  `PreToolUse` hook runs from the installed plugin cache, so the gates just built
+  don't yet protect a real push. Backlinked 2026-07-26 (paperwork-audit
+  backlink-symmetry check).
 
 ENH-052 is the **same class one level up**: where issue-13 / ENH-042 / issue-26
 are each a specific stale artifact, this item is about the absence of any
@@ -165,6 +170,15 @@ exercised against a real resolved/deferred item, and CHANGELOG-entry-currency
 remains unassigned to either mechanism. This ENH's `status:` stays `deferred`
 until those close — but the core mechanism (Gates 5/6 + companion skill) now
 exists and works, which the original sketch never committed to.
+
+**Update 2026-07-26:** one of the two remaining blockers closed. `kmg-paperwork-audit`'s
+Steps 2-3 were manually exercised against this branch's real data and caught a genuine
+resolved-vs-deferred judgment call — this ENH's own `status:` field (paperwork-audit
+flagged that the branch's diff looked like an implementation, not a deferred item, which
+is exactly the class of finding Steps 2-3 are meant to produce). Still open:
+CHANGELOG-entry-currency remains unassigned to either mechanism, and `issue-28` (#192,
+still deferred) means Gates 5/6 don't yet protect a real push from the installed plugin
+cache. `status:` stays `deferred` pending those two.
 
 Also confirmed, as an unplanned side-effect of this test: the live
 `PreToolUse` hook that governs this repo's actual pushes runs from the

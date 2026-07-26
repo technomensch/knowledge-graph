@@ -2,7 +2,7 @@
 id: issue-26
 type: Hardening
 status: deferred
-github-issue: null
+github-issue: "#190"
 branch: none
 created: 2026-07-18
 ---
@@ -30,3 +30,4 @@ This project already tracks the general pattern — "a documented reference or r
 - [issue-13](../issue-13/issue-13-description.md) — general detection-gap pattern this instance was folded into
 - [issue-25](../issue-25/issue-25-description.md) — filed in the same session, same underlying "process/reference gap not caught until hit live" theme
 - [ENH-051](../../enhancements/ENH-051/ENH-051-specification.md) — the enhancement being filed when this was found
+- [ENH-052](../../enhancements/ENH-052/ENH-052-specification.md) — superset pre-PR paperwork-consistency check that names this issue as a narrow, non-duplicated mechanism. Backlinked 2026-07-26 (paperwork-audit backlink-symmetry check).

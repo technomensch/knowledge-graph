@@ -2,7 +2,7 @@
 id: issue-28
 type: Hardening
 status: deferred
-github-issue: null
+github-issue: "#192"
 branch: none
 created: 2026-07-18
 ---
@@ -75,6 +75,7 @@ Checked `hooks/hooks.json`: the hook is wired as `${CLAUDE_PLUGIN_ROOT}/scripts/
 - [ADR-054: Document Cache-Clear as Official Upgrade Path](../../decisions/ADR-054-document-cache-clear-upgrade-workaround.md) — closest existing governing decision; addresses the post-*update* stale-cache case, not this active-local-development case. No new ADR filed for this issue — see [Task 3 judgment call] below.
 - [Lesson: Plugin Cache Not Synced From Local Repo](../../lessons-learned/debugging/Lessons_Learned_Debugging_Plugin_Cache_Not_Synced_From_Local_Repo.md) — same family, scoped to `commands/`/`core/`/`skills/`, not verified against `mcp-server/dist/`
 - [Lesson: Local Marketplace Testing - Two-Location Sync Required](../../lessons-learned/process/local-marketplace-testing-workflow.md) — same underlying pattern under an older local-marketplace testing topology
+- [ENH-052](../../enhancements/ENH-052/ENH-052-specification.md) — names this issue directly as the reason its Gates 5/6 don't yet protect a real push (they run from this working tree, not the installed plugin cache). Backlinked 2026-07-26 (paperwork-audit backlink-symmetry check).
 
 ### On the ADR question
 

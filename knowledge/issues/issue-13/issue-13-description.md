@@ -34,6 +34,7 @@ Confirmed 2026-07-14, while auditing the docs site ahead of a v0.6.19 presentati
 - v0.6.19 polish release (`docs/specs/2026-07-14-v0.6.19-polish-release-design.md`) — fixes the *current* 45 links (a subset, clusters 1+4), explicitly does not build the detection mechanism this issue tracks
 - ROADMAP.md § Outstanding Action Items — this finding is also tracked there as a pointer to this issue
 - [issue-26](../issue-26/issue-26-description.md) (2026-07-18) — same underlying pattern, different surface: `commands/kmg-start-issue-tracking.md` references `docs/issue-tracker.md`, which never existed in git history. Confirms the pattern this issue tracks is not confined to Docusaurus `docs/` content — command prompt files (`commands/*.md`) carry the same class of stale/dead reference, and none of this issue's three checked mechanisms (`onBrokenLinks`, `kmg-docs-impact-scan`, `pre-push-gate.sh`) would ever see them, since none touch `commands/` at all. Any eventual fix for this issue should note that scope gap explicitly rather than assume commands/ is covered by extension.
+- [ENH-052](../../enhancements/ENH-052/ENH-052-specification.md) — the "same class one level up": a superset pre-PR paperwork-consistency check that names this issue as one of the narrow mechanisms it doesn't duplicate. Backlinked 2026-07-26 (paperwork-audit backlink-symmetry check).
 
 ## Explicitly Deferred (Mode 3 — Track only)
 
