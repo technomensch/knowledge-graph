@@ -152,6 +152,35 @@ Fable (`claude-fable-5`) was given the emerging model above plus the research fi
 - Whether/how the two live divergent config files (`~/.kmgraph/kg-config.json` vs. legacy `~/.claude/kg-config.json`) get reconciled or retired under the new model (likely Q4, migration path).
 - Agent-behavior heuristics for defaulting search scope and offering cross-scope follow-up checks — deferred to fable/planning, not architectural.
 
+## Cross-Tool Comparison: gh's per-repo identity switching (2026-07-25)
+
+While debugging an unrelated problem in a different session/repo (`docs-readme-poc`) — `gh auth switch` not giving true per-terminal isolation because `gh` reads one shared `~/.config/gh/hosts.yml` regardless of terminal — the user was given this fix by that session's assistant, and asked whether it's applicable to ADR-067. Captured here as a validating data point, not a decision.
+
+**The gh fix, two parts:**
+1. `GH_CONFIG_DIR` env var override, pointed at an isolated per-identity config dir (`~/.config/gh-tidal`), set manually per terminal (or via `direnv`/`.envrc`).
+2. Optional zsh `chpwd` hook in `~/.zshrc` that auto-sets/unsets `GH_CONFIG_DIR` on `cd` into a specific repo — recomputed fresh every directory change, nothing persisted as "current identity" between calls.
+
+**Assessment: validates the principle, mechanism doesn't transfer directly.**
+
+- Part 2 (chpwd hook) is structurally the same pattern as this ADR's context-derived direction: derive the answer from cwd at the moment of the call, instead of storing it in a mutable pointer that can drift (`.active` / `GH_CONFIG_DIR`-if-forgotten-to-unset). Real independent evidence for "derive, don't store."
+- The mechanism doesn't reuse as-is because gh is a plain CLI — each invocation is a fresh process with no way to know "where am I" except reading ambient shell state, so a shell hook is the only lever available. KMGraph's `kg_*` tools are MCP tool calls that already run inside code with direct access to cwd/project-root at call time (`getProjectRoot()`, `mcp-server/src/utils.ts:106`, already wired as a mismatch guard in `capture.ts:254`, per issue-10). Introducing a shell-level env var here would add a new class of persisted state (shell-session-scoped) — the same failure category as `.active`, just relocated, not eliminated.
+- Where the two do line up structurally: isolated storage-per-identity (`~/.config/gh-tidal`) mirrors isolated storage-per-project-KG (`~/.kmgraph/knowledge-graphs/<name>/`, per ADR-066) — a storage-layout parallel, not a resolution-logic one.
+- Confirms the actual feasibility test for this ADR is promoting `getProjectRoot()` from guard to router inside `kg_*` handlers directly (code already half-built via issue-10), not a shell-hook analog.
+
+Real-world test in progress: user is attempting to get the gh `chpwd`-hook fix itself working, live, in the `docs-readme-poc` session/repo — a separate, unrelated debugging effort, not part of this ADR's implementation.
+
+## External Research (2026-07-26) — industry precedent, still no decision
+
+A web search for prior art on this exact class of problem (global mutable "current selection" state vs. deriving the answer from context per-call), requested explicitly to sanity-check the direction against outside evidence rather than only this project's own history.
+
+**1. `kubectl`'s `current-context` has the identical, well-documented bleed failure.** Multiple independent sources describe the same symptom this ADR names: a second terminal silently picks up a context change made in a first terminal, because `kubectl` reads one shared `~/.kube/config` `current-context` field regardless of which terminal or directory issued the change — structurally the same bug class as `.active`, just a different tool. The ecosystem's actual fix in practice is **not** a better switch command (`kubectx` itself is called out as still carrying the same global-mutation risk) — it's abandoning the shared pointer for either (a) `KUBECONFIG` env-var scoping per project, or (b) `direnv`, which loads/unloads directory-scoped state on `cd` with "variables never leak" as the explicit design goal. This is real-world confirmation that the "derive from context, don't store a shared pointer" direction already adopted above is the field's actual converged answer to this exact failure mode, not a novel or risky choice.
+
+**2. The MCP protocol itself is moving to statelessness in days, not years.** The 2026-07-28 MCP specification release candidate (SEP-2567, SEP-2575) removes the `initialize` handshake and the `Mcp-Session-Id` header entirely — every request now carries its own context in `_meta`, with no persisted session state and no sticky-routing requirement, specifically because "the Model Context Protocol's session-based architecture has been a production liability." KMGraph's `kg_*` tools are MCP tool calls running on this exact protocol. This lands directly on Q1: promoting `getProjectRoot()` from a mismatch guard (issue-10) to the primary per-call router isn't just internally consistent with this project's own evidence — it's the same architectural direction the protocol layer underneath it is independently taking, for the same underlying reason (a shared session/pointer is a liability; a self-describing per-call request is not).
+
+**3. Multi-tenant MCP isolation guidance converges on explicit-scope-per-call, never inferred from shared state** — consistent with, not a new input to, the registry-lookup + mandatory-disambiguation direction already adopted above for personal/global-topic KG selection.
+
+**Assessed scope of findings 1+2 — validates one half of the model, does not replace the other half.** Both findings are strong, independent confirmation for the **project-local** resolution case (cwd-derived, stateless, per-call) — which is also the empirically dominant case (all 18 historical `kmg-switch` invocations were project↔project). Neither finding has an analog for **personal KG** (singular, no cwd to derive from) or **global-topic KGs** (multiple named candidates; cwd carries no signal about which one is meant). `direnv`/`KUBECONFIG` scoping and the MCP stateless spec both solve "know where you are," not "pick one of several named things with no locational signal" — so they cannot substitute for the registry-lookup + mandatory-disambiguation mechanism (Fable's recommendation, § Brainstorm Session Findings above) for that second case. Adopting only findings 1+2 and dropping the registry-lookup piece would silently leave personal/global-topic KGs unresolved — the same shape of gap Option A was rejected for in ADR-001's original alternatives analysis. **Conclusion: findings 1+2 confirm and strengthen the project-local half of the emerging model; they do not replace the explicit-param/registry-lookup half, which stays in the model.**
+
 ## Related
 
 - ADR-001 (centralized multi-KG configuration — the `.active`/switch model this would revisit)
