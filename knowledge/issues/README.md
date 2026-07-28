@@ -4,8 +4,8 @@
 
 Tracking of investigated bugs, defects, and meta-issues for this project.
 
-**Total Issues:** 28 numbered issues, plus named meta-issues (see below)
-**Last Updated:** 2026-07-18
+**Total Issues:** 30 numbered issues, plus named meta-issues (see below)
+**Last Updated:** 2026-07-28
 
 ---
 
@@ -19,6 +19,8 @@ Tracking of investigated bugs, defects, and meta-issues for this project.
 
 ## All Issues (Chronological)
 
+- [issue-30: `kmg-handoff` and `kmg-session-wrap` only reference session-summary — neither generates one](issue-30/issue-30-description.md) — **Status:** 🟡 Deferred (Track only) — found live running `/kmgraph:kmg-handoff` with no session summary for the day; `kmg-handoff`'s own package is incomplete without one by its own stated purpose
+- [issue-29: `/kmgraph:kmg-extract-chat` bleeds cross-project content into `knowledge/chat-history/` (no default project scoping)](issue-29/issue-29-description.md) — **Status:** 🟡 Tracked (GitHub #197) — found live while working on [ADR-067](../decisions/ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md); same root failure class (cross-project KG bleed), different surface; historical archive contamination confirmed across 42 of 118 chat-history files, Feb–Jul 2026 — cleanup tracked as separate required follow-up
 - [issue-28: No Dev-Loop Mechanism Between a Locally Rebuilt `mcp-server/dist/` and Live `kg_*` Tool Calls](issue-28/issue-28-description.md) — **Status:** 🟡 Deferred (Track only) — found live while verifying [issue-27](issue-27/issue-27-description.md)'s fix; companion lesson: [Lessons_Learned_Debugging_MCP_Server_Rebuild_Not_Reflected_In_Live_Plugin_Tool_Calls](../lessons-learned/debugging/Lessons_Learned_Debugging_MCP_Server_Rebuild_Not_Reflected_In_Live_Plugin_Tool_Calls.md)
 - [issue-27: applyStrayKnowledgeDir Silently Overwrote Real KG Content — Actually Happened, Not Hypothetical](issue-27/issue-27-description.md) — **Status:** ✅ Resolved — same session, found live, fixed same day, regression test added
 - [issue-26: `commands/kmg-start-issue-tracking.md` References `docs/issue-tracker.md`, Which Does Not Exist](issue-26/issue-26-description.md) — **Status:** 🟡 Deferred (Track only) — same pattern as [issue-13](issue-13/issue-13-description.md), different surface

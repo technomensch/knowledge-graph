@@ -79,6 +79,16 @@ For reference, `cowork` is a KG **type/scope** meaning "team-shared, synced via 
 
 **Implementation:** planned in full as the 13-task `v0.6.20-storage-migration-completion` plan (`~/.claude/plans/v0.6.20-storage-migration-completion.md`). Decision made; execution not yet started as of this writing.
 
+## Post-Implementation Gap (2026-07-28)
+
+v0.6.20 (commit 815c8136) executed the migration decided above, but coverage was incomplete: it moved KG content storage (sessions, decisions, lessons, enhancements) but did not audit **command files that hardcode output paths** for the pre-migration layout.
+
+**Concrete instance found:** `commands/kmg-handoff.md` Step 1 hardcodes its default output directory as `./handoff-packages/$(date +%Y-%m-%d)` (repo root) — a literal predating this migration. The correct post-migration location is `knowledge/handoffs/` (already in active use — see `knowledge/handoffs/2026-05-27/`, etc.). Because the command was never updated, every `/kmgraph:kmg-handoff` run since the migration wrote a new dated folder to the root instead, producing 12 stray directories (`handoff-packages/2026-04-21` through `2026-07-18`) that `git status` never surfaced because `handoff-packages/` is gitignored (`.gitignore:94`).
+
+**Root cause:** the v0.6.20 migration plan scoped its verification to data directories and the two `kmg-init` implementations (per the Decision above); it did not include a repo-wide grep for old path literals (`~/.claude/knowledge-graphs`, `~/.claude/cowork-knowledge`, `./handoff-packages`, etc.) across `commands/*.md`. A migration that relocates a directory silently regenerates the old one forever if any generator still hardcodes the old path.
+
+**Tracked as:** see issue created per `/kmgraph:kmg-start-issue-tracking` (this session, 2026-07-28) — spec includes a requirement to extend the upgrade script's existing detect-and-migrate pattern (per Decision point 3 above) to cover this class of stale-path-in-command-file bug, not just this one instance.
+
 ## Related
 
 - `knowledge/issues/issue-14/investigation-log.md` — Finding 8 (the audit trail that surfaced this)

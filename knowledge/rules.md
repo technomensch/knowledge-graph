@@ -313,6 +313,15 @@ queries before making any plan recommendations:
 
 Running only the topic query misses architectural ADRs and ENHs that constrain the work.
 
+### User-Facing Docs Impact
+
+At plan-creation time — before writing task steps — identify all user-facing Docusaurus pages affected by the planned changes. Group them in a single "Docs Updates (Grouped)" section of the plan. Do not scatter doc edits across task steps.
+
+- **Why:** doc changes scattered across tasks get missed or applied inconsistently; grouping them upfront makes them visible, reviewable, and committable as a single coherent pass
+- **How:** scan the planned behavior changes and cross-reference against known user-facing pages (README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, CONCEPTS, GLOSSARY, pillar pages). List each affected page with the required change before writing any implementation task.
+- **Style:** follow the existing style guide for each page before editing — do not introduce new formatting patterns
+- **Moved from** `~/.kmgraph/plan-authoring-rules.md` (2026-07-28) — this project is the only one with a Docusaurus docs site, so the rule is project-specific, not cross-project.
+
 **Recall results take priority — reason about findings before recommending:**
 - If recall surfaces a rejected approach, examine WHY it was rejected and whether that reason is still applicable.
 - If still applicable: do not propose the approach; if unavoidable, explain why no workaround exists.
