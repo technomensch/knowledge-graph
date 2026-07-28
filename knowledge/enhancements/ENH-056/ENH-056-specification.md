@@ -2,8 +2,8 @@
 id: ENH-056
 type: Enhancement
 status: tracked
-github-issue: "#N"
-branch: issue/ENH-056-workflow-execution-completeness
+github-issue: "#199"
+branch: none
 created: 2026-07-28
 related_issues: ["issue-25", "issue-30"]
 related_enhs: ["ENH-052"]
@@ -12,7 +12,7 @@ related_adrs: ["ADR-043", "ADR-050"]
 
 # ENH-056: Commands/Workflows Documented as Multi-Step Processes Are Inconsistently Executed in Full
 
-**Local ID:** ENH-056 | **GitHub Issue:** #N (see frontmatter after creation)
+**Local ID:** ENH-056 | **GitHub Issue:** [#199](https://github.com/technomensch/knowledge-graph/issues/199)
 
 ## Problem Statement
 
