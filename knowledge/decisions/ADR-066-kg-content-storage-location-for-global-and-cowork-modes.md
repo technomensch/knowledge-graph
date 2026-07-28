@@ -87,7 +87,7 @@ v0.6.20 (commit 815c8136) executed the migration decided above, but coverage was
 
 **Root cause:** the v0.6.20 migration plan scoped its verification to data directories and the two `kmg-init` implementations (per the Decision above); it did not include a repo-wide grep for old path literals (`~/.claude/knowledge-graphs`, `~/.claude/cowork-knowledge`, `./handoff-packages`, etc.) across `commands/*.md`. A migration that relocates a directory silently regenerates the old one forever if any generator still hardcodes the old path.
 
-**Tracked as:** see issue created per `/kmgraph:kmg-start-issue-tracking` (this session, 2026-07-28) — spec includes a requirement to extend the upgrade script's existing detect-and-migrate pattern (per Decision point 3 above) to cover this class of stale-path-in-command-file bug, not just this one instance.
+**Tracked as:** `knowledge/issues/issue-31/issue-31-description.md` — GitHub issue [#200](https://github.com/technomensch/knowledge-graph/issues/200). Filed as its own Bug issue (workflow_mode 3, Track only — no branch created), separate from ENH-056/#199, which only cites this bug as one of two supporting examples for the broader cross-cutting pattern and does not fix or track it directly.
 
 ## Related
 
