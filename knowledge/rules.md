@@ -141,6 +141,10 @@ When a bug or enhancement is discovered mid-session, **first check whether an op
 - **Path F vs Path 1:** Path F = root cause unclear, investigation needed now but not here; Path 1 = clear enough to file, no immediate investigation needed
 - **Same-feature-area check:** before filing under Path 1, search `knowledge/enhancements/` for an existing open ENH on the same subsystem/feature — append there instead of creating a new number.
   - **Why:** the chat-extraction reliability saga spawned 6 separate ENH numbers (038/043/044/045/046/047) for one feature area (`kmg-extract-chat`) because each new bug got its own number on discovery instead of being checked against already-open work — user flagged this as unacceptable and the 6 were consolidated into one umbrella ENH-038 (2026-07-09).
+- **Path 1's own lightweight-vs-full split (ADR-068):** Path 1 itself has two weights, not one:
+  - **Lightweight** (hand-written file under `knowledge/enhancements/ENH-NNN/` or `knowledge/issues/issue-NNN/`, no branch, no GitHub issue) when **all** hold: no code change is planned as a near-term direct result; no one outside the current session needs visibility into it right now; the write-up is small enough for a paragraph or two.
+  - **Full** (`/kmgraph:kmg-start-issue-tracking`: branch + GitHub issue + `solution-approach.md` + gates) when **any** hold: code is going to change as a direct result; it needs external discoverability (a GitHub issue); it's large enough that a lightweight write-up would sprawl across multiple files anyway.
+  - **Why:** formalizes the de facto pattern already used inconsistently across issue-30, ENH-053/054/055, and issue-33 (each captured lightweight with a stated no-branch-overhead rationale, but never against a documented rule) — see `ADR-068` (`knowledge/decisions/ADR-068-lightweight-vs-full-workflow-rule-and-piloted-command-completion-check.md`).
 - **Source:** [[ADR-013-mid-execution-discovery-protocol]] (user-level `~/.kmgraph/decisions/`)
 
 ### Plan File Sync

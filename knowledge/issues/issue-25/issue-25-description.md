@@ -1,7 +1,7 @@
 ---
 id: issue-25
 type: Hardening
-status: deferred
+status: resolved
 github-issue: "#189"
 branch: none
 created: 2026-07-18
@@ -31,7 +31,7 @@ Discovered live, in-session, on 2026-07-18. While filing what became ENH-051 (KG
 
 ## Related
 
-- **Resolved by [ADR-068](../../decisions/ADR-068-lightweight-vs-full-workflow-rule-and-piloted-command-completion-check.md) (2026-08-01, status: Proposed)** — Half A of that ADR is this issue's rule: lightweight path vs. full `kmg-start-issue-tracking` workflow, formalizing the de facto pattern already used by issue-30/ENH-053/054/055/issue-33. Not yet implemented — ADR is Proposed, no plan written yet.
+- **Resolved by [ADR-068](../../decisions/ADR-068-lightweight-vs-full-workflow-rule-and-piloted-command-completion-check.md) (2026-08-01)** — Half A of that ADR is this issue's rule: lightweight path vs. full `kmg-start-issue-tracking` workflow, formalizing the de facto pattern already used by issue-30/ENH-053/054/055/issue-33. **Implemented:** `knowledge/rules.md` § Bug / Enhancement Triage (Path 1's lightweight-vs-full split bullet).
 - Loosely adjacent to ADR-058 ("naming-scope-upfront-check-for-new-commands-skills-docstrings") — same family of problem (undocumented scope boundaries between project mechanisms), different specific gap.
 - [ENH-051](../../enhancements/ENH-051/ENH-051-specification.md) — the enhancement being filed when this was found.
 - [issue-26](../issue-26/issue-26-description.md) — filed in the same session, same underlying "process/reference gap not caught until hit live" theme.
