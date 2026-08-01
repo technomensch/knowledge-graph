@@ -12,6 +12,8 @@ related_adrs: ["ADR-043", "ADR-050", "ADR-068"]
 
 **Retyped `Enhancement` → `Hardening` (2026-08-01):** this work hardens existing documented behavior that isn't being enforced; it doesn't add new capability. Stays the umbrella tracking artifact (GitHub #199 preserved) — the actual mechanism design now lives in [ADR-068](../../decisions/ADR-068-lightweight-vs-full-workflow-rule-and-piloted-command-completion-check.md), which also resolves issue-25 (a blocking dependency for this enhancement's AC-3/AC-4) and pilots a fix for issue-33 (instance #3 below).
 
+**Pilot implemented (2026-08-01):** ADR-068's Half B shipped — `scripts/handoff-file-tracing-gate.sh`, a hard-stop `Stop` hook checking `commands/kmg-handoff.md`'s embedded manifest against the session's `Read` history. First ENH-056 instance closed. Instances #1 (`kmg-handoff` never invoking `kmg-session-summary`), #2, and #4 (`kmg-meta-issue` attempt logging) remain open, per ADR-068's explicit Non-Goal against generalizing this pilot into a framework.
+
 # ENH-056: Commands/Workflows Documented as Multi-Step Processes Are Inconsistently Executed in Full
 
 **Local ID:** ENH-056 | **GitHub Issue:** [#199](https://github.com/technomensch/knowledge-graph/issues/199)

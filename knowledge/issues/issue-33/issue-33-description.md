@@ -59,4 +59,4 @@ Captured live, lightweight, local-only — matching the precedent set for issue-
 
 **This issue's second gap (buried recommendation not promoted to the checklist) remains unresolved** — ADR-068 explicitly defers it as judgment-shaped, out of scope for the pilot. Still open, tracked here.
 
-Not yet implemented — ADR is Proposed, no implementation plan written yet.
+**First gap resolved (2026-08-01)** via `knowledge/plans/v0.7.0-c3-adr-068-pilot.md` — `commands/kmg-handoff.md` now embeds a file manifest in generated `START-HERE.md`, and `scripts/handoff-file-tracing-gate.sh` hard-stops a session at `Stop` time if any manifest file wasn't opened. `status` stays `deferred` pending the second gap, since this issue isn't fully closed.

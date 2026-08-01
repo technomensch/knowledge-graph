@@ -1,7 +1,7 @@
 ---
 title: "ADR-068: Lightweight-vs-Full Workflow Rule, and a Piloted Command-Completion Check for Handoff/Recall File Tracing"
 number: 068
-status: Proposed
+status: Accepted
 date: 2026-08-01
 author: technomensch
 email: mkitact@gmail.com
@@ -10,7 +10,7 @@ git:
   commit: null
   pr: null
   issue: null
-implements: null
+implements: knowledge/plans/v0.7.0-c3-adr-068-pilot.md
 related:
   adrs: []
   lessons: []
@@ -27,8 +27,8 @@ category: architecture
 # ADR-068: Lightweight-vs-Full Workflow Rule, and a Piloted Command-Completion Check for Handoff/Recall File Tracing
 
 **Date:** 2026-08-01
-**Status:** Proposed
-**Implements:** none yet — this ADR authorizes the decision; a separate implementation plan (`v0.7.0-c?-...`) will enumerate the diffs.
+**Status:** Accepted
+**Implements:** `knowledge/plans/v0.7.0-c3-adr-068-pilot.md` (both halves implemented 2026-08-01, commits `85c29a15`, `9d90f25b`, `08b828c2`, `4753ea0c`)
 
 ---
 
@@ -175,4 +175,4 @@ This formalizes the de facto pattern already in informal use across issue-30, EN
 
 **Decision Made:** 2026-08-01
 **Last Updated:** 2026-08-01
-**Status:** Proposed
+**Status:** Accepted
