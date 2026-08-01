@@ -1,7 +1,7 @@
 ---
 id: issue-34
 type: Bug
-status: deferred
+status: fixed
 github-issue: null
 branch: none
 created: 2026-07-30
@@ -50,3 +50,19 @@ Plan: `v0.7.0-c2-issue-34-35-patch` — locked in 2026-08-01. Folded together wi
 Plan sequences issue-35's fix first (Phases 1-3: patch, test-fixture migration, verify, commit), then issue-34's addition (Phases 4-6: patch `issues`/`enhancements` into both arrays against the post-issue-35 file state, verify via live search repro re-running this issue's own `"dead weight in both lists"` query, commit). Both commits push together at the end.
 
 Status unchanged (`deferred` → will move to in-progress once Phase 1 execution starts).
+
+## Resolution (2026-08-01)
+
+Fixed by commit `50d839f8` ("fix(mcp-server): add issues/enhancements to FTS5 index and search fallback dirs") on branch `v0.7.0`.
+
+**What changed:**
+- Added `"issues"` and `"enhancements"` to `contentDirs` in `mcp-server/src/tools/fts5.ts` (the array `rebuildIndex()` uses to build its indexed file list).
+- Added `"issues"` and `"enhancements"` to the fallback `searchDirs` in `mcp-server/src/tools/search.ts` (the non-FTS5 search path).
+- Added fixture test coverage for both directories in `mcp-server/tests/fts5.test.ts` and `mcp-server/tests/search.test.ts`.
+
+**Verification done:**
+- Full `mcp-server` test suite green (151/151 tests) locally.
+- Live repro against the locally-rebuilt `mcp-server` code (bypassing the deployed MCP plugin, run directly against this repo's `knowledge/` dir) confirmed this issue's own repro query now returns hits from `knowledge/issues/issue-34/issue-34-description.md` and `knowledge/issues/issue-35/issue-35-description.md`, where before it returned 0.
+
+**Caveat:** Not yet pushed to origin and not yet tested/reviewed by the user beyond automated unit tests and the agent's own local repro.
+

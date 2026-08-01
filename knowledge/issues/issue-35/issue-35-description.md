@@ -1,7 +1,7 @@
 ---
 id: issue-35
 type: Bug
-status: deferred
+status: fixed
 github-issue: null
 branch: none
 created: 2026-07-30
@@ -57,3 +57,19 @@ Plan: `v0.7.0-c2-issue-34-35-patch` — locked in 2026-08-01, reviewed by Opus b
 4. Confirmed accurate: file paths, `contentDirs` at `fts5.ts:293`, fallback `searchDirs` at `search.ts:86`, no `issues`/`enhancements` scope leakage into issue-34's territory, and no third occurrence of the dead literal in either array (other `"knowledge"` hits in `cli.ts`/`config.ts`/`upgrade.ts` are unrelated repo-root-scoped code). `upgrade.ts:65`/`:253` already fixed the same root cause once before — cited as commit-body precedent.
 
 Status unchanged (`deferred` → will move to in-progress once Phase 1 execution starts).
+
+## Resolution
+
+**Fixed by commit `d3db547e`** — "fix(mcp-server): remove dead knowledge path literal from FTS5/search dir lists" — on branch `v0.7.0`.
+
+**What changed:**
+
+- Removed the dead `"knowledge"` entry from `contentDirs` in `mcp-server/src/tools/fts5.ts` and from the fallback `searchDirs` in `mcp-server/src/tools/search.ts`, resolving the `knowledge/knowledge` dead-path issue described above.
+- Per the Opus pre-lock BLOCKER finding, migrated the ~13 existing fixture writes in `mcp-server/tests/fts5.test.ts` and `mcp-server/tests/search.test.ts` off the dead `"knowledge"` fixture directory onto `"lessons-learned"`, so those tests keep exercising real, indexed content instead of silently indexing zero files.
+- Added two new absence-guard tests (one in each test file) that assert `"knowledge"` no longer appears in either `contentDirs` or `searchDirs`.
+
+**Precedent:** `mcp-server/src/tools/upgrade.ts:65` and `:253` already carried comments confirming this same root-cause class (stale pre-migration path literal) was fixed there previously — cited in the commit body as precedent. See also `knowledge/issues/issue-31/` for the first documented instance of this stale-path-literal pattern, which this issue was itself a recurrence of.
+
+**Verification done:** Full `mcp-server` test suite green — 151/151 tests passing, including the two new absence-guard tests. FTS5 rebuild `indexed`/`skipped` counts were compared before and after the fix and are unchanged from the pre-fix baseline, confirming the dead `"knowledge"` path always contributed 0 indexed files and its removal caused no real-content regression.
+
+**Not yet pushed to origin and not yet tested/reviewed by the user beyond automated unit tests.**
