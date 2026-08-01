@@ -172,7 +172,7 @@ else
 fi
 
 # Test 9: Template content matches source file
-SOURCE_CONTENT=$(cat "$REPO_ROOT/core/templates/lessons-learned/lesson-template.md" 2>/dev/null)
+SOURCE_CONTENT=$(cat "$REPO_ROOT/core/default-templates/lessons-learned/lesson-template.md" 2>/dev/null || true)
 RESULT=$(mcp_read_resource "kg://templates/lesson")
 # Use a distinctive line from the template body (not "---" which macOS grep misparses as flags)
 SOURCE_BODY=$(echo "$SOURCE_CONTENT" | grep -m1 "YAML\|title:\|lesson\|Lesson" | head -1)
