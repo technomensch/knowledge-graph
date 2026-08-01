@@ -247,10 +247,12 @@ A potential prompt/instruction set for the recurring "next attempt in a meta-iss
 
 ## Related
 
-- [ENH-058](../ENH-058/ENH-058-specification.md) — companion enhancement: a
-  diminishing-returns explanation for the attempt loop, surfacing plain-English
-  reasoning + a continue-or-accept recommendation on a repeatedly-failing test,
-  rather than another silent patch round.
+- [ENH-058](../ENH-058/ENH-058-specification.md) — companion enhancement, design
+  resolved 2026-08-01: at the 2nd consecutive failure of the same test, surfaces
+  a plain-English side-by-side of the current and prior finding, tagged "not
+  actually fixed" / "same issue, new instance" / "different sub-issue, same
+  test" — a comparison for the person to judge, not a system-rendered
+  recommendation, rather than another silent patch round.
 - [issue-25](../../issues/issue-25/issue-25-description.md) — the undocumented
   lightweight-vs-full-workflow authority gap; a direct contributing cause of
   instance #2 above.
