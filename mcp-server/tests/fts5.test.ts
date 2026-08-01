@@ -185,6 +185,23 @@ describe("rebuildIndex", () => {
     expect(result.skipped).toBe(0);
   });
 
+  test("indexes files under 'issues' and 'enhancements' (issue-34)", () => {
+    const kgRoot = makeTempDir("rebuild-issues-enhancements");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    fs.mkdirSync(path.join(kgRoot, "issues"), { recursive: true });
+    fs.mkdirSync(path.join(kgRoot, "enhancements"), { recursive: true });
+    writeMd(path.join(kgRoot, "issues"), "issue-1.md", "# Issue 1\nSomething broke");
+    writeMd(path.join(kgRoot, "enhancements"), "enh-1.md", "# Enhancement 1\nSomething to add");
+
+    const result = rebuildIndex(kgRoot, "rebuild-issues-enhancements");
+    expect(result.indexed).toBe(2);
+
+    const dbPath = getProjectDbPath("rebuild-issues-enhancements");
+    expect(searchFts5(dbPath, "broke", kgRoot).length).toBeGreaterThan(0);
+    expect(searchFts5(dbPath, "Enhancement", kgRoot).length).toBeGreaterThan(0);
+  });
+
   test("re-indexes modified files", () => {
     const kgRoot = makeTempDir("rebuild-mod");
     tempDirs.push(kgRoot);

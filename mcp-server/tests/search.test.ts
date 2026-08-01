@@ -78,6 +78,14 @@ describe("search.ts searchDirs fallback", () => {
     expect(match).not.toBeNull();
     expect(match![1]).not.toMatch(/"knowledge"/);
   });
+
+  it("lists 'issues' and 'enhancements' (issue-34)", () => {
+    const source = fs.readFileSync(path.join(__dirname, "../src/tools/search.ts"), "utf-8");
+    const match = source.match(/const searchDirs = \[([^\]]*)\]/);
+    expect(match).not.toBeNull();
+    expect(match![1]).toMatch(/"issues"/);
+    expect(match![1]).toMatch(/"enhancements"/);
+  });
 });
 
 // ---------------------------------------------------------------------------

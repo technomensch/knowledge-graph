@@ -30874,7 +30874,7 @@ function rebuildIndex(kgPath, kgName, kgType = "project-local") {
   const db = new Database(dbPath);
   try {
     initDb(db);
-    const contentDirs = ["knowledge", "lessons-learned", "decisions", "sessions", "chat-history"];
+    const contentDirs = ["lessons-learned", "decisions", "sessions", "chat-history", "issues", "enhancements"];
     const allFiles = [];
     for (const dir of contentDirs) {
       const dirPath = path3.join(kgPath, dir);
@@ -31125,7 +31125,7 @@ function searchKg(kgPath, kgName, kgType, query) {
   }
   if (!usingFts5) {
     results = [];
-    const searchDirs = ["knowledge", "concepts", "lessons-learned", "decisions", "sessions", "chat-history"];
+    const searchDirs = ["concepts", "lessons-learned", "decisions", "sessions", "chat-history", "issues", "enhancements"];
     for (const dir of searchDirs) {
       const dirPath = path4.join(kgPath, dir);
       const files = walkDir(dirPath, ".md");
