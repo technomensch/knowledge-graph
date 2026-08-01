@@ -193,3 +193,19 @@ it was built and later something changed the invocation path without updating ca
 whether the intended fix is relocating/duplicating the file into this repo's
 `skills/gov-capture-routing/SKILL.md` or changing invocation language in the 8 referencing
 files. See "Decision Fork" above for the two candidate paths, not yet chosen between.
+
+## Prior Art / Recall Findings (2026-08-01)
+
+Recall run across ADRs, issues, enhancements, chat-history, and session summaries (issues/enhancements searched via direct grep, not `kg_search` — FTS5 doesn't cover those dirs yet, see issue-34). No prior decision or explicit user lean toward fix-vs-retire exists anywhere in the KG.
+
+- `ADR-034` itself anticipated this fragility (Consequences section flags sync-drift risk from the skill living outside the repo) but never chose "migrate into repo" at design time.
+- `ADR-048` confirmed unrelated (per this issue's own "What the two related ADRs actually say" section above).
+- `issue-19` and session summary `knowledge/sessions/2026-07/2026-07-18-2026-07-17-main.md` both explicitly log the fork as "deliberately left open — low priority, no forcing function yet." No lean recorded.
+- **New since this issue was filed:** `issue-36` (filed same session as issue-34/35) is a second, independent instance of the same failure class — `kmgraph:recall` skill also unresolvable — and explicitly cross-references this issue's Decision Fork as applying there too. `knowledge/sessions/2026-07-31-main.md:26-27` (most recent) logged a third instance of the same phantom-skill-reference pattern.
+- `issue-17` confirmed same broad class ("documented automatic behavior that doesn't fire") but carries no fix-vs-retire framing of its own — a different concrete instance, not decision guidance.
+
+**Net effect on the "zero demand signal, low/medium priority" framing above:** softening. The gap has now recurred twice more (issue-36, and the 2026-07-31 session finding) since this issue's original "3+ months, no prior bug report" framing was written. Worth weighing when the fork is finally decided — deferring again means a third caller inherits the same unresolved question issue-36 already inherited once.
+
+**ADR-067 overlap found — handed off, not decided here:** ADR-067 (in-progress on this branch, owned by a separate concurrent session) designs a `[personal]`/`[project]` marker mechanism that overlaps functionally with what `gov-capture-routing` was built to do, and its stated retirement of `kmg-switch` would break `kmg-sync-all.md`'s restore step if `gov-capture-routing` is ever fixed rather than retired. Full findings and recommendation: `knowledge/handoffs/2026-08-01-issue-18-adr-067-overlap-findings.md`. This issue's Decision Fork should be resolved in light of that handoff, not independently — leans toward "retire," pending the ADR-067 owner's read.
+
+**`gov-` prefix provenance (confirmed, does not bear on the fork):** `/Users/mkaplan/GitHub/optimize-my-resume/chat-history/2026-02/2026-02-11-claude.md` (lines ~4837-6890) is where the flat `.agent/workflows/` prefix naming convention was designed — `gov-` for governance/enforcement/git-ops, `know-` for knowledge/recall, `plan-`/`proj-`/`doc-` for the rest — chosen over nested `SKILL.md` directories at the time. This confirms *why* the naming pattern exists, not why `gov-capture-routing` specifically lives outside the repo: per this issue's own Provenance section, `gov-capture-routing.md` was created later (April 15, 2026, same day as ADR-034) with no counterpart in the Feb 11 batch. Checked (also grepped, no hits): personal graph config has no separate `personal` KG registered; `Resume_Analyzer_Optimizer` repo has no matching content.

@@ -31,7 +31,8 @@ Discovered live, in-session, on 2026-07-18. While filing what became ENH-051 (KG
 
 ## Related
 
-- No governing ADR currently exists for this split. A new ADR may be the right resolution vehicle (decision has real trade-offs: process weight vs. discoverability/enforcement), rather than a quick rules.md patch.
+- **Resolved by [ADR-068](../../decisions/ADR-068-lightweight-vs-full-workflow-rule-and-piloted-command-completion-check.md) (2026-08-01, status: Proposed)** — Half A of that ADR is this issue's rule: lightweight path vs. full `kmg-start-issue-tracking` workflow, formalizing the de facto pattern already used by issue-30/ENH-053/054/055/issue-33. Not yet implemented — ADR is Proposed, no plan written yet.
 - Loosely adjacent to ADR-058 ("naming-scope-upfront-check-for-new-commands-skills-docstrings") — same family of problem (undocumented scope boundaries between project mechanisms), different specific gap.
 - [ENH-051](../../enhancements/ENH-051/ENH-051-specification.md) — the enhancement being filed when this was found.
 - [issue-26](../issue-26/issue-26-description.md) — filed in the same session, same underlying "process/reference gap not caught until hit live" theme.
+- [ENH-056](../../enhancements/ENH-056/ENH-056-specification.md) — this issue's rule is a blocking dependency for ENH-056's AC-3/AC-4 (distinguishing legitimate lightweight paths from silently-skipped steps)
