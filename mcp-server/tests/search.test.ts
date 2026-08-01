@@ -13,7 +13,7 @@ function makeTempDir(prefix: string): string {
 }
 
 function scaffoldKg(root: string): void {
-  for (const dir of ["knowledge", "lessons-learned", "decisions", "sessions"]) {
+  for (const dir of ["lessons-learned", "decisions", "sessions"]) {
     fs.mkdirSync(path.join(root, dir), { recursive: true });
   }
 }
@@ -62,6 +62,22 @@ afterEach(() => {
     }
   }
   tempDirs.length = 0;
+});
+
+// ---------------------------------------------------------------------------
+// issue-35: dead "knowledge" dir literal must not reappear in the fallback
+// searchDirs array (search.ts's linear-scan path isn't exported/unit-testable
+// in isolation — it lives inside registerSearchTool's closure — so this is a
+// static source guard rather than a behavioral test).
+// ---------------------------------------------------------------------------
+
+describe("search.ts searchDirs fallback", () => {
+  it("does not list the dead 'knowledge' directory", () => {
+    const source = fs.readFileSync(path.join(__dirname, "../src/tools/search.ts"), "utf-8");
+    const match = source.match(/const searchDirs = \[([^\]]*)\]/);
+    expect(match).not.toBeNull();
+    expect(match![1]).not.toMatch(/"knowledge"/);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -166,12 +182,12 @@ describe("multi-KG search via FTS5", () => {
     scaffoldKg(globalRoot);
 
     writeMd(
-      path.join(projRoot, "knowledge"),
+      path.join(projRoot, "lessons-learned"),
       "proj-only.md",
       "---\ntitle: Project Knowledge\n---\n\nThis belongs to the project KG only."
     );
     writeMd(
-      path.join(globalRoot, "knowledge"),
+      path.join(globalRoot, "lessons-learned"),
       "global-only.md",
       "---\ntitle: Global Knowledge\n---\n\nThis belongs to the global KG only."
     );
@@ -208,7 +224,7 @@ describe("SearchResult sourceKg field", () => {
     scaffoldKg(root);
 
     writeMd(
-      path.join(root, "knowledge"),
+      path.join(root, "lessons-learned"),
       "test.md",
       "---\ntitle: Test Entry\n---\n\nSome content here."
     );
@@ -240,7 +256,7 @@ describe("searchFts5 uses user-level storage (via getProjectDbPath)", () => {
     scaffoldKg(kgRoot);
 
     writeMd(
-      path.join(kgRoot, "knowledge"),
+      path.join(kgRoot, "lessons-learned"),
       "research.md",
       "---\ntitle: Research Results\n---\n# Research Results\n\nKey findings on authentication patterns."
     );
@@ -278,12 +294,12 @@ describe("searchFts5 uses user-level storage (via getProjectDbPath)", () => {
     scaffoldKg(kg2Root);
 
     writeMd(
-      path.join(kg1Root, "knowledge"),
+      path.join(kg1Root, "lessons-learned"),
       "doc1.md",
       "---\ntitle: Project Doc\n---\n\nProject-specific content."
     );
     writeMd(
-      path.join(kg2Root, "knowledge"),
+      path.join(kg2Root, "lessons-learned"),
       "doc2.md",
       "---\ntitle: Personal Doc\n---\n\nPersonal-specific content."
     );

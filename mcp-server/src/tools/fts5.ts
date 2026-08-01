@@ -290,7 +290,7 @@ export function rebuildIndex(kgPath: string, kgName: string, kgType = "project-l
     initDb(db);
 
     // Collect all .md files from target subdirectories
-    const contentDirs = ["knowledge", "lessons-learned", "decisions", "sessions", "chat-history"];
+    const contentDirs = ["lessons-learned", "decisions", "sessions", "chat-history"];
     const allFiles: string[] = [];
 
     for (const dir of contentDirs) {

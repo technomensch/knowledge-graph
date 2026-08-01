@@ -83,7 +83,7 @@ function searchKg(
 
   if (!usingFts5) {
     results = [];
-    const searchDirs = ["knowledge", "concepts", "lessons-learned", "decisions", "sessions", "chat-history"];
+    const searchDirs = ["concepts", "lessons-learned", "decisions", "sessions", "chat-history"];
 
     for (const dir of searchDirs) {
       const dirPath = path.join(kgPath, dir);
