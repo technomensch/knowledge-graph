@@ -159,6 +159,8 @@ This formalizes the de facto pattern already in informal use across issue-30, EN
 
 **Review Date:** Re-assess once the pilot has run against a handful of real handoff/recall sessions, to decide whether generalizing to other ENH-056 instances is warranted.
 
+**Full-suite test run findings (2026-08-01):** `tests/run-all-tests.sh` showed 12/18 suites failing at implementation time. This ADR's own new suite (`test-handoff-file-tracing-gate.sh`) passed 4/4 clean. Of the other 12: 2 (`test-stop-hook.sh`, `test-hooks.sh`) confirmed unrelated — pre-existing output-format assertions against scripts this ADR doesn't touch. 9 (`test-commands.sh`, `test-skills-agents.sh`, `test-tier-resolver-smoke.sh`, `test-tier-resolver-edge.sh`, `test-create-adr-implements.sh`, `test-dispatcher-tier-refactor.sh`, `test-decision-governance.sh`, plus 2 more) trace to pre-existing test-suite staleness against a pre-`kmg-`-prefix naming convention, unrelated to this ADR. 1 (`test-mcp-edge-cases.sh`, a KG-path search error-handling case) is plausibly related to the concurrent ADR-067 session's in-progress `search.ts` rewiring, not this ADR's scope. Full detail and triage appended to `ADR-067`'s "Known Gap — Full Test Suite Findings" section per the concurrent-session boundary (findings only, no edits to ADR-067's design).
+
 ---
 
 ## Related
