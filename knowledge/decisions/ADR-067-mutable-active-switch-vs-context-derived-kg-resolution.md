@@ -503,6 +503,10 @@ Surfaced while a different plan (`v0.7.0-c3-adr-068-pilot.md`, ADR-068) ran `tes
 
 **Recommendation, not a decision:** group 2 (stale `kmg-`-prefix test paths) looks like its own standalone bug, same general shape as issue-31/issue-35's stale-pre-migration-path pattern but in the test suite rather than command/tool source — worth its own issue if confirmed, separately from both ADR-067 and ADR-068. Not filed here per the "documentation only, append don't branch" instruction this addendum follows.
 
+**Update (2026-08-01):** Now tracked as issue-38 (GitHub #201).
+
+**Correction + Group 4 (2026-08-01):** the original triage above was incomplete — it accounted for 10 of the 12 failing suites (7 in group 2, 2 in group 3, 1 in group 1) but never identified the remaining 2 (`test-mcp-resources.sh`, `test-v050-misc.sh`), which issue-38's filing correctly excluded rather than guessing at. Investigated directly: both pass every individual assertion (8/8 and 4/4) when run standalone, but die silently under `set -e`+`pipefail` when the full suite triggers a code path referencing a hardcoded `core/templates/` directory that no longer exists — renamed to `core/default-templates/` at some prior, uncaptured point. Same failure class as issue-31/issue-35/issue-38 (stale pre-migration path, migration verification never extended to `tests/`), but a distinct migration instance (directory rename, not command/skill rename). Fixed directly (small, mechanical) rather than filed as a fifth stale-path issue — see the corresponding commit on `v0.7.0`.
+
 ## Related
 
 - ADR-001 (centralized multi-KG configuration — the `.active`/switch model this would revisit)

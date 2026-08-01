@@ -159,7 +159,14 @@ This formalizes the de facto pattern already in informal use across issue-30, EN
 
 **Review Date:** Re-assess once the pilot has run against a handful of real handoff/recall sessions, to decide whether generalizing to other ENH-056 instances is warranted.
 
-**Full-suite test run findings (2026-08-01):** `tests/run-all-tests.sh` showed 12/18 suites failing at implementation time. This ADR's own new suite (`test-handoff-file-tracing-gate.sh`) passed 4/4 clean. Of the other 12: 2 (`test-stop-hook.sh`, `test-hooks.sh`) confirmed unrelated — pre-existing output-format assertions against scripts this ADR doesn't touch. 9 (`test-commands.sh`, `test-skills-agents.sh`, `test-tier-resolver-smoke.sh`, `test-tier-resolver-edge.sh`, `test-create-adr-implements.sh`, `test-dispatcher-tier-refactor.sh`, `test-decision-governance.sh`, plus 2 more) trace to pre-existing test-suite staleness against a pre-`kmg-`-prefix naming convention, unrelated to this ADR. 1 (`test-mcp-edge-cases.sh`, a KG-path search error-handling case) is plausibly related to the concurrent ADR-067 session's in-progress `search.ts` rewiring, not this ADR's scope. Full detail and triage appended to `ADR-067`'s "Known Gap — Full Test Suite Findings" section per the concurrent-session boundary (findings only, no edits to ADR-067's design).
+**Full-suite test run findings (2026-08-01):** `tests/run-all-tests.sh` showed 12/18 suites failing at implementation time. This ADR's own new suite (`test-handoff-file-tracing-gate.sh`) passed 4/4 clean. Of the other 12, triaged into four groups (corrected 2026-08-01 — an earlier pass of this note vaguely said "9... plus 2 more" without identifying the 2; both are now identified, see group 4):
+
+1. **7 suites** (`test-commands.sh`, `test-skills-agents.sh`, `test-tier-resolver-smoke.sh`, `test-tier-resolver-edge.sh`, `test-create-adr-implements.sh`, `test-dispatcher-tier-refactor.sh`, `test-decision-governance.sh`) — pre-existing staleness against a pre-`kmg-`-prefix naming convention, unrelated to this ADR. Filed as [issue-38](../issues/issue-38/issue-38-description.md) / GitHub #201.
+2. **2 suites** (`test-stop-hook.sh`, `test-hooks.sh`) — confirmed unrelated, pre-existing output-format assertions against scripts this ADR doesn't touch.
+3. **1 suite** (`test-mcp-edge-cases.sh`, a KG-path search error-handling case) — plausibly related to the concurrent ADR-067 session's in-progress `search.ts` rewiring, not this ADR's scope.
+4. **2 suites** (`test-mcp-resources.sh`, `test-v050-misc.sh`) — a *second, distinct* stale-path bug, found and fixed the same session: both die under `set -e`+`pipefail` against a hardcoded `core/templates/` path that no longer exists (renamed to `core/default-templates/` at some point, never caught). Same failure class as issue-31/35/38 but a different migration instance. Fixed directly in this session rather than filed, since it was small and mechanical — see the corresponding commit on `v0.7.0`.
+
+Full detail and triage appended to `ADR-067`'s "Known Gap — Full Test Suite Findings" section per the concurrent-session boundary (findings only, no edits to ADR-067's design).
 
 ---
 
