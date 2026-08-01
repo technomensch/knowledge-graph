@@ -125,6 +125,8 @@ fi
 
 **Create START-HERE.md:**
 
+The manifest block below (ADR-068 pilot, issue-33) lists the same files this document's prose already names — `$summary_file` (empty/omitted if none was found) plus the two sibling package files always generated in the same run. No new file-discovery logic, just restating what Step 2/3/4 already produce, machine-readably, so `scripts/handoff-file-tracing-gate.sh` can confirm the consuming session actually opened them. Wrapped in an HTML comment so it renders invisibly in normal markdown viewing.
+
 ```markdown
 # Start Here — Project Handoff
 
@@ -137,6 +139,12 @@ fi
 
 For current state, open issues, and in-progress work: read the session summary linked above.
 For project structure and architecture: see DOCUMENTATION-MAP.md and ARCHITECTURE-SNAPSHOT.md in this package.
+
+<!-- kmgraph-handoff-manifest
+```json
+["$summary_file", "$output_dir/DOCUMENTATION-MAP.md", "$output_dir/ARCHITECTURE-SNAPSHOT.md"]
+```
+-->
 ```
 
 ---
