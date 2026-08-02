@@ -99,6 +99,16 @@ function archivedOrMerged(name: string, graph: GraphConfig): ResolutionResult {
   return { kind: "archived", name, graph };
 }
 
+export class ResolutionSession {
+  private lastResolvedName: string | null = null;
+
+  noteResolution(name: string): { changed: boolean } {
+    const changed = this.lastResolvedName !== null && this.lastResolvedName !== name;
+    this.lastResolvedName = name;
+    return { changed };
+  }
+}
+
 export function findTruePathTies(config: KgConfig, resolvedPath: string): string[] {
   const target = expand(resolvedPath);
   return Object.entries(config.graphs)
