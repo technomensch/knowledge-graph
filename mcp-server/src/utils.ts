@@ -164,6 +164,18 @@ export function findRegistryEntryByGraphId(
   return null;
 }
 
+export type PathHealth = "ok" | "parent-unreachable" | "path-missing" | "content-missing";
+
+export function checkGraphPathHealth(graph: GraphConfig): PathHealth {
+  const expanded = graph.path.replace(/^~/, os.homedir());
+  const parent = path.dirname(expanded);
+  if (!fs.existsSync(parent)) return "parent-unreachable";
+  if (!fs.existsSync(expanded)) return "content-missing";
+  const entries = fs.readdirSync(expanded);
+  if (entries.length === 0) return "content-missing";
+  return "ok";
+}
+
 export function getActiveGraphPath(config: KgConfig): string | null {
   if (!config.active || !config.graphs[config.active]) {
     return null;
