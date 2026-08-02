@@ -7,7 +7,7 @@ export interface FileEntry {
   hash: string;
 }
 
-const SKIP_FILES = new Set([".kmgraph-id"]);
+const SKIP_FILES = new Set([".kmgraph-id", ".git"]); // ".git" covers the worktree/submodule case where it's a pointer file, not a directory
 const SKIP_DIRS = new Set([".git"]); // findings doc #22: never hash git's internal object store
 
 export function hashDirectory(dirPath: string): FileEntry[] {
@@ -20,7 +20,9 @@ export function hashDirectory(dirPath: string): FileEntry[] {
       if (entry.isDirectory()) {
         if (SKIP_DIRS.has(entry.name)) continue; // e.g. `.git/` — thousands of unrelated internal blobs
         walk(full, rel);
-      } else if (!SKIP_FILES.has(entry.name)) {
+      } else if (entry.isFile() && !SKIP_FILES.has(entry.name)) {
+        // entry.isFile() excludes symlinks (isDirectory()===false for a symlink-to-dir would
+        // otherwise fall through here and crash on EISDIR/ENOENT) and other non-regular entries.
         const content = fs.readFileSync(full);
         const hash = crypto.createHash("sha256").update(content).digest("hex");
         results.push({ relPath: rel.split(path.sep).join("/"), hash });

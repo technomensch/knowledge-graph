@@ -223,6 +223,9 @@ export interface HandleConfigInitParams {
   // losing/survivor pair, once the four-answer prompt already picked
   // "reattach". Consumed only inside that specific gate.
   confirmMerge?: boolean;
+  // Real answer to the "broad_ancestor_registration" gate below -- consumed
+  // only when findBroadAncestorWarning fires, same pattern as confirmMerge.
+  confirmBroadRegistration?: "yes" | "no";
 }
 
 export interface HandleConfigInitResult {
@@ -231,7 +234,7 @@ export interface HandleConfigInitResult {
   isError?: true;
 }
 
-export async function handleConfigInit({ name, kgPath, type, categories, interaction, confirmMerge }: HandleConfigInitParams): Promise<HandleConfigInitResult> {
+export async function handleConfigInit({ name, kgPath, type, categories, interaction, confirmMerge, confirmBroadRegistration }: HandleConfigInitParams): Promise<HandleConfigInitResult> {
   const config = readConfig();
 
   // Validate name doesn't exist
@@ -262,18 +265,31 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
 
   const broadWarning = findBroadAncestorWarning(config, expandedPath);
   if (broadWarning) {
-    const mode = resolveInteractionMode({}).mode;
-    const gated = await gate({
-      mode,
-      reason: "broad_ancestor_registration",
-      param: "confirmBroadRegistration",
-      accepts: ["yes", "no"],
-      ask: () => new Promise<never>(() => {}), // no real ask() transport yet, same pattern as every other gate() stub in this plan
-    });
-    if ("error" in gated) {
-      return { content: [{ type: "text" as const, text: JSON.stringify(gated) }], isError: true };
+    let broadAnswer = confirmBroadRegistration;
+    if (!broadAnswer) {
+      const mode = resolveInteractionMode({ explicitParam: interaction }).mode;
+      const gated = await gate({
+        mode,
+        reason: "broad_ancestor_registration",
+        param: "confirmBroadRegistration",
+        accepts: ["yes", "no"],
+        ask: () => new Promise<never>(() => {}), // no real ask() transport yet, same pattern as every other gate() stub in this plan
+      });
+      if ("error" in gated) {
+        return { content: [{ type: "text" as const, text: JSON.stringify(gated) }], isError: true };
+      }
+      if (!("answer" in gated)) {
+        return {
+          content: [{
+            type: "text" as const,
+            text: `Registration cancelled: ${expandedPath} is an ancestor of ${broadWarning.isAncestorOfCount} already-registered graph(s) (${broadWarning.ancestorOfNames.join(", ")}). Confirm explicitly (confirmBroadRegistration: "yes") if this breadth is intentional.`,
+          }],
+          isError: true,
+        };
+      }
+      broadAnswer = gated.answer as "yes" | "no";
     }
-    if (!("answer" in gated) || gated.answer !== "yes") {
+    if (broadAnswer !== "yes") {
       return {
         content: [{
           type: "text" as const,
@@ -296,9 +312,11 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
         // Dominant real-world case: a fresh clone of an already-registered
         // repo with nothing captured in it yet. Silently re-point instead
         // of asking (findings doc #20).
-        if (existingEntry.graph.path !== kgPath) {
-          existingEntry.graph.path = kgPath;
-          writeConfig(config);
+        if (existingContentDir !== expandedPath) {
+          updateConfig((cfg) => {
+            cfg.graphs[existingEntry.name].path = kgPath;
+            return cfg;
+          });
         }
         return {
           content: [{
@@ -359,10 +377,20 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
             status: "pending",
             statusChangedAt: now,
             graphId: preExistingMarkerId,
+            // NOTE (Phase 4 final review finding I-6, not yet fixed): duplicateOf is recorded here but
+            // nothing currently reads it. The plan's Task 4.4 spec says this should suppress future
+            // duplicate-graphId prompts for this exact pair -- that suppression logic doesn't exist yet.
+            // A future task should check for an existing duplicateOf edge between the two entries before
+            // firing the four-answer prompt again.
             duplicateOf: existingEntry.name,
           };
 
-          const { preview, backupPath: previewBackupPath } = performRegistryMerge(config, name, existingEntry.name, {});
+          // Preview-only call -- computes the MergePreview shown to the user via the gate's
+          // `detail` and takes its own backup (M-2: harmless duplicate here, since nothing
+          // changes between this call and the final apply below). Its backupPath is not the
+          // one that matters for recovery, so it's intentionally not carried into the success
+          // message -- only the final apply's backup is.
+          const { preview } = performRegistryMerge(config, name, existingEntry.name, {});
 
           // NOTE (Task 4.5 review finding I-2, not yet fixed): confirmMerge:true currently cannot
           // distinguish a real second-call approval (user already saw the merge_preview gate and
@@ -402,29 +430,59 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
             }
           }
 
-          const applied = performRegistryMerge(config, name, existingEntry.name, { skipReview: true });
-          writeConfig(applied.config);
+          // I-4: goes through updateConfig (Phase 2's fixed-merge-base / bounded-retry
+          // concurrency protection) rather than a raw writeConfig, matching the pattern
+          // handleConfigRemintId already uses. Backup is taken once, before the retryable
+          // mutator, per the same unconditional-backup discipline performRegistryMerge's
+          // skipReview branch itself follows -- the mutation logic below mirrors that
+          // branch's `changeGraphStatus` + `mergedInto` steps directly against the working
+          // copy `updateConfig` hands the mutator (mutated in place, not reassigned), since
+          // that's the object `updateConfig` diffs against disk on each retry attempt.
+          const finalBackupPath = backupConfigFromDisk();
+          updateConfig((cfg) => {
+            cfg.graphs[name] = {
+              name,
+              path: kgPath,
+              type,
+              categories: categories as CategoryConfig[],
+              createdAt: now,
+              status: "pending",
+              statusChangedAt: now,
+              graphId: preExistingMarkerId,
+              duplicateOf: existingEntry.name,
+            };
+            changeGraphStatus(cfg, name, "archived");
+            cfg.graphs[name].mergedInto = existingEntry.name;
+            return cfg;
+          });
           return {
             content: [{
               type: "text" as const,
-              text: `Reattached: '${name}' merged into '${existingEntry.name}' (backup at ${previewBackupPath}; final backup at ${applied.backupPath}).`,
+              text: `Reattached: '${name}' merged into '${existingEntry.name}' (backup at ${finalBackupPath}).`,
             }],
           };
         }
         case "worktree": {
           const now = new Date().toISOString();
-          config.graphs[name] = {
-            name,
-            path: kgPath,
-            type,
-            categories: categories as CategoryConfig[],
-            createdAt: now,
-            status: "pending",
-            statusChangedAt: now,
-            graphId: preExistingMarkerId,
-            duplicateOf: existingEntry.name,
-          };
-          writeConfig(config);
+          updateConfig((cfg) => {
+            cfg.graphs[name] = {
+              name,
+              path: kgPath,
+              type,
+              categories: categories as CategoryConfig[],
+              createdAt: now,
+              status: "pending",
+              statusChangedAt: now,
+              graphId: preExistingMarkerId,
+              // NOTE (Phase 4 final review finding I-6, not yet fixed): duplicateOf is recorded here but
+              // nothing currently reads it. The plan's Task 4.4 spec says this should suppress future
+              // duplicate-graphId prompts for this exact pair -- that suppression logic doesn't exist yet.
+              // A future task should check for an existing duplicateOf edge between the two entries before
+              // firing the four-answer prompt again.
+              duplicateOf: existingEntry.name,
+            };
+            return cfg;
+          });
           return {
             content: [{
               type: "text" as const,
@@ -433,21 +491,26 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
           };
         }
         case "fork": {
+          // Mint + marker write happen once, before updateConfig -- mutator-purity rule
+          // (Task 2.3, findings doc #8): a retry inside updateConfig must never re-run
+          // an identity-minting side effect.
           const forkedId = mintGraphId();
           remintGraphIdMarker(expandedPath, forkedId);
           const forkWarning = markerTrackingWarning(expandedPath);
           const now = new Date().toISOString();
-          config.graphs[name] = {
-            name,
-            path: kgPath,
-            type,
-            categories: categories as CategoryConfig[],
-            createdAt: now,
-            status: "pending",
-            statusChangedAt: now,
-            graphId: forkedId,
-          };
-          writeConfig(config);
+          updateConfig((cfg) => {
+            cfg.graphs[name] = {
+              name,
+              path: kgPath,
+              type,
+              categories: categories as CategoryConfig[],
+              createdAt: now,
+              status: "pending",
+              statusChangedAt: now,
+              graphId: forkedId,
+            };
+            return cfg;
+          });
           return {
             content: [{
               type: "text" as const,
@@ -640,6 +703,10 @@ export function registerConfigTools(server: McpServer): void {
         .boolean()
         .optional()
         .describe("Explicit approval to apply a pending 'reattach' registry merge after reviewing its preview"),
+      confirmBroadRegistration: z
+        .enum(["yes", "no"])
+        .optional()
+        .describe("Explicit confirmation to register a KG that is an ancestor of already-registered graph(s)"),
     },
     async (params) => handleConfigInit(params)
   );
@@ -822,13 +889,32 @@ export async function handleConfigRemintId({ name, confirm }: HandleConfigRemint
   // graph.path already IS the KG's content root (Task 1.2/1.5 contract) — no
   // "knowledge" suffix to append. See findings doc #9 correction below.
   const contentDir = graph.path.replace(/^~/, os.homedir());
-  const newId = mintGraphId(); // minted once, before updateConfig — mutator-purity rule (Task 2.3, findings doc #8)
-  remintGraphIdMarker(contentDir, newId);
 
+  // I-5 path-existence guard: same shape as the guard added to kg_upgrade's
+  // apply-mode path (commit 1c5c154c, finding B-1) — without it, a deleted/
+  // unmounted graph.path would let remintGraphIdMarker's fs.writeFileSync
+  // throw a raw ENOENT out of the tool handler instead of a structured error.
+  if (!fs.existsSync(contentDir)) {
+    return {
+      content: [{ type: "text" as const, text: `Error: KG path not found: ${contentDir}` }],
+      isError: true,
+    };
+  }
+
+  const newId = mintGraphId(); // minted once, before updateConfig — mutator-purity rule (Task 2.3, findings doc #8)
+
+  // I-5 ordering: registry write happens BEFORE the marker write. If
+  // updateConfig throws (it explicitly can, after exhausting merge
+  // retries), the on-disk marker is untouched and still matches the
+  // registry's old graphId -- recoverable. The reverse order (marker first)
+  // would leave an unrecoverable mismatch: the marker holds newId with no
+  // record anywhere of the old id it replaced.
   updateConfig((cfg) => {
     cfg.graphs[name].graphId = newId;
     return cfg;
   });
+
+  remintGraphIdMarker(contentDir, newId);
 
   const tracked = isMarkerTracked(contentDir);
   const warning = tracked === false

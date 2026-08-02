@@ -348,9 +348,11 @@ export function readGraphIdMarker(kgPath: string): string | null {
 }
 
 // Checks whether the graphId marker file would be tracked by git if committed
-// (as opposed to gitignored, which is the normal/expected case for most KG
-// setups per spec §9). Returns null when kgPath isn't inside a git repo at
-// all, since there's nothing to check.
+// (as opposed to gitignored -- spec §9 wants the marker tracked so it
+// travels with clones; gitignored is the problem state that disables
+// duplicate/fork detection, which is what markerTrackingWarning's callers
+// warn about). Returns null when kgPath isn't inside a git repo at all,
+// since there's nothing to check.
 export function isMarkerTracked(kgPath: string): boolean | null {
   try {
     execFileSync("git", ["rev-parse", "--is-inside-work-tree"], { cwd: kgPath, stdio: "pipe" });

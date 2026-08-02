@@ -30,6 +30,27 @@ describe("hashDirectory + compareFileSets", () => {
     expect(entries.map((e) => e.relPath)).toEqual(["patterns.md"]);
   });
 
+  it("hashDirectory skips .git when it is a FILE (worktree/submodule gitdir pointer), not just a directory", () => {
+    fs.writeFileSync(path.join(dirA, "patterns.md"), "hello");
+    fs.writeFileSync(path.join(dirA, ".git"), "gitdir: /path/to/.git/worktrees/some-worktree\n");
+    const entries = hashDirectory(dirA);
+    expect(entries.map((e) => e.relPath)).toEqual(["patterns.md"]);
+  });
+
+  it("hashDirectory skips symlinks (to a directory, and broken) instead of throwing", () => {
+    fs.writeFileSync(path.join(dirA, "patterns.md"), "hello");
+    fs.mkdirSync(path.join(dirA, "real-dir"));
+    fs.writeFileSync(path.join(dirA, "real-dir", "inner.md"), "inner content");
+    fs.symlinkSync(path.join(dirA, "real-dir"), path.join(dirA, "linked-dir"));
+    fs.symlinkSync(path.join(dirA, "does-not-exist"), path.join(dirA, "broken-link"));
+
+    let entries: ReturnType<typeof hashDirectory> = [];
+    expect(() => {
+      entries = hashDirectory(dirA);
+    }).not.toThrow();
+    expect(entries.map((e) => e.relPath).sort()).toEqual(["patterns.md", "real-dir/inner.md"]);
+  });
+
   it("classifies identical, diverged, unique-a, unique-b, and moved correctly", () => {
     fs.writeFileSync(path.join(dirA, "same.md"), "content-x");
     fs.writeFileSync(path.join(dirB, "same.md"), "content-x");

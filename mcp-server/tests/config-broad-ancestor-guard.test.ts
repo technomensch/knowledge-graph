@@ -36,4 +36,18 @@ describe("findBroadAncestorWarning", () => {
     const config: KgConfig = { version: "1.0.0", graphs: { p: g(process.env.HOME + "/kmgraph-personal", "personal") }, sanitization: { enabled: false, patterns: [], action: "warn" } } as any;
     expect(findBroadAncestorWarning(config, process.env.HOME!)).toBeNull(); // would also be hard-blocked separately, but this test isolates the ancestor-scan behavior
   });
+
+  // M-7 (3): the filter excludes only status "deleted" -- pin that "archived"
+  // entries still count toward the broad-ancestor trigger (consistent with
+  // "active"/"pending"), since ADR-063's archive-never-delete means an
+  // archived entry's on-disk content is still there and still worth warning
+  // about.
+  it("includes archived-status entries in the ancestor count (only 'deleted' is excluded)", () => {
+    const archived = { ...g("/home/user/workspace/proj-a/knowledge"), status: "archived" as const };
+    const config: KgConfig = { version: "1.0.0", graphs: { a: archived }, sanitization: { enabled: false, patterns: [], action: "warn" } } as any;
+    const result = findBroadAncestorWarning(config, "/home/user/workspace");
+    expect(result).not.toBeNull();
+    expect(result!.isAncestorOfCount).toBe(1);
+    expect(result!.ancestorOfNames).toEqual(["a"]);
+  });
 });
