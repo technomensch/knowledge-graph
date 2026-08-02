@@ -107,7 +107,6 @@ describe("kg_config_switch with legacy config fallback", () => {
     const cfg = readConfig();
 
     // readConfig() should find and return the legacy config
-    expect(cfg.active).toBe("legacy-kg");
     expect(cfg.graphs["legacy-kg"]).toBeDefined();
     expect(cfg.graphs["legacy-kg"].name).toBe("legacy-kg");
   });
@@ -145,7 +144,6 @@ describe("kg_config_switch with legacy config fallback", () => {
     const cfg = readConfig();
 
     // readConfig() must NOT fall back to legacy config when KG_CONFIG_PATH is set
-    expect(cfg.active).toBeNull();
     expect(cfg.graphs).toEqual({});
   });
 
@@ -191,7 +189,8 @@ describe("kg_config_switch with legacy config fallback", () => {
     const { readConfig, handleConfigSwitch } = loadConfigToolsDefaultPath(home);
 
     const cfgBefore = readConfig();
-    expect(cfgBefore.active).toBe("graph-a");
+    expect(cfgBefore.graphs["graph-a"]).toBeDefined();
+    expect(cfgBefore.graphs["graph-b"]).toBeDefined();
 
     const result = handleConfigSwitch({ name: "graph-b" });
     expect(result.isError).toBeUndefined();
@@ -213,7 +212,6 @@ describe("kg_config_switch with legacy config fallback", () => {
 
     const cfg = readConfig();
     // Should return DEFAULT_CONFIG with empty graphs
-    expect(cfg.active).toBeNull();
     expect(cfg.graphs).toEqual({});
   });
 

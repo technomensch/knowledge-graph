@@ -49,7 +49,6 @@ function makeConfig(projRoot: string, personalRoot?: string): KgConfig {
       type: "project-local",
       categories: [],
       createdAt: now,
-      lastUsed: now,
       status: "active",
       statusChangedAt: now,
       graphId: "proj-id",
@@ -62,13 +61,12 @@ function makeConfig(projRoot: string, personalRoot?: string): KgConfig {
       type: "personal",
       categories: [],
       createdAt: now,
-      lastUsed: now,
       status: "active",
       statusChangedAt: now,
       graphId: "personal-id",
     };
   }
-  return { version: "1.0.0", active: "proj", graphs, sanitization: { enabled: false, patterns: [], action: "warn" } };
+  return { version: "1.0.0", graphs, sanitization: { enabled: false, patterns: [], action: "warn" } };
 }
 
 describe("handleFts5Status", () => {

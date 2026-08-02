@@ -6,14 +6,13 @@ import * as os from "os";
 import { execSync } from "child_process";
 
 function g(overrides: Partial<GraphConfig>): GraphConfig {
-  return { name: "g", path: "/g", type: "project-local", categories: [], createdAt: "x", lastUsed: "x", status: "active", statusChangedAt: "x", graphId: "id", ...overrides };
+  return { name: "g", path: "/g", type: "project-local", categories: [], createdAt: "x", status: "active", statusChangedAt: "x", graphId: "id", ...overrides };
 }
 
 describe("resolveGraph", () => {
   it("resolves by cwd match against a registered project-local path", () => {
     const config: KgConfig = {
       version: "1.0.0",
-      active: null,
       graphs: { myproj: g({ name: "myproj", path: "/home/user/myproj/knowledge" }) },
       sanitization: { enabled: false, patterns: [], action: "warn" },
     };
@@ -23,12 +22,12 @@ describe("resolveGraph", () => {
   });
 
   it("returns no-graph-in-cwd when cwd matches nothing registered and no name given", () => {
-    const config: KgConfig = { version: "1.0.0", active: null, graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } };
+    const config: KgConfig = { version: "1.0.0", graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } };
     expect(resolveGraph(config, "/somewhere/random").kind).toBe("no-graph-in-cwd");
   });
 
   it("exact name match routes directly regardless of cwd", () => {
-    const config: KgConfig = { version: "1.0.0", active: null, graphs: { myproj: g({ name: "myproj", path: "/x" }) }, sanitization: { enabled: false, patterns: [], action: "warn" } };
+    const config: KgConfig = { version: "1.0.0", graphs: { myproj: g({ name: "myproj", path: "/x" }) }, sanitization: { enabled: false, patterns: [], action: "warn" } };
     const result = resolveGraph(config, "/unrelated", "myproj");
     expect(result.kind).toBe("resolved");
   });
@@ -36,7 +35,6 @@ describe("resolveGraph", () => {
   it("fuzzy-matches a partial name and returns candidates, never silently picks one", () => {
     const config: KgConfig = {
       version: "1.0.0",
-      active: null,
       graphs: { "kmgraph-web": g({ name: "kmgraph-web", path: "/a" }), "kmgraph-api": g({ name: "kmgraph-api", path: "/b" }) },
       sanitization: { enabled: false, patterns: [], action: "warn" },
     };
@@ -46,7 +44,7 @@ describe("resolveGraph", () => {
   });
 
   it("returns not-registered for a name with zero matches, never searches the filesystem", () => {
-    const config: KgConfig = { version: "1.0.0", active: null, graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } };
+    const config: KgConfig = { version: "1.0.0", graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } };
     const result = resolveGraph(config, "/unrelated", "totally-unknown");
     expect(result.kind).toBe("not-registered");
   });
@@ -54,7 +52,6 @@ describe("resolveGraph", () => {
   it("returns archived when the cwd-resolved graph is archived, not resolved", () => {
     const config: KgConfig = {
       version: "1.0.0",
-      active: null,
       graphs: { myproj: g({ name: "myproj", path: "/home/user/myproj/knowledge", status: "archived" }) },
       sanitization: { enabled: false, patterns: [], action: "warn" },
     };
@@ -71,7 +68,6 @@ describe("resolveGraph", () => {
 
     const config: KgConfig = {
       version: "1.0.0",
-      active: null,
       graphs: { proj: g({ name: "proj", path: path.join(realProj, "knowledge") }) },
       sanitization: { enabled: false, patterns: [], action: "warn" },
     };
@@ -91,7 +87,6 @@ describe("resolveGraph", () => {
 
     const config: KgConfig = {
       version: "1.0.0",
-      active: null,
       graphs: { main: g({ name: "main", path: path.join(mainRepo, "knowledge") }) },
       sanitization: { enabled: false, patterns: [], action: "warn" },
     };
@@ -104,7 +99,6 @@ describe("resolveGraph", () => {
   it("returns merged (not archived) when an archived entry has mergedInto set (findings doc #19)", () => {
     const config: KgConfig = {
       version: "1.0.0",
-      active: null,
       graphs: {
         losing: g({ name: "losing", path: "/l/knowledge", status: "archived", statusChangedAt: "2026-08-01T00:00:00.000Z", mergedInto: "survivor" }),
         survivor: g({ name: "survivor", path: "/s/knowledge" }),
@@ -124,7 +118,6 @@ describe("resolveGraph", () => {
   it("returns ambiguous-tie when two registry entries resolve to the identical deepest path (findings doc #13)", () => {
     const config: KgConfig = {
       version: "1.0.0",
-      active: null,
       graphs: {
         original: g({ name: "original", path: "/repo/knowledge" }),
         fork: g({ name: "fork", path: "/repo/knowledge" }),
@@ -139,7 +132,7 @@ describe("resolveGraph", () => {
 
 describe("resolvePersonalGraph", () => {
   it("finds the single personal-type entry", () => {
-    const config = { version: "1.0.0", graphs: { p: { name: "p", path: "/p", type: "personal" as const, categories: [], createdAt: "x", lastUsed: "x", status: "active" as const, statusChangedAt: "x", graphId: "id" } }, sanitization: { enabled: false, patterns: [], action: "warn" as const } };
+    const config = { version: "1.0.0", graphs: { p: { name: "p", path: "/p", type: "personal" as const, categories: [], createdAt: "x", status: "active" as const, statusChangedAt: "x", graphId: "id" } }, sanitization: { enabled: false, patterns: [], action: "warn" as const } };
     const result = resolvePersonalGraph(config as any);
     expect("name" in result && result.name).toBe("p");
   });
@@ -150,8 +143,8 @@ describe("resolvePersonalGraph", () => {
   });
   it("errors cleanly when multiple personal graphs are registered (should never happen, but don't silently pick one)", () => {
     const config = { version: "1.0.0", graphs: {
-      p1: { name: "p1", path: "/p1", type: "personal" as const, categories: [], createdAt: "x", lastUsed: "x", status: "active" as const, statusChangedAt: "x", graphId: "id1" },
-      p2: { name: "p2", path: "/p2", type: "personal" as const, categories: [], createdAt: "x", lastUsed: "x", status: "active" as const, statusChangedAt: "x", graphId: "id2" },
+      p1: { name: "p1", path: "/p1", type: "personal" as const, categories: [], createdAt: "x", status: "active" as const, statusChangedAt: "x", graphId: "id1" },
+      p2: { name: "p2", path: "/p2", type: "personal" as const, categories: [], createdAt: "x", status: "active" as const, statusChangedAt: "x", graphId: "id2" },
     }, sanitization: { enabled: false, patterns: [], action: "warn" as const } };
     const result = resolvePersonalGraph(config as any);
     expect("error" in result).toBe(true);

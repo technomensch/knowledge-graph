@@ -84,7 +84,6 @@ afterEach(() => {
 function mockActiveKg(kgRoot: string): void {
   (readConfig as jest.Mock).mockReturnValue({
     version: "1.0.0",
-    active: "test-kg",
     graphs: {
       "test-kg": {
         name: "test-kg",
@@ -92,7 +91,6 @@ function mockActiveKg(kgRoot: string): void {
         type: "project-local",
         categories: [],
         createdAt: new Date().toISOString(),
-        lastUsed: new Date().toISOString(),
         status: "active",
         statusChangedAt: new Date().toISOString(),
         graphId: "test-graph-id",
@@ -564,7 +562,6 @@ describe("kg_capture — targetKg (multi-KG)", () => {
   function mockMultiKgConfig(projRoot: string, globalRoot: string): void {
     (readConfig as jest.Mock).mockReturnValue({
       version: "1.0.0",
-      active: "my-project",
       graphs: {
         "my-project": {
           name: "my-project",
@@ -572,7 +569,6 @@ describe("kg_capture — targetKg (multi-KG)", () => {
           type: "project-local",
           categories: [],
           createdAt: new Date().toISOString(),
-          lastUsed: new Date().toISOString(),
           status: "active",
           statusChangedAt: new Date().toISOString(),
           graphId: "test-graph-id-my-project",
@@ -583,7 +579,6 @@ describe("kg_capture — targetKg (multi-KG)", () => {
           type: "personal",
           categories: [],
           createdAt: new Date().toISOString(),
-          lastUsed: new Date().toISOString(),
           status: "active",
           statusChangedAt: new Date().toISOString(),
           graphId: "test-graph-id-personal",

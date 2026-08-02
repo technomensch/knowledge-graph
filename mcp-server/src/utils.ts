@@ -19,12 +19,6 @@ export interface GraphConfig {
   type: "project-local" | "personal" | "custom";
   categories: CategoryConfig[];
   createdAt: string;
-  lastUsed?: string; // KEPT for now, made OPTIONAL rather than required (2026-08-01, Opus pass 3, C1) —
-  // nothing reads this field except config.ts's kg_config_list display line (deleted in Task 1.9 Step 7),
-  // and making it optional here means no literal anywhere needs to actively supply-or-omit it in lockstep
-  // with the type's own requirement window; it simply stops mattering once nothing writes it, one character
-  // instead of a second Task 1.12 Step 0 extension into `src/tools/config.ts`/`src/cli.ts`. Removed outright
-  // in Task 1.12.
   status: GraphStatus;
   statusChangedAt: string;
   githubUser?: string;
@@ -44,7 +38,6 @@ export interface SanitizationPattern {
 
 export interface KgConfig {
   version: string;
-  active: string | null;
   graphs: Record<string, GraphConfig>;
   sanitization: {
     enabled: boolean;
@@ -55,7 +48,6 @@ export interface KgConfig {
 
 const DEFAULT_CONFIG: KgConfig = {
   version: "1.0.0",
-  active: null,
   graphs: {},
   sanitization: {
     enabled: false,

@@ -4,7 +4,7 @@ import * as os from "os";
 import { checkGraphPathHealth, GraphConfig } from "../src/utils.js";
 
 function makeGraph(p: string): GraphConfig {
-  return { name: "g", path: p, type: "project-local", categories: [], createdAt: "x", lastUsed: "x", status: "active", statusChangedAt: "x", graphId: "id" };
+  return { name: "g", path: p, type: "project-local", categories: [], createdAt: "x", status: "active", statusChangedAt: "x", graphId: "id" };
 }
 
 describe("checkGraphPathHealth", () => {

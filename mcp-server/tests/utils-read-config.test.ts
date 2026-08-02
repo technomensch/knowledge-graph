@@ -77,7 +77,6 @@ describe("readConfig legacy fallback", () => {
     const { readConfig } = loadReadConfigDefaultPath(home);
     const cfg = readConfig();
 
-    expect(cfg.active).toBe("legacy-kg");
     expect(cfg.graphs["legacy-kg"]).toBeDefined();
   });
 
@@ -98,7 +97,7 @@ describe("readConfig legacy fallback", () => {
     }), "utf-8");
 
     const { readConfig } = loadReadConfig(newPath, home);
-    expect(readConfig().active).toBe("new-kg");
+    expect(readConfig().graphs["new-kg"]).toBeDefined();
   });
 
   it("returns DEFAULT_CONFIG when KG_CONFIG_PATH is set to a nonexistent path, even if legacy exists", () => {
@@ -118,7 +117,6 @@ describe("readConfig legacy fallback", () => {
 
     const { readConfig } = loadReadConfig(newPath, home); // sets KG_CONFIG_PATH
     const cfg = readConfig();
-    expect(cfg.active).toBeNull();
     expect(cfg.graphs).toEqual({});
   });
 
@@ -128,7 +126,6 @@ describe("readConfig legacy fallback", () => {
 
     const { readConfig } = loadReadConfig(newPath, home);
     const cfg = readConfig();
-    expect(cfg.active).toBeNull();
     expect(cfg.graphs).toEqual({});
   });
 });

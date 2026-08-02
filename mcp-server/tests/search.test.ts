@@ -25,7 +25,6 @@ function writeMd(dir: string, name: string, content: string): string {
 }
 
 function makeConfig(
-  active: string,
   graphs: Record<string, { path: string; type: string }>
 ): KgConfig {
   const graphEntries: KgConfig["graphs"] = {};
@@ -36,7 +35,6 @@ function makeConfig(
       type: g.type as KgConfig["graphs"][string]["type"],
       categories: [],
       createdAt: new Date().toISOString(),
-      lastUsed: new Date().toISOString(),
       status: "active" as const,
       statusChangedAt: new Date().toISOString(),
       graphId: `test-graph-id-${name}`,
@@ -44,7 +42,6 @@ function makeConfig(
   }
   return {
     version: "1.0.0",
-    active,
     graphs: graphEntries,
     sanitization: { enabled: false, patterns: [], action: "warn" },
   };
@@ -99,7 +96,7 @@ describe("getAllGraphPaths", () => {
   const { getAllGraphPaths } = require("../src/utils.js");
 
   it("returns all graphs when no type filter given", () => {
-    const config = makeConfig("proj", {
+    const config = makeConfig({
       proj: { path: "/tmp/proj", type: "project-local" },
       personal: { path: "/tmp/personal", type: "personal" },
     });
@@ -108,7 +105,7 @@ describe("getAllGraphPaths", () => {
   });
 
   it("filters to personal type only", () => {
-    const config = makeConfig("proj", {
+    const config = makeConfig({
       proj: { path: "/tmp/proj", type: "project-local" },
       personal: { path: "/tmp/personal", type: "personal" },
     });
@@ -119,7 +116,7 @@ describe("getAllGraphPaths", () => {
   });
 
   it("defaults missing type to project-local (v0.2.1 compat)", () => {
-    const config = makeConfig("legacy", {
+    const config = makeConfig({
       legacy: { path: "/tmp/legacy", type: "" as any },
     });
     // Manually remove type field to simulate v0.2.1 config
@@ -129,7 +126,7 @@ describe("getAllGraphPaths", () => {
   });
 
   it("expands ~ in paths", () => {
-    const config = makeConfig("home", {
+    const config = makeConfig({
       home: { path: "~/.kmgraph", type: "personal" },
     });
     const result = getAllGraphPaths(config);
@@ -138,8 +135,7 @@ describe("getAllGraphPaths", () => {
   });
 
   it("returns empty array when no graphs registered", () => {
-    const config = makeConfig("none", {});
-    config.active = null;
+    const config = makeConfig({});
     const result = getAllGraphPaths(config);
     expect(result).toHaveLength(0);
   });

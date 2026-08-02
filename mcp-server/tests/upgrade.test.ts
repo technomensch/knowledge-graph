@@ -85,7 +85,6 @@ function mockActiveKg(kgRoot: string, graphOverrides: Record<string, unknown> = 
   process.cwd = () => kgRoot;
   (readConfig as jest.Mock).mockReturnValue({
     version: "1.0.0",
-    active: "test-kg",
     graphs: {
       "test-kg": {
         name: "test-kg",
@@ -93,7 +92,6 @@ function mockActiveKg(kgRoot: string, graphOverrides: Record<string, unknown> = 
         type: "project-local",
         categories: [],
         createdAt: new Date().toISOString(),
-        lastUsed: new Date().toISOString(),
         status: "active" as const,
         statusChangedAt: new Date().toISOString(),
         graphId: "test-graph-id",
@@ -112,7 +110,6 @@ function mockActiveKgMissingConfigFields(kgRoot: string): void {
   process.cwd = () => kgRoot;
   (readConfig as jest.Mock).mockReturnValue({
     version: "1.0.0",
-    active: "test-kg",
     graphs: {
       "test-kg": {
         name: "test-kg",
@@ -120,7 +117,6 @@ function mockActiveKgMissingConfigFields(kgRoot: string): void {
         type: "project-local",
         categories: [],
         createdAt: new Date().toISOString(),
-        lastUsed: new Date().toISOString(),
         status: "active" as const,
         statusChangedAt: new Date().toISOString(),
         graphId: "test-graph-id",
@@ -416,7 +412,6 @@ describe("T-13: apply config backfills missing fields", () => {
     // Set up a config missing platforms, autoSwitch, notification
     const configObj: KgConfig = {
       version: "1.0.0",
-      active: "test-kg",
       graphs: {
         "test-kg": {
           name: "test-kg",
@@ -424,7 +419,6 @@ describe("T-13: apply config backfills missing fields", () => {
           type: "project-local",
           categories: [],
           createdAt: new Date().toISOString(),
-          lastUsed: new Date().toISOString(),
           status: "active" as const,
           statusChangedAt: new Date().toISOString(),
           graphId: "test-graph-id",
@@ -584,7 +578,6 @@ describe("T-19: config apply is idempotent", () => {
     // First call: fields missing → returns config with defaults written
     const configWithDefaults: KgConfig = {
       version: "1.0.0",
-      active: "test-kg",
       graphs: {
         "test-kg": {
           name: "test-kg",
@@ -592,7 +585,6 @@ describe("T-19: config apply is idempotent", () => {
           type: "project-local",
           categories: [],
           createdAt: new Date().toISOString(),
-          lastUsed: new Date().toISOString(),
           status: "active" as const,
           statusChangedAt: new Date().toISOString(),
           graphId: "test-graph-id",
@@ -664,7 +656,6 @@ describe("T-22: KG path does not exist", () => {
   test("error returned when configured KG path is missing", async () => {
     (readConfig as jest.Mock).mockReturnValue({
       version: "1.0.0",
-      active: "test-kg",
       graphs: {
         "test-kg": {
           name: "test-kg",
@@ -672,7 +663,6 @@ describe("T-22: KG path does not exist", () => {
           type: "project-local",
           categories: [],
           createdAt: new Date().toISOString(),
-          lastUsed: new Date().toISOString(),
           status: "active" as const,
           statusChangedAt: new Date().toISOString(),
           graphId: "test-graph-id",
@@ -747,7 +737,6 @@ describe("T-25: multiple apply categories in one call", () => {
 
     const configObj: KgConfig = {
       version: "1.0.0",
-      active: "test-kg",
       graphs: {
         "test-kg": {
           name: "test-kg",
@@ -755,7 +744,6 @@ describe("T-25: multiple apply categories in one call", () => {
           type: "project-local",
           categories: [],
           createdAt: new Date().toISOString(),
-          lastUsed: new Date().toISOString(),
           status: "active" as const,
           statusChangedAt: new Date().toISOString(),
           graphId: "test-graph-id",

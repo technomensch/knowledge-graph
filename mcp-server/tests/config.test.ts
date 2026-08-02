@@ -42,7 +42,6 @@ function makeConfig(projRoot: string, personalRoot?: string): KgConfig {
       type: "project-local",
       categories: [],
       createdAt: now,
-      lastUsed: now,
       status: "active",
       statusChangedAt: now,
       graphId: "proj-id",
@@ -55,13 +54,12 @@ function makeConfig(projRoot: string, personalRoot?: string): KgConfig {
       type: "personal",
       categories: [],
       createdAt: now,
-      lastUsed: now,
       status: "active",
       statusChangedAt: now,
       graphId: "personal-id",
     };
   }
-  return { version: "1.0.0", active: "proj", graphs, sanitization: { enabled: false, patterns: [], action: "warn" } };
+  return { version: "1.0.0", graphs, sanitization: { enabled: false, patterns: [], action: "warn" } };
 }
 
 describe("handleConfigAddCategory", () => {
@@ -108,7 +106,7 @@ describe("handleConfigAddCategory", () => {
 describe("handleConfigInit", () => {
   it("no longer sets config.active, mints a real graphId, writes a matching marker file, and mints status=pending (ADR-067 Task 1.9 Step 7.5)", async () => {
     const kgPath = makeTempDir("init");
-    (readConfig as jest.Mock).mockReturnValue({ version: "1.0.0", active: null, graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } });
+    (readConfig as jest.Mock).mockReturnValue({ version: "1.0.0", graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } });
 
     let written: KgConfig | null = null;
     (writeConfig as jest.Mock).mockImplementation((cfg: KgConfig) => { written = cfg; });
@@ -123,10 +121,9 @@ describe("handleConfigInit", () => {
     expect(result.isError).toBeUndefined();
     expect(written).not.toBeNull();
     const cfg = written as unknown as KgConfig;
-    // Unchanged from the mocked readConfig() input (null), never set to
-    // "new-kg" -- resolution is context-derived now (Task 1.5), nothing
-    // writes config.active anymore.
-    expect(cfg.active).toBeNull();
+    // KgConfig no longer has an "active" field at all (Task 1.12) --
+    // resolution is fully context-derived (Task 1.5).
+    expect((cfg as unknown as Record<string, unknown>).active).toBeUndefined();
     const graph = cfg.graphs["new-kg"];
     expect(graph.status).toBe("pending");
     expect(graph.graphId).toBeTruthy();

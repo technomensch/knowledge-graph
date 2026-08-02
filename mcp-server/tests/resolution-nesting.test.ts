@@ -2,14 +2,13 @@ import { resolveGraph, findTruePathTies } from "../src/resolution.js";
 import { KgConfig, GraphConfig } from "../src/utils.js";
 
 function g(overrides: Partial<GraphConfig>): GraphConfig {
-  return { name: "g", path: "/g", type: "project-local", categories: [], createdAt: "x", lastUsed: "x", status: "active", statusChangedAt: "x", graphId: "id", ...overrides };
+  return { name: "g", path: "/g", type: "project-local", categories: [], createdAt: "x", status: "active", statusChangedAt: "x", graphId: "id", ...overrides };
 }
 
 describe("nested KG resolution", () => {
   it("does not false-match a sibling with a similar prefix (naive startsWith failure mode)", () => {
     const config: KgConfig = {
       version: "1.0.0",
-      active: null,
       graphs: { proj: g({ name: "proj", path: "/home/user/proj/knowledge" }) },
       sanitization: { enabled: false, patterns: [], action: "warn" },
     };
@@ -20,7 +19,6 @@ describe("nested KG resolution", () => {
   it("resolves the deepest of 3+ nesting levels", () => {
     const config: KgConfig = {
       version: "1.0.0",
-      active: null,
       graphs: {
         monorepo: g({ name: "monorepo", path: "/repo/knowledge" }),
         packages: g({ name: "packages", path: "/repo/packages/knowledge" }),
@@ -36,7 +34,6 @@ describe("nested KG resolution", () => {
   it("an archived deepest match surfaces as archived, never silently falls back a level", () => {
     const config: KgConfig = {
       version: "1.0.0",
-      active: null,
       graphs: {
         monorepo: g({ name: "monorepo", path: "/repo/knowledge" }),
         api: g({ name: "api", path: "/repo/packages/api/knowledge", status: "archived" }),
@@ -51,7 +48,6 @@ describe("nested KG resolution", () => {
   it("findTruePathTies detects two registry entries resolving to the identical path", () => {
     const config: KgConfig = {
       version: "1.0.0",
-      active: null,
       graphs: {
         original: g({ name: "original", path: "/repo/knowledge" }),
         fork: g({ name: "fork", path: "/repo/knowledge" }),
