@@ -111,6 +111,70 @@ describe("kg_config_init duplicate graphId detection", () => {
     expect(JSON.stringify(result.content)).toContain("KMG_INPUT_REQUIRED");
   });
 
+  it("interactive mode with ask()='reattach' refuses with the Task 4.5 not-built-yet error, no merge/backup attempted", async () => {
+    const { writeConfig, mintGraphId, writeGraphIdMarker, readConfig } = require("../src/utils.js") as typeof import("../src/utils.js");
+    const id = mintGraphId();
+    writeGraphIdMarker(existingKg, id);
+    fs.writeFileSync(path.join(existingKg, "only-in-existing.md"), "existing content");
+    writeConfig({
+      version: "1.0.0",
+      graphs: { existing: { name: "existing", path: existingKg, type: "project-local", categories: [], createdAt: "x", status: "active", statusChangedAt: "x", graphId: id } },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    });
+    writeGraphIdMarker(newKg, id);
+    fs.writeFileSync(path.join(newKg, "only-in-new.md"), "new content");
+
+    const interactionModule = require("../src/interaction.js") as typeof import("../src/interaction.js");
+    jest.spyOn(interactionModule, "resolveInteractionMode").mockReturnValue({ mode: "interactive" });
+    jest.spyOn(interactionModule, "gate").mockResolvedValue({ answer: "reattach" });
+
+    const { handleConfigInit } = require("../src/tools/config.js") as typeof import("../src/tools/config.js");
+    const result = await handleConfigInit({ name: "new-copy", kgPath: newKg, type: "project-local", categories: [], interaction: "interactive" });
+
+    expect(result.isError).toBe(true);
+    expect(JSON.stringify(result.content)).toContain("requires the dry-run/backup step (ADR-067 Task 4.5)");
+    const config = readConfig();
+    expect(config.graphs["new-copy"]).toBeUndefined(); // no registration performed
+    expect(config.graphs["existing"].status).toBe("active"); // untouched -- no merge/archive attempted
+    expect(config.graphs["existing"].mergedInto).toBeUndefined();
+  });
+
+  it("interactive mode with ask()='fork' remints the marker (not writeGraphIdMarker) and registers a new distinct graphId", async () => {
+    const utilsModule = require("../src/utils.js") as typeof import("../src/utils.js");
+    const { writeConfig, mintGraphId, writeGraphIdMarker, readConfig } = utilsModule;
+    const id = mintGraphId();
+    writeGraphIdMarker(existingKg, id);
+    fs.writeFileSync(path.join(existingKg, "only-in-existing.md"), "existing content");
+    writeConfig({
+      version: "1.0.0",
+      graphs: { existing: { name: "existing", path: existingKg, type: "project-local", categories: [], createdAt: "x", status: "active", statusChangedAt: "x", graphId: id } },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    });
+    writeGraphIdMarker(newKg, id);
+    fs.writeFileSync(path.join(newKg, "only-in-new.md"), "new content");
+
+    const writeMarkerSpy = jest.spyOn(utilsModule, "writeGraphIdMarker");
+    const remintMarkerSpy = jest.spyOn(utilsModule, "remintGraphIdMarker");
+    const mintIdSpy = jest.spyOn(utilsModule, "mintGraphId");
+    writeMarkerSpy.mockClear();
+    mintIdSpy.mockClear();
+
+    const interactionModule = require("../src/interaction.js") as typeof import("../src/interaction.js");
+    jest.spyOn(interactionModule, "resolveInteractionMode").mockReturnValue({ mode: "interactive" });
+    jest.spyOn(interactionModule, "gate").mockResolvedValue({ answer: "fork" });
+
+    const { handleConfigInit } = require("../src/tools/config.js") as typeof import("../src/tools/config.js");
+    const result = await handleConfigInit({ name: "new-copy", kgPath: newKg, type: "project-local", categories: [], interaction: "interactive" });
+
+    expect(result.isError).toBeUndefined();
+    expect(mintIdSpy).toHaveBeenCalledTimes(1);
+    expect(remintMarkerSpy).toHaveBeenCalledWith(newKg, expect.any(String));
+    expect(writeMarkerSpy).not.toHaveBeenCalled(); // fork must remint, not writeGraphIdMarker (throws when a marker already exists)
+    const config = readConfig();
+    expect(config.graphs["new-copy"].graphId).toBeTruthy();
+    expect(config.graphs["new-copy"].graphId).not.toBe(id); // distinct from the duplicated graphId
+  });
+
   it("ordinary registration (no pre-existing marker) mints a graphId via Task 1.9's existing mint, no second mint", async () => {
     const utilsModule = require("../src/utils.js") as typeof import("../src/utils.js");
     const writeSpy = jest.spyOn(utilsModule, "writeGraphIdMarker");
