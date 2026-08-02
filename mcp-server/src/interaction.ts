@@ -73,3 +73,49 @@ export function resolveInteractionMode(
 
   return { mode: "automated" };
 }
+
+export interface InputRequiredError {
+  error: "KMG_INPUT_REQUIRED";
+  reason: string;
+  resolveWith: { param: string; accepts?: string[] };
+}
+
+export function requireInput(reason: string, param: string, accepts?: string[]): InputRequiredError {
+  return { error: "KMG_INPUT_REQUIRED", reason, resolveWith: { param, accepts } };
+}
+
+export interface GateOptions {
+  mode: InteractionMode;
+  reason: string;
+  param: string;
+  accepts?: string[];
+  timeoutMs?: number;
+  ask: (signal: AbortSignal) => Promise<string>;
+}
+
+export async function gate(opts: GateOptions): Promise<{ answer: string } | InputRequiredError> {
+  if (opts.mode === "automated") {
+    return requireInput(opts.reason, opts.param, opts.accepts);
+  }
+  const timeoutMs = opts.timeoutMs ?? 30_000;
+  const controller = new AbortController();
+  let timeoutHandle: NodeJS.Timeout | undefined;
+
+  const timeout = new Promise<InputRequiredError>((resolve) => {
+    timeoutHandle = setTimeout(() => {
+      controller.abort(); // let an ask() implementation that respects AbortSignal actually stop waiting
+      resolve(requireInput(`${opts.reason}_timeout`, opts.param, opts.accepts));
+    }, timeoutMs);
+  });
+  const answered = opts.ask(controller.signal).then((answer) => ({ answer }));
+
+  try {
+    return await Promise.race([answered, timeout]);
+  } finally {
+    // Whichever side won, the timer must not be left pending — an
+    // un-cleared setTimeout leaks a live handle for every answered
+    // question, up to timeoutMs after the call already resolved
+    // (findings doc #17).
+    if (timeoutHandle !== undefined) clearTimeout(timeoutHandle);
+  }
+}
