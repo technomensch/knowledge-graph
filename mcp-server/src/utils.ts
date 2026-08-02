@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
+import * as crypto from "crypto";
 
 export const CONFIG_PATH = process.env.KG_CONFIG_PATH || path.join(os.homedir(), ".kmgraph", "kg-config.json");
 
@@ -115,6 +116,40 @@ export function changeGraphStatus(
 
 export function isWritable(graph: GraphConfig): boolean {
   return graph.status === "active";
+}
+
+const GRAPH_ID_MARKER_FILE = ".kmgraph-id";
+
+export function mintGraphId(): string {
+  return crypto.randomUUID();
+}
+
+export function writeGraphIdMarker(kgPath: string, graphId: string): void {
+  const markerPath = path.join(kgPath, GRAPH_ID_MARKER_FILE);
+  if (fs.existsSync(markerPath)) {
+    const existing = fs.readFileSync(markerPath, "utf-8").trim();
+    if (existing === graphId) return; // idempotent no-op
+    throw new Error(
+      `writeGraphIdMarker: ${markerPath} already has graphId '${existing}', refusing to overwrite with '${graphId}'`
+    );
+  }
+  fs.writeFileSync(markerPath, graphId + "\n", "utf-8");
+}
+
+export function readGraphIdMarker(kgPath: string): string | null {
+  const markerPath = path.join(kgPath, GRAPH_ID_MARKER_FILE);
+  if (!fs.existsSync(markerPath)) return null;
+  return fs.readFileSync(markerPath, "utf-8").trim();
+}
+
+// The only sanctioned way to overwrite an existing marker with a *different*
+// id. No mismatch guard — that's the whole point (fork deliberately breaks
+// identity from whatever marker the clone carried in). Callers: Task 4.4's
+// "fork" branch, and Task 4.6's standalone re-mint tool. Every other caller
+// must keep using the strict `writeGraphIdMarker` above.
+export function remintGraphIdMarker(kgPath: string, graphId: string): void {
+  const markerPath = path.join(kgPath, GRAPH_ID_MARKER_FILE);
+  fs.writeFileSync(markerPath, graphId + "\n", "utf-8");
 }
 
 export function getActiveGraphPath(config: KgConfig): string | null {
