@@ -84,12 +84,84 @@ export function readConfig(): KgConfig {
   return { ...DEFAULT_CONFIG };
 }
 
+// Monotonic per-process counter — avoids same-millisecond collisions that
+// `Date.now()` alone can hit when two writes land in the same process tick.
+// pid is still included so concurrent *processes* never collide either.
+let writeConfigTmpCounter = 0;
+
 export function writeConfig(config: KgConfig): void {
   const dir = path.dirname(CONFIG_PATH);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
-  fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2), "utf-8");
+
+  let mode = 0o644;
+  if (fs.existsSync(CONFIG_PATH)) {
+    mode = fs.statSync(CONFIG_PATH).mode & 0o777;
+  }
+
+  const tmpPath = path.join(dir, `.kg-config.json.tmp.${process.pid}.${writeConfigTmpCounter++}`);
+  const fd = fs.openSync(tmpPath, "w", mode);
+  try {
+    fs.writeFileSync(fd, JSON.stringify(config, null, 2), "utf-8");
+    fs.fsyncSync(fd);
+  } finally {
+    fs.closeSync(fd);
+  }
+  fs.chmodSync(tmpPath, mode);
+
+  try {
+    renameWithRetry(tmpPath, CONFIG_PATH);
+  } catch (err) {
+    // Rename never succeeded — don't leave a stray temp file behind forever.
+    fs.rmSync(tmpPath, { force: true });
+    throw err;
+  }
+
+  // Content fsync above only guarantees the temp file's bytes survive a
+  // crash; it says nothing about the directory-entry update that makes them
+  // visible under CONFIG_PATH's name. fsync the parent directory too so the
+  // rename itself is durable (spec §6).
+  //
+  // Review note (2026-08-01, findings doc #24 round-3 correction): Node cannot
+  // open a directory handle via fs.open on Windows (EISDIR/EPERM), and
+  // directory fsync is a POSIX-only concept. Without a guard, this block
+  // would throw on every writeConfig() call on Windows -- AFTER the rename
+  // already succeeded, so the write itself is fine but the tool would
+  // incorrectly report failure. Windows already gets durability from the
+  // EPERM/EBUSY rename retry a few lines above; skip the directory fsync
+  // there rather than fail on it.
+  try {
+    const dirFd = fs.openSync(dir, "r");
+    try {
+      fs.fsyncSync(dirFd);
+    } finally {
+      fs.closeSync(dirFd);
+    }
+  } catch {
+    // Directory fsync unsupported on this platform (Windows) -- the rename
+    // itself already succeeded above; this is a best-effort durability
+    // improvement, not a correctness requirement.
+  }
+}
+
+function renameWithRetry(tmpPath: string, targetPath: string, attempts = 5): void {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      fs.renameSync(tmpPath, targetPath);
+      return;
+    } catch (err) {
+      const code = (err as NodeJS.ErrnoException).code;
+      // Windows: AV/Search Indexer/OneDrive can transiently hold the handle.
+      if ((code === "EPERM" || code === "EBUSY") && i < attempts - 1) {
+        const waitMs = 10 * Math.pow(2, i) + Math.floor(Math.random() * 10);
+        const until = Date.now() + waitMs;
+        while (Date.now() < until) { /* bounded busy-wait, window is milliseconds */ }
+        continue;
+      }
+      throw err;
+    }
+  }
 }
 
 export function changeGraphStatus(
