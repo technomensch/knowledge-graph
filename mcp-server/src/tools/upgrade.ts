@@ -704,6 +704,25 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
 
   const results: string[] = [];
   let appliedAnyGraphDependent = false;
+  let anyCategoryFailed = false;
+
+  // Opus review (2026-08-02), BLOCKER B-1: the pre-Task-1.9 code checked
+  // fs.existsSync(kgPath) once, before branching on applyList, so a
+  // deleted/unmounted registry path hard-failed the whole call. The
+  // resolveGraph restructure moved that check into the inspect-mode branch
+  // only, leaving apply mode free to mkdirSync(..., {recursive:true}) a
+  // fresh empty tree at a stale path -- silently resurrecting a directory
+  // the user deleted. Re-added here, gated the same way inspect mode is.
+  const resolvedKgPathForApply = !("error" in target)
+    ? target.graph.path.replace(/^~/, os.homedir())
+    : undefined;
+  if (resolvedKgPathForApply && !fs.existsSync(resolvedKgPathForApply) && sortedApplyList.some((c) => c !== "config-location")) {
+    return {
+      content: [{ type: "text" as const, text: `Error: KG path not found: ${resolvedKgPathForApply}` }],
+      isError: true,
+    };
+  }
+
   for (const category of sortedApplyList) {
     if (category === "config-location") {
       results.push(`[config-location] ${applyConfigLocation()}`);
@@ -711,6 +730,7 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
     }
     if ("error" in target) {
       results.push(`[${category}] Error: ${target.error}`);
+      anyCategoryFailed = true;
       continue;
     }
     const kgPath = target.graph.path.replace(/^~/, os.homedir());
@@ -751,7 +771,12 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
     updateLastAppliedVersion(installedVersion, target.name);
   }
 
-  return { content: [{ type: "text" as const, text: results.join("\n\n") }] };
+  // Opus review (2026-08-02), SF-1: a resolution failure for a
+  // graph-dependent category previously produced a hard isError:true
+  // (pre-Task-1.9). The restructure folded the failure into `results` text
+  // with no isError flag, so a client saw a "successful" call whose text
+  // happened to contain "Error:". Restored here.
+  return { content: [{ type: "text" as const, text: results.join("\n\n") }], ...(anyCategoryFailed ? { isError: true as const } : {}) };
 }
 
 // ── Tool registration ────────────────────────────────────────────────────────

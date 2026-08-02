@@ -16,8 +16,16 @@ import { readConfig, writeConfig, KgConfig } from "../src/utils.js";
 const tempDirs: string[] = [];
 
 function makeTempDir(prefix: string): string {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), `config-test-${prefix}-`));
-  tempDirs.push(dir);
+  // Nest one level below a fresh mkdtemp wrapper (Opus review SF-2, same
+  // fixture-collision class already fixed in capture/upgrade/fts5-scope/
+  // sanitization test files) -- resolveGraph matches cwd against
+  // dirname(graph.path); a bare mkdtemp leaf shares os.tmpdir() as its
+  // dirname with every other fixture in this file, which would falsely
+  // match an "unrelated" cwd against a registered graph it shouldn't.
+  const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), `config-test-${prefix}-`));
+  const dir = path.join(wrapper, "kg");
+  fs.mkdirSync(dir);
+  tempDirs.push(wrapper);
   return dir;
 }
 
@@ -76,6 +84,19 @@ describe("handleConfigAddCategory", () => {
     expect(result.isError).toBeUndefined();
     expect(fs.existsSync(path.join(projRoot, "lessons-learned", "security"))).toBe(true);
     expect(writeConfig).toHaveBeenCalled();
+  });
+
+  it("errors when cwd resolves nothing (Opus review SF-2 -- proves the cwd match above is real, not an os.tmpdir()-ancestor false match)", async () => {
+    const projRoot = makeTempDir("proj-registered");
+    const unrelatedDir = makeTempDir("unrelated-cwd");
+    (readConfig as jest.Mock).mockReturnValue(makeConfig(projRoot));
+    const origCwd = process.cwd;
+    process.cwd = () => unrelatedDir;
+
+    const result = await handleConfigAddCategory({ name: "security", prefix: null, git: "commit" });
+    process.cwd = origCwd;
+
+    expect(result.isError).toBe(true);
   });
 
   it("resolves the personal graph when scope=user", async () => {

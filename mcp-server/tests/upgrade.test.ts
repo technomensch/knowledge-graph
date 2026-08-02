@@ -1689,3 +1689,88 @@ describe("config-location category", () => {
     expect(fs.existsSync(oldFile)).toBe(true);
   });
 });
+
+// ---------------------------------------------------------------------------
+// T-52: apply mode path-existence guard (Opus review B-1) + isError on
+// resolution failure (Opus review SF-1)
+// ---------------------------------------------------------------------------
+
+describe("T-52: apply mode does not resurrect a deleted/unmounted KG path", () => {
+  test("apply: ['directories'] against a registered-but-missing path errors instead of recreating it", async () => {
+    const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), "upgrade-test-t52-"));
+    const goneKgPath = path.join(wrapper, "kg"); // registered, never created on disk
+    (readConfig as jest.Mock).mockReturnValue({
+      version: "1.0.0",
+      graphs: {
+        "gone-kg": {
+          name: "gone-kg",
+          path: goneKgPath,
+          type: "project-local",
+          categories: [],
+          createdAt: new Date().toISOString(),
+          status: "active" as const,
+          statusChangedAt: new Date().toISOString(),
+          graphId: "gone-kg-id",
+        },
+      },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    } as KgConfig);
+    process.cwd = () => goneKgPath;
+
+    const result = await handleUpgrade({ apply: ["directories"] });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("KG path not found");
+    // Must not have created the directory as a side effect of the check.
+    expect(fs.existsSync(goneKgPath)).toBe(false);
+    fs.rmSync(wrapper, { recursive: true, force: true });
+  });
+
+  test("apply: ['directories'] with an unresolvable cwd returns isError:true, not a silent success", async () => {
+    const registeredKg = makeTempDir("t52b-registered");
+    tempDirs.push(registeredKg);
+    scaffoldKg(registeredKg);
+    (readConfig as jest.Mock).mockReturnValue({
+      version: "1.0.0",
+      graphs: {
+        "some-kg": {
+          name: "some-kg",
+          path: registeredKg,
+          type: "project-local",
+          categories: [],
+          createdAt: new Date().toISOString(),
+          status: "active" as const,
+          statusChangedAt: new Date().toISOString(),
+          graphId: "some-kg-id",
+        },
+      },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    } as KgConfig);
+    const unrelatedDir = makeTempDir("t52b-unrelated");
+    tempDirs.push(unrelatedDir);
+    process.cwd = () => unrelatedDir;
+
+    const result = await handleUpgrade({ apply: ["directories"] });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Error");
+  });
+
+  test("apply: ['config-location', 'directories'] with an unresolvable cwd still runs config-location but flags isError overall", async () => {
+    const home = makeTempDir("t52c-home");
+    tempDirs.push(home);
+    const legacyDir = path.join(home, ".claude");
+    fs.mkdirSync(legacyDir, { recursive: true });
+    fs.writeFileSync(path.join(legacyDir, "kg-config.json"), JSON.stringify({ version: "1.0.0", graphs: {} }), "utf-8");
+    process.env.HOME = home;
+    delete process.env.KG_CONFIG_PATH;
+    (readConfig as jest.Mock).mockImplementation(() => ({ version: "1.0.0", graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } }));
+    process.cwd = () => "/completely/unresolvable/path/for/t52c";
+
+    const result = await handleUpgrade({ apply: ["config-location", "directories"] });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("[config-location]");
+    expect(result.content[0].text).toContain("[directories] Error:");
+  });
+});
