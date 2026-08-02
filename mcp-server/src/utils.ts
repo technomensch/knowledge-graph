@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import * as crypto from "crypto";
+import { execFileSync } from "child_process";
 
 export const CONFIG_PATH = process.env.KG_CONFIG_PATH || path.join(os.homedir(), ".kmgraph", "kg-config.json");
 
@@ -344,6 +345,25 @@ export function readGraphIdMarker(kgPath: string): string | null {
   const markerPath = path.join(kgPath, GRAPH_ID_MARKER_FILE);
   if (!fs.existsSync(markerPath)) return null;
   return fs.readFileSync(markerPath, "utf-8").trim();
+}
+
+// Checks whether the graphId marker file would be tracked by git if committed
+// (as opposed to gitignored, which is the normal/expected case for most KG
+// setups per spec §9). Returns null when kgPath isn't inside a git repo at
+// all, since there's nothing to check.
+export function isMarkerTracked(kgPath: string): boolean | null {
+  try {
+    execFileSync("git", ["rev-parse", "--is-inside-work-tree"], { cwd: kgPath, stdio: "pipe" });
+  } catch {
+    return null; // not inside a git repo
+  }
+  try {
+    // git check-ignore exits 0 (and prints the path) when the path IS ignored.
+    execFileSync("git", ["check-ignore", GRAPH_ID_MARKER_FILE], { cwd: kgPath, stdio: "pipe" });
+    return false; // ignored -> not trackable
+  } catch {
+    return true; // check-ignore exits 1 when NOT ignored
+  }
 }
 
 // The only sanctioned way to overwrite an existing marker with a *different*

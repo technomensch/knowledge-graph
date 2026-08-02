@@ -1,7 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { mintGraphId, writeGraphIdMarker, readGraphIdMarker, remintGraphIdMarker, findRegistryEntryByGraphId } from "../src/utils.js";
+import { execSync } from "child_process";
+import { mintGraphId, writeGraphIdMarker, readGraphIdMarker, remintGraphIdMarker, findRegistryEntryByGraphId, isMarkerTracked } from "../src/utils.js";
 
 describe("graphId marker", () => {
   let dir: string;
@@ -48,6 +49,32 @@ describe("graphId marker", () => {
     const id = mintGraphId();
     expect(() => remintGraphIdMarker(dir, id)).not.toThrow();
     expect(readGraphIdMarker(dir)).toBe(id);
+  });
+});
+
+describe("isMarkerTracked", () => {
+  let dir: string;
+  beforeEach(() => {
+    dir = fs.mkdtempSync(path.join(os.tmpdir(), "marker-tracked-"));
+    execSync("git init -q", { cwd: dir });
+  });
+  afterEach(() => { fs.rmSync(dir, { recursive: true, force: true }); });
+
+  it("returns null outside a git repo", () => {
+    const nonGitDir = fs.mkdtempSync(path.join(os.tmpdir(), "no-git-"));
+    expect(isMarkerTracked(nonGitDir)).toBeNull();
+    fs.rmSync(nonGitDir, { recursive: true, force: true });
+  });
+
+  it("returns true when the marker path is not gitignored", () => {
+    fs.writeFileSync(path.join(dir, ".kmgraph-id"), "some-id");
+    expect(isMarkerTracked(dir)).toBe(true);
+  });
+
+  it("returns false when a .gitignore rule covers the marker path", () => {
+    fs.writeFileSync(path.join(dir, ".gitignore"), ".kmgraph-id\n");
+    fs.writeFileSync(path.join(dir, ".kmgraph-id"), "some-id");
+    expect(isMarkerTracked(dir)).toBe(false);
   });
 });
 
