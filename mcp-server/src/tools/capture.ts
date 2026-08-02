@@ -2,8 +2,9 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import * as fs from "fs";
 import * as path from "path";
-import { readConfig, getActiveGraphPath, getProjectRoot } from "../utils.js";
+import { readConfig } from "../utils.js";
 import { rebuildIndex } from "./fts5.js";
+import { resolveGraph } from "../resolution.js";
 
 export interface CaptureRequest {
   content: string;
@@ -228,40 +229,36 @@ export async function handleCapture(
   let skipCwdCheck = false;
 
   if (targetKg) {
-    // Explicit target KG: resolve path from config, skip CWD check (intentional user choice)
-    const graphConfig = config.graphs[targetKg];
-    if (!graphConfig) {
+    // Explicit target KG: resolve by exact name, skip CWD check (intentional
+    // user choice). resolveGraph's exact-name branch never scans the
+    // filesystem or falls back to cwd, matching the old direct-lookup
+    // behavior (ADR-067 Task 1.8).
+    const resolution = resolveGraph(config, process.cwd(), targetKg);
+    if (resolution.kind === "not-registered") {
       return {
         error: "VALIDATION_ERROR",
         message: `Unknown KG name: "${targetKg}". Check /kmgraph:status for registered KGs.`,
       };
     }
-    kgPath = graphConfig.path.replace(/^~/, require("os").homedir());
+    if (resolution.kind !== "resolved") {
+      // fuzzy-match/archived/ambiguous-tie/merged: Task 6.2 wires each of
+      // these through the interactivity gate with its real per-outcome
+      // behavior; for this task, preserve current behavior (no regression
+      // from today, where none of these outcomes exist at all) by treating
+      // them as KG_MISMATCH.
+      return { error: "KG_MISMATCH" };
+    }
+    kgPath = resolution.graph.path.replace(/^~/, require("os").homedir());
     skipCwdCheck = true;
   } else {
-    kgPath = getActiveGraphPath(config);
-  }
-
-  if (!kgPath) {
-    return {
-      error: "VALIDATION_ERROR",
-      message: "No active knowledge graph. Use kg_config_init or kg_config_switch first.",
-    };
-  }
-
-  // Active-KG / CWD alignment check (skipped when targetKg explicitly provided)
-  if (!skipCwdCheck) {
-    const activeKgRoot = getProjectRoot(kgPath);
-    const cwd = process.cwd();
-    const normalizedRoot = activeKgRoot.endsWith(path.sep) ? activeKgRoot : activeKgRoot + path.sep;
-    if (cwd !== activeKgRoot && !cwd.startsWith(normalizedRoot)) {
-      return {
-        error: "KG_MISMATCH",
-        activeKg: config.active ?? undefined,
-        activeKgRoot,
-        cwd,
-      };
+    const resolution = resolveGraph(config, process.cwd());
+    if (resolution.kind === "no-graph-in-cwd") {
+      return { error: "KG_MISMATCH", activeKgRoot: undefined, cwd: process.cwd() };
     }
+    if (resolution.kind !== "resolved") {
+      return { error: "KG_MISMATCH" };
+    }
+    kgPath = resolution.graph.path.replace(/^~/, require("os").homedir());
   }
 
   // Update-in-place path

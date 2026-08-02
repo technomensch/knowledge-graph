@@ -99,6 +99,11 @@ function archivedOrMerged(name: string, graph: GraphConfig): ResolutionResult {
   return { kind: "archived", name, graph };
 }
 
+export function isHomeOrRootCwd(cwd: string): boolean {
+  const normalized = path.resolve(cwd);
+  return normalized === path.resolve(os.homedir()) || normalized === path.parse(normalized).root;
+}
+
 export class ResolutionSession {
   private lastResolvedName: string | null = null;
 

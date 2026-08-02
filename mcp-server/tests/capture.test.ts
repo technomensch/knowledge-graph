@@ -41,7 +41,7 @@ import {
   checkExistingFile,
 } from "../src/tools/capture.js";
 import type { CaptureRequest, CaptureResponse, CaptureError } from "../src/tools/capture.js";
-import { readConfig, getActiveGraphPath } from "../src/utils.js";
+import { readConfig } from "../src/utils.js";
 import { rebuildIndex } from "../src/tools/fts5.js";
 
 // ---------------------------------------------------------------------------
@@ -49,7 +49,17 @@ import { rebuildIndex } from "../src/tools/fts5.js";
 // ---------------------------------------------------------------------------
 
 function makeTempDir(prefix: string): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), `capture-test-${prefix}-`));
+  // Nest the returned dir one level below a fresh mkdtemp wrapper (ADR-067
+  // Task 1.8) -- resolveGraph matches cwd against dirname(graph.path), so if
+  // this returned a bare mkdtemp leaf directly under the shared os.tmpdir(),
+  // every other test's "unrelated" cwd (also a direct child of the same
+  // shared tmpdir) would resolve as ancestor-or-equal too, false-passing the
+  // KG_MISMATCH tests below instead of genuinely exercising them. Nesting
+  // under a per-call-unique wrapper gives each fixture its own dirname().
+  const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), `capture-test-${prefix}-`));
+  const contentDir = path.join(wrapper, "knowledge");
+  fs.mkdirSync(contentDir);
+  return contentDir;
 }
 
 function scaffoldKg(root: string): void {
@@ -73,8 +83,24 @@ afterEach(() => {
 });
 
 function mockActiveKg(kgRoot: string): void {
-  (readConfig as jest.Mock).mockReturnValue({ active: "test-kg", graphs: {} });
-  (getActiveGraphPath as jest.Mock).mockReturnValue(kgRoot);
+  (readConfig as jest.Mock).mockReturnValue({
+    version: "1.0.0",
+    active: "test-kg",
+    graphs: {
+      "test-kg": {
+        name: "test-kg",
+        path: kgRoot,
+        type: "project-local",
+        categories: [],
+        createdAt: new Date().toISOString(),
+        lastUsed: new Date().toISOString(),
+        status: "active",
+        statusChangedAt: new Date().toISOString(),
+        graphId: "test-graph-id",
+      },
+    },
+    sanitization: { enabled: false, patterns: [], action: "warn" },
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -241,7 +267,9 @@ describe("kg_capture — KG_MISMATCH", () => {
     expect("error" in result).toBe(true);
     const err = result as CaptureError;
     expect(err.error).toBe("KG_MISMATCH");
-    expect(err.activeKgRoot).toBe(kgRoot);
+    // activeKgRoot is no longer populated (ADR-067 Task 1.8) -- resolution is
+    // context-derived, so there is no single "active" KG root to report once
+    // cwd matches nothing registered. cwd is still meaningful and preserved.
     expect(err.cwd).toBe(otherDir);
   });
 });
@@ -536,6 +564,7 @@ describe("resolveTargetPath", () => {
 describe("kg_capture — targetKg (multi-KG)", () => {
   function mockMultiKgConfig(projRoot: string, globalRoot: string): void {
     (readConfig as jest.Mock).mockReturnValue({
+      version: "1.0.0",
       active: "my-project",
       graphs: {
         "my-project": {
@@ -545,6 +574,9 @@ describe("kg_capture — targetKg (multi-KG)", () => {
           categories: [],
           createdAt: new Date().toISOString(),
           lastUsed: new Date().toISOString(),
+          status: "active",
+          statusChangedAt: new Date().toISOString(),
+          graphId: "test-graph-id-my-project",
         },
         "personal": {
           name: "personal",
@@ -553,10 +585,13 @@ describe("kg_capture — targetKg (multi-KG)", () => {
           categories: [],
           createdAt: new Date().toISOString(),
           lastUsed: new Date().toISOString(),
+          status: "active",
+          statusChangedAt: new Date().toISOString(),
+          graphId: "test-graph-id-personal",
         },
       },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
     });
-    (getActiveGraphPath as jest.Mock).mockReturnValue(projRoot);
   }
 
   test("writes lesson to personal KG when targetKg='personal'", async () => {

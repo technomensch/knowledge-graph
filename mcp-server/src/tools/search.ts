@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import { readConfig, getActiveGraphPath, getAllGraphPaths, walkDir } from "../utils.js";
+import { resolveGraph } from "../resolution.js";
 import { searchFts5, resolveDbPath } from "./fts5.js";
 import type { SearchResult } from "./fts5.js";
 
@@ -176,23 +177,25 @@ export function registerSearchTool(server: McpServer): void {
         const otherKgs = allKgs.filter((k) => k.name !== config.active);
         kgsToSearch = activeEntry ? [activeEntry, ...otherKgs] : otherKgs;
       } else {
-        // Default: active KG only
-        const activePath = getActiveGraphPath(config);
-        if (!activePath) {
+        // Default: cwd-resolved KG only (ADR-067 Task 1.8 -- resolution is
+        // context-derived, replacing config.active). fuzzy-match/archived/
+        // ambiguous-tie/merged/not-registered all fall through to the same
+        // error as no-graph-in-cwd for now; Task 6.2 wires each through the
+        // interactivity gate with its real per-outcome behavior.
+        const resolution = resolveGraph(config, process.cwd());
+        if (resolution.kind !== "resolved") {
           return {
             content: [
               {
                 type: "text" as const,
-                text: "Error: No active knowledge graph. Use kg_config_init or kg_config_switch first.",
+                text: "Error: No knowledge graph resolved from your current directory. Use kg_config_init first, or pass a graph name.",
               },
             ],
             isError: true,
           };
         }
-        const activeType = config.active && config.graphs[config.active]
-          ? (config.graphs[config.active].type || "project-local")
-          : "project-local";
-        kgsToSearch = [{ name: config.active!, path: activePath, type: activeType }];
+        const activePath = resolution.graph.path.replace(/^~/, os.homedir());
+        kgsToSearch = [{ name: resolution.name, path: activePath, type: resolution.graph.type || "project-local" }];
       }
 
       // Run search across all target KGs
