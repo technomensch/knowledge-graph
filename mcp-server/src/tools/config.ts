@@ -9,6 +9,7 @@ import {
   getPluginRoot,
   mintGraphId,
   writeGraphIdMarker,
+  readGraphIdMarker,
   KgConfig,
   GraphConfig,
   CategoryConfig,
@@ -184,21 +185,15 @@ export async function handleConfigInit({ name, kgPath, type, categories }: Handl
   // Write config entry
   const now = new Date().toISOString();
   const newGraphId = mintGraphId();
-  let graphConfig: GraphConfig;
-  try {
-    writeGraphIdMarker(expandedPath, newGraphId);
-    graphConfig = {
-      name,
-      path: kgPath,
-      type,
-      categories: categories as CategoryConfig[],
-      createdAt: now,
-      // lastUsed removed -- no writer needed once Task 1.12 deletes the field
-      status: "pending",
-      statusChangedAt: now,
-      graphId: newGraphId,
-    };
-  } catch (err) {
+
+  // Precise pre-check instead of try/catch around writeGraphIdMarker (Opus
+  // review nit): a bare catch there would also swallow genuine I/O errors
+  // (EACCES/ENOSPC/etc.) and mislabel them as a marker conflict. Checking
+  // the existing marker directly means writeGraphIdMarker's own throw (if
+  // it still somehow fires -- e.g. a race) is a real error and propagates
+  // normally rather than being misreported.
+  const existingMarkerId = readGraphIdMarker(expandedPath);
+  if (existingMarkerId && existingMarkerId !== newGraphId) {
     return {
       content: [
         {
@@ -209,6 +204,18 @@ export async function handleConfigInit({ name, kgPath, type, categories }: Handl
       isError: true,
     };
   }
+  writeGraphIdMarker(expandedPath, newGraphId);
+  const graphConfig: GraphConfig = {
+    name,
+    path: kgPath,
+    type,
+    categories: categories as CategoryConfig[],
+    createdAt: now,
+    // lastUsed removed -- no writer needed once Task 1.12 deletes the field
+    status: "pending",
+    statusChangedAt: now,
+    graphId: newGraphId,
+  };
 
   config.graphs[name] = graphConfig;
   // config.active = name; removed -- resolution is now context-derived (Task 1.5)

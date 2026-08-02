@@ -114,8 +114,9 @@ export function isHomeOrRootCwd(cwd: string): boolean {
 
 // Built to power a "notice the user when they cross from one nested knowledge graph
 // into another within the same session" feature, but not yet wired into any tool call path.
-// Verified against the full plan set: no later phase currently instantiates or references
-// this class — the nested-KG transition notice it was meant to power does not fire yet.
+// Verified against the full plan set: no later phase's production code path currently
+// instantiates or references this class (only its own unit test does) — the nested-KG
+// transition notice it was meant to power does not fire yet.
 // Future callers touching resolution-driven tool paths should either wire this in or
 // flag it as intentionally dropped scope, not assume it's already working.
 export class ResolutionSession {

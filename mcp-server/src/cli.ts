@@ -10,6 +10,7 @@ import {
   getPluginRoot,
   mintGraphId,
   writeGraphIdMarker,
+  readGraphIdMarker,
   GraphConfig,
   CategoryConfig,
 } from "./utils.js";
@@ -216,26 +217,29 @@ async function runInit(): Promise<void> {
     // 7. Write config
     const now = new Date().toISOString();
     const newGraphId = mintGraphId();
-    let graphConfig: GraphConfig;
-    try {
-      writeGraphIdMarker(expandedPath, newGraphId);
-      graphConfig = {
-        name,
-        path: kgPath,
-        type: kgType,
-        categories,
-        createdAt: now,
-        status: "pending",
-        statusChangedAt: now,
-        graphId: newGraphId,
-        // lastUsed removed -- optional on the type since Task 1.1, no writer needed
-      };
-    } catch (err) {
+
+    // Precise pre-check instead of try/catch around writeGraphIdMarker (Opus
+    // review nit): a bare catch there would also swallow genuine I/O errors
+    // and mislabel them as a marker conflict.
+    const existingMarkerId = readGraphIdMarker(expandedPath);
+    if (existingMarkerId && existingMarkerId !== newGraphId) {
       console.error(
         `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, remove or rename the existing .kmgraph-id marker file manually if you're certain this is intentional.`
       );
       process.exit(1);
     }
+    writeGraphIdMarker(expandedPath, newGraphId);
+    const graphConfig: GraphConfig = {
+      name,
+      path: kgPath,
+      type: kgType,
+      categories,
+      createdAt: now,
+      status: "pending",
+      statusChangedAt: now,
+      graphId: newGraphId,
+      // lastUsed removed -- optional on the type since Task 1.1, no writer needed
+    };
 
     config.graphs[name] = graphConfig;
     // config.active = name; removed -- resolution is now context-derived (Task 1.5)
