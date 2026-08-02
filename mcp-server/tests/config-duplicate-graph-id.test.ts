@@ -111,7 +111,7 @@ describe("kg_config_init duplicate graphId detection", () => {
     expect(JSON.stringify(result.content)).toContain("KMG_INPUT_REQUIRED");
   });
 
-  it("interactive mode with ask()='reattach' refuses with the Task 4.5 not-built-yet error, no merge/backup attempted", async () => {
+  it("interactive mode with ask()='reattach' then 'cancel' on the merge preview cancels, no write attempted (ADR-067 Task 4.5)", async () => {
     const { writeConfig, mintGraphId, writeGraphIdMarker, readConfig } = require("../src/utils.js") as typeof import("../src/utils.js");
     const id = mintGraphId();
     writeGraphIdMarker(existingKg, id);
@@ -126,17 +126,50 @@ describe("kg_config_init duplicate graphId detection", () => {
 
     const interactionModule = require("../src/interaction.js") as typeof import("../src/interaction.js");
     jest.spyOn(interactionModule, "resolveInteractionMode").mockReturnValue({ mode: "interactive" });
-    jest.spyOn(interactionModule, "gate").mockResolvedValue({ answer: "reattach" });
+    jest.spyOn(interactionModule, "gate").mockImplementation(async (opts) =>
+      opts.reason === "merge_preview" ? { answer: "cancel" } : { answer: "reattach" }
+    );
 
     const { handleConfigInit } = require("../src/tools/config.js") as typeof import("../src/tools/config.js");
     const result = await handleConfigInit({ name: "new-copy", kgPath: newKg, type: "project-local", categories: [], interaction: "interactive" });
 
     expect(result.isError).toBe(true);
-    expect(JSON.stringify(result.content)).toContain("requires the dry-run/backup step (ADR-067 Task 4.5)");
+    expect(JSON.stringify(result.content)).toContain("Merge cancelled");
     const config = readConfig();
     expect(config.graphs["new-copy"]).toBeUndefined(); // no registration performed
     expect(config.graphs["existing"].status).toBe("active"); // untouched -- no merge/archive attempted
     expect(config.graphs["existing"].mergedInto).toBeUndefined();
+  });
+
+  it("interactive mode with ask()='reattach' then 'confirm' on the merge preview merges the new registration into the existing entry, with a backup (ADR-067 Task 4.5)", async () => {
+    const { writeConfig, mintGraphId, writeGraphIdMarker, readConfig, CONFIG_PATH } = require("../src/utils.js") as typeof import("../src/utils.js");
+    const id = mintGraphId();
+    writeGraphIdMarker(existingKg, id);
+    fs.writeFileSync(path.join(existingKg, "only-in-existing.md"), "existing content");
+    writeConfig({
+      version: "1.0.0",
+      graphs: { existing: { name: "existing", path: existingKg, type: "project-local", categories: [], createdAt: "x", status: "active", statusChangedAt: "x", graphId: id } },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    });
+    writeGraphIdMarker(newKg, id);
+    fs.writeFileSync(path.join(newKg, "only-in-new.md"), "new content");
+
+    const interactionModule = require("../src/interaction.js") as typeof import("../src/interaction.js");
+    jest.spyOn(interactionModule, "resolveInteractionMode").mockReturnValue({ mode: "interactive" });
+    jest.spyOn(interactionModule, "gate").mockImplementation(async (opts) =>
+      opts.reason === "merge_preview" ? { answer: "confirm" } : { answer: "reattach" }
+    );
+
+    const { handleConfigInit } = require("../src/tools/config.js") as typeof import("../src/tools/config.js");
+    const result = await handleConfigInit({ name: "new-copy", kgPath: newKg, type: "project-local", categories: [], interaction: "interactive" });
+
+    expect(result.isError).toBeFalsy();
+    expect(JSON.stringify(result.content)).toContain("Reattached");
+    const config = readConfig();
+    expect(config.graphs["new-copy"].status).toBe("archived");
+    expect(config.graphs["new-copy"].mergedInto).toBe("existing");
+    expect(config.graphs["existing"].status).toBe("active"); // survivor untouched
+    expect(fs.existsSync(path.join(path.dirname(CONFIG_PATH), "backups"))).toBe(true);
   });
 
   it("interactive mode with ask()='fork' remints the marker (not writeGraphIdMarker) and registers a new distinct graphId", async () => {

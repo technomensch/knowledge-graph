@@ -14,8 +14,11 @@ import {
   findRegistryEntryByGraphId,
   isMarkerTracked,
   remintGraphIdMarker,
+  changeGraphStatus,
+  CONFIG_PATH,
   KgConfig,
   GraphConfig,
+  GraphStatus,
   CategoryConfig,
 } from "../utils.js";
 import { hashDirectory, compareFileSets } from "../graph-compare.js";
@@ -66,6 +69,78 @@ function markerTrackingWarning(contentDir: string): string {
   return isMarkerTracked(contentDir) === false
     ? `\nWarning: .kmgraph-id is gitignored at ${contentDir} -- duplicate/fork detection is silently disabled for this KG until it's tracked.`
     : "";
+}
+
+// ── Dry-run + backup for the "reattach" merge path (Task 4.5, spec §9) ───────
+
+export interface MergePreview {
+  losingName: string;
+  survivorName: string;
+  losingPath: string;
+  survivorPath: string;
+  losingStatus: GraphStatus;
+  willArchive: true;
+  willSetMergedInto: string;
+}
+
+export function buildMergePreview(
+  config: KgConfig,
+  losingName: string,
+  survivorName: string
+): MergePreview {
+  const losing = config.graphs[losingName];
+  const survivor = config.graphs[survivorName];
+  if (!losing || !survivor) {
+    throw new Error(`buildMergePreview: unknown graph name(s) '${losingName}'/'${survivorName}'`);
+  }
+  return {
+    losingName,
+    survivorName,
+    losingPath: losing.path,
+    survivorPath: survivor.path,
+    losingStatus: losing.status,
+    willArchive: true,
+    willSetMergedInto: survivorName,
+  };
+}
+
+function backupConfigFromDisk(): string {
+  // Read CONFIG_PATH's actual on-disk bytes — not a re-serialization of
+  // whatever in-memory `config` object the caller passed in, which can
+  // diverge from disk (stale read, concurrent writer, test-constructed
+  // object). The backup's job is "what was really there," which only the
+  // file itself can answer (findings doc #10).
+  const backupDir = path.join(path.dirname(CONFIG_PATH), "backups");
+  fs.mkdirSync(backupDir, { recursive: true });
+  const backupPath = path.join(backupDir, `kg-config-${new Date().toISOString().replace(/[:.]/g, "-")}.json`);
+  const onDiskBytes = fs.existsSync(CONFIG_PATH)
+    ? fs.readFileSync(CONFIG_PATH)
+    : Buffer.from("{}", "utf-8"); // no prior config on disk yet — back up an empty placeholder rather than throw
+  fs.writeFileSync(backupPath, onDiskBytes);
+  return backupPath;
+}
+
+export function performRegistryMerge(
+  config: KgConfig,
+  losingName: string,
+  survivorName: string,
+  opts: { skipReview?: boolean }
+): { config: KgConfig; backupPath: string; preview?: MergePreview } {
+  // Safety (backup) is unconditional — bypassing review must never bypass this.
+  const backupPath = backupConfigFromDisk();
+
+  if (!opts.skipReview) {
+    // Friction (the review step) is the only thing `skipReview` may skip.
+    // Without it, return a preview and do NOT apply the merge yet — the
+    // caller (Task 4.4's "reattach" branch, via gate()) shows this to the
+    // user and re-calls with skipReview: true only on explicit approval.
+    return { config, backupPath, preview: buildMergePreview(config, losingName, survivorName) };
+  }
+
+  const updated = changeGraphStatus(config, losingName, "archived");
+  updated.graphs[losingName].mergedInto = survivorName;
+
+  return { config: updated, backupPath };
 }
 
 // ── Broad-ancestor / $HOME / root registration guard (findings doc #21) ──────
@@ -141,6 +216,12 @@ export interface HandleConfigInitParams {
   type: "project-local" | "personal" | "custom";
   categories: Array<{ name: string; prefix: string | null; git: "commit" | "ignore" }>;
   interaction?: "interactive" | "automated";
+  // Real answer to the "merge_preview" gate below, not a blind bypass
+  // boolean (spec §12's "reject bare confirm: true" pattern): the only
+  // choice it stands in for is proceed-or-not on an already-identified
+  // losing/survivor pair, once the four-answer prompt already picked
+  // "reattach". Consumed only inside that specific gate.
+  confirmMerge?: boolean;
 }
 
 export interface HandleConfigInitResult {
@@ -149,7 +230,7 @@ export interface HandleConfigInitResult {
   isError?: true;
 }
 
-export async function handleConfigInit({ name, kgPath, type, categories, interaction }: HandleConfigInitParams): Promise<HandleConfigInitResult> {
+export async function handleConfigInit({ name, kgPath, type, categories, interaction, confirmMerge }: HandleConfigInitParams): Promise<HandleConfigInitResult> {
   const config = readConfig();
 
   // Validate name doesn't exist
@@ -262,16 +343,62 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
       const answer = gated.answer as DuplicateGraphIdAnswer;
       switch (answer) {
         case "reattach": {
-          // Registry-pointer-only merge (spec §9) requires Task 4.5's
-          // dry-run/backup step first -- not built yet. Refuse rather than
-          // archive the losing entry without a backup (do not implement a
-          // bypass-without-backup).
+          // Registry-pointer-only merge (spec §9, Task 4.5): the attempted
+          // new registration never becomes a standalone active entry -- it's
+          // created as a pending placeholder, then immediately merged into
+          // the existing entry (archived, mergedInto set), with a mandatory
+          // pre-merge backup and an explicit approval gate in between.
+          const now = new Date().toISOString();
+          config.graphs[name] = {
+            name,
+            path: kgPath,
+            type,
+            categories: categories as CategoryConfig[],
+            createdAt: now,
+            status: "pending",
+            statusChangedAt: now,
+            graphId: preExistingMarkerId,
+            duplicateOf: existingEntry.name,
+          };
+
+          const { preview, backupPath: previewBackupPath } = performRegistryMerge(config, name, existingEntry.name, {});
+
+          if (!confirmMerge) {
+            const mode = resolveInteractionMode({ explicitParam: interaction }).mode;
+            const gated = await gate({
+              mode,
+              reason: "merge_preview",
+              param: "confirmMerge",
+              accepts: ["confirm", "cancel"],
+              ask: () => new Promise<never>(() => {}), // no real ask() transport yet, same pattern as every other gate() stub in this plan
+            });
+
+            if ("error" in gated) {
+              return { content: [{ type: "text" as const, text: JSON.stringify({ ...gated, preview }) }], isError: true };
+            }
+            if (!("answer" in gated) || gated.answer !== "confirm") {
+              // No write happened -- config.graphs[name] above only mutated
+              // the in-memory `config` object, never persisted. The backup
+              // taken by the preview-only performRegistryMerge call is
+              // harmless: it captured pre-merge disk state that a cancel
+              // leaves unchanged anyway.
+              return {
+                content: [{
+                  type: "text" as const,
+                  text: `Merge cancelled: '${name}' was not reattached to '${existingEntry.name}'.`,
+                }],
+                isError: true,
+              };
+            }
+          }
+
+          const applied = performRegistryMerge(config, name, existingEntry.name, { skipReview: true });
+          writeConfig(applied.config);
           return {
             content: [{
               type: "text" as const,
-              text: `Error: 'reattach' requires the dry-run/backup step (ADR-067 Task 4.5), which isn't built yet -- choose 'worktree' or 'fork' for now, or resolve the duplicate manually.`,
+              text: `Reattached: '${name}' merged into '${existingEntry.name}' (backup at ${previewBackupPath}; final backup at ${applied.backupPath}).`,
             }],
-            isError: true,
           };
         }
         case "worktree": {
@@ -499,6 +626,10 @@ export function registerConfigTools(server: McpServer): void {
         .enum(["interactive", "automated"])
         .optional()
         .describe("Override interaction mode for gated prompts (e.g. duplicate graphId detection)"),
+      confirmMerge: z
+        .boolean()
+        .optional()
+        .describe("Explicit approval to apply a pending 'reattach' registry merge after reviewing its preview"),
     },
     async (params) => handleConfigInit(params)
   );
