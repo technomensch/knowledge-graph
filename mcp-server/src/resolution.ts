@@ -99,6 +99,13 @@ function archivedOrMerged(name: string, graph: GraphConfig): ResolutionResult {
   return { kind: "archived", name, graph };
 }
 
+export function findTruePathTies(config: KgConfig, resolvedPath: string): string[] {
+  const target = expand(resolvedPath);
+  return Object.entries(config.graphs)
+    .filter(([, g]) => expand(g.path) === target)
+    .map(([name]) => name);
+}
+
 export function resolveGraph(config: KgConfig, cwd: string, name?: string): ResolutionResult {
   if (name) {
     const exact = config.graphs[name];
