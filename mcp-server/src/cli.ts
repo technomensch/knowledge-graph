@@ -8,6 +8,8 @@ import {
   readConfig,
   writeConfig,
   getPluginRoot,
+  mintGraphId,
+  writeGraphIdMarker,
   GraphConfig,
   CategoryConfig,
 } from "./utils.js";
@@ -213,23 +215,22 @@ async function runInit(): Promise<void> {
 
     // 7. Write config
     const now = new Date().toISOString();
+    const newGraphId = mintGraphId();
+    writeGraphIdMarker(expandedPath, newGraphId);
     const graphConfig: GraphConfig = {
       name,
       path: kgPath,
       type: kgType,
       categories,
       createdAt: now,
-      lastUsed: now,
-      // Placeholder only (Task 1.1 Step 5) -- real mint-and-marker-write
-      // logic lands in Task 1.11 Step 3, once mintGraphId/writeGraphIdMarker
-      // (Task 1.2) exist.
       status: "pending",
       statusChangedAt: now,
-      graphId: "placeholder-graph-id",
+      graphId: newGraphId,
+      // lastUsed removed -- optional on the type since Task 1.1, no writer needed
     };
 
     config.graphs[name] = graphConfig;
-    config.active = name;
+    // config.active = name; removed -- resolution is now context-derived (Task 1.5)
     writeConfig(config);
 
     // 8. Print summary
