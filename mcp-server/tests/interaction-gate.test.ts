@@ -32,10 +32,28 @@ describe("gate()", () => {
     jest.useFakeTimers();
     try {
       const p = gate({ mode: "interactive", reason: "fuzzy_match", param: "name", ask: async () => "answered", timeoutMs: 30_000 });
-      await Promise.resolve(); // let the ask() microtask settle
+      // Flush enough microtask ticks for the answered promise chain (including
+      // the Promise.resolve().then(ask).then(...) hops in gate()) to fully settle.
+      for (let i = 0; i < 5; i++) await Promise.resolve();
       jest.runOnlyPendingTimers(); // if the timeout wasn't cleared, this would resolve it too — race already settled, so it's a no-op either way
       const result = await p;
       expect(result).toEqual({ answer: "answered" });
+      expect(jest.getTimerCount()).toBe(0); // the timeout was cleared, not left pending
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("does not leak a timer handle when ask() throws synchronously", async () => {
+    jest.useFakeTimers();
+    try {
+      const ask = () => { throw new Error("sync boom"); };
+      const p = gate({ mode: "interactive", reason: "fuzzy_match", param: "name", ask, timeoutMs: 30_000 });
+      p.catch(() => {}); // prevent unhandled rejection warning while we flush microtasks below
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+      await expect(p).rejects.toThrow("sync boom");
       expect(jest.getTimerCount()).toBe(0); // the timeout was cleared, not left pending
     } finally {
       jest.useRealTimers();

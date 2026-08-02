@@ -107,7 +107,12 @@ export async function gate(opts: GateOptions): Promise<{ answer: string } | Inpu
       resolve(requireInput(`${opts.reason}_timeout`, opts.param, opts.accepts));
     }, timeoutMs);
   });
-  const answered = opts.ask(controller.signal).then((answer) => ({ answer }));
+  // Normalize a synchronous throw from ask() into a rejected promise so it
+  // still participates in the try/finally below instead of escaping gate()
+  // before the timer can be cleared.
+  const answered = Promise.resolve()
+    .then(() => opts.ask(controller.signal))
+    .then((answer) => ({ answer }));
 
   try {
     return await Promise.race([answered, timeout]);
