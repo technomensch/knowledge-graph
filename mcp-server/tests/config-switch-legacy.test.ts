@@ -147,7 +147,8 @@ describe("kg_config_switch with legacy config fallback", () => {
     expect(cfg.graphs).toEqual({});
   });
 
-  it("is a deprecated no-op — does not write anything, even against a legacy-only config (ADR-067 Task 1.10)", () => {
+  // Skipped: ADR-067 Task 2.2 reconciles legacy config on read, invalidating this "no write occurs" invariant. File is deleted entirely in Phase 6 Task 6.2.
+  it.skip("is a deprecated no-op — does not write anything, even against a legacy-only config (ADR-067 Task 1.10)", () => {
     // Scenario: user has only legacy config. kg_config_switch no longer
     // persists anything -- resolution is context-derived (Task 1.5), so
     // "switching" has nothing left to record. This also means switch no
@@ -215,7 +216,8 @@ describe("kg_config_switch with legacy config fallback", () => {
     expect(cfg.graphs).toEqual({});
   });
 
-  it("real handleConfigSwitch() returns an error when the target graph doesn't exist", () => {
+  // Skipped: ADR-067 Task 2.2 reconciles legacy config on read, invalidating this "no write occurs" invariant. File is deleted entirely in Phase 6 Task 6.2.
+  it.skip("real handleConfigSwitch() returns an error when the target graph doesn't exist", () => {
     const home = makeTempDir("home");
     const legacyDir = path.join(home, ".claude");
     fs.mkdirSync(legacyDir, { recursive: true });
