@@ -27,4 +27,36 @@ describe("kg_compare_graphs tool registration", () => {
 
     fs.rmSync(validDir, { recursive: true, force: true });
   });
+
+  it("lists example filenames most-recently-modified first with a (N more) suffix when truncated", async () => {
+    const server = new McpServer({ name: "test", version: "0.0.0" });
+    let handler: any;
+    jest.spyOn(server, "tool").mockImplementation((...args: any[]) => { handler = args[3]; return server as any; });
+    registerCompareTools(server);
+
+    const dirA = fs.mkdtempSync(path.join(os.tmpdir(), "cmp-a-"));
+    const dirB = fs.mkdtempSync(path.join(os.tmpdir(), "cmp-b-"));
+
+    // 6 files unique to A only, with distinct mtimes assigned in reverse
+    // creation order so the newest file is NOT the last one created.
+    const names = ["f1.md", "f2.md", "f3.md", "f4.md", "f5.md", "f6.md"];
+    const baseTime = Date.now() / 1000;
+    names.forEach((name, i) => {
+      fs.writeFileSync(path.join(dirA, name), `content-${name}`);
+      // f1 gets the newest mtime, f6 the oldest.
+      const mtime = baseTime - i;
+      fs.utimesSync(path.join(dirA, name), mtime, mtime);
+    });
+
+    const result = await handler({ a: dirA, b: dirB });
+    const text = result.content[0].text as string;
+    const line = text.split("\n").find((l) => l.startsWith("Only in A (examples):"));
+    expect(line).toBeDefined();
+    expect(line).toContain("f1.md, f2.md, f3.md, f4.md, f5.md");
+    expect(line).not.toContain("f6.md");
+    expect(line).toContain("(1 more)");
+
+    fs.rmSync(dirA, { recursive: true, force: true });
+    fs.rmSync(dirB, { recursive: true, force: true });
+  });
 });

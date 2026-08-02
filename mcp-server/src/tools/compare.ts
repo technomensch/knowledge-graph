@@ -106,7 +106,14 @@ export function buildCompareSummary(dirA: string, dirB: string): CompareSummary 
 
 function topExamples(comparisons: ReturnType<typeof compareFileSets>, category: string, dirPath: string, limit = 5): string {
   const matches = comparisons.filter((c) => c.category === category);
-  const names = matches.slice(0, limit).map((c) => c.relPathA ?? c.relPathB);
+  const sorted = [...matches].sort((x, y) => {
+    const relX = x.relPathA ?? x.relPathB!;
+    const relY = y.relPathA ?? y.relPathB!;
+    const mtimeX = fs.statSync(path.join(dirPath, relX)).mtimeMs;
+    const mtimeY = fs.statSync(path.join(dirPath, relY)).mtimeMs;
+    return mtimeY - mtimeX;
+  });
+  const names = sorted.slice(0, limit).map((c) => c.relPathA ?? c.relPathB);
   const suffix = matches.length > limit ? ` (${matches.length - limit} more)` : "";
   return names.join(", ") + suffix;
 }
@@ -127,15 +134,28 @@ export function registerCompareTools(server: McpServer): void {
         return { content: [{ type: "text" as const, text: `Error: path B does not exist: ${b}` }], isError: true };
       }
       const summary = buildCompareSummary(a, b);
+      const entriesA = hashDirectory(a);
+      const entriesB = hashDirectory(b);
+      const comparisons = compareFileSets(entriesA, entriesB);
+
       const lines = [
         summary.verdict,
         `Files: A=${summary.fileCountA}, B=${summary.fileCountB}`,
         `Last activity: A=${summary.recencyA.filesTouchedLast30Days} files/30d (${summary.recencyA.source}), B=${summary.recencyB.filesTouchedLast30Days} files/30d (${summary.recencyB.source})`,
         `Changed in both: ${summary.changedInBoth}`,
-        `Only in A: ${summary.onlyInATracked} tracked, ${summary.onlyInAUntracked} untracked (unrecoverable if archived)`,
-        `Only in B: ${summary.onlyInBTracked} tracked, ${summary.onlyInBUntracked} untracked (unrecoverable if archived)`,
-        `Worktree fingerprint: ${summary.worktreeFingerprint ? "yes" : "no"}`,
       ];
+      if (summary.changedInBoth > 0) {
+        lines.push(`Changed in both (examples): ${topExamples(comparisons, "diverged", a)}`);
+      }
+      lines.push(`Only in A: ${summary.onlyInATracked} tracked, ${summary.onlyInAUntracked} untracked (unrecoverable if archived)`);
+      if (summary.onlyInATracked + summary.onlyInAUntracked > 0) {
+        lines.push(`Only in A (examples): ${topExamples(comparisons, "unique-a", a)}`);
+      }
+      lines.push(`Only in B: ${summary.onlyInBTracked} tracked, ${summary.onlyInBUntracked} untracked (unrecoverable if archived)`);
+      if (summary.onlyInBTracked + summary.onlyInBUntracked > 0) {
+        lines.push(`Only in B (examples): ${topExamples(comparisons, "unique-b", b)}`);
+      }
+      lines.push(`Worktree fingerprint: ${summary.worktreeFingerprint ? "yes" : "no"}`);
       return { content: [{ type: "text" as const, text: lines.join("\n") }] };
     }
   );
