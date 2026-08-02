@@ -56,11 +56,19 @@ const DEFAULT_CONFIG: KgConfig = {
   },
 };
 
+function parseConfigOrThrow(raw: string, filePath: string): KgConfig {
+  try {
+    return JSON.parse(raw) as KgConfig;
+  } catch (err) {
+    throw new Error(`Failed to parse KG config at ${filePath}: ${(err as Error).message}`);
+  }
+}
+
 export function readConfig(): KgConfig {
   // Primary: the platform-neutral location (or KG_CONFIG_PATH override).
   if (fs.existsSync(CONFIG_PATH)) {
     const raw = fs.readFileSync(CONFIG_PATH, "utf-8");
-    return JSON.parse(raw) as KgConfig;
+    return parseConfigOrThrow(raw, CONFIG_PATH);
   }
   // Legacy fallback: pre-v0.6 installs kept kg-config.json under ~/.claude/.
   // Without this, users who never migrated get DEFAULT_CONFIG and the
@@ -81,7 +89,7 @@ export function readConfig(): KgConfig {
   const legacyPath = path.join(process.env.HOME || os.homedir(), ".claude", "kg-config.json");
   if (fs.existsSync(legacyPath)) {
     const raw = fs.readFileSync(legacyPath, "utf-8");
-    const legacyConfig = JSON.parse(raw) as KgConfig;
+    const legacyConfig = parseConfigOrThrow(raw, legacyPath);
     // findings doc #5: write it forward once, so every subsequent read/write
     // in this and any other process agrees on a single file — the
     // precondition spec §6 requires before Task 2.3's merge-on-conflict
@@ -154,6 +162,112 @@ export function writeConfig(config: KgConfig): void {
     // itself already succeeded above; this is a best-effort durability
     // improvement, not a correctness requirement.
   }
+}
+
+export function updateConfig<T>(
+  mutator: (config: KgConfig) => T,
+  opts: { intentful?: boolean } = {}
+): T {
+  const intentful = opts.intentful ?? true;
+  const maxAttempts = intentful ? 3 : 2;
+
+  // Fixed merge-base for the whole call (like a git merge-base), not re-read
+  // per attempt: re-reading it fresh each attempt would let a concurrent
+  // writer that keeps reasserting the same value "launder" itself into the
+  // baseline on the next attempt, hiding an unresolved conflict instead of
+  // surfacing it after retries are exhausted.
+  const beforeSnapshot = JSON.parse(JSON.stringify(readConfig())) as KgConfig;
+
+  let lastResult: T | undefined;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const working = JSON.parse(JSON.stringify(readConfig())) as KgConfig;
+    lastResult = mutator(working);
+
+    const afterOnDisk = readConfig();
+    const merged = mergeGraphs(beforeSnapshot, afterOnDisk, working);
+
+    if (merged.conflict && attempt < maxAttempts - 1) {
+      if (intentful) {
+        const jitter = Math.floor(Math.random() * 5);
+        const until = Date.now() + jitter;
+        while (Date.now() < until) { /* microsecond window */ }
+        continue;
+      } else {
+        return lastResult as T; // best-effort: skip silently
+      }
+    }
+    if (merged.conflict && attempt === maxAttempts - 1) {
+      if (intentful) {
+        throw new Error(
+          `updateConfig: could not merge changes after ${maxAttempts} attempts — a concurrent writer keeps touching the same registry key(s). Retry the operation.`
+        );
+      }
+      return lastResult as T; // best-effort: skip silently, don't fail the caller's real operation
+    }
+
+    writeConfig(merged.config);
+    return lastResult as T;
+  }
+  return lastResult as T;
+}
+
+function mergeGraphs(
+  before: KgConfig,
+  afterOnDisk: KgConfig,
+  working: KgConfig
+): { config: KgConfig; conflict: boolean } {
+  const result: KgConfig = JSON.parse(JSON.stringify(afterOnDisk));
+  let conflict = false;
+
+  // Tier 1: `.graphs[name]` entries.
+  const touchedByMutator = new Set(
+    Object.keys(working.graphs).filter(
+      (name) => JSON.stringify(working.graphs[name]) !== JSON.stringify(before.graphs[name])
+    )
+  );
+  const removedByMutator = Object.keys(before.graphs).filter((name) => !(name in working.graphs));
+
+  for (const name of touchedByMutator) {
+    const changedOnDiskToo =
+      JSON.stringify(before.graphs[name]) !== JSON.stringify(afterOnDisk.graphs[name]);
+    // Also require the current disk value to still disagree with what we're
+    // about to write: with a fixed merge-base, a brand-new key that simply
+    // hasn't been persisted yet would otherwise look "changed since base"
+    // forever (base never had it) and falsely conflict on every attempt.
+    const stillDisagreesWithDisk =
+      JSON.stringify(afterOnDisk.graphs[name]) !== JSON.stringify(working.graphs[name]);
+    if (changedOnDiskToo && stillDisagreesWithDisk) {
+      conflict = true; // same key touched by both sides — genuinely contested
+    }
+    result.graphs[name] = working.graphs[name];
+  }
+  for (const name of removedByMutator) {
+    delete result.graphs[name];
+  }
+
+  // Tier 2: every other top-level registry key (`version`, `sanitization`,
+  // and any future top-level field) — spec §6 says "merge only the specific
+  // registry keys that changed," not "only `.graphs` keys." A `version` bump
+  // or `sanitization` edit landing concurrently with an unrelated `graphs`
+  // write must survive the same way a disjoint `graphs` write does.
+  const topLevelKeys = new Set([
+    ...Object.keys(before),
+    ...Object.keys(afterOnDisk),
+    ...Object.keys(working),
+  ]) as Set<keyof KgConfig>;
+  topLevelKeys.delete("graphs" as keyof KgConfig);
+
+  for (const key of topLevelKeys) {
+    const mutatorTouched = JSON.stringify(working[key]) !== JSON.stringify(before[key]);
+    if (!mutatorTouched) continue; // mutator didn't change it — disk value (already in `result`) wins
+    const diskChangedToo = JSON.stringify(before[key]) !== JSON.stringify(afterOnDisk[key]);
+    if (diskChangedToo && JSON.stringify(afterOnDisk[key]) !== JSON.stringify(working[key])) {
+      conflict = true; // both sides changed this key to different values — genuinely contested
+    }
+    (result as any)[key] = working[key];
+  }
+
+  return { config: result, conflict };
 }
 
 function renameWithRetry(tmpPath: string, targetPath: string, attempts = 5): void {
