@@ -1,6 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
 import { execFileSync } from "child_process";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
 import { hashDirectory, compareFileSets } from "../graph-compare.js";
 
 export interface RecencySignal {
@@ -100,4 +102,41 @@ export function buildCompareSummary(dirA: string, dirB: string): CompareSummary 
     worktreeFingerprint,
     verdict,
   };
+}
+
+function topExamples(comparisons: ReturnType<typeof compareFileSets>, category: string, dirPath: string, limit = 5): string {
+  const matches = comparisons.filter((c) => c.category === category);
+  const names = matches.slice(0, limit).map((c) => c.relPathA ?? c.relPathB);
+  const suffix = matches.length > limit ? ` (${matches.length - limit} more)` : "";
+  return names.join(", ") + suffix;
+}
+
+export function registerCompareTools(server: McpServer): void {
+  server.tool(
+    "kg_compare_graphs",
+    "Compare two KG folders by content hash + relative path to distinguish duplicate/forked/worktree registrations from genuine divergence",
+    {
+      a: z.string().describe("Absolute path to the first KG content directory"),
+      b: z.string().describe("Absolute path to the second KG content directory"),
+    },
+    async ({ a, b }) => {
+      if (!fs.existsSync(a)) {
+        return { content: [{ type: "text" as const, text: `Error: path A does not exist: ${a}` }], isError: true };
+      }
+      if (!fs.existsSync(b)) {
+        return { content: [{ type: "text" as const, text: `Error: path B does not exist: ${b}` }], isError: true };
+      }
+      const summary = buildCompareSummary(a, b);
+      const lines = [
+        summary.verdict,
+        `Files: A=${summary.fileCountA}, B=${summary.fileCountB}`,
+        `Last activity: A=${summary.recencyA.filesTouchedLast30Days} files/30d (${summary.recencyA.source}), B=${summary.recencyB.filesTouchedLast30Days} files/30d (${summary.recencyB.source})`,
+        `Changed in both: ${summary.changedInBoth}`,
+        `Only in A: ${summary.onlyInATracked} tracked, ${summary.onlyInAUntracked} untracked (unrecoverable if archived)`,
+        `Only in B: ${summary.onlyInBTracked} tracked, ${summary.onlyInBUntracked} untracked (unrecoverable if archived)`,
+        `Worktree fingerprint: ${summary.worktreeFingerprint ? "yes" : "no"}`,
+      ];
+      return { content: [{ type: "text" as const, text: lines.join("\n") }] };
+    }
+  );
 }

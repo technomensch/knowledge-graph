@@ -9,6 +9,7 @@ import { registerFts5Tool, registerFts5StatusTool } from "./tools/fts5.js";
 import { registerCaptureTool } from "./tools/capture.js";
 import { registerUpgradeTool } from "./tools/upgrade.js";
 import { registerVersionTool } from "./tools/version.js";
+import { registerCompareTools } from "./tools/compare.js";
 
 declare const __SERVER_VERSION__: string;
 
@@ -17,7 +18,7 @@ const server = new McpServer({
   version: typeof __SERVER_VERSION__ !== "undefined" ? __SERVER_VERSION__ : "0.0.0",
 });
 
-// Register tools (11 core tools)
+// Register tools (12 core tools)
 registerConfigTools(server);    // kg_config_init, kg_config_list, kg_config_switch, kg_config_add_category
 registerSearchTool(server);     // kg_search
 registerScaffoldTool(server);   // kg_scaffold
@@ -27,6 +28,7 @@ registerFts5StatusTool(server); // kg_fts5_status
 registerCaptureTool(server);    // kg_capture
 registerUpgradeTool(server);    // kg_upgrade
 registerVersionTool(server);    // kg_version
+registerCompareTools(server);   // kg_compare_graphs
 
 // Register resources (2 resources)
 registerConfigResource(server);    // kg://config
