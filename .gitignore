@@ -95,3 +95,6 @@ handoff-packages/
 
 # Mintlify preview (local only)
 mintlify-preview/
+
+# Git worktrees (local only)
+.worktrees/
