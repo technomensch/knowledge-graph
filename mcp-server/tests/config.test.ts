@@ -168,4 +168,43 @@ describe("handleConfigInit", () => {
     expect(result.content[0].text).toMatch(/already tracked as a different knowledge graph/);
     expect(writeConfig).not.toHaveBeenCalled();
   });
+
+  it("automated mode returns KMG_INPUT_REQUIRED with the broad-ancestor detail when registering an ancestor of an already-registered graph", async () => {
+    const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), "config-test-broad-ancestor-"));
+    tempDirs.push(wrapper);
+    const existingPath = path.join(wrapper, "existing-proj", "knowledge");
+    fs.mkdirSync(existingPath, { recursive: true });
+    const candidatePath = path.join(wrapper, "existing-proj");
+    const now = new Date().toISOString();
+    (readConfig as jest.Mock).mockReturnValue({
+      version: "1.0.0",
+      graphs: {
+        existing: {
+          name: "existing",
+          path: existingPath,
+          type: "project-local",
+          categories: [],
+          createdAt: now,
+          status: "active",
+          statusChangedAt: now,
+          graphId: "existing-id",
+        },
+      },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    });
+
+    const result = await handleConfigInit({
+      name: "broad-candidate",
+      kgPath: candidatePath,
+      type: "project-local",
+      categories: [],
+      interaction: "automated",
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("KMG_INPUT_REQUIRED");
+    const parsed = JSON.parse(result.content[0].text as string);
+    expect(parsed.detail).toMatchObject({ isAncestorOfCount: 1, ancestorOfNames: ["existing"] });
+    expect(writeConfig).not.toHaveBeenCalled();
+  });
 });

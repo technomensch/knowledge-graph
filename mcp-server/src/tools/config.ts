@@ -273,6 +273,7 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
         reason: "broad_ancestor_registration",
         param: "confirmBroadRegistration",
         accepts: ["yes", "no"],
+        detail: broadWarning,
         ask: () => new Promise<never>(() => {}), // no real ask() transport yet, same pattern as every other gate() stub in this plan
       });
       if ("error" in gated) {
@@ -343,6 +344,13 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
         reason: "duplicate_graph_id",
         param: "canonicalPath",
         accepts: orderedAnswers,
+        detail: {
+          existingName: existingEntry.name,
+          existingContentDir,
+          newPath: expandedPath,
+          sameOrigin: existingOrigin !== undefined && existingOrigin === newOrigin,
+          suggestedAnswer: suggestion,
+        },
         ask: () => new Promise<never>(() => {}), // no real ask() transport yet, same pattern as every other gate() stub in this plan
       });
 

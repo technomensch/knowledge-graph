@@ -39,6 +39,9 @@ describe("kg_config_init duplicate graphId detection", () => {
     expect(result.isError).toBe(true);
     expect(JSON.stringify(result.content)).toContain("KMG_INPUT_REQUIRED");
     expect(JSON.stringify(result.content)).toContain("canonicalPath");
+    const parsed = JSON.parse(result.content[0].text as string);
+    expect(parsed.detail).toMatchObject({ existingName: "existing", existingContentDir: existingKg, newPath: newKg });
+    expect(parsed.detail.suggestedAnswer).toBeDefined();
   });
 
   it("interactive mode with ask()='worktree' sets duplicateOf and performs no merge/archive", async () => {
