@@ -81,7 +81,7 @@ function resolveWorktreeMainRepoRoot(cwd: string): string | null {
   }
 }
 
-function isAncestorOrEqual(ancestor: string, descendant: string): boolean {
+export function isAncestorOrEqual(ancestor: string, descendant: string): boolean {
   const rel = path.relative(ancestor, descendant);
   return rel === "" || (!rel.startsWith("..") && !path.isAbsolute(rel));
 }

@@ -14,7 +14,30 @@ import {
   GraphConfig,
   CategoryConfig,
 } from "../utils.js";
-import { resolveGraph, resolvePersonalGraph } from "../resolution.js";
+import { resolveGraph, resolvePersonalGraph, isHomeOrRootCwd, isAncestorOrEqual } from "../resolution.js";
+import { resolveInteractionMode, gate } from "../interaction.js";
+
+// ── Broad-ancestor / $HOME / root registration guard (findings doc #21) ──────
+
+export function isHardBlockedRegistrationPath(kgPath: string): boolean {
+  return isHomeOrRootCwd(kgPath.replace(/^~/, os.homedir()));
+}
+
+export function findBroadAncestorWarning(
+  config: KgConfig,
+  kgPath: string
+): { isAncestorOfCount: number; ancestorOfNames: string[] } | null {
+  const candidate = kgPath.replace(/^~/, os.homedir());
+  const ancestorOfNames = Object.entries(config.graphs)
+    .filter(([, g]) => g.type !== "personal" && g.status !== "deleted")
+    .filter(([, g]) => {
+      const existingPath = g.path.replace(/^~/, os.homedir());
+      return existingPath !== candidate && isAncestorOrEqual(candidate, existingPath);
+    })
+    .map(([name]) => name);
+  if (ancestorOfNames.length === 0) return null;
+  return { isAncestorOfCount: ancestorOfNames.length, ancestorOfNames };
+}
 
 // ── Exported handler for direct testing ──────────────────────────────────────
 
@@ -92,6 +115,40 @@ export async function handleConfigInit({ name, kgPath, type, categories }: Handl
 
   // Expand path
   const expandedPath = kgPath.replace(/^~/, os.homedir());
+
+  if (isHardBlockedRegistrationPath(expandedPath)) {
+    return {
+      content: [{
+        type: "text" as const,
+        text: `Error: refusing to register a knowledge graph at ${expandedPath} — this is your home directory or the filesystem root. Registering a KG this broad would make it resolve as "the KG for" nearly every directory on this machine. Choose a more specific project path.`,
+      }],
+      isError: true,
+    };
+  }
+
+  const broadWarning = findBroadAncestorWarning(config, expandedPath);
+  if (broadWarning) {
+    const mode = resolveInteractionMode({}).mode;
+    const gated = await gate({
+      mode,
+      reason: "broad_ancestor_registration",
+      param: "confirmBroadRegistration",
+      accepts: ["yes", "no"],
+      ask: () => new Promise<never>(() => {}), // no real ask() transport yet, same pattern as every other gate() stub in this plan
+    });
+    if ("error" in gated) {
+      return { content: [{ type: "text" as const, text: JSON.stringify(gated) }], isError: true };
+    }
+    if (!("answer" in gated) || gated.answer !== "yes") {
+      return {
+        content: [{
+          type: "text" as const,
+          text: `Registration cancelled: ${expandedPath} is an ancestor of ${broadWarning.isAncestorOfCount} already-registered graph(s) (${broadWarning.ancestorOfNames.join(", ")}). Confirm explicitly (confirmBroadRegistration: "yes") if this breadth is intentional.`,
+        }],
+        isError: true,
+      };
+    }
+  }
 
   // Create directory structure
   const dirs = [

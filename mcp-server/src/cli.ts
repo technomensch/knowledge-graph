@@ -14,6 +14,7 @@ import {
   GraphConfig,
   CategoryConfig,
 } from "./utils.js";
+import { isHardBlockedRegistrationPath, findBroadAncestorWarning } from "./tools/config.js";
 
 declare const __SERVER_VERSION__: string;
 const SERVER_VERSION =
@@ -134,6 +135,26 @@ async function runInit(): Promise<void> {
 
     // Expand path for file operations
     const expandedPath = kgPath.replace(/^~/, os.homedir());
+
+    if (isHardBlockedRegistrationPath(expandedPath)) {
+      console.error(
+        `Error: refusing to register a knowledge graph at ${expandedPath} — this is your home directory or the filesystem root. Registering a KG this broad would make it resolve as "the KG for" nearly every directory on this machine. Choose a more specific project path.`
+      );
+      process.exit(1);
+    }
+
+    const broadWarning = findBroadAncestorWarning(config, expandedPath);
+    if (broadWarning) {
+      console.log("");
+      console.log(
+        `  Warning: ${expandedPath} is an ancestor of ${broadWarning.isAncestorOfCount} already-registered graph(s) (${broadWarning.ancestorOfNames.join(", ")}).`
+      );
+      const confirm = await ask(rl, "  Continue anyway? [yes/no]: ");
+      if (confirm.trim().toLowerCase() !== "yes") {
+        console.log("  Registration cancelled.");
+        process.exit(1);
+      }
+    }
 
     console.log("");
     console.log("  Creating knowledge graph...");
