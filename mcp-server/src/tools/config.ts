@@ -3,6 +3,7 @@ import { z } from "zod";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
+import { execFileSync } from "child_process";
 import {
   readConfig,
   writeConfig,
@@ -10,12 +11,62 @@ import {
   mintGraphId,
   writeGraphIdMarker,
   readGraphIdMarker,
+  findRegistryEntryByGraphId,
+  isMarkerTracked,
+  remintGraphIdMarker,
   KgConfig,
   GraphConfig,
   CategoryConfig,
 } from "../utils.js";
+import { hashDirectory, compareFileSets } from "../graph-compare.js";
 import { resolveGraph, resolvePersonalGraph, isHomeOrRootCwd, isAncestorOrEqual } from "../resolution.js";
 import { resolveInteractionMode, gate } from "../interaction.js";
+
+// ── Four-answer duplicate-graphId prompt (Task 4.4, spec §9) ─────────────────
+
+export type DuplicateGraphIdAnswer = "reattach" | "worktree" | "fork" | "decline";
+
+export interface DuplicateGraphIdContext {
+  existingName: string;
+  existingPath: string;
+  newPath: string;
+  sameOrigin: boolean; // captured origin URL comparison, ordering signal only
+}
+
+// Suggests which of the 4 answers to lead with; never auto-picks -- the
+// caller still presents all 4 and waits for an explicit choice. Same git
+// remote origin on both sides is the strongest signal this is the same
+// project relocated (reattach); anything else defaults to the
+// non-identity-mutating option (worktree) rather than assuming a fork.
+export function classifyDuplicateSuggestion(ctx: DuplicateGraphIdContext): DuplicateGraphIdAnswer {
+  return ctx.sameOrigin ? "reattach" : "worktree";
+}
+
+// True iff the two content directories have any diverged or one-sided file
+// -- a pure re-point with nothing captured yet (identical or moved-only)
+// returns false.
+export function hasDivergentContent(existingContentDir: string, newContentDir: string): boolean {
+  const comparisons = compareFileSets(hashDirectory(existingContentDir), hashDirectory(newContentDir));
+  return comparisons.some((c) => c.category === "diverged" || c.category === "unique-a" || c.category === "unique-b");
+}
+
+function getGitOriginUrl(dir: string): string | undefined {
+  try {
+    return (
+      execFileSync("git", ["config", "--get", "remote.origin.url"], { cwd: dir, stdio: ["ignore", "pipe", "ignore"] })
+        .toString()
+        .trim() || undefined
+    );
+  } catch {
+    return undefined;
+  }
+}
+
+function markerTrackingWarning(contentDir: string): string {
+  return isMarkerTracked(contentDir) === false
+    ? `\nWarning: .kmgraph-id is gitignored at ${contentDir} -- duplicate/fork detection is silently disabled for this KG until it's tracked.`
+    : "";
+}
 
 // ── Broad-ancestor / $HOME / root registration guard (findings doc #21) ──────
 
@@ -89,6 +140,7 @@ export interface HandleConfigInitParams {
   kgPath: string;
   type: "project-local" | "personal" | "custom";
   categories: Array<{ name: string; prefix: string | null; git: "commit" | "ignore" }>;
+  interaction?: "interactive" | "automated";
 }
 
 export interface HandleConfigInitResult {
@@ -97,7 +149,7 @@ export interface HandleConfigInitResult {
   isError?: true;
 }
 
-export async function handleConfigInit({ name, kgPath, type, categories }: HandleConfigInitParams): Promise<HandleConfigInitResult> {
+export async function handleConfigInit({ name, kgPath, type, categories, interaction }: HandleConfigInitParams): Promise<HandleConfigInitResult> {
   const config = readConfig();
 
   // Validate name doesn't exist
@@ -147,6 +199,134 @@ export async function handleConfigInit({ name, kgPath, type, categories }: Handl
         }],
         isError: true,
       };
+    }
+  }
+
+  // ── Duplicate graphId detection (Task 4.4, spec §9, findings #6/#18/#20) ──
+  const preExistingMarkerId = readGraphIdMarker(expandedPath);
+  if (preExistingMarkerId) {
+    const existingEntry = findRegistryEntryByGraphId(config, preExistingMarkerId);
+    if (existingEntry) {
+      const existingContentDir = existingEntry.graph.path.replace(/^~/, os.homedir());
+      const divergent = hasDivergentContent(existingContentDir, expandedPath);
+
+      if (!divergent) {
+        // Dominant real-world case: a fresh clone of an already-registered
+        // repo with nothing captured in it yet. Silently re-point instead
+        // of asking (findings doc #20).
+        if (existingEntry.graph.path !== kgPath) {
+          existingEntry.graph.path = kgPath;
+          writeConfig(config);
+        }
+        return {
+          content: [{
+            type: "text" as const,
+            text: `'${existingEntry.name}' is already registered with this content (graphId ${preExistingMarkerId}); re-pointed to ${kgPath}.`,
+          }],
+        };
+      }
+
+      const existingOrigin = existingEntry.graph.originUrl ?? getGitOriginUrl(existingContentDir);
+      const newOrigin = getGitOriginUrl(expandedPath);
+      const suggestion = classifyDuplicateSuggestion({
+        existingName: existingEntry.name,
+        existingPath: existingContentDir,
+        newPath: expandedPath,
+        sameOrigin: existingOrigin !== undefined && existingOrigin === newOrigin,
+      });
+      const allAnswers: DuplicateGraphIdAnswer[] = ["reattach", "worktree", "fork", "decline"];
+      const orderedAnswers = [suggestion, ...allAnswers.filter((a) => a !== suggestion)];
+
+      const mode = resolveInteractionMode({ explicitParam: interaction }).mode;
+      const gated = await gate({
+        mode,
+        reason: "duplicate_graph_id",
+        param: "canonicalPath",
+        accepts: orderedAnswers,
+        ask: () => new Promise<never>(() => {}), // no real ask() transport yet, same pattern as every other gate() stub in this plan
+      });
+
+      if ("error" in gated) {
+        return { content: [{ type: "text" as const, text: JSON.stringify(gated) }], isError: true };
+      }
+      if ("declined" in gated || "cancelled" in gated) {
+        return {
+          content: [{
+            type: "text" as const,
+            text: `Registration cancelled: duplicate graphId at ${expandedPath} was not resolved.`,
+          }],
+          isError: true,
+        };
+      }
+
+      const answer = gated.answer as DuplicateGraphIdAnswer;
+      switch (answer) {
+        case "reattach": {
+          // Registry-pointer-only merge (spec §9) requires Task 4.5's
+          // dry-run/backup step first -- not built yet. Refuse rather than
+          // archive the losing entry without a backup (do not implement a
+          // bypass-without-backup).
+          return {
+            content: [{
+              type: "text" as const,
+              text: `Error: 'reattach' requires the dry-run/backup step (ADR-067 Task 4.5), which isn't built yet -- choose 'worktree' or 'fork' for now, or resolve the duplicate manually.`,
+            }],
+            isError: true,
+          };
+        }
+        case "worktree": {
+          const now = new Date().toISOString();
+          config.graphs[name] = {
+            name,
+            path: kgPath,
+            type,
+            categories: categories as CategoryConfig[],
+            createdAt: now,
+            status: "pending",
+            statusChangedAt: now,
+            graphId: preExistingMarkerId,
+            duplicateOf: existingEntry.name,
+          };
+          writeConfig(config);
+          return {
+            content: [{
+              type: "text" as const,
+              text: `Registered '${name}' at ${kgPath} as a worktree duplicate of '${existingEntry.name}' (shared graphId ${preExistingMarkerId}).`,
+            }],
+          };
+        }
+        case "fork": {
+          const forkedId = mintGraphId();
+          remintGraphIdMarker(expandedPath, forkedId);
+          const forkWarning = markerTrackingWarning(expandedPath);
+          const now = new Date().toISOString();
+          config.graphs[name] = {
+            name,
+            path: kgPath,
+            type,
+            categories: categories as CategoryConfig[],
+            createdAt: now,
+            status: "pending",
+            statusChangedAt: now,
+            graphId: forkedId,
+          };
+          writeConfig(config);
+          return {
+            content: [{
+              type: "text" as const,
+              text: `Forked '${name}' at ${kgPath} with a new graphId (${forkedId}); the working tree is now dirty (.kmgraph-id changed) -- commit this when you're ready.${forkWarning}`,
+            }],
+          };
+        }
+        case "decline":
+        default:
+          return {
+            content: [{
+              type: "text" as const,
+              text: `Not initialized as a duplicate resolution; you'll be asked again at the next kmg-init for ${kgPath}.`,
+            }],
+          };
+      }
     }
   }
 
@@ -262,6 +442,7 @@ export async function handleConfigInit({ name, kgPath, type, categories }: Handl
     };
   }
   writeGraphIdMarker(expandedPath, newGraphId);
+  const ordinaryMarkerWarning = markerTrackingWarning(expandedPath);
   const graphConfig: GraphConfig = {
     name,
     path: kgPath,
@@ -282,7 +463,7 @@ export async function handleConfigInit({ name, kgPath, type, categories }: Handl
     content: [
       {
         type: "text" as const,
-        text: `Knowledge graph '${name}' initialized at ${kgPath}\nReady to use — knowledge graphs are resolved automatically from your current directory. Categories: ${categories.map((c) => c.name).join(", ")}`,
+        text: `Knowledge graph '${name}' initialized at ${kgPath}\nReady to use — knowledge graphs are resolved automatically from your current directory. Categories: ${categories.map((c) => c.name).join(", ")}${ordinaryMarkerWarning}`,
       },
     ],
   };
@@ -314,6 +495,10 @@ export function registerConfigTools(server: McpServer): void {
           { name: "patterns", prefix: null, git: "commit" },
         ])
         .describe("Categories to create"),
+      interaction: z
+        .enum(["interactive", "automated"])
+        .optional()
+        .describe("Override interaction mode for gated prompts (e.g. duplicate graphId detection)"),
     },
     async (params) => handleConfigInit(params)
   );
