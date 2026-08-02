@@ -3,7 +3,7 @@ import { z } from "zod";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { readConfig, getActiveGraphPath, getAllGraphPaths, walkDir } from "../utils.js";
+import { readConfig, getAllGraphPaths, walkDir } from "../utils.js";
 import { resolveGraph } from "../resolution.js";
 import { searchFts5, resolveDbPath } from "./fts5.js";
 import type { SearchResult } from "./fts5.js";
@@ -158,24 +158,26 @@ export function registerSearchTool(server: McpServer): void {
           };
         }
       } else if (searchScope === "all") {
-        // Active KG first, then all others
-        const activePath = getActiveGraphPath(config);
-        if (!activePath) {
+        // Primary (cwd-resolved) KG first, then all others (ADR-067 Task 1.9
+        // -- replacing config.active-based sort-first logic; this branch does
+        // not yet gate on confirmation, that's Task 6.5, layered on top).
+        const primaryResolution = resolveGraph(config, process.cwd());
+        const primaryName = primaryResolution.kind === "resolved" ? primaryResolution.name : undefined;
+        const allKgs = getAllGraphPaths(config);
+        const primaryEntry = primaryName ? allKgs.find((k) => k.name === primaryName) : undefined;
+        const otherKgs = primaryName ? allKgs.filter((k) => k.name !== primaryName) : allKgs;
+        kgsToSearch = primaryEntry ? [primaryEntry, ...otherKgs] : otherKgs;
+        if (kgsToSearch.length === 0) {
           return {
             content: [
               {
                 type: "text" as const,
-                text: "Error: No active knowledge graph. Use kg_config_init or kg_config_switch first.",
+                text: "No knowledge graphs registered. Use kg_config_init first.",
               },
             ],
             isError: true,
           };
         }
-        const allKgs = getAllGraphPaths(config);
-        // Sort: active KG first, then others
-        const activeEntry = allKgs.find((k) => k.name === config.active);
-        const otherKgs = allKgs.filter((k) => k.name !== config.active);
-        kgsToSearch = activeEntry ? [activeEntry, ...otherKgs] : otherKgs;
       } else {
         // Default: cwd-resolved KG only (ADR-067 Task 1.8 -- resolution is
         // context-derived, replacing config.active). fuzzy-match/archived/
@@ -222,7 +224,7 @@ export function registerSearchTool(server: McpServer): void {
       const isMultiKg = kgsToSearch.length > 1;
       const scopeLabel = isMultiKg
         ? `${kgsToSearch.length} KGs`
-        : `active KG (${kgsToSearch[0]?.name ?? config.active})`;
+        : `KG (${kgsToSearch[0]?.name ?? "no active graph"})`;
 
       if (allResults.length === 0) {
         return {

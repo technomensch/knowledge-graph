@@ -226,6 +226,7 @@ export async function handleCapture(
 
   const config = readConfig();
   let kgPath: string | null;
+  let resolvedKgName: string;
   let skipCwdCheck = false;
 
   if (targetKg) {
@@ -249,6 +250,7 @@ export async function handleCapture(
       return { error: "KG_MISMATCH" };
     }
     kgPath = resolution.graph.path.replace(/^~/, require("os").homedir());
+    resolvedKgName = resolution.name;
     skipCwdCheck = true;
   } else {
     const resolution = resolveGraph(config, process.cwd());
@@ -259,6 +261,7 @@ export async function handleCapture(
       return { error: "KG_MISMATCH" };
     }
     kgPath = resolution.graph.path.replace(/^~/, require("os").homedir());
+    resolvedKgName = resolution.name;
   }
 
   // Update-in-place path
@@ -279,7 +282,7 @@ export async function handleCapture(
       );
       let indexResult: Record<string, unknown> = {};
       try {
-        const kgName = targetKg || config.active || path.basename(kgPath);
+        const kgName = resolvedKgName;
         const kgType = config.graphs[kgName]?.type ?? "project-local";
         indexResult = rebuildIndex(kgPath, kgName, kgType) as unknown as Record<string, unknown>;
       } catch { /* best-effort */ }
@@ -341,7 +344,7 @@ export async function handleCapture(
   // FTS5 rebuild (in-process, best-effort)
   let indexResult: Record<string, unknown> = {};
   try {
-    const kgName = targetKg || config.active || path.basename(kgPath);
+    const kgName = resolvedKgName;
     const kgType = config.graphs[kgName]?.type ?? "project-local";
     indexResult = rebuildIndex(kgPath, kgName, kgType) as unknown as Record<string, unknown>;
   } catch { /* absent if node-sqlite3-wasm not installed */ }

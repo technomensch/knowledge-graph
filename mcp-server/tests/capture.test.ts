@@ -11,7 +11,6 @@ jest.mock("../src/utils.js", () => {
   return {
     ...actual,
     readConfig: jest.fn(),
-    getActiveGraphPath: jest.fn(),
     getProjectRoot: (kgPath: string) => {
       if ((kgPath as string).endsWith("/docs")) {
         return path.dirname(kgPath as string);

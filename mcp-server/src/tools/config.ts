@@ -7,6 +7,8 @@ import {
   readConfig,
   writeConfig,
   getPluginRoot,
+  mintGraphId,
+  writeGraphIdMarker,
   KgConfig,
   GraphConfig,
   CategoryConfig,
@@ -59,35 +61,20 @@ export function handleConfigSwitch(
   };
 }
 
-export function registerConfigTools(server: McpServer): void {
-  // ── kg_config_init ──────────────────────────────────────────────
-  server.tool(
-    "kg_config_init",
-    "Create a new knowledge graph: directory structure + config entry",
-    {
-      name: z.string().min(1).describe("Unique name for this knowledge graph"),
-      kgPath: z.string().describe("Absolute path where KG should be created"),
-      type: z
-        .enum(["project-local", "personal", "custom"])
-        .default("project-local")
-        .describe("KG type"),
-      categories: z
-        .array(
-          z.object({
-            name: z.string(),
-            prefix: z.string().nullable().default(null),
-            git: z.enum(["commit", "ignore"]).default("commit"),
-          })
-        )
-        .default([
-          { name: "architecture", prefix: null, git: "commit" },
-          { name: "process", prefix: null, git: "commit" },
-          { name: "patterns", prefix: null, git: "commit" },
-        ])
-        .describe("Categories to create"),
-    },
-    async ({ name, kgPath, type, categories }) => {
-      const config = readConfig();
+export interface HandleConfigInitParams {
+  name: string;
+  kgPath: string;
+  type: "project-local" | "personal" | "custom";
+  categories: Array<{ name: string; prefix: string | null; git: "commit" | "ignore" }>;
+}
+
+export interface HandleConfigInitResult {
+  [x: string]: unknown;
+  content: Array<{ type: "text"; text: string }>;
+  isError?: true;
+}
+
+export async function handleConfigInit({ name, kgPath, type, categories }: HandleConfigInitParams): Promise<HandleConfigInitResult> {      const config = readConfig();
 
       // Validate name doesn't exist
       if (config.graphs[name]) {
@@ -196,34 +183,61 @@ export function registerConfigTools(server: McpServer): void {
 
       // Write config entry
       const now = new Date().toISOString();
+      const newGraphId = mintGraphId();
+      writeGraphIdMarker(expandedPath, newGraphId);
       const graphConfig: GraphConfig = {
         name,
         path: kgPath,
         type,
         categories: categories as CategoryConfig[],
         createdAt: now,
-        lastUsed: now,
-        // Placeholder only (Task 1.1 Step 5) -- real mint-and-marker-write
-        // logic lands in Task 1.9 Step 7.5, once mintGraphId/writeGraphIdMarker
-        // (Task 1.2) exist.
+        // lastUsed removed -- no writer needed once Task 1.12 deletes the field
         status: "pending",
         statusChangedAt: now,
-        graphId: "placeholder-graph-id",
+        graphId: newGraphId,
       };
 
       config.graphs[name] = graphConfig;
-      config.active = name;
+      // config.active = name; removed -- resolution is now context-derived (Task 1.5)
       writeConfig(config);
 
       return {
         content: [
           {
             type: "text" as const,
-            text: `Knowledge graph '${name}' initialized at ${kgPath}\nSet as active. Categories: ${categories.map((c) => c.name).join(", ")}`,
+            text: `Knowledge graph '${name}' initialized at ${kgPath}\nReady to use — knowledge graphs are resolved automatically from your current directory. Categories: ${categories.map((c) => c.name).join(", ")}`,
           },
         ],
-      };
-    }
+      };}
+
+export function registerConfigTools(server: McpServer): void {
+  // ── kg_config_init ──────────────────────────────────────────────
+  server.tool(
+    "kg_config_init",
+    "Create a new knowledge graph: directory structure + config entry",
+    {
+      name: z.string().min(1).describe("Unique name for this knowledge graph"),
+      kgPath: z.string().describe("Absolute path where KG should be created"),
+      type: z
+        .enum(["project-local", "personal", "custom"])
+        .default("project-local")
+        .describe("KG type"),
+      categories: z
+        .array(
+          z.object({
+            name: z.string(),
+            prefix: z.string().nullable().default(null),
+            git: z.enum(["commit", "ignore"]).default("commit"),
+          })
+        )
+        .default([
+          { name: "architecture", prefix: null, git: "commit" },
+          { name: "process", prefix: null, git: "commit" },
+          { name: "patterns", prefix: null, git: "commit" },
+        ])
+        .describe("Categories to create"),
+    },
+    async (params) => handleConfigInit(params)
   );
 
   // ── kg_config_list ──────────────────────────────────────────────
@@ -247,9 +261,8 @@ export function registerConfigTools(server: McpServer): void {
       }
 
       const lines = graphs.map((g) => {
-        const active = g.name === config.active ? " (active)" : "";
         const cats = g.categories.map((c) => c.name).join(", ");
-        return `${g.name}${active} — ${g.path}\n  Categories: ${cats}\n  Last used: ${g.lastUsed}`;
+        return `${g.name} (${g.status}) — ${g.path}\n  Categories: ${cats}`;
       });
 
       return {

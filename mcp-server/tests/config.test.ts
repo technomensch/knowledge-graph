@@ -10,7 +10,7 @@ jest.mock("../src/utils.js", () => {
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { handleConfigAddCategory } from "../src/tools/config.js";
+import { handleConfigAddCategory, handleConfigInit } from "../src/tools/config.js";
 import { readConfig, writeConfig, KgConfig } from "../src/utils.js";
 
 const tempDirs: string[] = [];
@@ -102,5 +102,35 @@ describe("handleConfigAddCategory", () => {
     const result = await handleConfigAddCategory({ name: "ml-ops", prefix: null, git: "commit", scope: "user" });
 
     expect(result.isError).toBe(true);
+  });
+});
+
+describe("handleConfigInit", () => {
+  it("no longer sets config.active, mints a real graphId, writes a matching marker file, and mints status=pending (ADR-067 Task 1.9 Step 7.5)", async () => {
+    const kgPath = makeTempDir("init");
+    (readConfig as jest.Mock).mockReturnValue({ version: "1.0.0", active: null, graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } });
+
+    let written: KgConfig | null = null;
+    (writeConfig as jest.Mock).mockImplementation((cfg: KgConfig) => { written = cfg; });
+
+    const result = await handleConfigInit({
+      name: "new-kg",
+      kgPath,
+      type: "project-local",
+      categories: [{ name: "architecture", prefix: null, git: "commit" }],
+    });
+
+    expect(result.isError).toBeUndefined();
+    expect(written).not.toBeNull();
+    const cfg = written as unknown as KgConfig;
+    // Unchanged from the mocked readConfig() input (null), never set to
+    // "new-kg" -- resolution is context-derived now (Task 1.5), nothing
+    // writes config.active anymore.
+    expect(cfg.active).toBeNull();
+    const graph = cfg.graphs["new-kg"];
+    expect(graph.status).toBe("pending");
+    expect(graph.graphId).toBeTruthy();
+    expect(graph.graphId).not.toBe("placeholder-graph-id");
+    expect(fs.readFileSync(path.join(kgPath, ".kmgraph-id"), "utf-8").trim()).toBe(graph.graphId);
   });
 });

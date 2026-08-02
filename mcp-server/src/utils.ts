@@ -176,15 +176,6 @@ export function checkGraphPathHealth(graph: GraphConfig): PathHealth {
   return "ok";
 }
 
-export function getActiveGraphPath(config: KgConfig): string | null {
-  if (!config.active || !config.graphs[config.active]) {
-    return null;
-  }
-  const graphPath = config.graphs[config.active].path;
-  // Expand ~ to home directory
-  return graphPath.replace(/^~/, os.homedir());
-}
-
 export function getPluginRoot(): string {
   // When running as plugin: CLAUDE_PLUGIN_ROOT is set
   // When running standalone: use parent of mcp-server directory
