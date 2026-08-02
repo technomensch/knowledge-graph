@@ -7,6 +7,7 @@ import { execFileSync } from "child_process";
 import {
   readConfig,
   writeConfig,
+  updateConfig,
   getPluginRoot,
   mintGraphId,
   writeGraphIdMarker,
@@ -711,6 +712,17 @@ export function registerConfigTools(server: McpServer): void {
     },
     async (params) => handleConfigAddCategory(params)
   );
+
+  // ── kg_config_remint_id ───────────────────────────────────────────
+  server.tool(
+    "kg_config_remint_id",
+    "Mint a fresh graphId for a registered knowledge graph, breaking its identity link to any clone/fork sharing its current id",
+    {
+      name: z.string().min(1).describe("Registered knowledge graph name"),
+      confirm: z.boolean().describe("Must be true -- this is a deliberate identity break"),
+    },
+    async (params) => handleConfigRemintId(params)
+  );
 }
 
 // ── Exported handler for direct testing ──────────────────────────────────────
@@ -770,5 +782,63 @@ export function handleConfigAddCategory(
 
   return {
     content: [{ type: "text" as const, text: `Category '${catName}' added to '${graphName}'.\nDirectory created: ${catDir}` }],
+  };
+}
+
+// ── kg_config_remint_id: standalone identity break, reachable outside ────────
+// kmg-init (Task 4.6, spec §9). Task 4.4's fork branch only re-mints inline
+// during kmg-init, but a fork's knowledge/ typically already exists, so
+// kg_config_init short-circuits as "already initialized" and never reaches
+// the four-answer prompt -- this is the only way to break identity from a
+// stale carried-over marker in that situation.
+
+export interface HandleConfigRemintIdParams {
+  name: string;
+  confirm: boolean;
+}
+
+export interface HandleConfigRemintIdResult {
+  [x: string]: unknown;
+  content: Array<{ type: "text"; text: string }>;
+  isError?: true;
+}
+
+export async function handleConfigRemintId({ name, confirm }: HandleConfigRemintIdParams): Promise<HandleConfigRemintIdResult> {
+  const config = readConfig();
+  const graph = config.graphs[name];
+  if (!graph) {
+    return { content: [{ type: "text" as const, text: `Error: no registered graph named '${name}'.` }], isError: true };
+  }
+  if (!confirm) {
+    return {
+      content: [{
+        type: "text" as const,
+        text: `Re-minting '${name}''s graphId breaks its identity link to any clone/fork it currently shares an id with. Pass confirm: true to proceed.`,
+      }],
+      isError: true,
+    };
+  }
+
+  // graph.path already IS the KG's content root (Task 1.2/1.5 contract) — no
+  // "knowledge" suffix to append. See findings doc #9 correction below.
+  const contentDir = graph.path.replace(/^~/, os.homedir());
+  const newId = mintGraphId(); // minted once, before updateConfig — mutator-purity rule (Task 2.3, findings doc #8)
+  remintGraphIdMarker(contentDir, newId);
+
+  updateConfig((cfg) => {
+    cfg.graphs[name].graphId = newId;
+    return cfg;
+  });
+
+  const tracked = isMarkerTracked(contentDir);
+  const warning = tracked === false
+    ? `\nWarning: ${contentDir}'s .kmgraph-id marker is gitignored — it won't travel with clones, and duplicate detection is effectively disabled for this KG until that's fixed.`
+    : "";
+
+  return {
+    content: [{
+      type: "text" as const,
+      text: `Re-minted graphId for '${name}': ${newId}. Working tree is now dirty (new marker content) — consider committing it.${warning}`,
+    }],
   };
 }
