@@ -84,16 +84,34 @@ export function requireInput(reason: string, param: string, accepts?: string[]):
   return { error: "KMG_INPUT_REQUIRED", reason, resolveWith: { param, accepts } };
 }
 
+export type AskResult =
+  | { status: "answered"; answer: string }
+  | { status: "declined" }
+  | { status: "cancelled" };
+
+export type GateResult =
+  | { answer: string }
+  | { declined: true }
+  | { cancelled: true }
+  | InputRequiredError;
+
 export interface GateOptions {
   mode: InteractionMode;
   reason: string;
   param: string;
   accepts?: string[];
   timeoutMs?: number;
-  ask: (signal: AbortSignal) => Promise<string>;
+  /**
+   * Only invoked when mode === "interactive". Receives an AbortSignal that
+   * aborts on timeout. A synchronous throw or a rejected promise from ask()
+   * propagates out of gate() as a rejection -- gate() does not catch or map
+   * transport/adapter failures into a structured result. Callers must be
+   * prepared to catch (ADR-067 Phase 3 final review finding I-2).
+   */
+  ask: (signal: AbortSignal) => Promise<AskResult>;
 }
 
-export async function gate(opts: GateOptions): Promise<{ answer: string } | InputRequiredError> {
+export async function gate(opts: GateOptions): Promise<GateResult> {
   if (opts.mode === "automated") {
     return requireInput(opts.reason, opts.param, opts.accepts);
   }
@@ -107,20 +125,30 @@ export async function gate(opts: GateOptions): Promise<{ answer: string } | Inpu
       resolve(requireInput(`${opts.reason}_timeout`, opts.param, opts.accepts));
     }, timeoutMs);
   });
-  // Normalize a synchronous throw from ask() into a rejected promise so it
-  // still participates in the try/finally below instead of escaping gate()
-  // before the timer can be cleared.
-  const answered = Promise.resolve()
-    .then(() => opts.ask(controller.signal))
-    .then((answer) => ({ answer }));
+
+  // Wrapped so a synchronous throw inside ask() becomes a rejected promise
+  // and still flows through the try/finally below (ADR-067 Phase 3 fix,
+  // commit 1de44b6d) -- do not inline opts.ask(...) directly here.
+  const asked = Promise.resolve().then(() => opts.ask(controller.signal));
 
   try {
-    return await Promise.race([answered, timeout]);
+    const result = await Promise.race([asked, timeout]);
+
+    if ("error" in result) {
+      return result; // timeout won
+    }
+    if (result.status === "declined") {
+      return { declined: true };
+    }
+    if (result.status === "cancelled") {
+      return { cancelled: true };
+    }
+    // result.status === "answered"
+    if (opts.accepts && !opts.accepts.includes(result.answer)) {
+      return requireInput(`${opts.reason}_invalid_answer`, opts.param, opts.accepts);
+    }
+    return { answer: result.answer };
   } finally {
-    // Whichever side won, the timer must not be left pending — an
-    // un-cleared setTimeout leaks a live handle for every answered
-    // question, up to timeoutMs after the call already resolved
-    // (findings doc #17).
     if (timeoutHandle !== undefined) clearTimeout(timeoutHandle);
   }
 }

@@ -1,4 +1,4 @@
-import { gate, requireInput } from "../src/interaction.js";
+import { gate, requireInput, type AskResult } from "../src/interaction.js";
 
 describe("gate()", () => {
   it("requireInput produces the exact KMG_INPUT_REQUIRED shape", () => {
@@ -18,20 +18,62 @@ describe("gate()", () => {
   });
 
   it("interactive mode calls ask() and returns its answer", async () => {
-    const result = await gate({ mode: "interactive", reason: "fuzzy_match", param: "name", ask: async () => "chosen-graph" });
+    const result = await gate({ mode: "interactive", reason: "fuzzy_match", param: "name", ask: async () => ({ status: "answered", answer: "chosen-graph" }) });
     expect(result).toEqual({ answer: "chosen-graph" });
   });
 
   it("interactive mode times out with a structured error, never hangs", async () => {
-    const neverResolves = () => new Promise<string>(() => {});
+    const neverResolves = () => new Promise<AskResult>(() => {});
     const result = await gate({ mode: "interactive", reason: "fuzzy_match", param: "name", ask: neverResolves, timeoutMs: 20 });
     expect(result).toMatchObject({ error: "KMG_INPUT_REQUIRED" });
+  });
+
+  it("returns { declined: true } when ask() resolves a declined status", async () => {
+    const result = await gate({ mode: "interactive", reason: "fuzzy_match", param: "name", ask: async () => ({ status: "declined" }) });
+    expect(result).toEqual({ declined: true });
+  });
+
+  it("returns { cancelled: true } when ask() resolves a cancelled status", async () => {
+    const result = await gate({ mode: "interactive", reason: "fuzzy_match", param: "name", ask: async () => ({ status: "cancelled" }) });
+    expect(result).toEqual({ cancelled: true });
+  });
+
+  it("rejects an answer not in accepts, returning a structured KMG_INPUT_REQUIRED instead of the bad value", async () => {
+    const result = await gate({
+      mode: "interactive",
+      reason: "four_answer",
+      param: "choice",
+      accepts: ["reattach", "worktree", "fork", "decline"],
+      ask: async () => ({ status: "answered", answer: "not-a-real-option" }),
+    });
+    expect(result).toMatchObject({ error: "KMG_INPUT_REQUIRED", reason: "four_answer_invalid_answer" });
+  });
+
+  it("accepts a valid answer against the accepts list", async () => {
+    const result = await gate({
+      mode: "interactive",
+      reason: "four_answer",
+      param: "choice",
+      accepts: ["reattach", "worktree", "fork", "decline"],
+      ask: async () => ({ status: "answered", answer: "reattach" }),
+    });
+    expect(result).toEqual({ answer: "reattach" });
+  });
+
+  it("when accepts is not provided, any answered string passes through unchanged", async () => {
+    const result = await gate({
+      mode: "interactive",
+      reason: "fuzzy_match",
+      param: "name",
+      ask: async () => ({ status: "answered", answer: "anything" }),
+    });
+    expect(result).toEqual({ answer: "anything" });
   });
 
   it("does not leak a timer handle after ask() answers before the timeout (findings doc #17)", async () => {
     jest.useFakeTimers();
     try {
-      const p = gate({ mode: "interactive", reason: "fuzzy_match", param: "name", ask: async () => "answered", timeoutMs: 30_000 });
+      const p = gate({ mode: "interactive", reason: "fuzzy_match", param: "name", ask: async () => ({ status: "answered", answer: "answered" }), timeoutMs: 30_000 });
       // Flush enough microtask ticks for the answered promise chain (including
       // the Promise.resolve().then(ask).then(...) hops in gate()) to fully settle.
       for (let i = 0; i < 5; i++) await Promise.resolve();
@@ -63,7 +105,7 @@ describe("gate()", () => {
   it("aborts the signal passed to ask() when the timeout fires (findings doc #17)", async () => {
     let observedAborted = false;
     const ask = (signal: AbortSignal) =>
-      new Promise<string>((resolve) => {
+      new Promise<AskResult>((resolve) => {
         signal.addEventListener("abort", () => { observedAborted = true; });
       });
     await gate({ mode: "interactive", reason: "fuzzy_match", param: "name", ask, timeoutMs: 20 });
