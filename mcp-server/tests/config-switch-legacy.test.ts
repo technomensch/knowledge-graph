@@ -149,14 +149,16 @@ describe("kg_config_switch with legacy config fallback", () => {
     expect(cfg.graphs).toEqual({});
   });
 
-  it("writes the updated config to the NEW path after switching via legacy fallback", () => {
-    // Scenario: user has only legacy config, switches to a graph, config is written to new path.
-    // This verifies the "lazy implicit migration on first write" behavior.
+  it("is a deprecated no-op — does not write anything, even against a legacy-only config (ADR-067 Task 1.10)", () => {
+    // Scenario: user has only legacy config. kg_config_switch no longer
+    // persists anything -- resolution is context-derived (Task 1.5), so
+    // "switching" has nothing left to record. This also means switch no
+    // longer performs the old "lazy implicit migration to the new config
+    // path on first write" -- there's no write at all to trigger it.
     const home = makeTempDir("home");
     const legacyDir = path.join(home, ".claude");
     fs.mkdirSync(legacyDir, { recursive: true });
 
-    // Create legacy config with two graphs
     const legacyConfig = {
       version: "1.0.0",
       active: "graph-a",
@@ -188,40 +190,21 @@ describe("kg_config_switch with legacy config fallback", () => {
 
     const { readConfig, handleConfigSwitch } = loadConfigToolsDefaultPath(home);
 
-    // Step 1: readConfig() finds the legacy config
     const cfgBefore = readConfig();
     expect(cfgBefore.active).toBe("graph-a");
-    expect(cfgBefore.graphs["graph-a"]).toBeDefined();
-    expect(cfgBefore.graphs["graph-b"]).toBeDefined();
 
-    // Step 2: Call the REAL kg_config_switch handler (not a reimplementation)
     const result = handleConfigSwitch({ name: "graph-b" });
     expect(result.isError).toBeUndefined();
-    expect(result.content[0].text).toContain("Switched from 'graph-a' to 'graph-b'");
+    expect(result.content[0].text).toContain("no longer changes anything");
+    expect(result.content[0].text).toContain("/path/b");
 
-    // Step 3: Verify the new path file exists and contains the updated config,
-    // written by the real handler's writeConfig() call.
-    const newConfigDir = path.join(home, ".kmgraph");
-    const newConfigPath = path.join(newConfigDir, "kg-config.json");
-    expect(fs.existsSync(newConfigPath)).toBe(true);
+    // No migration to the new path — switch never called writeConfig().
+    const newConfigPath = path.join(home, ".kmgraph", "kg-config.json");
+    expect(fs.existsSync(newConfigPath)).toBe(false);
 
-    const writtenConfig = JSON.parse(fs.readFileSync(newConfigPath, "utf-8"));
-    expect(writtenConfig.active).toBe("graph-b");
-    expect(writtenConfig.graphs["graph-a"]).toBeDefined();
-    expect(writtenConfig.graphs["graph-b"]).toBeDefined();
-
-    // Step 4: On next read, the new path is preferred
-    jest.resetModules();
-    jest.doMock("os", () => ({
-      ...jest.requireActual("os"),
-      homedir: () => home,
-    }));
-    const { readConfig: readConfigAgain } = require("../src/utils.js") as typeof import("../src/utils.js");
-    jest.dontMock("os");
-
-    const cfgAfterRead = readConfigAgain();
-    expect(cfgAfterRead.active).toBe("graph-b");
-    expect(cfgAfterRead.graphs["graph-b"]).toBeDefined();
+    // Legacy file itself is untouched.
+    const legacyAfter = JSON.parse(fs.readFileSync(path.join(legacyDir, "kg-config.json"), "utf-8"));
+    expect(legacyAfter.active).toBe("graph-a");
   });
 
   it("correctly handles graph not found error (no legacy or new config)", () => {

@@ -46,16 +46,15 @@ export function handleConfigSwitch(
     };
   }
 
-  const prev = config.active;
-  config.active = name;
-  config.graphs[name].lastUsed = new Date().toISOString();
-  writeConfig(config);
-
+  // No longer writes config.active/lastUsed -- resolution is context-derived
+  // (Task 1.5). This tool is fully retired in Task 6.2; until then it stays
+  // registered as a harmless deprecated no-op so the rest of this phase's
+  // call-site sweep isn't blocked on deleting it early.
   return {
     content: [
       {
         type: "text" as const,
-        text: `Switched from '${prev}' to '${name}'\nLocation: ${config.graphs[name].path}`,
+        text: `'${name}' is registered at ${config.graphs[name].path}. kg_config_switch no longer changes anything -- knowledge graphs are resolved automatically from your current directory. This tool will be removed in a future release.`,
       },
     ],
   };
