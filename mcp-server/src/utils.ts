@@ -10,13 +10,28 @@ export interface CategoryConfig {
   git: "commit" | "ignore";
 }
 
+export type GraphStatus = "pending" | "active" | "archived" | "deleted";
+
 export interface GraphConfig {
   name: string;
   path: string;
   type: "project-local" | "personal" | "custom";
   categories: CategoryConfig[];
   createdAt: string;
-  lastUsed: string;
+  lastUsed?: string; // KEPT for now, made OPTIONAL rather than required (2026-08-01, Opus pass 3, C1) —
+  // nothing reads this field except config.ts's kg_config_list display line (deleted in Task 1.9 Step 7),
+  // and making it optional here means no literal anywhere needs to actively supply-or-omit it in lockstep
+  // with the type's own requirement window; it simply stops mattering once nothing writes it, one character
+  // instead of a second Task 1.12 Step 0 extension into `src/tools/config.ts`/`src/cli.ts`. Removed outright
+  // in Task 1.12.
+  status: GraphStatus;
+  statusChangedAt: string;
+  githubUser?: string;
+  graphId: string;
+  mergedInto?: string;
+  duplicateOf?: string;
+  originUrl?: string;
+  confirmedBy?: "interactive" | "automated";
   lastAppliedVersion?: string;
 }
 
@@ -82,6 +97,24 @@ export function writeConfig(config: KgConfig): void {
     fs.mkdirSync(dir, { recursive: true });
   }
   fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2), "utf-8");
+}
+
+export function changeGraphStatus(
+  config: KgConfig,
+  name: string,
+  status: GraphStatus,
+  opts: { githubUser?: string } = {}
+): KgConfig {
+  const graph = config.graphs[name];
+  if (!graph) throw new Error(`changeGraphStatus: unknown graph '${name}'`);
+  graph.status = status;
+  graph.statusChangedAt = new Date().toISOString();
+  if (opts.githubUser) graph.githubUser = opts.githubUser;
+  return config;
+}
+
+export function isWritable(graph: GraphConfig): boolean {
+  return graph.status === "active";
 }
 
 export function getActiveGraphPath(config: KgConfig): string | null {

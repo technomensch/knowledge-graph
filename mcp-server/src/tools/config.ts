@@ -202,6 +202,12 @@ export function registerConfigTools(server: McpServer): void {
         categories: categories as CategoryConfig[],
         createdAt: now,
         lastUsed: now,
+        // Placeholder only (Task 1.1 Step 5) -- real mint-and-marker-write
+        // logic lands in Task 1.9 Step 7.5, once mintGraphId/writeGraphIdMarker
+        // (Task 1.2) exist.
+        status: "pending",
+        statusChangedAt: now,
+        graphId: "placeholder-graph-id",
       };
 
       config.graphs[name] = graphConfig;

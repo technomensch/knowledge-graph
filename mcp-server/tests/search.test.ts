@@ -37,6 +37,9 @@ function makeConfig(
       categories: [],
       createdAt: new Date().toISOString(),
       lastUsed: new Date().toISOString(),
+      status: "active" as const,
+      statusChangedAt: new Date().toISOString(),
+      graphId: `test-graph-id-${name}`,
     };
   }
   return {
