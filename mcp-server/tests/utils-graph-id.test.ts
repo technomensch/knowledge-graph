@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { mintGraphId, writeGraphIdMarker, readGraphIdMarker, remintGraphIdMarker } from "../src/utils.js";
+import { mintGraphId, writeGraphIdMarker, readGraphIdMarker, remintGraphIdMarker, findRegistryEntryByGraphId } from "../src/utils.js";
 
 describe("graphId marker", () => {
   let dir: string;
@@ -48,5 +48,36 @@ describe("graphId marker", () => {
     const id = mintGraphId();
     expect(() => remintGraphIdMarker(dir, id)).not.toThrow();
     expect(readGraphIdMarker(dir)).toBe(id);
+  });
+});
+
+describe("findRegistryEntryByGraphId", () => {
+  it("finds the registry entry whose graphId matches", () => {
+    const config = {
+      version: "1.0.0",
+      graphs: {
+        a: { name: "a", path: "/a", type: "project-local" as const, categories: [], createdAt: "x", status: "active" as const, statusChangedAt: "x", graphId: "id-1" },
+        b: { name: "b", path: "/b", type: "project-local" as const, categories: [], createdAt: "x", status: "active" as const, statusChangedAt: "x", graphId: "id-2" },
+      },
+      sanitization: { enabled: false, patterns: [], action: "warn" as const },
+    };
+    const result = findRegistryEntryByGraphId(config as any, "id-2");
+    expect(result?.name).toBe("b");
+  });
+
+  it("returns null when no entry matches", () => {
+    const config = { version: "1.0.0", graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" as const } };
+    expect(findRegistryEntryByGraphId(config as any, "nope")).toBeNull();
+  });
+
+  it("excludes deleted entries from the match", () => {
+    const config = {
+      version: "1.0.0",
+      graphs: {
+        a: { name: "a", path: "/a", type: "project-local" as const, categories: [], createdAt: "x", status: "deleted" as const, statusChangedAt: "x", graphId: "id-1" },
+      },
+      sanitization: { enabled: false, patterns: [], action: "warn" as const },
+    };
+    expect(findRegistryEntryByGraphId(config as any, "id-1")).toBeNull();
   });
 });

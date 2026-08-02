@@ -152,6 +152,18 @@ export function remintGraphIdMarker(kgPath: string, graphId: string): void {
   fs.writeFileSync(markerPath, graphId + "\n", "utf-8");
 }
 
+export function findRegistryEntryByGraphId(
+  config: KgConfig,
+  graphId: string
+): { name: string; graph: GraphConfig } | null {
+  for (const [name, graph] of Object.entries(config.graphs)) {
+    if (graph.status !== "deleted" && graph.graphId === graphId) {
+      return { name, graph };
+    }
+  }
+  return null;
+}
+
 export function getActiveGraphPath(config: KgConfig): string | null {
   if (!config.active || !config.graphs[config.active]) {
     return null;
