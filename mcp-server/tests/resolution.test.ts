@@ -115,6 +115,37 @@ describe("resolveGraph", () => {
     expect(byCwd.kind).toBe("merged");
   });
 
+  it("returns archived (not resolved) when the cwd-matched graph has status deleted", () => {
+    const config: KgConfig = {
+      version: "1.0.0",
+      graphs: { myproj: g({ name: "myproj", path: "/home/user/myproj/knowledge", status: "deleted" }) },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    };
+    const result = resolveGraph(config, "/home/user/myproj/src");
+    expect(result.kind).toBe("archived");
+  });
+
+  it("resolves normally (not archived) when the cwd-matched graph has status pending", () => {
+    const config: KgConfig = {
+      version: "1.0.0",
+      graphs: { myproj: g({ name: "myproj", path: "/home/user/myproj/knowledge", status: "pending" }) },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    };
+    const result = resolveGraph(config, "/home/user/myproj/src");
+    expect(result.kind).toBe("resolved");
+    if (result.kind === "resolved") expect(result.name).toBe("myproj");
+  });
+
+  it("excludes personal-type graphs from cwd resolution even when the path would otherwise match", () => {
+    const config: KgConfig = {
+      version: "1.0.0",
+      graphs: { mypersonal: g({ name: "mypersonal", path: "/home/user/myproj/knowledge", type: "personal" }) },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    };
+    const result = resolveGraph(config, "/home/user/myproj/src");
+    expect(result.kind).toBe("no-graph-in-cwd");
+  });
+
   it("returns ambiguous-tie when two registry entries resolve to the identical deepest path (findings doc #13)", () => {
     const config: KgConfig = {
       version: "1.0.0",

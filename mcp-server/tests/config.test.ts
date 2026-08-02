@@ -151,4 +151,21 @@ describe("handleConfigInit", () => {
     expect(graph.graphId).not.toBe("placeholder-graph-id");
     expect(fs.readFileSync(path.join(kgPath, ".kmgraph-id"), "utf-8").trim()).toBe(graph.graphId);
   });
+
+  it("returns a clean error (not a thrown exception) when the target dir already has a marker for a different graph (Opus review SF-4)", async () => {
+    const kgPath = makeTempDir("init-marker-conflict");
+    fs.writeFileSync(path.join(kgPath, ".kmgraph-id"), "some-other-id\n", "utf-8");
+    (readConfig as jest.Mock).mockReturnValue({ version: "1.0.0", graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } });
+
+    const result = await handleConfigInit({
+      name: "new-kg",
+      kgPath,
+      type: "project-local",
+      categories: [{ name: "architecture", prefix: null, git: "commit" }],
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toMatch(/already tracked as a different knowledge graph/);
+    expect(writeConfig).not.toHaveBeenCalled();
+  });
 });

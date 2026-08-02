@@ -673,6 +673,57 @@ describe("kg_capture — targetKg (multi-KG)", () => {
     expect((result as CaptureError).message).toContain("nonexistent-kg");
   });
 
+  test("returns VALIDATION_ERROR with candidate list for ambiguous/fuzzy targetKg name", async () => {
+    const webRoot = makeTempDir("multi-fuzzy-web");
+    const apiRoot = makeTempDir("multi-fuzzy-api");
+    tempDirs.push(webRoot, apiRoot);
+    scaffoldKg(webRoot);
+    scaffoldKg(apiRoot);
+    (readConfig as jest.Mock).mockReturnValue({
+      version: "1.0.0",
+      graphs: {
+        "kmgraph-web": {
+          name: "kmgraph-web",
+          path: webRoot,
+          type: "project-local",
+          categories: [],
+          createdAt: new Date().toISOString(),
+          status: "active",
+          statusChangedAt: new Date().toISOString(),
+          graphId: "test-graph-id-kmgraph-web",
+        },
+        "kmgraph-api": {
+          name: "kmgraph-api",
+          path: apiRoot,
+          type: "project-local",
+          categories: [],
+          createdAt: new Date().toISOString(),
+          status: "active",
+          statusChangedAt: new Date().toISOString(),
+          graphId: "test-graph-id-kmgraph-api",
+        },
+      },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    });
+
+    const origCwd = process.cwd;
+    process.cwd = () => webRoot;
+
+    const request: CaptureRequest = {
+      content: "content",
+      type: "lesson",
+      metadata: { title: "Test" },
+    };
+
+    const result = await handleCapture(request, "kmgraph");
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(true);
+    expect((result as CaptureError).error).toBe("VALIDATION_ERROR");
+    expect((result as CaptureError).message).toContain("kmgraph-web");
+    expect((result as CaptureError).message).toContain("kmgraph-api");
+  });
+
   test("without targetKg still enforces CWD check — returns KG_MISMATCH from unrelated CWD", async () => {
     const projRoot = makeTempDir("multi-cwd-check");
     const globalRoot = makeTempDir("multi-cwd-check-g");

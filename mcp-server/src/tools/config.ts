@@ -73,141 +73,156 @@ export interface HandleConfigInitResult {
   isError?: true;
 }
 
-export async function handleConfigInit({ name, kgPath, type, categories }: HandleConfigInitParams): Promise<HandleConfigInitResult> {      const config = readConfig();
+export async function handleConfigInit({ name, kgPath, type, categories }: HandleConfigInitParams): Promise<HandleConfigInitResult> {
+  const config = readConfig();
 
-      // Validate name doesn't exist
-      if (config.graphs[name]) {
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: `Error: Knowledge graph '${name}' already exists. Use kg_config_switch to activate it.`,
-            },
-          ],
-          isError: true,
-        };
+  // Validate name doesn't exist
+  if (config.graphs[name]) {
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: `Error: Knowledge graph '${name}' already exists. Use kg_config_switch to activate it.`,
+        },
+      ],
+      isError: true,
+    };
+  }
+
+  // Expand path
+  const expandedPath = kgPath.replace(/^~/, os.homedir());
+
+  // Create directory structure
+  const dirs = [
+    "knowledge",
+    "lessons-learned",
+    "decisions",
+    "sessions",
+    "chat-history",
+    "tmp",
+  ];
+  for (const dir of dirs) {
+    fs.mkdirSync(path.join(expandedPath, dir), { recursive: true });
+  }
+
+  // Create category subdirectories
+  for (const cat of categories) {
+    fs.mkdirSync(
+      path.join(expandedPath, "lessons-learned", cat.name),
+      { recursive: true }
+    );
+  }
+
+  // Copy templates from plugin
+  const pluginRoot = getPluginRoot();
+  const templateSrc = path.join(pluginRoot, "core", "default-templates");
+
+  if (fs.existsSync(templateSrc)) {
+    // Copy knowledge templates
+    const knowledgeTemplates = [
+      "patterns.md",
+      "gotchas.md",
+      "concepts.md",
+      "architecture.md",
+      "workflows.md",
+    ];
+    for (const t of knowledgeTemplates) {
+      const src = path.join(templateSrc, "knowledge", "templates", t);
+      const dest = path.join(expandedPath, "knowledge", t);
+      if (fs.existsSync(src) && !fs.existsSync(dest)) {
+        fs.copyFileSync(src, dest);
       }
+    }
 
-      // Expand path
-      const expandedPath = kgPath.replace(/^~/, os.homedir());
-
-      // Create directory structure
-      const dirs = [
-        "knowledge",
-        "lessons-learned",
-        "decisions",
-        "sessions",
-        "chat-history",
-        "tmp",
-      ];
-      for (const dir of dirs) {
-        fs.mkdirSync(path.join(expandedPath, dir), { recursive: true });
+    // Copy lesson templates
+    const lessonSrc = path.join(templateSrc, "lessons-learned");
+    const lessonDest = path.join(expandedPath, "lessons-learned");
+    for (const t of ["README.md", "lesson-template.md"]) {
+      const src = path.join(lessonSrc, t);
+      const dest = path.join(lessonDest, t);
+      if (fs.existsSync(src) && !fs.existsSync(dest)) {
+        fs.copyFileSync(src, dest);
       }
+    }
 
-      // Create category subdirectories
-      for (const cat of categories) {
-        fs.mkdirSync(
-          path.join(expandedPath, "lessons-learned", cat.name),
-          { recursive: true }
-        );
+    // Copy ADR templates
+    const adrSrc = path.join(templateSrc, "decisions");
+    const adrDest = path.join(expandedPath, "decisions");
+    for (const t of ["README.md", "ADR-template.md"]) {
+      const src = path.join(adrSrc, t);
+      const dest = path.join(adrDest, t);
+      if (fs.existsSync(src) && !fs.existsSync(dest)) {
+        fs.copyFileSync(src, dest);
       }
+    }
 
-      // Copy templates from plugin
-      const pluginRoot = getPluginRoot();
-      const templateSrc = path.join(pluginRoot, "core", "default-templates");
+    // Copy session template
+    const sessSrc = path.join(templateSrc, "sessions", "session-template.md");
+    const sessDest = path.join(expandedPath, "sessions", "session-template.md");
+    if (fs.existsSync(sessSrc) && !fs.existsSync(sessDest)) {
+      fs.copyFileSync(sessSrc, sessDest);
+    }
 
-      if (fs.existsSync(templateSrc)) {
-        // Copy knowledge templates
-        const knowledgeTemplates = [
-          "patterns.md",
-          "gotchas.md",
-          "concepts.md",
-          "architecture.md",
-          "workflows.md",
-        ];
-        for (const t of knowledgeTemplates) {
-          const src = path.join(templateSrc, "knowledge", "templates", t);
-          const dest = path.join(expandedPath, "knowledge", t);
-          if (fs.existsSync(src) && !fs.existsSync(dest)) {
-            fs.copyFileSync(src, dest);
-          }
-        }
-
-        // Copy lesson templates
-        const lessonSrc = path.join(templateSrc, "lessons-learned");
-        const lessonDest = path.join(expandedPath, "lessons-learned");
-        for (const t of ["README.md", "lesson-template.md"]) {
-          const src = path.join(lessonSrc, t);
-          const dest = path.join(lessonDest, t);
-          if (fs.existsSync(src) && !fs.existsSync(dest)) {
-            fs.copyFileSync(src, dest);
-          }
-        }
-
-        // Copy ADR templates
-        const adrSrc = path.join(templateSrc, "decisions");
-        const adrDest = path.join(expandedPath, "decisions");
-        for (const t of ["README.md", "ADR-template.md"]) {
-          const src = path.join(adrSrc, t);
-          const dest = path.join(adrDest, t);
-          if (fs.existsSync(src) && !fs.existsSync(dest)) {
-            fs.copyFileSync(src, dest);
-          }
-        }
-
-        // Copy session template
-        const sessSrc = path.join(templateSrc, "sessions", "session-template.md");
-        const sessDest = path.join(expandedPath, "sessions", "session-template.md");
-        if (fs.existsSync(sessSrc) && !fs.existsSync(sessDest)) {
-          fs.copyFileSync(sessSrc, sessDest);
-        }
-
-        // Copy root scaffold files (me.md, rules.md, kg-index.md, triggers.md)
-        const rootScaffolds = ["me.md", "rules.md", "kg-index.md", "triggers.md"];
-        for (const f of rootScaffolds) {
-          const src = path.join(templateSrc, "knowledge", f);
-          const dest = path.join(expandedPath, f);
-          if (fs.existsSync(src) && !fs.existsSync(dest)) {
-            fs.copyFileSync(src, dest);
-          }
-        }
-
-        // Copy kg-category-index.md to knowledge/ subdir
-        const catIndexSrc = path.join(templateSrc, "knowledge", "kg-category-index.md");
-        const catIndexDest = path.join(expandedPath, "knowledge", "kg-category-index.md");
-        if (fs.existsSync(catIndexSrc) && !fs.existsSync(catIndexDest)) {
-          fs.copyFileSync(catIndexSrc, catIndexDest);
-        }
+    // Copy root scaffold files (me.md, rules.md, kg-index.md, triggers.md)
+    const rootScaffolds = ["me.md", "rules.md", "kg-index.md", "triggers.md"];
+    for (const f of rootScaffolds) {
+      const src = path.join(templateSrc, "knowledge", f);
+      const dest = path.join(expandedPath, f);
+      if (fs.existsSync(src) && !fs.existsSync(dest)) {
+        fs.copyFileSync(src, dest);
       }
+    }
 
-      // Write config entry
-      const now = new Date().toISOString();
-      const newGraphId = mintGraphId();
-      writeGraphIdMarker(expandedPath, newGraphId);
-      const graphConfig: GraphConfig = {
-        name,
-        path: kgPath,
-        type,
-        categories: categories as CategoryConfig[],
-        createdAt: now,
-        // lastUsed removed -- no writer needed once Task 1.12 deletes the field
-        status: "pending",
-        statusChangedAt: now,
-        graphId: newGraphId,
-      };
+    // Copy kg-category-index.md to knowledge/ subdir
+    const catIndexSrc = path.join(templateSrc, "knowledge", "kg-category-index.md");
+    const catIndexDest = path.join(expandedPath, "knowledge", "kg-category-index.md");
+    if (fs.existsSync(catIndexSrc) && !fs.existsSync(catIndexDest)) {
+      fs.copyFileSync(catIndexSrc, catIndexDest);
+    }
+  }
 
-      config.graphs[name] = graphConfig;
-      // config.active = name; removed -- resolution is now context-derived (Task 1.5)
-      writeConfig(config);
+  // Write config entry
+  const now = new Date().toISOString();
+  const newGraphId = mintGraphId();
+  let graphConfig: GraphConfig;
+  try {
+    writeGraphIdMarker(expandedPath, newGraphId);
+    graphConfig = {
+      name,
+      path: kgPath,
+      type,
+      categories: categories as CategoryConfig[],
+      createdAt: now,
+      // lastUsed removed -- no writer needed once Task 1.12 deletes the field
+      status: "pending",
+      statusChangedAt: now,
+      graphId: newGraphId,
+    };
+  } catch (err) {
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, remove or rename the existing .kmgraph-id marker file manually if you're certain this is intentional.`,
+        },
+      ],
+      isError: true,
+    };
+  }
 
-      return {
-        content: [
-          {
-            type: "text" as const,
-            text: `Knowledge graph '${name}' initialized at ${kgPath}\nReady to use — knowledge graphs are resolved automatically from your current directory. Categories: ${categories.map((c) => c.name).join(", ")}`,
-          },
-        ],
-      };}
+  config.graphs[name] = graphConfig;
+  // config.active = name; removed -- resolution is now context-derived (Task 1.5)
+  writeConfig(config);
+
+  return {
+    content: [
+      {
+        type: "text" as const,
+        text: `Knowledge graph '${name}' initialized at ${kgPath}\nReady to use — knowledge graphs are resolved automatically from your current directory. Categories: ${categories.map((c) => c.name).join(", ")}`,
+      },
+    ],
+  };
+}
 
 export function registerConfigTools(server: McpServer): void {
   // ── kg_config_init ──────────────────────────────────────────────
@@ -261,7 +276,7 @@ export function registerConfigTools(server: McpServer): void {
 
       const lines = graphs.map((g) => {
         const cats = g.categories.map((c) => c.name).join(", ");
-        return `${g.name} (${g.status}) — ${g.path}\n  Categories: ${cats}`;
+        return `${g.name} (${g.status ?? "active"}) — ${g.path}\n  Categories: ${cats}`;
       });
 
       return {

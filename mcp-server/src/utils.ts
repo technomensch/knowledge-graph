@@ -156,6 +156,11 @@ export function findRegistryEntryByGraphId(
   return null;
 }
 
+// "path-missing" is intentionally unreachable: checkGraphPathHealth collapses both
+// "path doesn't exist" and "path exists but is empty directory" into "content-missing"
+// since both need the same handling currently. Any code pattern-matching on "path-missing"
+// specifically will never see it fire. A future caller needing finer granularity should
+// branch on fs.existsSync directly rather than expecting this function to ever return it.
 export type PathHealth = "ok" | "parent-unreachable" | "path-missing" | "content-missing";
 
 export function checkGraphPathHealth(graph: GraphConfig): PathHealth {

@@ -112,6 +112,12 @@ export function isHomeOrRootCwd(cwd: string): boolean {
   return normalized === path.resolve(os.homedir()) || normalized === path.parse(normalized).root;
 }
 
+// Built to power a "notice the user when they cross from one nested knowledge graph
+// into another within the same session" feature, but not yet wired into any tool call path.
+// Verified against the full plan set: no later phase currently instantiates or references
+// this class — the nested-KG transition notice it was meant to power does not fire yet.
+// Future callers touching resolution-driven tool paths should either wire this in or
+// flag it as intentionally dropped scope, not assume it's already working.
 export class ResolutionSession {
   private lastResolvedName: string | null = null;
 
@@ -122,6 +128,13 @@ export class ResolutionSession {
   }
 }
 
+// Detects registry entries pointing at the identical path, but uses a simpler path-normalization
+// strategy than resolveGraph's internal normalizeRealPath: this function only does ~ expansion,
+// not symlink resolution. As a result, two registry entries with the same real path but reached
+// via different symlinks will NOT be detected as a tie by this function (though resolveGraph
+// itself does catch that case internally, via its own separate length-based grouping).
+// Future callers wiring this into duplicate-detection logic should either upgrade it to use
+// normalizeRealPath too, or explicitly accept the symlink-duplication gap.
 export function findTruePathTies(config: KgConfig, resolvedPath: string): string[] {
   const target = expand(resolvedPath);
   return Object.entries(config.graphs)

@@ -225,9 +225,8 @@ export async function handleCapture(
   if ("error" in validated) return validated as CaptureError;
 
   const config = readConfig();
-  let kgPath: string | null;
+  let kgPath: string;
   let resolvedKgName: string;
-  let skipCwdCheck = false;
 
   if (targetKg) {
     // Explicit target KG: resolve by exact name, skip CWD check (intentional
@@ -241,17 +240,22 @@ export async function handleCapture(
         message: `Unknown KG name: "${targetKg}". Check /kmgraph:status for registered KGs.`,
       };
     }
+    if (resolution.kind === "fuzzy-match") {
+      return {
+        error: "VALIDATION_ERROR",
+        message: `Ambiguous KG name "${targetKg}". Did you mean: ${resolution.candidates.join(", ")}?`,
+      };
+    }
     if (resolution.kind !== "resolved") {
-      // fuzzy-match/archived/ambiguous-tie/merged: Task 6.2 wires each of
-      // these through the interactivity gate with its real per-outcome
-      // behavior; for this task, preserve current behavior (no regression
-      // from today, where none of these outcomes exist at all) by treating
-      // them as KG_MISMATCH.
+      // archived/ambiguous-tie/merged: Task 6.2 wires each of these through
+      // the interactivity gate with its real per-outcome behavior; for this
+      // task, preserve current behavior (no regression from today, where
+      // none of these outcomes exist at all) by treating them as
+      // KG_MISMATCH.
       return { error: "KG_MISMATCH" };
     }
     kgPath = resolution.graph.path.replace(/^~/, require("os").homedir());
     resolvedKgName = resolution.name;
-    skipCwdCheck = true;
   } else {
     const resolution = resolveGraph(config, process.cwd());
     if (resolution.kind === "no-graph-in-cwd") {
