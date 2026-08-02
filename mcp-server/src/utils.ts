@@ -62,10 +62,12 @@ export function readConfig(): KgConfig {
     const raw = fs.readFileSync(CONFIG_PATH, "utf-8");
     return JSON.parse(raw) as KgConfig;
   }
-  // Read-only legacy fallback: pre-v0.6 installs kept kg-config.json under
-  // ~/.claude/. Without this, users who never migrated get DEFAULT_CONFIG and
-  // the config-location upgrade never becomes reachable. Never written here —
-  // migration is handled explicitly by kg_upgrade's config-location category.
+  // Legacy fallback: pre-v0.6 installs kept kg-config.json under ~/.claude/.
+  // Without this, users who never migrated get DEFAULT_CONFIG and the
+  // config-location upgrade never becomes reachable. Content is written
+  // forward to CONFIG_PATH below on first read (spec §6) so subsequent reads
+  // and writes agree on a single file; schema upgrade and legacy-file
+  // deletion remain kg_upgrade's config-location category's job.
   //
   // Only applies when using the default resolution path. An explicit
   // KG_CONFIG_PATH override means the user opted into a custom location: a
@@ -79,7 +81,16 @@ export function readConfig(): KgConfig {
   const legacyPath = path.join(process.env.HOME || os.homedir(), ".claude", "kg-config.json");
   if (fs.existsSync(legacyPath)) {
     const raw = fs.readFileSync(legacyPath, "utf-8");
-    return JSON.parse(raw) as KgConfig;
+    const legacyConfig = JSON.parse(raw) as KgConfig;
+    // findings doc #5: write it forward once, so every subsequent read/write
+    // in this and any other process agrees on a single file — the
+    // precondition spec §6 requires before Task 2.3's merge-on-conflict
+    // writer is coherent. Content-preserving only: the legacy file's exact
+    // shape (possibly still pre-Task-1.1 schema) is carried forward
+    // unchanged; Task 8.1 upgrades the shape and deletes the legacy file
+    // with backup/consent.
+    writeConfig(legacyConfig);
+    return legacyConfig;
   }
   return { ...DEFAULT_CONFIG };
 }
