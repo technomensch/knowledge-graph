@@ -147,8 +147,11 @@ describe("kg_config_switch with legacy config fallback", () => {
     expect(cfg.graphs).toEqual({});
   });
 
-  // Skipped: ADR-067 Task 2.2 reconciles legacy config on read, invalidating this "no write occurs" invariant. File is deleted entirely in Phase 6 Task 6.2.
-  it.skip("is a deprecated no-op — does not write anything, even against a legacy-only config (ADR-067 Task 1.10)", () => {
+  // Note: ADR-067 Task 2.2 reconciles legacy config on read, so the
+  // "no write occurs at all" assertion below was removed as stale (readConfig()
+  // now write-forwards the legacy content to newConfigPath). Every other
+  // assertion in this test remains valid.
+  it("is a deprecated no-op — does not write anything, even against a legacy-only config (ADR-067 Task 1.10)", () => {
     // Scenario: user has only legacy config. kg_config_switch no longer
     // persists anything -- resolution is context-derived (Task 1.5), so
     // "switching" has nothing left to record. This also means switch no
@@ -198,10 +201,6 @@ describe("kg_config_switch with legacy config fallback", () => {
     expect(result.content[0].text).toContain("no longer changes anything");
     expect(result.content[0].text).toContain("/path/b");
 
-    // No migration to the new path — switch never called writeConfig().
-    const newConfigPath = path.join(home, ".kmgraph", "kg-config.json");
-    expect(fs.existsSync(newConfigPath)).toBe(false);
-
     // Legacy file itself is untouched.
     const legacyAfter = JSON.parse(fs.readFileSync(path.join(legacyDir, "kg-config.json"), "utf-8"));
     expect(legacyAfter.active).toBe("graph-a");
@@ -216,8 +215,11 @@ describe("kg_config_switch with legacy config fallback", () => {
     expect(cfg.graphs).toEqual({});
   });
 
-  // Skipped: ADR-067 Task 2.2 reconciles legacy config on read, invalidating this "no write occurs" invariant. File is deleted entirely in Phase 6 Task 6.2.
-  it.skip("real handleConfigSwitch() returns an error when the target graph doesn't exist", () => {
+  // Note: ADR-067 Task 2.2 reconciles legacy config on read, so the
+  // "no write occurs at all" assertion below was removed as stale (readConfig()
+  // now write-forwards the legacy content to newConfigPath). Every other
+  // assertion in this test remains valid.
+  it("real handleConfigSwitch() returns an error when the target graph doesn't exist", () => {
     const home = makeTempDir("home");
     const legacyDir = path.join(home, ".claude");
     fs.mkdirSync(legacyDir, { recursive: true });
@@ -247,9 +249,5 @@ describe("kg_config_switch with legacy config fallback", () => {
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain("not found");
     expect(result.content[0].text).toContain("graph-a");
-
-    // Config must be unchanged — no write should have occurred on the error path.
-    const newConfigPath = path.join(home, ".kmgraph", "kg-config.json");
-    expect(fs.existsSync(newConfigPath)).toBe(false);
   });
 });

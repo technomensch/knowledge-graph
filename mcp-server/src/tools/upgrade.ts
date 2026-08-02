@@ -457,6 +457,16 @@ function checkStrayKnowledgeDir(kgPath: string, kgType: string | undefined): Upg
  * Check e — flag a kg-config.json still at the legacy ~/.claude/ location
  * when the platform-neutral ~/.kmgraph/ location hasn't been migrated to yet.
  * Skipped entirely when KG_CONFIG_PATH env var is set (explicit override in play).
+ *
+ * Final review finding I-1 (2026-08-02): as of ADR-067 Task 2.2, `readConfig()`
+ * write-forwards the legacy file's content to `newPath` on its very first call
+ * in any process. By the time `handleUpgrade()` reaches this function it has
+ * already called `readConfig()` once, so `fs.existsSync(newPath)` below is true
+ * on essentially every real invocation -- this category is effectively dead by
+ * construction. Task 8.1 must NOT key its legacy detection off "new path
+ * missing"; it must key off "does the legacy file still exist on disk"
+ * (`fs.existsSync(oldPath)` alone), since that's the only thing Task 2.2 leaves
+ * unresolved -- the content copy, not the leftover file.
  */
 function checkConfigLocation(): UpgradeItem[] {
   if (process.env.KG_CONFIG_PATH) return [];

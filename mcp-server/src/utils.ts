@@ -97,7 +97,17 @@ export function readConfig(): KgConfig {
     // shape (possibly still pre-Task-1.1 schema) is carried forward
     // unchanged; Task 8.1 upgrades the shape and deletes the legacy file
     // with backup/consent.
-    writeConfig(legacyConfig);
+    //
+    // Final review finding I-2 (2026-08-02): this forward-write is
+    // best-effort. A read must never hard-fail just because the primary
+    // directory happened to be unwritable (read-only mount, permissions,
+    // disk full) -- the read itself already succeeded, so degrade to
+    // returning the legacy content rather than throwing.
+    try {
+      writeConfig(legacyConfig);
+    } catch {
+      /* best-effort forward-write; the read below still succeeds */
+    }
     return legacyConfig;
   }
   return { ...DEFAULT_CONFIG };
@@ -164,6 +174,11 @@ export function writeConfig(config: KgConfig): void {
   }
 }
 
+// Final review finding I-4 (2026-08-02): the returned value reflects the
+// mutator's pre-merge working copy, not the merged config that was actually
+// persisted to disk -- a concurrent writer's changes folded in during the
+// merge are not reflected in it. Callers needing the authoritative post-write
+// state should call readConfig() again after updateConfig() returns.
 export function updateConfig<T>(
   mutator: (config: KgConfig) => T,
   opts: { intentful?: boolean } = {}
