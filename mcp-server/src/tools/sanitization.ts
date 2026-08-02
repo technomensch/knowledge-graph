@@ -3,7 +3,8 @@ import { z } from "zod";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { readConfig, getActiveGraphPath, walkDir } from "../utils.js";
+import { readConfig, walkDir, KgConfig } from "../utils.js";
+import { resolveGraph, resolvePersonalGraph } from "../resolution.js";
 
 interface Violation {
   file: string;
@@ -31,6 +32,28 @@ const DEFAULT_PATTERNS: Array<{ type: string; regex: RegExp }> = [
   },
 ];
 
+// ADR-067 Task 1.9: resolution is context-derived (resolveGraph), not
+// config.active-derived. scope:"user" reaches the personal graph, which
+// config.active could previously only reach by incidentally pointing at it.
+// Exported separately from the tool handler so the resolution logic has a
+// direct, mockable seam for tests.
+export function resolveScanPath(
+  config: KgConfig,
+  params: { kgPath?: string; scope?: "project" | "user" }
+): { scanPath: string } | { error: string } {
+  if (params.kgPath) {
+    return { scanPath: params.kgPath.replace(/^~/, os.homedir()) };
+  }
+  const target = params.scope === "user" ? resolvePersonalGraph(config) : (() => {
+    const resolution = resolveGraph(config, process.cwd());
+    return resolution.kind === "resolved"
+      ? { name: resolution.name, graph: resolution.graph }
+      : { error: "No knowledge graph resolved from your current directory and no path specified." };
+  })();
+  if ("error" in target) return target;
+  return { scanPath: target.graph.path.replace(/^~/, os.homedir()) };
+}
+
 export function registerSanitizationTool(server: McpServer): void {
   server.tool(
     "kg_check_sensitive",
@@ -39,33 +62,31 @@ export function registerSanitizationTool(server: McpServer): void {
       kgPath: z
         .string()
         .optional()
-        .describe("Path to scan (defaults to active KG)"),
+        .describe("Path to scan (default: resolved from your current directory)"),
+      scope: z
+        .enum(["project", "user"])
+        .optional()
+        .describe("project (default, cwd-resolved) or user (the personal knowledge graph) — ignored when kgPath is given"),
       patterns: z
         .array(z.string())
         .optional()
         .describe("Additional regex patterns to check (beyond defaults)"),
     },
-    async ({ kgPath, patterns: customPatterns }) => {
+    async ({ kgPath, scope, patterns: customPatterns }) => {
       // Determine path to scan
-      let scanPath: string;
-      if (kgPath) {
-        scanPath = kgPath.replace(/^~/, os.homedir());
-      } else {
-        const config = readConfig();
-        const activePath = getActiveGraphPath(config);
-        if (!activePath) {
-          return {
-            content: [
-              {
-                type: "text" as const,
-                text: "Error: No active KG and no path specified.",
-              },
-            ],
-            isError: true,
-          };
-        }
-        scanPath = activePath;
+      const resolved = resolveScanPath(readConfig(), { kgPath, scope });
+      if ("error" in resolved) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: `Error: ${resolved.error}`,
+            },
+          ],
+          isError: true,
+        };
       }
+      const scanPath = resolved.scanPath;
 
       if (!fs.existsSync(scanPath)) {
         return {

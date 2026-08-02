@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import { readConfig, writeConfig, getPluginRoot } from "../utils.js";
+import { resolveGraph, resolvePersonalGraph } from "../resolution.js";
 import { handleVersion } from "./version.js";
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -83,10 +84,10 @@ function checkDirectories(kgPath: string): UpgradeItem[] {
 /**
  * Check b — verify required config fields are present for the active graph.
  */
-function checkConfig(kgPath: string): UpgradeItem[] {
+function checkConfig(kgPath: string, graphName: string): UpgradeItem[] {
   const config = readConfig();
-  if (!config.active || !config.graphs[config.active]) return [];
-  const graph = config.graphs[config.active] as unknown as Record<string, unknown>;
+  if (!config.graphs[graphName]) return [];
+  const graph = config.graphs[graphName] as unknown as Record<string, unknown>;
 
   const requiredFields: Array<{ field: string; defaultValue: unknown }> = [
     { field: "platforms", defaultValue: [] },
@@ -270,12 +271,12 @@ function applyDirectories(kgPath: string): string {
     : "All directories already exist";
 }
 
-function applyConfig(): string {
+function applyConfig(graphName: string): string {
   const config = readConfig();
-  if (!config.active || !config.graphs[config.active]) {
-    return "No active graph to update config for";
+  if (!config.graphs[graphName]) {
+    return "No graph to update config for";
   }
-  const graph = config.graphs[config.active] as unknown as Record<string, unknown>;
+  const graph = config.graphs[graphName] as unknown as Record<string, unknown>;
   const defaults: Record<string, unknown> = {
     platforms: [],
     autoSwitch: false,
@@ -608,9 +609,10 @@ function applyPlatformSplit(kgPath: string): string {
 function checkVersionMismatch(
   installedVersion: string,
   kgType: string | undefined,
-  config: ReturnType<typeof readConfig>
+  config: ReturnType<typeof readConfig>,
+  graphName: string
 ): UpgradeItem[] {
-  const graphRecord = config.graphs[config.active!] as unknown as Record<string, unknown>;
+  const graphRecord = config.graphs[graphName] as unknown as Record<string, unknown>;
   const lastApplied = graphRecord.lastAppliedVersion as string | undefined;
   if (!lastApplied || lastApplied === installedVersion) return [];
   return [{
@@ -620,10 +622,10 @@ function checkVersionMismatch(
   }];
 }
 
-function updateLastAppliedVersion(installedVersion: string): void {
+function updateLastAppliedVersion(installedVersion: string, graphName: string): void {
   // Fresh read to avoid clobbering field additions made by applyConfig() in the same apply run
   const config = readConfig();
-  const graph = config.graphs[config.active!] as unknown as Record<string, unknown>;
+  const graph = config.graphs[graphName] as unknown as Record<string, unknown>;
   graph.lastAppliedVersion = installedVersion;
   writeConfig(config);
 }
@@ -636,6 +638,7 @@ export type ApplyCategory = "config-location" | "directories" | "config" | "temp
 export interface HandleUpgradeParams {
   apply?: ApplyCategory[];
   confirm_platform_split?: boolean;
+  scope?: "project" | "user";
 }
 
 export interface HandleUpgradeResult {
@@ -649,24 +652,17 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
   const installedVersion = handleVersion().installed;
   const config = readConfig();
 
-  if (!config.active || !config.graphs[config.active]) {
-    return {
-      content: [{ type: "text" as const, text: "Error: No active knowledge graph configured. Use kg_config_init or kg_config_switch first." }],
-      isError: true,
-    };
-  }
-
-  const rawPath = config.graphs[config.active].path;
-  const kgPath = rawPath.replace(/^~/, os.homedir());
-  const graphRecord = config.graphs[config.active] as unknown as Record<string, unknown>;
-  const kgType = graphRecord.type as string | undefined;
-
-  if (!fs.existsSync(kgPath)) {
-    return {
-      content: [{ type: "text" as const, text: `Error: KG path not found: ${kgPath}` }],
-      isError: true,
-    };
-  }
+  // ADR-067 Task 1.9: resolution is context-derived (resolveGraph), not
+  // config.active-derived. Resolution failure no longer short-circuits the
+  // whole tool -- config-location is graph-independent (and, per Task 8.1,
+  // a future migration category must run before any graph can resolve
+  // correctly) and must stay reachable even when no graph resolves.
+  const target = params.scope === "user" ? resolvePersonalGraph(config) : (() => {
+    const resolution = resolveGraph(config, process.cwd());
+    return resolution.kind === "resolved"
+      ? { name: resolution.name, graph: resolution.graph }
+      : { error: "No knowledge graph resolved from your current directory. Use kg_config_init first, or pass scope=\"user\"." };
+  })();
 
   const applyList = params.apply ?? [];
   const sortedApplyList = [...applyList].sort(
@@ -675,52 +671,84 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
 
   if (applyList.length === 0) {
     const result: InspectResult = { upgrades: [], warnings: [] };
+    result.upgrades.push(...checkConfigLocation());
+
+    if ("error" in target) {
+      result.upgrades.push({
+        category: "resolution",
+        description: target.error,
+        details: "Graph-dependent checks (directories, config, templates, stray-knowledge-dir, version-update) were skipped.",
+      });
+      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
+    }
+
+    const kgPath = target.graph.path.replace(/^~/, os.homedir());
+    const kgType = target.graph.type as string | undefined;
+    if (!fs.existsSync(kgPath)) {
+      return {
+        content: [{ type: "text" as const, text: `Error: KG path not found: ${kgPath}` }],
+        isError: true,
+      };
+    }
+
     result.upgrades.push(...checkDirectories(kgPath));
-    result.upgrades.push(...checkConfig(kgPath));
+    result.upgrades.push(...checkConfig(kgPath, target.name));
     result.upgrades.push(...checkStarterRelocation(kgPath));
     result.upgrades.push(...checkTemplates(kgPath));
     result.upgrades.push(...checkStrayKnowledgeDir(kgPath, kgType));
-    result.upgrades.push(...checkConfigLocation());
-    result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config));
+    result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config, target.name));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
     return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
   }
 
   const results: string[] = [];
+  let appliedAnyGraphDependent = false;
   for (const category of sortedApplyList) {
+    if (category === "config-location") {
+      results.push(`[config-location] ${applyConfigLocation()}`);
+      continue;
+    }
+    if ("error" in target) {
+      results.push(`[${category}] Error: ${target.error}`);
+      continue;
+    }
+    const kgPath = target.graph.path.replace(/^~/, os.homedir());
     switch (category) {
-      case "config-location":
-        results.push(`[config-location] ${applyConfigLocation()}`);
-        break;
       case "directories":
         results.push(`[directories] ${applyDirectories(kgPath)}`);
+        appliedAnyGraphDependent = true;
         break;
       case "config":
-        results.push(`[config] ${applyConfig()}`);
+        results.push(`[config] ${applyConfig(target.name)}`);
+        appliedAnyGraphDependent = true;
         break;
       case "templates":
         results.push(`[templates] ${applyTemplates(kgPath)}`);
+        appliedAnyGraphDependent = true;
         break;
       case "starter-relocation":
         results.push(`[starter-relocation] ${applyStarterRelocation(kgPath)}`);
+        appliedAnyGraphDependent = true;
         break;
       case "stray-knowledge-dir":
         results.push(`[stray-knowledge-dir] ${applyStrayKnowledgeDir(kgPath)}`);
+        appliedAnyGraphDependent = true;
         break;
       case "platform-split":
         if (!params.confirm_platform_split) {
           results.push("[platform-split] WARNING: platform-split migration removes content from rules.md. Pass confirm_platform_split: true to proceed.");
         } else {
           results.push(`[platform-split] ${applyPlatformSplit(kgPath)}`);
+          appliedAnyGraphDependent = true;
         }
         break;
     }
   }
 
-  // Write lastAppliedVersion sentinel after any successful apply
-  if (applyList.length > 0) {
-    updateLastAppliedVersion(installedVersion);
+  // Write lastAppliedVersion sentinel after any successful graph-dependent apply
+  if (appliedAnyGraphDependent && !("error" in target)) {
+    updateLastAppliedVersion(installedVersion, target.name);
   }
 
   return { content: [{ type: "text" as const, text: results.join("\n\n") }] };
@@ -747,9 +775,13 @@ export function registerUpgradeTool(server: McpServer): void {
         .describe(
           "Must be true to apply platform-split migration (removes content from rules.md)"
         ),
+      scope: z
+        .enum(["project", "user"])
+        .optional()
+        .describe("project (default, cwd-resolved) or user (the personal knowledge graph)"),
     },
-    async ({ apply, confirm_platform_split }) => {
-      return handleUpgrade({ apply: apply as ApplyCategory[] | undefined, confirm_platform_split });
+    async ({ apply, confirm_platform_split, scope }) => {
+      return handleUpgrade({ apply: apply as ApplyCategory[] | undefined, confirm_platform_split, scope });
     }
   );
 }

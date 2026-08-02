@@ -1,4 +1,4 @@
-import { resolveGraph } from "../src/resolution.js";
+import { resolveGraph, resolvePersonalGraph } from "../src/resolution.js";
 import { KgConfig, GraphConfig } from "../src/utils.js";
 import * as fs from "fs";
 import * as path from "path";
@@ -134,5 +134,26 @@ describe("resolveGraph", () => {
     const result = resolveGraph(config, "/repo/src");
     expect(result.kind).toBe("ambiguous-tie");
     if (result.kind === "ambiguous-tie") expect(result.candidates.sort()).toEqual(["fork", "original"]);
+  });
+});
+
+describe("resolvePersonalGraph", () => {
+  it("finds the single personal-type entry", () => {
+    const config = { version: "1.0.0", graphs: { p: { name: "p", path: "/p", type: "personal" as const, categories: [], createdAt: "x", lastUsed: "x", status: "active" as const, statusChangedAt: "x", graphId: "id" } }, sanitization: { enabled: false, patterns: [], action: "warn" as const } };
+    const result = resolvePersonalGraph(config as any);
+    expect("name" in result && result.name).toBe("p");
+  });
+  it("errors cleanly when zero personal graphs are registered", () => {
+    const config = { version: "1.0.0", graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" as const } };
+    const result = resolvePersonalGraph(config as any);
+    expect("error" in result).toBe(true);
+  });
+  it("errors cleanly when multiple personal graphs are registered (should never happen, but don't silently pick one)", () => {
+    const config = { version: "1.0.0", graphs: {
+      p1: { name: "p1", path: "/p1", type: "personal" as const, categories: [], createdAt: "x", lastUsed: "x", status: "active" as const, statusChangedAt: "x", graphId: "id1" },
+      p2: { name: "p2", path: "/p2", type: "personal" as const, categories: [], createdAt: "x", lastUsed: "x", status: "active" as const, statusChangedAt: "x", graphId: "id2" },
+    }, sanitization: { enabled: false, patterns: [], action: "warn" as const } };
+    const result = resolvePersonalGraph(config as any);
+    expect("error" in result).toBe(true);
   });
 });

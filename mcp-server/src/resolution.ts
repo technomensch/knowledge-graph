@@ -99,6 +99,14 @@ function archivedOrMerged(name: string, graph: GraphConfig): ResolutionResult {
   return { kind: "archived", name, graph };
 }
 
+export function resolvePersonalGraph(config: KgConfig): { name: string; graph: GraphConfig } | { error: string } {
+  const matches = Object.entries(config.graphs).filter(([, g]) => g.type === "personal" && g.status !== "deleted");
+  if (matches.length === 0) return { error: "No personal knowledge graph is registered. Use kg_config_init with type=personal first." };
+  if (matches.length > 1) return { error: `Multiple personal knowledge graphs are registered (${matches.map(([n]) => n).join(", ")}) — this should never happen. Resolve the duplicate before proceeding.` };
+  const [name, graph] = matches[0];
+  return { name, graph };
+}
+
 export function isHomeOrRootCwd(cwd: string): boolean {
   const normalized = path.resolve(cwd);
   return normalized === path.resolve(os.homedir()) || normalized === path.parse(normalized).root;

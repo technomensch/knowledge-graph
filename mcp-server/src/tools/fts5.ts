@@ -3,7 +3,8 @@ import { z } from "zod";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { readConfig, writeConfig, getActiveGraphPath, walkDir } from "../utils.js";
+import { readConfig, writeConfig, walkDir } from "../utils.js";
+import { resolveGraph, resolvePersonalGraph } from "../resolution.js";
 
 // Graceful fallback: node-sqlite3-wasm is bundled in dist/node_modules/ for marketplace installs
 // (v0.5.10.3+). This try/catch covers edge cases: partial clone, corrupted dist, or dev runs
@@ -407,49 +408,73 @@ export function searchFts5(
 export function registerFts5StatusTool(server: McpServer): void {
   server.tool(
     "kg_fts5_status",
-    "Check whether the FTS5 search index exists for the active knowledge graph. " +
-      "Returns { exists, db_path, kgType }. Read-only — does not create or modify the index.",
-    {},
-    async () => {
-      try {
-        const config = readConfig();
-        const activeName = config.active;
-        if (!activeName) {
-          return {
-            content: [{
-              type: "text" as const,
-              text: JSON.stringify({ exists: false, db_path: null, kgType: null, error: "No active KG" }),
-            }],
-          };
-        }
-        const graph = config.graphs[activeName];
-        const kgType = graph?.type ?? "project-local";
-        // resolveDbPath normally creates dirs — for status we compute the path without creating anything
-        let dbPath: string;
-        if (kgType === "personal") {
-          dbPath = path.join(os.homedir(), ".kmgraph", "index", "personal.db");
-        } else {
-          dbPath = path.join(os.homedir(), ".kmgraph", "index", "projects", `${activeName}.db`);
-        }
-        const exists = fs.existsSync(dbPath);
-        return {
-          content: [{
-            type: "text" as const,
-            text: JSON.stringify({ exists, db_path: dbPath, kgType }),
-          }],
-        };
-      } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : String(err);
-        return {
-          content: [{
-            type: "text" as const,
-            text: `Error checking FTS5 status: ${message}`,
-          }],
-          isError: true,
-        };
-      }
-    }
+    "Check whether the FTS5 search index exists for a knowledge graph (default: resolved " +
+      "from your current directory). Returns { exists, db_path, kgType }. Read-only — does " +
+      "not create or modify the index.",
+    {
+      scope: z
+        .enum(["project", "user"])
+        .optional()
+        .describe("project (default, cwd-resolved) or user (the personal knowledge graph)"),
+    },
+    async ({ scope }) => handleFts5Status({ scope })
   );
+}
+
+export interface HandleFts5StatusParams {
+  scope?: "project" | "user";
+}
+
+export interface HandleFts5StatusResult {
+  [x: string]: unknown;
+  content: Array<{ type: "text"; text: string }>;
+  isError?: true;
+}
+
+export function handleFts5Status(params: HandleFts5StatusParams): HandleFts5StatusResult {
+  try {
+    const config = readConfig();
+    const target = params.scope === "user" ? resolvePersonalGraph(config) : (() => {
+      const resolution = resolveGraph(config, process.cwd());
+      return resolution.kind === "resolved"
+        ? { name: resolution.name, graph: resolution.graph }
+        : { error: "No knowledge graph resolved from your current directory." };
+    })();
+
+    if ("error" in target) {
+      return {
+        content: [{
+          type: "text" as const,
+          text: JSON.stringify({ exists: false, db_path: null, kgType: null, error: target.error }),
+        }],
+      };
+    }
+
+    const kgType = target.graph.type ?? "project-local";
+    // resolveDbPath normally creates dirs — for status we compute the path without creating anything
+    let dbPath: string;
+    if (kgType === "personal") {
+      dbPath = path.join(os.homedir(), ".kmgraph", "index", "personal.db");
+    } else {
+      dbPath = path.join(os.homedir(), ".kmgraph", "index", "projects", `${target.name}.db`);
+    }
+    const exists = fs.existsSync(dbPath);
+    return {
+      content: [{
+        type: "text" as const,
+        text: JSON.stringify({ exists, db_path: dbPath, kgType }),
+      }],
+    };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return {
+      content: [{
+        type: "text" as const,
+        text: `Error checking FTS5 status: ${message}`,
+      }],
+      isError: true,
+    };
+  }
 }
 
 /**
@@ -458,101 +483,118 @@ export function registerFts5StatusTool(server: McpServer): void {
 export function registerFts5Tool(server: McpServer): void {
   server.tool(
     "kg_fts5_rebuild",
-    "Build or refresh FTS5 full-text search index for the active knowledge graph. " +
-      "Indexes all .md files in knowledge/, lessons-learned/, decisions/, sessions/. " +
-      "Incremental: only re-indexes changed files. Run after sync-all or any time " +
-      "search results seem stale.",
+    "Build or refresh FTS5 full-text search index for a knowledge graph (default: resolved " +
+      "from your current directory). Indexes all .md files in knowledge/, lessons-learned/, " +
+      "decisions/, sessions/. Incremental: only re-indexes changed files. Run after " +
+      "sync-all or any time search results seem stale.",
     {
       kgPath: z
         .string()
         .optional()
-        .describe("Override KG path (default: active KG)"),
+        .describe("Override KG path (default: cwd-resolved KG)"),
+      scope: z
+        .enum(["project", "user"])
+        .optional()
+        .describe("project (default, cwd-resolved) or user (the personal knowledge graph) — ignored when kgPath is given"),
     },
-    async ({ kgPath }) => {
-      if (!fts5Available) {
-        return {
-          content: [{
-            type: "text" as const,
-            text: "Search index is not available yet. The required package was installed in the background — please restart Claude Code and try again.",
-          }],
-          isError: true,
-        };
-      }
-      try {
-        const config = readConfig();
-        let resolvedPath: string;
-        let resolvedName: string;
-
-        if (kgPath) {
-          resolvedPath = kgPath.replace(/^~/, os.homedir());
-          // Find the matching KG name from config, or derive from path basename
-          const matchedEntry = Object.entries(config.graphs || {}).find(
-            ([, g]) => (g as any).path === resolvedPath
-          );
-          resolvedName = matchedEntry ? matchedEntry[0] : path.basename(resolvedPath);
-        } else {
-          const activePath = getActiveGraphPath(config);
-          if (!activePath) {
-            return {
-              content: [
-                {
-                  type: "text" as const,
-                  text: "Error: No active KG and no path specified.",
-                },
-              ],
-              isError: true,
-            };
-          }
-          resolvedPath = activePath;
-          resolvedName = config.active!;
-        }
-
-        if (!fs.existsSync(resolvedPath)) {
-          return {
-            content: [
-              {
-                type: "text" as const,
-                text: `Error: KG path does not exist: ${resolvedPath}`,
-              },
-            ],
-            isError: true,
-          };
-        }
-
-        // Determine kgType for the resolved graph
-        const graphEntry = config.graphs[resolvedName];
-        const resolvedType = graphEntry?.type ?? "project-local";
-
-        const result = rebuildIndex(resolvedPath, resolvedName, resolvedType);
-
-        // Update config to mark FTS5 as enabled, remove declined flag
-        if (config.active && config.graphs[config.active]) {
-          const graph = config.graphs[config.active] as unknown as Record<string, unknown>;
-          graph.fts5 = true;
-          delete graph.fts5_declined;
-          writeConfig(config);
-        }
-
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: JSON.stringify(result, null, 2),
-            },
-          ],
-        };
-      } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : String(err);
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: `Error rebuilding FTS5 index: ${message}`,
-            },
-          ],
-          isError: true,
-        };
-      }
-    }
+    async ({ kgPath, scope }) => handleFts5Rebuild({ kgPath, scope })
   );
+}
+
+export interface HandleFts5RebuildParams {
+  kgPath?: string;
+  scope?: "project" | "user";
+}
+
+export interface HandleFts5RebuildResult {
+  [x: string]: unknown;
+  content: Array<{ type: "text"; text: string }>;
+  isError?: true;
+}
+
+export function handleFts5Rebuild(params: HandleFts5RebuildParams): HandleFts5RebuildResult {
+  if (!fts5Available) {
+    return {
+      content: [{
+        type: "text" as const,
+        text: "Search index is not available yet. The required package was installed in the background — please restart Claude Code and try again.",
+      }],
+      isError: true,
+    };
+  }
+  try {
+    const config = readConfig();
+    let resolvedPath: string;
+    let resolvedName: string;
+
+    if (params.kgPath) {
+      resolvedPath = params.kgPath.replace(/^~/, os.homedir());
+      // Find the matching KG name from config, or derive from path basename
+      const matchedEntry = Object.entries(config.graphs || {}).find(
+        ([, g]) => (g as any).path === resolvedPath
+      );
+      resolvedName = matchedEntry ? matchedEntry[0] : path.basename(resolvedPath);
+    } else {
+      const target = params.scope === "user" ? resolvePersonalGraph(config) : (() => {
+        const resolution = resolveGraph(config, process.cwd());
+        return resolution.kind === "resolved"
+          ? { name: resolution.name, graph: resolution.graph }
+          : { error: "No knowledge graph resolved from your current directory and no path specified." };
+      })();
+      if ("error" in target) {
+        return { content: [{ type: "text" as const, text: `Error: ${target.error}` }], isError: true };
+      }
+      resolvedPath = target.graph.path.replace(/^~/, os.homedir());
+      resolvedName = target.name;
+    }
+
+    if (!fs.existsSync(resolvedPath)) {
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: `Error: KG path does not exist: ${resolvedPath}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+
+    // Determine kgType for the resolved graph
+    const graphEntry = config.graphs[resolvedName];
+    const resolvedType = graphEntry?.type ?? "project-local";
+
+    const result = rebuildIndex(resolvedPath, resolvedName, resolvedType);
+
+    // Update config to mark FTS5 as enabled, remove declined flag -- on the
+    // graph actually rebuilt (resolvedName), not config.active (ADR-067
+    // Task 1.9 -- the old code marked whichever graph happened to be
+    // .active, even when an explicit kgPath/scope targeted a different one).
+    if (config.graphs[resolvedName]) {
+      const graph = config.graphs[resolvedName] as unknown as Record<string, unknown>;
+      graph.fts5 = true;
+      delete graph.fts5_declined;
+      writeConfig(config);
+    }
+
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: JSON.stringify(result, null, 2),
+        },
+      ],
+    };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: `Error rebuilding FTS5 index: ${message}`,
+        },
+      ],
+      isError: true,
+    };
+  }
 }

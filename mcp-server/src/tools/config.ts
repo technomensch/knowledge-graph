@@ -11,6 +11,7 @@ import {
   GraphConfig,
   CategoryConfig,
 } from "../utils.js";
+import { resolveGraph, resolvePersonalGraph } from "../resolution.js";
 
 // ── Exported handler for direct testing ──────────────────────────────────────
 
@@ -275,7 +276,7 @@ export function registerConfigTools(server: McpServer): void {
   // ── kg_config_add_category ──────────────────────────────────────
   server.tool(
     "kg_config_add_category",
-    "Add a new category to the active knowledge graph",
+    "Add a new category to a knowledge graph (default: resolved from your current directory)",
     {
       name: z.string().describe("Category name (e.g., 'security', 'ml-ops')"),
       prefix: z
@@ -287,54 +288,71 @@ export function registerConfigTools(server: McpServer): void {
         .enum(["commit", "ignore"])
         .default("commit")
         .describe("Git strategy for this category"),
+      scope: z
+        .enum(["project", "user"])
+        .optional()
+        .describe("project (default, cwd-resolved) or user (the personal knowledge graph)"),
     },
-    async ({ name: catName, prefix, git }) => {
-      const config = readConfig();
-
-      if (!config.active || !config.graphs[config.active]) {
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: "Error: No active knowledge graph. Use kg_config_init or kg_config_switch first.",
-            },
-          ],
-          isError: true,
-        };
-      }
-
-      const graph = config.graphs[config.active];
-
-      // Check if category already exists
-      if (graph.categories.some((c) => c.name === catName)) {
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: `Error: Category '${catName}' already exists in '${config.active}'.`,
-            },
-          ],
-          isError: true,
-        };
-      }
-
-      // Create directory
-      const expandedPath = graph.path.replace(/^~/, os.homedir());
-      const catDir = path.join(expandedPath, "lessons-learned", catName);
-      fs.mkdirSync(catDir, { recursive: true });
-
-      // Add to config
-      graph.categories.push({ name: catName, prefix, git });
-      writeConfig(config);
-
-      return {
-        content: [
-          {
-            type: "text" as const,
-            text: `Category '${catName}' added to '${config.active}'.\nDirectory created: ${catDir}`,
-          },
-        ],
-      };
-    }
+    async (params) => handleConfigAddCategory(params)
   );
+}
+
+// ── Exported handler for direct testing ──────────────────────────────────────
+
+export interface HandleConfigAddCategoryParams {
+  name: string;
+  prefix?: string | null;
+  git?: "commit" | "ignore";
+  scope?: "project" | "user";
+}
+
+export interface HandleConfigAddCategoryResult {
+  [x: string]: unknown;
+  content: Array<{ type: "text"; text: string }>;
+  isError?: true;
+}
+
+export function handleConfigAddCategory(
+  params: HandleConfigAddCategoryParams
+): HandleConfigAddCategoryResult {
+  const { name: catName, prefix = null, git = "commit", scope } = params;
+  const config = readConfig();
+
+  // ADR-067 Task 1.9: resolution is context-derived (resolveGraph), not
+  // config.active-derived. scope:"user" reaches the personal graph, which
+  // config.active could previously only reach by incidentally pointing at
+  // it -- this restores that reachability explicitly.
+  let target: { name: string; graph: GraphConfig } | { error: string };
+  if (scope === "user") {
+    target = resolvePersonalGraph(config);
+  } else {
+    const resolution = resolveGraph(config, process.cwd());
+    target = resolution.kind === "resolved"
+      ? { name: resolution.name, graph: resolution.graph }
+      : { error: "No knowledge graph resolved from your current directory. Use kg_config_init first, or pass scope=\"user\"." };
+  }
+
+  if ("error" in target) {
+    return { content: [{ type: "text" as const, text: `Error: ${target.error}` }], isError: true };
+  }
+
+  const { name: graphName, graph } = target;
+
+  if (graph.categories.some((c) => c.name === catName)) {
+    return {
+      content: [{ type: "text" as const, text: `Error: Category '${catName}' already exists in '${graphName}'.` }],
+      isError: true,
+    };
+  }
+
+  const expandedPath = graph.path.replace(/^~/, os.homedir());
+  const catDir = path.join(expandedPath, "lessons-learned", catName);
+  fs.mkdirSync(catDir, { recursive: true });
+
+  graph.categories.push({ name: catName, prefix, git });
+  writeConfig(config);
+
+  return {
+    content: [{ type: "text" as const, text: `Category '${catName}' added to '${graphName}'.\nDirectory created: ${catDir}` }],
+  };
 }
