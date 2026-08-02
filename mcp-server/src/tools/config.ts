@@ -363,6 +363,14 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
 
           const { preview, backupPath: previewBackupPath } = performRegistryMerge(config, name, existingEntry.name, {});
 
+          // NOTE (Task 4.5 review finding I-2, not yet fixed): confirmMerge:true currently cannot
+          // distinguish a real second-call approval (user already saw the merge_preview gate and
+          // said "confirm") from a cold first call that happens to pass confirmMerge:true alongside
+          // canonicalPath:"reattach". This is unreachable today because canonicalPath isn't wired
+          // into HandleConfigInitParams/the zod schema yet -- automated mode always returns
+          // KMG_INPUT_REQUIRED before reaching this branch. Once that plumbing lands, add a guard
+          // here (e.g. require the caller to echo back a token/hash from the merge_preview response)
+          // before trusting a bare confirmMerge:true.
           if (!confirmMerge) {
             const mode = resolveInteractionMode({ explicitParam: interaction }).mode;
             const gated = await gate({
@@ -370,11 +378,12 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
               reason: "merge_preview",
               param: "confirmMerge",
               accepts: ["confirm", "cancel"],
+              detail: preview,
               ask: () => new Promise<never>(() => {}), // no real ask() transport yet, same pattern as every other gate() stub in this plan
             });
 
             if ("error" in gated) {
-              return { content: [{ type: "text" as const, text: JSON.stringify({ ...gated, preview }) }], isError: true };
+              return { content: [{ type: "text" as const, text: JSON.stringify(gated) }], isError: true };
             }
             if (!("answer" in gated) || gated.answer !== "confirm") {
               // No write happened -- config.graphs[name] above only mutated

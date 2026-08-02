@@ -78,10 +78,12 @@ export interface InputRequiredError {
   error: "KMG_INPUT_REQUIRED";
   reason: string;
   resolveWith: { param: string; accepts?: string[] };
+  detail?: unknown;
 }
 
-export function requireInput(reason: string, param: string, accepts?: string[]): InputRequiredError {
-  return { error: "KMG_INPUT_REQUIRED", reason, resolveWith: { param, accepts } };
+export function requireInput(reason: string, param: string, accepts?: string[], detail?: unknown): InputRequiredError {
+  const base: InputRequiredError = { error: "KMG_INPUT_REQUIRED", reason, resolveWith: { param, accepts } };
+  return detail !== undefined ? { ...base, detail } : base;
 }
 
 export type AskResult =
@@ -102,18 +104,27 @@ export interface GateOptions {
   accepts?: string[];
   timeoutMs?: number;
   /**
+   * Optional structured payload describing what's being confirmed (e.g. a
+   * merge preview, a candidate KG list). Automated-mode callers receive it
+   * merged into the InputRequiredError response via requireInput()'s detail
+   * param. Interactive callers' ask() implementations receive it as a
+   * second argument so a real elicitation transport can render it before
+   * prompting -- gate() itself never interprets this value, just carries it.
+   */
+  detail?: unknown;
+  /**
    * Only invoked when mode === "interactive". Receives an AbortSignal that
    * aborts on timeout. A synchronous throw or a rejected promise from ask()
    * propagates out of gate() as a rejection -- gate() does not catch or map
    * transport/adapter failures into a structured result. Callers must be
    * prepared to catch (ADR-067 Phase 3 final review finding I-2).
    */
-  ask: (signal: AbortSignal) => Promise<AskResult>;
+  ask: (signal: AbortSignal, detail?: unknown) => Promise<AskResult>;
 }
 
 export async function gate(opts: GateOptions): Promise<GateResult> {
   if (opts.mode === "automated") {
-    return requireInput(opts.reason, opts.param, opts.accepts);
+    return requireInput(opts.reason, opts.param, opts.accepts, opts.detail);
   }
   const timeoutMs = opts.timeoutMs ?? 30_000;
   const controller = new AbortController();
@@ -122,14 +133,14 @@ export async function gate(opts: GateOptions): Promise<GateResult> {
   const timeout = new Promise<InputRequiredError>((resolve) => {
     timeoutHandle = setTimeout(() => {
       controller.abort(); // let an ask() implementation that respects AbortSignal actually stop waiting
-      resolve(requireInput(`${opts.reason}_timeout`, opts.param, opts.accepts));
+      resolve(requireInput(`${opts.reason}_timeout`, opts.param, opts.accepts, opts.detail));
     }, timeoutMs);
   });
 
   // Wrapped so a synchronous throw inside ask() becomes a rejected promise
   // and still flows through the try/finally below (ADR-067 Phase 3 fix,
   // commit 1de44b6d) -- do not inline opts.ask(...) directly here.
-  const asked = Promise.resolve().then(() => opts.ask(controller.signal));
+  const asked = Promise.resolve().then(() => opts.ask(controller.signal, opts.detail));
 
   try {
     const result = await Promise.race([asked, timeout]);

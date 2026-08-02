@@ -111,4 +111,42 @@ describe("gate()", () => {
     await gate({ mode: "interactive", reason: "fuzzy_match", param: "name", ask, timeoutMs: 20 });
     expect(observedAborted).toBe(true);
   });
+
+  it("passes detail through to automated-mode's InputRequiredError", async () => {
+    const result = await gate({
+      mode: "automated",
+      reason: "x",
+      param: "y",
+      detail: { foo: "bar" },
+      ask: async () => ({ status: "answered", answer: "z" }),
+    });
+    expect((result as { detail?: unknown }).detail).toEqual({ foo: "bar" });
+  });
+
+  it("passes detail through to ask() as its second argument", async () => {
+    const ask = async (signal: AbortSignal, detail?: unknown) => ({ status: "answered" as const, answer: JSON.stringify(detail) });
+    const result = await gate({
+      mode: "interactive",
+      reason: "fuzzy_match",
+      param: "name",
+      detail: { foo: "bar" },
+      ask,
+    });
+    expect(result).toEqual({ answer: JSON.stringify({ foo: "bar" }) });
+  });
+
+  it("omits detail entirely when not provided (no behavior change for existing callers)", async () => {
+    const result = await gate({
+      mode: "automated",
+      reason: "x",
+      param: "y",
+      ask: async () => ({ status: "answered", answer: "z" }),
+    });
+    expect((result as { detail?: unknown }).detail).toBeUndefined();
+    expect(result).toEqual({
+      error: "KMG_INPUT_REQUIRED",
+      reason: "x",
+      resolveWith: { param: "y", accepts: undefined },
+    });
+  });
 });
