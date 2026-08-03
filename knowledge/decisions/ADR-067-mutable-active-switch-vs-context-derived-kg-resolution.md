@@ -15,7 +15,7 @@ related:
   adrs: [1, 19, 60, 66]
   lessons: []
   kg_entries: []
-  issues: [10, 14]
+  issues: [10, 14, 18]
 tags: [architecture, kg-resolution, switch, context-mode, cross-kg-bleed, state-model, decision-pending]
 category: architecture
 ---
@@ -507,6 +507,24 @@ Surfaced while a different plan (`v0.7.0-c3-adr-068-pilot.md`, ADR-068) ran `tes
 
 **Correction + Group 4 (2026-08-01):** the original triage above was incomplete — it accounted for 10 of the 12 failing suites (7 in group 2, 2 in group 3, 1 in group 1) but never identified the remaining 2 (`test-mcp-resources.sh`, `test-v050-misc.sh`), which issue-38's filing correctly excluded rather than guessing at. Investigated directly: both pass every individual assertion (8/8 and 4/4) when run standalone, but die silently under `set -e`+`pipefail` when the full suite triggers a code path referencing a hardcoded `core/templates/` directory that no longer exists — renamed to `core/default-templates/` at some prior, uncaptured point. Same failure class as issue-31/issue-35/issue-38 (stale pre-migration path, migration verification never extended to `tests/`), but a distinct migration instance (directory rename, not command/skill rename). Fixed directly (small, mechanical) rather than filed as a fifth stale-path issue — see the corresponding commit on `v0.7.0`.
 
+## Known Gap — `gov-capture-routing` Overlap and a Security Bypass, Found During Phase 6/7 Implementation (2026-08-03)
+
+Surfaced while implementing this ADR's Phase 6/7 on `v0.7.0-adr-067-c1`, unrelated to what either phase set out to do. **This ADR never referenced or was aware of `gov-capture-routing`** — confirmed by grep, zero hits for that string anywhere in this document before this section.
+
+**The overlap.** `gov-capture-routing` is a pre-existing skill, unrelated in origin to this ADR, designed under ADR-034 to detect "personal vs. project vs. named vs. active" capture-level intent from natural language and resolve `$level`/`$target_kg`/`$target_path`/`$restore_kg` for the commands and agents that call it. It's referenced by 5 commands (`kmg-session-summary.md`, `kmg-recall.md`, `kmg-capture-lesson.md`, `kmg-create-adr.md`, `kmg-sync-all.md`), 3 agents (`agents/create-adr-agent.md`, `agents/lesson-capture-agent.md`, `agents/session-summary-agent.md`), and one skill (`skills/kmg-auto-recall/SKILL.md`). It has been non-functional/unreachable via the Skill tool for 3+ months — tracked as **issue-18**, filed well before this ADR-067 work began, with its "fix vs. retire" question left open.
+
+This ADR's work has now functionally subsumed both things `gov-capture-routing` existed to do, as a side effect of pursuing its own unrelated goal, not as a design intent:
+- **The switch/restore half**: Phase 6 retired `kg_config_switch`/`kmg-switch.md` entirely (this ADR's core goal), and `commands/kmg-sync-all.md`'s restore-step contract was rewritten during Phase 6's doc sweep to state "No switch/restore needed."
+- **The level-detection half**: `kg_capture` gaining a `scope: "project"|"user"` param (added purely for consistency with `kg_search`/`kg_config_add_category`/`kg_fts5_status`/`kg_fts5_rebuild`/`kg_upgrade`, which already had one) plus `[personal]`/`[project]` marker parsing (Phase 6) and cwd-derived resolution (Phase 1) means a calling command can now pass `scope`/`targetKg` directly to `kg_capture` instead of needing a routing skill to pre-resolve intent from natural language first.
+
+**A concrete security bug, found while investigating the overlap.** Three of the agents that reference `gov-capture-routing` (`create-adr-agent.md`, `lesson-capture-agent.md`, `session-summary-agent.md`) also have a separate `--user` code path that bypasses `kg_capture` entirely — it writes directly via the Write tool to `~/.kmgraph/{decisions,lessons-learned,sessions}/`, with **zero confirmation gating**. This sidesteps `confirmPersonalScopeAccess`/`confirmFirstWrite` — the exact gates Phase 6 of this ADR built specifically to guard personal-scope writes. The bypass predates this ADR (it existed because `kg_capture` previously had no path to the personal graph at all), so it isn't a regression this ADR introduced, but it is now both obsolete and a live security hole, since the gated path it was working around now exists.
+
+**Consequence for this ADR's scope.** A new **Phase 7.1** (`knowledge/plans/v0.7.0-adr-067-p7.1.md`) is being added to close this gap: remove the dead `gov-capture-routing` invocation from the 5 commands + 1 skill above, and remove the `--user` Write-tool bypass from the 3 agents above, routing all capture-level resolution uniformly through `kg_capture`'s `scope`/`targetKg` params. This formally resolves issue-18's long-open fix-vs-retire fork as **RETIRE** — a direct, if unplanned, consequence of this ADR's own resolution model making the routing skill's job redundant.
+
+**Correction after independent review (2026-08-03), before Phase 7.1 executed:** the "functional subsumption" framing above oversold how clean the replacement is, and the security-bypass framing above was incomplete. Two things a review pass caught, folded into Phase 7.1's plan before any of it ran:
+- The 3 agents' `--user` bypass is not the only Write-tool escape hatch — each also has a separate "MCP unreachable/failed" fallback that, once the `--user` bypass is closed, would become reachable for `scope:"user"` writes too (same zero-gating problem, different trigger, and it targets the wrong graph — the project-local KG, not personal). Phase 7.1 Task 7.1.1 now explicitly closes this second path too.
+- `gov-capture-routing`'s actual skill file (`~/.claude/skills/gov-capture-routing.md`, real and complete, just unshipped/unreachable) has real capability beyond a flag-to-scope mapping — richer NL trigger vocabulary, conflict-resolution with a persisted per-file preference, and multi-capture-in-one-message handling. Phase 7.1's replacement does not reproduce any of that. Since the skill was never actually reachable in 3+ months of production use, this isn't a regression against real behavior, but it is a real, conscious narrowing of ADR-034's original design intent — Phase 7.1 now says so explicitly rather than implying lossless subsumption.
+
 ## Related
 
 - ADR-001 (centralized multi-KG configuration — the `.active`/switch model this would revisit)
@@ -515,4 +533,5 @@ Surfaced while a different plan (`v0.7.0-c3-adr-068-pilot.md`, ADR-068) ran `tes
 - issue-14 (`knowledge/issues/issue-14/investigation-log.md` — the session that surfaced this)
 - issue-15 (personal-KG writes misindexed under project-local FTS5 bucket — a bug the new model must not inherit)
 - issue-27 (silent overwrite via `applyStrayKnowledgeDir()` — reinforces a never-silently-misroute invariant)
+- issue-18 (`gov-capture-routing` non-functional for 3+ months — decided as RETIRE per § Known Gap above, to be closed once Phase 7.1 actually lands — not yet executed as of this writing)
 - ROADMAP.md → "Needs its own dedicated brainstorm/ADR before scheduling"

@@ -1,7 +1,7 @@
 ---
 id: issue-18
 type: Gap
-status: open
+status: in-progress
 github-issue: "#176"
 created: 2026-07-17
 related-issues: [issue-17]
@@ -209,3 +209,24 @@ Recall run across ADRs, issues, enhancements, chat-history, and session summarie
 **ADR-067 overlap found — handed off, not decided here:** ADR-067 (in-progress on this branch, owned by a separate concurrent session) designs a `[personal]`/`[project]` marker mechanism that overlaps functionally with what `gov-capture-routing` was built to do, and its stated retirement of `kmg-switch` would break `kmg-sync-all.md`'s restore step if `gov-capture-routing` is ever fixed rather than retired. Full findings and recommendation: `knowledge/handoffs/2026-08-01-issue-18-adr-067-overlap-findings.md`. This issue's Decision Fork should be resolved in light of that handoff, not independently — leans toward "retire," pending the ADR-067 owner's read.
 
 **`gov-` prefix provenance (confirmed, does not bear on the fork):** `/Users/mkaplan/GitHub/optimize-my-resume/chat-history/2026-02/2026-02-11-claude.md` (lines ~4837-6890) is where the flat `.agent/workflows/` prefix naming convention was designed — `gov-` for governance/enforcement/git-ops, `know-` for knowledge/recall, `plan-`/`proj-`/`doc-` for the rest — chosen over nested `SKILL.md` directories at the time. This confirms *why* the naming pattern exists, not why `gov-capture-routing` specifically lives outside the repo: per this issue's own Provenance section, `gov-capture-routing.md` was created later (April 15, 2026, same day as ADR-034) with no counterpart in the Feb 11 batch. Checked (also grepped, no hits): personal graph config has no separate `personal` KG registered; `Resume_Analyzer_Optimizer` repo has no matching content.
+
+## Decision — RETIRE (2026-08-03, ADR-067 owner's read)
+
+The handoff referenced above (`knowledge/handoffs/2026-08-01-issue-18-adr-067-overlap-findings.md`) has now been read by the ADR-067 owner, live, this session. Formal call: **retire `gov-capture-routing`** — option 2 from the Decision Fork above, not option 1 ("fix properly"). Both fork branches are now resolved.
+
+**Why retire, concretely — new evidence beyond what this issue already had:**
+
+- **Switch/restore half is already moot.** ADR-067 Phase 6 retired `kg_config_switch`/`kmg-switch.md` entirely, and `commands/kmg-sync-all.md`'s restore-step contract was rewritten in that same phase's doc sweep to say "No switch/restore needed... resolve automatically from context." Half of what `gov-capture-routing` coordinated (`$restore_kg`) no longer has anything to restore.
+- **Level-detection half is now also functionally subsumed** — not because ADR-067 explicitly designed against `gov-capture-routing` (it doesn't reference it anywhere; confirmed by grep across the ADR text), but because a concrete replacement mechanism now exists: `kg_capture` gained a `scope: "project"|"user"` parameter this session, bringing it in line with `kg_search`/`kg_config_add_category`/`kg_fts5_status`/`kg_fts5_rebuild`/`kg_upgrade`, which already had one. Combined with `[personal]`/`[project]` marker parsing (added Phase 6) and cwd-derived resolution (added Phase 1), a command no longer needs a separate routing skill to detect `--user`/`--project`/`--named`/`--active` intent and pre-resolve `$target_kg`/`$level` — it can pass `scope`/`targetKg` straight to the MCP tool, which resolves and gates internally.
+- **A real, serious bug surfaced as a direct consequence of this investigation.** Three agents — `agents/create-adr-agent.md`, `agents/lesson-capture-agent.md`, `agents/session-summary-agent.md` — each have a `--user` code path whose documented behavior is to bypass `kg_capture` entirely and write directly via the Write tool to `~/.kmgraph/{decisions,lessons-learned,sessions}/`. That bypass completely skips every personal-KG confirmation gate ADR-067 Phase 6 built (`confirmPersonalScopeAccess`, `confirmFirstWrite`) — a `--user`-path write through these 3 agents currently gets zero confirmation gating, directly contradicting these same files' own stated invariant ("No Write/Edit — all writes go through kg_capture," per `lesson-capture-agent.md`). This made sense before ADR-067, when `kg_capture` had no path to the personal graph at all — it is now both obsolete and a live security hole sitting directly next to the gates this session just hardened.
+
+**What's being done:** a new Phase 7.1 is being added to the ADR-067 implementation plan (`knowledge/plans/v0.7.0-adr-067-p7.1.md`, orchestration updated) to:
+
+1. Remove the `gov-capture-routing` invocation from the 5 referencing commands (`kmg-session-summary.md`, `kmg-recall.md`, `kmg-capture-lesson.md`, `kmg-create-adr.md`, `kmg-sync-all.md`) and 1 skill (`kmg-auto-recall/SKILL.md`), replacing it with direct NL-to-scope/targetKg detection.
+2. Remove the `--user: bypass kg_capture` special case from the 3 agents above, routing all levels (`--user`/`--project`/`--named`/`--active`) through `kg_capture` uniformly via `scope`/`targetKg`.
+
+Status is set to `in-progress` (not `resolved`/`closed`) — the decision is final, but the actual fix (Phase 7.1) has not landed yet.
+
+**Correction after independent review (2026-08-03), before Phase 7.1 executed:** an independent review pass caught two things missing from the decision above, both folded into Phase 7.1's plan before any of it ran, not left as a gap:
+- **The 3 agents have a second Write-tool bypass**, separate from the `--user`-flag one described above — an "MCP unreachable/failed" fallback that fires regardless of scope. Once the `--user`-flag bypass is closed, this second one would become reachable for `scope:"user"` writes too, with the same zero-gating problem AND a wrong-target bug (it writes to the project-local KG, not personal). Phase 7.1's Task 7.1.1 now explicitly closes both, not just the first.
+- **The "functional subsumption" framing above overstates how clean the replacement is.** `gov-capture-routing`'s actual skill file has real capability (richer NL vocabulary, conflict-resolution with a persisted preference, multi-capture-in-one-message) that Phase 7.1's flag-to-scope replacement does not reproduce. Since the skill was never reachable in production, this isn't a regression against real behavior — but it's a real, conscious narrowing of what ADR-034 originally designed, and Phase 7.1 now documents that explicitly rather than implying nothing was lost.
