@@ -37,13 +37,17 @@ e.g., "Searching: `~/.kmgraph/` (user KG only)" or "Searching: all configured KG
 
 ---
 
-## Step 0: Resolve Active KG Path
+## Step 0: Resolve Target KG Path
 
-Read `~/.kmgraph/kg-config.json`. Find the `active` field and look up `graphs[active].path`. Store this as `{active_kg_path}`.
+Call `kg_resolve` to get the KG resolved from the current working directory. Store the
+returned `path` as `{active_kg_path}` (issue-41: this step previously read `.active`
+directly from `~/.kmgraph/kg-config.json` — a pre-ADR-067 pattern with no cwd-mismatch
+check at all, unlike `agents/knowledge-extractor.md`, which already guarded this;
+`kg_resolve` derives the graph from cwd directly, so there's nothing left to mismatch).
 
-If the config file does not exist or no active graph is set:
+If `kg_resolve` errors (no graph registered for this directory):
 
-> I don't see a knowledge graph configured yet. Run `/kmgraph:kmg-init` to get started.
+> I don't see a knowledge graph configured for this directory yet. Run `/kmgraph:kmg-init` to get started.
 
 Stop here.
 
