@@ -248,24 +248,27 @@ ctxmode_available = ctxmode_db is not None
 
 ---
 
-## Step 1: Active KG / CWD Guard
+## Step 1: Resolve Target Graph
 
-Read `~/.kmgraph/kg-config.json`. Extract `active` key and resolve the active graph's `path`.
+```
+kg_resolve
+```
 
-Compare the active graph's project root against the current working directory. If they do not match:
-
-> "Hold on — the active knowledge graph is for [project name]. Do you want to switch to the knowledge graph for [current project] before continuing?"
-
-Block all further steps until the user confirms or switches. Do not proceed with a mismatched KG.
+There is no separate "active" pointer left to disagree with your current directory
+(issue-10's old `KG_MISMATCH` guard compared the two; ADR-067 retires it, since
+`kg_resolve` derives the graph from cwd directly — nothing to mismatch against). If
+`kg_resolve` errors (no graph registered for this directory), stop and tell the user to
+run `/kmgraph:kmg-init` first. Otherwise, store the returned `path` as `$active_kg` and
+`name` as `$active_kg_name` for use in Step 1.5 and beyond.
 
 ---
 
 ## Step 1.5: One-File-Per-Day Check
 
-Before gathering context, check if a session file already exists for today's branch:
+Before gathering context, check if a session file already exists for today's branch.
+Reuse `$active_kg` resolved in Step 1 — no need to re-resolve.
 
 ```bash
-active_kg=$(jq -r '.graphs[.active].path' ~/.kmgraph/kg-config.json)
 session_dir="${active_kg}/sessions"
 branch_slug=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')
 today=$(date +%Y-%m-%d)
@@ -391,12 +394,15 @@ commit_short=$(git rev-parse --short HEAD)
 ```
 
 **For Current State:**
+
+Use `$active_kg_name` (the `name` field `kg_resolve` returned in Step 1 — store it
+alongside `$active_kg` there) rather than re-reading the config:
+
 ```bash
 git rev-parse --abbrev-ref HEAD
 git rev-parse --short HEAD
 git status --porcelain
 ls -t docs/plans/*.md 2>/dev/null | head -1
-jq -r '.graphs[.active].name' ~/.kmgraph/kg-config.json
 ```
 
 **For Open Issues:**
@@ -408,8 +414,10 @@ grep -rl "status: draft\|status: proposed" knowledge/decisions/ knowledge/enhanc
 ```
 
 **For Session History:**
+
+Reuse `$active_kg` from Step 1 — no need to re-resolve.
+
 ```bash
-active_kg=$(jq -r '.graphs[.active].path' ~/.kmgraph/kg-config.json)
 find "${active_kg}/sessions" -name "*.md" -not -name "README.md" -not -name "*template*" -type f 2>/dev/null | sort | tail -3
 ```
 

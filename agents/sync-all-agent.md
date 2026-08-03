@@ -35,14 +35,16 @@ Check whether `mcp__plugin_context-mode_context-mode__ctx_batch_execute` is avai
 
 ---
 
-## Step 1: Get Active KG + Scan for New/Modified Lessons
+## Step 1: Resolve Target Graph + Scan for New/Modified Lessons
 
-Read `~/.kmgraph/kg-config.json` to get the active KG name and path.
+Resolve the target graph from the current working directory (issue-41: this previously
+read `.active` and `.graphs["$active_kg"].path` directly, a pre-ADR-067 pattern):
 
-```bash
-active_kg=$(jq -r '.active' ~/.kmgraph/kg-config.json)
-kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.kmgraph/kg-config.json)
 ```
+kg_resolve
+```
+
+Take the returned `path` as `$kg_path` below.
 
 Scan for recently modified lessons:
 

@@ -201,7 +201,7 @@ Tests `core/scripts/run_extraction.py` with a simulated Claude session fixture.
 |------|---------|
 | `fixtures/valid-config.json` | Well-formed `kg-config.json` with `__TEST_KG_PATH__` placeholder |
 | `fixtures/corrupt-config.json` | Intentionally invalid JSON for crash/error testing |
-| `fixtures/empty-config.json` | Valid JSON with `"active": null` and empty `"graphs"` |
+| `fixtures/empty-config.json` | Valid JSON with an empty `"graphs"` object |
 | `fixtures/sample-lesson.md` | Full YAML frontmatter lesson file for search tests |
 | `fixtures/sample-adr.md` | ADR file with title/status/context/decision structure |
 | `fixtures/sample-claude-session.jsonl` | 4-line Claude session log for extraction tests |

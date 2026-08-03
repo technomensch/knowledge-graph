@@ -9,7 +9,6 @@
 | `{kg_name}` | Name key used in kg-config.json |
 | `{KG_TYPE}` | Type string: "project-local" or "personal" |
 | `{categories}` | Array of category names configured for this KG |
-| `{preserve_active}` | Boolean — if true, do not change the active KG after upgrade |
 
 > **Caller note:** All `{PARAM}` placeholders in this module must be substituted by the caller before any bash block is executed. There is no runtime substitution — any unsubstituted `{PARAM}` will be passed literally to shell commands, producing silent errors (e.g., `grep` will look for a file literally named `{KG_PATH}/rules.md`).
 

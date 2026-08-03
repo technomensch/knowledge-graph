@@ -115,11 +115,14 @@ Examples:
 
 ### Step 3: Create Directory Structure
 
-**Get active KG path:**
-```bash
-active_kg=$(jq -r '.active' ~/.kmgraph/kg-config.json)
-kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.kmgraph/kg-config.json)
+**Resolve the target graph** (issue-41: this previously read `.active` and
+`.graphs["$active_kg"].path` directly, a pre-ADR-067 pattern):
+
 ```
+kg_resolve
+```
+
+Take the returned `path` as `$kg_path` below.
 
 **Create directories:**
 ```bash

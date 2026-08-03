@@ -1067,7 +1067,6 @@ if [ ! -f "$CONFIG_PATH" ]; then
     cat > "$CONFIG_PATH" <<'EOF'
 {
   "version": "1.0.0",
-  "active": null,
   "graphs": {},
   "sanitization": {
     "enabled": false,
@@ -1372,7 +1371,6 @@ Parameters:
 - `{categories}` = categories array collected in Step 1.2
 - `{git_strategy}` = selected git strategy from Step 1.2
 - `{category_git_rules}` = per-category git rules map from Step 1.2 (if selective strategy)
-- `{preserve_active}` = false
 
 ### Step 1.8.5: Global Personal KG Offer
 
@@ -1470,11 +1468,9 @@ Which platforms are you using? (select all that apply)
        {"name": "patterns", "prefix": null, "git": "ignore"},
        {"name": "process", "prefix": null, "git": "ignore"}
      ],
-     "createdAt": "[timestamp]",
-     "lastUsed": "[timestamp]"
+     "createdAt": "[timestamp]"
    }
    ```
-   Note: `"active"` is NOT changed — project KG remains active.
 
 5. Build FTS5 index for the new personal KG:
    Call `kg_fts5_rebuild` with `kgPath: "~/.kmgraph"`. Post-rebuild guard: if `indexed` is 0, log a note (normal for empty KG).
@@ -1884,7 +1880,6 @@ $KG_PATH/
 ```json
 {
   "version": "1.0.0",
-  "active": "my-project",
   "graphs": {
     "my-project": {
       "name": "my-project",
@@ -1895,8 +1890,7 @@ $KG_PATH/
         { "name": "process", "prefix": null, "git": "ignore" },
         { "name": "patterns", "prefix": null, "git": "commit" }
       ],
-      "createdAt": "2026-02-13T10:30:00Z",
-      "lastUsed": "2026-02-13T10:30:00Z"
+      "createdAt": "2026-02-13T10:30:00Z"
     }
   }
 }

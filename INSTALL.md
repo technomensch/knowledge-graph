@@ -571,7 +571,6 @@ mkdir -p "$HOME/.kmgraph" 2>/dev/null
 cat > "$HOME/.kmgraph/kg-config.json" << 'CONFIGEOF'
 {
   "version": "1.0.0",
-  "active": "KG_NAME",
   "graphs": {
     "KG_NAME": {
       "name": "KG_NAME",
@@ -582,8 +581,7 @@ cat > "$HOME/.kmgraph/kg-config.json" << 'CONFIGEOF'
         { "name": "process", "prefix": null, "git": "commit" },
         { "name": "patterns", "prefix": null, "git": "commit" }
       ],
-      "createdAt": "TIMESTAMP",
-      "lastUsed": "TIMESTAMP"
+      "createdAt": "TIMESTAMP"
     }
   },
   "sanitization": {
@@ -682,8 +680,13 @@ Run these checks to confirm everything is working:
 ```
 
 **Check directory structure:**
+
+Call the `kg_resolve` MCP tool to get the graph's path (issue-41: this previously read
+`c.graphs[c.active]` via a raw `node -e` one-liner — a pre-ADR-067 pattern that no longer
+reflects how any graph is actually selected; `kg_resolve` resolves from your current
+directory instead), then check its subdirectories:
+
 ```bash
-KG_PATH=$(node -e "const c=require('$HOME/.kmgraph/kg-config.json'); const g=c.graphs[c.active]; console.log(g.path.replace(/^~/, require('os').homedir()))" 2>/dev/null || echo "")
 [ -d "$KG_PATH/knowledge" ] && echo "DIRS_OK" || echo "DIRS_MISSING"
 [ -d "$KG_PATH/lessons-learned" ] && echo "LESSONS_OK" || echo "LESSONS_MISSING"
 [ -d "$KG_PATH/decisions" ] && echo "DECISIONS_OK" || echo "DECISIONS_MISSING"

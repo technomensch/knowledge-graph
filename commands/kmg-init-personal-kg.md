@@ -75,7 +75,6 @@ Parameters:
 - `{kg_name}` = "personal"
 - `{KG_TYPE}` = "personal"
 - `{categories}` = ["architecture", "debugging", "patterns", "process"]
-- `{preserve_active}` = true
 
 **Cross-project platform-split check (section d):** Section d auto-routes to `~/.claude/CLAUDE.md § Platform Preferences` for personal KGs via the `{KG_TYPE}` = "personal" passed above — no extra parameters needed.
 
@@ -220,7 +219,6 @@ Parameters:
 - `{categories}` = ["architecture", "debugging", "patterns", "process"]
 - `{git_strategy}` = "all-ignore"
 - `{category_git_rules}` = all categories set to "ignore"
-- `{preserve_active}` = true
 
 ---
 
