@@ -288,23 +288,37 @@ export async function handleSearch(
           mode,
           reason: "cross_kg_search_confirmation",
           param: "confirmCrossKgSearch",
-          // "exclude:<name>,..." is a free-form answer parsed by the
-          // caller's real ask() implementation (spec §12) -- gate()'s own
-          // accepts validation only needs the fixed-shape answers here.
-          accepts: ["all", "cancel"],
+          // No static `accepts` here: gate() validates answers by exact
+          // membership (interaction.ts), which can only work for a fixed
+          // enum or a dynamic-but-enumerable candidate list (e.g.
+          // resolution.ts's `accepts: resolution.candidates`). The
+          // "exclude:<name>,..." shape this question allows is genuinely
+          // free-form -- it can't be enumerated ahead of time -- so this
+          // call site validates the answer itself, below, instead of
+          // delegating that to gate().
           detail: { candidates: allKgs.map((k) => k.name) },
           ask: () => new Promise<never>(() => {}),
         });
         if (!("answer" in gated)) return errorResponse(gateResultToSearchError(gated));
-        if (gated.answer === "cancel") {
+        const answer = gated.answer;
+        if (answer === "cancel") {
           return { content: [{ type: "text" as const, text: "Cross-KG search cancelled." }] };
         }
-        if (gated.answer.startsWith("exclude:")) {
-          excludedNames = gated.answer
+        if (answer === "all") {
+          excludedNames = [];
+        } else if (answer.startsWith("exclude:")) {
+          excludedNames = answer
             .slice("exclude:".length)
             .split(",")
             .map((s) => s.trim())
             .filter(Boolean);
+        } else {
+          return errorResponse({
+            error: "KMG_INPUT_REQUIRED",
+            reason: "cross_kg_search_confirmation_invalid_answer",
+            resolveWith: { param: "confirmCrossKgSearch", accepts: ["all", "exclude:<name>,...", "cancel"] },
+            message: `Invalid answer "${answer}" for cross-KG search confirmation.`,
+          });
         }
 
         if (params.sticky !== undefined) {

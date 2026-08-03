@@ -26,9 +26,23 @@ jest.mock("../src/tools/fts5.js", () => ({
   resolveDbPath: jest.fn().mockReturnValue("/nonexistent/db/path/for-tests.db"),
 }));
 
+// gate()'s real interactive ask() transport doesn't exist yet (spec §12) --
+// search.ts's own interactive-mode calls hardcode a stub ask() that never
+// resolves, so there's no way to drive the interactive branch through
+// handleSearch's public params alone. Mocking gate() itself (defaulting to
+// the real implementation, so automated-mode behavior -- which never calls
+// gate() for this branch -- and any other gate() call sites are unaffected)
+// lets these tests supply controlled answers and actually exercise the
+// exclude-parsing code that the High-severity review finding caught.
+jest.mock("../src/interaction.js", () => {
+  const actual = jest.requireActual("../src/interaction.js") as Record<string, unknown>;
+  return { ...actual, gate: jest.fn(actual.gate as (...args: unknown[]) => unknown) };
+});
+
 import { handleSearch } from "../src/tools/search.js";
 import { CrossKgSearchSession, PersonalScopeSession } from "../src/resolution.js";
 import { readConfig, KgConfig } from "../src/utils.js";
+import { gate } from "../src/interaction.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -212,5 +226,102 @@ describe("kg_search scope:all confirmation gate", () => {
     const text = result.content[0].text;
     expect(text).toContain("a-note.md");
     expect(text).not.toContain("b-note.md");
+  });
+
+  it("interactive mode: an 'exclude:<name>' gate() answer actually excludes that KG (one-shot, session left unconfirmed)", async () => {
+    const rootA = makeTempDir("a4");
+    const rootB = makeTempDir("b4");
+    tempDirs.push(rootA, rootB);
+    scaffoldKg(rootA);
+    scaffoldKg(rootB);
+
+    writeMd(path.join(rootA, "lessons-learned"), "a-note.md", "---\ntitle: A Note\n---\n\nsome interactive-term content.");
+    writeMd(path.join(rootB, "lessons-learned"), "b-note.md", "---\ntitle: B Note\n---\n\nsome interactive-term content.");
+
+    (readConfig as jest.Mock).mockReturnValue(
+      makeConfig({
+        "kg-a": { path: rootA, type: "project-local" },
+        "kg-b": { path: rootB, type: "project-local" },
+      })
+    );
+    process.cwd = () => rootA;
+
+    // First gate() call answers the confirm/exclude/cancel question with a
+    // free-form exclude answer; second answers the one-shot-vs-sticky
+    // follow-up. Prior to the fix, gate()'s own accepts:["all","cancel"]
+    // check rejected "exclude:kg-b" with an _invalid_answer error before
+    // this parsing code ever ran.
+    (gate as jest.Mock)
+      .mockImplementationOnce(async () => ({ answer: "exclude:kg-b" }))
+      .mockImplementationOnce(async () => ({ answer: "one-shot" }));
+
+    const session = new CrossKgSearchSession();
+    const result = await handleSearch(
+      { query: "interactive-term", searchScope: "all", interaction: "interactive" },
+      new PersonalScopeSession(),
+      session
+    );
+
+    expect(result.isError).toBeFalsy();
+    const text = result.content[0].text;
+    expect(text).toContain("a-note.md");
+    expect(text).not.toContain("b-note.md");
+    // one-shot: the session must not remember this exclusion for later calls.
+    expect(session.isConfirmedForSession()).toBe(false);
+  });
+
+  it("interactive mode: an 'exclude:<name>' answer paired with 'sticky' persists the exclusion on the session", async () => {
+    const rootA = makeTempDir("a5");
+    const rootB = makeTempDir("b5");
+    tempDirs.push(rootA, rootB);
+    scaffoldKg(rootA);
+    scaffoldKg(rootB);
+
+    (readConfig as jest.Mock).mockReturnValue(
+      makeConfig({
+        "kg-a": { path: rootA, type: "project-local" },
+        "kg-b": { path: rootB, type: "project-local" },
+      })
+    );
+    process.cwd = () => rootA;
+
+    (gate as jest.Mock)
+      .mockImplementationOnce(async () => ({ answer: "exclude:kg-b" }))
+      .mockImplementationOnce(async () => ({ answer: "sticky" }));
+
+    const session = new CrossKgSearchSession();
+    await handleSearch(
+      { query: "irrelevant", searchScope: "all", interaction: "interactive" },
+      new PersonalScopeSession(),
+      session
+    );
+
+    expect(session.isConfirmedForSession()).toBe(true);
+    expect(session.excludedNames()).toEqual(["kg-b"]);
+  });
+
+  it("interactive mode: an answer gate() shouldn't have accepted (not all/exclude:.../cancel) returns KMG_INPUT_REQUIRED instead of silently searching", async () => {
+    const rootA = makeTempDir("a6");
+    tempDirs.push(rootA);
+    scaffoldKg(rootA);
+
+    (readConfig as jest.Mock).mockReturnValue(
+      makeConfig({ "kg-a": { path: rootA, type: "project-local" } })
+    );
+    process.cwd = () => rootA;
+
+    (gate as jest.Mock).mockImplementationOnce(async () => ({ answer: "banana" }));
+
+    const session = new CrossKgSearchSession();
+    const result = await handleSearch(
+      { query: "irrelevant", searchScope: "all", interaction: "interactive" },
+      new PersonalScopeSession(),
+      session
+    );
+
+    expect(result.isError).toBe(true);
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed.error).toBe("KMG_INPUT_REQUIRED");
+    expect(parsed.reason).toBe("cross_kg_search_confirmation_invalid_answer");
   });
 });
