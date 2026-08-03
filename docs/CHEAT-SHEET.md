@@ -23,7 +23,7 @@ One-page cheat sheet for the Knowledge Management Graph. For detailed documentat
 - **Extract my chat history** → `/kmgraph:kmg-extract-chat`
 - **Sync lessons to the knowledge graph** → `/kmgraph:kmg-update-graph`
 - **Check for sensitive data before sharing** → `/kmgraph:kmg-check-sensitive`
-- **Work with multiple knowledge graphs** → `/kmgraph:kmg-list` then `/kmgraph:kmg-switch`
+- **Work with multiple knowledge graphs** → `/kmgraph:kmg-list` to see all configured graphs; each command run from a project's directory automatically targets that project's graph (no switching needed)
 - **Link lessons to GitHub issues** → `/kmgraph:kmg-link-issue`
 - **Update plugin documentation** → `/kmgraph:kmg-update-doc --user-facing`
 - **Create comprehensive project handoff** → `/kmgraph:kmg-handoff`
@@ -56,7 +56,6 @@ Active users use these for regular workflows:
 | `/kmgraph:kmg-add-category` | Add a new category to existing knowledge graph |
 | `/kmgraph:kmg-session-summary` | Create summary of current chat session; `--snapshot` for lightweight mid-session capture |
 | `/kmgraph:kmg-list` | Display all configured knowledge graphs |
-| `/kmgraph:kmg-switch` | Change active knowledge graph |
 | `/kmgraph:kmg-check-sensitive` | Scan knowledge graph for potentially sensitive information |
 | `/kmgraph:kmg-config-sanitization` | Interactive wizard for pre-commit hook setup |
 | `/kmgraph:kmg-extract-chat` | Extract chat history from Claude, Gemini, and Codex logs (`--today`, `--date`, `--after`, `--before`, `--project`); large days auto-split into `YYYY-MM-DD/` subfolder |
@@ -222,10 +221,8 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 1. `/kmgraph:kmg-list`
    → See all configured knowledge graphs
 
-2. `/kmgraph:kmg-switch`
-   → Change to different project's KG
-
-3. Work with that project's knowledge
+2. `cd` into the other project's directory
+   → Commands run there automatically target that project's KG — no switch step
 
 ---
 

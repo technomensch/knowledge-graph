@@ -57,7 +57,6 @@ Commands work across platforms, but full automation is Claude Code-specific.
 
 ### Working with Multiple Knowledge Graphs
 - **View all configured knowledge graphs** → `/kmgraph:kmg-list`
-- **Switch to a different knowledge graph** → `/kmgraph:kmg-switch`
 
 ### Complex Problem Tracking
 - **Track a multi-attempt bug** → `/kmgraph:kmg-meta-issue`
@@ -81,7 +80,6 @@ Get the knowledge graph running and configure how it works.
 - [🟢 `/kmgraph:kmg-init`](#-kmgraphinit) — Initialize a new knowledge graph
 - [🟡 `/kmgraph:kmg-init-personal-kg`](#-kmgraphinit-personal-kg) — Create personal KG for cross-project lessons
 - [🟡 `/kmgraph:kmg-list`](#-kmgraphlist) — View all configured knowledge graphs
-- [🟡 `/kmgraph:kmg-switch`](#-kmgraphswitch) — Switch to a different knowledge graph
 - [🟡 `/kmgraph:kmg-add-category`](#-kmgraphadd-category) — Add custom categories
 - [🟡 `/kmgraph:kmg-config-sanitization`](#-kmgraphconfig-sanitization) — Set up safety features for team sharing
 
@@ -649,40 +647,6 @@ Total: 2 knowledge graph(s) configured
 
 ---
 
-### 🟡 `/kmgraph:kmg-switch`
-
-**Purpose**: Switch the active knowledge graph so all subsequent commands read from and write to the intended one.
-
-**When to use**:
-
-- Switch between different project knowledge graphs
-- Change to a topic-based KG for cross-project patterns
-- Return to a previously used KG
-
-**What it does**:
-
-1. Validates the target KG exists in config
-2. Verifies KG path exists on disk (warns if missing, allows override)
-3. Updates the `active` field in `~/.kmgraph/kg-config.json`
-4. Updates `lastUsed` timestamp
-5. Reports previous and new active KG
-
-**Time**: Instant
-
-**Example**:
-```bash
-/kmgraph:kmg-switch my-project
-/kmgraph:kmg-switch ai-research
-/kmgraph:kmg-switch ai-research --force    # Skip missing path warning
-```
-
-**Tips**:
-
-- All subsequent knowledge commands operate on the newly active KG
-- Use `/kmgraph:kmg-list` first to see available options
-
----
-
 ### 🟡 `/kmgraph:kmg-check-sensitive`
 
 **Purpose**: Scan the active knowledge graph for emails, API keys, and internal URLs before pushing to a shared repository. Flags findings with file name and line number for manual review.
@@ -1222,19 +1186,19 @@ Reading time: ~20 minutes for complete orientation
 1. Verify plugin installed: Check Claude Code > Extensions
 2. Restart Claude Code
 3. Update plugin: Check for updates in marketplace
-4. Check active KG: Run `/kmgraph:kmg-status`
+4. Check the resolved KG: Run `/kmgraph:kmg-status`
 
 ---
 
-### "No active knowledge graph"
+### "No knowledge graph resolved"
 
-**Problem**: Commands fail with "no active KG"
+**Problem**: Commands fail with "no knowledge graph resolved from the current directory"
 
 **Solutions**:
 
-1. Run `/kmgraph:kmg-init` to create your first KG
-2. Run `/kmgraph:kmg-list` to see available KGs
-3. Run `/kmgraph:kmg-switch` to activate an existing KG
+1. Run `/kmgraph:kmg-init` to create the first KG for this project
+2. Run `/kmgraph:kmg-list` to confirm a KG is registered for this directory
+3. Run the command from inside the project directory the KG is registered under
 
 ---
 

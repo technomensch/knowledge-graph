@@ -255,15 +255,15 @@ codex plugin add kmgraph@knowledge-management-graph
 
 ## MCP Tools Reference
 
-For all MCP-capable platforms, these 7 tools are available:
+For all MCP-capable platforms, these tools are available:
 
 | Tool | Description |
 |------|-------------|
 | `kg_config_init` | Create a new knowledge graph with directory structure |
 | `kg_config_list` | List all configured knowledge graphs |
-| `kg_config_switch` | Change the active knowledge graph |
-| `kg_config_add_category` | Add a new category to the active KG |
-| `kg_search` | Full-text search across the active KG |
+| `kg_config_add_category` | Add a new category to a resolved KG |
+| `kg_resolve` | Resolve the target KG's name and path from the current directory |
+| `kg_search` | Full-text search across a resolved KG |
 | `kg_scaffold` | Create a file from a template |
 | `kg_check_sensitive` | Scan for potentially sensitive data |
 

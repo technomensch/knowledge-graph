@@ -71,7 +71,6 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 - `/kmgraph:kmg-add-category` — Add a new category to existing knowledge graph
 - `/kmgraph:kmg-session-summary` — Create summary of current chat session
 - `/kmgraph:kmg-list` — Display all configured knowledge graphs
-- `/kmgraph:kmg-switch` — Change active knowledge graph
 - `/kmgraph:kmg-check-sensitive` — Scan knowledge graph for potentially sensitive information
 - `/kmgraph:kmg-config-sanitization` — Interactive wizard for pre-commit hook setup
 - `/kmgraph:kmg-extract-chat` — Extract chat history from Claude, Gemini, and Codex CLI logs (`--source codex` for Codex sessions)
