@@ -253,7 +253,7 @@ Do not use numbered headings in knowledge files — use plain headings (e.g., `#
 
 **Implementation:**
 - Skills (`create-adr`, `capture-lesson`, etc.) default to fast-tier for write/capture operations
-- Agents use `gov-capture-routing` skill to resolve task type and route accordingly
+- Commands resolve tier via the `ai-model-tier-resolver` module (`commands/init-shared/ai-model-tier-resolver.md`), passed to the agent invocation as `--model`
 - Borderline tasks → route to standard-tier when unsure (safer than under-provisioning)
 
 **Why:** fast-tier is fully capable for template-based operations. Using standard-tier for form-filling wastes resources. A session with 5 ADRs + 3 lessons saves ~60% vs. standard-tier-all-the-way.
