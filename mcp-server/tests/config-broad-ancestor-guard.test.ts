@@ -32,9 +32,18 @@ describe("findBroadAncestorWarning", () => {
     expect(result!.ancestorOfNames).toEqual(["a"]);
   });
 
-  it("does not consider personal-type graphs when checking ancestry (they intentionally live outside any project)", () => {
+  // Finding 3 (Fable review): personal-type graphs used to be excluded from this check, so
+  // registering a new KG at a path that is an ancestor of the personal graph's real storage
+  // directory triggered neither the hard-block nor this warning -- even though the new KG's
+  // content directory would then structurally contain the personal graph's files, and every
+  // personal-scope gate in this codebase keys off graph TYPE not path containment. Personal
+  // graphs must now be included in the ancestor scan like any other registered graph.
+  it("flags a candidate path that is an ancestor of a registered personal-type graph", () => {
     const config: KgConfig = { version: "1.0.0", graphs: { p: g(process.env.HOME + "/kmgraph-personal", "personal") }, sanitization: { enabled: false, patterns: [], action: "warn" } } as any;
-    expect(findBroadAncestorWarning(config, process.env.HOME!)).toBeNull(); // would also be hard-blocked separately, but this test isolates the ancestor-scan behavior
+    const result = findBroadAncestorWarning(config, process.env.HOME!);
+    expect(result).not.toBeNull();
+    expect(result!.isAncestorOfCount).toBe(1);
+    expect(result!.ancestorOfNames).toEqual(["p"]);
   });
 
   // M-7 (3): the filter excludes only status "deleted" -- pin that "archived"

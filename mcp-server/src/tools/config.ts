@@ -207,7 +207,7 @@ export function findBroadAncestorWarning(
 ): { isAncestorOfCount: number; ancestorOfNames: string[] } | null {
   const candidate = kgPath.replace(/^~/, os.homedir());
   const ancestorOfNames = Object.entries(config.graphs)
-    .filter(([, g]) => g.type !== "personal" && g.status !== "deleted")
+    .filter(([, g]) => g.status !== "deleted")
     .filter(([, g]) => {
       const existingPath = g.path.replace(/^~/, os.homedir());
       return existingPath !== candidate && isAncestorOrEqual(candidate, existingPath);

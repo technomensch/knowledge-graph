@@ -4,7 +4,8 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import { readConfig, walkDir, KgConfig } from "../utils.js";
-import { resolveGraph, resolvePersonalGraph } from "../resolution.js";
+import { resolveGraph, resolvePersonalGraph, PersonalScopeSession, confirmPersonalScopeAccess } from "../resolution.js";
+import { resolveInteractionMode, STUB_ASK_TIMEOUT_MS, stubAsk } from "../interaction.js";
 
 interface Violation {
   file: string;
@@ -54,7 +55,7 @@ export function resolveScanPath(
   return { scanPath: target.graph.path.replace(/^~/, os.homedir()) };
 }
 
-export function registerSanitizationTool(server: McpServer): void {
+export function registerSanitizationTool(server: McpServer, personalScopeSession: PersonalScopeSession): void {
   server.tool(
     "kg_check_sensitive",
     "Scan knowledge graph files for potentially sensitive information",
@@ -71,8 +72,15 @@ export function registerSanitizationTool(server: McpServer): void {
         .array(z.string())
         .optional()
         .describe("Additional regex patterns to check (beyond defaults)"),
+      confirmPersonalScope: z
+        .boolean()
+        .optional()
+        .describe(
+          "Confirms this repo may scan the personal knowledge graph. Required once per " +
+            "process before a scope:\"user\" scan is honored for a repo not yet confirmed."
+        ),
     },
-    async ({ kgPath, scope, patterns: customPatterns }) => {
+    async ({ kgPath, scope, patterns: customPatterns, confirmPersonalScope }) => {
       // Determine path to scan
       const resolved = resolveScanPath(readConfig(), { kgPath, scope });
       if ("error" in resolved) {
@@ -87,6 +95,23 @@ export function registerSanitizationTool(server: McpServer): void {
         };
       }
       const scanPath = resolved.scanPath;
+
+      // ADR-067 Task 6.4 (spec §11): scope:"user" (no kgPath override) reaches
+      // the personal graph -- same gate as kg_fts5_status/search.ts/capture.ts.
+      // Gated here, before the file walk below ever touches the personal KG's
+      // content directory.
+      if (!kgPath && scope === "user") {
+        const mode = resolveInteractionMode({}).mode;
+        const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
+          confirmPersonalScope,
+          mode,
+          timeoutMs: STUB_ASK_TIMEOUT_MS,
+          ask: stubAsk,
+        });
+        if (!("confirmed" in confirmed)) {
+          return { content: [{ type: "text" as const, text: JSON.stringify(confirmed) }], isError: true };
+        }
+      }
 
       if (!fs.existsSync(scanPath)) {
         return {

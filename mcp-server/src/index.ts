@@ -35,13 +35,13 @@ const crossKgSearchSession = new CrossKgSearchSession();
 registerConfigTools(server, personalScopeSession);    // kg_config_init, kg_config_list, kg_config_add_category
 registerSearchTool(server, personalScopeSession, crossKgSearchSession); // kg_search
 registerScaffoldTool(server);   // kg_scaffold
-registerSanitizationTool(server); // kg_check_sensitive
+registerSanitizationTool(server, personalScopeSession); // kg_check_sensitive
 registerFts5Tool(server, personalScopeSession);       // kg_fts5_rebuild
 registerFts5StatusTool(server, personalScopeSession); // kg_fts5_status
 registerCaptureTool(server, personalScopeSession);    // kg_capture
 registerUpgradeTool(server, personalScopeSession);    // kg_upgrade
 registerVersionTool(server);    // kg_version
-registerCompareTools(server);   // kg_compare_graphs
+registerCompareTools(server, personalScopeSession);   // kg_compare_graphs
 
 // Register resources (2 resources)
 registerConfigResource(server);    // kg://config

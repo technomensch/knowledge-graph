@@ -30,7 +30,7 @@ export async function registerCliMcpTools(
   registerConfigTools(server, personalScopeSession);
   registerSearchTool(server, personalScopeSession, crossKgSearchSession);
   registerScaffoldTool(server);
-  registerSanitizationTool(server);
+  registerSanitizationTool(server, personalScopeSession);
   registerConfigResource(server);
   registerTemplatesResource(server);
 }

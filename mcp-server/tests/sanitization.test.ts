@@ -1,8 +1,18 @@
+jest.mock("../src/utils.js", () => {
+  const actual = jest.requireActual("../src/utils.js") as Record<string, unknown>;
+  return {
+    ...actual,
+    readConfig: jest.fn(),
+  };
+});
+
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { resolveScanPath } from "../src/tools/sanitization.js";
-import { KgConfig } from "../src/utils.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { resolveScanPath, registerSanitizationTool } from "../src/tools/sanitization.js";
+import { readConfig, KgConfig } from "../src/utils.js";
+import { PersonalScopeSession } from "../src/resolution.js";
 
 const tempDirs: string[] = [];
 
@@ -91,5 +101,56 @@ describe("resolveScanPath", () => {
     process.cwd = origCwd;
 
     expect("error" in result).toBe(true);
+  });
+});
+
+// Finding 1 (Fable review): kg_check_sensitive had no confirmPersonalScopeAccess gate at all --
+// scope:"user" reached resolvePersonalGraph and walked/scanned the personal KG's files
+// unconfirmed. These tests cover the gate now wired into the registered tool's handler.
+describe("kg_check_sensitive scope:\"user\" gate", () => {
+  async function getHandler(session = new PersonalScopeSession()) {
+    const server = new McpServer({ name: "test", version: "0.0.0" });
+    let handler: any;
+    jest.spyOn(server, "tool").mockImplementation((...args: any[]) => { handler = args[3]; return server as any; });
+    registerSanitizationTool(server, session);
+    return handler;
+  }
+
+  afterEach(() => jest.clearAllMocks());
+
+  it('scope:"user" from an unconfirmed repo in automated mode returns KMG_INPUT_REQUIRED/personal_scope_unseen_repo', async () => {
+    const projRoot = makeTempDir("proj");
+    const personalRoot = makeTempDir("personal");
+    (readConfig as jest.Mock).mockReturnValue(makeConfig(projRoot, personalRoot));
+
+    const handler = await getHandler();
+    const result = await handler({ scope: "user" });
+
+    expect(result.isError).toBe(true);
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed).toMatchObject({ error: "KMG_INPUT_REQUIRED", reason: "personal_scope_unseen_repo" });
+  });
+
+  it('scope:"user" proceeds to scan the personal graph once confirmPersonalScope:true is passed', async () => {
+    const projRoot = makeTempDir("proj");
+    const personalRoot = makeTempDir("personal");
+    (readConfig as jest.Mock).mockReturnValue(makeConfig(projRoot, personalRoot));
+
+    const handler = await getHandler();
+    const result = await handler({ scope: "user", confirmPersonalScope: true });
+
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).toContain(personalRoot);
+  });
+
+  it("an explicit kgPath bypasses the personal-scope gate (only scope:\"user\" without kgPath is gated)", async () => {
+    const projRoot = makeTempDir("proj");
+    const personalRoot = makeTempDir("personal");
+    (readConfig as jest.Mock).mockReturnValue(makeConfig(projRoot, personalRoot));
+
+    const handler = await getHandler();
+    const result = await handler({ kgPath: personalRoot });
+
+    expect(result.isError).toBeUndefined();
   });
 });

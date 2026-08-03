@@ -1,9 +1,26 @@
 import * as fs from "fs";
 import * as path from "path";
+import * as os from "os";
 import { execFileSync } from "child_process";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { hashDirectory, compareFileSets, FileEntry, FileComparison, ComparisonCategory } from "../graph-compare.js";
+import { readConfig } from "../utils.js";
+import { PersonalScopeSession, confirmPersonalScopeAccess } from "../resolution.js";
+import { resolveInteractionMode, STUB_ASK_TIMEOUT_MS, stubAsk } from "../interaction.js";
+
+// Finding 2 (Fable review): a raw path string can't be gated the same way a scope enum can --
+// a personal-KG path could be passed under any of dozens of possible string values. Instead of
+// gating the enum, resolve the caller-supplied path against the registry and require
+// confirmation only when it actually lands on a registered personal-type graph.
+function normalizeForCompare(p: string): string {
+  const expanded = p.replace(/^~/, os.homedir());
+  try {
+    return fs.realpathSync(expanded);
+  } catch {
+    return path.resolve(expanded);
+  }
+}
 
 export interface RecencySignal {
   source: "git" | "mtime-fallback";
@@ -161,21 +178,55 @@ function topExamples(comparisons: FileComparison[], category: ComparisonCategory
   return names.join(", ") + suffix;
 }
 
-export function registerCompareTools(server: McpServer): void {
+export function registerCompareTools(server: McpServer, personalScopeSession: PersonalScopeSession): void {
   server.tool(
     "kg_compare_graphs",
     "Compare two KG folders by content hash + relative path to distinguish duplicate/forked/worktree registrations from genuine divergence",
     {
       a: z.string().describe("Absolute path to the first KG content directory"),
       b: z.string().describe("Absolute path to the second KG content directory"),
+      confirmPersonalScope: z
+        .boolean()
+        .optional()
+        .describe(
+          "Confirms this repo may access the personal knowledge graph. Required once per " +
+            "process before comparing against a path that resolves to the registered personal " +
+            "knowledge graph."
+        ),
     },
-    async ({ a, b }) => {
+    async ({ a, b, confirmPersonalScope }) => {
       if (!fs.existsSync(a)) {
         return { content: [{ type: "text" as const, text: `Error: path A does not exist: ${a}` }], isError: true };
       }
       if (!fs.existsSync(b)) {
         return { content: [{ type: "text" as const, text: `Error: path B does not exist: ${b}` }], isError: true };
       }
+
+      // Finding 2 (Fable review): reject an unconfirmed comparison against the personal graph
+      // before any file walk/hash/git-log ever touches it -- an untrusted repo's embedded
+      // instructions must not be able to exfiltrate personal-KG file counts/recency/filenames
+      // just by passing its real filesystem path as `a` or `b`.
+      const config = readConfig();
+      const normalizedA = normalizeForCompare(a);
+      const normalizedB = normalizeForCompare(b);
+      const personalGraphPaths = Object.values(config.graphs)
+        .filter((g) => g.type === "personal" && g.status !== "deleted")
+        .map((g) => normalizeForCompare(g.path));
+      const touchesPersonal = personalGraphPaths.some((p) => p === normalizedA || p === normalizedB);
+
+      if (touchesPersonal) {
+        const mode = resolveInteractionMode({}).mode;
+        const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
+          confirmPersonalScope,
+          mode,
+          timeoutMs: STUB_ASK_TIMEOUT_MS,
+          ask: stubAsk,
+        });
+        if (!("confirmed" in confirmed)) {
+          return { content: [{ type: "text" as const, text: JSON.stringify(confirmed) }], isError: true };
+        }
+      }
+
       try {
         // Computed once and shared between the summary and the examples lines below — computing
         // it twice risked a concurrent write between calls producing self-contradictory numbers.
