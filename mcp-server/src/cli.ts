@@ -424,8 +424,9 @@ async function main(): Promise<void> {
       version: SERVER_VERSION,
     });
 
+    const { PersonalScopeSession } = await import("./resolution.js");
     registerConfigTools(server);
-    registerSearchTool(server);
+    registerSearchTool(server, new PersonalScopeSession());
     registerScaffoldTool(server);
     registerSanitizationTool(server);
     registerConfigResource(server);

@@ -5,8 +5,17 @@ import * as path from "path";
 import * as os from "os";
 import { readConfig, KgConfig } from "../utils.js";
 import { rebuildIndex } from "./fts5.js";
-import { resolveGraph, resolveGraphOutcome, GatedResolution, ResolutionResult } from "../resolution.js";
-import { resolveInteractionMode, InteractionMode, GateResult } from "../interaction.js";
+import {
+  resolveGraph,
+  resolveGraphOutcome,
+  GatedResolution,
+  ResolutionResult,
+  parseScopeMarker,
+  PersonalScopeSession,
+  confirmPersonalScopeAccess,
+  resolvePersonalGraph,
+} from "../resolution.js";
+import { resolveInteractionMode, InteractionMode, GateResult, gate } from "../interaction.js";
 
 export interface CaptureRequest {
   content: string;
@@ -272,7 +281,9 @@ export function updateReadmeIndex(
 export async function handleCapture(
   request: CaptureRequest,
   targetKg?: string,
-  interaction?: InteractionMode
+  interaction?: InteractionMode,
+  personalScopeSession: PersonalScopeSession = new PersonalScopeSession(),
+  scopeOpts?: { sticky?: boolean; confirmPersonalScope?: boolean }
 ): Promise<CaptureResponse | CaptureError> {
   // Validate metadata
   const validated = validateMetadata(request.metadata);
@@ -280,20 +291,59 @@ export async function handleCapture(
 
   const config = readConfig();
   const mode = resolveInteractionMode({ explicitParam: interaction }).mode;
+  const automated = mode === "automated";
   let kgPath: string;
   let resolvedKgName: string;
   let notice: string | undefined;
 
-  if (targetKg) {
+  // ADR-067 Task 6.3 (spec §11): strip a leading [personal]/[project] marker
+  // from the title before it's used for filename/frontmatter generation.
+  const { marker, remainder } = parseScopeMarker(request.metadata.title);
+  if (marker !== null) request.metadata.title = remainder;
+
+  let effectiveTargetKg = targetKg;
+  if (!targetKg) {
+    if (marker !== null && !automated) {
+      if (scopeOpts?.sticky !== undefined) {
+        personalScopeSession.applyMarker(marker, scopeOpts.sticky);
+      } else {
+        const gated = await gate({
+          mode,
+          reason: "personal_scope_marker_sticky",
+          param: "sticky",
+          accepts: ["one-shot", "sticky"],
+          // No real blocking ask() transport exists yet at this layer (spec §12)
+          // -- matches every other gate() call site in this file/resolution.ts
+          // that has no real interactive transport yet.
+          ask: () => new Promise<never>(() => {}),
+        });
+        if (!("answer" in gated)) return gateResultToCaptureError(gated);
+        personalScopeSession.applyMarker(marker, gated.answer === "sticky");
+      }
+    }
+
+    // spec §11: "no read/write asymmetry" -- evaluated unconditionally (not
+    // just when a marker was present this call) so a scope set sticky by an
+    // earlier call (via kg_search or kg_capture, same shared session) still
+    // applies here.
+    const effectiveScope = personalScopeSession.currentScopeFor(automated);
+    if (effectiveScope === "personal") {
+      const personal = resolvePersonalGraph(config);
+      if ("error" in personal) return { error: "VALIDATION_ERROR", message: personal.error };
+      effectiveTargetKg = personal.name;
+    }
+  }
+
+  if (effectiveTargetKg) {
     // Explicit target KG: resolve by exact name, skip CWD check (intentional
     // user choice). resolveGraph's exact-name branch never scans the
     // filesystem or falls back to cwd, matching the old direct-lookup
     // behavior (ADR-067 Task 1.8).
-    const resolution = resolveGraph(config, process.cwd(), targetKg);
+    const resolution = resolveGraph(config, process.cwd(), effectiveTargetKg);
     if (resolution.kind === "not-registered") {
       return {
         error: "VALIDATION_ERROR",
-        message: `Unknown KG name: "${targetKg}". Check /kmgraph:status for registered KGs.`,
+        message: `Unknown KG name: "${effectiveTargetKg}". Check /kmgraph:status for registered KGs.`,
       };
     }
     // resolved/fuzzy-match/archived/merged (ambiguous-tie/no-graph-in-cwd
@@ -312,6 +362,19 @@ export async function handleCapture(
     kgPath = resolved.kgPath;
     resolvedKgName = resolved.resolvedKgName;
     notice = resolved.notice;
+  }
+
+  // spec §11: confirmPersonalScopeAccess gates every scope:"user" write
+  // reachable here, whether it arrived via an explicit targetKg naming a
+  // personal-type graph or a resolved [personal] marker -- symmetric with
+  // the read-side gate in search.ts.
+  if ((config.graphs[resolvedKgName]?.type ?? "project-local") === "personal") {
+    const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
+      confirmPersonalScope: scopeOpts?.confirmPersonalScope,
+      mode,
+      ask: () => new Promise<never>(() => {}),
+    });
+    if (!("confirmed" in confirmed)) return confirmed as CaptureError;
   }
 
   // Update-in-place path
@@ -408,11 +471,13 @@ export async function handleCapture(
   };
 }
 
-export function registerCaptureTool(server: McpServer): void {
+export function registerCaptureTool(server: McpServer, personalScopeSession: PersonalScopeSession): void {
   server.tool(
     "kg_capture",
     "Write a lesson, session summary, or ADR to a knowledge graph. " +
       "Defaults to the active KG. Pass targetKg to write to a named KG (e.g., a global personal KG). " +
+      "metadata.title may start with a [personal] or [project] marker to steer this call's " +
+      "(and optionally this session's) scope toward the personal or project-local knowledge graph. " +
       "Handles file naming, frontmatter generation, directory routing, README index update, " +
       "and FTS5 rebuild automatically. Returns KG_MISMATCH error when CWD is outside the active KG root " +
       "(bypassed when targetKg is specified).",
@@ -460,9 +525,30 @@ export function registerCaptureTool(server: McpServer): void {
           "Overrides auto-detected interaction mode. Automated callers receive a structured " +
             "KMG_INPUT_REQUIRED error (never a blocking question) when resolution is ambiguous."
         ),
+      sticky: z
+        .boolean()
+        .optional()
+        .describe(
+          "When metadata.title has a [personal]/[project] marker, whether the resulting scope " +
+            "should persist for the rest of this session (true) or apply to this call only " +
+            "(false). Required to resolve a marker without a blocking question."
+        ),
+      confirmPersonalScope: z
+        .boolean()
+        .optional()
+        .describe(
+          "Confirms this repo may write to the personal knowledge graph. Required once per " +
+            "process before a personal-scope write is honored for a repo not yet confirmed."
+        ),
     },
-    async ({ content, type, metadata, targetKg, interaction }) => {
-      const result = await handleCapture({ content, type, metadata }, targetKg, interaction);
+    async ({ content, type, metadata, targetKg, interaction, sticky, confirmPersonalScope }) => {
+      const result = await handleCapture(
+        { content, type, metadata },
+        targetKg,
+        interaction,
+        personalScopeSession,
+        { sticky, confirmPersonalScope }
+      );
       if ("error" in result) {
         return {
           content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],

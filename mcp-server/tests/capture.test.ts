@@ -606,7 +606,11 @@ describe("kg_capture — targetKg (multi-KG)", () => {
       metadata: { title: "Create vs Update Terminology", category: "process", tags: ["plans"] },
     };
 
-    const result = await handleCapture(request, "personal");
+    // ADR-067 Task 6.3: a write to a personal-type KG now requires
+    // confirmPersonalScopeAccess (spec §11) -- confirmPersonalScope:true is
+    // the automated-mode shortcut, since this test's default (unspecified)
+    // interaction mode resolves to "automated".
+    const result = await handleCapture(request, "personal", undefined, undefined, { confirmPersonalScope: true });
     process.cwd = origCwd;
 
     expect("error" in result).toBe(false);
@@ -641,7 +645,9 @@ describe("kg_capture — targetKg (multi-KG)", () => {
       metadata: { title: "Global Pattern", category: "patterns" },
     };
 
-    const result = await handleCapture(request, "personal");
+    // ADR-067 Task 6.3: writing to a personal-type KG now requires
+    // confirmPersonalScopeAccess (spec §11) -- see the previous test's note.
+    const result = await handleCapture(request, "personal", undefined, undefined, { confirmPersonalScope: true });
     process.cwd = origCwd;
 
     // Should succeed, not KG_MISMATCH
