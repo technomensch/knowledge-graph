@@ -319,6 +319,29 @@ export class PersonalScopeSession {
   }
 }
 
+// findings doc #14: kg_search's scope:"all" cross-KG union-read mode gated
+// behind a which-KGs-and-which-excluded confirmation. Same sticky/one-shot
+// shape as PersonalScopeSession, applied to a different trigger -- "may this
+// call search across every registered KG" instead of "is this call
+// personal-scoped." Ephemeral, process-lifetime, never persisted to disk.
+export class CrossKgSearchSession {
+  private confirmedForSession: boolean = false;
+  private excluded: Set<string> = new Set();
+
+  confirmSession(excluded: string[]): void {
+    this.confirmedForSession = true;
+    this.excluded = new Set(excluded);
+  }
+
+  isConfirmedForSession(): boolean {
+    return this.confirmedForSession;
+  }
+
+  excludedNames(): string[] {
+    return [...this.excluded];
+  }
+}
+
 // spec §11: a `scope: "user"` request from a repo the assistant hasn't seen
 // before needs its own confirmation, independent of the ordinary
 // stay/one-shot marker flow in applyMarker/currentScopeFor above -- a

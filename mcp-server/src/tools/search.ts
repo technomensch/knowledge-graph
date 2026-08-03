@@ -11,6 +11,7 @@ import {
   parseScopeMarker,
   PersonalScopeSession,
   confirmPersonalScopeAccess,
+  CrossKgSearchSession,
 } from "../resolution.js";
 import { resolveInteractionMode, InteractionMode, GateResult, gate } from "../interaction.js";
 import { searchFts5, resolveDbPath } from "./fts5.js";
@@ -179,11 +180,14 @@ export interface HandleSearchParams {
   interaction?: InteractionMode;
   sticky?: boolean;
   confirmPersonalScope?: boolean;
+  confirmCrossKgSearch?: boolean;
+  excludeKgs?: string[];
 }
 
 export async function handleSearch(
   params: HandleSearchParams,
-  personalScopeSession: PersonalScopeSession = new PersonalScopeSession()
+  personalScopeSession: PersonalScopeSession = new PersonalScopeSession(),
+  crossKgSearchSession: CrossKgSearchSession = new CrossKgSearchSession()
 ): Promise<ToolResponse> {
   const format = params.format ?? "summary";
   const requestedScope = params.searchScope ?? "active";
@@ -240,21 +244,100 @@ export async function handleSearch(
       };
     }
   } else if (searchScope === "all") {
+    const allKgs = getAllGraphPaths(config);
+    if (allKgs.length === 0) {
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: "No knowledge graphs registered. Use kg_config_init first.",
+          },
+        ],
+        isError: true,
+      };
+    }
+
+    // findings doc #14: scope:"all" is a cross-KG union-read that must be
+    // gated -- naming the candidate KGs and letting the caller exclude any
+    // -- unless this process-lifetime session already confirmed it (sticky
+    // from an earlier call, honoring its remembered exclusions).
+    let excludedNames: string[] = crossKgSearchSession.isConfirmedForSession()
+      ? crossKgSearchSession.excludedNames()
+      : [];
+
+    if (!crossKgSearchSession.isConfirmedForSession()) {
+      if (automated) {
+        if (!params.confirmCrossKgSearch) {
+          return errorResponse({
+            error: "KMG_INPUT_REQUIRED",
+            reason: "cross_kg_search_confirmation",
+            resolveWith: { param: "confirmCrossKgSearch", accepts: ["true"] },
+            detail: { candidates: allKgs.map((k) => k.name) },
+            message: `This search will run across ${allKgs.length} registered KGs: ${allKgs
+              .map((k) => k.name)
+              .join(", ")}. Pass confirmCrossKgSearch: true (optionally with excludeKgs) to proceed.`,
+          });
+        }
+        // Automated confirmations are per-call, not sticky -- there's no
+        // interactive one-shot-vs-sticky follow-up to answer in this mode
+        // (mirrors PersonalScopeSession.currentScopeFor(automated) disabling
+        // ephemeral stickiness entirely for automated callers).
+        excludedNames = params.excludeKgs ?? [];
+      } else {
+        const gated = await gate({
+          mode,
+          reason: "cross_kg_search_confirmation",
+          param: "confirmCrossKgSearch",
+          // "exclude:<name>,..." is a free-form answer parsed by the
+          // caller's real ask() implementation (spec §12) -- gate()'s own
+          // accepts validation only needs the fixed-shape answers here.
+          accepts: ["all", "cancel"],
+          detail: { candidates: allKgs.map((k) => k.name) },
+          ask: () => new Promise<never>(() => {}),
+        });
+        if (!("answer" in gated)) return errorResponse(gateResultToSearchError(gated));
+        if (gated.answer === "cancel") {
+          return { content: [{ type: "text" as const, text: "Cross-KG search cancelled." }] };
+        }
+        if (gated.answer.startsWith("exclude:")) {
+          excludedNames = gated.answer
+            .slice("exclude:".length)
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
+        }
+
+        if (params.sticky !== undefined) {
+          if (params.sticky) crossKgSearchSession.confirmSession(excludedNames);
+        } else {
+          const stickyGated = await gate({
+            mode,
+            reason: "cross_kg_search_sticky",
+            param: "sticky",
+            accepts: ["one-shot", "sticky"],
+            ask: () => new Promise<never>(() => {}),
+          });
+          if (!("answer" in stickyGated)) return errorResponse(gateResultToSearchError(stickyGated));
+          if (stickyGated.answer === "sticky") crossKgSearchSession.confirmSession(excludedNames);
+        }
+      }
+    }
+
     // Primary (cwd-resolved) KG first, then all others (ADR-067 Task 1.9
-    // -- replacing config.active-based sort-first logic; this branch does
-    // not yet gate on confirmation, that's Task 6.5, layered on top).
+    // -- replacing config.active-based sort-first logic), applied after
+    // exclusion.
     const primaryResolution = resolveGraph(config, process.cwd());
     const primaryName = primaryResolution.kind === "resolved" ? primaryResolution.name : undefined;
-    const allKgs = getAllGraphPaths(config);
-    const primaryEntry = primaryName ? allKgs.find((k) => k.name === primaryName) : undefined;
-    const otherKgs = primaryName ? allKgs.filter((k) => k.name !== primaryName) : allKgs;
+    const candidateKgs = allKgs.filter((k) => !excludedNames.includes(k.name));
+    const primaryEntry = primaryName ? candidateKgs.find((k) => k.name === primaryName) : undefined;
+    const otherKgs = primaryName ? candidateKgs.filter((k) => k.name !== primaryName) : candidateKgs;
     kgsToSearch = primaryEntry ? [primaryEntry, ...otherKgs] : otherKgs;
     if (kgsToSearch.length === 0) {
       return {
         content: [
           {
             type: "text" as const,
-            text: "No knowledge graphs registered. Use kg_config_init first.",
+            text: "No knowledge graphs left to search after exclusions.",
           },
         ],
         isError: true,
@@ -383,7 +466,11 @@ export async function handleSearch(
   };
 }
 
-export function registerSearchTool(server: McpServer, personalScopeSession: PersonalScopeSession): void {
+export function registerSearchTool(
+  server: McpServer,
+  personalScopeSession: PersonalScopeSession,
+  crossKgSearchSession: CrossKgSearchSession
+): void {
   server.tool(
     "kg_search",
     "Full-text search across knowledge graph files. By default searches the active KG only. " +
@@ -429,7 +516,22 @@ export function registerSearchTool(server: McpServer, personalScopeSession: Pers
           "Confirms this repo may read the personal knowledge graph. Required once per " +
             "process before a personal-scope read is honored for a repo not yet confirmed."
         ),
+      confirmCrossKgSearch: z
+        .boolean()
+        .optional()
+        .describe(
+          "Confirms this call may search across every registered KG (searchScope='all'). " +
+            "Required once per call in automated mode before a cross-KG search is honored, " +
+            "unless the session already confirmed it earlier."
+        ),
+      excludeKgs: z
+        .array(z.string())
+        .optional()
+        .describe(
+          "KG names to exclude from a searchScope='all' search. Only used alongside " +
+            "confirmCrossKgSearch: true."
+        ),
     },
-    async (params) => handleSearch(params, personalScopeSession)
+    async (params) => handleSearch(params, personalScopeSession, crossKgSearchSession)
   );
 }
