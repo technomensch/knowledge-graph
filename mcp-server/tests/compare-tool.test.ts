@@ -37,14 +37,16 @@ describe("kg_compare_graphs tool registration", () => {
     const dirA = fs.mkdtempSync(path.join(os.tmpdir(), "cmp-a-"));
     const dirB = fs.mkdtempSync(path.join(os.tmpdir(), "cmp-b-"));
 
-    // 6 files unique to A only, with distinct mtimes assigned in reverse
-    // creation order so the newest file is NOT the last one created.
+    // 6 files unique to A only. mtime is assigned so the newest file is
+    // alphabetically LAST (f6) and the oldest is alphabetically FIRST (f1) —
+    // this diverges from both creation order and alphabetical order, so the
+    // test actually exercises the recency sort (deleting it would fail here).
     const names = ["f1.md", "f2.md", "f3.md", "f4.md", "f5.md", "f6.md"];
     const baseTime = Date.now() / 1000;
     names.forEach((name, i) => {
       fs.writeFileSync(path.join(dirA, name), `content-${name}`);
-      // f1 gets the newest mtime, f6 the oldest.
-      const mtime = baseTime - i;
+      // f6 gets the newest mtime, f1 the oldest.
+      const mtime = baseTime - (names.length - 1 - i);
       fs.utimesSync(path.join(dirA, name), mtime, mtime);
     });
 
@@ -52,8 +54,8 @@ describe("kg_compare_graphs tool registration", () => {
     const text = result.content[0].text as string;
     const line = text.split("\n").find((l) => l.startsWith("Only in A (examples):"));
     expect(line).toBeDefined();
-    expect(line).toContain("f1.md, f2.md, f3.md, f4.md, f5.md");
-    expect(line).not.toContain("f6.md");
+    expect(line).toContain("f6.md, f5.md, f4.md, f3.md, f2.md");
+    expect(line).not.toContain("f1.md");
     expect(line).toContain("(1 more)");
 
     fs.rmSync(dirA, { recursive: true, force: true });

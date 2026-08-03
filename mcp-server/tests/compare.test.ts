@@ -39,6 +39,18 @@ describe("kg_compare_graphs summary", () => {
     expect(summary.fileCountB).toBe(1);
     expect(typeof summary.verdict).toBe("string");
     expect(summary.verdict.length).toBeGreaterThan(0);
+    expect(summary.worktreeFingerprint).toBe(false);
+  });
+
+  it("does not flag worktreeFingerprint for two non-git dirs that merely share one identical file", () => {
+    for (let i = 0; i < 5; i++) {
+      fs.writeFileSync(path.join(dirA, `a${i}.md`), `a-content-${i}`);
+      fs.writeFileSync(path.join(dirB, `b${i}.md`), `b-content-${i}`);
+    }
+    fs.writeFileSync(path.join(dirA, "shared.md"), "same");
+    fs.writeFileSync(path.join(dirB, "shared.md"), "same");
+    const summary = buildCompareSummary(dirA, dirB);
+    expect(summary.worktreeFingerprint).toBe(false);
   });
 
   it("flags worktreeFingerprint when tracked content is identical and only gitignored paths differ", () => {
