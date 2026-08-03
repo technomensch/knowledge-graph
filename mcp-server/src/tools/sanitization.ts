@@ -6,6 +6,7 @@ import * as os from "os";
 import { readConfig, walkDir, KgConfig } from "../utils.js";
 import { resolveGraph, resolvePersonalGraph, PersonalScopeSession, confirmPersonalScopeAccess, isAncestorOrEqual } from "../resolution.js";
 import { resolveInteractionMode, STUB_ASK_TIMEOUT_MS, stubAsk } from "../interaction.js";
+import { resolveEffectiveCwd } from "../platform-cwd.js";
 
 interface Violation {
   file: string;
@@ -53,13 +54,14 @@ function normalizeForScan(p: string): string {
 // direct, mockable seam for tests.
 export function resolveScanPath(
   config: KgConfig,
-  params: { kgPath?: string; scope?: "project" | "user" }
+  params: { kgPath?: string; scope?: "project" | "user" },
+  cwd: string = process.cwd()
 ): { scanPath: string } | { error: string } {
   if (params.kgPath) {
     return { scanPath: params.kgPath.replace(/^~/, os.homedir()) };
   }
   const target = params.scope === "user" ? resolvePersonalGraph(config) : (() => {
-    const resolution = resolveGraph(config, process.cwd());
+    const resolution = resolveGraph(config, cwd);
     return resolution.kind === "resolved"
       ? { name: resolution.name, graph: resolution.graph }
       : { error: "No knowledge graph resolved from your current directory and no path specified." };
@@ -93,11 +95,15 @@ export function registerSanitizationTool(server: McpServer, personalScopeSession
             "process before a scope:\"user\" scan is honored for a repo not yet confirmed."
         ),
     },
-    async ({ kgPath, scope, patterns: customPatterns, confirmPersonalScope }) => {
+    async ({ kgPath, scope, patterns: customPatterns, confirmPersonalScope }, extra) => {
       const config = readConfig();
+      const cwd = resolveEffectiveCwd({
+        processCwd: process.cwd(),
+        toolCallMeta: extra?._meta as Record<string, unknown> | undefined,
+      });
 
       // Determine path to scan
-      const resolved = resolveScanPath(config, { kgPath, scope });
+      const resolved = resolveScanPath(config, { kgPath, scope }, cwd);
       if ("error" in resolved) {
         return {
           content: [
@@ -130,7 +136,7 @@ export function registerSanitizationTool(server: McpServer, personalScopeSession
       // content directory.
       if ((!kgPath && scope === "user") || kgPathTouchesPersonal) {
         const mode = resolveInteractionMode({}).mode;
-        const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
+        const confirmed = await confirmPersonalScopeAccess(personalScopeSession, cwd, {
           confirmPersonalScope,
           mode,
           timeoutMs: STUB_ASK_TIMEOUT_MS,

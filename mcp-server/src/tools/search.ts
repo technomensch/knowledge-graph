@@ -14,6 +14,7 @@ import {
   CrossKgSearchSession,
 } from "../resolution.js";
 import { resolveInteractionMode, InteractionMode, GateResult, STUB_ASK_TIMEOUT_MS, gate, stubAsk } from "../interaction.js";
+import { resolveEffectiveCwd } from "../platform-cwd.js";
 import { searchFts5, resolveDbPath } from "./fts5.js";
 import type { SearchResult } from "./fts5.js";
 
@@ -182,18 +183,25 @@ export interface HandleSearchParams {
   confirmPersonalScope?: boolean;
   confirmCrossKgSearch?: boolean;
   excludeKgs?: string[];
+  workspaceRoot?: string;
 }
 
 export async function handleSearch(
   params: HandleSearchParams,
   personalScopeSession: PersonalScopeSession = new PersonalScopeSession(),
-  crossKgSearchSession: CrossKgSearchSession = new CrossKgSearchSession()
+  crossKgSearchSession: CrossKgSearchSession = new CrossKgSearchSession(),
+  toolCallMeta?: Record<string, unknown>
 ): Promise<ToolResponse> {
   const format = params.format ?? "summary";
   const requestedScope = params.searchScope ?? "active";
   const config = readConfig();
   const mode = resolveInteractionMode({ explicitParam: params.interaction }).mode;
   const automated = mode === "automated";
+  const cwd = resolveEffectiveCwd({
+    processCwd: process.cwd(),
+    toolCallMeta,
+    workspaceRootParam: params.workspaceRoot,
+  });
 
   // ADR-067 Task 6.3 (spec §11): strip a leading [personal]/[project] marker
   // before the remainder is used as the actual search text.
@@ -343,7 +351,7 @@ export async function handleSearch(
     // Primary (cwd-resolved) KG first, then all others (ADR-067 Task 1.9
     // -- replacing config.active-based sort-first logic), applied after
     // exclusion.
-    const primaryResolution = resolveGraph(config, process.cwd());
+    const primaryResolution = resolveGraph(config, cwd);
     const primaryName = primaryResolution.kind === "resolved" ? primaryResolution.name : undefined;
     const candidateKgs = allKgs.filter((k) => !excludedNames.includes(k.name));
     const primaryEntry = primaryName ? candidateKgs.find((k) => k.name === primaryName) : undefined;
@@ -365,8 +373,8 @@ export async function handleSearch(
     // gate()-backed archived/fuzzy-match/ambiguous-tie/merged/$HOME-or-root
     // handling as kg_capture (ADR-067 Task 6.2/6.3 -- replacing the plain
     // "not resolved" error this branch used as an interim placeholder).
-    const resolution = resolveGraph(config, process.cwd());
-    const outcome: GatedResolution = await resolveGraphOutcome(config, resolution, process.cwd(), mode);
+    const resolution = resolveGraph(config, cwd);
+    const outcome: GatedResolution = await resolveGraphOutcome(config, resolution, cwd, mode);
     if (outcome.kind === "gated") return errorResponse(gateResultToSearchError(outcome.result));
     if (outcome.kind === "not-registered") {
       return {
@@ -394,7 +402,7 @@ export async function handleSearch(
   // a resolved [personal] marker -- symmetric with the write-side gate in
   // capture.ts.
   if (kgsToSearch.some((kg) => kg.type === "personal")) {
-    const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
+    const confirmed = await confirmPersonalScopeAccess(personalScopeSession, cwd, {
       confirmPersonalScope: params.confirmPersonalScope,
       mode,
       timeoutMs: STUB_ASK_TIMEOUT_MS,
@@ -549,7 +557,16 @@ export function registerSearchTool(
           "KG names to exclude from a searchScope='all' search. Only used alongside " +
             "confirmCrossKgSearch: true."
         ),
+      workspaceRoot: z
+        .string()
+        .optional()
+        .describe(
+          "Explicit cwd override for clients whose process cwd doesn't reflect the caller's " +
+            "actual workspace (e.g. a plugin install path). Falls back to the MCP _meta " +
+            "sandboxCwd signal (Codex), then this param, then process.cwd()."
+        ),
     },
-    async (params) => handleSearch(params, personalScopeSession, crossKgSearchSession)
+    async (params, extra) =>
+      handleSearch(params, personalScopeSession, crossKgSearchSession, extra?._meta as Record<string, unknown> | undefined)
   );
 }

@@ -17,6 +17,7 @@ import {
 } from "../resolution.js";
 import { resolveInteractionMode, InteractionMode, GateResult, STUB_ASK_TIMEOUT_MS, gate, stubAsk } from "../interaction.js";
 import { confirmFirstWrite } from "./config.js";
+import { resolveEffectiveCwd } from "../platform-cwd.js";
 
 export interface CaptureRequest {
   content: string;
@@ -84,9 +85,10 @@ function gateResultToCaptureError(result: GateResult): CaptureError {
 async function resolveKgOutcome(
   config: KgConfig,
   resolution: ResolutionResult,
-  mode: InteractionMode
+  mode: InteractionMode,
+  cwd: string
 ): Promise<{ kgPath: string; resolvedKgName: string; notice?: string } | CaptureError> {
-  const outcome: GatedResolution = await resolveGraphOutcome(config, resolution, process.cwd(), mode);
+  const outcome: GatedResolution = await resolveGraphOutcome(config, resolution, cwd, mode);
   if (outcome.kind === "resolved") {
     return {
       kgPath: outcome.graph.path.replace(/^~/, os.homedir()),
@@ -95,7 +97,7 @@ async function resolveKgOutcome(
     };
   }
   if (outcome.kind === "no-graph-in-cwd") {
-    return { error: "KG_MISMATCH", activeKgRoot: undefined, cwd: process.cwd() };
+    return { error: "KG_MISMATCH", activeKgRoot: undefined, cwd };
   }
   if (outcome.kind === "not-registered") {
     return { error: "VALIDATION_ERROR", message: `Unknown KG name: "${outcome.name}".` };
@@ -284,7 +286,9 @@ export async function handleCapture(
   targetKg?: string,
   interaction?: InteractionMode,
   personalScopeSession: PersonalScopeSession = new PersonalScopeSession(),
-  scopeOpts?: { sticky?: boolean; confirmPersonalScope?: boolean; confirmFirstUse?: boolean }
+  scopeOpts?: { sticky?: boolean; confirmPersonalScope?: boolean; confirmFirstUse?: boolean },
+  workspaceRoot?: string,
+  toolCallMeta?: Record<string, unknown>
 ): Promise<CaptureResponse | CaptureError> {
   // Validate metadata
   const validated = validateMetadata(request.metadata);
@@ -293,6 +297,7 @@ export async function handleCapture(
   const config = readConfig();
   const mode = resolveInteractionMode({ explicitParam: interaction }).mode;
   const automated = mode === "automated";
+  const cwd = resolveEffectiveCwd({ processCwd: process.cwd(), toolCallMeta, workspaceRootParam: workspaceRoot });
   let kgPath: string;
   let resolvedKgName: string;
   let notice: string | undefined;
@@ -341,7 +346,7 @@ export async function handleCapture(
     // user choice). resolveGraph's exact-name branch never scans the
     // filesystem or falls back to cwd, matching the old direct-lookup
     // behavior (ADR-067 Task 1.8).
-    const resolution = resolveGraph(config, process.cwd(), effectiveTargetKg);
+    const resolution = resolveGraph(config, cwd, effectiveTargetKg);
     if (resolution.kind === "not-registered") {
       return {
         error: "VALIDATION_ERROR",
@@ -352,14 +357,14 @@ export async function handleCapture(
     // can't arise from an exact-name lookup): route through the shared
     // gate() logic -- fuzzy-match asks "which of these did you mean" via
     // gate(), same as ambiguous-tie's cwd-resolution path.
-    const resolved = await resolveKgOutcome(config, resolution, mode);
+    const resolved = await resolveKgOutcome(config, resolution, mode, cwd);
     if ("error" in resolved) return resolved;
     kgPath = resolved.kgPath;
     resolvedKgName = resolved.resolvedKgName;
     notice = resolved.notice;
   } else {
-    const resolution = resolveGraph(config, process.cwd());
-    const resolved = await resolveKgOutcome(config, resolution, mode);
+    const resolution = resolveGraph(config, cwd);
+    const resolved = await resolveKgOutcome(config, resolution, mode, cwd);
     if ("error" in resolved) return resolved;
     kgPath = resolved.kgPath;
     resolvedKgName = resolved.resolvedKgName;
@@ -389,7 +394,7 @@ export async function handleCapture(
   // personal-type graph or a resolved [personal] marker -- symmetric with
   // the read-side gate in search.ts.
   if ((config.graphs[resolvedKgName]?.type ?? "project-local") === "personal") {
-    const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
+    const confirmed = await confirmPersonalScopeAccess(personalScopeSession, cwd, {
       confirmPersonalScope: scopeOpts?.confirmPersonalScope,
       mode,
       timeoutMs: STUB_ASK_TIMEOUT_MS,
@@ -568,14 +573,24 @@ export function registerCaptureTool(server: McpServer, personalScopeSession: Per
           "Confirms this is a legitimate first write to a newly-registered (pending) knowledge " +
             "graph. Required once per graph before its first write is honored."
         ),
+      workspaceRoot: z
+        .string()
+        .optional()
+        .describe(
+          "Explicit cwd override for clients whose process cwd doesn't reflect the caller's " +
+            "actual workspace (e.g. a plugin install path). Falls back to the MCP _meta " +
+            "sandboxCwd signal (Codex), then this param, then process.cwd()."
+        ),
     },
-    async ({ content, type, metadata, targetKg, interaction, sticky, confirmPersonalScope, confirmFirstUse }) => {
+    async ({ content, type, metadata, targetKg, interaction, sticky, confirmPersonalScope, confirmFirstUse, workspaceRoot }, extra) => {
       const result = await handleCapture(
         { content, type, metadata },
         targetKg,
         interaction,
         personalScopeSession,
-        { sticky, confirmPersonalScope, confirmFirstUse }
+        { sticky, confirmPersonalScope, confirmFirstUse },
+        workspaceRoot,
+        extra?._meta as Record<string, unknown> | undefined
       );
       if ("error" in result) {
         return {

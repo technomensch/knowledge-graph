@@ -6,6 +6,7 @@ import * as os from "os";
 import { readConfig, writeConfig, walkDir } from "../utils.js";
 import { resolveGraph, resolvePersonalGraph, PersonalScopeSession, confirmPersonalScopeAccess } from "../resolution.js";
 import { resolveInteractionMode, STUB_ASK_TIMEOUT_MS, stubAsk } from "../interaction.js";
+import { resolveEffectiveCwd } from "../platform-cwd.js";
 
 // Graceful fallback: node-sqlite3-wasm is bundled in dist/node_modules/ for marketplace installs
 // (v0.5.10.3+). This try/catch covers edge cases: partial clone, corrupted dist, or dev runs
@@ -425,7 +426,8 @@ export function registerFts5StatusTool(server: McpServer, personalScopeSession: 
             "process before a scope:\"user\" read is honored for a repo not yet confirmed."
         ),
     },
-    async ({ scope, confirmPersonalScope }) => handleFts5Status({ scope, confirmPersonalScope }, personalScopeSession)
+    async ({ scope, confirmPersonalScope }, extra) =>
+      handleFts5Status({ scope, confirmPersonalScope }, personalScopeSession, extra?._meta as Record<string, unknown> | undefined)
   );
 }
 
@@ -442,12 +444,14 @@ export interface HandleFts5StatusResult {
 
 export async function handleFts5Status(
   params: HandleFts5StatusParams,
-  personalScopeSession: PersonalScopeSession = new PersonalScopeSession()
+  personalScopeSession: PersonalScopeSession = new PersonalScopeSession(),
+  toolCallMeta?: Record<string, unknown>
 ): Promise<HandleFts5StatusResult> {
   try {
     const config = readConfig();
+    const cwd = resolveEffectiveCwd({ processCwd: process.cwd(), toolCallMeta });
     const target = params.scope === "user" ? resolvePersonalGraph(config) : (() => {
-      const resolution = resolveGraph(config, process.cwd());
+      const resolution = resolveGraph(config, cwd);
       return resolution.kind === "resolved"
         ? { name: resolution.name, graph: resolution.graph }
         : { error: "No knowledge graph resolved from your current directory." };
@@ -467,7 +471,7 @@ export async function handleFts5Status(
     // -- same gate, closing the interim gap left open by Task 1.9.
     if (params.scope === "user") {
       const mode = resolveInteractionMode({}).mode;
-      const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
+      const confirmed = await confirmPersonalScopeAccess(personalScopeSession, cwd, {
         confirmPersonalScope: params.confirmPersonalScope,
         mode,
         timeoutMs: STUB_ASK_TIMEOUT_MS,
@@ -532,7 +536,8 @@ export function registerFts5Tool(server: McpServer, personalScopeSession: Person
             "process before a scope:\"user\" rebuild is honored for a repo not yet confirmed."
         ),
     },
-    async ({ kgPath, scope, confirmPersonalScope }) => handleFts5Rebuild({ kgPath, scope, confirmPersonalScope }, personalScopeSession)
+    async ({ kgPath, scope, confirmPersonalScope }, extra) =>
+      handleFts5Rebuild({ kgPath, scope, confirmPersonalScope }, personalScopeSession, extra?._meta as Record<string, unknown> | undefined)
   );
 }
 
@@ -550,8 +555,10 @@ export interface HandleFts5RebuildResult {
 
 export async function handleFts5Rebuild(
   params: HandleFts5RebuildParams,
-  personalScopeSession: PersonalScopeSession = new PersonalScopeSession()
+  personalScopeSession: PersonalScopeSession = new PersonalScopeSession(),
+  toolCallMeta?: Record<string, unknown>
 ): Promise<HandleFts5RebuildResult> {
+  const cwd = resolveEffectiveCwd({ processCwd: process.cwd(), toolCallMeta });
   if (!fts5Available) {
     return {
       content: [{
@@ -575,7 +582,7 @@ export async function handleFts5Rebuild(
       resolvedName = matchedEntry ? matchedEntry[0] : path.basename(resolvedPath);
     } else {
       const target = params.scope === "user" ? resolvePersonalGraph(config) : (() => {
-        const resolution = resolveGraph(config, process.cwd());
+        const resolution = resolveGraph(config, cwd);
         return resolution.kind === "resolved"
           ? { name: resolution.name, graph: resolution.graph }
           : { error: "No knowledge graph resolved from your current directory and no path specified." };
@@ -587,7 +594,7 @@ export async function handleFts5Rebuild(
       // the personal graph -- same gate as kg_fts5_status/search.ts/capture.ts.
       if (params.scope === "user") {
         const mode = resolveInteractionMode({}).mode;
-        const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
+        const confirmed = await confirmPersonalScopeAccess(personalScopeSession, cwd, {
           confirmPersonalScope: params.confirmPersonalScope,
           mode,
           timeoutMs: STUB_ASK_TIMEOUT_MS,

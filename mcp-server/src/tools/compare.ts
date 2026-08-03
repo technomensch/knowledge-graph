@@ -8,6 +8,7 @@ import { hashDirectory, compareFileSets, FileEntry, FileComparison, ComparisonCa
 import { readConfig } from "../utils.js";
 import { PersonalScopeSession, confirmPersonalScopeAccess, isAncestorOrEqual } from "../resolution.js";
 import { resolveInteractionMode, STUB_ASK_TIMEOUT_MS, stubAsk } from "../interaction.js";
+import { resolveEffectiveCwd } from "../platform-cwd.js";
 
 // Finding 2 (Fable review): a raw path string can't be gated the same way a scope enum can --
 // a personal-KG path could be passed under any of dozens of possible string values. Instead of
@@ -194,7 +195,11 @@ export function registerCompareTools(server: McpServer, personalScopeSession: Pe
             "knowledge graph."
         ),
     },
-    async ({ a, b, confirmPersonalScope }) => {
+    async ({ a, b, confirmPersonalScope }, extra) => {
+      const cwd = resolveEffectiveCwd({
+        processCwd: process.cwd(),
+        toolCallMeta: extra?._meta as Record<string, unknown> | undefined,
+      });
       if (!fs.existsSync(a)) {
         return { content: [{ type: "text" as const, text: `Error: path A does not exist: ${a}` }], isError: true };
       }
@@ -221,7 +226,7 @@ export function registerCompareTools(server: McpServer, personalScopeSession: Pe
 
       if (touchesPersonal) {
         const mode = resolveInteractionMode({}).mode;
-        const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
+        const confirmed = await confirmPersonalScopeAccess(personalScopeSession, cwd, {
           confirmPersonalScope,
           mode,
           timeoutMs: STUB_ASK_TIMEOUT_MS,

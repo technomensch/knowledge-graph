@@ -32,6 +32,7 @@ import {
   confirmPersonalScopeAccess,
 } from "../resolution.js";
 import { resolveInteractionMode, gate, InteractionMode, InputRequiredError, STUB_ASK_TIMEOUT_MS, requireInput, stubAsk } from "../interaction.js";
+import { resolveEffectiveCwd } from "../platform-cwd.js";
 
 // ── Four-answer duplicate-graphId prompt (Task 4.4, spec §9) ─────────────────
 
@@ -793,7 +794,8 @@ export function registerConfigTools(server: McpServer, personalScopeSession: Per
             "process before a scope:\"user\" write is honored for a repo not yet confirmed."
         ),
     },
-    async (params) => handleConfigAddCategory(params, personalScopeSession)
+    async (params, extra) =>
+      handleConfigAddCategory(params, personalScopeSession, extra?._meta as Record<string, unknown> | undefined)
   );
 
   // ── kg_config_remint_id ───────────────────────────────────────────
@@ -826,10 +828,12 @@ export interface HandleConfigAddCategoryResult {
 
 export async function handleConfigAddCategory(
   params: HandleConfigAddCategoryParams,
-  personalScopeSession: PersonalScopeSession = new PersonalScopeSession()
+  personalScopeSession: PersonalScopeSession = new PersonalScopeSession(),
+  toolCallMeta?: Record<string, unknown>
 ): Promise<HandleConfigAddCategoryResult> {
   const { name: catName, prefix = null, git = "commit", scope, confirmPersonalScope } = params;
   const config = readConfig();
+  const cwd = resolveEffectiveCwd({ processCwd: process.cwd(), toolCallMeta });
 
   // ADR-067 Task 1.9: resolution is context-derived (resolveGraph), not
   // config.active-derived. scope:"user" reaches the personal graph, which
@@ -839,7 +843,7 @@ export async function handleConfigAddCategory(
   if (scope === "user") {
     target = resolvePersonalGraph(config);
   } else {
-    const resolution = resolveGraph(config, process.cwd());
+    const resolution = resolveGraph(config, cwd);
     target = resolution.kind === "resolved"
       ? { name: resolution.name, graph: resolution.graph }
       : { error: "No knowledge graph resolved from your current directory. Use kg_config_init first, or pass scope=\"user\"." };
@@ -855,7 +859,7 @@ export async function handleConfigAddCategory(
   // concern applies and gets the same gate.
   if (scope === "user") {
     const mode = resolveInteractionMode({}).mode;
-    const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
+    const confirmed = await confirmPersonalScopeAccess(personalScopeSession, cwd, {
       confirmPersonalScope,
       mode,
       timeoutMs: STUB_ASK_TIMEOUT_MS,

@@ -6,6 +6,7 @@ import * as os from "os";
 import { readConfig, writeConfig, getPluginRoot } from "../utils.js";
 import { resolveGraph, resolvePersonalGraph, PersonalScopeSession, confirmPersonalScopeAccess } from "../resolution.js";
 import { resolveInteractionMode, STUB_ASK_TIMEOUT_MS, stubAsk } from "../interaction.js";
+import { resolveEffectiveCwd } from "../platform-cwd.js";
 import { handleVersion } from "./version.js";
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -661,11 +662,13 @@ export interface HandleUpgradeResult {
 
 export async function handleUpgrade(
   params: HandleUpgradeParams,
-  personalScopeSession: PersonalScopeSession = new PersonalScopeSession()
+  personalScopeSession: PersonalScopeSession = new PersonalScopeSession(),
+  toolCallMeta?: Record<string, unknown>
 ): Promise<HandleUpgradeResult> {
   // Under Jest/ts-jest __SERVER_VERSION__ is undefined → installedVersion = "0.0.0"
   const installedVersion = handleVersion().installed;
   const config = readConfig();
+  const cwd = resolveEffectiveCwd({ processCwd: process.cwd(), toolCallMeta });
 
   // ADR-067 Task 1.9: resolution is context-derived (resolveGraph), not
   // config.active-derived. Resolution failure no longer short-circuits the
@@ -673,7 +676,7 @@ export async function handleUpgrade(
   // a future migration category must run before any graph can resolve
   // correctly) and must stay reachable even when no graph resolves.
   const target = params.scope === "user" ? resolvePersonalGraph(config) : (() => {
-    const resolution = resolveGraph(config, process.cwd());
+    const resolution = resolveGraph(config, cwd);
     return resolution.kind === "resolved"
       ? { name: resolution.name, graph: resolution.graph }
       : { error: "No knowledge graph resolved from your current directory. Use kg_config_init first, or pass scope=\"user\"." };
@@ -687,7 +690,7 @@ export async function handleUpgrade(
   // "resolution" warning below and never touches the graph.
   if (params.scope === "user" && !("error" in target)) {
     const mode = resolveInteractionMode({}).mode;
-    const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
+    const confirmed = await confirmPersonalScopeAccess(personalScopeSession, cwd, {
       confirmPersonalScope: params.confirmPersonalScope,
       mode,
       timeoutMs: STUB_ASK_TIMEOUT_MS,
@@ -846,8 +849,12 @@ export function registerUpgradeTool(server: McpServer, personalScopeSession: Per
             "process before a scope:\"user\" upgrade is honored for a repo not yet confirmed."
         ),
     },
-    async ({ apply, confirm_platform_split, scope, confirmPersonalScope }) => {
-      return handleUpgrade({ apply: apply as ApplyCategory[] | undefined, confirm_platform_split, scope, confirmPersonalScope }, personalScopeSession);
+    async ({ apply, confirm_platform_split, scope, confirmPersonalScope }, extra) => {
+      return handleUpgrade(
+        { apply: apply as ApplyCategory[] | undefined, confirm_platform_split, scope, confirmPersonalScope },
+        personalScopeSession,
+        extra?._meta as Record<string, unknown> | undefined
+      );
     }
   );
 }
