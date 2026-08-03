@@ -71,8 +71,17 @@ to how `recall-agent`/`kg_search` already resolve scope):
   KG only)
 - A specific KG named by the user, or `--named=<kg>` → `--named=<kg>` (that KG only —
   `recall-agent` resolves the name itself)
-- Nothing specified, or an explicit `--active` flag → `--active` (all configured KGs —
-  project + personal — searched by default, current behavior)
+- An explicit signal for "the active KG specifically, not everything" (e.g. "just this
+  KG", or a literal `--active` flag) → `--active` — per `recall-agent`'s own flag table,
+  this means the single cwd-resolved KG **only**, overriding its normal auto-detect.
+- **Nothing specified at all** (no level flag, no NL signal) → pass **no** level flag to
+  `recall-agent`. Do not default this to `--active` — `recall-agent` has its own
+  auto-detect for the unflagged case (`all` if any personal KG is registered, `active`
+  otherwise; see its Step 1 `--scope` resolution), which is smarter than a hardcoded
+  choice here and must not be short-circuited. (The retired skill's original mapping
+  conflated "nothing specified" with an explicit `--active`, which would have forced
+  single-KG search even when a personal KG is registered and the smarter multi-KG default
+  should apply — corrected here, not carried forward.)
 - The existing `--scope=<active|all|personal-only>` flag (see Usage above) is a direct
   alternative path for scripting/explicit control. Level flags above take precedence over
   `--scope` when both are present, matching `recall-agent`'s own stated precedence — do
