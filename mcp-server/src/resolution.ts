@@ -3,6 +3,7 @@ import * as os from "os";
 import * as fs from "fs";
 import { execFileSync } from "child_process";
 import { KgConfig, GraphConfig } from "./utils.js";
+import { AskResult, InputRequiredError, InteractionMode, gate, requireInput } from "./interaction.js";
 
 export type ResolutionResult =
   | { kind: "resolved"; name: string; graph: GraphConfig }
@@ -141,6 +142,79 @@ export function findTruePathTies(config: KgConfig, resolvedPath: string): string
   return Object.entries(config.graphs)
     .filter(([, g]) => expand(g.path) === target)
     .map(([name]) => name);
+}
+
+export type ScopeMarker = "personal" | "project" | null;
+
+export function parseScopeMarker(text: string): { marker: ScopeMarker; remainder: string } {
+  const match = text.match(/^\[(personal|project)\]\s*/);
+  if (!match) return { marker: null, remainder: text };
+  return { marker: match[1] as "personal" | "project", remainder: text.slice(match[0].length) };
+}
+
+// Ephemeral, process-lifetime scope state (spec §11). Constructed once at
+// server startup, never persisted to disk, so a real process restart is
+// always a cold start with no scope carried over.
+export class PersonalScopeSession {
+  private currentScope: "personal" | "project" | null = null;
+  private confirmedRepos: Set<string> = new Set();
+
+  applyMarker(marker: ScopeMarker, _sticky: boolean): void {
+    this.currentScope = marker;
+  }
+
+  currentScopeFor(automated: boolean): "personal" | "project" | null {
+    if (automated) return null; // ephemeral scope disabled entirely in automated mode, spec §11
+    return this.currentScope;
+  }
+
+  hasConfirmedRepo(repoRoot: string): boolean {
+    return this.confirmedRepos.has(repoRoot);
+  }
+
+  confirmRepo(repoRoot: string): void {
+    this.confirmedRepos.add(repoRoot);
+  }
+}
+
+// spec §11: a `scope: "user"` request from a repo the assistant hasn't seen
+// before needs its own confirmation, independent of the ordinary
+// stay/one-shot marker flow in applyMarker/currentScopeFor above -- a
+// crafted instruction embedded in a freshly-cloned untrusted repo could
+// otherwise ask the assistant to write to the user's personal KG silently.
+// Sibling to Task 6.4's confirmFirstWrite: same gate() plumbing, its own
+// reason string, and per-repo-root (not per-graph-name) persistence via
+// PersonalScopeSession.confirmedRepos.
+export async function confirmPersonalScopeAccess(
+  session: PersonalScopeSession,
+  repoRoot: string,
+  opts: {
+    confirmPersonalScope?: boolean;
+    mode: InteractionMode;
+    ask: (signal: AbortSignal, detail?: unknown) => Promise<AskResult>;
+  }
+): Promise<{ confirmed: true } | InputRequiredError> {
+  if (session.hasConfirmedRepo(repoRoot)) return { confirmed: true }; // already confirmed this process, don't re-ask
+
+  if (opts.mode === "automated") {
+    if (!opts.confirmPersonalScope) return requireInput("personal_scope_unseen_repo", "confirmPersonalScope");
+    session.confirmRepo(repoRoot);
+    return { confirmed: true };
+  }
+
+  const gated = await gate({
+    mode: opts.mode,
+    reason: "personal_scope_unseen_repo",
+    param: "confirmPersonalScope",
+    accepts: ["yes", "no"],
+    ask: opts.ask,
+  });
+  if ("error" in gated) return gated;
+  if (!("answer" in gated) || gated.answer !== "yes") {
+    return requireInput("personal_scope_unseen_repo", "confirmPersonalScope", ["yes", "no"]);
+  }
+  session.confirmRepo(repoRoot);
+  return { confirmed: true };
 }
 
 export function resolveGraph(config: KgConfig, cwd: string, name?: string): ResolutionResult {
