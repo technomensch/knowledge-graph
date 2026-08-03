@@ -756,6 +756,127 @@ describe("kg_capture — targetKg (multi-KG)", () => {
   });
 });
 
+describe("kg_capture — scope param (consistency with kg_search/kg_config_add_category/kg_fts5_*/kg_upgrade)", () => {
+  function mockScopeConfig(projRoot: string, globalRoot: string): void {
+    (readConfig as jest.Mock).mockReturnValue({
+      version: "1.0.0",
+      graphs: {
+        "my-project": {
+          name: "my-project",
+          path: projRoot,
+          type: "project-local",
+          categories: [],
+          createdAt: new Date().toISOString(),
+          status: "active",
+          statusChangedAt: new Date().toISOString(),
+          graphId: "test-graph-id-my-project",
+        },
+        personal: {
+          name: "personal",
+          path: globalRoot,
+          type: "personal",
+          categories: [],
+          createdAt: new Date().toISOString(),
+          status: "active",
+          statusChangedAt: new Date().toISOString(),
+          graphId: "test-graph-id-personal",
+        },
+      },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    });
+  }
+
+  test("scope:'user' writes to the personal KG, gated by confirmPersonalScopeAccess like the other 5 tools", async () => {
+    const projRoot = makeTempDir("scope-proj");
+    const globalRoot = makeTempDir("scope-global");
+    tempDirs.push(projRoot, globalRoot);
+    scaffoldKg(projRoot);
+    scaffoldKg(globalRoot);
+    mockScopeConfig(projRoot, globalRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => projRoot; // cwd resolves to the project KG -- scope:"user" must override this
+
+    const request: CaptureRequest = {
+      content: "## Scope param test\n",
+      type: "lesson",
+      metadata: { title: "Scope Param Consistency" },
+    };
+
+    // Automated mode (default when unspecified), unconfirmed repo: same
+    // KMG_INPUT_REQUIRED gate every other scope:"user" reachable tool uses.
+    const unconfirmed = await handleCapture(request, undefined, undefined, undefined, { scope: "user" });
+    expect("error" in unconfirmed).toBe(true);
+    expect((unconfirmed as CaptureError).error).toBe("KMG_INPUT_REQUIRED");
+    expect((unconfirmed as CaptureError).reason).toBe("personal_scope_unseen_repo");
+
+    const confirmed = await handleCapture(request, undefined, undefined, undefined, {
+      scope: "user",
+      confirmPersonalScope: true,
+    });
+    process.cwd = origCwd;
+
+    expect("error" in confirmed).toBe(false);
+    const ok = confirmed as CaptureResponse;
+    expect(ok.status).toBe("created");
+    expect(ok.filePath.startsWith(globalRoot)).toBe(true);
+    expect(ok.filePath.startsWith(projRoot)).toBe(false);
+    expect(fs.existsSync(ok.filePath)).toBe(true);
+  });
+
+  test("scope:'project' (or omitted) resolves via cwd as before -- no behavior change for the default path", async () => {
+    const projRoot = makeTempDir("scope-proj-default");
+    const globalRoot = makeTempDir("scope-global-default");
+    tempDirs.push(projRoot, globalRoot);
+    scaffoldKg(projRoot);
+    scaffoldKg(globalRoot);
+    mockScopeConfig(projRoot, globalRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => projRoot;
+
+    const request: CaptureRequest = {
+      content: "## Scope default test\n",
+      type: "lesson",
+      metadata: { title: "Scope Default" },
+    };
+
+    const result = await handleCapture(request, undefined, undefined, undefined, { scope: "project" });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    expect(ok.filePath.startsWith(projRoot)).toBe(true);
+  });
+
+  test("explicit targetKg still wins over scope when both are somehow given", async () => {
+    const projRoot = makeTempDir("scope-precedence-proj");
+    const globalRoot = makeTempDir("scope-precedence-global");
+    tempDirs.push(projRoot, globalRoot);
+    scaffoldKg(projRoot);
+    scaffoldKg(globalRoot);
+    mockScopeConfig(projRoot, globalRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => globalRoot; // cwd would resolve to nothing useful here; targetKg is explicit
+
+    const request: CaptureRequest = {
+      content: "## Precedence test\n",
+      type: "lesson",
+      metadata: { title: "TargetKg Wins" },
+    };
+
+    // targetKg="my-project" explicitly given alongside scope:"user" -- targetKg wins,
+    // matching every other tool's targetKg-beats-scope precedent for explicit overrides.
+    const result = await handleCapture(request, "my-project", undefined, undefined, { scope: "user" });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    expect(ok.filePath.startsWith(projRoot)).toBe(true);
+  });
+});
+
 // ---------------------------------------------------------------------------
 // checkExistingFile
 // ---------------------------------------------------------------------------

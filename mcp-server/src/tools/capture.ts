@@ -286,7 +286,7 @@ export async function handleCapture(
   targetKg?: string,
   interaction?: InteractionMode,
   personalScopeSession: PersonalScopeSession = new PersonalScopeSession(),
-  scopeOpts?: { sticky?: boolean; confirmPersonalScope?: boolean; confirmFirstUse?: boolean },
+  scopeOpts?: { sticky?: boolean; confirmPersonalScope?: boolean; confirmFirstUse?: boolean; scope?: "project" | "user" },
   workspaceRoot?: string,
   toolCallMeta?: Record<string, unknown>
 ): Promise<CaptureResponse | CaptureError> {
@@ -308,7 +308,19 @@ export async function handleCapture(
   if (marker !== null) request.metadata.title = remainder;
 
   let effectiveTargetKg = targetKg;
-  if (!targetKg) {
+  if (!targetKg && scopeOpts?.scope === "user") {
+    // Explicit structured scope:"user" (consistency with kg_search/
+    // kg_config_add_category/kg_fts5_status/kg_fts5_rebuild/kg_upgrade, all
+    // of which already have this param) -- takes priority over marker
+    // inference since it's an explicit signal, not a free-text guess.
+    // Reuses the same personal-graph lookup the [personal] marker path
+    // below uses; the confirmPersonalScopeAccess gate further down keys off
+    // the resolved graph's type, not how it was reached, so this is gated
+    // identically to the marker/targetKg paths.
+    const personal = resolvePersonalGraph(config);
+    if ("error" in personal) return { error: "VALIDATION_ERROR", message: personal.error };
+    effectiveTargetKg = personal.name;
+  } else if (!targetKg) {
     if (marker !== null && !automated) {
       if (scopeOpts?.sticky !== undefined) {
         personalScopeSession.applyMarker(marker, scopeOpts.sticky);
@@ -559,6 +571,14 @@ export function registerCaptureTool(server: McpServer, personalScopeSession: Per
             "should persist for the rest of this session (true) or apply to this call only " +
             "(false). Required to resolve a marker without a blocking question."
         ),
+      scope: z
+        .enum(["project", "user"])
+        .optional()
+        .describe(
+          "project (default, cwd-resolved) or user (the personal knowledge graph). Consistent " +
+            "with kg_search/kg_config_add_category/kg_fts5_status/kg_fts5_rebuild/kg_upgrade's " +
+            "scope param. Ignored when targetKg is given; alternative to a [personal] marker."
+        ),
       confirmPersonalScope: z
         .boolean()
         .optional()
@@ -582,13 +602,13 @@ export function registerCaptureTool(server: McpServer, personalScopeSession: Per
             "sandboxCwd signal (Codex), then this param, then process.cwd()."
         ),
     },
-    async ({ content, type, metadata, targetKg, interaction, sticky, confirmPersonalScope, confirmFirstUse, workspaceRoot }, extra) => {
+    async ({ content, type, metadata, targetKg, interaction, sticky, confirmPersonalScope, confirmFirstUse, scope, workspaceRoot }, extra) => {
       const result = await handleCapture(
         { content, type, metadata },
         targetKg,
         interaction,
         personalScopeSession,
-        { sticky, confirmPersonalScope, confirmFirstUse },
+        { sticky, confirmPersonalScope, confirmFirstUse, scope },
         workspaceRoot,
         extra?._meta as Record<string, unknown> | undefined
       );
