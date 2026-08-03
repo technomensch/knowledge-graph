@@ -140,6 +140,23 @@ describe("kg_compare_graphs personal-scope gate", () => {
     fs.rmSync(otherDir, { recursive: true, force: true });
   });
 
+  it("called with a subdirectory NESTED INSIDE the registered personal graph's root (not the root itself) still returns the structured gate error", async () => {
+    const personalRoot = fs.mkdtempSync(path.join(os.tmpdir(), "cmp-personal-"));
+    const nestedSubdir = fs.mkdtempSync(path.join(personalRoot, "subdir-"));
+    const otherDir = fs.mkdtempSync(path.join(os.tmpdir(), "cmp-other-"));
+    (readConfig as jest.Mock).mockReturnValue(personalConfig(personalRoot));
+
+    const handler = await getHandler();
+    const result = await handler({ a: nestedSubdir, b: otherDir });
+
+    expect(result.isError).toBe(true);
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed).toMatchObject({ error: "KMG_INPUT_REQUIRED", reason: "personal_scope_unseen_repo" });
+
+    fs.rmSync(personalRoot, { recursive: true, force: true });
+    fs.rmSync(otherDir, { recursive: true, force: true });
+  });
+
   it("proceeds to compare once confirmPersonalScope:true is passed", async () => {
     const personalRoot = fs.mkdtempSync(path.join(os.tmpdir(), "cmp-personal-"));
     const otherDir = fs.mkdtempSync(path.join(os.tmpdir(), "cmp-other-"));

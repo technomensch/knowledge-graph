@@ -6,7 +6,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { hashDirectory, compareFileSets, FileEntry, FileComparison, ComparisonCategory } from "../graph-compare.js";
 import { readConfig } from "../utils.js";
-import { PersonalScopeSession, confirmPersonalScopeAccess } from "../resolution.js";
+import { PersonalScopeSession, confirmPersonalScopeAccess, isAncestorOrEqual } from "../resolution.js";
 import { resolveInteractionMode, STUB_ASK_TIMEOUT_MS, stubAsk } from "../interaction.js";
 
 // Finding 2 (Fable review): a raw path string can't be gated the same way a scope enum can --
@@ -212,7 +212,12 @@ export function registerCompareTools(server: McpServer, personalScopeSession: Pe
       const personalGraphPaths = Object.values(config.graphs)
         .filter((g) => g.type === "personal" && g.status !== "deleted")
         .map((g) => normalizeForCompare(g.path));
-      const touchesPersonal = personalGraphPaths.some((p) => p === normalizedA || p === normalizedB);
+      // Containment, not just equality -- a subdirectory nested inside the personal graph's
+      // registered root still exposes that graph's file hashes/counts/filenames and must be
+      // gated the same as the root itself.
+      const touchesPersonal = personalGraphPaths.some(
+        (p) => isAncestorOrEqual(p, normalizedA) || isAncestorOrEqual(p, normalizedB)
+      );
 
       if (touchesPersonal) {
         const mode = resolveInteractionMode({}).mode;
