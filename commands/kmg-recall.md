@@ -60,14 +60,33 @@ When a personal KG is registered, `recall` searches both project and personal KG
 
 ## Level Routing Detection
 
-Before searching, detect the level signal from the user's invocation to scope the search.
+Before searching, detect the user's intent for search scope from their message or an
+explicit flag directly — no separate routing skill needed (`gov-capture-routing`,
+formerly invoked here, has been retired — see issue-18 — as this detection is now native
+to how `recall-agent`/`kg_search` already resolve scope):
 
-**Invoke `gov-capture-routing` skill** to:
-1. Detect level signal from the user's message (NL patterns or explicit flags)
-2. Resolve `$level` and `$target_kg`
-3. Map to search scope: `--user` → `~/.kmgraph/` only; `--project` → current repo KG only; `--named=<kg>` → named KG only; `--active` or no signal → all configured KGs (default)
+- Personal/global-KG language ("my personal", "across all my projects"), or an explicit
+  `--user` flag → `--user` (personal KG only)
+- This-project language, or an explicit `--project` flag → `--project` (current repo's
+  KG only)
+- A specific KG named by the user, or `--named=<kg>` → `--named=<kg>` (that KG only —
+  `recall-agent` resolves the name itself)
+- Nothing specified, or an explicit `--active` flag → `--active` (all configured KGs —
+  project + personal — searched by default, current behavior)
+- The existing `--scope=<active|all|personal-only>` flag (see Usage above) is a direct
+  alternative path for scripting/explicit control. Level flags above take precedence over
+  `--scope` when both are present, matching `recall-agent`'s own stated precedence — do
+  not resolve both and pick one arbitrarily.
 
-Pass the resolved level flag to the `recall-agent` invocation.
+**Deliberately not reproduced from the retired skill:** the richer NL trigger vocabulary,
+conflict-resolution flow for two ambiguous signals in one message, and multi-capture
+handling `gov-capture-routing` supported are not replicated here — the mapping above is
+a straightforward level/flag → level/flag translation, not a full reimplementation. See
+issue-18's decision record for why this is an accepted scope narrowing, not an oversight.
+
+Pass the resolved level flag (or `--scope` if that's what was given) to the
+`recall-agent` invocation, exactly as `recall-agent` already expects — only how the flag
+gets resolved changes here, not the flag contract itself.
 
 ---
 
