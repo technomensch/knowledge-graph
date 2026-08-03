@@ -57,12 +57,9 @@ This applies even when `--active` (default) is used, so the user can correct the
 - `--user`: write directly via Write tool to `$target_path`. Skip `kg_capture` entirely.
 - `--project` / `--named` / `--active`: use `kg_capture` as normal to `$target_path`. If `kg_capture` MCP is unavailable: surface error and stop — do not fall back silently.
 
-### Switch/restore for `--project`
+### Targeting for `--project`
 
-If `--project` requires a KG switch:
-1. Record `$restore_kg` = current active KG
-2. Run `/kmgraph:kmg-switch {project_kg}`
-3. After capture completes: run `/kmgraph:kmg-switch {$restore_kg}`
+Pass `targetKg: {project_kg}` directly to `kg_capture` — knowledge graphs resolve automatically from context rather than a mutable "active" pointer, so no switch/restore step is needed before or after the write.
 
 ### Pass-through to `--delegate`
 
@@ -617,7 +614,11 @@ Once approved, call `kg_capture`:
 
 **KG_MISMATCH error:**
 
-> "The active knowledge graph is for a different project. Do you want to switch, or proceed anyway?"
+> "No knowledge graph is registered for your current directory. Run `/kmgraph:kmg-init` to register one, or pass an explicit `targetKg` to write elsewhere."
+
+**KMG_INPUT_REQUIRED error** (`reason` distinguishes the case — `archived_entry`, `fuzzy_match`, `ambiguous_path_tie`, `home_or_root_cwd`, etc.):
+
+Surface `resolveWith.accepts` (if present) as the candidate choices and ask the user to pick one, then retry `kg_capture` with that answer filled into the param named by `resolveWith.param`.
 
 **Other errors:**
 

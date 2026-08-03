@@ -174,8 +174,8 @@ Knowledge Graphs:
    Git: selective (architecture/patterns committed, process gitignored)
    Last used: 2026-02-13 15:45
 
-⚠️  No active knowledge graph set.
-    Use /kmgraph:kmg-switch <name> to activate one.
+⚠️  No knowledge graph resolves from your current directory.
+    cd into a registered project's directory, or pass targetKg explicitly to kg_capture/kg_search.
 
 Total: 1 knowledge graph(s) configured
 ```
@@ -192,9 +192,9 @@ Knowledge Graphs:
 
 **Warning**:
 ```
-⚠️  Active knowledge graph path does not exist: /Users/name/projects/my-app/docs/
-    The project may have been moved or deleted.
-    Use /kmgraph:kmg-switch to change to a different KG.
+⚠️  Registered knowledge graph path does not exist: /Users/name/projects/my-app/docs/
+    The project may have been moved or deleted. Update its path via /kmgraph:kmg-init,
+    or cd into a different registered project's directory to resolve against it instead.
 ```
 
 ## Turbo Mode
@@ -228,9 +228,8 @@ ai-research
 ## Integration with Other Skills
 
 - `/kmgraph:kmg-init` creates new entries shown here
-- `/kmgraph:kmg-switch` changes which one is marked "active"
-- `/kmgraph:kmg-status` shows detailed stats for active KG
-- All other skills operate on the "active" KG shown here
+- `/kmgraph:kmg-status` shows detailed stats for the KG resolved from your current directory
+- All other skills operate on the KG resolved from cwd (or an explicit named target) shown here
 
 ## Machine-Readable Output
 
@@ -263,6 +262,5 @@ Output:
 ## See Also
 
 - `/kmgraph:kmg-init` — Create a new knowledge graph
-- `/kmgraph:kmg-switch` — Change active KG
-- `/kmgraph:kmg-status` — View detailed stats for active KG
+- `/kmgraph:kmg-status` — View detailed stats for the KG resolved from your current directory
 - `/kmgraph:kmg-add-category` — Add categories to existing KG

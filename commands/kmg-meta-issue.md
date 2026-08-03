@@ -376,8 +376,8 @@ to powerful-tier for diagnosis. Receives exit-path decision at 5 attempts.
 ## Multi-KG Support
 
 When multiple knowledge graphs are configured:
-- Meta-issues stored in active KG: `{active_kg_path}/issues/`
-- Use `/kmgraph:kmg-switch` to change active KG before creating meta-issue
+- Meta-issues stored in the KG resolved from your current directory: `{active_kg_path}/issues/`
+- To file against a different KG, run this command from that KG's project directory (or pass its name explicitly, if supported)
 - Each KG can track its own domain-specific meta-issues
 
 ---

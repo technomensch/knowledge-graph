@@ -17,9 +17,9 @@
 
 ### Step 0: Verify active graph, then call kg_upgrade inspect
 
-**Step 0a — Verify active graph matches wizard target.**
+**Step 0a — Ensure `kg_upgrade` targets `{kg_name}`.**
 
-`kg_upgrade` always operates on the config's active graph. Before calling it, confirm `{kg_name}` equals the active graph:
+`kg_upgrade` no longer operates on a config-wide "active" graph — it resolves `scope: "project"` (default) from the caller's cwd, or `scope: "user"` for the personal knowledge graph. There is nothing to switch beforehand:
 
 ```bash
 CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
@@ -28,10 +28,10 @@ mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
 if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
   cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
 fi
-ACTIVE=$(jq -r '.active' "$CONFIG_PATH" 2>/dev/null)
+KG_TYPE=$(jq -r ".graphs[\"{kg_name}\"].type" "$CONFIG_PATH" 2>/dev/null)
 ```
 
-If `$ACTIVE` ≠ `{kg_name}`: temporarily switch active to `{kg_name}` using `kg_config_switch` tool before calling `kg_upgrade`, then after the upgrade call: if `{preserve_active}` is `true`, restore `$ACTIVE` (leave the original active graph unchanged); if `{preserve_active}` is `false`, leave `{kg_name}` active (the wizard's normal behavior). If you cannot switch (tool unavailable), skip to bash detection without setting any per-category flags.
+If `$KG_TYPE` is `"personal"`, call `kg_upgrade` with `scope: "user"`. Otherwise call it with cwd inside `{kg_name}`'s registered project directory (its default, `scope: "project"`, resolves from cwd). No config mutation or restore step is needed either way.
 
 **Step 0b — Call kg_upgrade (inspect mode, no args).**
 

@@ -2,8 +2,8 @@ import * as path from "path";
 import * as os from "os";
 import * as fs from "fs";
 import { execFileSync } from "child_process";
-import { KgConfig, GraphConfig } from "./utils.js";
-import { AskResult, InputRequiredError, InteractionMode, gate, requireInput } from "./interaction.js";
+import { KgConfig, GraphConfig, updateConfig, changeGraphStatus } from "./utils.js";
+import { AskResult, GateResult, InputRequiredError, InteractionMode, gate, requireInput } from "./interaction.js";
 
 export type ResolutionResult =
   | { kind: "resolved"; name: string; graph: GraphConfig }
@@ -111,6 +111,148 @@ export function resolvePersonalGraph(config: KgConfig): { name: string; graph: G
 export function isHomeOrRootCwd(cwd: string): boolean {
   const normalized = path.resolve(cwd);
   return normalized === path.resolve(os.homedir()) || normalized === path.parse(normalized).root;
+}
+
+// spec §8: a real (POSIX-only) signal for "does this $HOME/root cwd actually
+// belong to the user running this process" -- e.g. a sudo'd shell or a
+// container bind-mount can put you in a directory named /root or /home/xyz
+// that isn't really "yours." "unknown" (Windows, or any stat failure) is
+// deliberately NOT treated as a mismatch by callers -- spec §8 only wants
+// genuine ownership *mismatches* surfaced, not an inability to check.
+export function checkHomeOwnership(cwd: string): "matches" | "mismatch" | "unknown" {
+  if (process.platform === "win32") return "unknown"; // no POSIX uid concept
+  try {
+    const dirUid = fs.statSync(cwd).uid;
+    const processUid = os.userInfo().uid;
+    return dirUid === processUid ? "matches" : "mismatch";
+  } catch {
+    return "unknown";
+  }
+}
+
+// spec §8's two-layer $HOME/root flow. Only invoked once resolveGraph has
+// already returned "no-graph-in-cwd" for a cwd that is either the user's home
+// directory or the filesystem root -- silently defaulting a resolution from
+// such a broad cwd is exactly the "silently default to X" failure spec §8
+// exists to prevent (findings doc #11).
+async function gateHomeOrRootCwd(config: KgConfig, mode: InteractionMode): Promise<GateResult> {
+  let questionText =
+    "You're currently in your own home directory — is this for your personal graph, or one of your existing registered projects?";
+  if (mode === "interactive") {
+    const ownership = checkHomeOwnership(process.cwd());
+    if (ownership === "mismatch") {
+      questionText =
+        "Heads up: this home directory doesn't appear to belong to the current process's user (possible sudo/container mount). " +
+        questionText;
+    }
+    // "unknown" (e.g. Windows) is treated the same as "matches" -- proceed to
+    // the plain question, per spec §8.
+  }
+  const registeredNames = Object.keys(config.graphs);
+  return gate({
+    mode,
+    reason: "home_or_root_cwd",
+    param: "scope",
+    accepts: ["personal", ...registeredNames],
+    detail: { question: questionText },
+    // No real blocking ask() transport exists yet at this layer (spec §12:
+    // "mechanism, not native blocking elicitation") -- a never-resolving
+    // promise lets gate()'s own Promise.race/timeout machinery (Task 3.2) do
+    // what it already does for every other unanswered interactive question,
+    // producing the same KMG_INPUT_REQUIRED shape as the automated branch.
+    ask: () => new Promise<never>(() => {}),
+  });
+}
+
+export type GatedResolution =
+  | { kind: "resolved"; name: string; graph: GraphConfig; notice?: string }
+  | { kind: "gated"; result: GateResult }
+  | { kind: "not-registered"; name: string }
+  | { kind: "no-graph-in-cwd" };
+
+// Routes every ResolutionResult outcome through gate() with its real
+// per-outcome behavior (Task 6.2), shared between kg_capture and kg_search so
+// the two tools don't drift on how archived/fuzzy-match/ambiguous-tie/merged/
+// $HOME-or-root resolution is surfaced.
+export async function resolveGraphOutcome(
+  config: KgConfig,
+  resolution: ResolutionResult,
+  cwd: string,
+  mode: InteractionMode
+): Promise<GatedResolution> {
+  if (resolution.kind === "resolved") {
+    return { kind: "resolved", name: resolution.name, graph: resolution.graph };
+  }
+
+  if (resolution.kind === "not-registered") {
+    return { kind: "not-registered", name: resolution.name };
+  }
+
+  if (resolution.kind === "no-graph-in-cwd") {
+    if (!isHomeOrRootCwd(cwd)) return { kind: "no-graph-in-cwd" };
+    const gated = await gateHomeOrRootCwd(config, mode);
+    if (!("answer" in gated)) return { kind: "gated", result: gated };
+    if (gated.answer === "personal") {
+      const personal = resolvePersonalGraph(config);
+      if ("error" in personal) {
+        return { kind: "gated", result: requireInput("home_or_root_cwd_no_personal_kg", "scope", ["personal", ...Object.keys(config.graphs)]) };
+      }
+      return { kind: "resolved", name: personal.name, graph: personal.graph };
+    }
+    return resolveGraphOutcome(config, resolveGraph(config, cwd, gated.answer), cwd, mode);
+  }
+
+  // findings doc #19: a merged-away entry acts as a transparent alias to its
+  // survivor -- plain notice (logged by the caller, not asked as a
+  // question), then re-resolve and proceed against the survivor's graph.
+  if (resolution.kind === "merged") {
+    const notice = `'${resolution.name}' was merged into '${resolution.into}' on ${resolution.at}. Resolving against '${resolution.into}'.`;
+    const inner = await resolveGraphOutcome(config, resolveGraph(config, cwd, resolution.into), cwd, mode);
+    if (inner.kind === "resolved") {
+      return { ...inner, notice: inner.notice ? `${notice} ${inner.notice}` : notice };
+    }
+    return inner;
+  }
+
+  if (resolution.kind === "archived") {
+    // findings doc #19: "restore" would recreate the exact duplicate a merge
+    // already resolved, so it's excluded whenever mergedInto is set -- belt
+    // and suspenders alongside the "merged" branch above, which already
+    // routes a mergedInto-set entry away from this branch entirely.
+    const accepts = resolution.graph.mergedInto ? ["skip", "ignore"] : ["skip", "ignore", "restore"];
+    const gated = await gate({
+      mode,
+      reason: "archived_entry",
+      param: "confirmProceed",
+      accepts,
+      detail: { name: resolution.name, statusChangedAt: resolution.graph.statusChangedAt },
+      ask: () => new Promise<never>(() => {}),
+    });
+    if (!("answer" in gated)) return { kind: "gated", result: gated };
+    if (gated.answer === "restore") {
+      updateConfig((cfg) => changeGraphStatus(cfg, resolution.name, "active"));
+      return { kind: "resolved", name: resolution.name, graph: { ...resolution.graph, status: "active" } };
+    }
+    // "skip"/"ignore": proceed against the archived graph as-is this call --
+    // the distinction between the two only governs whether a *future* call
+    // re-asks within the same session, and no cross-call session store for
+    // that suppression exists yet (out of scope for this task).
+    return { kind: "resolved", name: resolution.name, graph: resolution.graph };
+  }
+
+  // "fuzzy-match" | "ambiguous-tie": same shape ("here are N registered
+  // names, which one"), different reason string for *why* multiple
+  // candidates exist (findings doc #13).
+  const reason = resolution.kind === "fuzzy-match" ? "fuzzy_match" : "ambiguous_path_tie";
+  const gated = await gate({
+    mode,
+    reason,
+    param: "name",
+    accepts: resolution.candidates,
+    ask: () => new Promise<never>(() => {}),
+  });
+  if (!("answer" in gated)) return { kind: "gated", result: gated };
+  return resolveGraphOutcome(config, resolveGraph(config, cwd, gated.answer), cwd, mode);
 }
 
 // Built to power a "notice the user when they cross from one nested knowledge graph

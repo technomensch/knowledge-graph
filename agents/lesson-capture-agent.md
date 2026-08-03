@@ -40,11 +40,9 @@ In the lesson draft, always show before any write:
 - `--user`: write directly via Write tool. Skip `kg_capture` entirely.
 - `--project` / `--named` / `--active`: use `kg_capture` to resolved path. If `kg_capture` MCP unavailable: surface error and stop.
 
-### Switch/restore for `--project`
+### Targeting for `--project`
 
-1. Record `$restore_kg` = current active KG
-2. Run `/kmgraph:kmg-switch {project_kg}`
-3. After capture: run `/kmgraph:kmg-switch {$restore_kg}`
+Pass `targetKg: {project_kg}` directly to `kg_capture` — knowledge graphs resolve automatically from context rather than a mutable "active" pointer, so no switch/restore step is needed before or after the write.
 
 ### Interaction with Phase 0 CWD Guard
 
@@ -232,7 +230,7 @@ If ≥2 KGs:
 
 3. Wait for user choice. Store the chosen KG name as `{target_kg}`.
 
-4. **Session memory:** Remember `{target_kg}` for the duration of this session to avoid re-prompting on subsequent captures. Only re-prompt if the user explicitly changes KG via `/kmgraph:kmg-switch`.
+4. **Session memory:** Remember `{target_kg}` for the duration of this session to avoid re-prompting on subsequent captures. Only re-prompt if the resolved KG for the current working directory actually changes (e.g. the user `cd`s into a different registered project).
 
 ---
 
@@ -268,7 +266,11 @@ Once user approves, call the `kg_capture` MCP tool:
 
 **KG_MISMATCH error:**
 
-> "The active knowledge graph is for a different project. Do you want to switch, or proceed anyway?"
+> "No knowledge graph is registered for your current directory. Run `/kmgraph:kmg-init` to register one, or pass an explicit `targetKg` to write elsewhere."
+
+**KMG_INPUT_REQUIRED error** (`reason` distinguishes the case — `archived_entry`, `fuzzy_match`, `ambiguous_path_tie`, `home_or_root_cwd`, etc.):
+
+Surface `resolveWith.accepts` (if present) as the candidate choices and ask the user to pick one, then retry `kg_capture` with that answer filled into the param named by `resolveWith.param` (e.g. `targetKg`, or a `confirmProceed`/`scope` field once Phase 6.3+ wires those through).
 
 **Other errors:**
 

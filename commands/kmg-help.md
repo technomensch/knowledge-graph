@@ -63,7 +63,6 @@ Output in this format:
   /kmgraph:kmg-add-category      Add a new category to an existing knowledge graph
   /kmgraph:kmg-session-summary   Create a summary of the current chat session
   /kmgraph:kmg-list              Display all configured knowledge graphs
-  /kmgraph:kmg-switch            Change the active knowledge graph
   /kmgraph:kmg-check-sensitive   Scan for sensitive data before sharing
   /kmgraph:kmg-config-sanitization  Set up pre-commit hooks for sensitive data
   /kmgraph:kmg-extract-chat      Extract chat history from Claude/Gemini logs

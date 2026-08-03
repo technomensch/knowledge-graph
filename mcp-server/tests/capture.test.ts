@@ -673,7 +673,7 @@ describe("kg_capture — targetKg (multi-KG)", () => {
     expect((result as CaptureError).message).toContain("nonexistent-kg");
   });
 
-  test("returns VALIDATION_ERROR with candidate list for ambiguous/fuzzy targetKg name", async () => {
+  test("returns KMG_INPUT_REQUIRED (reason fuzzy_match) with candidate list for ambiguous/fuzzy targetKg name (automated mode)", async () => {
     const webRoot = makeTempDir("multi-fuzzy-web");
     const apiRoot = makeTempDir("multi-fuzzy-api");
     tempDirs.push(webRoot, apiRoot);
@@ -715,13 +715,14 @@ describe("kg_capture — targetKg (multi-KG)", () => {
       metadata: { title: "Test" },
     };
 
-    const result = await handleCapture(request, "kmgraph");
+    const result = await handleCapture(request, "kmgraph", "automated");
     process.cwd = origCwd;
 
     expect("error" in result).toBe(true);
-    expect((result as CaptureError).error).toBe("VALIDATION_ERROR");
-    expect((result as CaptureError).message).toContain("kmgraph-web");
-    expect((result as CaptureError).message).toContain("kmgraph-api");
+    const err = result as CaptureError;
+    expect(err.error).toBe("KMG_INPUT_REQUIRED");
+    expect(err.reason).toBe("fuzzy_match");
+    expect(err.resolveWith?.accepts).toEqual(expect.arrayContaining(["kmgraph-web", "kmgraph-api"]));
   });
 
   test("without targetKg still enforces CWD check — returns KG_MISMATCH from unrelated CWD", async () => {
@@ -752,6 +753,223 @@ describe("kg_capture — targetKg (multi-KG)", () => {
 // ---------------------------------------------------------------------------
 // checkExistingFile
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Task 6.2: gate()-routed KG_MISMATCH outcomes (archived/fuzzy-match/
+// ambiguous-tie/merged/$HOME-or-root)
+// ---------------------------------------------------------------------------
+
+describe("kg_capture — gate()-routed resolution outcomes", () => {
+  function mockConfig(graphs: Record<string, unknown>): void {
+    (readConfig as jest.Mock).mockReturnValue({
+      version: "1.0.0",
+      graphs,
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    });
+  }
+
+  function graphEntry(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+    return {
+      name: "test-kg",
+      path: "/unused",
+      type: "project-local",
+      categories: [],
+      createdAt: new Date().toISOString(),
+      status: "active",
+      statusChangedAt: new Date().toISOString(),
+      graphId: "test-graph-id",
+      ...overrides,
+    };
+  }
+
+  test("automated mode: archived-entry capture attempt returns KMG_INPUT_REQUIRED with reason archived_entry", async () => {
+    const kgRoot = makeTempDir("archived-automated");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockConfig({
+      "archived-kg": graphEntry({ name: "archived-kg", path: kgRoot, status: "archived" }),
+    });
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    const result = await handleCapture(
+      { content: "content", type: "lesson", metadata: { title: "Test" } },
+      undefined,
+      "automated"
+    );
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(true);
+    const err = result as CaptureError;
+    expect(err.error).toBe("KMG_INPUT_REQUIRED");
+    expect(err.reason).toBe("archived_entry");
+    expect(err.resolveWith?.accepts).toEqual(expect.arrayContaining(["skip", "ignore", "restore"]));
+  });
+
+  test("interactive mode: fuzzy-match capture attempt proceeds against the gate()-answered candidate", async () => {
+    const webRoot = makeTempDir("gate-fuzzy-web");
+    const apiRoot = makeTempDir("gate-fuzzy-api");
+    tempDirs.push(webRoot, apiRoot);
+    scaffoldKg(webRoot);
+    scaffoldKg(apiRoot);
+    mockConfig({
+      "kmgraph-web": graphEntry({ name: "kmgraph-web", path: webRoot, graphId: "web-id" }),
+      "kmgraph-api": graphEntry({ name: "kmgraph-api", path: apiRoot, graphId: "api-id" }),
+    });
+
+    const interactionModule = require("../src/interaction.js") as typeof import("../src/interaction.js");
+    const gateSpy = jest.spyOn(interactionModule, "gate").mockResolvedValue({ answer: "kmgraph-web" });
+
+    const origCwd = process.cwd;
+    process.cwd = () => webRoot;
+
+    const result = await handleCapture(
+      { content: "content", type: "lesson", metadata: { title: "Test" } },
+      "kmgraph",
+      "interactive"
+    );
+    process.cwd = origCwd;
+    gateSpy.mockRestore();
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    expect(ok.status).toBe("created");
+    expect(ok.filePath.startsWith(webRoot)).toBe(true);
+  });
+
+  test("automated mode: capture from home directory with no graph/scope param returns KMG_INPUT_REQUIRED reason home_or_root_cwd and never checks ownership", async () => {
+    mockConfig({});
+
+    // Manual monkey-patch of the raw `require("fs")` module object instead of
+    // jest.spyOn: TS's `import * as fs` namespace binding wraps the raw
+    // module in a getter-only, non-configurable property, so neither
+    // jest.spyOn nor direct assignment on that binding can intercept it. The
+    // getter reads through to the raw module at access time, so patching the
+    // raw module directly (which IS configurable/writable) is observable
+    // through every `import * as fs` binding, including resolution.ts's.
+    const rawFs = require("fs") as Record<string, unknown>;
+    const originalStatSync = rawFs.statSync as typeof fs.statSync;
+    const statCalls: unknown[][] = [];
+    rawFs.statSync = (...args: Parameters<typeof fs.statSync>) => {
+      statCalls.push(args);
+      return (originalStatSync as (...a: Parameters<typeof fs.statSync>) => ReturnType<typeof fs.statSync>)(...args);
+    };
+
+    const origCwd = process.cwd;
+    process.cwd = () => os.homedir();
+
+    const result = await handleCapture(
+      { content: "content", type: "lesson", metadata: { title: "Test" } },
+      undefined,
+      "automated"
+    );
+    process.cwd = origCwd;
+    rawFs.statSync = originalStatSync;
+
+    expect("error" in result).toBe(true);
+    const err = result as CaptureError;
+    expect(err.error).toBe("KMG_INPUT_REQUIRED");
+    expect(err.reason).toBe("home_or_root_cwd");
+    expect(err.resolveWith?.param).toBe("scope");
+    // Ownership check is a fs.statSync call inside checkHomeOwnership -- it
+    // must never fire in automated mode (spec §8: "skipped entirely, not
+    // attempted"). Filter out unrelated statSync calls made elsewhere during
+    // resolution (e.g. symlink/ancestor walks).
+    expect(statCalls.some(([p]) => p === os.homedir())).toBe(false);
+  });
+
+  test("interactive mode: capture from root surfaces the home_or_root_cwd gate", async () => {
+    mockConfig({});
+
+    const interactionModule = require("../src/interaction.js") as typeof import("../src/interaction.js");
+    const gateSpy = jest.spyOn(interactionModule, "gate").mockResolvedValue(
+      require("../src/interaction.js").requireInput("home_or_root_cwd", "scope", ["personal"])
+    );
+
+    const origCwd = process.cwd;
+    const rootDir = path.parse(origCwd()).root;
+    process.cwd = () => rootDir;
+
+    const result = await handleCapture(
+      { content: "content", type: "lesson", metadata: { title: "Test" } },
+      undefined,
+      "interactive"
+    );
+    process.cwd = origCwd;
+
+    expect(gateSpy).toHaveBeenCalledWith(expect.objectContaining({ reason: "home_or_root_cwd", param: "scope" }));
+    gateSpy.mockRestore();
+
+    expect("error" in result).toBe(true);
+    const err = result as CaptureError;
+    expect(err.error).toBe("KMG_INPUT_REQUIRED");
+    expect(err.reason).toBe("home_or_root_cwd");
+  });
+
+  test("automated mode: ambiguous-tie (two registry entries at the identical resolved path) returns KMG_INPUT_REQUIRED with both names", async () => {
+    const sharedRoot = makeTempDir("ambiguous-tie");
+    tempDirs.push(sharedRoot);
+    scaffoldKg(sharedRoot);
+    mockConfig({
+      "entry-a": graphEntry({ name: "entry-a", path: path.join(sharedRoot, "knowledge"), graphId: "a-id" }),
+      "entry-b": graphEntry({ name: "entry-b", path: path.join(sharedRoot, "knowledge"), graphId: "b-id" }),
+    });
+
+    const origCwd = process.cwd;
+    process.cwd = () => sharedRoot;
+
+    const result = await handleCapture(
+      { content: "content", type: "lesson", metadata: { title: "Test" } },
+      undefined,
+      "automated"
+    );
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(true);
+    const err = result as CaptureError;
+    expect(err.error).toBe("KMG_INPUT_REQUIRED");
+    expect(err.reason).toBe("ambiguous_path_tie");
+    expect(err.resolveWith?.accepts).toEqual(expect.arrayContaining(["entry-a", "entry-b"]));
+  });
+
+  test("a mergedInto-set archived entry never offers restore and proceeds against the survivor with a merge notice", async () => {
+    const survivorRoot = makeTempDir("merged-survivor");
+    tempDirs.push(survivorRoot);
+    scaffoldKg(survivorRoot);
+    mockConfig({
+      "old-name": graphEntry({
+        name: "old-name",
+        path: "/archived/old-name",
+        status: "archived",
+        mergedInto: "new-name",
+        statusChangedAt: "2026-01-01T00:00:00.000Z",
+      }),
+      "new-name": graphEntry({ name: "new-name", path: survivorRoot, graphId: "survivor-id" }),
+    });
+
+    const interactionModule = require("../src/interaction.js") as typeof import("../src/interaction.js");
+    const gateSpy = jest.spyOn(interactionModule, "gate");
+
+    const result = await handleCapture(
+      { content: "content", type: "lesson", metadata: { title: "Test" } },
+      "old-name",
+      "automated"
+    );
+
+    // "merged" is a plain notice, never a gate/question -- gate() must not
+    // be called for this outcome, so "restore" (or any accepts list) can
+    // never surface for a merged-away entry.
+    expect(gateSpy).not.toHaveBeenCalled();
+    gateSpy.mockRestore();
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    expect(ok.status).toBe("created");
+    expect(ok.filePath.startsWith(survivorRoot)).toBe(true);
+    expect(ok.notice).toContain("'old-name' was merged into 'new-name' on 2026-01-01T00:00:00.000Z");
+  });
+});
 
 describe("checkExistingFile", () => {
   test("returns null for lesson type (only sessions checked)", () => {

@@ -42,7 +42,7 @@
 
 **Invoke `gov-capture-routing` skill** to:
 1. Detect level signal from the user's invocation (NL patterns or explicit flags)
-2. Resolve `$level`, `$target_kg`, `$restore_kg`
+2. Resolve `$level`, `$target_kg`
 3. Handle prompts if needed (named KG not found, no project KG configured, conflict resolution)
 
 **Pass-down contract:** Every sub-capture invoked by `sync-all` receives the resolved flag explicitly:
@@ -52,7 +52,7 @@
 
 Sub-captures that receive an explicit flag skip their own `gov-capture-routing` invocation.
 
-**Switch/restore:** If `--project` triggers a KG switch, the switch occurs before sub-captures begin. After all sub-captures complete, restore with `/kmgraph:kmg-switch {$restore_kg}`.
+**No switch/restore needed:** knowledge graphs resolve automatically from context (cwd, or an explicit `targetKg`) rather than a mutable "active" pointer — `$target_kg` is passed straight through to each sub-capture's `kg_capture` call (its `targetKg` param), so there is nothing global to switch before sub-captures begin or restore afterward.
 
 ---
 
@@ -123,8 +123,7 @@ Display the summary exactly as returned by the agent. Do not reformat or add add
 ## Multi-KG Support
 
 When multiple knowledge graphs are configured:
-- Operates on the **active** KG from `~/.kmgraph/kg-config.json`
-- Use `/kmgraph:kmg-switch` to change active KG before syncing
+- Operates on the KG resolved from your current directory, or an explicit `--project`/named target
 - Supports selective sync: `--category=architecture` to sync only architecture lessons
 
 ---

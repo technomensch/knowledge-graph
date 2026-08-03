@@ -967,7 +967,7 @@ Architectural decisions documented in:
 ```bash
 # Set up local KG
 git clone [repo]
-/kmgraph:kmg-switch team-project
+cd team-project   # knowledge graphs resolve automatically from cwd
 
 # Browse knowledge graph
 cat knowledge/index.md
@@ -991,17 +991,14 @@ cat knowledge/templates/patterns.md
 
 ### Step-by-Step Process
 
-#### Step 1: Clone and Activate
+#### Step 1: Clone and Resolve
 
 ```bash
 # Clone project
 git clone [repo-url]
-cd [project]
+cd [project]   # knowledge graphs resolve automatically from cwd, no activation step
 
-# Switch to project KG
-/kmgraph:kmg-switch [project-name]
-
-# Verify activation
+# Verify resolution
 /kmgraph:kmg-status
 ```
 
@@ -1222,7 +1219,7 @@ rm knowledge/lessons-learned/obsolete-lesson.md
 | Periodic Consolidation | Knowledge maintenance | 30-60 min | Weekly/bi-weekly | `/kmgraph:kmg-sync-all` |
 | Knowledge Search | Finding past knowledge | 2-10 min | Multiple/day | `/kmgraph:kmg-recall` |
 | Team Collaboration | Sharing with team | Continuous | Continuous | Selective git strategy |
-| Project Onboarding | Starting on project | 30-60 min | Once | `/kmgraph:kmg-switch`, read knowledge graph |
+| Project Onboarding | Starting on project | 30-60 min | Once | `cd` into project (auto-resolves), read knowledge graph |
 | Review & Maintenance | Quality assurance | 1-2 hours | Monthly/quarterly | `/kmgraph:kmg-check-sensitive`, review stats |
 
 ## Quick Reference by Situation

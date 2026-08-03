@@ -19,7 +19,7 @@ const server = new McpServer({
 });
 
 // Register tools (12 core tools)
-registerConfigTools(server);    // kg_config_init, kg_config_list, kg_config_switch, kg_config_add_category
+registerConfigTools(server);    // kg_config_init, kg_config_list, kg_config_add_category
 registerSearchTool(server);     // kg_search
 registerScaffoldTool(server);   // kg_scaffold
 registerSanitizationTool(server); // kg_check_sensitive

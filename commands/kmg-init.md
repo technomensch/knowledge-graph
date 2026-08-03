@@ -1838,10 +1838,9 @@ Skip wizard with flags:
 ## Integration with Other Skills
 
 - `/kmgraph:kmg-list` will show this KG
-- `/kmgraph:kmg-switch` can change to/from this KG
-- `/kmgraph:kmg-status` will reference this KG if active
+- `/kmgraph:kmg-status` will reference this KG when your cwd resolves to it
 - `/kmgraph:kmg-capture-lesson` will write to this KG
-- All other skills operate on this KG once active
+- All other skills operate on this KG when resolved from cwd (or an explicit named target)
 
 ## Files Created
 
@@ -1906,6 +1905,5 @@ $KG_PATH/
 ## See Also
 
 - `/kmgraph:kmg-list` — View all configured KGs
-- `/kmgraph:kmg-switch` — Change active KG
 - `/kmgraph:kmg-add-category` — Add categories to existing KG
 - `/kmgraph:kmg-status` — View active KG info and stats

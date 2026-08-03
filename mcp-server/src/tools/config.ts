@@ -168,49 +168,6 @@ export function findBroadAncestorWarning(
 
 // ── Exported handler for direct testing ──────────────────────────────────────
 
-export interface HandleConfigSwitchParams {
-  name: string;
-}
-
-export interface HandleConfigSwitchResult {
-  [x: string]: unknown;
-  content: Array<{ type: "text"; text: string }>;
-  isError?: true;
-}
-
-export function handleConfigSwitch(
-  params: HandleConfigSwitchParams
-): HandleConfigSwitchResult {
-  const { name } = params;
-  const config = readConfig();
-
-  if (!config.graphs[name]) {
-    const available = Object.keys(config.graphs).join(", ");
-    return {
-      content: [
-        {
-          type: "text" as const,
-          text: `Error: Knowledge graph '${name}' not found. Available: ${available || "none"}`,
-        },
-      ],
-      isError: true,
-    };
-  }
-
-  // No longer writes config.active/lastUsed -- resolution is context-derived
-  // (Task 1.5). This tool is fully retired in Task 6.2; until then it stays
-  // registered as a harmless deprecated no-op so the rest of this phase's
-  // call-site sweep isn't blocked on deleting it early.
-  return {
-    content: [
-      {
-        type: "text" as const,
-        text: `'${name}' is registered at ${config.graphs[name].path}. kg_config_switch no longer changes anything -- knowledge graphs are resolved automatically from your current directory. This tool will be removed in a future release.`,
-      },
-    ],
-  };
-}
-
 export interface HandleConfigInitParams {
   name: string;
   kgPath: string;
@@ -243,7 +200,7 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
       content: [
         {
           type: "text" as const,
-          text: `Error: Knowledge graph '${name}' already exists. Use kg_config_switch to activate it.`,
+          text: `Error: Knowledge graph '${name}' already exists at ${config.graphs[name].path}. Knowledge graphs resolve automatically from your current directory -- cd into ${config.graphs[name].path} (or a subdirectory of it) to work against it, no separate activation step needed.`,
         },
       ],
       isError: true,
@@ -753,16 +710,6 @@ export function registerConfigTools(server: McpServer): void {
         ],
       };
     }
-  );
-
-  // ── kg_config_switch ────────────────────────────────────────────
-  server.tool(
-    "kg_config_switch",
-    "Change the active knowledge graph",
-    {
-      name: z.string().describe("Name of the knowledge graph to activate"),
-    },
-    async ({ name }) => handleConfigSwitch({ name })
   );
 
   // ── kg_config_add_category ──────────────────────────────────────

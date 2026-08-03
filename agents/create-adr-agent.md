@@ -42,11 +42,9 @@ In the ADR draft, always show before any write:
 - `--user`: write directly via Write tool. Skip `kg_capture` entirely.
 - `--project` / `--named` / `--active`: use `kg_capture` to resolved path. If `kg_capture` MCP unavailable: surface error and stop.
 
-### Switch/restore for `--project`
+### Targeting for `--project`
 
-1. Record `$restore_kg` = current active KG
-2. Run `/kmgraph:kmg-switch {project_kg}`
-3. After capture: run `/kmgraph:kmg-switch {$restore_kg}`
+Pass `targetKg: {project_kg}` directly to `kg_capture` — knowledge graphs resolve automatically from context rather than a mutable "active" pointer, so no switch/restore step is needed before or after the write.
 
 ### Interaction with Phase 0 CWD Guard
 

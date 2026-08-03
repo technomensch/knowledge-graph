@@ -146,14 +146,14 @@ Otherwise, run the following check **before** creating any directories or runnin
    > but you are working in `{cwd}`. Chat history would be written to `{kg_path}/chat-history/`.
    >
    > Choose:
-   > 1. Switch the active KG to this project's graph, then extract here
+   > 1. Extract into the KG registered for this project instead, then extract here
    > 2. Extract to **{active_kg}** (`{kg_path}/chat-history/`) anyway
    > 3. Cancel
    >
    > Reply 1, 2, or 3.
 
-   - Option 1: Run `/kmgraph:kmg-switch` for the current project's KG (if configured), then re-resolve output dir in Step 1 using the newly active KG. **If the current project has no KG registered in `~/.kmgraph/kg-config.json`**, tell the user and offer `/kmgraph:kmg-init` to create one — or fall back to option 2 or 3.
-   - Option 2: Continue to Step 1 using the current active KG unchanged.
+   - Option 1: Look up the KG registered for `{cwd}` (or its nearest registered ancestor) in `~/.kmgraph/kg-config.json`, then re-resolve output dir in Step 1 against that graph. **If the current project has no KG registered**, tell the user and offer `/kmgraph:kmg-init` to create one — or fall back to option 2 or 3.
+   - Option 2: Continue to Step 1 using `{active_kg}` unchanged.
    - Option 3: Abort. Do not run extraction.
 
    **Do not proceed until the user explicitly responds.**
@@ -430,8 +430,7 @@ When using the default output directory (active KG):
 ## Multi-KG Support
 
 When multiple knowledge graphs are configured:
-- Operates on the **active** KG from `~/.kmgraph/kg-config.json`
-- Use `/kmgraph:kmg-switch` to change active KG before extraction
+- Operates on `{active_kg}` (see § Step 0: Active KG / Working Directory Guard above), or `--output-dir` if overridden
 - Each KG maintains its own chat-history/
 - Use `--output-dir` to extract to specific KG manually
 

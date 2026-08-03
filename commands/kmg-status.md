@@ -67,7 +67,7 @@ if [ "$active" == "null" ]; then
   echo "Available graphs:"
   /kmgraph:kmg-list --names-only
   echo ""
-  echo "Activate one with: /kmgraph:kmg-switch <name>"
+  echo "cd into one of these projects' directories to resolve against it."
   exit 0
 fi
 ```
@@ -215,5 +215,4 @@ Output:
 ## See Also
 
 - `/kmgraph:kmg-list` — View all configured KGs
-- `/kmgraph:kmg-switch` — Change active KG
 - `/kmgraph:kmg-sync-all` — Sync KG and review governance signals

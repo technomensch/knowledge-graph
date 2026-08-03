@@ -2,9 +2,11 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import * as fs from "fs";
 import * as path from "path";
-import { readConfig } from "../utils.js";
+import * as os from "os";
+import { readConfig, KgConfig } from "../utils.js";
 import { rebuildIndex } from "./fts5.js";
-import { resolveGraph } from "../resolution.js";
+import { resolveGraph, resolveGraphOutcome, GatedResolution, ResolutionResult } from "../resolution.js";
+import { resolveInteractionMode, InteractionMode, GateResult } from "../interaction.js";
 
 export interface CaptureRequest {
   content: string;
@@ -30,14 +32,65 @@ export interface CaptureResponse {
   filePath: string;
   relativePath: string;
   indexResult: Record<string, unknown>;
+  notice?: string;
 }
 
 export interface CaptureError {
-  error: "KG_MISMATCH" | "VALIDATION_ERROR" | "IO_ERROR" | "CONFLICT";
+  error: "KG_MISMATCH" | "VALIDATION_ERROR" | "IO_ERROR" | "CONFLICT" | "KMG_INPUT_REQUIRED";
   activeKg?: string;
   activeKgRoot?: string;
   cwd?: string;
   message?: string;
+  reason?: string;
+  resolveWith?: { param: string; accepts?: string[] };
+  detail?: unknown;
+}
+
+// Maps a GateResult (answered/declined/cancelled/InputRequiredError) that
+// resolveGraphOutcome couldn't resolve into a CaptureError. "answered" never
+// reaches here -- resolveGraphOutcome only returns kind: "gated" when there
+// was no usable answer.
+function gateResultToCaptureError(result: GateResult): CaptureError {
+  if ("answer" in result) {
+    // Unreachable: resolveGraphOutcome only returns kind: "gated" when there
+    // was no usable answer. Guarded here purely to keep the type total.
+    return { error: "KMG_INPUT_REQUIRED", reason: "unexpected_answered_state", message: "Internal error: gate() answered but resolveGraphOutcome treated it as unresolved." };
+  }
+  if ("error" in result) {
+    return {
+      error: "KMG_INPUT_REQUIRED",
+      reason: result.reason,
+      resolveWith: result.resolveWith,
+      detail: result.detail,
+      message: `Input required: ${result.reason}`,
+    };
+  }
+  if ("declined" in result) {
+    return { error: "KMG_INPUT_REQUIRED", reason: "declined", message: "Resolution question was declined." };
+  }
+  return { error: "KMG_INPUT_REQUIRED", reason: "cancelled", message: "Resolution question was cancelled." };
+}
+
+async function resolveKgOutcome(
+  config: KgConfig,
+  resolution: ResolutionResult,
+  mode: InteractionMode
+): Promise<{ kgPath: string; resolvedKgName: string; notice?: string } | CaptureError> {
+  const outcome: GatedResolution = await resolveGraphOutcome(config, resolution, process.cwd(), mode);
+  if (outcome.kind === "resolved") {
+    return {
+      kgPath: outcome.graph.path.replace(/^~/, os.homedir()),
+      resolvedKgName: outcome.name,
+      notice: outcome.notice,
+    };
+  }
+  if (outcome.kind === "no-graph-in-cwd") {
+    return { error: "KG_MISMATCH", activeKgRoot: undefined, cwd: process.cwd() };
+  }
+  if (outcome.kind === "not-registered") {
+    return { error: "VALIDATION_ERROR", message: `Unknown KG name: "${outcome.name}".` };
+  }
+  return gateResultToCaptureError(outcome.result);
 }
 
 function slugify(str: string): string {
@@ -218,15 +271,18 @@ export function updateReadmeIndex(
 
 export async function handleCapture(
   request: CaptureRequest,
-  targetKg?: string
+  targetKg?: string,
+  interaction?: InteractionMode
 ): Promise<CaptureResponse | CaptureError> {
   // Validate metadata
   const validated = validateMetadata(request.metadata);
   if ("error" in validated) return validated as CaptureError;
 
   const config = readConfig();
+  const mode = resolveInteractionMode({ explicitParam: interaction }).mode;
   let kgPath: string;
   let resolvedKgName: string;
+  let notice: string | undefined;
 
   if (targetKg) {
     // Explicit target KG: resolve by exact name, skip CWD check (intentional
@@ -240,32 +296,22 @@ export async function handleCapture(
         message: `Unknown KG name: "${targetKg}". Check /kmgraph:status for registered KGs.`,
       };
     }
-    if (resolution.kind === "fuzzy-match") {
-      return {
-        error: "VALIDATION_ERROR",
-        message: `Ambiguous KG name "${targetKg}". Did you mean: ${resolution.candidates.join(", ")}?`,
-      };
-    }
-    if (resolution.kind !== "resolved") {
-      // archived/ambiguous-tie/merged: Task 6.2 wires each of these through
-      // the interactivity gate with its real per-outcome behavior; for this
-      // task, preserve current behavior (no regression from today, where
-      // none of these outcomes exist at all) by treating them as
-      // KG_MISMATCH.
-      return { error: "KG_MISMATCH" };
-    }
-    kgPath = resolution.graph.path.replace(/^~/, require("os").homedir());
-    resolvedKgName = resolution.name;
+    // resolved/fuzzy-match/archived/merged (ambiguous-tie/no-graph-in-cwd
+    // can't arise from an exact-name lookup): route through the shared
+    // gate() logic -- fuzzy-match asks "which of these did you mean" via
+    // gate(), same as ambiguous-tie's cwd-resolution path.
+    const resolved = await resolveKgOutcome(config, resolution, mode);
+    if ("error" in resolved) return resolved;
+    kgPath = resolved.kgPath;
+    resolvedKgName = resolved.resolvedKgName;
+    notice = resolved.notice;
   } else {
     const resolution = resolveGraph(config, process.cwd());
-    if (resolution.kind === "no-graph-in-cwd") {
-      return { error: "KG_MISMATCH", activeKgRoot: undefined, cwd: process.cwd() };
-    }
-    if (resolution.kind !== "resolved") {
-      return { error: "KG_MISMATCH" };
-    }
-    kgPath = resolution.graph.path.replace(/^~/, require("os").homedir());
-    resolvedKgName = resolution.name;
+    const resolved = await resolveKgOutcome(config, resolution, mode);
+    if ("error" in resolved) return resolved;
+    kgPath = resolved.kgPath;
+    resolvedKgName = resolved.resolvedKgName;
+    notice = resolved.notice;
   }
 
   // Update-in-place path
@@ -290,7 +336,7 @@ export async function handleCapture(
         const kgType = config.graphs[kgName]?.type ?? "project-local";
         indexResult = rebuildIndex(kgPath, kgName, kgType) as unknown as Record<string, unknown>;
       } catch { /* best-effort */ }
-      return { status: "updated", filePath: existing, relativePath: path.relative(kgPath, existing), indexResult };
+      return { status: "updated", filePath: existing, relativePath: path.relative(kgPath, existing), indexResult, notice };
     } catch (err: unknown) {
       return { error: "IO_ERROR", message: err instanceof Error ? err.message : String(err) };
     }
@@ -358,6 +404,7 @@ export async function handleCapture(
     filePath,
     relativePath: path.relative(kgPath, filePath),
     indexResult,
+    notice,
   };
 }
 
@@ -406,9 +453,16 @@ export function registerCaptureTool(server: McpServer): void {
           "Named KG to write to (from kg-config.json). Use for global/personal KG captures. " +
             "If omitted, writes to the active KG. CWD alignment check is skipped when targetKg is set."
         ),
+      interaction: z
+        .enum(["interactive", "automated"])
+        .optional()
+        .describe(
+          "Overrides auto-detected interaction mode. Automated callers receive a structured " +
+            "KMG_INPUT_REQUIRED error (never a blocking question) when resolution is ambiguous."
+        ),
     },
-    async ({ content, type, metadata, targetKg }) => {
-      const result = await handleCapture({ content, type, metadata }, targetKg);
+    async ({ content, type, metadata, targetKg, interaction }) => {
+      const result = await handleCapture({ content, type, metadata }, targetKg, interaction);
       if ("error" in result) {
         return {
           content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],

@@ -202,4 +202,3 @@ Final config shape for the active KG entry:
 
 - `/kmgraph:kmg-init` — Initialize a knowledge graph (includes platform detection at setup time)
 - `/kmgraph:kmg-status` — Check current knowledge graph status
-- `/kmgraph:kmg-switch` — Change the active knowledge graph
