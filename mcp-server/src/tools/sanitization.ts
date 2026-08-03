@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import { readConfig, walkDir, KgConfig } from "../utils.js";
-import { resolveGraph, resolvePersonalGraph, PersonalScopeSession, confirmPersonalScopeAccess } from "../resolution.js";
+import { resolveGraph, resolvePersonalGraph, PersonalScopeSession, confirmPersonalScopeAccess, isAncestorOrEqual } from "../resolution.js";
 import { resolveInteractionMode, STUB_ASK_TIMEOUT_MS, stubAsk } from "../interaction.js";
 
 interface Violation {
@@ -32,6 +32,19 @@ const DEFAULT_PATTERNS: Array<{ type: string; regex: RegExp }> = [
     regex: /\bv\d+(\.\d+)?(\.\d+)?(\.x)?(\.\d+\.x)?\b/i,
   },
 ];
+
+// Mirrors compare.ts's normalizeForCompare: a raw path string can't be gated the same way a
+// scope enum can -- a personal-KG path could be passed under any of dozens of possible string
+// values, so containment is checked against the registry after normalizing, not against the
+// literal string.
+function normalizeForScan(p: string): string {
+  const expanded = p.replace(/^~/, os.homedir());
+  try {
+    return fs.realpathSync(expanded);
+  } catch {
+    return path.resolve(expanded);
+  }
+}
 
 // ADR-067 Task 1.9: resolution is context-derived (resolveGraph), not
 // config.active-derived. scope:"user" reaches the personal graph, which
@@ -81,8 +94,10 @@ export function registerSanitizationTool(server: McpServer, personalScopeSession
         ),
     },
     async ({ kgPath, scope, patterns: customPatterns, confirmPersonalScope }) => {
+      const config = readConfig();
+
       // Determine path to scan
-      const resolved = resolveScanPath(readConfig(), { kgPath, scope });
+      const resolved = resolveScanPath(config, { kgPath, scope });
       if ("error" in resolved) {
         return {
           content: [
@@ -96,11 +111,24 @@ export function registerSanitizationTool(server: McpServer, personalScopeSession
       }
       const scanPath = resolved.scanPath;
 
+      // A literal kgPath bypasses resolveScanPath's scope:"user" branch entirely (it returns
+      // before that branch is ever reached), so an unconfirmed kgPath pointing at -- or nested
+      // inside -- the registered personal graph must be gated independently, the same way
+      // compare.ts gates its `a`/`b` params. Without this, `kgPath` was a complete end-run
+      // around the scope:"user" gate below: any literal path string reached the personal KG's
+      // file contents (actual regex-matched secrets, not just hashes/counts) with zero
+      // confirmation.
+      const personalGraphPaths = Object.values(config.graphs)
+        .filter((g) => g.type === "personal" && g.status !== "deleted")
+        .map((g) => normalizeForScan(g.path));
+      const kgPathTouchesPersonal =
+        !!kgPath && personalGraphPaths.some((p) => isAncestorOrEqual(p, normalizeForScan(scanPath)));
+
       // ADR-067 Task 6.4 (spec §11): scope:"user" (no kgPath override) reaches
       // the personal graph -- same gate as kg_fts5_status/search.ts/capture.ts.
       // Gated here, before the file walk below ever touches the personal KG's
       // content directory.
-      if (!kgPath && scope === "user") {
+      if ((!kgPath && scope === "user") || kgPathTouchesPersonal) {
         const mode = resolveInteractionMode({}).mode;
         const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
           confirmPersonalScope,
@@ -129,7 +157,6 @@ export function registerSanitizationTool(server: McpServer, personalScopeSession
       const allPatterns = [...DEFAULT_PATTERNS];
 
       // Add custom patterns from config
-      const config = readConfig();
       if (config.sanitization?.patterns) {
         for (const p of config.sanitization.patterns) {
           if (p.enabled && p.pattern) {

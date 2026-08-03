@@ -143,7 +143,7 @@ describe("kg_check_sensitive scope:\"user\" gate", () => {
     expect(result.content[0].text).toContain(personalRoot);
   });
 
-  it("an explicit kgPath bypasses the personal-scope gate (only scope:\"user\" without kgPath is gated)", async () => {
+  it("a kgPath pointing at the registered personal graph's root is gated, not bypassed", async () => {
     const projRoot = makeTempDir("proj");
     const personalRoot = makeTempDir("personal");
     (readConfig as jest.Mock).mockReturnValue(makeConfig(projRoot, personalRoot));
@@ -151,6 +151,36 @@ describe("kg_check_sensitive scope:\"user\" gate", () => {
     const handler = await getHandler();
     const result = await handler({ kgPath: personalRoot });
 
+    expect(result.isError).toBe(true);
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed).toMatchObject({ error: "KMG_INPUT_REQUIRED", reason: "personal_scope_unseen_repo" });
+  });
+
+  it("a kgPath pointing at a subdirectory nested inside the personal graph's root is also gated", async () => {
+    const projRoot = makeTempDir("proj");
+    const personalRoot = makeTempDir("personal");
+    const nestedDir = path.join(personalRoot, "nested");
+    fs.mkdirSync(nestedDir);
+    (readConfig as jest.Mock).mockReturnValue(makeConfig(projRoot, personalRoot));
+
+    const handler = await getHandler();
+    const result = await handler({ kgPath: nestedDir });
+
+    expect(result.isError).toBe(true);
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed).toMatchObject({ error: "KMG_INPUT_REQUIRED", reason: "personal_scope_unseen_repo" });
+  });
+
+  it("a kgPath that does not touch any registered personal graph still scans unchanged (no gate)", async () => {
+    const projRoot = makeTempDir("proj");
+    const personalRoot = makeTempDir("personal");
+    const otherDir = makeTempDir("other");
+    (readConfig as jest.Mock).mockReturnValue(makeConfig(projRoot, personalRoot));
+
+    const handler = await getHandler();
+    const result = await handler({ kgPath: otherDir });
+
     expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).toContain(otherDir);
   });
 });
