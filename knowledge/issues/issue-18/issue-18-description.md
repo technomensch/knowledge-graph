@@ -1,7 +1,7 @@
 ---
 id: issue-18
 type: Gap
-status: in-progress
+status: resolved
 github-issue: "#176"
 created: 2026-07-17
 related-issues: [issue-17]
@@ -230,3 +230,27 @@ Status is set to `in-progress` (not `resolved`/`closed`) — the decision is fin
 **Correction after independent review (2026-08-03), before Phase 7.1 executed:** an independent review pass caught two things missing from the decision above, both folded into Phase 7.1's plan before any of it ran, not left as a gap:
 - **The 3 agents have a second Write-tool bypass**, separate from the `--user`-flag one described above — an "MCP unreachable/failed" fallback that fires regardless of scope. Once the `--user`-flag bypass is closed, this second one would become reachable for `scope:"user"` writes too, with the same zero-gating problem AND a wrong-target bug (it writes to the project-local KG, not personal). Phase 7.1's Task 7.1.1 now explicitly closes both, not just the first.
 - **The "functional subsumption" framing above overstates how clean the replacement is.** `gov-capture-routing`'s actual skill file has real capability (richer NL vocabulary, conflict-resolution with a persisted preference, multi-capture-in-one-message) that Phase 7.1's flag-to-scope replacement does not reproduce. Since the skill was never reachable in production, this isn't a regression against real behavior — but it's a real, conscious narrowing of what ADR-034 originally designed, and Phase 7.1 now documents that explicitly rather than implying nothing was lost.
+
+## Resolved (2026-08-03) — Phase 7.1 landed
+
+Phase 7.1 has been fully executed and committed on branch `v0.7.0-adr-067-c1`. Six commits, in order:
+
+1. `0f9b0416` — `kg_capture` gained its `scope` param (the replacement primitive Phase 7.1 builds on).
+2. `092a975c` — Task 7.1.1: closed both Write-tool bypasses (the `--user`-flag bypass and the "MCP unreachable" fallback flagged in the Correction above) in all 3 agents (`create-adr-agent.md`, `lesson-capture-agent.md`, `session-summary-agent.md`).
+3. `634adcf1` — doc updates following from Task 7.1.1.
+4. `6e59df63` — Task 7.1.2: retired the `gov-capture-routing` invocation from the 5 referencing commands (`kmg-session-summary.md`, `kmg-recall.md`, `kmg-capture-lesson.md`, `kmg-create-adr.md`, `kmg-sync-all.md`).
+5. `72e2f9ed` — Task 7.1.3: updated `kmg-auto-recall` skill (the one file that had already documented a fallback for this exact gap — see "Consequence" above).
+6. `3523e571` — Task 7.1.4: repo-wide sweep for stray `gov-capture-routing` references, marked ADR-034 **Superseded**, and fixed a mislabeled `knowledge/rules.md` reference found during the sweep.
+
+**Post-landing verification found and fixed one more real bug.** The real slash commands can't be exercised live to verify this kind of change — `/kmgraph:kmg-recall` resolves from the installed plugin cache at `~/.claude/plugins/cache/`, not this git worktree, so invoking it would run the stale pre-Phase-7.1 cached command, not the new local edits. Verification instead used a manual trace-through of the new Level Routing Detection logic in `kmg-recall.md` against `recall-agent`'s own documented flag semantics.
+
+That trace-through caught a real bug: `kmg-recall.md`'s replacement text had carried forward the retired `gov-capture-routing` skill's original wording verbatim — "nothing specified, or `--active` -> all configured KGs" — which incorrectly forced an explicit `--active` flag even when the user had signaled nothing. This short-circuited `recall-agent`'s own smarter auto-detect logic (search all KGs when a personal KG is registered, active-only otherwise), because `recall-agent`'s own flag table defines an explicit `--active` as meaning the single cwd-resolved KG only — not all KGs. Net effect before the fix: a bare `/kmgraph:kmg-recall <topic>` with a personal KG registered would have searched only the active KG instead of the intended project+personal default. Fixed in commit `96c8f901` — "nothing specified" now passes no level flag at all, letting `recall-agent`'s auto-detect run unshortcircuited.
+
+**Two more things found during the same trace-through, deliberately NOT fixed here — filed as [issue-40](../issue-40/issue-40-description.md) instead:**
+
+- `agents/session-summary-agent.md` has an explicit "Targeting for `--project`" section spelling out that `targetKg` is what's actually passed to `kg_capture`, but no equivalent explicit "Targeting for `--named`" section — ambiguous whether `--named=<kg>` follows the same `targetKg` pattern or something else. Likely also true of `lesson-capture-agent.md`/`create-adr-agent.md`, not individually re-checked.
+- The `--named=<kg>` flag name itself may be a poor choice — `commands/kmg-extract-chat.md` already uses `--project=<fragment>` for an unrelated purpose (filtering chat sessions by project name/path fragment), which would collide in meaning if `--named` were simply renamed to `--project` (these 5 commands already have a separate bare `--project` flag meaning "current repo's own KG", no value). A rename needs its own design decision, not a mechanical find-replace.
+
+These were left as a new issue rather than folded into this one because they span more files than Phase 7.1 touched and deserve their own scoped investigation.
+
+**Re-verified after the `96c8f901` fix, before closing this out:** full `npx jest` (38 suites / 366 tests) and `npx tsc --noEmit` both clean; the MCP-level cwd-alternation + personal-scope-isolation regression check (3 sandboxes, 1 persistent connection, 9 steps) re-run and still passing; and the specific `kmg-recall.md` "nothing specified" trace re-walked against `recall-agent.md`'s real auto-detect contract, confirmed correct — no level flag is now passed when nothing is signaled, letting `recall-agent`'s own `all`/`active` auto-detect run unshortcircuited.

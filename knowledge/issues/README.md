@@ -19,6 +19,7 @@ Tracking of investigated bugs, defects, and meta-issues for this project.
 
 ## All Issues (Chronological)
 
+- [issue-40: Capture-level flag naming/targeting consistency across commands+agents (`--named` vs `--project` vs `--graph`)](issue-40/issue-40-description.md) — **Status:** 🟡 OPEN — found during ADR-067 Phase 7.1 verification, split out from [issue-18](issue-18/issue-18-description.md)
 - [issue-30: `kmg-handoff` and `kmg-session-wrap` only reference session-summary — neither generates one](issue-30/issue-30-description.md) — **Status:** 🟡 Deferred (Track only) — found live running `/kmgraph:kmg-handoff` with no session summary for the day; `kmg-handoff`'s own package is incomplete without one by its own stated purpose
 - [issue-29: `/kmgraph:kmg-extract-chat` bleeds cross-project content into `knowledge/chat-history/` (no default project scoping)](issue-29/issue-29-description.md) — **Status:** 🟡 Tracked (GitHub #197) — found live while working on [ADR-067](../decisions/ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md); same root failure class (cross-project KG bleed), different surface; historical archive contamination confirmed across 42 of 118 chat-history files, Feb–Jul 2026 — cleanup tracked as separate required follow-up
 - [issue-28: No Dev-Loop Mechanism Between a Locally Rebuilt `mcp-server/dist/` and Live `kg_*` Tool Calls](issue-28/issue-28-description.md) — **Status:** 🟡 Deferred (Track only) — found live while verifying [issue-27](issue-27/issue-27-description.md)'s fix; companion lesson: [Lessons_Learned_Debugging_MCP_Server_Rebuild_Not_Reflected_In_Live_Plugin_Tool_Calls](../lessons-learned/debugging/Lessons_Learned_Debugging_MCP_Server_Rebuild_Not_Reflected_In_Live_Plugin_Tool_Calls.md)
@@ -31,7 +32,7 @@ Tracking of investigated bugs, defects, and meta-issues for this project.
 - [issue-21: Stop hook fails with "invalid stop hook JSON output" during Codex CLI init](issue-21/issue-21-description.md) — **Status:** 🟡 Deferred (Track only)
 - [issue-20: Session skipped its own Bug/Enhancement Triage rule for 4 filings](issue-20/issue-20-description.md) — **Status:** 🟡 OPEN
 - [issue-19: No hook-level enforcement for issue-creation discipline (prior-art check, provenance docs)](issue-19/issue-19-description.md) — **Status:** 🟡 OPEN
-- [issue-18: `gov-capture-routing` skill referenced by 8+ commands/agents but not invocable](issue-18/issue-18-description.md) — **Status:** 🟡 OPEN
+- [issue-18: `gov-capture-routing` skill referenced by 8+ commands/agents but not invocable](issue-18/issue-18-description.md) — **Status:** ✅ Resolved — Phase 7.1 landed 2026-08-03; follow-up naming question split into [issue-40](issue-40/issue-40-description.md)
 - [issue-17: No recall trigger when the assistant itself needs clarification mid-task](issue-17/issue-17-description.md) — **Status:** 🟡 OPEN
 - [issue-16: mcp-server kg_version / MCP handshake reports stale hardcoded 0.3.10](issue-16/issue-16-description.md) — **Status:** ✅ Fixed
 - [issue-15: Personal-KG FTS5 search index built in the wrong bucket — `rebuildIndex` never receives `kgType`](issue-15/issue-15-description.md) — **Status:** 🟡 Tracked
