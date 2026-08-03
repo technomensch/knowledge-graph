@@ -15,22 +15,21 @@ Creates a new Architecture Decision Record (ADR) through an interactive wizard. 
 
 | Flag | Behavior |
 |---|---|
-| `--user` | Write to `~/.kmgraph/decisions/` — bypass `kg_capture`, write directly via Write tool |
-| `--project` | Write to current repo's project KG decisions/ — switch temporarily if needed, restore after |
+| `--user` | Write to the personal KG's decisions/ — via `kg_capture` with `scope: "user"` (gated by `confirmPersonalScopeAccess`) |
+| `--project` | Write to current repo's project KG decisions/ — no switch/restore needed |
 | `--named=<kg>` | Write to named KG decisions/ — no switch |
 | `--active` | Write to active KG decisions/ (default, current behavior) |
 
-These flags are set by the `create-adr` command dispatcher via `gov-capture-routing` skill. This agent never performs NL detection — flags only.
+These flags are set by the `create-adr` command dispatcher directly (see that command's Level Routing Detection). This agent never performs NL detection — flags only.
 
 ### Path resolution
 
 1. Read flag (default: `--active`)
 2. Resolve `$target_path`:
-   - `--user` → `~/.kmgraph/decisions/`
+   - `--user` → resolved internally by `kg_capture` when `scope: "user"` is passed; no manual path computation needed here, but still show the resolved path to the user per "Surface resolved target" below (the `kg_capture` response includes it).
    - `--project` → read `~/.kmgraph/kg-config.json`, find graph matching current working directory → `{graph.path}/decisions/`
    - `--named=<kg>` → read `~/.kmgraph/kg-config.json`, find graph by name → `{graph.path}/decisions/`
    - `--active` → `{active_kg_path}/decisions/`
-3. Store `$restore_kg` = current active KG (only when `--project` triggers a switch)
 
 ### Surface resolved target
 
@@ -39,8 +38,8 @@ In the ADR draft, always show before any write:
 
 ### Write behavior
 
-- `--user`: write directly via Write tool. Skip `kg_capture` entirely.
-- `--project` / `--named` / `--active`: use `kg_capture` to resolved path. If `kg_capture` MCP unavailable: surface error and stop.
+- `--user`: pass `scope: "user"` to `kg_capture` — same call path as every other flag, gated by `confirmPersonalScopeAccess`. No separate Write-tool path.
+- `--project` / `--named` / `--active`: use `kg_capture` to resolved path (via `targetKg` for `--project`/`--named`, cwd-resolved for `--active`). If `kg_capture` MCP unavailable: surface error and stop — **for every flag, including `--user`.** Do not fall back to a direct Write-tool write for `scope: "user"` specifically: a personal-scope write with `kg_capture` unreachable must fail loudly, not silently retry through an ungated path against the wrong (project-local) directory.
 
 ### Targeting for `--project`
 
@@ -304,7 +303,9 @@ Call `kg_capture` MCP tool:
 }
 ```
 
-**If `kg_capture` is unavailable or fails:** Fall back to direct file write using the `Write` tool.
+**If `kg_capture` is unavailable or fails:**
+- `--user` (`scope: "user"`): do NOT fall back to a direct Write-tool write. Surface the error and stop — a personal-scope write must never bypass `confirmPersonalScopeAccess`, and a filesystem fallback here would both skip that gate and write to the wrong (project-local) directory. Tell the user `kg_capture` is unreachable and the personal-KG write did not happen.
+- `--project` / `--named` / `--active`: fall back to direct file write using the `Write` tool, to `{target_path}` as resolved above (not the personal path — this fallback is scoped to the non-personal flags only).
 
 ---
 

@@ -13,22 +13,21 @@ Captures a single lesson from the live session into the active knowledge graph u
 
 | Flag | Behavior |
 |---|---|
-| `--user` | Write to `~/.kmgraph/lessons-learned/` — bypass `kg_capture`, write directly via Write tool |
-| `--project` | Write to current repo's project KG lessons-learned/ — switch temporarily if needed, restore after |
+| `--user` | Write to the personal KG's lessons-learned/ — via `kg_capture` with `scope: "user"` (gated by `confirmPersonalScopeAccess`) |
+| `--project` | Write to current repo's project KG lessons-learned/ — no switch/restore needed |
 | `--named=<kg>` | Write to named KG lessons-learned/ — no switch |
 | `--active` | Write to active KG lessons-learned/ (default, current behavior) |
 
-These flags are set by the `capture-lesson` command dispatcher via `gov-capture-routing` skill. This agent never performs NL detection — flags only.
+These flags are set by the `capture-lesson` command dispatcher directly (see that command's Level Routing Detection). This agent never performs NL detection — flags only.
 
 ### Path resolution
 
 1. Read flag (default: `--active`)
 2. Resolve `$target_path`:
-   - `--user` → `~/.kmgraph/lessons-learned/`
+   - `--user` → resolved internally by `kg_capture` when `scope: "user"` is passed; no manual path computation needed here, but still show the resolved path to the user per "Surface resolved target" below (the `kg_capture` response includes it).
    - `--project` → read `~/.kmgraph/kg-config.json`, find graph matching current working directory → `{graph.path}/lessons-learned/`
    - `--named=<kg>` → read `~/.kmgraph/kg-config.json`, find graph by name → `{graph.path}/lessons-learned/`
    - `--active` → `{active_kg_path}/lessons-learned/`
-3. Store `$restore_kg` = current active KG (only when `--project` triggers a switch)
 
 ### Surface resolved target
 
@@ -37,8 +36,8 @@ In the lesson draft, always show before any write:
 
 ### Write behavior
 
-- `--user`: write directly via Write tool. Skip `kg_capture` entirely.
-- `--project` / `--named` / `--active`: use `kg_capture` to resolved path. If `kg_capture` MCP unavailable: surface error and stop.
+- `--user`: pass `scope: "user"` to `kg_capture` — same call path as every other flag, gated by `confirmPersonalScopeAccess`. No separate Write-tool path.
+- `--project` / `--named` / `--active`: use `kg_capture` to resolved path. If `kg_capture` MCP unavailable: surface error and stop — **for every flag, including `--user`.** See Phase 5F below: the file-system fallback there does not apply to `scope: "user"` writes.
 
 ### Targeting for `--project`
 
@@ -274,7 +273,7 @@ Surface `resolveWith.accepts` (if present) as the candidate choices and ask the 
 
 **Other errors:**
 
-Surface the error and ask the user whether to retry, abandon, or use fallback (file-system write).
+Surface the error and ask the user whether to retry or abandon. If this capture's scope was `"user"` (personal KG), do not offer a file-system fallback — a personal-scope write must never bypass `confirmPersonalScopeAccess`. For a non-personal-scope capture, retry, abandon, or fallback (file-system write) are all reasonable options.
 
 **MCP not registered / connection failed:**
 
@@ -293,12 +292,13 @@ If `kg_capture` fails because the MCP server is not registered, not found, or no
    - The full payload (content, type, metadata) so it can be retried
 3. **Wait for the return signal** from `mcp-setup-agent`:
    - If `registration_status: "success"`: retry the `kg_capture` call from Phase 5 exactly once.
-   - If `registration_status: "failed"`: use file-system fallback.
-4. **File-system fallback:**
+   - If `registration_status: "failed"` **and this capture's scope is NOT `"user"`**: use file-system fallback (Step 4).
+   - If `registration_status: "failed"` **and this capture's scope IS `"user"`**: do not fall back. Surface the error and stop — tell the user `kg_capture` is unreachable and the personal-KG write did not happen. A filesystem fallback would both skip `confirmPersonalScopeAccess` and write to the wrong (project-local) directory.
+4. **File-system fallback (non-personal scopes only):**
    - Write the lesson markdown directly to `{active_kg_path}/lessons-learned/` using the `Write` tool.
    - Follow existing file naming conventions (e.g., `YYYY-MM-DD-topic-slug.md`).
    - Tell the user: "Saved to the file system. Search won't be ranked until the index is connected."
-5. **Never lose the lesson** — the user's content is preserved regardless of MCP status.
+5. **Never lose a non-personal-scope lesson** — its content is preserved regardless of MCP status. A `scope: "user"` lesson that hits this failure path is NOT silently preserved via fallback — it is surfaced as a stopped, unwritten capture per Step 3 above, so the user can retry once `kg_capture` is available again rather than have it land ungated in the wrong place.
 
 ---
 
@@ -340,4 +340,4 @@ If the user chose to update:
 - `Grep` — search for similar lessons locally (optional, before kg_search)
 - `kg_search` — search knowledge graph for similar lessons
 - `kg_capture` — write lesson to KG (new in v0.2.1)
-- No `Write` / `Edit` — all writes go through `kg_capture`
+- `Write` — file-system fallback only, non-personal scopes only, only when `kg_capture` is unreachable after `mcp-setup-agent` retry fails (Phase 5F). Never used for `scope: "user"` — all personal-KG writes go through `kg_capture`, no exceptions.

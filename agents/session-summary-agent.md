@@ -28,22 +28,21 @@
 
 | Flag | Source |
 |---|---|
-| `--user` | Write to `~/.kmgraph/sessions/` — bypass `kg_capture`, write directly via Write tool |
-| `--project` | Write to current repo's project KG sessions/ — switch temporarily if needed, restore after |
+| `--user` | Write to the personal KG's sessions/ — via `kg_capture` with `scope: "user"` (gated by `confirmPersonalScopeAccess`) |
+| `--project` | Write to current repo's project KG sessions/ — no switch/restore needed |
 | `--named=<kg>` | Write to named KG sessions/ — no switch |
 | `--active` | Write to active KG sessions/ (default, current behavior) |
 
-These flags are set by the dispatcher (`session-summary` command) via `gov-capture-routing` skill. This agent never performs NL detection — it handles flags only.
+These flags are set by the dispatcher (`session-summary` command) directly (see that command's Level Routing Detection). This agent never performs NL detection — it handles flags only.
 
 ### Path resolution
 
 1. Read flag value (default: `--active` if none passed)
 2. Resolve `$target_path`:
-   - `--user` → `~/.kmgraph/sessions/`
+   - `--user` → resolved internally by `kg_capture` when `scope: "user"` is passed; no manual path computation needed here, but still show the resolved path to the user per "Always surface resolved target" below (the `kg_capture` response includes it).
    - `--project` → read `~/.kmgraph/kg-config.json`, find graph matching current working directory → `{graph.path}/sessions/`
    - `--named=<kg>` → read `~/.kmgraph/kg-config.json`, find graph by name → `{graph.path}/sessions/`
    - `--active` → read `~/.kmgraph/kg-config.json` → `{active_kg_path}/sessions/`
-3. Store `$restore_kg` = current active KG path (only when `--project` triggers a switch)
 
 ### Always surface resolved target
 
@@ -54,8 +53,8 @@ This applies even when `--active` (default) is used, so the user can correct the
 
 ### Write behavior
 
-- `--user`: write directly via Write tool to `$target_path`. Skip `kg_capture` entirely.
-- `--project` / `--named` / `--active`: use `kg_capture` as normal to `$target_path`. If `kg_capture` MCP is unavailable: surface error and stop — do not fall back silently.
+- `--user`: pass `scope: "user"` to `kg_capture` — same call path as every other flag, gated by `confirmPersonalScopeAccess`. No separate Write-tool path.
+- `--project` / `--named` / `--active`: use `kg_capture` as normal to `$target_path`. If `kg_capture` MCP is unavailable: surface error and stop — do not fall back silently. **This applies to `--user` too** — see Step 8F below: the file-system fallback there does not apply to `scope: "user"` writes.
 
 ### Targeting for `--project`
 
@@ -641,12 +640,13 @@ If `kg_capture` fails because the MCP server is not registered, not found, or no
    - The full payload (content, type, metadata) so it can be retried
 3. **Wait for the return signal** from `mcp-setup-agent`:
    - If `registration_status: "success"`: retry the `kg_capture` call from Step 8 exactly once.
-   - If `registration_status: "failed"`: use file-system fallback.
-4. **File-system fallback:**
+   - If `registration_status: "failed"` **and this capture's scope is NOT `"user"`**: use file-system fallback (Step 4).
+   - If `registration_status: "failed"` **and this capture's scope IS `"user"`**: do not fall back. Surface the error and stop — tell the user `kg_capture` is unreachable and the personal-KG write did not happen. A filesystem fallback would both skip `confirmPersonalScopeAccess` and write to the wrong (project-local) directory.
+4. **File-system fallback (non-personal scopes only):**
    - Write the session summary markdown directly to `{active_kg_path}/sessions/` using the `Write` tool.
    - Follow existing file naming conventions (e.g., `YYYY-MM-DD-session-type.md`).
    - Tell the user: "Saved to the file system. Search won't be ranked until the index is connected."
-5. **Never lose the session summary** — the user's content is preserved regardless of MCP status.
+5. **Never lose a non-personal-scope session summary** — its content is preserved regardless of MCP status. A `scope: "user"` summary that hits this failure path is NOT silently preserved via fallback — it is surfaced as a stopped, unwritten capture per Step 3 above, so the user can retry once `kg_capture` is available again rather than have it land ungated in the wrong place.
 
 ---
 
