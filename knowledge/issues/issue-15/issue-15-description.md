@@ -56,3 +56,8 @@ Scale: single small branch, TDD (red test → fix → green), no ADR or cross-ti
 Independently reviewed by Claude Opus (different model from the implementer): verdict **✅ Correct as-is**, zero Critical/Important findings, two minor informational notes (neither requiring change — confirmed no `config.graphs` null-crash risk, confirmed the two updated assertions correctly exercise the fallback branch). Opus re-ran the test suite and typecheck independently rather than trusting the report; both green. No further pass needed.
 
 Not pushed, no PR — awaiting user go-ahead.
+
+## Open Items
+
+- [ ] Push branch `v0.6.19` to `origin`, open PR
+- [ ] After merge, close GitHub issue **#172** (this issue's tracked GH counterpart) — not auto-closed since no `Closes #172` reference exists in the fix commit (`fb8bf665`)
