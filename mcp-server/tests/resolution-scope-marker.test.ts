@@ -30,12 +30,32 @@ describe("PersonalScopeSession", () => {
     session.applyMarker("personal", true);
     expect(session.currentScopeFor(false)).toBe("personal");
   });
-  it("interactive mode one-shot marker applies to the current call, then this test's own next check re-applies null manually (session doesn't self-clear inside this unit test; clearing-after-one-call is the caller's responsibility per the interface, tested via two explicit applyMarker calls)", () => {
+  it("a sticky marker survives repeated reads", () => {
+    const session = new PersonalScopeSession();
+    session.applyMarker("personal", true);
+    expect(session.currentScopeFor(false)).toBe("personal");
+    expect(session.currentScopeFor(false)).toBe("personal");
+    expect(session.currentScopeFor(false)).toBe("personal");
+  });
+  it("a one-shot marker expires after a single read", () => {
     const session = new PersonalScopeSession();
     session.applyMarker("personal", false); // one-shot
+    expect(session.currentScopeFor(false)).toBe("personal"); // applies to the call that set it
+    expect(session.currentScopeFor(false)).toBeNull(); // and to nothing after it
+  });
+  it("a one-shot marker does not resurrect a scope a previous sticky marker had set", () => {
+    const session = new PersonalScopeSession();
+    session.applyMarker("personal", true);
     expect(session.currentScopeFor(false)).toBe("personal");
-    session.applyMarker(null, false); // caller clears after consuming the one-shot
+    session.applyMarker("project", false);
+    expect(session.currentScopeFor(false)).toBe("project");
     expect(session.currentScopeFor(false)).toBeNull();
+  });
+  it("an automated-mode read does not consume a pending one-shot scope", () => {
+    const session = new PersonalScopeSession();
+    session.applyMarker("personal", false);
+    expect(session.currentScopeFor(true)).toBeNull();
+    expect(session.currentScopeFor(false)).toBe("personal");
   });
 });
 

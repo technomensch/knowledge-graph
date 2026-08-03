@@ -5,7 +5,7 @@ import * as path from "path";
 import * as os from "os";
 import { readConfig, writeConfig, getPluginRoot } from "../utils.js";
 import { resolveGraph, resolvePersonalGraph, PersonalScopeSession, confirmPersonalScopeAccess } from "../resolution.js";
-import { resolveInteractionMode } from "../interaction.js";
+import { resolveInteractionMode, STUB_ASK_TIMEOUT_MS, stubAsk } from "../interaction.js";
 import { handleVersion } from "./version.js";
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -690,7 +690,8 @@ export async function handleUpgrade(
     const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
       confirmPersonalScope: params.confirmPersonalScope,
       mode,
-      ask: () => new Promise<never>(() => {}),
+      timeoutMs: STUB_ASK_TIMEOUT_MS,
+      ask: stubAsk,
     });
     if (!("confirmed" in confirmed)) {
       return { content: [{ type: "text" as const, text: JSON.stringify(confirmed) }], isError: true };
@@ -814,7 +815,7 @@ export async function handleUpgrade(
 
 // ── Tool registration ────────────────────────────────────────────────────────
 
-export function registerUpgradeTool(server: McpServer, personalScopeSession: PersonalScopeSession = new PersonalScopeSession()): void {
+export function registerUpgradeTool(server: McpServer, personalScopeSession: PersonalScopeSession): void {
   server.tool(
     "kg_upgrade",
     "Inspect and apply KMGraph upgrades for MCP-only installations",

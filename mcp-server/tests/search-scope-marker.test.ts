@@ -306,3 +306,96 @@ describe("[personal]/[project] marker wiring in kg_capture", () => {
     expect(result.reason).toBe("personal_scope_unseen_repo");
   });
 });
+
+// ---------------------------------------------------------------------------
+// One-shot ("sticky: false") marker expiry -- the shared session must not stay
+// pinned to personal scope after a single one-shot answer.
+// ---------------------------------------------------------------------------
+
+describe("one-shot [personal] marker expiry across the shared session", () => {
+  it("a later kg_capture with no marker writes to the project KG, not the personal one", async () => {
+    const personalRoot = makeTempDir("oneshot-personal");
+    const projectRoot = makeTempDir("oneshot-project");
+    tempDirs.push(personalRoot, projectRoot);
+    scaffoldKg(personalRoot);
+    scaffoldKg(projectRoot);
+
+    writeMd(
+      path.join(personalRoot, "lessons-learned"),
+      "oneshot-note.md",
+      "---\ntitle: One Shot Note\n---\n\nContent about oneshot-note unique to the personal graph."
+    );
+
+    (readConfig as jest.Mock).mockReturnValue(
+      makeConfig({
+        "my-personal": { path: personalRoot, type: "personal" },
+        "my-project": { path: projectRoot, type: "project-local" },
+      })
+    );
+    process.cwd = () => projectRoot;
+
+    const session = new PersonalScopeSession();
+    session.confirmRepo(projectRoot);
+
+    // One-shot [personal] search: this call is personal-scoped.
+    const search = await handleSearch(
+      { query: "[personal] oneshot-note", interaction: "interactive", sticky: false },
+      session
+    );
+    expect(search.isError).toBeFalsy();
+    expect(search.content[0].text).toContain("oneshot-note.md");
+
+    // The next call carries no marker, so it must fall back to the project KG.
+    const capture = await handleCapture(
+      { content: "Ordinary project body.\n", type: "lesson", metadata: { title: "Ordinary Note" } },
+      undefined,
+      "interactive",
+      session
+    );
+    expect("error" in capture).toBe(false);
+    if ("error" in capture) throw new Error("unexpected error result");
+    expect(capture.filePath.startsWith(projectRoot)).toBe(true);
+    expect(capture.filePath.startsWith(personalRoot)).toBe(false);
+  });
+
+  it("a later kg_search with no marker searches the project KG, not the personal one", async () => {
+    const personalRoot = makeTempDir("oneshot-search-personal");
+    const projectRoot = makeTempDir("oneshot-search-project");
+    tempDirs.push(personalRoot, projectRoot);
+    scaffoldKg(personalRoot);
+    scaffoldKg(projectRoot);
+
+    writeMd(
+      path.join(personalRoot, "lessons-learned"),
+      "shared-term-personal.md",
+      "---\ntitle: Personal\n---\n\nA note about sharedterm in the personal graph."
+    );
+    writeMd(
+      path.join(projectRoot, "lessons-learned"),
+      "shared-term-project.md",
+      "---\ntitle: Project\n---\n\nA note about sharedterm in the project graph."
+    );
+
+    (readConfig as jest.Mock).mockReturnValue(
+      makeConfig({
+        "my-personal": { path: personalRoot, type: "personal" },
+        "my-project": { path: projectRoot, type: "project-local" },
+      })
+    );
+    process.cwd = () => projectRoot;
+
+    const session = new PersonalScopeSession();
+    session.confirmRepo(projectRoot);
+
+    const first = await handleSearch(
+      { query: "[personal] sharedterm", interaction: "interactive", sticky: false },
+      session
+    );
+    expect(first.content[0].text).toContain("shared-term-personal.md");
+    expect(first.content[0].text).not.toContain("shared-term-project.md");
+
+    const second = await handleSearch({ query: "sharedterm", interaction: "interactive" }, session);
+    expect(second.content[0].text).toContain("shared-term-project.md");
+    expect(second.content[0].text).not.toContain("shared-term-personal.md");
+  });
+});

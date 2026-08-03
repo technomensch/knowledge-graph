@@ -15,7 +15,7 @@ import {
   confirmPersonalScopeAccess,
   resolvePersonalGraph,
 } from "../resolution.js";
-import { resolveInteractionMode, InteractionMode, GateResult, gate } from "../interaction.js";
+import { resolveInteractionMode, InteractionMode, GateResult, STUB_ASK_TIMEOUT_MS, gate, stubAsk } from "../interaction.js";
 import { confirmFirstWrite } from "./config.js";
 
 export interface CaptureRequest {
@@ -316,7 +316,8 @@ export async function handleCapture(
           // No real blocking ask() transport exists yet at this layer (spec §12)
           // -- matches every other gate() call site in this file/resolution.ts
           // that has no real interactive transport yet.
-          ask: () => new Promise<never>(() => {}),
+          timeoutMs: STUB_ASK_TIMEOUT_MS,
+          ask: stubAsk,
         });
         if (!("answer" in gated)) return gateResultToCaptureError(gated);
         personalScopeSession.applyMarker(marker, gated.answer === "sticky");
@@ -376,7 +377,8 @@ export async function handleCapture(
       confirmFirstUse: scopeOpts?.confirmFirstUse,
       // No real blocking ask() transport exists yet at this layer (spec §12)
       // -- matches every other gate() call site in this file/resolution.ts.
-      ask: () => new Promise<never>(() => {}),
+      timeoutMs: STUB_ASK_TIMEOUT_MS,
+      ask: stubAsk,
     });
     if (!("config" in confirmedFirstWrite)) return confirmedFirstWrite as CaptureError;
     writeConfig(confirmedFirstWrite.config);
@@ -390,7 +392,8 @@ export async function handleCapture(
     const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
       confirmPersonalScope: scopeOpts?.confirmPersonalScope,
       mode,
-      ask: () => new Promise<never>(() => {}),
+      timeoutMs: STUB_ASK_TIMEOUT_MS,
+      ask: stubAsk,
     });
     if (!("confirmed" in confirmed)) return confirmed as CaptureError;
   }

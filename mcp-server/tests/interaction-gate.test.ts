@@ -1,4 +1,4 @@
-import { gate, requireInput, type AskResult } from "../src/interaction.js";
+import { STUB_ASK_TIMEOUT_MS, gate, requireInput, stubAsk, type AskResult } from "../src/interaction.js";
 
 describe("gate()", () => {
   it("requireInput produces the exact KMG_INPUT_REQUIRED shape", () => {
@@ -148,5 +148,76 @@ describe("gate()", () => {
       reason: "x",
       resolveWith: { param: "y", accepts: undefined },
     });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Stub-ask deadline: gates run sequentially, so the no-transport stub sites
+// (spec §12) must not each burn gate()'s 30s default -- a 3-gate kg_capture
+// chain took ~90s, past the point most MCP clients give up.
+// ---------------------------------------------------------------------------
+
+describe("STUB_ASK_TIMEOUT_MS", () => {
+  it("leaves gate()'s own default untouched for a future real ask() transport", () => {
+    expect(STUB_ASK_TIMEOUT_MS).toBeLessThan(30_000);
+  });
+
+  it("keeps the worst-case 3-gate chain comfortably under a 60s client timeout", () => {
+    expect(STUB_ASK_TIMEOUT_MS * 3).toBeLessThan(20_000);
+  });
+
+  it("a 3-gate stub chain resolves to three structured timeouts within its own budget", async () => {
+    jest.useFakeTimers();
+    try {
+      const chain = (async () => {
+        const results = [];
+        for (let i = 0; i < 3; i++) {
+          results.push(
+            await gate({
+              mode: "interactive",
+              reason: `gate_${i}`,
+              param: "confirm",
+              timeoutMs: STUB_ASK_TIMEOUT_MS,
+              ask: stubAsk,
+            })
+          );
+        }
+        return results;
+      })();
+
+      await jest.advanceTimersByTimeAsync(STUB_ASK_TIMEOUT_MS * 3);
+      const results = await chain;
+
+      expect(results).toHaveLength(3);
+      results.forEach((r, i) => expect(r).toMatchObject({ error: "KMG_INPUT_REQUIRED", reason: `gate_${i}_timeout` }));
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("a chain of stub gates is still pending one tick before its budget elapses", async () => {
+    jest.useFakeTimers();
+    try {
+      let settled = false;
+      const p = gate({
+        mode: "interactive",
+        reason: "slow_gate",
+        param: "confirm",
+        timeoutMs: STUB_ASK_TIMEOUT_MS,
+        ask: stubAsk,
+      }).then((r) => {
+        settled = true;
+        return r;
+      });
+
+      await jest.advanceTimersByTimeAsync(STUB_ASK_TIMEOUT_MS - 1);
+      expect(settled).toBe(false);
+
+      await jest.advanceTimersByTimeAsync(1);
+      await p;
+      expect(settled).toBe(true);
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });

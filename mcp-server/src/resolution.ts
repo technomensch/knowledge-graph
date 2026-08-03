@@ -3,7 +3,7 @@ import * as os from "os";
 import * as fs from "fs";
 import { execFileSync } from "child_process";
 import { KgConfig, GraphConfig, updateConfig, changeGraphStatus } from "./utils.js";
-import { AskResult, GateResult, InputRequiredError, InteractionMode, gate, requireInput } from "./interaction.js";
+import { AskResult, GateResult, InputRequiredError, InteractionMode, STUB_ASK_TIMEOUT_MS, gate, requireInput, stubAsk } from "./interaction.js";
 
 export type ResolutionResult =
   | { kind: "resolved"; name: string; graph: GraphConfig }
@@ -160,7 +160,8 @@ async function gateHomeOrRootCwd(config: KgConfig, mode: InteractionMode): Promi
     // promise lets gate()'s own Promise.race/timeout machinery (Task 3.2) do
     // what it already does for every other unanswered interactive question,
     // producing the same KMG_INPUT_REQUIRED shape as the automated branch.
-    ask: () => new Promise<never>(() => {}),
+    timeoutMs: STUB_ASK_TIMEOUT_MS,
+    ask: stubAsk,
   });
 }
 
@@ -226,7 +227,8 @@ export async function resolveGraphOutcome(
       param: "confirmProceed",
       accepts,
       detail: { name: resolution.name, statusChangedAt: resolution.graph.statusChangedAt },
-      ask: () => new Promise<never>(() => {}),
+      timeoutMs: STUB_ASK_TIMEOUT_MS,
+      ask: stubAsk,
     });
     if (!("answer" in gated)) return { kind: "gated", result: gated };
     if (gated.answer === "restore") {
@@ -249,7 +251,8 @@ export async function resolveGraphOutcome(
     reason,
     param: "name",
     accepts: resolution.candidates,
-    ask: () => new Promise<never>(() => {}),
+    timeoutMs: STUB_ASK_TIMEOUT_MS,
+    ask: stubAsk,
   });
   if (!("answer" in gated)) return { kind: "gated", result: gated };
   return resolveGraphOutcome(config, resolveGraph(config, cwd, gated.answer), cwd, mode);
@@ -299,15 +302,25 @@ export function parseScopeMarker(text: string): { marker: ScopeMarker; remainder
 // always a cold start with no scope carried over.
 export class PersonalScopeSession {
   private currentScope: "personal" | "project" | null = null;
+  private sticky: boolean = false;
   private confirmedRepos: Set<string> = new Set();
 
-  applyMarker(marker: ScopeMarker, _sticky: boolean): void {
+  applyMarker(marker: ScopeMarker, sticky: boolean): void {
     this.currentScope = marker;
+    this.sticky = marker !== null && sticky;
   }
 
+  // Reading a one-shot scope CONSUMES it: currentScopeFor is called exactly
+  // once per kg_search/kg_capture call, so a "one-shot" answer applies to the
+  // call that set it and no later one. Without this, a single one-shot
+  // [personal] marker permanently pinned the whole process to personal scope
+  // -- every later call, marker or not, silently read/wrote the personal KG,
+  // which is precisely the prompt-injection threat spec §11 exists to close.
   currentScopeFor(automated: boolean): "personal" | "project" | null {
     if (automated) return null; // ephemeral scope disabled entirely in automated mode, spec §11
-    return this.currentScope;
+    const scope = this.currentScope;
+    if (!this.sticky) this.currentScope = null;
+    return scope;
   }
 
   hasConfirmedRepo(repoRoot: string): boolean {
@@ -356,6 +369,7 @@ export async function confirmPersonalScopeAccess(
   opts: {
     confirmPersonalScope?: boolean;
     mode: InteractionMode;
+    timeoutMs?: number;
     ask: (signal: AbortSignal, detail?: unknown) => Promise<AskResult>;
   }
 ): Promise<{ confirmed: true } | InputRequiredError> {
@@ -372,6 +386,7 @@ export async function confirmPersonalScopeAccess(
     reason: "personal_scope_unseen_repo",
     param: "confirmPersonalScope",
     accepts: ["yes", "no"],
+    timeoutMs: opts.timeoutMs,
     ask: opts.ask,
   });
   if ("error" in gated) return gated;

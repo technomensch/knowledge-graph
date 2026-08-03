@@ -31,7 +31,7 @@ import {
   PersonalScopeSession,
   confirmPersonalScopeAccess,
 } from "../resolution.js";
-import { resolveInteractionMode, gate, InteractionMode, InputRequiredError, requireInput } from "../interaction.js";
+import { resolveInteractionMode, gate, InteractionMode, InputRequiredError, STUB_ASK_TIMEOUT_MS, requireInput, stubAsk } from "../interaction.js";
 
 // ── Four-answer duplicate-graphId prompt (Task 4.4, spec §9) ─────────────────
 
@@ -282,7 +282,8 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
         param: "confirmBroadRegistration",
         accepts: ["yes", "no"],
         detail: broadWarning,
-        ask: () => new Promise<never>(() => {}), // no real ask() transport yet, same pattern as every other gate() stub in this plan
+        timeoutMs: STUB_ASK_TIMEOUT_MS,
+        ask: stubAsk, // no real ask() transport yet, same pattern as every other gate() stub in this plan
       });
       if ("error" in gated) {
         return { content: [{ type: "text" as const, text: JSON.stringify(gated) }], isError: true };
@@ -359,7 +360,8 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
           sameOrigin: existingOrigin !== undefined && existingOrigin === newOrigin,
           suggestedAnswer: suggestion,
         },
-        ask: () => new Promise<never>(() => {}), // no real ask() transport yet, same pattern as every other gate() stub in this plan
+        timeoutMs: STUB_ASK_TIMEOUT_MS,
+        ask: stubAsk, // no real ask() transport yet, same pattern as every other gate() stub in this plan
       });
 
       if ("error" in gated) {
@@ -424,7 +426,8 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
               param: "confirmMerge",
               accepts: ["confirm", "cancel"],
               detail: preview,
-              ask: () => new Promise<never>(() => {}), // no real ask() transport yet, same pattern as every other gate() stub in this plan
+              timeoutMs: STUB_ASK_TIMEOUT_MS,
+              ask: stubAsk, // no real ask() transport yet, same pattern as every other gate() stub in this plan
             });
 
             if ("error" in gated) {
@@ -685,7 +688,7 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
   };
 }
 
-export function registerConfigTools(server: McpServer, personalScopeSession: PersonalScopeSession = new PersonalScopeSession()): void {
+export function registerConfigTools(server: McpServer, personalScopeSession: PersonalScopeSession): void {
   // ── kg_config_init ──────────────────────────────────────────────
   server.tool(
     "kg_config_init",
@@ -855,7 +858,8 @@ export async function handleConfigAddCategory(
     const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
       confirmPersonalScope,
       mode,
-      ask: () => new Promise<never>(() => {}),
+      timeoutMs: STUB_ASK_TIMEOUT_MS,
+      ask: stubAsk,
     });
     if (!("confirmed" in confirmed)) {
       return { content: [{ type: "text" as const, text: JSON.stringify(confirmed) }], isError: true };

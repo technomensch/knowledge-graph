@@ -5,7 +5,7 @@ import * as path from "path";
 import * as os from "os";
 import { readConfig, writeConfig, walkDir } from "../utils.js";
 import { resolveGraph, resolvePersonalGraph, PersonalScopeSession, confirmPersonalScopeAccess } from "../resolution.js";
-import { resolveInteractionMode } from "../interaction.js";
+import { resolveInteractionMode, STUB_ASK_TIMEOUT_MS, stubAsk } from "../interaction.js";
 
 // Graceful fallback: node-sqlite3-wasm is bundled in dist/node_modules/ for marketplace installs
 // (v0.5.10.3+). This try/catch covers edge cases: partial clone, corrupted dist, or dev runs
@@ -406,7 +406,7 @@ export function searchFts5(
  * Returns { exists: boolean, db_path: string, kgType: string } — read-only probe,
  * never creates directories.
  */
-export function registerFts5StatusTool(server: McpServer, personalScopeSession: PersonalScopeSession = new PersonalScopeSession()): void {
+export function registerFts5StatusTool(server: McpServer, personalScopeSession: PersonalScopeSession): void {
   server.tool(
     "kg_fts5_status",
     "Check whether the FTS5 search index exists for a knowledge graph (default: resolved " +
@@ -470,7 +470,8 @@ export async function handleFts5Status(
       const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
         confirmPersonalScope: params.confirmPersonalScope,
         mode,
-        ask: () => new Promise<never>(() => {}),
+        timeoutMs: STUB_ASK_TIMEOUT_MS,
+        ask: stubAsk,
       });
       if (!("confirmed" in confirmed)) {
         return { content: [{ type: "text" as const, text: JSON.stringify(confirmed) }], isError: true };
@@ -507,7 +508,7 @@ export async function handleFts5Status(
 /**
  * Registers the `kg_fts5_rebuild` MCP tool.
  */
-export function registerFts5Tool(server: McpServer, personalScopeSession: PersonalScopeSession = new PersonalScopeSession()): void {
+export function registerFts5Tool(server: McpServer, personalScopeSession: PersonalScopeSession): void {
   server.tool(
     "kg_fts5_rebuild",
     "Build or refresh FTS5 full-text search index for a knowledge graph (default: resolved " +
@@ -589,7 +590,8 @@ export async function handleFts5Rebuild(
         const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
           confirmPersonalScope: params.confirmPersonalScope,
           mode,
-          ask: () => new Promise<never>(() => {}),
+          timeoutMs: STUB_ASK_TIMEOUT_MS,
+          ask: stubAsk,
         });
         if (!("confirmed" in confirmed)) {
           return { content: [{ type: "text" as const, text: JSON.stringify(confirmed) }], isError: true };

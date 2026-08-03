@@ -122,6 +122,26 @@ export interface GateOptions {
   ask: (signal: AbortSignal, detail?: unknown) => Promise<AskResult>;
 }
 
+/**
+ * Deadline for gate() call sites whose ask() is the permanent no-transport
+ * stub below (spec §12: "mechanism, not native blocking elicitation").
+ *
+ * Those sites can never be answered, so their only outcome is the timeout, and
+ * gates run sequentially: at gate()'s own 30s default a three-gate kg_capture
+ * chain took ~90s, past the point most MCP clients give up and well into
+ * looking like a hang rather than a fast structured error. gate()'s default is
+ * deliberately left at 30s for a future real transport, where a human actually
+ * has to read and answer the question.
+ */
+export const STUB_ASK_TIMEOUT_MS = 5_000;
+
+/**
+ * The no-transport ask() stub. Never resolves, so gate()'s timeout produces
+ * the same KMG_INPUT_REQUIRED shape the automated branch returns directly.
+ * Always pair with `timeoutMs: STUB_ASK_TIMEOUT_MS`.
+ */
+export const stubAsk = (): Promise<never> => new Promise<never>(() => {});
+
 export async function gate(opts: GateOptions): Promise<GateResult> {
   if (opts.mode === "automated") {
     return requireInput(opts.reason, opts.param, opts.accepts, opts.detail);

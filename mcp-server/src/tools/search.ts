@@ -13,7 +13,7 @@ import {
   confirmPersonalScopeAccess,
   CrossKgSearchSession,
 } from "../resolution.js";
-import { resolveInteractionMode, InteractionMode, GateResult, gate } from "../interaction.js";
+import { resolveInteractionMode, InteractionMode, GateResult, STUB_ASK_TIMEOUT_MS, gate, stubAsk } from "../interaction.js";
 import { searchFts5, resolveDbPath } from "./fts5.js";
 import type { SearchResult } from "./fts5.js";
 
@@ -212,7 +212,8 @@ export async function handleSearch(
         // No real blocking ask() transport exists yet at this layer (spec §12) --
         // matches every other gate() call site in resolution.ts/capture.ts that
         // has no real interactive transport yet.
-        ask: () => new Promise<never>(() => {}),
+        timeoutMs: STUB_ASK_TIMEOUT_MS,
+        ask: stubAsk,
       });
       if (!("answer" in gated)) return errorResponse(gateResultToSearchError(gated));
       personalScopeSession.applyMarker(marker, gated.answer === "sticky");
@@ -297,7 +298,8 @@ export async function handleSearch(
           // call site validates the answer itself, below, instead of
           // delegating that to gate().
           detail: { candidates: allKgs.map((k) => k.name) },
-          ask: () => new Promise<never>(() => {}),
+          timeoutMs: STUB_ASK_TIMEOUT_MS,
+          ask: stubAsk,
         });
         if (!("answer" in gated)) return errorResponse(gateResultToSearchError(gated));
         const answer = gated.answer;
@@ -329,7 +331,8 @@ export async function handleSearch(
             reason: "cross_kg_search_sticky",
             param: "sticky",
             accepts: ["one-shot", "sticky"],
-            ask: () => new Promise<never>(() => {}),
+            timeoutMs: STUB_ASK_TIMEOUT_MS,
+            ask: stubAsk,
           });
           if (!("answer" in stickyGated)) return errorResponse(gateResultToSearchError(stickyGated));
           if (stickyGated.answer === "sticky") crossKgSearchSession.confirmSession(excludedNames);
@@ -394,7 +397,8 @@ export async function handleSearch(
     const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
       confirmPersonalScope: params.confirmPersonalScope,
       mode,
-      ask: () => new Promise<never>(() => {}),
+      timeoutMs: STUB_ASK_TIMEOUT_MS,
+      ask: stubAsk,
     });
     if (!("confirmed" in confirmed)) return errorResponse(confirmed as SearchError);
   }

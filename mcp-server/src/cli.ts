@@ -409,28 +409,18 @@ async function main(): Promise<void> {
     const { McpServer } = await import(
       "@modelcontextprotocol/sdk/server/mcp.js"
     );
-    const { registerConfigTools } = await import("./tools/config.js");
-    const { registerSearchTool } = await import("./tools/search.js");
-    const { registerScaffoldTool } = await import("./tools/scaffold.js");
-    const { registerSanitizationTool } = await import(
-      "./tools/sanitization.js"
-    );
-    const { registerConfigResource, registerTemplatesResource } = await import(
-      "./resources/index.js"
-    );
+    const { registerCliMcpTools } = await import("./mcp-bootstrap.js");
 
     const server = new McpServer({
       name: "knowledge-graph",
       version: SERVER_VERSION,
     });
 
+    // One session each, shared across every tool registered below -- see
+    // registerCliMcpTools' comment for why a per-registrar instance breaks
+    // spec §11.
     const { PersonalScopeSession, CrossKgSearchSession } = await import("./resolution.js");
-    registerConfigTools(server);
-    registerSearchTool(server, new PersonalScopeSession(), new CrossKgSearchSession());
-    registerScaffoldTool(server);
-    registerSanitizationTool(server);
-    registerConfigResource(server);
-    registerTemplatesResource(server);
+    await registerCliMcpTools(server, new PersonalScopeSession(), new CrossKgSearchSession());
 
     const transport = new StdioServerTransport();
     await server.connect(transport);
