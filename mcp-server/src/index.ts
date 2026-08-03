@@ -10,6 +10,7 @@ import { registerCaptureTool } from "./tools/capture.js";
 import { registerUpgradeTool } from "./tools/upgrade.js";
 import { registerVersionTool } from "./tools/version.js";
 import { registerCompareTools } from "./tools/compare.js";
+import { registerResolveTool } from "./tools/resolve.js";
 import { PersonalScopeSession, CrossKgSearchSession } from "./resolution.js";
 
 declare const __SERVER_VERSION__: string;
@@ -31,7 +32,7 @@ const personalScopeSession = new PersonalScopeSession();
 // personalScopeSession above.
 const crossKgSearchSession = new CrossKgSearchSession();
 
-// Register tools (12 core tools)
+// Register tools (13 core tools)
 registerConfigTools(server, personalScopeSession);    // kg_config_init, kg_config_list, kg_config_add_category
 registerSearchTool(server, personalScopeSession, crossKgSearchSession); // kg_search
 registerScaffoldTool(server);   // kg_scaffold
@@ -42,6 +43,7 @@ registerCaptureTool(server, personalScopeSession);    // kg_capture
 registerUpgradeTool(server, personalScopeSession);    // kg_upgrade
 registerVersionTool(server);    // kg_version
 registerCompareTools(server, personalScopeSession);   // kg_compare_graphs
+registerResolveTool(server, personalScopeSession);    // kg_resolve (issue-41, Phase 7.2 Task 7.2.1)
 
 // Register resources (2 resources)
 registerConfigResource(server);    // kg://config
