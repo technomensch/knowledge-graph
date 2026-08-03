@@ -947,11 +947,28 @@ describe("T-32: personal KG type — platform-split warning still detected", () 
     // ADR-067 Task 1.9: personal-type graphs are deliberately excluded from
     // resolveGraph's cwd walk (reached via scope="user" instead, not
     // context) -- explicit scope needed here, cwd alone no longer resolves it.
-    const result = await handleUpgrade({ scope: "user" });
+    // ADR-067 Task 6.4: scope:"user" now routes through confirmPersonalScopeAccess --
+    // confirmPersonalScope:true is required here since this test runs in automated mode.
+    const result = await handleUpgrade({ scope: "user", confirmPersonalScope: true });
     expect(result.isError).toBeUndefined();
     const parsed = parseResult(result);
     const platformSplit = parsed.warnings.find((w) => w.category === "platform-split");
     expect(platformSplit).toBeDefined();
+  });
+
+  // ADR-067 Task 6.4 (spec §11): scope:"user" reaches the personal graph the
+  // same way it does in search.ts/capture.ts -- same confirmPersonalScopeAccess
+  // gate, same reason string, closing the interim gap left open by Task 1.9.
+  it("scope:\"user\" from an unconfirmed repo in automated mode returns KMG_INPUT_REQUIRED/personal_scope_unseen_repo", async () => {
+    const kgRoot = makeTempDir("t32-gate");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot, { type: "personal" });
+
+    const result = await handleUpgrade({ scope: "user" });
+    expect(result.isError).toBe(true);
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed).toMatchObject({ error: "KMG_INPUT_REQUIRED", reason: "personal_scope_unseen_repo" });
   });
 });
 

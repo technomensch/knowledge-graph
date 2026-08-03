@@ -3,7 +3,7 @@ import { z } from "zod";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { readConfig, KgConfig } from "../utils.js";
+import { readConfig, writeConfig, KgConfig } from "../utils.js";
 import { rebuildIndex } from "./fts5.js";
 import {
   resolveGraph,
@@ -16,6 +16,7 @@ import {
   resolvePersonalGraph,
 } from "../resolution.js";
 import { resolveInteractionMode, InteractionMode, GateResult, gate } from "../interaction.js";
+import { confirmFirstWrite } from "./config.js";
 
 export interface CaptureRequest {
   content: string;
@@ -283,7 +284,7 @@ export async function handleCapture(
   targetKg?: string,
   interaction?: InteractionMode,
   personalScopeSession: PersonalScopeSession = new PersonalScopeSession(),
-  scopeOpts?: { sticky?: boolean; confirmPersonalScope?: boolean }
+  scopeOpts?: { sticky?: boolean; confirmPersonalScope?: boolean; confirmFirstUse?: boolean }
 ): Promise<CaptureResponse | CaptureError> {
   // Validate metadata
   const validated = validateMetadata(request.metadata);
@@ -362,6 +363,23 @@ export async function handleCapture(
     kgPath = resolved.kgPath;
     resolvedKgName = resolved.resolvedKgName;
     notice = resolved.notice;
+  }
+
+  // ADR-067 Task 6.4 (spec §7): a "pending" graph (freshly registered via
+  // kg_config_init, not yet confirmed) must not silently take its first
+  // write -- gate before any file touches disk. Only a confirmed answer
+  // (interactive "yes", or automated confirmFirstUse:true) flips it "active";
+  // anything else propagates a structured error and leaves the graph pending.
+  if (config.graphs[resolvedKgName]?.status === "pending") {
+    const confirmedFirstWrite = await confirmFirstWrite(config, resolvedKgName, {
+      mode,
+      confirmFirstUse: scopeOpts?.confirmFirstUse,
+      // No real blocking ask() transport exists yet at this layer (spec §12)
+      // -- matches every other gate() call site in this file/resolution.ts.
+      ask: () => new Promise<never>(() => {}),
+    });
+    if (!("config" in confirmedFirstWrite)) return confirmedFirstWrite as CaptureError;
+    writeConfig(confirmedFirstWrite.config);
   }
 
   // spec §11: confirmPersonalScopeAccess gates every scope:"user" write
@@ -540,14 +558,21 @@ export function registerCaptureTool(server: McpServer, personalScopeSession: Per
           "Confirms this repo may write to the personal knowledge graph. Required once per " +
             "process before a personal-scope write is honored for a repo not yet confirmed."
         ),
+      confirmFirstUse: z
+        .boolean()
+        .optional()
+        .describe(
+          "Confirms this is a legitimate first write to a newly-registered (pending) knowledge " +
+            "graph. Required once per graph before its first write is honored."
+        ),
     },
-    async ({ content, type, metadata, targetKg, interaction, sticky, confirmPersonalScope }) => {
+    async ({ content, type, metadata, targetKg, interaction, sticky, confirmPersonalScope, confirmFirstUse }) => {
       const result = await handleCapture(
         { content, type, metadata },
         targetKg,
         interaction,
         personalScopeSession,
-        { sticky, confirmPersonalScope }
+        { sticky, confirmPersonalScope, confirmFirstUse }
       );
       if ("error" in result) {
         return {

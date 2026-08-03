@@ -23,8 +23,15 @@ import {
   CategoryConfig,
 } from "../utils.js";
 import { hashDirectory, compareFileSets } from "../graph-compare.js";
-import { resolveGraph, resolvePersonalGraph, isHomeOrRootCwd, isAncestorOrEqual } from "../resolution.js";
-import { resolveInteractionMode, gate } from "../interaction.js";
+import {
+  resolveGraph,
+  resolvePersonalGraph,
+  isHomeOrRootCwd,
+  isAncestorOrEqual,
+  PersonalScopeSession,
+  confirmPersonalScopeAccess,
+} from "../resolution.js";
+import { resolveInteractionMode, gate, InteractionMode, InputRequiredError, requireInput } from "../interaction.js";
 
 // ── Four-answer duplicate-graphId prompt (Task 4.4, spec §9) ─────────────────
 
@@ -142,6 +149,50 @@ export function performRegistryMerge(
   updated.graphs[losingName].mergedInto = survivorName;
 
   return { config: updated, backupPath };
+}
+
+// ── First-time-repo confirmation: "pending" -> "active" (Task 6.4, spec §7) ──
+
+// A freshly-registered graph (kg_config_init mints new entries with
+// status:"pending" -- Task 1.9 Step 7.5) must not silently take its first
+// write. Only an explicit confirmation (automated: confirmFirstUse:true;
+// interactive: a "yes" answer through gate()) flips it "active" -- anything
+// else (a "no" answer, decline, cancel, or a gate timeout) leaves the graph
+// "pending" and returns a structured error, never a silent write. This
+// protects against a prompt-injection payload in a freshly-cloned untrusted
+// repo trying to get the assistant to write into it unnoticed.
+export async function confirmFirstWrite(
+  config: KgConfig,
+  name: string,
+  opts: { mode: InteractionMode; confirmFirstUse?: boolean; ask: () => Promise<string>; timeoutMs?: number }
+): Promise<{ config: KgConfig } | InputRequiredError> {
+  if (opts.mode === "automated") {
+    if (!opts.confirmFirstUse) {
+      return requireInput("first_time_repo", "confirmFirstUse");
+    }
+    const updated = changeGraphStatus(config, name, "active");
+    updated.graphs[name].confirmedBy = "automated";
+    return { config: updated };
+  }
+
+  const gated = await gate({
+    mode: opts.mode,
+    reason: "first_time_repo",
+    param: "confirmFirstUse",
+    accepts: ["yes", "no"],
+    timeoutMs: opts.timeoutMs,
+    // Adapts the plain string-returning ask() this function's callers use
+    // (no real blocking elicitation transport exists at this layer yet,
+    // spec §12) to gate()'s real AskResult-returning signature.
+    ask: async () => ({ status: "answered" as const, answer: await opts.ask() }),
+  });
+  if ("error" in gated) return gated; // timeout -- leaves the graph pending, no write
+  if (!("answer" in gated) || gated.answer !== "yes") {
+    return requireInput("first_time_repo", "confirmFirstUse", ["yes", "no"]);
+  }
+  const updated = changeGraphStatus(config, name, "active");
+  updated.graphs[name].confirmedBy = "interactive";
+  return { config: updated };
 }
 
 // ── Broad-ancestor / $HOME / root registration guard (findings doc #21) ──────
@@ -634,7 +685,7 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
   };
 }
 
-export function registerConfigTools(server: McpServer): void {
+export function registerConfigTools(server: McpServer, personalScopeSession: PersonalScopeSession = new PersonalScopeSession()): void {
   // ── kg_config_init ──────────────────────────────────────────────
   server.tool(
     "kg_config_init",
@@ -731,8 +782,15 @@ export function registerConfigTools(server: McpServer): void {
         .enum(["project", "user"])
         .optional()
         .describe("project (default, cwd-resolved) or user (the personal knowledge graph)"),
+      confirmPersonalScope: z
+        .boolean()
+        .optional()
+        .describe(
+          "Confirms this repo may write to the personal knowledge graph. Required once per " +
+            "process before a scope:\"user\" write is honored for a repo not yet confirmed."
+        ),
     },
-    async (params) => handleConfigAddCategory(params)
+    async (params) => handleConfigAddCategory(params, personalScopeSession)
   );
 
   // ── kg_config_remint_id ───────────────────────────────────────────
@@ -754,6 +812,7 @@ export interface HandleConfigAddCategoryParams {
   prefix?: string | null;
   git?: "commit" | "ignore";
   scope?: "project" | "user";
+  confirmPersonalScope?: boolean;
 }
 
 export interface HandleConfigAddCategoryResult {
@@ -762,10 +821,11 @@ export interface HandleConfigAddCategoryResult {
   isError?: true;
 }
 
-export function handleConfigAddCategory(
-  params: HandleConfigAddCategoryParams
-): HandleConfigAddCategoryResult {
-  const { name: catName, prefix = null, git = "commit", scope } = params;
+export async function handleConfigAddCategory(
+  params: HandleConfigAddCategoryParams,
+  personalScopeSession: PersonalScopeSession = new PersonalScopeSession()
+): Promise<HandleConfigAddCategoryResult> {
+  const { name: catName, prefix = null, git = "commit", scope, confirmPersonalScope } = params;
   const config = readConfig();
 
   // ADR-067 Task 1.9: resolution is context-derived (resolveGraph), not
@@ -784,6 +844,22 @@ export function handleConfigAddCategory(
 
   if ("error" in target) {
     return { content: [{ type: "text" as const, text: `Error: ${target.error}` }], isError: true };
+  }
+
+  // ADR-067 Task 6.4 (spec §11): closes the interim gap left by Task 1.9 --
+  // scope:"user" here reaches the personal graph the same way it does in
+  // search.ts/capture.ts, so the same untrusted-repo-triggers-a-write
+  // concern applies and gets the same gate.
+  if (scope === "user") {
+    const mode = resolveInteractionMode({}).mode;
+    const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
+      confirmPersonalScope,
+      mode,
+      ask: () => new Promise<never>(() => {}),
+    });
+    if (!("confirmed" in confirmed)) {
+      return { content: [{ type: "text" as const, text: JSON.stringify(confirmed) }], isError: true };
+    }
   }
 
   const { name: graphName, graph } = target;

@@ -107,7 +107,9 @@ describe("handleConfigAddCategory", () => {
     const origCwd = process.cwd;
     process.cwd = () => "/completely/unrelated";
 
-    const result = await handleConfigAddCategory({ name: "ml-ops", prefix: null, git: "commit", scope: "user" });
+    // ADR-067 Task 6.4: scope:"user" now routes through confirmPersonalScopeAccess --
+    // confirmPersonalScope:true is required here since this test runs in automated mode.
+    const result = await handleConfigAddCategory({ name: "ml-ops", prefix: null, git: "commit", scope: "user", confirmPersonalScope: true });
     process.cwd = origCwd;
 
     expect(result.isError).toBeUndefined();
@@ -121,6 +123,22 @@ describe("handleConfigAddCategory", () => {
     const result = await handleConfigAddCategory({ name: "ml-ops", prefix: null, git: "commit", scope: "user" });
 
     expect(result.isError).toBe(true);
+  });
+
+  // ADR-067 Task 6.4 (spec §11): scope:"user" reaches the personal graph the
+  // same way it does in search.ts/capture.ts -- same confirmPersonalScopeAccess
+  // gate, same reason string, closing the interim gap left open by Task 1.9.
+  it('scope:"user" from an unconfirmed repo in automated mode returns KMG_INPUT_REQUIRED/personal_scope_unseen_repo', async () => {
+    const projRoot = makeTempDir("proj");
+    const personalRoot = makeTempDir("personal");
+    fs.mkdirSync(path.join(personalRoot, "lessons-learned"), { recursive: true });
+    (readConfig as jest.Mock).mockReturnValue(makeConfig(projRoot, personalRoot));
+
+    const result = await handleConfigAddCategory({ name: "ml-ops", prefix: null, git: "commit", scope: "user" });
+
+    expect(result.isError).toBe(true);
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed).toMatchObject({ error: "KMG_INPUT_REQUIRED", reason: "personal_scope_unseen_repo" });
   });
 });
 

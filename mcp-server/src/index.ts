@@ -26,14 +26,14 @@ const server = new McpServer({
 const personalScopeSession = new PersonalScopeSession();
 
 // Register tools (12 core tools)
-registerConfigTools(server);    // kg_config_init, kg_config_list, kg_config_add_category
+registerConfigTools(server, personalScopeSession);    // kg_config_init, kg_config_list, kg_config_add_category
 registerSearchTool(server, personalScopeSession);     // kg_search
 registerScaffoldTool(server);   // kg_scaffold
 registerSanitizationTool(server); // kg_check_sensitive
-registerFts5Tool(server);       // kg_fts5_rebuild
-registerFts5StatusTool(server); // kg_fts5_status
+registerFts5Tool(server, personalScopeSession);       // kg_fts5_rebuild
+registerFts5StatusTool(server, personalScopeSession); // kg_fts5_status
 registerCaptureTool(server, personalScopeSession);    // kg_capture
-registerUpgradeTool(server);    // kg_upgrade
+registerUpgradeTool(server, personalScopeSession);    // kg_upgrade
 registerVersionTool(server);    // kg_version
 registerCompareTools(server);   // kg_compare_graphs
 

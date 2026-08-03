@@ -4,7 +4,8 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import { readConfig, writeConfig, walkDir } from "../utils.js";
-import { resolveGraph, resolvePersonalGraph } from "../resolution.js";
+import { resolveGraph, resolvePersonalGraph, PersonalScopeSession, confirmPersonalScopeAccess } from "../resolution.js";
+import { resolveInteractionMode } from "../interaction.js";
 
 // Graceful fallback: node-sqlite3-wasm is bundled in dist/node_modules/ for marketplace installs
 // (v0.5.10.3+). This try/catch covers edge cases: partial clone, corrupted dist, or dev runs
@@ -405,7 +406,7 @@ export function searchFts5(
  * Returns { exists: boolean, db_path: string, kgType: string } — read-only probe,
  * never creates directories.
  */
-export function registerFts5StatusTool(server: McpServer): void {
+export function registerFts5StatusTool(server: McpServer, personalScopeSession: PersonalScopeSession = new PersonalScopeSession()): void {
   server.tool(
     "kg_fts5_status",
     "Check whether the FTS5 search index exists for a knowledge graph (default: resolved " +
@@ -416,13 +417,21 @@ export function registerFts5StatusTool(server: McpServer): void {
         .enum(["project", "user"])
         .optional()
         .describe("project (default, cwd-resolved) or user (the personal knowledge graph)"),
+      confirmPersonalScope: z
+        .boolean()
+        .optional()
+        .describe(
+          "Confirms this repo may read the personal knowledge graph. Required once per " +
+            "process before a scope:\"user\" read is honored for a repo not yet confirmed."
+        ),
     },
-    async ({ scope }) => handleFts5Status({ scope })
+    async ({ scope, confirmPersonalScope }) => handleFts5Status({ scope, confirmPersonalScope }, personalScopeSession)
   );
 }
 
 export interface HandleFts5StatusParams {
   scope?: "project" | "user";
+  confirmPersonalScope?: boolean;
 }
 
 export interface HandleFts5StatusResult {
@@ -431,7 +440,10 @@ export interface HandleFts5StatusResult {
   isError?: true;
 }
 
-export function handleFts5Status(params: HandleFts5StatusParams): HandleFts5StatusResult {
+export async function handleFts5Status(
+  params: HandleFts5StatusParams,
+  personalScopeSession: PersonalScopeSession = new PersonalScopeSession()
+): Promise<HandleFts5StatusResult> {
   try {
     const config = readConfig();
     const target = params.scope === "user" ? resolvePersonalGraph(config) : (() => {
@@ -448,6 +460,21 @@ export function handleFts5Status(params: HandleFts5StatusParams): HandleFts5Stat
           text: JSON.stringify({ exists: false, db_path: null, kgType: null, error: target.error }),
         }],
       };
+    }
+
+    // ADR-067 Task 6.4 (spec §11): scope:"user" reaches the personal graph
+    // here the same way it does in search.ts/capture.ts/kg_config_add_category
+    // -- same gate, closing the interim gap left open by Task 1.9.
+    if (params.scope === "user") {
+      const mode = resolveInteractionMode({}).mode;
+      const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
+        confirmPersonalScope: params.confirmPersonalScope,
+        mode,
+        ask: () => new Promise<never>(() => {}),
+      });
+      if (!("confirmed" in confirmed)) {
+        return { content: [{ type: "text" as const, text: JSON.stringify(confirmed) }], isError: true };
+      }
     }
 
     const kgType = target.graph.type ?? "project-local";
@@ -480,7 +507,7 @@ export function handleFts5Status(params: HandleFts5StatusParams): HandleFts5Stat
 /**
  * Registers the `kg_fts5_rebuild` MCP tool.
  */
-export function registerFts5Tool(server: McpServer): void {
+export function registerFts5Tool(server: McpServer, personalScopeSession: PersonalScopeSession = new PersonalScopeSession()): void {
   server.tool(
     "kg_fts5_rebuild",
     "Build or refresh FTS5 full-text search index for a knowledge graph (default: resolved " +
@@ -496,14 +523,22 @@ export function registerFts5Tool(server: McpServer): void {
         .enum(["project", "user"])
         .optional()
         .describe("project (default, cwd-resolved) or user (the personal knowledge graph) — ignored when kgPath is given"),
+      confirmPersonalScope: z
+        .boolean()
+        .optional()
+        .describe(
+          "Confirms this repo may write to the personal knowledge graph. Required once per " +
+            "process before a scope:\"user\" rebuild is honored for a repo not yet confirmed."
+        ),
     },
-    async ({ kgPath, scope }) => handleFts5Rebuild({ kgPath, scope })
+    async ({ kgPath, scope, confirmPersonalScope }) => handleFts5Rebuild({ kgPath, scope, confirmPersonalScope }, personalScopeSession)
   );
 }
 
 export interface HandleFts5RebuildParams {
   kgPath?: string;
   scope?: "project" | "user";
+  confirmPersonalScope?: boolean;
 }
 
 export interface HandleFts5RebuildResult {
@@ -512,7 +547,10 @@ export interface HandleFts5RebuildResult {
   isError?: true;
 }
 
-export function handleFts5Rebuild(params: HandleFts5RebuildParams): HandleFts5RebuildResult {
+export async function handleFts5Rebuild(
+  params: HandleFts5RebuildParams,
+  personalScopeSession: PersonalScopeSession = new PersonalScopeSession()
+): Promise<HandleFts5RebuildResult> {
   if (!fts5Available) {
     return {
       content: [{
@@ -543,6 +581,19 @@ export function handleFts5Rebuild(params: HandleFts5RebuildParams): HandleFts5Re
       })();
       if ("error" in target) {
         return { content: [{ type: "text" as const, text: `Error: ${target.error}` }], isError: true };
+      }
+      // ADR-067 Task 6.4 (spec §11): scope:"user" (no kgPath override) reaches
+      // the personal graph -- same gate as kg_fts5_status/search.ts/capture.ts.
+      if (params.scope === "user") {
+        const mode = resolveInteractionMode({}).mode;
+        const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
+          confirmPersonalScope: params.confirmPersonalScope,
+          mode,
+          ask: () => new Promise<never>(() => {}),
+        });
+        if (!("confirmed" in confirmed)) {
+          return { content: [{ type: "text" as const, text: JSON.stringify(confirmed) }], isError: true };
+        }
       }
       resolvedPath = target.graph.path.replace(/^~/, os.homedir());
       resolvedName = target.name;

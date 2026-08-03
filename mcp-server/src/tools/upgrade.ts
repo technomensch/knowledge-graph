@@ -4,7 +4,8 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import { readConfig, writeConfig, getPluginRoot } from "../utils.js";
-import { resolveGraph, resolvePersonalGraph } from "../resolution.js";
+import { resolveGraph, resolvePersonalGraph, PersonalScopeSession, confirmPersonalScopeAccess } from "../resolution.js";
+import { resolveInteractionMode } from "../interaction.js";
 import { handleVersion } from "./version.js";
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -649,6 +650,7 @@ export interface HandleUpgradeParams {
   apply?: ApplyCategory[];
   confirm_platform_split?: boolean;
   scope?: "project" | "user";
+  confirmPersonalScope?: boolean;
 }
 
 export interface HandleUpgradeResult {
@@ -657,7 +659,10 @@ export interface HandleUpgradeResult {
   isError?: true;
 }
 
-export async function handleUpgrade(params: HandleUpgradeParams): Promise<HandleUpgradeResult> {
+export async function handleUpgrade(
+  params: HandleUpgradeParams,
+  personalScopeSession: PersonalScopeSession = new PersonalScopeSession()
+): Promise<HandleUpgradeResult> {
   // Under Jest/ts-jest __SERVER_VERSION__ is undefined → installedVersion = "0.0.0"
   const installedVersion = handleVersion().installed;
   const config = readConfig();
@@ -673,6 +678,24 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
       ? { name: resolution.name, graph: resolution.graph }
       : { error: "No knowledge graph resolved from your current directory. Use kg_config_init first, or pass scope=\"user\"." };
   })();
+
+  // ADR-067 Task 6.4 (spec §11): scope:"user" reaches the personal graph
+  // here the same way it does in search.ts/capture.ts/kg_config_add_category/
+  // kg_fts5_status/kg_fts5_rebuild -- same gate, closing the interim gap
+  // left open by Task 1.9. Only gated when resolution actually succeeded --
+  // an unresolved target already short-circuits into its own inspect-only
+  // "resolution" warning below and never touches the graph.
+  if (params.scope === "user" && !("error" in target)) {
+    const mode = resolveInteractionMode({}).mode;
+    const confirmed = await confirmPersonalScopeAccess(personalScopeSession, process.cwd(), {
+      confirmPersonalScope: params.confirmPersonalScope,
+      mode,
+      ask: () => new Promise<never>(() => {}),
+    });
+    if (!("confirmed" in confirmed)) {
+      return { content: [{ type: "text" as const, text: JSON.stringify(confirmed) }], isError: true };
+    }
+  }
 
   const applyList = params.apply ?? [];
   const sortedApplyList = [...applyList].sort(
@@ -791,7 +814,7 @@ export async function handleUpgrade(params: HandleUpgradeParams): Promise<Handle
 
 // ── Tool registration ────────────────────────────────────────────────────────
 
-export function registerUpgradeTool(server: McpServer): void {
+export function registerUpgradeTool(server: McpServer, personalScopeSession: PersonalScopeSession = new PersonalScopeSession()): void {
   server.tool(
     "kg_upgrade",
     "Inspect and apply KMGraph upgrades for MCP-only installations",
@@ -814,9 +837,16 @@ export function registerUpgradeTool(server: McpServer): void {
         .enum(["project", "user"])
         .optional()
         .describe("project (default, cwd-resolved) or user (the personal knowledge graph)"),
+      confirmPersonalScope: z
+        .boolean()
+        .optional()
+        .describe(
+          "Confirms this repo may touch the personal knowledge graph. Required once per " +
+            "process before a scope:\"user\" upgrade is honored for a repo not yet confirmed."
+        ),
     },
-    async ({ apply, confirm_platform_split, scope }) => {
-      return handleUpgrade({ apply: apply as ApplyCategory[] | undefined, confirm_platform_split, scope });
+    async ({ apply, confirm_platform_split, scope, confirmPersonalScope }) => {
+      return handleUpgrade({ apply: apply as ApplyCategory[] | undefined, confirm_platform_split, scope, confirmPersonalScope }, personalScopeSession);
     }
   );
 }
