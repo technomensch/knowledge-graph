@@ -1,7 +1,7 @@
 ---
 id: issue-15
 type: Bug
-status: tracked
+status: resolved
 github-issue: "#172"
 created: 2026-07-16
 related-issues: [issue-14]
@@ -55,9 +55,10 @@ Scale: single small branch, TDD (red test → fix → green), no ADR or cross-ti
 
 Independently reviewed by Claude Opus (different model from the implementer): verdict **✅ Correct as-is**, zero Critical/Important findings, two minor informational notes (neither requiring change — confirmed no `config.graphs` null-crash risk, confirmed the two updated assertions correctly exercise the fallback branch). Opus re-ran the test suite and typecheck independently rather than trusting the report; both green. No further pass needed.
 
-Not pushed, no PR — awaiting user go-ahead.
+**Resolved (2026-08-03).** Pushed on branch `v0.6.19` (with author/committer email corrected to the noreply address to satisfy GitHub's push-privacy check), opened as [PR #203](https://github.com/technomensch/knowledge-graph/pull/203), merged to `main` at commit `39c32517`.
+
+GitHub issue **#172** is closed — but not by this PR's `Closes #172` reference as originally planned; it was already closed independently on 2026-07-16, before PR #203 existed. The `Closes #172` reference in the PR body was a no-op since the issue was already in the closed state by the time of merge.
 
 ## Open Items
 
-- [ ] Push branch `v0.6.19` to `origin`, open PR
-- [ ] After merge, close GitHub issue **#172** (this issue's tracked GH counterpart) — not auto-closed since no `Closes #172` reference exists in the fix commit (`fb8bf665`)
+None — closed out.
