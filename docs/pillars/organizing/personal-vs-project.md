@@ -49,7 +49,7 @@ These files are the platform-agnostic foundation that all AI platform config fil
 | **`/kmgraph:kmg-recall`** | Searches both KGs automatically when a personal KG is registered. Results show `[project]` or `[personal]` source labels. |
 | **`/kmgraph:kmg-capture-lesson`** | Shows a KG picker when ≥2 KGs are registered. Only one prompt per session (choice remembered). |
 | **SessionStart hook** | Surfaces recent personal KG lessons alongside project lessons. |
-| **Target KG** | Resolved from your current working directory for every call — no global "active" pointer to keep in sync. Running from inside a project directory targets that project's KG by default; see [`[personal]`/`[project]` markers](#personal-project-markers-in-search-and-capture) below to reach the other scope without changing directories. |
+| **Target KG** | Resolved from the current working directory for every call — no global "active" pointer to keep in sync. Running from inside a project directory targets that project's KG by default; see [`[personal]`/`[project]` markers](#personal-project-markers-in-search-and-capture) below to reach the other scope without changing directories. |
 
 ## When to use personal vs project
 
@@ -96,7 +96,7 @@ All capture commands (`session-summary`, `create-adr`, `capture-lesson`, `sync-a
 | `--user` / "user level" / "for the user" | Personal KG (`~/.kmgraph/`) | Writes directly; bypasses cwd resolution entirely |
 | `--project` / "for this project" / "project level" | Current project's KG | Resolves the project KG for the current directory; no directory change needed |
 | `--named=<kg>` / name of a KG (e.g., "career-ops") | Named KG from `kg-config.json` | Writes to named KG directly, by name, regardless of cwd |
-| (no signal) | The KG resolved from your current working directory | Default behavior; every draft shows `Saving to: {path}` for confirmation |
+| (no signal) | The KG resolved from the current working directory | Default behavior; every draft shows `Saving to: {path}` for confirmation |
 
 **Examples:**
 
@@ -126,7 +126,7 @@ Only the exact bracketed literal at the very start of the string is recognized �
 
 The marker is stripped from the text before it's used as the search query or capture content, and it only affects the single call it's attached to — a marker on one `kg_search` call does not change where the next call resolves. This scope override is **interactive-mode only**: automated/scripted calls (see [KMG_INPUT_REQUIRED](/reference/PLATFORM-ADAPTATION#kmg_input_required-error-contract)) ignore any bracketed prefix and always resolve from cwd/explicit parameters, so an untrusted string can't silently redirect a scripted call to the personal KG.
 
-The first time a marker (or `scope: "user"`) reaches the personal KG from a repository the session hasn't touched before, a one-time confirmation is required before the personal KG is read or written — this is a distinct, per-repository confirmation, separate from the marker parsing itself, and exists to stop a crafted instruction embedded in a freshly-cloned untrusted repo from silently reaching your personal KG.
+The first time a marker (or `scope: "user"`) reaches the personal KG from a repository the session hasn't touched before, a one-time confirmation is required before the personal KG is read or written — this is a distinct, per-repository confirmation, separate from the marker parsing itself, and exists to stop a crafted instruction embedded in a freshly-cloned untrusted repo from silently reaching the personal KG.
 
 ## Setup
 

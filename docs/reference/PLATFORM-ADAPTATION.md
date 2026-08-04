@@ -331,8 +331,8 @@ This is process-lifetime state only — nothing is written to disk, so a new ser
 
 Registering a new knowledge graph (`kg_config_init`, or the `kmg-init` CLI wizard) is checked against two guards before the directory is scaffolded:
 
-- **Hard block, no override:** registering a KG whose path *is* your home directory or the filesystem root is refused outright — there is no confirmation parameter that overrides this. A path this broad would resolve as "the KG for" nearly every directory on the machine.
-- **Broad-ancestor warning, confirmable:** registering a KG whose path is an ancestor of one or more *already-registered* KGs (but isn't `$HOME`/root itself) is not blocked, but requires confirmation — the new registration would make every command run from inside those existing KGs' directories ambiguous about which KG they resolve to. Automated callers pass `confirmBroadRegistration: true` to proceed (or get `KMG_INPUT_REQUIRED` with `reason: "broad_ancestor_registration"` and a `detail` listing the affected KG names otherwise); interactive callers are asked `yes`/`no` with the same detail.
+- **Hard block, no override:** registering a KG whose path *is* the user's home directory or the filesystem root is refused outright — there is no confirmation parameter that overrides this. A path this broad would resolve as "the KG for" nearly every directory on the machine.
+- **Broad-ancestor warning, confirmable:** registering a KG whose path is an ancestor of one or more *already-registered* KGs (but isn't `$HOME`/root itself) is not blocked, but requires confirmation — the new registration would make every command run from inside those existing KGs' directories ambiguous about which KG they resolve to. Automated callers pass `confirmBroadRegistration: "yes"` to proceed (or get `KMG_INPUT_REQUIRED` with `reason: "broad_ancestor_registration"` and a `detail` listing the affected KG names otherwise); interactive callers are asked `yes`/`no` with the same detail.
 
 Neither guard existed in 0.6.x, where a new registration was scaffolded unconditionally regardless of how broad or narrow its path was relative to other registered graphs.
 
