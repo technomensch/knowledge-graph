@@ -2984,7 +2984,7 @@ var require_compile = __commonJS({
       const schOrFunc = root.refs[ref];
       if (schOrFunc)
         return schOrFunc;
-      let _sch = resolve6.call(this, root, ref);
+      let _sch = resolve7.call(this, root, ref);
       if (_sch === void 0) {
         const schema = (_a2 = root.localRefs) === null || _a2 === void 0 ? void 0 : _a2[ref];
         const { schemaId } = this.opts;
@@ -3011,7 +3011,7 @@ var require_compile = __commonJS({
     function sameSchemaEnv(s1, s2) {
       return s1.schema === s2.schema && s1.root === s2.root && s1.baseId === s2.baseId;
     }
-    function resolve6(root, ref) {
+    function resolve7(root, ref) {
       let sch;
       while (typeof (sch = this.refs[ref]) == "string")
         ref = sch;
@@ -3736,7 +3736,7 @@ var require_fast_uri = __commonJS({
       }
       return uri;
     }
-    function resolve6(baseURI, relativeURI, options) {
+    function resolve7(baseURI, relativeURI, options) {
       const schemelessOptions = options ? Object.assign({ scheme: "null" }, options) : { scheme: "null" };
       const resolved = resolveComponent(parse4(baseURI, schemelessOptions), parse4(relativeURI, schemelessOptions), schemelessOptions, true);
       schemelessOptions.skipEscape = true;
@@ -3999,7 +3999,7 @@ var require_fast_uri = __commonJS({
     var fastUri = {
       SCHEMES,
       normalize,
-      resolve: resolve6,
+      resolve: resolve7,
       resolveComponent,
       equal,
       serialize,
@@ -28163,7 +28163,7 @@ var Protocol = class {
           return;
         }
         const pollInterval = task2.pollInterval ?? this._options?.defaultTaskPollInterval ?? 1e3;
-        await new Promise((resolve6) => setTimeout(resolve6, pollInterval));
+        await new Promise((resolve7) => setTimeout(resolve7, pollInterval));
         options?.signal?.throwIfAborted();
       }
     } catch (error48) {
@@ -28180,7 +28180,7 @@ var Protocol = class {
    */
   request(request, resultSchema, options) {
     const { relatedRequestId, resumptionToken, onresumptiontoken, task, relatedTask } = options ?? {};
-    return new Promise((resolve6, reject) => {
+    return new Promise((resolve7, reject) => {
       const earlyReject = (error48) => {
         reject(error48);
       };
@@ -28258,7 +28258,7 @@ var Protocol = class {
           if (!parseResult.success) {
             reject(parseResult.error);
           } else {
-            resolve6(parseResult.data);
+            resolve7(parseResult.data);
           }
         } catch (error48) {
           reject(error48);
@@ -28519,12 +28519,12 @@ var Protocol = class {
       }
     } catch {
     }
-    return new Promise((resolve6, reject) => {
+    return new Promise((resolve7, reject) => {
       if (signal.aborted) {
         reject(new McpError(ErrorCode.InvalidRequest, "Request cancelled"));
         return;
       }
-      const timeoutId = setTimeout(resolve6, interval);
+      const timeoutId = setTimeout(resolve7, interval);
       signal.addEventListener("abort", () => {
         clearTimeout(timeoutId);
         reject(new McpError(ErrorCode.InvalidRequest, "Request cancelled"));
@@ -29705,7 +29705,7 @@ var McpServer = class {
     let task = createTaskResult.task;
     const pollInterval = task.pollInterval ?? 5e3;
     while (task.status !== "completed" && task.status !== "failed" && task.status !== "cancelled") {
-      await new Promise((resolve6) => setTimeout(resolve6, pollInterval));
+      await new Promise((resolve7) => setTimeout(resolve7, pollInterval));
       const updatedTask = await extra.taskStore.getTask(taskId);
       if (!updatedTask) {
         throw new McpError(ErrorCode.InternalError, `Task ${taskId} not found during polling`);
@@ -30372,12 +30372,12 @@ var StdioServerTransport = class {
     this.onclose?.();
   }
   send(message) {
-    return new Promise((resolve6) => {
+    return new Promise((resolve7) => {
       const json2 = serializeMessage(message);
       if (this._stdout.write(json2)) {
-        resolve6();
+        resolve7();
       } else {
-        this._stdout.once("drain", resolve6);
+        this._stdout.once("drain", resolve7);
       }
     });
   }
@@ -30609,6 +30609,15 @@ function findRegistryEntryByGraphId(config2, graphId) {
   }
   return null;
 }
+function checkGraphPathHealth(graph) {
+  const expanded = graph.path.replace(/^~/, os.homedir());
+  const parent = path.dirname(expanded);
+  if (!fs.existsSync(parent)) return "parent-unreachable";
+  if (!fs.existsSync(expanded)) return "content-missing";
+  const entries = fs.readdirSync(expanded);
+  if (entries.length === 0) return "content-missing";
+  return "ok";
+}
 function getPluginRoot() {
   return process.env.CLAUDE_PLUGIN_ROOT || path.resolve(__dirname, "..", "..");
 }
@@ -30773,10 +30782,10 @@ async function gate(opts) {
   const timeoutMs = opts.timeoutMs ?? 3e4;
   const controller = new AbortController();
   let timeoutHandle;
-  const timeout = new Promise((resolve6) => {
+  const timeout = new Promise((resolve7) => {
     timeoutHandle = setTimeout(() => {
       controller.abort();
-      resolve6(requireInput(`${opts.reason}_timeout`, opts.param, opts.accepts, opts.detail));
+      resolve7(requireInput(`${opts.reason}_timeout`, opts.param, opts.accepts, opts.detail));
     }, timeoutMs);
   });
   const asked = Promise.resolve().then(() => opts.ask(controller.signal, opts.detail));
@@ -30941,8 +30950,18 @@ async function resolveGraphOutcome(config2, resolution, cwd, mode) {
     });
     if (!("answer" in gated2)) return { kind: "gated", result: gated2 };
     if (gated2.answer === "restore") {
+      const health = checkGraphPathHealth(resolution.graph);
       updateConfig((cfg) => changeGraphStatus(cfg, resolution.name, "active"));
-      return { kind: "resolved", name: resolution.name, graph: { ...resolution.graph, status: "active" } };
+      const restoredGraph = { ...resolution.graph, status: "active" };
+      if (health !== "ok") {
+        return {
+          kind: "resolved",
+          name: resolution.name,
+          graph: restoredGraph,
+          notice: `'${resolution.name}' was restored to active, but its registered path looks ${health} (${restoredGraph.path}) -- verify the path before relying on this graph.`
+        };
+      }
+      return { kind: "resolved", name: resolution.name, graph: restoredGraph };
     }
     return { kind: "resolved", name: resolution.name, graph: resolution.graph };
   }
@@ -31168,6 +31187,55 @@ function findBroadAncestorWarning(config2, kgPath) {
   if (ancestorOfNames.length === 0) return null;
   return { isAncestorOfCount: ancestorOfNames.length, ancestorOfNames };
 }
+function resolveRegistrationGuard(config2, kgPath) {
+  const expandedPath = kgPath.replace(/^~/, os3.homedir());
+  return {
+    expandedPath,
+    hardBlocked: isHardBlockedRegistrationPath(expandedPath),
+    broadWarning: findBroadAncestorWarning(config2, expandedPath)
+  };
+}
+function scaffoldGraphDirectory(expandedPath, categories) {
+  const dirs = ["knowledge", "lessons-learned", "decisions", "sessions", "chat-history", "tmp"];
+  for (const dir of dirs) {
+    fs4.mkdirSync(path4.join(expandedPath, dir), { recursive: true });
+  }
+  for (const cat of categories) {
+    fs4.mkdirSync(path4.join(expandedPath, "lessons-learned", cat.name), { recursive: true });
+  }
+  const pluginRoot = getPluginRoot();
+  const templateSrc = path4.join(pluginRoot, "core", "default-templates");
+  let templatesCopied = 0;
+  if (!fs4.existsSync(templateSrc)) return templatesCopied;
+  const copyIfMissing = (src, dest) => {
+    if (fs4.existsSync(src) && !fs4.existsSync(dest)) {
+      fs4.copyFileSync(src, dest);
+      templatesCopied++;
+    }
+  };
+  const knowledgeTemplates = ["patterns.md", "gotchas.md", "concepts.md", "architecture.md", "workflows.md"];
+  for (const t of knowledgeTemplates) {
+    copyIfMissing(path4.join(templateSrc, "knowledge", "templates", t), path4.join(expandedPath, "knowledge", t));
+  }
+  for (const t of ["README.md", "lesson-template.md"]) {
+    copyIfMissing(path4.join(templateSrc, "lessons-learned", t), path4.join(expandedPath, "lessons-learned", t));
+  }
+  for (const t of ["README.md", "ADR-template.md"]) {
+    copyIfMissing(path4.join(templateSrc, "decisions", t), path4.join(expandedPath, "decisions", t));
+  }
+  copyIfMissing(
+    path4.join(templateSrc, "sessions", "session-template.md"),
+    path4.join(expandedPath, "sessions", "session-template.md")
+  );
+  for (const f of ["me.md", "rules.md", "kg-index.md", "triggers.md"]) {
+    copyIfMissing(path4.join(templateSrc, "knowledge", f), path4.join(expandedPath, f));
+  }
+  copyIfMissing(
+    path4.join(templateSrc, "knowledge", "kg-category-index.md"),
+    path4.join(expandedPath, "knowledge", "kg-category-index.md")
+  );
+  return templatesCopied;
+}
 async function handleConfigInit({ name, kgPath, type, categories, interaction, confirmMerge, confirmBroadRegistration }) {
   const config2 = readConfig();
   if (config2.graphs[name]) {
@@ -31181,8 +31249,8 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
       isError: true
     };
   }
-  const expandedPath = kgPath.replace(/^~/, os3.homedir());
-  if (isHardBlockedRegistrationPath(expandedPath)) {
+  const { expandedPath, hardBlocked, broadWarning } = resolveRegistrationGuard(config2, kgPath);
+  if (hardBlocked) {
     return {
       content: [{
         type: "text",
@@ -31191,7 +31259,6 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
       isError: true
     };
   }
-  const broadWarning = findBroadAncestorWarning(config2, expandedPath);
   if (broadWarning) {
     let broadAnswer = confirmBroadRegistration;
     if (!broadAnswer) {
@@ -31423,77 +31490,7 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
       }
     }
   }
-  const dirs = [
-    "knowledge",
-    "lessons-learned",
-    "decisions",
-    "sessions",
-    "chat-history",
-    "tmp"
-  ];
-  for (const dir of dirs) {
-    fs4.mkdirSync(path4.join(expandedPath, dir), { recursive: true });
-  }
-  for (const cat of categories) {
-    fs4.mkdirSync(
-      path4.join(expandedPath, "lessons-learned", cat.name),
-      { recursive: true }
-    );
-  }
-  const pluginRoot = getPluginRoot();
-  const templateSrc = path4.join(pluginRoot, "core", "default-templates");
-  if (fs4.existsSync(templateSrc)) {
-    const knowledgeTemplates = [
-      "patterns.md",
-      "gotchas.md",
-      "concepts.md",
-      "architecture.md",
-      "workflows.md"
-    ];
-    for (const t of knowledgeTemplates) {
-      const src = path4.join(templateSrc, "knowledge", "templates", t);
-      const dest = path4.join(expandedPath, "knowledge", t);
-      if (fs4.existsSync(src) && !fs4.existsSync(dest)) {
-        fs4.copyFileSync(src, dest);
-      }
-    }
-    const lessonSrc = path4.join(templateSrc, "lessons-learned");
-    const lessonDest = path4.join(expandedPath, "lessons-learned");
-    for (const t of ["README.md", "lesson-template.md"]) {
-      const src = path4.join(lessonSrc, t);
-      const dest = path4.join(lessonDest, t);
-      if (fs4.existsSync(src) && !fs4.existsSync(dest)) {
-        fs4.copyFileSync(src, dest);
-      }
-    }
-    const adrSrc = path4.join(templateSrc, "decisions");
-    const adrDest = path4.join(expandedPath, "decisions");
-    for (const t of ["README.md", "ADR-template.md"]) {
-      const src = path4.join(adrSrc, t);
-      const dest = path4.join(adrDest, t);
-      if (fs4.existsSync(src) && !fs4.existsSync(dest)) {
-        fs4.copyFileSync(src, dest);
-      }
-    }
-    const sessSrc = path4.join(templateSrc, "sessions", "session-template.md");
-    const sessDest = path4.join(expandedPath, "sessions", "session-template.md");
-    if (fs4.existsSync(sessSrc) && !fs4.existsSync(sessDest)) {
-      fs4.copyFileSync(sessSrc, sessDest);
-    }
-    const rootScaffolds = ["me.md", "rules.md", "kg-index.md", "triggers.md"];
-    for (const f of rootScaffolds) {
-      const src = path4.join(templateSrc, "knowledge", f);
-      const dest = path4.join(expandedPath, f);
-      if (fs4.existsSync(src) && !fs4.existsSync(dest)) {
-        fs4.copyFileSync(src, dest);
-      }
-    }
-    const catIndexSrc = path4.join(templateSrc, "knowledge", "kg-category-index.md");
-    const catIndexDest = path4.join(expandedPath, "knowledge", "kg-category-index.md");
-    if (fs4.existsSync(catIndexSrc) && !fs4.existsSync(catIndexDest)) {
-      fs4.copyFileSync(catIndexSrc, catIndexDest);
-    }
-  }
+  scaffoldGraphDirectory(expandedPath, categories);
   const now = (/* @__PURE__ */ new Date()).toISOString();
   const newGraphId = mintGraphId();
   const existingMarkerId = readGraphIdMarker(expandedPath);
@@ -31729,6 +31726,14 @@ function resolveDbPath(kgName, kgType) {
   if (kgType === "project-local" || kgType === "project") return getProjectDbPath(kgName);
   console.warn(`resolveDbPath: unknown kgType "${kgType}", defaulting to project-local`);
   return getProjectDbPath(kgName);
+}
+function normalizeForFts5Scope(p) {
+  const expanded = p.replace(/^~/, os4.homedir());
+  try {
+    return fs5.realpathSync(expanded);
+  } catch {
+    return path5.resolve(expanded);
+  }
 }
 function sanitizeFts5Query(raw) {
   let sanitized = raw.replace(/[":(){}[\]^~*+\\]/g, " ").replace(/\s+/g, " ").trim();
@@ -32025,6 +32030,22 @@ async function handleFts5Rebuild(params, personalScopeSession2 = new PersonalSco
         ([, g]) => g.path === resolvedPath
       );
       resolvedName = matchedEntry ? matchedEntry[0] : path5.basename(resolvedPath);
+      const personalGraphPaths = Object.values(config2.graphs || {}).filter((g) => g.type === "personal" && g.status !== "deleted").map((g) => normalizeForFts5Scope(g.path));
+      const kgPathTouchesPersonal = personalGraphPaths.some(
+        (p) => isAncestorOrEqual(p, normalizeForFts5Scope(resolvedPath))
+      );
+      if (kgPathTouchesPersonal) {
+        const mode = resolveInteractionMode({}).mode;
+        const confirmed = await confirmPersonalScopeAccess(personalScopeSession2, cwd, {
+          confirmPersonalScope: params.confirmPersonalScope,
+          mode,
+          timeoutMs: STUB_ASK_TIMEOUT_MS,
+          ask: stubAsk
+        });
+        if (!("confirmed" in confirmed)) {
+          return { content: [{ type: "text", text: JSON.stringify(confirmed) }], isError: true };
+        }
+      }
     } else {
       const target = params.scope === "user" ? resolvePersonalGraph(config2) : (() => {
         const resolution = resolveGraph(config2, cwd);
@@ -33361,6 +33382,8 @@ function registerVersionTool(server2) {
 
 // src/tools/upgrade.ts
 var APPLY_ORDER = [
+  "status-schema",
+  // ADR-067 Task 8.1: reconcile old .active/legacy schema before anything else touches the registry
   "config-location",
   // must run before anything else reads config from the new path
   "directories",
@@ -33736,6 +33759,128 @@ function checkConfigLocation() {
     }
   ];
 }
+function checkStatusSchema() {
+  const config2 = readConfig();
+  const rawConfig = config2;
+  const hasTopLevelActive = rawConfig.active !== void 0;
+  const graphsNeedingMigration = Object.entries(config2.graphs).filter(([, g]) => {
+    const graph = g;
+    return graph.status === void 0 || graph.statusChangedAt === void 0 || graph.graphId === void 0;
+  }).map(([name]) => name);
+  const homeDir = process.env.HOME || os9.homedir();
+  const legacyPath = path11.join(homeDir, ".claude", "kg-config.json");
+  const legacyFileExists = !process.env.KG_CONFIG_PATH && fs11.existsSync(legacyPath);
+  if (!hasTopLevelActive && graphsNeedingMigration.length === 0 && !legacyFileExists) return [];
+  const reasons = [];
+  if (hasTopLevelActive) reasons.push("top-level 'active' key still present");
+  if (graphsNeedingMigration.length > 0) {
+    reasons.push(`${graphsNeedingMigration.length} graph(s) missing status/statusChangedAt/graphId: ${graphsNeedingMigration.join(", ")}`);
+  }
+  if (legacyFileExists) reasons.push(`legacy config file still exists at ${legacyPath}`);
+  return [
+    {
+      category: "status-schema",
+      description: `ADR-067 schema migration needed: ${reasons.join("; ")}`,
+      details: `Run with apply: ["status-schema"] and confirmMigration: true (interactive callers will instead be asked to confirm) to migrate every graph to the status/graphId schema and remove the legacy config file. A backup of both files is written to ${path11.join(path11.dirname(CONFIG_PATH), "backups")} before any change, regardless of whether migration is ultimately confirmed.`
+    }
+  ];
+}
+function backupStatusSchemaFiles() {
+  const backupDir = path11.join(path11.dirname(CONFIG_PATH), "backups");
+  fs11.mkdirSync(backupDir, { recursive: true });
+  const ts = (/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-");
+  const configBackupPath = path11.join(backupDir, `kg-config-${ts}.json`);
+  const onDiskBytes = fs11.existsSync(CONFIG_PATH) ? fs11.readFileSync(CONFIG_PATH) : Buffer.from("{}", "utf-8");
+  fs11.writeFileSync(configBackupPath, onDiskBytes);
+  const homeDir = process.env.HOME || os9.homedir();
+  const legacyPath = path11.join(homeDir, ".claude", "kg-config.json");
+  let legacyBackupPath;
+  if (fs11.existsSync(legacyPath)) {
+    legacyBackupPath = path11.join(backupDir, `kg-config-legacy-${ts}.json`);
+    fs11.writeFileSync(legacyBackupPath, fs11.readFileSync(legacyPath));
+  }
+  return { configBackupPath, legacyBackupPath };
+}
+async function confirmStatusSchemaMigration(opts) {
+  if (opts.confirmMigration === true) return { confirmed: true };
+  if (opts.mode === "automated") {
+    return requireInput("status_schema_migration", "confirmMigration");
+  }
+  const gated = await gate({
+    mode: opts.mode,
+    reason: "status_schema_migration",
+    param: "confirmMigration",
+    accepts: ["yes", "no"],
+    timeoutMs: opts.timeoutMs,
+    ask: stubAsk
+    // no real ask() transport yet, same pattern as every other gate() stub in this plan
+  });
+  if ("error" in gated) return gated;
+  if (!("answer" in gated) || gated.answer !== "yes") {
+    return requireInput("status_schema_migration", "confirmMigration", ["yes", "no"]);
+  }
+  return { confirmed: true };
+}
+function performStatusSchemaMigration() {
+  const config2 = readConfig();
+  const migratedGraphs = [];
+  const needsAttention = [];
+  for (const [name, g] of Object.entries(config2.graphs)) {
+    const graph = g;
+    let touched = false;
+    if (graph.status === void 0) {
+      const health = checkGraphPathHealth(g);
+      if (health === "ok") {
+        graph.status = "active";
+        graph.statusChangedAt = (/* @__PURE__ */ new Date()).toISOString();
+        touched = true;
+      } else {
+        needsAttention.push({ name, health });
+      }
+    } else if (graph.statusChangedAt === void 0) {
+      graph.statusChangedAt = (/* @__PURE__ */ new Date()).toISOString();
+      touched = true;
+    }
+    if (graph.graphId === void 0) {
+      const kgPath = graph.path.replace(/^~/, os9.homedir());
+      const pathExists = fs11.existsSync(kgPath);
+      const existingMarker = pathExists ? readGraphIdMarker(kgPath) : null;
+      const graphId = existingMarker ?? mintGraphId();
+      graph.graphId = graphId;
+      if (pathExists) {
+        try {
+          writeGraphIdMarker(kgPath, graphId);
+        } catch {
+        }
+      }
+      touched = true;
+    }
+    if (touched) migratedGraphs.push(name);
+  }
+  const rawConfig = config2;
+  const hadTopLevelActive = rawConfig.active !== void 0;
+  delete rawConfig.active;
+  writeConfig(config2);
+  const homeDir = process.env.HOME || os9.homedir();
+  const legacyPath = path11.join(homeDir, ".claude", "kg-config.json");
+  let legacyRemoved = false;
+  if (!process.env.KG_CONFIG_PATH && fs11.existsSync(legacyPath)) {
+    fs11.unlinkSync(legacyPath);
+    legacyRemoved = true;
+  }
+  const parts = [];
+  parts.push(
+    migratedGraphs.length > 0 ? `Migrated schema for: ${migratedGraphs.join(", ")}` : "All graphs already on current schema"
+  );
+  if (hadTopLevelActive) parts.push("Removed top-level 'active' key");
+  if (legacyRemoved) parts.push(`Removed legacy config file at ${legacyPath}`);
+  if (needsAttention.length > 0) {
+    parts.push(
+      `Needs attention -- NOT auto-activated (path unhealthy, status left unset, resolve and re-run): ` + needsAttention.map((n) => `${n.name} (${n.health})`).join(", ")
+    );
+  }
+  return parts.join(". ");
+}
 var STRAY_KNOWLEDGE_TEMPLATE_FILES = [
   "architecture.md",
   "concepts.md",
@@ -33877,6 +34022,7 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
   );
   if (applyList.length === 0) {
     const result = { upgrades: [], warnings: [] };
+    result.upgrades.push(...checkStatusSchema());
     result.upgrades.push(...checkConfigLocation());
     if ("error" in target) {
       result.upgrades.push({
@@ -33908,13 +34054,27 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
   let appliedAnyGraphDependent = false;
   let anyCategoryFailed = false;
   const resolvedKgPathForApply = !("error" in target) ? target.graph.path.replace(/^~/, os9.homedir()) : void 0;
-  if (resolvedKgPathForApply && !fs11.existsSync(resolvedKgPathForApply) && sortedApplyList.some((c) => c !== "config-location")) {
+  if (resolvedKgPathForApply && !fs11.existsSync(resolvedKgPathForApply) && sortedApplyList.some((c) => c !== "config-location" && c !== "status-schema")) {
     return {
       content: [{ type: "text", text: `Error: KG path not found: ${resolvedKgPathForApply}` }],
       isError: true
     };
   }
   for (const category of sortedApplyList) {
+    if (category === "status-schema") {
+      backupStatusSchemaFiles();
+      const mode = resolveInteractionMode({}).mode;
+      const confirmation = await confirmStatusSchemaMigration({
+        mode,
+        confirmMigration: params.confirmMigration,
+        timeoutMs: STUB_ASK_TIMEOUT_MS
+      });
+      if (!("confirmed" in confirmation)) {
+        return { content: [{ type: "text", text: JSON.stringify(confirmation) }], isError: true };
+      }
+      results.push(`[status-schema] ${performStatusSchemaMigration()}`);
+      continue;
+    }
     if (category === "config-location") {
       results.push(`[config-location] ${applyConfigLocation()}`);
       continue;
@@ -33966,8 +34126,8 @@ function registerUpgradeTool(server2, personalScopeSession2) {
     "kg_upgrade",
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
-      apply: external_exports3.array(external_exports3.enum(["config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"])).optional().default([]).describe(
-        'Categories to apply. Omit or pass [] to inspect only. Values: "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"'
+      apply: external_exports3.array(external_exports3.enum(["status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"])).optional().default([]).describe(
+        'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"'
       ),
       confirm_platform_split: external_exports3.boolean().optional().default(false).describe(
         "Must be true to apply platform-split migration (removes content from rules.md)"
@@ -33975,11 +34135,14 @@ function registerUpgradeTool(server2, personalScopeSession2) {
       scope: external_exports3.enum(["project", "user"]).optional().describe("project (default, cwd-resolved) or user (the personal knowledge graph)"),
       confirmPersonalScope: external_exports3.boolean().optional().describe(
         'Confirms this repo may touch the personal knowledge graph. Required once per process before a scope:"user" upgrade is honored for a repo not yet confirmed.'
+      ),
+      confirmMigration: external_exports3.boolean().optional().describe(
+        "Must be true (in automated mode) to apply the status-schema migration -- reconciles old .active/legacy config into the status/graphId schema and deletes the legacy ~/.claude/kg-config.json file. Interactive callers are asked to confirm instead."
       )
     },
-    async ({ apply, confirm_platform_split, scope, confirmPersonalScope }, extra) => {
+    async ({ apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration }, extra) => {
       return handleUpgrade(
-        { apply, confirm_platform_split, scope, confirmPersonalScope },
+        { apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration },
         personalScopeSession2,
         extra?._meta
       );

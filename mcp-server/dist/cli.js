@@ -246,6 +246,15 @@ function findRegistryEntryByGraphId(config2, graphId) {
   }
   return null;
 }
+function checkGraphPathHealth(graph) {
+  const expanded = graph.path.replace(/^~/, os.homedir());
+  const parent = path.dirname(expanded);
+  if (!fs.existsSync(parent)) return "parent-unreachable";
+  if (!fs.existsSync(expanded)) return "content-missing";
+  const entries = fs.readdirSync(expanded);
+  if (entries.length === 0) return "content-missing";
+  return "ok";
+}
 function getPluginRoot() {
   return process.env.CLAUDE_PLUGIN_ROOT || path.resolve(__dirname, "..", "..");
 }
@@ -14731,10 +14740,10 @@ async function gate(opts) {
   const timeoutMs = opts.timeoutMs ?? 3e4;
   const controller = new AbortController();
   let timeoutHandle;
-  const timeout = new Promise((resolve5) => {
+  const timeout = new Promise((resolve6) => {
     timeoutHandle = setTimeout(() => {
       controller.abort();
-      resolve5(requireInput(`${opts.reason}_timeout`, opts.param, opts.accepts, opts.detail));
+      resolve6(requireInput(`${opts.reason}_timeout`, opts.param, opts.accepts, opts.detail));
     }, timeoutMs);
   });
   const asked = Promise.resolve().then(() => opts.ask(controller.signal, opts.detail));
@@ -14937,8 +14946,18 @@ async function resolveGraphOutcome(config2, resolution, cwd, mode) {
     });
     if (!("answer" in gated2)) return { kind: "gated", result: gated2 };
     if (gated2.answer === "restore") {
+      const health = checkGraphPathHealth(resolution.graph);
       updateConfig((cfg) => changeGraphStatus(cfg, resolution.name, "active"));
-      return { kind: "resolved", name: resolution.name, graph: { ...resolution.graph, status: "active" } };
+      const restoredGraph = { ...resolution.graph, status: "active" };
+      if (health !== "ok") {
+        return {
+          kind: "resolved",
+          name: resolution.name,
+          graph: restoredGraph,
+          notice: `'${resolution.name}' was restored to active, but its registered path looks ${health} (${restoredGraph.path}) -- verify the path before relying on this graph.`
+        };
+      }
+      return { kind: "resolved", name: resolution.name, graph: restoredGraph };
     }
     return { kind: "resolved", name: resolution.name, graph: resolution.graph };
   }
@@ -15117,7 +15136,9 @@ __export(config_exports, {
   hasDivergentContent: () => hasDivergentContent,
   isHardBlockedRegistrationPath: () => isHardBlockedRegistrationPath,
   performRegistryMerge: () => performRegistryMerge,
-  registerConfigTools: () => registerConfigTools
+  registerConfigTools: () => registerConfigTools,
+  resolveRegistrationGuard: () => resolveRegistrationGuard,
+  scaffoldGraphDirectory: () => scaffoldGraphDirectory
 });
 function classifyDuplicateSuggestion(ctx) {
   return ctx.sameOrigin ? "reattach" : "worktree";
@@ -15210,6 +15231,55 @@ function findBroadAncestorWarning(config2, kgPath) {
   if (ancestorOfNames.length === 0) return null;
   return { isAncestorOfCount: ancestorOfNames.length, ancestorOfNames };
 }
+function resolveRegistrationGuard(config2, kgPath) {
+  const expandedPath = kgPath.replace(/^~/, os3.homedir());
+  return {
+    expandedPath,
+    hardBlocked: isHardBlockedRegistrationPath(expandedPath),
+    broadWarning: findBroadAncestorWarning(config2, expandedPath)
+  };
+}
+function scaffoldGraphDirectory(expandedPath, categories) {
+  const dirs = ["knowledge", "lessons-learned", "decisions", "sessions", "chat-history", "tmp"];
+  for (const dir of dirs) {
+    fs4.mkdirSync(path4.join(expandedPath, dir), { recursive: true });
+  }
+  for (const cat of categories) {
+    fs4.mkdirSync(path4.join(expandedPath, "lessons-learned", cat.name), { recursive: true });
+  }
+  const pluginRoot = getPluginRoot();
+  const templateSrc = path4.join(pluginRoot, "core", "default-templates");
+  let templatesCopied = 0;
+  if (!fs4.existsSync(templateSrc)) return templatesCopied;
+  const copyIfMissing = (src, dest) => {
+    if (fs4.existsSync(src) && !fs4.existsSync(dest)) {
+      fs4.copyFileSync(src, dest);
+      templatesCopied++;
+    }
+  };
+  const knowledgeTemplates = ["patterns.md", "gotchas.md", "concepts.md", "architecture.md", "workflows.md"];
+  for (const t of knowledgeTemplates) {
+    copyIfMissing(path4.join(templateSrc, "knowledge", "templates", t), path4.join(expandedPath, "knowledge", t));
+  }
+  for (const t of ["README.md", "lesson-template.md"]) {
+    copyIfMissing(path4.join(templateSrc, "lessons-learned", t), path4.join(expandedPath, "lessons-learned", t));
+  }
+  for (const t of ["README.md", "ADR-template.md"]) {
+    copyIfMissing(path4.join(templateSrc, "decisions", t), path4.join(expandedPath, "decisions", t));
+  }
+  copyIfMissing(
+    path4.join(templateSrc, "sessions", "session-template.md"),
+    path4.join(expandedPath, "sessions", "session-template.md")
+  );
+  for (const f of ["me.md", "rules.md", "kg-index.md", "triggers.md"]) {
+    copyIfMissing(path4.join(templateSrc, "knowledge", f), path4.join(expandedPath, f));
+  }
+  copyIfMissing(
+    path4.join(templateSrc, "knowledge", "kg-category-index.md"),
+    path4.join(expandedPath, "knowledge", "kg-category-index.md")
+  );
+  return templatesCopied;
+}
 async function handleConfigInit({ name, kgPath, type, categories, interaction, confirmMerge, confirmBroadRegistration }) {
   const config2 = readConfig();
   if (config2.graphs[name]) {
@@ -15223,8 +15293,8 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
       isError: true
     };
   }
-  const expandedPath = kgPath.replace(/^~/, os3.homedir());
-  if (isHardBlockedRegistrationPath(expandedPath)) {
+  const { expandedPath, hardBlocked, broadWarning } = resolveRegistrationGuard(config2, kgPath);
+  if (hardBlocked) {
     return {
       content: [{
         type: "text",
@@ -15233,7 +15303,6 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
       isError: true
     };
   }
-  const broadWarning = findBroadAncestorWarning(config2, expandedPath);
   if (broadWarning) {
     let broadAnswer = confirmBroadRegistration;
     if (!broadAnswer) {
@@ -15465,77 +15534,7 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
       }
     }
   }
-  const dirs = [
-    "knowledge",
-    "lessons-learned",
-    "decisions",
-    "sessions",
-    "chat-history",
-    "tmp"
-  ];
-  for (const dir of dirs) {
-    fs4.mkdirSync(path4.join(expandedPath, dir), { recursive: true });
-  }
-  for (const cat of categories) {
-    fs4.mkdirSync(
-      path4.join(expandedPath, "lessons-learned", cat.name),
-      { recursive: true }
-    );
-  }
-  const pluginRoot = getPluginRoot();
-  const templateSrc = path4.join(pluginRoot, "core", "default-templates");
-  if (fs4.existsSync(templateSrc)) {
-    const knowledgeTemplates = [
-      "patterns.md",
-      "gotchas.md",
-      "concepts.md",
-      "architecture.md",
-      "workflows.md"
-    ];
-    for (const t of knowledgeTemplates) {
-      const src = path4.join(templateSrc, "knowledge", "templates", t);
-      const dest = path4.join(expandedPath, "knowledge", t);
-      if (fs4.existsSync(src) && !fs4.existsSync(dest)) {
-        fs4.copyFileSync(src, dest);
-      }
-    }
-    const lessonSrc = path4.join(templateSrc, "lessons-learned");
-    const lessonDest = path4.join(expandedPath, "lessons-learned");
-    for (const t of ["README.md", "lesson-template.md"]) {
-      const src = path4.join(lessonSrc, t);
-      const dest = path4.join(lessonDest, t);
-      if (fs4.existsSync(src) && !fs4.existsSync(dest)) {
-        fs4.copyFileSync(src, dest);
-      }
-    }
-    const adrSrc = path4.join(templateSrc, "decisions");
-    const adrDest = path4.join(expandedPath, "decisions");
-    for (const t of ["README.md", "ADR-template.md"]) {
-      const src = path4.join(adrSrc, t);
-      const dest = path4.join(adrDest, t);
-      if (fs4.existsSync(src) && !fs4.existsSync(dest)) {
-        fs4.copyFileSync(src, dest);
-      }
-    }
-    const sessSrc = path4.join(templateSrc, "sessions", "session-template.md");
-    const sessDest = path4.join(expandedPath, "sessions", "session-template.md");
-    if (fs4.existsSync(sessSrc) && !fs4.existsSync(sessDest)) {
-      fs4.copyFileSync(sessSrc, sessDest);
-    }
-    const rootScaffolds = ["me.md", "rules.md", "kg-index.md", "triggers.md"];
-    for (const f of rootScaffolds) {
-      const src = path4.join(templateSrc, "knowledge", f);
-      const dest = path4.join(expandedPath, f);
-      if (fs4.existsSync(src) && !fs4.existsSync(dest)) {
-        fs4.copyFileSync(src, dest);
-      }
-    }
-    const catIndexSrc = path4.join(templateSrc, "knowledge", "kg-category-index.md");
-    const catIndexDest = path4.join(expandedPath, "knowledge", "kg-category-index.md");
-    if (fs4.existsSync(catIndexSrc) && !fs4.existsSync(catIndexDest)) {
-      fs4.copyFileSync(catIndexSrc, catIndexDest);
-    }
-  }
+  scaffoldGraphDirectory(expandedPath, categories);
   const now = (/* @__PURE__ */ new Date()).toISOString();
   const newGraphId = mintGraphId();
   const existingMarkerId = readGraphIdMarker(expandedPath);
@@ -17388,12 +17387,12 @@ var init_stdio2 = __esm({
         this.onclose?.();
       }
       send(message) {
-        return new Promise((resolve5) => {
+        return new Promise((resolve6) => {
           const json2 = serializeMessage(message);
           if (this._stdout.write(json2)) {
-            resolve5();
+            resolve6();
           } else {
-            this._stdout.once("drain", resolve5);
+            this._stdout.once("drain", resolve6);
           }
         });
       }
@@ -23751,7 +23750,7 @@ var init_protocol = __esm({
               return;
             }
             const pollInterval = task2.pollInterval ?? this._options?.defaultTaskPollInterval ?? 1e3;
-            await new Promise((resolve5) => setTimeout(resolve5, pollInterval));
+            await new Promise((resolve6) => setTimeout(resolve6, pollInterval));
             options?.signal?.throwIfAborted();
           }
         } catch (error48) {
@@ -23768,7 +23767,7 @@ var init_protocol = __esm({
        */
       request(request, resultSchema, options) {
         const { relatedRequestId, resumptionToken, onresumptiontoken, task, relatedTask } = options ?? {};
-        return new Promise((resolve5, reject) => {
+        return new Promise((resolve6, reject) => {
           const earlyReject = (error48) => {
             reject(error48);
           };
@@ -23846,7 +23845,7 @@ var init_protocol = __esm({
               if (!parseResult.success) {
                 reject(parseResult.error);
               } else {
-                resolve5(parseResult.data);
+                resolve6(parseResult.data);
               }
             } catch (error48) {
               reject(error48);
@@ -24107,12 +24106,12 @@ var init_protocol = __esm({
           }
         } catch {
         }
-        return new Promise((resolve5, reject) => {
+        return new Promise((resolve6, reject) => {
           if (signal.aborted) {
             reject(new McpError(ErrorCode.InvalidRequest, "Request cancelled"));
             return;
           }
-          const timeoutId = setTimeout(resolve5, interval);
+          const timeoutId = setTimeout(resolve6, interval);
           signal.addEventListener("abort", () => {
             clearTimeout(timeoutId);
             reject(new McpError(ErrorCode.InvalidRequest, "Request cancelled"));
@@ -27139,7 +27138,7 @@ var require_compile = __commonJS({
       const schOrFunc = root.refs[ref];
       if (schOrFunc)
         return schOrFunc;
-      let _sch = resolve5.call(this, root, ref);
+      let _sch = resolve6.call(this, root, ref);
       if (_sch === void 0) {
         const schema = (_a2 = root.localRefs) === null || _a2 === void 0 ? void 0 : _a2[ref];
         const { schemaId } = this.opts;
@@ -27166,7 +27165,7 @@ var require_compile = __commonJS({
     function sameSchemaEnv(s1, s2) {
       return s1.schema === s2.schema && s1.root === s2.root && s1.baseId === s2.baseId;
     }
-    function resolve5(root, ref) {
+    function resolve6(root, ref) {
       let sch;
       while (typeof (sch = this.refs[ref]) == "string")
         ref = sch;
@@ -27891,7 +27890,7 @@ var require_fast_uri = __commonJS({
       }
       return uri;
     }
-    function resolve5(baseURI, relativeURI, options) {
+    function resolve6(baseURI, relativeURI, options) {
       const schemelessOptions = options ? Object.assign({ scheme: "null" }, options) : { scheme: "null" };
       const resolved = resolveComponent(parse4(baseURI, schemelessOptions), parse4(relativeURI, schemelessOptions), schemelessOptions, true);
       schemelessOptions.skipEscape = true;
@@ -28154,7 +28153,7 @@ var require_fast_uri = __commonJS({
     var fastUri = {
       SCHEMES,
       normalize,
-      resolve: resolve5,
+      resolve: resolve6,
       resolveComponent,
       equal,
       serialize,
@@ -31130,12 +31129,12 @@ var require_dist = __commonJS({
         throw new Error(`Unknown format "${name}"`);
       return f;
     };
-    function addFormats(ajv, list, fs11, exportName) {
+    function addFormats(ajv, list, fs10, exportName) {
       var _a2;
       var _b;
       (_a2 = (_b = ajv.opts.code).formats) !== null && _a2 !== void 0 ? _a2 : _b.formats = (0, codegen_1._)`require("ajv-formats/dist/formats").${exportName}`;
       for (const f of list)
-        ajv.addFormat(f, fs11[f]);
+        ajv.addFormat(f, fs10[f]);
     }
     module2.exports = exports2 = formatsPlugin;
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -32354,7 +32353,7 @@ var init_mcp = __esm({
         let task = createTaskResult.task;
         const pollInterval = task.pollInterval ?? 5e3;
         while (task.status !== "completed" && task.status !== "failed" && task.status !== "cancelled") {
-          await new Promise((resolve5) => setTimeout(resolve5, pollInterval));
+          await new Promise((resolve6) => setTimeout(resolve6, pollInterval));
           const updatedTask = await extra.taskStore.getTask(taskId);
           if (!updatedTask) {
             throw new McpError(ErrorCode.InternalError, `Task ${taskId} not found during polling`);
@@ -32882,12 +32881,12 @@ var init_mcp = __esm({
 
 // src/tools/fts5.ts
 function getPersonalDbPath() {
-  const dir = path5.join(os4.homedir(), ".kmgraph", "index");
+  const dir = path5.join(os5.homedir(), ".kmgraph", "index");
   fs5.mkdirSync(dir, { recursive: true });
   return path5.join(dir, "personal.db");
 }
 function getProjectDbPath(kgName) {
-  const dir = path5.join(os4.homedir(), ".kmgraph", "index", "projects");
+  const dir = path5.join(os5.homedir(), ".kmgraph", "index", "projects");
   fs5.mkdirSync(dir, { recursive: true });
   return path5.join(dir, `${kgName}.db`);
 }
@@ -32929,13 +32928,13 @@ function searchFts5(dbPath, query, kgPath) {
     db.close();
   }
 }
-var fs5, path5, os4, Database, fts5Available;
+var fs5, path5, os5, Database, fts5Available;
 var init_fts5 = __esm({
   "src/tools/fts5.ts"() {
     "use strict";
     fs5 = __toESM(require("fs"));
     path5 = __toESM(require("path"));
-    os4 = __toESM(require("os"));
+    os5 = __toESM(require("os"));
     init_utils();
     init_resolution();
     init_interaction();
@@ -33218,7 +33217,7 @@ async function handleSearch(params, personalScopeSession = new PersonalScopeSess
         isError: true
       };
     }
-    const activePath = outcome.graph.path.replace(/^~/, os5.homedir());
+    const activePath = outcome.graph.path.replace(/^~/, os6.homedir());
     kgsToSearch = [{ name: outcome.name, path: activePath, type: outcome.graph.type || "project-local" }];
   }
   if (kgsToSearch.some((kg) => kg.type === "personal")) {
@@ -33348,14 +33347,14 @@ function registerSearchTool(server, personalScopeSession, crossKgSearchSession) 
     async (params, extra) => handleSearch(params, personalScopeSession, crossKgSearchSession, extra?._meta)
   );
 }
-var fs6, path6, os5;
+var fs6, path6, os6;
 var init_search = __esm({
   "src/tools/search.ts"() {
     "use strict";
     init_zod();
     fs6 = __toESM(require("fs"));
     path6 = __toESM(require("path"));
-    os5 = __toESM(require("os"));
+    os6 = __toESM(require("os"));
     init_utils();
     init_resolution();
     init_interaction();
@@ -33430,7 +33429,7 @@ ${available}`
           content = content.replace(new RegExp(key, "g"), value);
         }
       }
-      const expandedOutput = outputPath.replace(/^~/, os6.homedir());
+      const expandedOutput = outputPath.replace(/^~/, os7.homedir());
       const parentDir = path7.dirname(expandedOutput);
       fs7.mkdirSync(parentDir, { recursive: true });
       if (fs7.existsSync(expandedOutput)) {
@@ -33473,14 +33472,14 @@ function listTemplates(dir, baseDir) {
   }
   return results;
 }
-var fs7, path7, os6;
+var fs7, path7, os7;
 var init_scaffold = __esm({
   "src/tools/scaffold.ts"() {
     "use strict";
     init_zod();
     fs7 = __toESM(require("fs"));
     path7 = __toESM(require("path"));
-    os6 = __toESM(require("os"));
+    os7 = __toESM(require("os"));
     init_utils();
   }
 });
@@ -33492,7 +33491,7 @@ __export(sanitization_exports, {
   resolveScanPath: () => resolveScanPath
 });
 function normalizeForScan(p) {
-  const expanded = p.replace(/^~/, os7.homedir());
+  const expanded = p.replace(/^~/, os8.homedir());
   try {
     return fs8.realpathSync(expanded);
   } catch {
@@ -33501,14 +33500,14 @@ function normalizeForScan(p) {
 }
 function resolveScanPath(config2, params, cwd = process.cwd()) {
   if (params.kgPath) {
-    return { scanPath: params.kgPath.replace(/^~/, os7.homedir()) };
+    return { scanPath: params.kgPath.replace(/^~/, os8.homedir()) };
   }
   const target = params.scope === "user" ? resolvePersonalGraph(config2) : (() => {
     const resolution = resolveGraph(config2, cwd);
     return resolution.kind === "resolved" ? { name: resolution.name, graph: resolution.graph } : { error: "No knowledge graph resolved from your current directory and no path specified." };
   })();
   if ("error" in target) return target;
-  return { scanPath: target.graph.path.replace(/^~/, os7.homedir()) };
+  return { scanPath: target.graph.path.replace(/^~/, os8.homedir()) };
 }
 function registerSanitizationTool(server, personalScopeSession) {
   server.tool(
@@ -33637,14 +33636,14 @@ Review these entries before pushing to public repository.`
     }
   );
 }
-var fs8, path8, os7, DEFAULT_PATTERNS;
+var fs8, path8, os8, DEFAULT_PATTERNS;
 var init_sanitization = __esm({
   "src/tools/sanitization.ts"() {
     "use strict";
     init_zod();
     fs8 = __toESM(require("fs"));
     path8 = __toESM(require("path"));
-    os7 = __toESM(require("os"));
+    os8 = __toESM(require("os"));
     init_utils();
     init_resolution();
     init_interaction();
@@ -33887,12 +33886,48 @@ __export(cli_exports, {
   resolveInitLocation: () => resolveInitLocation
 });
 module.exports = __toCommonJS(cli_exports);
-var fs10 = __toESM(require("fs"));
 var path10 = __toESM(require("path"));
-var os8 = __toESM(require("os"));
 var readline = __toESM(require("readline"));
 init_utils();
 init_config();
+
+// src/tools/resolve.ts
+var os4 = __toESM(require("os"));
+init_utils();
+init_resolution();
+init_interaction();
+init_platform_cwd();
+function resolveKgPath(config2, params, cwd = process.cwd()) {
+  if (params.scope === "user") {
+    const personal = resolvePersonalGraph(config2);
+    if ("error" in personal) return personal;
+    return { name: personal.name, path: personal.graph.path.replace(/^~/, os4.homedir()) };
+  }
+  const resolution = resolveGraph(config2, cwd);
+  switch (resolution.kind) {
+    case "resolved":
+      return { name: resolution.name, path: resolution.graph.path.replace(/^~/, os4.homedir()) };
+    case "no-graph-in-cwd":
+      return { error: 'No knowledge graph resolved from your current directory. Run /kmgraph:kmg-init first, or pass scope:"user" for the personal graph.' };
+    case "archived":
+      return { error: `Graph "${resolution.name}" is archived, not live. Choose a different graph or restore it first.` };
+    case "merged": {
+      const survivor = resolveGraph(config2, cwd, resolution.into);
+      if (survivor.kind === "resolved") {
+        return { name: survivor.name, path: survivor.graph.path.replace(/^~/, os4.homedir()) };
+      }
+      return { error: `Graph "${resolution.name}" was merged into "${resolution.into}" at ${resolution.at}, but "${resolution.into}" does not resolve.` };
+    }
+    case "ambiguous-tie":
+      return { error: `Ambiguous: multiple registered graphs resolve to the same path (${resolution.candidates.join(", ")}). Disambiguate manually.` };
+    case "fuzzy-match":
+      return { error: `No exact match; did you mean one of: ${resolution.candidates.join(", ")}?` };
+    case "not-registered":
+      return { error: `No graph named "${resolution.name}" is registered.` };
+  }
+}
+
+// src/cli.ts
 var SERVER_VERSION = true ? "0.7.0" : (() => {
   try {
     return null.version;
@@ -33901,8 +33936,8 @@ var SERVER_VERSION = true ? "0.7.0" : (() => {
   }
 })();
 function ask(rl, question) {
-  return new Promise((resolve5) => {
-    rl.question(question, (answer) => resolve5(answer.trim()));
+  return new Promise((resolve6) => {
+    rl.question(question, (answer) => resolve6(answer.trim()));
   });
 }
 function printHeader() {
@@ -33982,14 +34017,13 @@ async function runInit() {
       { name: "process", prefix: null, git: "commit" },
       { name: "patterns", prefix: null, git: "commit" }
     ];
-    const expandedPath = kgPath.replace(/^~/, os8.homedir());
-    if (isHardBlockedRegistrationPath(expandedPath)) {
+    const { expandedPath, hardBlocked, broadWarning } = resolveRegistrationGuard(config2, kgPath);
+    if (hardBlocked) {
       console.error(
         `Error: refusing to register a knowledge graph at ${expandedPath} \u2014 this is your home directory or the filesystem root. Registering a KG this broad would make it resolve as "the KG for" nearly every directory on this machine. Choose a more specific project path.`
       );
       process.exit(1);
     }
-    const broadWarning = findBroadAncestorWarning(config2, expandedPath);
     if (broadWarning) {
       console.log("");
       console.log(
@@ -34003,68 +34037,7 @@ async function runInit() {
     }
     console.log("");
     console.log("  Creating knowledge graph...");
-    const dirs = [
-      "knowledge",
-      "lessons-learned",
-      "decisions",
-      "sessions",
-      "chat-history"
-    ];
-    for (const dir of dirs) {
-      fs10.mkdirSync(path10.join(expandedPath, dir), { recursive: true });
-    }
-    for (const cat of categories) {
-      fs10.mkdirSync(path10.join(expandedPath, "lessons-learned", cat.name), {
-        recursive: true
-      });
-    }
-    const pluginRoot = getPluginRoot();
-    const templateSrc = path10.join(pluginRoot, "core", "default-templates");
-    let templatesCopied = 0;
-    if (fs10.existsSync(templateSrc)) {
-      const knowledgeTemplates = [
-        "patterns.md",
-        "gotchas.md",
-        "concepts.md",
-        "architecture.md",
-        "workflows.md",
-        "index.md"
-      ];
-      for (const t of knowledgeTemplates) {
-        const src = path10.join(templateSrc, "knowledge", t);
-        const dest = path10.join(expandedPath, "knowledge", t);
-        if (fs10.existsSync(src) && !fs10.existsSync(dest)) {
-          fs10.copyFileSync(src, dest);
-          templatesCopied++;
-        }
-      }
-      for (const t of ["README.md", "lesson-template.md"]) {
-        const src = path10.join(templateSrc, "lessons-learned", t);
-        const dest = path10.join(expandedPath, "lessons-learned", t);
-        if (fs10.existsSync(src) && !fs10.existsSync(dest)) {
-          fs10.copyFileSync(src, dest);
-          templatesCopied++;
-        }
-      }
-      for (const t of ["README.md", "ADR-template.md"]) {
-        const src = path10.join(templateSrc, "decisions", t);
-        const dest = path10.join(expandedPath, "decisions", t);
-        if (fs10.existsSync(src) && !fs10.existsSync(dest)) {
-          fs10.copyFileSync(src, dest);
-          templatesCopied++;
-        }
-      }
-      const sessSrc = path10.join(
-        templateSrc,
-        "sessions",
-        "session-template.md"
-      );
-      const sessDest = path10.join(expandedPath, "sessions", "session-template.md");
-      if (fs10.existsSync(sessSrc) && !fs10.existsSync(sessDest)) {
-        fs10.copyFileSync(sessSrc, sessDest);
-        templatesCopied++;
-      }
-    }
+    const templatesCopied = scaffoldGraphDirectory(expandedPath, categories);
     const now = (/* @__PURE__ */ new Date()).toISOString();
     const newGraphId = mintGraphId();
     const existingMarkerId = readGraphIdMarker(expandedPath);
@@ -34172,6 +34145,32 @@ function printConfig(platform) {
   }
   console.log("");
 }
+function printResolveJson(value) {
+  console.log(JSON.stringify(value));
+}
+function runResolve(args) {
+  let cwd = process.cwd();
+  let scope;
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === "--cwd" && args[i + 1]) {
+      cwd = args[i + 1];
+      i++;
+    } else if (args[i] === "--scope" && args[i + 1]) {
+      const value = args[i + 1];
+      if (value === "user" || value === "project") {
+        scope = value;
+      }
+      i++;
+    }
+  }
+  const config2 = readConfig();
+  const resolved = resolveKgPath(config2, { scope }, cwd);
+  if ("error" in resolved) {
+    printResolveJson({ error: resolved.error });
+    process.exit(1);
+  }
+  printResolveJson(resolved);
+}
 function printUsage() {
   console.log("");
   console.log("  Knowledge Management Graph CLI");
@@ -34183,6 +34182,12 @@ function printUsage() {
   );
   console.log(
     "    node dist/cli.js config <ide> Print MCP config for an IDE"
+  );
+  console.log(
+    "    node dist/cli.js resolve [--cwd <path>] [--scope user]"
+  );
+  console.log(
+    "                                   Print the cwd-resolved KG as JSON ({name, path})"
   );
   console.log("");
   console.log("  Supported IDEs:");
@@ -34200,8 +34205,8 @@ async function main() {
       name: "knowledge-graph",
       version: SERVER_VERSION
     });
-    const { PersonalScopeSession: PersonalScopeSession3, CrossKgSearchSession: CrossKgSearchSession2 } = await Promise.resolve().then(() => (init_resolution(), resolution_exports));
-    await registerCliMcpTools2(server, new PersonalScopeSession3(), new CrossKgSearchSession2());
+    const { PersonalScopeSession: PersonalScopeSession4, CrossKgSearchSession: CrossKgSearchSession2 } = await Promise.resolve().then(() => (init_resolution(), resolution_exports));
+    await registerCliMcpTools2(server, new PersonalScopeSession4(), new CrossKgSearchSession2());
     const transport = new StdioServerTransport2();
     await server.connect(transport);
     console.error("Knowledge Graph MCP server running on stdio");
@@ -34222,6 +34227,9 @@ async function main() {
       printConfig(platform);
       break;
     }
+    case "resolve":
+      runResolve(args.slice(1));
+      break;
     case "--help":
     case "-h":
     case "help":

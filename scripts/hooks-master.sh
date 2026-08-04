@@ -144,7 +144,7 @@ _inject_profile "$PERSONAL_KG_DIR/me.md"       "~/.kmgraph/me.md (personal ident
 _inject_profile "$PERSONAL_KG_DIR/triggers.md" "~/.kmgraph/triggers.md (personal workflow phase router)"
 
 # ─────────────────────────────────────────────────────────────
-# SECTION 2: KG Configuration Validation (from check-memory.sh)
+# SECTION 2: KG Resolution (cwd-derived, issue-41 / ADR-067 Phase 9)
 # ─────────────────────────────────────────────────────────────
 
 if [ ! -f "$CONFIG_PATH" ]; then
@@ -153,101 +153,59 @@ if [ ! -f "$CONFIG_PATH" ]; then
     exit 0
 fi
 
-ACTIVE_KG=$(grep -o '"active"[[:space:]]*:[[:space:]]*"[^"]*"' "$CONFIG_PATH" | sed 's/.*"\([^"]*\)".*/\1/')
+# issue-41 (ADR-067 Phase 9): resolution is cwd-derived, not a mutable
+# `.active` pointer. The scripts/ hooks were the one place the retired
+# `.active`/autoSwitch model survived (grep'd straight out of kg-config.json,
+# with a silent `cfg.active = ...` rewrite when CWD didn't match) -- fixed
+# here by shelling out to the same resolveGraph() logic the kg_resolve MCP
+# tool exposes to markdown callers (mcp-server/src/tools/resolve.ts), via a
+# thin `resolve` CLI subcommand (mcp-server/src/cli.ts) built into the
+# already-built dist/cli.js this script's own auto-build step (Section 1)
+# guarantees is present. There is no "active KG" or "switch" concept left:
+# resolution is automatic from CWD, so a CWD that doesn't resolve just gets
+# an informational message, not a blocking error or a silent config rewrite.
 
-if [ -z "$ACTIVE_KG" ]; then
-    echo -e "${YELLOW}⚠️  No active knowledge graph set in config.${NC}"
-    echo "   Run /kmgraph:kmg-list and /kmgraph:kmg-switch to activate a KG."
+RESOLVE_CLI="$PLUGIN_ROOT/mcp-server/dist/cli.js"
+
+if ! command -v node &> /dev/null || [ ! -f "$RESOLVE_CLI" ]; then
+    echo -e "${YELLOW}⚠️  Cannot resolve knowledge graph: Node.js or the MCP server build is unavailable.${NC}"
     exit 1
 fi
 
-KG_PATH=$(grep -A 10 "\"$ACTIVE_KG\"" "$CONFIG_PATH" | grep '"path"' | head -1 | sed 's/.*"path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
+RESOLVE_JSON=$(node "$RESOLVE_CLI" resolve --cwd "$(pwd)" 2>/dev/null)
+RESOLVE_STATUS=$?
 
-if [ -z "$KG_PATH" ]; then
-    echo -e "${YELLOW}⚠️  Could not read path for active KG: $ACTIVE_KG${NC}"
-    exit 1
+if [ "$RESOLVE_STATUS" -ne 0 ]; then
+    RESOLVE_ERR=$(node -e "
+      try {
+        const r = JSON.parse(process.argv[1]);
+        process.stdout.write(r.error || '');
+      } catch(e) {}
+    " "$RESOLVE_JSON" 2>/dev/null)
+    echo -e "${BLUE}ℹ️  ${RESOLVE_ERR:-No knowledge graph resolves for this directory.}${NC}"
+    echo "   Run /kmgraph:kmg-init to set one up here, or cd into a registered project."
+    exit 0
 fi
 
-KG_PATH="${KG_PATH/#\~/$HOME}"
+RESOLVED_KG=$(node -e "
+  try {
+    const r = JSON.parse(process.argv[1]);
+    process.stdout.write(r.name || '');
+  } catch(e) {}
+" "$RESOLVE_JSON" 2>/dev/null)
 
-if [ ! -d "$KG_PATH" ]; then
-    echo -e "${RED}⚠️  Active KG path does not exist: $KG_PATH${NC}"
-    echo "   KG: $ACTIVE_KG"
-    echo "   Run /kmgraph:kmg-init or /kmgraph:kmg-switch to fix configuration."
+KG_PATH=$(node -e "
+  try {
+    const r = JSON.parse(process.argv[1]);
+    process.stdout.write(r.path || '');
+  } catch(e) {}
+" "$RESOLVE_JSON" 2>/dev/null)
+
+if [ -z "$KG_PATH" ] || [ ! -d "$KG_PATH" ]; then
+    echo -e "${RED}⚠️  Resolved KG path does not exist: $KG_PATH${NC}"
+    echo "   KG: $RESOLVED_KG"
+    echo "   Run /kmgraph:kmg-init to fix configuration."
     exit 1
-fi
-
-# ─────────────────────────────────────────────────────────────
-# SECTION 2.5: CWD / Active KG Alignment
-# Option 1: warn if CWD is outside active KG project root
-# Option 3: auto-switch silently if autoSwitch: true in config
-# ─────────────────────────────────────────────────────────────
-
-KG_TYPE=$(grep -A 10 "\"$ACTIVE_KG\"" "$CONFIG_PATH" | grep '"type"' | head -1 | sed 's/.*"type"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
-
-if [ "$KG_TYPE" = "project-local" ]; then
-    # Derive project root (handle /docs subdirectory pattern)
-    KG_PATH_BASENAME=$(basename "$KG_PATH")
-    if [ "$KG_PATH_BASENAME" = "docs" ]; then
-        EXPECTED_PROJECT_ROOT=$(dirname "$KG_PATH")
-    else
-        EXPECTED_PROJECT_ROOT="$KG_PATH"
-    fi
-
-    CWD=$(pwd)
-    case "$CWD" in
-        "$EXPECTED_PROJECT_ROOT"|"$EXPECTED_PROJECT_ROOT"/*)
-            # CWD is within the active KG project — no action needed
-            ;;
-        *)
-            # CWD is outside the active KG project root
-            AUTO_SWITCH=$(grep -A 20 "\"$ACTIVE_KG\"" "$CONFIG_PATH" | grep '"autoSwitch"' | head -1 | sed 's/.*"autoSwitch"[[:space:]]*:[[:space:]]*\([^,}]*\).*/\1/' | tr -d '[:space:]')
-
-            if [ "$AUTO_SWITCH" = "true" ] && command -v node &> /dev/null; then
-                # Option 3: find the KG whose project root matches CWD and switch silently
-                MATCHED_KG=$(node -e "
-                  const path = require('path');
-                  try {
-                    const cfg = JSON.parse(require('fs').readFileSync('$CONFIG_PATH', 'utf8'));
-                    const cwd = process.env.CWD_CHECK;
-                    for (const [name, g] of Object.entries(cfg.graphs || {})) {
-                      if (name === cfg.active) continue;
-                      let root = (g.path || '').replace(/^~/, process.env.HOME);
-                      if (path.basename(root) === 'docs') root = path.dirname(root);
-                      if (cwd === root || cwd.startsWith(root + '/')) {
-                        process.stdout.write(name);
-                        break;
-                      }
-                    }
-                  } catch(e) {}
-                " 2>/dev/null CWD_CHECK="$CWD")
-
-                if [ -n "$MATCHED_KG" ]; then
-                    # Silently update active KG in config
-                    node -e "
-                      try {
-                        const fs = require('fs');
-                        const cfg = JSON.parse(fs.readFileSync('$CONFIG_PATH', 'utf8'));
-                        cfg.active = '$MATCHED_KG';
-                        fs.writeFileSync('$CONFIG_PATH', JSON.stringify(cfg, null, 2));
-                      } catch(e) {}
-                    " 2>/dev/null
-                    # Reload active KG name for subsequent sections
-                    ACTIVE_KG="$MATCHED_KG"
-                    KG_PATH=$(grep -A 10 "\"$ACTIVE_KG\"" "$CONFIG_PATH" | grep '"path"' | head -1 | sed 's/.*"path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
-                    KG_PATH="${KG_PATH/#\~/$HOME}"
-                fi
-                # If no match found, fall through silently (autoSwitch can't find a target)
-            else
-                # Option 1: warn the user
-                echo -e "${YELLOW}⚠️  Active KG '${ACTIVE_KG}' is set for a different project.${NC}"
-                echo "   Active KG project: $EXPECTED_PROJECT_ROOT"
-                echo "   Current directory: $CWD"
-                echo "   Run /kmgraph:kmg-switch to change the active KG for this project."
-                echo ""
-            fi
-            ;;
-    esac
 fi
 
 # ─────────────────────────────────────────────────────────────

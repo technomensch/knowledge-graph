@@ -12,6 +12,7 @@ import {
   CategoryConfig,
 } from "./utils.js";
 import { resolveRegistrationGuard, scaffoldGraphDirectory } from "./tools/config.js";
+import { resolveKgPath } from "./tools/resolve.js";
 
 declare const __SERVER_VERSION__: string;
 const SERVER_VERSION =
@@ -299,6 +300,47 @@ function printConfig(platform: string): void {
   console.log("");
 }
 
+// ── Resolve Subcommand ───────────────────────────────────────────────
+
+// issue-41 (Phase 9 scripts/ cleanup): the SessionStart/Stop/PostToolUse
+// hook scripts in scripts/ are plain bash with no MCP client and no LLM in
+// the loop, so they can't invoke the kg_resolve *tool* the way markdown
+// commands/agents do. This subcommand exposes the same resolveKgPath()
+// logic as a one-shot CLI call those scripts can shell out to against the
+// already-built dist/cli.js, instead of re-deriving "which KG is this" by
+// grepping the retired `.active` pointer out of kg-config.json.
+function printResolveJson(value: unknown): void {
+  console.log(JSON.stringify(value));
+}
+
+function runResolve(args: string[]): void {
+  let cwd = process.cwd();
+  let scope: "project" | "user" | undefined;
+
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === "--cwd" && args[i + 1]) {
+      cwd = args[i + 1];
+      i++;
+    } else if (args[i] === "--scope" && args[i + 1]) {
+      const value = args[i + 1];
+      if (value === "user" || value === "project") {
+        scope = value;
+      }
+      i++;
+    }
+  }
+
+  const config = readConfig();
+  const resolved = resolveKgPath(config, { scope }, cwd);
+
+  if ("error" in resolved) {
+    printResolveJson({ error: resolved.error });
+    process.exit(1);
+  }
+
+  printResolveJson(resolved);
+}
+
 // ── Usage ────────────────────────────────────────────────────────────
 
 function printUsage(): void {
@@ -312,6 +354,12 @@ function printUsage(): void {
   );
   console.log(
     "    node dist/cli.js config <ide> Print MCP config for an IDE"
+  );
+  console.log(
+    "    node dist/cli.js resolve [--cwd <path>] [--scope user]"
+  );
+  console.log(
+    "                                   Print the cwd-resolved KG as JSON ({name, path})"
   );
   console.log("");
   console.log("  Supported IDEs:");
@@ -368,6 +416,10 @@ async function main(): Promise<void> {
       printConfig(platform);
       break;
     }
+
+    case "resolve":
+      runResolve(args.slice(1));
+      break;
 
     case "--help":
     case "-h":

@@ -79,23 +79,31 @@ else
   fail "No config file — should exit 0, not $EXIT_CODE"
 fi
 
-# Test 2: Config exists but no active KG
+# Test 2: Config exists but no graphs registered — nothing resolves from CWD.
+# issue-41 (ADR-067 Phase 9): resolution is cwd-derived (kg_resolve /
+# resolveGraph), not a mutable `.active` pointer — there is no "active KG" to
+# be missing, just "nothing resolves for this directory."
 cat > "$TEST_CONFIG" << 'EOF'
 {"version":"1.0.0","graphs":{},"sanitization":{"enabled":false,"patterns":[],"action":"warn"}}
 EOF
 OUTPUT=$(KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" 2>&1 || true)
 EXIT_CODE=$?
-if echo "$OUTPUT" | grep -qiE "No active|active.*knowledge graph"; then
-  pass "No active KG — outputs warning"
+if echo "$OUTPUT" | grep -qiE "No knowledge graph resolves|no knowledge graph resolved"; then
+  pass "No graphs registered — outputs 'no knowledge graph resolves' info message"
 else
-  fail "No active KG should output 'No active knowledge graph' (got: $(echo "$OUTPUT" | head -2))"
+  fail "No graphs registered should output a 'no knowledge graph resolves' message (got: $(echo "$OUTPUT" | head -2))"
+fi
+if [ $EXIT_CODE -eq 0 ]; then
+  pass "No graphs registered — exits 0 (informational, not blocking)"
+else
+  fail "No graphs registered should exit 0, not $EXIT_CODE"
 fi
 
-# Test 3: Active KG path doesn't exist
+# Test 3: Registered KG's path doesn't exist on disk (CWD resolves to it —
+# graph.path's parent dir is the project root resolveGraph walks up to).
 cat > "$TEST_CONFIG" << EOF
 {
   "version": "1.0.0",
-  "active": "missing-kg",
   "graphs": {
     "missing-kg": {
       "name": "missing-kg",
@@ -103,14 +111,16 @@ cat > "$TEST_CONFIG" << EOF
       "type": "project-local",
       "categories": [],
       "createdAt": "2026-01-01T00:00:00.000Z",
-      "lastUsed": "2026-01-01T00:00:00.000Z"
+      "status": "active",
+      "statusChangedAt": "2026-01-01T00:00:00.000Z",
+      "graphId": "missing-kg-id"
     }
   },
   "sanitization": {"enabled":false,"patterns":[],"action":"warn"}
 }
 EOF
 set +e
-OUTPUT=$(KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" 2>&1)
 EXIT_CODE=$?
 set -e
 if echo "$OUTPUT" | grep -qiE "does not exist|path.*not.*exist|not exist"; then
@@ -124,12 +134,13 @@ else
   fail "Non-existent KG path should exit non-zero"
 fi
 
-# Test 4: Valid config and existing KG — exits 0
+# Test 4: Valid config and existing KG, CWD inside its project root — exits 0.
+# resolveGraph derives the project root as dirname(graph.path), so CWD must be
+# under $TEST_DIR (TEST_KG_DIR's parent), not necessarily TEST_KG_DIR itself.
 mkdir -p "$TEST_KG_DIR/lessons-learned"
 cat > "$TEST_CONFIG" << EOF
 {
   "version": "1.0.0",
-  "active": "test-kg",
   "graphs": {
     "test-kg": {
       "name": "test-kg",
@@ -137,18 +148,37 @@ cat > "$TEST_CONFIG" << EOF
       "type": "project-local",
       "categories": [],
       "createdAt": "2026-01-01T00:00:00.000Z",
-      "lastUsed": "2026-01-01T00:00:00.000Z"
+      "status": "active",
+      "statusChangedAt": "2026-01-01T00:00:00.000Z",
+      "graphId": "test-kg-id"
     }
   },
   "sanitization": {"enabled":false,"patterns":[],"action":"warn"}
 }
 EOF
-OUTPUT=$(KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" 2>&1 || true)
+OUTPUT=$(cd "$TEST_KG_DIR" && KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" 2>&1 || true)
 EXIT_CODE=$?
 if [ $EXIT_CODE -eq 0 ]; then
-  pass "Valid config and existing KG — exits 0"
+  pass "Valid config, CWD resolves to registered KG — exits 0"
 else
   fail "Valid config should exit 0 (got $EXIT_CODE, output: $(echo "$OUTPUT" | head -2))"
+fi
+
+# Test 4b: Same config, but CWD outside any registered project — informational
+# message, not a blocking error (there is nothing to "switch" to).
+OUTSIDE_DIR=$(mktemp -d)
+OUTPUT=$(cd "$OUTSIDE_DIR" && KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" 2>&1 || true)
+EXIT_CODE=$?
+rm -rf "$OUTSIDE_DIR"
+if echo "$OUTPUT" | grep -qiE "No knowledge graph resolves|no knowledge graph resolved"; then
+  pass "CWD outside any registered project — outputs 'no knowledge graph resolves' info message"
+else
+  fail "CWD outside any registered project should output a 'no knowledge graph resolves' message (got: $(echo "$OUTPUT" | head -2))"
+fi
+if [ $EXIT_CODE -eq 0 ]; then
+  pass "CWD outside any registered project — exits 0 (informational, not blocking)"
+else
+  fail "CWD outside any registered project should exit 0, not $EXIT_CODE"
 fi
 
 echo ""
@@ -168,7 +198,7 @@ EOF
 # Touch to current time (within 7 days)
 touch "$LESSON_FILE"
 
-OUTPUT=$(KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" 2>&1 || true)
+OUTPUT=$(cd "$TEST_KG_DIR" && KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" 2>&1 || true)
 if echo "$OUTPUT" | grep -qiE "Recent Lesson|lesson|recent"; then
   pass "Recent lessons section displayed when lesson exists"
 else
@@ -192,7 +222,7 @@ else
 fi
 # HOME is faked for the ~/.kmgraph/rules.md staleness path; KG_CONFIG_PATH sandboxes
 # the config independently (belt-and-suspenders — either alone would suffice here).
-OUTPUT=$(HOME="$FAKE_HOME" KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" 2>&1 || true)
+OUTPUT=$(cd "$TEST_KG_DIR" && HOME="$FAKE_HOME" KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" 2>&1 || true)
 if echo "$OUTPUT" | grep -qiE "stale|days ago"; then
   pass "Stale ~/.kmgraph/rules.md (35 days old) — outputs stale warning"
 else
@@ -202,7 +232,7 @@ fi
 # Test 7: Fresh ~/.kmgraph/rules.md produces no staleness warning
 touch "$FAKE_KMGRAPH/rules.md"  # Reset to current time
 
-OUTPUT=$(HOME="$FAKE_HOME" KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" 2>&1 || true)
+OUTPUT=$(cd "$TEST_KG_DIR" && HOME="$FAKE_HOME" KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" 2>&1 || true)
 if ! echo "$OUTPUT" | grep -qiE "stale|days ago"; then
   pass "Fresh ~/.kmgraph/rules.md — no staleness warning shown"
 else

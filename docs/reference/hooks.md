@@ -46,13 +46,13 @@ Hooks with a `matcher` field fire only when the tool name (and optionally the to
 
 | Script | Event | Matcher | Enabled by default | What it does |
 |---|---|---|---|---|
-| `hooks-master.sh` | `SessionStart` | (all) | Yes | Validates KG config and MCP server build; displays recent lessons (last 7 days) from active and personal KGs; checks MEMORY.md staleness and diffs since last session; auto-switches active KG if `autoSwitch: true` and CWD matches a different project |
+| `hooks-master.sh` | `SessionStart` | (all) | Yes | Resolves the knowledge graph for the current directory (cwd-derived, via the same `resolveGraph()` logic `kg_resolve` exposes — see below); validates the resolved KG's path and the MCP server build; displays recent lessons (last 7 days) from the resolved and personal KGs; checks MEMORY.md staleness and diffs since last session |
 | `post-tool-lesson-check.sh` | `PostToolUse` | `Write\|Edit` | Yes | Scans tool input for lesson-worthy keywords (`fix`, `solved`, `debug`, `pattern`, etc.); suppresses on `docs/`, `.git/`, and `.md`-only writes; surfaces a prompt to run `/kmgraph:kmg-capture-lesson` |
 | `platform-file-change-check.sh` | `PostToolUse` | `Write\|Edit` | Yes | Detects writes to platform config files (`CLAUDE.md`, `GEMINI.md`, `.cursorrules`, `copilot-instructions.md`, etc.); prompts the user to consider syncing other platform files via `/kmgraph:kmg-setup-platform` |
-| `plan-mirror.sh` | `PostToolUse` | `Write` | Yes | Detects writes to `~/.claude/plans/`; copies the file to `docs/plans/` in the active KG project root; exits silently if the target directory does not exist |
+| `plan-mirror.sh` | `PostToolUse` | `Write` | Yes | Detects writes to `~/.claude/plans/`; resolves the KG for the current directory; copies the file to `docs/plans/` in that KG's project root; exits silently if no KG resolves or the target directory does not exist |
 | `pre-commit-knowledge-gate.sh` | `PreToolUse` | `Bash.*git commit` | Yes | Intercepts plain `git commit` calls (skips `--amend` and `--no-verify`); checks staged files for lesson-worthy source types (`src/`, `*.ts`, `*.py`, `*.sh`, etc.); advisory prompt only — does not block the commit |
 | `pre-skill-rules-inject.sh` | `PreToolUse` | `Skill` | Yes | Fires before any superpowers skill invocation; injects `~/.kmgraph/rules.md` overrides into skill context; hard-blocks brainstorming and planning without a prior recall query; enforces PR gate for execution and finishing skills |
-| `session-end-prompt.sh` | `Stop` | (all) | Yes | Checks for open plan tasks, draft/proposed ADRs, and recent lesson-worthy commits without a captured lesson; displays a summary prompt to stderr; emits `{"decision": "continue"}` JSON to stdout via `trap EXIT` for Codex CLI compatibility; uses a `/tmp` flag to suppress duplicate output within the same session |
+| `session-end-prompt.sh` | `Stop` | (all) | Yes | Resolves the knowledge graph for the current directory; checks for open plan tasks, draft/proposed ADRs, and recent lesson-worthy commits without a captured lesson; displays a summary prompt to stderr; emits `{"decision": "continue"}` JSON to stdout via `trap EXIT` for Codex CLI compatibility; uses a `/tmp` flag (keyed on the resolved KG name) to suppress duplicate output within the same session |
 | `stop-plan-gate.sh` | `Stop` | (all) | Yes | Re-injects the plan approval gate reminder at session end when a plan was written this session; uses a daily flag file to suppress duplicates |
 | `post-plan-validate-checklist.sh` | `PostToolUse` | `Write` | Yes | After writing any `plans/*.md` file, outputs an advisory post-plan validation checklist; exits silently for non-plan writes |
 | `notification-dispatch.sh` | `Notification` | (all) | No (opt-in) | Forwards the notification text to a configured `webhookUrl` in `kg-config.json`; exits silently if `webhookUrl` is absent; network failures never block the hook |
@@ -70,6 +70,33 @@ The other eight scripts are always active once KMGraph is installed. Individual 
 ## Script Locations
 
 All hook scripts reside in `scripts/` relative to the plugin root. Additional scripts in that directory (`fuzzy-search-archive.sh`, `install-vscode.sh`, `prepare-mcp.sh`, `validate-plugin.sh`) are invoked by installer and CLI commands, not by the hook system.
+
+## Knowledge Graph Resolution in Hooks
+
+`hooks-master.sh`, `session-end-prompt.sh`, and `plan-mirror.sh` each need to know
+which knowledge graph applies to the current session. Resolution is entirely
+**cwd-derived** (ADR-067): there is no mutable "active KG" pointer and nothing
+to "switch." A hook script determines the resolved KG by shelling out to a
+`resolve` subcommand on the already-built MCP server CLI:
+
+```bash
+node "$PLUGIN_ROOT/mcp-server/dist/cli.js" resolve --cwd "$(pwd)"
+# {"name":"my-project","path":"/Users/you/project/knowledge"}
+```
+
+This subcommand runs the same `resolveGraph()` logic the `kg_resolve` MCP tool
+exposes to markdown commands/agents (`mcp-server/src/tools/resolve.ts`) — the
+hook scripts get it via a CLI call instead of an MCP tool call because they run
+as plain bash with no LLM/MCP client in the loop. On success it exits `0` and
+prints `{"name", "path"}` as JSON; on failure (no graph registers for that
+directory, or it's archived/ambiguous) it exits non-zero and prints
+`{"error": "..."}`. A hook script that fails to resolve prints an informational
+message and continues — there is no "switch to fix this" action, since
+resolution already happens automatically from wherever you are.
+
+The `mcp-server` auto-build step in `hooks-master.sh` (Section 1) keeps
+`dist/cli.js` current, so this works out of the box after install/upgrade
+without any extra build step at hook-run time.
 
 ## Config Path Resolution
 
