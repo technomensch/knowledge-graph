@@ -348,7 +348,6 @@ describe("T-10: no knowledge graph resolves from cwd", () => {
   test("reports a resolution item but still returns a valid report (config-location stays reachable, ADR-067)", async () => {
     (readConfig as jest.Mock).mockReturnValue({
       version: "1.0.0",
-      active: null,
       graphs: {},
       sanitization: { enabled: false, patterns: [], action: "warn" },
     });

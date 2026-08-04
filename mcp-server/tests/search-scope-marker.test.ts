@@ -39,7 +39,18 @@ import { readConfig, KgConfig } from "../src/utils.js";
 // ---------------------------------------------------------------------------
 
 function makeTempDir(prefix: string): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), `scope-marker-test-${prefix}-`));
+  // Nest the returned dir one level below a fresh mkdtemp wrapper (ADR-067
+  // Task 1.8) -- resolveGraph matches cwd against dirname(graph.path), so if
+  // this returned a bare mkdtemp leaf directly under the shared os.tmpdir(),
+  // sibling graphs registered in the same test (e.g. my-personal/my-project)
+  // would both collapse to the same dirname() boundary (os.tmpdir() itself),
+  // causing resolveGraph to see them as tied at the same depth and return
+  // "ambiguous-tie" instead of resolving cleanly. Nesting under a
+  // per-call-unique wrapper gives each fixture its own dirname().
+  const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), `scope-marker-test-${prefix}-`));
+  const contentDir = path.join(wrapper, "knowledge");
+  fs.mkdirSync(contentDir);
+  return contentDir;
 }
 
 function scaffoldKg(root: string): void {

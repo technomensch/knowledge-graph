@@ -37,8 +37,12 @@ describe("kg_compare_graphs summary", () => {
     const summary = buildCompareSummary(dirA, dirB);
     expect(summary.fileCountA).toBe(2);
     expect(summary.fileCountB).toBe(1);
-    expect(typeof summary.verdict).toBe("string");
-    expect(summary.verdict.length).toBeGreaterThan(0);
+    // shared.md is identical on both sides and only-a.md exists only in A, so
+    // no shared file changed on both sides -- this is compare.ts's
+    // "no shared files changed" verdict branch, not a "genuine divergence" one.
+    expect(summary.verdict).toBe(
+      "No shared files changed, but the two folders have different unique content."
+    );
     expect(summary.worktreeFingerprint).toBe(false);
   });
 

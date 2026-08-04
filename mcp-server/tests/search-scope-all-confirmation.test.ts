@@ -49,7 +49,18 @@ import { gate } from "../src/interaction.js";
 // ---------------------------------------------------------------------------
 
 function makeTempDir(prefix: string): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), `scope-all-test-${prefix}-`));
+  // Nest the returned dir one level below a fresh mkdtemp wrapper (ADR-067
+  // Task 1.8) -- resolveGraph matches cwd against dirname(graph.path), so if
+  // this returned a bare mkdtemp leaf directly under the shared os.tmpdir(),
+  // sibling graphs registered in the same test (e.g. kg-a/kg-b) would both
+  // collapse to the same dirname() boundary (os.tmpdir() itself), causing
+  // resolveGraph to see them as tied at the same depth and return
+  // "ambiguous-tie" instead of resolving cleanly. Nesting under a
+  // per-call-unique wrapper gives each fixture its own dirname().
+  const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), `scope-all-test-${prefix}-`));
+  const contentDir = path.join(wrapper, "knowledge");
+  fs.mkdirSync(contentDir);
+  return contentDir;
 }
 
 function scaffoldKg(root: string): void {
@@ -323,5 +334,44 @@ describe("kg_search scope:all confirmation gate", () => {
     const parsed = JSON.parse(result.content[0].text);
     expect(parsed.error).toBe("KMG_INPUT_REQUIRED");
     expect(parsed.reason).toBe("cross_kg_search_confirmation_invalid_answer");
+  });
+
+  it("orders the cwd-resolved KG first among equal-quality matches, regardless of registration order", async () => {
+    // Both KGs are project-local (same kgOrder tier) and both matches are
+    // plain body text (same matchType tier), so search.ts's stable sort
+    // leaves them tied -- the only thing that can determine which comes
+    // first in the output is kgsToSearch's push order, which places the
+    // cwd-resolved ("primary") KG first (ADR-067 Task 1.9). Registering
+    // kg-a before kg-b but resolving cwd against rootB proves the ordering
+    // follows cwd resolution, not registration or alphabetical order.
+    const rootA = makeTempDir("order-a");
+    const rootB = makeTempDir("order-b");
+    tempDirs.push(rootA, rootB);
+    scaffoldKg(rootA);
+    scaffoldKg(rootB);
+
+    writeMd(path.join(rootA, "lessons-learned"), "a-note.md", "---\ntitle: A Note\n---\n\nsome order-term content.");
+    writeMd(path.join(rootB, "lessons-learned"), "b-note.md", "---\ntitle: B Note\n---\n\nsome order-term content.");
+
+    (readConfig as jest.Mock).mockReturnValue(
+      makeConfig({
+        "kg-a": { path: rootA, type: "project-local" },
+        "kg-b": { path: rootB, type: "project-local" },
+      })
+    );
+    process.cwd = () => rootB;
+
+    const session = new CrossKgSearchSession();
+    const result = await handleSearch(
+      { query: "order-term", searchScope: "all", interaction: "automated", confirmCrossKgSearch: true },
+      new PersonalScopeSession(),
+      session
+    );
+
+    expect(result.isError).toBeFalsy();
+    const text = result.content[0].text;
+    expect(text).toContain("a-note.md");
+    expect(text).toContain("b-note.md");
+    expect(text.indexOf("b-note.md")).toBeLessThan(text.indexOf("a-note.md"));
   });
 });

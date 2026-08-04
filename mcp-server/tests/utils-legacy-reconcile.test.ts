@@ -27,8 +27,7 @@ describe("readConfig legacy-path reconciliation", () => {
   // os.homedir() reads the real OS-level environment via the native binding,
   // not Jest's JS-level process.env — setting process.env.HOME alone does not
   // redirect it here (confirmed: unrelated real files were nearly touched
-  // during TDD without this mock). Same pattern as
-  // tests/config-switch-legacy.test.ts's loadUtilsDefaultPath().
+  // during TDD without this mock).
   function loadUtils() {
     jest.doMock("os", () => ({
       ...jest.requireActual("os"),
