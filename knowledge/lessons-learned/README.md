@@ -4,12 +4,12 @@
 
 Comprehensive catalog of all lessons-learned documents.
 
-**Total Lessons:** 55 (10 architecture, 25 process, 20 patterns)
+**Total Lessons:** 59 (10 architecture, 25 process, 20 patterns, 4 debugging)
 **Last Updated:** 2026-08-04
 
 > **Known issues in this index** (see [issue tracker](../issues/README.md) for permanent tracking):
 > - Two files live at the top of `lessons-learned/` instead of inside their declared category folder: `Lessons_Learned_gh_issue_create_omission.md` (process) and `Lessons_Learned_InBand_Version_Warning_Burst_Cadence_Pattern.md` (patterns). Listed below under their correct category; not physically moved.
-> - **2026-08-04 correction:** This index previously declared a "Debugging Lessons (10 total)" category and a matching 10-entry chronological block under `debugging/`. That directory does not exist on disk, is not present anywhere in this branch's git history (`git log --all` and `git log -S` for the referenced filenames return nothing), and no other tracked file in the repo links to it except one dangling reference from `knowledge/issues/README.md` (issue-28's "companion lesson" link, also broken). The 10 debugging entries were removed from this index as fabricated/never-captured content rather than real lessons that went missing — there is nothing to restore. If any of those investigations (MCP rebuild staleness, os.homedir() caching, plugin-cache sync, Docusaurus trailingSlash, marketplace slug truncation, namespace-visibility shadow commands, line-vs-token metrics, interactive prompts in hooks, duplicate hooks declaration) are still relevant, they need to be recaptured as new lessons from scratch — the described content was never written to disk to begin with.
+> - **2026-08-04 correction (revised):** This index previously declared a "Debugging Lessons (10 total)" category, then a follow-up correction removed all 10 entries as fabricated. A second round of investigation determined that framing was wrong for 4 of the 10: **6 confirmed fabricated** (never written to disk, no git history, no chat-history corroboration) — *MCP Server Rebuild Not Reflected In Live Plugin Tool Calls*, *Truncated Plugin Marketplace Slug Bug*, *Plugin Namespace Visibility - Shadow Command Failure* (the PascalCase filename variant — a same-day index artifact, distinct from the real kebab-case lesson below), *Line vs Token Metrics Must Be Applied Consistently*, *Interactive Prompts and Slash Commands Don't Work in Hooks*, and *Duplicate Hooks Declaration Causes Plugin Load Failure* — these remain removed, and any still-relevant investigations among them would need to be recaptured as new lessons from scratch. **4 confirmed real and restored below** under `debugging/`: one (`namespace-visibility-shadow-command-failure.md`) recovered verbatim from git history at commit `26894611`, the only one of the ten that ever touched git before the category was gitignored; the other three (`Lessons_Learned_os_homedir_Stale_Cache_On_macOS.md`, `Lessons_Learned_Debugging_Plugin_Cache_Not_Synced_From_Local_Repo.md`, `Lessons_Learned_Debugging_Docusaurus_Trailingslash_+_Non_Root_Baseurl_Breaks_Static_Asset_Loading_In_Dev.md`) were reconstructed from chat-history evidence, since their originals were always gitignored and never themselves touched git — each carries a Context note to that effect and should not be read as verbatim recoveries.
 
 ---
 
@@ -91,10 +91,22 @@ Comprehensive catalog of all lessons-learned documents.
 
 ---
 
+### Debugging Lessons (4 total)
+
+- [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md) — 2026-02-16 — *recovered verbatim from git history (commit `26894611`)*
+- [Plugin Cache Not Synced From Local Repo](debugging/Lessons_Learned_Debugging_Plugin_Cache_Not_Synced_From_Local_Repo.md) — 2026-04-09 — *reconstructed from chat-history evidence*
+- [Docusaurus trailingSlash + non-root baseUrl breaks static asset loading in dev](debugging/Lessons_Learned_Debugging_Docusaurus_Trailingslash_+_Non_Root_Baseurl_Breaks_Static_Asset_Loading_In_Dev.md) — 2026-04-08 — *reconstructed from chat-history evidence*
+- [os.homedir() Stale Cache On macOS](debugging/Lessons_Learned_os_homedir_Stale_Cache_On_macOS.md) — 2026-07-12 — *reconstructed from chat-history evidence*
+
+**Tags:** #debugging
+
+---
+
 ## Chronological Index
 
 **2026**
 - [2026-07-14] [Resource-Path Migrations Must Grep the Prompt Layer, Not Just the Server Layer](process/Lessons_Learned_Process_Migration_Must_Grep_Prompt_Layer_Not_Just_Server_Layer.md)
+- [2026-07-12] [os.homedir() Stale Cache On macOS](debugging/Lessons_Learned_os_homedir_Stale_Cache_On_macOS.md)
 - [2026-07-12] [Two-Cycle Cross-Model Review for High-Risk Changes](process/Lessons_Learned_Process_Two_Cycle_Cross_Model_Review_For_High_Risk_Changes.md)
 - [2026-07-10] [Fix Ownership Follows the Root-Cause KG, Not the Code's Location](patterns/Lessons_Learned_Patterns_Fix_Ownership_Follows_Root_Cause_KG_Not_Code_Location.md)
 - [2026-06-25] [Bulk Frontmatter Strip Over-Reached Into knowledge dir](process/Lessons_Learned_Process_Bulk_Frontmatter_Strip_Over_Reached_Into_Knowledge_Dir_—_Restore_Via_Git_Checkout_Pre_Strip.md)
@@ -126,6 +138,8 @@ Comprehensive catalog of all lessons-learned documents.
 - [2026-04-09] [Template Source Files Should Encode Role, Not Deployed Output Name](patterns/Lessons_Learned_Template_Source_Naming_Role_Not_Output.md)
 - [2026-04-09] [Check Gitignore Before Migration Cleanup](patterns/Lessons_Learned_Patterns_Check_Gitignore_Before_Migration_Cleanup.md)
 - [2026-04-09] [KMGraph Fingerprint Detection Before Migration](patterns/Lessons_Learned_KMGraph_Fingerprint_Detection_Before_Migration.md)
+- [2026-04-09] [Plugin Cache Not Synced From Local Repo](debugging/Lessons_Learned_Debugging_Plugin_Cache_Not_Synced_From_Local_Repo.md)
+- [2026-04-08] [Docusaurus trailingSlash + non-root baseUrl breaks static asset loading in dev](debugging/Lessons_Learned_Debugging_Docusaurus_Trailingslash_+_Non_Root_Baseurl_Breaks_Static_Asset_Loading_In_Dev.md)
 - [2026-04-07] [Spec Drift In Command Language](process/Lessons_Learned_Process_Spec_Drift_In_Command_Language.md)
 - [2026-04-07] [Git Presence Gate in Commands](patterns/Lessons_Learned_Patterns_Git_Presence_Gate_In_Commands.md)
 - [2026-04-06] [Plugin Settings Scope Consistency](patterns/Lessons_Learned_Plugin_Settings_Scope_Consistency.md)
@@ -147,6 +161,7 @@ Comprehensive catalog of all lessons-learned documents.
 - [2026-02-21] [Plugin Example File Management](architecture/Lessons_Learned_Plugin_Example_File_Management.md)
 - [2026-02-16] [Local Marketplace Testing - Two-Location Sync Required](process/local-marketplace-testing-workflow.md)
 - [2026-02-16] [Commands vs Skills Architecture Research](architecture/Lessons_Learned_Commands_vs_Skills_Architecture.md)
+- [2026-02-16] [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md)
 
 **Undated** (no `date`/`created` frontmatter field — see file body for source context)
 - [Recall Two-Query Pattern in Planning Contexts](architecture/Lessons_Learned_Recall_Two_Query_Pattern_Planning_Contexts.md)
@@ -159,6 +174,7 @@ Comprehensive catalog of all lessons-learned documents.
 **#architecture** (10 lessons) — see [By Category](#architecture-lessons-10-total) above
 **#process** (25 lessons) — see [By Category](#process-lessons-25-total) above
 **#patterns** (20 lessons) — see [By Category](#patterns-lessons-20-total) above
+**#debugging** (4 lessons) — see [By Category](#debugging-lessons-4-total) above
 
 Fine-grained per-lesson tags are in each file's own `tags:` frontmatter — use `/kmgraph:recall "<keyword>"` (FTS5 search) to search across them rather than maintaining a hand-built reverse index here; at this scale a manually maintained fine-grained tag cloud drifts out of sync faster than it can be kept useful.
 
