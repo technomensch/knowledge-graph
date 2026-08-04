@@ -581,7 +581,10 @@ cat > "$HOME/.kmgraph/kg-config.json" << 'CONFIGEOF'
         { "name": "process", "prefix": null, "git": "commit" },
         { "name": "patterns", "prefix": null, "git": "commit" }
       ],
-      "createdAt": "TIMESTAMP"
+      "createdAt": "TIMESTAMP",
+      "status": "active",
+      "statusChangedAt": "TIMESTAMP",
+      "graphId": "GRAPH_ID"
     }
   },
   "sanitization": {
@@ -593,7 +596,7 @@ cat > "$HOME/.kmgraph/kg-config.json" << 'CONFIGEOF'
 CONFIGEOF
 ```
 
-Replace `KG_NAME` with the user's chosen name, `KG_PATH` with the actual path, and `TIMESTAMP` with the current ISO 8601 timestamp.
+Replace `KG_NAME` with the user's chosen name, `KG_PATH` with the actual path, and `TIMESTAMP` with the current ISO 8601 timestamp (use the same value for `createdAt` and `statusChangedAt`). Replace `GRAPH_ID` with a freshly generated UUID (e.g. `uuidgen` or `python3 -c "import uuid; print(uuid.uuid4())"`) — it's this graph's permanent identity, used to detect duplicate registrations. `status` should be `"active"` so the graph is writable; `kg_config_init` uses this same status/statusChangedAt/graphId shape when it creates a config for you.
 
 #### 2C.5: Create Instructions File
 
