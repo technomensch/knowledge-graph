@@ -4,8 +4,8 @@
 
 Tracking of investigated bugs, defects, and meta-issues for this project.
 
-**Total Issues:** 30 numbered issues, plus named meta-issues (see below)
-**Last Updated:** 2026-07-28
+**Total Issues:** 36 numbered issues, plus named meta-issues (see below)
+**Last Updated:** 2026-08-04
 
 ---
 
@@ -20,6 +20,12 @@ Tracking of investigated bugs, defects, and meta-issues for this project.
 ## All Issues (Chronological)
 
 - [issue-40: Capture-level flag naming/targeting consistency across commands+agents (`--named` vs `--project` vs `--graph`)](issue-40/issue-40-description.md) — **Status:** 🟡 OPEN — found during ADR-067 Phase 7.1 verification, split out from [issue-18](issue-18/issue-18-description.md)
+- [issue-39: `kg_capture` Prepends a Second, Differently-Shaped Frontmatter Block When Updating a File via `existingFile`](issue-39/issue-39-description.md) — **Status:** 🟡 Deferred — `kg_capture` called with `metadata.existingFile` pointing at an existing session-summary file prepends a second, differently-shaped frontmatter block instead of merging into the existing one.
+- [issue-38: Multiple `tests/` Suites Reference Pre-`kmg-`-Prefix Command/Skill Names — Silently Broken Since the Rename Migration](issue-38/issue-38-description.md) — **Status:** 🟡 Deferred — Several suites under `tests/` assert against command/skill filenames using the naming convention that predates the `kmg-` prefix rename, so they've been silently broken since the rename migration.
+- [issue-35: `kg_search`/FTS5's `"knowledge"` Directory Entry Is a Dead Pre-Migration Path Literal — Recurrence of issue-31's Pattern](issue-35/issue-35-description.md) — **Status:** ✅ Fixed — Found 2026-07-30 in the same code read that surfaced issue-34; a dead pre-migration path literal in the FTS5 index config, same pattern as issue-31.
+- [issue-34: `kg_search`/FTS5 Index Never Cover `knowledge/issues/` or `knowledge/enhancements/`](issue-34/issue-34-description.md) — **Status:** ✅ Fixed — Found 2026-07-30 while validating whether `kmg-auto-recall`/`kg_search` can surface prior issues and enhancements for a candidate meta-issue attempt-loop prompt (ENH-056); confirmed live that the FTS5 index never covered those directories.
+- [issue-33: Handoff/Recall Commands Don't Require Tracing Linked Files — Sessions Read Only the Pointer Layer](issue-33/issue-33-description.md) — **Status:** 🟡 Deferred — Observed live 2026-07-29 in a `docs-readme-poc` handoff/recall flow: the session read only the top-level package files and never traced back into the linked source files the package pointed to.
+- [issue-31: `kmg-handoff` Writes to Stale Pre-Migration Path `./handoff-packages/` Instead of `knowledge/handoffs/`](issue-31/issue-31-description.md) — **Status:** 🟡 Tracked — `commands/kmg-handoff.md` Step 1 hardcodes its default output directory as the stale pre-migration `./handoff-packages/` path instead of `knowledge/handoffs/`.
 - [issue-30: `kmg-handoff` and `kmg-session-wrap` only reference session-summary — neither generates one](issue-30/issue-30-description.md) — **Status:** 🟡 Deferred (Track only) — found live running `/kmgraph:kmg-handoff` with no session summary for the day; `kmg-handoff`'s own package is incomplete without one by its own stated purpose
 - [issue-29: `/kmgraph:kmg-extract-chat` bleeds cross-project content into `knowledge/chat-history/` (no default project scoping)](issue-29/issue-29-description.md) — **Status:** 🟡 Tracked (GitHub #197) — found live while working on [ADR-067](../decisions/ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md); same root failure class (cross-project KG bleed), different surface; historical archive contamination confirmed across 42 of 118 chat-history files, Feb–Jul 2026 — cleanup tracked as separate required follow-up
 - [issue-28: No Dev-Loop Mechanism Between a Locally Rebuilt `mcp-server/dist/` and Live `kg_*` Tool Calls](issue-28/issue-28-description.md) — **Status:** 🟡 Deferred (Track only) — found live while verifying [issue-27](issue-27/issue-27-description.md)'s fix; companion lesson: [Lessons_Learned_Debugging_MCP_Server_Rebuild_Not_Reflected_In_Live_Plugin_Tool_Calls](../lessons-learned/debugging/Lessons_Learned_Debugging_MCP_Server_Rebuild_Not_Reflected_In_Live_Plugin_Tool_Calls.md)
