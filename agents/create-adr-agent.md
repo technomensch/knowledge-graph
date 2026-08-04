@@ -45,27 +45,21 @@ In the ADR draft, always show before any write:
 
 Pass `targetKg: {project_kg}` directly to `kg_capture` — knowledge graphs resolve automatically from context rather than a mutable "active" pointer, so no switch/restore step is needed before or after the write.
 
-### Interaction with Phase 0 CWD Guard
+### Interaction with Phase 0 Graph Resolution
 
-When `--user`, `--project`, or `--named` is explicitly set, skip the Phase 0 mismatch warning — routing intent is already explicit. Only show the CWD mismatch warning when `--active` (default) is used.
+Phase 0 always resolves the graph via `kg_resolve` regardless of which flag is set — there is no separate mismatch warning to skip. Explicit `--user`/`--project`/`--named` routing still determines the write target (see Path resolution above); Phase 0's resolution supplies `$active_kg_path`/`$active_kg_name` for numbering and other cwd-derived reads.
 
 ---
 
-## Phase 0: Active KG / CWD Guard
+## Phase 0: Resolve Target Graph
 
-Before any work, verify the active knowledge graph matches the current working directory.
+```
+kg_resolve
+```
 
-1. Read `~/.kmgraph/kg-config.json` — get the active KG name and its `path`.
-2. Derive the project root from the KG path: if the path ends in `/docs`, the parent directory is the project root; otherwise the path itself is the root.
-3. Compare the derived root against the current working directory (use `pwd`).
+There is no separate "active" pointer left to disagree with your current working directory (ADR-067 retires the old CWD-mismatch guard, since `kg_resolve` derives the graph from cwd directly — nothing to mismatch against). If `kg_resolve` errors (no graph registered for this directory), stop and tell the user to run `/kmgraph:kmg-init` first. Otherwise, store the returned `path` as `$active_kg_path` and `name` as `$active_kg_name` for use in later phases.
 
-**If mismatch:**
-
-> "Hold on — the active knowledge graph is for **[active KG name]**. Do you want to switch to it, or create the ADR there anyway?"
-
-Block until the user responds. Do not proceed until resolved.
-
-**If match:** Continue to Phase 1.
+Continue to Phase 0.5.
 
 ---
 

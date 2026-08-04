@@ -401,7 +401,7 @@ When using the default output directory (active KG):
 ## Multi-KG Support
 
 When multiple knowledge graphs are configured:
-- Operates on `{active_kg}` (see § Step 0: Active KG / Working Directory Guard above), or `--output-dir` if overridden
+- Operates on `{kg_path}` (see § Step 0: Resolve Target Graph above), or `--output-dir` if overridden
 - Each KG maintains its own chat-history/
 - Use `--output-dir` to extract to specific KG manually
 

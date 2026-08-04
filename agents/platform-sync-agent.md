@@ -30,9 +30,9 @@ Read `{source_file}` in full. If a git diff is available for the file (`git diff
 
 ## Phase 1: Resolve Configured Platforms
 
-Read `~/.kmgraph/kg-config.json`. Find the `active` field and look up `graphs[active]`.
+Call `kg_resolve` to resolve the target graph for the current working directory (no separate "active" pointer to read — ADR-067 derives the graph from cwd directly). If `kg_resolve` errors (no graph registered for this directory), stop and tell the user to run `/kmgraph:kmg-init` first.
 
-Check for a `platforms` array in the active graph config. This tells you which platform files are configured for this project.
+Check for a `platforms` array in the resolved graph config. This tells you which platform files are configured for this project.
 
 If no `platforms` array exists:
 

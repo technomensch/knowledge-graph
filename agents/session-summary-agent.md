@@ -93,7 +93,17 @@ Go directly to [Snapshot Mode](#snapshot-mode) below. Skip Steps 1–9.
 
 ### S1: Resolve output path
 
-Read `~/.kmgraph/kg-config.json` → active KG path → `{active_kg_path}/sessions/`.
+```
+kg_resolve
+```
+
+There is no separate "active" pointer left to disagree with your current directory
+(ADR-067 retires the old `KG_MISMATCH`-style guard, since `kg_resolve` derives the
+graph from cwd directly). If `kg_resolve` errors (no graph registered for this
+directory), stop and tell the user to run `/kmgraph:kmg-init` first. Otherwise, store
+the returned `path` as `$active_kg_path` → `{active_kg_path}/sessions/`. (Snapshot Mode
+is entered directly and skips Steps 1–9, so this resolves independently rather than
+reusing Step 1's value — same underlying call, no separate "active" pointer read.)
 
 Derive unified filename:
 ```bash

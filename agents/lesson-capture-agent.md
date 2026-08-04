@@ -43,27 +43,21 @@ In the lesson draft, always show before any write:
 
 Pass `targetKg: {project_kg}` directly to `kg_capture` — knowledge graphs resolve automatically from context rather than a mutable "active" pointer, so no switch/restore step is needed before or after the write.
 
-### Interaction with Phase 0 CWD Guard
+### Interaction with Phase 0 Graph Resolution
 
-When `--user`, `--project`, or `--named` is explicitly set, skip the Phase 0 mismatch warning — routing intent is already explicit. Only show the CWD mismatch warning when `--active` (default) is used.
+Phase 0 always resolves the graph via `kg_resolve` regardless of which flag is set — there is no separate mismatch warning to skip. Explicit `--user`/`--project`/`--named` routing still determines the write target (see Path resolution above); Phase 0's resolution supplies `$active_kg_path`/`$active_kg_name` for other cwd-derived reads (e.g. Step 2.0's session-summary check).
 
 ---
 
-## Phase 0: Active KG / CWD Guard
+## Phase 0: Resolve Target Graph
 
-Before any write, verify the active knowledge graph matches the current working directory.
+```
+kg_resolve
+```
 
-1. Read `~/.kmgraph/kg-config.json` — get the active KG name and its `path`.
-2. Derive the project root from the KG path: if the path ends in `/docs`, the parent directory is the project root; otherwise the path itself is the root.
-3. Compare the derived root against the current working directory (use `pwd`).
+There is no separate "active" pointer left to disagree with your current working directory (ADR-067 retires the old CWD-mismatch guard, since `kg_resolve` derives the graph from cwd directly — nothing to mismatch against). If `kg_resolve` errors (no graph registered for this directory), stop and tell the user to run `/kmgraph:kmg-init` first. Otherwise, store the returned `path` as `$active_kg_path` and `name` as `$active_kg_name` for use in later phases.
 
-**If mismatch:**
-
-> "Hold on — the active knowledge graph is for **[active KG name]**. Do you want to switch to it, or save this lesson there anyway?"
-
-Block until the user responds. Do not proceed until resolved.
-
-**If match:** Continue to Phase 1.
+Continue to Phase 1.
 
 ---
 
@@ -116,8 +110,8 @@ Check whether the dispatching skill passed a context payload (`context_provided:
 
 Before asking the user for context, check whether a session summary was written today:
 
-1. Read `~/.kmgraph/kg-config.json` to get the active KG path.
-2. Look for any file matching `{kgPath}/sessions/YYYY-MM/*` where the filename contains today's date (format: `YYYY-MM-DD`).
+1. Reuse `$active_kg_path` resolved in Phase 0 — no need to re-resolve.
+2. Look for any file matching `{active_kg_path}/sessions/YYYY-MM/*` where the filename contains today's date (format: `YYYY-MM-DD`).
 3. If found, ask:
 
    > "I found a session summary from today — use it to pre-fill the lesson context?
@@ -210,19 +204,19 @@ Present the draft and prompt:
 
 **Only run this phase if ≥2 KGs are registered in `~/.kmgraph/kg-config.json`.**
 
-Count entries in `graphs`. If only one KG exists, skip this phase and write to the active KG.
+Count entries in `graphs`. If only one KG exists, skip this phase and write to `$active_kg_path` (resolved in Phase 0).
 
 If ≥2 KGs:
 
 1. Identify available destinations:
-   - Active/project KG: `graphs[active]` — name and path
+   - Project KG: `$active_kg_path` / `$active_kg_name` — already resolved in Phase 0, no need to re-read config
    - Personal KGs: all entries with `type: "personal"` — names and paths
 
 2. Present the picker:
 
    > "Where should this lesson be saved?
    >
-   > 1. **[active KG name]** — project KG (this project only)
+   > 1. **[$active_kg_name]** — project KG (this project only)
    > 2. **[personal KG name]** — personal KG (available across all projects)
    >
    > Choose 1 or 2:"

@@ -41,8 +41,8 @@ Before any other step, locate the target file.
 - If no match is found, report an error and exit
 
 **KG content auto-detection:**
-- Read `~/.kmgraph/kg-config.json` to get the active KG path
-- If the resolved file path falls within the active KG directory, automatically pre-select option 2 (KG content) in the disambiguation dialog
+- Call `kg_resolve` to get the target KG path for the current working directory (no separate "active" pointer to read — ADR-067 derives the graph from cwd directly). If `kg_resolve` errors (no graph registered for this directory), skip auto-detection and fall through to the disambiguation dialog.
+- If the resolved file path falls within the resolved KG directory, automatically pre-select option 2 (KG content) in the disambiguation dialog
 
 **Confirmed path stored as `$TARGET_FILE` for subsequent steps.**
 
@@ -76,7 +76,7 @@ Resolved file: $TARGET_FILE
 - **Option 2 selected:** Proceed to Step 1b (KG content confirmation)
 - **Option 3 selected:** Exit with message `Update cancelled.`
 
-**Note:** If KG auto-detection identified the file as KG content (Step 0), pre-select option 2 with a note: `(Auto-detected as KG content based on active KG path)`
+**Note:** If KG auto-detection identified the file as KG content (Step 0), pre-select option 2 with a note: `(Auto-detected as KG content based on resolved KG path)`
 
 #### Step 1b: KG Content Confirmation
 
@@ -545,7 +545,7 @@ If `$TARGET_FILE` is not in the Tier 1 list, exit normally without this prompt.
 
 **Routing**
 - [ ] File path resolved (`$TARGET_FILE` confirmed)
-- [ ] KG auto-detection checked against active KG path
+- [ ] KG auto-detection checked against `kg_resolve`-resolved KG path
 - [ ] Disambiguation dialog shown (if `--user-facing` was absent)
 - [ ] Correct path taken (user-facing wizard or KG content confirmation)
 
