@@ -92,6 +92,10 @@ hardcodes the old path.
   over from the same v0.6.20 migration? Not audited as part of this issue — flagged here
   as a follow-up question. If the answer is yes, that strengthens the case for the
   broader repo-wide grep ADR-066 already recommends as a migration-checklist item.
+  **Answered 2026-07-30 (issue-35): yes, and beyond `commands/*.md`** — `mcp-server/src/tools/fts5.ts`
+  and `search.ts` both carry a dead `"knowledge"` directory-list entry left over from
+  before `kgPath` was changed to point directly at `knowledge/` itself. Same root cause,
+  different layer of the codebase than this issue scoped.
 - Should the fix also add a `knowledge/handoffs/` existence check or a one-time migration
   helper, or is a plain path-literal edit sufficient given `handoff-packages/` content was
   never committed?

@@ -34,6 +34,23 @@ bad idea, but because the lightweight status+timestamp model already satisfies e
 concrete requirement discussed. Revisit only if a real need for multi-transition history
 shows up in practice.
 
+**Concrete use case surfaced 2026-07-28, during ADR-067's Fable Review Findings item 13
+walkthrough:** a "browse activity across all registered KGs" bulk-read tool was proposed for
+a team-lead-on-a-shared-machine scenario, then descoped as not matching how this project's
+actual user works (solo, multiple client repos). A sharper, real version of the underlying
+need surfaced during that discussion: **shared-login / hot-desk accountability** — e.g. a
+federal contractor forced to share a physical desk or log into a shared machine under one
+OS account, where multiple people's registered project KGs end up in the same local registry
+at different times. Cross-project bleed in that scenario is already fully prevented by
+ADR-067 items 1-12 (cwd-based resolution, hard-fail on un-init'd repos, contractor-isolation
+never-fall-back-to-personal) — this is a *different* concern: "who touched what, and when,"
+an audit/accountability question, not a resolution-correctness one. If ENH-054 is revived,
+this is the concrete trigger that would justify it, and the eventual design should carry
+forward two constraints noted during that discussion: any read surface here should stay
+strictly read-only (never reintroduce write-target ambiguity), and any sort/recency key
+should use content-file mtime, not a `lastUsed` registry field (removed under ADR-067 item 4
+— it had no reliable writer once `kmg-switch` retired).
+
 ## Related
 
 - ADR-067 (`knowledge/decisions/ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md`)

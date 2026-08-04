@@ -63,6 +63,8 @@ codex plugin add kmgraph@knowledge-management-graph
 - The hook-based warning (Option 2) should be implemented in the next feature release to catch users who skip documentation
 - The upstream Claude Code issues should be upvoted to increase priority for an official fix
 
+**Update, 2026-07-28:** Option 2 was implemented — see ADR-055 (version sentinel + `kg_upgrade inspect`). A further layer of this same problem, beyond both ADR-054's manual workaround and ADR-055's sentinel, was found and tracked as `issue-32`: an already-running process doesn't pick up new code even after the cache/config staleness is otherwise resolved, since Node.js doesn't hot-reload. Live repro captured the same day.
+
 ## Related
 
 - [Lesson: Claude Code Plugin Cache Stale After Update](../lessons-learned/process/claude-code-plugin-cache-stale-after-update.md)
