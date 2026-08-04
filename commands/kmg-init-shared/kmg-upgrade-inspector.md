@@ -268,7 +268,6 @@ For each item in `upgrades[]`, show a preview entry:
 - **Config fields (check b):** show the current JSON value (missing/null) and the default that would be written, e.g.:
   ```
   [preview] kg-config.json — graphs.{kg_name}.platforms: (missing) → []
-  [preview] kg-config.json — graphs.{kg_name}.autoSwitch: (missing) → false
   ```
 
 - **Templates (check c):** for each template that would be updated, show a line-by-line unified diff between the installed version and the plugin version. For templates that are new (not yet installed), show the full file content. Use plain text — no ANSI color codes required:
@@ -382,14 +381,15 @@ if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
 fi
 # Fields that may be missing from older installs:
 # - platforms: [] (added in v0.2.0)
-# - autoSwitch: false (added in v0.2.0)
 # - notification: { webhookUrl: "" } (added in v0.2.0)
 # - type: "project-local" (added in v0.2.2 — required for multi-KG support)
+# Note: autoSwitch is retired (issue-41 / ADR-067 Phase 9) — resolution is
+# cwd-derived now, there is nothing to "switch." Do not write this field to
+# new or upgraded config entries.
 
 if jq '
   .graphs["{kg_name}"] |=
     if .platforms == null then .platforms = [] else . end |
-    if .autoSwitch == null then .autoSwitch = false else . end |
     if .notification == null then .notification = { "webhookUrl": "" } else . end |
     if .type == null then .type = "{KG_TYPE}" else . end
 ' "$CONFIG_PATH" > "${CONFIG_PATH}.tmp" && [ -s "${CONFIG_PATH}.tmp" ] && jq empty "${CONFIG_PATH}.tmp" 2>/dev/null; then

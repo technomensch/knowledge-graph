@@ -61,14 +61,15 @@ fi
 
 # Fields that may be missing from older installs:
 # - platforms: [] (added in v0.2.0)
-# - autoSwitch: false (added in v0.2.0)
 # - notification: { webhookUrl: "" } (added in v0.2.0)
 # - type: "project-local" (added in v0.2.2 — required for multi-KG support)
+# Note: autoSwitch is retired (issue-41 / ADR-067 Phase 9) — resolution is
+# cwd-derived now, there is nothing to "switch." Do not write this field to
+# new or upgraded config entries.
 
 jq '
   .graphs["'"$kg_name"'"] |=
     if .platforms == null then .platforms = [] else . end |
-    if .autoSwitch == null then .autoSwitch = false else . end |
     if .notification == null then .notification = { "webhookUrl": "" } else . end |
     if .type == null then .type = "project-local" else . end
 ' "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"

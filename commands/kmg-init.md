@@ -1771,9 +1771,8 @@ jq ".graphs[\"$kg_name\"].platforms = (.graphs[\"$kg_name\"].platforms // []) + 
 mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
 ```
 
-Do not error if the `platforms`, `autoSwitch`, or `notification` fields are absent in an existing config entry — treat all missing fields as their defaults:
+Do not error if the `platforms` or `notification` fields are absent in an existing config entry — treat all missing fields as their defaults:
 - `platforms`: `[]`
-- `autoSwitch`: `false`
 - `notification.webhookUrl`: `""`
 
 The updated config entry schema:
@@ -1783,7 +1782,6 @@ The updated config entry schema:
   "my-project": {
     "path": "/path/to/kg/knowledge",
     "type": "project-local",
-    "autoSwitch": false,
     "platforms": ["gemini", "cursor"],
     "notification": { "webhookUrl": "" }
   }

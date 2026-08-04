@@ -96,7 +96,6 @@ function mockActiveKg(kgRoot: string, graphOverrides: Record<string, unknown> = 
         statusChangedAt: new Date().toISOString(),
         graphId: "test-graph-id",
         platforms: [],
-        autoSwitch: false,
         notification: "none",
         ...graphOverrides,
       },
@@ -120,7 +119,7 @@ function mockActiveKgMissingConfigFields(kgRoot: string): void {
         status: "active" as const,
         statusChangedAt: new Date().toISOString(),
         graphId: "test-graph-id",
-        // intentionally missing: platforms, autoSwitch, notification
+        // intentionally missing: platforms, notification
       },
     },
     sanitization: { enabled: false, patterns: [], action: "warn" },
@@ -408,7 +407,7 @@ describe("T-13: apply config backfills missing fields", () => {
     const kgRoot = makeTempDir("t13");
     tempDirs.push(kgRoot);
     scaffoldKg(kgRoot);
-    // Set up a config missing platforms, autoSwitch, notification
+    // Set up a config missing platforms, notification
     const configObj: KgConfig = {
       version: "1.0.0",
       graphs: {
@@ -439,8 +438,8 @@ describe("T-13: apply config backfills missing fields", () => {
     expect(written).not.toBeNull();
     const graph = (written as unknown as KgConfig).graphs["test-kg"] as unknown as Record<string, unknown>;
     expect(graph["platforms"]).toBeDefined();
-    expect(graph["autoSwitch"]).toBeDefined();
     expect(graph["notification"]).toBeDefined();
+    expect(graph["autoSwitch"]).toBeUndefined();
   });
 });
 
@@ -746,7 +745,7 @@ describe("T-25: multiple apply categories in one call", () => {
           status: "active" as const,
           statusChangedAt: new Date().toISOString(),
           graphId: "test-graph-id",
-          // intentionally missing: platforms, autoSwitch, notification
+          // intentionally missing: platforms, notification
         },
       },
       sanitization: { enabled: false, patterns: [], action: "warn" },

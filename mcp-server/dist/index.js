@@ -33435,7 +33435,6 @@ function checkConfig(kgPath, graphName) {
   const graph = config2.graphs[graphName];
   const requiredFields = [
     { field: "platforms", defaultValue: [] },
-    { field: "autoSwitch", defaultValue: false },
     { field: "notification", defaultValue: "none" },
     { field: "type", defaultValue: "project-local" }
   ];
@@ -33587,7 +33586,6 @@ function applyConfig(graphName) {
   const graph = config2.graphs[graphName];
   const defaults = {
     platforms: [],
-    autoSwitch: false,
     notification: "none",
     type: "project-local"
   };

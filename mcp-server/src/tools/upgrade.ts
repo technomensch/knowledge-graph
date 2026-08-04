@@ -113,7 +113,6 @@ function checkConfig(kgPath: string, graphName: string): UpgradeItem[] {
 
   const requiredFields: Array<{ field: string; defaultValue: unknown }> = [
     { field: "platforms", defaultValue: [] },
-    { field: "autoSwitch", defaultValue: false },
     { field: "notification", defaultValue: "none" },
     { field: "type", defaultValue: "project-local" },
   ];
@@ -301,7 +300,6 @@ function applyConfig(graphName: string): string {
   const graph = config.graphs[graphName] as unknown as Record<string, unknown>;
   const defaults: Record<string, unknown> = {
     platforms: [],
-    autoSwitch: false,
     notification: "none",
     type: "project-local",
   };

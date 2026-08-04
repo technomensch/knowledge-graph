@@ -178,7 +178,6 @@ Final config shape for the active KG entry:
 {
   "path": "/path/to/kg/docs",
   "type": "project-local",
-  "autoSwitch": false,
   "platforms": ["gemini", "cursor"],
   "notification": { "webhookUrl": "" }
 }
