@@ -9,6 +9,29 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.0] — 2026-08-04
+
+### Changed
+
+- **ADR-067 resolved: the mutable `.active` KG-config pointer is gone, replaced by context-derived (cwd-based) resolution.** New `resolveGraph()` (`mcp-server/src/config.ts`) derives the working KG from the caller's cwd against the registry every time, instead of trusting a switchable pointer that could silently drift from the KGs actually on disk (nested-KG boundary detection and true-path-tie handling included). `kmg-switch`, `kg_config_switch`, and the `KG_MISMATCH` error path are retired — the whole class of "which KG am I even in" bugs that mechanism caused no longer has a codepath to trigger it. All ~50+ call sites across `commands/`, `agents/`, `skills/`, hook scripts, and `cli.ts` that read or wrote `.active`/`lastUsed` were migrated off it across several sweeps (including two independent Opus review passes that each found additional missed sites, e.g. `recall-agent`, `kg_fts5_rebuild`'s personal-scope path, `kg_search`'s cross-KG confirmation).
+- **Registry schema gains a `status`/`graphId` lifecycle** (`pending`/`active`/`archived`/`deleted`) — every registered KG now has a minted `graphId` and a `.kmgraph-id` marker file, with duplicate-`graphId` detection (a manually copied/cloned KG folder) resolved via a four-answer prompt (reattach / new worktree / fork / decline) instead of silently colliding. A path-health classifier (parent-unreachable / content-missing / ok) gates auto-reactivation of archived entries.
+- **Concurrency-safe config writer** — `writeConfig` is now crash-safe (temp file + fsync + atomic rename) and `updateConfig` merges disjoint concurrent writes instead of last-write-wins clobbering.
+- **New interactivity discriminator** — `resolveInteractionMode()` plus a single `gate()`/`ask()` chokepoint now produce a structured `KMG_INPUT_REQUIRED` response for automated/CI callers instead of hanging on a prompt no one can answer; wired through every confirmation surface added by this release (first-time-repo activation, broad-ancestor registration, `scope:"user"`/`scope:"all"` confirmations, duplicate-`graphId` prompts).
+- **New `kg_compare_graphs` MCP tool** — summarizes recency, recoverability, and worktree-fingerprint signals across candidate KGs to help a caller (human or automated) pick the right one.
+- **New `kg_resolve` MCP tool** — standalone cwd-derived KG path lookup, reachable outside `kmg-init`.
+- **`[personal]`/`[project]` marker syntax** — `kg_capture`/`kg_search` now accept an inline scope marker plus an ephemeral one-shot personal-scope session, alongside a `scope` param added to `kg_capture` and 5 other tools for consistency.
+- **Migration path off the legacy config and `.active`** — `kg_upgrade` gains a new schema-reconciliation apply category that folds an existing legacy `~/.claude/kg-config.json` and any `.active` pointer into the new `status`/`graphId` schema, wired into `kmg-init` and covered by a new end-to-end migration integration test.
+- **Dead `autoSwitch` hook mechanism retired** from upgrade tooling and docs — it had no live callers left once `.active`-driven switching was removed.
+- **`gov-capture-routing` retired** (issue-18) — its indirection was redundant once commands could route `scope`/`targetKg` directly; ADR-034 marked superseded.
+- **ENH-051 closed** — `cli.ts` and `kg_config_init`'s duplicated path-resolution and broad-ancestor-guard logic deduplicated into one shared implementation.
+
+### Fixed
+
+- Multiple personal-scope gate gaps closed across independent review passes: `kg_check_sensitive`'s `kgPath` param could bypass the personal-scope gate; `kg_compare_graphs`'s gate only matched an exact root, not subdirectories; the broad-ancestor guard had a personal-exclusion gap; `kg_search` silently returned empty results for a KG with a missing path instead of surfacing the problem.
+- A section-skip regression and a personal-scope hook-resolve bypass found and closed in the same review pass that closed out the branch.
+
+Closes issue-41.
+
 ## [0.6.20] — 2026-07-18
 
 ### Changed
