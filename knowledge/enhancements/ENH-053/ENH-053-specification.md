@@ -2,7 +2,7 @@
 id: ENH-053
 type: Enhancement
 status: proposed
-github-issue: null
+github-issue: "#208"
 branch: none
 created: 2026-07-26
 related_adrs: ["ADR-067"]
@@ -10,7 +10,7 @@ related_adrs: ["ADR-067"]
 
 # ENH-053: Topic-KGs Spanning Multiple Related Projects (Not User-Graph, Not Single-Project)
 
-**Local ID:** ENH-053 | **GitHub Issue:** none filed (captured only, deferred to future scoping)
+**Local ID:** ENH-053 | **GitHub Issue:** [#208](https://github.com/technomensch/knowledge-graph/issues/208)
 
 ## Problem Statement
 

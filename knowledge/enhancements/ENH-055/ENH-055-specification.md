@@ -2,7 +2,7 @@
 id: ENH-055
 type: Enhancement
 status: proposed
-github-issue: null
+github-issue: "#210"
 branch: none
 created: 2026-07-26
 related_enhs: ["ENH-053", "ENH-054"]
@@ -10,7 +10,7 @@ related_enhs: ["ENH-053", "ENH-054"]
 
 # ENH-055: `kmg-capture-router`'s Trigger Vocabulary Misses "Future Idea" Phrasing
 
-**Local ID:** ENH-055 | **GitHub Issue:** none filed (captured only, deferred to future scoping)
+**Local ID:** ENH-055 | **GitHub Issue:** [#210](https://github.com/technomensch/knowledge-graph/issues/210)
 
 ## Problem Statement
 

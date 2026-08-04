@@ -2,7 +2,7 @@
 id: ENH-058
 type: Enhancement
 status: proposed
-github-issue: null
+github-issue: "#211"
 branch: none
 created: 2026-07-30
 related_enhs: ["ENH-056"]
