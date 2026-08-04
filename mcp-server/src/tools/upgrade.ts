@@ -3,9 +3,25 @@ import { z } from "zod";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { readConfig, writeConfig, getPluginRoot } from "../utils.js";
+import {
+  readConfig,
+  writeConfig,
+  getPluginRoot,
+  CONFIG_PATH,
+  mintGraphId,
+  writeGraphIdMarker,
+  readGraphIdMarker,
+} from "../utils.js";
 import { resolveGraph, resolvePersonalGraph, PersonalScopeSession, confirmPersonalScopeAccess } from "../resolution.js";
-import { resolveInteractionMode, STUB_ASK_TIMEOUT_MS, stubAsk } from "../interaction.js";
+import {
+  resolveInteractionMode,
+  STUB_ASK_TIMEOUT_MS,
+  stubAsk,
+  gate,
+  requireInput,
+  InteractionMode,
+  InputRequiredError,
+} from "../interaction.js";
 import { resolveEffectiveCwd } from "../platform-cwd.js";
 import { handleVersion } from "./version.js";
 
@@ -29,6 +45,7 @@ interface InspectResult {
 }
 
 const APPLY_ORDER = [
+  "status-schema",      // ADR-067 Task 8.1: reconcile old .active/legacy schema before anything else touches the registry
   "config-location",   // must run before anything else reads config from the new path
   "directories",
   "config",
@@ -485,6 +502,190 @@ function checkConfigLocation(): UpgradeItem[] {
   ];
 }
 
+/**
+ * Check f — ADR-067 Task 8.1: detect a registry still shaped with the
+ * pre-ADR-067 schema (top-level `active` key, and/or graph entries missing
+ * status/statusChangedAt/graphId), and/or a leftover legacy
+ * ~/.claude/kg-config.json file still physically present on disk.
+ *
+ * Task 2.2 already write-forwards the legacy file's *content* into the
+ * primary path on first read, so this is not a "which file is authoritative"
+ * question -- it's "the shape of what's already been read" plus "the
+ * physical leftover file's continued existence" (findings doc #5, final
+ * review finding I-1).
+ */
+function checkStatusSchema(): UpgradeItem[] {
+  const config = readConfig();
+  const rawConfig = config as unknown as Record<string, unknown>;
+  const hasTopLevelActive = rawConfig.active !== undefined;
+
+  const graphsNeedingMigration = Object.entries(config.graphs)
+    .filter(([, g]) => {
+      const graph = g as unknown as Record<string, unknown>;
+      return graph.status === undefined || graph.statusChangedAt === undefined || graph.graphId === undefined;
+    })
+    .map(([name]) => name);
+
+  const homeDir = process.env.HOME || os.homedir();
+  const legacyPath = path.join(homeDir, ".claude", "kg-config.json");
+  const legacyFileExists = fs.existsSync(legacyPath);
+
+  if (!hasTopLevelActive && graphsNeedingMigration.length === 0 && !legacyFileExists) return [];
+
+  const reasons: string[] = [];
+  if (hasTopLevelActive) reasons.push("top-level 'active' key still present");
+  if (graphsNeedingMigration.length > 0) {
+    reasons.push(`${graphsNeedingMigration.length} graph(s) missing status/statusChangedAt/graphId: ${graphsNeedingMigration.join(", ")}`);
+  }
+  if (legacyFileExists) reasons.push(`legacy config file still exists at ${legacyPath}`);
+
+  return [
+    {
+      category: "status-schema",
+      description: `ADR-067 schema migration needed: ${reasons.join("; ")}`,
+      details:
+        `Run with apply: ["status-schema"] and confirmMigration: true (interactive callers will instead ` +
+        `be asked to confirm) to migrate every graph to the status/graphId schema and remove the legacy ` +
+        `config file. A backup of both files is written to ${path.join(path.dirname(CONFIG_PATH), "backups")} ` +
+        `before any change, regardless of whether migration is ultimately confirmed.`,
+    },
+  ];
+}
+
+/**
+ * ADR-063 pattern (see performRegistryMerge/backupConfigFromDisk in
+ * tools/config.ts): backs up the real on-disk bytes of both the primary
+ * config and the legacy config (if present) before any destructive step.
+ * Unconditional -- runs before the consent gate below, not after.
+ */
+function backupStatusSchemaFiles(): { configBackupPath: string; legacyBackupPath?: string } {
+  const backupDir = path.join(path.dirname(CONFIG_PATH), "backups");
+  fs.mkdirSync(backupDir, { recursive: true });
+  const ts = new Date().toISOString().replace(/[:.]/g, "-");
+
+  const configBackupPath = path.join(backupDir, `kg-config-${ts}.json`);
+  const onDiskBytes = fs.existsSync(CONFIG_PATH)
+    ? fs.readFileSync(CONFIG_PATH)
+    : Buffer.from("{}", "utf-8"); // no prior config on disk yet — back up an empty placeholder rather than throw
+  fs.writeFileSync(configBackupPath, onDiskBytes);
+
+  const homeDir = process.env.HOME || os.homedir();
+  const legacyPath = path.join(homeDir, ".claude", "kg-config.json");
+  let legacyBackupPath: string | undefined;
+  if (fs.existsSync(legacyPath)) {
+    legacyBackupPath = path.join(backupDir, `kg-config-legacy-${ts}.json`);
+    fs.writeFileSync(legacyBackupPath, fs.readFileSync(legacyPath));
+  }
+
+  return { configBackupPath, legacyBackupPath };
+}
+
+/**
+ * Consent gate for the status-schema migration (spec §12): automated callers
+ * must pass confirmMigration:true explicitly; interactive callers are asked
+ * via gate(), matching every other gate() call site in this codebase. An
+ * explicit confirmMigration is honored directly in either mode (mirrors
+ * config.ts's confirmBroadRegistration/confirmMerge "real answer bypasses
+ * the ask" pattern) so a caller that already has the user's answer never
+ * hits the no-transport stubAsk() timeout.
+ */
+async function confirmStatusSchemaMigration(opts: {
+  mode: InteractionMode;
+  confirmMigration?: boolean;
+  timeoutMs?: number;
+}): Promise<{ confirmed: true } | InputRequiredError> {
+  if (opts.confirmMigration === true) return { confirmed: true };
+  if (opts.mode === "automated") {
+    return requireInput("status_schema_migration", "confirmMigration");
+  }
+  const gated = await gate({
+    mode: opts.mode,
+    reason: "status_schema_migration",
+    param: "confirmMigration",
+    accepts: ["yes", "no"],
+    timeoutMs: opts.timeoutMs,
+    ask: stubAsk, // no real ask() transport yet, same pattern as every other gate() stub in this plan
+  });
+  if ("error" in gated) return gated;
+  if (!("answer" in gated) || gated.answer !== "yes") {
+    return requireInput("status_schema_migration", "confirmMigration", ["yes", "no"]);
+  }
+  return { confirmed: true };
+}
+
+/**
+ * Applies the schema migration: every graph missing status/statusChangedAt/
+ * graphId gets them (status:"active" -- spec §3 has no single "the active
+ * graph" concept anymore, so every non-deleted legacy graph activates
+ * rather than only whatever the old `.active` pointer named); mints a fresh
+ * graphId + marker for any graph lacking one (reusing an existing on-disk
+ * marker instead of minting a second id, if one is somehow already there);
+ * removes the top-level `active` key; and deletes the legacy config file
+ * outright (spec §14 -- retire the legacy path, don't leave an unreconciled
+ * duplicate). Caller must have already gated consent and written the backup.
+ */
+function performStatusSchemaMigration(): string {
+  const config = readConfig();
+
+  const migratedGraphs: string[] = [];
+  for (const [name, g] of Object.entries(config.graphs)) {
+    const graph = g as unknown as Record<string, unknown>;
+    let touched = false;
+
+    if (graph.status === undefined) {
+      graph.status = "active";
+      touched = true;
+    }
+    if (graph.statusChangedAt === undefined) {
+      graph.statusChangedAt = new Date().toISOString();
+      touched = true;
+    }
+    if (graph.graphId === undefined) {
+      const kgPath = (graph.path as string).replace(/^~/, os.homedir());
+      const pathExists = fs.existsSync(kgPath);
+      const existingMarker = pathExists ? readGraphIdMarker(kgPath) : null;
+      const graphId = existingMarker ?? mintGraphId();
+      graph.graphId = graphId;
+      if (pathExists) {
+        try {
+          writeGraphIdMarker(kgPath, graphId);
+        } catch {
+          // Marker already present with a different id than what we just read
+          // (concurrent writer) -- the registry field is still updated above;
+          // Task 1.4's path-health machinery surfaces the mismatch separately.
+        }
+      }
+      touched = true;
+    }
+
+    if (touched) migratedGraphs.push(name);
+  }
+
+  const rawConfig = config as unknown as Record<string, unknown>;
+  const hadTopLevelActive = rawConfig.active !== undefined;
+  delete rawConfig.active;
+
+  writeConfig(config);
+
+  const homeDir = process.env.HOME || os.homedir();
+  const legacyPath = path.join(homeDir, ".claude", "kg-config.json");
+  let legacyRemoved = false;
+  if (fs.existsSync(legacyPath)) {
+    fs.unlinkSync(legacyPath);
+    legacyRemoved = true;
+  }
+
+  const parts: string[] = [];
+  parts.push(
+    migratedGraphs.length > 0
+      ? `Migrated schema for: ${migratedGraphs.join(", ")}`
+      : "All graphs already on current schema"
+  );
+  if (hadTopLevelActive) parts.push("Removed top-level 'active' key");
+  if (legacyRemoved) parts.push(`Removed legacy config file at ${legacyPath}`);
+  return parts.join(". ");
+}
+
 // Files that belong in concepts/ if found in the stray knowledge/ dir
 const STRAY_KNOWLEDGE_TEMPLATE_FILES = [
   "architecture.md",
@@ -645,13 +846,17 @@ function updateLastAppliedVersion(installedVersion: string, graphName: string): 
 // ── Exported handler for direct testing ──────────────────────────────────────
 
 // "version-update" is inspect-only — NOT an apply category; do not add it here
-export type ApplyCategory = "config-location" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir";
+export type ApplyCategory = "status-schema" | "config-location" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir";
 
 export interface HandleUpgradeParams {
   apply?: ApplyCategory[];
   confirm_platform_split?: boolean;
   scope?: "project" | "user";
   confirmPersonalScope?: boolean;
+  // ADR-067 Task 8.1: required (automated mode) to apply "status-schema".
+  // Interactive mode is asked via gate() instead; an explicit true here is
+  // still honored in either mode (see confirmStatusSchemaMigration).
+  confirmMigration?: boolean;
 }
 
 export interface HandleUpgradeResult {
@@ -708,6 +913,7 @@ export async function handleUpgrade(
 
   if (applyList.length === 0) {
     const result: InspectResult = { upgrades: [], warnings: [] };
+    result.upgrades.push(...checkStatusSchema());
     result.upgrades.push(...checkConfigLocation());
 
     if ("error" in target) {
@@ -753,7 +959,7 @@ export async function handleUpgrade(
   const resolvedKgPathForApply = !("error" in target)
     ? target.graph.path.replace(/^~/, os.homedir())
     : undefined;
-  if (resolvedKgPathForApply && !fs.existsSync(resolvedKgPathForApply) && sortedApplyList.some((c) => c !== "config-location")) {
+  if (resolvedKgPathForApply && !fs.existsSync(resolvedKgPathForApply) && sortedApplyList.some((c) => c !== "config-location" && c !== "status-schema")) {
     return {
       content: [{ type: "text" as const, text: `Error: KG path not found: ${resolvedKgPathForApply}` }],
       isError: true,
@@ -761,6 +967,22 @@ export async function handleUpgrade(
   }
 
   for (const category of sortedApplyList) {
+    if (category === "status-schema") {
+      // Backup precedes the consent gate (interfaces item 6) -- unconditional,
+      // regardless of whether the migration is ultimately confirmed.
+      backupStatusSchemaFiles();
+      const mode = resolveInteractionMode({}).mode;
+      const confirmation = await confirmStatusSchemaMigration({
+        mode,
+        confirmMigration: params.confirmMigration,
+        timeoutMs: STUB_ASK_TIMEOUT_MS,
+      });
+      if (!("confirmed" in confirmation)) {
+        return { content: [{ type: "text" as const, text: JSON.stringify(confirmation) }], isError: true };
+      }
+      results.push(`[status-schema] ${performStatusSchemaMigration()}`);
+      continue;
+    }
     if (category === "config-location") {
       results.push(`[config-location] ${applyConfigLocation()}`);
       continue;
@@ -824,11 +1046,11 @@ export function registerUpgradeTool(server: McpServer, personalScopeSession: Per
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
       apply: z
-        .array(z.enum(["config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"]))
+        .array(z.enum(["status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"]))
         .optional()
         .default([])
         .describe(
-          'Categories to apply. Omit or pass [] to inspect only. Values: "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"'
+          'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"'
         ),
       confirm_platform_split: z
         .boolean()
@@ -848,10 +1070,18 @@ export function registerUpgradeTool(server: McpServer, personalScopeSession: Per
           "Confirms this repo may touch the personal knowledge graph. Required once per " +
             "process before a scope:\"user\" upgrade is honored for a repo not yet confirmed."
         ),
+      confirmMigration: z
+        .boolean()
+        .optional()
+        .describe(
+          "Must be true (in automated mode) to apply the status-schema migration -- reconciles " +
+            "old .active/legacy config into the status/graphId schema and deletes the legacy " +
+            "~/.claude/kg-config.json file. Interactive callers are asked to confirm instead."
+        ),
     },
-    async ({ apply, confirm_platform_split, scope, confirmPersonalScope }, extra) => {
+    async ({ apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration }, extra) => {
       return handleUpgrade(
-        { apply: apply as ApplyCategory[] | undefined, confirm_platform_split, scope, confirmPersonalScope },
+        { apply: apply as ApplyCategory[] | undefined, confirm_platform_split, scope, confirmPersonalScope, confirmMigration },
         personalScopeSession,
         extra?._meta as Record<string, unknown> | undefined
       );
