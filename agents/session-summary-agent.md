@@ -37,12 +37,17 @@ These flags are set by the dispatcher (`session-summary` command) directly (see 
 
 ### Path resolution
 
+Step S-1 runs before Step 0/Step 1, so it cannot reuse a later step's resolution — it
+resolves fresh here, and Step 1 / Snapshot Mode S1 (which run after S-1) each resolve
+independently in turn (each call is idempotent — no `.active` pointer to drift out of
+sync).
+
 1. Read flag value (default: `--active` if none passed)
 2. Resolve `$target_path`:
    - `--user` → resolved internally by `kg_capture` when `scope: "user"` is passed; no manual path computation needed here, but still show the resolved path to the user per "Always surface resolved target" below (the `kg_capture` response includes it).
-   - `--project` → read `~/.kmgraph/kg-config.json`, find graph matching current working directory → `{graph.path}/sessions/`
-   - `--named=<kg>` → read `~/.kmgraph/kg-config.json`, find graph by name → `{graph.path}/sessions/`
-   - `--active` → read `~/.kmgraph/kg-config.json` → `{active_kg_path}/sessions/`
+   - `--project` → call `kg_resolve` (cwd-resolved) → `{path}/sessions/`
+   - `--named=<kg>` → read `~/.kmgraph/kg-config.json`, find graph by name → `{graph.path}/sessions/` (`kg_resolve` has no by-name lookup, so a named target still requires a direct config read — this is a legitimate name-keyed lookup, not a read of the dead `.active` field)
+   - `--active` → call `kg_resolve` → `{path}/sessions/`. There is no separate "active" pointer left to disagree with your current directory (ADR-067 retires the old `.active` field; `kg_resolve` derives the graph from cwd directly). If `kg_resolve` errors (no graph registered for this directory), stop and tell the user to run `/kmgraph:kmg-init` first.
 
 ### Always surface resolved target
 
@@ -491,7 +496,7 @@ Skipping any item means starting work without full context.
 - **Uncommitted changes:** [git status --porcelain summary, or "clean"]
 - **In-progress work:** [active plan path — `[path]`]
 - **Next steps:** [first unchecked step from active plan, or "See active plan"]
-- **Active KG:** [KG name from kg-config.json]
+- **Active KG:** [$active_kg_name resolved in Step 1]
 
 ## Open Issues
 
