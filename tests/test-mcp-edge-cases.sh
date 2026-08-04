@@ -42,9 +42,14 @@ mcp_tool_call() {
   local tool_name="$1"
   local _default_args="{}"
   local args_json="${2:-$_default_args}"
+  local sandbox_cwd="${3:-}"
+  local meta=""
+  if [ -n "$sandbox_cwd" ]; then
+    meta=",\"_meta\":{\"sandboxCwd\":\"file://${sandbox_cwd}\"}"
+  fi
   {
     echo "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"test\",\"version\":\"1.0\"}}}"
-    echo "{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"${tool_name}\",\"arguments\":${args_json}}}"
+    echo "{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"${tool_name}\",\"arguments\":${args_json}${meta}}}"
     sleep 0.3
   } | KG_CONFIG_PATH="$TEST_CONFIG" CLAUDE_PLUGIN_ROOT="$REPO_ROOT" node "$MCP_SERVER" 2>/dev/null || true
 }
@@ -80,32 +85,36 @@ fi
 echo ""
 echo "── Active KG Path Issues ───────────────────────────────────────"
 
-# Test 3: Active KG points to non-existent directory
+# Test 3: Registered KG points to a non-existent directory
+# Resolution is cwd-derived (ADR-067), not config-active-derived -- sandboxCwd
+# points at the registered (but missing) path itself so the ancestor-fallback
+# normalization (resolution.ts's resolveNearestExistingAncestor) still
+# resolves this graph rather than erroring earlier with a generic
+# no-graph-in-cwd (issue-41: this used to rely on "active": "ghost-kg" alone).
+GHOST_KG_PATH="$TEST_DIR/this-path-does-not-exist"
 cat > "$TEST_CONFIG" << EOF
 {
   "version": "1.0.0",
-  "active": "ghost-kg",
   "graphs": {
     "ghost-kg": {
       "name": "ghost-kg",
-      "path": "$TEST_DIR/this-path-does-not-exist",
+      "path": "$GHOST_KG_PATH",
       "type": "project-local",
       "categories": [],
-      "createdAt": "2026-01-01T00:00:00.000Z",
-      "lastUsed": "2026-01-01T00:00:00.000Z"
+      "createdAt": "2026-01-01T00:00:00.000Z"
     }
   },
   "sanitization": { "enabled": false, "patterns": [], "action": "warn" }
 }
 EOF
-RESULT=$(mcp_tool_call "kg_search" "{\"query\":\"test\",\"format\":\"summary\"}")
+RESULT=$(mcp_tool_call "kg_search" "{\"query\":\"test\",\"format\":\"summary\"}" "$GHOST_KG_PATH")
 if echo "$RESULT" | grep -qE "does not exist|not found|Error"; then
   pass "Search on non-existent KG path returns clear error"
 else
   fail "Search should error on non-existent KG path"
 fi
 
-RESULT=$(mcp_tool_call "kg_check_sensitive" "{}")
+RESULT=$(mcp_tool_call "kg_check_sensitive" "{}" "$GHOST_KG_PATH")
 if echo "$RESULT" | grep -qE "does not exist|not found|Error"; then
   pass "Sanitization on non-existent KG path returns clear error"
 else
@@ -152,7 +161,7 @@ echo "── Path Edge Cases ─────────────────
 # Test 5: KG path with spaces in directory name
 SPACED_KG="$TEST_DIR/my knowledge graph"
 cat > "$TEST_CONFIG" << 'EOF_RESET'
-{"version":"1.0.0","active":null,"graphs":{},"sanitization":{"enabled":false,"patterns":[],"action":"warn"}}
+{"version":"1.0.0","graphs":{},"sanitization":{"enabled":false,"patterns":[],"action":"warn"}}
 EOF_RESET
 RESULT=$(mcp_tool_call "kg_config_init" "{\"name\":\"spaced-kg\",\"kgPath\":\"$SPACED_KG\"}")
 if echo "$RESULT" | grep -q "initialized" && [ -d "$SPACED_KG/knowledge" ]; then
@@ -166,7 +175,7 @@ echo "── Input Validation ────────────────�
 
 # Reset to clean config
 cat > "$TEST_CONFIG" << 'EOF_RESET'
-{"version":"1.0.0","active":null,"graphs":{},"sanitization":{"enabled":false,"patterns":[],"action":"warn"}}
+{"version":"1.0.0","graphs":{},"sanitization":{"enabled":false,"patterns":[],"action":"warn"}}
 EOF_RESET
 
 # Test 6: Very long search query

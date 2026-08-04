@@ -1,11 +1,11 @@
 
 # /kmgraph:kmg-check-sensitive — Scan for Sensitive Data
 
-Scan the active knowledge graph for potentially sensitive information using regex patterns from config or defaults.
+Scan the knowledge graph resolved from the current directory for potentially sensitive information, using regex patterns from config or defaults.
 
 ## What This Does
 
-Scans all markdown files in active KG for:
+Scans all markdown files in the resolved KG for:
 - Email addresses
 - API keys/tokens (common patterns)
 - URLs (http://, https://)
@@ -15,13 +15,13 @@ Scans all markdown files in active KG for:
 
 ```bash
 /kmgraph:kmg-check-sensitive
-/kmgraph:kmg-check-sensitive --fix-suggestions
+/kmgraph:kmg-check-sensitive --user
 ```
 
 ## Implementation
 
 Call the `kg_check_sensitive` MCP tool directly — it already resolves the target graph
-from your current directory (`scope: "project"`, the default) or the personal graph
+from the current directory (`scope: "project"`, the default) or the personal graph
 (`scope: "user"`, if `--user` was passed), scans for the same email/API-key/URL/custom
 patterns this command used to reimplement in bash, and reports results in the same shape.
 No separate path-resolution step is needed (issue-41: this command previously resolved
@@ -29,7 +29,7 @@ its own scan path via `jq -r '.graphs[.active].path'`, a pre-ADR-067 pattern tha
 longer reflects how any graph is actually selected).
 
 ```
-kg_check_sensitive scope="project"
+kg_check_sensitive scope="project"    # default, or scope="user" if --user was passed
 ```
 
 Pass through `patterns` (additional regexes) if the user supplied any beyond
@@ -46,8 +46,6 @@ and runtime patterns itself.
 - lesson-template.md:8 — api-key: API_KEY=abc123def456
 
 Review these entries before pushing to public repository.
-
-Run with --fix-suggestions to see recommended fixes.
 ```
 
 ## See Also

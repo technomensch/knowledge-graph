@@ -683,8 +683,8 @@ Run these checks to confirm everything is working:
 
 Call the `kg_resolve` MCP tool to get the graph's path (issue-41: this previously read
 `c.graphs[c.active]` via a raw `node -e` one-liner — a pre-ADR-067 pattern that no longer
-reflects how any graph is actually selected; `kg_resolve` resolves from your current
-directory instead), then check its subdirectories:
+reflects how any graph is actually selected; `kg_resolve` resolves from the current
+directory instead). Take the returned `path` as `$KG_PATH`, then check its subdirectories:
 
 ```bash
 [ -d "$KG_PATH/knowledge" ] && echo "DIRS_OK" || echo "DIRS_MISSING"

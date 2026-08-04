@@ -1,7 +1,7 @@
 
 # Create Architecture Decision Record
 
-**Purpose:** Create a new Architecture Decision Record (ADR) using the active knowledge graph. Auto-fills git metadata, auto-increments the ADR number, prompts for decision content, and updates the decisions index.
+**Purpose:** Create a new Architecture Decision Record (ADR) using the knowledge graph resolved from the current directory. Auto-fills git metadata, auto-increments the ADR number, prompts for decision content, and updates the decisions index.
 
 **Version:** 1.0 (Created: 2026-02-20)
 
@@ -52,17 +52,24 @@ After the agent returns, extract the draft content and display it verbatim in yo
 
 ---
 
-## Step 0: Resolve Active KG Path
+## Step 0: Resolve Target KG Path
 
-**Read the active knowledge graph configuration:**
+Resolve `{active_kg_path}` according to the flag Level Routing above resolved (issue-41:
+this step previously read `.active` directly and ignored routing entirely — a
+pre-ADR-067 pattern that also predates Level Routing's own resolution; both are fixed
+together here since Step 0's resolution feeds every direct file operation later in this
+command, not just the `create-adr-agent` dispatch):
 
-```bash
-# Read ~/.kmgraph/kg-config.json
-# Find "active" field
-# Get path from graphs[active].path
-```
+- **`--active` (default):** call `kg_resolve` (no scope — cwd-derived). Take the returned
+  `path` as `{active_kg_path}`.
+- **`--user`:** call `kg_resolve` with `scope: "user"`. Take the returned `path` as
+  `{active_kg_path}`.
+- **`--named=<kg>`:** look up `graphs["<kg>"].path` directly from
+  `~/.kmgraph/kg-config.json` (a keyed lookup by the name the user gave — not the
+  retired mutable-pointer pattern). Take that as `{active_kg_path}`.
 
-Store as `{active_kg_path}` for all subsequent steps.
+If resolution errors (no graph registered for this directory, or the named graph doesn't
+exist), stop and report the error rather than falling through to an undefined path.
 
 **Decisions directory:** `{active_kg_path}/decisions/`
 
@@ -75,28 +82,13 @@ mkdir -p {active_kg_path}/decisions/
 
 ## Project KG Guardrail
 
-**STOP before any write if the active KG does not match the current project's KG.**
-
-After resolving `{active_kg_path}`, detect the project root and its KG:
-
-```bash
-project_root=$(git rev-parse --show-toplevel 2>/dev/null)
-project_kg="${project_root}/knowledge"
-```
-
-If `$project_kg` **exists** AND its resolved path **differs** from `{active_kg_path}`:
-
-> "The active KG is **[active_kg_name]** (`{active_kg_path}`), but this project has its own KG at `{project_kg}/`.
->
-> Which graph should receive this ADR?
->
-> **[1]** Project KG — `{project_kg}/decisions/`
-> **[2]** Active KG — `{active_kg_name}` (`{active_kg_path}/decisions/`)
-> **[3]** Cancel"
-
-Wait for user selection. Update `{active_kg_path}` to the chosen graph's root before continuing. Do **not** proceed to the Snapshot Gate until the user has chosen.
-
-If `$project_kg` does not exist, or paths match, continue without prompting.
+There is no separate guard needed here (issue-41: this section previously compared a
+stale `.active`-derived pointer against the project's own KG and prompted on mismatch —
+a pre-ADR-067 pattern). In the default (`--active`) case, Step 0 above already resolves
+`{active_kg_path}` via cwd-derived resolution, which by construction finds this
+project's own KG — there is nothing left to disagree with. When `--user`/`--named=<kg>`
+is explicitly passed, the user has already stated their intended target; no guard
+applies.
 
 ---
 
@@ -482,7 +474,7 @@ Let me ask a few questions:
 
 ## Checklist Before Creating ADR
 
-- [ ] Active KG path resolved from `~/.kmgraph/kg-config.json`
+- [ ] Target KG path resolved (via `kg_resolve` or named lookup, per Step 0)
 - [ ] ADR number auto-incremented correctly (highest existing + 1)
 - [ ] Git metadata collected (author, email, branch, commit)
 - [ ] Title, status, and category confirmed by user

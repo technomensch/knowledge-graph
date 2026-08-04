@@ -196,7 +196,7 @@ The system presents candidates for your review before creating entries.
 2. Registers it as `type: "personal"` with name `"personal"` in `~/.kmgraph/kg-config.json`
 3. Copies knowledge templates (patterns, gotchas, concepts)
 4. Builds FTS5 search index for the new KG
-5. Does **not** change the active KG — project KG remains active
+5. Does **not** affect which KG resolves from the project directory
 
 After setup:
 - `/kmgraph:kmg-capture-lesson` shows a **KG picker** when ≥2 KGs are registered
@@ -208,7 +208,7 @@ After setup:
 
 # Claude creates ~/.kmgraph/
 # Registers "personal" KG (type: personal) in config
-# Active KG unchanged
+# Project-directory resolution unchanged
 ```
 
 **Related**: See [Personal vs Project Knowledge](../pillars/organizing/personal-vs-project.md) for when to use each.
@@ -289,7 +289,7 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 
 **Example**:
 ```bash
-/kmgraph:kmg-capture-lesson                        # → active KG
+/kmgraph:kmg-capture-lesson                        # → KG resolved from the current directory
 /kmgraph:kmg-capture-lesson "user level"           # → personal KG (~/.kmgraph/)
 /kmgraph:kmg-capture-lesson --project              # → current project's KG
 /kmgraph:kmg-capture-lesson --named=career-ops     # → career-ops KG
@@ -307,13 +307,12 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 - Include error messages verbatim
 - Note what DIDN'T work (helps future you)
 - Level routing: use "user level" for cross-project patterns; "for this project" for codebase-specific lessons. See [Personal vs Project KGs](../pillars/organizing/personal-vs-project) for details.
-- If the active KG differs from the project's own KG, the command stops before writing and asks which graph to use
 
 ---
 
 ### 🟢 `/kmgraph:kmg-status`
 
-**Purpose**: Show the health and contents of the active knowledge graph at a glance. File counts, sync timestamps, staleness warnings, and a quick command reference, all without leaving the conversation.
+**Purpose**: Show the health and contents of the knowledge graph resolved from the current directory at a glance. File counts, staleness warnings, and a quick command reference, all without leaving the conversation.
 
 **When to use**:
 
@@ -324,9 +323,8 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 
 **What it shows**:
 
-- Active KG name and file path
+- Resolved KG name and file path
 - Categories and git strategy
-- Last sync timestamp
 - File counts (lessons, KG entries, ADRs, sessions)
 - Warnings (stale profile files, missing paths)
 - Quick command reference for common next steps
@@ -338,14 +336,13 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 Knowledge Graph Status
 ━━━━━━━━━━━━━━━━━━━━━
 
-Active KG: my-project
+Knowledge Graph: my-project
 Location:  /Users/name/projects/my-app/docs/
 Categories: architecture, process, patterns, debugging
 Git: selective (architecture/patterns committed, process/debugging gitignored)
-Last sync: 2026-02-12 15:45
 
 Stats:
-  Lessons: 12 (3 new since last sync)
+  Lessons: 12
   KG Entries: 28 patterns, 6 concepts, 4 gotchas
   ADRs: 5
   Sessions: 8
@@ -407,11 +404,11 @@ Dispatches to the recall agent, which searches:
 
 | Value | Behavior |
 |---|---|
-| `active` | Active KG only (original behavior) |
-| `all` | Active KG + all registered KGs (auto-default when personal KG exists) |
+| `active` | The KG resolved from the current directory only |
+| `all` | The resolved KG + all registered KGs (auto-default when personal KG exists) |
 | `personal-only` | Only KGs with `type: personal` |
 
-**Level routing**: Scope search to a specific KG without changing the active KG:
+**Level routing**: Scope search to a specific KG:
 
 | Flag / Natural Language | Searches |
 |---|---|
@@ -479,7 +476,7 @@ Dispatches to the recall agent, which searches:
 
 ### 🟡 `/kmgraph:kmg-add-category`
 
-**Purpose**: Add a new category to the active knowledge graph. Creates the directory structure, index file, and git strategy in one step, so the new category is ready to capture lessons immediately.
+**Purpose**: Add a new category to the knowledge graph resolved from the current directory. Creates the directory structure, index file, and git strategy in one step, so the new category is ready to capture lessons immediately.
 
 **When to use**:
 
@@ -536,7 +533,7 @@ Dispatches to the recall agent, which searches:
 
 **Example**:
 ```bash
-/kmgraph:kmg-session-summary                        # → active KG
+/kmgraph:kmg-session-summary                        # → KG resolved from the current directory
 /kmgraph:kmg-session-summary --auto                 # Skip confirmation, save immediately
 /kmgraph:kmg-session-summary --snapshot             # Mid-session save without review gate
 /kmgraph:kmg-session-summary "user level"           # → personal KG (~/.kmgraph/sessions/)
@@ -568,7 +565,7 @@ Dispatches to the recall agent, which searches:
 **What it does**:
 
 1. `{OPTIONAL}` Before capturing ADR, prompt will ask whether or not to take a snapshot of the current session before starting to preserve an archive of the context behind the decision
-2. Reviews the current ADR items in the active knowledge graph
+2. Reviews the current ADR items in the resolved knowledge graph
 3. Assigns the next ADR number automatically
 4. Captures git context for the record — author, branch, and PR/issue number automatically
 5. Wizard starts to capture the following:
@@ -590,7 +587,7 @@ Dispatches to the recall agent, which searches:
 
 **Example**:
 ```bash
-/kmgraph:kmg-create-adr                                             # → active KG
+/kmgraph:kmg-create-adr                                             # → KG resolved from the current directory
 /kmgraph:kmg-create-adr "Use PostgreSQL for primary database"       # Pre-fills title
 /kmgraph:kmg-create-adr "Prefer TypeScript strict mode" --user      # → personal KG decisions/
 /kmgraph:kmg-create-adr "Use Redis caching" --project               # → current project decisions/
@@ -602,26 +599,25 @@ Dispatches to the recall agent, which searches:
 - Use Proposed status for decisions still under review; Accepted for decisions already implemented
 - Link to related lessons in Step 3.8 — creates bidirectional traceability
 - If a snapshot was taken earlier in the session, the ADR's Context section can draw from it
-- If the active KG differs from the project's own KG, the wizard stops before writing and asks which graph to use
 
 ---
 
 ### 🟡 `/kmgraph:kmg-list`
 
-**Purpose**: Display all knowledge graph projects registered locally. Useful when working across multiple projects and the exact KG name needs to be identified before switching.
+**Purpose**: Display all knowledge graph projects registered locally. Useful when working across multiple projects and the exact KG name needs to be identified.
 
 **When to use**:
 
 - View all available knowledge graphs
-- Check which KG is currently active
-- Review KG configurations before switching
+- Check which KG resolves from the current directory
+- Review KG configurations
 - Verify a new KG was created successfully
 
 **What it shows**:
 
 - All configured knowledge graphs with numbered list
-- Active KG highlighted
-- Location paths, categories, git strategy, last used timestamp
+- The KG resolved from the current directory highlighted, if any
+- Location paths, categories, git strategy
 - Total count
 
 **Time**: Instant
@@ -649,7 +645,7 @@ Total: 2 knowledge graph(s) configured
 
 ### 🟡 `/kmgraph:kmg-check-sensitive`
 
-**Purpose**: Scan the active knowledge graph for emails, API keys, and internal URLs before pushing to a shared repository. Flags findings with file name and line number for manual review.
+**Purpose**: Scan the knowledge graph resolved from the current directory for emails, API keys, and internal URLs before pushing to a shared repository. Flags findings with file name and line number for manual review.
 
 **When to use**:
 
@@ -660,9 +656,9 @@ Total: 2 knowledge graph(s) configured
 **What it does**:
 
 1. Loads scan patterns from `.claude/sanitization-config.json` (or uses defaults)
-2. Scans all markdown files in the active KG for: email addresses, API keys/tokens, URLs
+2. Scans all markdown files in the resolved KG for: email addresses, API keys/tokens, URLs
 3. Reports findings with file name, line number, and matched content
-4. Optionally shows fix suggestions with `--fix-suggestions` flag
+4. Use `--user` to scan the personal knowledge graph instead
 
 **Time**: Under 5 seconds
 
@@ -738,8 +734,8 @@ Test the hook:
 
 **What it does**:
 
-1. **(Step 0) Checks active KG alignment** — Compares the active KG's project root against the current working directory. On mismatch, stops and asks: switch active KG / proceed to active KG anyway / cancel. Skipped when `--output-dir` or `--project` is present.
-2. Determines output directory (active KG's `chat-history/` by default, or custom path)
+1. **(Step 0) Resolves the target KG** — calls `kg_resolve` to derive the graph from the current working directory. Skipped when `--output-dir` or `--project` is present.
+2. Determines output directory (the resolved KG's `chat-history/` by default, or custom path)
 2. Scans Claude logs (`~/.claude/projects/` for `.jsonl` files), Gemini logs (`~/.gemini/tmp/` for `session-*.json` [pre-0.42.0] and `session-*.jsonl` [0.42.0+, streaming format], plus `~/.gemini/antigravity/conversations/` for `.pb` files), and/or Codex CLI sessions (`~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl`)
 3. Merges sessions by date into `YYYY-MM-DD-claude.md`, `YYYY-MM-DD-gemini.md`, and/or `YYYY-MM-DD-codex.md`
 4. If a daily file exceeds 900 KB or 30,000 lines, automatically splits into numbered parts (`-part1.md`, `-part2.md`, …) inside a `YYYY-MM-DD/` subfolder to prevent Obsidian rendering failures
@@ -1138,7 +1134,7 @@ Reading time: ~20 minutes for complete orientation
 **Three ways to view knowledge**:
 
 1. **`/kmgraph:kmg-status`**
-   - High-level overview of active KG
+   - High-level overview of the resolved KG
    - File counts, warnings, recent activity
    - Use: Daily check-in, health check
 

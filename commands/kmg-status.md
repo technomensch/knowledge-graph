@@ -1,14 +1,13 @@
 
 # /kmgraph:kmg-status — Knowledge Graph Status Dashboard
 
-Display active knowledge graph information, statistics, and quick command reference.
+Display the resolved knowledge graph's information, statistics, and quick command reference.
 
 ## What This Does
 
 Shows:
-- Active KG name and location
+- Resolved KG name and location
 - Categories and git strategy
-- Last sync timestamp
 - File counts (lessons, KG entries, ADRs, sessions)
 - Warnings (stale profile files, missing config, path not found)
 - Quick command reference
@@ -19,11 +18,10 @@ Shows:
 Knowledge Graph Status
 ━━━━━━━━━━━━━━━━━━━━━
 
-Active KG: my-project
+Knowledge Graph: my-project
 Location:  /Users/name/projects/my-app/docs/
 Categories: architecture, process, patterns, debugging
 Git: selective (architecture/patterns committed, process/debugging gitignored)
-Last sync: 2026-02-12 15:45
 
 Stats:
   Lessons: 12 (3 new since last sync)
@@ -54,23 +52,23 @@ if [ ! -f "$CONFIG_PATH" ]; then
 fi
 ```
 
-### Step 2: Get Active KG
+### Step 2: Resolve Target KG
+
+Call `kg_resolve` (issue-41: this step previously read `.active` directly — a
+pre-ADR-067 pattern; `kg_resolve` derives the graph from the current working directory
+instead). If it errors (no graph registered for this directory):
 
 ```bash
-CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
-
-active=$(jq -r '.active' "$CONFIG_PATH")
-
-if [ "$active" == "null" ]; then
-  echo "No active knowledge graph."
-  echo ""
-  echo "Available graphs:"
-  /kmgraph:kmg-list --names-only
-  echo ""
-  echo "cd into one of these projects' directories to resolve against it."
-  exit 0
-fi
+echo "No knowledge graph resolved from your current directory."
+echo ""
+echo "Available graphs:"
+/kmgraph:kmg-list --names-only
+echo ""
+echo "cd into one of these projects' directories to resolve against it."
+exit 0
 ```
+
+Otherwise, take the returned `name` as `$active` and `path` as `$kg_path` below.
 
 ### Step 3: Load KG Details
 
@@ -78,10 +76,7 @@ fi
 CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
 
 kg_data=$(jq -r ".graphs[\"$active\"]" "$CONFIG_PATH")
-kg_path=$(echo "$kg_data" | jq -r '.path')
-kg_path="${kg_path/#\~/$HOME}"  # Expand tilde
 categories=$(echo "$kg_data" | jq -r '.categories[].name' | tr '\n' ', ' | sed 's/,$//')
-last_used=$(echo "$kg_data" | jq -r '.lastUsed')
 ```
 
 ### Step 4: Count Files
@@ -139,11 +134,10 @@ done
 echo "Knowledge Graph Status"
 echo "━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "Active KG: $active"
+echo "Knowledge Graph: $active"
 echo "Location:  $kg_path"
 echo "Categories: $categories"
 echo "Git: $(determine_git_strategy "$kg_data")"
-echo "Last sync: $(format_date "$last_used")"
 echo ""
 
 if [ ! -d "$kg_path" ]; then
@@ -195,7 +189,7 @@ JSON output:
 Output:
 ```json
 {
-  "active": "my-project",
+  "name": "my-project",
   "path": "/Users/name/projects/my-app/docs/",
   "stats": {
     "lessons": 12,

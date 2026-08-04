@@ -166,7 +166,7 @@ echo "── Section 5: Default fallback (active key null) ───────
 
 # Test 9: Config exists but active is null
 cat > "$TEST_CONFIG" << 'NULLEOF'
-{"version":"1.0.0","active":null,"graphs":{},"sanitization":{"enabled":false,"patterns":[],"action":"warn"}}
+{"version":"1.0.0","graphs":{},"sanitization":{"enabled":false,"patterns":[],"action":"warn"}}
 NULLEOF
 rm -f "/tmp/.kg-session-summarized-default-${TODAY}"
 set +e

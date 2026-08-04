@@ -81,7 +81,7 @@ fi
 
 # Test 2: Config exists but no active KG
 cat > "$TEST_CONFIG" << 'EOF'
-{"version":"1.0.0","active":null,"graphs":{},"sanitization":{"enabled":false,"patterns":[],"action":"warn"}}
+{"version":"1.0.0","graphs":{},"sanitization":{"enabled":false,"patterns":[],"action":"warn"}}
 EOF
 OUTPUT=$(KG_CONFIG_PATH="$TEST_CONFIG" bash "$HOOKS_MASTER" 2>&1 || true)
 EXIT_CODE=$?

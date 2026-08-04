@@ -41,7 +41,7 @@ First-time users need these for basic operation:
 | `/kmgraph:kmg-init` | Initialize a new knowledge graph with wizard-based setup |
 | `/kmgraph:kmg-init-personal-kg` | Create personal KG at `~/.kmgraph/` for cross-project lessons |
 | `/kmgraph:kmg-capture-lesson [topic]` | Document lessons learned with git metadata tracking |
-| `/kmgraph:kmg-status` | View active knowledge graph info and quick reference |
+| `/kmgraph:kmg-status` | View the resolved knowledge graph's info and quick reference |
 | `/kmgraph:kmg-recall [query]` | Search across all memory systems (lessons, decisions, knowledge) |
 
 *→ [Full details in Command Guide](reference/command-guide.md#essential-commands)*
@@ -167,7 +167,7 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 - **Sanitization**: Process of detecting and removing sensitive data (API keys, credentials, PII) before sharing code publicly
 - **Meta-Issue**: Multi-attempt problem tracking system for complex bugs that span multiple debugging sessions
 - **Category**: Organizational unit within a knowledge graph (e.g., "debugging", "architecture", "process")
-- **Active KG**: The currently selected knowledge graph when multiple graphs are configured
+- **Target Knowledge Graph**: The knowledge graph a command operates on, resolved from the current working directory — not a manually selected "active" graph
 - **Session Summary**: Markdown summary of a chat session extracted from conversation history
 - **Recall**: Unified search across lessons learned, decisions, knowledge graph, and session summaries
 - **Search Index** (`kg_fts5_rebuild`): Optional catalog of all knowledge graph content. Build or refresh it for faster, relevance-ranked search results. Updates automatically during sync-all once enabled
@@ -229,7 +229,7 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 ## Quick Tips
 
 - **Start with Essential commands** — Add Intermediate and Advanced commands as needs arise
-- **Use `/kmgraph:kmg-status` often** — Shows what's in your active knowledge graph at a glance
+- **Use `/kmgraph:kmg-status` often** — Shows what's in the resolved knowledge graph at a glance
 - **`/kmgraph:kmg-recall` searches everything** — Lessons, decisions, knowledge entries, and session summaries; add `--scope=all` to include personal KG
 - **MEMORY.md auto-updates** — Check it before important sessions to see what context is loaded
 - **Commands use colon syntax** — It's `/kmgraph:` not `/knowledge-` (colon, not hyphen)

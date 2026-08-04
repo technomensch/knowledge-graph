@@ -13,7 +13,7 @@ title: Commands Reference
 | Command | Description | Key flags |
 |---|---|---|
 | [`/kmgraph:kmg-init`](#init) | Initialize a new knowledge graph with wizard-based setup; discovers locally running Ollama and LM Studio instances and offers to configure them for tier mapping | — |
-| [`/kmgraph:kmg-status`](#status) | Display active KG health, file counts, and warnings | `--minimal`, `--json` |
+| [`/kmgraph:kmg-status`](#status) | Display the resolved KG's health, file counts, and warnings | `--minimal`, `--json` |
 | [`/kmgraph:kmg-recall`](#recall) | Full-text search across lessons, ADRs, KG entries, sessions, and the authoritative profile files (`~/.kmgraph/rules.md`, `~/.kmgraph/me.md`, `knowledge/rules.md`, `knowledge/me.md`) | `--scope=all\|active\|personal-only`, `--user`, `--project`, `--named=<kg>`, `--format=detailed\|paths` |
 | [`/kmgraph:kmg-capture-lesson`](#capture-lesson) | Guided interview to document a problem solved, pattern discovered, or bug fixed | `--user`, `--project`, `--named=<kg>` |
 
@@ -94,7 +94,7 @@ title: Commands Reference
 | [`/kmgraph:kmg-add-category`](#add-category) | Add a new category directory and KG entry file to an existing knowledge graph | `--prefix <p>`, `--git ignore\|commit` |
 | [`/kmgraph:kmg-list`](#list) | List all configured knowledge graphs from `~/.kmgraph/kg-config.json` | `--names-only`, `--json` |
 | [`/kmgraph:kmg-config-sanitization`](#config-sanitization) | Install a pre-commit hook for sensitive-data detection with interactive pattern wizard | — |
-| [`/kmgraph:kmg-check-sensitive`](#check-sensitive) | Scan active KG files for emails, API keys, and internal URLs before sharing | `--fix-suggestions` |
+| [`/kmgraph:kmg-check-sensitive`](#check-sensitive) | Scan the resolved KG's files for emails, API keys, and internal URLs before sharing | `--user` |
 | [`/kmgraph:kmg-update-doc`](#update-doc) | Update plugin or project documentation with standards validation and diff preview | `--user-facing` |
 | [`/kmgraph:kmg-setup-platform`](#setup-platform) | Detect installed AI tools and configure KMGraph integrations per platform | — |
 
