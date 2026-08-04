@@ -78,7 +78,7 @@ Run `kg_upgrade` (or `/kmgraph:kmg-init`, option 1 — Verify/upgrade) to migrat
 - Both the primary and any leftover legacy config file are backed up to `~/.kmgraph/backups/` unconditionally, before anything is changed.
 - Every graph whose path is still reachable (`checkGraphPathHealth` reports `"ok"`) is migrated to the new schema and set to `status: "active"`; the old top-level `active` key is removed.
 - A graph whose path is no longer reachable is **not** silently activated — it is left unmigrated and listed under "Needs attention" in the `kg_upgrade` result so you can decide whether to relocate, archive, or remove it.
-- Once every graph is migrated, the leftover legacy `~/.claude/kg-config.json` file is deleted (after the backup above, and only with confirmation — pass `confirmMigration: true` when calling `kg_upgrade` non-interactively).
+- The leftover legacy `~/.claude/kg-config.json` file is deleted as part of this same migration step (after the backup above, and only with confirmation — pass `confirmMigration: true` when calling `kg_upgrade` non-interactively). This happens regardless of whether every graph was migrated — a graph left under "Needs attention" does not block the legacy file's deletion, since it's already safely backed up and the "Needs attention" graph was never depending on that legacy file in the first place.
 
 If you see a "Needs attention" entry after migrating, the fastest path is usually to fix the graph's `path` field (or remove the stale entry) in `~/.kmgraph/kg-config.json` and re-run `kg_upgrade` to pick it up.
 

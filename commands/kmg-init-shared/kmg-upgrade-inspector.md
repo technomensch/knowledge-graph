@@ -51,12 +51,13 @@ The tool returns:
 
 **Parse `upgrades[]`:**
 - For each entry: add its `description` to the wizard's pending items display.
-- For each entry with `category` in `["directories", "config", "templates", "starter-relocation", "stray-knowledge-dir"]`: add the deduplicated `category` value to `_mcp_apply[]` (dedup: only add if not already present) and set its per-category tracking flag in your context:
+- For each entry with `category` in `["directories", "config", "templates", "starter-relocation", "stray-knowledge-dir", "status-schema"]`: add the deduplicated `category` value to `_mcp_apply[]` (dedup: only add if not already present) and set its per-category tracking flag in your context:
   - `"directories"` → `_mcp_covered_directories=true`
   - `"config"` → `_mcp_covered_config=true`
   - `"templates"` → `_mcp_covered_templates=true`
   - `"starter-relocation"` → `_mcp_covered_starter_relocation=true`
   - `"stray-knowledge-dir"` → `_mcp_covered_stray_knowledge_dir=true`
+  - `"status-schema"` → `_mcp_covered_status_schema=true` (ADR-067 Task 8.1: reconciles the legacy `.active`/schema-less registry shape and removes the leftover legacy config file; see the confirmMigration note under "Apply MCP-covered items first" below)
 - If `category` is `"version-update"`: display the description as an informational item but do NOT add to `_mcp_apply[]` and do NOT set a tracking flag — it is inspect-only and cannot be applied via `kg_upgrade apply`.
 
 These per-category flags are **LLM-tracked state variables** — they are tracked in your context across bash block invocations in this module, not as shell variables. Each guarded bash block below begins with a prose instruction ("Only run if `_mcp_covered_X` is not set") that is the actual gate.
@@ -326,12 +327,15 @@ If the user picks option 3 (skip), exit with no changes.
 
 **Apply MCP-covered items first** (when `_mcp_apply[]` is non-empty):
 
-Call `kg_upgrade apply: [<_mcp_apply contents>]`.
+Call `kg_upgrade apply: [<_mcp_apply contents>]`. **If `_mcp_apply[]` contains `"status-schema"`, the same call must also pass `confirmMigration: true`** — the wizard's own consent step (the item's description was already shown in the pending-items list above, and the user chose "Apply all" or explicitly approved this item under "choose individually") satisfies `kg_upgrade`'s consent gate for this migration; without `confirmMigration: true` the tool call will fail with `KMG_INPUT_REQUIRED` even though the user already agreed.
 
-`_mcp_apply[]` may only contain values from the valid apply enum: `"directories"`, `"config"`, `"templates"`, `"starter-relocation"`, `"stray-knowledge-dir"`. Never include `"version-update"` or `"platform-split"` — these will cause Zod validation to reject the entire call.
+`_mcp_apply[]` may only contain values from the valid apply enum: `"directories"`, `"config"`, `"templates"`, `"starter-relocation"`, `"stray-knowledge-dir"`, `"status-schema"`. Never include `"version-update"` or `"platform-split"` — these will cause Zod validation to reject the entire call.
 
 Example: if Step 0 found `directories` and `templates` pending:
 `kg_upgrade apply: ["directories", "templates"]`
+
+Example: if Step 0 found `status-schema` pending (alone or combined with other MCP-covered categories):
+`kg_upgrade apply: ["status-schema"], confirmMigration: true`
 
 Then continue to apply wizard-only items (d, e, f, g, h, i, j, k) via their existing bash logic. (Sections a, b, c, l, m are each guarded by their per-category flag — no double-apply.)
 

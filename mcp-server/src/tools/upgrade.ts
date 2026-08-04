@@ -516,6 +516,15 @@ function checkConfigLocation(): UpgradeItem[] {
  * question -- it's "the shape of what's already been read" plus "the
  * physical leftover file's continued existence" (findings doc #5, final
  * review finding I-1).
+ *
+ * Final review finding 2 (Phase 8 final review): matches
+ * checkConfigLocation()/applyConfigLocation() -- when KG_CONFIG_PATH is set,
+ * readConfig() (utils.ts) deliberately does NOT write-forward legacy content
+ * into the overridden path, so the legacy file at ~/.claude/kg-config.json
+ * has nothing to do with that active config. Detecting/backing up/deleting
+ * it here would be acting on a file that was never actually migrated into
+ * the config in play. Skip legacy-file handling entirely in that case; the
+ * schema-shape check for the (overridden-path) config itself still runs.
  */
 function checkStatusSchema(): UpgradeItem[] {
   const config = readConfig();
@@ -531,7 +540,7 @@ function checkStatusSchema(): UpgradeItem[] {
 
   const homeDir = process.env.HOME || os.homedir();
   const legacyPath = path.join(homeDir, ".claude", "kg-config.json");
-  const legacyFileExists = fs.existsSync(legacyPath);
+  const legacyFileExists = !process.env.KG_CONFIG_PATH && fs.existsSync(legacyPath);
 
   if (!hasTopLevelActive && graphsNeedingMigration.length === 0 && !legacyFileExists) return [];
 
@@ -689,7 +698,13 @@ function performStatusSchemaMigration(): string {
   const homeDir = process.env.HOME || os.homedir();
   const legacyPath = path.join(homeDir, ".claude", "kg-config.json");
   let legacyRemoved = false;
-  if (fs.existsSync(legacyPath)) {
+  // Final review finding 2 (Phase 8 final review): matches checkStatusSchema()
+  // above and applyConfigLocation()/checkConfigLocation() -- when
+  // KG_CONFIG_PATH is set, readConfig() never forwarded the legacy file's
+  // content into it, so this migration has nothing to do with that legacy
+  // file. Leave it untouched rather than deleting a file whose content was
+  // never actually migrated into the active (overridden) config.
+  if (!process.env.KG_CONFIG_PATH && fs.existsSync(legacyPath)) {
     fs.unlinkSync(legacyPath);
     legacyRemoved = true;
   }

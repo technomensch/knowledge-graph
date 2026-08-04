@@ -300,4 +300,124 @@ describe("handleUpgrade status-schema migration category (ADR-067 Task 8.1)", ()
     expect(item).toBeDefined();
     expect(item.description).toMatch(/orphan-kg/);
   });
+
+  // Final review finding 3 (Phase 8 final review): performStatusSchemaMigration
+  // deletes the legacy file unconditionally, independent of whether any graph
+  // is left under "Needs attention" -- the plan's Task 8.1 brief describes
+  // legacy-file retirement as this task's own destructive step (spec §14,
+  // "retire the legacy path outright"), not something gated on every graph
+  // migrating cleanly. Combines the two scenarios the Task 8.1/8.3 tests each
+  // covered alone (orphan graph; legacy file present) into a single case.
+  it("deletes the legacy file even when an orphaned graph is left needing attention", async () => {
+    const home = makeTempDir("home");
+    const kgRoot = makeTempDir("kg"); // healthy graph
+    scaffoldKg(kgRoot);
+    const orphanParent = makeTempDir("orphan-parent");
+    const orphanPath = path.join(orphanParent, "does-not-exist-kg");
+    delete process.env.KG_CONFIG_PATH;
+    process.env.HOME = home;
+
+    const primaryDir = path.join(home, ".kmgraph");
+    fs.mkdirSync(primaryDir, { recursive: true });
+    const primaryConfigPath = path.join(primaryDir, "kg-config.json");
+    const config = {
+      version: "1.0.0",
+      active: "legacy-kg",
+      graphs: {
+        "legacy-kg": {
+          name: "legacy-kg",
+          path: kgRoot,
+          type: "project-local",
+          categories: [],
+          createdAt: new Date().toISOString(),
+          lastUsed: new Date().toISOString(),
+          platforms: [],
+          autoSwitch: false,
+          notification: "none",
+        },
+        "orphan-kg": {
+          name: "orphan-kg",
+          path: orphanPath,
+          type: "project-local",
+          categories: [],
+          createdAt: new Date().toISOString(),
+          lastUsed: new Date().toISOString(),
+          platforms: [],
+          autoSwitch: false,
+          notification: "none",
+        },
+      },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    };
+    fs.writeFileSync(primaryConfigPath, JSON.stringify(config), "utf-8");
+
+    // Leftover legacy file also present.
+    const legacyDir = path.join(home, ".claude");
+    fs.mkdirSync(legacyDir, { recursive: true });
+    const legacyConfigPath = path.join(legacyDir, "kg-config.json");
+    fs.writeFileSync(legacyConfigPath, JSON.stringify(config), "utf-8");
+
+    const { handleUpgrade } = loadHandleUpgrade(home);
+    const result = await handleUpgrade({ apply: ["status-schema"], confirmMigration: true });
+
+    expect(result.isError).toBeUndefined();
+
+    // The orphan is still left needing attention...
+    const migrated = JSON.parse(fs.readFileSync(primaryConfigPath, "utf-8"));
+    expect(migrated.graphs["orphan-kg"].status).toBeUndefined();
+    expect(result.content[0].text).toMatch(/[Nn]eeds attention/);
+    expect(result.content[0].text).toMatch(/orphan-kg/);
+
+    // ...but the legacy file is still deleted unconditionally (backed up first).
+    expect(fs.existsSync(legacyConfigPath)).toBe(false);
+    expect(result.content[0].text).toMatch(/Removed legacy config file/);
+    const backupDir = path.join(primaryDir, "backups");
+    const backups = fs.readdirSync(backupDir);
+    expect(backups.some((f) => f.includes("legacy"))).toBe(true);
+  });
+
+  // Final review finding 2 (Phase 8 final review): checkStatusSchema() and
+  // performStatusSchemaMigration() must match checkConfigLocation()/
+  // applyConfigLocation() -- when KG_CONFIG_PATH is set, readConfig() never
+  // forwarded the legacy file's content into the overridden config, so this
+  // migration must not detect, back up, or delete that unrelated legacy file.
+  it("skips legacy-file detection and deletion entirely when KG_CONFIG_PATH is set", async () => {
+    const home = makeTempDir("home");
+    const kgRoot = makeTempDir("kg");
+    scaffoldKg(kgRoot);
+    process.env.HOME = home;
+
+    // Custom config path, unrelated to ~/.kmgraph or ~/.claude.
+    const customDir = makeTempDir("custom-config");
+    const customConfigPath = path.join(customDir, "kg-config.json");
+    fs.writeFileSync(customConfigPath, JSON.stringify(oldSchemaConfig(kgRoot)), "utf-8");
+    process.env.KG_CONFIG_PATH = customConfigPath;
+
+    // A legacy file also happens to exist -- must be left completely alone.
+    const legacyDir = path.join(home, ".claude");
+    fs.mkdirSync(legacyDir, { recursive: true });
+    const legacyConfigPath = path.join(legacyDir, "kg-config.json");
+    fs.writeFileSync(legacyConfigPath, JSON.stringify(oldSchemaConfig(kgRoot)), "utf-8");
+
+    const { handleUpgrade } = loadHandleUpgrade(home);
+
+    // Inspect: status-schema item (if any, from the schema shape alone) must
+    // not mention the legacy file.
+    const inspectResult = await handleUpgrade({});
+    const parsedInspect = JSON.parse(inspectResult.content[0].text);
+    const item = parsedInspect.upgrades.find((u: { category: string }) => u.category === "status-schema");
+    if (item) {
+      // Graph name itself happens to be "legacy-kg" in this fixture, so
+      // assert on the legacy-*file* phrasing specifically, not "legacy" as
+      // a bare substring.
+      expect(item.description).not.toMatch(/legacy (config )?file/);
+    }
+
+    // Apply: legacy file must survive untouched, and the result text must not
+    // claim it was removed.
+    const applyResult = await handleUpgrade({ apply: ["status-schema"], confirmMigration: true });
+    expect(applyResult.isError).toBeUndefined();
+    expect(fs.existsSync(legacyConfigPath)).toBe(true);
+    expect(applyResult.content[0].text).not.toMatch(/Removed legacy config file/);
+  });
 });
