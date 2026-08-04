@@ -309,29 +309,34 @@ function printConfig(platform: string): void {
 // logic as a one-shot CLI call those scripts can shell out to against the
 // already-built dist/cli.js, instead of re-deriving "which KG is this" by
 // grepping the retired `.active` pointer out of kg-config.json.
+//
+// Deliberately project-scope only (no `--scope user`): the kg_resolve MCP
+// *tool* gates scope:"user" behind confirmPersonalScopeAccess (resolve.ts) --
+// the same per-repo confirmation invariant kg_check_sensitive/kg_search/
+// kg_capture all enforce before a call may touch the personal graph. This
+// CLI subcommand has no equivalent interactive confirmation channel, and
+// none of the scripts/ callers need personal-scope resolution (all three
+// resolve the project KG for the current directory). Exposing an ungated
+// `--scope user` here would let anything with Bash access silently bypass
+// that confirmation gate and disclose the personal graph's path from a
+// repo that was never confirmed for personal-scope access -- so the option
+// is left out rather than gated, since nothing here needs it.
 function printResolveJson(value: unknown): void {
   console.log(JSON.stringify(value));
 }
 
 function runResolve(args: string[]): void {
   let cwd = process.cwd();
-  let scope: "project" | "user" | undefined;
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--cwd" && args[i + 1]) {
       cwd = args[i + 1];
       i++;
-    } else if (args[i] === "--scope" && args[i + 1]) {
-      const value = args[i + 1];
-      if (value === "user" || value === "project") {
-        scope = value;
-      }
-      i++;
     }
   }
 
   const config = readConfig();
-  const resolved = resolveKgPath(config, { scope }, cwd);
+  const resolved = resolveKgPath(config, {}, cwd);
 
   if ("error" in resolved) {
     printResolveJson({ error: resolved.error });
@@ -356,7 +361,7 @@ function printUsage(): void {
     "    node dist/cli.js config <ide> Print MCP config for an IDE"
   );
   console.log(
-    "    node dist/cli.js resolve [--cwd <path>] [--scope user]"
+    "    node dist/cli.js resolve [--cwd <path>]"
   );
   console.log(
     "                                   Print the cwd-resolved KG as JSON ({name, path})"

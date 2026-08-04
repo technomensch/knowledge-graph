@@ -34150,21 +34150,14 @@ function printResolveJson(value) {
 }
 function runResolve(args) {
   let cwd = process.cwd();
-  let scope;
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--cwd" && args[i + 1]) {
       cwd = args[i + 1];
       i++;
-    } else if (args[i] === "--scope" && args[i + 1]) {
-      const value = args[i + 1];
-      if (value === "user" || value === "project") {
-        scope = value;
-      }
-      i++;
     }
   }
   const config2 = readConfig();
-  const resolved = resolveKgPath(config2, { scope }, cwd);
+  const resolved = resolveKgPath(config2, {}, cwd);
   if ("error" in resolved) {
     printResolveJson({ error: resolved.error });
     process.exit(1);
@@ -34184,7 +34177,7 @@ function printUsage() {
     "    node dist/cli.js config <ide> Print MCP config for an IDE"
   );
   console.log(
-    "    node dist/cli.js resolve [--cwd <path>] [--scope user]"
+    "    node dist/cli.js resolve [--cwd <path>]"
   );
   console.log(
     "                                   Print the cwd-resolved KG as JSON ({name, path})"
