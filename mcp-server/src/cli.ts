@@ -1,20 +1,17 @@
 #!/usr/bin/env node
 
-import * as fs from "fs";
 import * as path from "path";
-import * as os from "os";
 import * as readline from "readline";
 import {
   readConfig,
   writeConfig,
-  getPluginRoot,
   mintGraphId,
   writeGraphIdMarker,
   readGraphIdMarker,
   GraphConfig,
   CategoryConfig,
 } from "./utils.js";
-import { isHardBlockedRegistrationPath, findBroadAncestorWarning } from "./tools/config.js";
+import { resolveRegistrationGuard, scaffoldGraphDirectory } from "./tools/config.js";
 
 declare const __SERVER_VERSION__: string;
 const SERVER_VERSION =
@@ -133,17 +130,16 @@ async function runInit(): Promise<void> {
       { name: "patterns", prefix: null, git: "commit" },
     ];
 
-    // Expand path for file operations
-    const expandedPath = kgPath.replace(/^~/, os.homedir());
+    // Expand path + run both registration guards (shared with kg_config_init, ENH-051)
+    const { expandedPath, hardBlocked, broadWarning } = resolveRegistrationGuard(config, kgPath);
 
-    if (isHardBlockedRegistrationPath(expandedPath)) {
+    if (hardBlocked) {
       console.error(
         `Error: refusing to register a knowledge graph at ${expandedPath} — this is your home directory or the filesystem root. Registering a KG this broad would make it resolve as "the KG for" nearly every directory on this machine. Choose a more specific project path.`
       );
       process.exit(1);
     }
 
-    const broadWarning = findBroadAncestorWarning(config, expandedPath);
     if (broadWarning) {
       console.log("");
       console.log(
@@ -159,81 +155,9 @@ async function runInit(): Promise<void> {
     console.log("");
     console.log("  Creating knowledge graph...");
 
-    // 5. Create directory structure
-    const dirs = [
-      "knowledge",
-      "lessons-learned",
-      "decisions",
-      "sessions",
-      "chat-history",
-    ];
-    for (const dir of dirs) {
-      fs.mkdirSync(path.join(expandedPath, dir), { recursive: true });
-    }
-
-    // Create category subdirectories
-    for (const cat of categories) {
-      fs.mkdirSync(path.join(expandedPath, "lessons-learned", cat.name), {
-        recursive: true,
-      });
-    }
-
-    // 6. Copy templates from plugin
-    const pluginRoot = getPluginRoot();
-    const templateSrc = path.join(pluginRoot, "core", "default-templates");
-
-    let templatesCopied = 0;
-    if (fs.existsSync(templateSrc)) {
-      // Knowledge templates
-      const knowledgeTemplates = [
-        "patterns.md",
-        "gotchas.md",
-        "concepts.md",
-        "architecture.md",
-        "workflows.md",
-        "index.md",
-      ];
-      for (const t of knowledgeTemplates) {
-        const src = path.join(templateSrc, "knowledge", t);
-        const dest = path.join(expandedPath, "knowledge", t);
-        if (fs.existsSync(src) && !fs.existsSync(dest)) {
-          fs.copyFileSync(src, dest);
-          templatesCopied++;
-        }
-      }
-
-      // Lesson templates
-      for (const t of ["README.md", "lesson-template.md"]) {
-        const src = path.join(templateSrc, "lessons-learned", t);
-        const dest = path.join(expandedPath, "lessons-learned", t);
-        if (fs.existsSync(src) && !fs.existsSync(dest)) {
-          fs.copyFileSync(src, dest);
-          templatesCopied++;
-        }
-      }
-
-      // ADR templates
-      for (const t of ["README.md", "ADR-template.md"]) {
-        const src = path.join(templateSrc, "decisions", t);
-        const dest = path.join(expandedPath, "decisions", t);
-        if (fs.existsSync(src) && !fs.existsSync(dest)) {
-          fs.copyFileSync(src, dest);
-          templatesCopied++;
-        }
-      }
-
-      // Session template
-      const sessSrc = path.join(
-        templateSrc,
-        "sessions",
-        "session-template.md"
-      );
-      const sessDest = path.join(expandedPath, "sessions", "session-template.md");
-      if (fs.existsSync(sessSrc) && !fs.existsSync(sessDest)) {
-        fs.copyFileSync(sessSrc, sessDest);
-        templatesCopied++;
-      }
-    }
+    // 5/6. Create directory structure + copy default templates (shared with
+    // kg_config_init, ENH-051)
+    const templatesCopied = scaffoldGraphDirectory(expandedPath, categories);
 
     // 7. Write config
     const now = new Date().toISOString();

@@ -218,6 +218,87 @@ export function findBroadAncestorWarning(
   return { isAncestorOfCount: ancestorOfNames.length, ancestorOfNames };
 }
 
+// ── Shared init scaffold (ENH-051 dedup, ADR-067 Task 8.2) ────────────────────
+//
+// cli.ts's interactive setup wizard and this file's kg_config_init handler
+// each build a brand-new graph's on-disk layout the same way: expand the
+// path, run both registration guards, create the standard directory tree,
+// and best-effort-copy the default templates. Task 4.1 landed the guard
+// calls directly in cli.ts before this dedup could happen (it couldn't wait);
+// this collapses that into one shared implementation. What's deliberately
+// NOT shared is how each caller reacts to a hard-block or a broad-ancestor
+// warning -- cli.ts drives a synchronous readline confirm loop, kg_config_init
+// drives an async gate() with automated/interactive modes -- so only the
+// deterministic path-resolution/guard-check/scaffold steps live here.
+
+export interface RegistrationGuardCheck {
+  expandedPath: string;
+  hardBlocked: boolean;
+  broadWarning: { isAncestorOfCount: number; ancestorOfNames: string[] } | null;
+}
+
+export function resolveRegistrationGuard(config: KgConfig, kgPath: string): RegistrationGuardCheck {
+  const expandedPath = kgPath.replace(/^~/, os.homedir());
+  return {
+    expandedPath,
+    hardBlocked: isHardBlockedRegistrationPath(expandedPath),
+    broadWarning: findBroadAncestorWarning(config, expandedPath),
+  };
+}
+
+// Creates the standard graph directory tree at `expandedPath` and
+// best-effort-copies the default templates from core/default-templates/ over
+// it (never overwriting a file that already exists there). Returns how many
+// template files were actually copied, purely for caller-side reporting.
+export function scaffoldGraphDirectory(
+  expandedPath: string,
+  categories: Array<{ name: string }>
+): number {
+  const dirs = ["knowledge", "lessons-learned", "decisions", "sessions", "chat-history", "tmp"];
+  for (const dir of dirs) {
+    fs.mkdirSync(path.join(expandedPath, dir), { recursive: true });
+  }
+  for (const cat of categories) {
+    fs.mkdirSync(path.join(expandedPath, "lessons-learned", cat.name), { recursive: true });
+  }
+
+  const pluginRoot = getPluginRoot();
+  const templateSrc = path.join(pluginRoot, "core", "default-templates");
+  let templatesCopied = 0;
+  if (!fs.existsSync(templateSrc)) return templatesCopied;
+
+  const copyIfMissing = (src: string, dest: string): void => {
+    if (fs.existsSync(src) && !fs.existsSync(dest)) {
+      fs.copyFileSync(src, dest);
+      templatesCopied++;
+    }
+  };
+
+  const knowledgeTemplates = ["patterns.md", "gotchas.md", "concepts.md", "architecture.md", "workflows.md"];
+  for (const t of knowledgeTemplates) {
+    copyIfMissing(path.join(templateSrc, "knowledge", "templates", t), path.join(expandedPath, "knowledge", t));
+  }
+  for (const t of ["README.md", "lesson-template.md"]) {
+    copyIfMissing(path.join(templateSrc, "lessons-learned", t), path.join(expandedPath, "lessons-learned", t));
+  }
+  for (const t of ["README.md", "ADR-template.md"]) {
+    copyIfMissing(path.join(templateSrc, "decisions", t), path.join(expandedPath, "decisions", t));
+  }
+  copyIfMissing(
+    path.join(templateSrc, "sessions", "session-template.md"),
+    path.join(expandedPath, "sessions", "session-template.md")
+  );
+  for (const f of ["me.md", "rules.md", "kg-index.md", "triggers.md"]) {
+    copyIfMissing(path.join(templateSrc, "knowledge", f), path.join(expandedPath, f));
+  }
+  copyIfMissing(
+    path.join(templateSrc, "knowledge", "kg-category-index.md"),
+    path.join(expandedPath, "knowledge", "kg-category-index.md")
+  );
+
+  return templatesCopied;
+}
+
 // ── Exported handler for direct testing ──────────────────────────────────────
 
 export interface HandleConfigInitParams {
@@ -259,10 +340,10 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
     };
   }
 
-  // Expand path
-  const expandedPath = kgPath.replace(/^~/, os.homedir());
+  // Expand path + run both registration guards (shared with cli.ts, ENH-051)
+  const { expandedPath, hardBlocked, broadWarning } = resolveRegistrationGuard(config, kgPath);
 
-  if (isHardBlockedRegistrationPath(expandedPath)) {
+  if (hardBlocked) {
     return {
       content: [{
         type: "text" as const,
@@ -272,7 +353,6 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
     };
   }
 
-  const broadWarning = findBroadAncestorWarning(config, expandedPath);
   if (broadWarning) {
     let broadAnswer = confirmBroadRegistration;
     if (!broadAnswer) {
@@ -550,94 +630,8 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
     }
   }
 
-  // Create directory structure
-  const dirs = [
-    "knowledge",
-    "lessons-learned",
-    "decisions",
-    "sessions",
-    "chat-history",
-    "tmp",
-  ];
-  for (const dir of dirs) {
-    fs.mkdirSync(path.join(expandedPath, dir), { recursive: true });
-  }
-
-  // Create category subdirectories
-  for (const cat of categories) {
-    fs.mkdirSync(
-      path.join(expandedPath, "lessons-learned", cat.name),
-      { recursive: true }
-    );
-  }
-
-  // Copy templates from plugin
-  const pluginRoot = getPluginRoot();
-  const templateSrc = path.join(pluginRoot, "core", "default-templates");
-
-  if (fs.existsSync(templateSrc)) {
-    // Copy knowledge templates
-    const knowledgeTemplates = [
-      "patterns.md",
-      "gotchas.md",
-      "concepts.md",
-      "architecture.md",
-      "workflows.md",
-    ];
-    for (const t of knowledgeTemplates) {
-      const src = path.join(templateSrc, "knowledge", "templates", t);
-      const dest = path.join(expandedPath, "knowledge", t);
-      if (fs.existsSync(src) && !fs.existsSync(dest)) {
-        fs.copyFileSync(src, dest);
-      }
-    }
-
-    // Copy lesson templates
-    const lessonSrc = path.join(templateSrc, "lessons-learned");
-    const lessonDest = path.join(expandedPath, "lessons-learned");
-    for (const t of ["README.md", "lesson-template.md"]) {
-      const src = path.join(lessonSrc, t);
-      const dest = path.join(lessonDest, t);
-      if (fs.existsSync(src) && !fs.existsSync(dest)) {
-        fs.copyFileSync(src, dest);
-      }
-    }
-
-    // Copy ADR templates
-    const adrSrc = path.join(templateSrc, "decisions");
-    const adrDest = path.join(expandedPath, "decisions");
-    for (const t of ["README.md", "ADR-template.md"]) {
-      const src = path.join(adrSrc, t);
-      const dest = path.join(adrDest, t);
-      if (fs.existsSync(src) && !fs.existsSync(dest)) {
-        fs.copyFileSync(src, dest);
-      }
-    }
-
-    // Copy session template
-    const sessSrc = path.join(templateSrc, "sessions", "session-template.md");
-    const sessDest = path.join(expandedPath, "sessions", "session-template.md");
-    if (fs.existsSync(sessSrc) && !fs.existsSync(sessDest)) {
-      fs.copyFileSync(sessSrc, sessDest);
-    }
-
-    // Copy root scaffold files (me.md, rules.md, kg-index.md, triggers.md)
-    const rootScaffolds = ["me.md", "rules.md", "kg-index.md", "triggers.md"];
-    for (const f of rootScaffolds) {
-      const src = path.join(templateSrc, "knowledge", f);
-      const dest = path.join(expandedPath, f);
-      if (fs.existsSync(src) && !fs.existsSync(dest)) {
-        fs.copyFileSync(src, dest);
-      }
-    }
-
-    // Copy kg-category-index.md to knowledge/ subdir
-    const catIndexSrc = path.join(templateSrc, "knowledge", "kg-category-index.md");
-    const catIndexDest = path.join(expandedPath, "knowledge", "kg-category-index.md");
-    if (fs.existsSync(catIndexSrc) && !fs.existsSync(catIndexDest)) {
-      fs.copyFileSync(catIndexSrc, catIndexDest);
-    }
-  }
+  // Create directory structure + copy default templates (shared with cli.ts, ENH-051)
+  scaffoldGraphDirectory(expandedPath, categories);
 
   // Write config entry
   const now = new Date().toISOString();
