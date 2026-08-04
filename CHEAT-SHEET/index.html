@@ -5,8 +5,8 @@
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">Cheat Sheet | Knowledge Management Graph</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://technomensch.github.io/knowledge-graph/CHEAT-SHEET"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Cheat Sheet | Knowledge Management Graph"><meta data-rh="true" name="description" content="Version 2026-04-22"><meta data-rh="true" property="og:description" content="Version 2026-04-22"><link data-rh="true" rel="icon" href="/knowledge-graph/img/square.png"><link data-rh="true" rel="canonical" href="https://technomensch.github.io/knowledge-graph/CHEAT-SHEET"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/CHEAT-SHEET" hreflang="en"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/CHEAT-SHEET" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Cheat Sheet","item":"https://technomensch.github.io/knowledge-graph/CHEAT-SHEET"}]}</script><link rel="alternate" type="application/rss+xml" href="/knowledge-graph/docs-updates/rss.xml" title="KMGraph Docs Updates RSS Feed">
 <link rel="alternate" type="application/atom+xml" href="/knowledge-graph/docs-updates/atom.xml" title="KMGraph Docs Updates Atom Feed"><link rel="stylesheet" href="/knowledge-graph/assets/css/styles.212119a5.css">
-<script src="/knowledge-graph/assets/js/runtime~main.e04f238c.js" defer="defer"></script>
-<script src="/knowledge-graph/assets/js/main.ae950ee1.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/runtime~main.652b8425.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/main.85e85a48.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -31,7 +31,7 @@
 <li class=""><strong>Extract my chat history</strong> → <code>/kmgraph:kmg-extract-chat</code></li>
 <li class=""><strong>Sync lessons to the knowledge graph</strong> → <code>/kmgraph:kmg-update-graph</code></li>
 <li class=""><strong>Check for sensitive data before sharing</strong> → <code>/kmgraph:kmg-check-sensitive</code></li>
-<li class=""><strong>Work with multiple knowledge graphs</strong> → <code>/kmgraph:kmg-list</code> then <code>/kmgraph:kmg-switch</code></li>
+<li class=""><strong>Work with multiple knowledge graphs</strong> → <code>/kmgraph:kmg-list</code> to see all configured graphs; each command run from a project&#x27;s directory automatically targets that project&#x27;s graph (no switching needed)</li>
 <li class=""><strong>Link lessons to GitHub issues</strong> → <code>/kmgraph:kmg-link-issue</code></li>
 <li class=""><strong>Update plugin documentation</strong> → <code>/kmgraph:kmg-update-doc --user-facing</code></li>
 <li class=""><strong>Create comprehensive project handoff</strong> → <code>/kmgraph:kmg-handoff</code></li>
@@ -69,7 +69,7 @@
 
 
 
-<table><thead><tr><th>Command</th><th>Purpose</th></tr></thead><tbody><tr><td><code>/kmgraph:kmg-init</code></td><td>Initialize a new knowledge graph with wizard-based setup</td></tr><tr><td><code>/kmgraph:kmg-init-personal-kg</code></td><td>Create personal KG at <code>~/.kmgraph/</code> for cross-project lessons</td></tr><tr><td><code>/kmgraph:kmg-capture-lesson [topic]</code></td><td>Document lessons learned with git metadata tracking</td></tr><tr><td><code>/kmgraph:kmg-status</code></td><td>View active knowledge graph info and quick reference</td></tr><tr><td><code>/kmgraph:kmg-recall [query]</code></td><td>Search across all memory systems (lessons, decisions, knowledge)</td></tr></tbody></table>
+<table><thead><tr><th>Command</th><th>Purpose</th></tr></thead><tbody><tr><td><code>/kmgraph:kmg-init</code></td><td>Initialize a new knowledge graph with wizard-based setup</td></tr><tr><td><code>/kmgraph:kmg-init-personal-kg</code></td><td>Create personal KG at <code>~/.kmgraph/</code> for cross-project lessons</td></tr><tr><td><code>/kmgraph:kmg-capture-lesson [topic]</code></td><td>Document lessons learned with git metadata tracking</td></tr><tr><td><code>/kmgraph:kmg-status</code></td><td>View the resolved knowledge graph&#x27;s info and quick reference</td></tr><tr><td><code>/kmgraph:kmg-recall [query]</code></td><td>Search across all memory systems (lessons, decisions, knowledge)</td></tr></tbody></table>
 <p><em>→ <a class="" href="/knowledge-graph/reference/command-guide#essential-commands">Full details in Command Guide</a></em></p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-intermediate-once-comfortable">🟡 Intermediate (Once Comfortable)<a href="#-intermediate-once-comfortable" class="hash-link" aria-label="Direct link to 🟡 Intermediate (Once Comfortable)" title="Direct link to 🟡 Intermediate (Once Comfortable)" translate="no">​</a></h3>
 <p>Active users use these for regular workflows:</p>
@@ -114,11 +114,7 @@
 
 
 
-
-
-
-
-<table><thead><tr><th>Command</th><th>Purpose</th></tr></thead><tbody><tr><td><code>/kmgraph:kmg-update-graph</code></td><td>Extract knowledge graph entries from lessons. Uses background file reading for large batches when context-mode is installed</td></tr><tr><td><code>/kmgraph:kmg-add-category</code></td><td>Add a new category to existing knowledge graph</td></tr><tr><td><code>/kmgraph:kmg-session-summary</code></td><td>Create summary of current chat session; <code>--snapshot</code> for lightweight mid-session capture</td></tr><tr><td><code>/kmgraph:kmg-list</code></td><td>Display all configured knowledge graphs</td></tr><tr><td><code>/kmgraph:kmg-switch</code></td><td>Change active knowledge graph</td></tr><tr><td><code>/kmgraph:kmg-check-sensitive</code></td><td>Scan knowledge graph for potentially sensitive information</td></tr><tr><td><code>/kmgraph:kmg-config-sanitization</code></td><td>Interactive wizard for pre-commit hook setup</td></tr><tr><td><code>/kmgraph:kmg-extract-chat</code></td><td>Extract chat history from Claude, Gemini, and Codex logs (<code>--today</code>, <code>--date</code>, <code>--after</code>, <code>--before</code>, <code>--project</code>); large days auto-split into <code>YYYY-MM-DD/</code> subfolder</td></tr><tr><td><code>/kmgraph:kmg-update-doc</code></td><td>Update plugin/project docs (<code>--user-facing</code>) or KG content</td></tr></tbody></table>
+<table><thead><tr><th>Command</th><th>Purpose</th></tr></thead><tbody><tr><td><code>/kmgraph:kmg-update-graph</code></td><td>Extract knowledge graph entries from lessons. Uses background file reading for large batches when context-mode is installed</td></tr><tr><td><code>/kmgraph:kmg-add-category</code></td><td>Add a new category to existing knowledge graph</td></tr><tr><td><code>/kmgraph:kmg-session-summary</code></td><td>Create summary of current chat session; <code>--snapshot</code> for lightweight mid-session capture</td></tr><tr><td><code>/kmgraph:kmg-list</code></td><td>Display all configured knowledge graphs</td></tr><tr><td><code>/kmgraph:kmg-check-sensitive</code></td><td>Scan knowledge graph for potentially sensitive information</td></tr><tr><td><code>/kmgraph:kmg-config-sanitization</code></td><td>Interactive wizard for pre-commit hook setup</td></tr><tr><td><code>/kmgraph:kmg-extract-chat</code></td><td>Extract chat history from Claude, Gemini, and Codex logs (<code>--today</code>, <code>--date</code>, <code>--after</code>, <code>--before</code>, <code>--project</code>); large days auto-split into <code>YYYY-MM-DD/</code> subfolder</td></tr><tr><td><code>/kmgraph:kmg-update-doc</code></td><td>Update plugin/project docs (<code>--user-facing</code>) or KG content</td></tr></tbody></table>
 <p><em>→ <a class="" href="/knowledge-graph/reference/command-guide#intermediate-commands">Full details in Command Guide</a></em></p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-advanced-power-features">🔴 Advanced (Power Features)<a href="#-advanced-power-features" class="hash-link" aria-label="Direct link to 🔴 Advanced (Power Features)" title="Direct link to 🔴 Advanced (Power Features)" translate="no">​</a></h3>
 <p>Power users leverage these for complex workflows:</p>
@@ -303,7 +299,7 @@
 <li class=""><strong>Sanitization</strong>: Process of detecting and removing sensitive data (API keys, credentials, PII) before sharing code publicly</li>
 <li class=""><strong>Meta-Issue</strong>: Multi-attempt problem tracking system for complex bugs that span multiple debugging sessions</li>
 <li class=""><strong>Category</strong>: Organizational unit within a knowledge graph (e.g., &quot;debugging&quot;, &quot;architecture&quot;, &quot;process&quot;)</li>
-<li class=""><strong>Active KG</strong>: The currently selected knowledge graph when multiple graphs are configured</li>
+<li class=""><strong>Target Knowledge Graph</strong>: The knowledge graph a command operates on, resolved from the current working directory — not a manually selected &quot;active&quot; graph</li>
 <li class=""><strong>Session Summary</strong>: Markdown summary of a chat session extracted from conversation history</li>
 <li class=""><strong>Recall</strong>: Unified search across lessons learned, decisions, knowledge graph, and session summaries</li>
 <li class=""><strong>Search Index</strong> (<code>kg_fts5_rebuild</code>): Optional catalog of all knowledge graph content. Build or refresh it for faster, relevance-ranked search results. Updates automatically during sync-all once enabled</li>
@@ -373,18 +369,15 @@
 → See all configured knowledge graphs</p>
 </li>
 <li class="">
-<p><code>/kmgraph:kmg-switch</code>
-→ Change to different project&#x27;s KG</p>
-</li>
-<li class="">
-<p>Work with that project&#x27;s knowledge</p>
+<p><code>cd</code> into the other project&#x27;s directory
+→ Commands run there automatically target that project&#x27;s KG — no switch step</p>
 </li>
 </ol>
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="quick-tips">Quick Tips<a href="#quick-tips" class="hash-link" aria-label="Direct link to Quick Tips" title="Direct link to Quick Tips" translate="no">​</a></h2>
 <ul>
 <li class=""><strong>Start with Essential commands</strong> — Add Intermediate and Advanced commands as needs arise</li>
-<li class=""><strong>Use <code>/kmgraph:kmg-status</code> often</strong> — Shows what&#x27;s in your active knowledge graph at a glance</li>
+<li class=""><strong>Use <code>/kmgraph:kmg-status</code> often</strong> — Shows what&#x27;s in the resolved knowledge graph at a glance</li>
 <li class=""><strong><code>/kmgraph:kmg-recall</code> searches everything</strong> — Lessons, decisions, knowledge entries, and session summaries; add <code>--scope=all</code> to include personal KG</li>
 <li class=""><strong>MEMORY.md auto-updates</strong> — Check it before important sessions to see what context is loaded</li>
 <li class=""><strong>Commands use colon syntax</strong> — It&#x27;s <code>/kmgraph:</code> not <code>/knowledge-</code> (colon, not hyphen)</li>
