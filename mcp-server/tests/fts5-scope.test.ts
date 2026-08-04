@@ -160,4 +160,63 @@ describe("handleFts5Rebuild", () => {
     const parsed = JSON.parse(result.content[0].text);
     expect(parsed).toMatchObject({ error: "KMG_INPUT_REQUIRED", reason: "personal_scope_unseen_repo" });
   });
+
+  // ADR-067 sweep (fable review): a raw kgPath param previously bypassed the
+  // scope:"user" gate entirely -- it resolved resolvedPath/resolvedName from the
+  // literal path and went straight to rebuildIndex() with zero confirmation, even
+  // when that literal path pointed at the registered personal graph. This is the
+  // same bug class already closed in compare.ts (`a`/`b`) and sanitization.ts
+  // (`kgPath`).
+  it("a kgPath pointing directly at a registered personal-type graph requires confirmation in automated mode", async () => {
+    const projRoot = makeTempDir("proj");
+    const personalRoot = makeTempDir("personal");
+    (readConfig as jest.Mock).mockReturnValue(makeConfig(projRoot, personalRoot));
+
+    const result = await handleFts5Rebuild({ kgPath: personalRoot });
+    expect(result.isError).toBe(true);
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed).toMatchObject({ error: "KMG_INPUT_REQUIRED", reason: "personal_scope_unseen_repo" });
+  });
+
+  // Containment, not just equality: a kgPath nested inside the personal graph's
+  // registered root still exposes that graph's content and must be gated the
+  // same as the root itself (mirrors compare.ts's containment test).
+  it("a kgPath nested inside a registered personal-type graph requires confirmation in automated mode", async () => {
+    const projRoot = makeTempDir("proj");
+    const personalRoot = makeTempDir("personal");
+    const nested = path.join(personalRoot, "lessons-learned");
+    fs.mkdirSync(nested, { recursive: true });
+    (readConfig as jest.Mock).mockReturnValue(makeConfig(projRoot, personalRoot));
+
+    const result = await handleFts5Rebuild({ kgPath: nested });
+    expect(result.isError).toBe(true);
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed).toMatchObject({ error: "KMG_INPUT_REQUIRED", reason: "personal_scope_unseen_repo" });
+  });
+
+  it("a kgPath pointing at a registered personal-type graph proceeds once confirmPersonalScope is true", async () => {
+    const projRoot = makeTempDir("proj");
+    const personalRoot = makeTempDir("personal");
+    for (const d of ["lessons-learned", "decisions", "sessions"]) {
+      fs.mkdirSync(path.join(personalRoot, d), { recursive: true });
+    }
+    (readConfig as jest.Mock).mockReturnValue(makeConfig(projRoot, personalRoot));
+
+    const result = await handleFts5Rebuild({ kgPath: personalRoot, confirmPersonalScope: true });
+    expect(result.isError).toBeUndefined();
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed.db_path).toBeDefined();
+  });
+
+  it("a kgPath pointing at a non-personal (project-local) graph is not gated", async () => {
+    const projRoot = makeTempDir("proj");
+    const personalRoot = makeTempDir("personal");
+    for (const d of ["lessons-learned", "decisions", "sessions"]) {
+      fs.mkdirSync(path.join(projRoot, d), { recursive: true });
+    }
+    (readConfig as jest.Mock).mockReturnValue(makeConfig(projRoot, personalRoot));
+
+    const result = await handleFts5Rebuild({ kgPath: projRoot });
+    expect(result.isError).toBeUndefined();
+  });
 });

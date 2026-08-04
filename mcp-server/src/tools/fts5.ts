@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import { readConfig, writeConfig, walkDir } from "../utils.js";
-import { resolveGraph, resolvePersonalGraph, PersonalScopeSession, confirmPersonalScopeAccess } from "../resolution.js";
+import { resolveGraph, resolvePersonalGraph, PersonalScopeSession, confirmPersonalScopeAccess, isAncestorOrEqual } from "../resolution.js";
 import { resolveInteractionMode, STUB_ASK_TIMEOUT_MS, stubAsk } from "../interaction.js";
 import { resolveEffectiveCwd } from "../platform-cwd.js";
 
@@ -96,6 +96,19 @@ export function getDbPath(kgPath: string): string {
  * Strips FTS5 operator characters from a raw query string so it can be used
  * safely in a MATCH clause. Returns '""' for empty / whitespace-only input.
  */
+// Mirrors compare.ts's normalizeForCompare / sanitization.ts's normalizeForScan: a raw path
+// string can't be gated the same way a scope enum can -- a personal-KG path could be passed
+// under any of dozens of possible string values, so containment is checked against the
+// registry after normalizing, not against the literal string.
+function normalizeForFts5Scope(p: string): string {
+  const expanded = p.replace(/^~/, os.homedir());
+  try {
+    return fs.realpathSync(expanded);
+  } catch {
+    return path.resolve(expanded);
+  }
+}
+
 export function sanitizeFts5Query(raw: string): string {
   let sanitized = raw
     .replace(/[":(){}[\]^~*+\\]/g, " ")
@@ -580,6 +593,32 @@ export async function handleFts5Rebuild(
         ([, g]) => (g as any).path === resolvedPath
       );
       resolvedName = matchedEntry ? matchedEntry[0] : path.basename(resolvedPath);
+
+      // ADR-067 sweep: a raw kgPath bypasses the scope:"user" gate below entirely (this
+      // branch returns before that branch is ever reached), so an unconfirmed kgPath
+      // pointing at -- or nested inside -- the registered personal graph must be gated
+      // independently, mirroring compare.ts's `a`/`b` and sanitization.ts's `kgPath` fix.
+      // Without this, `kgPath` was a complete end-run around the scope:"user" gate: any
+      // literal path string reached rebuildIndex() -- a WRITE to that graph's FTS5 index
+      // -- with zero confirmation.
+      const personalGraphPaths = Object.values(config.graphs || {})
+        .filter((g) => (g as any).type === "personal" && (g as any).status !== "deleted")
+        .map((g) => normalizeForFts5Scope((g as any).path));
+      const kgPathTouchesPersonal = personalGraphPaths.some((p) =>
+        isAncestorOrEqual(p, normalizeForFts5Scope(resolvedPath))
+      );
+      if (kgPathTouchesPersonal) {
+        const mode = resolveInteractionMode({}).mode;
+        const confirmed = await confirmPersonalScopeAccess(personalScopeSession, cwd, {
+          confirmPersonalScope: params.confirmPersonalScope,
+          mode,
+          timeoutMs: STUB_ASK_TIMEOUT_MS,
+          ask: stubAsk,
+        });
+        if (!("confirmed" in confirmed)) {
+          return { content: [{ type: "text" as const, text: JSON.stringify(confirmed) }], isError: true };
+        }
+      }
     } else {
       const target = params.scope === "user" ? resolvePersonalGraph(config) : (() => {
         const resolution = resolveGraph(config, cwd);
