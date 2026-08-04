@@ -1,5 +1,13 @@
-import { resolveGraph, resolvePersonalGraph } from "../src/resolution.js";
-import { KgConfig, GraphConfig } from "../src/utils.js";
+jest.mock("../src/utils.js", () => {
+  const actual = jest.requireActual("../src/utils.js") as Record<string, unknown>;
+  return {
+    ...actual,
+    updateConfig: jest.fn(),
+  };
+});
+
+import { resolveGraph, resolvePersonalGraph, resolveGraphOutcome } from "../src/resolution.js";
+import { KgConfig, GraphConfig, updateConfig } from "../src/utils.js";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
@@ -179,5 +187,85 @@ describe("resolvePersonalGraph", () => {
     }, sanitization: { enabled: false, patterns: [], action: "warn" as const } };
     const result = resolvePersonalGraph(config as any);
     expect("error" in result).toBe(true);
+  });
+});
+
+// ADR-067 sweep (fable review): Task 8.1's migration category refuses to
+// auto-activate a graph whose path is unhealthy -- "NOT silently activated."
+// A restore-from-archive answer carried the identical risk (the graph may
+// have been archived because its directory moved or was deleted) but skipped
+// checkGraphPathHealth entirely and always flipped status to "active" with no
+// signal. These tests cover both the unchanged-behavior (healthy path) case
+// and the new health-surfacing (unhealthy path) case.
+describe("resolveGraphOutcome — archived entry, restore answer", () => {
+  const interactionModule = require("../src/interaction.js") as typeof import("../src/interaction.js");
+  const tempDirs: string[] = [];
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    (updateConfig as jest.Mock).mockClear();
+    for (const dir of tempDirs) {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+    tempDirs.length = 0;
+  });
+
+  it("restores a graph with a healthy path to active with no health notice (unchanged behavior)", async () => {
+    const kgRoot = fs.mkdtempSync(path.join(os.tmpdir(), "resolve-restore-healthy-"));
+    fs.mkdirSync(path.join(kgRoot, "lessons-learned"), { recursive: true });
+    tempDirs.push(kgRoot);
+
+    const graph = g({ name: "myproj", path: kgRoot, status: "archived" });
+    const config: KgConfig = {
+      version: "1.0.0",
+      graphs: { myproj: graph },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    };
+    jest.spyOn(interactionModule, "gate").mockResolvedValue({ answer: "restore" });
+
+    const outcome = await resolveGraphOutcome(
+      config,
+      { kind: "archived", name: "myproj", graph },
+      "/unrelated",
+      "interactive"
+    );
+
+    expect(outcome.kind).toBe("resolved");
+    if (outcome.kind === "resolved") {
+      expect(outcome.graph.status).toBe("active");
+      expect(outcome.notice).toBeUndefined();
+    }
+    expect(updateConfig).toHaveBeenCalled();
+  });
+
+  it("restores a graph with an unhealthy (missing) path but surfaces a health notice instead of silently activating", async () => {
+    const missingPath = path.join(os.tmpdir(), `resolve-restore-missing-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    // Deliberately never created -- checkGraphPathHealth must see it as missing.
+
+    const graph = g({ name: "myproj", path: missingPath, status: "archived" });
+    const config: KgConfig = {
+      version: "1.0.0",
+      graphs: { myproj: graph },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    };
+    jest.spyOn(interactionModule, "gate").mockResolvedValue({ answer: "restore" });
+
+    const outcome = await resolveGraphOutcome(
+      config,
+      { kind: "archived", name: "myproj", graph },
+      "/unrelated",
+      "interactive"
+    );
+
+    expect(outcome.kind).toBe("resolved");
+    if (outcome.kind === "resolved") {
+      // The user explicitly asked to restore, so status still flips to active --
+      // but the caller must be told the path looks unhealthy, not left to find out later.
+      expect(outcome.graph.status).toBe("active");
+      expect(outcome.notice).toBeDefined();
+      expect(outcome.notice).toMatch(/myproj.*restored to active/);
+      expect(outcome.notice).toMatch(/content-missing/);
+    }
+    expect(updateConfig).toHaveBeenCalled();
   });
 });

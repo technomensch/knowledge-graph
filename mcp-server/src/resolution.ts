@@ -2,7 +2,7 @@ import * as path from "path";
 import * as os from "os";
 import * as fs from "fs";
 import { execFileSync } from "child_process";
-import { KgConfig, GraphConfig, updateConfig, changeGraphStatus } from "./utils.js";
+import { KgConfig, GraphConfig, updateConfig, changeGraphStatus, checkGraphPathHealth } from "./utils.js";
 import { AskResult, GateResult, InputRequiredError, InteractionMode, STUB_ASK_TIMEOUT_MS, gate, requireInput, stubAsk } from "./interaction.js";
 
 export type ResolutionResult =
@@ -232,8 +232,29 @@ export async function resolveGraphOutcome(
     });
     if (!("answer" in gated)) return { kind: "gated", result: gated };
     if (gated.answer === "restore") {
+      // Task 8.1 (upgrade.ts's migration category) refuses to auto-activate a
+      // graph whose path is unhealthy -- "NOT silently activated." A
+      // restored-from-archive graph carries the identical risk: it may have
+      // been archived because its directory moved or was deleted out from
+      // under it. The user explicitly asked to restore, so this still honors
+      // that (status flips to "active" either way, matching every other
+      // per-call outcome in this function that isn't itself a blocking gate)
+      // -- but an unhealthy path must not restore silently. Surface it via
+      // the same `notice` channel the "merged" branch above already uses to
+      // carry a non-blocking FYI back through resolveGraphOutcome's callers,
+      // rather than inventing a new outcome shape.
+      const health = checkGraphPathHealth(resolution.graph);
       updateConfig((cfg) => changeGraphStatus(cfg, resolution.name, "active"));
-      return { kind: "resolved", name: resolution.name, graph: { ...resolution.graph, status: "active" } };
+      const restoredGraph = { ...resolution.graph, status: "active" as const };
+      if (health !== "ok") {
+        return {
+          kind: "resolved",
+          name: resolution.name,
+          graph: restoredGraph,
+          notice: `'${resolution.name}' was restored to active, but its registered path looks ${health} (${restoredGraph.path}) -- verify the path before relying on this graph.`,
+        };
+      }
+      return { kind: "resolved", name: resolution.name, graph: restoredGraph };
     }
     // "skip"/"ignore": proceed against the archived graph as-is this call --
     // the distinction between the two only governs whether a *future* call
