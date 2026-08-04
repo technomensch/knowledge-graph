@@ -115,11 +115,14 @@ Examples:
 
 ### Step 3: Create Directory Structure
 
-**Get active KG path:**
-```bash
-active_kg=$(jq -r '.active' ~/.kmgraph/kg-config.json)
-kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.kmgraph/kg-config.json)
+**Resolve the target graph** (issue-41: this previously read `.active` and
+`.graphs["$active_kg"].path` directly, a pre-ADR-067 pattern):
+
 ```
+kg_resolve
+```
+
+Take the returned `path` as `$kg_path` below.
 
 **Create directories:**
 ```bash
@@ -376,8 +379,8 @@ to powerful-tier for diagnosis. Receives exit-path decision at 5 attempts.
 ## Multi-KG Support
 
 When multiple knowledge graphs are configured:
-- Meta-issues stored in active KG: `{active_kg_path}/issues/`
-- Use `/kmgraph:kmg-switch` to change active KG before creating meta-issue
+- Meta-issues stored in the KG resolved from your current directory: `{active_kg_path}/issues/`
+- To file against a different KG, run this command from that KG's project directory (or pass its name explicitly, if supported)
 - Each KG can track its own domain-specific meta-issues
 
 ---

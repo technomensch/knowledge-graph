@@ -255,17 +255,86 @@ codex plugin add kmgraph@knowledge-management-graph
 
 ## MCP Tools Reference
 
-For all MCP-capable platforms, these 7 tools are available:
+For all MCP-capable platforms, these tools are available:
 
 | Tool | Description |
 |------|-------------|
 | `kg_config_init` | Create a new knowledge graph with directory structure |
 | `kg_config_list` | List all configured knowledge graphs |
-| `kg_config_switch` | Change the active knowledge graph |
-| `kg_config_add_category` | Add a new category to the active KG |
-| `kg_search` | Full-text search across the active KG |
+| `kg_config_add_category` | Add a new category to a resolved KG |
+| `kg_resolve` | Resolve the target KG's name and path from the current directory |
+| `kg_search` | Full-text search across a resolved KG |
+| `kg_capture` | Write a new entry to a resolved KG |
+| `kg_compare_graphs` | Compare two KG folders by content hash + relative path to distinguish a duplicate/forked/worktree registration from genuine divergence |
 | `kg_scaffold` | Create a file from a template |
 | `kg_check_sensitive` | Scan for potentially sensitive data |
+
+### `kg_compare_graphs`
+
+Use this before merging, archiving, or deleting a knowledge graph whose registered path might just be a duplicate, fork, or worktree copy of another registered graph, rather than genuinely divergent content.
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `a` | string | Yes | Absolute path to the first KG content directory |
+| `b` | string | Yes | Absolute path to the second KG content directory |
+| `confirmPersonalScope` | boolean | No | Confirms this repo may access the personal knowledge graph. Required once per process before comparing against a path that resolves to the registered personal knowledge graph — see [Confirmation gates](#confirmation-gates) below |
+
+**Returns** a plain-text summary: file counts on each side, a recency signal per side (`git log` activity in the last 30 days, or file mtimes as a fallback when either directory isn't a git repo), how many files changed on both sides, how many are unique to each side (broken out by git-tracked vs. untracked, since an untracked-only file isn't recoverable if its side is later archived), up to 5 example filenames per category, and a `worktreeFingerprint` verdict — `true` when tracked content is identical on both sides, meaning this looks like a worktree/linked copy rather than a real divergence.
+
+Comparing against a path that resolves to the registered personal KG (or a subdirectory of it) is gated the same way as any other personal-scope access — see `confirmPersonalScope` above and [Confirmation gates](#confirmation-gates).
+
+---
+
+## `KMG_INPUT_REQUIRED` error contract {#kmg_input_required-error-contract}
+
+Anyone scripting against `kg_*` tools directly (not through a Claude Code slash command) needs to know this shape — it's how a tool call that needs a human decision reports that back, instead of silently guessing or hanging.
+
+Any `kg_*` tool call that needs a decision only a human (or an explicit script-supplied parameter) can make — an ambiguous name match, an archived graph, a first-time repo, a broad or `$HOME`/root registration, a cross-KG search, personal-scope access from an unseen repo — returns an error response whose text content is JSON of this shape instead of a normal result:
+
+```json
+{
+  "error": "KMG_INPUT_REQUIRED",
+  "reason": "fuzzy_match",
+  "resolveWith": { "param": "name", "accepts": ["kmgraph-api", "kmgraph-web"] },
+  "detail": { "...": "optional, reason-specific context" }
+}
+```
+
+| Field | Type | Always present | Meaning |
+|---|---|---|---|
+| `error` | `"KMG_INPUT_REQUIRED"` | Yes | Fixed literal — this is what a caller should check to detect the contract |
+| `reason` | string | Yes | Machine-readable cause, e.g. `fuzzy_match`, `ambiguous_path_tie`, `archived_entry`, `home_or_root_cwd`, `first_time_repo`, `broad_ancestor_registration`, `cross_kg_search_confirmation`, `personal_scope_unseen_repo`. A `_timeout` or `_invalid_answer` suffix is appended when the cause is specifically an unanswered or rejected prior gate |
+| `resolveWith.param` | string | Yes | The parameter name to pass on the retried call to supply the missing decision |
+| `resolveWith.accepts` | string[] | No | The enumerable set of valid values for `resolveWith.param`, when the set is known ahead of time (e.g. candidate KG names). Omitted when the answer is genuinely free-form and can't be enumerated |
+| `detail` | unknown | No | Optional reason-specific structured context (e.g. the candidate list, a merge preview) — shape varies by `reason` and is not itself part of the stable contract |
+
+**How to resolve it:** re-issue the same tool call with the parameter named in `resolveWith.param` set to one of `resolveWith.accepts` (if present) or an otherwise valid value for that reason. There is no separate "answer" tool — the answer is a normal parameter on a normal retry of the original call.
+
+**Automated vs. interactive mode:** whether a tool call can even attempt to ask a question first (rather than returning `KMG_INPUT_REQUIRED` immediately) depends on interaction mode, which is detected automatically (CI environment variables, an explicit `interaction` parameter, or a client-capability signal) and can be forced with the `KMG_INTERACTION=interactive|automated` environment variable. Scripted/CI callers should assume **automated** mode: every gated decision comes back as `KMG_INPUT_REQUIRED` immediately, with no attempt to interactively prompt first.
+
+## Confirmation gates {#confirmation-gates}
+
+Two confirmation gates were added in v0.7.0 that did not exist in prior 0.6.x releases. Both use the same `KMG_INPUT_REQUIRED` contract above when running in automated mode, so existing automation should be ready to handle them once it's built against this contract.
+
+### Cross-KG search (`kg_search` with `scope: "all"`)
+
+Searching with `scope: "all"` reads across every registered knowledge graph, including the personal KG if one is registered. The first `scope: "all"` call in a process is gated behind a confirmation naming every candidate KG:
+
+- **Automated mode:** returns `KMG_INPUT_REQUIRED` with `reason: "cross_kg_search_confirmation"` and `resolveWith.param: "confirmCrossKgSearch"` (`accepts: ["true"]`) until the retry passes `confirmCrossKgSearch: true`, optionally narrowed with `excludeKgs: [...]`. Each automated confirmation is per-call — it is not remembered for later calls in the same process.
+- **Interactive mode:** prompts for `"all"` (search every candidate) or `"exclude:<name>,..."` (search all but the named KGs), then asks whether that choice should stay for the rest of the session (`sticky`) or apply once. A sticky confirmation is remembered for the rest of the process; a one-shot confirmation only covers the call that triggered it.
+
+This is process-lifetime state only — nothing is written to disk, so a new server process always re-asks.
+
+### Broad-ancestor / `$HOME`/root registration guard
+
+Registering a new knowledge graph (`kg_config_init`, or the `kmg-init` CLI wizard) is checked against two guards before the directory is scaffolded:
+
+- **Hard block, no override:** registering a KG whose path *is* the user's home directory or the filesystem root is refused outright — there is no confirmation parameter that overrides this. A path this broad would resolve as "the KG for" nearly every directory on the machine.
+- **Broad-ancestor warning, confirmable:** registering a KG whose path is an ancestor of one or more *already-registered* KGs (but isn't `$HOME`/root itself) is not blocked, but requires confirmation — the new registration would make every command run from inside those existing KGs' directories ambiguous about which KG they resolve to. Automated callers pass `confirmBroadRegistration: "yes"` to proceed (or get `KMG_INPUT_REQUIRED` with `reason: "broad_ancestor_registration"` and a `detail` listing the affected KG names otherwise); interactive callers are asked `yes`/`no` with the same detail.
+
+Neither guard existed in 0.6.x, where a new registration was scaffolded unconditionally regardless of how broad or narrow its path was relative to other registered graphs.
 
 ---
 

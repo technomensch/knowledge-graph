@@ -7,12 +7,24 @@
 
 ## Level Routing Detection
 
-Before any other steps, detect the level signal from the user's invocation and resolve it to an explicit flag.
+Before any other steps, detect the user's intent for WHERE this lesson should be
+captured, directly from their message or an explicit flag — no separate routing skill
+needed (`gov-capture-routing`, formerly invoked here, has been retired — see issue-18 —
+this detection is now native to how `kg_capture`/`lesson-capture-agent` already resolve
+scope):
 
-**Invoke `gov-capture-routing` skill** to:
-1. Detect level signal from the user's message (NL patterns or explicit flags)
-2. Resolve `$level`, `$target_kg`, `$target_path` (→ `{target_kg}/lessons-learned/`), `$restore_kg`
-3. Handle prompts if needed (named KG not found, no project KG configured, conflict resolution)
+- Personal/global-KG language ("my personal", "global lesson"), or an explicit `--user`
+  flag → `--user` (`lesson-capture-agent` passes `scope: "user"` to `kg_capture`)
+- This-project language, or an explicit `--project` flag → `--project`
+- A specific KG named by the user, or `--named=<kg>` → `--named=<kg>` (resolves to
+  `targetKg` at the `kg_capture` call)
+- Nothing specified, or `--active` → `--active` (default, cwd-derived resolution)
+- No `$restore_kg` to resolve — knowledge graphs resolve from context per call, not a
+  mutable "active" pointer, so there is nothing to restore after (ADR-067 Phase 6).
+- Handle prompts if genuinely needed (named KG not found, no project KG configured) —
+  the conflict-resolution flow the retired skill supported for two ambiguous signals in
+  one message is not reproduced here; see issue-18's decision record for why this is an
+  accepted scope narrowing.
 
 Pass the resolved flag (`--user`, `--project`, `--named=<kg>`, or `--active`) to the `lesson-capture-agent` invocation.
 
@@ -20,28 +32,12 @@ Pass the resolved flag (`--user`, `--project`, `--named=<kg>`, or `--active`) to
 
 ## Project KG Guardrail
 
-**STOP before any write if the active KG does not match the current project's KG.**
-
-After routing resolves `$target_kg`, detect the project root and its KG:
-
-```bash
-project_root=$(git rev-parse --show-toplevel 2>/dev/null)
-project_kg="${project_root}/knowledge"
-```
-
-If `$project_kg` **exists** AND its resolved path **differs** from `$target_kg`, and the user did not explicitly pass `--user` or `--named=<kg>`:
-
-> "The active KG is **[active_kg_name]** (`$target_kg`), but this project has its own KG at `{project_kg}/`.
->
-> Which graph should receive this lesson?
->
-> **[1]** Project KG — `{project_kg}/lessons-learned/`
-> **[2]** Active KG — `{active_kg_name}` (`$target_kg/lessons-learned/`)
-> **[3]** Cancel"
-
-Wait for user selection. Update `$target_kg` and `$target_path` to the chosen graph before continuing. Do **not** dispatch to `lesson-capture-agent` until the user has chosen.
-
-If `$project_kg` does not exist, or paths match, or user explicitly specified a target, continue without prompting.
+There is no separate guard needed here (issue-41: this section previously compared a
+stale `.active`-derived pointer against the project's own KG and prompted on mismatch —
+a pre-ADR-067 pattern). In the default (no flag) case, Level Routing already resolves
+`$target_kg` via cwd-derived resolution, which by construction finds this project's own
+KG — there is nothing left to disagree with. When `--user`/`--named=<kg>` is explicitly
+passed, the user has already stated their intended target; no guard applies.
 
 ---
 
@@ -60,7 +56,9 @@ If `$project_kg` does not exist, or paths match, or user explicitly specified a 
 
 *Entered when the user invokes `/kmgraph:kmg-capture-lesson update <filename>`.*
 
-1. Locate the file at `{active_kg_path}/lessons-learned/<filename>`. If not found, ask the user for the correct path.
+1. Call `kg_resolve` and take the returned `path` as `{active_kg_path}`. Locate the file
+   at `{active_kg_path}/lessons-learned/<filename>`. If not found, ask the user for the
+   correct path.
 2. Read the file and extract: current version, last-updated date.
 3. Ask what to change:
 

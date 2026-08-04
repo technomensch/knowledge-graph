@@ -1,11 +1,11 @@
 
 # /kmgraph:kmg-check-sensitive — Scan for Sensitive Data
 
-Scan the active knowledge graph for potentially sensitive information using regex patterns from config or defaults.
+Scan the knowledge graph resolved from the current directory for potentially sensitive information, using regex patterns from config or defaults.
 
 ## What This Does
 
-Scans all markdown files in active KG for:
+Scans all markdown files in the resolved KG for:
 - Email addresses
 - API keys/tokens (common patterns)
 - URLs (http://, https://)
@@ -15,77 +15,26 @@ Scans all markdown files in active KG for:
 
 ```bash
 /kmgraph:kmg-check-sensitive
-/kmgraph:kmg-check-sensitive --fix-suggestions
+/kmgraph:kmg-check-sensitive --user
 ```
 
 ## Implementation
 
-### Step 1: Get Active KG Path
+Call the `kg_check_sensitive` MCP tool directly — it already resolves the target graph
+from the current directory (`scope: "project"`, the default) or the personal graph
+(`scope: "user"`, if `--user` was passed), scans for the same email/API-key/URL/custom
+patterns this command used to reimplement in bash, and reports results in the same shape.
+No separate path-resolution step is needed (issue-41: this command previously resolved
+its own scan path via `jq -r '.graphs[.active].path'`, a pre-ADR-067 pattern that no
+longer reflects how any graph is actually selected).
 
-```bash
-kg_path=$(jq -r '.graphs[.active].path' ~/.kmgraph/kg-config.json)
+```
+kg_check_sensitive scope="project"    # default, or scope="user" if --user was passed
 ```
 
-### Step 2: Load Patterns
-
-```bash
-# Load from config or use defaults
-if [ -f .claude/sanitization-config.json ]; then
-  patterns=$(jq -r '.patterns[]' .claude/sanitization-config.json)
-else
-  # Default patterns
-  patterns=(
-    "email:\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
-    "api-key:\b(api[_-]?key|token|secret)[[:space:]]*[:=][[:space:]]*['\"]?[A-Za-z0-9_-]{16,}['\"]?"
-    "url:https?://[^\s]+"
-  )
-fi
-```
-
-### Step 3: Scan Files
-
-```bash
-# Find all markdown files
-find "$kg_path" -name "*.md" | while read file; do
-  # Scan each pattern
-  for pattern in "${patterns[@]}"; do
-    type=$(echo "$pattern" | cut -d: -f1)
-    regex=$(echo "$pattern" | cut -d: -f2-)
-
-    # Grep for pattern
-    matches=$(grep -n -E "$regex" "$file" 2>/dev/null || true)
-
-    if [ -n "$matches" ]; then
-      echo "$file:$matches" >> /tmp/sensitive-findings.txt
-    fi
-  done
-done
-```
-
-### Step 4: Report Findings
-
-```bash
-if [ ! -s /tmp/sensitive-findings.txt ]; then
-  echo "✅ No sensitive data found in $kg_path"
-  exit 0
-fi
-
-echo "⚠️  Potential sensitive data found:"
-echo ""
-
-cat /tmp/sensitive-findings.txt | while read finding; do
-  file=$(echo "$finding" | cut -d: -f1)
-  line=$(echo "$finding" | cut -d: -f2)
-  match=$(echo "$finding" | cut -d: -f3-)
-
-  echo "- $(basename $file):$line — $match"
-done
-
-echo ""
-echo "Review these entries before pushing to public repository."
-echo ""
-echo "Run with --fix-suggestions to see recommended fixes."
-```
+Pass through `patterns` (additional regexes) if the user supplied any beyond
+`.claude/sanitization-config.json`'s configured set — the tool already merges configured
+and runtime patterns itself.
 
 ## Output Example
 
@@ -97,8 +46,6 @@ echo "Run with --fix-suggestions to see recommended fixes."
 - lesson-template.md:8 — api-key: API_KEY=abc123def456
 
 Review these entries before pushing to public repository.
-
-Run with --fix-suggestions to see recommended fixes.
 ```
 
 ## See Also

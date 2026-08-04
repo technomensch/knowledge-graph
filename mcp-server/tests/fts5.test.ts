@@ -26,7 +26,7 @@ function makeTempDir(prefix: string): string {
 
 /** Creates the standard KG subdirectory structure. */
 function scaffoldKg(root: string): void {
-  for (const dir of ["knowledge", "lessons-learned", "decisions", "sessions"]) {
+  for (const dir of ["lessons-learned", "decisions", "sessions"]) {
     fs.mkdirSync(path.join(root, dir), { recursive: true });
   }
 }
@@ -158,9 +158,9 @@ describe("rebuildIndex", () => {
     scaffoldKg(kgRoot);
 
     // Create 3 files
-    writeMd(path.join(kgRoot, "knowledge"), "a.md", "# A\nContent A");
-    writeMd(path.join(kgRoot, "knowledge"), "b.md", "# B\nContent B");
-    writeMd(path.join(kgRoot, "knowledge"), "c.md", "# C\nContent C");
+    writeMd(path.join(kgRoot, "lessons-learned"), "a.md", "# A\nContent A");
+    writeMd(path.join(kgRoot, "lessons-learned"), "b.md", "# B\nContent B");
+    writeMd(path.join(kgRoot, "lessons-learned"), "c.md", "# C\nContent C");
 
     // First build
     const first = rebuildIndex(kgRoot, "rebuild-skip");
@@ -173,20 +173,49 @@ describe("rebuildIndex", () => {
     expect(second.skipped).toBe(3);
   });
 
+  test("does not index files under a dead 'knowledge' dir (issue-35)", () => {
+    const kgRoot = makeTempDir("rebuild-dead-knowledge");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    fs.mkdirSync(path.join(kgRoot, "knowledge"), { recursive: true });
+    writeMd(path.join(kgRoot, "knowledge"), "orphan.md", "# Orphan\nShould not be indexed");
+
+    const result = rebuildIndex(kgRoot, "rebuild-dead-knowledge");
+    expect(result.indexed).toBe(0);
+    expect(result.skipped).toBe(0);
+  });
+
+  test("indexes files under 'issues' and 'enhancements' (issue-34)", () => {
+    const kgRoot = makeTempDir("rebuild-issues-enhancements");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    fs.mkdirSync(path.join(kgRoot, "issues"), { recursive: true });
+    fs.mkdirSync(path.join(kgRoot, "enhancements"), { recursive: true });
+    writeMd(path.join(kgRoot, "issues"), "issue-1.md", "# Issue 1\nSomething broke");
+    writeMd(path.join(kgRoot, "enhancements"), "enh-1.md", "# Enhancement 1\nSomething to add");
+
+    const result = rebuildIndex(kgRoot, "rebuild-issues-enhancements");
+    expect(result.indexed).toBe(2);
+
+    const dbPath = getProjectDbPath("rebuild-issues-enhancements");
+    expect(searchFts5(dbPath, "broke", kgRoot).length).toBeGreaterThan(0);
+    expect(searchFts5(dbPath, "Enhancement", kgRoot).length).toBeGreaterThan(0);
+  });
+
   test("re-indexes modified files", () => {
     const kgRoot = makeTempDir("rebuild-mod");
     tempDirs.push(kgRoot);
     scaffoldKg(kgRoot);
 
-    writeMd(path.join(kgRoot, "knowledge"), "a.md", "# A\nContent A");
-    writeMd(path.join(kgRoot, "knowledge"), "b.md", "# B\nContent B");
-    writeMd(path.join(kgRoot, "knowledge"), "c.md", "# C\nContent C");
+    writeMd(path.join(kgRoot, "lessons-learned"), "a.md", "# A\nContent A");
+    writeMd(path.join(kgRoot, "lessons-learned"), "b.md", "# B\nContent B");
+    writeMd(path.join(kgRoot, "lessons-learned"), "c.md", "# C\nContent C");
 
     // First build
     rebuildIndex(kgRoot, "rebuild-mod");
 
     // Modify one file — need to change mtime. Write new content and ensure mtime differs.
-    const fileB = path.join(kgRoot, "knowledge", "b.md");
+    const fileB = path.join(kgRoot, "lessons-learned", "b.md");
     // Ensure mtime changes: wait a tick then rewrite
     const oldMtime = fs.statSync(fileB).mtimeMs;
     // Force mtime change by writing new content
@@ -207,15 +236,15 @@ describe("rebuildIndex", () => {
     tempDirs.push(kgRoot);
     scaffoldKg(kgRoot);
 
-    writeMd(path.join(kgRoot, "knowledge"), "a.md", "# A\nContent A");
-    writeMd(path.join(kgRoot, "knowledge"), "b.md", "# B\nContent B");
-    writeMd(path.join(kgRoot, "knowledge"), "c.md", "# C\nContent C");
+    writeMd(path.join(kgRoot, "lessons-learned"), "a.md", "# A\nContent A");
+    writeMd(path.join(kgRoot, "lessons-learned"), "b.md", "# B\nContent B");
+    writeMd(path.join(kgRoot, "lessons-learned"), "c.md", "# C\nContent C");
 
     // First build
     rebuildIndex(kgRoot, "rebuild-del");
 
     // Delete one file
-    fs.unlinkSync(path.join(kgRoot, "knowledge", "c.md"));
+    fs.unlinkSync(path.join(kgRoot, "lessons-learned", "c.md"));
 
     const second = rebuildIndex(kgRoot, "rebuild-del");
     expect(second.indexed).toBe(0);
@@ -235,7 +264,7 @@ describe("searchFts5", () => {
     scaffoldKg(kgRoot);
 
     writeMd(
-      path.join(kgRoot, "knowledge"),
+      path.join(kgRoot, "lessons-learned"),
       "auth.md",
       "# Authentication\n\nOAuth2 token refresh implementation details."
     );
@@ -271,7 +300,7 @@ describe("searchFts5", () => {
     tempDirs.push(kgRoot);
     scaffoldKg(kgRoot);
 
-    writeMd(path.join(kgRoot, "knowledge"), "test.md", "# Test\nSome content.");
+    writeMd(path.join(kgRoot, "lessons-learned"), "test.md", "# Test\nSome content.");
     rebuildIndex(kgRoot, "search-empty");
 
     const dbPath = getProjectDbPath("search-empty");
@@ -311,7 +340,7 @@ describe("DB path resolution", () => {
     tempDirs.push(kgRoot);
     scaffoldKg(kgRoot);
 
-    writeMd(path.join(kgRoot, "knowledge"), "test.md", "# Test\nContent");
+    writeMd(path.join(kgRoot, "lessons-learned"), "test.md", "# Test\nContent");
 
     // Rebuild should use resolveDbPath internally
     const result = rebuildIndex(kgRoot, "test-kg-001");
@@ -343,12 +372,12 @@ describe("Multiple KGs with separate DBs", () => {
     scaffoldKg(projRoot2);
 
     writeMd(
-      path.join(projRoot1, "knowledge"),
+      path.join(projRoot1, "lessons-learned"),
       "doc1.md",
       "# Doc 1\nContent for KG1"
     );
     writeMd(
-      path.join(projRoot2, "knowledge"),
+      path.join(projRoot2, "lessons-learned"),
       "doc2.md",
       "# Doc 2\nContent for KG2"
     );
@@ -400,7 +429,7 @@ describe("DB file location independence", () => {
     tempDirs.push(kgRoot);
     scaffoldKg(kgRoot);
 
-    writeMd(path.join(kgRoot, "knowledge"), "test.md", "# Test\nContent");
+    writeMd(path.join(kgRoot, "lessons-learned"), "test.md", "# Test\nContent");
 
     const result = rebuildIndex(kgRoot, "tc-008-kg");
 
@@ -420,7 +449,7 @@ describe("DB file location independence", () => {
     tempDirs.push(kgRoot);
     scaffoldKg(kgRoot);
 
-    writeMd(path.join(kgRoot, "knowledge"), "test.md", "# Test\nContent");
+    writeMd(path.join(kgRoot, "lessons-learned"), "test.md", "# Test\nContent");
 
     const result = rebuildIndex(kgRoot, "tc-008b-kg");
     const dbPath = result.db_path;

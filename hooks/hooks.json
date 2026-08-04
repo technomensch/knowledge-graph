@@ -138,6 +138,12 @@
             "comment": "Session end: surface open plans, draft ADRs, uncaptured lessons",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/session-end-prompt.sh",
             "timeout": 30
+          },
+          {
+            "type": "command",
+            "comment": "Session end: block if handoff/recall manifest names files never opened this session (ADR-068 pilot, issue-33)",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/handoff-file-tracing-gate.sh",
+            "timeout": 10
           }
         ]
       }

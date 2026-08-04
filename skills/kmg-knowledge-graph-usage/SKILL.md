@@ -186,10 +186,6 @@ Commands remain available for explicit, interactive use. They operate on all fou
 - Configure categories and git strategy
 - One-time setup command
 
-**`/kmgraph:kmg-switch [name]`**
-- Change active KG
-- Routes subsequent commands to selected graph
-
 **`/kmgraph:kmg-check-sensitive`**
 - Scan for sensitive data before sharing
 - Manual security check before commits/pushes

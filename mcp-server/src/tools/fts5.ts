@@ -3,7 +3,10 @@ import { z } from "zod";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { readConfig, writeConfig, getActiveGraphPath, walkDir } from "../utils.js";
+import { readConfig, writeConfig, walkDir } from "../utils.js";
+import { resolveGraph, resolvePersonalGraph, PersonalScopeSession, confirmPersonalScopeAccess, isAncestorOrEqual } from "../resolution.js";
+import { resolveInteractionMode, STUB_ASK_TIMEOUT_MS, stubAsk } from "../interaction.js";
+import { resolveEffectiveCwd } from "../platform-cwd.js";
 
 // Graceful fallback: node-sqlite3-wasm is bundled in dist/node_modules/ for marketplace installs
 // (v0.5.10.3+). This try/catch covers edge cases: partial clone, corrupted dist, or dev runs
@@ -93,6 +96,19 @@ export function getDbPath(kgPath: string): string {
  * Strips FTS5 operator characters from a raw query string so it can be used
  * safely in a MATCH clause. Returns '""' for empty / whitespace-only input.
  */
+// Mirrors compare.ts's normalizeForCompare / sanitization.ts's normalizeForScan: a raw path
+// string can't be gated the same way a scope enum can -- a personal-KG path could be passed
+// under any of dozens of possible string values, so containment is checked against the
+// registry after normalizing, not against the literal string.
+function normalizeForFts5Scope(p: string): string {
+  const expanded = p.replace(/^~/, os.homedir());
+  try {
+    return fs.realpathSync(expanded);
+  } catch {
+    return path.resolve(expanded);
+  }
+}
+
 export function sanitizeFts5Query(raw: string): string {
   let sanitized = raw
     .replace(/[":(){}[\]^~*+\\]/g, " ")
@@ -290,7 +306,7 @@ export function rebuildIndex(kgPath: string, kgName: string, kgType = "project-l
     initDb(db);
 
     // Collect all .md files from target subdirectories
-    const contentDirs = ["knowledge", "lessons-learned", "decisions", "sessions", "chat-history"];
+    const contentDirs = ["lessons-learned", "decisions", "sessions", "chat-history", "issues", "enhancements"];
     const allFiles: string[] = [];
 
     for (const dir of contentDirs) {
@@ -404,155 +420,280 @@ export function searchFts5(
  * Returns { exists: boolean, db_path: string, kgType: string } — read-only probe,
  * never creates directories.
  */
-export function registerFts5StatusTool(server: McpServer): void {
+export function registerFts5StatusTool(server: McpServer, personalScopeSession: PersonalScopeSession): void {
   server.tool(
     "kg_fts5_status",
-    "Check whether the FTS5 search index exists for the active knowledge graph. " +
-      "Returns { exists, db_path, kgType }. Read-only — does not create or modify the index.",
-    {},
-    async () => {
-      try {
-        const config = readConfig();
-        const activeName = config.active;
-        if (!activeName) {
-          return {
-            content: [{
-              type: "text" as const,
-              text: JSON.stringify({ exists: false, db_path: null, kgType: null, error: "No active KG" }),
-            }],
-          };
-        }
-        const graph = config.graphs[activeName];
-        const kgType = graph?.type ?? "project-local";
-        // resolveDbPath normally creates dirs — for status we compute the path without creating anything
-        let dbPath: string;
-        if (kgType === "personal") {
-          dbPath = path.join(os.homedir(), ".kmgraph", "index", "personal.db");
-        } else {
-          dbPath = path.join(os.homedir(), ".kmgraph", "index", "projects", `${activeName}.db`);
-        }
-        const exists = fs.existsSync(dbPath);
-        return {
-          content: [{
-            type: "text" as const,
-            text: JSON.stringify({ exists, db_path: dbPath, kgType }),
-          }],
-        };
-      } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : String(err);
-        return {
-          content: [{
-            type: "text" as const,
-            text: `Error checking FTS5 status: ${message}`,
-          }],
-          isError: true,
-        };
+    "Check whether the FTS5 search index exists for a knowledge graph (default: resolved " +
+      "from your current directory). Returns { exists, db_path, kgType }. Read-only — does " +
+      "not create or modify the index.",
+    {
+      scope: z
+        .enum(["project", "user"])
+        .optional()
+        .describe("project (default, cwd-resolved) or user (the personal knowledge graph)"),
+      confirmPersonalScope: z
+        .boolean()
+        .optional()
+        .describe(
+          "Confirms this repo may read the personal knowledge graph. Required once per " +
+            "process before a scope:\"user\" read is honored for a repo not yet confirmed."
+        ),
+    },
+    async ({ scope, confirmPersonalScope }, extra) =>
+      handleFts5Status({ scope, confirmPersonalScope }, personalScopeSession, extra?._meta as Record<string, unknown> | undefined)
+  );
+}
+
+export interface HandleFts5StatusParams {
+  scope?: "project" | "user";
+  confirmPersonalScope?: boolean;
+}
+
+export interface HandleFts5StatusResult {
+  [x: string]: unknown;
+  content: Array<{ type: "text"; text: string }>;
+  isError?: true;
+}
+
+export async function handleFts5Status(
+  params: HandleFts5StatusParams,
+  personalScopeSession: PersonalScopeSession = new PersonalScopeSession(),
+  toolCallMeta?: Record<string, unknown>
+): Promise<HandleFts5StatusResult> {
+  try {
+    const config = readConfig();
+    const cwd = resolveEffectiveCwd({ processCwd: process.cwd(), toolCallMeta });
+    const target = params.scope === "user" ? resolvePersonalGraph(config) : (() => {
+      const resolution = resolveGraph(config, cwd);
+      return resolution.kind === "resolved"
+        ? { name: resolution.name, graph: resolution.graph }
+        : { error: "No knowledge graph resolved from your current directory." };
+    })();
+
+    if ("error" in target) {
+      return {
+        content: [{
+          type: "text" as const,
+          text: JSON.stringify({ exists: false, db_path: null, kgType: null, error: target.error }),
+        }],
+      };
+    }
+
+    // ADR-067 Task 6.4 (spec §11): scope:"user" reaches the personal graph
+    // here the same way it does in search.ts/capture.ts/kg_config_add_category
+    // -- same gate, closing the interim gap left open by Task 1.9.
+    if (params.scope === "user") {
+      const mode = resolveInteractionMode({}).mode;
+      const confirmed = await confirmPersonalScopeAccess(personalScopeSession, cwd, {
+        confirmPersonalScope: params.confirmPersonalScope,
+        mode,
+        timeoutMs: STUB_ASK_TIMEOUT_MS,
+        ask: stubAsk,
+      });
+      if (!("confirmed" in confirmed)) {
+        return { content: [{ type: "text" as const, text: JSON.stringify(confirmed) }], isError: true };
       }
     }
-  );
+
+    const kgType = target.graph.type ?? "project-local";
+    // resolveDbPath normally creates dirs — for status we compute the path without creating anything
+    let dbPath: string;
+    if (kgType === "personal") {
+      dbPath = path.join(os.homedir(), ".kmgraph", "index", "personal.db");
+    } else {
+      dbPath = path.join(os.homedir(), ".kmgraph", "index", "projects", `${target.name}.db`);
+    }
+    const exists = fs.existsSync(dbPath);
+    return {
+      content: [{
+        type: "text" as const,
+        text: JSON.stringify({ exists, db_path: dbPath, kgType }),
+      }],
+    };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return {
+      content: [{
+        type: "text" as const,
+        text: `Error checking FTS5 status: ${message}`,
+      }],
+      isError: true,
+    };
+  }
 }
 
 /**
  * Registers the `kg_fts5_rebuild` MCP tool.
  */
-export function registerFts5Tool(server: McpServer): void {
+export function registerFts5Tool(server: McpServer, personalScopeSession: PersonalScopeSession): void {
   server.tool(
     "kg_fts5_rebuild",
-    "Build or refresh FTS5 full-text search index for the active knowledge graph. " +
-      "Indexes all .md files in knowledge/, lessons-learned/, decisions/, sessions/. " +
-      "Incremental: only re-indexes changed files. Run after sync-all or any time " +
-      "search results seem stale.",
+    "Build or refresh FTS5 full-text search index for a knowledge graph (default: resolved " +
+      "from your current directory). Indexes all .md files in knowledge/, lessons-learned/, " +
+      "decisions/, sessions/. Incremental: only re-indexes changed files. Run after " +
+      "sync-all or any time search results seem stale.",
     {
       kgPath: z
         .string()
         .optional()
-        .describe("Override KG path (default: active KG)"),
+        .describe("Override KG path (default: cwd-resolved KG)"),
+      scope: z
+        .enum(["project", "user"])
+        .optional()
+        .describe("project (default, cwd-resolved) or user (the personal knowledge graph) — ignored when kgPath is given"),
+      confirmPersonalScope: z
+        .boolean()
+        .optional()
+        .describe(
+          "Confirms this repo may write to the personal knowledge graph. Required once per " +
+            "process before a scope:\"user\" rebuild is honored for a repo not yet confirmed."
+        ),
     },
-    async ({ kgPath }) => {
-      if (!fts5Available) {
-        return {
-          content: [{
-            type: "text" as const,
-            text: "Search index is not available yet. The required package was installed in the background — please restart Claude Code and try again.",
-          }],
-          isError: true,
-        };
-      }
-      try {
-        const config = readConfig();
-        let resolvedPath: string;
-        let resolvedName: string;
-
-        if (kgPath) {
-          resolvedPath = kgPath.replace(/^~/, os.homedir());
-          // Find the matching KG name from config, or derive from path basename
-          const matchedEntry = Object.entries(config.graphs || {}).find(
-            ([, g]) => (g as any).path === resolvedPath
-          );
-          resolvedName = matchedEntry ? matchedEntry[0] : path.basename(resolvedPath);
-        } else {
-          const activePath = getActiveGraphPath(config);
-          if (!activePath) {
-            return {
-              content: [
-                {
-                  type: "text" as const,
-                  text: "Error: No active KG and no path specified.",
-                },
-              ],
-              isError: true,
-            };
-          }
-          resolvedPath = activePath;
-          resolvedName = config.active!;
-        }
-
-        if (!fs.existsSync(resolvedPath)) {
-          return {
-            content: [
-              {
-                type: "text" as const,
-                text: `Error: KG path does not exist: ${resolvedPath}`,
-              },
-            ],
-            isError: true,
-          };
-        }
-
-        // Determine kgType for the resolved graph
-        const graphEntry = config.graphs[resolvedName];
-        const resolvedType = graphEntry?.type ?? "project-local";
-
-        const result = rebuildIndex(resolvedPath, resolvedName, resolvedType);
-
-        // Update config to mark FTS5 as enabled, remove declined flag
-        if (config.active && config.graphs[config.active]) {
-          const graph = config.graphs[config.active] as unknown as Record<string, unknown>;
-          graph.fts5 = true;
-          delete graph.fts5_declined;
-          writeConfig(config);
-        }
-
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: JSON.stringify(result, null, 2),
-            },
-          ],
-        };
-      } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : String(err);
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: `Error rebuilding FTS5 index: ${message}`,
-            },
-          ],
-          isError: true,
-        };
-      }
-    }
+    async ({ kgPath, scope, confirmPersonalScope }, extra) =>
+      handleFts5Rebuild({ kgPath, scope, confirmPersonalScope }, personalScopeSession, extra?._meta as Record<string, unknown> | undefined)
   );
+}
+
+export interface HandleFts5RebuildParams {
+  kgPath?: string;
+  scope?: "project" | "user";
+  confirmPersonalScope?: boolean;
+}
+
+export interface HandleFts5RebuildResult {
+  [x: string]: unknown;
+  content: Array<{ type: "text"; text: string }>;
+  isError?: true;
+}
+
+export async function handleFts5Rebuild(
+  params: HandleFts5RebuildParams,
+  personalScopeSession: PersonalScopeSession = new PersonalScopeSession(),
+  toolCallMeta?: Record<string, unknown>
+): Promise<HandleFts5RebuildResult> {
+  const cwd = resolveEffectiveCwd({ processCwd: process.cwd(), toolCallMeta });
+  if (!fts5Available) {
+    return {
+      content: [{
+        type: "text" as const,
+        text: "Search index is not available yet. The required package was installed in the background — please restart Claude Code and try again.",
+      }],
+      isError: true,
+    };
+  }
+  try {
+    const config = readConfig();
+    let resolvedPath: string;
+    let resolvedName: string;
+
+    if (params.kgPath) {
+      resolvedPath = params.kgPath.replace(/^~/, os.homedir());
+      // Find the matching KG name from config, or derive from path basename
+      const matchedEntry = Object.entries(config.graphs || {}).find(
+        ([, g]) => (g as any).path === resolvedPath
+      );
+      resolvedName = matchedEntry ? matchedEntry[0] : path.basename(resolvedPath);
+
+      // ADR-067 sweep: a raw kgPath bypasses the scope:"user" gate below entirely (this
+      // branch returns before that branch is ever reached), so an unconfirmed kgPath
+      // pointing at -- or nested inside -- the registered personal graph must be gated
+      // independently, mirroring compare.ts's `a`/`b` and sanitization.ts's `kgPath` fix.
+      // Without this, `kgPath` was a complete end-run around the scope:"user" gate: any
+      // literal path string reached rebuildIndex() -- a WRITE to that graph's FTS5 index
+      // -- with zero confirmation.
+      const personalGraphPaths = Object.values(config.graphs || {})
+        .filter((g) => (g as any).type === "personal" && (g as any).status !== "deleted")
+        .map((g) => normalizeForFts5Scope((g as any).path));
+      const kgPathTouchesPersonal = personalGraphPaths.some((p) =>
+        isAncestorOrEqual(p, normalizeForFts5Scope(resolvedPath))
+      );
+      if (kgPathTouchesPersonal) {
+        const mode = resolveInteractionMode({}).mode;
+        const confirmed = await confirmPersonalScopeAccess(personalScopeSession, cwd, {
+          confirmPersonalScope: params.confirmPersonalScope,
+          mode,
+          timeoutMs: STUB_ASK_TIMEOUT_MS,
+          ask: stubAsk,
+        });
+        if (!("confirmed" in confirmed)) {
+          return { content: [{ type: "text" as const, text: JSON.stringify(confirmed) }], isError: true };
+        }
+      }
+    } else {
+      const target = params.scope === "user" ? resolvePersonalGraph(config) : (() => {
+        const resolution = resolveGraph(config, cwd);
+        return resolution.kind === "resolved"
+          ? { name: resolution.name, graph: resolution.graph }
+          : { error: "No knowledge graph resolved from your current directory and no path specified." };
+      })();
+      if ("error" in target) {
+        return { content: [{ type: "text" as const, text: `Error: ${target.error}` }], isError: true };
+      }
+      // ADR-067 Task 6.4 (spec §11): scope:"user" (no kgPath override) reaches
+      // the personal graph -- same gate as kg_fts5_status/search.ts/capture.ts.
+      if (params.scope === "user") {
+        const mode = resolveInteractionMode({}).mode;
+        const confirmed = await confirmPersonalScopeAccess(personalScopeSession, cwd, {
+          confirmPersonalScope: params.confirmPersonalScope,
+          mode,
+          timeoutMs: STUB_ASK_TIMEOUT_MS,
+          ask: stubAsk,
+        });
+        if (!("confirmed" in confirmed)) {
+          return { content: [{ type: "text" as const, text: JSON.stringify(confirmed) }], isError: true };
+        }
+      }
+      resolvedPath = target.graph.path.replace(/^~/, os.homedir());
+      resolvedName = target.name;
+    }
+
+    if (!fs.existsSync(resolvedPath)) {
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: `Error: KG path does not exist: ${resolvedPath}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+
+    // Determine kgType for the resolved graph
+    const graphEntry = config.graphs[resolvedName];
+    const resolvedType = graphEntry?.type ?? "project-local";
+
+    const result = rebuildIndex(resolvedPath, resolvedName, resolvedType);
+
+    // Update config to mark FTS5 as enabled, remove declined flag -- on the
+    // graph actually rebuilt (resolvedName), not config.active (ADR-067
+    // Task 1.9 -- the old code marked whichever graph happened to be
+    // .active, even when an explicit kgPath/scope targeted a different one).
+    if (config.graphs[resolvedName]) {
+      const graph = config.graphs[resolvedName] as unknown as Record<string, unknown>;
+      graph.fts5 = true;
+      delete graph.fts5_declined;
+      writeConfig(config);
+    }
+
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: JSON.stringify(result, null, 2),
+        },
+      ],
+    };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: `Error rebuilding FTS5 index: ${message}`,
+        },
+      ],
+      isError: true,
+    };
+  }
 }

@@ -1,7 +1,10 @@
 #!/bin/bash
-# plan-mirror.sh - PostToolUse hook: auto-mirror plans from ~/.claude/plans/ to active KG docs/plans/
+# plan-mirror.sh - PostToolUse hook: auto-mirror plans from ~/.claude/plans/ to the
+# cwd-resolved KG's docs/plans/
 # Security: no eval, no network, all variables quoted, subshells quoted
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PLUGIN_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
 mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
 # one-time migration: seed from the legacy ~/.claude location if the new path is absent (atomic, race-safe)
@@ -46,24 +49,34 @@ if [ ! -f "$FILE_PATH" ]; then
     exit 0
 fi
 
-# Load active KG config
+# Resolve the KG for the current directory. issue-41 (ADR-067 Phase 9):
+# resolution is cwd-derived via the same resolveGraph() logic the kg_resolve
+# MCP tool exposes, not a mutable `.active` pointer grep'd out of
+# kg-config.json — see hooks-master.sh for the fuller rationale comment.
 if [ ! -f "$CONFIG_PATH" ]; then
     exit 0
 fi
 
-ACTIVE_KG="$(grep -o '"active"[[:space:]]*:[[:space:]]*"[^"]*"' "$CONFIG_PATH" | sed 's/.*"\([^"]*\)".*/\1/')"
-
-if [ -z "$ACTIVE_KG" ]; then
+RESOLVE_CLI="$PLUGIN_ROOT/mcp-server/dist/cli.js"
+if ! command -v node &> /dev/null || [ ! -f "$RESOLVE_CLI" ]; then
     exit 0
 fi
 
-KG_PATH="$(grep -A 10 "\"$ACTIVE_KG\"" "$CONFIG_PATH" | grep '"path"' | head -1 | sed 's/.*"path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')"
+RESOLVE_JSON="$(node "$RESOLVE_CLI" resolve --cwd "$(pwd)" 2>/dev/null)"
+if [ $? -ne 0 ]; then
+    exit 0
+fi
+
+KG_PATH="$(node -e "
+  try {
+    const r = JSON.parse(process.argv[1]);
+    process.stdout.write(r.path || '');
+  } catch(e) {}
+" "$RESOLVE_JSON" 2>/dev/null)"
 
 if [ -z "$KG_PATH" ]; then
     exit 0
 fi
-
-KG_PATH="${KG_PATH/#\~/$HOME}"
 
 # Derive project root from KG path (parent of docs/)
 KG_PROJECT_ROOT="$(dirname "$KG_PATH")"

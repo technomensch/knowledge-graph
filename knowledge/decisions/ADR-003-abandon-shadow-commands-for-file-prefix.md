@@ -134,7 +134,7 @@ Phase 2 (later): Full namespace rename to `kg-sis` to incorporate publisher iden
 ## Related Documentation
 
 **Lessons Learned:**
-- [Plugin Namespace Visibility — Shadow Command Failure](../lessons-learned/debugging/Lessons_Learned_Plugin_Namespace_Visibility_Shadow_Command_Failure.md) — Why shadow commands didn't work as intended
+- [Plugin Namespace Visibility — Shadow Command Failure](../lessons-learned/debugging/namespace-visibility-shadow-command-failure.md) — Why shadow commands didn't work as intended
 
 ---
 

@@ -1067,7 +1067,6 @@ if [ ! -f "$CONFIG_PATH" ]; then
     cat > "$CONFIG_PATH" <<'EOF'
 {
   "version": "1.0.0",
-  "active": null,
   "graphs": {},
   "sanitization": {
     "enabled": false,
@@ -1372,7 +1371,6 @@ Parameters:
 - `{categories}` = categories array collected in Step 1.2
 - `{git_strategy}` = selected git strategy from Step 1.2
 - `{category_git_rules}` = per-category git rules map from Step 1.2 (if selective strategy)
-- `{preserve_active}` = false
 
 ### Step 1.8.5: Global Personal KG Offer
 
@@ -1470,11 +1468,9 @@ Which platforms are you using? (select all that apply)
        {"name": "patterns", "prefix": null, "git": "ignore"},
        {"name": "process", "prefix": null, "git": "ignore"}
      ],
-     "createdAt": "[timestamp]",
-     "lastUsed": "[timestamp]"
+     "createdAt": "[timestamp]"
    }
    ```
-   Note: `"active"` is NOT changed — project KG remains active.
 
 5. Build FTS5 index for the new personal KG:
    Call `kg_fts5_rebuild` with `kgPath: "~/.kmgraph"`. Post-rebuild guard: if `indexed` is 0, log a note (normal for empty KG).
@@ -1775,9 +1771,8 @@ jq ".graphs[\"$kg_name\"].platforms = (.graphs[\"$kg_name\"].platforms // []) + 
 mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
 ```
 
-Do not error if the `platforms`, `autoSwitch`, or `notification` fields are absent in an existing config entry — treat all missing fields as their defaults:
+Do not error if the `platforms` or `notification` fields are absent in an existing config entry — treat all missing fields as their defaults:
 - `platforms`: `[]`
-- `autoSwitch`: `false`
 - `notification.webhookUrl`: `""`
 
 The updated config entry schema:
@@ -1787,7 +1782,6 @@ The updated config entry schema:
   "my-project": {
     "path": "/path/to/kg/knowledge",
     "type": "project-local",
-    "autoSwitch": false,
     "platforms": ["gemini", "cursor"],
     "notification": { "webhookUrl": "" }
   }
@@ -1838,10 +1832,9 @@ Skip wizard with flags:
 ## Integration with Other Skills
 
 - `/kmgraph:kmg-list` will show this KG
-- `/kmgraph:kmg-switch` can change to/from this KG
-- `/kmgraph:kmg-status` will reference this KG if active
+- `/kmgraph:kmg-status` will reference this KG when your cwd resolves to it
 - `/kmgraph:kmg-capture-lesson` will write to this KG
-- All other skills operate on this KG once active
+- All other skills operate on this KG when resolved from cwd (or an explicit named target)
 
 ## Files Created
 
@@ -1885,7 +1878,6 @@ $KG_PATH/
 ```json
 {
   "version": "1.0.0",
-  "active": "my-project",
   "graphs": {
     "my-project": {
       "name": "my-project",
@@ -1896,8 +1888,7 @@ $KG_PATH/
         { "name": "process", "prefix": null, "git": "ignore" },
         { "name": "patterns", "prefix": null, "git": "commit" }
       ],
-      "createdAt": "2026-02-13T10:30:00Z",
-      "lastUsed": "2026-02-13T10:30:00Z"
+      "createdAt": "2026-02-13T10:30:00Z"
     }
   }
 }
@@ -1906,6 +1897,5 @@ $KG_PATH/
 ## See Also
 
 - `/kmgraph:kmg-list` — View all configured KGs
-- `/kmgraph:kmg-switch` — Change active KG
 - `/kmgraph:kmg-add-category` — Add categories to existing KG
 - `/kmgraph:kmg-status` — View active KG info and stats

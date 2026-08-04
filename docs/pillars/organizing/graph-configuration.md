@@ -114,9 +114,8 @@ Template changes affect new documents only — existing entries are not modified
 After init, the most common configuration tasks are:
 
 1. **Adding a new category** — `/kmgraph:kmg-add-category`
-2. **Switching the active KG** — `/kmgraph:kmg-switch` (for multi-KG setups)
-3. **Listing all configured KGs** — `/kmgraph:kmg-list`
-4. **Editing templates** — directly in `core/default-templates/`
+2. **Listing all configured KGs** — `/kmgraph:kmg-list` (for multi-KG setups — each command targets whichever KG the current directory resolves to, no switch step needed)
+3. **Editing templates** — directly in `core/default-templates/`
 
 Avoid restructuring the directory layout after the KG is in use. Moving files breaks cross-references and FTS5 index entries. If you need to reorganize, use `kg_fts5_rebuild` after the move.
 

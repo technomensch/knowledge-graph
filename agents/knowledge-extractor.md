@@ -126,18 +126,18 @@ Subagent: Writes approved items to knowledge graph
 
 ---
 
-### Step 1: Get Active KG Path
+### Step 1: Resolve Target Graph
 
-```bash
-active_kg=$(jq -r '.active' ~/.kmgraph/kg-config.json)
-kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.kmgraph/kg-config.json)
+```
+kg_resolve
 ```
 
-Verify the active KG matches the current working directory. If mismatch:
-
-> "The active knowledge graph is for **[active KG name]**. Switch or proceed anyway?"
-
-Block until resolved.
+Take the returned `path` as `$kg_path` below. There is no separate "active" pointer left
+to disagree with the current working directory (issue-41: this step previously read
+`.active` and then separately verified it matched cwd — the pre-ADR-067 `KG_MISMATCH`
+pattern; `kg_resolve` derives the graph from cwd directly, so there's nothing left to
+mismatch). If `kg_resolve` errors (no graph registered for this directory), stop and
+tell the user to run `/kmgraph:kmg-init` first.
 
 ---
 

@@ -1,6 +1,5 @@
 {
   "version": "1.0.0",
-  "active": null,
   "graphs": {},
   "sanitization": {
     "enabled": false,

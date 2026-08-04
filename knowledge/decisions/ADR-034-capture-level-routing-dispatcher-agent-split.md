@@ -1,7 +1,7 @@
 ---
 title: "ADR-034: Capture Level Routing — Dispatcher/Agent Split with Shared gov-capture-routing Skill"
 date: 2026-04-15
-status: Accepted
+status: Superseded
 deciders: [technomensch]
 implements: v0.3.9-beta
 tags: [architecture, capture, routing, governance, skills, agents, commands]
@@ -11,7 +11,7 @@ tags: [architecture, capture, routing, governance, skills, agents, commands]
 
 ## Status
 
-Accepted — implemented in v0.3.9-beta (branch: v0.3.9-capture-level-routing, PR #91)
+**Superseded by ADR-067 (2026-08-03).** Originally Accepted — implemented in v0.3.9-beta (branch: v0.3.9-capture-level-routing, PR #91). The `gov-capture-routing` skill this ADR designed lived at `~/.claude/skills/gov-capture-routing.md` (a personal, unshipped file, not this project's `skills/<name>/SKILL.md` convention) and was unreachable via the Skill tool for 3+ months — tracked as issue-18, which was decided as RETIRE rather than fix. ADR-067's `scope`/`targetKg` params on `kg_capture` (and the equivalent params already on `kg_search`/`kg_config_add_category`/`kg_fts5_status`/`kg_fts5_rebuild`/`kg_upgrade`), combined with `[personal]`/`[project]` marker parsing and cwd-derived resolution, functionally replace what this ADR's dispatcher/agent split + shared routing skill were designed to do — see ADR-067's "Known Gap" addendum and issue-18's decision record for the full reasoning. The dispatcher/agent split itself (commands do NL detection, agents handle flags only) is preserved; only the shared `gov-capture-routing` skill in between is retired, replaced by direct detection in each command.
 
 ## Context
 

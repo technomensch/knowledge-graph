@@ -75,7 +75,6 @@ Parameters:
 - `{kg_name}` = "personal"
 - `{KG_TYPE}` = "personal"
 - `{categories}` = ["architecture", "debugging", "patterns", "process"]
-- `{preserve_active}` = true
 
 **Cross-project platform-split check (section d):** Section d auto-routes to `~/.claude/CLAUDE.md § Platform Preferences` for personal KGs via the `{KG_TYPE}` = "personal" passed above — no extra parameters needed.
 
@@ -220,7 +219,6 @@ Parameters:
 - `{categories}` = ["architecture", "debugging", "patterns", "process"]
 - `{git_strategy}` = "all-ignore"
 - `{category_git_rules}` = all categories set to "ignore"
-- `{preserve_active}` = true
 
 ---
 
@@ -240,12 +238,12 @@ Parameters:
 
 What changed:
   • Registered as "personal" (type: personal) in ~/.kmgraph/kg-config.json
-  • Active KG unchanged: still "[current active KG]"
+  • No other KG is affected — resolution stays context-derived from your cwd
 
 How to use:
-  • /kmgraph:kmg-capture-lesson — saves to project KG by default; pick "personal" for cross-project lessons
+  • /kmgraph:kmg-capture-lesson — saves to the project KG resolved from cwd by default; pick "personal" for cross-project lessons
   • /kmgraph:kmg-recall "query" — now searches both project and personal KGs automatically
-  • /kmgraph:kmg-switch personal — make personal KG active (advanced; usually not needed)
+  • Pass targetKg: "personal" to kg_capture directly for a one-off personal-KG write from anywhere
 ```
 
 ---
@@ -421,4 +419,3 @@ If both counts are 0: skip silently (normal for a fresh personal KG).
 - `/kmgraph:kmg-init` — Full KG initialization wizard (includes personal KG offer)
 - `/kmgraph:kmg-capture-lesson` — Capture lessons; shows KG picker when multiple KGs registered
 - `/kmgraph:kmg-recall` — Search across project and personal KGs
-- `/kmgraph:kmg-switch` — Change active KG

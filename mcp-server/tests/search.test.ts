@@ -13,7 +13,7 @@ function makeTempDir(prefix: string): string {
 }
 
 function scaffoldKg(root: string): void {
-  for (const dir of ["knowledge", "lessons-learned", "decisions", "sessions"]) {
+  for (const dir of ["lessons-learned", "decisions", "sessions"]) {
     fs.mkdirSync(path.join(root, dir), { recursive: true });
   }
 }
@@ -25,7 +25,6 @@ function writeMd(dir: string, name: string, content: string): string {
 }
 
 function makeConfig(
-  active: string,
   graphs: Record<string, { path: string; type: string }>
 ): KgConfig {
   const graphEntries: KgConfig["graphs"] = {};
@@ -36,12 +35,13 @@ function makeConfig(
       type: g.type as KgConfig["graphs"][string]["type"],
       categories: [],
       createdAt: new Date().toISOString(),
-      lastUsed: new Date().toISOString(),
+      status: "active" as const,
+      statusChangedAt: new Date().toISOString(),
+      graphId: `test-graph-id-${name}`,
     };
   }
   return {
     version: "1.0.0",
-    active,
     graphs: graphEntries,
     sanitization: { enabled: false, patterns: [], action: "warn" },
   };
@@ -65,6 +65,30 @@ afterEach(() => {
 });
 
 // ---------------------------------------------------------------------------
+// issue-35: dead "knowledge" dir literal must not reappear in the fallback
+// searchDirs array (search.ts's linear-scan path isn't exported/unit-testable
+// in isolation — it lives inside registerSearchTool's closure — so this is a
+// static source guard rather than a behavioral test).
+// ---------------------------------------------------------------------------
+
+describe("search.ts searchDirs fallback", () => {
+  it("does not list the dead 'knowledge' directory", () => {
+    const source = fs.readFileSync(path.join(__dirname, "../src/tools/search.ts"), "utf-8");
+    const match = source.match(/const searchDirs = \[([^\]]*)\]/);
+    expect(match).not.toBeNull();
+    expect(match![1]).not.toMatch(/"knowledge"/);
+  });
+
+  it("lists 'issues' and 'enhancements' (issue-34)", () => {
+    const source = fs.readFileSync(path.join(__dirname, "../src/tools/search.ts"), "utf-8");
+    const match = source.match(/const searchDirs = \[([^\]]*)\]/);
+    expect(match).not.toBeNull();
+    expect(match![1]).toMatch(/"issues"/);
+    expect(match![1]).toMatch(/"enhancements"/);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // getAllGraphPaths tests
 // ---------------------------------------------------------------------------
 
@@ -72,7 +96,7 @@ describe("getAllGraphPaths", () => {
   const { getAllGraphPaths } = require("../src/utils.js");
 
   it("returns all graphs when no type filter given", () => {
-    const config = makeConfig("proj", {
+    const config = makeConfig({
       proj: { path: "/tmp/proj", type: "project-local" },
       personal: { path: "/tmp/personal", type: "personal" },
     });
@@ -81,7 +105,7 @@ describe("getAllGraphPaths", () => {
   });
 
   it("filters to personal type only", () => {
-    const config = makeConfig("proj", {
+    const config = makeConfig({
       proj: { path: "/tmp/proj", type: "project-local" },
       personal: { path: "/tmp/personal", type: "personal" },
     });
@@ -92,7 +116,7 @@ describe("getAllGraphPaths", () => {
   });
 
   it("defaults missing type to project-local (v0.2.1 compat)", () => {
-    const config = makeConfig("legacy", {
+    const config = makeConfig({
       legacy: { path: "/tmp/legacy", type: "" as any },
     });
     // Manually remove type field to simulate v0.2.1 config
@@ -102,7 +126,7 @@ describe("getAllGraphPaths", () => {
   });
 
   it("expands ~ in paths", () => {
-    const config = makeConfig("home", {
+    const config = makeConfig({
       home: { path: "~/.kmgraph", type: "personal" },
     });
     const result = getAllGraphPaths(config);
@@ -111,8 +135,7 @@ describe("getAllGraphPaths", () => {
   });
 
   it("returns empty array when no graphs registered", () => {
-    const config = makeConfig("none", {});
-    config.active = null;
+    const config = makeConfig({});
     const result = getAllGraphPaths(config);
     expect(result).toHaveLength(0);
   });
@@ -166,12 +189,12 @@ describe("multi-KG search via FTS5", () => {
     scaffoldKg(globalRoot);
 
     writeMd(
-      path.join(projRoot, "knowledge"),
+      path.join(projRoot, "lessons-learned"),
       "proj-only.md",
       "---\ntitle: Project Knowledge\n---\n\nThis belongs to the project KG only."
     );
     writeMd(
-      path.join(globalRoot, "knowledge"),
+      path.join(globalRoot, "lessons-learned"),
       "global-only.md",
       "---\ntitle: Global Knowledge\n---\n\nThis belongs to the global KG only."
     );
@@ -208,7 +231,7 @@ describe("SearchResult sourceKg field", () => {
     scaffoldKg(root);
 
     writeMd(
-      path.join(root, "knowledge"),
+      path.join(root, "lessons-learned"),
       "test.md",
       "---\ntitle: Test Entry\n---\n\nSome content here."
     );
@@ -240,7 +263,7 @@ describe("searchFts5 uses user-level storage (via getProjectDbPath)", () => {
     scaffoldKg(kgRoot);
 
     writeMd(
-      path.join(kgRoot, "knowledge"),
+      path.join(kgRoot, "lessons-learned"),
       "research.md",
       "---\ntitle: Research Results\n---\n# Research Results\n\nKey findings on authentication patterns."
     );
@@ -278,12 +301,12 @@ describe("searchFts5 uses user-level storage (via getProjectDbPath)", () => {
     scaffoldKg(kg2Root);
 
     writeMd(
-      path.join(kg1Root, "knowledge"),
+      path.join(kg1Root, "lessons-learned"),
       "doc1.md",
       "---\ntitle: Project Doc\n---\n\nProject-specific content."
     );
     writeMd(
-      path.join(kg2Root, "knowledge"),
+      path.join(kg2Root, "lessons-learned"),
       "doc2.md",
       "---\ntitle: Personal Doc\n---\n\nPersonal-specific content."
     );

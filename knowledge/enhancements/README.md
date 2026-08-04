@@ -4,8 +4,8 @@
 
 Formal tracking of proposed and resolved enhancements for this project.
 
-**Total ENHs:** 46
-**Last Updated:** 2026-07-18
+**Total ENHs:** 51
+**Last Updated:** 2026-08-04
 
 ---
 
@@ -24,8 +24,17 @@ Formal tracking of proposed and resolved enhancements for this project.
 
 ## All ENHs (Chronological)
 
+- [ENH-058: Meta-Issue Attempt Loop Should Explain a Repeatedly-Failing Test in Plain English and Recommend Whether to Keep Pursuing It](ENH-058/ENH-058-specification.md) — **Status:** 🟡 Proposed — Observed live in the docs-readme-poc style-guide-required-sections-saga meta-issue: a single test failed across four consecutive review attempts with no sign of converging; proposes the loop explain the pattern in plain English and recommend whether to keep pursuing it. Related to [ENH-056](ENH-056/ENH-056-specification.md).
+- [ENH-056: Commands/Workflows Documented as Multi-Step Processes Are Inconsistently Executed in Full](ENH-056/ENH-056-specification.md) — **Status:** Tracked — Commands/workflows documented as multi-step, prose-based processes are inconsistently executed in full; related to [issue-25](../issues/issue-25/issue-25-description.md), [issue-30](../issues/issue-30/issue-30-description.md), [issue-33](../issues/issue-33/issue-33-description.md), [issue-34](../issues/issue-34/issue-34-description.md), [issue-35](../issues/issue-35/issue-35-description.md).
+- [ENH-055: `kmg-capture-router`'s Trigger Vocabulary Misses "Future Idea" Phrasing](ENH-055/ENH-055-specification.md) — **Status:** 🟡 Proposed — Surfaced live during the v0.7 (ADR-067) brainstorm session, twice in a row: ideas explicitly framed as future work weren't recognized by the router's trigger vocabulary. Related to [ENH-053](ENH-053/ENH-053-specification.md), [ENH-054](ENH-054/ENH-054-specification.md).
+- [ENH-054: Full Audit-Trail History Log for Registry Lifecycle Transitions](ENH-054/ENH-054-specification.md) — **Status:** 🟡 Proposed — Surfaced during the v0.7 (ADR-067) brainstorm on KG resolution, specifically the registry lifecycle transitions, which currently have no audit-trail history log.
+- [ENH-053: Topic-KGs Spanning Multiple Related Projects (Not User-Graph, Not Single-Project)](ENH-053/ENH-053-specification.md) — **Status:** 🟡 Proposed — Surfaced during the v0.7 (ADR-067) brainstorm on KG resolution; today's model has exactly two scopes (user-graph, single-project) with no in-between for topic-KGs spanning multiple related projects.
 - [ENH-052: No pre-PR consistency check for the knowledge graph's own internal paperwork (README indexes, status frontmatter, backlinks, changelog/summary currency)](ENH-052/ENH-052-specification.md) — **Status:** 🟡 Deferred (Track only) — same underlying pattern as [issue-13](../issues/issue-13/issue-13-description.md), [ENH-042](ENH-042/ENH-042-specification.md), [issue-26](../issues/issue-26/issue-26-description.md)
 - [ENH-051: Stop Hand-Duplicating KG Path Logic Between cli.ts and kmg-init.md](ENH-051/ENH-051-specification.md) — **Status:** 🟡 Deferred (Track only) — Governed by [ADR-066](../decisions/ADR-066-kg-content-storage-location-for-global-and-cowork-modes.md), [ADR-067](../decisions/ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md)
+- [ENH-050: Document Trigger Keywords Tied to Each Command/Skill in User-Facing Docs](ENH-050/ENH-050-specification.md) — **Status:** 🟡 Proposed — Github issue #181.
+- [ENH-049: Concurrent Multi-Repo/Multi-Tool Work with Different Active KGs](ENH-049/ENH-049-specification.md) — **Status:** 🟡 Proposed — Github issue #180; related to [ADR-067](../decisions/ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md).
+- [ENH-048: Session-Wrap Status-Alignment Verification](ENH-048/ENH-048-specification.md) — **Status:** 🟡 Proposed — Github issue #178.
+- [ENH-042: Three disconnected release-doc-sync mechanisms leave README and actual version numbers chronically out of sync](ENH-042/ENH-042-specification.md) — **Status:** 🟡 Proposed — Discovered 2026-07-06; three disconnected release-doc-sync mechanisms (README, ROADMAP, CHANGELOG, package.json, plugin.json) leave version numbers chronically out of sync; related to [ENH-041](ENH-041/ENH-041-specification.md), [ENH-034](ENH-034/ENH-034-specification.md), [ENH-052](ENH-052/ENH-052-specification.md), [issue-13](../issues/issue-13/issue-13-description.md).
 - [ENH-041: Broken nav breadcrumb (GETTING-STARTED.md / WORKFLOWS.md) baked into every index README scaffold](ENH-041/ENH-041-specification.md) — **Status:** 🟡 Proposed
 - [ENH-040: Remove chat-history/*.md from kg_search / kg_fts5_rebuild indexing scope](ENH-040/ENH-040-specification.md) — **Status:** 🟡 Proposed — Governed by [ADR-060](../decisions/ADR-060-narrow-kg-search-scope-away-from-raw-chat-history.md)
 - [ENH-039: Rule-injection scripts hardcode personal split-file names instead of discovering them](ENH-039/ENH-039-specification.md) — **Status:** 🟡 Proposed

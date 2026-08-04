@@ -200,7 +200,7 @@ grep -ir "/knowledge:" docs/ | grep -v ".md~" | wc -l  # Should be minimal
 - [Plugin Namespace Branding Pattern](../knowledge/patterns.md#namespace-branding) — Pattern for future tool branding
 
 **Lessons Learned:**
-- [Plugin Namespace Visibility](../lessons-learned/debugging/Lessons_Learned_Plugin_Namespace_Visibility.md) — Why shadow commands failed
+- [Plugin Namespace Visibility](../lessons-learned/debugging/namespace-visibility-shadow-command-failure.md) — Why shadow commands failed
 
 ---
 

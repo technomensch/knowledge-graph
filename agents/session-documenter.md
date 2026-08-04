@@ -19,7 +19,7 @@
 
 | Flag | Behavior |
 |---|---|
-| `--user` | Write to `~/.kmgraph/sessions/` — bypass `kg_capture`, write directly via Write tool |
+| `--user` | Write to the personal KG's sessions/ — via `kg_capture` with `scope: "user"` (gated by `confirmPersonalScopeAccess`) |
 | `--project` | Write to current repo's project KG sessions/ |
 | `--named=<kg>` | Write to named KG sessions/ |
 | `--active` | Write to active KG sessions/ (default) |
@@ -28,8 +28,8 @@ Also accepts `$target_kg` (resolved absolute path) passed directly from caller �
 
 ### Write behavior
 
-- `--user`: write directly via Write tool. Skip `kg_capture` entirely.
-- `--project` / `--named` / `--active`: use `kg_capture` to resolved path. If `kg_capture` MCP unavailable: surface error and stop.
+- `--user`: pass `scope: "user"` to `kg_capture` — same call path as every other flag, gated by `confirmPersonalScopeAccess`. No separate Write-tool path.
+- `--project` / `--named` / `--active`: use `kg_capture` to resolved path. If `kg_capture` MCP unavailable: surface error and stop — **for every flag, including `--user`.** Do not fall back to a direct Write-tool write for `scope: "user"` specifically: a personal-scope write with `kg_capture` unreachable must fail loudly, not silently retry through an ungated path against the wrong (project-local) directory.
 
 ### Surface resolved target
 

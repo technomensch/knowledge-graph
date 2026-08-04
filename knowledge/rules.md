@@ -141,6 +141,10 @@ When a bug or enhancement is discovered mid-session, **first check whether an op
 - **Path F vs Path 1:** Path F = root cause unclear, investigation needed now but not here; Path 1 = clear enough to file, no immediate investigation needed
 - **Same-feature-area check:** before filing under Path 1, search `knowledge/enhancements/` for an existing open ENH on the same subsystem/feature — append there instead of creating a new number.
   - **Why:** the chat-extraction reliability saga spawned 6 separate ENH numbers (038/043/044/045/046/047) for one feature area (`kmg-extract-chat`) because each new bug got its own number on discovery instead of being checked against already-open work — user flagged this as unacceptable and the 6 were consolidated into one umbrella ENH-038 (2026-07-09).
+- **Path 1's own lightweight-vs-full split (ADR-068):** Path 1 itself has two weights, not one:
+  - **Lightweight** (hand-written file under `knowledge/enhancements/ENH-NNN/` or `knowledge/issues/issue-NNN/`, no branch, no GitHub issue) when **all** hold: no code change is planned as a near-term direct result; no one outside the current session needs visibility into it right now; the write-up is small enough for a paragraph or two.
+  - **Full** (`/kmgraph:kmg-start-issue-tracking`: branch + GitHub issue + `solution-approach.md` + gates) when **any** hold: code is going to change as a direct result; it needs external discoverability (a GitHub issue); it's large enough that a lightweight write-up would sprawl across multiple files anyway.
+  - **Why:** formalizes the de facto pattern already used inconsistently across issue-30, ENH-053/054/055, and issue-33 (each captured lightweight with a stated no-branch-overhead rationale, but never against a documented rule) — see `ADR-068` (`knowledge/decisions/ADR-068-lightweight-vs-full-workflow-rule-and-piloted-command-completion-check.md`).
 - **Source:** [[ADR-013-mid-execution-discovery-protocol]] (user-level `~/.kmgraph/decisions/`)
 
 ### Plan File Sync
@@ -249,7 +253,7 @@ Do not use numbered headings in knowledge files — use plain headings (e.g., `#
 
 **Implementation:**
 - Skills (`create-adr`, `capture-lesson`, etc.) default to fast-tier for write/capture operations
-- Agents use `gov-capture-routing` skill to resolve task type and route accordingly
+- Commands resolve tier via the `ai-model-tier-resolver` module (`commands/init-shared/ai-model-tier-resolver.md`), passed to the agent invocation as `--model`
 - Borderline tasks → route to standard-tier when unsure (safer than under-provisioning)
 
 **Why:** fast-tier is fully capable for template-based operations. Using standard-tier for form-filling wastes resources. A session with 5 ADRs + 3 lessons saves ~60% vs. standard-tier-all-the-way.
@@ -312,6 +316,15 @@ queries before making any plan recommendations:
 2. The architectural domain of the change (rules, deployment, platform, cross-LLM, etc.)
 
 Running only the topic query misses architectural ADRs and ENHs that constrain the work.
+
+### User-Facing Docs Impact
+
+At plan-creation time — before writing task steps — identify all user-facing Docusaurus pages affected by the planned changes. Group them in a single "Docs Updates (Grouped)" section of the plan. Do not scatter doc edits across task steps.
+
+- **Why:** doc changes scattered across tasks get missed or applied inconsistently; grouping them upfront makes them visible, reviewable, and committable as a single coherent pass
+- **How:** scan the planned behavior changes and cross-reference against known user-facing pages (README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, CONCEPTS, GLOSSARY, pillar pages). List each affected page with the required change before writing any implementation task.
+- **Style:** follow the existing style guide for each page before editing — do not introduce new formatting patterns
+- **Moved from** `~/.kmgraph/plan-authoring-rules.md` (2026-07-28) — this project is the only one with a Docusaurus docs site, so the rule is project-specific, not cross-project.
 
 **Recall results take priority — reason about findings before recommending:**
 - If recall surfaces a rejected approach, examine WHY it was rejected and whether that reason is still applicable.

@@ -65,12 +65,12 @@ echo ""
 
 # Find me.md template
 ME_TEMPLATE=""
-if [ -f "$REPO_ROOT/core/templates/knowledge/templates/project/me.md" ]; then
-  ME_TEMPLATE="$REPO_ROOT/core/templates/knowledge/templates/project/me.md"
-else
-  ME_TEMPLATE=$(find "$REPO_ROOT/core/templates" -name "me.md" -path "*/project/*" 2>/dev/null | head -1)
+if [ -f "$REPO_ROOT/core/default-templates/knowledge/templates/project/me.md" ]; then
+  ME_TEMPLATE="$REPO_ROOT/core/default-templates/knowledge/templates/project/me.md"
+elif [ -d "$REPO_ROOT/core/default-templates" ]; then
+  ME_TEMPLATE=$(find "$REPO_ROOT/core/default-templates" -name "me.md" -path "*/project/*" 2>/dev/null | head -1 || true)
   if [ -z "$ME_TEMPLATE" ]; then
-    ME_TEMPLATE=$(find "$REPO_ROOT/core/templates" -name "me.md" 2>/dev/null | head -1)
+    ME_TEMPLATE=$(find "$REPO_ROOT/core/default-templates" -name "me.md" 2>/dev/null | head -1 || true)
   fi
 fi
 

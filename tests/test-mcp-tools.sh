@@ -1,6 +1,6 @@
 #!/bin/bash
-# test-mcp-tools.sh — Functional tests for all 7 MCP tools
-# Tests kg_config_init, kg_config_list, kg_config_switch, kg_config_add_category,
+# test-mcp-tools.sh — Functional tests for the core MCP tools
+# Tests kg_config_init, kg_config_list, kg_config_add_category,
 # kg_search, kg_scaffold, kg_check_sensitive
 
 set -euo pipefail
@@ -19,7 +19,13 @@ fail() { echo "  ❌ FAIL: $1"; FAIL=$((FAIL + 1)); }
 # ── Setup ────────────────────────────────────────────────────────────────────
 
 TEST_DIR=$(mktemp -d)
-TEST_KG_DIR="$TEST_DIR/test-kg"
+# Nested one level below TEST_DIR, in its own subdirectory -- resolveGraph()
+# matches on dirname(g.path) (the KG's *parent*, so a KG living in a docs/
+# subfolder still resolves from anywhere in the project), so two sibling KGs
+# sharing a literal parent directory would permanently tie against each
+# other for any cwd under that shared parent. Giving each its own parent
+# avoids that.
+TEST_KG_DIR="$TEST_DIR/proj1/test-kg"
 TEST_CONFIG="$TEST_DIR/kg-config.json"
 
 cleanup() {
@@ -33,7 +39,7 @@ export KG_CONFIG_PATH="$TEST_CONFIG"
 export CLAUDE_PLUGIN_ROOT="$REPO_ROOT"
 
 echo "═══════════════════════════════════════════════════════════════"
-echo "TEST SUITE: MCP Tools (7 tools)"
+echo "TEST SUITE: MCP Tools"
 echo "MCP server: $MCP_SERVER"
 echo "Test dir:   $TEST_DIR"
 echo "═══════════════════════════════════════════════════════════════"
@@ -53,19 +59,24 @@ mcp_call() {
   local _default_args="{}"
   local args_json="${2:-$_default_args}"
   local id="${3:-2}"
+  local config_path="${4:-$TEST_CONFIG}"
 
+  # Resolution is cwd-derived (ADR-067), not config-active-derived -- this
+  # subprocess's real cwd is wherever the test script was invoked from, not
+  # TEST_KG_DIR, so cwd-resolving calls (kg_config_add_category, kg_search
+  # with no explicit kgPath/scope) need an explicit sandbox cwd override.
+  # _meta.sandboxCwd is the same mechanism a real MCP client uses.
   {
     echo "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"test\",\"version\":\"1.0\"}}}"
-    echo "{\"jsonrpc\":\"2.0\",\"id\":${id},\"method\":\"tools/call\",\"params\":{\"name\":\"${tool_name}\",\"arguments\":${args_json}}}"
+    echo "{\"jsonrpc\":\"2.0\",\"id\":${id},\"method\":\"tools/call\",\"params\":{\"name\":\"${tool_name}\",\"arguments\":${args_json},\"_meta\":{\"sandboxCwd\":\"file://${TEST_KG_DIR}\"}}}"
     sleep 0.3
-  } | KG_CONFIG_PATH="$TEST_CONFIG" CLAUDE_PLUGIN_ROOT="$REPO_ROOT" node "$MCP_SERVER" 2>/dev/null || true
+  } | KG_CONFIG_PATH="$config_path" CLAUDE_PLUGIN_ROOT="$REPO_ROOT" node "$MCP_SERVER" 2>/dev/null || true
 }
 
 # Write initial empty config
 cat > "$TEST_CONFIG" << 'EOF'
 {
   "version": "1.0.0",
-  "active": null,
   "graphs": {},
   "sanitization": { "enabled": false, "patterns": [], "action": "warn" }
 }
@@ -99,12 +110,13 @@ else
   fail "Config not updated after init"
 fi
 
-# Test 4: Active set to new graph
-ACTIVE=$(python3 -c "import json; c=json.load(open('$TEST_CONFIG')); print(c.get('active',''))" 2>/dev/null)
-if [ "$ACTIVE" = "test-kg" ]; then
-  pass "Init sets active graph"
+# Test 4: New graph gets a minted graphId and starts pending
+GRAPH_ID=$(python3 -c "import json; c=json.load(open('$TEST_CONFIG')); print(c['graphs']['test-kg'].get('graphId',''))" 2>/dev/null)
+STATUS=$(python3 -c "import json; c=json.load(open('$TEST_CONFIG')); print(c['graphs']['test-kg'].get('status',''))" 2>/dev/null)
+if [ -n "$GRAPH_ID" ] && [ "$STATUS" = "pending" ]; then
+  pass "Init mints a graphId and sets status=pending"
 else
-  fail "Active not set after init (got: $ACTIVE)"
+  fail "Init should mint a graphId and set status=pending (got graphId: $GRAPH_ID, status: $STATUS)"
 fi
 
 # Test 5: Duplicate name rejected
@@ -116,7 +128,7 @@ else
 fi
 
 # Test 6: Custom categories create subdirectories
-KG2_DIR="$TEST_DIR/test-kg2"
+KG2_DIR="$TEST_DIR/proj2/test-kg2"
 RESULT=$(mcp_call "kg_config_init" "{\"name\":\"test-kg2\",\"kgPath\":\"$KG2_DIR\",\"categories\":[{\"name\":\"security\",\"prefix\":\"sec-\",\"git\":\"commit\"},{\"name\":\"ml-ops\",\"prefix\":null,\"git\":\"ignore\"}]}")
 if [ -d "$KG2_DIR/lessons-learned/security" ] && [ -d "$KG2_DIR/lessons-learned/ml-ops" ]; then
   pass "Init creates custom category subdirectories"
@@ -138,59 +150,29 @@ else
   fail "List did not show all graphs"
 fi
 
-# Test 8: Active marker shown
-if echo "$RESULT" | grep -q "active"; then
-  pass "List shows active marker"
+# Test 8: Status label shown per graph
+if echo "$RESULT" | grep -qE "\(pending\)|\(active\)"; then
+  pass "List shows each graph's status label"
 else
-  fail "List did not show active marker"
+  fail "List did not show a status label"
 fi
 
 # Test 9: List on empty config
-cat > "$TEST_CONFIG" << 'EOF'
-{"version":"1.0.0","active":null,"graphs":{},"sanitization":{"enabled":false,"patterns":[],"action":"warn"}}
+# Uses an isolated, throwaway config path rather than wiping $TEST_CONFIG in
+# place -- wiping and re-initing the same $TEST_KG_DIR path collides with
+# Phase 4's marker-file duplicate-registration guard (the on-disk
+# .kmgraph-id marker survives a config wipe, so a "fresh" re-init at the
+# same path reads as already-tracked-under-a-different-graphId).
+EMPTY_CONFIG="$TEST_DIR/kg-config-empty.json"
+cat > "$EMPTY_CONFIG" << 'EOF'
+{"version":"1.0.0","graphs":{},"sanitization":{"enabled":false,"patterns":[],"action":"warn"}}
 EOF
-RESULT=$(mcp_call "kg_config_list" "{}")
+RESULT=$(mcp_call "kg_config_list" "{}" 2 "$EMPTY_CONFIG")
 if echo "$RESULT" | grep -q "No knowledge graphs"; then
   pass "List returns empty message when no graphs configured"
 else
   fail "List should indicate no graphs configured"
 fi
-
-# Restore config with both graphs
-mcp_call "kg_config_init" "{\"name\":\"test-kg\",\"kgPath\":\"$TEST_KG_DIR\"}" > /dev/null
-mcp_call "kg_config_init" "{\"name\":\"test-kg2\",\"kgPath\":\"$KG2_DIR\",\"categories\":[{\"name\":\"security\",\"prefix\":null,\"git\":\"commit\"}]}" > /dev/null
-
-echo ""
-
-# ── kg_config_switch ─────────────────────────────────────────────────────────
-
-echo "── kg_config_switch ────────────────────────────────────────────"
-
-# Test 10: Switch to existing graph
-RESULT=$(mcp_call "kg_config_switch" "{\"name\":\"test-kg2\"}")
-if echo "$RESULT" | grep -q "Switched"; then
-  pass "Switch changes active graph"
-else
-  fail "Switch did not confirm change"
-fi
-
-ACTIVE=$(python3 -c "import json; c=json.load(open('$TEST_CONFIG')); print(c.get('active',''))" 2>/dev/null)
-if [ "$ACTIVE" = "test-kg2" ]; then
-  pass "Switch updates active field in config"
-else
-  fail "Config active field not updated after switch (got: $ACTIVE)"
-fi
-
-# Test 12: Switch to non-existent graph
-RESULT=$(mcp_call "kg_config_switch" "{\"name\":\"does-not-exist\"}")
-if echo "$RESULT" | grep -q "not found"; then
-  pass "Switch rejects unknown graph name"
-else
-  fail "Switch should reject unknown name"
-fi
-
-# Switch back to test-kg
-mcp_call "kg_config_switch" "{\"name\":\"test-kg\"}" > /dev/null
 
 echo ""
 
@@ -220,19 +202,16 @@ else
   fail "Add category should reject duplicate"
 fi
 
-# Test 15: No active KG
-cat > "$TEST_CONFIG" << 'EOF'
-{"version":"1.0.0","active":null,"graphs":{},"sanitization":{"enabled":false,"patterns":[],"action":"warn"}}
-EOF
-RESULT=$(mcp_call "kg_config_add_category" "{\"name\":\"test\",\"prefix\":null,\"git\":\"commit\"}")
-if echo "$RESULT" | grep -q "No active"; then
-  pass "Add category fails gracefully with no active KG"
+# Test 15: No KG resolves from the working directory
+# Isolated config, same reason as Test 9 -- avoids wiping/restoring
+# $TEST_CONFIG in place, which would collide with Phase 4's marker-file
+# duplicate-registration guard on the shared $TEST_KG_DIR path.
+RESULT=$(mcp_call "kg_config_add_category" "{\"name\":\"test\",\"prefix\":null,\"git\":\"commit\"}" 2 "$EMPTY_CONFIG")
+if echo "$RESULT" | grep -q "No knowledge graph resolved"; then
+  pass "Add category fails gracefully with no KG resolved"
 else
-  fail "Add category should error with no active KG"
+  fail "Add category should error when no KG resolves"
 fi
-
-# Restore config
-mcp_call "kg_config_init" "{\"name\":\"test-kg\",\"kgPath\":\"$TEST_KG_DIR\"}" > /dev/null
 
 echo ""
 
@@ -277,19 +256,16 @@ else
   fail "Search paths format should return file paths"
 fi
 
-# Test 20: No active KG
-cat > "$TEST_CONFIG" << 'EOF'
-{"version":"1.0.0","active":null,"graphs":{},"sanitization":{"enabled":false,"patterns":[],"action":"warn"}}
-EOF
-RESULT=$(mcp_call "kg_search" "{\"query\":\"test\",\"format\":\"summary\"}")
-if echo "$RESULT" | grep -q "No active"; then
-  pass "Search fails gracefully with no active KG"
+# Test 20: No KG resolves from the working directory
+# Isolated config, same reason as Test 9/15. No restore needed afterward --
+# every remaining test (kg_scaffold, kg_check_sensitive) passes its target
+# path explicitly rather than relying on config resolution.
+RESULT=$(mcp_call "kg_search" "{\"query\":\"test\",\"format\":\"summary\"}" 2 "$EMPTY_CONFIG")
+if echo "$RESULT" | grep -q "No knowledge graph\|not resolved"; then
+  pass "Search fails gracefully with no KG resolved"
 else
-  fail "Search should error with no active KG"
+  fail "Search should error when no KG resolves"
 fi
-
-# Restore
-mcp_call "kg_config_init" "{\"name\":\"test-kg\",\"kgPath\":\"$TEST_KG_DIR\"}" > /dev/null
 
 echo ""
 

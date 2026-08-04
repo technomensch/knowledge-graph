@@ -23,9 +23,12 @@ trigger keywords. This skill handles reactive ("have we?") recall only.
 When triggered:
 1. Extract the user's search query/keywords from their question
 2. Invoke the `kmgraph:kmg-recall` command via the Skill tool with the extracted query
-   - The command chains through `gov-capture-routing` (level/scope detection) → `recall-agent` (search)
-   - This is NOT a direct recall-agent dispatch; level routing happens first
-   - `gov-capture-routing` is Claude Code-only. On non-Claude platforms or if unavailable: dispatch directly to recall-agent with `--scope=active` as fallback (UQ-8)
+   - `kmg-recall` resolves search scope directly (personal/project/named/active detection
+     is native to the command itself, ADR-067 — no separate routing skill in between).
+     This is NOT a direct recall-agent dispatch; `kmg-recall`'s own Level Routing
+     Detection step runs first, then hands off to `recall-agent`.
+   - Default scope when nothing explicit is signaled: `--active` (current behavior,
+     unchanged).
 3. Present results naturally — do not expose internal routing mechanics
 
 **Priority enforcement:**
@@ -45,5 +48,5 @@ I'm seeing timeout errors on large tables."
 **Assistant Response:**
 "Let me check what we've documented about this before answering..."
 → [Invoke kmgraph:kmg-recall via Skill tool with query: "database migration timeout errors"]
-→ [Command routes through gov-capture-routing → recall-agent]
+→ [Command resolves scope directly, then dispatches to recall-agent]
 → [Surface relevant lessons/decisions, including related patterns]

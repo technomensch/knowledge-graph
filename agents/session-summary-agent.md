@@ -28,22 +28,26 @@
 
 | Flag | Source |
 |---|---|
-| `--user` | Write to `~/.kmgraph/sessions/` — bypass `kg_capture`, write directly via Write tool |
-| `--project` | Write to current repo's project KG sessions/ — switch temporarily if needed, restore after |
+| `--user` | Write to the personal KG's sessions/ — via `kg_capture` with `scope: "user"` (gated by `confirmPersonalScopeAccess`) |
+| `--project` | Write to current repo's project KG sessions/ — no switch/restore needed |
 | `--named=<kg>` | Write to named KG sessions/ — no switch |
 | `--active` | Write to active KG sessions/ (default, current behavior) |
 
-These flags are set by the dispatcher (`session-summary` command) via `gov-capture-routing` skill. This agent never performs NL detection — it handles flags only.
+These flags are set by the dispatcher (`session-summary` command) directly (see that command's Level Routing Detection). This agent never performs NL detection — it handles flags only.
 
 ### Path resolution
 
+Step S-1 runs before Step 0/Step 1, so it cannot reuse a later step's resolution — it
+resolves fresh here, and Step 1 / Snapshot Mode S1 (which run after S-1) each resolve
+independently in turn (each call is idempotent — no `.active` pointer to drift out of
+sync).
+
 1. Read flag value (default: `--active` if none passed)
 2. Resolve `$target_path`:
-   - `--user` → `~/.kmgraph/sessions/`
-   - `--project` → read `~/.kmgraph/kg-config.json`, find graph matching current working directory → `{graph.path}/sessions/`
-   - `--named=<kg>` → read `~/.kmgraph/kg-config.json`, find graph by name → `{graph.path}/sessions/`
-   - `--active` → read `~/.kmgraph/kg-config.json` → `{active_kg_path}/sessions/`
-3. Store `$restore_kg` = current active KG path (only when `--project` triggers a switch)
+   - `--user` → resolved internally by `kg_capture` when `scope: "user"` is passed; no manual path computation needed here, but still show the resolved path to the user per "Always surface resolved target" below (the `kg_capture` response includes it).
+   - `--project` → call `kg_resolve` (cwd-resolved) → `{path}/sessions/`
+   - `--named=<kg>` → read `~/.kmgraph/kg-config.json`, find graph by name → `{graph.path}/sessions/` (`kg_resolve` has no by-name lookup, so a named target still requires a direct config read — this is a legitimate name-keyed lookup, not a read of the dead `.active` field)
+   - `--active` → call `kg_resolve` → `{path}/sessions/`. There is no separate "active" pointer left to disagree with your current directory (ADR-067 retires the old `.active` field; `kg_resolve` derives the graph from cwd directly). If `kg_resolve` errors (no graph registered for this directory), stop and tell the user to run `/kmgraph:kmg-init` first.
 
 ### Always surface resolved target
 
@@ -54,15 +58,12 @@ This applies even when `--active` (default) is used, so the user can correct the
 
 ### Write behavior
 
-- `--user`: write directly via Write tool to `$target_path`. Skip `kg_capture` entirely.
-- `--project` / `--named` / `--active`: use `kg_capture` as normal to `$target_path`. If `kg_capture` MCP is unavailable: surface error and stop — do not fall back silently.
+- `--user`: pass `scope: "user"` to `kg_capture` — same call path as every other flag, gated by `confirmPersonalScopeAccess`. No separate Write-tool path.
+- `--project` / `--named` / `--active`: use `kg_capture` as normal to `$target_path`. If `kg_capture` MCP is unavailable: surface error and stop — do not fall back silently. **This applies to `--user` too** — see Step 8F below: the file-system fallback there does not apply to `scope: "user"` writes.
 
-### Switch/restore for `--project`
+### Targeting for `--project`
 
-If `--project` requires a KG switch:
-1. Record `$restore_kg` = current active KG
-2. Run `/kmgraph:kmg-switch {project_kg}`
-3. After capture completes: run `/kmgraph:kmg-switch {$restore_kg}`
+Pass `targetKg: {project_kg}` directly to `kg_capture` — knowledge graphs resolve automatically from context rather than a mutable "active" pointer, so no switch/restore step is needed before or after the write.
 
 ### Pass-through to `--delegate`
 
@@ -97,7 +98,17 @@ Go directly to [Snapshot Mode](#snapshot-mode) below. Skip Steps 1–9.
 
 ### S1: Resolve output path
 
-Read `~/.kmgraph/kg-config.json` → active KG path → `{active_kg_path}/sessions/`.
+```
+kg_resolve
+```
+
+There is no separate "active" pointer left to disagree with your current directory
+(ADR-067 retires the old `KG_MISMATCH`-style guard, since `kg_resolve` derives the
+graph from cwd directly). If `kg_resolve` errors (no graph registered for this
+directory), stop and tell the user to run `/kmgraph:kmg-init` first. Otherwise, store
+the returned `path` as `$active_kg_path` → `{active_kg_path}/sessions/`. (Snapshot Mode
+is entered directly and skips Steps 1–9, so this resolves independently rather than
+reusing Step 1's value — same underlying call, no separate "active" pointer read.)
 
 Derive unified filename:
 ```bash
@@ -252,24 +263,27 @@ ctxmode_available = ctxmode_db is not None
 
 ---
 
-## Step 1: Active KG / CWD Guard
+## Step 1: Resolve Target Graph
 
-Read `~/.kmgraph/kg-config.json`. Extract `active` key and resolve the active graph's `path`.
+```
+kg_resolve
+```
 
-Compare the active graph's project root against the current working directory. If they do not match:
-
-> "Hold on — the active knowledge graph is for [project name]. Do you want to switch to the knowledge graph for [current project] before continuing?"
-
-Block all further steps until the user confirms or switches. Do not proceed with a mismatched KG.
+There is no separate "active" pointer left to disagree with your current directory
+(issue-10's old `KG_MISMATCH` guard compared the two; ADR-067 retires it, since
+`kg_resolve` derives the graph from cwd directly — nothing to mismatch against). If
+`kg_resolve` errors (no graph registered for this directory), stop and tell the user to
+run `/kmgraph:kmg-init` first. Otherwise, store the returned `path` as `$active_kg` and
+`name` as `$active_kg_name` for use in Step 1.5 and beyond.
 
 ---
 
 ## Step 1.5: One-File-Per-Day Check
 
-Before gathering context, check if a session file already exists for today's branch:
+Before gathering context, check if a session file already exists for today's branch.
+Reuse `$active_kg` resolved in Step 1 — no need to re-resolve.
 
 ```bash
-active_kg=$(jq -r '.graphs[.active].path' ~/.kmgraph/kg-config.json)
 session_dir="${active_kg}/sessions"
 branch_slug=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')
 today=$(date +%Y-%m-%d)
@@ -395,12 +409,15 @@ commit_short=$(git rev-parse --short HEAD)
 ```
 
 **For Current State:**
+
+Use `$active_kg_name` (the `name` field `kg_resolve` returned in Step 1 — store it
+alongside `$active_kg` there) rather than re-reading the config:
+
 ```bash
 git rev-parse --abbrev-ref HEAD
 git rev-parse --short HEAD
 git status --porcelain
 ls -t docs/plans/*.md 2>/dev/null | head -1
-jq -r '.graphs[.active].name' ~/.kmgraph/kg-config.json
 ```
 
 **For Open Issues:**
@@ -412,8 +429,10 @@ grep -rl "status: draft\|status: proposed" knowledge/decisions/ knowledge/enhanc
 ```
 
 **For Session History:**
+
+Reuse `$active_kg` from Step 1 — no need to re-resolve.
+
 ```bash
-active_kg=$(jq -r '.graphs[.active].path' ~/.kmgraph/kg-config.json)
 find "${active_kg}/sessions" -name "*.md" -not -name "README.md" -not -name "*template*" -type f 2>/dev/null | sort | tail -3
 ```
 
@@ -477,7 +496,7 @@ Skipping any item means starting work without full context.
 - **Uncommitted changes:** [git status --porcelain summary, or "clean"]
 - **In-progress work:** [active plan path — `[path]`]
 - **Next steps:** [first unchecked step from active plan, or "See active plan"]
-- **Active KG:** [KG name from kg-config.json]
+- **Active KG:** [$active_kg_name resolved in Step 1]
 
 ## Open Issues
 
@@ -617,7 +636,11 @@ Once approved, call `kg_capture`:
 
 **KG_MISMATCH error:**
 
-> "The active knowledge graph is for a different project. Do you want to switch, or proceed anyway?"
+> "No knowledge graph is registered for your current directory. Run `/kmgraph:kmg-init` to register one, or pass an explicit `targetKg` to write elsewhere."
+
+**KMG_INPUT_REQUIRED error** (`reason` distinguishes the case — `archived_entry`, `fuzzy_match`, `ambiguous_path_tie`, `home_or_root_cwd`, etc.):
+
+Surface `resolveWith.accepts` (if present) as the candidate choices and ask the user to pick one, then retry `kg_capture` with that answer filled into the param named by `resolveWith.param`.
 
 **Other errors:**
 
@@ -640,12 +663,13 @@ If `kg_capture` fails because the MCP server is not registered, not found, or no
    - The full payload (content, type, metadata) so it can be retried
 3. **Wait for the return signal** from `mcp-setup-agent`:
    - If `registration_status: "success"`: retry the `kg_capture` call from Step 8 exactly once.
-   - If `registration_status: "failed"`: use file-system fallback.
-4. **File-system fallback:**
+   - If `registration_status: "failed"` **and this capture's scope is NOT `"user"`**: use file-system fallback (Step 4).
+   - If `registration_status: "failed"` **and this capture's scope IS `"user"`**: do not fall back. Surface the error and stop — tell the user `kg_capture` is unreachable and the personal-KG write did not happen. A filesystem fallback would both skip `confirmPersonalScopeAccess` and write to the wrong (project-local) directory.
+4. **File-system fallback (non-personal scopes only):**
    - Write the session summary markdown directly to `{active_kg_path}/sessions/` using the `Write` tool.
    - Follow existing file naming conventions (e.g., `YYYY-MM-DD-session-type.md`).
    - Tell the user: "Saved to the file system. Search won't be ranked until the index is connected."
-5. **Never lose the session summary** — the user's content is preserved regardless of MCP status.
+5. **Never lose a non-personal-scope session summary** — its content is preserved regardless of MCP status. A `scope: "user"` summary that hits this failure path is NOT silently preserved via fallback — it is surfaced as a stopped, unwritten capture per Step 3 above, so the user can retry once `kg_capture` is available again rather than have it land ungated in the wrong place.
 
 ---
 

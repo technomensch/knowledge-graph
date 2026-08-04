@@ -233,11 +233,19 @@ Do not write any files or create any directories until the user confirms.
 ## Step 2: Determine Issue Number
 
 ### 2.1: Check Existing Issues
-First resolve the active KG path:
-```bash
-# Read active KG path from config
-KG_PATH=$(python3 -c "import json; d=json.load(open('$HOME/.kmgraph/kg-config.json')); print(d['graphs'][d['active']]['path'])" 2>/dev/null || echo ".")
+First resolve the target graph (issue-41: this previously read
+`d['graphs'][d['active']]['path']` via a raw `python3 -c` one-liner — a pre-ADR-067
+pattern; against a real, correctly-migrated config this silently resolved into whatever
+project `.active` happened to point at, not the current one, since the field no longer
+tracks the current project at all):
 
+```
+kg_resolve
+```
+
+Take the returned `path` as `$KG_PATH` below.
+
+```bash
 # List existing issue documentation files
 ls -1 "$KG_PATH/issues/" 2>/dev/null | grep -E '^issue-[0-9]+' | sort -V
 

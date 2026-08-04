@@ -13,22 +13,21 @@ Captures a single lesson from the live session into the active knowledge graph u
 
 | Flag | Behavior |
 |---|---|
-| `--user` | Write to `~/.kmgraph/lessons-learned/` — bypass `kg_capture`, write directly via Write tool |
-| `--project` | Write to current repo's project KG lessons-learned/ — switch temporarily if needed, restore after |
+| `--user` | Write to the personal KG's lessons-learned/ — via `kg_capture` with `scope: "user"` (gated by `confirmPersonalScopeAccess`) |
+| `--project` | Write to current repo's project KG lessons-learned/ — no switch/restore needed |
 | `--named=<kg>` | Write to named KG lessons-learned/ — no switch |
 | `--active` | Write to active KG lessons-learned/ (default, current behavior) |
 
-These flags are set by the `capture-lesson` command dispatcher via `gov-capture-routing` skill. This agent never performs NL detection — flags only.
+These flags are set by the `capture-lesson` command dispatcher directly (see that command's Level Routing Detection). This agent never performs NL detection — flags only.
 
 ### Path resolution
 
 1. Read flag (default: `--active`)
 2. Resolve `$target_path`:
-   - `--user` → `~/.kmgraph/lessons-learned/`
+   - `--user` → resolved internally by `kg_capture` when `scope: "user"` is passed; no manual path computation needed here, but still show the resolved path to the user per "Surface resolved target" below (the `kg_capture` response includes it).
    - `--project` → read `~/.kmgraph/kg-config.json`, find graph matching current working directory → `{graph.path}/lessons-learned/`
    - `--named=<kg>` → read `~/.kmgraph/kg-config.json`, find graph by name → `{graph.path}/lessons-learned/`
    - `--active` → `{active_kg_path}/lessons-learned/`
-3. Store `$restore_kg` = current active KG (only when `--project` triggers a switch)
 
 ### Surface resolved target
 
@@ -37,36 +36,28 @@ In the lesson draft, always show before any write:
 
 ### Write behavior
 
-- `--user`: write directly via Write tool. Skip `kg_capture` entirely.
-- `--project` / `--named` / `--active`: use `kg_capture` to resolved path. If `kg_capture` MCP unavailable: surface error and stop.
+- `--user`: pass `scope: "user"` to `kg_capture` — same call path as every other flag, gated by `confirmPersonalScopeAccess`. No separate Write-tool path.
+- `--project` / `--named` / `--active`: use `kg_capture` to resolved path. If `kg_capture` MCP unavailable: surface error and stop — **for every flag, including `--user`.** See Phase 5F below: the file-system fallback there does not apply to `scope: "user"` writes.
 
-### Switch/restore for `--project`
+### Targeting for `--project`
 
-1. Record `$restore_kg` = current active KG
-2. Run `/kmgraph:kmg-switch {project_kg}`
-3. After capture: run `/kmgraph:kmg-switch {$restore_kg}`
+Pass `targetKg: {project_kg}` directly to `kg_capture` — knowledge graphs resolve automatically from context rather than a mutable "active" pointer, so no switch/restore step is needed before or after the write.
 
-### Interaction with Phase 0 CWD Guard
+### Interaction with Phase 0 Graph Resolution
 
-When `--user`, `--project`, or `--named` is explicitly set, skip the Phase 0 mismatch warning — routing intent is already explicit. Only show the CWD mismatch warning when `--active` (default) is used.
+Phase 0 always resolves the graph via `kg_resolve` regardless of which flag is set — there is no separate mismatch warning to skip. Explicit `--user`/`--project`/`--named` routing still determines the write target (see Path resolution above); Phase 0's resolution supplies `$active_kg_path`/`$active_kg_name` for other cwd-derived reads (e.g. Step 2.0's session-summary check).
 
 ---
 
-## Phase 0: Active KG / CWD Guard
+## Phase 0: Resolve Target Graph
 
-Before any write, verify the active knowledge graph matches the current working directory.
+```
+kg_resolve
+```
 
-1. Read `~/.kmgraph/kg-config.json` — get the active KG name and its `path`.
-2. Derive the project root from the KG path: if the path ends in `/docs`, the parent directory is the project root; otherwise the path itself is the root.
-3. Compare the derived root against the current working directory (use `pwd`).
+There is no separate "active" pointer left to disagree with your current working directory (ADR-067 retires the old CWD-mismatch guard, since `kg_resolve` derives the graph from cwd directly — nothing to mismatch against). If `kg_resolve` errors (no graph registered for this directory), stop and tell the user to run `/kmgraph:kmg-init` first. Otherwise, store the returned `path` as `$active_kg_path` and `name` as `$active_kg_name` for use in later phases.
 
-**If mismatch:**
-
-> "Hold on — the active knowledge graph is for **[active KG name]**. Do you want to switch to it, or save this lesson there anyway?"
-
-Block until the user responds. Do not proceed until resolved.
-
-**If match:** Continue to Phase 1.
+Continue to Phase 1.
 
 ---
 
@@ -119,8 +110,8 @@ Check whether the dispatching skill passed a context payload (`context_provided:
 
 Before asking the user for context, check whether a session summary was written today:
 
-1. Read `~/.kmgraph/kg-config.json` to get the active KG path.
-2. Look for any file matching `{kgPath}/sessions/YYYY-MM/*` where the filename contains today's date (format: `YYYY-MM-DD`).
+1. Reuse `$active_kg_path` resolved in Phase 0 — no need to re-resolve.
+2. Look for any file matching `{active_kg_path}/sessions/YYYY-MM/*` where the filename contains today's date (format: `YYYY-MM-DD`).
 3. If found, ask:
 
    > "I found a session summary from today — use it to pre-fill the lesson context?
@@ -213,26 +204,26 @@ Present the draft and prompt:
 
 **Only run this phase if ≥2 KGs are registered in `~/.kmgraph/kg-config.json`.**
 
-Count entries in `graphs`. If only one KG exists, skip this phase and write to the active KG.
+Count entries in `graphs`. If only one KG exists, skip this phase and write to `$active_kg_path` (resolved in Phase 0).
 
 If ≥2 KGs:
 
 1. Identify available destinations:
-   - Active/project KG: `graphs[active]` — name and path
+   - Project KG: `$active_kg_path` / `$active_kg_name` — already resolved in Phase 0, no need to re-read config
    - Personal KGs: all entries with `type: "personal"` — names and paths
 
 2. Present the picker:
 
    > "Where should this lesson be saved?
    >
-   > 1. **[active KG name]** — project KG (this project only)
+   > 1. **[$active_kg_name]** — project KG (this project only)
    > 2. **[personal KG name]** — personal KG (available across all projects)
    >
    > Choose 1 or 2:"
 
 3. Wait for user choice. Store the chosen KG name as `{target_kg}`.
 
-4. **Session memory:** Remember `{target_kg}` for the duration of this session to avoid re-prompting on subsequent captures. Only re-prompt if the user explicitly changes KG via `/kmgraph:kmg-switch`.
+4. **Session memory:** Remember `{target_kg}` for the duration of this session to avoid re-prompting on subsequent captures. Only re-prompt if the resolved KG for the current working directory actually changes (e.g. the user `cd`s into a different registered project).
 
 ---
 
@@ -268,11 +259,15 @@ Once user approves, call the `kg_capture` MCP tool:
 
 **KG_MISMATCH error:**
 
-> "The active knowledge graph is for a different project. Do you want to switch, or proceed anyway?"
+> "No knowledge graph is registered for your current directory. Run `/kmgraph:kmg-init` to register one, or pass an explicit `targetKg` to write elsewhere."
+
+**KMG_INPUT_REQUIRED error** (`reason` distinguishes the case — `archived_entry`, `fuzzy_match`, `ambiguous_path_tie`, `home_or_root_cwd`, etc.):
+
+Surface `resolveWith.accepts` (if present) as the candidate choices and ask the user to pick one, then retry `kg_capture` with that answer filled into the param named by `resolveWith.param` (e.g. `targetKg`, or a `confirmProceed`/`scope` field once Phase 6.3+ wires those through).
 
 **Other errors:**
 
-Surface the error and ask the user whether to retry, abandon, or use fallback (file-system write).
+Surface the error and ask the user whether to retry or abandon. If this capture's scope was `"user"` (personal KG), do not offer a file-system fallback — a personal-scope write must never bypass `confirmPersonalScopeAccess`. For a non-personal-scope capture, retry, abandon, or fallback (file-system write) are all reasonable options.
 
 **MCP not registered / connection failed:**
 
@@ -291,12 +286,13 @@ If `kg_capture` fails because the MCP server is not registered, not found, or no
    - The full payload (content, type, metadata) so it can be retried
 3. **Wait for the return signal** from `mcp-setup-agent`:
    - If `registration_status: "success"`: retry the `kg_capture` call from Phase 5 exactly once.
-   - If `registration_status: "failed"`: use file-system fallback.
-4. **File-system fallback:**
+   - If `registration_status: "failed"` **and this capture's scope is NOT `"user"`**: use file-system fallback (Step 4).
+   - If `registration_status: "failed"` **and this capture's scope IS `"user"`**: do not fall back. Surface the error and stop — tell the user `kg_capture` is unreachable and the personal-KG write did not happen. A filesystem fallback would both skip `confirmPersonalScopeAccess` and write to the wrong (project-local) directory.
+4. **File-system fallback (non-personal scopes only):**
    - Write the lesson markdown directly to `{active_kg_path}/lessons-learned/` using the `Write` tool.
    - Follow existing file naming conventions (e.g., `YYYY-MM-DD-topic-slug.md`).
    - Tell the user: "Saved to the file system. Search won't be ranked until the index is connected."
-5. **Never lose the lesson** — the user's content is preserved regardless of MCP status.
+5. **Never lose a non-personal-scope lesson** — its content is preserved regardless of MCP status. A `scope: "user"` lesson that hits this failure path is NOT silently preserved via fallback — it is surfaced as a stopped, unwritten capture per Step 3 above, so the user can retry once `kg_capture` is available again rather than have it land ungated in the wrong place.
 
 ---
 
@@ -338,4 +334,4 @@ If the user chose to update:
 - `Grep` — search for similar lessons locally (optional, before kg_search)
 - `kg_search` — search knowledge graph for similar lessons
 - `kg_capture` — write lesson to KG (new in v0.2.1)
-- No `Write` / `Edit` — all writes go through `kg_capture`
+- `Write` — file-system fallback only, non-personal scopes only, only when `kg_capture` is unreachable after `mcp-setup-agent` retry fails (Phase 5F). Never used for `scope: "user"` — all personal-KG writes go through `kg_capture`, no exceptions.

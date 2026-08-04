@@ -11,7 +11,6 @@
 | `{categories}` | Array of category names with prefix and git rules |
 | `{git_strategy}` | Git strategy: "all-commit", "all-ignore", or "selective" |
 | `{category_git_rules}` | Per-category git rule map (used when git_strategy is "selective") |
-| `{preserve_active}` | Boolean — if true, do not modify the "active" field in config |
 
 ---
 
@@ -36,21 +35,12 @@ config_entry=$(cat <<EOF
       echo "{ \"name\": \"$cat\", \"prefix\": $prefix, \"git\": \"$git_rule\" },"
     done | sed '$ s/,$//')
   ],
-  "createdAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-  "lastUsed": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  "createdAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 }
 EOF
 )
 
 # Update config with jq (or manual JSON manipulation)
-# Only include the .active assignment when {preserve_active} is false.
-# Use the appropriate form below based on the value of {preserve_active}:
-
-# If {preserve_active} is FALSE — set the active KG:
-jq ".graphs[\"{kg_name}\"] = $config_entry | .active = \"{kg_name}\"" \
-  "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
-
-# If {preserve_active} is TRUE — do NOT modify .active:
 jq ".graphs[\"{kg_name}\"] = $config_entry" \
   "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
 
@@ -71,14 +61,15 @@ fi
 
 # Fields that may be missing from older installs:
 # - platforms: [] (added in v0.2.0)
-# - autoSwitch: false (added in v0.2.0)
 # - notification: { webhookUrl: "" } (added in v0.2.0)
 # - type: "project-local" (added in v0.2.2 — required for multi-KG support)
+# Note: autoSwitch is retired (issue-41 / ADR-067 Phase 9) — resolution is
+# cwd-derived now, there is nothing to "switch." Do not write this field to
+# new or upgraded config entries.
 
 jq '
   .graphs["'"$kg_name"'"] |=
     if .platforms == null then .platforms = [] else . end |
-    if .autoSwitch == null then .autoSwitch = false else . end |
     if .notification == null then .notification = { "webhookUrl": "" } else . end |
     if .type == null then .type = "project-local" else . end
 ' "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"

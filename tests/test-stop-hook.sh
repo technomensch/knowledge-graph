@@ -47,12 +47,16 @@ fi
 TEST_KG_DIR="$TEST_DIR/test-kg"
 mkdir -p "$TEST_KG_DIR"
 
+# issue-41 (ADR-067 Phase 9): resolution is cwd-derived (kg_resolve /
+# resolveGraph), not a mutable `.active` pointer — there is no "active" field
+# in the config schema anymore. resolveGraph derives the project root as
+# dirname(graph.path), so callers must cd into $TEST_DIR (or a descendant,
+# e.g. $TEST_KG_DIR) before invoking the hook for it to resolve.
 make_config() {
   local kg_name="$1"
   cat > "$TEST_CONFIG" << EOF
 {
   "version": "1.0.0",
-  "active": "${kg_name}",
   "graphs": {
     "${kg_name}": {
       "name": "${kg_name}",
@@ -60,7 +64,9 @@ make_config() {
       "type": "project-local",
       "categories": [],
       "createdAt": "2026-01-01T00:00:00.000Z",
-      "lastUsed": "2026-01-01T00:00:00.000Z"
+      "status": "active",
+      "statusChangedAt": "2026-01-01T00:00:00.000Z",
+      "graphId": "${kg_name}-id"
     }
   },
   "sanitization": {"enabled":false,"patterns":[],"action":"warn"}
@@ -68,12 +74,17 @@ make_config() {
 EOF
 }
 
+# Run the stop hook with CWD inside the resolvable KG's project root
+run_stop_hook() {
+  (cd "$TEST_KG_DIR" && KG_CONFIG_PATH="$TEST_CONFIG" bash "$STOP_HOOK") 2>&1
+}
+
 echo "── Section 1: Flag creation ─────────────────────────────────────"
 
 # Test 1: Flag is created with kg-name-date pattern (not PPID-date)
 make_config "test-kg"
 rm -f "/tmp/.kg-session-summarized-test-kg-${TODAY}"
-KG_CONFIG_PATH="$TEST_CONFIG" bash "$STOP_HOOK" > /dev/null 2>&1 || true
+run_stop_hook > /dev/null 2>&1 || true
 
 EXPECTED_FLAG="/tmp/.kg-session-summarized-test-kg-${TODAY}"
 if [ -f "$EXPECTED_FLAG" ]; then
@@ -86,7 +97,7 @@ fi
 # Use realpath to resolve /tmp symlink on macOS (/tmp → /private/tmp)
 TMP_REAL="$(realpath /tmp 2>/dev/null || echo /tmp)"
 # Clear any pre-existing today flags so the count is environment-independent
-find "$TMP_REAL" -maxdepth 1 -name ".kg-session-summarized-*-${TODAY}" -delete 2>/dev/null; KG_CONFIG_PATH="$TEST_CONFIG" bash "$STOP_HOOK" > /dev/null 2>&1 || true
+find "$TMP_REAL" -maxdepth 1 -name ".kg-session-summarized-*-${TODAY}" -delete 2>/dev/null; run_stop_hook > /dev/null 2>&1 || true
 TOTAL_FLAGS=$(find "$TMP_REAL" -maxdepth 1 -name ".kg-session-summarized-*-${TODAY}" 2>/dev/null | wc -l | tr -d ' ')
 if [ "$TOTAL_FLAGS" -eq 1 ]; then
   pass "Exactly one flag created — no PPID-based extras"
@@ -104,7 +115,7 @@ if [ ! -f "$EXPECTED_FLAG" ]; then
   fail "precondition: test-kg flag missing before dedup check"
 fi
 set +e
-OUTPUT=$(KG_CONFIG_PATH="$TEST_CONFIG" bash "$STOP_HOOK" 2>&1)
+OUTPUT=$(run_stop_hook)
 EXIT_CODE=$?
 set -e
 if [ $EXIT_CODE -eq 0 ]; then
@@ -124,7 +135,7 @@ echo "── Section 3: Per-project isolation ───────────�
 # Test 5 & 6: Different KG name produces different flags; original unaffected
 make_config "other-kg"
 rm -f "/tmp/.kg-session-summarized-other-kg-${TODAY}"
-KG_CONFIG_PATH="$TEST_CONFIG" bash "$STOP_HOOK" > /dev/null 2>&1 || true
+run_stop_hook > /dev/null 2>&1 || true
 
 OTHER_FLAG="/tmp/.kg-session-summarized-other-kg-${TODAY}"
 if [ -f "$OTHER_FLAG" ]; then
@@ -162,11 +173,11 @@ else
 fi
 
 echo ""
-echo "── Section 5: Default fallback (active key null) ─────────────────"
+echo "── Section 5: Default fallback (no graph resolves) ─────────────────"
 
-# Test 9: Config exists but active is null
+# Test 9: Config exists but no graphs registered — nothing resolves from CWD
 cat > "$TEST_CONFIG" << 'NULLEOF'
-{"version":"1.0.0","active":null,"graphs":{},"sanitization":{"enabled":false,"patterns":[],"action":"warn"}}
+{"version":"1.0.0","graphs":{},"sanitization":{"enabled":false,"patterns":[],"action":"warn"}}
 NULLEOF
 rm -f "/tmp/.kg-session-summarized-default-${TODAY}"
 set +e
@@ -174,14 +185,14 @@ OUTPUT=$(KG_CONFIG_PATH="$TEST_CONFIG" bash "$STOP_HOOK" 2>&1)
 EXIT_CODE=$?
 set -e
 if [ $EXIT_CODE -eq 0 ]; then
-  pass "Null active KG — hook exits 0 gracefully"
+  pass "No graph resolves — hook exits 0 gracefully"
 else
-  fail "Null active KG — should exit 0, got $EXIT_CODE"
+  fail "No graph resolves — should exit 0, got $EXIT_CODE"
 fi
 if [ ! -f "/tmp/.kg-session-summarized-default-${TODAY}" ]; then
-  pass "Null active KG — no flag written (hook exits before touch)"
+  pass "No graph resolves — no flag written (hook exits before touch)"
 else
-  fail "Null active KG — flag should not be written"
+  fail "No graph resolves — flag should not be written"
 fi
 
 echo ""

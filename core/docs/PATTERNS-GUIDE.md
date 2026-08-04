@@ -543,7 +543,6 @@ MEMORY.md indexes these files and auto-populates at session start via hooks.
 For knowledge graph health checks and index updates:
 - Use `/kmgraph:kmg-status` to see current state
 - Use `/kmgraph:kmg-sync-all` to rebuild indexes and sync all profile files
-- Use `/kmgraph:kmg-switch` to change active knowledge graphs
 
 See [Command Guide](../../docs/COMMAND-GUIDE.md) for details.
 
