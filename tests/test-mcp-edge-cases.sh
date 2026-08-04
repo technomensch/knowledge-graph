@@ -127,28 +127,26 @@ mkdir -p "$EMPTY_KG/knowledge" "$EMPTY_KG/lessons-learned" "$EMPTY_KG/decisions"
 cat > "$TEST_CONFIG" << EOF
 {
   "version": "1.0.0",
-  "active": "empty-kg",
   "graphs": {
     "empty-kg": {
       "name": "empty-kg",
       "path": "$EMPTY_KG",
       "type": "project-local",
       "categories": [],
-      "createdAt": "2026-01-01T00:00:00.000Z",
-      "lastUsed": "2026-01-01T00:00:00.000Z"
+      "createdAt": "2026-01-01T00:00:00.000Z"
     }
   },
   "sanitization": { "enabled": false, "patterns": [], "action": "warn" }
 }
 EOF
-RESULT=$(mcp_tool_call "kg_search" "{\"query\":\"anything\",\"format\":\"summary\"}")
+RESULT=$(mcp_tool_call "kg_search" "{\"query\":\"anything\",\"format\":\"summary\"}" "$EMPTY_KG")
 if echo "$RESULT" | grep -q "No results"; then
   pass "Search on empty KG returns 'No results'"
 else
   fail "Search on empty KG should return no-results message"
 fi
 
-RESULT=$(mcp_tool_call "kg_check_sensitive" "{}")
+RESULT=$(mcp_tool_call "kg_check_sensitive" "{}" "$EMPTY_KG")
 if echo "$RESULT" | grep -qiE "No sensitive|0 file|no.*found"; then
   pass "Sanitization on empty KG returns clean result"
 else

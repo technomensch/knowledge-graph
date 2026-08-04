@@ -71,9 +71,9 @@ function searchKg(
   kgName: string,
   kgType: string,
   query: string
-): { results: SearchResult[]; usingFts5: boolean } {
+): { results: SearchResult[]; usingFts5: boolean; missing: boolean } {
   if (!fs.existsSync(kgPath)) {
-    return { results: [], usingFts5: false };
+    return { results: [], usingFts5: false, missing: true };
   }
 
   const dbPath = resolveDbPath(kgName, kgType);
@@ -119,7 +119,7 @@ function searchKg(
     r.sourceKgType = kgType;
   }
 
-  return { results, usingFts5 };
+  return { results, usingFts5, missing: false };
 }
 
 /** Returns a human-readable source label for a result. */
@@ -413,12 +413,32 @@ export async function handleSearch(
 
   // Run search across all target KGs
   const allResults: SearchResult[] = [];
+  const missingKgs: string[] = [];
   let anyFts5 = false;
 
   for (const kg of kgsToSearch) {
-    const { results, usingFts5 } = searchKg(kg.path, kg.name, kg.type, query);
+    const { results, usingFts5, missing } = searchKg(kg.path, kg.name, kg.type, query);
     allResults.push(...results);
     if (usingFts5) anyFts5 = true;
+    if (missing) missingKgs.push(kg.name);
+  }
+
+  // search.ts's own registered-but-missing-path check (kg_check_sensitive,
+  // kg_fts5_rebuild, and kg_compare all error on this already) -- a single
+  // resolved KG whose directory is gone must error, not silently look like
+  // an empty-but-valid search. A missing KG within a searchScope:"all" union
+  // read must not abort the whole search though, so that case is surfaced as
+  // a warning prefix on the eventual output instead.
+  if (kgsToSearch.length === 1 && missingKgs.length === 1) {
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: `Error: KG path does not exist: ${kgsToSearch[0].path}`,
+        },
+      ],
+      isError: true,
+    };
   }
 
   // Sort merged results: project-local before global (within same match quality)
@@ -436,13 +456,17 @@ export async function handleSearch(
   const scopeLabel = isMultiKg
     ? `${kgsToSearch.length} KGs`
     : `KG (${kgsToSearch[0]?.name ?? "no active graph"})`;
+  const missingWarning =
+    missingKgs.length > 0
+      ? `Warning: ${missingKgs.join(", ")} — registered path does not exist, skipped.\n\n`
+      : "";
 
   if (allResults.length === 0) {
     return {
       content: [
         {
           type: "text" as const,
-          text: `No results found for "${query}" in ${scopeLabel}.`,
+          text: `${missingWarning}No results found for "${query}" in ${scopeLabel}.`,
         },
       ],
     };
@@ -488,7 +512,7 @@ export async function handleSearch(
   }
 
   return {
-    content: [{ type: "text" as const, text: output }],
+    content: [{ type: "text" as const, text: `${missingWarning}${output}` }],
   };
 }
 
