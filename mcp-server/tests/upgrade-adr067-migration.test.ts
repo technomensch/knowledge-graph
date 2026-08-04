@@ -223,4 +223,81 @@ describe("handleUpgrade status-schema migration category (ADR-067 Task 8.1)", ()
     expect(fs.existsSync(backupDir)).toBe(true);
     expect(fs.readdirSync(backupDir).length).toBeGreaterThan(0);
   });
+
+  it("does not silently activate a graph with an unreachable path; surfaces it in the result instead", async () => {
+    const home = makeTempDir("home");
+    const kgRoot = makeTempDir("kg"); // healthy graph
+    scaffoldKg(kgRoot);
+    const orphanParent = makeTempDir("orphan-parent"); // parent exists, content dir does not
+    const orphanPath = path.join(orphanParent, "does-not-exist-kg");
+    delete process.env.KG_CONFIG_PATH;
+    process.env.HOME = home;
+
+    const primaryDir = path.join(home, ".kmgraph");
+    fs.mkdirSync(primaryDir, { recursive: true });
+    const primaryConfigPath = path.join(primaryDir, "kg-config.json");
+    const config = {
+      version: "1.0.0",
+      active: "legacy-kg",
+      graphs: {
+        "legacy-kg": {
+          name: "legacy-kg",
+          path: kgRoot,
+          type: "project-local",
+          categories: [],
+          createdAt: new Date().toISOString(),
+          lastUsed: new Date().toISOString(),
+          platforms: [],
+          autoSwitch: false,
+          notification: "none",
+        },
+        "orphan-kg": {
+          name: "orphan-kg",
+          path: orphanPath,
+          type: "project-local",
+          categories: [],
+          createdAt: new Date().toISOString(),
+          lastUsed: new Date().toISOString(),
+          platforms: [],
+          autoSwitch: false,
+          notification: "none",
+        },
+      },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    };
+    fs.writeFileSync(primaryConfigPath, JSON.stringify(config), "utf-8");
+
+    const { handleUpgrade } = loadHandleUpgrade(home);
+    const result = await handleUpgrade({ apply: ["status-schema"], confirmMigration: true });
+
+    expect(result.isError).toBeUndefined();
+
+    const migrated = JSON.parse(fs.readFileSync(primaryConfigPath, "utf-8"));
+
+    // Healthy graph: activated as normal.
+    expect(migrated.graphs["legacy-kg"].status).toBe("active");
+    expect(typeof migrated.graphs["legacy-kg"].statusChangedAt).toBe("string");
+
+    // Unreachable graph: NOT silently activated -- status left unset, a
+    // path-health question for the user rather than an auto-decision.
+    const orphan = migrated.graphs["orphan-kg"];
+    expect(orphan.status).toBeUndefined();
+    expect(orphan.statusChangedAt).toBeUndefined();
+    // graphId minting is unconditional (Task 1.2 interfaces item), just no
+    // marker file since there's no directory to write it into.
+    expect(typeof orphan.graphId).toBe("string");
+    expect(fs.existsSync(path.join(orphanPath, ".kmgraph-id"))).toBe(false);
+
+    // Surfaced in the returned result text, not silently dropped.
+    expect(result.content[0].text).toMatch(/orphan-kg/);
+    expect(result.content[0].text).toMatch(/content-missing|parent-unreachable|path-missing/);
+    expect(result.content[0].text).toMatch(/[Nn]eeds attention/);
+
+    // Since it's still unmigrated, a follow-up inspect must keep flagging it.
+    const inspectResult = await handleUpgrade({});
+    const parsedInspect = JSON.parse(inspectResult.content[0].text);
+    const item = parsedInspect.upgrades.find((u: { category: string }) => u.category === "status-schema");
+    expect(item).toBeDefined();
+    expect(item.description).toMatch(/orphan-kg/);
+  });
 });

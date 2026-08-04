@@ -11,6 +11,9 @@ import {
   mintGraphId,
   writeGraphIdMarker,
   readGraphIdMarker,
+  checkGraphPathHealth,
+  GraphConfig,
+  PathHealth,
 } from "../utils.js";
 import { resolveGraph, resolvePersonalGraph, PersonalScopeSession, confirmPersonalScopeAccess } from "../resolution.js";
 import {
@@ -623,20 +626,36 @@ async function confirmStatusSchemaMigration(opts: {
  * removes the top-level `active` key; and deletes the legacy config file
  * outright (spec §14 -- retire the legacy path, don't leave an unreconciled
  * duplicate). Caller must have already gated consent and written the backup.
+ *
+ * Interfaces item (4) draws a line between non-orphaned and orphaned/
+ * unreachable graphs: only a graph whose path is actually reachable
+ * (Task 1.4's checkGraphPathHealth returns "ok") gets auto-activated. A
+ * graph with an unhealthy path is deliberately left without a status --
+ * NOT silently activated, NOT auto-decided to some other status either --
+ * and is reported back in the migration summary so the user can resolve it
+ * (move/restore the path, or remove the stale registry entry) and re-run
+ * the migration. Its still-missing status also means checkStatusSchema()
+ * continues to flag it as unmigrated until that happens.
  */
 function performStatusSchemaMigration(): string {
   const config = readConfig();
 
   const migratedGraphs: string[] = [];
+  const needsAttention: Array<{ name: string; health: PathHealth }> = [];
   for (const [name, g] of Object.entries(config.graphs)) {
     const graph = g as unknown as Record<string, unknown>;
     let touched = false;
 
     if (graph.status === undefined) {
-      graph.status = "active";
-      touched = true;
-    }
-    if (graph.statusChangedAt === undefined) {
+      const health = checkGraphPathHealth(g as GraphConfig);
+      if (health === "ok") {
+        graph.status = "active";
+        graph.statusChangedAt = new Date().toISOString();
+        touched = true;
+      } else {
+        needsAttention.push({ name, health });
+      }
+    } else if (graph.statusChangedAt === undefined) {
       graph.statusChangedAt = new Date().toISOString();
       touched = true;
     }
@@ -683,6 +702,12 @@ function performStatusSchemaMigration(): string {
   );
   if (hadTopLevelActive) parts.push("Removed top-level 'active' key");
   if (legacyRemoved) parts.push(`Removed legacy config file at ${legacyPath}`);
+  if (needsAttention.length > 0) {
+    parts.push(
+      `Needs attention -- NOT auto-activated (path unhealthy, status left unset, resolve and re-run): ` +
+        needsAttention.map((n) => `${n.name} (${n.health})`).join(", ")
+    );
+  }
   return parts.join(". ");
 }
 
