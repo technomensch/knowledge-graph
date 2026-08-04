@@ -185,14 +185,7 @@ This document does not recommend one path over the other — that decision is le
 
 ## Status
 
-Open — gap confirmed, no fix implemented yet. Scope TBD: could mean (a) the skill was
-designed but never made discoverable in the project/plugin context it's invoked from, (b)
-it was built and later something changed the invocation path without updating callers, or
-(c) something else — needs investigation into how the Skill tool resolves personal
-(`~/.claude/skills/`) vs. plugin-scoped (`skills/`) skill names before scoping a fix, and
-whether the intended fix is relocating/duplicating the file into this repo's
-`skills/gov-capture-routing/SKILL.md` or changing invocation language in the 8 referencing
-files. See "Decision Fork" above for the two candidate paths, not yet chosen between.
+Resolved — see the "## Resolved (2026-08-03) — Phase 7.1 landed" section near the end of this file for the actual fix and commit history. This paragraph is left in place as the historical, in-progress framing that was accurate at the time it was written.
 
 ## Prior Art / Recall Findings (2026-08-01)
 
