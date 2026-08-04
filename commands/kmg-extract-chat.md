@@ -104,61 +104,27 @@ The workflow runs the centralized Python extraction script located at `${CLAUDE_
 
 ## Execution Steps
 
-### Step 0: Active KG / Working Directory Guard
+### Step 0: Resolve Target Graph
 
 **Skip this step entirely** if an explicit destination flag is present in the user's invocation:
 `--output-dir` or `--project`. When the user has named a target, intent is unambiguous —
 proceed directly to Step 1.
 
-Otherwise, run the following check **before** creating any directories or running extraction:
+Otherwise, resolve the graph directly from the current working directory:
 
-1. Read the active KG name and path:
-   ```bash
-   active_kg=$(jq -r '.active' ~/.kmgraph/kg-config.json)
-   kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.kmgraph/kg-config.json)
-   kg_path="${kg_path/#\~/$HOME}"
-   ```
-   The tilde expansion is required: `jq` returns the raw JSON string (e.g. `~/GitHub/foo`),
-   but `pwd` returns an absolute path. Without expansion the comparison always fails for
-   tilde-stored KG paths.
+```
+kg_resolve
+```
 
-2. Derive the project root from `kg_path`. If `kg_path` ends in `/docs`, the project root is
-   its parent directory; otherwise the project root IS `kg_path`. (Mirrors `getProjectRoot`
-   in `mcp-server/src/utils.ts`.)
-   ```bash
-   if [[ "$kg_path" == */docs ]]; then
-     project_root="${kg_path%/docs}"
-   else
-     project_root="$kg_path"
-   fi
-   ```
+There is no separate "active" pointer left to disagree with cwd (issue-41: this step
+previously read `.active`, derived a project root from it, and compared that against
+`pwd` — the pre-ADR-067 `KG_MISMATCH` pattern; `kg_resolve` derives the graph from cwd
+directly, so there's nothing left to mismatch). Take the returned `path` as `$kg_path`
+for Step 0.5 and Step 1.
 
-3. Compare the project root against the current working directory. A **match** is when `pwd`
-   equals `project_root` OR `pwd` starts with `project_root/` (allows subdirectories).
-   ```bash
-   cwd=$(pwd)
-   # Match if cwd == project_root OR cwd starts with project_root/
-   ```
-
-4. **If mismatch — STOP. Do not run `mkdir` or the extraction script. Ask the user:**
-
-   > Hold on — the active knowledge graph is **{active_kg}** (project root: `{project_root}`),
-   > but you are working in `{cwd}`. Chat history would be written to `{kg_path}/chat-history/`.
-   >
-   > Choose:
-   > 1. Switch the active KG to this project's graph, then extract here
-   > 2. Extract to **{active_kg}** (`{kg_path}/chat-history/`) anyway
-   > 3. Cancel
-   >
-   > Reply 1, 2, or 3.
-
-   - Option 1: Run `/kmgraph:kmg-switch` for the current project's KG (if configured), then re-resolve output dir in Step 1 using the newly active KG. **If the current project has no KG registered in `~/.kmgraph/kg-config.json`**, tell the user and offer `/kmgraph:kmg-init` to create one — or fall back to option 2 or 3.
-   - Option 2: Continue to Step 1 using the current active KG unchanged.
-   - Option 3: Abort. Do not run extraction.
-
-   **Do not proceed until the user explicitly responds.**
-
-5. **If match:** Continue to Step 0.5.
+**If `kg_resolve` errors** (no graph registered for this directory): tell the user and
+offer `/kmgraph:kmg-init` to create one, or suggest `--output-dir`/`--project` to name a
+target explicitly. Do not run `mkdir` or the extraction script until resolved.
 
 ---
 
@@ -168,11 +134,11 @@ Otherwise, run the following check **before** creating any directories or runnin
 
 Otherwise, check whether this is the first extraction run since the plugin crossed the version that fixed a past message-loss bug in the Claude extractor.
 
-First resolve the chat-history directory from the (possibly just-switched, per Step 0) active KG — this is the same resolution Step 1 performs, but Step 0.5 runs *before* Step 1, so `chat_history` must be resolved here or every `read_last_extract_version` / `write_last_extract_version` / health-check call below would reference an undefined path (and would miss a Step 0 Option-1 KG switch):
+Derive the chat-history directory from `$kg_path` (resolved in Step 0 — reuse it, no
+need to re-resolve; if Step 0 was skipped because `--project`/`--output-dir` was given,
+this whole step is also skipped per the condition above, so `$kg_path` is always
+available whenever this line runs):
 ```bash
-active_kg=$(jq -r '.active' ~/.kmgraph/kg-config.json)
-kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.kmgraph/kg-config.json)
-kg_path="${kg_path/#\~/$HOME}"
 chat_history="${kg_path}/chat-history"
 ```
 
@@ -233,12 +199,17 @@ No backup guidance for Gemini — nothing is lost, so recovery framing would be 
 ### Step 1: Determine Output Directory
 
 **Default behavior (no --output-dir):**
-```bash
-# Get active KG path from config
-active_kg=$(jq -r '.active' ~/.kmgraph/kg-config.json)
-kg_path=$(jq -r ".graphs[\"$active_kg\"].path" ~/.kmgraph/kg-config.json)
 
-# Use active KG's chat-history/ subdirectory
+If `$kg_path` is already set (Step 0 ran and resolved it), reuse it — no need to
+re-resolve. Otherwise (Step 0 was skipped because `--project` was given without
+`--output-dir`) resolve it now:
+
+```
+kg_resolve
+```
+
+```bash
+# Use the resolved graph's chat-history/ subdirectory
 output_dir="${kg_path}/chat-history"
 ```
 
@@ -430,8 +401,7 @@ When using the default output directory (active KG):
 ## Multi-KG Support
 
 When multiple knowledge graphs are configured:
-- Operates on the **active** KG from `~/.kmgraph/kg-config.json`
-- Use `/kmgraph:kmg-switch` to change active KG before extraction
+- Operates on `{kg_path}` (see § Step 0: Resolve Target Graph above), or `--output-dir` if overridden
 - Each KG maintains its own chat-history/
 - Use `--output-dir` to extract to specific KG manually
 

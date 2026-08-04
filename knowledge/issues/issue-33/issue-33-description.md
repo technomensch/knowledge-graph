@@ -2,7 +2,7 @@
 id: issue-33
 type: Hardening
 status: deferred
-github-issue: null
+github-issue: "#206"
 branch: none
 created: 2026-07-29
 ---

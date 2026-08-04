@@ -107,10 +107,19 @@ Handoff package will be created in: $output_dir
 ### Step 2: Generate START-HERE.md
 
 **Auto-detect today's session summary:**
+
+First resolve the target graph (issue-41: this previously read `jq -r
+'.graphs[.active].path' ~/.kmgraph/kg-config.json`, a pre-ADR-067 pattern):
+
+```
+kg_resolve
+```
+
+Take the returned `path` as `$active_kg` below.
+
 ```bash
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 current_commit=$(git rev-parse --short HEAD)
-active_kg=$(jq -r '.graphs[.active].path' ~/.kmgraph/kg-config.json)
 session_dir="${active_kg}/sessions"
 today=$(date +%Y-%m-%d)
 branch_slug=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')

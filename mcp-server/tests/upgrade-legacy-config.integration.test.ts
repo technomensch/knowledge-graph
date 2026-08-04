@@ -83,12 +83,23 @@ describe("handleUpgrade with config only at legacy ~/.claude path (integration)"
     const { handleUpgrade } = require("../src/tools/upgrade.js") as typeof import("../src/tools/upgrade.js");
     jest.dontMock("os");
 
+    // ADR-067 Task 1.9: resolution is context-derived (resolveGraph), not
+    // config.active-derived -- the real jest process cwd (this test file's
+    // own directory) isn't under kgRoot, so without this mock resolveGraph
+    // would return no-graph-in-cwd regardless of the legacy-config fallback
+    // working correctly, silently defeating what this test exists to prove.
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
     const result = await handleUpgrade({});
+    process.cwd = origCwd;
 
     expect(result.isError).toBeUndefined();
-    expect(result.content[0].text).not.toContain("No active knowledge graph configured");
-    // Inspect output is JSON; the active KG resolved so we get an upgrades/warnings report.
+    // Inspect output is JSON; a "resolution" item would only appear if the
+    // legacy-registered graph failed to resolve -- its absence is what
+    // proves the legacy config path is actually reachable end-to-end.
     const parsed = JSON.parse(result.content[0].text);
     expect(Array.isArray(parsed.upgrades)).toBe(true);
+    expect(parsed.upgrades.find((u: { category: string }) => u.category === "resolution")).toBeUndefined();
   });
 });

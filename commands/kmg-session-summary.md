@@ -51,12 +51,24 @@ Use the default (no flag) for typical single-session, single-branch work.
 
 ## Level Routing Detection
 
-Before dispatching to any agent, detect the level signal from the user's invocation and resolve it to an explicit flag.
+Before dispatching to any agent, detect the user's intent for WHERE this session summary
+should be captured, directly from their message or an explicit flag — no separate
+routing skill needed (`gov-capture-routing`, formerly invoked here, has been retired —
+see issue-18 — this detection is now native to how `kg_capture`/`session-summary-agent`
+already resolve scope):
 
-**Invoke `gov-capture-routing` skill** to:
-1. Detect level signal from the user's message (NL patterns or explicit flags)
-2. Resolve `$level`, `$target_kg`, `$target_path`, `$restore_kg`
-3. Handle prompts if needed (named KG not found, no project KG configured, conflict resolution)
+- Personal/global-KG language ("my personal", "global session"), or an explicit `--user`
+  flag → `--user` (`session-summary-agent` passes `scope: "user"` to `kg_capture`)
+- This-project language, or an explicit `--project` flag → `--project`
+- A specific KG named by the user, or `--named=<kg>` → `--named=<kg>` (resolves to
+  `targetKg` at the `kg_capture` call)
+- Nothing specified, or `--active` → `--active` (default, cwd-derived resolution)
+- No `$restore_kg` to resolve — knowledge graphs resolve from context per call, not a
+  mutable "active" pointer, so there is nothing to restore after (ADR-067 Phase 6).
+- Handle prompts if genuinely needed (named KG not found, no project KG configured) —
+  the conflict-resolution flow the retired skill supported for two ambiguous signals in
+  one message is not reproduced here; see issue-18's decision record for why this is an
+  accepted scope narrowing.
 
 The resolved flag (`--user`, `--project`, `--named=<kg>`, or `--active`) is then passed to the agent invocation in the Dispatch section below.
 

@@ -144,145 +144,126 @@ _inject_profile "$PERSONAL_KG_DIR/me.md"       "~/.kmgraph/me.md (personal ident
 _inject_profile "$PERSONAL_KG_DIR/triggers.md" "~/.kmgraph/triggers.md (personal workflow phase router)"
 
 # ─────────────────────────────────────────────────────────────
-# SECTION 2: KG Configuration Validation (from check-memory.sh)
+# SECTION 2: KG Resolution (cwd-derived, issue-41 / ADR-067 Phase 9)
+#
+# issue-41 (ADR-067 Phase 9): resolution is cwd-derived, not a mutable
+# `.active` pointer. The scripts/ hooks were the one place the retired
+# `.active`/autoSwitch model survived (grep'd straight out of kg-config.json,
+# with a silent `cfg.active = ...` rewrite when CWD didn't match) -- fixed
+# here by shelling out to the same resolveGraph() logic the kg_resolve MCP
+# tool exposes to markdown callers (mcp-server/src/tools/resolve.ts), via a
+# thin `resolve` CLI subcommand (mcp-server/src/cli.ts) built into the
+# already-built dist/cli.js this script's own auto-build step (Section 1)
+# guarantees is present. There is no "active KG" or "switch" concept left:
+# resolution is automatic from CWD, so a CWD that doesn't resolve just gets
+# an informational message, not a blocking error or a silent config rewrite.
+#
+# Post-review fix: this section only sets PROJECT_RESOLVED/KG_PATH and
+# (on the one genuine misconfiguration case -- a registered KG whose path no
+# longer exists on disk) FINAL_EXIT=1. It never `exit`s directly. Sections
+# 3.5 (personal/global KG lessons), 4 (profile staleness), and the ENH-016
+# rules-split check are about the user's personal KG and global config
+# health, not "which project KG resolved from this cwd" -- under the old
+# `.active` model a missing/unset active KG was near-never true on a real
+# install, so those sections' reachability never depended on it in practice.
+# Under cwd-derived resolution, "no project resolves from this cwd" is a
+# routine state (any session started from $HOME or outside a registered
+# project), so an early `exit` here would routinely and silently skip
+# sections that have nothing to do with project resolution. Only Section 3
+# (recent lessons) and Section 3.75 (project routing injection) actually
+# need KG_PATH, so only those are gated on PROJECT_RESOLVED below.
 # ─────────────────────────────────────────────────────────────
+
+FINAL_EXIT=0
+PROJECT_RESOLVED=false
+KG_PATH=""
+RESOLVED_KG=""
 
 if [ ! -f "$CONFIG_PATH" ]; then
     echo -e "${BLUE}ℹ️  No knowledge graph configured.${NC}"
     echo "   Run /kmgraph:kmg-init to get started."
-    exit 0
-fi
+else
+    RESOLVE_CLI="$PLUGIN_ROOT/mcp-server/dist/cli.js"
 
-ACTIVE_KG=$(grep -o '"active"[[:space:]]*:[[:space:]]*"[^"]*"' "$CONFIG_PATH" | sed 's/.*"\([^"]*\)".*/\1/')
-
-if [ -z "$ACTIVE_KG" ]; then
-    echo -e "${YELLOW}⚠️  No active knowledge graph set in config.${NC}"
-    echo "   Run /kmgraph:kmg-list and /kmgraph:kmg-switch to activate a KG."
-    exit 1
-fi
-
-KG_PATH=$(grep -A 10 "\"$ACTIVE_KG\"" "$CONFIG_PATH" | grep '"path"' | head -1 | sed 's/.*"path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
-
-if [ -z "$KG_PATH" ]; then
-    echo -e "${YELLOW}⚠️  Could not read path for active KG: $ACTIVE_KG${NC}"
-    exit 1
-fi
-
-KG_PATH="${KG_PATH/#\~/$HOME}"
-
-if [ ! -d "$KG_PATH" ]; then
-    echo -e "${RED}⚠️  Active KG path does not exist: $KG_PATH${NC}"
-    echo "   KG: $ACTIVE_KG"
-    echo "   Run /kmgraph:kmg-init or /kmgraph:kmg-switch to fix configuration."
-    exit 1
-fi
-
-# ─────────────────────────────────────────────────────────────
-# SECTION 2.5: CWD / Active KG Alignment
-# Option 1: warn if CWD is outside active KG project root
-# Option 3: auto-switch silently if autoSwitch: true in config
-# ─────────────────────────────────────────────────────────────
-
-KG_TYPE=$(grep -A 10 "\"$ACTIVE_KG\"" "$CONFIG_PATH" | grep '"type"' | head -1 | sed 's/.*"type"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
-
-if [ "$KG_TYPE" = "project-local" ]; then
-    # Derive project root (handle /docs subdirectory pattern)
-    KG_PATH_BASENAME=$(basename "$KG_PATH")
-    if [ "$KG_PATH_BASENAME" = "docs" ]; then
-        EXPECTED_PROJECT_ROOT=$(dirname "$KG_PATH")
+    if ! command -v node &> /dev/null || [ ! -f "$RESOLVE_CLI" ]; then
+        echo -e "${YELLOW}⚠️  Cannot resolve knowledge graph: Node.js or the MCP server build is unavailable.${NC}"
     else
-        EXPECTED_PROJECT_ROOT="$KG_PATH"
-    fi
+        RESOLVE_JSON=$(node "$RESOLVE_CLI" resolve --cwd "$(pwd)" 2>/dev/null)
+        RESOLVE_STATUS=$?
 
-    CWD=$(pwd)
-    case "$CWD" in
-        "$EXPECTED_PROJECT_ROOT"|"$EXPECTED_PROJECT_ROOT"/*)
-            # CWD is within the active KG project — no action needed
-            ;;
-        *)
-            # CWD is outside the active KG project root
-            AUTO_SWITCH=$(grep -A 20 "\"$ACTIVE_KG\"" "$CONFIG_PATH" | grep '"autoSwitch"' | head -1 | sed 's/.*"autoSwitch"[[:space:]]*:[[:space:]]*\([^,}]*\).*/\1/' | tr -d '[:space:]')
+        if [ "$RESOLVE_STATUS" -ne 0 ]; then
+            RESOLVE_ERR=$(node -e "
+              try {
+                const r = JSON.parse(process.argv[1]);
+                process.stdout.write(r.error || '');
+              } catch(e) {}
+            " "$RESOLVE_JSON" 2>/dev/null)
+            echo -e "${BLUE}ℹ️  ${RESOLVE_ERR:-No knowledge graph resolves for this directory.}${NC}"
+            echo "   Run /kmgraph:kmg-init to set one up here, or cd into a registered project."
+        else
+            RESOLVED_KG=$(node -e "
+              try {
+                const r = JSON.parse(process.argv[1]);
+                process.stdout.write(r.name || '');
+              } catch(e) {}
+            " "$RESOLVE_JSON" 2>/dev/null)
 
-            if [ "$AUTO_SWITCH" = "true" ] && command -v node &> /dev/null; then
-                # Option 3: find the KG whose project root matches CWD and switch silently
-                MATCHED_KG=$(node -e "
-                  const path = require('path');
-                  try {
-                    const cfg = JSON.parse(require('fs').readFileSync('$CONFIG_PATH', 'utf8'));
-                    const cwd = process.env.CWD_CHECK;
-                    for (const [name, g] of Object.entries(cfg.graphs || {})) {
-                      if (name === cfg.active) continue;
-                      let root = (g.path || '').replace(/^~/, process.env.HOME);
-                      if (path.basename(root) === 'docs') root = path.dirname(root);
-                      if (cwd === root || cwd.startsWith(root + '/')) {
-                        process.stdout.write(name);
-                        break;
-                      }
-                    }
-                  } catch(e) {}
-                " 2>/dev/null CWD_CHECK="$CWD")
+            KG_PATH=$(node -e "
+              try {
+                const r = JSON.parse(process.argv[1]);
+                process.stdout.write(r.path || '');
+              } catch(e) {}
+            " "$RESOLVE_JSON" 2>/dev/null)
 
-                if [ -n "$MATCHED_KG" ]; then
-                    # Silently update active KG in config
-                    node -e "
-                      try {
-                        const fs = require('fs');
-                        const cfg = JSON.parse(fs.readFileSync('$CONFIG_PATH', 'utf8'));
-                        cfg.active = '$MATCHED_KG';
-                        fs.writeFileSync('$CONFIG_PATH', JSON.stringify(cfg, null, 2));
-                      } catch(e) {}
-                    " 2>/dev/null
-                    # Reload active KG name for subsequent sections
-                    ACTIVE_KG="$MATCHED_KG"
-                    KG_PATH=$(grep -A 10 "\"$ACTIVE_KG\"" "$CONFIG_PATH" | grep '"path"' | head -1 | sed 's/.*"path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
-                    KG_PATH="${KG_PATH/#\~/$HOME}"
-                fi
-                # If no match found, fall through silently (autoSwitch can't find a target)
+            if [ -z "$KG_PATH" ] || [ ! -d "$KG_PATH" ]; then
+                echo -e "${RED}⚠️  Resolved KG path does not exist: $KG_PATH${NC}"
+                echo "   KG: $RESOLVED_KG"
+                echo "   Run /kmgraph:kmg-init to fix configuration."
+                FINAL_EXIT=1
+                KG_PATH=""
             else
-                # Option 1: warn the user
-                echo -e "${YELLOW}⚠️  Active KG '${ACTIVE_KG}' is set for a different project.${NC}"
-                echo "   Active KG project: $EXPECTED_PROJECT_ROOT"
-                echo "   Current directory: $CWD"
-                echo "   Run /kmgraph:kmg-switch to change the active KG for this project."
-                echo ""
+                PROJECT_RESOLVED=true
             fi
-            ;;
-    esac
+        fi
+    fi
 fi
 
 # ─────────────────────────────────────────────────────────────
 # SECTION 3: Recent Lessons (from recent-lessons.sh)
+# Project-scoped -- only runs when a project KG resolved from CWD.
 # ─────────────────────────────────────────────────────────────
 
-LESSONS_DIR="$KG_PATH/lessons-learned"
-if [ -d "$LESSONS_DIR" ]; then
-    RECENT_LESSONS=$(find "$LESSONS_DIR" -name "*.md" -type f -mtime -7 2>/dev/null)
+if [ "$PROJECT_RESOLVED" = true ]; then
+    LESSONS_DIR="$KG_PATH/lessons-learned"
+    if [ -d "$LESSONS_DIR" ]; then
+        RECENT_LESSONS=$(find "$LESSONS_DIR" -name "*.md" -type f -mtime -7 2>/dev/null)
 
-    if [ -n "$RECENT_LESSONS" ]; then
-        LESSON_COUNT=$(echo "$RECENT_LESSONS" | wc -l | tr -d ' ')
-        if [ "$LESSON_COUNT" -gt 0 ]; then
-            echo -e "${BLUE}📚 Recent Lessons (last 7 days):${NC}"
-            echo "$RECENT_LESSONS" | while read -r lesson_path; do
-                filename=$(basename "$lesson_path" .md)
-                title=""
-                if [ -f "$lesson_path" ]; then
-                    title=$(grep -m 1 '^title:' "$lesson_path" 2>/dev/null | sed 's/^title:[[:space:]]*"\?\([^"]*\)"\?/\1/')
-                    if [ -z "$title" ]; then
-                        title=$(grep -m 1 '^# ' "$lesson_path" 2>/dev/null | sed 's/^# //')
+        if [ -n "$RECENT_LESSONS" ]; then
+            LESSON_COUNT=$(echo "$RECENT_LESSONS" | wc -l | tr -d ' ')
+            if [ "$LESSON_COUNT" -gt 0 ]; then
+                echo -e "${BLUE}📚 Recent Lessons (last 7 days):${NC}"
+                echo "$RECENT_LESSONS" | while read -r lesson_path; do
+                    filename=$(basename "$lesson_path" .md)
+                    title=""
+                    if [ -f "$lesson_path" ]; then
+                        title=$(grep -m 1 '^title:' "$lesson_path" 2>/dev/null | sed 's/^title:[[:space:]]*"\?\([^"]*\)"\?/\1/')
+                        if [ -z "$title" ]; then
+                            title=$(grep -m 1 '^# ' "$lesson_path" 2>/dev/null | sed 's/^# //')
+                        fi
+                        if [ -z "$title" ]; then
+                            title=$(echo "$filename" | sed 's/_/ /g' | sed 's/Lessons Learned //')
+                        fi
+                    else
+                        title=$(echo "$filename" | sed 's/_/ /g')
                     fi
-                    if [ -z "$title" ]; then
-                        title=$(echo "$filename" | sed 's/_/ /g' | sed 's/Lessons Learned //')
-                    fi
-                else
-                    title=$(echo "$filename" | sed 's/_/ /g')
-                fi
-                rel_path="${lesson_path#$KG_PATH/}"
-                echo "   • $title"
-                echo "     $rel_path"
-            done
-            echo ""
-            echo -e "${GREEN}Tip:${NC} Use ${BLUE}/kmgraph:kmg-recall \"query\"${NC} to search lessons"
-            echo ""
+                    rel_path="${lesson_path#$KG_PATH/}"
+                    echo "   • $title"
+                    echo "     $rel_path"
+                done
+                echo ""
+                echo -e "${GREEN}Tip:${NC} Use ${BLUE}/kmgraph:kmg-recall \"query\"${NC} to search lessons"
+                echo ""
+            fi
         fi
     fi
 fi
@@ -346,10 +327,13 @@ fi
 # Injects $KG_PATH/{me,triggers}.md into session context. Reuses
 # _inject_profile helper defined in Section 1.5. Project routing
 # loads AFTER personal routing so it overrides on conflict.
+# Project-scoped -- only runs when a project KG resolved from CWD.
 # ─────────────────────────────────────────────────────────────
 
-_inject_profile "$KG_PATH/me.md"       "knowledge/me.md (project identity)"
-_inject_profile "$KG_PATH/triggers.md" "knowledge/triggers.md (project triggers)"
+if [ "$PROJECT_RESOLVED" = true ]; then
+    _inject_profile "$KG_PATH/me.md"       "knowledge/me.md (project identity)"
+    _inject_profile "$KG_PATH/triggers.md" "knowledge/triggers.md (project triggers)"
+fi
 
 # ─────────────────────────────────────────────────────────────
 # SECTION 4: Profile File Staleness (post-MEMORY.md cascade)
@@ -430,4 +414,4 @@ _check_rules_split_threshold
 # as part of the post-migration cascade fix (ENH-014).
 # ─────────────────────────────────────────────────────────────
 
-exit 0
+exit "$FINAL_EXIT"

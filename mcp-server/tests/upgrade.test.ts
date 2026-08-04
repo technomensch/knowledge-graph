@@ -26,7 +26,19 @@ import type { KgConfig } from "../src/utils.js";
 // ---------------------------------------------------------------------------
 
 function makeTempDir(prefix: string): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), `upgrade-test-${prefix}-`));
+  // Nest one level below a fresh mkdtemp wrapper (ADR-067 Task 1.9 Step 3.5)
+  // -- resolveGraph matches cwd against dirname(graph.path); a bare mkdtemp
+  // leaf returned directly would make dirname() resolve to the shared
+  // os.tmpdir() for every fixture in this file, so any cwd-mocked test would
+  // false-match every other test's temp KG too, not just its own. Nesting
+  // under a per-call-unique wrapper gives each fixture its own dirname()
+  // without moving where scaffoldKg/scaffoldKgPartial write content --
+  // checkDirectories() and friends still operate directly on the returned
+  // path, unchanged.
+  const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), `upgrade-test-${prefix}-`));
+  const kgDir = path.join(wrapper, "kg");
+  fs.mkdirSync(kgDir);
+  return kgDir;
 }
 
 function scaffoldKg(root: string): void {
@@ -50,9 +62,11 @@ function scaffoldKgPartial(root: string): void {
 }
 
 const tempDirs: string[] = [];
+const ORIGINAL_CWD = process.cwd;
 
 afterEach(() => {
   jest.clearAllMocks();
+  process.cwd = ORIGINAL_CWD;
   for (const dir of tempDirs) {
     try {
       fs.rmSync(dir, { recursive: true, force: true });
@@ -64,9 +78,13 @@ afterEach(() => {
 });
 
 function mockActiveKg(kgRoot: string, graphOverrides: Record<string, unknown> = {}): void {
+  // ADR-067 Task 1.9: resolution is context-derived (resolveGraph), not
+  // config.active-derived -- every caller of this helper wants kgRoot to be
+  // the graph handleUpgrade resolves, so mock cwd to match (restored in the
+  // file-level afterEach above).
+  process.cwd = () => kgRoot;
   (readConfig as jest.Mock).mockReturnValue({
     version: "1.0.0",
-    active: "test-kg",
     graphs: {
       "test-kg": {
         name: "test-kg",
@@ -74,9 +92,10 @@ function mockActiveKg(kgRoot: string, graphOverrides: Record<string, unknown> = 
         type: "project-local",
         categories: [],
         createdAt: new Date().toISOString(),
-        lastUsed: new Date().toISOString(),
+        status: "active" as const,
+        statusChangedAt: new Date().toISOString(),
+        graphId: "test-graph-id",
         platforms: [],
-        autoSwitch: false,
         notification: "none",
         ...graphOverrides,
       },
@@ -87,9 +106,9 @@ function mockActiveKg(kgRoot: string, graphOverrides: Record<string, unknown> = 
 
 function mockActiveKgMissingConfigFields(kgRoot: string): void {
   // Simulate a v0.2.2 config — no platforms, autoSwitch, notification fields
+  process.cwd = () => kgRoot;
   (readConfig as jest.Mock).mockReturnValue({
     version: "1.0.0",
-    active: "test-kg",
     graphs: {
       "test-kg": {
         name: "test-kg",
@@ -97,8 +116,10 @@ function mockActiveKgMissingConfigFields(kgRoot: string): void {
         type: "project-local",
         categories: [],
         createdAt: new Date().toISOString(),
-        lastUsed: new Date().toISOString(),
-        // intentionally missing: platforms, autoSwitch, notification
+        status: "active" as const,
+        statusChangedAt: new Date().toISOString(),
+        graphId: "test-graph-id",
+        // intentionally missing: platforms, notification
       },
     },
     sanitization: { enabled: false, patterns: [], action: "warn" },
@@ -322,18 +343,23 @@ describe("T-9: platform-split with confirmation applied", () => {
 // T-10: No active KG configured
 // ---------------------------------------------------------------------------
 
-describe("T-10: no active KG configured", () => {
-  test("returns error when active is null", async () => {
+describe("T-10: no knowledge graph resolves from cwd", () => {
+  test("reports a resolution item but still returns a valid report (config-location stays reachable, ADR-067)", async () => {
     (readConfig as jest.Mock).mockReturnValue({
       version: "1.0.0",
-      active: null,
       graphs: {},
       sanitization: { enabled: false, patterns: [], action: "warn" },
     });
+    const origCwd = process.cwd;
+    process.cwd = () => "/definitely/not/registered";
 
     const result = await handleUpgrade({});
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Error");
+    process.cwd = origCwd;
+
+    expect(result.isError).toBeUndefined();
+    const parsed = parseResult(result);
+    const item = parsed.upgrades.find((u) => u.category === "resolution");
+    expect(item).toBeDefined();
   });
 });
 
@@ -381,10 +407,9 @@ describe("T-13: apply config backfills missing fields", () => {
     const kgRoot = makeTempDir("t13");
     tempDirs.push(kgRoot);
     scaffoldKg(kgRoot);
-    // Set up a config missing platforms, autoSwitch, notification
+    // Set up a config missing platforms, notification
     const configObj: KgConfig = {
       version: "1.0.0",
-      active: "test-kg",
       graphs: {
         "test-kg": {
           name: "test-kg",
@@ -392,12 +417,15 @@ describe("T-13: apply config backfills missing fields", () => {
           type: "project-local",
           categories: [],
           createdAt: new Date().toISOString(),
-          lastUsed: new Date().toISOString(),
+          status: "active" as const,
+          statusChangedAt: new Date().toISOString(),
+          graphId: "test-graph-id",
         },
       },
       sanitization: { enabled: false, patterns: [], action: "warn" },
     };
     (readConfig as jest.Mock).mockReturnValue(configObj);
+    process.cwd = () => kgRoot;
 
     let written: KgConfig | null = null;
     (writeConfig as jest.Mock).mockImplementation((cfg: KgConfig) => { written = cfg; });
@@ -410,8 +438,8 @@ describe("T-13: apply config backfills missing fields", () => {
     expect(written).not.toBeNull();
     const graph = (written as unknown as KgConfig).graphs["test-kg"] as unknown as Record<string, unknown>;
     expect(graph["platforms"]).toBeDefined();
-    expect(graph["autoSwitch"]).toBeDefined();
     expect(graph["notification"]).toBeDefined();
+    expect(graph["autoSwitch"]).toBeUndefined();
   });
 });
 
@@ -548,7 +576,6 @@ describe("T-19: config apply is idempotent", () => {
     // First call: fields missing → returns config with defaults written
     const configWithDefaults: KgConfig = {
       version: "1.0.0",
-      active: "test-kg",
       graphs: {
         "test-kg": {
           name: "test-kg",
@@ -556,12 +583,15 @@ describe("T-19: config apply is idempotent", () => {
           type: "project-local",
           categories: [],
           createdAt: new Date().toISOString(),
-          lastUsed: new Date().toISOString(),
+          status: "active" as const,
+          statusChangedAt: new Date().toISOString(),
+          graphId: "test-graph-id",
         },
       },
       sanitization: { enabled: false, patterns: [], action: "warn" },
     };
     (readConfig as jest.Mock).mockReturnValue(configWithDefaults);
+    process.cwd = () => kgRoot;
     (writeConfig as jest.Mock).mockImplementation(() => undefined);
 
     const first = await handleUpgrade({ apply: ["config"] });
@@ -624,7 +654,6 @@ describe("T-22: KG path does not exist", () => {
   test("error returned when configured KG path is missing", async () => {
     (readConfig as jest.Mock).mockReturnValue({
       version: "1.0.0",
-      active: "test-kg",
       graphs: {
         "test-kg": {
           name: "test-kg",
@@ -632,11 +661,14 @@ describe("T-22: KG path does not exist", () => {
           type: "project-local",
           categories: [],
           createdAt: new Date().toISOString(),
-          lastUsed: new Date().toISOString(),
+          status: "active" as const,
+          statusChangedAt: new Date().toISOString(),
+          graphId: "test-graph-id",
         },
       },
       sanitization: { enabled: false, patterns: [], action: "warn" },
     });
+    process.cwd = () => "/nonexistent/path/that/does/not/exist";
 
     const result = await handleUpgrade({});
     expect(result.isError).toBe(true);
@@ -703,7 +735,6 @@ describe("T-25: multiple apply categories in one call", () => {
 
     const configObj: KgConfig = {
       version: "1.0.0",
-      active: "test-kg",
       graphs: {
         "test-kg": {
           name: "test-kg",
@@ -711,13 +742,16 @@ describe("T-25: multiple apply categories in one call", () => {
           type: "project-local",
           categories: [],
           createdAt: new Date().toISOString(),
-          lastUsed: new Date().toISOString(),
-          // intentionally missing: platforms, autoSwitch, notification
+          status: "active" as const,
+          statusChangedAt: new Date().toISOString(),
+          graphId: "test-graph-id",
+          // intentionally missing: platforms, notification
         },
       },
       sanitization: { enabled: false, patterns: [], action: "warn" },
     };
     (readConfig as jest.Mock).mockReturnValue(configObj);
+    process.cwd = () => kgRoot;
 
     let written: KgConfig | null = null;
     (writeConfig as jest.Mock).mockImplementation((cfg: KgConfig) => { written = cfg; });
@@ -908,11 +942,31 @@ describe("T-32: personal KG type — platform-split warning still detected", () 
       "---\ntitle: Rules\n---\n# Rules\n\n- File search: use Glob and Grep — not Bash find/grep\n"
     );
 
-    const result = await handleUpgrade({});
+    // ADR-067 Task 1.9: personal-type graphs are deliberately excluded from
+    // resolveGraph's cwd walk (reached via scope="user" instead, not
+    // context) -- explicit scope needed here, cwd alone no longer resolves it.
+    // ADR-067 Task 6.4: scope:"user" now routes through confirmPersonalScopeAccess --
+    // confirmPersonalScope:true is required here since this test runs in automated mode.
+    const result = await handleUpgrade({ scope: "user", confirmPersonalScope: true });
     expect(result.isError).toBeUndefined();
     const parsed = parseResult(result);
     const platformSplit = parsed.warnings.find((w) => w.category === "platform-split");
     expect(platformSplit).toBeDefined();
+  });
+
+  // ADR-067 Task 6.4 (spec §11): scope:"user" reaches the personal graph the
+  // same way it does in search.ts/capture.ts -- same confirmPersonalScopeAccess
+  // gate, same reason string, closing the interim gap left open by Task 1.9.
+  it("scope:\"user\" from an unconfirmed repo in automated mode returns KMG_INPUT_REQUIRED/personal_scope_unseen_repo", async () => {
+    const kgRoot = makeTempDir("t32-gate");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot, { type: "personal" });
+
+    const result = await handleUpgrade({ scope: "user" });
+    expect(result.isError).toBe(true);
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed).toMatchObject({ error: "KMG_INPUT_REQUIRED", reason: "personal_scope_unseen_repo" });
   });
 });
 
@@ -1510,7 +1564,7 @@ describe("T-51: lastAppliedVersion written to config after apply", () => {
     await handleUpgrade({ apply: ["directories"] });
 
     expect(writtenConfig).toBeDefined();
-    const lastApplied = (writtenConfig!.graphs[writtenConfig!.active!] as unknown as Record<string, unknown>).lastAppliedVersion;
+    const lastApplied = (writtenConfig!.graphs["test-kg"] as unknown as Record<string, unknown>).lastAppliedVersion;
     expect(lastApplied).toBe(handleVersion().installed); // "0.0.0" under Jest
   });
 });
@@ -1528,7 +1582,7 @@ describe("T-51b: lastAppliedVersion does not clobber applyConfig side effects", 
     await handleUpgrade({ apply: ["config", "directories"] });
 
     expect(writtenConfig).toBeDefined();
-    const lastApplied = (writtenConfig!.graphs[writtenConfig!.active!] as unknown as Record<string, unknown>).lastAppliedVersion;
+    const lastApplied = (writtenConfig!.graphs["test-kg"] as unknown as Record<string, unknown>).lastAppliedVersion;
     expect(lastApplied).toBe(handleVersion().installed);
   });
 });
@@ -1648,5 +1702,90 @@ describe("config-location category", () => {
     // Second call must not alter the migrated file or delete the legacy one.
     expect(fs.readFileSync(newFile, "utf-8")).toBe(afterFirst);
     expect(fs.existsSync(oldFile)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// T-52: apply mode path-existence guard (Opus review B-1) + isError on
+// resolution failure (Opus review SF-1)
+// ---------------------------------------------------------------------------
+
+describe("T-52: apply mode does not resurrect a deleted/unmounted KG path", () => {
+  test("apply: ['directories'] against a registered-but-missing path errors instead of recreating it", async () => {
+    const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), "upgrade-test-t52-"));
+    const goneKgPath = path.join(wrapper, "kg"); // registered, never created on disk
+    (readConfig as jest.Mock).mockReturnValue({
+      version: "1.0.0",
+      graphs: {
+        "gone-kg": {
+          name: "gone-kg",
+          path: goneKgPath,
+          type: "project-local",
+          categories: [],
+          createdAt: new Date().toISOString(),
+          status: "active" as const,
+          statusChangedAt: new Date().toISOString(),
+          graphId: "gone-kg-id",
+        },
+      },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    } as KgConfig);
+    process.cwd = () => goneKgPath;
+
+    const result = await handleUpgrade({ apply: ["directories"] });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("KG path not found");
+    // Must not have created the directory as a side effect of the check.
+    expect(fs.existsSync(goneKgPath)).toBe(false);
+    fs.rmSync(wrapper, { recursive: true, force: true });
+  });
+
+  test("apply: ['directories'] with an unresolvable cwd returns isError:true, not a silent success", async () => {
+    const registeredKg = makeTempDir("t52b-registered");
+    tempDirs.push(registeredKg);
+    scaffoldKg(registeredKg);
+    (readConfig as jest.Mock).mockReturnValue({
+      version: "1.0.0",
+      graphs: {
+        "some-kg": {
+          name: "some-kg",
+          path: registeredKg,
+          type: "project-local",
+          categories: [],
+          createdAt: new Date().toISOString(),
+          status: "active" as const,
+          statusChangedAt: new Date().toISOString(),
+          graphId: "some-kg-id",
+        },
+      },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    } as KgConfig);
+    const unrelatedDir = makeTempDir("t52b-unrelated");
+    tempDirs.push(unrelatedDir);
+    process.cwd = () => unrelatedDir;
+
+    const result = await handleUpgrade({ apply: ["directories"] });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Error");
+  });
+
+  test("apply: ['config-location', 'directories'] with an unresolvable cwd still runs config-location but flags isError overall", async () => {
+    const home = makeTempDir("t52c-home");
+    tempDirs.push(home);
+    const legacyDir = path.join(home, ".claude");
+    fs.mkdirSync(legacyDir, { recursive: true });
+    fs.writeFileSync(path.join(legacyDir, "kg-config.json"), JSON.stringify({ version: "1.0.0", graphs: {} }), "utf-8");
+    process.env.HOME = home;
+    delete process.env.KG_CONFIG_PATH;
+    (readConfig as jest.Mock).mockImplementation(() => ({ version: "1.0.0", graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } }));
+    process.cwd = () => "/completely/unresolvable/path/for/t52c";
+
+    const result = await handleUpgrade({ apply: ["config-location", "directories"] });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("[config-location]");
+    expect(result.content[0].text).toContain("[directories] Error:");
   });
 });

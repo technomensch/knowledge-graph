@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 
-import * as fs from "fs";
 import * as path from "path";
-import * as os from "os";
 import * as readline from "readline";
 import {
   readConfig,
   writeConfig,
-  getPluginRoot,
+  mintGraphId,
+  writeGraphIdMarker,
+  readGraphIdMarker,
   GraphConfig,
   CategoryConfig,
 } from "./utils.js";
+import { resolveRegistrationGuard, scaffoldGraphDirectory } from "./tools/config.js";
+import { resolveKgPath } from "./tools/resolve.js";
 
 declare const __SERVER_VERSION__: string;
 const SERVER_VERSION =
@@ -129,101 +131,64 @@ async function runInit(): Promise<void> {
       { name: "patterns", prefix: null, git: "commit" },
     ];
 
-    // Expand path for file operations
-    const expandedPath = kgPath.replace(/^~/, os.homedir());
+    // Expand path + run both registration guards (shared with kg_config_init, ENH-051)
+    const { expandedPath, hardBlocked, broadWarning } = resolveRegistrationGuard(config, kgPath);
+
+    if (hardBlocked) {
+      console.error(
+        `Error: refusing to register a knowledge graph at ${expandedPath} — this is your home directory or the filesystem root. Registering a KG this broad would make it resolve as "the KG for" nearly every directory on this machine. Choose a more specific project path.`
+      );
+      process.exit(1);
+    }
+
+    if (broadWarning) {
+      console.log("");
+      console.log(
+        `  Warning: ${expandedPath} is an ancestor of ${broadWarning.isAncestorOfCount} already-registered graph(s) (${broadWarning.ancestorOfNames.join(", ")}).`
+      );
+      const confirm = await ask(rl, "  Continue anyway? [yes/no]: ");
+      if (confirm.trim().toLowerCase() !== "yes") {
+        console.log("  Registration cancelled.");
+        process.exit(1);
+      }
+    }
 
     console.log("");
     console.log("  Creating knowledge graph...");
 
-    // 5. Create directory structure
-    const dirs = [
-      "knowledge",
-      "lessons-learned",
-      "decisions",
-      "sessions",
-      "chat-history",
-    ];
-    for (const dir of dirs) {
-      fs.mkdirSync(path.join(expandedPath, dir), { recursive: true });
-    }
-
-    // Create category subdirectories
-    for (const cat of categories) {
-      fs.mkdirSync(path.join(expandedPath, "lessons-learned", cat.name), {
-        recursive: true,
-      });
-    }
-
-    // 6. Copy templates from plugin
-    const pluginRoot = getPluginRoot();
-    const templateSrc = path.join(pluginRoot, "core", "default-templates");
-
-    let templatesCopied = 0;
-    if (fs.existsSync(templateSrc)) {
-      // Knowledge templates
-      const knowledgeTemplates = [
-        "patterns.md",
-        "gotchas.md",
-        "concepts.md",
-        "architecture.md",
-        "workflows.md",
-        "index.md",
-      ];
-      for (const t of knowledgeTemplates) {
-        const src = path.join(templateSrc, "knowledge", t);
-        const dest = path.join(expandedPath, "knowledge", t);
-        if (fs.existsSync(src) && !fs.existsSync(dest)) {
-          fs.copyFileSync(src, dest);
-          templatesCopied++;
-        }
-      }
-
-      // Lesson templates
-      for (const t of ["README.md", "lesson-template.md"]) {
-        const src = path.join(templateSrc, "lessons-learned", t);
-        const dest = path.join(expandedPath, "lessons-learned", t);
-        if (fs.existsSync(src) && !fs.existsSync(dest)) {
-          fs.copyFileSync(src, dest);
-          templatesCopied++;
-        }
-      }
-
-      // ADR templates
-      for (const t of ["README.md", "ADR-template.md"]) {
-        const src = path.join(templateSrc, "decisions", t);
-        const dest = path.join(expandedPath, "decisions", t);
-        if (fs.existsSync(src) && !fs.existsSync(dest)) {
-          fs.copyFileSync(src, dest);
-          templatesCopied++;
-        }
-      }
-
-      // Session template
-      const sessSrc = path.join(
-        templateSrc,
-        "sessions",
-        "session-template.md"
-      );
-      const sessDest = path.join(expandedPath, "sessions", "session-template.md");
-      if (fs.existsSync(sessSrc) && !fs.existsSync(sessDest)) {
-        fs.copyFileSync(sessSrc, sessDest);
-        templatesCopied++;
-      }
-    }
+    // 5/6. Create directory structure + copy default templates (shared with
+    // kg_config_init, ENH-051)
+    const templatesCopied = scaffoldGraphDirectory(expandedPath, categories);
 
     // 7. Write config
     const now = new Date().toISOString();
+    const newGraphId = mintGraphId();
+
+    // Precise pre-check instead of try/catch around writeGraphIdMarker (Opus
+    // review nit): a bare catch there would also swallow genuine I/O errors
+    // and mislabel them as a marker conflict.
+    const existingMarkerId = readGraphIdMarker(expandedPath);
+    if (existingMarkerId && existingMarkerId !== newGraphId) {
+      console.error(
+        `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, remove or rename the existing .kmgraph-id marker file manually if you're certain this is intentional.`
+      );
+      process.exit(1);
+    }
+    writeGraphIdMarker(expandedPath, newGraphId);
     const graphConfig: GraphConfig = {
       name,
       path: kgPath,
       type: kgType,
       categories,
       createdAt: now,
-      lastUsed: now,
+      status: "pending",
+      statusChangedAt: now,
+      graphId: newGraphId,
+      // lastUsed removed -- optional on the type since Task 1.1, no writer needed
     };
 
     config.graphs[name] = graphConfig;
-    config.active = name;
+    // config.active = name; removed -- resolution is now context-derived (Task 1.5)
     writeConfig(config);
 
     // 8. Print summary
@@ -335,6 +300,52 @@ function printConfig(platform: string): void {
   console.log("");
 }
 
+// ── Resolve Subcommand ───────────────────────────────────────────────
+
+// issue-41 (Phase 9 scripts/ cleanup): the SessionStart/Stop/PostToolUse
+// hook scripts in scripts/ are plain bash with no MCP client and no LLM in
+// the loop, so they can't invoke the kg_resolve *tool* the way markdown
+// commands/agents do. This subcommand exposes the same resolveKgPath()
+// logic as a one-shot CLI call those scripts can shell out to against the
+// already-built dist/cli.js, instead of re-deriving "which KG is this" by
+// grepping the retired `.active` pointer out of kg-config.json.
+//
+// Deliberately project-scope only (no `--scope user`): the kg_resolve MCP
+// *tool* gates scope:"user" behind confirmPersonalScopeAccess (resolve.ts) --
+// the same per-repo confirmation invariant kg_check_sensitive/kg_search/
+// kg_capture all enforce before a call may touch the personal graph. This
+// CLI subcommand has no equivalent interactive confirmation channel, and
+// none of the scripts/ callers need personal-scope resolution (all three
+// resolve the project KG for the current directory). Exposing an ungated
+// `--scope user` here would let anything with Bash access silently bypass
+// that confirmation gate and disclose the personal graph's path from a
+// repo that was never confirmed for personal-scope access -- so the option
+// is left out rather than gated, since nothing here needs it.
+function printResolveJson(value: unknown): void {
+  console.log(JSON.stringify(value));
+}
+
+function runResolve(args: string[]): void {
+  let cwd = process.cwd();
+
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === "--cwd" && args[i + 1]) {
+      cwd = args[i + 1];
+      i++;
+    }
+  }
+
+  const config = readConfig();
+  const resolved = resolveKgPath(config, {}, cwd);
+
+  if ("error" in resolved) {
+    printResolveJson({ error: resolved.error });
+    process.exit(1);
+  }
+
+  printResolveJson(resolved);
+}
+
 // ── Usage ────────────────────────────────────────────────────────────
 
 function printUsage(): void {
@@ -348,6 +359,12 @@ function printUsage(): void {
   );
   console.log(
     "    node dist/cli.js config <ide> Print MCP config for an IDE"
+  );
+  console.log(
+    "    node dist/cli.js resolve [--cwd <path>]"
+  );
+  console.log(
+    "                                   Print the cwd-resolved KG as JSON ({name, path})"
   );
   console.log("");
   console.log("  Supported IDEs:");
@@ -369,27 +386,18 @@ async function main(): Promise<void> {
     const { McpServer } = await import(
       "@modelcontextprotocol/sdk/server/mcp.js"
     );
-    const { registerConfigTools } = await import("./tools/config.js");
-    const { registerSearchTool } = await import("./tools/search.js");
-    const { registerScaffoldTool } = await import("./tools/scaffold.js");
-    const { registerSanitizationTool } = await import(
-      "./tools/sanitization.js"
-    );
-    const { registerConfigResource, registerTemplatesResource } = await import(
-      "./resources/index.js"
-    );
+    const { registerCliMcpTools } = await import("./mcp-bootstrap.js");
 
     const server = new McpServer({
       name: "knowledge-graph",
       version: SERVER_VERSION,
     });
 
-    registerConfigTools(server);
-    registerSearchTool(server);
-    registerScaffoldTool(server);
-    registerSanitizationTool(server);
-    registerConfigResource(server);
-    registerTemplatesResource(server);
+    // One session each, shared across every tool registered below -- see
+    // registerCliMcpTools' comment for why a per-registrar instance breaks
+    // spec §11.
+    const { PersonalScopeSession, CrossKgSearchSession } = await import("./resolution.js");
+    await registerCliMcpTools(server, new PersonalScopeSession(), new CrossKgSearchSession());
 
     const transport = new StdioServerTransport();
     await server.connect(transport);
@@ -413,6 +421,10 @@ async function main(): Promise<void> {
       printConfig(platform);
       break;
     }
+
+    case "resolve":
+      runResolve(args.slice(1));
+      break;
 
     case "--help":
     case "-h":

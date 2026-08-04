@@ -163,7 +163,7 @@ If hard limit exceeded:
 - [Token-Based Size Limits Pattern](../knowledge/patterns.md#token-based-size-limits) — Reusable pattern for other file size management
 
 **Lessons Learned:**
-- [Line vs Token Metrics Must Be Applied Consistently](../lessons-learned/debugging/Lessons_Learned_Line_vs_Token_Metrics_Confusion.md) — Debugging insights
+- *(2026-08-04 correction: this previously linked to `Lessons_Learned_Line_vs_Token_Metrics_Confusion.md`, a lesson a KG-index audit found was never actually captured — no such file exists or ever touched git history. Link removed; no replacement lesson exists for this topic.)*
 
 ---
 

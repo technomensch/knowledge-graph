@@ -62,7 +62,6 @@ Functional tests for every MCP tool using isolated temp config (`KG_CONFIG_PATH`
 |---------|-------|
 | `kg_config_init` | Creates dirs, writes config, sets active, rejects duplicates, custom categories |
 | `kg_config_list` | Shows graphs, active marker, empty config message |
-| `kg_config_switch` | Switches active, updates config, rejects unknown name |
 | `kg_config_add_category` | Creates dir, rejects duplicates, fails with no active KG |
 | `kg_search` | Finds content, no-results message, detailed format, paths format, no active KG |
 | `kg_scaffold` | Creates file, substitutes variables, fills date, rejects invalid template, rejects existing file |
@@ -201,7 +200,7 @@ Tests `core/scripts/run_extraction.py` with a simulated Claude session fixture.
 |------|---------|
 | `fixtures/valid-config.json` | Well-formed `kg-config.json` with `__TEST_KG_PATH__` placeholder |
 | `fixtures/corrupt-config.json` | Intentionally invalid JSON for crash/error testing |
-| `fixtures/empty-config.json` | Valid JSON with `"active": null` and empty `"graphs"` |
+| `fixtures/empty-config.json` | Valid JSON with an empty `"graphs"` object |
 | `fixtures/sample-lesson.md` | Full YAML frontmatter lesson file for search tests |
 | `fixtures/sample-adr.md` | ADR file with title/status/context/decision structure |
 | `fixtures/sample-claude-session.jsonl` | 4-line Claude session log for extraction tests |

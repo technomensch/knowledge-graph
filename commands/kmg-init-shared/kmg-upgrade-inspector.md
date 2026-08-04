@@ -9,7 +9,6 @@
 | `{kg_name}` | Name key used in kg-config.json |
 | `{KG_TYPE}` | Type string: "project-local" or "personal" |
 | `{categories}` | Array of category names configured for this KG |
-| `{preserve_active}` | Boolean — if true, do not change the active KG after upgrade |
 
 > **Caller note:** All `{PARAM}` placeholders in this module must be substituted by the caller before any bash block is executed. There is no runtime substitution — any unsubstituted `{PARAM}` will be passed literally to shell commands, producing silent errors (e.g., `grep` will look for a file literally named `{KG_PATH}/rules.md`).
 
@@ -17,9 +16,9 @@
 
 ### Step 0: Verify active graph, then call kg_upgrade inspect
 
-**Step 0a — Verify active graph matches wizard target.**
+**Step 0a — Ensure `kg_upgrade` targets `{kg_name}`.**
 
-`kg_upgrade` always operates on the config's active graph. Before calling it, confirm `{kg_name}` equals the active graph:
+`kg_upgrade` no longer operates on a config-wide "active" graph — it resolves `scope: "project"` (default) from the caller's cwd, or `scope: "user"` for the personal knowledge graph. There is nothing to switch beforehand:
 
 ```bash
 CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
@@ -28,10 +27,10 @@ mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
 if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
   cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
 fi
-ACTIVE=$(jq -r '.active' "$CONFIG_PATH" 2>/dev/null)
+KG_TYPE=$(jq -r ".graphs[\"{kg_name}\"].type" "$CONFIG_PATH" 2>/dev/null)
 ```
 
-If `$ACTIVE` ≠ `{kg_name}`: temporarily switch active to `{kg_name}` using `kg_config_switch` tool before calling `kg_upgrade`, then after the upgrade call: if `{preserve_active}` is `true`, restore `$ACTIVE` (leave the original active graph unchanged); if `{preserve_active}` is `false`, leave `{kg_name}` active (the wizard's normal behavior). If you cannot switch (tool unavailable), skip to bash detection without setting any per-category flags.
+If `$KG_TYPE` is `"personal"`, call `kg_upgrade` with `scope: "user"`. Otherwise call it with cwd inside `{kg_name}`'s registered project directory (its default, `scope: "project"`, resolves from cwd). No config mutation or restore step is needed either way.
 
 **Step 0b — Call kg_upgrade (inspect mode, no args).**
 
@@ -52,12 +51,13 @@ The tool returns:
 
 **Parse `upgrades[]`:**
 - For each entry: add its `description` to the wizard's pending items display.
-- For each entry with `category` in `["directories", "config", "templates", "starter-relocation", "stray-knowledge-dir"]`: add the deduplicated `category` value to `_mcp_apply[]` (dedup: only add if not already present) and set its per-category tracking flag in your context:
+- For each entry with `category` in `["directories", "config", "templates", "starter-relocation", "stray-knowledge-dir", "status-schema"]`: add the deduplicated `category` value to `_mcp_apply[]` (dedup: only add if not already present) and set its per-category tracking flag in your context:
   - `"directories"` → `_mcp_covered_directories=true`
   - `"config"` → `_mcp_covered_config=true`
   - `"templates"` → `_mcp_covered_templates=true`
   - `"starter-relocation"` → `_mcp_covered_starter_relocation=true`
   - `"stray-knowledge-dir"` → `_mcp_covered_stray_knowledge_dir=true`
+  - `"status-schema"` → `_mcp_covered_status_schema=true` (ADR-067 Task 8.1: reconciles the legacy `.active`/schema-less registry shape and removes the leftover legacy config file; see the confirmMigration note under "Apply MCP-covered items first" below)
 - If `category` is `"version-update"`: display the description as an informational item but do NOT add to `_mcp_apply[]` and do NOT set a tracking flag — it is inspect-only and cannot be applied via `kg_upgrade apply`.
 
 These per-category flags are **LLM-tracked state variables** — they are tracked in your context across bash block invocations in this module, not as shell variables. Each guarded bash block below begins with a prose instruction ("Only run if `_mcp_covered_X` is not set") that is the actual gate.
@@ -268,7 +268,6 @@ For each item in `upgrades[]`, show a preview entry:
 - **Config fields (check b):** show the current JSON value (missing/null) and the default that would be written, e.g.:
   ```
   [preview] kg-config.json — graphs.{kg_name}.platforms: (missing) → []
-  [preview] kg-config.json — graphs.{kg_name}.autoSwitch: (missing) → false
   ```
 
 - **Templates (check c):** for each template that would be updated, show a line-by-line unified diff between the installed version and the plugin version. For templates that are new (not yet installed), show the full file content. Use plain text — no ANSI color codes required:
@@ -327,12 +326,15 @@ If the user picks option 3 (skip), exit with no changes.
 
 **Apply MCP-covered items first** (when `_mcp_apply[]` is non-empty):
 
-Call `kg_upgrade apply: [<_mcp_apply contents>]`.
+Call `kg_upgrade apply: [<_mcp_apply contents>]`. **If `_mcp_apply[]` contains `"status-schema"`, the same call must also pass `confirmMigration: true`** — the wizard's own consent step (the item's description was already shown in the pending-items list above, and the user chose "Apply all" or explicitly approved this item under "choose individually") satisfies `kg_upgrade`'s consent gate for this migration; without `confirmMigration: true` the tool call will fail with `KMG_INPUT_REQUIRED` even though the user already agreed.
 
-`_mcp_apply[]` may only contain values from the valid apply enum: `"directories"`, `"config"`, `"templates"`, `"starter-relocation"`, `"stray-knowledge-dir"`. Never include `"version-update"` or `"platform-split"` — these will cause Zod validation to reject the entire call.
+`_mcp_apply[]` may only contain values from the valid apply enum: `"directories"`, `"config"`, `"templates"`, `"starter-relocation"`, `"stray-knowledge-dir"`, `"status-schema"`. Never include `"version-update"` or `"platform-split"` — these will cause Zod validation to reject the entire call.
 
 Example: if Step 0 found `directories` and `templates` pending:
 `kg_upgrade apply: ["directories", "templates"]`
+
+Example: if Step 0 found `status-schema` pending (alone or combined with other MCP-covered categories):
+`kg_upgrade apply: ["status-schema"], confirmMigration: true`
 
 Then continue to apply wizard-only items (d, e, f, g, h, i, j, k) via their existing bash logic. (Sections a, b, c, l, m are each guarded by their per-category flag — no double-apply.)
 
@@ -379,14 +381,15 @@ if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
 fi
 # Fields that may be missing from older installs:
 # - platforms: [] (added in v0.2.0)
-# - autoSwitch: false (added in v0.2.0)
 # - notification: { webhookUrl: "" } (added in v0.2.0)
 # - type: "project-local" (added in v0.2.2 — required for multi-KG support)
+# Note: autoSwitch is retired (issue-41 / ADR-067 Phase 9) — resolution is
+# cwd-derived now, there is nothing to "switch." Do not write this field to
+# new or upgraded config entries.
 
 if jq '
   .graphs["{kg_name}"] |=
     if .platforms == null then .platforms = [] else . end |
-    if .autoSwitch == null then .autoSwitch = false else . end |
     if .notification == null then .notification = { "webhookUrl": "" } else . end |
     if .type == null then .type = "{KG_TYPE}" else . end
 ' "$CONFIG_PATH" > "${CONFIG_PATH}.tmp" && [ -s "${CONFIG_PATH}.tmp" ] && jq empty "${CONFIG_PATH}.tmp" 2>/dev/null; then

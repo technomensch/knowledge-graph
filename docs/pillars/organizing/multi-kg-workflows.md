@@ -17,23 +17,23 @@ KMGraph supports multiple knowledge graphs — project-local, personal, and glob
 | Global-topic (named, non-project-tied) | `~/.kmgraph/knowledge-graphs/<name>/` | Configured per instance — git strategy is per-KG |
 | `custom` | Any path | Configured per instance |
 
-## View and switch
+## View and target
 
 ```bash
 /kmgraph:kmg-list
 ```
 
-Shows all configured KGs and which is currently active.
+Shows all configured KGs.
 
-```bash
-/kmgraph:kmg-switch personal
-/kmgraph:kmg-switch project-local
-/kmgraph:kmg-switch ai-research
-```
+There is no switch step — each capture/recall command resolves its target KG from the
+current working directory automatically. Running a command from inside a project's
+directory targets that project's `project-local` KG; `--user`/`scope: "user"` reaches
+the personal KG from any directory; a named KG not tied to any directory (like a
+global-topic KG) is reached with `--targetKg <name>` (see "Capture without switching"
+below).
 
-All capture and recall commands operate on the active KG.
-
-Run `/kmgraph:kmg-status` to confirm the active KG and entry count, or `/kmgraph:kmg-list` to see all registered KGs.
+Run `/kmgraph:kmg-status` to confirm the KG resolved for the current directory and its
+entry count, or `/kmgraph:kmg-list` to see all registered KGs.
 
 ## Set up a personal KG
 
@@ -59,7 +59,9 @@ For a named KG not tied to any single project (e.g. cross-project research notes
 }
 ```
 
-Then switch to it: `/kmgraph:kmg-switch ai-research`
+A global-topic KG isn't tied to any directory, so it's not resolved from cwd — reach it
+explicitly with `--targetKg ai-research` on capture/recall commands (see "Capture without
+switching" below).
 
 `gitStrategy` controls what happens to entries after capture:
 

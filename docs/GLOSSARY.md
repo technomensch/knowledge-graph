@@ -4,16 +4,18 @@ title: Glossary
 
 This glossary provides plain-English definitions for key terms and concepts used throughout the Knowledge Management Graph documentation.
 
-## Active Knowledge Graph (Active KG)
+## Target Knowledge Graph
 
 > 👍 **What is it?**
 >
-> The currently selected knowledge graph when multiple graphs exist in the system configuration.
-**Why it matters**: Users working across multiple projects may maintain separate knowledge graphs for each one (e.g., one for a web app, another for an infrastructure project). Commands operate on whichever graph is currently active.
+> The knowledge graph a command operates on, resolved from the current working
+> directory — not a manually selected "active" graph.
 
-**How to manage**: The `/kmgraph:kmg-list` command displays all configured graphs. The `/kmgraph:kmg-switch` command changes the active selection.
+**Why it matters**: Contributors working across multiple projects may maintain separate knowledge graphs for each one (e.g., one for a web app, another for an infrastructure project). Each command resolves its target automatically from the directory it runs in — no switching step, and no shared selection that could drift out of sync between projects or sessions.
 
-**Plain English**: The "currently open notebook" when multiple notebooks exist.
+**How to manage**: The `/kmgraph:kmg-list` command displays all configured graphs. There is no switch command — running a command from inside a project's directory targets that project's graph directly; `--user` (where supported) targets the personal graph instead.
+
+**Plain English**: The graph "here" — determined by the current location, not by a shared pointer someone last moved.
 
 ---
 ## ADR (Architecture Decision Record)

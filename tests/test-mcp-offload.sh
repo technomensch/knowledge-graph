@@ -52,16 +52,21 @@ mcp_tool_call() {
   local tool_name="$1"
   local _default_args="{}"
   local args_json="${2:-$_default_args}"
+  local sandbox_cwd="${3:-}"
+  local meta=""
+  if [ -n "$sandbox_cwd" ]; then
+    meta=",\"_meta\":{\"sandboxCwd\":\"file://${sandbox_cwd}\"}"
+  fi
   {
     echo "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"test\",\"version\":\"1.0\"}}}"
-    echo "{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"${tool_name}\",\"arguments\":${args_json}}}"
+    echo "{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"${tool_name}\",\"arguments\":${args_json}${meta}}}"
     sleep 0.3
   } | KG_CONFIG_PATH="$TEST_CONFIG" CLAUDE_PLUGIN_ROOT="$REPO_ROOT" node "$MCP_SERVER" 2>/dev/null || true
 }
 
 # Start with empty config
 cat > "$TEST_CONFIG" << 'EOF'
-{"version":"1.0.0","active":null,"graphs":{},"sanitization":{"enabled":false,"patterns":[],"action":"warn"}}
+{"version":"1.0.0","graphs":{},"sanitization":{"enabled":false,"patterns":[],"action":"warn"}}
 EOF
 
 # ── Tests ────────────────────────────────────────────────────────────────────
@@ -92,7 +97,7 @@ fi
 mkdir -p "$REMOTE_KG_PATH/lessons-learned/architecture"
 cp "$FIXTURES_DIR/sample-lesson.md" "$REMOTE_KG_PATH/lessons-learned/architecture/offloaded-lesson.md"
 
-RESULT=$(mcp_tool_call "kg_search" "{\"query\":\"MCP Server\",\"format\":\"summary\"}")
+RESULT=$(mcp_tool_call "kg_search" "{\"query\":\"MCP Server\",\"format\":\"summary\"}" "$REMOTE_KG_PATH")
 if echo "$RESULT" | grep -q -i "match\|found"; then
   pass "Search finds content in offloaded KG"
 else
@@ -116,27 +121,30 @@ else
   fail "Sanitization should work on offloaded path"
 fi
 
-# Test 6: Switch between local and remote KGs — search returns results only from active
+# Test 6: cwd-resolution isolation — search from one KG's directory never
+# returns another KG's content (issue-41: this used to switch a shared
+# "active" pointer and check isolation across the switch; resolution is now
+# cwd-derived per call, so isolation is verified by pointing sandboxCwd at
+# each KG in turn instead)
 LOCAL_KG_PATH="$LOCAL_DIR/local-kg"
 mcp_tool_call "kg_config_init" "{\"name\":\"local\",\"kgPath\":\"$LOCAL_KG_PATH\"}" > /dev/null
 mkdir -p "$LOCAL_KG_PATH/knowledge"
 echo "# LOCAL ONLY CONTENT: unique-local-marker-xyz" > "$LOCAL_KG_PATH/knowledge/local.md"
 
-# Active is now "local" — search for remote content should return nothing
-RESULT=$(mcp_tool_call "kg_search" "{\"query\":\"offloaded-lesson\",\"format\":\"summary\"}")
+# From the local KG's directory, searching for remote-only content should return nothing
+RESULT=$(mcp_tool_call "kg_search" "{\"query\":\"offloaded-lesson\",\"format\":\"summary\"}" "$LOCAL_KG_PATH")
 if echo "$RESULT" | grep -q "No results"; then
-  pass "Search on local KG does not return offloaded KG content"
+  pass "Search from local KG does not return offloaded KG content"
 else
-  fail "Active KG isolation: search should only search active KG"
+  fail "cwd-resolution isolation: search should only search the KG resolved from cwd"
 fi
 
-# Switch to offloaded — now remote content should be found
-mcp_tool_call "kg_config_switch" "{\"name\":\"offloaded\"}" > /dev/null
-RESULT=$(mcp_tool_call "kg_search" "{\"query\":\"MCP Server\",\"format\":\"summary\"}")
+# From the remote KG's directory, the same query should find remote content
+RESULT=$(mcp_tool_call "kg_search" "{\"query\":\"MCP Server\",\"format\":\"summary\"}" "$REMOTE_KG_PATH")
 if echo "$RESULT" | grep -q -i "match\|found"; then
-  pass "Switch to offloaded KG — search returns remote content"
+  pass "Search from offloaded KG's directory returns remote content"
 else
-  fail "After switch, search should find offloaded KG content"
+  fail "Search from offloaded KG's directory should find offloaded KG content"
 fi
 
 echo ""

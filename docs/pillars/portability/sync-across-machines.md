@@ -35,9 +35,10 @@ Then register the KG with KMGraph:
 
 ```bash
 /kmgraph:kmg-init-personal-kg
-# or
-/kmgraph:kmg-switch personal
 ```
+
+Once registered, the personal KG is always reachable via `--user` (or `scope: "user"` on
+supporting MCP tools) — no separate switch step.
 
 **Ongoing sync:**
 

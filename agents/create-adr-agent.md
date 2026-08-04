@@ -15,22 +15,21 @@ Creates a new Architecture Decision Record (ADR) through an interactive wizard. 
 
 | Flag | Behavior |
 |---|---|
-| `--user` | Write to `~/.kmgraph/decisions/` — bypass `kg_capture`, write directly via Write tool |
-| `--project` | Write to current repo's project KG decisions/ — switch temporarily if needed, restore after |
+| `--user` | Write to the personal KG's decisions/ — via `kg_capture` with `scope: "user"` (gated by `confirmPersonalScopeAccess`) |
+| `--project` | Write to current repo's project KG decisions/ — no switch/restore needed |
 | `--named=<kg>` | Write to named KG decisions/ — no switch |
 | `--active` | Write to active KG decisions/ (default, current behavior) |
 
-These flags are set by the `create-adr` command dispatcher via `gov-capture-routing` skill. This agent never performs NL detection — flags only.
+These flags are set by the `create-adr` command dispatcher directly (see that command's Level Routing Detection). This agent never performs NL detection — flags only.
 
 ### Path resolution
 
 1. Read flag (default: `--active`)
 2. Resolve `$target_path`:
-   - `--user` → `~/.kmgraph/decisions/`
+   - `--user` → resolved internally by `kg_capture` when `scope: "user"` is passed; no manual path computation needed here, but still show the resolved path to the user per "Surface resolved target" below (the `kg_capture` response includes it).
    - `--project` → read `~/.kmgraph/kg-config.json`, find graph matching current working directory → `{graph.path}/decisions/`
    - `--named=<kg>` → read `~/.kmgraph/kg-config.json`, find graph by name → `{graph.path}/decisions/`
    - `--active` → `{active_kg_path}/decisions/`
-3. Store `$restore_kg` = current active KG (only when `--project` triggers a switch)
 
 ### Surface resolved target
 
@@ -39,36 +38,28 @@ In the ADR draft, always show before any write:
 
 ### Write behavior
 
-- `--user`: write directly via Write tool. Skip `kg_capture` entirely.
-- `--project` / `--named` / `--active`: use `kg_capture` to resolved path. If `kg_capture` MCP unavailable: surface error and stop.
+- `--user`: pass `scope: "user"` to `kg_capture` — same call path as every other flag, gated by `confirmPersonalScopeAccess`. No separate Write-tool path.
+- `--project` / `--named` / `--active`: use `kg_capture` to resolved path (via `targetKg` for `--project`/`--named`, cwd-resolved for `--active`). If `kg_capture` MCP unavailable: surface error and stop — **for every flag, including `--user`.** Do not fall back to a direct Write-tool write for `scope: "user"` specifically: a personal-scope write with `kg_capture` unreachable must fail loudly, not silently retry through an ungated path against the wrong (project-local) directory.
 
-### Switch/restore for `--project`
+### Targeting for `--project`
 
-1. Record `$restore_kg` = current active KG
-2. Run `/kmgraph:kmg-switch {project_kg}`
-3. After capture: run `/kmgraph:kmg-switch {$restore_kg}`
+Pass `targetKg: {project_kg}` directly to `kg_capture` — knowledge graphs resolve automatically from context rather than a mutable "active" pointer, so no switch/restore step is needed before or after the write.
 
-### Interaction with Phase 0 CWD Guard
+### Interaction with Phase 0 Graph Resolution
 
-When `--user`, `--project`, or `--named` is explicitly set, skip the Phase 0 mismatch warning — routing intent is already explicit. Only show the CWD mismatch warning when `--active` (default) is used.
+Phase 0 always resolves the graph via `kg_resolve` regardless of which flag is set — there is no separate mismatch warning to skip. Explicit `--user`/`--project`/`--named` routing still determines the write target (see Path resolution above); Phase 0's resolution supplies `$active_kg_path`/`$active_kg_name` for numbering and other cwd-derived reads.
 
 ---
 
-## Phase 0: Active KG / CWD Guard
+## Phase 0: Resolve Target Graph
 
-Before any work, verify the active knowledge graph matches the current working directory.
+```
+kg_resolve
+```
 
-1. Read `~/.kmgraph/kg-config.json` — get the active KG name and its `path`.
-2. Derive the project root from the KG path: if the path ends in `/docs`, the parent directory is the project root; otherwise the path itself is the root.
-3. Compare the derived root against the current working directory (use `pwd`).
+There is no separate "active" pointer left to disagree with your current working directory (ADR-067 retires the old CWD-mismatch guard, since `kg_resolve` derives the graph from cwd directly — nothing to mismatch against). If `kg_resolve` errors (no graph registered for this directory), stop and tell the user to run `/kmgraph:kmg-init` first. Otherwise, store the returned `path` as `$active_kg_path` and `name` as `$active_kg_name` for use in later phases.
 
-**If mismatch:**
-
-> "Hold on — the active knowledge graph is for **[active KG name]**. Do you want to switch to it, or create the ADR there anyway?"
-
-Block until the user responds. Do not proceed until resolved.
-
-**If match:** Continue to Phase 1.
+Continue to Phase 0.5.
 
 ---
 
@@ -306,7 +297,9 @@ Call `kg_capture` MCP tool:
 }
 ```
 
-**If `kg_capture` is unavailable or fails:** Fall back to direct file write using the `Write` tool.
+**If `kg_capture` is unavailable or fails:**
+- `--user` (`scope: "user"`): do NOT fall back to a direct Write-tool write. Surface the error and stop — a personal-scope write must never bypass `confirmPersonalScopeAccess`, and a filesystem fallback here would both skip that gate and write to the wrong (project-local) directory. Tell the user `kg_capture` is unreachable and the personal-KG write did not happen.
+- `--project` / `--named` / `--active`: fall back to direct file write using the `Write` tool, to `{target_path}` as resolved above (not the personal path — this fallback is scoped to the non-personal flags only).
 
 ---
 

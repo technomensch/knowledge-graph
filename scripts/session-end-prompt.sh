@@ -2,6 +2,8 @@
 # session-end-prompt.sh - Stop hook: remind user to wrap up before ending session
 # Security: no eval, no network, all variables quoted, subshells quoted
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PLUGIN_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
 mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
 # one-time migration: seed from the legacy ~/.claude location if the new path is absent (atomic, race-safe)
@@ -21,12 +23,48 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # ─────────────────────────────────────────────────────────────
-# Session flag: avoid double-prompting within same session
-# Keyed on active KG name + date for per-project isolation.
+# Config check — require a KG that resolves from the current directory
 # ─────────────────────────────────────────────────────────────
 
-ACTIVE_KG="$(grep -o '"active"[[:space:]]*:[[:space:]]*"[^"]*"' "$CONFIG_PATH" 2>/dev/null | sed 's/.*"\([^"]*\)".*/\1/')"
-FLAG_PATH="/tmp/.kg-session-summarized-${ACTIVE_KG:-default}-$(date +%Y%m%d)"
+if [ ! -f "$CONFIG_PATH" ]; then
+    exit 0
+fi
+
+# issue-41 (ADR-067 Phase 9): resolution is cwd-derived via the same
+# resolveGraph() logic the kg_resolve MCP tool exposes, not a mutable
+# `.active` pointer grep'd out of kg-config.json. See hooks-master.sh for
+# the fuller rationale comment (this script mirrors the same approach).
+RESOLVED_KG=""
+KG_PATH=""
+RESOLVE_CLI="$PLUGIN_ROOT/mcp-server/dist/cli.js"
+if command -v node &> /dev/null && [ -f "$RESOLVE_CLI" ]; then
+    RESOLVE_JSON="$(node "$RESOLVE_CLI" resolve --cwd "$(pwd)" 2>/dev/null)"
+    if [ $? -eq 0 ]; then
+        RESOLVED_KG="$(node -e "
+          try {
+            const r = JSON.parse(process.argv[1]);
+            process.stdout.write(r.name || '');
+          } catch(e) {}
+        " "$RESOLVE_JSON" 2>/dev/null)"
+        KG_PATH="$(node -e "
+          try {
+            const r = JSON.parse(process.argv[1]);
+            process.stdout.write(r.path || '');
+          } catch(e) {}
+        " "$RESOLVE_JSON" 2>/dev/null)"
+    fi
+fi
+
+if [ -z "$KG_PATH" ] || [ ! -d "$KG_PATH" ]; then
+    exit 0
+fi
+
+# ─────────────────────────────────────────────────────────────
+# Session flag: avoid double-prompting within same session
+# Keyed on resolved KG name + date for per-project isolation.
+# ─────────────────────────────────────────────────────────────
+
+FLAG_PATH="/tmp/.kg-session-summarized-${RESOLVED_KG:-default}-$(date +%Y%m%d)"
 
 if [ -f "$FLAG_PATH" ]; then
     exit 0
@@ -41,30 +79,6 @@ SNAPSHOT_FLAG="/tmp/.kg-snapshot-$(date +%Y-%m-%d)"
 SNAPSHOT_TODAY=false
 if [ -f "$SNAPSHOT_FLAG" ]; then
     SNAPSHOT_TODAY=true
-fi
-
-# ─────────────────────────────────────────────────────────────
-# Config check — require active KG
-# ─────────────────────────────────────────────────────────────
-
-if [ ! -f "$CONFIG_PATH" ]; then
-    exit 0
-fi
-
-if [ -z "$ACTIVE_KG" ]; then
-    exit 0
-fi
-
-KG_PATH="$(grep -A 10 "\"$ACTIVE_KG\"" "$CONFIG_PATH" | grep '"path"' | head -1 | sed 's/.*"path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')"
-
-if [ -z "$KG_PATH" ]; then
-    exit 0
-fi
-
-KG_PATH="${KG_PATH/#\~/$HOME}"
-
-if [ ! -d "$KG_PATH" ]; then
-    exit 0
 fi
 
 # Derive project root: KG path is the docs/ dir, parent is the project root

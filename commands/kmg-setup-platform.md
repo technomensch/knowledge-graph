@@ -178,7 +178,6 @@ Final config shape for the active KG entry:
 {
   "path": "/path/to/kg/docs",
   "type": "project-local",
-  "autoSwitch": false,
   "platforms": ["gemini", "cursor"],
   "notification": { "webhookUrl": "" }
 }
@@ -202,4 +201,3 @@ Final config shape for the active KG entry:
 
 - `/kmgraph:kmg-init` — Initialize a knowledge graph (includes platform detection at setup time)
 - `/kmgraph:kmg-status` — Check current knowledge graph status
-- `/kmgraph:kmg-switch` — Change the active knowledge graph

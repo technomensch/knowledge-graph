@@ -7,28 +7,25 @@ All bash/shell checks in this command are **implementation guidance only** — r
 
 Inspect and restore knowledge graph archives created by the knowledge-file-migrator. Supports two subcommands: `list` and `rollback`.
 
-## Guard: Active Knowledge Graph Required
+## Guard: Target Knowledge Graph Must Resolve
 
-Before any subcommand executes, verify that an active knowledge graph is configured:
+Before any subcommand executes, resolve the target graph from the current working
+directory (issue-41: this guard previously read `.active` and `.graphs[$name].path`
+directly — a pre-ADR-067 pattern; at the time this was written, `.active` was still the
+resolution model, but ADR-067 has since removed the field from the config schema
+entirely, so this guard was silently broken — it would abort with "No active knowledge
+graph found" even against a correctly-registered graph):
+
+```
+kg_resolve
+```
+
+Take the returned `name` as `$ACTIVE_KG` and `path` as `$KG_PATH` for every subcommand
+below — both variable names are kept as-is so the rest of this file (list/rollback/purge)
+needs no other changes. If `kg_resolve` errors (no graph registered for this directory):
 
 ```bash
-KG_CONFIG="$HOME/.kmgraph/kg-config.json"
-
-if [ ! -f "$KG_CONFIG" ]; then
-  abort "No active knowledge graph found. Run \`/kmgraph:kmg-init\` first."
-fi
-
-ACTIVE_KG=$(jq -r '.active // empty' "$KG_CONFIG")
-if [ -z "$ACTIVE_KG" ]; then
-  abort "No active knowledge graph found. Run \`/kmgraph:kmg-init\` first."
-fi
-
-KG_PATH=$(jq -r --arg name "$ACTIVE_KG" '.graphs[$name].path // empty' "$KG_CONFIG")
-KG_TYPE=$(jq -r --arg name "$ACTIVE_KG" '.graphs[$name].type // empty' "$KG_CONFIG")
-
-if [ -z "$KG_PATH" ] || [ ! -d "$KG_PATH" ]; then
-  abort "No active knowledge graph found. Run \`/kmgraph:kmg-init\` first."
-fi
+abort "No knowledge graph resolved from your current directory. Run \`/kmgraph:kmg-init\` first."
 ```
 
 ---

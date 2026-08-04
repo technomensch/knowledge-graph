@@ -11,7 +11,6 @@ jest.mock("../src/utils.js", () => {
   return {
     ...actual,
     readConfig: jest.fn(),
-    getActiveGraphPath: jest.fn(),
     getProjectRoot: (kgPath: string) => {
       if ((kgPath as string).endsWith("/docs")) {
         return path.dirname(kgPath as string);
@@ -41,7 +40,7 @@ import {
   checkExistingFile,
 } from "../src/tools/capture.js";
 import type { CaptureRequest, CaptureResponse, CaptureError } from "../src/tools/capture.js";
-import { readConfig, getActiveGraphPath } from "../src/utils.js";
+import { readConfig } from "../src/utils.js";
 import { rebuildIndex } from "../src/tools/fts5.js";
 
 // ---------------------------------------------------------------------------
@@ -49,7 +48,17 @@ import { rebuildIndex } from "../src/tools/fts5.js";
 // ---------------------------------------------------------------------------
 
 function makeTempDir(prefix: string): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), `capture-test-${prefix}-`));
+  // Nest the returned dir one level below a fresh mkdtemp wrapper (ADR-067
+  // Task 1.8) -- resolveGraph matches cwd against dirname(graph.path), so if
+  // this returned a bare mkdtemp leaf directly under the shared os.tmpdir(),
+  // every other test's "unrelated" cwd (also a direct child of the same
+  // shared tmpdir) would resolve as ancestor-or-equal too, false-passing the
+  // KG_MISMATCH tests below instead of genuinely exercising them. Nesting
+  // under a per-call-unique wrapper gives each fixture its own dirname().
+  const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), `capture-test-${prefix}-`));
+  const contentDir = path.join(wrapper, "knowledge");
+  fs.mkdirSync(contentDir);
+  return contentDir;
 }
 
 function scaffoldKg(root: string): void {
@@ -73,8 +82,22 @@ afterEach(() => {
 });
 
 function mockActiveKg(kgRoot: string): void {
-  (readConfig as jest.Mock).mockReturnValue({ active: "test-kg", graphs: {} });
-  (getActiveGraphPath as jest.Mock).mockReturnValue(kgRoot);
+  (readConfig as jest.Mock).mockReturnValue({
+    version: "1.0.0",
+    graphs: {
+      "test-kg": {
+        name: "test-kg",
+        path: kgRoot,
+        type: "project-local",
+        categories: [],
+        createdAt: new Date().toISOString(),
+        status: "active",
+        statusChangedAt: new Date().toISOString(),
+        graphId: "test-graph-id",
+      },
+    },
+    sanitization: { enabled: false, patterns: [], action: "warn" },
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -241,7 +264,9 @@ describe("kg_capture — KG_MISMATCH", () => {
     expect("error" in result).toBe(true);
     const err = result as CaptureError;
     expect(err.error).toBe("KG_MISMATCH");
-    expect(err.activeKgRoot).toBe(kgRoot);
+    // activeKgRoot is no longer populated (ADR-067 Task 1.8) -- resolution is
+    // context-derived, so there is no single "active" KG root to report once
+    // cwd matches nothing registered. cwd is still meaningful and preserved.
     expect(err.cwd).toBe(otherDir);
   });
 });
@@ -536,7 +561,7 @@ describe("resolveTargetPath", () => {
 describe("kg_capture — targetKg (multi-KG)", () => {
   function mockMultiKgConfig(projRoot: string, globalRoot: string): void {
     (readConfig as jest.Mock).mockReturnValue({
-      active: "my-project",
+      version: "1.0.0",
       graphs: {
         "my-project": {
           name: "my-project",
@@ -544,7 +569,9 @@ describe("kg_capture — targetKg (multi-KG)", () => {
           type: "project-local",
           categories: [],
           createdAt: new Date().toISOString(),
-          lastUsed: new Date().toISOString(),
+          status: "active",
+          statusChangedAt: new Date().toISOString(),
+          graphId: "test-graph-id-my-project",
         },
         "personal": {
           name: "personal",
@@ -552,11 +579,13 @@ describe("kg_capture — targetKg (multi-KG)", () => {
           type: "personal",
           categories: [],
           createdAt: new Date().toISOString(),
-          lastUsed: new Date().toISOString(),
+          status: "active",
+          statusChangedAt: new Date().toISOString(),
+          graphId: "test-graph-id-personal",
         },
       },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
     });
-    (getActiveGraphPath as jest.Mock).mockReturnValue(projRoot);
   }
 
   test("writes lesson to personal KG when targetKg='personal'", async () => {
@@ -577,7 +606,11 @@ describe("kg_capture — targetKg (multi-KG)", () => {
       metadata: { title: "Create vs Update Terminology", category: "process", tags: ["plans"] },
     };
 
-    const result = await handleCapture(request, "personal");
+    // ADR-067 Task 6.3: a write to a personal-type KG now requires
+    // confirmPersonalScopeAccess (spec §11) -- confirmPersonalScope:true is
+    // the automated-mode shortcut, since this test's default (unspecified)
+    // interaction mode resolves to "automated".
+    const result = await handleCapture(request, "personal", undefined, undefined, { confirmPersonalScope: true });
     process.cwd = origCwd;
 
     expect("error" in result).toBe(false);
@@ -612,7 +645,9 @@ describe("kg_capture — targetKg (multi-KG)", () => {
       metadata: { title: "Global Pattern", category: "patterns" },
     };
 
-    const result = await handleCapture(request, "personal");
+    // ADR-067 Task 6.3: writing to a personal-type KG now requires
+    // confirmPersonalScopeAccess (spec §11) -- see the previous test's note.
+    const result = await handleCapture(request, "personal", undefined, undefined, { confirmPersonalScope: true });
     process.cwd = origCwd;
 
     // Should succeed, not KG_MISMATCH
@@ -644,6 +679,58 @@ describe("kg_capture — targetKg (multi-KG)", () => {
     expect((result as CaptureError).message).toContain("nonexistent-kg");
   });
 
+  test("returns KMG_INPUT_REQUIRED (reason fuzzy_match) with candidate list for ambiguous/fuzzy targetKg name (automated mode)", async () => {
+    const webRoot = makeTempDir("multi-fuzzy-web");
+    const apiRoot = makeTempDir("multi-fuzzy-api");
+    tempDirs.push(webRoot, apiRoot);
+    scaffoldKg(webRoot);
+    scaffoldKg(apiRoot);
+    (readConfig as jest.Mock).mockReturnValue({
+      version: "1.0.0",
+      graphs: {
+        "kmgraph-web": {
+          name: "kmgraph-web",
+          path: webRoot,
+          type: "project-local",
+          categories: [],
+          createdAt: new Date().toISOString(),
+          status: "active",
+          statusChangedAt: new Date().toISOString(),
+          graphId: "test-graph-id-kmgraph-web",
+        },
+        "kmgraph-api": {
+          name: "kmgraph-api",
+          path: apiRoot,
+          type: "project-local",
+          categories: [],
+          createdAt: new Date().toISOString(),
+          status: "active",
+          statusChangedAt: new Date().toISOString(),
+          graphId: "test-graph-id-kmgraph-api",
+        },
+      },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    });
+
+    const origCwd = process.cwd;
+    process.cwd = () => webRoot;
+
+    const request: CaptureRequest = {
+      content: "content",
+      type: "lesson",
+      metadata: { title: "Test" },
+    };
+
+    const result = await handleCapture(request, "kmgraph", "automated");
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(true);
+    const err = result as CaptureError;
+    expect(err.error).toBe("KMG_INPUT_REQUIRED");
+    expect(err.reason).toBe("fuzzy_match");
+    expect(err.resolveWith?.accepts).toEqual(expect.arrayContaining(["kmgraph-web", "kmgraph-api"]));
+  });
+
   test("without targetKg still enforces CWD check — returns KG_MISMATCH from unrelated CWD", async () => {
     const projRoot = makeTempDir("multi-cwd-check");
     const globalRoot = makeTempDir("multi-cwd-check-g");
@@ -669,9 +756,347 @@ describe("kg_capture — targetKg (multi-KG)", () => {
   });
 });
 
+describe("kg_capture — scope param (consistency with kg_search/kg_config_add_category/kg_fts5_*/kg_upgrade)", () => {
+  function mockScopeConfig(projRoot: string, globalRoot: string): void {
+    (readConfig as jest.Mock).mockReturnValue({
+      version: "1.0.0",
+      graphs: {
+        "my-project": {
+          name: "my-project",
+          path: projRoot,
+          type: "project-local",
+          categories: [],
+          createdAt: new Date().toISOString(),
+          status: "active",
+          statusChangedAt: new Date().toISOString(),
+          graphId: "test-graph-id-my-project",
+        },
+        personal: {
+          name: "personal",
+          path: globalRoot,
+          type: "personal",
+          categories: [],
+          createdAt: new Date().toISOString(),
+          status: "active",
+          statusChangedAt: new Date().toISOString(),
+          graphId: "test-graph-id-personal",
+        },
+      },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    });
+  }
+
+  test("scope:'user' writes to the personal KG, gated by confirmPersonalScopeAccess like the other 5 tools", async () => {
+    const projRoot = makeTempDir("scope-proj");
+    const globalRoot = makeTempDir("scope-global");
+    tempDirs.push(projRoot, globalRoot);
+    scaffoldKg(projRoot);
+    scaffoldKg(globalRoot);
+    mockScopeConfig(projRoot, globalRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => projRoot; // cwd resolves to the project KG -- scope:"user" must override this
+
+    const request: CaptureRequest = {
+      content: "## Scope param test\n",
+      type: "lesson",
+      metadata: { title: "Scope Param Consistency" },
+    };
+
+    // Automated mode (default when unspecified), unconfirmed repo: same
+    // KMG_INPUT_REQUIRED gate every other scope:"user" reachable tool uses.
+    const unconfirmed = await handleCapture(request, undefined, undefined, undefined, { scope: "user" });
+    expect("error" in unconfirmed).toBe(true);
+    expect((unconfirmed as CaptureError).error).toBe("KMG_INPUT_REQUIRED");
+    expect((unconfirmed as CaptureError).reason).toBe("personal_scope_unseen_repo");
+
+    const confirmed = await handleCapture(request, undefined, undefined, undefined, {
+      scope: "user",
+      confirmPersonalScope: true,
+    });
+    process.cwd = origCwd;
+
+    expect("error" in confirmed).toBe(false);
+    const ok = confirmed as CaptureResponse;
+    expect(ok.status).toBe("created");
+    expect(ok.filePath.startsWith(globalRoot)).toBe(true);
+    expect(ok.filePath.startsWith(projRoot)).toBe(false);
+    expect(fs.existsSync(ok.filePath)).toBe(true);
+  });
+
+  test("scope:'project' (or omitted) resolves via cwd as before -- no behavior change for the default path", async () => {
+    const projRoot = makeTempDir("scope-proj-default");
+    const globalRoot = makeTempDir("scope-global-default");
+    tempDirs.push(projRoot, globalRoot);
+    scaffoldKg(projRoot);
+    scaffoldKg(globalRoot);
+    mockScopeConfig(projRoot, globalRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => projRoot;
+
+    const request: CaptureRequest = {
+      content: "## Scope default test\n",
+      type: "lesson",
+      metadata: { title: "Scope Default" },
+    };
+
+    const result = await handleCapture(request, undefined, undefined, undefined, { scope: "project" });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    expect(ok.filePath.startsWith(projRoot)).toBe(true);
+  });
+
+  test("explicit targetKg still wins over scope when both are somehow given", async () => {
+    const projRoot = makeTempDir("scope-precedence-proj");
+    const globalRoot = makeTempDir("scope-precedence-global");
+    tempDirs.push(projRoot, globalRoot);
+    scaffoldKg(projRoot);
+    scaffoldKg(globalRoot);
+    mockScopeConfig(projRoot, globalRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => globalRoot; // cwd would resolve to nothing useful here; targetKg is explicit
+
+    const request: CaptureRequest = {
+      content: "## Precedence test\n",
+      type: "lesson",
+      metadata: { title: "TargetKg Wins" },
+    };
+
+    // targetKg="my-project" explicitly given alongside scope:"user" -- targetKg wins,
+    // matching every other tool's targetKg-beats-scope precedent for explicit overrides.
+    const result = await handleCapture(request, "my-project", undefined, undefined, { scope: "user" });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    expect(ok.filePath.startsWith(projRoot)).toBe(true);
+  });
+});
+
 // ---------------------------------------------------------------------------
 // checkExistingFile
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Task 6.2: gate()-routed KG_MISMATCH outcomes (archived/fuzzy-match/
+// ambiguous-tie/merged/$HOME-or-root)
+// ---------------------------------------------------------------------------
+
+describe("kg_capture — gate()-routed resolution outcomes", () => {
+  function mockConfig(graphs: Record<string, unknown>): void {
+    (readConfig as jest.Mock).mockReturnValue({
+      version: "1.0.0",
+      graphs,
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    });
+  }
+
+  function graphEntry(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+    return {
+      name: "test-kg",
+      path: "/unused",
+      type: "project-local",
+      categories: [],
+      createdAt: new Date().toISOString(),
+      status: "active",
+      statusChangedAt: new Date().toISOString(),
+      graphId: "test-graph-id",
+      ...overrides,
+    };
+  }
+
+  test("automated mode: archived-entry capture attempt returns KMG_INPUT_REQUIRED with reason archived_entry", async () => {
+    const kgRoot = makeTempDir("archived-automated");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockConfig({
+      "archived-kg": graphEntry({ name: "archived-kg", path: kgRoot, status: "archived" }),
+    });
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    const result = await handleCapture(
+      { content: "content", type: "lesson", metadata: { title: "Test" } },
+      undefined,
+      "automated"
+    );
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(true);
+    const err = result as CaptureError;
+    expect(err.error).toBe("KMG_INPUT_REQUIRED");
+    expect(err.reason).toBe("archived_entry");
+    expect(err.resolveWith?.accepts).toEqual(expect.arrayContaining(["skip", "ignore", "restore"]));
+  });
+
+  test("interactive mode: fuzzy-match capture attempt proceeds against the gate()-answered candidate", async () => {
+    const webRoot = makeTempDir("gate-fuzzy-web");
+    const apiRoot = makeTempDir("gate-fuzzy-api");
+    tempDirs.push(webRoot, apiRoot);
+    scaffoldKg(webRoot);
+    scaffoldKg(apiRoot);
+    mockConfig({
+      "kmgraph-web": graphEntry({ name: "kmgraph-web", path: webRoot, graphId: "web-id" }),
+      "kmgraph-api": graphEntry({ name: "kmgraph-api", path: apiRoot, graphId: "api-id" }),
+    });
+
+    const interactionModule = require("../src/interaction.js") as typeof import("../src/interaction.js");
+    const gateSpy = jest.spyOn(interactionModule, "gate").mockResolvedValue({ answer: "kmgraph-web" });
+
+    const origCwd = process.cwd;
+    process.cwd = () => webRoot;
+
+    const result = await handleCapture(
+      { content: "content", type: "lesson", metadata: { title: "Test" } },
+      "kmgraph",
+      "interactive"
+    );
+    process.cwd = origCwd;
+    gateSpy.mockRestore();
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    expect(ok.status).toBe("created");
+    expect(ok.filePath.startsWith(webRoot)).toBe(true);
+  });
+
+  test("automated mode: capture from home directory with no graph/scope param returns KMG_INPUT_REQUIRED reason home_or_root_cwd and never checks ownership", async () => {
+    mockConfig({});
+
+    // Manual monkey-patch of the raw `require("fs")` module object instead of
+    // jest.spyOn: TS's `import * as fs` namespace binding wraps the raw
+    // module in a getter-only, non-configurable property, so neither
+    // jest.spyOn nor direct assignment on that binding can intercept it. The
+    // getter reads through to the raw module at access time, so patching the
+    // raw module directly (which IS configurable/writable) is observable
+    // through every `import * as fs` binding, including resolution.ts's.
+    const rawFs = require("fs") as Record<string, unknown>;
+    const originalStatSync = rawFs.statSync as typeof fs.statSync;
+    const statCalls: unknown[][] = [];
+    rawFs.statSync = (...args: Parameters<typeof fs.statSync>) => {
+      statCalls.push(args);
+      return (originalStatSync as (...a: Parameters<typeof fs.statSync>) => ReturnType<typeof fs.statSync>)(...args);
+    };
+
+    const origCwd = process.cwd;
+    process.cwd = () => os.homedir();
+
+    const result = await handleCapture(
+      { content: "content", type: "lesson", metadata: { title: "Test" } },
+      undefined,
+      "automated"
+    );
+    process.cwd = origCwd;
+    rawFs.statSync = originalStatSync;
+
+    expect("error" in result).toBe(true);
+    const err = result as CaptureError;
+    expect(err.error).toBe("KMG_INPUT_REQUIRED");
+    expect(err.reason).toBe("home_or_root_cwd");
+    expect(err.resolveWith?.param).toBe("scope");
+    // Ownership check is a fs.statSync call inside checkHomeOwnership -- it
+    // must never fire in automated mode (spec §8: "skipped entirely, not
+    // attempted"). Filter out unrelated statSync calls made elsewhere during
+    // resolution (e.g. symlink/ancestor walks).
+    expect(statCalls.some(([p]) => p === os.homedir())).toBe(false);
+  });
+
+  test("interactive mode: capture from root surfaces the home_or_root_cwd gate", async () => {
+    mockConfig({});
+
+    const interactionModule = require("../src/interaction.js") as typeof import("../src/interaction.js");
+    const gateSpy = jest.spyOn(interactionModule, "gate").mockResolvedValue(
+      require("../src/interaction.js").requireInput("home_or_root_cwd", "scope", ["personal"])
+    );
+
+    const origCwd = process.cwd;
+    const rootDir = path.parse(origCwd()).root;
+    process.cwd = () => rootDir;
+
+    const result = await handleCapture(
+      { content: "content", type: "lesson", metadata: { title: "Test" } },
+      undefined,
+      "interactive"
+    );
+    process.cwd = origCwd;
+
+    expect(gateSpy).toHaveBeenCalledWith(expect.objectContaining({ reason: "home_or_root_cwd", param: "scope" }));
+    gateSpy.mockRestore();
+
+    expect("error" in result).toBe(true);
+    const err = result as CaptureError;
+    expect(err.error).toBe("KMG_INPUT_REQUIRED");
+    expect(err.reason).toBe("home_or_root_cwd");
+  });
+
+  test("automated mode: ambiguous-tie (two registry entries at the identical resolved path) returns KMG_INPUT_REQUIRED with both names", async () => {
+    const sharedRoot = makeTempDir("ambiguous-tie");
+    tempDirs.push(sharedRoot);
+    scaffoldKg(sharedRoot);
+    mockConfig({
+      "entry-a": graphEntry({ name: "entry-a", path: path.join(sharedRoot, "knowledge"), graphId: "a-id" }),
+      "entry-b": graphEntry({ name: "entry-b", path: path.join(sharedRoot, "knowledge"), graphId: "b-id" }),
+    });
+
+    const origCwd = process.cwd;
+    process.cwd = () => sharedRoot;
+
+    const result = await handleCapture(
+      { content: "content", type: "lesson", metadata: { title: "Test" } },
+      undefined,
+      "automated"
+    );
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(true);
+    const err = result as CaptureError;
+    expect(err.error).toBe("KMG_INPUT_REQUIRED");
+    expect(err.reason).toBe("ambiguous_path_tie");
+    expect(err.resolveWith?.accepts).toEqual(expect.arrayContaining(["entry-a", "entry-b"]));
+  });
+
+  test("a mergedInto-set archived entry never offers restore and proceeds against the survivor with a merge notice", async () => {
+    const survivorRoot = makeTempDir("merged-survivor");
+    tempDirs.push(survivorRoot);
+    scaffoldKg(survivorRoot);
+    mockConfig({
+      "old-name": graphEntry({
+        name: "old-name",
+        path: "/archived/old-name",
+        status: "archived",
+        mergedInto: "new-name",
+        statusChangedAt: "2026-01-01T00:00:00.000Z",
+      }),
+      "new-name": graphEntry({ name: "new-name", path: survivorRoot, graphId: "survivor-id" }),
+    });
+
+    const interactionModule = require("../src/interaction.js") as typeof import("../src/interaction.js");
+    const gateSpy = jest.spyOn(interactionModule, "gate");
+
+    const result = await handleCapture(
+      { content: "content", type: "lesson", metadata: { title: "Test" } },
+      "old-name",
+      "automated"
+    );
+
+    // "merged" is a plain notice, never a gate/question -- gate() must not
+    // be called for this outcome, so "restore" (or any accepts list) can
+    // never surface for a merged-away entry.
+    expect(gateSpy).not.toHaveBeenCalled();
+    gateSpy.mockRestore();
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    expect(ok.status).toBe("created");
+    expect(ok.filePath.startsWith(survivorRoot)).toBe(true);
+    expect(ok.notice).toContain("'old-name' was merged into 'new-name' on 2026-01-01T00:00:00.000Z");
+  });
+});
 
 describe("checkExistingFile", () => {
   test("returns null for lesson type (only sessions checked)", () => {

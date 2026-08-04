@@ -89,10 +89,17 @@ fi
 
 ### Step 4: Update KG Entry (if exists)
 
+Resolve the target graph first (issue-41: this previously read `jq -r
+'.graphs[.active].path' ~/.kmgraph/kg-config.json`, a pre-ADR-067 pattern):
+
+```
+kg_resolve
+```
+
+Take the returned `path` as `$kg_path` below.
+
 ```bash
 # Search for KG entry referencing this lesson
-kg_path=$(jq -r '.graphs[.active].path' ~/.kmgraph/kg-config.json)
-
 kg_entry=$(grep -l "$(basename $file_path)" "$kg_path"/knowledge/*.md 2>/dev/null || true)
 
 if [ -n "$kg_entry" ]; then

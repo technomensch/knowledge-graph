@@ -31,19 +31,27 @@ Prefix (optional, e.g., "sec-"): sec-
 Git strategy (commit/ignore): ignore
 ```
 
-### Create Directories
+### Resolve the Target Graph
 
-```bash
-CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
-mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
-# one-time migration: seed from the legacy ~/.claude location if the new path is absent
-if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
-  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
-fi
-# Get active KG path from config
-kg_path=$(jq -r '.graphs[.active].path' "$CONFIG_PATH")
-mkdir -p "$kg_path/lessons-learned/$category"
 ```
+kg_resolve
+```
+
+Take the returned `path` as `$kg_path` for the remaining steps below (issue-41: this
+command previously resolved its own path via `jq -r '.graphs[.active].path'` and wrote
+categories via `jq ".graphs[.active].categories += [...]"` — both pre-ADR-067 patterns
+that no longer reflect how any graph is actually selected or written).
+
+### Add the Category
+
+```
+kg_config_add_category name="$category" prefix="$prefix" git="$git_strategy"
+```
+
+This resolves the graph the same way `kg_resolve` above did, checks for a duplicate
+category name, creates `$kg_path/lessons-learned/$category/`, and writes the category
+entry into the config — the config-write step no longer happens in this command's own
+bash at all.
 
 ### Create KG Entry File
 
@@ -52,20 +60,6 @@ if [ ! -f "$kg_path/knowledge/${category}.md" ]; then
   cp "${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/entry-template.md" \
      "$kg_path/knowledge/${category}.md"
 fi
-```
-
-### Update Config
-
-```bash
-CONFIG_PATH="${KG_CONFIG_PATH:-$HOME/.kmgraph/kg-config.json}"
-mkdir -p "$(dirname "$CONFIG_PATH")" 2>/dev/null
-# one-time migration: seed from the legacy ~/.claude location if the new path is absent
-if [ ! -f "$CONFIG_PATH" ] && [ -f "$HOME/.claude/kg-config.json" ]; then
-  cp "$HOME/.claude/kg-config.json" "$CONFIG_PATH.tmp.$$" 2>/dev/null && mv -f "$CONFIG_PATH.tmp.$$" "$CONFIG_PATH" 2>/dev/null
-fi
-jq ".graphs[.active].categories += [{\"name\": \"$category\", \"prefix\": \"$prefix\", \"git\": \"$git_strategy\"}]" \
-   "$CONFIG_PATH" > "${CONFIG_PATH}.tmp"
-mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
 ```
 
 ### Update .gitignore

@@ -249,6 +249,7 @@ done
 | **v0.6.5–v0.6.17** | No upgrade action required. Bug fixes and improvements (init wizard directory scaffolding, upgrade inspector, POSIX hook compatibility, template handling, FTS5 indexing) and chat-extraction reliability fixes (message-loss, format-drift, gemini project-scoping, rebuild safety) are automatic after plugin reload. |
 | **v0.6.18–v0.6.19** | No upgrade action required. `KG_CONFIG_PATH` hook behavior change (v0.6.18) and docs-site link fixes plus the completed `~/.kmgraph/` config-path migration across commands/agents/scripts (v0.6.19, no runtime behavior change beyond what v0.6.18 already introduced) are automatic after plugin reload. **⚠️ Advisory (v0.6.18):** if you ran `tests/test-hooks.sh` or `tests/test-stop-hook.sh` before v0.6.18 and the process was interrupted, check for unexpected `test-kg` entries with placeholder timestamps — the file to check is `~/.kmgraph/kg-config.json` if you've already upgraded past v0.6.19, or `~/.claude/kg-config.json` (legacy path) if not; the v0.6.19 migration carries stray entries forward rather than dropping them. Re-register your graphs via `/kmgraph:kmg-init` if needed. |
 | **v0.6.20** | **⚠️ Advisory if you use cowork mode or global-topic KGs.** Cowork mode is retired from new setups (not reachable through real Claude Cowork's plugin surface — no runtime removal of your existing data). Global-topic KGs relocate from `~/.claude/knowledge-graphs/<name>/` to `~/.kmgraph/knowledge-graphs/<name>/`. Run the upgrade inspector (`/kmgraph:kmg-init`, option — Verify/upgrade) to detect existing cowork or legacy global-topic content and offer a one-time archive/copy-forward; nothing is silently moved or dropped. No action needed otherwise. |
+| **v0.7.0** | **⚠️ Breaking: `.active`-based KG switching retired (ADR-067).** Graph resolution now derives from your current working directory (`resolveGraph`) instead of a global `active` pointer in `kg-config.json`; `kmg-switch` and `kg_config_switch` are gone. Run `kg_upgrade` (or `/kmgraph:kmg-init`, option — Verify/upgrade) to migrate: both the primary and any leftover legacy config are backed up to `~/.kmgraph/backups/` first, every graph with a reachable path is migrated to the new `status`/`statusChangedAt`/`graphId` schema, and the legacy `~/.claude/kg-config.json` file is removed as part of the same step (with confirmation). Graphs with an unreachable path are left unmigrated and listed under "Needs attention" rather than silently activated. See [Upgrading to v0.7.0](docs/troubleshooting/index.md#upgrading-to-v070-cwd-derived-resolution--config-schema-migration) for full detail. |
 
 After the wizard completes, your existing lessons, ADRs, sessions, and chat history are untouched.
 
@@ -369,7 +370,7 @@ Then restart Codex.
 
 ### Step 2B: MCP IDE Installation (Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Claude Desktop)
 
-This path installs the MCP server, which provides 8 tools for knowledge management: `kg_config_init`, `kg_config_list`, `kg_config_switch`, `kg_config_add_category`, `kg_search`, `kg_scaffold`, `kg_check_sensitive`, and `kg_fts5_rebuild` (build or refresh a search index for faster, relevance-ranked results). Builds a dual-DB index stored at `~/.kmgraph/index/personal.db` (personal KG) or `~/.kmgraph/index/projects/<name>.db` (project KG).
+This path installs the MCP server, which provides every `kg_*` tool for knowledge management: `kg_config_init`, `kg_config_list`, `kg_config_add_category`, `kg_resolve`, `kg_search`, `kg_scaffold`, `kg_check_sensitive`, and `kg_fts5_rebuild` (build or refresh a search index for faster, relevance-ranked results) among others. Builds a dual-DB index stored at `~/.kmgraph/index/personal.db` (personal KG) or `~/.kmgraph/index/projects/<name>.db` (project KG).
 
 #### 2B.1: Check Prerequisites
 
@@ -571,7 +572,6 @@ mkdir -p "$HOME/.kmgraph" 2>/dev/null
 cat > "$HOME/.kmgraph/kg-config.json" << 'CONFIGEOF'
 {
   "version": "1.0.0",
-  "active": "KG_NAME",
   "graphs": {
     "KG_NAME": {
       "name": "KG_NAME",
@@ -583,7 +583,9 @@ cat > "$HOME/.kmgraph/kg-config.json" << 'CONFIGEOF'
         { "name": "patterns", "prefix": null, "git": "commit" }
       ],
       "createdAt": "TIMESTAMP",
-      "lastUsed": "TIMESTAMP"
+      "status": "active",
+      "statusChangedAt": "TIMESTAMP",
+      "graphId": "GRAPH_ID"
     }
   },
   "sanitization": {
@@ -595,7 +597,7 @@ cat > "$HOME/.kmgraph/kg-config.json" << 'CONFIGEOF'
 CONFIGEOF
 ```
 
-Replace `KG_NAME` with the user's chosen name, `KG_PATH` with the actual path, and `TIMESTAMP` with the current ISO 8601 timestamp.
+Replace `KG_NAME` with the user's chosen name, `KG_PATH` with the actual path, and `TIMESTAMP` with the current ISO 8601 timestamp (use the same value for `createdAt` and `statusChangedAt`). Replace `GRAPH_ID` with a freshly generated UUID (e.g. `uuidgen` or `python3 -c "import uuid; print(uuid.uuid4())"`) — it's this graph's permanent identity, used to detect duplicate registrations. `status` should be `"active"` so the graph is writable; `kg_config_init` uses this same status/statusChangedAt/graphId shape when it creates a config for you.
 
 #### 2C.5: Create Instructions File
 
@@ -682,8 +684,13 @@ Run these checks to confirm everything is working:
 ```
 
 **Check directory structure:**
+
+Call the `kg_resolve` MCP tool to get the graph's path (issue-41: this previously read
+`c.graphs[c.active]` via a raw `node -e` one-liner — a pre-ADR-067 pattern that no longer
+reflects how any graph is actually selected; `kg_resolve` resolves from the current
+directory instead). Take the returned `path` as `$KG_PATH`, then check its subdirectories:
+
 ```bash
-KG_PATH=$(node -e "const c=require('$HOME/.kmgraph/kg-config.json'); const g=c.graphs[c.active]; console.log(g.path.replace(/^~/, require('os').homedir()))" 2>/dev/null || echo "")
 [ -d "$KG_PATH/knowledge" ] && echo "DIRS_OK" || echo "DIRS_MISSING"
 [ -d "$KG_PATH/lessons-learned" ] && echo "LESSONS_OK" || echo "LESSONS_MISSING"
 [ -d "$KG_PATH/decisions" ] && echo "DECISIONS_OK" || echo "DECISIONS_MISSING"

@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.6.20
+**Version:** 0.7.0
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -71,7 +71,6 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 - `/kmgraph:kmg-add-category` — Add a new category to existing knowledge graph
 - `/kmgraph:kmg-session-summary` — Create summary of current chat session
 - `/kmgraph:kmg-list` — Display all configured knowledge graphs
-- `/kmgraph:kmg-switch` — Change active knowledge graph
 - `/kmgraph:kmg-check-sensitive` — Scan knowledge graph for potentially sensitive information
 - `/kmgraph:kmg-config-sanitization` — Interactive wizard for pre-commit hook setup
 - `/kmgraph:kmg-extract-chat` — Extract chat history from Claude, Gemini, and Codex CLI logs (`--source codex` for Codex sessions)
@@ -89,94 +88,33 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 
 ---
 
-## v0.6.x Feature Highlights
+## v0.7.x Feature Highlights
 
-**v0.6.20 — 2026-07-18**
+**v0.7.0 — 2026-08-04** *(ADR-067: context-derived KG resolution)*
 
-- **ADR-066 resolved: cowork KG mode retired, global-topic KG storage relocated** — cowork mode is no longer offered for new setups (never actually reachable through real Claude Cowork's plugin surface); global-topic KGs relocate to `~/.kmgraph/knowledge-graphs/<name>/`. Upgrade inspector detects and offers to archive existing cowork content — never silently dropped.
-- **106-line folder-structure migration sweep** — stale `docs/` KG-root references corrected to `knowledge/` across core docs, examples, skills, and commands (independent Fable audit finding).
-- **issue-27 fixed: a real data-loss bug, caught live** — `applyStrayKnowledgeDir` was silently overwriting real KG content instead of checking the destination first; this repo's own KG lost content from it mid-session and was recovered via `git restore`. Destination-content check added; regression test included.
-- Two independent adversarial review passes (Opus, Fable) on this branch's own diff found and fixed additional write-safety gaps (unguarded `jq`-failure paths, truncated-write detection) before merge — see [CHANGELOG.md](CHANGELOG.md) for the full list.
+- **The mutable `.active` KG-config pointer is gone** — a new `resolveGraph()` derives the working KG from your current working directory against the registry on every call instead of trusting a switchable pointer that could drift from what's actually on disk. `kmg-switch`, `kg_config_switch`, and the `KG_MISMATCH` error path are retired along with it; ~50+ call sites across commands, agents, skills, hooks, and the CLI migrated off `.active`/`lastUsed` reads and writes.
+- **Registry gains a `status`/`graphId` lifecycle** — every registered KG has a minted `graphId` and marker file; a duplicated KG folder (copy/clone) is caught and resolved via a reattach/worktree/fork/decline prompt instead of silently colliding.
+- **Concurrency-safe config writer** — crash-safe atomic writes (temp file + fsync + rename) and conflict-merging updates replace last-write-wins.
+- **New interactivity discriminator** — a single `gate()` chokepoint returns a structured `KMG_INPUT_REQUIRED` response for automated/CI callers instead of hanging on a prompt no one can answer.
+- **New MCP tools** — `kg_compare_graphs` (recency/recoverability/worktree-fingerprint comparison) and `kg_resolve` (standalone cwd-derived path lookup).
+- **`[personal]`/`[project]` marker syntax** for `kg_capture`/`kg_search`, plus a `scope` param added to `kg_capture` and 5 other tools for consistency.
+- **Migration path off the legacy config and `.active`** — `kg_upgrade` gains a schema-reconciliation apply category, wired into `kmg-init`. See [Upgrading to v0.7.0](docs/troubleshooting/index.md#upgrading-to-v070-cwd-derived-resolution--config-schema-migration).
 
-**v0.6.19 — 2026-07-16**
+*Full per-version detail in [CHANGELOG.md](CHANGELOG.md).*
 
-- **`kg-config.json` write-path split-brain fully closed** (issue-14, GH #171) — the last 37 files still hardcoding the pre-migration `~/.claude/kg-config.json` path (across commands, agents, hook scripts, docs, and the CLI) now resolve `~/.kmgraph/kg-config.json` consistently, verified end-to-end by a 13-row operational acceptance-test matrix across both the MCP-tool and command/prompt surfaces.
-- **Personal-KG search index routing fixed** (issue-15, GH #172) — captures into a personal KG now build the search index in the correct bucket instead of silently falling back to linear scan.
-- **28 broken docs-site links repaired** — dead redirects left over from the ADR-027 restructure, misc broken relative paths, and template placeholder links; issue-13 (GH #170) tracks the separate gap that let this class of regression go undetected for months.
+---
 
-**v0.6.18 — 2026-07-11**
+**v0.6.x Feature Highlights** *(2026-06-16 to 2026-07-18)*
 
-- **Chat-extraction `--rebuild` write path made crash-safe** — atomic writes (temp-file + rename) and rename-aside backups (never delete) replace a pre-write `shutil.rmtree` and a single clobberable `.backup` slot; two consecutive `--rebuild` runs now each get their own distinct backup instead of destroying the last good copy.
-- **Gemini's fail-closed `--project` scoping (ADR-062) fixed to actually fail closed** — hash-named directory detection now runs before substring matching, closing a leak where a hex-valued `--project` filter could match and include an unattributable directory.
-- **`.pb` content-dating no longer silently degrades to file mtime** — every fallback path (dependency absent, decode failure, empty content) now surfaces a visible warning; outlier timestamps are bounded to a realistic session window instead of an unbounded 10-year search.
-- **`kg-config.json` no longer at risk from the test suite** — hook scripts honor a `KG_CONFIG_PATH` override, so sandboxed tests no longer clobber the real global config file in place. Closes #163.
-- New [ADR-063](knowledge/decisions/ADR-063-never-destroy-known-good-state-before-confirmed-write.md) records the shared "never destroy known-good state before the replacement is confirmed written" principle behind both fixes above.
+- **All skill and command names required a `kmg-` prefix** (v0.6.0, breaking) — `kmgraph:recall` → `kmgraph:kmg-recall`, etc. MCP tool names (`kg_*`) unchanged. Closes ADR-053.
+- **`kg_upgrade` matured into a full apply pipeline** — templates, starter relocation, stray `knowledge/knowledge/` merge, and directory scaffolding all implemented with user-content protection (never overwrites a modified file) and a mandatory STOP gate in `kmg-init` so the upgrade menu can't be skipped.
+- **Chat-extraction reliability overhaul** — fixed message loss and format drift across Claude/Gemini/Codex extractors, added fail-closed `--project` scoping, content-based `.pb` dating, and a `--rebuild` flag for clean re-extraction.
+- **`kg-config.json` write-path split-brain fully closed** (issue-14) — the last 37 files hardcoding the pre-migration `~/.claude/kg-config.json` path now consistently resolve `~/.kmgraph/kg-config.json`, verified by a 13-row operational acceptance matrix.
+- **Security: hono HIGH vulnerability patched**; `kg-config.json` protected from test-suite clobbering via `KG_CONFIG_PATH` overrides.
+- **ADR-066 resolved: cowork KG mode retired, global-topic KG storage relocated** to `~/.kmgraph/knowledge-graphs/<name>/`, alongside a 106-line stale-path migration sweep.
+- **issue-27: a real data-loss bug caught live** — `applyStrayKnowledgeDir` was silently overwriting real KG content instead of checking the destination first; fixed with a destination-content check and regression test, following two independent adversarial review passes (Opus, Fable) that closed additional write-safety gaps before merge.
 
-**v0.6.17 — 2026-07-10**
-
-- **Claude extractor multi-day session misfiling fixed (ENH-047)** — each message now derives its own date bucket from its own timestamp instead of the whole session inheriting its first message's date, so `/clear`/context-compaction sessions spanning multiple days file correctly under `--today`/`--date=`.
-- **Gemini extractor gains fail-closed project scoping (ENH-044)** — `--project` now excludes `.pb` files and hash-named `~/.gemini/tmp/` directories that can't be positively attributed to the requested project, with a visible skip notice, instead of silently leaking other projects' conversations into the KG.
-- **Codex extractor's incremental mtime-skip bug removed (ENH-045)** — matches the same fix already shipped for Claude in v0.6.16; running `--incremental` twice within an hour no longer silently no-ops.
-- **Gemini `.pb` sessions dated from content, not file mtime (ENH-046)** — survives copy/move/restore-from-backup without misdating.
-- **`--rebuild` flag added for forced clean re-extraction (ENH-043)** — repairs chat-history files written before the v0.6.16 uuid-dedup fix; one-time repair pass recovered 9 of 68 flagged dates (42 pre-2026-05-30 dates permanently unrecoverable, no source data exists).
-
-**v0.6.16 — 2026-07-06**
-
-- **Extractor message loss and format-drift fixed** — Claude incremental extraction no longer drops subagent messages; per-message `uuid` dedup (split-file-aware) replaces a buggy single cross-file timestamp cutoff. Gemini gains a new streaming `.jsonl` parser for its post-2026-05-13 session format alongside the existing `.json` path.
-- **`chat_extractor_base.py` fails loudly instead of silently writing into the plugin's own directory** when `KG_OUTPUT_DIR` is unset.
-- **Enhancements/Issues README indexes** — `knowledge/enhancements/README.md` and `knowledge/issues/README.md` now exist and cross-reference `knowledge/decisions/README.md`; matching starter templates ship in `core/default-templates/`.
-- **Shared scripts discover personal rules-file splits by content marker**, not a hardcoded filename — any future personal `~/.kmgraph/rules.md` split (any name, any boundary) needs no script change.
-
-**v0.6.15 — 2026-07-02**
-
-- **Init completeness fixes** — Fresh init now creates `concepts/` and `templates/` (not legacy `knowledge/`), scaffolds `triggers.md`, and deploys `kg-category-index.md` to `concepts/`. All template copy targets corrected.
-- **Step 1.10 source detection** — Backfill offer fires correctly when `chat-history/`, `plans/`, `research/`, or `specs/` exist, even without a `CLAUDE.md`. Source paths detected via if/elif precedence and passed to the extractor.
-- **CLAUDE.md creation offer** — When no `CLAUDE.md` exists at project root, init now offers to create one with KMGraph platform preferences (standalone guard, real user input, existing files never touched).
-- **Extractor approval gate scoped to update-graph mode** — `knowledge-extractor` in init-backfill mode returns candidates only; coordinator handles approval and writes. Full write pipeline preserved for update-graph mode.
-- **Concepts removed from top navbar** — Concepts is now sidebar-only; top navbar shows Getting Started, Commands, Configuration only.
-- **Backfill troubleshooting docs** — New `## Troubleshooting` section in the backfill guide covers manual recovery for all platforms.
-
-**v0.6.10 — 2026-06-22**
-
-- **Codex skills fixed** — All 15 `SKILL.md` files now include required YAML frontmatter. Skills were completely non-functional in Codex due to missing `---` delimiters.
-- **Stop hook POSIX fix** — `session-end-prompt.sh` bash-isms (`[[`, `&>`) replaced with POSIX equivalents. Hook now runs correctly when invoked via `sh`.
-
-**v0.6.9 — 2026-06-21**
-
-- **Inspector starter-relocation path fix** — `kmg-upgrade-inspector` now writes relocated starters to `{KG_PATH}/templates/` (was `{KG_PATH}/knowledge/templates/`, causing double-nesting on `knowledge/`-rooted KGs). `rules-size-check.sh` executable bit corrected.
-
-**v0.6.8 — 2026-06-21**
-
-- **Security: hono HIGH vulnerability resolved** — `npm audit fix` in mcp-server patches hono path traversal, CORS, cookie-merging, and header-handling CVEs. No functional changes.
-
-**v0.6.7 — 2026-06-21**
-
-- **`kg_upgrade apply templates` no longer overwrites user content** — `applyTemplates()` now checks each dest file before writing. Existing files with different content are skipped and reported as "Skipped (user content): … (manual review required)". Previously, user-modified READMEs (e.g., a 50-ADR `decisions/README.md`) were silently overwritten. Closes ENH-029 Bug 1.
-- **Apply order enforced automatically** — When `apply` includes both `starter-relocation` and `templates`, `starter-relocation` now always runs first regardless of call order. Prevents a race where templates would deploy starters before relocation could move them. Closes ENH-029 Bug 3.
-
-**v0.6.6 — 2026-06-21**
-
-- **Mandatory STOP gate in `kmg-init` existing-KG branch** — LLMs could previously skip the upgrade menu and proceed directly to FTS5/wiki steps when forward momentum was high. A hard STOP block now forces the numbered menu to appear before any upgrade path continues. Closes ENH-028.
-
-**v0.6.5 — 2026-06-21**
-
-- **`kmg-init` now wires directly into `kg_upgrade` inspect** — The upgrade wizard calls the `kg_upgrade` MCP tool at the existing-KG detection step instead of running its own parallel checks. Eliminates the drift where init and `kg_upgrade` could disagree on what needed upgrading. Closes ENH-022 wiring scope.
-
-**v0.6.4 — 2026-06-20**
-
-- **`kg_upgrade` apply categories fully implemented** — `applyTemplates()` now deploys all template files to correct destinations (`templates/`, `concepts/`). `applyStarterRelocation()` moves starters from live dirs to `templates/`. `applyStrayKnowledgeDir()` merges the legacy `knowledge/knowledge/` subdir. `checkDirectories()` detects and `applyDirectories()` creates all required subdirs.
-
-**v0.6.2 — 2026-06-17**
-
-- **`kg_upgrade` template mapping corrected** — `checkTemplates()` was mapping template files to `knowledge/` instead of `concepts/`. Fixed to use the correct post-ENH-022 path.
-
-**v0.6.1 — 2026-06-17**
-
-- **Recommendation-gate hook: platform-aware output schema** — `recommendation-gate.sh` updated to use `hookSpecificOutput` schema for platform-aware Stop hook output. Fixes formatting on non-Claude platforms.
-
-**v0.6.0 — 2026-06-16** *(Breaking: skill/command rename)*
-
-- **All skill and command names now require `kmg-` prefix** — `kmgraph:recall` → `kmgraph:kmg-recall`, `kmgraph:capture-lesson` → `kmgraph:kmg-capture-lesson`, etc. MCP tool names (`kg_*`) unchanged. Full rename table in [CHANGELOG.md](CHANGELOG.md). Closes ADR-053.
+*Full per-version detail in [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
@@ -264,7 +202,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.6.20 (2026-07-18)
+**Current Release:** v0.7.0 (2026-08-04)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -366,6 +304,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.6.20 (2026-07-18)
+**Current Version:** v0.7.0 (2026-08-04)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info

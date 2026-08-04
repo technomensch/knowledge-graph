@@ -1,6 +1,5 @@
 {
   "version": "1.0.0",
-  "active": "test-kg",
   "graphs": {
     "test-kg": {
       "name": "test-kg",
@@ -12,7 +11,9 @@
         { "name": "patterns", "prefix": null, "git": "commit" }
       ],
       "createdAt": "2026-01-01T00:00:00.000Z",
-      "lastUsed": "2026-01-01T00:00:00.000Z"
+      "status": "active",
+      "statusChangedAt": "2026-01-01T00:00:00.000Z",
+      "graphId": "a1b2c3d4-e5f6-4789-a0b1-c2d3e4f5a6b7"
     }
   },
   "sanitization": {

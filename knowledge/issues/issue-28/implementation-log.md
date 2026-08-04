@@ -4,6 +4,6 @@
 
 Searched `docs/`, `CLAUDE.md`, `INSTALL.md`, and `knowledge/decisions/` for an existing dev-loop mechanism covering this. Found related-but-not-identical prior art: `ADR-054` (post-update stale cache, not active local dev), `Lessons_Learned_Debugging_Plugin_Cache_Not_Synced_From_Local_Repo.md` (covers `commands/`/`core/`/`skills/`, not verified for `mcp-server/dist/`), `local-marketplace-testing-workflow.md` and `claude-code-plugin-cache-stale-after-update.md` (same family, different specific scenarios). No existing documented solution for this exact case. Filed as Hardening, Mode 3 (Track only) — no branch, no GitHub issue, `status: deferred`. No ADR filed — judged a process/tooling gap, not an architectural decision point (see issue-28-description.md's "On the ADR question").
 
-Companion lesson captured: `knowledge/lessons-learned/debugging/Lessons_Learned_Debugging_MCP_Server_Rebuild_Not_Reflected_In_Live_Plugin_Tool_Calls.md`.
+**2026-08-04 correction:** the "companion lesson captured" claim below was inaccurate — a KG-index audit found no `Lessons_Learned_Debugging_MCP_Server_Rebuild_Not_Reflected_In_Live_Plugin_Tool_Calls.md` was ever written to disk (gitignored `debugging/` category, never touched git, no corroborating chat-history evidence). No companion lesson exists for this issue; this implementation log and `issue-28-description.md` remain the only record.
 
 No implementation performed. No further work logged.

@@ -2,8 +2,22 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import * as fs from "fs";
 import * as path from "path";
-import { readConfig, getActiveGraphPath, getProjectRoot } from "../utils.js";
+import * as os from "os";
+import { readConfig, writeConfig, KgConfig } from "../utils.js";
 import { rebuildIndex } from "./fts5.js";
+import {
+  resolveGraph,
+  resolveGraphOutcome,
+  GatedResolution,
+  ResolutionResult,
+  parseScopeMarker,
+  PersonalScopeSession,
+  confirmPersonalScopeAccess,
+  resolvePersonalGraph,
+} from "../resolution.js";
+import { resolveInteractionMode, InteractionMode, GateResult, STUB_ASK_TIMEOUT_MS, gate, stubAsk } from "../interaction.js";
+import { confirmFirstWrite } from "./config.js";
+import { resolveEffectiveCwd } from "../platform-cwd.js";
 
 export interface CaptureRequest {
   content: string;
@@ -29,14 +43,66 @@ export interface CaptureResponse {
   filePath: string;
   relativePath: string;
   indexResult: Record<string, unknown>;
+  notice?: string;
 }
 
 export interface CaptureError {
-  error: "KG_MISMATCH" | "VALIDATION_ERROR" | "IO_ERROR" | "CONFLICT";
+  error: "KG_MISMATCH" | "VALIDATION_ERROR" | "IO_ERROR" | "CONFLICT" | "KMG_INPUT_REQUIRED";
   activeKg?: string;
   activeKgRoot?: string;
   cwd?: string;
   message?: string;
+  reason?: string;
+  resolveWith?: { param: string; accepts?: string[] };
+  detail?: unknown;
+}
+
+// Maps a GateResult (answered/declined/cancelled/InputRequiredError) that
+// resolveGraphOutcome couldn't resolve into a CaptureError. "answered" never
+// reaches here -- resolveGraphOutcome only returns kind: "gated" when there
+// was no usable answer.
+function gateResultToCaptureError(result: GateResult): CaptureError {
+  if ("answer" in result) {
+    // Unreachable: resolveGraphOutcome only returns kind: "gated" when there
+    // was no usable answer. Guarded here purely to keep the type total.
+    return { error: "KMG_INPUT_REQUIRED", reason: "unexpected_answered_state", message: "Internal error: gate() answered but resolveGraphOutcome treated it as unresolved." };
+  }
+  if ("error" in result) {
+    return {
+      error: "KMG_INPUT_REQUIRED",
+      reason: result.reason,
+      resolveWith: result.resolveWith,
+      detail: result.detail,
+      message: `Input required: ${result.reason}`,
+    };
+  }
+  if ("declined" in result) {
+    return { error: "KMG_INPUT_REQUIRED", reason: "declined", message: "Resolution question was declined." };
+  }
+  return { error: "KMG_INPUT_REQUIRED", reason: "cancelled", message: "Resolution question was cancelled." };
+}
+
+async function resolveKgOutcome(
+  config: KgConfig,
+  resolution: ResolutionResult,
+  mode: InteractionMode,
+  cwd: string
+): Promise<{ kgPath: string; resolvedKgName: string; notice?: string } | CaptureError> {
+  const outcome: GatedResolution = await resolveGraphOutcome(config, resolution, cwd, mode);
+  if (outcome.kind === "resolved") {
+    return {
+      kgPath: outcome.graph.path.replace(/^~/, os.homedir()),
+      resolvedKgName: outcome.name,
+      notice: outcome.notice,
+    };
+  }
+  if (outcome.kind === "no-graph-in-cwd") {
+    return { error: "KG_MISMATCH", activeKgRoot: undefined, cwd };
+  }
+  if (outcome.kind === "not-registered") {
+    return { error: "VALIDATION_ERROR", message: `Unknown KG name: "${outcome.name}".` };
+  }
+  return gateResultToCaptureError(outcome.result);
 }
 
 function slugify(str: string): string {
@@ -217,51 +283,136 @@ export function updateReadmeIndex(
 
 export async function handleCapture(
   request: CaptureRequest,
-  targetKg?: string
+  targetKg?: string,
+  interaction?: InteractionMode,
+  personalScopeSession: PersonalScopeSession = new PersonalScopeSession(),
+  scopeOpts?: { sticky?: boolean; confirmPersonalScope?: boolean; confirmFirstUse?: boolean; scope?: "project" | "user" },
+  workspaceRoot?: string,
+  toolCallMeta?: Record<string, unknown>
 ): Promise<CaptureResponse | CaptureError> {
   // Validate metadata
   const validated = validateMetadata(request.metadata);
   if ("error" in validated) return validated as CaptureError;
 
   const config = readConfig();
-  let kgPath: string | null;
-  let skipCwdCheck = false;
+  const mode = resolveInteractionMode({ explicitParam: interaction }).mode;
+  const automated = mode === "automated";
+  const cwd = resolveEffectiveCwd({ processCwd: process.cwd(), toolCallMeta, workspaceRootParam: workspaceRoot });
+  let kgPath: string;
+  let resolvedKgName: string;
+  let notice: string | undefined;
 
-  if (targetKg) {
-    // Explicit target KG: resolve path from config, skip CWD check (intentional user choice)
-    const graphConfig = config.graphs[targetKg];
-    if (!graphConfig) {
+  // ADR-067 Task 6.3 (spec §11): strip a leading [personal]/[project] marker
+  // from the title before it's used for filename/frontmatter generation.
+  const { marker, remainder } = parseScopeMarker(request.metadata.title);
+  if (marker !== null) request.metadata.title = remainder;
+
+  let effectiveTargetKg = targetKg;
+  if (!targetKg && scopeOpts?.scope === "user") {
+    // Explicit structured scope:"user" (consistency with kg_search/
+    // kg_config_add_category/kg_fts5_status/kg_fts5_rebuild/kg_upgrade, all
+    // of which already have this param) -- takes priority over marker
+    // inference since it's an explicit signal, not a free-text guess.
+    // Reuses the same personal-graph lookup the [personal] marker path
+    // below uses; the confirmPersonalScopeAccess gate further down keys off
+    // the resolved graph's type, not how it was reached, so this is gated
+    // identically to the marker/targetKg paths.
+    const personal = resolvePersonalGraph(config);
+    if ("error" in personal) return { error: "VALIDATION_ERROR", message: personal.error };
+    effectiveTargetKg = personal.name;
+  } else if (!targetKg) {
+    if (marker !== null && !automated) {
+      if (scopeOpts?.sticky !== undefined) {
+        personalScopeSession.applyMarker(marker, scopeOpts.sticky);
+      } else {
+        const gated = await gate({
+          mode,
+          reason: "personal_scope_marker_sticky",
+          param: "sticky",
+          accepts: ["one-shot", "sticky"],
+          // No real blocking ask() transport exists yet at this layer (spec §12)
+          // -- matches every other gate() call site in this file/resolution.ts
+          // that has no real interactive transport yet.
+          timeoutMs: STUB_ASK_TIMEOUT_MS,
+          ask: stubAsk,
+        });
+        if (!("answer" in gated)) return gateResultToCaptureError(gated);
+        personalScopeSession.applyMarker(marker, gated.answer === "sticky");
+      }
+    }
+
+    // spec §11: "no read/write asymmetry" -- evaluated unconditionally (not
+    // just when a marker was present this call) so a scope set sticky by an
+    // earlier call (via kg_search or kg_capture, same shared session) still
+    // applies here.
+    const effectiveScope = personalScopeSession.currentScopeFor(automated);
+    if (effectiveScope === "personal") {
+      const personal = resolvePersonalGraph(config);
+      if ("error" in personal) return { error: "VALIDATION_ERROR", message: personal.error };
+      effectiveTargetKg = personal.name;
+    }
+  }
+
+  if (effectiveTargetKg) {
+    // Explicit target KG: resolve by exact name, skip CWD check (intentional
+    // user choice). resolveGraph's exact-name branch never scans the
+    // filesystem or falls back to cwd, matching the old direct-lookup
+    // behavior (ADR-067 Task 1.8).
+    const resolution = resolveGraph(config, cwd, effectiveTargetKg);
+    if (resolution.kind === "not-registered") {
       return {
         error: "VALIDATION_ERROR",
-        message: `Unknown KG name: "${targetKg}". Check /kmgraph:status for registered KGs.`,
+        message: `Unknown KG name: "${effectiveTargetKg}". Check /kmgraph:status for registered KGs.`,
       };
     }
-    kgPath = graphConfig.path.replace(/^~/, require("os").homedir());
-    skipCwdCheck = true;
+    // resolved/fuzzy-match/archived/merged (ambiguous-tie/no-graph-in-cwd
+    // can't arise from an exact-name lookup): route through the shared
+    // gate() logic -- fuzzy-match asks "which of these did you mean" via
+    // gate(), same as ambiguous-tie's cwd-resolution path.
+    const resolved = await resolveKgOutcome(config, resolution, mode, cwd);
+    if ("error" in resolved) return resolved;
+    kgPath = resolved.kgPath;
+    resolvedKgName = resolved.resolvedKgName;
+    notice = resolved.notice;
   } else {
-    kgPath = getActiveGraphPath(config);
+    const resolution = resolveGraph(config, cwd);
+    const resolved = await resolveKgOutcome(config, resolution, mode, cwd);
+    if ("error" in resolved) return resolved;
+    kgPath = resolved.kgPath;
+    resolvedKgName = resolved.resolvedKgName;
+    notice = resolved.notice;
   }
 
-  if (!kgPath) {
-    return {
-      error: "VALIDATION_ERROR",
-      message: "No active knowledge graph. Use kg_config_init or kg_config_switch first.",
-    };
+  // ADR-067 Task 6.4 (spec §7): a "pending" graph (freshly registered via
+  // kg_config_init, not yet confirmed) must not silently take its first
+  // write -- gate before any file touches disk. Only a confirmed answer
+  // (interactive "yes", or automated confirmFirstUse:true) flips it "active";
+  // anything else propagates a structured error and leaves the graph pending.
+  if (config.graphs[resolvedKgName]?.status === "pending") {
+    const confirmedFirstWrite = await confirmFirstWrite(config, resolvedKgName, {
+      mode,
+      confirmFirstUse: scopeOpts?.confirmFirstUse,
+      // No real blocking ask() transport exists yet at this layer (spec §12)
+      // -- matches every other gate() call site in this file/resolution.ts.
+      timeoutMs: STUB_ASK_TIMEOUT_MS,
+      ask: stubAsk,
+    });
+    if (!("config" in confirmedFirstWrite)) return confirmedFirstWrite as CaptureError;
+    writeConfig(confirmedFirstWrite.config);
   }
 
-  // Active-KG / CWD alignment check (skipped when targetKg explicitly provided)
-  if (!skipCwdCheck) {
-    const activeKgRoot = getProjectRoot(kgPath);
-    const cwd = process.cwd();
-    const normalizedRoot = activeKgRoot.endsWith(path.sep) ? activeKgRoot : activeKgRoot + path.sep;
-    if (cwd !== activeKgRoot && !cwd.startsWith(normalizedRoot)) {
-      return {
-        error: "KG_MISMATCH",
-        activeKg: config.active ?? undefined,
-        activeKgRoot,
-        cwd,
-      };
-    }
+  // spec §11: confirmPersonalScopeAccess gates every scope:"user" write
+  // reachable here, whether it arrived via an explicit targetKg naming a
+  // personal-type graph or a resolved [personal] marker -- symmetric with
+  // the read-side gate in search.ts.
+  if ((config.graphs[resolvedKgName]?.type ?? "project-local") === "personal") {
+    const confirmed = await confirmPersonalScopeAccess(personalScopeSession, cwd, {
+      confirmPersonalScope: scopeOpts?.confirmPersonalScope,
+      mode,
+      timeoutMs: STUB_ASK_TIMEOUT_MS,
+      ask: stubAsk,
+    });
+    if (!("confirmed" in confirmed)) return confirmed as CaptureError;
   }
 
   // Update-in-place path
@@ -282,11 +433,11 @@ export async function handleCapture(
       );
       let indexResult: Record<string, unknown> = {};
       try {
-        const kgName = targetKg || config.active || path.basename(kgPath);
+        const kgName = resolvedKgName;
         const kgType = config.graphs[kgName]?.type ?? "project-local";
         indexResult = rebuildIndex(kgPath, kgName, kgType) as unknown as Record<string, unknown>;
       } catch { /* best-effort */ }
-      return { status: "updated", filePath: existing, relativePath: path.relative(kgPath, existing), indexResult };
+      return { status: "updated", filePath: existing, relativePath: path.relative(kgPath, existing), indexResult, notice };
     } catch (err: unknown) {
       return { error: "IO_ERROR", message: err instanceof Error ? err.message : String(err) };
     }
@@ -344,7 +495,7 @@ export async function handleCapture(
   // FTS5 rebuild (in-process, best-effort)
   let indexResult: Record<string, unknown> = {};
   try {
-    const kgName = targetKg || config.active || path.basename(kgPath);
+    const kgName = resolvedKgName;
     const kgType = config.graphs[kgName]?.type ?? "project-local";
     indexResult = rebuildIndex(kgPath, kgName, kgType) as unknown as Record<string, unknown>;
   } catch { /* absent if node-sqlite3-wasm not installed */ }
@@ -354,14 +505,17 @@ export async function handleCapture(
     filePath,
     relativePath: path.relative(kgPath, filePath),
     indexResult,
+    notice,
   };
 }
 
-export function registerCaptureTool(server: McpServer): void {
+export function registerCaptureTool(server: McpServer, personalScopeSession: PersonalScopeSession): void {
   server.tool(
     "kg_capture",
     "Write a lesson, session summary, or ADR to a knowledge graph. " +
       "Defaults to the active KG. Pass targetKg to write to a named KG (e.g., a global personal KG). " +
+      "metadata.title may start with a [personal] or [project] marker to steer this call's " +
+      "(and optionally this session's) scope toward the personal or project-local knowledge graph. " +
       "Handles file naming, frontmatter generation, directory routing, README index update, " +
       "and FTS5 rebuild automatically. Returns KG_MISMATCH error when CWD is outside the active KG root " +
       "(bypassed when targetKg is specified).",
@@ -402,9 +556,62 @@ export function registerCaptureTool(server: McpServer): void {
           "Named KG to write to (from kg-config.json). Use for global/personal KG captures. " +
             "If omitted, writes to the active KG. CWD alignment check is skipped when targetKg is set."
         ),
+      interaction: z
+        .enum(["interactive", "automated"])
+        .optional()
+        .describe(
+          "Overrides auto-detected interaction mode. Automated callers receive a structured " +
+            "KMG_INPUT_REQUIRED error (never a blocking question) when resolution is ambiguous."
+        ),
+      sticky: z
+        .boolean()
+        .optional()
+        .describe(
+          "When metadata.title has a [personal]/[project] marker, whether the resulting scope " +
+            "should persist for the rest of this session (true) or apply to this call only " +
+            "(false). Required to resolve a marker without a blocking question."
+        ),
+      scope: z
+        .enum(["project", "user"])
+        .optional()
+        .describe(
+          "project (default, cwd-resolved) or user (the personal knowledge graph). Consistent " +
+            "with kg_search/kg_config_add_category/kg_fts5_status/kg_fts5_rebuild/kg_upgrade's " +
+            "scope param. Ignored when targetKg is given; alternative to a [personal] marker."
+        ),
+      confirmPersonalScope: z
+        .boolean()
+        .optional()
+        .describe(
+          "Confirms this repo may write to the personal knowledge graph. Required once per " +
+            "process before a personal-scope write is honored for a repo not yet confirmed."
+        ),
+      confirmFirstUse: z
+        .boolean()
+        .optional()
+        .describe(
+          "Confirms this is a legitimate first write to a newly-registered (pending) knowledge " +
+            "graph. Required once per graph before its first write is honored."
+        ),
+      workspaceRoot: z
+        .string()
+        .optional()
+        .describe(
+          "Explicit cwd override for clients whose process cwd doesn't reflect the caller's " +
+            "actual workspace (e.g. a plugin install path). Falls back to the MCP _meta " +
+            "sandboxCwd signal (Codex), then this param, then process.cwd()."
+        ),
     },
-    async ({ content, type, metadata, targetKg }) => {
-      const result = await handleCapture({ content, type, metadata }, targetKg);
+    async ({ content, type, metadata, targetKg, interaction, sticky, confirmPersonalScope, confirmFirstUse, scope, workspaceRoot }, extra) => {
+      const result = await handleCapture(
+        { content, type, metadata },
+        targetKg,
+        interaction,
+        personalScopeSession,
+        { sticky, confirmPersonalScope, confirmFirstUse, scope },
+        workspaceRoot,
+        extra?._meta as Record<string, unknown> | undefined
+      );
       if ("error" in result) {
         return {
           content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],

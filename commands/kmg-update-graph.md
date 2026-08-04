@@ -79,7 +79,7 @@ Parameters:
 ```
 
 The agent executes the full extraction pipeline:
-1. Get active KG path and validate CWD match
+1. Resolve target graph via `kg_resolve` (cwd-derived; no separate "active" pointer or CWD-mismatch check — ADR-067)
 2. Identify new or modified lessons
 3. Extract key elements (title, problem, solution, triggers, category)
 4. Check existing knowledge graph for duplicates

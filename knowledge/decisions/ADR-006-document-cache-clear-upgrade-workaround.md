@@ -63,5 +63,5 @@ codex plugin add kmgraph@knowledge-management-graph
 
 ## Related
 
-- [Lesson: Claude Code Plugin Cache Stale After Update](../lessons-learned/debugging/claude-code-plugin-cache-stale-after-update.md)
+- [Lesson: Claude Code Plugin Cache Stale After Update](../lessons-learned/process/claude-code-plugin-cache-stale-after-update.md)
 - [GETTING-STARTED.md](../GETTING-STARTED.md) — Implementation of this decision

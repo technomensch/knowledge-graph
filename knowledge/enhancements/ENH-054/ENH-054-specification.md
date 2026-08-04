@@ -2,7 +2,7 @@
 id: ENH-054
 type: Enhancement
 status: proposed
-github-issue: null
+github-issue: "#209"
 branch: none
 created: 2026-07-26
 related_adrs: ["ADR-067"]
@@ -10,7 +10,7 @@ related_adrs: ["ADR-067"]
 
 # ENH-054: Full Audit-Trail History Log for Registry Lifecycle Transitions
 
-**Local ID:** ENH-054 | **GitHub Issue:** none filed (captured only, deferred to future scoping)
+**Local ID:** ENH-054 | **GitHub Issue:** [#209](https://github.com/technomensch/knowledge-graph/issues/209)
 
 ## Problem Statement
 
