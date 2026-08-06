@@ -18,7 +18,8 @@ TRANSCRIPT_FILE="$TEST_DIR/transcript.jsonl"
 STARTHERE_FILE="$TEST_DIR/START-HERE.md"
 INPUT="{\"session_id\": \"test-session-$$\", \"transcript_path\": \"${TRANSCRIPT_FILE}\"}"
 
-cleanup() { rm -rf "$TEST_DIR"; }
+REPO_RELATIVE_FILE="$REPO_ROOT/.tmp-handoff-gate-test-$$.md"
+cleanup() { rm -rf "$TEST_DIR"; rm -f "$REPO_RELATIVE_FILE"; }
 trap cleanup EXIT INT TERM
 
 # Real Claude Code transcript shape: tool calls nest under .message.content[].
@@ -94,6 +95,34 @@ RESULT=$?
 set -e
 [ "$RESULT" -eq 2 ] && pass "missing file → exit 2 (hard stop)" || fail "missing file → expected exit 2, got $RESULT"
 echo "$OUTPUT" | grep -q "c.md" && pass "block message names the missing file" || fail "block message should name c.md"
+
+# ── Test 4: real-world shape — manifest path is REPO_ROOT-relative (as
+# commands/kmg-handoff.md actually writes it, via "./handoff-packages/...")
+# but Read always records an absolute path in the transcript. The file WAS
+# read; the exit-0 expectation catches a regression back to the exact-string
+# bug this test suite's first 3 cases never exercised (their manifest paths
+# were already absolute on both sides, masking the real mismatch). ─────────
+touch "$REPO_RELATIVE_FILE"
+REPO_RELATIVE_BASENAME="$(basename "$REPO_RELATIVE_FILE")"
+cat > "$STARTHERE_FILE" << MDEOF
+# Start Here — Project Handoff
+
+<!-- kmgraph-handoff-manifest
+\`\`\`json
+["./${REPO_RELATIVE_BASENAME}"]
+\`\`\`
+-->
+MDEOF
+
+cat > "$TRANSCRIPT_FILE" << EOF
+$(read_entry "$STARTHERE_FILE")
+$(read_entry "$REPO_RELATIVE_FILE")
+EOF
+set +e
+RESULT_OUTPUT=$(echo "$INPUT" | bash "$HOOK" 2>&1)
+RESULT=$?
+set -e
+[ "$RESULT" -eq 0 ] && pass "REPO_ROOT-relative manifest path, absolute Read path, file read → exit 0" || fail "relative-vs-absolute path match → expected exit 0, got $RESULT ($RESULT_OUTPUT)"
 
 echo ""
 echo "═══════════════════════════════════════════════════════════════"
