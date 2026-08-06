@@ -57,6 +57,8 @@ Captured live, lightweight, local-only — matching the precedent set for issue-
 
 **[ADR-068](../../decisions/ADR-068-lightweight-vs-full-workflow-rule-and-piloted-command-completion-check.md) (status: Proposed) pilots a fix for this issue's first gap** (pointer-layer-only reading) — a hard-stop check comparing a handoff/recall document's declared file list against everything actually opened (`Read` calls) across the full session, fail-open when no manifest exists. Scoped to a single pilot only, deliberately not a general framework (see ADR-068's Non-Goals) and deliberately not adopting `docs-readme-poc`'s heavier `ADR-023` precedent (independent second-agent verification, evidence citations) — this check has no judgment component, so that machinery isn't needed.
 
+- [issue-42](../issue-42/issue-42-description.md) — regression found in this ADR-068 pilot mechanism itself (relative-vs-absolute path mismatch hard-blocked every session), not a reopening of this issue.
+
 **This issue's second gap (buried recommendation not promoted to the checklist) remains unresolved** — ADR-068 explicitly defers it as judgment-shaped, out of scope for the pilot. Still open, tracked here.
 
 **First gap resolved (2026-08-01)** via `knowledge/plans/v0.7.0-c3-adr-068-pilot.md` — `commands/kmg-handoff.md` now embeds a file manifest in generated `START-HERE.md`, and `scripts/handoff-file-tracing-gate.sh` hard-stops a session at `Stop` time if any manifest file wasn't opened. `status` stays `deferred` pending the second gap, since this issue isn't fully closed.
