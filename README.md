@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.7.0
+**Version:** 0.7.1
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -89,6 +89,10 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 ---
 
 ## v0.7.x Feature Highlights
+
+**v0.7.1 — 2026-08-06** *(handoff gate path-mismatch fix)*
+
+- **`handoff-file-tracing-gate.sh` hard-blocked every session that read a handoff package**, even when every manifest file was genuinely opened — its exact-string match compared repo-root-relative manifest paths against always-absolute transcript `Read` paths. Now anchors relative manifest paths at `REPO_ROOT` before comparing. Closes #213, issue-42.
 
 **v0.7.0 — 2026-08-04** *(ADR-067: context-derived KG resolution)*
 
@@ -202,7 +206,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.7.0 (2026-08-04)
+**Current Release:** v0.7.1 (2026-08-06)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -304,6 +308,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.7.0 (2026-08-04)
+**Current Version:** v0.7.1 (2026-08-06)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info
