@@ -19,6 +19,11 @@
 
 set -euo pipefail
 
+# Same repo-root resolution convention as check-github-issue-sync.sh /
+# pre-push-gate.sh — needed to anchor the manifest's relative paths (see fix
+# below) regardless of what cwd this hook happens to run in.
+REPO_ROOT="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+
 INPUT=$(cat)
 
 TRANSCRIPT_PATH=""
@@ -52,7 +57,19 @@ MANIFEST_FILES=$(printf '%s' "$MANIFEST_JSON" | jq -r '.[]?' 2>/dev/null || true
 MISSING=""
 while IFS= read -r manifest_file; do
   [[ -z "$manifest_file" ]] && continue
-  if ! printf '%s\n' "$READ_FILES" | grep -qxF "$manifest_file"; then
+  # Manifest paths are written relative to REPO_ROOT (commands/kmg-handoff.md's
+  # output_dir is "./handoff-packages/..."), but Read always records an
+  # absolute path in the transcript — an exact-string match against
+  # READ_FILES here would never succeed even when the file genuinely was
+  # opened. Anchor relative manifest paths at REPO_ROOT before comparing;
+  # leave an already-absolute manifest path (e.g. a summary_file found
+  # outside the repo tree) untouched.
+  if [[ "$manifest_file" == /* ]]; then
+    resolved_manifest_file="$manifest_file"
+  else
+    resolved_manifest_file="${REPO_ROOT}/${manifest_file#./}"
+  fi
+  if ! printf '%s\n' "$READ_FILES" | grep -qxF "$resolved_manifest_file"; then
     MISSING="${MISSING}${manifest_file}"$'\n'
   fi
 done <<< "$MANIFEST_FILES"

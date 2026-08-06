@@ -9,6 +9,12 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.1] — 2026-08-06
+
+### Fixed
+
+- **`handoff-file-tracing-gate.sh` hard-blocked every session that read a handoff package**, even when every manifest file was genuinely opened — its exact-string match compared repo-root-relative manifest paths against always-absolute transcript `Read` paths, which can never match. Now anchors relative manifest paths at `REPO_ROOT` (same convention as `check-github-issue-sync.sh`/`pre-push-gate.sh`) before comparing. Regression in ADR-068's pilot mechanism, not a reopening of issue-33. Closes #213, issue-42.
+
 ## [0.7.0] — 2026-08-04
 
 ### Changed
