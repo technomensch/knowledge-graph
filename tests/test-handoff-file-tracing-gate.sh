@@ -13,10 +13,13 @@ FAIL=0
 pass() { echo "  ✅ PASS: $1"; PASS=$((PASS + 1)); }
 fail() { echo "  ❌ FAIL: $1"; FAIL=$((FAIL + 1)); }
 
-TEST_DIR=$(mktemp -d)
+# pwd -P: canonicalize past macOS's /var → /private/var symlink, because
+# git rev-parse --show-toplevel returns physical paths and Test 5 compares
+# fixture paths against it byte-for-byte.
+TEST_DIR=$(cd "$(mktemp -d)" && pwd -P)
 TRANSCRIPT_FILE="$TEST_DIR/transcript.jsonl"
 STARTHERE_FILE="$TEST_DIR/START-HERE.md"
-INPUT="{\"session_id\": \"test-session-$$\", \"transcript_path\": \"${TRANSCRIPT_FILE}\"}"
+INPUT="{\"session_id\": \"test-session-$$\", \"transcript_path\": \"${TRANSCRIPT_FILE}\", \"cwd\": \"${REPO_ROOT}\"}"
 
 REPO_RELATIVE_FILE="$REPO_ROOT/.tmp-handoff-gate-test-$$.md"
 cleanup() { rm -rf "$TEST_DIR"; rm -f "$REPO_RELATIVE_FILE"; }
@@ -123,6 +126,45 @@ RESULT_OUTPUT=$(echo "$INPUT" | bash "$HOOK" 2>&1)
 RESULT=$?
 set -e
 [ "$RESULT" -eq 0 ] && pass "REPO_ROOT-relative manifest path, absolute Read path, file read → exit 0" || fail "relative-vs-absolute path match → expected exit 0, got $RESULT ($RESULT_OUTPUT)"
+
+# ── Test 5: issue-43 — session runs inside a git WORKTREE. Manifest paths are
+# relative, transcript Read paths are absolute *inside the worktree*, and
+# CLAUDE_PROJECT_DIR points at the MAIN checkout (its documented behavior in
+# worktree sessions). Pre-fix, REPO_ROOT anchored at the main checkout, so
+# the comparison could never match → false exit 2. Post-fix, git -C <cwd>
+# rev-parse --show-toplevel resolves the worktree's own root → exit 0. ──────
+FIXTURE_REPO="$TEST_DIR/fixture-repo"
+WORKTREE_DIR="$TEST_DIR/fixture-worktree"
+git init -q "$FIXTURE_REPO"
+git -C "$FIXTURE_REPO" -c user.email=test@test -c user.name=test commit -q --allow-empty -m init
+git -C "$FIXTURE_REPO" worktree add -q -b test-worktree-branch "$WORKTREE_DIR" > /dev/null 2>&1
+
+mkdir -p "$WORKTREE_DIR/handoff-packages/2026-08-10"
+WT_LINKED_FILE="$WORKTREE_DIR/handoff-packages/2026-08-10/DOCUMENTATION-MAP.md"
+touch "$WT_LINKED_FILE"
+WT_STARTHERE="$WORKTREE_DIR/handoff-packages/2026-08-10/START-HERE.md"
+cat > "$WT_STARTHERE" << 'MDEOF'
+# Start Here — Project Handoff
+
+<!-- kmgraph-handoff-manifest
+```json
+["./handoff-packages/2026-08-10/DOCUMENTATION-MAP.md"]
+```
+-->
+MDEOF
+
+WT_TRANSCRIPT="$TEST_DIR/worktree-transcript.jsonl"
+cat > "$WT_TRANSCRIPT" << EOF
+$(read_entry "$WT_STARTHERE")
+$(read_entry "$WT_LINKED_FILE")
+EOF
+WT_INPUT="{\"session_id\": \"test-session-$$\", \"transcript_path\": \"${WT_TRANSCRIPT}\", \"cwd\": \"${WORKTREE_DIR}\"}"
+
+set +e
+RESULT_OUTPUT=$(echo "$WT_INPUT" | CLAUDE_PROJECT_DIR="$FIXTURE_REPO" bash "$HOOK" 2>&1)
+RESULT=$?
+set -e
+[ "$RESULT" -eq 0 ] && pass "worktree session: relative manifest path, in-worktree absolute Read, CLAUDE_PROJECT_DIR=main checkout → exit 0" || fail "worktree anchor resolution → expected exit 0, got $RESULT ($RESULT_OUTPUT)"
 
 echo ""
 echo "═══════════════════════════════════════════════════════════════"
