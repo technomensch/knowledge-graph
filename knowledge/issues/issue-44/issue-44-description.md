@@ -93,6 +93,7 @@ rediscovered as "the git-common-dir approach should have worked."
 - [issue-42](../issue-42/issue-42-description.md) — first fix in this saga (relative vs absolute path exact-match)
 - [issue-43](../issue-43/issue-43-description.md) — second fix (`CLAUDE_PROJECT_DIR` vs worktree root); confirmed working correctly for tracked files by this issue's own observation
 - [ADR-068](../../decisions/ADR-068-lightweight-vs-full-workflow-rule-and-piloted-command-completion-check.md) — the pilot mechanism all three issues are gaps/regressions in
-- `scripts/handoff-file-tracing-gate.sh` — the script needing the fix
-- `tests/test-handoff-file-tracing-gate.sh` — needs a 7th test for the gitignored-in-worktree case
+- [issue-33](../issue-33/issue-33-description.md) — original gap this mechanism was built to close; deferred, unrelated second gap
+- `scripts/handoff-file-tracing-gate.sh` — the fixed script (`PKG_ROOT` fallback)
+- `tests/test-handoff-file-tracing-gate.sh` — expanded to 9/9 (Tests 6-7)
 - `commands/kmg-handoff.md:154` — where `handoff-packages/` output originates, and where it's gitignored
