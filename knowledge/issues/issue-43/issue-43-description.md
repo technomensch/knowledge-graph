@@ -1,10 +1,11 @@
 ---
 id: issue-43
 type: Bug
-status: tracked
+status: resolved
 github-issue: "#215"
 branch: v0.7.1.1-issue-43-worktree-repo-root-mismatch
 created: 2026-08-10
+resolved: 2026-08-10
 ---
 
 # Issue-43: `handoff-file-tracing-gate.sh` Hard-Blocks Every Session Run Inside a Git Worktree — `CLAUDE_PROJECT_DIR` Resolves to the Main Repo, Not the Worktree
@@ -66,24 +67,30 @@ or deferred decision found. issue-42's follow-up list only flagged shell-special
 manifest paths as a known gap; worktrees were never on it. This is a newly
 discovered gap, not a reopened or previously-deferred one.
 
-## Fix Direction (not yet implemented)
+## Fix (implemented 2026-08-10)
 
-Prefer `git rev-parse --show-toplevel` over `CLAUDE_PROJECT_DIR` when computing
-`REPO_ROOT` for this comparison. `--show-toplevel` is worktree-aware statelessly —
-run from inside a worktree it returns the worktree's own root; run from the main
-checkout it returns the main root. No worktree registration involved or needed
-(worktree registration is a KG-registry concept — `kg-config.json`/`kg_resolve` —
-unrelated to this path-anchoring bug, and treating an ephemeral worktree as its own
-registered KG would be the wrong fix shape entirely).
+Flipped the precedence entirely — `git rev-parse --show-toplevel` first,
+`CLAUDE_PROJECT_DIR` as fallback for non-git contexts only — with one hardening
+beyond the drafted direction: git is anchored at the **session's cwd from the hook
+input JSON** (`git -C "$HOOK_CWD"`), not the hook process's own cwd, which is not
+guaranteed to be inside the worktree when the hook fires:
 
-Needs design/verification before implementation:
-- Whether to flip the precedence entirely (`show-toplevel` first, `CLAUDE_PROJECT_DIR`
-  fallback) or detect worktree context specifically (`git rev-parse --is-inside-work-tree`
-  plus comparing `--show-toplevel` against `--git-common-dir`'s parent) and only
-  override in that case — the latter avoids changing behavior for the non-worktree
-  case entirely.
-- Regression test coverage for a manifest generated inside a worktree, `Read` paths
-  absolute inside that same worktree.
+```bash
+HOOK_CWD=$(printf '%s' "$INPUT" | jq -r '.cwd // ""' 2>/dev/null || true)
+[[ -z "$HOOK_CWD" || ! -d "$HOOK_CWD" ]] && HOOK_CWD="$(pwd)"
+REPO_ROOT="$(git -C "$HOOK_CWD" rev-parse --show-toplevel 2>/dev/null || echo "${CLAUDE_PROJECT_DIR:-$HOOK_CWD}")"
+```
+
+`--show-toplevel` is worktree-aware statelessly — each worktree is its own valid
+toplevel; only `--git-common-dir` is shared with the main checkout. No worktree
+registration involved or needed (worktree registration is a KG-registry concept —
+`kg-config.json`/`kg_resolve` — unrelated to this path-anchoring bug, and treating
+an ephemeral worktree as its own registered KG would be the wrong fix shape entirely).
+
+The worktree-detection-only alternative (`--is-inside-work-tree` + comparing
+`--show-toplevel` against `--git-common-dir`'s parent) was rejected — see
+[solution-approach.md](solution-approach.md). Regression coverage added as Test 5
+in `tests/test-handoff-file-tracing-gate.sh` (see [test-cases.md](test-cases.md)).
 
 ## Related
 
