@@ -9,6 +9,12 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.1.1] — 2026-08-10
+
+### Fixed
+
+- **`handoff-file-tracing-gate.sh` still hard-blocked sessions run inside a git worktree** — issue-42's `REPO_ROOT` anchor preferred `CLAUDE_PROJECT_DIR`, which resolves to the *main* checkout in worktree sessions, so relative manifest paths were anchored where the in-worktree absolute `Read` paths could never match. Now resolves `REPO_ROOT` via `git -C <session-cwd> rev-parse --show-toplevel` (worktree-aware; session cwd taken from the hook's input JSON, not the hook process's cwd), with `CLAUDE_PROJECT_DIR` as fallback for non-git contexts only. Regression test added (fixture worktree, `CLAUDE_PROJECT_DIR` pointed at the main checkout). Closes #215, issue-43.
+
 ## [0.7.1] — 2026-08-06
 
 ### Fixed
