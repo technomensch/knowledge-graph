@@ -40,3 +40,4 @@ Added a 5th regression test to `tests/test-handoff-file-tracing-gate.sh` that sp
 - `scripts/handoff-file-tracing-gate.sh` — the fixed hook
 - `tests/test-handoff-file-tracing-gate.sh` — the expanded regression suite (5/5 passing)
 - `commands/kmg-handoff.md:154` — where the manifest's relative `output_dir` originates
+- [issue-43](../issue-43/issue-43-description.md) — follow-on gap found 2026-08-10: this fix's `REPO_ROOT` anchor (`CLAUDE_PROJECT_DIR`) resolves to the main repo, not a git worktree, reproducing the same mismatch shape inside worktree sessions

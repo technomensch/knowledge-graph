@@ -58,6 +58,7 @@ Captured live, lightweight, local-only — matching the precedent set for issue-
 **[ADR-068](../../decisions/ADR-068-lightweight-vs-full-workflow-rule-and-piloted-command-completion-check.md) (status: Proposed) pilots a fix for this issue's first gap** (pointer-layer-only reading) — a hard-stop check comparing a handoff/recall document's declared file list against everything actually opened (`Read` calls) across the full session, fail-open when no manifest exists. Scoped to a single pilot only, deliberately not a general framework (see ADR-068's Non-Goals) and deliberately not adopting `docs-readme-poc`'s heavier `ADR-023` precedent (independent second-agent verification, evidence citations) — this check has no judgment component, so that machinery isn't needed.
 
 - [issue-42](../issue-42/issue-42-description.md) — regression found in this ADR-068 pilot mechanism itself (relative-vs-absolute path mismatch hard-blocked every session), not a reopening of this issue.
+- [issue-43](../issue-43/issue-43-description.md) — follow-on gap found 2026-08-10 in the same pilot mechanism: `REPO_ROOT` anchoring (issue-42's fix) resolves to the main repo, not a git worktree, reproducing the same mismatch shape inside worktree sessions.
 
 **This issue's second gap (buried recommendation not promoted to the checklist) remains unresolved** — ADR-068 explicitly defers it as judgment-shaped, out of scope for the pilot. Still open, tracked here.
 

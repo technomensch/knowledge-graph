@@ -19,17 +19,26 @@
 
 set -euo pipefail
 
-# Same repo-root resolution convention as check-github-issue-sync.sh /
-# pre-push-gate.sh — needed to anchor the manifest's relative paths (see fix
-# below) regardless of what cwd this hook happens to run in.
-REPO_ROOT="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
-
 INPUT=$(cat)
 
 TRANSCRIPT_PATH=""
+HOOK_CWD=""
 if command -v jq &>/dev/null; then
   TRANSCRIPT_PATH=$(printf '%s' "$INPUT" | jq -r '.transcript_path // ""' 2>/dev/null || true)
+  HOOK_CWD=$(printf '%s' "$INPUT" | jq -r '.cwd // ""' 2>/dev/null || true)
 fi
+[[ -z "$HOOK_CWD" || ! -d "$HOOK_CWD" ]] && HOOK_CWD="$(pwd)"
+
+# Anchor for the manifest's relative paths (see loop below). issue-43: inside
+# a git worktree CLAUDE_PROJECT_DIR resolves to the MAIN checkout, not the
+# worktree, so anchoring there re-creates issue-42's can-never-match shape
+# against the transcript's in-worktree absolute Read paths. git rev-parse
+# --show-toplevel is worktree-aware (each worktree is its own toplevel; only
+# --git-common-dir is shared), so it gets first precedence — run against the
+# session's cwd from the hook input, not this process's cwd, which is not
+# guaranteed to be inside the worktree. CLAUDE_PROJECT_DIR remains the
+# fallback for non-git contexts only.
+REPO_ROOT="$(git -C "$HOOK_CWD" rev-parse --show-toplevel 2>/dev/null || echo "${CLAUDE_PROJECT_DIR:-$HOOK_CWD}")"
 
 # Fail open: no transcript, no jq — nothing to check against.
 if [[ -z "$TRANSCRIPT_PATH" ]] || [[ ! -f "$TRANSCRIPT_PATH" ]] || ! command -v jq &>/dev/null; then
