@@ -10,8 +10,40 @@ type: solution-approach
 `scripts/handoff-file-tracing-gate.sh` derives `PKG_ROOT` from `STARTHERE_PATH` —
 the transcript's own absolute `Read` path for the `START-HERE.md`-pattern file that
 was actually opened this session (already verified to exist on disk at line 58,
-pre-existing code). When a manifest file's `REPO_ROOT`-anchored path doesn't exist
-on disk, the loop falls back to `PKG_ROOT` before giving up on that entry.
+pre-existing code). When a manifest file's `REPO_ROOT`-anchored path wasn't
+actually `Read` this session, the loop falls back to `PKG_ROOT` before giving up
+on that entry.
+
+## Round 2: code-review finding, same day
+
+First implementation gated the fallback on `[[ ! -f "$resolved_manifest_file" ...
+]]` — on-disk existence, not `Read`-membership. `handoff-file-tracing-gate.sh`
+had, by that point, shipped three bugs in three days (issue-42, issue-43, issue-44
+itself) each caught by a passing-but-inadequate test suite, so a code-review pass
+(`pr-review-toolkit:code-reviewer`) was run against the diff before merging —
+not just against the plan, which Fable had already validated.
+
+The reviewer reproduced a real false-block: `handoff-packages/<date>/` directory
+names are date-derived, so two checkouts collide on the same relative path
+routinely (any two sessions run the same day). If a same-named decoy file happens
+to exist at the `REPO_ROOT`-anchored path (never opened there — the real read
+happened at `PKG_ROOT`), the `-f` check found a "real-looking" file and never
+triggered the fallback, so the final `grep -qxF` compared against the decoy's
+path — which was never in `READ_FILES` — and false-blocked, even though the
+linked file demonstrably was opened (just at the other root).
+
+Fixed by gating the fallback on `READ_FILES` membership instead of `-f`:
+
+```bash
+if [[ -n "$PKG_ROOT" && "$PKG_ROOT" != "$REPO_ROOT" ]] \
+   && ! printf '%s\n' "$READ_FILES" | grep -qxF "$resolved_manifest_file"; then
+  resolved_manifest_file="${PKG_ROOT}/${manifest_file#./}"
+fi
+```
+
+This can't introduce a false pass in either direction: it only changes which path
+is *checked*, and the final verdict is always a literal `READ_FILES` membership
+test against whichever path gets picked.
 
 ## Alternatives considered
 

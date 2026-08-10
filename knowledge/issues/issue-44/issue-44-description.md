@@ -63,10 +63,24 @@ fi
 
 ```bash
 resolved_manifest_file="${REPO_ROOT}/${manifest_file#./}"
-if [[ ! -f "$resolved_manifest_file" && -n "$PKG_ROOT" && "$PKG_ROOT" != "$REPO_ROOT" ]]; then
+if [[ -n "$PKG_ROOT" && "$PKG_ROOT" != "$REPO_ROOT" ]] \
+   && ! printf '%s\n' "$READ_FILES" | grep -qxF "$resolved_manifest_file"; then
   resolved_manifest_file="${PKG_ROOT}/${manifest_file#./}"
 fi
 ```
+
+**Corrected after code review (same day):** the first implementation gated the
+fallback on `[[ ! -f "$resolved_manifest_file" ... ]]` — on-disk existence — rather
+than on whether that path was actually `Read`. A `pr-review-toolkit:code-reviewer`
+pass reproduced a real false-block: `handoff-packages/<date>/` directory names are
+date-derived, so two independent checkouts routinely collide on the same relative
+path; if a same-named decoy file happens to exist at the `REPO_ROOT`-anchored
+location (never opened there — the real read happened at `PKG_ROOT`), the
+existence check saw a "real" file and never triggered the fallback, so the
+`grep -qxF` comparison used the wrong (decoy) path and false-blocked. Fixed by
+gating on `READ_FILES` membership instead of `-f` — the fallback now fires
+whenever the primary path wasn't actually read, regardless of what happens to
+exist on disk there.
 
 Why this beats the git-common-dir fallback (rejected):
 1. **Covers cross-worktree reads for free** (worktree A generates, worktree B

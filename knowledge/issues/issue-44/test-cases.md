@@ -5,8 +5,8 @@ type: test-cases
 
 # Test Cases — issue-44
 
-Covered by `tests/test-handoff-file-tracing-gate.sh` (9/9 passing after fix,
-expanded from issue-43's 5, plus one new test in-between covered separately):
+Covered by `tests/test-handoff-file-tracing-gate.sh` (10/10 passing after both
+rounds of fix, expanded from issue-43's 5):
 
 6. **(new)** Gitignored handoff-package generated in a fixture's main checkout
    (`.gitignore` explicitly excludes `handoff-packages/`), a second worktree added
@@ -20,6 +20,16 @@ expanded from issue-43's 5, plus one new test in-between covered separately):
    the `PKG_ROOT` fallback doesn't mask real gaps — it only changes which path is
    *expected*, not whether the transcript's `Read` history has to actually contain
    it.
+
+8. **(new, round 2 — code review finding)** Same fixture as 6/7, but a decoy
+   file is placed on disk at the `REPO_ROOT`-anchored path (same relative
+   `handoff-packages/2026-08-10/DOCUMENTATION-MAP.md`, same-date collision
+   between two independent checkouts) — never `Read`. The manifest's linked
+   file was genuinely opened, but only at `PKG_ROOT`. Must exit 0: the
+   fallback has to fire because the `REPO_ROOT`-anchored path wasn't `Read`,
+   regardless of a same-named file happening to exist there. This is the
+   `pr-review-toolkit:code-reviewer` pass's reproduction of a real false-block
+   in round 1's `-f`-gated fallback, added as a permanent regression test.
 
 ## Manual verification performed this session (independent review, Fable)
 

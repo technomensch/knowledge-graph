@@ -92,8 +92,13 @@ while IFS= read -r manifest_file; do
     # issue-44: gitignored handoff-package files don't exist under REPO_ROOT
     # when the package was generated somewhere else (main checkout, a
     # different worktree). Fall back to the package's actual root, derived
-    # from STARTHERE_PATH above, before giving up on this file.
-    if [[ ! -f "$resolved_manifest_file" && -n "$PKG_ROOT" && "$PKG_ROOT" != "$REPO_ROOT" ]]; then
+    # from STARTHERE_PATH above, before giving up on this file. Gate on
+    # whether the REPO_ROOT-anchored path was actually Read (not just
+    # whether it exists on disk) -- handoff-packages/<date>/ directory names
+    # collide across checkouts routinely, so a decoy file can genuinely
+    # exist at the wrong root without ever having been opened there.
+    if [[ -n "$PKG_ROOT" && "$PKG_ROOT" != "$REPO_ROOT" ]] \
+       && ! printf '%s\n' "$READ_FILES" | grep -qxF "$resolved_manifest_file"; then
       resolved_manifest_file="${PKG_ROOT}/${manifest_file#./}"
     fi
   fi

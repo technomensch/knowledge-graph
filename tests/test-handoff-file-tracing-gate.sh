@@ -241,6 +241,40 @@ set -e
 [ "$RESULT" -eq 2 ] && pass "fallback doesn't mask a genuinely unopened file → exit 2" || fail "expected exit 2 for unopened file, got $RESULT ($RESULT_OUTPUT)"
 echo "$RESULT_OUTPUT" | grep -q "NEVER-READ.md" && pass "block message names the genuinely-missing file" || fail "block message should name NEVER-READ.md"
 
+# ── Test 8: code-review finding — the PKG_ROOT fallback must trigger on
+# whether the REPO_ROOT-anchored path was actually Read, not on whether it
+# merely exists on disk. handoff-packages/<date>/ directory names collide
+# across checkouts routinely (both are date-derived), so a DECOY file can
+# genuinely exist at REPO_ROOT without ever having been opened there — the
+# real file was opened at PKG_ROOT instead. A file-existence-gated fallback
+# would see the decoy, conclude "no fallback needed," and false-block even
+# though the linked file demonstrably was read (just at the other root). ──
+mkdir -p "$WORKTREE_DIR2/handoff-packages/2026-08-10"
+DECOY_FILE="$WORKTREE_DIR2/handoff-packages/2026-08-10/DOCUMENTATION-MAP.md"
+touch "$DECOY_FILE"
+
+cat > "$MAIN_STARTHERE" << 'MDEOF'
+# Start Here — Project Handoff
+
+<!-- kmgraph-handoff-manifest
+```json
+["./handoff-packages/2026-08-10/DOCUMENTATION-MAP.md"]
+```
+-->
+MDEOF
+
+cat > "$GITIGNORED_TRANSCRIPT" << EOF
+$(read_entry "$MAIN_STARTHERE")
+$(read_entry "$MAIN_LINKED_FILE")
+EOF
+
+set +e
+RESULT_OUTPUT=$(echo "$GITIGNORED_INPUT" | bash "$HOOK" 2>&1)
+RESULT=$?
+set -e
+rm -f "$DECOY_FILE"
+[ "$RESULT" -eq 0 ] && pass "decoy file at REPO_ROOT doesn't suppress the PKG_ROOT fallback → exit 0" || fail "decoy-file-on-disk → expected exit 0, got $RESULT ($RESULT_OUTPUT)"
+
 echo ""
 echo "═══════════════════════════════════════════════════════════════"
 echo "RESULTS: $PASS passed, $FAIL failed"

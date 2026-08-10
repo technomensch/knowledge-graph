@@ -92,7 +92,7 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 
 **v0.7.1.2 — 2026-08-10** *(handoff gate gitignored-file fix)*
 
-- **`handoff-file-tracing-gate.sh` still hard-blocked worktree sessions when the handoff package's own files were generated in a different checkout** — `handoff-packages/` is gitignored, so `git worktree add` never checks it out; issue-43's anchor is correct, but a package generated elsewhere structurally can't exist under a different worktree's own root. Now falls back to `PKG_ROOT`, derived from the transcript's own `Read` path for the file that was actually opened. Closes #217, issue-44.
+- **`handoff-file-tracing-gate.sh` still hard-blocked worktree sessions when the handoff package's own files were generated in a different checkout** — `handoff-packages/` is gitignored, so `git worktree add` never checks it out; issue-43's anchor is correct, but a package generated elsewhere structurally can't exist under a different worktree's own root. Now falls back to `PKG_ROOT`, derived from the transcript's own `Read` path for the file that was actually opened, gated on `Read` membership rather than mere on-disk existence — a same-date decoy file at the wrong root can't suppress the fallback. Closes #217, issue-44.
 
 **v0.7.1.1 — 2026-08-10** *(handoff gate worktree fix)*
 
