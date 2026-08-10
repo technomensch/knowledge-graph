@@ -1,10 +1,11 @@
 ---
 id: issue-44
 type: Bug
-status: tracked
+status: resolved
 github-issue: "#217"
 branch: v0.7.1.2-issue-44-worktree-gitignored-handoff-files
 created: 2026-08-10
+resolved: 2026-08-10
 ---
 
 # Issue-44: `handoff-file-tracing-gate.sh` Structurally Can't Be Satisfied Inside a Worktree When Manifest Files Live Under Gitignored `handoff-packages/`
@@ -43,19 +44,49 @@ anchor: main-repo vs worktree root). Here the anchor is *correct* for the worktr
 the problem is the referenced content was never generated there and gitignore
 prevents it from ever appearing there.
 
-## Fix Direction (not yet implemented, needs Fable review)
+## Fix (implemented)
 
-When a manifest file doesn't exist under the resolved (worktree) `REPO_ROOT`, fall
-back to checking it under the **main checkout root** before declaring it missing —
-derived via `git -C "$HOOK_CWD" rev-parse --git-common-dir`, whose parent directory
-is the main checkout (the shared `.git` storage lives there; a worktree's own
-`--git-common-dir` output points back to it, not to itself).
+An independent review pass (Fable) found a simpler and strictly more accurate fix
+than the originally drafted `git rev-parse --git-common-dir` approach: the script
+already holds an exact, verified anchor to the package's true root —
+`STARTHERE_PATH`, the transcript's own absolute `Read` path for the file that was
+actually opened (guaranteed to exist on disk, checked at line 58). Deriving
+`PKG_ROOT` from it and falling back to it when the `REPO_ROOT`-anchored path
+doesn't exist on disk:
 
-This only covers "handoff package generated in main, read from a worktree that
-never checked it out" — not the reverse, and not cross-worktree reads (worktree A
-generates a handoff package, worktree B tries to read it back). Both are far
-narrower real-world cases and likely out of scope; needs a decision during
-implementation review on whether to note-only or also handle.
+```bash
+PKG_ROOT=""
+if [[ "$STARTHERE_PATH" == */handoff-packages/* ]]; then
+  PKG_ROOT="${STARTHERE_PATH%/handoff-packages/*}"
+fi
+```
+
+```bash
+resolved_manifest_file="${REPO_ROOT}/${manifest_file#./}"
+if [[ ! -f "$resolved_manifest_file" && -n "$PKG_ROOT" && "$PKG_ROOT" != "$REPO_ROOT" ]]; then
+  resolved_manifest_file="${PKG_ROOT}/${manifest_file#./}"
+fi
+```
+
+Why this beats the git-common-dir fallback (rejected):
+1. **Covers cross-worktree reads for free** (worktree A generates, worktree B
+   reads) — the anchor is wherever the package actually is, not just "the main
+   checkout." The originally-flagged scope question dissolves.
+2. **Same-source path spelling** — `PKG_ROOT` derives from the transcript's own
+   `Read` path, so the expected path is spelled exactly as `Read` records paths,
+   immune to the symlink-normalization mismatch class (macOS `/tmp` →
+   `/private/tmp`) that a fresh `git rev-parse` call could reintroduce — the exact
+   failure shape issue-42/43 already fixed once.
+3. No git call at all for this fallback — one less moving part.
+
+Verified during review (empirically, not just reasoned): `git worktree add` never
+checks out gitignored content — confirmed against a real throwaway fixture, not
+assumed. `git rev-parse --git-common-dir`'s plain (non-`--path-format=absolute`)
+output is relative from the main checkout (`.git`/`../.git`) and absolute from a
+worktree — the originally-drafted fallback's bare `dirname` would have been buggy
+in the main-checkout case had it been used (harmless there only because the
+fallback is moot in that case, but wrong code) — documented here so it isn't
+rediscovered as "the git-common-dir approach should have worked."
 
 ## Related
 

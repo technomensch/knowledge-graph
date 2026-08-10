@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.7.1.1
+**Version:** 0.7.1.2
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -89,6 +89,10 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 ---
 
 ## v0.7.x Feature Highlights
+
+**v0.7.1.2 — 2026-08-10** *(handoff gate gitignored-file fix)*
+
+- **`handoff-file-tracing-gate.sh` still hard-blocked worktree sessions when the handoff package's own files were generated in a different checkout** — `handoff-packages/` is gitignored, so `git worktree add` never checks it out; issue-43's anchor is correct, but a package generated elsewhere structurally can't exist under a different worktree's own root. Now falls back to `PKG_ROOT`, derived from the transcript's own `Read` path for the file that was actually opened. Closes #217, issue-44.
 
 **v0.7.1.1 — 2026-08-10** *(handoff gate worktree fix)*
 
@@ -210,7 +214,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.7.1.1 (2026-08-10)
+**Current Release:** v0.7.1.2 (2026-08-10)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -312,6 +316,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.7.1.1 (2026-08-10)
+**Current Version:** v0.7.1.2 (2026-08-10)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info

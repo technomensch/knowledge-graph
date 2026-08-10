@@ -9,6 +9,12 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.1.2] — 2026-08-10
+
+### Fixed
+
+- **`handoff-file-tracing-gate.sh` still hard-blocked sessions inside a git worktree when the handoff package's own files (`handoff-packages/`, gitignored by design) were generated in a different checkout** — issue-43's worktree-aware `REPO_ROOT` is correct, but `git worktree add` never checks out gitignored content, so a package generated in the main checkout (or another worktree) structurally can't exist under a different worktree's own root, regardless of anchor correctness. Now derives a `PKG_ROOT` fallback from `STARTHERE_PATH` — the transcript's own absolute `Read` path for the file that was actually opened — instead of a fresh `git` call, which also covers cross-worktree reads for free. Regression tests added (gitignored-package fixture, plus a negative twin confirming the fallback doesn't mask a genuinely unopened file). Closes #217, issue-44.
+
 ## [0.7.1.1] — 2026-08-10
 
 ### Fixed
@@ -35,7 +41,7 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 - **Migration path off the legacy config and `.active`** — `kg_upgrade` gains a new schema-reconciliation apply category that folds an existing legacy `~/.claude/kg-config.json` and any `.active` pointer into the new `status`/`graphId` schema, wired into `kmg-init` and covered by a new end-to-end migration integration test.
 - **Dead `autoSwitch` hook mechanism retired** from upgrade tooling and docs — it had no live callers left once `.active`-driven switching was removed.
 - **`gov-capture-routing` retired** (issue-18) — its indirection was redundant once commands could route `scope`/`targetKg` directly; ADR-034 marked superseded.
-- **ENH-051 closed** — `cli.ts` and `kg_config_init`'s duplicated path-resolution and broad-ancestor-guard logic deduplicated into one shared implementation.
+- **`cli.ts` and `kg_config_init`'s broad-ancestor-guard logic deduplicated into one shared implementation** (`resolveRegistrationGuard`/`findBroadAncestorWarning` in `mcp-server/src/tools/config.ts`, imported by `cli.ts`) — verified in source 2026-08-05. **Correction, 2026-08-05:** this entry originally also claimed "ENH-051 closed," conflating this real guard-logic dedup with ENH-051's actual, separate scope (path-*resolution* — computing a KG storage path from a location-type choice). That part was never built: `handleConfigInit` still requires `kgPath` as a caller-supplied input rather than computing one, and `kmg-init.md` still hand-maintains its own copy of the location-to-path logic (see `commands/kmg-init.md:1101`'s sync comment, unchanged). ENH-051 remains open — same status as the "Known gaps" entry for it under v0.6.20 below, which this entry should never have appeared to override.
 
 ### Fixed
 
