@@ -166,6 +166,81 @@ RESULT=$?
 set -e
 [ "$RESULT" -eq 0 ] && pass "worktree session: relative manifest path, in-worktree absolute Read, CLAUDE_PROJECT_DIR=main checkout → exit 0" || fail "worktree anchor resolution → expected exit 0, got $RESULT ($RESULT_OUTPUT)"
 
+# ── Test 6: issue-44 — handoff-packages/ is gitignored, so a package
+# generated in the MAIN checkout never gets checked out into a worktree at
+# all (not a wrong-anchor problem like issue-43 — the files structurally
+# don't exist under the worktree's own REPO_ROOT). Read paths are recorded
+# at the main checkout's absolute path (the only place the files exist);
+# HOOK_CWD is the worktree. Pre-fix (issue-43's fix alone), REPO_ROOT
+# correctly resolves to the worktree, but resolved_manifest_file under it
+# doesn't exist on disk and never matches → false exit 2. Post-fix,
+# STARTHERE_PATH-derived PKG_ROOT falls back to the main checkout → exit 0. ─
+FIXTURE_REPO2="$TEST_DIR/fixture-repo2"
+WORKTREE_DIR2="$TEST_DIR/fixture-worktree2"
+git init -q "$FIXTURE_REPO2"
+echo "handoff-packages/" > "$FIXTURE_REPO2/.gitignore"
+git -C "$FIXTURE_REPO2" add .gitignore
+git -C "$FIXTURE_REPO2" -c user.email=test@test -c user.name=test commit -q -m init
+git -C "$FIXTURE_REPO2" worktree add -q -b test-worktree-branch2 "$WORKTREE_DIR2" > /dev/null 2>&1
+
+mkdir -p "$FIXTURE_REPO2/handoff-packages/2026-08-10"
+MAIN_LINKED_FILE="$FIXTURE_REPO2/handoff-packages/2026-08-10/DOCUMENTATION-MAP.md"
+touch "$MAIN_LINKED_FILE"
+MAIN_STARTHERE="$FIXTURE_REPO2/handoff-packages/2026-08-10/START-HERE.md"
+cat > "$MAIN_STARTHERE" << 'MDEOF'
+# Start Here — Project Handoff
+
+<!-- kmgraph-handoff-manifest
+```json
+["./handoff-packages/2026-08-10/DOCUMENTATION-MAP.md"]
+```
+-->
+MDEOF
+
+# Confirm the fixture actually reproduces the real-world condition: the
+# worktree must NOT have handoff-packages/ checked out.
+if [ -e "$WORKTREE_DIR2/handoff-packages" ]; then
+  fail "test 6 fixture invalid: handoff-packages/ unexpectedly present in worktree"
+fi
+
+GITIGNORED_TRANSCRIPT="$TEST_DIR/gitignored-transcript.jsonl"
+cat > "$GITIGNORED_TRANSCRIPT" << EOF
+$(read_entry "$MAIN_STARTHERE")
+$(read_entry "$MAIN_LINKED_FILE")
+EOF
+GITIGNORED_INPUT="{\"session_id\": \"test-session-$$\", \"transcript_path\": \"${GITIGNORED_TRANSCRIPT}\", \"cwd\": \"${WORKTREE_DIR2}\"}"
+
+set +e
+RESULT_OUTPUT=$(echo "$GITIGNORED_INPUT" | bash "$HOOK" 2>&1)
+RESULT=$?
+set -e
+[ "$RESULT" -eq 0 ] && pass "gitignored handoff-package generated in main, read from worktree → exit 0" || fail "gitignored-in-worktree fallback → expected exit 0, got $RESULT ($RESULT_OUTPUT)"
+
+# ── Test 7: negative twin of Test 6 — the fallback must not mask a genuinely
+# unopened file. Same fixture, but the manifest also names a second file that
+# was never Read anywhere (main or worktree) → still exit 2, still named. ──
+cat > "$MAIN_STARTHERE" << 'MDEOF'
+# Start Here — Project Handoff
+
+<!-- kmgraph-handoff-manifest
+```json
+["./handoff-packages/2026-08-10/DOCUMENTATION-MAP.md", "./handoff-packages/2026-08-10/NEVER-READ.md"]
+```
+-->
+MDEOF
+
+cat > "$GITIGNORED_TRANSCRIPT" << EOF
+$(read_entry "$MAIN_STARTHERE")
+$(read_entry "$MAIN_LINKED_FILE")
+EOF
+
+set +e
+RESULT_OUTPUT=$(echo "$GITIGNORED_INPUT" | bash "$HOOK" 2>&1)
+RESULT=$?
+set -e
+[ "$RESULT" -eq 2 ] && pass "fallback doesn't mask a genuinely unopened file → exit 2" || fail "expected exit 2 for unopened file, got $RESULT ($RESULT_OUTPUT)"
+echo "$RESULT_OUTPUT" | grep -q "NEVER-READ.md" && pass "block message names the genuinely-missing file" || fail "block message should name NEVER-READ.md"
+
 echo ""
 echo "═══════════════════════════════════════════════════════════════"
 echo "RESULTS: $PASS passed, $FAIL failed"

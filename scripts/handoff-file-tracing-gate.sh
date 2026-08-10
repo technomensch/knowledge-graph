@@ -57,6 +57,18 @@ STARTHERE_PATH=$(printf '%s\n' "$READ_FILES" | grep -F "START-HERE.md" | tail -1
 [[ -z "$STARTHERE_PATH" ]] && exit 0
 [[ ! -f "$STARTHERE_PATH" ]] && exit 0
 
+# issue-44: handoff-packages/ is gitignored, so a manifest generated in one
+# checkout (main or a different worktree) is never present under a REPO_ROOT
+# resolved from wherever THIS session happens to be running -- no anchor
+# fixes that, the referenced files just aren't there. STARTHERE_PATH is the
+# transcript's own absolute Read path for the file that WAS actually opened,
+# so it names the package's true root directly, with no git call and no
+# symlink-normalization risk (the same class of mismatch issue-42/43 fixed).
+PKG_ROOT=""
+if [[ "$STARTHERE_PATH" == */handoff-packages/* ]]; then
+  PKG_ROOT="${STARTHERE_PATH%/handoff-packages/*}"
+fi
+
 MANIFEST_JSON=$(awk '/<!-- kmgraph-handoff-manifest/{flag=1; next} /-->/{flag=0} flag' "$STARTHERE_PATH" | grep -v '```' || true)
 [[ -z "$MANIFEST_JSON" ]] && exit 0
 
@@ -77,6 +89,13 @@ while IFS= read -r manifest_file; do
     resolved_manifest_file="$manifest_file"
   else
     resolved_manifest_file="${REPO_ROOT}/${manifest_file#./}"
+    # issue-44: gitignored handoff-package files don't exist under REPO_ROOT
+    # when the package was generated somewhere else (main checkout, a
+    # different worktree). Fall back to the package's actual root, derived
+    # from STARTHERE_PATH above, before giving up on this file.
+    if [[ ! -f "$resolved_manifest_file" && -n "$PKG_ROOT" && "$PKG_ROOT" != "$REPO_ROOT" ]]; then
+      resolved_manifest_file="${PKG_ROOT}/${manifest_file#./}"
+    fi
   fi
   if ! printf '%s\n' "$READ_FILES" | grep -qxF "$resolved_manifest_file"; then
     MISSING="${MISSING}${manifest_file}"$'\n'
