@@ -59,6 +59,7 @@ Captured live, lightweight, local-only — matching the precedent set for issue-
 
 - [issue-42](../issue-42/issue-42-description.md) — regression found in this ADR-068 pilot mechanism itself (relative-vs-absolute path mismatch hard-blocked every session), not a reopening of this issue.
 - [issue-43](../issue-43/issue-43-description.md) — follow-on gap found 2026-08-10 in the same pilot mechanism: `REPO_ROOT` anchoring (issue-42's fix) resolves to the main repo, not a git worktree, reproducing the same mismatch shape inside worktree sessions.
+- [issue-44](../issue-44/issue-44-description.md) — third gap, same day, same mechanism: gitignored manifest files (`handoff-packages/`) never get checked out into a worktree at all, so no `REPO_ROOT` anchor fixes it.
 
 **This issue's second gap (buried recommendation not promoted to the checklist) remains unresolved** — ADR-068 explicitly defers it as judgment-shaped, out of scope for the pilot. Still open, tracked here.
 

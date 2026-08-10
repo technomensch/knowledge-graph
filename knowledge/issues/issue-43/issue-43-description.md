@@ -95,6 +95,7 @@ in `tests/test-handoff-file-tracing-gate.sh` (see [test-cases.md](test-cases.md)
 ## Related
 
 - [issue-42](../issue-42/issue-42-description.md) — the fix this is a follow-on gap to; same script, different anchor source
+- [issue-44](../issue-44/issue-44-description.md) — follow-on gap found 2026-08-10: this fix's worktree-anchored `REPO_ROOT` is correct, but gitignored manifest files (`handoff-packages/`) never get checked out into a worktree at all, so the anchor points to a location where they structurally can't exist
 - [ADR-068](../../decisions/ADR-068-lightweight-vs-full-workflow-rule-and-piloted-command-completion-check.md) — the pilot mechanism both issues are regressions/gaps in
 - [issue-33](../issue-33/issue-33-description.md) — original gap this mechanism was built to close; deferred, unrelated second gap
 - `scripts/handoff-file-tracing-gate.sh` — the script needing the fix

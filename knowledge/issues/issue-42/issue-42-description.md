@@ -41,3 +41,4 @@ Added a 5th regression test to `tests/test-handoff-file-tracing-gate.sh` that sp
 - `tests/test-handoff-file-tracing-gate.sh` — the expanded regression suite (5/5 passing)
 - `commands/kmg-handoff.md:154` — where the manifest's relative `output_dir` originates
 - [issue-43](../issue-43/issue-43-description.md) — follow-on gap found 2026-08-10: this fix's `REPO_ROOT` anchor (`CLAUDE_PROJECT_DIR`) resolves to the main repo, not a git worktree, reproducing the same mismatch shape inside worktree sessions
+- [issue-44](../issue-44/issue-44-description.md) — third gap in the same saga, found the same day: gitignored manifest files (`handoff-packages/`) never get checked out into any worktree at all, regardless of anchor correctness
