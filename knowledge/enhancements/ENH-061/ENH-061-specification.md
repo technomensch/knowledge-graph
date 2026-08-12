@@ -10,7 +10,7 @@ related_issues: []
 related_adrs: [ADR-062]
 ---
 
-# ENH-061: Claude Extractor Fails Closed on Unscoped Extraction, Attributes by `cwd` Not Directory Name
+# ENH-061: Extraction Fails Closed on Unscoped Runs (All Sources), Claude Attributes by `cwd` Not Directory Name
 
 ## Problem
 
@@ -33,19 +33,26 @@ which this ENH implements.
 
 ## Scope (Phase 1 — this ENH)
 
-1. **Fully-unscoped invocation hard-stops.** When `run_extraction.py --source
-   claude` (or `--source all`) is invoked with no `--project`, stop before
-   reading any session content. Explain plainly what would happen (merge
-   sessions from every project on the machine, not just the current repo),
-   ask for explicit confirmation to proceed anyway, and advise using
-   `--project=<name>`.
-2. **`--project=<name>` matching 2+ directories shows a composition notice, does
-   not hard-stop.** Since the user did explicitly scope something, proceed —
-   but report source attribution before writing ("N sessions from `<repo>`, M
-   from worktree `<name>`, K from `<other-dir>`"), computed via the `cwd` field
-   already present in each session's `.jsonl` records (no new I/O pass — the
-   parse loop already reads every line), cross-referenced against a freshly-run
-   `git worktree list --porcelain` (never cached) where applicable.
+1. **Fully-unscoped invocation hard-stops — for all four `--source` values**
+   (`claude`, `gemini`, `codex`, `all`), not just Claude. The "merges every
+   session on the machine" failure mode is structural to every extractor's
+   unscoped path — Gemini globs all of `~/.gemini/tmp/*` unscoped the same way
+   Claude globs all of `~/.claude/projects/*`; Codex has the equivalent gap.
+   Implemented once, at the shared `run_extraction.py` CLI entry point, not
+   duplicated per-extractor. When `--project` is not given, stop before reading
+   any session content. Explain plainly what would happen (merge sessions from
+   every project on the machine, not just the current repo), ask for explicit
+   confirmation to proceed anyway, and advise using `--project=<name>`.
+2. **Claude-specific: `--project=<name>` matching 2+ directories shows a
+   composition notice, does not hard-stop.** Since the user did explicitly
+   scope something, proceed — but report source attribution before writing
+   ("N sessions from `<repo>`, M from worktree `<name>`, K from
+   `<other-dir>`"), computed via the `cwd` field already present in each
+   session's `.jsonl` records (no new I/O pass — the parse loop already reads
+   every line). This item is Claude-only because the worktree-directory-
+   splitting problem it addresses is a Claude Code structural quirk — Gemini
+   and Codex don't split sessions across per-worktree project directories the
+   same way.
 3. Directory-name parsing (any of the three coexisting conventions) is a
    fallback only, for the case where a project directory has already been
    log-rotated to nothing and there's no `.jsonl` left to read `cwd` from.

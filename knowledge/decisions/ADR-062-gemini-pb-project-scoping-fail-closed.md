@@ -197,15 +197,26 @@ this machine, not assumed):**
 **Extended decision — the same fail-closed, never-silent principle, applied to
 the case this ADR's original scope excluded:**
 
-1. **Fully-unscoped invocation now fails closed, not open.** When `--project` is
-   not given at all, the extractor stops before reading anything, states plainly
-   what it's about to do (merge sessions from every project on the machine, not
-   just this repo), asks for explicit confirmation to proceed anyway, and
-   advises using `--project=<name>` instead. This mirrors this ADR's original
-   Option-B rejection (`fails open — a warning is easy to miss` — § Alternatives
-   Considered): a notice the user can only see *after* the fact was rejected for
-   `.pb`/hash-dirs for the same reason it's rejected here — a confirmation gate
-   *before* the read is the fail-closed shape, not a warning after.
+1. **Fully-unscoped invocation now fails closed, not open — for all three
+   sources (`claude`, `gemini`, `codex`, `all`), not just Claude.** The
+   "merges everyone's sessions" failure mode is structural to every extractor's
+   unscoped path, not unique to Claude's directory layout — Gemini globs all of
+   `~/.gemini/tmp/*` unscoped the same way Claude globs all of
+   `~/.claude/projects/*`. This supersedes this ADR's original Neutral
+   consequence ("Unscoped extraction is unaffected by this decision — it
+   already includes everything, as today") for the *gating* question — that
+   line was true when written (this ADR's original scope was `.pb`/hash-dir
+   exclusion only, not the unscoped path at all) but the new gate applies to
+   the shared `run_extraction.py` CLI entry point regardless of `--source`.
+   When `--project` is not given, the extractor stops before reading anything,
+   states plainly what it's about to do (merge sessions from every project on
+   the machine, not just this repo), asks for explicit confirmation to proceed
+   anyway, and advises using `--project=<name>` instead. This mirrors this
+   ADR's original Option-B rejection (`fails open — a warning is easy to
+   miss` — § Alternatives Considered): a notice the user can only see *after*
+   the fact was rejected for `.pb`/hash-dirs for the same reason it's rejected
+   here — a confirmation gate *before* the read is the fail-closed shape, not a
+   warning after.
 2. **`--project=<name>` matching 2+ directories (a worktree, or any
    substring-coincidental sibling) does not hard-stop** — the user did explicitly
    scope something, so this is Option-B's "include with a visible notice," not

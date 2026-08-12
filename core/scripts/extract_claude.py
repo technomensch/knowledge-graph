@@ -155,11 +155,23 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
     
     # Collect all sessions first
     all_sessions = []
-    
+
+    # ENH-061: attribute each session by its own recorded `cwd`, not by which
+    # ~/.claude/projects/ directory it was found under. A git worktree gets
+    # its own separate project directory (naming conventions for this are not
+    # consistent -- confirmed 3 different ones coexist on real machines), but
+    # every session .jsonl carries an absolute `cwd` field per message, which
+    # is a reliable, convention-independent signal. Used below to print a
+    # composition breakdown whenever project_filter matched more than one
+    # directory, so a multi-directory merge (worktree or otherwise) is never
+    # silent -- see ADR-062's amendment extending its fail-closed/never-silent
+    # principle from Gemini to Claude.
+    cwd_file_counts: Dict[str, int] = {}
+
     for project_dir in project_dirs:
         # Find jsonl files in each project recursively (including subagents)
         jsonl_files = glob.glob(os.path.join(project_dir, "**", "*.jsonl"), recursive=True)
-        
+
         for jsonl_path in jsonl_files:
             # Skip empty files
             if os.path.getsize(jsonl_path) == 0:
@@ -180,12 +192,16 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
             date_ts_str: Dict[str, str] = {}
             pending_untimestamped = []
             current_date = None
+            file_cwd = None  # ENH-061: first `cwd` seen in this session's records
 
             try:
                 with open(jsonl_path, 'r') as f:
                     for line in f:
                         try:
                             obj = json.loads(line)
+
+                            if file_cwd is None and obj.get('cwd'):
+                                file_cwd = obj['cwd']
 
                             msg_date = None
                             msg_ts_str = None
@@ -256,6 +272,23 @@ def extract_claude_sessions(days_back=None, date_filter=None, after_date=None,
                     'messages': bucket_messages,
                     'count': len(bucket_messages)
                 })
+
+            cwd_file_counts[file_cwd or "(no cwd recorded)"] = \
+                cwd_file_counts.get(file_cwd or "(no cwd recorded)", 0) + 1
+
+    # ENH-061: project_filter matching more than one distinct cwd means
+    # sessions from genuinely different working contexts (a worktree, an
+    # unrelated same-prefix directory, etc.) are about to be merged into one
+    # output. Never silent about that -- print the breakdown before writing,
+    # so a multi-context merge is always visible even though it's still
+    # allowed (the user did explicitly scope something with --project).
+    if project_filter and len(cwd_file_counts) > 1:
+        print(f"NOTE: --project={project_filter!r} matched {len(cwd_file_counts)} "
+              f"distinct working directories -- sessions from all of them are included:")
+        for cwd_path, count in sorted(cwd_file_counts.items(), key=lambda kv: -kv[1]):
+            print(f"  {count} session file(s) from {cwd_path}")
+        print("  If this isn't what you meant, re-run with a more specific "
+              "--project value (e.g. a worktree's own name).")
 
     # Group by date
     from collections import defaultdict

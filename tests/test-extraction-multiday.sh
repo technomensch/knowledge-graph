@@ -39,7 +39,7 @@ OUTPUT_DIR="$TEST_DIR/output"
 mkdir -p "$OUTPUT_DIR"
 
 HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
-  --source claude --output-dir "$OUTPUT_DIR" \
+  --source claude --output-dir "$OUTPUT_DIR" --confirm-unscoped \
   > "$TEST_DIR/fanout.log" 2>&1 || true
 
 DAY1_FILE=$(find "$OUTPUT_DIR" -name "2026-06-01-claude.md" | head -1)
@@ -91,7 +91,7 @@ FILTER_OUT="$TEST_DIR/output-filtered"
 mkdir -p "$FILTER_OUT"
 
 HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
-  --source claude --output-dir "$FILTER_OUT" --date=2026-06-03 \
+  --source claude --output-dir "$FILTER_OUT" --date=2026-06-03 --confirm-unscoped \
   > "$TEST_DIR/filtered.log" 2>&1 || true
 
 FILTER_DAY1_FILE=$(find "$FILTER_OUT" -name "2026-06-01-claude.md" 2>/dev/null | head -1)
@@ -176,7 +176,7 @@ case "$PRE_PATH" in
 esac
 
 HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
-  --source claude --output-dir "$SPLIT_OUT" --date=2026-06-03 --incremental \
+  --source claude --output-dir "$SPLIT_OUT" --date=2026-06-03 --incremental --confirm-unscoped \
   > "$TEST_DIR/split.log" 2>&1 || true
 
 # (a) no stray flat file created alongside the split subfolder
@@ -238,7 +238,7 @@ LEADING_OUT="$TEST_DIR/output-leading"
 mkdir -p "$LEADING_OUT"
 
 HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
-  --source claude --output-dir "$LEADING_OUT" \
+  --source claude --output-dir "$LEADING_OUT" --confirm-unscoped \
   > "$TEST_DIR/leading.log" 2>&1 || true
 
 LEADING_FILE=$(find "$LEADING_OUT" -name "2026-06-10-claude.md" | head -1)

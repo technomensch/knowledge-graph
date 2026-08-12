@@ -40,7 +40,7 @@ mkdir -p "$OUTPUT_DIR"
 
 HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
   --source claude --output-dir "$OUTPUT_DIR" --date 2026-07-01 \
-  --claude-projects-dir "$TEST_DIR/backup-projects" \
+  --claude-projects-dir "$TEST_DIR/backup-projects" --confirm-unscoped \
   > "$TEST_DIR/override.log" 2>&1 || true
 
 OUTPUT_FILE=$(find "$OUTPUT_DIR" -name "2026-07-01-claude.md" | head -1)
