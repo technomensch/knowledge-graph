@@ -67,19 +67,59 @@ If a new rule is being added to `rules.md`, **always check whether a trigger ent
 
 For each file that needs updating, draft the proposed content inline for user review before writing.
 
-### Step 4: Gate — all three files reviewed
+### Step 4: Gate — all three files covered
 
-Before marking the profile update complete:
+Before showing anything for approval, confirm internally that all three files have
+been considered:
 
-- [ ] `me.md` — reviewed; updated if needed or confirmed no change needed
-- [ ] `rules.md` — reviewed; updated if needed or confirmed no change needed
-- [ ] `triggers.md` — reviewed; updated if needed or confirmed no change needed
+- [ ] `me.md` — drafted a change, or determined no change needed
+- [ ] `rules.md` — drafted a change, or determined no change needed
+- [ ] `triggers.md` — drafted a change, or determined no change needed
 
-Do not mark done until all three are explicitly checked.
+Do not proceed to Step 5 until all three are explicitly accounted for.
 
-### Step 5: Write
+### Step 5: STOP — show drafts, wait for explicit approval (mandatory, no exceptions)
 
-Write to the correct level (`~/.kmgraph/` or `knowledge/`) using the Write or Edit tool. Commit changes in the project KG (knowledge/) if applicable.
+**This step cannot be skipped, shortcut, or inferred from context.** Drafting the
+content in Step 3 is not review. The user reading a message that happens to
+contain a draft is not approval. Only an explicit affirmative reply, given after
+the draft is shown, counts as approval.
+
+For every file that would change, show its full drafted diff/content in one
+message, then ask literally:
+
+> "Approve these profile changes? (yes / edit / no)"
+
+- **On "yes" / "approve" / equivalent explicit affirmative:** proceed to Step 6.
+- **On "edit [feedback]":** revise the draft, re-show it in full, ask again. Do not
+  write the partially-revised version.
+- **On "no" / decline:** stop. State plainly that nothing was written.
+- **On silence, a topic change, or any reply that isn't an explicit yes/no:**
+  treat as not-yet-approved. Do not write. Do not proceed on the assumption that
+  moving on implies consent — ask again or drop it, but never write unconfirmed.
+
+### Step 6: Write
+
+Only after explicit approval in Step 5: write to the correct level (`~/.kmgraph/`
+or `knowledge/`) using the Write or Edit tool. Commit changes in the project KG
+(knowledge/) if applicable. Immediately confirm which file(s) were changed and
+what changed — never let the first the user hears of a change be after the fact.
+
+## Constraints
+
+- **Never write to any profile file without the Step 5 approval gate having
+  fired and received an explicit affirmative response in this same request.**
+  Self-review, internal drafting, or "I'll show them eventually" does not
+  satisfy this — the user must see the draft and explicitly say yes before any
+  Write or Edit tool call touches `me.md`, `rules.md`, or `triggers.md` at
+  either level.
+- If this skill is ever invoked in a context where interactive confirmation
+  isn't possible (a fully automated/background run with no user turn to
+  respond), do not write — draft the changes and report them as pending
+  approval instead of writing unconfirmed.
+- After writing, state explicitly what changed, in which file(s) — informing
+  the user only after the fact, without the prior gate, is exactly the failure
+  mode this skill exists to prevent.
 
 ---
 

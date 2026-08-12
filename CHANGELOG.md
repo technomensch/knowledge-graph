@@ -9,6 +9,12 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.1.3] — 2026-08-12
+
+### Changed
+
+- **`kmg-update-profile` now has a mandatory explicit-approval gate before writing any profile file** — the old Step 4/5 let a session draft, self-review, and write without ever pausing for the user to actually say yes, so a profile change could land and only be reported after the fact. New Step 5 shows every file's full drafted content and requires an explicit affirmative reply before Step 6 writes anything; silence or a topic change no longer counts as approval. Matches the approval gate `rules-capture-agent` already had. A durable backstop rule was also added to `~/.kmgraph/rules.md` § Approval Gates, independent of any single skill firing correctly. Closes #219, ENH-060.
+
 ## [0.7.1.2] — 2026-08-10
 
 ### Fixed

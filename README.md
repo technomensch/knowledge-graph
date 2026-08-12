@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.7.1.2
+**Version:** 0.7.1.3
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -89,6 +89,10 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 ---
 
 ## v0.7.x Feature Highlights
+
+**v0.7.1.3 — 2026-08-12** *(profile-update approval gate hardening)*
+
+- **`kmg-update-profile` now has a mandatory explicit-approval gate before writing any profile file** — old flow could draft, self-review, and write without ever pausing for the user to say yes. New gate shows every file's full drafted content and requires an explicit affirmative reply before writing; silence isn't consent. Closes #219, ENH-060.
 
 **v0.7.1.2 — 2026-08-10** *(handoff gate gitignored-file fix)*
 
@@ -214,7 +218,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.7.1.2 (2026-08-10)
+**Current Release:** v0.7.1.3 (2026-08-12)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -316,6 +320,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.7.1.2 (2026-08-10)
+**Current Version:** v0.7.1.3 (2026-08-12)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info
