@@ -9,6 +9,10 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Meta-issue "Attempts" paperwork drifted from actual attempts silently, confirmed 3x in one real instance** — the convention (README = terse index, `implementation-log.md` = chronological log, `attempts/NNN-*/` = full detail) was enforced only by prose, and the scaffold's own reminder to use `--add-attempt` had already failed twice before. Adds a new Step 5 to `kmg-paperwork-audit`: a mechanical folder↔log-header invariant check plus a README `## Attempts` entry size guardrail, both self-contained bash/awk since `scripts/pre-push-gate.sh` (where the skill previously said this kind of check belonged) isn't shipped to consumer repos. Confirmed against two live drift cases already present in this repo's own `knowledge/issues/` and a naming inconsistency in a third. Also tightens `core/default-templates/meta-issue/README.md` and `core/docs/META-ISSUE-GUIDE.md` to point at the atomic `--add-attempt`/`--log-attempt` commands instead of presenting folder-creation and log-update as independent steps. Closes #222, issue-45.
+
 ## [0.7.1.3] — 2026-08-12
 
 ### Changed

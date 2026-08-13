@@ -5,7 +5,7 @@ status: deferred
 github-issue: "#188"
 branch: none
 created: 2026-07-18
-related_issues: ["issue-13", "issue-26", "issue-28"]
+related_issues: ["issue-13", "issue-26", "issue-28", "issue-45"]
 related_enhs: ["ENH-042"]
 ---
 
