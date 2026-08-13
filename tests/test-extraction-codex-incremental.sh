@@ -42,7 +42,7 @@ mkdir -p "$OUTPUT_DIR"
 
 echo "── First extraction: 2 messages ──"
 HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
-  --source codex --output-dir "$OUTPUT_DIR" --date "$LOCAL_DATE" --incremental \
+  --source codex --output-dir "$OUTPUT_DIR" --date "$LOCAL_DATE" --incremental --confirm-unscoped \
   > "$TEST_DIR/first.log" 2>&1 || true
 
 OUTPUT_FILE=$(find "$OUTPUT_DIR" -name "${LOCAL_DATE}-codex.md" | head -1)
@@ -58,7 +58,7 @@ echo "── Update the source file with 2 more turns, re-run --incremental imme
 cp "$FIXTURES_DIR/sample-codex-rollout-updated.jsonl" "$SESSION_DIR/rollout-test-session.jsonl"
 
 SECOND_LOG=$(HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
-  --source codex --output-dir "$OUTPUT_DIR" --date "$LOCAL_DATE" --incremental 2>&1)
+  --source codex --output-dir "$OUTPUT_DIR" --date "$LOCAL_DATE" --incremental --confirm-unscoped 2>&1)
 
 if echo "$SECOND_LOG" | grep -qi "Skipped.*already current"; then
   fail "incremental re-run inside the same hour was silently skipped (ENH-045 bug still present)"

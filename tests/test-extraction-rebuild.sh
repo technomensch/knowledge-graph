@@ -63,7 +63,7 @@ EOF
 
 echo "── Run WITHOUT --rebuild (incremental append) — expect it does NOT clean up the old block ──"
 HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
-  --source claude --output-dir "$OUTPUT_DIR" --date "$DATE" --incremental \
+  --source claude --output-dir "$OUTPUT_DIR" --date "$DATE" --incremental --confirm-unscoped \
   > "$TEST_DIR/no-rebuild.log" 2>&1 || true
 
 if grep -q "^## Session 1 (Started:" "$OUTPUT_FILE"; then
@@ -97,7 +97,7 @@ Start the investigation.
 EOF
 
 HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
-  --source claude --output-dir "$OUTPUT_DIR" --date "$DATE" --rebuild \
+  --source claude --output-dir "$OUTPUT_DIR" --date "$DATE" --rebuild --confirm-unscoped \
   > "$TEST_DIR/rebuild.log" 2>&1 || true
 
 SESSION_BLOCKS=$(grep -c "^## Session" "$OUTPUT_FILE" 2>/dev/null || true)
@@ -132,7 +132,7 @@ echo "── Gap 5: --rebuild over a malformed/truncated existing file ──"
 rm -rf "$OUTPUT_DIR"; mkdir -p "$OUTPUT_DIR/2026-07"
 printf '# Complete Chat Session Export\n## Full Conversation from Claude Code\n\n**Date:** 2026-07-03\n\n### Message 1: User\n<!-- uuid: rebuild-001 -->\n**Timestamp:** 2026-07-03T09:00:00\n\n**Content:**\n\nStart the inv' > "$OUTPUT_FILE"
 HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
-  --source claude --output-dir "$OUTPUT_DIR" --date "$DATE" --rebuild \
+  --source claude --output-dir "$OUTPUT_DIR" --date "$DATE" --rebuild --confirm-unscoped \
   > "$TEST_DIR/rebuild-malformed.log" 2>&1 || true
 if ! grep -qi "Traceback" "$TEST_DIR/rebuild-malformed.log"; then
   pass "rebuild over a malformed/truncated file does not crash (no traceback)"
@@ -190,7 +190,7 @@ case "$PRE_PATH" in
 esac
 
 HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
-  --source claude --output-dir "$OUTPUT_DIR" --date "$DATE" --rebuild \
+  --source claude --output-dir "$OUTPUT_DIR" --date "$DATE" --rebuild --confirm-unscoped \
   > "$TEST_DIR/rebuild-split.log" 2>&1 || true
 
 if [ ! -d "$OUTPUT_DIR/2026-07-03" ]; then
@@ -240,7 +240,7 @@ Start the investigation.
 ---
 EOF
 HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
-  --source claude --output-dir "$OUTPUT_DIR" --date "$DATE" --rebuild --incremental \
+  --source claude --output-dir "$OUTPUT_DIR" --date "$DATE" --rebuild --incremental --confirm-unscoped \
   > "$TEST_DIR/rebuild-incremental.log" 2>&1 || true
 PREC_SESSIONS=$(grep -c "^## Session" "$OUTPUT_FILE" 2>/dev/null || true)
 PREC_SESSIONS=${PREC_SESSIONS:-0}

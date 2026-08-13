@@ -9,6 +9,13 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.1.3] — 2026-08-12
+
+### Changed
+
+- **`kmg-update-profile` now has a mandatory explicit-approval gate before writing any profile file** — the old Step 4/5 let a session draft, self-review, and write without ever pausing for the user to actually say yes, so a profile change could land and only be reported after the fact. New Step 5 shows every file's full drafted content and requires an explicit affirmative reply before Step 6 writes anything; silence or a topic change no longer counts as approval. Matches the approval gate `rules-capture-agent` already had. A durable backstop rule was also added to `~/.kmgraph/rules.md` § Approval Gates, independent of any single skill firing correctly. Closes #219, ENH-060.
+- **`kmg-extract-chat` now fails closed on unscoped extraction and attributes Claude sessions by `cwd`, not directory name.** Omitting `--project` used to silently merge chat-history sessions from every project on the machine into whatever repo's output the run happened to write to; it now refuses to run without either `--project=<name>` or a new `--confirm-unscoped` flag, for all four `--source` values (the failure mode is structural to every extractor's unscoped glob, not Claude-specific). Separately, a git worktree gets its own `~/.claude/projects/` directory (three incompatible naming conventions confirmed to coexist on real machines), so `--project=<repo-name>` silently merged main-checkout and worktree sessions together; it now proceeds (scope was explicitly given) but prints a composition breakdown attributed via each session's own `cwd` field. Extends [ADR-062](knowledge/decisions/ADR-062-gemini-pb-project-scoping-fail-closed.md)'s existing Gemini-only fail-closed/never-silent principle to Claude, Gemini, and Codex. Closes #221, ENH-061.
+
 ## [0.7.1.2] — 2026-08-10
 
 ### Fixed

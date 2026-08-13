@@ -23,8 +23,39 @@ def main():
     parser.add_argument("--incremental", action="store_true", help="Only extract new sessions (skip if file already exists and is current)")
     parser.add_argument("--rebuild", action="store_true", help="Force overwrite/flatten every date in scope, ignoring existing output state (repairs pre-fix corrupted files — see ENH-043)")
     parser.add_argument("--claude-projects-dir", type=str, default=None, help="Override the Claude session-log source directory (e.g. a restored backup) instead of ~/.claude/projects — see ENH-043")
+    parser.add_argument("--confirm-unscoped", action="store_true", help="Acknowledge running without --project: merges sessions from every project on this machine (see ENH-061 / ADR-062 amendment)")
 
     args = parser.parse_args()
+
+    # ENH-061 / ADR-062 amendment: an unscoped run (--project not given) merges
+    # sessions from every project on the machine into whatever repo's
+    # chat-history/ this happens to write to -- structural to every source's
+    # unscoped path (each globs its own tmp/projects dir with no per-repo
+    # boundary), not just Claude. Fail closed: refuse to read anything until
+    # the user either scopes with --project or explicitly acknowledges the
+    # broad run. Mirrors this codebase's existing --today interactive-prompt
+    # pattern (sys.stdin.isatty()) for the human-at-a-terminal case; a
+    # non-interactive caller (Claude Code itself, invoked via Bash, has no
+    # tty attached) must pass --confirm-unscoped explicitly -- there is no
+    # way to prompt it, and silently proceeding would defeat the point.
+    if args.project is None and not args.confirm_unscoped:
+        explanation = (
+            "No --project given: this would merge chat-history sessions from "
+            "EVERY project on this machine (every directory under "
+            "~/.claude/projects/, ~/.gemini/tmp/, and Codex's session store), "
+            "not just the current repo, into this run's output.\n"
+            "  - To scope to one project: re-run with --project=<name>\n"
+            "  - To proceed unscoped anyway: re-run with --confirm-unscoped"
+        )
+        if sys.stdin.isatty():
+            print(explanation)
+            response = input("Proceed unscoped anyway? [y/N]: ").strip().lower()
+            if response not in ('y', 'yes'):
+                print("Extraction cancelled -- no session content was read.")
+                return
+        else:
+            print(f"ERROR: {explanation}", file=sys.stderr)
+            sys.exit(1)
 
     # --rebuild is Claude-only (it exists specifically to repair the
     # ENH-047 date-bucketing corruption that was unique to the Claude

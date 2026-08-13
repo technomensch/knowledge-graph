@@ -31,7 +31,7 @@ mkdir -p "$OUTPUT_DIR"
 
 echo "── Pass 1: fresh extraction (non-incremental) ──"
 HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
-  --source claude --output-dir "$OUTPUT_DIR" --date "$DATE" \
+  --source claude --output-dir "$OUTPUT_DIR" --date "$DATE" --confirm-unscoped \
   > "$TEST_DIR/pass1.log" 2>&1 || true
 
 OUTPUT_FILE="$OUTPUT_DIR/2026-07/${DATE}-claude.md"
@@ -53,7 +53,7 @@ cat >> "$PROJECT_DIR/main-session.jsonl" <<'EOF'
 EOF
 
 HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
-  --source claude --output-dir "$OUTPUT_DIR" --date "$DATE" --incremental \
+  --source claude --output-dir "$OUTPUT_DIR" --date "$DATE" --incremental --confirm-unscoped \
   > "$TEST_DIR/pass2.log" 2>&1 || true
 
 COUNT_2=$(grep -c '^### Message' "$OUTPUT_FILE" 2>/dev/null || echo 0)
@@ -93,7 +93,7 @@ cat > "$SPLIT_DIR/2026-07-03-claude-part-02.md" <<'EOF'
 EOF
 
 HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
-  --source claude --output-dir "$OUTPUT_DIR" --date "$DATE" --incremental \
+  --source claude --output-dir "$OUTPUT_DIR" --date "$DATE" --incremental --confirm-unscoped \
   > "$TEST_DIR/pass3.log" 2>&1 || true
 
 COUNT_PART2=$(grep -c '<!-- uuid: sub-002 -->' "$SPLIT_DIR/2026-07-03-claude-part-02.md" 2>/dev/null) || COUNT_PART2=0

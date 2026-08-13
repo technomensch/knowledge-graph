@@ -129,7 +129,7 @@ cp "$FIXTURES_DIR/sample-gemini-foreign-conversation.pb" \
 # than picking a single file, or the wrong day's file could be checked.
 PB_BASELINE_OUT="$TEST_DIR/output-pb-baseline"; mkdir -p "$PB_BASELINE_OUT"
 HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
-  --source gemini --output-dir "$PB_BASELINE_OUT" \
+  --source gemini --output-dir "$PB_BASELINE_OUT" --confirm-unscoped \
   > "$TEST_DIR/gemini-pb-baseline.log" 2>&1 || true
 if grep -rq "FOREIGN-PB-CONTENT-MARKER-9f3a" "$PB_BASELINE_OUT"; then
   pass "unfiltered baseline includes the foreign .pb fixture's content (fixture is real, not vacuous)"
@@ -164,7 +164,7 @@ cp "$FIXTURES_DIR/sample-gemini-hashdir-session.jsonl" \
 
 HASH_BASELINE_OUT="$TEST_DIR/output-hashdir-baseline"; mkdir -p "$HASH_BASELINE_OUT"
 HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
-  --source gemini --output-dir "$HASH_BASELINE_OUT" --date 2026-07-01 \
+  --source gemini --output-dir "$HASH_BASELINE_OUT" --date 2026-07-01 --confirm-unscoped \
   > "$TEST_DIR/gemini-hashdir-baseline.log" 2>&1 || true
 if grep -rq "HASHDIR unattributable content marker" "$HASH_BASELINE_OUT"; then
   pass "unfiltered baseline includes the hash-named directory's content (fixture is real, not vacuous)"

@@ -17,7 +17,8 @@ related:
   kg_entries:
     - knowledge/issues/chat-extraction-reliability-saga/attempts/ENH-044/specification.md
     - knowledge/enhancements/ENH-038/ENH-038-specification.md
-tags: [privacy, extraction, gemini, trust-boundary, v0.6.17]
+    - knowledge/enhancements/ENH-061/ENH-061-specification.md
+tags: [privacy, extraction, gemini, claude, worktree, trust-boundary, v0.6.17, v0.7.1.3]
 category: architecture
 ---
 
@@ -138,8 +139,8 @@ Given the asymmetry above, the fix must optimize for "never leak foreign content
 ---
 
 **Decision Made:** 2026-07-10
-**Last Updated:** 2026-07-11
-**Status:** Accepted — implemented (`126d98ce`), tested (`faa393d6`), verified against real data; regression found and closed 2026-07-11 (see Amendment below)
+**Last Updated:** 2026-08-12
+**Status:** Accepted — implemented (`126d98ce`), tested (`faa393d6`), verified against real data; regression found and closed 2026-07-11; extended to the Claude extractor 2026-08-12 (see Amendments below)
 
 ---
 
@@ -152,3 +153,98 @@ This is a regression in *implementation ordering*, not a reconsideration of the 
 **No change to this ADR's Decision, Rationale, or Alternatives sections** — the fail-closed policy stands exactly as decided. This amendment records that a real deviation existed in the shipped code and has been closed, for anyone reading this ADR to understand why "fixed" doesn't mean "never had a bug."
 
 Full detail: `knowledge/issues/chat-extraction-reliability-saga/README.md` § "Post-Merge Regression Findings", finding 3; `attempts/ENH-044/specification.md` item 7.
+
+---
+
+## Amendment — v0.7.1.3 (2026-08-12) — Extended to the Claude extractor
+
+**This ADR's original Scope section explicitly excluded "any change to Claude or
+Codex extractors,"** on the stated basis that `extract_claude.py:137-139` "already
+scopes correctly" (fragment-matches `project_filter` against `~/.claude/projects/`
+directory basenames before globbing). That statement was true for the bug ENH-044
+tested — cross-*project* contamination — but nobody had tested the cross-*worktree*-
+of-the-same-project case. A real session (2026-08-12) surfaced it directly.
+
+**New findings (independently reviewed and evidence-verified against real data on
+this machine, not assumed):**
+
+1. **The unscoped default is worse than "mixes worktrees."** When `--project` is
+   omitted entirely, `extract_claude_sessions()` has no cwd-derived fallback at
+   all — it merges sessions from **every project directory on the entire
+   machine** into whatever repo's `chat-history/` the command happens to be
+   writing to. cwd controls only where output lands, never what gets read in.
+2. **Worktree directory naming is not one convention.** Three coexist, confirmed
+   live on this machine: `<repo>--claude-worktrees-<name>`, `<repo>--worktrees-
+   <name>`, and plain unmarked sibling directories with no indicator at all. Any
+   fix based on parsing directory-name conventions would be incomplete from day
+   one and silently miss whichever convention it wasn't written for.
+3. **A stale worktree project-directory already exists on this machine right
+   now** — a since-deleted worktree's `~/.claude/projects/` log directory still
+   substring-matches this repo's `--project` filter today. Not a hypothetical
+   edge case.
+4. **A reliable attribution signal exists that sidesteps all three naming
+   conventions: every session `.jsonl` record carries a `cwd` field** (plus a
+   richer one-off `worktree-state` record type with explicit
+   `worktreePath`/`worktreeName`/`worktreeBranch`). Confirmed present even in the
+   *oldest* available session logs for two different projects, not just recent
+   sessions — a durable signal, not a going-forward-only fix. Cross-referencing
+   `cwd` against a freshly-run `git worktree list --porcelain` (never cached —
+   this codebase has already paid down two bugs from trusting a stale pointer
+   over live git state: ADR-067/issue-41's `.active`-pointer removal, and
+   issue-43/44's `REPO_ROOT` drift in `handoff-file-tracing-gate.sh`) gives
+   unambiguous attribution with no directory-name parsing at all.
+
+**Extended decision — the same fail-closed, never-silent principle, applied to
+the case this ADR's original scope excluded:**
+
+1. **Fully-unscoped invocation now fails closed, not open — for all three
+   sources (`claude`, `gemini`, `codex`, `all`), not just Claude.** The
+   "merges everyone's sessions" failure mode is structural to every extractor's
+   unscoped path, not unique to Claude's directory layout — Gemini globs all of
+   `~/.gemini/tmp/*` unscoped the same way Claude globs all of
+   `~/.claude/projects/*`. This supersedes this ADR's original Neutral
+   consequence ("Unscoped extraction is unaffected by this decision — it
+   already includes everything, as today") for the *gating* question — that
+   line was true when written (this ADR's original scope was `.pb`/hash-dir
+   exclusion only, not the unscoped path at all) but the new gate applies to
+   the shared `run_extraction.py` CLI entry point regardless of `--source`.
+   When `--project` is not given, the extractor stops before reading anything,
+   states plainly what it's about to do (merge sessions from every project on
+   the machine, not just this repo), asks for explicit confirmation to proceed
+   anyway, and advises using `--project=<name>` instead. This mirrors this
+   ADR's original Option-B rejection (`fails open — a warning is easy to
+   miss` — § Alternatives Considered): a notice the user can only see *after*
+   the fact was rejected for `.pb`/hash-dirs for the same reason it's rejected
+   here — a confirmation gate *before* the read is the fail-closed shape, not a
+   warning after.
+2. **`--project=<name>` matching 2+ directories (a worktree, or any
+   substring-coincidental sibling) does not hard-stop** — the user did explicitly
+   scope something, so this is Option-B's "include with a visible notice," not
+   full fail-closed exclusion. The extractor proceeds but reports a composition
+   breakdown (source attribution, via the `cwd`-field mechanism above) before
+   writing, so a silent multi-directory merge is never possible even when
+   `--project` is set.
+3. **Explicitly deferred, not decided here:** (a) proactive prompts offering to
+   also extract a detected-but-uncaptured sibling worktree, or confirming intent
+   when cwd is a worktree but the given scope looks like it meant the main repo
+   — a real, wanted feature, sequenced as a fast-follow once the attribution
+   mechanism above is live and trusted; (b) a persistent extraction-state ledger
+   to answer "has this worktree already been captured" — likely unnecessary,
+   since existing uuid-dedup (`parse_seen_uuids`, `extract_claude.py:80-117`)
+   may already answer this without new state; (c) whether the unscoped-by-default
+   *policy* itself should change to repo-scoped-by-default globally, beyond just
+   gating the read — a larger behavior change breaking existing bare-invocation
+   habits, requiring its own version bump and deliberation if pursued.
+
+**Rationale for extending here rather than a new ADR:** the risk asymmetry this
+ADR already established — leaking foreign content into a project's committed,
+searchable store is expensive to undo; refusing to run until scope is confirmed
+is cheap and reversible (just re-run with the flag) — applies identically to the
+Claude case. This is the same decision, not a new one; documenting it as an
+amendment keeps the fail-closed philosophy visibly single-sourced across both
+extractors rather than two independent-looking decisions that happen to agree.
+
+**Tracked:** [ENH-061](../enhancements/ENH-061/ENH-061-specification.md).
+
+Full evidence trail (real directory listing, real `.jsonl` field confirmation,
+full scenario table, rejected design directions): see ENH-061's specification.

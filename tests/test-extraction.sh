@@ -86,6 +86,7 @@ mkdir -p "$OUTPUT_DIR"
 OUTPUT=$(HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
   --source claude \
   --output-dir "$OUTPUT_DIR" \
+  --confirm-unscoped \
   2>&1 || true)
 
 OUTPUT_FILE=$(find "$OUTPUT_DIR" -name "*claude*.md" 2>/dev/null | head -1)
@@ -114,6 +115,7 @@ fi
 OUTPUT=$(HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
   --source claude \
   --output-dir "$TEST_DIR/output-claude" \
+  --confirm-unscoped \
   2>&1; echo "EXIT:$?")
 EXIT_CODE=$(echo "$OUTPUT" | grep "EXIT:" | sed 's/EXIT://')
 if [ "$EXIT_CODE" = "0" ] || echo "$OUTPUT" | grep -qiE "extract|session|written|created|no.*session"; then
@@ -128,6 +130,7 @@ mkdir -p "$CUSTOM_DIR"
 HOME="$FAKE_HOME" python3 "$EXTRACTION_SCRIPT" \
   --source claude \
   --output-dir "$CUSTOM_DIR" \
+  --confirm-unscoped \
   2>&1 > /dev/null || true
 if [ -d "$CUSTOM_DIR" ]; then
   pass "Custom --output-dir is used by extraction script"
