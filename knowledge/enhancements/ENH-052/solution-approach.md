@@ -68,6 +68,14 @@ this flag** — see the companion skill spec below.
 Gate 6 depends on a skill that doesn't exist yet. This section specs it so
 Gate 6 isn't a permanent, unsatisfiable reminder.
 
+**Later extension (issue-45, 2026-08-13):** `kmg-paperwork-audit` gained a third
+check outside this original two-check scope — a mechanical, repo-wide meta-issue
+"Attempts" paperwork-drift check, landed as Step 5. It's mechanical (the kind of
+thing this ENH says belongs in a Gate, not this skill), but landed here anyway
+because `scripts/pre-push-gate.sh` isn't part of the distributed plugin surface
+and this skill is the only shipped mechanism on the right trigger set. See
+issue-45 for the full rationale.
+
 **Purpose:** handle the two checks Gate 5 explicitly cannot — they require
 reading and understanding content, not just counting files or grepping for a
 reference pattern.
