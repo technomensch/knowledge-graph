@@ -90,9 +90,10 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 
 ## v0.7.x Feature Highlights
 
-**v0.7.1.3 — 2026-08-12** *(profile-update approval gate hardening)*
+**v0.7.1.3 — 2026-08-12** *(profile approval gate + extraction scoping hardening)*
 
 - **`kmg-update-profile` now has a mandatory explicit-approval gate before writing any profile file** — old flow could draft, self-review, and write without ever pausing for the user to say yes. New gate shows every file's full drafted content and requires an explicit affirmative reply before writing; silence isn't consent. Closes #219, ENH-060.
+- **`kmg-extract-chat` now fails closed on unscoped extraction and attributes Claude sessions by `cwd`, not directory name** — omitting `--project` used to silently merge sessions from every project on the machine; now requires `--project=<name>` or a new `--confirm-unscoped` flag, across all four sources. Separately, `--project` matching both a repo and its git worktrees (each gets its own session-log directory, naming conventions inconsistent) now prints a composition breakdown instead of silently merging them. Closes #221, ENH-061.
 
 **v0.7.1.2 — 2026-08-10** *(handoff gate gitignored-file fix)*
 

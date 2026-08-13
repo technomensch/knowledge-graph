@@ -1,10 +1,11 @@
 ---
 id: ENH-061
 type: Enhancement
-status: proposed
+status: resolved
 github-issue: "#221"
 branch: v0.7.1.3-ENH-060-profile-approval-gate
 created: 2026-08-12
+resolved: 2026-08-13
 related_enhs: [ENH-044]
 related_issues: []
 related_adrs: [ADR-062]
