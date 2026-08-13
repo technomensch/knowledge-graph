@@ -254,6 +254,7 @@ done
 | **v0.7.1.1** | No upgrade action required. Fixes `handoff-file-tracing-gate.sh` hard-blocking sessions run inside a git worktree (`CLAUDE_PROJECT_DIR` resolves to the main checkout; `REPO_ROOT` now resolved worktree-aware via `git rev-parse --show-toplevel` at the session cwd) — automatic after plugin reload. |
 | **v0.7.1.2** | No upgrade action required. Fixes `handoff-file-tracing-gate.sh` still hard-blocking worktree sessions when the handoff package itself (gitignored `handoff-packages/`) was generated in a different checkout — automatic after plugin reload. |
 | **v0.7.1.3** | No upgrade action required. `kmg-update-profile` now requires explicit approval before writing any profile file; `kmg-extract-chat` now requires `--project=<name>` or `--confirm-unscoped` (fails closed instead of silently merging every project's sessions) — automatic after plugin reload. |
+| **v0.7.1.4** | No upgrade action required. `kmg-paperwork-audit` gains a new Step 5 — a mechanical check for meta-issue "Attempts" paperwork drift (folder↔log-header invariant, README entry size guardrail) — automatic after plugin reload. |
 
 After the wizard completes, your existing lessons, ADRs, sessions, and chat history are untouched.
 

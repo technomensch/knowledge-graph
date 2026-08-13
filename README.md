@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.7.1.3
+**Version:** 0.7.1.4
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -89,6 +89,10 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 ---
 
 ## v0.7.x Feature Highlights
+
+**v0.7.1.4 — 2026-08-13** *(meta-issue Attempts paperwork-drift check)*
+
+- **Meta-issue "Attempts" paperwork drifted from actual attempts silently, confirmed 3x in one real instance** — the README-index/implementation-log/attempts-folder convention was enforced only by prose. `kmg-paperwork-audit` gains a new Step 5: a mechanical folder↔log-header invariant check plus a README `## Attempts` entry size guardrail, both self-contained bash/awk (no dependency on `scripts/pre-push-gate.sh`, which isn't shipped to consumer repos). Closes #222, issue-45.
 
 **v0.7.1.3 — 2026-08-12** *(profile approval gate + extraction scoping hardening)*
 
@@ -219,7 +223,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.7.1.3 (2026-08-12)
+**Current Release:** v0.7.1.4 (2026-08-13)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -321,6 +325,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.7.1.3 (2026-08-12)
+**Current Version:** v0.7.1.4 (2026-08-13)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info
