@@ -34,6 +34,9 @@
 
 ## Attempts
 
+<!-- One line per attempt. Full detail belongs in attempts/NNN-*/attempt-results.md;
+     chronological narrative belongs in implementation-log.md. Do not expand entries here. -->
+
 [Auto-populated from implementation-log.md]
 
 1. **[001-baseline](attempts/001-baseline/)** — [Status] — [Brief outcome]
@@ -60,11 +63,13 @@
 
 ## How to Use This Meta-Issue
 
-1. **Add attempt:** Create new `attempts/NNN-name/` folder from attempt-template
+1. **Add attempt:** Create new `attempts/NNN-name/` folder **and** append its `## Attempt NNN`
+   entry to `implementation-log.md` together, as one step — `/kmgraph:kmg-meta-issue
+   --add-attempt` does both atomically for this reason. Doing only one half is the single most
+   common way this convention drifts out of sync (issue-45).
 2. **Update understanding:** Edit `analysis/root-cause-evolution.md` when beliefs shift
-3. **Log progress:** Update `implementation-log.md` with each attempt
-4. **Extract lessons:** Create lessons-learned when patterns emerge
-5. **Sync to KG:** Run `/kmgraph:kmg-update-graph` to extract insights
+3. **Extract lessons:** Create lessons-learned when patterns emerge
+4. **Sync to KG:** Run `/kmgraph:kmg-update-graph` to extract insights
 
 ---
 

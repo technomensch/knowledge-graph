@@ -289,6 +289,12 @@ mkdir docs/meta-issues/[issue-name]/attempts/{001-caching,002-queries}
 
 ### 3. Before Each New Attempt
 
+> Prefer `/kmgraph:kmg-meta-issue --add-attempt NNN "<label>"` over the manual steps below — it
+> creates the attempt directory **and** appends the `implementation-log.md` entry in one atomic
+> operation. Doing them as two separate manual steps (as shown next) is the most common way this
+> convention drifts out of sync — a folder gets created without ever gaining a matching log entry,
+> or vice versa (issue-45). The manual steps are shown for reference, not as the preferred path.
+
 **Create attempt directory:**
 
 ```bash
