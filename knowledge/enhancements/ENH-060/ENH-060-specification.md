@@ -67,3 +67,4 @@ edited directly outside either flow.
   contract), unaffected by this change
 - `~/.kmgraph/rules.md` § Approval Gates — the durable, cross-session backstop rule
   (personal file, not part of this repo)
+- [ENH-061](../ENH-061/ENH-061-specification.md) — unrelated fix, shipped together on this same branch/version (v0.7.1.3) per an explicit WIP-append decision

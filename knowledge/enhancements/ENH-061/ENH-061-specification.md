@@ -77,5 +77,6 @@ which this ENH implements.
 
 - [ADR-062 Amendment](../../decisions/ADR-062-gemini-pb-project-scoping-fail-closed.md#amendment--v0713-2026-08-12--extended-to-the-claude-extractor) — the decision this ENH implements
 - [ENH-044](../../issues/chat-extraction-reliability-saga/attempts/ENH-044/specification.md) — the sibling Gemini fix this extends the same principle to
+- [ENH-060](../ENH-060/ENH-060-specification.md) — unrelated fix, shipped together on this same branch/version (v0.7.1.3) per an explicit WIP-append decision
 - `core/scripts/extract_claude.py` — the script needing the fix
 - `commands/kmg-extract-chat.md` — needs the new hard-stop behavior documented
