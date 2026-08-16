@@ -29,9 +29,26 @@ markdown files — these are manual/scripted verification, not unit tests.
    to the three newly-fixed sites (previously these three were `main`-only
    hardcoded and would have failed silently on a `master`-default repo too —
    confirm whether that's a real risk for this repo, low priority if not).
+7. **Undeterminable default branch (no local `main` or `master` ref):** in a
+   fresh single-branch clone or a worktree where neither exists locally,
+   confirm all three newly-fixed sites (`session-summary-agent.md:444`,
+   `kmg-docs-impact-scan/SKILL.md:24`, `kmg-update-issue-plan.md:87`) report
+   the reason and skip the dependent step, rather than erroring out on
+   `git merge-base "" HEAD` / `git diff --name-only "" HEAD`. This is the
+   failure mode solution-approach.md's fallback section exists to prevent —
+   without this test it's easy to ship the merge-base happy path only.
+8. **Docs-site consistency:** after the fix, confirm
+   `docs/pillars/tailoring/docs-impact-scan.md` no longer states
+   `git diff main...HEAD` as current behavior, and that
+   `docs/superpowers/specs/2026-04-16-docs-impact-scan-design.md` has an
+   explicit note if left as historic record rather than updated.
 
 ## ADR verification
 
-7. Confirm `knowledge/decisions/ADR-036-docs-impact-scan.md` is updated in the
+9. Confirm `knowledge/decisions/ADR-036-docs-impact-scan.md` is updated in the
    same PR as the `kmg-docs-impact-scan/SKILL.md:24` change — the fix should not
    land without the ADR amendment.
+10. Confirm the drive-by fixes in the same ADR-036 pass: `skills/docs-impact-scan/SKILL.md`
+    path references (lines 73, 136) corrected to
+    `skills/kmg-docs-impact-scan/`, and the `Status:` field (line 184) made
+    consistent with the frontmatter/line 25.

@@ -7,15 +7,25 @@ branch: v0.7.1.5-capture-filename-diffbase-fix
 created: 2026-08-16
 ---
 
-# Issue 46: Session-summary and ADR capture filenames double-prepend date/ADR-number (and double-embed frontmatter)
+# Issue 46: Session-summary and ADR captures double-prepend filenames, duplicate frontmatter blocks, and use a filename algorithm the caller can't reproduce
 
 ## Summary
 
-Two distinct manifestations of the same architectural flaw: **the MCP capture
+Three distinct manifestations of the same architectural flaw: **the MCP capture
 layer and its caller agents both independently own something that should have a
-single owner** — first found as a duplicated filename prefix, then found again
-(live, in this issue's own tracking artifacts) as a duplicated YAML frontmatter
-block.
+single owner.** All three are now live-confirmed on disk in this repo, not
+theoretical.
+
+- **A — filename prefix double-prepend** (date/ADR-number)
+- **B — duplicated YAML frontmatter block** (whole header, not just a prefix)
+- **C — caller's own filename-prediction algorithm silently diverges from
+  `deriveFileName()`'s** (`slugify()` strips characters the caller's naive
+  template doesn't account for)
+
+A and B independently confirmed via an Opus review pass (2026-08-16) that
+validated this issue's original findings against current repo state; C was
+found by that same review and was missed by the original investigation
+entirely.
 
 ### Manifestation A — filename prefix double-prepend
 
@@ -27,59 +37,94 @@ prefix is applied twice. Output filenames land as
 `2026-08-16-2026-08-16-main.md` instead of `2026-08-16-main.md`, and (for ADRs)
 `ADR-069-adr-069-my-decision.md` instead of `ADR-069-my-decision.md`.
 
+**This is not cosmetic for sessions.** `session-summary-agent.md:122` (`ls …
+grep "^${today}-${branch_slug}"`) and `:290` (`find -name
+"${today}-${branch_slug}.md"`) can never match an already-doubled filename, so
+the agent always concludes no session file exists yet for today
+(`{session_file_mode} = new`). But `checkExistingFile()`
+(`capture.ts:249-265`) matches on the today's-date prefix alone and *does*
+match the doubled file → `kg_capture` returns the `CONFLICT` error
+(`capture.ts:447-455`). **The doubled prefix actively breaks the
+one-file-per-day session flow**, it doesn't just produce an ugly filename.
+Confirmed by 8 doubled-date session files already on disk, including two where
+the filename date and title date disagree because capture ran after midnight
+(`2026-07-12-2026-07-11-main.md`, `2026-07-18-2026-07-17-main.md`).
+
+**Confirmed live for ADRs, via a broken index link rather than a surviving
+filename:** no doubled-prefix ADR *filename* currently exists on disk, but
+`knowledge/decisions/README.md` (line 196) links to
+`ADR-046-adr-046-introduce-conceptsetup-hybrid-page-type-and-document-how-to-guide-pattern-separately-from-narrative-guides.md`
+— the doubled-prefix filename `kg_capture` actually wrote at capture time. The
+file was later renamed by hand to
+`ADR-046-concept-setup-hybrid-page-type-and-how-to-guide-pattern.md`; the
+README index entry was never updated. **A grep for surviving doubled-prefix
+filenames will find nothing and wrongly report "clean" — check the README
+index links too.**
+
 ### Manifestation B — duplicated YAML frontmatter block
 
-`mcp-server/src/tools/capture.ts` (write path, ~line 472) does:
+`mcp-server/src/tools/capture.ts` does, at **two** separate write sites — the
+new-file path (line 474) and the update-in-place path
+(lines 429-433) — unconditionally:
 ```ts
 fs.writeFileSync(filePath, generateFrontmatter(request.type, request.metadata) + request.content, "utf-8");
 ```
-unconditionally, for every capture type. `generateFrontmatter()` always builds its
-own `---\ntitle: ...\n---` block from `metadata`. If the caller's `content` string
-*also* already contains its own hand-written frontmatter block, the result is two
-stacked `---...---` blocks in the same file — most YAML parsers only read the
-first, so the second becomes stray, unparsed body text carrying a stale/wrong
-title.
+`generateFrontmatter()` always builds its own `---\ntitle: ...\n---` block from
+`metadata`. If the caller's `content` string *also* already contains its own
+hand-written frontmatter block, the result is two stacked `---...---` blocks
+in the same file — most YAML parsers only read the first, so the second
+becomes stray, unparsed body text carrying a stale/wrong title.
 
-**Confirmed live** in this issue's own session snapshot,
-`knowledge/sessions/2026-08/2026-08-16-main.md` (created earlier in this same
-investigation, before this bug was noticed):
-```yaml
----
-title: "main"
-date: 2026-08-16
-branch: main
-commit: af447452
-tags: [session, snapshot, main, bug-investigation]
----
----
-title: "2026-08-16-main"
-date: 2026-08-16
-branch: main
-as_of_commit: af447452
-last_updated: 2026-08-16 16:16
-tags: [session, snapshot]
----
-```
-Block 1 (lines 1-7) comes from `generateFrontmatter()`, using the corrected bare
-`metadata.title` ("main") — this is the value that avoided Manifestation A.
-Block 2 (lines 8-15) comes from `agents/session-summary-agent.md`'s own S4
-content template (lines 165-178), which independently constructs a full
-frontmatter block — including the OLD dated title format — as part of the
-`content` string it sends. The two were never meant to coexist; `content` should
-never have included a frontmatter block of its own.
+**Confirmed live**, 9 files total:
 
-**Structurally likely, not yet live-confirmed:** ADR captures. `create-adr-agent.md`
-Phase 5 (lines ~253-272) populates a full frontmatter block into the "Full
-populated ADR markdown" it sends as `content`, mirroring session-summary-agent's
-pattern exactly. Since `generateFrontmatter()` runs unconditionally for `type:
-"adr"` too, every ADR captured through this agent very likely has the same
-duplicated-block defect, compounding with Manifestation A's doubled filename
-prefix on the same files.
+- **Session:** `knowledge/sessions/2026-08/2026-08-16-main.md` (this issue's
+  own snapshot artifact) and `knowledge/sessions/2026-07/2026-07-14-main.md`,
+  plus 5 more (see `solution-approach.md` for the full list and per-file field
+  conflicts). Two independent content templates in
+  `agents/session-summary-agent.md` embed their own frontmatter block: the S4
+  snapshot template (lines 169-176) and the Step 6 full-summary template
+  (lines 450-457) — both are sent as `content` to `kg_capture` (S5 line 198,
+  Step 8 line 600), so both paths produce doubled blocks.
+- **ADR:** `knowledge/decisions/ADR-046-concept-setup-hybrid-page-type-and-how-to-guide-pattern.md`
+  has two stacked blocks — block 1 is `generateFrontmatter()`'s `adr` branch
+  output (`title / status: Proposed / date / deciders / tags`), block 2 is
+  `agents/create-adr-agent.md` Phase 5's template (lines 255-274:
+  `number / created / status: Accepted / author / email / git / implements /
+  related / tags / category`). **This has a real data-integrity consequence:**
+  `generateFrontmatter()` hardcodes `status: Proposed` (capture.ts:196)
+  regardless of the actual decision status, and since parsers read only block
+  1, **ADR-046 currently reads as `Proposed` when its real status is
+  `Accepted`.** The `commands/kmg-create-adr.md` (PROTECTED — see below) Step
+  5.1 (lines 346-367) carries the identical template and is a fourth site with
+  the same defect.
+- **Lesson (partial):** the `lesson-capture-agent.md` *agent template* itself
+  is clean — its Phase 4 content is body-only, confirmed against this
+  session's own two lesson captures, which had no embedded frontmatter block.
+  But the corpus is not entirely clean: at least one lesson file,
+  `knowledge/lessons-learned/debugging/Lessons_Learned_Debugging_Anchor_Path_...md`,
+  has two stacked blocks — produced by some other caller (a hand-composed
+  direct `kg_capture` call, not this agent). The fix must not assume "the
+  agent is clean" implies "the corpus is clean."
 
-**Confirmed clean:** lesson captures. `lesson-capture-agent.md`'s Phase 4 content
-(verified against this session's own two lesson captures) contains no embedded
-frontmatter block — body sections only (`## Problem`, `## Solution`, etc.) — so
-`generateFrontmatter()`'s output is the only frontmatter block in lesson files.
+### Manifestation C — caller's filename prediction diverges from `deriveFileName()`'s algorithm
+
+`session-summary-agent.md:114-118` computes its own expected filename as
+`target_filename="${today}-${branch_slug}.md"` and uses that string to check
+whether today's session file already exists (`:122`, and again at `:290`).
+But the *actual* filename `kg_capture` will write is computed independently by
+`slugify()` (`capture.ts:108-115`), which strips characters (e.g. `.`) that
+the agent's naive template does not account for.
+
+**Confirmed live:** for branch `v0.7.0-adr-067-c1`, the agent's own arithmetic
+predicts `2026-08-02-v0.7.0-adr-067-c1.md`, but the file `kg_capture` actually
+wrote is `knowledge/sessions/2026-08/2026-08-02-2026-08-02-v070-adr-067-c1.md`
+— dots stripped, and (compounding with Manifestation A) doubled. Every
+version branch in this repo has a dotted name, including this issue's own
+branch (`v0.7.1.5-capture-filename-diffbase-fix` — no dots, so not itself
+affected, but the pattern generalizes to any dotted branch name, which is most
+of this repo's history per `git branch -a`). Same root cause as A and B: two
+places compute a filename-relevant value from the same input, using different
+algorithms, with nothing enforcing agreement.
 
 ## Root Cause
 
@@ -100,54 +145,57 @@ Both branches assume `metadata.title` is the *bare* title, with no prefix. Two
 caller agents violate that assumption:
 
 - `agents/session-summary-agent.md` constructs `title` as
-  `"[YYYY-MM-DD]-[branch-slug]"` at lines 170, 201, 451, and 603. Line 594 states
-  the (incorrect) intent explicitly: *"Use `{session_filename}` … as the `title` —
-  this ensures the MCP server creates or updates the file as
-  `YYYY-MM-DD-{branch-slug}.md`"* — the doc assumes `title` becomes the filename
-  verbatim, when `deriveFileName()` re-derives and re-prepends the date on top of it.
+  `"[YYYY-MM-DD]-[branch-slug]"` at lines 170, 201, 451, and 603. Line 594
+  states the (incorrect) intent explicitly: *"Use `{session_filename}` … as
+  the `title` — this ensures the MCP server creates or updates the file as
+  `YYYY-MM-DD-{branch-slug}.md`"* — the doc assumes `title` becomes the
+  filename verbatim, when `deriveFileName()` re-derives and re-prepends the
+  date on top of it.
 - `agents/create-adr-agent.md` constructs `title` as `"ADR-{NNN}: {title}"` at
   lines 256 and 286, which `slugify()` turns into `adr-nnn-{title}` — then
   `deriveFileName()` prepends `ADR-{NNN}-` again on top.
 
-The `lesson` type (`capture.ts:136-150`, prefix `Lessons_Learned_`) is **not**
-affected — `agents/lesson-capture-agent.md` passes a bare topic with no prefix.
-`scaffold.ts` is also unaffected — `kg_scaffold` takes an explicit `outputPath` and
-derives no filename of its own.
+The `lesson` type (`capture.ts:136-149`, prefix `Lessons_Learned_`) is **not**
+affected by Manifestation A — `agents/lesson-capture-agent.md` passes a bare
+topic with no prefix. `scaffold.ts` is also unaffected — `kg_scaffold` takes
+an explicit `outputPath` and derives no filename of its own.
 
 ## Confirmed Scope
 
 **Manifestation A — filename prefix:**
 
-| Capture type | MCP-side prefix (capture.ts) | Caller bakes same prefix into `title`? | Affected caller sites |
-|---|---|---|---|
-| `session` | `todayIso()` (L152) | Yes | `session-summary-agent.md:170,201,451,594,603` |
-| `adr` | `ADR-{NNN}-` (L156-157) | Yes | `create-adr-agent.md:256,286` |
-| `lesson` | `Lessons_Learned_` (L136-150) | No | clean |
-| default/fallback (L160) | none | n/a | clean |
+| Capture type | MCP-side prefix (capture.ts) | Caller bakes same prefix into `title`? | Affected caller sites | Status |
+|---|---|---|---|---|
+| `session` | `todayIso()` (L152) | Yes | `session-summary-agent.md:170,201,451,594,603` | Confirmed live, 8 doubled-date files, breaks one-file-per-day flow (not cosmetic) |
+| `adr` | `ADR-{NNN}-` (L156-157) | Yes | `create-adr-agent.md:256,286`; `commands/kmg-create-adr.md:346-367` (PROTECTED) | Confirmed live via broken README link, no surviving doubled filename |
+| `lesson` | `Lessons_Learned_` (L136-149) | No | clean | Clean |
+| default/fallback (L160) | none | n/a | clean | Clean |
 
 **Manifestation B — frontmatter block:**
 
 | Capture type | MCP always prepends `generateFrontmatter()` output? | Caller's `content` also embeds its own frontmatter block? | Status |
 |---|---|---|---|
-| `session` | Yes (write path, ~L472) | Yes — `session-summary-agent.md` S4 template (L165-178) | Confirmed live (`knowledge/sessions/2026-08/2026-08-16-main.md`) |
-| `adr` | Yes | Yes — `create-adr-agent.md` Phase 5 (L253-272) | Structurally certain, not yet live-confirmed |
-| `lesson` | Yes | No — `lesson-capture-agent.md` Phase 4 content has no frontmatter block | Clean |
+| `session` | Yes, at both write sites (L429-433, L474) | Yes — S4 template (L169-176) and Step 6 template (L450-457), both in `session-summary-agent.md` | Confirmed live, 7 files |
+| `adr` | Yes | Yes — `create-adr-agent.md` Phase 5 (L255-274); also `commands/kmg-create-adr.md:346-367` | Confirmed live (`ADR-046-...md`), includes wrong `status: Proposed` vs. real `Accepted` |
+| `lesson` | Yes | Agent template: No. Corpus: at least 1 file affected via a different (non-agent) caller | Agent clean; corpus not fully clean |
+
+**Manifestation C:**
+
+| Site | Caller's algorithm | MCP's actual algorithm | Status |
+|---|---|---|---|
+| `session-summary-agent.md:114-118,122,290` | `"${today}-${branch_slug}.md"` (string concat) | `slugify()` (capture.ts:108-115), strips dots and other chars | Confirmed live for dotted branch names, e.g. `2026-08-02-2026-08-02-v070-adr-067-c1.md` |
 
 Confirmed present, unchanged, in every cached plugin version checked
 (0.6.20 → 0.7.1.4) — long-standing, not a regression from recent work.
-
-**Likely real-world impact:** any ADR captured through `create-adr-agent.md` to
-date may already exist on disk as a doubled-prefix file
-(`ADR-NNN-adr-nnn-{slug}.md`). Part of the fix work is confirming whether any such
-files exist in this repo's `knowledge/decisions/` and, if so, renaming them.
 
 ## Test Coverage Gap
 
 `mcp-server/tests/capture.test.ts` exercises `type: "session"` (line ~450-455) and
 `type: "adr"` (line ~458-463) only with clean, unprefixed titles
 (`"Feature Work"`, `"Use TypeScript"`). No existing test passes a title that
-already contains a date or `ADR-NNN` prefix, so the current suite cannot catch this
-defect. See `knowledge/issues/issue-46/test-cases.md`.
+already contains a date or `ADR-NNN` prefix, and no test asserts on frontmatter
+block count or filename-algorithm agreement, so the current suite cannot catch
+any of the three manifestations. See `knowledge/issues/issue-46/test-cases.md`.
 
 ## Related
 
@@ -155,6 +203,10 @@ defect. See `knowledge/issues/issue-46/test-cases.md`.
   the `lesson` type's prefix; confirms prefixing is intentionally
   `deriveFileName()`'s job, but does not address caller-side duplication. A fix
   here is complementary, not contradictory.
+- `commands/kmg-create-adr.md` and `commands/kmg-update-issue-plan.md` are
+  **PROTECTED** per `CLAUDE.md` / `knowledge/rules.md` — do not modify without
+  explicit user permission. Both need changes for this fix (ADR template
+  duplication; see [[issue-47]] for the second).
 - See [[issue-47]] for the related (but separately-scoped) diff-on-main bug found
   in the same investigation session.
 
@@ -163,5 +215,10 @@ defect. See `knowledge/issues/issue-46/test-cases.md`.
 Found 2026-08-16 while reviewing a session-summary output filename
 (`2026-08-16-2026-08-16-main.md`) during spec-drafting, before any feature branch
 existed. Confirmed and scoped via an Opus deep-dive subagent
-(`agentId: ae187d4f06180abd7`) before filing. Full snapshot of the session:
-`knowledge/sessions/2026-08/2026-08-16-main.md`.
+(`agentId: ae187d4f06180abd7`) before filing. Manifestation B initially found via
+this issue's own session-summary snapshot; expanded and fully validated (citations,
+Manifestation A's ADR-side live confirmation, Manifestation C, and several plan
+defects) via a second Opus review pass (`agentId: ab2c94344860e5824`) before
+implementation. Full snapshot of the session:
+`knowledge/sessions/2026-08/2026-08-16-main.md` (itself one of the affected
+artifacts — see Manifestation B).
