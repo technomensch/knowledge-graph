@@ -248,3 +248,5 @@ See [core/examples/lessons-learned/](../../examples/lessons-learned/) for filled
 **How to capture**:
 - [Manual Workflow](../../docs/WORKFLOWS.md#workflow-1-create-lesson-learned) - Step-by-step
 - [Command Guide](../../../docs/COMMAND-GUIDE.md#essential-commands) - Automated (Claude Code)
+- [Ownership-of-Derivation Contract Violation Causes Double-Prefixed Filenames](patterns/Lessons_Learned_Patterns_Ownership_Of_Derivation_Contract_Violation_Causes_Double_Prefixed_Filenames.md)
+- [Hardcoded main...HEAD Branch-Comparison Base Silently Returns Empty Pre-Divergence](patterns/Lessons_Learned_Patterns_Hardcoded_Main...head_Branch_Comparison_Base_Silently_Returns_Empty_Pre_Divergence.md)
