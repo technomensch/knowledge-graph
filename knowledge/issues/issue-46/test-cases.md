@@ -1,9 +1,9 @@
 # Test Cases — issue-46
 
-Add to `mcp-server/tests/capture.test.ts`, alongside the existing `deriveFileName`
-coverage.
+Covers both manifestations: filename prefix double-prepend (A) and duplicated
+frontmatter block (B). Add to `mcp-server/tests/capture.test.ts`.
 
-## Unit — `deriveFileName()`
+## Unit — `deriveFileName()` (Manifestation A)
 
 1. **Session, bare title** (regression guard, existing case): `type: "session"`,
    `title: "main"` → `${today}-main.md`. Already covered; keep as-is.
@@ -18,6 +18,20 @@ coverage.
 4. **ADR, already-prefixed title (the bug case):** `type: "adr"`, `adrNumber: 69`,
    `title: "ADR-069: My Decision"` → currently produces
    `ADR-069-adr-069-my-decision.md`. Document as above.
+
+## Unit — write path (Manifestation B)
+
+9. **Content with embedded frontmatter (the bug case):** call the capture write
+   path with `type: "session"`, `content` beginning with its own `---\ntitle:
+   "x"\n---\n\n## Body`. Assert the written file does NOT contain two `---`-only
+   lines back to back — i.e. only one frontmatter block survives. Currently
+   fails (both blocks are written, stacked).
+10. **Content without embedded frontmatter (regression guard):** same as above
+    but `content` is body-only (`## Body...`). Assert exactly one frontmatter
+    block, matching current correct behavior.
+11. **ADR equivalent of case 9:** `type: "adr"`, `content` beginning with its own
+    frontmatter block (as `create-adr-agent.md` currently constructs). Same
+    assertion as case 9.
 
 ## Integration — agent contract
 
@@ -35,3 +49,8 @@ coverage.
    `ADR-{NNN}-{slug}.md` (single ADR-number prefix).
 8. `ls knowledge/decisions/` and confirm no existing `ADR-*-adr-*-*.md`
    doubled-prefix files remain (per solution-approach.md step 4's audit).
+9. Confirm `knowledge/sessions/2026-08/2026-08-16-main.md` has exactly one
+   frontmatter block after the repair (solution-approach.md step 7).
+10. Run the audit grep from solution-approach.md step 8 and confirm zero
+    remaining double-frontmatter files across `knowledge/sessions/` and
+    `knowledge/decisions/`, or that all found instances were repaired.

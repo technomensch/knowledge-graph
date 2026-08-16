@@ -27,7 +27,7 @@ this exact bug — and the resulting file landed correctly as `2026-08-16-main.m
 That's option B, done ad hoc, by hand, once. This fix makes it structural so every
 future invocation doesn't depend on the agent noticing.
 
-## Changes required
+## Changes required — Manifestation A (filename prefix)
 
 1. **`agents/session-summary-agent.md`** — lines 201, 603 (`metadata.title` passed
    to `kg_capture`): change from `"[YYYY-MM-DD]-[branch-slug]"` to
@@ -55,6 +55,47 @@ future invocation doesn't depend on the agent noticing.
    doubled-prefix artifacts created by the create-adr-agent bug prior to this fix,
    and rename if found. (Session files are lower-risk to leave as-is since the
    doubled date is cosmetic-only there; still worth a quick `ls` check.)
+
+## Changes required — Manifestation B (duplicated frontmatter block)
+
+Same ownership principle as Manifestation A, applied to the whole frontmatter
+block instead of a prefix substring: `generateFrontmatter()` in `capture.ts`
+should be the *only* place a frontmatter block is generated. Callers must send
+`content` as body-only — the same shape `lesson-capture-agent.md` already uses
+correctly.
+
+5. **`agents/session-summary-agent.md`** S4 template (lines ~165-178): remove the
+   `---` frontmatter block from the content the agent constructs, for both the
+   "create new" and "update existing" paths. Content sent to `kg_capture` should
+   start directly at `## Operational Snapshot...`. Verify the "update existing"
+   path (S4's second branch, "update YAML header fields") doesn't depend on a
+   frontmatter block being present in the file it's editing in place — if it
+   does, that logic needs to move to `generateFrontmatter()`'s inputs (i.e. pass
+   `as_of_commit`/`last_updated` through `metadata` instead of writing them into
+   `content`).
+6. **`agents/create-adr-agent.md`** Phase 5 (lines ~253-272): remove the
+   frontmatter block from the "Full populated ADR markdown" content; pass the
+   equivalent fields (`status`, `number`, `git`, `implements`, `related`,
+   `category`) through `metadata` instead, extending `generateFrontmatter()`'s
+   `adr` branch (capture.ts lines ~192-200) to emit them — it currently only
+   emits `title`, `status: Proposed` (hardcoded, not from metadata — separate
+   minor issue worth flagging in the PR), `date`, `deciders`, `tags`. Confirm
+   with a live ADR capture test that no ADR-specific metadata is lost in the
+   switch.
+7. **Repair the malformed live artifact:** `knowledge/sessions/2026-08/2026-08-16-main.md`
+   currently has two stacked frontmatter blocks (see issue-46-description.md for
+   the exact content). Fix by hand as part of this branch's work — merge the two
+   blocks into one, keep the corrected bare title, drop the duplicate.
+8. **Audit for other pre-existing malformed files:** grep `knowledge/sessions/`
+   and `knowledge/decisions/` for files with two `---`-only lines back to back
+   in the first ~20 lines — every prior session/ADR capture is a candidate.
+
+## Test coverage note
+
+No existing test in `capture.test.ts` asserts on the *number* of frontmatter
+blocks written, or on `content` containing a pre-existing frontmatter block —
+this is a second, independent test-coverage gap from Manifestation A's. See
+`test-cases.md`.
 
 ## Linked Knowledge
 
