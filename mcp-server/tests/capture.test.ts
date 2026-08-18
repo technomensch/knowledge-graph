@@ -38,6 +38,7 @@ import {
   updateReadmeIndex,
   validateMetadata,
   checkExistingFile,
+  displayTitleFor,
 } from "../src/tools/capture.js";
 import type { CaptureRequest, CaptureResponse, CaptureError } from "../src/tools/capture.js";
 import { readConfig } from "../src/utils.js";
@@ -463,6 +464,20 @@ describe("deriveFileName", () => {
     const name = deriveFileName("adr", { title: "First Decision" });
     expect(name).toBe("ADR-001-first-decision.md");
   });
+
+  // issue-46 Manifestation A: deriveFileName does NOT detect/strip a
+  // caller-supplied prefix -- it trusts the caller. These document the
+  // pre-fix defect shape and confirm the contract is enforced by the caller
+  // (agents/session-summary-agent.md, agents/create-adr-agent.md), not here.
+  test("session filename does NOT strip a caller-supplied date prefix (trust-the-caller contract)", () => {
+    const name = deriveFileName("session", { title: "2026-08-16-main" });
+    expect(name).toMatch(/^\d{4}-\d{2}-\d{2}-2026-08-16-main\.md$/);
+  });
+
+  test("adr filename does NOT strip a caller-supplied ADR-number prefix (trust-the-caller contract)", () => {
+    const name = deriveFileName("adr", { title: "ADR-069: My Decision" }, 69);
+    expect(name).toBe("ADR-069-adr-069-my-decision.md");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -494,25 +509,70 @@ describe("generateFrontmatter", () => {
       tags: ["feature"],
       git: { branch: "dev", commit_short: "abc1234" },
     });
-    expect(fm).toContain('title: "My Session"');
+    // issue-46 backfix hardening: title carries the same date prefix as the
+    // README index entry (displayTitleFor) -- a bare title regressed FTS5
+    // title-ranked search, which relies on the date prefix as signal.
+    expect(fm).toContain(`title: "${today}-My Session"`);
     expect(fm).toContain(`date: ${today}`);
     expect(fm).toContain("branch: dev");
     expect(fm).toContain("commit: abc1234");
     expect(fm).toContain("tags: [feature]");
   });
 
-  test("adr frontmatter has status Proposed and date", () => {
-    const today = new Date().toISOString().slice(0, 10);
+  test("session frontmatter title matches displayTitleFor's dated form used by the README index", () => {
+    const fm = generateFrontmatter("session", { title: "Consistency Check" });
+    const titleLine = fm.split("\n").find((l) => l.startsWith("title:"));
+    expect(titleLine).toBe(`title: "${displayTitleFor("session", { title: "Consistency Check" })}"`);
+  });
+
+  test("adr frontmatter defaults to status Proposed, uses created (ISO) not date, author not deciders", () => {
+    // issue-46 Manifestation B: this branch was previously a stub (callers
+    // always sent their own complete block on top) — now sole owner, full
+    // shape matches core/default-templates/decisions/ADR-template.md.
     const fm = generateFrontmatter("adr", {
       title: "Use Postgres",
       tags: ["db"],
-      git: { author: "alice" },
+      git: { author: "alice", email: "alice@example.com", branch: "main", commit: "abc123" },
     });
     expect(fm).toContain('title: "Use Postgres"');
     expect(fm).toContain("status: Proposed");
-    expect(fm).toContain(`date: ${today}`);
-    expect(fm).toContain("deciders: alice");
+    expect(fm).toMatch(/created: \d{4}-\d{2}-\d{2}T/);
+    expect(fm).not.toMatch(/^date:/m);
+    expect(fm).toContain("author: alice");
+    expect(fm).toContain("email: alice@example.com");
+    expect(fm).not.toContain("deciders:");
+    expect(fm).toContain("  branch: main");
+    expect(fm).toContain("  commit: abc123");
+    expect(fm).toContain("  pr: null");
+    expect(fm).toContain("  issue: null");
+    expect(fm).toContain("implements: null");
+    expect(fm).toContain("related:");
+    expect(fm).toContain("  adrs: []");
     expect(fm).toContain("tags: [db]");
+  });
+
+  test("adr frontmatter status reflects metadata.status when provided", () => {
+    const fm = generateFrontmatter("adr", { title: "Accepted Decision", status: "Accepted" });
+    expect(fm).toContain("status: Accepted");
+    expect(fm).not.toContain("status: Proposed");
+  });
+
+  test("adr frontmatter includes number, implements, related, search_aliases, category when provided", () => {
+    const fm = generateFrontmatter("adr", {
+      title: "Full Fields",
+      number: 69,
+      implements: "v2.0.0",
+      related: { adrs: ["ADR-001"], lessons: ["Some_Lesson"], kg_entries: ["concept-x"] },
+      search_aliases: ["alias-one"],
+      category: "architecture",
+    });
+    expect(fm).toContain("number: 69");
+    expect(fm).toContain("implements: v2.0.0");
+    expect(fm).toContain("adrs: [ADR-001]");
+    expect(fm).toContain("lessons: [Some_Lesson]");
+    expect(fm).toContain("kg_entries: [concept-x]");
+    expect(fm).toContain("search_aliases: [alias-one]");
+    expect(fm).toContain("category: architecture");
   });
 
   test("frontmatter opens and closes with --- delimiters", () => {
@@ -1125,5 +1185,327 @@ describe("checkExistingFile", () => {
 
     const result = checkExistingFile("session", kgRoot, { title: "My Session" });
     expect(result).toBe(existingFile);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// issue-46: agent contract -- metadata.title must never carry a re-baked
+// date/ADR-number prefix (Manifestation A regression guard)
+// ---------------------------------------------------------------------------
+
+describe("agent contract — no re-baked prefix in metadata.title (issue-46)", () => {
+  const repoRoot = path.resolve(__dirname, "../..");
+  const filesToCheck = [
+    "agents/session-summary-agent.md",
+    "agents/create-adr-agent.md",
+    "commands/kmg-create-adr.md",
+  ];
+
+  test.each(filesToCheck)("%s never sends a dated or ADR-numbered metadata.title", (relPath) => {
+    const filePath = path.join(repoRoot, relPath);
+    const content = fs.readFileSync(filePath, "utf-8");
+    const titleFieldPattern = /"title":\s*"([^"]*)"/g;
+    let match: RegExpExecArray | null;
+    let checked = 0;
+    while ((match = titleFieldPattern.exec(content)) !== null) {
+      checked++;
+      expect(match[1]).not.toMatch(/\d{4}-\d{2}-\d{2}/);
+      expect(match[1]).not.toMatch(/ADR-\d+/);
+    }
+    // commands/kmg-create-adr.md has no kg_capture JSON payload at all
+    // (confirmed during issue-46 implementation -- it's a standalone
+    // implementation, see issue-48) -- zero matches there is expected, not a
+    // silently-vacuous test.
+    if (relPath !== "commands/kmg-create-adr.md") {
+      expect(checked).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// issue-46 Manifestation B: defensive frontmatter strip at both write sites
+// ---------------------------------------------------------------------------
+
+describe("kg_capture — defensive frontmatter strip (issue-46 Manifestation B)", () => {
+  function fenceCount(content: string): number {
+    return (content.match(/^---$/gm) || []).length;
+  }
+
+  test("strips a leading frontmatter block from content before writing (session, new file)", async () => {
+    const kgRoot = makeTempDir("strip-session");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    const result = await handleCapture({
+      content: '---\ntitle: "stale"\n---\n\n## Body\n',
+      type: "session",
+      metadata: { title: "main" },
+    });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    const content = fs.readFileSync(ok.filePath, "utf-8");
+    expect(fenceCount(content)).toBe(2);
+    expect(content).toContain("## Body");
+    expect(content).not.toContain("stale");
+  });
+
+  test("is a no-op when content has no embedded frontmatter (regression guard)", async () => {
+    const kgRoot = makeTempDir("strip-noop");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    const result = await handleCapture({
+      content: "## Body only\n",
+      type: "session",
+      metadata: { title: "main" },
+    });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    const content = fs.readFileSync(ok.filePath, "utf-8");
+    expect(fenceCount(content)).toBe(2);
+    expect(content).toContain("## Body only");
+  });
+
+  test("strips a leading frontmatter block from content before writing (adr, new file)", async () => {
+    const kgRoot = makeTempDir("strip-adr");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    const result = await handleCapture({
+      content: '---\ntitle: "ADR-001: stale"\n---\n\n# Decision\n',
+      type: "adr",
+      metadata: { title: "Real Decision" },
+    });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    const content = fs.readFileSync(ok.filePath, "utf-8");
+    expect(fenceCount(content)).toBe(2);
+    expect(content).toContain("# Decision");
+    expect(content).not.toContain("stale");
+  });
+
+  test("strips embedded frontmatter at the update-in-place write site too", async () => {
+    const kgRoot = makeTempDir("strip-update");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    const existingPath = path.join(kgRoot, "sessions", "existing.md");
+    fs.mkdirSync(path.dirname(existingPath), { recursive: true });
+    fs.writeFileSync(existingPath, "---\ntitle: old\n---\nOld body\n", "utf-8");
+
+    const result = await handleCapture({
+      content: '---\ntitle: "stale-embedded"\n---\n\n## Updated body\n',
+      type: "session",
+      metadata: { title: "main", existingFile: existingPath },
+    });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    const content = fs.readFileSync(existingPath, "utf-8");
+    expect(fenceCount(content)).toBe(2);
+    expect(content).toContain("## Updated body");
+    expect(content).not.toContain("stale-embedded");
+  });
+
+  // Opus review (2026-08-17), Important #5: stripLeadingFrontmatter had the
+  // same false-positive class as upgrade.ts's detectDoubledFrontmatter
+  // (CRITICAL #1) -- it stripped up to the next `\n---`-prefixed line with
+  // no check the region in between was actually YAML. A body that merely
+  // opens with a horizontal rule (no real content following it starts with
+  // a `---`) must not be treated as embedded frontmatter to strip.
+  test("does NOT strip a body that opens with a horizontal rule but has no real frontmatter fields", async () => {
+    const kgRoot = makeTempDir("strip-false-positive");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    const bodyContent = "---\n\n## Session Continuation\n\nReal content that must survive.\n\n---\n\n## Next\n";
+    const result = await handleCapture({
+      content: bodyContent,
+      type: "session",
+      metadata: { title: "main" },
+    });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    const content = fs.readFileSync(ok.filePath, "utf-8");
+    expect(content).toContain("## Session Continuation");
+    expect(content).toContain("Real content that must survive.");
+    expect(content).toContain("## Next");
+  });
+
+  test("does NOT strip a body containing a colon-prefixed prose line between dividers (Fable review, 2026-08-18)", async () => {
+    const kgRoot = makeTempDir("strip-prose-colon");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    // A single stray "Note:"-shaped line at column 0 must not be enough to
+    // treat the whole region as YAML -- every non-blank line must qualify.
+    const bodyContent = "---\n\n## Summary\n\nNote: deferred X.\n\n---\n\n## Details\n";
+    const result = await handleCapture({
+      content: bodyContent,
+      type: "session",
+      metadata: { title: "main" },
+    });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    const content = fs.readFileSync(ok.filePath, "utf-8");
+    expect(content).toContain("## Summary");
+    expect(content).toContain("Note: deferred X.");
+    expect(content).toContain("## Details");
+  });
+
+  test("does NOT mistake a longer dash run (----) for the frontmatter closing fence", async () => {
+    const kgRoot = makeTempDir("strip-dash-run");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    const bodyContent = '---\ntitle: "real"\n----\n\n## Body\n';
+    const result = await handleCapture({
+      content: bodyContent,
+      type: "session",
+      metadata: { title: "main" },
+    });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    const content = fs.readFileSync(ok.filePath, "utf-8");
+    // No real closing "---" line exists in the input, so nothing should be
+    // stripped -- the whole original body is preserved after the server's
+    // own generated frontmatter.
+    expect(content).toContain('title: "real"');
+    expect(content).toContain("----");
+    expect(content).toContain("## Body");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// issue-46 Manifestation B: metadata plumbing (update-in-place header
+// fields, ADR status honoring metadata.status)
+// ---------------------------------------------------------------------------
+
+describe("kg_capture — metadata plumbing for update-in-place (issue-46)", () => {
+  test("as_of_commit and last_updated appear in the regenerated frontmatter", async () => {
+    const kgRoot = makeTempDir("plumbing-session");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    const existingPath = path.join(kgRoot, "sessions", "existing.md");
+    fs.mkdirSync(path.dirname(existingPath), { recursive: true });
+    fs.writeFileSync(existingPath, "---\ntitle: old\n---\nOld\n", "utf-8");
+
+    const result = await handleCapture({
+      content: "## Updated\n",
+      type: "session",
+      metadata: {
+        title: "main",
+        existingFile: existingPath,
+        as_of_commit: "abc1234",
+        last_updated: "2026-08-17 12:00",
+      },
+    });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    const content = fs.readFileSync(existingPath, "utf-8");
+    expect(content).toContain("as_of_commit: abc1234");
+    expect(content).toContain("last_updated: 2026-08-17 12:00");
+  });
+
+  test("second same-day session capture via existingFile succeeds without CONFLICT", async () => {
+    // Regression guard for the non-functional update-in-place path found
+    // during issue-46 implementation: previously agents sent inert
+    // "version": "append" instead of existingFile, so any second same-day
+    // capture hit CONFLICT (see checkExistingFile test above). This confirms
+    // the fixed path (existingFile set) bypasses that conflict branch.
+    const kgRoot = makeTempDir("plumbing-no-conflict");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    const today = new Date().toISOString().slice(0, 10);
+    const ym = today.slice(0, 7);
+    const sessionDir = path.join(kgRoot, "sessions", ym);
+    fs.mkdirSync(sessionDir, { recursive: true });
+    const existingPath = path.join(sessionDir, `${today}-main.md`);
+    fs.writeFileSync(existingPath, "---\ntitle: main\n---\nFirst capture\n", "utf-8");
+
+    const result = await handleCapture({
+      content: "## Second capture\n",
+      type: "session",
+      metadata: { title: "main", existingFile: existingPath, last_updated: "2026-08-17 13:00" },
+    });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    expect((result as CaptureResponse).status).toBe("updated");
+    const content = fs.readFileSync(existingPath, "utf-8");
+    expect(content).toContain("## Second capture");
+    expect(content).not.toContain("First capture");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// displayTitleFor -- README index display text (issue-46 solution-approach
+// item 12: reconstruct from type + adrNumber/date rather than regress to a
+// bare title now that metadata.title no longer carries the prefix)
+// ---------------------------------------------------------------------------
+
+describe("displayTitleFor", () => {
+  test("adr: reconstructs 'ADR-NNN: Title' from bare title + adrNumber", () => {
+    expect(displayTitleFor("adr", { title: "My Decision" }, 69)).toBe("ADR-069: My Decision");
+  });
+
+  test("session: reconstructs 'YYYY-MM-DD-title' from bare title", () => {
+    const today = new Date().toISOString().slice(0, 10);
+    expect(displayTitleFor("session", { title: "main" })).toBe(`${today}-main`);
+  });
+
+  test("lesson: returns bare title unchanged (never had a prefix)", () => {
+    expect(displayTitleFor("lesson", { title: "Some Lesson" })).toBe("Some Lesson");
   });
 });

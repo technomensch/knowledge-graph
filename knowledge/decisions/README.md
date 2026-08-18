@@ -193,4 +193,4 @@ ADRs follow a lightweight format:
 - [Real Examples](../../examples/decisions/) - Filled-out ADRs
 - [Pattern Guide](../../docs/PATTERNS-GUIDE.md) - Writing quality tips
 - [triggers.md — Platform-Agnostic Rule Timing Companion File](ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file.md)
-- [ADR-046: Introduce concept+setup hybrid page type and document how-to guide pattern separately from narrative guides](ADR-046-adr-046-introduce-conceptsetup-hybrid-page-type-and-document-how-to-guide-pattern-separately-from-narrative-guides.md)
+- [ADR-046: Introduce concept+setup hybrid page type and document how-to guide pattern separately from narrative guides](ADR-046-concept-setup-hybrid-page-type-and-how-to-guide-pattern.md)

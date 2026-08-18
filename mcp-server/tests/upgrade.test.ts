@@ -1789,3 +1789,398 @@ describe("T-52: apply mode does not resurrect a deleted/unmounted KG path", () =
     expect(result.content[0].text).toContain("[directories] Error:");
   });
 });
+
+// ---------------------------------------------------------------------------
+// issue-46 backfix: capture-corruption inspect + apply
+// ---------------------------------------------------------------------------
+
+describe("capture-corruption — inspect mode", () => {
+  test("detects doubled frontmatter and doubled filenames, reports counts", async () => {
+    const kgRoot = makeTempDir("cc-inspect");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    fs.writeFileSync(
+      path.join(sessionsYm, "2026-08-16-main.md"),
+      '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "2026-08-16-main"\ndate: 2026-08-16\nas_of_commit: abc1234\n---\n\n## Body\n',
+      "utf-8"
+    );
+    fs.writeFileSync(
+      path.join(sessionsYm, "2026-08-06-2026-08-06-main.md"),
+      '---\ntitle: "main"\ndate: 2026-08-06\n---\n\n## Body\n',
+      "utf-8"
+    );
+
+    const result = await handleUpgrade({});
+    const parsed = JSON.parse(result.content[0].text);
+    const item = parsed.upgrades.find((u: { category: string }) => u.category === "capture-corruption");
+
+    expect(item).toBeDefined();
+    expect(item.description).toContain("1 file(s) with a duplicated frontmatter block");
+    expect(item.description).toContain("1 file(s) with an exact doubled date/ADR-number filename prefix");
+  });
+
+  test("does not flag a single frontmatter block followed by a body horizontal rule (false-positive guard)", async () => {
+    const kgRoot = makeTempDir("cc-inspect-fp");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-04");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    // Single block, then a bare --- as a body divider (blank-line-free gap
+    // between fence and heading is the only real signal this guards) --
+    // matches real files found in this repo's own history (2026-04-21,
+    // 2026-05-25) that are NOT the double-frontmatter bug.
+    fs.writeFileSync(
+      path.join(sessionsYm, "2026-04-21-clean.md"),
+      '---\ntitle: "Snapshot"\ndate: 2026-04-21\n---\n---\n### Snapshot: mid-session\n\nBody text.\n',
+      "utf-8"
+    );
+
+    const result = await handleUpgrade({});
+    const parsed = JSON.parse(result.content[0].text);
+    const item = parsed.upgrades.find((u: { category: string }) => u.category === "capture-corruption");
+    expect(item).toBeUndefined();
+  });
+});
+
+describe("capture-corruption — apply mode", () => {
+  test("merges a clean doubled-frontmatter session file into a single block, preserving fields from both", async () => {
+    const kgRoot = makeTempDir("cc-apply-merge");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const filePath = path.join(sessionsYm, "2026-08-16-main.md");
+    fs.writeFileSync(
+      filePath,
+      '---\ntitle: "main"\ndate: 2026-08-16\nbranch: main\ncommit: af447452\ntags: [session, snapshot]\n---\n' +
+        '---\ntitle: "main"\ndate: 2026-08-16\nbranch: main\nas_of_commit: af447452\nlast_updated: "2026-08-16 16:16"\ntags: [session, snapshot]\n---\n\n## Body\n',
+      "utf-8"
+    );
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    expect(result.content[0].text).toContain("[capture-corruption]");
+    expect(result.content[0].text).toContain("1 frontmatter block(s) merged");
+
+    const after = fs.readFileSync(filePath, "utf-8");
+    const fenceLines = (after.match(/^---$/gm) || []).length;
+    expect(fenceLines).toBe(2);
+    expect(after).toContain('commit: af447452');
+    expect(after).toContain("as_of_commit: af447452");
+    expect(after).toContain('last_updated: "2026-08-16 16:16"');
+    expect(after).toContain("## Body");
+  });
+
+  test("renames an exact doubled-date filename, leaving content alone", async () => {
+    const kgRoot = makeTempDir("cc-apply-rename");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const src = path.join(sessionsYm, "2026-08-06-2026-08-06-main.md");
+    fs.writeFileSync(src, '---\ntitle: "main"\ndate: 2026-08-06\n---\n\n## Body\n', "utf-8");
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    expect(result.content[0].text).toContain("1 filename(s) de-duplicated");
+
+    expect(fs.existsSync(src)).toBe(false);
+    const dst = path.join(sessionsYm, "2026-08-06-main.md");
+    expect(fs.existsSync(dst)).toBe(true);
+    expect(fs.readFileSync(dst, "utf-8")).toContain("## Body");
+  });
+
+  test("does NOT auto-merge a genuine field conflict — reports it instead", async () => {
+    const kgRoot = makeTempDir("cc-apply-conflict");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const decisionsDir = path.join(kgRoot, "decisions");
+    const filePath = path.join(decisionsDir, "ADR-999-conflict.md");
+    const original =
+      '---\ntitle: "Conflict"\nstatus: Proposed\n---\n' +
+      '---\ntitle: "Conflict"\nstatus: Accepted\n---\n\n# ADR-999\n';
+    fs.writeFileSync(filePath, original, "utf-8");
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    expect(result.content[0].text).toContain("0 frontmatter block(s) merged");
+    expect(result.content[0].text).toContain("need manual review");
+    expect(result.content[0].text).toContain("status");
+
+    // File must be untouched -- never guess on a real conflict
+    expect(fs.readFileSync(filePath, "utf-8")).toBe(original);
+  });
+
+  test("does NOT auto-rename a near-doubled filename (midnight rollover) — reports it instead", async () => {
+    const kgRoot = makeTempDir("cc-apply-rollover");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-07");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const src = path.join(sessionsYm, "2026-07-12-2026-07-11-main.md");
+    fs.writeFileSync(src, '---\ntitle: "2026-07-11-main"\ndate: 2026-07-11\n---\n\n## Body\n', "utf-8");
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    expect(result.content[0].text).toContain("0 filename(s) de-duplicated");
+    expect(result.content[0].text).toContain("need manual review");
+    expect(result.content[0].text).toContain("near-doubled filename");
+
+    // File must be untouched -- ambiguous which date is correct without
+    // inspecting content, and this apply pass doesn't guess
+    expect(fs.existsSync(src)).toBe(true);
+  });
+
+  test("apply is idempotent — a second run against already-repaired files is a no-op", async () => {
+    const kgRoot = makeTempDir("cc-apply-idempotent");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    fs.writeFileSync(
+      path.join(sessionsYm, "2026-08-16-main.md"),
+      '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\nas_of_commit: abc1234\n---\n\n## Body\n',
+      "utf-8"
+    );
+
+    await handleUpgrade({ apply: ["capture-corruption"] });
+    const second = await handleUpgrade({ apply: ["capture-corruption"] });
+
+    expect(second.content[0].text).toContain("0 frontmatter block(s) merged");
+    expect(second.content[0].text).toContain("0 filename(s) de-duplicated");
+    expect(second.content[0].text).not.toContain("need manual review");
+  });
+
+  test("renames a doubled ADR filename and fixes decisions/README.md's link to it", async () => {
+    const kgRoot = makeTempDir("cc-apply-adr-readme");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const decisionsDir = path.join(kgRoot, "decisions");
+    const src = path.join(decisionsDir, "ADR-046-adr-046-some-decision.md");
+    fs.writeFileSync(src, '---\ntitle: "Some Decision"\nstatus: Accepted\n---\n\n# ADR-046\n', "utf-8");
+    fs.writeFileSync(
+      path.join(decisionsDir, "README.md"),
+      "# Decisions\n\n- [ADR-046: Some Decision](ADR-046-adr-046-some-decision.md)\n",
+      "utf-8"
+    );
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    expect(result.content[0].text).toContain("1 filename(s) de-duplicated");
+    expect(result.content[0].text).toContain("1 README link(s) repointed");
+
+    expect(fs.existsSync(src)).toBe(false);
+    const dst = path.join(decisionsDir, "ADR-046-some-decision.md");
+    expect(fs.existsSync(dst)).toBe(true);
+
+    const readme = fs.readFileSync(path.join(decisionsDir, "README.md"), "utf-8");
+    expect(readme).toContain("(ADR-046-some-decision.md)");
+    expect(readme).not.toContain("ADR-046-adr-046-some-decision.md");
+  });
+
+  test("fixes a stale README link even when the file was already renamed by hand (no corresponding rename this run)", async () => {
+    const kgRoot = makeTempDir("cc-apply-stale-link");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const decisionsDir = path.join(kgRoot, "decisions");
+    // File already correctly named (as if renamed by hand previously) --
+    // only the README index is stale, mirroring this repo's own ADR-046 case.
+    fs.writeFileSync(
+      path.join(decisionsDir, "ADR-050-already-renamed.md"),
+      '---\ntitle: "Already Renamed"\n---\n\n# ADR-050\n',
+      "utf-8"
+    );
+    fs.writeFileSync(
+      path.join(decisionsDir, "README.md"),
+      "# Decisions\n\n- [ADR-050: Already Renamed](ADR-050-adr-050-already-renamed.md)\n",
+      "utf-8"
+    );
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    expect(result.content[0].text).toContain("1 README link(s) repointed");
+
+    const readme = fs.readFileSync(path.join(decisionsDir, "README.md"), "utf-8");
+    expect(readme).toContain("(ADR-050-already-renamed.md)");
+  });
+
+  test("does not touch a README link whose de-doubled target doesn't exist on disk (reports it instead)", async () => {
+    const kgRoot = makeTempDir("cc-apply-orphan-link");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const decisionsDir = path.join(kgRoot, "decisions");
+    const readmeContent = "# Decisions\n\n- [ADR-060: Ghost](ADR-060-adr-060-ghost.md)\n";
+    fs.writeFileSync(path.join(decisionsDir, "README.md"), readmeContent, "utf-8");
+    // No corresponding file exists at all -- neither the doubled nor the
+    // de-doubled name.
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    expect(result.content[0].text).toContain("0 README link(s) repointed");
+    expect(result.content[0].text).toContain("need manual review");
+
+    expect(fs.readFileSync(path.join(decisionsDir, "README.md"), "utf-8")).toBe(readmeContent);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Opus review (2026-08-17), CRITICAL #1: detectDoubledFrontmatter's
+// false-positive guard only worked when the mistaken "block2" never found a
+// closing `---` at all. A real file whose body opens with a `---` divider
+// AND contains a later `---` further down (a second section break) supplies
+// block2 a closing line, so the old code merged/deleted everything in
+// between as if it were frontmatter. Reproduced live against this repo's
+// own knowledge/sessions/2026-05/2026-05-25-v0.6.0-phase-1-planning-multi-
+// platform-decisions.md. These tests model that exact shape.
+// ---------------------------------------------------------------------------
+
+describe("capture-corruption — real-shape false-positive guard (CRITICAL #1 regression)", () => {
+  const REAL_SHAPE_CONTENT =
+    '---\ntitle: "Snapshot"\ndate: 2026-05-25\n---\n' + // block1: real frontmatter
+    "---\n" + // body divider, zero-gap after block1's closing fence
+    "\n## Session Continuation\n\n### Overview\n\nSome real paragraph text that must survive.\n\n" +
+    "---\n" + // a later, unrelated section divider — gives the old code a false "block2" close
+    "\n## Next Section\n\nMore real content.\n";
+
+  test("inspect mode does not flag a file shaped like a real body-divider-then-section-divider file", async () => {
+    const kgRoot = makeTempDir("cc-critical1-inspect");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-05");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    fs.writeFileSync(path.join(sessionsYm, "2026-05-25-real-shape.md"), REAL_SHAPE_CONTENT, "utf-8");
+
+    const result = await handleUpgrade({});
+    const parsed = JSON.parse(result.content[0].text);
+    const item = parsed.upgrades.find((u: { category: string }) => u.category === "capture-corruption");
+    expect(item).toBeUndefined();
+  });
+
+  test("apply mode leaves the file byte-for-byte untouched and writes no .bak", async () => {
+    const kgRoot = makeTempDir("cc-critical1-apply");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-05");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const filePath = path.join(sessionsYm, "2026-05-25-real-shape.md");
+    fs.writeFileSync(filePath, REAL_SHAPE_CONTENT, "utf-8");
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    expect(result.content[0].text).toContain("0 frontmatter block(s) merged");
+
+    expect(fs.readFileSync(filePath, "utf-8")).toBe(REAL_SHAPE_CONTENT);
+    expect(fs.existsSync(`${filePath}.bak`)).toBe(false);
+    expect(fs.readFileSync(filePath, "utf-8")).toContain("## Session Continuation");
+    expect(fs.readFileSync(filePath, "utf-8")).toContain("### Overview");
+  });
+
+  test("a .bak backup is written when a genuine doubled-frontmatter merge does happen", async () => {
+    const kgRoot = makeTempDir("cc-critical1-bak");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const filePath = path.join(sessionsYm, "2026-08-16-main.md");
+    const original =
+      '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\nas_of_commit: abc1234\n---\n\n## Body\n';
+    fs.writeFileSync(filePath, original, "utf-8");
+
+    await handleUpgrade({ apply: ["capture-corruption"] });
+
+    const bakPath = `${filePath}.bak`;
+    expect(fs.existsSync(bakPath)).toBe(true);
+    expect(fs.readFileSync(bakPath, "utf-8")).toBe(original);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Opus review (2026-08-17), CRITICAL #2: DOUBLED_ADR_FILENAME had no
+// backreference tying the two ADR numbers together, so a file legitimately
+// referencing a *different* ADR in its slug would be wrongly de-doubled.
+// ---------------------------------------------------------------------------
+
+describe("capture-corruption — narrowed false-positive guard (Fable review, 2026-08-18)", () => {
+  // block2.order.length > 0 alone still false-positived on prose containing
+  // a single stray colon-prefixed line (e.g. "Note: ...") at column 0,
+  // surrounded by real non-YAML content -- looksLikeYaml requires ALL
+  // non-blank lines in the block to be key:/continuation lines, not just one.
+  test("does not flag or corrupt a body containing a colon-prefixed prose line between dividers", async () => {
+    const kgRoot = makeTempDir("cc-fable-prose-colon");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const filePath = path.join(sessionsYm, "2026-08-18-prose-colon.md");
+    const content =
+      '---\ntitle: "main"\ndate: 2026-08-18\n---\n' +
+      "---\n\n## Summary\n\nNote: deferred X.\n\n---\n\n## Details\n";
+    fs.writeFileSync(filePath, content, "utf-8");
+
+    const inspect = await handleUpgrade({});
+    const parsed = JSON.parse(inspect.content[0].text);
+    const item = parsed.upgrades.find((u: { category: string }) => u.category === "capture-corruption");
+    expect(item).toBeUndefined();
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    expect(result.content[0].text).toContain("0 frontmatter block(s) merged");
+    expect(fs.readFileSync(filePath, "utf-8")).toBe(content);
+    expect(fs.existsSync(`${filePath}.bak`)).toBe(false);
+  });
+});
+
+describe("capture-corruption — ADR backreference guard (CRITICAL #2 regression)", () => {
+  test("does NOT rename an ADR filename whose slug references a different ADR number", async () => {
+    const kgRoot = makeTempDir("cc-critical2-different");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const decisionsDir = path.join(kgRoot, "decisions");
+    const src = path.join(decisionsDir, "ADR-050-adr-046-followup-fix.md");
+    fs.writeFileSync(src, '---\ntitle: "Followup Fix"\n---\n\n# ADR-050\n', "utf-8");
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    expect(result.content[0].text).toContain("0 filename(s) de-duplicated");
+    expect(fs.existsSync(src)).toBe(true);
+    expect(fs.existsSync(path.join(decisionsDir, "ADR-050-followup-fix.md"))).toBe(false);
+  });
+
+  test("still renames a genuine same-number doubled ADR filename", async () => {
+    const kgRoot = makeTempDir("cc-critical2-same");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const decisionsDir = path.join(kgRoot, "decisions");
+    const src = path.join(decisionsDir, "ADR-046-adr-046-again.md");
+    fs.writeFileSync(src, '---\ntitle: "Again"\n---\n\n# ADR-046\n', "utf-8");
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    expect(result.content[0].text).toContain("1 filename(s) de-duplicated");
+    expect(fs.existsSync(src)).toBe(false);
+    expect(fs.existsSync(path.join(decisionsDir, "ADR-046-again.md"))).toBe(true);
+  });
+});

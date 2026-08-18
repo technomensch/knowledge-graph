@@ -32,9 +32,25 @@ export interface CaptureRequest {
       commit_short?: string;
       author?: string;
       email?: string;
+      pr?: string | null;
+      issue?: string | null;
     };
     version?: string;
     existingFile?: string;
+    // session-only: update-in-place header fields (issue-46 Manifestation B)
+    as_of_commit?: string;
+    last_updated?: string;
+    // adr-only: full frontmatter fields (issue-46 Manifestation B), matching
+    // core/default-templates/decisions/ADR-template.md's canonical shape
+    status?: string;
+    number?: number;
+    implements?: string | null;
+    related?: {
+      adrs?: string[];
+      lessons?: string[];
+      kg_entries?: string[];
+    };
+    search_aliases?: string[];
   };
 }
 
@@ -118,6 +134,63 @@ function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+// issue-46 Manifestation B defensive backstop: generateFrontmatter() is the
+// sole owner of the frontmatter block written to disk. If content already
+// starts with one (a caller template not yet updated, or a hand-composed
+// kg_capture call), strip it here rather than stacking two blocks. Fixing
+// caller templates (agents/session-summary-agent.md,
+// agents/create-adr-agent.md) is the primary fix; this is the enforcement
+// backstop for callers this fix doesn't reach.
+function stripLeadingFrontmatter(content: string): string {
+  if (!content.startsWith("---")) return content;
+  const newlineAfterOpen = content.indexOf("\n");
+  if (newlineAfterOpen === -1) return content;
+  if (content.slice(0, newlineAfterOpen).trim() !== "---") return content;
+
+  // Scan line-by-line for the closing `---` and whether the block in
+  // between is entirely real YAML — every non-blank line must be a
+  // `key:` field or an indented continuation of one, not just "at least
+  // one" field present. A body that merely opens with a markdown
+  // horizontal rule (or a longer dash run like `----`) is real content,
+  // not frontmatter, and must not be stripped. Requiring only one field
+  // still false-positives on prose containing a stray colon-prefixed line
+  // (e.g. "Note: deferred X." at column 0) — Fable review (2026-08-18)
+  // reproduced this live. Same false-positive class as upgrade.ts's
+  // detectDoubledFrontmatter/looksLikeYaml.
+  let hasField = false;
+  let looksLikeYaml = true;
+  let prevWasKey = false;
+  let lineStart = newlineAfterOpen + 1;
+  let closeLineEnd = -1;
+  while (lineStart <= content.length) {
+    let lineEnd = content.indexOf("\n", lineStart);
+    if (lineEnd === -1) lineEnd = content.length;
+    const line = content.slice(lineStart, lineEnd);
+    if (line.trim() === "---") {
+      closeLineEnd = lineEnd;
+      break;
+    }
+    if (/^[A-Za-z_][\w-]*:/.test(line)) {
+      hasField = true;
+      prevWasKey = true;
+    } else if (prevWasKey && /^\s/.test(line)) {
+      // indented continuation of the previous key — still valid YAML
+    } else if (line.trim() !== "") {
+      looksLikeYaml = false;
+      prevWasKey = false;
+    } else {
+      prevWasKey = false; // blank line ends continuation eligibility
+    }
+    lineStart = lineEnd + 1;
+  }
+  if (closeLineEnd === -1 || !hasField || !looksLikeYaml) return content;
+
+  let rest = content.slice(closeLineEnd + 1);
+  if (rest.startsWith("\r\n")) rest = rest.slice(2);
+  else if (rest.startsWith("\n")) rest = rest.slice(1);
+  return rest.replace(/^\s*\n/, "");
+}
+
 export function validateMetadata(
   metadata: CaptureRequest["metadata"]
 ): CaptureRequest["metadata"] | CaptureError {
@@ -148,6 +221,9 @@ export function deriveFileName(
     return `Lessons_Learned_${titlePascal}.md`;
   }
 
+  // Caller must pass a bare title (issue-46 Manifestation A) — this function
+  // owns all filename prefixing. A caller-supplied date or ADR-number prefix
+  // is NOT stripped; it will double-prepend. See knowledge/issues/issue-46/.
   if (type === "session") {
     return `${todayIso()}-${slugify(metadata.title)}.md`;
   }
@@ -184,21 +260,51 @@ export function generateFrontmatter(
     if (metadata.category) lines.push(`category: ${metadata.category}`);
     if (metadata.version) lines.push(`version: "${metadata.version}"`);
   } else if (type === "session") {
-    lines.push(`title: "${metadata.title.replace(/"/g, '\\"')}"`);
+    // issue-46 backfix hardening: use the same dated title displayTitleFor()
+    // already computes for the README index — a bare title here regresses
+    // FTS5 title-ranked search, which relies on the date prefix as signal.
+    lines.push(`title: "${displayTitleFor("session", metadata).replace(/"/g, '\\"')}"`);
     lines.push(`date: ${today}`);
     if (metadata.git?.branch) lines.push(`branch: ${metadata.git.branch}`);
     if (metadata.git?.commit_short) lines.push(`commit: ${metadata.git.commit_short}`);
+    // issue-46 Manifestation B: these previously lived in a caller-embedded
+    // frontmatter block; now sole-owned here, sourced from metadata so the
+    // update-in-place path (existingFile) can refresh them.
+    if (metadata.as_of_commit) lines.push(`as_of_commit: ${metadata.as_of_commit}`);
+    if (metadata.last_updated) lines.push(`last_updated: ${metadata.last_updated}`);
     if (metadata.tags && metadata.tags.length > 0) {
       lines.push(`tags: [${metadata.tags.join(", ")}]`);
     }
   } else if (type === "adr") {
+    // issue-46 Manifestation B: full shape matches
+    // core/default-templates/decisions/ADR-template.md — previously only a
+    // stub (title/status-hardcoded/date/deciders/tags) because callers always
+    // embedded their own complete block on top of this one; now sole owner.
     lines.push(`title: "${metadata.title.replace(/"/g, '\\"')}"`);
-    lines.push(`status: Proposed`);
-    lines.push(`date: ${today}`);
-    if (metadata.git?.author) lines.push(`deciders: ${metadata.git.author}`);
+    if (metadata.number !== undefined) lines.push(`number: ${metadata.number}`);
+    lines.push(`created: ${now}`);
+    lines.push(`status: ${metadata.status ?? "Proposed"}`);
+    if (metadata.git?.author) lines.push(`author: ${metadata.git.author}`);
+    if (metadata.git?.email) lines.push(`email: ${metadata.git.email}`);
+    if (metadata.git?.branch || metadata.git?.commit || metadata.git?.pr !== undefined || metadata.git?.issue !== undefined) {
+      lines.push("git:");
+      if (metadata.git?.branch) lines.push(`  branch: ${metadata.git.branch}`);
+      if (metadata.git?.commit) lines.push(`  commit: ${metadata.git.commit}`);
+      lines.push(`  pr: ${metadata.git?.pr ?? "null"}`);
+      lines.push(`  issue: ${metadata.git?.issue ?? "null"}`);
+    }
+    lines.push(`implements: ${metadata.implements ?? "null"}`);
+    lines.push("related:");
+    lines.push(`  adrs: [${(metadata.related?.adrs ?? []).join(", ")}]`);
+    lines.push(`  lessons: [${(metadata.related?.lessons ?? []).join(", ")}]`);
+    lines.push(`  kg_entries: [${(metadata.related?.kg_entries ?? []).join(", ")}]`);
     if (metadata.tags && metadata.tags.length > 0) {
       lines.push(`tags: [${metadata.tags.join(", ")}]`);
     }
+    if (metadata.search_aliases && metadata.search_aliases.length > 0) {
+      lines.push(`search_aliases: [${metadata.search_aliases.join(", ")}]`);
+    }
+    if (metadata.category) lines.push(`category: ${metadata.category}`);
   }
 
   lines.push("---", "");
@@ -262,6 +368,24 @@ export function checkExistingFile(
     }
   }
   return null;
+}
+
+// issue-46 Manifestation A: metadata.title is now bare (no date/ADR-number
+// prefix). README index entries previously got that prefix for free from the
+// (buggy) doubled title; reconstruct a display title from type + the
+// server-derived prefix instead of regressing to a bare title in the index.
+export function displayTitleFor(
+  type: CaptureRequest["type"],
+  metadata: CaptureRequest["metadata"],
+  adrNumber?: number
+): string {
+  if (type === "adr" && adrNumber !== undefined) {
+    return `ADR-${String(adrNumber).padStart(3, "0")}: ${metadata.title}`;
+  }
+  if (type === "session") {
+    return `${todayIso()}-${metadata.title}`;
+  }
+  return metadata.title;
 }
 
 export function updateReadmeIndex(
@@ -428,7 +552,7 @@ export async function handleCapture(
     try {
       fs.writeFileSync(
         existing,
-        generateFrontmatter(request.type, request.metadata) + request.content,
+        generateFrontmatter(request.type, request.metadata) + stripLeadingFrontmatter(request.content),
         "utf-8"
       );
       let indexResult: Record<string, unknown> = {};
@@ -455,7 +579,7 @@ export async function handleCapture(
   }
 
   // Resolve target path
-  const { dir, fileName } = resolveTargetPath(kgPath, request.type, request.metadata);
+  const { dir, fileName, adrNumber } = resolveTargetPath(kgPath, request.type, request.metadata);
 
   // Create directory if needed
   try {
@@ -471,7 +595,7 @@ export async function handleCapture(
 
   // Write file
   try {
-    fs.writeFileSync(filePath, generateFrontmatter(request.type, request.metadata) + request.content, "utf-8");
+    fs.writeFileSync(filePath, generateFrontmatter(request.type, request.metadata) + stripLeadingFrontmatter(request.content), "utf-8");
   } catch (err: unknown) {
     return { error: "IO_ERROR", message: `Failed to write file: ${err instanceof Error ? err.message : String(err)}` };
   }
@@ -487,7 +611,7 @@ export async function handleCapture(
       readmePath = path.join(kgPath, "decisions", "README.md");
     }
     updateReadmeIndex(readmePath, {
-      title: request.metadata.title,
+      title: displayTitleFor(request.type, request.metadata, adrNumber),
       relativePath: path.relative(path.dirname(readmePath), filePath),
     });
   } catch { /* best-effort */ }
@@ -526,7 +650,12 @@ export function registerCaptureTool(server: McpServer, personalScopeSession: Per
         .describe("Entry type: determines directory routing and frontmatter template"),
       metadata: z
         .object({
-          title: z.string().describe("Used in frontmatter and filename generation"),
+          title: z
+            .string()
+            .describe(
+              "Bare title, no date or ADR-number prefix — this tool derives and owns all " +
+                "filename/frontmatter prefixing. A pre-prefixed title double-prepends."
+            ),
           category: z
             .string()
             .optional()
@@ -539,6 +668,8 @@ export function registerCaptureTool(server: McpServer, personalScopeSession: Per
               commit_short: z.string().optional(),
               author: z.string().optional(),
               email: z.string().optional(),
+              pr: z.string().nullable().optional().describe("adr type only: PR number or null"),
+              issue: z.string().nullable().optional().describe("adr type only: issue number or null"),
             })
             .optional()
             .describe("Git context metadata"),
@@ -547,6 +678,26 @@ export function registerCaptureTool(server: McpServer, personalScopeSession: Per
             .string()
             .optional()
             .describe("Absolute path to existing file for update-in-place"),
+          as_of_commit: z
+            .string()
+            .optional()
+            .describe("session type only: short commit hash for the update-in-place header"),
+          last_updated: z
+            .string()
+            .optional()
+            .describe("session type only: timestamp for the update-in-place header"),
+          status: z.string().optional().describe("adr type only: Proposed|Accepted|Deprecated|Superseded"),
+          number: z.number().optional().describe("adr type only: ADR sequential number"),
+          implements: z.string().nullable().optional().describe("adr type only: version or feature this ADR applies to"),
+          related: z
+            .object({
+              adrs: z.array(z.string()).optional(),
+              lessons: z.array(z.string()).optional(),
+              kg_entries: z.array(z.string()).optional(),
+            })
+            .optional()
+            .describe("adr type only: linked ADRs/lessons/KG entries"),
+          search_aliases: z.array(z.string()).optional().describe("adr type only: alternate search terms"),
         })
         .describe("Entry metadata"),
       targetKg: z

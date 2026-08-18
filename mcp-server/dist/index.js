@@ -3747,49 +3747,49 @@ var require_fast_uri = __commonJS({
       schemelessOptions.skipEscape = true;
       return serialize(resolved, schemelessOptions);
     }
-    function resolveComponent(base, relative7, options, skipNormalization) {
+    function resolveComponent(base, relative8, options, skipNormalization) {
       const target = {};
       if (!skipNormalization) {
         base = parse4(serialize(base, options), options);
-        relative7 = parse4(serialize(relative7, options), options);
+        relative8 = parse4(serialize(relative8, options), options);
       }
       options = options || {};
-      if (!options.tolerant && relative7.scheme) {
-        target.scheme = relative7.scheme;
-        target.userinfo = relative7.userinfo;
-        target.host = relative7.host;
-        target.port = relative7.port;
-        target.path = removeDotSegments(relative7.path || "");
-        target.query = relative7.query;
+      if (!options.tolerant && relative8.scheme) {
+        target.scheme = relative8.scheme;
+        target.userinfo = relative8.userinfo;
+        target.host = relative8.host;
+        target.port = relative8.port;
+        target.path = removeDotSegments(relative8.path || "");
+        target.query = relative8.query;
       } else {
-        if (relative7.userinfo !== void 0 || relative7.host !== void 0 || relative7.port !== void 0) {
-          target.userinfo = relative7.userinfo;
-          target.host = relative7.host;
-          target.port = relative7.port;
-          target.path = removeDotSegments(relative7.path || "");
-          target.query = relative7.query;
+        if (relative8.userinfo !== void 0 || relative8.host !== void 0 || relative8.port !== void 0) {
+          target.userinfo = relative8.userinfo;
+          target.host = relative8.host;
+          target.port = relative8.port;
+          target.path = removeDotSegments(relative8.path || "");
+          target.query = relative8.query;
         } else {
-          if (!relative7.path) {
+          if (!relative8.path) {
             target.path = base.path;
-            if (relative7.query !== void 0) {
-              target.query = relative7.query;
+            if (relative8.query !== void 0) {
+              target.query = relative8.query;
             } else {
               target.query = base.query;
             }
           } else {
-            if (relative7.path[0] === "/") {
-              target.path = removeDotSegments(relative7.path);
+            if (relative8.path[0] === "/") {
+              target.path = removeDotSegments(relative8.path);
             } else {
               if ((base.userinfo !== void 0 || base.host !== void 0 || base.port !== void 0) && !base.path) {
-                target.path = "/" + relative7.path;
+                target.path = "/" + relative8.path;
               } else if (!base.path) {
-                target.path = relative7.path;
+                target.path = relative8.path;
               } else {
-                target.path = base.path.slice(0, base.path.lastIndexOf("/") + 1) + relative7.path;
+                target.path = base.path.slice(0, base.path.lastIndexOf("/") + 1) + relative8.path;
               }
               target.path = removeDotSegments(target.path);
             }
-            target.query = relative7.query;
+            target.query = relative8.query;
           }
           target.userinfo = base.userinfo;
           target.host = base.host;
@@ -3797,7 +3797,7 @@ var require_fast_uri = __commonJS({
         }
         target.scheme = base.scheme;
       }
-      target.fragment = relative7.fragment;
+      target.fragment = relative8.fragment;
       return target;
     }
     function equal(uriA, uriB, options) {
@@ -33023,6 +33023,42 @@ function slugify2(str) {
 function todayIso() {
   return (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
 }
+function stripLeadingFrontmatter(content) {
+  if (!content.startsWith("---")) return content;
+  const newlineAfterOpen = content.indexOf("\n");
+  if (newlineAfterOpen === -1) return content;
+  if (content.slice(0, newlineAfterOpen).trim() !== "---") return content;
+  let hasField = false;
+  let looksLikeYaml = true;
+  let prevWasKey = false;
+  let lineStart = newlineAfterOpen + 1;
+  let closeLineEnd = -1;
+  while (lineStart <= content.length) {
+    let lineEnd = content.indexOf("\n", lineStart);
+    if (lineEnd === -1) lineEnd = content.length;
+    const line = content.slice(lineStart, lineEnd);
+    if (line.trim() === "---") {
+      closeLineEnd = lineEnd;
+      break;
+    }
+    if (/^[A-Za-z_][\w-]*:/.test(line)) {
+      hasField = true;
+      prevWasKey = true;
+    } else if (prevWasKey && /^\s/.test(line)) {
+    } else if (line.trim() !== "") {
+      looksLikeYaml = false;
+      prevWasKey = false;
+    } else {
+      prevWasKey = false;
+    }
+    lineStart = lineEnd + 1;
+  }
+  if (closeLineEnd === -1 || !hasField || !looksLikeYaml) return content;
+  let rest = content.slice(closeLineEnd + 1);
+  if (rest.startsWith("\r\n")) rest = rest.slice(2);
+  else if (rest.startsWith("\n")) rest = rest.slice(1);
+  return rest.replace(/^\s*\n/, "");
+}
 function validateMetadata(metadata) {
   if (!metadata.title || metadata.title.trim() === "") {
     return { error: "VALIDATION_ERROR", message: "metadata.title is required" };
@@ -33068,21 +33104,41 @@ function generateFrontmatter(type, metadata) {
     if (metadata.category) lines.push(`category: ${metadata.category}`);
     if (metadata.version) lines.push(`version: "${metadata.version}"`);
   } else if (type === "session") {
-    lines.push(`title: "${metadata.title.replace(/"/g, '\\"')}"`);
+    lines.push(`title: "${displayTitleFor("session", metadata).replace(/"/g, '\\"')}"`);
     lines.push(`date: ${today}`);
     if (metadata.git?.branch) lines.push(`branch: ${metadata.git.branch}`);
     if (metadata.git?.commit_short) lines.push(`commit: ${metadata.git.commit_short}`);
+    if (metadata.as_of_commit) lines.push(`as_of_commit: ${metadata.as_of_commit}`);
+    if (metadata.last_updated) lines.push(`last_updated: ${metadata.last_updated}`);
     if (metadata.tags && metadata.tags.length > 0) {
       lines.push(`tags: [${metadata.tags.join(", ")}]`);
     }
   } else if (type === "adr") {
     lines.push(`title: "${metadata.title.replace(/"/g, '\\"')}"`);
-    lines.push(`status: Proposed`);
-    lines.push(`date: ${today}`);
-    if (metadata.git?.author) lines.push(`deciders: ${metadata.git.author}`);
+    if (metadata.number !== void 0) lines.push(`number: ${metadata.number}`);
+    lines.push(`created: ${now}`);
+    lines.push(`status: ${metadata.status ?? "Proposed"}`);
+    if (metadata.git?.author) lines.push(`author: ${metadata.git.author}`);
+    if (metadata.git?.email) lines.push(`email: ${metadata.git.email}`);
+    if (metadata.git?.branch || metadata.git?.commit || metadata.git?.pr !== void 0 || metadata.git?.issue !== void 0) {
+      lines.push("git:");
+      if (metadata.git?.branch) lines.push(`  branch: ${metadata.git.branch}`);
+      if (metadata.git?.commit) lines.push(`  commit: ${metadata.git.commit}`);
+      lines.push(`  pr: ${metadata.git?.pr ?? "null"}`);
+      lines.push(`  issue: ${metadata.git?.issue ?? "null"}`);
+    }
+    lines.push(`implements: ${metadata.implements ?? "null"}`);
+    lines.push("related:");
+    lines.push(`  adrs: [${(metadata.related?.adrs ?? []).join(", ")}]`);
+    lines.push(`  lessons: [${(metadata.related?.lessons ?? []).join(", ")}]`);
+    lines.push(`  kg_entries: [${(metadata.related?.kg_entries ?? []).join(", ")}]`);
     if (metadata.tags && metadata.tags.length > 0) {
       lines.push(`tags: [${metadata.tags.join(", ")}]`);
     }
+    if (metadata.search_aliases && metadata.search_aliases.length > 0) {
+      lines.push(`search_aliases: [${metadata.search_aliases.join(", ")}]`);
+    }
+    if (metadata.category) lines.push(`category: ${metadata.category}`);
   }
   lines.push("---", "");
   return lines.join("\n");
@@ -33129,6 +33185,15 @@ function checkExistingFile(type, kgPath, metadata) {
     }
   }
   return null;
+}
+function displayTitleFor(type, metadata, adrNumber) {
+  if (type === "adr" && adrNumber !== void 0) {
+    return `ADR-${String(adrNumber).padStart(3, "0")}: ${metadata.title}`;
+  }
+  if (type === "session") {
+    return `${todayIso()}-${metadata.title}`;
+  }
+  return metadata.title;
 }
 function updateReadmeIndex(indexPath, entry) {
   const line = `- [${entry.title}](${entry.relativePath})${entry.description ? ` \u2014 ${entry.description}` : ""}`;
@@ -33242,7 +33307,7 @@ async function handleCapture(request, targetKg, interaction, personalScopeSessio
     try {
       fs10.writeFileSync(
         existing,
-        generateFrontmatter(request.type, request.metadata) + request.content,
+        generateFrontmatter(request.type, request.metadata) + stripLeadingFrontmatter(request.content),
         "utf-8"
       );
       let indexResult2 = {};
@@ -33266,7 +33331,7 @@ async function handleCapture(request, targetKg, interaction, personalScopeSessio
       };
     }
   }
-  const { dir, fileName } = resolveTargetPath(kgPath, request.type, request.metadata);
+  const { dir, fileName, adrNumber } = resolveTargetPath(kgPath, request.type, request.metadata);
   try {
     if (!fs10.existsSync(dir)) fs10.mkdirSync(dir, { recursive: true });
   } catch (err) {
@@ -33277,7 +33342,7 @@ async function handleCapture(request, targetKg, interaction, personalScopeSessio
   }
   const filePath = path10.join(dir, fileName);
   try {
-    fs10.writeFileSync(filePath, generateFrontmatter(request.type, request.metadata) + request.content, "utf-8");
+    fs10.writeFileSync(filePath, generateFrontmatter(request.type, request.metadata) + stripLeadingFrontmatter(request.content), "utf-8");
   } catch (err) {
     return { error: "IO_ERROR", message: `Failed to write file: ${err instanceof Error ? err.message : String(err)}` };
   }
@@ -33291,7 +33356,7 @@ async function handleCapture(request, targetKg, interaction, personalScopeSessio
       readmePath = path10.join(kgPath, "decisions", "README.md");
     }
     updateReadmeIndex(readmePath, {
-      title: request.metadata.title,
+      title: displayTitleFor(request.type, request.metadata, adrNumber),
       relativePath: path10.relative(path10.dirname(readmePath), filePath)
     });
   } catch {
@@ -33319,7 +33384,9 @@ function registerCaptureTool(server2, personalScopeSession2) {
       content: external_exports3.string().describe("Full markdown body of the lesson, session summary, or ADR"),
       type: external_exports3.enum(["lesson", "session", "adr"]).describe("Entry type: determines directory routing and frontmatter template"),
       metadata: external_exports3.object({
-        title: external_exports3.string().describe("Used in frontmatter and filename generation"),
+        title: external_exports3.string().describe(
+          "Bare title, no date or ADR-number prefix \u2014 this tool derives and owns all filename/frontmatter prefixing. A pre-prefixed title double-prepends."
+        ),
         category: external_exports3.string().optional().describe("Subdirectory routing (architecture, debugging, process, patterns)"),
         tags: external_exports3.array(external_exports3.string()).optional().describe("Searchability tags"),
         git: external_exports3.object({
@@ -33327,10 +33394,23 @@ function registerCaptureTool(server2, personalScopeSession2) {
           commit: external_exports3.string().optional(),
           commit_short: external_exports3.string().optional(),
           author: external_exports3.string().optional(),
-          email: external_exports3.string().optional()
+          email: external_exports3.string().optional(),
+          pr: external_exports3.string().nullable().optional().describe("adr type only: PR number or null"),
+          issue: external_exports3.string().nullable().optional().describe("adr type only: issue number or null")
         }).optional().describe("Git context metadata"),
         version: external_exports3.string().optional().describe("Version string for updates to existing files"),
-        existingFile: external_exports3.string().optional().describe("Absolute path to existing file for update-in-place")
+        existingFile: external_exports3.string().optional().describe("Absolute path to existing file for update-in-place"),
+        as_of_commit: external_exports3.string().optional().describe("session type only: short commit hash for the update-in-place header"),
+        last_updated: external_exports3.string().optional().describe("session type only: timestamp for the update-in-place header"),
+        status: external_exports3.string().optional().describe("adr type only: Proposed|Accepted|Deprecated|Superseded"),
+        number: external_exports3.number().optional().describe("adr type only: ADR sequential number"),
+        implements: external_exports3.string().nullable().optional().describe("adr type only: version or feature this ADR applies to"),
+        related: external_exports3.object({
+          adrs: external_exports3.array(external_exports3.string()).optional(),
+          lessons: external_exports3.array(external_exports3.string()).optional(),
+          kg_entries: external_exports3.array(external_exports3.string()).optional()
+        }).optional().describe("adr type only: linked ADRs/lessons/KG entries"),
+        search_aliases: external_exports3.array(external_exports3.string()).optional().describe("adr type only: alternate search terms")
       }).describe("Entry metadata"),
       targetKg: external_exports3.string().optional().describe(
         "Named KG to write to (from kg-config.json). Use for global/personal KG captures. If omitted, writes to the active KG. CWD alignment check is skipped when targetKg is set."
@@ -33412,6 +33492,8 @@ var APPLY_ORDER = [
   // must run BEFORE templates
   "templates",
   "stray-knowledge-dir",
+  "capture-corruption",
+  // issue-46 backfix: content repair, order-independent of the others
   "platform-split"
 ];
 function parseFrontmatter(filePath) {
@@ -33428,6 +33510,219 @@ function parseFrontmatter(filePath) {
     }
   }
   return result;
+}
+function parseFrontmatterBlockRaw(lines, startIdx) {
+  if (lines[startIdx]?.trim() !== "---") return null;
+  let end = -1;
+  for (let i = startIdx + 1; i < lines.length; i++) {
+    if (lines[i].trim() === "---") {
+      end = i;
+      break;
+    }
+  }
+  if (end === -1) return null;
+  const fields = /* @__PURE__ */ new Map();
+  const order = [];
+  let currentKey = null;
+  let looksLikeYaml = true;
+  for (let i = startIdx + 1; i < end; i++) {
+    const line = lines[i];
+    const topMatch = line.match(/^([A-Za-z_][\w-]*):(.*)$/);
+    if (topMatch) {
+      currentKey = topMatch[1];
+      fields.set(currentKey, [line]);
+      order.push(currentKey);
+    } else if (currentKey && /^\s/.test(line)) {
+      fields.get(currentKey).push(line);
+    } else if (line.trim() !== "") {
+      currentKey = null;
+      looksLikeYaml = false;
+    } else {
+      currentKey = null;
+    }
+  }
+  return { startLine: startIdx, endLine: end, fields, order, looksLikeYaml };
+}
+function detectDoubledFrontmatter(lines) {
+  const block1 = parseFrontmatterBlockRaw(lines, 0);
+  if (!block1) return null;
+  const block2 = parseFrontmatterBlockRaw(lines, block1.endLine + 1);
+  if (!block2) return null;
+  if (block2.order.length === 0 || !block2.looksLikeYaml) return null;
+  return { block1, block2 };
+}
+function mergeFrontmatterBlocks(block1, block2) {
+  const conflicts = [];
+  const fields = /* @__PURE__ */ new Map();
+  const order = [];
+  for (const key of block1.order) {
+    fields.set(key, block1.fields.get(key));
+    order.push(key);
+  }
+  for (const key of block2.order) {
+    const incoming = block2.fields.get(key);
+    if (fields.has(key)) {
+      const existing = fields.get(key).join("\n");
+      if (existing !== incoming.join("\n")) conflicts.push(key);
+      continue;
+    }
+    fields.set(key, incoming);
+    order.push(key);
+  }
+  if (conflicts.length > 0) return { conflicts };
+  const out = ["---"];
+  for (const key of order) out.push(...fields.get(key));
+  out.push("---");
+  return { mergedLines: out };
+}
+var DOUBLED_DATE_FILENAME = /^(\d{4}-\d{2}-\d{2})-\1-(.+\.md)$/;
+var NEAR_DOUBLED_DATE_FILENAME = /^(\d{4}-\d{2}-\d{2})-(\d{4}-\d{2}-\d{2})-(.+\.md)$/;
+var DOUBLED_ADR_FILENAME = /^(ADR-(\d+))-adr-\2-(.+\.md)$/i;
+function deDoubledFilename(entry) {
+  const dateMatch = entry.match(DOUBLED_DATE_FILENAME);
+  if (dateMatch) return `${dateMatch[1]}-${dateMatch[2]}`;
+  const adrMatch = entry.match(DOUBLED_ADR_FILENAME);
+  if (adrMatch) return `${adrMatch[1]}-${adrMatch[3]}`;
+  return null;
+}
+function captureCorruptionDirs(kgPath) {
+  const dirs = [];
+  const sessionsRoot = path11.join(kgPath, "sessions");
+  if (fs11.existsSync(sessionsRoot)) {
+    for (const ym of fs11.readdirSync(sessionsRoot)) {
+      const full = path11.join(sessionsRoot, ym);
+      if (fs11.statSync(full).isDirectory()) dirs.push(full);
+    }
+  }
+  const decisionsRoot = path11.join(kgPath, "decisions");
+  if (fs11.existsSync(decisionsRoot)) dirs.push(decisionsRoot);
+  const lessonsRoot = path11.join(kgPath, "lessons-learned");
+  if (fs11.existsSync(lessonsRoot)) {
+    for (const cat of fs11.readdirSync(lessonsRoot)) {
+      const full = path11.join(lessonsRoot, cat);
+      if (fs11.statSync(full).isDirectory()) dirs.push(full);
+    }
+  }
+  return dirs;
+}
+function checkCaptureCorruption(kgPath) {
+  let doubledFrontmatter = 0;
+  let doubledFilenames = 0;
+  let nearDoubledFilenames = 0;
+  for (const dir of captureCorruptionDirs(kgPath)) {
+    for (const entry of fs11.readdirSync(dir)) {
+      if (!entry.endsWith(".md")) continue;
+      if (deDoubledFilename(entry)) doubledFilenames++;
+      else if (NEAR_DOUBLED_DATE_FILENAME.test(entry)) nearDoubledFilenames++;
+      const full = path11.join(dir, entry);
+      if (!fs11.statSync(full).isFile()) continue;
+      const lines = fs11.readFileSync(full, "utf-8").split("\n");
+      if (detectDoubledFrontmatter(lines)) doubledFrontmatter++;
+    }
+  }
+  let staleReadmeLinks = 0;
+  for (const readmeRelPath of ["sessions/README.md", "decisions/README.md", "lessons-learned/README.md"]) {
+    const readmePath = path11.join(kgPath, readmeRelPath);
+    if (!fs11.existsSync(readmePath)) continue;
+    const content = fs11.readFileSync(readmePath, "utf-8");
+    for (const m of content.matchAll(/\]\(([^)]+\.md)\)/g)) {
+      const linkTarget = m[1];
+      const base = path11.basename(linkTarget);
+      const target = deDoubledFilename(base);
+      if (!target) continue;
+      const dedoubledLink = linkTarget.slice(0, linkTarget.length - base.length) + target;
+      if (fs11.existsSync(path11.join(path11.dirname(readmePath), dedoubledLink))) staleReadmeLinks++;
+    }
+  }
+  if (doubledFrontmatter === 0 && doubledFilenames === 0 && nearDoubledFilenames === 0 && staleReadmeLinks === 0) return [];
+  const parts = [];
+  if (doubledFrontmatter > 0) parts.push(`${doubledFrontmatter} file(s) with a duplicated frontmatter block`);
+  if (doubledFilenames > 0) parts.push(`${doubledFilenames} file(s) with an exact doubled date/ADR-number filename prefix`);
+  if (nearDoubledFilenames > 0) parts.push(`${nearDoubledFilenames} file(s) with a near-doubled filename (different adjacent dates \u2014 needs manual review, not auto-renamed)`);
+  if (staleReadmeLinks > 0) parts.push(`${staleReadmeLinks} README index link(s) pointing at a doubled filename`);
+  return [{
+    category: "capture-corruption",
+    description: `issue-46: ${parts.join("; ")}`,
+    details: `These were written before the capture.ts filename/frontmatter-ownership fix (issue-46) and stay corrupted until repaired. Run with apply: ["capture-corruption"] to fix the unambiguous cases automatically (exact-duplicate filenames stripped; frontmatter blocks merged only when the two blocks don't disagree on any field). Anything ambiguous (a real field conflict, or a near-doubled filename from a midnight rollover) is reported, never guessed at \u2014 you'll get a list to resolve by hand.`
+  }];
+}
+function applyCaptureCorruption(kgPath) {
+  let mergedCount = 0;
+  let renamedCount = 0;
+  const reviewNeeded = [];
+  for (const dir of captureCorruptionDirs(kgPath)) {
+    for (const entry of fs11.readdirSync(dir)) {
+      if (!entry.endsWith(".md")) continue;
+      const full = path11.join(dir, entry);
+      if (!fs11.statSync(full).isFile()) continue;
+      const raw = fs11.readFileSync(full, "utf-8");
+      const lines = raw.split("\n");
+      const doubled = detectDoubledFrontmatter(lines);
+      if (!doubled) continue;
+      const result = mergeFrontmatterBlocks(doubled.block1, doubled.block2);
+      if ("conflicts" in result) {
+        reviewNeeded.push(`${path11.relative(kgPath, full)}: frontmatter fields disagree (${result.conflicts.join(", ")}) \u2014 not auto-merged`);
+        continue;
+      }
+      const rest = lines.slice(doubled.block2.endLine + 1);
+      const newContent = [...result.mergedLines, ...rest].join("\n");
+      fs11.writeFileSync(`${full}.bak`, raw, "utf-8");
+      fs11.writeFileSync(full, newContent, "utf-8");
+      mergedCount++;
+    }
+  }
+  for (const dir of captureCorruptionDirs(kgPath)) {
+    for (const entry of fs11.readdirSync(dir)) {
+      if (!entry.endsWith(".md")) continue;
+      const target = deDoubledFilename(entry);
+      if (!target) {
+        if (NEAR_DOUBLED_DATE_FILENAME.test(entry)) {
+          reviewNeeded.push(`${path11.relative(kgPath, path11.join(dir, entry))}: near-doubled filename (different adjacent dates, likely a midnight rollover) \u2014 not auto-renamed, resolve manually`);
+        }
+        continue;
+      }
+      const targetFull = path11.join(dir, target);
+      const srcFull = path11.join(dir, entry);
+      if (fs11.existsSync(targetFull)) {
+        reviewNeeded.push(`${path11.relative(kgPath, srcFull)}: target filename ${target} already exists \u2014 not auto-renamed`);
+        continue;
+      }
+      fs11.renameSync(srcFull, targetFull);
+      renamedCount++;
+    }
+  }
+  let readmeLinksFixed = 0;
+  for (const readmeRelPath of ["sessions/README.md", "decisions/README.md", "lessons-learned/README.md"]) {
+    const readmePath = path11.join(kgPath, readmeRelPath);
+    if (!fs11.existsSync(readmePath)) continue;
+    let content = fs11.readFileSync(readmePath, "utf-8");
+    let changed = false;
+    content = content.replace(/\]\(([^)]+\.md)\)/g, (whole, linkTarget) => {
+      const base = path11.basename(linkTarget);
+      const target = deDoubledFilename(base);
+      if (!target) return whole;
+      const dedoubledLink = linkTarget.slice(0, linkTarget.length - base.length) + target;
+      const candidateFull = path11.join(path11.dirname(readmePath), dedoubledLink);
+      if (!fs11.existsSync(candidateFull)) {
+        reviewNeeded.push(`${readmeRelPath}: link to ${linkTarget} looks doubled but ${dedoubledLink} doesn't exist \u2014 not auto-fixed`);
+        return whole;
+      }
+      changed = true;
+      readmeLinksFixed++;
+      return `](${dedoubledLink})`;
+    });
+    if (changed) fs11.writeFileSync(readmePath, content, "utf-8");
+  }
+  const parts = [
+    `${mergedCount} frontmatter block(s) merged` + (mergedCount > 0 ? " (.bak backup written for each)" : ""),
+    `${renamedCount} filename(s) de-duplicated`,
+    `${readmeLinksFixed} README link(s) repointed`
+  ];
+  if (reviewNeeded.length > 0) {
+    parts.push(`${reviewNeeded.length} item(s) need manual review:
+  - ${reviewNeeded.join("\n  - ")}`);
+  }
+  return parts.join("; ");
 }
 function checkDirectories(kgPath) {
   const required2 = [
@@ -34063,6 +34358,7 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
     result.upgrades.push(...checkStarterRelocation(kgPath));
     result.upgrades.push(...checkTemplates(kgPath));
     result.upgrades.push(...checkStrayKnowledgeDir(kgPath, kgType));
+    result.upgrades.push(...checkCaptureCorruption(kgPath));
     result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config2, target.name));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
@@ -34124,6 +34420,10 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
         results.push(`[stray-knowledge-dir] ${applyStrayKnowledgeDir(kgPath)}`);
         appliedAnyGraphDependent = true;
         break;
+      case "capture-corruption":
+        results.push(`[capture-corruption] ${applyCaptureCorruption(kgPath)}`);
+        appliedAnyGraphDependent = true;
+        break;
       case "platform-split":
         if (!params.confirm_platform_split) {
           results.push("[platform-split] WARNING: platform-split migration removes content from rules.md. Pass confirm_platform_split: true to proceed.");
@@ -34144,8 +34444,8 @@ function registerUpgradeTool(server2, personalScopeSession2) {
     "kg_upgrade",
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
-      apply: external_exports3.array(external_exports3.enum(["status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"])).optional().default([]).describe(
-        'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"'
+      apply: external_exports3.array(external_exports3.enum(["status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption"])).optional().default([]).describe(
+        'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs)'
       ),
       confirm_platform_split: external_exports3.boolean().optional().default(false).describe(
         "Must be true to apply platform-split migration (removes content from rules.md)"

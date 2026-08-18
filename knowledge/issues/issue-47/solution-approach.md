@@ -75,6 +75,40 @@ carry this same fallback, not just the merge-base happy path:
    point-in-time record), or update in place. Do not silently edit a historic
    spec without flagging the decision.
 
+## Backfix for existing users (required before this branch ships)
+
+Fixing the four call sites only prevents *new* silent-blank sections. Every
+existing session-summary file captured while on the base branch pre-branch
+already has a blank/missing "key files modified" section, with no
+indication why — that's not corrupted data to repair, but it is a silent,
+unexplained gap that should not ship unaddressed once the fix exists to
+explain it.
+
+7. **`mcp-server/src/tools/upgrade.ts`** — add a migration (new `kg_upgrade`
+   category, or fold into issue-46's `"capture-corruption"` category if by
+   the time this is implemented that's the more natural home — decide at
+   implementation time) that scans `sessions/*/*.md` for files with an
+   empty/missing "key files modified" section. For each:
+   - If the file's frontmatter `branch:` is the repo's actual default
+     branch (`main`/`master`) — the blank section is *correct*, not a gap.
+     Nothing to backfix; optionally add the explicit label from item 1
+     above for consistency with newly-captured files, but this is cosmetic,
+     not a data-loss repair.
+   - If `branch:` is a feature branch and the recorded `commit`/
+     `as_of_commit` is still resolvable in local git history — this is the
+     genuinely bug-affected case (the file was captured while `HEAD`
+     equaled `main`, i.e., a merge or rebase happened before this session
+     summary was written, or the branch itself has since been deleted but
+     the commit is still reachable). Attempt to regenerate the section
+     using the corrected merge-base diff logic against that historical
+     commit. If the commit/branch is no longer resolvable (deleted, gc'd),
+     leave a note explaining the gap can no longer be reconstructed, rather
+     than silently doing nothing.
+8. This is inherently best-effort — old commits and deleted branches are
+   sometimes genuinely gone. Report what could and couldn't be
+   reconstructed; never fabricate a plausible-looking file list for a commit
+   that isn't actually resolvable.
+
 ## ADR-036 amendment
 
 Add a section documenting: (a) why `main...HEAD` was insufficient (silently empty

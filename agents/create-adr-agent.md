@@ -249,41 +249,27 @@ Proceed? (yes / change details / cancel)
 
 Read the base template from `${CLAUDE_PLUGIN_ROOT}/core/default-templates/decisions/ADR-template.md`.
 
-Populate all frontmatter fields:
-
-```yaml
----
-title: "ADR-{NNN}: {title}"
-number: {NNN}
-created: {ISO 8601 timestamp}
-status: {status}
-author: {git user.name}
-email: {git user.email}
-git:
-  branch: {branch}
-  commit: {full SHA}
-  pr: {pr-number or null}
-  issue: {issue-number or null}
-implements: {$implements_ref}
-related:
-  adrs: []
-  lessons: [{lesson filenames if provided}]
-  kg_entries: []
-tags: [{category}]
-category: {architecture|process|technology}
----
-```
-
-Populate each body section with user responses from Phase 3. Preserve all template section headers. Leave unprovided optional sections as "None".
+`content` sent to `kg_capture` is body-only — no frontmatter block. The MCP
+server generates the frontmatter from `metadata` below; populate each body
+section with user responses from Phase 3, preserve all template section
+headers, leave unprovided optional sections as "None".
 
 Call `kg_capture` MCP tool:
 
 ```json
 {
-  "content": "[Full populated ADR markdown]",
+  "content": "[Populated ADR body sections only — no frontmatter]",
   "type": "adr",
   "metadata": {
-    "title": "ADR-{NNN}: {title}",
+    "title": "{title}",
+    "status": "{status}",
+    "number": {NNN},
+    "implements": "{$implements_ref}",
+    "related": {
+      "adrs": [],
+      "lessons": [{lesson filenames if provided}],
+      "kg_entries": []
+    },
     "category": "{category}",
     "tags": ["{category}"],
     "git": {
@@ -291,7 +277,9 @@ Call `kg_capture` MCP tool:
       "commit": "{full hash}",
       "commit_short": "{short hash}",
       "author": "{Author Name}",
-      "email": "{email}"
+      "email": "{email}",
+      "pr": "{pr-number or null}",
+      "issue": "{issue-number or null}"
     }
   }
 }

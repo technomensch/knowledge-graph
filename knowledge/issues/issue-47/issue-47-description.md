@@ -3,7 +3,7 @@ id: issue-47
 type: Bug
 status: tracked
 github-issue: "#227"
-branch: v0.7.1.5-capture-filename-diffbase-fix
+branch: v0.7.2-issues-46-51
 created: 2026-08-16
 ---
 
@@ -64,6 +64,17 @@ inline at the three new sites (see solution-approach.md).
 
 Confirmed present, unchanged, in every cached plugin version checked
 (0.6.20 → 0.7.1.4).
+
+## Backfix Requirement
+
+The fix at the four call sites only prevents *new* silent-blank sections.
+Existing session-summary files captured while on the base branch pre-branch
+already have an unexplained blank "key files modified" section. **This
+branch does not ship without a `kg_upgrade` migration** that distinguishes
+"correctly blank" (was genuinely on the default branch) from "bug-affected"
+(was on a feature branch, blanked by the bug) and attempts best-effort
+reconstruction of the latter from git history — see `solution-approach.md`
+items 7-8.
 
 ## Downstream Impact
 

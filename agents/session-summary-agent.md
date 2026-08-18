@@ -110,19 +110,34 @@ the returned `path` as `$active_kg_path` → `{active_kg_path}/sessions/`. (Snap
 is entered directly and skips Steps 1–9, so this resolves independently rather than
 reusing Step 1's value — same underlying call, no separate "active" pointer read.)
 
-Derive unified filename:
+Compute today's date and branch slug (the latter is passed as the bare
+`title` to `kg_capture`, per S5 — it is NOT used to predict the exact
+filename below; see the note after this block for why):
 ```bash
 today=$(date +%Y-%m-%d)
+ym=$(date +%Y-%m)
 branch_slug=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')
-target_filename="${today}-${branch_slug}.md"
 ```
 
-Check if a session file for today's branch already exists:
+Check if a session file for today already exists — match by date prefix
+only, the same way the MCP server's own conflict check does
+(`checkExistingFile()` in `capture.ts` matches `${date}-*.md`, not a
+branch-specific name):
 ```bash
-ls {active_kg_path}/sessions/ | grep "^${today}-${branch_slug}"
+existing=$(ls {active_kg_path}/sessions/${ym}/ 2>/dev/null | grep "^${today}-" | head -1)
 ```
 
-Store `{snapshot_exists} = true/false`, `{target_filename}`, and `{existing_snapshot_path}` if found.
+Store `{snapshot_exists} = true` if `$existing` is non-empty (else `false`),
+and `{existing_snapshot_path} = {active_kg_path}/sessions/${ym}/$existing`.
+
+**Do not construct an expected filename by hand for the "create new" case**
+(issue-46 Manifestation C): the real filename is `${today}-${slugify(title)}`,
+where `slugify()` (server-side, `capture.ts`) strips characters a naive
+`${today}-${branch_slug}.md` client-side guess does not account for — e.g. a
+dotted branch like `v0.7.0-adr-067-c1` slugifies to `v070-adr-067-c1`,
+diverging from a hand-built guess. After calling `kg_capture` (S5), read the
+actual written filename from its response's `relativePath` — do not assume
+it matches a prediction made here.
 
 ### S2: Gather lightweight context
 
@@ -162,19 +177,13 @@ Write a compact snapshot block:
 
 ### S4: Write or append
 
-Use `{target_filename}` derived in S1 (`YYYY-MM-DD-{branch-slug}.md`).
+The filename is server-derived (see S1's note) — nothing to do with it here
+beyond branching on `{snapshot_exists}` from S1.
 
-**If `{snapshot_exists}` is false:** Create a new session file:
+**If `{snapshot_exists}` is false:** Create a new session file. `content` sent
+to `kg_capture` is body-only — no frontmatter block; the MCP server generates
+it from `metadata` (including `as_of_commit`, `last_updated`, see S5):
 ```markdown
----
-title: "[YYYY-MM-DD]-[branch-slug]"
-date: [YYYY-MM-DD]
-branch: [current branch]
-as_of_commit: [short-hash]
-last_updated: [YYYY-MM-DD HH:MM]
-tags: [session, snapshot]
----
-
 ═══════════════════════════════════════════════
 ## Operational Snapshot (point-in-time, as-of [short-hash])
 ═══════════════════════════════════════════════
@@ -183,7 +192,11 @@ tags: [session, snapshot]
 [snapshot block from S3]
 ```
 
-**If `{snapshot_exists}` is true:** Update YAML header fields (`as_of_commit`, `last_updated`), then append the snapshot block under the Operational Snapshot zone.
+**If `{snapshot_exists}` is true:** pass `existingFile: {existing_snapshot_path}`
+and updated `as_of_commit`/`last_updated` via `metadata` (see S5) — the server
+regenerates the frontmatter block from metadata, do not hand-edit YAML header
+fields in content. Then append the snapshot block under the Operational
+Snapshot zone in the body content sent.
 
 Deduplication before appending:
 - Commit hashes already in the file → skip those lines from the new block
@@ -198,17 +211,19 @@ Call `kg_capture` with:
   "content": "[full snapshot content]",
   "type": "session",
   "metadata": {
-    "title": "[YYYY-MM-DD]-[branch-slug]",
+    "title": "[branch-slug]",
     "tags": ["session", "snapshot", "[branch]"],
     "git": {
       "branch": "[branch]",
       "commit_short": "[short-hash]"
-    }
+    },
+    "as_of_commit": "[short-hash]",
+    "last_updated": "[YYYY-MM-DD HH:MM]"
   }
 }
 ```
 
-If today's session already exists, include `"version": "append"` in metadata to signal append intent.
+**If `{snapshot_exists}` is true:** add `"existingFile": "{existing_snapshot_path}"` to `metadata` above — this routes `kg_capture` to the update-in-place path, which regenerates the frontmatter block (including the refreshed `as_of_commit`/`last_updated` above) and replaces the file content with what's sent here. Do not send `"version": "append"` — that field only has effect for `type: "lesson"` captures, not session captures; it is a no-op here.
 
 On success: return the snapshot file path and a one-line confirmation. **Do not ask for review — return immediately.**
 
@@ -287,7 +302,11 @@ Reuse `$active_kg` resolved in Step 1 — no need to re-resolve.
 session_dir="${active_kg}/sessions"
 branch_slug=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')
 today=$(date +%Y-%m-%d)
-existing=$(find "$session_dir" -name "${today}-${branch_slug}.md" 2>/dev/null | head -1)
+# issue-46 Manifestation C: match by date prefix only, the same way the MCP
+# server's own checkExistingFile() does -- NOT an exact "${today}-${branch_slug}.md"
+# guess, which diverges from the real (slugify()'d) filename for any branch
+# name containing characters slugify() strips (e.g. dots).
+existing=$(find "$session_dir" -name "${today}-*.md" 2>/dev/null | head -1)
 ```
 
 **If `$existing` is found:**
@@ -399,12 +418,11 @@ If found:
 
 ## Step 6: Draft Session Summary
 
-Derive the unified filename and gather operational section data first:
+Gather operational section data (the filename is server-derived — see
+Step 1.5's note, nothing to compute here):
 
 ```bash
 branch_slug=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')
-today=$(date +%Y-%m-%d)
-session_filename="${today}-${branch_slug}.md"
 commit_short=$(git rev-parse --short HEAD)
 ```
 
@@ -444,18 +462,12 @@ enh_id=$(echo "$branch" | grep -o 'ENH-[0-9]*' | head -1)
 git diff --name-only main...HEAD 2>/dev/null | grep -v '^docs/plans/' | head -10
 ```
 
-Compose the summary using this zone-structured template:
+Compose the summary using this zone-structured template. `content` sent to
+`kg_capture` is body-only — no frontmatter block; the MCP server generates it
+from `metadata` (see Step 8's payload, which carries `as_of_commit`,
+`last_updated`, etc.):
 
 ```markdown
----
-title: "[YYYY-MM-DD]-[branch-slug]"
-date: [YYYY-MM-DD]
-branch: [current branch]
-as_of_commit: [short-hash]
-last_updated: [YYYY-MM-DD HH:MM]
-tags: [session]
----
-
 # Session Summary — [Date] — [branch-slug]
 
 ## Start-of-Session Reading (Required)
@@ -591,7 +603,7 @@ Allow inline edits. If user adds context, re-draft and re-present with the same 
 
 ## Step 8: Capture via `kg_capture` MCP Tool
 
-Use `{session_filename}` derived in Step 6 as the `title` — this ensures the MCP server creates or updates the file as `YYYY-MM-DD-{branch-slug}.md` (unified with snapshot mode).
+The filename is `{today}-{slugify(branch_slug)}.md`, computed independently by the MCP server's `deriveFileName()` — it is NOT derived from `metadata.title`, and it is not guaranteed to match a hand-built `{today}-{branch_slug}.md` guess (`slugify()` strips characters like dots — issue-46 Manifestation C). Pass the bare `[branch-slug]` as `title` below; do not bake the date into it (double-prepends) and do not predict the resulting filename — read it from the `kg_capture` response instead.
 
 Once approved, call `kg_capture`:
 
@@ -600,12 +612,14 @@ Once approved, call `kg_capture`:
   "content": "[Full markdown summary from Step 6]",
   "type": "session",
   "metadata": {
-    "title": "[YYYY-MM-DD]-[branch-slug]",
+    "title": "[branch-slug]",
     "tags": ["session", "[type]", "[branch-name]"],
     "git": {
       "branch": "[current branch]",
       "commit_short": "[latest short hash]"
-    }
+    },
+    "as_of_commit": "[latest short hash]",
+    "last_updated": "[YYYY-MM-DD HH:MM]"
   }
 }
 ```
@@ -614,19 +628,22 @@ Once approved, call `kg_capture`:
 
 | Zone | Sections | Rule |
 |---|---|---|
-| Header | YAML `as_of_commit`, `last_updated`, `title` | Overwrite every run |
+| Header | YAML `as_of_commit`, `last_updated`, `title` | Regenerated by the server from `metadata` every run — not written into `content` |
 | Gate | Start-of-Session Reading | Overwrite every run |
 | Operational | Current State, Open Issues, Session History | Overwrite every run |
 | Operational | Session Findings | Append+dedup within day (skip rows with identical descriptions) |
 | Narrative | Accumulated blocks | Append-only, timestamped; never overwrite |
 
 **If `{session_file_mode} = append`** (file exists from Step 1.5):
-- Overwrite Header + Gate + Operational zones
+- Overwrite Header + Gate + Operational zones in the `content` string sent
 - Append+dedup Session Findings rows
 - Append new `### Update — HH:MM` block to Accumulated Narrative
-- Call with `"version": "append"` in metadata
+- Add `"existingFile": "{existing_session_path}"` to `metadata` above — this
+  routes `kg_capture` to the update-in-place path (full overwrite of the
+  target file with the regenerated frontmatter + the `content` sent here).
+  Do not send `"version": "append"` — it has no effect for `type: "session"`.
 
-**If `{session_file_mode} = new`**: Call kg_capture without version flag.
+**If `{session_file_mode} = new`**: Call `kg_capture` without `existingFile`.
 
 **Handle responses:**
 

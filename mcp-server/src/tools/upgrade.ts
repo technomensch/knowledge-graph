@@ -55,6 +55,7 @@ const APPLY_ORDER = [
   "starter-relocation",   // must run BEFORE templates
   "templates",
   "stray-knowledge-dir",
+  "capture-corruption",   // issue-46 backfix: content repair, order-independent of the others
   "platform-split",
 ];
 
@@ -78,6 +79,337 @@ function parseFrontmatter(filePath: string): Record<string, string> {
     }
   }
   return result;
+}
+
+// issue-46 backfix: existing users' knowledge/ may already contain files
+// corrupted by the filename-double-prepend / frontmatter-double-embed bugs
+// (fixed going forward in capture.ts and the agent templates, but already-
+// written files stay broken until migrated). This section detects and
+// repairs both signatures. Conservative by design (ADR-063/ADR-040 precedent
+// in this file, see applyStrayKnowledgeDir above): only merges frontmatter
+// blocks when there is no field disagreement between them; a real conflict
+// (same key, different value) is reported for manual review, never guessed.
+
+interface RawFrontmatterBlock {
+  /** 0-indexed line of the opening `---` */
+  startLine: number;
+  /** 0-indexed line of the closing `---` */
+  endLine: number;
+  /** top-level key -> its raw source lines (key line + any indented continuation lines) */
+  fields: Map<string, string[]>;
+  /** insertion order of keys, for stable output */
+  order: string[];
+  /**
+   * True iff every non-blank line in the block is a `key:` line or an
+   * indented continuation of one — i.e. the block plausibly IS frontmatter,
+   * not prose that merely happens to contain a colon-prefixed line (e.g. a
+   * "Note: ..." or "TODO: ..." line at column 0). Fable review (2026-08-18)
+   * found `order.length > 0` alone still false-positives on exactly this
+   * shape: a single stray `key:`-looking prose line among otherwise
+   * non-matching lines was enough to pass the old guard.
+   */
+  looksLikeYaml: boolean;
+}
+
+function parseFrontmatterBlockRaw(lines: string[], startIdx: number): RawFrontmatterBlock | null {
+  if (lines[startIdx]?.trim() !== "---") return null;
+  let end = -1;
+  for (let i = startIdx + 1; i < lines.length; i++) {
+    if (lines[i].trim() === "---") { end = i; break; }
+  }
+  if (end === -1) return null;
+  const fields = new Map<string, string[]>();
+  const order: string[] = [];
+  let currentKey: string | null = null;
+  let looksLikeYaml = true;
+  for (let i = startIdx + 1; i < end; i++) {
+    const line = lines[i];
+    const topMatch = line.match(/^([A-Za-z_][\w-]*):(.*)$/);
+    if (topMatch) {
+      currentKey = topMatch[1];
+      fields.set(currentKey, [line]);
+      order.push(currentKey);
+    } else if (currentKey && /^\s/.test(line)) {
+      fields.get(currentKey)!.push(line);
+    } else if (line.trim() !== "") {
+      // A non-blank line that's neither a `key:` nor an indented
+      // continuation of one — real frontmatter never contains this; it's
+      // prose. Once seen, this block can never look like YAML, even if a
+      // later line happens to also match the key: pattern.
+      currentKey = null;
+      looksLikeYaml = false;
+    } else {
+      currentKey = null; // a blank line ends continuation eligibility
+    }
+  }
+  return { startLine: startIdx, endLine: end, fields, order, looksLikeYaml };
+}
+
+/**
+ * True only when the line immediately after block1's closing `---` is
+ * itself a bare `---` (the doubled-frontmatter signature) AND the region
+ * between that opening line and the next `---` actually parses as YAML in
+ * full — every non-blank line is a `key:` field or an indented
+ * continuation, not just "at least one" (see `looksLikeYaml`). A single
+ * frontmatter block followed by a `---` used as a body horizontal rule
+ * (e.g. a session snapshot that opens its body with a divider before a
+ * "## Section" heading, possibly containing a "Note: ..."-shaped prose
+ * line) has the same zero-gap shape but isn't real YAML — that's prose,
+ * not a second frontmatter block, and must never be treated as one
+ * (confirmed live data-loss bug, issue-46 backfix hardening: see
+ * knowledge/sessions/2026-05/2026-05-25-*.md for a real-world example of
+ * this exact shape).
+ */
+function detectDoubledFrontmatter(lines: string[]): { block1: RawFrontmatterBlock; block2: RawFrontmatterBlock } | null {
+  const block1 = parseFrontmatterBlockRaw(lines, 0);
+  if (!block1) return null;
+  const block2 = parseFrontmatterBlockRaw(lines, block1.endLine + 1);
+  if (!block2) return null;
+  if (block2.order.length === 0 || !block2.looksLikeYaml) return null;
+  return { block1, block2 };
+}
+
+/**
+ * Union-merge two frontmatter blocks. Matching keys with identical raw text
+ * are deduped; matching keys with different raw text are a genuine
+ * disagreement (e.g. two different `status:` or `date:` values) and abort
+ * the merge for this file rather than silently picking one — same
+ * never-guess-on-real-conflict rule as applyStrayKnowledgeDir.
+ */
+function mergeFrontmatterBlocks(
+  block1: RawFrontmatterBlock,
+  block2: RawFrontmatterBlock
+): { mergedLines: string[] } | { conflicts: string[] } {
+  const conflicts: string[] = [];
+  const fields = new Map<string, string[]>();
+  const order: string[] = [];
+  for (const key of block1.order) {
+    fields.set(key, block1.fields.get(key)!);
+    order.push(key);
+  }
+  for (const key of block2.order) {
+    const incoming = block2.fields.get(key)!;
+    if (fields.has(key)) {
+      const existing = fields.get(key)!.join("\n");
+      if (existing !== incoming.join("\n")) conflicts.push(key);
+      continue;
+    }
+    fields.set(key, incoming);
+    order.push(key);
+  }
+  if (conflicts.length > 0) return { conflicts };
+  const out: string[] = ["---"];
+  for (const key of order) out.push(...fields.get(key)!);
+  out.push("---");
+  return { mergedLines: out };
+}
+
+/** Exact-duplicate date prefix only, e.g. `2026-08-06-2026-08-06-main.md` ->
+ *  `2026-08-06-main.md`. A near-duplicate (midnight rollover, e.g.
+ *  `2026-07-12-2026-07-11-main.md`) is a different date, not a clean strip —
+ *  those are reported for manual review rather than guessed at. */
+const DOUBLED_DATE_FILENAME = /^(\d{4}-\d{2}-\d{2})-\1-(.+\.md)$/;
+/** Looser signature (any two adjacent YYYY-MM-DD segments) used only to
+ *  surface a manual-review note for the rollover case above — never renamed
+ *  automatically. */
+const NEAR_DOUBLED_DATE_FILENAME = /^(\d{4}-\d{2}-\d{2})-(\d{4}-\d{2}-\d{2})-(.+\.md)$/;
+/** Same doubling, ADR side: `ADR-046-adr-046-{slug}.md` -> `ADR-046-{slug}.md`.
+ *  `\2` requires the second ADR number to exactly match the first — without
+ *  it, a file legitimately referencing a *different* ADR in its slug (e.g.
+ *  `ADR-050-adr-046-followup-fix.md`) would be wrongly treated as doubled
+ *  and stripped of that reference. */
+const DOUBLED_ADR_FILENAME = /^(ADR-(\d+))-adr-\2-(.+\.md)$/i;
+
+/** De-doubles a filename via whichever pattern matches, or null if neither does. */
+function deDoubledFilename(entry: string): string | null {
+  const dateMatch = entry.match(DOUBLED_DATE_FILENAME);
+  if (dateMatch) return `${dateMatch[1]}-${dateMatch[2]}`;
+  const adrMatch = entry.match(DOUBLED_ADR_FILENAME);
+  if (adrMatch) return `${adrMatch[1]}-${adrMatch[3]}`;
+  return null;
+}
+
+function captureCorruptionDirs(kgPath: string): string[] {
+  const dirs: string[] = [];
+  const sessionsRoot = path.join(kgPath, "sessions");
+  if (fs.existsSync(sessionsRoot)) {
+    for (const ym of fs.readdirSync(sessionsRoot)) {
+      const full = path.join(sessionsRoot, ym);
+      if (fs.statSync(full).isDirectory()) dirs.push(full);
+    }
+  }
+  const decisionsRoot = path.join(kgPath, "decisions");
+  if (fs.existsSync(decisionsRoot)) dirs.push(decisionsRoot);
+  const lessonsRoot = path.join(kgPath, "lessons-learned");
+  if (fs.existsSync(lessonsRoot)) {
+    for (const cat of fs.readdirSync(lessonsRoot)) {
+      const full = path.join(lessonsRoot, cat);
+      if (fs.statSync(full).isDirectory()) dirs.push(full);
+    }
+  }
+  return dirs;
+}
+
+/**
+ * Check g — issue-46 backfix. Scans sessions/decisions/lessons-learned for
+ * files already corrupted by the filename-double-prepend and
+ * frontmatter-double-embed bugs (fixed prospectively elsewhere; this is the
+ * retroactive repair for files written before the fix).
+ */
+function checkCaptureCorruption(kgPath: string): UpgradeItem[] {
+  let doubledFrontmatter = 0;
+  let doubledFilenames = 0;
+  let nearDoubledFilenames = 0;
+
+  for (const dir of captureCorruptionDirs(kgPath)) {
+    for (const entry of fs.readdirSync(dir)) {
+      if (!entry.endsWith(".md")) continue;
+      if (deDoubledFilename(entry)) doubledFilenames++;
+      else if (NEAR_DOUBLED_DATE_FILENAME.test(entry)) nearDoubledFilenames++;
+      const full = path.join(dir, entry);
+      if (!fs.statSync(full).isFile()) continue;
+      const lines = fs.readFileSync(full, "utf-8").split("\n");
+      if (detectDoubledFrontmatter(lines)) doubledFrontmatter++;
+    }
+  }
+
+  // Stale README index links: a link may reference a doubled filename that
+  // no longer exists on disk (already renamed by hand, or by a prior
+  // capture-corruption apply run) — this is the exact gap found in this
+  // repo's own decisions/README.md for ADR-046. Only counts as a finding
+  // when the de-doubled candidate actually exists (see applyCaptureCorruption
+  // pass 3); otherwise there's nothing this migration could safely do.
+  let staleReadmeLinks = 0;
+  for (const readmeRelPath of ["sessions/README.md", "decisions/README.md", "lessons-learned/README.md"]) {
+    const readmePath = path.join(kgPath, readmeRelPath);
+    if (!fs.existsSync(readmePath)) continue;
+    const content = fs.readFileSync(readmePath, "utf-8");
+    for (const m of content.matchAll(/\]\(([^)]+\.md)\)/g)) {
+      const linkTarget = m[1];
+      const base = path.basename(linkTarget);
+      const target = deDoubledFilename(base);
+      if (!target) continue;
+      const dedoubledLink = linkTarget.slice(0, linkTarget.length - base.length) + target;
+      if (fs.existsSync(path.join(path.dirname(readmePath), dedoubledLink))) staleReadmeLinks++;
+    }
+  }
+
+  if (doubledFrontmatter === 0 && doubledFilenames === 0 && nearDoubledFilenames === 0 && staleReadmeLinks === 0) return [];
+
+  const parts: string[] = [];
+  if (doubledFrontmatter > 0) parts.push(`${doubledFrontmatter} file(s) with a duplicated frontmatter block`);
+  if (doubledFilenames > 0) parts.push(`${doubledFilenames} file(s) with an exact doubled date/ADR-number filename prefix`);
+  if (nearDoubledFilenames > 0) parts.push(`${nearDoubledFilenames} file(s) with a near-doubled filename (different adjacent dates — needs manual review, not auto-renamed)`);
+  if (staleReadmeLinks > 0) parts.push(`${staleReadmeLinks} README index link(s) pointing at a doubled filename`);
+
+  return [{
+    category: "capture-corruption",
+    description: `issue-46: ${parts.join("; ")}`,
+    details:
+      `These were written before the capture.ts filename/frontmatter-ownership fix (issue-46) and stay ` +
+      `corrupted until repaired. Run with apply: ["capture-corruption"] to fix the unambiguous cases ` +
+      `automatically (exact-duplicate filenames stripped; frontmatter blocks merged only when the two ` +
+      `blocks don't disagree on any field). Anything ambiguous (a real field conflict, or a near-doubled ` +
+      `filename from a midnight rollover) is reported, never guessed at — you'll get a list to resolve by hand.`,
+  }];
+}
+
+/**
+ * Apply g — issue-46 backfix. Conservative by construction: exact-duplicate
+ * filenames are stripped (skipped with a report if the target name is
+ * somehow already taken); frontmatter blocks are merged only when clean
+ * (no key disagreement). Anything else is reported, not guessed.
+ */
+function applyCaptureCorruption(kgPath: string): string {
+  let mergedCount = 0;
+  let renamedCount = 0;
+  const reviewNeeded: string[] = [];
+
+  // Pass 1: frontmatter merges (in place, same filename)
+  for (const dir of captureCorruptionDirs(kgPath)) {
+    for (const entry of fs.readdirSync(dir)) {
+      if (!entry.endsWith(".md")) continue;
+      const full = path.join(dir, entry);
+      if (!fs.statSync(full).isFile()) continue;
+      const raw = fs.readFileSync(full, "utf-8");
+      const lines = raw.split("\n");
+      const doubled = detectDoubledFrontmatter(lines);
+      if (!doubled) continue;
+      const result = mergeFrontmatterBlocks(doubled.block1, doubled.block2);
+      if ("conflicts" in result) {
+        reviewNeeded.push(`${path.relative(kgPath, full)}: frontmatter fields disagree (${result.conflicts.join(", ")}) — not auto-merged`);
+        continue;
+      }
+      const rest = lines.slice(doubled.block2.endLine + 1);
+      const newContent = [...result.mergedLines, ...rest].join("\n");
+      fs.writeFileSync(`${full}.bak`, raw, "utf-8");
+      fs.writeFileSync(full, newContent, "utf-8");
+      mergedCount++;
+    }
+  }
+
+  // Pass 2: exact-duplicate filename renames (separate pass so a file
+  // needing both operations gets its content fixed before its path moves).
+  // Covers both the session/date pattern and the ADR-number pattern.
+  for (const dir of captureCorruptionDirs(kgPath)) {
+    for (const entry of fs.readdirSync(dir)) {
+      if (!entry.endsWith(".md")) continue;
+      const target = deDoubledFilename(entry);
+      if (!target) {
+        if (NEAR_DOUBLED_DATE_FILENAME.test(entry)) {
+          reviewNeeded.push(`${path.relative(kgPath, path.join(dir, entry))}: near-doubled filename (different adjacent dates, likely a midnight rollover) — not auto-renamed, resolve manually`);
+        }
+        continue;
+      }
+      const targetFull = path.join(dir, target);
+      const srcFull = path.join(dir, entry);
+      if (fs.existsSync(targetFull)) {
+        reviewNeeded.push(`${path.relative(kgPath, srcFull)}: target filename ${target} already exists — not auto-renamed`);
+        continue;
+      }
+      fs.renameSync(srcFull, targetFull);
+      renamedCount++;
+    }
+  }
+
+  // Pass 3: fix README index links pointing at a doubled filename — whether
+  // that file was just renamed above, or was already renamed by hand
+  // earlier (leaving only the index stale, the exact case found in this
+  // repo's own decisions/README.md for ADR-046). A link is only rewritten
+  // when the de-doubled target actually exists on disk; otherwise it's
+  // reported, never guessed at.
+  let readmeLinksFixed = 0;
+  for (const readmeRelPath of ["sessions/README.md", "decisions/README.md", "lessons-learned/README.md"]) {
+    const readmePath = path.join(kgPath, readmeRelPath);
+    if (!fs.existsSync(readmePath)) continue;
+    let content = fs.readFileSync(readmePath, "utf-8");
+    let changed = false;
+    content = content.replace(/\]\(([^)]+\.md)\)/g, (whole, linkTarget: string) => {
+      const base = path.basename(linkTarget);
+      const target = deDoubledFilename(base);
+      if (!target) return whole;
+      const dedoubledLink = linkTarget.slice(0, linkTarget.length - base.length) + target;
+      const candidateFull = path.join(path.dirname(readmePath), dedoubledLink);
+      if (!fs.existsSync(candidateFull)) {
+        reviewNeeded.push(`${readmeRelPath}: link to ${linkTarget} looks doubled but ${dedoubledLink} doesn't exist — not auto-fixed`);
+        return whole;
+      }
+      changed = true;
+      readmeLinksFixed++;
+      return `](${dedoubledLink})`;
+    });
+    if (changed) fs.writeFileSync(readmePath, content, "utf-8");
+  }
+
+  const parts = [
+    `${mergedCount} frontmatter block(s) merged` + (mergedCount > 0 ? " (.bak backup written for each)" : ""),
+    `${renamedCount} filename(s) de-duplicated`,
+    `${readmeLinksFixed} README link(s) repointed`,
+  ];
+  if (reviewNeeded.length > 0) {
+    parts.push(`${reviewNeeded.length} item(s) need manual review:\n  - ${reviewNeeded.join("\n  - ")}`);
+  }
+  return parts.join("; ");
 }
 
 /**
@@ -884,7 +1216,7 @@ function updateLastAppliedVersion(installedVersion: string, graphName: string): 
 // ── Exported handler for direct testing ──────────────────────────────────────
 
 // "version-update" is inspect-only — NOT an apply category; do not add it here
-export type ApplyCategory = "status-schema" | "config-location" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir";
+export type ApplyCategory = "status-schema" | "config-location" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir" | "capture-corruption";
 
 export interface HandleUpgradeParams {
   apply?: ApplyCategory[];
@@ -977,6 +1309,7 @@ export async function handleUpgrade(
     result.upgrades.push(...checkStarterRelocation(kgPath));
     result.upgrades.push(...checkTemplates(kgPath));
     result.upgrades.push(...checkStrayKnowledgeDir(kgPath, kgType));
+    result.upgrades.push(...checkCaptureCorruption(kgPath));
     result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config, target.name));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
@@ -1052,6 +1385,10 @@ export async function handleUpgrade(
         results.push(`[stray-knowledge-dir] ${applyStrayKnowledgeDir(kgPath)}`);
         appliedAnyGraphDependent = true;
         break;
+      case "capture-corruption":
+        results.push(`[capture-corruption] ${applyCaptureCorruption(kgPath)}`);
+        appliedAnyGraphDependent = true;
+        break;
       case "platform-split":
         if (!params.confirm_platform_split) {
           results.push("[platform-split] WARNING: platform-split migration removes content from rules.md. Pass confirm_platform_split: true to proceed.");
@@ -1084,11 +1421,11 @@ export function registerUpgradeTool(server: McpServer, personalScopeSession: Per
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
       apply: z
-        .array(z.enum(["status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"]))
+        .array(z.enum(["status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption"]))
         .optional()
         .default([])
         .describe(
-          'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"'
+          'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs)'
         ),
       confirm_platform_split: z
         .boolean()

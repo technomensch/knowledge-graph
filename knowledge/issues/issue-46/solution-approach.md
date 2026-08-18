@@ -52,11 +52,14 @@ net, not a substitute.
    lines 255-274) — no separate action needed once that block is removed and
    its fields moved to `metadata`. Line 286 (the `kg_capture` JSON payload) is
    the one that must change directly.
-3. **`commands/kmg-create-adr.md`** (**PROTECTED** — requires explicit user
-   permission before editing) — lines 346-367 carry the identical
-   frontmatter-block template as `create-adr-agent.md` Phase 5. Must be fixed
-   the same way, or the command path reintroduces both Manifestation A and B
-   for ADRs even after the agent is fixed.
+3. ~~`commands/kmg-create-adr.md`~~ — **ruled out during implementation
+   (2026-08-17):** this command never calls `kg_capture`; it's a fully
+   standalone implementation (own filename generation, own frontmatter/body
+   assembly, direct write). It has neither Manifestation A nor B — no fix
+   needed here. The resemblance to `create-adr-agent.md`'s template is
+   real but irrelevant, since there's no second layer (`capture.ts`) for it
+   to double-generate against. See issue-48 (or actual number) for the
+   separate finding that these are two un-synced implementations.
 4. **`mcp-server/src/tools/capture.ts`** — no prefix-generation code change
    required; `deriveFileName()`'s existing behavior becomes correct once
    callers stop duplicating it. Add a one-line comment above lines 151-153 and
@@ -128,8 +131,7 @@ Contract decision above.
     producing wrong status metadata on `ADR-046-...md` right now (see
     issue-46-description.md Manifestation B). Add the same fields to the zod
     schema. Confirm with a live ADR capture that no metadata is lost.
-11. **`commands/kmg-create-adr.md`** (**PROTECTED**) — same template fix as
-    item 10.
+11. ~~`commands/kmg-create-adr.md`~~ — ruled out, see item 3 above.
 12. **README index display-text regression:** `updateReadmeIndex()`
     (`capture.ts:490`) uses `request.metadata.title` verbatim as the link
     text. After items 1-2/10-11 strip the prefix from `metadata.title`, index
@@ -189,6 +191,38 @@ Contract decision above.
     is still needed for some reason, it must call the same `slugify()` rules
     (duplicate the regex exactly, with a comment noting the two must stay in
     sync — acceptable only as a fallback, not the primary approach).
+
+## Backfix for existing users (required before this branch ships)
+
+Fixing `capture.ts` and the agent templates only stops *new* corruption —
+every existing install (this repo included, until repaired by hand during
+implementation) already has files corrupted by these bugs, and stays broken
+forever without a migration. This is not optional polish: shipping the
+prospective fix alone silently abandons every user who already hit the bug.
+
+16. **`mcp-server/src/tools/upgrade.ts`** — add a new `kg_upgrade` category,
+    `"capture-corruption"`, following this file's existing check/apply
+    pattern (`checkStrayKnowledgeDir`/`applyStrayKnowledgeDir` is the closest
+    precedent). Scans `sessions/*/*.md`, `decisions/*.md`,
+    `lessons-learned/*/*.md` for:
+    - Doubled frontmatter blocks (same detection as the manual audit —
+      zero-gap `---`/`---`, distinct from a single block followed by a body
+      horizontal-rule divider, a real and common false-positive pattern
+      found in this repo's own history).
+    - Exact-duplicate date/ADR-number filename prefixes.
+    - Conservative by construction, matching this file's established
+      never-guess-on-a-real-conflict rule (ADR-063/ADR-040): frontmatter
+      blocks are merged only when the two blocks don't disagree on any
+      field (union merge); a field present in both with different values is
+      reported for manual review, never auto-resolved. Same for filenames —
+      exact duplicates are stripped automatically; a near-duplicate (two
+      different adjacent dates, e.g. a midnight-rollover case) is reported,
+      never guessed at.
+17. Add regression tests covering: clean merge, clean rename, a genuine
+    field conflict (must NOT be touched), a near-doubled filename (must NOT
+    be renamed), the false-positive single-block-plus-divider case (must NOT
+    be flagged), and idempotency (running apply twice is a no-op the second
+    time).
 
 ## Test coverage note
 

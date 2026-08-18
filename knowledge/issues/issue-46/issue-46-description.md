@@ -1,9 +1,9 @@
 ---
 id: issue-46
 type: Bug
-status: tracked
+status: in-progress
 github-issue: "#226"
-branch: v0.7.1.5-capture-filename-diffbase-fix
+branch: v0.7.2-issues-46-51
 created: 2026-08-16
 ---
 
@@ -94,9 +94,17 @@ becomes stray, unparsed body text carrying a stale/wrong title.
   `generateFrontmatter()` hardcodes `status: Proposed` (capture.ts:196)
   regardless of the actual decision status, and since parsers read only block
   1, **ADR-046 currently reads as `Proposed` when its real status is
-  `Accepted`.** The `commands/kmg-create-adr.md` (PROTECTED — see below) Step
-  5.1 (lines 346-367) carries the identical template and is a fourth site with
-  the same defect.
+  `Accepted`.**
+  **Correction (found during implementation, 2026-08-17):** `commands/kmg-create-adr.md`
+  was originally flagged here as a fourth affected site. Direct inspection
+  during implementation found this **incorrect** — that command never calls
+  `kg_capture` (confirmed: zero matches for an actual call in the file); it
+  computes its own filename and frontmatter+body directly and writes
+  standalone, bypassing the MCP capture pipeline entirely. It has neither
+  Manifestation A nor B. No fix needed there for this issue. Separately, this
+  means two independent, un-synced implementations of ADR creation exist in
+  this repo — tracked as its own issue, see [[issue-48]] (or the actual
+  number assigned).
 - **Lesson (partial):** the `lesson-capture-agent.md` *agent template* itself
   is clean — its Phase 4 content is body-only, confirmed against this
   session's own two lesson captures, which had no embedded frontmatter block.
@@ -120,7 +128,7 @@ predicts `2026-08-02-v0.7.0-adr-067-c1.md`, but the file `kg_capture` actually
 wrote is `knowledge/sessions/2026-08/2026-08-02-2026-08-02-v070-adr-067-c1.md`
 — dots stripped, and (compounding with Manifestation A) doubled. Every
 version branch in this repo has a dotted name, including this issue's own
-branch (`v0.7.1.5-capture-filename-diffbase-fix` — no dots, so not itself
+branch (`v0.7.2-issues-46-51` — no dots, so not itself
 affected, but the pattern generalizes to any dotted branch name, which is most
 of this repo's history per `git branch -a`). Same root cause as A and B: two
 places compute a filename-relevant value from the same input, using different
@@ -167,7 +175,7 @@ an explicit `outputPath` and derives no filename of its own.
 | Capture type | MCP-side prefix (capture.ts) | Caller bakes same prefix into `title`? | Affected caller sites | Status |
 |---|---|---|---|---|
 | `session` | `todayIso()` (L152) | Yes | `session-summary-agent.md:170,201,451,594,603` | Confirmed live, 8 doubled-date files, breaks one-file-per-day flow (not cosmetic) |
-| `adr` | `ADR-{NNN}-` (L156-157) | Yes | `create-adr-agent.md:256,286`; `commands/kmg-create-adr.md:346-367` (PROTECTED) | Confirmed live via broken README link, no surviving doubled filename |
+| `adr` | `ADR-{NNN}-` (L156-157) | Yes | `create-adr-agent.md:256,286` (`commands/kmg-create-adr.md` ruled out — see correction below) | Confirmed live via broken README link, no surviving doubled filename |
 | `lesson` | `Lessons_Learned_` (L136-149) | No | clean | Clean |
 | default/fallback (L160) | none | n/a | clean | Clean |
 
@@ -176,7 +184,7 @@ an explicit `outputPath` and derives no filename of its own.
 | Capture type | MCP always prepends `generateFrontmatter()` output? | Caller's `content` also embeds its own frontmatter block? | Status |
 |---|---|---|---|
 | `session` | Yes, at both write sites (L429-433, L474) | Yes — S4 template (L169-176) and Step 6 template (L450-457), both in `session-summary-agent.md` | Confirmed live, 7 files |
-| `adr` | Yes | Yes — `create-adr-agent.md` Phase 5 (L255-274); also `commands/kmg-create-adr.md:346-367` | Confirmed live (`ADR-046-...md`), includes wrong `status: Proposed` vs. real `Accepted` |
+| `adr` | Yes | Yes — `create-adr-agent.md` Phase 5 (L255-274) only (`commands/kmg-create-adr.md` ruled out) | Confirmed live (`ADR-046-...md`), includes wrong `status: Proposed` vs. real `Accepted` |
 | `lesson` | Yes | Agent template: No. Corpus: at least 1 file affected via a different (non-agent) caller | Agent clean; corpus not fully clean |
 
 **Manifestation C:**
@@ -188,6 +196,25 @@ an explicit `outputPath` and derives no filename of its own.
 Confirmed present, unchanged, in every cached plugin version checked
 (0.6.20 → 0.7.1.4) — long-standing, not a regression from recent work.
 
+## Backfix Requirement
+
+The fix in `capture.ts` and the agent templates only prevents *new*
+corruption. Every existing kmgraph install already has files corrupted by
+these bugs (this repo had 16 — 7 doubled-frontmatter merges, 8 filename
+de-duplications with one file needing both, 1 broken README link, repaired
+by hand during implementation before this could be verified as generally
+fixable). **This branch does not ship without a `kg_upgrade` migration that
+backfixes other users' already-corrupted files** — see
+`solution-approach.md` items 16-17. Without it, only this repo's data gets
+fixed; every other install stays silently broken forever.
+
+**Satisfied (2026-08-17, plan Step 15.5):** `kg_upgrade`'s
+`"capture-corruption"` category does this. An Opus review of the initial
+implementation found the merge/rename logic itself had a live false-positive
+data-loss bug (would delete real body content in some files); a follow-up
+Fable review found the first fix still had a narrower version of the same
+gap. Both fixed — see `implementation-log.md`'s 2026-08-17 entries.
+
 ## Test Coverage Gap
 
 `mcp-server/tests/capture.test.ts` exercises `type: "session"` (line ~450-455) and
@@ -197,18 +224,26 @@ already contains a date or `ADR-NNN` prefix, and no test asserts on frontmatter
 block count or filename-algorithm agreement, so the current suite cannot catch
 any of the three manifestations. See `knowledge/issues/issue-46/test-cases.md`.
 
+**Closed (2026-08-17, plan Step 11):** all three manifestations now have
+regression coverage in `capture.test.ts`, plus `upgrade.test.ts` coverage for
+the `capture-corruption` backfix category. Full mcp-server suite: 440/440.
+
 ## Related
 
 - `knowledge/decisions/ADR-031-lessons-learned-plural-prefix-naming.md` — governs
   the `lesson` type's prefix; confirms prefixing is intentionally
   `deriveFileName()`'s job, but does not address caller-side duplication. A fix
   here is complementary, not contradictory.
-- `commands/kmg-create-adr.md` and `commands/kmg-update-issue-plan.md` are
-  **PROTECTED** per `CLAUDE.md` / `knowledge/rules.md` — do not modify without
-  explicit user permission. Both need changes for this fix (ADR template
-  duplication; see [[issue-47]] for the second).
+- `commands/kmg-update-issue-plan.md` is **PROTECTED** per `CLAUDE.md` /
+  `knowledge/rules.md` — needed for [[issue-47]]'s fix, not this one.
+  `commands/kmg-create-adr.md` was originally flagged as PROTECTED-and-needed
+  here too; ruled out during implementation (see Manifestation B correction
+  above) — it does not call `kg_capture` and has neither manifestation.
 - See [[issue-47]] for the related (but separately-scoped) diff-on-main bug found
   in the same investigation session.
+- See [[issue-48]] (or actual assigned number) for the dual-ADR-implementation
+  drift-risk finding, discovered while ruling out `commands/kmg-create-adr.md`
+  above — tracked as its own issue, not part of this one's scope.
 
 ## Discovery Context
 
