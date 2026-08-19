@@ -31,3 +31,4 @@ This project already tracks the general pattern — "a documented reference or r
 - [issue-25](../issue-25/issue-25-description.md) — filed in the same session, same underlying "process/reference gap not caught until hit live" theme
 - [ENH-051](../../enhancements/ENH-051/ENH-051-specification.md) — the enhancement being filed when this was found
 - [ENH-052](../../enhancements/ENH-052/ENH-052-specification.md) — superset pre-PR paperwork-consistency check that names this issue as a narrow, non-duplicated mechanism. Backlinked 2026-07-26 (paperwork-audit backlink-symmetry check).
+- [issue-49](../issue-49/issue-49-description.md), [issue-50](../issue-50/issue-50-description.md), [issue-51](../issue-51/issue-51-description.md) — all three name this issue, alongside issue-13/ENH-042/issue-28, as part of ENH-052's "internal paperwork drifts silently, nothing catches it" pattern family. Backlinked 2026-08-19.

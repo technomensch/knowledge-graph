@@ -69,6 +69,10 @@ other consumer repo. Any new mechanical check for this convention cannot assume
 - The failure is silent: nothing surfaces the drift until a human happens to notice (as in
   Attempt 015), by which point cleanup is manual and retroactive.
 
+## Related
+
+- [issue-49](../issue-49/issue-49-description.md) — cites this issue's branch/plan (`v0.7.1.4-issue-45`) as one of five fully-merged `v0.7.1.x` plans audited for the Safety-Header STATUS-freeze bug. Backlinked 2026-08-19.
+
 ## Reported By
 
 Relayed from a peer session (Fable) investigating the `tidal-docs` meta-issue instance; confirmed

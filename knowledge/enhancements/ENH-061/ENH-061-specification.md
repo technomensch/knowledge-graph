@@ -80,3 +80,4 @@ which this ENH implements.
 - [ENH-060](../ENH-060/ENH-060-specification.md) — unrelated fix, shipped together on this same branch/version (v0.7.1.3) per an explicit WIP-append decision
 - `core/scripts/extract_claude.py` — the script needing the fix
 - `commands/kmg-extract-chat.md` — needs the new hard-stop behavior documented
+- [issue-49](../../issues/issue-49/issue-49-description.md) — cites this ENH's branch/plan as one of five fully-merged `v0.7.1.x` plans audited for the Safety-Header STATUS-freeze bug. Backlinked 2026-08-19.

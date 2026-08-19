@@ -111,3 +111,4 @@ rediscovered as "the git-common-dir approach should have worked."
 - `scripts/handoff-file-tracing-gate.sh` — the fixed script (`PKG_ROOT` fallback)
 - `tests/test-handoff-file-tracing-gate.sh` — expanded to 9/9 (Tests 6-7)
 - `commands/kmg-handoff.md:154` — where `handoff-packages/` output originates, and where it's gitignored
+- [issue-49](../issue-49/issue-49-description.md) — cites this issue's branch/plan (`v0.7.1.2-issue-44`) as one of five fully-merged `v0.7.1.x` plans audited for the Safety-Header STATUS-freeze bug. Backlinked 2026-08-19.
