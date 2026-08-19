@@ -25,10 +25,10 @@ Does **not** apply to:
 
 1. Resolve the default branch: try local `main`, then local `master`. If neither resolves, skip identifier extraction and report "docs-impact scan skipped: no local main/master branch found" — do not error.
 2. Compute `MERGE_BASE=$(git merge-base "$DEFAULT_BRANCH" HEAD)`. If empty (shallow clone, no common ancestor), skip identifier extraction and report "docs-impact scan skipped: shallow clone, no common ancestor with $DEFAULT_BRANCH" — a distinct message from case 1, since the branch does exist here.
-3. If `$MERGE_BASE` equals `$(git rev-parse HEAD)` (HEAD is still on the default branch — no feature branch yet): extract identifiers from `git status --porcelain` / `git diff --stat HEAD` instead — the actual uncommitted/staged changes, not an empty diff.
-4. Otherwise (real feature branch): run `git diff --name-only "$MERGE_BASE" HEAD` as before.
+3. If `$MERGE_BASE` equals `$(git rev-parse HEAD)` (HEAD is still on the default branch — no feature branch yet): extract identifiers from `git diff HEAD` (full patch of the actual uncommitted/staged changes, not an empty diff), plus `git status --porcelain` to catch brand-new untracked files the diff cannot see.
+4. Otherwise (real feature branch): run `git diff "$MERGE_BASE" HEAD` as before.
 
-Extract changed identifiers from whichever source above applies: command names, feature names, flag names, skill names. If the diff is very large, cap at 20 identifiers and note the cap to the user.
+Use the **full patch**, not `--name-only` or `--stat`: flag names, feature names, and command names live inside the changed lines, not in the filenames, so a name-only listing cannot yield them. Extract changed identifiers from whichever source above applies: command names, feature names, flag names, skill names. If the diff is very large, cap at 20 identifiers and note the cap to the user.
 
 ### Step 2 — Grep scan
 

@@ -435,14 +435,14 @@ alongside `$active_kg` there) rather than re-reading the config:
 git rev-parse --abbrev-ref HEAD
 git rev-parse --short HEAD
 git status --porcelain
-ls -t docs/plans/*.md 2>/dev/null | head -1
+ls -t knowledge/plans/*.md 2>/dev/null | head -1
 ```
 
 **For Open Issues:**
 ```bash
 gh issue list --state open --json number,title 2>/dev/null
 gh pr list --state open --json number,title,headRefName 2>/dev/null
-ls docs/plans/*.md 2>/dev/null
+ls knowledge/plans/*.md 2>/dev/null
 grep -rl "status: draft\|status: proposed" knowledge/decisions/ knowledge/enhancements/ 2>/dev/null | head -5
 ```
 
@@ -456,7 +456,7 @@ find "${active_kg}/sessions" -name "*.md" -not -name "README.md" -not -name "*te
 
 **For Start-of-Session Reading:**
 ```bash
-active_plan=$(ls -t docs/plans/*.md 2>/dev/null | head -1)
+active_plan=$(ls -t knowledge/plans/*.md 2>/dev/null | head -1)
 branch=$(git rev-parse --abbrev-ref HEAD)
 enh_id=$(echo "$branch" | grep -o 'ENH-[0-9]*' | head -1)
 # git diff main...HEAD is silently empty when HEAD == main (pre-branch, e.g.
@@ -484,9 +484,9 @@ else
     # be silently missing. git status --porcelain covers staged, unstaged,
     # AND untracked in one pass (verified live: an untracked file did not
     # appear via git diff --name-only, confirming this isn't a hypothetical).
-    git status --porcelain --untracked-files=all 2>/dev/null | cut -c4- | grep -v '^docs/plans/' | head -10
+    git status --porcelain --untracked-files=all 2>/dev/null | cut -c4- | grep -v '^knowledge/plans/' | head -10
   else
-    git diff --name-only "$MERGE_BASE" HEAD 2>/dev/null | grep -v '^docs/plans/' | head -10
+    git diff --name-only "$MERGE_BASE" HEAD 2>/dev/null | grep -v '^knowledge/plans/' | head -10
   fi
 fi
 ```
@@ -548,7 +548,7 @@ Skipping any item means starting work without full context.
 [gh pr list output — number + title + branch, or "None found"]
 
 ### Active Plans
-[ls docs/plans/*.md — filenames, or "None found"]
+[ls knowledge/plans/*.md — filenames, or "None found"]
 
 ### Pending Decisions
 [grep results for draft/proposed in decisions/ and enhancements/, or "None found"]

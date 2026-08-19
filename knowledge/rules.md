@@ -303,7 +303,7 @@ Do not use numbered headings in knowledge files — use plain headings (e.g., `#
 | `knowledge/me.md` | Personal identity file | no (gitignored) |
 | `commands/init-shared/` | Shared parameterized modules called by init.md and init-personal-kg.md | yes |
 | `knowledge/ENH-NNN/` | Plans and specs for a specific enhancement (ADR-029) | selective |
-| `knowledge/plans/` | Misc plans with no ENH/issue parent (ADR-029) | selective |
+| `knowledge/plans/` | Misc plans with no ENH/issue parent (ADR-029) — local-reference copy of `~/.claude/plans/` | no (gitignored) |
 
 ## Plan Protocol
 

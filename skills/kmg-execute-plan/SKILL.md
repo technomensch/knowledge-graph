@@ -11,7 +11,7 @@ description: Enforce zero-deviation plan execution when user invokes plan implem
 - "execute plan"
 - "implement plan"
 - "start [plan-file]"
-- Reference to `docs/plans/*.md` file in conversation
+- Reference to a `knowledge/plans/*.md` or `~/.claude/plans/*.md` file in conversation
 - Any mention of explicit plan-based execution
 
 **Platform Guard (checked before anything else below):**
@@ -113,7 +113,10 @@ If flag ABSENT: skip this check and proceed normally.
 4. **HALT on Ambiguity** — Output HALT block if plan is unclear. Stop and ask user for clarification.
 5. **Checkpoints** — After every 3 file edits, output checkpoint and await user acknowledgment before continuing.
 6. **Rollback Protocol** — If integrity audit fails, revert file and re-apply change. If second attempt fails, trigger HALT. A protocol-owned Safety Header STATUS rewrite (Step 1 or Step 7) is never an integrity-audit failure and never enters this rollback loop.
-7. **Completion Verification** — Quote each success criterion and verify it. Only if every criterion verifies, rewrite the plan file's own Safety Header line so it reads exactly `**STATUS:** ✅ COMPLETE` — keep the `**STATUS:**` label, replace only the value (a real write to the plan file, not a chat-only status report; this line is protocol-owned metadata and is exempt from the Data Integrity Audit). If any criterion fails to verify, leave the STATUS line unchanged and trigger HALT (Step 4) instead. Output completion status. Then, as part of that completion output, explicitly answer: "Does this change alter how KG content is captured, stored, or structured? If yes: does `kg_upgrade` need a new/updated category for it, and is that category reachable through `/kmgraph:kmg-init`'s wizard, not just via a raw `kg_upgrade apply` call?" If the answer is yes and the category is missing or not wizard-reachable, do not proceed to Step 8 — HALT and surface the gap to the user.
+7. **Completion Verification** — Resolve **both** gates below **before** touching the plan file's STATUS line. The STATUS line is only ever rewritten to `✅ COMPLETE` on the path that reaches Step 8; any HALT path leaves it at its current in-progress value.
+   1. *Criteria gate:* Quote each success criterion and verify it. If any criterion fails to verify, leave the STATUS line unchanged and trigger HALT (Step 4).
+   2. *KG-capture gate:* Explicitly answer: "Does this change alter how KG content is captured, stored, or structured? If yes: does `kg_upgrade` need a new/updated category for it, and is that category reachable through `/kmgraph:kmg-init`'s wizard, not just via a raw `kg_upgrade apply` call?" If the answer is yes and the category is missing or not wizard-reachable, leave the STATUS line unchanged, do not proceed to Step 8 — HALT and surface the gap to the user.
+   3. *Only if both gates clear:* rewrite the plan file's own Safety Header line so it reads exactly `**STATUS:** ✅ COMPLETE` — keep the `**STATUS:**` label, replace only the value (a real write to the plan file, not a chat-only status report; this line is protocol-owned metadata and is exempt from the Data Integrity Audit). Then output completion status, including the answer to the KG-capture question above.
 8. **Commit Gate** — After all tasks complete, create conventional commit with issue reference.
 
 **Source:** Adapted from `.agent/workflows/gov-execute-plan.md` (now kmg-execute-plan)
@@ -122,7 +125,7 @@ If flag ABSENT: skip this check and proceed normally.
 
 **Example Trigger:**
 ```
-User: "Let's execute the v0.0.10.1 plan from docs/plans/v0.0.10.1-alpha-skills-and-agents.md"
+User: "Let's execute the v0.0.10.1 plan from knowledge/plans/v0.0.10.1-alpha-skills-and-agents.md"
 ```
 
 **Assistant Response:**
