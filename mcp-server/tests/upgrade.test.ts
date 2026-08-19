@@ -20,6 +20,7 @@ import { handleUpgrade } from "../src/tools/upgrade.js";
 import { handleVersion } from "../src/tools/version.js";
 import { readConfig, writeConfig } from "../src/utils.js";
 import type { KgConfig } from "../src/utils.js";
+import { STUB_ASK_TIMEOUT_MS } from "../src/interaction.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -308,8 +309,47 @@ describe("T-8: platform-split without confirmation", () => {
       confirm_platform_split: false,
     });
 
-    expect(result.content[0].text).toContain("WARNING");
+    // c5: retrofitted onto the shared backfix gate -- a breaking behavior
+    // change from the old non-error "WARNING" text (see the plan's Step 4
+    // note). Automated mode with no confirmation now returns
+    // KMG_INPUT_REQUIRED as its own content block, isError:true. This is
+    // the only category in the call and nothing else applied, so the empty
+    // prose block is omitted and the error is content[0].
+    expect(result.isError).toBe(true);
+    expect(result.content.length).toBe(1);
+    const errorBlock = JSON.parse(result.content[0].text);
+    expect(errorBlock.error).toBe("KMG_INPUT_REQUIRED");
+    expect(errorBlock.resolveWith.param).toBe("confirm_platform_split");
     // File should be unchanged
+    const after = fs.readFileSync(path.join(kgRoot, "knowledge", "rules.md"), "utf-8");
+    expect(after).toBe(contaminated);
+  });
+
+  test("regression (2nd Opus review, 2026-08-18): schema already 2 but real contamination present — still gated, not silently applied", async () => {
+    // checkPlatformSplit()'s "nothing found" signal is `kmgraph_schema >= 2`,
+    // a stored marker -- NOT a live re-scan for contamination the way
+    // checkCaptureCorruption's is. A file whose schema was already bumped
+    // (by hand, or by a prior partial run) but that still carries a flagged
+    // line must NOT be treated as "nothing to do" -- applyPlatformSplit()
+    // has no schema check of its own and would delete the line unconsented
+    // if the gate were ever skipped here. This is the exact bug an earlier
+    // "skip the ask when checkPlatformSplit finds nothing" version of this
+    // code introduced and a second review caught before it shipped.
+    const kgRoot = makeTempDir("c5-platform-split-schema-mismatch");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    const contaminated =
+      "---\ntitle: Rules\nkmgraph_schema: 2\n---\n# Rules\n\n- File search: use Glob and Grep — not Bash find/grep\n";
+    writeRules(kgRoot, contaminated);
+
+    const result = await handleUpgrade({ apply: ["platform-split"] });
+
+    expect(result.isError).toBe(true);
+    const errorBlock = JSON.parse(result.content[0].text);
+    expect(errorBlock.error).toBe("KMG_INPUT_REQUIRED");
+    expect(errorBlock.resolveWith.param).toBe("confirm_platform_split");
+    // File must be untouched -- no consent given, despite schema already being 2
     const after = fs.readFileSync(path.join(kgRoot, "knowledge", "rules.md"), "utf-8");
     expect(after).toBe(contaminated);
   });
@@ -1865,7 +1905,7 @@ describe("capture-corruption — apply mode", () => {
       "utf-8"
     );
 
-    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
     expect(result.content[0].text).toContain("[capture-corruption]");
     expect(result.content[0].text).toContain("1 frontmatter block(s) merged");
 
@@ -1889,7 +1929,7 @@ describe("capture-corruption — apply mode", () => {
     const src = path.join(sessionsYm, "2026-08-06-2026-08-06-main.md");
     fs.writeFileSync(src, '---\ntitle: "main"\ndate: 2026-08-06\n---\n\n## Body\n', "utf-8");
 
-    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
     expect(result.content[0].text).toContain("1 filename(s) de-duplicated");
 
     expect(fs.existsSync(src)).toBe(false);
@@ -1911,7 +1951,7 @@ describe("capture-corruption — apply mode", () => {
       '---\ntitle: "Conflict"\nstatus: Accepted\n---\n\n# ADR-999\n';
     fs.writeFileSync(filePath, original, "utf-8");
 
-    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
     expect(result.content[0].text).toContain("0 frontmatter block(s) merged");
     expect(result.content[0].text).toContain("need manual review");
     expect(result.content[0].text).toContain("status");
@@ -1931,7 +1971,7 @@ describe("capture-corruption — apply mode", () => {
     const src = path.join(sessionsYm, "2026-07-12-2026-07-11-main.md");
     fs.writeFileSync(src, '---\ntitle: "2026-07-11-main"\ndate: 2026-07-11\n---\n\n## Body\n', "utf-8");
 
-    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
     expect(result.content[0].text).toContain("0 filename(s) de-duplicated");
     expect(result.content[0].text).toContain("need manual review");
     expect(result.content[0].text).toContain("near-doubled filename");
@@ -1955,8 +1995,8 @@ describe("capture-corruption — apply mode", () => {
       "utf-8"
     );
 
-    await handleUpgrade({ apply: ["capture-corruption"] });
-    const second = await handleUpgrade({ apply: ["capture-corruption"] });
+    await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
+    const second = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
 
     expect(second.content[0].text).toContain("0 frontmatter block(s) merged");
     expect(second.content[0].text).toContain("0 filename(s) de-duplicated");
@@ -1978,7 +2018,7 @@ describe("capture-corruption — apply mode", () => {
       "utf-8"
     );
 
-    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
     expect(result.content[0].text).toContain("1 filename(s) de-duplicated");
     expect(result.content[0].text).toContain("1 README link(s) repointed");
 
@@ -2011,7 +2051,7 @@ describe("capture-corruption — apply mode", () => {
       "utf-8"
     );
 
-    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
     expect(result.content[0].text).toContain("1 README link(s) repointed");
 
     const readme = fs.readFileSync(path.join(decisionsDir, "README.md"), "utf-8");
@@ -2030,7 +2070,7 @@ describe("capture-corruption — apply mode", () => {
     // No corresponding file exists at all -- neither the doubled nor the
     // de-doubled name.
 
-    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
     expect(result.content[0].text).toContain("0 README link(s) repointed");
     expect(result.content[0].text).toContain("need manual review");
 
@@ -2084,7 +2124,7 @@ describe("capture-corruption — real-shape false-positive guard (CRITICAL #1 re
     const filePath = path.join(sessionsYm, "2026-05-25-real-shape.md");
     fs.writeFileSync(filePath, REAL_SHAPE_CONTENT, "utf-8");
 
-    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
     expect(result.content[0].text).toContain("0 frontmatter block(s) merged");
 
     expect(fs.readFileSync(filePath, "utf-8")).toBe(REAL_SHAPE_CONTENT);
@@ -2106,7 +2146,7 @@ describe("capture-corruption — real-shape false-positive guard (CRITICAL #1 re
       '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\nas_of_commit: abc1234\n---\n\n## Body\n';
     fs.writeFileSync(filePath, original, "utf-8");
 
-    await handleUpgrade({ apply: ["capture-corruption"] });
+    await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
 
     const bakPath = `${filePath}.bak`;
     expect(fs.existsSync(bakPath)).toBe(true);
@@ -2144,7 +2184,7 @@ describe("capture-corruption — narrowed false-positive guard (Fable review, 20
     const item = parsed.upgrades.find((u: { category: string }) => u.category === "capture-corruption");
     expect(item).toBeUndefined();
 
-    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
     expect(result.content[0].text).toContain("0 frontmatter block(s) merged");
     expect(fs.readFileSync(filePath, "utf-8")).toBe(content);
     expect(fs.existsSync(`${filePath}.bak`)).toBe(false);
@@ -2162,7 +2202,7 @@ describe("capture-corruption — ADR backreference guard (CRITICAL #2 regression
     const src = path.join(decisionsDir, "ADR-050-adr-046-followup-fix.md");
     fs.writeFileSync(src, '---\ntitle: "Followup Fix"\n---\n\n# ADR-050\n', "utf-8");
 
-    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
     expect(result.content[0].text).toContain("0 filename(s) de-duplicated");
     expect(fs.existsSync(src)).toBe(true);
     expect(fs.existsSync(path.join(decisionsDir, "ADR-050-followup-fix.md"))).toBe(false);
@@ -2178,9 +2218,229 @@ describe("capture-corruption — ADR backreference guard (CRITICAL #2 regression
     const src = path.join(decisionsDir, "ADR-046-adr-046-again.md");
     fs.writeFileSync(src, '---\ntitle: "Again"\n---\n\n# ADR-046\n', "utf-8");
 
-    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
     expect(result.content[0].text).toContain("1 filename(s) de-duplicated");
     expect(fs.existsSync(src)).toBe(false);
     expect(fs.existsSync(path.join(decisionsDir, "ADR-046-again.md"))).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// c5 (v0.7.2): shared backfix consent gate (confirmBackfixCategory)
+// ---------------------------------------------------------------------------
+
+describe("c5: capture-corruption gated by confirmBackfix", () => {
+  test("nothing to repair, no confirmBackfix — applies as a no-op, does NOT ask (2nd Opus review, 2026-08-18)", async () => {
+    // Every other test in this describe block that exercises the "nothing
+    // to repair" skip also happens to pass confirmBackfix: true, which
+    // means they'd still pass even if this skip path were deleted -- it
+    // was flagged as genuinely untested. This test omits confirmBackfix
+    // entirely against a clean KG, so it can only pass via the skip.
+    const kgRoot = makeTempDir("c5-cc-noop-no-ask");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    // No corrupted files seeded -- rescan finds nothing.
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+
+    // Must NOT be the gate's KMG_INPUT_REQUIRED -- confirms the skip fired.
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).toContain("[capture-corruption]");
+    expect(result.content[0].text).not.toContain("KMG_INPUT_REQUIRED");
+    expect(result.content[0].text).toContain("0 frontmatter block(s) merged");
+  });
+
+
+  test("automated mode, no confirmBackfix — returns KMG_INPUT_REQUIRED, not applied", async () => {
+    const kgRoot = makeTempDir("c5-cc-unconfirmed");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const filePath = path.join(sessionsYm, "2026-08-16-main.md");
+    const original = '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\n---\n\n## Body\n';
+    fs.writeFileSync(filePath, original, "utf-8");
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+
+    // Only category in the call, and it's genuinely unconfirmed (real
+    // corruption exists, so the "nothing to repair" skip does not apply) —
+    // the empty prose block is omitted, so the error is content[0].
+    expect(result.isError).toBe(true);
+    expect(result.content.length).toBe(1);
+    const errorBlock = JSON.parse(result.content[0].text);
+    expect(errorBlock.error).toBe("KMG_INPUT_REQUIRED");
+    expect(errorBlock.resolveWith.param).toBe("confirmBackfix");
+    // detail carries the human-readable per-run count the gate is asking
+    // about — this is the whole reason Step 1 added a `detail` field.
+    expect(errorBlock.detail).toContain("duplicated frontmatter block");
+    // File must be untouched — no consent given, nothing should have been written
+    expect(fs.readFileSync(filePath, "utf-8")).toBe(original);
+  });
+
+  test("BLOCKER regression: an unconfirmed LAST-in-order category does not discard an earlier category's results", async () => {
+    const kgRoot = makeTempDir("c5-blocker");
+    tempDirs.push(kgRoot);
+    scaffoldKgPartial(kgRoot); // leaves "directories" real work to do
+    mockActiveKg(kgRoot, { lastAppliedVersion: "0.0.0-old" });
+    // Must seed real corruption — otherwise capture-corruption hits the
+    // "nothing to repair" skip (fix for Opus review finding, 2026-08-18)
+    // and never reaches the gate at all, defeating this test's entire
+    // premise (it needs capture-corruption to end up unconfirmed/pending).
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    fs.writeFileSync(
+      path.join(sessionsYm, "2026-08-16-main.md"),
+      '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\n---\n\n## Body\n',
+      "utf-8"
+    );
+
+    let writtenConfig: ReturnType<typeof readConfig> | undefined;
+    (writeConfig as jest.Mock).mockImplementation((cfg) => { writtenConfig = cfg; });
+
+    const result = await handleUpgrade({ apply: ["directories", "capture-corruption"] });
+
+    // Earlier category's success text must survive, not be discarded by the
+    // later unconfirmed gate — the exact bug this plan's Step 3 fixes.
+    expect(result.content[0].text).toContain("[directories]");
+    expect(result.isError).toBe(true);
+    expect(result.content.length).toBeGreaterThan(1);
+    const errorBlock = JSON.parse(result.content[1].text);
+    expect(errorBlock.error).toBe("KMG_INPUT_REQUIRED");
+    expect(errorBlock.resolveWith.param).toBe("confirmBackfix");
+
+    // updateLastAppliedVersion must still run, since "directories" genuinely applied
+    expect(writtenConfig).toBeDefined();
+    const lastApplied = (writtenConfig!.graphs["test-kg"] as unknown as Record<string, unknown>).lastAppliedVersion;
+    expect(lastApplied).toBe(handleVersion().installed);
+  });
+
+  test("confirmBackfix does not also bypass platform-split — independent knobs", async () => {
+    const kgRoot = makeTempDir("c5-independent-knobs");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    const contaminated = "---\ntitle: Rules\n---\n# Rules\n\n- File search: use Glob and Grep — not Bash find/grep\n";
+    writeRules(kgRoot, contaminated);
+
+    const result = await handleUpgrade({ apply: ["capture-corruption", "platform-split"], confirmBackfix: true });
+
+    // capture-corruption reaches its "nothing to repair" skip (no corrupted
+    // files seeded here), not the gate — either way, no gate error for it
+    expect(result.content[0].text).toContain("[capture-corruption]");
+    // platform-split is still gated — confirmBackfix does not answer confirm_platform_split
+    expect(result.isError).toBe(true);
+    const errorBlock = JSON.parse(result.content[1].text);
+    expect(errorBlock.resolveWith.param).toBe("confirm_platform_split");
+    const after = fs.readFileSync(path.join(kgRoot, "knowledge", "rules.md"), "utf-8");
+    expect(after).toBe(contaminated); // untouched
+  });
+
+  test("confirm_platform_split does not also bypass capture-corruption — independent knobs, reverse direction", async () => {
+    const kgRoot = makeTempDir("c5-independent-knobs-reverse");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    writeRules(kgRoot, "---\ntitle: Rules\n---\n# Rules\n\n- File search: use Glob and Grep — not Bash find/grep\n");
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const filePath = path.join(sessionsYm, "2026-08-16-main.md");
+    const original = '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\n---\n\n## Body\n';
+    fs.writeFileSync(filePath, original, "utf-8");
+
+    const result = await handleUpgrade({ apply: ["capture-corruption", "platform-split"], confirm_platform_split: true });
+
+    // platform-split applied (confirmed), but capture-corruption is still
+    // gated — confirm_platform_split does not answer confirmBackfix
+    expect(result.content[0].text).toContain("[platform-split]");
+    expect(result.isError).toBe(true);
+    const errorBlock = JSON.parse(result.content[1].text);
+    expect(errorBlock.resolveWith.param).toBe("confirmBackfix");
+    // File must be untouched — capture-corruption never got consent
+    expect(fs.readFileSync(filePath, "utf-8")).toBe(original);
+  });
+
+  test("interactive mode: gate() is genuinely invoked (stub times out), not silently treated as automated", async () => {
+    jest.useFakeTimers();
+    const prevInteraction = process.env.KMG_INTERACTION;
+    process.env.KMG_INTERACTION = "interactive";
+    try {
+      const kgRoot = makeTempDir("c5-interactive");
+      tempDirs.push(kgRoot);
+      scaffoldKg(kgRoot);
+      mockActiveKg(kgRoot);
+      // Must seed real corruption — otherwise the "nothing to repair" skip
+      // (fix for Opus review finding, 2026-08-18) short-circuits before the
+      // gate is ever reached, defeating this test's whole premise.
+      const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+      fs.mkdirSync(sessionsYm, { recursive: true });
+      fs.writeFileSync(
+        path.join(sessionsYm, "2026-08-16-main.md"),
+        '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\n---\n\n## Body\n',
+        "utf-8"
+      );
+
+      const resultPromise = handleUpgrade({ apply: ["capture-corruption"] });
+      await jest.advanceTimersByTimeAsync(STUB_ASK_TIMEOUT_MS);
+      const result = await resultPromise;
+
+      expect(result.isError).toBe(true);
+      expect(result.content.length).toBe(1); // only category in the call, no prose block
+      const errorBlock = JSON.parse(result.content[0].text);
+      expect(errorBlock.error).toBe("KMG_INPUT_REQUIRED");
+      expect(errorBlock.reason).toContain("capture_corruption_backfix");
+    } finally {
+      process.env.KMG_INTERACTION = prevInteraction;
+      jest.useRealTimers();
+    }
+  });
+
+  test("Step 6.5 short-circuit: two unconfirmed gated categories in interactive mode settle after ONE stub timeout, not two", async () => {
+    jest.useFakeTimers();
+    const prevInteraction = process.env.KMG_INTERACTION;
+    process.env.KMG_INTERACTION = "interactive";
+    try {
+      const kgRoot = makeTempDir("c5-skipask");
+      tempDirs.push(kgRoot);
+      scaffoldKg(kgRoot);
+      mockActiveKg(kgRoot);
+      writeRules(kgRoot, "---\ntitle: Rules\n---\n# Rules\n\n- File search: use Glob and Grep — not Bash find/grep\n");
+      // Must seed real corruption — otherwise capture-corruption hits the
+      // "nothing to repair" skip and never reaches its gate at all, leaving
+      // only platform-split gated and defeating this test's whole premise
+      // (proving the short-circuit between TWO gated categories).
+      const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+      fs.mkdirSync(sessionsYm, { recursive: true });
+      fs.writeFileSync(
+        path.join(sessionsYm, "2026-08-16-main.md"),
+        '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\n---\n\n## Body\n',
+        "utf-8"
+      );
+
+      const resultPromise = handleUpgrade({ apply: ["capture-corruption", "platform-split"] });
+      let settled = false;
+      resultPromise.then(() => { settled = true; });
+
+      // Advance by exactly ONE stub timeout. If platform-split (the second
+      // gated category) were still stacking its own full gate()/stubAsk
+      // wait instead of short-circuiting once capture-corruption's gate
+      // already came back unconfirmed, this would not be enough for both.
+      await jest.advanceTimersByTimeAsync(STUB_ASK_TIMEOUT_MS);
+      await Promise.resolve(); // flush microtasks so `settled` reflects reality
+      expect(settled).toBe(true);
+
+      const result = await resultPromise;
+      expect(result.isError).toBe(true);
+      // Both categories are unconfirmed and neither applied, so there's no
+      // prose block to include — just the 2 pending errors.
+      expect(result.content.length).toBe(2);
+    } finally {
+      process.env.KMG_INTERACTION = prevInteraction;
+      jest.useRealTimers();
+    }
   });
 });

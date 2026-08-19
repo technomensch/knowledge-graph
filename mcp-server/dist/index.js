@@ -33643,7 +33643,7 @@ function checkCaptureCorruption(kgPath) {
   return [{
     category: "capture-corruption",
     description: `issue-46: ${parts.join("; ")}`,
-    details: `These were written before the capture.ts filename/frontmatter-ownership fix (issue-46) and stay corrupted until repaired. Run with apply: ["capture-corruption"] to fix the unambiguous cases automatically (exact-duplicate filenames stripped; frontmatter blocks merged only when the two blocks don't disagree on any field). Anything ambiguous (a real field conflict, or a near-doubled filename from a midnight rollover) is reported, never guessed at \u2014 you'll get a list to resolve by hand.`
+    details: `These were written before the capture.ts filename/frontmatter-ownership fix (issue-46) and stay corrupted until repaired. Run with apply: ["capture-corruption"], confirmBackfix: true to fix the unambiguous cases automatically (exact-duplicate filenames stripped; frontmatter blocks merged only when the two blocks don't disagree on any field). Anything ambiguous (a real field conflict, or a near-doubled filename from a midnight rollover) is reported, never guessed at \u2014 you'll get a list to resolve by hand.`
   }];
 }
 function applyCaptureCorruption(kgPath) {
@@ -34134,6 +34134,30 @@ async function confirmStatusSchemaMigration(opts) {
   }
   return { confirmed: true };
 }
+async function confirmBackfixCategory(opts) {
+  if (opts.confirmed === true) return { confirmed: true };
+  if (opts.skipAsk || opts.mode === "automated") {
+    return requireInput(opts.reasonCode, opts.param, ["yes", "no"], opts.detail);
+  }
+  try {
+    const gated = await gate({
+      mode: opts.mode,
+      reason: opts.reasonCode,
+      param: opts.param,
+      accepts: ["yes", "no"],
+      timeoutMs: opts.timeoutMs,
+      detail: opts.detail,
+      ask: stubAsk
+    });
+    if ("error" in gated) return gated;
+    if (!("answer" in gated) || gated.answer !== "yes") {
+      return requireInput(opts.reasonCode, opts.param, ["yes", "no"], opts.detail);
+    }
+    return { confirmed: true };
+  } catch {
+    return requireInput(`${opts.reasonCode}_ask_failed`, opts.param, ["yes", "no"], opts.detail);
+  }
+}
 function performStatusSchemaMigration() {
   const config2 = readConfig();
   const migratedGraphs = [];
@@ -34365,6 +34389,7 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
     return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
   }
   const results = [];
+  const pending = [];
   let appliedAnyGraphDependent = false;
   let anyCategoryFailed = false;
   const resolvedKgPathForApply = !("error" in target) ? target.graph.path.replace(/^~/, os9.homedir()) : void 0;
@@ -34420,24 +34445,58 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
         results.push(`[stray-knowledge-dir] ${applyStrayKnowledgeDir(kgPath)}`);
         appliedAnyGraphDependent = true;
         break;
-      case "capture-corruption":
+      case "capture-corruption": {
+        const mode = resolveInteractionMode({}).mode;
+        const rescan = checkCaptureCorruption(kgPath);
+        const confirmation = rescan.length === 0 ? { confirmed: true } : await confirmBackfixCategory({
+          reasonCode: "capture_corruption_backfix",
+          param: "confirmBackfix",
+          mode,
+          confirmed: params.confirmBackfix,
+          timeoutMs: STUB_ASK_TIMEOUT_MS,
+          detail: rescan[0]?.description,
+          skipAsk: pending.length > 0
+        });
+        if (!("confirmed" in confirmation)) {
+          pending.push(confirmation);
+          anyCategoryFailed = true;
+          break;
+        }
         results.push(`[capture-corruption] ${applyCaptureCorruption(kgPath)}`);
         appliedAnyGraphDependent = true;
         break;
-      case "platform-split":
-        if (!params.confirm_platform_split) {
-          results.push("[platform-split] WARNING: platform-split migration removes content from rules.md. Pass confirm_platform_split: true to proceed.");
-        } else {
-          results.push(`[platform-split] ${applyPlatformSplit(kgPath)}`);
-          appliedAnyGraphDependent = true;
+      }
+      case "platform-split": {
+        const mode = resolveInteractionMode({}).mode;
+        const confirmation = await confirmBackfixCategory({
+          reasonCode: "platform_split_backfix",
+          param: "confirm_platform_split",
+          mode,
+          confirmed: params.confirm_platform_split,
+          timeoutMs: STUB_ASK_TIMEOUT_MS,
+          detail: "platform-split migration removes content from rules.md.",
+          skipAsk: pending.length > 0
+        });
+        if (!("confirmed" in confirmation)) {
+          pending.push(confirmation);
+          anyCategoryFailed = true;
+          break;
         }
+        results.push(`[platform-split] ${applyPlatformSplit(kgPath)}`);
+        appliedAnyGraphDependent = true;
         break;
+      }
     }
   }
   if (appliedAnyGraphDependent && !("error" in target)) {
     updateLastAppliedVersion(installedVersion, target.name);
   }
-  return { content: [{ type: "text", text: results.join("\n\n") }], ...anyCategoryFailed ? { isError: true } : {} };
+  const content = [];
+  if (results.length > 0 || pending.length === 0) {
+    content.push({ type: "text", text: results.join("\n\n") });
+  }
+  content.push(...pending.map((e) => ({ type: "text", text: JSON.stringify(e) })));
+  return { content, ...anyCategoryFailed ? { isError: true } : {} };
 }
 function registerUpgradeTool(server2, personalScopeSession2) {
   server2.tool(
@@ -34456,11 +34515,14 @@ function registerUpgradeTool(server2, personalScopeSession2) {
       ),
       confirmMigration: external_exports3.boolean().optional().describe(
         "Must be true (in automated mode) to apply the status-schema migration -- reconciles old .active/legacy config into the status/graphId schema and deletes the legacy ~/.claude/kg-config.json file. Interactive callers are asked to confirm instead."
+      ),
+      confirmBackfix: external_exports3.boolean().optional().describe(
+        'Must be true (in automated mode) to apply backfix categories that repair already-corrupted content -- currently "capture-corruption" (issue-46). Interactive callers are asked to confirm instead.'
       )
     },
-    async ({ apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration }, extra) => {
+    async ({ apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix }, extra) => {
       return handleUpgrade(
-        { apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration },
+        { apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix },
         personalScopeSession2,
         extra?._meta
       );

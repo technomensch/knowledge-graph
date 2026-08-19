@@ -307,10 +307,11 @@ function checkCaptureCorruption(kgPath: string): UpgradeItem[] {
     description: `issue-46: ${parts.join("; ")}`,
     details:
       `These were written before the capture.ts filename/frontmatter-ownership fix (issue-46) and stay ` +
-      `corrupted until repaired. Run with apply: ["capture-corruption"] to fix the unambiguous cases ` +
-      `automatically (exact-duplicate filenames stripped; frontmatter blocks merged only when the two ` +
-      `blocks don't disagree on any field). Anything ambiguous (a real field conflict, or a near-doubled ` +
-      `filename from a midnight rollover) is reported, never guessed at — you'll get a list to resolve by hand.`,
+      `corrupted until repaired. Run with apply: ["capture-corruption"], confirmBackfix: true to fix the ` +
+      `unambiguous cases automatically (exact-duplicate filenames stripped; frontmatter blocks merged only ` +
+      `when the two blocks don't disagree on any field). Anything ambiguous (a real field conflict, or a ` +
+      `near-doubled filename from a midnight rollover) is reported, never guessed at — you'll get a list to ` +
+      `resolve by hand.`,
   }];
 }
 
@@ -956,6 +957,60 @@ async function confirmStatusSchemaMigration(opts: {
 }
 
 /**
+ * Shared consent gate for kg_upgrade's "backfix" categories (c5 / v0.7.2):
+ * repairs applied to files already corrupted by a prior bug, as opposed to
+ * routine structural upgrades. Generalizes confirmStatusSchemaMigration()
+ * above by reason/param instead of hardcoding one category. An explicit
+ * `confirmed: true` is honored in either mode (same "real answer bypasses
+ * the ask" pattern); automated mode with no explicit answer returns
+ * requireInput(...); interactive mode calls gate() via the same no-real-
+ * transport stubAsk() every other gate() site in this file already uses.
+ *
+ * Decision: one shared boolean per call, not per-category granularity --
+ * every current/planned consumer (capture-corruption, platform-split,
+ * future plan-status-drift) is a batch repair with no per-item ask needed.
+ * `confirmed` here and `confirm_platform_split` (platform-split's own
+ * pre-existing param, preserved for backward compatibility) are two
+ * independent knobs, not aliases -- passing one does not bypass the other.
+ */
+async function confirmBackfixCategory(opts: {
+  reasonCode: string; // stable machine token -- gate()/requireInput() suffix it directly (e.g. "${reasonCode}_timeout"), so this must be a token, not prose
+  detail?: unknown; // human-readable prose + counts go here, not in reasonCode
+  param: string; // the bypass param name this category answers to, e.g. "confirmBackfix"
+  mode: InteractionMode;
+  confirmed?: boolean; // explicit bypass value for whatever `param` names; strict === true check below treats false/undefined identically as "not yet answered", never as "declined" -- load-bearing for confirm_platform_split's zod .default(false)
+  timeoutMs?: number; // callers MUST pass STUB_ASK_TIMEOUT_MS
+  skipAsk?: boolean; // Step 6.5: once an earlier gated category in the same apply loop already came back unconfirmed, later ones short-circuit straight to requireInput() instead of stacking another stubAsk() timeout in interactive mode. No-op in automated mode, which already returns immediately.
+}): Promise<{ confirmed: true } | InputRequiredError> {
+  if (opts.confirmed === true) return { confirmed: true };
+  if (opts.skipAsk || opts.mode === "automated") {
+    return requireInput(opts.reasonCode, opts.param, ["yes", "no"], opts.detail);
+  }
+  try {
+    const gated = await gate({
+      mode: opts.mode,
+      reason: opts.reasonCode,
+      param: opts.param,
+      accepts: ["yes", "no"],
+      timeoutMs: opts.timeoutMs,
+      detail: opts.detail,
+      ask: stubAsk,
+    });
+    if ("error" in gated) return gated;
+    if (!("answer" in gated) || gated.answer !== "yes") {
+      return requireInput(opts.reasonCode, opts.param, ["yes", "no"], opts.detail);
+    }
+    return { confirmed: true };
+  } catch {
+    // interaction.ts:117-122: an ask() rejection propagates out of gate()
+    // unmapped. Moot today (stubAsk never rejects) but this helper is meant
+    // to outlive the stub and serve multiple categories -- catch here once
+    // rather than leaving every future caller to rediscover the gap.
+    return requireInput(`${opts.reasonCode}_ask_failed`, opts.param, ["yes", "no"], opts.detail);
+  }
+}
+
+/**
  * Applies the schema migration: every graph missing status/statusChangedAt/
  * graphId gets them (status:"active" -- spec §3 has no single "the active
  * graph" concept anymore, so every non-deleted legacy graph activates
@@ -1227,6 +1282,11 @@ export interface HandleUpgradeParams {
   // Interactive mode is asked via gate() instead; an explicit true here is
   // still honored in either mode (see confirmStatusSchemaMigration).
   confirmMigration?: boolean;
+  // c5 (v0.7.2): required (automated mode) to apply any "backfix" category
+  // -- currently "capture-corruption" -- that repairs already-corrupted
+  // content. Interactive mode is asked via gate() instead; an explicit true
+  // here is still honored in either mode (see confirmBackfixCategory).
+  confirmBackfix?: boolean;
 }
 
 export interface HandleUpgradeResult {
@@ -1317,6 +1377,13 @@ export async function handleUpgrade(
   }
 
   const results: string[] = [];
+  // c5 (v0.7.2) BLOCKER fix: an unconfirmed backfix category (capture-
+  // corruption, platform-split -- both LAST in APPLY_ORDER) must not
+  // discard earlier categories' already-accumulated `results` text. Each
+  // pending InputRequiredError goes here instead of into `results`, and is
+  // emitted as its own separate content block below, so it stays
+  // independently JSON.parse-able and the prose report survives intact.
+  const pending: InputRequiredError[] = [];
   let appliedAnyGraphDependent = false;
   let anyCategoryFailed = false;
 
@@ -1385,18 +1452,83 @@ export async function handleUpgrade(
         results.push(`[stray-knowledge-dir] ${applyStrayKnowledgeDir(kgPath)}`);
         appliedAnyGraphDependent = true;
         break;
-      case "capture-corruption":
+      case "capture-corruption": {
+        // c5: retrofitted onto the shared backfix gate -- previously applied
+        // unconditionally with no consent check at all (the most severe of
+        // the three original gaps this plan closes).
+        const mode = resolveInteractionMode({}).mode;
+        // Re-scan for an honest per-run count/description rather than a
+        // stale one computed at inspect time (checkCaptureCorruption's
+        // counts aren't otherwise exposed as structured data). Also lets us
+        // skip the ASK (not the apply call itself) when inspect's own scan
+        // finds nothing to repair (Opus review, 2026-08-18) -- otherwise a
+        // healthy KG gets a hard KMG_INPUT_REQUIRED for a would-be no-op,
+        // with no detail explaining what it's even asking about. Still call
+        // applyCaptureCorruption() unconditionally below either way (not
+        // substituted with a canned message): it has its own independent
+        // false-positive guard from inspect's, and several regression tests
+        // exist specifically to prove the two guards agree -- shortcutting
+        // past the real call here would let them silently diverge again.
+        const rescan = checkCaptureCorruption(kgPath);
+        const confirmation = rescan.length === 0
+          ? { confirmed: true as const }
+          : await confirmBackfixCategory({
+              reasonCode: "capture_corruption_backfix",
+              param: "confirmBackfix",
+              mode,
+              confirmed: params.confirmBackfix,
+              timeoutMs: STUB_ASK_TIMEOUT_MS,
+              detail: rescan[0]?.description,
+              skipAsk: pending.length > 0,
+            });
+        if (!("confirmed" in confirmation)) {
+          pending.push(confirmation);
+          anyCategoryFailed = true;
+          break;
+        }
         results.push(`[capture-corruption] ${applyCaptureCorruption(kgPath)}`);
         appliedAnyGraphDependent = true;
         break;
-      case "platform-split":
-        if (!params.confirm_platform_split) {
-          results.push("[platform-split] WARNING: platform-split migration removes content from rules.md. Pass confirm_platform_split: true to proceed.");
-        } else {
-          results.push(`[platform-split] ${applyPlatformSplit(kgPath)}`);
-          appliedAnyGraphDependent = true;
+      }
+      case "platform-split": {
+        // c5: migrated from a boolean-flag-only check onto the shared
+        // backfix gate for consistency with capture-corruption/status-
+        // schema, preserving confirm_platform_split as the bypass param
+        // name. Breaking behavior change (named explicitly, not a pure
+        // refactor): automated callers that previously got back a non-error
+        // warning string now get KMG_INPUT_REQUIRED with isError:true
+        // instead when the flag is omitted.
+        const mode = resolveInteractionMode({}).mode;
+        // NOT given the same "skip the ask when nothing to do" treatment as
+        // capture-corruption (reverted after a second Opus review, 2026-08-18,
+        // found it was unsafe here): checkPlatformSplit()'s "nothing found"
+        // signal is `kmgraph_schema >= 2` -- a stored version marker, not a
+        // live re-scan for contamination the way checkCaptureCorruption's is.
+        // A file whose schema was already bumped but that still (or again)
+        // has flagged lines would report "nothing to do" while
+        // applyPlatformSplit() unconditionally deletes those lines anyway --
+        // a silent, unconsented content removal, which is exactly the class
+        // of gap this plan exists to close. Always gate here; only
+        // capture-corruption's check/apply pair was verified to share
+        // identical scan logic closely enough to skip the ask safely.
+        const confirmation = await confirmBackfixCategory({
+          reasonCode: "platform_split_backfix",
+          param: "confirm_platform_split",
+          mode,
+          confirmed: params.confirm_platform_split,
+          timeoutMs: STUB_ASK_TIMEOUT_MS,
+          detail: "platform-split migration removes content from rules.md.",
+          skipAsk: pending.length > 0,
+        });
+        if (!("confirmed" in confirmation)) {
+          pending.push(confirmation);
+          anyCategoryFailed = true;
+          break;
         }
+        results.push(`[platform-split] ${applyPlatformSplit(kgPath)}`);
+        appliedAnyGraphDependent = true;
         break;
+      }
     }
   }
 
@@ -1410,7 +1542,27 @@ export async function handleUpgrade(
   // (pre-Task-1.9). The restructure folded the failure into `results` text
   // with no isError flag, so a client saw a "successful" call whose text
   // happened to contain "Error:". Restored here.
-  return { content: [{ type: "text" as const, text: results.join("\n\n") }], ...(anyCategoryFailed ? { isError: true as const } : {}) };
+  //
+  // c5: each pending backfix consent is its own content block (not embedded
+  // as a substring of the joined prose) so it stays independently
+  // JSON.parse-able, matching every other KMG_INPUT_REQUIRED response shape
+  // in this file -- see the `pending` declaration above for why. The prose
+  // block is omitted entirely when `results` is empty (found in Opus review,
+  // 2026-08-18) rather than emitted as an empty string: every other
+  // KMG_INPUT_REQUIRED response in this file puts bare JSON at content[0],
+  // and a caller following that existing convention would otherwise hit a
+  // JSON.parse SyntaxError against "" for a single-category unconfirmed call.
+  // The prose block is included whenever there's real prose OR nothing else
+  // to fall back on (an empty `content` array would break every caller that
+  // assumes at least one block always exists, e.g. an unrecognized apply
+  // category that hits no switch case). It's omitted only when it would
+  // otherwise be an empty string sitting in front of a real pending error.
+  const content: Array<{ type: "text"; text: string }> = [];
+  if (results.length > 0 || pending.length === 0) {
+    content.push({ type: "text" as const, text: results.join("\n\n") });
+  }
+  content.push(...pending.map((e) => ({ type: "text" as const, text: JSON.stringify(e) })));
+  return { content, ...(anyCategoryFailed ? { isError: true as const } : {}) };
 }
 
 // ── Tool registration ────────────────────────────────────────────────────────
@@ -1453,10 +1605,18 @@ export function registerUpgradeTool(server: McpServer, personalScopeSession: Per
             "old .active/legacy config into the status/graphId schema and deletes the legacy " +
             "~/.claude/kg-config.json file. Interactive callers are asked to confirm instead."
         ),
+      confirmBackfix: z
+        .boolean()
+        .optional()
+        .describe(
+          "Must be true (in automated mode) to apply backfix categories that repair already-" +
+            "corrupted content -- currently \"capture-corruption\" (issue-46). Interactive callers " +
+            "are asked to confirm instead."
+        ),
     },
-    async ({ apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration }, extra) => {
+    async ({ apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix }, extra) => {
       return handleUpgrade(
-        { apply: apply as ApplyCategory[] | undefined, confirm_platform_split, scope, confirmPersonalScope, confirmMigration },
+        { apply: apply as ApplyCategory[] | undefined, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix },
         personalScopeSession,
         extra?._meta as Record<string, unknown> | undefined
       );
