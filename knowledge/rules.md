@@ -149,15 +149,15 @@ When a bug or enhancement is discovered mid-session, **first check whether an op
 
 ### Plan File Sync
 
-`~/.claude/plans/<name>.md` and `knowledge/plans/<name>.md` must always be identical. After any edit to either copy, sync immediately:
+`~/.claude/plans/<name>.md` is the canonical source. `knowledge/plans/<name>.md` is a downstream, gitignored, local-reference copy. Sync is **one-way only**: `~/.claude/plans/` → `knowledge/plans/`. Always edit `~/.claude/plans/<name>.md` first, then copy it over. Never edit `knowledge/plans/` first and copy back to `~/.claude/plans/` — even if the resulting content ends up identical either way, editing in the wrong direction makes `knowledge/plans/` the de facto source, which is not the convention.
 
 ```bash
 cp ~/.claude/plans/<name>.md /path/to/repo/knowledge/plans/<name>.md
 ```
 
-Verify with `wc -l` on both files. A line count mismatch means they are out of sync.
+Verify with `diff -q` (or `wc -l`) on both files after every edit. Any mismatch means they are out of sync — fix by re-copying from `~/.claude/plans/`, never the reverse.
 
-- **Why:** Plans diverged during v0.5.8 planning when Task 10/11 were appended to the second copy in a session but not reflected back to `~/.claude/plans/`. When discovered, the copies had to be manually reconciled.
+- **Why:** Plans diverged during v0.5.8 planning when Task 10/11 were appended to the second copy in a session but not reflected back to `~/.claude/plans/`. When discovered, the copies had to be manually reconciled. The one-way direction was made explicit 2026-08-18 after a session edited `knowledge/plans/` first and copied back to `~/.claude/plans/`, which the user flagged as backwards even though both copies ended up identical.
 - **Note:** the sync target was originally `docs/plans/`; ADR-014's own index entry records the move to `knowledge/plans/` (per ADR-029), and `docs/plans/` no longer exists in this repo. This section previously still named the old path — corrected 2026-08-17.
 
 ### Plugin Cache & Local Testing
