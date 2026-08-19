@@ -220,7 +220,7 @@ PROTECTED: Do NOT modify without explicit permission.
 | kmg-auto-recall | History question, past decision | Guides knowledge graph search |
 | session-wrap | Session end, context limit | Prompts /kmgraph:kmg-session-summary |
 | adr-guide | Architecture decision | Suggests /kmgraph:kmg-create-adr |
-| kmg-execute-plan | "execute plan" or docs/plans/*.md | Enforces zero-deviation protocol |
+| kmg-execute-plan | "execute plan" or knowledge/plans/*.md or ~/.claude/plans/*.md | Enforces zero-deviation protocol |
 
 ### agents/ — Subagents
 
