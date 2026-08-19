@@ -132,6 +132,85 @@ decisions/README.md index update, or the git add of the ADR here.
 EOF
 if "$CHECK" >/dev/null 2>&1; then pass "negated boundary prose does not falsely trip pattern markers"; else fail "negated boundary prose should pass, guard false-positived"; fi
 
+# --- Negation GOVERNANCE, not mere presence (regressions found reviewing ea489f4f) ---
+
+# A negation earlier in the sentence must not excuse a later independent
+# imperative that genuinely re-adds the behavior. "no longer" here describes
+# the agent; the main clause still tells THIS command to do the index update.
+cat > "$FIX/commands/kmg-create-adr.md" <<'EOF'
+## Step 3: Dispatch to create-adr-agent
+
+Dispatch `create-adr-agent`.
+
+Since the agent no longer updates decisions/README.md, append the new entry to decisions/README.md from this command after the agent returns.
+EOF
+if "$CHECK" >/dev/null 2>&1; then fail "negation-then-imperative re-addition should fail"; else pass "negation-then-imperative re-addition fails (exit 1)"; fi
+
+# The same shape with the marker only in the negated clause must still pass.
+cat > "$FIX/commands/kmg-create-adr.md" <<'EOF'
+## Step 3: Dispatch to create-adr-agent
+
+Dispatch `create-adr-agent`.
+
+This command no longer updates decisions/README.md, and the agent owns that step.
+EOF
+if "$CHECK" >/dev/null 2>&1; then pass "negated clause alone does not trip the guard"; else fail "negated clause alone should pass, guard false-positived"; fi
+
+# Multi-sentence boundary prose: the ownership sentence carries no negation of
+# its own, but attributes the work to the agent — not a re-implementation.
+cat > "$FIX/commands/kmg-create-adr.md" <<'EOF'
+## Step 3: Dispatch to create-adr-agent
+
+Dispatch `create-adr-agent`.
+
+Do not re-implement the index update here. That update belongs to the agent, which appends to decisions/README.md itself.
+EOF
+if "$CHECK" >/dev/null 2>&1; then pass "agent-ownership sentence after negated sentence does not trip"; else fail "agent-ownership boundary prose should pass, guard false-positived"; fi
+
+# Ownership stated AFTER the marker reads the same as ownership stated before it.
+cat > "$FIX/commands/kmg-create-adr.md" <<'EOF'
+## Step 3: Dispatch to create-adr-agent
+
+Dispatch `create-adr-agent`.
+
+The decisions/README.md index update belongs to create-adr-agent. The git add of decisions/ADR-NNN files is handled by the agent too.
+EOF
+if "$CHECK" >/dev/null 2>&1; then pass "trailing ownership attribution does not trip the guard"; else fail "trailing ownership attribution should pass, guard false-positived"; fi
+
+# "e.g." must not be read as a sentence end — splitting there would strand the
+# marker in a fragment that has lost its governing "Do not".
+cat > "$FIX/commands/kmg-create-adr.md" <<'EOF'
+## Step 3: Dispatch to create-adr-agent
+
+Dispatch `create-adr-agent`.
+
+Do not re-implement steps here, e.g. the decisions/README.md index update or slug derivation of the filename.
+EOF
+if "$CHECK" >/dev/null 2>&1; then pass "e.g. inside a negated list does not trip the guard"; else fail "e.g. inside a negated list should pass, guard false-positived"; fi
+
+# Same for i.e. / etc., and for a marker sitting mid-sentence after "README.md ".
+cat > "$FIX/commands/kmg-create-adr.md" <<'EOF'
+## Step 3: Dispatch to create-adr-agent
+
+Dispatch `create-adr-agent`.
+
+Never re-create the agent's steps here, i.e. the decisions/README.md index update, the git add of decisions/ADR-001-foo.md, etc. The agent owns all of them.
+EOF
+if "$CHECK" >/dev/null 2>&1; then pass "i.e./etc. inside a negated list does not trip the guard"; else fail "i.e./etc. inside a negated list should pass, guard false-positived"; fi
+
+# A re-added agent-unavailable fallback section must still fail even though the
+# sentence mentions the agent (an exemption phrase) before the marker.
+cat > "$FIX/commands/kmg-create-adr.md" <<'EOF'
+## Step 3: Dispatch to create-adr-agent
+
+Dispatch `create-adr-agent`.
+
+## Fallback: write the ADR directly
+
+If `create-adr-agent` is unavailable, write the ADR file directly from this command.
+EOF
+if "$CHECK" >/dev/null 2>&1; then fail "re-added fallback section should fail"; else pass "re-added fallback section fails (exit 1)"; fi
+
 # --- Missing target file entirely: SKIP (exit 0), not a false failure ---
 rm -f "$FIX/commands/kmg-create-adr.md"
 if "$CHECK" >/dev/null 2>&1; then pass "missing target file skips cleanly"; else fail "missing target file should not fail"; fi

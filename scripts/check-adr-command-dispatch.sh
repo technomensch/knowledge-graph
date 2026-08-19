@@ -18,9 +18,9 @@
 #   1. Verbatim literals from the pre-fix file — catch a wholesale revert.
 #   2. Pattern-class markers — catch INCREMENTAL re-addition with new
 #      phrasing, which is how issue-48's own root-cause analysis says the
-#      drift actually happened. These are matched against non-negated lines
-#      only, so boundary prose ("Do not re-implement the file write here")
-#      does not trip them.
+#      drift actually happened. These are matched only where no exemption
+#      GOVERNS the match, so boundary prose ("Do not re-implement the file
+#      write here") does not trip them. See the governance scan below.
 
 set -euo pipefail
 
@@ -62,23 +62,116 @@ if grep -qE '["'"'"'`]?context_provided["'"'"'`]?[[:space:]]*[:=][[:space:]]*tru
 fi
 
 # --- Pattern-class markers: incremental re-addition with new phrasing ---
-# Boundary prose that forbids something is not a re-implementation, so strip
-# negated sentences before scanning. Markdown hard-wraps sentences across
-# lines, so unwrap each paragraph and re-split on sentence boundaries first —
-# a plain line filter would keep the tail of "Do not re-implement ... the
-# decisions/README.md index update ..." and false-positive on it.
-NON_NEGATED="$(
-  awk 'BEGIN{RS="";ORS="\n"} {gsub(/\n/," "); gsub(/([.!?]) /,"&\n"); print}' "$TARGET" \
-    | grep -vE '[Dd]o not|[Dd]on.t|[Nn]ever|no longer|not re-implement' || true
-)"
+#
+# Boundary prose that forbids something ("Do not re-implement the index update
+# here") is not a re-implementation, and ownership prose that attributes the
+# work to the agent ("the agent appends to decisions/README.md itself") is not
+# either. But an earlier "do not"/"no longer" in a sentence must NOT blanket-
+# excuse a later independent instruction in that same sentence — "Since the
+# agent no longer updates decisions/README.md, append the new entry to
+# decisions/README.md from this command" genuinely re-adds the behavior.
+#
+# So the rule is GOVERNANCE, not mere presence: a marker hit is excused only if
+# an exemption phrase (negation or agent-ownership) appears BEFORE the hit and
+# within the same instruction segment. A segment ends where a new imperative
+# clause begins — a comma/semicolon/colon followed by a bare-form verb
+# ("..., append the entry"). Bare form is the signal: imperative "updates the
+# index" (third person, descriptive) does not open a new instruction, while
+# "update the index" does. Coordinated noun lists under a negation ("Do not
+# re-implement the wizard, the Write of decisions/ADR-NNN files, the
+# decisions/README.md index update") never open a segment, so they stay
+# excused.
+#
+# Markdown hard-wraps sentences across lines, so each paragraph is unwrapped
+# and re-split on sentence boundaries first. The splitter is abbreviation-aware
+# ("e.g.", "i.e.", "etc." are not sentence ends) and requires the next sentence
+# to start with a capital, so "decisions/README.md index update" is not torn in
+# half at the file extension. Splitting too eagerly would strand a marker in a
+# fragment that no longer contains its governing negation.
+GOVERNANCE_AWK=$(cat <<'AWK'
+function check(s,   sl, tmp, off, i, vstart, abs, ss, se, prefix) {
+  sl = tolower(s)
+  gsub(SEP, ".", sl)          # restore protected abbreviation periods
+  sl = sl " "                 # sentinel so a trailing word still has a delimiter
 
-scan() { printf '%s\n' "$NON_NEGATED" | grep -qiE "$1"; }
+  # Instruction-segment starts: sentence start, plus every clause-initial
+  # bare-form verb after a comma/semicolon/colon.
+  split("", resets); nres = 1; resets[1] = 1
+  tmp = sl; off = 0
+  while (match(tmp, /[,;:] +/)) {
+    vstart = RSTART + RLENGTH
+    abs = off + vstart
+    if (substr(tmp, vstart) ~ VERB) resets[++nres] = abs
+    off = off + vstart - 1
+    tmp = substr(tmp, vstart)
+  }
 
-if scan 'ADR-\{NNN\}-\{slug\}\.md|derive.{0,20}slug'; then
+  # A marker hit fires unless an exemption phrase precedes it in its segment,
+  # or an explicit ownership predicate appears anywhere in that segment (those
+  # read the same before or after the marker: "the index update belongs to the
+  # agent" == "the agent owns the index update").
+  tmp = sl; off = 0
+  while (match(tmp, marker)) {
+    abs = off + RSTART
+    ss = 1; se = length(sl) + 1
+    for (i = 1; i <= nres; i++) {
+      if (resets[i] <= abs && resets[i] > ss) ss = resets[i]
+      if (resets[i] >  abs && resets[i] < se) se = resets[i]
+    }
+    prefix = substr(sl, ss, abs - ss)
+    if (prefix !~ EXEMPT && substr(sl, ss, se - ss) !~ OWNS) return 1
+    off = off + RSTART
+    tmp = substr(tmp, RSTART + 1)
+  }
+  return 0
+}
+BEGIN {
+  SEP = sprintf("%c", 1)
+  CONN = "(so|then|therefore|instead|now|next|finally|also|and) +"
+  VERB = "^(" CONN ")*(append|add|apply|assemble|build|call|commit|construct|copy|create|derive|edit|emit|generate|insert|invoke|make|modify|output|pass|patch|prepend|produce|put|record|register|run|save|set|stage|store|update|use|write)([^a-z]|$)"
+  EXEMPT = "(do not|don.t|does not|did not|never|no longer|not re-implement|is not|are not|was not|must not|cannot|can.t|rather than|instead of|no need to|create-adr-agent|the agent|agent.s)"
+  OWNS   = "(belongs? to|owned by|agent owns|handled by|the job of)"
+  RS = ""
+  hit = 0
+}
+{
+  para = $0
+  gsub(/\n/, " ", para)
+  gsub(/—/, ";", para)              # em dash is a clause boundary like ;
+  gsub(/ -- /, "; ", para)
+  # Protect abbreviation periods so they are not read as sentence ends.
+  gsub(/[Ee]\.[Gg]\./,   "e" SEP "g" SEP, para)
+  gsub(/[Ii]\.[Ee]\./,   "i" SEP "e" SEP, para)
+  gsub(/[Ee]tc\./,       "etc" SEP, para)
+  gsub(/[Vv]s\./,        "vs" SEP, para)
+  gsub(/[Cc]f\./,        "cf" SEP, para)
+  gsub(/[Aa]pprox\./,    "approx" SEP, para)
+  gsub(/[Ff]ig\./,       "fig" SEP, para)
+  gsub(/[Ee]t al\./,     "et al" SEP, para)
+
+  rest = para
+  while (match(rest, /[.!?][]"')`*]* +[A-Z]/)) {
+    cut = RSTART + RLENGTH - 1
+    s = substr(rest, 1, cut - 1)
+    sub(/ +$/, "", s)
+    if (check(s)) hit = 1
+    rest = substr(rest, cut)
+  }
+  if (check(rest)) hit = 1
+}
+END { if (hit) print "HIT" }
+AWK
+)
+
+# Marker regexes below are matched case-insensitively (awk lowercases each
+# sentence first), so they are written in lower case.
+scan() { [ -n "$(awk -v marker="$1" "$GOVERNANCE_AWK" "$TARGET")" ]; }
+
+if scan 'adr-\{nnn\}-\{slug\}\.md|derive.{0,20}slug'; then
   findings+=("re-embeds ADR filename/slug derivation — filename generation belongs to create-adr-agent (Phase 5)")
   FAIL=1
 fi
-if scan 'decisions/README\.md'; then
+if scan 'decisions/readme\.md'; then
   findings+=("re-embeds a decisions index (decisions/README.md) update — the index belongs to create-adr-agent (Phase 6)")
   FAIL=1
 fi
@@ -86,7 +179,7 @@ if scan 'git add [^ ]*decisions/'; then
   findings+=("re-embeds staging of the ADR file — committing belongs to create-adr-agent (Phase 7)")
   FAIL=1
 fi
-if scan '\bWrite\b[^.]{0,80}(decisions/|ADR-)'; then
+if scan '(^|[^a-z])write([^a-z])[^.]{0,80}(decisions/|adr-)'; then
   findings+=("re-embeds a direct Write-tool creation of the ADR file — the write belongs to create-adr-agent (Phase 5, via kg_capture)")
   FAIL=1
 fi
