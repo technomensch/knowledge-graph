@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
+import { execSync } from "child_process";
 
 // ---------------------------------------------------------------------------
 // Mocks — must be declared before imports that use them
@@ -2442,5 +2443,231 @@ describe("c5: capture-corruption gated by confirmBackfix", () => {
       process.env.KMG_INTERACTION = prevInteraction;
       jest.useRealTimers();
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// c2 (issue-47): diff-blank-reconstruction backfix
+// ---------------------------------------------------------------------------
+
+describe("c2: diff-blank-reconstruction (issue-47 backfix)", () => {
+  function gitInit(dir: string): void {
+    execSync("git init -q -b main", { cwd: dir });
+    execSync('git config user.email t@t.com && git config user.name t', { cwd: dir });
+  }
+
+  test("correctly blank on default branch — not flagged, not touched", async () => {
+    const kgRoot = makeTempDir("c2-blank-main");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    gitInit(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "seed.md"), "seed", "utf-8");
+    execSync("git add seed.md && git commit -q -m seed", { cwd: kgRoot });
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const sessFile = path.join(sessionsYm, "2026-08-18-main.md");
+    const content =
+      '---\ntitle: "main"\nbranch: main\ncommit: abc123\n---\n\n**External files:**\n- none this session\n';
+    fs.writeFileSync(sessFile, content, "utf-8");
+
+    const inspect = await handleUpgrade({});
+    const parsed = JSON.parse(inspect.content[0].text);
+    expect(
+      (parsed.upgrades as Array<{ category: string }>).find((u) => u.category === "diff-blank-reconstruction")
+    ).toBeUndefined();
+
+    const result = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("0 session file(s) reconstructed, 0 left");
+    // Untouched — correctly-blank is not a gap, nothing to backfix
+    expect(fs.readFileSync(sessFile, "utf-8")).toBe(content);
+    expect(fs.existsSync(`${sessFile}.bak`)).toBe(false);
+  });
+
+  test("reconstructable — feature branch, resolvable commit, gated then rebuilt from real git history", async () => {
+    const kgRoot = makeTempDir("c2-reconstructable");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    gitInit(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "seed.md"), "seed", "utf-8");
+    execSync("git add seed.md && git commit -q -m seed", { cwd: kgRoot });
+    execSync("git checkout -q -b feature", { cwd: kgRoot });
+    fs.writeFileSync(path.join(kgRoot, "changed.md"), "changed", "utf-8");
+    execSync("git add changed.md && git commit -q -m changed", { cwd: kgRoot });
+    const featureSha = execSync("git rev-parse HEAD", { cwd: kgRoot }).toString().trim();
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const sessFile = path.join(sessionsYm, "2026-08-18-feature.md");
+    const content =
+      `---\ntitle: "feature"\nbranch: feature\ncommit: ${featureSha}\n---\n\n**External files:**\n- none this session\n\n**Read within this summary:**\n`;
+    fs.writeFileSync(sessFile, content, "utf-8");
+
+    // Gated: no confirmBackfix, must not touch the file
+    const gated = await handleUpgrade({ apply: ["diff-blank-reconstruction"] });
+    expect(gated.isError).toBe(true);
+    const err = JSON.parse(gated.content[0].text);
+    expect(err.error).toBe("KMG_INPUT_REQUIRED");
+    expect(err.resolveWith.param).toBe("confirmBackfix");
+    expect(fs.readFileSync(sessFile, "utf-8")).toBe(content);
+
+    // Confirmed: reconstructs from real git history (not a guess)
+    const result = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("1 session file(s) reconstructed, 0 left");
+    const after = fs.readFileSync(sessFile, "utf-8");
+    expect(after).toContain("`changed.md` ← modified this session (reconstructed)");
+    expect(after).not.toContain("seed.md"); // only the feature-branch delta, not the whole history
+    expect(fs.existsSync(`${sessFile}.bak`)).toBe(true);
+    expect(fs.readFileSync(`${sessFile}.bak`, "utf-8")).toBe(content); // backup is the pre-rewrite content
+  });
+
+  test("unresolvable — commit no longer resolvable, gets an honest note, never a guessed file list", async () => {
+    const kgRoot = makeTempDir("c2-unresolvable");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    gitInit(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "seed.md"), "seed", "utf-8");
+    execSync("git add seed.md && git commit -q -m seed", { cwd: kgRoot });
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const sessFile = path.join(sessionsYm, "2026-08-18-gone.md");
+    // A real 40-char SHA-1 shape (not merely malformed) that never existed in
+    // this repo -- proves "valid-looking but genuinely gone", not just
+    // "rejected for being the wrong length" (found in review, 2026-08-18).
+    const bogusSha = "0123456789abcdef0123456789abcdef0123dead";
+    const content =
+      `---\ntitle: "gone"\nbranch: deleted-feature\ncommit: ${bogusSha}\n---\n\n**External files:**\n- none this session\n`;
+    fs.writeFileSync(sessFile, content, "utf-8");
+
+    const result = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("0 session file(s) reconstructed, 1 left with an unresolvable note.");
+    const after = fs.readFileSync(sessFile, "utf-8");
+    expect(after).toContain("could not be reconstructed");
+    expect(after).toContain(bogusSha);
+    // Never fabricate a plausible-looking list for an unresolvable commit
+    expect(after).not.toContain("← modified this session (reconstructed)");
+    expect(fs.existsSync(`${sessFile}.bak`)).toBe(true);
+  });
+
+  test("no branch recorded — skipped, not misclassified either way", async () => {
+    const kgRoot = makeTempDir("c2-no-branch");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    gitInit(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "seed.md"), "seed", "utf-8");
+    execSync("git add seed.md && git commit -q -m seed", { cwd: kgRoot });
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const sessFile = path.join(sessionsYm, "2026-08-18-nobranch.md");
+    const content = '---\ntitle: "nobranch"\n---\n\n**External files:**\n- none this session\n';
+    fs.writeFileSync(sessFile, content, "utf-8");
+
+    const result = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("0 session file(s) reconstructed, 0 left");
+    expect(fs.readFileSync(sessFile, "utf-8")).toBe(content); // untouched, not guessed at
+  });
+
+  test("BLOCKER regression (2nd Opus review, 2026-08-18): re-running apply is idempotent, does not grow notes or clobber the .bak", async () => {
+    // The unresolvable-note and reconstructed-empty write paths originally
+    // wrote no `← modified this session` marker, so a second run
+    // re-classified an already-handled file as still-blank and appended
+    // ANOTHER note (verified: note count 1 -> 2 across two runs before this
+    // fix), while unconditionally overwriting .bak with the already-mutated
+    // content, making the true original unrecoverable. Both are covered here
+    // against the unresolvable path specifically, since it's the one that
+    // never writes the file-list marker at all.
+    const kgRoot = makeTempDir("c2-idempotent");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    gitInit(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "seed.md"), "seed", "utf-8");
+    execSync("git add seed.md && git commit -q -m seed", { cwd: kgRoot });
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const sessFile = path.join(sessionsYm, "2026-08-18-gone.md");
+    const bogusSha = "0123456789abcdef0123456789abcdef0123dead";
+    const original =
+      `---\ntitle: "gone"\nbranch: deleted-feature\ncommit: ${bogusSha}\n---\n\n**External files:**\n- none this session\n`;
+    fs.writeFileSync(sessFile, original, "utf-8");
+
+    const first = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    expect(first.content[0].text).toContain("0 session file(s) reconstructed, 1 left with an unresolvable note.");
+    const afterFirst = fs.readFileSync(sessFile, "utf-8");
+    const bakAfterFirst = fs.readFileSync(`${sessFile}.bak`, "utf-8");
+    expect(bakAfterFirst).toBe(original); // backup preserves the true original
+
+    const second = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    // Second run must find nothing left to do -- the file is now recognized
+    // as already-handled, not re-classified as blank.
+    expect(second.content[0].text).toContain("0 session file(s) reconstructed, 0 left with an unresolvable note.");
+    const afterSecond = fs.readFileSync(sessFile, "utf-8");
+    expect(afterSecond).toBe(afterFirst); // untouched by the second run
+    const noteCount = (afterSecond.match(/could not be reconstructed/g) || []).length;
+    expect(noteCount).toBe(1); // not 2 -- no duplicate note appended
+    const bakAfterSecond = fs.readFileSync(`${sessFile}.bak`, "utf-8");
+    expect(bakAfterSecond).toBe(original); // backup still the true original, not clobbered with mutated content
+  });
+
+  test("non-git kgPath — degrades gracefully, does not misclassify every blank file as unresolvable", async () => {
+    // Without a git-repo guard, resolveDefaultBranchForGit/isCommitResolvable
+    // both fail closed to "nothing found", so every blank session file would
+    // land in `unresolvable` and get a false-positive "could not be
+    // reconstructed" note written into it -- for a KG that was never a git
+    // repo in the first place (a real, stated audience for this MCP-only
+    // tool). Deliberately no gitInit() call here.
+    const kgRoot = makeTempDir("c2-non-git");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const sessFile = path.join(sessionsYm, "2026-08-18-nogit.md");
+    const content =
+      '---\ntitle: "nogit"\nbranch: some-branch\ncommit: deadbeef\n---\n\n**External files:**\n- none this session\n';
+    fs.writeFileSync(sessFile, content, "utf-8");
+
+    const inspect = await handleUpgrade({});
+    const parsed = JSON.parse(inspect.content[0].text);
+    expect(
+      (parsed.upgrades as Array<{ category: string }>).find((u) => u.category === "diff-blank-reconstruction")
+    ).toBeUndefined();
+
+    const result = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("0 session file(s) reconstructed, 0 left");
+    expect(fs.readFileSync(sessFile, "utf-8")).toBe(content); // untouched — no false-positive note
+  });
+
+  test("descriptive branch suffix (e.g. 'main (post-merge; was ...)') is still recognized as the default branch", async () => {
+    // A plain string-equality check misclassifies this real shape (found in
+    // this repo's own KG during review, 2026-08-18) as a feature branch.
+    const kgRoot = makeTempDir("c2-descriptive-branch");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    gitInit(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "seed.md"), "seed", "utf-8");
+    execSync("git add seed.md && git commit -q -m seed", { cwd: kgRoot });
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const sessFile = path.join(sessionsYm, "2026-08-18-descriptive.md");
+    const content =
+      '---\ntitle: "descriptive"\nbranch: main (post-merge; was v0.6.17-something)\ncommit: abc123\n---\n\n**External files:**\n- none this session\n';
+    fs.writeFileSync(sessFile, content, "utf-8");
+
+    const result = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    // Recognized as correctly-blank (on the default branch), not misfiled
+    // into reconstructable/unresolvable and rewritten.
+    expect(result.content[0].text).toContain("0 session file(s) reconstructed, 0 left");
+    expect(fs.readFileSync(sessFile, "utf-8")).toBe(content); // untouched
   });
 });

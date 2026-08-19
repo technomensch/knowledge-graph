@@ -459,7 +459,36 @@ find "${active_kg}/sessions" -name "*.md" -not -name "README.md" -not -name "*te
 active_plan=$(ls -t docs/plans/*.md 2>/dev/null | head -1)
 branch=$(git rev-parse --abbrev-ref HEAD)
 enh_id=$(echo "$branch" | grep -o 'ENH-[0-9]*' | head -1)
-git diff --name-only main...HEAD 2>/dev/null | grep -v '^docs/plans/' | head -10
+# git diff main...HEAD is silently empty when HEAD == main (pre-branch, e.g.
+# mid spec-drafting) -- merge-base(main,HEAD) is HEAD itself in that case,
+# and a diff terminating at HEAD structurally cannot see the working tree.
+# Resolve the default branch dynamically and fall back to uncommitted/staged
+# changes on that exact case, instead of silently showing nothing.
+DEFAULT_BRANCH=""
+for candidate in main master; do
+  if git show-ref --verify --quiet "refs/heads/${candidate}" 2>/dev/null; then
+    DEFAULT_BRANCH="$candidate"
+    break
+  fi
+done
+if [ -z "$DEFAULT_BRANCH" ]; then
+  echo "Files changed this session: unknown (no local main/master branch found)"
+else
+  MERGE_BASE=$(git merge-base "$DEFAULT_BRANCH" HEAD 2>/dev/null || true)
+  if [ -z "$MERGE_BASE" ]; then
+    echo "Files changed this session: unknown (shallow clone, no common ancestor with $DEFAULT_BRANCH)"
+  elif [ "$MERGE_BASE" = "$(git rev-parse HEAD)" ]; then
+    echo "No feature branch yet — showing uncommitted/staged changes only"
+    # git diff --name-only only sees tracked-file changes -- a brand-new
+    # untracked file (very plausibly present in exactly this scenario) would
+    # be silently missing. git status --porcelain covers staged, unstaged,
+    # AND untracked in one pass (verified live: an untracked file did not
+    # appear via git diff --name-only, confirming this isn't a hypothetical).
+    git status --porcelain --untracked-files=all 2>/dev/null | cut -c4- | grep -v '^docs/plans/' | head -10
+  else
+    git diff --name-only "$MERGE_BASE" HEAD 2>/dev/null | grep -v '^docs/plans/' | head -10
+  fi
+fi
 ```
 
 Compose the summary using this zone-structured template. `content` sent to
@@ -483,7 +512,7 @@ Skipping any item means starting work without full context.
 - [ ] `knowledge/enhancements/[ENH-NNN]/[ENH-NNN]-specification.md`
       WHY: defines the behavior being implemented.
       Without it you will implement the wrong thing.
-[For each key file modified this session (git diff --name-only main...HEAD | head -10):]
+[For each key file modified this session (per the resolved list above — merge-base diff against the default branch, or uncommitted/staged changes if HEAD is still on that branch):]
 - [ ] `[file path]` ← modified this session
       WHY: changed this session; read before editing.
 

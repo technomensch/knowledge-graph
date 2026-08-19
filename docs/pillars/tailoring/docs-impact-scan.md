@@ -14,7 +14,7 @@ The scan runs in eight steps:
 
 | Step | Action |
 |---|---|
-| 1 | Read `git diff main...HEAD` — extract changed command names, feature names, flag names, skill names |
+| 1 | Diff against the resolved default branch's merge-base with `HEAD` (not a hardcoded `main`) — extract changed command names, feature names, flag names, skill names. Falls back to uncommitted/staged changes when `HEAD` is still on the default branch (no feature branch yet), instead of showing nothing. |
 | 2 | Grep all `.md` files in the project root and `docs/` for each extracted identifier |
 | 3 | Always add obvious files: `README.md`, `INSTALL.md`, `CHANGELOG.md`, `COMMAND-GUIDE.md` |
 | 4 | Query the active knowledge graph for learned correction patterns (e.g., "when X changes, also check Y") |
@@ -25,7 +25,7 @@ The scan runs in eight steps:
 
 ```mermaid
 flowchart TD
-    A([Trigger phrase detected\n&quot;push to origin&quot; / &quot;create PR&quot;]) --> B[Step 1: Read git diff main...HEAD]
+    A([Trigger phrase detected\n&quot;push to origin&quot; / &quot;create PR&quot;]) --> B[Step 1: Diff against resolved\ndefault branch's merge-base]
     B --> C[Step 2: Extract identifiers\ncommand names · flags · feature names · skill names]
     C --> D[Step 3: Grep all .md files\nin project root and docs/]
     D --> E[Step 4: Add obvious files\nREADME · INSTALL · CHANGELOG · COMMAND-GUIDE]

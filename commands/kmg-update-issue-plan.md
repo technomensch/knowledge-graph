@@ -82,10 +82,29 @@ This workflow ensures that insights extracted from the Knowledge Graph are prope
 ### 4.2: Generate PR Description with Lessons
 
 If a PR exists for the current branch:
-1. **Scan lessons:** Find all lessons created/updated on this branch
+1. **Scan lessons:** Find all lessons created/updated on this branch. `git log ... origin/main..HEAD` is silently empty when `HEAD` equals `main` (pre-branch) and assumed a remote-tracking ref is always current — switched to a local-branch merge-base resolution, consistent with this project's other diff-base sites (`agents/session-summary-agent.md`, `skills/kmg-docs-impact-scan/SKILL.md`), with a distinct fallback when neither resolves:
    ```bash
-   git log --name-only --pretty=format: origin/main..HEAD | grep "lessons-learned/" | sort -u
+   DEFAULT_BRANCH=""
+   for candidate in main master; do
+     if git show-ref --verify --quiet "refs/heads/${candidate}" 2>/dev/null; then
+       DEFAULT_BRANCH="$candidate"
+       break
+     fi
+   done
+   if [ -z "$DEFAULT_BRANCH" ]; then
+     echo "Lessons scan skipped: no local main/master branch found"
+   else
+     MERGE_BASE=$(git merge-base "$DEFAULT_BRANCH" HEAD 2>/dev/null || true)
+     if [ -z "$MERGE_BASE" ]; then
+       echo "Lessons scan skipped: shallow clone, no common ancestor with $DEFAULT_BRANCH"
+     elif [ "$MERGE_BASE" = "$(git rev-parse HEAD)" ]; then
+       echo "Lessons scan: no feature branch yet — no committed lessons to scan (explicit label, not a silent blank; see AC2)"
+     else
+       git log --name-only --pretty=format: "$MERGE_BASE"..HEAD | grep "lessons-learned/" | sort -u
+     fi
+   fi
    ```
+   `git log` (not `git diff`) is intentional here — it lists every file *touched by any commit* in range (e.g. a lessons file created then moved still appears — verified live: `git log` shows both the old and new filename, `git diff` shows only the final name), where `git diff` would show only the net change against `HEAD`. For lessons-learned discovery, a file's full history matters, not just its final delta. The `MERGE_BASE == HEAD` case is handled with an explicit label for spec parity with this project's other two diff-base sites (AC2), even though in practice this step only runs "if a PR exists for the current branch" (line 84), which already implies real commits exist on a real branch — this branch is a defensive completeness case, not the expected common path.
 2. **Generate PR section:**
    ```markdown
    ## Related Lessons

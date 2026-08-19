@@ -21,7 +21,14 @@ Does **not** apply to:
 
 ### Step 1 — Read git diff
 
-Run `git diff main...HEAD` and extract changed identifiers: command names, feature names, flag names, skill names. If the diff is very large, cap at 20 identifiers and note the cap to the user.
+`git diff main...HEAD` is silently empty when `HEAD` equals the default branch (e.g. a pre-branch session, before any commits diverge) — merge-base is `HEAD` itself in that case, and a diff terminating at `HEAD` structurally cannot see the working tree. Resolve the default branch dynamically instead of assuming `main`, and fall back to uncommitted/staged changes on that exact case:
+
+1. Resolve the default branch: try local `main`, then local `master`. If neither resolves, skip identifier extraction and report "docs-impact scan skipped: no local main/master branch found" — do not error.
+2. Compute `MERGE_BASE=$(git merge-base "$DEFAULT_BRANCH" HEAD)`. If empty (shallow clone, no common ancestor), skip identifier extraction and report "docs-impact scan skipped: shallow clone, no common ancestor with $DEFAULT_BRANCH" — a distinct message from case 1, since the branch does exist here.
+3. If `$MERGE_BASE` equals `$(git rev-parse HEAD)` (HEAD is still on the default branch — no feature branch yet): extract identifiers from `git status --porcelain` / `git diff --stat HEAD` instead — the actual uncommitted/staged changes, not an empty diff.
+4. Otherwise (real feature branch): run `git diff --name-only "$MERGE_BASE" HEAD` as before.
+
+Extract changed identifiers from whichever source above applies: command names, feature names, flag names, skill names. If the diff is very large, cap at 20 identifiers and note the cap to the user.
 
 ### Step 2 — Grep scan
 

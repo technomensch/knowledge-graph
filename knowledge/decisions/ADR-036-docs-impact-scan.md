@@ -50,7 +50,7 @@ Add a new `docs-impact-scan` skill to the plugin that acts as the discovery laye
 
 ### Workflow
 
-1. Read `git diff main...HEAD` — extract changed identifiers (command names, feature names, flag names, skill names); cap at 20 if diff is very large
+1. Resolve the default branch dynamically (local `main`, then `master`) and diff against its merge-base with `HEAD` — not a hardcoded `git diff main...HEAD` (see 2026-08-18 Amendment below) — extract changed identifiers (command names, feature names, flag names, skill names); cap at 20 if diff is very large
 2. Grep scan scope for references to extracted identifiers
 3. Add obvious files to list regardless of grep hits
 4. Check KG patterns for learned corrections matching changed identifiers
@@ -70,7 +70,7 @@ When users manually add files the scan missed, the skill offers to save a KG pat
 
 ### Placement
 
-`skills/docs-impact-scan/SKILL.md` — ships with the plugin, project-agnostic.
+`skills/kmg-docs-impact-scan/SKILL.md` — ships with the plugin, project-agnostic.
 
 ---
 
@@ -133,7 +133,7 @@ The scan quality is bounded by how well identifiers appear verbatim in docs. Val
 **Branch:** `v0.5.9.3-docs-enforcement-protocol-gap`
 
 **Affected Components:**
-- `skills/docs-impact-scan/SKILL.md` — skill shipped; Step 8 extended in v0.5.9.3 (see below)
+- `skills/kmg-docs-impact-scan/SKILL.md` — skill shipped; Step 8 extended in v0.5.9.3 (see below)
 - `scripts/pre-push-gate.sh` — Gate 3: checks per-commit completion flag before `git push`
 - `hooks/hooks.json` — `PreToolUse Bash` entry wires `pre-push-gate.sh`
 
@@ -169,6 +169,20 @@ The flag is written at the end of Step 8 by the skill. If the flag is absent at 
 
 ---
 
+## Amendment (2026-08-18) — issue-47: `git diff main...HEAD` silently empty pre-branch
+
+**(a) Why `main...HEAD` was insufficient:** `git diff A...B` is defined as `git diff $(git merge-base A B) B`. When `HEAD` equals `main` — the common case for a session run before any commits diverge, e.g. mid spec-drafting — `merge-base(main, HEAD)` is `HEAD` itself, so the diff is `git diff HEAD HEAD`: always empty, silently. The identifier extraction this skill's Step 1 depends on got nothing to work with on exactly the sessions where a docs-impact scan matters most (early, pre-commit). Hardcoding `main` also assumed every repo's default branch has that name.
+
+**(b) The merge-base replacement:** Resolve the default branch dynamically (try local `main`, then `master`) instead of assuming `main`, then diff against `git merge-base "$DEFAULT_BRANCH" HEAD` rather than the literal branch name. This is a portability fix (handles a diverged local `main` correctly) layered on top of the real fix in (c) — merge-base alone does not fix the pre-branch case, since merge-base is still `HEAD` when `HEAD` hasn't diverged yet.
+
+**(c) On-base-branch explicit-label handling:** Detect `HEAD == merge-base` via a string comparison (`[ "$MERGE_BASE" = "$(git rev-parse HEAD)" ]`) — this catches both an attached `HEAD` on the default branch and a detached `HEAD`, where a branch-name comparison would fail. When true: report "No feature branch yet" as an explicit label, and extract identifiers from `git status --porcelain` / `git diff --stat HEAD` (the actual uncommitted/staged changes) instead of an empty diff — a label alone, with nothing underneath, is barely better than the original silent blank for the exact discovery scenario this amendment exists to fix.
+
+**(d) Undetermined-branch fallback:** If neither `main` nor `master` resolves as a local ref, or if `merge-base` returns empty (shallow clone, no common ancestor), skip identifier extraction and report the specific reason — do not error, and do not conflate the two cases (a missing branch and a failed merge-base are different problems with different remediation).
+
+Same fix applied to this ADR's own sibling call sites: `agents/session-summary-agent.md` (2 sites) and `commands/kmg-update-issue-plan.md` (kept `git log` there instead of `git diff` — see `v0.7.2-c2-issue-47-diff-on-main-plan.md` Step 7 for why).
+
+---
+
 ## Related Documentation
 
 **Design Spec:**
@@ -180,5 +194,5 @@ The flag is written at the end of Step 8 by the skill. If the flag is absent at 
 ---
 
 **Decision Made:** 2026-04-16
-**Last Updated:** 2026-04-16
-**Status:** Proposed
+**Last Updated:** 2026-08-18
+**Status:** Accepted
