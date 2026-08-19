@@ -2,7 +2,7 @@
 id: issue-37
 type: Enhancement
 status: deferred
-github-issue: null
+github-issue: pending
 branch: none
 created: 2026-08-01
 ---
