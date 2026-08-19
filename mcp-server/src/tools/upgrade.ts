@@ -1270,7 +1270,16 @@ function updateLastAppliedVersion(installedVersion: string, graphName: string): 
 
 // ── Exported handler for direct testing ──────────────────────────────────────
 
-// "version-update" is inspect-only — NOT an apply category; do not add it here
+// "version-update" and "resolution" are inspect-only — NOT apply categories. Any
+// new category added here (or to the Zod enum below) must also be added to
+// commands/kmg-init-shared/kmg-upgrade-inspector.md's deny-list logic if it is
+// NOT a valid apply target, or the wizard's `_mcp_apply[]` deny-list will wrongly
+// include it and Zod will reject the whole apply call (issue-51). Conversely, if
+// a new category is gated on the shared `confirmBackfix` boolean (like
+// "capture-corruption"), review kmg-upgrade-inspector.md's confirmBackfix wiring:
+// that boolean is per-call, not per-category, so a call consenting to one
+// confirmBackfix-gated category silently also consents to any other one present
+// in the same `apply: [...]` array.
 export type ApplyCategory = "status-schema" | "config-location" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir" | "capture-corruption";
 
 export interface HandleUpgradeParams {
@@ -1347,14 +1356,9 @@ export async function handleUpgrade(
     result.upgrades.push(...checkConfigLocation());
 
     if ("error" in target) {
-      // DRIFT GUARD (issue-51): "resolution" is pushed into upgrades[] but is NOT a
-      // member of ApplyCategory (see the type declaration above) or the apply Zod
-      // enum in registerUpgradeTool — same for "version-update". Any FUTURE category
-      // routed into upgrades[] that is likewise not an apply-enum member MUST also be
-      // added to the deny-list in commands/kmg-init-shared/kmg-upgrade-inspector.md
-      // (Step 0's parse loop and the apply-construction note). Miss it and
-      // /kmgraph:kmg-init builds an apply: [...] call that Zod rejects wholesale,
-      // failing the user's legitimate fixes too.
+      // "resolution" (below) is inspect-only, same as "version-update" — see the
+      // drift-guard comment on the ApplyCategory declaration above for the full
+      // maintenance note.
       result.upgrades.push({
         category: "resolution",
         description: target.error,

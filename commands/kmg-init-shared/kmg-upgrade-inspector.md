@@ -321,7 +321,7 @@ Apply all, pick individually, or skip?
 
 **Implementation note:** The preview is a display-only pass over the same inspection data already collected — no new filesystem checks are needed. The `--preview` flag can be passed as an argument to `/kmgraph:kmg-init` to jump directly to the preview without showing the menu first: if the command is invoked with `--preview`, run the inspection, show the preview, and then show the Apply/Choose/Skip menu (without option 0, since preview has already run).
 
-If the user picks option 2 (choose individually), present each item as a separate yes/no prompt before running it.
+If the user picks option 2 (choose individually), present each item as a separate yes/no prompt before running it. **If the user declines an item, remove its `category` from `_mcp_apply[]` before the apply call below** (dedup-safe: only remove if present) — an item shown but declined must never reach `kg_upgrade apply`, and this matters most for `capture-corruption`, which rewrites and renames files. If declining leaves `_mcp_apply[]` empty, skip the `kg_upgrade apply` call entirely.
 
 If the user picks option 3 (skip), exit with no changes.
 
@@ -331,10 +331,13 @@ Call `kg_upgrade apply: [<_mcp_apply contents>]`. **If `_mcp_apply[]` contains `
 
 **If `_mcp_apply[]` contains `"capture-corruption"`, the same call must also pass `confirmBackfix: true`** — the wizard's own consent step (the item's description was already shown in the pending-items list above, and the user chose "Apply all" or explicitly approved this item under "choose individually") satisfies `kg_upgrade`'s consent gate for this backfix; without it the tool call will fail even though the user already agreed.
 
-`_mcp_apply[]` may contain any category returned by `kg_upgrade inspect` except `"version-update"` and `"resolution"` — neither is a member of the apply enum, and including either will cause Zod validation to reject the entire call. `"platform-split"` IS a valid apply-enum member but is never a candidate here in practice: `kg_upgrade inspect` reports it under `warnings[]`, not `upgrades[]` (see the `warnings[]` handling note above), so Step 0's loop over `upgrades[]` never encounters it — do not add it here manually.
+`_mcp_apply[]` contains exactly the categories Step 0 added to it from `upgrades[]` (minus anything removed above for a declined item) — never anything from `warnings[]`, and never `"version-update"` or `"resolution"`; including either of the latter two will cause Zod validation to reject the entire call. `"platform-split"` IS a valid apply-enum member but is never a candidate here in practice: `kg_upgrade inspect` reports it under `warnings[]`, not `upgrades[]` (see the `warnings[]` handling note above), so Step 0's loop over `upgrades[]` never encounters it — do not add it here manually.
 
 Example: if Step 0 found `directories` and `templates` pending:
 `kg_upgrade apply: ["directories", "templates"]`
+
+Example: if Step 0 found `status-schema` and `capture-corruption` pending, both approved:
+`kg_upgrade apply: ["status-schema", "capture-corruption"], confirmMigration: true, confirmBackfix: true`
 
 Example: if Step 0 found `status-schema` pending (alone or combined with other MCP-covered categories):
 `kg_upgrade apply: ["status-schema"], confirmMigration: true`
