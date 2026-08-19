@@ -33459,6 +33459,7 @@ function registerCaptureTool(server2, personalScopeSession2) {
 var fs11 = __toESM(require("fs"));
 var path11 = __toESM(require("path"));
 var os9 = __toESM(require("os"));
+var import_child_process4 = require("child_process");
 
 // src/tools/version.ts
 var pkg = { version: true ? "0.7.0" : "0.0.0" };
@@ -33494,6 +33495,8 @@ var APPLY_ORDER = [
   "stray-knowledge-dir",
   "capture-corruption",
   // issue-46 backfix: content repair, order-independent of the others
+  "diff-blank-reconstruction",
+  // issue-47 backfix: content repair, order-independent of the others
   "platform-split"
 ];
 function parseFrontmatter(filePath) {
@@ -33743,6 +33746,150 @@ function checkDirectories(kgPath) {
       details: `Run with apply: ["directories"] to create them under ${kgPath}`
     }
   ];
+}
+function isInsideGitRepo(kgPath) {
+  try {
+    (0, import_child_process4.execFileSync)("git", ["rev-parse", "--is-inside-work-tree"], { cwd: kgPath, stdio: "pipe" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+function isOnDefaultBranch(branch, defaultBranch) {
+  return branch === defaultBranch || branch.startsWith(`${defaultBranch} `) || branch.startsWith(`${defaultBranch}(`);
+}
+function resolveDefaultBranchForGit(kgPath) {
+  for (const candidate of ["main", "master"]) {
+    try {
+      (0, import_child_process4.execFileSync)("git", ["show-ref", "--verify", "--quiet", `refs/heads/${candidate}`], {
+        cwd: kgPath,
+        stdio: "pipe"
+      });
+      return candidate;
+    } catch {
+    }
+  }
+  return null;
+}
+function isCommitResolvable(kgPath, commitRef) {
+  try {
+    (0, import_child_process4.execFileSync)("git", ["cat-file", "-e", `${commitRef}^{commit}`], { cwd: kgPath, stdio: "pipe" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+function gitMergeBase(kgPath, a, b) {
+  try {
+    return (0, import_child_process4.execFileSync)("git", ["merge-base", a, b], { cwd: kgPath, stdio: "pipe" }).toString().trim();
+  } catch {
+    return null;
+  }
+}
+function gitDiffNameOnly(kgPath, a, b) {
+  try {
+    const out = (0, import_child_process4.execFileSync)("git", ["diff", "--name-only", a, b], { cwd: kgPath, stdio: "pipe" }).toString();
+    return out.split("\n").filter((l) => l.trim().length > 0);
+  } catch {
+    return [];
+  }
+}
+var BACKFIX_SENTINEL = "issue-47 backfix (c2";
+function findBlankDiffSessionFiles(kgPath) {
+  const sessionsDir = path11.join(kgPath, "sessions");
+  const result = { correctlyBlank: 0, reconstructable: [], unresolvable: [] };
+  if (!fs11.existsSync(sessionsDir)) return result;
+  if (!isInsideGitRepo(kgPath)) return result;
+  const defaultBranch = resolveDefaultBranchForGit(kgPath);
+  for (const ym of fs11.readdirSync(sessionsDir)) {
+    const ymDir = path11.join(sessionsDir, ym);
+    if (!fs11.statSync(ymDir).isFile() && fs11.statSync(ymDir).isDirectory()) {
+      for (const entry of fs11.readdirSync(ymDir)) {
+        if (!entry.endsWith(".md") || entry === "README.md") continue;
+        const full = path11.join(ymDir, entry);
+        if (!fs11.statSync(full).isFile()) continue;
+        const fm = parseFrontmatter(full);
+        const branch = fm["branch"];
+        if (!branch) continue;
+        const body = fs11.readFileSync(full, "utf-8");
+        if (body.includes("\u2190 modified this session") || body.includes(BACKFIX_SENTINEL)) continue;
+        if (defaultBranch && isOnDefaultBranch(branch, defaultBranch)) {
+          result.correctlyBlank++;
+          continue;
+        }
+        const commitRef = fm["as_of_commit"] || fm["commit"] || null;
+        const item = { fullPath: full, relName: `${ym}/${entry}`, commitRef, reconstructable: false };
+        if (defaultBranch && commitRef && commitRef !== "TBD" && isCommitResolvable(kgPath, commitRef)) {
+          item.reconstructable = true;
+          result.reconstructable.push(item);
+        } else {
+          result.unresolvable.push(item);
+        }
+      }
+    }
+  }
+  return result;
+}
+function checkDiffBlankReconstruction(kgPath) {
+  const { reconstructable, unresolvable } = findBlankDiffSessionFiles(kgPath);
+  if (reconstructable.length === 0 && unresolvable.length === 0) return [];
+  const parts = [];
+  if (reconstructable.length > 0) parts.push(`${reconstructable.length} session file(s) with a blank "key files modified" section, reconstructable from git history`);
+  if (unresolvable.length > 0) parts.push(`${unresolvable.length} session file(s) with a blank section whose recorded commit is no longer resolvable`);
+  return [{
+    category: "diff-blank-reconstruction",
+    description: `issue-47: ${parts.join("; ")}`,
+    details: `These were captured while HEAD equaled the default branch (pre-branch, e.g. mid spec-drafting), before the git-diff-base fix (issue-47) landed -- "git diff main...HEAD" was silently empty in that state, leaving the section blank with no explanation. Run with apply: ["diff-blank-reconstruction"], confirmBackfix: true to best-effort reconstruct the modified-file list from git history for cases where the recorded commit is still resolvable (via the corrected merge-base logic). Unresolvable cases (deleted branch, gc'd commit) get an explanatory note instead -- never a fabricated file list.`
+  }];
+}
+function backupOnce(fullPath, raw) {
+  const bakPath = `${fullPath}.bak`;
+  if (!fs11.existsSync(bakPath)) fs11.writeFileSync(bakPath, raw, "utf-8");
+}
+function applyDiffBlankReconstruction(kgPath) {
+  const { reconstructable, unresolvable } = findBlankDiffSessionFiles(kgPath);
+  const defaultBranch = resolveDefaultBranchForGit(kgPath);
+  let reconstructedCount = 0;
+  let notedCount = 0;
+  const stamp = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
+  for (const item of unresolvable) {
+    const raw = fs11.readFileSync(item.fullPath, "utf-8");
+    backupOnce(item.fullPath, raw);
+    const reason = !item.commitRef ? "no commit was recorded" : item.commitRef === "TBD" ? 'the recorded commit is still the placeholder "TBD" -- never actually filled in' : !defaultBranch ? `no local main/master branch was found to diff commit ${item.commitRef} against` : `recorded commit ${item.commitRef} is no longer resolvable`;
+    const note = `
+<!-- ${BACKFIX_SENTINEL}, ${stamp}): "key files modified" could not be reconstructed -- ${reason} in local git history. -->
+`;
+    fs11.writeFileSync(item.fullPath, insertAfterExternalFilesHeading(raw, note), "utf-8");
+    notedCount++;
+  }
+  for (const item of reconstructable) {
+    const commitRef = item.commitRef;
+    const mergeBase = gitMergeBase(kgPath, defaultBranch, commitRef);
+    const fileList = mergeBase && mergeBase !== commitRef ? gitDiffNameOnly(kgPath, mergeBase, commitRef) : [];
+    const raw = fs11.readFileSync(item.fullPath, "utf-8");
+    backupOnce(item.fullPath, raw);
+    const block = fileList.length > 0 ? `
+<!-- ${BACKFIX_SENTINEL}, ${stamp}): reconstructed from git history (best-effort) -->
+` + fileList.map((f) => `- \`${f}\` \u2190 modified this session (reconstructed)`).join("\n") + "\n" : `
+<!-- ${BACKFIX_SENTINEL}, ${stamp}): "key files modified" confirmed empty via git history -- no files changed at commit ${commitRef} relative to ${defaultBranch}. -->
+`;
+    fs11.writeFileSync(item.fullPath, insertAfterExternalFilesHeading(raw, block), "utf-8");
+    reconstructedCount++;
+  }
+  return `${reconstructedCount} session file(s) reconstructed, ${notedCount} left with an unresolvable note.`;
+}
+function insertAfterExternalFilesHeading(content, block) {
+  const heading = "**External files:**";
+  const idx = content.indexOf(heading);
+  if (idx === -1) {
+    return content.replace(/\n?$/, `
+
+**External files (issue-47 backfix):**
+${block}`);
+  }
+  const lineEnd = content.indexOf("\n", idx);
+  const insertAt = lineEnd === -1 ? content.length : lineEnd + 1;
+  return content.slice(0, insertAt) + block + content.slice(insertAt);
 }
 function checkConfig(kgPath, graphName) {
   const config2 = readConfig();
@@ -34383,6 +34530,7 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
     result.upgrades.push(...checkTemplates(kgPath));
     result.upgrades.push(...checkStrayKnowledgeDir(kgPath, kgType));
     result.upgrades.push(...checkCaptureCorruption(kgPath));
+    result.upgrades.push(...checkDiffBlankReconstruction(kgPath));
     result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config2, target.name));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
@@ -34466,6 +34614,27 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
         appliedAnyGraphDependent = true;
         break;
       }
+      case "diff-blank-reconstruction": {
+        const mode = resolveInteractionMode({}).mode;
+        const rescan = checkDiffBlankReconstruction(kgPath);
+        const confirmation = rescan.length === 0 ? { confirmed: true } : await confirmBackfixCategory({
+          reasonCode: "diff_blank_reconstruction_backfix",
+          param: "confirmBackfix",
+          mode,
+          confirmed: params.confirmBackfix,
+          timeoutMs: STUB_ASK_TIMEOUT_MS,
+          detail: rescan[0]?.description,
+          skipAsk: pending.length > 0
+        });
+        if (!("confirmed" in confirmation)) {
+          pending.push(confirmation);
+          anyCategoryFailed = true;
+          break;
+        }
+        results.push(`[diff-blank-reconstruction] ${applyDiffBlankReconstruction(kgPath)}`);
+        appliedAnyGraphDependent = true;
+        break;
+      }
       case "platform-split": {
         const mode = resolveInteractionMode({}).mode;
         const confirmation = await confirmBackfixCategory({
@@ -34503,8 +34672,8 @@ function registerUpgradeTool(server2, personalScopeSession2) {
     "kg_upgrade",
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
-      apply: external_exports3.array(external_exports3.enum(["status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption"])).optional().default([]).describe(
-        'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs)'
+      apply: external_exports3.array(external_exports3.enum(["status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction"])).optional().default([]).describe(
+        'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history)'
       ),
       confirm_platform_split: external_exports3.boolean().optional().default(false).describe(
         "Must be true to apply platform-split migration (removes content from rules.md)"
@@ -34534,7 +34703,7 @@ function registerUpgradeTool(server2, personalScopeSession2) {
 var fs12 = __toESM(require("fs"));
 var path12 = __toESM(require("path"));
 var os10 = __toESM(require("os"));
-var import_child_process4 = require("child_process");
+var import_child_process5 = require("child_process");
 function normalizeForCompare(p) {
   const expanded = p.replace(/^~/, os10.homedir());
   try {
@@ -34545,7 +34714,7 @@ function normalizeForCompare(p) {
 }
 function isGitRepo(dirPath) {
   try {
-    (0, import_child_process4.execFileSync)("git", ["rev-parse", "--is-inside-work-tree"], { cwd: dirPath, stdio: "pipe" });
+    (0, import_child_process5.execFileSync)("git", ["rev-parse", "--is-inside-work-tree"], { cwd: dirPath, stdio: "pipe" });
     return true;
   } catch {
     return false;
@@ -34555,7 +34724,7 @@ function getRecencySignal(dirPath, precomputedEntries) {
   if (isGitRepo(dirPath)) {
     try {
       const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1e3).toISOString();
-      const out = (0, import_child_process4.execFileSync)("git", ["log", "--since", since, "--name-only", "--format=", "--", "."], { cwd: dirPath, stdio: "pipe" }).toString();
+      const out = (0, import_child_process5.execFileSync)("git", ["log", "--since", since, "--name-only", "--format=", "--", "."], { cwd: dirPath, stdio: "pipe" }).toString();
       const files = new Set(out.split("\n").map((l) => l.trim()).filter(Boolean));
       return { source: "git", filesTouchedLast30Days: files.size };
     } catch {
@@ -34571,7 +34740,7 @@ function getRecencySignal(dirPath, precomputedEntries) {
 }
 function isGitTracked(dirPath, relPath) {
   try {
-    (0, import_child_process4.execFileSync)("git", ["ls-files", "--error-unmatch", "--", relPath], { cwd: dirPath, stdio: "pipe" });
+    (0, import_child_process5.execFileSync)("git", ["ls-files", "--error-unmatch", "--", relPath], { cwd: dirPath, stdio: "pipe" });
     return true;
   } catch {
     return false;

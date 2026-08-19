@@ -3,6 +3,7 @@ import { z } from "zod";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
+import { execFileSync } from "child_process";
 import {
   readConfig,
   writeConfig,
@@ -56,6 +57,7 @@ const APPLY_ORDER = [
   "templates",
   "stray-knowledge-dir",
   "capture-corruption",   // issue-46 backfix: content repair, order-independent of the others
+  "diff-blank-reconstruction",   // issue-47 backfix: content repair, order-independent of the others
   "platform-split",
 ];
 
@@ -434,6 +436,278 @@ function checkDirectories(kgPath: string): UpgradeItem[] {
       details: `Run with apply: ["directories"] to create them under ${kgPath}`,
     },
   ];
+}
+
+// ── issue-47 backfix: reconstruct blank "key files modified" sections ──────────
+
+/**
+ * True if `kgPath` is inside a git working tree at all. This tool's stated
+ * audience includes MCP-only installs with a non-git KG -- without this
+ * guard, every helper below would fail closed into "no main/master, commit
+ * unresolvable" for every single blank session file, and the category would
+ * mutate every one of them with a false-positive "could not be
+ * reconstructed" note (found in review, 2026-08-18: verified live against a
+ * non-git kgPath).
+ */
+function isInsideGitRepo(kgPath: string): boolean {
+  try {
+    execFileSync("git", ["rev-parse", "--is-inside-work-tree"], { cwd: kgPath, stdio: "pipe" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * True if `branch` should be treated as the resolved default branch --
+ * exact match, or a descriptive-suffix variant real session files actually
+ * carry (found in review, 2026-08-18, against this repo's own KG: e.g.
+ * `main (post-merge; was v0.6.17-...)`). A plain string-equality check
+ * misclassifies these as feature branches and flags them as bug-affected
+ * when they're actually fine.
+ */
+function isOnDefaultBranch(branch: string, defaultBranch: string): boolean {
+  return branch === defaultBranch || branch.startsWith(`${defaultBranch} `) || branch.startsWith(`${defaultBranch}(`);
+}
+
+/**
+ * Resolve the repo's default branch as a local ref, same convention as
+ * agents/session-summary-agent.md and skills/kmg-docs-impact-scan/SKILL.md's
+ * fixed sites (c2, v0.7.2): try `main`, then `master`. Returns null if
+ * neither resolves (not an error -- callers report the specific reason).
+ */
+function resolveDefaultBranchForGit(kgPath: string): string | null {
+  for (const candidate of ["main", "master"]) {
+    try {
+      execFileSync("git", ["show-ref", "--verify", "--quiet", `refs/heads/${candidate}`], {
+        cwd: kgPath,
+        stdio: "pipe",
+      });
+      return candidate;
+    } catch {
+      // not this candidate, try the next
+    }
+  }
+  return null;
+}
+
+/** True if `commitRef` still resolves to a real commit in local git history. */
+function isCommitResolvable(kgPath: string, commitRef: string): boolean {
+  try {
+    execFileSync("git", ["cat-file", "-e", `${commitRef}^{commit}`], { cwd: kgPath, stdio: "pipe" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** `git merge-base a b`, or null if it fails (e.g. unrelated histories). */
+function gitMergeBase(kgPath: string, a: string, b: string): string | null {
+  try {
+    return execFileSync("git", ["merge-base", a, b], { cwd: kgPath, stdio: "pipe" }).toString().trim();
+  } catch {
+    return null;
+  }
+}
+
+/** `git diff --name-only a b`, best-effort -- empty array on failure, never throws. */
+function gitDiffNameOnly(kgPath: string, a: string, b: string): string[] {
+  try {
+    const out = execFileSync("git", ["diff", "--name-only", a, b], { cwd: kgPath, stdio: "pipe" }).toString();
+    return out.split("\n").filter((l) => l.trim().length > 0);
+  } catch {
+    return [];
+  }
+}
+
+interface BlankDiffSessionFile {
+  fullPath: string;
+  relName: string;
+  commitRef: string | null;
+  reconstructable: boolean;
+}
+
+/**
+ * Sentinel marking a session file as already handled by this backfix --
+ * every write path below (reconstructed-with-files, reconstructed-empty,
+ * AND the unresolvable note) includes this exact string in its inserted
+ * comment. Checking for it (not just the file-list marker) is what makes a
+ * second run idempotent: without it, the unresolvable-note and
+ * reconstructed-empty paths wrote no `← modified this session` marker, so
+ * every re-run re-classified the file as still-blank and appended another
+ * note, unbounded (found in review, 2026-08-18 -- verified live: note count
+ * went 1 -> 2 across two runs, and the destructive part -- see below --
+ * made the original content unrecoverable after that).
+ */
+const BACKFIX_SENTINEL = "issue-47 backfix (c2";
+
+/**
+ * Walks sessions/<month>/*.md, classifying each file with a blank "key files
+ * modified" section (no `← modified this session` marker AND no
+ * BACKFIX_SENTINEL anywhere in the body) into: correctly blank (captured on
+ * the default branch -- not a gap), reconstructable (feature branch,
+ * recorded commit still resolvable), or unresolvable (feature branch,
+ * commit gone). Shared by check and apply so the two never disagree on
+ * classification. Returns all-empty immediately if kgPath isn't inside a
+ * git repo at all -- nothing to (mis)classify without git available.
+ */
+function findBlankDiffSessionFiles(kgPath: string): {
+  correctlyBlank: number;
+  reconstructable: BlankDiffSessionFile[];
+  unresolvable: BlankDiffSessionFile[];
+} {
+  const sessionsDir = path.join(kgPath, "sessions");
+  const result = { correctlyBlank: 0, reconstructable: [] as BlankDiffSessionFile[], unresolvable: [] as BlankDiffSessionFile[] };
+  if (!fs.existsSync(sessionsDir)) return result;
+  if (!isInsideGitRepo(kgPath)) return result;
+
+  const defaultBranch = resolveDefaultBranchForGit(kgPath);
+
+  for (const ym of fs.readdirSync(sessionsDir)) {
+    const ymDir = path.join(sessionsDir, ym);
+    if (!fs.statSync(ymDir).isFile() && fs.statSync(ymDir).isDirectory()) {
+      for (const entry of fs.readdirSync(ymDir)) {
+        if (!entry.endsWith(".md") || entry === "README.md") continue;
+        const full = path.join(ymDir, entry);
+        if (!fs.statSync(full).isFile()) continue;
+        const fm = parseFrontmatter(full);
+        const branch = fm["branch"];
+        if (!branch) continue; // no branch recorded -- can't classify, skip rather than guess
+
+        const body = fs.readFileSync(full, "utf-8");
+        if (body.includes("← modified this session") || body.includes(BACKFIX_SENTINEL)) continue; // already populated or already handled by this backfix
+
+        if (defaultBranch && isOnDefaultBranch(branch, defaultBranch)) {
+          result.correctlyBlank++;
+          continue;
+        }
+
+        const commitRef = fm["as_of_commit"] || fm["commit"] || null;
+        const item: BlankDiffSessionFile = { fullPath: full, relName: `${ym}/${entry}`, commitRef, reconstructable: false };
+        // Reconstruction needs BOTH a resolvable commit AND a resolved default
+        // branch to diff against -- without the latter, gitMergeBase() would
+        // be called with a null branch ref and silently fail (found in
+        // review, 2026-08-18: an earlier version of this check omitted the
+        // defaultBranch requirement, letting a git repo with no local
+        // main/master still classify commit-resolvable files as
+        // "reconstructable", which would then render the literal string
+        // "null" into the applied note).
+        if (defaultBranch && commitRef && commitRef !== "TBD" && isCommitResolvable(kgPath, commitRef)) {
+          item.reconstructable = true;
+          result.reconstructable.push(item);
+        } else {
+          result.unresolvable.push(item);
+        }
+      }
+    }
+  }
+  return result;
+}
+
+function checkDiffBlankReconstruction(kgPath: string): UpgradeItem[] {
+  const { reconstructable, unresolvable } = findBlankDiffSessionFiles(kgPath);
+  if (reconstructable.length === 0 && unresolvable.length === 0) return [];
+
+  const parts: string[] = [];
+  if (reconstructable.length > 0) parts.push(`${reconstructable.length} session file(s) with a blank "key files modified" section, reconstructable from git history`);
+  if (unresolvable.length > 0) parts.push(`${unresolvable.length} session file(s) with a blank section whose recorded commit is no longer resolvable`);
+
+  return [{
+    category: "diff-blank-reconstruction",
+    description: `issue-47: ${parts.join("; ")}`,
+    details:
+      `These were captured while HEAD equaled the default branch (pre-branch, e.g. mid ` +
+      `spec-drafting), before the git-diff-base fix (issue-47) landed -- "git diff main...HEAD" ` +
+      `was silently empty in that state, leaving the section blank with no explanation. Run with ` +
+      `apply: ["diff-blank-reconstruction"], confirmBackfix: true to best-effort reconstruct the ` +
+      `modified-file list from git history for cases where the recorded commit is still resolvable ` +
+      `(via the corrected merge-base logic). Unresolvable cases (deleted branch, gc'd commit) get an ` +
+      `explanatory note instead -- never a fabricated file list.`,
+  }];
+}
+
+/**
+ * Apply g — issue-47 backfix. Conservative by construction, mirroring
+ * capture-corruption: a .bak backup is written before any rewrite, and an
+ * unresolvable commit gets an honest note, never a guessed file list. A
+ * reconstruction that finds the historical commit IS the default branch's
+ * merge-base (nothing actually changed, even historically) still counts as
+ * reconstructed -- an explained, git-verified empty list is strictly better
+ * than an unexplained blank.
+ */
+/** Write a .bak backup only if one doesn't already exist -- never clobber an earlier, possibly-original backup with a later, already-mutated write (ADR-063). */
+function backupOnce(fullPath: string, raw: string): void {
+  const bakPath = `${fullPath}.bak`;
+  if (!fs.existsSync(bakPath)) fs.writeFileSync(bakPath, raw, "utf-8");
+}
+
+function applyDiffBlankReconstruction(kgPath: string): string {
+  const { reconstructable, unresolvable } = findBlankDiffSessionFiles(kgPath);
+  const defaultBranch = resolveDefaultBranchForGit(kgPath);
+  let reconstructedCount = 0;
+  let notedCount = 0;
+  const stamp = new Date().toISOString().slice(0, 10);
+
+  for (const item of unresolvable) {
+    const raw = fs.readFileSync(item.fullPath, "utf-8");
+    backupOnce(item.fullPath, raw);
+    const reason = !item.commitRef
+      ? "no commit was recorded"
+      : item.commitRef === "TBD"
+        ? 'the recorded commit is still the placeholder "TBD" -- never actually filled in'
+        : !defaultBranch
+          ? `no local main/master branch was found to diff commit ${item.commitRef} against`
+          : `recorded commit ${item.commitRef} is no longer resolvable`;
+    const note =
+      `\n<!-- ${BACKFIX_SENTINEL}, ${stamp}): "key files modified" could not be reconstructed -- ` +
+      `${reason} in local git history. -->\n`;
+    fs.writeFileSync(item.fullPath, insertAfterExternalFilesHeading(raw, note), "utf-8");
+    notedCount++;
+  }
+
+  for (const item of reconstructable) {
+    const commitRef = item.commitRef as string; // reconstructable implies non-null
+    // defaultBranch is guaranteed non-null here: findBlankDiffSessionFiles only
+    // populates `reconstructable` after resolving it (isInsideGitRepo + a
+    // resolved default branch are both prerequisites for reaching this branch).
+    const mergeBase = gitMergeBase(kgPath, defaultBranch as string, commitRef);
+    const fileList = mergeBase && mergeBase !== commitRef ? gitDiffNameOnly(kgPath, mergeBase, commitRef) : [];
+
+    const raw = fs.readFileSync(item.fullPath, "utf-8");
+    backupOnce(item.fullPath, raw);
+    const block = fileList.length > 0
+      ? `\n<!-- ${BACKFIX_SENTINEL}, ${stamp}): reconstructed from git history (best-effort) -->\n` +
+        fileList.map((f) => `- \`${f}\` ← modified this session (reconstructed)`).join("\n") + "\n"
+      : `\n<!-- ${BACKFIX_SENTINEL}, ${stamp}): "key files modified" confirmed empty via git ` +
+        `history -- no files changed at commit ${commitRef} relative to ${defaultBranch}. -->\n`;
+    fs.writeFileSync(item.fullPath, insertAfterExternalFilesHeading(raw, block), "utf-8");
+    reconstructedCount++;
+  }
+
+  return `${reconstructedCount} session file(s) reconstructed, ${notedCount} left with an unresolvable note.`;
+}
+
+/**
+ * Insert `block` immediately after the FULL LINE containing the
+ * "**External files:**" heading, if present; otherwise append it at the end
+ * of the file with its own heading, so the note is never silently dropped
+ * just because a file predates that section existing.
+ *
+ * Splicing right after the heading substring (not the end of its line) is
+ * wrong when the heading has inline content on the same line -- e.g.
+ * `**External files:** none this session` -- which orphans " none this
+ * session" onto its own line below the inserted block (found in review,
+ * 2026-08-18, verified live). Find the end of that line instead.
+ */
+function insertAfterExternalFilesHeading(content: string, block: string): string {
+  const heading = "**External files:**";
+  const idx = content.indexOf(heading);
+  if (idx === -1) {
+    return content.replace(/\n?$/, `\n\n**External files (issue-47 backfix):**\n${block}`);
+  }
+  const lineEnd = content.indexOf("\n", idx);
+  const insertAt = lineEnd === -1 ? content.length : lineEnd + 1;
+  return content.slice(0, insertAt) + block + content.slice(insertAt);
 }
 
 /**
@@ -1277,11 +1551,11 @@ function updateLastAppliedVersion(installedVersion: string, graphName: string): 
 // as excluded — otherwise the wizard will wrongly add it to `_mcp_apply[]` and Zod
 // will reject the whole apply call (issue-51). Conversely, if a new category IS
 // added here and is gated on the shared `confirmBackfix` boolean (like
-// "capture-corruption"), review kmg-upgrade-inspector.md's confirmBackfix wiring:
-// that boolean is per-call, not per-category, so a call consenting to one
-// confirmBackfix-gated category silently also consents to any other one present
-// in the same `apply: [...]` array.
-export type ApplyCategory = "status-schema" | "config-location" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir" | "capture-corruption";
+// "capture-corruption" and, as of issue-47, "diff-blank-reconstruction"), review
+// kmg-upgrade-inspector.md's confirmBackfix wiring: that boolean is per-call, not
+// per-category, so a call consenting to one confirmBackfix-gated category silently
+// also consents to any other one present in the same `apply: [...]` array.
+export type ApplyCategory = "status-schema" | "config-location" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir" | "capture-corruption" | "diff-blank-reconstruction";
 
 export interface HandleUpgradeParams {
   apply?: ApplyCategory[];
@@ -1383,6 +1657,7 @@ export async function handleUpgrade(
     result.upgrades.push(...checkTemplates(kgPath));
     result.upgrades.push(...checkStrayKnowledgeDir(kgPath, kgType));
     result.upgrades.push(...checkCaptureCorruption(kgPath));
+    result.upgrades.push(...checkDiffBlankReconstruction(kgPath));
     result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config, target.name));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
@@ -1503,6 +1778,38 @@ export async function handleUpgrade(
         appliedAnyGraphDependent = true;
         break;
       }
+      case "diff-blank-reconstruction": {
+        // c2 (issue-47): same shared backfix gate as capture-corruption,
+        // same shared confirmBackfix param -- see the orchestration plan's
+        // handoff note under v0.7.2-c5-update-patch-plan.md for why this
+        // reuses c5's gate rather than inventing a second one-off mechanism.
+        // Safe to skip the ask (not the underlying apply call) when nothing
+        // is found: findBlankDiffSessionFiles() is the SAME function both
+        // check and apply call, so unlike platform-split's now-reverted
+        // attempt at this optimization, there is no possibility of the two
+        // guards silently diverging -- they are literally the same scan.
+        const mode = resolveInteractionMode({}).mode;
+        const rescan = checkDiffBlankReconstruction(kgPath);
+        const confirmation = rescan.length === 0
+          ? { confirmed: true as const }
+          : await confirmBackfixCategory({
+              reasonCode: "diff_blank_reconstruction_backfix",
+              param: "confirmBackfix",
+              mode,
+              confirmed: params.confirmBackfix,
+              timeoutMs: STUB_ASK_TIMEOUT_MS,
+              detail: rescan[0]?.description,
+              skipAsk: pending.length > 0,
+            });
+        if (!("confirmed" in confirmation)) {
+          pending.push(confirmation);
+          anyCategoryFailed = true;
+          break;
+        }
+        results.push(`[diff-blank-reconstruction] ${applyDiffBlankReconstruction(kgPath)}`);
+        appliedAnyGraphDependent = true;
+        break;
+      }
       case "platform-split": {
         // c5: migrated from a boolean-flag-only check onto the shared
         // backfix gate for consistency with capture-corruption/status-
@@ -1586,11 +1893,11 @@ export function registerUpgradeTool(server: McpServer, personalScopeSession: Per
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
       apply: z
-        .array(z.enum(["status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption"]))
+        .array(z.enum(["status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction"]))
         .optional()
         .default([])
         .describe(
-          'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs)'
+          'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history)'
         ),
       confirm_platform_split: z
         .boolean()
