@@ -51,7 +51,7 @@ The tool returns:
 
 **Parse `upgrades[]`:**
 - For each entry: add its `description` to the wizard's pending items display.
-- For each entry with `category` in `["directories", "config", "templates", "starter-relocation", "stray-knowledge-dir", "status-schema"]`: add the deduplicated `category` value to `_mcp_apply[]` (dedup: only add if not already present) and set its per-category tracking flag in your context:
+- For each entry whose `category` is neither `"version-update"` nor `"resolution"` (both handled separately below, and neither is a member of `kg_upgrade`'s apply enum): add the deduplicated `category` value to `_mcp_apply[]` (dedup: only add if not already present), then set its per-category tracking flag in your context if one is listed for it below — categories with no flag listed (e.g. `config-location`, `capture-corruption`) simply don't set one:
   - `"directories"` → `_mcp_covered_directories=true`
   - `"config"` → `_mcp_covered_config=true`
   - `"templates"` → `_mcp_covered_templates=true`
@@ -59,6 +59,7 @@ The tool returns:
   - `"stray-knowledge-dir"` → `_mcp_covered_stray_knowledge_dir=true`
   - `"status-schema"` → `_mcp_covered_status_schema=true` (ADR-067 Task 8.1: reconciles the legacy `.active`/schema-less registry shape and removes the leftover legacy config file; see the confirmMigration note under "Apply MCP-covered items first" below)
 - If `category` is `"version-update"`: display the description as an informational item but do NOT add to `_mcp_apply[]` and do NOT set a tracking flag — it is inspect-only and cannot be applied via `kg_upgrade apply`.
+- If `category` is `"resolution"`: display the description as an informational item but do NOT add to `_mcp_apply[]` and do NOT set a tracking flag — it is a resolution-failure marker, not a member of the apply enum, and cannot be applied via `kg_upgrade apply`.
 
 These per-category flags are **LLM-tracked state variables** — they are tracked in your context across bash block invocations in this module, not as shell variables. Each guarded bash block below begins with a prose instruction ("Only run if `_mcp_covered_X` is not set") that is the actual gate.
 
@@ -328,7 +329,9 @@ If the user picks option 3 (skip), exit with no changes.
 
 Call `kg_upgrade apply: [<_mcp_apply contents>]`. **If `_mcp_apply[]` contains `"status-schema"`, the same call must also pass `confirmMigration: true`** — the wizard's own consent step (the item's description was already shown in the pending-items list above, and the user chose "Apply all" or explicitly approved this item under "choose individually") satisfies `kg_upgrade`'s consent gate for this migration; without `confirmMigration: true` the tool call will fail with `KMG_INPUT_REQUIRED` even though the user already agreed.
 
-`_mcp_apply[]` may only contain values from the valid apply enum: `"directories"`, `"config"`, `"templates"`, `"starter-relocation"`, `"stray-knowledge-dir"`, `"status-schema"`. Never include `"version-update"` or `"platform-split"` — these will cause Zod validation to reject the entire call.
+**If `_mcp_apply[]` contains `"capture-corruption"`, the same call must also pass `confirmBackfix: true`** — the wizard's own consent step (the item's description was already shown in the pending-items list above, and the user chose "Apply all" or explicitly approved this item under "choose individually") satisfies `kg_upgrade`'s consent gate for this backfix; without it the tool call will fail even though the user already agreed.
+
+`_mcp_apply[]` may contain any category returned by `kg_upgrade inspect` except `"version-update"` and `"resolution"` — neither is a member of the apply enum, and including either will cause Zod validation to reject the entire call. `"platform-split"` IS a valid apply-enum member but is never a candidate here in practice: `kg_upgrade inspect` reports it under `warnings[]`, not `upgrades[]` (see the `warnings[]` handling note above), so Step 0's loop over `upgrades[]` never encounters it — do not add it here manually.
 
 Example: if Step 0 found `directories` and `templates` pending:
 `kg_upgrade apply: ["directories", "templates"]`

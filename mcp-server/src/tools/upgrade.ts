@@ -1347,6 +1347,14 @@ export async function handleUpgrade(
     result.upgrades.push(...checkConfigLocation());
 
     if ("error" in target) {
+      // DRIFT GUARD (issue-51): "resolution" is pushed into upgrades[] but is NOT a
+      // member of ApplyCategory (see the type declaration above) or the apply Zod
+      // enum in registerUpgradeTool — same for "version-update". Any FUTURE category
+      // routed into upgrades[] that is likewise not an apply-enum member MUST also be
+      // added to the deny-list in commands/kmg-init-shared/kmg-upgrade-inspector.md
+      // (Step 0's parse loop and the apply-construction note). Miss it and
+      // /kmgraph:kmg-init builds an apply: [...] call that Zod rejects wholesale,
+      // failing the user's legitimate fixes too.
       result.upgrades.push({
         category: "resolution",
         description: target.error,
