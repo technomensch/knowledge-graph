@@ -2176,6 +2176,71 @@ describe("capture-corruption — real-shape false-positive guard (CRITICAL #1 re
     expect(fs.existsSync(bakPath)).toBe(true);
     expect(fs.readFileSync(bakPath, "utf-8")).toBe(original);
   });
+
+  test("regression (Opus review, 2026-08-19): an existing .bak is never clobbered (ADR-063 backupOnce)", async () => {
+    // capture-corruption's pass 1 used a bare writeFileSync for its backup,
+    // unlike diff-blank-reconstruction and plan-status-drift which both go
+    // through backupOnce(). Those categories share write targets under
+    // sessions/ and run in separate invocations as often as together, so an
+    // unconditional write here overwrote a .bak holding the TRUE original
+    // with content a sibling category had already mutated — the exact
+    // unrecoverable-original failure the 2026-08-18 BLOCKER fix closed on the
+    // issue-47 side.
+    const kgRoot = makeTempDir("cc-bak-not-clobbered");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const filePath = path.join(sessionsYm, "2026-08-16-main.md");
+    const trueOriginal = "---\ntitle: TRUE ORIGINAL\n---\n\n## Body\n";
+    // Stand in for "an earlier category already backed this file up, then
+    // rewrote it": .bak holds the pristine original, the live file is the
+    // already-mutated (here, doubled-frontmatter) content.
+    fs.writeFileSync(`${filePath}.bak`, trueOriginal, "utf-8");
+    fs.writeFileSync(
+      filePath,
+      '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\nas_of_commit: abc1234\n---\n\n## Body\n',
+      "utf-8"
+    );
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("1 frontmatter block(s) merged");
+    // The merge still happened...
+    expect(fs.readFileSync(filePath, "utf-8")).toContain("as_of_commit: abc1234");
+    // ...but the pre-existing backup still holds the true original.
+    expect(fs.readFileSync(`${filePath}.bak`, "utf-8")).toBe(trueOriginal);
+  });
+
+  test("regression (Opus review, 2026-08-19): a dangling symlink under sessions/ does not crash capture-corruption", async () => {
+    const kgRoot = makeTempDir("cc-dangling-symlink");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const filePath = path.join(sessionsYm, "2026-08-16-main.md");
+    const original =
+      '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\nas_of_commit: abc1234\n---\n\n## Body\n';
+    fs.writeFileSync(filePath, original, "utf-8");
+    // readdirSync lists these, statSync/readFileSync throw ENOENT on them.
+    // Before the fix, one such entry crashed the whole kg_upgrade call.
+    fs.symlinkSync(path.join(sessionsYm, "nope.md"), path.join(sessionsYm, "dangling.md"));
+    fs.symlinkSync(path.join(kgRoot, "sessions", "nope-dir"), path.join(kgRoot, "sessions", "2026-07"));
+
+    const inspect = await handleUpgrade({});
+    const parsed = JSON.parse(inspect.content[0].text);
+    // The real finding still surfaces — bad entries skipped, scan not aborted.
+    expect(
+      (parsed.upgrades as Array<{ category: string }>).find((u) => u.category === "capture-corruption")
+    ).toBeDefined();
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
+    expect(result.isError).toBeFalsy();
+    expect(fs.readFileSync(filePath, "utf-8")).toContain("as_of_commit: abc1234");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -2741,6 +2806,134 @@ describe("c2: diff-blank-reconstruction (issue-47 backfix)", () => {
     // into reconstructable/unresolvable and rewritten.
     expect(result.content[0].text).toContain("0 session file(s) reconstructed, 0 left");
     expect(fs.readFileSync(sessFile, "utf-8")).toBe(content); // untouched
+  });
+
+  test("regression (Opus review, 2026-08-19): a repo whose default branch is neither main nor master mutates NOTHING", async () => {
+    // resolveDefaultBranchForGit() only tries main/master by project
+    // convention. In a `trunk`-default repo it returns null, and before the
+    // fix that null poisoned every classification at once: isOnDefaultBranch()
+    // could never match (so a correctly-blank file captured on trunk was NOT
+    // counted as correctly blank), and the reconstructable test required a
+    // non-null defaultBranch (so it always failed too). Every blank session
+    // file in the repo therefore landed in unresolvable[] and had a false
+    // "could not be reconstructed" note written into it. Skipping entirely is
+    // the same posture as the non-git case above.
+    const kgRoot = makeTempDir("c2-trunk-default");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    execSync("git init -q -b trunk", { cwd: kgRoot });
+    execSync('git config user.email t@t.com && git config user.name t', { cwd: kgRoot });
+    fs.writeFileSync(path.join(kgRoot, "seed.md"), "seed", "utf-8");
+    execSync("git add seed.md && git commit -q -m seed", { cwd: kgRoot });
+    const trunkSha = execSync("git rev-parse HEAD", { cwd: kgRoot }).toString().trim();
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    // Correctly blank: captured on the repo's actual default branch.
+    const onDefault = path.join(sessionsYm, "2026-08-18-trunk.md");
+    const onDefaultContent =
+      `---\ntitle: "trunk"\nbranch: trunk\ncommit: ${trunkSha}\n---\n\n**External files:**\n- none this session\n`;
+    fs.writeFileSync(onDefault, onDefaultContent, "utf-8");
+    // A genuine feature-branch file too — also untouchable, since there is no
+    // resolvable base to diff it against.
+    const onFeature = path.join(sessionsYm, "2026-08-18-feat.md");
+    const onFeatureContent =
+      `---\ntitle: "feat"\nbranch: some-feature\ncommit: ${trunkSha}\n---\n\n**External files:**\n- none this session\n`;
+    fs.writeFileSync(onFeature, onFeatureContent, "utf-8");
+
+    const inspect = await handleUpgrade({});
+    const parsed = JSON.parse(inspect.content[0].text);
+    expect(
+      (parsed.upgrades as Array<{ category: string }>).find((u) => u.category === "diff-blank-reconstruction")
+    ).toBeUndefined();
+
+    const result = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("0 session file(s) reconstructed, 0 left");
+    expect(fs.readFileSync(onDefault, "utf-8")).toBe(onDefaultContent);
+    expect(fs.readFileSync(onFeature, "utf-8")).toBe(onFeatureContent);
+    expect(fs.existsSync(`${onDefault}.bak`)).toBe(false);
+    expect(fs.existsSync(`${onFeature}.bak`)).toBe(false);
+  });
+
+  test("regression (Opus review, 2026-08-19): a failed merge-base is reported as a failure, never as 'confirmed empty via git history'", async () => {
+    // An orphan branch shares no history with main, so `git merge-base main
+    // <orphanSha>` exits non-zero and gitMergeBase() returns null. Before the
+    // fix, null merge-base collapsed into fileList = [] alongside the
+    // legitimate "git ran and found nothing" case, and the empty branch wrote
+    // a factually false "confirmed empty via git history -- no files changed"
+    // claim into the user's session file. git failing to answer is not
+    // evidence of an empty diff.
+    const kgRoot = makeTempDir("c2-unrelated-histories");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    gitInit(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "seed.md"), "seed", "utf-8");
+    execSync("git add seed.md && git commit -q -m seed", { cwd: kgRoot });
+    execSync("git checkout -q --orphan orphan-feature", { cwd: kgRoot });
+    fs.writeFileSync(path.join(kgRoot, "orphan.md"), "orphan", "utf-8");
+    execSync("git add orphan.md && git commit -q -m orphan", { cwd: kgRoot });
+    const orphanSha = execSync("git rev-parse HEAD", { cwd: kgRoot }).toString().trim();
+    execSync("git checkout -q main", { cwd: kgRoot });
+    // Precondition for this test to mean anything: the commit IS resolvable
+    // (so the file classifies as reconstructable) but has no merge base.
+    expect(() => execSync(`git merge-base main ${orphanSha}`, { cwd: kgRoot, stdio: "pipe" })).toThrow();
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const sessFile = path.join(sessionsYm, "2026-08-18-orphan.md");
+    const content =
+      `---\ntitle: "orphan"\nbranch: orphan-feature\ncommit: ${orphanSha}\n---\n\n**External files:**\n- none this session\n`;
+    fs.writeFileSync(sessFile, content, "utf-8");
+
+    const result = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("0 session file(s) reconstructed, 1 left with an unresolvable note.");
+    const after = fs.readFileSync(sessFile, "utf-8");
+    expect(after).toContain("could not be reconstructed");
+    expect(after).toContain("no merge base");
+    expect(after).not.toContain("confirmed empty via git");
+    expect(after).not.toContain("← modified this session (reconstructed)");
+    expect(fs.readFileSync(`${sessFile}.bak`, "utf-8")).toBe(content);
+  });
+
+  test("regression (Opus review, 2026-08-19): a dangling symlink under sessions/ does not crash the scan", async () => {
+    const kgRoot = makeTempDir("c2-dangling-symlink");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    gitInit(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "seed.md"), "seed", "utf-8");
+    execSync("git add seed.md && git commit -q -m seed", { cwd: kgRoot });
+    execSync("git checkout -q -b feature", { cwd: kgRoot });
+    fs.writeFileSync(path.join(kgRoot, "changed.md"), "changed", "utf-8");
+    execSync("git add changed.md && git commit -q -m changed", { cwd: kgRoot });
+    const featureSha = execSync("git rev-parse HEAD", { cwd: kgRoot }).toString().trim();
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const sessFile = path.join(sessionsYm, "2026-08-18-feature.md");
+    fs.writeFileSync(
+      sessFile,
+      `---\ntitle: "feature"\nbranch: feature\ncommit: ${featureSha}\n---\n\n**External files:**\n- none this session\n`,
+      "utf-8"
+    );
+    // readdirSync lists these, but statSync/readFileSync throw ENOENT. Before
+    // the fix the unguarded stat/read took down the ENTIRE kg_upgrade call,
+    // discarding every finding accumulated before it.
+    fs.symlinkSync(path.join(sessionsYm, "nope.md"), path.join(sessionsYm, "dangling.md"));
+    fs.symlinkSync(path.join(kgRoot, "sessions", "nope-dir"), path.join(kgRoot, "sessions", "2026-07"));
+
+    const inspect = await handleUpgrade({});
+    const parsed = JSON.parse(inspect.content[0].text);
+    // The real finding still surfaces — the bad entries were skipped, not
+    // treated as a reason to abort.
+    expect(
+      (parsed.upgrades as Array<{ category: string }>).find((u) => u.category === "diff-blank-reconstruction")
+    ).toBeDefined();
+
+    const result = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("1 session file(s) reconstructed, 0 left");
   });
 });
 

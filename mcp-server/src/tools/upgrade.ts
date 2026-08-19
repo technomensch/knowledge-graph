@@ -232,13 +232,36 @@ function deDoubledFilename(entry: string): string | null {
   return null;
 }
 
+/** statSync().isDirectory() that answers false instead of throwing for an
+ *  entry that can't be stat'ed at all -- a dangling symlink, a
+ *  permission-denied entry, or one that vanished between readdir and stat.
+ *  Same fail-safe posture plan-status-drift's scan already takes (Opus
+ *  review, 2026-08-19): one bad directory entry must never crash an entire
+ *  inspect/apply call and discard every result accumulated before it. */
+function isDirectorySafe(fullPath: string): boolean {
+  try {
+    return fs.statSync(fullPath).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+/** As above, for the isFile() side. */
+function isFileSafe(fullPath: string): boolean {
+  try {
+    return fs.statSync(fullPath).isFile();
+  } catch {
+    return false;
+  }
+}
+
 function captureCorruptionDirs(kgPath: string): string[] {
   const dirs: string[] = [];
   const sessionsRoot = path.join(kgPath, "sessions");
   if (fs.existsSync(sessionsRoot)) {
     for (const ym of fs.readdirSync(sessionsRoot)) {
       const full = path.join(sessionsRoot, ym);
-      if (fs.statSync(full).isDirectory()) dirs.push(full);
+      if (isDirectorySafe(full)) dirs.push(full);
     }
   }
   const decisionsRoot = path.join(kgPath, "decisions");
@@ -247,7 +270,7 @@ function captureCorruptionDirs(kgPath: string): string[] {
   if (fs.existsSync(lessonsRoot)) {
     for (const cat of fs.readdirSync(lessonsRoot)) {
       const full = path.join(lessonsRoot, cat);
-      if (fs.statSync(full).isDirectory()) dirs.push(full);
+      if (isDirectorySafe(full)) dirs.push(full);
     }
   }
   return dirs;
@@ -270,9 +293,13 @@ function checkCaptureCorruption(kgPath: string): UpgradeItem[] {
       if (deDoubledFilename(entry)) doubledFilenames++;
       else if (NEAR_DOUBLED_DATE_FILENAME.test(entry)) nearDoubledFilenames++;
       const full = path.join(dir, entry);
-      if (!fs.statSync(full).isFile()) continue;
-      const lines = fs.readFileSync(full, "utf-8").split("\n");
-      if (detectDoubledFrontmatter(lines)) doubledFrontmatter++;
+      if (!isFileSafe(full)) continue;
+      try {
+        const lines = fs.readFileSync(full, "utf-8").split("\n");
+        if (detectDoubledFrontmatter(lines)) doubledFrontmatter++;
+      } catch {
+        continue; // unreadable (permissions, vanished mid-scan) -- skip, don't let one bad file break the whole inspect
+      }
     }
   }
 
@@ -334,8 +361,13 @@ function applyCaptureCorruption(kgPath: string): string {
     for (const entry of fs.readdirSync(dir)) {
       if (!entry.endsWith(".md")) continue;
       const full = path.join(dir, entry);
-      if (!fs.statSync(full).isFile()) continue;
-      const raw = fs.readFileSync(full, "utf-8");
+      if (!isFileSafe(full)) continue;
+      let raw: string;
+      try {
+        raw = fs.readFileSync(full, "utf-8");
+      } catch {
+        continue; // unreadable (permissions, vanished mid-scan) -- skip, don't let one bad file abort the whole apply
+      }
       const lines = raw.split("\n");
       const doubled = detectDoubledFrontmatter(lines);
       if (!doubled) continue;
@@ -346,7 +378,14 @@ function applyCaptureCorruption(kgPath: string): string {
       }
       const rest = lines.slice(doubled.block2.endLine + 1);
       const newContent = [...result.mergedLines, ...rest].join("\n");
-      fs.writeFileSync(`${full}.bak`, raw, "utf-8");
+      // backupOnce, NOT a bare writeFileSync (Opus review, 2026-08-19): this
+      // is the same ADR-063 never-clobber-an-earlier-backup rule that
+      // diff-blank-reconstruction and plan-status-drift already follow. The
+      // categories share write targets under sessions/ and are applied in
+      // separate runs as often as together, so an unconditional write here
+      // would overwrite a .bak holding the true original with content another
+      // category had already mutated -- making the original unrecoverable.
+      backupOnce(full, raw);
       fs.writeFileSync(full, newContent, "utf-8");
       mergedCount++;
     }
@@ -406,7 +445,10 @@ function applyCaptureCorruption(kgPath: string): string {
   }
 
   const parts = [
-    `${mergedCount} frontmatter block(s) merged` + (mergedCount > 0 ? " (.bak backup written for each)" : ""),
+    // "kept" not "written": backupOnce() leaves an existing .bak in place
+    // rather than overwriting it, so the guarantee is that a backup exists —
+    // not that this run is the one that created it.
+    `${mergedCount} frontmatter block(s) merged` + (mergedCount > 0 ? " (.bak backup kept for each)" : ""),
     `${renamedCount} filename(s) de-duplicated`,
     `${readmeLinksFixed} README link(s) repointed`,
   ];
@@ -511,13 +553,20 @@ function gitMergeBase(kgPath: string, a: string, b: string): string | null {
   }
 }
 
-/** `git diff --name-only a b`, best-effort -- empty array on failure, never throws. */
-function gitDiffNameOnly(kgPath: string, a: string, b: string): string[] {
+/**
+ * `git diff --name-only a b`. Returns null when git could not answer at all,
+ * NOT an empty array (Opus review, 2026-08-19): the caller writes a factual
+ * "confirmed empty via git history" claim into the user's session file on an
+ * empty list, so "git ran and found no changed files" and "git failed" must
+ * stay distinguishable -- collapsing them made a failed diff get recorded as
+ * verified fact. Never throws.
+ */
+function gitDiffNameOnly(kgPath: string, a: string, b: string): string[] | null {
   try {
     const out = execFileSync("git", ["diff", "--name-only", a, b], { cwd: kgPath, stdio: "pipe" }).toString();
     return out.split("\n").filter((l) => l.trim().length > 0);
   } catch {
-    return [];
+    return null;
   }
 }
 
@@ -563,37 +612,47 @@ function findBlankDiffSessionFiles(kgPath: string): {
   if (!isInsideGitRepo(kgPath)) return result;
 
   const defaultBranch = resolveDefaultBranchForGit(kgPath);
+  // Same fail-safe as the isInsideGitRepo guard above (Opus review,
+  // 2026-08-19). Without a resolved default branch -- a repo whose default is
+  // `trunk`/`develop`/`dev`, or one with no commits yet -- NOTHING here is
+  // classifiable: isOnDefaultBranch() can never match, so a session file
+  // captured on `trunk` and correctly blank would be misfiled as
+  // `unresolvable` and have a false "could not be reconstructed" note written
+  // into it, and the reconstructable test can never pass either, so EVERY
+  // blank session file in the repo would be mutated. Skipping matches the
+  // stated project convention for this exact case (skills/
+  // kmg-docs-impact-scan/SKILL.md step 1: "if neither resolves ... report
+  // skipped -- do not error").
+  if (!defaultBranch) return result;
 
   for (const ym of fs.readdirSync(sessionsDir)) {
     const ymDir = path.join(sessionsDir, ym);
-    if (!fs.statSync(ymDir).isFile() && fs.statSync(ymDir).isDirectory()) {
+    if (isDirectorySafe(ymDir)) {
       for (const entry of fs.readdirSync(ymDir)) {
         if (!entry.endsWith(".md") || entry === "README.md") continue;
         const full = path.join(ymDir, entry);
-        if (!fs.statSync(full).isFile()) continue;
-        const fm = parseFrontmatter(full);
+        if (!isFileSafe(full)) continue;
+        let fm: Record<string, string>;
+        let body: string;
+        try {
+          fm = parseFrontmatter(full);
+          body = fs.readFileSync(full, "utf-8");
+        } catch {
+          continue; // unreadable (permissions, vanished mid-scan) -- skip, don't let one bad file break the whole scan
+        }
         const branch = fm["branch"];
         if (!branch) continue; // no branch recorded -- can't classify, skip rather than guess
 
-        const body = fs.readFileSync(full, "utf-8");
         if (body.includes("← modified this session") || body.includes(BACKFIX_SENTINEL)) continue; // already populated or already handled by this backfix
 
-        if (defaultBranch && isOnDefaultBranch(branch, defaultBranch)) {
+        if (isOnDefaultBranch(branch, defaultBranch)) {
           result.correctlyBlank++;
           continue;
         }
 
         const commitRef = fm["as_of_commit"] || fm["commit"] || null;
         const item: BlankDiffSessionFile = { fullPath: full, relName: `${ym}/${entry}`, commitRef, reconstructable: false };
-        // Reconstruction needs BOTH a resolvable commit AND a resolved default
-        // branch to diff against -- without the latter, gitMergeBase() would
-        // be called with a null branch ref and silently fail (found in
-        // review, 2026-08-18: an earlier version of this check omitted the
-        // defaultBranch requirement, letting a git repo with no local
-        // main/master still classify commit-resolvable files as
-        // "reconstructable", which would then render the literal string
-        // "null" into the applied note).
-        if (defaultBranch && commitRef && commitRef !== "TBD" && isCommitResolvable(kgPath, commitRef)) {
+        if (commitRef && commitRef !== "TBD" && isCommitResolvable(kgPath, commitRef)) {
           item.reconstructable = true;
           result.reconstructable.push(item);
         } else {
@@ -649,20 +708,23 @@ function applyDiffBlankReconstruction(kgPath: string): string {
   let notedCount = 0;
   const stamp = new Date().toISOString().slice(0, 10);
 
+  /** The single honest-failure note shape, shared by both loops below. */
+  const unresolvableNote = (reason: string): string =>
+    `\n<!-- ${BACKFIX_SENTINEL}, ${stamp}): "key files modified" could not be reconstructed -- ` +
+    `${reason} in local git history. -->\n`;
+
   for (const item of unresolvable) {
     const raw = fs.readFileSync(item.fullPath, "utf-8");
     backupOnce(item.fullPath, raw);
+    // No `!defaultBranch` arm here: findBlankDiffSessionFiles now returns an
+    // all-empty result when the default branch doesn't resolve, so both lists
+    // are empty in that case and this loop never runs.
     const reason = !item.commitRef
       ? "no commit was recorded"
       : item.commitRef === "TBD"
         ? 'the recorded commit is still the placeholder "TBD" -- never actually filled in'
-        : !defaultBranch
-          ? `no local main/master branch was found to diff commit ${item.commitRef} against`
-          : `recorded commit ${item.commitRef} is no longer resolvable`;
-    const note =
-      `\n<!-- ${BACKFIX_SENTINEL}, ${stamp}): "key files modified" could not be reconstructed -- ` +
-      `${reason} in local git history. -->\n`;
-    fs.writeFileSync(item.fullPath, insertAfterExternalFilesHeading(raw, note), "utf-8");
+        : `recorded commit ${item.commitRef} is no longer resolvable`;
+    fs.writeFileSync(item.fullPath, insertAfterExternalFilesHeading(raw, unresolvableNote(reason)), "utf-8");
     notedCount++;
   }
 
@@ -672,17 +734,41 @@ function applyDiffBlankReconstruction(kgPath: string): string {
     // populates `reconstructable` after resolving it (isInsideGitRepo + a
     // resolved default branch are both prerequisites for reaching this branch).
     const mergeBase = gitMergeBase(kgPath, defaultBranch as string, commitRef);
-    const fileList = mergeBase && mergeBase !== commitRef ? gitDiffNameOnly(kgPath, mergeBase, commitRef) : [];
+    // Three distinct outcomes that must NOT collapse into one (Opus review,
+    // 2026-08-19): null = git could not answer (no merge-base -- unrelated
+    // histories -- or the diff itself failed), which is a failure and gets an
+    // honest note; [] = git answered "nothing changed", which is a verified
+    // fact and may be written as one. The old single-expression form folded
+    // both git-failure paths into [] and then asserted "confirmed empty via
+    // git history" over them.
+    const fileList: string[] | null =
+      mergeBase === null
+        ? null
+        : mergeBase === commitRef
+          ? [] // commit IS the merge-base: genuinely nothing diverged, no diff needed
+          : gitDiffNameOnly(kgPath, mergeBase, commitRef);
 
     const raw = fs.readFileSync(item.fullPath, "utf-8");
     backupOnce(item.fullPath, raw);
-    const block = fileList.length > 0
-      ? `\n<!-- ${BACKFIX_SENTINEL}, ${stamp}): reconstructed from git history (best-effort) -->\n` +
-        fileList.map((f) => `- \`${f}\` ← modified this session (reconstructed)`).join("\n") + "\n"
-      : `\n<!-- ${BACKFIX_SENTINEL}, ${stamp}): "key files modified" confirmed empty via git ` +
+    let block: string;
+    if (fileList === null) {
+      const reason = mergeBase === null
+        ? `no merge base between ${defaultBranch} and commit ${commitRef} could be computed (unrelated histories?)`
+        : `"git diff" against the merge base of ${defaultBranch} and commit ${commitRef} failed`;
+      block = unresolvableNote(reason);
+      notedCount++;
+    } else if (fileList.length > 0) {
+      block =
+        `\n<!-- ${BACKFIX_SENTINEL}, ${stamp}): reconstructed from git history (best-effort) -->\n` +
+        fileList.map((f) => `- \`${f}\` ← modified this session (reconstructed)`).join("\n") + "\n";
+      reconstructedCount++;
+    } else {
+      block =
+        `\n<!-- ${BACKFIX_SENTINEL}, ${stamp}): "key files modified" confirmed empty via git ` +
         `history -- no files changed at commit ${commitRef} relative to ${defaultBranch}. -->\n`;
+      reconstructedCount++;
+    }
     fs.writeFileSync(item.fullPath, insertAfterExternalFilesHeading(raw, block), "utf-8");
-    reconstructedCount++;
   }
 
   return `${reconstructedCount} session file(s) reconstructed, ${notedCount} left with an unresolvable note.`;
@@ -2054,7 +2140,7 @@ export async function handleUpgrade(
       result.upgrades.push({
         category: "resolution",
         description: target.error,
-        details: "Graph-dependent checks (directories, config, templates, stray-knowledge-dir, version-update) were skipped.",
+        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, version-update, and the platform-split warning) were skipped.",
       });
       return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
     }
@@ -2079,7 +2165,7 @@ export async function handleUpgrade(
       result.upgrades.push({
         category: "resolution",
         description: `KG path not found: ${kgPath}`,
-        details: "Graph-dependent checks (directories, config, templates, stray-knowledge-dir, version-update) were skipped.",
+        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, version-update, and the platform-split warning) were skipped.",
       });
       return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
     }
@@ -2098,9 +2184,11 @@ export async function handleUpgrade(
   }
 
   const results: string[] = [];
-  // c5 (v0.7.2) BLOCKER fix: an unconfirmed backfix category (capture-
-  // corruption, platform-split -- both LAST in APPLY_ORDER) must not
-  // discard earlier categories' already-accumulated `results` text. Each
+  // c5 (v0.7.2) BLOCKER fix: an unconfirmed backfix category (plan-status-
+  // drift, capture-corruption, diff-blank-reconstruction, platform-split --
+  // all four gated categories, at varying positions in APPLY_ORDER, so one
+  // can and does land ahead of categories that apply successfully after it)
+  // must not discard earlier categories' already-accumulated `results`. Each
   // pending InputRequiredError goes here instead of into `results`, and is
   // emitted as its own separate content block below, so it stays
   // independently JSON.parse-able and the prose report survives intact.
