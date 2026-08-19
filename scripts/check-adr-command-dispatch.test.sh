@@ -54,6 +54,35 @@ git commit -m "docs(adr): create ADR-{NNN}: {title}"
 EOF
 if "$CHECK" >/dev/null 2>&1; then fail "re-embedded commit block should fail"; else pass "re-embedded commit block fails (exit 1)"; fi
 
+# --- Regression: re-embedded old numbered wizard subsection ---
+cat > "$FIX/commands/kmg-create-adr.md" <<'EOF'
+## Step 3: Dispatch to create-adr-agent
+
+Dispatch `create-adr-agent`.
+
+### 3.1 Decision Title
+
+What is the title of this decision?
+EOF
+if "$CHECK" >/dev/null 2>&1; then fail "re-embedded wizard subsection should fail"; else pass "re-embedded wizard subsection fails (exit 1)"; fi
+
+# --- Regression: context_provided: true reintroduced ---
+cat > "$FIX/commands/kmg-create-adr.md" <<'EOF'
+## Step 3: Dispatch to create-adr-agent
+
+Dispatch `create-adr-agent`, passing context_provided: true and the wizard answers.
+EOF
+if "$CHECK" >/dev/null 2>&1; then fail "reintroduced context_provided: true should fail"; else pass "reintroduced context_provided: true fails (exit 1)"; fi
+
+# --- Non-regression: the negation sentence and example quote must NOT trip the guard ---
+cat > "$FIX/commands/kmg-create-adr.md" <<'EOF'
+## Step 3: Dispatch to create-adr-agent
+
+Dispatch `create-adr-agent`. Do not pass a context payload (no `context_provided`).
+The agent asks "What is the title of this decision?" directly.
+EOF
+if "$CHECK" >/dev/null 2>&1; then pass "negation sentence + example quote does not falsely trip the guard"; else fail "negation sentence + example quote should pass, guard false-positived"; fi
+
 # --- Regression: dispatch missing entirely ---
 cat > "$FIX/commands/kmg-create-adr.md" <<'EOF'
 ## Step 0: Resolve Target KG Path

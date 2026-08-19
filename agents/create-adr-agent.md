@@ -130,7 +130,7 @@ If git is unavailable, skip git metadata and proceed with manual fields only.
 
 **If `wizard_mode: false` (context was passed):**
 
-Skip all 8 wizard questions. Use the passed payload to populate all fields:
+Skip all 9 wizard questions. Use the passed payload to populate all fields:
 - title → from payload
 - status → from payload (default "Proposed" if blank)
 - category → from payload

@@ -58,6 +58,10 @@ command, not just the `create-adr-agent` dispatch):
 
 - **`--active` (default):** call `kg_resolve` (no scope — cwd-derived). Take the returned
   `path` as `{active_kg_path}`.
+- **`--project`:** same as `--active` — call `kg_resolve` (cwd-derived). `--project` and
+  `--active` resolve to the same project graph from this command's cwd-derived context;
+  the distinction matters at the `create-adr-agent` dispatch (Phase -1), which targets
+  `kg_capture` differently per flag even when the resolved path is identical.
 - **`--user`:** call `kg_resolve` with `scope: "user"`. Take the returned `path` as
   `{active_kg_path}`.
 - **`--named=<kg>`:** look up `graphs["<kg>"].path` directly from
@@ -148,10 +152,10 @@ ls {active_kg_path}/decisions/ | grep -E '^ADR-[0-9]+'
 - Single ADR exists → next is its number + 1
 - No ADRs exist → start at 001
 
-**Announce to user:**
-```
-Auto-detected: ADR-002 (next sequential number from 1 existing ADR)
-```
+Do not announce this number to the user — `create-adr-agent` (Phase 1)
+independently re-derives it with a cross-branch collision check that can
+bump it, and is the number that actually gets used. Announcing here risks
+showing the user two different ADR numbers in one run.
 
 ---
 
@@ -185,14 +189,18 @@ git rev-parse HEAD          # commit (full SHA)
 Dispatch `create-adr-agent`, passing:
 - The level-routing flag resolved above (`--user`, `--project`, `--named=<kg>`, or `--active`)
 - `--model [$resolved_model]` (from Tier resolution above)
+- The title argument, if one was given on the command line (the agent's
+  Phase 3 pre-fills its first wizard question from it and confirms rather
+  than prompting fresh — see `agents/create-adr-agent.md:150`)
 
 Do not pass a context payload (no `context_provided`). The agent runs its own
 full interactive wizard (Phase 3, 9 questions including "Implementation
 Commit") directly with the user, resolves its own ADR numbering (Phase 1,
 with cross-branch collision check) and git metadata (Phase 2), writes the
 file via `kg_capture` (Phase 5), updates the decisions index (Phase 6), and
-commits (Phase 7). All user interaction — wizard questions, draft
-confirmation — happens directly through the agent.
+commits (Phase 7). All user interaction — wizard questions and the
+pre-write confirmation summary (Phase 4) — happens directly through the
+agent.
 
 This command's role ends at dispatch. Do not re-implement the wizard,
 filename generation, file write, index update, or commit here.
@@ -208,8 +216,6 @@ filename generation, file write, index update, or commit here.
 ```
 Creating new Architecture Decision Record...
 
-Auto-detected: ADR-002 (next sequential number)
-
 Collecting git metadata...
   Author:  Jane Smith <jane@example.com>
   Branch:  feature/add-caching
@@ -219,8 +225,9 @@ Dispatching to create-adr-agent...
 ```
 
 Then `create-adr-agent` takes over: it runs its own wizard directly with the
-user ("What is the title of this decision?" and on), confirms the draft,
-writes the file, updates the index, and commits.
+user ("What is the title of this decision?" and on, starting with its own
+ADR-number announcement per its cross-branch collision check), shows a
+summary for confirmation, writes the file, updates the index, and commits.
 
 ---
 

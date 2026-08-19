@@ -10,7 +10,9 @@
 # of drift issue-48 fixed.
 #
 # Mode: report (default) — exit 1 with findings if the command re-embeds the
-# old implementation OR is missing the dispatch step; exit 0 otherwise.
+# old implementation (frontmatter, commit block, Step 4-7 headers, the old
+# numbered wizard subsections, or a reintroduced context_provided: true) OR
+# is missing the dispatch step; exit 0 otherwise.
 
 set -euo pipefail
 
@@ -36,6 +38,14 @@ if grep -qF 'git commit -m "docs(adr): create ADR-{NNN}' "$TARGET"; then
 fi
 if grep -qE '^## Step [4-7]:' "$TARGET"; then
   findings+=("re-embeds a numbered Step 4-7 (filename/write/index/commit) instead of dispatching")
+  FAIL=1
+fi
+if grep -qE '^### 3\.[1-8] ' "$TARGET"; then
+  findings+=("re-embeds the old inline wizard (numbered ### 3.N subsection found — the wizard now belongs entirely to create-adr-agent's own Phase 3)")
+  FAIL=1
+fi
+if grep -qF 'context_provided: true' "$TARGET"; then
+  findings+=("re-passes context_provided: true to create-adr-agent — this collapses the agent's own wizard, which is exactly the dual-implementation risk this fix removed (see plan Step 3's chosen resolution)")
   FAIL=1
 fi
 
