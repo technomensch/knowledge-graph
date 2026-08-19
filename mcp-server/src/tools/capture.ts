@@ -141,7 +141,22 @@ function todayIso(): string {
 // caller templates (agents/session-summary-agent.md,
 // agents/create-adr-agent.md) is the primary fix; this is the enforcement
 // backstop for callers this fix doesn't reach.
-function stripLeadingFrontmatter(content: string): string {
+// Every key generateFrontmatter() above can emit, at either nesting level,
+// plus legacy template keys (`deciders`) that appear in already-written files.
+// Stripping is gated on recognizing at least one of these — see the
+// false-positive note in stripLeadingFrontmatterOnce().
+const GENERATED_FRONTMATTER_KEYS = new Set([
+  "title", "created", "updated", "date", "author", "email",
+  "git", "branch", "commit", "commit_short",
+  "tags", "category", "version", "status", "number",
+  "as_of_commit", "last_updated", "implements",
+  "related", "adrs", "lessons", "kg_entries",
+  "search_aliases", "deciders", "pr", "issue",
+]);
+
+// Strips at most ONE leading frontmatter block. Callers want the fixed-point
+// wrapper below, not this.
+function stripLeadingFrontmatterOnce(content: string): string {
   if (!content.startsWith("---")) return content;
   const newlineAfterOpen = content.indexOf("\n");
   if (newlineAfterOpen === -1) return content;
@@ -152,12 +167,17 @@ function stripLeadingFrontmatter(content: string): string {
   // `key:` field or an indented continuation of one, not just "at least
   // one" field present. A body that merely opens with a markdown
   // horizontal rule (or a longer dash run like `----`) is real content,
-  // not frontmatter, and must not be stripped. Requiring only one field
-  // still false-positives on prose containing a stray colon-prefixed line
-  // (e.g. "Note: deferred X." at column 0) — Fable review (2026-08-18)
-  // reproduced this live. Same false-positive class as upgrade.ts's
-  // detectDoubledFrontmatter/looksLikeYaml.
-  let hasField = false;
+  // not frontmatter, and must not be stripped.
+  //
+  // "All lines look key-shaped" is still not enough on its own: a prose
+  // region whose every line happens to be colon-prefixed (e.g. a region
+  // containing only "Note: deferred X.") passes that test and gets silently
+  // deleted — Fable review (2026-08-19) reproduced this live against the
+  // previous hardening. So also require at least one key the server itself
+  // would have emitted (GENERATED_FRONTMATTER_KEYS). Same false-positive
+  // class as upgrade.ts's detectDoubledFrontmatter/looksLikeYaml.
+  let hasKnownKey = false;
+  let sawNonBlank = false;
   let looksLikeYaml = true;
   let prevWasKey = false;
   let lineStart = newlineAfterOpen + 1;
@@ -170,12 +190,19 @@ function stripLeadingFrontmatter(content: string): string {
       closeLineEnd = lineEnd;
       break;
     }
-    if (/^[A-Za-z_][\w-]*:/.test(line)) {
-      hasField = true;
+    const topKey = /^([A-Za-z_][\w-]*):/.exec(line);
+    if (topKey) {
+      sawNonBlank = true;
+      if (GENERATED_FRONTMATTER_KEYS.has(topKey[1].toLowerCase())) hasKnownKey = true;
       prevWasKey = true;
     } else if (prevWasKey && /^\s/.test(line)) {
-      // indented continuation of the previous key — still valid YAML
+      // indented continuation of the previous key — still valid YAML. A
+      // nested `  branch:`/`  adrs:` counts toward the known-key gate too.
+      sawNonBlank = true;
+      const nestedKey = /^\s+([A-Za-z_][\w-]*):/.exec(line);
+      if (nestedKey && GENERATED_FRONTMATTER_KEYS.has(nestedKey[1].toLowerCase())) hasKnownKey = true;
     } else if (line.trim() !== "") {
+      sawNonBlank = true;
       looksLikeYaml = false;
       prevWasKey = false;
     } else {
@@ -183,12 +210,33 @@ function stripLeadingFrontmatter(content: string): string {
     }
     lineStart = lineEnd + 1;
   }
-  if (closeLineEnd === -1 || !hasField || !looksLikeYaml) return content;
+  if (closeLineEnd === -1 || !looksLikeYaml) return content;
+  // A fenced region holding only blank lines is a degenerate/empty
+  // frontmatter block. Leaving it in place makes the real block stack on top
+  // and writes a file opening with four `---` fences, so strip it. (The only
+  // other thing this shape can be is two adjacent horizontal rules, and
+  // dropping those still preserves every line of body content.)
+  if (sawNonBlank && !hasKnownKey) return content;
 
   let rest = content.slice(closeLineEnd + 1);
   if (rest.startsWith("\r\n")) rest = rest.slice(2);
   else if (rest.startsWith("\n")) rest = rest.slice(1);
   return rest.replace(/^\s*\n/, "");
+}
+
+// Content can arrive with more than one block already stacked — a LEGACY file
+// corrupted before this backstop existed, read back and re-submitted through
+// the update-in-place path (existingFile), or a caller template that doubled
+// on its own. Stripping exactly once leaves a block behind for
+// generateFrontmatter() to stack on top of, re-emitting the corruption, so
+// run to a fixed point. Terminates: each strip strictly shortens the string.
+function stripLeadingFrontmatter(content: string): string {
+  let current = content;
+  for (;;) {
+    const next = stripLeadingFrontmatterOnce(current);
+    if (next === current) return current;
+    current = next;
+  }
 }
 
 export function validateMetadata(
@@ -199,6 +247,36 @@ export function validateMetadata(
   }
   if (!metadata.tags) metadata.tags = [];
   return metadata;
+}
+
+// issue-46 Manifestation A server-side enforcement. Manifestation B (embedded
+// frontmatter) got the stripLeadingFrontmatter() backstop above; the doubled
+// filename/title prefix had only a documented caller contract, so a stale
+// cached agent definition or a hand-composed kg_capture call sending
+// title: "2026-08-19-main" still reproduced "2026-08-19-2026-08-19-main.md"
+// end-to-end. Reject rather than silently strip: deriveFileName() and
+// displayTitleFor() own the prefix, and guessing which prefix was intended
+// would corrupt a legitimate title that merely looks pre-prefixed.
+const TITLE_PREFIX_RULES: Partial<
+  Record<CaptureRequest["type"], { pattern: RegExp; label: string }>
+> = {
+  session: { pattern: /^\d{4}-\d{2}-\d{2}[-\s]/, label: "a date prefix (YYYY-MM-DD-)" },
+  adr: { pattern: /^ADR-\d+[:\-\s]/i, label: "an ADR-number prefix (ADR-NNN)" },
+};
+
+export function checkTitlePrefix(
+  type: CaptureRequest["type"],
+  title: string
+): CaptureError | null {
+  const rule = TITLE_PREFIX_RULES[type];
+  if (!rule || !rule.pattern.test(title.trim())) return null;
+  return {
+    error: "VALIDATION_ERROR",
+    message:
+      `metadata.title must be bare, but "${title}" already carries ${rule.label} ` +
+      `that kg_capture also adds — writing it would produce a doubled prefix ` +
+      `(issue-46 Manifestation A). Resend the title without the prefix.`,
+  };
 }
 
 export function deriveFileName(
@@ -223,7 +301,8 @@ export function deriveFileName(
 
   // Caller must pass a bare title (issue-46 Manifestation A) — this function
   // owns all filename prefixing. A caller-supplied date or ADR-number prefix
-  // is NOT stripped; it will double-prepend. See knowledge/issues/issue-46/.
+  // is NOT stripped here; it will double-prepend. handleCapture() rejects such
+  // titles up front via checkTitlePrefix(). See knowledge/issues/issue-46/.
   if (type === "session") {
     return `${todayIso()}-${slugify(metadata.title)}.md`;
   }
@@ -417,6 +496,11 @@ export async function handleCapture(
   // Validate metadata
   const validated = validateMetadata(request.metadata);
   if ("error" in validated) return validated as CaptureError;
+
+  // issue-46 Manifestation A: reject an already-prefixed title before any
+  // filename is derived or byte written.
+  const prefixError = checkTitlePrefix(request.type, request.metadata.title);
+  if (prefixError) return prefixError;
 
   const config = readConfig();
   const mode = resolveInteractionMode({ explicitParam: interaction }).mode;
@@ -654,7 +738,8 @@ export function registerCaptureTool(server: McpServer, personalScopeSession: Per
             .string()
             .describe(
               "Bare title, no date or ADR-number prefix — this tool derives and owns all " +
-                "filename/frontmatter prefixing. A pre-prefixed title double-prepends."
+                "filename/frontmatter prefixing. A pre-prefixed title (session: 'YYYY-MM-DD-...', " +
+                "adr: 'ADR-NNN...') is rejected with VALIDATION_ERROR rather than double-prepended."
             ),
           category: z
             .string()

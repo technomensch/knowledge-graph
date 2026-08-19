@@ -39,6 +39,7 @@ import {
   validateMetadata,
   checkExistingFile,
   displayTitleFor,
+  checkTitlePrefix,
 } from "../src/tools/capture.js";
 import type { CaptureRequest, CaptureResponse, CaptureError } from "../src/tools/capture.js";
 import { readConfig } from "../src/utils.js";
@@ -467,8 +468,9 @@ describe("deriveFileName", () => {
 
   // issue-46 Manifestation A: deriveFileName does NOT detect/strip a
   // caller-supplied prefix -- it trusts the caller. These document the
-  // pre-fix defect shape and confirm the contract is enforced by the caller
-  // (agents/session-summary-agent.md, agents/create-adr-agent.md), not here.
+  // pre-fix defect shape; the prefix is now rejected one layer up, in
+  // handleCapture via checkTitlePrefix (see the checkTitlePrefix describe
+  // block), so this shape is unreachable through the tool entry point.
   test("session filename does NOT strip a caller-supplied date prefix (trust-the-caller contract)", () => {
     const name = deriveFileName("session", { title: "2026-08-16-main" });
     expect(name).toMatch(/^\d{4}-\d{2}-\d{2}-2026-08-16-main\.md$/);
@@ -1413,6 +1415,283 @@ describe("kg_capture — defensive frontmatter strip (issue-46 Manifestation B)"
     expect(content).toContain('title: "real"');
     expect(content).toContain("----");
     expect(content).toContain("## Body");
+  });
+
+  // -------------------------------------------------------------------------
+  // Fable review (2026-08-19): the historical corruption shapes were never
+  // exercised -- every positive strip test above used a minimal single-line
+  // `title:` block, so stacked blocks, empty blocks, nested keys and CRLF all
+  // had zero coverage.
+  // -------------------------------------------------------------------------
+
+  test("strips stacked double frontmatter blocks to a fixed point (legacy corruption shape)", async () => {
+    const kgRoot = makeTempDir("strip-stacked");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    const result = await handleCapture({
+      content: '---\ntitle: "outer stale"\n---\n\n---\ntitle: "inner stale"\n---\n\n## Body\n',
+      type: "session",
+      metadata: { title: "main" },
+    });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    const content = fs.readFileSync(ok.filePath, "utf-8");
+    expect(fenceCount(content)).toBe(2);
+    expect(content).not.toContain("outer stale");
+    expect(content).not.toContain("inner stale");
+    expect(content).toContain("## Body");
+  });
+
+  test("re-capturing an already-corrupted (doubled) existing file heals it rather than re-emitting", async () => {
+    const kgRoot = makeTempDir("strip-heal-legacy");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    const existingPath = path.join(kgRoot, "sessions", "legacy.md");
+    fs.mkdirSync(path.dirname(existingPath), { recursive: true });
+    // Shape of a file written before the Manifestation B fix existed.
+    const corrupted = '---\ntitle: "a"\n---\n\n---\ntitle: "b"\n---\n\n## Old body\n';
+    fs.writeFileSync(existingPath, corrupted, "utf-8");
+
+    // Read it back and resubmit, exactly as an update-in-place caller does.
+    const result = await handleCapture({
+      content: fs.readFileSync(existingPath, "utf-8"),
+      type: "session",
+      metadata: { title: "main", existingFile: existingPath },
+    });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    const content = fs.readFileSync(existingPath, "utf-8");
+    expect(fenceCount(content)).toBe(2);
+    expect(content).toContain("## Old body");
+  });
+
+  test("strips a degenerate empty frontmatter block instead of writing four fences", async () => {
+    const kgRoot = makeTempDir("strip-empty-block");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    const result = await handleCapture({
+      content: "---\n---\n# Body\n",
+      type: "session",
+      metadata: { title: "main" },
+    });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    const content = fs.readFileSync(ok.filePath, "utf-8");
+    expect(fenceCount(content)).toBe(2);
+    expect(content).toContain("# Body");
+  });
+
+  test("strips an empty frontmatter block whose region is only blank lines", async () => {
+    const kgRoot = makeTempDir("strip-blank-block");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    const result = await handleCapture({
+      content: "---\n\n---\n# Body\n",
+      type: "session",
+      metadata: { title: "main" },
+    });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    const content = fs.readFileSync(ok.filePath, "utf-8");
+    expect(fenceCount(content)).toBe(2);
+    expect(content).toContain("# Body");
+  });
+
+  test("strips a realistic nested-key block (git:/related: indented continuations)", async () => {
+    const kgRoot = makeTempDir("strip-nested");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    const embedded = [
+      "---",
+      'title: "ADR-001: stale"',
+      "status: Proposed",
+      "git:",
+      "  branch: v0.7.2-issues-46-51",
+      "  commit: deadbeef",
+      "  pr: null",
+      "related:",
+      "  adrs: []",
+      "  lessons: []",
+      "tags: [a, b]",
+      "---",
+      "",
+      "# Decision",
+      "",
+    ].join("\n");
+
+    const result = await handleCapture({
+      content: embedded,
+      type: "adr",
+      metadata: { title: "Real Decision" },
+    });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    const content = fs.readFileSync(ok.filePath, "utf-8");
+    expect(fenceCount(content)).toBe(2);
+    expect(content).not.toContain("stale");
+    expect(content).not.toContain("v0.7.2-issues-46-51");
+    expect(content).toContain("# Decision");
+  });
+
+  test("strips a CRLF-line-ended frontmatter block", async () => {
+    const kgRoot = makeTempDir("strip-crlf");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    const result = await handleCapture({
+      content: '---\r\ntitle: "stale"\r\n---\r\n\r\n## Body\r\n',
+      type: "session",
+      metadata: { title: "main" },
+    });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    const content = fs.readFileSync(ok.filePath, "utf-8");
+    expect(fenceCount(content)).toBe(2);
+    expect(content).not.toContain("stale");
+    expect(content).toContain("## Body");
+  });
+
+  test("does NOT strip a fenced prose region whose every line is colon-prefixed", async () => {
+    const kgRoot = makeTempDir("strip-all-colon-prose");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    // Every line here is key-shaped, so "all lines look like YAML" is not a
+    // sufficient guard -- none of the keys are ones the server would emit.
+    const result = await handleCapture({
+      content: "---\nNote: deferred X.\nCaveat: revisit later.\n---\n\n# Real doc\n",
+      type: "session",
+      metadata: { title: "main" },
+    });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(false);
+    const ok = result as CaptureResponse;
+    const content = fs.readFileSync(ok.filePath, "utf-8");
+    expect(content).toContain("Note: deferred X.");
+    expect(content).toContain("Caveat: revisit later.");
+    expect(content).toContain("# Real doc");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// issue-46 Manifestation A: server-side rejection of pre-prefixed titles
+// ---------------------------------------------------------------------------
+
+describe("checkTitlePrefix (issue-46 Manifestation A enforcement)", () => {
+  test("rejects a session title already carrying a date prefix", () => {
+    const err = checkTitlePrefix("session", "2026-08-19-main");
+    expect(err).not.toBeNull();
+    expect(err!.error).toBe("VALIDATION_ERROR");
+  });
+
+  test("rejects an adr title already carrying an ADR-number prefix", () => {
+    expect(checkTitlePrefix("adr", "ADR-069: My Decision")).not.toBeNull();
+    expect(checkTitlePrefix("adr", "ADR-069-my-decision")).not.toBeNull();
+  });
+
+  test("accepts bare titles for every type", () => {
+    expect(checkTitlePrefix("session", "main")).toBeNull();
+    expect(checkTitlePrefix("adr", "My Decision")).toBeNull();
+    expect(checkTitlePrefix("lesson", "2026-08-19-something")).toBeNull();
+  });
+
+  test("does not reject a date-shaped fragment that is not a prefix", () => {
+    expect(checkTitlePrefix("session", "retro for 2026-08-19")).toBeNull();
+    expect(checkTitlePrefix("adr", "supersedes ADR-012")).toBeNull();
+  });
+
+  test("handleCapture rejects a pre-prefixed session title before writing anything", async () => {
+    const kgRoot = makeTempDir("prefix-reject-session");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    const today = new Date().toISOString().slice(0, 10);
+    const result = await handleCapture({
+      content: "## Body\n",
+      type: "session",
+      metadata: { title: `${today}-main` },
+    });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(true);
+    expect((result as CaptureError).error).toBe("VALIDATION_ERROR");
+    // Nothing was written -- the doubled name must not exist on disk.
+    const sessionDir = path.join(kgRoot, "sessions", today.slice(0, 7));
+    const written = fs.existsSync(sessionDir) ? fs.readdirSync(sessionDir) : [];
+    expect(written).toEqual([]);
+  });
+
+  test("handleCapture rejects a pre-prefixed adr title before writing anything", async () => {
+    const kgRoot = makeTempDir("prefix-reject-adr");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+
+    const result = await handleCapture({
+      content: "# Decision\n",
+      type: "adr",
+      metadata: { title: "ADR-069: My Decision" },
+    });
+    process.cwd = origCwd;
+
+    expect("error" in result).toBe(true);
+    expect((result as CaptureError).error).toBe("VALIDATION_ERROR");
+    const decisionsDir = path.join(kgRoot, "decisions");
+    const written = (fs.existsSync(decisionsDir) ? fs.readdirSync(decisionsDir) : [])
+      .filter((f) => f.endsWith(".md") && f !== "README.md");
+    expect(written).toEqual([]);
   });
 });
 
