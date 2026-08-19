@@ -1645,8 +1645,14 @@ async function confirmStatusSchemaMigration(opts: {
  * transport stubAsk() every other gate() site in this file already uses.
  *
  * Decision: one shared boolean per call, not per-category granularity --
- * every current/planned consumer (capture-corruption, platform-split,
- * future plan-status-drift) is a batch repair with no per-item ask needed.
+ * every consumer of this function (capture-corruption, platform-split,
+ * diff-blank-reconstruction, plan-status-drift) is a batch repair with no
+ * per-item ask needed. Note platform-split is gated through this same
+ * function but with its OWN param (confirm_platform_split, see below) --
+ * the other three (capture-corruption, diff-blank-reconstruction,
+ * plan-status-drift) share the literal `confirmBackfix` param, so a single
+ * `confirmBackfix: true` authorizes all three of those at once if more than
+ * one is present in the same `apply` call.
  * `confirmed` here and `confirm_platform_split` (platform-split's own
  * pre-existing param, preserved for backward compatibility) are two
  * independent knobs, not aliases -- passing one does not bypass the other.
@@ -1971,9 +1977,15 @@ export interface HandleUpgradeParams {
   // still honored in either mode (see confirmStatusSchemaMigration).
   confirmMigration?: boolean;
   // c5 (v0.7.2): required (automated mode) to apply any "backfix" category
-  // -- currently "capture-corruption" -- that repairs already-corrupted
-  // content. Interactive mode is asked via gate() instead; an explicit true
-  // here is still honored in either mode (see confirmBackfixCategory).
+  // that repairs already-written content -- currently "capture-corruption"
+  // (issue-46), "diff-blank-reconstruction" (issue-47), and
+  // "plan-status-drift" Tier A writes (issue-49). One shared boolean gates
+  // all three: a caller listing more than one in the same `apply` call
+  // authorizes all of them at once (Fable review, 2026-08-19 -- see the
+  // wizard's per-category "details shown before consent" requirement, which
+  // is what keeps that shared-boolean design safe in practice). Interactive
+  // mode is asked via gate() instead; an explicit true here is still
+  // honored in either mode (see confirmBackfixCategory).
   confirmBackfix?: boolean;
 }
 
@@ -2388,8 +2400,10 @@ export function registerUpgradeTool(server: McpServer, personalScopeSession: Per
         .optional()
         .describe(
           "Must be true (in automated mode) to apply backfix categories that repair already-" +
-            "corrupted content -- currently \"capture-corruption\" (issue-46). Interactive callers " +
-            "are asked to confirm instead."
+            "written content -- \"capture-corruption\" (issue-46), \"diff-blank-reconstruction\" " +
+            "(issue-47), and \"plan-status-drift\" Tier A writes (issue-49) all share this one " +
+            "flag; setting it authorizes any of these three present in the same apply call. " +
+            "Interactive callers are asked to confirm instead."
         ),
     },
     async ({ apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix }, extra) => {

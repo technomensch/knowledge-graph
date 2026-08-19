@@ -2363,6 +2363,55 @@ describe("c5: capture-corruption gated by confirmBackfix", () => {
     expect(after).toBe(contaminated); // untouched
   });
 
+  test("confirmBackfix authorizes capture-corruption AND plan-status-drift together — single shared boolean (Fable review, 2026-08-19)", async () => {
+    // capture-corruption, diff-blank-reconstruction, and plan-status-drift
+    // all share the literal confirmBackfix param (unlike platform-split,
+    // which has its own confirm_platform_split knob, covered by the
+    // sibling tests above/below). This test proves a single
+    // confirmBackfix: true genuinely authorizes both when they're present
+    // together in one apply call -- not just each in isolation.
+    const kgRoot = makeTempDir("c6-shared-confirm-backfix");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    // capture-corruption fixture: a doubled frontmatter block to merge.
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const filePath = path.join(sessionsYm, "2026-08-16-main.md");
+    fs.writeFileSync(
+      filePath,
+      '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\n---\n\n## Body\n',
+      "utf-8"
+    );
+
+    // plan-status-drift fixture: a genuine Tier A finding, rooted at the
+    // same kgRoot (findProjectRoot walks up from cwd looking for
+    // knowledge/plans/).
+    const fakeHome = makeTempDir("c6-shared-confirm-backfix-home");
+    tempDirs.push(fakeHome);
+    fakeHomedir(fakeHome);
+    const plansDir = path.join(kgRoot, "knowledge", "plans");
+    const mirrorDir = path.join(fakeHome, ".claude", "plans");
+    fs.mkdirSync(plansDir, { recursive: true });
+    fs.mkdirSync(mirrorDir, { recursive: true });
+    fs.writeFileSync(path.join(plansDir, "v0.7.2-shared-plan.md"), planContent(STATUS_COMPLETE), "utf-8");
+    fs.writeFileSync(path.join(mirrorDir, "v0.7.2-shared-plan.md"), planContent(FROZEN_PRE_C7), "utf-8");
+
+    try {
+      const result = await handleUpgrade({ apply: ["capture-corruption", "plan-status-drift"], confirmBackfix: true });
+
+      expect(result.isError).toBeUndefined();
+      expect(result.content[0].text).toContain("[capture-corruption]");
+      expect(result.content[0].text).toContain("1 frontmatter block(s) merged");
+      expect(result.content[0].text).toContain("[plan-status-drift]");
+      expect(result.content[0].text).toContain("1 plan mirror(s) synced");
+      expect(fs.readFileSync(path.join(mirrorDir, "v0.7.2-shared-plan.md"), "utf-8")).toContain("COMPLETE");
+    } finally {
+      restoreHomedir();
+    }
+  });
+
   test("confirm_platform_split does not also bypass capture-corruption — independent knobs, reverse direction", async () => {
     const kgRoot = makeTempDir("c5-independent-knobs-reverse");
     tempDirs.push(kgRoot);
