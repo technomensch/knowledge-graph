@@ -51,6 +51,7 @@ interface InspectResult {
 const APPLY_ORDER = [
   "status-schema",      // ADR-067 Task 8.1: reconcile old .active/legacy schema before anything else touches the registry
   "config-location",   // must run before anything else reads config from the new path
+  "plan-status-drift",   // issue-49 backfix: graph-independent like status-schema/config-location above, order-independent of everything else
   "directories",
   "config",
   "starter-relocation",   // must run BEFORE templates
@@ -708,6 +709,409 @@ function insertAfterExternalFilesHeading(content: string, block: string): string
   const lineEnd = content.indexOf("\n", idx);
   const insertAt = lineEnd === -1 ? content.length : lineEnd + 1;
   return content.slice(0, insertAt) + block + content.slice(insertAt);
+}
+
+// ── issue-49 backfix: plan Safety-Header STATUS drift (plan-status-drift) ──
+
+/**
+ * Frozen Safety-Header placeholder strings this category recognizes. Both
+ * Tier A's write-guard and Tier B's candidate-matcher MUST consume this
+ * exact same list -- never let one tier's placeholder recognition drift
+ * from the other's (c6 plan Step 2, gap #1). The pre-c7 string is always
+ * recognized; c7 renames it going forward for newly-born plans to a second
+ * string, recognized too, so this category doesn't silently stop working on
+ * existing plans once c7 lands, and correctly covers new-shape ones.
+ */
+const FROZEN_PLACEHOLDERS = [
+  "**STATUS:** 🔴 STOPPED (Waiting for Manual Approval of Step 1)",
+  "**STATUS:** 🔴 AWAITING APPROVAL (Waiting for Manual Approval of Step 1)",
+];
+
+/**
+ * Normalize a string for comparison purposes: CRLF/lone-CR -> LF, strip
+ * trailing newlines entirely (not collapse to one -- "text\n" and "text"
+ * must compare equal), strip a leading BOM. Both tiers of detection, and
+ * Tier A's write-time re-check, must call this SAME function -- never two
+ * independently written near-identical passes (c6 plan Step 2, gap #2).
+ */
+function normalizeForCompare(s: string): string {
+  return s.replace(/^﻿/, "").replace(/\r\n?/g, "\n").replace(/\n+$/, "");
+}
+
+/**
+ * Extract the first line matching `^**STATUS:**` (the Safety-Header line),
+ * or null if none found. Anchored to the header line specifically -- never
+ * scans the rest of the body for placeholder-shaped text (this plan's own
+ * body, and c7's, both quote old/new placeholder strings verbatim in prose;
+ * a whole-file substring match would mis-fire on files like these).
+ */
+function extractStatusLine(content: string): string | null {
+  for (const line of content.split(/\r\n|\r|\n/)) {
+    if (/^\*\*STATUS:\*\*/.test(line)) return line;
+  }
+  return null;
+}
+
+/** The STATUS value portion after the `**STATUS:**` label (e.g. `🔴 STOPPED (...)`). */
+function statusValueOf(statusLine: string): string {
+  return statusLine.replace(/^\*\*STATUS:\*\*\s*/, "");
+}
+
+/** True if `statusLine` is one of the recognized frozen placeholders, normalized-compared. */
+function isFrozenPlaceholder(statusLine: string): boolean {
+  const normalized = normalizeForCompare(statusLine);
+  return FROZEN_PLACEHOLDERS.some((p) => normalizeForCompare(p) === normalized);
+}
+
+/**
+ * True if `canonicalContent` and `mirrorContent` are identical apart from
+ * their respective STATUS lines, after normalization. Replaces each file's
+ * STATUS line with a common sentinel before comparing, so the STATUS line's
+ * own content difference (the whole point of a Tier A finding) never
+ * counts against "identical".
+ */
+function restIdenticalApartFromStatus(canonicalContent: string, mirrorContent: string, canonicalStatus: string, mirrorStatus: string): boolean {
+  const strip = (content: string, statusLine: string): string => {
+    const idx = content.indexOf(statusLine);
+    if (idx === -1) return content;
+    return content.slice(0, idx) + " STATUS " + content.slice(idx + statusLine.length);
+  };
+  return normalizeForCompare(strip(canonicalContent, canonicalStatus)) === normalizeForCompare(strip(mirrorContent, mirrorStatus));
+}
+
+/**
+ * Replace `oldStatusLine` with `newStatusLine` inside `content`, touching
+ * nothing else -- crucially, the surrounding line-terminator bytes are
+ * left completely untouched (both extracted lines are terminator-free, per
+ * extractStatusLine's split/rejoin), so the mirror's own line-ending
+ * convention (CRLF/LF) is preserved automatically, never overwritten with
+ * canonical's (c6 plan Step 2, write-side gap: splicing in canonical's raw
+ * text including its own terminator would have produced a mixed-line-ending
+ * file).
+ */
+function spliceStatusLine(content: string, oldStatusLine: string, newStatusLine: string): string {
+  const idx = content.indexOf(oldStatusLine);
+  if (idx === -1) return content; // defensive no-op; callers only invoke this once a finding has proven the line exists
+  return content.slice(0, idx) + newStatusLine + content.slice(idx + oldStatusLine.length);
+}
+
+interface TierAFinding {
+  canonicalPath: string;
+  mirrorPath: string;
+  canonicalStatusLine: string;
+  mirrorStatusLine: string;
+  // The exact mirror bytes this finding validated -- callers MUST splice
+  // and write these bytes, not re-read the file, or a save landing between
+  // this read and the write would be spliced/written unvalidated (Opus
+  // review, 2026-08-19: the predicate was re-derived fresh, but the bytes
+  // it approved and the bytes actually written were two different reads).
+  mirrorContent: string;
+}
+
+/**
+ * Re-derives the FULL three-clause Tier A write predicate fresh from disk
+ * every time it's called -- both `checkPlanStatusDrift()` (for counting)
+ * and `applyPlanStatusDrift()` (immediately before writing) call this SAME
+ * function, and apply NEVER trusts a pre-computed finding list. This is
+ * what makes Tier B structurally impossible to auto-apply, not merely
+ * asserted: a Tier B canonical (frozen placeholder) can never satisfy
+ * clause 2 below (`canonicalHasComplete`), and the AND -- not OR -- is what
+ * closes the "mirror hand-annotated to something real" overwrite risk.
+ *
+ * The three conditions, all required:
+ * 1. The two STATUS lines differ (normalized).
+ * 2. The mirror's STATUS matches `^🔴` (any stopped-shaped variant) AND
+ *    canonical's STATUS contains `✅ COMPLETE`.
+ * 3. The rest of the file is identical apart from that line (normalized).
+ */
+function computeTierAFinding(canonicalPath: string, mirrorPath: string): TierAFinding | null {
+  if (!fs.existsSync(canonicalPath) || !fs.existsSync(mirrorPath)) return null;
+  const canonicalContent = fs.readFileSync(canonicalPath, "utf-8");
+  const mirrorContent = fs.readFileSync(mirrorPath, "utf-8");
+  const canonicalStatus = extractStatusLine(canonicalContent);
+  const mirrorStatus = extractStatusLine(mirrorContent);
+  if (canonicalStatus === null || mirrorStatus === null) return null;
+
+  if (normalizeForCompare(canonicalStatus) === normalizeForCompare(mirrorStatus)) return null; // clause 1
+
+  const mirrorLooksStopped = statusValueOf(mirrorStatus).startsWith("🔴");
+  const canonicalHasComplete = canonicalStatus.includes("✅ COMPLETE");
+  if (!(mirrorLooksStopped && canonicalHasComplete)) return null; // clause 2 (AND, not OR)
+
+  if (!restIdenticalApartFromStatus(canonicalContent, mirrorContent, canonicalStatus, mirrorStatus)) return null; // clause 3
+
+  return { canonicalPath, mirrorPath, canonicalStatusLine: canonicalStatus, mirrorStatusLine: mirrorStatus, mirrorContent };
+}
+
+/** True if a canonical (and, if present, its mirror) qualify as a Tier B candidate: exact-match frozen placeholder, never a fuzzy STOPPED-substring match. */
+function isTierBCandidate(canonicalStatus: string, mirrorStatus: string | null): boolean {
+  if (!isFrozenPlaceholder(canonicalStatus)) return false;
+  return mirrorStatus === null || isFrozenPlaceholder(mirrorStatus);
+}
+
+/**
+ * Best-effort branch-segment guess from a plan filename: strip `.md`, strip
+ * a trailing `-plan` suffix. Stated explicitly per the plan: this rarely
+ * matches a real branch name for this project's actual naming convention --
+ * kept only because the `Related: Shares branch` line never discriminates
+ * (all 8 in-flight v0.7.2-c* plans share one identical branch string, and
+ * the 5 already-completed plans that COULD be discriminated by branch name
+ * have no `Shares branch` line at all).
+ */
+function extractBranchCandidateFromFilename(filename: string): string {
+  return filename.replace(/\.md$/, "").replace(/-plan$/, "");
+}
+
+/**
+ * Extract the merged branch segment from one git merge-commit subject line,
+ * or null if the subject doesn't parse (a large fraction of real merge
+ * history -- ~38% in this repo -- doesn't; that's expected, not a bug: Tier
+ * B is report-only, so an unparseable subject just means missing evidence,
+ * never a false positive).
+ *
+ * 1. PR shape: everything after the FIRST `/` following the literal
+ *    substring "from " -- branch names here can contain `/` themselves
+ *    (e.g. `technomensch/dependabot/npm_and_yarn/...`), so first-slash, not
+ *    last-slash or basename-style extraction.
+ * 2. `Merge branch '<branch>'` shape (pre-PR-era / non-GitHub merges):
+ *    the single-quoted segment.
+ * 3. Anything else, including a subject with no branch name at all (a
+ *    GitHub setting that uses the PR title as the merge subject): skip.
+ */
+function extractMergedBranchSegment(subject: string): string | null {
+  const fromIdx = subject.indexOf("from ");
+  if (fromIdx !== -1) {
+    const after = subject.slice(fromIdx + "from ".length);
+    const slashIdx = after.indexOf("/");
+    if (slashIdx !== -1) return after.slice(slashIdx + 1).trim();
+  }
+  const branchMatch = subject.match(/Merge branch '([^']+)'/);
+  return branchMatch ? branchMatch[1] : null;
+}
+
+/**
+ * True if `branchCandidate` was ever merged into `defaultBranch`, by EXACT
+ * string equality against each parsed merge-commit subject's extracted
+ * segment -- never regex/substring matching, which produces real false
+ * positives in this repo's own history (e.g. `v0.7.1.4-version-sync` is a
+ * substring-match false-positive for `v0.7.1.4-issue-45-...`, confirmed
+ * live; `git log -F --grep=...` does NOT fix this, since `-F` disables
+ * regex metacharacters but does not anchor the match).
+ *
+ * A false `false` here means "no evidence found" (squash-merge, rebase-
+ * merge, deleted branch with no surviving merge commit, or genuinely not
+ * merged) -- this signal is a boolean "was this branch ever merged," not
+ * uniquely identifying "the" merge commit (three branch names in this
+ * repo's own history were each merged more than once).
+ */
+function wasBranchMerged(projectRoot: string, defaultBranch: string, branchCandidate: string): boolean {
+  try {
+    const out = execFileSync("git", ["log", defaultBranch, "--merges", "--format=%s"], { cwd: projectRoot, stdio: "pipe" }).toString();
+    for (const subject of out.split("\n")) {
+      if (!subject.trim()) continue;
+      if (extractMergedBranchSegment(subject) === branchCandidate) return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Walk upward from `startDir` looking for a `knowledge/plans/` directory,
+ * stopping at (and returning) a `.git`-marked directory even if
+ * `knowledge/plans/` doesn't exist there. Deliberately does NOT reuse
+ * `resolveEffectiveCwd()` -- verified it has no git/project-root ascent
+ * logic at all (`platform-cwd.ts`: `sandboxCwd ?? workspaceRootParam ??
+ * process.cwd()`), so `path.join(cwd, "knowledge/plans")` against a bare
+ * `process.cwd()` would silently return zero findings from any
+ * subdirectory. Returns null if walked to the filesystem root and found
+ * neither marker.
+ */
+function findProjectRoot(startDir: string): string | null {
+  let dir = path.resolve(startDir);
+  for (;;) {
+    if (fs.existsSync(path.join(dir, "knowledge", "plans")) || fs.existsSync(path.join(dir, ".git"))) {
+      return dir;
+    }
+    const parent = path.dirname(dir);
+    if (parent === dir) return null; // reached filesystem root
+    dir = parent;
+  }
+}
+
+/**
+ * Cheap, git-log-free count of Tier A findings only -- used by the apply
+ * loop's gate decision (skip-the-ask when there's genuinely nothing to
+ * repair), computed fresh via the exact same `computeTierAFinding()`
+ * predicate the full scan and the write path both use, so this can never
+ * diverge from what apply actually does.
+ */
+function countTierAFindings(projectRoot: string): number {
+  const plansDir = path.join(projectRoot, "knowledge", "plans");
+  if (!fs.existsSync(plansDir)) return 0;
+  const mirrorDir = path.join(os.homedir(), ".claude", "plans");
+  let count = 0;
+  for (const f of fs.readdirSync(plansDir)) {
+    if (!f.endsWith(".md")) continue;
+    const canonicalPath = path.join(plansDir, f);
+    try {
+      if (!fs.statSync(canonicalPath).isFile()) continue;
+      if (computeTierAFinding(canonicalPath, path.join(mirrorDir, f))) count++;
+    } catch {
+      continue; // unreadable/vanished entry (permissions, dangling symlink, race) -- skip, don't let one bad file break the count
+    }
+  }
+  return count;
+}
+
+function checkPlanStatusDrift(cwd: string): UpgradeItem[] {
+  const projectRoot = findProjectRoot(cwd);
+  if (!projectRoot) return [];
+  const plansDir = path.join(projectRoot, "knowledge", "plans");
+  if (!fs.existsSync(plansDir)) return [];
+  const mirrorDir = path.join(os.homedir(), ".claude", "plans");
+
+  // A flat, non-recursive listing naturally excludes an archive/ subdirectory's
+  // contents (per Step 1's scope note) without any special-casing.
+  const planFiles = fs.readdirSync(plansDir).filter((f) => {
+    if (!f.endsWith(".md")) return false;
+    try {
+      return fs.statSync(path.join(plansDir, f)).isFile();
+    } catch {
+      return false; // unreadable/vanished between readdir and stat -- skip, don't let one bad entry break the whole inspect
+    }
+  });
+
+  const defaultBranch = resolveDefaultBranchForGit(projectRoot);
+
+  let tierACount = 0;
+  let tierBCount = 0;
+  const tierBLines: string[] = [];
+
+  for (const f of planFiles) {
+    const canonicalPath = path.join(plansDir, f);
+    const mirrorPath = path.join(mirrorDir, f);
+    try {
+      const canonicalContent = fs.readFileSync(canonicalPath, "utf-8");
+      const canonicalStatus = extractStatusLine(canonicalContent);
+      if (canonicalStatus === null) continue; // no Safety-Header STATUS line -- not a plan this category understands
+
+      if (computeTierAFinding(canonicalPath, mirrorPath)) {
+        tierACount++;
+        continue; // mutually exclusive with Tier B by construction -- see computeTierAFinding's doc comment
+      }
+
+      const mirrorExists = fs.existsSync(mirrorPath);
+      const mirrorStatus = mirrorExists ? extractStatusLine(fs.readFileSync(mirrorPath, "utf-8")) : null;
+      if (isTierBCandidate(canonicalStatus, mirrorStatus)) {
+        tierBCount++;
+        const branchCandidate = extractBranchCandidateFromFilename(f);
+        const merged = defaultBranch ? wasBranchMerged(projectRoot, defaultBranch, branchCandidate) : false;
+        tierBLines.push(
+          `${f}: candidate branch "${branchCandidate}" (filename-derived, best-effort, rarely a real match) -- ` +
+          (merged
+            ? "merge evidence FOUND (branch-level only -- cannot distinguish this plan from any sibling sharing the same branch string)"
+            : "no merge evidence found (squash/rebase-merge produces no merge commit to find, or genuinely not yet merged)")
+        );
+      }
+    } catch {
+      continue; // unreadable file (permissions, vanished mid-scan, dangling symlink) -- skip, don't let one bad file break the whole inspect
+    }
+  }
+
+  let orphanedCount = 0;
+  if (fs.existsSync(mirrorDir)) {
+    for (const f of fs.readdirSync(mirrorDir)) {
+      if (f.endsWith(".md") && !fs.existsSync(path.join(plansDir, f))) orphanedCount++;
+    }
+  }
+
+  // Orphans are informational-only by design (Step 1's scope note) and must
+  // NEVER by themselves satisfy this emit gate (Opus review, 2026-08-19,
+  // finding #2): an upgrades[] entry gets added to the wizard's
+  // _mcp_apply[] and offered for apply, but applyPlanStatusDrift() has
+  // nothing to repair for an orphan-only case (0 Tier A), so it would
+  // report "0 synced" and the identical item would reappear on every future
+  // inspect, forever, with no action able to clear it. (A warnings[]-routed
+  // alternative was considered and rejected: kmg-upgrade-inspector.md's
+  // warnings[] contract routes every entry through the platform-split
+  // wizard flow, which has no handler for an unrelated informational note
+  // -- reusing it here would just recreate finding #1's bug under a new
+  // category. Folding the orphan count into the Tier A/B item's own
+  // description below, and saying nothing when orphans are the only thing
+  // found, was the reviewer's own stated alternative fix.)
+  if (tierACount === 0 && tierBCount === 0) return [];
+
+  return [{
+    category: "plan-status-drift",
+    description:
+      `issue-49: ${tierACount} Tier A mirror-drift, auto-repairable; ${tierBCount} Tier B candidates, ` +
+      `needs manual review; ${orphanedCount} orphaned mirror-only files, informational`,
+    details:
+      `Tier A: knowledge/plans/X.md's Safety-Header STATUS is ahead of its ~/.claude/plans/X.md mirror ` +
+      `(canonical already "✅ COMPLETE", mirror still a frozen "🔴 STOPPED"/"🔴 AWAITING APPROVAL" ` +
+      `placeholder, rest of the file identical) -- safe, mechanical, one-direction repair (canonical -> ` +
+      `mirror).` +
+      (tierACount > 0 ? ` Run with apply: ["plan-status-drift"], confirmBackfix: true to repair Tier A findings only.` : "") +
+      ` Tier B: BOTH copies still show the exact frozen placeholder -- this tier only ever gathers ` +
+      `best-effort branch-merge evidence for a human to review by hand; it never marks anything COMPLETE ` +
+      `on its own judgment, regardless of how confident the evidence looks, and apply never touches these.` +
+      (tierBLines.length > 0 ? `\nTier B candidates:\n${tierBLines.join("\n")}` : "") +
+      (orphanedCount > 0 ? `\n${orphanedCount} file(s) exist in ~/.claude/plans/ with no knowledge/plans/ counterpart -- informational only, no action taken.` : ""),
+  }];
+}
+
+/**
+ * Only Tier A findings are ever auto-repaired -- Tier B is never touched
+ * here regardless of confidence (see computeTierAFinding's doc comment for
+ * why this is structurally guaranteed, not just a loop that happens not to
+ * visit Tier B files). Re-derives the write predicate fresh for every plan
+ * file on every call; never consumes a cached finding list.
+ */
+function applyPlanStatusDrift(cwd: string): string {
+  const projectRoot = findProjectRoot(cwd);
+  if (!projectRoot) return "No project root found -- nothing to repair.";
+  const plansDir = path.join(projectRoot, "knowledge", "plans");
+  if (!fs.existsSync(plansDir)) return "No knowledge/plans/ directory found -- nothing to repair.";
+  const mirrorDir = path.join(os.homedir(), ".claude", "plans");
+
+  const planFiles = fs.readdirSync(plansDir).filter((f) => {
+    if (!f.endsWith(".md")) return false;
+    try {
+      return fs.statSync(path.join(plansDir, f)).isFile();
+    } catch {
+      return false; // unreadable/vanished between readdir and stat -- skip, don't abort the whole apply
+    }
+  });
+
+  let repairedCount = 0;
+  for (const f of planFiles) {
+    const canonicalPath = path.join(plansDir, f);
+    const mirrorPath = path.join(mirrorDir, f);
+    let finding: TierAFinding | null;
+    try {
+      finding = computeTierAFinding(canonicalPath, mirrorPath);
+    } catch {
+      continue; // unreadable file (permissions, vanished mid-scan, dangling symlink) -- skip, don't abort other categories' already-accumulated results
+    }
+    if (!finding) continue; // not (or no longer) a Tier A finding -- silently skipped, not written
+
+    // Splice and write the SAME bytes the predicate above validated -- do
+    // not re-read the file here. A second, unvalidated read would be a
+    // TOCTOU window: an edit landing between computeTierAFinding()'s read
+    // and a fresh read here would get canonical's STATUS spliced into
+    // content the predicate never actually checked.
+    try {
+      backupOnce(mirrorPath, finding.mirrorContent);
+      fs.writeFileSync(mirrorPath, spliceStatusLine(finding.mirrorContent, finding.mirrorStatusLine, finding.canonicalStatusLine), "utf-8");
+      repairedCount++;
+    } catch {
+      continue; // write/backup failed (permissions, disk) -- skip, don't abort other files or other apply categories
+    }
+  }
+
+  return `${repairedCount} plan mirror(s) synced to canonical STATUS.`;
 }
 
 /**
@@ -1555,7 +1959,7 @@ function updateLastAppliedVersion(installedVersion: string, graphName: string): 
 // kmg-upgrade-inspector.md's confirmBackfix wiring: that boolean is per-call, not
 // per-category, so a call consenting to one confirmBackfix-gated category silently
 // also consents to any other one present in the same `apply: [...]` array.
-export type ApplyCategory = "status-schema" | "config-location" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir" | "capture-corruption" | "diff-blank-reconstruction";
+export type ApplyCategory = "status-schema" | "config-location" | "plan-status-drift" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir" | "capture-corruption" | "diff-blank-reconstruction";
 
 export interface HandleUpgradeParams {
   apply?: ApplyCategory[];
@@ -1629,6 +2033,7 @@ export async function handleUpgrade(
     const result: InspectResult = { upgrades: [], warnings: [] };
     result.upgrades.push(...checkStatusSchema());
     result.upgrades.push(...checkConfigLocation());
+    result.upgrades.push(...checkPlanStatusDrift(cwd));
 
     if ("error" in target) {
       // "resolution" (below) is inspect-only, same as "version-update" — see the
@@ -1645,10 +2050,26 @@ export async function handleUpgrade(
     const kgPath = target.graph.path.replace(/^~/, os.homedir());
     const kgType = target.graph.type as string | undefined;
     if (!fs.existsSync(kgPath)) {
-      return {
-        content: [{ type: "text" as const, text: `Error: KG path not found: ${kgPath}` }],
-        isError: true,
-      };
+      // Pre-existing bug, fixed here (c6, issue-49 Step 4 point 7): this used
+      // to return a bare error, discarding whatever checkStatusSchema()/
+      // checkConfigLocation()/checkPlanStatusDrift() had already pushed into
+      // `result` above -- a user with a registered-but-deleted graph path
+      // never learned their plan mirrors were stale, even though that
+      // finding had already been computed. Return the partial result
+      // instead, matching the existing degraded-mode pattern the sibling
+      // "error" in target path above already uses -- including pushing the
+      // "resolution" marker into upgrades[], NOT warnings[] (Opus review,
+      // 2026-08-19): kmg-upgrade-inspector.md's warnings[] contract routes
+      // every entry through the platform-split wizard flow, which has no
+      // handler for a bare "resolution" marker with no flaggedLines; only
+      // upgrades[] has the dedicated "resolution" case (display as
+      // informational, never added to _mcp_apply[]) that this marker needs.
+      result.upgrades.push({
+        category: "resolution",
+        description: `KG path not found: ${kgPath}`,
+        details: "Graph-dependent checks (directories, config, templates, stray-knowledge-dir, version-update) were skipped.",
+      });
+      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
     }
 
     result.upgrades.push(...checkDirectories(kgPath));
@@ -1685,7 +2106,7 @@ export async function handleUpgrade(
   const resolvedKgPathForApply = !("error" in target)
     ? target.graph.path.replace(/^~/, os.homedir())
     : undefined;
-  if (resolvedKgPathForApply && !fs.existsSync(resolvedKgPathForApply) && sortedApplyList.some((c) => c !== "config-location" && c !== "status-schema")) {
+  if (resolvedKgPathForApply && !fs.existsSync(resolvedKgPathForApply) && sortedApplyList.some((c) => c !== "config-location" && c !== "status-schema" && c !== "plan-status-drift")) {
     return {
       content: [{ type: "text" as const, text: `Error: KG path not found: ${resolvedKgPathForApply}` }],
       isError: true,
@@ -1711,6 +2132,43 @@ export async function handleUpgrade(
     }
     if (category === "config-location") {
       results.push(`[config-location] ${applyConfigLocation()}`);
+      continue;
+    }
+    if (category === "plan-status-drift") {
+      // c6 (issue-49): born already gated through c5's shared consent
+      // mechanism, unlike capture-corruption/platform-split which had to be
+      // retrofitted. Same placement as status-schema/config-location above
+      // (before the "error" in target check) -- this category is graph-
+      // independent and must never fall into the switch(category) block
+      // below, which assumes a resolved kgPath. Deliberately does NOT set
+      // appliedAnyGraphDependent: that flag drives updateLastAppliedVersion(),
+      // which writes a version sentinel onto whatever graph `target`
+      // resolved to -- this category never touches a graph at all, so
+      // setting it would write an unrelated side effect onto an unrelated
+      // (or nonexistent) graph.
+      const mode = resolveInteractionMode({}).mode;
+      const projectRoot = findProjectRoot(cwd);
+      const tierACount = projectRoot ? countTierAFindings(projectRoot) : 0;
+      const confirmation = tierACount === 0
+        ? { confirmed: true as const }
+        : await confirmBackfixCategory({
+            reasonCode: "plan_status_drift_backfix",
+            param: "confirmBackfix",
+            mode,
+            confirmed: params.confirmBackfix,
+            timeoutMs: STUB_ASK_TIMEOUT_MS,
+            // Not a "confirmed merged" framing -- Tier A never involves a
+            // merge-status judgment, only Tier B did in the original design,
+            // and Tier B is never applied.
+            detail: `${tierACount} plan file(s) in ~/.claude/plans/ are stale copies of their already-COMPLETE knowledge/plans/ canonical -- sync their STATUS line now?`,
+            skipAsk: pending.length > 0,
+          });
+      if (!("confirmed" in confirmation)) {
+        pending.push(confirmation);
+        anyCategoryFailed = true;
+        continue;
+      }
+      results.push(`[plan-status-drift] ${applyPlanStatusDrift(cwd)}`);
       continue;
     }
     if ("error" in target) {
@@ -1893,11 +2351,11 @@ export function registerUpgradeTool(server: McpServer, personalScopeSession: Per
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
       apply: z
-        .array(z.enum(["status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction"]))
+        .array(z.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction"]))
         .optional()
         .default([])
         .describe(
-          'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history)'
+          'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history)'
         ),
       confirm_platform_split: z
         .boolean()

@@ -17,6 +17,18 @@ jest.mock("../src/utils.js", () => {
   };
 });
 
+// The plan-status-drift blocks at the bottom of this file need a fake home
+// directory (~/.claude/plans/ is half of that category's input). Assigning
+// process.env.HOME is NOT enough: Node resolves os.homedir() once at startup,
+// so a later assignment does not move it, and jest.spyOn(os, "homedir") throws
+// "Cannot redefine property" because the built-in module's exports are
+// non-configurable. Mocking the module is the only handle. homedir() keeps the
+// real value by default, so every other test in this file is unaffected.
+jest.mock("os", () => {
+  const actualOs = jest.requireActual("os") as typeof import("os");
+  return { ...actualOs, homedir: jest.fn(() => actualOs.homedir()) };
+});
+
 import { handleUpgrade } from "../src/tools/upgrade.js";
 import { handleVersion } from "../src/tools/version.js";
 import { readConfig, writeConfig } from "../src/utils.js";
@@ -712,8 +724,19 @@ describe("T-22: KG path does not exist", () => {
     process.cwd = () => "/nonexistent/path/that/does/not/exist";
 
     const result = await handleUpgrade({});
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Error");
+    // c6 (issue-49) fixed a pre-existing bug here: this used to discard
+    // whatever checkStatusSchema()/checkConfigLocation()/
+    // checkPlanStatusDrift() had already computed and return a bare
+    // isError:true. Now it returns the partial result instead, matching the
+    // sibling "error" in target path's existing degraded-mode pattern -- a
+    // user with a deleted graph path still sees whatever graph-independent
+    // findings were already available. The "resolution" marker itself lives
+    // in upgrades[], not warnings[] (Opus review, 2026-08-19 -- warnings[]
+    // is contractually routed through the wizard's platform-split flow,
+    // which has no handler for a bare resolution marker).
+    expect(result.isError).toBeUndefined();
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed.upgrades.some((u: { category: string; description: string }) => u.category === "resolution" && u.description.includes("KG path not found"))).toBe(true);
   });
 });
 
@@ -2669,5 +2692,802 @@ describe("c2: diff-blank-reconstruction (issue-47 backfix)", () => {
     // into reconstructable/unresolvable and rewritten.
     expect(result.content[0].text).toContain("0 session file(s) reconstructed, 0 left");
     expect(fs.readFileSync(sessFile, "utf-8")).toBe(content); // untouched
+  });
+});
+
+// ---------------------------------------------------------------------------
+// c6 (issue-49): plan-status-drift backfix
+//
+// Unlike capture-corruption/diff-blank-reconstruction, this category does NOT
+// operate under a KG's kgPath. Its two inputs are:
+//   - the canonical copy at <projectRoot>/knowledge/plans/X.md, where
+//     projectRoot is found by findProjectRoot(cwd)'s upward walk, and
+//   - the local mirror at os.homedir()/.claude/plans/X.md.
+// So every fixture below builds a real project root (a real `git init` repo
+// with a knowledge/plans/ subdir), points process.cwd at it, and fakes the
+// home directory.
+//
+// The home side is module-mocked, not env-faked: the config-location block
+// above gets away with assigning process.env.HOME only because utils.ts's
+// legacy path reads `process.env.HOME || os.homedir()` explicitly. Node
+// resolves os.homedir() once at startup, so a later $HOME assignment does NOT
+// move it (verified: os.homedir() still returned the real home afterwards, and
+// every mirror-side assertion here silently read the developer's real
+// ~/.claude/plans). checkPlanStatusDrift() calls bare os.homedir(), hence the
+// jest.mock("os", ...) at the top of this file. $HOME is set alongside it
+// purely so the two signals never disagree for any other code the call
+// touches.
+// ---------------------------------------------------------------------------
+
+/** The unmocked home directory — restored after each plan-status-drift test. */
+const REAL_HOMEDIR = (jest.requireActual("os") as typeof import("os")).homedir();
+
+function fakeHomedir(dir: string): void {
+  (os.homedir as unknown as jest.Mock).mockReturnValue(dir);
+}
+
+function restoreHomedir(): void {
+  (os.homedir as unknown as jest.Mock).mockReturnValue(REAL_HOMEDIR);
+}
+
+/**
+ * The two EXACT frozen Safety-Header placeholders the implementation
+ * recognizes (FROZEN_PLACEHOLDERS in upgrade.ts). Duplicated verbatim here on
+ * purpose: if the implementation's list is edited, these tests must fail
+ * loudly rather than silently follow it.
+ */
+const FROZEN_PRE_C7 = "**STATUS:** 🔴 STOPPED (Waiting for Manual Approval of Step 1)";
+const FROZEN_C7 = "**STATUS:** 🔴 AWAITING APPROVAL (Waiting for Manual Approval of Step 1)";
+const STATUS_COMPLETE = "**STATUS:** ✅ COMPLETE";
+
+const DEFAULT_PLAN_BODY = "## Step 1\n\nDo the thing.\n";
+
+function planContent(statusLine: string, body: string = DEFAULT_PLAN_BODY): string {
+  return `# Implementation Plan\n\n## Safety Header\n\n${statusLine}\n**PROTOCOL:** zero-deviation\n\n${body}`;
+}
+
+// Same shape as the c2 block's gitInit — real git repos as fixtures, not mocks.
+function gitInitRepo(dir: string): void {
+  execSync("git init -q -b main", { cwd: dir });
+  execSync('git config user.email t@t.com && git config user.name t', { cwd: dir });
+}
+
+function seedCommit(dir: string): void {
+  fs.writeFileSync(path.join(dir, "seed.md"), "seed", "utf-8");
+  execSync("git add -A && git commit -q -m seed", { cwd: dir });
+}
+
+/** Real `--no-ff` merge into main, producing a `Merge branch '<branch>'` subject. */
+function mergeBranchNoFf(dir: string, branch: string): void {
+  execSync(`git checkout -q -b ${branch}`, { cwd: dir });
+  fs.writeFileSync(path.join(dir, `work-${branch}.md`), "work", "utf-8");
+  execSync("git add -A && git commit -q -m work", { cwd: dir });
+  execSync("git checkout -q main", { cwd: dir });
+  execSync(`git merge -q --no-ff -m "Merge branch '${branch}'" ${branch}`, { cwd: dir });
+}
+
+interface PlanFixture {
+  projectRoot: string;
+  plansDir: string;
+  mirrorDir: string;
+}
+
+function makePlanFixture(prefix: string, fakeHome: string, opts: { git?: boolean } = {}): PlanFixture {
+  const projectRoot = makeTempDir(prefix);
+  tempDirs.push(projectRoot);
+  const plansDir = path.join(projectRoot, "knowledge", "plans");
+  fs.mkdirSync(plansDir, { recursive: true });
+  const mirrorDir = path.join(fakeHome, ".claude", "plans");
+  fs.mkdirSync(mirrorDir, { recursive: true });
+  if (opts.git !== false) gitInitRepo(projectRoot);
+  mockActiveKg(projectRoot); // also points process.cwd at projectRoot
+  return { projectRoot, plansDir, mirrorDir };
+}
+
+function writePlanPair(
+  fx: PlanFixture,
+  name: string,
+  canonical: string,
+  mirror?: string
+): { canonicalPath: string; mirrorPath: string } {
+  const canonicalPath = path.join(fx.plansDir, name);
+  const mirrorPath = path.join(fx.mirrorDir, name);
+  fs.writeFileSync(canonicalPath, canonical, "utf-8");
+  if (mirror !== undefined) fs.writeFileSync(mirrorPath, mirror, "utf-8");
+  return { canonicalPath, mirrorPath };
+}
+
+function parseInspect(result: Awaited<ReturnType<typeof handleUpgrade>>): {
+  upgrades: Array<{ category: string; description: string; details?: string }>;
+  warnings: Array<{ category: string; description: string }>;
+} {
+  return JSON.parse(result.content[0].text);
+}
+
+function planDriftItem(result: Awaited<ReturnType<typeof handleUpgrade>>) {
+  return parseInspect(result).upgrades.find((u) => u.category === "plan-status-drift");
+}
+
+function listBakFiles(dir: string): string[] {
+  const out: string[] = [];
+  const walk = (d: string): void => {
+    for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
+      const full = path.join(d, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (entry.name.endsWith(".bak")) out.push(full);
+    }
+  };
+  walk(dir);
+  return out;
+}
+
+describe("plan-status-drift — inspect mode", () => {
+  const ORIGINAL_HOME = process.env.HOME;
+  let fakeHome: string;
+
+  beforeEach(() => {
+    fakeHome = makeTempDir("psd-home");
+    tempDirs.push(fakeHome);
+    fakeHomedir(fakeHome);
+    process.env.HOME = fakeHome;
+  });
+
+  afterEach(() => {
+    restoreHomedir();
+    if (ORIGINAL_HOME === undefined) delete process.env.HOME;
+    else process.env.HOME = ORIGINAL_HOME;
+  });
+
+  // 1
+  test("Tier A: canonical COMPLETE + mirror still the frozen placeholder + rest identical is flagged", async () => {
+    const fx = makePlanFixture("psd-tier-a", fakeHome);
+    writePlanPair(fx, "v0.7.2-demo-plan.md", planContent(STATUS_COMPLETE), planContent(FROZEN_PRE_C7));
+
+    const item = planDriftItem(await handleUpgrade({}));
+    expect(item).toBeDefined();
+    expect(item!.description).toContain("1 Tier A mirror-drift");
+    expect(item!.description).toContain("0 Tier B");
+    expect(item!.description).toContain("0 orphaned");
+  });
+
+  // 2
+  test("false-positive guard: canonical and mirror already identical (STATUS included) is not flagged", async () => {
+    const fx = makePlanFixture("psd-identical", fakeHome);
+    const content = planContent(STATUS_COMPLETE);
+    writePlanPair(fx, "v0.7.2-identical-plan.md", content, content);
+
+    expect(planDriftItem(await handleUpgrade({}))).toBeUndefined();
+  });
+
+  // 3
+  test("false-positive guard: a pair that ALSO differs outside the STATUS line is not a Tier A finding", async () => {
+    const fx = makePlanFixture("psd-body-diff", fakeHome);
+    const divergentBody = "## Step 1\n\nDo the thing.\n\n## Step 2\n\nAdded to canonical after the mirror was copied.\n";
+    const { mirrorPath } = writePlanPair(
+      fx,
+      "v0.7.2-bodydiff-plan.md",
+      planContent(STATUS_COMPLETE, divergentBody),
+      planContent(FROZEN_PRE_C7)
+    );
+
+    expect(planDriftItem(await handleUpgrade({}))).toBeUndefined();
+
+    // Control: bring the bodies back into agreement and the SAME pair becomes
+    // Tier A -- proves the absence above was clause 3 ("differ ONLY in
+    // STATUS") firing, not a detector that never fires at all.
+    fs.writeFileSync(mirrorPath, planContent(FROZEN_PRE_C7, divergentBody), "utf-8");
+    const item = planDriftItem(await handleUpgrade({}));
+    expect(item!.description).toContain("1 Tier A");
+  });
+
+  // 4
+  test("Tier B: both copies frozen at the exact placeholder with merge evidence present is manual-review only", async () => {
+    const fx = makePlanFixture("psd-tier-b", fakeHome);
+    seedCommit(fx.projectRoot);
+    mergeBranchNoFf(fx.projectRoot, "v0.7.2-c6-demo");
+    writePlanPair(fx, "v0.7.2-c6-demo-plan.md", planContent(FROZEN_PRE_C7), planContent(FROZEN_PRE_C7));
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    // Never counted as auto-applicable, however strong the evidence looks.
+    expect(item.description).toContain("0 Tier A");
+    expect(item.description).toContain("1 Tier B");
+    expect(item.details).toContain("Tier B candidates:");
+    expect(item.details).toContain("v0.7.2-c6-demo-plan.md");
+    expect(item.details).toContain("merge evidence FOUND");
+    expect(item.details).toContain("cannot distinguish this plan from any sibling");
+  });
+
+  // 5
+  test("Tier B: two plans sharing one identical branch reference BOTH stay in manual review", async () => {
+    const fx = makePlanFixture("psd-tier-b-collision", fakeHome);
+    seedCommit(fx.projectRoot);
+    mergeBranchNoFf(fx.projectRoot, "v0.7.2-issues-46-51");
+
+    const shared = "## Related\n\nShares branch v0.7.2-issues-46-51 with its sibling plans.\n";
+    writePlanPair(fx, "v0.7.2-c6-first-plan.md", planContent(FROZEN_PRE_C7, shared), planContent(FROZEN_PRE_C7, shared));
+    writePlanPair(fx, "v0.7.2-c7-second-plan.md", planContent(FROZEN_C7, shared), planContent(FROZEN_C7, shared));
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    expect(item.description).toContain("0 Tier A");
+    expect(item.description).toContain("2 Tier B");
+    expect(item.details).toContain("v0.7.2-c6-first-plan.md");
+    expect(item.details).toContain("v0.7.2-c7-second-plan.md");
+    // The shared in-body branch string never resolves either one: the branch
+    // candidate is filename-derived, so a merged sibling branch is evidence
+    // for neither plan.
+    expect(item.details).not.toContain("merge evidence FOUND");
+  });
+
+  // 6
+  test("Tier B: exact-string match only — other step numbers / transitioned states are not candidates", async () => {
+    const fx = makePlanFixture("psd-tier-b-fp", fakeHome);
+    const variants: Array<[string, string]> = [
+      ["v0.7.2-step0-plan.md", "**STATUS:** 🔴 STOPPED (Waiting for Manual Approval of Step 0)"],
+      ["v0.7.2-step4-plan.md", "**STATUS:** 🔴 STOPPED (Waiting for Manual Approval of Step 4)"],
+      ["v0.7.2-inprogress-plan.md", "**STATUS:** 🟡 IN PROGRESS (Step 2)"],
+      ["v0.7.2-complete-plan.md", STATUS_COMPLETE],
+      // Bare "STOPPED" — the shape a fuzzy substring matcher would swallow.
+      ["v0.7.2-bare-stopped-plan.md", "**STATUS:** 🔴 STOPPED"],
+    ];
+    for (const [name, status] of variants) {
+      const content = planContent(status);
+      writePlanPair(fx, name, content, content);
+    }
+
+    expect(planDriftItem(await handleUpgrade({}))).toBeUndefined();
+  });
+
+  // 7a
+  test("Tier B evidence: a candidate that is a strict PREFIX of a different merged branch is not treated as merged", async () => {
+    const fx = makePlanFixture("psd-prefix-guard", fakeHome);
+    seedCommit(fx.projectRoot);
+    // Only the LONGER name was ever merged; a naive substring/grep match would
+    // report the shorter one as merged too (confirmed live in this repo).
+    mergeBranchNoFf(fx.projectRoot, "v0.7.1.4-version-sync-issue-45-extra");
+    mergeBranchNoFf(fx.projectRoot, "v0.7.1.5-exact");
+
+    writePlanPair(fx, "v0.7.1.4-version-sync-plan.md", planContent(FROZEN_PRE_C7), planContent(FROZEN_PRE_C7));
+    writePlanPair(fx, "v0.7.1.5-exact-plan.md", planContent(FROZEN_PRE_C7), planContent(FROZEN_PRE_C7));
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    expect(item.description).toContain("2 Tier B");
+    const lines = item.details!.split("\n");
+    const prefixLine = lines.find((l) => l.startsWith("v0.7.1.4-version-sync-plan.md"))!;
+    const exactLine = lines.find((l) => l.startsWith("v0.7.1.5-exact-plan.md"))!;
+    expect(prefixLine).toContain("no merge evidence found");
+    // Control in the same fixture: exact segment equality DOES match, so the
+    // assertion above is a real guard, not a signal that never fires.
+    expect(exactLine).toContain("merge evidence FOUND");
+  });
+
+  // 7b
+  test("Tier B evidence: a squash-merged branch (no merge commit at all) still lands in manual review", async () => {
+    const fx = makePlanFixture("psd-squash", fakeHome);
+    seedCommit(fx.projectRoot);
+    execSync("git checkout -q -b v0.7.2-squashed", { cwd: fx.projectRoot });
+    fs.writeFileSync(path.join(fx.projectRoot, "squashed-work.md"), "work", "utf-8");
+    execSync("git add -A && git commit -q -m work", { cwd: fx.projectRoot });
+    execSync("git checkout -q main", { cwd: fx.projectRoot });
+    execSync("git merge -q --squash v0.7.2-squashed", { cwd: fx.projectRoot });
+    execSync('git commit -q -m "feat: squashed work (#42)"', { cwd: fx.projectRoot });
+    execSync("git branch -q -D v0.7.2-squashed", { cwd: fx.projectRoot });
+
+    writePlanPair(fx, "v0.7.2-squashed-plan.md", planContent(FROZEN_PRE_C7), planContent(FROZEN_PRE_C7));
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    expect(item.description).toContain("0 Tier A");
+    expect(item.description).toContain("1 Tier B"); // not silently dropped
+    expect(item.details).toContain("v0.7.2-squashed-plan.md");
+    expect(item.details).toContain("no merge evidence found");
+  });
+
+  // 7c
+  test("Tier B evidence: a fast-forward-merged branch deleted afterwards still lands in manual review", async () => {
+    const fx = makePlanFixture("psd-ff-deleted", fakeHome);
+    seedCommit(fx.projectRoot);
+    execSync("git checkout -q -b v0.7.2-ffgone", { cwd: fx.projectRoot });
+    fs.writeFileSync(path.join(fx.projectRoot, "ff-work.md"), "work", "utf-8");
+    execSync("git add -A && git commit -q -m work", { cwd: fx.projectRoot });
+    execSync("git checkout -q main", { cwd: fx.projectRoot });
+    execSync("git merge -q --ff-only v0.7.2-ffgone", { cwd: fx.projectRoot }); // no merge commit
+    execSync("git branch -q -d v0.7.2-ffgone", { cwd: fx.projectRoot }); // no surviving ref
+
+    writePlanPair(fx, "v0.7.2-ffgone-plan.md", planContent(FROZEN_PRE_C7), planContent(FROZEN_PRE_C7));
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    expect(item.description).toContain("0 Tier A");
+    expect(item.description).toContain("1 Tier B");
+    expect(item.details).toContain("v0.7.2-ffgone-plan.md");
+    expect(item.details).toContain("no merge evidence found");
+  });
+
+  // 8
+  test("orphaned mirror-only files alone never produce an actionable item (Opus review, 2026-08-19)", async () => {
+    const fx = makePlanFixture("psd-orphan", fakeHome);
+    fs.writeFileSync(path.join(fx.mirrorDir, "v0.6.0-orphan-plan.md"), planContent(FROZEN_PRE_C7), "utf-8");
+
+    const parsed = parseInspect(await handleUpgrade({}));
+    // An orphan-only finding (0 Tier A, 0 Tier B) must NOT become an
+    // upgrades[] item -- that would add "plan-status-drift" to the wizard's
+    // apply list with nothing for apply to actually repair, so it would
+    // report "0 synced" and reappear on every future inspect with no way to
+    // ever clear it. (A warnings[]-routed alternative was considered and
+    // rejected: kmg-upgrade-inspector.md's warnings[] contract routes every
+    // entry through the platform-split wizard flow, which has no handler
+    // for an unrelated informational note -- that would just recreate the
+    // sibling "resolution"-in-warnings[] bug under a new category.)
+    expect(parsed.upgrades.find((u) => u.category === "plan-status-drift")).toBeUndefined();
+    expect(parsed.warnings.find((w) => w.category === "plan-status-drift")).toBeUndefined();
+  });
+
+  test("orphan count folds into the Tier A/B item's own description when a real finding also exists", async () => {
+    const fx = makePlanFixture("psd-orphan-with-tier-a", fakeHome);
+    writePlanPair(fx, "v0.7.2-real-plan.md", planContent(STATUS_COMPLETE), planContent(FROZEN_PRE_C7));
+    fs.writeFileSync(path.join(fx.mirrorDir, "v0.6.0-orphan-plan.md"), planContent(FROZEN_PRE_C7), "utf-8");
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    expect(item.description).toContain("1 Tier A");
+    expect(item.description).toContain("1 orphaned mirror-only files");
+    expect(item.details).toContain("informational only, no action taken");
+    expect(item.details).not.toContain("v0.6.0-orphan-plan.md"); // never named as actionable
+  });
+
+  // 9
+  test("project-root walk: a cwd deep inside the project still finds knowledge/plans/ at the ascended root", async () => {
+    const fx = makePlanFixture("psd-walk", fakeHome);
+    writePlanPair(fx, "v0.7.2-walk-plan.md", planContent(STATUS_COMPLETE), planContent(FROZEN_PRE_C7));
+    const nested = path.join(fx.projectRoot, "mcp-server", "src", "tools");
+    fs.mkdirSync(nested, { recursive: true });
+    process.cwd = () => nested; // deeper than makePlanFixture's default
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    expect(item.description).toContain("1 Tier A");
+  });
+
+  test("project-root walk: no knowledge/plans/ in the ancestor chain returns cleanly, no throw and no finding", async () => {
+    // (a) a real project-root marker (.git) but no knowledge/plans/ under it
+    const bare = makeTempDir("psd-nowalk");
+    tempDirs.push(bare);
+    gitInitRepo(bare);
+    mockActiveKg(bare);
+
+    const withMarker = await handleUpgrade({});
+    expect(withMarker.isError).toBeUndefined();
+    expect(planDriftItem(withMarker)).toBeUndefined();
+
+    // (b) no project-root marker at all — findProjectRoot walks to the
+    // filesystem root and gives up; still a clean empty result, not a throw.
+    const unmarked = makeTempDir("psd-nomarker");
+    tempDirs.push(unmarked);
+    mockActiveKg(unmarked);
+
+    const withoutMarker = await handleUpgrade({});
+    expect(withoutMarker.isError).toBeUndefined();
+    expect(planDriftItem(withoutMarker)).toBeUndefined();
+  });
+
+  // 10
+  test("archive/ subdirectory is excluded by the flat, non-recursive listing", async () => {
+    const fx = makePlanFixture("psd-archive", fakeHome);
+    const archiveDir = path.join(fx.plansDir, "archive");
+    fs.mkdirSync(archiveDir, { recursive: true });
+    // Frozen placeholder, no mirror -> would be a Tier B candidate if scanned.
+    fs.writeFileSync(path.join(archiveDir, "v0.5.0-archived-plan.md"), planContent(FROZEN_PRE_C7), "utf-8");
+
+    expect(planDriftItem(await handleUpgrade({}))).toBeUndefined();
+  });
+
+  // 11
+  test("Tier B: a canonical frozen at the placeholder with NO mirror counterpart is still a candidate", async () => {
+    const fx = makePlanFixture("psd-canonical-only", fakeHome);
+    writePlanPair(fx, "v0.7.2-nomirror-plan.md", planContent(FROZEN_C7)); // deliberately no mirror
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    expect(item.description).toContain("0 Tier A");
+    expect(item.description).toContain("1 Tier B");
+    expect(item.description).toContain("0 orphaned");
+    expect(item.details).toContain("v0.7.2-nomirror-plan.md");
+  });
+
+  // 12a
+  test("line-ending normalization (detection): a CRLF canonical vs an LF mirror is still Tier A", async () => {
+    const fx = makePlanFixture("psd-crlf-detect", fakeHome);
+    writePlanPair(
+      fx,
+      "v0.7.2-crlf-plan.md",
+      planContent(STATUS_COMPLETE).replace(/\n/g, "\r\n"),
+      planContent(FROZEN_PRE_C7)
+    );
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    expect(item.description).toContain("1 Tier A");
+  });
+
+  // 12b
+  test("line-ending normalization (detection): trailing newline present vs absent is still Tier A", async () => {
+    const fx = makePlanFixture("psd-trailing-nl", fakeHome);
+    writePlanPair(
+      fx,
+      "v0.7.2-trailing-plan.md",
+      planContent(STATUS_COMPLETE), // ends with "\n"
+      planContent(FROZEN_PRE_C7).replace(/\n+$/, "") // no trailing newline at all
+    );
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    expect(item.description).toContain("1 Tier A");
+  });
+
+  // 12c
+  test("line-ending normalization (detection): lone-\\r line endings are still Tier A", async () => {
+    const fx = makePlanFixture("psd-lone-cr", fakeHome);
+    writePlanPair(
+      fx,
+      "v0.7.2-lonecr-plan.md",
+      planContent(STATUS_COMPLETE).replace(/\n/g, "\r"),
+      planContent(FROZEN_PRE_C7)
+    );
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    expect(item.description).toContain("1 Tier A");
+  });
+
+  // 13
+  test("overwrite-risk regression (AND, not OR): a hand-annotated mirror STATUS is never a Tier A finding", async () => {
+    // The condition is "mirror looks ^🔴 AND canonical contains ✅ COMPLETE".
+    // Under an OR (or a bare "the two differ") the hand-written note below
+    // would be silently overwritten with canonical's COMPLETE.
+    const fx = makePlanFixture("psd-and-not-or", fakeHome);
+    const mirrorContent = planContent("**STATUS:** 🟡 IN PROGRESS (Step 4 blocked)");
+    const { canonicalPath, mirrorPath } = writePlanPair(
+      fx,
+      "v0.7.2-handnote-plan.md",
+      planContent(STATUS_COMPLETE),
+      mirrorContent
+    );
+
+    expect(planDriftItem(await handleUpgrade({}))).toBeUndefined();
+
+    // And a real apply run leaves the hand annotation alone.
+    const applied = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+    expect(applied.content[0].text).toContain("0 plan mirror(s) synced");
+    expect(fs.readFileSync(mirrorPath, "utf-8")).toBe(mirrorContent);
+    expect(fs.readFileSync(canonicalPath, "utf-8")).toBe(planContent(STATUS_COMPLETE));
+    expect(fs.existsSync(`${mirrorPath}.bak`)).toBe(false);
+  });
+
+  // 14
+  test("backwards-write guard: a canonical still stopped while the mirror was hand-advanced is not Tier A", async () => {
+    const fx = makePlanFixture("psd-backwards", fakeHome);
+    const canonicalContent = planContent("**STATUS:** 🔴 STOPPED (Waiting for Manual Approval of Step 3)");
+    const mirrorContent = planContent(STATUS_COMPLETE);
+    const { canonicalPath, mirrorPath } = writePlanPair(
+      fx,
+      "v0.7.2-backwards-plan.md",
+      canonicalContent,
+      mirrorContent
+    );
+
+    expect(planDriftItem(await handleUpgrade({}))).toBeUndefined();
+
+    const applied = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+    expect(applied.content[0].text).toContain("0 plan mirror(s) synced");
+    // Neither direction written: canonical is never a write target at all, and
+    // the mirror must not be dragged backwards to canonical's stopped state.
+    expect(fs.readFileSync(canonicalPath, "utf-8")).toBe(canonicalContent);
+    expect(fs.readFileSync(mirrorPath, "utf-8")).toBe(mirrorContent);
+    expect(fs.existsSync(`${mirrorPath}.bak`)).toBe(false);
+  });
+
+  test("unreadable entry regression (Opus review, 2026-08-19): a dangling symlink in knowledge/plans/ does not crash the whole inspect", async () => {
+    const fx = makePlanFixture("psd-dangling-symlink", fakeHome);
+    writePlanPair(
+      fx,
+      "v0.7.2-real-plan.md",
+      planContent(STATUS_COMPLETE),
+      planContent(FROZEN_PRE_C7)
+    );
+    // A dangling symlink: readdirSync lists it, but statSync/readFileSync
+    // throw ENOENT on it. Before the fix, this threw out of the unguarded
+    // fs.statSync/fs.readFileSync calls and took down the ENTIRE kg_upgrade
+    // inspect call -- not just this category -- discarding every other
+    // finding along with it.
+    fs.symlinkSync(path.join(fx.plansDir, "does-not-exist.md"), path.join(fx.plansDir, "dangling-plan.md"));
+
+    const parsed = parseInspect(await handleUpgrade({}));
+    // The real Tier A finding still surfaces -- the dangling entry was
+    // skipped, not treated as a reason to abort the scan.
+    const item = parsed.upgrades.find((u) => u.category === "plan-status-drift");
+    expect(item).toBeDefined();
+    expect(item!.description).toContain("1 Tier A");
+  });
+});
+
+describe("plan-status-drift — apply mode", () => {
+  const ORIGINAL_HOME = process.env.HOME;
+  let fakeHome: string;
+
+  beforeEach(() => {
+    fakeHome = makeTempDir("psd-apply-home");
+    tempDirs.push(fakeHome);
+    fakeHomedir(fakeHome); // see the block comment above — $HOME alone does not move os.homedir()
+    process.env.HOME = fakeHome;
+  });
+
+  afterEach(() => {
+    restoreHomedir();
+    if (ORIGINAL_HOME === undefined) delete process.env.HOME;
+    else process.env.HOME = ORIGINAL_HOME;
+  });
+
+  // 15
+  test("Tier A repair: mirror STATUS synced, .bak holds the pre-rewrite mirror, canonical untouched", async () => {
+    const fx = makePlanFixture("psd-repair", fakeHome);
+    const canonicalContent = planContent(STATUS_COMPLETE);
+    const mirrorContent = planContent(FROZEN_PRE_C7);
+    const { canonicalPath, mirrorPath } = writePlanPair(fx, "v0.7.2-repair-plan.md", canonicalContent, mirrorContent);
+
+    const result = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).toContain("[plan-status-drift] 1 plan mirror(s) synced to canonical STATUS.");
+    expect(fs.readFileSync(mirrorPath, "utf-8")).toBe(canonicalContent); // STATUS line now matches exactly
+    expect(fs.readFileSync(`${mirrorPath}.bak`, "utf-8")).toBe(mirrorContent); // pre-rewrite content
+    expect(fs.readFileSync(canonicalPath, "utf-8")).toBe(canonicalContent); // one-direction only
+    expect(fs.existsSync(`${canonicalPath}.bak`)).toBe(false); // canonical is never a write target
+  });
+
+  // 16a
+  test("re-check before write: a mirror that stopped qualifying between scan and apply is skipped, not overwritten", async () => {
+    const fx = makePlanFixture("psd-recheck-skip", fakeHome);
+    const { mirrorPath } = writePlanPair(
+      fx,
+      "v0.7.2-recheck-plan.md",
+      planContent(STATUS_COMPLETE),
+      planContent(FROZEN_PRE_C7)
+    );
+
+    // Scan sees a Tier A finding...
+    expect(planDriftItem(await handleUpgrade({}))!.description).toContain("1 Tier A");
+
+    // ...then the user edits the mirror out from under it.
+    const handEdited = planContent("**STATUS:** 🟡 IN PROGRESS (reopened by hand)");
+    fs.writeFileSync(mirrorPath, handEdited, "utf-8");
+
+    const result = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("0 plan mirror(s) synced");
+    expect(fs.readFileSync(mirrorPath, "utf-8")).toBe(handEdited); // stale finding not replayed
+    expect(fs.existsSync(`${mirrorPath}.bak`)).toBe(false); // nothing was even backed up
+  });
+
+  // 16b
+  test("re-check before write: a mirror changed to a DIFFERENT stopped variant is written from the NEW state", async () => {
+    const fx = makePlanFixture("psd-recheck-new", fakeHome);
+    const canonicalContent = planContent(STATUS_COMPLETE);
+    const preScanMirror = planContent(FROZEN_PRE_C7);
+    const { mirrorPath } = writePlanPair(fx, "v0.7.2-recheck2-plan.md", canonicalContent, preScanMirror);
+
+    expect(planDriftItem(await handleUpgrade({}))!.description).toContain("1 Tier A");
+
+    // Still Tier A-shaped, but different bytes than the scan saw.
+    const postScanMirror = planContent(FROZEN_C7);
+    fs.writeFileSync(mirrorPath, postScanMirror, "utf-8");
+
+    const result = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("1 plan mirror(s) synced");
+    expect(fs.readFileSync(mirrorPath, "utf-8")).toBe(canonicalContent);
+    // The backup is the state at write time, not the state the scan saw.
+    expect(fs.readFileSync(`${mirrorPath}.bak`, "utf-8")).toBe(postScanMirror);
+    expect(fs.readFileSync(`${mirrorPath}.bak`, "utf-8")).not.toBe(preScanMirror);
+  });
+
+  // 17
+  test("Tier B is NEVER touched by apply: zero files written, zero .bak files created", async () => {
+    const fx = makePlanFixture("psd-tier-b-untouched", fakeHome);
+    seedCommit(fx.projectRoot);
+    mergeBranchNoFf(fx.projectRoot, "v0.7.2-c6-frozen"); // strongest-looking evidence available
+
+    const pairs = [
+      writePlanPair(fx, "v0.7.2-c6-frozen-plan.md", planContent(FROZEN_PRE_C7), planContent(FROZEN_PRE_C7)),
+      writePlanPair(fx, "v0.7.2-c7-frozen-plan.md", planContent(FROZEN_C7), planContent(FROZEN_C7)),
+    ];
+    // Plus a canonical-only Tier B candidate (no mirror at all).
+    const canonicalOnly = writePlanPair(fx, "v0.7.2-c8-frozen-plan.md", planContent(FROZEN_PRE_C7));
+
+    const before = pairs.map((p) => ({
+      canonical: fs.readFileSync(p.canonicalPath, "utf-8"),
+      mirror: fs.readFileSync(p.mirrorPath, "utf-8"),
+    }));
+
+    const result = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).toContain("0 plan mirror(s) synced");
+    pairs.forEach((p, i) => {
+      expect(fs.readFileSync(p.canonicalPath, "utf-8")).toBe(before[i].canonical);
+      expect(fs.readFileSync(p.mirrorPath, "utf-8")).toBe(before[i].mirror);
+    });
+    expect(fs.existsSync(canonicalOnly.mirrorPath)).toBe(false); // no mirror conjured into existence
+    expect(listBakFiles(fx.plansDir)).toEqual([]);
+    expect(listBakFiles(fx.mirrorDir)).toEqual([]);
+  });
+
+  // 18
+  test("idempotency: a second apply against an already-synced mirror is a full no-op and does not clobber the .bak", async () => {
+    // Mirrors the diff-blank-reconstruction BLOCKER regression test above: the
+    // failure mode there was a second run re-classifying an already-handled
+    // file and overwriting .bak with already-mutated content, making the true
+    // original unrecoverable.
+    const fx = makePlanFixture("psd-idempotent", fakeHome);
+    const canonicalContent = planContent(STATUS_COMPLETE);
+    const originalMirror = planContent(FROZEN_PRE_C7);
+    const { mirrorPath } = writePlanPair(fx, "v0.7.2-idem-plan.md", canonicalContent, originalMirror);
+
+    const first = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+    expect(first.content[0].text).toContain("1 plan mirror(s) synced");
+    const afterFirst = fs.readFileSync(mirrorPath, "utf-8");
+    expect(fs.readFileSync(`${mirrorPath}.bak`, "utf-8")).toBe(originalMirror);
+
+    const second = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+    expect(second.isError).toBeUndefined();
+    expect(second.content[0].text).toContain("0 plan mirror(s) synced");
+    expect(fs.readFileSync(mirrorPath, "utf-8")).toBe(afterFirst); // untouched by the second run
+    expect(fs.readFileSync(`${mirrorPath}.bak`, "utf-8")).toBe(originalMirror); // still the true original
+    expect(listBakFiles(fx.mirrorDir)).toEqual([`${mirrorPath}.bak`]); // exactly one, no duplicates
+    // The category is idempotent at the inspect layer too — nothing left to report.
+    expect(planDriftItem(await handleUpgrade({}))).toBeUndefined();
+  });
+
+  // 19
+  test("graph-independence (apply): succeeds against a graph whose registered path is missing, writes no version sentinel", async () => {
+    const fx = makePlanFixture("psd-graph-independent", fakeHome);
+    const canonicalContent = planContent(STATUS_COMPLETE);
+    const { mirrorPath } = writePlanPair(fx, "v0.7.2-nograph-plan.md", canonicalContent, planContent(FROZEN_PRE_C7));
+
+    // Registered at a path that resolves from cwd (dirname is projectRoot) but
+    // does not exist on disk.
+    const gonePath = path.join(fx.projectRoot, "gone-kg");
+    mockActiveKg(fx.projectRoot, { path: gonePath });
+    expect(fs.existsSync(gonePath)).toBe(false);
+
+    const result = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).not.toContain("KG path not found");
+    expect(result.content[0].text).toContain("1 plan mirror(s) synced");
+    expect(fs.readFileSync(mirrorPath, "utf-8")).toBe(canonicalContent);
+    // Never writes lastAppliedVersion onto an unrelated (here, nonexistent) graph.
+    expect(writeConfig as jest.Mock).not.toHaveBeenCalled();
+    expect(fs.existsSync(gonePath)).toBe(false); // and never resurrects the path
+  });
+
+  test("graph-independence (inspect): a missing KG path returns the finding plus a resolution item, not a bare error", async () => {
+    const fx = makePlanFixture("psd-graph-independent-inspect", fakeHome);
+    writePlanPair(fx, "v0.7.2-nograph2-plan.md", planContent(STATUS_COMPLETE), planContent(FROZEN_PRE_C7));
+
+    const gonePath = path.join(fx.projectRoot, "gone-kg");
+    mockActiveKg(fx.projectRoot, { path: gonePath });
+
+    const result = await handleUpgrade({});
+    const parsed = parseInspect(result);
+
+    // The already-computed finding survives instead of being discarded.
+    const item = parsed.upgrades.find((u) => u.category === "plan-status-drift");
+    expect(item).toBeDefined();
+    expect(item!.description).toContain("1 Tier A");
+    // The resolution marker belongs in upgrades[], NOT warnings[] (Opus
+    // review, 2026-08-19): kmg-upgrade-inspector.md's warnings[] contract
+    // routes every entry through the platform-split wizard flow, which has
+    // no handler for a bare "resolution" marker -- only upgrades[] has the
+    // dedicated informational-only "resolution" case this needs.
+    const resolution = parsed.upgrades.find((u) => u.category === "resolution");
+    expect(resolution).toBeDefined();
+    expect(resolution!.description).toContain("KG path not found");
+    expect(parsed.warnings.find((w) => w.category === "resolution")).toBeUndefined();
+  });
+
+  // 20
+  test("consent gate: apply without confirmBackfix in automated mode returns KMG_INPUT_REQUIRED and writes nothing", async () => {
+    const fx = makePlanFixture("psd-gate-unanswered", fakeHome);
+    const mirrorContent = planContent(FROZEN_PRE_C7);
+    const { mirrorPath } = writePlanPair(fx, "v0.7.2-gate-plan.md", planContent(STATUS_COMPLETE), mirrorContent);
+
+    const result = await handleUpgrade({ apply: ["plan-status-drift"] });
+
+    expect(result.isError).toBe(true);
+    expect(result.content.length).toBe(1); // only category in the call — bare JSON at content[0]
+    const errorBlock = JSON.parse(result.content[0].text);
+    expect(errorBlock.error).toBe("KMG_INPUT_REQUIRED");
+    expect(errorBlock.reason).toContain("plan_status_drift_backfix");
+    expect(errorBlock.resolveWith.param).toBe("confirmBackfix"); // the shared c5 param, not a new one
+    expect(errorBlock.detail).toContain("1 plan file(s)");
+    expect(fs.readFileSync(mirrorPath, "utf-8")).toBe(mirrorContent);
+    expect(fs.existsSync(`${mirrorPath}.bak`)).toBe(false);
+  });
+
+  // 21
+  test("consent gate DECLINED: an explicit confirmBackfix:false still writes nothing", async () => {
+    // Highest-risk path per plan review: a user who answered "no" must never
+    // end up with written files. `confirmed === true` is a strict check, so
+    // false is treated as "not consented", never as a bypass.
+    const fx = makePlanFixture("psd-gate-declined", fakeHome);
+    const mirrorContent = planContent(FROZEN_PRE_C7);
+    const { canonicalPath, mirrorPath } = writePlanPair(
+      fx,
+      "v0.7.2-declined-plan.md",
+      planContent(STATUS_COMPLETE),
+      mirrorContent
+    );
+
+    const result = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: false });
+
+    expect(result.isError).toBe(true);
+    const errorBlock = JSON.parse(result.content[0].text);
+    expect(errorBlock.error).toBe("KMG_INPUT_REQUIRED");
+    expect(errorBlock.resolveWith.param).toBe("confirmBackfix");
+    expect(fs.readFileSync(mirrorPath, "utf-8")).toBe(mirrorContent);
+    expect(fs.readFileSync(canonicalPath, "utf-8")).toBe(planContent(STATUS_COMPLETE));
+    expect(listBakFiles(fx.mirrorDir)).toEqual([]);
+    expect(listBakFiles(fx.plansDir)).toEqual([]);
+  });
+
+  // 22
+  test("mixed Tier A + Tier B in one run: Tier A repaired, Tier B untouched and still reported", async () => {
+    const fx = makePlanFixture("psd-mixed", fakeHome);
+    seedCommit(fx.projectRoot);
+    mergeBranchNoFf(fx.projectRoot, "v0.7.2-mixed-b");
+
+    const canonicalA = planContent(STATUS_COMPLETE);
+    const mirrorA = planContent(FROZEN_PRE_C7);
+    const a = writePlanPair(fx, "v0.7.2-mixed-a-plan.md", canonicalA, mirrorA);
+
+    const frozenB = planContent(FROZEN_PRE_C7);
+    const b = writePlanPair(fx, "v0.7.2-mixed-b-plan.md", frozenB, frozenB);
+
+    const before = planDriftItem(await handleUpgrade({}))!;
+    expect(before.description).toContain("1 Tier A");
+    expect(before.description).toContain("1 Tier B");
+
+    const result = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("1 plan mirror(s) synced");
+
+    // Tier A repaired...
+    expect(fs.readFileSync(a.mirrorPath, "utf-8")).toBe(canonicalA);
+    expect(fs.readFileSync(`${a.mirrorPath}.bak`, "utf-8")).toBe(mirrorA);
+    // ...Tier B completely untouched, and still surfaced for manual review.
+    expect(fs.readFileSync(b.canonicalPath, "utf-8")).toBe(frozenB);
+    expect(fs.readFileSync(b.mirrorPath, "utf-8")).toBe(frozenB);
+    expect(fs.existsSync(`${b.mirrorPath}.bak`)).toBe(false);
+
+    const after = planDriftItem(await handleUpgrade({}))!;
+    expect(after.description).toContain("0 Tier A");
+    expect(after.description).toContain("1 Tier B");
+    expect(after.details).toContain("v0.7.2-mixed-b-plan.md");
+  });
+
+  // 23
+  test("line-ending preservation (write): a CRLF mirror stays CRLF throughout, never mixed", async () => {
+    // Distinct from the detection-side CRLF test: an earlier draft fixed only
+    // the comparison, so the write spliced canonical's LF-terminated line into
+    // a CRLF file and produced a mixed-line-ending mirror that a naive
+    // idempotency check would not have caught.
+    const fx = makePlanFixture("psd-crlf-write", fakeHome);
+    const canonicalContent = planContent(STATUS_COMPLETE); // LF
+    const mirrorContent = planContent(FROZEN_PRE_C7).replace(/\n/g, "\r\n"); // CRLF
+    const { mirrorPath } = writePlanPair(fx, "v0.7.2-crlf-write-plan.md", canonicalContent, mirrorContent);
+
+    const result = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("1 plan mirror(s) synced");
+
+    const after = fs.readFileSync(mirrorPath, "utf-8");
+    expect(after).toContain("**STATUS:** ✅ COMPLETE"); // the repair actually happened
+    expect(after).not.toContain(FROZEN_PRE_C7);
+    // Internally consistent: every LF in the file is part of a CRLF pair.
+    const lfCount = (after.match(/\n/g) || []).length;
+    const crlfCount = (after.match(/\r\n/g) || []).length;
+    expect(lfCount).toBeGreaterThan(0);
+    expect(crlfCount).toBe(lfCount);
+    // And exactly what canonical says, once line endings are normalized away.
+    expect(after.replace(/\r\n/g, "\n")).toBe(canonicalContent);
+    expect(fs.readFileSync(`${mirrorPath}.bak`, "utf-8")).toBe(mirrorContent);
   });
 });
