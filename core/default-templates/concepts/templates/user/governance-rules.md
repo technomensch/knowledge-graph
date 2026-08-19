@@ -64,13 +64,13 @@ Forbidden: Improvements, assumptions, gap-filling, unauthorized fixes
 
 **8-step protocol:**
 
-1. **State Initialization** — Output STRICT EXECUTION MODE banner before any action
+1. **State Initialization** — Output STRICT EXECUTION MODE banner before any action. If the plan file defines a Safety Header `**STATUS:**` field, then the first time the user gives explicit "YES" to approve any of the plan's own numbered implementation steps, rewrite that field so it reads an in-progress value (e.g. `🟡 IN PROGRESS`) — keep the `**STATUS:**` label, replace only the value, and do not assume the prior value; match on the label, not on the value. This is a real write to the plan file, not a chat-only status report.
 2. **Literal Mapping** — Quote each plan instruction before executing (no assumptions)
-3. **Data Integrity Audit** — Read file after every edit; verify ONLY plan-specified changes were made. Revert if unauthorized additions found.
+3. **Data Integrity Audit** — Read file after every edit; verify ONLY plan-specified changes were made. Revert if unauthorized additions found. Exception: the plan file's own Safety Header STATUS field, when rewritten by this protocol itself (Step 1 or Step 7), is protocol-owned metadata rather than a plan-specified content change — never flag or revert it.
 4. **HALT on Ambiguity** — Output HALT block if plan is unclear. Stop and ask user for clarification.
 5. **Checkpoints** — After every 3 file edits, output checkpoint and await user acknowledgment before continuing.
-6. **Rollback Protocol** — If integrity audit fails, revert file and re-apply. If second attempt fails, trigger HALT.
-7. **Completion Verification** — Quote each success criterion and verify it. Output completion status.
+6. **Rollback Protocol** — If integrity audit fails, revert file and re-apply. If second attempt fails, trigger HALT. A protocol-owned Safety Header STATUS rewrite (Step 1 or Step 7) is never an integrity-audit failure and never enters this rollback loop.
+7. **Completion Verification** — Quote each success criterion and verify it. Only if every criterion verifies and the plan file defines a Safety Header `**STATUS:**` field, rewrite that field so it reads a complete value (e.g. `✅ COMPLETE`) — keep the label, replace only the value (protocol-owned metadata, exempt from the Data Integrity Audit). If any criterion fails to verify, leave the STATUS field unchanged and trigger HALT (Step 4) instead. Output completion status.
 8. **Commit Gate** — After all tasks complete, create conventional commit with issue reference.
 
 **Mid-execution discovery protocol:** Do NOT silently fix OR silently skip discoveries outside the plan. Every discovery requires a decision.
