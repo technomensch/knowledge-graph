@@ -250,3 +250,4 @@ See [core/examples/lessons-learned/](../../examples/lessons-learned/) for filled
 - [Command Guide](../../../docs/COMMAND-GUIDE.md#essential-commands) - Automated (Claude Code)
 - [Ownership-of-Derivation Contract Violation Causes Double-Prefixed Filenames](patterns/Lessons_Learned_Patterns_Ownership_Of_Derivation_Contract_Violation_Causes_Double_Prefixed_Filenames.md)
 - [Hardcoded main...HEAD Branch-Comparison Base Silently Returns Empty Pre-Divergence](patterns/Lessons_Learned_Patterns_Hardcoded_Main...head_Branch_Comparison_Base_Silently_Returns_Empty_Pre_Divergence.md)
+- [Dispatch, Don't Duplicate: Corpus-Verify Before Backfilling](patterns/Lessons_Learned_Patterns_Dispatch_Dont_Duplicate_Corpus_Verify_Before_Backfilling.md)
