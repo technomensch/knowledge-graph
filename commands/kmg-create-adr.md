@@ -176,11 +176,10 @@ git rev-parse HEAD          # commit (full SHA)
 - Branch with no numeric prefix → `null`
 - Verify PR with: `gh pr list --head $(git rev-parse --abbrev-ref HEAD) --json number --jq '.[0].number'` (if gh CLI available)
 
-**If git is not available:**
-- Skip all git metadata fields
-- Create frontmatter with title, number, created, status, category only
-
-**Current timestamp:** Use ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ`
+**If git is not available:** skip the git metadata fields here and continue to
+Step 3. Do not assemble frontmatter or a fallback field set in this command —
+`create-adr-agent` (Phase 2) re-derives git metadata itself and handles the
+git-unavailable case on its own, and it owns the only frontmatter schema.
 
 ---
 

@@ -3,7 +3,7 @@
 
 Creates a new Architecture Decision Record (ADR) through an interactive wizard. Handles numbering, git metadata, user prompts, template population, and index management.
 
-**Boundary with `create-adr` command:** This agent contains the full ADR creation logic. The `create-adr` command is a thin dispatch wrapper — it resolves the KG path, ADR number, and git metadata, then hands off to this agent, which runs the wizard, writes the file, updates the index, and commits.
+**Boundary with `create-adr` command:** This agent contains the full ADR creation logic. The `create-adr` command is a thin dispatch wrapper — it resolves and passes only the level-routing flag, the model tier, and an optional title, then hands off to this agent. Nothing else is passed: this agent re-derives the target KG path (Phase -1), the ADR number (Phase 1, with its own cross-branch collision check), and git metadata (Phase 2) itself, then runs the wizard, writes the file, updates the index, and commits. Do not trim those phases as redundant — the command does not supply their values.
 
 ---
 
