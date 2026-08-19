@@ -74,7 +74,7 @@ The docs-impact-scan skill runs an eight-step pre-push workflow — diff scan, d
 | `session-end-prompt.sh` | Stop | Prompts for session summary; Codex CLI-compatible (emits JSON decision on stdout via `trap EXIT`) |
 | `post-tool-lesson-check.sh` | PostToolUse | Prompts for lesson capture after certain tools |
 | `platform-file-change-check.sh` | PostToolUse | Detects changes to CLAUDE.md / AGENTS.md |
-| `plan-mirror.sh` | PostToolUse | Mirrors plan files from `~/.claude/plans/` to `docs/plans/` |
+| `plan-mirror.sh` | PostToolUse | Mirrors plan files from `~/.claude/plans/` to `knowledge/plans/` (or `docs/plans/` if the project has no `knowledge/` dir) |
 | `pre-commit-knowledge-gate.sh` | PreToolUse (git commit) | Prompts for knowledge capture before commit |
 | `pre-skill-rules-inject.sh` | PreToolUse (Skill) | Injects rules overrides; hard-blocks brainstorm/plan without recall; enforces PR gate |
 | `stop-plan-gate.sh` | Stop | Re-surfaces plan approval gate at session end when a plan was written |

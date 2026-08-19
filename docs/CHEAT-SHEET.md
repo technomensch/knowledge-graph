@@ -92,7 +92,7 @@ Skills activate automatically based on conversation context. No invocation neede
 | `adr-guide` | Architecture decision discussed, "I'm thinking of using..." | `/kmgraph:kmg-create-adr` with decision guidance |
 | `doc-update-router` | "update [doc name]", "update the session summary", "update the changelog" | Routes to `/kmgraph:kmg-update-doc --user-facing`, `/kmgraph:kmg-session-summary`, or `/kmgraph:kmg-create-adr` |
 | `capture-router` | "capture that" / "remember that" / "save that" | Auto-detects type+location, single confirmation before writing |
-| `gov-execute-plan` | "execute plan", implementation start, `docs/plans/*.md` mentioned | Zero-deviation 8-step execution protocol |
+| `gov-execute-plan` | "execute plan", implementation start, `knowledge/plans/*.md` or `~/.claude/plans/*.md` mentioned | Zero-deviation 8-step execution protocol |
 | `brainstorm-recall` | `superpowers:brainstorming` invoked | Runs `kmgraph:kmg-recall` before any recommendation; results appear under "Prior Art" |
 | `stuck-work-escalation` | 3+ failed attempts, 30+ min stuck, same bug resisting fixes | Opus diagnosis gate → hypothesis logging → exit-path decision at 5 attempts |
 | `docs-impact-scan` | "push to origin", "push and merge", "open PR", "create PR", "finishing up", "ready to push" | Scans changed identifiers, validates affected docs list, dispatches `/kmgraph:kmg-update-doc --user-facing` for each |

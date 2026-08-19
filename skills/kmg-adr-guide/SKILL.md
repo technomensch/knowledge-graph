@@ -71,7 +71,7 @@ When triggered, guide the user toward documenting the decision as an Architectur
    After extracting the decision, invoke the `kmgraph:kmg-recall` skill (via Skill tool) with the decision topic as input, then grep for other ADRs, skills, commands, docs referencing the affected concept. Present a list: `[file] — [action required]`. If nothing found, state it explicitly.
 
 6. **Step 4b — In-plan cascade advisory:**
-   If an active plan exists (check `docs/plans/` for recently modified plan files), output:
+   If an active plan exists (check `knowledge/plans/` and `~/.claude/plans/` for recently modified plan files), output:
    > "Decision captured — if an active plan is in progress, review its tasks for cascade impact before executing."
 
 7. **Step 5: Open Questions:**

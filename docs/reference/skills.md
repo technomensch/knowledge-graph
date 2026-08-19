@@ -24,7 +24,7 @@ Skills listen for keywords and patterns in the conversation. When a match is det
 | **sidebar-update** | A docs file is moved or renamed, "move [doc]", "rename [doc]", `git mv` on a `docs/` path | Finds the stale `id:` entry in `sidebars.js`, updates it to the new path, scans for broken internal links |
 | **capture-router** | "capture that", "remember that", "save that", and similar natural-language capture phrases | Auto-detects content type and destination from content signals; presents single confirmation before writing |
 | **rules-capture** | "always X", "never X", "from now on X", "don't do X" (standing rule), "I prefer X", "make that a rule" — implicit behavioral corrections without capture vocabulary | Detects scope (project vs personal, rule vs me), shows one-line suggestion with 4-target shortcut menu, dispatches to `rules-capture-agent` on confirmation |
-| **gov-execute-plan** | "execute plan", implementation start, `docs/plans/*.md` mentioned | Zero-deviation 8-step execution protocol |
+| **gov-execute-plan** | "execute plan", implementation start, `knowledge/plans/*.md` or `~/.claude/plans/*.md` mentioned | Zero-deviation 8-step execution protocol |
 | **knowledge-graph-usage** | Questions about KMGraph itself, "how do I...", "what command..." | Orients to the four-layer architecture and surfaces relevant commands |
 | **brainstorm-recall** | `superpowers:brainstorming` invoked; fires before `adr-guide` | Invokes `kmgraph:kmg-recall` with the topic; surfaces results under "Prior Art" before any recommendation |
 
