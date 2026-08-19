@@ -1270,12 +1270,13 @@ function updateLastAppliedVersion(installedVersion: string, graphName: string): 
 
 // ── Exported handler for direct testing ──────────────────────────────────────
 
-// "version-update" and "resolution" are inspect-only — NOT apply categories. Any
-// new category added here (or to the Zod enum below) must also be added to
-// commands/kmg-init-shared/kmg-upgrade-inspector.md's deny-list logic if it is
-// NOT a valid apply target, or the wizard's `_mcp_apply[]` deny-list will wrongly
-// include it and Zod will reject the whole apply call (issue-51). Conversely, if
-// a new category is gated on the shared `confirmBackfix` boolean (like
+// "version-update" and "resolution" are inspect-only — NOT apply categories. If a
+// NEW category is ever pushed into result.upgrades[] (e.g. a new checkX() call)
+// that is NOT added to this ApplyCategory type / the Zod enum below, the wizard's
+// deny-list in commands/kmg-init-shared/kmg-upgrade-inspector.md must also list it
+// as excluded — otherwise the wizard will wrongly add it to `_mcp_apply[]` and Zod
+// will reject the whole apply call (issue-51). Conversely, if a new category IS
+// added here and is gated on the shared `confirmBackfix` boolean (like
 // "capture-corruption"), review kmg-upgrade-inspector.md's confirmBackfix wiring:
 // that boolean is per-call, not per-category, so a call consenting to one
 // confirmBackfix-gated category silently also consents to any other one present
