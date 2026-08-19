@@ -1,9 +1,9 @@
 ---
 id: issue-51
 type: Bug
-status: tracked
-github-issue: null
-branch: none
+status: resolved
+github-issue: pending
+branch: v0.7.2-issues-46-51
 created: 2026-08-17
 related_enhs: ["ENH-052"]
 related_issues: ["issue-50"]
