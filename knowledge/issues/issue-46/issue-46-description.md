@@ -244,6 +244,10 @@ the `capture-corruption` backfix category. Full mcp-server suite: 440/440.
 - See [[issue-48]] (or actual assigned number) for the dual-ADR-implementation
   drift-risk finding, discovered while ruling out `commands/kmg-create-adr.md`
   above — tracked as its own issue, not part of this one's scope.
+- [[issue-50]] and [[issue-51]] cite this issue as a case study of a fix that
+  added a `kg_upgrade` backfix category (`capture-corruption`) only because
+  the person fixing the bug happened to add one, not because the workflow
+  required it. Backlinked 2026-08-19.
 
 ## Discovery Context
 

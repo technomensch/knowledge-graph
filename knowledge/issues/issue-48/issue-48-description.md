@@ -1,7 +1,7 @@
 ---
 id: issue-48
 type: Refactor
-status: tracked
+status: resolved
 github-issue: "#228"
 branch: v0.7.2-issues-46-51
 created: 2026-08-17
@@ -120,14 +120,18 @@ drift apart with no test or lint catching it.
 
 ## Backfix Requirement
 
-Fixing the code-path divergence (whichever `solution-approach.md` option is
-chosen) only prevents new ADRs from getting the command-path's divergent
-schema — existing ADRs already written through that path keep their
-divergent shape (`author`/`email` at top level, no `commit_short`,
-`implements` always `null`) forever unless backfixed. **A `kg_upgrade`
-migration is required as part of this issue's eventual implementation
-plan**, not optional cleanup — see `solution-approach.md`'s Backfix
-requirement section.
+**Superseded during implementation (2026-08-19).** This section originally
+required a `kg_upgrade` migration to reshape existing command-path ADRs'
+`author`/`email` fields under a nested `git:` block. Before implementing,
+the planned backfix step was corpus-verified against all 70 existing ADRs
+in this repo and found to rest on a fabricated premise: 0/70 actually
+diverge in that shape. Writing the migration anyway would have invented a
+third, incorrect schema and corrupted correctly-formed files. The backfix
+step was deleted from the plan before implementation; see
+`implementation-log.md`'s 2026-08-19 entry. No `kg_upgrade` migration was
+built or is required for this issue — the fix (dispatching
+`commands/kmg-create-adr.md` to `create-adr-agent`) prevents new divergence
+going forward, which was the actual, verified need.
 
 ## Related
 
@@ -142,6 +146,10 @@ requirement section.
   requires explicit user permission before editing. This issue only
   proposes an approach; see `solution-approach.md`. No fix is implemented
   here.
+- [[issue-50]] and [[issue-51]] cite this issue as a case study whose backfix
+  is still only described in prose (`solution-approach.md`), not yet built —
+  evidence that `kg_upgrade`-category authoring is optional in practice, not
+  enforced. Backlinked 2026-08-19.
 
 ## Discovery Context
 

@@ -1,7 +1,7 @@
 ---
 id: issue-47
 type: Bug
-status: tracked
+status: resolved
 github-issue: "#227"
 branch: v0.7.2-issues-46-51
 created: 2026-08-16
@@ -118,6 +118,10 @@ items 7-8.
   sync diff-base selection — this fix is net-new architecture for those two.
 - See [[issue-46]] for the related (but separately-scoped) filename
   double-prepend bug found in the same investigation session.
+- [[issue-50]] and [[issue-51]] cite this issue as a case study whose backfix
+  is still only described in prose (`solution-approach.md`), not yet built —
+  evidence that `kg_upgrade`-category authoring is optional in practice, not
+  enforced. Backlinked 2026-08-19.
 
 ## Discovery Context
 

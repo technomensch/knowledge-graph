@@ -86,35 +86,17 @@ Regardless of which option is chosen, a regression guard should exist so a
 future edit to one ADR-creation code path cannot silently drift from the
 other again without being caught — see `test-cases.md`.
 
-## Backfix requirement (applies once an option above is implemented)
+## Backfix requirement — superseded during implementation (2026-08-19)
 
-Whichever option is eventually chosen, existing ADRs created through the
-command path (`commands/kmg-create-adr.md`, before any fix) already carry
-the divergent schema documented above — `author`/`email` at top level
-instead of nested under `git:`, no `commit_short`, `implements` hardcoded
-`null`. **Fixing the code path going forward does not repair those
-existing files.** When this issue moves from "tracked" to implementation,
-its plan must include a `kg_upgrade` migration (or extension of whichever
-migration category issue-46/47 have already established in
-`mcp-server/src/tools/upgrade.ts` by then — check its current state first)
-that:
-- Detects ADRs matching the command-path schema shape (top-level
-  `author`/`email`, no `commit_short`, `implements: null` with no
-  corresponding wizard answer on record).
-- Normalizes structurally-safe cases (moving `author`/`email` under `git:`
-  is a pure reshape, no information loss, always safe to automate).
-- Does **not** attempt to fabricate a value for `implements` — a null that
-  really means "no implementing commit was ever recorded" is not
-  reconstructable, and guessing one would be worse than leaving it null.
-  Flag these for optional manual backfill rather than guessing.
-
-This is deferred out of *this issue's* current scope (tracking + proposal
-only, per user direction) but must be included in the plan whenever
-implementation actually starts — noted here now so it isn't rediscovered
-and re-litigated later, per explicit user direction (2026-08-17) that
-issue-46, issue-47, and this issue should each carry their own backfix
-requirement rather than treating "migrate existing users" as a separate,
-easily-dropped follow-up.
+This section originally required a `kg_upgrade` migration to reshape
+existing command-path ADRs' `author`/`email` fields under `git:`. Before
+building it, the premise was corpus-verified against all 70 existing ADRs
+in this repo: 0/70 actually carry the divergent shape described above.
+Writing the migration anyway would have invented a third, incorrect schema
+and corrupted the 39 correctly-formed files it scanned. The backfix step
+was deleted from the implementation plan before implementation started —
+see `implementation-log.md`'s 2026-08-19 entry. No `kg_upgrade` migration
+was built or is required for this issue.
 
 ## Out of scope for this issue
 
