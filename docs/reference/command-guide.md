@@ -597,7 +597,7 @@ Dispatches to the recall agent, which searches:
 
 - Pass a title as an argument to skip the first wizard prompt
 - Use Proposed status for decisions still under review; Accepted for decisions already implemented
-- Link to related lessons in Step 3.8 — creates bidirectional traceability
+- Link to related lessons in the "Related Lessons" wizard question — creates bidirectional traceability
 - If a snapshot was taken earlier in the session, the ADR's Context section can draw from it
 
 ---

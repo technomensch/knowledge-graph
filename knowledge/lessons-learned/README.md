@@ -4,7 +4,7 @@
 
 Comprehensive catalog of all lessons-learned documents.
 
-**Total Lessons:** 59 (10 architecture, 25 process, 20 patterns, 4 debugging)
+**Total Lessons:** 60 (10 architecture, 25 process, 21 patterns, 4 debugging)
 **Last Updated:** 2026-08-04
 
 > **Known issues in this index** (see [issue tracker](../issues/README.md) for permanent tracking):
@@ -64,8 +64,9 @@ Comprehensive catalog of all lessons-learned documents.
 
 ---
 
-### Patterns Lessons (20 total)
+### Patterns Lessons (21 total)
 
+- [Dispatch, Don't Duplicate: Corpus-Verify Before Backfilling](patterns/Lessons_Learned_Patterns_Dispatch_Dont_Duplicate_Corpus_Verify_Before_Backfilling.md) — 2026-08-19
 - [Fix Ownership Follows the Root-Cause KG, Not the Code's Location](patterns/Lessons_Learned_Patterns_Fix_Ownership_Follows_Root_Cause_KG_Not_Code_Location.md) — 2026-07-10
 - [LLM Compliance Gate for Branching Commands](patterns/Lessons_Learned_Patterns_LLM_Compliance_Gate_For_Branching_Commands.md) — 2026-06-21
 - [Routing-Layer-Only Profile Injection Pattern](patterns/Lessons_Learned_Routing_Layer_Injection_Pattern.md) — 2026-04-28
@@ -105,6 +106,7 @@ Comprehensive catalog of all lessons-learned documents.
 ## Chronological Index
 
 **2026**
+- [2026-08-19] [Dispatch, Don't Duplicate: Corpus-Verify Before Backfilling](patterns/Lessons_Learned_Patterns_Dispatch_Dont_Duplicate_Corpus_Verify_Before_Backfilling.md)
 - [2026-07-14] [Resource-Path Migrations Must Grep the Prompt Layer, Not Just the Server Layer](process/Lessons_Learned_Process_Migration_Must_Grep_Prompt_Layer_Not_Just_Server_Layer.md)
 - [2026-07-12] [os.homedir() Stale Cache On macOS](debugging/Lessons_Learned_os_homedir_Stale_Cache_On_macOS.md)
 - [2026-07-12] [Two-Cycle Cross-Model Review for High-Risk Changes](process/Lessons_Learned_Process_Two_Cycle_Cross_Model_Review_For_High_Risk_Changes.md)
@@ -173,7 +175,7 @@ Comprehensive catalog of all lessons-learned documents.
 
 **#architecture** (10 lessons) — see [By Category](#architecture-lessons-10-total) above
 **#process** (25 lessons) — see [By Category](#process-lessons-25-total) above
-**#patterns** (20 lessons) — see [By Category](#patterns-lessons-20-total) above
+**#patterns** (21 lessons) — see [By Category](#patterns-lessons-21-total) above
 **#debugging** (4 lessons) — see [By Category](#debugging-lessons-4-total) above
 
 Fine-grained per-lesson tags are in each file's own `tags:` frontmatter — use `/kmgraph:recall "<keyword>"` (FTS5 search) to search across them rather than maintaining a hand-built reverse index here; at this scale a manually maintained fine-grained tag cloud drifts out of sync faster than it can be kept useful.

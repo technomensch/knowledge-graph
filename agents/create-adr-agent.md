@@ -3,7 +3,7 @@
 
 Creates a new Architecture Decision Record (ADR) through an interactive wizard. Handles numbering, git metadata, user prompts, template population, and index management.
 
-**Boundary with `create-adr` command:** This agent contains the full ADR creation logic. The `create-adr` command currently embeds its own implementation (v0.2.2 will refactor it to a thin dispatch wrapper).
+**Boundary with `create-adr` command:** This agent contains the full ADR creation logic. The `create-adr` command is a thin dispatch wrapper — it resolves the KG path, ADR number, and git metadata, then hands off to this agent, which runs the wizard, writes the file, updates the index, and commits.
 
 ---
 
@@ -130,7 +130,7 @@ If git is unavailable, skip git metadata and proceed with manual fields only.
 
 **If `wizard_mode: false` (context was passed):**
 
-Skip all 8 wizard questions. Use the passed payload to populate all fields:
+Skip all 9 wizard questions. Use the passed payload to populate all fields:
 - title → from payload
 - status → from payload (default "Proposed" if blank)
 - category → from payload
