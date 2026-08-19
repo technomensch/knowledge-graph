@@ -114,6 +114,10 @@ Same broader class as [issue-17](../issue-17/issue-17-description.md) (GH #175):
 documented automatic behaviors/triggers that reference a mechanism which doesn't actually
 fire in practice — a second, distinct concrete instance found the day after issue-17.
 
+[issue-41](../issue-41/issue-41-description.md) — cites this issue's Phase 7.1 fix (5 commands
++ 3 agents + 1 skill) as only partial coverage of the worktree-KG-registration gap. Backlinked
+2026-08-19.
+
 ## Provenance / Historical Context
 
 Filesystem investigation across related personal repos (confirmed this session) traces

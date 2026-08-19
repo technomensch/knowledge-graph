@@ -6,7 +6,7 @@ github-issue: pending
 branch: v0.7.2-issues-46-51
 created: 2026-08-17
 related_enhs: ["ENH-052"]
-related_issues: ["issue-50"]
+related_issues: ["issue-50", "issue-48"]
 ---
 
 # issue-51: kg_upgrade Wizard's Hardcoded Category Allow-List Has Drifted From the Tool's Real Schema — Two Categories Unreachable via /kmgraph:kmg-init
@@ -197,3 +197,10 @@ Fits cleanly inside 7.1.5; does not need its own 7.1.6.
 Found live 2026-08-17 while investigating issue-50's root-cause question ("is a fix's
 `kg_upgrade` coverage checked/wired anywhere"), by directly reading
 `kmg-upgrade-inspector.md`'s routing logic against `upgrade.ts`'s real schema.
+
+## Related
+
+- [issue-48](../issue-48/issue-48-description.md) — cites this issue as a case study whose
+  backfix (`capture-corruption`) only reached the wizard because this issue's own fix landed;
+  without it, `capture-corruption` would join `config-location` on the unreachable side of the
+  allow-list drift this issue describes. Backlinked 2026-08-19.

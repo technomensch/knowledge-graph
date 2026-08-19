@@ -248,6 +248,9 @@ the `capture-corruption` backfix category. Full mcp-server suite: 440/440.
   added a `kg_upgrade` backfix category (`capture-corruption`) only because
   the person fixing the bug happened to add one, not because the workflow
   required it. Backlinked 2026-08-19.
+- [ENH-052](../../enhancements/ENH-052/ENH-052-specification.md) cites this
+  issue as one of five case studies of internal paperwork drifting silently
+  with nothing to catch it. Backlinked 2026-08-19.
 
 ## Discovery Context
 

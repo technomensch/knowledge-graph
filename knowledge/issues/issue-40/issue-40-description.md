@@ -72,3 +72,5 @@ the answer.
 - [issue-18](../issue-18/issue-18-description.md) — Phase 7.1 that introduced/retained the
   `--named` vocabulary this issue questions; also where this finding was first logged
   before being split out here.
+- [issue-41](../issue-41/issue-41-description.md) — cites this issue as a live example of the
+  worktree-KG numbering-collision risk it describes. Backlinked 2026-08-19.

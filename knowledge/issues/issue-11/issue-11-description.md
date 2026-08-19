@@ -154,3 +154,5 @@ concurred: fix the gate, do not unify; recommended going further than a command-
 - GitHub #124 / local `issue-5` — the Cause-1 bug and its fix
 - GitHub #130 — ENH-023, confirms the Cause-1 fix worked
 - `knowledge/analysis/outstanding-items-inventory-2026-07-11.md` — broader sweep this finding emerged from
+- [ENH-052](../../enhancements/ENH-052/ENH-052-specification.md) — cites this issue's `pre-push-gate.sh` Gate 4 as the github-issue-sync invariant, one of the mechanisms in its "internal paperwork drifts silently, nothing catches it" pattern family. Backlinked 2026-08-19.
+- [issue-13](../issue-13/issue-13-description.md) — cites this issue's Gate 4 as "unrelated to docs content," distinguishing it from the missing docs-build gate issue-13 identifies. Backlinked 2026-08-19.
