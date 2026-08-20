@@ -74,6 +74,14 @@ Minimal change — rename the skill directory and update any internal references
 
 ---
 
+## Related
+
+- [issue-11](../../issues/issue-11/issue-11-description.md) — cites this ENH (created
+  2026-05-21, before the `start-issue-tracking` `gh issue create` fix landed 2026-05-30) as
+  one of the Cause-1 casualties: `github_issue: null` because the tool itself silently
+  failed to create a GitHub issue, not because of the later brainstorm-bypass cause.
+  Backlinked 2026-08-19.
+
 ## Status
 
 **Deferred** — no version target. No branch created yet.

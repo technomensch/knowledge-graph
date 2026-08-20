@@ -111,6 +111,10 @@ Currently, KMGraph knowledge graphs are project-local by default. Users must cap
 
 ## Related Knowledge Artifacts
 
+- [issue-11](../../issues/issue-11/issue-11-description.md) — traces the `ENH-NNN`
+  numbering scheme's origin to `optimize-my-resume` commit `2ade748` (2026-01-25), the
+  same session that minted this ENH's own number. Backlinked 2026-08-19.
+
 After v0.2.2 ships, two lessons and ADRs must be captured:
 
 1. **Lesson:** "Plan language — Create vs Update distinction" (discovered 2026-03-27)

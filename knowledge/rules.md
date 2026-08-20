@@ -133,7 +133,7 @@ When a bug or enhancement is discovered mid-session, **first check whether an op
 
 - **Path F — Fork to new conversation:** Bug is complex or unclear, needs investigation, and would derail the current session. Open a separate chat/terminal to investigate. Continue current session unblocked.
 - **Path 1 — Capture as issue/enhancement:** Fix is out of scope or clear enough to file without immediate investigation. Create silently via `/kmgraph:kmg-start-issue-tracking`. Surface the result (GH issue link or local ENH file preview) immediately after.
-- **Path 2 — Add to current plan:** Active plan exists, task not yet started. Add a new task to the plan. Sync both copies immediately (`~/.claude/plans/` and `docs/plans/` must be identical after every edit).
+- **Path 2 — Add to current plan:** Active plan exists, task not yet started. Add a new task to the plan. Sync both copies immediately (`~/.claude/plans/` and `knowledge/plans/` must be identical after every edit).
 - **Path 3 — Implement + update plan:** Branch exists, work in progress. Implement the fix now, then update the plan file to document what was added so the PR body stays accurate. Sync both copies.
 
 **Always ask** — never auto-route. One question: "Path F (fork), Path 1 (issue), Path 2 (add to plan), or Path 3 (implement now)?"
@@ -149,15 +149,16 @@ When a bug or enhancement is discovered mid-session, **first check whether an op
 
 ### Plan File Sync
 
-`~/.claude/plans/<name>.md` and `docs/plans/<name>.md` must always be identical. After any edit to either copy, sync immediately:
+`~/.claude/plans/<name>.md` is the canonical source. `knowledge/plans/<name>.md` is a downstream, gitignored, local-reference copy. Sync is **one-way only**: `~/.claude/plans/` → `knowledge/plans/`. Always edit `~/.claude/plans/<name>.md` first, then copy it over. Never edit `knowledge/plans/` first and copy back to `~/.claude/plans/` — even if the resulting content ends up identical either way, editing in the wrong direction makes `knowledge/plans/` the de facto source, which is not the convention.
 
 ```bash
-cp ~/.claude/plans/<name>.md /path/to/repo/docs/plans/<name>.md
+cp ~/.claude/plans/<name>.md /path/to/repo/knowledge/plans/<name>.md
 ```
 
-Verify with `wc -l` on both files. A line count mismatch means they are out of sync.
+Verify with `diff -q` (or `wc -l`) on both files after every edit. Any mismatch means they are out of sync — fix by re-copying from `~/.claude/plans/`, never the reverse.
 
-- **Why:** Plans diverged during v0.5.8 planning when Task 10/11 were appended to `docs/plans/` in a session but not reflected back to `~/.claude/plans/`. When discovered, the copies had to be manually reconciled.
+- **Why:** Plans diverged during v0.5.8 planning when Task 10/11 were appended to the second copy in a session but not reflected back to `~/.claude/plans/`. When discovered, the copies had to be manually reconciled. The one-way direction was made explicit 2026-08-18 after a session edited `knowledge/plans/` first and copied back to `~/.claude/plans/`, which the user flagged as backwards even though both copies ended up identical.
+- **Note:** the sync target was originally `docs/plans/`; ADR-014's own index entry records the move to `knowledge/plans/` (per ADR-029), and `docs/plans/` no longer exists in this repo. This section previously still named the old path — corrected 2026-08-17.
 
 ### Plugin Cache & Local Testing
 
@@ -300,10 +301,9 @@ Do not use numbered headings in knowledge files — use plain headings (e.g., `#
 | `knowledge/chat-history/` | Exported chat logs | no (gitignored) |
 | `knowledge/tmp/` | Scratch files | no (gitignored) |
 | `knowledge/me.md` | Personal identity file | no (gitignored) |
-| `docs/plans/` | Local plan files (working reference) | no (gitignored) |
 | `commands/init-shared/` | Shared parameterized modules called by init.md and init-personal-kg.md | yes |
 | `knowledge/ENH-NNN/` | Plans and specs for a specific enhancement (ADR-029) | selective |
-| `knowledge/plans/` | Misc plans with no ENH/issue parent (ADR-029) | selective |
+| `knowledge/plans/` | Misc plans with no ENH/issue parent (ADR-029) — local-reference copy of `~/.claude/plans/` | no (gitignored) |
 
 ## Plan Protocol
 

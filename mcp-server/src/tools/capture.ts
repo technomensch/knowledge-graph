@@ -32,9 +32,25 @@ export interface CaptureRequest {
       commit_short?: string;
       author?: string;
       email?: string;
+      pr?: string | null;
+      issue?: string | null;
     };
     version?: string;
     existingFile?: string;
+    // session-only: update-in-place header fields (issue-46 Manifestation B)
+    as_of_commit?: string;
+    last_updated?: string;
+    // adr-only: full frontmatter fields (issue-46 Manifestation B), matching
+    // core/default-templates/decisions/ADR-template.md's canonical shape
+    status?: string;
+    number?: number;
+    implements?: string | null;
+    related?: {
+      adrs?: string[];
+      lessons?: string[];
+      kg_entries?: string[];
+    };
+    search_aliases?: string[];
   };
 }
 
@@ -118,6 +134,111 @@ function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+// issue-46 Manifestation B defensive backstop: generateFrontmatter() is the
+// sole owner of the frontmatter block written to disk. If content already
+// starts with one (a caller template not yet updated, or a hand-composed
+// kg_capture call), strip it here rather than stacking two blocks. Fixing
+// caller templates (agents/session-summary-agent.md,
+// agents/create-adr-agent.md) is the primary fix; this is the enforcement
+// backstop for callers this fix doesn't reach.
+// Every key generateFrontmatter() above can emit, at either nesting level,
+// plus legacy template keys (`deciders`) that appear in already-written files.
+// Stripping is gated on recognizing at least one of these — see the
+// false-positive note in stripLeadingFrontmatterOnce().
+const GENERATED_FRONTMATTER_KEYS = new Set([
+  "title", "created", "updated", "date", "author", "email",
+  "git", "branch", "commit", "commit_short",
+  "tags", "category", "version", "status", "number",
+  "as_of_commit", "last_updated", "implements",
+  "related", "adrs", "lessons", "kg_entries",
+  "search_aliases", "deciders", "pr", "issue",
+]);
+
+// Strips at most ONE leading frontmatter block. Callers want the fixed-point
+// wrapper below, not this.
+function stripLeadingFrontmatterOnce(content: string): string {
+  if (!content.startsWith("---")) return content;
+  const newlineAfterOpen = content.indexOf("\n");
+  if (newlineAfterOpen === -1) return content;
+  if (content.slice(0, newlineAfterOpen).trim() !== "---") return content;
+
+  // Scan line-by-line for the closing `---` and whether the block in
+  // between is entirely real YAML — every non-blank line must be a
+  // `key:` field or an indented continuation of one, not just "at least
+  // one" field present. A body that merely opens with a markdown
+  // horizontal rule (or a longer dash run like `----`) is real content,
+  // not frontmatter, and must not be stripped.
+  //
+  // "All lines look key-shaped" is still not enough on its own: a prose
+  // region whose every line happens to be colon-prefixed (e.g. a region
+  // containing only "Note: deferred X.") passes that test and gets silently
+  // deleted — Fable review (2026-08-19) reproduced this live against the
+  // previous hardening. So also require at least one key the server itself
+  // would have emitted (GENERATED_FRONTMATTER_KEYS). Same false-positive
+  // class as upgrade.ts's detectDoubledFrontmatter/looksLikeYaml.
+  let hasKnownKey = false;
+  let sawNonBlank = false;
+  let looksLikeYaml = true;
+  let prevWasKey = false;
+  let lineStart = newlineAfterOpen + 1;
+  let closeLineEnd = -1;
+  while (lineStart <= content.length) {
+    let lineEnd = content.indexOf("\n", lineStart);
+    if (lineEnd === -1) lineEnd = content.length;
+    const line = content.slice(lineStart, lineEnd);
+    if (line.trim() === "---") {
+      closeLineEnd = lineEnd;
+      break;
+    }
+    const topKey = /^([A-Za-z_][\w-]*):/.exec(line);
+    if (topKey) {
+      sawNonBlank = true;
+      if (GENERATED_FRONTMATTER_KEYS.has(topKey[1].toLowerCase())) hasKnownKey = true;
+      prevWasKey = true;
+    } else if (prevWasKey && /^\s/.test(line)) {
+      // indented continuation of the previous key — still valid YAML. A
+      // nested `  branch:`/`  adrs:` counts toward the known-key gate too.
+      sawNonBlank = true;
+      const nestedKey = /^\s+([A-Za-z_][\w-]*):/.exec(line);
+      if (nestedKey && GENERATED_FRONTMATTER_KEYS.has(nestedKey[1].toLowerCase())) hasKnownKey = true;
+    } else if (line.trim() !== "") {
+      sawNonBlank = true;
+      looksLikeYaml = false;
+      prevWasKey = false;
+    } else {
+      prevWasKey = false; // blank line ends continuation eligibility
+    }
+    lineStart = lineEnd + 1;
+  }
+  if (closeLineEnd === -1 || !looksLikeYaml) return content;
+  // A fenced region holding only blank lines is a degenerate/empty
+  // frontmatter block. Leaving it in place makes the real block stack on top
+  // and writes a file opening with four `---` fences, so strip it. (The only
+  // other thing this shape can be is two adjacent horizontal rules, and
+  // dropping those still preserves every line of body content.)
+  if (sawNonBlank && !hasKnownKey) return content;
+
+  let rest = content.slice(closeLineEnd + 1);
+  if (rest.startsWith("\r\n")) rest = rest.slice(2);
+  else if (rest.startsWith("\n")) rest = rest.slice(1);
+  return rest.replace(/^\s*\n/, "");
+}
+
+// Content can arrive with more than one block already stacked — a LEGACY file
+// corrupted before this backstop existed, read back and re-submitted through
+// the update-in-place path (existingFile), or a caller template that doubled
+// on its own. Stripping exactly once leaves a block behind for
+// generateFrontmatter() to stack on top of, re-emitting the corruption, so
+// run to a fixed point. Terminates: each strip strictly shortens the string.
+function stripLeadingFrontmatter(content: string): string {
+  let current = content;
+  for (;;) {
+    const next = stripLeadingFrontmatterOnce(current);
+    if (next === current) return current;
+    current = next;
+  }
+}
+
 export function validateMetadata(
   metadata: CaptureRequest["metadata"]
 ): CaptureRequest["metadata"] | CaptureError {
@@ -126,6 +247,36 @@ export function validateMetadata(
   }
   if (!metadata.tags) metadata.tags = [];
   return metadata;
+}
+
+// issue-46 Manifestation A server-side enforcement. Manifestation B (embedded
+// frontmatter) got the stripLeadingFrontmatter() backstop above; the doubled
+// filename/title prefix had only a documented caller contract, so a stale
+// cached agent definition or a hand-composed kg_capture call sending
+// title: "2026-08-19-main" still reproduced "2026-08-19-2026-08-19-main.md"
+// end-to-end. Reject rather than silently strip: deriveFileName() and
+// displayTitleFor() own the prefix, and guessing which prefix was intended
+// would corrupt a legitimate title that merely looks pre-prefixed.
+const TITLE_PREFIX_RULES: Partial<
+  Record<CaptureRequest["type"], { pattern: RegExp; label: string }>
+> = {
+  session: { pattern: /^\d{4}-\d{2}-\d{2}[-\s]/, label: "a date prefix (YYYY-MM-DD-)" },
+  adr: { pattern: /^ADR-\d+[:\-\s]/i, label: "an ADR-number prefix (ADR-NNN)" },
+};
+
+export function checkTitlePrefix(
+  type: CaptureRequest["type"],
+  title: string
+): CaptureError | null {
+  const rule = TITLE_PREFIX_RULES[type];
+  if (!rule || !rule.pattern.test(title.trim())) return null;
+  return {
+    error: "VALIDATION_ERROR",
+    message:
+      `metadata.title must be bare, but "${title}" already carries ${rule.label} ` +
+      `that kg_capture also adds — writing it would produce a doubled prefix ` +
+      `(issue-46 Manifestation A). Resend the title without the prefix.`,
+  };
 }
 
 export function deriveFileName(
@@ -148,6 +299,10 @@ export function deriveFileName(
     return `Lessons_Learned_${titlePascal}.md`;
   }
 
+  // Caller must pass a bare title (issue-46 Manifestation A) — this function
+  // owns all filename prefixing. A caller-supplied date or ADR-number prefix
+  // is NOT stripped here; it will double-prepend. handleCapture() rejects such
+  // titles up front via checkTitlePrefix(). See knowledge/issues/issue-46/.
   if (type === "session") {
     return `${todayIso()}-${slugify(metadata.title)}.md`;
   }
@@ -184,21 +339,51 @@ export function generateFrontmatter(
     if (metadata.category) lines.push(`category: ${metadata.category}`);
     if (metadata.version) lines.push(`version: "${metadata.version}"`);
   } else if (type === "session") {
-    lines.push(`title: "${metadata.title.replace(/"/g, '\\"')}"`);
+    // issue-46 backfix hardening: use the same dated title displayTitleFor()
+    // already computes for the README index — a bare title here regresses
+    // FTS5 title-ranked search, which relies on the date prefix as signal.
+    lines.push(`title: "${displayTitleFor("session", metadata).replace(/"/g, '\\"')}"`);
     lines.push(`date: ${today}`);
     if (metadata.git?.branch) lines.push(`branch: ${metadata.git.branch}`);
     if (metadata.git?.commit_short) lines.push(`commit: ${metadata.git.commit_short}`);
+    // issue-46 Manifestation B: these previously lived in a caller-embedded
+    // frontmatter block; now sole-owned here, sourced from metadata so the
+    // update-in-place path (existingFile) can refresh them.
+    if (metadata.as_of_commit) lines.push(`as_of_commit: ${metadata.as_of_commit}`);
+    if (metadata.last_updated) lines.push(`last_updated: ${metadata.last_updated}`);
     if (metadata.tags && metadata.tags.length > 0) {
       lines.push(`tags: [${metadata.tags.join(", ")}]`);
     }
   } else if (type === "adr") {
+    // issue-46 Manifestation B: full shape matches
+    // core/default-templates/decisions/ADR-template.md — previously only a
+    // stub (title/status-hardcoded/date/deciders/tags) because callers always
+    // embedded their own complete block on top of this one; now sole owner.
     lines.push(`title: "${metadata.title.replace(/"/g, '\\"')}"`);
-    lines.push(`status: Proposed`);
-    lines.push(`date: ${today}`);
-    if (metadata.git?.author) lines.push(`deciders: ${metadata.git.author}`);
+    if (metadata.number !== undefined) lines.push(`number: ${metadata.number}`);
+    lines.push(`created: ${now}`);
+    lines.push(`status: ${metadata.status ?? "Proposed"}`);
+    if (metadata.git?.author) lines.push(`author: ${metadata.git.author}`);
+    if (metadata.git?.email) lines.push(`email: ${metadata.git.email}`);
+    if (metadata.git?.branch || metadata.git?.commit || metadata.git?.pr !== undefined || metadata.git?.issue !== undefined) {
+      lines.push("git:");
+      if (metadata.git?.branch) lines.push(`  branch: ${metadata.git.branch}`);
+      if (metadata.git?.commit) lines.push(`  commit: ${metadata.git.commit}`);
+      lines.push(`  pr: ${metadata.git?.pr ?? "null"}`);
+      lines.push(`  issue: ${metadata.git?.issue ?? "null"}`);
+    }
+    lines.push(`implements: ${metadata.implements ?? "null"}`);
+    lines.push("related:");
+    lines.push(`  adrs: [${(metadata.related?.adrs ?? []).join(", ")}]`);
+    lines.push(`  lessons: [${(metadata.related?.lessons ?? []).join(", ")}]`);
+    lines.push(`  kg_entries: [${(metadata.related?.kg_entries ?? []).join(", ")}]`);
     if (metadata.tags && metadata.tags.length > 0) {
       lines.push(`tags: [${metadata.tags.join(", ")}]`);
     }
+    if (metadata.search_aliases && metadata.search_aliases.length > 0) {
+      lines.push(`search_aliases: [${metadata.search_aliases.join(", ")}]`);
+    }
+    if (metadata.category) lines.push(`category: ${metadata.category}`);
   }
 
   lines.push("---", "");
@@ -264,6 +449,24 @@ export function checkExistingFile(
   return null;
 }
 
+// issue-46 Manifestation A: metadata.title is now bare (no date/ADR-number
+// prefix). README index entries previously got that prefix for free from the
+// (buggy) doubled title; reconstruct a display title from type + the
+// server-derived prefix instead of regressing to a bare title in the index.
+export function displayTitleFor(
+  type: CaptureRequest["type"],
+  metadata: CaptureRequest["metadata"],
+  adrNumber?: number
+): string {
+  if (type === "adr" && adrNumber !== undefined) {
+    return `ADR-${String(adrNumber).padStart(3, "0")}: ${metadata.title}`;
+  }
+  if (type === "session") {
+    return `${todayIso()}-${metadata.title}`;
+  }
+  return metadata.title;
+}
+
 export function updateReadmeIndex(
   indexPath: string,
   entry: { title: string; relativePath: string; description?: string }
@@ -293,6 +496,11 @@ export async function handleCapture(
   // Validate metadata
   const validated = validateMetadata(request.metadata);
   if ("error" in validated) return validated as CaptureError;
+
+  // issue-46 Manifestation A: reject an already-prefixed title before any
+  // filename is derived or byte written.
+  const prefixError = checkTitlePrefix(request.type, request.metadata.title);
+  if (prefixError) return prefixError;
 
   const config = readConfig();
   const mode = resolveInteractionMode({ explicitParam: interaction }).mode;
@@ -428,7 +636,7 @@ export async function handleCapture(
     try {
       fs.writeFileSync(
         existing,
-        generateFrontmatter(request.type, request.metadata) + request.content,
+        generateFrontmatter(request.type, request.metadata) + stripLeadingFrontmatter(request.content),
         "utf-8"
       );
       let indexResult: Record<string, unknown> = {};
@@ -455,7 +663,7 @@ export async function handleCapture(
   }
 
   // Resolve target path
-  const { dir, fileName } = resolveTargetPath(kgPath, request.type, request.metadata);
+  const { dir, fileName, adrNumber } = resolveTargetPath(kgPath, request.type, request.metadata);
 
   // Create directory if needed
   try {
@@ -471,7 +679,7 @@ export async function handleCapture(
 
   // Write file
   try {
-    fs.writeFileSync(filePath, generateFrontmatter(request.type, request.metadata) + request.content, "utf-8");
+    fs.writeFileSync(filePath, generateFrontmatter(request.type, request.metadata) + stripLeadingFrontmatter(request.content), "utf-8");
   } catch (err: unknown) {
     return { error: "IO_ERROR", message: `Failed to write file: ${err instanceof Error ? err.message : String(err)}` };
   }
@@ -487,7 +695,7 @@ export async function handleCapture(
       readmePath = path.join(kgPath, "decisions", "README.md");
     }
     updateReadmeIndex(readmePath, {
-      title: request.metadata.title,
+      title: displayTitleFor(request.type, request.metadata, adrNumber),
       relativePath: path.relative(path.dirname(readmePath), filePath),
     });
   } catch { /* best-effort */ }
@@ -526,7 +734,13 @@ export function registerCaptureTool(server: McpServer, personalScopeSession: Per
         .describe("Entry type: determines directory routing and frontmatter template"),
       metadata: z
         .object({
-          title: z.string().describe("Used in frontmatter and filename generation"),
+          title: z
+            .string()
+            .describe(
+              "Bare title, no date or ADR-number prefix — this tool derives and owns all " +
+                "filename/frontmatter prefixing. A pre-prefixed title (session: 'YYYY-MM-DD-...', " +
+                "adr: 'ADR-NNN...') is rejected with VALIDATION_ERROR rather than double-prepended."
+            ),
           category: z
             .string()
             .optional()
@@ -539,6 +753,8 @@ export function registerCaptureTool(server: McpServer, personalScopeSession: Per
               commit_short: z.string().optional(),
               author: z.string().optional(),
               email: z.string().optional(),
+              pr: z.string().nullable().optional().describe("adr type only: PR number or null"),
+              issue: z.string().nullable().optional().describe("adr type only: issue number or null"),
             })
             .optional()
             .describe("Git context metadata"),
@@ -547,6 +763,26 @@ export function registerCaptureTool(server: McpServer, personalScopeSession: Per
             .string()
             .optional()
             .describe("Absolute path to existing file for update-in-place"),
+          as_of_commit: z
+            .string()
+            .optional()
+            .describe("session type only: short commit hash for the update-in-place header"),
+          last_updated: z
+            .string()
+            .optional()
+            .describe("session type only: timestamp for the update-in-place header"),
+          status: z.string().optional().describe("adr type only: Proposed|Accepted|Deprecated|Superseded"),
+          number: z.number().optional().describe("adr type only: ADR sequential number"),
+          implements: z.string().nullable().optional().describe("adr type only: version or feature this ADR applies to"),
+          related: z
+            .object({
+              adrs: z.array(z.string()).optional(),
+              lessons: z.array(z.string()).optional(),
+              kg_entries: z.array(z.string()).optional(),
+            })
+            .optional()
+            .describe("adr type only: linked ADRs/lessons/KG entries"),
+          search_aliases: z.array(z.string()).optional().describe("adr type only: alternate search terms"),
         })
         .describe("Entry metadata"),
       targetKg: z

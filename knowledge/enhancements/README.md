@@ -4,7 +4,7 @@
 
 Formal tracking of proposed and resolved enhancements for this project.
 
-**Total ENHs:** 51
+**Total ENHs:** 55
 **Last Updated:** 2026-08-04
 
 ---
@@ -24,7 +24,11 @@ Formal tracking of proposed and resolved enhancements for this project.
 
 ## All ENHs (Chronological)
 
+- [ENH-061: Extraction Fails Closed on Unscoped Runs (All Sources), Claude Attributes by `cwd` Not Directory Name](ENH-061/ENH-061-specification.md) — **Status:** ✅ Resolved in v0.7.1.3 — `extract_claude.py`'s `--project` substring match doesn't scope by git worktree, and omitting `--project` merged sessions from every project on the machine; hard-stops fully-unscoped runs across all four `--source` values and attributes Claude sessions by `cwd` instead of directory name. Implements [ADR-062](../decisions/ADR-062-gemini-pb-project-scoping-fail-closed.md)'s v0.7.1.3 amendment; related to [ENH-044](../issues/chat-extraction-reliability-saga/attempts/ENH-044/specification.md), [ENH-060](ENH-060/ENH-060-specification.md).
+- [ENH-060: Mandatory Explicit-Approval Gate in `kmg-update-profile` Before Writing Profile Files](ENH-060/ENH-060-specification.md) — **Status:** ✅ Resolved in v0.7.1.3 — `kmg-update-profile`'s Step 4 gate language was ambiguous between self-review and explicit user approval, letting profile writes land without user sign-off; splits it into an internal coverage check plus a new mandatory stop-and-wait approval gate, matching `rules-capture-agent`'s existing pattern. Related to [ENH-061](ENH-061/ENH-061-specification.md).
+- [ENH-059: Recommend `obsidian-skills` During Install for Better Wikilink Generation and Obsidian Integration](ENH-059/ENH-059-specification.md) — **Status:** 🟡 Proposed — Idea capture only, not yet designed: recommend installing [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills) during install to improve wikilink generation and Obsidian integration.
 - [ENH-058: Meta-Issue Attempt Loop Should Explain a Repeatedly-Failing Test in Plain English and Recommend Whether to Keep Pursuing It](ENH-058/ENH-058-specification.md) — **Status:** 🟡 Proposed — Observed live in the docs-readme-poc style-guide-required-sections-saga meta-issue: a single test failed across four consecutive review attempts with no sign of converging; proposes the loop explain the pattern in plain English and recommend whether to keep pursuing it. Related to [ENH-056](ENH-056/ENH-056-specification.md).
+- [ENH-057: Hook Active KG Name into `claude-hud` Status Bar](ENH-057/ENH-057-specification.md) — **Status:** 🟡 Proposed — Idea capture only, not yet designed: surface the currently-resolved KG's name in the `claude-hud` status bar, relevant once [ADR-067](../decisions/ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md)'s context-derived resolution model ships.
 - [ENH-056: Commands/Workflows Documented as Multi-Step Processes Are Inconsistently Executed in Full](ENH-056/ENH-056-specification.md) — **Status:** Tracked — Commands/workflows documented as multi-step, prose-based processes are inconsistently executed in full; related to [issue-25](../issues/issue-25/issue-25-description.md), [issue-30](../issues/issue-30/issue-30-description.md), [issue-33](../issues/issue-33/issue-33-description.md), [issue-34](../issues/issue-34/issue-34-description.md), [issue-35](../issues/issue-35/issue-35-description.md).
 - [ENH-055: `kmg-capture-router`'s Trigger Vocabulary Misses "Future Idea" Phrasing](ENH-055/ENH-055-specification.md) — **Status:** 🟡 Proposed — Surfaced live during the v0.7 (ADR-067) brainstorm session, twice in a row: ideas explicitly framed as future work weren't recognized by the router's trigger vocabulary. Related to [ENH-053](ENH-053/ENH-053-specification.md), [ENH-054](ENH-054/ENH-054-specification.md).
 - [ENH-054: Full Audit-Trail History Log for Registry Lifecycle Transitions](ENH-054/ENH-054-specification.md) — **Status:** 🟡 Proposed — Surfaced during the v0.7 (ADR-067) brainstorm on KG resolution, specifically the registry lifecycle transitions, which currently have no audit-trail history log.

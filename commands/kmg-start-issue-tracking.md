@@ -347,7 +347,12 @@ Every generated plan MUST include this **Safety Header** and **Atomic Approval P
 ```markdown
 # Implementation Plan: [Version]-[ID]-[Slug]
 
-**STATUS:** 🔴 STOPPED (Waiting for Manual Approval of Step 1)
+**STATUS:** 🔴 AWAITING APPROVAL (Waiting for Manual Approval of Step 1)
+<!-- STATUS transitions happen only when kmg-execute-plan's 8-step protocol actually
+     runs, i.e. Gemini/Antigravity sessions: its Step 1 rewrites this line to
+     🟡 IN PROGRESS on approval, its Step 7 to ✅ COMPLETE on verified completion.
+     Under Claude Code the skill's Platform Guard exits before Step 1, so a
+     Claude Code-run plan gets NO automatic transition — update this line by hand. -->
 **GOVERNANCE:** Atomic Approval Required (Step-by-Step)
 **BEHAVIOR LOCKS:** 
 - [x] Zero-Deviation Execution

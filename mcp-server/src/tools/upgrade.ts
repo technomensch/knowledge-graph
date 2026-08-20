@@ -3,6 +3,7 @@ import { z } from "zod";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
+import { execFileSync } from "child_process";
 import {
   readConfig,
   writeConfig,
@@ -50,11 +51,14 @@ interface InspectResult {
 const APPLY_ORDER = [
   "status-schema",      // ADR-067 Task 8.1: reconcile old .active/legacy schema before anything else touches the registry
   "config-location",   // must run before anything else reads config from the new path
+  "plan-status-drift",   // issue-49 backfix: graph-independent like status-schema/config-location above, order-independent of everything else
   "directories",
   "config",
   "starter-relocation",   // must run BEFORE templates
   "templates",
   "stray-knowledge-dir",
+  "capture-corruption",   // issue-46 backfix: content repair, order-independent of the others
+  "diff-blank-reconstruction",   // issue-47 backfix: content repair, order-independent of the others
   "platform-split",
 ];
 
@@ -80,6 +84,380 @@ function parseFrontmatter(filePath: string): Record<string, string> {
   return result;
 }
 
+// issue-46 backfix: existing users' knowledge/ may already contain files
+// corrupted by the filename-double-prepend / frontmatter-double-embed bugs
+// (fixed going forward in capture.ts and the agent templates, but already-
+// written files stay broken until migrated). This section detects and
+// repairs both signatures. Conservative by design (ADR-063/ADR-040 precedent
+// in this file, see applyStrayKnowledgeDir above): only merges frontmatter
+// blocks when there is no field disagreement between them; a real conflict
+// (same key, different value) is reported for manual review, never guessed.
+
+interface RawFrontmatterBlock {
+  /** 0-indexed line of the opening `---` */
+  startLine: number;
+  /** 0-indexed line of the closing `---` */
+  endLine: number;
+  /** top-level key -> its raw source lines (key line + any indented continuation lines) */
+  fields: Map<string, string[]>;
+  /** insertion order of keys, for stable output */
+  order: string[];
+  /**
+   * True iff every non-blank line in the block is a `key:` line or an
+   * indented continuation of one — i.e. the block plausibly IS frontmatter,
+   * not prose that merely happens to contain a colon-prefixed line (e.g. a
+   * "Note: ..." or "TODO: ..." line at column 0). Fable review (2026-08-18)
+   * found `order.length > 0` alone still false-positives on exactly this
+   * shape: a single stray `key:`-looking prose line among otherwise
+   * non-matching lines was enough to pass the old guard.
+   */
+  looksLikeYaml: boolean;
+}
+
+function parseFrontmatterBlockRaw(lines: string[], startIdx: number): RawFrontmatterBlock | null {
+  if (lines[startIdx]?.trim() !== "---") return null;
+  let end = -1;
+  for (let i = startIdx + 1; i < lines.length; i++) {
+    if (lines[i].trim() === "---") { end = i; break; }
+  }
+  if (end === -1) return null;
+  const fields = new Map<string, string[]>();
+  const order: string[] = [];
+  let currentKey: string | null = null;
+  let looksLikeYaml = true;
+  for (let i = startIdx + 1; i < end; i++) {
+    const line = lines[i];
+    const topMatch = line.match(/^([A-Za-z_][\w-]*):(.*)$/);
+    if (topMatch) {
+      currentKey = topMatch[1];
+      fields.set(currentKey, [line]);
+      order.push(currentKey);
+    } else if (currentKey && /^\s/.test(line)) {
+      fields.get(currentKey)!.push(line);
+    } else if (line.trim() !== "") {
+      // A non-blank line that's neither a `key:` nor an indented
+      // continuation of one — real frontmatter never contains this; it's
+      // prose. Once seen, this block can never look like YAML, even if a
+      // later line happens to also match the key: pattern.
+      currentKey = null;
+      looksLikeYaml = false;
+    } else {
+      currentKey = null; // a blank line ends continuation eligibility
+    }
+  }
+  return { startLine: startIdx, endLine: end, fields, order, looksLikeYaml };
+}
+
+/**
+ * True only when the line immediately after block1's closing `---` is
+ * itself a bare `---` (the doubled-frontmatter signature) AND the region
+ * between that opening line and the next `---` actually parses as YAML in
+ * full — every non-blank line is a `key:` field or an indented
+ * continuation, not just "at least one" (see `looksLikeYaml`). A single
+ * frontmatter block followed by a `---` used as a body horizontal rule
+ * (e.g. a session snapshot that opens its body with a divider before a
+ * "## Section" heading, possibly containing a "Note: ..."-shaped prose
+ * line) has the same zero-gap shape but isn't real YAML — that's prose,
+ * not a second frontmatter block, and must never be treated as one
+ * (confirmed live data-loss bug, issue-46 backfix hardening: see
+ * knowledge/sessions/2026-05/2026-05-25-*.md for a real-world example of
+ * this exact shape).
+ */
+function detectDoubledFrontmatter(lines: string[]): { block1: RawFrontmatterBlock; block2: RawFrontmatterBlock } | null {
+  const block1 = parseFrontmatterBlockRaw(lines, 0);
+  if (!block1) return null;
+  const block2 = parseFrontmatterBlockRaw(lines, block1.endLine + 1);
+  if (!block2) return null;
+  if (block2.order.length === 0 || !block2.looksLikeYaml) return null;
+  return { block1, block2 };
+}
+
+/**
+ * Union-merge two frontmatter blocks. Matching keys with identical raw text
+ * are deduped; matching keys with different raw text are a genuine
+ * disagreement (e.g. two different `status:` or `date:` values) and abort
+ * the merge for this file rather than silently picking one — same
+ * never-guess-on-real-conflict rule as applyStrayKnowledgeDir.
+ */
+function mergeFrontmatterBlocks(
+  block1: RawFrontmatterBlock,
+  block2: RawFrontmatterBlock
+): { mergedLines: string[] } | { conflicts: string[] } {
+  const conflicts: string[] = [];
+  const fields = new Map<string, string[]>();
+  const order: string[] = [];
+  for (const key of block1.order) {
+    fields.set(key, block1.fields.get(key)!);
+    order.push(key);
+  }
+  for (const key of block2.order) {
+    const incoming = block2.fields.get(key)!;
+    if (fields.has(key)) {
+      const existing = fields.get(key)!.join("\n");
+      if (existing !== incoming.join("\n")) conflicts.push(key);
+      continue;
+    }
+    fields.set(key, incoming);
+    order.push(key);
+  }
+  if (conflicts.length > 0) return { conflicts };
+  const out: string[] = ["---"];
+  for (const key of order) out.push(...fields.get(key)!);
+  out.push("---");
+  return { mergedLines: out };
+}
+
+/** Exact-duplicate date prefix only, e.g. `2026-08-06-2026-08-06-main.md` ->
+ *  `2026-08-06-main.md`. A near-duplicate (midnight rollover, e.g.
+ *  `2026-07-12-2026-07-11-main.md`) is a different date, not a clean strip —
+ *  those are reported for manual review rather than guessed at. */
+const DOUBLED_DATE_FILENAME = /^(\d{4}-\d{2}-\d{2})-\1-(.+\.md)$/;
+/** Looser signature (any two adjacent YYYY-MM-DD segments) used only to
+ *  surface a manual-review note for the rollover case above — never renamed
+ *  automatically. */
+const NEAR_DOUBLED_DATE_FILENAME = /^(\d{4}-\d{2}-\d{2})-(\d{4}-\d{2}-\d{2})-(.+\.md)$/;
+/** Same doubling, ADR side: `ADR-046-adr-046-{slug}.md` -> `ADR-046-{slug}.md`.
+ *  `\2` requires the second ADR number to exactly match the first — without
+ *  it, a file legitimately referencing a *different* ADR in its slug (e.g.
+ *  `ADR-050-adr-046-followup-fix.md`) would be wrongly treated as doubled
+ *  and stripped of that reference. */
+const DOUBLED_ADR_FILENAME = /^(ADR-(\d+))-adr-\2-(.+\.md)$/i;
+
+/** De-doubles a filename via whichever pattern matches, or null if neither does. */
+function deDoubledFilename(entry: string): string | null {
+  const dateMatch = entry.match(DOUBLED_DATE_FILENAME);
+  if (dateMatch) return `${dateMatch[1]}-${dateMatch[2]}`;
+  const adrMatch = entry.match(DOUBLED_ADR_FILENAME);
+  if (adrMatch) return `${adrMatch[1]}-${adrMatch[3]}`;
+  return null;
+}
+
+/** statSync().isDirectory() that answers false instead of throwing for an
+ *  entry that can't be stat'ed at all -- a dangling symlink, a
+ *  permission-denied entry, or one that vanished between readdir and stat.
+ *  Same fail-safe posture plan-status-drift's scan already takes (Opus
+ *  review, 2026-08-19): one bad directory entry must never crash an entire
+ *  inspect/apply call and discard every result accumulated before it. */
+function isDirectorySafe(fullPath: string): boolean {
+  try {
+    return fs.statSync(fullPath).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+/** As above, for the isFile() side. */
+function isFileSafe(fullPath: string): boolean {
+  try {
+    return fs.statSync(fullPath).isFile();
+  } catch {
+    return false;
+  }
+}
+
+function captureCorruptionDirs(kgPath: string): string[] {
+  const dirs: string[] = [];
+  const sessionsRoot = path.join(kgPath, "sessions");
+  if (fs.existsSync(sessionsRoot)) {
+    for (const ym of fs.readdirSync(sessionsRoot)) {
+      const full = path.join(sessionsRoot, ym);
+      if (isDirectorySafe(full)) dirs.push(full);
+    }
+  }
+  const decisionsRoot = path.join(kgPath, "decisions");
+  if (fs.existsSync(decisionsRoot)) dirs.push(decisionsRoot);
+  const lessonsRoot = path.join(kgPath, "lessons-learned");
+  if (fs.existsSync(lessonsRoot)) {
+    for (const cat of fs.readdirSync(lessonsRoot)) {
+      const full = path.join(lessonsRoot, cat);
+      if (isDirectorySafe(full)) dirs.push(full);
+    }
+  }
+  return dirs;
+}
+
+/**
+ * Check g — issue-46 backfix. Scans sessions/decisions/lessons-learned for
+ * files already corrupted by the filename-double-prepend and
+ * frontmatter-double-embed bugs (fixed prospectively elsewhere; this is the
+ * retroactive repair for files written before the fix).
+ */
+function checkCaptureCorruption(kgPath: string): UpgradeItem[] {
+  let doubledFrontmatter = 0;
+  let doubledFilenames = 0;
+  let nearDoubledFilenames = 0;
+
+  for (const dir of captureCorruptionDirs(kgPath)) {
+    for (const entry of fs.readdirSync(dir)) {
+      if (!entry.endsWith(".md")) continue;
+      if (deDoubledFilename(entry)) doubledFilenames++;
+      else if (NEAR_DOUBLED_DATE_FILENAME.test(entry)) nearDoubledFilenames++;
+      const full = path.join(dir, entry);
+      if (!isFileSafe(full)) continue;
+      try {
+        const lines = fs.readFileSync(full, "utf-8").split("\n");
+        if (detectDoubledFrontmatter(lines)) doubledFrontmatter++;
+      } catch {
+        continue; // unreadable (permissions, vanished mid-scan) -- skip, don't let one bad file break the whole inspect
+      }
+    }
+  }
+
+  // Stale README index links: a link may reference a doubled filename that
+  // no longer exists on disk (already renamed by hand, or by a prior
+  // capture-corruption apply run) — this is the exact gap found in this
+  // repo's own decisions/README.md for ADR-046. Only counts as a finding
+  // when the de-doubled candidate actually exists (see applyCaptureCorruption
+  // pass 3); otherwise there's nothing this migration could safely do.
+  let staleReadmeLinks = 0;
+  for (const readmeRelPath of ["sessions/README.md", "decisions/README.md", "lessons-learned/README.md"]) {
+    const readmePath = path.join(kgPath, readmeRelPath);
+    if (!fs.existsSync(readmePath)) continue;
+    const content = fs.readFileSync(readmePath, "utf-8");
+    for (const m of content.matchAll(/\]\(([^)]+\.md)\)/g)) {
+      const linkTarget = m[1];
+      const base = path.basename(linkTarget);
+      const target = deDoubledFilename(base);
+      if (!target) continue;
+      const dedoubledLink = linkTarget.slice(0, linkTarget.length - base.length) + target;
+      if (fs.existsSync(path.join(path.dirname(readmePath), dedoubledLink))) staleReadmeLinks++;
+    }
+  }
+
+  if (doubledFrontmatter === 0 && doubledFilenames === 0 && nearDoubledFilenames === 0 && staleReadmeLinks === 0) return [];
+
+  const parts: string[] = [];
+  if (doubledFrontmatter > 0) parts.push(`${doubledFrontmatter} file(s) with a duplicated frontmatter block`);
+  if (doubledFilenames > 0) parts.push(`${doubledFilenames} file(s) with an exact doubled date/ADR-number filename prefix`);
+  if (nearDoubledFilenames > 0) parts.push(`${nearDoubledFilenames} file(s) with a near-doubled filename (different adjacent dates — needs manual review, not auto-renamed)`);
+  if (staleReadmeLinks > 0) parts.push(`${staleReadmeLinks} README index link(s) pointing at a doubled filename`);
+
+  return [{
+    category: "capture-corruption",
+    description: `issue-46: ${parts.join("; ")}`,
+    details:
+      `These were written before the capture.ts filename/frontmatter-ownership fix (issue-46) and stay ` +
+      `corrupted until repaired. Run with apply: ["capture-corruption"], confirmBackfix: true to fix the ` +
+      `unambiguous cases automatically (exact-duplicate filenames stripped; frontmatter blocks merged only ` +
+      `when the two blocks don't disagree on any field). Anything ambiguous (a real field conflict, or a ` +
+      `near-doubled filename from a midnight rollover) is reported, never guessed at — you'll get a list to ` +
+      `resolve by hand.`,
+  }];
+}
+
+/**
+ * Apply g — issue-46 backfix. Conservative by construction: exact-duplicate
+ * filenames are stripped (skipped with a report if the target name is
+ * somehow already taken); frontmatter blocks are merged only when clean
+ * (no key disagreement). Anything else is reported, not guessed.
+ */
+function applyCaptureCorruption(kgPath: string): string {
+  let mergedCount = 0;
+  let renamedCount = 0;
+  const reviewNeeded: string[] = [];
+
+  // Pass 1: frontmatter merges (in place, same filename)
+  for (const dir of captureCorruptionDirs(kgPath)) {
+    for (const entry of fs.readdirSync(dir)) {
+      if (!entry.endsWith(".md")) continue;
+      const full = path.join(dir, entry);
+      if (!isFileSafe(full)) continue;
+      let raw: string;
+      try {
+        raw = fs.readFileSync(full, "utf-8");
+      } catch {
+        continue; // unreadable (permissions, vanished mid-scan) -- skip, don't let one bad file abort the whole apply
+      }
+      const lines = raw.split("\n");
+      const doubled = detectDoubledFrontmatter(lines);
+      if (!doubled) continue;
+      const result = mergeFrontmatterBlocks(doubled.block1, doubled.block2);
+      if ("conflicts" in result) {
+        reviewNeeded.push(`${path.relative(kgPath, full)}: frontmatter fields disagree (${result.conflicts.join(", ")}) — not auto-merged`);
+        continue;
+      }
+      const rest = lines.slice(doubled.block2.endLine + 1);
+      const newContent = [...result.mergedLines, ...rest].join("\n");
+      // backupOnce, NOT a bare writeFileSync (Opus review, 2026-08-19): this
+      // is the same ADR-063 never-clobber-an-earlier-backup rule that
+      // diff-blank-reconstruction and plan-status-drift already follow. The
+      // categories share write targets under sessions/ and are applied in
+      // separate runs as often as together, so an unconditional write here
+      // would overwrite a .bak holding the true original with content another
+      // category had already mutated -- making the original unrecoverable.
+      backupOnce(full, raw);
+      fs.writeFileSync(full, newContent, "utf-8");
+      mergedCount++;
+    }
+  }
+
+  // Pass 2: exact-duplicate filename renames (separate pass so a file
+  // needing both operations gets its content fixed before its path moves).
+  // Covers both the session/date pattern and the ADR-number pattern.
+  for (const dir of captureCorruptionDirs(kgPath)) {
+    for (const entry of fs.readdirSync(dir)) {
+      if (!entry.endsWith(".md")) continue;
+      const target = deDoubledFilename(entry);
+      if (!target) {
+        if (NEAR_DOUBLED_DATE_FILENAME.test(entry)) {
+          reviewNeeded.push(`${path.relative(kgPath, path.join(dir, entry))}: near-doubled filename (different adjacent dates, likely a midnight rollover) — not auto-renamed, resolve manually`);
+        }
+        continue;
+      }
+      const targetFull = path.join(dir, target);
+      const srcFull = path.join(dir, entry);
+      if (fs.existsSync(targetFull)) {
+        reviewNeeded.push(`${path.relative(kgPath, srcFull)}: target filename ${target} already exists — not auto-renamed`);
+        continue;
+      }
+      fs.renameSync(srcFull, targetFull);
+      renamedCount++;
+    }
+  }
+
+  // Pass 3: fix README index links pointing at a doubled filename — whether
+  // that file was just renamed above, or was already renamed by hand
+  // earlier (leaving only the index stale, the exact case found in this
+  // repo's own decisions/README.md for ADR-046). A link is only rewritten
+  // when the de-doubled target actually exists on disk; otherwise it's
+  // reported, never guessed at.
+  let readmeLinksFixed = 0;
+  for (const readmeRelPath of ["sessions/README.md", "decisions/README.md", "lessons-learned/README.md"]) {
+    const readmePath = path.join(kgPath, readmeRelPath);
+    if (!fs.existsSync(readmePath)) continue;
+    let content = fs.readFileSync(readmePath, "utf-8");
+    let changed = false;
+    content = content.replace(/\]\(([^)]+\.md)\)/g, (whole, linkTarget: string) => {
+      const base = path.basename(linkTarget);
+      const target = deDoubledFilename(base);
+      if (!target) return whole;
+      const dedoubledLink = linkTarget.slice(0, linkTarget.length - base.length) + target;
+      const candidateFull = path.join(path.dirname(readmePath), dedoubledLink);
+      if (!fs.existsSync(candidateFull)) {
+        reviewNeeded.push(`${readmeRelPath}: link to ${linkTarget} looks doubled but ${dedoubledLink} doesn't exist — not auto-fixed`);
+        return whole;
+      }
+      changed = true;
+      readmeLinksFixed++;
+      return `](${dedoubledLink})`;
+    });
+    if (changed) fs.writeFileSync(readmePath, content, "utf-8");
+  }
+
+  const parts = [
+    // "kept" not "written": backupOnce() leaves an existing .bak in place
+    // rather than overwriting it, so the guarantee is that a backup exists —
+    // not that this run is the one that created it.
+    `${mergedCount} frontmatter block(s) merged` + (mergedCount > 0 ? " (.bak backup kept for each)" : ""),
+    `${renamedCount} filename(s) de-duplicated`,
+    `${readmeLinksFixed} README link(s) repointed`,
+  ];
+  if (reviewNeeded.length > 0) {
+    parts.push(`${reviewNeeded.length} item(s) need manual review:\n  - ${reviewNeeded.join("\n  - ")}`);
+  }
+  return parts.join("; ");
+}
+
 /**
  * Check a — verify required KG subdirectories exist.
  */
@@ -101,6 +479,725 @@ function checkDirectories(kgPath: string): UpgradeItem[] {
       details: `Run with apply: ["directories"] to create them under ${kgPath}`,
     },
   ];
+}
+
+// ── issue-47 backfix: reconstruct blank "key files modified" sections ──────────
+
+/**
+ * True if `kgPath` is inside a git working tree at all. This tool's stated
+ * audience includes MCP-only installs with a non-git KG -- without this
+ * guard, every helper below would fail closed into "no main/master, commit
+ * unresolvable" for every single blank session file, and the category would
+ * mutate every one of them with a false-positive "could not be
+ * reconstructed" note (found in review, 2026-08-18: verified live against a
+ * non-git kgPath).
+ */
+function isInsideGitRepo(kgPath: string): boolean {
+  try {
+    execFileSync("git", ["rev-parse", "--is-inside-work-tree"], { cwd: kgPath, stdio: "pipe" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * True if `branch` should be treated as the resolved default branch --
+ * exact match, or a descriptive-suffix variant real session files actually
+ * carry (found in review, 2026-08-18, against this repo's own KG: e.g.
+ * `main (post-merge; was v0.6.17-...)`). A plain string-equality check
+ * misclassifies these as feature branches and flags them as bug-affected
+ * when they're actually fine.
+ */
+function isOnDefaultBranch(branch: string, defaultBranch: string): boolean {
+  return branch === defaultBranch || branch.startsWith(`${defaultBranch} `) || branch.startsWith(`${defaultBranch}(`);
+}
+
+/**
+ * Resolve the repo's default branch as a local ref, same convention as
+ * agents/session-summary-agent.md and skills/kmg-docs-impact-scan/SKILL.md's
+ * fixed sites (c2, v0.7.2): try `main`, then `master`. Returns null if
+ * neither resolves (not an error -- callers report the specific reason).
+ */
+function resolveDefaultBranchForGit(kgPath: string): string | null {
+  for (const candidate of ["main", "master"]) {
+    try {
+      execFileSync("git", ["show-ref", "--verify", "--quiet", `refs/heads/${candidate}`], {
+        cwd: kgPath,
+        stdio: "pipe",
+      });
+      return candidate;
+    } catch {
+      // not this candidate, try the next
+    }
+  }
+  return null;
+}
+
+/** True if `commitRef` still resolves to a real commit in local git history. */
+function isCommitResolvable(kgPath: string, commitRef: string): boolean {
+  try {
+    execFileSync("git", ["cat-file", "-e", `${commitRef}^{commit}`], { cwd: kgPath, stdio: "pipe" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** `git merge-base a b`, or null if it fails (e.g. unrelated histories). */
+function gitMergeBase(kgPath: string, a: string, b: string): string | null {
+  try {
+    return execFileSync("git", ["merge-base", a, b], { cwd: kgPath, stdio: "pipe" }).toString().trim();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * `git diff --name-only a b`. Returns null when git could not answer at all,
+ * NOT an empty array (Opus review, 2026-08-19): the caller writes a factual
+ * "confirmed empty via git history" claim into the user's session file on an
+ * empty list, so "git ran and found no changed files" and "git failed" must
+ * stay distinguishable -- collapsing them made a failed diff get recorded as
+ * verified fact. Never throws.
+ */
+function gitDiffNameOnly(kgPath: string, a: string, b: string): string[] | null {
+  try {
+    const out = execFileSync("git", ["diff", "--name-only", a, b], { cwd: kgPath, stdio: "pipe" }).toString();
+    return out.split("\n").filter((l) => l.trim().length > 0);
+  } catch {
+    return null;
+  }
+}
+
+interface BlankDiffSessionFile {
+  fullPath: string;
+  relName: string;
+  commitRef: string | null;
+  reconstructable: boolean;
+}
+
+/**
+ * Sentinel marking a session file as already handled by this backfix --
+ * every write path below (reconstructed-with-files, reconstructed-empty,
+ * AND the unresolvable note) includes this exact string in its inserted
+ * comment. Checking for it (not just the file-list marker) is what makes a
+ * second run idempotent: without it, the unresolvable-note and
+ * reconstructed-empty paths wrote no `← modified this session` marker, so
+ * every re-run re-classified the file as still-blank and appended another
+ * note, unbounded (found in review, 2026-08-18 -- verified live: note count
+ * went 1 -> 2 across two runs, and the destructive part -- see below --
+ * made the original content unrecoverable after that).
+ */
+const BACKFIX_SENTINEL = "issue-47 backfix (c2";
+
+/**
+ * Walks sessions/<month>/*.md, classifying each file with a blank "key files
+ * modified" section (no `← modified this session` marker AND no
+ * BACKFIX_SENTINEL anywhere in the body) into: correctly blank (captured on
+ * the default branch -- not a gap), reconstructable (feature branch,
+ * recorded commit still resolvable), or unresolvable (feature branch,
+ * commit gone). Shared by check and apply so the two never disagree on
+ * classification. Returns all-empty immediately if kgPath isn't inside a
+ * git repo at all -- nothing to (mis)classify without git available.
+ */
+function findBlankDiffSessionFiles(kgPath: string): {
+  correctlyBlank: number;
+  reconstructable: BlankDiffSessionFile[];
+  unresolvable: BlankDiffSessionFile[];
+} {
+  const sessionsDir = path.join(kgPath, "sessions");
+  const result = { correctlyBlank: 0, reconstructable: [] as BlankDiffSessionFile[], unresolvable: [] as BlankDiffSessionFile[] };
+  if (!fs.existsSync(sessionsDir)) return result;
+  if (!isInsideGitRepo(kgPath)) return result;
+
+  const defaultBranch = resolveDefaultBranchForGit(kgPath);
+  // Same fail-safe as the isInsideGitRepo guard above (Opus review,
+  // 2026-08-19). Without a resolved default branch -- a repo whose default is
+  // `trunk`/`develop`/`dev`, or one with no commits yet -- NOTHING here is
+  // classifiable: isOnDefaultBranch() can never match, so a session file
+  // captured on `trunk` and correctly blank would be misfiled as
+  // `unresolvable` and have a false "could not be reconstructed" note written
+  // into it, and the reconstructable test can never pass either, so EVERY
+  // blank session file in the repo would be mutated. Skipping matches the
+  // stated project convention for this exact case (skills/
+  // kmg-docs-impact-scan/SKILL.md step 1: "if neither resolves ... report
+  // skipped -- do not error").
+  if (!defaultBranch) return result;
+
+  for (const ym of fs.readdirSync(sessionsDir)) {
+    const ymDir = path.join(sessionsDir, ym);
+    if (isDirectorySafe(ymDir)) {
+      for (const entry of fs.readdirSync(ymDir)) {
+        if (!entry.endsWith(".md") || entry === "README.md") continue;
+        const full = path.join(ymDir, entry);
+        if (!isFileSafe(full)) continue;
+        let fm: Record<string, string>;
+        let body: string;
+        try {
+          fm = parseFrontmatter(full);
+          body = fs.readFileSync(full, "utf-8");
+        } catch {
+          continue; // unreadable (permissions, vanished mid-scan) -- skip, don't let one bad file break the whole scan
+        }
+        const branch = fm["branch"];
+        if (!branch) continue; // no branch recorded -- can't classify, skip rather than guess
+
+        if (body.includes("← modified this session") || body.includes(BACKFIX_SENTINEL)) continue; // already populated or already handled by this backfix
+
+        if (isOnDefaultBranch(branch, defaultBranch)) {
+          result.correctlyBlank++;
+          continue;
+        }
+
+        const commitRef = fm["as_of_commit"] || fm["commit"] || null;
+        const item: BlankDiffSessionFile = { fullPath: full, relName: `${ym}/${entry}`, commitRef, reconstructable: false };
+        if (commitRef && commitRef !== "TBD" && isCommitResolvable(kgPath, commitRef)) {
+          item.reconstructable = true;
+          result.reconstructable.push(item);
+        } else {
+          result.unresolvable.push(item);
+        }
+      }
+    }
+  }
+  return result;
+}
+
+function checkDiffBlankReconstruction(kgPath: string): UpgradeItem[] {
+  const { reconstructable, unresolvable } = findBlankDiffSessionFiles(kgPath);
+  if (reconstructable.length === 0 && unresolvable.length === 0) return [];
+
+  const parts: string[] = [];
+  if (reconstructable.length > 0) parts.push(`${reconstructable.length} session file(s) with a blank "key files modified" section, reconstructable from git history`);
+  if (unresolvable.length > 0) parts.push(`${unresolvable.length} session file(s) with a blank section whose recorded commit is no longer resolvable`);
+
+  return [{
+    category: "diff-blank-reconstruction",
+    description: `issue-47: ${parts.join("; ")}`,
+    details:
+      `These were captured while HEAD equaled the default branch (pre-branch, e.g. mid ` +
+      `spec-drafting), before the git-diff-base fix (issue-47) landed -- "git diff main...HEAD" ` +
+      `was silently empty in that state, leaving the section blank with no explanation. Run with ` +
+      `apply: ["diff-blank-reconstruction"], confirmBackfix: true to best-effort reconstruct the ` +
+      `modified-file list from git history for cases where the recorded commit is still resolvable ` +
+      `(via the corrected merge-base logic). Unresolvable cases (deleted branch, gc'd commit) get an ` +
+      `explanatory note instead -- never a fabricated file list.`,
+  }];
+}
+
+/**
+ * Apply g — issue-47 backfix. Conservative by construction, mirroring
+ * capture-corruption: a .bak backup is written before any rewrite, and an
+ * unresolvable commit gets an honest note, never a guessed file list. A
+ * reconstruction that finds the historical commit IS the default branch's
+ * merge-base (nothing actually changed, even historically) still counts as
+ * reconstructed -- an explained, git-verified empty list is strictly better
+ * than an unexplained blank.
+ */
+/** Write a .bak backup only if one doesn't already exist -- never clobber an earlier, possibly-original backup with a later, already-mutated write (ADR-063). */
+function backupOnce(fullPath: string, raw: string): void {
+  const bakPath = `${fullPath}.bak`;
+  if (!fs.existsSync(bakPath)) fs.writeFileSync(bakPath, raw, "utf-8");
+}
+
+function applyDiffBlankReconstruction(kgPath: string): string {
+  const { reconstructable, unresolvable } = findBlankDiffSessionFiles(kgPath);
+  const defaultBranch = resolveDefaultBranchForGit(kgPath);
+  let reconstructedCount = 0;
+  let notedCount = 0;
+  const stamp = new Date().toISOString().slice(0, 10);
+
+  /** The single honest-failure note shape, shared by both loops below. */
+  const unresolvableNote = (reason: string): string =>
+    `\n<!-- ${BACKFIX_SENTINEL}, ${stamp}): "key files modified" could not be reconstructed -- ` +
+    `${reason} in local git history. -->\n`;
+
+  for (const item of unresolvable) {
+    const raw = fs.readFileSync(item.fullPath, "utf-8");
+    backupOnce(item.fullPath, raw);
+    // No `!defaultBranch` arm here: findBlankDiffSessionFiles now returns an
+    // all-empty result when the default branch doesn't resolve, so both lists
+    // are empty in that case and this loop never runs.
+    const reason = !item.commitRef
+      ? "no commit was recorded"
+      : item.commitRef === "TBD"
+        ? 'the recorded commit is still the placeholder "TBD" -- never actually filled in'
+        : `recorded commit ${item.commitRef} is no longer resolvable`;
+    fs.writeFileSync(item.fullPath, insertAfterExternalFilesHeading(raw, unresolvableNote(reason)), "utf-8");
+    notedCount++;
+  }
+
+  for (const item of reconstructable) {
+    const commitRef = item.commitRef as string; // reconstructable implies non-null
+    // defaultBranch is guaranteed non-null here: findBlankDiffSessionFiles only
+    // populates `reconstructable` after resolving it (isInsideGitRepo + a
+    // resolved default branch are both prerequisites for reaching this branch).
+    const mergeBase = gitMergeBase(kgPath, defaultBranch as string, commitRef);
+    // Three distinct outcomes that must NOT collapse into one (Opus review,
+    // 2026-08-19): null = git could not answer (no merge-base -- unrelated
+    // histories -- or the diff itself failed), which is a failure and gets an
+    // honest note; [] = git answered "nothing changed", which is a verified
+    // fact and may be written as one. The old single-expression form folded
+    // both git-failure paths into [] and then asserted "confirmed empty via
+    // git history" over them.
+    const fileList: string[] | null =
+      mergeBase === null
+        ? null
+        : mergeBase === commitRef
+          ? [] // commit IS the merge-base: genuinely nothing diverged, no diff needed
+          : gitDiffNameOnly(kgPath, mergeBase, commitRef);
+
+    const raw = fs.readFileSync(item.fullPath, "utf-8");
+    backupOnce(item.fullPath, raw);
+    let block: string;
+    if (fileList === null) {
+      const reason = mergeBase === null
+        ? `no merge base between ${defaultBranch} and commit ${commitRef} could be computed (unrelated histories?)`
+        : `"git diff" against the merge base of ${defaultBranch} and commit ${commitRef} failed`;
+      block = unresolvableNote(reason);
+      notedCount++;
+    } else if (fileList.length > 0) {
+      block =
+        `\n<!-- ${BACKFIX_SENTINEL}, ${stamp}): reconstructed from git history (best-effort) -->\n` +
+        fileList.map((f) => `- \`${f}\` ← modified this session (reconstructed)`).join("\n") + "\n";
+      reconstructedCount++;
+    } else {
+      block =
+        `\n<!-- ${BACKFIX_SENTINEL}, ${stamp}): "key files modified" confirmed empty via git ` +
+        `history -- no files changed at commit ${commitRef} relative to ${defaultBranch}. -->\n`;
+      reconstructedCount++;
+    }
+    fs.writeFileSync(item.fullPath, insertAfterExternalFilesHeading(raw, block), "utf-8");
+  }
+
+  return `${reconstructedCount} session file(s) reconstructed, ${notedCount} left with an unresolvable note.`;
+}
+
+/**
+ * Insert `block` immediately after the FULL LINE containing the
+ * "**External files:**" heading, if present; otherwise append it at the end
+ * of the file with its own heading, so the note is never silently dropped
+ * just because a file predates that section existing.
+ *
+ * Splicing right after the heading substring (not the end of its line) is
+ * wrong when the heading has inline content on the same line -- e.g.
+ * `**External files:** none this session` -- which orphans " none this
+ * session" onto its own line below the inserted block (found in review,
+ * 2026-08-18, verified live). Find the end of that line instead.
+ */
+function insertAfterExternalFilesHeading(content: string, block: string): string {
+  const heading = "**External files:**";
+  const idx = content.indexOf(heading);
+  if (idx === -1) {
+    return content.replace(/\n?$/, `\n\n**External files (issue-47 backfix):**\n${block}`);
+  }
+  const lineEnd = content.indexOf("\n", idx);
+  const insertAt = lineEnd === -1 ? content.length : lineEnd + 1;
+  return content.slice(0, insertAt) + block + content.slice(insertAt);
+}
+
+// ── issue-49 backfix: plan Safety-Header STATUS drift (plan-status-drift) ──
+
+/**
+ * Frozen Safety-Header placeholder strings this category recognizes. Both
+ * Tier A's write-guard and Tier B's candidate-matcher MUST consume this
+ * exact same list -- never let one tier's placeholder recognition drift
+ * from the other's (c6 plan Step 2, gap #1). The pre-c7 string is always
+ * recognized; c7 renames it going forward for newly-born plans to a second
+ * string, recognized too, so this category doesn't silently stop working on
+ * existing plans once c7 lands, and correctly covers new-shape ones.
+ */
+const FROZEN_PLACEHOLDERS = [
+  "**STATUS:** 🔴 STOPPED (Waiting for Manual Approval of Step 1)",
+  "**STATUS:** 🔴 AWAITING APPROVAL (Waiting for Manual Approval of Step 1)",
+];
+
+/**
+ * Normalize a string for comparison purposes: CRLF/lone-CR -> LF, strip
+ * trailing newlines entirely (not collapse to one -- "text\n" and "text"
+ * must compare equal), strip a leading BOM. Both tiers of detection, and
+ * Tier A's write-time re-check, must call this SAME function -- never two
+ * independently written near-identical passes (c6 plan Step 2, gap #2).
+ */
+function normalizeForCompare(s: string): string {
+  return s.replace(/^﻿/, "").replace(/\r\n?/g, "\n").replace(/\n+$/, "");
+}
+
+/**
+ * Extract the first line matching `^**STATUS:**` (the Safety-Header line),
+ * or null if none found. Anchored to the header line specifically -- never
+ * scans the rest of the body for placeholder-shaped text (this plan's own
+ * body, and c7's, both quote old/new placeholder strings verbatim in prose;
+ * a whole-file substring match would mis-fire on files like these).
+ */
+function extractStatusLine(content: string): string | null {
+  for (const line of content.split(/\r\n|\r|\n/)) {
+    if (/^\*\*STATUS:\*\*/.test(line)) return line;
+  }
+  return null;
+}
+
+/** The STATUS value portion after the `**STATUS:**` label (e.g. `🔴 STOPPED (...)`). */
+function statusValueOf(statusLine: string): string {
+  return statusLine.replace(/^\*\*STATUS:\*\*\s*/, "");
+}
+
+/** True if `statusLine` is one of the recognized frozen placeholders, normalized-compared. */
+function isFrozenPlaceholder(statusLine: string): boolean {
+  const normalized = normalizeForCompare(statusLine);
+  return FROZEN_PLACEHOLDERS.some((p) => normalizeForCompare(p) === normalized);
+}
+
+/**
+ * True if `canonicalContent` and `mirrorContent` are identical apart from
+ * their respective STATUS lines, after normalization. Replaces each file's
+ * STATUS line with a common sentinel before comparing, so the STATUS line's
+ * own content difference (the whole point of a Tier A finding) never
+ * counts against "identical".
+ */
+function restIdenticalApartFromStatus(canonicalContent: string, mirrorContent: string, canonicalStatus: string, mirrorStatus: string): boolean {
+  const strip = (content: string, statusLine: string): string => {
+    const idx = content.indexOf(statusLine);
+    if (idx === -1) return content;
+    return content.slice(0, idx) + " STATUS " + content.slice(idx + statusLine.length);
+  };
+  return normalizeForCompare(strip(canonicalContent, canonicalStatus)) === normalizeForCompare(strip(mirrorContent, mirrorStatus));
+}
+
+/**
+ * Replace `oldStatusLine` with `newStatusLine` inside `content`, touching
+ * nothing else -- crucially, the surrounding line-terminator bytes are
+ * left completely untouched (both extracted lines are terminator-free, per
+ * extractStatusLine's split/rejoin), so the mirror's own line-ending
+ * convention (CRLF/LF) is preserved automatically, never overwritten with
+ * canonical's (c6 plan Step 2, write-side gap: splicing in canonical's raw
+ * text including its own terminator would have produced a mixed-line-ending
+ * file).
+ */
+function spliceStatusLine(content: string, oldStatusLine: string, newStatusLine: string): string {
+  const idx = content.indexOf(oldStatusLine);
+  if (idx === -1) return content; // defensive no-op; callers only invoke this once a finding has proven the line exists
+  return content.slice(0, idx) + newStatusLine + content.slice(idx + oldStatusLine.length);
+}
+
+interface TierAFinding {
+  canonicalPath: string;
+  mirrorPath: string;
+  canonicalStatusLine: string;
+  mirrorStatusLine: string;
+  // The exact mirror bytes this finding validated -- callers MUST splice
+  // and write these bytes, not re-read the file, or a save landing between
+  // this read and the write would be spliced/written unvalidated (Opus
+  // review, 2026-08-19: the predicate was re-derived fresh, but the bytes
+  // it approved and the bytes actually written were two different reads).
+  mirrorContent: string;
+}
+
+/**
+ * Re-derives the FULL three-clause Tier A write predicate fresh from disk
+ * every time it's called -- both `checkPlanStatusDrift()` (for counting)
+ * and `applyPlanStatusDrift()` (immediately before writing) call this SAME
+ * function, and apply NEVER trusts a pre-computed finding list. This is
+ * what makes Tier B structurally impossible to auto-apply, not merely
+ * asserted: a Tier B canonical (frozen placeholder) can never satisfy
+ * clause 2 below (`canonicalHasComplete`), and the AND -- not OR -- is what
+ * closes the "mirror hand-annotated to something real" overwrite risk.
+ *
+ * The three conditions, all required:
+ * 1. The two STATUS lines differ (normalized).
+ * 2. The mirror's STATUS matches `^🔴` (any stopped-shaped variant) AND
+ *    canonical's STATUS contains `✅ COMPLETE`.
+ * 3. The rest of the file is identical apart from that line (normalized).
+ */
+function computeTierAFinding(canonicalPath: string, mirrorPath: string): TierAFinding | null {
+  if (!fs.existsSync(canonicalPath) || !fs.existsSync(mirrorPath)) return null;
+  const canonicalContent = fs.readFileSync(canonicalPath, "utf-8");
+  const mirrorContent = fs.readFileSync(mirrorPath, "utf-8");
+  const canonicalStatus = extractStatusLine(canonicalContent);
+  const mirrorStatus = extractStatusLine(mirrorContent);
+  if (canonicalStatus === null || mirrorStatus === null) return null;
+
+  if (normalizeForCompare(canonicalStatus) === normalizeForCompare(mirrorStatus)) return null; // clause 1
+
+  const mirrorLooksStopped = statusValueOf(mirrorStatus).startsWith("🔴");
+  const canonicalHasComplete = canonicalStatus.includes("✅ COMPLETE");
+  if (!(mirrorLooksStopped && canonicalHasComplete)) return null; // clause 2 (AND, not OR)
+
+  if (!restIdenticalApartFromStatus(canonicalContent, mirrorContent, canonicalStatus, mirrorStatus)) return null; // clause 3
+
+  return { canonicalPath, mirrorPath, canonicalStatusLine: canonicalStatus, mirrorStatusLine: mirrorStatus, mirrorContent };
+}
+
+/** True if a canonical (and, if present, its mirror) qualify as a Tier B candidate: exact-match frozen placeholder, never a fuzzy STOPPED-substring match. */
+function isTierBCandidate(canonicalStatus: string, mirrorStatus: string | null): boolean {
+  if (!isFrozenPlaceholder(canonicalStatus)) return false;
+  return mirrorStatus === null || isFrozenPlaceholder(mirrorStatus);
+}
+
+/**
+ * Best-effort branch-segment guess from a plan filename: strip `.md`, strip
+ * a trailing `-plan` suffix. Stated explicitly per the plan: this rarely
+ * matches a real branch name for this project's actual naming convention --
+ * kept only because the `Related: Shares branch` line never discriminates
+ * (all 8 in-flight v0.7.2-c* plans share one identical branch string, and
+ * the 5 already-completed plans that COULD be discriminated by branch name
+ * have no `Shares branch` line at all).
+ */
+function extractBranchCandidateFromFilename(filename: string): string {
+  return filename.replace(/\.md$/, "").replace(/-plan$/, "");
+}
+
+/**
+ * Extract the merged branch segment from one git merge-commit subject line,
+ * or null if the subject doesn't parse (a large fraction of real merge
+ * history -- ~38% in this repo -- doesn't; that's expected, not a bug: Tier
+ * B is report-only, so an unparseable subject just means missing evidence,
+ * never a false positive).
+ *
+ * 1. PR shape: everything after the FIRST `/` following the literal
+ *    substring "from " -- branch names here can contain `/` themselves
+ *    (e.g. `technomensch/dependabot/npm_and_yarn/...`), so first-slash, not
+ *    last-slash or basename-style extraction.
+ * 2. `Merge branch '<branch>'` shape (pre-PR-era / non-GitHub merges):
+ *    the single-quoted segment.
+ * 3. Anything else, including a subject with no branch name at all (a
+ *    GitHub setting that uses the PR title as the merge subject): skip.
+ */
+function extractMergedBranchSegment(subject: string): string | null {
+  const fromIdx = subject.indexOf("from ");
+  if (fromIdx !== -1) {
+    const after = subject.slice(fromIdx + "from ".length);
+    const slashIdx = after.indexOf("/");
+    if (slashIdx !== -1) return after.slice(slashIdx + 1).trim();
+  }
+  const branchMatch = subject.match(/Merge branch '([^']+)'/);
+  return branchMatch ? branchMatch[1] : null;
+}
+
+/**
+ * True if `branchCandidate` was ever merged into `defaultBranch`, by EXACT
+ * string equality against each parsed merge-commit subject's extracted
+ * segment -- never regex/substring matching, which produces real false
+ * positives in this repo's own history (e.g. `v0.7.1.4-version-sync` is a
+ * substring-match false-positive for `v0.7.1.4-issue-45-...`, confirmed
+ * live; `git log -F --grep=...` does NOT fix this, since `-F` disables
+ * regex metacharacters but does not anchor the match).
+ *
+ * A false `false` here means "no evidence found" (squash-merge, rebase-
+ * merge, deleted branch with no surviving merge commit, or genuinely not
+ * merged) -- this signal is a boolean "was this branch ever merged," not
+ * uniquely identifying "the" merge commit (three branch names in this
+ * repo's own history were each merged more than once).
+ */
+function wasBranchMerged(projectRoot: string, defaultBranch: string, branchCandidate: string): boolean {
+  try {
+    const out = execFileSync("git", ["log", defaultBranch, "--merges", "--format=%s"], { cwd: projectRoot, stdio: "pipe" }).toString();
+    for (const subject of out.split("\n")) {
+      if (!subject.trim()) continue;
+      if (extractMergedBranchSegment(subject) === branchCandidate) return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Walk upward from `startDir` looking for a `knowledge/plans/` directory,
+ * stopping at (and returning) a `.git`-marked directory even if
+ * `knowledge/plans/` doesn't exist there. Deliberately does NOT reuse
+ * `resolveEffectiveCwd()` -- verified it has no git/project-root ascent
+ * logic at all (`platform-cwd.ts`: `sandboxCwd ?? workspaceRootParam ??
+ * process.cwd()`), so `path.join(cwd, "knowledge/plans")` against a bare
+ * `process.cwd()` would silently return zero findings from any
+ * subdirectory. Returns null if walked to the filesystem root and found
+ * neither marker.
+ */
+function findProjectRoot(startDir: string): string | null {
+  let dir = path.resolve(startDir);
+  for (;;) {
+    if (fs.existsSync(path.join(dir, "knowledge", "plans")) || fs.existsSync(path.join(dir, ".git"))) {
+      return dir;
+    }
+    const parent = path.dirname(dir);
+    if (parent === dir) return null; // reached filesystem root
+    dir = parent;
+  }
+}
+
+/**
+ * Cheap, git-log-free count of Tier A findings only -- used by the apply
+ * loop's gate decision (skip-the-ask when there's genuinely nothing to
+ * repair), computed fresh via the exact same `computeTierAFinding()`
+ * predicate the full scan and the write path both use, so this can never
+ * diverge from what apply actually does.
+ */
+function countTierAFindings(projectRoot: string): number {
+  const plansDir = path.join(projectRoot, "knowledge", "plans");
+  if (!fs.existsSync(plansDir)) return 0;
+  const mirrorDir = path.join(os.homedir(), ".claude", "plans");
+  let count = 0;
+  for (const f of fs.readdirSync(plansDir)) {
+    if (!f.endsWith(".md")) continue;
+    const canonicalPath = path.join(plansDir, f);
+    try {
+      if (!fs.statSync(canonicalPath).isFile()) continue;
+      if (computeTierAFinding(canonicalPath, path.join(mirrorDir, f))) count++;
+    } catch {
+      continue; // unreadable/vanished entry (permissions, dangling symlink, race) -- skip, don't let one bad file break the count
+    }
+  }
+  return count;
+}
+
+function checkPlanStatusDrift(cwd: string): UpgradeItem[] {
+  const projectRoot = findProjectRoot(cwd);
+  if (!projectRoot) return [];
+  const plansDir = path.join(projectRoot, "knowledge", "plans");
+  if (!fs.existsSync(plansDir)) return [];
+  const mirrorDir = path.join(os.homedir(), ".claude", "plans");
+
+  // A flat, non-recursive listing naturally excludes an archive/ subdirectory's
+  // contents (per Step 1's scope note) without any special-casing.
+  const planFiles = fs.readdirSync(plansDir).filter((f) => {
+    if (!f.endsWith(".md")) return false;
+    try {
+      return fs.statSync(path.join(plansDir, f)).isFile();
+    } catch {
+      return false; // unreadable/vanished between readdir and stat -- skip, don't let one bad entry break the whole inspect
+    }
+  });
+
+  const defaultBranch = resolveDefaultBranchForGit(projectRoot);
+
+  let tierACount = 0;
+  let tierBCount = 0;
+  const tierBLines: string[] = [];
+
+  for (const f of planFiles) {
+    const canonicalPath = path.join(plansDir, f);
+    const mirrorPath = path.join(mirrorDir, f);
+    try {
+      const canonicalContent = fs.readFileSync(canonicalPath, "utf-8");
+      const canonicalStatus = extractStatusLine(canonicalContent);
+      if (canonicalStatus === null) continue; // no Safety-Header STATUS line -- not a plan this category understands
+
+      if (computeTierAFinding(canonicalPath, mirrorPath)) {
+        tierACount++;
+        continue; // mutually exclusive with Tier B by construction -- see computeTierAFinding's doc comment
+      }
+
+      const mirrorExists = fs.existsSync(mirrorPath);
+      const mirrorStatus = mirrorExists ? extractStatusLine(fs.readFileSync(mirrorPath, "utf-8")) : null;
+      if (isTierBCandidate(canonicalStatus, mirrorStatus)) {
+        tierBCount++;
+        const branchCandidate = extractBranchCandidateFromFilename(f);
+        const merged = defaultBranch ? wasBranchMerged(projectRoot, defaultBranch, branchCandidate) : false;
+        tierBLines.push(
+          `${f}: candidate branch "${branchCandidate}" (filename-derived, best-effort, rarely a real match) -- ` +
+          (merged
+            ? "merge evidence FOUND (branch-level only -- cannot distinguish this plan from any sibling sharing the same branch string)"
+            : "no merge evidence found (squash/rebase-merge produces no merge commit to find, or genuinely not yet merged)")
+        );
+      }
+    } catch {
+      continue; // unreadable file (permissions, vanished mid-scan, dangling symlink) -- skip, don't let one bad file break the whole inspect
+    }
+  }
+
+  let orphanedCount = 0;
+  if (fs.existsSync(mirrorDir)) {
+    for (const f of fs.readdirSync(mirrorDir)) {
+      if (f.endsWith(".md") && !fs.existsSync(path.join(plansDir, f))) orphanedCount++;
+    }
+  }
+
+  // Orphans are informational-only by design (Step 1's scope note) and must
+  // NEVER by themselves satisfy this emit gate (Opus review, 2026-08-19,
+  // finding #2): an upgrades[] entry gets added to the wizard's
+  // _mcp_apply[] and offered for apply, but applyPlanStatusDrift() has
+  // nothing to repair for an orphan-only case (0 Tier A), so it would
+  // report "0 synced" and the identical item would reappear on every future
+  // inspect, forever, with no action able to clear it. (A warnings[]-routed
+  // alternative was considered and rejected: kmg-upgrade-inspector.md's
+  // warnings[] contract routes every entry through the platform-split
+  // wizard flow, which has no handler for an unrelated informational note
+  // -- reusing it here would just recreate finding #1's bug under a new
+  // category. Folding the orphan count into the Tier A/B item's own
+  // description below, and saying nothing when orphans are the only thing
+  // found, was the reviewer's own stated alternative fix.)
+  if (tierACount === 0 && tierBCount === 0) return [];
+
+  return [{
+    category: "plan-status-drift",
+    description:
+      `issue-49: ${tierACount} Tier A mirror-drift, auto-repairable; ${tierBCount} Tier B candidates, ` +
+      `needs manual review; ${orphanedCount} orphaned mirror-only files, informational`,
+    details:
+      `Tier A: knowledge/plans/X.md's Safety-Header STATUS is ahead of its ~/.claude/plans/X.md mirror ` +
+      `(canonical already "✅ COMPLETE", mirror still a frozen "🔴 STOPPED"/"🔴 AWAITING APPROVAL" ` +
+      `placeholder, rest of the file identical) -- safe, mechanical, one-direction repair (canonical -> ` +
+      `mirror).` +
+      (tierACount > 0 ? ` Run with apply: ["plan-status-drift"], confirmBackfix: true to repair Tier A findings only.` : "") +
+      ` Tier B: BOTH copies still show the exact frozen placeholder -- this tier only ever gathers ` +
+      `best-effort branch-merge evidence for a human to review by hand; it never marks anything COMPLETE ` +
+      `on its own judgment, regardless of how confident the evidence looks, and apply never touches these.` +
+      (tierBLines.length > 0 ? `\nTier B candidates:\n${tierBLines.join("\n")}` : "") +
+      (orphanedCount > 0 ? `\n${orphanedCount} file(s) exist in ~/.claude/plans/ with no knowledge/plans/ counterpart -- informational only, no action taken.` : ""),
+  }];
+}
+
+/**
+ * Only Tier A findings are ever auto-repaired -- Tier B is never touched
+ * here regardless of confidence (see computeTierAFinding's doc comment for
+ * why this is structurally guaranteed, not just a loop that happens not to
+ * visit Tier B files). Re-derives the write predicate fresh for every plan
+ * file on every call; never consumes a cached finding list.
+ */
+function applyPlanStatusDrift(cwd: string): string {
+  const projectRoot = findProjectRoot(cwd);
+  if (!projectRoot) return "No project root found -- nothing to repair.";
+  const plansDir = path.join(projectRoot, "knowledge", "plans");
+  if (!fs.existsSync(plansDir)) return "No knowledge/plans/ directory found -- nothing to repair.";
+  const mirrorDir = path.join(os.homedir(), ".claude", "plans");
+
+  const planFiles = fs.readdirSync(plansDir).filter((f) => {
+    if (!f.endsWith(".md")) return false;
+    try {
+      return fs.statSync(path.join(plansDir, f)).isFile();
+    } catch {
+      return false; // unreadable/vanished between readdir and stat -- skip, don't abort the whole apply
+    }
+  });
+
+  let repairedCount = 0;
+  for (const f of planFiles) {
+    const canonicalPath = path.join(plansDir, f);
+    const mirrorPath = path.join(mirrorDir, f);
+    let finding: TierAFinding | null;
+    try {
+      finding = computeTierAFinding(canonicalPath, mirrorPath);
+    } catch {
+      continue; // unreadable file (permissions, vanished mid-scan, dangling symlink) -- skip, don't abort other categories' already-accumulated results
+    }
+    if (!finding) continue; // not (or no longer) a Tier A finding -- silently skipped, not written
+
+    // Splice and write the SAME bytes the predicate above validated -- do
+    // not re-read the file here. A second, unvalidated read would be a
+    // TOCTOU window: an edit landing between computeTierAFinding()'s read
+    // and a fresh read here would get canonical's STATUS spliced into
+    // content the predicate never actually checked.
+    try {
+      backupOnce(mirrorPath, finding.mirrorContent);
+      fs.writeFileSync(mirrorPath, spliceStatusLine(finding.mirrorContent, finding.mirrorStatusLine, finding.canonicalStatusLine), "utf-8");
+      repairedCount++;
+    } catch {
+      continue; // write/backup failed (permissions, disk) -- skip, don't abort other files or other apply categories
+    }
+  }
+
+  return `${repairedCount} plan mirror(s) synced to canonical STATUS.`;
 }
 
 /**
@@ -624,6 +1721,66 @@ async function confirmStatusSchemaMigration(opts: {
 }
 
 /**
+ * Shared consent gate for kg_upgrade's "backfix" categories (c5 / v0.7.2):
+ * repairs applied to files already corrupted by a prior bug, as opposed to
+ * routine structural upgrades. Generalizes confirmStatusSchemaMigration()
+ * above by reason/param instead of hardcoding one category. An explicit
+ * `confirmed: true` is honored in either mode (same "real answer bypasses
+ * the ask" pattern); automated mode with no explicit answer returns
+ * requireInput(...); interactive mode calls gate() via the same no-real-
+ * transport stubAsk() every other gate() site in this file already uses.
+ *
+ * Decision: one shared boolean per call, not per-category granularity --
+ * every consumer of this function (capture-corruption, platform-split,
+ * diff-blank-reconstruction, plan-status-drift) is a batch repair with no
+ * per-item ask needed. Note platform-split is gated through this same
+ * function but with its OWN param (confirm_platform_split, see below) --
+ * the other three (capture-corruption, diff-blank-reconstruction,
+ * plan-status-drift) share the literal `confirmBackfix` param, so a single
+ * `confirmBackfix: true` authorizes all three of those at once if more than
+ * one is present in the same `apply` call.
+ * `confirmed` here and `confirm_platform_split` (platform-split's own
+ * pre-existing param, preserved for backward compatibility) are two
+ * independent knobs, not aliases -- passing one does not bypass the other.
+ */
+async function confirmBackfixCategory(opts: {
+  reasonCode: string; // stable machine token -- gate()/requireInput() suffix it directly (e.g. "${reasonCode}_timeout"), so this must be a token, not prose
+  detail?: unknown; // human-readable prose + counts go here, not in reasonCode
+  param: string; // the bypass param name this category answers to, e.g. "confirmBackfix"
+  mode: InteractionMode;
+  confirmed?: boolean; // explicit bypass value for whatever `param` names; strict === true check below treats false/undefined identically as "not yet answered", never as "declined" -- load-bearing for confirm_platform_split's zod .default(false)
+  timeoutMs?: number; // callers MUST pass STUB_ASK_TIMEOUT_MS
+  skipAsk?: boolean; // Step 6.5: once an earlier gated category in the same apply loop already came back unconfirmed, later ones short-circuit straight to requireInput() instead of stacking another stubAsk() timeout in interactive mode. No-op in automated mode, which already returns immediately.
+}): Promise<{ confirmed: true } | InputRequiredError> {
+  if (opts.confirmed === true) return { confirmed: true };
+  if (opts.skipAsk || opts.mode === "automated") {
+    return requireInput(opts.reasonCode, opts.param, ["yes", "no"], opts.detail);
+  }
+  try {
+    const gated = await gate({
+      mode: opts.mode,
+      reason: opts.reasonCode,
+      param: opts.param,
+      accepts: ["yes", "no"],
+      timeoutMs: opts.timeoutMs,
+      detail: opts.detail,
+      ask: stubAsk,
+    });
+    if ("error" in gated) return gated;
+    if (!("answer" in gated) || gated.answer !== "yes") {
+      return requireInput(opts.reasonCode, opts.param, ["yes", "no"], opts.detail);
+    }
+    return { confirmed: true };
+  } catch {
+    // interaction.ts:117-122: an ask() rejection propagates out of gate()
+    // unmapped. Moot today (stubAsk never rejects) but this helper is meant
+    // to outlive the stub and serve multiple categories -- catch here once
+    // rather than leaving every future caller to rediscover the gap.
+    return requireInput(`${opts.reasonCode}_ask_failed`, opts.param, ["yes", "no"], opts.detail);
+  }
+}
+
+/**
  * Applies the schema migration: every graph missing status/statusChangedAt/
  * graphId gets them (status:"active" -- spec §3 has no single "the active
  * graph" concept anymore, so every non-deleted legacy graph activates
@@ -883,8 +2040,18 @@ function updateLastAppliedVersion(installedVersion: string, graphName: string): 
 
 // ── Exported handler for direct testing ──────────────────────────────────────
 
-// "version-update" is inspect-only — NOT an apply category; do not add it here
-export type ApplyCategory = "status-schema" | "config-location" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir";
+// "version-update" and "resolution" are inspect-only — NOT apply categories. If a
+// NEW category is ever pushed into result.upgrades[] (e.g. a new checkX() call)
+// that is NOT added to this ApplyCategory type / the Zod enum below, the wizard's
+// deny-list in commands/kmg-init-shared/kmg-upgrade-inspector.md must also list it
+// as excluded — otherwise the wizard will wrongly add it to `_mcp_apply[]` and Zod
+// will reject the whole apply call (issue-51). Conversely, if a new category IS
+// added here and is gated on the shared `confirmBackfix` boolean (like
+// "capture-corruption" and, as of issue-47, "diff-blank-reconstruction"), review
+// kmg-upgrade-inspector.md's confirmBackfix wiring: that boolean is per-call, not
+// per-category, so a call consenting to one confirmBackfix-gated category silently
+// also consents to any other one present in the same `apply: [...]` array.
+export type ApplyCategory = "status-schema" | "config-location" | "plan-status-drift" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir" | "capture-corruption" | "diff-blank-reconstruction";
 
 export interface HandleUpgradeParams {
   apply?: ApplyCategory[];
@@ -895,6 +2062,17 @@ export interface HandleUpgradeParams {
   // Interactive mode is asked via gate() instead; an explicit true here is
   // still honored in either mode (see confirmStatusSchemaMigration).
   confirmMigration?: boolean;
+  // c5 (v0.7.2): required (automated mode) to apply any "backfix" category
+  // that repairs already-written content -- currently "capture-corruption"
+  // (issue-46), "diff-blank-reconstruction" (issue-47), and
+  // "plan-status-drift" Tier A writes (issue-49). One shared boolean gates
+  // all three: a caller listing more than one in the same `apply` call
+  // authorizes all of them at once (Fable review, 2026-08-19 -- see the
+  // wizard's per-category "details shown before consent" requirement, which
+  // is what keeps that shared-boolean design safe in practice). Interactive
+  // mode is asked via gate() instead; an explicit true here is still
+  // honored in either mode (see confirmBackfixCategory).
+  confirmBackfix?: boolean;
 }
 
 export interface HandleUpgradeResult {
@@ -953,12 +2131,16 @@ export async function handleUpgrade(
     const result: InspectResult = { upgrades: [], warnings: [] };
     result.upgrades.push(...checkStatusSchema());
     result.upgrades.push(...checkConfigLocation());
+    result.upgrades.push(...checkPlanStatusDrift(cwd));
 
     if ("error" in target) {
+      // "resolution" (below) is inspect-only, same as "version-update" — see the
+      // drift-guard comment on the ApplyCategory declaration above for the full
+      // maintenance note.
       result.upgrades.push({
         category: "resolution",
         description: target.error,
-        details: "Graph-dependent checks (directories, config, templates, stray-knowledge-dir, version-update) were skipped.",
+        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, version-update, and the platform-split warning) were skipped.",
       });
       return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
     }
@@ -966,10 +2148,26 @@ export async function handleUpgrade(
     const kgPath = target.graph.path.replace(/^~/, os.homedir());
     const kgType = target.graph.type as string | undefined;
     if (!fs.existsSync(kgPath)) {
-      return {
-        content: [{ type: "text" as const, text: `Error: KG path not found: ${kgPath}` }],
-        isError: true,
-      };
+      // Pre-existing bug, fixed here (c6, issue-49 Step 4 point 7): this used
+      // to return a bare error, discarding whatever checkStatusSchema()/
+      // checkConfigLocation()/checkPlanStatusDrift() had already pushed into
+      // `result` above -- a user with a registered-but-deleted graph path
+      // never learned their plan mirrors were stale, even though that
+      // finding had already been computed. Return the partial result
+      // instead, matching the existing degraded-mode pattern the sibling
+      // "error" in target path above already uses -- including pushing the
+      // "resolution" marker into upgrades[], NOT warnings[] (Opus review,
+      // 2026-08-19): kmg-upgrade-inspector.md's warnings[] contract routes
+      // every entry through the platform-split wizard flow, which has no
+      // handler for a bare "resolution" marker with no flaggedLines; only
+      // upgrades[] has the dedicated "resolution" case (display as
+      // informational, never added to _mcp_apply[]) that this marker needs.
+      result.upgrades.push({
+        category: "resolution",
+        description: `KG path not found: ${kgPath}`,
+        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, version-update, and the platform-split warning) were skipped.",
+      });
+      return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
     }
 
     result.upgrades.push(...checkDirectories(kgPath));
@@ -977,6 +2175,8 @@ export async function handleUpgrade(
     result.upgrades.push(...checkStarterRelocation(kgPath));
     result.upgrades.push(...checkTemplates(kgPath));
     result.upgrades.push(...checkStrayKnowledgeDir(kgPath, kgType));
+    result.upgrades.push(...checkCaptureCorruption(kgPath));
+    result.upgrades.push(...checkDiffBlankReconstruction(kgPath));
     result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config, target.name));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
@@ -984,6 +2184,15 @@ export async function handleUpgrade(
   }
 
   const results: string[] = [];
+  // c5 (v0.7.2) BLOCKER fix: an unconfirmed backfix category (plan-status-
+  // drift, capture-corruption, diff-blank-reconstruction, platform-split --
+  // all four gated categories, at varying positions in APPLY_ORDER, so one
+  // can and does land ahead of categories that apply successfully after it)
+  // must not discard earlier categories' already-accumulated `results`. Each
+  // pending InputRequiredError goes here instead of into `results`, and is
+  // emitted as its own separate content block below, so it stays
+  // independently JSON.parse-able and the prose report survives intact.
+  const pending: InputRequiredError[] = [];
   let appliedAnyGraphDependent = false;
   let anyCategoryFailed = false;
 
@@ -997,7 +2206,7 @@ export async function handleUpgrade(
   const resolvedKgPathForApply = !("error" in target)
     ? target.graph.path.replace(/^~/, os.homedir())
     : undefined;
-  if (resolvedKgPathForApply && !fs.existsSync(resolvedKgPathForApply) && sortedApplyList.some((c) => c !== "config-location" && c !== "status-schema")) {
+  if (resolvedKgPathForApply && !fs.existsSync(resolvedKgPathForApply) && sortedApplyList.some((c) => c !== "config-location" && c !== "status-schema" && c !== "plan-status-drift")) {
     return {
       content: [{ type: "text" as const, text: `Error: KG path not found: ${resolvedKgPathForApply}` }],
       isError: true,
@@ -1023,6 +2232,43 @@ export async function handleUpgrade(
     }
     if (category === "config-location") {
       results.push(`[config-location] ${applyConfigLocation()}`);
+      continue;
+    }
+    if (category === "plan-status-drift") {
+      // c6 (issue-49): born already gated through c5's shared consent
+      // mechanism, unlike capture-corruption/platform-split which had to be
+      // retrofitted. Same placement as status-schema/config-location above
+      // (before the "error" in target check) -- this category is graph-
+      // independent and must never fall into the switch(category) block
+      // below, which assumes a resolved kgPath. Deliberately does NOT set
+      // appliedAnyGraphDependent: that flag drives updateLastAppliedVersion(),
+      // which writes a version sentinel onto whatever graph `target`
+      // resolved to -- this category never touches a graph at all, so
+      // setting it would write an unrelated side effect onto an unrelated
+      // (or nonexistent) graph.
+      const mode = resolveInteractionMode({}).mode;
+      const projectRoot = findProjectRoot(cwd);
+      const tierACount = projectRoot ? countTierAFindings(projectRoot) : 0;
+      const confirmation = tierACount === 0
+        ? { confirmed: true as const }
+        : await confirmBackfixCategory({
+            reasonCode: "plan_status_drift_backfix",
+            param: "confirmBackfix",
+            mode,
+            confirmed: params.confirmBackfix,
+            timeoutMs: STUB_ASK_TIMEOUT_MS,
+            // Not a "confirmed merged" framing -- Tier A never involves a
+            // merge-status judgment, only Tier B did in the original design,
+            // and Tier B is never applied.
+            detail: `${tierACount} plan file(s) in ~/.claude/plans/ are stale copies of their already-COMPLETE knowledge/plans/ canonical -- sync their STATUS line now?`,
+            skipAsk: pending.length > 0,
+          });
+      if (!("confirmed" in confirmation)) {
+        pending.push(confirmation);
+        anyCategoryFailed = true;
+        continue;
+      }
+      results.push(`[plan-status-drift] ${applyPlanStatusDrift(cwd)}`);
       continue;
     }
     if ("error" in target) {
@@ -1052,14 +2298,115 @@ export async function handleUpgrade(
         results.push(`[stray-knowledge-dir] ${applyStrayKnowledgeDir(kgPath)}`);
         appliedAnyGraphDependent = true;
         break;
-      case "platform-split":
-        if (!params.confirm_platform_split) {
-          results.push("[platform-split] WARNING: platform-split migration removes content from rules.md. Pass confirm_platform_split: true to proceed.");
-        } else {
-          results.push(`[platform-split] ${applyPlatformSplit(kgPath)}`);
-          appliedAnyGraphDependent = true;
+      case "capture-corruption": {
+        // c5: retrofitted onto the shared backfix gate -- previously applied
+        // unconditionally with no consent check at all (the most severe of
+        // the three original gaps this plan closes).
+        const mode = resolveInteractionMode({}).mode;
+        // Re-scan for an honest per-run count/description rather than a
+        // stale one computed at inspect time (checkCaptureCorruption's
+        // counts aren't otherwise exposed as structured data). Also lets us
+        // skip the ASK (not the apply call itself) when inspect's own scan
+        // finds nothing to repair (Opus review, 2026-08-18) -- otherwise a
+        // healthy KG gets a hard KMG_INPUT_REQUIRED for a would-be no-op,
+        // with no detail explaining what it's even asking about. Still call
+        // applyCaptureCorruption() unconditionally below either way (not
+        // substituted with a canned message): it has its own independent
+        // false-positive guard from inspect's, and several regression tests
+        // exist specifically to prove the two guards agree -- shortcutting
+        // past the real call here would let them silently diverge again.
+        const rescan = checkCaptureCorruption(kgPath);
+        const confirmation = rescan.length === 0
+          ? { confirmed: true as const }
+          : await confirmBackfixCategory({
+              reasonCode: "capture_corruption_backfix",
+              param: "confirmBackfix",
+              mode,
+              confirmed: params.confirmBackfix,
+              timeoutMs: STUB_ASK_TIMEOUT_MS,
+              detail: rescan[0]?.description,
+              skipAsk: pending.length > 0,
+            });
+        if (!("confirmed" in confirmation)) {
+          pending.push(confirmation);
+          anyCategoryFailed = true;
+          break;
         }
+        results.push(`[capture-corruption] ${applyCaptureCorruption(kgPath)}`);
+        appliedAnyGraphDependent = true;
         break;
+      }
+      case "diff-blank-reconstruction": {
+        // c2 (issue-47): same shared backfix gate as capture-corruption,
+        // same shared confirmBackfix param -- see the orchestration plan's
+        // handoff note under v0.7.2-c5-update-patch-plan.md for why this
+        // reuses c5's gate rather than inventing a second one-off mechanism.
+        // Safe to skip the ask (not the underlying apply call) when nothing
+        // is found: findBlankDiffSessionFiles() is the SAME function both
+        // check and apply call, so unlike platform-split's now-reverted
+        // attempt at this optimization, there is no possibility of the two
+        // guards silently diverging -- they are literally the same scan.
+        const mode = resolveInteractionMode({}).mode;
+        const rescan = checkDiffBlankReconstruction(kgPath);
+        const confirmation = rescan.length === 0
+          ? { confirmed: true as const }
+          : await confirmBackfixCategory({
+              reasonCode: "diff_blank_reconstruction_backfix",
+              param: "confirmBackfix",
+              mode,
+              confirmed: params.confirmBackfix,
+              timeoutMs: STUB_ASK_TIMEOUT_MS,
+              detail: rescan[0]?.description,
+              skipAsk: pending.length > 0,
+            });
+        if (!("confirmed" in confirmation)) {
+          pending.push(confirmation);
+          anyCategoryFailed = true;
+          break;
+        }
+        results.push(`[diff-blank-reconstruction] ${applyDiffBlankReconstruction(kgPath)}`);
+        appliedAnyGraphDependent = true;
+        break;
+      }
+      case "platform-split": {
+        // c5: migrated from a boolean-flag-only check onto the shared
+        // backfix gate for consistency with capture-corruption/status-
+        // schema, preserving confirm_platform_split as the bypass param
+        // name. Breaking behavior change (named explicitly, not a pure
+        // refactor): automated callers that previously got back a non-error
+        // warning string now get KMG_INPUT_REQUIRED with isError:true
+        // instead when the flag is omitted.
+        const mode = resolveInteractionMode({}).mode;
+        // NOT given the same "skip the ask when nothing to do" treatment as
+        // capture-corruption (reverted after a second Opus review, 2026-08-18,
+        // found it was unsafe here): checkPlatformSplit()'s "nothing found"
+        // signal is `kmgraph_schema >= 2` -- a stored version marker, not a
+        // live re-scan for contamination the way checkCaptureCorruption's is.
+        // A file whose schema was already bumped but that still (or again)
+        // has flagged lines would report "nothing to do" while
+        // applyPlatformSplit() unconditionally deletes those lines anyway --
+        // a silent, unconsented content removal, which is exactly the class
+        // of gap this plan exists to close. Always gate here; only
+        // capture-corruption's check/apply pair was verified to share
+        // identical scan logic closely enough to skip the ask safely.
+        const confirmation = await confirmBackfixCategory({
+          reasonCode: "platform_split_backfix",
+          param: "confirm_platform_split",
+          mode,
+          confirmed: params.confirm_platform_split,
+          timeoutMs: STUB_ASK_TIMEOUT_MS,
+          detail: "platform-split migration removes content from rules.md.",
+          skipAsk: pending.length > 0,
+        });
+        if (!("confirmed" in confirmation)) {
+          pending.push(confirmation);
+          anyCategoryFailed = true;
+          break;
+        }
+        results.push(`[platform-split] ${applyPlatformSplit(kgPath)}`);
+        appliedAnyGraphDependent = true;
+        break;
+      }
     }
   }
 
@@ -1073,7 +2420,27 @@ export async function handleUpgrade(
   // (pre-Task-1.9). The restructure folded the failure into `results` text
   // with no isError flag, so a client saw a "successful" call whose text
   // happened to contain "Error:". Restored here.
-  return { content: [{ type: "text" as const, text: results.join("\n\n") }], ...(anyCategoryFailed ? { isError: true as const } : {}) };
+  //
+  // c5: each pending backfix consent is its own content block (not embedded
+  // as a substring of the joined prose) so it stays independently
+  // JSON.parse-able, matching every other KMG_INPUT_REQUIRED response shape
+  // in this file -- see the `pending` declaration above for why. The prose
+  // block is omitted entirely when `results` is empty (found in Opus review,
+  // 2026-08-18) rather than emitted as an empty string: every other
+  // KMG_INPUT_REQUIRED response in this file puts bare JSON at content[0],
+  // and a caller following that existing convention would otherwise hit a
+  // JSON.parse SyntaxError against "" for a single-category unconfirmed call.
+  // The prose block is included whenever there's real prose OR nothing else
+  // to fall back on (an empty `content` array would break every caller that
+  // assumes at least one block always exists, e.g. an unrecognized apply
+  // category that hits no switch case). It's omitted only when it would
+  // otherwise be an empty string sitting in front of a real pending error.
+  const content: Array<{ type: "text"; text: string }> = [];
+  if (results.length > 0 || pending.length === 0) {
+    content.push({ type: "text" as const, text: results.join("\n\n") });
+  }
+  content.push(...pending.map((e) => ({ type: "text" as const, text: JSON.stringify(e) })));
+  return { content, ...(anyCategoryFailed ? { isError: true as const } : {}) };
 }
 
 // ── Tool registration ────────────────────────────────────────────────────────
@@ -1084,11 +2451,11 @@ export function registerUpgradeTool(server: McpServer, personalScopeSession: Per
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
       apply: z
-        .array(z.enum(["status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"]))
+        .array(z.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction"]))
         .optional()
         .default([])
         .describe(
-          'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir"'
+          'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history)'
         ),
       confirm_platform_split: z
         .boolean()
@@ -1116,10 +2483,20 @@ export function registerUpgradeTool(server: McpServer, personalScopeSession: Per
             "old .active/legacy config into the status/graphId schema and deletes the legacy " +
             "~/.claude/kg-config.json file. Interactive callers are asked to confirm instead."
         ),
+      confirmBackfix: z
+        .boolean()
+        .optional()
+        .describe(
+          "Must be true (in automated mode) to apply backfix categories that repair already-" +
+            "written content -- \"capture-corruption\" (issue-46), \"diff-blank-reconstruction\" " +
+            "(issue-47), and \"plan-status-drift\" Tier A writes (issue-49) all share this one " +
+            "flag; setting it authorizes any of these three present in the same apply call. " +
+            "Interactive callers are asked to confirm instead."
+        ),
     },
-    async ({ apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration }, extra) => {
+    async ({ apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix }, extra) => {
       return handleUpgrade(
-        { apply: apply as ApplyCategory[] | undefined, confirm_platform_split, scope, confirmPersonalScope, confirmMigration },
+        { apply: apply as ApplyCategory[] | undefined, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix },
         personalScopeSession,
         extra?._meta as Record<string, unknown> | undefined
       );

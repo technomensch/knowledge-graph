@@ -100,3 +100,4 @@ in `tests/test-handoff-file-tracing-gate.sh` (see [test-cases.md](test-cases.md)
 - [issue-33](../issue-33/issue-33-description.md) — original gap this mechanism was built to close; deferred, unrelated second gap
 - `scripts/handoff-file-tracing-gate.sh` — the script needing the fix
 - `tests/test-handoff-file-tracing-gate.sh` — needs a 6th test for the worktree case
+- [issue-49](../issue-49/issue-49-description.md) — cites this issue's branch/plan (`v0.7.1.1-issue-43`) as one of five fully-merged `v0.7.1.x` plans audited for the Safety-Header STATUS-freeze bug. Backlinked 2026-08-19.

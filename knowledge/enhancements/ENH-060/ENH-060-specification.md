@@ -68,3 +68,4 @@ edited directly outside either flow.
 - `~/.kmgraph/rules.md` § Approval Gates — the durable, cross-session backstop rule
   (personal file, not part of this repo)
 - [ENH-061](../ENH-061/ENH-061-specification.md) — unrelated fix, shipped together on this same branch/version (v0.7.1.3) per an explicit WIP-append decision
+- [issue-49](../../issues/issue-49/issue-49-description.md) — cites this ENH's branch/plan as one of five fully-merged `v0.7.1.x` plans audited for the Safety-Header STATUS-freeze bug. Backlinked 2026-08-19.

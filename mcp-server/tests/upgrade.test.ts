@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
+import { execSync } from "child_process";
 
 // ---------------------------------------------------------------------------
 // Mocks — must be declared before imports that use them
@@ -16,10 +17,23 @@ jest.mock("../src/utils.js", () => {
   };
 });
 
+// The plan-status-drift blocks at the bottom of this file need a fake home
+// directory (~/.claude/plans/ is half of that category's input). Assigning
+// process.env.HOME is NOT enough: Node resolves os.homedir() once at startup,
+// so a later assignment does not move it, and jest.spyOn(os, "homedir") throws
+// "Cannot redefine property" because the built-in module's exports are
+// non-configurable. Mocking the module is the only handle. homedir() keeps the
+// real value by default, so every other test in this file is unaffected.
+jest.mock("os", () => {
+  const actualOs = jest.requireActual("os") as typeof import("os");
+  return { ...actualOs, homedir: jest.fn(() => actualOs.homedir()) };
+});
+
 import { handleUpgrade } from "../src/tools/upgrade.js";
 import { handleVersion } from "../src/tools/version.js";
 import { readConfig, writeConfig } from "../src/utils.js";
 import type { KgConfig } from "../src/utils.js";
+import { STUB_ASK_TIMEOUT_MS } from "../src/interaction.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -308,8 +322,47 @@ describe("T-8: platform-split without confirmation", () => {
       confirm_platform_split: false,
     });
 
-    expect(result.content[0].text).toContain("WARNING");
+    // c5: retrofitted onto the shared backfix gate -- a breaking behavior
+    // change from the old non-error "WARNING" text (see the plan's Step 4
+    // note). Automated mode with no confirmation now returns
+    // KMG_INPUT_REQUIRED as its own content block, isError:true. This is
+    // the only category in the call and nothing else applied, so the empty
+    // prose block is omitted and the error is content[0].
+    expect(result.isError).toBe(true);
+    expect(result.content.length).toBe(1);
+    const errorBlock = JSON.parse(result.content[0].text);
+    expect(errorBlock.error).toBe("KMG_INPUT_REQUIRED");
+    expect(errorBlock.resolveWith.param).toBe("confirm_platform_split");
     // File should be unchanged
+    const after = fs.readFileSync(path.join(kgRoot, "knowledge", "rules.md"), "utf-8");
+    expect(after).toBe(contaminated);
+  });
+
+  test("regression (2nd Opus review, 2026-08-18): schema already 2 but real contamination present — still gated, not silently applied", async () => {
+    // checkPlatformSplit()'s "nothing found" signal is `kmgraph_schema >= 2`,
+    // a stored marker -- NOT a live re-scan for contamination the way
+    // checkCaptureCorruption's is. A file whose schema was already bumped
+    // (by hand, or by a prior partial run) but that still carries a flagged
+    // line must NOT be treated as "nothing to do" -- applyPlatformSplit()
+    // has no schema check of its own and would delete the line unconsented
+    // if the gate were ever skipped here. This is the exact bug an earlier
+    // "skip the ask when checkPlatformSplit finds nothing" version of this
+    // code introduced and a second review caught before it shipped.
+    const kgRoot = makeTempDir("c5-platform-split-schema-mismatch");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    const contaminated =
+      "---\ntitle: Rules\nkmgraph_schema: 2\n---\n# Rules\n\n- File search: use Glob and Grep — not Bash find/grep\n";
+    writeRules(kgRoot, contaminated);
+
+    const result = await handleUpgrade({ apply: ["platform-split"] });
+
+    expect(result.isError).toBe(true);
+    const errorBlock = JSON.parse(result.content[0].text);
+    expect(errorBlock.error).toBe("KMG_INPUT_REQUIRED");
+    expect(errorBlock.resolveWith.param).toBe("confirm_platform_split");
+    // File must be untouched -- no consent given, despite schema already being 2
     const after = fs.readFileSync(path.join(kgRoot, "knowledge", "rules.md"), "utf-8");
     expect(after).toBe(contaminated);
   });
@@ -671,8 +724,19 @@ describe("T-22: KG path does not exist", () => {
     process.cwd = () => "/nonexistent/path/that/does/not/exist";
 
     const result = await handleUpgrade({});
-    expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Error");
+    // c6 (issue-49) fixed a pre-existing bug here: this used to discard
+    // whatever checkStatusSchema()/checkConfigLocation()/
+    // checkPlanStatusDrift() had already computed and return a bare
+    // isError:true. Now it returns the partial result instead, matching the
+    // sibling "error" in target path's existing degraded-mode pattern -- a
+    // user with a deleted graph path still sees whatever graph-independent
+    // findings were already available. The "resolution" marker itself lives
+    // in upgrades[], not warnings[] (Opus review, 2026-08-19 -- warnings[]
+    // is contractually routed through the wizard's platform-split flow,
+    // which has no handler for a bare resolution marker).
+    expect(result.isError).toBeUndefined();
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed.upgrades.some((u: { category: string; description: string }) => u.category === "resolution" && u.description.includes("KG path not found"))).toBe(true);
   });
 });
 
@@ -1787,5 +1851,1885 @@ describe("T-52: apply mode does not resurrect a deleted/unmounted KG path", () =
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain("[config-location]");
     expect(result.content[0].text).toContain("[directories] Error:");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// issue-46 backfix: capture-corruption inspect + apply
+// ---------------------------------------------------------------------------
+
+describe("capture-corruption — inspect mode", () => {
+  test("detects doubled frontmatter and doubled filenames, reports counts", async () => {
+    const kgRoot = makeTempDir("cc-inspect");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    fs.writeFileSync(
+      path.join(sessionsYm, "2026-08-16-main.md"),
+      '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "2026-08-16-main"\ndate: 2026-08-16\nas_of_commit: abc1234\n---\n\n## Body\n',
+      "utf-8"
+    );
+    fs.writeFileSync(
+      path.join(sessionsYm, "2026-08-06-2026-08-06-main.md"),
+      '---\ntitle: "main"\ndate: 2026-08-06\n---\n\n## Body\n',
+      "utf-8"
+    );
+
+    const result = await handleUpgrade({});
+    const parsed = JSON.parse(result.content[0].text);
+    const item = parsed.upgrades.find((u: { category: string }) => u.category === "capture-corruption");
+
+    expect(item).toBeDefined();
+    expect(item.description).toContain("1 file(s) with a duplicated frontmatter block");
+    expect(item.description).toContain("1 file(s) with an exact doubled date/ADR-number filename prefix");
+  });
+
+  test("does not flag a single frontmatter block followed by a body horizontal rule (false-positive guard)", async () => {
+    const kgRoot = makeTempDir("cc-inspect-fp");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-04");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    // Single block, then a bare --- as a body divider (blank-line-free gap
+    // between fence and heading is the only real signal this guards) --
+    // matches real files found in this repo's own history (2026-04-21,
+    // 2026-05-25) that are NOT the double-frontmatter bug.
+    fs.writeFileSync(
+      path.join(sessionsYm, "2026-04-21-clean.md"),
+      '---\ntitle: "Snapshot"\ndate: 2026-04-21\n---\n---\n### Snapshot: mid-session\n\nBody text.\n',
+      "utf-8"
+    );
+
+    const result = await handleUpgrade({});
+    const parsed = JSON.parse(result.content[0].text);
+    const item = parsed.upgrades.find((u: { category: string }) => u.category === "capture-corruption");
+    expect(item).toBeUndefined();
+  });
+});
+
+describe("capture-corruption — apply mode", () => {
+  test("merges a clean doubled-frontmatter session file into a single block, preserving fields from both", async () => {
+    const kgRoot = makeTempDir("cc-apply-merge");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const filePath = path.join(sessionsYm, "2026-08-16-main.md");
+    fs.writeFileSync(
+      filePath,
+      '---\ntitle: "main"\ndate: 2026-08-16\nbranch: main\ncommit: af447452\ntags: [session, snapshot]\n---\n' +
+        '---\ntitle: "main"\ndate: 2026-08-16\nbranch: main\nas_of_commit: af447452\nlast_updated: "2026-08-16 16:16"\ntags: [session, snapshot]\n---\n\n## Body\n',
+      "utf-8"
+    );
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("[capture-corruption]");
+    expect(result.content[0].text).toContain("1 frontmatter block(s) merged");
+
+    const after = fs.readFileSync(filePath, "utf-8");
+    const fenceLines = (after.match(/^---$/gm) || []).length;
+    expect(fenceLines).toBe(2);
+    expect(after).toContain('commit: af447452');
+    expect(after).toContain("as_of_commit: af447452");
+    expect(after).toContain('last_updated: "2026-08-16 16:16"');
+    expect(after).toContain("## Body");
+  });
+
+  test("renames an exact doubled-date filename, leaving content alone", async () => {
+    const kgRoot = makeTempDir("cc-apply-rename");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const src = path.join(sessionsYm, "2026-08-06-2026-08-06-main.md");
+    fs.writeFileSync(src, '---\ntitle: "main"\ndate: 2026-08-06\n---\n\n## Body\n', "utf-8");
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("1 filename(s) de-duplicated");
+
+    expect(fs.existsSync(src)).toBe(false);
+    const dst = path.join(sessionsYm, "2026-08-06-main.md");
+    expect(fs.existsSync(dst)).toBe(true);
+    expect(fs.readFileSync(dst, "utf-8")).toContain("## Body");
+  });
+
+  test("does NOT auto-merge a genuine field conflict — reports it instead", async () => {
+    const kgRoot = makeTempDir("cc-apply-conflict");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const decisionsDir = path.join(kgRoot, "decisions");
+    const filePath = path.join(decisionsDir, "ADR-999-conflict.md");
+    const original =
+      '---\ntitle: "Conflict"\nstatus: Proposed\n---\n' +
+      '---\ntitle: "Conflict"\nstatus: Accepted\n---\n\n# ADR-999\n';
+    fs.writeFileSync(filePath, original, "utf-8");
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("0 frontmatter block(s) merged");
+    expect(result.content[0].text).toContain("need manual review");
+    expect(result.content[0].text).toContain("status");
+
+    // File must be untouched -- never guess on a real conflict
+    expect(fs.readFileSync(filePath, "utf-8")).toBe(original);
+  });
+
+  test("does NOT auto-rename a near-doubled filename (midnight rollover) — reports it instead", async () => {
+    const kgRoot = makeTempDir("cc-apply-rollover");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-07");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const src = path.join(sessionsYm, "2026-07-12-2026-07-11-main.md");
+    fs.writeFileSync(src, '---\ntitle: "2026-07-11-main"\ndate: 2026-07-11\n---\n\n## Body\n', "utf-8");
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("0 filename(s) de-duplicated");
+    expect(result.content[0].text).toContain("need manual review");
+    expect(result.content[0].text).toContain("near-doubled filename");
+
+    // File must be untouched -- ambiguous which date is correct without
+    // inspecting content, and this apply pass doesn't guess
+    expect(fs.existsSync(src)).toBe(true);
+  });
+
+  test("apply is idempotent — a second run against already-repaired files is a no-op", async () => {
+    const kgRoot = makeTempDir("cc-apply-idempotent");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    fs.writeFileSync(
+      path.join(sessionsYm, "2026-08-16-main.md"),
+      '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\nas_of_commit: abc1234\n---\n\n## Body\n',
+      "utf-8"
+    );
+
+    await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
+    const second = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
+
+    expect(second.content[0].text).toContain("0 frontmatter block(s) merged");
+    expect(second.content[0].text).toContain("0 filename(s) de-duplicated");
+    expect(second.content[0].text).not.toContain("need manual review");
+  });
+
+  test("renames a doubled ADR filename and fixes decisions/README.md's link to it", async () => {
+    const kgRoot = makeTempDir("cc-apply-adr-readme");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const decisionsDir = path.join(kgRoot, "decisions");
+    const src = path.join(decisionsDir, "ADR-046-adr-046-some-decision.md");
+    fs.writeFileSync(src, '---\ntitle: "Some Decision"\nstatus: Accepted\n---\n\n# ADR-046\n', "utf-8");
+    fs.writeFileSync(
+      path.join(decisionsDir, "README.md"),
+      "# Decisions\n\n- [ADR-046: Some Decision](ADR-046-adr-046-some-decision.md)\n",
+      "utf-8"
+    );
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("1 filename(s) de-duplicated");
+    expect(result.content[0].text).toContain("1 README link(s) repointed");
+
+    expect(fs.existsSync(src)).toBe(false);
+    const dst = path.join(decisionsDir, "ADR-046-some-decision.md");
+    expect(fs.existsSync(dst)).toBe(true);
+
+    const readme = fs.readFileSync(path.join(decisionsDir, "README.md"), "utf-8");
+    expect(readme).toContain("(ADR-046-some-decision.md)");
+    expect(readme).not.toContain("ADR-046-adr-046-some-decision.md");
+  });
+
+  test("fixes a stale README link even when the file was already renamed by hand (no corresponding rename this run)", async () => {
+    const kgRoot = makeTempDir("cc-apply-stale-link");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const decisionsDir = path.join(kgRoot, "decisions");
+    // File already correctly named (as if renamed by hand previously) --
+    // only the README index is stale, mirroring this repo's own ADR-046 case.
+    fs.writeFileSync(
+      path.join(decisionsDir, "ADR-050-already-renamed.md"),
+      '---\ntitle: "Already Renamed"\n---\n\n# ADR-050\n',
+      "utf-8"
+    );
+    fs.writeFileSync(
+      path.join(decisionsDir, "README.md"),
+      "# Decisions\n\n- [ADR-050: Already Renamed](ADR-050-adr-050-already-renamed.md)\n",
+      "utf-8"
+    );
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("1 README link(s) repointed");
+
+    const readme = fs.readFileSync(path.join(decisionsDir, "README.md"), "utf-8");
+    expect(readme).toContain("(ADR-050-already-renamed.md)");
+  });
+
+  test("does not touch a README link whose de-doubled target doesn't exist on disk (reports it instead)", async () => {
+    const kgRoot = makeTempDir("cc-apply-orphan-link");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const decisionsDir = path.join(kgRoot, "decisions");
+    const readmeContent = "# Decisions\n\n- [ADR-060: Ghost](ADR-060-adr-060-ghost.md)\n";
+    fs.writeFileSync(path.join(decisionsDir, "README.md"), readmeContent, "utf-8");
+    // No corresponding file exists at all -- neither the doubled nor the
+    // de-doubled name.
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("0 README link(s) repointed");
+    expect(result.content[0].text).toContain("need manual review");
+
+    expect(fs.readFileSync(path.join(decisionsDir, "README.md"), "utf-8")).toBe(readmeContent);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Opus review (2026-08-17), CRITICAL #1: detectDoubledFrontmatter's
+// false-positive guard only worked when the mistaken "block2" never found a
+// closing `---` at all. A real file whose body opens with a `---` divider
+// AND contains a later `---` further down (a second section break) supplies
+// block2 a closing line, so the old code merged/deleted everything in
+// between as if it were frontmatter. Reproduced live against this repo's
+// own knowledge/sessions/2026-05/2026-05-25-v0.6.0-phase-1-planning-multi-
+// platform-decisions.md. These tests model that exact shape.
+// ---------------------------------------------------------------------------
+
+describe("capture-corruption — real-shape false-positive guard (CRITICAL #1 regression)", () => {
+  const REAL_SHAPE_CONTENT =
+    '---\ntitle: "Snapshot"\ndate: 2026-05-25\n---\n' + // block1: real frontmatter
+    "---\n" + // body divider, zero-gap after block1's closing fence
+    "\n## Session Continuation\n\n### Overview\n\nSome real paragraph text that must survive.\n\n" +
+    "---\n" + // a later, unrelated section divider — gives the old code a false "block2" close
+    "\n## Next Section\n\nMore real content.\n";
+
+  test("inspect mode does not flag a file shaped like a real body-divider-then-section-divider file", async () => {
+    const kgRoot = makeTempDir("cc-critical1-inspect");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-05");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    fs.writeFileSync(path.join(sessionsYm, "2026-05-25-real-shape.md"), REAL_SHAPE_CONTENT, "utf-8");
+
+    const result = await handleUpgrade({});
+    const parsed = JSON.parse(result.content[0].text);
+    const item = parsed.upgrades.find((u: { category: string }) => u.category === "capture-corruption");
+    expect(item).toBeUndefined();
+  });
+
+  test("apply mode leaves the file byte-for-byte untouched and writes no .bak", async () => {
+    const kgRoot = makeTempDir("cc-critical1-apply");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-05");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const filePath = path.join(sessionsYm, "2026-05-25-real-shape.md");
+    fs.writeFileSync(filePath, REAL_SHAPE_CONTENT, "utf-8");
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("0 frontmatter block(s) merged");
+
+    expect(fs.readFileSync(filePath, "utf-8")).toBe(REAL_SHAPE_CONTENT);
+    expect(fs.existsSync(`${filePath}.bak`)).toBe(false);
+    expect(fs.readFileSync(filePath, "utf-8")).toContain("## Session Continuation");
+    expect(fs.readFileSync(filePath, "utf-8")).toContain("### Overview");
+  });
+
+  test("a .bak backup is written when a genuine doubled-frontmatter merge does happen", async () => {
+    const kgRoot = makeTempDir("cc-critical1-bak");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const filePath = path.join(sessionsYm, "2026-08-16-main.md");
+    const original =
+      '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\nas_of_commit: abc1234\n---\n\n## Body\n';
+    fs.writeFileSync(filePath, original, "utf-8");
+
+    await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
+
+    const bakPath = `${filePath}.bak`;
+    expect(fs.existsSync(bakPath)).toBe(true);
+    expect(fs.readFileSync(bakPath, "utf-8")).toBe(original);
+  });
+
+  test("regression (Opus review, 2026-08-19): an existing .bak is never clobbered (ADR-063 backupOnce)", async () => {
+    // capture-corruption's pass 1 used a bare writeFileSync for its backup,
+    // unlike diff-blank-reconstruction and plan-status-drift which both go
+    // through backupOnce(). Those categories share write targets under
+    // sessions/ and run in separate invocations as often as together, so an
+    // unconditional write here overwrote a .bak holding the TRUE original
+    // with content a sibling category had already mutated — the exact
+    // unrecoverable-original failure the 2026-08-18 BLOCKER fix closed on the
+    // issue-47 side.
+    const kgRoot = makeTempDir("cc-bak-not-clobbered");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const filePath = path.join(sessionsYm, "2026-08-16-main.md");
+    const trueOriginal = "---\ntitle: TRUE ORIGINAL\n---\n\n## Body\n";
+    // Stand in for "an earlier category already backed this file up, then
+    // rewrote it": .bak holds the pristine original, the live file is the
+    // already-mutated (here, doubled-frontmatter) content.
+    fs.writeFileSync(`${filePath}.bak`, trueOriginal, "utf-8");
+    fs.writeFileSync(
+      filePath,
+      '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\nas_of_commit: abc1234\n---\n\n## Body\n',
+      "utf-8"
+    );
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("1 frontmatter block(s) merged");
+    // The merge still happened...
+    expect(fs.readFileSync(filePath, "utf-8")).toContain("as_of_commit: abc1234");
+    // ...but the pre-existing backup still holds the true original.
+    expect(fs.readFileSync(`${filePath}.bak`, "utf-8")).toBe(trueOriginal);
+  });
+
+  test("regression (Opus review, 2026-08-19): a dangling symlink under sessions/ does not crash capture-corruption", async () => {
+    const kgRoot = makeTempDir("cc-dangling-symlink");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const filePath = path.join(sessionsYm, "2026-08-16-main.md");
+    const original =
+      '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\nas_of_commit: abc1234\n---\n\n## Body\n';
+    fs.writeFileSync(filePath, original, "utf-8");
+    // readdirSync lists these, statSync/readFileSync throw ENOENT on them.
+    // Before the fix, one such entry crashed the whole kg_upgrade call.
+    fs.symlinkSync(path.join(sessionsYm, "nope.md"), path.join(sessionsYm, "dangling.md"));
+    fs.symlinkSync(path.join(kgRoot, "sessions", "nope-dir"), path.join(kgRoot, "sessions", "2026-07"));
+
+    const inspect = await handleUpgrade({});
+    const parsed = JSON.parse(inspect.content[0].text);
+    // The real finding still surfaces — bad entries skipped, scan not aborted.
+    expect(
+      (parsed.upgrades as Array<{ category: string }>).find((u) => u.category === "capture-corruption")
+    ).toBeDefined();
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
+    expect(result.isError).toBeFalsy();
+    expect(fs.readFileSync(filePath, "utf-8")).toContain("as_of_commit: abc1234");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Opus review (2026-08-17), CRITICAL #2: DOUBLED_ADR_FILENAME had no
+// backreference tying the two ADR numbers together, so a file legitimately
+// referencing a *different* ADR in its slug would be wrongly de-doubled.
+// ---------------------------------------------------------------------------
+
+describe("capture-corruption — narrowed false-positive guard (Fable review, 2026-08-18)", () => {
+  // block2.order.length > 0 alone still false-positived on prose containing
+  // a single stray colon-prefixed line (e.g. "Note: ...") at column 0,
+  // surrounded by real non-YAML content -- looksLikeYaml requires ALL
+  // non-blank lines in the block to be key:/continuation lines, not just one.
+  test("does not flag or corrupt a body containing a colon-prefixed prose line between dividers", async () => {
+    const kgRoot = makeTempDir("cc-fable-prose-colon");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const filePath = path.join(sessionsYm, "2026-08-18-prose-colon.md");
+    const content =
+      '---\ntitle: "main"\ndate: 2026-08-18\n---\n' +
+      "---\n\n## Summary\n\nNote: deferred X.\n\n---\n\n## Details\n";
+    fs.writeFileSync(filePath, content, "utf-8");
+
+    const inspect = await handleUpgrade({});
+    const parsed = JSON.parse(inspect.content[0].text);
+    const item = parsed.upgrades.find((u: { category: string }) => u.category === "capture-corruption");
+    expect(item).toBeUndefined();
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("0 frontmatter block(s) merged");
+    expect(fs.readFileSync(filePath, "utf-8")).toBe(content);
+    expect(fs.existsSync(`${filePath}.bak`)).toBe(false);
+  });
+});
+
+describe("capture-corruption — ADR backreference guard (CRITICAL #2 regression)", () => {
+  test("does NOT rename an ADR filename whose slug references a different ADR number", async () => {
+    const kgRoot = makeTempDir("cc-critical2-different");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const decisionsDir = path.join(kgRoot, "decisions");
+    const src = path.join(decisionsDir, "ADR-050-adr-046-followup-fix.md");
+    fs.writeFileSync(src, '---\ntitle: "Followup Fix"\n---\n\n# ADR-050\n', "utf-8");
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("0 filename(s) de-duplicated");
+    expect(fs.existsSync(src)).toBe(true);
+    expect(fs.existsSync(path.join(decisionsDir, "ADR-050-followup-fix.md"))).toBe(false);
+  });
+
+  test("still renames a genuine same-number doubled ADR filename", async () => {
+    const kgRoot = makeTempDir("cc-critical2-same");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const decisionsDir = path.join(kgRoot, "decisions");
+    const src = path.join(decisionsDir, "ADR-046-adr-046-again.md");
+    fs.writeFileSync(src, '---\ntitle: "Again"\n---\n\n# ADR-046\n', "utf-8");
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("1 filename(s) de-duplicated");
+    expect(fs.existsSync(src)).toBe(false);
+    expect(fs.existsSync(path.join(decisionsDir, "ADR-046-again.md"))).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// c5 (v0.7.2): shared backfix consent gate (confirmBackfixCategory)
+// ---------------------------------------------------------------------------
+
+describe("c5: capture-corruption gated by confirmBackfix", () => {
+  test("nothing to repair, no confirmBackfix — applies as a no-op, does NOT ask (2nd Opus review, 2026-08-18)", async () => {
+    // Every other test in this describe block that exercises the "nothing
+    // to repair" skip also happens to pass confirmBackfix: true, which
+    // means they'd still pass even if this skip path were deleted -- it
+    // was flagged as genuinely untested. This test omits confirmBackfix
+    // entirely against a clean KG, so it can only pass via the skip.
+    const kgRoot = makeTempDir("c5-cc-noop-no-ask");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    // No corrupted files seeded -- rescan finds nothing.
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+
+    // Must NOT be the gate's KMG_INPUT_REQUIRED -- confirms the skip fired.
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).toContain("[capture-corruption]");
+    expect(result.content[0].text).not.toContain("KMG_INPUT_REQUIRED");
+    expect(result.content[0].text).toContain("0 frontmatter block(s) merged");
+  });
+
+
+  test("automated mode, no confirmBackfix — returns KMG_INPUT_REQUIRED, not applied", async () => {
+    const kgRoot = makeTempDir("c5-cc-unconfirmed");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const filePath = path.join(sessionsYm, "2026-08-16-main.md");
+    const original = '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\n---\n\n## Body\n';
+    fs.writeFileSync(filePath, original, "utf-8");
+
+    const result = await handleUpgrade({ apply: ["capture-corruption"] });
+
+    // Only category in the call, and it's genuinely unconfirmed (real
+    // corruption exists, so the "nothing to repair" skip does not apply) —
+    // the empty prose block is omitted, so the error is content[0].
+    expect(result.isError).toBe(true);
+    expect(result.content.length).toBe(1);
+    const errorBlock = JSON.parse(result.content[0].text);
+    expect(errorBlock.error).toBe("KMG_INPUT_REQUIRED");
+    expect(errorBlock.resolveWith.param).toBe("confirmBackfix");
+    // detail carries the human-readable per-run count the gate is asking
+    // about — this is the whole reason Step 1 added a `detail` field.
+    expect(errorBlock.detail).toContain("duplicated frontmatter block");
+    // File must be untouched — no consent given, nothing should have been written
+    expect(fs.readFileSync(filePath, "utf-8")).toBe(original);
+  });
+
+  test("BLOCKER regression: an unconfirmed LAST-in-order category does not discard an earlier category's results", async () => {
+    const kgRoot = makeTempDir("c5-blocker");
+    tempDirs.push(kgRoot);
+    scaffoldKgPartial(kgRoot); // leaves "directories" real work to do
+    mockActiveKg(kgRoot, { lastAppliedVersion: "0.0.0-old" });
+    // Must seed real corruption — otherwise capture-corruption hits the
+    // "nothing to repair" skip (fix for Opus review finding, 2026-08-18)
+    // and never reaches the gate at all, defeating this test's entire
+    // premise (it needs capture-corruption to end up unconfirmed/pending).
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    fs.writeFileSync(
+      path.join(sessionsYm, "2026-08-16-main.md"),
+      '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\n---\n\n## Body\n',
+      "utf-8"
+    );
+
+    let writtenConfig: ReturnType<typeof readConfig> | undefined;
+    (writeConfig as jest.Mock).mockImplementation((cfg) => { writtenConfig = cfg; });
+
+    const result = await handleUpgrade({ apply: ["directories", "capture-corruption"] });
+
+    // Earlier category's success text must survive, not be discarded by the
+    // later unconfirmed gate — the exact bug this plan's Step 3 fixes.
+    expect(result.content[0].text).toContain("[directories]");
+    expect(result.isError).toBe(true);
+    expect(result.content.length).toBeGreaterThan(1);
+    const errorBlock = JSON.parse(result.content[1].text);
+    expect(errorBlock.error).toBe("KMG_INPUT_REQUIRED");
+    expect(errorBlock.resolveWith.param).toBe("confirmBackfix");
+
+    // updateLastAppliedVersion must still run, since "directories" genuinely applied
+    expect(writtenConfig).toBeDefined();
+    const lastApplied = (writtenConfig!.graphs["test-kg"] as unknown as Record<string, unknown>).lastAppliedVersion;
+    expect(lastApplied).toBe(handleVersion().installed);
+  });
+
+  test("confirmBackfix does not also bypass platform-split — independent knobs", async () => {
+    const kgRoot = makeTempDir("c5-independent-knobs");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    const contaminated = "---\ntitle: Rules\n---\n# Rules\n\n- File search: use Glob and Grep — not Bash find/grep\n";
+    writeRules(kgRoot, contaminated);
+
+    const result = await handleUpgrade({ apply: ["capture-corruption", "platform-split"], confirmBackfix: true });
+
+    // capture-corruption reaches its "nothing to repair" skip (no corrupted
+    // files seeded here), not the gate — either way, no gate error for it
+    expect(result.content[0].text).toContain("[capture-corruption]");
+    // platform-split is still gated — confirmBackfix does not answer confirm_platform_split
+    expect(result.isError).toBe(true);
+    const errorBlock = JSON.parse(result.content[1].text);
+    expect(errorBlock.resolveWith.param).toBe("confirm_platform_split");
+    const after = fs.readFileSync(path.join(kgRoot, "knowledge", "rules.md"), "utf-8");
+    expect(after).toBe(contaminated); // untouched
+  });
+
+  test("confirmBackfix authorizes capture-corruption AND plan-status-drift together — single shared boolean (Fable review, 2026-08-19)", async () => {
+    // capture-corruption, diff-blank-reconstruction, and plan-status-drift
+    // all share the literal confirmBackfix param (unlike platform-split,
+    // which has its own confirm_platform_split knob, covered by the
+    // sibling tests above/below). This test proves a single
+    // confirmBackfix: true genuinely authorizes both when they're present
+    // together in one apply call -- not just each in isolation.
+    const kgRoot = makeTempDir("c6-shared-confirm-backfix");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    // capture-corruption fixture: a doubled frontmatter block to merge.
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const filePath = path.join(sessionsYm, "2026-08-16-main.md");
+    fs.writeFileSync(
+      filePath,
+      '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\n---\n\n## Body\n',
+      "utf-8"
+    );
+
+    // plan-status-drift fixture: a genuine Tier A finding, rooted at the
+    // same kgRoot (findProjectRoot walks up from cwd looking for
+    // knowledge/plans/).
+    const fakeHome = makeTempDir("c6-shared-confirm-backfix-home");
+    tempDirs.push(fakeHome);
+    fakeHomedir(fakeHome);
+    const plansDir = path.join(kgRoot, "knowledge", "plans");
+    const mirrorDir = path.join(fakeHome, ".claude", "plans");
+    fs.mkdirSync(plansDir, { recursive: true });
+    fs.mkdirSync(mirrorDir, { recursive: true });
+    fs.writeFileSync(path.join(plansDir, "v0.7.2-shared-plan.md"), planContent(STATUS_COMPLETE), "utf-8");
+    fs.writeFileSync(path.join(mirrorDir, "v0.7.2-shared-plan.md"), planContent(FROZEN_PRE_C7), "utf-8");
+
+    try {
+      const result = await handleUpgrade({ apply: ["capture-corruption", "plan-status-drift"], confirmBackfix: true });
+
+      expect(result.isError).toBeUndefined();
+      expect(result.content[0].text).toContain("[capture-corruption]");
+      expect(result.content[0].text).toContain("1 frontmatter block(s) merged");
+      expect(result.content[0].text).toContain("[plan-status-drift]");
+      expect(result.content[0].text).toContain("1 plan mirror(s) synced");
+      expect(fs.readFileSync(path.join(mirrorDir, "v0.7.2-shared-plan.md"), "utf-8")).toContain("COMPLETE");
+    } finally {
+      restoreHomedir();
+    }
+  });
+
+  test("confirm_platform_split does not also bypass capture-corruption — independent knobs, reverse direction", async () => {
+    const kgRoot = makeTempDir("c5-independent-knobs-reverse");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    writeRules(kgRoot, "---\ntitle: Rules\n---\n# Rules\n\n- File search: use Glob and Grep — not Bash find/grep\n");
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const filePath = path.join(sessionsYm, "2026-08-16-main.md");
+    const original = '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\n---\n\n## Body\n';
+    fs.writeFileSync(filePath, original, "utf-8");
+
+    const result = await handleUpgrade({ apply: ["capture-corruption", "platform-split"], confirm_platform_split: true });
+
+    // platform-split applied (confirmed), but capture-corruption is still
+    // gated — confirm_platform_split does not answer confirmBackfix
+    expect(result.content[0].text).toContain("[platform-split]");
+    expect(result.isError).toBe(true);
+    const errorBlock = JSON.parse(result.content[1].text);
+    expect(errorBlock.resolveWith.param).toBe("confirmBackfix");
+    // File must be untouched — capture-corruption never got consent
+    expect(fs.readFileSync(filePath, "utf-8")).toBe(original);
+  });
+
+  test("interactive mode: gate() is genuinely invoked (stub times out), not silently treated as automated", async () => {
+    jest.useFakeTimers();
+    const prevInteraction = process.env.KMG_INTERACTION;
+    process.env.KMG_INTERACTION = "interactive";
+    try {
+      const kgRoot = makeTempDir("c5-interactive");
+      tempDirs.push(kgRoot);
+      scaffoldKg(kgRoot);
+      mockActiveKg(kgRoot);
+      // Must seed real corruption — otherwise the "nothing to repair" skip
+      // (fix for Opus review finding, 2026-08-18) short-circuits before the
+      // gate is ever reached, defeating this test's whole premise.
+      const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+      fs.mkdirSync(sessionsYm, { recursive: true });
+      fs.writeFileSync(
+        path.join(sessionsYm, "2026-08-16-main.md"),
+        '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\n---\n\n## Body\n',
+        "utf-8"
+      );
+
+      const resultPromise = handleUpgrade({ apply: ["capture-corruption"] });
+      await jest.advanceTimersByTimeAsync(STUB_ASK_TIMEOUT_MS);
+      const result = await resultPromise;
+
+      expect(result.isError).toBe(true);
+      expect(result.content.length).toBe(1); // only category in the call, no prose block
+      const errorBlock = JSON.parse(result.content[0].text);
+      expect(errorBlock.error).toBe("KMG_INPUT_REQUIRED");
+      expect(errorBlock.reason).toContain("capture_corruption_backfix");
+    } finally {
+      process.env.KMG_INTERACTION = prevInteraction;
+      jest.useRealTimers();
+    }
+  });
+
+  test("Step 6.5 short-circuit: two unconfirmed gated categories in interactive mode settle after ONE stub timeout, not two", async () => {
+    jest.useFakeTimers();
+    const prevInteraction = process.env.KMG_INTERACTION;
+    process.env.KMG_INTERACTION = "interactive";
+    try {
+      const kgRoot = makeTempDir("c5-skipask");
+      tempDirs.push(kgRoot);
+      scaffoldKg(kgRoot);
+      mockActiveKg(kgRoot);
+      writeRules(kgRoot, "---\ntitle: Rules\n---\n# Rules\n\n- File search: use Glob and Grep — not Bash find/grep\n");
+      // Must seed real corruption — otherwise capture-corruption hits the
+      // "nothing to repair" skip and never reaches its gate at all, leaving
+      // only platform-split gated and defeating this test's whole premise
+      // (proving the short-circuit between TWO gated categories).
+      const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+      fs.mkdirSync(sessionsYm, { recursive: true });
+      fs.writeFileSync(
+        path.join(sessionsYm, "2026-08-16-main.md"),
+        '---\ntitle: "main"\ndate: 2026-08-16\n---\n---\ntitle: "main"\ndate: 2026-08-16\n---\n\n## Body\n',
+        "utf-8"
+      );
+
+      const resultPromise = handleUpgrade({ apply: ["capture-corruption", "platform-split"] });
+      let settled = false;
+      resultPromise.then(() => { settled = true; });
+
+      // Advance by exactly ONE stub timeout. If platform-split (the second
+      // gated category) were still stacking its own full gate()/stubAsk
+      // wait instead of short-circuiting once capture-corruption's gate
+      // already came back unconfirmed, this would not be enough for both.
+      await jest.advanceTimersByTimeAsync(STUB_ASK_TIMEOUT_MS);
+      await Promise.resolve(); // flush microtasks so `settled` reflects reality
+      expect(settled).toBe(true);
+
+      const result = await resultPromise;
+      expect(result.isError).toBe(true);
+      // Both categories are unconfirmed and neither applied, so there's no
+      // prose block to include — just the 2 pending errors.
+      expect(result.content.length).toBe(2);
+    } finally {
+      process.env.KMG_INTERACTION = prevInteraction;
+      jest.useRealTimers();
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// c2 (issue-47): diff-blank-reconstruction backfix
+// ---------------------------------------------------------------------------
+
+describe("c2: diff-blank-reconstruction (issue-47 backfix)", () => {
+  function gitInit(dir: string): void {
+    execSync("git init -q -b main", { cwd: dir });
+    execSync('git config user.email t@t.com && git config user.name t', { cwd: dir });
+  }
+
+  test("correctly blank on default branch — not flagged, not touched", async () => {
+    const kgRoot = makeTempDir("c2-blank-main");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    gitInit(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "seed.md"), "seed", "utf-8");
+    execSync("git add seed.md && git commit -q -m seed", { cwd: kgRoot });
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const sessFile = path.join(sessionsYm, "2026-08-18-main.md");
+    const content =
+      '---\ntitle: "main"\nbranch: main\ncommit: abc123\n---\n\n**External files:**\n- none this session\n';
+    fs.writeFileSync(sessFile, content, "utf-8");
+
+    const inspect = await handleUpgrade({});
+    const parsed = JSON.parse(inspect.content[0].text);
+    expect(
+      (parsed.upgrades as Array<{ category: string }>).find((u) => u.category === "diff-blank-reconstruction")
+    ).toBeUndefined();
+
+    const result = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("0 session file(s) reconstructed, 0 left");
+    // Untouched — correctly-blank is not a gap, nothing to backfix
+    expect(fs.readFileSync(sessFile, "utf-8")).toBe(content);
+    expect(fs.existsSync(`${sessFile}.bak`)).toBe(false);
+  });
+
+  test("reconstructable — feature branch, resolvable commit, gated then rebuilt from real git history", async () => {
+    const kgRoot = makeTempDir("c2-reconstructable");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    gitInit(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "seed.md"), "seed", "utf-8");
+    execSync("git add seed.md && git commit -q -m seed", { cwd: kgRoot });
+    execSync("git checkout -q -b feature", { cwd: kgRoot });
+    fs.writeFileSync(path.join(kgRoot, "changed.md"), "changed", "utf-8");
+    execSync("git add changed.md && git commit -q -m changed", { cwd: kgRoot });
+    const featureSha = execSync("git rev-parse HEAD", { cwd: kgRoot }).toString().trim();
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const sessFile = path.join(sessionsYm, "2026-08-18-feature.md");
+    const content =
+      `---\ntitle: "feature"\nbranch: feature\ncommit: ${featureSha}\n---\n\n**External files:**\n- none this session\n\n**Read within this summary:**\n`;
+    fs.writeFileSync(sessFile, content, "utf-8");
+
+    // Gated: no confirmBackfix, must not touch the file
+    const gated = await handleUpgrade({ apply: ["diff-blank-reconstruction"] });
+    expect(gated.isError).toBe(true);
+    const err = JSON.parse(gated.content[0].text);
+    expect(err.error).toBe("KMG_INPUT_REQUIRED");
+    expect(err.resolveWith.param).toBe("confirmBackfix");
+    expect(fs.readFileSync(sessFile, "utf-8")).toBe(content);
+
+    // Confirmed: reconstructs from real git history (not a guess)
+    const result = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("1 session file(s) reconstructed, 0 left");
+    const after = fs.readFileSync(sessFile, "utf-8");
+    expect(after).toContain("`changed.md` ← modified this session (reconstructed)");
+    expect(after).not.toContain("seed.md"); // only the feature-branch delta, not the whole history
+    expect(fs.existsSync(`${sessFile}.bak`)).toBe(true);
+    expect(fs.readFileSync(`${sessFile}.bak`, "utf-8")).toBe(content); // backup is the pre-rewrite content
+  });
+
+  test("unresolvable — commit no longer resolvable, gets an honest note, never a guessed file list", async () => {
+    const kgRoot = makeTempDir("c2-unresolvable");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    gitInit(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "seed.md"), "seed", "utf-8");
+    execSync("git add seed.md && git commit -q -m seed", { cwd: kgRoot });
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const sessFile = path.join(sessionsYm, "2026-08-18-gone.md");
+    // A real 40-char SHA-1 shape (not merely malformed) that never existed in
+    // this repo -- proves "valid-looking but genuinely gone", not just
+    // "rejected for being the wrong length" (found in review, 2026-08-18).
+    const bogusSha = "0123456789abcdef0123456789abcdef0123dead";
+    const content =
+      `---\ntitle: "gone"\nbranch: deleted-feature\ncommit: ${bogusSha}\n---\n\n**External files:**\n- none this session\n`;
+    fs.writeFileSync(sessFile, content, "utf-8");
+
+    const result = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("0 session file(s) reconstructed, 1 left with an unresolvable note.");
+    const after = fs.readFileSync(sessFile, "utf-8");
+    expect(after).toContain("could not be reconstructed");
+    expect(after).toContain(bogusSha);
+    // Never fabricate a plausible-looking list for an unresolvable commit
+    expect(after).not.toContain("← modified this session (reconstructed)");
+    expect(fs.existsSync(`${sessFile}.bak`)).toBe(true);
+  });
+
+  test("no branch recorded — skipped, not misclassified either way", async () => {
+    const kgRoot = makeTempDir("c2-no-branch");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    gitInit(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "seed.md"), "seed", "utf-8");
+    execSync("git add seed.md && git commit -q -m seed", { cwd: kgRoot });
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const sessFile = path.join(sessionsYm, "2026-08-18-nobranch.md");
+    const content = '---\ntitle: "nobranch"\n---\n\n**External files:**\n- none this session\n';
+    fs.writeFileSync(sessFile, content, "utf-8");
+
+    const result = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("0 session file(s) reconstructed, 0 left");
+    expect(fs.readFileSync(sessFile, "utf-8")).toBe(content); // untouched, not guessed at
+  });
+
+  test("BLOCKER regression (2nd Opus review, 2026-08-18): re-running apply is idempotent, does not grow notes or clobber the .bak", async () => {
+    // The unresolvable-note and reconstructed-empty write paths originally
+    // wrote no `← modified this session` marker, so a second run
+    // re-classified an already-handled file as still-blank and appended
+    // ANOTHER note (verified: note count 1 -> 2 across two runs before this
+    // fix), while unconditionally overwriting .bak with the already-mutated
+    // content, making the true original unrecoverable. Both are covered here
+    // against the unresolvable path specifically, since it's the one that
+    // never writes the file-list marker at all.
+    const kgRoot = makeTempDir("c2-idempotent");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    gitInit(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "seed.md"), "seed", "utf-8");
+    execSync("git add seed.md && git commit -q -m seed", { cwd: kgRoot });
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const sessFile = path.join(sessionsYm, "2026-08-18-gone.md");
+    const bogusSha = "0123456789abcdef0123456789abcdef0123dead";
+    const original =
+      `---\ntitle: "gone"\nbranch: deleted-feature\ncommit: ${bogusSha}\n---\n\n**External files:**\n- none this session\n`;
+    fs.writeFileSync(sessFile, original, "utf-8");
+
+    const first = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    expect(first.content[0].text).toContain("0 session file(s) reconstructed, 1 left with an unresolvable note.");
+    const afterFirst = fs.readFileSync(sessFile, "utf-8");
+    const bakAfterFirst = fs.readFileSync(`${sessFile}.bak`, "utf-8");
+    expect(bakAfterFirst).toBe(original); // backup preserves the true original
+
+    const second = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    // Second run must find nothing left to do -- the file is now recognized
+    // as already-handled, not re-classified as blank.
+    expect(second.content[0].text).toContain("0 session file(s) reconstructed, 0 left with an unresolvable note.");
+    const afterSecond = fs.readFileSync(sessFile, "utf-8");
+    expect(afterSecond).toBe(afterFirst); // untouched by the second run
+    const noteCount = (afterSecond.match(/could not be reconstructed/g) || []).length;
+    expect(noteCount).toBe(1); // not 2 -- no duplicate note appended
+    const bakAfterSecond = fs.readFileSync(`${sessFile}.bak`, "utf-8");
+    expect(bakAfterSecond).toBe(original); // backup still the true original, not clobbered with mutated content
+  });
+
+  test("non-git kgPath — degrades gracefully, does not misclassify every blank file as unresolvable", async () => {
+    // Without a git-repo guard, resolveDefaultBranchForGit/isCommitResolvable
+    // both fail closed to "nothing found", so every blank session file would
+    // land in `unresolvable` and get a false-positive "could not be
+    // reconstructed" note written into it -- for a KG that was never a git
+    // repo in the first place (a real, stated audience for this MCP-only
+    // tool). Deliberately no gitInit() call here.
+    const kgRoot = makeTempDir("c2-non-git");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const sessFile = path.join(sessionsYm, "2026-08-18-nogit.md");
+    const content =
+      '---\ntitle: "nogit"\nbranch: some-branch\ncommit: deadbeef\n---\n\n**External files:**\n- none this session\n';
+    fs.writeFileSync(sessFile, content, "utf-8");
+
+    const inspect = await handleUpgrade({});
+    const parsed = JSON.parse(inspect.content[0].text);
+    expect(
+      (parsed.upgrades as Array<{ category: string }>).find((u) => u.category === "diff-blank-reconstruction")
+    ).toBeUndefined();
+
+    const result = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("0 session file(s) reconstructed, 0 left");
+    expect(fs.readFileSync(sessFile, "utf-8")).toBe(content); // untouched — no false-positive note
+  });
+
+  test("descriptive branch suffix (e.g. 'main (post-merge; was ...)') is still recognized as the default branch", async () => {
+    // A plain string-equality check misclassifies this real shape (found in
+    // this repo's own KG during review, 2026-08-18) as a feature branch.
+    const kgRoot = makeTempDir("c2-descriptive-branch");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    gitInit(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "seed.md"), "seed", "utf-8");
+    execSync("git add seed.md && git commit -q -m seed", { cwd: kgRoot });
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const sessFile = path.join(sessionsYm, "2026-08-18-descriptive.md");
+    const content =
+      '---\ntitle: "descriptive"\nbranch: main (post-merge; was v0.6.17-something)\ncommit: abc123\n---\n\n**External files:**\n- none this session\n';
+    fs.writeFileSync(sessFile, content, "utf-8");
+
+    const result = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    // Recognized as correctly-blank (on the default branch), not misfiled
+    // into reconstructable/unresolvable and rewritten.
+    expect(result.content[0].text).toContain("0 session file(s) reconstructed, 0 left");
+    expect(fs.readFileSync(sessFile, "utf-8")).toBe(content); // untouched
+  });
+
+  test("regression (Opus review, 2026-08-19): a repo whose default branch is neither main nor master mutates NOTHING", async () => {
+    // resolveDefaultBranchForGit() only tries main/master by project
+    // convention. In a `trunk`-default repo it returns null, and before the
+    // fix that null poisoned every classification at once: isOnDefaultBranch()
+    // could never match (so a correctly-blank file captured on trunk was NOT
+    // counted as correctly blank), and the reconstructable test required a
+    // non-null defaultBranch (so it always failed too). Every blank session
+    // file in the repo therefore landed in unresolvable[] and had a false
+    // "could not be reconstructed" note written into it. Skipping entirely is
+    // the same posture as the non-git case above.
+    const kgRoot = makeTempDir("c2-trunk-default");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    execSync("git init -q -b trunk", { cwd: kgRoot });
+    execSync('git config user.email t@t.com && git config user.name t', { cwd: kgRoot });
+    fs.writeFileSync(path.join(kgRoot, "seed.md"), "seed", "utf-8");
+    execSync("git add seed.md && git commit -q -m seed", { cwd: kgRoot });
+    const trunkSha = execSync("git rev-parse HEAD", { cwd: kgRoot }).toString().trim();
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    // Correctly blank: captured on the repo's actual default branch.
+    const onDefault = path.join(sessionsYm, "2026-08-18-trunk.md");
+    const onDefaultContent =
+      `---\ntitle: "trunk"\nbranch: trunk\ncommit: ${trunkSha}\n---\n\n**External files:**\n- none this session\n`;
+    fs.writeFileSync(onDefault, onDefaultContent, "utf-8");
+    // A genuine feature-branch file too — also untouchable, since there is no
+    // resolvable base to diff it against.
+    const onFeature = path.join(sessionsYm, "2026-08-18-feat.md");
+    const onFeatureContent =
+      `---\ntitle: "feat"\nbranch: some-feature\ncommit: ${trunkSha}\n---\n\n**External files:**\n- none this session\n`;
+    fs.writeFileSync(onFeature, onFeatureContent, "utf-8");
+
+    const inspect = await handleUpgrade({});
+    const parsed = JSON.parse(inspect.content[0].text);
+    expect(
+      (parsed.upgrades as Array<{ category: string }>).find((u) => u.category === "diff-blank-reconstruction")
+    ).toBeUndefined();
+
+    const result = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("0 session file(s) reconstructed, 0 left");
+    expect(fs.readFileSync(onDefault, "utf-8")).toBe(onDefaultContent);
+    expect(fs.readFileSync(onFeature, "utf-8")).toBe(onFeatureContent);
+    expect(fs.existsSync(`${onDefault}.bak`)).toBe(false);
+    expect(fs.existsSync(`${onFeature}.bak`)).toBe(false);
+  });
+
+  test("regression (Opus review, 2026-08-19): a failed merge-base is reported as a failure, never as 'confirmed empty via git history'", async () => {
+    // An orphan branch shares no history with main, so `git merge-base main
+    // <orphanSha>` exits non-zero and gitMergeBase() returns null. Before the
+    // fix, null merge-base collapsed into fileList = [] alongside the
+    // legitimate "git ran and found nothing" case, and the empty branch wrote
+    // a factually false "confirmed empty via git history -- no files changed"
+    // claim into the user's session file. git failing to answer is not
+    // evidence of an empty diff.
+    const kgRoot = makeTempDir("c2-unrelated-histories");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    gitInit(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "seed.md"), "seed", "utf-8");
+    execSync("git add seed.md && git commit -q -m seed", { cwd: kgRoot });
+    execSync("git checkout -q --orphan orphan-feature", { cwd: kgRoot });
+    fs.writeFileSync(path.join(kgRoot, "orphan.md"), "orphan", "utf-8");
+    execSync("git add orphan.md && git commit -q -m orphan", { cwd: kgRoot });
+    const orphanSha = execSync("git rev-parse HEAD", { cwd: kgRoot }).toString().trim();
+    execSync("git checkout -q main", { cwd: kgRoot });
+    // Precondition for this test to mean anything: the commit IS resolvable
+    // (so the file classifies as reconstructable) but has no merge base.
+    expect(() => execSync(`git merge-base main ${orphanSha}`, { cwd: kgRoot, stdio: "pipe" })).toThrow();
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const sessFile = path.join(sessionsYm, "2026-08-18-orphan.md");
+    const content =
+      `---\ntitle: "orphan"\nbranch: orphan-feature\ncommit: ${orphanSha}\n---\n\n**External files:**\n- none this session\n`;
+    fs.writeFileSync(sessFile, content, "utf-8");
+
+    const result = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("0 session file(s) reconstructed, 1 left with an unresolvable note.");
+    const after = fs.readFileSync(sessFile, "utf-8");
+    expect(after).toContain("could not be reconstructed");
+    expect(after).toContain("no merge base");
+    expect(after).not.toContain("confirmed empty via git");
+    expect(after).not.toContain("← modified this session (reconstructed)");
+    expect(fs.readFileSync(`${sessFile}.bak`, "utf-8")).toBe(content);
+  });
+
+  test("regression (Opus review, 2026-08-19): a dangling symlink under sessions/ does not crash the scan", async () => {
+    const kgRoot = makeTempDir("c2-dangling-symlink");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    gitInit(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "seed.md"), "seed", "utf-8");
+    execSync("git add seed.md && git commit -q -m seed", { cwd: kgRoot });
+    execSync("git checkout -q -b feature", { cwd: kgRoot });
+    fs.writeFileSync(path.join(kgRoot, "changed.md"), "changed", "utf-8");
+    execSync("git add changed.md && git commit -q -m changed", { cwd: kgRoot });
+    const featureSha = execSync("git rev-parse HEAD", { cwd: kgRoot }).toString().trim();
+
+    const sessionsYm = path.join(kgRoot, "sessions", "2026-08");
+    fs.mkdirSync(sessionsYm, { recursive: true });
+    const sessFile = path.join(sessionsYm, "2026-08-18-feature.md");
+    fs.writeFileSync(
+      sessFile,
+      `---\ntitle: "feature"\nbranch: feature\ncommit: ${featureSha}\n---\n\n**External files:**\n- none this session\n`,
+      "utf-8"
+    );
+    // readdirSync lists these, but statSync/readFileSync throw ENOENT. Before
+    // the fix the unguarded stat/read took down the ENTIRE kg_upgrade call,
+    // discarding every finding accumulated before it.
+    fs.symlinkSync(path.join(sessionsYm, "nope.md"), path.join(sessionsYm, "dangling.md"));
+    fs.symlinkSync(path.join(kgRoot, "sessions", "nope-dir"), path.join(kgRoot, "sessions", "2026-07"));
+
+    const inspect = await handleUpgrade({});
+    const parsed = JSON.parse(inspect.content[0].text);
+    // The real finding still surfaces — the bad entries were skipped, not
+    // treated as a reason to abort.
+    expect(
+      (parsed.upgrades as Array<{ category: string }>).find((u) => u.category === "diff-blank-reconstruction")
+    ).toBeDefined();
+
+    const result = await handleUpgrade({ apply: ["diff-blank-reconstruction"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("1 session file(s) reconstructed, 0 left");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// c6 (issue-49): plan-status-drift backfix
+//
+// Unlike capture-corruption/diff-blank-reconstruction, this category does NOT
+// operate under a KG's kgPath. Its two inputs are:
+//   - the canonical copy at <projectRoot>/knowledge/plans/X.md, where
+//     projectRoot is found by findProjectRoot(cwd)'s upward walk, and
+//   - the local mirror at os.homedir()/.claude/plans/X.md.
+// So every fixture below builds a real project root (a real `git init` repo
+// with a knowledge/plans/ subdir), points process.cwd at it, and fakes the
+// home directory.
+//
+// The home side is module-mocked, not env-faked: the config-location block
+// above gets away with assigning process.env.HOME only because utils.ts's
+// legacy path reads `process.env.HOME || os.homedir()` explicitly. Node
+// resolves os.homedir() once at startup, so a later $HOME assignment does NOT
+// move it (verified: os.homedir() still returned the real home afterwards, and
+// every mirror-side assertion here silently read the developer's real
+// ~/.claude/plans). checkPlanStatusDrift() calls bare os.homedir(), hence the
+// jest.mock("os", ...) at the top of this file. $HOME is set alongside it
+// purely so the two signals never disagree for any other code the call
+// touches.
+// ---------------------------------------------------------------------------
+
+/** The unmocked home directory — restored after each plan-status-drift test. */
+const REAL_HOMEDIR = (jest.requireActual("os") as typeof import("os")).homedir();
+
+function fakeHomedir(dir: string): void {
+  (os.homedir as unknown as jest.Mock).mockReturnValue(dir);
+}
+
+function restoreHomedir(): void {
+  (os.homedir as unknown as jest.Mock).mockReturnValue(REAL_HOMEDIR);
+}
+
+/**
+ * The two EXACT frozen Safety-Header placeholders the implementation
+ * recognizes (FROZEN_PLACEHOLDERS in upgrade.ts). Duplicated verbatim here on
+ * purpose: if the implementation's list is edited, these tests must fail
+ * loudly rather than silently follow it.
+ */
+const FROZEN_PRE_C7 = "**STATUS:** 🔴 STOPPED (Waiting for Manual Approval of Step 1)";
+const FROZEN_C7 = "**STATUS:** 🔴 AWAITING APPROVAL (Waiting for Manual Approval of Step 1)";
+const STATUS_COMPLETE = "**STATUS:** ✅ COMPLETE";
+
+const DEFAULT_PLAN_BODY = "## Step 1\n\nDo the thing.\n";
+
+function planContent(statusLine: string, body: string = DEFAULT_PLAN_BODY): string {
+  return `# Implementation Plan\n\n## Safety Header\n\n${statusLine}\n**PROTOCOL:** zero-deviation\n\n${body}`;
+}
+
+// Same shape as the c2 block's gitInit — real git repos as fixtures, not mocks.
+function gitInitRepo(dir: string): void {
+  execSync("git init -q -b main", { cwd: dir });
+  execSync('git config user.email t@t.com && git config user.name t', { cwd: dir });
+}
+
+function seedCommit(dir: string): void {
+  fs.writeFileSync(path.join(dir, "seed.md"), "seed", "utf-8");
+  execSync("git add -A && git commit -q -m seed", { cwd: dir });
+}
+
+/** Real `--no-ff` merge into main, producing a `Merge branch '<branch>'` subject. */
+function mergeBranchNoFf(dir: string, branch: string): void {
+  execSync(`git checkout -q -b ${branch}`, { cwd: dir });
+  fs.writeFileSync(path.join(dir, `work-${branch}.md`), "work", "utf-8");
+  execSync("git add -A && git commit -q -m work", { cwd: dir });
+  execSync("git checkout -q main", { cwd: dir });
+  execSync(`git merge -q --no-ff -m "Merge branch '${branch}'" ${branch}`, { cwd: dir });
+}
+
+interface PlanFixture {
+  projectRoot: string;
+  plansDir: string;
+  mirrorDir: string;
+}
+
+function makePlanFixture(prefix: string, fakeHome: string, opts: { git?: boolean } = {}): PlanFixture {
+  const projectRoot = makeTempDir(prefix);
+  tempDirs.push(projectRoot);
+  const plansDir = path.join(projectRoot, "knowledge", "plans");
+  fs.mkdirSync(plansDir, { recursive: true });
+  const mirrorDir = path.join(fakeHome, ".claude", "plans");
+  fs.mkdirSync(mirrorDir, { recursive: true });
+  if (opts.git !== false) gitInitRepo(projectRoot);
+  mockActiveKg(projectRoot); // also points process.cwd at projectRoot
+  return { projectRoot, plansDir, mirrorDir };
+}
+
+function writePlanPair(
+  fx: PlanFixture,
+  name: string,
+  canonical: string,
+  mirror?: string
+): { canonicalPath: string; mirrorPath: string } {
+  const canonicalPath = path.join(fx.plansDir, name);
+  const mirrorPath = path.join(fx.mirrorDir, name);
+  fs.writeFileSync(canonicalPath, canonical, "utf-8");
+  if (mirror !== undefined) fs.writeFileSync(mirrorPath, mirror, "utf-8");
+  return { canonicalPath, mirrorPath };
+}
+
+function parseInspect(result: Awaited<ReturnType<typeof handleUpgrade>>): {
+  upgrades: Array<{ category: string; description: string; details?: string }>;
+  warnings: Array<{ category: string; description: string }>;
+} {
+  return JSON.parse(result.content[0].text);
+}
+
+function planDriftItem(result: Awaited<ReturnType<typeof handleUpgrade>>) {
+  return parseInspect(result).upgrades.find((u) => u.category === "plan-status-drift");
+}
+
+function listBakFiles(dir: string): string[] {
+  const out: string[] = [];
+  const walk = (d: string): void => {
+    for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
+      const full = path.join(d, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (entry.name.endsWith(".bak")) out.push(full);
+    }
+  };
+  walk(dir);
+  return out;
+}
+
+describe("plan-status-drift — inspect mode", () => {
+  const ORIGINAL_HOME = process.env.HOME;
+  let fakeHome: string;
+
+  beforeEach(() => {
+    fakeHome = makeTempDir("psd-home");
+    tempDirs.push(fakeHome);
+    fakeHomedir(fakeHome);
+    process.env.HOME = fakeHome;
+  });
+
+  afterEach(() => {
+    restoreHomedir();
+    if (ORIGINAL_HOME === undefined) delete process.env.HOME;
+    else process.env.HOME = ORIGINAL_HOME;
+  });
+
+  // 1
+  test("Tier A: canonical COMPLETE + mirror still the frozen placeholder + rest identical is flagged", async () => {
+    const fx = makePlanFixture("psd-tier-a", fakeHome);
+    writePlanPair(fx, "v0.7.2-demo-plan.md", planContent(STATUS_COMPLETE), planContent(FROZEN_PRE_C7));
+
+    const item = planDriftItem(await handleUpgrade({}));
+    expect(item).toBeDefined();
+    expect(item!.description).toContain("1 Tier A mirror-drift");
+    expect(item!.description).toContain("0 Tier B");
+    expect(item!.description).toContain("0 orphaned");
+  });
+
+  // 2
+  test("false-positive guard: canonical and mirror already identical (STATUS included) is not flagged", async () => {
+    const fx = makePlanFixture("psd-identical", fakeHome);
+    const content = planContent(STATUS_COMPLETE);
+    writePlanPair(fx, "v0.7.2-identical-plan.md", content, content);
+
+    expect(planDriftItem(await handleUpgrade({}))).toBeUndefined();
+  });
+
+  // 3
+  test("false-positive guard: a pair that ALSO differs outside the STATUS line is not a Tier A finding", async () => {
+    const fx = makePlanFixture("psd-body-diff", fakeHome);
+    const divergentBody = "## Step 1\n\nDo the thing.\n\n## Step 2\n\nAdded to canonical after the mirror was copied.\n";
+    const { mirrorPath } = writePlanPair(
+      fx,
+      "v0.7.2-bodydiff-plan.md",
+      planContent(STATUS_COMPLETE, divergentBody),
+      planContent(FROZEN_PRE_C7)
+    );
+
+    expect(planDriftItem(await handleUpgrade({}))).toBeUndefined();
+
+    // Control: bring the bodies back into agreement and the SAME pair becomes
+    // Tier A -- proves the absence above was clause 3 ("differ ONLY in
+    // STATUS") firing, not a detector that never fires at all.
+    fs.writeFileSync(mirrorPath, planContent(FROZEN_PRE_C7, divergentBody), "utf-8");
+    const item = planDriftItem(await handleUpgrade({}));
+    expect(item!.description).toContain("1 Tier A");
+  });
+
+  // 4
+  test("Tier B: both copies frozen at the exact placeholder with merge evidence present is manual-review only", async () => {
+    const fx = makePlanFixture("psd-tier-b", fakeHome);
+    seedCommit(fx.projectRoot);
+    mergeBranchNoFf(fx.projectRoot, "v0.7.2-c6-demo");
+    writePlanPair(fx, "v0.7.2-c6-demo-plan.md", planContent(FROZEN_PRE_C7), planContent(FROZEN_PRE_C7));
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    // Never counted as auto-applicable, however strong the evidence looks.
+    expect(item.description).toContain("0 Tier A");
+    expect(item.description).toContain("1 Tier B");
+    expect(item.details).toContain("Tier B candidates:");
+    expect(item.details).toContain("v0.7.2-c6-demo-plan.md");
+    expect(item.details).toContain("merge evidence FOUND");
+    expect(item.details).toContain("cannot distinguish this plan from any sibling");
+  });
+
+  // 5
+  test("Tier B: two plans sharing one identical branch reference BOTH stay in manual review", async () => {
+    const fx = makePlanFixture("psd-tier-b-collision", fakeHome);
+    seedCommit(fx.projectRoot);
+    mergeBranchNoFf(fx.projectRoot, "v0.7.2-issues-46-51");
+
+    const shared = "## Related\n\nShares branch v0.7.2-issues-46-51 with its sibling plans.\n";
+    writePlanPair(fx, "v0.7.2-c6-first-plan.md", planContent(FROZEN_PRE_C7, shared), planContent(FROZEN_PRE_C7, shared));
+    writePlanPair(fx, "v0.7.2-c7-second-plan.md", planContent(FROZEN_C7, shared), planContent(FROZEN_C7, shared));
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    expect(item.description).toContain("0 Tier A");
+    expect(item.description).toContain("2 Tier B");
+    expect(item.details).toContain("v0.7.2-c6-first-plan.md");
+    expect(item.details).toContain("v0.7.2-c7-second-plan.md");
+    // The shared in-body branch string never resolves either one: the branch
+    // candidate is filename-derived, so a merged sibling branch is evidence
+    // for neither plan.
+    expect(item.details).not.toContain("merge evidence FOUND");
+  });
+
+  // 6
+  test("Tier B: exact-string match only — other step numbers / transitioned states are not candidates", async () => {
+    const fx = makePlanFixture("psd-tier-b-fp", fakeHome);
+    const variants: Array<[string, string]> = [
+      ["v0.7.2-step0-plan.md", "**STATUS:** 🔴 STOPPED (Waiting for Manual Approval of Step 0)"],
+      ["v0.7.2-step4-plan.md", "**STATUS:** 🔴 STOPPED (Waiting for Manual Approval of Step 4)"],
+      ["v0.7.2-inprogress-plan.md", "**STATUS:** 🟡 IN PROGRESS (Step 2)"],
+      ["v0.7.2-complete-plan.md", STATUS_COMPLETE],
+      // Bare "STOPPED" — the shape a fuzzy substring matcher would swallow.
+      ["v0.7.2-bare-stopped-plan.md", "**STATUS:** 🔴 STOPPED"],
+    ];
+    for (const [name, status] of variants) {
+      const content = planContent(status);
+      writePlanPair(fx, name, content, content);
+    }
+
+    expect(planDriftItem(await handleUpgrade({}))).toBeUndefined();
+  });
+
+  // 7a
+  test("Tier B evidence: a candidate that is a strict PREFIX of a different merged branch is not treated as merged", async () => {
+    const fx = makePlanFixture("psd-prefix-guard", fakeHome);
+    seedCommit(fx.projectRoot);
+    // Only the LONGER name was ever merged; a naive substring/grep match would
+    // report the shorter one as merged too (confirmed live in this repo).
+    mergeBranchNoFf(fx.projectRoot, "v0.7.1.4-version-sync-issue-45-extra");
+    mergeBranchNoFf(fx.projectRoot, "v0.7.1.5-exact");
+
+    writePlanPair(fx, "v0.7.1.4-version-sync-plan.md", planContent(FROZEN_PRE_C7), planContent(FROZEN_PRE_C7));
+    writePlanPair(fx, "v0.7.1.5-exact-plan.md", planContent(FROZEN_PRE_C7), planContent(FROZEN_PRE_C7));
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    expect(item.description).toContain("2 Tier B");
+    const lines = item.details!.split("\n");
+    const prefixLine = lines.find((l) => l.startsWith("v0.7.1.4-version-sync-plan.md"))!;
+    const exactLine = lines.find((l) => l.startsWith("v0.7.1.5-exact-plan.md"))!;
+    expect(prefixLine).toContain("no merge evidence found");
+    // Control in the same fixture: exact segment equality DOES match, so the
+    // assertion above is a real guard, not a signal that never fires.
+    expect(exactLine).toContain("merge evidence FOUND");
+  });
+
+  // 7b
+  test("Tier B evidence: a squash-merged branch (no merge commit at all) still lands in manual review", async () => {
+    const fx = makePlanFixture("psd-squash", fakeHome);
+    seedCommit(fx.projectRoot);
+    execSync("git checkout -q -b v0.7.2-squashed", { cwd: fx.projectRoot });
+    fs.writeFileSync(path.join(fx.projectRoot, "squashed-work.md"), "work", "utf-8");
+    execSync("git add -A && git commit -q -m work", { cwd: fx.projectRoot });
+    execSync("git checkout -q main", { cwd: fx.projectRoot });
+    execSync("git merge -q --squash v0.7.2-squashed", { cwd: fx.projectRoot });
+    execSync('git commit -q -m "feat: squashed work (#42)"', { cwd: fx.projectRoot });
+    execSync("git branch -q -D v0.7.2-squashed", { cwd: fx.projectRoot });
+
+    writePlanPair(fx, "v0.7.2-squashed-plan.md", planContent(FROZEN_PRE_C7), planContent(FROZEN_PRE_C7));
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    expect(item.description).toContain("0 Tier A");
+    expect(item.description).toContain("1 Tier B"); // not silently dropped
+    expect(item.details).toContain("v0.7.2-squashed-plan.md");
+    expect(item.details).toContain("no merge evidence found");
+  });
+
+  // 7c
+  test("Tier B evidence: a fast-forward-merged branch deleted afterwards still lands in manual review", async () => {
+    const fx = makePlanFixture("psd-ff-deleted", fakeHome);
+    seedCommit(fx.projectRoot);
+    execSync("git checkout -q -b v0.7.2-ffgone", { cwd: fx.projectRoot });
+    fs.writeFileSync(path.join(fx.projectRoot, "ff-work.md"), "work", "utf-8");
+    execSync("git add -A && git commit -q -m work", { cwd: fx.projectRoot });
+    execSync("git checkout -q main", { cwd: fx.projectRoot });
+    execSync("git merge -q --ff-only v0.7.2-ffgone", { cwd: fx.projectRoot }); // no merge commit
+    execSync("git branch -q -d v0.7.2-ffgone", { cwd: fx.projectRoot }); // no surviving ref
+
+    writePlanPair(fx, "v0.7.2-ffgone-plan.md", planContent(FROZEN_PRE_C7), planContent(FROZEN_PRE_C7));
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    expect(item.description).toContain("0 Tier A");
+    expect(item.description).toContain("1 Tier B");
+    expect(item.details).toContain("v0.7.2-ffgone-plan.md");
+    expect(item.details).toContain("no merge evidence found");
+  });
+
+  // 8
+  test("orphaned mirror-only files alone never produce an actionable item (Opus review, 2026-08-19)", async () => {
+    const fx = makePlanFixture("psd-orphan", fakeHome);
+    fs.writeFileSync(path.join(fx.mirrorDir, "v0.6.0-orphan-plan.md"), planContent(FROZEN_PRE_C7), "utf-8");
+
+    const parsed = parseInspect(await handleUpgrade({}));
+    // An orphan-only finding (0 Tier A, 0 Tier B) must NOT become an
+    // upgrades[] item -- that would add "plan-status-drift" to the wizard's
+    // apply list with nothing for apply to actually repair, so it would
+    // report "0 synced" and reappear on every future inspect with no way to
+    // ever clear it. (A warnings[]-routed alternative was considered and
+    // rejected: kmg-upgrade-inspector.md's warnings[] contract routes every
+    // entry through the platform-split wizard flow, which has no handler
+    // for an unrelated informational note -- that would just recreate the
+    // sibling "resolution"-in-warnings[] bug under a new category.)
+    expect(parsed.upgrades.find((u) => u.category === "plan-status-drift")).toBeUndefined();
+    expect(parsed.warnings.find((w) => w.category === "plan-status-drift")).toBeUndefined();
+  });
+
+  test("orphan count folds into the Tier A/B item's own description when a real finding also exists", async () => {
+    const fx = makePlanFixture("psd-orphan-with-tier-a", fakeHome);
+    writePlanPair(fx, "v0.7.2-real-plan.md", planContent(STATUS_COMPLETE), planContent(FROZEN_PRE_C7));
+    fs.writeFileSync(path.join(fx.mirrorDir, "v0.6.0-orphan-plan.md"), planContent(FROZEN_PRE_C7), "utf-8");
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    expect(item.description).toContain("1 Tier A");
+    expect(item.description).toContain("1 orphaned mirror-only files");
+    expect(item.details).toContain("informational only, no action taken");
+    expect(item.details).not.toContain("v0.6.0-orphan-plan.md"); // never named as actionable
+  });
+
+  // 9
+  test("project-root walk: a cwd deep inside the project still finds knowledge/plans/ at the ascended root", async () => {
+    const fx = makePlanFixture("psd-walk", fakeHome);
+    writePlanPair(fx, "v0.7.2-walk-plan.md", planContent(STATUS_COMPLETE), planContent(FROZEN_PRE_C7));
+    const nested = path.join(fx.projectRoot, "mcp-server", "src", "tools");
+    fs.mkdirSync(nested, { recursive: true });
+    process.cwd = () => nested; // deeper than makePlanFixture's default
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    expect(item.description).toContain("1 Tier A");
+  });
+
+  test("project-root walk: no knowledge/plans/ in the ancestor chain returns cleanly, no throw and no finding", async () => {
+    // (a) a real project-root marker (.git) but no knowledge/plans/ under it
+    const bare = makeTempDir("psd-nowalk");
+    tempDirs.push(bare);
+    gitInitRepo(bare);
+    mockActiveKg(bare);
+
+    const withMarker = await handleUpgrade({});
+    expect(withMarker.isError).toBeUndefined();
+    expect(planDriftItem(withMarker)).toBeUndefined();
+
+    // (b) no project-root marker at all — findProjectRoot walks to the
+    // filesystem root and gives up; still a clean empty result, not a throw.
+    const unmarked = makeTempDir("psd-nomarker");
+    tempDirs.push(unmarked);
+    mockActiveKg(unmarked);
+
+    const withoutMarker = await handleUpgrade({});
+    expect(withoutMarker.isError).toBeUndefined();
+    expect(planDriftItem(withoutMarker)).toBeUndefined();
+  });
+
+  // 10
+  test("archive/ subdirectory is excluded by the flat, non-recursive listing", async () => {
+    const fx = makePlanFixture("psd-archive", fakeHome);
+    const archiveDir = path.join(fx.plansDir, "archive");
+    fs.mkdirSync(archiveDir, { recursive: true });
+    // Frozen placeholder, no mirror -> would be a Tier B candidate if scanned.
+    fs.writeFileSync(path.join(archiveDir, "v0.5.0-archived-plan.md"), planContent(FROZEN_PRE_C7), "utf-8");
+
+    expect(planDriftItem(await handleUpgrade({}))).toBeUndefined();
+  });
+
+  // 11
+  test("Tier B: a canonical frozen at the placeholder with NO mirror counterpart is still a candidate", async () => {
+    const fx = makePlanFixture("psd-canonical-only", fakeHome);
+    writePlanPair(fx, "v0.7.2-nomirror-plan.md", planContent(FROZEN_C7)); // deliberately no mirror
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    expect(item.description).toContain("0 Tier A");
+    expect(item.description).toContain("1 Tier B");
+    expect(item.description).toContain("0 orphaned");
+    expect(item.details).toContain("v0.7.2-nomirror-plan.md");
+  });
+
+  // 12a
+  test("line-ending normalization (detection): a CRLF canonical vs an LF mirror is still Tier A", async () => {
+    const fx = makePlanFixture("psd-crlf-detect", fakeHome);
+    writePlanPair(
+      fx,
+      "v0.7.2-crlf-plan.md",
+      planContent(STATUS_COMPLETE).replace(/\n/g, "\r\n"),
+      planContent(FROZEN_PRE_C7)
+    );
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    expect(item.description).toContain("1 Tier A");
+  });
+
+  // 12b
+  test("line-ending normalization (detection): trailing newline present vs absent is still Tier A", async () => {
+    const fx = makePlanFixture("psd-trailing-nl", fakeHome);
+    writePlanPair(
+      fx,
+      "v0.7.2-trailing-plan.md",
+      planContent(STATUS_COMPLETE), // ends with "\n"
+      planContent(FROZEN_PRE_C7).replace(/\n+$/, "") // no trailing newline at all
+    );
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    expect(item.description).toContain("1 Tier A");
+  });
+
+  // 12c
+  test("line-ending normalization (detection): lone-\\r line endings are still Tier A", async () => {
+    const fx = makePlanFixture("psd-lone-cr", fakeHome);
+    writePlanPair(
+      fx,
+      "v0.7.2-lonecr-plan.md",
+      planContent(STATUS_COMPLETE).replace(/\n/g, "\r"),
+      planContent(FROZEN_PRE_C7)
+    );
+
+    const item = planDriftItem(await handleUpgrade({}))!;
+    expect(item.description).toContain("1 Tier A");
+  });
+
+  // 13
+  test("overwrite-risk regression (AND, not OR): a hand-annotated mirror STATUS is never a Tier A finding", async () => {
+    // The condition is "mirror looks ^🔴 AND canonical contains ✅ COMPLETE".
+    // Under an OR (or a bare "the two differ") the hand-written note below
+    // would be silently overwritten with canonical's COMPLETE.
+    const fx = makePlanFixture("psd-and-not-or", fakeHome);
+    const mirrorContent = planContent("**STATUS:** 🟡 IN PROGRESS (Step 4 blocked)");
+    const { canonicalPath, mirrorPath } = writePlanPair(
+      fx,
+      "v0.7.2-handnote-plan.md",
+      planContent(STATUS_COMPLETE),
+      mirrorContent
+    );
+
+    expect(planDriftItem(await handleUpgrade({}))).toBeUndefined();
+
+    // And a real apply run leaves the hand annotation alone.
+    const applied = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+    expect(applied.content[0].text).toContain("0 plan mirror(s) synced");
+    expect(fs.readFileSync(mirrorPath, "utf-8")).toBe(mirrorContent);
+    expect(fs.readFileSync(canonicalPath, "utf-8")).toBe(planContent(STATUS_COMPLETE));
+    expect(fs.existsSync(`${mirrorPath}.bak`)).toBe(false);
+  });
+
+  // 14
+  test("backwards-write guard: a canonical still stopped while the mirror was hand-advanced is not Tier A", async () => {
+    const fx = makePlanFixture("psd-backwards", fakeHome);
+    const canonicalContent = planContent("**STATUS:** 🔴 STOPPED (Waiting for Manual Approval of Step 3)");
+    const mirrorContent = planContent(STATUS_COMPLETE);
+    const { canonicalPath, mirrorPath } = writePlanPair(
+      fx,
+      "v0.7.2-backwards-plan.md",
+      canonicalContent,
+      mirrorContent
+    );
+
+    expect(planDriftItem(await handleUpgrade({}))).toBeUndefined();
+
+    const applied = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+    expect(applied.content[0].text).toContain("0 plan mirror(s) synced");
+    // Neither direction written: canonical is never a write target at all, and
+    // the mirror must not be dragged backwards to canonical's stopped state.
+    expect(fs.readFileSync(canonicalPath, "utf-8")).toBe(canonicalContent);
+    expect(fs.readFileSync(mirrorPath, "utf-8")).toBe(mirrorContent);
+    expect(fs.existsSync(`${mirrorPath}.bak`)).toBe(false);
+  });
+
+  test("unreadable entry regression (Opus review, 2026-08-19): a dangling symlink in knowledge/plans/ does not crash the whole inspect", async () => {
+    const fx = makePlanFixture("psd-dangling-symlink", fakeHome);
+    writePlanPair(
+      fx,
+      "v0.7.2-real-plan.md",
+      planContent(STATUS_COMPLETE),
+      planContent(FROZEN_PRE_C7)
+    );
+    // A dangling symlink: readdirSync lists it, but statSync/readFileSync
+    // throw ENOENT on it. Before the fix, this threw out of the unguarded
+    // fs.statSync/fs.readFileSync calls and took down the ENTIRE kg_upgrade
+    // inspect call -- not just this category -- discarding every other
+    // finding along with it.
+    fs.symlinkSync(path.join(fx.plansDir, "does-not-exist.md"), path.join(fx.plansDir, "dangling-plan.md"));
+
+    const parsed = parseInspect(await handleUpgrade({}));
+    // The real Tier A finding still surfaces -- the dangling entry was
+    // skipped, not treated as a reason to abort the scan.
+    const item = parsed.upgrades.find((u) => u.category === "plan-status-drift");
+    expect(item).toBeDefined();
+    expect(item!.description).toContain("1 Tier A");
+  });
+});
+
+describe("plan-status-drift — apply mode", () => {
+  const ORIGINAL_HOME = process.env.HOME;
+  let fakeHome: string;
+
+  beforeEach(() => {
+    fakeHome = makeTempDir("psd-apply-home");
+    tempDirs.push(fakeHome);
+    fakeHomedir(fakeHome); // see the block comment above — $HOME alone does not move os.homedir()
+    process.env.HOME = fakeHome;
+  });
+
+  afterEach(() => {
+    restoreHomedir();
+    if (ORIGINAL_HOME === undefined) delete process.env.HOME;
+    else process.env.HOME = ORIGINAL_HOME;
+  });
+
+  // 15
+  test("Tier A repair: mirror STATUS synced, .bak holds the pre-rewrite mirror, canonical untouched", async () => {
+    const fx = makePlanFixture("psd-repair", fakeHome);
+    const canonicalContent = planContent(STATUS_COMPLETE);
+    const mirrorContent = planContent(FROZEN_PRE_C7);
+    const { canonicalPath, mirrorPath } = writePlanPair(fx, "v0.7.2-repair-plan.md", canonicalContent, mirrorContent);
+
+    const result = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).toContain("[plan-status-drift] 1 plan mirror(s) synced to canonical STATUS.");
+    expect(fs.readFileSync(mirrorPath, "utf-8")).toBe(canonicalContent); // STATUS line now matches exactly
+    expect(fs.readFileSync(`${mirrorPath}.bak`, "utf-8")).toBe(mirrorContent); // pre-rewrite content
+    expect(fs.readFileSync(canonicalPath, "utf-8")).toBe(canonicalContent); // one-direction only
+    expect(fs.existsSync(`${canonicalPath}.bak`)).toBe(false); // canonical is never a write target
+  });
+
+  // 16a
+  test("re-check before write: a mirror that stopped qualifying between scan and apply is skipped, not overwritten", async () => {
+    const fx = makePlanFixture("psd-recheck-skip", fakeHome);
+    const { mirrorPath } = writePlanPair(
+      fx,
+      "v0.7.2-recheck-plan.md",
+      planContent(STATUS_COMPLETE),
+      planContent(FROZEN_PRE_C7)
+    );
+
+    // Scan sees a Tier A finding...
+    expect(planDriftItem(await handleUpgrade({}))!.description).toContain("1 Tier A");
+
+    // ...then the user edits the mirror out from under it.
+    const handEdited = planContent("**STATUS:** 🟡 IN PROGRESS (reopened by hand)");
+    fs.writeFileSync(mirrorPath, handEdited, "utf-8");
+
+    const result = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("0 plan mirror(s) synced");
+    expect(fs.readFileSync(mirrorPath, "utf-8")).toBe(handEdited); // stale finding not replayed
+    expect(fs.existsSync(`${mirrorPath}.bak`)).toBe(false); // nothing was even backed up
+  });
+
+  // 16b
+  test("re-check before write: a mirror changed to a DIFFERENT stopped variant is written from the NEW state", async () => {
+    const fx = makePlanFixture("psd-recheck-new", fakeHome);
+    const canonicalContent = planContent(STATUS_COMPLETE);
+    const preScanMirror = planContent(FROZEN_PRE_C7);
+    const { mirrorPath } = writePlanPair(fx, "v0.7.2-recheck2-plan.md", canonicalContent, preScanMirror);
+
+    expect(planDriftItem(await handleUpgrade({}))!.description).toContain("1 Tier A");
+
+    // Still Tier A-shaped, but different bytes than the scan saw.
+    const postScanMirror = planContent(FROZEN_C7);
+    fs.writeFileSync(mirrorPath, postScanMirror, "utf-8");
+
+    const result = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("1 plan mirror(s) synced");
+    expect(fs.readFileSync(mirrorPath, "utf-8")).toBe(canonicalContent);
+    // The backup is the state at write time, not the state the scan saw.
+    expect(fs.readFileSync(`${mirrorPath}.bak`, "utf-8")).toBe(postScanMirror);
+    expect(fs.readFileSync(`${mirrorPath}.bak`, "utf-8")).not.toBe(preScanMirror);
+  });
+
+  // 17
+  test("Tier B is NEVER touched by apply: zero files written, zero .bak files created", async () => {
+    const fx = makePlanFixture("psd-tier-b-untouched", fakeHome);
+    seedCommit(fx.projectRoot);
+    mergeBranchNoFf(fx.projectRoot, "v0.7.2-c6-frozen"); // strongest-looking evidence available
+
+    const pairs = [
+      writePlanPair(fx, "v0.7.2-c6-frozen-plan.md", planContent(FROZEN_PRE_C7), planContent(FROZEN_PRE_C7)),
+      writePlanPair(fx, "v0.7.2-c7-frozen-plan.md", planContent(FROZEN_C7), planContent(FROZEN_C7)),
+    ];
+    // Plus a canonical-only Tier B candidate (no mirror at all).
+    const canonicalOnly = writePlanPair(fx, "v0.7.2-c8-frozen-plan.md", planContent(FROZEN_PRE_C7));
+
+    const before = pairs.map((p) => ({
+      canonical: fs.readFileSync(p.canonicalPath, "utf-8"),
+      mirror: fs.readFileSync(p.mirrorPath, "utf-8"),
+    }));
+
+    const result = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).toContain("0 plan mirror(s) synced");
+    pairs.forEach((p, i) => {
+      expect(fs.readFileSync(p.canonicalPath, "utf-8")).toBe(before[i].canonical);
+      expect(fs.readFileSync(p.mirrorPath, "utf-8")).toBe(before[i].mirror);
+    });
+    expect(fs.existsSync(canonicalOnly.mirrorPath)).toBe(false); // no mirror conjured into existence
+    expect(listBakFiles(fx.plansDir)).toEqual([]);
+    expect(listBakFiles(fx.mirrorDir)).toEqual([]);
+  });
+
+  // 18
+  test("idempotency: a second apply against an already-synced mirror is a full no-op and does not clobber the .bak", async () => {
+    // Mirrors the diff-blank-reconstruction BLOCKER regression test above: the
+    // failure mode there was a second run re-classifying an already-handled
+    // file and overwriting .bak with already-mutated content, making the true
+    // original unrecoverable.
+    const fx = makePlanFixture("psd-idempotent", fakeHome);
+    const canonicalContent = planContent(STATUS_COMPLETE);
+    const originalMirror = planContent(FROZEN_PRE_C7);
+    const { mirrorPath } = writePlanPair(fx, "v0.7.2-idem-plan.md", canonicalContent, originalMirror);
+
+    const first = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+    expect(first.content[0].text).toContain("1 plan mirror(s) synced");
+    const afterFirst = fs.readFileSync(mirrorPath, "utf-8");
+    expect(fs.readFileSync(`${mirrorPath}.bak`, "utf-8")).toBe(originalMirror);
+
+    const second = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+    expect(second.isError).toBeUndefined();
+    expect(second.content[0].text).toContain("0 plan mirror(s) synced");
+    expect(fs.readFileSync(mirrorPath, "utf-8")).toBe(afterFirst); // untouched by the second run
+    expect(fs.readFileSync(`${mirrorPath}.bak`, "utf-8")).toBe(originalMirror); // still the true original
+    expect(listBakFiles(fx.mirrorDir)).toEqual([`${mirrorPath}.bak`]); // exactly one, no duplicates
+    // The category is idempotent at the inspect layer too — nothing left to report.
+    expect(planDriftItem(await handleUpgrade({}))).toBeUndefined();
+  });
+
+  // 19
+  test("graph-independence (apply): succeeds against a graph whose registered path is missing, writes no version sentinel", async () => {
+    const fx = makePlanFixture("psd-graph-independent", fakeHome);
+    const canonicalContent = planContent(STATUS_COMPLETE);
+    const { mirrorPath } = writePlanPair(fx, "v0.7.2-nograph-plan.md", canonicalContent, planContent(FROZEN_PRE_C7));
+
+    // Registered at a path that resolves from cwd (dirname is projectRoot) but
+    // does not exist on disk.
+    const gonePath = path.join(fx.projectRoot, "gone-kg");
+    mockActiveKg(fx.projectRoot, { path: gonePath });
+    expect(fs.existsSync(gonePath)).toBe(false);
+
+    const result = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).not.toContain("KG path not found");
+    expect(result.content[0].text).toContain("1 plan mirror(s) synced");
+    expect(fs.readFileSync(mirrorPath, "utf-8")).toBe(canonicalContent);
+    // Never writes lastAppliedVersion onto an unrelated (here, nonexistent) graph.
+    expect(writeConfig as jest.Mock).not.toHaveBeenCalled();
+    expect(fs.existsSync(gonePath)).toBe(false); // and never resurrects the path
+  });
+
+  test("graph-independence (inspect): a missing KG path returns the finding plus a resolution item, not a bare error", async () => {
+    const fx = makePlanFixture("psd-graph-independent-inspect", fakeHome);
+    writePlanPair(fx, "v0.7.2-nograph2-plan.md", planContent(STATUS_COMPLETE), planContent(FROZEN_PRE_C7));
+
+    const gonePath = path.join(fx.projectRoot, "gone-kg");
+    mockActiveKg(fx.projectRoot, { path: gonePath });
+
+    const result = await handleUpgrade({});
+    const parsed = parseInspect(result);
+
+    // The already-computed finding survives instead of being discarded.
+    const item = parsed.upgrades.find((u) => u.category === "plan-status-drift");
+    expect(item).toBeDefined();
+    expect(item!.description).toContain("1 Tier A");
+    // The resolution marker belongs in upgrades[], NOT warnings[] (Opus
+    // review, 2026-08-19): kmg-upgrade-inspector.md's warnings[] contract
+    // routes every entry through the platform-split wizard flow, which has
+    // no handler for a bare "resolution" marker -- only upgrades[] has the
+    // dedicated informational-only "resolution" case this needs.
+    const resolution = parsed.upgrades.find((u) => u.category === "resolution");
+    expect(resolution).toBeDefined();
+    expect(resolution!.description).toContain("KG path not found");
+    expect(parsed.warnings.find((w) => w.category === "resolution")).toBeUndefined();
+  });
+
+  // 20
+  test("consent gate: apply without confirmBackfix in automated mode returns KMG_INPUT_REQUIRED and writes nothing", async () => {
+    const fx = makePlanFixture("psd-gate-unanswered", fakeHome);
+    const mirrorContent = planContent(FROZEN_PRE_C7);
+    const { mirrorPath } = writePlanPair(fx, "v0.7.2-gate-plan.md", planContent(STATUS_COMPLETE), mirrorContent);
+
+    const result = await handleUpgrade({ apply: ["plan-status-drift"] });
+
+    expect(result.isError).toBe(true);
+    expect(result.content.length).toBe(1); // only category in the call — bare JSON at content[0]
+    const errorBlock = JSON.parse(result.content[0].text);
+    expect(errorBlock.error).toBe("KMG_INPUT_REQUIRED");
+    expect(errorBlock.reason).toContain("plan_status_drift_backfix");
+    expect(errorBlock.resolveWith.param).toBe("confirmBackfix"); // the shared c5 param, not a new one
+    expect(errorBlock.detail).toContain("1 plan file(s)");
+    expect(fs.readFileSync(mirrorPath, "utf-8")).toBe(mirrorContent);
+    expect(fs.existsSync(`${mirrorPath}.bak`)).toBe(false);
+  });
+
+  // 21
+  test("consent gate DECLINED: an explicit confirmBackfix:false still writes nothing", async () => {
+    // Highest-risk path per plan review: a user who answered "no" must never
+    // end up with written files. `confirmed === true` is a strict check, so
+    // false is treated as "not consented", never as a bypass.
+    const fx = makePlanFixture("psd-gate-declined", fakeHome);
+    const mirrorContent = planContent(FROZEN_PRE_C7);
+    const { canonicalPath, mirrorPath } = writePlanPair(
+      fx,
+      "v0.7.2-declined-plan.md",
+      planContent(STATUS_COMPLETE),
+      mirrorContent
+    );
+
+    const result = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: false });
+
+    expect(result.isError).toBe(true);
+    const errorBlock = JSON.parse(result.content[0].text);
+    expect(errorBlock.error).toBe("KMG_INPUT_REQUIRED");
+    expect(errorBlock.resolveWith.param).toBe("confirmBackfix");
+    expect(fs.readFileSync(mirrorPath, "utf-8")).toBe(mirrorContent);
+    expect(fs.readFileSync(canonicalPath, "utf-8")).toBe(planContent(STATUS_COMPLETE));
+    expect(listBakFiles(fx.mirrorDir)).toEqual([]);
+    expect(listBakFiles(fx.plansDir)).toEqual([]);
+  });
+
+  // 22
+  test("mixed Tier A + Tier B in one run: Tier A repaired, Tier B untouched and still reported", async () => {
+    const fx = makePlanFixture("psd-mixed", fakeHome);
+    seedCommit(fx.projectRoot);
+    mergeBranchNoFf(fx.projectRoot, "v0.7.2-mixed-b");
+
+    const canonicalA = planContent(STATUS_COMPLETE);
+    const mirrorA = planContent(FROZEN_PRE_C7);
+    const a = writePlanPair(fx, "v0.7.2-mixed-a-plan.md", canonicalA, mirrorA);
+
+    const frozenB = planContent(FROZEN_PRE_C7);
+    const b = writePlanPair(fx, "v0.7.2-mixed-b-plan.md", frozenB, frozenB);
+
+    const before = planDriftItem(await handleUpgrade({}))!;
+    expect(before.description).toContain("1 Tier A");
+    expect(before.description).toContain("1 Tier B");
+
+    const result = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("1 plan mirror(s) synced");
+
+    // Tier A repaired...
+    expect(fs.readFileSync(a.mirrorPath, "utf-8")).toBe(canonicalA);
+    expect(fs.readFileSync(`${a.mirrorPath}.bak`, "utf-8")).toBe(mirrorA);
+    // ...Tier B completely untouched, and still surfaced for manual review.
+    expect(fs.readFileSync(b.canonicalPath, "utf-8")).toBe(frozenB);
+    expect(fs.readFileSync(b.mirrorPath, "utf-8")).toBe(frozenB);
+    expect(fs.existsSync(`${b.mirrorPath}.bak`)).toBe(false);
+
+    const after = planDriftItem(await handleUpgrade({}))!;
+    expect(after.description).toContain("0 Tier A");
+    expect(after.description).toContain("1 Tier B");
+    expect(after.details).toContain("v0.7.2-mixed-b-plan.md");
+  });
+
+  // 23
+  test("line-ending preservation (write): a CRLF mirror stays CRLF throughout, never mixed", async () => {
+    // Distinct from the detection-side CRLF test: an earlier draft fixed only
+    // the comparison, so the write spliced canonical's LF-terminated line into
+    // a CRLF file and produced a mixed-line-ending mirror that a naive
+    // idempotency check would not have caught.
+    const fx = makePlanFixture("psd-crlf-write", fakeHome);
+    const canonicalContent = planContent(STATUS_COMPLETE); // LF
+    const mirrorContent = planContent(FROZEN_PRE_C7).replace(/\n/g, "\r\n"); // CRLF
+    const { mirrorPath } = writePlanPair(fx, "v0.7.2-crlf-write-plan.md", canonicalContent, mirrorContent);
+
+    const result = await handleUpgrade({ apply: ["plan-status-drift"], confirmBackfix: true });
+    expect(result.content[0].text).toContain("1 plan mirror(s) synced");
+
+    const after = fs.readFileSync(mirrorPath, "utf-8");
+    expect(after).toContain("**STATUS:** ✅ COMPLETE"); // the repair actually happened
+    expect(after).not.toContain(FROZEN_PRE_C7);
+    // Internally consistent: every LF in the file is part of a CRLF pair.
+    const lfCount = (after.match(/\n/g) || []).length;
+    const crlfCount = (after.match(/\r\n/g) || []).length;
+    expect(lfCount).toBeGreaterThan(0);
+    expect(crlfCount).toBe(lfCount);
+    // And exactly what canonical says, once line endings are normalized away.
+    expect(after.replace(/\r\n/g, "\n")).toBe(canonicalContent);
+    expect(fs.readFileSync(`${mirrorPath}.bak`, "utf-8")).toBe(mirrorContent);
   });
 });

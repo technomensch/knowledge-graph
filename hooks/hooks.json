@@ -41,7 +41,7 @@
         "hooks": [
           {
             "type": "command",
-            "comment": "After writing to ~/.claude/plans/: mirror to docs/plans/ in active KG project",
+            "comment": "After writing to ~/.claude/plans/: mirror to knowledge/plans/ (or docs/plans/ if the project has no knowledge/ dir) in the resolved KG project",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/plan-mirror.sh",
             "timeout": 10
           }

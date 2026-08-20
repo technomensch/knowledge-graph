@@ -3,7 +3,7 @@
 **Status:** 🟡 Proposed
 **Discovered:** 2026-07-05
 **Governed by:** none (stale-link/scaffold-parity fix, not a new command/skill/docstring — ADR-058's naming/scope check does not apply)
-**Related:** ADR-027 (Docusaurus Docs Restructure — Diátaxis IA; the causal decision that deleted `GETTING-STARTED.md`), `core/default-templates/decisions/README.md`, `core/default-templates/lessons-learned/README.md`, `core/default-templates/enhancements/README.md`, `core/default-templates/issues/README.md`, `knowledge/decisions/README.md`, `knowledge/enhancements/README.md`, `knowledge/issues/README.md`, `knowledge/sessions/2026-04/2026-04-07-docs-restructure-planning.md`, branch `v0.6.16-update-claude-extract-chat-for-sub-agents`
+**Related:** ADR-027 (Docusaurus Docs Restructure — Diátaxis IA; the causal decision that deleted `GETTING-STARTED.md`), `core/default-templates/decisions/README.md`, `core/default-templates/lessons-learned/README.md`, `core/default-templates/enhancements/README.md`, `core/default-templates/issues/README.md`, `knowledge/decisions/README.md`, `knowledge/enhancements/README.md`, `knowledge/issues/README.md`, `knowledge/sessions/2026-04/2026-04-07-docs-restructure-planning.md`, branch `v0.6.16-update-claude-extract-chat-for-sub-agents`, [ENH-042](../ENH-042/ENH-042-specification.md) (same-session sibling finding, same ADR-027-drift root cause for one of its contributing bugs; backlinked 2026-08-19)
 
 ---
 

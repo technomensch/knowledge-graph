@@ -99,3 +99,8 @@ Extracted output follows the existing per-date naming pattern: `YYYY-MM-DD-codex
 - `core/scripts/extract_gemini.py` — reference implementation for new module
 - `commands/extract-chat.md` — PROTECTED: requires explicit user permission for edits
 - ADR-044 — Split Oversized Daily Chat History Files (applies to Codex output too)
+- [issue-11](../../issues/issue-11/issue-11-description.md) — cites this ENH (created
+  2026-06-12, well after the Cause-1 fix landed) as the first confirmed instance of Cause
+  2: specs bypassing `start-issue-tracking` entirely (most likely via
+  `superpowers:brainstorming` output), never reaching the step that creates a GitHub
+  issue. Backlinked 2026-08-19.

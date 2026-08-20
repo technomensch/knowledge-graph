@@ -186,6 +186,14 @@ if [ -x "$SYNC_CHECK" ]; then
   fi
 fi
 
+# ── Gate 4b: kmg-create-adr dual-implementation regression guard (issue-48) ───
+
+ADR_DISPATCH_CHECK="${REPO_ROOT}/scripts/check-adr-command-dispatch.sh"
+if [ -x "$ADR_DISPATCH_CHECK" ]; then
+  ADR_DISPATCH_OUT=$("$ADR_DISPATCH_CHECK" 2>&1) || FINDINGS="${FINDINGS}${ADR_DISPATCH_OUT}
+"
+fi
+
 # ── Gate 5: KG index-count drift + backlink symmetry (ENH-052) ────────────────
 
 # Index-count drift: declared "Total X" in each area's README vs real count.

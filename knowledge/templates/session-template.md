@@ -22,7 +22,7 @@ Before writing code or making changes, read everything below.
 Skipping any item means starting work without full context.
 
 **External files:**
-- [ ] `docs/plans/{plan-file}.md`
+- [ ] `knowledge/plans/{plan-file}.md`
       WHY: current implementation step and acceptance criteria.
       Without it you will not know where to start or what done looks like.
 - [ ] `knowledge/enhancements/ENH-NNN/ENH-NNN-specification.md`  *(if applicable)*
@@ -49,7 +49,7 @@ Skipping any item means starting work without full context.
 - **Branch:** {branch-name}
 - **Commit:** {short-hash} — {latest commit message}
 - **Uncommitted changes:** {git status --porcelain summary, or "clean"}
-- **In-progress work:** `docs/plans/{plan-file}.md`
+- **In-progress work:** `knowledge/plans/{plan-file}.md`
 - **Next steps:** {first unchecked step from active plan}
 - **Active KG:** {KG name}
 
@@ -64,7 +64,7 @@ None found.
 None found.
 
 ### Active Plans
-<!-- ls docs/plans/*.md -->
+<!-- ls knowledge/plans/*.md -->
 None found.
 
 ### Pending Decisions

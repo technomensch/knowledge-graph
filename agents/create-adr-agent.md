@@ -3,7 +3,7 @@
 
 Creates a new Architecture Decision Record (ADR) through an interactive wizard. Handles numbering, git metadata, user prompts, template population, and index management.
 
-**Boundary with `create-adr` command:** This agent contains the full ADR creation logic. The `create-adr` command currently embeds its own implementation (v0.2.2 will refactor it to a thin dispatch wrapper).
+**Boundary with `create-adr` command:** This agent contains the full ADR creation logic. The `create-adr` command is a thin dispatch wrapper — it resolves and passes only the level-routing flag, the model tier, and an optional title, then hands off to this agent. Nothing else is passed: this agent re-derives the target KG path (Phase -1), the ADR number (Phase 1, with its own cross-branch collision check), and git metadata (Phase 2) itself, then runs the wizard, writes the file, updates the index, and commits. Do not trim those phases as redundant — the command does not supply their values.
 
 ---
 
@@ -130,7 +130,7 @@ If git is unavailable, skip git metadata and proceed with manual fields only.
 
 **If `wizard_mode: false` (context was passed):**
 
-Skip all 8 wizard questions. Use the passed payload to populate all fields:
+Skip all 9 wizard questions. Use the passed payload to populate all fields:
 - title → from payload
 - status → from payload (default "Proposed" if blank)
 - category → from payload
@@ -249,41 +249,27 @@ Proceed? (yes / change details / cancel)
 
 Read the base template from `${CLAUDE_PLUGIN_ROOT}/core/default-templates/decisions/ADR-template.md`.
 
-Populate all frontmatter fields:
-
-```yaml
----
-title: "ADR-{NNN}: {title}"
-number: {NNN}
-created: {ISO 8601 timestamp}
-status: {status}
-author: {git user.name}
-email: {git user.email}
-git:
-  branch: {branch}
-  commit: {full SHA}
-  pr: {pr-number or null}
-  issue: {issue-number or null}
-implements: {$implements_ref}
-related:
-  adrs: []
-  lessons: [{lesson filenames if provided}]
-  kg_entries: []
-tags: [{category}]
-category: {architecture|process|technology}
----
-```
-
-Populate each body section with user responses from Phase 3. Preserve all template section headers. Leave unprovided optional sections as "None".
+`content` sent to `kg_capture` is body-only — no frontmatter block. The MCP
+server generates the frontmatter from `metadata` below; populate each body
+section with user responses from Phase 3, preserve all template section
+headers, leave unprovided optional sections as "None".
 
 Call `kg_capture` MCP tool:
 
 ```json
 {
-  "content": "[Full populated ADR markdown]",
+  "content": "[Populated ADR body sections only — no frontmatter]",
   "type": "adr",
   "metadata": {
-    "title": "ADR-{NNN}: {title}",
+    "title": "{title}",
+    "status": "{status}",
+    "number": {NNN},
+    "implements": "{$implements_ref}",
+    "related": {
+      "adrs": [],
+      "lessons": [{lesson filenames if provided}],
+      "kg_entries": []
+    },
     "category": "{category}",
     "tags": ["{category}"],
     "git": {
@@ -291,7 +277,9 @@ Call `kg_capture` MCP tool:
       "commit": "{full hash}",
       "commit_short": "{short hash}",
       "author": "{Author Name}",
-      "email": "{email}"
+      "email": "{email}",
+      "pr": "{pr-number or null}",
+      "issue": "{issue-number or null}"
     }
   }
 }

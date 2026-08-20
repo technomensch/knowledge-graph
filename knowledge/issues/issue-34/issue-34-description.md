@@ -2,7 +2,7 @@
 id: issue-34
 type: Bug
 status: fixed
-github-issue: null
+github-issue: pending
 branch: none
 created: 2026-07-30
 related_enhs: ["ENH-056"]
@@ -42,6 +42,9 @@ Captured live, lightweight, local-only — track only, no plan, no branch. Direc
 - `mcp-server/src/tools/search.ts` (fallback `searchDirs`)
 - ENH-056 (`knowledge/enhancements/ENH-056/ENH-056-specification.md`) — candidate meta-issue attempt-loop prompt assumes recall covers issues, which this bug shows it currently does not
 - issue-35 — separate bug found in the same investigation (dead `"knowledge"` path literal in the same two directory lists)
+- [issue-18](../issue-18/issue-18-description.md) — cites this issue as the reason its own
+  recall sweep searched `issues/`/`enhancements/` via direct grep instead of `kg_search`
+  (FTS5 didn't cover those directories at the time). Backlinked 2026-08-19.
 
 ## Fix Plan (C2, branch v0.7.0)
 

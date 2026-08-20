@@ -51,7 +51,7 @@ The tool returns:
 
 **Parse `upgrades[]`:**
 - For each entry: add its `description` to the wizard's pending items display.
-- For each entry with `category` in `["directories", "config", "templates", "starter-relocation", "stray-knowledge-dir", "status-schema"]`: add the deduplicated `category` value to `_mcp_apply[]` (dedup: only add if not already present) and set its per-category tracking flag in your context:
+- For each entry whose `category` is neither `"version-update"` nor `"resolution"` (both handled separately below, and neither is a member of `kg_upgrade`'s apply enum): add the deduplicated `category` value to `_mcp_apply[]` (dedup: only add if not already present), then set its per-category tracking flag in your context if one is listed for it below — categories with no flag listed (e.g. `config-location`, `capture-corruption`) simply don't set one:
   - `"directories"` → `_mcp_covered_directories=true`
   - `"config"` → `_mcp_covered_config=true`
   - `"templates"` → `_mcp_covered_templates=true`
@@ -59,6 +59,7 @@ The tool returns:
   - `"stray-knowledge-dir"` → `_mcp_covered_stray_knowledge_dir=true`
   - `"status-schema"` → `_mcp_covered_status_schema=true` (ADR-067 Task 8.1: reconciles the legacy `.active`/schema-less registry shape and removes the leftover legacy config file; see the confirmMigration note under "Apply MCP-covered items first" below)
 - If `category` is `"version-update"`: display the description as an informational item but do NOT add to `_mcp_apply[]` and do NOT set a tracking flag — it is inspect-only and cannot be applied via `kg_upgrade apply`.
+- If `category` is `"resolution"`: display the description as an informational item but do NOT add to `_mcp_apply[]` and do NOT set a tracking flag — it is a resolution-failure marker, not a member of the apply enum, and cannot be applied via `kg_upgrade apply`.
 
 These per-category flags are **LLM-tracked state variables** — they are tracked in your context across bash block invocations in this module, not as shell variables. Each guarded bash block below begins with a prose instruction ("Only run if `_mcp_covered_X` is not set") that is the actual gate.
 
@@ -320,18 +321,31 @@ Apply all, pick individually, or skip?
 
 **Implementation note:** The preview is a display-only pass over the same inspection data already collected — no new filesystem checks are needed. The `--preview` flag can be passed as an argument to `/kmgraph:kmg-init` to jump directly to the preview without showing the menu first: if the command is invoked with `--preview`, run the inspection, show the preview, and then show the Apply/Choose/Skip menu (without option 0, since preview has already run).
 
-If the user picks option 2 (choose individually), present each item as a separate yes/no prompt before running it.
+If the user picks option 2 (choose individually), ask every item's yes/no question first and record each answer — do not call `kg_upgrade apply` or run any bash fallback during this loop. Track which `category` each MCP-sourced item came from (Step 0 already read this from the same `upgrades[]` entries); bash-detected items (e.g. missing-directory or stray-file findings) have no `category` and are handled by their own section below, not through `_mcp_apply[]`. After collecting all answers: for each declined item that has a `category`, remove that `category` from `_mcp_apply[]` (dedup-safe: only remove if present) — an item shown but declined must never reach `kg_upgrade apply`, and this matters most for `capture-corruption`, `diff-blank-reconstruction` (issue-47), and `plan-status-drift` (issue-49, Tier A only), all of which rewrite files. Do NOT clear that category's `_mcp_covered_*` flag when pruning — the flag means "this category was present in Step 0's `upgrades[]`," not "this category was applied," and clearing it would route the declined item into the bash fallback (sections a/b/c/l/m) instead, applying it anyway. `templates` covers multiple files deduped into a single `_mcp_apply[]` entry: if the user declines any template item, drop `"templates"` from `_mcp_apply[]` entirely (it applies all-or-nothing) and tell the user the approved template items were skipped along with it. Once all prunes are done, make one batched `kg_upgrade apply` call for whatever remains in `_mcp_apply[]`; if declining leaves it empty, skip the call entirely.
 
 If the user picks option 3 (skip), exit with no changes.
 
+**Regardless of Apply all vs. choose individually:** if `_mcp_apply[]` contains `"status-schema"`, `"capture-corruption"`, `"diff-blank-reconstruction"` (issue-47), or `"plan-status-drift"` (issue-49), show the user that item's full `details` text (not just its one-line `description` from the pending-items list) and get an explicit yes/no on it specifically before proceeding — one confirmation per category present, even when more than one of these four is pending in the same call. These categories require passing `confirmMigration`/`confirmBackfix` below, and the consent that unlocks those flags must be informed by what the fix actually does (schema migration; file renames and frontmatter rewrites; session-file content edits reconstructed from git history; a plan mirror's STATUS line synced to its canonical) — not just the finding summary shown earlier. `confirmBackfix` is a single shared boolean, not per-category (see the drift-guard comment on `ApplyCategory` in `upgrade.ts`): if more than one of `capture-corruption`, `diff-blank-reconstruction`, and `plan-status-drift` are pending, each still gets its own details-shown confirmation per this paragraph — do not let one item's yes silently stand in for another's. If this explicit confirmation is declined for any one item, remove that category from `_mcp_apply[]` (same pruning rule as above); a decline on one confirmBackfix-gated category does not affect another that was separately confirmed.
+
 **Apply MCP-covered items first** (when `_mcp_apply[]` is non-empty):
 
-Call `kg_upgrade apply: [<_mcp_apply contents>]`. **If `_mcp_apply[]` contains `"status-schema"`, the same call must also pass `confirmMigration: true`** — the wizard's own consent step (the item's description was already shown in the pending-items list above, and the user chose "Apply all" or explicitly approved this item under "choose individually") satisfies `kg_upgrade`'s consent gate for this migration; without `confirmMigration: true` the tool call will fail with `KMG_INPUT_REQUIRED` even though the user already agreed.
+Call `kg_upgrade apply: [<_mcp_apply contents>]`. **If `_mcp_apply[]` contains `"status-schema"`, the same call must also pass `confirmMigration: true`** — the explicit details-shown confirmation required above satisfies `kg_upgrade`'s consent gate for this migration; without `confirmMigration: true` the tool call will fail with `KMG_INPUT_REQUIRED` even though the user already agreed.
 
-`_mcp_apply[]` may only contain values from the valid apply enum: `"directories"`, `"config"`, `"templates"`, `"starter-relocation"`, `"stray-knowledge-dir"`, `"status-schema"`. Never include `"version-update"` or `"platform-split"` — these will cause Zod validation to reject the entire call.
+**If `_mcp_apply[]` contains any of `"capture-corruption"`, `"diff-blank-reconstruction"`, or `"plan-status-drift"`, the same call must also pass `confirmBackfix: true`** — the explicit details-shown confirmation(s) required above satisfy `kg_upgrade`'s consent gate for all three backfixes (they share one boolean, not one each — see the paragraph above); without `confirmBackfix: true` the tool call will fail even though the user already agreed.
+
+`_mcp_apply[]` contains exactly the categories Step 0 added to it from `upgrades[]` (minus anything removed above for a declined item) — never anything from `warnings[]`, and never `"version-update"` or `"resolution"`; including either of the latter two will cause Zod validation to reject the entire call. `"platform-split"` IS a valid apply-enum member but is never a candidate here in practice: `kg_upgrade inspect` reports it under `warnings[]`, not `upgrades[]` (see the `warnings[]` handling note above), so Step 0's loop over `upgrades[]` never encounters it — do not add it here manually.
 
 Example: if Step 0 found `directories` and `templates` pending:
 `kg_upgrade apply: ["directories", "templates"]`
+
+Example: if Step 0 found `status-schema` and `capture-corruption` pending, both approved:
+`kg_upgrade apply: ["status-schema", "capture-corruption"], confirmMigration: true, confirmBackfix: true`
+
+Example: if Step 0 found `capture-corruption` and `diff-blank-reconstruction` both pending — each got its own separate details-shown confirmation above, both approved — the call still passes `confirmBackfix: true` only once (it's one shared flag covering both, not two separate ones):
+`kg_upgrade apply: ["capture-corruption", "diff-blank-reconstruction"], confirmBackfix: true`
+
+Example: if Step 0 found `plan-status-drift` pending alone (a stale `~/.claude/plans/` mirror), approved:
+`kg_upgrade apply: ["plan-status-drift"], confirmBackfix: true`
 
 Example: if Step 0 found `status-schema` pending (alone or combined with other MCP-covered categories):
 `kg_upgrade apply: ["status-schema"], confirmMigration: true`

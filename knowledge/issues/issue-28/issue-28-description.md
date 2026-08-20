@@ -76,6 +76,7 @@ Checked `hooks/hooks.json`: the hook is wired as `${CLAUDE_PLUGIN_ROOT}/scripts/
 - [Lesson: Plugin Cache Not Synced From Local Repo](../../lessons-learned/debugging/Lessons_Learned_Debugging_Plugin_Cache_Not_Synced_From_Local_Repo.md) — same family, scoped to `commands/`/`core/`/`skills/`, not verified against `mcp-server/dist/`
 - [Lesson: Local Marketplace Testing - Two-Location Sync Required](../../lessons-learned/process/local-marketplace-testing-workflow.md) — same underlying pattern under an older local-marketplace testing topology
 - [ENH-052](../../enhancements/ENH-052/ENH-052-specification.md) — names this issue directly as the reason its Gates 5/6 don't yet protect a real push (they run from this working tree, not the installed plugin cache). Backlinked 2026-07-26 (paperwork-audit backlink-symmetry check).
+- [issue-49](../issue-49/issue-49-description.md), [issue-50](../issue-50/issue-50-description.md), [issue-51](../issue-51/issue-51-description.md) — all three name this issue, alongside issue-13/ENH-042/issue-26, as part of ENH-052's "internal paperwork drifts silently, nothing catches it" pattern family. Backlinked 2026-08-19.
 
 ### On the ADR question
 

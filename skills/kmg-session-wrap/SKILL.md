@@ -16,7 +16,7 @@ description: Prompt for session summary when user indicates they are stopping wo
 - Milestone completed
 
 **Active Work Signals:**
-- `docs/plans/*.md` contains unchecked `- [ ]` items (mid-plan indicator)
+- `knowledge/plans/*.md` or `~/.claude/plans/*.md` contains unchecked `- [ ]` items (mid-plan indicator)
 - `knowledge/decisions/*.md` has ADRs with `Status: Proposed` or `Status: Draft` (open decisions)
 - Recent commits have lesson-worthy keywords (`fix`, `solved`, `implement`, `pattern`, `debug`, `refactor`) but no corresponding lesson file in `knowledge/lessons-learned/`
 - Rules were captured to `knowledge/rules.md` or `knowledge/me.md` this session: surface "You established N guideline(s) this session. Worth checking whether any of them only apply in specific situations."

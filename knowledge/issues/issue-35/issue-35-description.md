@@ -2,7 +2,7 @@
 id: issue-35
 type: Bug
 status: fixed
-github-issue: null
+github-issue: pending
 branch: none
 created: 2026-07-30
 related_adrs: ["ADR-066"]

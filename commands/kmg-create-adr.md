@@ -42,13 +42,9 @@ detection is now native to how `kg_capture`/`create-adr-agent` already resolve s
   one message is not reproduced here; see issue-18's decision record for why this is an
   accepted scope narrowing.
 
-Pass the resolved flag (`--user`, `--project`, `--named=<kg>`, or `--active`) to the `create-adr-agent` invocation.
-
 #### Tier resolution
 
 Set `$requested_tier` = `standard-tier`. Invoke `ai-model-tier-resolver` module (`commands/init-shared/ai-model-tier-resolver.md`) with `$requested_tier` and `{KG_PATH}`. On success: pass `--model [$resolved_model]` to the subagent.
-
-After the agent returns, extract the draft content and display it verbatim in your main-thread response before asking save/edit/cancel. Do not rely on the tool result being visible to the user.
 
 ---
 
@@ -62,6 +58,10 @@ command, not just the `create-adr-agent` dispatch):
 
 - **`--active` (default):** call `kg_resolve` (no scope — cwd-derived). Take the returned
   `path` as `{active_kg_path}`.
+- **`--project`:** same as `--active` — call `kg_resolve` (cwd-derived). `--project` and
+  `--active` resolve to the same project graph from this command's cwd-derived context;
+  the distinction matters at the `create-adr-agent` dispatch (Phase -1), which targets
+  `kg_capture` differently per flag even when the resolved path is identical.
 - **`--user`:** call `kg_resolve` with `scope: "user"`. Take the returned `path` as
   `{active_kg_path}`.
 - **`--named=<kg>`:** look up `graphs["<kg>"].path` directly from
@@ -152,10 +152,10 @@ ls {active_kg_path}/decisions/ | grep -E '^ADR-[0-9]+'
 - Single ADR exists → next is its number + 1
 - No ADRs exist → start at 001
 
-**Announce to user:**
-```
-Auto-detected: ADR-002 (next sequential number from 1 existing ADR)
-```
+Do not announce this number to the user — `create-adr-agent` (Phase 1)
+independently re-derives it with a cross-branch collision check that can
+bump it, and is the number that actually gets used. Announcing here risks
+showing the user two different ADR numbers in one run.
 
 ---
 
@@ -176,276 +176,33 @@ git rev-parse HEAD          # commit (full SHA)
 - Branch with no numeric prefix → `null`
 - Verify PR with: `gh pr list --head $(git rev-parse --abbrev-ref HEAD) --json number --jq '.[0].number'` (if gh CLI available)
 
-**If git is not available:**
-- Skip all git metadata fields
-- Create frontmatter with title, number, created, status, category only
-
-**Current timestamp:** Use ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ`
-
----
-
-## Step 3: Interactive Wizard (INTERACTIVE)
-
-**Ask the user these questions. Wait for answers before proceeding.**
-
-If a title was passed as a command argument, pre-fill question 1 and confirm it rather than prompting fresh.
-
-### 3.1 Decision Title
-
-```
-What is the title of this decision?
-(Example: "Use PostgreSQL for Primary Database", "Adopt Trunk-Based Development")
-```
-
-**Wait for user response.**
-
-### 3.2 Decision Status
-
-```
-What is the current status of this decision?
-
-1. Proposed    — Decision under consideration (default)
-2. Accepted    — Decision approved and implemented
-3. Deprecated  — No longer relevant
-4. Superseded  — Replaced by a newer ADR (will prompt for superseding ADR number)
-```
-
-**Default:** Proposed. Wait for user selection.
-
-### 3.3 Category
-
-```
-Which category best describes this decision?
-
-1. Architecture   — System design, component structure, patterns
-2. Process        — Development workflow, team processes, procedures
-3. Technology     — Tool selection, framework choices, infrastructure
-```
-
-**Wait for user selection.**
-
-### 3.4 Context
-
-```
-Describe the situation requiring this decision.
-
-Include:
-- What needs to be decided
-- Why it matters
-- Who is affected
-- Any constraints or limitations
-
-(2–5 sentences or bullet points)
-```
-
-**Wait for user response.**
-
-### 3.5 Decision
-
-```
-What is the decision?
-State it clearly and concisely — what was chosen or will be done.
-
-(1–3 sentences)
-```
-
-**Wait for user response.**
-
-### 3.6 Rationale
-
-```
-Why was this decision made?
-
-Include:
-- Primary reasons for this choice
-- Alternatives considered and why they were rejected
-- Key trade-offs accepted
-
-(Bullet points preferred)
-```
-
-**Wait for user response.**
-
-### 3.7 Consequences
-
-```
-What are the consequences of this decision?
-
-Include:
-- Positive impacts (✅)
-- Negative impacts or costs (❌)
-- How costs are mitigated (if applicable)
-
-(Bullet points preferred)
-```
-
-**Wait for user response.**
-
-### 3.8 Related Lessons (Optional)
-
-```
-Is this decision related to any existing lessons learned?
-
-If yes, provide the filename(s):
-  Example: Lessons_Learned_Database_Pooling.md
-
-(Press Enter to skip)
-```
-
-**Wait for user response or skip.**
+**If git is not available:** skip the git metadata fields here and continue to
+Step 3. Do not assemble frontmatter or a fallback field set in this command —
+`create-adr-agent` (Phase 2) re-derives git metadata itself and handles the
+git-unavailable case on its own, and it owns the only frontmatter schema.
 
 ---
 
-## Step 4: Generate Filename and Confirm
+## Step 3: Dispatch to create-adr-agent
 
-**Filename generation:**
-- Derive slug from title: lowercase, spaces → hyphens, remove special characters
-- Format: `ADR-{NNN}-{slug}.md`
-- Examples:
-  - Title "Use PostgreSQL for Primary Database" → `ADR-002-use-postgresql-for-primary-database.md`
-  - Title "Adopt Trunk-Based Development" → `ADR-002-adopt-trunk-based-development.md`
-- Truncate slug to 60 characters if needed
+Dispatch `create-adr-agent`, passing:
+- The level-routing flag resolved above (`--user`, `--project`, `--named=<kg>`, or `--active`)
+- `--model [$resolved_model]` (from Tier resolution above)
+- The title argument, if one was given on the command line (the agent's
+  Phase 3 pre-fills its first wizard question from it and confirms rather
+  than prompting fresh — see `agents/create-adr-agent.md:150`)
 
-**Present summary to user for confirmation:**
+Do not pass a context payload (no `context_provided`). The agent runs its own
+full interactive wizard (Phase 3, 9 questions including "Implementation
+Commit") directly with the user, resolves its own ADR numbering (Phase 1,
+with cross-branch collision check) and git metadata (Phase 2), writes the
+file via `kg_capture` (Phase 5), updates the decisions index (Phase 6), and
+commits (Phase 7). All user interaction — wizard questions and the
+pre-write confirmation summary (Phase 4) — happens directly through the
+agent.
 
-```
-📋 Creating new Architecture Decision Record:
-
-Number:    ADR-002
-Title:     [title]
-Status:    [status]
-Category:  [category]
-File:      {active_kg_path}/decisions/ADR-002-[slug].md
-
-Git metadata auto-filled:
-  Author:  [name] <[email]>
-  Branch:  [branch]
-  Commit:  [short-hash]
-
-Related lessons: [filenames or "None"]
-
-Proceed? (yes / change details / cancel)
-```
-
-**Wait for user confirmation before writing any files.**
-
----
-
-## Step 5: Create ADR File
-
-**Read the base template:**
-
-```
-Action: Read ${CLAUDE_PLUGIN_ROOT}/core/default-templates/decisions/ADR-template.md
-```
-
-**Populate template with gathered data, replacing all placeholder fields:**
-
-### 5.1 YAML Frontmatter
-
-```yaml
----
-title: "ADR-{NNN}: {title}"
-number: {NNN}
-created: {YYYY-MM-DDTHH:MM:SSZ}
-status: {status}
-author: {git config user.name}
-email: {git config user.email}
-git:
-  branch: {branch}
-  commit: {full commit SHA}
-  pr: {pr-number or null}
-  issue: {issue-number or null}
-implements: null
-related:
-  adrs: []
-  lessons: [{lesson filenames if provided, else empty list}]
-  kg_entries: []
-tags: [{category}]
-category: {architecture|process|technology}
----
-```
-
-### 5.2 Document Body
-
-Populate each section with the content gathered in Step 3:
-
-- **H1 title:** `# ADR-{NNN}: {title}`
-- **Date:** Current date (YYYY-MM-DD)
-- **Status line:** `**Status:** {status}`
-- **Context section:** User's context response (structured as Problem / Scope bullets)
-- **Decision section:** User's decision response
-- **Rationale section:** User's rationale response (alternatives, trade-offs)
-- **Consequences section:** User's consequences response (positive, negative, mitigation)
-- **Related Decisions section:** Empty or pre-filled if user provided related ADRs
-- **Related Documentation / Lessons Learned:** Linked lessons if provided in Step 3.8
-
-**Preserve all template section headers.** Fill placeholder text with user responses; leave unprovided optional sections as "None" or empty.
-
-**Cross-References:** When referencing other KMGraph files in the ADR body, use Obsidian wiki link syntax: `[[filename-without-extension]]`. For ADRs, always use the full filename: `[[ADR-028-rules-md-scaffolding]]`, not `[[ADR-028]]`. For external GitHub issues and PRs, use standard markdown links: `[#NNN](url)`. Never use wiki links for external URLs.
-
----
-
-## Step 6: Update Decisions Index
-
-**Update `{active_kg_path}/decisions/README.md`:**
-
-### 6.1 Update total count and date
-
-Find and replace the header stats:
-```markdown
-**Total ADRs:** N → N+1
-**Last Updated:** {today's date}
-```
-
-### 6.2 Add to "All ADRs (Chronological)" section
-
-Append the new entry at the top of the chronological list:
-```markdown
-- [ADR-{NNN}: {title}](ADR-{NNN}-{slug}.md) — **Status:** {status} — {one-line context summary}
-```
-
-### 6.3 Add to "By Category" section
-
-Add under the correct category heading:
-- Architecture → `### Architecture`
-- Process → `### Process`
-- Technology → `### Technology Choices`
-
-Entry format:
-```markdown
-- [ADR-{NNN}](ADR-{NNN}-{slug}.md) — {title}
-```
-
-**If the category section does not exist in the README**, create it before adding the entry.
-
-**Update the "Creating a New ADR" section** to reference the new command:
-```markdown
-Run `/kmgraph:kmg-create-adr` — the command handles numbering, metadata, and index updates automatically.
-```
-
-Only add this line if it is not already present.
-
----
-
-## Step 7: Commit
-
-After both files are written and confirmed:
-
-```bash
-git add {active_kg_path}/decisions/ADR-{NNN}-{slug}.md
-git add {active_kg_path}/decisions/README.md
-git commit -m "docs(adr): create ADR-{NNN}: {title}
-
-Status: {status}
-Category: {category}
-Branch: {branch}
-Commit: {short-hash}
-
-{one-line context summary}
-
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
-```
+This command's role ends at dispatch. Do not re-implement the wizard,
+filename generation, file write, index update, or commit here.
 
 ---
 
@@ -458,36 +215,33 @@ Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
 ```
 Creating new Architecture Decision Record...
 
-Auto-detected: ADR-002 (next sequential number)
-
 Collecting git metadata...
   Author:  Jane Smith <jane@example.com>
   Branch:  feature/add-caching
   Commit:  a1b2c3d
 
-Let me ask a few questions:
-
-1. What is the title of this decision?
+Dispatching to create-adr-agent...
 ```
+
+Then `create-adr-agent` takes over: it runs its own wizard directly with the
+user ("What is the title of this decision?" and on, starting with its own
+ADR-number announcement per its cross-branch collision check), shows a
+summary for confirmation, writes the file, updates the index, and commits.
 
 ---
 
 ## Checklist Before Creating ADR
 
 - [ ] Target KG path resolved (via `kg_resolve` or named lookup, per Step 0)
-- [ ] ADR number auto-incremented correctly (highest existing + 1)
-- [ ] Git metadata collected (author, email, branch, commit)
-- [ ] Title, status, and category confirmed by user
-- [ ] Context, decision, rationale, and consequences gathered
-- [ ] Filename follows `ADR-{NNN}-{slug}.md` pattern
-- [ ] User confirmed summary before file creation
-- [ ] Template read from `core/default-templates/decisions/ADR-template.md`
-- [ ] YAML frontmatter fully populated (all `[FUTURE-AUTO]` fields filled)
-- [ ] All template placeholder text replaced with actual content
-- [ ] `decisions/README.md` total count updated
-- [ ] `decisions/README.md` chronological list updated
-- [ ] `decisions/README.md` by-category section updated
-- [ ] Both files committed with descriptive message
+- [ ] Decisions directory exists (created if missing, per Step 0)
+- [ ] ADR number auto-incremented correctly (highest existing + 1, per Step 1
+      — `create-adr-agent` independently re-verifies this with its own
+      cross-branch collision check before writing)
+- [ ] Git metadata collected (author, email, branch, commit, per Step 2)
+- [ ] `create-adr-agent` dispatched with the resolved level-routing flag and
+      `$resolved_model` — no context payload
+- [ ] Agent's wizard, draft confirmation, file write, index update, and
+      commit completed (verify via the agent's own output, not this command)
 
 ---
 

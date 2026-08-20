@@ -72,7 +72,7 @@ mv hooks/hooks.json.disabled hooks/hooks.json
 | `platform-file-change-check.sh` | Detects changes to CLAUDE.md / AGENTS.md | Yes |
 | `pre-commit-knowledge-gate.sh` | Blocks commits that skip knowledge capture | Yes (reduces automation) |
 | `session-end-prompt.sh` | Prompts for session summary on Stop; Codex CLI-compatible | Yes |
-| `plan-mirror.sh` | Mirrors plan files from `~/.claude/plans/` to `docs/plans/` | Yes |
+| `plan-mirror.sh` | Mirrors plan files from `~/.claude/plans/` to `knowledge/plans/` (or `docs/plans/` if the project has no `knowledge/` dir) | Yes |
 | `notification-dispatch.sh` | Sends webhook notifications | Yes (if webhook not configured) |
 
 ## Related

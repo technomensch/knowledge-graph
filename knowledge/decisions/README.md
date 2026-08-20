@@ -4,7 +4,7 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 68
+**Total ADRs:** 70
 **Last Updated:** 2026-08-04
 
 ---
@@ -19,6 +19,7 @@ Formal documentation of significant architecture decisions.
 
 - [ADR-068: Lightweight-vs-Full Workflow Rule, and a Piloted Command-Completion Check for Handoff/Recall File Tracing](ADR-068-lightweight-vs-full-workflow-rule-and-piloted-command-completion-check.md) — **Status:** Accepted — issue-25's lightweight-vs-full workflow rule: use a hand-written file (no branch, no GitHub issue) when no code change is planned, no external visibility is needed, and the write-up fits in a paragraph or two; paired with a piloted command-completion check for handoff/recall file tracing.
 - [ADR-067: Mutable `.active` switch vs context-derived KG resolution — decision pending](ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md) — **Status:** Proposed — context + open decision only, explicitly deferred (not decided this session); related to [ADR-066](ADR-066-kg-content-storage-location-for-global-and-cowork-modes.md), governs [ENH-051](../enhancements/ENH-051/ENH-051-specification.md).
+- [ADR-067 Implementation Spec: KG Resolution Model](ADR-067-implementation-spec.md) — **Status:** Ready for implementation — Companion implementation-ready reference transcribed from the full ADR-067 brainstorm/review record (13 Fable-review items + 3 previously-undesigned mechanisms, resolved 2026-07-28); the source ADR above remains the durable decision record and rationale trail, this document covers *what to build*.
 - [ADR-066: KG content-storage location for global-topic and cowork modes](ADR-066-kg-content-storage-location-for-global-and-cowork-modes.md) — **Status:** Accepted — resolved 2026-07-17; decided cowork KG mode should be retired and global-topic KG storage relocated. Implemented on `v0.6.20-storage-migration-completion` (this branch) — cowork retirement, storage-location bugfixes, and the 12-file `docs/`→`knowledge/` folder-migration sweep all trace back to this decision.
 - [ADR-065: ROADMAP.md and CHANGELOG.md duplication — CHANGELOG is the single source of truth for shipped history](ADR-065-roadmap-changelog-duplication-changelog-is-source-of-truth.md) — **Status:** Accepted — CHANGELOG.md is authoritative for shipped history; ROADMAP.md covers forward-looking/unshipped work only.
 - [ADR-064: Shared Module Pattern for Slash Command Deduplication](ADR-064-shared-module-pattern-for-slash-command-deduplication.md) — **Status:** Accepted — Duplicated init command logic extracted into five parameterized shared modules under `commands/kmg-init-shared/`; parent commands invoke modules by name with explicit parameter contracts. (Restored 2026-07-12 from archive — original was overwritten by ADR numbering collision on 2026-04-10.)
@@ -80,6 +81,7 @@ Formal documentation of significant architecture decisions.
 - [ADR-008: Third-Person Language Standard for User-Facing Docs](ADR-008-third-person-language-standard.md) — **Status:** Accepted — All user-facing documentation uses third-person language only ("Users can execute...", "The system provides...").
 - [ADR-007: Distribution Hygiene via package.json Files Allowlist](ADR-007-distribution-hygiene-files-allowlist.md) — **Status:** Accepted — Implements an explicit `package.json` files allowlist with three tiers (essential/optional/excluded) to control what ships in the distributed package.
 - [ADR-006: Delegated vs Inline KG Update Architecture](ADR-006-delegated-vs-inline-kg-updates.md) — **Status:** Accepted — Implements a hybrid architecture: inline updates limited to simple single-file changes within the current KG, delegated (agent-routed) updates for everything else.
+- [ADR-006 (duplicate, orphaned): Document Cache-Clear as Official Upgrade Path](ADR-006-document-cache-clear-upgrade-workaround.md) — **Status:** Accepted (superseded duplicate) — The original ADR-006-numbered file, pre-dating the 2026-06-15 collision renumbering. Its content is now [ADR-054](ADR-054-document-cache-clear-upgrade-workaround.md); per ADR-054's own note this file "remains on disk unlinked pending cleanup." Listed here only for index completeness, not as an independent decision.
 - [ADR-005: Defer MEMORY.md Auto-Sync Rules Engine to v0.0.5](ADR-005-defer-memory-rules-engine.md) — **Status:** Accepted — Selects Option 3 (Restore Only): implements `/kg-sis:restore-memory` in v0.0.4-alpha, defers the rules engine and smart summarization to v0.0.5-alpha.
 - [ADR-004: Token-Based MEMORY.md Size Limits](ADR-004-token-based-memory-size-limits.md) — **Status:** Accepted — Implements token-based size limits with soft and hard thresholds for MEMORY.md.
 - [ADR-003: Abandon Shadow Commands; Use File Prefix](ADR-003-abandon-shadow-commands-for-file-prefix.md) — **Status:** Accepted — Phase 1 (v0.0.1–v0.0.2) uses file-prefix naming (`knowledge-init.md`, `knowledge-capture-lesson.md`) instead of shadow commands.
@@ -193,4 +195,4 @@ ADRs follow a lightweight format:
 - [Real Examples](../../examples/decisions/) - Filled-out ADRs
 - [Pattern Guide](../../docs/PATTERNS-GUIDE.md) - Writing quality tips
 - [triggers.md — Platform-Agnostic Rule Timing Companion File](ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file.md)
-- [ADR-046: Introduce concept+setup hybrid page type and document how-to guide pattern separately from narrative guides](ADR-046-adr-046-introduce-conceptsetup-hybrid-page-type-and-document-how-to-guide-pattern-separately-from-narrative-guides.md)
+- [ADR-046: Introduce concept+setup hybrid page type and document how-to guide pattern separately from narrative guides](ADR-046-concept-setup-hybrid-page-type-and-how-to-guide-pattern.md)

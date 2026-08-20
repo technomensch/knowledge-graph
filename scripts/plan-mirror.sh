@@ -1,6 +1,7 @@
 #!/bin/bash
 # plan-mirror.sh - PostToolUse hook: auto-mirror plans from ~/.claude/plans/ to the
-# cwd-resolved KG's docs/plans/
+# cwd-resolved KG project's plans dir — knowledge/plans/ when the project has a
+# knowledge/ dir (per ADR-029), else the docs/plans/ template default
 # Security: no eval, no network, all variables quoted, subshells quoted
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -80,7 +81,16 @@ fi
 
 # Derive project root from KG path (parent of docs/)
 KG_PROJECT_ROOT="$(dirname "$KG_PATH")"
-TARGET_DIR="$KG_PROJECT_ROOT/docs/plans"
+
+# Mirror target: knowledge/plans/ when the project has a knowledge/ dir (per
+# ADR-029), else the docs/plans/ template default — same resolution order as
+# pre-skill-rules-inject.sh's MIRROR_DEFAULT_DIR.
+if [ -d "$KG_PROJECT_ROOT/knowledge" ]; then
+    TARGET_REL="knowledge/plans"
+else
+    TARGET_REL="docs/plans"
+fi
+TARGET_DIR="$KG_PROJECT_ROOT/$TARGET_REL"
 
 # Graceful degradation: if target doesn't exist, skip silently
 if [ ! -d "$TARGET_DIR" ]; then
@@ -90,6 +100,6 @@ fi
 FILE_BASE="$(basename "$FILE_PATH")"
 cp "$FILE_PATH" "$TARGET_DIR/$FILE_BASE"
 
-echo -e "${BLUE}📋 Plan mirrored to docs/plans/$FILE_BASE${NC}"
+echo -e "${BLUE}📋 Plan mirrored to $TARGET_REL/$FILE_BASE${NC}"
 
 exit 0

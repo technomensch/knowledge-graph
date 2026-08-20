@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.7.1.4
+**Version:** 0.7.2
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -89,6 +89,14 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 ---
 
 ## v0.7.x Feature Highlights
+
+**v0.7.2 — 2026-08-19** *(capture-corruption repair, plan-status backfix, ADR dispatch collapse)*
+
+- **New `kg_upgrade` repair tooling for two previously-silent corruption bugs** — `capture-corruption` retroactively cleans up files with doubled frontmatter or a doubled filename prefix (issue-46); `diff-blank-reconstruction` reconstructs session-summary "files changed" sections left blank by a `main`-hardcoding bug (issue-47), now fixed at the source too. Both — plus a new `plan-status-drift` category that repairs plans whose Safety Header never advanced past "STOPPED" (issue-49) — go through one shared consent gate before touching existing files.
+- **`kg_upgrade`'s wizard can now reach every backfix category** — routing inverted from a hardcoded allow-list to a deny-list, closing the gap where `capture-corruption` and `config-location` were visible in the wizard but unreachable except via a raw MCP call. Closes issue-51.
+- **`kmg-create-adr` and `create-adr-agent` collapsed into one implementation** — the command's own independent reimplementation had already drifted from the agent's; it now dispatches to the agent with no partial context payload, guarded by a new regression script. Closes issue-48.
+- **`git diff main...HEAD` resolves the real default branch instead of hardcoding `main`** — session-summary, docs-impact-scan, and `kmg-update-issue-plan` no longer go silently blank on repos whose default branch isn't `main`, or on pre-branch sessions.
+- Dependabot: `nanoid`/`dompurify` bumped and bounded; stale `docs/plans/` references — including two silently-broken hooks (`plan-mirror.sh`, `session-end-prompt.sh`) — corrected to `knowledge/plans/` throughout.
 
 **v0.7.1.4 — 2026-08-13** *(meta-issue Attempts paperwork-drift check)*
 
@@ -223,7 +231,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.7.1.4 (2026-08-13)
+**Current Release:** v0.7.2 (2026-08-19)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -325,6 +333,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.7.1.4 (2026-08-13)
+**Current Version:** v0.7.2 (2026-08-19)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info

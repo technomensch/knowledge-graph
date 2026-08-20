@@ -88,7 +88,14 @@ KG_PROJECT_ROOT="$(dirname "$KG_PATH")"
 # Check 1: Open plans with unchecked items
 # ─────────────────────────────────────────────────────────────
 
-PLANS_DIR="$KG_PROJECT_ROOT/docs/plans"
+# Plans dir: knowledge/plans/ when the project has a knowledge/ dir (per
+# ADR-029), else the docs/plans/ template default — same resolution order as
+# plan-mirror.sh and pre-skill-rules-inject.sh.
+if [ -d "$KG_PROJECT_ROOT/knowledge" ]; then
+    PLANS_DIR="$KG_PROJECT_ROOT/knowledge/plans"
+else
+    PLANS_DIR="$KG_PROJECT_ROOT/docs/plans"
+fi
 OPEN_PLAN_MSG=""
 
 if [ -d "$PLANS_DIR" ]; then

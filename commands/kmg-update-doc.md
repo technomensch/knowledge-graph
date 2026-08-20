@@ -249,7 +249,7 @@ When running a full release docs pass (`--user-facing` with no specific file), w
 - `docs/troubleshooting/index.md`
 - `docs/index.mdx`
 
-**Excluded** (not user-facing): `CLAUDE.md`, `GEMINI.md`, `CONTRIBUTING.md`, `ROADMAP.md`, `docs/specs/`, `docs/plans/`, `docs/templates/`
+**Excluded** (not user-facing): `CLAUDE.md`, `GEMINI.md`, `CONTRIBUTING.md`, `ROADMAP.md`, `docs/specs/`, `docs/plans/`, `knowledge/plans/`, `~/.claude/plans/`, `docs/templates/`
 
 ---
 
