@@ -81,7 +81,9 @@ Cross-project git conventions (branch naming, commits, PR policy, vulnerability 
 ### Known/Ignored Vulnerabilities (this repo)
 
 Dependabot findings specific to this repo's dependency tree — not portable to other projects.
-- **Known/ignored (8 — Docusaurus/build-tool transitive deps, dev-only, not runtime):**
+- **Known/ignored (10 — Docusaurus/build-tool transitive deps, dev-only, not runtime):**
+  - #125 image-size HIGH — DoS via infinite loop in JXL/HEIF parsers (CVE-2025-71329) — `@docusaurus/core` → `@docusaurus/mdx-loader` → `image-size`. No fixed version yet as of 2026-08-20 (vulnerable range `<= 2.0.2` covers latest).
+  - #126 image-size HIGH — DoS via infinite loop in ICNS parser (CVE-2025-71330) — same path as #125. No fixed version yet as of 2026-08-20.
   - #30 lodash-es HIGH — Code Injection via `_.template` (CVE-2026-4800) — webpack transitive
   - #27 serialize-javascript HIGH — RCE via RegExp.flags (GHSA-5c6j-r48x-rmvq) — webpack transitive
   - #29 lodash-es medium — Prototype Pollution via `_.unset`/`_.omit` (CVE-2026-2950) — webpack transitive
