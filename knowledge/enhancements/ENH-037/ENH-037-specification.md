@@ -3,7 +3,7 @@
 **Status:** ✅ Resolved in v0.6.16
 **Discovered:** 2026-07-04
 **Governed by:** none (scaffolding/docs parity fix, not a new command/skill/docstring — ADR-058's naming/scope check does not apply)
-**Related:** `knowledge/decisions/README.md` (the pattern being extended), `core/default-templates/decisions/README.md`, `core/default-templates/lessons-learned/README.md`, ADR-029 (Plan File Location — cites `knowledge/decisions/`, `knowledge/enhancements/ENH-NNN/`, `knowledge/issue-NNN/` as parallel artifact-folder conventions)
+**Related:** `knowledge/decisions/README.md` (the pattern being extended), `core/default-templates/decisions/README.md`, `core/default-templates/lessons-learned/README.md`, ADR-029 (Plan File Location — cites `knowledge/decisions/`, `knowledge/enhancements/ENH-NNN/`, `knowledge/issue-NNN/` as parallel artifact-folder conventions), [ENH-041](../ENH-041/ENH-041-specification.md) (found the same broken nav breadcrumb freshly propagated into the four README indexes this ENH created; backlinked 2026-08-19)
 
 ---
 

@@ -207,3 +207,4 @@ The second area is the core unimplemented gap. Work on the snapshot gate is bloc
 - **ADR-022:** Branch creation commands must guard active work context-switch
 - **Session:** 2026-03-28 — conversation that identified this pattern
 - **ENH-048:** Session-Wrap Status-Alignment Verification (2026-07-17) — same subsystem (session-summary/session-wrap), adjacent but distinct scope: this ENH covers accumulation/append behavior across runs, ENH-048 covers verifying that outstanding-item status characterizations are still accurate before a summary is finalized. Linked, not merged.
+- [issue-11](../../issues/issue-11/issue-11-description.md) — cites this ENH as one of only 5 (of ~42) ENH specs carrying a real `github_issue` value at the time of that investigation. Backlinked 2026-08-19.

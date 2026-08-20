@@ -16,7 +16,7 @@ related_enhs: ["ENH-051"]
 **Version Target:** v0.5.10.7
 **Created:** 2026-05-29
 **Updated:** 2026-06-12 — full scope established via brainstorm; web research conducted
-**Related:** [ENH-051](../ENH-051/ENH-051-specification.md) — cites this ENH as the precedent for disambiguating duplicated path-resolution logic; backlinked 2026-07-26 (paperwork-audit backlink-symmetry check)
+**Related:** [ENH-051](../ENH-051/ENH-051-specification.md) — cites this ENH as the precedent for disambiguating duplicated path-resolution logic; backlinked 2026-07-26 (paperwork-audit backlink-symmetry check), [issue-11](../../issues/issue-11/issue-11-description.md) — cites this ENH (created 2026-05-29, the last of the Cause-1 casualties before the `gh issue create` fix landed the next day) as `github_issue: null`; backlinked 2026-08-19
 
 ---
 

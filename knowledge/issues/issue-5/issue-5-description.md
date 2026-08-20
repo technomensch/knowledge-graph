@@ -50,3 +50,7 @@ In Step 5 of `commands/start-issue-tracking.md`:
 - **ENH-017** — proposes UX improvements to Step 1.2; shares the same command file;
   implementation should be coordinated to avoid merge conflicts
 - **GitHub Issue:** #124
+- [issue-11](../issue-11/issue-11-description.md) — cites this issue's fix (`gh issue create`
+  was never actually called from `start-issue-tracking` Step 5) as Cause 1 of ENH specs
+  missing a real GitHub issue link; confirms the fix worked (ENH-023 got a real issue after
+  landing). Backlinked 2026-08-19.

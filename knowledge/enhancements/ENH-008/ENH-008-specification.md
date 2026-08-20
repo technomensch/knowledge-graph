@@ -111,3 +111,10 @@ Does that sound right, or should this go somewhere else?
 - [ ] Happy path is one round trip (confirm → write)
 - [ ] Ambiguous referent asks clarifying question before routing
 - [ ] Does not conflict with lesson-capture or adr-guide trigger vocabularies
+
+## Related
+
+- [ENH-036](../ENH-036/ENH-036-specification.md) — cites this ENH's 2026-03-30 narrowing
+  of `kmg-capture-router` (per ADR-057's third amendment) as believed-not-original-intent,
+  the working premise for broadening the router's trigger surface back out. Backlinked
+  2026-08-19.
