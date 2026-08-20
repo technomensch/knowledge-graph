@@ -36,11 +36,11 @@ category: architecture
 
 **Problem, two coupled gaps:**
 
-1. **issue-25:** two overlapping mechanisms exist for capturing an enhancement/issue in this project — a lightweight hand-written spec file (no command, no branch, no GitHub issue), and the full `/kmgraph:kmg-start-issue-tracking` workflow (branch + GitHub issue + `solution-approach.md` + gates). Both claim the same territory (`knowledge/enhancements/ENH-NNN/`), and nothing documents which one governs. This has already caused a real miss (ENH-051 was filed lightweight, then redone through the formal workflow after the user caught it).
+1. **issue-25:** two overlapping mechanisms exist for capturing an enhancement/issue in this project — a lightweight hand-written spec file (no command, no branch, no GitHub issue), and the full `/kmgraph:kmg-start-issue-tracking` workflow (branch + GitHub issue + `solution-approach.md` + gates). Both claim the same territory (`knowledge/enhancements/ENH-NNN/`), and nothing documents which one governs. This has already caused a real miss ([[ENH-051]] was filed lightweight, then redone through the formal workflow after the user caught it).
 
-2. **issue-33, an instance of ENH-056:** a session picking up work via a handoff/recall package read only the top-level pointer files (a progress tracker, a README) and produced a "caught up" summary without tracing into the linked source files those pointers referenced (implementation log, root-cause notes, full review reports). The user caught it live: *"you only read the package, you didn't trace back and read the full context and linked files."* ENH-056 documents this as one of four confirmed instances of a broader pattern — commands/workflows described as multi-step prose processes are inconsistently executed in full, because nothing verifies the documented steps actually happened.
+2. **issue-33, an instance of [[ENH-056]]:** a session picking up work via a handoff/recall package read only the top-level pointer files (a progress tracker, a README) and produced a "caught up" summary without tracing into the linked source files those pointers referenced (implementation log, root-cause notes, full review reports). The user caught it live: *"you only read the package, you didn't trace back and read the full context and linked files."* [[ENH-056]] documents this as one of four confirmed instances of a broader pattern — commands/workflows described as multi-step prose processes are inconsistently executed in full, because nothing verifies the documented steps actually happened.
 
-**Why these two are in one ADR:** ENH-056's own acceptance criteria (AC-3, AC-4) make issue-25's rule a hard dependency — a completion-check gate cannot distinguish "a step was legitimately skipped because the lightweight path was correct" from "a step was silently abbreviated" without issue-25's rule existing first. They are separate decisions but not independently actionable.
+**Why these two are in one ADR:** [[ENH-056]]'s own acceptance criteria (AC-3, AC-4) make issue-25's rule a hard dependency — a completion-check gate cannot distinguish "a step was legitimately skipped because the lightweight path was correct" from "a step was silently abbreviated" without issue-25's rule existing first. They are separate decisions but not independently actionable.
 
 **Prior art considered and explicitly not reused wholesale:** `docs-readme-poc` (a sibling project) built a structurally similar mechanism — `ADR-023-terminal-validation-requires-independent-content-verification` — to fix self-attested "Pass" results in a style-guide validator that turned out to share identical, non-page-specific evidence text across 182 checks. Its fix (evidence-hardening + a second, independent agent-verification pass for judgment-requiring checks + moving mechanically-checkable items to a dedicated linter) is real, proven, and took a 14-attempt saga (`style-guide-required-sections-saga`, multiple Opus/Codex/Fable review rounds) to build and hold up. That system solves a much larger problem than this ADR needs to: hundreds of judgment-requiring checks across an entire content corpus. This ADR's scope (did a file get opened) has no judgment component, so the expensive parts of that precedent — the independent-verification agent pass, the evidence-citation requirement, the corpus-wide sweep — are deliberately not adopted here. See Non-Goals.
 
@@ -60,7 +60,7 @@ category: architecture
 - It needs to be discoverable/trackable by someone other than the current session (a GitHub issue for visibility)
 - It's large enough that a lightweight write-up would need to sprawl across multiple files anyway
 
-This formalizes the de facto pattern already in informal use across issue-30, ENH-053/054/055, and issue-33 itself (each explicitly captured as "small, deferred, write it down" with a stated no-branch-overhead rationale) — it does not introduce new judgment, it documents judgment already being exercised inconsistently.
+This formalizes the de facto pattern already in informal use across issue-30, [[ENH-053]]/054/055, and issue-33 itself (each explicitly captured as "small, deferred, write it down" with a stated no-branch-overhead rationale) — it does not introduce new judgment, it documents judgment already being exercised inconsistently.
 
 ### Half B — piloted command-completion check (ENH-056 / issue-33)
 
@@ -95,21 +95,21 @@ This formalizes the de facto pattern already in informal use across issue-30, EN
 - Rejected because: explicitly overridden by user decision — hard stop, not a nudge, for this specific check.
 
 **Option C: General per-command completion-criteria framework (per `ENH-056`'s `solution-approach.md`, generalized immediately rather than piloted).**
-- Pros: one mechanism to maintain long-term, closes all four of ENH-056's documented instances at once.
-- Cons: `solution-approach.md` itself already warns against this ("prototype one command's completion gate end-to-end before generalizing"). `ADR-057` (this repo, unrelated subsystem — detection-layer consolidation) is sharper precedent than "build too early": it tested **4 separate consolidation architectures** for merging 5 independently-evolved detection skills, and every one failed independent review because it silently dropped real capability — one proposal alone lost 13+ real behaviors with no home in the simplified design. Final decision: no consolidation, all 5 stay separate (`ENH-036`, the concrete 5→2 proposal, was formally Withdrawn on the same governing decision). The transferable risk for Option C: each command's completion criteria are already documented as non-uniform (`solution-approach.md`'s own point #1), the same way the 5 skills' trigger logic was — forcing them into one framework risks the identical silent-capability-loss failure mode ADR-057 already lived through and rejected.
+- Pros: one mechanism to maintain long-term, closes all four of [[ENH-056]]'s documented instances at once.
+- Cons: `solution-approach.md` itself already warns against this ("prototype one command's completion gate end-to-end before generalizing"). `ADR-057` (this repo, unrelated subsystem — detection-layer consolidation) is sharper precedent than "build too early": it tested **4 separate consolidation architectures** for merging 5 independently-evolved detection skills, and every one failed independent review because it silently dropped real capability — one proposal alone lost 13+ real behaviors with no home in the simplified design. Final decision: no consolidation, all 5 stay separate (`ENH-036`, the concrete 5→2 proposal, was formally Withdrawn on the same governing decision). The transferable risk for Option C: each command's completion criteria are already documented as non-uniform (`solution-approach.md`'s own point [#1](https://github.com/technomensch/knowledge-graph/issues/1)), the same way the 5 skills' trigger logic was — forcing them into one framework risks the identical silent-capability-loss failure mode [[ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth]] already lived through and rejected.
 - Rejected for now because: not yet earned, and this repo has direct, recent evidence (not just a general heuristic) that premature consolidation of genuinely-different-per-instance logic tends to lose capability rather than simplify. This ADR authorizes the first pilot; a generalized framework is a future decision made with real evidence from this pilot, not a default.
 
 ### Trade-offs
 
 **Benefits:**
-- ✅ Closes issue-25's real, already-demonstrated ambiguity (ENH-051 was mis-filed once already)
+- ✅ Closes issue-25's real, already-demonstrated ambiguity ([[ENH-051]] was mis-filed once already)
 - ✅ Closes issue-33's confirmed gap with a check that can't be silently ignored
 - ✅ Cheap to build — mechanical, single pilot, no new agent dispatch, no linter, no corpus sweep
 - ✅ Explicit Non-Goals prevent the scope creep that turned `docs-readme-poc`'s equivalent work into a 14-attempt saga
 
 **Costs:**
 - ❌ Hard-stop risks a false block if the manifest-detection logic misreads a handoff document's file list — mitigated by fail-open-on-no-manifest, but not eliminated
-- ❌ Does not address ENH-056's other three documented instances (kmg-handoff not invoking kmg-session-summary; kmg-meta-issue attempt logging; ENH-056's own first capture attempt) — those remain open, tracked separately
+- ❌ Does not address [[ENH-056]]'s other three documented instances (kmg-handoff not invoking kmg-session-summary; kmg-meta-issue attempt logging; [[ENH-056]]'s own first capture attempt) — those remain open, tracked separately
 - ❌ Does not address issue-33's second gap (a buried recommendation in a linked file never promoted to the checklist) — that's judgment-shaped and explicitly out of scope here
 
 ---
@@ -117,11 +117,11 @@ This formalizes the de facto pattern already in informal use across issue-30, EN
 ## Consequences
 
 ### Positive
-1. issue-25 and issue-33 close as resolved instances of ENH-056 once implemented.
-2. Establishes a template for future ENH-056 pilots: mechanical checks get hard-stop treatment when they're genuinely boolean; judgment checks stay out of scope until deliberately taken on with their own cost accounted for.
+1. issue-25 and issue-33 close as resolved instances of [[ENH-056]] once implemented.
+2. Establishes a template for future [[ENH-056]] pilots: mechanical checks get hard-stop treatment when they're genuinely boolean; judgment checks stay out of scope until deliberately taken on with their own cost accounted for.
 
 ### Negative
-1. ENH-056 remains open as an umbrella — this ADR resolves one pilot, not the general problem.
+1. [[ENH-056]] remains open as an umbrella — this ADR resolves one pilot, not the general problem.
 2. issue-33's second gap (buried recommendations not promoted to the checklist) remains open, undesigned.
 
 ### Neutral
@@ -131,7 +131,7 @@ This formalizes the de facto pattern already in informal use across issue-30, EN
 
 ## Non-Goals
 
-- **No general per-command completion-criteria framework.** This ADR authorizes exactly one pilot (handoff/recall file-tracing). Extending to `kmg-start-issue-tracking`'s artifact checks (branch/issue/spec existence) or `kmg-meta-issue`'s attempt-logging auto-capture is future ENH-056 work, not designed here.
+- **No general per-command completion-criteria framework.** This ADR authorizes exactly one pilot (handoff/recall file-tracing). Extending to `kmg-start-issue-tracking`'s artifact checks (branch/issue/spec existence) or `kmg-meta-issue`'s attempt-logging auto-capture is future [[ENH-056]] work, not designed here.
 - **No verification of comprehension.** The check confirms a file was *opened* (a `Read` tool call occurred), not that its content was understood or correctly acted on. Verifying comprehension would require the same judgment-heavy apparatus `docs-readme-poc` built for its style-guide validator, and is not being repeated here.
 - **No independent second-agent verification pass.** Unlike `ADR-023`'s pattern, there is no second, blind check of the first check's result — the underlying check (was a file opened) is deterministic and doesn't benefit from a second opinion the way a judgment call would.
 - **No promotion of buried recommendations to the checklist** (issue-33's second, distinct gap) — that requires reading and interpreting a file's prose, which is judgment-shaped and explicitly deferred.
@@ -157,11 +157,11 @@ This formalizes the de facto pattern already in informal use across issue-30, EN
 - A handoff/recall package with no clear file manifest does not trigger a block (fail-open confirmed)
 - A session that reads a manifest file earlier in the conversation (not the final turn) is not falsely blocked
 
-**Review Date:** Re-assess once the pilot has run against a handful of real handoff/recall sessions, to decide whether generalizing to other ENH-056 instances is warranted.
+**Review Date:** Re-assess once the pilot has run against a handful of real handoff/recall sessions, to decide whether generalizing to other [[ENH-056]] instances is warranted.
 
 **Full-suite test run findings (2026-08-01):** `tests/run-all-tests.sh` showed 12/18 suites failing at implementation time. This ADR's own new suite (`test-handoff-file-tracing-gate.sh`) passed 4/4 clean. Of the other 12, triaged into four groups (corrected 2026-08-01 — an earlier pass of this note vaguely said "9... plus 2 more" without identifying the 2; both are now identified, see group 4):
 
-1. **7 suites** (`test-commands.sh`, `test-skills-agents.sh`, `test-tier-resolver-smoke.sh`, `test-tier-resolver-edge.sh`, `test-create-adr-implements.sh`, `test-dispatcher-tier-refactor.sh`, `test-decision-governance.sh`) — pre-existing staleness against a pre-`kmg-`-prefix naming convention, unrelated to this ADR. Filed as [issue-38](../issues/issue-38/issue-38-description.md) / GitHub #201.
+1. **7 suites** (`test-commands.sh`, `test-skills-agents.sh`, `test-tier-resolver-smoke.sh`, `test-tier-resolver-edge.sh`, `test-create-adr-implements.sh`, `test-dispatcher-tier-refactor.sh`, `test-decision-governance.sh`) — pre-existing staleness against a pre-`kmg-`-prefix naming convention, unrelated to this ADR. Filed as [issue-38](../issues/issue-38/issue-38-description.md) / GitHub [#201](https://github.com/technomensch/knowledge-graph/issues/201).
 2. **2 suites** (`test-stop-hook.sh`, `test-hooks.sh`) — confirmed unrelated, pre-existing output-format assertions against scripts this ADR doesn't touch.
 3. **1 suite** (`test-mcp-edge-cases.sh`, a KG-path search error-handling case) — plausibly related to the concurrent ADR-067 session's in-progress `search.ts` rewiring, not this ADR's scope.
 4. **2 suites** (`test-mcp-resources.sh`, `test-v050-misc.sh`) — a *second, distinct* stale-path bug, found and fixed the same session: both die under `set -e`+`pipefail` against a hardcoded `core/templates/` path that no longer exists (renamed to `core/default-templates/` at some point, never caught). Same failure class as issue-31/35/38 but a different migration instance. Fixed directly in this session rather than filed, since it was small and mechanical — see the corresponding commit on `v0.7.0`.
@@ -178,7 +178,7 @@ Full detail and triage appended to `ADR-067`'s "Known Gap — Full Test Suite Fi
 - `docs-readme-poc` repo, `ADR-023-terminal-validation-requires-independent-content-verification` — external precedent considered and deliberately not fully adopted; see Context and Option A above
 - `ADR-050` (pre-push composite gate / advisory hook convention) — this ADR's Half B is an explicit, narrow exception to that convention's default advisory-only pattern
 - `ADR-057` (this repo — detection-layer consolidation decision, Accepted, settled 2026-07-03: no consolidation) — cited as the reason a generalized framework is rejected for now (Option C)
-- `ENH-036` (this repo — the concrete 5→2 detection-skill consolidation proposal, Status: Withdrawn) — governed by the same ADR-057 decision; confirms the rejected-consolidation precedent was a real, specced proposal, not just a hypothetical caution
+- `ENH-036` (this repo — the concrete 5→2 detection-skill consolidation proposal, Status: Withdrawn) — governed by the same [[ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth]] decision; confirms the rejected-consolidation precedent was a real, specced proposal, not just a hypothetical caution
 
 ---
 

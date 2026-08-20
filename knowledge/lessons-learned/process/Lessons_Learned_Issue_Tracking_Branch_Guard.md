@@ -19,13 +19,13 @@ category: process
 
 **Date:** 2026-03-28
 **Category:** Process (Git Workflow)
-**Discovered during:** v0.2.1-beta when ENH-001 issue tracking caused branch switch
+**Discovered during:** v0.2.1-beta when [[ENH-001]] issue tracking caused branch switch
 
 ---
 
 ## Problem
 
-During v0.2.1-beta implementation (on branch `v0.2.1-beta-mcp-write-and-portability`), the `/kmgraph:start-issue-tracking` command was run to document the ENH-001 user-level global KG enhancement. The command silently ran `git checkout main && git checkout -b issue/ENH-001-global-kg`.
+During v0.2.1-beta implementation (on branch `v0.2.1-beta-mcp-write-and-portability`), the `/kmgraph:start-issue-tracking` command was run to document the [[ENH-001]] user-level global KG enhancement. The command silently ran `git checkout main && git checkout -b issue/ENH-001-global-kg`.
 
 **Impact:**
 - All subsequent v0.2.1-beta commits landed on `issue/ENH-001-global-kg`
@@ -83,7 +83,7 @@ This guard pattern applies to **any command that creates Git branches**, includi
 
 ## Related
 
-- **ADR-022:** Branch creation commands must guard against active work context-switch (architectural decision)
+- **[[ADR-022-branch-creation-commands-active-work-guard]]:** Branch creation commands must guard against active work context-switch (architectural decision)
 - `commands/start-issue-tracking.md` → Step 5.0: Active Work Guard
 
 ---

@@ -26,13 +26,13 @@ category: architecture
 
 **Date:** 2026-07-10
 **Status:** Accepted
-**Implements:** `knowledge/plans/v0.6.17-fix-extract-chat-multiday-bucketing.md` Task 5/6 (ENH-044)
+**Implements:** `knowledge/plans/v0.6.17-fix-extract-chat-multiday-bucketing.md` Task 5/6 ([[ENH-044]])
 
 ---
 
 ## Context
 
-**Problem:** ENH-044's `.json`/`.jsonl` Gemini project-scoping fix (`bf1cb51c`) is real and verified working, but it does not cover two structural gaps confirmed against real data on this machine:
+**Problem:** [[ENH-044]]'s `.json`/`.jsonl` Gemini project-scoping fix (`bf1cb51c`) is real and verified working, but it does not cover two structural gaps confirmed against real data on this machine:
 
 1. **`.pb` files carry no per-project path.** `extract_gemini_pb_sessions()` (`core/scripts/extract_gemini.py:245-257`) globs `GEMINI_CONV_DIR/*.pb` flat — `GEMINI_CONV_DIR = ~/.gemini/antigravity/conversations`, with no per-project subdirectory structure the way `GEMINI_TMP_DIR` has for `.json`/`.jsonl`. The function accepts a `project_filter` parameter but does not apply it — its own docstring says so. 93 real `.pb` files exist on this machine; the leak is masked only by accident, because `blackboxprotobuf` is not installed here, so `.pb` extraction no-ops. On any machine with that optional dependency installed, `--project=knowledge-graph` would pull in all 93 foreign conversations.
 2. **Hash-named `~/.gemini/tmp/` directories** (9 confirmed on this machine, e.g. `26f813b7…`) cannot fragment-match a human-readable `--project` string at all.
@@ -134,7 +134,7 @@ Given the asymmetry above, the fix must optimize for "never leak foreign content
 
 ## Related Decisions
 
-- **[[ADR-046 through ADR-061]]** — no directly conflicting prior decision found on Gemini project-scoping specifically; ENH-044's own spec (`bf1cb51c`) established the `.json`/`.jsonl` scoping pattern this ADR extends the *policy* of (fail-closed) to the paths that pattern couldn't reach.
+- **[[ADR-046 through ADR-061]]** — no directly conflicting prior decision found on Gemini project-scoping specifically; [[ENH-044]]'s own spec (`bf1cb51c`) established the `.json`/`.jsonl` scoping pattern this ADR extends the *policy* of (fail-closed) to the paths that pattern couldn't reach.
 
 ---
 
@@ -161,7 +161,7 @@ Full detail: `knowledge/issues/chat-extraction-reliability-saga/README.md` § "P
 **This ADR's original Scope section explicitly excluded "any change to Claude or
 Codex extractors,"** on the stated basis that `extract_claude.py:137-139` "already
 scopes correctly" (fragment-matches `project_filter` against `~/.claude/projects/`
-directory basenames before globbing). That statement was true for the bug ENH-044
+directory basenames before globbing). That statement was true for the bug [[ENH-044]]
 tested — cross-*project* contamination — but nobody had tested the cross-*worktree*-
 of-the-same-project case. A real session (2026-08-12) surfaced it directly.
 
@@ -247,4 +247,4 @@ extractors rather than two independent-looking decisions that happen to agree.
 **Tracked:** [ENH-061](../enhancements/ENH-061/ENH-061-specification.md).
 
 Full evidence trail (real directory listing, real `.jsonl` field confirmation,
-full scenario table, rejected design directions): see ENH-061's specification.
+full scenario table, rejected design directions): see [[ENH-061]]'s specification.

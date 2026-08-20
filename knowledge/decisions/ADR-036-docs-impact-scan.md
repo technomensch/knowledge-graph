@@ -151,7 +151,7 @@ The skill is phrase-triggered. To enforce it on every push, `pre-push-gate.sh` G
 
 The flag is written at the end of Step 8 by the skill. If the flag is absent at push time, `pre-push-gate.sh` injects an advisory instruction to run docs-impact-scan before pushing.
 
-**Related ADR:** ADR-050 documents the full pre-push composite gate design (Gate 2 + Gate 3) and output contract.
+**Related ADR:** [[ADR-050-pre-push-composite-gate-inline-recommendation-gate]] documents the full pre-push composite gate design (Gate 2 + Gate 3) and output contract.
 
 ---
 

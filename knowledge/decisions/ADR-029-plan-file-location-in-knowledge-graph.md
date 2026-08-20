@@ -33,14 +33,14 @@ category: process
 **Problem:**
 - Implementation plans lived in `docs/plans/` (gitignored, local only) and were invisible to `kg_search`
 - Plans had no standard connection to the ENH or issue they implemented
-- ADR-014 established a dual-location protocol (`~/.claude/plans/` + `docs/plans/`) but neither location is part of the knowledge graph
+- [[ADR-014-maintain-dual-plan-file-locations]] established a dual-location protocol (`~/.claude/plans/` + `docs/plans/`) but neither location is part of the knowledge graph
 - A v0.3.0-beta planning session surfaced that the KG was missing its own work history - plans executed and gone, leaving only lessons and ADRs but no trace of the implementation plan itself
 
 **Scope:**
 - Where plan files live within the knowledge graph directory structure
 - Naming convention for plan files
 - Fallback location for plans not linked to an ENH or issue
-- Out of scope: changes to `~/.claude/plans/` (ephemeral, unchanged) or `docs/plans/` (local working reference, unchanged per ADR-014)
+- Out of scope: changes to `~/.claude/plans/` (ephemeral, unchanged) or `docs/plans/` (local working reference, unchanged per [[ADR-014-maintain-dual-plan-file-locations]])
 
 ---
 
@@ -98,7 +98,7 @@ The skill lives in KMGraph (not superpowers) because the backfill logic is KMGra
 - Cons: No structural link between plan and ENH; graph edges are weaker; naming must encode the ENH reference in the filename
 - Rejected because: Co-location in the ENH folder makes the relationship explicit and enables automatic wiki backlinks
 
-**Option C: Keep plans in `docs/plans/` only (ADR-014 status quo)**
+**Option C: Keep plans in `docs/plans/` only ([[ADR-014-maintain-dual-plan-file-locations]] status quo)**
 - Pros: No change needed
 - Cons: Plans remain invisible to `kg_search`; KG has no record of how decisions were implemented
 - Rejected because: The KG should capture the full project memory, including implementation plans
@@ -136,13 +136,13 @@ The skill lives in KMGraph (not superpowers) because the backfill logic is KMGra
 
 ### Neutral
 
-1. **ADR-014 unchanged:** `~/.claude/plans/` and `docs/plans/` dual-location protocol remains in force; this adds a third location (KG) as the canonical persistent record
+1. **[[ADR-014-maintain-dual-plan-file-locations]] unchanged:** `~/.claude/plans/` and `docs/plans/` dual-location protocol remains in force; this adds a third location (KG) as the canonical persistent record
 
 ---
 
 ## Implementation
 
-**Timeline:** v0.3.0-beta (scoped to ENH-010 or a new ENH)
+**Timeline:** v0.3.0-beta (scoped to [[ENH-010]] or a new ENH)
 
 **Affected Components:**
 - New: `skills/pre-implementation-backfill.md`

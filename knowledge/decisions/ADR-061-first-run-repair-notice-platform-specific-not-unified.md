@@ -27,22 +27,22 @@ category: architecture
 
 **Date:** 2026-07-08
 **Status:** Accepted
-**Implements:** Task 11/11a of `knowledge/plans/v0.6.17-fix-extract-chat-rebuild.md` (ENH-043)
-**Related:** ENH-043 (Claude message-loss + `--rebuild`), ENH-044 (Gemini cross-project contamination), ENH-045 (Codex incremental-staleness, filed as a consequence of this ADR)
+**Implements:** Task 11/11a of `knowledge/plans/v0.6.17-fix-extract-chat-rebuild.md` ([[ENH-043]])
+**Related:** [[ENH-043]] (Claude message-loss + `--rebuild`), [[ENH-044]] (Gemini cross-project contamination), [[ENH-045]] (Codex incremental-staleness, filed as a consequence of this ADR)
 
 ---
 
 ## Context
 
-While implementing v0.6.17's `--rebuild` feature (ENH-043 — a bug where the Claude extractor's incremental dedup could silently drop subagent messages, and once a file was corrupted, no normal re-run could self-heal it), the repair was run against real chat-history data: 68 dates were flagged, but only 9 were repairable from data still present on disk. Claude Code's own session logs (`~/.claude/projects/`) had rotated/deleted anything older than 2026-05-30. The user separately recovered a Backblaze cloud backup covering part of the gap and manually pointed the tool at it via a temporary `HOME` environment-variable override — a working but fragile, undocumented hack.
+While implementing v0.6.17's `--rebuild` feature ([[ENH-043]] — a bug where the Claude extractor's incremental dedup could silently drop subagent messages, and once a file was corrupted, no normal re-run could self-heal it), the repair was run against real chat-history data: 68 dates were flagged, but only 9 were repairable from data still present on disk. Claude Code's own session logs (`~/.claude/projects/`) had rotated/deleted anything older than 2026-05-30. The user separately recovered a Backblaze cloud backup covering part of the gap and manually pointed the tool at it via a temporary `HOME` environment-variable override — a working but fragile, undocumented hack.
 
 This raised the question: once v0.6.17 ships, how does a user discover their own chat-history might be affected, and what do they do about it?
 
 **First design pass (rejected):** an Opus-designed first-run notice proposing a short, uniform prompt — "N days look affected, want me to fix them? [y/N]" — shown identically regardless of platform. The user explicitly rejected this: it doesn't explain *why* dates are unrecoverable (risking the user assuming it's their fault or the tool is broken), and it was scoped to possibly cover Claude, Gemini, and Codex with the same mechanism without checking whether their underlying problems are actually the same shape.
 
 Investigating that question found they are not:
-- **Claude (ENH-043):** genuine data loss. Messages were dropped at extraction time; recovery requires either source `.jsonl` logs still on disk or a backup of them.
-- **Gemini (ENH-044):** cross-project contamination, not loss. All the data exists; it's just merged into the wrong project's output file. The fix (`--project` scoping) is fully forward-looking — there's nothing to "recover" from a backup.
+- **Claude ([[ENH-043]]):** genuine data loss. Messages were dropped at extraction time; recovery requires either source `.jsonl` logs still on disk or a backup of them.
+- **Gemini ([[ENH-044]]):** cross-project contamination, not loss. All the data exists; it's just merged into the wrong project's output file. The fix (`--project` scoping) is fully forward-looking — there's nothing to "recover" from a backup.
 - **Codex:** discovered mid-design, previously unaudited for this class of bug — `extract_codex.py` still has the exact "skip if output file's mtime is under an hour old" pattern that was identified as broken and removed from Claude's extractor in v0.6.16 (commit `22c7559d`), never ported. A staleness bug, not data loss, and not previously scoped into any plan.
 
 ---
@@ -53,7 +53,7 @@ Do not build one unified "some of your data might be incomplete" notice. Instead
 
 1. **Claude gets the full backup-recovery flow**: a layered notice (short default + on-request "tell me more" explaining that Claude Code itself rotates old session logs — not user error), concrete backup-folder guidance per platform, and first-class CLI flags (`--claude-projects-dir` on the extraction script, `--source-root` on the discovery script) so a user can point the tool at a restored backup as a supported operation, replacing the manual `HOME`-override hack.
 2. **Gemini gets a different, corrective (not recovery) notice**: fires when `--source gemini`/`all` is used without `--project`, pointing the user at the scoping flag. No backup guidance — nothing is lost, so recovery framing would be misleading.
-3. **Codex is explicitly out of scope for this notice.** The staleness bug is real but unrelated in shape (no data loss, no recovery angle); folding it in would conflate three different problems under one mechanism. Filed separately as ENH-045.
+3. **Codex is explicitly out of scope for this notice.** The staleness bug is real but unrelated in shape (no data loss, no recovery angle); folding it in would conflate three different problems under one mechanism. Filed separately as [[ENH-045]].
 
 ---
 
@@ -72,7 +72,7 @@ Do not build one unified "some of your data might be incomplete" notice. Instead
 - `core/scripts/extract_claude.py` and `run_extraction.py` gain an optional `claude_projects_dir` override, additive and backward-compatible.
 - `core/scripts/check_extraction_health.py` gains `--source-root` and a per-date repairability check (`has_source_for_date`), so the notice can honestly report "N repairable now" vs. "M need a backup" instead of a single undifferentiated count.
 - A version-stamp file (`{chat_history}/.kmg-extract-state.json`) is introduced as the "have we shown this notice yet" mechanism — the first durable per-KG state file of this kind in the extraction pipeline.
-- ENH-045 (Codex staleness) exists as a direct consequence of this ADR's scoping discussion, not as independently-discovered work.
+- [[ENH-045]] (Codex staleness) exists as a direct consequence of this ADR's scoping discussion, not as independently-discovered work.
 
 ---
 
@@ -94,4 +94,4 @@ Do not build one unified "some of your data might be incomplete" notice. Instead
 
 ## Related Decisions
 
-None yet — this is the first ADR governing the extraction pipeline's user-facing notification design specifically (distinct from ADR-044, which governs file-splitting mechanics, and ADR-060, which governs `kg_search` indexing scope).
+None yet — this is the first ADR governing the extraction pipeline's user-facing notification design specifically (distinct from [[ADR-044-split-oversized-chat-history-files]], which governs file-splitting mechanics, and [[ADR-060-narrow-kg-search-scope-away-from-raw-chat-history]], which governs `kg_search` indexing scope).

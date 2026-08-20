@@ -24,7 +24,7 @@ category: process
 
 When diagnosing whether a PR or branch has been merged to main, running `git log origin/main` or `git log --oneline origin/main` may display stale commit history even after a successful merge. This leads to false conclusions about the state of the remote repository.
 
-**Example:** User ran `git log origin/main` and saw v0.5.10.2 as the latest commit, leading to concern that the v0.5.10.3 PR (#135) had not merged. In reality, both PRs (#134 and #135) were already merged; the local remote-tracking branch was simply out of date.
+**Example:** User ran `git log origin/main` and saw v0.5.10.2 as the latest commit, leading to concern that the v0.5.10.3 PR ([#135](https://github.com/technomensch/knowledge-graph/issues/135)) had not merged. In reality, both PRs ([#134](https://github.com/technomensch/knowledge-graph/issues/134) and [#135](https://github.com/technomensch/knowledge-graph/issues/135)) were already merged; the local remote-tracking branch was simply out of date.
 
 ---
 
@@ -149,7 +149,7 @@ To verify the stale data behavior:
 ## Real-World Impact
 
 In the v0.5.10.3 release cycle, this issue caused:
-- Unnecessary concern about PR #135 not merging
+- Unnecessary concern about PR [#135](https://github.com/technomensch/knowledge-graph/issues/135) not merging
 - False belief that the release was incomplete
 - Time spent investigating false hypothesis
 

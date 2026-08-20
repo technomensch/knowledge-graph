@@ -14,7 +14,7 @@ category: process
 
 Commit `654c13fb` migrated `mcp-server/src/utils.ts`'s `CONFIG_PATH` default from `~/.claude/kg-config.json` to `~/.kmgraph/kg-config.json`, with a legacy-read fallback added in follow-up commits `2d0aba01` and `dd62385b`. This migration was correct, thorough, and independently reviewed (see the "Two-Cycle Cross-Model Review" lesson) — entirely within `mcp-server/src/`.
 
-It was never propagated to the command/agent/script layer. A full-repo grep for the old path string found **35 files** still containing literal references to `~/.claude/kg-config.json` — and several of these were not documentation staleness but raw `jq`/`mv` shell commands embedded directly inside command-prompt markdown files (e.g. `commands/kmg-init.md`, 38 references) that read/write the file directly, completely bypassing `mcp-server/src/utils.ts`'s `CONFIG_PATH` resolution logic. This became issue-14 (GitHub #171).
+It was never propagated to the command/agent/script layer. A full-repo grep for the old path string found **35 files** still containing literal references to `~/.claude/kg-config.json` — and several of these were not documentation staleness but raw `jq`/`mv` shell commands embedded directly inside command-prompt markdown files (e.g. `commands/kmg-init.md`, 38 references) that read/write the file directly, completely bypassing `mcp-server/src/utils.ts`'s `CONFIG_PATH` resolution logic. This became issue-14 (GitHub [#171](https://github.com/technomensch/knowledge-graph/issues/171)).
 
 ## Root Cause: Two Independent Access Paths to the Same Resource
 
@@ -56,7 +56,7 @@ Apply this any time a resource's canonical path, filename, or format changes in 
 - `commands/kmg-init.md` — 38 references, including embedded `jq`/`mv` writes bypassing `mcp-server/src/utils.ts`
 - 3 severity tiers identified: embedded writes (high), read-only lookups (medium), prose mentions (low)
 - Sibling check: FTS5 search index migration (also `~/.claude/` -> `~/.kmgraph/`) did NOT exhibit the same split-brain pattern
-- Tracked as issue-14, GitHub #171
+- Tracked as issue-14, GitHub [#171](https://github.com/technomensch/knowledge-graph/issues/171)
 
 ## Context
 

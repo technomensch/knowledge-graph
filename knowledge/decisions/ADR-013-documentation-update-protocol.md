@@ -53,7 +53,7 @@ Establish **mandatory two-layer documentation update protocol** for all multi-br
 **Enforcement**: Separate documented final branch with explicit plan file
 **Owner**: Release lead (designated session/developer)
 
-**Branch Name Convention**: `docs-update-{description}` (no version prefix — superseded by ADR-027)
+**Branch Name Convention**: `docs-update-{description}` (no version prefix — superseded by [[ADR-027-docusaurus-restructure-diataxis-docs-feed]])
 **Example**: `docs-update-release-sync`
 
 **Mandatory Updates**:
@@ -127,7 +127,7 @@ Making final docs-update a separate branch enforces release discipline. It canno
 
 **Gate 1 automation:** `scripts/plan-docs-xref-check.sh` (PostToolUse `Write|Edit` hook) fires after any plan file write/edit. It checks for the `## Docs Impact` heading (exact string `^## Docs Impact$`). If absent, it injects an advisory `systemMessage` reminder. This is an **advisory layer** atop the manual checklist — not a replacement. Per-file-content-hash idempotency prevents re-injection on unchanged content.
 
-**Output contract:** PostToolUse → `systemMessage`. Always `exit 0`. See ADR-050 for the full gate design contract.
+**Output contract:** PostToolUse → `systemMessage`. Always `exit 0`. See [[ADR-050-pre-push-composite-gate-inline-recommendation-gate]] for the full gate design contract.
 
 ---
 
@@ -192,11 +192,11 @@ Add to GitHub PR template for feature branches:
 
 ## Related Decisions
 
-- **ADR-001**: Centralized multi-KG configuration (architecture foundation for doc consistency)
-- **ADR-002**: Commands vs skills architecture (determines which doc sections update)
-- **ADR-008**: Third-person language standard (applies to all documentation)
-- **ADR-009**: Three-tier installation architecture (informs INSTALL.md updates)
-- issue-8: Docs Update Enforcement Meta-Issue (centralizes this ADR + ADR-021 + ADR-036)
+- **[[ADR-001-centralized-multi-kg-configuration]]**: Centralized multi-KG configuration (architecture foundation for doc consistency)
+- **[[ADR-002-commands-vs-skills-architecture]]**: Commands vs skills architecture (determines which doc sections update)
+- **[[ADR-008-third-person-language-standard]]**: Third-person language standard (applies to all documentation)
+- **[[ADR-009-three-tier-installation-architecture]]**: Three-tier installation architecture (informs INSTALL.md updates)
+- issue-8: Docs Update Enforcement Meta-Issue (centralizes this ADR + [[ADR-021-single-source-of-truth-dry-documentation]] + [[ADR-036-docs-impact-scan]])
 
 ## Lessons Learned
 
@@ -217,7 +217,7 @@ This decision is mandatory for all releases starting with **v0.0.11-alpha** and 
 
 ## Amendment — 2026-04-08 (superseded in part by ADR-027)
 
-**ADR-027** (Docusaurus restructure and Diátaxis docs feed) supersedes the branch naming convention in this ADR.
+**[[ADR-027-docusaurus-restructure-diataxis-docs-feed]]** (Docusaurus restructure and Diátaxis docs feed) supersedes the branch naming convention in this ADR.
 
 - **Old:** `v{major}.{minor}-docs-update-{description}` (e.g., `v0.0.11-docs-update-release-sync`)
 - **New:** `docs-update-{description}` (e.g., `docs-update-release-sync`) — no version prefix

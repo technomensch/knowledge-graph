@@ -25,19 +25,19 @@ category: architecture
 
 **Date:** 2026-07-05
 **Status:** Proposed
-**Implements:** null (design decision; ENH-040 tracks the implementation)
-**Related:** ADR-001 (multi-KG config — establishes why kmgraph's active-KG model is manual/git-like, not auto-detected like context-mode's project scoping); ENH-040 (removes chat-history from `kg_search`/`kg_fts5_rebuild` indexing scope)
+**Implements:** null (design decision; [[ENH-040]] tracks the implementation)
+**Related:** [[ADR-001-centralized-multi-kg-configuration]] (multi-KG config — establishes why kmgraph's active-KG model is manual/git-like, not auto-detected like context-mode's project scoping); [[ENH-040]] (removes chat-history from `kg_search`/`kg_fts5_rebuild` indexing scope)
 
 ---
 
 ## Context
 
-Prompted by a user question ("recall why we switch KGs manually and context-mode doesn't") that led to re-evaluating the current `context-mode` plugin (v1.0.169) against kmgraph's design, now that context-mode has grown substantially since kmgraph's KG-config decisions were made (ADR-001, 2026-02-15).
+Prompted by a user question ("recall why we switch KGs manually and context-mode doesn't") that led to re-evaluating the current `context-mode` plugin (v1.0.169) against kmgraph's design, now that context-mode has grown substantially since kmgraph's KG-config decisions were made ([[ADR-001-centralized-multi-kg-configuration]], 2026-02-15).
 
 Current state of both systems:
 
 - **context-mode v1.0.169** now ships full session-continuity: PreToolUse/PostToolUse/UserPromptSubmit/Stop/PreCompact/SessionStart hooks capture tool events, user decisions, errors, blockers into a per-project SQLite DB; `ctx_search` runs Porter-stemming + trigram matching merged via Reciprocal Rank Fusion, with proximity reranking and fuzzy correction. Scope is auto-resolved per-project (no manual switch) and content has a 14-day cleanup window — it is not meant to be a durable, curated store.
-- **kmgraph** `kg_search` indexes both curated knowledge artifacts (ADRs, lessons-learned, enhancements) *and* raw `chat-history/*.md` transcripts, across manually-selected active KG (or `searchScope: all`/`personal-only`). This is durable (git-committed) and multi-KG (project/global/shared) by design (ADR-001).
+- **kmgraph** `kg_search` indexes both curated knowledge artifacts (ADRs, lessons-learned, enhancements) *and* raw `chat-history/*.md` transcripts, across manually-selected active KG (or `searchScope: all`/`personal-only`). This is durable (git-committed) and multi-KG (project/global/shared) by design ([[ADR-001-centralized-multi-kg-configuration]]).
 
 The overlap: both systems now answer "what did we discuss/decide in a past session" by searching indexed conversation history. `kg_search` doing this via raw chat-history transcripts duplicates work context-mode already does better (stemming+trigram+RRF+proximity+fuzzy vs kmgraph's plain FTS5), while kmgraph's real differentiator — curated, authored knowledge (ADRs/lessons/enhancements) — has no context-mode equivalent (context-mode auto-captures events; it does not author artifacts).
 
@@ -56,7 +56,7 @@ Division of responsibility going forward:
 ## Rationale
 
 - **Redundant search surfaces cost more than they save.** Two tools (`ctx_search`, `kg_search`) both claiming to answer "recall past discussion" forces the user/agent to guess which one has the better-ranked result — context-mode's RRF+proximity+fuzzy pipeline is strictly better for that job than kmgraph's plain FTS5 MATCH.
-- **kmgraph's actual value is curation, not transcription.** ADR-001 already establishes kmgraph's manual multi-KG model exists to serve intentional, durable knowledge management (git-like active pointer, multi-KG for different tasks) — indexing raw transcripts doesn't fit that model, it's scope creep from before context-mode had session continuity.
+- **kmgraph's actual value is curation, not transcription.** [[ADR-001-centralized-multi-kg-configuration]] already establishes kmgraph's manual multi-KG model exists to serve intentional, durable knowledge management (git-like active pointer, multi-KG for different tasks) — indexing raw transcripts doesn't fit that model, it's scope creep from before context-mode had session continuity.
 - **Ownership follows lifecycle, not habit.** context-mode's 14-day cleanup marks its data as intentionally ephemeral; kmgraph's git-committed docs are intentionally durable. Recall tooling should route to the store whose lifecycle matches the question ("recent session" → context-mode; "why did we decide X" → kmgraph).
 
 ---
@@ -65,7 +65,7 @@ Division of responsibility going forward:
 
 - `kg_fts5_rebuild` stops walking `chat-history/` for indexing; `kg_search` scope shrinks to `decisions/`, `enhancements/`, `lessons-learned/`, `sessions/`, and rules/me/triggers files.
 - Any skill or agent currently relying on `kg_search` hitting chat-history (e.g. `kmg-auto-recall`) needs to be pointed at `ctx_search` instead, or dual-search both tools explicitly when the question spans both curated decisions and raw session history.
-- No change to kmgraph's multi-KG active-pointer model (ADR-001 stands) — this ADR only narrows *what* gets indexed within a KG, not how KGs are selected.
+- No change to kmgraph's multi-KG active-pointer model ([[ADR-001-centralized-multi-kg-configuration]] stands) — this ADR only narrows *what* gets indexed within a KG, not how KGs are selected.
 - Existing chat-history files are untouched (still readable as raw artifacts); only their FTS5 indexing for `kg_search` recall is removed.
 
 ---
@@ -79,7 +79,7 @@ Division of responsibility going forward:
 
 ## Prior Discussion / Evidence Sources
 
-- Live investigation, 2026-07-05 session: read ADR-001 in full, ran `ctx_doctor` (context-mode v1.0.169, all checks OK), read context-mode's README `## Tools`, `## How the Knowledge Base Works`, `## Session Continuity` sections in full.
+- Live investigation, 2026-07-05 session: read [[ADR-001-centralized-multi-kg-configuration]] in full, ran `ctx_doctor` (context-mode v1.0.169, all checks OK), read context-mode's README `## Tools`, `## How the Knowledge Base Works`, `## Session Continuity` sections in full.
 - `kg_search` (searchScope: all) confirmed chat-history/*.md is currently indexed and returned as top matches for a conceptual query, alongside genuine ADR/heading matches.
 
 ---

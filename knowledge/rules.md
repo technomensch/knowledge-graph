@@ -76,36 +76,11 @@ Before creating a PR with doc changes: run `git diff HEAD~N -- docs/` for each c
 
 ## Git Workflow
 
-### Branch Naming
+Cross-project git conventions (branch naming, commits, PR policy, vulnerability gate, cherry-pick safety) live in `~/.kmgraph/git-rules.md` — see there for the full procedure. This project follows those as-is; the only project-specific addition is the known/ignored vulnerability list below.
 
-- Feature: `v{ver}-{description}`
-- Bug fix: `v{ver}-fix-{description}`
-- Docs-only: `docs-update-{description}`
+### Known/Ignored Vulnerabilities (this repo)
 
-### Branch Hierarchy & Chaining
-
-Chained branches must branch from their parent, not main — verify parent is fully committed first
-- **Why:** branch-creating commands previously switched context silently mid-implementation, landing commits on the wrong branch
-- **Source:** [Issue Tracking Branch Guard](lessons-learned/process/Lessons_Learned_Issue_Tracking_Branch_Guard.md)
-
-### PR Target Verification
-
-Before creating a PR, verify the target branch is the parent in the chain, not main
-- **Why:** v0.3.3-beta was PRed against main instead of its parent v0.3.2; required a rebase to restore the correct chain
-
-### Commits
-
-- Format: `type(scope): subject` — include `Closes #N` in body
-- Types: `feat` | `fix` | `docs` | `refactor` | `chore` | `perf` | `style` | `test` | `build` | `ci` | `revert`
-
-### PR Policy
-
-Push branches, await user review — never auto-merge, never delete branches, never force-push
-
-### Post-Push Security Scan
-
-After any `git push`: scan output for Dependabot vulnerability notices — stop and surface to user before merging or deploying
-- **Why:** a vulnerability notice appeared in push output and was nearly missed; would have shipped vulnerable dependencies
+Dependabot findings specific to this repo's dependency tree — not portable to other projects.
 - **Known/ignored (8 — Docusaurus/build-tool transitive deps, dev-only, not runtime):**
   - #30 lodash-es HIGH — Code Injection via `_.template` (CVE-2026-4800) — webpack transitive
   - #27 serialize-javascript HIGH — RCE via RegExp.flags (GHSA-5c6j-r48x-rmvq) — webpack transitive
@@ -117,11 +92,6 @@ After any `git push`: scan output for Dependabot vulnerability notices — stop 
   - brace-expansion HIGH — DoS via exponential/unbounded `{}` expansion (GHSA-3jxr-9vmj-r5cp, GHSA-mh99-v99m-4gvg) — three incompatible major-version consumers in the tree (`serve-handler` needs 1.x, root `orama`/`glob` chain needs 2.x, `typedoc` needs 5.x). Override attempted 2026-07-25: a flat version override collapses all three to one version, breaking the other two the same way the postcss override did (2 vulns → 27). Reverted — needs per-consumer nested overrides (untested) or an upstream bump.
   - Do NOT stop or warn on these. Only surface NEW alerts not on this list.
 - **Re-check cadence:** Monthly (or when touching `package.json`/lockfiles), re-run `npm audit`/check Dependabot alerts against the Known/ignored and Pending-fix lists above. For each entry: if upstream shipped a fixed version, upgrade and remove the entry; if not, leave as-is. Do not treat these lists as permanent — they're stale until re-verified.
-
-### Cherry-Pick Safety
-
-After any cherry-pick: verify source branch state before continuing work on either branch
-- **Why:** branch contamination from a cherry-pick required a force push to fix; the sooner caught, the cheaper the fix
 
 ---
 

@@ -55,4 +55,4 @@ Anyone writing wizard or migration logic in KMGraph commands.
 - The wizard surfaced `docs/.fts5.db` as a cleanup candidate even though it was the active gitignored search index for the project-local KG
 - Branch: v0.3.0-beta
 - Commit: 1f70f3a5
-- Fix applied in `commands/init.md` and `commands/init-personal-kg.md`; documented in ADR-028
+- Fix applied in `commands/init.md` and `commands/init-personal-kg.md`; documented in [[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]]

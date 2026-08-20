@@ -110,11 +110,11 @@ db.close();
 1. **Relevance-ranked search:** BM25 ranking surfaces the most relevant files first, regardless of where the match appears in the file
 2. **Porter stemmer:** "searching" matches "search", "decisions" matches "decision" — reduces missed results from word form variation
 3. **Incremental rebuild:** mtime-based change detection means only modified files are re-indexed on each rebuild
-4. **Zero-config install:** Existing users get `node-sqlite3-wasm` installed automatically on their next session start via the package.json hash check in hooks-master.sh (see ADR-016 for the graceful fallback pattern)
+4. **Zero-config install:** Existing users get `node-sqlite3-wasm` installed automatically on their next session start via the package.json hash check in hooks-master.sh (see [[ADR-016-graceful-fallback-optional-mcp-dependencies]] for the graceful fallback pattern)
 
 ### Negative
 
-1. **Graceful fallback required:** Because the package installs asynchronously on first session start, the MCP server must handle the case where `node-sqlite3-wasm` is not yet present. This requires the `try/require` pattern (see ADR-016).
+1. **Graceful fallback required:** Because the package installs asynchronously on first session start, the MCP server must handle the case where `node-sqlite3-wasm` is not yet present. This requires the `try/require` pattern (see [[ADR-016-graceful-fallback-optional-mcp-dependencies]]).
 2. **WASM startup overhead:** The first query of a session initializes the WASM runtime (~50-100ms). Subsequent queries are fast.
 
 ### Neutral

@@ -136,8 +136,8 @@ A `trap cleanup EXIT` or a single-slot `.backup` file both work in the common ca
 
 ## Related Decisions
 
-- **[[ADR-012]]** (hook security model, kg-config's governing decision) — this ADR's principle is a generalization of what ADR-012 already required for hooks specifically ("no writes outside the active KG path," idempotency); this ADR extends the same spirit to any destructive operation, not just hooks.
-- **[[ADR-044]]** (split oversized chat-history files) — this ADR's chat-extraction implementation must and does stay compatible with ADR-044's split-file mechanics; `backup_aside()`'s dot-hidden naming was specifically chosen so backups never collide with ADR-044's `^\d{4}-\d{2}-\d{2}$` split-folder contract.
+- **[[ADR-012]]** (hook security model, kg-config's governing decision) — this ADR's principle is a generalization of what [[ADR-012-hook-security-model]] already required for hooks specifically ("no writes outside the active KG path," idempotency); this ADR extends the same spirit to any destructive operation, not just hooks.
+- **[[ADR-044]]** (split oversized chat-history files) — this ADR's chat-extraction implementation must and does stay compatible with [[ADR-044-split-oversized-chat-history-files]]'s split-file mechanics; `backup_aside()`'s dot-hidden naming was specifically chosen so backups never collide with [[ADR-044-split-oversized-chat-history-files]]'s `^\d{4}-\d{2}-\d{2}$` split-folder contract.
 - **[[ADR-062]]** (Gemini fail-closed scoping) — a sibling v0.6.18 finding (Finding 3) fixed a related-but-distinct class of bug (a fail-closed control failing open due to check ordering) in the same branch; not the same principle as this ADR, but discovered and fixed in the same review pass.
 
 ---

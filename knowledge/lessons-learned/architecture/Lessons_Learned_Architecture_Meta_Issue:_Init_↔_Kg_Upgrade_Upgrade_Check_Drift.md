@@ -12,13 +12,13 @@ category: architecture
 **Type:** meta-issue
 **Status:** ✅ Resolved in v0.6.5 — upgrade.ts bugs fixed in v0.6.4; init ↔ kg_upgrade wiring landed in v0.6.5
 **Discovered:** 2026-06-20
-**Related:** ENH-022, ADR-055, v0.6.4 branch
+**Related:** [[ENH-022]], [[ADR-055-cross-platform-upgrade-triggering-version-sentinel-over-startup-notification]], v0.6.4 branch
 
 ---
 
 ## Summary
 
-`/kmgraph:kmg-init` slash command runs parallel bash-based upgrade checks instead of calling the `kg_upgrade` MCP tool. ENH-022 checks (starter-relocation, stray-knowledge-dir, version-update sentinel) are invisible to Claude Code users unless they explicitly invoke `kg_upgrade` directly. The two code paths have drifted and will continue to drift as `kg_upgrade` grows.
+`/kmgraph:kmg-init` slash command runs parallel bash-based upgrade checks instead of calling the `kg_upgrade` MCP tool. [[ENH-022]] checks (starter-relocation, stray-knowledge-dir, version-update sentinel) are invisible to Claude Code users unless they explicitly invoke `kg_upgrade` directly. The two code paths have drifted and will continue to drift as `kg_upgrade` grows.
 
 ---
 
@@ -40,13 +40,13 @@ A string-spread bug in the `apply` switch (spreading a string instead of an arra
 
 | Version | What was tried | Why it failed |
 |---|---|---|
-| v0.6.2 | Corrected `templateSub/kgSub` mapping from `"knowledge"` → `"concepts"` in upgrade.ts (commit `2cfd3a7c`) after running upgrade against test repo and observing wrong output | Surface fix only; ENH-022 spec not read; deeper bugs (directory name, live-dir targeting, missing checks) remained |
-| v0.6.3 | Never committed — same June 17 session; after v0.6.2 merged and upgrade still broken, ENH-022 spec was finally read mid-session (line 3888 of 2026-06-17-claude.md); scope immediately expanded to v0.6.4 | N/A — became v0.6.4 |
-| v0.6.4 | Read ENH-022 spec; traced full template deployment flow; found all four root-cause bugs; fixed upgrade.ts; added version-sentinel for Codex/Gemini (ADR-055) | **Fixed.** Template bugs resolved; init drift deferred to follow-on. |
+| v0.6.2 | Corrected `templateSub/kgSub` mapping from `"knowledge"` → `"concepts"` in upgrade.ts (commit `2cfd3a7c`) after running upgrade against test repo and observing wrong output | Surface fix only; [[ENH-022]] spec not read; deeper bugs (directory name, live-dir targeting, missing checks) remained |
+| v0.6.3 | Never committed — same June 17 session; after v0.6.2 merged and upgrade still broken, [[ENH-022]] spec was finally read mid-session (line 3888 of 2026-06-17-claude.md); scope immediately expanded to v0.6.4 | N/A — became v0.6.4 |
+| v0.6.4 | Read [[ENH-022]] spec; traced full template deployment flow; found all four root-cause bugs; fixed upgrade.ts; added version-sentinel for Codex/Gemini ([[ADR-055-cross-platform-upgrade-triggering-version-sentinel-over-startup-notification]]) | **Fixed.** Template bugs resolved; init drift deferred to follow-on. |
 
 **Note:** v0.6.1 (`fix-recommendation-gate-schema`) was a Stop hook schema fix — unrelated to upgrade template paths. Not an upgrade attempt.
 
-**Pattern:** v0.6.2 patched a visible symptom without reading the ENH-022 spec. The spec was read mid-session after v0.6.2 was already merged and still broken. Reading the spec immediately revealed all four bugs.
+**Pattern:** v0.6.2 patched a visible symptom without reading the [[ENH-022]] spec. The spec was read mid-session after v0.6.2 was already merged and still broken. Reading the spec immediately revealed all four bugs.
 
 ---
 
@@ -55,17 +55,17 @@ A string-spread bug in the `apply` switch (spreading a string instead of an arra
 - Claude Code users get incomplete upgrade detection (misses all MCP-tool-only checks)
 - Every new `kg_upgrade` check must be duplicated in init's bash script or it won't surface in the wizard
 - Testing is harder because two code paths exist for the same domain
-- ENH-022 prompts took 4 implementation attempts before the init drift gap was identified
+- [[ENH-022]] prompts took 4 implementation attempts before the init drift gap was identified
 
 ---
 
 ## Resolution
 
-**v0.6.4:** The three `upgrade.ts` root-cause bugs are fixed on branch `v0.6.4-fix-upgrade-template-paths` (commits `7d07ed96`, `3d230b2f`, `91dbdcd6`, `325cc560`). The "wire init → kg_upgrade" decision was **deferred**: instead, ADR-055 added a version-sentinel approach to trigger `kg_upgrade` automatically on Codex and Gemini after install, bypassing the init wizard entirely for those platforms.
+**v0.6.4:** The three `upgrade.ts` root-cause bugs are fixed on branch `v0.6.4-fix-upgrade-template-paths` (commits `7d07ed96`, `3d230b2f`, `91dbdcd6`, `325cc560`). The "wire init → kg_upgrade" decision was **deferred**: instead, [[ADR-055-cross-platform-upgrade-triggering-version-sentinel-over-startup-notification]] added a version-sentinel approach to trigger `kg_upgrade` automatically on Codex and Gemini after install, bypassing the init wizard entirely for those platforms.
 
 The init ↔ kg_upgrade drift gap remained open for Claude Code (Claude Code has a proper hook/wizard path that the sentinel approach doesn't cover).
 
-**v0.6.5:** Init wiring implemented. `kmg-upgrade-inspector.md` Step 0 calls `kg_upgrade` inspect; results surfaced in wizard; apply routed through `kg_upgrade apply`. Bash fallback retained. Broken path ref in `kmg-init.md` line 45 fixed. ENH-022 spec updated.
+**v0.6.5:** Init wiring implemented. `kmg-upgrade-inspector.md` Step 0 calls `kg_upgrade` inspect; results surfaced in wizard; apply routed through `kg_upgrade apply`. Bash fallback retained. Broken path ref in `kmg-init.md` line 45 fixed. [[ENH-022]] spec updated.
 
 ---
 
@@ -77,7 +77,7 @@ Wire `/kmgraph:kmg-init` to call `kg_upgrade` (no args) as part of its "See what
 
 ## Discovery Context
 
-Discovered 2026-06-20 during v0.6.4 testing — 4th attempt at surfacing ENH-022 upgrade prompts to Claude Code users. Each prior attempt added checks to the init command's bash path; none reached users because the MCP tool's checks run in a separate code path that init never invokes.
+Discovered 2026-06-20 during v0.6.4 testing — 4th attempt at surfacing [[ENH-022]] upgrade prompts to Claude Code users. Each prior attempt added checks to the init command's bash path; none reached users because the MCP tool's checks run in a separate code path that init never invokes.
 
 **Key lesson:** Read the ENH spec before diagnosing upgrade failures. v0.6.2 patched a symptom without reading the spec; reading it mid-session immediately revealed all four root causes.
 
@@ -86,7 +86,7 @@ Discovered 2026-06-20 during v0.6.4 testing — 4th attempt at surfacing ENH-022
 ## Follow-Up Actions
 
 - [x] Fix three root-cause bugs in upgrade.ts (done in v0.6.4)
-- [x] Decide Codex/Gemini upgrade trigger — version sentinel chosen (ADR-055), deferred init wiring
-- [x] Create ENH tracking the init ↔ kg_upgrade drift gap (added as ENH-022 v0.6.5 scope addition — Task 3)
+- [x] Decide Codex/Gemini upgrade trigger — version sentinel chosen ([[ADR-055-cross-platform-upgrade-triggering-version-sentinel-over-startup-notification]]), deferred init wiring
+- [x] Create ENH tracking the init ↔ kg_upgrade drift gap (added as [[ENH-022]] v0.6.5 scope addition — Task 3)
 - [x] Wire init → kg_upgrade for Claude Code (done in v0.6.5 Task 2; broken path ref in kmg-init.md fixed in Task 1)
-- [ ] Update ADR-055 or create new ADR if the wiring introduces a dependency on MCP availability at init time
+- [ ] Update [[ADR-055-cross-platform-upgrade-triggering-version-sentinel-over-startup-notification]] or create new ADR if the wiring introduces a dependency on MCP availability at init time

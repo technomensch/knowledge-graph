@@ -52,7 +52,7 @@ Implement explicit allowlist via `package.json` with three tiers:
 
 ### Accepted (Should Include)
 
-- `core/examples/` — Reference content (debatable, see ADR-002)
+- `core/examples/` — Reference content (debatable, see [[ADR-002-commands-vs-skills-architecture]])
 - `README.md` — Top-level documentation
 - `LICENSE` — License file
 

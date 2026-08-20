@@ -51,4 +51,4 @@ still "succeeds" (file gets created, just wrong-named).
 - Branch: v0.7.1.5-capture-filename-diffbase-fix
 - Commit: af447452 (investigation session; fix not yet committed on this branch)
 - Category: patterns
-- Linked issues: issue-46 (GitHub #226)
+- Linked issues: issue-46 (GitHub [#226](https://github.com/technomensch/knowledge-graph/issues/226))

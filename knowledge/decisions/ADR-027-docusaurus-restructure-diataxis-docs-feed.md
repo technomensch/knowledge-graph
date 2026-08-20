@@ -25,7 +25,7 @@ category: process
 **Date:** 2026-04-08
 **Status:** Accepted
 **Implements:** v0.0.6 docs site (branch: `docs-update-docusaurus-migration-restructure`)
-**Related:** ADR-013 (documentation update protocol), ADR-023 (single source of truth changelog)
+**Related:** [[ADR-013-documentation-update-protocol]] (documentation update protocol), [[ADR-023-single-source-of-truth-changelog]] (single source of truth changelog)
 
 ---
 
@@ -277,7 +277,7 @@ The `CHANGELOG.md` and `docs-updates/` feed have non-overlapping scopes by defin
 
 ## Related Decisions
 
-- **[ADR-013](ADR-013-documentation-update-protocol.md):** Original documentation update protocol — superseded in part by this ADR's branch schema and changelog decisions; add amendment to ADR-013 pointing here
+- **[ADR-013](ADR-013-documentation-update-protocol.md):** Original documentation update protocol — superseded in part by this ADR's branch schema and changelog decisions; add amendment to [[ADR-013-documentation-update-protocol]] pointing here
 - **[ADR-023](ADR-023-single-source-of-truth-changelog.md):** Single source of truth for CHANGELOG — this ADR extends the scope boundary to cover the docs-updates feed
 
 ## Related Documentation
@@ -298,7 +298,7 @@ The `CHANGELOG.md` and `docs-updates/` feed have non-overlapping scopes by defin
 
 1. **Pluggable storage backends** — Notion, Obsidian, NotebookLM as primary KG stores instead of local markdown. Requires changes to `/kmgraph:init`, MCP server config schema, and backend adapters. Version-bump territory. Integration *guides* are in scope for this restructure; storage layer changes are not.
 2. **Contributor vs user command surface area** — `update-doc`, `create-doc`, and `doc-update-router` are KMGraph project contributor tools, not end-user tools. Today they ship to every user. Future: separate via `kmgraph-contrib` plugin, a marker file, or a `commands/contributing/` subdirectory with conditional registration.
-   - **Resolution (see [ADR-056](ADR-056-reject-plugin-split-for-contributor-only-doc-commands.md)):** This deferred item was resolved by ADR-056, which rejected the plugin-split (and marker-file / subdirectory) options in favor of repo-context auto-detection. Implementation is tracked in [ENH-033](../enhancements/ENH-033/ENH-033-specification.md).
+   - **Resolution (see [ADR-056](ADR-056-reject-plugin-split-for-contributor-only-doc-commands.md)):** This deferred item was resolved by [[ADR-056-reject-plugin-split-for-contributor-only-doc-commands]], which rejected the plugin-split (and marker-file / subdirectory) options in favor of repo-context auto-detection. Implementation is tracked in [ENH-033](../enhancements/ENH-033/ENH-033-specification.md).
 3. **STYLE-GUIDE.md slim-down** — Currently 633 lines; audience is contributors only. Deferred per user direction.
 
 ---

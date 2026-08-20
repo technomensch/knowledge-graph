@@ -29,14 +29,14 @@ category: architecture
 
 ## Context
 
-This ADR records a question surfaced on 2026-07-14 during the issue-14 (#171) config-path blast-radius audit. It is **not** part of issue-14's fix (c1/c2/c3), which is scoped to the `kg-config.json` path only. It is captured here so the decision is tracked with its full context rather than lost.
+This ADR records a question surfaced on 2026-07-14 during the issue-14 ([#171](https://github.com/technomensch/knowledge-graph/issues/171)) config-path blast-radius audit. It is **not** part of issue-14's fix (c1/c2/c3), which is scoped to the `kg-config.json` path only. It is captured here so the decision is tracked with its full context rather than lost.
 
 ### What has migrated to `~/.kmgraph/`, and what governs it
 
-The project has an established **platform-agnostic principle**: kmgraph data should live outside `~/.claude/` (a Claude-Code-specific directory unreachable by Gemini CLI, Codex, Copilot, etc.) so the tool works across AI platforms. That principle was set by **ADR-028** and applied through a series of *narrowly-scoped* migrations:
+The project has an established **platform-agnostic principle**: kmgraph data should live outside `~/.claude/` (a Claude-Code-specific directory unreachable by Gemini CLI, Codex, Copilot, etc.) so the tool works across AI platforms. That principle was set by **[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]]** and applied through a series of *narrowly-scoped* migrations:
 
-- **ADR-028** (Accepted, v0.3.5-beta) — moved the **personal KG home** from `~/.claude/knowledge-graph/` to `~/.kmgraph/`. Scope: the personal KG only.
-- **ADR-001** (Accepted, updated 2026-07-11) — moved **`kg-config.json`** to `~/.kmgraph/kg-config.json`. Scope: the config file only.
+- **[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]]** (Accepted, v0.3.5-beta) — moved the **personal KG home** from `~/.claude/knowledge-graph/` to `~/.kmgraph/`. Scope: the personal KG only.
+- **[[ADR-001-centralized-multi-kg-configuration]]** (Accepted, updated 2026-07-11) — moved **`kg-config.json`** to `~/.kmgraph/kg-config.json`. Scope: the config file only.
 - **FTS5 index relocation** (v0.6.18, no standalone ADR) — moved the **search index** to `~/.kmgraph/index/`. Scope: the index only.
 
 A recall pass (recall-agent, `--scope=all`, 2026-07-14) confirmed: **no ADR — accepted or proposed — has ever decided that the "global topic-based" or "cowork" KG *content* stores relocate to `~/.kmgraph/`.** Those two locations appear in zero ADRs, specs, or roadmap decisions.
@@ -57,7 +57,7 @@ For reference, `cowork` is a KG **type/scope** meaning "team-shared, synced via 
 ### Why this is a real question, not a typo
 
 - The two init flows offer **different storage choices and different paths** for the same operation — a user's KG lands in a different place depending on which entry point they use.
-- ADR-028's platform-agnostic rationale would *justify* moving content out of `~/.claude/` too — but that reasoning has never been applied to these modes, and doing so is a behavior change with user-migration implications (existing KGs already created under `~/.claude/knowledge-graphs/` or `~/.claude/cowork-knowledge/`).
+- [[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]]'s platform-agnostic rationale would *justify* moving content out of `~/.claude/` too — but that reasoning has never been applied to these modes, and doing so is a behavior change with user-migration implications (existing KGs already created under `~/.claude/knowledge-graphs/` or `~/.claude/cowork-knowledge/`).
 - It is therefore a **product/architecture decision**, not a mechanical path fix, and out of scope for the config-path bug.
 
 ## Decision
@@ -69,10 +69,10 @@ For reference, `cowork` is a KG **type/scope** meaning "team-shared, synced via 
    **Global-topic: yes — kept.**
 
 2. **Does content storage relocate from `~/.claude/` to `~/.kmgraph/`?**
-   Yes, for global-topic KGs: `~/.claude/knowledge-graphs/<name>/` → **`~/.kmgraph/knowledge-graphs/<name>/`** — no wrapper/umbrella folder. Fable-verified: the personal-KG index rebuild only walks a fixed, enumerated set of dirs at `~/.kmgraph/` root, so a sibling `knowledge-graphs/` folder has zero collision risk with personal KG content. `knowledge-graphs/` is already the umbrella; per-KG paths are stored individually in `kg-config.json`, so a hypothetical future second mode could claim its own sibling folder later with no disruption — no pre-built structure needed now. (This does **not** reopen ADR-028 — the personal KG's own placement directly at `~/.kmgraph/` root is untouched.)
+   Yes, for global-topic KGs: `~/.claude/knowledge-graphs/<name>/` → **`~/.kmgraph/knowledge-graphs/<name>/`** — no wrapper/umbrella folder. Fable-verified: the personal-KG index rebuild only walks a fixed, enumerated set of dirs at `~/.kmgraph/` root, so a sibling `knowledge-graphs/` folder has zero collision risk with personal KG content. `knowledge-graphs/` is already the umbrella; per-KG paths are stored individually in `kg-config.json`, so a hypothetical future second mode could claim its own sibling folder later with no disruption — no pre-built structure needed now. (This does **not** reopen [[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]] — the personal KG's own placement directly at `~/.kmgraph/` root is untouched.)
 
 3. **Migration path for existing installs?**
-   Global-topic: reuse the existing one-time legacy-seed-and-copy pattern already used for `kg-config.json` — detect `~/.claude/knowledge-graphs/`, copy forward once. Cowork: detect-and-archive per point 1 above, honoring ADR-063 (never destroy known-good state before a confirmed write).
+   Global-topic: reuse the existing one-time legacy-seed-and-copy pattern already used for `kg-config.json` — detect `~/.claude/knowledge-graphs/`, copy forward once. Cowork: detect-and-archive per point 1 above, honoring [[ADR-063-never-destroy-known-good-state-before-confirmed-write]] (never destroy known-good state before a confirmed write).
 
 4. **Which layer is authoritative?**
    The MCP server (`cli.ts`) — but it is **not already correct as-is** and must be fixed first: its "home" location option currently sets `kgPath = ~/.kmgraph` with no `<name>` subfolder, so using it today to create a second named KG would overlay the personal KG's own directories. Fix `cli.ts` (add a proper global-topic location option per point 2; purge `cowork` from its type menu and from `config.ts`'s type enum) before declaring it authoritative. Root-cause fix, not just "pick a winner": `commands/kmg-init.md` should delegate path computation to the MCP tool (`kg_config_init`/`kg_scaffold`) instead of duplicating the logic in its own bash case-statement, so the two surfaces structurally cannot diverge again. `kmg-init.md` keeps its richer UX (categories, git strategy, upgrade checks); it stops owning the storage-mode table.
@@ -87,12 +87,12 @@ v0.6.20 (commit 815c8136) executed the migration decided above, but coverage was
 
 **Root cause:** the v0.6.20 migration plan scoped its verification to data directories and the two `kmg-init` implementations (per the Decision above); it did not include a repo-wide grep for old path literals (`~/.claude/knowledge-graphs`, `~/.claude/cowork-knowledge`, `./handoff-packages`, etc.) across `commands/*.md`. A migration that relocates a directory silently regenerates the old one forever if any generator still hardcodes the old path.
 
-**Tracked as:** `knowledge/issues/issue-31/issue-31-description.md` — GitHub issue [#200](https://github.com/technomensch/knowledge-graph/issues/200). Filed as its own Bug issue (workflow_mode 3, Track only — no branch created), separate from ENH-056/#199, which only cites this bug as one of two supporting examples for the broader cross-cutting pattern and does not fix or track it directly.
+**Tracked as:** `knowledge/issues/issue-31/issue-31-description.md` — GitHub issue [#200](https://github.com/technomensch/knowledge-graph/issues/200). Filed as its own Bug issue (workflow_mode 3, Track only — no branch created), separate from [[ENH-056]]/[#199](https://github.com/technomensch/knowledge-graph/issues/199), which only cites this bug as one of two supporting examples for the broader cross-cutting pattern and does not fix or track it directly.
 
 ## Related
 
 - `knowledge/issues/issue-14/investigation-log.md` — Finding 8 (the audit trail that surfaced this)
-- ADR-028 (platform-agnostic source of truth; the precedent this decision would extend)
-- ADR-001 (kg-config.json migration; sibling narrow migration)
-- ADR-063 (never destroy known-good state before confirmed write; governs any migration path chosen)
+- [[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]] (platform-agnostic source of truth; the precedent this decision would extend)
+- [[ADR-001-centralized-multi-kg-configuration]] (kg-config.json migration; sibling narrow migration)
+- [[ADR-063-never-destroy-known-good-state-before-confirmed-write]] (never destroy known-good state before confirmed write; governs any migration path chosen)
 - ROADMAP.md → "Needs its own dedicated brainstorm/ADR before scheduling"

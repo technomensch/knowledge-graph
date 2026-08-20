@@ -24,7 +24,7 @@ category: process
 
 **Date:** 2026-04-21  
 **Status:** Accepted  
-**Related:** ADR-037 (default graph rules)
+**Related:** [[ADR-037-default-rules-for-graph-deployment]] (default graph rules)
 
 ---
 
@@ -145,8 +145,8 @@ These are structured data entry tasks with clear templates — Haiku is fully ca
 
 ## Related Decisions
 
-- **ADR-037:** Default rules seeded at graph deployment. This ADR is a concrete instantiation of that principle.
-- **ADR-034:** Capture-level routing dispatcher. Complements this decision by automating level detection.
+- **[[ADR-037-default-rules-for-graph-deployment]]:** Default rules seeded at graph deployment. This ADR is a concrete instantiation of that principle.
+- **[[ADR-034-capture-level-routing-dispatcher-agent-split]]:** Capture-level routing dispatcher. Complements this decision by automating level detection.
 
 ---
 

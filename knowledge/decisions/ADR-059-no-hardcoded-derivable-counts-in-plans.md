@@ -26,13 +26,13 @@ category: process
 **Date:** 2026-07-04
 **Status:** Accepted
 **Implements:** null (rule-only change to `~/.kmgraph/plan-authoring-rules.md`; no code)
-**Related:** ENH-037 (README indexes for `enhancements/`/`issues/` — the plan where this was caught), ENH-038 (Gemini/Claude extractor fixes — created mid-session, which is what caused the count to drift a second time)
+**Related:** [[ENH-037]] (README indexes for `enhancements/`/`issues/` — the plan where this was caught), [[ENH-038]] (Gemini/Claude extractor fixes — created mid-session, which is what caused the count to drift a second time)
 
 ---
 
 ## Context
 
-While drafting/extending the `v0.6.16-update-claude-extract-chat-for-sub-agents` plan, ENH-037's Task 8 (populate `knowledge/enhancements/README.md` and `knowledge/issues/README.md` with real content) was written with a hardcoded expected count: "36 ENH entries," later "37" after ENH-037 itself was created, then observed stale again minutes later when ENH-038 was created in the same session — 38. The plan's own prose ("Total ENHs: 37", "37 lines, ENH-001 through ENH-037") was wrong before Task 8 had even run once.
+While drafting/extending the `v0.6.16-update-claude-extract-chat-for-sub-agents` plan, [[ENH-037]]'s Task 8 (populate `knowledge/enhancements/README.md` and `knowledge/issues/README.md` with real content) was written with a hardcoded expected count: "36 ENH entries," later "37" after [[ENH-037]] itself was created, then observed stale again minutes later when [[ENH-038]] was created in the same session — 38. The plan's own prose ("Total ENHs: 37", "37 lines, [[ENH-001]] through [[ENH-037]]") was wrong before Task 8 had even run once.
 
 This user is running multiple concurrent AI sessions (Claude, Codex, Gemini/Antigravity) against the same repo, per `~/.kmgraph/me.md`'s `active_platform`/`platforms` config. Any plan step that asserts a specific file/folder/entry count as a fixed expectation is stale the moment a *different* concurrent session adds or removes an artifact before that step executes — the gap between plan-drafting time and task-execution time is real, exploitable time in this environment, not a theoretical edge case.
 
@@ -64,7 +64,7 @@ Rule text added to `~/.kmgraph/plan-authoring-rules.md § Plan Protocol` under a
 ## Consequences
 
 - Plan steps that previously read "expect N entries" now read "expect however many `<glob/ls -c command>` reports at run time" — slightly more verbose, but immune to drift.
-- Generated index/README documents (ENH-037's deliverables) must always compute their own "Total X" front matter from a live directory read, never from the plan's narrative — already how ENH-037's Task 8 generator script was designed (it globs `knowledge/enhancements/ENH-*` directly), so no behavior change there, only the plan's own prose was the problem.
+- Generated index/README documents ([[ENH-037]]'s deliverables) must always compute their own "Total X" front matter from a live directory read, never from the plan's narrative — already how [[ENH-037]]'s Task 8 generator script was designed (it globs `knowledge/enhancements/ENH-*` directly), so no behavior change there, only the plan's own prose was the problem.
 - No code changes; this is a plan-authoring process rule only. `~/.kmgraph/plan-authoring-rules.md` is the sole artifact this ADR implements.
 
 ---
@@ -78,7 +78,7 @@ Rule text added to `~/.kmgraph/plan-authoring-rules.md § Plan Protocol` under a
 
 ## Prior Discussion / Evidence Sources
 
-- Live discovery: `v0.6.16-update-claude-extract-chat-for-sub-agents` plan, ENH-037 Task 8, 2026-07-04 session — count observed drifting 36→37→38 as ENH-037 and ENH-038 were both created within the same session.
+- Live discovery: `v0.6.16-update-claude-extract-chat-for-sub-agents` plan, [[ENH-037]] Task 8, 2026-07-04 session — count observed drifting 36→37→38 as [[ENH-037]] and [[ENH-038]] were both created within the same session.
 - `~/.kmgraph/me.md` — confirms multi-platform concurrent-session operating mode (`active_platform: claude`, `platforms: [claude, gemini, codex]`), the structural reason this matters beyond a one-off transcription slip.
 - `governance-rules.md § When to Capture` — the ADR-trigger condition ("any process or governance rule discovered during a session") that this ADR satisfies.
 

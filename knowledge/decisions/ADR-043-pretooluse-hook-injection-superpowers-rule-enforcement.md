@@ -23,7 +23,7 @@ category: process
 
 **Date:** 2026-04-21
 **Status:** Accepted
-**Note:** Renumbered from ADR-041 to resolve cross-branch numbering collision with ADR-041 (Tier Abstraction Label System).
+**Note:** Renumbered from [[ADR-041-tier-abstraction-label-system]] to resolve cross-branch numbering collision with [[ADR-041-tier-abstraction-label-system]] (Tier Abstraction Label System).
 **Related:** [[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file]], [[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]], [[ADR-038-model-selection-rule-for-kg-tasks]]
 
 ---
@@ -41,7 +41,7 @@ category: process
 - In scope: all kmgraph marketplace users who also use superpowers
 - Out of scope: modifying third-party skill content (superpowers CLAUDE.md explicitly prohibits project-specific changes)
 
-**v0.5.9 Expansion (ENH-015 — Decision Governance Protocol):**
+**v0.5.9 Expansion ([[ENH-015]] — Decision Governance Protocol):**
 v0.5.9 significantly expands the hook's scope beyond the original brainstorming/writing-plans rule injection. The hook now implements a full 7-branch case statement with HARD BLOCKs and governance gates.
 
 ---
@@ -180,7 +180,7 @@ All HARD BLOCKs use "invoke the kmgraph:recall skill (via Skill tool)" — NOT `
 - **[[ADR-038-model-selection-rule-for-kg-tasks]]:** Model selection for KG ops; model heuristics addition extends this to cover plan execution task types
 - **[[ENH-015-decision-governance-protocol]]:** The feature this ADR implements; contains full Platform Delivery Matrix, Known Gaps, and Amendment Deliverables
 - **[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]]:** rules.md split shipping constraint — the rules-registry in `core/rules-registry/` follows the same principle for canonical rule text
-- **[[issue-6]]:** GitHub #125 — bug: plan-rules.md falsely described PostToolUse checklist hook as a blocking gate; fixed in v0.5.9.2 (advisory intent clarified; Layer 3 hard gate deferred per this ADR's Gap 2 pattern)
+- **[[issue-6]]:** GitHub [#125](https://github.com/technomensch/knowledge-graph/issues/125) — bug: plan-rules.md falsely described PostToolUse checklist hook as a blocking gate; fixed in v0.5.9.2 (advisory intent clarified; Layer 3 hard gate deferred per this ADR's Gap 2 pattern)
 
 ---
 

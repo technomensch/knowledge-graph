@@ -26,12 +26,12 @@ This matches a known upstream Docusaurus issue (docusaurus/docusaurus#5974): whe
 
 ## Solution
 
-This repo's `docusaurus.config.js` runs with a non-root `baseUrl: '/knowledge-graph/'` (the site is served under GitHub Pages at `/knowledge-graph/`, not domain root) and `trailingSlash: undefined` — explicitly set to `undefined` rather than left absent from the config object, which reads as a deliberate acknowledgment of the upstream issue rather than an oversight. No inline comment ties the setting to #5974 in the current config, so that connection is preserved here for future readers.
+This repo's `docusaurus.config.js` runs with a non-root `baseUrl: '/knowledge-graph/'` (the site is served under GitHub Pages at `/knowledge-graph/`, not domain root) and `trailingSlash: undefined` — explicitly set to `undefined` rather than left absent from the config object, which reads as a deliberate acknowledgment of the upstream issue rather than an oversight. No inline comment ties the setting to [#5974](https://github.com/technomensch/knowledge-graph/issues/5974) in the current config, so that connection is preserved here for future readers.
 
 ## When to Apply
 
 - Any Docusaurus site deployed under a non-root `baseUrl` (subpath deployment, e.g. GitHub Pages project sites) that sees static assets failing to load specifically in the dev server, not necessarily in production builds.
-- Before changing `trailingSlash` in a non-root-`baseUrl` Docusaurus project, check upstream issue #5974 for the current state of the interaction and confirm the change doesn't reintroduce the asset-loading break.
+- Before changing `trailingSlash` in a non-root-`baseUrl` Docusaurus project, check upstream issue [#5974](https://github.com/technomensch/knowledge-graph/issues/5974) for the current state of the interaction and confirm the change doesn't reintroduce the asset-loading break.
 
 ## Context
 

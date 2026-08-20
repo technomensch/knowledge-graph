@@ -9,11 +9,11 @@ deciders: technomensch, Claude Sonnet 4.5
 
 ## Status
 
-**Accepted** - 2026-02-16 (Deprecated in favor of ADR-010)
+**Accepted** - 2026-02-16 (Deprecated in favor of [[ADR-010-namespace-rename-knowledge-to-kg-sis]])
 
 ## Context
 
-The initial implementation attempted to control the command namespace via "shadow commands" — MCP tool definitions that would collide with competitors to force a specific namespace. Later replaced by file prefix pattern, then eventually by full namespace rename in v0.0.8.3 (ADR-010).
+The initial implementation attempted to control the command namespace via "shadow commands" — MCP tool definitions that would collide with competitors to force a specific namespace. Later replaced by file prefix pattern, then eventually by full namespace rename in v0.0.8.3 ([[ADR-010-namespace-rename-knowledge-to-kg-sis]]).
 
 ### Problem
 
@@ -108,7 +108,7 @@ Phase 2 (later): Full namespace rename to `kg-sis` to incorporate publisher iden
 
 **Migration Path:**
 - v0.0.1→v0.0.2: Rename command files with prefix
-- v0.0.8.3: Rename from `knowledge-*` to `kg-sis-*` (ADR-010)
+- v0.0.8.3: Rename from `knowledge-*` to `kg-sis-*` ([[ADR-010-namespace-rename-knowledge-to-kg-sis]])
 
 ---
 
@@ -120,7 +120,7 @@ Phase 2 (later): Full namespace rename to `kg-sis` to incorporate publisher iden
 - Users can identify command family by prefix
 - Easy to migrate to new namespace if needed
 
-**Review Date:** When considering v0.0.8.3 namespace rename (ADR-010)
+**Review Date:** When considering v0.0.8.3 namespace rename ([[ADR-010-namespace-rename-knowledge-to-kg-sis]])
 
 ---
 
@@ -140,7 +140,7 @@ Phase 2 (later): Full namespace rename to `kg-sis` to incorporate publisher iden
 
 ## Migration to ADR-010
 
-**Deprecated in v0.0.8.3:** This pattern was replaced by full namespace rename to `/kg-sis:*` commands (see ADR-010 for rationale).
+**Deprecated in v0.0.8.3:** This pattern was replaced by full namespace rename to `/kg-sis:*` commands (see [[ADR-010-namespace-rename-knowledge-to-kg-sis]] for rationale).
 
 **What Changed:**
 - `knowledge-capture-lesson` → `/kg-sis:capture-lesson`
@@ -151,4 +151,4 @@ Phase 2 (later): Full namespace rename to `kg-sis` to incorporate publisher iden
 
 **Decision Made:** 2026-02-16
 **Last Updated:** 2026-02-22
-**Status:** Accepted (Deprecated in v0.0.8.3, replaced by ADR-010)
+**Status:** Accepted (Deprecated in v0.0.8.3, replaced by [[ADR-010-namespace-rename-knowledge-to-kg-sis]])

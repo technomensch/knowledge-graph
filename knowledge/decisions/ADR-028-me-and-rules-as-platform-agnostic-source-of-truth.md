@@ -9,7 +9,7 @@ tags: [adr, identity, rules, platform-portability, me-md, rules-md, source-of-tr
 **Date:** 2026-04-09
 **Status:** Accepted
 **Implements:** v0.3.0-beta
-**Related:** ADR-001 (centralized KG config), ADR-017 (four-layer architecture), ADR-021 (single source of truth)
+**Related:** [[ADR-001-centralized-multi-kg-configuration]] (centralized KG config), [[ADR-017-four-layer-architecture-thin-commands]] (four-layer architecture), [[ADR-021-single-source-of-truth-dry-documentation]] (single source of truth)
 
 ---
 
@@ -225,9 +225,9 @@ The two-level pattern is already established in KMGraph via CLAUDE.md (project v
 
 ## Related Decisions
 
-- ADR-001: Centralized KG config — `knowledge/` path is resolved from `~/.claude/kg-config.json`
-- ADR-017: Four-layer architecture — this ADR extends the "thin shim" pattern to platform config files
-- ADR-021: Single source of truth — `me.md` and `rules.md` are the canonical sources; all platform files are derived
+- [[ADR-001-centralized-multi-kg-configuration]]: Centralized KG config — `knowledge/` path is resolved from `~/.claude/kg-config.json`
+- [[ADR-017-four-layer-architecture-thin-commands]]: Four-layer architecture — this ADR extends the "thin shim" pattern to platform config files
+- [[ADR-021-single-source-of-truth-dry-documentation]]: Single source of truth — `me.md` and `rules.md` are the canonical sources; all platform files are derived
 
 ---
 
@@ -301,7 +301,7 @@ This pattern is consistent with the ADR's broader principle — the user should 
 
 As `~/.kmgraph/rules.md` grows beyond ~120 lines, mixing behavioral rules (workflow, communication, approval gates) with plan-protocol rules (execution modes, validation checklists, stuck-work escalation) in a single file creates injection noise — all rules appear in all contexts regardless of relevance.
 
-**Observation:** A recommendation-trigger pattern has been identified (ENH-016): when a rules file exceeds ~120 lines OR contains two or more clearly separable logical domains, the system recommends splitting into focused files.
+**Observation:** A recommendation-trigger pattern has been identified ([[ENH-016]]): when a rules file exceeds ~120 lines OR contains two or more clearly separable logical domains, the system recommends splitting into focused files.
 
 **Example split pattern:**
 - `rules.md` — behavioral rules only (git workflow, communication, approval gates, knowledge capture, profile structure)
@@ -325,19 +325,19 @@ As `~/.kmgraph/rules.md` grows beyond ~120 lines, mixing behavioral rules (workf
 
 **Recovery tool:** The `platform-sync-agent` skill exists to propagate changes across platform config files and hook scripts after a split. Use it to automate the cross-reference update.
 
-**Decision:** Do not split proactively. Split only when the file exceeds the ~120-line threshold AND the user explicitly requests it, OR when the split becomes the most maintainable option during a rules-related amendment (ENH-016 tracks the recommendation-trigger implementation).
+**Decision:** Do not split proactively. Split only when the file exceeds the ~120-line threshold AND the user explicitly requests it, OR when the split becomes the most maintainable option during a rules-related amendment ([[ENH-016]] tracks the recommendation-trigger implementation).
 
 **See:** `knowledge/enhancements/ENH-016/ENH-016-specification.md` for the full recommendation-trigger protocol.
 
-**rules-capture sub-file routing (v0.5.10):** The `rules-capture` skill will be updated in v0.5.10 (Task 15) to detect sub-files in `~/.kmgraph/` matching `*rules*.md` and route captured rules to the most specific sub-file based on content keyword matching. See ENH-016 for the routing spec.
+**rules-capture sub-file routing (v0.5.10):** The `rules-capture` skill will be updated in v0.5.10 (Task 15) to detect sub-files in `~/.kmgraph/` matching `*rules*.md` and route captured rules to the most specific sub-file based on content keyword matching. See [[ENH-016]] for the routing spec.
 
-**Shipping constraint discovered during implementation (2026-05-25):** The shipped hook must use conditional fallback logic when reading split files. Hardcoding `plan-rules.md` paths in the hook breaks injection for users who haven't split — the sections silently fail to load. Pattern: `[ -f "$PLAN_RULES" ] || PLAN_RULES="$RULES"` before any `_extract_section` call. See ENH-016 spec "Shipping Constraint" section.
+**Shipping constraint discovered during implementation (2026-05-25):** The shipped hook must use conditional fallback logic when reading split files. Hardcoding `plan-rules.md` paths in the hook breaks injection for users who haven't split — the sections silently fail to load. Pattern: `[ -f "$PLAN_RULES" ] || PLAN_RULES="$RULES"` before any `_extract_section` call. See [[ENH-016]] spec "Shipping Constraint" section.
 
 ---
 
 ## Amendment — 2026-05-25: Decision Governance Protocol + Open Questions Capture
 
-Established during v0.5.9 ENH-015 design session.
+Established during v0.5.9 [[ENH-015]] design session.
 
 **Background agent pattern for ADR/ENH creation:** When a decision or enhancement crystallizes during a brainstorming session, ADR drafting and ENH spec capture fire as non-blocking background fast-agents. The brainstorm flow continues uninterrupted. When agents complete, the model presents a review-or-save prompt: "Review before saving, or save now? Files at `knowledge/decisions/ADR-NNN.md` and `knowledge/enhancements/ENH-NNN/`". If "save now": files already written, user reviews outside session at listed paths. If "review first": content surfaced inline for approve/edit/skip per item.
 

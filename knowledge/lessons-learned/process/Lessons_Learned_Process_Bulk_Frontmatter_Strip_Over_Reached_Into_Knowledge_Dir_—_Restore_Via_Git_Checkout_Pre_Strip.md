@@ -20,6 +20,6 @@ Restoration was safe because `22972a33` made no body-text changes — only front
 ## Pattern / Next Time
 
 1. **Verify scope before merging bulk strip commits**: run `git show --stat <commit> -- knowledge/` to confirm `knowledge/` was not touched unintentionally.
-2. **ENH/ADR YAML frontmatter is load-bearing** — `status`, `version_target`, `git.branch/commit`, `implements`, `related_adrs` are not readme.com render noise. They govern recall, ADR-042 compliance, and session continuity. Never strip them.
+2. **ENH/ADR YAML frontmatter is load-bearing** — `status`, `version_target`, `git.branch/commit`, `implements`, `related_adrs` are not readme.com render noise. They govern recall, [[ADR-042-adr-implements-commit-reference-mandatory]] compliance, and session continuity. Never strip them.
 3. **P1 restore passes must audit ALL docs/**, not just files with obvious JSX errors. Use `git diff --name-only <bad-commit>~1 <bad-commit> -- docs/` to find every file the bad commit touched.
 4. **Safe restore mechanism**: `git checkout <commit>~1 -- <path>` when only metadata was stripped and bodies are unchanged — no cherry-pick or revert needed.

@@ -43,7 +43,7 @@ This occurred despite the v0.0.10.1 plan explicitly listing "Step 5: Update COMM
 - **All other doc files**: version number consistency, cross-references to new features
 - **Verification**: mkdocs build with zero warnings
 
-**Trigger**: Must be a separate documented final branch (`docs-update-{description}`) with explicit plan file. *(Branch naming updated 2026-04-08 per ADR-027 — no version prefix for docs-only branches.)*
+**Trigger**: Must be a separate documented final branch (`docs-update-{description}`) with explicit plan file. *(Branch naming updated 2026-04-08 per [[ADR-027-docusaurus-restructure-diataxis-docs-feed]] — no version prefix for docs-only branches.)*
 
 ## Why This Pattern Matters
 
@@ -110,10 +110,10 @@ Suggest: "Documentation updates may be needed. If multi-branch release series co
 
 ## Related Architecture Decisions
 
-- **ADR-001**: Centralized multi-KG configuration (informs docs-update triggers)
-- **ADR-002**: Commands vs skills architecture (affects which doc sections need updating)
-- **ADR-008**: Third-person language standard (applies to all doc updates)
-- **[Future] ADR-013**: Documentation Update Protocol (formalizes this pattern as mandatory)
+- **[[ADR-001-centralized-multi-kg-configuration]]**: Centralized multi-KG configuration (informs docs-update triggers)
+- **[[ADR-002-commands-vs-skills-architecture]]**: Commands vs skills architecture (affects which doc sections need updating)
+- **[[ADR-008-third-person-language-standard]]**: Third-person language standard (applies to all doc updates)
+- **[Future] [[ADR-013-documentation-update-protocol]]**: Documentation Update Protocol (formalizes this pattern as mandatory)
 
 ---
 

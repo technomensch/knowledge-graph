@@ -5,7 +5,7 @@ date: 2026-03-03
 deciders: technomensch, Claude Haiku 4.5
 ---
 
-> **Renumbered:** Was ADR-006 (collision with ADR-006-delegated-vs-inline-kg-updates.md). Renumbered to ADR-054 on 2026-06-15.
+> **Renumbered:** Was ADR-006 (collision with ADR-006-delegated-vs-inline-kg-updates.md). Renumbered to [[ADR-054-document-cache-clear-upgrade-workaround]] on 2026-06-15.
 
 # ADR-054: Document Cache-Clear as Official Upgrade Path for Claude Code Plugin
 
@@ -17,7 +17,7 @@ deciders: technomensch, Claude Haiku 4.5
 
 Claude Code's plugin update mechanism does not invalidate the plugin cache when a version changes. Running `claude plugin update` or using "Update Now" updates metadata but leaves the physical cache directory unchanged. Users who update the plugin continue running stale files until they manually clear the cache.
 
-This is a confirmed platform bug with multiple open issues against Claude Code (#14061, #15642, #19197, #29074). There is no timeline for an upstream fix.
+This is a confirmed platform bug with multiple open issues against Claude Code ([#14061](https://github.com/technomensch/knowledge-graph/issues/14061), [#15642](https://github.com/technomensch/knowledge-graph/issues/15642), [#19197](https://github.com/technomensch/knowledge-graph/issues/19197), [#29074](https://github.com/technomensch/knowledge-graph/issues/29074)). There is no timeline for an upstream fix.
 
 The same stale-cache issue exists in Codex CLI, where versioned plugins are cached at `~/.codex/plugins/cache/$MARKETPLACE/$PLUGIN/$VERSION/` and do not clear on update (GitHub issue openai/codex#21138). Codex has been tested as a second full-automation tier with identical cache behavior.
 
@@ -54,7 +54,7 @@ codex plugin add kmgraph@knowledge-management-graph
 - **Immediate:** Documentation is deployable now without additional implementation risk
 - **Effective:** The `rm -rf` workaround is reliable and confirmed working across both full-automation platforms (Claude Code and Codex CLI)
 - **Conservative:** Avoids writing to either platform's internal cache directory from plugin code
-- **Traceable:** Links to upstream issues (Claude Code #29074, Codex #21138) so users can monitor for official fixes
+- **Traceable:** Links to upstream issues (Claude Code [#29074](https://github.com/technomensch/knowledge-graph/issues/29074), Codex [#21138](https://github.com/technomensch/knowledge-graph/issues/21138)) so users can monitor for official fixes
 - **Equivalent tiers:** Both Claude Code and Codex CLI provide full automation with identical cache behavior
 
 ## Consequences
@@ -63,7 +63,7 @@ codex plugin add kmgraph@knowledge-management-graph
 - The hook-based warning (Option 2) should be implemented in the next feature release to catch users who skip documentation
 - The upstream Claude Code issues should be upvoted to increase priority for an official fix
 
-**Update, 2026-07-28:** Option 2 was implemented — see ADR-055 (version sentinel + `kg_upgrade inspect`). A further layer of this same problem, beyond both ADR-054's manual workaround and ADR-055's sentinel, was found and tracked as `issue-32`: an already-running process doesn't pick up new code even after the cache/config staleness is otherwise resolved, since Node.js doesn't hot-reload. Live repro captured the same day.
+**Update, 2026-07-28:** Option 2 was implemented — see [[ADR-055-cross-platform-upgrade-triggering-version-sentinel-over-startup-notification]] (version sentinel + `kg_upgrade inspect`). A further layer of this same problem, beyond both [[ADR-054-document-cache-clear-upgrade-workaround]]'s manual workaround and [[ADR-055-cross-platform-upgrade-triggering-version-sentinel-over-startup-notification]]'s sentinel, was found and tracked as `issue-32`: an already-running process doesn't pick up new code even after the cache/config staleness is otherwise resolved, since Node.js doesn't hot-reload. Live repro captured the same day.
 
 ## Related
 

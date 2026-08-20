@@ -69,21 +69,21 @@ Apply `kmg-` prefix (knowledge-management-graph) to all skill and command names 
 
 ### Lineage (Precedent from Earlier Decisions)
 
-**ADR-003 (2026-02-16): File Prefix Pattern**  
+**[[ADR-003-abandon-shadow-commands-for-file-prefix]] (2026-02-16): File Prefix Pattern**  
 Established that prefixing is reversible, scalable, and effective for collision avoidance. Temporary `knowledge-` prefix proved the pattern works.
 
-**ADR-010 (2026-02-21): Full Namespace Rename**  
+**[[ADR-010-namespace-rename-knowledge-to-kg-sis]] (2026-02-21): Full Namespace Rename**  
 Demonstrated that breaking name changes are acceptable when:
 - Documented in CHANGELOG with migration table
 - Justified by clear benefit (collision avoidance, publisher identity)
 - Scope is complete (not partial renames that confuse users)
 - Migration path is clear for users
 
-**ADR-028 (live): me.md + rules.md as Platform-Agnostic Source of Truth**  
-Established principle: identity and behavioral rules must be portable across platforms. Platform-specific configs diverge from a shared source of truth — ADR-053 applies the same portability logic to naming.
+**[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]] (live): me.md + rules.md as Platform-Agnostic Source of Truth**  
+Established principle: identity and behavioral rules must be portable across platforms. Platform-specific configs diverge from a shared source of truth — [[ADR-053-kmg-prefix-cross-platform-naming]] applies the same portability logic to naming.
 
-**ADR-032 (superseded by v0.3.5-beta fixup): Platform-Specific Directives**  
-Original intent (platforms have different constraints, need different handling) informs ADR-053. Mechanism was superseded (`knowledge/platform/` reversed in favor of `CLAUDE.md`). Cited here for the principle only, not the mechanism.
+**[[ADR-032-platform-specific-directives-in-platform-config]] (superseded by v0.3.5-beta fixup): Platform-Specific Directives**  
+Original intent (platforms have different constraints, need different handling) informs [[ADR-053-kmg-prefix-cross-platform-naming]]. Mechanism was superseded (`knowledge/platform/` reversed in favor of `CLAUDE.md`). Cited here for the principle only, not the mechanism.
 
 ### Why `kmg-` Prefix Solves Both Problems
 
@@ -142,12 +142,12 @@ See implementation plan:
 
 | Decision | Reason |
 |---|---|
-| ADR-003 | Established prefixing pattern; ADR-053 extends it |
-| ADR-010 | Precedent for breaking name changes; ADR-053 follows same protocol |
-| ADR-028 | Platform-agnostic source of truth principle; ADR-053 extends to naming |
-| ADR-032 | Platform-specific constraints principle (superseded mechanism, live principle) |
-| ADR-013 | Docs updates required when behavior changes (affects user-facing docs) |
-| ENH-013 (absorbed) | Original kg-recall → auto-recall enhancement; subsumed into v0.6.0 |
+| [[ADR-003-abandon-shadow-commands-for-file-prefix]] | Established prefixing pattern; [[ADR-053-kmg-prefix-cross-platform-naming]] extends it |
+| [[ADR-010-namespace-rename-knowledge-to-kg-sis]] | Precedent for breaking name changes; [[ADR-053-kmg-prefix-cross-platform-naming]] follows same protocol |
+| [[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]] | Platform-agnostic source of truth principle; [[ADR-053-kmg-prefix-cross-platform-naming]] extends to naming |
+| [[ADR-032-platform-specific-directives-in-platform-config]] | Platform-specific constraints principle (superseded mechanism, live principle) |
+| [[ADR-013-documentation-update-protocol]] | Docs updates required when behavior changes (affects user-facing docs) |
+| [[ENH-013]] (absorbed) | Original kg-recall → auto-recall enhancement; subsumed into v0.6.0 |
 
 ---
 

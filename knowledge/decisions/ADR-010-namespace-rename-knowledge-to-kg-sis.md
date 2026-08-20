@@ -13,7 +13,7 @@ deciders: technomensch, Claude Opus 4.6
 
 ## Context
 
-The plugin was initially branded as "knowledge" (commands: `/knowledge:init`, `/knowledge:capture-lesson`, etc.), implementing the file-prefix pattern from ADR-003. However, "knowledge" is generic and collision-prone in marketplace. By v0.0.8.3, the need for clearer branding and publisher identity became clear, and a full namespace rename was executed.
+The plugin was initially branded as "knowledge" (commands: `/knowledge:init`, `/knowledge:capture-lesson`, etc.), implementing the file-prefix pattern from [[ADR-003-abandon-shadow-commands-for-file-prefix]]. However, "knowledge" is generic and collision-prone in marketplace. By v0.0.8.3, the need for clearer branding and publisher identity became clear, and a full namespace rename was executed.
 
 ### Problem
 
@@ -74,7 +74,7 @@ Full namespace rename from `knowledge` to `kg-sis`:
 2. **Publisher identity:** "sis" ties to stayinginsync brand
 3. **Scalability:** Foundation for future tools (e.g., `kg-research`, `kg-audit`)
 4. **Professional:** Clearer than generic "knowledge"
-5. **Reversible:** Pattern established in ADR-003 makes renaming straightforward
+5. **Reversible:** Pattern established in [[ADR-003-abandon-shadow-commands-for-file-prefix]] makes renaming straightforward
 
 ### Alternatives Considered
 
@@ -207,12 +207,12 @@ grep -ir "/knowledge:" docs/ | grep -v ".md~" | wc -l  # Should be minimal
 ## Migration Path from ADR-003
 
 **Evolution:**
-1. **v0.0.1-v0.0.2 (ADR-003):** File prefix pattern `knowledge-*.md`
-2. **v0.0.8.3 (ADR-010):** Full namespace rename to `/kg-sis:*`
+1. **v0.0.1-v0.0.2 ([[ADR-003-abandon-shadow-commands-for-file-prefix]]):** File prefix pattern `knowledge-*.md`
+2. **v0.0.8.3 ([[ADR-010-namespace-rename-knowledge-to-kg-sis]]):** Full namespace rename to `/kg-sis:*`
 
 **Transition:**
-- ADR-003 solved immediate problem (file prefixes)
-- ADR-010 solved long-term problem (publisher branding)
+- [[ADR-003-abandon-shadow-commands-for-file-prefix]] solved immediate problem (file prefixes)
+- [[ADR-010-namespace-rename-knowledge-to-kg-sis]] solved long-term problem (publisher branding)
 - Both patterns documented for future reference
 
 ---

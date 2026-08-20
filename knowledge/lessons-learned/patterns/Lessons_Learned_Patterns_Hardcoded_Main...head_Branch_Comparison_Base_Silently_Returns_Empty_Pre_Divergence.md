@@ -31,7 +31,7 @@ ADR amendment, not just a script patch.
 Replace all four hardcoded `main...HEAD` comparisons with the existing
 dynamic default-branch-detection + `git merge-base` pattern from
 `skills/kmg-paperwork-audit/SKILL.md:30-44`. For the `kmg-docs-impact-scan`
-site, pair the code fix with an ADR-036 amendment since its current hardcoded
+site, pair the code fix with an [[ADR-036-docs-impact-scan]] amendment since its current hardcoded
 behavior is the documented decision.
 
 Full detail: `knowledge/issues/issue-47/issue-47-description.md` and
@@ -51,4 +51,4 @@ surface.
 - Branch: v0.7.1.5-capture-filename-diffbase-fix
 - Commit: af447452 (investigation session; fix not yet committed on this branch)
 - Category: patterns
-- Linked issues: issue-47 (GitHub #227)
+- Linked issues: issue-47 (GitHub [#227](https://github.com/technomensch/knowledge-graph/issues/227))

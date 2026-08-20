@@ -145,7 +145,7 @@ Every other version — any version whose `CHANGELOG.md` entry already exists �
 
 ## Related Decisions
 
-- **[[ADR-059]]** (plans must not hardcode derivable counts) — a related but distinct pattern: ADR-059 governs stale hardcoded *counts* in plan documents going out of sync with a changing repo; this ADR governs a different artifact (permanent release documentation) and a different failure mode (structural duplication of narrative across two files, not a single stale number). Both are instances of the same broader class — unenforced drift between a document's claimed state and actual repo state — but the fix here is a scope/ownership split between two files, not a "derive at run time" rule.
+- **[[ADR-059]]** (plans must not hardcode derivable counts) — a related but distinct pattern: [[ADR-059-no-hardcoded-derivable-counts-in-plans]] governs stale hardcoded *counts* in plan documents going out of sync with a changing repo; this ADR governs a different artifact (permanent release documentation) and a different failure mode (structural duplication of narrative across two files, not a single stale number). Both are instances of the same broader class — unenforced drift between a document's claimed state and actual repo state — but the fix here is a scope/ownership split between two files, not a "derive at run time" rule.
 
 ---
 

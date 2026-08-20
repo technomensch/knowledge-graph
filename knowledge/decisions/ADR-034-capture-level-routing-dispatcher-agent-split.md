@@ -11,7 +11,7 @@ tags: [architecture, capture, routing, governance, skills, agents, commands]
 
 ## Status
 
-**Superseded by ADR-067 (2026-08-03).** Originally Accepted — implemented in v0.3.9-beta (branch: v0.3.9-capture-level-routing, PR #91). The `gov-capture-routing` skill this ADR designed lived at `~/.claude/skills/gov-capture-routing.md` (a personal, unshipped file, not this project's `skills/<name>/SKILL.md` convention) and was unreachable via the Skill tool for 3+ months — tracked as issue-18, which was decided as RETIRE rather than fix. ADR-067's `scope`/`targetKg` params on `kg_capture` (and the equivalent params already on `kg_search`/`kg_config_add_category`/`kg_fts5_status`/`kg_fts5_rebuild`/`kg_upgrade`), combined with `[personal]`/`[project]` marker parsing and cwd-derived resolution, functionally replace what this ADR's dispatcher/agent split + shared routing skill were designed to do — see ADR-067's "Known Gap" addendum and issue-18's decision record for the full reasoning. The dispatcher/agent split itself (commands do NL detection, agents handle flags only) is preserved; only the shared `gov-capture-routing` skill in between is retired, replaced by direct detection in each command.
+**Superseded by ADR-067 (2026-08-03).** Originally Accepted — implemented in v0.3.9-beta (branch: v0.3.9-capture-level-routing, PR [#91](https://github.com/technomensch/knowledge-graph/issues/91)). The `gov-capture-routing` skill this ADR designed lived at `~/.claude/skills/gov-capture-routing.md` (a personal, unshipped file, not this project's `skills/<name>/SKILL.md` convention) and was unreachable via the Skill tool for 3+ months — tracked as issue-18, which was decided as RETIRE rather than fix. ADR-067's `scope`/`targetKg` params on `kg_capture` (and the equivalent params already on `kg_search`/`kg_config_add_category`/`kg_fts5_status`/`kg_fts5_rebuild`/`kg_upgrade`), combined with `[personal]`/`[project]` marker parsing and cwd-derived resolution, functionally replace what this ADR's dispatcher/agent split + shared routing skill were designed to do — see ADR-067's "Known Gap" addendum and issue-18's decision record for the full reasoning. The dispatcher/agent split itself (commands do NL detection, agents handle flags only) is preserved; only the shared `gov-capture-routing` skill in between is retired, replaced by direct detection in each command.
 
 ## Context
 
@@ -94,8 +94,8 @@ The conflict case (e.g., "save to user level for the knowledge-graph project") i
 - `~/.claude/plans/v0.3.9-capture-level-routing.md` — full implementation plan
 - `~/.kmgraph/triggers.md` — "When capturing anything" trigger section
 - PR technomensch/knowledge-graph#91
-- ADR-017: Four-Layer Architecture Thin Commands (related: commands as thin dispatchers)
-- **Resolution (see [ADR-057](ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth.md)):** this ADR unified write *destination* routing across capture skills. ADR-057 later identified that the corresponding *detection/trigger* layer never received an equivalent unified design — it grew piecemeal across 5 independent skills.
+- [[ADR-017-four-layer-architecture-thin-commands]]: Four-Layer Architecture Thin Commands (related: commands as thin dispatchers)
+- **Resolution (see [ADR-057](ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth.md)):** this ADR unified write *destination* routing across capture skills. [[ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth]] later identified that the corresponding *detection/trigger* layer never received an equivalent unified design — it grew piecemeal across 5 independent skills.
 
 ---
 
@@ -113,7 +113,7 @@ The conflict case (e.g., "save to user level for the knowledge-graph project") i
 
 ### 2026-04-21 — Dispatcher Tier Resolution Is Authoritative; Agent Frontmatter Must Not Override (v0.5.1-beta Phase 2 remediation)
 
-**Rule:** Agent frontmatter (`agents/*.md`) MUST NOT specify a `model:` field. The dispatcher owns invocation policy (see Decision above); an agent `model:` field overrides the resolved `--model [resolved]` flag silently, bypassing the entire tier resolution chain established in ADR-041.
+**Rule:** Agent frontmatter (`agents/*.md`) MUST NOT specify a `model:` field. The dispatcher owns invocation policy (see Decision above); an agent `model:` field overrides the resolved `--model [resolved]` flag silently, bypassing the entire tier resolution chain established in [[ADR-041-tier-abstraction-label-system]].
 
 **Correct pattern:**
 - Dispatcher: reads `me.md`, resolves tier label → concrete model name, passes `--model [resolved]` to subagent
@@ -122,4 +122,4 @@ The conflict case (e.g., "save to user level for the knowledge-graph project") i
 **Incorrect pattern (eliminated in v0.5.1-beta):**
 - Agent frontmatter: `model: sonnet` — hardcodes a platform-specific model name, ignores dispatcher resolution
 
-**Scope:** Applied to all 8 agents in `agents/*.md`. The `model:` field was removed from all agent frontmatter as part of Phase 2 remediation. See also ADR-041 Amendment (2026-04-21).
+**Scope:** Applied to all 8 agents in `agents/*.md`. The `model:` field was removed from all agent frontmatter as part of Phase 2 remediation. See also [[ADR-041-tier-abstraction-label-system]] Amendment (2026-04-21).

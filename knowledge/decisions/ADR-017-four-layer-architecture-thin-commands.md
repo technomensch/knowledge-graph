@@ -110,7 +110,7 @@ Both paths produce identical output — the agent is the single source of execut
 - ✅ Commands shrink from 400–950 lines to ~80–150 lines — dramatically easier to maintain
 - ✅ Each agent owns one concern — changes are localized
 - ✅ Two entry paths share one execution path — no logic drift
-- ✅ Agent instructions are plain markdown — portable (see ADR-018)
+- ✅ Agent instructions are plain markdown — portable (see [[ADR-018-agents-template-platform-portability]])
 - ✅ Hooks can now dispatch to agents directly
 
 **Costs:**
@@ -130,8 +130,8 @@ Both paths produce identical output — the agent is the single source of execut
 
 1. **Maintainability:** Lesson format changes, recall result presentation changes, and session summary structure changes are each confined to a single ~150–250 line agent file.
 2. **Testability:** Agents can be invoked in isolation — `tests/test-skills-agents.sh` covers each agent independently.
-3. **Automation:** PostToolUse, Stop, and PreToolUse hooks (ADR-020) can dispatch to agents directly, enabling automated capture without manual command invocation.
-4. **Portability foundation:** Agent files written in plain markdown are the foundation for ADR-018 (AGENTS-template portability).
+3. **Automation:** PostToolUse, Stop, and PreToolUse hooks ([[ADR-020-lifecycle-hooks-suite-automated-capture]]) can dispatch to agents directly, enabling automated capture without manual command invocation.
+4. **Portability foundation:** Agent files written in plain markdown are the foundation for [[ADR-018-agents-template-platform-portability]] (AGENTS-template portability).
 
 ### Negative
 

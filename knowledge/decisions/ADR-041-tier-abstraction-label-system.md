@@ -24,7 +24,7 @@ category: architecture
 **Date:** 2026-04-21
 **Status:** Accepted
 **Implements:** v0.5.1-beta (Phase 2)
-**Related:** ADR-034 (dispatcher/agent split), ADR-038 (model selection rule), ADR-039 (profile terminology)
+**Related:** [[ADR-034-capture-level-routing-dispatcher-agent-split]] (dispatcher/agent split), [[ADR-038-model-selection-rule-for-kg-tasks]] (model selection rule), [[ADR-039-profile-terminology]] (profile terminology)
 
 ---
 
@@ -131,7 +131,7 @@ Tier labels are platform-neutral vocabulary that any LLM ecosystem supports. Map
 
 **Correct pattern:** Omit `model:` from agent frontmatter entirely. Claude Code's default behavior when `model:` is absent is to inherit from the caller — exactly what tier resolution requires.
 
-**Rationale:** The entire premise of ADR-041 is that tier→model mapping is user-owned data in `me.md`, resolved at invocation time by the dispatcher. Frontmatter `model:` hardcodes a platform-specific model name into the agent file — the exact anti-pattern this ADR eliminates. ADR-034 establishes that dispatchers own invocation policy; frontmatter `model:` inverts that ownership.
+**Rationale:** The entire premise of [[ADR-041-tier-abstraction-label-system]] is that tier→model mapping is user-owned data in `me.md`, resolved at invocation time by the dispatcher. Frontmatter `model:` hardcodes a platform-specific model name into the agent file — the exact anti-pattern this ADR eliminates. [[ADR-034-capture-level-routing-dispatcher-agent-split]] establishes that dispatchers own invocation policy; frontmatter `model:` inverts that ownership.
 
 **Applied to:** All 8 agents in `agents/*.md` — `model:` field removed in v0.5.1-beta Phase 2 remediation commit.
 
@@ -153,7 +153,7 @@ Tier labels are platform-neutral vocabulary that any LLM ecosystem supports. Map
 
 Three corrections applied to `ai-model-tier-resolver.md` following post-implementation review:
 
-1. **Alias map — `pro-*` added (M1):** Gemini Pro row expanded to include `pro-*` pattern (matching ADR-041 spec). Prior implementation used `gemini-pro-*` only, which under-matched the ADR's `pro-*` alias.
+1. **Alias map — `pro-*` added (M1):** Gemini Pro row expanded to include `pro-*` pattern (matching [[ADR-041-tier-abstraction-label-system]] spec). Prior implementation used `gemini-pro-*` only, which under-matched the ADR's `pro-*` alias.
 
 2. **Collapse chain — downward-only (M2):** R-3C now explicitly specifies downward-only collapse (`powerful → standard → fast`). A request for `fast-tier` halts immediately if fast is unconfigured rather than upgrading to a more expensive tier.
 

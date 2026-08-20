@@ -26,7 +26,7 @@ category: architecture
 **Implements:** v0.3.1
 **Related:** None
 
-> **Note:** This ADR was originally created as ADR-031 on 2026-04-10 (branch `v0.3.1-init-shared-refactor`). A numbering collision during the same-day merge of branch `v0.3.2-capture-draft-approve` caused ADR-031 to be reassigned to a different decision ("Lessons_Learned_ Plural Prefix Naming"). The content is restored here under the next available sequential number (ADR-064) with no changes to the original prose. Source: `.kg-archive-docs/decisions/ADR-031-shared-module-pattern-for-slash-command-deduplication.md`.
+> **Note:** This ADR was originally created as [[ADR-031-lessons-learned-plural-prefix-naming]] on 2026-04-10 (branch `v0.3.1-init-shared-refactor`). A numbering collision during the same-day merge of branch `v0.3.2-capture-draft-approve` caused [[ADR-031-lessons-learned-plural-prefix-naming]] to be reassigned to a different decision ("Lessons_Learned_ Plural Prefix Naming"). The content is restored here under the next available sequential number ([[ADR-064-shared-module-pattern-for-slash-command-deduplication]]) with no changes to the original prose. Source: `.kg-archive-docs/decisions/ADR-031-shared-module-pattern-for-slash-command-deduplication.md`.
 
 ---
 
@@ -175,5 +175,5 @@ None
 
 **Decision Made:** 2026-04-10
 **Last Updated:** 2026-04-10 (amended: cross-reference rewrite added to path migration)
-**Restored:** 2026-07-12 (renumbered from ADR-031 archive copy due to numbering collision)
+**Restored:** 2026-07-12 (renumbered from [[ADR-031-lessons-learned-plural-prefix-naming]] archive copy due to numbering collision)
 **Status:** Accepted

@@ -25,7 +25,7 @@ category: process
 
 **Date:** 2026-04-21  
 **Status:** Accepted  
-**Related:** ADR-028 (me.md and rules.md as source of truth), ADR-010 (user-level mirror — `~/.kmgraph/decisions/ADR-010-profile-terminology.md`)
+**Related:** [[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]] (me.md and rules.md as source of truth), [[ADR-010-namespace-rename-knowledge-to-kg-sis]] (user-level mirror — `~/.kmgraph/decisions/ADR-010-profile-terminology.md`)
 
 ---
 
@@ -147,7 +147,7 @@ With terminology, this becomes:
 
 ## Related Decisions
 
-- **ADR-028:** Establishes me.md and rules.md as platform-agnostic source of truth. This ADR provides naming convention for the complete set.
+- **[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]]:** Establishes me.md and rules.md as platform-agnostic source of truth. This ADR provides naming convention for the complete set.
 
 ---
 

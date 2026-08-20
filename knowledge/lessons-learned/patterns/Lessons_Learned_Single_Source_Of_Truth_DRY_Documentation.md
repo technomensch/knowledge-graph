@@ -91,7 +91,7 @@ The full DRY documentation pattern, authority map, and enforcement guidance are 
 
 ## Related
 
-- **ADR-021:** Single Source of Truth for Documentation — DRY Principle (architectural decision)
+- **[[ADR-021-single-source-of-truth-dry-documentation]]:** Single Source of Truth for Documentation — DRY Principle (architectural decision)
 - **Lesson:** Documentation Deprecation Lifecycle
 
 ---

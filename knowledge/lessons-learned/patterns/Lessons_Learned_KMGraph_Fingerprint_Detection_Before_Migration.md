@@ -147,7 +147,7 @@ fi
 ## Related Documentation
 
 **Architecture Decisions:**
-- ADR-029 — v0.3.0-beta migration architecture
+- [[ADR-029-plan-file-location-in-knowledge-graph]] — v0.3.0-beta migration architecture
 
 **Other Lessons:**
 - [Git Presence Gate in Commands](./Lessons_Learned_Patterns_Git_Presence_Gate_In_Commands.md) — Related pattern: use environmental signals to gate command behavior

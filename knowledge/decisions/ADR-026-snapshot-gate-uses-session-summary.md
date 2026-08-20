@@ -22,16 +22,16 @@ category: process
 
 **Date:** 2026-04-06
 **Status:** Accepted
-**Implements:** ENH-002
-**Related:** ADR-020 (lifecycle hooks suite), ENH-002 solution-approach.md
+**Implements:** [[ENH-002]]
+**Related:** [[ADR-020-lifecycle-hooks-suite-automated-capture]] (lifecycle hooks suite), [[ENH-002]] solution-approach.md
 
 ---
 
 ## Context
 
-ENH-002 designed a "Snapshot Gate" — a prompt inserted at the start of all capture commands (`/kmgraph:capture-lesson`, `/kmgraph:create-adr`, `/kmgraph:start-issue-tracking`) that offers to preserve session context before proceeding.
+[[ENH-002]] designed a "Snapshot Gate" — a prompt inserted at the start of all capture commands (`/kmgraph:capture-lesson`, `/kmgraph:create-adr`, `/kmgraph:start-issue-tracking`) that offers to preserve session context before proceeding.
 
-The original design in ENH-002's solution-approach explicitly invokes `session-summary-agent --snapshot`: a lightweight variant of the full session summary that captures conversation context and file changes without requiring git history.
+The original design in [[ENH-002]]'s solution-approach explicitly invokes `session-summary-agent --snapshot`: a lightweight variant of the full session summary that captures conversation context and file changes without requiring git history.
 
 **Problem:**
 - When `capture-lesson.md` was implemented, the gate's language drifted — describing the snapshot as "a lightweight mid-session save" rather than a `session-summary` invocation
@@ -67,7 +67,7 @@ After the agent returns, a visible transition message confirms: *"Session summar
 
 1. **Eliminates conceptual split:** One mechanism (session-summary) instead of two overlapping constructs (snapshot vs. session-summary). Users learn one command, not two.
 2. **Produces a persistent file:** Session summary writes to disk. Survives model switches, rate limit recoveries, and context compression — none of which a context-only snapshot survives.
-3. **Matches original intent:** ENH-002 solution-approach.md (line 15) explicitly states: "The gate is a single two-question prompt that runs the session-summary-agent in lightweight mode." The drift was an implementation error, not a design evolution.
+3. **Matches original intent:** [[ENH-002]] solution-approach.md (line 15) explicitly states: "The gate is a single two-question prompt that runs the session-summary-agent in lightweight mode." The drift was an implementation error, not a design evolution.
 4. **Better lesson quality:** A written session summary provides richer source material for a lesson's `context` field than reconstructed in-context text.
 
 ### Alternatives Considered
@@ -80,7 +80,7 @@ After the agent returns, a visible transition message confirms: *"Session summar
 **Option B: Remove the gate entirely**
 - Pros: Simplest UX
 - Cons: Loses the "capture context at the moment of discovery" value
-- Rejected because: ENH-002's core value proposition is precisely this gate
+- Rejected because: [[ENH-002]]'s core value proposition is precisely this gate
 
 ### Trade-offs
 
@@ -132,8 +132,8 @@ This closes the model-switch fragility loop end-to-end: gate writes the file →
 
 **Affected Components:**
 - `commands/capture-lesson.md` — Snapshot Gate section updated (this branch)
-- `commands/create-adr.md` — Gate language to be updated (ENH-002 full implementation)
-- `commands/start-issue-tracking.md` — Gate language to be updated (ENH-002 full implementation)
+- `commands/create-adr.md` — Gate language to be updated ([[ENH-002]] full implementation)
+- `commands/start-issue-tracking.md` — Gate language to be updated ([[ENH-002]] full implementation)
 
 **Migration Path:**
 No migration needed — language-only change in command files. No stored data affected.

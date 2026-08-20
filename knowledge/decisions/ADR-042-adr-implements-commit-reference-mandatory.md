@@ -73,7 +73,7 @@ Rule added to `~/.kmgraph/rules.md § Knowledge Capture > ADR — Implementation
 
 ### Alternatives Considered
 
-**Option A: Rely on commit message convention (e.g., "implements ADR-042")**
+**Option A: Rely on commit message convention (e.g., "implements [[ADR-042-adr-implements-commit-reference-mandatory]]")**
 - Pros: No ADR change required; visible in `git log`
 - Cons: Only searchable via git; ADR file itself remains an orphan without the link; relies on discipline at commit time
 - Rejected because: the ADR file is the canonical record — it must be self-contained
@@ -174,7 +174,7 @@ None
 
 **Context-passed path:** When `wizard_mode: false` (skill/dispatcher passes context directly), `$implements_ref` is populated from `payload.implements_ref` if present, otherwise defaults to `null`. Prevents blank frontmatter from automated capture flows.
 
-**Retroactive compliance:** All Accepted ADRs through ADR-043 have `implements` backfilled with `[[wiki-link]]` commit references or `non-git-tracked` notes. ADR-041 cross-branch collision resolved: pretooluse-hook ADR renumbered to ADR-043.
+**Retroactive compliance:** All Accepted ADRs through [[ADR-043-pretooluse-hook-injection-superpowers-rule-enforcement]] have `implements` backfilled with `[[wiki-link]]` commit references or `non-git-tracked` notes. [[ADR-041-tier-abstraction-label-system]] cross-branch collision resolved: pretooluse-hook ADR renumbered to [[ADR-043-pretooluse-hook-injection-superpowers-rule-enforcement]].
 
 **Decision Made:** 2026-04-22
 **Last Updated:** 2026-04-21

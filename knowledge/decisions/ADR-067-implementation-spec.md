@@ -23,7 +23,7 @@ Transcribed from the full ADR-067 brainstorm/review record (13 Fable-review item
 
 ## 2. Scope: two KG shapes
 
-Global-topic KGs (ADR-066's third taxonomy shape) are **out of scope** — no real cross-project-topic use case observed; captured separately as **ENH-053**, revisit only if one appears.
+Global-topic KGs ([[ADR-066-kg-content-storage-location-for-global-and-cowork-modes]]'s third taxonomy shape) are **out of scope** — no real cross-project-topic use case observed; captured separately as **[[ENH-053]]**, revisit only if one appears.
 
 - **Project-local** (many) — resolved from cwd/project-root, per call, no switch.
 - **Personal** (exactly one) — lives outside all repos in `~/.kmgraph/`; resolved via explicit `scope` param, not a switch.
@@ -39,13 +39,13 @@ Global-topic KGs (ADR-066's third taxonomy shape) are **out of scope** — no re
 
 `graphs` entries (keyed by **name**, confirmed via `utils.ts:29,88` — not a list) gain:
 
-- **`status`**: `pending` | `active` | `archived` | `deleted` (4-value enum; `pending` added for §7). Archive, never hard-delete — flips status + timestamp only, content directory untouched (ADR-063 invariant).
+- **`status`**: `pending` | `active` | `archived` | `deleted` (4-value enum; `pending` added for §7). Archive, never hard-delete — flips status + timestamp only, content directory untouched ([[ADR-063-never-destroy-known-good-state-before-confirmed-write]] invariant).
 - **`statusChangedAt`** timestamp.
 - **`githubUser`** (optional) — attribution only, not access control; powers "who archived this" in the restore-offer flow.
 - **`graphId`** — see §9.
 - **No `lastUsed` field.** Confirmed only 3 writers today (`kg_config_switch`, init, `kmg-switch.md`), all retired with `kmg-switch` — removed entirely during migration rather than kept-but-ignored. If recency is needed later (§15), derive it the same way §10's compare-view does: **git-derived recency** (`git log -1 --format=%cI`) for git-tracked KGs as the primary signal, filesystem mtime only as a fallback for non-git KGs — never a registry field (preserves append-mostly invariant), and never filesystem mtime as the primary signal for a git-tracked KG (§10 established why: `git clone`/`checkout` resets mtime to checkout time, so a freshly re-cloned KG would misleadingly rank as "most recent" regardless of how stale its actual content is — this applies to any recency ranking, not only the compare-view's specific use case).
 - **Never write to an archived/deleted entry silently** — surface "archived on `<date>`," offer to restore, before proceeding. Applies regardless of whether resolution was automatic (cwd) or explicit (name) — silence is never earned just because resolution was implicit. **Ask-frequency, not a fixed policy:** the surfacing prompt itself offers two distinctly-labeled options, not interchangeable — **"Skip"** (just this once, ask again next call) vs. **"Ignore"** (stop reminding for the rest of this session). "Always surface, never silent on first encounter" always holds; this only decides how long an acknowledgment lasts once given.
-- Full history log (every transition) explicitly deferred — **ENH-054**, YAGNI'd; lightweight status+timestamp covers every discussed need.
+- Full history log (every transition) explicitly deferred — **[[ENH-054]]**, YAGNI'd; lightweight status+timestamp covers every discussed need.
 
 **Path-missing handling** (registry entry exists, but the path it points at doesn't): check parent directory reachability first (unmounted drive ≠ deleted). If parent is reachable and target isn't: ask "deleted or moved?" — never default to `deleted`. If moved, update path, keep entry. Only mark `deleted` on explicit user confirmation.
 
@@ -102,7 +102,7 @@ The distinction: the ownership check itself still has real value for a human ses
 
 ## 9. Duplicate/forked/worktree KG registration
 
-**Base mechanism:** a `graphId` marker lives in the KG's own content directory (`knowledge/`), not the registry entry — travels automatically with clones/checkouts of that history when git-tracked. **Always written regardless of git status** — non-git KGs (personal, per ADR-066) still get one; git-tracking is what makes it *travel*, not what makes it *exist*. At `kmg-init`, check for a `graphId` already present elsewhere in the registry; surface rather than silently double-register.
+**Base mechanism:** a `graphId` marker lives in the KG's own content directory (`knowledge/`), not the registry entry — travels automatically with clones/checkouts of that history when git-tracked. **Always written regardless of git status** — non-git KGs (personal, per [[ADR-066-kg-content-storage-location-for-global-and-cowork-modes]]) still get one; git-tracking is what makes it *travel*, not what makes it *exist*. At `kmg-init`, check for a `graphId` already present elsewhere in the registry; surface rather than silently double-register.
 
 **Verified empirically before finalizing this design** (this repo's own 690-file KG): forks are distinguishable from clones via `origin` remote URL from creation, not indistinguishable as first assumed. Filename-only comparison is a bad proxy here — 22 basenames recur across unrelated folders purely from this project's own template scaffolding (`specification.md`, `progress-log.md`, etc.) — comparisons must use relative path + content hash (§10 covers the compare-view built on this).
 
@@ -116,7 +116,7 @@ The distinction: the ownership check itself still has real value for a human ses
 
 **Merge is scoped narrowly: registry pointer only, never KG content.** A full content-level merge of two independently-numbered KGs walks straight into the cross-branch ID-collision problem (§6) — two separate `issue-1`/`ENH-1`... sequences colliding on merge. Merging *only* the registry pointer (stop treating them as two separate registered paths, point at one going forward) avoids that; actual file-tree reconciliation stays a manual, human-led step, optionally assisted by §10's compare view.
 
-**Dry-run required before any actual merge, with explicit approval.** Bypass is allowed, but split into two independent axes, not one: bypass may skip *friction* (the dry-run/review step) — it must never skip *safety* (a backup/undo point is written regardless of whether the user bypassed review). Matches this project's own established pattern elsewhere (PR admin-override, `--admin` merges) and the ADR-063 invariant (never destroy known-good state before a confirmed write) — overriding review is not the same request as overriding the safety net, and the two stay separate rather than letting one imply the other.
+**Dry-run required before any actual merge, with explicit approval.** Bypass is allowed, but split into two independent axes, not one: bypass may skip *friction* (the dry-run/review step) — it must never skip *safety* (a backup/undo point is written regardless of whether the user bypassed review). Matches this project's own established pattern elsewhere (PR admin-override, `--admin` merges) and the [[ADR-063-never-destroy-known-good-state-before-confirmed-write]] invariant (never destroy known-good state before a confirmed write) — overriding review is not the same request as overriding the safety net, and the two stay separate rather than letting one imply the other.
 
 **Losing-folder fate: archive, never delete.** `mergedInto` pointer on the archived entry; its name stays resolvable as an alias to the survivor. A session landing in the archived folder gets "merged into X on `<date>`," not a bare "not initialized." Reversible, satisfying the bypass-safety rule above for free without a separate backup mechanism.
 
@@ -171,7 +171,7 @@ Fires as part of §9's flow, **after** the content-divergence gate — not on ev
 - **Automated mode disables ephemeral scope entirely** — no standing conversation to persist within; `scope` is per-call only there.
 - **Known residual risk:** mid-session compaction could silently drop this never-on-disk preference; echoing the resolved target on every write (already standard elsewhere in this design) makes it visible after the fact, doesn't prevent it.
 
-**Marker syntax: `[personal]` / `[project]` bracket prefix**, one-shot shortcut without repeating the up-front question. Bare words rejected (ordinary prose containing "personal" would misfire, same failure class as ENH-055's trigger-vocabulary gap). Dash/CLI-flag style rejected (dashes appear constantly in prose). Slash-command style rejected outright (collides with real slash commands on these platforms). Symmetric `[project]` counterpart included — no reason only one direction gets a shortcut.
+**Marker syntax: `[personal]` / `[project]` bracket prefix**, one-shot shortcut without repeating the up-front question. Bare words rejected (ordinary prose containing "personal" would misfire, same failure class as [[ENH-055]]'s trigger-vocabulary gap). Dash/CLI-flag style rejected (dashes appear constantly in prose). Slash-command style rejected outright (collides with real slash commands on these platforms). Symmetric `[project]` counterpart included — no reason only one direction gets a shortcut.
 
 **Documentation impact:** `[personal]`/`[project]` is new user-facing syntax — `docs/` reference/guide pages must be updated when this ships.
 
@@ -219,17 +219,17 @@ Never used as a signal: `clientInfo.name` (spoofable), container/Docker detectio
 ## 14. Migration path
 
 - Rides the **existing `upgrade-inspector` mechanism** (already shipped for the v0.6.20 cowork/global-topic migration) — not a bespoke disconnected script.
-- Explicit plain-English notice of the behavior change, explicit consent before cutover, originals backed up before any destructive step (ADR-063 pattern, matches the cowork-mode migration precedent).
+- Explicit plain-English notice of the behavior change, explicit consent before cutover, originals backed up before any destructive step ([[ADR-063-never-destroy-known-good-state-before-confirmed-write]] pattern, matches the cowork-mode migration precedent).
 - **Reconciles the two divergent config files as part of this same step** — `~/.kmgraph/kg-config.json` (current) vs. legacy `~/.claude/kg-config.json` (confirmed live and still actively written to, at least one real code path — `kg_search` — still preferring the stale legacy file at time of writing). Any implementation must retire the legacy path outright, not add new resolution logic alongside an unreconciled duplicate.
 - `cli.ts` independently reads/writes `.active` as its own third surface (alongside `commands/*.md`/`agents/*.md` and `index.ts`'s resolution logic) — needs the same migration treatment.
 - Standing approval already given to edit `commands/*.md` and `skills/*.md` for this migration specifically (PROTECTED-directory gate satisfied for this migration only, not a blanket waiver).
-- Proceeds independently of ENH-034 (capture-pipeline command renaming) — accepted risk that 3 overlapping files may need a second edit pass if ENH-034 later lands.
+- Proceeds independently of [[ENH-034]] (capture-pipeline command renaming) — accepted risk that 3 overlapping files may need a second edit pass if [[ENH-034]] later lands.
 
 ## 15. Explicitly out of scope / deferred
 
-- **ENH-053** — topic-KGs spanning multiple projects. No real use case observed.
-- **ENH-054** — full audit-trail history log. YAGNI'd; lightweight status+timestamp covers every discussed need. **Revival trigger recorded**: shared-login/hot-desk accountability (e.g. a federal contractor sharing a desk/machine) — a genuine "who touched what, when" need, distinct from KG-resolution correctness (which is already fully handled by §§4-9 regardless of how many people's projects share one machine's registry). If revived: strictly read-only, sort by git-derived recency (not `lastUsed`, removed in §4; not raw filesystem mtime either, per §4/§10's re-clone caveat).
-- **ENH-055** — `kmg-capture-router` trigger-vocabulary gap (misses "future enhancement"/"worth capturing" phrasing).
+- **[[ENH-053]]** — topic-KGs spanning multiple projects. No real use case observed.
+- **[[ENH-054]]** — full audit-trail history log. YAGNI'd; lightweight status+timestamp covers every discussed need. **Revival trigger recorded**: shared-login/hot-desk accountability (e.g. a federal contractor sharing a desk/machine) — a genuine "who touched what, when" need, distinct from KG-resolution correctness (which is already fully handled by §§4-9 regardless of how many people's projects share one machine's registry). If revived: strictly read-only, sort by git-derived recency (not `lastUsed`, removed in §4; not raw filesystem mtime either, per §4/§10's re-clone caveat).
+- **[[ENH-055]]** — `kmg-capture-router` trigger-vocabulary gap (misses "future enhancement"/"worth capturing" phrasing).
 - Cross-branch `ENH-NNN`/`issue-N` ID collision — deferred, git catches it for free today (§6).
 - Post-merge git divergence between already-merged clones — explicitly out of scope, manual human git operation (§9).
 - Agent-behavior heuristics for defaulting search scope / cross-scope follow-up offers — deferred to a later planning pass, not architectural.
@@ -254,29 +254,29 @@ Empirical claims in this spec were independently checked, not taken on trust, at
 Surveyed all open issues/ENHs for overlap with this work (2026-07-28). **None of the items below are closed by writing this spec — closure only happens after the corresponding implementation work is done, tested, and passing**, same bar as any other fix in this project. Listed here so release/branch planning groups the right work together rather than discovering overlap mid-implementation.
 
 **Resolved *by* this design, not separate work — close once implemented and verified:**
-- **ENH-049** (Concurrent Multi-Repo/Multi-Tool Work with Different Active KGs) — the real-world pain point that motivated this entire ADR; this spec *is* its design. Verify the resolved behavior actually eliminates the reported friction before closing, not just that the mechanism was built.
+- **[[ENH-049]]** (Concurrent Multi-Repo/Multi-Tool Work with Different Active KGs) — the real-world pain point that motivated this entire ADR; this spec *is* its design. Verify the resolved behavior actually eliminates the reported friction before closing, not just that the mechanism was built.
 - **issue-10** (`KG_MISMATCH` guard / `getProjectRoot()`) — becomes dead code once this model ships (§11). Retire as part of the same change.
 - **issue-14** (config split-brain, legacy `~/.claude/kg-config.json`) — directly addressed by the migration path (§14).
 - **issue-23** (`kg_config_switch` false-success bug) — moot once `kmg-switch`/`kg_config_switch` is retired (§11); the buggy command disappears rather than being fixed.
 
 **Efficient to fold in — same code being touched anyway, not required to ship this release:**
 - **issue-15** (personal-KG writes misindexed under the project-local FTS5 bucket, still open) — already named in §11 as a constraint the new model must not reproduce; the write path this touches is the same one being rebuilt.
-- **ENH-030** (KG remove/unregister command, proposed) — thin UI on top of the registry archive/delete lifecycle already being rebuilt (§4).
-- **ENH-051** (duplicated KG path logic between `cli.ts` and `kmg-init.md`, deferred) — `cli.ts` is already called out in §14 as needing the same migration treatment as everything else; deduplicating its path logic in the same pass avoids a second edit later (same tradeoff already accepted for ENH-034 in §14).
+- **[[ENH-030]]** (KG remove/unregister command, proposed) — thin UI on top of the registry archive/delete lifecycle already being rebuilt (§4).
+- **[[ENH-051]]** (duplicated KG path logic between `cli.ts` and `kmg-init.md`, deferred) — `cli.ts` is already called out in §14 as needing the same migration treatment as everything else; deduplicating its path logic in the same pass avoids a second edit later (same tradeoff already accepted for [[ENH-034]] in §14).
 
 **New item filed as a result of this session's research, tracked separately, grouping optional:**
-- **issue-32** (already-running MCP server processes silently serve stale plugin code after an upgrade) — filed 2026-07-28 against ADR-055's Known Gap. Out of this ADR's own scope (a code-staleness problem, not a KG-resolution problem) but surfaced during this same research and worth considering for the same release window given the shared "upgrade/update handling" theme.
+- **issue-32** (already-running MCP server processes silently serve stale plugin code after an upgrade) — filed 2026-07-28 against [[ADR-055-cross-platform-upgrade-triggering-version-sentinel-over-startup-notification]]'s Known Gap. Out of this ADR's own scope (a code-staleness problem, not a KG-resolution problem) but surfaced during this same research and worth considering for the same release window given the shared "upgrade/update handling" theme.
 
-**Explicitly not grouped:** ENH-053 (deliberately descoped, revisit only if a real use case appears), ENH-055 (unrelated code path — capture-router trigger vocabulary, no shared code with this work).
+**Explicitly not grouped:** [[ENH-053]] (deliberately descoped, revisit only if a real use case appears), [[ENH-055]] (unrelated code path — capture-router trigger vocabulary, no shared code with this work).
 
 **Acknowledged, not designed for — flagged by a concurrent session working issue-18 (2026-08-01):** `gov-capture-routing` (the mechanism `issue-18` documents as referenced-but-unreachable across 8+ commands) does a conceptually similar job to §11's `[personal]`/`[project]` marker syntax — detecting a level signal and resolving which KG a call targets. No code overlap exists today (`gov-capture-routing` has been silently non-functional for 3+ months, so it was invisible to this ADR's own design research), but `commands/kmg-sync-all.md`'s `gov-capture-routing` pass-down contract does call `kmg-switch` for its restore step — already covered by this spec's own §11 retirement sweep (`kmg-sync-all.md` is already in the Task 7.2 grep-sweep file list). No scope change to this ADR from this note; recorded so issue-18's "fix vs. retire" decision can be made in light of what this ADR ships, rather than independently. Full findings: `knowledge/handoffs/2026-08-01-issue-18-adr-067-overlap-findings.md`.
 
 ## Related
 
 - Source ADR: `knowledge/decisions/ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md`
-- ADR-001 (original `.active`/switch model)
-- ADR-055 (`knowledge/decisions/ADR-055-cross-platform-upgrade-triggering-version-sentinel-over-startup-notification.md`) — houses the related-but-distinct running-process-staleness gap surfaced during this ADR's research (§ Known Gap)
-- ADR-063 (never destroy known-good state before a confirmed write — invariant reused throughout)
-- ADR-066 (content-storage taxonomy — source of the project-local/personal/global-topic shapes)
+- [[ADR-001-centralized-multi-kg-configuration]] (original `.active`/switch model)
+- [[ADR-055-cross-platform-upgrade-triggering-version-sentinel-over-startup-notification]] (`knowledge/decisions/ADR-055-cross-platform-upgrade-triggering-version-sentinel-over-startup-notification.md`) — houses the related-but-distinct running-process-staleness gap surfaced during this ADR's research (§ Known Gap)
+- [[ADR-063-never-destroy-known-good-state-before-confirmed-write]] (never destroy known-good state before a confirmed write — invariant reused throughout)
+- [[ADR-066-kg-content-storage-location-for-global-and-cowork-modes]] (content-storage taxonomy — source of the project-local/personal/global-topic shapes)
 - issue-10, issue-14, issue-15, issue-27
-- ENH-053, ENH-054, ENH-055
+- [[ENH-053]], [[ENH-054]], [[ENH-055]]

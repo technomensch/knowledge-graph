@@ -72,7 +72,7 @@ ln -s ../CHANGELOG.md docs/CHANGELOG.md
 - Eliminates dual-maintenance: one file to update on every release
 - Root `CHANGELOG.md` is always in sync with the docs site by construction
 - GitHub and MkDocs users see identical content
-- Consistent with ADR-021 (Single Source of Truth for Documentation)
+- Consistent with [[ADR-021-single-source-of-truth-dry-documentation]] (Single Source of Truth for Documentation)
 
 **Trade-offs:**
 - Requires mkdocs-include-markdown-plugin (already a dependency — no new requirement)

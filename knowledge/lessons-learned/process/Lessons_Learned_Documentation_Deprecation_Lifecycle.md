@@ -93,7 +93,7 @@ The full deprecation format, phase descriptions, and approval language are in:
 
 ## Related
 
-- **ADR-013:** Documentation Update Protocol
+- **[[ADR-013-documentation-update-protocol]]:** Documentation Update Protocol
 - **Lesson:** Single Source of Truth (DRY) for Documentation
 
 ---

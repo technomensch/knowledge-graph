@@ -72,7 +72,7 @@ Dual architecture with clear separation:
 
 **Key Finding:** The initial research found that mixing command and skill patterns creates maintenance burden. When leadership asked "where should X go?", the answer became ambiguous.
 
-**Design Decision:** Formalized as ADR-002: Commands vs Skills Architecture.
+**Design Decision:** Formalized as [[ADR-002-commands-vs-skills-architecture]]: Commands vs Skills Architecture.
 
 ---
 

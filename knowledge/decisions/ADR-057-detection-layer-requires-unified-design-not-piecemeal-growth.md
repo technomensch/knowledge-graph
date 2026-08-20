@@ -26,7 +26,7 @@ category: architecture
 **Date:** 2026-07-01
 **Status:** Accepted — investigation settled 2026-07-03 (final decision: no consolidation)
 **Implements:** No implementation required. The final decision is "no change" to the 5 skills, apart from two minor items: (1) clean up `rules-capture-agent`'s input contract into a pure write-executor, and (2) add a shared trigger-fixture file. See the Decision section.
-**Related:** [ADR-034](ADR-034-capture-level-routing-dispatcher-agent-split.md) (the one genuinely unified capture system — destination routing, not detection), [ADR-045](ADR-045-update-profile-skill-not-command.md) (the "consistent with" admission), [ADR-056](ADR-056-reject-plugin-split-for-contributor-only-doc-commands.md) (sibling piecemeal-growth finding from the same session), ENH-006, ENH-008 (prior-art evidence)
+**Related:** [ADR-034](ADR-034-capture-level-routing-dispatcher-agent-split.md) (the one genuinely unified capture system — destination routing, not detection), [ADR-045](ADR-045-update-profile-skill-not-command.md) (the "consistent with" admission), [ADR-056](ADR-056-reject-plugin-split-for-contributor-only-doc-commands.md) (sibling piecemeal-growth finding from the same session), [[ENH-006]], [[ENH-008]] (prior-art evidence)
 
 ---
 
@@ -53,11 +53,11 @@ The maintainer had assumed these were part of a deliberately unified "detection 
 **Evidence gathered (recall investigation, 2026-07-01):**
 
 - **Two creation waves, no unifying spec.** `lesson-capture` and `adr-guide` were both created 2026-02-27 in one generic batch commit (`739181b1`, "Add skills and subagents layer") alongside 3 other skills — no governing ENH/ADR at creation.
-- `capture-router` created 2026-03-30 under **ENH-008**, bundled into a release commit with 3 unrelated ENHs (ENH-005, ENH-006, ENH-007) — a narrowly-scoped one-off gap fix, not a detection-layer initiative.
+- `capture-router` created 2026-03-30 under **[[ENH-008]]**, bundled into a release commit with 3 unrelated ENHs ([[ENH-005]], [[ENH-006]], [[ENH-007]]) — a narrowly-scoped one-off gap fix, not a detection-layer initiative.
 - `rules-capture` created 2026-04-10 with no governing ENH/ADR at creation. Its interactions with `lesson-capture` (exclusion added) and `capture-router` (routing fix) were patched in reactively **within 1 day** of creation — evidence of retrofitted coupling, not upfront co-design.
-- `update-profile` created 2026-04-23 under **ADR-045**. ADR-045's own text is the clinching evidence: its "Neutral" consequences section states the skill approach is merely *"consistent with how other behavioral enforcements (rules-capture, lesson-capture, adr-guide) are implemented in kmgraph"* — i.e. it explicitly **followed an observed pattern rather than a designed architecture.** This is the closest thing to a unifying rationale anywhere in the KG, and it explicitly is not one.
-- **ENH-006** (2026-03-30) found and fixed keyword-detection gaps in *both* `lesson-capture` and `adr-guide` in the same audit, but logged them as two separate lettered problems (B and C) — evaluated as independent one-off defects, not components of one system.
-- The only genuinely unified shared system found is **ADR-034** (`gov-capture-routing`, 2026-04-15) — but that governs write **destination** (which KG: user / project / named), not detection **trigger logic**. No ADR unifies when/how these 5 skills fire.
+- `update-profile` created 2026-04-23 under **[[ADR-045-update-profile-skill-not-command]]**. [[ADR-045-update-profile-skill-not-command]]'s own text is the clinching evidence: its "Neutral" consequences section states the skill approach is merely *"consistent with how other behavioral enforcements (rules-capture, lesson-capture, adr-guide) are implemented in kmgraph"* — i.e. it explicitly **followed an observed pattern rather than a designed architecture.** This is the closest thing to a unifying rationale anywhere in the KG, and it explicitly is not one.
+- **[[ENH-006]]** (2026-03-30) found and fixed keyword-detection gaps in *both* `lesson-capture` and `adr-guide` in the same audit, but logged them as two separate lettered problems (B and C) — evaluated as independent one-off defects, not components of one system.
+- The only genuinely unified shared system found is **[[ADR-034-capture-level-routing-dispatcher-agent-split]]** (`gov-capture-routing`, 2026-04-15) — but that governs write **destination** (which KG: user / project / named), not detection **trigger logic**. No ADR unifies when/how these 5 skills fire.
 
 **Consequence of piecemeal growth:** each skill independently re-implements NL pattern detection for its own trigger vocabulary, with no shared classification logic, no consistent confidence/precision model across skills, and cross-skill exclusions (e.g. `rules-capture` excluding `lesson-capture`'s territory) maintained as ad-hoc patches rather than a single source of truth.
 
@@ -108,10 +108,10 @@ That larger pipeline design is **not yet finalized** and does **not yet have its
 
 ~~Do NOT write an implementation ENH for detection-layer consolidation yet. The classifier's exact shape depends on decisions not yet locked in the parent design (e.g. how `capture_mode` routing interacts with classification).~~
 
-**This reasoning was tested and found false — see "Amendments" section below.** `capture_mode` is a downstream consumer of the classifier's output, not a co-dependency. The consolidation ENH is ready to be specced now — **filed as [ENH-036](../enhancements/ENH-036/ENH-036-specification.md)** under the ADR-058 umbrella.
+**This reasoning was tested and found false — see "Amendments" section below.** `capture_mode` is a downstream consumer of the classifier's output, not a co-dependency. The consolidation ENH is ready to be specced now — **filed as [ENH-036](../enhancements/ENH-036/ENH-036-specification.md)** under the [[ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings]] umbrella.
 
-1. The consolidation ENH is folded into the umbrella naming/governance ADR as a ready-now item, alongside **ADR-056 / ENH-033** (contributor-vs-user command scoping) and the chat-history backfill extractor ENH.
-2. That umbrella ADR cites **this ADR (ADR-057)** as one of its governing decisions.
+1. The consolidation ENH is folded into the umbrella naming/governance ADR as a ready-now item, alongside **[[ADR-056-reject-plugin-split-for-contributor-only-doc-commands]] / [[ENH-033]]** (contributor-vs-user command scoping) and the chat-history backfill extractor ENH.
+2. That umbrella ADR cites **this ADR ([[ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth]])** as one of its governing decisions.
 3. **Forward cross-reference:** update this section with the real ENH number once the consolidation ENH is filed.
 
 ---
@@ -120,7 +120,7 @@ That larger pipeline design is **not yet finalized** and does **not yet have its
 
 ### Why this approach
 
-1. **The evidence is decisive.** Every one of the 5 skills traces to either a generic batch commit, a one-off gap-fix ENH bundled with unrelated work, or a create-then-patch-within-a-day sequence. No artifact anywhere in the KG designs the detection layer as a system. ADR-045 self-describes as pattern-following, not architecture.
+1. **The evidence is decisive.** Every one of the 5 skills traces to either a generic batch commit, a one-off gap-fix ENH bundled with unrelated work, or a create-then-patch-within-a-day sequence. No artifact anywhere in the KG designs the detection layer as a system. [[ADR-045-update-profile-skill-not-command]] self-describes as pattern-following, not architecture.
 2. **Detection is the layer that should be unified; drafting is not.** All 5 skills do the *same kind* of work (NL signal detection + type discrimination) and currently duplicate it. The drafting agents do *genuinely different* work (different artifacts, templates, destinations) and correctly stay separate. Consolidating detection removes duplication without collapsing things that are legitimately distinct.
 3. **A single classifier gives a consistent precision/confidence model.** Today each skill has its own ad-hoc trigger vocabulary and no shared confidence model; cross-skill exclusions are patches. One classifier is the natural home for a single source of truth on when a signal fires and which type it is.
 4. **Deferring the ENH is correct, not procrastination.** The classifier's shape is genuinely dependent on unresolved parent-design questions (`capture_mode` routing). Filing an ENH now would lock a shape that the parent design may invalidate.
@@ -172,17 +172,17 @@ That larger pipeline design is **not yet finalized** and does **not yet have its
 
 ### Neutral
 
-1. **Contrast with ADR-034 is now explicit:** destination routing *is* unified (`gov-capture-routing`); detection is *not*. This ADR names that asymmetry rather than leaving it implicit.
+1. **Contrast with [[ADR-034-capture-level-routing-dispatcher-agent-split]] is now explicit:** destination routing *is* unified (`gov-capture-routing`); detection is *not*. This ADR names that asymmetry rather than leaving it implicit.
 
 ---
 
 ## Prior Discussion / Evidence Sources
 
-- **ENH-006** (`knowledge/enhancements/ENH-006/ENH-006-specification.md`) — the keyword-gap audit that treated `lesson-capture` and `adr-guide` gaps as two separate lettered problems (B and C), evidencing that they were seen as independent defects rather than one system.
-- **ENH-008** (`knowledge/enhancements/ENH-008/ENH-008-specification.md`) — `capture-router`'s origin as a one-off gap fix, bundled with unrelated ENHs.
-- **ADR-045** (`ADR-045-update-profile-skill-not-command.md`) — the "consistent with how other behavioral enforcements ... are implemented" admission; closest thing to a unifying rationale, and explicitly not one.
-- **ADR-034** (`ADR-034-capture-level-routing-dispatcher-agent-split.md`) — the one genuinely unified shared capture system, governing write *destination* (which KG), not detection *trigger logic*; contrasted here against the absence of an equivalent for detection.
-- **ADR-056** (`ADR-056-reject-plugin-split-for-contributor-only-doc-commands.md`) — sibling finding from the same session, a different layer of the same overall "system got confusing through piecemeal growth" theme.
+- **[[ENH-006]]** (`knowledge/enhancements/ENH-006/ENH-006-specification.md`) — the keyword-gap audit that treated `lesson-capture` and `adr-guide` gaps as two separate lettered problems (B and C), evidencing that they were seen as independent defects rather than one system.
+- **[[ENH-008]]** (`knowledge/enhancements/ENH-008/ENH-008-specification.md`) — `capture-router`'s origin as a one-off gap fix, bundled with unrelated ENHs.
+- **[[ADR-045-update-profile-skill-not-command]]** (`ADR-045-update-profile-skill-not-command.md`) — the "consistent with how other behavioral enforcements ... are implemented" admission; closest thing to a unifying rationale, and explicitly not one.
+- **[[ADR-034-capture-level-routing-dispatcher-agent-split]]** (`ADR-034-capture-level-routing-dispatcher-agent-split.md`) — the one genuinely unified shared capture system, governing write *destination* (which KG), not detection *trigger logic*; contrasted here against the absence of an equivalent for detection.
+- **[[ADR-056-reject-plugin-split-for-contributor-only-doc-commands]]** (`ADR-056-reject-plugin-split-for-contributor-only-doc-commands.md`) — sibling finding from the same session, a different layer of the same overall "system got confusing through piecemeal growth" theme.
 
 ---
 
@@ -191,14 +191,14 @@ That larger pipeline design is **not yet finalized** and does **not yet have its
 - **[ADR-034](ADR-034-capture-level-routing-dispatcher-agent-split.md):** Unified *destination* routing; this ADR identifies the missing unified *detection* counterpart.
 - **[ADR-045](ADR-045-update-profile-skill-not-command.md):** Its "consistent with" wording is the clinching evidence of pattern-following over design.
 - **[ADR-056](ADR-056-reject-plugin-split-for-contributor-only-doc-commands.md):** Same-session sibling finding on piecemeal growth in the doc-command layer.
-- **[ADR-058](ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md):** Cites this ADR as evidence — the architectural-accretion instance of the broader process gap it governs. ADR-058's governance layer sits above this decision; the DETECT-layer consolidation ENH unblocked by this ADR's 2026-07-03 amendment is filed as **ENH-036** under ADR-058's umbrella.
+- **[ADR-058](ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md):** Cites this ADR as evidence — the architectural-accretion instance of the broader process gap it governs. [[ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings]]'s governance layer sits above this decision; the DETECT-layer consolidation ENH unblocked by this ADR's 2026-07-03 amendment is filed as **[[ENH-036]]** under [[ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings]]'s umbrella.
 
 ---
 
 ## Future Considerations
 
 1. ~~File the consolidation ENH once the parent auto-capture pipeline design is finalized~~ — **superseded, see Amendments below: the dependency this deferral was based on does not hold. The ENH is no longer blocked.**
-2. **Close the forward-reference loop:** ~~update this ADR's "Deferred implementation" marker with the real ENH number when it exists.~~ **Done (2026-07-03): the consolidation ENH is [ENH-036](../enhancements/ENH-036/ENH-036-specification.md), governed by ADR-057 and ADR-058.**
+2. **Close the forward-reference loop:** ~~update this ADR's "Deferred implementation" marker with the real ENH number when it exists.~~ **Done (2026-07-03): the consolidation ENH is [ENH-036](../enhancements/ENH-036/ENH-036-specification.md), governed by [[ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth]] and [[ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings]].**
 3. **Classifier precision model:** decide how a single confidence model reconciles the 5 previously-independent trigger vocabularies without regressing any current trigger's recall. **This is now the actual open dependency — see Amendments.**
 
 ---

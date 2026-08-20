@@ -115,7 +115,7 @@ A protocol violation occurred during `v0.0.10-docs` branch implementation when c
 
 **For documentation burden:**
 - Add "Plan File Protocol" section to CLAUDE.md
-- Link to Lessons_Learned_Plan_File_Dual_Location_Protocol.md
+- Link to [[Lessons_Learned_Plan_File_Dual_Location_Protocol]].md
 - Update project onboarding documentation
 
 ---
@@ -150,14 +150,14 @@ The version in docs/plans/ filename should match the branch/feature version:
 
 ## Related Decisions
 
-- **ADR-013:** Documentation Update Protocol (plans must document changes)
-- **ADR-010:** Namespace Rename (governance for renaming protocols)
+- **[[ADR-013-documentation-update-protocol]]:** Documentation Update Protocol (plans must document changes)
+- **[[ADR-010-namespace-rename-knowledge-to-kg-sis]]:** Namespace Rename (governance for renaming protocols)
 
 ---
 
 ## Related Lessons Learned
 
-- **Lessons_Learned_Plan_File_Dual_Location_Protocol.md** — Full pattern with examples and prevention checklist
+- **[[Lessons_Learned_Plan_File_Dual_Location_Protocol]].md** — Full pattern with examples and prevention checklist
 
 ---
 

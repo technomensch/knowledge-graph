@@ -366,7 +366,7 @@ export function doFeatureThing(...): ReturnType {
 ## Related Documentation
 
 **Architecture Decisions:**
-- See ADR-015 and ADR-016 (created with this lesson)
+- See [[ADR-015-node-sqlite3-wasm-for-fts5-search]] and [[ADR-016-graceful-fallback-optional-mcp-dependencies]] (created with this lesson)
 
 **Implementation:**
 - `mcp-server/src/tools/fts5.ts` — FTS5 index management and search

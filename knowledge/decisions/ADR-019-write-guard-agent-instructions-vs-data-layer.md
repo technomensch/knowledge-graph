@@ -11,7 +11,7 @@
 
 KMGraph supports multiple knowledge graphs via `~/.claude/kg-config.json`. A user working on project A can have project B's knowledge graph active — either accidentally (they forgot to switch) or intentionally (cross-referencing). When `lesson-capture-agent` or `session-summary-agent` writes to the active KG, it may write to the wrong project's graph.
 
-The v0.2.0-beta local-config branch (ADR-012 area) already ships a SessionStart alert that warns at session start if the active KG doesn't match the current working directory. But this only catches the mismatch once per session — it doesn't protect individual write operations during the session.
+The v0.2.0-beta local-config branch ([[ADR-012-hook-security-model]] area) already ships a SessionStart alert that warns at session start if the active KG doesn't match the current working directory. But this only catches the mismatch once per session — it doesn't protect individual write operations during the session.
 
 **Problem:**
 - Agents write to the active KG, which may not match the current project directory
@@ -68,7 +68,7 @@ Before writing any file:
 
 1. **Incremental safety:** The write guard provides meaningful protection now, in v0.2.0-beta, without waiting for the `kg_capture` MCP tool. A guard that is model-dependent is better than no guard.
 2. **Agent instructions are the available enforcement point:** In v0.2.0-beta, agents write via filesystem tools (Read/Write/Edit). There is no data-layer hook in this path. Agent instructions are the only place to insert the check.
-3. **Deferred data-layer enforcement is explicitly tracked:** The v0.2.1 tracking issue (GitHub #39) captures `kg_capture` as the migration target. This is not an indefinite deferral — it has a version and an issue.
+3. **Deferred data-layer enforcement is explicitly tracked:** The v0.2.1 tracking issue (GitHub [#39](https://github.com/technomensch/knowledge-graph/issues/39)) captures `kg_capture` as the migration target. This is not an indefinite deferral — it has a version and an issue.
 4. **User experience is identical regardless of enforcement layer:** The user sees the same block message whether the check is in agent instructions or in a TypeScript tool. The v0.2.1 migration is transparent to users.
 
 ### Alternatives Considered
@@ -127,7 +127,7 @@ Before writing any file:
 
 ## Implementation
 
-**Timeline:** Agent instruction guard implemented 2026-03-27 in v0.2.0-beta (Phase 2). `kg_capture` enforcement deferred to v0.2.1 (GitHub issue #39).
+**Timeline:** Agent instruction guard implemented 2026-03-27 in v0.2.0-beta (Phase 2). `kg_capture` enforcement deferred to v0.2.1 (GitHub issue [#39](https://github.com/technomensch/knowledge-graph/issues/39)).
 
 **Affected Components:**
 - `agents/lesson-capture-agent.md` — pre-write KG alignment check in instructions
@@ -145,7 +145,7 @@ Before writing any file:
 **Success Criteria:**
 - ✅ `lesson-capture-agent` and `session-summary-agent` block writes when active KG doesn't match current project directory
 - ✅ Block message names the conflicting project and offers explicit options (switch or continue)
-- ✅ v0.2.1 tracking issue (GitHub #39) captures `kg_capture` as the migration target
+- ✅ v0.2.1 tracking issue (GitHub [#39](https://github.com/technomensch/knowledge-graph/issues/39)) captures `kg_capture` as the migration target
 
 **Review Date:** 2026-06-27 — reassess after v0.2.1 ships `kg_capture`; this ADR status should update to Superseded at that point
 
@@ -164,7 +164,7 @@ Before writing any file:
 - `agents/lesson-capture-agent.md` — write guard section
 - `agents/session-summary-agent.md` — write guard section
 - `docs/plans/v0.2.0-beta-master.md` — "Active KG / Project Directory Alignment" section
-- GitHub issue #39 — v0.2.1 tracking issue for `kg_capture`
+- GitHub issue [#39](https://github.com/technomensch/knowledge-graph/issues/39) — v0.2.1 tracking issue for `kg_capture`
 
 ---
 
@@ -196,7 +196,7 @@ filesystem tools. The "non-agent write paths" gap remains open for these command
 `capture.ts:252-266` semantics; skip on explicit `--output-dir`/`--project`).
 Cross-platform (Claude, Gemini, Codex). Model-dependent.
 
-**ENH-026** tracks: sync-all/update-graph Step 0 guards, `run_extraction.py` bypass-proof
+**[[ENH-026]]** tracks: sync-all/update-graph Step 0 guards, `run_extraction.py` bypass-proof
 CWD check, full unguarded-path audit, and ADR supersession.
 
-**Review date updated:** Reassess when ENH-026 ships; mark this ADR Superseded at that point.
+**Review date updated:** Reassess when [[ENH-026]] ships; mark this ADR Superseded at that point.

@@ -40,18 +40,18 @@ category: architecture
 
 ## Context
 
-ADR-028 established `knowledge/rules.md` as a platform-agnostic source of truth — designed to travel unchanged to Gemini, Cursor, Codex, and any future AI tool. However, an audit of `knowledge/rules.md` on 2026-04-11 found that the Tool Preferences section contained Claude Code-specific tool names:
+[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]] established `knowledge/rules.md` as a platform-agnostic source of truth — designed to travel unchanged to Gemini, Cursor, Codex, and any future AI tool. However, an audit of `knowledge/rules.md` on 2026-04-11 found that the Tool Preferences section contained Claude Code-specific tool names:
 
 - `Glob`, `Grep`, `Bash`, `Read`, `Edit` — Claude Code tool API names
 - `context-mode MCP tools` — Claude Code-specific context management plugin
 - `subagents` — Claude Code subagent delegation pattern
 - `.jsonl` — Claude Code transcript format; referencing it creates a Claude-specific scoping rule
 
-These entries violate ADR-028's platform-agnostic guarantee. On Gemini CLI or Cursor, these directives reference tools that do not exist, either silently degrading or confusing the agent.
+These entries violate [[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]]'s platform-agnostic guarantee. On Gemini CLI or Cursor, these directives reference tools that do not exist, either silently degrading or confusing the agent.
 
 **Architecture decision required:** Where should Claude-specific directives live?
 
-The original plan considered `CLAUDE.md`, but CLAUDE.md is already a thin shim (ADR-028, ADR-017) and must not take on a dual role as a directive store. Mixing shim responsibilities with tool directives creates a second source of truth and breaks the single-shim-line pattern.
+The original plan considered `CLAUDE.md`, but CLAUDE.md is already a thin shim ([[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]], [[ADR-017-four-layer-architecture-thin-commands]]) and must not take on a dual role as a directive store. Mixing shim responsibilities with tool directives creates a second source of truth and breaks the single-shim-line pattern.
 
 ---
 
@@ -88,7 +88,7 @@ knowledge/platform/
 
 ### Why not CLAUDE.md
 
-CLAUDE.md is already a thin shim. Its role is to load the platform-agnostic foundation files (`knowledge/rules.md`, `knowledge/me.md`) and add minimal project-identification context. Adding tool directives creates a second source of truth, making it unclear whether a tool preference lives in `rules.md` or `CLAUDE.md`. The shim pattern (ADR-028) requires that `rules.md` is the single authoritative source; CLAUDE.md must not store directives that duplicate or extend it.
+CLAUDE.md is already a thin shim. Its role is to load the platform-agnostic foundation files (`knowledge/rules.md`, `knowledge/me.md`) and add minimal project-identification context. Adding tool directives creates a second source of truth, making it unclear whether a tool preference lives in `rules.md` or `CLAUDE.md`. The shim pattern ([[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]]) requires that `rules.md` is the single authoritative source; CLAUDE.md must not store directives that duplicate or extend it.
 
 ### Why `knowledge/platform/` not `knowledge/rules-claude.md`
 
@@ -104,7 +104,7 @@ A single file containing all platforms in separate sections creates merge confli
 
 ### Positive
 
-1. **ADR-028 compatibility restored.** `knowledge/rules.md` contains zero Claude-specific tool references after this change.
+1. **[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]] compatibility restored.** `knowledge/rules.md` contains zero Claude-specific tool references after this change.
 2. **Multi-platform extensibility.** Adding Gemini, Cursor, or Codex support is a new file in `knowledge/platform/` — no surgery on `rules.md`.
 3. **Clear ownership.** Tool directives for each platform are discoverable in a single, predictable file.
 4. **CLAUDE.md stays thin.** The shim pattern is preserved; CLAUDE.md continues to point rather than store.
@@ -144,7 +144,7 @@ knowledge/
 
 **Files created/modified in v0.3.5-beta:**
 - Create: `knowledge/platform/claude.md`
-- Update: `knowledge/rules.md` — remove Claude-specific tool entries; add ADR-032 reference comment
+- Update: `knowledge/rules.md` — remove Claude-specific tool entries; add [[ADR-032-platform-specific-directives-in-platform-config]] reference comment
 - Update: `CLAUDE.md` — add `## Platform Preferences` shim section
 - Update: `core/templates/knowledge/rules.md` — apply same split; add guidance comment
 - Update: `commands/init.md` — scaffold `knowledge/platform/claude.md` for new installs; upgrade flow for existing users
@@ -159,4 +159,4 @@ knowledge/
 
 ## Amendment — 2026-04-21 (Superseded in part by ADR-039)
 
-ADR-032 mandated `knowledge/platform/<platform>.md` as the primary home for platform-specific config. ADR-039 supersedes this in part: platform files are now **project-level overrides only**, not the primary config location. The primary config for platform and tier mapping lives in `me.md` YAML frontmatter (User Profile or Project Profile per ADR-039 terminology). See also ADR-041 (tier abstraction label system).
+[[ADR-032-platform-specific-directives-in-platform-config]] mandated `knowledge/platform/<platform>.md` as the primary home for platform-specific config. [[ADR-039-profile-terminology]] supersedes this in part: platform files are now **project-level overrides only**, not the primary config location. The primary config for platform and tier mapping lives in `me.md` YAML frontmatter (User Profile or Project Profile per [[ADR-039-profile-terminology]] terminology). See also [[ADR-041-tier-abstraction-label-system]] (tier abstraction label system).

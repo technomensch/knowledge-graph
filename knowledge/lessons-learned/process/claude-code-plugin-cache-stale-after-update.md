@@ -116,9 +116,9 @@ None available within the plugin — this is a platform-level limitation in both
 - **Fix:** esbuild bundling to create self-contained binary
 
 **Example sequence:**
-1. User installs kmgraph v0.5.9 from marketplace → unbundled binary fails (issue #2)
+1. User installs kmgraph v0.5.9 from marketplace → unbundled binary fails (issue [#2](https://github.com/technomensch/knowledge-graph/issues/2))
 2. User manually installs v0.5.10.3 with esbuild fix via git clone → works
-3. User runs `claude plugin update` → binary is cached stale (issue #1), shows old version
+3. User runs `claude plugin update` → binary is cached stale (issue [#1](https://github.com/technomensch/knowledge-graph/issues/1)), shows old version
 4. User clears cache and reinstalls → works again
 
 Both issues must be solved together for a reliable upgrade experience.

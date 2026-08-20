@@ -56,7 +56,7 @@ This is a variant of the DRY documentation problem: the same information must ex
 
 **Immediate:** Add `docs/CHANGELOG.md` to the release checklist as a mandatory update target alongside root `CHANGELOG.md`.
 
-**Long-term (tracked in ADR-023):** Establish root `CHANGELOG.md` as the single source of truth and configure MkDocs to include it directly — eliminating the dual-maintenance requirement.
+**Long-term (tracked in [[ADR-023-single-source-of-truth-changelog]]):** Establish root `CHANGELOG.md` as the single source of truth and configure MkDocs to include it directly — eliminating the dual-maintenance requirement.
 
 ---
 
@@ -72,8 +72,8 @@ Verify with: `grep -n "0\.\(current version\)" CHANGELOG.md docs/CHANGELOG.md` �
 
 ## Related
 
-- **ADR-023:** Single source of truth for CHANGELOG — root file included by MkDocs
-- **ADR-021:** Single Source of Truth (DRY) for Documentation
+- **[[ADR-023-single-source-of-truth-changelog]]:** Single source of truth for CHANGELOG — root file included by MkDocs
+- **[[ADR-021-single-source-of-truth-dry-documentation]]:** Single Source of Truth (DRY) for Documentation
 - **STYLE-GUIDE.md** — Section 4f: Changelog entry format (TL;DR first)
 
 ---

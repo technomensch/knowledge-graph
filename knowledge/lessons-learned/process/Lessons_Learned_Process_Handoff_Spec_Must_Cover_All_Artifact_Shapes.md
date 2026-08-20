@@ -11,7 +11,7 @@ category: process
 ---
 ## Problem
 
-ENH-021 assumed a single handoff artifact — one `.md` file in `knowledge/sessions/YYYY-MM/` with YAML frontmatter. In reality the repo has two handoff shapes:
+[[ENH-021]] assumed a single handoff artifact — one `.md` file in `knowledge/sessions/YYYY-MM/` with YAML frontmatter. In reality the repo has two handoff shapes:
 
 1. **Session-style** — a single `.md` file with YAML frontmatter
 2. **Package handoff** — multi-file output under `./handoff-packages/YYYY-MM-DD/` with a `START-HERE.md` using markdown header fields (no YAML)
@@ -26,7 +26,7 @@ Added `continues_from` to both shapes:
 - YAML frontmatter field for session-style handoffs
 - Header field in `START-HERE.md` for package handoffs
 
-Documented both shapes in the ENH-021 implementation notes.
+Documented both shapes in the [[ENH-021]] implementation notes.
 
 ## When to Apply
 
@@ -42,5 +42,5 @@ Signal: you are writing an ENH spec that touches a template, adds a frontmatter 
 
 - Branch: `v0.5.10-ux-session-handoff`
 - Commit: `a8dd1739`
-- Related: ENH-021, ADR-051, `commands/handoff.md`
+- Related: [[ENH-021]], [[ADR-051-session-summary-handoff-asymmetric-coupling]], `commands/handoff.md`
 - Category: process

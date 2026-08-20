@@ -15,7 +15,7 @@ Command language in the skills and agent specs drifted from the canonical spec a
 
 ## Solution
 
-Audited all three affected commands against the canonical Snapshot Gate spec. Replaced all instances of "snapshot the session" with "run a session summary" and added a `[?]` inline explanation with a transition message. Added a git-inclusion prompt to `start-issue-tracking` to match the other commands. Updated `lesson-capture-agent` Phase 2 to check for today's session summary before prompting the user, offering to pre-fill context — closing the model-switch fragility loop. Documented the design intent and drift in ADR-026.
+Audited all three affected commands against the canonical Snapshot Gate spec. Replaced all instances of "snapshot the session" with "run a session summary" and added a `[?]` inline explanation with a transition message. Added a git-inclusion prompt to `start-issue-tracking` to match the other commands. Updated `lesson-capture-agent` Phase 2 to check for today's session summary before prompting the user, offering to pre-fill context — closing the model-switch fragility loop. Documented the design intent and drift in [[ADR-026-snapshot-gate-uses-session-summary]].
 
 ## When to apply
 

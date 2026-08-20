@@ -145,7 +145,7 @@ _inject_profile "context-budget" "$KG_PATH/context-budget.md"
 
 ## Trade-offs
 
-- **Trigger anchors must stay in sync with `rules.md` section headings.** If a heading in `rules.md` changes, its trigger pointer in `triggers.md` breaks silently. This is a known trade-off accepted in ADR-047.
+- **Trigger anchors must stay in sync with `rules.md` section headings.** If a heading in `rules.md` changes, its trigger pointer in `triggers.md` breaks silently. This is a known trade-off accepted in [[ADR-047-profile-auto-load-routing-layer-only]].
 - **~4k token fixed overhead per session.** The routing layer (`me.md` + `triggers.md`) is small by design. If these files grow significantly, the injection cost must be re-evaluated.
 - **Silent skip on missing files.** New projects that haven't run `init` get no errors, but also no routing context until they do. This is the correct behavior.
 

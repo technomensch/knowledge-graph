@@ -28,7 +28,7 @@ category: architecture
 **Date:** 2026-04-28
 **Status:** Accepted
 **Implements:** v0.5.4 — Profile Auto-Load
-**Related:** ADR-028 (me.md + rules.md as source of truth), ADR-033 (triggers.md companion file), ADR-020 (lifecycle hooks), ADR-045 (update-profile skill)
+**Related:** [[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]] (me.md + rules.md as source of truth), [[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file]] (triggers.md companion file), [[ADR-020-lifecycle-hooks-suite-automated-capture]] (lifecycle hooks), [[ADR-045-update-profile-skill-not-command]] (update-profile skill)
 
 ---
 
@@ -36,7 +36,7 @@ category: architecture
 
 After context compaction, the profile files (`~/.kmgraph/me.md`, `~/.kmgraph/triggers.md`, `~/.kmgraph/rules.md`, `knowledge/me.md`, `knowledge/triggers.md`) were not reloaded into session context. `~/.claude/CLAUDE.md` instructed Claude to read them at SessionStart, but the instruction was passive — nothing enforced it. Behavioral rules, identity context, and workflow-phase gates went missing mid-session without warning.
 
-ADR-028 established `me.md` and `rules.md` as the platform-agnostic sources of truth for identity and behavioral rules. ADR-033 introduced `triggers.md` as the timing companion that maps workflow phases to rule-section references. Both ADRs deferred the question of *how* these files get loaded into session context.
+[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]] established `me.md` and `rules.md` as the platform-agnostic sources of truth for identity and behavioral rules. [[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file]] introduced `triggers.md` as the timing companion that maps workflow phases to rule-section references. Both ADRs deferred the question of *how* these files get loaded into session context.
 
 **The naive fix — bulk-inject all profile files at every SessionStart — was considered and rejected.** Loading `rules.md` (522 lines personal + 241 lines project, ~13k tokens) at every session start flattens the me/triggers/rules graph design: triggers become redundant routing glue that is already fully present in context. More importantly, it imposes a permanent context tax that grows as `rules.md` grows. The architecture was explicitly designed for on-demand loading via trigger pointers; bulk injection undermines it.
 
@@ -131,7 +131,7 @@ New projects won't have `knowledge/me.md` or `knowledge/triggers.md` yet. New us
 - If a rule has no trigger reference, it won't fire automatically; rules without trigger coverage are invisible to the system
 
 **Mitigation:**
-- Anchors are stable by convention (ADR-033 established this); heading changes should be treated as breaking changes requiring trigger updates
+- Anchors are stable by convention ([[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file]] established this); heading changes should be treated as breaking changes requiring trigger updates
 - `/kmgraph:capture-lesson` and future linting can flag uncovered rules
 
 ---

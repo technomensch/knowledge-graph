@@ -29,9 +29,9 @@ category: documentation
 
 ## Context
 
-The docs-impact-scan feature (ADR-036) and its pre-push gate (ADR-050) constitute a significant workflow automation: phrase-triggered diff scanning, user validation, targeted doc dispatch, and a commit-specific completion flag that gates pushes. Despite this, the full workflow was only documented in internal ADRs and single-row table entries in three reference pages (`docs/reference/skills.md`, `docs/pillars/tailoring/automation-layer.md`, `docs/CHEAT-SHEET.md`).
+The docs-impact-scan feature ([[ADR-036-docs-impact-scan]]) and its pre-push gate ([[ADR-050-pre-push-composite-gate-inline-recommendation-gate]]) constitute a significant workflow automation: phrase-triggered diff scanning, user validation, targeted doc dispatch, and a commit-specific completion flag that gates pushes. Despite this, the full workflow was only documented in internal ADRs and single-row table entries in three reference pages (`docs/reference/skills.md`, `docs/pillars/tailoring/automation-layer.md`, `docs/CHEAT-SHEET.md`).
 
-During a pre-push docs-impact-scan run on v0.5.10.5, the gap was identified: no dedicated user-facing guide existed. The complete Gate 3 contract — same-branch-before-push, flag anatomy, eight-step workflow, learned pattern accumulation — was invisible to users unless they read ADR-036 and ADR-050 directly.
+During a pre-push docs-impact-scan run on v0.5.10.5, the gap was identified: no dedicated user-facing guide existed. The complete Gate 3 contract — same-branch-before-push, flag anatomy, eight-step workflow, learned pattern accumulation — was invisible to users unless they read [[ADR-036-docs-impact-scan]] and [[ADR-050-pre-push-composite-gate-inline-recommendation-gate]] directly.
 
 Placement was evaluated using Opus (claude-opus-4-7) against the existing docs information architecture.
 

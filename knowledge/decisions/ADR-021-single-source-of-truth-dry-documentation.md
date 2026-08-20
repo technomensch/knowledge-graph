@@ -74,13 +74,13 @@ This rule is documented in `commands/update-doc.md` under "Single Source of Trut
 
 ## Related
 
-- issue-8: Docs Update Enforcement Meta-Issue (centralizes this ADR + ADR-013 + ADR-036)
-- ADR-013: Documentation Update Protocol (Gate 1 `## Docs Impact` heading constant)
-- ADR-036: docs-impact-scan Skill (Gate 3 wired in v0.5.9.3)
-- ADR-050: Pre-Push Composite Gate + Inline Recommendation Gate (Gate 2 version-sync; DRY contract for recommendation-gate.sh sourcing triggers.md)
+- issue-8: Docs Update Enforcement Meta-Issue (centralizes this ADR + [[ADR-013-documentation-update-protocol]] + [[ADR-036-docs-impact-scan]])
+- [[ADR-013-documentation-update-protocol]]: Documentation Update Protocol (Gate 1 `## Docs Impact` heading constant)
+- [[ADR-036-docs-impact-scan]]: docs-impact-scan Skill (Gate 3 wired in v0.5.9.3)
+- [[ADR-050-pre-push-composite-gate-inline-recommendation-gate]]: Pre-Push Composite Gate + Inline Recommendation Gate (Gate 2 version-sync; DRY contract for recommendation-gate.sh sourcing triggers.md)
 
 ## Amendment — 2026-05-30 (wired enforcement — v0.5.9.3)
 
 Gate 1 (`plan-docs-xref-check.sh`) and Gate 2 (`pre-push-gate.sh` version-sync) are now wired as advisory hook injections. Gate 2 also enforces the DRY principle by cross-checking `package.json` and `.claude-plugin/plugin.json` versions — the version string has a single source (`package.json`); `plugin.json` must match it.
 
-The `recommendation-gate.sh` hook (issue-9, ADR-050) sources its preamble text from `~/.kmgraph/triggers.md` per this ADR's DRY principle. Hardcoded fallback text applies only when `triggers.md` is absent (ENH-016 pattern).
+The `recommendation-gate.sh` hook (issue-9, [[ADR-050-pre-push-composite-gate-inline-recommendation-gate]]) sources its preamble text from `~/.kmgraph/triggers.md` per this ADR's DRY principle. Hardcoded fallback text applies only when `triggers.md` is absent ([[ENH-016]] pattern).

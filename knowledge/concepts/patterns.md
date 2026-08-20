@@ -48,7 +48,7 @@ Copy this template for each new pattern:
 **Evidence:**
 [ADR-035-stuck-work-escalation](../decisions/ADR-035-stuck-work-escalation.md) — Key decision: skill is single source of truth — no rules.md or triggers.md entries (DRY principle applied).
 
-**See Lesson:** No dedicated lesson file — derived from ADR-035 session (2026-04-16).
+**See Lesson:** No dedicated lesson file — derived from [[ADR-035-stuck-work-escalation]] session (2026-04-16).
 
 **Related:** [[ADR-035-stuck-work-escalation]], [[Lessons_Learned_Patterns_Single_Source_Of_Truth_DRY_Documentation]]
 
@@ -96,7 +96,7 @@ Copy this template for each new pattern:
 **Evidence:**
 [ADR-004-superpowers-plan-approval-gate](~/.kmgraph/decisions/ADR-004-superpowers-plan-approval-gate.md) — Extended parallelism rule to output per-task execution mode table (2026-04-16).
 
-**See Lesson:** No dedicated lesson file — derived from ADR-004 update, chat session 2026-04-16 (L3330).
+**See Lesson:** No dedicated lesson file — derived from [[ADR-004-token-based-memory-size-limits]] update, chat session 2026-04-16 (L3330).
 
 **Related:** [[ADR-004-superpowers-plan-approval-gate]]
 
@@ -112,7 +112,7 @@ Copy this template for each new pattern:
 **Evidence:**
 [ADR-036-docs-impact-scan](../decisions/ADR-036-docs-impact-scan.md) — Full design: scan is the discovery layer, `update-doc` wizard handles the update. Mandatory plan step.
 
-**See Lesson:** No dedicated lesson file — derived from ADR-036 brainstorming session (2026-04-16).
+**See Lesson:** No dedicated lesson file — derived from [[ADR-036-docs-impact-scan]] brainstorming session (2026-04-16).
 
 **Related:** [[ADR-036-docs-impact-scan]]
 

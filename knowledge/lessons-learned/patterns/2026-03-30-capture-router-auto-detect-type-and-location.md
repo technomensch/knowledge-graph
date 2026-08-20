@@ -59,4 +59,4 @@ Low-resistance capture is only valuable if content lands in the right place. Men
 - Branch: v0.2.3-beta
 - Commit: 4071bfe8
 - Category: patterns
-- Related: ENH-008, doc-update-router (same pattern: auto-route with disambiguation fallback)
+- Related: [[ENH-008]], doc-update-router (same pattern: auto-route with disambiguation fallback)

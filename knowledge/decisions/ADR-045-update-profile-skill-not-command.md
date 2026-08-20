@@ -92,7 +92,7 @@ Platform-agnostic users (Gemini CLI, Cursor, Windsurf, Codex CLI) cannot invoke 
 
 ### Neutral
 - The skill approach is consistent with how other behavioral enforcements (rules-capture, lesson-capture, adr-guide) are implemented in kmgraph
-- **Resolution (see [ADR-057](ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth.md)):** this "consistent with" wording was later identified as evidence that the detection layer grew piecemeal rather than by unified design — ADR-057 documents the fragmentation and the eventual consolidation direction.
+- **Resolution (see [ADR-057](ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth.md)):** this "consistent with" wording was later identified as evidence that the detection layer grew piecemeal rather than by unified design — [[ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth]] documents the fragmentation and the eventual consolidation direction.
 
 ---
 

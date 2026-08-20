@@ -23,7 +23,7 @@ category: process
 
 **Date:** 2026-04-16
 **Status:** Proposed
-**Related:** ADR-008 (Meta-Issue Tracking Pattern)
+**Related:** [[ADR-008-third-person-language-standard]] (Meta-Issue Tracking Pattern)
 
 ---
 

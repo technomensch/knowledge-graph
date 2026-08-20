@@ -26,7 +26,7 @@ category: process
 
 **Date:** 2026-04-20
 **Status:** Proposed
-**Related:** ADR-033 (triggers.md), ADR-034 (capture-level routing)
+**Related:** [[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file]] (triggers.md), [[ADR-034-capture-level-routing-dispatcher-agent-split]] (capture-level routing)
 
 ---
 
@@ -125,7 +125,7 @@ Seed a **default graph-usage rules block** into `knowledge/rules.md` during `/km
 **Option C: Encode rules as system prompt additions in CLAUDE.md/GEMINI.md**
 - Pros: Always loaded
 - Cons: Bloats context at every session; these are reference rules, not always-on instructions
-- Rejected: Trigger-based loading (read when relevant) is the right pattern per ADR-033
+- Rejected: Trigger-based loading (read when relevant) is the right pattern per [[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file]]
 
 ### Trade-offs
 
@@ -190,7 +190,7 @@ Seed a **default graph-usage rules block** into `knowledge/rules.md` during `/km
 
 - **[ADR-033](ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file.md):** triggers.md — governs when rules.md is loaded; default rules only work if triggers fire correctly
 - **[ADR-034](ADR-034-capture-level-routing-dispatcher-agent-split.md):** Capture-level routing — governs which artifact type to create; complements the decision table above
-- **[User ADR-007](~/.kmgraph/decisions/ADR-007-memory-thin-pointers-adr-first.md):** Memory Files Are Thin Pointers — the user-level rules and trigger hardening that this plugin ADR must implement at the system level; ADR-007 § Plugin Fix Required contains the specific changes needed in `/kmgraph:init`, `feedback` type description, `/kmgraph:sync-all` audit, and `/kmgraph:session-summary`
+- **[User ADR-007](~/.kmgraph/decisions/ADR-007-memory-thin-pointers-adr-first.md):** Memory Files Are Thin Pointers — the user-level rules and trigger hardening that this plugin ADR must implement at the system level; [[ADR-007-distribution-hygiene-files-allowlist]] § Plugin Fix Required contains the specific changes needed in `/kmgraph:init`, `feedback` type description, `/kmgraph:sync-all` audit, and `/kmgraph:session-summary`
 
 ---
 

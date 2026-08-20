@@ -57,7 +57,7 @@ All scripts must comply with the hook security model:
 
 `session-end-prompt.sh` writes a flag file at `/tmp/.kg-session-summarized-{kg-name}-{YYYYMMDD}`. If the flag exists, the script exits silently. The flag is scoped to the active KG name and date — two sessions on the same project share one flag (first Stop hook wins), and different projects get independent flags. Flag files older than 24h are cleaned up on each run to prevent `/tmp/` accumulation.
 
-> **Amendment (v0.5.5):** The original design used `{PPID}-{YYYYMMDD}` as the flag key. Because `$PPID` resolves to a different value for each subprocess invocation in Claude Code, this caused ~150 flag files per session and the dedup check never matched. Changed to `{kg-name}-{YYYYMMDD}` in v0.5.5 (PR #108, closes issue #106).
+> **Amendment (v0.5.5):** The original design used `{PPID}-{YYYYMMDD}` as the flag key. Because `$PPID` resolves to a different value for each subprocess invocation in Claude Code, this caused ~150 flag files per session and the dedup check never matched. Changed to `{kg-name}-{YYYYMMDD}` in v0.5.5 (PR [#108](https://github.com/technomensch/knowledge-graph/issues/108), closes issue [#106](https://github.com/technomensch/knowledge-graph/issues/106)).
 
 ### Lesson-Worthy Signal Detection
 
@@ -78,7 +78,7 @@ Claude Code lifecycle hooks fire at deterministic moments within the normal work
 
 ### Why Six Separate Scripts (not one master hook)
 
-Each script handles exactly one concern at exactly one moment. A bug in session-end handling does not affect the pre-commit gate. Scripts can be enabled or disabled individually in `hooks.json`. This follows the same single-responsibility principle as the agent layer (ADR-017).
+Each script handles exactly one concern at exactly one moment. A bug in session-end handling does not affect the pre-commit gate. Scripts can be enabled or disabled individually in `hooks.json`. This follows the same single-responsibility principle as the agent layer ([[ADR-017-four-layer-architecture-thin-commands]]).
 
 Note: `hooks-master.sh` (the existing SessionStart hook from v0.0.9) remains separate and unchanged. It handles session start configuration (active KG display, MCP server health check, auto-switch logic). The new six scripts handle capture moments during and at the end of a session.
 
@@ -87,7 +87,7 @@ Note: `hooks-master.sh` (the existing SessionStart hook from v0.0.9) remains sep
 **Option A: Single mega-hook script routing all events**
 - Pros: One file to maintain
 - Cons: A bug in any branch of the routing logic affects all hooks; harder to test; harder to disable one behavior without affecting others
-- Rejected: Violates single-responsibility; conflicts with ADR-012 hook security model guidance on scope
+- Rejected: Violates single-responsibility; conflicts with [[ADR-012-hook-security-model]] hook security model guidance on scope
 
 **Option B: Inline hook logic in `hooks.json` (no shell scripts)**
 - Pros: All hook logic in one file
@@ -114,7 +114,7 @@ Note: `hooks-master.sh` (the existing SessionStart hook from v0.0.9) remains sep
 
 1. **Hook noise risk:** If keyword matching is too broad, users receive too many prompts. Initial calibration required — the `post-tool-lesson-check.sh` keyword list may need tuning based on real-world usage
 2. **PPID dependency:** Session-end double-fire prevention uses PPID, which works correctly in terminal sessions but may behave unexpectedly in some non-interactive or scripted environments
-3. **Platform dependency:** Claude Code lifecycle hooks only. Non-Claude Code platforms (Gemini CLI, Cursor) do not have equivalent hook systems — `AGENTS-template.md` (ADR-018) provides behavioral guidance for those platforms, but lifecycle automation is absent
+3. **Platform dependency:** Claude Code lifecycle hooks only. Non-Claude Code platforms (Gemini CLI, Cursor) do not have equivalent hook systems — `AGENTS-template.md` ([[ADR-018-agents-template-platform-portability]]) provides behavioral guidance for those platforms, but lifecycle automation is absent
 
 ### Neutral
 

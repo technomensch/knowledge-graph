@@ -18,7 +18,7 @@ category: process
 
 **Date:** 2026-03-28
 **Category:** Process (Development Workflow)
-**Discovered during:** v0.2.1-beta implementation (ENH-001 issue tracking)
+**Discovered during:** v0.2.1-beta implementation ([[ENH-001]] issue tracking)
 
 ---
 
@@ -72,7 +72,7 @@ Never attempt to commit files under `docs/plans/`. When setting up a new branch 
 
 ## Related
 
-- **ADR-014:** Maintain Dual Plan File Locations
+- **[[ADR-014-maintain-dual-plan-file-locations]]:** Maintain Dual Plan File Locations
 - **CLAUDE.md:** "Plans are LOCAL-ONLY and gitignored" in Key Workflows section
 - **Lesson:** Plan File Dual-Location Protocol
 

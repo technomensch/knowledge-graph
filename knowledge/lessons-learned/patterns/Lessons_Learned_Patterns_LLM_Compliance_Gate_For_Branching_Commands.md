@@ -23,7 +23,7 @@ Replace the prose conditional with a **MANDATORY STOP gate** using all three of:
 2. **Explicit prohibition** — name exactly what must NOT happen ("Do NOT run any initialization, scaffolding, FTS5, or wiki steps yet")
 3. **Explicit requirement** — name exactly what MUST happen ("You MUST present the menu below before proceeding") and state that forward execution is blocked ("Do not proceed past this point until the user has entered a selection")
 
-Applied in v0.6.6 to `commands/kmg-init.md` and `commands/kmg-init-personal-kg.md` (ENH-028) to gate the existing-KG detection branch.
+Applied in v0.6.6 to `commands/kmg-init.md` and `commands/kmg-init-personal-kg.md` ([[ENH-028]]) to gate the existing-KG detection branch.
 
 ## When to Apply
 
@@ -50,6 +50,6 @@ Use this pattern for any command section where:
 
 ## Related
 
-- ENH-028 — the specific compliance gap that prompted this lesson
+- [[ENH-028]] — the specific compliance gap that prompted this lesson
 - v0.6.5 live testing — compliance gap discovered during init of an existing project KG
-- ADR-053 — parity constraint between kmg-init.md and kmg-init-personal-kg.md
+- [[ADR-053-kmg-prefix-cross-platform-naming]] — parity constraint between kmg-init.md and kmg-init-personal-kg.md

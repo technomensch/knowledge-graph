@@ -24,7 +24,7 @@ category: process
 **Date:** 2026-06-07
 **Status:** Accepted
 **Implements:** v0.5.10
-**Related:** ADR-026 (snapshot gate / session-summary-agent), ADR-049 (Review Audit Protocol), ADR-050 (pre-push composite gate)
+**Related:** [[ADR-026-snapshot-gate-uses-session-summary]] (snapshot gate / session-summary-agent), [[ADR-049-review-audit-protocol-post-plan-pre-push-review-governance]] (Review Audit Protocol), [[ADR-050-pre-push-composite-gate-inline-recommendation-gate]] (pre-push composite gate)
 
 ---
 

@@ -25,8 +25,8 @@ category: architecture
 
 **Date:** 2026-07-01
 **Status:** Accepted
-**Implements:** (design-first — no implementation commit yet; see ENH-033)
-**Related:** [ADR-027](ADR-027-docusaurus-restructure-diataxis-docs-feed.md) (supersedes its deferred recommendation on this point), ENH-033 (implementation spec)
+**Implements:** (design-first — no implementation commit yet; see [[ENH-033]])
+**Related:** [ADR-027](ADR-027-docusaurus-restructure-diataxis-docs-feed.md) (supersedes its deferred recommendation on this point), [[ENH-033]] (implementation spec)
 
 ---
 
@@ -41,7 +41,7 @@ kmgraph ships the `kmg-update-doc` and `kmg-create-doc` commands to **all** inst
 
 **Scope:**
 - In scope: the packaging/visibility decision for `kmg-update-doc` and `kmg-create-doc` (and the related `kmg-doc-update-router` skill).
-- Out of scope: the detailed behavioral fix itself (captured separately in ENH-033).
+- Out of scope: the detailed behavioral fix itself (captured separately in [[ENH-033]]).
 
 **Technical finding (this session):** kmgraph's plugin manifest (`.claude-plugin/plugin.json`) has **no `commands` field** — Claude Code discovers commands by filesystem scan of the `commands/` directory. There is therefore **no runtime mechanism** to conditionally hide a command from `/kmgraph:` autocomplete based on a marker file or config flag. A command either exists as a `.md` file in `commands/` (always discoverable) or it does not. The **only** way to make a command invisible to a subset of installers is to ship it in a separate plugin.
 
@@ -51,7 +51,7 @@ kmgraph ships the `kmg-update-doc` and `kmg-create-doc` commands to **all** inst
 
 **Reject the plugin-split option. Do NOT create a `kmgraph-contrib` plugin.**
 
-The three previously-floated options — separate `kmgraph-contrib` plugin, a `.kmgraph-contributor` marker file, and a `commands/contributing/` subdirectory — are all rejected. The problem is resolved instead through **behavioral repo-context auto-detection** (specified in ENH-033), plus lightweight labeling for residual discoverability.
+The three previously-floated options — separate `kmgraph-contrib` plugin, a `.kmgraph-contributor` marker file, and a `commands/contributing/` subdirectory — are all rejected. The problem is resolved instead through **behavioral repo-context auto-detection** (specified in [[ENH-033]]), plus lightweight labeling for residual discoverability.
 
 ---
 
@@ -99,7 +99,7 @@ The three previously-floated options — separate `kmgraph-contrib` plugin, a `.
 
 ### Positive
 
-1. **Correctness restored:** After ENH-033 lands, the doc commands stop imposing kmgraph's conventions on unrelated projects.
+1. **Correctness restored:** After [[ENH-033]] lands, the doc commands stop imposing kmgraph's conventions on unrelated projects.
 2. **Simplicity preserved:** Single-plugin architecture retained; no second version track.
 
 ### Negative
@@ -108,7 +108,7 @@ The three previously-floated options — separate `kmgraph-contrib` plugin, a `.
 
 ### Neutral
 
-1. **ADR-027's deferred item is now resolved** for this specific point — no separate packaging follow-up is needed.
+1. **[[ADR-027-docusaurus-restructure-diataxis-docs-feed]]'s deferred item is now resolved** for this specific point — no separate packaging follow-up is needed.
 
 ---
 
@@ -116,7 +116,7 @@ The three previously-floated options — separate `kmgraph-contrib` plugin, a `.
 
 This decision consolidates and closes prior art that was documented but never actioned:
 
-- **ADR-027** (`ADR-027-docusaurus-restructure-diataxis-docs-feed.md`, ~line 300) flagged `update-doc`, `create-doc`, and the `doc-update-router` skill as "contributor-only tools shipping to all users." It was deferred with no follow-on ENH. **This ADR supersedes that deferred recommendation** and resolves it via ENH-033 rather than a packaging change.
+- **[[ADR-027-docusaurus-restructure-diataxis-docs-feed]]** (`ADR-027-docusaurus-restructure-diataxis-docs-feed.md`, ~line 300) flagged `update-doc`, `create-doc`, and the `doc-update-router` skill as "contributor-only tools shipping to all users." It was deferred with no follow-on ENH. **This ADR supersedes that deferred recommendation** and resolves it via [[ENH-033]] rather than a packaging change.
 - **Chat history 2026-04-08** (`knowledge/chat-history/2026-04/2026-04-07-claude-part-02.md`, part 2): the user stated directly that "those commands should only be available to contributors. Users of the kmgraph don't need to update the docs, they are updating the graph." The same three options (separate plugin, marker file, subdirectory) were floated and explicitly punted ("explore later").
 - **Chat history 2026-02-20** (`knowledge/chat-history/2026-02/2026-02-20-claude-part-01.md`): an earlier precursor discussing `--user`/`--plugin` flag ambiguity for the same command.
 
@@ -125,7 +125,7 @@ This decision consolidates and closes prior art that was documented but never ac
 ## Related Decisions
 
 - **[ADR-027](ADR-027-docusaurus-restructure-diataxis-docs-feed.md):** Supersedes its deferred recommendation to treat these as contributor-only tools; that item is resolved here via behavioral auto-detection.
-- **[ADR-058](ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md):** Cites this ADR as evidence — the scope-leakage instance of the broader process gap it governs (a missing upfront naming/scope check for new commands/skills). This ADR's individual fix is not re-decided there; ADR-058 adds a preventive governance layer above it.
+- **[ADR-058](ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md):** Cites this ADR as evidence — the scope-leakage instance of the broader process gap it governs (a missing upfront naming/scope check for new commands/skills). This ADR's individual fix is not re-decided there; [[ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings]] adds a preventive governance layer above it.
 
 ---
 

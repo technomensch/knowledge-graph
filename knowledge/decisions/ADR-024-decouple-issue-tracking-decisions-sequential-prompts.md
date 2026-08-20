@@ -153,7 +153,7 @@ No migration needed. The change is behavioral (prompt structure); existing issue
 - [ENH-006](../enhancements/ENH-006/) — Issue tracking gap fixes that motivated this decision
 
 **Issues:**
-- [[issue-5]] — GitHub #124 — bug: `start-issue-tracking` Step 5 never called `gh issue create`; any Step 5 changes must stay consistent with sequential prompt design in this ADR; fixed in v0.5.9.2
+- [[issue-5]] — GitHub [#124](https://github.com/technomensch/knowledge-graph/issues/124) — bug: `start-issue-tracking` Step 5 never called `gh issue create`; any Step 5 changes must stay consistent with sequential prompt design in this ADR; fixed in v0.5.9.2
 
 ---
 

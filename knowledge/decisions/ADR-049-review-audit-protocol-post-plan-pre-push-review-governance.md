@@ -57,7 +57,7 @@ Implement a formal review audit protocol with the following locked behaviors:
 - `dig deeper` — agent investigates further
 - `discuss` — session snapshot taken first
 
-**Cascade check stub:** Before any `fix now` action, ask: does this affect initialization scripts, user profile files, or existing graphs? User-local or project-wide? Full cascade protocol deferred to ENH-015 and ENH-020 (pending creation — see plan task 1.1).
+**Cascade check stub:** Before any `fix now` action, ask: does this affect initialization scripts, user profile files, or existing graphs? User-local or project-wide? Full cascade protocol deferred to [[ENH-015]] and [[ENH-020]] (pending creation — see plan task 1.1).
 
 **Halt pattern:** HALT ONCE after the complete audit trail table is displayed — a single halt covering all findings, not one halt per finding. Each decision block must include: finding description, severity, recommended action, and the five decision options. Bare "proceed?" prompts without context are explicitly prohibited.
 
@@ -70,7 +70,7 @@ The absence of a formal review protocol caused reviews to be inconsistent and pr
 - **Non-blocking investigation over ad-hoc interruption** — completing the full pass before acting ensures comprehensive coverage; partial fixes mid-review risk missing related issues.
 - **Recall gate as explicit step** — batching recall into one decision point avoids context noise and respects reviewer control over when prior knowledge is loaded.
 - **HALT pattern** — prevents silent auto-resolution; each finding requires an explicit user decision, creating accountability and traceability.
-- **Cascade check stub** — lightweight pre-fix gate that surfaces blast radius before committing to a fix, deferring full logic to ENH-015/ENH-020 rather than duplicating it here.
+- **Cascade check stub** — lightweight pre-fix gate that surfaces blast radius before committing to a fix, deferring full logic to [[ENH-015]]/[[ENH-020]] rather than duplicating it here.
 - **Audit trail table** — ensures permanent record even for "ignore" decisions, supporting future retrospectives.
 
 ## Consequences
@@ -96,6 +96,6 @@ The protocol is authored in `core/rules-registry/review-audit-protocol.md` and d
 
 ## Related
 
-- ENH-015 — Cascade governance framework (full cascade protocol)
-- ENH-020 — Preventive cascade template (extends ENH-015)
+- [[ENH-015]] — Cascade governance framework (full cascade protocol)
+- [[ENH-020]] — Preventive cascade template (extends [[ENH-015]])
 - `v0.5.9.1-review-audit-protocol` — implementation branch
