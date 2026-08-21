@@ -120,7 +120,7 @@ Every session summary includes:
 | **Accumulated Narrative** | Narrative | Append-only, timestamped blocks |
 
 The Operational Snapshot zone is bounded by `═══` dividers and labeled `as-of {commit}`.
-The Accumulated Narrative zone is append-only — narrative blocks are never overwritten.
+The Accumulated Narrative zone is append-only by default — new blocks are added, not merged into old ones. If the user explicitly asks to correct or redact a specific past block, edit that block directly rather than only appending a correction below it.
 
 **Example structure:**
 
