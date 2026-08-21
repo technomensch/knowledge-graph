@@ -312,7 +312,7 @@ existing=$(find "$session_dir" -name "${today}-*.md" 2>/dev/null | head -1)
 **If `$existing` is found:**
 - Load as base document; operational sections (Current State, Open Issues, Session History) will be overwritten in Step 6
 - Session Findings will be appended+deduped (skip rows with identical descriptions)
-- Accumulated Narrative blocks will be appended only — never overwritten
+- Accumulated Narrative blocks are appended by default. If the user explicitly asks to correct or redact a specific past block, edit it directly instead.
 - Store `{session_file_mode} = append`, `{existing_session_path} = $existing`
 
 **If not found:**
@@ -661,7 +661,7 @@ Once approved, call `kg_capture`:
 | Gate | Start-of-Session Reading | Overwrite every run |
 | Operational | Current State, Open Issues, Session History | Overwrite every run |
 | Operational | Session Findings | Append+dedup within day (skip rows with identical descriptions) |
-| Narrative | Accumulated blocks | Append-only, timestamped; never overwrite |
+| Narrative | Accumulated blocks | Append-only by default, timestamped; edit a block directly only on explicit user request to correct/redact |
 
 **If `{session_file_mode} = append`** (file exists from Step 1.5):
 - Overwrite Header + Gate + Operational zones in the `content` string sent

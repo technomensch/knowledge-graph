@@ -50,7 +50,7 @@ When triggered:
 
    The agent uses `context_provided: true` to skip its interactive wizard and go directly to draft generation.
 
-3. **Use friendly, user-addressed language** — never mention agent mechanics:
+3. **Use friendly, user-addressed language** — don't volunteer agent mechanics unprompted:
    - ✅ "Looks like you just solved something worth keeping — here's what I'd save:"
    - ✅ "I noticed you figured something out — want me to document that?"
    - ❌ "Dispatching to lesson-capture-agent..."

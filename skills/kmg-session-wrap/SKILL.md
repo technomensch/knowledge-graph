@@ -34,7 +34,7 @@ description: Prompt for session summary when user indicates they are stopping wo
 - If no snapshot flag: use standard wrap-up prompt.
 
 **Behavior:**
-When triggered, directly dispatch to `session-summary-agent` with conversational language that addresses the user, never exposing internal mechanics.
+When triggered, directly dispatch to `session-summary-agent` with conversational language that addresses the user — don't volunteer internal mechanics unprompted.
 
 **Example Triggers:**
 
@@ -54,7 +54,7 @@ User: "Alright, I've pushed this to the branch. Wrapping up for today."
 ```
 
 **User-Facing Language Rules:**
-- Address the user directly (never expose internal tool names or agent names)
+- Address the user directly — don't volunteer internal tool or agent names unprompted; if asked what ran, say so plainly
 - Conversational, inviting language
 - No technical jargon about "dispatching", "agents", or internal file paths
 - Single, clear question per prompt

@@ -333,7 +333,7 @@ After the rule is written, classify whether it is phase-specific or unconditiona
 
 **If unconditional** ("always", "never", applies universally): skip this step silently — no trigger entry needed.
 
-**User-facing language rule:** Never mention `triggers.md`, `rules.md`, or any file name in the prompt. Describe behavior and situations only.
+**User-facing language rule:** Don't volunteer `triggers.md`, `rules.md`, or other internal file names unprompted — describe behavior and situations instead. If the user asks which file something lives in, name it.
 
 ## Do NOT
 

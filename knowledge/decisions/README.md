@@ -4,7 +4,7 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 69
+**Total ADRs:** 70
 **Last Updated:** 2026-08-20
 
 ---
@@ -17,6 +17,7 @@ Formal documentation of significant architecture decisions.
 
 ## All ADRs (Chronological)
 
+- [ADR-069: Prompt Hardening — Project Instruction Files](ADR-069-prompt-hardening-project-instruction-files.md) — **Status:** Accepted — Companion to the personal KG's ADR-015: applies the same rule-word ("always"/"never"/"must") hardening methodology to this project's shipped `commands/`/`skills/`/`agents/` instruction files, rewriting 3 absolutes-with-a-demonstrated-conflict as if-then statements while leaving destructive-action safety gates untouched. Target v0.7.3.
 - [ADR-068: Lightweight-vs-Full Workflow Rule, and a Piloted Command-Completion Check for Handoff/Recall File Tracing](ADR-068-lightweight-vs-full-workflow-rule-and-piloted-command-completion-check.md) — **Status:** Accepted — issue-25's lightweight-vs-full workflow rule: use a hand-written file (no branch, no GitHub issue) when no code change is planned, no external visibility is needed, and the write-up fits in a paragraph or two; paired with a piloted command-completion check for handoff/recall file tracing.
 - [ADR-067: Mutable `.active` switch vs context-derived KG resolution — decision pending](ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md) — **Status:** Proposed — context + open decision only, explicitly deferred (not decided this session); related to [ADR-066](ADR-066-kg-content-storage-location-for-global-and-cowork-modes.md), governs [ENH-051](../enhancements/ENH-051/ENH-051-specification.md).
 - [ADR-067 Implementation Spec: KG Resolution Model](ADR-067-implementation-spec.md) — **Status:** Ready for implementation — Companion implementation-ready reference transcribed from the full ADR-067 brainstorm/review record (13 Fable-review items + 3 previously-undesigned mechanisms, resolved 2026-07-28); the source ADR above remains the durable decision record and rationale trail, this document covers *what to build*.

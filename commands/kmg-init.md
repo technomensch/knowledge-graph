@@ -1,7 +1,7 @@
 
 ## Execution Rules
 
-All bash/shell checks in this command are **implementation guidance only** — run them silently as internal steps. Never show bash commands, shell code, or raw command output to the user. Present only plain-English results, prompts, and status messages.
+All bash/shell checks in this command are **implementation guidance only** — run them silently as internal steps, presenting plain-English results, prompts, and status messages. If the user asks to see the actual command or its raw output, show it.
 
 # /kmgraph:kmg-init — Knowledge Graph Initialization Wizard
 

@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.7.2
+**Version:** 0.7.3
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -89,6 +89,10 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 ---
 
 ## v0.7.x Feature Highlights
+
+**v0.7.3 — 2026-08-20** *(prompt hardening — commands/skills/agents)*
+
+- **Four bare rule-word absolutes in shipped `commands/`/`skills/`/`agents/` files rewritten as if-then statements** — each one selected for a demonstrated conflict, dead end, or overbroad scope (not a blanket sweep; destructive-action safety gates are untouched). Bash-output suppression in three init/migration commands now allows showing raw output on request; agent-mechanics/internal-file-name disclosure wording harmonized across five sibling skills; the session-summary Accumulated Narrative append-only rule now has an explicit correction/redaction path. See [ADR-069](knowledge/decisions/ADR-069-prompt-hardening-project-instruction-files.md).
 
 **v0.7.2 — 2026-08-19** *(capture-corruption repair, plan-status backfix, ADR dispatch collapse)*
 
@@ -231,7 +235,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.7.2 (2026-08-19)
+**Current Release:** v0.7.3 (2026-08-20)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -333,6 +337,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.7.2 (2026-08-19)
+**Current Version:** v0.7.3 (2026-08-20)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info

@@ -9,6 +9,12 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.3] — 2026-08-20
+
+### Changed
+
+- **Prompt hardening pass on shipped instruction files** — four bare rule-word absolutes ("always"/"never"/"must") in `commands/`, `skills/`, and `agents/` rewritten as if-then statements, each selected because it had a demonstrated conflict, dead end, or overbroad scope (not a blanket sweep — destructive-action safety gates like "never auto-delete" or "never force-push" are untouched). Bash/shell-output suppression in three init/migration commands now allows showing raw output if the user asks (debugging path that didn't exist before). Agent-mechanics and internal-file-name disclosure wording harmonized across five sibling skills (`kmg-session-wrap`, `kmg-lesson-capture`, `kmg-rules-capture`, `kmg-doc-update-router`, `kmg-capture-router`) to the same "don't volunteer unprompted" pattern two of them already used. The session-summary Accumulated Narrative zone's append-only rule (in both the command doc and `session-summary-agent`, which actually performs the write) now has an explicit correction/redaction path for an explicit user request, instead of no path at all. See [ADR-069](knowledge/decisions/ADR-069-prompt-hardening-project-instruction-files.md); companion decision to the personal-KG `ADR-015` that ran the same audit over this maintainer's own `~/.kmgraph/` bundle.
+
 ## [0.7.2] — 2026-08-19
 
 ### Added
