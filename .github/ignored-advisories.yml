@@ -1,17 +1,40 @@
 # Known vulnerabilities accepted as unfixable at this time.
 # Format per ADR-005 (vulnerability gate protocol).
-# Each entry: ghsa_id, reason, blocked_by, added_date
+# Each entry: ghsa_id, reason, blocked_by, added_date, last_checked, review_date
+#
+# last_checked: updated every time the Vulnerability Gate re-verifies this
+# entry against the upstream advisory (looking for a newly published fix).
+# Skip re-checking an entry if last_checked is within the last 24 hours.
 
 ignored_advisories:
-  - ghsa_id: GHSA-w7jw-789q-3m8p
-    cve_id: CVE-2026-9277
-    package: shell-quote
-    severity: critical
+  - ghsa_id: GHSA-w3rx-r6r6-pgpr
+    cve_id: CVE-2025-71330
+    package: image-size
+    severity: high
     reason: >
-      Transitive dependency via @docusaurus/core → webpack-dev-server →
-      launch-editor → shell-quote. No fix available upstream; blocked by
-      Docusaurus not upgrading webpack-dev-server. Not directly exploitable
-      in this project (no user-controlled .op object tokens passed to quote()).
-    blocked_by: "@docusaurus/core (webpack-dev-server transitive)"
-    added_date: "2026-06-11"
-    review_date: "2026-09-11"
+      Transitive dependency via @docusaurus/mdx-loader (docs-only build
+      dependency, not runtime code this project exposes to untrusted input).
+      No fixed version exists upstream — vulnerable range is <= 2.0.2, and
+      2.0.2 is the latest version ever published to npm (first_patched_version
+      is null on the advisory itself). Not blocked by a Docusaurus version
+      pin — @docusaurus/mdx-loader's own range (^2.0.2) would accept a fixed
+      release immediately if one existed; there simply isn't one yet.
+      ICNS-parser denial-of-service (infinite loop) only.
+    blocked_by: "no upstream fix published (image-size itself, not a pin)"
+    added_date: "2026-08-22"
+    last_checked: "2026-08-22"
+    review_date: "2026-11-22"
+
+  - ghsa_id: GHSA-5p2g-fcmc-qvqq
+    cve_id: CVE-2025-71329
+    package: image-size
+    severity: high
+    reason: >
+      Same dependency chain and same root cause as GHSA-w3rx-r6r6-pgpr above
+      (transitive via @docusaurus/mdx-loader, no fixed version published for
+      any release of image-size, not blocked by a version pin). JXL/HEIF
+      parser denial-of-service (infinite loop) only.
+    blocked_by: "no upstream fix published (image-size itself, not a pin)"
+    added_date: "2026-08-22"
+    last_checked: "2026-08-22"
+    review_date: "2026-11-22"
