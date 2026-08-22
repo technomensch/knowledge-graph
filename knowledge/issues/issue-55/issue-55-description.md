@@ -2,7 +2,7 @@
 id: issue-55
 type: Bug
 status: resolved
-github-issue: "#TBD"
+github-issue: "#242"
 branch: v0.7.4-bug-fixes
 created: 2026-08-22
 related_issues: ["issue-41", "issue-15", "issue-34", "issue-35"]
