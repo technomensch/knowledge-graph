@@ -3,7 +3,7 @@ title: "v0.2.1 Backlog — kg_capture MCP Tool, sync-all/update-graph Refactor, 
 local-id: issue-1
 github-id: 39
 type: meta-issue
-status: open
+status: resolved
 version-target: 0.2.1-beta
 created: 2026-03-27
 parent: v0.2.0-beta-layered-architecture

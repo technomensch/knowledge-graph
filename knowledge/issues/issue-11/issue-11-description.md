@@ -1,7 +1,7 @@
 ---
 id: issue-11
 type: Hardening
-status: tracked
+status: resolved
 github-issue: "#165"
 branch: v0.6.18-misc-patches (deferred — not yet created; this work lands as an additional commit once c0 creates it)
 created: 2026-07-11

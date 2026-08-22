@@ -1,7 +1,7 @@
 ---
 id: issue-6
 type: Bug
-status: tracked
+status: resolved
 github-issue: "#125"
 branch: v0.5.9.2-fix-gh-issue-create
 created: 2026-05-28

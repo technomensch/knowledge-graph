@@ -1,7 +1,7 @@
 ---
 id: issue-5
 type: Bug
-status: tracked
+status: resolved
 github-issue: "#124"
 branch: v0.5.9.2-fix-gh-issue-create
 created: 2026-05-28

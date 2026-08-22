@@ -1,7 +1,7 @@
 ---
 title: "ENH-049: Concurrent Multi-Repo/Multi-Tool Work with Different Active KGs"
 number: 049
-status: proposed
+status: resolved
 version_target: null
 github_issue: 180
 created: 2026-07-17

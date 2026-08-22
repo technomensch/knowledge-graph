@@ -1,7 +1,7 @@
 ---
 id: issue-23
 type: Bug
-status: deferred
+status: resolved
 github-issue: "#183"
 branch: none
 created: 2026-07-17

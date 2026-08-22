@@ -1,7 +1,7 @@
 ---
 id: issue-45
 type: Bug
-status: in-progress
+status: resolved
 github-issue: "#222"
 branch: v0.7.1.4-issue-45-meta-issue-attempts-paperwork-drift
 created: 2026-08-13
