@@ -1,7 +1,7 @@
 ---
 id: issue-30
 type: Hardening
-status: deferred
+status: resolved
 github-issue: "#205"
 branch: none
 created: 2026-07-28
@@ -33,3 +33,7 @@ Captured live, lightweight — not run through the full `kmg-start-issue-trackin
 - [issue-31](../issue-31/issue-31-description.md) — also touches `commands/kmg-handoff.md`
   directly (its stale pre-migration output-path bug); non-conflicting, additive fixes —
   good single-PR candidate alongside this issue.
+
+## Resolution (2026-08-22)
+
+Fixed — `commands/kmg-handoff.md` now auto-invokes `session-summary-agent --auto` when no summary exists for today, before finalizing START-HERE.md's `continues_from` link. `kmg-session-wrap` intentionally left prompt-only, per this issue's own note that the two mechanisms don't need the same fix. Batched with issue-31 in one PR (same file, non-conflicting), per this issue's own suggestion. GitHub issue #205 close is a separate, explicit follow-up.
