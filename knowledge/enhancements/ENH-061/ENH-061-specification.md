@@ -81,3 +81,4 @@ which this ENH implements.
 - `core/scripts/extract_claude.py` — the script needing the fix
 - `commands/kmg-extract-chat.md` — needs the new hard-stop behavior documented
 - [issue-49](../../issues/issue-49/issue-49-description.md) — cites this ENH's branch/plan as one of five fully-merged `v0.7.1.x` plans audited for the Safety-Header STATUS-freeze bug. Backlinked 2026-08-19.
+- [issue-29](../../issues/issue-29/issue-29-description.md) — closed as resolved by this ENH's fail-closed gate; issue-29 originally proposed a different (auto-detect-current-project) design, superseded by this one. Backlinked 2026-08-22.

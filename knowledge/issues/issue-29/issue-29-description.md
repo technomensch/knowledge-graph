@@ -1,13 +1,59 @@
 ---
 id: issue-29
 type: Bug
-status: tracked
+status: resolved
 github-issue: "#197"
 branch: issue/29-chat-extraction-cross-project-bleed
 created: 2026-07-27
+resolved: 2026-08-22
 ---
 
 # Issue 29: `/kmgraph:kmg-extract-chat` bleeds cross-project content into `knowledge/chat-history/` (no default project scoping)
+
+## Resolution (2026-08-22)
+
+The root cause here — an unscoped extraction run silently merging every project's session
+content into whatever repo happens to be running it — is fully closed on `main`, but via a
+different design than this issue's own "Proposed Fix" section (below) called for.
+
+[ENH-061](../../enhancements/ENH-061/ENH-061-specification.md) (GitHub #221, closed; shipped in
+PR #220, commit `2583ecb89`) added a **fail-closed gate** to `core/scripts/run_extraction.py`,
+governed by [ADR-062](../../decisions/ADR-062-gemini-pb-project-scoping-fail-closed.md)'s
+amendment extending its existing Gemini-side fail-closed pattern to Claude/Codex/`all`. When
+`--project` is omitted, the script now refuses to run at all — an interactive terminal gets a
+y/N confirmation prompt, a non-interactive caller (Claude Code's own Bash-tool invocations, no
+tty attached) gets a hard `sys.exit(1)` — unless `--confirm-unscoped` is explicitly passed. No
+extraction happens, scoped or unscoped, until the caller states intent one way or the other.
+
+This differs from the fix originally proposed here (auto-detect and default to the
+current-project scope) in one deliberate way: it never infers a scope on the caller's behalf.
+Auto-detection was considered and rejected as the better answer specifically *for this bug* — a
+default-to-current-project design still depends on resolving "current project" correctly, and
+this repo's git worktrees confirmed-in-practice break simple cwd→project-name resolution (three
+inconsistent `~/.claude/projects/` naming conventions coexist). A design that still needs that
+resolution to be right reintroduces a narrower version of the same "silent wrong-scope"
+failure class this issue exists to close — the sibling problem ADR-067 was independently
+fighting on the `kg_*` MCP tool layer. Fail-closed sidesteps needing the guess to be correct at
+all: either the caller states scope explicitly, or nothing runs.
+
+The other symptom that triggered this issue — an unrecognized flag (`--knowledge-graph`) being
+silently swallowed — turned out not to need the shorthand-alias mechanism proposed below either:
+plain `argparse.parse_args()` (as currently used, not `parse_known_args()`) already errors
+loudly on unrecognized long-form flags by default. That "silent swallow" was specific to how the
+flag reached the script in the original repro, not a standing argparse gap.
+
+`commands/kmg-extract-chat.md` already documents the shipped `--confirm-unscoped` behavior,
+worktree composition notices, and ADR-062 in full — no doc update needed as part of closing this
+issue.
+
+**Not covered by this resolution, still open as separate follow-up:** the 42+ already-
+contaminated historical `knowledge/chat-history/` files (Feb–Jul 2026) documented below. ENH-061
+is forward-looking only; it does not touch already-written archive content. See "Required
+Follow-Up" section below — still accurate, still unaddressed, needs its own issue/plan.
+
+The local plan `~/.claude/plans/v0.6.21-issue-29-chat-extraction-cross-project-bleed.md`
+(auto-detect design, per the original "Proposed Fix" below) is superseded by the above and will
+not be executed.
 
 ## Summary
 
@@ -183,3 +229,8 @@ separate, in-progress remediation effort; the historical Feb–Jul archive is no
 - PR #198 (`issue/29-chat-extraction-cross-project-bleed`) — this issue's original tracking PR;
   parked/closed without merging since it never contained an implementation, only this tracking
   doc. See PR comment for details.
+- [ENH-061](../../enhancements/ENH-061/ENH-061-specification.md) (GitHub #221, PR #220, commit
+  `2583ecb89`) — the fix that actually closes this issue's root cause; see "Resolution" section
+  at the top of this file.
+- [ADR-062](../../decisions/ADR-062-gemini-pb-project-scoping-fail-closed.md) — the fail-closed
+  pattern ENH-061 extended from Gemini to Claude/Codex/`all`, governing the resolution above.
