@@ -1,13 +1,31 @@
 ---
 id: issue-24
 type: Bug
-status: deferred
+status: resolved
 github-issue: "#185"
 branch: none
 created: 2026-07-18
 ---
 
 # Issue-24: `kg_capture` produces a malformed double-frontmatter file when content already includes its own YAML frontmatter
+
+## Resolution (2026-08-22)
+
+Confirmed as a duplicate of [[issue-46]] (GitHub #226, already closed as
+COMPLETED). issue-46's "Manifestation B" is this exact bug: `kg_capture`
+unconditionally prepending `generateFrontmatter()`'s output onto
+caller-supplied `content` at both write sites in
+`mcp-server/src/tools/capture.ts`, regardless of whether that content
+(as produced by `session-summary-agent.md`'s templates) already carries
+its own frontmatter block — producing the same stacked `---...---
+---...---` corruption described below. The shipped fix
+(commits `e082d7f9`, `94ff2897`) added `stripLeadingFrontmatter()`, which
+strips any caller-supplied leading frontmatter block before the tool
+prepends its own, and closes this exact `kg_capture`/session-type code
+path. issue-46 also fixed the related double-dated-filename symptom noted
+below (its "Manifestation A"). Closed as a duplicate rather than
+independently reimplemented; GitHub #185 closed with a comment pointing to
+#226.
 
 ## Problem
 
@@ -49,4 +67,5 @@ Manually edited the saved file to remove the tool-generated outer frontmatter bl
 
 ## Status
 
-Deferred (Mode 3 — track only). No branch created, no implementation planned yet. Needs investigation into `mcp-server/src/tools/capture.ts`'s frontmatter-generation logic — whether it should detect and skip generating its own frontmatter when the content already has one, merge the two, or something else.
+Resolved — see "Resolution (2026-08-22)" above. Fixed as part of [[issue-46]]'s
+Manifestation B; no separate branch or implementation needed for this issue.
