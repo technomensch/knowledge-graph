@@ -1,7 +1,7 @@
 ---
 id: issue-36
 type: Bug
-status: tracked
+status: resolved
 github-issue: "#237"
 branch: none
 created: 2026-07-31
@@ -71,6 +71,10 @@ To reach SATISFIED: fix all 4 `pre-skill-rules-inject.sh` occurrences + resync b
   lives in the exact file ENH-023 proposes extending with a new case branch); fix this
   issue's occurrences before or alongside ENH-023's edit to avoid clobbering each other.
 
+## Resolution (2026-08-22)
+
+Fixed all 4 occurrences in `scripts/pre-skill-rules-inject.sh` (lines 160, 168, 183, 215), plus a 5th live site found during execution in `scripts/recommendation-gate.sh:32` (same bug class, hook-wired via `hooks/hooks.json:126`, missed by both the original plan and an earlier Opus review pass — caught by the implementer's own Step 6 sweep before marking resolved), plus 6 additional same-class references outside the repo (`~/.kmgraph/triggers.md` x3, `~/.kmgraph/plan-execution-rules.md` x2, `~/.kmgraph/knowledge/kg-category-index-global.md` x1). Used `/kmgraph:kmg-recall` (the command) uniformly across all 5 script sites, not `kmgraph:kmg-auto-recall` (the skill) — confirmed directly against `skills/kmg-auto-recall/SKILL.md`, which states it "handles reactive (\"have we?\") recall only" and explicitly defers hard-block-injected recall (exactly what all 5 sites are) to this same mechanism. This resolves the contradiction the first (incomplete) 2026-08-01 fix attempt left standing between the dotfile twin and the hook script. Resynced both persistent (non-version-pinned) plugin-cache copies at `~/.claude/plugins/marketplaces/knowledge-management-graph/` (`pre-skill-rules-inject.sh` and `recommendation-gate.sh` — the latter added to scope since hooks resolve `${CLAUDE_PLUGIN_ROOT}` to this same cache directory, not the repo checkout); version-pinned cache copies left alone per issue-32's already-tracked scope. Verified via a live-surface grep sweep (`scripts/`, `commands/`, `skills/`, `agents/` — `knowledge/` intentionally excluded: it returns ~2,463 hits of historical/archival content, e.g. this file's own "Attempted fix" section above, that correctly document the past bug and are not live-firing instructions) plus the dotfile checks before marking resolved, given this issue's own history of an incomplete first fix passing informal review.
+
 ## Status
 
-Tracked, not closed — first fix attempt (2026-08-01) was incomplete per independent Opus review; see "Attempted fix" above for exactly what's still broken. Branch/scope decision (separate from `v0.7.0`) being made in a different planning session as of this update.
+Resolved — GitHub issue #237 close is a separate, explicit follow-up (not automated by this fix).
