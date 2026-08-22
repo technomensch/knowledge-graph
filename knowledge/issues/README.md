@@ -4,7 +4,7 @@
 
 Tracking of investigated bugs, defects, and meta-issues for this project.
 
-**Total Issues:** 55 numbered issues, plus named meta-issues (see below)
+**Total Issues:** 56 numbered issues, plus named meta-issues (see below)
 **Last Updated:** 2026-08-22
 
 ---
@@ -19,6 +19,7 @@ Tracking of investigated bugs, defects, and meta-issues for this project.
 
 ## All Issues (Chronological)
 
+- [issue-56: `kmg-handoff`'s default-path fix (issue-31) has no `kg_upgrade` category — 17 stray `./handoff-packages/*` directories are undetected and undisclosed](issue-56/issue-56-description.md) — **Status:** 🟡 Tracked — found during a user-asked architecture-impact review of this branch; issue-31's default-path change is the same class of user-facing move as [issue-55](issue-55/issue-55-description.md) but was never wired into `kg_upgrade` and the leftover directories were never disclosed to users.
 - [issue-55: `kg_search`'s project-local FTS5 index path is keyed only by KG name, not by path](issue-55/issue-55-description.md) — **Status:** ✅ Resolved — a stale/cross-repo index file at `~/.kmgraph/index/projects/<name>.db` could silently shadow a KG's real content, since the path never accounted for *where* the KG actually lives. Fixed in v0.7.4 by keying the index filename on a digest of the KG's normalized path (`<name>-<pathHash>.db`), plus a new opt-in `kg_upgrade` category (`stale-fts5-index-format`) to migrate existing installs.
 - [issue-54: `kg_upgrade` has no check category for leftover renumbered-ADR orphan files](issue-54/issue-54-description.md) — **Status:** 🟡 Deferred (Track only) — GitHub issue #240 filed (labels: bug + gap). Split out from issue-53's item 2 after item 1 was confirmed already shipped; this is the real, unaddressed half — a new `kg_upgrade` UpgradeItem category to detect an already-orphaned renumbered file, which the existing creation-time collision check structurally cannot catch.
 - [issue-53: ADR Creation Has No Collision Check — Numbers Can Be Assigned Twice](issue-53/issue-53-description.md) — **Status:** ✅ Resolved — GitHub issue #231 closed. Item 1 (the actual ask) was already shipped in commit `046bc2234` four months before this issue was filed; item 2 split out to [issue-54](issue-54/issue-54-description.md).
