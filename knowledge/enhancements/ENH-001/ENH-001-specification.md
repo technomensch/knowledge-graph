@@ -114,6 +114,9 @@ Currently, KMGraph knowledge graphs are project-local by default. Users must cap
 - [issue-11](../../issues/issue-11/issue-11-description.md) — traces the `ENH-NNN`
   numbering scheme's origin to `optimize-my-resume` commit `2ade748` (2026-01-25), the
   same session that minted this ENH's own number. Backlinked 2026-08-19.
+- [issue-55](../../issues/issue-55/issue-55-description.md) — surfaced a different FTS5
+  index-collision bug in the same multi-KG search subsystem this ENH designed; checked and
+  confirmed unrelated to this ENH's own scope, but same neighborhood.
 
 After v0.2.2 ships, two lessons and ADRs must be captured:
 

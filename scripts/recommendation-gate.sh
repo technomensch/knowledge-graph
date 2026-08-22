@@ -29,7 +29,7 @@ DETECT_REGEX='(what (could|should|can) we do|how (should|do|would) (we|i|you) (a
 
 # Hardcoded fallback preamble (used when triggers.md absent or section missing)
 FALLBACK_PREAMBLE='Before producing this recommendation:
-1. Invoke kmgraph:recall on the topic — show results under "Prior Art"
+1. Invoke `/kmgraph:kmg-recall` on the topic — show results under "Prior Art"
 2. ADR pre-check — search knowledge/decisions/ for covering ADRs
 3. Note cascade / blast-radius of proposed options
 4. Root-cause gate — determine root cause vs symptom before presenting options; if symptom-only, surface root cause and ask first

@@ -1,7 +1,7 @@
 ---
 id: issue-31
 type: Bug
-status: tracked
+status: resolved
 github-issue: "#200"
 branch: none
 created: 2026-07-28
@@ -113,3 +113,10 @@ hardcodes the old path.
   [issue-30](../issue-30/issue-30-description.md) both touch `commands/kmg-handoff.md`
   directly (this issue's path bug, issue-30's missing session-summary auto-invoke) —
   non-conflicting, good single-PR candidate.
+- [issue-56](../issue-56/issue-56-description.md) — added the missing `kg_upgrade` category
+  (`stale-handoff-packages-location`) and disclosure for the 17 stray `./handoff-packages/*`
+  directories this issue's fix left behind undetected.
+
+## Resolution (2026-08-22)
+
+Fixed — `commands/kmg-handoff.md`'s default output path corrected from `./handoff-packages/$(date +%Y-%m-%d)` to `knowledge/handoffs/$(date +%Y-%m-%d)` (and the matching `--output-dir` doc line). The pre-existing stray `./handoff-packages/*` directories at the repo root (count re-derived live at execution time, not copied from planning-time notes — ADR-059) are left untouched — gitignored, never committed, informational only; disposition (migrate vs. delete) is left to the user's own discretion, not resolved by this fix, per this issue's own "Open Questions" framing. Batched with issue-30 in one PR (same file, non-conflicting). GitHub issue #200 close is a separate, explicit follow-up.

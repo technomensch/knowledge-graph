@@ -20,16 +20,16 @@ echo ""
 
 # Test 1: Resolver module exists
 echo "Test 1: Resolver module exists"
-if [ -f "$COMMANDS_DIR/init-shared/ai-model-tier-resolver.md" ]; then
-  pass "commands/init-shared/ai-model-tier-resolver.md exists"
+if [ -f "$COMMANDS_DIR/kmg-init-shared/kmg-ai-model-tier-resolver.md" ]; then
+  pass "commands/kmg-init-shared/kmg-ai-model-tier-resolver.md exists"
 else
-  fail "commands/init-shared/ai-model-tier-resolver.md does NOT exist"
+  fail "commands/kmg-init-shared/kmg-ai-model-tier-resolver.md does NOT exist"
 fi
 
 # Test 2: capture-lesson.md references tier resolver
 echo "Test 2: capture-lesson.md references tier resolver"
 set +e
-grep -q "ai-model-tier-resolver" "$COMMANDS_DIR/capture-lesson.md"
+grep -q "ai-model-tier-resolver" "$COMMANDS_DIR/kmg-capture-lesson.md"
 result=$?
 set -e
 if [ $result -eq 0 ]; then
@@ -41,7 +41,7 @@ fi
 # Test 3: session-summary.md references tier resolver
 echo "Test 3: session-summary.md references tier resolver"
 set +e
-grep -q "ai-model-tier-resolver" "$COMMANDS_DIR/session-summary.md"
+grep -q "ai-model-tier-resolver" "$COMMANDS_DIR/kmg-session-summary.md"
 result=$?
 set -e
 if [ $result -eq 0 ]; then
@@ -53,7 +53,7 @@ fi
 # Test 4: sync-all.md references tier resolver
 echo "Test 4: sync-all.md references tier resolver"
 set +e
-grep -q "ai-model-tier-resolver" "$COMMANDS_DIR/sync-all.md"
+grep -q "ai-model-tier-resolver" "$COMMANDS_DIR/kmg-sync-all.md"
 result=$?
 set -e
 if [ $result -eq 0 ]; then
@@ -65,7 +65,7 @@ fi
 # Test 5: capture-lesson.md no hardcoded Opus model
 echo "Test 5: capture-lesson.md no hardcoded Opus model"
 set +e
-grep -q "claude-opus-4-7" "$COMMANDS_DIR/capture-lesson.md"
+grep -q "claude-opus-4-7" "$COMMANDS_DIR/kmg-capture-lesson.md"
 result=$?
 set -e
 if [ $result -ne 0 ]; then
@@ -77,7 +77,7 @@ fi
 # Test 6: session-summary.md no hardcoded Opus model
 echo "Test 6: session-summary.md no hardcoded Opus model"
 set +e
-grep -q "claude-opus-4-7" "$COMMANDS_DIR/session-summary.md"
+grep -q "claude-opus-4-7" "$COMMANDS_DIR/kmg-session-summary.md"
 result=$?
 set -e
 if [ $result -ne 0 ]; then
@@ -89,7 +89,7 @@ fi
 # Test 7: sync-all.md no hardcoded Opus model
 echo "Test 7: sync-all.md no hardcoded Opus model"
 set +e
-grep -q "claude-opus-4-7" "$COMMANDS_DIR/sync-all.md"
+grep -q "claude-opus-4-7" "$COMMANDS_DIR/kmg-sync-all.md"
 result=$?
 set -e
 if [ $result -ne 0 ]; then

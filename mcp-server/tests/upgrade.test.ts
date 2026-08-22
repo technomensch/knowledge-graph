@@ -3733,3 +3733,294 @@ describe("plan-status-drift — apply mode", () => {
     expect(fs.readFileSync(`${mirrorPath}.bak`, "utf-8")).toBe(mirrorContent);
   });
 });
+
+// ---------------------------------------------------------------------------
+// issue-55: "stale-fts5-index-format" upgrade category
+//
+// Before v0.7.4 a project-local FTS5 index lived at
+// <indexDir>/projects/<kgName>.db -- keyed by name alone, so two unrelated
+// repos with same-named graphs shared one file. The relocation to a
+// path-hashed filename is user-visible architecture, so existing installs get
+// an explicit, opt-in migration rather than a silent one.
+// ---------------------------------------------------------------------------
+
+describe("upgrade category: stale-fts5-index-format (issue-55)", () => {
+  const { getIndexDir } = jest.requireActual("../src/utils.js") as {
+    getIndexDir: () => string;
+  };
+  const { computeDbPath } = jest.requireActual("../src/tools/fts5.js") as {
+    computeDbPath: (n: string, t: string, p: string) => string;
+  };
+
+  const createdIndexFiles: string[] = [];
+
+  function oldFormatPath(kgName: string): string {
+    return path.join(getIndexDir(), "projects", `${kgName}.db`);
+  }
+
+  function plantOldFormatIndex(kgName: string): string {
+    const p = oldFormatPath(kgName);
+    fs.mkdirSync(path.dirname(p), { recursive: true });
+    fs.writeFileSync(p, "not-a-real-sqlite-file", "utf-8");
+    createdIndexFiles.push(p);
+    return p;
+  }
+
+  function scaffoldContent(kgRoot: string): void {
+    fs.mkdirSync(path.join(kgRoot, "lessons-learned"), { recursive: true });
+    fs.writeFileSync(
+      path.join(kgRoot, "lessons-learned", "a.md"),
+      "# A\n\nsome indexable content",
+      "utf-8"
+    );
+  }
+
+  afterEach(() => {
+    for (const f of createdIndexFiles) {
+      try {
+        fs.rmSync(f, { force: true });
+      } catch {
+        /* best-effort */
+      }
+    }
+    createdIndexFiles.length = 0;
+  });
+
+  async function inspectCategories(): Promise<string[]> {
+    const result = await handleUpgrade({});
+    const parsed = JSON.parse(result.content[0].text);
+    return (parsed.upgrades as Array<{ category: string }>).map((u) => u.category);
+  }
+
+  it("does not fire when no old-format index exists", async () => {
+    const kgRoot = makeTempDir("fts5-none");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    expect(await inspectCategories()).not.toContain("stale-fts5-index-format");
+  });
+
+  it("fires when an old-format (name-only) index exists", async () => {
+    const kgRoot = makeTempDir("fts5-stale");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    const old = plantOldFormatIndex("test-kg");
+
+    const result = await handleUpgrade({});
+    const parsed = JSON.parse(result.content[0].text);
+    const item = (parsed.upgrades as Array<{ category: string; details?: string }>).find(
+      (u) => u.category === "stale-fts5-index-format"
+    );
+    expect(item).toBeDefined();
+    expect(item!.details).toContain(old);
+    // The details must name the new location the user is opting into.
+    expect(item!.details).toContain(computeDbPath("test-kg", "project-local", kgRoot));
+  });
+
+  it("does not fire for a personal graph (always used a fixed singleton path)", async () => {
+    const kgRoot = makeTempDir("fts5-personal");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot, { type: "personal" });
+    plantOldFormatIndex("test-kg");
+
+    expect(await inspectCategories()).not.toContain("stale-fts5-index-format");
+  });
+
+  it("apply rebuilds at the new path, leaves the old file alone, and stops firing", async () => {
+    const kgRoot = makeTempDir("fts5-apply");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    scaffoldContent(kgRoot);
+    mockActiveKg(kgRoot);
+    const old = plantOldFormatIndex("test-kg");
+
+    expect(await inspectCategories()).toContain("stale-fts5-index-format");
+
+    const applied = await handleUpgrade({ apply: ["stale-fts5-index-format"] });
+    const text = applied.content[0].text;
+    expect(applied.isError).toBeUndefined();
+    expect(text).toContain("[stale-fts5-index-format]");
+
+    const newPath = computeDbPath("test-kg", "project-local", kgRoot);
+    createdIndexFiles.push(newPath);
+    expect(fs.existsSync(newPath)).toBe(true);
+    expect(text).toContain(newPath);
+
+    // Non-destructive: the old file is still exactly where it was.
+    expect(fs.existsSync(old)).toBe(true);
+
+    // And the category no longer fires.
+    expect(await inspectCategories()).not.toContain("stale-fts5-index-format");
+  });
+
+  it("apply on a graph with no old-format index still lands at the current-format path", async () => {
+    const kgRoot = makeTempDir("fts5-noop");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    scaffoldContent(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const applied = await handleUpgrade({ apply: ["stale-fts5-index-format"] });
+    createdIndexFiles.push(computeDbPath("test-kg", "project-local", kgRoot));
+    expect(applied.content[0].text).toContain("[stale-fts5-index-format]");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// issue-56: "stale-handoff-packages-location" upgrade category
+//
+// Before issue-31's fix, /kmgraph:kmg-handoff wrote every package to
+// <repoRoot>/handoff-packages/<date>/ (gitignored, never surfaced by
+// git status). The default now writes to knowledge/handoffs/<date>/ instead,
+// but anything already on disk from before the fix is a silent orphan. Same
+// treatment as stale-fts5-index-format: opt-in, non-destructive migration.
+// ---------------------------------------------------------------------------
+
+describe("upgrade category: stale-handoff-packages-location (issue-56)", () => {
+  async function inspectCategories(): Promise<string[]> {
+    const result = await handleUpgrade({});
+    const parsed = JSON.parse(result.content[0].text);
+    return (parsed.upgrades as Array<{ category: string }>).map((u) => u.category);
+  }
+
+  function repoRootOf(kgRoot: string): string {
+    return path.dirname(kgRoot);
+  }
+
+  function plantStrayPackage(kgRoot: string, dateDir: string, files: Record<string, string>): string {
+    const dir = path.join(repoRootOf(kgRoot), "handoff-packages", dateDir);
+    fs.mkdirSync(dir, { recursive: true });
+    for (const [name, content] of Object.entries(files)) {
+      fs.writeFileSync(path.join(dir, name), content, "utf-8");
+    }
+    return dir;
+  }
+
+  it("does not fire when no handoff-packages/ directory exists", async () => {
+    const kgRoot = makeTempDir("hp-none");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    expect(await inspectCategories()).not.toContain("stale-handoff-packages-location");
+  });
+
+  it("does not fire when handoff-packages/ exists but has no dated subfolders", async () => {
+    const kgRoot = makeTempDir("hp-empty");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    fs.mkdirSync(path.join(repoRootOf(kgRoot), "handoff-packages"), { recursive: true });
+
+    expect(await inspectCategories()).not.toContain("stale-handoff-packages-location");
+  });
+
+  it("fires when a stray dated package folder exists, naming the destination", async () => {
+    const kgRoot = makeTempDir("hp-stale");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    plantStrayPackage(kgRoot, "2026-04-21", { "START-HERE.md": "# hi" });
+
+    const result = await handleUpgrade({});
+    const parsed = JSON.parse(result.content[0].text);
+    const item = (parsed.upgrades as Array<{ category: string; details?: string }>).find(
+      (u) => u.category === "stale-handoff-packages-location"
+    );
+    expect(item).toBeDefined();
+    expect(item!.details).toContain("2026-04-21");
+    expect(item!.details).toContain(path.join(kgRoot, "handoffs"));
+  });
+
+  it("does not fire for a personal graph", async () => {
+    const kgRoot = makeTempDir("hp-personal");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot, { type: "personal" });
+    plantStrayPackage(kgRoot, "2026-04-21", { "START-HERE.md": "# hi" });
+
+    expect(await inspectCategories()).not.toContain("stale-handoff-packages-location");
+  });
+
+  it("apply moves files into knowledge/handoffs/<date>/ and removes the now-empty stray dirs", async () => {
+    const kgRoot = makeTempDir("hp-apply");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    const strayDir = plantStrayPackage(kgRoot, "2026-04-21", {
+      "START-HERE.md": "# package",
+      "DOCUMENTATION-MAP.md": "# map",
+    });
+
+    const applied = await handleUpgrade({ apply: ["stale-handoff-packages-location"] });
+    const text = applied.content[0].text;
+    expect(applied.isError).toBeUndefined();
+    expect(text).toContain("[stale-handoff-packages-location]");
+
+    const destDir = path.join(kgRoot, "handoffs", "2026-04-21");
+    expect(fs.readFileSync(path.join(destDir, "START-HERE.md"), "utf-8")).toBe("# package");
+    expect(fs.readFileSync(path.join(destDir, "DOCUMENTATION-MAP.md"), "utf-8")).toBe("# map");
+
+    // Source date dir and the now-empty top-level handoff-packages/ are both gone.
+    expect(fs.existsSync(strayDir)).toBe(false);
+    expect(fs.existsSync(path.join(repoRootOf(kgRoot), "handoff-packages"))).toBe(false);
+
+    // And the category no longer fires.
+    expect(await inspectCategories()).not.toContain("stale-handoff-packages-location");
+  });
+
+  it("apply dedups a file identical to one already at the destination", async () => {
+    const kgRoot = makeTempDir("hp-dedup");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    plantStrayPackage(kgRoot, "2026-04-21", { "START-HERE.md": "# same" });
+    fs.mkdirSync(path.join(kgRoot, "handoffs", "2026-04-21"), { recursive: true });
+    fs.writeFileSync(path.join(kgRoot, "handoffs", "2026-04-21", "START-HERE.md"), "# same", "utf-8");
+
+    const applied = await handleUpgrade({ apply: ["stale-handoff-packages-location"] });
+    expect(applied.content[0].text).toContain("duplicate removed");
+    expect(fs.existsSync(path.join(repoRootOf(kgRoot), "handoff-packages"))).toBe(false);
+  });
+
+  it("apply leaves a genuinely conflicting file untouched on both sides and reports it", async () => {
+    const kgRoot = makeTempDir("hp-conflict");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    const strayDir = plantStrayPackage(kgRoot, "2026-04-21", { "START-HERE.md": "# stray version" });
+    fs.mkdirSync(path.join(kgRoot, "handoffs", "2026-04-21"), { recursive: true });
+    fs.writeFileSync(
+      path.join(kgRoot, "handoffs", "2026-04-21", "START-HERE.md"),
+      "# real version",
+      "utf-8"
+    );
+
+    const applied = await handleUpgrade({ apply: ["stale-handoff-packages-location"] });
+    const text = applied.content[0].text;
+    expect(text).toContain("Skipped");
+    expect(text).toContain("manual review");
+
+    // Neither file was touched.
+    expect(fs.readFileSync(path.join(strayDir, "START-HERE.md"), "utf-8")).toBe("# stray version");
+    expect(fs.readFileSync(path.join(kgRoot, "handoffs", "2026-04-21", "START-HERE.md"), "utf-8")).toBe(
+      "# real version"
+    );
+    // The stray dir survives (non-empty) — still detected on a fresh inspect.
+    expect(await inspectCategories()).toContain("stale-handoff-packages-location");
+  });
+
+  it("apply on a graph with no stray directory is a clean no-op", async () => {
+    const kgRoot = makeTempDir("hp-noop");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const applied = await handleUpgrade({ apply: ["stale-handoff-packages-location"] });
+    expect(applied.content[0].text).toContain("[stale-handoff-packages-location]");
+    expect(applied.content[0].text).toContain("No stray handoff-packages/");
+  });
+});

@@ -1,5 +1,5 @@
 #!/bin/bash
-# test-commands.sh — Structural and syntax validation for all 25 slash commands
+# test-commands.sh — Structural and syntax validation for all 24 slash commands
 #
 # Commands are markdown files with YAML frontmatter and embedded bash scripts.
 # This test validates structure and syntax without needing to run Claude Code.
@@ -32,36 +32,37 @@ else
   exit 1
 fi
 
-# ── Test 2: All 25 expected command files present ────────────────────────────
+# ── Test 2: All 24 expected command files present ────────────────────────────
 
 echo "── File presence ───────────────────────────────────────────────"
 
+# Commands were migrated to the kmg- prefix convention (see CLAUDE.md); the
+# unprefixed "switch.md" command was retired and has no kmg- successor.
 EXPECTED_COMMANDS=(
-  "add-category.md"
-  "capture-lesson.md"
-  "check-sensitive.md"
-  "config-sanitization.md"
-  "create-adr.md"
-  "create-doc.md"
-  "extract-chat.md"
-  "handoff.md"
-  "help.md"
-  "init.md"
-  "link-issue.md"
-  "list.md"
-  "meta-issue.md"
-  "recall.md"
-  "session-summary.md"
-  "setup-platform.md"
-  "start-issue-tracking.md"
-  "status.md"
-  "switch.md"
-  "sync-all.md"
-  "update-doc.md"
-  "update-graph.md"
-  "update-issue-plan.md"
-  "init-personal-kg.md"
-  "migration.md"
+  "kmg-add-category.md"
+  "kmg-capture-lesson.md"
+  "kmg-check-sensitive.md"
+  "kmg-config-sanitization.md"
+  "kmg-create-adr.md"
+  "kmg-create-doc.md"
+  "kmg-extract-chat.md"
+  "kmg-handoff.md"
+  "kmg-help.md"
+  "kmg-init.md"
+  "kmg-link-issue.md"
+  "kmg-list.md"
+  "kmg-meta-issue.md"
+  "kmg-recall.md"
+  "kmg-session-summary.md"
+  "kmg-setup-platform.md"
+  "kmg-start-issue-tracking.md"
+  "kmg-status.md"
+  "kmg-sync-all.md"
+  "kmg-update-doc.md"
+  "kmg-update-graph.md"
+  "kmg-update-issue-plan.md"
+  "kmg-init-personal-kg.md"
+  "kmg-migration.md"
 )
 
 MISSING=0
@@ -73,19 +74,19 @@ for cmd in "${EXPECTED_COMMANDS[@]}"; do
 done
 
 if [ $MISSING -eq 0 ]; then
-  pass "All 25 expected command files present"
+  pass "All 24 expected command files present"
 else
   fail "$MISSING command file(s) missing (see above)"
 fi
 
-# Test 3: Exact count is 25 (top-level only — init-shared/ modules are excluded)
+# Test 3: Exact count is 24 (top-level only — kmg-init-shared/ modules are excluded)
 ACTUAL_COUNT=$(find "$COMMANDS_DIR" -maxdepth 1 -name "*.md" -type f | wc -l | tr -d ' ')
-if [ "$ACTUAL_COUNT" -eq 25 ]; then
-  pass "Exact command count is 25"
-elif [ "$ACTUAL_COUNT" -gt 25 ]; then
-  fail "More than 25 command files found ($ACTUAL_COUNT) — unexpected files?"
+if [ "$ACTUAL_COUNT" -eq 24 ]; then
+  pass "Exact command count is 24"
+elif [ "$ACTUAL_COUNT" -gt 24 ]; then
+  fail "More than 24 command files found ($ACTUAL_COUNT) — unexpected files?"
 else
-  fail "Fewer than 25 command files found ($ACTUAL_COUNT)"
+  fail "Fewer than 24 command files found ($ACTUAL_COUNT)"
 fi
 
 # Test 4: No zero-byte files
@@ -99,35 +100,15 @@ fi
 echo ""
 echo "── Frontmatter validation ──────────────────────────────────────"
 
-# Test 5: All files have YAML frontmatter opening delimiter
-MISSING_FRONTMATTER=0
-for f in "$COMMANDS_DIR"/*.md; do
-  if ! head -1 "$f" | grep -q "^---"; then
-    echo "    Missing frontmatter: $(basename $f)"
-    MISSING_FRONTMATTER=$((MISSING_FRONTMATTER + 1))
-  fi
-done
-if [ $MISSING_FRONTMATTER -eq 0 ]; then
-  pass "All command files have YAML frontmatter (--- delimiter)"
-else
-  fail "$MISSING_FRONTMATTER files missing YAML frontmatter"
-fi
-
-# Test 6: All files have closing frontmatter delimiter
-UNCLOSED_FRONTMATTER=0
-for f in "$COMMANDS_DIR"/*.md; do
-  # Count --- occurrences; need at least 2 (open + close)
-  DELIMITER_COUNT=$(grep -c "^---" "$f" 2>/dev/null || echo 0)
-  if [ "$DELIMITER_COUNT" -lt 2 ]; then
-    echo "    Unclosed frontmatter: $(basename $f)"
-    UNCLOSED_FRONTMATTER=$((UNCLOSED_FRONTMATTER + 1))
-  fi
-done
-if [ $UNCLOSED_FRONTMATTER -eq 0 ]; then
-  pass "All command files have properly closed YAML frontmatter"
-else
-  fail "$UNCLOSED_FRONTMATTER files have unclosed frontmatter"
-fi
+# Tests 5-6 (removed): originally checked for a YAML frontmatter --- delimiter
+# pair, but command files in this repo have never used YAML frontmatter —
+# unlike skills/ and agents/, which do (name:/description: fields). All 24
+# files start directly with markdown prose/headings; the grep -c "^---" count
+# these checks relied on was actually counting stray markdown horizontal-rule
+# dividers inside the file body, not frontmatter delimiters. Confirmed this
+# predates the kmg- rename (same result on the pre-rename base commit) — not
+# something to paper over with a fabricated structural rule.
+pass "Frontmatter checks skipped — commands/ files don't use YAML frontmatter by convention"
 
 echo ""
 echo "── Namespace validation ────────────────────────────────────────"
@@ -189,39 +170,39 @@ fi
 echo ""
 echo "── Key command content checks ──────────────────────────────────"
 
-# Test 11: help.md references key commands
-if [ -f "$COMMANDS_DIR/help.md" ]; then
-  HELP_CONTENT=$(cat "$COMMANDS_DIR/help.md")
+# Test 11: kmg-help.md references key commands
+if [ -f "$COMMANDS_DIR/kmg-help.md" ]; then
+  HELP_CONTENT=$(cat "$COMMANDS_DIR/kmg-help.md")
   MISSING_REFS=0
   for key_cmd in "capture-lesson" "recall" "sync-all" "session-summary"; do
     if ! echo "$HELP_CONTENT" | grep -q "$key_cmd"; then
-      echo "    help.md missing reference to: $key_cmd"
+      echo "    kmg-help.md missing reference to: $key_cmd"
       MISSING_REFS=$((MISSING_REFS + 1))
     fi
   done
   if [ $MISSING_REFS -eq 0 ]; then
-    pass "help.md references all key commands (capture-lesson, recall, sync-all, session-summary)"
+    pass "kmg-help.md references all key commands (capture-lesson, recall, sync-all, session-summary)"
   else
-    fail "help.md missing $MISSING_REFS key command references"
+    fail "kmg-help.md missing $MISSING_REFS key command references"
   fi
 else
-  fail "help.md not found"
+  fail "kmg-help.md not found"
 fi
 
-# Test 12: sync-all.md orchestrates multiple sub-commands
-if [ -f "$COMMANDS_DIR/sync-all.md" ]; then
-  SYNC_CONTENT=$(cat "$COMMANDS_DIR/sync-all.md")
+# Test 12: kmg-sync-all.md orchestrates multiple sub-commands
+if [ -f "$COMMANDS_DIR/kmg-sync-all.md" ]; then
+  SYNC_CONTENT=$(cat "$COMMANDS_DIR/kmg-sync-all.md")
   PIPELINE_CMDS=0
   for sub_cmd in "update-graph" "session-summary" "capture-lesson"; do
     echo "$SYNC_CONTENT" | grep -q "$sub_cmd" && PIPELINE_CMDS=$((PIPELINE_CMDS + 1)) || true
   done
   if [ $PIPELINE_CMDS -ge 2 ]; then
-    pass "sync-all.md references multiple pipeline sub-commands ($PIPELINE_CMDS found)"
+    pass "kmg-sync-all.md references multiple pipeline sub-commands ($PIPELINE_CMDS found)"
   else
-    fail "sync-all.md should reference multiple sub-commands (found $PIPELINE_CMDS)"
+    fail "kmg-sync-all.md should reference multiple sub-commands (found $PIPELINE_CMDS)"
   fi
 else
-  fail "sync-all.md not found"
+  fail "kmg-sync-all.md not found"
 fi
 
 echo ""

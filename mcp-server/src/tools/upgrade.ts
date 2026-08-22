@@ -15,7 +15,9 @@ import {
   checkGraphPathHealth,
   GraphConfig,
   PathHealth,
+  getIndexDir,
 } from "../utils.js";
+import { computeDbPath, rebuildIndex } from "./fts5.js";
 import { resolveGraph, resolvePersonalGraph, PersonalScopeSession, confirmPersonalScopeAccess } from "../resolution.js";
 import {
   resolveInteractionMode,
@@ -59,6 +61,8 @@ const APPLY_ORDER = [
   "stray-knowledge-dir",
   "capture-corruption",   // issue-46 backfix: content repair, order-independent of the others
   "diff-blank-reconstruction",   // issue-47 backfix: content repair, order-independent of the others
+  "stale-fts5-index-format",   // issue-55 backfix: search-index relocation, order-independent of the others
+  "stale-handoff-packages-location",   // issue-56 backfix: file relocation, order-independent of the others
   "platform-split",
 ];
 
@@ -1551,6 +1555,249 @@ function applyStarterRelocation(kgPath: string): string {
   return parts.join(". ") || "No starters to relocate";
 }
 
+/**
+ * issue-55 — old-format FTS5 index detection.
+ *
+ * Before v0.7.4 a project-local search index lived at
+ * `~/.kmgraph/index/projects/<kgName>.db` — keyed by the graph's *name* alone,
+ * so two unrelated repos that both named their graph "knowledge" silently
+ * shared one index file and served each other's search results. The index
+ * filename now also carries a digest of the graph's real path.
+ *
+ * That relocation is user-visible architecture, so it ships as an opt-in
+ * upgrade category rather than happening silently: this fires only when an
+ * old-format file exists AND no new-format file has been built yet, so it
+ * stops firing as soon as the rebuild below has run.
+ */
+function checkStaleFts5IndexFormat(
+  kgPath: string,
+  kgName: string,
+  kgType: string | undefined
+): UpgradeItem[] {
+  const type = kgType ?? "project-local";
+  // The personal graph has always used a fixed singleton path (personal.db) —
+  // it was never name-keyed and has nothing to migrate.
+  if (type === "personal") return [];
+
+  const oldPath = path.join(getIndexDir(), "projects", `${kgName}.db`);
+  if (!fs.existsSync(oldPath)) return [];
+
+  const newPath = computeDbPath(kgName, type, kgPath);
+  // Already migrated (or the graph's name happens to sanitize to the same
+  // literal, which computeDbPath's hash suffix makes impossible in practice).
+  if (newPath === oldPath || fs.existsSync(newPath)) return [];
+
+  return [{
+    category: "stale-fts5-index-format",
+    description: `Search index for "${kgName}" is in the pre-v0.7.4 name-only format (collision risk)`,
+    details:
+      `Found an older search index for this knowledge graph:\n  ${oldPath}\n\n` +
+      `That file is named after the graph alone, so any other project whose graph is also ` +
+      `called "${kgName}" would share it — and searches could quietly return the other ` +
+      `project's notes, or return nothing at all. Newer indexes include a fingerprint of ` +
+      `where the graph actually lives, so that can't happen.\n\n` +
+      `Applying this rebuilds this graph's index at the new location:\n  ${newPath}\n\n` +
+      `This is safe and non-destructive: it only re-reads your own markdown files and writes ` +
+      `a fresh index. Nothing in your knowledge graph is modified, and the old index file is ` +
+      `left exactly where it is — once the new one is in place the old one is inert, and you ` +
+      `can delete it yourself whenever you like.`,
+  }];
+}
+
+/**
+ * issue-55 — rebuild this graph's index under the collision-safe filename.
+ * Deliberately leaves the old file in place (ADR-063: never destroy state the
+ * user didn't explicitly agree to lose); it becomes an inert orphan.
+ */
+function applyStaleFts5IndexFormat(
+  kgPath: string,
+  kgName: string,
+  kgType: string | undefined
+): string {
+  const type = kgType ?? "project-local";
+  if (type === "personal") {
+    return "Personal knowledge graph uses a fixed index path; nothing to migrate";
+  }
+
+  const oldPath = path.join(getIndexDir(), "projects", `${kgName}.db`);
+  const newPath = computeDbPath(kgName, type, kgPath);
+  if (newPath === oldPath) return "Index already uses the current format; skipped";
+  if (!fs.existsSync(oldPath) && fs.existsSync(newPath)) {
+    return `Index already rebuilt at ${newPath}; skipped`;
+  }
+
+  try {
+    const result = rebuildIndex(kgPath, kgName, type);
+    const orphanNote = fs.existsSync(oldPath)
+      ? ` Old index left in place at ${oldPath} — inert now, safe to delete whenever you like.`
+      : "";
+    return (
+      `Rebuilt search index at ${result.db_path} ` +
+      `(${result.indexed} indexed, ${result.skipped} unchanged).${orphanNote}`
+    );
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return `Error rebuilding search index: ${message}`;
+  }
+}
+
+/**
+ * issue-56 — stray pre-migration handoff-package directories.
+ *
+ * Before issue-31's fix, `/kmgraph:kmg-handoff` wrote every package to
+ * `<repoRoot>/handoff-packages/<date>/` (gitignored, so `git status` never
+ * surfaced it). The default now writes to `knowledge/handoffs/<date>/`
+ * instead — but that fix only changed where *new* packages land; anything
+ * already on disk from before the fix is a silent, undiscoverable orphan.
+ * Same class of user-visible location move as stale-fts5-index-format
+ * above, same treatment: an opt-in, non-destructive migration.
+ *
+ * repoRoot is derived as dirname(kgPath) rather than hardcoding "knowledge"
+ * as the KG folder name — this only assumes handoff-packages/ is a sibling
+ * of wherever the KG actually lives, which is looser (and more portable)
+ * than the literal "knowledge/handoffs" path kmg-handoff.md itself hardcodes.
+ */
+function checkStaleHandoffPackagesLocation(
+  kgPath: string,
+  kgType: string | undefined
+): UpgradeItem[] {
+  // Same guard as stray-knowledge-dir: this is a project-repo convention
+  // (handoff packages live next to the repo's own knowledge/ folder), not
+  // something the personal graph has ever done.
+  if ((kgType ?? "project-local") !== "project-local") return [];
+
+  const repoRoot = path.dirname(kgPath);
+  const strayDir = path.join(repoRoot, "handoff-packages");
+  if (!fs.existsSync(strayDir)) return [];
+
+  let dateDirs: string[];
+  try {
+    dateDirs = fs
+      .readdirSync(strayDir)
+      .filter((entry) => fs.statSync(path.join(strayDir, entry)).isDirectory());
+  } catch {
+    return [];
+  }
+  if (dateDirs.length === 0) return [];
+
+  const destBase = path.join(kgPath, "handoffs");
+  return [{
+    category: "stale-handoff-packages-location",
+    description: `${dateDirs.length} handoff package(s) found at the pre-fix ./handoff-packages/ location`,
+    details:
+      `Found ${dateDirs.length} dated handoff package folder(s) at:\n  ${strayDir}\n\n` +
+      `These predate a fix (issue-31) that moved \`/kmgraph:kmg-handoff\`'s default output ` +
+      `from that location to \`knowledge/handoffs/\`. Because \`handoff-packages/\` is ` +
+      `gitignored, these never showed up in \`git status\` and were easy to forget about.\n\n` +
+      `Dates found: ${dateDirs.sort().join(", ")}\n\n` +
+      `Applying this moves each package's files into the equivalent dated folder under:\n  ${destBase}\n\n` +
+      `This is non-destructive: a file identical to one already at the destination is ` +
+      `deduplicated (the stray copy is removed); a file that differs from an existing ` +
+      `destination file is left exactly where it is and reported so you can look at it ` +
+      `yourself — nothing is ever overwritten. The old \`handoff-packages/<date>/\` folder ` +
+      `(and \`handoff-packages/\` itself) is only removed once it's empty.`,
+  }];
+}
+
+/**
+ * issue-56 — move each stray dated handoff-package folder into
+ * knowledge/handoffs/<date>/, file by file. Mirrors applyStrayKnowledgeDir's
+ * ADR-063 dedup-or-report-conflict pattern: identical content is deduplicated
+ * (stray copy removed), differing content is left untouched and reported,
+ * nothing is ever silently overwritten.
+ */
+function applyStaleHandoffPackagesLocation(kgPath: string): string {
+  const repoRoot = path.dirname(kgPath);
+  const strayDir = path.join(repoRoot, "handoff-packages");
+  if (!fs.existsSync(strayDir)) return "No stray handoff-packages/ directory found; skipped";
+
+  const destBase = path.join(kgPath, "handoffs");
+  const moved: string[] = [];
+  const skipped: string[] = [];
+
+  let dateDirs: string[];
+  try {
+    dateDirs = fs
+      .readdirSync(strayDir)
+      .filter((entry) => fs.statSync(path.join(strayDir, entry)).isDirectory());
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return `Error reading ${strayDir}: ${message}`;
+  }
+
+  for (const dateDir of dateDirs) {
+    moveHandoffPackageDir(
+      path.join(strayDir, dateDir),
+      path.join(destBase, dateDir),
+      dateDir,
+      moved,
+      skipped
+    );
+  }
+
+  let remaining = 0;
+  try {
+    remaining = fs.readdirSync(strayDir).length;
+    if (remaining === 0) fs.rmdirSync(strayDir);
+  } catch {
+    /* best-effort — leave it if it can't be removed */
+  }
+
+  const parts: string[] = [];
+  if (moved.length > 0) parts.push(`Moved to knowledge/handoffs/: ${moved.join(", ")}`);
+  if (skipped.length > 0) parts.push(`Skipped (needs manual review): ${skipped.join(", ")}`);
+  if (remaining > 0) parts.push(`handoff-packages/ not removed — ${remaining} item(s) remain`);
+  return parts.join(". ") || "Nothing to move";
+}
+
+function moveHandoffPackageDir(
+  srcDir: string,
+  destDir: string,
+  label: string,
+  moved: string[],
+  skipped: string[]
+): void {
+  if (!fs.existsSync(srcDir)) return;
+  fs.mkdirSync(destDir, { recursive: true });
+
+  for (const entry of fs.readdirSync(srcDir)) {
+    const src = path.join(srcDir, entry);
+    const dest = path.join(destDir, entry);
+
+    if (fs.statSync(src).isDirectory()) {
+      moveHandoffPackageDir(src, dest, `${label}/${entry}`, moved, skipped);
+      try {
+        if (fs.readdirSync(src).length === 0) fs.rmdirSync(src);
+      } catch {
+        /* best-effort */
+      }
+      continue;
+    }
+
+    if (fs.existsSync(dest)) {
+      if (fs.readFileSync(src).equals(fs.readFileSync(dest))) {
+        fs.unlinkSync(src);
+        moved.push(`${label}/${entry} (duplicate removed)`);
+      } else {
+        skipped.push(
+          `${label}/${entry} (differs from existing knowledge/handoffs/${label}/${entry} — neither touched)`
+        );
+      }
+      continue;
+    }
+
+    fs.copyFileSync(src, dest);
+    fs.unlinkSync(src);
+    moved.push(`${label}/${entry}`);
+  }
+
+  try {
+    if (fs.readdirSync(srcDir).length === 0) fs.rmdirSync(srcDir);
+  } catch {
+    /* best-effort */
+  }
+}
+
 function checkStrayKnowledgeDir(kgPath: string, kgType: string | undefined): UpgradeItem[] {
   if (kgType !== "project-local") return [];
   const strayDir = path.join(kgPath, "knowledge");
@@ -2051,7 +2298,7 @@ function updateLastAppliedVersion(installedVersion: string, graphName: string): 
 // kmg-upgrade-inspector.md's confirmBackfix wiring: that boolean is per-call, not
 // per-category, so a call consenting to one confirmBackfix-gated category silently
 // also consents to any other one present in the same `apply: [...]` array.
-export type ApplyCategory = "status-schema" | "config-location" | "plan-status-drift" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir" | "capture-corruption" | "diff-blank-reconstruction";
+export type ApplyCategory = "status-schema" | "config-location" | "plan-status-drift" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir" | "capture-corruption" | "diff-blank-reconstruction" | "stale-fts5-index-format" | "stale-handoff-packages-location";
 
 export interface HandleUpgradeParams {
   apply?: ApplyCategory[];
@@ -2140,7 +2387,7 @@ export async function handleUpgrade(
       result.upgrades.push({
         category: "resolution",
         description: target.error,
-        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, version-update, and the platform-split warning) were skipped.",
+        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, stale-handoff-packages-location, version-update, and the platform-split warning) were skipped.",
       });
       return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
     }
@@ -2165,7 +2412,7 @@ export async function handleUpgrade(
       result.upgrades.push({
         category: "resolution",
         description: `KG path not found: ${kgPath}`,
-        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, version-update, and the platform-split warning) were skipped.",
+        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, stale-handoff-packages-location, version-update, and the platform-split warning) were skipped.",
       });
       return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
     }
@@ -2177,6 +2424,8 @@ export async function handleUpgrade(
     result.upgrades.push(...checkStrayKnowledgeDir(kgPath, kgType));
     result.upgrades.push(...checkCaptureCorruption(kgPath));
     result.upgrades.push(...checkDiffBlankReconstruction(kgPath));
+    result.upgrades.push(...checkStaleFts5IndexFormat(kgPath, target.name, kgType));
+    result.upgrades.push(...checkStaleHandoffPackagesLocation(kgPath, kgType));
     result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config, target.name));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
@@ -2296,6 +2545,24 @@ export async function handleUpgrade(
         break;
       case "stray-knowledge-dir":
         results.push(`[stray-knowledge-dir] ${applyStrayKnowledgeDir(kgPath)}`);
+        appliedAnyGraphDependent = true;
+        break;
+      case "stale-fts5-index-format":
+        // issue-55: no confirmBackfix gate — unlike the content-repair
+        // categories this never edits a knowledge file. It only writes a new
+        // cache file under ~/.kmgraph/index/ and leaves the old one untouched,
+        // so the wizard's per-item yes/no is the only consent it needs.
+        results.push(
+          `[stale-fts5-index-format] ${applyStaleFts5IndexFormat(kgPath, target.name, target.graph.type as string | undefined)}`
+        );
+        appliedAnyGraphDependent = true;
+        break;
+      case "stale-handoff-packages-location":
+        // issue-56: same no-confirmBackfix-gate reasoning as stray-knowledge-
+        // dir — this moves real files, but only ever dedups identical content
+        // or reports (never overwrites) a conflict, so the wizard's per-item
+        // yes/no is the only consent it needs.
+        results.push(`[stale-handoff-packages-location] ${applyStaleHandoffPackagesLocation(kgPath)}`);
         appliedAnyGraphDependent = true;
         break;
       case "capture-corruption": {
@@ -2451,11 +2718,11 @@ export function registerUpgradeTool(server: McpServer, personalScopeSession: Per
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
       apply: z
-        .array(z.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction"]))
+        .array(z.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction", "stale-fts5-index-format", "stale-handoff-packages-location"]))
         .optional()
         .default([])
         .describe(
-          'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history)'
+          'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history), "stale-fts5-index-format" (issue-55 backfix: rebuilds a pre-v0.7.4 name-only search index at the collision-safe path-keyed location; non-destructive, leaves the old file in place), "stale-handoff-packages-location" (issue-56 backfix: moves pre-fix ./handoff-packages/<date>/ folders into knowledge/handoffs/<date>/; non-destructive, dedups identical files and reports rather than overwrites any that differ)'
         ),
       confirm_platform_split: z
         .boolean()

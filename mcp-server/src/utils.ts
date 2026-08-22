@@ -6,6 +6,20 @@ import { execFileSync } from "child_process";
 
 export const CONFIG_PATH = process.env.KG_CONFIG_PATH || path.join(os.homedir(), ".kmgraph", "kg-config.json");
 
+/**
+ * Root directory for FTS5 index databases (`personal.db` and `projects/*.db`).
+ *
+ * `KG_INDEX_DIR` is the index-side counterpart of `KG_CONFIG_PATH` above: an
+ * explicit override so test harnesses can sandbox index writes instead of
+ * scattering files through the developer's real `~/.kmgraph/index/`. Unlike
+ * `CONFIG_PATH` this is a function, not a module-level const, so the override
+ * is honored even when the env var is set after this module is first imported
+ * (Jest `setupFiles` run per test file, after module resolution has begun).
+ */
+export function getIndexDir(): string {
+  return process.env.KG_INDEX_DIR || path.join(os.homedir(), ".kmgraph", "index");
+}
+
 export interface CategoryConfig {
   name: string;
   prefix: string | null;

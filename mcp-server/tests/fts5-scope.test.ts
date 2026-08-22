@@ -10,7 +10,7 @@ jest.mock("../src/utils.js", () => {
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { handleFts5Status, handleFts5Rebuild } from "../src/tools/fts5.js";
+import { handleFts5Status, handleFts5Rebuild, rebuildIndex } from "../src/tools/fts5.js";
 import { readConfig, writeConfig, KgConfig } from "../src/utils.js";
 
 const tempDirs: string[] = [];
@@ -218,5 +218,109 @@ describe("handleFts5Rebuild", () => {
 
     const result = await handleFts5Rebuild({ kgPath: projRoot });
     expect(result.isError).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// issue-55: kg_fts5_status must agree with kg_search / kg_fts5_rebuild about
+// where a KG's index lives, must expand "~" independently of process.cwd(),
+// and must keep its published "read-only ... never creates directories"
+// contract while doing so.
+// ---------------------------------------------------------------------------
+
+describe("issue-55: handleFts5Status db_path contract", () => {
+  it("reports the same db_path that rebuildIndex actually writes", async () => {
+    const projRoot = makeTempDir("parity");
+    for (const d of ["lessons-learned", "decisions", "sessions"]) {
+      fs.mkdirSync(path.join(projRoot, d), { recursive: true });
+    }
+    fs.writeFileSync(
+      path.join(projRoot, "lessons-learned", "a.md"),
+      "# A\n\nparity content",
+      "utf-8"
+    );
+    (readConfig as jest.Mock).mockReturnValue(makeConfig(projRoot));
+
+    const rebuilt = rebuildIndex(projRoot, "proj", "project-local");
+
+    const origCwd = process.cwd;
+    process.cwd = () => projRoot;
+    const result = await handleFts5Status({});
+    process.cwd = origCwd;
+
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed.db_path).toBe(rebuilt.db_path);
+    expect(parsed.exists).toBe(true);
+  });
+
+  it("creates no directories when the index dir does not exist yet", async () => {
+    const projRoot = makeTempDir("no-mkdir");
+    (readConfig as jest.Mock).mockReturnValue(makeConfig(projRoot));
+
+    const sandbox = fs.mkdtempSync(path.join(os.tmpdir(), "fts5-status-nomkdir-"));
+    tempDirs.push(sandbox);
+    const virginIndexDir = path.join(sandbox, "index");
+    expect(fs.existsSync(virginIndexDir)).toBe(false);
+
+    const prev = process.env.KG_INDEX_DIR;
+    process.env.KG_INDEX_DIR = virginIndexDir;
+    const origCwd = process.cwd;
+    process.cwd = () => projRoot;
+    try {
+      const result = await handleFts5Status({});
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.exists).toBe(false);
+      expect(parsed.db_path.startsWith(virginIndexDir)).toBe(true);
+      // The whole point: status is read-only.
+      expect(fs.existsSync(virginIndexDir)).toBe(false);
+    } finally {
+      process.cwd = origCwd;
+      if (prev === undefined) delete process.env.KG_INDEX_DIR;
+      else process.env.KG_INDEX_DIR = prev;
+    }
+  });
+
+  it("resolves a ~-registered graph to the same db_path from any cwd, and agrees with rebuildIndex", async () => {
+    // A graph registered with an unexpanded "~/..." path -- Opus review F2: the
+    // handler used to reconstruct the db path from target.graph.path without
+    // ever expanding it, so the value it reported could not match what
+    // kg_search/kg_fts5_rebuild computed, and (via path.resolve's fallback)
+    // could vary with the caller's cwd. The fixture lives under $HOME because
+    // that is the only place a genuinely "~"-expressible path can live.
+    const wrapper = fs.mkdtempSync(path.join(os.homedir(), ".kmgraph-issue55-"));
+    tempDirs.push(wrapper);
+    const kgRoot = path.join(wrapper, "kg");
+    const nested = path.join(kgRoot, "lessons-learned");
+    fs.mkdirSync(nested, { recursive: true });
+    for (const d of ["decisions", "sessions"]) {
+      fs.mkdirSync(path.join(kgRoot, d), { recursive: true });
+    }
+    fs.writeFileSync(path.join(nested, "a.md"), "# A\n\ntilde content", "utf-8");
+
+    const tildePath = `~/${path.basename(wrapper)}/kg`;
+    const config = makeConfig(kgRoot);
+    config.graphs.proj.path = tildePath;
+    (readConfig as jest.Mock).mockReturnValue(config);
+
+    // The write side always sees the expanded absolute path.
+    const rebuilt = rebuildIndex(kgRoot, "proj", "project-local");
+
+    const origCwd = process.cwd;
+    try {
+      // Two genuinely different cwds that both still resolve to this graph.
+      process.cwd = () => kgRoot;
+      const fromRoot = JSON.parse((await handleFts5Status({})).content[0].text);
+      process.cwd = () => nested;
+      const fromNested = JSON.parse((await handleFts5Status({})).content[0].text);
+
+      expect(fromRoot.db_path).toBeDefined();
+      expect(fromRoot.db_path).not.toContain("~");
+      expect(fromRoot.db_path).toBe(fromNested.db_path);
+      // ...and it is the file kg_fts5_rebuild actually wrote.
+      expect(fromRoot.db_path).toBe(rebuilt.db_path);
+      expect(fromRoot.exists).toBe(true);
+    } finally {
+      process.cwd = origCwd;
+    }
   });
 });

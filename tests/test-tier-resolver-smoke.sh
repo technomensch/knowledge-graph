@@ -18,9 +18,9 @@ echo "════════════════════════�
 echo ""
 
 # Test 1: Resolver file exists at expected path
-RESOLVER_FILE="$REPO_ROOT/commands/init-shared/ai-model-tier-resolver.md"
+RESOLVER_FILE="$REPO_ROOT/commands/kmg-init-shared/kmg-ai-model-tier-resolver.md"
 if [ -f "$RESOLVER_FILE" ]; then
-  pass "Resolver file exists at commands/init-shared/ai-model-tier-resolver.md"
+  pass "Resolver file exists at commands/kmg-init-shared/kmg-ai-model-tier-resolver.md"
 else
   fail "Resolver file not found at $RESOLVER_FILE"
 fi

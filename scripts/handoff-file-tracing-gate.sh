@@ -60,13 +60,18 @@ STARTHERE_PATH=$(printf '%s\n' "$READ_FILES" | grep -F "START-HERE.md" | tail -1
 # issue-44: handoff-packages/ is gitignored, so a manifest generated in one
 # checkout (main or a different worktree) is never present under a REPO_ROOT
 # resolved from wherever THIS session happens to be running -- no anchor
-# fixes that, the referenced files just aren't there. STARTHERE_PATH is the
+# fixes that, the referenced files just aren't there. The same gap applies to
+# the current default output_dir, knowledge/handoffs/ (tracked in git, but a
+# package generated in one checkout still won't exist under another
+# checkout's REPO_ROOT until it's committed). STARTHERE_PATH is the
 # transcript's own absolute Read path for the file that WAS actually opened,
 # so it names the package's true root directly, with no git call and no
 # symlink-normalization risk (the same class of mismatch issue-42/43 fixed).
 PKG_ROOT=""
 if [[ "$STARTHERE_PATH" == */handoff-packages/* ]]; then
   PKG_ROOT="${STARTHERE_PATH%/handoff-packages/*}"
+elif [[ "$STARTHERE_PATH" == */knowledge/handoffs/* ]]; then
+  PKG_ROOT="${STARTHERE_PATH%/knowledge/handoffs/*}"
 fi
 
 MANIFEST_JSON=$(awk '/<!-- kmgraph-handoff-manifest/{flag=1; next} /-->/{flag=0} flag' "$STARTHERE_PATH" | grep -v '```' || true)
@@ -79,24 +84,26 @@ MISSING=""
 while IFS= read -r manifest_file; do
   [[ -z "$manifest_file" ]] && continue
   # Manifest paths are written relative to REPO_ROOT (commands/kmg-handoff.md's
-  # output_dir is "./handoff-packages/..."), but Read always records an
-  # absolute path in the transcript — an exact-string match against
-  # READ_FILES here would never succeed even when the file genuinely was
-  # opened. Anchor relative manifest paths at REPO_ROOT before comparing;
-  # leave an already-absolute manifest path (e.g. a summary_file found
-  # outside the repo tree) untouched.
+  # output_dir now defaults to "knowledge/handoffs/YYYY-MM-DD/"; older
+  # packages on disk may still use the legacy "./handoff-packages/..." path),
+  # but Read always records an absolute path in the transcript — an
+  # exact-string match against READ_FILES here would never succeed even when
+  # the file genuinely was opened. Anchor relative manifest paths at
+  # REPO_ROOT before comparing; leave an already-absolute manifest path (e.g.
+  # a summary_file found outside the repo tree) untouched.
   if [[ "$manifest_file" == /* ]]; then
     resolved_manifest_file="$manifest_file"
   else
     resolved_manifest_file="${REPO_ROOT}/${manifest_file#./}"
-    # issue-44: gitignored handoff-package files don't exist under REPO_ROOT
-    # when the package was generated somewhere else (main checkout, a
-    # different worktree). Fall back to the package's actual root, derived
+    # issue-44: handoff package files (either location) don't exist under
+    # REPO_ROOT when the package was generated somewhere else (main checkout,
+    # a different worktree). Fall back to the package's actual root, derived
     # from STARTHERE_PATH above, before giving up on this file. Gate on
     # whether the REPO_ROOT-anchored path was actually Read (not just
-    # whether it exists on disk) -- handoff-packages/<date>/ directory names
-    # collide across checkouts routinely, so a decoy file can genuinely
-    # exist at the wrong root without ever having been opened there.
+    # whether it exists on disk) -- handoff-packages/<date>/ or
+    # knowledge/handoffs/<date>/ directory names collide across checkouts
+    # routinely, so a decoy file can genuinely exist at the wrong root
+    # without ever having been opened there.
     if [[ -n "$PKG_ROOT" && "$PKG_ROOT" != "$REPO_ROOT" ]] \
        && ! printf '%s\n' "$READ_FILES" | grep -qxF "$resolved_manifest_file"; then
       resolved_manifest_file="${PKG_ROOT}/${manifest_file#./}"

@@ -49,6 +49,10 @@ Minor, contained fix — not a candidate for a multi-phase plan or brainstorm se
 
 Scale: single small branch, TDD (red test → fix → green), no ADR or cross-tier plan needed.
 
+## Related
+
+- [issue-55](../issue-55/issue-55-description.md) — later FTS5 bug in the same subsystem (`fts5.ts`): project-local index path keyed only by KG name, causing cross-repo index collisions; different defect from this issue's `kgType`-defaulting bug.
+
 ## Status
 
 **Fixed (2026-07-16), not yet pushed.** Landed on branch `v0.6.19` (commit `fb8bf665`) alongside issue-14's config-path fix, rather than its own branch — bundling small unrelated fixes onto the active release branch matches this project's existing practice (the prior `v0.6.18-misc-patches` branch did the same for issue-10/11/12 + dependabot alerts). Both `capture.ts` call sites now look up `config.graphs[kgName]?.type ?? "project-local"` and pass it to `rebuildIndex`. Added a regression test asserting personal-KG captures call `rebuildIndex` with `"personal"` (confirmed to fail pre-fix), updated 2 pre-existing assertions that hard-coded the old 2-argument call shape. Full suite: 144/144 pass, typecheck clean (re-verified after the move).

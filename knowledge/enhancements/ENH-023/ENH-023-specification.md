@@ -63,5 +63,5 @@ Add a `code-review` branch to the `pre-skill-rules-inject.sh` case statement tha
   (installed-plugin-cache vs. working-tree drift affecting anything wired via
   `hooks/hooks.json`), and [issue-36](../../issues/issue-36/issue-36-description.md) (stale
   `kmgraph:recall` references live directly in `scripts/pre-skill-rules-inject.sh`, the exact
-  file this ENH proposes extending) — native GitHub `blockedBy` links wired; this note
-  explains why.
+  file this ENH proposes extending — resolved 2026-08-22, no longer a blocker) — native GitHub
+  `blockedBy` links wired; this note explains why. issue-21 and issue-28 remain open blockers.

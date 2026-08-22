@@ -157,7 +157,7 @@ CAPTURE_BLOCK=""
 
 if [[ "$SKILL_TYPE" == "brainstorming" ]]; then
   OVERRIDE_BLOCK='--- Brainstorm Recall (HARD BLOCK — supersedes skill) ---
-Before making any recommendation, invoke the kmgraph:recall skill (via Skill tool) with the topic as input.
+Before making any recommendation, invoke `/kmgraph:kmg-recall` on the topic.
 Include results under a "Prior Art" heading before answering.
 Do not skip recall even if the topic seems simple.
 --- End Brainstorm Recall ---'
@@ -165,7 +165,7 @@ Do not skip recall even if the topic seems simple.
 
 elif [[ "$SKILL_TYPE" == "debugging" ]]; then
   OVERRIDE_BLOCK='--- Debug Recall (HARD BLOCK — supersedes skill) ---
-Before proposing the first hypothesis, invoke the kmgraph:recall skill (via Skill tool) with the error signature or component name as input.
+Before proposing the first hypothesis, invoke `/kmgraph:kmg-recall` with the error signature or component name as input.
 Surface prior lessons-learned and meta-issues under "Prior Attempts" before debugging.
 Do not skip recall even for familiar-looking bugs — prior context prevents re-treading failed paths.
 --- End Debug Recall ---'
@@ -180,7 +180,7 @@ Before dispatching any reviewer or surfacing any finding:
    - Match found + new evidence: surface finding with explicit ADR reference
    - No match: surface normally
 
-2. Review Context — invoke kmgraph:recall with each modified file path or concept as input.
+2. Review Context — invoke `/kmgraph:kmg-recall` with each modified file path or concept as input.
    Pass surfaced ADRs and lessons as REQUIRED context in the reviewer dispatch payload.
    Do not dispatch a cold reviewer — a reviewer unaware of ADR constraints may approve violations.
 
@@ -212,7 +212,7 @@ Rules:
 elif [[ "$SKILL_TYPE" == "planning" ]]; then
   RECALL_HARD_BLOCK='--- Plan Recall (HARD BLOCK — supersedes skill) ---
 Before writing any plan:
-1. Invoke the kmgraph:recall skill (via Skill tool) with TWO queries — run both:
+1. Invoke `/kmgraph:kmg-recall` with TWO queries — run both:
    a. The specific plan topic (e.g., "recall enforcement", "hook injection")
    b. The architectural domain of the change (e.g., "rules deployment", "platform-agnostic", "cross-platform rules", "LLM compatibility")
    Running only the topic query misses architectural ADRs and ENHs that constrain the work.
@@ -229,7 +229,7 @@ Before writing any plan:
 Do not skip recall — plans built without prior context repeat solved problems or contradict existing decisions.
 NOTE: this fires at skill invocation, before the interview. You MUST re-confirm recall was run before writing the FIRST PLAN TASK, not just before the interview begins.
 If recall returns zero results: do NOT treat as "no prior art." Output "Recall returned nothing for '"'"'<query>'"'"' — MCP server availability unconfirmed. Expand vocabulary or verify MCP before proceeding."
-If you cannot invoke recall at all (Skill tool unavailable, MCP down):
+If you cannot invoke recall at all (recall unavailable, MCP down):
   DO NOT proceed as if the step succeeded.
   DO NOT fabricate a "no results" response.
   Output: "RECALL BLOCKED — [reason]. Proceeding without prior art check. User should verify manually."

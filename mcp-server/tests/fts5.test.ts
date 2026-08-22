@@ -12,8 +12,11 @@ import {
   getPersonalDbPath,
   getProjectDbPath,
   resolveDbPath,
+  computeDbPath,
+  sanitizeKgNameForFilename,
   FTS5_DB_FILENAME,
 } from "../src/tools/fts5.js";
+import { getIndexDir } from "../src/utils.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -197,7 +200,7 @@ describe("rebuildIndex", () => {
     const result = rebuildIndex(kgRoot, "rebuild-issues-enhancements");
     expect(result.indexed).toBe(2);
 
-    const dbPath = getProjectDbPath("rebuild-issues-enhancements");
+    const dbPath = getProjectDbPath("rebuild-issues-enhancements", kgRoot);
     expect(searchFts5(dbPath, "broke", kgRoot).length).toBeGreaterThan(0);
     expect(searchFts5(dbPath, "Enhancement", kgRoot).length).toBeGreaterThan(0);
   });
@@ -272,7 +275,7 @@ describe("searchFts5", () => {
     // Build index
     rebuildIndex(kgRoot, "search-shape");
 
-    const dbPath = getProjectDbPath("search-shape");
+    const dbPath = getProjectDbPath("search-shape", kgRoot);
     const results = searchFts5(dbPath, "authentication", kgRoot);
 
     expect(results.length).toBeGreaterThan(0);
@@ -303,7 +306,7 @@ describe("searchFts5", () => {
     writeMd(path.join(kgRoot, "lessons-learned"), "test.md", "# Test\nSome content.");
     rebuildIndex(kgRoot, "search-empty");
 
-    const dbPath = getProjectDbPath("search-empty");
+    const dbPath = getProjectDbPath("search-empty", kgRoot);
 
     // Empty query — sanitizeFts5Query returns '""' which FTS5 handles
     // Should not throw
@@ -345,16 +348,17 @@ describe("DB path resolution", () => {
     // Rebuild should use resolveDbPath internally
     const result = rebuildIndex(kgRoot, "test-kg-001");
 
-    // Verify DB path in result
-    expect(result.db_path).toContain(".kmgraph/index");
-    expect(result.db_path).toContain("test-kg-001.db");
+    // Verify DB path in result. issue-55: the filename is now
+    // "<name>-<pathHash>.db" rather than a bare "<name>.db", so the KG name is
+    // still identifiable in it but no longer the whole key.
+    expect(path.dirname(result.db_path)).toBe(path.join(getIndexDir(), "projects"));
+    expect(path.basename(result.db_path)).toMatch(/^test-kg-001-[0-9a-f]{12}\.db$/);
 
     // Verify file actually exists
     expect(fs.existsSync(result.db_path)).toBe(true);
 
-    // Verify it's in the home directory, not in the project
-    const homeDir = os.homedir();
-    expect(result.db_path).toContain(homeDir);
+    // Verify it's in the user-level index dir, not in the project
+    expect(result.db_path.startsWith(kgRoot)).toBe(false);
   });
 });
 
@@ -385,14 +389,15 @@ describe("Multiple KGs with separate DBs", () => {
     const result1 = rebuildIndex(projRoot1, "kg-instance-1");
     const result2 = rebuildIndex(projRoot2, "kg-instance-2");
 
-    // Both should have DB at ~/.kmgraph/index/
-    expect(result1.db_path).toContain(".kmgraph/index");
-    expect(result2.db_path).toContain(".kmgraph/index");
+    // Both should have DB under the user-level index dir
+    const projectsDir = path.join(getIndexDir(), "projects");
+    expect(path.dirname(result1.db_path)).toBe(projectsDir);
+    expect(path.dirname(result2.db_path)).toBe(projectsDir);
 
     // But with different filenames
     expect(result1.db_path).not.toBe(result2.db_path);
-    expect(result1.db_path).toContain("kg-instance-1.db");
-    expect(result2.db_path).toContain("kg-instance-2.db");
+    expect(path.basename(result1.db_path)).toMatch(/^kg-instance-1-[0-9a-f]{12}\.db$/);
+    expect(path.basename(result2.db_path)).toMatch(/^kg-instance-2-[0-9a-f]{12}\.db$/);
 
     // Both should exist and be valid databases
     expect(fs.existsSync(result1.db_path)).toBe(true);
@@ -433,13 +438,11 @@ describe("DB file location independence", () => {
 
     const result = rebuildIndex(kgRoot, "tc-008-kg");
 
-    // DB should be in user's home, not in project
+    // DB should be in the user-level index dir, not in the project
     expect(result.db_path).not.toContain(kgRoot);
-    expect(result.db_path).toContain(os.homedir());
-    expect(result.db_path).toContain(".kmgraph/index");
+    expect(result.db_path.startsWith(getIndexDir())).toBe(true);
 
     // Verify by checking path structure
-    const dbDir = path.dirname(result.db_path);
     const projectIsNotAncestor = !result.db_path.startsWith(kgRoot);
     expect(projectIsNotAncestor).toBe(true);
   });
@@ -494,9 +497,9 @@ describe(".gitignore patterns", () => {
 // ---------------------------------------------------------------------------
 
 describe("getPersonalDbPath", () => {
-  it("returns ~/.kmgraph/index/personal.db", () => {
+  it("returns <indexDir>/personal.db", () => {
     const result = getPersonalDbPath();
-    expect(result).toContain(path.join(".kmgraph", "index", "personal.db"));
+    expect(result).toBe(path.join(getIndexDir(), "personal.db"));
   });
 });
 
@@ -505,11 +508,14 @@ describe("getPersonalDbPath", () => {
 // ---------------------------------------------------------------------------
 
 describe("getProjectDbPath", () => {
-  it("returns ~/.kmgraph/index/projects/<name>.db", () => {
-    const result = getProjectDbPath("my-kg");
-    expect(result).toContain(
-      path.join(".kmgraph", "index", "projects", "my-kg.db")
-    );
+  it("returns <indexDir>/projects/<name>-<pathHash>.db", () => {
+    const kgRoot = makeTempDir("get-project-db-path");
+    tempDirs.push(kgRoot);
+    const result = getProjectDbPath("my-kg", kgRoot);
+    expect(path.dirname(result)).toBe(path.join(getIndexDir(), "projects"));
+    // Intent preserved from the pre-issue-55 assertion: the KG name is still
+    // present in the filename. It is just no longer the *whole* filename.
+    expect(path.basename(result)).toMatch(/^my-kg-[0-9a-f]{12}\.db$/);
   });
 });
 
@@ -519,11 +525,120 @@ describe("getProjectDbPath", () => {
 
 describe("resolveDbPath", () => {
   it("routes personal to personal.db", () => {
-    expect(resolveDbPath("any", "personal")).toContain("personal.db");
+    expect(resolveDbPath("any", "personal", os.homedir())).toContain("personal.db");
   });
-  it("routes project-local to projects/<name>.db", () => {
-    expect(resolveDbPath("my-kg", "project-local")).toContain(
-      path.join("projects", "my-kg.db")
+  it("routes project-local to projects/<name>-<pathHash>.db", () => {
+    const kgRoot = makeTempDir("resolve-db-path");
+    tempDirs.push(kgRoot);
+    const result = resolveDbPath("my-kg", "project-local", kgRoot);
+    expect(path.dirname(result)).toBe(path.join(getIndexDir(), "projects"));
+    expect(path.basename(result)).toMatch(/^my-kg-[0-9a-f]{12}\.db$/);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// issue-55: index path is keyed by KG path, not just KG name
+// ---------------------------------------------------------------------------
+
+describe("issue-55: computeDbPath path-keying", () => {
+  it("gives two same-named KGs at different paths distinct db files", () => {
+    const rootA = makeTempDir("collide-a");
+    const rootB = makeTempDir("collide-b");
+    tempDirs.push(rootA, rootB);
+
+    const a = computeDbPath("shared-name", "project-local", rootA);
+    const b = computeDbPath("shared-name", "project-local", rootB);
+
+    expect(a).not.toBe(b);
+    expect(path.basename(a)).toMatch(/^shared-name-[0-9a-f]{12}\.db$/);
+    expect(path.basename(b)).toMatch(/^shared-name-[0-9a-f]{12}\.db$/);
+  });
+
+  it("is stable for the same KG path across repeated calls", () => {
+    const root = makeTempDir("stable");
+    tempDirs.push(root);
+    expect(computeDbPath("kg", "project-local", root)).toBe(
+      computeDbPath("kg", "project-local", root)
     );
+  });
+
+  it("creates no directories (pure) — kg_fts5_status's read-only contract", () => {
+    const sandbox = fs.mkdtempSync(path.join(os.tmpdir(), "fts5-pure-index-"));
+    tempDirs.push(sandbox);
+    const nonexistentIndexDir = path.join(sandbox, "no-such-index-dir");
+    const kgRoot = makeTempDir("pure");
+    tempDirs.push(kgRoot);
+
+    const prev = process.env.KG_INDEX_DIR;
+    process.env.KG_INDEX_DIR = nonexistentIndexDir;
+    try {
+      const dbPath = computeDbPath("kg", "project-local", kgRoot);
+      expect(dbPath.startsWith(nonexistentIndexDir)).toBe(true);
+      // Nothing at all may be created — not the index dir, not projects/
+      expect(fs.existsSync(nonexistentIndexDir)).toBe(false);
+      // Contrast: resolveDbPath (the write-path variant) *does* create it
+      resolveDbPath("kg", "project-local", kgRoot);
+      expect(fs.existsSync(path.join(nonexistentIndexDir, "projects"))).toBe(true);
+    } finally {
+      if (prev === undefined) delete process.env.KG_INDEX_DIR;
+      else process.env.KG_INDEX_DIR = prev;
+    }
+  });
+
+  it("resolves a ~-prefixed KG path identically regardless of process.cwd()", () => {
+    const relativeToHome = path.relative(os.homedir(), os.tmpdir());
+    // Only meaningful when tmpdir is under home; otherwise use home itself.
+    const tildePath = relativeToHome.startsWith("..") ? "~" : `~/${relativeToHome}`;
+
+    const origCwd = process.cwd;
+    try {
+      process.cwd = () => "/";
+      const fromRoot = computeDbPath("tilde-kg", "project-local", tildePath);
+      process.cwd = () => os.tmpdir();
+      const fromTmp = computeDbPath("tilde-kg", "project-local", tildePath);
+      expect(fromRoot).toBe(fromTmp);
+
+      // ...and identical to the fully-expanded absolute form of the same path
+      const expanded = tildePath.replace(/^~/, os.homedir());
+      expect(computeDbPath("tilde-kg", "project-local", expanded)).toBe(fromRoot);
+    } finally {
+      process.cwd = origCwd;
+    }
+  });
+
+  it("routes personal graphs to the fixed personal.db regardless of kgPath", () => {
+    const rootA = makeTempDir("personal-a");
+    const rootB = makeTempDir("personal-b");
+    tempDirs.push(rootA, rootB);
+    expect(computeDbPath("x", "personal", rootA)).toBe(
+      computeDbPath("y", "personal", rootB)
+    );
+    expect(computeDbPath("x", "personal", rootA)).toBe(
+      path.join(getIndexDir(), "personal.db")
+    );
+  });
+});
+
+describe("issue-55: sanitizeKgNameForFilename", () => {
+  it("strips path separators so a KG name cannot escape projects/", () => {
+    expect(sanitizeKgNameForFilename("../../etc/passwd")).not.toContain("/");
+    expect(sanitizeKgNameForFilename("../../etc/passwd")).not.toContain("..");
+    expect(sanitizeKgNameForFilename("a/b")).toBe("a-b");
+  });
+
+  it("keeps ordinary names untouched", () => {
+    expect(sanitizeKgNameForFilename("my-kg_01")).toBe("my-kg_01");
+  });
+
+  it("falls back to 'kg' when a name sanitizes away entirely", () => {
+    expect(sanitizeKgNameForFilename("///")).toBe("kg");
+    expect(sanitizeKgNameForFilename("")).toBe("kg");
+  });
+
+  it("produces a db path that stays inside projects/ for a hostile name", () => {
+    const kgRoot = makeTempDir("hostile-name");
+    tempDirs.push(kgRoot);
+    const dbPath = computeDbPath("../../../evil", "project-local", kgRoot);
+    expect(path.dirname(dbPath)).toBe(path.join(getIndexDir(), "projects"));
   });
 });

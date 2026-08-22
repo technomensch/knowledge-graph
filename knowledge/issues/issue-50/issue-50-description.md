@@ -118,6 +118,12 @@ is that prose-based enforcement has already failed for this exact class of probl
 (ADR-043's own finding) — so treat the MVP as a stopgap, not a resolution, and expect this issue to
 need a real follow-up.
 
+## Related
+
+- [issue-56](../issue-56/issue-56-description.md) — applied this issue's "does the category
+  reach users" lesson when deciding to land a `CHANGELOG.md`/`README.md` disclosure alongside
+  its own new `kg_upgrade` category.
+
 ## Reported By
 
 Root-cause investigation initiated by the user 2026-08-17, tracing why `kg_upgrade` backfix work

@@ -44,6 +44,9 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // src/utils.ts
+function getIndexDir() {
+  return process.env.KG_INDEX_DIR || path.join(os.homedir(), ".kmgraph", "index");
+}
 function parseConfigOrThrow(raw, filePath) {
   try {
     return JSON.parse(raw);
@@ -32900,21 +32903,34 @@ var init_mcp = __esm({
 });
 
 // src/tools/fts5.ts
-function getPersonalDbPath() {
-  const dir = path5.join(os5.homedir(), ".kmgraph", "index");
-  fs5.mkdirSync(dir, { recursive: true });
-  return path5.join(dir, "personal.db");
+function sanitizeKgNameForFilename(kgName) {
+  const cleaned = (kgName || "").replace(/[^A-Za-z0-9_-]/g, "-").replace(/-{2,}/g, "-").replace(/^-+|-+$/g, "");
+  return cleaned || "kg";
 }
-function getProjectDbPath(kgName) {
-  const dir = path5.join(os5.homedir(), ".kmgraph", "index", "projects");
-  fs5.mkdirSync(dir, { recursive: true });
-  return path5.join(dir, `${kgName}.db`);
+function kgPathHash(kgPath) {
+  return crypto3.createHash("sha256").update(normalizeForFts5Scope(kgPath)).digest("hex").slice(0, 12);
 }
-function resolveDbPath(kgName, kgType) {
-  if (kgType === "personal") return getPersonalDbPath();
-  if (kgType === "project-local" || kgType === "project") return getProjectDbPath(kgName);
-  console.warn(`resolveDbPath: unknown kgType "${kgType}", defaulting to project-local`);
-  return getProjectDbPath(kgName);
+function computeDbPath(kgName, kgType, kgPath) {
+  const indexDir = getIndexDir();
+  if (kgType === "personal") return path5.join(indexDir, "personal.db");
+  if (kgType !== "project-local" && kgType !== "project" && kgType !== "custom") {
+    console.warn(`computeDbPath: unknown kgType "${kgType}", defaulting to project-local`);
+  }
+  const filename = `${sanitizeKgNameForFilename(kgName)}-${kgPathHash(kgPath)}.db`;
+  return path5.join(indexDir, "projects", filename);
+}
+function resolveDbPath(kgName, kgType, kgPath) {
+  const dbPath = computeDbPath(kgName, kgType, kgPath);
+  fs5.mkdirSync(path5.dirname(dbPath), { recursive: true });
+  return dbPath;
+}
+function normalizeForFts5Scope(p) {
+  const expanded = p.replace(/^~/, os5.homedir());
+  try {
+    return fs5.realpathSync(expanded);
+  } catch {
+    return path5.resolve(expanded);
+  }
 }
 function sanitizeFts5Query(raw) {
   let sanitized = raw.replace(/[":(){}[\]^~*+\\]/g, " ").replace(/\s+/g, " ").trim();
@@ -32948,13 +32964,14 @@ function searchFts5(dbPath, query, kgPath) {
     db.close();
   }
 }
-var fs5, path5, os5, Database, fts5Available;
+var fs5, path5, os5, crypto3, Database, fts5Available;
 var init_fts5 = __esm({
   "src/tools/fts5.ts"() {
     "use strict";
     fs5 = __toESM(require("fs"));
     path5 = __toESM(require("path"));
     os5 = __toESM(require("os"));
+    crypto3 = __toESM(require("crypto"));
     init_utils();
     init_resolution();
     init_interaction();
@@ -33007,7 +33024,7 @@ function searchKg(kgPath, kgName, kgType, query) {
   if (!fs6.existsSync(kgPath)) {
     return { results: [], usingFts5: false, missing: true };
   }
-  const dbPath = resolveDbPath(kgName, kgType);
+  const dbPath = resolveDbPath(kgName, kgType, kgPath);
   let results;
   let usingFts5 = false;
   if (fs6.existsSync(dbPath)) {
@@ -33948,7 +33965,7 @@ function resolveKgPath(config2, params, cwd = process.cwd()) {
 }
 
 // src/cli.ts
-var SERVER_VERSION = true ? "0.7.0" : (() => {
+var SERVER_VERSION = true ? "0.7.4" : (() => {
   try {
     return null.version;
   } catch {

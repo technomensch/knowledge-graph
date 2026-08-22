@@ -1,6 +1,6 @@
 {
   "name": "@knowledge-graph-plugin/mcp-server",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "description": "MCP server for Knowledge Management Graph — cross-platform data layer for knowledge capture, search, and management",
   "main": "dist/index.js",
   "bin": {
@@ -60,6 +60,9 @@
     "testEnvironment": "node",
     "testMatch": [
       "**/tests/**/*.test.ts"
+    ],
+    "setupFiles": [
+      "<rootDir>/tests/jest.setup.ts"
     ],
     "moduleNameMapper": {
       "^(\\.{1,2}/.*)\\.js$": "$1"

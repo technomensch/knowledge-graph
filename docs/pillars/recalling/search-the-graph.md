@@ -45,10 +45,14 @@ The index covers all knowledge graph entries including exported chat logs (`know
 
 To revert to file-walk search, delete the index database file for the relevant knowledge graph:
 
-- Project KG: `~/.kmgraph/index/projects/<kgName>.db`
+- Project KG: `~/.kmgraph/index/projects/<kgName>-<pathHash>.db`
 - Personal KG: `~/.kmgraph/index/personal.db`
 
+`<pathHash>` is a short digest of where the knowledge graph actually lives on disk (added in v0.7.4). It is what keeps two unrelated projects that happen to use the same `<kgName>` from sharing — and silently shadowing — one another's index. Rather than reconstructing the filename by hand, run `kg_fts5_status`: it reports the exact `db_path` for the active graph without creating or modifying anything.
+
 Run `kg_fts5_rebuild` to recreate the index at any time.
+
+**Upgrading from before v0.7.4:** indexes built under the older name-only format (`projects/<kgName>.db`) are no longer read. Run `kg_upgrade` and accept the `stale-fts5-index-format` item to rebuild at the new location — it is non-destructive and leaves the old file in place for you to delete at your convenience.
 
 ## Related
 

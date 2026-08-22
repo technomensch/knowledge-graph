@@ -38,7 +38,14 @@ Tracked as Task N in the v0.5.9-decision-governance plan.
 After applying the fix, run `kg_fts5_rebuild`, then:
 
 ```bash
-sqlite3 ~/.kmgraph/index/projects/knowledge-graph.db \
+# As of v0.7.4 (issue-55) the project index filename is "<kgName>-<pathHash>.db",
+# not a bare "<kgName>.db" — the digest keys the index to the KG's real path so
+# same-named graphs in different repos can't share one file. Ask kg_fts5_status
+# for the authoritative db_path, or glob for it:
+DB_PATH=$(find ~/.kmgraph/index/projects -maxdepth 1 \
+  -name "knowledge-graph-*.db" | head -1)
+
+sqlite3 "$DB_PATH" \
   "SELECT COUNT(*) FROM kg_index_meta WHERE file_path LIKE '%chat-history%'"
 ```
 

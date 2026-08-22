@@ -3,7 +3,8 @@ import { z } from "zod";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { readConfig, writeConfig, walkDir } from "../utils.js";
+import * as crypto from "crypto";
+import { readConfig, writeConfig, walkDir, getIndexDir } from "../utils.js";
 import { resolveGraph, resolvePersonalGraph, PersonalScopeSession, confirmPersonalScopeAccess, isAncestorOrEqual } from "../resolution.js";
 import { resolveInteractionMode, STUB_ASK_TIMEOUT_MS, stubAsk } from "../interaction.js";
 import { resolveEffectiveCwd } from "../platform-cwd.js";
@@ -30,30 +31,83 @@ export const FTS5_DB_FILENAME = ".fts5.db";
 // Path helpers
 // ---------------------------------------------------------------------------
 
+/**
+ * Makes a KG name safe to embed in a filename. Anything outside [A-Za-z0-9_-]
+ * (path separators, `..`, spaces, unicode) collapses to `-`, so a KG name can
+ * never escape the projects/ directory or shadow a sibling's file. Falls back
+ * to "kg" for a name that sanitizes away to nothing.
+ */
+export function sanitizeKgNameForFilename(kgName: string): string {
+  const cleaned = (kgName || "")
+    .replace(/[^A-Za-z0-9_-]/g, "-")
+    .replace(/-{2,}/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return cleaned || "kg";
+}
+
+/**
+ * Short, stable digest of a KG's *normalized* on-disk location (issue-55).
+ *
+ * The KG name alone is not unique — two unrelated repos can both call their
+ * graph "knowledge", and before this hash existed they silently shared (and
+ * shadowed) one another's FTS5 index file. Hashing `normalizeForFts5Scope(kgPath)`
+ * (not the raw string) means `~/foo`, `/Users/me/foo`, and a symlink to either
+ * all land on the same digest regardless of the caller's cwd.
+ */
+export function kgPathHash(kgPath: string): string {
+  return crypto
+    .createHash("sha256")
+    .update(normalizeForFts5Scope(kgPath))
+    .digest("hex")
+    .slice(0, 12);
+}
+
+/**
+ * PURE path computation — never touches the filesystem beyond the realpath
+ * lookup inside `normalizeForFts5Scope`. `kg_fts5_status` publishes a
+ * "read-only ... never creates directories" contract and therefore MUST call
+ * this, not `resolveDbPath` below.
+ *
+ * Routes to `<indexDir>/personal.db` for the personal graph, or
+ * `<indexDir>/projects/<sanitizedName>-<pathHash>.db` for everything else.
+ */
+export function computeDbPath(kgName: string, kgType: string, kgPath: string): string {
+  const indexDir = getIndexDir();
+  if (kgType === "personal") return path.join(indexDir, "personal.db");
+  if (kgType !== "project-local" && kgType !== "project" && kgType !== "custom") {
+    // Unknown type — default to project-local with a console warning
+    console.warn(`computeDbPath: unknown kgType "${kgType}", defaulting to project-local`);
+  }
+  const filename = `${sanitizeKgNameForFilename(kgName)}-${kgPathHash(kgPath)}.db`;
+  return path.join(indexDir, "projects", filename);
+}
+
 export function getPersonalDbPath(): string {
-  const dir = path.join(os.homedir(), ".kmgraph", "index");
+  const dir = getIndexDir();
   fs.mkdirSync(dir, { recursive: true });
   return path.join(dir, "personal.db");
 }
 
-export function getProjectDbPath(kgName: string): string {
-  // TODO(v0.3.7): name collision risk — two repos with the same kgName share this file.
-  // Future: use a registry with stable content-hash IDs as filenames.
-  const dir = path.join(os.homedir(), ".kmgraph", "index", "projects");
-  fs.mkdirSync(dir, { recursive: true });
-  return path.join(dir, `${kgName}.db`);
+/**
+ * Project-local DB path, creating the containing directory. issue-55: keyed by
+ * the KG's realpath as well as its name, so same-named graphs in different
+ * repos no longer collide on one file.
+ */
+export function getProjectDbPath(kgName: string, kgPath: string): string {
+  const dbPath = computeDbPath(kgName, "project-local", kgPath);
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+  return dbPath;
 }
 
 /**
- * Central dispatcher: routes to personal.db or projects/<kgName>.db based on kgType.
+ * Central dispatcher: `computeDbPath` plus directory creation. Use this from
+ * any write path (rebuild/capture); use `computeDbPath` from read-only paths.
  * Note: kgName is ignored when kgType is "personal" (personal DB is a fixed singleton path).
  */
-export function resolveDbPath(kgName: string, kgType: string): string {
-  if (kgType === "personal") return getPersonalDbPath();
-  if (kgType === "project-local" || kgType === "project") return getProjectDbPath(kgName);
-  // Unknown type — default to project-local with a console warning
-  console.warn(`resolveDbPath: unknown kgType "${kgType}", defaulting to project-local`);
-  return getProjectDbPath(kgName);
+export function resolveDbPath(kgName: string, kgType: string, kgPath: string): string {
+  const dbPath = computeDbPath(kgName, kgType, kgPath);
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+  return dbPath;
 }
 
 // ---------------------------------------------------------------------------
@@ -86,7 +140,7 @@ export interface SearchResult {
 
 /**
  * Returns the absolute path to the FTS5 database for a given KG root.
- * @deprecated Use resolveDbPath(kgName, kgType) instead — stores DB in user-level cache.
+ * @deprecated Use resolveDbPath(kgName, kgType, kgPath) instead — stores DB in user-level cache.
  */
 export function getDbPath(kgPath: string): string {
   return path.join(kgPath, FTS5_DB_FILENAME);
@@ -299,7 +353,7 @@ export function rebuildIndex(kgPath: string, kgName: string, kgType = "project-l
     );
   }
   const start = Date.now();
-  const dbPath = resolveDbPath(kgName, kgType);
+  const dbPath = resolveDbPath(kgName, kgType, kgPath);
   const db = new Database(dbPath);
 
   try {
@@ -496,13 +550,14 @@ export async function handleFts5Status(
     }
 
     const kgType = target.graph.type ?? "project-local";
-    // resolveDbPath normally creates dirs — for status we compute the path without creating anything
-    let dbPath: string;
-    if (kgType === "personal") {
-      dbPath = path.join(os.homedir(), ".kmgraph", "index", "personal.db");
-    } else {
-      dbPath = path.join(os.homedir(), ".kmgraph", "index", "projects", `${target.name}.db`);
-    }
+    // issue-55: this used to reconstruct the path inline, which (a) drifted from
+    // what kg_search/kg_fts5_rebuild actually use the moment the format changed
+    // and (b) passed target.graph.path's raw, unexpanded "~/..." string nowhere,
+    // so a `~`-registered graph reported a path that depended on process.cwd().
+    // computeDbPath is the single shared source of truth AND is pure — this tool's
+    // published contract is "read-only ... never creates directories", so it must
+    // not call resolveDbPath(), which mkdirSync's.
+    const dbPath = computeDbPath(target.name, kgType, target.graph.path);
     const exists = fs.existsSync(dbPath);
     return {
       content: [{

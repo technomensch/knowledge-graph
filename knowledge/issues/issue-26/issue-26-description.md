@@ -1,7 +1,7 @@
 ---
 id: issue-26
 type: Hardening
-status: deferred
+status: resolved
 github-issue: "#190"
 branch: none
 created: 2026-07-18
@@ -36,3 +36,7 @@ This project already tracks the general pattern — "a documented reference or r
   touched by [issue-19](../issue-19/issue-19-description.md) (no prior-art/provenance
   enforcement) and [issue-52](../issue-52/issue-52-description.md) (GitHub-issue-creation
   Step 5.0 bypass) — same command surface, FYI, not batched with this issue.
+
+## Resolution (2026-08-22)
+
+Fixed — `commands/kmg-start-issue-tracking.md` Step 6.1 now points at the real, already-maintained convention (`issues/README.md` / `enhancements/README.md`) instead of the nonexistent `docs/issue-tracker.md`. No stub file created: the existing indexes already do the job the dead reference was presumably meant to do. GitHub issue #190 close is a separate, explicit follow-up (not automated by this fix).

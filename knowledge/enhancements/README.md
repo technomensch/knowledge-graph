@@ -4,13 +4,14 @@
 
 Formal tracking of proposed and resolved enhancements for this project.
 
-**Total ENHs:** 56
+**Total ENHs:** 57
 **Last Updated:** 2026-08-22
 
 ---
 
 ## Open ENHs
 
+- [ENH-063: Decision-Provenance Tagging for ADRs](ENH-063/ENH-063-specification.md) — **Status:** 🟡 Deferred (Track only) — GitHub #243. Proposes a `decision_provenance` frontmatter field on ADRs (origin + response_channel) to distinguish AI-automatic, AI-recommended-user-agreed, and user-explicit decisions, with an explicit guard against a subagent auto-answering its own question and recording it as a user response.
 - [ENH-062: Track issue/ADR/ENH relationships (blocked-by, related-to, depends-on) in local KG metadata](ENH-062/ENH-062-specification.md) — **Status:** 🟡 Proposed — GitHub #241. Formalizes this session's manual GitHub relationship-mapping work (blockedBy/blocking/sub-issues/Project fields) into local KG metadata; research needed to determine whether it belongs in templates, the start-issue-tracking command, or a dedicated skill. Related: [issue-53](../issues/issue-53/issue-53-description.md), [issue-54](../issues/issue-54/issue-54-description.md).
 - [ENH-041: Broken nav breadcrumb (GETTING-STARTED.md / WORKFLOWS.md) baked into every index README scaffold](ENH-041/ENH-041-specification.md) — **Status:** 🟡 Proposed
 - [ENH-040: Remove chat-history/*.md from kg_search / kg_fts5_rebuild indexing scope](ENH-040/ENH-040-specification.md) — **Status:** 🟡 Proposed — Governed by [ADR-060](../decisions/ADR-060-narrow-kg-search-scope-away-from-raw-chat-history.md)

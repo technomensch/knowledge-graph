@@ -44,7 +44,7 @@ detection is now native to how `kg_capture`/`create-adr-agent` already resolve s
 
 #### Tier resolution
 
-Set `$requested_tier` = `standard-tier`. Invoke `ai-model-tier-resolver` module (`commands/init-shared/ai-model-tier-resolver.md`) with `$requested_tier` and `{KG_PATH}`. On success: pass `--model [$resolved_model]` to the subagent.
+Set `$requested_tier` = `standard-tier`. Invoke `kmg-ai-model-tier-resolver` module (`commands/kmg-init-shared/kmg-ai-model-tier-resolver.md`) with `$requested_tier` and `{KG_PATH}`. On success: pass `--model [$resolved_model]` to the subagent.
 
 ---
 

@@ -33,7 +33,7 @@ This command generates a complete handoff package consolidating all work, issues
 ```
 
 **Parameters:**
-- `--output-dir=<path>` (optional): Custom output directory (default: `./handoff-packages/YYYY-MM-DD/`)
+- `--output-dir=<path>` (optional): Custom output directory (default: `knowledge/handoffs/YYYY-MM-DD/`)
 - `--force` (optional): Overwrite existing handoff package for today
 
 ---
@@ -87,7 +87,7 @@ Operational state (current branch, open issues, in-progress work) lives in the l
 
 **If --output-dir not provided:**
 ```bash
-output_dir="./handoff-packages/$(date +%Y-%m-%d)"
+output_dir="knowledge/handoffs/$(date +%Y-%m-%d)"
 mkdir -p "$output_dir"
 ```
 
@@ -131,6 +131,19 @@ if [ -z "$summary_file" ]; then
   summary_file=$(find "$session_dir" -name "${today}*.md" 2>/dev/null | head -1)
 fi
 ```
+
+**If no summary found for today, auto-generate one (issue-30) — don't leave a dead pointer:**
+
+If `$summary_file` is still empty at this point, invoke `session-summary-agent --auto` (same auto-generate behavior as `/kmgraph:kmg-session-summary --auto` — skips the confirmation prompt). When it returns, re-run the same lookup to pick up the new file:
+
+```bash
+summary_file=$(find "$session_dir" -name "${today}*${branch_slug}*.md" 2>/dev/null | head -1)
+if [ -z "$summary_file" ]; then
+  summary_file=$(find "$session_dir" -name "${today}*.md" 2>/dev/null | head -1)
+fi
+```
+
+If the agent invocation itself fails (no MCP/agent available), fall back to the existing "No session summary found" inline text in START-HERE.md below — this auto-generate step must never block the rest of the handoff package.
 
 **Create START-HERE.md:**
 
