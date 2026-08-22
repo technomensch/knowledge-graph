@@ -4,7 +4,7 @@
 
 Tracking of investigated bugs, defects, and meta-issues for this project.
 
-**Total Issues:** 52 numbered issues, plus named meta-issues (see below)
+**Total Issues:** 53 numbered issues, plus named meta-issues (see below)
 **Last Updated:** 2026-08-22
 
 ---
