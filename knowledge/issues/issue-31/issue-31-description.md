@@ -109,3 +109,7 @@ hardcodes the old path.
 - `knowledge/issues/issue-30/issue-30-description.md` — the other supporting example
   cited by ENH-056 (session-summary generation gap, a separate bug)
 - `commands/kmg-handoff.md:36,90` — the stale path literal
+- Same-file batching candidate: this issue and
+  [issue-30](../issue-30/issue-30-description.md) both touch `commands/kmg-handoff.md`
+  directly (this issue's path bug, issue-30's missing session-summary auto-invoke) —
+  non-conflicting, good single-PR candidate.

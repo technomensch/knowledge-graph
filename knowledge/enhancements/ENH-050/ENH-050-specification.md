@@ -36,6 +36,11 @@ A user reading the docs can see *what a command does*, but not *what phrases/tri
 ## Related
 
 - **ENH-006:** Sequential Prompts, Decoupled Decisions, and Skill Trigger Gaps — related subsystem (skill triggers), but distinct scope. ENH-006 addresses a specific ROADMAP/CHANGELOG sync-gate trigger mechanism; this ENH is about documenting trigger keywords in user-facing docs for readability/discoverability. Linked, not merged.
+- `docs/reference/command-guide.md`/`commands.md` hotspot: also touched by
+  [issue-41](../../issues/issue-41/issue-41-description.md) and
+  [ENH-034](../ENH-034/ENH-034-specification.md) (which already cross-links
+  [ENH-042](../ENH-042/ENH-042-specification.md)) — same docs surface as this ENH's
+  trigger-keyword documentation goal, FYI.
 
 ## Out of Scope
 

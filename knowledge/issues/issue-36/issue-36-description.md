@@ -66,6 +66,10 @@ To reach SATISFIED: fix all 4 `pre-skill-rules-inject.sh` occurrences + resync b
 - issue-17 (`knowledge/issues/issue-17/`) — same class: automatic trigger vocabulary that doesn't actually fire
 - issue-18 (`knowledge/issues/issue-18/`) — same class, same failure shape (`Unknown skill: kmgraph:gov-capture-routing`), same "Decision Fork" question applies here too (fix the reference vs. accept the fallback as the real behavior)
 - issue-33 (`knowledge/issues/issue-33/`) — different failure mode, same recall-subsystem neighborhood (pointers not dereferenced, vs. this issue's name-doesn't-resolve)
+- Blocks [ENH-023](../../enhancements/ENH-023/ENH-023-specification.md) — both touch
+  `scripts/pre-skill-rules-inject.sh` directly (this issue's stale `kmgraph:recall` text
+  lives in the exact file ENH-023 proposes extending with a new case branch); fix this
+  issue's occurrences before or alongside ENH-023's edit to avoid clobbering each other.
 
 ## Status
 

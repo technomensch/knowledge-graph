@@ -67,3 +67,7 @@ it.
   unresolved deprecation question
 - `knowledge/sessions/2026-08-01-v0.7.0.md` (lines 59, 107) — prior session's
   "flagged, not decided" note on this same topic
+- `commands/kmg-sync-all.md` hotspot: also touched by
+  [issue-38](../issue-38/issue-38-description.md) (stale test-path references),
+  [issue-40](../issue-40/issue-40-description.md) (`--named` flag vocabulary), and ENH-026
+  (KG Write Guard) — same command surface as this issue's auto-trigger question, FYI.

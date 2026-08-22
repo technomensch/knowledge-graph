@@ -129,6 +129,13 @@ manually triaging, same as every prior occurrence.
   only" scoping decision for retroactive issue-filing.
 - `scripts/check-github-issue-sync.sh` / `scripts/pre-push-gate.sh` Gate 4 — the existing
   detection mechanism (advisory, pre-push only, no earlier catch point).
+- `scripts/pre-push-gate.sh` hotspot: besides Gate 4 (above) and ENH-052 (above), also
+  touched by [issue-13](../issue-13/issue-13-description.md), [issue-28](../issue-28/issue-28-description.md),
+  and [ENH-056](../../enhancements/ENH-056/ENH-056-specification.md) — FYI for whoever
+  touches this gate next.
+- `commands/kmg-start-issue-tracking.md` hotspot: besides this issue's own Step 5.0 focus,
+  also touched by issue-13 (above), [issue-19](../issue-19/issue-19-description.md), and
+  [issue-26](../issue-26/issue-26-description.md) — same command surface, FYI.
 
 ## Reported By
 

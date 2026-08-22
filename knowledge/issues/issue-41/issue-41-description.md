@@ -315,6 +315,18 @@ rebuilt, `tests/test-mcp-edge-cases.sh` re-run to close out the "known accepted 
   naming-clarity question; overlaps with this issue's "what flag should I have used" answer.
 - `knowledge/decisions/ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md` —
   the ADR whose resolution model this issue's migration-completeness finding is about.
+- [issue-38](../issue-38/issue-38-description.md) — same-file batching candidate: its
+  stale-test-path findings and this issue's `commands/kmg-create-adr.md`/
+  `commands/kmg-capture-lesson.md` KG_MISMATCH-guard fixes touch the same comparison
+  logic; good single-PR candidate alongside issue-40.
+- [ENH-051](../../enhancements/ENH-051/ENH-051-specification.md) — this issue's
+  migration-completeness work touches `mcp-server/src/cli.ts` path-resolution logic that
+  ENH-051 also targets; ENH-051 is now blocked by this issue in GitHub.
+- `docs/reference/command-guide.md` hotspot: this issue's fixes already swept ~20 stale
+  "active KG" references there; also separately touched by
+  [ENH-034](../../enhancements/ENH-034/ENH-034-specification.md),
+  [ENH-042](../../enhancements/ENH-042/ENH-042-specification.md), and
+  [ENH-050](../../enhancements/ENH-050/ENH-050-specification.md) — same docs surface, FYI.
 - [issue-29](../issue-29/issue-29-description.md) — its resolution note cites this issue's
   Phase 7.2 migration-completeness work when explaining why the `kg-config.json`/`.active`
   mechanism its own originally-proposed fix depended on is retired. Backlinked 2026-08-22.

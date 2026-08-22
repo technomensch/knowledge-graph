@@ -30,3 +30,6 @@ Captured live, lightweight — not run through the full `kmg-start-issue-trackin
 - `commands/kmg-handoff.md`
 - `commands/kmg-session-summary.md`
 - `skills/kmg-session-wrap/`
+- [issue-31](../issue-31/issue-31-description.md) — also touches `commands/kmg-handoff.md`
+  directly (its stale pre-migration output-path bug); non-conflicting, additive fixes —
+  good single-PR candidate alongside this issue.

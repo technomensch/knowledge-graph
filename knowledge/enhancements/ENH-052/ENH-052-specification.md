@@ -5,7 +5,7 @@ status: deferred
 github-issue: "#188"
 branch: none
 created: 2026-07-18
-related_issues: ["issue-13", "issue-26", "issue-28", "issue-45", "issue-49", "issue-50", "issue-51"]
+related_issues: ["issue-13", "issue-26", "issue-28", "issue-45", "issue-49", "issue-50", "issue-51", "issue-52"]
 related_enhs: ["ENH-042"]
 ---
 
@@ -127,12 +127,18 @@ instances hit different surfaces:
   `config-location` are unreachable through `/kmgraph:kmg-init` even though
   their findings still appear in the wizard's pending-items list. Backlinked
   2026-08-17.
+- **[issue-52](../../issues/issue-52/issue-52-description.md)** — the
+  `superpowers:brainstorming`-bypass gap: specs that never invoke
+  `start-issue-tracking` are born with `github_issue: pending` and no automatic
+  path to a real GitHub issue. Its prior research directly feeds
+  `scripts/check-github-issue-sync.sh` (Gate 4), one of the three narrow
+  mechanisms this ENH names above. Backlinked 2026-08-22.
 
 ENH-052 is the **same class one level up**: where issue-13 / ENH-042 / issue-26 /
-issue-28 / issue-49 / issue-50 / issue-51 are each a specific stale artifact, this item is about the
+issue-28 / issue-49 / issue-50 / issue-51 / issue-52 are each a specific stale artifact, this item is about the
 absence of any mechanism that checks the knowledge graph's *own internal
 consistency* — its indexes, statuses, backlinks, and release/summary currency —
-before a PR ships. The recurrence across seven independent discoveries is itself
+before a PR ships. The recurrence across eight independent discoveries is itself
 the argument that a general enforcement mechanism, not another one-off fix, is
 warranted.
 
@@ -228,3 +234,17 @@ Resolved (no longer open) design questions from the original sketch:
 - Retroactively correcting every currently-stale index/status/backlink in the KG —
   that is cleanup work, distinct from building the mechanism that would prevent
   recurrence.
+
+## Related (Hotspot Cross-Links)
+
+- **`scripts/pre-push-gate.sh` hotspot:** besides this ENH's own Gates 5/6,
+  [issue-13](../../issues/issue-13/issue-13-description.md),
+  [issue-28](../../issues/issue-28/issue-28-description.md),
+  [issue-52](../../issues/issue-52/issue-52-description.md), and
+  [ENH-056](../ENH-056/ENH-056-specification.md) also touch this file — worth
+  checking for conflicts before any of these land.
+- **`commands/kmg-start-issue-tracking.md` hotspot:** besides
+  [issue-26](../../issues/issue-26/issue-26-description.md) and issue-52
+  (both already cited above), [issue-19](../../issues/issue-19/issue-19-description.md)
+  also touches this command's workflow (no prior-art/provenance enforcement) —
+  same surface, FYI.

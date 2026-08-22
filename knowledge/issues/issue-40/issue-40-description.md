@@ -74,3 +74,10 @@ the answer.
   before being split out here.
 - [issue-41](../issue-41/issue-41-description.md) — cites this issue as a live example of the
   worktree-KG numbering-collision risk it describes. Backlinked 2026-08-19.
+- [issue-38](../issue-38/issue-38-description.md) — same-file batching candidate: its stale
+  `tests/test-create-adr-implements.sh` failure and this issue's flag-naming question both
+  touch `commands/kmg-create-adr.md`/`commands/kmg-capture-lesson.md`'s comparison logic;
+  good single-PR candidate alongside issue-41.
+- `commands/kmg-sync-all.md` hotspot: also touched by
+  [issue-37](../issue-37/issue-37-description.md), issue-38 (above), and ENH-026 — FYI,
+  not batched here.

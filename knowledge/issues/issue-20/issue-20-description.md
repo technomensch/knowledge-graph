@@ -73,6 +73,12 @@ on the assistant's own diligence/memory. This issue does not decide whether such
 should be built, or what it should check; it only records the observation for whoever
 scopes issue-19's fix.
 
+## Related (Same File)
+
+- `knowledge/rules.md` hotspot: [issue-13](../issue-13/issue-13-description.md) (and
+  issue-17, not part of this cross-link pass) separately propose/discuss changes to
+  `knowledge/rules.md`'s enforcement — same file, FYI, not batched with this issue.
+
 ## Status
 
 Open — self-identified compliance gap this session, not yet resolved. No corrective

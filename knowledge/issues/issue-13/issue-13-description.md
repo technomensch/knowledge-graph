@@ -36,6 +36,16 @@ Confirmed 2026-07-14, while auditing the docs site ahead of a v0.6.19 presentati
 - [issue-26](../issue-26/issue-26-description.md) (2026-07-18) — same underlying pattern, different surface: `commands/kmg-start-issue-tracking.md` references `docs/issue-tracker.md`, which never existed in git history. Confirms the pattern this issue tracks is not confined to Docusaurus `docs/` content — command prompt files (`commands/*.md`) carry the same class of stale/dead reference, and none of this issue's three checked mechanisms (`onBrokenLinks`, `kmg-docs-impact-scan`, `pre-push-gate.sh`) would ever see them, since none touch `commands/` at all. Any eventual fix for this issue should note that scope gap explicitly rather than assume commands/ is covered by extension.
 - [ENH-052](../../enhancements/ENH-052/ENH-052-specification.md) — the "same class one level up": a superset pre-PR paperwork-consistency check that names this issue as one of the narrow mechanisms it doesn't duplicate. Backlinked 2026-07-26 (paperwork-audit backlink-symmetry check).
 - [issue-49](../issue-49/issue-49-description.md), [issue-50](../issue-50/issue-50-description.md), [issue-51](../issue-51/issue-51-description.md) — all three name this issue, alongside ENH-042/issue-26/issue-28, as part of ENH-052's "internal paperwork drifts silently, nothing catches it" pattern family. Backlinked 2026-08-19.
+- `scripts/pre-push-gate.sh` hotspot: besides ENH-052 (above), also touched by
+  [issue-28](../issue-28/issue-28-description.md), [issue-52](../issue-52/issue-52-description.md),
+  and [ENH-056](../../enhancements/ENH-056/ENH-056-specification.md) — FYI for whoever
+  touches this gate next.
+- `commands/kmg-start-issue-tracking.md` hotspot: besides issue-26 (above), also touched
+  by [issue-19](../issue-19/issue-19-description.md) and issue-52 (above) — same command
+  surface, FYI.
+- `knowledge/rules.md` hotspot: [issue-20](../issue-20/issue-20-description.md) (and
+  issue-17, not part of this cross-link pass) separately discuss/propose changes to
+  `knowledge/rules.md`'s enforcement — FYI, not batched with this issue.
 
 ## Explicitly Deferred (Mode 3 — Track only)
 

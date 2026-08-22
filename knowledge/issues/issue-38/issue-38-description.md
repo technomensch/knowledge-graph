@@ -120,3 +120,11 @@ local-only.
   `tests/test-tier-resolver-smoke.sh`, `tests/test-tier-resolver-edge.sh`,
   `tests/test-create-adr-implements.sh`, `tests/test-dispatcher-tier-refactor.sh`,
   `tests/test-decision-governance.sh` — the affected suites
+- [issue-40](../issue-40/issue-40-description.md), [issue-41](../issue-41/issue-41-description.md)
+  — same-file batching candidate: this issue's `tests/test-create-adr-implements.sh`
+  failure and issue-40/41's fixes both touch `commands/kmg-create-adr.md`/
+  `commands/kmg-capture-lesson.md`'s comparison logic; good single-PR candidate
+  alongside those two.
+- `commands/kmg-sync-all.md` hotspot: also touched by
+  [issue-37](../issue-37/issue-37-description.md), issue-40 (above), and ENH-026 —
+  FYI, not batched with this issue.

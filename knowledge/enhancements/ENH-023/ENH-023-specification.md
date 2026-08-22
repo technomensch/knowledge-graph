@@ -58,3 +58,10 @@ Add a `code-review` branch to the `pre-skill-rules-inject.sh` case statement tha
 - [issue-11](../../issues/issue-11/issue-11-description.md) — cites this ENH (created
   2026-06-07, the day after the `start-issue-tracking` `gh issue create` fix landed) as
   confirmation the fix worked: real linked issue `#130`. Backlinked 2026-08-19.
+- **Blocked by** [issue-21](../../issues/issue-21/issue-21-description.md) (Codex Stop-hook
+  JSON failure, wired through `hooks/hooks.json`), [issue-28](../../issues/issue-28/issue-28-description.md)
+  (installed-plugin-cache vs. working-tree drift affecting anything wired via
+  `hooks/hooks.json`), and [issue-36](../../issues/issue-36/issue-36-description.md) (stale
+  `kmgraph:recall` references live directly in `scripts/pre-skill-rules-inject.sh`, the exact
+  file this ENH proposes extending) — native GitHub `blockedBy` links wired; this note
+  explains why.

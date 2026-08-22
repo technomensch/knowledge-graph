@@ -34,6 +34,9 @@ This is a real, currently-reproducing cross-platform compatibility gap, not a hy
 
 - This project explicitly markets Codex CLI support (`.codex-plugin/` directory, marketplace keywords include "codex", command-guide documents "22 commands + skills" for Codex).
 - Broader context: this session separately found (issue-18/#176) that at least one core mechanism (`gov-capture-routing`) was built without verifying it actually resolves/executes correctly outside the author's own Claude Code environment. This may be a related class of gap — mechanisms validated only under Claude Code, not verified under other supported platforms — worth keeping in mind during investigation, not asserting as confirmed.
+- Blocks [ENH-023](../../enhancements/ENH-023/ENH-023-specification.md) — both concern
+  hook behavior wired through `hooks/hooks.json`; ENH-023's marketplace-skill governance
+  extension should account for this Codex-specific Stop-hook failure.
 
 ## Status
 

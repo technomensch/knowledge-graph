@@ -287,3 +287,7 @@ A potential prompt/instruction set for the recurring "next attempt in a meta-iss
 - `scripts/pre-push-gate.sh` — existing gate implementation and header
   comments documenting the "why gates, not a smarter skill (ADR-043, ADR-050)"
   rationale directly.
+- `scripts/pre-push-gate.sh` hotspot: besides ENH-052 (above), also touched by
+  [issue-13](../../issues/issue-13/issue-13-description.md),
+  [issue-28](../../issues/issue-28/issue-28-description.md), and
+  [issue-52](../../issues/issue-52/issue-52-description.md) — FYI, not batched with this ENH.

@@ -77,6 +77,14 @@ Checked `hooks/hooks.json`: the hook is wired as `${CLAUDE_PLUGIN_ROOT}/scripts/
 - [Lesson: Local Marketplace Testing - Two-Location Sync Required](../../lessons-learned/process/local-marketplace-testing-workflow.md) — same underlying pattern under an older local-marketplace testing topology
 - [ENH-052](../../enhancements/ENH-052/ENH-052-specification.md) — names this issue directly as the reason its Gates 5/6 don't yet protect a real push (they run from this working tree, not the installed plugin cache). Backlinked 2026-07-26 (paperwork-audit backlink-symmetry check).
 - [issue-49](../issue-49/issue-49-description.md), [issue-50](../issue-50/issue-50-description.md), [issue-51](../issue-51/issue-51-description.md) — all three name this issue, alongside issue-13/ENH-042/issue-26, as part of ENH-052's "internal paperwork drifts silently, nothing catches it" pattern family. Backlinked 2026-08-19.
+- Blocks [ENH-023](../../enhancements/ENH-023/ENH-023-specification.md) — the
+  `${CLAUDE_PLUGIN_ROOT}`-resolves-to-cache gap this issue documents affects any
+  `hooks/hooks.json`-wired script ENH-023 would extend, including
+  `pre-skill-rules-inject.sh`.
+- `scripts/pre-push-gate.sh` hotspot: besides ENH-052 (above), also touched by
+  [issue-13](../issue-13/issue-13-description.md), [issue-52](../issue-52/issue-52-description.md),
+  and [ENH-056](../../enhancements/ENH-056/ENH-056-specification.md) — FYI for whoever
+  touches this gate next.
 
 ### On the ADR question
 

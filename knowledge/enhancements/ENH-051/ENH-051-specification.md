@@ -41,6 +41,10 @@ Discovered while executing v0.6.20 Task 4 (branch `v0.6.20-storage-migration-com
 - **Deferred personal/project restructuring** (noted out-of-scope in the v0.6.20 plan, reopens ADR-028 if pursued, possibly tied to v7/npm-distribution planning) — not a filed item, so not a formal dependency. This item is compatible with and likely reduces the cost of that future restructuring (one server-side path function to change instead of two hand-maintained copies), but does not depend on it landing first.
 - [issue-25](../../issues/issue-25/issue-25-description.md) — surfaced while filing this enhancement; no documented rule for which of two overlapping mechanisms governs enhancement capture in this project.
 - [issue-26](../../issues/issue-26/issue-26-description.md) — found while executing `/kmgraph:kmg-start-issue-tracking` to redo this enhancement through the formal workflow after issue-25 was caught.
+- **Blocked by** [issue-41](../../issues/issue-41/issue-41-description.md) — its
+  migration-completeness work adds path-resolution logic to `mcp-server/src/cli.ts` (the
+  new `resolve` CLI subcommand) that this ENH's path-computation delegation would also need
+  to touch; native GitHub `blockedBy` link wired, this note explains why.
 
 ## Goals
 

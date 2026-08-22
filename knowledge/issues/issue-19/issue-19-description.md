@@ -68,6 +68,12 @@ entirely on an assistant session reading and following markdown instructions, wi
 corresponding mechanical check in `hooks/hooks.json` (or elsewhere in the harness) that
 would catch a session that skips it.
 
+`commands/kmg-start-issue-tracking.md` hotspot: also touched by
+[issue-13](../issue-13/issue-13-description.md), [issue-26](../issue-26/issue-26-description.md),
+[issue-52](../issue-52/issue-52-description.md), and
+[ENH-052](../../enhancements/ENH-052/ENH-052-specification.md) — same command surface as
+this issue's prior-art-check gap, FYI.
+
 ## Proposed shape of fix (not a commitment — direction only)
 
 Floated direction: a new `PostToolUse` hook, mirroring `post-tool-lesson-check.sh`'s
