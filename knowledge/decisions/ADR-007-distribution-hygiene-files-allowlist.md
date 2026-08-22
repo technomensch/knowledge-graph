@@ -178,6 +178,8 @@ Implement explicit allowlist via `package.json` with three tiers:
 
 **Date:** 2026-06-11
 
+**Originating incident:** [GitHub #133](https://github.com/technomensch/knowledge-graph/issues/133) — this ADR's original Essential tier listed `mcp-server/dist/` but assumed the compiled output alone was functional. It wasn't: `dist/` was a bare `tsc` compile with its dependencies left unbundled in `node_modules/`, which this ADR separately excludes from distribution (see Excluded tier above) and which marketplace installs never `npm install` (Claude Code and Codex CLI clone via git only). Every marketplace-tier install threw `Cannot find module '@modelcontextprotocol/sdk/...'` at startup. Fixed by switching to esbuild bundling (PR #135); the WASM carve-out below is a direct consequence of that fix — esbuild can bundle regular JS deps into `dist/` but cannot inline WASM binaries, so those still need this explicit exception.
+
 The `node_modules/` exclusion above has one carved-out exception: `mcp-server/dist/node_modules/node-sqlite3-wasm/` is committed to git and included in distributions.
 
 **Why:** esbuild cannot inline WASM binaries — they must be present on disk at a path resolvable by Node's `require()`. Marketplace installs (Claude Code, Codex CLI) clone via git without running `npm install`, so the WASM runtime must be committed alongside the bundle. See [ADR-015](ADR-015-node-sqlite3-wasm-for-fts5-search.md) (WASM dependency) and [ADR-016](ADR-016-graceful-fallback-optional-mcp-dependencies.md) (esbuild bundling requirement).
@@ -211,5 +213,5 @@ The `node_modules/` exclusion above has one carved-out exception: `mcp-server/di
 ---
 
 **Decision Made:** 2026-02-17
-**Last Updated:** 2026-06-11
+**Last Updated:** 2026-08-22
 **Status:** Accepted
