@@ -33563,6 +33563,8 @@ var APPLY_ORDER = [
   // issue-47 backfix: content repair, order-independent of the others
   "stale-fts5-index-format",
   // issue-55 backfix: search-index relocation, order-independent of the others
+  "stale-handoff-packages-location",
+  // issue-56 backfix: file relocation, order-independent of the others
   "platform-split"
 ];
 function parseFrontmatter(filePath) {
@@ -34539,6 +34541,104 @@ function applyStaleFts5IndexFormat(kgPath, kgName, kgType) {
     return `Error rebuilding search index: ${message}`;
   }
 }
+function checkStaleHandoffPackagesLocation(kgPath, kgType) {
+  if ((kgType ?? "project-local") !== "project-local") return [];
+  const repoRoot = path11.dirname(kgPath);
+  const strayDir = path11.join(repoRoot, "handoff-packages");
+  if (!fs11.existsSync(strayDir)) return [];
+  let dateDirs;
+  try {
+    dateDirs = fs11.readdirSync(strayDir).filter((entry) => fs11.statSync(path11.join(strayDir, entry)).isDirectory());
+  } catch {
+    return [];
+  }
+  if (dateDirs.length === 0) return [];
+  const destBase = path11.join(kgPath, "handoffs");
+  return [{
+    category: "stale-handoff-packages-location",
+    description: `${dateDirs.length} handoff package(s) found at the pre-fix ./handoff-packages/ location`,
+    details: `Found ${dateDirs.length} dated handoff package folder(s) at:
+  ${strayDir}
+
+These predate a fix (issue-31) that moved \`/kmgraph:kmg-handoff\`'s default output from that location to \`knowledge/handoffs/\`. Because \`handoff-packages/\` is gitignored, these never showed up in \`git status\` and were easy to forget about.
+
+Dates found: ${dateDirs.sort().join(", ")}
+
+Applying this moves each package's files into the equivalent dated folder under:
+  ${destBase}
+
+This is non-destructive: a file identical to one already at the destination is deduplicated (the stray copy is removed); a file that differs from an existing destination file is left exactly where it is and reported so you can look at it yourself \u2014 nothing is ever overwritten. The old \`handoff-packages/<date>/\` folder (and \`handoff-packages/\` itself) is only removed once it's empty.`
+  }];
+}
+function applyStaleHandoffPackagesLocation(kgPath) {
+  const repoRoot = path11.dirname(kgPath);
+  const strayDir = path11.join(repoRoot, "handoff-packages");
+  if (!fs11.existsSync(strayDir)) return "No stray handoff-packages/ directory found; skipped";
+  const destBase = path11.join(kgPath, "handoffs");
+  const moved = [];
+  const skipped = [];
+  let dateDirs;
+  try {
+    dateDirs = fs11.readdirSync(strayDir).filter((entry) => fs11.statSync(path11.join(strayDir, entry)).isDirectory());
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return `Error reading ${strayDir}: ${message}`;
+  }
+  for (const dateDir of dateDirs) {
+    moveHandoffPackageDir(
+      path11.join(strayDir, dateDir),
+      path11.join(destBase, dateDir),
+      dateDir,
+      moved,
+      skipped
+    );
+  }
+  let remaining = 0;
+  try {
+    remaining = fs11.readdirSync(strayDir).length;
+    if (remaining === 0) fs11.rmdirSync(strayDir);
+  } catch {
+  }
+  const parts = [];
+  if (moved.length > 0) parts.push(`Moved to knowledge/handoffs/: ${moved.join(", ")}`);
+  if (skipped.length > 0) parts.push(`Skipped (needs manual review): ${skipped.join(", ")}`);
+  if (remaining > 0) parts.push(`handoff-packages/ not removed \u2014 ${remaining} item(s) remain`);
+  return parts.join(". ") || "Nothing to move";
+}
+function moveHandoffPackageDir(srcDir, destDir, label, moved, skipped) {
+  if (!fs11.existsSync(srcDir)) return;
+  fs11.mkdirSync(destDir, { recursive: true });
+  for (const entry of fs11.readdirSync(srcDir)) {
+    const src = path11.join(srcDir, entry);
+    const dest = path11.join(destDir, entry);
+    if (fs11.statSync(src).isDirectory()) {
+      moveHandoffPackageDir(src, dest, `${label}/${entry}`, moved, skipped);
+      try {
+        if (fs11.readdirSync(src).length === 0) fs11.rmdirSync(src);
+      } catch {
+      }
+      continue;
+    }
+    if (fs11.existsSync(dest)) {
+      if (fs11.readFileSync(src).equals(fs11.readFileSync(dest))) {
+        fs11.unlinkSync(src);
+        moved.push(`${label}/${entry} (duplicate removed)`);
+      } else {
+        skipped.push(
+          `${label}/${entry} (differs from existing knowledge/handoffs/${label}/${entry} \u2014 neither touched)`
+        );
+      }
+      continue;
+    }
+    fs11.copyFileSync(src, dest);
+    fs11.unlinkSync(src);
+    moved.push(`${label}/${entry}`);
+  }
+  try {
+    if (fs11.readdirSync(srcDir).length === 0) fs11.rmdirSync(srcDir);
+  } catch {
+  }
+}
 function checkStrayKnowledgeDir(kgPath, kgType) {
   if (kgType !== "project-local") return [];
   const strayDir = path11.join(kgPath, "knowledge");
@@ -34861,7 +34961,7 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
       result.upgrades.push({
         category: "resolution",
         description: target.error,
-        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, version-update, and the platform-split warning) were skipped."
+        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, stale-handoff-packages-location, version-update, and the platform-split warning) were skipped."
       });
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
     }
@@ -34871,7 +34971,7 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
       result.upgrades.push({
         category: "resolution",
         description: `KG path not found: ${kgPath}`,
-        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, version-update, and the platform-split warning) were skipped."
+        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, stale-handoff-packages-location, version-update, and the platform-split warning) were skipped."
       });
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
     }
@@ -34883,6 +34983,7 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
     result.upgrades.push(...checkCaptureCorruption(kgPath));
     result.upgrades.push(...checkDiffBlankReconstruction(kgPath));
     result.upgrades.push(...checkStaleFts5IndexFormat(kgPath, target.name, kgType));
+    result.upgrades.push(...checkStaleHandoffPackagesLocation(kgPath, kgType));
     result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config2, target.name));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
@@ -34975,6 +35076,10 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
         );
         appliedAnyGraphDependent = true;
         break;
+      case "stale-handoff-packages-location":
+        results.push(`[stale-handoff-packages-location] ${applyStaleHandoffPackagesLocation(kgPath)}`);
+        appliedAnyGraphDependent = true;
+        break;
       case "capture-corruption": {
         const mode = resolveInteractionMode({}).mode;
         const rescan = checkCaptureCorruption(kgPath);
@@ -35054,8 +35159,8 @@ function registerUpgradeTool(server2, personalScopeSession2) {
     "kg_upgrade",
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
-      apply: external_exports3.array(external_exports3.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction", "stale-fts5-index-format"])).optional().default([]).describe(
-        'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history), "stale-fts5-index-format" (issue-55 backfix: rebuilds a pre-v0.7.4 name-only search index at the collision-safe path-keyed location; non-destructive, leaves the old file in place)'
+      apply: external_exports3.array(external_exports3.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction", "stale-fts5-index-format", "stale-handoff-packages-location"])).optional().default([]).describe(
+        'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history), "stale-fts5-index-format" (issue-55 backfix: rebuilds a pre-v0.7.4 name-only search index at the collision-safe path-keyed location; non-destructive, leaves the old file in place), "stale-handoff-packages-location" (issue-56 backfix: moves pre-fix ./handoff-packages/<date>/ folders into knowledge/handoffs/<date>/; non-destructive, dedups identical files and reports rather than overwrites any that differ)'
       ),
       confirm_platform_split: external_exports3.boolean().optional().default(false).describe(
         "Must be true to apply platform-split migration (removes content from rules.md)"

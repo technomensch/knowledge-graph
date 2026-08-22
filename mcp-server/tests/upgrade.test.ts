@@ -3868,3 +3868,159 @@ describe("upgrade category: stale-fts5-index-format (issue-55)", () => {
     expect(applied.content[0].text).toContain("[stale-fts5-index-format]");
   });
 });
+
+// ---------------------------------------------------------------------------
+// issue-56: "stale-handoff-packages-location" upgrade category
+//
+// Before issue-31's fix, /kmgraph:kmg-handoff wrote every package to
+// <repoRoot>/handoff-packages/<date>/ (gitignored, never surfaced by
+// git status). The default now writes to knowledge/handoffs/<date>/ instead,
+// but anything already on disk from before the fix is a silent orphan. Same
+// treatment as stale-fts5-index-format: opt-in, non-destructive migration.
+// ---------------------------------------------------------------------------
+
+describe("upgrade category: stale-handoff-packages-location (issue-56)", () => {
+  async function inspectCategories(): Promise<string[]> {
+    const result = await handleUpgrade({});
+    const parsed = JSON.parse(result.content[0].text);
+    return (parsed.upgrades as Array<{ category: string }>).map((u) => u.category);
+  }
+
+  function repoRootOf(kgRoot: string): string {
+    return path.dirname(kgRoot);
+  }
+
+  function plantStrayPackage(kgRoot: string, dateDir: string, files: Record<string, string>): string {
+    const dir = path.join(repoRootOf(kgRoot), "handoff-packages", dateDir);
+    fs.mkdirSync(dir, { recursive: true });
+    for (const [name, content] of Object.entries(files)) {
+      fs.writeFileSync(path.join(dir, name), content, "utf-8");
+    }
+    return dir;
+  }
+
+  it("does not fire when no handoff-packages/ directory exists", async () => {
+    const kgRoot = makeTempDir("hp-none");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    expect(await inspectCategories()).not.toContain("stale-handoff-packages-location");
+  });
+
+  it("does not fire when handoff-packages/ exists but has no dated subfolders", async () => {
+    const kgRoot = makeTempDir("hp-empty");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    fs.mkdirSync(path.join(repoRootOf(kgRoot), "handoff-packages"), { recursive: true });
+
+    expect(await inspectCategories()).not.toContain("stale-handoff-packages-location");
+  });
+
+  it("fires when a stray dated package folder exists, naming the destination", async () => {
+    const kgRoot = makeTempDir("hp-stale");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    plantStrayPackage(kgRoot, "2026-04-21", { "START-HERE.md": "# hi" });
+
+    const result = await handleUpgrade({});
+    const parsed = JSON.parse(result.content[0].text);
+    const item = (parsed.upgrades as Array<{ category: string; details?: string }>).find(
+      (u) => u.category === "stale-handoff-packages-location"
+    );
+    expect(item).toBeDefined();
+    expect(item!.details).toContain("2026-04-21");
+    expect(item!.details).toContain(path.join(kgRoot, "handoffs"));
+  });
+
+  it("does not fire for a personal graph", async () => {
+    const kgRoot = makeTempDir("hp-personal");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot, { type: "personal" });
+    plantStrayPackage(kgRoot, "2026-04-21", { "START-HERE.md": "# hi" });
+
+    expect(await inspectCategories()).not.toContain("stale-handoff-packages-location");
+  });
+
+  it("apply moves files into knowledge/handoffs/<date>/ and removes the now-empty stray dirs", async () => {
+    const kgRoot = makeTempDir("hp-apply");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    const strayDir = plantStrayPackage(kgRoot, "2026-04-21", {
+      "START-HERE.md": "# package",
+      "DOCUMENTATION-MAP.md": "# map",
+    });
+
+    const applied = await handleUpgrade({ apply: ["stale-handoff-packages-location"] });
+    const text = applied.content[0].text;
+    expect(applied.isError).toBeUndefined();
+    expect(text).toContain("[stale-handoff-packages-location]");
+
+    const destDir = path.join(kgRoot, "handoffs", "2026-04-21");
+    expect(fs.readFileSync(path.join(destDir, "START-HERE.md"), "utf-8")).toBe("# package");
+    expect(fs.readFileSync(path.join(destDir, "DOCUMENTATION-MAP.md"), "utf-8")).toBe("# map");
+
+    // Source date dir and the now-empty top-level handoff-packages/ are both gone.
+    expect(fs.existsSync(strayDir)).toBe(false);
+    expect(fs.existsSync(path.join(repoRootOf(kgRoot), "handoff-packages"))).toBe(false);
+
+    // And the category no longer fires.
+    expect(await inspectCategories()).not.toContain("stale-handoff-packages-location");
+  });
+
+  it("apply dedups a file identical to one already at the destination", async () => {
+    const kgRoot = makeTempDir("hp-dedup");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    plantStrayPackage(kgRoot, "2026-04-21", { "START-HERE.md": "# same" });
+    fs.mkdirSync(path.join(kgRoot, "handoffs", "2026-04-21"), { recursive: true });
+    fs.writeFileSync(path.join(kgRoot, "handoffs", "2026-04-21", "START-HERE.md"), "# same", "utf-8");
+
+    const applied = await handleUpgrade({ apply: ["stale-handoff-packages-location"] });
+    expect(applied.content[0].text).toContain("duplicate removed");
+    expect(fs.existsSync(path.join(repoRootOf(kgRoot), "handoff-packages"))).toBe(false);
+  });
+
+  it("apply leaves a genuinely conflicting file untouched on both sides and reports it", async () => {
+    const kgRoot = makeTempDir("hp-conflict");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    const strayDir = plantStrayPackage(kgRoot, "2026-04-21", { "START-HERE.md": "# stray version" });
+    fs.mkdirSync(path.join(kgRoot, "handoffs", "2026-04-21"), { recursive: true });
+    fs.writeFileSync(
+      path.join(kgRoot, "handoffs", "2026-04-21", "START-HERE.md"),
+      "# real version",
+      "utf-8"
+    );
+
+    const applied = await handleUpgrade({ apply: ["stale-handoff-packages-location"] });
+    const text = applied.content[0].text;
+    expect(text).toContain("Skipped");
+    expect(text).toContain("manual review");
+
+    // Neither file was touched.
+    expect(fs.readFileSync(path.join(strayDir, "START-HERE.md"), "utf-8")).toBe("# stray version");
+    expect(fs.readFileSync(path.join(kgRoot, "handoffs", "2026-04-21", "START-HERE.md"), "utf-8")).toBe(
+      "# real version"
+    );
+    // The stray dir survives (non-empty) — still detected on a fresh inspect.
+    expect(await inspectCategories()).toContain("stale-handoff-packages-location");
+  });
+
+  it("apply on a graph with no stray directory is a clean no-op", async () => {
+    const kgRoot = makeTempDir("hp-noop");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const applied = await handleUpgrade({ apply: ["stale-handoff-packages-location"] });
+    expect(applied.content[0].text).toContain("[stale-handoff-packages-location]");
+    expect(applied.content[0].text).toContain("No stray handoff-packages/");
+  });
+});

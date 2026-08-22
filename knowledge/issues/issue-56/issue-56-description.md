@@ -1,7 +1,7 @@
 ---
 id: issue-56
 type: Bug
-status: tracked
+status: resolved
 github-issue: "#TBD"
 branch: v0.7.4-bug-fixes
 created: 2026-08-22
@@ -43,6 +43,23 @@ Mirror issue-55's pattern:
 - Needs a decision on exactly what "migrate" means here — issue-31's own Option A/B framing (migrate vs. discard) was never resolved; whoever designs this fix should decide, or route the choice to the user via the upgrade prompt itself rather than picking on their behalf.
 - A `CHANGELOG.md`/root `README.md` disclosure of the stray-directory situation should land at the same time as (or before) the code fix — not after, per issue-50/51's own "does the category reach users" lesson.
 
+## Resolution (2026-08-22)
+
+Fixed on `v0.7.4-bug-fixes`, same day as filing — the user asked for the code change immediately rather than leaving it tracked-only.
+
+**New `kg_upgrade` category `stale-handoff-packages-location`** (`mcp-server/src/tools/upgrade.ts`), mirroring issue-55's `stale-fts5-index-format` pattern:
+
+- `checkStaleHandoffPackagesLocation(kgPath, kgType)` — fires only for `project-local` graphs, only when `<repoRoot>/handoff-packages/` exists and contains at least one dated subfolder. `repoRoot` is derived as `path.dirname(kgPath)` rather than hardcoding `"knowledge"` as the KG folder name, so it works even for a KG folder with a non-default name — looser (and more portable) than the literal `"knowledge/handoffs"` path `kmg-handoff.md` itself hardcodes.
+- `applyStaleHandoffPackagesLocation(kgPath)` + helper `moveHandoffPackageDir()` — recursively moves each dated folder's files into `knowledge/handoffs/<date>/`. Reuses the same ADR-063 dedup-or-report pattern as `applyStrayKnowledgeDir`: a file identical to one already at the destination is deduplicated (stray copy removed); a file that genuinely differs is left untouched on both sides and named in the result for manual review — never overwritten. A source folder (and `handoff-packages/` itself) is only removed once fully empty.
+- Wired into `ApplyCategory`, `APPLY_ORDER` (order-independent, alongside `stale-fts5-index-format`), the `z.enum([...])` schema + description, the inspect dispatch, both "graph-dependent checks skipped" resolution messages, and the apply-dispatch switch (no `confirmBackfix` gate — same reasoning as `stray-knowledge-dir`: only ever dedups or reports, never overwrites).
+- Documented as section `q` of `commands/kmg-init-shared/kmg-upgrade-inspector.md`, matching the existing `p` (FTS5) section's structure. No wizard allow/deny-list changes needed — the wizard's `_mcp_apply[]` logic already routes any category not `"version-update"`/`"resolution"` generically.
+- 8 new tests in `mcp-server/tests/upgrade.test.ts` (`describe("upgrade category: stale-handoff-packages-location (issue-56)")`): no-fire cases (no dir, empty dir, personal graph), fire-with-correct-details, successful move + empty-dir cleanup, dedup-on-identical, skip-and-report-on-conflict (with a follow-up inspect confirming it still fires), and a clean no-op apply.
+- `CHANGELOG.md`'s issue-30/31 entry updated to point at this category instead of leaving the gap undisclosed; the `[0.7.4]` `Added` section gets its own bullet for the new category, matching the FTS5 one's structure.
+
+**Verification:** `npx tsc --noEmit` clean; `npm test` (mcp-server) 41/41 suites, 531/531 tests (8 new); `mcp-server/dist/{index,cli}.js` rebuilt via `npm run build` against the final source.
+
+**Deliberately not done:** no attempt to guess or default a "migrate vs. discard" policy beyond what's implemented — the fix always migrates (moves) non-conflicting files and never discards anything, which was the least controversial reading of issue-31's own unresolved Option A/B framing (migrate was Option A). A user who genuinely wants Option B (discard) still has that as a fully manual choice, same as before this fix — this category does not add a delete path.
+
 ## Status
 
-Tracked, not yet designed or implemented. Filed as a direct consequence of a user-asked architecture-impact review of this branch, not from an independent bug hunt. GitHub issue creation deferred — file when this is scheduled for implementation, per this project's own Mode 1/Mode 2 convention in `commands/kmg-start-issue-tracking.md`.
+Resolved — see the Resolution section above.

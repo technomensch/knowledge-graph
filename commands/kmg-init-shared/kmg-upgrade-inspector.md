@@ -1227,3 +1227,18 @@ Before v0.7.4 a project-local FTS5 index was stored at `~/.kmgraph/index/project
 - Non-destructive — re-reads the graph's own markdown and writes a fresh index. Nothing in the knowledge graph is modified.
 - The old index file is left exactly where it is (ADR-063). Once the new one exists the old one is inert and the user can delete it whenever they like.
 - Idempotent — applying again on an already-migrated graph just rebuilds at the current-format path.
+
+#### q. Stale handoff-packages location (v0.7.4 — issue-56)
+
+**Purpose:** Offer an opt-in migration of pre-fix `./handoff-packages/<date>/` folders into `knowledge/handoffs/<date>/`.
+
+Before issue-31's fix, `/kmgraph:kmg-handoff` wrote every package to `<repoRoot>/handoff-packages/<date>/`, the same relative-to-cwd literal that predated the v0.6.20 content-location migration. Because `handoff-packages/` is gitignored, `git status` never surfaced these, so a repo can silently accumulate them indefinitely. The default output location is now `knowledge/handoffs/<date>/`, but that fix only changed where *new* packages land — anything already on disk stays exactly where it was until this category is applied.
+
+**Detection:** fully MCP-covered — this category is emitted by `kg_upgrade` inspect (`stale-handoff-packages-location` in `upgrades[]`) and has no bash fallback. It fires only when `<repoRoot>/handoff-packages/` exists and contains at least one dated subfolder; `repoRoot` is derived as the parent directory of the graph's own path, not a hardcoded `"knowledge"` literal, so it works even if a project's KG folder isn't named `knowledge`. It never fires for the personal graph — this is a per-repo convention, not something the personal graph has ever done.
+
+**Apply:** included in the batched `kg_upgrade apply: [...]` call like any other MCP-covered category. It sets no `_mcp_covered_*` flag and does **not** require `confirmBackfix` — like `stray-knowledge-dir`, it only ever deduplicates a file that's byte-identical to one already at the destination, or reports (never overwrites) one that differs. The wizard's per-item yes/no is the only consent it needs.
+
+**Safety rules:**
+- Never overwrites — a destination file that differs from its stray counterpart is left untouched on both sides and named in the result for manual review (ADR-063).
+- A stray dated folder (and `handoff-packages/` itself) is only removed once it's fully empty; anything flagged for manual review keeps its folder in place.
+- Idempotent — applying again after a manual review/cleanup only touches what's still actually stray.
