@@ -137,8 +137,15 @@ done
   upgrades+=("Migration available: knowledge content found under docs/ (pre-migration layout) — move to knowledge/")
 
 # Stale in-project FTS5 file check (post-~/.kmgraph/index/ migration)
-REAL_DB="$HOME/.kmgraph/index/projects/{kg_name}.db"
-if [ -f "$REAL_DB" ]; then
+# issue-55: as of v0.7.4 the project index filename is "<name>-<pathHash>.db",
+# not a bare "<name>.db" -- matching only the old literal would make this
+# precondition report "not migrated yet" forever on any freshly built index.
+# Accept either form; this guard only needs "has an index ever been built".
+INDEX_DIR="${KG_INDEX_DIR:-$HOME/.kmgraph/index}/projects"
+REAL_DB=$(find "$INDEX_DIR" -maxdepth 1 -type f \
+  \( -name "{kg_name}.db" -o -name "{kg_name}-*.db" \) \
+  2>/dev/null | head -1)
+if [ -n "$REAL_DB" ]; then
   STALE_FTS5=$(find "$KG_PARENT" \
     -not -path "$KG_PARENT/.git/*" \
     \( -name ".fts5.db" -o -name ".fts5.db-journal" \) \
@@ -671,7 +678,7 @@ To migrate manually: move files from docs/{decisions,lessons-learned,...}/ to kn
 
 **Constraints:**
 - Only runs if the detection check above found stale files
-- Only deletes when real DB at `~/.kmgraph/index/projects/{kg_name}.db` is confirmed
+- Only deletes when a real DB for this graph is confirmed under `~/.kmgraph/index/projects/` — either the current `{kg_name}-<pathHash>.db` form (v0.7.4+, issue-55) or the pre-v0.7.4 bare `{kg_name}.db`
 - Always prompts — never auto-deletes
 - Adds `**/.fts5.db` and `**/.fts5.db-journal` to `.gitignore` on cleanup (idempotent)
 
@@ -1205,3 +1212,18 @@ fi
 - Copy-only — never deletes or moves the original (ADR-063).
 - Never overwrites an existing destination — skips per-KG if already present at the new path.
 - `kg-config.json` rewrite only touches `path` values under the old prefix, and only after the copy succeeds.
+
+#### p. Stale FTS5 index format (v0.7.4 — issue-55)
+
+**Purpose:** Offer an opt-in rebuild of a project-local search index that still lives at the pre-v0.7.4 name-only path.
+
+Before v0.7.4 a project-local FTS5 index was stored at `~/.kmgraph/index/projects/<kg_name>.db` — keyed by the graph's *name* alone. Two unrelated repos that both named their graph `knowledge` silently shared one index file, so `kg_search` in one project could return the other project's notes, or (when the shared index was stale) return nothing at all while never falling back to the linear scan that would have found the content. The filename now also carries a short digest of the graph's real filesystem path (`<kg_name>-<pathHash>.db`), which makes that collision impossible.
+
+**Detection:** fully MCP-covered — this category is emitted by `kg_upgrade` inspect (`stale-fts5-index-format` in `upgrades[]`) and has no bash fallback. It fires only when an old-format file exists for this graph **and** no new-format file has been built yet, so it stops appearing as soon as the rebuild has run. It never fires for the personal graph, which has always used a fixed singleton path (`~/.kmgraph/index/personal.db`) and has nothing to migrate.
+
+**Apply:** included in the batched `kg_upgrade apply: [...]` call like any other MCP-covered category. It sets no `_mcp_covered_*` flag and does **not** require `confirmBackfix` — unlike the content-repair categories it never edits a knowledge file, it only writes a new cache file under `~/.kmgraph/index/`. The wizard's per-item yes/no is the only consent it needs.
+
+**Safety rules:**
+- Non-destructive — re-reads the graph's own markdown and writes a fresh index. Nothing in the knowledge graph is modified.
+- The old index file is left exactly where it is (ADR-063). Once the new one exists the old one is inert and the user can delete it whenever they like.
+- Idempotent — applying again on an already-migrated graph just rebuilds at the current-format path.

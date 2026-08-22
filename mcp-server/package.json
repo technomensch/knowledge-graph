@@ -61,6 +61,9 @@
     "testMatch": [
       "**/tests/**/*.test.ts"
     ],
+    "setupFiles": [
+      "<rootDir>/tests/jest.setup.ts"
+    ],
     "moduleNameMapper": {
       "^(\\.{1,2}/.*)\\.js$": "$1"
     }

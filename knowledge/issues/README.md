@@ -4,7 +4,7 @@
 
 Tracking of investigated bugs, defects, and meta-issues for this project.
 
-**Total Issues:** 54 numbered issues, plus named meta-issues (see below)
+**Total Issues:** 55 numbered issues, plus named meta-issues (see below)
 **Last Updated:** 2026-08-22
 
 ---
@@ -19,6 +19,7 @@ Tracking of investigated bugs, defects, and meta-issues for this project.
 
 ## All Issues (Chronological)
 
+- [issue-55: `kg_search`'s project-local FTS5 index path is keyed only by KG name, not by path](issue-55/issue-55-description.md) — **Status:** ✅ Resolved — a stale/cross-repo index file at `~/.kmgraph/index/projects/<name>.db` could silently shadow a KG's real content, since the path never accounted for *where* the KG actually lives. Fixed in v0.7.4 by keying the index filename on a digest of the KG's normalized path (`<name>-<pathHash>.db`), plus a new opt-in `kg_upgrade` category (`stale-fts5-index-format`) to migrate existing installs.
 - [issue-54: `kg_upgrade` has no check category for leftover renumbered-ADR orphan files](issue-54/issue-54-description.md) — **Status:** 🟡 Deferred (Track only) — GitHub issue #240 filed (labels: bug + gap). Split out from issue-53's item 2 after item 1 was confirmed already shipped; this is the real, unaddressed half — a new `kg_upgrade` UpgradeItem category to detect an already-orphaned renumbered file, which the existing creation-time collision check structurally cannot catch.
 - [issue-53: ADR Creation Has No Collision Check — Numbers Can Be Assigned Twice](issue-53/issue-53-description.md) — **Status:** ✅ Resolved — GitHub issue #231 closed. Item 1 (the actual ask) was already shipped in commit `046bc2234` four months before this issue was filed; item 2 split out to [issue-54](issue-54/issue-54-description.md).
 - [issue-52: `superpowers:brainstorming`-Originated Specs Still Bypass `start-issue-tracking`'s GitHub-Issue Creation](issue-52/issue-52-description.md) — **Status:** 🟡 Deferred (Track only) — GitHub issue #229 filed to research a flag/keyword/trigger so brainstorm-originated issues/ENHs reliably get a real GitHub issue; direct continuation of [issue-11](issue-11/issue-11-description.md)'s own GitHub #165 investigation (Cause 2, still open).

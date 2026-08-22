@@ -2984,7 +2984,7 @@ var require_compile = __commonJS({
       const schOrFunc = root.refs[ref];
       if (schOrFunc)
         return schOrFunc;
-      let _sch = resolve7.call(this, root, ref);
+      let _sch = resolve8.call(this, root, ref);
       if (_sch === void 0) {
         const schema = (_a2 = root.localRefs) === null || _a2 === void 0 ? void 0 : _a2[ref];
         const { schemaId } = this.opts;
@@ -3011,7 +3011,7 @@ var require_compile = __commonJS({
     function sameSchemaEnv(s1, s2) {
       return s1.schema === s2.schema && s1.root === s2.root && s1.baseId === s2.baseId;
     }
-    function resolve7(root, ref) {
+    function resolve8(root, ref) {
       let sch;
       while (typeof (sch = this.refs[ref]) == "string")
         ref = sch;
@@ -3736,7 +3736,7 @@ var require_fast_uri = __commonJS({
       }
       return uri;
     }
-    function resolve7(baseURI, relativeURI, options) {
+    function resolve8(baseURI, relativeURI, options) {
       const schemelessOptions = options ? Object.assign({ scheme: "null" }, options) : { scheme: "null" };
       const { parsed: baseParsed, malformedAuthorityOrPort: baseMalformed } = parseWithStatus(baseURI, schemelessOptions);
       const { parsed: relativeParsed, malformedAuthorityOrPort: relativeMalformed } = parseWithStatus(relativeURI, schemelessOptions);
@@ -4019,7 +4019,7 @@ var require_fast_uri = __commonJS({
     var fastUri = {
       SCHEMES,
       normalize,
-      resolve: resolve7,
+      resolve: resolve8,
       resolveComponent,
       equal,
       serialize,
@@ -28183,7 +28183,7 @@ var Protocol = class {
           return;
         }
         const pollInterval = task2.pollInterval ?? this._options?.defaultTaskPollInterval ?? 1e3;
-        await new Promise((resolve7) => setTimeout(resolve7, pollInterval));
+        await new Promise((resolve8) => setTimeout(resolve8, pollInterval));
         options?.signal?.throwIfAborted();
       }
     } catch (error48) {
@@ -28200,7 +28200,7 @@ var Protocol = class {
    */
   request(request, resultSchema, options) {
     const { relatedRequestId, resumptionToken, onresumptiontoken, task, relatedTask } = options ?? {};
-    return new Promise((resolve7, reject) => {
+    return new Promise((resolve8, reject) => {
       const earlyReject = (error48) => {
         reject(error48);
       };
@@ -28278,7 +28278,7 @@ var Protocol = class {
           if (!parseResult.success) {
             reject(parseResult.error);
           } else {
-            resolve7(parseResult.data);
+            resolve8(parseResult.data);
           }
         } catch (error48) {
           reject(error48);
@@ -28539,12 +28539,12 @@ var Protocol = class {
       }
     } catch {
     }
-    return new Promise((resolve7, reject) => {
+    return new Promise((resolve8, reject) => {
       if (signal.aborted) {
         reject(new McpError(ErrorCode.InvalidRequest, "Request cancelled"));
         return;
       }
-      const timeoutId = setTimeout(resolve7, interval);
+      const timeoutId = setTimeout(resolve8, interval);
       signal.addEventListener("abort", () => {
         clearTimeout(timeoutId);
         reject(new McpError(ErrorCode.InvalidRequest, "Request cancelled"));
@@ -29725,7 +29725,7 @@ var McpServer = class {
     let task = createTaskResult.task;
     const pollInterval = task.pollInterval ?? 5e3;
     while (task.status !== "completed" && task.status !== "failed" && task.status !== "cancelled") {
-      await new Promise((resolve7) => setTimeout(resolve7, pollInterval));
+      await new Promise((resolve8) => setTimeout(resolve8, pollInterval));
       const updatedTask = await extra.taskStore.getTask(taskId);
       if (!updatedTask) {
         throw new McpError(ErrorCode.InternalError, `Task ${taskId} not found during polling`);
@@ -30392,12 +30392,12 @@ var StdioServerTransport = class {
     this.onclose?.();
   }
   send(message) {
-    return new Promise((resolve7) => {
+    return new Promise((resolve8) => {
       const json2 = serializeMessage(message);
       if (this._stdout.write(json2)) {
-        resolve7();
+        resolve8();
       } else {
-        this._stdout.once("drain", resolve7);
+        this._stdout.once("drain", resolve8);
       }
     });
   }
@@ -30416,6 +30416,9 @@ var os = __toESM(require("os"));
 var crypto = __toESM(require("crypto"));
 var import_child_process = require("child_process");
 var CONFIG_PATH = process.env.KG_CONFIG_PATH || path.join(os.homedir(), ".kmgraph", "kg-config.json");
+function getIndexDir() {
+  return process.env.KG_INDEX_DIR || path.join(os.homedir(), ".kmgraph", "index");
+}
 var DEFAULT_CONFIG = {
   version: "1.0.0",
   graphs: {},
@@ -30802,10 +30805,10 @@ async function gate(opts) {
   const timeoutMs = opts.timeoutMs ?? 3e4;
   const controller = new AbortController();
   let timeoutHandle;
-  const timeout = new Promise((resolve7) => {
+  const timeout = new Promise((resolve8) => {
     timeoutHandle = setTimeout(() => {
       controller.abort();
-      resolve7(requireInput(`${opts.reason}_timeout`, opts.param, opts.accepts, opts.detail));
+      resolve8(requireInput(`${opts.reason}_timeout`, opts.param, opts.accepts, opts.detail));
     }, timeoutMs);
   });
   const asked = Promise.resolve().then(() => opts.ask(controller.signal, opts.detail));
@@ -31724,6 +31727,7 @@ var os5 = __toESM(require("os"));
 var fs5 = __toESM(require("fs"));
 var path5 = __toESM(require("path"));
 var os4 = __toESM(require("os"));
+var crypto3 = __toESM(require("crypto"));
 var Database;
 var fts5Available = false;
 try {
@@ -31731,21 +31735,26 @@ try {
   fts5Available = true;
 } catch {
 }
-function getPersonalDbPath() {
-  const dir = path5.join(os4.homedir(), ".kmgraph", "index");
-  fs5.mkdirSync(dir, { recursive: true });
-  return path5.join(dir, "personal.db");
+function sanitizeKgNameForFilename(kgName) {
+  const cleaned = (kgName || "").replace(/[^A-Za-z0-9_-]/g, "-").replace(/-{2,}/g, "-").replace(/^-+|-+$/g, "");
+  return cleaned || "kg";
 }
-function getProjectDbPath(kgName) {
-  const dir = path5.join(os4.homedir(), ".kmgraph", "index", "projects");
-  fs5.mkdirSync(dir, { recursive: true });
-  return path5.join(dir, `${kgName}.db`);
+function kgPathHash(kgPath) {
+  return crypto3.createHash("sha256").update(normalizeForFts5Scope(kgPath)).digest("hex").slice(0, 12);
 }
-function resolveDbPath(kgName, kgType) {
-  if (kgType === "personal") return getPersonalDbPath();
-  if (kgType === "project-local" || kgType === "project") return getProjectDbPath(kgName);
-  console.warn(`resolveDbPath: unknown kgType "${kgType}", defaulting to project-local`);
-  return getProjectDbPath(kgName);
+function computeDbPath(kgName, kgType, kgPath) {
+  const indexDir = getIndexDir();
+  if (kgType === "personal") return path5.join(indexDir, "personal.db");
+  if (kgType !== "project-local" && kgType !== "project" && kgType !== "custom") {
+    console.warn(`computeDbPath: unknown kgType "${kgType}", defaulting to project-local`);
+  }
+  const filename = `${sanitizeKgNameForFilename(kgName)}-${kgPathHash(kgPath)}.db`;
+  return path5.join(indexDir, "projects", filename);
+}
+function resolveDbPath(kgName, kgType, kgPath) {
+  const dbPath = computeDbPath(kgName, kgType, kgPath);
+  fs5.mkdirSync(path5.dirname(dbPath), { recursive: true });
+  return dbPath;
 }
 function normalizeForFts5Scope(p) {
   const expanded = p.replace(/^~/, os4.homedir());
@@ -31876,7 +31885,7 @@ function rebuildIndex(kgPath, kgName, kgType = "project-local") {
     );
   }
   const start = Date.now();
-  const dbPath = resolveDbPath(kgName, kgType);
+  const dbPath = resolveDbPath(kgName, kgType, kgPath);
   const db = new Database(dbPath);
   try {
     initDb(db);
@@ -31991,12 +32000,7 @@ async function handleFts5Status(params, personalScopeSession2 = new PersonalScop
       }
     }
     const kgType = target.graph.type ?? "project-local";
-    let dbPath;
-    if (kgType === "personal") {
-      dbPath = path5.join(os4.homedir(), ".kmgraph", "index", "personal.db");
-    } else {
-      dbPath = path5.join(os4.homedir(), ".kmgraph", "index", "projects", `${target.name}.db`);
-    }
+    const dbPath = computeDbPath(target.name, kgType, target.graph.path);
     const exists = fs5.existsSync(dbPath);
     return {
       content: [{
@@ -32165,7 +32169,7 @@ function searchKg(kgPath, kgName, kgType, query) {
   if (!fs6.existsSync(kgPath)) {
     return { results: [], usingFts5: false, missing: true };
   }
-  const dbPath = resolveDbPath(kgName, kgType);
+  const dbPath = resolveDbPath(kgName, kgType, kgPath);
   let results;
   let usingFts5 = false;
   if (fs6.existsSync(dbPath)) {
@@ -33023,12 +33027,41 @@ function slugify2(str) {
 function todayIso() {
   return (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
 }
-function stripLeadingFrontmatter(content) {
+var GENERATED_FRONTMATTER_KEYS = /* @__PURE__ */ new Set([
+  "title",
+  "created",
+  "updated",
+  "date",
+  "author",
+  "email",
+  "git",
+  "branch",
+  "commit",
+  "commit_short",
+  "tags",
+  "category",
+  "version",
+  "status",
+  "number",
+  "as_of_commit",
+  "last_updated",
+  "implements",
+  "related",
+  "adrs",
+  "lessons",
+  "kg_entries",
+  "search_aliases",
+  "deciders",
+  "pr",
+  "issue"
+]);
+function stripLeadingFrontmatterOnce(content) {
   if (!content.startsWith("---")) return content;
   const newlineAfterOpen = content.indexOf("\n");
   if (newlineAfterOpen === -1) return content;
   if (content.slice(0, newlineAfterOpen).trim() !== "---") return content;
-  let hasField = false;
+  let hasKnownKey = false;
+  let sawNonBlank = false;
   let looksLikeYaml = true;
   let prevWasKey = false;
   let lineStart = newlineAfterOpen + 1;
@@ -33041,11 +33074,17 @@ function stripLeadingFrontmatter(content) {
       closeLineEnd = lineEnd;
       break;
     }
-    if (/^[A-Za-z_][\w-]*:/.test(line)) {
-      hasField = true;
+    const topKey = /^([A-Za-z_][\w-]*):/.exec(line);
+    if (topKey) {
+      sawNonBlank = true;
+      if (GENERATED_FRONTMATTER_KEYS.has(topKey[1].toLowerCase())) hasKnownKey = true;
       prevWasKey = true;
     } else if (prevWasKey && /^\s/.test(line)) {
+      sawNonBlank = true;
+      const nestedKey = /^\s+([A-Za-z_][\w-]*):/.exec(line);
+      if (nestedKey && GENERATED_FRONTMATTER_KEYS.has(nestedKey[1].toLowerCase())) hasKnownKey = true;
     } else if (line.trim() !== "") {
+      sawNonBlank = true;
       looksLikeYaml = false;
       prevWasKey = false;
     } else {
@@ -33053,11 +33092,20 @@ function stripLeadingFrontmatter(content) {
     }
     lineStart = lineEnd + 1;
   }
-  if (closeLineEnd === -1 || !hasField || !looksLikeYaml) return content;
+  if (closeLineEnd === -1 || !looksLikeYaml) return content;
+  if (sawNonBlank && !hasKnownKey) return content;
   let rest = content.slice(closeLineEnd + 1);
   if (rest.startsWith("\r\n")) rest = rest.slice(2);
   else if (rest.startsWith("\n")) rest = rest.slice(1);
   return rest.replace(/^\s*\n/, "");
+}
+function stripLeadingFrontmatter(content) {
+  let current = content;
+  for (; ; ) {
+    const next = stripLeadingFrontmatterOnce(current);
+    if (next === current) return current;
+    current = next;
+  }
 }
 function validateMetadata(metadata) {
   if (!metadata.title || metadata.title.trim() === "") {
@@ -33065,6 +33113,18 @@ function validateMetadata(metadata) {
   }
   if (!metadata.tags) metadata.tags = [];
   return metadata;
+}
+var TITLE_PREFIX_RULES = {
+  session: { pattern: /^\d{4}-\d{2}-\d{2}[-\s]/, label: "a date prefix (YYYY-MM-DD-)" },
+  adr: { pattern: /^ADR-\d+[:\-\s]/i, label: "an ADR-number prefix (ADR-NNN)" }
+};
+function checkTitlePrefix(type, title) {
+  const rule = TITLE_PREFIX_RULES[type];
+  if (!rule || !rule.pattern.test(title.trim())) return null;
+  return {
+    error: "VALIDATION_ERROR",
+    message: `metadata.title must be bare, but "${title}" already carries ${rule.label} that kg_capture also adds \u2014 writing it would produce a doubled prefix (issue-46 Manifestation A). Resend the title without the prefix.`
+  };
 }
 function deriveFileName(type, metadata, adrNumber) {
   if (type === "lesson") {
@@ -33212,6 +33272,8 @@ ${line}
 async function handleCapture(request, targetKg, interaction, personalScopeSession2 = new PersonalScopeSession(), scopeOpts, workspaceRoot, toolCallMeta) {
   const validated = validateMetadata(request.metadata);
   if ("error" in validated) return validated;
+  const prefixError = checkTitlePrefix(request.type, request.metadata.title);
+  if (prefixError) return prefixError;
   const config2 = readConfig();
   const mode = resolveInteractionMode({ explicitParam: interaction }).mode;
   const automated = mode === "automated";
@@ -33385,7 +33447,7 @@ function registerCaptureTool(server2, personalScopeSession2) {
       type: external_exports3.enum(["lesson", "session", "adr"]).describe("Entry type: determines directory routing and frontmatter template"),
       metadata: external_exports3.object({
         title: external_exports3.string().describe(
-          "Bare title, no date or ADR-number prefix \u2014 this tool derives and owns all filename/frontmatter prefixing. A pre-prefixed title double-prepends."
+          "Bare title, no date or ADR-number prefix \u2014 this tool derives and owns all filename/frontmatter prefixing. A pre-prefixed title (session: 'YYYY-MM-DD-...', adr: 'ADR-NNN...') is rejected with VALIDATION_ERROR rather than double-prepended."
         ),
         category: external_exports3.string().optional().describe("Subdirectory routing (architecture, debugging, process, patterns)"),
         tags: external_exports3.array(external_exports3.string()).optional().describe("Searchability tags"),
@@ -33462,7 +33524,7 @@ var os9 = __toESM(require("os"));
 var import_child_process4 = require("child_process");
 
 // src/tools/version.ts
-var pkg = { version: true ? "0.7.0" : "0.0.0" };
+var pkg = { version: true ? "0.7.4" : "0.0.0" };
 var SCHEMA_VERSION = 2;
 function handleVersion() {
   return { installed: pkg.version, schema: SCHEMA_VERSION };
@@ -33487,6 +33549,8 @@ var APPLY_ORDER = [
   // ADR-067 Task 8.1: reconcile old .active/legacy schema before anything else touches the registry
   "config-location",
   // must run before anything else reads config from the new path
+  "plan-status-drift",
+  // issue-49 backfix: graph-independent like status-schema/config-location above, order-independent of everything else
   "directories",
   "config",
   "starter-relocation",
@@ -33497,6 +33561,8 @@ var APPLY_ORDER = [
   // issue-46 backfix: content repair, order-independent of the others
   "diff-blank-reconstruction",
   // issue-47 backfix: content repair, order-independent of the others
+  "stale-fts5-index-format",
+  // issue-55 backfix: search-index relocation, order-independent of the others
   "platform-split"
 ];
 function parseFrontmatter(filePath) {
@@ -33588,13 +33654,27 @@ function deDoubledFilename(entry) {
   if (adrMatch) return `${adrMatch[1]}-${adrMatch[3]}`;
   return null;
 }
+function isDirectorySafe(fullPath) {
+  try {
+    return fs11.statSync(fullPath).isDirectory();
+  } catch {
+    return false;
+  }
+}
+function isFileSafe(fullPath) {
+  try {
+    return fs11.statSync(fullPath).isFile();
+  } catch {
+    return false;
+  }
+}
 function captureCorruptionDirs(kgPath) {
   const dirs = [];
   const sessionsRoot = path11.join(kgPath, "sessions");
   if (fs11.existsSync(sessionsRoot)) {
     for (const ym of fs11.readdirSync(sessionsRoot)) {
       const full = path11.join(sessionsRoot, ym);
-      if (fs11.statSync(full).isDirectory()) dirs.push(full);
+      if (isDirectorySafe(full)) dirs.push(full);
     }
   }
   const decisionsRoot = path11.join(kgPath, "decisions");
@@ -33603,7 +33683,7 @@ function captureCorruptionDirs(kgPath) {
   if (fs11.existsSync(lessonsRoot)) {
     for (const cat of fs11.readdirSync(lessonsRoot)) {
       const full = path11.join(lessonsRoot, cat);
-      if (fs11.statSync(full).isDirectory()) dirs.push(full);
+      if (isDirectorySafe(full)) dirs.push(full);
     }
   }
   return dirs;
@@ -33618,9 +33698,13 @@ function checkCaptureCorruption(kgPath) {
       if (deDoubledFilename(entry)) doubledFilenames++;
       else if (NEAR_DOUBLED_DATE_FILENAME.test(entry)) nearDoubledFilenames++;
       const full = path11.join(dir, entry);
-      if (!fs11.statSync(full).isFile()) continue;
-      const lines = fs11.readFileSync(full, "utf-8").split("\n");
-      if (detectDoubledFrontmatter(lines)) doubledFrontmatter++;
+      if (!isFileSafe(full)) continue;
+      try {
+        const lines = fs11.readFileSync(full, "utf-8").split("\n");
+        if (detectDoubledFrontmatter(lines)) doubledFrontmatter++;
+      } catch {
+        continue;
+      }
     }
   }
   let staleReadmeLinks = 0;
@@ -33657,8 +33741,13 @@ function applyCaptureCorruption(kgPath) {
     for (const entry of fs11.readdirSync(dir)) {
       if (!entry.endsWith(".md")) continue;
       const full = path11.join(dir, entry);
-      if (!fs11.statSync(full).isFile()) continue;
-      const raw = fs11.readFileSync(full, "utf-8");
+      if (!isFileSafe(full)) continue;
+      let raw;
+      try {
+        raw = fs11.readFileSync(full, "utf-8");
+      } catch {
+        continue;
+      }
       const lines = raw.split("\n");
       const doubled = detectDoubledFrontmatter(lines);
       if (!doubled) continue;
@@ -33669,7 +33758,7 @@ function applyCaptureCorruption(kgPath) {
       }
       const rest = lines.slice(doubled.block2.endLine + 1);
       const newContent = [...result.mergedLines, ...rest].join("\n");
-      fs11.writeFileSync(`${full}.bak`, raw, "utf-8");
+      backupOnce(full, raw);
       fs11.writeFileSync(full, newContent, "utf-8");
       mergedCount++;
     }
@@ -33717,7 +33806,10 @@ function applyCaptureCorruption(kgPath) {
     if (changed) fs11.writeFileSync(readmePath, content, "utf-8");
   }
   const parts = [
-    `${mergedCount} frontmatter block(s) merged` + (mergedCount > 0 ? " (.bak backup written for each)" : ""),
+    // "kept" not "written": backupOnce() leaves an existing .bak in place
+    // rather than overwriting it, so the guarantee is that a backup exists —
+    // not that this run is the one that created it.
+    `${mergedCount} frontmatter block(s) merged` + (mergedCount > 0 ? " (.bak backup kept for each)" : ""),
     `${renamedCount} filename(s) de-duplicated`,
     `${readmeLinksFixed} README link(s) repointed`
   ];
@@ -33791,7 +33883,7 @@ function gitDiffNameOnly(kgPath, a, b) {
     const out = (0, import_child_process4.execFileSync)("git", ["diff", "--name-only", a, b], { cwd: kgPath, stdio: "pipe" }).toString();
     return out.split("\n").filter((l) => l.trim().length > 0);
   } catch {
-    return [];
+    return null;
   }
 }
 var BACKFIX_SENTINEL = "issue-47 backfix (c2";
@@ -33801,25 +33893,32 @@ function findBlankDiffSessionFiles(kgPath) {
   if (!fs11.existsSync(sessionsDir)) return result;
   if (!isInsideGitRepo(kgPath)) return result;
   const defaultBranch = resolveDefaultBranchForGit(kgPath);
+  if (!defaultBranch) return result;
   for (const ym of fs11.readdirSync(sessionsDir)) {
     const ymDir = path11.join(sessionsDir, ym);
-    if (!fs11.statSync(ymDir).isFile() && fs11.statSync(ymDir).isDirectory()) {
+    if (isDirectorySafe(ymDir)) {
       for (const entry of fs11.readdirSync(ymDir)) {
         if (!entry.endsWith(".md") || entry === "README.md") continue;
         const full = path11.join(ymDir, entry);
-        if (!fs11.statSync(full).isFile()) continue;
-        const fm = parseFrontmatter(full);
+        if (!isFileSafe(full)) continue;
+        let fm;
+        let body;
+        try {
+          fm = parseFrontmatter(full);
+          body = fs11.readFileSync(full, "utf-8");
+        } catch {
+          continue;
+        }
         const branch = fm["branch"];
         if (!branch) continue;
-        const body = fs11.readFileSync(full, "utf-8");
         if (body.includes("\u2190 modified this session") || body.includes(BACKFIX_SENTINEL)) continue;
-        if (defaultBranch && isOnDefaultBranch(branch, defaultBranch)) {
+        if (isOnDefaultBranch(branch, defaultBranch)) {
           result.correctlyBlank++;
           continue;
         }
         const commitRef = fm["as_of_commit"] || fm["commit"] || null;
         const item = { fullPath: full, relName: `${ym}/${entry}`, commitRef, reconstructable: false };
-        if (defaultBranch && commitRef && commitRef !== "TBD" && isCommitResolvable(kgPath, commitRef)) {
+        if (commitRef && commitRef !== "TBD" && isCommitResolvable(kgPath, commitRef)) {
           item.reconstructable = true;
           result.reconstructable.push(item);
         } else {
@@ -33852,29 +33951,39 @@ function applyDiffBlankReconstruction(kgPath) {
   let reconstructedCount = 0;
   let notedCount = 0;
   const stamp = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
+  const unresolvableNote = (reason) => `
+<!-- ${BACKFIX_SENTINEL}, ${stamp}): "key files modified" could not be reconstructed -- ${reason} in local git history. -->
+`;
   for (const item of unresolvable) {
     const raw = fs11.readFileSync(item.fullPath, "utf-8");
     backupOnce(item.fullPath, raw);
-    const reason = !item.commitRef ? "no commit was recorded" : item.commitRef === "TBD" ? 'the recorded commit is still the placeholder "TBD" -- never actually filled in' : !defaultBranch ? `no local main/master branch was found to diff commit ${item.commitRef} against` : `recorded commit ${item.commitRef} is no longer resolvable`;
-    const note = `
-<!-- ${BACKFIX_SENTINEL}, ${stamp}): "key files modified" could not be reconstructed -- ${reason} in local git history. -->
-`;
-    fs11.writeFileSync(item.fullPath, insertAfterExternalFilesHeading(raw, note), "utf-8");
+    const reason = !item.commitRef ? "no commit was recorded" : item.commitRef === "TBD" ? 'the recorded commit is still the placeholder "TBD" -- never actually filled in' : `recorded commit ${item.commitRef} is no longer resolvable`;
+    fs11.writeFileSync(item.fullPath, insertAfterExternalFilesHeading(raw, unresolvableNote(reason)), "utf-8");
     notedCount++;
   }
   for (const item of reconstructable) {
     const commitRef = item.commitRef;
     const mergeBase = gitMergeBase(kgPath, defaultBranch, commitRef);
-    const fileList = mergeBase && mergeBase !== commitRef ? gitDiffNameOnly(kgPath, mergeBase, commitRef) : [];
+    const fileList = mergeBase === null ? null : mergeBase === commitRef ? [] : gitDiffNameOnly(kgPath, mergeBase, commitRef);
     const raw = fs11.readFileSync(item.fullPath, "utf-8");
     backupOnce(item.fullPath, raw);
-    const block = fileList.length > 0 ? `
+    let block;
+    if (fileList === null) {
+      const reason = mergeBase === null ? `no merge base between ${defaultBranch} and commit ${commitRef} could be computed (unrelated histories?)` : `"git diff" against the merge base of ${defaultBranch} and commit ${commitRef} failed`;
+      block = unresolvableNote(reason);
+      notedCount++;
+    } else if (fileList.length > 0) {
+      block = `
 <!-- ${BACKFIX_SENTINEL}, ${stamp}): reconstructed from git history (best-effort) -->
-` + fileList.map((f) => `- \`${f}\` \u2190 modified this session (reconstructed)`).join("\n") + "\n" : `
+` + fileList.map((f) => `- \`${f}\` \u2190 modified this session (reconstructed)`).join("\n") + "\n";
+      reconstructedCount++;
+    } else {
+      block = `
 <!-- ${BACKFIX_SENTINEL}, ${stamp}): "key files modified" confirmed empty via git history -- no files changed at commit ${commitRef} relative to ${defaultBranch}. -->
 `;
+      reconstructedCount++;
+    }
     fs11.writeFileSync(item.fullPath, insertAfterExternalFilesHeading(raw, block), "utf-8");
-    reconstructedCount++;
   }
   return `${reconstructedCount} session file(s) reconstructed, ${notedCount} left with an unresolvable note.`;
 }
@@ -33890,6 +33999,204 @@ ${block}`);
   const lineEnd = content.indexOf("\n", idx);
   const insertAt = lineEnd === -1 ? content.length : lineEnd + 1;
   return content.slice(0, insertAt) + block + content.slice(insertAt);
+}
+var FROZEN_PLACEHOLDERS = [
+  "**STATUS:** \u{1F534} STOPPED (Waiting for Manual Approval of Step 1)",
+  "**STATUS:** \u{1F534} AWAITING APPROVAL (Waiting for Manual Approval of Step 1)"
+];
+function normalizeForCompare(s) {
+  return s.replace(/^﻿/, "").replace(/\r\n?/g, "\n").replace(/\n+$/, "");
+}
+function extractStatusLine(content) {
+  for (const line of content.split(/\r\n|\r|\n/)) {
+    if (/^\*\*STATUS:\*\*/.test(line)) return line;
+  }
+  return null;
+}
+function statusValueOf(statusLine) {
+  return statusLine.replace(/^\*\*STATUS:\*\*\s*/, "");
+}
+function isFrozenPlaceholder(statusLine) {
+  const normalized = normalizeForCompare(statusLine);
+  return FROZEN_PLACEHOLDERS.some((p) => normalizeForCompare(p) === normalized);
+}
+function restIdenticalApartFromStatus(canonicalContent, mirrorContent, canonicalStatus, mirrorStatus) {
+  const strip = (content, statusLine) => {
+    const idx = content.indexOf(statusLine);
+    if (idx === -1) return content;
+    return content.slice(0, idx) + " STATUS " + content.slice(idx + statusLine.length);
+  };
+  return normalizeForCompare(strip(canonicalContent, canonicalStatus)) === normalizeForCompare(strip(mirrorContent, mirrorStatus));
+}
+function spliceStatusLine(content, oldStatusLine, newStatusLine) {
+  const idx = content.indexOf(oldStatusLine);
+  if (idx === -1) return content;
+  return content.slice(0, idx) + newStatusLine + content.slice(idx + oldStatusLine.length);
+}
+function computeTierAFinding(canonicalPath, mirrorPath) {
+  if (!fs11.existsSync(canonicalPath) || !fs11.existsSync(mirrorPath)) return null;
+  const canonicalContent = fs11.readFileSync(canonicalPath, "utf-8");
+  const mirrorContent = fs11.readFileSync(mirrorPath, "utf-8");
+  const canonicalStatus = extractStatusLine(canonicalContent);
+  const mirrorStatus = extractStatusLine(mirrorContent);
+  if (canonicalStatus === null || mirrorStatus === null) return null;
+  if (normalizeForCompare(canonicalStatus) === normalizeForCompare(mirrorStatus)) return null;
+  const mirrorLooksStopped = statusValueOf(mirrorStatus).startsWith("\u{1F534}");
+  const canonicalHasComplete = canonicalStatus.includes("\u2705 COMPLETE");
+  if (!(mirrorLooksStopped && canonicalHasComplete)) return null;
+  if (!restIdenticalApartFromStatus(canonicalContent, mirrorContent, canonicalStatus, mirrorStatus)) return null;
+  return { canonicalPath, mirrorPath, canonicalStatusLine: canonicalStatus, mirrorStatusLine: mirrorStatus, mirrorContent };
+}
+function isTierBCandidate(canonicalStatus, mirrorStatus) {
+  if (!isFrozenPlaceholder(canonicalStatus)) return false;
+  return mirrorStatus === null || isFrozenPlaceholder(mirrorStatus);
+}
+function extractBranchCandidateFromFilename(filename) {
+  return filename.replace(/\.md$/, "").replace(/-plan$/, "");
+}
+function extractMergedBranchSegment(subject) {
+  const fromIdx = subject.indexOf("from ");
+  if (fromIdx !== -1) {
+    const after = subject.slice(fromIdx + "from ".length);
+    const slashIdx = after.indexOf("/");
+    if (slashIdx !== -1) return after.slice(slashIdx + 1).trim();
+  }
+  const branchMatch = subject.match(/Merge branch '([^']+)'/);
+  return branchMatch ? branchMatch[1] : null;
+}
+function wasBranchMerged(projectRoot, defaultBranch, branchCandidate) {
+  try {
+    const out = (0, import_child_process4.execFileSync)("git", ["log", defaultBranch, "--merges", "--format=%s"], { cwd: projectRoot, stdio: "pipe" }).toString();
+    for (const subject of out.split("\n")) {
+      if (!subject.trim()) continue;
+      if (extractMergedBranchSegment(subject) === branchCandidate) return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+function findProjectRoot(startDir) {
+  let dir = path11.resolve(startDir);
+  for (; ; ) {
+    if (fs11.existsSync(path11.join(dir, "knowledge", "plans")) || fs11.existsSync(path11.join(dir, ".git"))) {
+      return dir;
+    }
+    const parent = path11.dirname(dir);
+    if (parent === dir) return null;
+    dir = parent;
+  }
+}
+function countTierAFindings(projectRoot) {
+  const plansDir = path11.join(projectRoot, "knowledge", "plans");
+  if (!fs11.existsSync(plansDir)) return 0;
+  const mirrorDir = path11.join(os9.homedir(), ".claude", "plans");
+  let count = 0;
+  for (const f of fs11.readdirSync(plansDir)) {
+    if (!f.endsWith(".md")) continue;
+    const canonicalPath = path11.join(plansDir, f);
+    try {
+      if (!fs11.statSync(canonicalPath).isFile()) continue;
+      if (computeTierAFinding(canonicalPath, path11.join(mirrorDir, f))) count++;
+    } catch {
+      continue;
+    }
+  }
+  return count;
+}
+function checkPlanStatusDrift(cwd) {
+  const projectRoot = findProjectRoot(cwd);
+  if (!projectRoot) return [];
+  const plansDir = path11.join(projectRoot, "knowledge", "plans");
+  if (!fs11.existsSync(plansDir)) return [];
+  const mirrorDir = path11.join(os9.homedir(), ".claude", "plans");
+  const planFiles = fs11.readdirSync(plansDir).filter((f) => {
+    if (!f.endsWith(".md")) return false;
+    try {
+      return fs11.statSync(path11.join(plansDir, f)).isFile();
+    } catch {
+      return false;
+    }
+  });
+  const defaultBranch = resolveDefaultBranchForGit(projectRoot);
+  let tierACount = 0;
+  let tierBCount = 0;
+  const tierBLines = [];
+  for (const f of planFiles) {
+    const canonicalPath = path11.join(plansDir, f);
+    const mirrorPath = path11.join(mirrorDir, f);
+    try {
+      const canonicalContent = fs11.readFileSync(canonicalPath, "utf-8");
+      const canonicalStatus = extractStatusLine(canonicalContent);
+      if (canonicalStatus === null) continue;
+      if (computeTierAFinding(canonicalPath, mirrorPath)) {
+        tierACount++;
+        continue;
+      }
+      const mirrorExists = fs11.existsSync(mirrorPath);
+      const mirrorStatus = mirrorExists ? extractStatusLine(fs11.readFileSync(mirrorPath, "utf-8")) : null;
+      if (isTierBCandidate(canonicalStatus, mirrorStatus)) {
+        tierBCount++;
+        const branchCandidate = extractBranchCandidateFromFilename(f);
+        const merged = defaultBranch ? wasBranchMerged(projectRoot, defaultBranch, branchCandidate) : false;
+        tierBLines.push(
+          `${f}: candidate branch "${branchCandidate}" (filename-derived, best-effort, rarely a real match) -- ` + (merged ? "merge evidence FOUND (branch-level only -- cannot distinguish this plan from any sibling sharing the same branch string)" : "no merge evidence found (squash/rebase-merge produces no merge commit to find, or genuinely not yet merged)")
+        );
+      }
+    } catch {
+      continue;
+    }
+  }
+  let orphanedCount = 0;
+  if (fs11.existsSync(mirrorDir)) {
+    for (const f of fs11.readdirSync(mirrorDir)) {
+      if (f.endsWith(".md") && !fs11.existsSync(path11.join(plansDir, f))) orphanedCount++;
+    }
+  }
+  if (tierACount === 0 && tierBCount === 0) return [];
+  return [{
+    category: "plan-status-drift",
+    description: `issue-49: ${tierACount} Tier A mirror-drift, auto-repairable; ${tierBCount} Tier B candidates, needs manual review; ${orphanedCount} orphaned mirror-only files, informational`,
+    details: `Tier A: knowledge/plans/X.md's Safety-Header STATUS is ahead of its ~/.claude/plans/X.md mirror (canonical already "\u2705 COMPLETE", mirror still a frozen "\u{1F534} STOPPED"/"\u{1F534} AWAITING APPROVAL" placeholder, rest of the file identical) -- safe, mechanical, one-direction repair (canonical -> mirror).` + (tierACount > 0 ? ` Run with apply: ["plan-status-drift"], confirmBackfix: true to repair Tier A findings only.` : "") + ` Tier B: BOTH copies still show the exact frozen placeholder -- this tier only ever gathers best-effort branch-merge evidence for a human to review by hand; it never marks anything COMPLETE on its own judgment, regardless of how confident the evidence looks, and apply never touches these.` + (tierBLines.length > 0 ? `
+Tier B candidates:
+${tierBLines.join("\n")}` : "") + (orphanedCount > 0 ? `
+${orphanedCount} file(s) exist in ~/.claude/plans/ with no knowledge/plans/ counterpart -- informational only, no action taken.` : "")
+  }];
+}
+function applyPlanStatusDrift(cwd) {
+  const projectRoot = findProjectRoot(cwd);
+  if (!projectRoot) return "No project root found -- nothing to repair.";
+  const plansDir = path11.join(projectRoot, "knowledge", "plans");
+  if (!fs11.existsSync(plansDir)) return "No knowledge/plans/ directory found -- nothing to repair.";
+  const mirrorDir = path11.join(os9.homedir(), ".claude", "plans");
+  const planFiles = fs11.readdirSync(plansDir).filter((f) => {
+    if (!f.endsWith(".md")) return false;
+    try {
+      return fs11.statSync(path11.join(plansDir, f)).isFile();
+    } catch {
+      return false;
+    }
+  });
+  let repairedCount = 0;
+  for (const f of planFiles) {
+    const canonicalPath = path11.join(plansDir, f);
+    const mirrorPath = path11.join(mirrorDir, f);
+    let finding;
+    try {
+      finding = computeTierAFinding(canonicalPath, mirrorPath);
+    } catch {
+      continue;
+    }
+    if (!finding) continue;
+    try {
+      backupOnce(mirrorPath, finding.mirrorContent);
+      fs11.writeFileSync(mirrorPath, spliceStatusLine(finding.mirrorContent, finding.mirrorStatusLine, finding.canonicalStatusLine), "utf-8");
+      repairedCount++;
+    } catch {
+      continue;
+    }
+  }
+  return `${repairedCount} plan mirror(s) synced to canonical STATUS.`;
 }
 function checkConfig(kgPath, graphName) {
   const config2 = readConfig();
@@ -34190,6 +34497,47 @@ function applyStarterRelocation(kgPath) {
   if (moved.length > 0) parts.push(`Relocated: ${moved.join(", ")}`);
   if (skipped.length > 0) parts.push(`Skipped: ${skipped.join(", ")}`);
   return parts.join(". ") || "No starters to relocate";
+}
+function checkStaleFts5IndexFormat(kgPath, kgName, kgType) {
+  const type = kgType ?? "project-local";
+  if (type === "personal") return [];
+  const oldPath = path11.join(getIndexDir(), "projects", `${kgName}.db`);
+  if (!fs11.existsSync(oldPath)) return [];
+  const newPath = computeDbPath(kgName, type, kgPath);
+  if (newPath === oldPath || fs11.existsSync(newPath)) return [];
+  return [{
+    category: "stale-fts5-index-format",
+    description: `Search index for "${kgName}" is in the pre-v0.7.4 name-only format (collision risk)`,
+    details: `Found an older search index for this knowledge graph:
+  ${oldPath}
+
+That file is named after the graph alone, so any other project whose graph is also called "${kgName}" would share it \u2014 and searches could quietly return the other project's notes, or return nothing at all. Newer indexes include a fingerprint of where the graph actually lives, so that can't happen.
+
+Applying this rebuilds this graph's index at the new location:
+  ${newPath}
+
+This is safe and non-destructive: it only re-reads your own markdown files and writes a fresh index. Nothing in your knowledge graph is modified, and the old index file is left exactly where it is \u2014 once the new one is in place the old one is inert, and you can delete it yourself whenever you like.`
+  }];
+}
+function applyStaleFts5IndexFormat(kgPath, kgName, kgType) {
+  const type = kgType ?? "project-local";
+  if (type === "personal") {
+    return "Personal knowledge graph uses a fixed index path; nothing to migrate";
+  }
+  const oldPath = path11.join(getIndexDir(), "projects", `${kgName}.db`);
+  const newPath = computeDbPath(kgName, type, kgPath);
+  if (newPath === oldPath) return "Index already uses the current format; skipped";
+  if (!fs11.existsSync(oldPath) && fs11.existsSync(newPath)) {
+    return `Index already rebuilt at ${newPath}; skipped`;
+  }
+  try {
+    const result = rebuildIndex(kgPath, kgName, type);
+    const orphanNote = fs11.existsSync(oldPath) ? ` Old index left in place at ${oldPath} \u2014 inert now, safe to delete whenever you like.` : "";
+    return `Rebuilt search index at ${result.db_path} (${result.indexed} indexed, ${result.skipped} unchanged).${orphanNote}`;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return `Error rebuilding search index: ${message}`;
+  }
 }
 function checkStrayKnowledgeDir(kgPath, kgType) {
   if (kgType !== "project-local") return [];
@@ -34508,21 +34856,24 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
     const result = { upgrades: [], warnings: [] };
     result.upgrades.push(...checkStatusSchema());
     result.upgrades.push(...checkConfigLocation());
+    result.upgrades.push(...checkPlanStatusDrift(cwd));
     if ("error" in target) {
       result.upgrades.push({
         category: "resolution",
         description: target.error,
-        details: "Graph-dependent checks (directories, config, templates, stray-knowledge-dir, version-update) were skipped."
+        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, version-update, and the platform-split warning) were skipped."
       });
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
     }
     const kgPath = target.graph.path.replace(/^~/, os9.homedir());
     const kgType = target.graph.type;
     if (!fs11.existsSync(kgPath)) {
-      return {
-        content: [{ type: "text", text: `Error: KG path not found: ${kgPath}` }],
-        isError: true
-      };
+      result.upgrades.push({
+        category: "resolution",
+        description: `KG path not found: ${kgPath}`,
+        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, version-update, and the platform-split warning) were skipped."
+      });
+      return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
     }
     result.upgrades.push(...checkDirectories(kgPath));
     result.upgrades.push(...checkConfig(kgPath, target.name));
@@ -34531,6 +34882,7 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
     result.upgrades.push(...checkStrayKnowledgeDir(kgPath, kgType));
     result.upgrades.push(...checkCaptureCorruption(kgPath));
     result.upgrades.push(...checkDiffBlankReconstruction(kgPath));
+    result.upgrades.push(...checkStaleFts5IndexFormat(kgPath, target.name, kgType));
     result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config2, target.name));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
@@ -34541,7 +34893,7 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
   let appliedAnyGraphDependent = false;
   let anyCategoryFailed = false;
   const resolvedKgPathForApply = !("error" in target) ? target.graph.path.replace(/^~/, os9.homedir()) : void 0;
-  if (resolvedKgPathForApply && !fs11.existsSync(resolvedKgPathForApply) && sortedApplyList.some((c) => c !== "config-location" && c !== "status-schema")) {
+  if (resolvedKgPathForApply && !fs11.existsSync(resolvedKgPathForApply) && sortedApplyList.some((c) => c !== "config-location" && c !== "status-schema" && c !== "plan-status-drift")) {
     return {
       content: [{ type: "text", text: `Error: KG path not found: ${resolvedKgPathForApply}` }],
       isError: true
@@ -34564,6 +34916,30 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
     }
     if (category === "config-location") {
       results.push(`[config-location] ${applyConfigLocation()}`);
+      continue;
+    }
+    if (category === "plan-status-drift") {
+      const mode = resolveInteractionMode({}).mode;
+      const projectRoot = findProjectRoot(cwd);
+      const tierACount = projectRoot ? countTierAFindings(projectRoot) : 0;
+      const confirmation = tierACount === 0 ? { confirmed: true } : await confirmBackfixCategory({
+        reasonCode: "plan_status_drift_backfix",
+        param: "confirmBackfix",
+        mode,
+        confirmed: params.confirmBackfix,
+        timeoutMs: STUB_ASK_TIMEOUT_MS,
+        // Not a "confirmed merged" framing -- Tier A never involves a
+        // merge-status judgment, only Tier B did in the original design,
+        // and Tier B is never applied.
+        detail: `${tierACount} plan file(s) in ~/.claude/plans/ are stale copies of their already-COMPLETE knowledge/plans/ canonical -- sync their STATUS line now?`,
+        skipAsk: pending.length > 0
+      });
+      if (!("confirmed" in confirmation)) {
+        pending.push(confirmation);
+        anyCategoryFailed = true;
+        continue;
+      }
+      results.push(`[plan-status-drift] ${applyPlanStatusDrift(cwd)}`);
       continue;
     }
     if ("error" in target) {
@@ -34591,6 +34967,12 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
         break;
       case "stray-knowledge-dir":
         results.push(`[stray-knowledge-dir] ${applyStrayKnowledgeDir(kgPath)}`);
+        appliedAnyGraphDependent = true;
+        break;
+      case "stale-fts5-index-format":
+        results.push(
+          `[stale-fts5-index-format] ${applyStaleFts5IndexFormat(kgPath, target.name, target.graph.type)}`
+        );
         appliedAnyGraphDependent = true;
         break;
       case "capture-corruption": {
@@ -34672,8 +35054,8 @@ function registerUpgradeTool(server2, personalScopeSession2) {
     "kg_upgrade",
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
-      apply: external_exports3.array(external_exports3.enum(["status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction"])).optional().default([]).describe(
-        'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history)'
+      apply: external_exports3.array(external_exports3.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction", "stale-fts5-index-format"])).optional().default([]).describe(
+        'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history), "stale-fts5-index-format" (issue-55 backfix: rebuilds a pre-v0.7.4 name-only search index at the collision-safe path-keyed location; non-destructive, leaves the old file in place)'
       ),
       confirm_platform_split: external_exports3.boolean().optional().default(false).describe(
         "Must be true to apply platform-split migration (removes content from rules.md)"
@@ -34686,7 +35068,7 @@ function registerUpgradeTool(server2, personalScopeSession2) {
         "Must be true (in automated mode) to apply the status-schema migration -- reconciles old .active/legacy config into the status/graphId schema and deletes the legacy ~/.claude/kg-config.json file. Interactive callers are asked to confirm instead."
       ),
       confirmBackfix: external_exports3.boolean().optional().describe(
-        'Must be true (in automated mode) to apply backfix categories that repair already-corrupted content -- currently "capture-corruption" (issue-46). Interactive callers are asked to confirm instead.'
+        'Must be true (in automated mode) to apply backfix categories that repair already-written content -- "capture-corruption" (issue-46), "diff-blank-reconstruction" (issue-47), and "plan-status-drift" Tier A writes (issue-49) all share this one flag; setting it authorizes any of these three present in the same apply call. Interactive callers are asked to confirm instead.'
       )
     },
     async ({ apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix }, extra) => {
@@ -34704,7 +35086,7 @@ var fs12 = __toESM(require("fs"));
 var path12 = __toESM(require("path"));
 var os10 = __toESM(require("os"));
 var import_child_process5 = require("child_process");
-function normalizeForCompare(p) {
+function normalizeForCompare2(p) {
   const expanded = p.replace(/^~/, os10.homedir());
   try {
     return fs12.realpathSync(expanded);
@@ -34835,9 +35217,9 @@ function registerCompareTools(server2, personalScopeSession2) {
         return { content: [{ type: "text", text: `Error: path B does not exist: ${b}` }], isError: true };
       }
       const config2 = readConfig();
-      const normalizedA = normalizeForCompare(a);
-      const normalizedB = normalizeForCompare(b);
-      const personalGraphPaths = Object.values(config2.graphs).filter((g) => g.type === "personal" && g.status !== "deleted").map((g) => normalizeForCompare(g.path));
+      const normalizedA = normalizeForCompare2(a);
+      const normalizedB = normalizeForCompare2(b);
+      const personalGraphPaths = Object.values(config2.graphs).filter((g) => g.type === "personal" && g.status !== "deleted").map((g) => normalizeForCompare2(g.path));
       const touchesPersonal = personalGraphPaths.some(
         (p) => isAncestorOrEqual(p, normalizedA) || isAncestorOrEqual(p, normalizedB)
       );
@@ -34960,7 +35342,7 @@ function registerResolveTool(server2, personalScopeSession2) {
 // src/index.ts
 var server = new McpServer({
   name: "knowledge-graph",
-  version: true ? "0.7.0" : "0.0.0"
+  version: true ? "0.7.4" : "0.0.0"
 });
 var personalScopeSession = new PersonalScopeSession();
 var crossKgSearchSession = new CrossKgSearchSession();

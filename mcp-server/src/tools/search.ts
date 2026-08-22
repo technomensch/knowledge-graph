@@ -76,7 +76,10 @@ function searchKg(
     return { results: [], usingFts5: false, missing: true };
   }
 
-  const dbPath = resolveDbPath(kgName, kgType);
+  // issue-55: kgPath must be threaded through — an index keyed only by kgName
+  // meant an unrelated same-named KG's stale index would be found here and
+  // queried as if it were this KG's, suppressing the correct linear-scan fallback.
+  const dbPath = resolveDbPath(kgName, kgType, kgPath);
   let results: SearchResult[];
   let usingFts5 = false;
 

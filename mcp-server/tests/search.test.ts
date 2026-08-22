@@ -1,8 +1,25 @@
+// issue-55: handleSearch() reads the registry through readConfig(); mocked so
+// the regression test below can drive two *separate* installs that each
+// register a graph under the same name. Spreads the real module so every other
+// util in this file (getAllGraphPaths, getIndexDir) stays real.
+jest.mock("../src/utils.js", () => {
+  const actual = jest.requireActual("../src/utils.js") as Record<string, unknown>;
+  return {
+    ...actual,
+    readConfig: jest.fn(() => ({
+      version: "1.0.0",
+      graphs: {},
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    })),
+  };
+});
+
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import { rebuildIndex, getProjectDbPath, searchFts5 } from "../src/tools/fts5.js";
-import { KgConfig } from "../src/utils.js";
+import { handleSearch } from "../src/tools/search.js";
+import { KgConfig, getIndexDir, readConfig } from "../src/utils.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -173,9 +190,9 @@ describe("multi-KG search via FTS5", () => {
     expect(projResult.indexed).toBeGreaterThan(0);
     expect(globalResult.indexed).toBeGreaterThan(0);
 
-    // Verify indexes are at user-level ~/.kmgraph/index/ path
-    expect(projResult.db_path).toContain(".kmgraph/index");
-    expect(globalResult.db_path).toContain(".kmgraph/index");
+    // Verify indexes are at the user-level index dir
+    expect(projResult.db_path.startsWith(getIndexDir())).toBe(true);
+    expect(globalResult.db_path.startsWith(getIndexDir())).toBe(true);
     expect(fs.existsSync(projResult.db_path)).toBe(true);
     expect(fs.existsSync(globalResult.db_path)).toBe(true);
   });
@@ -202,8 +219,8 @@ describe("multi-KG search via FTS5", () => {
     rebuildIndex(projRoot, "proj-kg");
     rebuildIndex(globalRoot, "personal-kg");
 
-    const projDbPath = getProjectDbPath("proj-kg");
-    const globalDbPath = getProjectDbPath("personal-kg");
+    const projDbPath = getProjectDbPath("proj-kg", projRoot);
+    const globalDbPath = getProjectDbPath("personal-kg", globalRoot);
 
     const projResults = searchFts5(projDbPath, "project KG only", projRoot);
     const globalResults = searchFts5(globalDbPath, "global KG only", globalRoot);
@@ -237,7 +254,7 @@ describe("SearchResult sourceKg field", () => {
     );
 
     rebuildIndex(root, "tag-kg");
-    const dbPath = getProjectDbPath("tag-kg");
+    const dbPath = getProjectDbPath("tag-kg", root);
     const results = searchFts5(dbPath, "content", root);
     expect(results.length).toBeGreaterThan(0);
 
@@ -271,12 +288,12 @@ describe("searchFts5 uses user-level storage (via getProjectDbPath)", () => {
     // Rebuild using new path function
     const rebuildResult = rebuildIndex(kgRoot, "tc-004-kg");
 
-    // Verify DB is at user-level path
-    expect(rebuildResult.db_path).toContain(os.homedir());
-    expect(rebuildResult.db_path).toContain(".kmgraph/index");
+    // Verify DB is at the user-level index dir, outside the project tree
+    expect(rebuildResult.db_path.startsWith(getIndexDir())).toBe(true);
+    expect(rebuildResult.db_path.startsWith(kgRoot)).toBe(false);
 
     // Verify searchFts5 can read from that path
-    const dbPath = getProjectDbPath("tc-004-kg");
+    const dbPath = getProjectDbPath("tc-004-kg", kgRoot);
     expect(fs.existsSync(dbPath)).toBe(true);
 
     // Search should work
@@ -315,8 +332,8 @@ describe("searchFts5 uses user-level storage (via getProjectDbPath)", () => {
     rebuildIndex(kg1Root, "project-kg");
     rebuildIndex(kg2Root, "personal-kg");
 
-    const projDbPath = getProjectDbPath("project-kg");
-    const persDbPath = getProjectDbPath("personal-kg");
+    const projDbPath = getProjectDbPath("project-kg", kg1Root);
+    const persDbPath = getProjectDbPath("personal-kg", kg2Root);
 
     // Verify separate paths
     expect(projDbPath).not.toBe(persDbPath);
@@ -333,5 +350,122 @@ describe("searchFts5 uses user-level storage (via getProjectDbPath)", () => {
     // Cross-contamination check: project search shouldn't find personal content
     const projSearchForPersonal = searchFts5(projDbPath, "Personal", kg1Root);
     expect(projSearchForPersonal).toHaveLength(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// issue-55 regression: the project-local FTS5 index path must be keyed by the
+// KG's filesystem path, not by its name alone.
+//
+// Deliberately exercised through handleSearch() -> searchKg() (the actual
+// defective call path) rather than rebuildIndex()/searchFts5() directly: the
+// lower-level functions were never the bug. searchKg() found *any* file at the
+// name-keyed path, assumed it belonged to the KG being searched, queried it,
+// and thereby suppressed the correct linear-scan fallback.
+// ---------------------------------------------------------------------------
+
+describe("issue-55: same-named KGs at different paths do not share an index", () => {
+  /** Nested one level below a fresh mkdtemp wrapper — resolveGraph() matches
+   *  cwd against dirname(graph.path), so a bare mkdtemp leaf would share
+   *  os.tmpdir() as its dirname with every other fixture here. */
+  function makeNestedKg(prefix: string): string {
+    const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), `issue55-${prefix}-`));
+    tempDirs.push(wrapper);
+    const kg = path.join(wrapper, "knowledge");
+    fs.mkdirSync(kg, { recursive: true });
+    scaffoldKg(kg);
+    return kg;
+  }
+
+  async function searchIn(kgRoot: string, kgName: string, query: string): Promise<string> {
+    (readConfig as jest.Mock).mockReturnValue(
+      makeConfig({ [kgName]: { path: kgRoot, type: "project-local" } })
+    );
+    const origCwd = process.cwd;
+    process.cwd = () => kgRoot;
+    try {
+      const result = await handleSearch({
+        query,
+        format: "detailed",
+        interaction: "automated",
+      });
+      return result.content.map((c: { text: string }) => c.text).join("\n");
+    } finally {
+      process.cwd = origCwd;
+    }
+  }
+
+  it("each KG's search returns only its own content, and never empty", async () => {
+    const SHARED_NAME = "shared-name";
+
+    const rootA = makeNestedKg("alpha");
+    const rootB = makeNestedKg("beta");
+
+    writeMd(
+      path.join(rootA, "lessons-learned"),
+      "alpha.md",
+      "---\ntitle: Alpha Doc\n---\n# Alpha Doc\n\nzebrafishalpha marker content."
+    );
+    writeMd(
+      path.join(rootB, "lessons-learned"),
+      "beta.md",
+      "---\ntitle: Beta Doc\n---\n# Beta Doc\n\nzebrafishbeta marker content."
+    );
+
+    // Build both indexes under the *same* KG name — this is the collision.
+    const buildA = rebuildIndex(rootA, SHARED_NAME);
+    const buildB = rebuildIndex(rootB, SHARED_NAME);
+    expect(buildA.db_path).not.toBe(buildB.db_path);
+    expect(buildA.indexed).toBeGreaterThan(0);
+    expect(buildB.indexed).toBeGreaterThan(0);
+
+    // A finds its own marker...
+    const aOwn = await searchIn(rootA, SHARED_NAME, "zebrafishalpha");
+    expect(aOwn).not.toContain("No results found");
+    expect(aOwn).toContain("alpha.md");
+
+    // ...and never B's.
+    const aForB = await searchIn(rootA, SHARED_NAME, "zebrafishbeta");
+    expect(aForB).not.toContain("beta.md");
+
+    // B finds its own marker (pre-fix this returned A's index, so it was
+    // either empty or contained alpha.md)...
+    const bOwn = await searchIn(rootB, SHARED_NAME, "zebrafishbeta");
+    expect(bOwn).not.toContain("No results found");
+    expect(bOwn).toContain("beta.md");
+
+    // ...and never A's.
+    const bForA = await searchIn(rootB, SHARED_NAME, "zebrafishalpha");
+    expect(bForA).not.toContain("alpha.md");
+  });
+
+  it("a never-indexed KG still falls back to linear scan when a same-named index exists", async () => {
+    const SHARED_NAME = "fallback-name";
+
+    const indexedRoot = makeNestedKg("indexed");
+    const freshRoot = makeNestedKg("fresh");
+
+    writeMd(
+      path.join(indexedRoot, "lessons-learned"),
+      "indexed.md",
+      "---\ntitle: Indexed Doc\n---\n# Indexed Doc\n\nquokkaindexed content."
+    );
+    writeMd(
+      path.join(freshRoot, "lessons-learned"),
+      "fresh.md",
+      "---\ntitle: Fresh Doc\n---\n# Fresh Doc\n\nquokkafresh content."
+    );
+
+    // Only the first KG ever gets an index built.
+    rebuildIndex(indexedRoot, SHARED_NAME);
+    expect(fs.existsSync(getProjectDbPath(SHARED_NAME, freshRoot))).toBe(false);
+
+    // The second, never-indexed KG must reach the linear-scan fallback. This
+    // is the exact failure test-mcp-tools.sh hit: "No results found" for
+    // content that plainly exists on disk.
+    const freshResult = await searchIn(freshRoot, SHARED_NAME, "quokkafresh");
+    expect(freshResult).not.toContain("No results found");
+    expect(freshResult).toContain("fresh.md");
+    expect(freshResult).not.toContain("indexed.md");
   });
 });

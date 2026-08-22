@@ -27,15 +27,22 @@ TEST_DIR=$(mktemp -d)
 # avoids that.
 TEST_KG_DIR="$TEST_DIR/proj1/test-kg"
 TEST_CONFIG="$TEST_DIR/kg-config.json"
+# issue-55: FTS5 index files live outside the repo, under ~/.kmgraph/index/ by
+# default. Keep this suite's index writes inside TEST_DIR (reaped by cleanup
+# below) instead of accumulating orphans in the developer's real index dir --
+# nothing anywhere enumerates or reaps that directory. This is the index-side
+# counterpart of KG_CONFIG_PATH above.
+TEST_INDEX_DIR="$TEST_DIR/index"
 
 cleanup() {
   rm -rf "$TEST_DIR"
-  unset KG_CONFIG_PATH CLAUDE_PLUGIN_ROOT
+  unset KG_CONFIG_PATH CLAUDE_PLUGIN_ROOT KG_INDEX_DIR
 }
 trap cleanup EXIT INT TERM
 
 # Set env vars for isolated test config
 export KG_CONFIG_PATH="$TEST_CONFIG"
+export KG_INDEX_DIR="$TEST_INDEX_DIR"
 export CLAUDE_PLUGIN_ROOT="$REPO_ROOT"
 
 echo "═══════════════════════════════════════════════════════════════"

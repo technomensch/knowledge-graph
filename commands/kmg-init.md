@@ -169,10 +169,19 @@ After the DB location migrated to `~/.kmgraph/index/`, old `.fts5.db` files can 
 ```bash
 KG_ROOT="{project_root}"  # root of the git repo containing the KG
 
-# 1. Confirm real DB exists at the new location before deleting anything
-REAL_DB="$HOME/.kmgraph/index/projects/${kg_name}.db"
-if [ ! -f "$REAL_DB" ]; then
-  echo "ℹ️  Skipping stale FTS5 cleanup — new-location DB not found at $REAL_DB."
+# 1. Confirm real DB exists at the new location before deleting anything.
+#    issue-55: the project index filename is "<name>-<pathHash>.db" as of
+#    v0.7.4 (keyed by where the KG actually lives, so same-named graphs in
+#    different repos no longer share one file). Older installs may still only
+#    have the pre-v0.7.4 bare "<name>.db". Accept either — this guard only
+#    needs to answer "has an index ever been built for this graph", and must
+#    not go stale again the next time the filename format changes.
+INDEX_DIR="${KG_INDEX_DIR:-$HOME/.kmgraph/index}/projects"
+REAL_DB=$(find "$INDEX_DIR" -maxdepth 1 -type f \
+  \( -name "${kg_name}.db" -o -name "${kg_name}-*.db" \) \
+  2>/dev/null | head -1)
+if [ -z "$REAL_DB" ]; then
+  echo "ℹ️  Skipping stale FTS5 cleanup — no index found for \"${kg_name}\" under $INDEX_DIR."
   echo "   Run /kmgraph:kmg-sync-all to build it first, then re-run /kmgraph:kmg-init."
   # exit_step
 fi

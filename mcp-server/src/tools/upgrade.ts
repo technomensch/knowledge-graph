@@ -15,7 +15,9 @@ import {
   checkGraphPathHealth,
   GraphConfig,
   PathHealth,
+  getIndexDir,
 } from "../utils.js";
+import { computeDbPath, rebuildIndex } from "./fts5.js";
 import { resolveGraph, resolvePersonalGraph, PersonalScopeSession, confirmPersonalScopeAccess } from "../resolution.js";
 import {
   resolveInteractionMode,
@@ -59,6 +61,7 @@ const APPLY_ORDER = [
   "stray-knowledge-dir",
   "capture-corruption",   // issue-46 backfix: content repair, order-independent of the others
   "diff-blank-reconstruction",   // issue-47 backfix: content repair, order-independent of the others
+  "stale-fts5-index-format",   // issue-55 backfix: search-index relocation, order-independent of the others
   "platform-split",
 ];
 
@@ -1551,6 +1554,92 @@ function applyStarterRelocation(kgPath: string): string {
   return parts.join(". ") || "No starters to relocate";
 }
 
+/**
+ * issue-55 — old-format FTS5 index detection.
+ *
+ * Before v0.7.4 a project-local search index lived at
+ * `~/.kmgraph/index/projects/<kgName>.db` — keyed by the graph's *name* alone,
+ * so two unrelated repos that both named their graph "knowledge" silently
+ * shared one index file and served each other's search results. The index
+ * filename now also carries a digest of the graph's real path.
+ *
+ * That relocation is user-visible architecture, so it ships as an opt-in
+ * upgrade category rather than happening silently: this fires only when an
+ * old-format file exists AND no new-format file has been built yet, so it
+ * stops firing as soon as the rebuild below has run.
+ */
+function checkStaleFts5IndexFormat(
+  kgPath: string,
+  kgName: string,
+  kgType: string | undefined
+): UpgradeItem[] {
+  const type = kgType ?? "project-local";
+  // The personal graph has always used a fixed singleton path (personal.db) —
+  // it was never name-keyed and has nothing to migrate.
+  if (type === "personal") return [];
+
+  const oldPath = path.join(getIndexDir(), "projects", `${kgName}.db`);
+  if (!fs.existsSync(oldPath)) return [];
+
+  const newPath = computeDbPath(kgName, type, kgPath);
+  // Already migrated (or the graph's name happens to sanitize to the same
+  // literal, which computeDbPath's hash suffix makes impossible in practice).
+  if (newPath === oldPath || fs.existsSync(newPath)) return [];
+
+  return [{
+    category: "stale-fts5-index-format",
+    description: `Search index for "${kgName}" is in the pre-v0.7.4 name-only format (collision risk)`,
+    details:
+      `Found an older search index for this knowledge graph:\n  ${oldPath}\n\n` +
+      `That file is named after the graph alone, so any other project whose graph is also ` +
+      `called "${kgName}" would share it — and searches could quietly return the other ` +
+      `project's notes, or return nothing at all. Newer indexes include a fingerprint of ` +
+      `where the graph actually lives, so that can't happen.\n\n` +
+      `Applying this rebuilds this graph's index at the new location:\n  ${newPath}\n\n` +
+      `This is safe and non-destructive: it only re-reads your own markdown files and writes ` +
+      `a fresh index. Nothing in your knowledge graph is modified, and the old index file is ` +
+      `left exactly where it is — once the new one is in place the old one is inert, and you ` +
+      `can delete it yourself whenever you like.`,
+  }];
+}
+
+/**
+ * issue-55 — rebuild this graph's index under the collision-safe filename.
+ * Deliberately leaves the old file in place (ADR-063: never destroy state the
+ * user didn't explicitly agree to lose); it becomes an inert orphan.
+ */
+function applyStaleFts5IndexFormat(
+  kgPath: string,
+  kgName: string,
+  kgType: string | undefined
+): string {
+  const type = kgType ?? "project-local";
+  if (type === "personal") {
+    return "Personal knowledge graph uses a fixed index path; nothing to migrate";
+  }
+
+  const oldPath = path.join(getIndexDir(), "projects", `${kgName}.db`);
+  const newPath = computeDbPath(kgName, type, kgPath);
+  if (newPath === oldPath) return "Index already uses the current format; skipped";
+  if (!fs.existsSync(oldPath) && fs.existsSync(newPath)) {
+    return `Index already rebuilt at ${newPath}; skipped`;
+  }
+
+  try {
+    const result = rebuildIndex(kgPath, kgName, type);
+    const orphanNote = fs.existsSync(oldPath)
+      ? ` Old index left in place at ${oldPath} — inert now, safe to delete whenever you like.`
+      : "";
+    return (
+      `Rebuilt search index at ${result.db_path} ` +
+      `(${result.indexed} indexed, ${result.skipped} unchanged).${orphanNote}`
+    );
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return `Error rebuilding search index: ${message}`;
+  }
+}
+
 function checkStrayKnowledgeDir(kgPath: string, kgType: string | undefined): UpgradeItem[] {
   if (kgType !== "project-local") return [];
   const strayDir = path.join(kgPath, "knowledge");
@@ -2051,7 +2140,7 @@ function updateLastAppliedVersion(installedVersion: string, graphName: string): 
 // kmg-upgrade-inspector.md's confirmBackfix wiring: that boolean is per-call, not
 // per-category, so a call consenting to one confirmBackfix-gated category silently
 // also consents to any other one present in the same `apply: [...]` array.
-export type ApplyCategory = "status-schema" | "config-location" | "plan-status-drift" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir" | "capture-corruption" | "diff-blank-reconstruction";
+export type ApplyCategory = "status-schema" | "config-location" | "plan-status-drift" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir" | "capture-corruption" | "diff-blank-reconstruction" | "stale-fts5-index-format";
 
 export interface HandleUpgradeParams {
   apply?: ApplyCategory[];
@@ -2140,7 +2229,7 @@ export async function handleUpgrade(
       result.upgrades.push({
         category: "resolution",
         description: target.error,
-        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, version-update, and the platform-split warning) were skipped.",
+        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, version-update, and the platform-split warning) were skipped.",
       });
       return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
     }
@@ -2165,7 +2254,7 @@ export async function handleUpgrade(
       result.upgrades.push({
         category: "resolution",
         description: `KG path not found: ${kgPath}`,
-        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, version-update, and the platform-split warning) were skipped.",
+        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, version-update, and the platform-split warning) were skipped.",
       });
       return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
     }
@@ -2177,6 +2266,7 @@ export async function handleUpgrade(
     result.upgrades.push(...checkStrayKnowledgeDir(kgPath, kgType));
     result.upgrades.push(...checkCaptureCorruption(kgPath));
     result.upgrades.push(...checkDiffBlankReconstruction(kgPath));
+    result.upgrades.push(...checkStaleFts5IndexFormat(kgPath, target.name, kgType));
     result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config, target.name));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
@@ -2296,6 +2386,16 @@ export async function handleUpgrade(
         break;
       case "stray-knowledge-dir":
         results.push(`[stray-knowledge-dir] ${applyStrayKnowledgeDir(kgPath)}`);
+        appliedAnyGraphDependent = true;
+        break;
+      case "stale-fts5-index-format":
+        // issue-55: no confirmBackfix gate — unlike the content-repair
+        // categories this never edits a knowledge file. It only writes a new
+        // cache file under ~/.kmgraph/index/ and leaves the old one untouched,
+        // so the wizard's per-item yes/no is the only consent it needs.
+        results.push(
+          `[stale-fts5-index-format] ${applyStaleFts5IndexFormat(kgPath, target.name, target.graph.type as string | undefined)}`
+        );
         appliedAnyGraphDependent = true;
         break;
       case "capture-corruption": {
@@ -2451,11 +2551,11 @@ export function registerUpgradeTool(server: McpServer, personalScopeSession: Per
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
       apply: z
-        .array(z.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction"]))
+        .array(z.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction", "stale-fts5-index-format"]))
         .optional()
         .default([])
         .describe(
-          'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history)'
+          'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history), "stale-fts5-index-format" (issue-55 backfix: rebuilds a pre-v0.7.4 name-only search index at the collision-safe path-keyed location; non-destructive, leaves the old file in place)'
         ),
       confirm_platform_split: z
         .boolean()

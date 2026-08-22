@@ -375,7 +375,7 @@ Then restart Codex.
 
 ### Step 2B: MCP IDE Installation (Cursor, Windsurf, Continue.dev, JetBrains, VS Code, Claude Desktop)
 
-This path installs the MCP server, which provides every `kg_*` tool for knowledge management: `kg_config_init`, `kg_config_list`, `kg_config_add_category`, `kg_resolve`, `kg_search`, `kg_scaffold`, `kg_check_sensitive`, and `kg_fts5_rebuild` (build or refresh a search index for faster, relevance-ranked results) among others. Builds a dual-DB index stored at `~/.kmgraph/index/personal.db` (personal KG) or `~/.kmgraph/index/projects/<name>.db` (project KG).
+This path installs the MCP server, which provides every `kg_*` tool for knowledge management: `kg_config_init`, `kg_config_list`, `kg_config_add_category`, `kg_resolve`, `kg_search`, `kg_scaffold`, `kg_check_sensitive`, and `kg_fts5_rebuild` (build or refresh a search index for faster, relevance-ranked results) among others. Builds a dual-DB index stored at `~/.kmgraph/index/personal.db` (personal KG) or `~/.kmgraph/index/projects/<name>-<pathHash>.db` (project KG — the path digest keeps two projects that share a KG name from sharing one index file). Run `kg_fts5_status` to see the exact path for a given graph.
 
 #### 2B.1: Check Prerequisites
 
