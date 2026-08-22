@@ -252,3 +252,4 @@ See [core/examples/lessons-learned/](../../examples/lessons-learned/) for filled
 - [Command Guide](../../../docs/COMMAND-GUIDE.md#essential-commands) - Automated (Claude Code)
 - [Ownership-of-Derivation Contract Violation Causes Double-Prefixed Filenames](patterns/Lessons_Learned_Patterns_Ownership_Of_Derivation_Contract_Violation_Causes_Double_Prefixed_Filenames.md)
 - [Hardcoded main...HEAD Branch-Comparison Base Silently Returns Empty Pre-Divergence](patterns/Lessons_Learned_Patterns_Hardcoded_Main...head_Branch_Comparison_Base_Silently_Returns_Empty_Pre_Divergence.md)
+- [Fixed-Name Test Fixtures Collide With Real, Non-Sandboxed Shared State](patterns/Lessons_Learned_Patterns_Fixed_Name_Test_Fixtures_Collide_With_Real,_Non_Sandboxed_Shared_State.md)
