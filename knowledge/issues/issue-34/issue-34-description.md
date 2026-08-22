@@ -1,7 +1,7 @@
 ---
 id: issue-34
 type: Bug
-status: fixed
+status: resolved
 github-issue: pending
 branch: none
 created: 2026-07-30
@@ -68,4 +68,6 @@ Fixed by commit `50d839f8` ("fix(mcp-server): add issues/enhancements to FTS5 in
 - Live repro against the locally-rebuilt `mcp-server` code (bypassing the deployed MCP plugin, run directly against this repo's `knowledge/` dir) confirmed this issue's own repro query now returns hits from `knowledge/issues/issue-34/issue-34-description.md` and `knowledge/issues/issue-35/issue-35-description.md`, where before it returned 0.
 
 **Caveat:** Not yet pushed to origin and not yet tested/reviewed by the user beyond automated unit tests and the agent's own local repro.
+
+**Confirmed merged (2026-08-22):** commit `50d839f8` is now an ancestor of `main`. Re-verified live: `mcp-server/src/tools/fts5.ts`'s `contentDirs` includes `"issues"` and `"enhancements"`. Status updated to `resolved`.
 

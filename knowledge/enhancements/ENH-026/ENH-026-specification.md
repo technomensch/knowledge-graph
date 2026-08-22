@@ -1,5 +1,7 @@
 # ENH-026: KG Write Guard — Unguarded Command Class
 
+**Local ID:** ENH-026 | **GitHub Issue:** [#233](https://github.com/technomensch/knowledge-graph/issues/233) (filed 2026-08-22, retroactively; native GitHub `blockedBy` link added to ENH-034/#232 for the `kmg-update-graph` portion — see Related below)
+
 **Status:** Proposed
 **Version:** TBD (post-v0.5.10.8)
 **Parent:** ADR-019 (write guard design), v0.5.10.8 (extract-chat patch)

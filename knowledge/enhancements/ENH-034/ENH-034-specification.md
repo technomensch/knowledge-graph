@@ -1,5 +1,7 @@
 # ENH-034: Capture-pipeline command naming and grouping
 
+**Local ID:** ENH-034 | **GitHub Issue:** [#232](https://github.com/technomensch/knowledge-graph/issues/232) (filed 2026-08-22, retroactively — see [issue-52](../../issues/issue-52/issue-52-description.md) for why brainstorm-originated specs don't reliably get one automatically)
+
 **Status:** 🟡 Proposed
 **Discovered:** 2026-07-01
 **Governed by:** [ADR-058](../../decisions/ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md)

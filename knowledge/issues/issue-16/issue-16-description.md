@@ -1,7 +1,7 @@
 ---
 id: issue-16
 type: Bug
-status: fixed
+status: resolved
 github-issue: "#174"
 created: 2026-07-16
 related-issues: []
@@ -70,3 +70,7 @@ Both `mcp-server/package.json` build scripts now inject `$npm_package_version` i
 Cross-checked by running full test suite (`npm test` in `mcp-server/`): all tests pass, including the version tool test which verifies `kg_version` output.
 
 Not pushed, no PR — awaiting user go-ahead. Will be merged to `main` as part of `v0.6.19` release.
+
+**Confirmed merged (2026-08-22):** commit `ffed79f0` is now an ancestor of `main`. Re-verified live: `grep -r "0.3.10" mcp-server/dist/*.js` returns zero matches, `mcp-server/package.json` reports `0.7.3`. Status updated to `resolved`.
+
+**Disambiguation from issue-32:** during an overlap audit, this issue's "0.3.10" symptom was compared against issue-32's (a different bug — stale already-running processes not hot-reloading after upgrade). They're genuinely distinct: this issue was a hardcoded literal in build scripts + `index.ts`, now fixed at the source; issue-32 is a process-lifecycle problem that exists regardless of whether the source is correct. Not duplicates, no merge needed.

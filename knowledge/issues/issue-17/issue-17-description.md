@@ -90,3 +90,5 @@ involves the `gov-capture-routing` skill, referenced by 8+ commands/agents as an
 automatic level-routing step, which errors with "Unknown skill" when actually invoked.
 Same broader class as this issue, but a genuinely separate concrete mechanism — not a
 duplicate filing.
+
+A third instance of the general "skill trigger vocabulary misses real phrasing" class — different skill again — is [ENH-055](../../enhancements/ENH-055/ENH-055-specification.md) (GH #210), `kmg-capture-router` missing "future idea" phrasing. Cross-linked 2026-08-22; not a duplicate, but any generalized trigger-vocabulary fix should probably cover both.

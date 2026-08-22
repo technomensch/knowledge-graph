@@ -1,7 +1,7 @@
 ---
 id: issue-35
 type: Bug
-status: fixed
+status: resolved
 github-issue: pending
 branch: none
 created: 2026-07-30
@@ -73,3 +73,5 @@ Status unchanged (`deferred` → will move to in-progress once Phase 1 execution
 **Verification done:** Full `mcp-server` test suite green — 151/151 tests passing, including the two new absence-guard tests. FTS5 rebuild `indexed`/`skipped` counts were compared before and after the fix and are unchanged from the pre-fix baseline, confirming the dead `"knowledge"` path always contributed 0 indexed files and its removal caused no real-content regression.
 
 **Not yet pushed to origin and not yet tested/reviewed by the user beyond automated unit tests.**
+
+**Confirmed merged (2026-08-22):** commit `d3db547e` is now an ancestor of `main`. Re-verified live: no dead `"knowledge"` literal remains in `mcp-server/src/tools/fts5.ts`'s `contentDirs`. Status updated to `resolved`.

@@ -1,5 +1,7 @@
 # ENH-042: Three disconnected release-doc-sync mechanisms leave README and actual version numbers chronically out of sync
 
+**Local ID:** ENH-042 | **GitHub Issue:** [#234](https://github.com/technomensch/knowledge-graph/issues/234) (filed 2026-08-22, retroactively; native GitHub `blockedBy` link added to ENH-034/#232 — see Related below)
+
 **Status:** 🟡 Proposed
 **Discovered:** 2026-07-06
 **Governed by:** none (process/governance gap, not a new command/skill/docstring — ADR-058's naming/scope check does not apply)

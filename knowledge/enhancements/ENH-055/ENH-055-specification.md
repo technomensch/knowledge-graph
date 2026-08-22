@@ -6,11 +6,14 @@ github-issue: "#210"
 branch: none
 created: 2026-07-26
 related_enhs: ["ENH-053", "ENH-054"]
+related_issues: ["issue-17"]
 ---
 
 # ENH-055: `kmg-capture-router`'s Trigger Vocabulary Misses "Future Idea" Phrasing
 
 **Local ID:** ENH-055 | **GitHub Issue:** [#210](https://github.com/technomensch/knowledge-graph/issues/210)
+
+**Related:** [issue-17](../../issues/issue-17/issue-17-description.md) (#175) — same underlying failure class applied to a different skill: issue-17 is about `kmg-auto-recall` missing a trigger for "assistant needs clarification mid-task," this ENH is about `kmg-capture-router` missing a trigger for "future idea" phrasing. No doc previously cross-linked these; found during a 2026-08-22 overlap audit. Not a duplicate — different skills, different trigger gaps — but worth fixing together since any router-vocabulary-gap fix pattern developed for one likely generalizes to the other.
 
 ## Problem Statement
 

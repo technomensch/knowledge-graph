@@ -16,7 +16,7 @@ Formal tracking of proposed and resolved enhancements for this project.
 - [ENH-039: Rule-injection scripts hardcode personal split-file names instead of discovering them](ENH-039/ENH-039-specification.md) — **Status:** 🟡 Proposed
 - [ENH-037: README indexes for enhancements/ and issues/, cross-referenced with decisions/](ENH-037/ENH-037-specification.md) — **Status:** 🟡 Proposed
 - [ENH-035: Chat-history-to-KG backfill extractor (standalone)](ENH-035/ENH-035-specification.md) — **Status:** 🟡 Proposed — Governed by [ADR-058](../decisions/ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md)
-- [ENH-034: Capture-pipeline command naming and grouping](ENH-034/ENH-034-specification.md) — **Status:** 🟡 Proposed — Governed by [ADR-058](../decisions/ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md)
+- [ENH-034: Capture-pipeline command naming and grouping](ENH-034/ENH-034-specification.md) — **Status:** 🟡 Proposed — GitHub #232. Governed by [ADR-058](../decisions/ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md)
 - [ENH-033: Repo-context auto-detection for `kmg-update-doc` / `kmg-create-doc`](ENH-033/ENH-033-specification.md) — **Status:** 🟡 Proposed — Governed by [ADR-056](../decisions/ADR-056-reject-plugin-split-for-contributor-only-doc-commands.md)
 - [ENH-030: KG Remove / Unregister Command](ENH-030/ENH-030-specification.md) — **Status:** 🟡 Proposed
 
@@ -38,7 +38,7 @@ Formal tracking of proposed and resolved enhancements for this project.
 - [ENH-050: Document Trigger Keywords Tied to Each Command/Skill in User-Facing Docs](ENH-050/ENH-050-specification.md) — **Status:** 🟡 Proposed — Github issue #181.
 - [ENH-049: Concurrent Multi-Repo/Multi-Tool Work with Different Active KGs](ENH-049/ENH-049-specification.md) — **Status:** ✅ Resolved — Github issue #180; related to [ADR-067](../decisions/ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md).
 - [ENH-048: Session-Wrap Status-Alignment Verification](ENH-048/ENH-048-specification.md) — **Status:** 🟡 Proposed — Github issue #178.
-- [ENH-042: Three disconnected release-doc-sync mechanisms leave README and actual version numbers chronically out of sync](ENH-042/ENH-042-specification.md) — **Status:** 🟡 Proposed — Discovered 2026-07-06; three disconnected release-doc-sync mechanisms (README, ROADMAP, CHANGELOG, package.json, plugin.json) leave version numbers chronically out of sync; related to [ENH-041](ENH-041/ENH-041-specification.md), [ENH-034](ENH-034/ENH-034-specification.md), [ENH-052](ENH-052/ENH-052-specification.md), [issue-13](../issues/issue-13/issue-13-description.md).
+- [ENH-042: Three disconnected release-doc-sync mechanisms leave README and actual version numbers chronically out of sync](ENH-042/ENH-042-specification.md) — **Status:** 🟡 Proposed — GitHub #234. Discovered 2026-07-06; three disconnected release-doc-sync mechanisms (README, ROADMAP, CHANGELOG, package.json, plugin.json) leave version numbers chronically out of sync; related to [ENH-041](ENH-041/ENH-041-specification.md), [ENH-034](ENH-034/ENH-034-specification.md), [ENH-052](ENH-052/ENH-052-specification.md), [issue-13](../issues/issue-13/issue-13-description.md).
 - [ENH-041: Broken nav breadcrumb (GETTING-STARTED.md / WORKFLOWS.md) baked into every index README scaffold](ENH-041/ENH-041-specification.md) — **Status:** 🟡 Proposed
 - [ENH-040: Remove chat-history/*.md from kg_search / kg_fts5_rebuild indexing scope](ENH-040/ENH-040-specification.md) — **Status:** 🟡 Proposed — Governed by [ADR-060](../decisions/ADR-060-narrow-kg-search-scope-away-from-raw-chat-history.md)
 - [ENH-039: Rule-injection scripts hardcode personal split-file names instead of discovering them](ENH-039/ENH-039-specification.md) — **Status:** 🟡 Proposed
@@ -46,7 +46,7 @@ Formal tracking of proposed and resolved enhancements for this project.
 - [ENH-037: README indexes for enhancements/ and issues/, cross-referenced with decisions/](ENH-037/ENH-037-specification.md) — **Status:** 🟡 Proposed
 - [ENH-036: `kmg-capture-router` as the sole detection engine — 5 detection skills consolidated to 2](ENH-036/ENH-036-specification.md) — **Status:** ⚪ Withdrawn — Governed by [ADR-057](../decisions/ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth.md), [ADR-058](../decisions/ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md)
 - [ENH-035: Chat-history-to-KG backfill extractor (standalone)](ENH-035/ENH-035-specification.md) — **Status:** 🟡 Proposed — Governed by [ADR-058](../decisions/ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md)
-- [ENH-034: Capture-pipeline command naming and grouping](ENH-034/ENH-034-specification.md) — **Status:** 🟡 Proposed — Governed by [ADR-058](../decisions/ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md)
+- [ENH-034: Capture-pipeline command naming and grouping](ENH-034/ENH-034-specification.md) — **Status:** 🟡 Proposed — GitHub #232. Governed by [ADR-058](../decisions/ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md)
 - [ENH-033: Repo-context auto-detection for `kmg-update-doc` / `kmg-create-doc`](ENH-033/ENH-033-specification.md) — **Status:** 🟡 Proposed — Governed by [ADR-056](../decisions/ADR-056-reject-plugin-split-for-contributor-only-doc-commands.md)
 - [ENH-032: Knowledge-Extractor Approval Gate Blocks Coordinator Relay](ENH-032/ENH-032-specification.md) — **Status:** ✅ Resolved in v0.6.15
 - [ENH-031: Init Completeness — Backfill, triggers.md, and CLAUDE.md Gaps](ENH-031/ENH-031-specification.md) — **Status:** ✅ Resolved in v0.6.15
@@ -54,7 +54,7 @@ Formal tracking of proposed and resolved enhancements for this project.
 - [ENH-029: Upgrade Inspector Preview Correctness](ENH-029/ENH-029-specification.md) — **Status:** ✅ Resolved in v0.6.7
 - [ENH-028: Mandatory STOP Gate for Existing-KG Branch in kmg-init](ENH-028/ENH-028-specification.md) — **Status:** ✅ Resolved in v0.6.6
 - [ENH-027: Superpowers Brainstorming Spec → KG Linkage](ENH-027/ENH-027-specification.md) — **Status:** Proposed
-- [ENH-026: KG Write Guard — Unguarded Command Class](ENH-026/ENH-026-specification.md) — **Status:** Proposed
+- [ENH-026: KG Write Guard — Unguarded Command Class](ENH-026/ENH-026-specification.md) — **Status:** Proposed — GitHub #233, blocked by #232 (ENH-034)
 - [ENH-025: Cross-Platform Knowledge Extractor (Backfill from Chat History)](ENH-025/ENH-025-specification.md) — **Status:** (status not set)
 - [ENH-024: Add Codex CLI Chat History Extraction Support](ENH-024/ENH-024-specification.md) — **Status:** (status not set)
 - [ENH-023: Extend pre-skill-rules-inject.sh to Cover Official Marketplace Skills](ENH-023/ENH-023-specification.md) — **Status:** (status not set)
