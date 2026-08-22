@@ -123,10 +123,16 @@ if [ $EXIT_CODE -eq 0 ]; then
 else
   fail "Second run should exit 0, got $EXIT_CODE"
 fi
-if [ -z "$OUTPUT" ]; then
-  pass "Second run produces no output (early exit)"
+# scripts/session-end-prompt.sh:16 installs an EXIT trap that always emits the
+# hook-protocol-required stub ({"hookSpecificOutput":...} for Claude Code,
+# {"decision":"continue"} for Codex) on every exit path, including early
+# no-op returns — Claude Code Stop hooks require this format. "No output" was
+# only ever true before that trap existed; check for the stub instead of
+# emptiness (accept either platform's stub so this stays portable to CI).
+if [ "$OUTPUT" = '{"hookSpecificOutput": {"hookEventName": "Stop"}}' ] || [ "$OUTPUT" = '{"decision": "continue"}' ]; then
+  pass "Second run produces only the required hook-protocol stub (early exit, no other output)"
 else
-  fail "Second run should produce no output (got: $OUTPUT)"
+  fail "Second run should produce only the hook-protocol stub (got: $OUTPUT)"
 fi
 
 echo ""
@@ -166,10 +172,10 @@ if [ $EXIT_CODE -eq 0 ]; then
 else
   fail "No config file — hook should exit 0, got $EXIT_CODE"
 fi
-if [ -z "$OUTPUT" ]; then
-  pass "No config file — no output (silent early exit)"
+if [ "$OUTPUT" = '{"hookSpecificOutput": {"hookEventName": "Stop"}}' ] || [ "$OUTPUT" = '{"decision": "continue"}' ]; then
+  pass "No config file — produces only the required hook-protocol stub (silent early exit otherwise)"
 else
-  fail "No config file — should produce no output (got: $OUTPUT)"
+  fail "No config file — should produce only the hook-protocol stub (got: $OUTPUT)"
 fi
 
 echo ""

@@ -82,7 +82,7 @@ Set `$requested_tier`:
 - Default path (session-summary-agent): `standard-tier`
 - `--delegate` path (session-documenter): `powerful-tier`
 
-Invoke `ai-model-tier-resolver` module (`commands/init-shared/ai-model-tier-resolver.md`) with `$requested_tier` and `{KG_PATH}`.
+Invoke `kmg-ai-model-tier-resolver` module (`commands/kmg-init-shared/kmg-ai-model-tier-resolver.md`) with `$requested_tier` and `{KG_PATH}`.
 
 On success: pass `--model [$resolved_model]` to the subagent invocation.
 

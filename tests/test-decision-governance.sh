@@ -25,44 +25,47 @@ echo "════════════════════════�
 echo ""
 echo "── Skill file existence ──"
 
-# Test 1: brainstorm-recall skill exists
-if [[ -f "$REPO_ROOT/skills/brainstorm-recall/SKILL.md" ]]; then
-  pass "Test 01: skills/brainstorm-recall/SKILL.md exists"
+# Test 1: kmg-brainstorm-recall skill exists
+if [[ -f "$REPO_ROOT/skills/kmg-brainstorm-recall/SKILL.md" ]]; then
+  pass "Test 01: skills/kmg-brainstorm-recall/SKILL.md exists"
 else
-  fail "Test 01: skills/brainstorm-recall/SKILL.md missing"
+  fail "Test 01: skills/kmg-brainstorm-recall/SKILL.md missing"
 fi
 
 echo ""
-echo "── brainstorm-recall content ──"
+echo "── kmg-brainstorm-recall content ──"
 
-BRAINSTORM="$REPO_ROOT/skills/brainstorm-recall/SKILL.md"
+BRAINSTORM="$REPO_ROOT/skills/kmg-brainstorm-recall/SKILL.md"
 
-# Test 2: brainstorm-recall contains required trigger keywords (5+)
+# Test 2: kmg-brainstorm-recall contains required trigger keywords (5+)
 KEYWORD_COUNT=$(grep -c -E "brainstorm|design|option|approach|alternative" "$BRAINSTORM" 2>/dev/null || echo 0)
 if [[ "$KEYWORD_COUNT" -ge 5 ]]; then
-  pass "Test 02: brainstorm-recall has 5+ trigger keywords ($KEYWORD_COUNT found)"
+  pass "Test 02: kmg-brainstorm-recall has 5+ trigger keywords ($KEYWORD_COUNT found)"
 else
-  fail "Test 02: brainstorm-recall has fewer than 5 trigger keywords ($KEYWORD_COUNT found)"
+  fail "Test 02: kmg-brainstorm-recall has fewer than 5 trigger keywords ($KEYWORD_COUNT found)"
 fi
 
-# Test 3: brainstorm-recall contains "Prior Art" heading reference
+# Test 3: kmg-brainstorm-recall contains "Prior Art" heading reference
 if grep -q "Prior Art" "$BRAINSTORM" 2>/dev/null; then
-  pass "Test 03: brainstorm-recall contains 'Prior Art' heading"
+  pass "Test 03: kmg-brainstorm-recall contains 'Prior Art' heading"
 else
-  fail "Test 03: brainstorm-recall missing 'Prior Art' heading"
+  fail "Test 03: kmg-brainstorm-recall missing 'Prior Art' heading"
 fi
 
-# Test 4: brainstorm-recall dispatches kmgraph:recall via Skill tool
-if grep -q "kmgraph:recall" "$BRAINSTORM" 2>/dev/null; then
-  pass "Test 04: brainstorm-recall dispatches kmgraph:recall skill"
+# Test 4: kmg-brainstorm-recall dispatches a real recall mechanism
+# (the old check required the literal string "kmgraph:recall" — itself the
+# exact dead skill reference issue-36 fixed elsewhere; that string being
+# ABSENT is now correct, so check for a real recall reference instead)
+if grep -qE "kmg-recall|kmg-auto-recall|kg_search" "$BRAINSTORM" 2>/dev/null; then
+  pass "Test 04: kmg-brainstorm-recall dispatches a real recall command/skill/tool"
 else
-  fail "Test 04: brainstorm-recall missing kmgraph:recall dispatch"
+  fail "Test 04: kmg-brainstorm-recall missing a real recall dispatch"
 fi
 
 echo ""
 echo "── adr-guide extensions ──"
 
-ADR_GUIDE="$REPO_ROOT/skills/adr-guide/SKILL.md"
+ADR_GUIDE="$REPO_ROOT/skills/kmg-adr-guide/SKILL.md"
 
 # Test 5: adr-guide contains "Project-wide cascade" text
 if grep -qi "project-wide cascade\|project.wide cascade" "$ADR_GUIDE" 2>/dev/null; then
@@ -86,22 +89,24 @@ else
 fi
 
 echo ""
-echo "── gov-execute-plan extensions ──"
+echo "── kmg-execute-plan extensions ──"
 
-GOV="$REPO_ROOT/skills/gov-execute-plan/SKILL.md"
+# gov-execute-plan was renamed kmg-execute-plan (dropped the "gov" segment
+# entirely, not just prefixed) — verified against the actual skills/ directory.
+GOV="$REPO_ROOT/skills/kmg-execute-plan/SKILL.md"
 
-# Test 8: gov-execute-plan contains In-Plan Cascade gate text
+# Test 8: kmg-execute-plan contains In-Plan Cascade gate text
 if grep -q "In-Plan Cascade" "$GOV" 2>/dev/null; then
-  pass "Test 08: gov-execute-plan contains 'In-Plan Cascade' gate"
+  pass "Test 08: kmg-execute-plan contains 'In-Plan Cascade' gate"
 else
-  fail "Test 08: gov-execute-plan missing 'In-Plan Cascade' gate"
+  fail "Test 08: kmg-execute-plan missing 'In-Plan Cascade' gate"
 fi
 
-# Test 9: gov-execute-plan checks for kmgraph-adr-captured flag
+# Test 9: kmg-execute-plan checks for kmgraph-adr-captured flag
 if grep -q "kmgraph-adr-captured" "$GOV" 2>/dev/null; then
-  pass "Test 09: gov-execute-plan references kmgraph-adr-captured flag"
+  pass "Test 09: kmg-execute-plan references kmgraph-adr-captured flag"
 else
-  fail "Test 09: gov-execute-plan missing kmgraph-adr-captured flag reference"
+  fail "Test 09: kmg-execute-plan missing kmgraph-adr-captured flag reference"
 fi
 
 # Test 10: adr-guide touches kmgraph-adr-captured flag
@@ -159,12 +164,15 @@ else
   fail "Test 14: systematic-debugging missing Debug Recall HARD BLOCK"
 fi
 
-# Test 15: requesting-code-review injects Review Context Injection HARD BLOCK
+# Test 15: requesting-code-review injects the Review Audit Protocol HARD BLOCK
+# (renamed from "Review Context Injection" — verified against the hook's
+# actual review-request branch, which now also covers the full post-plan/
+# pre-push audit flow, not just context injection).
 OUTPUT_REVIEW=$(HOME="$TEST_DIR" echo '{"tool_input":{"skill":"superpowers:requesting-code-review"}}' | bash "$HOOK" 2>/dev/null || true)
-if echo "$OUTPUT_REVIEW" | grep -q "Review Context Injection (HARD BLOCK"; then
-  pass "Test 15: requesting-code-review injects Review Context Injection HARD BLOCK"
+if echo "$OUTPUT_REVIEW" | grep -q "Review Audit Protocol (HARD BLOCK"; then
+  pass "Test 15: requesting-code-review injects Review Audit Protocol HARD BLOCK"
 else
-  fail "Test 15: requesting-code-review missing Review Context Injection HARD BLOCK"
+  fail "Test 15: requesting-code-review missing Review Audit Protocol HARD BLOCK"
 fi
 
 # Test 16: execution branch contains ADR flag check (structural — already covered by Test 13 runtime behavior)
@@ -191,8 +199,10 @@ else
   fail "Test 18: planning branch missing Plan Recall HARD BLOCK"
 fi
 
-# ── Test 19: plan-rules.md (or rules.md fallback) contains plan-mode recall directive
-PLAN_RULES_TARGET="$HOME/.kmgraph/plan-rules.md"
+# ── Test 19: plan-execution-rules.md (or rules.md fallback) contains plan-mode recall directive
+# The directive lives in plan-execution-rules.md, not plan-rules.md (which
+# doesn't exist) — verified against the actual ~/.kmgraph/ dotfile layout.
+PLAN_RULES_TARGET="$HOME/.kmgraph/plan-execution-rules.md"
 [ -f "$PLAN_RULES_TARGET" ] || PLAN_RULES_TARGET="$HOME/.kmgraph/rules.md"
 if [ -f "$PLAN_RULES_TARGET" ] && grep -q "Recall in Plan Mode" "$PLAN_RULES_TARGET"; then
   pass "Test 19: $(basename $PLAN_RULES_TARGET) contains Recall in Plan Mode directive"

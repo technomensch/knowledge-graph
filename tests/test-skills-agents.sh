@@ -30,22 +30,27 @@ echo ""
 
 echo "── Skills ──────────────────────────────────────────────────────"
 
+# Skills were migrated to the kmg- prefix convention (see CLAUDE.md).
+# gov-execute-plan/gov-plan-gate dropped the "gov" segment entirely
+# (kmg-execute-plan, kmg-plan-gate) rather than following the simple
+# prefix pattern — verified against the actual skills/ directory.
 EXPECTED_SKILLS=(
-  "lesson-capture"
-  "kg-recall"
-  "session-wrap"
-  "adr-guide"
-  "gov-execute-plan"
-  "gov-plan-gate"
-  "knowledge-graph-usage"
-  "capture-router"
-  "doc-update-router"
-  "docs-impact-scan"
-  "rules-capture"
-  "sidebar-update"
-  "stuck-work-escalation"
-  "update-profile"
-  "brainstorm-recall"
+  "kmg-lesson-capture"
+  "kmg-auto-recall"
+  "kmg-session-wrap"
+  "kmg-adr-guide"
+  "kmg-execute-plan"
+  "kmg-plan-gate"
+  "kmg-knowledge-graph-usage"
+  "kmg-capture-router"
+  "kmg-doc-update-router"
+  "kmg-docs-impact-scan"
+  "kmg-rules-capture"
+  "kmg-sidebar-update"
+  "kmg-stuck-work-escalation"
+  "kmg-update-profile"
+  "kmg-brainstorm-recall"
+  "kmg-paperwork-audit"
 )
 
 # Test 1: Skills directory exists
@@ -68,17 +73,17 @@ if [ -n "$SKILLS_DIR" ]; then
     fi
   done
   if [ $MISSING_SKILLS -eq 0 ]; then
-    pass "All 15 skill directories present"
+    pass "All 16 skill directories present"
   else
     fail "$MISSING_SKILLS skill director(ies) missing"
   fi
 
-  # Test 3: Exact count is 14
+  # Test 3: Exact count is 16
   ACTUAL_COUNT=$(find "$SKILLS_DIR" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')
-  if [ "$ACTUAL_COUNT" -eq 15 ]; then
-    pass "Exact skill count is 15"
+  if [ "$ACTUAL_COUNT" -eq 16 ]; then
+    pass "Exact skill count is 16"
   else
-    fail "Skill count is $ACTUAL_COUNT (expected 15)"
+    fail "Skill count is $ACTUAL_COUNT (expected 16)"
   fi
 
   # Test 4: No empty skill directories
@@ -110,52 +115,56 @@ if [ -n "$SKILLS_DIR" ]; then
   echo ""
   echo "── Skill content checks ────────────────────────────────────────"
 
-  # Test 6: lesson-capture references /kmgraph:kmg-capture-lesson
-  if [ -d "$SKILLS_DIR/lesson-capture" ]; then
-    CONTENT=$(cat "$SKILLS_DIR/lesson-capture"/* 2>/dev/null)
+  # Test 6: kmg-lesson-capture references /kmgraph:kmg-capture-lesson
+  if [ -d "$SKILLS_DIR/kmg-lesson-capture" ]; then
+    CONTENT=$(cat "$SKILLS_DIR/kmg-lesson-capture"/* 2>/dev/null)
     if echo "$CONTENT" | grep -q "kmg-capture-lesson\|kmgraph"; then
-      pass "lesson-capture skill references /kmgraph:kmg-capture-lesson"
+      pass "kmg-lesson-capture skill references /kmgraph:kmg-capture-lesson"
     else
-      fail "lesson-capture skill should reference kmg-capture-lesson command"
+      fail "kmg-lesson-capture skill should reference kmg-capture-lesson command"
     fi
   else
-    fail "lesson-capture skill directory not found"
+    fail "kmg-lesson-capture skill directory not found"
   fi
 
-  # Test 7: kg-recall references recall or kg_search
-  if [ -d "$SKILLS_DIR/kg-recall" ]; then
-    CONTENT=$(cat "$SKILLS_DIR/kg-recall"/* 2>/dev/null)
+  # Test 7: kmg-auto-recall references recall or kg_search
+  if [ -d "$SKILLS_DIR/kmg-auto-recall" ]; then
+    CONTENT=$(cat "$SKILLS_DIR/kmg-auto-recall"/* 2>/dev/null)
     if echo "$CONTENT" | grep -qE "recall|kg_search|kmgraph"; then
-      pass "kg-recall skill references recall command or kg_search tool"
+      pass "kmg-auto-recall skill references recall command or kg_search tool"
     else
-      fail "kg-recall skill should reference recall or kg_search"
+      fail "kmg-auto-recall skill should reference recall or kg_search"
     fi
   else
-    fail "kg-recall skill directory not found"
+    fail "kmg-auto-recall skill directory not found"
   fi
 
-  # Test 8: session-wrap references /kmgraph:kmg-session-summary
-  if [ -d "$SKILLS_DIR/session-wrap" ]; then
-    CONTENT=$(cat "$SKILLS_DIR/session-wrap"/* 2>/dev/null)
-    if echo "$CONTENT" | grep -q "kmg-session-summary\|kmgraph"; then
-      pass "session-wrap skill references /kmgraph:kmg-session-summary"
+  # Test 8: kmg-session-wrap dispatches session-summary
+  # This skill deliberately dispatches straight to `session-summary-agent`
+  # rather than the /kmgraph:kmg-session-summary command (see its own
+  # "User-Facing Language Rules": don't volunteer internal command/agent
+  # names unprompted) — so check for either mechanism, not just the command.
+  if [ -d "$SKILLS_DIR/kmg-session-wrap" ]; then
+    CONTENT=$(cat "$SKILLS_DIR/kmg-session-wrap"/* 2>/dev/null)
+    if echo "$CONTENT" | grep -q "kmg-session-summary\|kmgraph\|session-summary-agent"; then
+      pass "kmg-session-wrap skill references session-summary (command or agent)"
     else
-      fail "session-wrap skill should reference kmg-session-summary command"
+      fail "kmg-session-wrap skill should reference session-summary (command or agent)"
     fi
   else
-    fail "session-wrap skill directory not found"
+    fail "kmg-session-wrap skill directory not found"
   fi
 
-  # Test 9: adr-guide references /kmgraph:kmg-create-adr
-  if [ -d "$SKILLS_DIR/adr-guide" ]; then
-    CONTENT=$(cat "$SKILLS_DIR/adr-guide"/* 2>/dev/null)
+  # Test 9: kmg-adr-guide references /kmgraph:kmg-create-adr
+  if [ -d "$SKILLS_DIR/kmg-adr-guide" ]; then
+    CONTENT=$(cat "$SKILLS_DIR/kmg-adr-guide"/* 2>/dev/null)
     if echo "$CONTENT" | grep -q "kmg-create-adr\|kmgraph"; then
-      pass "adr-guide skill references /kmgraph:kmg-create-adr"
+      pass "kmg-adr-guide skill references /kmgraph:kmg-create-adr"
     else
-      fail "adr-guide skill should reference kmg-create-adr command"
+      fail "kmg-adr-guide skill should reference kmg-create-adr command"
     fi
   else
-    fail "adr-guide skill directory not found"
+    fail "kmg-adr-guide skill directory not found"
   fi
 
 fi  # end if SKILLS_DIR
@@ -268,13 +277,17 @@ else
   fail "session-documenter.md not found"
 fi
 
-# Test 17: knowledge-reviewer references sonnet model
+# Test 17: knowledge-reviewer does not hardcode a model name
+# Model tier selection moved to the ai-model-tier-resolver module, invoked by
+# the dispatching command (see test-dispatcher-tier-refactor.sh) — agent files
+# no longer declare their own model/tier inline, so this now checks the
+# absence of a hardcoded model string rather than the presence of "sonnet".
 if [ -f "$AGENTS_DIR/knowledge-reviewer.md" ]; then
   CONTENT=$(cat "$AGENTS_DIR/knowledge-reviewer.md")
-  if echo "$CONTENT" | grep -qi "sonnet"; then
-    pass "knowledge-reviewer references sonnet model"
+  if echo "$CONTENT" | grep -qiE "claude-(opus|sonnet|haiku)-[0-9]"; then
+    fail "knowledge-reviewer.md hardcodes a model name (should defer to the tier resolver)"
   else
-    fail "knowledge-reviewer should specify sonnet model"
+    pass "knowledge-reviewer.md does not hardcode a model name (tier resolved by dispatcher)"
   fi
 else
   fail "knowledge-reviewer.md not found"

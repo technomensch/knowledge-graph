@@ -120,7 +120,7 @@ Added per explicit user direction ("this type of change should be handled by the
 | New opt-in `kg_upgrade` category | `tests/upgrade.test.ts` → "upgrade category: stale-fts5-index-format (issue-55)" (5 tests) |
 | Both `commands/` guards still detect a current-format index | Both widened to `{kg_name}.db` OR `{kg_name}-*.db` |
 | Jest suite passes | 41 suites / 523 tests green |
-| `test-mcp-tools.sh` passes without manual cleanup | 27/27 — **including with a stale old-format `~/.kmgraph/index/projects/test-kg.db` deliberately re-planted**, which is the exact file whose deletion previously took the suite from 25/27 to 27/27. This proves the fix rather than a workaround. |
+| `test-mcp-tools.sh` passes without manual cleanup | 27/27. **Correction (2026-08-22, post-review):** an earlier version of this row claimed re-planting the stale `~/.kmgraph/index/projects/test-kg.db` file and getting 27/27 "proves the fix" — that's wrong. This suite now exports `KG_INDEX_DIR` (its own sandboxing addition below), so it no longer consults the real `~/.kmgraph/index/projects/` at all; a file planted there has no effect on the outcome, fix or no fix. The 27/27 here demonstrates the suite is properly sandboxed (a real, separate virtue), not that the path-keying fix works. The actual proof is `mcp-server/tests/search.test.ts`'s two `handleSearch()`-level regression tests below, which exercise two same-named KGs at different paths through the real defective call path. |
 | `run-all-tests.sh` full suite passes | All green |
 | `CHANGELOG.md` entry | Added under `[0.7.4]` (Added + Changed + Fixed) |
 

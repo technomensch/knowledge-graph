@@ -82,7 +82,7 @@ Detect which flags the user passed:
 
 #### Tier resolution
 
-Set `$requested_tier` = `standard-tier`. Invoke `ai-model-tier-resolver` module (`commands/init-shared/ai-model-tier-resolver.md`) with `$requested_tier` and `{KG_PATH}`. On success: pass `--model [$resolved_model]` to each subagent invocation.
+Set `$requested_tier` = `standard-tier`. Invoke `kmg-ai-model-tier-resolver` module (`commands/kmg-init-shared/kmg-ai-model-tier-resolver.md`) with `$requested_tier` and `{KG_PATH}`. On success: pass `--model [$resolved_model]` to each subagent invocation.
 
 Spawn the `sync-all-agent` subagent with parsed flags:
 

@@ -6,7 +6,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-RESOLVER="$REPO_ROOT/commands/init-shared/ai-model-tier-resolver.md"
+RESOLVER="$REPO_ROOT/commands/kmg-init-shared/kmg-ai-model-tier-resolver.md"
 FIXTURE_DIR="$REPO_ROOT/tests/fixtures/tier-resolver"
 
 PASS=0

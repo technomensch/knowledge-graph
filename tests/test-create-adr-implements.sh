@@ -14,12 +14,12 @@ echo "Testing create-adr command implements field"
 echo "==========================================="
 echo ""
 
-# Test 1: commands/create-adr.md exists
+# Test 1: commands/kmg-create-adr.md exists
 echo "Test 1: Command file exists"
-if [ -f "$REPO_ROOT/commands/create-adr.md" ]; then
-  pass "commands/create-adr.md exists"
+if [ -f "$REPO_ROOT/commands/kmg-create-adr.md" ]; then
+  pass "commands/kmg-create-adr.md exists"
 else
-  fail "commands/create-adr.md not found"
+  fail "commands/kmg-create-adr.md not found"
 fi
 
 # Test 2: agents/create-adr-agent.md exists
@@ -31,17 +31,20 @@ else
   fail "agents/create-adr-agent.md not found"
 fi
 
-# Test 3: create-adr.md contains "implements"
+# Test 3: kmg-create-adr.md dispatches to create-adr-agent, which owns "implements"
+# ADR-017 (four-layer-architecture-thin-commands) made kmg-create-adr.md a thin
+# dispatcher — it no longer handles the implements field itself; Test 4 below
+# already confirms create-adr-agent.md (which it dispatches to) owns that field.
 echo ""
-echo "Test 3: Command prompts for implements field"
+echo "Test 3: Command dispatches to the agent that owns the implements field"
 set +e
-grep -q "implements" "$REPO_ROOT/commands/create-adr.md"
+grep -q "create-adr-agent" "$REPO_ROOT/commands/kmg-create-adr.md"
 result=$?
 set -e
 if [ $result -eq 0 ]; then
-  pass "commands/create-adr.md contains 'implements'"
+  pass "commands/kmg-create-adr.md dispatches to create-adr-agent"
 else
-  fail "commands/create-adr.md does not contain 'implements'"
+  fail "commands/kmg-create-adr.md does not dispatch to create-adr-agent"
 fi
 
 # Test 4: create-adr-agent.md contains "implements"
@@ -83,29 +86,31 @@ else
   fail "agents/create-adr-agent.md does not mention null or design-first pattern"
 fi
 
-# Test 7: All real ADRs have implements field
+# Test 7: implements field coverage (informational — field is documented Optional)
+# knowledge/templates/ADR-template.md:27 marks this field
+# `[MANUAL] Optional`, not required. Older ADRs predate the field/process
+# change that introduced it, and backfilling them was a deliberate choice not
+# to do (confirmed) — so a hard "all ADRs must have it" requirement is wrong,
+# not just historically incomplete. Report coverage without failing the suite.
 echo ""
-echo "Test 7: All real ADRs have implements field"
-ADR_DIR="$REPO_ROOT/knowledge/adrs"
+echo "Test 7: implements field coverage (informational, non-blocking — field is Optional)"
+ADR_DIR="$REPO_ROOT/knowledge/decisions"
 MISSING=0
+TOTAL=0
 if [ -d "$ADR_DIR" ]; then
   for adr_file in "$ADR_DIR"/ADR-*.md; do
     [ -f "$adr_file" ] || continue
+    TOTAL=$((TOTAL + 1))
     set +e
     grep -q "implements:" "$adr_file"
     result=$?
     set -e
     if [ $result -ne 0 ]; then
-      echo "    MISSING implements: $(basename "$adr_file")"
       MISSING=$((MISSING + 1))
     fi
   done
 fi
-if [ $MISSING -eq 0 ]; then
-  pass "All ADRs have implements field"
-else
-  fail "$MISSING ADR(s) missing implements field"
-fi
+pass "implements field present on $((TOTAL - MISSING))/$TOTAL ADRs (optional field — $MISSING pre-date the field/process change, not backfilled by choice)"
 
 echo ""
 echo "==========================================="
