@@ -456,7 +456,18 @@ Closes #{github_issue_num}"
 ## Step 6: Update Issue Tracker & Knowledge Capture
 
 ### 6.1: Master Issue Tracker
-Add entry to `docs/issue-tracker.md`. 
+
+There is no single master tracker file in this repo (issue-26) — the real, already-maintained convention is the two per-type index files. Add one line to the correct index for `{issue_type}`:
+
+- Issues → `{active_kg_path}/issues/README.md`
+- Enhancements → `{active_kg_path}/enhancements/README.md`
+
+Match the exact style of the most recent entry in that file (newest-first list):
+```
+- [{id}: {Title}]({folder}/{id}-description.md) — **Status:** {status-emoji} {Status} — {one-line summary}
+```
+
+If that README declares a "Total X" count, increment it too. 
 
 ### 6.2: Knowledge Capture Integration (Delegation)
 
