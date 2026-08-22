@@ -229,7 +229,7 @@ Before writing any plan:
 Do not skip recall — plans built without prior context repeat solved problems or contradict existing decisions.
 NOTE: this fires at skill invocation, before the interview. You MUST re-confirm recall was run before writing the FIRST PLAN TASK, not just before the interview begins.
 If recall returns zero results: do NOT treat as "no prior art." Output "Recall returned nothing for '"'"'<query>'"'"' — MCP server availability unconfirmed. Expand vocabulary or verify MCP before proceeding."
-If you cannot invoke recall at all (Skill tool unavailable, MCP down):
+If you cannot invoke recall at all (recall unavailable, MCP down):
   DO NOT proceed as if the step succeeded.
   DO NOT fabricate a "no results" response.
   Output: "RECALL BLOCKED — [reason]. Proceeding without prior art check. User should verify manually."

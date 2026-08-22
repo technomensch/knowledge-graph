@@ -9,6 +9,14 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.4] — 2026-08-22
+
+### Fixed
+
+- **`kmg-start-issue-tracking.md` pointed at a dead `docs/issue-tracker.md` reference** — corrected to point at the real issue/ENH indexes (`knowledge/issues/README.md`, `knowledge/enhancements/README.md`). Closes issue-26.
+- **`kmg-handoff` wrote to the stale pre-migration `./handoff-packages/` path and never generated a missing session summary** — Step 1's default output directory corrected to `knowledge/handoffs/YYYY-MM-DD/`, and the command now auto-invokes `session-summary-agent` when no summary exists for the day instead of shipping an incomplete package. Closes issue-30, issue-31.
+- **Hook-injected instructions referenced `kmgraph:recall`, a skill name that doesn't exist** — replaced with the real `/kmgraph:kmg-recall` command across `scripts/pre-skill-rules-inject.sh` (4 sites) and `scripts/recommendation-gate.sh` (1 site), plus 6 same-class references in dotfiles outside the repo. Closes issue-36.
+
 ## [0.7.3] — 2026-08-20
 
 ### Changed

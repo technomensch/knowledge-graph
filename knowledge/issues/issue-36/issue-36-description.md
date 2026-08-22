@@ -59,7 +59,7 @@ Both live plugin-cache copies of this script are also still stale and uncorrecte
 
 **Scope note for whoever picks this up:** `scripts/pre-skill-rules-inject.sh` is real project code (checked into this repo), not a personal-dotfile fix like the rest of this issue — a real branching decision, since it's unrelated to any in-progress feature branch. Currently sitting uncommitted on `v0.7.0` (the ADR-067 branch) purely as an artifact of when this was investigated — recommend NOT bundling it into that branch, since it's unrelated to KG resolution.
 
-To reach SATISFIED: fix all 4 `pre-skill-rules-inject.sh` occurrences + resync both plugin-cache copies, plus the 4 additional same-class references above.
+To reach SATISFIED: fix all 4 `pre-skill-rules-inject.sh` occurrences + resync both plugin-cache copies, plus the 4 additional same-class references above. (Superseded — see Resolution below: actually 5 sites + 6 references.)
 
 ## Related
 

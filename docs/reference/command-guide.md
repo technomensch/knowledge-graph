@@ -1081,7 +1081,7 @@ Operational state (current branch, open issues, in-progress work) lives in the l
 ```
 ✅ Handoff package created!
 
-Location: ./handoff-packages/2026-06-09
+Location: knowledge/handoffs/2026-06-09
 
 Files:
 - START-HERE.md               — 8 lines
@@ -1094,7 +1094,7 @@ Reading time: ~20 minutes for complete orientation
 
 **Tips**:
 
-- Creates dated directory: `handoff-packages/YYYY-MM-DD/` by default
+- Creates dated directory: `knowledge/handoffs/YYYY-MM-DD/` by default
 - START-HERE.md auto-detects today's session summary and sets `continues_from` — run `/kmgraph:kmg-session-summary` first for best results
 - Files can be shared via zip or archived for future reference
 

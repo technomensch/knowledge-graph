@@ -275,6 +275,78 @@ set -e
 rm -f "$DECOY_FILE"
 [ "$RESULT" -eq 0 ] && pass "decoy file at REPO_ROOT doesn't suppress the PKG_ROOT fallback → exit 0" || fail "decoy-file-on-disk → expected exit 0, got $RESULT ($RESULT_OUTPUT)"
 
+# ── Test 9: knowledge/handoffs/ (current default output_dir per
+# commands/kmg-handoff.md) — same cross-checkout gap as Test 6, but for the
+# new path pattern: a package generated in one checkout that hasn't been
+# committed yet doesn't exist under a REPO_ROOT resolved from a different
+# worktree. Confirms the generalized PKG_ROOT match (final-review cleanup
+# for issue-31's path migration) covers knowledge/handoffs/ the same way it
+# already covered the legacy handoff-packages/ path. ───────────────────────
+FIXTURE_REPO3="$TEST_DIR/fixture-repo3"
+WORKTREE_DIR3="$TEST_DIR/fixture-worktree3"
+git init -q "$FIXTURE_REPO3"
+git -C "$FIXTURE_REPO3" -c user.email=test@test -c user.name=test commit -q --allow-empty -m init
+git -C "$FIXTURE_REPO3" worktree add -q -b test-worktree-branch3 "$WORKTREE_DIR3" > /dev/null 2>&1
+
+mkdir -p "$FIXTURE_REPO3/knowledge/handoffs/2026-08-10"
+MAIN_LINKED_FILE3="$FIXTURE_REPO3/knowledge/handoffs/2026-08-10/DOCUMENTATION-MAP.md"
+touch "$MAIN_LINKED_FILE3"
+MAIN_STARTHERE3="$FIXTURE_REPO3/knowledge/handoffs/2026-08-10/START-HERE.md"
+cat > "$MAIN_STARTHERE3" << 'MDEOF'
+# Start Here — Project Handoff
+
+<!-- kmgraph-handoff-manifest
+```json
+["./knowledge/handoffs/2026-08-10/DOCUMENTATION-MAP.md"]
+```
+-->
+MDEOF
+
+# Confirm the fixture actually reproduces the real-world condition: the
+# worktree must NOT have the uncommitted package checked out.
+if [ -e "$WORKTREE_DIR3/knowledge/handoffs" ]; then
+  fail "test 9 fixture invalid: knowledge/handoffs/ unexpectedly present in worktree"
+fi
+
+KH_TRANSCRIPT="$TEST_DIR/kh-transcript.jsonl"
+cat > "$KH_TRANSCRIPT" << EOF
+$(read_entry "$MAIN_STARTHERE3")
+$(read_entry "$MAIN_LINKED_FILE3")
+EOF
+KH_INPUT="{\"session_id\": \"test-session-$$\", \"transcript_path\": \"${KH_TRANSCRIPT}\", \"cwd\": \"${WORKTREE_DIR3}\"}"
+
+set +e
+RESULT_OUTPUT=$(echo "$KH_INPUT" | bash "$HOOK" 2>&1)
+RESULT=$?
+set -e
+[ "$RESULT" -eq 0 ] && pass "knowledge/handoffs/ package generated in main, read from worktree → exit 0" || fail "knowledge/handoffs/ fallback → expected exit 0, got $RESULT ($RESULT_OUTPUT)"
+
+# ── Test 10: negative twin of Test 9 — the knowledge/handoffs/ fallback must
+# not mask a genuinely unopened file either. Same fixture, manifest also
+# names a second file that was never Read anywhere → still exit 2, still
+# named. ─────────────────────────────────────────────────────────────────
+cat > "$MAIN_STARTHERE3" << 'MDEOF'
+# Start Here — Project Handoff
+
+<!-- kmgraph-handoff-manifest
+```json
+["./knowledge/handoffs/2026-08-10/DOCUMENTATION-MAP.md", "./knowledge/handoffs/2026-08-10/NEVER-READ.md"]
+```
+-->
+MDEOF
+
+cat > "$KH_TRANSCRIPT" << EOF
+$(read_entry "$MAIN_STARTHERE3")
+$(read_entry "$MAIN_LINKED_FILE3")
+EOF
+
+set +e
+RESULT_OUTPUT=$(echo "$KH_INPUT" | bash "$HOOK" 2>&1)
+RESULT=$?
+set -e
+[ "$RESULT" -eq 2 ] && pass "knowledge/handoffs/ fallback doesn't mask a genuinely unopened file → exit 2" || fail "expected exit 2 for unopened file, got $RESULT ($RESULT_OUTPUT)"
+echo "$RESULT_OUTPUT" | grep -q "NEVER-READ.md" && pass "block message names the genuinely-missing file" || fail "block message should name NEVER-READ.md"
+
 echo ""
 echo "═══════════════════════════════════════════════════════════════"
 echo "RESULTS: $PASS passed, $FAIL failed"
