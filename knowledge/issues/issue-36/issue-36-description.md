@@ -2,7 +2,7 @@
 id: issue-36
 type: Bug
 status: tracked
-github-issue: none
+github-issue: "#237"
 branch: none
 created: 2026-07-31
 related_issues: ["issue-17", "issue-18", "issue-33"]

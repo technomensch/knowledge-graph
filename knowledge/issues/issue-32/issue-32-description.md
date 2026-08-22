@@ -2,7 +2,7 @@
 id: issue-32
 type: Bug
 status: tracked
-github-issue: none
+github-issue: "#236"
 branch: v0.7.0
 created: 2026-07-28
 related_adrs: ["ADR-054", "ADR-055", "ADR-067"]

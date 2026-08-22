@@ -2,7 +2,7 @@
 id: issue-41
 type: Enhancement
 status: in-progress
-github-issue: pending
+github-issue: "#239"
 branch: none
 created: 2026-08-03
 related-issues: [issue-18, issue-40]
