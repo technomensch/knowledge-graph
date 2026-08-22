@@ -92,3 +92,7 @@ Same broader class as this issue, but a genuinely separate concrete mechanism �
 duplicate filing.
 
 A third instance of the general "skill trigger vocabulary misses real phrasing" class — different skill again — is [ENH-055](../../enhancements/ENH-055/ENH-055-specification.md) (GH #210), `kmg-capture-router` missing "future idea" phrasing. Cross-linked 2026-08-22; not a duplicate, but any generalized trigger-vocabulary fix should probably cover both.
+
+## Related
+
+- [issue-36](../issue-36/issue-36-description.md) — same class: automatic trigger vocabulary that doesn't actually fire (stale `kmgraph:recall` skill-name references live in `scripts/pre-skill-rules-inject.sh`), a separate concrete instance of this issue's broader pattern.

@@ -36,3 +36,4 @@ practice; don't design speculatively ahead of that.
 
 - ADR-067 (`knowledge/decisions/ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md`) — the KG resolution model this would eventually need to slot into
 - `docs/specs/2026-07-26-adr-067-kg-resolution-v0.7-spec.md` — the v0.7 spec this was descoped out of
+- issue-30 (`knowledge/issues/issue-30/issue-30-description.md`) — cited this ENH's lightweight, deferred "write it down" capture precedent (no branch/PR overhead) when scoping its own `kmg-handoff`/`kmg-session-wrap` fix

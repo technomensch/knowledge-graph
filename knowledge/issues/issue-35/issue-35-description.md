@@ -44,6 +44,10 @@ Captured live, lightweight, local-only — track only, no plan, no branch. Secon
 - `ADR-066` (`knowledge/decisions/ADR-066-kg-content-storage-location-for-global-and-cowork-modes.md`) — § "Post-Implementation Gap," root cause shared with issue-31
 - `mcp-server/src/tools/fts5.ts` (`rebuildIndex`, `contentDirs`)
 - `mcp-server/src/tools/search.ts` (fallback `searchDirs`)
+- [issue-55](../issue-55/issue-55-description.md) — later FTS5 bug in the same subsystem:
+  project-local index path keyed only by KG name, causing cross-repo index collisions;
+  confirmed this issue's dead-`"knowledge"`-literal fix still intact while investigating,
+  different defect.
 
 ## Fix Plan (C2, branch v0.7.0)
 

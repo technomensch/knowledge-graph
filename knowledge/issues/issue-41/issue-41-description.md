@@ -330,3 +330,6 @@ rebuilt, `tests/test-mcp-edge-cases.sh` re-run to close out the "known accepted 
 - [issue-29](../issue-29/issue-29-description.md) — its resolution note cites this issue's
   Phase 7.2 migration-completeness work when explaining why the `kg-config.json`/`.active`
   mechanism its own originally-proposed fix depended on is retired. Backlinked 2026-08-22.
+- [issue-55](../issue-55/issue-55-description.md) — a related but distinct collision class in
+  the same registry neighborhood: FTS5 *index files* colliding by KG name, rather than this
+  issue's graph *entries* colliding.

@@ -45,6 +45,9 @@ Captured live, lightweight, local-only — track only, no plan, no branch. Direc
 - [issue-18](../issue-18/issue-18-description.md) — cites this issue as the reason its own
   recall sweep searched `issues/`/`enhancements/` via direct grep instead of `kg_search`
   (FTS5 didn't cover those directories at the time). Backlinked 2026-08-19.
+- [issue-55](../issue-55/issue-55-description.md) — later FTS5 bug in the same subsystem:
+  project-local index path keyed only by KG name, causing cross-repo index collisions;
+  confirmed this issue's `contentDirs` fix still intact while investigating, different defect.
 
 ## Fix Plan (C2, branch v0.7.0)
 

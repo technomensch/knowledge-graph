@@ -33,6 +33,7 @@ This is a code-staleness problem (is the running process current with what's ins
 - **`knowledge/decisions/ADR-054-document-cache-clear-upgrade-workaround.md`** — the origin of this whole thread. Accepted a manual `rm -rf` cache-clear as the *interim* upgrade path (2026-03-03), and explicitly deferred an automated hook-based version check "to the next release cycle." That deferred idea became ADR-055's sentinel mechanism; this issue is the layer beyond both — the sentinel now exists and correctly detects disk-state staleness, but neither ADR-054's manual workaround nor ADR-055's sentinel addresses an *already-running process* silently continuing to serve pre-upgrade code. Same underlying "efficient upgrade pipeline" problem, three successive layers.
 - `knowledge/decisions/ADR-055-cross-platform-upgrade-triggering-version-sentinel-over-startup-notification.md` — § Known Gap (full detail, repro, and rationale already recorded there as of 2026-07-28)
 - `knowledge/decisions/ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md` — § Fable Review Findings item 9 (where this was originally caught, then redirected here as out of that ADR's scope)
+- [issue-36](../issue-36/issue-36-description.md) — its resolution deliberately left version-pinned plugin-cache copies of `pre-skill-rules-inject.sh`/`recommendation-gate.sh` untouched, deferring to this issue's already-tracked scope for stale version-pinned processes.
 
 ## Cross-platform research (2026-08-01, corrected 2026-08-01 after independent Opus review)
 

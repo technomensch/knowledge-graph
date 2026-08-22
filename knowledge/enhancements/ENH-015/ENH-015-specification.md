@@ -228,3 +228,7 @@ See: `knowledge/enhancements/ENH-020/ENH-020-specification.md`
 - Replacing `superpowers:brainstorming` — brainstorm-recall works alongside it
 - Multi-platform skill name collision risk: **addressed in v0.6.0** via `kmg-` prefix normalization (all skill/command names prefixed — bare-name collision eliminated).
 - Pure conversational planning enforcement: when a model answers a planning question WITHOUT invoking any skill at all, no hook fires. This is an architecture-level limitation — hooks only fire on Skill tool invocations.
+
+## Related
+
+- [ENH-023](../ENH-023/ENH-023-specification.md) — extends the `pre-skill-rules-inject.sh` hard-block pattern this ENH established (via ADR-043) to cover official marketplace skills (e.g. `code-review:code-review`) beyond `superpowers:*`.

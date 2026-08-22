@@ -130,6 +130,7 @@ Added per explicit user direction ("this type of change should be handled by the
 - issue-41 (`knowledge/issues/issue-41/`) — different worktree-registration collision class in the same registry, related but distinct (graph *entries* colliding, not FTS5 *index files*).
 - issue-15 (`knowledge/issues/issue-15/`) — earlier FTS5 bug: personal-KG index built in the wrong bucket (`kgType` defaulting). Resolved. Same subsystem (`fts5.ts`), different defect.
 - issue-34 / issue-35 (`knowledge/issues/issue-34/`, `knowledge/issues/issue-35/`) — earlier FTS5 directory-scope bugs (missing `issues`/`enhancements` dirs; dead `"knowledge"` path literal). Both resolved, both confirmed still fixed in current source (`contentDirs`/`searchDirs` checked directly). Same subsystem, different defect.
+- [issue-56](../issue-56/issue-56-description.md) — mirrored this issue's `kg_upgrade` category pattern (`stale-fts5-index-format`) to add an equivalent category (`stale-handoff-packages-location`) for a different stale-location gap (issue-31's handoff-packages path change).
 
 ## Status
 

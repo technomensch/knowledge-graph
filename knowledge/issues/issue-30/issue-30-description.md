@@ -33,6 +33,9 @@ Captured live, lightweight — not run through the full `kmg-start-issue-trackin
 - [issue-31](../issue-31/issue-31-description.md) — also touches `commands/kmg-handoff.md`
   directly (its stale pre-migration output-path bug); non-conflicting, additive fixes —
   good single-PR candidate alongside this issue.
+- [issue-56](../issue-56/issue-56-description.md) — added the missing `kg_upgrade` category
+  and `CHANGELOG.md` disclosure that this issue's batched `[0.7.4]` PR (with issue-31) was
+  missing for the `kmg-handoff.md` output-path change.
 
 ## Resolution (2026-08-22)
 

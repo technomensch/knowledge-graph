@@ -113,6 +113,9 @@ hardcodes the old path.
   [issue-30](../issue-30/issue-30-description.md) both touch `commands/kmg-handoff.md`
   directly (this issue's path bug, issue-30's missing session-summary auto-invoke) —
   non-conflicting, good single-PR candidate.
+- [issue-56](../issue-56/issue-56-description.md) — added the missing `kg_upgrade` category
+  (`stale-handoff-packages-location`) and disclosure for the 17 stray `./handoff-packages/*`
+  directories this issue's fix left behind undetected.
 
 ## Resolution (2026-08-22)
 
