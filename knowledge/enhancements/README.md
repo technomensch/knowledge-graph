@@ -4,13 +4,14 @@
 
 Formal tracking of proposed and resolved enhancements for this project.
 
-**Total ENHs:** 55
-**Last Updated:** 2026-08-04
+**Total ENHs:** 56
+**Last Updated:** 2026-08-22
 
 ---
 
 ## Open ENHs
 
+- [ENH-062: Track issue/ADR/ENH relationships (blocked-by, related-to, depends-on) in local KG metadata](ENH-062/ENH-062-specification.md) — **Status:** 🟡 Proposed — GitHub #241. Formalizes this session's manual GitHub relationship-mapping work (blockedBy/blocking/sub-issues/Project fields) into local KG metadata; research needed to determine whether it belongs in templates, the start-issue-tracking command, or a dedicated skill. Related: [issue-53](../issues/issue-53/issue-53-description.md), [issue-54](../issues/issue-54/issue-54-description.md).
 - [ENH-041: Broken nav breadcrumb (GETTING-STARTED.md / WORKFLOWS.md) baked into every index README scaffold](ENH-041/ENH-041-specification.md) — **Status:** 🟡 Proposed
 - [ENH-040: Remove chat-history/*.md from kg_search / kg_fts5_rebuild indexing scope](ENH-040/ENH-040-specification.md) — **Status:** 🟡 Proposed — Governed by [ADR-060](../decisions/ADR-060-narrow-kg-search-scope-away-from-raw-chat-history.md)
 - [ENH-039: Rule-injection scripts hardcode personal split-file names instead of discovering them](ENH-039/ENH-039-specification.md) — **Status:** 🟡 Proposed

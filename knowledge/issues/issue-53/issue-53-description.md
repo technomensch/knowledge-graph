@@ -1,10 +1,11 @@
 ---
 id: issue-53
 type: Bug
-status: deferred
+status: resolved
 github-issue: "#231"
 branch: none
 created: 2026-08-22
+related-issues: [issue-54]
 ---
 
 # issue-53: ADR creation has no collision check — numbers can be assigned twice
@@ -25,9 +26,9 @@ Whatever creates ADR files (the `kmg-create-adr` command/agent, or manual author
 
 ## Suggested Fix (not scoped/planned — tracking only)
 
-1. Add a pre-write collision check to ADR creation (list `decisions/ADR-{N}-*.md`, refuse/renumber on match) — mirrors the existing `git log --all` cross-branch collision check already used for `issue-N`/`ENH-NNN` in `/kmgraph:kmg-start-issue-tracking` Step 2.2.
-2. Consider whether a "pending cleanup" orphan file should be auto-flagged by the upgrade inspector (`kg_upgrade`) rather than relying on the wiki-link pass to stumble into it.
+1. ~~Add a pre-write collision check to ADR creation (list `decisions/ADR-{N}-*.md`, refuse/renumber on match)~~ — **already done.** Verified 2026-08-22: commit `046bc2234` (2026-04-10) added exactly this — a cross-branch collision check to `create-adr-agent.md` Phase 1, four months before this issue was filed. `commands/kmg-create-adr.md` is a thin dispatcher that hands off to the same agent for number assignment, so there's no second, unpatched code path either. This item duplicated already-shipped work — same "already fixed, never recognized" pattern as the ADR-006 orphan file itself.
+2. Consider whether a "pending cleanup" orphan file should be auto-flagged by the upgrade inspector (`kg_upgrade`) rather than relying on the wiki-link pass to stumble into it. — **Split out to [issue-54](../issue-54/issue-54-description.md)**, 2026-08-22: a real, unaddressed gap (the April check only fires at creation time, it can't retroactively detect an already-orphaned file), but materially bigger (new `kg_upgrade` UpgradeItem category + Zod/APPLY_ORDER wiring + tests) than item 1's scope, so it gets its own ticket rather than riding along here.
 
 ## Status
 
-Deferred — tracking only, no branch or implementation plan created. Filed retroactively after being fixed reactively in commit `8dab9210` on the `main` branch (2026-08-22 session).
+**Resolved** — item 1 (the actual collision-check ask) was already shipped before this issue existed. Item 2 (orphan detection) lives on as [issue-54](../issue-54/issue-54-description.md). Filed retroactively after being fixed reactively in commit `8dab9210` on the `main` branch (2026-08-22 session); closed the same day once item 1 was confirmed already resolved.

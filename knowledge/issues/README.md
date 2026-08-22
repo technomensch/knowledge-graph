@@ -4,7 +4,7 @@
 
 Tracking of investigated bugs, defects, and meta-issues for this project.
 
-**Total Issues:** 53 numbered issues, plus named meta-issues (see below)
+**Total Issues:** 54 numbered issues, plus named meta-issues (see below)
 **Last Updated:** 2026-08-22
 
 ---
@@ -19,7 +19,8 @@ Tracking of investigated bugs, defects, and meta-issues for this project.
 
 ## All Issues (Chronological)
 
-- [issue-53: ADR Creation Has No Collision Check — Numbers Can Be Assigned Twice](issue-53/issue-53-description.md) — **Status:** 🟡 Deferred (Track only) — GitHub issue #231 filed. Root-caused after fixing a real `ADR-006` duplicate (two unrelated decisions assigned the same number, one later renumbered to `ADR-054` but its orphan left unlinked on disk for two months); fixed reactively in commit `8dab9210`, filed retroactively for the underlying missing collision-check.
+- [issue-54: `kg_upgrade` has no check category for leftover renumbered-ADR orphan files](issue-54/issue-54-description.md) — **Status:** 🟡 Deferred (Track only) — GitHub issue #240 filed (labels: bug + gap). Split out from issue-53's item 2 after item 1 was confirmed already shipped; this is the real, unaddressed half — a new `kg_upgrade` UpgradeItem category to detect an already-orphaned renumbered file, which the existing creation-time collision check structurally cannot catch.
+- [issue-53: ADR Creation Has No Collision Check — Numbers Can Be Assigned Twice](issue-53/issue-53-description.md) — **Status:** ✅ Resolved — GitHub issue #231 closed. Item 1 (the actual ask) was already shipped in commit `046bc2234` four months before this issue was filed; item 2 split out to [issue-54](issue-54/issue-54-description.md).
 - [issue-52: `superpowers:brainstorming`-Originated Specs Still Bypass `start-issue-tracking`'s GitHub-Issue Creation](issue-52/issue-52-description.md) — **Status:** 🟡 Deferred (Track only) — GitHub issue #229 filed to research a flag/keyword/trigger so brainstorm-originated issues/ENHs reliably get a real GitHub issue; direct continuation of [issue-11](issue-11/issue-11-description.md)'s own GitHub #165 investigation (Cause 2, still open).
 - [issue-51: kg_upgrade Wizard's Hardcoded Category Allow-List Has Drifted From the Tool's Real Schema — Two Categories Unreachable via /kmgraph:kmg-init](issue-51/issue-51-description.md) — **Status:** ✅ Resolved — `kmg-upgrade-inspector.md`'s hardcoded 6-category allow-list has drifted from `upgrade.ts`'s real 9-category schema; `config-location` and `capture-corruption` findings are displayed to users but unreachable through `/kmgraph:kmg-init`. Same family as [ENH-052](../enhancements/ENH-052/ENH-052-specification.md); related to [issue-50](issue-50/issue-50-description.md).
 - [issue-50: No Check That a Bug Fix Requiring Data Backfill Gets a kg_upgrade Category — Or That the Category Reaches Users](issue-50/issue-50-description.md) — **Status:** ✅ Resolved — Nothing in the fix-authoring workflow checks whether a fix that corrupts captured KG content gets a `kg_upgrade` backfix category, or that the category is actually wired into the wizard; case studies: [issue-46](issue-46/issue-46-description.md), [issue-47](issue-47/issue-47-description.md), [issue-48](issue-48/issue-48-description.md). Same family as [ENH-052](../enhancements/ENH-052/ENH-052-specification.md); related to [issue-51](issue-51/issue-51-description.md).
