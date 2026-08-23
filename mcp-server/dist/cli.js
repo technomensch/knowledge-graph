@@ -15554,6 +15554,15 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
       }
     }
   }
+  if (!preExistingMarkerId && (fs4.existsSync(path4.join(expandedPath, "decisions")) || fs4.existsSync(path4.join(expandedPath, "lessons-learned")))) {
+    return {
+      content: [{
+        type: "text",
+        text: `Found existing content at ${expandedPath} (decisions/ or lessons-learned/ already present) that isn't registered or marked as a KMGraph. Refusing to scaffold over it. Run kg_upgrade with apply: ["connect-unregistered-graph"] to register it instead.`
+      }],
+      isError: true
+    };
+  }
   scaffoldGraphDirectory(expandedPath, categories);
   const newGraphId = mintGraphId();
   const existingMarkerId = readGraphIdMarker(expandedPath);

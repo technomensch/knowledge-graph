@@ -677,6 +677,29 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
     }
   }
 
+  // Follow-up (Task A): refuse to scaffold over a folder that already has
+  // decisions/ or lessons-learned/ content but no marker at all -- checked
+  // BEFORE scaffoldGraphDirectory runs, same "check before you write files"
+  // discipline as every guard above it in this function, so this can never
+  // leak scaffold files the way a scaffold-then-refuse ordering bug would
+  // (that class of bug is Task C's, a different file/flow -- not reproduced
+  // here). Gated on `!preExistingMarkerId`: a folder with an *orphaned*
+  // marker (marker present, not registered) does NOT hit this -- it falls
+  // through to the existing marker-mismatch hard-refusal a few lines below
+  // instead (unchanged). Only "real content, zero marker at all" is new.
+  if (
+    !preExistingMarkerId &&
+    (fs.existsSync(path.join(expandedPath, "decisions")) || fs.existsSync(path.join(expandedPath, "lessons-learned")))
+  ) {
+    return {
+      content: [{
+        type: "text" as const,
+        text: `Found existing content at ${expandedPath} (decisions/ or lessons-learned/ already present) that isn't registered or marked as a KMGraph. Refusing to scaffold over it. Run kg_upgrade with apply: ["connect-unregistered-graph"] to register it instead.`,
+      }],
+      isError: true,
+    };
+  }
+
   // Create directory structure + copy default templates (shared with cli.ts, ENH-051)
   scaffoldGraphDirectory(expandedPath, categories);
 
