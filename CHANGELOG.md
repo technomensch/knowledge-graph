@@ -9,7 +9,16 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
-## [0.7.4] — 2026-08-22
+## [0.7.4.1] — 2026-08-23
+
+### Added
+
+- **Numbering-collision detection gate for `ADR-NNN` / `ENH-NNN` / `issue-N` IDs** (`scripts/check-numbering-collision.sh`, wired into `scripts/pre-push-gate.sh` as Gate 7 — advisory-only, never blocks a push). Two contributors on different branches can independently claim the same next sequential ID; for ADRs specifically, git merges the two differently-slugged files cleanly with no conflict, so nothing surfaced the duplicate before. The detector normalizes padding (`ADR-14` and `ADR-014` are the same number 14) and exempts companion docs (`*-implementation-spec.md`) that legitimately share their parent ADR's number. Implements the mechanism resolved in ADR-067 § "Mechanism resolved 2026-08-23"; developer tooling for this source repo — `scripts/` is not distributed to consumer repos.
+- **Explicit collision-fix script** (`scripts/fix-numbering-collision.sh`) — never auto-run from any hook. Renumbers the later-created ("loser") entry to the next free number via a git first-commit-date tie-break (ties reported honestly as arbitrary), renames inner files for `ENH`/`issue` directories to keep backlink resolution working, and rewrites only references provably unique to the loser (its boundary-anchored slug, for ADRs). Everything else — bare mentions, all `ENH`/`issue` references (no slug exists to disambiguate loser from winner), the renamed entry's own self-identity header, and references found in a report-only scan of `commands/`, `docs/`, `scripts/`, `mcp-server/`, `agents/`, `skills/`, `core/`, and `ROADMAP.md` — is reported under an `AMBIGUOUS` list for manual review, never guessed at. Companion docs sharing the collided number are flagged for manual ownership review.
+
+### Changed
+
+- **ADR-067 gained an as-built correction section** documenting where the shipped collision mechanism deliberately deviates from the original design (no repo-wide auto-rewrite, no self-identity rewrite, advisory-only detection distinct from the explicit fix script) and why each deviation was made — each traces to a corruption bug reproduced during review rather than a scope cut.
 
 ### Added
 
