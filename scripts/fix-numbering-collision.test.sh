@@ -264,4 +264,51 @@ grep -q "^ref: ADR-096-a&b.md$" "$REPO12/knowledge/decisions/ADR-095-zulu.md" &&
 grep -q "decoy: ADR-095-aXb.md should not match" "$REPO12/knowledge/decisions/ADR-095-zulu.md" && pass "unrelated decoy slug left untouched" || fail "decoy slug should not have been touched"
 rm -rf "$REPO12"
 
+# --- ERE metacharacters in a slug (+) must still be matched literally ------
+# "+" is an ERE quantifier (unlike BRE); an escape helper covering only the
+# BRE set made the safe rewrite silently fail to match "c++" — and a later
+# fix attempt put "[" directly before "." in the bracket expression, forming
+# the POSIX collating-symbol opener "[." which unbalanced the expression and
+# killed the whole script under set -e mid-run. Both asserted here.
+REPO13="$(mktemp -d)"
+(
+  cd "$REPO13"
+  git init -q
+  git config user.email test@test.com
+  git config user.name test
+  mkdir -p knowledge/decisions
+  echo "# ADR-097: Zulu" > knowledge/decisions/ADR-097-zulu.md
+  git add . && GIT_AUTHOR_DATE="2024-01-01T00:00:00" GIT_COMMITTER_DATE="2024-01-01T00:00:00" git commit -q -m "winner"
+  echo "# ADR-097: C plus plus" > "knowledge/decisions/ADR-097-c++.md"
+  git add . && GIT_AUTHOR_DATE="2024-01-02T00:00:00" GIT_COMMITTER_DATE="2024-01-02T00:00:00" git commit -q -m "loser"
+  printf 'ref: ADR-097-c++.md\ndecoy: ADR-097-cxx.md untouched\n' > knowledge/decisions/ADR-097-zulu.md
+  git add . && git commit -q -m "add ref with ERE-metachar slug"
+)
+OUT13=$(CLAUDE_PROJECT_DIR="$REPO13" "$FIX_SCRIPT" decisions 97 2>&1) || { echo "$OUT13"; fail "fix script crashed on ERE-metachar slug (script must not die mid-run)"; }
+grep -q "^ref: ADR-098-c++.md$" "$REPO13/knowledge/decisions/ADR-097-zulu.md" && pass "ERE-metachar slug (+) matched literally and rewritten" || fail "slug containing + was not rewritten — ERE escaping regression"
+grep -q "decoy: ADR-097-cxx.md untouched" "$REPO13/knowledge/decisions/ADR-097-zulu.md" && pass "ERE-metachar decoy not over-matched" || fail "+ was treated as a quantifier and over-matched the decoy"
+rm -rf "$REPO13"
+
+# --- Adjacent references separated by one boundary char must ALL be caught -
+# (sed consumes the boundary on each match, so alternating occurrences
+# escape a single pass — the script runs the substitution twice).
+REPO14="$(mktemp -d)"
+(
+  cd "$REPO14"
+  git init -q
+  git config user.email test@test.com
+  git config user.name test
+  mkdir -p knowledge/decisions
+  echo "# ADR-098: Zulu" > knowledge/decisions/ADR-098-zulu.md
+  git add . && GIT_AUTHOR_DATE="2024-01-01T00:00:00" GIT_COMMITTER_DATE="2024-01-01T00:00:00" git commit -q -m "winner"
+  echo "# ADR-098: Alpha" > knowledge/decisions/ADR-098-alpha.md
+  git add . && GIT_AUTHOR_DATE="2024-01-02T00:00:00" GIT_COMMITTER_DATE="2024-01-02T00:00:00" git commit -q -m "loser"
+  printf 'refs: ADR-098-alpha ADR-098-alpha ADR-098-alpha ADR-098-alpha\n' > knowledge/decisions/ADR-098-zulu.md
+  git add . && git commit -q -m "add four adjacent refs"
+)
+CLAUDE_PROJECT_DIR="$REPO14" "$FIX_SCRIPT" decisions 98 >/dev/null 2>&1 || fail "fix script exited non-zero on adjacent-refs fixture"
+REMAINING=$(grep -c "ADR-098-alpha" "$REPO14/knowledge/decisions/ADR-098-zulu.md" || true)
+[ "$REMAINING" -eq 0 ] && pass "all four adjacent references rewritten (two-pass sed)" || fail "$REMAINING adjacent reference(s) missed by the rewrite — single-pass sed regression"
+rm -rf "$REPO14"
+
 exit $FAIL

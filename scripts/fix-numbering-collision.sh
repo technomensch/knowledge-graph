@@ -268,9 +268,21 @@ fi
 # are never silently missed.
 LOSER_ALT_ID="${PREFIX}-${LOSER_DIGITS}"
 
-# Escaping for use as a literal BRE pattern (delimiter @, plus BRE metachars).
+# Escaping for use as a literal ERE pattern (grep -E / sed -E share it, so
+# the FULL ERE metachar set must be covered — +?(){}| are quantifiers/groups
+# in ERE even though they're literal in BRE; an earlier version escaped only
+# the BRE set, and a slug containing "+" (e.g. "c++") made the safe rewrite
+# silently fail to match, leaving a dangling reference with no warning).
+# @ is escaped because it's used as the s@@@ delimiter below.
+# Char order inside the bracket expression is load-bearing: `]` must come
+# first (literal), and `[` must NOT be immediately followed by `.`, `=`, or
+# `:` — POSIX treats `[.`/`[=`/`[:` inside a bracket expression as opening a
+# collating-symbol/equivalence-class/char-class construct, which unbalances
+# the expression and makes sed abort (reproduced: the previous ordering
+# `[][.*...` died with "unbalanced brackets", killing the whole script under
+# set -e right after the rename).
 escape_sed_pattern() {
-  printf '%s' "$1" | sed -e 's/[\\]/\\\\/g' -e 's/[.[*^$@]/\\&/g'
+  printf '%s' "$1" | sed -e 's/[\\]/\\\\/g' -e 's/[][*^$@+?(){}|.]/\\&/g'
 }
 # Escaping for use as sed replacement text (delimiter @, backreference &).
 escape_sed_replacement() {
@@ -319,7 +331,17 @@ while IFS= read -r ref_file; do
   if [ -n "$SAFE_MATCH_REGEX" ] && grep -qE "$SAFE_MATCH_REGEX" "$ref_file" 2>/dev/null; then
     ESCAPED_NEW_REF=$(escape_sed_replacement "$NEW_REF")
     BAK_FILES+=("${ref_file}.bak")
-    sed -i.bak -E "s@${SAFE_MATCH_REGEX}@\\1${ESCAPED_NEW_REF}\\2@g" "$ref_file"
+    # The substitution runs TWICE (two -e clauses): the boundary character
+    # between two adjacent references is consumed by the first match, so
+    # "REF REF REF" leaves the middle one untouched in a single pass —
+    # re-scanning the modified line catches it. Two passes always suffice:
+    # after pass one, any missed occurrence is flanked by already-replaced
+    # text, never by another missed occurrence. Idempotent, so re-matching
+    # already-replaced text is impossible (OLD_REF no longer present there).
+    sed -i.bak -E \
+      -e "s@${SAFE_MATCH_REGEX}@\\1${ESCAPED_NEW_REF}\\2@g" \
+      -e "s@${SAFE_MATCH_REGEX}@\\1${ESCAPED_NEW_REF}\\2@g" \
+      "$ref_file"
     rm -f "${ref_file}.bak"
     REWRITTEN=$((REWRITTEN + 1))
   fi
