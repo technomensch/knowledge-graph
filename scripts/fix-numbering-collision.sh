@@ -174,4 +174,58 @@ if [ "$AREA" != "decisions" ] && [ -d "$NEW_PATH" ]; then
   done < <(find "$NEW_PATH" -maxdepth 1 -type f 2>/dev/null)
 fi
 
-echo "fix-numbering-collision: renamed to ${NEW_BASE}. Reference rewrite across knowledge/ not yet applied by this revision — see Task 4."
+# --- Rewrite only references unambiguously scoped to the LOSER, never the ---
+# --- winner (which keeps OLD_ID) or an ambiguous bare mention ------------
+#
+# After this fix, OLD_ID still belongs to $WINNER. A bare mention like
+# "see ADR-014" elsewhere could mean the winner (still correctly ADR-014) or
+# the just-renumbered loser — there is no mechanical way to tell which, so
+# bare mentions are reported for manual review, never auto-rewritten. Only
+# rewrite targets that are unique to the loser specifically:
+#   - decisions: the loser's own slug (e.g. "ADR-014-alpha") is unique to it —
+#     the winner has a different slug, so this substring can't hit the winner.
+#   - enhancements/issues (no slug — directory name IS the bare ID): only
+#     path-qualified forms ("ENH-014/", "issue-14/") and known inner-filename
+#     suffixes (already handled by Task 3's inner-file rename loop, which
+#     also rewrites each renamed inner file's own header) are unambiguous.
+#     Bare non-path mentions are reported, not rewritten — same ambiguity as
+#     decisions' bare-ID case, and this repo's actual ENH/issue folders have
+#     no slug to disambiguate with.
+case "$AREA" in
+  decisions)
+    LOSER_SUFFIX_NOEXT="${SLUG_TAIL}"                # e.g. "alpha", set above when NEW_BASE was built
+    OLD_REF="${OLD_ID}-${LOSER_SUFFIX_NOEXT}"        # e.g. "ADR-014-alpha" — unique to the loser
+    NEW_REF="${NEW_ID}-${LOSER_SUFFIX_NOEXT}"        # e.g. "ADR-015-alpha"
+    ;;
+  enhancements|issues)
+    OLD_REF="${OLD_ID}/"
+    NEW_REF="${NEW_ID}/"
+    ;;
+esac
+
+REWRITTEN=0
+AMBIGUOUS_HITS=""
+while IFS= read -r ref_file; do
+  [ -n "$ref_file" ] || continue
+  [ -f "$ref_file" ] || continue
+
+  if grep -qF "$OLD_REF" "$ref_file" 2>/dev/null; then
+    sed -i.bak "s@${OLD_REF}@${NEW_REF}@g" "$ref_file"
+    rm -f "${ref_file}.bak"
+    REWRITTEN=$((REWRITTEN + 1))
+  fi
+
+  # Bare OLD_ID mentions not part of the safe target above are ambiguous —
+  # report, never guess. (^|[^0-9-]) / ([^0-9/-]|$) additionally excludes the
+  # OLD_REF form itself (already handled above) from being double-reported.
+  if grep -qE "(^|[^0-9-])${OLD_ID}([^0-9/-]|\$)" "$ref_file" 2>/dev/null; then
+    AMBIGUOUS_HITS="${AMBIGUOUS_HITS}  - ${ref_file}
+"
+  fi
+done < <(find "${REPO_ROOT}/knowledge" -type f -name '*.md' -not -path '*/knowledge/plans/*' 2>/dev/null)
+
+echo "fix-numbering-collision: renamed to ${NEW_BASE}, rewrote unambiguous references in ${REWRITTEN} file(s). Review the diff before committing."
+if [ -n "$AMBIGUOUS_HITS" ]; then
+  echo "fix-numbering-collision: AMBIGUOUS — bare ${OLD_ID} mentions found outside a rewritten context (${OLD_ID} still belongs to $(basename "$WINNER") after this fix). Check by hand whether any of these actually meant the renumbered entry:"
+  printf '%s' "$AMBIGUOUS_HITS"
+fi

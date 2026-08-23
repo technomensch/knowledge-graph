@@ -34,6 +34,11 @@ git add . && GIT_AUTHOR_DATE="2024-01-01T00:00:00" GIT_COMMITTER_DATE="2024-01-0
 echo "# ADR-014: Alpha decision" > knowledge/decisions/ADR-014-alpha.md
 git add . && GIT_AUTHOR_DATE="2024-01-02T00:00:00" GIT_COMMITTER_DATE="2024-01-02T00:00:00" git commit -q -m "add ADR-014-alpha (later)"
 
+mkdir -p knowledge/issues/issue-1
+echo "See [[ADR-014-alpha]] for the related decision." >> knowledge/decisions/ADR-014-zulu.md
+echo "Related: ADR-014 covers this." > knowledge/issues/issue-1/issue-1-description.md
+git add . && git commit -q -m "add cross-references to ADR-014-alpha"
+
 export CLAUDE_PROJECT_DIR="$REPO"
 OUT=$("$FIX_SCRIPT" decisions 14 2>&1) || { echo "$OUT"; fail "fix script exited non-zero"; }
 
@@ -41,6 +46,11 @@ OUT=$("$FIX_SCRIPT" decisions 14 2>&1) || { echo "$OUT"; fail "fix script exited
 [ ! -f "knowledge/decisions/ADR-014-alpha.md" ] && pass "later entry (alpha) no longer at ADR-014" || fail "alpha should have been renumbered away from ADR-014"
 [ -f "knowledge/decisions/ADR-015-alpha.md" ] && pass "later entry (alpha) renumbered to next free ADR-015" || fail "alpha should now be ADR-015-alpha.md"
 grep -q "# ADR-015: Alpha decision" knowledge/decisions/ADR-015-alpha.md && pass "alpha's in-file header updated to ADR-015" || fail "alpha's header still says ADR-014"
+
+grep -q "ADR-015-alpha" knowledge/decisions/ADR-014-zulu.md && pass "loser's slug-qualified wikilink rewritten to new ID" || fail "wikilink still points at old ADR-014-alpha"
+grep -q "# ADR-014: Zulu decision" knowledge/decisions/ADR-014-zulu.md && pass "winner's own header untouched (not corrupted)" || fail "winner's header was incorrectly rewritten — this is the winner-corruption bug"
+grep -q "Related: ADR-014 covers this" knowledge/issues/issue-1/issue-1-description.md && pass "ambiguous bare-ID mention left untouched (could mean the winner)" || fail "bare ADR-014 mention should NOT have been auto-rewritten — it's ambiguous"
+printf '%s' "$OUT" | grep -q "AMBIGUOUS" && printf '%s' "$OUT" | grep -q "issue-1-description.md" && pass "fix script flags the ambiguous mention for manual review" || fail "fix script should report issue-1-description.md as needing manual review, got: $OUT"
 
 # --- Genuine tie: both colliding files added in the SAME commit, so they get
 # --- identical author/committer timestamps naturally (no date-pinning trick
