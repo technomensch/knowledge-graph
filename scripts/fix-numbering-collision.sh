@@ -1,15 +1,25 @@
 #!/usr/bin/env bash
 # fix-numbering-collision.sh — resolves a numbering collision reported by
 # check-numbering-collision.sh. Renumbers the LATER-created entry (by first
-# commit date) to the next free number in its sequence, and rewrites every
-# reference to its old ID across knowledge/ (reference rewrite added in a
-# later revision of this same file — see Task 4).
+# commit date) to the next free number in its sequence.
 #
 # Usage: fix-numbering-collision.sh <decisions|enhancements|issues> <number>
 #
 # This script MUTATES files. It is never invoked automatically from any
 # hook — run it explicitly, then review the diff before committing, same as
 # any other change. See ADR-067 § "Mechanism resolved 2026-08-23".
+#
+# Reference-rewrite policy: only a reference unambiguously scoped to the
+# loser specifically is auto-rewritten (its own slug, for decisions — there
+# is no safe automatic target at all for enhancements/issues, which have no
+# slug to disambiguate loser from winner). Every other mention of the old ID
+# — including the loser's own file body beyond its self-identity header — is
+# reported under "AMBIGUOUS" for manual review, never guessed at.
+# Scan scope: knowledge/ is scanned for both rewrite and ambiguity reporting;
+# commands/, docs/, scripts/, mcp-server/, agents/, skills/, core/, and
+# ROADMAP.md are scanned for ambiguity reporting ONLY (never rewritten) —
+# a bounded, pragmatic set of the directories most likely to reference an ID,
+# not an exhaustive repo-wide sweep.
 
 set -euo pipefail
 
@@ -26,10 +36,18 @@ case "$NUMBER" in
   ''|*[!0-9]*) echo "fix-numbering-collision: <number> must be a non-negative integer, got '$NUMBER'" >&2; exit 2 ;;
 esac
 
+# FIND_EXCLUDE must match check-numbering-collision.sh's companion-doc
+# exemption exactly (currently: ADR-NNN-implementation-spec.md alongside the
+# real ADR-NNN it documents, e.g. this repo's own ADR-067 pair) — without it,
+# this script disagrees with the detector about what counts as a collision:
+# it would "fix" a companion-doc pair the detector correctly calls clean, and
+# refuse to fix a genuine collision the detector correctly flags (3-entries
+# guard trips on decisions+companion+decisions). Both were reproduced during
+# final review. Extend this list if new companion-doc suffix patterns appear.
 case "$AREA" in
-  decisions)    DIR="${REPO_ROOT}/knowledge/decisions";    ID_REGEX='^ADR-([0-9]+)-.*\.md$';  PREFIX="ADR";   PAD=3 ;;
-  enhancements) DIR="${REPO_ROOT}/knowledge/enhancements"; ID_REGEX='^ENH-([0-9]+)$';         PREFIX="ENH";   PAD=3 ;;
-  issues)       DIR="${REPO_ROOT}/knowledge/issues";       ID_REGEX='^issue-([0-9]+)$';       PREFIX="issue"; PAD=0 ;;
+  decisions)    DIR="${REPO_ROOT}/knowledge/decisions";    ID_REGEX='^ADR-([0-9]+)-.*\.md$';  PREFIX="ADR";   PAD=3; FIND_EXCLUDE=(-not -iname '*-implementation-spec.md') ;;
+  enhancements) DIR="${REPO_ROOT}/knowledge/enhancements"; ID_REGEX='^ENH-([0-9]+)$';         PREFIX="ENH";   PAD=3; FIND_EXCLUDE=() ;;
+  issues)       DIR="${REPO_ROOT}/knowledge/issues";       ID_REGEX='^issue-([0-9]+)$';       PREFIX="issue"; PAD=0; FIND_EXCLUDE=() ;;
   *) echo "unknown area: $AREA (expected decisions|enhancements|issues)" >&2; exit 2 ;;
 esac
 
@@ -52,7 +70,7 @@ while IFS= read -r path; do
   id=$(printf '%s\n' "$base" | sed -nE "s/${ID_REGEX}/\\1/p")
   [ -n "$id" ] || continue
   [ "$((10#$id))" -eq "$((10#$NUMBER))" ] && MATCHES+=("$path")
-done < <(find "$DIR" -maxdepth 1 2>/dev/null | sort)
+done < <(find "$DIR" -maxdepth 1 "${FIND_EXCLUDE[@]+"${FIND_EXCLUDE[@]}"}" 2>/dev/null | sort)
 
 if [ "${#MATCHES[@]}" -lt 2 ]; then
   echo "fix-numbering-collision: no collision found for ${OLD_ID} (found ${#MATCHES[@]} match(es))" >&2
@@ -98,7 +116,7 @@ while IFS= read -r path; do
   [ -n "$id" ] || continue
   n=$((10#$id))
   [ "$n" -gt "$MAX" ] && MAX="$n"
-done < <(find "$DIR" -maxdepth 1 2>/dev/null)
+done < <(find "$DIR" -maxdepth 1 "${FIND_EXCLUDE[@]+"${FIND_EXCLUDE[@]}"}" 2>/dev/null)
 
 NEW_NUM=$((MAX + 1))
 NEW_ID="${PREFIX}-$(pad_number "$NEW_NUM")"
@@ -147,30 +165,57 @@ if [ ! -e "$NEW_PATH" ]; then
 fi
 
 # Best-effort cleanup if a later step in this script dies mid-sed (set -e).
-trap 'rm -f "${NEW_PATH:-}.bak"' EXIT
+# Sweeps knowledge/ rather than tracking one path — every .bak this script
+# creates lives under knowledge/, and the run is short-lived enough that a
+# blanket sweep at exit is safe.
+cleanup_bak_files() {
+  find "${REPO_ROOT}/knowledge" -name '*.bak' -delete 2>/dev/null || true
+}
+trap cleanup_bak_files EXIT
 
-# --- Update the loser's own in-file header/frontmatter reference, if a file ---
+# --- Update the loser's own in-file self-identity header, line 1 ONLY ---
+# Deliberately scoped to line 1 (this repo's "# ADR-NNN: Title" convention),
+# NOT a blanket file-wide rewrite. A blanket rewrite was found, via final
+# branch review, to silently corrupt a body mention that correctly pointed
+# at the WINNER (e.g. "builds on ADR-014 (winner)" inside the loser's own
+# file became "builds on ADR-015", a dangling reference — and silently so,
+# since by the time the ambiguity scan ran below, no OLD_ID remained in this
+# file to flag). Any OLD_ID mention beyond line 1 is intentionally left for
+# the general ambiguous-scan pass below to catch instead of guessing here.
 if [ -f "$NEW_PATH" ]; then
-  sed -i.bak -E "s/(^|[^0-9])${OLD_ID}([^0-9]|$)/\\1${NEW_ID}\\2/g" "$NEW_PATH"
+  sed -i.bak -E "1s/(^|[^0-9])${OLD_ID}([^0-9]|$)/\\1${NEW_ID}\\2/g" "$NEW_PATH"
   rm -f "${NEW_PATH}.bak"
 fi
 
 # --- Rename inner files for directory-based areas (enhancements/issues) ---
-# These have no slug, so their inner files are named <OLD_ID>-<fixed-suffix>
+# These have no slug, so their inner files are named <PREFIX>-<NNN>-<suffix>
 # (e.g. issue-14-description.md) — renaming them keeps pre-push-gate.sh's
 # Gate 5 backlink check (which resolves paths by exact <ref>/<ref>-*.md) working.
+#
+# Match each inner file's OWN on-disk number via regex, not a literal
+# "${OLD_ID}-" prefix string — the outer directory's number can be malformed
+# padding (that's the whole point of this fix: ENH-14/ collides with ENH-014/
+# on number, not on padded string). A prior revision matched the literal
+# OLD_ID (canonical padding) and silently missed the malformed case entirely
+# — reproduced via final review: ENH-14/'s own ENH-14-specification.md was
+# neither renamed nor rewritten, leaving ENH-015/ENH-14-specification.md on
+# disk and breaking Gate 5's exact-path backlink resolution silently.
 if [ "$AREA" != "decisions" ] && [ -d "$NEW_PATH" ]; then
+  INNER_REGEX="^${PREFIX}-([0-9]+)-(.*)\$"
   while IFS= read -r inner; do
     [ -n "$inner" ] || continue
     inner_base=$(basename "$inner")
-    case "$inner_base" in
-      "${OLD_ID}"-*)
-        new_inner_base="${NEW_ID}-${inner_base#${OLD_ID}-}"
-        mv "$inner" "${NEW_PATH}/${new_inner_base}"
-        sed -i.bak -E "s/(^|[^0-9])${OLD_ID}([^0-9]|$)/\\1${NEW_ID}\\2/g" "${NEW_PATH}/${new_inner_base}" 2>/dev/null || true
-        rm -f "${NEW_PATH}/${new_inner_base}.bak"
-        ;;
-    esac
+    inner_num=$(printf '%s\n' "$inner_base" | sed -nE "s/${INNER_REGEX}/\\1/p")
+    inner_suffix=$(printf '%s\n' "$inner_base" | sed -nE "s/${INNER_REGEX}/\\2/p")
+    [ -n "$inner_num" ] || continue
+    [ "$((10#$inner_num))" -eq "$((10#$NUMBER))" ] || continue
+    new_inner_base="${NEW_ID}-${inner_suffix}"
+    mv "$inner" "${NEW_PATH}/${new_inner_base}"
+    # Line-1-only, same self-identity scoping rationale as the decisions
+    # case above — and matched against the file's ACTUAL old prefix
+    # (${PREFIX}-${inner_num}, unpadded as found), not the canonical OLD_ID.
+    sed -i.bak -E "1s/(^|[^0-9])${PREFIX}-${inner_num}([^0-9]|\$)/\\1${NEW_ID}\\2/g" "${NEW_PATH}/${new_inner_base}" 2>/dev/null || true
+    rm -f "${NEW_PATH}/${new_inner_base}.bak"
   done < <(find "$NEW_PATH" -maxdepth 1 -type f 2>/dev/null)
 fi
 
@@ -246,6 +291,32 @@ while IFS= read -r ref_file; do
 "
   fi
 done < <(find "${REPO_ROOT}/knowledge" -type f -name '*.md' -not -path '*/knowledge/plans/*' 2>/dev/null)
+
+# --- Ambiguous-only scan outside knowledge/ ---------------------------------
+# The safe rewrite above is intentionally confined to knowledge/ (the only
+# scope this design has been tested against). But IDs are also referenced
+# from commands/, docs/, scripts/, mcp-server/, agents/, skills/, core/, and
+# top-level docs like ROADMAP.md — leaving those silently dangling after a
+# renumber with no warning contradicts this design's own "report what you
+# can't safely rewrite" posture (final branch review flagged this directly).
+# This pass only REPORTS, never rewrites, and is a bounded, pragmatic set of
+# likely-reference locations, not an exhaustive whole-filesystem sweep.
+EXTRA_SCAN_DIRS="commands docs scripts mcp-server agents skills core"
+for extra_dir in $EXTRA_SCAN_DIRS; do
+  [ -d "${REPO_ROOT}/${extra_dir}" ] || continue
+  while IFS= read -r ref_file; do
+    [ -n "$ref_file" ] || continue
+    [ -f "$ref_file" ] || continue
+    if grep -qE "$AMBIGUOUS_REGEX" "$ref_file" 2>/dev/null; then
+      AMBIGUOUS_HITS="${AMBIGUOUS_HITS}  - ${ref_file}
+"
+    fi
+  done < <(find "${REPO_ROOT}/${extra_dir}" -type f \( -name '*.md' -o -name '*.ts' -o -name '*.sh' \) 2>/dev/null)
+done
+if [ -f "${REPO_ROOT}/ROADMAP.md" ] && grep -qE "$AMBIGUOUS_REGEX" "${REPO_ROOT}/ROADMAP.md" 2>/dev/null; then
+  AMBIGUOUS_HITS="${AMBIGUOUS_HITS}  - ${REPO_ROOT}/ROADMAP.md
+"
+fi
 
 echo "fix-numbering-collision: renamed to ${NEW_BASE}, rewrote unambiguous references in ${REWRITTEN} file(s). Review the diff before committing."
 if [ -n "$AMBIGUOUS_HITS" ]; then

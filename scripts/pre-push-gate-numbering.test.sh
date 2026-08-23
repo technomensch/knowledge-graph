@@ -10,7 +10,6 @@ fail() { printf 'FAIL - %s\n' "$1"; FAIL=1; }
 FIX="$(mktemp -d)"
 trap 'rm -rf "$FIX"' EXIT
 mkdir -p "$FIX/knowledge/decisions"
-cp "${SCRIPT_DIR}/check-numbering-collision.sh" "$FIX/scripts_check_numbering_collision.sh" 2>/dev/null || true
 mkdir -p "$FIX/scripts"
 cp "${SCRIPT_DIR}/check-numbering-collision.sh" "$FIX/scripts/check-numbering-collision.sh"
 chmod +x "$FIX/scripts/check-numbering-collision.sh"
