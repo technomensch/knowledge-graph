@@ -156,17 +156,17 @@ async function runInit(): Promise<void> {
     console.log("");
     console.log("  Creating knowledge graph...");
 
-    // 5/6. Create directory structure + copy default templates (shared with
-    // kg_config_init, ENH-051)
-    const templatesCopied = scaffoldGraphDirectory(expandedPath, categories);
-
-    // 7. Write config
-    const now = new Date().toISOString();
-    const newGraphId = mintGraphId();
-
+    // Mint the graph id and check for a marker mismatch BEFORE scaffolding
+    // any files -- scaffoldGraphDirectory writes real files, so running this
+    // check after it (as this used to) leaves scaffold files behind in a
+    // folder the CLI just refused to register. cli.ts has no earlier
+    // marker-related variable to reuse here -- this is the only
+    // readGraphIdMarker() call in this function.
+    //
     // Precise pre-check instead of try/catch around writeGraphIdMarker (Opus
     // review nit): a bare catch there would also swallow genuine I/O errors
     // and mislabel them as a marker conflict.
+    const newGraphId = mintGraphId();
     const existingMarkerId = readGraphIdMarker(expandedPath);
     if (existingMarkerId && existingMarkerId !== newGraphId) {
       console.error(
@@ -174,6 +174,13 @@ async function runInit(): Promise<void> {
       );
       process.exit(1);
     }
+
+    // 5/6. Create directory structure + copy default templates (shared with
+    // kg_config_init, ENH-051)
+    const templatesCopied = scaffoldGraphDirectory(expandedPath, categories);
+
+    // 7. Write config
+    const now = new Date().toISOString();
     writeGraphIdMarker(expandedPath, newGraphId);
     const graphConfig: GraphConfig = {
       name,

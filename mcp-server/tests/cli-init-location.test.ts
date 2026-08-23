@@ -134,7 +134,7 @@ describe("scaffoldGraphDirectory", () => {
       const kgPath = path.join(wrapper, "kg");
       const templatesCopied = scaffoldGraphDirectory(kgPath, [{ name: "architecture" }, { name: "process" }]);
 
-      for (const dir of ["knowledge", "lessons-learned", "decisions", "sessions", "chat-history", "tmp"]) {
+      for (const dir of ["concepts", "templates", "lessons-learned", "decisions", "sessions", "chat-history", "tmp"]) {
         expect(fs.existsSync(path.join(kgPath, dir))).toBe(true);
       }
       expect(fs.existsSync(path.join(kgPath, "lessons-learned", "architecture"))).toBe(true);
@@ -153,6 +153,74 @@ describe("scaffoldGraphDirectory", () => {
       scaffoldGraphDirectory(kgPath, [{ name: "architecture" }]);
       expect(() => scaffoldGraphDirectory(kgPath, [{ name: "architecture" }])).not.toThrow();
       expect(fs.existsSync(path.join(kgPath, "lessons-learned", "architecture"))).toBe(true);
+    } finally {
+      fs.rmSync(wrapper, { recursive: true, force: true });
+    }
+  });
+
+  // Regression coverage for the wizard-parity drift fix: scaffoldGraphDirectory's
+  // copy destinations had fallen out of sync with the canonical routing in
+  // commands/kmg-init-shared/kmg-template-seed.md (starter templates were
+  // landing in their live dirs instead of templates/, and the root profile
+  // files were being sourced from the wrong -- much longer -- concepts/*.md
+  // files instead of concepts/templates/project/*.md).
+  test("routes starter templates to templates/, not into their live dirs, matching the wizard", () => {
+    const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), "cli-init-scaffold-routing-"));
+    try {
+      const kgPath = path.join(wrapper, "kg");
+      scaffoldGraphDirectory(kgPath, []);
+
+      const templatesDir = path.join(kgPath, "templates");
+      const expectedTemplateFiles = [
+        "patterns.md",
+        "gotchas.md",
+        "concepts.md",
+        "architecture.md",
+        "workflows.md",
+        "entry-template.md",
+        "lesson-template.md",
+        "ADR-template.md",
+        "session-template.md",
+      ];
+      for (const f of expectedTemplateFiles) {
+        expect(fs.existsSync(path.join(templatesDir, f))).toBe(true);
+      }
+      expect(fs.readdirSync(templatesDir).sort()).toEqual([...expectedTemplateFiles].sort());
+
+      // lessons-learned/ and decisions/ keep only their live READMEs --
+      // the starter templates that used to also land there are gone.
+      expect(fs.readdirSync(path.join(kgPath, "lessons-learned"))).toEqual(["README.md"]);
+      expect(fs.readdirSync(path.join(kgPath, "decisions"))).toEqual(["README.md"]);
+
+      // sessions/ has no starter file at all now (moved to templates/).
+      expect(fs.existsSync(path.join(kgPath, "sessions", "session-template.md"))).toBe(false);
+
+      // Root-level profile files land at the KG root under their final
+      // names, not the old knowledge/kg-index.md naming.
+      for (const f of ["me.md", "rules.md", "triggers.md", "index.md"]) {
+        expect(fs.existsSync(path.join(kgPath, f))).toBe(true);
+      }
+      expect(fs.existsSync(path.join(kgPath, "kg-index.md"))).toBe(false);
+
+      // kg-category-index.md lives under concepts/, not knowledge/.
+      expect(fs.existsSync(path.join(kgPath, "concepts", "kg-category-index.md"))).toBe(true);
+      expect(fs.existsSync(path.join(kgPath, "knowledge"))).toBe(false);
+    } finally {
+      fs.rmSync(wrapper, { recursive: true, force: true });
+    }
+  });
+
+  test("root me.md/rules.md/triggers.md come from the project profile starters, not the longer concepts/*.md files", () => {
+    const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), "cli-init-scaffold-profile-"));
+    try {
+      const kgPath = path.join(wrapper, "kg");
+      scaffoldGraphDirectory(kgPath, [{ name: "architecture" }]);
+
+      const pluginRoot = path.join(__dirname, "..", "..");
+      for (const f of ["me.md", "rules.md", "triggers.md"]) {
+        const expectedSrc = path.join(pluginRoot, "core", "default-templates", "concepts", "templates", "project", f);
+        expect(fs.readFileSync(path.join(kgPath, f), "utf-8")).toBe(fs.readFileSync(expectedSrc, "utf-8"));
+      }
     } finally {
       fs.rmSync(wrapper, { recursive: true, force: true });
     }

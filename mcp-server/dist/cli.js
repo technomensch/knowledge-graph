@@ -15244,7 +15244,7 @@ function resolveRegistrationGuard(config2, kgPath) {
   };
 }
 function scaffoldGraphDirectory(expandedPath, categories) {
-  const dirs = ["knowledge", "lessons-learned", "decisions", "sessions", "chat-history", "tmp"];
+  const dirs = ["concepts", "templates", "lessons-learned", "decisions", "sessions", "chat-history", "tmp"];
   for (const dir of dirs) {
     fs4.mkdirSync(path4.join(expandedPath, dir), { recursive: true });
   }
@@ -15261,26 +15261,35 @@ function scaffoldGraphDirectory(expandedPath, categories) {
       templatesCopied++;
     }
   };
-  const knowledgeTemplates = ["patterns.md", "gotchas.md", "concepts.md", "architecture.md", "workflows.md"];
-  for (const t of knowledgeTemplates) {
-    copyIfMissing(path4.join(templateSrc, "knowledge", "templates", t), path4.join(expandedPath, "knowledge", t));
+  const conceptTemplates = ["patterns.md", "gotchas.md", "concepts.md", "architecture.md", "workflows.md"];
+  for (const t of conceptTemplates) {
+    copyIfMissing(path4.join(templateSrc, "concepts", "templates", t), path4.join(expandedPath, "templates", t));
   }
-  for (const t of ["README.md", "lesson-template.md"]) {
-    copyIfMissing(path4.join(templateSrc, "lessons-learned", t), path4.join(expandedPath, "lessons-learned", t));
-  }
-  for (const t of ["README.md", "ADR-template.md"]) {
-    copyIfMissing(path4.join(templateSrc, "decisions", t), path4.join(expandedPath, "decisions", t));
-  }
+  copyIfMissing(
+    path4.join(templateSrc, "concepts", "entry-template.md"),
+    path4.join(expandedPath, "templates", "entry-template.md")
+  );
+  copyIfMissing(path4.join(templateSrc, "lessons-learned", "README.md"), path4.join(expandedPath, "lessons-learned", "README.md"));
+  copyIfMissing(path4.join(templateSrc, "decisions", "README.md"), path4.join(expandedPath, "decisions", "README.md"));
+  copyIfMissing(
+    path4.join(templateSrc, "lessons-learned", "lesson-template.md"),
+    path4.join(expandedPath, "templates", "lesson-template.md")
+  );
+  copyIfMissing(
+    path4.join(templateSrc, "decisions", "ADR-template.md"),
+    path4.join(expandedPath, "templates", "ADR-template.md")
+  );
   copyIfMissing(
     path4.join(templateSrc, "sessions", "session-template.md"),
-    path4.join(expandedPath, "sessions", "session-template.md")
+    path4.join(expandedPath, "templates", "session-template.md")
   );
-  for (const f of ["me.md", "rules.md", "kg-index.md", "triggers.md"]) {
-    copyIfMissing(path4.join(templateSrc, "knowledge", f), path4.join(expandedPath, f));
-  }
+  copyIfMissing(path4.join(templateSrc, "concepts", "templates", "project", "me.md"), path4.join(expandedPath, "me.md"));
+  copyIfMissing(path4.join(templateSrc, "concepts", "templates", "project", "rules.md"), path4.join(expandedPath, "rules.md"));
+  copyIfMissing(path4.join(templateSrc, "concepts", "templates", "project", "triggers.md"), path4.join(expandedPath, "triggers.md"));
+  copyIfMissing(path4.join(templateSrc, "concepts", "kg-index.md"), path4.join(expandedPath, "index.md"));
   copyIfMissing(
-    path4.join(templateSrc, "knowledge", "kg-category-index.md"),
-    path4.join(expandedPath, "knowledge", "kg-category-index.md")
+    path4.join(templateSrc, "concepts", "kg-category-index.md"),
+    path4.join(expandedPath, "concepts", "kg-category-index.md")
   );
   return templatesCopied;
 }

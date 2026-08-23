@@ -254,7 +254,7 @@ export function scaffoldGraphDirectory(
   expandedPath: string,
   categories: Array<{ name: string }>
 ): number {
-  const dirs = ["knowledge", "lessons-learned", "decisions", "sessions", "chat-history", "tmp"];
+  const dirs = ["concepts", "templates", "lessons-learned", "decisions", "sessions", "chat-history", "tmp"];
   for (const dir of dirs) {
     fs.mkdirSync(path.join(expandedPath, dir), { recursive: true });
   }
@@ -274,26 +274,51 @@ export function scaffoldGraphDirectory(
     }
   };
 
-  const knowledgeTemplates = ["patterns.md", "gotchas.md", "concepts.md", "architecture.md", "workflows.md"];
-  for (const t of knowledgeTemplates) {
-    copyIfMissing(path.join(templateSrc, "knowledge", "templates", t), path.join(expandedPath, "knowledge", t));
+  // KG content templates + starter templates all deploy into templates/
+  // (ADR-040), never into their corresponding live dirs -- matches
+  // commands/kmg-init-shared/kmg-template-seed.md exactly.
+  const conceptTemplates = ["patterns.md", "gotchas.md", "concepts.md", "architecture.md", "workflows.md"];
+  for (const t of conceptTemplates) {
+    copyIfMissing(path.join(templateSrc, "concepts", "templates", t), path.join(expandedPath, "templates", t));
   }
-  for (const t of ["README.md", "lesson-template.md"]) {
-    copyIfMissing(path.join(templateSrc, "lessons-learned", t), path.join(expandedPath, "lessons-learned", t));
-  }
-  for (const t of ["README.md", "ADR-template.md"]) {
-    copyIfMissing(path.join(templateSrc, "decisions", t), path.join(expandedPath, "decisions", t));
-  }
+  copyIfMissing(
+    path.join(templateSrc, "concepts", "entry-template.md"),
+    path.join(expandedPath, "templates", "entry-template.md")
+  );
+
+  // READMEs stay in their live dirs (orientation files, not starters).
+  copyIfMissing(path.join(templateSrc, "lessons-learned", "README.md"), path.join(expandedPath, "lessons-learned", "README.md"));
+  copyIfMissing(path.join(templateSrc, "decisions", "README.md"), path.join(expandedPath, "decisions", "README.md"));
+
+  // Starter templates deploy to templates/, not into their live dirs.
+  copyIfMissing(
+    path.join(templateSrc, "lessons-learned", "lesson-template.md"),
+    path.join(expandedPath, "templates", "lesson-template.md")
+  );
+  copyIfMissing(
+    path.join(templateSrc, "decisions", "ADR-template.md"),
+    path.join(expandedPath, "templates", "ADR-template.md")
+  );
   copyIfMissing(
     path.join(templateSrc, "sessions", "session-template.md"),
-    path.join(expandedPath, "sessions", "session-template.md")
+    path.join(expandedPath, "templates", "session-template.md")
   );
-  for (const f of ["me.md", "rules.md", "kg-index.md", "triggers.md"]) {
-    copyIfMissing(path.join(templateSrc, "knowledge", f), path.join(expandedPath, f));
-  }
+
+  // Root-level profile files come from the project profile starters under
+  // concepts/templates/project/, NOT concepts/{me,rules,triggers}.md --
+  // those are different (longer) files. copyIfMissing (skip-if-exists) is
+  // kept for all four here, including me.md -- unlike the wizard, which
+  // unconditionally overwrites me.md. This function's own doc-comment says
+  // it never overwrites, so that contract stays consistent; the wizard's
+  // unconditional me.md overwrite is an intentional, accepted divergence.
+  copyIfMissing(path.join(templateSrc, "concepts", "templates", "project", "me.md"), path.join(expandedPath, "me.md"));
+  copyIfMissing(path.join(templateSrc, "concepts", "templates", "project", "rules.md"), path.join(expandedPath, "rules.md"));
+  copyIfMissing(path.join(templateSrc, "concepts", "templates", "project", "triggers.md"), path.join(expandedPath, "triggers.md"));
+  copyIfMissing(path.join(templateSrc, "concepts", "kg-index.md"), path.join(expandedPath, "index.md"));
+
   copyIfMissing(
-    path.join(templateSrc, "knowledge", "kg-category-index.md"),
-    path.join(expandedPath, "knowledge", "kg-category-index.md")
+    path.join(templateSrc, "concepts", "kg-category-index.md"),
+    path.join(expandedPath, "concepts", "kg-category-index.md")
   );
 
   return templatesCopied;
