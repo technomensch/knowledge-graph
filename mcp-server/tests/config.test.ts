@@ -327,4 +327,32 @@ describe("handleConfigInit", () => {
     expect(result.content[0].text).toMatch(/Found existing content at/);
     expect(writeConfig).not.toHaveBeenCalled();
   });
+
+  // ENH-064 Task 8: the disk-content pre-check above is gated on
+  // `!preExistingMarkerId` (Task 4 review fix, round 1) -- when a
+  // .kmgraph-id marker IS present but orphaned (its graphId isn't in the
+  // registry), that gate is false, so the "isn't registered or marked"
+  // disk-content refusal must NOT fire. Control instead falls through to
+  // the existing marker-mismatch check further down, which is the
+  // accurate description of this state (a marker really is present, it
+  // just doesn't match anything real). No test previously exercised a
+  // folder with both an orphaned marker AND decisions/ content together.
+  it("orphaned marker (present but unregistered) plus decisions/ content hits the marker-mismatch path, not the disk-content refusal", async () => {
+    const kgPath = makeTempDir("init-orphaned-marker-with-content");
+    fs.writeFileSync(path.join(kgPath, ".kmgraph-id"), "orphaned-graph-id\n", "utf-8");
+    fs.mkdirSync(path.join(kgPath, "decisions"), { recursive: true });
+    (readConfig as jest.Mock).mockReturnValue({ version: "1.0.0", graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } });
+
+    const result = await handleConfigInit({
+      name: "new-kg",
+      kgPath,
+      type: "project-local",
+      categories: [{ name: "architecture", prefix: null, git: "commit" }],
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toMatch(/already tracked as a different knowledge graph \(marker mismatch\)/);
+    expect(result.content[0].text).not.toMatch(/Found existing content at/);
+    expect(writeConfig).not.toHaveBeenCalled();
+  });
 });

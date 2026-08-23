@@ -4301,6 +4301,15 @@ describe("upgrade category: missing-root-readme (ENH-064)", () => {
     mockActiveKg(kgRoot);
     mockTemplateSource();
 
+    // ENH-064 Task 8 / test-cases.md criterion 4's exact wording: "adds the
+    // README without altering any other existing file." Plant a sentinel
+    // file elsewhere in the graph before applying, and confirm it's
+    // byte-for-byte unchanged afterward -- the assertions below this block
+    // only ever checked README.md itself.
+    const sentinelPath = path.join(kgRoot, "decisions", "ADR-001-existing.md");
+    const sentinelContent = "# ADR-001: Existing Decision\n\nAlready here before the backfill ran.\n";
+    fs.writeFileSync(sentinelPath, sentinelContent, "utf-8");
+
     expect(await inspectCategories()).toContain("missing-root-readme");
 
     const applied = await handleUpgrade({ apply: ["missing-root-readme"] });
@@ -4313,6 +4322,9 @@ describe("upgrade category: missing-root-readme (ENH-064)", () => {
     expect(fs.readFileSync(readmePath, "utf-8")).toBe(TEMPLATE_CONTENT);
 
     expect(await inspectCategories()).not.toContain("missing-root-readme");
+
+    // The pre-existing file must be untouched.
+    expect(fs.readFileSync(sentinelPath, "utf-8")).toBe(sentinelContent);
   });
 
   it("apply never overwrites an existing (including user-edited) README.md", async () => {
