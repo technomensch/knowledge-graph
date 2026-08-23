@@ -174,4 +174,94 @@ OUT4=$(CLAUDE_PROJECT_DIR="$REPO4" "$FIX_SCRIPT" decisions 30 2>&1) && fail "sho
 printf '%s' "$OUT4" | grep -q "3 entries claim" && pass ">2-matches message names the count" || fail ">2-matches message should name the count, got: $OUT4"
 rm -rf "$REPO4"
 
+# --- Prefix-overlapping slugs: winner's slug starts with the loser's slug ---
+# (e.g. winner "ADR-014-alpha-extended", loser "ADR-014-alpha") — an
+# unanchored substring match on the loser's slug would corrupt the winner's
+# own identity and any third-party reference to it. Real shape: this repo
+# already has prefix-overlapping ADR slugs (ADR-036/ADR-052). Reproduced by
+# an independent review as a Critical corruption bug; asserted here.
+REPO8="$(mktemp -d)"
+(
+  cd "$REPO8"
+  git init -q
+  git config user.email test@test.com
+  git config user.name test
+  mkdir -p knowledge/decisions knowledge/notes
+  printf '# ADR-014: Alpha Extended decision\nCanonical path: knowledge/decisions/ADR-014-alpha-extended.md\n' > knowledge/decisions/ADR-014-alpha-extended.md
+  git add . && GIT_AUTHOR_DATE="2024-01-01T00:00:00" GIT_COMMITTER_DATE="2024-01-01T00:00:00" git commit -q -m "winner: alpha-extended (earlier)"
+  echo "# ADR-014: Alpha decision" > knowledge/decisions/ADR-014-alpha.md
+  git add . && GIT_AUTHOR_DATE="2024-01-02T00:00:00" GIT_COMMITTER_DATE="2024-01-02T00:00:00" git commit -q -m "loser: alpha (later)"
+  echo "Winner ref: ADR-014-alpha-extended.md" > knowledge/notes/ref.md
+  git add . && git commit -q -m "add third-party ref to winner"
+)
+CLAUDE_PROJECT_DIR="$REPO8" "$FIX_SCRIPT" decisions 14 >/tmp/fix-out8.$$ 2>&1 || { cat /tmp/fix-out8.$$; fail "fix script exited non-zero on prefix-overlap fixture"; }
+grep -q "Canonical path: knowledge/decisions/ADR-014-alpha-extended.md" "$REPO8/knowledge/decisions/ADR-014-alpha-extended.md" && pass "winner's own file untouched despite loser's slug being its prefix" || fail "winner's own file was corrupted by an unanchored prefix match — the reproduced Critical bug"
+grep -q "Winner ref: ADR-014-alpha-extended.md" "$REPO8/knowledge/notes/ref.md" && pass "third-party reference to the winner untouched despite prefix overlap" || fail "third-party winner reference was corrupted by an unanchored prefix match"
+rm -rf "$REPO8" /tmp/fix-out8.$$
+
+# --- Extra-scan (outside knowledge/) must catch slug-qualified references, ---
+# --- not just bare ones — the report-only scan has no safe-rewrite pass to
+# --- lean on, so nothing there should be silently excluded.
+REPO9="$(mktemp -d)"
+mkdir -p "$REPO9/knowledge/decisions" "$REPO9/docs"
+touch "$REPO9/knowledge/decisions/ADR-070-zulu.md"
+touch "$REPO9/knowledge/decisions/ADR-070-alpha.md"
+echo "See ADR-070-alpha for the decision." > "$REPO9/docs/guide.md"
+OUT9=$(CLAUDE_PROJECT_DIR="$REPO9" "$FIX_SCRIPT" decisions 70 2>&1) || { echo "$OUT9"; fail "fix script exited non-zero on extra-scan slug-qualified fixture"; }
+printf '%s' "$OUT9" | grep -q "docs/guide.md" && pass "slug-qualified reference outside knowledge/ is flagged ambiguous" || fail "expected docs/guide.md to be reported ambiguous, got: $OUT9"
+rm -rf "$REPO9"
+
+# --- Malformed-padding loser must be caught by the ambiguous scan even ---
+# --- though its leftover mentions use its own on-disk (non-canonical) form.
+REPO10="$(mktemp -d)"
+mkdir -p "$REPO10/knowledge/enhancements/ENH-080" "$REPO10/knowledge/enhancements/ENH-80" "$REPO10/knowledge/notes"
+echo "spec for winner" > "$REPO10/knowledge/enhancements/ENH-080/ENH-080-specification.md"
+printf 'id: ENH-80\n# ENH-80: Loser\n' > "$REPO10/knowledge/enhancements/ENH-80/ENH-80-specification.md"
+echo "points at loser dir: knowledge/enhancements/ENH-80/" > "$REPO10/knowledge/notes/r.md"
+OUT10=$(CLAUDE_PROJECT_DIR="$REPO10" "$FIX_SCRIPT" enhancements 80 2>&1) || { echo "$OUT10"; fail "fix script exited non-zero on malformed-padding fixture"; }
+printf '%s' "$OUT10" | grep -q "ENH-081-specification.md\|ENH-081$" && pass "malformed-padding loser's own renamed inner file is flagged ambiguous" || true
+[ -f "$REPO10/knowledge/enhancements/ENH-081/ENH-081-specification.md" ] && printf '%s' "$OUT10" | grep -q "ENH-081-specification.md" && pass "malformed-padding loser's leftover self-identity is flagged ambiguous" || fail "expected the renamed inner file to be flagged ambiguous, got: $OUT10"
+printf '%s' "$OUT10" | grep -q "notes/r.md" && pass "third-party reference to the malformed-padding loser's old path is flagged ambiguous" || fail "expected knowledge/notes/r.md to be reported ambiguous, got: $OUT10"
+rm -rf "$REPO10"
+
+# --- A companion doc (excluded from collision detection) has ambiguous ---
+# --- ownership between winner and loser — must be surfaced, not silent.
+REPO11="$(mktemp -d)"
+(
+  cd "$REPO11"
+  git init -q
+  git config user.email test@test.com
+  git config user.name test
+  mkdir -p knowledge/decisions
+  echo "# ADR-090: Zulu" > knowledge/decisions/ADR-090-zulu.md
+  git add . && GIT_AUTHOR_DATE="2024-01-01T00:00:00" GIT_COMMITTER_DATE="2024-01-01T00:00:00" git commit -q -m "winner"
+  echo "# ADR-090: Alpha" > knowledge/decisions/ADR-090-alpha.md
+  git add . && GIT_AUTHOR_DATE="2024-01-02T00:00:00" GIT_COMMITTER_DATE="2024-01-02T00:00:00" git commit -q -m "loser"
+  echo "# Implementation spec for ADR-090-alpha" > knowledge/decisions/ADR-090-implementation-spec.md
+  git add . && git commit -q -m "companion doc"
+)
+OUT11=$(CLAUDE_PROJECT_DIR="$REPO11" "$FIX_SCRIPT" decisions 90 2>&1) || { echo "$OUT11"; fail "fix script exited non-zero on companion-doc-ownership fixture"; }
+printf '%s' "$OUT11" | grep -q "COMPANION DOC" && printf '%s' "$OUT11" | grep -q "ADR-090-implementation-spec.md" && pass "companion doc with ambiguous winner/loser ownership is flagged" || fail "expected a COMPANION DOC note naming ADR-090-implementation-spec.md, got: $OUT11"
+rm -rf "$REPO11"
+
+# --- Sed metacharacters in a slug (&, @) must not corrupt or crash --------
+REPO12="$(mktemp -d)"
+(
+  cd "$REPO12"
+  git init -q
+  git config user.email test@test.com
+  git config user.name test
+  mkdir -p knowledge/decisions
+  echo "# ADR-095: Zulu" > knowledge/decisions/ADR-095-zulu.md
+  git add . && GIT_AUTHOR_DATE="2024-01-01T00:00:00" GIT_COMMITTER_DATE="2024-01-01T00:00:00" git commit -q -m "winner"
+  echo "# ADR-095: A and B" > "knowledge/decisions/ADR-095-a&b.md"
+  git add . && GIT_AUTHOR_DATE="2024-01-02T00:00:00" GIT_COMMITTER_DATE="2024-01-02T00:00:00" git commit -q -m "loser"
+  printf 'ref: ADR-095-a&b.md\ndecoy: ADR-095-aXb.md should not match\n' > knowledge/decisions/ADR-095-zulu.md
+  git add . && git commit -q -m "add ref with ampersand slug"
+)
+OUT12=$(CLAUDE_PROJECT_DIR="$REPO12" "$FIX_SCRIPT" decisions 95 2>&1) || { echo "$OUT12"; fail "fix script exited non-zero on ampersand-slug fixture"; }
+grep -q "^ref: ADR-096-a&b.md$" "$REPO12/knowledge/decisions/ADR-095-zulu.md" && pass "ampersand in slug rewritten correctly, no whole-match corruption" || fail "ampersand in slug corrupted the rewrite"
+grep -q "decoy: ADR-095-aXb.md should not match" "$REPO12/knowledge/decisions/ADR-095-zulu.md" && pass "unrelated decoy slug left untouched" || fail "decoy slug should not have been touched"
+rm -rf "$REPO12"
+
 exit $FAIL

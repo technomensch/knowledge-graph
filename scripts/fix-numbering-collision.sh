@@ -13,8 +13,9 @@
 # loser specifically is auto-rewritten (its own slug, for decisions — there
 # is no safe automatic target at all for enhancements/issues, which have no
 # slug to disambiguate loser from winner). Every other mention of the old ID
-# — including the loser's own file body beyond its self-identity header — is
-# reported under "AMBIGUOUS" for manual review, never guessed at.
+# — including the loser's own file body and its own self-identity header,
+# neither of which is auto-rewritten — is reported under "AMBIGUOUS" for
+# manual review, never guessed at.
 # Scan scope: knowledge/ is scanned for both rewrite and ambiguity reporting;
 # commands/, docs/, scripts/, mcp-server/, agents/, skills/, core/, and
 # ROADMAP.md are scanned for ambiguity reporting ONLY (never rewritten) —
@@ -139,9 +140,18 @@ echo "fix-numbering-collision: ${OLD_ID} collision — keeping $(basename "$WINN
 # loser's actual on-disk padding doesn't match OLD_ID's canonical padded form
 # (e.g. a malformed "ADR-14-x.md" next to a canonical "ADR-014-y.md").
 LOSER_BASE=$(basename "$LOSER")
+# The loser's own on-disk digit string (unpadded, as actually found) — NOT
+# necessarily equal to OLD_ID's canonical padding. Needed so the ambiguous
+# scan can also recognize the loser's malformed form (e.g. "ENH-14") even
+# when it differs from the canonical "${OLD_ID}" — see AMBIGUOUS_REGEX below.
+LOSER_DIGITS=$(printf '%s\n' "$LOSER_BASE" | sed -nE "s/${ID_REGEX}/\\1/p")
 case "$AREA" in
   decisions)
     SLUG_TAIL=$(printf '%s\n' "$LOSER_BASE" | sed -nE 's/^ADR-[0-9]+-(.*)\.md$/\1/p')
+    if [ -z "$SLUG_TAIL" ]; then
+      echo "fix-numbering-collision: refusing — loser's filename ${LOSER_BASE} has an empty slug, cannot build a safe, unambiguous rewrite target" >&2
+      exit 1
+    fi
     NEW_BASE="ADR-$(pad_number "$NEW_NUM")-${SLUG_TAIL}.md"
     ;;
   enhancements) NEW_BASE="ENH-$(pad_number "$NEW_NUM")" ;;
@@ -232,7 +242,14 @@ fi
 # bare mentions are reported for manual review, never auto-rewritten. Only
 # rewrite targets that are unique to the loser specifically:
 #   - decisions: the loser's own slug (e.g. "ADR-014-alpha") is unique to it —
-#     the winner has a different slug, so this substring can't hit the winner.
+#     the winner has a DIFFERENT slug, so a boundary-anchored match on this
+#     exact string can't hit the winner's own reference to itself. Anchoring
+#     matters: an earlier revision used an unanchored substring match, which
+#     silently corrupted a winner whose slug happened to start with the
+#     loser's slug (e.g. winner "ADR-014-alpha-extended", loser
+#     "ADR-014-alpha" — "ADR-014-alpha" is a literal prefix of the winner's
+#     own slug) — real, reproduced corruption, not a hypothetical; this repo
+#     already has prefix-overlapping ADR slugs today (ADR-036/ADR-052 shape).
 #   - enhancements/issues (no slug — directory name IS the bare ID): there is
 #     NO safe automatic rewrite target. A path-qualified form like "ENH-014/"
 #     is NOT unique to the loser — the WINNER keeps that exact same path
@@ -242,24 +259,52 @@ fi
 #     to silently rewrite a winner-pointing reference into the loser's new
 #     location — real, reproduced corruption, not a hypothetical.) Every
 #     mention — path-qualified or bare — is reported as ambiguous instead.
+#
+# LOSER_ALT_ID: the loser's ACTUAL on-disk digit form (e.g. "ENH-14"), which
+# can differ from the canonical OLD_ID (e.g. "ENH-014") for a malformed-
+# padding collision — the one real collision shape enhancements/issues can
+# even produce (see check-numbering-collision.sh's own header comment). Both
+# forms are checked everywhere below so a malformed loser's leftover mentions
+# are never silently missed.
+LOSER_ALT_ID="${PREFIX}-${LOSER_DIGITS}"
+
+# Escaping for use as a literal BRE pattern (delimiter @, plus BRE metachars).
+escape_sed_pattern() {
+  printf '%s' "$1" | sed -e 's/[\\]/\\\\/g' -e 's/[.[*^$@]/\\&/g'
+}
+# Escaping for use as sed replacement text (delimiter @, backreference &).
+escape_sed_replacement() {
+  printf '%s' "$1" | sed -e 's/[\\]/\\\\/g' -e 's/[&@]/\\&/g'
+}
+
 case "$AREA" in
   decisions)
-    LOSER_SUFFIX_NOEXT="${SLUG_TAIL}"                # e.g. "alpha", set above when NEW_BASE was built
-    OLD_REF="${OLD_ID}-${LOSER_SUFFIX_NOEXT}"        # e.g. "ADR-014-alpha" — unique to the loser
-    NEW_REF="${NEW_ID}-${LOSER_SUFFIX_NOEXT}"        # e.g. "ADR-015-alpha"
-    # Trailing exclusion keeps "/" and "-" out of what counts as ambiguous,
-    # since both are already covered by the safe OLD_REF rewrite above.
-    AMBIGUOUS_REGEX="(^|[^0-9-])${OLD_ID}([^0-9/-]|\$)"
+    OLD_REF="${OLD_ID}-${SLUG_TAIL}"        # e.g. "ADR-014-alpha" — unique to the loser
+    NEW_REF="${NEW_ID}-${SLUG_TAIL}"        # e.g. "ADR-015-alpha"
+    # Boundary-anchored: OLD_REF must not be immediately followed (or
+    # preceded) by another slug-continuation character, or it could match as
+    # a PREFIX of a longer, unrelated identifier (the winner-corruption bug
+    # above). "/" is excluded from what counts as ambiguous below since a
+    # trailing "/" after a decisions filename isn't a real reference shape.
+    SAFE_MATCH_REGEX="(^|[^A-Za-z0-9-])$(escape_sed_pattern "$OLD_REF")([^A-Za-z0-9-]|\$)"
+    AMBIGUOUS_REGEX="(^|[^0-9-])(${OLD_ID}|${LOSER_ALT_ID})([^0-9/-]|\$)"
     ;;
   enhancements|issues)
     OLD_REF=""
     NEW_REF=""
-    # No "/" exclusion here — unlike decisions, a trailing "/" (path-qualified
-    # form) is NOT handled by a safe rewrite for these two areas, so it must
-    # be caught by the ambiguous scan too, not skipped.
-    AMBIGUOUS_REGEX="(^|[^0-9-])${OLD_ID}([^0-9-]|\$)"
+    SAFE_MATCH_REGEX=""
+    # No "/" exclusion — unlike decisions, a path-qualified form is NOT
+    # handled by a safe rewrite for these two areas, so it must be caught by
+    # the ambiguous scan too, not skipped. Includes LOSER_ALT_ID so a
+    # malformed-padding loser's own leftover mentions are still caught even
+    # when they don't match the canonical OLD_ID.
+    AMBIGUOUS_REGEX="(^|[^0-9-])(${OLD_ID}|${LOSER_ALT_ID})([^0-9-]|\$)"
     ;;
 esac
+# Extra-scan (outside knowledge/) never rewrites anything, so there is no
+# "already covered by the safe rewrite" case to exclude — every mention,
+# path-qualified or not, is reportable there.
+EXTRA_SCAN_REGEX="(^|[^0-9])(${OLD_ID}|${LOSER_ALT_ID})([^0-9]|\$)"
 
 REWRITTEN=0
 AMBIGUOUS_HITS=""
@@ -271,11 +316,10 @@ while IFS= read -r ref_file; do
   # can legitimately contain a slug-qualified cross-reference TO the loser
   # (e.g. "see ADR-014-alpha for background" inside the winner's own file),
   # which still needs updating even though the winner's own identity doesn't.
-  if [ -n "$OLD_REF" ] && grep -qF "$OLD_REF" "$ref_file" 2>/dev/null; then
-    ESCAPED_OLD_REF=$(printf '%s' "$OLD_REF" | sed 's/[][\.*^$/]/\\&/g')
-    ESCAPED_NEW_REF=$(printf '%s' "$NEW_REF" | sed 's/[][\.*^$/]/\\&/g')
+  if [ -n "$SAFE_MATCH_REGEX" ] && grep -qE "$SAFE_MATCH_REGEX" "$ref_file" 2>/dev/null; then
+    ESCAPED_NEW_REF=$(escape_sed_replacement "$NEW_REF")
     BAK_FILES+=("${ref_file}.bak")
-    sed -i.bak "s@${ESCAPED_OLD_REF}@${ESCAPED_NEW_REF}@g" "$ref_file"
+    sed -i.bak -E "s@${SAFE_MATCH_REGEX}@\\1${ESCAPED_NEW_REF}\\2@g" "$ref_file"
     rm -f "${ref_file}.bak"
     REWRITTEN=$((REWRITTEN + 1))
   fi
@@ -312,19 +356,38 @@ for extra_dir in $EXTRA_SCAN_DIRS; do
   while IFS= read -r ref_file; do
     [ -n "$ref_file" ] || continue
     [ -f "$ref_file" ] || continue
-    if grep -qE "$AMBIGUOUS_REGEX" "$ref_file" 2>/dev/null; then
+    if grep -qE "$EXTRA_SCAN_REGEX" "$ref_file" 2>/dev/null; then
       AMBIGUOUS_HITS="${AMBIGUOUS_HITS}  - ${ref_file}
 "
     fi
   done < <(find "${REPO_ROOT}/${extra_dir}" -type f -not -path '*/node_modules/*' \( -name '*.md' -o -name '*.mdx' -o -name '*.ts' -o -name '*.sh' \) 2>/dev/null)
 done
-if [ -f "${REPO_ROOT}/ROADMAP.md" ] && grep -qE "$AMBIGUOUS_REGEX" "${REPO_ROOT}/ROADMAP.md" 2>/dev/null; then
+if [ -f "${REPO_ROOT}/ROADMAP.md" ] && grep -qE "$EXTRA_SCAN_REGEX" "${REPO_ROOT}/ROADMAP.md" 2>/dev/null; then
   AMBIGUOUS_HITS="${AMBIGUOUS_HITS}  - ${REPO_ROOT}/ROADMAP.md
 "
+fi
+
+# --- Flag any companion doc sharing this number — ownership is ambiguous ---
+# A companion doc (matched by FIND_EXCLUDE, e.g. *-implementation-spec.md)
+# shares OLD_ID's number but isn't itself one of the two colliding entries,
+# so it was correctly excluded from collision detection above. But which of
+# winner/loser it actually documents can't be determined mechanically — flag
+# it for manual attention rather than silently leaving it unmentioned.
+COMPANION_NOTE=""
+if [ "$AREA" = "decisions" ]; then
+  while IFS= read -r companion; do
+    [ -n "$companion" ] || continue
+    COMPANION_NOTE="${COMPANION_NOTE}  - ${companion}
+"
+  done < <(find "$DIR" -maxdepth 1 -iname "${OLD_ID}*implementation-spec.md" 2>/dev/null)
 fi
 
 echo "fix-numbering-collision: renamed to ${NEW_BASE}, rewrote unambiguous references in ${REWRITTEN} file(s). Review the diff before committing."
 if [ -n "$AMBIGUOUS_HITS" ]; then
   echo "fix-numbering-collision: AMBIGUOUS — bare ${OLD_ID} mentions found outside a rewritten context (${OLD_ID} still belongs to $(basename "$WINNER") after this fix). Check by hand whether any of these actually meant the renumbered entry:"
   printf '%s' "$AMBIGUOUS_HITS"
+fi
+if [ -n "$COMPANION_NOTE" ]; then
+  echo "fix-numbering-collision: COMPANION DOC — the following companion doc(s) shared ${OLD_ID} and were excluded from collision detection, but this script cannot determine whether they belong to the winner or the loser. Check by hand and rename/update manually if needed:"
+  printf '%s' "$COMPANION_NOTE"
 fi
