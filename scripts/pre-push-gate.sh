@@ -263,6 +263,17 @@ if [ -n "$SCAN_FLAG" ]; then
   fi
 fi
 
+# ── Gate 7: numbering collision detection (ADR-067 § Mechanism resolved 2026-08-23) ──
+
+NUMBERING_CHECK="${REPO_ROOT}/scripts/check-numbering-collision.sh"
+if [ -x "$NUMBERING_CHECK" ]; then
+  NUMBERING_FINDINGS=$("$NUMBERING_CHECK" --findings 2>/dev/null || true)
+  if [ -n "$NUMBERING_FINDINGS" ]; then
+    FINDINGS="${FINDINGS}${NUMBERING_FINDINGS}
+"
+  fi
+fi
+
 # ── Emit ──────────────────────────────────────────────────────────────────────
 
 [ -z "$FINDINGS" ] && exit 0
