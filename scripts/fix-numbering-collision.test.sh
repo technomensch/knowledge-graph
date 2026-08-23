@@ -55,7 +55,11 @@ OUT=$("$FIX_SCRIPT" decisions 14 2>&1) || { echo "$OUT"; fail "fix script exited
 [ -f "knowledge/decisions/ADR-014-zulu.md" ] && pass "earlier entry (zulu) keeps ADR-014" || fail "zulu should still be ADR-014"
 [ ! -f "knowledge/decisions/ADR-014-alpha.md" ] && pass "later entry (alpha) no longer at ADR-014" || fail "alpha should have been renumbered away from ADR-014"
 [ -f "knowledge/decisions/ADR-015-alpha.md" ] && pass "later entry (alpha) renumbered to next free ADR-015" || fail "alpha should now be ADR-015-alpha.md"
-grep -q "# ADR-015: Alpha decision" knowledge/decisions/ADR-015-alpha.md && pass "alpha's in-file header updated to ADR-015" || fail "alpha's header still says ADR-014"
+# Self-identity headers are intentionally NOT auto-rewritten (no file-format
+# assumption is safe across every real shape — see the script's own comment
+# at the rename site) — the header stays as-is, and the renamed file is
+# expected to surface under AMBIGUOUS instead, checked further below.
+grep -q "# ADR-014: Alpha decision" knowledge/decisions/ADR-015-alpha.md && pass "alpha's header is left untouched, not guessed at" || fail "alpha's header should remain unchanged (self-identity rewrite is intentionally not attempted)"
 grep -q "Builds on ADR-014 (the winner) for background." knowledge/decisions/ADR-015-alpha.md && pass "loser's own body mention of the winner is untouched (not blanket-rewritten)" || fail "loser's body mention of the winner was incorrectly rewritten — this is the reproduced corruption bug"
 printf '%s' "$OUT" | grep -q "^  - .*ADR-015-alpha.md" && pass "loser's renamed file is itself flagged ambiguous for its own leftover bare mention" || fail "expected ADR-015-alpha.md to appear in the ambiguous list (it still bare-mentions ADR-014), got: $OUT"
 

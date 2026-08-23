@@ -165,32 +165,41 @@ if [ ! -e "$NEW_PATH" ]; then
 fi
 
 # Best-effort cleanup if a later step in this script dies mid-sed (set -e).
-# Sweeps knowledge/ rather than tracking one path — every .bak this script
-# creates lives under knowledge/, and the run is short-lived enough that a
-# blanket sweep at exit is safe.
+# Tracks the exact .bak paths this run creates rather than sweeping
+# knowledge/ for any file named *.bak — a blanket sweep was tried and found,
+# via re-review, to delete this repo's own 29 pre-existing, untracked,
+# gitignored .bak files under knowledge/sessions/ on every run, silently and
+# unrecoverably (gitignored means no git history to restore from).
+BAK_FILES=()
 cleanup_bak_files() {
-  find "${REPO_ROOT}/knowledge" -name '*.bak' -delete 2>/dev/null || true
+  local f
+  for f in "${BAK_FILES[@]+"${BAK_FILES[@]}"}"; do
+    rm -f "$f"
+  done
 }
 trap cleanup_bak_files EXIT
 
-# --- Update the loser's own in-file self-identity header, line 1 ONLY ---
-# Deliberately scoped to line 1 (this repo's "# ADR-NNN: Title" convention),
-# NOT a blanket file-wide rewrite. A blanket rewrite was found, via final
-# branch review, to silently corrupt a body mention that correctly pointed
-# at the WINNER (e.g. "builds on ADR-014 (winner)" inside the loser's own
-# file became "builds on ADR-015", a dangling reference — and silently so,
-# since by the time the ambiguity scan ran below, no OLD_ID remained in this
-# file to flag). Any OLD_ID mention beyond line 1 is intentionally left for
-# the general ambiguous-scan pass below to catch instead of guessing here.
-if [ -f "$NEW_PATH" ]; then
-  sed -i.bak -E "1s/(^|[^0-9])${OLD_ID}([^0-9]|$)/\\1${NEW_ID}\\2/g" "$NEW_PATH"
-  rm -f "${NEW_PATH}.bak"
-fi
+# --- The loser's own self-identity header is NOT auto-rewritten -----------
+# Two different auto-rewrite attempts were tried here and both proved unsafe
+# via review: a blanket file-wide rewrite corrupted body mentions correctly
+# pointing at the WINNER (e.g. "builds on ADR-014 (winner)" silently became
+# a dangling ADR-015 reference); a line-1-only rewrite (assuming a
+# "# ADR-NNN: Title" convention on line 1) turned out wrong for most real
+# files — the majority of this repo's ADRs carry their identity in YAML
+# frontmatter starting on line 2, and issue/ inner files have no line-1
+# identity at all, so the "fix" silently missed them. There is no format
+# assumption that holds safely across every file shape, so this script makes
+# none: the renamed file is scanned by the same ambiguous-mention pass below
+# as every other file, and ANY leftover OLD_ID mention in it — including its
+# own header — surfaces under AMBIGUOUS for a human to update by hand. Never
+# wrong, at the cost of one manual edit the tool already tells you about.
 
 # --- Rename inner files for directory-based areas (enhancements/issues) ---
 # These have no slug, so their inner files are named <PREFIX>-<NNN>-<suffix>
 # (e.g. issue-14-description.md) — renaming them keeps pre-push-gate.sh's
 # Gate 5 backlink check (which resolves paths by exact <ref>/<ref>-*.md) working.
+# Content self-identity (if any) is left for the ambiguous scan, same
+# rationale as the decisions case above.
 #
 # Match each inner file's OWN on-disk number via regex, not a literal
 # "${OLD_ID}-" prefix string — the outer directory's number can be malformed
@@ -211,11 +220,6 @@ if [ "$AREA" != "decisions" ] && [ -d "$NEW_PATH" ]; then
     [ "$((10#$inner_num))" -eq "$((10#$NUMBER))" ] || continue
     new_inner_base="${NEW_ID}-${inner_suffix}"
     mv "$inner" "${NEW_PATH}/${new_inner_base}"
-    # Line-1-only, same self-identity scoping rationale as the decisions
-    # case above — and matched against the file's ACTUAL old prefix
-    # (${PREFIX}-${inner_num}, unpadded as found), not the canonical OLD_ID.
-    sed -i.bak -E "1s/(^|[^0-9])${PREFIX}-${inner_num}([^0-9]|\$)/\\1${NEW_ID}\\2/g" "${NEW_PATH}/${new_inner_base}" 2>/dev/null || true
-    rm -f "${NEW_PATH}/${new_inner_base}.bak"
   done < <(find "$NEW_PATH" -maxdepth 1 -type f 2>/dev/null)
 fi
 
@@ -270,6 +274,7 @@ while IFS= read -r ref_file; do
   if [ -n "$OLD_REF" ] && grep -qF "$OLD_REF" "$ref_file" 2>/dev/null; then
     ESCAPED_OLD_REF=$(printf '%s' "$OLD_REF" | sed 's/[][\.*^$/]/\\&/g')
     ESCAPED_NEW_REF=$(printf '%s' "$NEW_REF" | sed 's/[][\.*^$/]/\\&/g')
+    BAK_FILES+=("${ref_file}.bak")
     sed -i.bak "s@${ESCAPED_OLD_REF}@${ESCAPED_NEW_REF}@g" "$ref_file"
     rm -f "${ref_file}.bak"
     REWRITTEN=$((REWRITTEN + 1))
@@ -311,7 +316,7 @@ for extra_dir in $EXTRA_SCAN_DIRS; do
       AMBIGUOUS_HITS="${AMBIGUOUS_HITS}  - ${ref_file}
 "
     fi
-  done < <(find "${REPO_ROOT}/${extra_dir}" -type f \( -name '*.md' -o -name '*.ts' -o -name '*.sh' \) 2>/dev/null)
+  done < <(find "${REPO_ROOT}/${extra_dir}" -type f -not -path '*/node_modules/*' \( -name '*.md' -o -name '*.mdx' -o -name '*.ts' -o -name '*.sh' \) 2>/dev/null)
 done
 if [ -f "${REPO_ROOT}/ROADMAP.md" ] && grep -qE "$AMBIGUOUS_REGEX" "${REPO_ROOT}/ROADMAP.md" 2>/dev/null; then
   AMBIGUOUS_HITS="${AMBIGUOUS_HITS}  - ${REPO_ROOT}/ROADMAP.md
