@@ -210,6 +210,7 @@ def split_file_if_oversized(output_path):
         stem = re.sub(r'-part-\d+\.md$', '', filename)
         part_match = re.search(r'-part-(\d+)\.md$', filename)
         start_part = int(part_match.group(1)) if part_match else 1
+        split_dir = parent_dir
     else:
         date_m = re.match(r'(\d{4}-\d{2}-\d{2})', filename)
         date_str = date_m.group(1) if date_m else 'unknown'
