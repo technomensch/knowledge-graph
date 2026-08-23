@@ -130,6 +130,29 @@ When running `/kmgraph:kmg-init` on an existing installation, the wizard inspect
 >
 > `/kmgraph:kmg-init` is safe to re-run at any time. It skips steps already complete and only offers items still pending for your install.
 
+### First Install Onto an Existing Knowledge Graph
+
+Landed in a repo where `knowledge/` is already populated — decisions, lessons
+learned, sessions checked in by someone else's KMGraph use — and you've never
+installed KMGraph yourself? That's what the `README.md` at the root of that
+folder is for: KMGraph writes it there automatically, explaining that the
+folder is a KMGraph knowledge graph and naming the plugin and the
+`/kmgraph:kmg-init` command — that's what leads a reader to this installer.
+(Graphs created before that README existed get one back-filled the next time
+`kg_upgrade` runs against them.)
+
+> 📘 **Won't the installer overwrite what's already there?**
+>
+> No. Nothing blindly re-scaffolds over existing content. `/kmgraph:kmg-init`'s
+> existing-graph detection (the same mechanism used for version upgrades, above)
+> also fires on disk content alone — finding `decisions/` or `lessons-learned/`
+> at the target path routes the wizard into the same Verify/Upgrade flow instead
+> of scaffolding fresh, even on your first run against that folder. MCP IDE
+> users (no wizard) get the same protection from the `kg_config_init` tool
+> directly: it refuses to scaffold over unregistered `decisions/` or
+> `lessons-learned/` content and points you to `kg_upgrade` to register and
+> back-fill it safely instead.
+
 ### Upgrading on Codex or Gemini CLI
 
 On platforms without the Claude Code wizard, upgrades are handled via the `kg_upgrade` MCP tool:
