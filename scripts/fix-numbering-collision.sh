@@ -1,0 +1,168 @@
+#!/usr/bin/env bash
+# fix-numbering-collision.sh — resolves a numbering collision reported by
+# check-numbering-collision.sh. Renumbers the LATER-created entry (by first
+# commit date) to the next free number in its sequence, and rewrites every
+# reference to its old ID across knowledge/ (reference rewrite added in a
+# later revision of this same file — see Task 4).
+#
+# Usage: fix-numbering-collision.sh <decisions|enhancements|issues> <number>
+#
+# This script MUTATES files. It is never invoked automatically from any
+# hook — run it explicitly, then review the diff before committing, same as
+# any other change. See ADR-067 § "Mechanism resolved 2026-08-23".
+
+set -euo pipefail
+
+REPO_ROOT="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+AREA="${1:-}"
+NUMBER="${2:-}"
+
+if [ -z "$AREA" ] || [ -z "$NUMBER" ]; then
+  echo "usage: $(basename "$0") <decisions|enhancements|issues> <number>" >&2
+  exit 2
+fi
+
+case "$NUMBER" in
+  ''|*[!0-9]*) echo "fix-numbering-collision: <number> must be a non-negative integer, got '$NUMBER'" >&2; exit 2 ;;
+esac
+
+case "$AREA" in
+  decisions)    DIR="${REPO_ROOT}/knowledge/decisions";    ID_REGEX='^ADR-([0-9]+)-.*\.md$';  PREFIX="ADR";   PAD=3 ;;
+  enhancements) DIR="${REPO_ROOT}/knowledge/enhancements"; ID_REGEX='^ENH-([0-9]+)$';         PREFIX="ENH";   PAD=3 ;;
+  issues)       DIR="${REPO_ROOT}/knowledge/issues";       ID_REGEX='^issue-([0-9]+)$';       PREFIX="issue"; PAD=0 ;;
+  *) echo "unknown area: $AREA (expected decisions|enhancements|issues)" >&2; exit 2 ;;
+esac
+
+pad_number() {
+  local n="$1"
+  if [ "$PAD" -gt 0 ]; then
+    printf "%0${PAD}d" "$n"
+  else
+    printf "%d" "$n"
+  fi
+}
+
+OLD_ID="${PREFIX}-$(pad_number "$((10#$NUMBER))")"
+
+# --- Find every entry matching this number ---
+MATCHES=()
+while IFS= read -r path; do
+  [ -n "$path" ] || continue
+  base=$(basename "$path")
+  id=$(printf '%s\n' "$base" | sed -nE "s/${ID_REGEX}/\\1/p")
+  [ -n "$id" ] || continue
+  [ "$((10#$id))" -eq "$((10#$NUMBER))" ] && MATCHES+=("$path")
+done < <(find "$DIR" -maxdepth 1 2>/dev/null | sort)
+
+if [ "${#MATCHES[@]}" -lt 2 ]; then
+  echo "fix-numbering-collision: no collision found for ${OLD_ID} (found ${#MATCHES[@]} match(es))" >&2
+  exit 1
+fi
+if [ "${#MATCHES[@]}" -gt 2 ]; then
+  echo "fix-numbering-collision: ${#MATCHES[@]} entries claim ${OLD_ID} — this script resolves one pair at a time. Resolve manually or re-run after fixing one pair." >&2
+  exit 1
+fi
+
+# --- Tie-break: earlier first-commit date wins, keeps the number ---
+# `|| true` guards each call: set -o pipefail means a non-git REPO_ROOT (git
+# log exits 128) would otherwise abort the whole script here under set -e,
+# with no output — this makes that case fall through to the empty-epoch
+# default below instead of dying silently.
+first_commit_epoch() {
+  local path="$1" rel
+  rel="${path#"$REPO_ROOT"/}"
+  git -C "$REPO_ROOT" log --diff-filter=A --follow --format=%at -- "$rel" 2>/dev/null | tail -1
+}
+
+EPOCH_A=$(first_commit_epoch "${MATCHES[0]}") || true
+EPOCH_B=$(first_commit_epoch "${MATCHES[1]}") || true
+
+# Entries never committed (working-tree only) sort last — treat missing epoch as "now".
+[ -z "$EPOCH_A" ] && EPOCH_A=9999999999
+[ -z "$EPOCH_B" ] && EPOCH_B=9999999999
+
+if [ "$EPOCH_A" -le "$EPOCH_B" ]; then
+  WINNER="${MATCHES[0]}"
+  LOSER="${MATCHES[1]}"
+else
+  WINNER="${MATCHES[1]}"
+  LOSER="${MATCHES[0]}"
+fi
+
+# --- Compute next free number in this sequence ---
+MAX=0
+while IFS= read -r path; do
+  [ -n "$path" ] || continue
+  base=$(basename "$path")
+  id=$(printf '%s\n' "$base" | sed -nE "s/${ID_REGEX}/\\1/p")
+  [ -n "$id" ] || continue
+  n=$((10#$id))
+  [ "$n" -gt "$MAX" ] && MAX="$n"
+done < <(find "$DIR" -maxdepth 1 2>/dev/null)
+
+NEW_NUM=$((MAX + 1))
+NEW_ID="${PREFIX}-$(pad_number "$NEW_NUM")"
+
+echo "fix-numbering-collision: ${OLD_ID} collision — keeping $(basename "$WINNER") (earlier), renumbering $(basename "$LOSER") to ${NEW_ID}"
+
+# --- Rename the loser ---
+# Rebuild the new basename from the regex capture groups, not from a literal
+# OLD_ID substring replace — a literal replace silently no-ops (and the
+# `mv a a` fallback below would then "succeed" while renaming nothing) if the
+# loser's actual on-disk padding doesn't match OLD_ID's canonical padded form
+# (e.g. a malformed "ADR-14-x.md" next to a canonical "ADR-014-y.md").
+LOSER_BASE=$(basename "$LOSER")
+case "$AREA" in
+  decisions)
+    SLUG_TAIL=$(printf '%s\n' "$LOSER_BASE" | sed -nE 's/^ADR-[0-9]+-(.*)\.md$/\1/p')
+    NEW_BASE="ADR-$(pad_number "$NEW_NUM")-${SLUG_TAIL}.md"
+    ;;
+  enhancements) NEW_BASE="ENH-$(pad_number "$NEW_NUM")" ;;
+  issues)       NEW_BASE="issue-${NEW_NUM}" ;;
+esac
+NEW_PATH="${DIR}/${NEW_BASE}"
+
+if [ "$NEW_PATH" = "$LOSER" ]; then
+  echo "fix-numbering-collision: internal error — computed new path is identical to the old path ($NEW_PATH), refusing to proceed" >&2
+  exit 1
+fi
+if [ -e "$NEW_PATH" ]; then
+  echo "fix-numbering-collision: refusing to overwrite existing path $NEW_PATH" >&2
+  exit 1
+fi
+
+git -C "$REPO_ROOT" mv "$LOSER" "$NEW_PATH" 2>/dev/null || mv "$LOSER" "$NEW_PATH"
+if [ ! -e "$NEW_PATH" ]; then
+  echo "fix-numbering-collision: rename failed — $NEW_PATH does not exist after mv" >&2
+  exit 1
+fi
+
+# Best-effort cleanup if a later step in this script dies mid-sed (set -e).
+trap 'rm -f "${NEW_PATH:-}.bak"' EXIT
+
+# --- Update the loser's own in-file header/frontmatter reference, if a file ---
+if [ -f "$NEW_PATH" ]; then
+  sed -i.bak -E "s/(^|[^0-9])${OLD_ID}([^0-9]|$)/\\1${NEW_ID}\\2/g" "$NEW_PATH"
+  rm -f "${NEW_PATH}.bak"
+fi
+
+# --- Rename inner files for directory-based areas (enhancements/issues) ---
+# These have no slug, so their inner files are named <OLD_ID>-<fixed-suffix>
+# (e.g. issue-14-description.md) — renaming them keeps pre-push-gate.sh's
+# Gate 5 backlink check (which resolves paths by exact <ref>/<ref>-*.md) working.
+if [ "$AREA" != "decisions" ] && [ -d "$NEW_PATH" ]; then
+  while IFS= read -r inner; do
+    [ -n "$inner" ] || continue
+    inner_base=$(basename "$inner")
+    case "$inner_base" in
+      "${OLD_ID}"-*)
+        new_inner_base="${NEW_ID}-${inner_base#${OLD_ID}-}"
+        mv "$inner" "${NEW_PATH}/${new_inner_base}"
+        sed -i.bak -E "s/(^|[^0-9])${OLD_ID}([^0-9]|$)/\\1${NEW_ID}\\2/g" "${NEW_PATH}/${new_inner_base}" 2>/dev/null || true
+        rm -f "${NEW_PATH}/${new_inner_base}.bak"
+        ;;
+    esac
+  done < <(find "$NEW_PATH" -maxdepth 1 -type f 2>/dev/null)
+fi
+
+echo "fix-numbering-collision: renamed to ${NEW_BASE}. Reference rewrite across knowledge/ not yet applied by this revision — see Task 4."
