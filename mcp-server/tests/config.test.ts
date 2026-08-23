@@ -355,4 +355,36 @@ describe("handleConfigInit", () => {
     expect(result.content[0].text).not.toMatch(/Found existing content at/);
     expect(writeConfig).not.toHaveBeenCalled();
   });
+
+  // Final-review finding Important #3 (scaffold-then-refuse leak): the
+  // marker-mismatch refusal used to run AFTER scaffoldGraphDirectory, so an
+  // orphaned-marker mismatch would still leave freshly-scaffolded template
+  // files -- including the ENH-064 attribution README.md -- behind in a
+  // folder the function was about to refuse to register. This pins the fix:
+  // the mismatch check now runs before scaffoldGraphDirectory is called, so
+  // nothing gets written on this path.
+  it("does not leak scaffolded files (e.g. README.md) into the target dir when refusing on a marker mismatch", async () => {
+    const kgPath = makeTempDir("init-marker-mismatch-no-leak");
+    fs.writeFileSync(path.join(kgPath, ".kmgraph-id"), "some-other-id\n", "utf-8");
+    (readConfig as jest.Mock).mockReturnValue({ version: "1.0.0", graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } });
+
+    const beforeEntries = fs.readdirSync(kgPath).sort();
+
+    const result = await handleConfigInit({
+      name: "new-kg",
+      kgPath,
+      type: "project-local",
+      categories: [{ name: "architecture", prefix: null, git: "commit" }],
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toMatch(/already tracked as a different knowledge graph \(marker mismatch\)/);
+    expect(writeConfig).not.toHaveBeenCalled();
+    // Nothing scaffoldGraphDirectory would create exists -- the dir's
+    // contents are exactly what the test setup itself wrote (.kmgraph-id).
+    expect(fs.existsSync(path.join(kgPath, "README.md"))).toBe(false);
+    expect(fs.existsSync(path.join(kgPath, "decisions"))).toBe(false);
+    expect(fs.existsSync(path.join(kgPath, "templates"))).toBe(false);
+    expect(fs.readdirSync(kgPath).sort()).toEqual(beforeEntries);
+  });
 });

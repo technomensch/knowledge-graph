@@ -1,7 +1,7 @@
 ---
 id: ENH-064
 type: Enhancement
-status: tracked
+status: implemented
 github-issue: "#246"
 branch: v0.7.5-ENH-064-add-readme-to-graph
 created: 2026-08-23
@@ -55,11 +55,16 @@ that manages it."
    issue files with attribution text or HTML comments — repeating a
    plugin badge across every content file reads as spam and pollutes
    files that may be copied elsewhere. One README is enough.
-3. **Machine-detectable marker (open question, see below):** if
-   `kmg-init` needs to detect "this folder already exists but wasn't
-   initialized by me," a small config file (e.g. `.kmgraph.yml`) is a
-   candidate — cleaner than parsing README prose. Needs design in the
-   implementation phase; not decided here.
+3. **Machine-detectable marker (resolved during implementation):** no new
+   `.kmgraph.yml` (or similar) marker file convention was added. Both entry
+   points reuse the existing `.kmgraph-id` marker mechanism plus a plain
+   disk-content check (presence of `decisions/` or `lessons-learned/`) —
+   the markdown-wizard path's Step 1.5 already had equivalent disk-based
+   detection, so the MCP-native path (`kg_config_init` / `handleConfigInit`)
+   just needed the same disk-content pre-check added to reach parity. A
+   second, differently-scoped marker convention alongside `.kmgraph-id`
+   would only have created two overlapping ways to answer the same
+   question, so this closes the gap without inventing one.
 
 ## Draft README Copy (subject to refinement during implementation)
 
@@ -101,7 +106,9 @@ that manages it."
 - `core/default-templates/` (PROTECTED — requires explicit user
   permission per `CLAUDE.md` Code Protection Rules) if the README is
   templated there rather than generated inline
-- Possibly a new `.kmgraph.yml` marker file convention (open question)
+- No new marker file convention was added; the existing `.kmgraph-id` marker
+  plus a disk-content pre-check cover the detection need (see resolved
+  decision above)
 - `INSTALL.md` and `docs/INSTALL.md` (kept in sync) — neither currently
   documents the "first-time install, pre-existing populated `knowledge/`
   folder" path this ENH creates; both only cover upgrading an existing

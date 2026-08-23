@@ -289,18 +289,24 @@ blindly re-scaffolds over existing content:
   `decisions/` or `lessons-learned/` under the target path routes the wizard into
   the same Verify/Upgrade flow used for version upgrades instead of scaffolding
   fresh — even though this is the first time *you* have run the wizard against
-  this folder.
+  this folder. That refusal-to-overwrite is real, but Verify/Upgrade's own
+  parameters are documented as coming from an existing `kg-config.json` registry
+  entry, which a first-time, genuinely unregistered folder does not have. **This
+  is a known gap, not a self-service fix:** the wizard reliably detects and
+  refuses to overwrite, but it does not currently complete an automated connect
+  for this exact case either — treat the refusal as protection against
+  scaffolding over someone else's content, not as a pointer to a working
+  automated connect flow.
 - **MCP IDE users** (Cursor, Windsurf, Continue.dev, VS Code, JetBrains): the
   `kg_config_init` tool refuses to scaffold when it finds `decisions/` or
   `lessons-learned/` content that isn't already registered on your machine. Its
-  error message names `kg_upgrade` as the next step, but that does not
-  currently complete the connect for this exact case: `kg_upgrade` only
-  resolves already-registered graphs (from `kg-config.json`, with no
-  disk-content fallback), so it responds by asking you to run `kg_config_init`
-  first — the same tool that just refused. **This is a known gap, not a
-  self-service fix:** treat the refusal as protection against `kg_config_init`
-  silently adopting someone else's content, not as a pointer to a working
-  automated connect flow.
+  error message names `kg_upgrade` as the next step — as of v0.7.4.2 that's a
+  real, working path, not a dead end: run `kg_upgrade` with
+  `apply: ["connect-unregistered-graph"]` (see the v0.7.4.2 row in the table
+  above) to register the folder in place, with no re-scaffold and no template
+  writes. It isn't automatic — you have to name the category explicitly, and
+  `kg_config_init` still won't do it for you — but it's a self-service fix now,
+  not just a refusal.
 
 Proceed to Step 1 below — the rest of the install walks you through this
 automatically once you reach the init step (Step 3).

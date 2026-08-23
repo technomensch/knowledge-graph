@@ -149,16 +149,23 @@ automatically.)
 > existing-graph detection (the same mechanism used for version upgrades, above)
 > also fires on disk content alone — finding `decisions/` or `lessons-learned/`
 > at the target path routes the wizard into the same Verify/Upgrade flow instead
-> of scaffolding fresh, even on your first run against that folder. MCP IDE
-> users (no wizard) get the same *refusal-to-overwrite* protection from the
+> of scaffolding fresh, even on your first run against that folder. That
+> refusal-to-overwrite is real, but Verify/Upgrade's own parameters are
+> documented as coming from an existing `kg-config.json` registry entry, which a
+> first-time, genuinely unregistered folder does not have — so the wizard does
+> not currently complete an automated connect for this exact case either. MCP
+> IDE users (no wizard) get the same *refusal-to-overwrite* protection from the
 > `kg_config_init` tool directly: it refuses to scaffold over unregistered
 > `decisions/` or `lessons-learned/` content. Its error message names
-> `kg_upgrade` as the next step, but that does not currently complete the
-> connect for this exact case — `kg_upgrade` only resolves already-registered
-> graphs, so it responds by asking you to run `kg_config_init` first, the same
-> tool that just refused. This is a known gap, not a self-service fix: treat
-> the refusal as protection against silently adopting someone else's content,
-> not as a pointer to a working automated connect flow.
+> `kg_upgrade` as the next step — as of v0.7.4.2 that's a real, working path,
+> not a dead end: run `kg_upgrade` with `apply: ["connect-unregistered-graph"]`
+> to register the folder in place, with no re-scaffold and no template writes.
+> It isn't automatic — you have to name the category explicitly — but it's a
+> self-service fix now. The wizard side remains a real gap, though: its
+> Verify/Upgrade flow still expects registry parameters a genuinely
+> unregistered folder doesn't have, so treat its refusal as protection against
+> scaffolding over someone else's content, not as a pointer to a working
+> automated connect flow on that platform.
 
 ### Upgrading on Codex or Gemini CLI
 

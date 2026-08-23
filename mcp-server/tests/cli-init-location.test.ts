@@ -141,6 +141,21 @@ describe("scaffoldGraphDirectory", () => {
       expect(fs.existsSync(path.join(kgPath, "lessons-learned", "process"))).toBe(true);
       expect(typeof templatesCopied).toBe("number");
       expect(templatesCopied).toBeGreaterThanOrEqual(0);
+
+      // Fix 1 (final-review Important #1): the five content templates land in
+      // templates/ (matching the wizard's real routing,
+      // commands/kmg-init-shared/kmg-template-seed.md), not concepts/.
+      for (const t of ["patterns.md", "gotchas.md", "concepts.md", "architecture.md", "workflows.md"]) {
+        expect(fs.existsSync(path.join(kgPath, "templates", t))).toBe(true);
+        expect(fs.existsSync(path.join(kgPath, "concepts", t))).toBe(false);
+      }
+      // me.md/rules.md/triggers.md/index.md land at the KG root, sourced from
+      // concepts/templates/project/ -- not the old concepts/{me,rules,kg-index,triggers}.md
+      // paths, and the index file is named index.md, not kg-index.md.
+      for (const f of ["me.md", "rules.md", "triggers.md", "index.md"]) {
+        expect(fs.existsSync(path.join(kgPath, f))).toBe(true);
+      }
+      expect(fs.existsSync(path.join(kgPath, "kg-index.md"))).toBe(false);
     } finally {
       fs.rmSync(wrapper, { recursive: true, force: true });
     }
