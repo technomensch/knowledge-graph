@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 
+import * as fs from "fs";
 import * as path from "path";
 import * as readline from "readline";
 import {
   readConfig,
-  writeConfig,
   mintGraphId,
   writeGraphIdMarker,
   readGraphIdMarker,
   GraphConfig,
   CategoryConfig,
 } from "./utils.js";
-import { resolveRegistrationGuard, scaffoldGraphDirectory } from "./tools/config.js";
+import { resolveRegistrationGuard, scaffoldGraphDirectory, registerGraphConfig } from "./tools/config.js";
 import { resolveKgPath } from "./tools/resolve.js";
 
 declare const __SERVER_VERSION__: string;
@@ -170,7 +170,28 @@ async function runInit(): Promise<void> {
     const existingMarkerId = readGraphIdMarker(expandedPath);
     if (existingMarkerId && existingMarkerId !== newGraphId) {
       console.error(
-        `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, remove or rename the existing .kmgraph-id marker file manually if you're certain this is intentional.`
+        `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, either run kg_upgrade with apply: ["connect-unregistered-graph"] to register this folder under its existing graphId (preserves continuity, does not scaffold), or remove/rename the existing .kmgraph-id marker file manually if you're certain a fresh identity is intentional.`
+      );
+      process.exit(1);
+    }
+
+    // Opus validation review fix #4: mirrors handleConfigInit's (config.ts)
+    // "refuse to scaffold over a folder that already has decisions/ or
+    // lessons-learned/ content but no marker at all" guard -- this CLI path
+    // still blind-scaffolded over such a folder with no data-safety check at
+    // all. Checked BEFORE scaffoldGraphDirectory runs, same "check before you
+    // write files" discipline as the marker-mismatch check above. Gated on
+    // `!existingMarkerId`: a folder with an *orphaned* marker (marker
+    // present, not registered here) does NOT hit this -- it already hit the
+    // marker-mismatch refusal above instead (existingMarkerId would equal
+    // newGraphId only in the astronomically unlikely case of a real
+    // collision, so in practice any existing marker here already exited).
+    if (
+      !existingMarkerId &&
+      (fs.existsSync(path.join(expandedPath, "decisions")) || fs.existsSync(path.join(expandedPath, "lessons-learned")))
+    ) {
+      console.error(
+        `Error: Found existing content at ${expandedPath} (decisions/ or lessons-learned/ already present) that isn't registered or marked as a KMGraph. Refusing to scaffold over it. Run kg_upgrade with apply: ["connect-unregistered-graph"] to register it instead.`
       );
       process.exit(1);
     }
@@ -179,24 +200,18 @@ async function runInit(): Promise<void> {
     // kg_config_init, ENH-051)
     const templatesCopied = scaffoldGraphDirectory(expandedPath, categories);
 
-    // 7. Write config
-    const now = new Date().toISOString();
+    // 7. Write config -- shared with kg_config_init's own final registry
+    // write (registerGraphConfig, config.ts) rather than duplicating the
+    // GraphConfig-build + writeConfig sequence inline here.
     writeGraphIdMarker(expandedPath, newGraphId);
-    const graphConfig: GraphConfig = {
+    // config.active = name; removed -- resolution is now context-derived (Task 1.5)
+    registerGraphConfig(config, {
       name,
-      path: kgPath,
+      kgPath,
       type: kgType,
       categories,
-      createdAt: now,
-      status: "pending",
-      statusChangedAt: now,
       graphId: newGraphId,
-      // lastUsed removed -- optional on the type since Task 1.1, no writer needed
-    };
-
-    config.graphs[name] = graphConfig;
-    // config.active = name; removed -- resolution is now context-derived (Task 1.5)
-    writeConfig(config);
+    });
 
     // 8. Print summary
     console.log("");

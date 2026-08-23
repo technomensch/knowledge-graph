@@ -18,7 +18,7 @@ import {
   getIndexDir,
   KgConfig,
 } from "../utils.js";
-import { registerGraphConfig } from "./config.js";
+import { registerGraphConfig, resolveRegistrationGuard } from "./config.js";
 import { computeDbPath, rebuildIndex } from "./fts5.js";
 import { resolveGraph, resolvePersonalGraph, PersonalScopeSession, confirmPersonalScopeAccess } from "../resolution.js";
 import {
@@ -2401,6 +2401,14 @@ export interface HandleUpgradeParams {
   // mode is asked via gate() instead; an explicit true here is still
   // honored in either mode (see confirmBackfixCategory).
   confirmBackfix?: boolean;
+  // Opus validation review fix #3: required to register a knowledge graph
+  // whose path is an ancestor of one or more already-registered graphs, via
+  // the "connect-unregistered-graph" category -- same registration guard
+  // (and same param name/shape) handleConfigInit's own confirmBroadRegistration
+  // already uses (config.ts). Not needed when the target has no such
+  // ancestor relationship; the home/root hard block below has no bypass at
+  // all, in either tool.
+  confirmBroadRegistration?: "yes" | "no";
 }
 
 export interface HandleUpgradeResult {
@@ -2432,32 +2440,98 @@ export async function handleUpgrade(
   // whole tool -- config-location is graph-independent (and, per Task 8.1,
   // a future migration category must run before any graph can resolve
   // correctly) and must stay reachable even when no graph resolves.
-  const target = params.scope === "user" ? resolvePersonalGraph(config) : (() => {
+  //
+  // Sequential (not a single expression-bodied IIFE) so the
+  // connect-unregistered-graph branch below can `await gate()` and `return`
+  // straight out of handleUpgrade -- same registration guard (home/root hard
+  // block + broad-ancestor confirmation) handleConfigInit and cli.ts's
+  // runInit both already run before *their* scaffold call. Opus validation
+  // review fix #3: connectUnregisteredGraph used to register the cwd
+  // directly, with neither guard, so a monorepo root holding a top-level
+  // decisions/ folder (a common, unrelated convention) plus an
+  // already-registered sub-project graph could get silently registered as a
+  // whole new ancestor graph -- exactly the case findBroadAncestorWarning
+  // exists to catch.
+  let target: { name: string; graph: GraphConfig } | { error: string };
+  if (params.scope === "user") {
+    target = resolvePersonalGraph(config);
+  } else {
     const resolution = resolveGraph(config, cwd);
     if (resolution.kind === "resolved") {
-      return { name: resolution.name, graph: resolution.graph };
-    }
-    // Task A: only "no-graph-in-cwd" means nothing is registered for this
-    // path at all -- "archived", "merged", and "ambiguous-tie" all mean a
-    // registry entry already exists for it (just not currently resolvable),
-    // and registering a brand-new entry on top of one of those would create
-    // a genuine duplicate. Narrower than the pre-existing generic fallback
-    // below, which (unchanged) still treats every other non-resolved kind
-    // the same way it always has.
-    if (resolution.kind === "no-graph-in-cwd" && hasUnregisteredGraphContent(cwd)) {
+      target = { name: resolution.name, graph: resolution.graph };
+    } else if (resolution.kind === "no-graph-in-cwd" && hasUnregisteredGraphContent(cwd)) {
+      // Task A: only "no-graph-in-cwd" means nothing is registered for this
+      // path at all -- "archived", "merged", and "ambiguous-tie" all mean a
+      // registry entry already exists for it (just not currently
+      // resolvable), and registering a brand-new entry on top of one of
+      // those would create a genuine duplicate. Narrower than the
+      // pre-existing generic fallback below, which (unchanged) still treats
+      // every other non-resolved kind the same way it always has.
       if (!(params.apply ?? []).includes("connect-unregistered-graph")) {
-        return {
+        target = {
           error:
             `Found existing knowledge graph content at ${cwd} that isn't registered. ` +
             `Run kg_upgrade with apply: ["connect-unregistered-graph"] to register it.`,
         };
+      } else {
+        const { expandedPath, hardBlocked, broadWarning } = resolveRegistrationGuard(config, cwd);
+
+        if (hardBlocked) {
+          return {
+            content: [{
+              type: "text" as const,
+              text: `Error: refusing to register a knowledge graph at ${expandedPath} — this is your home directory or the filesystem root. Registering a KG this broad would make it resolve as "the KG for" nearly every directory on this machine. Choose a more specific project path.`,
+            }],
+            isError: true,
+          };
+        }
+
+        if (broadWarning) {
+          let broadAnswer = params.confirmBroadRegistration;
+          if (!broadAnswer) {
+            const mode = resolveInteractionMode({}).mode;
+            const gated = await gate({
+              mode,
+              reason: "broad_ancestor_registration",
+              param: "confirmBroadRegistration",
+              accepts: ["yes", "no"],
+              detail: broadWarning,
+              timeoutMs: STUB_ASK_TIMEOUT_MS,
+              ask: stubAsk, // no real ask() transport yet, same pattern as every other gate() stub in this plan
+            });
+            if ("error" in gated) {
+              return { content: [{ type: "text" as const, text: JSON.stringify(gated) }], isError: true };
+            }
+            if (!("answer" in gated)) {
+              return {
+                content: [{
+                  type: "text" as const,
+                  text: `Registration cancelled: ${expandedPath} is an ancestor of ${broadWarning.isAncestorOfCount} already-registered graph(s) (${broadWarning.ancestorOfNames.join(", ")}). Confirm explicitly (confirmBroadRegistration: "yes") if this breadth is intentional.`,
+                }],
+                isError: true,
+              };
+            }
+            broadAnswer = gated.answer as "yes" | "no";
+          }
+          if (broadAnswer !== "yes") {
+            return {
+              content: [{
+                type: "text" as const,
+                text: `Registration cancelled: ${expandedPath} is an ancestor of ${broadWarning.isAncestorOfCount} already-registered graph(s) (${broadWarning.ancestorOfNames.join(", ")}). Confirm explicitly (confirmBroadRegistration: "yes") if this breadth is intentional.`,
+              }],
+              isError: true,
+            };
+          }
+        }
+
+        const connected = connectUnregisteredGraph(config, cwd);
+        connectedGraph = { name: connected.name, graphId: connected.graph.graphId };
+        target = { name: connected.name, graph: connected.graph };
       }
-      const connected = connectUnregisteredGraph(config, cwd);
-      connectedGraph = { name: connected.name, graphId: connected.graph.graphId };
-      return { name: connected.name, graph: connected.graph };
+    } else {
+      target = { error: "No knowledge graph resolved from your current directory. Use kg_config_init first, or pass scope=\"user\"." };
     }
-    return { error: "No knowledge graph resolved from your current directory. Use kg_config_init first, or pass scope=\"user\"." };
-  })();
+  }
 
   // ADR-067 Task 6.4 (spec §11): scope:"user" reaches the personal graph
   // here the same way it does in search.ts/capture.ts/kg_config_add_category/
@@ -2881,10 +2955,18 @@ export function registerUpgradeTool(server: McpServer, personalScopeSession: Per
             "flag; setting it authorizes any of these three present in the same apply call. " +
             "Interactive callers are asked to confirm instead."
         ),
+      confirmBroadRegistration: z
+        .enum(["yes", "no"])
+        .optional()
+        .describe(
+          "Explicit confirmation to register a knowledge graph (via \"connect-unregistered-graph\") " +
+            "whose path is an ancestor of already-registered graph(s). Same guard kg_config_init runs " +
+            "before scaffolding; a home/root path is refused outright with no bypass."
+        ),
     },
-    async ({ apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix }, extra) => {
+    async ({ apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix, confirmBroadRegistration }, extra) => {
       return handleUpgrade(
-        { apply: apply as ApplyCategory[] | undefined, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix },
+        { apply: apply as ApplyCategory[] | undefined, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix, confirmBroadRegistration },
         personalScopeSession,
         extra?._meta as Record<string, unknown> | undefined
       );

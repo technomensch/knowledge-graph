@@ -239,9 +239,18 @@ describe("cli.ts / kg_config_init dedup -- single implementation, not a third co
   test("cli.ts imports the shared guard/scaffold functions instead of reimplementing them", () => {
     const source = fs.readFileSync(path.join(__dirname, "../src/cli.ts"), "utf-8");
 
-    expect(source).toMatch(/import\s*\{\s*resolveRegistrationGuard,\s*scaffoldGraphDirectory\s*\}\s*from\s*"\.\/tools\/config\.js"/);
+    // Opus validation review fix #4: cli.ts's runInit() now also calls the
+    // shared registerGraphConfig (config.ts) for its final registry write
+    // instead of duplicating the GraphConfig-build + writeConfig sequence
+    // inline, so this import line grew a third named import -- the regex
+    // below only pins that all three shared functions come from one import
+    // statement out of "./tools/config.js", not their exact ordering.
+    expect(source).toMatch(/import\s*\{[^}]*resolveRegistrationGuard[^}]*\}\s*from\s*"\.\/tools\/config\.js"/);
+    expect(source).toMatch(/import\s*\{[^}]*scaffoldGraphDirectory[^}]*\}\s*from\s*"\.\/tools\/config\.js"/);
+    expect(source).toMatch(/import\s*\{[^}]*registerGraphConfig[^}]*\}\s*from\s*"\.\/tools\/config\.js"/);
     expect(source).toContain("resolveRegistrationGuard(config, kgPath)");
     expect(source).toContain("scaffoldGraphDirectory(expandedPath, categories)");
+    expect(source).toContain("registerGraphConfig(config, {");
 
     // No standalone inline calls to the two guard primitives left in cli.ts --
     // they're only reachable now through resolveRegistrationGuard inside config.ts.
@@ -254,5 +263,35 @@ describe("cli.ts / kg_config_init dedup -- single implementation, not a third co
 
     expect(source).toContain("resolveRegistrationGuard(config, kgPath)");
     expect(source).toContain("scaffoldGraphDirectory(expandedPath, categories)");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Opus validation review fix #4: cli.ts's runInit() blind-scaffolded over a
+// folder with decisions/ or lessons-learned/ content and no marker -- the
+// same data-safety gap fix #1 (config.ts's handleConfigInit) already closed
+// for the MCP path was still open here. runInit() is not exported (it's an
+// interactive readline wizard), so this is a source-level guard in the same
+// style as the dedup tests above: it pins that the refusal check exists, is
+// gated on `!existingMarkerId` the same way config.ts's is, and -- the part
+// that actually matters -- appears BEFORE the scaffoldGraphDirectory(...)
+// call in source order, so a future edit can't silently reorder them back
+// into the same scaffold-then-refuse leak this fix wave closed in config.ts.
+// ---------------------------------------------------------------------------
+
+describe("cli.ts runInit -- unregistered-content refusal (Opus validation review fix #4)", () => {
+  test("refuses to scaffold over decisions/ or lessons-learned/ content with no marker, checked before scaffoldGraphDirectory", () => {
+    const source = fs.readFileSync(path.join(__dirname, "../src/cli.ts"), "utf-8");
+
+    expect(source).toContain("!existingMarkerId &&");
+    expect(source).toContain('path.join(expandedPath, "decisions")');
+    expect(source).toContain('path.join(expandedPath, "lessons-learned")');
+    expect(source).toContain('apply: ["connect-unregistered-graph"]');
+
+    const refusalIdx = source.indexOf('path.join(expandedPath, "decisions")');
+    const scaffoldCallIdx = source.indexOf("scaffoldGraphDirectory(expandedPath, categories)");
+    expect(refusalIdx).toBeGreaterThan(-1);
+    expect(scaffoldCallIdx).toBeGreaterThan(-1);
+    expect(refusalIdx).toBeLessThan(scaffoldCallIdx);
   });
 });

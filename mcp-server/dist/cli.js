@@ -15572,20 +15572,19 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
       isError: true
     };
   }
-  scaffoldGraphDirectory(expandedPath, categories);
   const newGraphId = mintGraphId();
-  const existingMarkerId = readGraphIdMarker(expandedPath);
-  if (existingMarkerId && existingMarkerId !== newGraphId) {
+  if (preExistingMarkerId && preExistingMarkerId !== newGraphId) {
     return {
       content: [
         {
           type: "text",
-          text: `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, remove or rename the existing .kmgraph-id marker file manually if you're certain this is intentional.`
+          text: `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, either run kg_upgrade with apply: ["connect-unregistered-graph"] to register this folder under its existing graphId (preserves continuity, does not scaffold), or remove/rename the existing .kmgraph-id marker file manually if you're certain a fresh identity is intentional.`
         }
       ],
       isError: true
     };
   }
+  scaffoldGraphDirectory(expandedPath, categories);
   writeGraphIdMarker(expandedPath, newGraphId);
   const ordinaryMarkerWarning = markerTrackingWarning(expandedPath);
   registerGraphConfig(config2, {
@@ -31180,12 +31179,12 @@ var require_dist = __commonJS({
         throw new Error(`Unknown format "${name}"`);
       return f;
     };
-    function addFormats(ajv, list, fs10, exportName) {
+    function addFormats(ajv, list, fs11, exportName) {
       var _a2;
       var _b;
       (_a2 = (_b = ajv.opts.code).formats) !== null && _a2 !== void 0 ? _a2 : _b.formats = (0, codegen_1._)`require("ajv-formats/dist/formats").${exportName}`;
       for (const f of list)
-        ajv.addFormat(f, fs10[f]);
+        ajv.addFormat(f, fs11[f]);
     }
     module2.exports = exports2 = formatsPlugin;
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -33951,6 +33950,7 @@ __export(cli_exports, {
   resolveInitLocation: () => resolveInitLocation
 });
 module.exports = __toCommonJS(cli_exports);
+var fs10 = __toESM(require("fs"));
 var path10 = __toESM(require("path"));
 var readline = __toESM(require("readline"));
 init_utils();
@@ -33993,7 +33993,7 @@ function resolveKgPath(config2, params, cwd = process.cwd()) {
 }
 
 // src/cli.ts
-var SERVER_VERSION = true ? "0.7.4" : (() => {
+var SERVER_VERSION = true ? "0.7.4.2" : (() => {
   try {
     return null.version;
   } catch {
@@ -34102,30 +34102,29 @@ async function runInit() {
     }
     console.log("");
     console.log("  Creating knowledge graph...");
-    const templatesCopied = scaffoldGraphDirectory(expandedPath, categories);
-    const now = (/* @__PURE__ */ new Date()).toISOString();
     const newGraphId = mintGraphId();
     const existingMarkerId = readGraphIdMarker(expandedPath);
     if (existingMarkerId && existingMarkerId !== newGraphId) {
       console.error(
-        `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, remove or rename the existing .kmgraph-id marker file manually if you're certain this is intentional.`
+        `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, either run kg_upgrade with apply: ["connect-unregistered-graph"] to register this folder under its existing graphId (preserves continuity, does not scaffold), or remove/rename the existing .kmgraph-id marker file manually if you're certain a fresh identity is intentional.`
       );
       process.exit(1);
     }
+    if (!existingMarkerId && (fs10.existsSync(path10.join(expandedPath, "decisions")) || fs10.existsSync(path10.join(expandedPath, "lessons-learned")))) {
+      console.error(
+        `Error: Found existing content at ${expandedPath} (decisions/ or lessons-learned/ already present) that isn't registered or marked as a KMGraph. Refusing to scaffold over it. Run kg_upgrade with apply: ["connect-unregistered-graph"] to register it instead.`
+      );
+      process.exit(1);
+    }
+    const templatesCopied = scaffoldGraphDirectory(expandedPath, categories);
     writeGraphIdMarker(expandedPath, newGraphId);
-    const graphConfig = {
+    registerGraphConfig(config2, {
       name,
-      path: kgPath,
+      kgPath,
       type: kgType,
       categories,
-      createdAt: now,
-      status: "pending",
-      statusChangedAt: now,
       graphId: newGraphId
-      // lastUsed removed -- optional on the type since Task 1.1, no writer needed
-    };
-    config2.graphs[name] = graphConfig;
-    writeConfig(config2);
+    });
     console.log("");
     console.log("  Knowledge graph initialized:");
     console.log(`    Name:       ${name}`);

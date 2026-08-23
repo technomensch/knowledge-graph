@@ -4157,3 +4157,90 @@ describe("upgrade category: connect-unregistered-graph (Task A)", () => {
     expect(Object.keys(cfgAfter.graphs)).toEqual(["test-kg"]);
   });
 });
+
+// ---------------------------------------------------------------------------
+// Opus validation review fix #3: connect-unregistered-graph must run through
+// the same registration guard (resolveRegistrationGuard) handleConfigInit
+// and cli.ts's runInit already run before scaffolding/registering -- it
+// used to register the cwd directly, with neither the home/root hard block
+// nor the broad-ancestor confirmation. Real risk: a monorepo root with a
+// top-level decisions/ folder (unrelated convention) plus an already-
+// registered sub-project graph would get silently registered as a whole new
+// ancestor graph with no warning -- exactly the case findBroadAncestorWarning
+// exists to catch.
+// ---------------------------------------------------------------------------
+
+describe("connect-unregistered-graph + registration guard (Opus validation review fix #3)", () => {
+  function mockRegistryWithExisting(existingPath: string): KgConfig {
+    const now = new Date().toISOString();
+    const cfg: KgConfig = {
+      version: "1.0.0",
+      graphs: {
+        existing: {
+          name: "existing",
+          path: existingPath,
+          type: "project-local",
+          categories: [],
+          createdAt: now,
+          status: "active",
+          statusChangedAt: now,
+          graphId: "existing-id",
+        },
+      },
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    };
+    (readConfig as jest.Mock).mockReturnValue(cfg);
+    return cfg;
+  }
+
+  it("automated mode returns KMG_INPUT_REQUIRED (not a silent registration) when the candidate is an ancestor of an already-registered graph", async () => {
+    const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), "upgrade-test-broad-ancestor-"));
+    tempDirs.push(wrapper);
+    const existingPath = path.join(wrapper, "sub-project", "knowledge");
+    fs.mkdirSync(existingPath, { recursive: true });
+    const candidatePath = wrapper; // ancestor of existingPath
+    fs.mkdirSync(path.join(candidatePath, "decisions"), { recursive: true });
+    const cfg = mockRegistryWithExisting(existingPath);
+    process.cwd = () => candidatePath;
+    (writeConfig as jest.Mock).mockImplementation(() => undefined);
+
+    const result = await handleUpgrade({ apply: ["connect-unregistered-graph"] });
+
+    expect(result.isError).toBe(true);
+    const errorBlock = JSON.parse(result.content[0].text);
+    expect(errorBlock.error).toBe("KMG_INPUT_REQUIRED");
+    expect(errorBlock.resolveWith.param).toBe("confirmBroadRegistration");
+
+    // No new registry entry was created -- still exactly the pre-existing
+    // "existing" graph, and no marker was written into the candidate dir.
+    expect(Object.keys(cfg.graphs)).toEqual(["existing"]);
+    expect(writeConfig).not.toHaveBeenCalled();
+    expect(fs.existsSync(path.join(candidatePath, ".kmgraph-id"))).toBe(false);
+  });
+
+  it('registers the graph once confirmBroadRegistration: "yes" is supplied', async () => {
+    const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), "upgrade-test-broad-ancestor-confirm-"));
+    tempDirs.push(wrapper);
+    const existingPath = path.join(wrapper, "sub-project", "knowledge");
+    fs.mkdirSync(existingPath, { recursive: true });
+    const candidatePath = wrapper;
+    fs.mkdirSync(path.join(candidatePath, "decisions"), { recursive: true });
+    const cfg = mockRegistryWithExisting(existingPath);
+    process.cwd = () => candidatePath;
+    (writeConfig as jest.Mock).mockImplementation(() => undefined);
+
+    const result = await handleUpgrade({
+      apply: ["connect-unregistered-graph"],
+      confirmBroadRegistration: "yes",
+    });
+
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).toContain("[connect-unregistered-graph]");
+    expect(result.content[0].text).toContain("Registered");
+
+    const name = path.basename(candidatePath);
+    expect(cfg.graphs[name]).toBeDefined();
+    expect(cfg.graphs[name].path).toBe(candidatePath);
+    expect(writeConfig).toHaveBeenCalled();
+  });
+});

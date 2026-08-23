@@ -31547,20 +31547,19 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
       isError: true
     };
   }
-  scaffoldGraphDirectory(expandedPath, categories);
   const newGraphId = mintGraphId();
-  const existingMarkerId = readGraphIdMarker(expandedPath);
-  if (existingMarkerId && existingMarkerId !== newGraphId) {
+  if (preExistingMarkerId && preExistingMarkerId !== newGraphId) {
     return {
       content: [
         {
           type: "text",
-          text: `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, remove or rename the existing .kmgraph-id marker file manually if you're certain this is intentional.`
+          text: `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, either run kg_upgrade with apply: ["connect-unregistered-graph"] to register this folder under its existing graphId (preserves continuity, does not scaffold), or remove/rename the existing .kmgraph-id marker file manually if you're certain a fresh identity is intentional.`
         }
       ],
       isError: true
     };
   }
+  scaffoldGraphDirectory(expandedPath, categories);
   writeGraphIdMarker(expandedPath, newGraphId);
   const ordinaryMarkerWarning = markerTrackingWarning(expandedPath);
   registerGraphConfig(config2, {
@@ -33551,7 +33550,7 @@ var os9 = __toESM(require("os"));
 var import_child_process4 = require("child_process");
 
 // src/tools/version.ts
-var pkg = { version: true ? "0.7.4" : "0.0.0" };
+var pkg = { version: true ? "0.7.4.2" : "0.0.0" };
 var SCHEMA_VERSION = 2;
 function handleVersion() {
   return { installed: pkg.version, schema: SCHEMA_VERSION };
@@ -34989,23 +34988,75 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
   const config2 = readConfig();
   const cwd = resolveEffectiveCwd({ processCwd: process.cwd(), toolCallMeta });
   let connectedGraph;
-  const target = params.scope === "user" ? resolvePersonalGraph(config2) : (() => {
+  let target;
+  if (params.scope === "user") {
+    target = resolvePersonalGraph(config2);
+  } else {
     const resolution = resolveGraph(config2, cwd);
     if (resolution.kind === "resolved") {
-      return { name: resolution.name, graph: resolution.graph };
-    }
-    if (resolution.kind === "no-graph-in-cwd" && hasUnregisteredGraphContent(cwd)) {
+      target = { name: resolution.name, graph: resolution.graph };
+    } else if (resolution.kind === "no-graph-in-cwd" && hasUnregisteredGraphContent(cwd)) {
       if (!(params.apply ?? []).includes("connect-unregistered-graph")) {
-        return {
+        target = {
           error: `Found existing knowledge graph content at ${cwd} that isn't registered. Run kg_upgrade with apply: ["connect-unregistered-graph"] to register it.`
         };
+      } else {
+        const { expandedPath, hardBlocked, broadWarning } = resolveRegistrationGuard(config2, cwd);
+        if (hardBlocked) {
+          return {
+            content: [{
+              type: "text",
+              text: `Error: refusing to register a knowledge graph at ${expandedPath} \u2014 this is your home directory or the filesystem root. Registering a KG this broad would make it resolve as "the KG for" nearly every directory on this machine. Choose a more specific project path.`
+            }],
+            isError: true
+          };
+        }
+        if (broadWarning) {
+          let broadAnswer = params.confirmBroadRegistration;
+          if (!broadAnswer) {
+            const mode = resolveInteractionMode({}).mode;
+            const gated = await gate({
+              mode,
+              reason: "broad_ancestor_registration",
+              param: "confirmBroadRegistration",
+              accepts: ["yes", "no"],
+              detail: broadWarning,
+              timeoutMs: STUB_ASK_TIMEOUT_MS,
+              ask: stubAsk
+              // no real ask() transport yet, same pattern as every other gate() stub in this plan
+            });
+            if ("error" in gated) {
+              return { content: [{ type: "text", text: JSON.stringify(gated) }], isError: true };
+            }
+            if (!("answer" in gated)) {
+              return {
+                content: [{
+                  type: "text",
+                  text: `Registration cancelled: ${expandedPath} is an ancestor of ${broadWarning.isAncestorOfCount} already-registered graph(s) (${broadWarning.ancestorOfNames.join(", ")}). Confirm explicitly (confirmBroadRegistration: "yes") if this breadth is intentional.`
+                }],
+                isError: true
+              };
+            }
+            broadAnswer = gated.answer;
+          }
+          if (broadAnswer !== "yes") {
+            return {
+              content: [{
+                type: "text",
+                text: `Registration cancelled: ${expandedPath} is an ancestor of ${broadWarning.isAncestorOfCount} already-registered graph(s) (${broadWarning.ancestorOfNames.join(", ")}). Confirm explicitly (confirmBroadRegistration: "yes") if this breadth is intentional.`
+              }],
+              isError: true
+            };
+          }
+        }
+        const connected = connectUnregisteredGraph(config2, cwd);
+        connectedGraph = { name: connected.name, graphId: connected.graph.graphId };
+        target = { name: connected.name, graph: connected.graph };
       }
-      const connected = connectUnregisteredGraph(config2, cwd);
-      connectedGraph = { name: connected.name, graphId: connected.graph.graphId };
-      return { name: connected.name, graph: connected.graph };
+    } else {
+      target = { error: 'No knowledge graph resolved from your current directory. Use kg_config_init first, or pass scope="user".' };
     }
-    return { error: 'No knowledge graph resolved from your current directory. Use kg_config_init first, or pass scope="user".' };
-  })();
+  }
   if (params.scope === "user" && !("error" in target)) {
     const mode = resolveInteractionMode({}).mode;
     const confirmed = await confirmPersonalScopeAccess(personalScopeSession2, cwd, {
@@ -35250,11 +35301,14 @@ function registerUpgradeTool(server2, personalScopeSession2) {
       ),
       confirmBackfix: external_exports3.boolean().optional().describe(
         'Must be true (in automated mode) to apply backfix categories that repair already-written content -- "capture-corruption" (issue-46), "diff-blank-reconstruction" (issue-47), and "plan-status-drift" Tier A writes (issue-49) all share this one flag; setting it authorizes any of these three present in the same apply call. Interactive callers are asked to confirm instead.'
+      ),
+      confirmBroadRegistration: external_exports3.enum(["yes", "no"]).optional().describe(
+        'Explicit confirmation to register a knowledge graph (via "connect-unregistered-graph") whose path is an ancestor of already-registered graph(s). Same guard kg_config_init runs before scaffolding; a home/root path is refused outright with no bypass.'
       )
     },
-    async ({ apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix }, extra) => {
+    async ({ apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix, confirmBroadRegistration }, extra) => {
       return handleUpgrade(
-        { apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix },
+        { apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix, confirmBroadRegistration },
         personalScopeSession2,
         extra?._meta
       );
@@ -35523,7 +35577,7 @@ function registerResolveTool(server2, personalScopeSession2) {
 // src/index.ts
 var server = new McpServer({
   name: "knowledge-graph",
-  version: true ? "0.7.4" : "0.0.0"
+  version: true ? "0.7.4.2" : "0.0.0"
 });
 var personalScopeSession = new PersonalScopeSession();
 var crossKgSearchSession = new CrossKgSearchSession();

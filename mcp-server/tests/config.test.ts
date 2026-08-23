@@ -175,6 +175,8 @@ describe("handleConfigInit", () => {
     fs.writeFileSync(path.join(kgPath, ".kmgraph-id"), "some-other-id\n", "utf-8");
     (readConfig as jest.Mock).mockReturnValue({ version: "1.0.0", graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } });
 
+    const before = fs.readdirSync(kgPath).sort();
+
     const result = await handleConfigInit({
       name: "new-kg",
       kgPath,
@@ -185,6 +187,15 @@ describe("handleConfigInit", () => {
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toMatch(/already tracked as a different knowledge graph/);
     expect(writeConfig).not.toHaveBeenCalled();
+
+    // Opus validation review fix #2: the marker-mismatch check used to run
+    // AFTER scaffoldGraphDirectory, so this orphaned-marker-mismatch path
+    // left real scaffold files (templates/, concepts/, etc.) behind in a
+    // folder the function then refused to register -- checking writeConfig
+    // alone (above) didn't catch that leak. Assert disk state is untouched
+    // beyond the marker file the test itself created.
+    expect(fs.readdirSync(kgPath).sort()).toEqual(before);
+    expect(fs.existsSync(path.join(kgPath, "templates"))).toBe(false);
   });
 
   // Follow-up to Task A (kg_upgrade's connect-unregistered-graph category):

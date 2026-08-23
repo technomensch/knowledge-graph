@@ -705,13 +705,11 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
   // Follow-up (Task A): refuse to scaffold over a folder that already has
   // decisions/ or lessons-learned/ content but no marker at all -- checked
   // BEFORE scaffoldGraphDirectory runs, same "check before you write files"
-  // discipline as every guard above it in this function, so this can never
-  // leak scaffold files the way a scaffold-then-refuse ordering bug would
-  // (that class of bug is Task C's, a different file/flow -- not reproduced
-  // here). Gated on `!preExistingMarkerId`: a folder with an *orphaned*
-  // marker (marker present, not registered) does NOT hit this -- it falls
-  // through to the existing marker-mismatch hard-refusal a few lines below
-  // instead (unchanged). Only "real content, zero marker at all" is new.
+  // discipline as every guard above it in this function. Gated on
+  // `!preExistingMarkerId`: a folder with an *orphaned* marker (marker
+  // present, not registered) does NOT hit this -- it falls through to the
+  // marker-mismatch hard-refusal below instead. Only "real content, zero
+  // marker at all" is new.
   if (
     !preExistingMarkerId &&
     (fs.existsSync(path.join(expandedPath, "decisions")) || fs.existsSync(path.join(expandedPath, "lessons-learned")))
@@ -725,30 +723,36 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
     };
   }
 
-  // Create directory structure + copy default templates (shared with cli.ts, ENH-051)
-  scaffoldGraphDirectory(expandedPath, categories);
-
-  // Write config entry
-  const newGraphId = mintGraphId();
-
+  // Mint the graph id and check for a marker mismatch BEFORE scaffolding any
+  // files -- scaffoldGraphDirectory writes real files, so running this check
+  // after it (as this used to, Opus validation review fix #2) leaves
+  // scaffold files behind in a folder this function then refuses to
+  // register. Reuses `preExistingMarkerId` (already read above, findings
+  // #6/#18/#20) rather than reading the marker file a second time -- it
+  // hasn't changed between here and there, nothing in between writes it.
+  //
   // Precise pre-check instead of try/catch around writeGraphIdMarker (Opus
   // review nit): a bare catch there would also swallow genuine I/O errors
   // (EACCES/ENOSPC/etc.) and mislabel them as a marker conflict. Checking
   // the existing marker directly means writeGraphIdMarker's own throw (if
   // it still somehow fires -- e.g. a race) is a real error and propagates
   // normally rather than being misreported.
-  const existingMarkerId = readGraphIdMarker(expandedPath);
-  if (existingMarkerId && existingMarkerId !== newGraphId) {
+  const newGraphId = mintGraphId();
+  if (preExistingMarkerId && preExistingMarkerId !== newGraphId) {
     return {
       content: [
         {
           type: "text" as const,
-          text: `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, remove or rename the existing .kmgraph-id marker file manually if you're certain this is intentional.`,
+          text: `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, either run kg_upgrade with apply: ["connect-unregistered-graph"] to register this folder under its existing graphId (preserves continuity, does not scaffold), or remove/rename the existing .kmgraph-id marker file manually if you're certain a fresh identity is intentional.`,
         },
       ],
       isError: true,
     };
   }
+
+  // Create directory structure + copy default templates (shared with cli.ts, ENH-051)
+  scaffoldGraphDirectory(expandedPath, categories);
+
   writeGraphIdMarker(expandedPath, newGraphId);
   const ordinaryMarkerWarning = markerTrackingWarning(expandedPath);
   // config.active = name; removed -- resolution is now context-derived (Task 1.5)
