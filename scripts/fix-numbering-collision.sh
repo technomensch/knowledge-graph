@@ -103,7 +103,16 @@ done < <(find "$DIR" -maxdepth 1 2>/dev/null)
 NEW_NUM=$((MAX + 1))
 NEW_ID="${PREFIX}-$(pad_number "$NEW_NUM")"
 
-echo "fix-numbering-collision: ${OLD_ID} collision — keeping $(basename "$WINNER") (earlier), renumbering $(basename "$LOSER") to ${NEW_ID}"
+# Tied timestamps are real (e.g. both colliding files added in the same
+# commit) — WINNER is then chosen only by find|sort order, not chronology.
+# Say so honestly rather than claiming "(earlier)" when it isn't.
+if [ "$EPOCH_A" -eq "$EPOCH_B" ]; then
+  TIE_NOTE="(tie — arbitrary, kept alphabetically-first)"
+else
+  TIE_NOTE="(earlier)"
+fi
+
+echo "fix-numbering-collision: ${OLD_ID} collision — keeping $(basename "$WINNER") ${TIE_NOTE}, renumbering $(basename "$LOSER") to ${NEW_ID}"
 
 # --- Rename the loser ---
 # Rebuild the new basename from the regex capture groups, not from a literal
