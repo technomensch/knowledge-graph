@@ -138,8 +138,10 @@ installed KMGraph yourself? That's what the `README.md` at the root of that
 folder is for: KMGraph writes it there automatically, explaining that the
 folder is a KMGraph knowledge graph and naming the plugin and the
 `/kmgraph:kmg-init` command — that's what leads a reader to this installer.
-(Graphs created before that README existed get one back-filled the next time
-`kg_upgrade` runs against them.)
+(Graphs created before that README existed get one via the opt-in
+`missing-root-readme` `kg_upgrade` category — run `kg_upgrade apply` with that
+category, or `/kmgraph:kmg-init`, option — Verify/upgrade. It is not applied
+automatically.)
 
 > 📘 **Won't the installer overwrite what's already there?**
 >
@@ -148,10 +150,15 @@ folder is a KMGraph knowledge graph and naming the plugin and the
 > also fires on disk content alone — finding `decisions/` or `lessons-learned/`
 > at the target path routes the wizard into the same Verify/Upgrade flow instead
 > of scaffolding fresh, even on your first run against that folder. MCP IDE
-> users (no wizard) get the same protection from the `kg_config_init` tool
-> directly: it refuses to scaffold over unregistered `decisions/` or
-> `lessons-learned/` content and points you to `kg_upgrade` to register and
-> back-fill it safely instead.
+> users (no wizard) get the same *refusal-to-overwrite* protection from the
+> `kg_config_init` tool directly: it refuses to scaffold over unregistered
+> `decisions/` or `lessons-learned/` content. Its error message names
+> `kg_upgrade` as the next step, but that does not currently complete the
+> connect for this exact case — `kg_upgrade` only resolves already-registered
+> graphs, so it responds by asking you to run `kg_config_init` first, the same
+> tool that just refused. This is a known gap, not a self-service fix: treat
+> the refusal as protection against silently adopting someone else's content,
+> not as a pointer to a working automated connect flow.
 
 ### Upgrading on Codex or Gemini CLI
 

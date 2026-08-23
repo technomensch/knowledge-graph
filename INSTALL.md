@@ -276,8 +276,10 @@ keep reading before proceeding to Step 1.
 **How you'd know:** a `README.md` at the root of that folder, written by KMGraph
 itself, explaining that the folder is a KMGraph knowledge graph and naming the
 plugin and the `/kmgraph:kmg-init` command — that's what leads a reader here.
-(Graphs created before that README existed get one backfilled automatically the
-next time `kg_upgrade` runs against them.)
+(Graphs created before that README existed get one via the opt-in
+`missing-root-readme` `kg_upgrade` category — run `kg_upgrade apply` with that
+category, or `/kmgraph:kmg-init`, option — Verify/upgrade. It is not applied
+automatically.)
 
 **Will installing here overwrite or merge with what's already there?** No — nothing
 blindly re-scaffolds over existing content:
@@ -290,8 +292,15 @@ blindly re-scaffolds over existing content:
   this folder.
 - **MCP IDE users** (Cursor, Windsurf, Continue.dev, VS Code, JetBrains): the
   `kg_config_init` tool refuses to scaffold when it finds `decisions/` or
-  `lessons-learned/` content that isn't already registered on your machine, and
-  directs you to the `kg_upgrade` tool to register and back-fill it safely instead.
+  `lessons-learned/` content that isn't already registered on your machine. Its
+  error message names `kg_upgrade` as the next step, but that does not
+  currently complete the connect for this exact case: `kg_upgrade` only
+  resolves already-registered graphs (from `kg-config.json`, with no
+  disk-content fallback), so it responds by asking you to run `kg_config_init`
+  first — the same tool that just refused. **This is a known gap, not a
+  self-service fix:** treat the refusal as protection against `kg_config_init`
+  silently adopting someone else's content, not as a pointer to a working
+  automated connect flow.
 
 Proceed to Step 1 below — the rest of the install walks you through this
 automatically once you reach the init step (Step 3).
