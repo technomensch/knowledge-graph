@@ -4024,3 +4024,136 @@ describe("upgrade category: stale-handoff-packages-location (issue-56)", () => {
     expect(applied.content[0].text).toContain("No stray handoff-packages/");
   });
 });
+
+// ---------------------------------------------------------------------------
+// Task A: "connect-unregistered-graph" upgrade category
+//
+// Closes the kg_config_init <-> kg_upgrade dead end: kg_config_init refuses
+// to scaffold over a folder that already has decisions/lessons-learned
+// content (or an orphaned .kmgraph-id marker) and points the user at
+// kg_upgrade to register it -- but kg_upgrade previously had no way to
+// register a graph that isn't already in the config registry (resolveGraph
+// is cwd-resolved-only against already-registered paths), so an
+// unregistered-but-populated cwd always fell into the same generic "No
+// knowledge graph resolved" dead end kg_config_init was pointing away from.
+// ---------------------------------------------------------------------------
+
+describe("upgrade category: connect-unregistered-graph (Task A)", () => {
+  function makeUnregisteredContentDir(prefix: string): string {
+    const dir = makeTempDir(prefix);
+    fs.mkdirSync(path.join(dir, "decisions"), { recursive: true });
+    return dir;
+  }
+
+  function mockEmptyRegistry(): KgConfig {
+    const cfg: KgConfig = {
+      version: "1.0.0",
+      graphs: {},
+      sanitization: { enabled: false, patterns: [], action: "warn" },
+    };
+    (readConfig as jest.Mock).mockReturnValue(cfg);
+    return cfg;
+  }
+
+  it("inspect mode (apply: []) surfaces a connect-specific message instead of the generic dead end", async () => {
+    const dir = makeUnregisteredContentDir("connect-inspect");
+    tempDirs.push(dir);
+    mockEmptyRegistry();
+    process.cwd = () => dir;
+
+    const result = await handleUpgrade({ apply: [] });
+    expect(result.isError).toBeUndefined();
+    const parsed = JSON.parse(result.content[0].text);
+    const item = parsed.upgrades.find((u: { category: string }) => u.category === "resolution");
+    expect(item).toBeDefined();
+    expect(item.description).toContain(dir);
+    expect(item.description).toContain("isn't registered");
+    expect(item.description).toContain("connect-unregistered-graph");
+    // The point of this test: NOT the old dead-end message.
+    expect(item.description).not.toContain("Use kg_config_init first");
+  });
+
+  it('apply: ["connect-unregistered-graph"] registers the graph, writes a matching marker, does not scaffold, and proceeds without error', async () => {
+    const dir = makeUnregisteredContentDir("connect-apply");
+    tempDirs.push(dir);
+    const cfg = mockEmptyRegistry();
+    process.cwd = () => dir;
+    (writeConfig as jest.Mock).mockImplementation(() => undefined);
+
+    const before = fs.readdirSync(dir).sort();
+
+    const result = await handleUpgrade({ apply: ["connect-unregistered-graph"] });
+
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).toContain("[connect-unregistered-graph]");
+    expect(result.content[0].text).toContain("Registered");
+
+    const name = path.basename(dir);
+    expect(cfg.graphs[name]).toBeDefined();
+    expect(cfg.graphs[name].path).toBe(dir);
+    expect(cfg.graphs[name].type).toBe("project-local");
+    expect(writeConfig).toHaveBeenCalled();
+
+    const markerPath = path.join(dir, ".kmgraph-id");
+    expect(fs.existsSync(markerPath)).toBe(true);
+    const markerId = fs.readFileSync(markerPath, "utf-8").trim();
+    expect(markerId).toBe(cfg.graphs[name].graphId);
+
+    // No scaffold: the only thing added beyond what this test itself
+    // created ("decisions/") is the freshly-written marker file -- no
+    // "lessons-learned", "sessions", "templates", etc.
+    const after = fs.readdirSync(dir).sort();
+    expect(after).toEqual([...before, ".kmgraph-id"].sort());
+  });
+
+  it("reuses an orphaned .kmgraph-id marker's existing graphId instead of minting a new one", async () => {
+    const dir = makeUnregisteredContentDir("connect-orphan-marker");
+    tempDirs.push(dir);
+    const cfg = mockEmptyRegistry();
+    process.cwd = () => dir;
+    (writeConfig as jest.Mock).mockImplementation(() => undefined);
+
+    const orphanId = "orphaned-graph-id-1234";
+    fs.writeFileSync(path.join(dir, ".kmgraph-id"), orphanId + "\n", "utf-8");
+
+    const result = await handleUpgrade({ apply: ["connect-unregistered-graph"] });
+    expect(result.isError).toBeUndefined();
+
+    const name = path.basename(dir);
+    expect(cfg.graphs[name].graphId).toBe(orphanId);
+    expect(fs.readFileSync(path.join(dir, ".kmgraph-id"), "utf-8").trim()).toBe(orphanId);
+  });
+
+  it("no disk content and not registered — the old generic dead-end message is unchanged", async () => {
+    const dir = makeTempDir("connect-nothing"); // empty: no decisions/, no lessons-learned/, no marker
+    tempDirs.push(dir);
+    mockEmptyRegistry();
+    process.cwd = () => dir;
+
+    const result = await handleUpgrade({ apply: [] });
+    const parsed = JSON.parse(result.content[0].text);
+    const item = parsed.upgrades.find((u: { category: string }) => u.category === "resolution");
+    expect(item).toBeDefined();
+    expect(item.description).toBe(
+      'No knowledge graph resolved from your current directory. Use kg_config_init first, or pass scope="user".'
+    );
+  });
+
+  it("a cwd that already resolves normally is totally unaffected by requesting connect-unregistered-graph", async () => {
+    const kgRoot = makeTempDir("connect-already-resolved");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    const result = await handleUpgrade({ apply: ["connect-unregistered-graph"] });
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).toContain(
+      "[connect-unregistered-graph] Graph already resolved; nothing to connect."
+    );
+
+    // No new registry entry was created -- still exactly the one graph
+    // mockActiveKg set up.
+    const cfgAfter = readConfig() as unknown as KgConfig;
+    expect(Object.keys(cfgAfter.graphs)).toEqual(["test-kg"]);
+  });
+});

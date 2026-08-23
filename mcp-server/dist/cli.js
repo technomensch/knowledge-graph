@@ -15140,6 +15140,7 @@ __export(config_exports, {
   isHardBlockedRegistrationPath: () => isHardBlockedRegistrationPath,
   performRegistryMerge: () => performRegistryMerge,
   registerConfigTools: () => registerConfigTools,
+  registerGraphConfig: () => registerGraphConfig,
   resolveRegistrationGuard: () => resolveRegistrationGuard,
   scaffoldGraphDirectory: () => scaffoldGraphDirectory
 });
@@ -15283,6 +15284,22 @@ function scaffoldGraphDirectory(expandedPath, categories) {
   );
   return templatesCopied;
 }
+function registerGraphConfig(config2, params) {
+  const now = (/* @__PURE__ */ new Date()).toISOString();
+  const graphConfig = {
+    name: params.name,
+    path: params.kgPath,
+    type: params.type,
+    categories: params.categories,
+    createdAt: now,
+    status: "pending",
+    statusChangedAt: now,
+    graphId: params.graphId
+  };
+  config2.graphs[params.name] = graphConfig;
+  writeConfig(config2);
+  return graphConfig;
+}
 async function handleConfigInit({ name, kgPath, type, categories, interaction, confirmMerge, confirmBroadRegistration }) {
   const config2 = readConfig();
   if (config2.graphs[name]) {
@@ -15406,15 +15423,15 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
       const answer = gated.answer;
       switch (answer) {
         case "reattach": {
-          const now2 = (/* @__PURE__ */ new Date()).toISOString();
+          const now = (/* @__PURE__ */ new Date()).toISOString();
           config2.graphs[name] = {
             name,
             path: kgPath,
             type,
             categories,
-            createdAt: now2,
+            createdAt: now,
             status: "pending",
-            statusChangedAt: now2,
+            statusChangedAt: now,
             graphId: preExistingMarkerId,
             // NOTE (Phase 4 final review finding I-6, not yet fixed): duplicateOf is recorded here but
             // nothing currently reads it. The plan's Task 4.4 spec says this should suppress future
@@ -15456,9 +15473,9 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
               path: kgPath,
               type,
               categories,
-              createdAt: now2,
+              createdAt: now,
               status: "pending",
-              statusChangedAt: now2,
+              statusChangedAt: now,
               graphId: preExistingMarkerId,
               duplicateOf: existingEntry.name
             };
@@ -15474,16 +15491,16 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
           };
         }
         case "worktree": {
-          const now2 = (/* @__PURE__ */ new Date()).toISOString();
+          const now = (/* @__PURE__ */ new Date()).toISOString();
           updateConfig((cfg) => {
             cfg.graphs[name] = {
               name,
               path: kgPath,
               type,
               categories,
-              createdAt: now2,
+              createdAt: now,
               status: "pending",
-              statusChangedAt: now2,
+              statusChangedAt: now,
               graphId: preExistingMarkerId,
               // NOTE (Phase 4 final review finding I-6, not yet fixed): duplicateOf is recorded here but
               // nothing currently reads it. The plan's Task 4.4 spec says this should suppress future
@@ -15505,16 +15522,16 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
           const forkedId = mintGraphId();
           remintGraphIdMarker(expandedPath, forkedId);
           const forkWarning = markerTrackingWarning(expandedPath);
-          const now2 = (/* @__PURE__ */ new Date()).toISOString();
+          const now = (/* @__PURE__ */ new Date()).toISOString();
           updateConfig((cfg) => {
             cfg.graphs[name] = {
               name,
               path: kgPath,
               type,
               categories,
-              createdAt: now2,
+              createdAt: now,
               status: "pending",
-              statusChangedAt: now2,
+              statusChangedAt: now,
               graphId: forkedId
             };
             return cfg;
@@ -15538,7 +15555,6 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
     }
   }
   scaffoldGraphDirectory(expandedPath, categories);
-  const now = (/* @__PURE__ */ new Date()).toISOString();
   const newGraphId = mintGraphId();
   const existingMarkerId = readGraphIdMarker(expandedPath);
   if (existingMarkerId && existingMarkerId !== newGraphId) {
@@ -15554,19 +15570,13 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
   }
   writeGraphIdMarker(expandedPath, newGraphId);
   const ordinaryMarkerWarning = markerTrackingWarning(expandedPath);
-  const graphConfig = {
+  registerGraphConfig(config2, {
     name,
-    path: kgPath,
+    kgPath,
     type,
     categories,
-    createdAt: now,
-    // lastUsed removed -- no writer needed once Task 1.12 deletes the field
-    status: "pending",
-    statusChangedAt: now,
     graphId: newGraphId
-  };
-  config2.graphs[name] = graphConfig;
-  writeConfig(config2);
+  });
   return {
     content: [
       {

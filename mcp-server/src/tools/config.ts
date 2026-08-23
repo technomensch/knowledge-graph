@@ -299,6 +299,53 @@ export function scaffoldGraphDirectory(
   return templatesCopied;
 }
 
+// ── Shared graph-registration write (Task A, kg_upgrade connect-unregistered-graph) ──
+//
+// The final "commit this graph to the registry" step of kg_config_init's
+// scaffold path -- build the GraphConfig entry, insert it into
+// config.graphs[name], persist via writeConfig(config). Split out so
+// kg_upgrade's connect-unregistered-graph category (upgrade.ts) can register
+// an already-populated, unregistered folder without duplicating this
+// sequence.
+//
+// Deliberately narrow: it takes an already-decided graphId as a parameter
+// rather than deciding mint-vs-reuse itself, because the two callers need
+// genuinely different marker semantics -- handleConfigInit treats ANY
+// pre-existing marker on a fresh-scaffold target as a hard conflict and
+// refuses (see config.test.ts's "Opus review SF-4" test: an orphaned marker
+// -- present on disk, graphId not found in the registry -- still errors
+// there, it is never reused). kg_upgrade's connect flow is the opposite
+// case: it never scaffolds, it only attaches a registry entry to content
+// that already exists, so an orphaned marker there is presumptively that
+// content's own prior identity and IS reused on purpose. Both callers keep
+// their own mint/reuse/writeGraphIdMarker logic; only the config-entry write
+// itself is shared here.
+export function registerGraphConfig(
+  config: KgConfig,
+  params: {
+    name: string;
+    kgPath: string;
+    type: "project-local" | "personal" | "custom";
+    categories: CategoryConfig[];
+    graphId: string;
+  }
+): GraphConfig {
+  const now = new Date().toISOString();
+  const graphConfig: GraphConfig = {
+    name: params.name,
+    path: params.kgPath,
+    type: params.type,
+    categories: params.categories,
+    createdAt: now,
+    status: "pending",
+    statusChangedAt: now,
+    graphId: params.graphId,
+  };
+  config.graphs[params.name] = graphConfig;
+  writeConfig(config);
+  return graphConfig;
+}
+
 // ── Exported handler for direct testing ──────────────────────────────────────
 
 export interface HandleConfigInitParams {
@@ -634,7 +681,6 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
   scaffoldGraphDirectory(expandedPath, categories);
 
   // Write config entry
-  const now = new Date().toISOString();
   const newGraphId = mintGraphId();
 
   // Precise pre-check instead of try/catch around writeGraphIdMarker (Opus
@@ -657,21 +703,14 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
   }
   writeGraphIdMarker(expandedPath, newGraphId);
   const ordinaryMarkerWarning = markerTrackingWarning(expandedPath);
-  const graphConfig: GraphConfig = {
+  // config.active = name; removed -- resolution is now context-derived (Task 1.5)
+  registerGraphConfig(config, {
     name,
-    path: kgPath,
+    kgPath,
     type,
     categories: categories as CategoryConfig[],
-    createdAt: now,
-    // lastUsed removed -- no writer needed once Task 1.12 deletes the field
-    status: "pending",
-    statusChangedAt: now,
     graphId: newGraphId,
-  };
-
-  config.graphs[name] = graphConfig;
-  // config.active = name; removed -- resolution is now context-derived (Task 1.5)
-  writeConfig(config);
+  });
 
   return {
     content: [

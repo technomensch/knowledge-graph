@@ -31259,6 +31259,22 @@ function scaffoldGraphDirectory(expandedPath, categories) {
   );
   return templatesCopied;
 }
+function registerGraphConfig(config2, params) {
+  const now = (/* @__PURE__ */ new Date()).toISOString();
+  const graphConfig = {
+    name: params.name,
+    path: params.kgPath,
+    type: params.type,
+    categories: params.categories,
+    createdAt: now,
+    status: "pending",
+    statusChangedAt: now,
+    graphId: params.graphId
+  };
+  config2.graphs[params.name] = graphConfig;
+  writeConfig(config2);
+  return graphConfig;
+}
 async function handleConfigInit({ name, kgPath, type, categories, interaction, confirmMerge, confirmBroadRegistration }) {
   const config2 = readConfig();
   if (config2.graphs[name]) {
@@ -31382,15 +31398,15 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
       const answer = gated.answer;
       switch (answer) {
         case "reattach": {
-          const now2 = (/* @__PURE__ */ new Date()).toISOString();
+          const now = (/* @__PURE__ */ new Date()).toISOString();
           config2.graphs[name] = {
             name,
             path: kgPath,
             type,
             categories,
-            createdAt: now2,
+            createdAt: now,
             status: "pending",
-            statusChangedAt: now2,
+            statusChangedAt: now,
             graphId: preExistingMarkerId,
             // NOTE (Phase 4 final review finding I-6, not yet fixed): duplicateOf is recorded here but
             // nothing currently reads it. The plan's Task 4.4 spec says this should suppress future
@@ -31432,9 +31448,9 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
               path: kgPath,
               type,
               categories,
-              createdAt: now2,
+              createdAt: now,
               status: "pending",
-              statusChangedAt: now2,
+              statusChangedAt: now,
               graphId: preExistingMarkerId,
               duplicateOf: existingEntry.name
             };
@@ -31450,16 +31466,16 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
           };
         }
         case "worktree": {
-          const now2 = (/* @__PURE__ */ new Date()).toISOString();
+          const now = (/* @__PURE__ */ new Date()).toISOString();
           updateConfig((cfg) => {
             cfg.graphs[name] = {
               name,
               path: kgPath,
               type,
               categories,
-              createdAt: now2,
+              createdAt: now,
               status: "pending",
-              statusChangedAt: now2,
+              statusChangedAt: now,
               graphId: preExistingMarkerId,
               // NOTE (Phase 4 final review finding I-6, not yet fixed): duplicateOf is recorded here but
               // nothing currently reads it. The plan's Task 4.4 spec says this should suppress future
@@ -31481,16 +31497,16 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
           const forkedId = mintGraphId();
           remintGraphIdMarker(expandedPath, forkedId);
           const forkWarning = markerTrackingWarning(expandedPath);
-          const now2 = (/* @__PURE__ */ new Date()).toISOString();
+          const now = (/* @__PURE__ */ new Date()).toISOString();
           updateConfig((cfg) => {
             cfg.graphs[name] = {
               name,
               path: kgPath,
               type,
               categories,
-              createdAt: now2,
+              createdAt: now,
               status: "pending",
-              statusChangedAt: now2,
+              statusChangedAt: now,
               graphId: forkedId
             };
             return cfg;
@@ -31514,7 +31530,6 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
     }
   }
   scaffoldGraphDirectory(expandedPath, categories);
-  const now = (/* @__PURE__ */ new Date()).toISOString();
   const newGraphId = mintGraphId();
   const existingMarkerId = readGraphIdMarker(expandedPath);
   if (existingMarkerId && existingMarkerId !== newGraphId) {
@@ -31530,19 +31545,13 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
   }
   writeGraphIdMarker(expandedPath, newGraphId);
   const ordinaryMarkerWarning = markerTrackingWarning(expandedPath);
-  const graphConfig = {
+  registerGraphConfig(config2, {
     name,
-    path: kgPath,
+    kgPath,
     type,
     categories,
-    createdAt: now,
-    // lastUsed removed -- no writer needed once Task 1.12 deletes the field
-    status: "pending",
-    statusChangedAt: now,
     graphId: newGraphId
-  };
-  config2.graphs[name] = graphConfig;
-  writeConfig(config2);
+  });
   return {
     content: [
       {
@@ -33551,6 +33560,8 @@ var APPLY_ORDER = [
   // must run before anything else reads config from the new path
   "plan-status-drift",
   // issue-49 backfix: graph-independent like status-schema/config-location above, order-independent of everything else
+  "connect-unregistered-graph",
+  // Task A: registers an unregistered-but-populated cwd. Structurally unlike every entry below -- its real work runs during target resolution, BEFORE this loop starts (there's no resolved graph yet to act on) -- placed first among the graph-dependent categories purely so its status message reports before anything that then runs against the graph it just registered.
   "directories",
   "config",
   "starter-relocation",
@@ -33567,6 +33578,33 @@ var APPLY_ORDER = [
   // issue-56 backfix: file relocation, order-independent of the others
   "platform-split"
 ];
+function hasUnregisteredGraphContent(cwd) {
+  return fs11.existsSync(path11.join(cwd, "decisions")) || fs11.existsSync(path11.join(cwd, "lessons-learned")) || readGraphIdMarker(cwd) !== null;
+}
+function deriveUniqueGraphName(config2, cwd) {
+  const base = path11.basename(cwd) || "graph";
+  if (!config2.graphs[base]) return base;
+  let suffix = 2;
+  while (config2.graphs[`${base}-${suffix}`]) suffix++;
+  return `${base}-${suffix}`;
+}
+function connectUnregisteredGraph(config2, cwd) {
+  const existingMarker = readGraphIdMarker(cwd);
+  const graphId = existingMarker ?? mintGraphId();
+  writeGraphIdMarker(cwd, graphId);
+  const name = deriveUniqueGraphName(config2, cwd);
+  const graph = registerGraphConfig(config2, {
+    name,
+    kgPath: cwd,
+    // Personal graphs already have their own scope:"user" resolution path
+    // (resolvePersonalGraph) and never reach this branch -- see the
+    // `params.scope === "user"` split in handleUpgrade.
+    type: "project-local",
+    categories: [],
+    graphId
+  });
+  return { name, graph };
+}
 function parseFrontmatter(filePath) {
   if (!fs11.existsSync(filePath)) return {};
   const lines = fs11.readFileSync(filePath, "utf-8").split("\n");
@@ -34932,9 +34970,23 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
   const installedVersion = handleVersion().installed;
   const config2 = readConfig();
   const cwd = resolveEffectiveCwd({ processCwd: process.cwd(), toolCallMeta });
+  let connectedGraph;
   const target = params.scope === "user" ? resolvePersonalGraph(config2) : (() => {
     const resolution = resolveGraph(config2, cwd);
-    return resolution.kind === "resolved" ? { name: resolution.name, graph: resolution.graph } : { error: 'No knowledge graph resolved from your current directory. Use kg_config_init first, or pass scope="user".' };
+    if (resolution.kind === "resolved") {
+      return { name: resolution.name, graph: resolution.graph };
+    }
+    if (resolution.kind === "no-graph-in-cwd" && hasUnregisteredGraphContent(cwd)) {
+      if (!(params.apply ?? []).includes("connect-unregistered-graph")) {
+        return {
+          error: `Found existing knowledge graph content at ${cwd} that isn't registered. Run kg_upgrade with apply: ["connect-unregistered-graph"] to register it.`
+        };
+      }
+      const connected = connectUnregisteredGraph(config2, cwd);
+      connectedGraph = { name: connected.name, graphId: connected.graph.graphId };
+      return { name: connected.name, graph: connected.graph };
+    }
+    return { error: 'No knowledge graph resolved from your current directory. Use kg_config_init first, or pass scope="user".' };
   })();
   if (params.scope === "user" && !("error" in target)) {
     const mode = resolveInteractionMode({}).mode;
@@ -35050,6 +35102,12 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
     }
     const kgPath = target.graph.path.replace(/^~/, os9.homedir());
     switch (category) {
+      case "connect-unregistered-graph":
+        results.push(
+          connectedGraph ? `[connect-unregistered-graph] Registered '${connectedGraph.name}' at ${kgPath} (graphId ${connectedGraph.graphId}).` : `[connect-unregistered-graph] Graph already resolved; nothing to connect.`
+        );
+        appliedAnyGraphDependent = true;
+        break;
       case "directories":
         results.push(`[directories] ${applyDirectories(kgPath)}`);
         appliedAnyGraphDependent = true;
@@ -35159,8 +35217,8 @@ function registerUpgradeTool(server2, personalScopeSession2) {
     "kg_upgrade",
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
-      apply: external_exports3.array(external_exports3.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction", "stale-fts5-index-format", "stale-handoff-packages-location"])).optional().default([]).describe(
-        'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history), "stale-fts5-index-format" (issue-55 backfix: rebuilds a pre-v0.7.4 name-only search index at the collision-safe path-keyed location; non-destructive, leaves the old file in place), "stale-handoff-packages-location" (issue-56 backfix: moves pre-fix ./handoff-packages/<date>/ folders into knowledge/handoffs/<date>/; non-destructive, dedups identical files and reports rather than overwrites any that differ)'
+      apply: external_exports3.array(external_exports3.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction", "stale-fts5-index-format", "stale-handoff-packages-location", "connect-unregistered-graph"])).optional().default([]).describe(
+        `Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history), "stale-fts5-index-format" (issue-55 backfix: rebuilds a pre-v0.7.4 name-only search index at the collision-safe path-keyed location; non-destructive, leaves the old file in place), "stale-handoff-packages-location" (issue-56 backfix: moves pre-fix ./handoff-packages/<date>/ folders into knowledge/handoffs/<date>/; non-destructive, dedups identical files and reports rather than overwrites any that differ), "connect-unregistered-graph" (registers the current directory as a new knowledge graph when it already has decisions/ or lessons-learned/ content -- or an orphaned .kmgraph-id marker -- but isn't in the config registry yet; does not scaffold any new files, only attaches a registry entry to what's already there, then continues into any other categories requested in the same call)`
       ),
       confirm_platform_split: external_exports3.boolean().optional().default(false).describe(
         "Must be true to apply platform-split migration (removes content from rules.md)"
