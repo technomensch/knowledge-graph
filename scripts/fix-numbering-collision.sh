@@ -184,22 +184,31 @@ fi
 # rewrite targets that are unique to the loser specifically:
 #   - decisions: the loser's own slug (e.g. "ADR-014-alpha") is unique to it —
 #     the winner has a different slug, so this substring can't hit the winner.
-#   - enhancements/issues (no slug — directory name IS the bare ID): only
-#     path-qualified forms ("ENH-014/", "issue-14/") and known inner-filename
-#     suffixes (already handled by Task 3's inner-file rename loop, which
-#     also rewrites each renamed inner file's own header) are unambiguous.
-#     Bare non-path mentions are reported, not rewritten — same ambiguity as
-#     decisions' bare-ID case, and this repo's actual ENH/issue folders have
-#     no slug to disambiguate with.
+#   - enhancements/issues (no slug — directory name IS the bare ID): there is
+#     NO safe automatic rewrite target. A path-qualified form like "ENH-014/"
+#     is NOT unique to the loser — the WINNER keeps that exact same path
+#     after this fix, so blindly rewriting it corrupts any reference that
+#     correctly pointed at the winner. (An earlier revision of this script
+#     treated the path-qualified form as safe and was found, via task review,
+#     to silently rewrite a winner-pointing reference into the loser's new
+#     location — real, reproduced corruption, not a hypothetical.) Every
+#     mention — path-qualified or bare — is reported as ambiguous instead.
 case "$AREA" in
   decisions)
     LOSER_SUFFIX_NOEXT="${SLUG_TAIL}"                # e.g. "alpha", set above when NEW_BASE was built
     OLD_REF="${OLD_ID}-${LOSER_SUFFIX_NOEXT}"        # e.g. "ADR-014-alpha" — unique to the loser
     NEW_REF="${NEW_ID}-${LOSER_SUFFIX_NOEXT}"        # e.g. "ADR-015-alpha"
+    # Trailing exclusion keeps "/" and "-" out of what counts as ambiguous,
+    # since both are already covered by the safe OLD_REF rewrite above.
+    AMBIGUOUS_REGEX="(^|[^0-9-])${OLD_ID}([^0-9/-]|\$)"
     ;;
   enhancements|issues)
-    OLD_REF="${OLD_ID}/"
-    NEW_REF="${NEW_ID}/"
+    OLD_REF=""
+    NEW_REF=""
+    # No "/" exclusion here — unlike decisions, a trailing "/" (path-qualified
+    # form) is NOT handled by a safe rewrite for these two areas, so it must
+    # be caught by the ambiguous scan too, not skipped.
+    AMBIGUOUS_REGEX="(^|[^0-9-])${OLD_ID}([^0-9-]|\$)"
     ;;
 esac
 
@@ -209,16 +218,30 @@ while IFS= read -r ref_file; do
   [ -n "$ref_file" ] || continue
   [ -f "$ref_file" ] || continue
 
-  if grep -qF "$OLD_REF" "$ref_file" 2>/dev/null; then
-    sed -i.bak "s@${OLD_REF}@${NEW_REF}@g" "$ref_file"
+  # Safe rewrite runs on every file, including the winner's own — the winner
+  # can legitimately contain a slug-qualified cross-reference TO the loser
+  # (e.g. "see ADR-014-alpha for background" inside the winner's own file),
+  # which still needs updating even though the winner's own identity doesn't.
+  if [ -n "$OLD_REF" ] && grep -qF "$OLD_REF" "$ref_file" 2>/dev/null; then
+    ESCAPED_OLD_REF=$(printf '%s' "$OLD_REF" | sed 's/[][\.*^$/]/\\&/g')
+    ESCAPED_NEW_REF=$(printf '%s' "$NEW_REF" | sed 's/[][\.*^$/]/\\&/g')
+    sed -i.bak "s@${ESCAPED_OLD_REF}@${ESCAPED_NEW_REF}@g" "$ref_file"
     rm -f "${ref_file}.bak"
     REWRITTEN=$((REWRITTEN + 1))
   fi
 
-  # Bare OLD_ID mentions not part of the safe target above are ambiguous —
-  # report, never guess. (^|[^0-9-]) / ([^0-9/-]|$) additionally excludes the
-  # OLD_REF form itself (already handled above) from being double-reported.
-  if grep -qE "(^|[^0-9-])${OLD_ID}([^0-9/-]|\$)" "$ref_file" 2>/dev/null; then
+  # Never flag the winner's own file (decisions) or anything inside the
+  # winner's own directory (enhancements/issues) as ambiguous — its bare
+  # self-reference to its own ID is correct and expected, not something
+  # needing manual review. (Any actual cross-reference to the loser it
+  # contained was already handled by the safe rewrite above, if present.)
+  case "$ref_file" in
+    "$WINNER"|"$WINNER"/*) continue ;;
+  esac
+
+  # Bare/path-qualified OLD_ID mentions not part of the safe target above are
+  # ambiguous — report, never guess.
+  if grep -qE "$AMBIGUOUS_REGEX" "$ref_file" 2>/dev/null; then
     AMBIGUOUS_HITS="${AMBIGUOUS_HITS}  - ${ref_file}
 "
   fi
