@@ -284,4 +284,47 @@ describe("handleConfigInit", () => {
     expect(parsed.detail).toMatchObject({ isAncestorOfCount: 1, ancestorOfNames: ["existing"] });
     expect(writeConfig).not.toHaveBeenCalled();
   });
+
+  // ENH-064: a folder that already has real decisions/ or lessons-learned/
+  // content but was never marked (.kmgraph-id) or registered must not be
+  // silently adopted as a brand-new graph -- the marker-based duplicate
+  // check above doesn't cover this (no marker file exists at all), so this
+  // is a distinct disk-content pre-check.
+  it("refuses to scaffold over a pre-existing, unregistered decisions/ dir instead of silently adopting it", async () => {
+    const kgPath = makeTempDir("init-preexisting-content");
+    fs.mkdirSync(path.join(kgPath, "decisions"), { recursive: true });
+    (readConfig as jest.Mock).mockReturnValue({ version: "1.0.0", graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } });
+
+    const result = await handleConfigInit({
+      name: "new-kg",
+      kgPath,
+      type: "project-local",
+      categories: [{ name: "architecture", prefix: null, git: "commit" }],
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toMatch(/Found existing content at/);
+    expect(result.content[0].text).toMatch(/decisions\/ or lessons-learned\/ already present/);
+    expect(result.content[0].text).toMatch(/kg_upgrade/);
+    expect(writeConfig).not.toHaveBeenCalled();
+    // No new .kmgraph-id marker should have been minted over the existing content.
+    expect(fs.existsSync(path.join(kgPath, ".kmgraph-id"))).toBe(false);
+  });
+
+  it("refuses to scaffold over a pre-existing, unregistered lessons-learned/ dir instead of silently adopting it", async () => {
+    const kgPath = makeTempDir("init-preexisting-lessons");
+    fs.mkdirSync(path.join(kgPath, "lessons-learned"), { recursive: true });
+    (readConfig as jest.Mock).mockReturnValue({ version: "1.0.0", graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } });
+
+    const result = await handleConfigInit({
+      name: "new-kg",
+      kgPath,
+      type: "project-local",
+      categories: [{ name: "architecture", prefix: null, git: "commit" }],
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toMatch(/Found existing content at/);
+    expect(writeConfig).not.toHaveBeenCalled();
+  });
 });

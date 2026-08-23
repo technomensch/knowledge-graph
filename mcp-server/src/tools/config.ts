@@ -320,6 +320,7 @@ export function scaffoldGraphDirectory(
     path.join(templateSrc, "concepts", "kg-category-index.md"),
     path.join(expandedPath, "concepts", "kg-category-index.md")
   );
+  copyIfMissing(path.join(templateSrc, "README-root.md"), path.join(expandedPath, "README.md"));
 
   return templatesCopied;
 }

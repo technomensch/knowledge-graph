@@ -29,6 +29,8 @@ cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/kg-category-index.md" "
   cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/project/triggers.md" "{KG_PATH}/triggers.md"
 [ -f "{KG_PATH}/index.md" ] && echo "index.md already exists — skipping scaffold." || \
   cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/kg-index.md" "{KG_PATH}/index.md"
+[ -f "{KG_PATH}/README.md" ] && echo "README.md already exists — skipping scaffold." || \
+  cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/README-root.md" "{KG_PATH}/README.md"
 # me.md is always gitignored — safe to scaffold fresh
 cp "{CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/project/me.md" "{KG_PATH}/me.md"
 

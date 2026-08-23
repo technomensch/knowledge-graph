@@ -210,6 +210,21 @@ describe("scaffoldGraphDirectory", () => {
     }
   });
 
+  // ENH-064: every newly-scaffolded graph gets a root README (Task 3 added
+  // core/default-templates/README-root.md; this proves it's actually wired
+  // into the scaffold, and that copyIfMissing's do-not-overwrite guarantee
+  // covers it like every other template copy in this function.
+  test("copies README-root.md to <kgPath>/README.md", () => {
+    const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), "cli-init-scaffold-readme-"));
+    try {
+      const kgPath = path.join(wrapper, "kg");
+      scaffoldGraphDirectory(kgPath, []);
+      expect(fs.existsSync(path.join(kgPath, "README.md"))).toBe(true);
+    } finally {
+      fs.rmSync(wrapper, { recursive: true, force: true });
+    }
+  });
+
   test("root me.md/rules.md/triggers.md come from the project profile starters, not the longer concepts/*.md files", () => {
     const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), "cli-init-scaffold-profile-"));
     try {
@@ -221,6 +236,21 @@ describe("scaffoldGraphDirectory", () => {
         const expectedSrc = path.join(pluginRoot, "core", "default-templates", "concepts", "templates", "project", f);
         expect(fs.readFileSync(path.join(kgPath, f), "utf-8")).toBe(fs.readFileSync(expectedSrc, "utf-8"));
       }
+    } finally {
+      fs.rmSync(wrapper, { recursive: true, force: true });
+    }
+  });
+
+  test("does not overwrite an existing README.md at the KG root", () => {
+    const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), "cli-init-scaffold-readme-preserve-"));
+    try {
+      const kgPath = path.join(wrapper, "kg");
+      fs.mkdirSync(kgPath, { recursive: true });
+      fs.writeFileSync(path.join(kgPath, "README.md"), "custom content, do not clobber\n", "utf-8");
+
+      scaffoldGraphDirectory(kgPath, []);
+
+      expect(fs.readFileSync(path.join(kgPath, "README.md"), "utf-8")).toBe("custom content, do not clobber\n");
     } finally {
       fs.rmSync(wrapper, { recursive: true, force: true });
     }
