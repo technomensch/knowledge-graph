@@ -1,7 +1,7 @@
 ---
 id: issue-58
 type: Bug
-status: implemented
+status: resolved
 github-issue: "#249"
 branch: v0.7.4.2-fix-scaffold-upgrade-gaps
 created: 2026-08-23
