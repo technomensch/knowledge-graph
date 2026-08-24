@@ -90,6 +90,10 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 
 ## v0.7.x Feature Highlights
 
+**Unreleased** *(ENH-064 — attribution README)*
+
+- **Attribution README scaffolded into every new knowledge graph.** Explains what KMGraph is and how a reader who finds the repo without the plugin installed can install it and run `/kmgraph:kmg-init` to connect — a knowledge graph is plain Markdown with no attribution otherwise, and a maintainer's graph often gets shared, cloned, or forked without that context. Graphs registered before this feature shipped get the README via a new opt-in `kg_upgrade` category, `missing-root-readme` (non-destructive, never overwrites an existing `README.md`). Closes #246, ENH-064.
+
 **v0.7.4.2 — 2026-08-23** *(closes the kg_config_init ↔ kg_upgrade dead end, shared registration guard, scaffold-routing fix)*
 
 - **New opt-in `kg_upgrade` category `connect-unregistered-graph`** — registers an existing unregistered folder in place (no re-scaffold, no template writes) when `kg_config_init` refuses to scaffold over already-present, unregistered `decisions/`/`lessons-learned/` content and points you here instead, closing a circular dead end between the two tools. Reuses an orphaned `.kmgraph-id` marker's existing `graphId` when present (preserving continuity); otherwise derives a unique name from the directory basename. Not yet reachable from the `/kmgraph:kmg-init` wizard — run `kg_upgrade` with `apply: ["connect-unregistered-graph"]` directly (MCP or CLI). Closes issue-57.
