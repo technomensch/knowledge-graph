@@ -4,8 +4,8 @@
 
 Formal documentation of significant architecture decisions.
 
-**Total ADRs:** 70
-**Last Updated:** 2026-08-20
+**Total ADRs:** 71
+**Last Updated:** 2026-08-23
 
 ---
 
@@ -17,6 +17,7 @@ Formal documentation of significant architecture decisions.
 
 ## All ADRs (Chronological)
 
+- [ADR-070: Scaffold/Upgrade Dead-End — connect-unregistered-graph, Shared Registration Guards, Canonical Scaffold Routing](ADR-070-scaffold-upgrade-dead-end-connect-unregistered-graph.md) — **Status:** Accepted — Closes the circular dead-end where `kg_config_init` refuses to scaffold over unregistered `decisions/`/`lessons-learned/` content and points at `kg_upgrade`, which had no way to register it; adds opt-in `connect-unregistered-graph` category, closes a registration-guard bypass found by Opus review, and canonicalizes MCP-native scaffold routing against the wizard. All three findings surfaced automatically during AI code review of an unrelated branch (v0.7.5-ENH-064's final review) — see the ADR's Provenance note. `connect-unregistered-graph` is not yet reachable from the Claude Code wizard flow (deferred).
 - [ADR-069: Prompt Hardening — Project Instruction Files](ADR-069-prompt-hardening-project-instruction-files.md) — **Status:** Accepted — Companion to the personal KG's ADR-015: applies the same rule-word ("always"/"never"/"must") hardening methodology to this project's shipped `commands/`/`skills/`/`agents/` instruction files, rewriting 3 absolutes-with-a-demonstrated-conflict as if-then statements while leaving destructive-action safety gates untouched. Target v0.7.3.
 - [ADR-068: Lightweight-vs-Full Workflow Rule, and a Piloted Command-Completion Check for Handoff/Recall File Tracing](ADR-068-lightweight-vs-full-workflow-rule-and-piloted-command-completion-check.md) — **Status:** Accepted — issue-25's lightweight-vs-full workflow rule: use a hand-written file (no branch, no GitHub issue) when no code change is planned, no external visibility is needed, and the write-up fits in a paragraph or two; paired with a piloted command-completion check for handoff/recall file tracing.
 - [ADR-067: Mutable `.active` switch vs context-derived KG resolution — decision pending](ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md) — **Status:** Proposed — context + open decision only, explicitly deferred (not decided this session); related to [ADR-066](ADR-066-kg-content-storage-location-for-global-and-cowork-modes.md), governs [ENH-051](../enhancements/ENH-051/ENH-051-specification.md).
@@ -93,6 +94,7 @@ Formal documentation of significant architecture decisions.
 ## By Category
 
 ### Architecture
+- [ADR-070: Scaffold/Upgrade Dead-End — connect-unregistered-graph, Shared Registration Guards, Canonical Scaffold Routing](ADR-070-scaffold-upgrade-dead-end-connect-unregistered-graph.md) — New opt-in `kg_upgrade` category registers unregistered-but-populated folders in place, closing the `kg_config_init`↔`kg_upgrade` dead end; every registration path now shares one `resolveRegistrationGuard`; MCP-native scaffold routing rewritten to match the wizard's canonical routing. All three findings surfaced by AI code review of an unrelated branch's final review.
 - [ADR-064: Shared Module Pattern for Slash Command Deduplication](ADR-064-shared-module-pattern-for-slash-command-deduplication.md) — Parameterized shared modules under `commands/kmg-init-shared/` replace duplicated instruction blocks across init commands; explicit parameter contract tables enforce interfaces
 - [ADR-057: Detection layer requires unified design, not piecemeal growth](ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth.md) — 5 capture-trigger skills grew accreted/undesigned; consolidate detection/classification into one shared skill, keep drafting agents separate; consolidation ENH ready to spec (deferral reasoning corrected 2026-07-03)
 - [ADR-056: Reject plugin-split for contributor-only doc commands](ADR-056-reject-plugin-split-for-contributor-only-doc-commands.md) — Keep single-plugin architecture; fix imposed-house-style bug via repo-context auto-detection ([[ENH-033]]) + labeling instead of a `kmgraph-contrib` split
