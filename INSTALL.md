@@ -264,6 +264,55 @@ After the wizard completes, your existing lessons, ADRs, sessions, and chat hist
 
 ---
 
+## Step 0.7: First Install, Pre-Existing `knowledge/` Folder (read even if you skipped Step 0.6)
+
+**This is for you if:** you have never installed KMGraph before, but you landed in a
+repo where `knowledge/` (or another registered KG path) is already populated —
+`decisions/`, `lessons-learned/`, `sessions/` checked in by someone else's KMGraph
+use. Step 0.6 above is labeled "skip if first install" — that label is about *your*
+prior install, not about content that's already there. If this is your situation,
+keep reading before proceeding to Step 1.
+
+**How you'd know:** a `README.md` at the root of that folder, written by KMGraph
+itself, explaining that the folder is a KMGraph knowledge graph and naming the
+plugin and the `/kmgraph:kmg-init` command — that's what leads a reader here.
+(Graphs created before that README existed get one via the opt-in
+`missing-root-readme` `kg_upgrade` category — run `kg_upgrade apply` with that
+category, or `/kmgraph:kmg-init`, option — Verify/upgrade. It is not applied
+automatically.)
+
+**Will installing here overwrite or merge with what's already there?** No — nothing
+blindly re-scaffolds over existing content:
+
+- **Claude Code users:** `/kmgraph:kmg-init`'s existing-graph detection (the same
+  mechanism described in Step 0.6) also fires on disk content alone. Finding
+  `decisions/` or `lessons-learned/` under the target path routes the wizard into
+  the same Verify/Upgrade flow used for version upgrades instead of scaffolding
+  fresh — even though this is the first time *you* have run the wizard against
+  this folder. That refusal-to-overwrite is real, but Verify/Upgrade's own
+  parameters are documented as coming from an existing `kg-config.json` registry
+  entry, which a first-time, genuinely unregistered folder does not have. **This
+  is a known gap, not a self-service fix:** the wizard reliably detects and
+  refuses to overwrite, but it does not currently complete an automated connect
+  for this exact case either — treat the refusal as protection against
+  scaffolding over someone else's content, not as a pointer to a working
+  automated connect flow.
+- **MCP IDE users** (Cursor, Windsurf, Continue.dev, VS Code, JetBrains): the
+  `kg_config_init` tool refuses to scaffold when it finds `decisions/` or
+  `lessons-learned/` content that isn't already registered on your machine. Its
+  error message names `kg_upgrade` as the next step — as of v0.7.4.2 that's a
+  real, working path, not a dead end: run `kg_upgrade` with
+  `apply: ["connect-unregistered-graph"]` (see the v0.7.4.2 row in the table
+  above) to register the folder in place, with no re-scaffold and no template
+  writes. It isn't automatic — you have to name the category explicitly, and
+  `kg_config_init` still won't do it for you — but it's a self-service fix now,
+  not just a refusal.
+
+Proceed to Step 1 below — the rest of the install walks you through this
+automatically once you reach the init step (Step 3).
+
+---
+
 ### Step 1: Detect Platform
 
 

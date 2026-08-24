@@ -141,6 +141,21 @@ describe("scaffoldGraphDirectory", () => {
       expect(fs.existsSync(path.join(kgPath, "lessons-learned", "process"))).toBe(true);
       expect(typeof templatesCopied).toBe("number");
       expect(templatesCopied).toBeGreaterThanOrEqual(0);
+
+      // Fix 1 (final-review Important #1): the five content templates land in
+      // templates/ (matching the wizard's real routing,
+      // commands/kmg-init-shared/kmg-template-seed.md), not concepts/.
+      for (const t of ["patterns.md", "gotchas.md", "concepts.md", "architecture.md", "workflows.md"]) {
+        expect(fs.existsSync(path.join(kgPath, "templates", t))).toBe(true);
+        expect(fs.existsSync(path.join(kgPath, "concepts", t))).toBe(false);
+      }
+      // me.md/rules.md/triggers.md/index.md land at the KG root, sourced from
+      // concepts/templates/project/ -- not the old concepts/{me,rules,kg-index,triggers}.md
+      // paths, and the index file is named index.md, not kg-index.md.
+      for (const f of ["me.md", "rules.md", "triggers.md", "index.md"]) {
+        expect(fs.existsSync(path.join(kgPath, f))).toBe(true);
+      }
+      expect(fs.existsSync(path.join(kgPath, "kg-index.md"))).toBe(false);
     } finally {
       fs.rmSync(wrapper, { recursive: true, force: true });
     }
@@ -210,6 +225,21 @@ describe("scaffoldGraphDirectory", () => {
     }
   });
 
+  // ENH-064: every newly-scaffolded graph gets a root README (Task 3 added
+  // core/default-templates/README-root.md; this proves it's actually wired
+  // into the scaffold, and that copyIfMissing's do-not-overwrite guarantee
+  // covers it like every other template copy in this function.
+  test("copies README-root.md to <kgPath>/README.md", () => {
+    const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), "cli-init-scaffold-readme-"));
+    try {
+      const kgPath = path.join(wrapper, "kg");
+      scaffoldGraphDirectory(kgPath, []);
+      expect(fs.existsSync(path.join(kgPath, "README.md"))).toBe(true);
+    } finally {
+      fs.rmSync(wrapper, { recursive: true, force: true });
+    }
+  });
+
   test("root me.md/rules.md/triggers.md come from the project profile starters, not the longer concepts/*.md files", () => {
     const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), "cli-init-scaffold-profile-"));
     try {
@@ -221,6 +251,111 @@ describe("scaffoldGraphDirectory", () => {
         const expectedSrc = path.join(pluginRoot, "core", "default-templates", "concepts", "templates", "project", f);
         expect(fs.readFileSync(path.join(kgPath, f), "utf-8")).toBe(fs.readFileSync(expectedSrc, "utf-8"));
       }
+    } finally {
+      fs.rmSync(wrapper, { recursive: true, force: true });
+    }
+  });
+
+  // ENH-064 acceptance criterion 1: fresh init writes a README whose content
+  // -- not just presence -- carries the "plain Markdown, no tooling
+  // required" statement, the KMGraph link, and the /kmgraph:kmg-init install
+  // instruction. Compared byte-for-byte against the real source template so
+  // this fails the moment either drifts out of sync with the other.
+  test("copied README.md content matches core/default-templates/README-root.md and covers the required statements", () => {
+    const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), "cli-init-scaffold-readme-content-"));
+    try {
+      const kgPath = path.join(wrapper, "kg");
+      scaffoldGraphDirectory(kgPath, []);
+
+      const templatePath = path.join(__dirname, "..", "..", "core", "default-templates", "README-root.md");
+      const templateContent = fs.readFileSync(templatePath, "utf-8");
+      const copiedContent = fs.readFileSync(path.join(kgPath, "README.md"), "utf-8");
+
+      expect(copiedContent).toBe(templateContent);
+      expect(copiedContent).toContain("plain Markdown");
+      expect(copiedContent).toContain("No tooling is required");
+      expect(copiedContent).toContain("https://kmgraph.stayinginsync.info");
+      expect(copiedContent).toContain("/kmgraph:kmg-init");
+    } finally {
+      fs.rmSync(wrapper, { recursive: true, force: true });
+    }
+  });
+
+  // ENH-064 acceptance criterion 2: voice/style compliance -- no em dashes,
+  // neutral third-person (no "you"/"your"). Almost certainly uncovered
+  // before this task; asserted directly against the template's real text.
+  test("README-root.md content is free of em dashes and second-person address", () => {
+    const templatePath = path.join(__dirname, "..", "..", "core", "default-templates", "README-root.md");
+    const content = fs.readFileSync(templatePath, "utf-8");
+
+    expect(content).not.toContain("—"); // em dash
+    expect(content.toLowerCase()).not.toMatch(/\byou\b/);
+    expect(content.toLowerCase()).not.toMatch(/\byour\b/);
+  });
+
+  // ENH-064 acceptance criterion 3: no per-file watermarking. Nothing in
+  // scaffoldGraphDirectory adds attribution text/HTML comments to the
+  // decision/lesson templates it copies -- this is trivially true by
+  // construction today, but a light regression test still earns its keep:
+  // it fails loudly if a future change starts stamping these files.
+  test("decision/lesson templates carry no KMGraph attribution watermark", () => {
+    const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), "cli-init-scaffold-watermark-"));
+    try {
+      const kgPath = path.join(wrapper, "kg");
+      scaffoldGraphDirectory(kgPath, []);
+
+      const filesToCheck = [
+        path.join(kgPath, "templates", "ADR-template.md"),
+        path.join(kgPath, "decisions", "README.md"),
+        path.join(kgPath, "templates", "lesson-template.md"),
+        path.join(kgPath, "lessons-learned", "README.md"),
+      ];
+
+      for (const file of filesToCheck) {
+        const content = fs.readFileSync(file, "utf-8");
+        expect(content).not.toMatch(/<!--\s*kmgraph/i);
+        expect(content).not.toMatch(/generated by kmgraph/i);
+        expect(content).not.toMatch(/powered by kmgraph/i);
+        expect(content).not.toMatch(/created by kmgraph/i);
+        expect(content).not.toContain("kmgraph.stayinginsync.info");
+      }
+    } finally {
+      fs.rmSync(wrapper, { recursive: true, force: true });
+    }
+  });
+
+  // ENH-064 acceptance criterion 6: scaffolding into a nested knowledge-graph
+  // folder must not touch or shadow a repo-root README.md that sits above
+  // it. scaffoldGraphDirectory only ever writes inside expandedPath, but
+  // this proves it end-to-end against a realistic project-root layout.
+  test("does not touch a project-root README.md when scaffolding into a nested knowledge/ subfolder", () => {
+    const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), "cli-init-scaffold-root-readme-"));
+    try {
+      const projectRootReadme = path.join(wrapper, "README.md");
+      const rootContent = "# My Project\n\nThis is the actual project README.\n";
+      fs.writeFileSync(projectRootReadme, rootContent, "utf-8");
+
+      const kgPath = path.join(wrapper, "knowledge");
+      scaffoldGraphDirectory(kgPath, []);
+
+      expect(fs.readFileSync(projectRootReadme, "utf-8")).toBe(rootContent);
+      expect(fs.existsSync(path.join(kgPath, "README.md"))).toBe(true);
+      expect(fs.readFileSync(path.join(kgPath, "README.md"), "utf-8")).not.toBe(rootContent);
+    } finally {
+      fs.rmSync(wrapper, { recursive: true, force: true });
+    }
+  });
+
+  test("does not overwrite an existing README.md at the KG root", () => {
+    const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), "cli-init-scaffold-readme-preserve-"));
+    try {
+      const kgPath = path.join(wrapper, "kg");
+      fs.mkdirSync(kgPath, { recursive: true });
+      fs.writeFileSync(path.join(kgPath, "README.md"), "custom content, do not clobber\n", "utf-8");
+
+      scaffoldGraphDirectory(kgPath, []);
+
+      expect(fs.readFileSync(path.join(kgPath, "README.md"), "utf-8")).toBe("custom content, do not clobber\n");
     } finally {
       fs.rmSync(wrapper, { recursive: true, force: true });
     }

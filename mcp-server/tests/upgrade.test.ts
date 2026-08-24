@@ -4244,3 +4244,117 @@ describe("connect-unregistered-graph + registration guard (Opus validation revie
     expect(writeConfig).toHaveBeenCalled();
   });
 });
+
+// ---------------------------------------------------------------------------
+// ENH-064: "missing-root-readme" upgrade category
+//
+// A graph registered before this feature shipped never got the attribution
+// README.md that scaffold-time init (Task 3/4) now writes at the graph root.
+// Same treatment as stale-fts5-index-format/stale-handoff-packages-location:
+// opt-in, non-destructive, fires only when the gap exists, no confirmBackfix
+// (purely additive).
+// ---------------------------------------------------------------------------
+
+describe("upgrade category: missing-root-readme (ENH-064)", () => {
+  const TEMPLATE_CONTENT = "# Knowledge Graph\n\nThis directory is managed by KMGraph.\n";
+
+  function mockTemplateSource(): string {
+    const mockPluginRoot = makeTempDir("readme-plugin");
+    tempDirs.push(mockPluginRoot);
+    const srcDir = path.join(mockPluginRoot, "core", "default-templates");
+    fs.mkdirSync(srcDir, { recursive: true });
+    fs.writeFileSync(path.join(srcDir, "README-root.md"), TEMPLATE_CONTENT, "utf-8");
+    const { getPluginRoot } = jest.requireMock("../src/utils.js") as { getPluginRoot: jest.Mock };
+    getPluginRoot.mockReturnValue(mockPluginRoot);
+    return mockPluginRoot;
+  }
+
+  async function inspectCategories(): Promise<string[]> {
+    const result = await handleUpgrade({});
+    const parsed = JSON.parse(result.content[0].text);
+    return (parsed.upgrades as Array<{ category: string }>).map((u) => u.category);
+  }
+
+  it("fires when a registered graph is missing README.md", async () => {
+    const kgRoot = makeTempDir("readme-missing");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+
+    expect(await inspectCategories()).toContain("missing-root-readme");
+  });
+
+  it("does not fire when README.md already exists (any content)", async () => {
+    const kgRoot = makeTempDir("readme-present");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "README.md"), "# My own custom README\n", "utf-8");
+    mockActiveKg(kgRoot);
+
+    expect(await inspectCategories()).not.toContain("missing-root-readme");
+  });
+
+  it("apply copies the template to README.md and the category stops firing", async () => {
+    const kgRoot = makeTempDir("readme-apply");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    mockTemplateSource();
+
+    // ENH-064 Task 8 / test-cases.md criterion 4's exact wording: "adds the
+    // README without altering any other existing file." Plant a sentinel
+    // file elsewhere in the graph before applying, and confirm it's
+    // byte-for-byte unchanged afterward -- the assertions below this block
+    // only ever checked README.md itself.
+    const sentinelPath = path.join(kgRoot, "decisions", "ADR-001-existing.md");
+    const sentinelContent = "# ADR-001: Existing Decision\n\nAlready here before the backfill ran.\n";
+    fs.writeFileSync(sentinelPath, sentinelContent, "utf-8");
+
+    expect(await inspectCategories()).toContain("missing-root-readme");
+
+    const applied = await handleUpgrade({ apply: ["missing-root-readme"] });
+    const text = applied.content[0].text;
+    expect(applied.isError).toBeUndefined();
+    expect(text).toContain("[missing-root-readme]");
+
+    const readmePath = path.join(kgRoot, "README.md");
+    expect(fs.existsSync(readmePath)).toBe(true);
+    expect(fs.readFileSync(readmePath, "utf-8")).toBe(TEMPLATE_CONTENT);
+
+    expect(await inspectCategories()).not.toContain("missing-root-readme");
+
+    // The pre-existing file must be untouched.
+    expect(fs.readFileSync(sentinelPath, "utf-8")).toBe(sentinelContent);
+  });
+
+  it("apply never overwrites an existing (including user-edited) README.md", async () => {
+    const kgRoot = makeTempDir("readme-no-overwrite");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    const userContent = "# My own custom README\n\nDo not touch this.\n";
+    fs.writeFileSync(path.join(kgRoot, "README.md"), userContent, "utf-8");
+    mockActiveKg(kgRoot);
+    mockTemplateSource();
+
+    const applied = await handleUpgrade({ apply: ["missing-root-readme"] });
+    const text = applied.content[0].text;
+    expect(applied.isError).toBeUndefined();
+    expect(text).toContain("[missing-root-readme]");
+    expect(text).toContain("already exists");
+
+    expect(fs.readFileSync(path.join(kgRoot, "README.md"), "utf-8")).toBe(userContent);
+  });
+
+  it("apply on a graph with no template source reports and does not crash", async () => {
+    const kgRoot = makeTempDir("readme-no-template");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot);
+    // getPluginRoot stays at the file-level default ("/nonexistent-plugin-root")
+
+    const applied = await handleUpgrade({ apply: ["missing-root-readme"] });
+    expect(applied.isError).toBeUndefined();
+    expect(applied.content[0].text).toContain("[missing-root-readme]");
+    expect(fs.existsSync(path.join(kgRoot, "README.md"))).toBe(false);
+  });
+});

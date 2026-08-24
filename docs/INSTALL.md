@@ -130,6 +130,43 @@ When running `/kmgraph:kmg-init` on an existing installation, the wizard inspect
 >
 > `/kmgraph:kmg-init` is safe to re-run at any time. It skips steps already complete and only offers items still pending for your install.
 
+### First Install Onto an Existing Knowledge Graph
+
+Landed in a repo where `knowledge/` is already populated — decisions, lessons
+learned, sessions checked in by someone else's KMGraph use — and you've never
+installed KMGraph yourself? That's what the `README.md` at the root of that
+folder is for: KMGraph writes it there automatically, explaining that the
+folder is a KMGraph knowledge graph and naming the plugin and the
+`/kmgraph:kmg-init` command — that's what leads a reader to this installer.
+(Graphs created before that README existed get one via the opt-in
+`missing-root-readme` `kg_upgrade` category — run `kg_upgrade apply` with that
+category, or `/kmgraph:kmg-init`, option — Verify/upgrade. It is not applied
+automatically.)
+
+> 📘 **Won't the installer overwrite what's already there?**
+>
+> No. Nothing blindly re-scaffolds over existing content. `/kmgraph:kmg-init`'s
+> existing-graph detection (the same mechanism used for version upgrades, above)
+> also fires on disk content alone — finding `decisions/` or `lessons-learned/`
+> at the target path routes the wizard into the same Verify/Upgrade flow instead
+> of scaffolding fresh, even on your first run against that folder. That
+> refusal-to-overwrite is real, but Verify/Upgrade's own parameters are
+> documented as coming from an existing `kg-config.json` registry entry, which a
+> first-time, genuinely unregistered folder does not have — so the wizard does
+> not currently complete an automated connect for this exact case either. MCP
+> IDE users (no wizard) get the same *refusal-to-overwrite* protection from the
+> `kg_config_init` tool directly: it refuses to scaffold over unregistered
+> `decisions/` or `lessons-learned/` content. Its error message names
+> `kg_upgrade` as the next step — as of v0.7.4.2 that's a real, working path,
+> not a dead end: run `kg_upgrade` with `apply: ["connect-unregistered-graph"]`
+> to register the folder in place, with no re-scaffold and no template writes.
+> It isn't automatic — you have to name the category explicitly — but it's a
+> self-service fix now. The wizard side remains a real gap, though: its
+> Verify/Upgrade flow still expects registry parameters a genuinely
+> unregistered folder doesn't have, so treat its refusal as protection against
+> scaffolding over someone else's content, not as a pointer to a working
+> automated connect flow on that platform.
+
 ### Upgrading on Codex or Gemini CLI
 
 On platforms without the Claude Code wizard, upgrades are handled via the `kg_upgrade` MCP tool:

@@ -66,6 +66,7 @@ const APPLY_ORDER = [
   "diff-blank-reconstruction",   // issue-47 backfix: content repair, order-independent of the others
   "stale-fts5-index-format",   // issue-55 backfix: search-index relocation, order-independent of the others
   "stale-handoff-packages-location",   // issue-56 backfix: file relocation, order-independent of the others
+  "missing-root-readme",   // ENH-064 backfix: additive file backfill, order-independent of the others
   "platform-split",
 ];
 
@@ -1879,6 +1880,55 @@ function moveHandoffPackageDir(
   }
 }
 
+/**
+ * ENH-064 — a graph registered before this feature shipped never got the
+ * attribution README that scaffold-time init now writes (Task 4, both the
+ * MCP-native path in config.ts's scaffoldGraphDirectory() and the wizard
+ * path). Same class of "existing installs missed a file newer installs get
+ * automatically" gap as stale-fts5-index-format/stale-handoff-packages-
+ * location above, same treatment: opt-in, non-destructive, no confirmBackfix
+ * (adding a file that didn't exist is purely additive).
+ */
+function checkMissingRootReadme(kgPath: string): UpgradeItem[] {
+  const readmePath = path.join(kgPath, "README.md");
+  if (fs.existsSync(readmePath)) return [];
+
+  return [{
+    category: "missing-root-readme",
+    description: "Knowledge graph root is missing README.md",
+    details:
+      `This knowledge graph was registered before KMGraph started writing an attribution ` +
+      `README.md at the graph root, so this one never got one.\n\n` +
+      `Applying this copies the standard attribution README to:\n  ${readmePath}\n\n` +
+      `This is safe and non-destructive: it only writes a new file when one doesn't already ` +
+      `exist there — an existing README.md (including one you've edited yourself) is never ` +
+      `touched.`,
+  }];
+}
+
+/**
+ * ENH-064 — copy core/default-templates/README-root.md to $KG_PATH/README.md.
+ * The check above only fires when the file is absent, but the copy itself is
+ * guarded too (defense in depth, matching this file's existing conventions
+ * for the other backfill categories) so a second/racing apply can never
+ * clobber a README the user has since created or edited.
+ */
+function applyMissingRootReadme(kgPath: string): string {
+  const readmePath = path.join(kgPath, "README.md");
+  if (fs.existsSync(readmePath)) {
+    return "README.md already exists; skipped";
+  }
+
+  const pluginRoot = getPluginRoot();
+  const srcPath = path.join(pluginRoot, "core", "default-templates", "README-root.md");
+  if (!fs.existsSync(srcPath)) {
+    return `Template not found at ${srcPath}; skipped`;
+  }
+
+  fs.copyFileSync(srcPath, readmePath);
+  return `Copied attribution README to ${readmePath}`;
+}
+
 function checkStrayKnowledgeDir(kgPath: string, kgType: string | undefined): UpgradeItem[] {
   if (kgType !== "project-local") return [];
   const strayDir = path.join(kgPath, "knowledge");
@@ -2379,7 +2429,7 @@ function updateLastAppliedVersion(installedVersion: string, graphName: string): 
 // kmg-upgrade-inspector.md's confirmBackfix wiring: that boolean is per-call, not
 // per-category, so a call consenting to one confirmBackfix-gated category silently
 // also consents to any other one present in the same `apply: [...]` array.
-export type ApplyCategory = "status-schema" | "config-location" | "plan-status-drift" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir" | "capture-corruption" | "diff-blank-reconstruction" | "stale-fts5-index-format" | "stale-handoff-packages-location" | "connect-unregistered-graph";
+export type ApplyCategory = "status-schema" | "config-location" | "plan-status-drift" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir" | "capture-corruption" | "diff-blank-reconstruction" | "stale-fts5-index-format" | "stale-handoff-packages-location" | "connect-unregistered-graph" | "missing-root-readme";
 
 export interface HandleUpgradeParams {
   apply?: ApplyCategory[];
@@ -2570,7 +2620,7 @@ export async function handleUpgrade(
       result.upgrades.push({
         category: "resolution",
         description: target.error,
-        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, stale-handoff-packages-location, version-update, and the platform-split warning) were skipped.",
+        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, stale-handoff-packages-location, missing-root-readme, version-update, and the platform-split warning) were skipped.",
       });
       return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
     }
@@ -2595,7 +2645,7 @@ export async function handleUpgrade(
       result.upgrades.push({
         category: "resolution",
         description: `KG path not found: ${kgPath}`,
-        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, stale-handoff-packages-location, version-update, and the platform-split warning) were skipped.",
+        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, stale-handoff-packages-location, missing-root-readme, version-update, and the platform-split warning) were skipped.",
       });
       return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
     }
@@ -2609,6 +2659,7 @@ export async function handleUpgrade(
     result.upgrades.push(...checkDiffBlankReconstruction(kgPath));
     result.upgrades.push(...checkStaleFts5IndexFormat(kgPath, target.name, kgType));
     result.upgrades.push(...checkStaleHandoffPackagesLocation(kgPath, kgType));
+    result.upgrades.push(...checkMissingRootReadme(kgPath));
     result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config, target.name));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
@@ -2758,6 +2809,14 @@ export async function handleUpgrade(
         // or reports (never overwrites) a conflict, so the wizard's per-item
         // yes/no is the only consent it needs.
         results.push(`[stale-handoff-packages-location] ${applyStaleHandoffPackagesLocation(kgPath)}`);
+        appliedAnyGraphDependent = true;
+        break;
+      case "missing-root-readme":
+        // ENH-064: no confirmBackfix gate — purely additive, same reasoning
+        // as stale-fts5-index-format/stale-handoff-packages-location above.
+        // Adding a file that didn't exist can never destroy anything, so the
+        // wizard's per-item yes/no is the only consent it needs.
+        results.push(`[missing-root-readme] ${applyMissingRootReadme(kgPath)}`);
         appliedAnyGraphDependent = true;
         break;
       case "capture-corruption": {
@@ -2913,11 +2972,11 @@ export function registerUpgradeTool(server: McpServer, personalScopeSession: Per
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
       apply: z
-        .array(z.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction", "stale-fts5-index-format", "stale-handoff-packages-location", "connect-unregistered-graph"]))
+        .array(z.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction", "stale-fts5-index-format", "stale-handoff-packages-location", "connect-unregistered-graph", "missing-root-readme"]))
         .optional()
         .default([])
         .describe(
-          'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history), "stale-fts5-index-format" (issue-55 backfix: rebuilds a pre-v0.7.4 name-only search index at the collision-safe path-keyed location; non-destructive, leaves the old file in place), "stale-handoff-packages-location" (issue-56 backfix: moves pre-fix ./handoff-packages/<date>/ folders into knowledge/handoffs/<date>/; non-destructive, dedups identical files and reports rather than overwrites any that differ), "connect-unregistered-graph" (registers the current directory as a new knowledge graph when it already has decisions/ or lessons-learned/ content -- or an orphaned .kmgraph-id marker -- but isn\'t in the config registry yet; does not scaffold any new files, only attaches a registry entry to what\'s already there, then continues into any other categories requested in the same call)'
+          'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history), "stale-fts5-index-format" (issue-55 backfix: rebuilds a pre-v0.7.4 name-only search index at the collision-safe path-keyed location; non-destructive, leaves the old file in place), "stale-handoff-packages-location" (issue-56 backfix: moves pre-fix ./handoff-packages/<date>/ folders into knowledge/handoffs/<date>/; non-destructive, dedups identical files and reports rather than overwrites any that differ), "connect-unregistered-graph" (registers the current directory as a new knowledge graph when it already has decisions/ or lessons-learned/ content -- or an orphaned .kmgraph-id marker -- but isn\'t in the config registry yet; does not scaffold any new files, only attaches a registry entry to what\'s already there, then continues into any other categories requested in the same call), "missing-root-readme" (ENH-064 backfix: copies the attribution README to a registered graph\'s root when missing; non-destructive, never overwrites an existing README.md)'
         ),
       confirm_platform_split: z
         .boolean()

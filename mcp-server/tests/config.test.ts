@@ -284,4 +284,107 @@ describe("handleConfigInit", () => {
     expect(parsed.detail).toMatchObject({ isAncestorOfCount: 1, ancestorOfNames: ["existing"] });
     expect(writeConfig).not.toHaveBeenCalled();
   });
+
+  // ENH-064: a folder that already has real decisions/ or lessons-learned/
+  // content but was never marked (.kmgraph-id) or registered must not be
+  // silently adopted as a brand-new graph -- the marker-based duplicate
+  // check above doesn't cover this (no marker file exists at all), so this
+  // is a distinct disk-content pre-check.
+  it("refuses to scaffold over a pre-existing, unregistered decisions/ dir instead of silently adopting it", async () => {
+    const kgPath = makeTempDir("init-preexisting-content");
+    fs.mkdirSync(path.join(kgPath, "decisions"), { recursive: true });
+    (readConfig as jest.Mock).mockReturnValue({ version: "1.0.0", graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } });
+
+    const result = await handleConfigInit({
+      name: "new-kg",
+      kgPath,
+      type: "project-local",
+      categories: [{ name: "architecture", prefix: null, git: "commit" }],
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toMatch(/Found existing content at/);
+    expect(result.content[0].text).toMatch(/decisions\/ or lessons-learned\/ already present/);
+    expect(result.content[0].text).toMatch(/kg_upgrade/);
+    expect(writeConfig).not.toHaveBeenCalled();
+    // No new .kmgraph-id marker should have been minted over the existing content.
+    expect(fs.existsSync(path.join(kgPath, ".kmgraph-id"))).toBe(false);
+  });
+
+  it("refuses to scaffold over a pre-existing, unregistered lessons-learned/ dir instead of silently adopting it", async () => {
+    const kgPath = makeTempDir("init-preexisting-lessons");
+    fs.mkdirSync(path.join(kgPath, "lessons-learned"), { recursive: true });
+    (readConfig as jest.Mock).mockReturnValue({ version: "1.0.0", graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } });
+
+    const result = await handleConfigInit({
+      name: "new-kg",
+      kgPath,
+      type: "project-local",
+      categories: [{ name: "architecture", prefix: null, git: "commit" }],
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toMatch(/Found existing content at/);
+    expect(writeConfig).not.toHaveBeenCalled();
+  });
+
+  // ENH-064 Task 8: the disk-content pre-check above is gated on
+  // `!preExistingMarkerId` (Task 4 review fix, round 1) -- when a
+  // .kmgraph-id marker IS present but orphaned (its graphId isn't in the
+  // registry), that gate is false, so the "isn't registered or marked"
+  // disk-content refusal must NOT fire. Control instead falls through to
+  // the existing marker-mismatch check further down, which is the
+  // accurate description of this state (a marker really is present, it
+  // just doesn't match anything real). No test previously exercised a
+  // folder with both an orphaned marker AND decisions/ content together.
+  it("orphaned marker (present but unregistered) plus decisions/ content hits the marker-mismatch path, not the disk-content refusal", async () => {
+    const kgPath = makeTempDir("init-orphaned-marker-with-content");
+    fs.writeFileSync(path.join(kgPath, ".kmgraph-id"), "orphaned-graph-id\n", "utf-8");
+    fs.mkdirSync(path.join(kgPath, "decisions"), { recursive: true });
+    (readConfig as jest.Mock).mockReturnValue({ version: "1.0.0", graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } });
+
+    const result = await handleConfigInit({
+      name: "new-kg",
+      kgPath,
+      type: "project-local",
+      categories: [{ name: "architecture", prefix: null, git: "commit" }],
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toMatch(/already tracked as a different knowledge graph \(marker mismatch\)/);
+    expect(result.content[0].text).not.toMatch(/Found existing content at/);
+    expect(writeConfig).not.toHaveBeenCalled();
+  });
+
+  // Final-review finding Important #3 (scaffold-then-refuse leak): the
+  // marker-mismatch refusal used to run AFTER scaffoldGraphDirectory, so an
+  // orphaned-marker mismatch would still leave freshly-scaffolded template
+  // files -- including the ENH-064 attribution README.md -- behind in a
+  // folder the function was about to refuse to register. This pins the fix:
+  // the mismatch check now runs before scaffoldGraphDirectory is called, so
+  // nothing gets written on this path.
+  it("does not leak scaffolded files (e.g. README.md) into the target dir when refusing on a marker mismatch", async () => {
+    const kgPath = makeTempDir("init-marker-mismatch-no-leak");
+    fs.writeFileSync(path.join(kgPath, ".kmgraph-id"), "some-other-id\n", "utf-8");
+    (readConfig as jest.Mock).mockReturnValue({ version: "1.0.0", graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } });
+
+    const beforeEntries = fs.readdirSync(kgPath).sort();
+
+    const result = await handleConfigInit({
+      name: "new-kg",
+      kgPath,
+      type: "project-local",
+      categories: [{ name: "architecture", prefix: null, git: "commit" }],
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toMatch(/already tracked as a different knowledge graph \(marker mismatch\)/);
+    expect(writeConfig).not.toHaveBeenCalled();
+    // Nothing scaffoldGraphDirectory would create exists -- the dir's
+    // contents are exactly what the test setup itself wrote (.kmgraph-id).
+    expect(fs.existsSync(path.join(kgPath, "README.md"))).toBe(false);
+    expect(fs.existsSync(path.join(kgPath, "decisions"))).toBe(false);
+    expect(fs.existsSync(path.join(kgPath, "templates"))).toBe(false);
+    expect(fs.readdirSync(kgPath).sort()).toEqual(beforeEntries);
+  });
 });

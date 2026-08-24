@@ -31266,6 +31266,7 @@ function scaffoldGraphDirectory(expandedPath, categories) {
     path4.join(templateSrc, "concepts", "kg-category-index.md"),
     path4.join(expandedPath, "concepts", "kg-category-index.md")
   );
+  copyIfMissing(path4.join(templateSrc, "README-root.md"), path4.join(expandedPath, "README.md"));
   return templatesCopied;
 }
 function registerGraphConfig(config2, params) {
@@ -33550,7 +33551,7 @@ var os9 = __toESM(require("os"));
 var import_child_process4 = require("child_process");
 
 // src/tools/version.ts
-var pkg = { version: true ? "0.7.4.2" : "0.0.0" };
+var pkg = { version: true ? "0.7.5" : "0.0.0" };
 var SCHEMA_VERSION = 2;
 function handleVersion() {
   return { installed: pkg.version, schema: SCHEMA_VERSION };
@@ -33593,6 +33594,8 @@ var APPLY_ORDER = [
   // issue-55 backfix: search-index relocation, order-independent of the others
   "stale-handoff-packages-location",
   // issue-56 backfix: file relocation, order-independent of the others
+  "missing-root-readme",
+  // ENH-064 backfix: additive file backfill, order-independent of the others
   "platform-split"
 ];
 function hasUnregisteredGraphContent(cwd) {
@@ -34694,6 +34697,33 @@ function moveHandoffPackageDir(srcDir, destDir, label, moved, skipped) {
   } catch {
   }
 }
+function checkMissingRootReadme(kgPath) {
+  const readmePath = path11.join(kgPath, "README.md");
+  if (fs11.existsSync(readmePath)) return [];
+  return [{
+    category: "missing-root-readme",
+    description: "Knowledge graph root is missing README.md",
+    details: `This knowledge graph was registered before KMGraph started writing an attribution README.md at the graph root, so this one never got one.
+
+Applying this copies the standard attribution README to:
+  ${readmePath}
+
+This is safe and non-destructive: it only writes a new file when one doesn't already exist there \u2014 an existing README.md (including one you've edited yourself) is never touched.`
+  }];
+}
+function applyMissingRootReadme(kgPath) {
+  const readmePath = path11.join(kgPath, "README.md");
+  if (fs11.existsSync(readmePath)) {
+    return "README.md already exists; skipped";
+  }
+  const pluginRoot = getPluginRoot();
+  const srcPath = path11.join(pluginRoot, "core", "default-templates", "README-root.md");
+  if (!fs11.existsSync(srcPath)) {
+    return `Template not found at ${srcPath}; skipped`;
+  }
+  fs11.copyFileSync(srcPath, readmePath);
+  return `Copied attribution README to ${readmePath}`;
+}
 function checkStrayKnowledgeDir(kgPath, kgType) {
   if (kgType !== "project-local") return [];
   const strayDir = path11.join(kgPath, "knowledge");
@@ -35082,7 +35112,7 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
       result.upgrades.push({
         category: "resolution",
         description: target.error,
-        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, stale-handoff-packages-location, version-update, and the platform-split warning) were skipped."
+        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, stale-handoff-packages-location, missing-root-readme, version-update, and the platform-split warning) were skipped."
       });
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
     }
@@ -35092,7 +35122,7 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
       result.upgrades.push({
         category: "resolution",
         description: `KG path not found: ${kgPath}`,
-        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, stale-handoff-packages-location, version-update, and the platform-split warning) were skipped."
+        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, stale-handoff-packages-location, missing-root-readme, version-update, and the platform-split warning) were skipped."
       });
       return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
     }
@@ -35105,6 +35135,7 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
     result.upgrades.push(...checkDiffBlankReconstruction(kgPath));
     result.upgrades.push(...checkStaleFts5IndexFormat(kgPath, target.name, kgType));
     result.upgrades.push(...checkStaleHandoffPackagesLocation(kgPath, kgType));
+    result.upgrades.push(...checkMissingRootReadme(kgPath));
     result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config2, target.name));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
@@ -35207,6 +35238,10 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
         results.push(`[stale-handoff-packages-location] ${applyStaleHandoffPackagesLocation(kgPath)}`);
         appliedAnyGraphDependent = true;
         break;
+      case "missing-root-readme":
+        results.push(`[missing-root-readme] ${applyMissingRootReadme(kgPath)}`);
+        appliedAnyGraphDependent = true;
+        break;
       case "capture-corruption": {
         const mode = resolveInteractionMode({}).mode;
         const rescan = checkCaptureCorruption(kgPath);
@@ -35286,8 +35321,8 @@ function registerUpgradeTool(server2, personalScopeSession2) {
     "kg_upgrade",
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
-      apply: external_exports3.array(external_exports3.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction", "stale-fts5-index-format", "stale-handoff-packages-location", "connect-unregistered-graph"])).optional().default([]).describe(
-        `Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history), "stale-fts5-index-format" (issue-55 backfix: rebuilds a pre-v0.7.4 name-only search index at the collision-safe path-keyed location; non-destructive, leaves the old file in place), "stale-handoff-packages-location" (issue-56 backfix: moves pre-fix ./handoff-packages/<date>/ folders into knowledge/handoffs/<date>/; non-destructive, dedups identical files and reports rather than overwrites any that differ), "connect-unregistered-graph" (registers the current directory as a new knowledge graph when it already has decisions/ or lessons-learned/ content -- or an orphaned .kmgraph-id marker -- but isn't in the config registry yet; does not scaffold any new files, only attaches a registry entry to what's already there, then continues into any other categories requested in the same call)`
+      apply: external_exports3.array(external_exports3.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction", "stale-fts5-index-format", "stale-handoff-packages-location", "connect-unregistered-graph", "missing-root-readme"])).optional().default([]).describe(
+        `Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history), "stale-fts5-index-format" (issue-55 backfix: rebuilds a pre-v0.7.4 name-only search index at the collision-safe path-keyed location; non-destructive, leaves the old file in place), "stale-handoff-packages-location" (issue-56 backfix: moves pre-fix ./handoff-packages/<date>/ folders into knowledge/handoffs/<date>/; non-destructive, dedups identical files and reports rather than overwrites any that differ), "connect-unregistered-graph" (registers the current directory as a new knowledge graph when it already has decisions/ or lessons-learned/ content -- or an orphaned .kmgraph-id marker -- but isn't in the config registry yet; does not scaffold any new files, only attaches a registry entry to what's already there, then continues into any other categories requested in the same call), "missing-root-readme" (ENH-064 backfix: copies the attribution README to a registered graph's root when missing; non-destructive, never overwrites an existing README.md)`
       ),
       confirm_platform_split: external_exports3.boolean().optional().default(false).describe(
         "Must be true to apply platform-split migration (removes content from rules.md)"
@@ -35577,7 +35612,7 @@ function registerResolveTool(server2, personalScopeSession2) {
 // src/index.ts
 var server = new McpServer({
   name: "knowledge-graph",
-  version: true ? "0.7.4.2" : "0.0.0"
+  version: true ? "0.7.5" : "0.0.0"
 });
 var personalScopeSession = new PersonalScopeSession();
 var crossKgSearchSession = new CrossKgSearchSession();
