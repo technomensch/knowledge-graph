@@ -90,7 +90,7 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 
 ## v0.7.x Feature Highlights
 
-**Unreleased** *(ENH-064 — attribution README)*
+**v0.7.5 — 2026-08-23** *(ENH-064 — attribution README)*
 
 - **Attribution README scaffolded into every new knowledge graph.** Explains what KMGraph is and how a reader who finds the repo without the plugin installed can install it and run `/kmgraph:kmg-init` to connect — a knowledge graph is plain Markdown with no attribution otherwise, and a maintainer's graph often gets shared, cloned, or forked without that context. Graphs registered before this feature shipped get the README via a new opt-in `kg_upgrade` category, `missing-root-readme` (non-destructive, never overwrites an existing `README.md`). Closes #246, ENH-064.
 

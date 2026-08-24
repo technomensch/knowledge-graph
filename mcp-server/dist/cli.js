@@ -15291,6 +15291,7 @@ function scaffoldGraphDirectory(expandedPath, categories) {
     path4.join(templateSrc, "concepts", "kg-category-index.md"),
     path4.join(expandedPath, "concepts", "kg-category-index.md")
   );
+  copyIfMissing(path4.join(templateSrc, "README-root.md"), path4.join(expandedPath, "README.md"));
   return templatesCopied;
 }
 function registerGraphConfig(config2, params) {
@@ -33993,7 +33994,7 @@ function resolveKgPath(config2, params, cwd = process.cwd()) {
 }
 
 // src/cli.ts
-var SERVER_VERSION = true ? "0.7.4.2" : (() => {
+var SERVER_VERSION = true ? "0.7.5" : (() => {
   try {
     return null.version;
   } catch {

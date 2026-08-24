@@ -9,6 +9,8 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.5] — 2026-08-23
+
 ### Added
 
 - **Attribution README scaffolded into every new knowledge graph, plus a `kg_upgrade` backfill for graphs created before this feature shipped.** A knowledge graph is plain Markdown with no attribution — someone who later finds the repo without the plugin installed has no way to know it's a KMGraph graph or how to connect. `kg_config_init`/the CLI's `runInit` now scaffold a `README.md` at the graph root explaining what KMGraph is and how to install it and run `/kmgraph:kmg-init` (neutral third-person voice, no per-file watermarking). Graphs registered before this shipped get the README via a new opt-in `kg_upgrade` category, `missing-root-readme` — non-destructive, never overwrites an existing `README.md`. Requires no `confirmBackfix`; purely additive. Closes #246, ENH-064.
