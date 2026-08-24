@@ -254,7 +254,7 @@ export function scaffoldGraphDirectory(
   expandedPath: string,
   categories: Array<{ name: string }>
 ): number {
-  const dirs = ["knowledge", "lessons-learned", "decisions", "sessions", "chat-history", "tmp"];
+  const dirs = ["concepts", "templates", "lessons-learned", "decisions", "sessions", "chat-history", "tmp"];
   for (const dir of dirs) {
     fs.mkdirSync(path.join(expandedPath, dir), { recursive: true });
   }
@@ -274,29 +274,101 @@ export function scaffoldGraphDirectory(
     }
   };
 
-  const knowledgeTemplates = ["patterns.md", "gotchas.md", "concepts.md", "architecture.md", "workflows.md"];
-  for (const t of knowledgeTemplates) {
-    copyIfMissing(path.join(templateSrc, "knowledge", "templates", t), path.join(expandedPath, "knowledge", t));
+  // KG content templates + starter templates all deploy into templates/
+  // (ADR-040), never into their corresponding live dirs -- matches
+  // commands/kmg-init-shared/kmg-template-seed.md exactly.
+  const conceptTemplates = ["patterns.md", "gotchas.md", "concepts.md", "architecture.md", "workflows.md"];
+  for (const t of conceptTemplates) {
+    copyIfMissing(path.join(templateSrc, "concepts", "templates", t), path.join(expandedPath, "templates", t));
   }
-  for (const t of ["README.md", "lesson-template.md"]) {
-    copyIfMissing(path.join(templateSrc, "lessons-learned", t), path.join(expandedPath, "lessons-learned", t));
-  }
-  for (const t of ["README.md", "ADR-template.md"]) {
-    copyIfMissing(path.join(templateSrc, "decisions", t), path.join(expandedPath, "decisions", t));
-  }
+  copyIfMissing(
+    path.join(templateSrc, "concepts", "entry-template.md"),
+    path.join(expandedPath, "templates", "entry-template.md")
+  );
+
+  // READMEs stay in their live dirs (orientation files, not starters).
+  copyIfMissing(path.join(templateSrc, "lessons-learned", "README.md"), path.join(expandedPath, "lessons-learned", "README.md"));
+  copyIfMissing(path.join(templateSrc, "decisions", "README.md"), path.join(expandedPath, "decisions", "README.md"));
+
+  // Starter templates deploy to templates/, not into their live dirs.
+  copyIfMissing(
+    path.join(templateSrc, "lessons-learned", "lesson-template.md"),
+    path.join(expandedPath, "templates", "lesson-template.md")
+  );
+  copyIfMissing(
+    path.join(templateSrc, "decisions", "ADR-template.md"),
+    path.join(expandedPath, "templates", "ADR-template.md")
+  );
   copyIfMissing(
     path.join(templateSrc, "sessions", "session-template.md"),
-    path.join(expandedPath, "sessions", "session-template.md")
+    path.join(expandedPath, "templates", "session-template.md")
   );
-  for (const f of ["me.md", "rules.md", "kg-index.md", "triggers.md"]) {
-    copyIfMissing(path.join(templateSrc, "knowledge", f), path.join(expandedPath, f));
-  }
+
+  // Root-level profile files come from the project profile starters under
+  // concepts/templates/project/, NOT concepts/{me,rules,triggers}.md --
+  // those are different (longer) files. copyIfMissing (skip-if-exists) is
+  // kept for all four here, including me.md -- unlike the wizard, which
+  // unconditionally overwrites me.md. This function's own doc-comment says
+  // it never overwrites, so that contract stays consistent; the wizard's
+  // unconditional me.md overwrite is an intentional, accepted divergence.
+  copyIfMissing(path.join(templateSrc, "concepts", "templates", "project", "me.md"), path.join(expandedPath, "me.md"));
+  copyIfMissing(path.join(templateSrc, "concepts", "templates", "project", "rules.md"), path.join(expandedPath, "rules.md"));
+  copyIfMissing(path.join(templateSrc, "concepts", "templates", "project", "triggers.md"), path.join(expandedPath, "triggers.md"));
+  copyIfMissing(path.join(templateSrc, "concepts", "kg-index.md"), path.join(expandedPath, "index.md"));
+
   copyIfMissing(
-    path.join(templateSrc, "knowledge", "kg-category-index.md"),
-    path.join(expandedPath, "knowledge", "kg-category-index.md")
+    path.join(templateSrc, "concepts", "kg-category-index.md"),
+    path.join(expandedPath, "concepts", "kg-category-index.md")
   );
 
   return templatesCopied;
+}
+
+// ── Shared graph-registration write (Task A, kg_upgrade connect-unregistered-graph) ──
+//
+// The final "commit this graph to the registry" step of kg_config_init's
+// scaffold path -- build the GraphConfig entry, insert it into
+// config.graphs[name], persist via writeConfig(config). Split out so
+// kg_upgrade's connect-unregistered-graph category (upgrade.ts) can register
+// an already-populated, unregistered folder without duplicating this
+// sequence.
+//
+// Deliberately narrow: it takes an already-decided graphId as a parameter
+// rather than deciding mint-vs-reuse itself, because the two callers need
+// genuinely different marker semantics -- handleConfigInit treats ANY
+// pre-existing marker on a fresh-scaffold target as a hard conflict and
+// refuses (see config.test.ts's "Opus review SF-4" test: an orphaned marker
+// -- present on disk, graphId not found in the registry -- still errors
+// there, it is never reused). kg_upgrade's connect flow is the opposite
+// case: it never scaffolds, it only attaches a registry entry to content
+// that already exists, so an orphaned marker there is presumptively that
+// content's own prior identity and IS reused on purpose. Both callers keep
+// their own mint/reuse/writeGraphIdMarker logic; only the config-entry write
+// itself is shared here.
+export function registerGraphConfig(
+  config: KgConfig,
+  params: {
+    name: string;
+    kgPath: string;
+    type: "project-local" | "personal" | "custom";
+    categories: CategoryConfig[];
+    graphId: string;
+  }
+): GraphConfig {
+  const now = new Date().toISOString();
+  const graphConfig: GraphConfig = {
+    name: params.name,
+    path: params.kgPath,
+    type: params.type,
+    categories: params.categories,
+    createdAt: now,
+    status: "pending",
+    statusChangedAt: now,
+    graphId: params.graphId,
+  };
+  config.graphs[params.name] = graphConfig;
+  writeConfig(config);
+  return graphConfig;
 }
 
 // ── Exported handler for direct testing ──────────────────────────────────────
@@ -630,48 +702,67 @@ export async function handleConfigInit({ name, kgPath, type, categories, interac
     }
   }
 
-  // Create directory structure + copy default templates (shared with cli.ts, ENH-051)
-  scaffoldGraphDirectory(expandedPath, categories);
+  // Follow-up (Task A): refuse to scaffold over a folder that already has
+  // decisions/ or lessons-learned/ content but no marker at all -- checked
+  // BEFORE scaffoldGraphDirectory runs, same "check before you write files"
+  // discipline as every guard above it in this function. Gated on
+  // `!preExistingMarkerId`: a folder with an *orphaned* marker (marker
+  // present, not registered) does NOT hit this -- it falls through to the
+  // marker-mismatch hard-refusal below instead. Only "real content, zero
+  // marker at all" is new.
+  if (
+    !preExistingMarkerId &&
+    (fs.existsSync(path.join(expandedPath, "decisions")) || fs.existsSync(path.join(expandedPath, "lessons-learned")))
+  ) {
+    return {
+      content: [{
+        type: "text" as const,
+        text: `Found existing content at ${expandedPath} (decisions/ or lessons-learned/ already present) that isn't registered or marked as a KMGraph. Refusing to scaffold over it. Run kg_upgrade with apply: ["connect-unregistered-graph"] to register it instead.`,
+      }],
+      isError: true,
+    };
+  }
 
-  // Write config entry
-  const now = new Date().toISOString();
-  const newGraphId = mintGraphId();
-
+  // Mint the graph id and check for a marker mismatch BEFORE scaffolding any
+  // files -- scaffoldGraphDirectory writes real files, so running this check
+  // after it (as this used to, Opus validation review fix #2) leaves
+  // scaffold files behind in a folder this function then refuses to
+  // register. Reuses `preExistingMarkerId` (already read above, findings
+  // #6/#18/#20) rather than reading the marker file a second time -- it
+  // hasn't changed between here and there, nothing in between writes it.
+  //
   // Precise pre-check instead of try/catch around writeGraphIdMarker (Opus
   // review nit): a bare catch there would also swallow genuine I/O errors
   // (EACCES/ENOSPC/etc.) and mislabel them as a marker conflict. Checking
   // the existing marker directly means writeGraphIdMarker's own throw (if
   // it still somehow fires -- e.g. a race) is a real error and propagates
   // normally rather than being misreported.
-  const existingMarkerId = readGraphIdMarker(expandedPath);
-  if (existingMarkerId && existingMarkerId !== newGraphId) {
+  const newGraphId = mintGraphId();
+  if (preExistingMarkerId && preExistingMarkerId !== newGraphId) {
     return {
       content: [
         {
           type: "text" as const,
-          text: `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, remove or rename the existing .kmgraph-id marker file manually if you're certain this is intentional.`,
+          text: `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, either run kg_upgrade with apply: ["connect-unregistered-graph"] to register this folder under its existing graphId (preserves continuity, does not scaffold), or remove/rename the existing .kmgraph-id marker file manually if you're certain a fresh identity is intentional.`,
         },
       ],
       isError: true,
     };
   }
+
+  // Create directory structure + copy default templates (shared with cli.ts, ENH-051)
+  scaffoldGraphDirectory(expandedPath, categories);
+
   writeGraphIdMarker(expandedPath, newGraphId);
   const ordinaryMarkerWarning = markerTrackingWarning(expandedPath);
-  const graphConfig: GraphConfig = {
+  // config.active = name; removed -- resolution is now context-derived (Task 1.5)
+  registerGraphConfig(config, {
     name,
-    path: kgPath,
+    kgPath,
     type,
     categories: categories as CategoryConfig[],
-    createdAt: now,
-    // lastUsed removed -- no writer needed once Task 1.12 deletes the field
-    status: "pending",
-    statusChangedAt: now,
     graphId: newGraphId,
-  };
-
-  config.graphs[name] = graphConfig;
-  // config.active = name; removed -- resolution is now context-derived (Task 1.5)
-  writeConfig(config);
+  });
 
   return {
     content: [

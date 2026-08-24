@@ -15140,6 +15140,7 @@ __export(config_exports, {
   isHardBlockedRegistrationPath: () => isHardBlockedRegistrationPath,
   performRegistryMerge: () => performRegistryMerge,
   registerConfigTools: () => registerConfigTools,
+  registerGraphConfig: () => registerGraphConfig,
   resolveRegistrationGuard: () => resolveRegistrationGuard,
   scaffoldGraphDirectory: () => scaffoldGraphDirectory
 });
@@ -15243,7 +15244,7 @@ function resolveRegistrationGuard(config2, kgPath) {
   };
 }
 function scaffoldGraphDirectory(expandedPath, categories) {
-  const dirs = ["knowledge", "lessons-learned", "decisions", "sessions", "chat-history", "tmp"];
+  const dirs = ["concepts", "templates", "lessons-learned", "decisions", "sessions", "chat-history", "tmp"];
   for (const dir of dirs) {
     fs4.mkdirSync(path4.join(expandedPath, dir), { recursive: true });
   }
@@ -15260,28 +15261,53 @@ function scaffoldGraphDirectory(expandedPath, categories) {
       templatesCopied++;
     }
   };
-  const knowledgeTemplates = ["patterns.md", "gotchas.md", "concepts.md", "architecture.md", "workflows.md"];
-  for (const t of knowledgeTemplates) {
-    copyIfMissing(path4.join(templateSrc, "knowledge", "templates", t), path4.join(expandedPath, "knowledge", t));
+  const conceptTemplates = ["patterns.md", "gotchas.md", "concepts.md", "architecture.md", "workflows.md"];
+  for (const t of conceptTemplates) {
+    copyIfMissing(path4.join(templateSrc, "concepts", "templates", t), path4.join(expandedPath, "templates", t));
   }
-  for (const t of ["README.md", "lesson-template.md"]) {
-    copyIfMissing(path4.join(templateSrc, "lessons-learned", t), path4.join(expandedPath, "lessons-learned", t));
-  }
-  for (const t of ["README.md", "ADR-template.md"]) {
-    copyIfMissing(path4.join(templateSrc, "decisions", t), path4.join(expandedPath, "decisions", t));
-  }
+  copyIfMissing(
+    path4.join(templateSrc, "concepts", "entry-template.md"),
+    path4.join(expandedPath, "templates", "entry-template.md")
+  );
+  copyIfMissing(path4.join(templateSrc, "lessons-learned", "README.md"), path4.join(expandedPath, "lessons-learned", "README.md"));
+  copyIfMissing(path4.join(templateSrc, "decisions", "README.md"), path4.join(expandedPath, "decisions", "README.md"));
+  copyIfMissing(
+    path4.join(templateSrc, "lessons-learned", "lesson-template.md"),
+    path4.join(expandedPath, "templates", "lesson-template.md")
+  );
+  copyIfMissing(
+    path4.join(templateSrc, "decisions", "ADR-template.md"),
+    path4.join(expandedPath, "templates", "ADR-template.md")
+  );
   copyIfMissing(
     path4.join(templateSrc, "sessions", "session-template.md"),
-    path4.join(expandedPath, "sessions", "session-template.md")
+    path4.join(expandedPath, "templates", "session-template.md")
   );
-  for (const f of ["me.md", "rules.md", "kg-index.md", "triggers.md"]) {
-    copyIfMissing(path4.join(templateSrc, "knowledge", f), path4.join(expandedPath, f));
-  }
+  copyIfMissing(path4.join(templateSrc, "concepts", "templates", "project", "me.md"), path4.join(expandedPath, "me.md"));
+  copyIfMissing(path4.join(templateSrc, "concepts", "templates", "project", "rules.md"), path4.join(expandedPath, "rules.md"));
+  copyIfMissing(path4.join(templateSrc, "concepts", "templates", "project", "triggers.md"), path4.join(expandedPath, "triggers.md"));
+  copyIfMissing(path4.join(templateSrc, "concepts", "kg-index.md"), path4.join(expandedPath, "index.md"));
   copyIfMissing(
-    path4.join(templateSrc, "knowledge", "kg-category-index.md"),
-    path4.join(expandedPath, "knowledge", "kg-category-index.md")
+    path4.join(templateSrc, "concepts", "kg-category-index.md"),
+    path4.join(expandedPath, "concepts", "kg-category-index.md")
   );
   return templatesCopied;
+}
+function registerGraphConfig(config2, params) {
+  const now = (/* @__PURE__ */ new Date()).toISOString();
+  const graphConfig = {
+    name: params.name,
+    path: params.kgPath,
+    type: params.type,
+    categories: params.categories,
+    createdAt: now,
+    status: "pending",
+    statusChangedAt: now,
+    graphId: params.graphId
+  };
+  config2.graphs[params.name] = graphConfig;
+  writeConfig(config2);
+  return graphConfig;
 }
 async function handleConfigInit({ name, kgPath, type, categories, interaction, confirmMerge, confirmBroadRegistration }) {
   const config2 = readConfig();
@@ -15406,15 +15432,15 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
       const answer = gated.answer;
       switch (answer) {
         case "reattach": {
-          const now2 = (/* @__PURE__ */ new Date()).toISOString();
+          const now = (/* @__PURE__ */ new Date()).toISOString();
           config2.graphs[name] = {
             name,
             path: kgPath,
             type,
             categories,
-            createdAt: now2,
+            createdAt: now,
             status: "pending",
-            statusChangedAt: now2,
+            statusChangedAt: now,
             graphId: preExistingMarkerId,
             // NOTE (Phase 4 final review finding I-6, not yet fixed): duplicateOf is recorded here but
             // nothing currently reads it. The plan's Task 4.4 spec says this should suppress future
@@ -15456,9 +15482,9 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
               path: kgPath,
               type,
               categories,
-              createdAt: now2,
+              createdAt: now,
               status: "pending",
-              statusChangedAt: now2,
+              statusChangedAt: now,
               graphId: preExistingMarkerId,
               duplicateOf: existingEntry.name
             };
@@ -15474,16 +15500,16 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
           };
         }
         case "worktree": {
-          const now2 = (/* @__PURE__ */ new Date()).toISOString();
+          const now = (/* @__PURE__ */ new Date()).toISOString();
           updateConfig((cfg) => {
             cfg.graphs[name] = {
               name,
               path: kgPath,
               type,
               categories,
-              createdAt: now2,
+              createdAt: now,
               status: "pending",
-              statusChangedAt: now2,
+              statusChangedAt: now,
               graphId: preExistingMarkerId,
               // NOTE (Phase 4 final review finding I-6, not yet fixed): duplicateOf is recorded here but
               // nothing currently reads it. The plan's Task 4.4 spec says this should suppress future
@@ -15505,16 +15531,16 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
           const forkedId = mintGraphId();
           remintGraphIdMarker(expandedPath, forkedId);
           const forkWarning = markerTrackingWarning(expandedPath);
-          const now2 = (/* @__PURE__ */ new Date()).toISOString();
+          const now = (/* @__PURE__ */ new Date()).toISOString();
           updateConfig((cfg) => {
             cfg.graphs[name] = {
               name,
               path: kgPath,
               type,
               categories,
-              createdAt: now2,
+              createdAt: now,
               status: "pending",
-              statusChangedAt: now2,
+              statusChangedAt: now,
               graphId: forkedId
             };
             return cfg;
@@ -15537,36 +15563,37 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
       }
     }
   }
-  scaffoldGraphDirectory(expandedPath, categories);
-  const now = (/* @__PURE__ */ new Date()).toISOString();
+  if (!preExistingMarkerId && (fs4.existsSync(path4.join(expandedPath, "decisions")) || fs4.existsSync(path4.join(expandedPath, "lessons-learned")))) {
+    return {
+      content: [{
+        type: "text",
+        text: `Found existing content at ${expandedPath} (decisions/ or lessons-learned/ already present) that isn't registered or marked as a KMGraph. Refusing to scaffold over it. Run kg_upgrade with apply: ["connect-unregistered-graph"] to register it instead.`
+      }],
+      isError: true
+    };
+  }
   const newGraphId = mintGraphId();
-  const existingMarkerId = readGraphIdMarker(expandedPath);
-  if (existingMarkerId && existingMarkerId !== newGraphId) {
+  if (preExistingMarkerId && preExistingMarkerId !== newGraphId) {
     return {
       content: [
         {
           type: "text",
-          text: `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, remove or rename the existing .kmgraph-id marker file manually if you're certain this is intentional.`
+          text: `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, either run kg_upgrade with apply: ["connect-unregistered-graph"] to register this folder under its existing graphId (preserves continuity, does not scaffold), or remove/rename the existing .kmgraph-id marker file manually if you're certain a fresh identity is intentional.`
         }
       ],
       isError: true
     };
   }
+  scaffoldGraphDirectory(expandedPath, categories);
   writeGraphIdMarker(expandedPath, newGraphId);
   const ordinaryMarkerWarning = markerTrackingWarning(expandedPath);
-  const graphConfig = {
+  registerGraphConfig(config2, {
     name,
-    path: kgPath,
+    kgPath,
     type,
     categories,
-    createdAt: now,
-    // lastUsed removed -- no writer needed once Task 1.12 deletes the field
-    status: "pending",
-    statusChangedAt: now,
     graphId: newGraphId
-  };
-  config2.graphs[name] = graphConfig;
-  writeConfig(config2);
+  });
   return {
     content: [
       {
@@ -31152,12 +31179,12 @@ var require_dist = __commonJS({
         throw new Error(`Unknown format "${name}"`);
       return f;
     };
-    function addFormats(ajv, list, fs10, exportName) {
+    function addFormats(ajv, list, fs11, exportName) {
       var _a2;
       var _b;
       (_a2 = (_b = ajv.opts.code).formats) !== null && _a2 !== void 0 ? _a2 : _b.formats = (0, codegen_1._)`require("ajv-formats/dist/formats").${exportName}`;
       for (const f of list)
-        ajv.addFormat(f, fs10[f]);
+        ajv.addFormat(f, fs11[f]);
     }
     module2.exports = exports2 = formatsPlugin;
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -33923,6 +33950,7 @@ __export(cli_exports, {
   resolveInitLocation: () => resolveInitLocation
 });
 module.exports = __toCommonJS(cli_exports);
+var fs10 = __toESM(require("fs"));
 var path10 = __toESM(require("path"));
 var readline = __toESM(require("readline"));
 init_utils();
@@ -33965,7 +33993,7 @@ function resolveKgPath(config2, params, cwd = process.cwd()) {
 }
 
 // src/cli.ts
-var SERVER_VERSION = true ? "0.7.4" : (() => {
+var SERVER_VERSION = true ? "0.7.4.2" : (() => {
   try {
     return null.version;
   } catch {
@@ -34074,30 +34102,29 @@ async function runInit() {
     }
     console.log("");
     console.log("  Creating knowledge graph...");
-    const templatesCopied = scaffoldGraphDirectory(expandedPath, categories);
-    const now = (/* @__PURE__ */ new Date()).toISOString();
     const newGraphId = mintGraphId();
     const existingMarkerId = readGraphIdMarker(expandedPath);
     if (existingMarkerId && existingMarkerId !== newGraphId) {
       console.error(
-        `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, remove or rename the existing .kmgraph-id marker file manually if you're certain this is intentional.`
+        `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, either run kg_upgrade with apply: ["connect-unregistered-graph"] to register this folder under its existing graphId (preserves continuity, does not scaffold), or remove/rename the existing .kmgraph-id marker file manually if you're certain a fresh identity is intentional.`
       );
       process.exit(1);
     }
+    if (!existingMarkerId && (fs10.existsSync(path10.join(expandedPath, "decisions")) || fs10.existsSync(path10.join(expandedPath, "lessons-learned")))) {
+      console.error(
+        `Error: Found existing content at ${expandedPath} (decisions/ or lessons-learned/ already present) that isn't registered or marked as a KMGraph. Refusing to scaffold over it. Run kg_upgrade with apply: ["connect-unregistered-graph"] to register it instead.`
+      );
+      process.exit(1);
+    }
+    const templatesCopied = scaffoldGraphDirectory(expandedPath, categories);
     writeGraphIdMarker(expandedPath, newGraphId);
-    const graphConfig = {
+    registerGraphConfig(config2, {
       name,
-      path: kgPath,
+      kgPath,
       type: kgType,
       categories,
-      createdAt: now,
-      status: "pending",
-      statusChangedAt: now,
       graphId: newGraphId
-      // lastUsed removed -- optional on the type since Task 1.1, no writer needed
-    };
-    config2.graphs[name] = graphConfig;
-    writeConfig(config2);
+    });
     console.log("");
     console.log("  Knowledge graph initialized:");
     console.log(`    Name:       ${name}`);

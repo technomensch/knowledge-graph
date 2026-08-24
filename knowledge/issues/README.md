@@ -4,8 +4,8 @@
 
 Tracking of investigated bugs, defects, and meta-issues for this project.
 
-**Total Issues:** 56 numbered issues, plus named meta-issues (see below)
-**Last Updated:** 2026-08-22
+**Total Issues:** 58 numbered issues, plus named meta-issues (see below)
+**Last Updated:** 2026-08-23
 
 ---
 
@@ -19,6 +19,8 @@ Tracking of investigated bugs, defects, and meta-issues for this project.
 
 ## All Issues (Chronological)
 
+- [issue-58: `scaffoldGraphDirectory` template-routing drift and scaffold-then-refuse file leak](issue-58/issue-58-description.md) — **Status:** ✅ Resolved — found during automated review of an unrelated branch (see [ADR-070](../decisions/ADR-070-scaffold-upgrade-dead-end-connect-unregistered-graph.md)); MCP-native scaffold routing diverged from the wizard's canonical routing, and scaffold files could leak to disk before a marker-mismatch refusal aborted registration. Fixed in commits `7db94804` and `57396128`.
+- [issue-57: `kg_config_init` and `kg_upgrade` form a circular dead end over unregistered decisions/lessons-learned content](issue-57/issue-57-description.md) — **Status:** ✅ Resolved — found during automated review of an unrelated branch (see [ADR-070](../decisions/ADR-070-scaffold-upgrade-dead-end-connect-unregistered-graph.md)); `kg_config_init`'s refusal message pointed users at `kg_upgrade`, which had no way to register an unregistered folder. Fixed with a new opt-in `connect-unregistered-graph` `kg_upgrade` category, commits `f233c0f6`, `e4cfa44b`, `57396128`.
 - [issue-56: `kmg-handoff`'s default-path fix (issue-31) has no `kg_upgrade` category — 17 stray `./handoff-packages/*` directories are undetected and undisclosed](issue-56/issue-56-description.md) — **Status:** ✅ Resolved — found during a user-asked architecture-impact review of this branch; fixed same day with a new `stale-handoff-packages-location` `kg_upgrade` category mirroring [issue-55](issue-55/issue-55-description.md)'s pattern, migrating stray dated folders into `knowledge/handoffs/`.
 - [issue-55: `kg_search`'s project-local FTS5 index path is keyed only by KG name, not by path](issue-55/issue-55-description.md) — **Status:** ✅ Resolved — a stale/cross-repo index file at `~/.kmgraph/index/projects/<name>.db` could silently shadow a KG's real content, since the path never accounted for *where* the KG actually lives. Fixed in v0.7.4 by keying the index filename on a digest of the KG's normalized path (`<name>-<pathHash>.db`), plus a new opt-in `kg_upgrade` category (`stale-fts5-index-format`) to migrate existing installs.
 - [issue-54: `kg_upgrade` has no check category for leftover renumbered-ADR orphan files](issue-54/issue-54-description.md) — **Status:** 🟡 Deferred (Track only) — GitHub issue #240 filed (labels: bug + gap). Split out from issue-53's item 2 after item 1 was confirmed already shipped; this is the real, unaddressed half — a new `kg_upgrade` UpgradeItem category to detect an already-orphaned renumbered file, which the existing creation-time collision check structurally cannot catch.

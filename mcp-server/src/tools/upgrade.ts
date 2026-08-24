@@ -16,7 +16,9 @@ import {
   GraphConfig,
   PathHealth,
   getIndexDir,
+  KgConfig,
 } from "../utils.js";
+import { registerGraphConfig, resolveRegistrationGuard } from "./config.js";
 import { computeDbPath, rebuildIndex } from "./fts5.js";
 import { resolveGraph, resolvePersonalGraph, PersonalScopeSession, confirmPersonalScopeAccess } from "../resolution.js";
 import {
@@ -54,6 +56,7 @@ const APPLY_ORDER = [
   "status-schema",      // ADR-067 Task 8.1: reconcile old .active/legacy schema before anything else touches the registry
   "config-location",   // must run before anything else reads config from the new path
   "plan-status-drift",   // issue-49 backfix: graph-independent like status-schema/config-location above, order-independent of everything else
+  "connect-unregistered-graph",   // Task A: registers an unregistered-but-populated cwd. Structurally unlike every entry below -- its real work runs during target resolution, BEFORE this loop starts (there's no resolved graph yet to act on) -- placed first among the graph-dependent categories purely so its status message reports before anything that then runs against the graph it just registered.
   "directories",
   "config",
   "starter-relocation",   // must run BEFORE templates
@@ -67,6 +70,84 @@ const APPLY_ORDER = [
 ];
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
+
+/**
+ * Task A -- closes the kg_config_init <-> kg_upgrade dead end: kg_config_init
+ * refuses to scaffold over a folder that already has decisions/lessons-
+ * learned content (or an orphaned .kmgraph-id marker) and points the user at
+ * kg_upgrade to register it, but until now kg_upgrade had no way to register
+ * a graph that isn't already in the config registry -- resolveGraph() only
+ * matches cwd against already-registered paths (resolution.ts), so an
+ * unregistered-but-populated cwd always fell straight into handleUpgrade's
+ * generic "No knowledge graph resolved" dead end.
+ *
+ * True iff `cwd` looks like an existing (but unregistered) knowledge graph:
+ * either of the two content directories kg_config_init's own scaffold
+ * creates is already present, or a .kmgraph-id marker survives from a prior
+ * registration that's since been lost from the registry.
+ */
+function hasUnregisteredGraphContent(cwd: string): boolean {
+  return (
+    fs.existsSync(path.join(cwd, "decisions")) ||
+    fs.existsSync(path.join(cwd, "lessons-learned")) ||
+    readGraphIdMarker(cwd) !== null
+  );
+}
+
+/**
+ * Task A -- kg_config_init never auto-derives a name from a path (callers
+ * always supply one explicitly and a collision is just a flat error, "use a
+ * different name"); kg_upgrade's connect flow has no name parameter at all
+ * (HandleUpgradeParams, below), so it derives one from the directory's own
+ * basename and disambiguates against the registry itself rather than
+ * bouncing the call back to the caller for a name that was never asked for.
+ */
+function deriveUniqueGraphName(config: KgConfig, cwd: string): string {
+  const base = path.basename(cwd) || "graph";
+  if (!config.graphs[base]) return base;
+  let suffix = 2;
+  while (config.graphs[`${base}-${suffix}`]) suffix++;
+  return `${base}-${suffix}`;
+}
+
+/**
+ * Task A -- registers `cwd` as a new graph, reusing an orphaned marker's
+ * existing graphId when one is present rather than minting a fresh one.
+ *
+ * Deliberately different from handleConfigInit's own marker handling
+ * (config.ts): that path treats ANY pre-existing marker on a fresh-scaffold
+ * target as a hard conflict and refuses (config.test.ts's "Opus review SF-4"
+ * test covers exactly this -- an orphaned marker there is never reused,
+ * because kg_config_init might be about to scaffold blank content over a
+ * directory secretly tracked under a different identity). This function
+ * never scaffolds anything -- callers only reach it after confirming real
+ * content already exists at `cwd` -- so a marker found here is presumptively
+ * that same content's own prior identity, and reusing it preserves
+ * continuity instead of minting a second, orphaned identity for one folder.
+ *
+ * Does NOT call scaffoldGraphDirectory: the whole premise of this category is
+ * that the content is already there, so there is nothing to scaffold.
+ */
+function connectUnregisteredGraph(config: KgConfig, cwd: string): { name: string; graph: GraphConfig } {
+  const existingMarker = readGraphIdMarker(cwd);
+  const graphId = existingMarker ?? mintGraphId();
+  // Idempotent no-op when `graphId` is the marker's own existing value
+  // (utils.ts's writeGraphIdMarker); only actually writes when there was no
+  // marker at all yet.
+  writeGraphIdMarker(cwd, graphId);
+  const name = deriveUniqueGraphName(config, cwd);
+  const graph = registerGraphConfig(config, {
+    name,
+    kgPath: cwd,
+    // Personal graphs already have their own scope:"user" resolution path
+    // (resolvePersonalGraph) and never reach this branch -- see the
+    // `params.scope === "user"` split in handleUpgrade.
+    type: "project-local",
+    categories: [],
+    graphId,
+  });
+  return { name, graph };
+}
 
 /**
  * Parse YAML frontmatter from a file and return key-value pairs.
@@ -2298,7 +2379,7 @@ function updateLastAppliedVersion(installedVersion: string, graphName: string): 
 // kmg-upgrade-inspector.md's confirmBackfix wiring: that boolean is per-call, not
 // per-category, so a call consenting to one confirmBackfix-gated category silently
 // also consents to any other one present in the same `apply: [...]` array.
-export type ApplyCategory = "status-schema" | "config-location" | "plan-status-drift" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir" | "capture-corruption" | "diff-blank-reconstruction" | "stale-fts5-index-format" | "stale-handoff-packages-location";
+export type ApplyCategory = "status-schema" | "config-location" | "plan-status-drift" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir" | "capture-corruption" | "diff-blank-reconstruction" | "stale-fts5-index-format" | "stale-handoff-packages-location" | "connect-unregistered-graph";
 
 export interface HandleUpgradeParams {
   apply?: ApplyCategory[];
@@ -2320,6 +2401,14 @@ export interface HandleUpgradeParams {
   // mode is asked via gate() instead; an explicit true here is still
   // honored in either mode (see confirmBackfixCategory).
   confirmBackfix?: boolean;
+  // Opus validation review fix #3: required to register a knowledge graph
+  // whose path is an ancestor of one or more already-registered graphs, via
+  // the "connect-unregistered-graph" category -- same registration guard
+  // (and same param name/shape) handleConfigInit's own confirmBroadRegistration
+  // already uses (config.ts). Not needed when the target has no such
+  // ancestor relationship; the home/root hard block below has no bypass at
+  // all, in either tool.
+  confirmBroadRegistration?: "yes" | "no";
 }
 
 export interface HandleUpgradeResult {
@@ -2338,17 +2427,111 @@ export async function handleUpgrade(
   const config = readConfig();
   const cwd = resolveEffectiveCwd({ processCwd: process.cwd(), toolCallMeta });
 
+  // Task A: set only when connect-unregistered-graph actually registers a
+  // fresh entry below (as opposed to the category being requested against a
+  // cwd that already resolves, or one requested-but-not-taken because
+  // resolution failed for some other reason) -- the apply-loop switch case
+  // for "connect-unregistered-graph" uses this to report what really
+  // happened rather than repeating the resolution logic.
+  let connectedGraph: { name: string; graphId: string } | undefined;
+
   // ADR-067 Task 1.9: resolution is context-derived (resolveGraph), not
   // config.active-derived. Resolution failure no longer short-circuits the
   // whole tool -- config-location is graph-independent (and, per Task 8.1,
   // a future migration category must run before any graph can resolve
   // correctly) and must stay reachable even when no graph resolves.
-  const target = params.scope === "user" ? resolvePersonalGraph(config) : (() => {
+  //
+  // Sequential (not a single expression-bodied IIFE) so the
+  // connect-unregistered-graph branch below can `await gate()` and `return`
+  // straight out of handleUpgrade -- same registration guard (home/root hard
+  // block + broad-ancestor confirmation) handleConfigInit and cli.ts's
+  // runInit both already run before *their* scaffold call. Opus validation
+  // review fix #3: connectUnregisteredGraph used to register the cwd
+  // directly, with neither guard, so a monorepo root holding a top-level
+  // decisions/ folder (a common, unrelated convention) plus an
+  // already-registered sub-project graph could get silently registered as a
+  // whole new ancestor graph -- exactly the case findBroadAncestorWarning
+  // exists to catch.
+  let target: { name: string; graph: GraphConfig } | { error: string };
+  if (params.scope === "user") {
+    target = resolvePersonalGraph(config);
+  } else {
     const resolution = resolveGraph(config, cwd);
-    return resolution.kind === "resolved"
-      ? { name: resolution.name, graph: resolution.graph }
-      : { error: "No knowledge graph resolved from your current directory. Use kg_config_init first, or pass scope=\"user\"." };
-  })();
+    if (resolution.kind === "resolved") {
+      target = { name: resolution.name, graph: resolution.graph };
+    } else if (resolution.kind === "no-graph-in-cwd" && hasUnregisteredGraphContent(cwd)) {
+      // Task A: only "no-graph-in-cwd" means nothing is registered for this
+      // path at all -- "archived", "merged", and "ambiguous-tie" all mean a
+      // registry entry already exists for it (just not currently
+      // resolvable), and registering a brand-new entry on top of one of
+      // those would create a genuine duplicate. Narrower than the
+      // pre-existing generic fallback below, which (unchanged) still treats
+      // every other non-resolved kind the same way it always has.
+      if (!(params.apply ?? []).includes("connect-unregistered-graph")) {
+        target = {
+          error:
+            `Found existing knowledge graph content at ${cwd} that isn't registered. ` +
+            `Run kg_upgrade with apply: ["connect-unregistered-graph"] to register it.`,
+        };
+      } else {
+        const { expandedPath, hardBlocked, broadWarning } = resolveRegistrationGuard(config, cwd);
+
+        if (hardBlocked) {
+          return {
+            content: [{
+              type: "text" as const,
+              text: `Error: refusing to register a knowledge graph at ${expandedPath} — this is your home directory or the filesystem root. Registering a KG this broad would make it resolve as "the KG for" nearly every directory on this machine. Choose a more specific project path.`,
+            }],
+            isError: true,
+          };
+        }
+
+        if (broadWarning) {
+          let broadAnswer = params.confirmBroadRegistration;
+          if (!broadAnswer) {
+            const mode = resolveInteractionMode({}).mode;
+            const gated = await gate({
+              mode,
+              reason: "broad_ancestor_registration",
+              param: "confirmBroadRegistration",
+              accepts: ["yes", "no"],
+              detail: broadWarning,
+              timeoutMs: STUB_ASK_TIMEOUT_MS,
+              ask: stubAsk, // no real ask() transport yet, same pattern as every other gate() stub in this plan
+            });
+            if ("error" in gated) {
+              return { content: [{ type: "text" as const, text: JSON.stringify(gated) }], isError: true };
+            }
+            if (!("answer" in gated)) {
+              return {
+                content: [{
+                  type: "text" as const,
+                  text: `Registration cancelled: ${expandedPath} is an ancestor of ${broadWarning.isAncestorOfCount} already-registered graph(s) (${broadWarning.ancestorOfNames.join(", ")}). Confirm explicitly (confirmBroadRegistration: "yes") if this breadth is intentional.`,
+                }],
+                isError: true,
+              };
+            }
+            broadAnswer = gated.answer as "yes" | "no";
+          }
+          if (broadAnswer !== "yes") {
+            return {
+              content: [{
+                type: "text" as const,
+                text: `Registration cancelled: ${expandedPath} is an ancestor of ${broadWarning.isAncestorOfCount} already-registered graph(s) (${broadWarning.ancestorOfNames.join(", ")}). Confirm explicitly (confirmBroadRegistration: "yes") if this breadth is intentional.`,
+              }],
+              isError: true,
+            };
+          }
+        }
+
+        const connected = connectUnregisteredGraph(config, cwd);
+        connectedGraph = { name: connected.name, graphId: connected.graph.graphId };
+        target = { name: connected.name, graph: connected.graph };
+      }
+    } else {
+      target = { error: "No knowledge graph resolved from your current directory. Use kg_config_init first, or pass scope=\"user\"." };
+    }
+  }
 
   // ADR-067 Task 6.4 (spec §11): scope:"user" reaches the personal graph
   // here the same way it does in search.ts/capture.ts/kg_config_add_category/
@@ -2527,6 +2710,18 @@ export async function handleUpgrade(
     }
     const kgPath = target.graph.path.replace(/^~/, os.homedir());
     switch (category) {
+      case "connect-unregistered-graph":
+        // Task A: the actual registration already happened above, during
+        // target resolution -- there was no resolved graph for this switch
+        // to act on until that ran. This case only reports what happened,
+        // same shape as every other category's results entry.
+        results.push(
+          connectedGraph
+            ? `[connect-unregistered-graph] Registered '${connectedGraph.name}' at ${kgPath} (graphId ${connectedGraph.graphId}).`
+            : `[connect-unregistered-graph] Graph already resolved; nothing to connect.`
+        );
+        appliedAnyGraphDependent = true;
+        break;
       case "directories":
         results.push(`[directories] ${applyDirectories(kgPath)}`);
         appliedAnyGraphDependent = true;
@@ -2718,11 +2913,11 @@ export function registerUpgradeTool(server: McpServer, personalScopeSession: Per
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
       apply: z
-        .array(z.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction", "stale-fts5-index-format", "stale-handoff-packages-location"]))
+        .array(z.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction", "stale-fts5-index-format", "stale-handoff-packages-location", "connect-unregistered-graph"]))
         .optional()
         .default([])
         .describe(
-          'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history), "stale-fts5-index-format" (issue-55 backfix: rebuilds a pre-v0.7.4 name-only search index at the collision-safe path-keyed location; non-destructive, leaves the old file in place), "stale-handoff-packages-location" (issue-56 backfix: moves pre-fix ./handoff-packages/<date>/ folders into knowledge/handoffs/<date>/; non-destructive, dedups identical files and reports rather than overwrites any that differ)'
+          'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history), "stale-fts5-index-format" (issue-55 backfix: rebuilds a pre-v0.7.4 name-only search index at the collision-safe path-keyed location; non-destructive, leaves the old file in place), "stale-handoff-packages-location" (issue-56 backfix: moves pre-fix ./handoff-packages/<date>/ folders into knowledge/handoffs/<date>/; non-destructive, dedups identical files and reports rather than overwrites any that differ), "connect-unregistered-graph" (registers the current directory as a new knowledge graph when it already has decisions/ or lessons-learned/ content -- or an orphaned .kmgraph-id marker -- but isn\'t in the config registry yet; does not scaffold any new files, only attaches a registry entry to what\'s already there, then continues into any other categories requested in the same call)'
         ),
       confirm_platform_split: z
         .boolean()
@@ -2760,10 +2955,18 @@ export function registerUpgradeTool(server: McpServer, personalScopeSession: Per
             "flag; setting it authorizes any of these three present in the same apply call. " +
             "Interactive callers are asked to confirm instead."
         ),
+      confirmBroadRegistration: z
+        .enum(["yes", "no"])
+        .optional()
+        .describe(
+          "Explicit confirmation to register a knowledge graph (via \"connect-unregistered-graph\") " +
+            "whose path is an ancestor of already-registered graph(s). Same guard kg_config_init runs " +
+            "before scaffolding; a home/root path is refused outright with no bypass."
+        ),
     },
-    async ({ apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix }, extra) => {
+    async ({ apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix, confirmBroadRegistration }, extra) => {
       return handleUpgrade(
-        { apply: apply as ApplyCategory[] | undefined, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix },
+        { apply: apply as ApplyCategory[] | undefined, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix, confirmBroadRegistration },
         personalScopeSession,
         extra?._meta as Record<string, unknown> | undefined
       );

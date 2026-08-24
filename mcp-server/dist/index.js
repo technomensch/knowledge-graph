@@ -31219,7 +31219,7 @@ function resolveRegistrationGuard(config2, kgPath) {
   };
 }
 function scaffoldGraphDirectory(expandedPath, categories) {
-  const dirs = ["knowledge", "lessons-learned", "decisions", "sessions", "chat-history", "tmp"];
+  const dirs = ["concepts", "templates", "lessons-learned", "decisions", "sessions", "chat-history", "tmp"];
   for (const dir of dirs) {
     fs4.mkdirSync(path4.join(expandedPath, dir), { recursive: true });
   }
@@ -31236,28 +31236,53 @@ function scaffoldGraphDirectory(expandedPath, categories) {
       templatesCopied++;
     }
   };
-  const knowledgeTemplates = ["patterns.md", "gotchas.md", "concepts.md", "architecture.md", "workflows.md"];
-  for (const t of knowledgeTemplates) {
-    copyIfMissing(path4.join(templateSrc, "knowledge", "templates", t), path4.join(expandedPath, "knowledge", t));
+  const conceptTemplates = ["patterns.md", "gotchas.md", "concepts.md", "architecture.md", "workflows.md"];
+  for (const t of conceptTemplates) {
+    copyIfMissing(path4.join(templateSrc, "concepts", "templates", t), path4.join(expandedPath, "templates", t));
   }
-  for (const t of ["README.md", "lesson-template.md"]) {
-    copyIfMissing(path4.join(templateSrc, "lessons-learned", t), path4.join(expandedPath, "lessons-learned", t));
-  }
-  for (const t of ["README.md", "ADR-template.md"]) {
-    copyIfMissing(path4.join(templateSrc, "decisions", t), path4.join(expandedPath, "decisions", t));
-  }
+  copyIfMissing(
+    path4.join(templateSrc, "concepts", "entry-template.md"),
+    path4.join(expandedPath, "templates", "entry-template.md")
+  );
+  copyIfMissing(path4.join(templateSrc, "lessons-learned", "README.md"), path4.join(expandedPath, "lessons-learned", "README.md"));
+  copyIfMissing(path4.join(templateSrc, "decisions", "README.md"), path4.join(expandedPath, "decisions", "README.md"));
+  copyIfMissing(
+    path4.join(templateSrc, "lessons-learned", "lesson-template.md"),
+    path4.join(expandedPath, "templates", "lesson-template.md")
+  );
+  copyIfMissing(
+    path4.join(templateSrc, "decisions", "ADR-template.md"),
+    path4.join(expandedPath, "templates", "ADR-template.md")
+  );
   copyIfMissing(
     path4.join(templateSrc, "sessions", "session-template.md"),
-    path4.join(expandedPath, "sessions", "session-template.md")
+    path4.join(expandedPath, "templates", "session-template.md")
   );
-  for (const f of ["me.md", "rules.md", "kg-index.md", "triggers.md"]) {
-    copyIfMissing(path4.join(templateSrc, "knowledge", f), path4.join(expandedPath, f));
-  }
+  copyIfMissing(path4.join(templateSrc, "concepts", "templates", "project", "me.md"), path4.join(expandedPath, "me.md"));
+  copyIfMissing(path4.join(templateSrc, "concepts", "templates", "project", "rules.md"), path4.join(expandedPath, "rules.md"));
+  copyIfMissing(path4.join(templateSrc, "concepts", "templates", "project", "triggers.md"), path4.join(expandedPath, "triggers.md"));
+  copyIfMissing(path4.join(templateSrc, "concepts", "kg-index.md"), path4.join(expandedPath, "index.md"));
   copyIfMissing(
-    path4.join(templateSrc, "knowledge", "kg-category-index.md"),
-    path4.join(expandedPath, "knowledge", "kg-category-index.md")
+    path4.join(templateSrc, "concepts", "kg-category-index.md"),
+    path4.join(expandedPath, "concepts", "kg-category-index.md")
   );
   return templatesCopied;
+}
+function registerGraphConfig(config2, params) {
+  const now = (/* @__PURE__ */ new Date()).toISOString();
+  const graphConfig = {
+    name: params.name,
+    path: params.kgPath,
+    type: params.type,
+    categories: params.categories,
+    createdAt: now,
+    status: "pending",
+    statusChangedAt: now,
+    graphId: params.graphId
+  };
+  config2.graphs[params.name] = graphConfig;
+  writeConfig(config2);
+  return graphConfig;
 }
 async function handleConfigInit({ name, kgPath, type, categories, interaction, confirmMerge, confirmBroadRegistration }) {
   const config2 = readConfig();
@@ -31382,15 +31407,15 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
       const answer = gated.answer;
       switch (answer) {
         case "reattach": {
-          const now2 = (/* @__PURE__ */ new Date()).toISOString();
+          const now = (/* @__PURE__ */ new Date()).toISOString();
           config2.graphs[name] = {
             name,
             path: kgPath,
             type,
             categories,
-            createdAt: now2,
+            createdAt: now,
             status: "pending",
-            statusChangedAt: now2,
+            statusChangedAt: now,
             graphId: preExistingMarkerId,
             // NOTE (Phase 4 final review finding I-6, not yet fixed): duplicateOf is recorded here but
             // nothing currently reads it. The plan's Task 4.4 spec says this should suppress future
@@ -31432,9 +31457,9 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
               path: kgPath,
               type,
               categories,
-              createdAt: now2,
+              createdAt: now,
               status: "pending",
-              statusChangedAt: now2,
+              statusChangedAt: now,
               graphId: preExistingMarkerId,
               duplicateOf: existingEntry.name
             };
@@ -31450,16 +31475,16 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
           };
         }
         case "worktree": {
-          const now2 = (/* @__PURE__ */ new Date()).toISOString();
+          const now = (/* @__PURE__ */ new Date()).toISOString();
           updateConfig((cfg) => {
             cfg.graphs[name] = {
               name,
               path: kgPath,
               type,
               categories,
-              createdAt: now2,
+              createdAt: now,
               status: "pending",
-              statusChangedAt: now2,
+              statusChangedAt: now,
               graphId: preExistingMarkerId,
               // NOTE (Phase 4 final review finding I-6, not yet fixed): duplicateOf is recorded here but
               // nothing currently reads it. The plan's Task 4.4 spec says this should suppress future
@@ -31481,16 +31506,16 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
           const forkedId = mintGraphId();
           remintGraphIdMarker(expandedPath, forkedId);
           const forkWarning = markerTrackingWarning(expandedPath);
-          const now2 = (/* @__PURE__ */ new Date()).toISOString();
+          const now = (/* @__PURE__ */ new Date()).toISOString();
           updateConfig((cfg) => {
             cfg.graphs[name] = {
               name,
               path: kgPath,
               type,
               categories,
-              createdAt: now2,
+              createdAt: now,
               status: "pending",
-              statusChangedAt: now2,
+              statusChangedAt: now,
               graphId: forkedId
             };
             return cfg;
@@ -31513,36 +31538,37 @@ async function handleConfigInit({ name, kgPath, type, categories, interaction, c
       }
     }
   }
-  scaffoldGraphDirectory(expandedPath, categories);
-  const now = (/* @__PURE__ */ new Date()).toISOString();
+  if (!preExistingMarkerId && (fs4.existsSync(path4.join(expandedPath, "decisions")) || fs4.existsSync(path4.join(expandedPath, "lessons-learned")))) {
+    return {
+      content: [{
+        type: "text",
+        text: `Found existing content at ${expandedPath} (decisions/ or lessons-learned/ already present) that isn't registered or marked as a KMGraph. Refusing to scaffold over it. Run kg_upgrade with apply: ["connect-unregistered-graph"] to register it instead.`
+      }],
+      isError: true
+    };
+  }
   const newGraphId = mintGraphId();
-  const existingMarkerId = readGraphIdMarker(expandedPath);
-  if (existingMarkerId && existingMarkerId !== newGraphId) {
+  if (preExistingMarkerId && preExistingMarkerId !== newGraphId) {
     return {
       content: [
         {
           type: "text",
-          text: `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, remove or rename the existing .kmgraph-id marker file manually if you're certain this is intentional.`
+          text: `Error: '${expandedPath}' is already tracked as a different knowledge graph (marker mismatch). If you meant to fork/re-register it, that flow isn't built yet (ADR-067 Phase 4) -- for now, either run kg_upgrade with apply: ["connect-unregistered-graph"] to register this folder under its existing graphId (preserves continuity, does not scaffold), or remove/rename the existing .kmgraph-id marker file manually if you're certain a fresh identity is intentional.`
         }
       ],
       isError: true
     };
   }
+  scaffoldGraphDirectory(expandedPath, categories);
   writeGraphIdMarker(expandedPath, newGraphId);
   const ordinaryMarkerWarning = markerTrackingWarning(expandedPath);
-  const graphConfig = {
+  registerGraphConfig(config2, {
     name,
-    path: kgPath,
+    kgPath,
     type,
     categories,
-    createdAt: now,
-    // lastUsed removed -- no writer needed once Task 1.12 deletes the field
-    status: "pending",
-    statusChangedAt: now,
     graphId: newGraphId
-  };
-  config2.graphs[name] = graphConfig;
-  writeConfig(config2);
+  });
   return {
     content: [
       {
@@ -33524,7 +33550,7 @@ var os9 = __toESM(require("os"));
 var import_child_process4 = require("child_process");
 
 // src/tools/version.ts
-var pkg = { version: true ? "0.7.4" : "0.0.0" };
+var pkg = { version: true ? "0.7.4.2" : "0.0.0" };
 var SCHEMA_VERSION = 2;
 function handleVersion() {
   return { installed: pkg.version, schema: SCHEMA_VERSION };
@@ -33551,6 +33577,8 @@ var APPLY_ORDER = [
   // must run before anything else reads config from the new path
   "plan-status-drift",
   // issue-49 backfix: graph-independent like status-schema/config-location above, order-independent of everything else
+  "connect-unregistered-graph",
+  // Task A: registers an unregistered-but-populated cwd. Structurally unlike every entry below -- its real work runs during target resolution, BEFORE this loop starts (there's no resolved graph yet to act on) -- placed first among the graph-dependent categories purely so its status message reports before anything that then runs against the graph it just registered.
   "directories",
   "config",
   "starter-relocation",
@@ -33567,6 +33595,33 @@ var APPLY_ORDER = [
   // issue-56 backfix: file relocation, order-independent of the others
   "platform-split"
 ];
+function hasUnregisteredGraphContent(cwd) {
+  return fs11.existsSync(path11.join(cwd, "decisions")) || fs11.existsSync(path11.join(cwd, "lessons-learned")) || readGraphIdMarker(cwd) !== null;
+}
+function deriveUniqueGraphName(config2, cwd) {
+  const base = path11.basename(cwd) || "graph";
+  if (!config2.graphs[base]) return base;
+  let suffix = 2;
+  while (config2.graphs[`${base}-${suffix}`]) suffix++;
+  return `${base}-${suffix}`;
+}
+function connectUnregisteredGraph(config2, cwd) {
+  const existingMarker = readGraphIdMarker(cwd);
+  const graphId = existingMarker ?? mintGraphId();
+  writeGraphIdMarker(cwd, graphId);
+  const name = deriveUniqueGraphName(config2, cwd);
+  const graph = registerGraphConfig(config2, {
+    name,
+    kgPath: cwd,
+    // Personal graphs already have their own scope:"user" resolution path
+    // (resolvePersonalGraph) and never reach this branch -- see the
+    // `params.scope === "user"` split in handleUpgrade.
+    type: "project-local",
+    categories: [],
+    graphId
+  });
+  return { name, graph };
+}
 function parseFrontmatter(filePath) {
   if (!fs11.existsSync(filePath)) return {};
   const lines = fs11.readFileSync(filePath, "utf-8").split("\n");
@@ -34932,10 +34987,76 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
   const installedVersion = handleVersion().installed;
   const config2 = readConfig();
   const cwd = resolveEffectiveCwd({ processCwd: process.cwd(), toolCallMeta });
-  const target = params.scope === "user" ? resolvePersonalGraph(config2) : (() => {
+  let connectedGraph;
+  let target;
+  if (params.scope === "user") {
+    target = resolvePersonalGraph(config2);
+  } else {
     const resolution = resolveGraph(config2, cwd);
-    return resolution.kind === "resolved" ? { name: resolution.name, graph: resolution.graph } : { error: 'No knowledge graph resolved from your current directory. Use kg_config_init first, or pass scope="user".' };
-  })();
+    if (resolution.kind === "resolved") {
+      target = { name: resolution.name, graph: resolution.graph };
+    } else if (resolution.kind === "no-graph-in-cwd" && hasUnregisteredGraphContent(cwd)) {
+      if (!(params.apply ?? []).includes("connect-unregistered-graph")) {
+        target = {
+          error: `Found existing knowledge graph content at ${cwd} that isn't registered. Run kg_upgrade with apply: ["connect-unregistered-graph"] to register it.`
+        };
+      } else {
+        const { expandedPath, hardBlocked, broadWarning } = resolveRegistrationGuard(config2, cwd);
+        if (hardBlocked) {
+          return {
+            content: [{
+              type: "text",
+              text: `Error: refusing to register a knowledge graph at ${expandedPath} \u2014 this is your home directory or the filesystem root. Registering a KG this broad would make it resolve as "the KG for" nearly every directory on this machine. Choose a more specific project path.`
+            }],
+            isError: true
+          };
+        }
+        if (broadWarning) {
+          let broadAnswer = params.confirmBroadRegistration;
+          if (!broadAnswer) {
+            const mode = resolveInteractionMode({}).mode;
+            const gated = await gate({
+              mode,
+              reason: "broad_ancestor_registration",
+              param: "confirmBroadRegistration",
+              accepts: ["yes", "no"],
+              detail: broadWarning,
+              timeoutMs: STUB_ASK_TIMEOUT_MS,
+              ask: stubAsk
+              // no real ask() transport yet, same pattern as every other gate() stub in this plan
+            });
+            if ("error" in gated) {
+              return { content: [{ type: "text", text: JSON.stringify(gated) }], isError: true };
+            }
+            if (!("answer" in gated)) {
+              return {
+                content: [{
+                  type: "text",
+                  text: `Registration cancelled: ${expandedPath} is an ancestor of ${broadWarning.isAncestorOfCount} already-registered graph(s) (${broadWarning.ancestorOfNames.join(", ")}). Confirm explicitly (confirmBroadRegistration: "yes") if this breadth is intentional.`
+                }],
+                isError: true
+              };
+            }
+            broadAnswer = gated.answer;
+          }
+          if (broadAnswer !== "yes") {
+            return {
+              content: [{
+                type: "text",
+                text: `Registration cancelled: ${expandedPath} is an ancestor of ${broadWarning.isAncestorOfCount} already-registered graph(s) (${broadWarning.ancestorOfNames.join(", ")}). Confirm explicitly (confirmBroadRegistration: "yes") if this breadth is intentional.`
+              }],
+              isError: true
+            };
+          }
+        }
+        const connected = connectUnregisteredGraph(config2, cwd);
+        connectedGraph = { name: connected.name, graphId: connected.graph.graphId };
+        target = { name: connected.name, graph: connected.graph };
+      }
+    } else {
+      target = { error: 'No knowledge graph resolved from your current directory. Use kg_config_init first, or pass scope="user".' };
+    }
+  }
   if (params.scope === "user" && !("error" in target)) {
     const mode = resolveInteractionMode({}).mode;
     const confirmed = await confirmPersonalScopeAccess(personalScopeSession2, cwd, {
@@ -35050,6 +35171,12 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
     }
     const kgPath = target.graph.path.replace(/^~/, os9.homedir());
     switch (category) {
+      case "connect-unregistered-graph":
+        results.push(
+          connectedGraph ? `[connect-unregistered-graph] Registered '${connectedGraph.name}' at ${kgPath} (graphId ${connectedGraph.graphId}).` : `[connect-unregistered-graph] Graph already resolved; nothing to connect.`
+        );
+        appliedAnyGraphDependent = true;
+        break;
       case "directories":
         results.push(`[directories] ${applyDirectories(kgPath)}`);
         appliedAnyGraphDependent = true;
@@ -35159,8 +35286,8 @@ function registerUpgradeTool(server2, personalScopeSession2) {
     "kg_upgrade",
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
-      apply: external_exports3.array(external_exports3.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction", "stale-fts5-index-format", "stale-handoff-packages-location"])).optional().default([]).describe(
-        'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history), "stale-fts5-index-format" (issue-55 backfix: rebuilds a pre-v0.7.4 name-only search index at the collision-safe path-keyed location; non-destructive, leaves the old file in place), "stale-handoff-packages-location" (issue-56 backfix: moves pre-fix ./handoff-packages/<date>/ folders into knowledge/handoffs/<date>/; non-destructive, dedups identical files and reports rather than overwrites any that differ)'
+      apply: external_exports3.array(external_exports3.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction", "stale-fts5-index-format", "stale-handoff-packages-location", "connect-unregistered-graph"])).optional().default([]).describe(
+        `Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history), "stale-fts5-index-format" (issue-55 backfix: rebuilds a pre-v0.7.4 name-only search index at the collision-safe path-keyed location; non-destructive, leaves the old file in place), "stale-handoff-packages-location" (issue-56 backfix: moves pre-fix ./handoff-packages/<date>/ folders into knowledge/handoffs/<date>/; non-destructive, dedups identical files and reports rather than overwrites any that differ), "connect-unregistered-graph" (registers the current directory as a new knowledge graph when it already has decisions/ or lessons-learned/ content -- or an orphaned .kmgraph-id marker -- but isn't in the config registry yet; does not scaffold any new files, only attaches a registry entry to what's already there, then continues into any other categories requested in the same call)`
       ),
       confirm_platform_split: external_exports3.boolean().optional().default(false).describe(
         "Must be true to apply platform-split migration (removes content from rules.md)"
@@ -35174,11 +35301,14 @@ function registerUpgradeTool(server2, personalScopeSession2) {
       ),
       confirmBackfix: external_exports3.boolean().optional().describe(
         'Must be true (in automated mode) to apply backfix categories that repair already-written content -- "capture-corruption" (issue-46), "diff-blank-reconstruction" (issue-47), and "plan-status-drift" Tier A writes (issue-49) all share this one flag; setting it authorizes any of these three present in the same apply call. Interactive callers are asked to confirm instead.'
+      ),
+      confirmBroadRegistration: external_exports3.enum(["yes", "no"]).optional().describe(
+        'Explicit confirmation to register a knowledge graph (via "connect-unregistered-graph") whose path is an ancestor of already-registered graph(s). Same guard kg_config_init runs before scaffolding; a home/root path is refused outright with no bypass.'
       )
     },
-    async ({ apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix }, extra) => {
+    async ({ apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix, confirmBroadRegistration }, extra) => {
       return handleUpgrade(
-        { apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix },
+        { apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix, confirmBroadRegistration },
         personalScopeSession2,
         extra?._meta
       );
@@ -35447,7 +35577,7 @@ function registerResolveTool(server2, personalScopeSession2) {
 // src/index.ts
 var server = new McpServer({
   name: "knowledge-graph",
-  version: true ? "0.7.4" : "0.0.0"
+  version: true ? "0.7.4.2" : "0.0.0"
 });
 var personalScopeSession = new PersonalScopeSession();
 var crossKgSearchSession = new CrossKgSearchSession();

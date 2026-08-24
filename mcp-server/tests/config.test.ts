@@ -175,6 +175,8 @@ describe("handleConfigInit", () => {
     fs.writeFileSync(path.join(kgPath, ".kmgraph-id"), "some-other-id\n", "utf-8");
     (readConfig as jest.Mock).mockReturnValue({ version: "1.0.0", graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } });
 
+    const before = fs.readdirSync(kgPath).sort();
+
     const result = await handleConfigInit({
       name: "new-kg",
       kgPath,
@@ -184,6 +186,63 @@ describe("handleConfigInit", () => {
 
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toMatch(/already tracked as a different knowledge graph/);
+    expect(writeConfig).not.toHaveBeenCalled();
+
+    // Opus validation review fix #2: the marker-mismatch check used to run
+    // AFTER scaffoldGraphDirectory, so this orphaned-marker-mismatch path
+    // left real scaffold files (templates/, concepts/, etc.) behind in a
+    // folder the function then refused to register -- checking writeConfig
+    // alone (above) didn't catch that leak. Assert disk state is untouched
+    // beyond the marker file the test itself created.
+    expect(fs.readdirSync(kgPath).sort()).toEqual(before);
+    expect(fs.existsSync(path.join(kgPath, "templates"))).toBe(false);
+  });
+
+  // Follow-up to Task A (kg_upgrade's connect-unregistered-graph category):
+  // kg_config_init must actually refuse to scaffold over unregistered
+  // decisions/lessons-learned content and point at the new category, rather
+  // than silently scaffolding over it -- otherwise the category has no real
+  // caller on this branch.
+  it("refuses to scaffold over an unregistered decisions/ dir with no marker at all, and points at connect-unregistered-graph", async () => {
+    const kgPath = makeTempDir("init-unregistered-content");
+    fs.mkdirSync(path.join(kgPath, "decisions"), { recursive: true });
+    (readConfig as jest.Mock).mockReturnValue({ version: "1.0.0", graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } });
+
+    const before = fs.readdirSync(kgPath).sort();
+
+    const result = await handleConfigInit({
+      name: "new-kg",
+      kgPath,
+      type: "project-local",
+      categories: [{ name: "architecture", prefix: null, git: "commit" }],
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain(kgPath);
+    expect(result.content[0].text).toContain("Refusing to scaffold");
+    expect(result.content[0].text).toContain('apply: ["connect-unregistered-graph"]');
+    expect(writeConfig).not.toHaveBeenCalled();
+
+    // No scaffold files leaked -- disk state is exactly what the test itself
+    // created ("decisions/"), same "check before you write files" guarantee
+    // every other guard in this function already provides.
+    expect(fs.readdirSync(kgPath).sort()).toEqual(before);
+  });
+
+  it("refuses to scaffold over unregistered lessons-learned/ content too (not just decisions/)", async () => {
+    const kgPath = makeTempDir("init-unregistered-ll-content");
+    fs.mkdirSync(path.join(kgPath, "lessons-learned"), { recursive: true });
+    (readConfig as jest.Mock).mockReturnValue({ version: "1.0.0", graphs: {}, sanitization: { enabled: false, patterns: [], action: "warn" } });
+
+    const result = await handleConfigInit({
+      name: "new-kg",
+      kgPath,
+      type: "project-local",
+      categories: [{ name: "architecture", prefix: null, git: "commit" }],
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('apply: ["connect-unregistered-graph"]');
     expect(writeConfig).not.toHaveBeenCalled();
   });
 

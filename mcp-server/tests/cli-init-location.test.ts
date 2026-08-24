@@ -134,7 +134,7 @@ describe("scaffoldGraphDirectory", () => {
       const kgPath = path.join(wrapper, "kg");
       const templatesCopied = scaffoldGraphDirectory(kgPath, [{ name: "architecture" }, { name: "process" }]);
 
-      for (const dir of ["knowledge", "lessons-learned", "decisions", "sessions", "chat-history", "tmp"]) {
+      for (const dir of ["concepts", "templates", "lessons-learned", "decisions", "sessions", "chat-history", "tmp"]) {
         expect(fs.existsSync(path.join(kgPath, dir))).toBe(true);
       }
       expect(fs.existsSync(path.join(kgPath, "lessons-learned", "architecture"))).toBe(true);
@@ -157,6 +157,74 @@ describe("scaffoldGraphDirectory", () => {
       fs.rmSync(wrapper, { recursive: true, force: true });
     }
   });
+
+  // Regression coverage for the wizard-parity drift fix: scaffoldGraphDirectory's
+  // copy destinations had fallen out of sync with the canonical routing in
+  // commands/kmg-init-shared/kmg-template-seed.md (starter templates were
+  // landing in their live dirs instead of templates/, and the root profile
+  // files were being sourced from the wrong -- much longer -- concepts/*.md
+  // files instead of concepts/templates/project/*.md).
+  test("routes starter templates to templates/, not into their live dirs, matching the wizard", () => {
+    const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), "cli-init-scaffold-routing-"));
+    try {
+      const kgPath = path.join(wrapper, "kg");
+      scaffoldGraphDirectory(kgPath, []);
+
+      const templatesDir = path.join(kgPath, "templates");
+      const expectedTemplateFiles = [
+        "patterns.md",
+        "gotchas.md",
+        "concepts.md",
+        "architecture.md",
+        "workflows.md",
+        "entry-template.md",
+        "lesson-template.md",
+        "ADR-template.md",
+        "session-template.md",
+      ];
+      for (const f of expectedTemplateFiles) {
+        expect(fs.existsSync(path.join(templatesDir, f))).toBe(true);
+      }
+      expect(fs.readdirSync(templatesDir).sort()).toEqual([...expectedTemplateFiles].sort());
+
+      // lessons-learned/ and decisions/ keep only their live READMEs --
+      // the starter templates that used to also land there are gone.
+      expect(fs.readdirSync(path.join(kgPath, "lessons-learned"))).toEqual(["README.md"]);
+      expect(fs.readdirSync(path.join(kgPath, "decisions"))).toEqual(["README.md"]);
+
+      // sessions/ has no starter file at all now (moved to templates/).
+      expect(fs.existsSync(path.join(kgPath, "sessions", "session-template.md"))).toBe(false);
+
+      // Root-level profile files land at the KG root under their final
+      // names, not the old knowledge/kg-index.md naming.
+      for (const f of ["me.md", "rules.md", "triggers.md", "index.md"]) {
+        expect(fs.existsSync(path.join(kgPath, f))).toBe(true);
+      }
+      expect(fs.existsSync(path.join(kgPath, "kg-index.md"))).toBe(false);
+
+      // kg-category-index.md lives under concepts/, not knowledge/.
+      expect(fs.existsSync(path.join(kgPath, "concepts", "kg-category-index.md"))).toBe(true);
+      expect(fs.existsSync(path.join(kgPath, "knowledge"))).toBe(false);
+    } finally {
+      fs.rmSync(wrapper, { recursive: true, force: true });
+    }
+  });
+
+  test("root me.md/rules.md/triggers.md come from the project profile starters, not the longer concepts/*.md files", () => {
+    const wrapper = fs.mkdtempSync(path.join(os.tmpdir(), "cli-init-scaffold-profile-"));
+    try {
+      const kgPath = path.join(wrapper, "kg");
+      scaffoldGraphDirectory(kgPath, [{ name: "architecture" }]);
+
+      const pluginRoot = path.join(__dirname, "..", "..");
+      for (const f of ["me.md", "rules.md", "triggers.md"]) {
+        const expectedSrc = path.join(pluginRoot, "core", "default-templates", "concepts", "templates", "project", f);
+        expect(fs.readFileSync(path.join(kgPath, f), "utf-8")).toBe(fs.readFileSync(expectedSrc, "utf-8"));
+      }
+    } finally {
+      fs.rmSync(wrapper, { recursive: true, force: true });
+    }
+  });
 });
 
 describe("cli.ts / kg_config_init dedup -- single implementation, not a third copy", () => {
@@ -171,9 +239,18 @@ describe("cli.ts / kg_config_init dedup -- single implementation, not a third co
   test("cli.ts imports the shared guard/scaffold functions instead of reimplementing them", () => {
     const source = fs.readFileSync(path.join(__dirname, "../src/cli.ts"), "utf-8");
 
-    expect(source).toMatch(/import\s*\{\s*resolveRegistrationGuard,\s*scaffoldGraphDirectory\s*\}\s*from\s*"\.\/tools\/config\.js"/);
+    // Opus validation review fix #4: cli.ts's runInit() now also calls the
+    // shared registerGraphConfig (config.ts) for its final registry write
+    // instead of duplicating the GraphConfig-build + writeConfig sequence
+    // inline, so this import line grew a third named import -- the regex
+    // below only pins that all three shared functions come from one import
+    // statement out of "./tools/config.js", not their exact ordering.
+    expect(source).toMatch(/import\s*\{[^}]*resolveRegistrationGuard[^}]*\}\s*from\s*"\.\/tools\/config\.js"/);
+    expect(source).toMatch(/import\s*\{[^}]*scaffoldGraphDirectory[^}]*\}\s*from\s*"\.\/tools\/config\.js"/);
+    expect(source).toMatch(/import\s*\{[^}]*registerGraphConfig[^}]*\}\s*from\s*"\.\/tools\/config\.js"/);
     expect(source).toContain("resolveRegistrationGuard(config, kgPath)");
     expect(source).toContain("scaffoldGraphDirectory(expandedPath, categories)");
+    expect(source).toContain("registerGraphConfig(config, {");
 
     // No standalone inline calls to the two guard primitives left in cli.ts --
     // they're only reachable now through resolveRegistrationGuard inside config.ts.
@@ -186,5 +263,35 @@ describe("cli.ts / kg_config_init dedup -- single implementation, not a third co
 
     expect(source).toContain("resolveRegistrationGuard(config, kgPath)");
     expect(source).toContain("scaffoldGraphDirectory(expandedPath, categories)");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Opus validation review fix #4: cli.ts's runInit() blind-scaffolded over a
+// folder with decisions/ or lessons-learned/ content and no marker -- the
+// same data-safety gap fix #1 (config.ts's handleConfigInit) already closed
+// for the MCP path was still open here. runInit() is not exported (it's an
+// interactive readline wizard), so this is a source-level guard in the same
+// style as the dedup tests above: it pins that the refusal check exists, is
+// gated on `!existingMarkerId` the same way config.ts's is, and -- the part
+// that actually matters -- appears BEFORE the scaffoldGraphDirectory(...)
+// call in source order, so a future edit can't silently reorder them back
+// into the same scaffold-then-refuse leak this fix wave closed in config.ts.
+// ---------------------------------------------------------------------------
+
+describe("cli.ts runInit -- unregistered-content refusal (Opus validation review fix #4)", () => {
+  test("refuses to scaffold over decisions/ or lessons-learned/ content with no marker, checked before scaffoldGraphDirectory", () => {
+    const source = fs.readFileSync(path.join(__dirname, "../src/cli.ts"), "utf-8");
+
+    expect(source).toContain("!existingMarkerId &&");
+    expect(source).toContain('path.join(expandedPath, "decisions")');
+    expect(source).toContain('path.join(expandedPath, "lessons-learned")');
+    expect(source).toContain('apply: ["connect-unregistered-graph"]');
+
+    const refusalIdx = source.indexOf('path.join(expandedPath, "decisions")');
+    const scaffoldCallIdx = source.indexOf("scaffoldGraphDirectory(expandedPath, categories)");
+    expect(refusalIdx).toBeGreaterThan(-1);
+    expect(scaffoldCallIdx).toBeGreaterThan(-1);
+    expect(refusalIdx).toBeLessThan(scaffoldCallIdx);
   });
 });
