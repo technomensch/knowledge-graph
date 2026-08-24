@@ -137,7 +137,7 @@ Decision: the wizard's routing is the canonical source of truth — it was corre
 
 1. **Not yet reachable from the Claude Code wizard.** `/kmgraph:kmg-init`'s Verify/Upgrade path (`commands/kmg-init-shared/kmg-upgrade-inspector.md`) treats every `category: "resolution"` item — which is what `kg_upgrade`'s inspect mode reports for an unregistered-but-populated cwd — as informational-only and never adds it to `_mcp_apply[]` for auto-apply (confirmed at `kmg-upgrade-inspector.md` lines 54–62 and 343: `"resolution"` is explicitly excluded from the apply-enum categories the wizard will ever pass to `kg_upgrade apply`). A user going through the guided wizard today still can't reach `connect-unregistered-graph` without dropping to a direct `kg_upgrade` MCP call or the CLI. This is a known, **deliberately deferred** gap: `commands/` is PROTECTED and wiring this in requires separate explicit user permission, out of scope for this branch.
 2. **No escape-hatch confirmation flag on the new refusal.** The `kg_config_init`/`cli.ts` "found unregistered decisions/lessons-learned content, refusing to scaffold" refusal has no `confirm`-style override, unlike other similar guards in the same code (e.g. the broad-ancestor warning's `confirmBroadRegistration`). **Deliberately deferred** — no established need for a bypass has surfaced yet; adding one preemptively risked building an unused escape hatch around a data-safety check.
-3. **Paperwork not yet updated.** `CHANGELOG.md`, `README.md`, `INSTALL.md`, and `docs/reference/command-guide.md` do not yet document the new `connect-unregistered-graph` category. A separate paperwork pass is planned.
+3. **Paperwork updated.** `CHANGELOG.md` (new `[0.7.4.2]` entry), `README.md` (new `v0.7.4.2` Feature Highlights entry), `INSTALL.md` (new `v0.7.4.2` upgrade-notes table row), and `docs/reference/command-guide.md` (new `connect-unregistered-graph` row in the `kg_upgrade` category table) all now document the new `connect-unregistered-graph` category, closed in the same paperwork pass that documents this ADR itself.
 4. **Two release-metadata files left out of the version-sync fix.** Per the Opus fix-wave report, `.codex-plugin/plugin.json` and `.claude-plugin/marketplace.json` were left at `0.7.4.1` while `package.json`/`plugin.json`/`mcp-server/package.json` were bumped to `0.7.4.2` — out of this fix wave's explicit 3-file scope, and will show as advisory `VERSION DRIFT` findings in `scripts/pre-push-gate.sh` until a follow-up syncs them.
 
 ### Neutral
@@ -171,7 +171,7 @@ Decision: the wizard's routing is the canonical source of truth — it was corre
 
 1. **Wire `connect-unregistered-graph` into the wizard.** `commands/kmg-init-shared/kmg-upgrade-inspector.md` would need a `"resolution"`-category branch that offers auto-apply the same way other categories do — requires explicit user permission to touch `commands/`.
 2. **Decide whether the new refusal needs a confirmation escape hatch**, once (if) a real user scenario surfaces where refusing to scaffold over unregistered content is the wrong call.
-3. **Paperwork pass**: `CHANGELOG.md`, `README.md`, `INSTALL.md`, `docs/reference/command-guide.md`, plus syncing `.codex-plugin/plugin.json`/`.claude-plugin/marketplace.json` versions.
+3. ~~**Paperwork pass**: `CHANGELOG.md`, `README.md`, `INSTALL.md`, `docs/reference/command-guide.md`~~ — done (see Consequences → Negative/Open #3); `.codex-plugin/plugin.json`/`.claude-plugin/marketplace.json` version sync was also already completed on this branch (commit `81841aca`).
 
 ---
 

@@ -9,6 +9,18 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.4.2] — 2026-08-23
+
+### Added
+
+- **New opt-in `kg_upgrade` category `connect-unregistered-graph`** — registers an existing unregistered folder in place (no re-scaffold, no template writes) when `kg_config_init` refuses to scaffold over already-present, unregistered `decisions/`/`lessons-learned/` content and points you here instead, closing a circular dead end between the two tools. Reuses an orphaned `.kmgraph-id` marker's existing `graphId` when present (preserving continuity instead of minting a new identity); otherwise derives a unique name from the directory basename. Requires no `confirmBackfix` — it registers rather than repairs content. Not yet reachable from the `/kmgraph:kmg-init` wizard: run `kg_upgrade` with `apply: ["connect-unregistered-graph"]` directly (MCP or CLI). Closes #248, issue-57.
+
+### Fixed
+
+- **Every graph-registration path now shares one `resolveRegistrationGuard`.** The new `connect-unregistered-graph` path initially registered a folder without the shared home/root hard-block and broad-ancestor-warning check that `kg_config_init` and the CLI's `runInit` already ran before writing a registry entry — a monorepo root with an unrelated top-level `decisions/` folder could have been silently registered as a brand-new knowledge graph, with no hard-block and no warning. MCP-native init, CLI init, and the connect category now all call the identical guard; no path is exempted. Closes #248, issue-57.
+- **`scaffoldGraphDirectory`'s template routing had drifted from the wizard's canonical routing** (`commands/kmg-init-shared/kmg-template-seed.md`): it was copying starter templates into live content directories (`concepts/`, `lessons-learned/`, `decisions/`, `sessions/`) instead of a dedicated `templates/` directory, was missing `entry-template.md` entirely, and was sourcing the wrong (longer) variants of `me.md`/`rules.md`/`triggers.md`. Rewritten file-by-file to match the wizard exactly, including the corrected directory list (`concepts`, `templates`, `lessons-learned`, `decisions`, `sessions`, `chat-history`, `tmp`). Closes #249, issue-58.
+- **Scaffold-then-refuse file leak** — both `kg_config_init` and the CLI's `runInit` could write scaffold files to disk via `scaffoldGraphDirectory` before a marker-mismatch or unregistered-content check ran to potentially abort registration, leaving scaffold files behind in a folder the tool then refused to register. Both refusal checks now run ahead of the scaffold write on both the MCP-native and CLI init paths. Closes #249, issue-58.
+
 ## [0.7.4.1] — 2026-08-23
 
 ### Added
