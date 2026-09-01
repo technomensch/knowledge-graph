@@ -4,7 +4,7 @@
 
 Comprehensive catalog of all lessons-learned documents.
 
-**Total Lessons:** 61 (10 architecture, 25 process, 22 patterns, 4 debugging)
+**Total Lessons:** 63 (10 architecture, 26 process, 22 patterns, 5 debugging)
 **Last Updated:** 2026-08-04
 
 > **Known issues in this index** (see [issue tracker](../issues/README.md) for permanent tracking):
@@ -32,8 +32,9 @@ Comprehensive catalog of all lessons-learned documents.
 
 ---
 
-### Process Lessons (25 total)
+### Process Lessons (26 total)
 
+- [kg-config registry orphaned by repo or folder rename - fixed via kmg-init path-repoint](process/Lessons_Learned_Process_Kg_Config_Registry_Orphaned_By_Repo_Or_Folder_Rename_Fixed_Via_Kmg_Init_Path_Repoint.md) — 2026-08-06
 - [Resource-Path Migrations Must Grep the Prompt Layer, Not Just the Server Layer](process/Lessons_Learned_Process_Migration_Must_Grep_Prompt_Layer_Not_Just_Server_Layer.md) — 2026-07-14
 - [Two-Cycle Cross-Model Review (Fable-Review → Opus-Fix → Fable-Re-Review) for High-Risk Changes](process/Lessons_Learned_Process_Two_Cycle_Cross_Model_Review_For_High_Risk_Changes.md) — 2026-07-12
 - [Bulk Frontmatter Strip Over-Reached Into knowledge dir — Restore via git checkout pre-strip](process/Lessons_Learned_Process_Bulk_Frontmatter_Strip_Over_Reached_Into_Knowledge_Dir_—_Restore_Via_Git_Checkout_Pre_Strip.md) — 2026-06-25
@@ -92,12 +93,13 @@ Comprehensive catalog of all lessons-learned documents.
 
 ---
 
-### Debugging Lessons (4 total)
+### Debugging Lessons (5 total)
 
 - [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md) — 2026-02-16 — *recovered verbatim from git history (commit `26894611`)*
 - [Plugin Cache Not Synced From Local Repo](debugging/Lessons_Learned_Debugging_Plugin_Cache_Not_Synced_From_Local_Repo.md) — 2026-04-09 — *reconstructed from chat-history evidence*
 - [Docusaurus trailingSlash + non-root baseUrl breaks static asset loading in dev](debugging/Lessons_Learned_Debugging_Docusaurus_Trailingslash_+_Non_Root_Baseurl_Breaks_Static_Asset_Loading_In_Dev.md) — 2026-04-08 — *reconstructed from chat-history evidence*
 - [os.homedir() Stale Cache On macOS](debugging/Lessons_Learned_os_homedir_Stale_Cache_On_macOS.md) — 2026-07-12 — *reconstructed from chat-history evidence*
+- [Anchor Path-Comparison Scripts to Session cwd, Not a Fixed Project-Root Env Var — Git Worktrees Break the Assumption](debugging/Lessons_Learned_Debugging_Anchor_Path_Comparison_Scripts_To_Session_Cwd,_Not_A_Fixed_Project_Root_Env_Var_—_Git_Worktrees_Break_The_Assumption.md) — 2026-08-10 — *local-only, `debugging/` is gitignored — never committed (PR #216, issue-43, per its own frontmatter, but the file itself has no git history)*
 
 **Tags:** #debugging
 

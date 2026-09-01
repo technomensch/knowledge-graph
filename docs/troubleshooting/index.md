@@ -156,6 +156,41 @@ Git is recommended but not required. With git, the system automatically captures
 
 ---
 
+## I renamed my repo (or its containing folder) — is my KG still registered?
+
+Yes, and `/kmgraph:kmg-init` fixes it automatically. GitHub repo renames and
+local folder renames don't update `~/.kmgraph/kg-config.json` for you — the
+registry still points at the old path under the old key. But the KG content
+itself, including its `.kmgraph-id` marker file, moves with the folder, so
+the fix is a repoint, not a fresh setup.
+
+Run `/kmgraph:kmg-init` from inside the renamed folder. It detects this exact
+situation — a fully-formed KG on disk with no config entry pointing at it,
+whose `graphId` matches an existing (now-stale) registry entry — and offers
+to fix the config entry in place rather than registering a duplicate:
+
+- Renames the config key to match the folder's current name
+- Repoints `path` to the folder's current location
+- Preserves everything else on the entry — categories, git strategy,
+  `lastUsed`, history
+
+Accept the fix (option 1) and it's done in one step, with the original
+config backed up first (`kg-config.json.bak.<timestamp>`) same as any other
+config write.
+
+**One follow-up worth doing right after:** the FTS5 search index is
+local-only and doesn't move with the folder rename. `kmg-init` will offer to
+rebuild it (`kg_fts5_rebuild`) once the config fix lands — accept that too,
+or `kg_search`/`kg_recall` fall back to a slower linear scan until you
+rebuild manually later.
+
+If you renamed two repos in a swap (e.g. repo A → repo B's old name, repo B
+→ a holding name) rather than a single rename, do the folder/`git remote`
+renames locally first so they match GitHub, *then* run `/kmgraph:kmg-init` —
+it resolves off whatever's actually on disk at the time it runs.
+
+---
+
 ## Still stuck?
 
 Open an issue at [github.com/technomensch/knowledge-graph/issues](https://github.com/technomensch/knowledge-graph/issues).

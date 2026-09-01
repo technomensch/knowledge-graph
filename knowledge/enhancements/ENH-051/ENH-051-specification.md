@@ -57,3 +57,26 @@ Discovered while executing v0.6.20 Task 4 (branch `v0.6.20-storage-migration-com
 - Adding new location types beyond the current three (project-local, personal/global-topic, custom).
 - Resolving ADR-067 (context-derived vs. mutable `.active` resolution) — proceeds independently of that decision.
 - Personal/project restructuring (`~/.kmgraph/personal/` + `~/.kmgraph/project/<name>/`) — deferred separately, not decided here.
+
+---
+
+## Status note (2026-09-01)
+
+Found while auditing ADR-067's implementation status. Two things have changed
+since this spec was written:
+
+1. **ADR-067's outcome is now known** — shipped v0.7.0, 2026-08-04. The
+   "must not assume ADR-067's outcome" caveat in Out of Scope above is moot;
+   this item can now build against the actual shipped resolution model
+   instead of hedging against an undecided one.
+2. **Still blocked by issue-41**, unchanged — issue-41 is still open. Its
+   migration-completeness work adds path-resolution logic to
+   `mcp-server/src/cli.ts` (a new `resolve` subcommand) that this ENH's
+   path-computation delegation would also need to touch. Starting ENH-051
+   before issue-41 lands risks the same rework this spec's own "Context That
+   Triggered This" section describes for the original bug (hand-duplicated
+   logic drifting because nothing forced two copies to change together).
+
+**Not required for ADR-067 to be considered shipped** — its own §18 marked
+this "efficient to fold in, not required to ship this release." Recommend
+holding this until issue-41 lands rather than starting now.

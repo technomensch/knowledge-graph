@@ -33551,7 +33551,7 @@ var os9 = __toESM(require("os"));
 var import_child_process4 = require("child_process");
 
 // src/tools/version.ts
-var pkg = { version: true ? "0.7.5" : "0.0.0" };
+var pkg = { version: true ? "0.7.6" : "0.0.0" };
 var SCHEMA_VERSION = 2;
 function handleVersion() {
   return { installed: pkg.version, schema: SCHEMA_VERSION };
@@ -35612,7 +35612,7 @@ function registerResolveTool(server2, personalScopeSession2) {
 // src/index.ts
 var server = new McpServer({
   name: "knowledge-graph",
-  version: true ? "0.7.5" : "0.0.0"
+  version: true ? "0.7.6" : "0.0.0"
 });
 var personalScopeSession = new PersonalScopeSession();
 var crossKgSearchSession = new CrossKgSearchSession();
