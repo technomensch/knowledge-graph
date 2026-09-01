@@ -9,6 +9,20 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.6] — 2026-09-01
+
+### Added
+- Troubleshooting doc entry + process lesson documenting repo/folder-rename KG re-registration behavior — closes a docs-impact-scan gap for the duplicate-`graphId` reattach/repoint feature (commit `024c9031`, shipped v0.7.0 with no docs coverage at the time)
+- Attribution README restored at this graph's root via `kg_upgrade`'s `missing-root-readme` category (ENH-064 backfix)
+
+### Fixed
+- `ADR-067-implementation-spec.md` status field corrected — was stale at "Ready for implementation" despite the core resolution model having shipped in v0.7.0; added a full per-section implementation-status audit verified against source, not just spec text
+- Stale command references (`/kmgraph:update-graph` → `/kmgraph:kmg-update-graph`, `/kmgraph:recall` → `/kmgraph:kmg-recall`) and wikilink style synced in `entry-template.md`/`kg-category-index.md` scaffold templates — `kg_upgrade`'s `templates` category detects this drift but can't auto-fix it once a destination file has diverged, by design
+- 17 stray handoff packages relocated from `./handoff-packages/` into `knowledge/handoffs/` (issue-56 backfix)
+
+### Notes
+- Filed impact/sequencing notes on ENH-030, ENH-051, and the source ADR-067 documenting what shipped and what remains as optional follow-up work (a KG remove/unregister command; deduping `cli.ts`/`kmg-init.md` path-computation logic, blocked on issue-41) — neither is required for ADR-067 to be considered shipped
+
 ## [0.7.5] — 2026-08-23
 
 ### Added
