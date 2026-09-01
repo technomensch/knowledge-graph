@@ -4,7 +4,7 @@
 
 Comprehensive catalog of all lessons-learned documents.
 
-**Total Lessons:** 63 (10 architecture, 26 process, 22 patterns, 5 debugging)
+**Total Lessons:** 62 (10 architecture, 26 process, 21 patterns, 5 debugging)
 **Last Updated:** 2026-08-04
 
 > **Known issues in this index** (see [issue tracker](../issues/README.md) for permanent tracking):
