@@ -1,6 +1,6 @@
 ---
 title: "ADR-067 Implementation Spec: KG Resolution Model"
-status: Ready for implementation
+status: Implemented (core model shipped v0.7.0, 2026-08-04; numbering-collision mechanism shipped v0.7.4.1, 2026-08-23) — 2 optional fold-ins remain unbuilt, see Implementation Status
 date: 2026-07-28
 supersedes_draft: "docs/specs/2026-07-26-adr-067-kg-resolution-v0.7-spec.md"
 source_adr: "knowledge/decisions/ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md"
@@ -14,6 +14,105 @@ related_issues: [10, 14, 15, 27]
 Transcribed from the full ADR-067 brainstorm/review record (13 Fable-review items + 3 previously-undesigned mechanisms, all resolved 2026-07-28). This document is the implementation-ready reference; the source ADR remains the durable decision record and rationale trail — consult it for *why*, this document for *what to build*.
 
 **Location note:** written to `knowledge/decisions/` alongside the source ADR, not `docs/superpowers/specs/` — per this project's current rules override (specs from `superpowers:brainstorming` stay in their ENH/ADR/issue folder, where `recall` searches for them). This supersedes the ADR's own earlier stated target path.
+
+---
+
+## Implementation Status (verified 2026-09-01)
+
+The `status:` field above was stale (`Ready for implementation`) despite the
+core model having shipped four weeks earlier. This section replaces trust in
+that field with a per-section audit, checked directly against shipped code —
+not inferred from the archived phase plans (`knowledge/plans/archive/v0.7.x/ADR-067/`),
+whose task checkboxes are uniformly unchecked across all 10 phase files and
+are therefore **not** a reliable completion signal one way or the other; this
+project simply doesn't track completion by editing archived-plan checkboxes.
+
+**Note on the source ADR:** `ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md`
+itself still carries `status: Proposed` in its own frontmatter — the same
+kind of stale bookkeeping this section fixes here, just in the other file.
+Not corrected as part of this pass (separate file, separate decision to make);
+flagged so it doesn't get mistaken for "still not decided."
+
+### §1–14 (core resolution model) — ✅ Shipped v0.7.0 (2026-08-04, PR #212)
+
+Per `CHANGELOG.md`: "the mutable `.active` KG-config pointer is gone,
+replaced by context-derived (cwd-based) resolution... `kmg-switch`,
+`kg_config_switch`, and the `KG_MISMATCH` error path are retired... All ~50+
+call sites across `commands/`, `agents/`, `skills/`, hook scripts, and
+`cli.ts`... were migrated off it across several sweeps (including two
+independent Opus review passes)."
+
+Independently verified against source, not just the CHANGELOG claim or the
+spec text:
+
+| § | Mechanism | Evidence |
+|---|---|---|
+| §3 | cwd-derived resolution | `kg_resolve` tool, live-tested this session |
+| §4 | registry `status` lifecycle | `status-schema` migration category in `upgrade.ts` |
+| §5 | nested-KG deepest-match | `resolution.ts:462-479`, boundary-safe, sorts by root length |
+| §6(a) | crash-safe atomic writes | `utils.ts`: temp file → `fsyncSync` (content + dir) → `renameSync` |
+| §6(b) | mutual exclusion | `utils.ts`: real `updateConfig(mutatorFn)` + 3-way `mergeGraphs` with retry — **the harder of the spec's two named options, not the simpler key-merge fallback it said to prefer as pragmatic** |
+| §8 | `$HOME`/root ownership check | `resolution.ts:126` — `os.userInfo().uid` comparison, interactive-only per spec |
+| §9 | duplicate/worktree `graphId`, 4-answer prompt | `config.ts` (commit `024c9031`, "four-answer duplicate-graphId prompt") |
+| §10 | `kg_compare_graphs` | `mcp-server/src/tools/compare.ts`, registered in `index.ts` |
+| §11 | `kmg-switch` retired | `commands/kmg-switch.md` physically removed, zero live references anywhere (specs/historical docs excepted) |
+| §11 | `KG_MISMATCH` old guard retired | the *old* stale-`.active`-vs-cwd mechanism is gone; the string is reused for a new, legitimately-different "no registered graph at this cwd" case under `resolveGraph()`, rewritten the same day (commit `dafeeaa0`, 2026-08-01) — not leftover dead code |
+| §11 | `[personal]`/`[project]` marker | `resolution.ts`: `parseScopeMarker()` regex + `PersonalScopeSession` class — sticky/one-shot consumption matches the spec's exact prompt-injection rationale, not a stub |
+| §12 | automated-mode discriminator, `KMG_INPUT_REQUIRED` | present across `resolution.ts`, `interaction.ts`, `capture.ts`, `config.ts`, `search.ts` |
+| §13 | Codex `sandbox-state-meta` | `platform-cwd.ts`, wired into `search.ts`/`capture.ts`/`upgrade.ts` |
+| §14 | legacy `~/.claude/kg-config.json` retired | no read-fallback outside the migration code itself |
+| §14 | `cli.ts` migrated off `.active` | confirmed via its own comments: `"config.active = name; removed -- resolution is now context-derived (Task 1.5)"` |
+| §16 | docs-impact checklist | `[personal]`/`[project]` documented (`docs/pillars/organizing/personal-vs-project.md`), `kg_compare_graphs` documented (`docs/reference/PLATFORM-ADAPTATION.md`), no live user-facing doc still references `kmg-switch` |
+
+### §6 cross-branch `ENH-NNN`/`issue-N` ID collision — ✅ Shipped differently, v0.7.4.1 (2026-08-23)
+
+Original spec (§6, §15) explicitly **deferred** this, calling it not-yet-designed
+and speculating a compare-and-swap atomic-claim mechanism as "the candidate
+direction... not designed further now." The source ADR later grew a
+**"Mechanism resolved 2026-08-23"** addendum (in a dedicated session,
+`v0.7.4.1-graph-numbering-conflict-gate`) that chose a simpler design instead:
+flat sequential numbering kept, with a merge-time uniqueness check —
+`scripts/check-numbering-collision.sh`, wired into the pre-push gate as an
+**advisory-only** check (never blocks a push), not the originally-speculated
+CAS/atomic-claim mechanism. Per `CHANGELOG.md` [0.7.4.1], the ADR itself
+documents "where the shipped collision mechanism deliberately deviates from
+the original design... each traces to a corruption bug reproduced during
+review rather than a scope cut."
+
+### §18 grouped release scope — cross-checked item by item
+
+**"Resolved by this design, close once implemented and verified"** — all 4 ✅ confirmed `resolved`:
+ENH-049, issue-10, issue-14, issue-23.
+
+**"Efficient to fold in, not required to ship this release"** — mixed:
+- issue-15 ✅ `resolved`
+- **ENH-030** (KG remove/unregister command) — ❌ still `Proposed`, not built
+- **ENH-051** (dedupe KG-path-from-location logic between `cli.ts`/`kmg-init.md`) — ❌ still `Proposed`/deferred, not built
+
+**"New item, tracked separately, grouping optional"**:
+- **issue-32** (stale MCP server process serves old code post-upgrade) — still `tracked`/open, but the spec itself called this out-of-ADR-067's-own-scope (a code-staleness problem, not a KG-resolution problem); tracked independently, not a gap in this ADR's delivery.
+
+**§15 "explicitly out of scope / deferred by design"** — correctly still `proposed`,
+not gaps: ENH-053 (topic-KGs, no real use case observed), ENH-054 (full
+audit-trail log, YAGNI'd with a stated revival trigger), ENH-055
+(`kmg-capture-router` trigger-vocabulary gap, unrelated code path).
+
+### What still needs to happen
+
+Only two real, still-open loose ends trace back to this ADR, and both were
+explicitly marked optional at spec-writing time — neither blocks calling the
+core model "shipped":
+
+1. **ENH-030** — KG remove/unregister command. Thin UI on top of the
+   registry archive/delete lifecycle that already exists (§4) — the
+   lifecycle mechanism shipped, just no user-facing command wraps it yet.
+2. **ENH-051** — `cli.ts` and `kmg-init.md` still each hand-maintain their
+   own copy of KG-path-from-location logic instead of sharing one. Technical
+   debt, not a correctness gap — both copies work, they're just duplicated.
+
+Everything else either shipped (core model + numbering-collision follow-up),
+or was deliberately scoped out by the design itself (ENH-053/054/055) and
+remains correctly unbuilt.
 
 ---
 
