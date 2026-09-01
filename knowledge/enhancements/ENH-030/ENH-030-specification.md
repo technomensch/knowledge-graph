@@ -37,3 +37,26 @@ A new command `/kmgraph:kmg-remove` (or `kg_remove` MCP tool) that:
 
 - `config.json` manipulation already exists in `kg_config_switch` — the remove command can reuse that pattern
 - The delete-files path must be guarded: require user to type the KG name to confirm (similar to GitHub repo deletion UX)
+
+---
+
+## Status note (2026-09-01) — spec is stale, needs refresh before implementation
+
+Found while auditing [[ADR-067]]'s implementation status. `kg_config_switch`
+(the reuse pattern named above) is **retired** — ADR-067 §11 removed it along
+with `kmg-switch` and the old `.active` pointer model entirely (shipped
+v0.7.0, 2026-08-04). The "Related" line above is also stale for the same
+reason (`kmg-switch` no longer exists).
+
+Building this today should target the **current** registry lifecycle model
+instead: `graphs` entries now carry a `status: pending | active | archived |
+deleted` enum with `statusChangedAt` (ADR-067 §4, `mcp-server/src/resolution.ts`
+/ `config.ts`) — "archive, never hard-delete" is already the invariant this
+enhancement's "Unregister only" mode wants; "Unregister + delete" would be
+the first caller to actually flip an entry to `deleted`. Reuse *that*
+mechanism, not the removed `kg_config_switch` pattern.
+
+**No blocker** — self-contained, can be picked up independently anytime.
+Not required for ADR-067 to be considered shipped (its own §18 marked this
+"efficient to fold in, not required to ship this release"). Do a quick spec
+pass to replace the stale references above before implementation starts.

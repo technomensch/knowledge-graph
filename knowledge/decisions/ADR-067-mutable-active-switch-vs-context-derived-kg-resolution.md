@@ -29,6 +29,8 @@ category: architecture
 
 **This ADR is now fully implementation-ready**, pending only the mechanical step of transcribing the resolved design into a single spec document (target `docs/superpowers/specs/YYYY-MM-DD-adr-067-kg-resolution-design.md`, per the Authoritative Note above) and completing the documentation-impact checklist noted there. Still no branch, no code changes.
 
+**Implementation status note (2026-09-01) — `status:` field intentionally left as `Proposed`, not flipped to Accepted here.** The design described above did ship: core model in `v0.7.0` (2026-08-04, PR #212), the cross-branch ID collision mechanism (§ Round 2 Item 4) shipped later and differently in `v0.7.4.1` (2026-08-23, see that section's own "Mechanism resolved 2026-08-23" addendum). Full per-section shipped/version evidence lives in the companion doc, `ADR-067-implementation-spec.md` § Implementation Status — that is the authoritative audit, not repeated here. Two items from that audit remain genuinely open, not required for this design to be considered delivered (both were marked optional at spec-writing time, § 18 of the companion spec): [[ENH-030]] (KG remove/unregister command — no blocker, spec needs a small refresh since it references the now-retired `kg_config_switch`) and [[ENH-051]] (dedupe `cli.ts`/`kmg-init.md` path logic — blocked on issue-41, still open). This note records that the implementation happened; it does not assert the decision-record lifecycle status should change — leave that call to whoever formally closes this ADR.
+
 ---
 
 ## Context
