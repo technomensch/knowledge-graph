@@ -1,7 +1,7 @@
 <!--
 KNOWLEDGE GRAPH ENTRY TEMPLATE
 This template is filled manually when creating standalone KG entries.
-Most KG entries are auto-generated from lessons via /kmgraph:update-graph.
+Most KG entries are auto-generated from lessons via /kmgraph:kmg-update-graph.
 Use this template when you need to create a KG entry directly.
 -->
 
@@ -31,9 +31,9 @@ Use this template when creating a new KG entry manually.
 - [Source Title](https://docs.example.com) — [Brief context of what was learned]
 
 **Related:**
-- [Related KG entry](./file.md#section)
-- [Related concept](./concepts.md#section)
-- [Related ADR](../../decisions/ADR-XXX.md)
+- [[related-concept-name]]
+- [[another-related-entry]]
+- [[ADR-XXX-decision-title]]
 
 **See Lesson:** [Full lesson with deep dive]
 
