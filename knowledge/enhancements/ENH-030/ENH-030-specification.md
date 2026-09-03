@@ -3,6 +3,7 @@
 **Status:** 🟡 Proposed
 **Discovered:** 2026-06-28
 **Related:** `kmg-init`, `kmg-switch`, `kmg-list`
+**GitHub Issue:** #256
 
 ---
 
