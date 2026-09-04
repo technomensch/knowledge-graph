@@ -1,3 +1,9 @@
+---
+id: ENH-038
+type: Bug
+status: resolved
+---
+
 # ENH-038: Extract-chat-history reliability (umbrella)
 
 **Status:** ✅ Resolved (v0.6.18) — all 6 v0.6.17 bugs and all 6 v0.6.18 post-merge regression findings fixed and merged to `main` (PR #164, `c968c1d5`, 2026-07-11). (ENH-043's own spec status line still reads 🟡 Proposed despite its code/tests being complete — a leftover flip-the-status task from the *original* v0.6.17 plan, not this umbrella's own outstanding work.)

@@ -1,3 +1,9 @@
+---
+id: ENH-030
+type: Enhancement
+status: proposed
+---
+
 # ENH-030: KG Remove / Unregister Command
 
 **Status:** 🟡 Proposed

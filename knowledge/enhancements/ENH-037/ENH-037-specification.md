@@ -1,3 +1,9 @@
+---
+id: ENH-037
+type: Enhancement
+status: resolved
+---
+
 # ENH-037: README indexes for enhancements/ and issues/, cross-referenced with decisions/
 
 **Status:** ✅ Resolved in v0.6.16

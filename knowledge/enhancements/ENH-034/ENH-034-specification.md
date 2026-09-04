@@ -1,3 +1,9 @@
+---
+id: ENH-034
+type: Enhancement
+status: proposed
+---
+
 # ENH-034: Capture-pipeline command naming and grouping
 
 **Local ID:** ENH-034 | **GitHub Issue:** [#232](https://github.com/technomensch/knowledge-graph/issues/232) (filed 2026-08-22, retroactively — see [issue-52](../../issues/issue-52/issue-52-description.md) for why brainstorm-originated specs don't reliably get one automatically)

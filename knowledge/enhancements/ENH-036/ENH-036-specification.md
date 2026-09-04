@@ -1,3 +1,9 @@
+---
+id: ENH-036
+type: Refactor
+status: withdrawn
+---
+
 # ENH-036: `kmg-capture-router` as the sole detection engine — 5 detection skills consolidated to 2
 
 **Status:** ⚪ Withdrawn

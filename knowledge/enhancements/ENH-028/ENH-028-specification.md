@@ -1,4 +1,7 @@
 ---
+id: ENH-028
+type: Bug
+status: resolved
 title: >-
   ENH-028: Mandatory STOP Gate for Existing-KG Branch in kmg-init and
   kmg-init-personal-kg — Prevent Upgrade-Inspector Bypass

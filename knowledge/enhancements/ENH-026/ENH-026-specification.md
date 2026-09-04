@@ -1,3 +1,9 @@
+---
+id: ENH-026
+type: Hardening
+status: proposed
+---
+
 # ENH-026: KG Write Guard — Unguarded Command Class
 
 **Local ID:** ENH-026 | **GitHub Issue:** [#233](https://github.com/technomensch/knowledge-graph/issues/233) (filed 2026-08-22, retroactively; native GitHub `blockedBy` link added to ENH-034/#232 for the `kmg-update-graph` portion — see Related below)

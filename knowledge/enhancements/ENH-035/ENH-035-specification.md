@@ -1,3 +1,9 @@
+---
+id: ENH-035
+type: Enhancement
+status: proposed
+---
+
 # ENH-035: Chat-history-to-KG backfill extractor (standalone)
 
 **Status:** 🟡 Proposed
