@@ -208,7 +208,7 @@ Do not use numbered headings in knowledge files — use plain headings (e.g., `#
 
 ### Cadence & Routing
 
-- Run `/kmgraph:kmg-sync-all` at the end of each significant work session
+- Run `/kmgraph:kmg-backfill` after significant work sessions to index new lessons/decisions
 - Feature/enhancement suggestions: use `/kmgraph:kmg-start-issue-tracking` for standalone deferred work; for active plans, offer to add as a new phase rather than creating an informal suggestion
 
 ---

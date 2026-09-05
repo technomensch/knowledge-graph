@@ -27,9 +27,8 @@ The Knowledge Graph system coordinates across four layers that work together sea
 - **recall-agent** — Knowledge search and retrieval (context-aware ranking)
 - **session-summary-agent** — Lightweight current-session summary (fresh context preservation)
 - **platform-sync-agent** — Cross-platform config file sync (Claude Desktop + Claude Code alignment)
-- **knowledge-extractor** — Batch backfill from large files (approval-gated writes)
+- **knowledge-extractor** — Batch backfill from large files (never writes — coordinator writes after approval)
 - **session-documenter** — Deep git archaeology for summaries (approval-gated commits)
-- **knowledge-reviewer** — Review KG entry quality (ongoing curation)
 
 ### Lifecycle Layer: Hooks
 **Automate at the right moment**
@@ -163,11 +162,6 @@ Commands remain available for explicit, interactive use. They operate on all fou
 - Available for manual use at any time
 - Dispatches to session-summary-agent
 
-**`/kmgraph:kmg-sync-all`**
-- Full orchestration pipeline in one command
-- Extract → capture → update graph
-- Dispatches multiple agents in sequence
-
 ### Search and Recall
 
 **`/kmgraph:kmg-recall "query"`**
@@ -226,27 +220,16 @@ Commands remain available for explicit, interactive use. They operate on all fou
 3. Apply documented solution or adapt approach
 ```
 
-**Periodic knowledge consolidation:**
-```
-1. /kmgraph:kmg-sync-all
-   - Extracts recent chats
-   - Captures lessons from extracted content
-   - Updates knowledge graph with insights
-2. Review generated content for quality
-```
-
 **After lesson capture (NEW - v0.0.3):**
 ```
 Context: User just completed /kmgraph:kmg-capture-lesson
 
 Proactive suggestion:
 "✅ Lesson captured! Extract insights to Knowledge Graph?"
-- Recommended: /kmgraph:kmg-update-graph (extracts patterns/gotchas/concepts)
-- Full pipeline: /kmgraph:kmg-sync-all (extraction + governance check + GitHub)
 - Later: Skip for now, run manually later
 
-Why now: Fresh context enables better extraction. The knowledge-reviewer
-agent will assess quality automatically.
+Why now: Fresh context enables better extraction. Run `/kmgraph:kmg-backfill`
+to index it into the knowledge graph.
 ```
 
 **After significant commits (NEW - v0.0.3):**

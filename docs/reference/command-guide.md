@@ -37,9 +37,19 @@ Commands work across platforms, but full automation is Claude Code-specific.
 - **Document what I just learned** → `/kmgraph:kmg-capture-lesson`
 - **Find something I documented before** → `/kmgraph:kmg-recall "search query"`
 
-### Daily Use
-- **Sync lessons to the knowledge graph** → `/kmgraph:kmg-update-graph`
-- **Summarize this conversation** → `/kmgraph:kmg-session-summary`
+### Capture Pipeline (in workflow order)
+- **Capture** — document what I just learned → `/kmgraph:kmg-capture-lesson`
+- **Structure** — index existing lessons/decisions/chat-history into the graph → `/kmgraph:kmg-backfill`
+- **Track / Link** — start structured issue tracking with Git branch → `/kmgraph:kmg-start-issue-tracking`
+- **Track / Link** — link a lesson or ADR to a GitHub issue → `/kmgraph:kmg-link-issue`
+- **Track / Link** — track a multi-attempt bug or feature → `/kmgraph:kmg-meta-issue`
+- **Propagate** — sync progress to plans and GitHub → `/kmgraph:kmg-update-issue-plan`
+- **Session** — summarize this conversation → `/kmgraph:kmg-session-summary`
+- **Session** — create comprehensive handoff documentation → `/kmgraph:kmg-handoff`
+
+> **Note**: The term "issues" in this guide refers to GitHub Issues — a platform feature for tracking bugs, feature requests, and enhancements. This is distinct from "knowledge graph issues" (meta-issues) or "lessons learned issues" (problems documented in the KG).
+
+### Other Daily Use
 - **Add a new category (e.g., security, ml-ops)** → `/kmgraph:kmg-add-category`
 - **See my chat history** → `/kmgraph:kmg-extract-chat`
 - **Update plugin documentation** → `/kmgraph:kmg-update-doc --user-facing`
@@ -47,27 +57,12 @@ Commands work across platforms, but full automation is Claude Code-specific.
 ### Team Collaboration
 - **Share knowledge safely** → `/kmgraph:kmg-config-sanitization`
 - **Check for sensitive data before sharing** → `/kmgraph:kmg-check-sensitive`
-- **Link lessons to GitHub issues** → `/kmgraph:kmg-link-issue`
 
 ### Project Transitions & Onboarding
-- **Create comprehensive handoff documentation** → `/kmgraph:kmg-handoff`
 - **Set up for new developer** → `/kmgraph:kmg-setup-platform`
-
-> **Note**: The term "issues" in this guide refers to GitHub Issues — a platform feature for tracking bugs, feature requests, and enhancements. This is distinct from "knowledge graph issues" (meta-issues) or "lessons learned issues" (problems documented in the KG).
 
 ### Working with Multiple Knowledge Graphs
 - **View all configured knowledge graphs** → `/kmgraph:kmg-list`
-
-### Complex Problem Tracking
-- **Track a multi-attempt bug** → `/kmgraph:kmg-meta-issue`
-- **Start structured issue tracking with documentation and Git branch** → `/kmgraph:kmg-start-issue-tracking`
-- **Sync progress to plans and GitHub** → `/kmgraph:kmg-update-issue-plan`
-
-### Memory Management
-- **Run the full sync pipeline in one command** → `/kmgraph:kmg-sync-all`
-
-
-
 
 ---
 
@@ -83,38 +78,42 @@ Get the knowledge graph running and configure how it works.
 - [🟡 `/kmgraph:kmg-add-category`](#-kmgraphadd-category) — Add custom categories
 - [🟡 `/kmgraph:kmg-config-sanitization`](#-kmgraphconfig-sanitization) — Set up safety features for team sharing
 
-#### Capture & Document
+#### Capture Pipeline (workflow order)
 
-Document lessons, capture history, and summarize sessions.
+The capture-pipeline cluster, grouped by the stage each command belongs to — read top to bottom in the order you'd actually use them, not alphabetically.
 
-- [🟢 `/kmgraph:kmg-capture-lesson`](#-kmgraphcapture-lesson) — Capture problems solved and patterns discovered
-- [🟡 `/kmgraph:kmg-extract-chat`](#-kmgraphextract-chat) — Export chat history to markdown
-- [🟡 `/kmgraph:kmg-session-summary`](#-kmgraphsession-summary) — Summarize important work sessions
+**Capture**
+- [🟢 `/kmgraph:kmg-capture-lesson`](#-kmgraphcapture-lesson) — Capture problems solved and patterns discovered *(skills: `kmg-lesson-capture`, `kmg-capture-router`)*
 
-#### Search & Sync
+**Structure**
+- [🟡 `/kmgraph:kmg-backfill`](#-kmgraphbackfill) — Index existing lessons/decisions/chat-history into the knowledge graph
 
-Find knowledge and keep the graph synchronized.
+**Track / Link**
+- [🔴 `/kmgraph:kmg-start-issue-tracking`](#-kmgraphstart-issue-tracking) — Systematic issue tracking with Git branches
+- [🔴 `/kmgraph:kmg-link-issue`](#-kmgraphlink-issue) — Connect lessons to GitHub issues
+- [🔴 `/kmgraph:kmg-meta-issue`](#-kmgraphmeta-issue) — Track multi-attempt bugs and features
+
+**Propagate**
+- [🔴 `/kmgraph:kmg-update-issue-plan`](#-kmgraphupdate-issue-plan) — Sync progress with GitHub and plans
+
+**Session**
+- [🟡 `/kmgraph:kmg-session-summary`](#-kmgraphsession-summary) — Summarize important work sessions *(skill: `kmg-session-wrap`)*
+- [🔴 `/kmgraph:kmg-handoff`](#-kmgraphhandoff) — Create comprehensive handoff documentation *(agent: `session-documenter`)*
+
+#### Search & Document
+
+Find knowledge and manage documentation outside the capture pipeline.
 
 - [🟢 `/kmgraph:kmg-status`](#-kmgraphstatus) — Check current knowledge graph status
 - [🟢 `/kmgraph:kmg-recall`](#-kmgraphrecall) — Search across all knowledge entries
-- [🟡 `/kmgraph:kmg-update-graph`](#-kmgraphupdate-graph) — Extract lessons into knowledge graph
+- [🟡 `/kmgraph:kmg-extract-chat`](#-kmgraphextract-chat) — Export chat history to markdown
 - [🟡 `/kmgraph:kmg-update-doc`](#-kmgraphupdate-doc) — Update documentation with changes
-- [🔴 `/kmgraph:kmg-sync-all`](#-kmgraphsync-all) — Run complete synchronization pipeline
 
 #### Team & Sharing
 
 Share knowledge safely with team members.
 
 - [🟡 `/kmgraph:kmg-check-sensitive`](#-kmgraphcheck-sensitive) — Scan for sensitive data before sharing
-- [🔴 `/kmgraph:kmg-link-issue`](#-kmgraphlink-issue) — Connect lessons to GitHub issues
-
-#### Advanced Issues
-
-Track complex, multi-attempt problems systematically.
-
-- [🔴 `/kmgraph:kmg-meta-issue`](#-kmgraphmeta-issue) — Track multi-attempt bugs and features
-- [🔴 `/kmgraph:kmg-start-issue-tracking`](#-kmgraphstart-issue-tracking) — Systematic issue tracking with Git branches
-- [🔴 `/kmgraph:kmg-update-issue-plan`](#-kmgraphupdate-issue-plan) — Sync progress with GitHub and plans
 
 ---
 
@@ -171,7 +170,7 @@ When you enable backfill, the system extracts existing knowledge from your proje
 
 The system presents candidates for your review before creating entries.
 
-**After backfill**: If backfill was used, the knowledge graph now contains a full set of imported content. This is a good time to build the search index so all that content is immediately searchable by relevance. Run `/kmgraph:kmg-sync-all` and accept the index prompt, or call `kg_fts5_rebuild` directly from the MCP tool panel.
+**After backfill**: If backfill was used, the knowledge graph now contains a full set of imported content. This is a good time to build the search index so all that content is immediately searchable by relevance. Call `kg_fts5_rebuild` directly from the MCP tool panel.
 
 **Next steps**: Run `/kmgraph:kmg-status` to verify setup
 
@@ -282,7 +281,7 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 - prevention
 7. Creates the lesson file from the standard template with all fields populated
 8. Updates category and chronological indexes
-9. `{OPTIONAL}` Runs `/kmgraph:kmg-update-graph` to extract KG entries from the new lesson
+9. `{OPTIONAL}` Runs `/kmgraph:kmg-backfill` to index the new lesson into the knowledge graph
 10. `{OPTIONAL}` Links to a GitHub Issue via `/kmgraph:kmg-link-issue`
 
 **Time**: 5-10 minutes (faster with practice)
@@ -350,7 +349,7 @@ Stats:
 Quick Commands:
   /kmgraph:kmg-capture-lesson    — Document a lesson
   /kmgraph:kmg-recall "query"    — Search across all KG
-  /kmgraph:kmg-sync-all          — Run full sync pipeline
+  /kmgraph:kmg-backfill          — Index lessons/decisions into the graph
 ```
 
 **Tips**: Use the flags `--minimal` for a one-line summary and `--json` for machine-readable output.
@@ -435,42 +434,40 @@ Dispatches to the recall agent, which searches:
 
 ## Intermediate Commands
 
-### 🟡 `/kmgraph:kmg-update-graph`
+### 🟡 `/kmgraph:kmg-backfill`
 
-**Purpose**: Takes individual lessons learned and adds them directly into the knowledge graph's searchable index. Lessons hold the full narrative; `update-graph` makes patterns findable in seconds, not minutes.
+**Purpose**: Extracts lesson/decision/KG-entry candidates from three already-existing narrative sources — `chat-history/`, `knowledge/lessons-learned/`, and `knowledge/decisions/` — and presents them for confirmation before writing. Consolidates the job of a now-retired lesson/decision indexing command with chat-history extraction into one command. See ADR-071 in `knowledge/decisions/` for the retirement rationale.
 
 **When to use**:
 
-- After creating or updating lesson-learned documents
-- When discovering new patterns or best practices
-- Before completing complex work sessions
-- Daily or weekly consolidation of captured knowledge
+- After creating or updating lesson-learned documents or ADRs
+- To draft candidates from raw `chat-history/` transcripts
+- Any time you want to (re-)index `chat-history/`, `lessons-learned/`, or `decisions/` on demand — you don't need to re-run `kmg-init` to do that
 
 **What it does**:
 
-1. Identifies new or modified lessons (since last sync or last 24 hours)
-2. Reads each lesson and extracts: title, problem, solution, when-to-use triggers
-3. Checks if a matching KG entry already exists in `knowledge/patterns.md` (or similar)
-4. Creates new entries or updates existing ones with bidirectional links
-5. Runs data integrity audit on each new entry
-6. Commits KG changes
+1. Resolves the active knowledge graph (`kg_resolve`)
+2. Scans `chat-history/`, `lessons-learned/`, and `decisions/` in full, or a single scoped `[path]` if given
+3. Delegates to the `knowledge-extractor` subagent (default) to read the files and draft candidates without pulling large files into the main conversation
+4. Prints a confirmation line (`Drafting from: ... → Writing to: ...`) and presents the full candidate list
+5. Writes only approved candidates — this command never auto-writes
 
-**Time**: 1-5 minutes depending on number of lessons
+**Time**: 1-5 minutes depending on volume
 
 **Example**:
 ```bash
-/kmgraph:kmg-update-graph
-/kmgraph:kmg-update-graph --lesson=Pattern_Discovery.md    # Process specific lesson
-/kmgraph:kmg-update-graph --auto                          # Skip prompts, silent mode
-/kmgraph:kmg-update-graph --interactive                    # Review each entry before saving
+/kmgraph:kmg-backfill
+/kmgraph:kmg-backfill knowledge/chat-history/2026-08/
+/kmgraph:kmg-backfill knowledge/lessons-learned/architecture/
+/kmgraph:kmg-backfill --date=2026-08-20
+/kmgraph:kmg-backfill --after=2026-08-01 --before=2026-08-31
 ```
 
 **Tips**:
 
-- `--auto` flag is useful when called from other commands (e.g., after `/kmgraph:kmg-capture-lesson`)
-- `--interactive` flag lets you review and edit each extracted entry before saving
-
-**Cleaner conversations**: When the context-mode plugin is installed and there are 10 or more lessons to process, `update-graph` reads the lesson files in a background process instead of inline. This keeps the conversation cleaner without changing any results. Falls back automatically if context-mode is not installed.
+- `--delegate knowledge-extractor` is **on** by default; only disable it for a single small known-good file
+- Does **not** support `--source`, `--output-dir`, `--today`, `--rebuild`, `--dry-run`, `--yes`/`--no-confirm`, or `--project`/`--confirm-unscoped` — see `commands/kmg-backfill.md` for the reasoning behind each rejection
+- Not the same as `kmg-init`'s own backfill offer, which drafts brand-new candidates from `plans/`, `research/`, `specs/`, `README.md`, and `CHANGELOG.md` at setup time
 
 ---
 
@@ -936,7 +933,7 @@ With `--user-facing`:
 
 **When to use**:
 
-- After extracting new KG entries with `/kmgraph:kmg-update-graph`
+- After extracting new KG entries with `/kmgraph:kmg-backfill`
 - When implementation plan needs to reflect new insights
 - Before committing governance-related changes
 - When progress needs to be posted to a GitHub Issue
@@ -945,7 +942,7 @@ With `--user-facing`:
 
 **What it does**:
 
-1. **Knowledge extraction**: Runs `/kmgraph:kmg-update-graph` to extract patterns
+1. **Knowledge extraction**: Runs `/kmgraph:kmg-backfill` to extract patterns
 2. **Plan sync**: Updates the active implementation plan with a "Lessons Learned Integration" section
 3. **Local issue update**: Appends progress and new verification requirements to local issue docs
 4. **GitHub sync**: Maps local issue ID to GitHub Issue number, posts a knowledge sync comment, and updates PR description with related lessons
@@ -994,58 +991,6 @@ With `--user-facing`:
 /kmgraph:kmg-link-issue knowledge/lessons-learned/process/my-lesson.md --issue 42
 /kmgraph:kmg-link-issue knowledge/decisions/ADR-005.md --issue 38 --pr 40
 ```
-
----
-
-### 🔴 `/kmgraph:kmg-sync-all`
-
-**Purpose**: The catch-up command when lessons have been captured but the pipeline has not run. Replaces four manual steps in a single pass: update-graph, plan sync, issue update, and GitHub posting.
-
-**When to use**:
-
-- After significant work sessions to consolidate everything
-- Weekly deep sync to ensure KG, plans, and GitHub are aligned
-- Before major milestones or project phase changes
-- As a catch-up sync if you've been capturing lessons without syncing
-
-**What it does**:
-
-1. **Scans** for new or modified lessons in `{active_kg_path}/lessons-learned/`
-2. **Extracts** KG entries from lessons (delegates to `/kmgraph:kmg-update-graph`)
-3. **Links** to active implementation plan if relevant
-4. **Updates** local issue with KG references and progress notes
-5. **Enriches** today's session summary with KG insights
-6. **Generates** GitHub Issue comment draft and asks for single confirmation before posting
-
-**Time**: 1-5 minutes depending on volume
-
-**Example**:
-```bash
-/kmgraph:kmg-sync-all
-/kmgraph:kmg-sync-all --auto       # Skip GitHub posting confirmation
-/kmgraph:kmg-sync-all --dry-run    # Preview without changes
-```
-
-**Output**:
-```
-Knowledge Sync Complete
------------------------
-Lessons scanned:  3 (2 new, 1 modified)
-KG entries:       2 created, 1 updated
-Plan linked:      v2.0 (Step 2 → Prefix Naming lesson)
-Local issue:      issue-42 (updated)
-GitHub:           #45 (comment posted)
-Session:          2026-02-11 (enriched)
-```
-
-**Tips**:
-
-- Idempotent — safe to run multiple times (existing entries updated, not duplicated)
-- GitHub integration is optional — works fully offline if `gh` CLI is not installed
-
-**Cleaner conversations**: When the context-mode plugin is installed, `sync-all` runs file scans in a background process so the results do not fill the conversation. Falls back automatically if context-mode is not installed. No configuration required.
-
-**Search index**: Each run of `sync-all` automatically refreshes the search index if one has been built. On the first run after upgrading, `sync-all` will ask once whether to build the index. The preference is remembered.
 
 ---
 
@@ -1102,30 +1047,24 @@ Reading time: ~20 minutes for complete orientation
 
 ## Command Comparison
 
-### Capture vs Update vs Sync
+### Capture vs Backfill
 
-**Three ways to save learnings**:
+**Two ways to save learnings**:
 
 1. **`/kmgraph:kmg-capture-lesson`**
    - Creates a NEW lesson file
    - Guided interview process
    - Use: When documenting new learnings
 
-2. **`/kmgraph:kmg-update-graph`**
-   - Extracts patterns from existing lessons
-   - Updates knowledge entries
-   - Use: Daily or weekly to consolidate
-
-3. **`/kmgraph:kmg-sync-all`**
-   - Full 4-step pipeline (capture → update → sync → link)
-   - Comprehensive sync across KG, plans, issues, and GitHub
-   - Use: Weekly deep sync or before sharing
+2. **`/kmgraph:kmg-backfill`**
+   - Indexes existing lessons/decisions/chat-history into the knowledge graph
+   - Drafts candidates and asks for confirmation before writing
+   - Use: Any time existing narrative sources haven't been indexed yet
 
 **When to use which**:
 
 - Just solved a problem → `capture-lesson`
-- End of day/week → `update-graph`
-- Major milestone → `sync-all`
+- Existing lessons/decisions/chat-history not yet indexed → `backfill`
 
 ---
 
@@ -1288,8 +1227,7 @@ This section covers implementation specifics for users who want to understand ho
 
 When the [context-mode plugin](https://github.com/steventcramer/context-mode) is installed alongside kmgraph:
 
-- `sync-all` uses `ctx_batch_execute` to combine lesson scanning and KG extraction in a single sandboxed background process
-- `update-graph` uses `ctx_execute_file` for sandboxed file reads when processing 10 or more lessons; falls back to the knowledge-extractor subagent for large batches without context-mode, or reads directly for small batches
+- `kmg-backfill` uses `ctx_execute_file` for sandboxed file reads when processing 10 or more lessons/decisions; falls back to the `knowledge-extractor` subagent for large batches without context-mode, or reads directly for small batches
 - Detection: kmgraph checks for `mcp__plugin_context-mode_context-mode__ctx_batch_execute` at runtime; no configuration required; zero breaking change if context-mode is absent
 
 ### Search Index Implementation

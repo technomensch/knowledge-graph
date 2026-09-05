@@ -1,4 +1,12 @@
+---
+id: ENH-026
+type: Hardening
+status: proposed
+---
+
 # ENH-026: KG Write Guard — Unguarded Command Class
+
+**Update (2026-09-04):** ENH-034's `kmg-update-graph` decision (previously an open rename candidate, per the Related note below) was **removal**, not rename (Option C), confirmed removed in v0.7.7. Scope item 1's "Add Step 0 guard to `update-graph`" was superseded/moot — no file to guard once removed. Its `kmg-sync-all` half was moot too — ENH-034 removed `kmg-sync-all`/`sync-all-agent` as well, confirmed removed in v0.7.7. Unaffected by this update: scope item 2 (`run_extraction.py` CWD check — belongs to `kmg-extract-chat`, untouched by ENH-034/035), item 3 (audit remaining unguarded write paths — should include the new `kmg-backfill` command from ENH-035, now shipped), and item 4 (supersede ADR-019 with a new enforcement-picture ADR).
 
 **Local ID:** ENH-026 | **GitHub Issue:** [#233](https://github.com/technomensch/knowledge-graph/issues/233) (filed 2026-08-22, retroactively; native GitHub `blockedBy` link added to ENH-034/#232 for the `kmg-update-graph` portion — see Related below)
 

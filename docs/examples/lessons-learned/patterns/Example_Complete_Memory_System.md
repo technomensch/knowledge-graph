@@ -147,15 +147,6 @@ Results:
 - Session: "Validation Refactoring Session" (2024-08-22)
 ```
 
-### `/kmgraph:kmg-sync-all`
-
-Complete pipeline automation:
-1. Capture lesson (if applicable)
-2. Update knowledge graph
-3. Update project memory (MEMORY.md)
-4. Create session summary
-5. Commit everything with links
-
 ---
 
 ## The LEVERAGE Principle
@@ -279,7 +270,7 @@ After implementing complete system:
 **Phase 2:** Added automation (/lesson-learned, /create-adr)
 **Phase 3:** Added Knowledge Graph extraction
 **Phase 4:** Added session summaries
-**Phase 5:** Added /kmgraph:kmg-sync-all pipeline
+**Phase 5:** Added automated knowledge-sync pipeline (since consolidated into `/kmgraph:kmg-backfill`)
 **Phase 6:** Integrated with MEMORY.md bidirectional sync
 
 Each phase built on previous, validating architecture.

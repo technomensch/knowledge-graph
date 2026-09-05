@@ -130,22 +130,20 @@ This file contains example patterns from a real project, generalized for demonst
 
 **Quick Reference:**
 ```
-Manual (4 steps):
+Manual steps:
 1. /capture-lesson
-2. /update-graph  
-3. /update-issue-plan
-4. git commit + update MEMORY.md
+2. /update-issue-plan
+3. git commit + update MEMORY.md
 
-Automated (1 step):
-/kmgraph:kmg-sync-all
-  → Runs all 4 steps with single confirmation
+On-demand indexing:
+/kmgraph:kmg-backfill
+  → Indexes existing lessons/decisions/chat-history into the graph, with confirmation before writing
 ```
 
 **Benefits:**
-- Reduces 4-step workflow to 1 command
-- Ensures no steps are skipped
-- Atomic operation (all or nothing)
-- Single confirmation point
+- Reduces repetitive manual indexing to one on-demand command
+- Confirms every candidate before it's written
+- Re-invocable any time — safe to run repeatedly
 
 **Cross-References:**
 - **Related:** [[Smart Defaults](#smart-defaults)]
@@ -237,7 +235,6 @@ meta-issue/
 - Platform-specific paths (e.g., `~/.claude/projects/[hash]/memory/MEMORY.md`)
 - Discovery mechanism to locate existing memory
 - Fallback creation if not found
-- Integration with sync pipeline
 
 **Cross-References:**
 - **Related:** [[Four-Pillar Memory](#four-pillar-memory)], [[Bidirectional Memory Sync](#bidirectional-memory-sync)]

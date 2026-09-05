@@ -2,7 +2,7 @@
 id: issue-51
 type: Bug
 status: resolved
-github-issue: pending
+github-issue: "#255"
 branch: v0.7.2-issues-46-51
 created: 2026-08-17
 related_enhs: ["ENH-052"]

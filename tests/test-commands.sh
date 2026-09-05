@@ -1,5 +1,5 @@
 #!/bin/bash
-# test-commands.sh — Structural and syntax validation for all 24 slash commands
+# test-commands.sh — Structural and syntax validation for all 22 slash commands
 #
 # Commands are markdown files with YAML frontmatter and embedded bash scripts.
 # This test validates structure and syntax without needing to run Claude Code.
@@ -32,7 +32,7 @@ else
   exit 1
 fi
 
-# ── Test 2: All 24 expected command files present ────────────────────────────
+# ── Test 2: All 22 expected command files present ────────────────────────────
 
 echo "── File presence ───────────────────────────────────────────────"
 
@@ -40,6 +40,7 @@ echo "── File presence ─────────────────�
 # unprefixed "switch.md" command was retired and has no kmg- successor.
 EXPECTED_COMMANDS=(
   "kmg-add-category.md"
+  "kmg-backfill.md"
   "kmg-capture-lesson.md"
   "kmg-check-sensitive.md"
   "kmg-config-sanitization.md"
@@ -57,9 +58,7 @@ EXPECTED_COMMANDS=(
   "kmg-setup-platform.md"
   "kmg-start-issue-tracking.md"
   "kmg-status.md"
-  "kmg-sync-all.md"
   "kmg-update-doc.md"
-  "kmg-update-graph.md"
   "kmg-update-issue-plan.md"
   "kmg-init-personal-kg.md"
   "kmg-migration.md"
@@ -74,19 +73,19 @@ for cmd in "${EXPECTED_COMMANDS[@]}"; do
 done
 
 if [ $MISSING -eq 0 ]; then
-  pass "All 24 expected command files present"
+  pass "All 23 expected command files present"
 else
   fail "$MISSING command file(s) missing (see above)"
 fi
 
-# Test 3: Exact count is 24 (top-level only — kmg-init-shared/ modules are excluded)
+# Test 3: Exact count is 23 (top-level only — kmg-init-shared/ modules are excluded)
 ACTUAL_COUNT=$(find "$COMMANDS_DIR" -maxdepth 1 -name "*.md" -type f | wc -l | tr -d ' ')
-if [ "$ACTUAL_COUNT" -eq 24 ]; then
-  pass "Exact command count is 24"
-elif [ "$ACTUAL_COUNT" -gt 24 ]; then
-  fail "More than 24 command files found ($ACTUAL_COUNT) — unexpected files?"
+if [ "$ACTUAL_COUNT" -eq 23 ]; then
+  pass "Exact command count is 23"
+elif [ "$ACTUAL_COUNT" -gt 23 ]; then
+  fail "More than 23 command files found ($ACTUAL_COUNT) — unexpected files?"
 else
-  fail "Fewer than 24 command files found ($ACTUAL_COUNT)"
+  fail "Fewer than 23 command files found ($ACTUAL_COUNT)"
 fi
 
 # Test 4: No zero-byte files
@@ -174,14 +173,14 @@ echo "── Key command content checks ─────────────�
 if [ -f "$COMMANDS_DIR/kmg-help.md" ]; then
   HELP_CONTENT=$(cat "$COMMANDS_DIR/kmg-help.md")
   MISSING_REFS=0
-  for key_cmd in "capture-lesson" "recall" "sync-all" "session-summary"; do
+  for key_cmd in "capture-lesson" "recall" "session-summary" "backfill"; do
     if ! echo "$HELP_CONTENT" | grep -q "$key_cmd"; then
       echo "    kmg-help.md missing reference to: $key_cmd"
       MISSING_REFS=$((MISSING_REFS + 1))
     fi
   done
   if [ $MISSING_REFS -eq 0 ]; then
-    pass "kmg-help.md references all key commands (capture-lesson, recall, sync-all, session-summary)"
+    pass "kmg-help.md references all key commands (capture-lesson, recall, session-summary, backfill)"
   else
     fail "kmg-help.md missing $MISSING_REFS key command references"
   fi
@@ -189,20 +188,18 @@ else
   fail "kmg-help.md not found"
 fi
 
-# Test 12: kmg-sync-all.md orchestrates multiple sub-commands
-if [ -f "$COMMANDS_DIR/kmg-sync-all.md" ]; then
-  SYNC_CONTENT=$(cat "$COMMANDS_DIR/kmg-sync-all.md")
-  PIPELINE_CMDS=0
-  for sub_cmd in "update-graph" "session-summary" "capture-lesson"; do
-    echo "$SYNC_CONTENT" | grep -q "$sub_cmd" && PIPELINE_CMDS=$((PIPELINE_CMDS + 1)) || true
-  done
-  if [ $PIPELINE_CMDS -ge 2 ]; then
-    pass "kmg-sync-all.md references multiple pipeline sub-commands ($PIPELINE_CMDS found)"
+# Test 12: kmg-backfill.md exists and documents required flags
+if [ -f "$COMMANDS_DIR/kmg-backfill.md" ]; then
+  CONTENT=$(cat "$COMMANDS_DIR/kmg-backfill.md")
+  if echo "$CONTENT" | grep -q -- "--delegate knowledge-extractor" && \
+     echo "$CONTENT" | grep -q -- "--date=" && \
+     ! echo "$CONTENT" | grep -q -- "--source "; then
+    pass "kmg-backfill.md documents required flags, omits rejected --source"
   else
-    fail "kmg-sync-all.md should reference multiple sub-commands (found $PIPELINE_CMDS)"
+    fail "kmg-backfill.md missing required flags or has a rejected flag"
   fi
 else
-  fail "kmg-sync-all.md not found"
+  fail "kmg-backfill.md not found"
 fi
 
 echo ""

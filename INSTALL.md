@@ -380,7 +380,7 @@ claude --plugin-dir /path/to/knowledge-graph
 
 #### Step 2A.1: Install context-mode (Optional — Claude Code only)
 
-context-mode is a companion plugin that keeps the conversation cleaner when syncing large knowledge graphs. When installed, `sync-all` and `update-graph` offload file reading to a background process — only a short summary returns to the conversation. Nothing changes if it is not installed.
+context-mode is a companion plugin that keeps the conversation cleaner when syncing large knowledge graphs. When installed, `kmg-backfill` offloads file reading to a background process — only a short summary returns to the conversation. Nothing changes if it is not installed.
 
 Ask the user:
 

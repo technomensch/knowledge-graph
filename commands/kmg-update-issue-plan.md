@@ -21,7 +21,7 @@ This workflow ensures that insights extracted from the Knowledge Graph are prope
 
 ## Step 1: Institutional Knowledge Extraction
 
-1. **Trigger:** Run `/kmgraph:kmg-update-graph`.
+1. **Trigger:** Run `/kmgraph:kmg-backfill` to extract recent lessons/decisions into the KG.
 2. **Analysis:** Review the extracted patterns or lessons.
 3. **Identification:** Identify the **Primary Lesson** that prompted this sync (e.g., "Active Enforcement Failure").
 
@@ -235,8 +235,7 @@ When multiple knowledge graphs are configured:
 
 ## Integration with Other Skills
 
-- `/kmgraph:kmg-update-graph` — Triggers Step 1 (knowledge extraction)
-- `/kmgraph:kmg-sync-all` — Calls this skill as part of full sync pipeline
+- `/kmgraph:kmg-backfill` — Triggers Step 1 (knowledge extraction)
 - `/kmgraph:kmg-capture-lesson` — Lessons sync here for plan integration
 - `/kmgraph:kmg-start-issue-tracking` — Creates new issues from decision gates
 
@@ -246,7 +245,7 @@ When multiple knowledge graphs are configured:
 
 ```bash
 # 1. Extract insights from lesson
-/kmgraph:kmg-update-graph
+/kmgraph:kmg-backfill
 
 # 2. Sync to plan and issues
 /kmgraph:kmg-update-issue-plan

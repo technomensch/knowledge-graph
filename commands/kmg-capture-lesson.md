@@ -169,6 +169,4 @@ After the agent returns, extract the draft content and display it verbatim in yo
 
 ## Related Commands
 
-- `/kmgraph:kmg-update-graph` — extract insights from a lesson into the knowledge graph
-- `/kmgraph:kmg-sync-all` — batch sync all lessons
 - `/kmgraph:kmg-create-adr` — create a standalone architectural decision record

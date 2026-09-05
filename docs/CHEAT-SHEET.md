@@ -21,7 +21,7 @@ One-page cheat sheet for the Knowledge Management Graph. For detailed documentat
 - **Set up team knowledge sharing** → `/kmgraph:kmg-config-sanitization`
 - **Summarize my current chat session** → `/kmgraph:kmg-session-summary`
 - **Extract my chat history** → `/kmgraph:kmg-extract-chat`
-- **Sync lessons to the knowledge graph** → `/kmgraph:kmg-update-graph`
+- **Index lessons/decisions/chat-history into the knowledge graph** → `/kmgraph:kmg-backfill`
 - **Check for sensitive data before sharing** → `/kmgraph:kmg-check-sensitive`
 - **Work with multiple knowledge graphs** → `/kmgraph:kmg-list` to see all configured graphs; each command run from a project's directory automatically targets that project's graph (no switching needed)
 - **Link lessons to GitHub issues** → `/kmgraph:kmg-link-issue`
@@ -52,7 +52,7 @@ Active users use these for regular workflows:
 
 | Command | Purpose |
 |---------|---------|
-| `/kmgraph:kmg-update-graph` | Extract knowledge graph entries from lessons. Uses background file reading for large batches when context-mode is installed |
+| `/kmgraph:kmg-backfill` | Index lessons/decisions/chat-history into the knowledge graph. Delegates to the `knowledge-extractor` subagent for large batches by default |
 | `/kmgraph:kmg-add-category` | Add a new category to existing knowledge graph |
 | `/kmgraph:kmg-session-summary` | Create summary of current chat session; `--snapshot` for lightweight mid-session capture |
 | `/kmgraph:kmg-list` | Display all configured knowledge graphs |
@@ -73,7 +73,6 @@ Power users leverage these for complex workflows:
 | `/kmgraph:kmg-start-issue-tracking` | Initialize issue tracking with structured docs, auto-creates GitHub Issue (Step 5.0), and Git branch |
 | `/kmgraph:kmg-update-issue-plan` | Sync knowledge graph → plan → issue → GitHub |
 | `/kmgraph:kmg-link-issue` | Manually link existing lesson or ADR to GitHub issue |
-| `/kmgraph:kmg-sync-all` | Automated full sync pipeline (4 steps → 1 command). Uses background file scanning when context-mode is installed. Refreshes search index automatically if built |
 | `/kmgraph:kmg-handoff` | Create comprehensive handoff documentation for transitions or onboarding |
 
 *→ [Full details in Command Guide](reference/command-guide.md#advanced-commands)*
@@ -112,10 +111,8 @@ Heavy-lift task handlers. Usually invoked automatically by skills/commands.
 | recall-agent | Searching knowledge graph | Via `/kmgraph:kmg-recall [query]` command |
 | session-summary-agent | Session wrap-up and documentation | Auto-triggered at end of work |
 | mcp-setup-agent | MCP server setup and configuration | IDE detection + auto-config |
-| knowledge-extractor | Batch KG extraction and parsing | Via `/kmgraph:kmg-sync-all` |
-| sync-all-agent | Executing KG sync pipeline | Via `/kmgraph:kmg-sync-all` command |
+| knowledge-extractor | Batch KG extraction and parsing | Via `/kmgraph:kmg-backfill` |
 | create-adr-agent | ADR creation wizard | Via `/kmgraph:kmg-create-adr` command |
-| knowledge-reviewer | Quality review for lessons and ADRs | Via `/kmgraph:kmg-update-graph` command |
 
 See [Concepts Guide](concepts/why-kmgraph.md) § Four-Layer Architecture for full agent overview and when each operates.
 
@@ -149,11 +146,8 @@ Use for: full session parsing across multiple branches, automated session summar
 ### Knowledge Graph Updates (knowledge-extractor)
 Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 ```bash
-# Before delegation (default)
-/kmgraph:kmg-update-graph  # Processes all new lessons in-context
-
-# Suggested delegation
-# (Assistant suggests: "For 50+ KB of lessons, delegate to knowledge-extractor")
+# Default behavior — delegates to knowledge-extractor automatically
+/kmgraph:kmg-backfill  # Reads lessons/decisions/chat-history via the knowledge-extractor subagent
 ```
 
 ---
@@ -170,7 +164,7 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 - **Target Knowledge Graph**: The knowledge graph a command operates on, resolved from the current working directory — not a manually selected "active" graph
 - **Session Summary**: Markdown summary of a chat session extracted from conversation history
 - **Recall**: Unified search across lessons learned, decisions, knowledge graph, and session summaries
-- **Search Index** (`kg_fts5_rebuild`): Optional catalog of all knowledge graph content. Build or refresh it for faster, relevance-ranked search results. Updates automatically during sync-all once enabled
+- **Search Index** (`kg_fts5_rebuild`): Optional catalog of all knowledge graph content. Build or refresh it for faster, relevance-ranked search results
 
 ---
 
@@ -194,8 +188,8 @@ Use for: bulk lesson extraction (10+ lessons at once), pattern analysis
 2. `/kmgraph:kmg-capture-lesson`
    → Document it while fresh in your mind
 
-3. `/kmgraph:kmg-update-graph`
-   → Sync to knowledge graph for quick reference
+3. `/kmgraph:kmg-backfill`
+   → Index into the knowledge graph for quick reference
 
 ### Before Sharing Code (2 minutes)
 

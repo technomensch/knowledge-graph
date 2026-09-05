@@ -389,7 +389,7 @@ See [META-ISSUE-GUIDE.md](./META-ISSUE-GUIDE.md) for a detailed guide.
 
 **When:** A lesson contains a reusable pattern, concept, or common pitfall worth preserving as a quick-reference entry.
 
-**Claude Code equivalent:** `/kmgraph:kmg-update-graph`
+**Claude Code equivalent:** `/kmgraph:kmg-backfill`
 
 ### Extract a Pattern
 

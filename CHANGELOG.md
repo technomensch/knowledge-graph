@@ -9,6 +9,20 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.7] — 2026-09-05
+
+### Added
+- `kmg-backfill` — new standalone command consolidating chat-history/lessons-learned/decisions extraction into one confirm-before-write flow. Replaces `kmg-update-graph`. See ADR-071.
+- `kg_extract` MCP tool — cross-platform equivalent of `kmg-backfill`, for Codex/Gemini users without Claude Code subagent spawning. Read-only; never writes. Closes ENH-025.
+
+### Removed
+- `kmg-update-graph`, `kmg-sync-all`, `sync-all-agent` — confirmed-dead orchestration pipeline, inherited unmodified from an unrelated prior project (`optimize-my-resume`), zero confirmed real-world use ([issue-37](knowledge/issues/issue-37/issue-37-description.md)). Superseded by `kmg-backfill`. See ADR-071.
+
+### Fixed
+- `kmg-init` Step 1.10's `sources[]` array now actually detects `knowledge/lessons-learned/` and `knowledge/decisions/`, and no longer silently skips the whole step when only those (plus chat-history) are present — previously never scanned despite `knowledge-extractor.md` documenting otherwise (real bug, found while validating ENH-034/035 in ADR-071).
+- `mcp-server`'s new `kg_extract` tool hardened after independent review: `sourcePaths` are now validated to actually live under the resolved graph's `chat-history/`/`lessons-learned/`/`decisions/` directories (previously any readable path on disk could be echoed back), resolved via `realpathSync` so a symlink can't be used to escape that scope, against the graph root rather than the process cwd.
+- Assorted dead `kmg-update-graph`/`kmg-sync-all`/`knowledge-reviewer` references left in live docs/skills after the initial removal pass, caught by two independent review rounds — see commit history on `v0.7.7-remove-stale-commands` for the full list.
+
 ## [0.7.6] — 2026-09-01
 
 ### Added

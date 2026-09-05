@@ -40,4 +40,4 @@
 
 ## At session end
 
-- Apply: `rules.md § Knowledge Capture > Cadence & Routing` (run /kmgraph:kmg-sync-all)
+- Apply: `rules.md § Knowledge Capture > Cadence & Routing` (run /kmgraph:kmg-backfill)

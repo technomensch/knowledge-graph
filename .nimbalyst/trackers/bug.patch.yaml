@@ -1,0 +1,89 @@
+# Shared with your team. Saving this file updates it for everyone. Last changed by technomensch.
+
+type: bug
+fields:
+  - name: dependsOn
+    set:
+      name: dependsOn
+      type: relationship
+      relationshipTypeKey: depends-on
+      targetTrackerTypes:
+        - bug
+        - idea
+      multiValue: true
+      displayInline: true
+      inverseFieldId: blockedItems
+      inverseRelationshipTypeKey: blocks
+  - name: blockedItems
+    set:
+      name: blockedItems
+      type: relationship
+      relationshipTypeKey: blocks
+      targetTrackerTypes:
+        - bug
+        - idea
+      multiValue: true
+      displayInline: true
+      inverseFieldId: dependsOn
+      inverseRelationshipTypeKey: depends-on
+  - name: childOf
+    set:
+      name: childOf
+      type: relationship
+      relationshipTypeKey: child-of
+      targetTrackerTypes:
+        - bug
+        - idea
+      multiValue: false
+      displayInline: true
+      inverseFieldId: parentOf
+      inverseRelationshipTypeKey: parent-of
+  - name: parentOf
+    set:
+      name: parentOf
+      type: relationship
+      relationshipTypeKey: parent-of
+      targetTrackerTypes:
+        - bug
+        - idea
+      multiValue: true
+      displayInline: true
+      inverseFieldId: childOf
+      inverseRelationshipTypeKey: child-of
+  - name: relatesTo
+    set:
+      name: relatesTo
+      type: relationship
+      relationshipTypeKey: relates-to
+      targetTrackerTypes:
+        - bug
+        - idea
+        - decision
+      multiValue: true
+      displayInline: false
+      inverseFieldId: relatesTo
+      inverseRelationshipTypeKey: relates-to
+  - name: duplicateOf
+    set:
+      name: duplicateOf
+      type: relationship
+      relationshipTypeKey: duplicates
+      targetTrackerTypes:
+        - bug
+        - idea
+      multiValue: false
+      displayInline: true
+      inverseFieldId: duplicatedBy
+      inverseRelationshipTypeKey: duplicated-by
+  - name: duplicatedBy
+    set:
+      name: duplicatedBy
+      type: relationship
+      relationshipTypeKey: duplicated-by
+      targetTrackerTypes:
+        - bug
+        - idea
+      multiValue: true
+      displayInline: true
+      inverseFieldId: duplicateOf
+      inverseRelationshipTypeKey: duplicates

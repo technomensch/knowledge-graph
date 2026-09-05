@@ -356,13 +356,6 @@ After resolving meta-issue → Create lesson from analysis/lessons-learned.md
 Link lesson back to meta-issue for evidence
 ```
 
-**With /kmgraph:kmg-update-graph:**
-```
-Extract patterns from meta-issue attempts
-Auto-detect when meta-issue has reusable insights
-Suggest KG sync when 3+ belief shifts documented
-```
-
 **With /kmgraph:kmg-session-summary:**
 ```
 Session summaries reference meta-issue progress
@@ -483,4 +476,4 @@ Updated: description.md (current understanding section)
 **Created:** 2026-02-12
 **Version:** 1.0 (Plugin version)
 **Based On:** ADR-008 Meta-Issue Tracking Pattern
-**Related Skills:** /kmgraph:kmg-capture-lesson, /kmgraph:kmg-update-graph, /kmgraph:kmg-session-summary
+**Related Skills:** /kmgraph:kmg-capture-lesson, /kmgraph:kmg-session-summary

@@ -1,3 +1,9 @@
+---
+id: ENH-033
+type: Bug
+status: proposed
+---
+
 # ENH-033: Repo-context auto-detection for `kmg-update-doc` / `kmg-create-doc`
 
 **Status:** 🟡 Proposed

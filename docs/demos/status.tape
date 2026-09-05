@@ -73,10 +73,7 @@ Enter
 Type "echo '  /kmgraph:kmg-recall query    — Search across all KG'"
 Sleep 150ms
 Enter
-Type "echo '  /kmgraph:kmg-sync-all         — Run full sync pipeline'"
-Sleep 150ms
-Enter
-Type "echo '  /kmgraph:kmg-update-graph     — Extract KG entries from lessons'"
+Type "echo '  /kmgraph:kmg-backfill         — Index lessons/decisions/chat-history into the KG'"
 Sleep 150ms
 Enter
 Type "echo '  /kmgraph:kmg-session-summary  — Summarize this session'"

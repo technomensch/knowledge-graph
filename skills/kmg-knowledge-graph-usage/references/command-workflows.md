@@ -666,28 +666,16 @@ ls knowledge/chat-history/
 
 #### Step 4: Update Knowledge Graph
 
-```bash
-# Consolidate lessons into knowledge graph
-/kmgraph:kmg-update-graph
-
-# Processes lessons-learned/:
-# - Extracts patterns
-# - Updates knowledge/templates/patterns.md
-# - Updates knowledge/templates/gotchas.md
-# - Updates knowledge/templates/architecture.md
-# - Preserves git metadata
-```
+Run `/kmgraph:kmg-backfill knowledge/lessons-learned/` to index `lessons-learned/`:
+- Drafts KG-index entries pointing back to each existing lesson file
+- Preserves source file references (no content is duplicated)
+- Presents candidates and confirms before writing anything
 
 #### Step 5: Review Generated Content
 
-**Check knowledge graph files:**
+**Check what was drafted:**
 
-```bash
-# Review what was consolidated
-cat knowledge/templates/patterns.md
-cat knowledge/templates/gotchas.md
-cat knowledge/templates/architecture.md
-```
+Review the candidate KG-index entries `kmg-backfill` presented in Step 4 before approving.
 
 **Edit for:**
 - Clarity and organization
@@ -697,20 +685,7 @@ cat knowledge/templates/architecture.md
 
 #### Step 6: One-Command Alternative
 
-**Use consolidated workflow:**
-
-```bash
-# Single command for complete pipeline
-/kmgraph:kmg-sync-all
-
-# Equivalent to:
-# 1. /kmgraph:kmg-extract-chat
-# 2. Auto-capture lessons from chats
-# 3. /kmgraph:kmg-update-graph
-# 4. Generate session summaries
-```
-
-**Benefit:** Automated end-to-end knowledge consolidation.
+After Step 1 (`kmg-extract-chat`) has populated `chat-history/`, `/kmgraph:kmg-backfill` can combine Steps 2-4 (reviewing chat-history, drafting lesson candidates, and indexing `lessons-learned/`) into a single confirm-before-write pass — run it instead of doing them manually.
 
 ### Consolidation Checklist
 
@@ -1149,15 +1124,7 @@ find knowledge/lessons-learned -name "*.md" -mtime +180
 
 #### Step 5: Update Knowledge Graph
 
-```bash
-# Re-consolidate lessons
-/kmgraph:kmg-update-graph
-
-# Review generated:
-# - knowledge/templates/patterns.md
-# - knowledge/templates/gotchas.md
-# - knowledge/templates/architecture.md
-```
+Run `/kmgraph:kmg-backfill` to index the consolidated `lessons-learned/`/`decisions/` content into the knowledge graph — it drafts KG-index entries pointing back to each file, then review generated candidates:
 
 #### Step 6: Archive or Remove Obsolete
 
@@ -1216,7 +1183,7 @@ rm knowledge/lessons-learned/obsolete-lesson.md
 | End-of-Session | After productive sessions | 5-10 min | 1-2x/day | `/kmgraph:kmg-session-summary` |
 | Problem-Solving | Facing specific problem | Varies | As needed | `/kmgraph:kmg-recall`, `/kmgraph:kmg-capture-lesson` |
 | Complex Investigation | Multi-attempt problems | Multiple sessions | 1-2x/month | `/kmgraph:kmg-meta-issue` |
-| Periodic Consolidation | Knowledge maintenance | 30-60 min | Weekly/bi-weekly | `/kmgraph:kmg-sync-all` |
+| Periodic Consolidation | Knowledge maintenance | 30-60 min | Weekly/bi-weekly | — |
 | Knowledge Search | Finding past knowledge | 2-10 min | Multiple/day | `/kmgraph:kmg-recall` |
 | Team Collaboration | Sharing with team | Continuous | Continuous | Selective git strategy |
 | Project Onboarding | Starting on project | 30-60 min | Once | `cd` into project (auto-resolves), read knowledge graph |
@@ -1238,9 +1205,6 @@ rm knowledge/lessons-learned/obsolete-lesson.md
 
 **"Same issue third time"**
 → `/kmgraph:kmg-meta-issue [number]`
-
-**"Weekly review time"**
-→ `/kmgraph:kmg-sync-all`
 
 **"New project setup"**
 → `/kmgraph:kmg-init [name]`
@@ -1273,7 +1237,6 @@ rm knowledge/lessons-learned/obsolete-lesson.md
 - More efficient than constant updates
 
 **Automation:**
-- Use `/kmgraph:kmg-sync-all` for full pipeline
 - Configure git hooks for validation
 - Automate sensitive data checks
 - Schedule periodic reviews

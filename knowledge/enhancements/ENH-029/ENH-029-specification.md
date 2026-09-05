@@ -1,3 +1,9 @@
+---
+id: ENH-029
+type: Bug
+status: resolved
+---
+
 # ENH-029: Upgrade Inspector Preview Correctness
 
 **Status:** ✅ Resolved in v0.6.7

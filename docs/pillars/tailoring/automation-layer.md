@@ -43,7 +43,7 @@ sequenceDiagram
     Command->>KG: Write lesson (direct, if small)
 
     Note over Hook: PostToolUse fires after write
-    Hook->>Dev: Confirm capture + suggest /kmgraph:kmg-update-graph
+    Hook->>Dev: Confirm capture + suggest /kmgraph:kmg-backfill
 
 ```
 

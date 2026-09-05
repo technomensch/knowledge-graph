@@ -33994,7 +33994,7 @@ function resolveKgPath(config2, params, cwd = process.cwd()) {
 }
 
 // src/cli.ts
-var SERVER_VERSION = true ? "0.7.6" : (() => {
+var SERVER_VERSION = true ? "0.7.7" : (() => {
   try {
     return null.version;
   } catch {

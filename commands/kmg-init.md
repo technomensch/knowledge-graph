@@ -147,7 +147,7 @@ if [ -f "$OLD_DB" ] && [ "$FTS5_MIGRATED" != "true" ]; then
       rm -f /tmp/kg-config-tmp.json
       printf '⚠️  kg-config.json update failed (jq error or invalid output) — original left untouched.\n'
     fi
-    printf '✓ Index location updated. Run kg_fts5_rebuild or /kmgraph:kmg-sync-all to rebuild.\n'
+    printf '✓ Index location updated. Run kg_fts5_rebuild to rebuild.\n'
   else
     printf 'Skipped. Search continues via linear scan until you choose to migrate.\n'
   fi
@@ -182,7 +182,7 @@ REAL_DB=$(find "$INDEX_DIR" -maxdepth 1 -type f \
   2>/dev/null | head -1)
 if [ -z "$REAL_DB" ]; then
   echo "ℹ️  Skipping stale FTS5 cleanup — no index found for \"${kg_name}\" under $INDEX_DIR."
-  echo "   Run /kmgraph:kmg-sync-all to build it first, then re-run /kmgraph:kmg-init."
+  echo "   Build the index first, then re-run /kmgraph:kmg-init."
   # exit_step
 fi
 
@@ -652,12 +652,14 @@ KG_ENTRY_COUNT=$(find "knowledge/knowledge" -name "*.md" ! -name "*template*" 2>
 if [ "$LESSON_COUNT" -gt 0 ] && [ "$KG_ENTRY_COUNT" -eq 0 ]; then
   echo "⚠️  $LESSON_COUNT lessons migrated but no KG entries exist yet."
   echo ""
-  echo "  Run /kmgraph:kmg-update-graph to extract patterns from your lessons?"
+  echo "  Extract patterns from your lessons now?"
   echo "  This populates knowledge/ with structured entries for fast recall."
   echo ""
-  echo "    1. Yes — run update-graph now"
+  echo "    1. Yes — run extraction now"
   echo "    2. Skip — I'll run it later"
-  # If Yes: invoke /kmgraph:kmg-update-graph --auto --sync-all
+  # If the user selects Yes: invoke /kmgraph:kmg-backfill knowledge/lessons-learned/
+  # (see commands/kmg-backfill.md) — it drafts KG-index entries from the migrated
+  # lessons and confirms before writing. If Skip: continue, extraction can be run anytime.
 fi
 
 # h. Content migration offer — populate me.md and rules.md from existing CLAUDE.md
@@ -929,7 +931,7 @@ Parameters:
 
 #### 1g. Knowledge extraction check
 
-The `knowledge/` directory holds structured patterns, concepts, and gotchas extracted from lessons. It is populated by `/kmgraph:kmg-update-graph` and is never populated automatically. Check whether extraction has been run:
+The `knowledge/` directory holds structured patterns, concepts, and gotchas extracted from lessons. It is never populated automatically. Check whether extraction has been run:
 
 ```bash
 LESSON_COUNT=$(find "$KG_ROOT/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
@@ -938,13 +940,14 @@ KG_COUNT=$(find "$KG_ROOT/knowledge" -name "*.md" ! -name "*template*" 2>/dev/nu
 if [ "$LESSON_COUNT" -gt 0 ] && [ "$KG_COUNT" -eq 0 ]; then
   echo "⚠️  knowledge/ is empty — $LESSON_COUNT lessons exist but patterns have never been extracted."
   echo ""
-  echo "  Run /kmgraph:kmg-update-graph now to populate structured KG entries?"
+  echo "  Extract patterns from existing lessons now to populate structured KG entries?"
   echo "    1. Yes — extract patterns from existing lessons"
   echo "    2. Skip for now"
 fi
 ```
 
-If the user selects **Yes**, run `/kmgraph:kmg-update-graph --auto --sync-all`. The `--auto` flag skips per-lesson prompts (consent was given by answering Yes here) and `--sync-all` processes all lessons with missing entries in one pass. If the user selects **Skip**, continue — `update-graph` can be run at any time.
+If the user selects **Yes**: invoke `/kmgraph:kmg-backfill knowledge/lessons-learned/` (see `commands/kmg-backfill.md`) — it drafts KG-index entries from the existing lessons and confirms before writing.
+If the user selects **Skip**, continue — extraction can be run at any time.
 
 #### 1h. Output verification summary
 
@@ -1582,11 +1585,24 @@ Run Step 1.10 whenever the project has existing content directories to scan.
 **Detect which sources are present (record the matched path for each):**
 ```bash
 sources=()
+backfill_sources=()   # each entry routed through its own /kmgraph:kmg-backfill invocation, below
+
 if [ -d "knowledge/chat-history" ]; then
-  sources+=("knowledge/chat-history/")
+  backfill_sources+=("knowledge/chat-history/")
 elif [ -d "chat-history" ]; then
-  sources+=("chat-history/")
+  backfill_sources+=("chat-history/")
 fi
+if [ -d "knowledge/lessons-learned" ]; then
+  backfill_sources+=("knowledge/lessons-learned/")
+elif [ -d "lessons-learned" ]; then
+  backfill_sources+=("lessons-learned/")
+fi
+if [ -d "knowledge/decisions" ]; then
+  backfill_sources+=("knowledge/decisions/")
+elif [ -d "decisions" ]; then
+  backfill_sources+=("decisions/")
+fi
+
 if [ -d "knowledge/plans" ]; then
   sources+=("knowledge/plans/")
 elif [ -d "plans" ]; then
@@ -1598,35 +1614,42 @@ fi
 [ -f "CHANGELOG.md" ] && sources+=("CHANGELOG.md")
 ```
 
-If `${#sources[@]} -eq 0`: skip this step silently — no content to scan.
+If `${#sources[@]} -eq 0 && ${#backfill_sources[@]} -eq 0`: skip this step entirely — no content to scan.
 
-**Prompt user:**
+**Prompt user (combining both source groups in one y/N — both need the same confirm-before-write treatment):**
 ```
 Would you like to backfill the knowledge graph from existing project content? [y/N]
 
 Found these sources to scan:
-  [list each entry in sources[] on its own line with •]
+  [list each entry in sources[] AND backfill_sources[] on its own line with •]
 
-The knowledge-extractor subagent will return lesson and decision candidates.
-You review and approve before anything is written.
+Candidates will be drafted and presented for your review before anything is written.
 ```
 
-**If yes:**
+**If yes, and `backfill_sources[]` is non-empty:**
+1. For **each entry** in `backfill_sources[]` (one of `chat-history/`, `lessons-learned/`, `decisions/`, in either its `knowledge/`-prefixed or bare form — whichever was actually matched in Step 1.10's detection above): invoke `/kmgraph:kmg-backfill <entry>`, passing that single matched path as `kmg-backfill`'s `[path]` argument (see `commands/kmg-backfill.md` Steps 1-4). `kmg-backfill` only accepts one `[path]` at a time — do not pass the whole array in a single call. Each invocation runs its own confirm-before-write flow independently of Step 1.10's `sources[]` branch below.
+
+**If yes, and `sources[]` (plans/research/specs/README/CHANGELOG) is non-empty:**
 1. Invoke `knowledge-extractor` subagent in **"init-backfill" mode** — pass mode="init-backfill" explicitly
-2. Pass the `sources[]` array to the subagent (actual matched paths)
+2. Pass the `sources[]` array to the subagent (actual matched paths — no longer includes chat-history/lessons-learned/decisions, those are `kmg-backfill`'s job now)
 3. Subagent returns a structured candidate list (lessons, ADRs, patterns, gotchas) — it does NOT write
 4. Present candidates to user for review; user selects which to approve
 5. Show explicit confirmation: "I will write N files to the knowledge graph. Confirm? [y/N]"
 6. On user confirmation: coordinator writes approved candidates directly
 7. Output summary of written entries
 
+**On non-Claude-Code platforms without subagent spawning** (Codex, Gemini before an equivalent lands): `kmg-backfill`'s `--delegate knowledge-extractor` step isn't reachable — fall back to the `kg_extract` MCP tool directly, called once per `backfill_sources[]` entry, for that portion.
+
+**Final output** (report only the section(s) for the branch(es) that actually ran — do not print a section whose branch didn't run):
 ```
 ✅ Backfill complete!
 
-Discovered and added:
-  • X lessons from existing documentation
-  • Y architecture decisions from CHANGELOG
-  • Z patterns from source files
+From chat-history/lessons-learned/decisions (via kmg-backfill, if backfill_sources[] ran):
+  • X entries indexed/drafted
+
+From plans/research/specs/README/CHANGELOG (if sources[] ran):
+  • Y lessons from existing documentation
+  • Z architecture decisions from CHANGELOG
 
 Review these entries in your KG and edit as needed.
 ```

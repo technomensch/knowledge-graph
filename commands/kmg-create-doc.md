@@ -495,7 +495,6 @@ Proceed? (yes / change details / cancel)
 - `/kmgraph:kmg-capture-lesson` — Document lessons learned and solved problems
 - `/kmgraph:kmg-create-adr` — Create Architecture Decision Records
 - `/kmgraph:kmg-recall` — Search existing documentation and knowledge
-- `/kmgraph:kmg-sync-all` — Full knowledge pipeline sync
 
 ---
 

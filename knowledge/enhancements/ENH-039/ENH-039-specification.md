@@ -1,3 +1,9 @@
+---
+id: ENH-039
+type: Bug
+status: resolved
+---
+
 # ENH-039: Rule-injection scripts hardcode personal split-file names instead of discovering them
 
 **Status:** ✅ Resolved

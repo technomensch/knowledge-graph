@@ -70,7 +70,7 @@ This guide focuses on **platform capabilities and usage patterns** after install
 - No automated git metadata tracking
 - No bidirectional MEMORY.md sync
 - Manual category README updates
-- No automated pipelines (`/kmgraph:kmg-sync-all` equivalent)
+- No automated pipelines (`/kmgraph:kmg-backfill` equivalent — use the `kg_extract` MCP tool instead)
 
 **Workaround:** Use manual workflows from [WORKFLOWS.md](./WORKFLOWS.md) + Cursor Composer for assistance
 
@@ -152,7 +152,7 @@ This guide focuses on **platform capabilities and usage patterns** after install
 **Limitations:**
 - No Claude Code commands (22 commands are Claude Code-specific)
 - No SessionStart hooks
-- No automated pipeline (`/kmgraph:kmg-sync-all` equivalent)
+- No automated pipeline (`/kmgraph:kmg-backfill` equivalent — use the `kg_extract` MCP tool instead)
 
 ---
 

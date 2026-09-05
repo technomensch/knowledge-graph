@@ -1,3 +1,9 @@
+---
+id: ENH-032
+type: Bug
+status: resolved
+---
+
 # ENH-032: Knowledge-Extractor Approval Gate Blocks Coordinator Relay
 
 **Status:** ✅ Resolved in v0.6.15

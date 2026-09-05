@@ -1,8 +1,15 @@
+---
+id: ENH-030
+type: Enhancement
+status: proposed
+---
+
 # ENH-030: KG Remove / Unregister Command
 
 **Status:** 🟡 Proposed
 **Discovered:** 2026-06-28
 **Related:** `kmg-init`, `kmg-switch`, `kmg-list`
+**GitHub Issue:** #256
 
 ---
 

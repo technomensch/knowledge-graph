@@ -89,7 +89,7 @@ graph TB
 
 ## Routing captures by level
 
-All capture commands (`session-summary`, `create-adr`, `capture-lesson`, `sync-all`) and `recall` accept an explicit routing flag — or recognize equivalent natural language in the invocation message:
+All capture commands (`session-summary`, `create-adr`, `capture-lesson`) and `recall` accept an explicit routing flag — or recognize equivalent natural language in the invocation message:
 
 | Signal | Resolves to | Behavior |
 |---|---|---|

@@ -137,21 +137,46 @@ marketplace.json (embedded plugin entry)|${MARKETPLACE_JSON}|.plugins[0].version
     fi
   fi
 
-  # Advisory: CHANGELOG should reference the version being pushed
+  # Advisory: CHANGELOG's latest release header should match package.json.
+  # Anchor-compare against the top ## [X.Y.Z] header, not a substring search
+  # across the whole file — a presence check matches ANY historical mention
+  # of the version string (e.g. inside an older changelog-style entry),
+  # which silently passes even when the real "current version" is stale.
   CHANGELOG="${REPO_ROOT}/CHANGELOG.md"
   if [ -n "$PKG_VER" ] && [ -f "$CHANGELOG" ]; then
-    if ! grep -qF "$PKG_VER" "$CHANGELOG" 2>/dev/null; then
-      FINDINGS="${FINDINGS}CHANGELOG ADVISORY: version ${PKG_VER} not found in CHANGELOG.md. Add a release entry before pushing.
+    CHANGELOG_VER=$(grep -m1 -E '^## \[[0-9]' "$CHANGELOG" 2>/dev/null | sed -E 's/^## \[([0-9A-Za-z.+-]+)\].*/\1/')
+    if [ -z "$CHANGELOG_VER" ]; then
+      FINDINGS="${FINDINGS}CHANGELOG ADVISORY: no versioned release header (## [X.Y.Z]) found. Add a release entry before pushing.
+"
+    elif [ "$PKG_VER" != "$CHANGELOG_VER" ]; then
+      FINDINGS="${FINDINGS}CHANGELOG ADVISORY: latest release header is [${CHANGELOG_VER}], but package.json is ${PKG_VER}. Add/update the release entry before pushing.
 "
     fi
   fi
 
-  # Advisory: README should reference the version being pushed
+  # Advisory: README's version declaration lines should match package.json.
+  # Same anchor-compare fix as CHANGELOG above — checks the actual
+  # **Version:** and **Current Version:** declaration lines, not a
+  # substring search that can match a stale historical mention elsewhere
+  # in the file (the exact miss that let a real README drift ship silently:
+  # a changelog-style entry inside README.md happened to contain the current
+  # version string while both real declaration lines were stale).
   README="${REPO_ROOT}/README.md"
   if [ -n "$PKG_VER" ] && [ -f "$README" ]; then
-    if ! grep -qF "$PKG_VER" "$README" 2>/dev/null; then
-      FINDINGS="${FINDINGS}README ADVISORY: version ${PKG_VER} not found in README.md. Update the version reference before pushing.
+    README_VER=$(grep -m1 -E '^\*\*Version:\*\*' "$README" 2>/dev/null | sed -E 's/^\*\*Version:\*\* *v?//')
+    README_CURRENT_VER=$(grep -m1 -E '^\*\*Current Version:\*\*' "$README" 2>/dev/null | sed -E 's/^\*\*Current Version:\*\* *v?([0-9.]+).*/\1/')
+    if [ -z "$README_VER" ] && [ -z "$README_CURRENT_VER" ]; then
+      FINDINGS="${FINDINGS}README ADVISORY: no '**Version:**' or '**Current Version:**' declaration line found. Update the version reference before pushing.
 "
+    else
+      if [ -n "$README_VER" ] && [ "$PKG_VER" != "$README_VER" ]; then
+        FINDINGS="${FINDINGS}README ADVISORY: '**Version:**' line reads ${README_VER}, but package.json is ${PKG_VER}. Update the version line before pushing.
+"
+      fi
+      if [ -n "$README_CURRENT_VER" ] && [ "$PKG_VER" != "$README_CURRENT_VER" ]; then
+        FINDINGS="${FINDINGS}README ADVISORY: '**Current Version:**' line reads ${README_CURRENT_VER}, but package.json is ${PKG_VER}. Update the version line before pushing.
+"
+      fi
     fi
   fi
 fi

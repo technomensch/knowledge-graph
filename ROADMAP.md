@@ -22,8 +22,8 @@ A filtered, ranked view onto the sections below — not a replacement for them. 
 
 ### Tier 2 — Blocked on one decision (ENH-034)
 
-- **ENH-034 — Command rename decision (Option A/B still open).** Whether `kmg-update-graph` becomes `kmg-ingest-graph` and `kmg-update-issue-plan` becomes `kmg-propagate-issue-plan`. Two other items are stuck waiting on this one call — resolve it and both unlock.
-- **ENH-026 remainder — KG Write Guard.** `kmg-sync-all` guard + `run_extraction.py` bypass-proof check + ADR-019 supersession. A write-path integrity control that prevents bad or bypassed writes to the KG. The `kmg-update-graph` half is already done; the rest is held pending ENH-034 because the guard needs the final command names.
+- **ENH-034 — Command rename decision.** Decided 2026-09-04: Option C, removal — see ADR-071. The prior lesson/decision indexing command was removed and replaced by `kmg-backfill`; `kmg-update-issue-plan` keeps its current name (Option A, no rename).
+- **ENH-026 remainder — KG Write Guard.** `run_extraction.py` bypass-proof check + ADR-019 supersession. A write-path integrity control that prevents bad or bypassed writes to the KG. Both guard pieces this item originally scoped are moot now that the commands they guarded were removed (ADR-071) — remaining scope needs re-assessment, tracked for follow-up.
 - **ENH-042 — Release-doc-sync mechanism.** Three disconnected mechanisms currently try to keep README/version/ROADMAP/CHANGELOG in sync and drift apart because nothing forces them to agree. It gets more expensive to untangle the longer it sits, and it's also held pending ENH-034.
 
 ### Tier 3 — Decision-debt (no code needed, just make a call)
@@ -141,8 +141,8 @@ These items were identified during the v0.0.6-docs-restructure planning session 
 Full detail, file:line evidence, and verdicts for every item below: `knowledge/analysis/outstanding-items-inventory-2026-07-11.md`. Batch A items (status-label corrections) are already closed out above/via this same commit — not repeated here.
 
 **Next branch focus — command cluster:**
-- ENH-034 — Capture-pipeline command naming and grouping (targeted renames `kmg-update-graph`→`kmg-ingest-graph`?, `kmg-update-issue-plan`→`kmg-propagate-issue-plan`?; Option A/B decision still open)
-- ENH-026 (remainder) — KG Write Guard: `kmg-sync-all` guard + `run_extraction.py` bypass-proof check + ADR-019 supersession. The `kmg-update-graph` piece is already done; held pending ENH-034's naming decision (cross-linked in both specs)
+- ENH-034 — Capture-pipeline command naming and grouping. Decided 2026-09-04: Option C, removal — see ADR-071 (prior lesson/decision indexing command removed, replaced by `kmg-backfill`); `kmg-update-issue-plan` kept as-is, no rename
+- ENH-026 (remainder) — KG Write Guard: `run_extraction.py` bypass-proof check + ADR-019 supersession. Both guard pieces this item originally scoped are moot now that the commands they guarded were removed (ADR-071) — remaining scope needs re-assessment
 - ENH-042 — Three disconnected release-doc-sync mechanisms leave README/version/ROADMAP/CHANGELOG chronically out of sync; held pending ENH-034 (cross-linked in both specs)
 - Command-surface reduction / whether `kmg-update-issue-plan` should be a hook instead of a command — untracked, no ENH yet; needs its own brainstorm before scoping
 

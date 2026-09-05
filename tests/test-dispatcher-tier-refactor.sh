@@ -50,20 +50,8 @@ else
   fail "session-summary.md does NOT reference ai-model-tier-resolver"
 fi
 
-# Test 4: sync-all.md references tier resolver
-echo "Test 4: sync-all.md references tier resolver"
-set +e
-grep -q "ai-model-tier-resolver" "$COMMANDS_DIR/kmg-sync-all.md"
-result=$?
-set -e
-if [ $result -eq 0 ]; then
-  pass "sync-all.md references ai-model-tier-resolver"
-else
-  fail "sync-all.md does NOT reference ai-model-tier-resolver"
-fi
-
-# Test 5: capture-lesson.md no hardcoded Opus model
-echo "Test 5: capture-lesson.md no hardcoded Opus model"
+# Test 4: capture-lesson.md no hardcoded Opus model
+echo "Test 4: capture-lesson.md no hardcoded Opus model"
 set +e
 grep -q "claude-opus-4-7" "$COMMANDS_DIR/kmg-capture-lesson.md"
 result=$?
@@ -74,8 +62,8 @@ else
   fail "capture-lesson.md contains hardcoded model name claude-opus-4-7 (should use tier resolver)"
 fi
 
-# Test 6: session-summary.md no hardcoded Opus model
-echo "Test 6: session-summary.md no hardcoded Opus model"
+# Test 5: session-summary.md no hardcoded Opus model
+echo "Test 5: session-summary.md no hardcoded Opus model"
 set +e
 grep -q "claude-opus-4-7" "$COMMANDS_DIR/kmg-session-summary.md"
 result=$?
@@ -86,19 +74,7 @@ else
   fail "session-summary.md contains hardcoded model name claude-opus-4-7 (should use tier resolver)"
 fi
 
-# Test 7: sync-all.md no hardcoded Opus model
-echo "Test 7: sync-all.md no hardcoded Opus model"
-set +e
-grep -q "claude-opus-4-7" "$COMMANDS_DIR/kmg-sync-all.md"
-result=$?
-set -e
-if [ $result -ne 0 ]; then
-  pass "sync-all.md does not contain hardcoded claude-opus-4-7"
-else
-  fail "sync-all.md contains hardcoded model name claude-opus-4-7 (should use tier resolver)"
-fi
-
-# Test 8: Agents with subagent dispatch reference tiers (warnings only)
+# Test 6: Agents with subagent dispatch reference tiers (warnings only)
 echo ""
 echo "── Agent tier reference check (warnings only) ──────────────────"
 for agent_file in "$AGENTS_DIR"/*.md; do
