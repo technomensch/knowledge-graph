@@ -69,7 +69,7 @@
    common way this convention drifts out of sync (issue-45).
 2. **Update understanding:** Edit `analysis/root-cause-evolution.md` when beliefs shift
 3. **Extract lessons:** Create lessons-learned when patterns emerge
-4. **Sync to KG:** Run `/kmgraph:kmg-update-graph` to extract insights
+4. **Sync to KG:** Run `/kmgraph:kmg-backfill` to extract insights
 
 ---
 

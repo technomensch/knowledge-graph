@@ -50,27 +50,37 @@ Read `${CLAUDE_PLUGIN_ROOT}/docs/COMMAND-GUIDE.md` and extract every command hea
 Output in this format:
 
 ```
-📚 Knowledge Graph Commands (21 total)
+📚 Knowledge Graph Commands (19 total)
 
 🟢 Essential
   /kmgraph:kmg-init              Initialize a new knowledge graph
-  /kmgraph:kmg-capture-lesson    Document lessons learned and solved problems
   /kmgraph:kmg-status            Display active KG status and stats
   /kmgraph:kmg-recall            Search across all project memory systems
 
+🔄 Capture Pipeline (workflow order)
+  Capture
+    /kmgraph:kmg-capture-lesson       Document lessons learned and solved problems
+                                       (skills: kmg-lesson-capture, kmg-capture-router)
+  Structure
+    /kmgraph:kmg-backfill             Index lessons/decisions/chat-history into the KG
+  Track / Link
+    /kmgraph:kmg-start-issue-tracking Initialize structured issue tracking with Git branch
+    /kmgraph:kmg-link-issue           Link lessons or ADRs to GitHub Issues
+    /kmgraph:kmg-meta-issue           Track complex multi-attempt problems
+  Propagate
+    /kmgraph:kmg-update-issue-plan    Sync progress to plans and GitHub
+  Session
+    /kmgraph:kmg-session-summary      Create a summary of the current chat session
+                                       (skill: kmg-session-wrap)
+    /kmgraph:kmg-handoff              Create cross-session handoff documentation
+                                       (agent: session-documenter)
+
 🟡 Intermediate
   /kmgraph:kmg-add-category      Add a new category to an existing knowledge graph
-  /kmgraph:kmg-session-summary   Create a summary of the current chat session
   /kmgraph:kmg-list              Display all configured knowledge graphs
   /kmgraph:kmg-check-sensitive   Scan for sensitive data before sharing
   /kmgraph:kmg-config-sanitization  Set up pre-commit hooks for sensitive data
   /kmgraph:kmg-extract-chat      Extract chat history from Claude/Gemini logs
-
-🔴 Advanced
-  /kmgraph:kmg-meta-issue        Track complex multi-attempt problems
-  /kmgraph:kmg-start-issue-tracking  Initialize structured issue tracking with Git branch
-  /kmgraph:kmg-update-issue-plan     Sync progress to plans and GitHub
-  /kmgraph:kmg-link-issue        Link lessons or ADRs to GitHub Issues
 
 📄 Documentation
   /kmgraph:kmg-create-doc        Scaffold new documentation files
@@ -159,7 +169,7 @@ Output:
 Display help for any knowledge graph command.
 
 Usage:
-  /kmgraph:kmg-help --list              List all 21 commands
+  /kmgraph:kmg-help --list              List all 19 commands
   /kmgraph:kmg-help <command-name>      Show full help for a command
 
 Examples:
@@ -247,10 +257,13 @@ What would you like to do?
 **Assistant responds:**
 
 ```
-📚 Knowledge Graph Commands (21 total)
+📚 Knowledge Graph Commands (19 total)
 
 🟢 Essential
   /kmgraph:kmg-init              Initialize a new knowledge graph
+  ...
+
+🔄 Capture Pipeline (workflow order)
   ...
 ```
 

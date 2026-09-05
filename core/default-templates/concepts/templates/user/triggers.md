@@ -25,6 +25,6 @@
 
 ## At session end
 
-- Gate: do not close session until sync-all has run
+- Gate: do not close session until backfill has been considered
 - Apply: `rules.md § Knowledge Capture`
-- Run: `/kmgraph:kmg-sync-all`
+- Run: `/kmgraph:kmg-backfill`

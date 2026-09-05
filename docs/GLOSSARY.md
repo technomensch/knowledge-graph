@@ -412,36 +412,6 @@ function detectCategory(title, description) {
 **Pairing with a handoff**: Session summaries are permanent and retrospective; handoff documents are ephemeral and forward-looking. When both are created in the same session, the handoff can reference the summary via an optional `continues_from` field rather than duplicating completed-work content. The summary itself never references the handoff (asymmetric, one-way coupling).
 
 ---
-## Sync Pipeline
-
-> 👍 **What is it?**
->
-> A multi-step process that captures, extracts, and synchronizes knowledge across the system. The full pipeline runs four operations in sequence:
-1. **Capture** — Document a lesson from recent work
-2. **Extract** — Pull key insights into knowledge graph entries
-3. **Sync** — Update MEMORY.md with new patterns
-4. **Summarize** — Create a session summary
-
-**How to run**: The `/kmgraph:kmg-sync-all` command orchestrates all four steps automatically. Individual steps can also be run separately for more control.
-
-**When to use**: At major milestones, end-of-week reviews, or before sharing knowledge with the team. Daily use typically involves only Step 1 (capture) and Step 2 (extract).
-
-**Plain English**: A one-command pipeline that captures, organizes, and synchronizes all new knowledge.
-
-**Example:**
-```
-bash
-/kmgraph:kmg-sync-all
-
-# Orchestrates:
-# 1. Capture lesson (if applicable)
-# 2. Update knowledge graph
-# 3. Update MEMORY.md
-# 4. Create session summary
-# 5. Commit everything with links
-```
-
----
 ## Template
 
 > 👍 **What is it?**

@@ -56,17 +56,14 @@ title: Commands Reference
 |---|---|---|
 | [`/kmgraph:kmg-recall`](#recall) | Search all project memory systems; automatically includes personal KG when registered | `--scope=all\|active\|personal-only`, `--user`, `--project`, `--named=<kg>`, `--format=detailed\|paths` |
 | [`/kmgraph:kmg-status`](#status) | High-level KG overview: file counts, last sync, MEMORY.md warnings | `--minimal`, `--json` |
-| [`/kmgraph:kmg-update-graph`](#update-graph) | Extract structured patterns from lessons and sync to knowledge graph entries | `--lesson=<file>`, `--auto`, `--interactive` |
-| [`/kmgraph:kmg-sync-all`](#sync-all) | Run the full sync pipeline: extract → update → MEMORY.md → plan → GitHub | `--auto`, `--dry-run`, `--user`, `--project`, `--named=<kg>` |
+| [`/kmgraph:kmg-backfill`](#backfill) | Index existing lessons/decisions/chat-history into the knowledge graph, drafting candidates for confirmation before writing | `[path]`, `--date=<YYYY-MM-DD>`, `--after=<date>`, `--before=<date>`, `--delegate knowledge-extractor` |
 
 **Examples:**
 ```bash
 /kmgraph:kmg-recall "workflow patterns" --scope=personal-only
 /kmgraph:kmg-recall "auth patterns" --user
-/kmgraph:kmg-update-graph --auto
-/kmgraph:kmg-update-graph --lesson=Pattern_Discovery.md
-/kmgraph:kmg-sync-all --dry-run
-/kmgraph:kmg-sync-all --user
+/kmgraph:kmg-backfill
+/kmgraph:kmg-backfill --after=2026-08-01 --before=2026-08-31
 ```
 
 ---
@@ -76,7 +73,6 @@ title: Commands Reference
 | Command | Description | Key flags |
 |---|---|---|
 | [`/kmgraph:kmg-session-summary`](#session-summary) | Create or append a session summary; snapshot mode skips the review gate | `--auto`, `--snapshot`, `--user`, `--project`, `--named=<kg>` |
-| [`/kmgraph:kmg-sync-all`](#sync-all) | Orchestrate full knowledge sync in one command | `--auto`, `--dry-run` |
 
 **Examples:**
 ```bash

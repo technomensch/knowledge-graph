@@ -67,7 +67,7 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 
 ### 🟡 Intermediate Commands (Once Comfortable)
 
-- `/kmgraph:kmg-update-graph` — Extract knowledge graph entries from lessons
+- `/kmgraph:kmg-backfill` — Index lessons/decisions/chat-history into the knowledge graph
 - `/kmgraph:kmg-add-category` — Add a new category to existing knowledge graph
 - `/kmgraph:kmg-session-summary` — Create summary of current chat session
 - `/kmgraph:kmg-list` — Display all configured knowledge graphs
@@ -83,7 +83,6 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 - `/kmgraph:kmg-start-issue-tracking` — Initialize issue tracking with structured docs and Git branch
 - `/kmgraph:kmg-update-issue-plan` — Sync knowledge graph → plan → issue → GitHub
 - `/kmgraph:kmg-link-issue` — Manually link existing lesson or ADR to GitHub issue
-- `/kmgraph:kmg-sync-all` — Automated full sync pipeline (4 steps → 1 command)
 - `/kmgraph:kmg-handoff` — Create comprehensive handoff documentation for transitions, context limits, or onboarding
 
 ---

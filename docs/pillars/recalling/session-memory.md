@@ -30,7 +30,7 @@ At session start, the SessionStart hook reads `MEMORY.md` and loads it into cont
 
 ## How to keep it fresh
 
-Run `/kmgraph:kmg-update-graph` after capturing new lessons. This extracts entries from your session notes and updates the MEMORY.md index so future sessions benefit.
+Run `/kmgraph:kmg-backfill` after capturing new lessons or decisions. This indexes them into the knowledge graph so MEMORY.md's pointers stay useful for future sessions.
 
 ## Related
 

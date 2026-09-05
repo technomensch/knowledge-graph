@@ -33,7 +33,7 @@ The following agents never write files or push commits without user approval:
 Most agents are invoked automatically. To delegate a heavy operation explicitly:
 
 ```bash
-/kmgraph:kmg-update-graph --delegate knowledge-extractor
+/kmgraph:kmg-backfill --delegate knowledge-extractor
 /kmgraph:kmg-session-summary --delegate session-documenter
 /kmgraph:kmg-extract-chat --delegate knowledge-extractor
 ```

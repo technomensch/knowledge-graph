@@ -235,7 +235,7 @@ When you invoke a command/skill, it automates:
 - **`/kmgraph:kmg-capture-lesson`:** Auto-categorizes, updates indexes, creates cross-refs, commits
 - **`/kmgraph:kmg-session-summary`:** Auto-detects session type, extracts key artifacts, organizes by date
 - **`/kmgraph:kmg-recall`:** Auto-searches across all memory systems, ranks results, formats output
-- **`/kmgraph:kmg-sync-all`:** Runs entire 4-step pipeline with single confirmation
+- **`/kmgraph:kmg-backfill`:** Indexes existing lessons/decisions/chat-history into the graph, with single confirmation before writing
 
 **What's Manual (Triggers):**
 

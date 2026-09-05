@@ -110,7 +110,7 @@ codex plugin add kmgraph@knowledge-management-graph
 - No automated git metadata tracking
 - No bidirectional MEMORY.md sync
 - Manual category README updates
-- No automated pipelines (`/kmgraph:kmg-sync-all` equivalent)
+- No automated pipelines (`/kmgraph:kmg-backfill` equivalent — use the `kg_extract` MCP tool instead)
 
 **Workaround:** Use manual workflows from [session memory](../pillars/recalling/session-memory.md) + Cursor Composer for assistance
 
@@ -192,7 +192,7 @@ codex plugin add kmgraph@knowledge-management-graph
 **Limitations:**
 - No Claude Code commands (22 commands are Claude Code-specific)
 - No SessionStart hooks
-- No automated pipeline (`/kmgraph:kmg-sync-all` equivalent)
+- No automated pipeline (`/kmgraph:kmg-backfill` equivalent — use the `kg_extract` MCP tool instead)
 
 ---
 

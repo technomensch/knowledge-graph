@@ -26,10 +26,10 @@ Select `y`. The backfill automatically processes:
 ## After init
 
 ```bash
-/kmgraph:kmg-update-graph --auto --sync-all
+/kmgraph:kmg-backfill
 ```
 
-This processes all existing lessons silently in one pass without per-lesson prompts. Existing lessons and decisions are never modified — only the search index and graph entries are updated.
+This scans `chat-history/`, `lessons-learned/`, and `decisions/`, drafts candidates, and presents them for confirmation before writing anything. Existing lessons and decisions are never modified — only the knowledge graph's index entries are created or updated.
 
 Confirm with `/kmgraph:kmg-status` (entry count) and `/kmgraph:kmg-recall "topic"` (search works).
 
@@ -87,12 +87,14 @@ The extractor found no scannable sources. Confirm at least one of these exists i
 - `README.md`
 - `CHANGELOG.md`
 
-If sources exist but were missed, run `kmg-update-graph` and point it at the specific directory:
+If sources exist but were missed, re-run `/kmgraph:kmg-init` (it detects the existing KG and re-offers the backfill step) — or, if the missed source is `chat-history/`, `lessons-learned/`, or `decisions/`, run `/kmgraph:kmg-backfill` directly, optionally scoped to a path:
 
 **Claude Code:**
 ```
-/kmgraph:kmg-update-graph --source research/
+/kmgraph:kmg-backfill knowledge/chat-history/2026-08/
 ```
+
+If the missed source is `research/`, `plans/`, or `specs/` instead, `kmg-backfill` can't reach it — re-running `/kmgraph:kmg-init` is the only remedy.
 
 ### Backfill failed mid-run
 

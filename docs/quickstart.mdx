@@ -130,15 +130,14 @@ Shows the active knowledge graph, entry count, and recent captures.
 ```mermaid
 %%{init: { 'flowchart': { 'useMaxWidth': true }, 'theme': 'neutral' }}%%
 graph LR
-    A["📝 Capture<br/>/kmgraph:kmg-capture-lesson"] --> B["📊 Extract<br/>/kmgraph:kmg-update-graph"]
-    B --> C["🔄 Sync<br/>/kmgraph:kmg-sync-all"]
-    C --> D["💾 Summarize<br/>/kmgraph:kmg-session-summary"]
+    A["📝 Capture<br/>/kmgraph:kmg-capture-lesson"] --> B["📊 Structure<br/>/kmgraph:kmg-backfill"]
+    B --> C["💾 Summarize<br/>/kmgraph:kmg-session-summary"]
 
     accTitle: Knowledge Capture Pipeline
-    accDescr: Four-step workflow: Capture lessons feeds into Extract patterns, which feeds into Sync across graphs, which feeds into Summarize session.
+    accDescr: Three-step workflow: Capture lessons feeds into Structure (index into the graph), which feeds into Summarize session.
 ```
 
-Use `/kmgraph:kmg-sync-all` at the end of a session to run all four steps in one command.
+Run `/kmgraph:kmg-backfill` any time to index existing lessons, decisions, or chat-history into the graph, and `/kmgraph:kmg-session-summary` at the end of a session to capture what happened.
 
 ---
 

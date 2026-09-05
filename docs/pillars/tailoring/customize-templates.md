@@ -35,7 +35,7 @@ All templates live in `core/default-templates/`. When the MCP server or a comman
 | Architecture Decision Record | `core/default-templates/decisions/ADR-template.md` | `/kmgraph:kmg-create-adr` |
 | Session summary | `core/default-templates/sessions/session-template.md` | `/kmgraph:kmg-session-summary` |
 | MEMORY.md | `core/default-templates/MEMORY-template.md` | `/kmgraph:kmg-init` |
-| Knowledge entry | `core/default-templates/concepts/entry-template.md` | `/kmgraph:kmg-update-graph` |
+| Knowledge entry | `core/default-templates/concepts/entry-template.md` | `/kmgraph:kmg-backfill` |
 | Meta-issue | `core/default-templates/meta-issue/meta-issue-template.md` | `/kmgraph:kmg-start-issue-tracking` |
 
 ## Copy the template

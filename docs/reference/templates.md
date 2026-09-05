@@ -36,16 +36,16 @@ For customization guidance, see [Customize Templates](../pillars/tailoring/custo
 
 ## Knowledge Graph Entries
 
-These templates live under `core/default-templates/concepts/` and provide per-category structures for the knowledge graph. Most entries are auto-generated from lessons via `/kmgraph:kmg-update-graph`; use these templates when creating entries directly.
+These templates live under `core/default-templates/concepts/` and provide per-category structures for the knowledge graph. Most entries are auto-generated from lessons/decisions via `/kmgraph:kmg-backfill`; use these templates when creating entries directly.
 
 | File | Category | Purpose | Created by |
 |---|---|---|---|
-| `concepts/entry-template.md` | General | Base template for any standalone KG entry | Manual / `/kmgraph:kmg-update-graph` |
-| `concepts/templates/architecture.md` | Architecture | Architectural components, design decisions, trade-offs | `/kmgraph:kmg-update-graph` |
-| `concepts/templates/concepts.md` | Concepts | Domain terminology and core abstractions | `/kmgraph:kmg-update-graph` |
-| `concepts/templates/gotchas.md` | Gotchas | Pitfalls and anti-patterns; symptom → root cause → fix | `/kmgraph:kmg-update-graph` |
-| `concepts/templates/patterns.md` | Patterns | Reusable solutions discovered from lessons | `/kmgraph:kmg-update-graph` |
-| `concepts/templates/workflows.md` | Workflows | Standard operating procedures and repeatable processes | `/kmgraph:kmg-update-graph` |
+| `concepts/entry-template.md` | General | Base template for any standalone KG entry | Manual / `/kmgraph:kmg-backfill` |
+| `concepts/templates/architecture.md` | Architecture | Architectural components, design decisions, trade-offs | `/kmgraph:kmg-backfill` |
+| `concepts/templates/concepts.md` | Concepts | Domain terminology and core abstractions | `/kmgraph:kmg-backfill` |
+| `concepts/templates/gotchas.md` | Gotchas | Pitfalls and anti-patterns; symptom → root cause → fix | `/kmgraph:kmg-backfill` |
+| `concepts/templates/patterns.md` | Patterns | Reusable solutions discovered from lessons | `/kmgraph:kmg-backfill` |
+| `concepts/templates/workflows.md` | Workflows | Standard operating procedures and repeatable processes | `/kmgraph:kmg-backfill` |
 
 > All paths above are relative to `core/default-templates/`. At init, these files are seeded to `knowledge/templates/` in your live knowledge graph.
 
