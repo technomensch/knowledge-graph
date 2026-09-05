@@ -11,6 +11,7 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ### Added
 - `kmg-backfill` — new standalone command consolidating chat-history/lessons-learned/decisions extraction into one confirm-before-write flow. Replaces `kmg-update-graph`. See ADR-071.
+- `kg_extract` MCP tool — cross-platform equivalent of `kmg-backfill`, for Codex/Gemini users without Claude Code subagent spawning. Read-only; never writes. Closes ENH-025.
 
 ### Removed
 - `kmg-update-graph`, `kmg-sync-all`, `sync-all-agent` — confirmed-dead orchestration pipeline, inherited unmodified from an unrelated prior project (`optimize-my-resume`), zero confirmed real-world use ([issue-37](knowledge/issues/issue-37/issue-37-description.md)). Superseded by `kmg-backfill`. See ADR-071.

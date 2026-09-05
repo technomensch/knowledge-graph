@@ -3230,8 +3230,8 @@ var require_utils = __commonJS({
       }
       return ind;
     }
-    function removeDotSegments(path13) {
-      let input = path13;
+    function removeDotSegments(path14) {
+      let input = path14;
       const output = [];
       let nextSlash = -1;
       let len = 0;
@@ -3576,8 +3576,8 @@ var require_schemes = __commonJS({
         wsComponent.secure = void 0;
       }
       if (wsComponent.resourceName) {
-        const [path13, query] = wsComponent.resourceName.split("?");
-        wsComponent.path = path13 && path13 !== "/" ? path13 : void 0;
+        const [path14, query] = wsComponent.resourceName.split("?");
+        wsComponent.path = path14 && path14 !== "/" ? path14 : void 0;
         wsComponent.query = query;
         wsComponent.resourceName = void 0;
       }
@@ -6995,12 +6995,12 @@ var require_dist = __commonJS({
         throw new Error(`Unknown format "${name}"`);
       return f;
     };
-    function addFormats(ajv, list, fs13, exportName) {
+    function addFormats(ajv, list, fs14, exportName) {
       var _a2;
       var _b;
       (_a2 = (_b = ajv.opts.code).formats) !== null && _a2 !== void 0 ? _a2 : _b.formats = (0, codegen_1._)`require("ajv-formats/dist/formats").${exportName}`;
       for (const f of list)
-        ajv.addFormat(f, fs13[f]);
+        ajv.addFormat(f, fs14[f]);
     }
     module2.exports = exports2 = formatsPlugin;
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -7367,8 +7367,8 @@ function getErrorMap() {
 
 // node_modules/zod/v3/helpers/parseUtil.js
 var makeIssue = (params) => {
-  const { data, path: path13, errorMaps, issueData } = params;
-  const fullPath = [...path13, ...issueData.path || []];
+  const { data, path: path14, errorMaps, issueData } = params;
+  const fullPath = [...path14, ...issueData.path || []];
   const fullIssue = {
     ...issueData,
     path: fullPath
@@ -7483,11 +7483,11 @@ var errorUtil;
 
 // node_modules/zod/v3/types.js
 var ParseInputLazyPath = class {
-  constructor(parent, value, path13, key) {
+  constructor(parent, value, path14, key) {
     this._cachedPath = [];
     this.parent = parent;
     this.data = value;
-    this._path = path13;
+    this._path = path14;
     this._key = key;
   }
   get path() {
@@ -11410,10 +11410,10 @@ function mergeDefs(...defs) {
 function cloneDef(schema) {
   return mergeDefs(schema._zod.def);
 }
-function getElementAtPath(obj, path13) {
-  if (!path13)
+function getElementAtPath(obj, path14) {
+  if (!path14)
     return obj;
-  return path13.reduce((acc, key) => acc?.[key], obj);
+  return path14.reduce((acc, key) => acc?.[key], obj);
 }
 function promiseAllObject(promisesObj) {
   const keys = Object.keys(promisesObj);
@@ -11796,11 +11796,11 @@ function aborted(x, startIndex = 0) {
   }
   return false;
 }
-function prefixIssues(path13, issues) {
+function prefixIssues(path14, issues) {
   return issues.map((iss) => {
     var _a2;
     (_a2 = iss).path ?? (_a2.path = []);
-    iss.path.unshift(path13);
+    iss.path.unshift(path14);
     return iss;
   });
 }
@@ -11983,7 +11983,7 @@ function formatError(error48, mapper = (issue2) => issue2.message) {
 }
 function treeifyError(error48, mapper = (issue2) => issue2.message) {
   const result = { errors: [] };
-  const processError = (error49, path13 = []) => {
+  const processError = (error49, path14 = []) => {
     var _a2, _b;
     for (const issue2 of error49.issues) {
       if (issue2.code === "invalid_union" && issue2.errors.length) {
@@ -11993,7 +11993,7 @@ function treeifyError(error48, mapper = (issue2) => issue2.message) {
       } else if (issue2.code === "invalid_element") {
         processError({ issues: issue2.issues }, issue2.path);
       } else {
-        const fullpath = [...path13, ...issue2.path];
+        const fullpath = [...path14, ...issue2.path];
         if (fullpath.length === 0) {
           result.errors.push(mapper(issue2));
           continue;
@@ -12025,8 +12025,8 @@ function treeifyError(error48, mapper = (issue2) => issue2.message) {
 }
 function toDotPath(_path) {
   const segs = [];
-  const path13 = _path.map((seg) => typeof seg === "object" ? seg.key : seg);
-  for (const seg of path13) {
+  const path14 = _path.map((seg) => typeof seg === "object" ? seg.key : seg);
+  for (const seg of path14) {
     if (typeof seg === "number")
       segs.push(`[${seg}]`);
     else if (typeof seg === "symbol")
@@ -24432,13 +24432,13 @@ function resolveRef(ref, ctx) {
   if (!ref.startsWith("#")) {
     throw new Error("External $ref is not supported, only local refs (#/...) are allowed");
   }
-  const path13 = ref.slice(1).split("/").filter(Boolean);
-  if (path13.length === 0) {
+  const path14 = ref.slice(1).split("/").filter(Boolean);
+  if (path14.length === 0) {
     return ctx.rootSchema;
   }
   const defsKey = ctx.version === "draft-2020-12" ? "$defs" : "definitions";
-  if (path13[0] === defsKey) {
-    const key = path13[1];
+  if (path14[0] === defsKey) {
+    const key = path14[1];
     if (!key || !ctx.defs[key]) {
       throw new Error(`Reference not found: ${ref}`);
     }
@@ -33551,7 +33551,7 @@ var os9 = __toESM(require("os"));
 var import_child_process4 = require("child_process");
 
 // src/tools/version.ts
-var pkg = { version: true ? "0.7.6" : "0.0.0" };
+var pkg = { version: true ? "0.7.7" : "0.0.0" };
 var SCHEMA_VERSION = 2;
 function handleVersion() {
   return { installed: pkg.version, schema: SCHEMA_VERSION };
@@ -35609,10 +35609,83 @@ function registerResolveTool(server2, personalScopeSession2) {
   );
 }
 
+// src/tools/extract.ts
+var fs13 = __toESM(require("fs"));
+var path13 = __toESM(require("path"));
+function categoryForPath(p) {
+  if (p.includes("decisions")) return "decision";
+  if (p.includes("chat-history")) return "lesson";
+  return "kg-entry";
+}
+function draftFromFile(filePath) {
+  const content = fs13.readFileSync(filePath, "utf-8");
+  const titleMatch = content.match(/^#\s*(?:Lesson:\s*)?(.+)$/m);
+  const problemMatch = content.match(/##\s*Problem\s*\n+([^\n#]+)/);
+  const solutionMatch = content.match(/##\s*Solution\s*\n+([^\n#]+)/);
+  return {
+    category: categoryForPath(filePath),
+    title: titleMatch ? titleMatch[1].trim() : path13.basename(filePath, ".md"),
+    problem: problemMatch ? problemMatch[1].trim() : void 0,
+    solution: solutionMatch ? solutionMatch[1].trim() : void 0,
+    sourceRef: filePath
+  };
+}
+function collectMarkdownFiles(sourcePath) {
+  const stat = fs13.statSync(sourcePath);
+  if (stat.isFile()) return sourcePath.endsWith(".md") ? [sourcePath] : [];
+  return fs13.readdirSync(sourcePath, { withFileTypes: true }).flatMap((entry) => {
+    const full = path13.join(sourcePath, entry.name);
+    return entry.isDirectory() ? collectMarkdownFiles(full) : entry.isFile() && full.endsWith(".md") ? [full] : [];
+  });
+}
+async function handleExtract(request, workspaceRoot, toolCallMeta) {
+  if (!request.sourcePaths || request.sourcePaths.length === 0) {
+    return { error: "VALIDATION_ERROR", message: "sourcePaths must contain at least one path" };
+  }
+  const config2 = readConfig();
+  const cwd = resolveEffectiveCwd({ processCwd: process.cwd(), toolCallMeta, workspaceRootParam: workspaceRoot });
+  const resolution = resolveGraph(config2, cwd);
+  if (resolution.kind === "not-registered") {
+    return { error: "NOT_REGISTERED", message: "Unknown or unregistered knowledge graph for this directory." };
+  }
+  if (resolution.kind === "no-graph-in-cwd") {
+    return { error: "KG_MISMATCH", message: "No knowledge graph resolved from your current directory. Run /kmgraph:kmg-init first." };
+  }
+  if (resolution.kind === "fuzzy-match" || resolution.kind === "ambiguous-tie") {
+    return { error: "KG_MISMATCH", message: `Multiple candidate graphs found: ${resolution.candidates.join(", ")}. Specify explicitly.` };
+  }
+  if (resolution.kind === "merged") {
+    return { error: "KG_MISMATCH", message: `This graph was merged into "${resolution.into}". Use that graph instead.` };
+  }
+  const targetKgPath = resolution.graph.path;
+  const candidates = request.sourcePaths.flatMap((p) => collectMarkdownFiles(p)).map((filePath) => draftFromFile(filePath));
+  return { candidates, targetKgPath };
+}
+function registerExtractTool(server2) {
+  server2.tool(
+    "kg_extract",
+    "Read-only extraction of lesson/decision/KG-entry candidates from chat-history/, lessons-learned/, or decisions/ paths. Never writes -- pair with kg_capture for the approval-gated write step. Cross-platform equivalent of kmg-backfill for Codex/Gemini users without Claude Code subagent spawning.",
+    {
+      sourcePaths: external_exports3.array(external_exports3.string()).min(1).describe("One or more paths under chat-history/, lessons-learned/, or decisions/"),
+      workspaceRoot: external_exports3.string().optional().describe("Explicit cwd override, same convention as kg_capture")
+    },
+    async ({ sourcePaths, workspaceRoot }, extra) => {
+      const result = await handleExtract({ sourcePaths }, workspaceRoot, extra?._meta);
+      if ("error" in result) {
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+          isError: true
+        };
+      }
+      return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+    }
+  );
+}
+
 // src/index.ts
 var server = new McpServer({
   name: "knowledge-graph",
-  version: true ? "0.7.6" : "0.0.0"
+  version: true ? "0.7.7" : "0.0.0"
 });
 var personalScopeSession = new PersonalScopeSession();
 var crossKgSearchSession = new CrossKgSearchSession();
@@ -35627,6 +35700,7 @@ registerUpgradeTool(server, personalScopeSession);
 registerVersionTool(server);
 registerCompareTools(server, personalScopeSession);
 registerResolveTool(server, personalScopeSession);
+registerExtractTool(server);
 registerConfigResource(server);
 registerTemplatesResource(server);
 async function main() {
