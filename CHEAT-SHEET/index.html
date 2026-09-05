@@ -5,8 +5,8 @@
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">Cheat Sheet | Knowledge Management Graph</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://technomensch.github.io/knowledge-graph/CHEAT-SHEET"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Cheat Sheet | Knowledge Management Graph"><meta data-rh="true" name="description" content="Version 2026-04-22"><meta data-rh="true" property="og:description" content="Version 2026-04-22"><link data-rh="true" rel="icon" href="/knowledge-graph/img/square.png"><link data-rh="true" rel="canonical" href="https://technomensch.github.io/knowledge-graph/CHEAT-SHEET"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/CHEAT-SHEET" hreflang="en"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/CHEAT-SHEET" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Cheat Sheet","item":"https://technomensch.github.io/knowledge-graph/CHEAT-SHEET"}]}</script><link rel="alternate" type="application/rss+xml" href="/knowledge-graph/docs-updates/rss.xml" title="KMGraph Docs Updates RSS Feed">
 <link rel="alternate" type="application/atom+xml" href="/knowledge-graph/docs-updates/atom.xml" title="KMGraph Docs Updates Atom Feed"><link rel="stylesheet" href="/knowledge-graph/assets/css/styles.212119a5.css">
-<script src="/knowledge-graph/assets/js/runtime~main.afefa8d5.js" defer="defer"></script>
-<script src="/knowledge-graph/assets/js/main.6d1a038a.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/runtime~main.39edd34d.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/main.54d5c05b.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -29,7 +29,7 @@
 <li class=""><strong>Set up team knowledge sharing</strong> → <code>/kmgraph:kmg-config-sanitization</code></li>
 <li class=""><strong>Summarize my current chat session</strong> → <code>/kmgraph:kmg-session-summary</code></li>
 <li class=""><strong>Extract my chat history</strong> → <code>/kmgraph:kmg-extract-chat</code></li>
-<li class=""><strong>Sync lessons to the knowledge graph</strong> → <code>/kmgraph:kmg-update-graph</code></li>
+<li class=""><strong>Index lessons/decisions/chat-history into the knowledge graph</strong> → <code>/kmgraph:kmg-backfill</code></li>
 <li class=""><strong>Check for sensitive data before sharing</strong> → <code>/kmgraph:kmg-check-sensitive</code></li>
 <li class=""><strong>Work with multiple knowledge graphs</strong> → <code>/kmgraph:kmg-list</code> to see all configured graphs; each command run from a project&#x27;s directory automatically targets that project&#x27;s graph (no switching needed)</li>
 <li class=""><strong>Link lessons to GitHub issues</strong> → <code>/kmgraph:kmg-link-issue</code></li>
@@ -114,7 +114,7 @@
 
 
 
-<table><thead><tr><th>Command</th><th>Purpose</th></tr></thead><tbody><tr><td><code>/kmgraph:kmg-update-graph</code></td><td>Extract knowledge graph entries from lessons. Uses background file reading for large batches when context-mode is installed</td></tr><tr><td><code>/kmgraph:kmg-add-category</code></td><td>Add a new category to existing knowledge graph</td></tr><tr><td><code>/kmgraph:kmg-session-summary</code></td><td>Create summary of current chat session; <code>--snapshot</code> for lightweight mid-session capture</td></tr><tr><td><code>/kmgraph:kmg-list</code></td><td>Display all configured knowledge graphs</td></tr><tr><td><code>/kmgraph:kmg-check-sensitive</code></td><td>Scan knowledge graph for potentially sensitive information</td></tr><tr><td><code>/kmgraph:kmg-config-sanitization</code></td><td>Interactive wizard for pre-commit hook setup</td></tr><tr><td><code>/kmgraph:kmg-extract-chat</code></td><td>Extract chat history from Claude, Gemini, and Codex logs (<code>--today</code>, <code>--date</code>, <code>--after</code>, <code>--before</code>, <code>--project</code>); large days auto-split into <code>YYYY-MM-DD/</code> subfolder</td></tr><tr><td><code>/kmgraph:kmg-update-doc</code></td><td>Update plugin/project docs (<code>--user-facing</code>) or KG content</td></tr></tbody></table>
+<table><thead><tr><th>Command</th><th>Purpose</th></tr></thead><tbody><tr><td><code>/kmgraph:kmg-backfill</code></td><td>Index lessons/decisions/chat-history into the knowledge graph. Delegates to the <code>knowledge-extractor</code> subagent for large batches by default</td></tr><tr><td><code>/kmgraph:kmg-add-category</code></td><td>Add a new category to existing knowledge graph</td></tr><tr><td><code>/kmgraph:kmg-session-summary</code></td><td>Create summary of current chat session; <code>--snapshot</code> for lightweight mid-session capture</td></tr><tr><td><code>/kmgraph:kmg-list</code></td><td>Display all configured knowledge graphs</td></tr><tr><td><code>/kmgraph:kmg-check-sensitive</code></td><td>Scan knowledge graph for potentially sensitive information</td></tr><tr><td><code>/kmgraph:kmg-config-sanitization</code></td><td>Interactive wizard for pre-commit hook setup</td></tr><tr><td><code>/kmgraph:kmg-extract-chat</code></td><td>Extract chat history from Claude, Gemini, and Codex logs (<code>--today</code>, <code>--date</code>, <code>--after</code>, <code>--before</code>, <code>--project</code>); large days auto-split into <code>YYYY-MM-DD/</code> subfolder</td></tr><tr><td><code>/kmgraph:kmg-update-doc</code></td><td>Update plugin/project docs (<code>--user-facing</code>) or KG content</td></tr></tbody></table>
 <p><em>→ <a class="" href="/knowledge-graph/reference/command-guide#intermediate-commands">Full details in Command Guide</a></em></p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="-advanced-power-features">🔴 Advanced (Power Features)<a href="#-advanced-power-features" class="hash-link" aria-label="Direct link to 🔴 Advanced (Power Features)" title="Direct link to 🔴 Advanced (Power Features)" translate="no">​</a></h3>
 <p>Power users leverage these for complex workflows:</p>
@@ -147,11 +147,7 @@
 
 
 
-
-
-
-
-<table><thead><tr><th>Command</th><th>Purpose</th></tr></thead><tbody><tr><td><code>/kmgraph:kmg-meta-issue</code></td><td>Initialize meta-issue tracking for complex multi-attempt problems</td></tr><tr><td><code>/kmgraph:kmg-start-issue-tracking</code></td><td>Initialize issue tracking with structured docs, auto-creates GitHub Issue (Step 5.0), and Git branch</td></tr><tr><td><code>/kmgraph:kmg-update-issue-plan</code></td><td>Sync knowledge graph → plan → issue → GitHub</td></tr><tr><td><code>/kmgraph:kmg-link-issue</code></td><td>Manually link existing lesson or ADR to GitHub issue</td></tr><tr><td><code>/kmgraph:kmg-sync-all</code></td><td>Automated full sync pipeline (4 steps → 1 command). Uses background file scanning when context-mode is installed. Refreshes search index automatically if built</td></tr><tr><td><code>/kmgraph:kmg-handoff</code></td><td>Create comprehensive handoff documentation for transitions or onboarding</td></tr></tbody></table>
+<table><thead><tr><th>Command</th><th>Purpose</th></tr></thead><tbody><tr><td><code>/kmgraph:kmg-meta-issue</code></td><td>Initialize meta-issue tracking for complex multi-attempt problems</td></tr><tr><td><code>/kmgraph:kmg-start-issue-tracking</code></td><td>Initialize issue tracking with structured docs, auto-creates GitHub Issue (Step 5.0), and Git branch</td></tr><tr><td><code>/kmgraph:kmg-update-issue-plan</code></td><td>Sync knowledge graph → plan → issue → GitHub</td></tr><tr><td><code>/kmgraph:kmg-link-issue</code></td><td>Manually link existing lesson or ADR to GitHub issue</td></tr><tr><td><code>/kmgraph:kmg-handoff</code></td><td>Create comprehensive handoff documentation for transitions or onboarding</td></tr></tbody></table>
 <p><em>→ <a class="" href="/knowledge-graph/reference/command-guide#advanced-commands">Full details in Command Guide</a></em></p>
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="auto-triggered-skills">Auto-Triggered Skills<a href="#auto-triggered-skills" class="hash-link" aria-label="Direct link to Auto-Triggered Skills" title="Direct link to Auto-Triggered Skills" translate="no">​</a></h2>
@@ -265,17 +261,7 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-<table><thead><tr><th>Agent</th><th>When Used</th><th>Example</th></tr></thead><tbody><tr><td>lesson-capture-agent</td><td>Capturing lessons from sessions</td><td>Auto-triggered after bug fix</td></tr><tr><td>recall-agent</td><td>Searching knowledge graph</td><td>Via <code>/kmgraph:kmg-recall [query]</code> command</td></tr><tr><td>session-summary-agent</td><td>Session wrap-up and documentation</td><td>Auto-triggered at end of work</td></tr><tr><td>mcp-setup-agent</td><td>MCP server setup and configuration</td><td>IDE detection + auto-config</td></tr><tr><td>knowledge-extractor</td><td>Batch KG extraction and parsing</td><td>Via <code>/kmgraph:kmg-sync-all</code></td></tr><tr><td>sync-all-agent</td><td>Executing KG sync pipeline</td><td>Via <code>/kmgraph:kmg-sync-all</code> command</td></tr><tr><td>create-adr-agent</td><td>ADR creation wizard</td><td>Via <code>/kmgraph:kmg-create-adr</code> command</td></tr><tr><td>knowledge-reviewer</td><td>Quality review for lessons and ADRs</td><td>Via <code>/kmgraph:kmg-update-graph</code> command</td></tr></tbody></table>
+<table><thead><tr><th>Agent</th><th>When Used</th><th>Example</th></tr></thead><tbody><tr><td>lesson-capture-agent</td><td>Capturing lessons from sessions</td><td>Auto-triggered after bug fix</td></tr><tr><td>recall-agent</td><td>Searching knowledge graph</td><td>Via <code>/kmgraph:kmg-recall [query]</code> command</td></tr><tr><td>session-summary-agent</td><td>Session wrap-up and documentation</td><td>Auto-triggered at end of work</td></tr><tr><td>mcp-setup-agent</td><td>MCP server setup and configuration</td><td>IDE detection + auto-config</td></tr><tr><td>knowledge-extractor</td><td>Batch KG extraction and parsing</td><td>Via <code>/kmgraph:kmg-backfill</code></td></tr><tr><td>create-adr-agent</td><td>ADR creation wizard</td><td>Via <code>/kmgraph:kmg-create-adr</code> command</td></tr></tbody></table>
 <p>See <a class="" href="/knowledge-graph/concepts/why-kmgraph">Concepts Guide</a> § Four-Layer Architecture for full agent overview and when each operates.</p>
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="delegation-for-heavy-lift-tasks">Delegation for Heavy-Lift Tasks<a href="#delegation-for-heavy-lift-tasks" class="hash-link" aria-label="Direct link to Delegation for Heavy-Lift Tasks" title="Direct link to Delegation for Heavy-Lift Tasks" translate="no">​</a></h2>
@@ -288,7 +274,7 @@
 <div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Before delegation (default)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-session-summary  # Parses entire chat history in-context</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Suggested delegation</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># (Assistant suggests: &quot;For multi-session history, delegate to session-documenter&quot;)</span><br></div></code></pre></div></div>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="knowledge-graph-updates-knowledge-extractor">Knowledge Graph Updates (knowledge-extractor)<a href="#knowledge-graph-updates-knowledge-extractor" class="hash-link" aria-label="Direct link to Knowledge Graph Updates (knowledge-extractor)" title="Direct link to Knowledge Graph Updates (knowledge-extractor)" translate="no">​</a></h3>
 <p>Use for: bulk lesson extraction (10+ lessons at once), pattern analysis</p>
-<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Before delegation (default)</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-update-graph  # Processes all new lessons in-context</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Suggested delegation</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain"># (Assistant suggests: &quot;For 50+ KB of lessons, delegate to knowledge-extractor&quot;)</span><br></div></code></pre></div></div>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain"># Default behavior — delegates to knowledge-extractor automatically</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-backfill  # Reads lessons/decisions/chat-history via the knowledge-extractor subagent</span><br></div></code></pre></div></div>
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="key-concepts">Key Concepts<a href="#key-concepts" class="hash-link" aria-label="Direct link to Key Concepts" title="Direct link to Key Concepts" translate="no">​</a></h2>
 <ul>
@@ -302,7 +288,7 @@
 <li class=""><strong>Target Knowledge Graph</strong>: The knowledge graph a command operates on, resolved from the current working directory — not a manually selected &quot;active&quot; graph</li>
 <li class=""><strong>Session Summary</strong>: Markdown summary of a chat session extracted from conversation history</li>
 <li class=""><strong>Recall</strong>: Unified search across lessons learned, decisions, knowledge graph, and session summaries</li>
-<li class=""><strong>Search Index</strong> (<code>kg_fts5_rebuild</code>): Optional catalog of all knowledge graph content. Build or refresh it for faster, relevance-ranked search results. Updates automatically during sync-all once enabled</li>
+<li class=""><strong>Search Index</strong> (<code>kg_fts5_rebuild</code>): Optional catalog of all knowledge graph content. Build or refresh it for faster, relevance-ranked search results</li>
 </ul>
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="common-workflows">Common Workflows<a href="#common-workflows" class="hash-link" aria-label="Direct link to Common Workflows" title="Direct link to Common Workflows" translate="no">​</a></h2>
@@ -331,8 +317,8 @@
 → Document it while fresh in your mind</p>
 </li>
 <li class="">
-<p><code>/kmgraph:kmg-update-graph</code>
-→ Sync to knowledge graph for quick reference</p>
+<p><code>/kmgraph:kmg-backfill</code>
+→ Index into the knowledge graph for quick reference</p>
 </li>
 </ol>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="before-sharing-code-2-minutes">Before Sharing Code (2 minutes)<a href="#before-sharing-code-2-minutes" class="hash-link" aria-label="Direct link to Before Sharing Code (2 minutes)" title="Direct link to Before Sharing Code (2 minutes)" translate="no">​</a></h3>

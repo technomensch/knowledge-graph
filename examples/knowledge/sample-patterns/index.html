@@ -5,8 +5,8 @@
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">Sample Patterns | Knowledge Management Graph</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://technomensch.github.io/knowledge-graph/examples/knowledge/sample-patterns"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Sample Patterns | Knowledge Management Graph"><meta data-rh="true" name="description" content="Last Updated: 2026-02-13"><meta data-rh="true" property="og:description" content="Last Updated: 2026-02-13"><link data-rh="true" rel="icon" href="/knowledge-graph/img/square.png"><link data-rh="true" rel="canonical" href="https://technomensch.github.io/knowledge-graph/examples/knowledge/sample-patterns"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/examples/knowledge/sample-patterns" hreflang="en"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/examples/knowledge/sample-patterns" hreflang="x-default"><link rel="alternate" type="application/rss+xml" href="/knowledge-graph/docs-updates/rss.xml" title="KMGraph Docs Updates RSS Feed">
 <link rel="alternate" type="application/atom+xml" href="/knowledge-graph/docs-updates/atom.xml" title="KMGraph Docs Updates Atom Feed"><link rel="stylesheet" href="/knowledge-graph/assets/css/styles.212119a5.css">
-<script src="/knowledge-graph/assets/js/runtime~main.afefa8d5.js" defer="defer"></script>
-<script src="/knowledge-graph/assets/js/main.6d1a038a.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/runtime~main.39edd34d.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/main.54d5c05b.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -113,13 +113,12 @@
 <p><strong>Solution:</strong> Replace manual pipeline with single-command automation</p>
 <p><strong>When to use:</strong> Repetitive workflows requiring multiple sequential steps (knowledge sync, deployment, validation pipelines)</p>
 <p><strong>Quick Reference:</strong></p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">Manual (4 steps):</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">1. /capture-lesson</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">2. /update-graph  </span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">3. /update-issue-plan</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">4. git commit + update MEMORY.md</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">Automated (1 step):</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-sync-all</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  → Runs all 4 steps with single confirmation</span><br></div></code></pre></div></div>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#F8F8F2"><span class="token plain">Manual steps:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">1. /capture-lesson</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">2. /update-issue-plan</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">3. git commit + update MEMORY.md</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">On-demand indexing:</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">/kmgraph:kmg-backfill</span><br></div><div class="token-line" style="color:#F8F8F2"><span class="token plain">  → Indexes existing lessons/decisions/chat-history into the graph, with confirmation before writing</span><br></div></code></pre></div></div>
 <p><strong>Benefits:</strong></p>
 <ul>
-<li class="">Reduces 4-step workflow to 1 command</li>
-<li class="">Ensures no steps are skipped</li>
-<li class="">Atomic operation (all or nothing)</li>
-<li class="">Single confirmation point</li>
+<li class="">Reduces repetitive manual indexing to one on-demand command</li>
+<li class="">Confirms every candidate before it&#x27;s written</li>
+<li class="">Re-invocable any time — safe to run repeatedly</li>
 </ul>
 <p><strong>Cross-References:</strong></p>
 <ul>
@@ -187,7 +186,6 @@
 <li class="">Platform-specific paths (e.g., <code>~/.claude/projects/[hash]/memory/MEMORY.md</code>)</li>
 <li class="">Discovery mechanism to locate existing memory</li>
 <li class="">Fallback creation if not found</li>
-<li class="">Integration with sync pipeline</li>
 </ul>
 <p><strong>Cross-References:</strong></p>
 <ul>

@@ -5,8 +5,8 @@
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">Platform Adaptation | Knowledge Management Graph</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://technomensch.github.io/knowledge-graph/reference/PLATFORM-ADAPTATION"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Platform Adaptation | Knowledge Management Graph"><meta data-rh="true" name="description" content="Navigation: Home &gt; Quickstart &gt; Platform Adaptation"><meta data-rh="true" property="og:description" content="Navigation: Home &gt; Quickstart &gt; Platform Adaptation"><link data-rh="true" rel="icon" href="/knowledge-graph/img/square.png"><link data-rh="true" rel="canonical" href="https://technomensch.github.io/knowledge-graph/reference/PLATFORM-ADAPTATION"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/reference/PLATFORM-ADAPTATION" hreflang="en"><link data-rh="true" rel="alternate" href="https://technomensch.github.io/knowledge-graph/reference/PLATFORM-ADAPTATION" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Platform Adaptation","item":"https://technomensch.github.io/knowledge-graph/reference/PLATFORM-ADAPTATION"}]}</script><link rel="alternate" type="application/rss+xml" href="/knowledge-graph/docs-updates/rss.xml" title="KMGraph Docs Updates RSS Feed">
 <link rel="alternate" type="application/atom+xml" href="/knowledge-graph/docs-updates/atom.xml" title="KMGraph Docs Updates Atom Feed"><link rel="stylesheet" href="/knowledge-graph/assets/css/styles.212119a5.css">
-<script src="/knowledge-graph/assets/js/runtime~main.afefa8d5.js" defer="defer"></script>
-<script src="/knowledge-graph/assets/js/main.6d1a038a.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/runtime~main.39edd34d.js" defer="defer"></script>
+<script src="/knowledge-graph/assets/js/main.54d5c05b.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -153,7 +153,7 @@
 <li class="">No automated git metadata tracking</li>
 <li class="">No bidirectional MEMORY.md sync</li>
 <li class="">Manual category README updates</li>
-<li class="">No automated pipelines (<code>/kmgraph:kmg-sync-all</code> equivalent)</li>
+<li class="">No automated pipelines (<code>/kmgraph:kmg-backfill</code> equivalent — use the <code>kg_extract</code> MCP tool instead)</li>
 </ul>
 <p><strong>Workaround:</strong> Use manual workflows from <a class="" href="/knowledge-graph/pillars/recalling/session-memory">session memory</a> + Cursor Composer for assistance</p>
 <hr>
@@ -230,7 +230,7 @@
 <ul>
 <li class="">No Claude Code commands (22 commands are Claude Code-specific)</li>
 <li class="">No SessionStart hooks</li>
-<li class="">No automated pipeline (<code>/kmgraph:kmg-sync-all</code> equivalent)</li>
+<li class="">No automated pipeline (<code>/kmgraph:kmg-backfill</code> equivalent — use the <code>kg_extract</code> MCP tool instead)</li>
 </ul>
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="aider">Aider<a href="#aider" class="hash-link" aria-label="Direct link to Aider" title="Direct link to Aider" translate="no">​</a></h2>
@@ -331,7 +331,11 @@
 
 
 
-<table><thead><tr><th>Tool</th><th>Description</th></tr></thead><tbody><tr><td><code>kg_config_init</code></td><td>Create a new knowledge graph with directory structure</td></tr><tr><td><code>kg_config_list</code></td><td>List all configured knowledge graphs</td></tr><tr><td><code>kg_config_add_category</code></td><td>Add a new category to a resolved KG</td></tr><tr><td><code>kg_resolve</code></td><td>Resolve the target KG&#x27;s name and path from the current directory</td></tr><tr><td><code>kg_search</code></td><td>Full-text search across a resolved KG</td></tr><tr><td><code>kg_capture</code></td><td>Write a new entry to a resolved KG</td></tr><tr><td><code>kg_compare_graphs</code></td><td>Compare two KG folders by content hash + relative path to distinguish a duplicate/forked/worktree registration from genuine divergence</td></tr><tr><td><code>kg_scaffold</code></td><td>Create a file from a template</td></tr><tr><td><code>kg_check_sensitive</code></td><td>Scan for potentially sensitive data</td></tr></tbody></table>
+
+
+
+
+<table><thead><tr><th>Tool</th><th>Description</th></tr></thead><tbody><tr><td><code>kg_config_init</code></td><td>Create a new knowledge graph with directory structure</td></tr><tr><td><code>kg_config_list</code></td><td>List all configured knowledge graphs</td></tr><tr><td><code>kg_config_add_category</code></td><td>Add a new category to a resolved KG</td></tr><tr><td><code>kg_resolve</code></td><td>Resolve the target KG&#x27;s name and path from the current directory</td></tr><tr><td><code>kg_search</code></td><td>Full-text search across a resolved KG</td></tr><tr><td><code>kg_capture</code></td><td>Write a new entry to a resolved KG</td></tr><tr><td><code>kg_compare_graphs</code></td><td>Compare two KG folders by content hash + relative path to distinguish a duplicate/forked/worktree registration from genuine divergence</td></tr><tr><td><code>kg_scaffold</code></td><td>Create a file from a template</td></tr><tr><td><code>kg_check_sensitive</code></td><td>Scan for potentially sensitive data</td></tr><tr><td><code>kg_extract</code></td><td>Read-only extraction of lesson/decision/KG-entry candidates from <code>chat-history/</code>, <code>lessons-learned/</code>, or <code>decisions/</code> paths — pair with <code>kg_capture</code> for the approval-gated write step. Cross-platform equivalent of <code>kmg-backfill</code> for Codex/Gemini users without Claude Code subagent spawning</td></tr></tbody></table>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="kg_compare_graphs"><code>kg_compare_graphs</code><a href="#kg_compare_graphs" class="hash-link" aria-label="Direct link to kg_compare_graphs" title="Direct link to kg_compare_graphs" translate="no">​</a></h3>
 <p>Use this before merging, archiving, or deleting a knowledge graph whose registered path might just be a duplicate, fork, or worktree copy of another registered graph, rather than genuinely divergent content.</p>
 <p><strong>Parameters:</strong></p>
