@@ -179,7 +179,6 @@ echo "── Agents ────────────────────
 EXPECTED_AGENTS=(
   "knowledge-extractor"
   "session-documenter"
-  "knowledge-reviewer"
   "lesson-capture-agent"
   "session-summary-agent"
   "mcp-setup-agent"
@@ -202,7 +201,7 @@ else
   [ $FAIL -eq 0 ] && exit 0 || exit 1
 fi
 
-# Test 11: All 8 agent files present (agents are .md files, not directories)
+# Test 11: All 9 agent files present (agents are .md files, not directories)
 MISSING_AGENTS=0
 for agent in "${EXPECTED_AGENTS[@]}"; do
   if [ ! -f "$AGENTS_DIR/$agent.md" ]; then
@@ -211,17 +210,17 @@ for agent in "${EXPECTED_AGENTS[@]}"; do
   fi
 done
 if [ $MISSING_AGENTS -eq 0 ]; then
-  pass "All 10 agent files present"
+  pass "All 9 agent files present"
 else
   fail "$MISSING_AGENTS agent file(s) missing"
 fi
 
-# Test 12: Exact count is 10
+# Test 12: Exact count is 9
 ACTUAL_COUNT=$(find "$AGENTS_DIR" -name "*.md" -maxdepth 1 -type f | wc -l | tr -d ' ')
-if [ "$ACTUAL_COUNT" -eq 10 ]; then
-  pass "Exact agent count is 10"
+if [ "$ACTUAL_COUNT" -eq 9 ]; then
+  pass "Exact agent count is 9"
 else
-  fail "Agent count is $ACTUAL_COUNT (expected 10)"
+  fail "Agent count is $ACTUAL_COUNT (expected 9)"
 fi
 
 # Test 13: No empty agent files
@@ -274,22 +273,6 @@ if [ -f "$AGENTS_DIR/session-documenter.md" ]; then
   fi
 else
   fail "session-documenter.md not found"
-fi
-
-# Test 17: knowledge-reviewer does not hardcode a model name
-# Model tier selection moved to the ai-model-tier-resolver module, invoked by
-# the dispatching command (see test-dispatcher-tier-refactor.sh) — agent files
-# no longer declare their own model/tier inline, so this now checks the
-# absence of a hardcoded model string rather than the presence of "sonnet".
-if [ -f "$AGENTS_DIR/knowledge-reviewer.md" ]; then
-  CONTENT=$(cat "$AGENTS_DIR/knowledge-reviewer.md")
-  if echo "$CONTENT" | grep -qiE "claude-(opus|sonnet|haiku)-[0-9]"; then
-    fail "knowledge-reviewer.md hardcodes a model name (should defer to the tier resolver)"
-  else
-    pass "knowledge-reviewer.md does not hardcode a model name (tier resolved by dispatcher)"
-  fi
-else
-  fail "knowledge-reviewer.md not found"
 fi
 
 echo ""
