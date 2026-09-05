@@ -15,6 +15,9 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 ### Removed
 - `kmg-update-graph`, `kmg-sync-all`, `sync-all-agent` — confirmed-dead orchestration pipeline, inherited unmodified from an unrelated prior project (`optimize-my-resume`), zero confirmed real-world use ([issue-37](knowledge/issues/issue-37/issue-37-description.md)). Superseded by `kmg-backfill`. See ADR-071.
 
+### Fixed
+- `kmg-init` Step 1.10's `sources[]` array now actually detects `knowledge/lessons-learned/` and `knowledge/decisions/`, and no longer silently skips the whole step when only those (plus chat-history) are present — previously never scanned despite `knowledge-extractor.md` documenting otherwise (real bug, found while validating ENH-034/035 in ADR-071).
+
 ## [0.7.6] — 2026-09-01
 
 ### Added

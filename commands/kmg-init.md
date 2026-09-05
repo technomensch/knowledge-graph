@@ -1583,11 +1583,24 @@ Run Step 1.10 whenever the project has existing content directories to scan.
 **Detect which sources are present (record the matched path for each):**
 ```bash
 sources=()
+backfill_sources=()   # routed through /kmgraph:kmg-backfill (Step 1.10a below)
+
 if [ -d "knowledge/chat-history" ]; then
-  sources+=("knowledge/chat-history/")
+  backfill_sources+=("knowledge/chat-history/")
 elif [ -d "chat-history" ]; then
-  sources+=("chat-history/")
+  backfill_sources+=("chat-history/")
 fi
+if [ -d "knowledge/lessons-learned" ]; then
+  backfill_sources+=("knowledge/lessons-learned/")
+elif [ -d "lessons-learned" ]; then
+  backfill_sources+=("lessons-learned/")
+fi
+if [ -d "knowledge/decisions" ]; then
+  backfill_sources+=("knowledge/decisions/")
+elif [ -d "decisions" ]; then
+  backfill_sources+=("decisions/")
+fi
+
 if [ -d "knowledge/plans" ]; then
   sources+=("knowledge/plans/")
 elif [ -d "plans" ]; then
@@ -1599,35 +1612,42 @@ fi
 [ -f "CHANGELOG.md" ] && sources+=("CHANGELOG.md")
 ```
 
-If `${#sources[@]} -eq 0`: skip this step silently — no content to scan.
+If `${#sources[@]} -eq 0 && ${#backfill_sources[@]} -eq 0`: skip this step entirely — no content to scan.
 
-**Prompt user:**
+**Prompt user (combining both source groups in one y/N — both need the same confirm-before-write treatment):**
 ```
 Would you like to backfill the knowledge graph from existing project content? [y/N]
 
 Found these sources to scan:
-  [list each entry in sources[] on its own line with •]
+  [list each entry in sources[] AND backfill_sources[] on its own line with •]
 
-The knowledge-extractor subagent will return lesson and decision candidates.
-You review and approve before anything is written.
+Candidates will be drafted and presented for your review before anything is written.
 ```
 
-**If yes:**
+**If yes, and `backfill_sources[]` is non-empty:**
+1. Invoke `/kmgraph:kmg-backfill` with `backfill_sources[]` as its source scope (chat-history/lessons-learned/decisions — see `commands/kmg-backfill.md` Steps 1-4). It handles its own confirm-before-write flow independently of Step 1.10's remaining sources below.
+
+**If yes, and `sources[]` (plans/research/specs/README/CHANGELOG) is non-empty:**
 1. Invoke `knowledge-extractor` subagent in **"init-backfill" mode** — pass mode="init-backfill" explicitly
-2. Pass the `sources[]` array to the subagent (actual matched paths)
+2. Pass the `sources[]` array to the subagent (actual matched paths — no longer includes chat-history/lessons-learned/decisions, those are `kmg-backfill`'s job now)
 3. Subagent returns a structured candidate list (lessons, ADRs, patterns, gotchas) — it does NOT write
 4. Present candidates to user for review; user selects which to approve
 5. Show explicit confirmation: "I will write N files to the knowledge graph. Confirm? [y/N]"
 6. On user confirmation: coordinator writes approved candidates directly
 7. Output summary of written entries
 
+**On non-Claude-Code platforms without subagent spawning** (Codex, Gemini before an equivalent lands): `kmg-backfill`'s `--delegate knowledge-extractor` step isn't reachable — fall back to the `kg_extract` MCP tool directly (see Task 6) for the `backfill_sources[]` portion.
+
+**Combined final output** (after both groups, if both ran):
 ```
 ✅ Backfill complete!
 
-Discovered and added:
-  • X lessons from existing documentation
-  • Y architecture decisions from CHANGELOG
-  • Z patterns from source files
+From chat-history/lessons-learned/decisions (via kmg-backfill):
+  • X entries indexed/drafted
+
+From plans/research/specs/README/CHANGELOG:
+  • Y lessons from existing documentation
+  • Z architecture decisions from CHANGELOG
 
 Review these entries in your KG and edit as needed.
 ```
