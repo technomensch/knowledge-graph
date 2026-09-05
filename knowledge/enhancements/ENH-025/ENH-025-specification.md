@@ -1,7 +1,7 @@
 ---
 title: "ENH-025: Cross-Platform Knowledge Extractor (Backfill from Chat History)"
 number: 025
-status: proposed
+status: accepted
 version_target: null
 github_issue: null
 created: 2026-06-12
@@ -70,8 +70,18 @@ Lighter-weight than Option A but model-dependent (quality varies by platform).
 2. Should it support date-range filtering to limit which chat history files are parsed?
 3. Does Option B (inline skill) need to ship alongside Option A, or is Option A sufficient?
 
+## Update (2026-09-04) — coordinated with ENH-035
+
+Found via an open-ticket overlap check while finalizing [ENH-034](../ENH-034/ENH-034-specification.md)/[ENH-035](../ENH-035/ENH-035-specification.md) (`kmg-update-graph` removal + new consolidated `kmg-backfill` command). This ENH's `kg_extract` design is adopted as ENH-035's answer to its own cross-platform-parity question — implement together, not as two separate passes on the same files.
+
+**Scope update:** `kg_extract` should read `knowledge/lessons-learned/` and `knowledge/decisions/` in addition to chat-history, matching `kmg-backfill`'s broadened 3-source scope (ENH-035 absorbed `kmg-update-graph`'s job of indexing already-existing lessons/decisions into KG entries). Step-2 "Reads and parses the files server-side" and step-3 "Returns structured lesson candidates" apply the same way to all three source types.
+
+**File-path note:** `commands/init.md` in this spec's original 2026-06-12 text refers to the command now named `commands/kmg-init.md` (post `kmg-` prefix rename) — its Step 1.10 is exactly the section ENH-035 is refactoring.
+
 ## Related
 
 - ENH-024: Codex CLI chat history extraction (source format context)
+- ENH-035: consolidated `kmg-backfill` command — `kg_extract` is its MCP-tool equivalent, scope now includes lessons-learned/decisions per the update above
+- ENH-034: `kmg-update-graph` removal — the reason `kg_extract`'s scope grew beyond chat-history
 - `agents/knowledge-extractor.md`: Claude Code-only equivalent
-- `commands/init.md` Step 1.10: backfill offer that calls the extractor
+- `commands/kmg-init.md` Step 1.10: backfill offer that calls the extractor (renamed from `commands/init.md`)

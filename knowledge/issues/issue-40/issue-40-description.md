@@ -10,6 +10,8 @@ related_issues: ["issue-18"]
 
 # issue-40: Capture-level flag naming/targeting consistency across commands+agents (`--named` vs `--project` vs `--graph`)
 
+**Update (2026-09-04):** `commands/kmg-sync-all.md`, one of the 5 files listed below, is slated for removal per [ENH-034](../../enhancements/ENH-034/ENH-034-specification.md) (confirmed-dead pipeline). Drop it from this issue's file list once that removal ships — the `--named` naming decision still applies to the remaining 4 commands + 3 agents regardless.
+
 ## Problem
 
 `--named=<kg>` is used across `commands/kmg-session-summary.md`, `commands/kmg-recall.md`,

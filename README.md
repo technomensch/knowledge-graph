@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.7.6
+**Version:** 0.7.7
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
