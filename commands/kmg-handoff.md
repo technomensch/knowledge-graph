@@ -465,7 +465,7 @@ Handoff ready for sharing or archival!
 ```
 Active Branch: v0.0.10.3-alpha-token-optimization
 Current Commit: a1b2c3d (feat: add subagent delegation blocks)
-Files Modified: 5 (commands/update-graph.md, session-summary.md, extract-chat.md, plus 2 others)
+Files Modified: 5 (commands/kmg-backfill.md, session-summary.md, extract-chat.md, plus 2 others)
 
 Recent Work:
 - Added delegation guidance to 3 heavy commands

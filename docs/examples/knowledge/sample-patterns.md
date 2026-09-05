@@ -235,7 +235,6 @@ meta-issue/
 - Platform-specific paths (e.g., `~/.claude/projects/[hash]/memory/MEMORY.md`)
 - Discovery mechanism to locate existing memory
 - Fallback creation if not found
-- Integration with sync pipeline
 
 **Cross-References:**
 - **Related:** [[Four-Pillar Memory](#four-pillar-memory)], [[Bidirectional Memory Sync](#bidirectional-memory-sync)]

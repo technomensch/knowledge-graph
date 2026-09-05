@@ -15,7 +15,7 @@ For multi-session history extraction (10+ sessions or 100+ KB chat logs), consid
 /kmgraph:kmg-extract-chat --delegate knowledge-extractor
 ```
 
-This parses and archives chat logs into `chat-history/` without consuming your main context. It does **not** extract lessons or decisions — for that, run `/kmgraph:kmg-backfill` afterward.
+The `knowledge-extractor` subagent reads and parses the raw chat logs so they never consume your main context; the coordinator session then runs `run_extraction.py` to archive the parsed output into `chat-history/`. This command does **not** extract lessons or decisions — for that, run `/kmgraph:kmg-backfill` afterward.
 
 ---
 

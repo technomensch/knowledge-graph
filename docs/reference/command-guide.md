@@ -1227,8 +1227,7 @@ This section covers implementation specifics for users who want to understand ho
 
 When the [context-mode plugin](https://github.com/steventcramer/context-mode) is installed alongside kmgraph:
 
-- `sync-all` uses `ctx_batch_execute` to combine lesson scanning and KG extraction in a single sandboxed background process
-- `update-graph` uses `ctx_execute_file` for sandboxed file reads when processing 10 or more lessons; falls back to the knowledge-extractor subagent for large batches without context-mode, or reads directly for small batches
+- `kmg-backfill` uses `ctx_execute_file` for sandboxed file reads when processing 10 or more lessons/decisions; falls back to the `knowledge-extractor` subagent for large batches without context-mode, or reads directly for small batches
 - Detection: kmgraph checks for `mcp__plugin_context-mode_context-mode__ctx_batch_execute` at runtime; no configuration required; zero breaking change if context-mode is absent
 
 ### Search Index Implementation

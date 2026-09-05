@@ -27,9 +27,8 @@ The Knowledge Graph system coordinates across four layers that work together sea
 - **recall-agent** — Knowledge search and retrieval (context-aware ranking)
 - **session-summary-agent** — Lightweight current-session summary (fresh context preservation)
 - **platform-sync-agent** — Cross-platform config file sync (Claude Desktop + Claude Code alignment)
-- **knowledge-extractor** — Batch backfill from large files (approval-gated writes)
+- **knowledge-extractor** — Batch backfill from large files (never writes — coordinator writes after approval)
 - **session-documenter** — Deep git archaeology for summaries (approval-gated commits)
-- **knowledge-reviewer** — Review KG entry quality (ongoing curation)
 
 ### Lifecycle Layer: Hooks
 **Automate at the right moment**
@@ -229,8 +228,8 @@ Proactive suggestion:
 "✅ Lesson captured! Extract insights to Knowledge Graph?"
 - Later: Skip for now, run manually later
 
-Why now: Fresh context enables better extraction. The knowledge-reviewer
-agent will assess quality automatically.
+Why now: Fresh context enables better extraction. Run `/kmgraph:kmg-backfill`
+to index it into the knowledge graph.
 ```
 
 **After significant commits (NEW - v0.0.3):**

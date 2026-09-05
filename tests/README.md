@@ -39,7 +39,7 @@ test-mcp-resources.sh     yes                  Both MCP resources
 test-mcp-offload.sh       yes                  KG at non-local path
 test-mcp-edge-cases.sh    yes                  Error handling
 test-commands.sh          no                   25 commands structure + syntax
-test-skills-agents.sh     no                   6 skills + 3 agents structure
+test-skills-agents.sh     no                   6 skills + 9 agents structure
 test-hooks.sh             no                   SessionStart hook
 test-extraction.sh        no                   Python extraction scripts
 ──────────────────────────────────────────────────────────────────
@@ -135,7 +135,7 @@ Commands are markdown files with YAML frontmatter and embedded bash scripts.
 
 ### `test-skills-agents.sh` — Skills and Agents (~17 tests)
 
-Structural validation for all 6 skills and 3 agents.
+Structural validation for all 6 skills and 9 agents (the Agents (2) content-check table below covers a specific named subset, not the full agent count).
 
 #### Skills (6)
 
@@ -149,16 +149,15 @@ Structural validation for all 6 skills and 3 agents.
 | session-wrap references session-summary | Content check |
 | adr-guide references create-adr | Content check |
 
-#### Agents (3)
+#### Agents (2)
 
 | Test | Assert |
 |------|--------|
-| All 3 agent dirs exist | knowledge-extractor, session-documenter, knowledge-reviewer |
+| Both agent dirs exist | knowledge-extractor, session-documenter |
 | No empty agent directories | Each has ≥ 1 file |
 | No deprecated `/knowledge:` namespace | `grep -r "/knowledge:" agents/` = 0 |
 | knowledge-extractor has read-only constraint | Content contains "read-only" or "approval" |
 | session-documenter has approval-gated git | Content contains "approval" or "gated" |
-| knowledge-reviewer references sonnet model | Content contains "sonnet" |
 
 ---
 

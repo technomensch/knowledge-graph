@@ -657,7 +657,9 @@ if [ "$LESSON_COUNT" -gt 0 ] && [ "$KG_ENTRY_COUNT" -eq 0 ]; then
   echo ""
   echo "    1. Yes — run extraction now"
   echo "    2. Skip — I'll run it later"
-  # TODO(Task 4): wire the Yes branch to a real extraction command (Step 1.10 rewrite)
+  # If the user selects Yes: invoke /kmgraph:kmg-backfill knowledge/lessons-learned/
+  # (see commands/kmg-backfill.md) — it drafts KG-index entries from the migrated
+  # lessons and confirms before writing. If Skip: continue, extraction can be run anytime.
 fi
 
 # h. Content migration offer — populate me.md and rules.md from existing CLAUDE.md
@@ -944,7 +946,7 @@ if [ "$LESSON_COUNT" -gt 0 ] && [ "$KG_COUNT" -eq 0 ]; then
 fi
 ```
 
-<!-- TODO(Task 4): wire the Yes branch to a real extraction command (Step 1.10 rewrite) -->
+If the user selects **Yes**: invoke `/kmgraph:kmg-backfill knowledge/lessons-learned/` (see `commands/kmg-backfill.md`) — it drafts KG-index entries from the existing lessons and confirms before writing.
 If the user selects **Skip**, continue — extraction can be run at any time.
 
 #### 1h. Output verification summary
@@ -1583,7 +1585,7 @@ Run Step 1.10 whenever the project has existing content directories to scan.
 **Detect which sources are present (record the matched path for each):**
 ```bash
 sources=()
-backfill_sources=()   # routed through /kmgraph:kmg-backfill (Step 1.10a below)
+backfill_sources=()   # each entry routed through its own /kmgraph:kmg-backfill invocation, below
 
 if [ -d "knowledge/chat-history" ]; then
   backfill_sources+=("knowledge/chat-history/")
@@ -1625,7 +1627,7 @@ Candidates will be drafted and presented for your review before anything is writ
 ```
 
 **If yes, and `backfill_sources[]` is non-empty:**
-1. Invoke `/kmgraph:kmg-backfill` with `backfill_sources[]` as its source scope (chat-history/lessons-learned/decisions — see `commands/kmg-backfill.md` Steps 1-4). It handles its own confirm-before-write flow independently of Step 1.10's remaining sources below.
+1. For **each entry** in `backfill_sources[]` (one of `chat-history/`, `lessons-learned/`, `decisions/`, in either its `knowledge/`-prefixed or bare form — whichever was actually matched in Step 1.10's detection above): invoke `/kmgraph:kmg-backfill <entry>`, passing that single matched path as `kmg-backfill`'s `[path]` argument (see `commands/kmg-backfill.md` Steps 1-4). `kmg-backfill` only accepts one `[path]` at a time — do not pass the whole array in a single call. Each invocation runs its own confirm-before-write flow independently of Step 1.10's `sources[]` branch below.
 
 **If yes, and `sources[]` (plans/research/specs/README/CHANGELOG) is non-empty:**
 1. Invoke `knowledge-extractor` subagent in **"init-backfill" mode** — pass mode="init-backfill" explicitly
@@ -1636,16 +1638,16 @@ Candidates will be drafted and presented for your review before anything is writ
 6. On user confirmation: coordinator writes approved candidates directly
 7. Output summary of written entries
 
-**On non-Claude-Code platforms without subagent spawning** (Codex, Gemini before an equivalent lands): `kmg-backfill`'s `--delegate knowledge-extractor` step isn't reachable — fall back to the `kg_extract` MCP tool directly (see Task 6) for the `backfill_sources[]` portion.
+**On non-Claude-Code platforms without subagent spawning** (Codex, Gemini before an equivalent lands): `kmg-backfill`'s `--delegate knowledge-extractor` step isn't reachable — fall back to the `kg_extract` MCP tool directly, called once per `backfill_sources[]` entry, for that portion.
 
-**Combined final output** (after both groups, if both ran):
+**Final output** (report only the section(s) for the branch(es) that actually ran — do not print a section whose branch didn't run):
 ```
 ✅ Backfill complete!
 
-From chat-history/lessons-learned/decisions (via kmg-backfill):
+From chat-history/lessons-learned/decisions (via kmg-backfill, if backfill_sources[] ran):
   • X entries indexed/drafted
 
-From plans/research/specs/README/CHANGELOG:
+From plans/research/specs/README/CHANGELOG (if sources[] ran):
   • Y lessons from existing documentation
   • Z architecture decisions from CHANGELOG
 

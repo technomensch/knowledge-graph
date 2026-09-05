@@ -133,14 +133,14 @@ These flags appear across multiple commands and share consistent behavior.
 
 | Flag | Commands | Behavior |
 |---|---|---|
-| `--auto` | `update-graph`, `session-summary`, `sync-all`, `update-issue-plan` | Skip confirmation prompts; silent/non-interactive mode. Safe for use when called from another command. |
-| `--dry-run` | `sync-all` | Preview changes without writing any files. Useful for verifying scope before committing. |
+| `--auto` | `session-summary`, `update-issue-plan` | Skip confirmation prompts; silent/non-interactive mode. Safe for use when called from another command. |
+| `--dry-run` | `init`, `init-personal-kg` | Preview changes without writing any files. Useful for verifying scope before committing. |
 | `--snapshot` | `session-summary` | Lightweight mid-session capture. Appends to today's session file without a review gate. Used automatically by `capture-lesson`, `create-adr`, and `start-issue-tracking` when the user opts in. |
 | `--targetKg` | MCP tools (`kg_capture`, `kg_search`) | Target a specific knowledge graph by name instead of the one resolved from the working directory. |
 | `--delegate` | Advanced usage | Signals that execution should be handed off to the agent layer rather than handled inline. Applies to thin-dispatcher commands that route to `agents/`. |
-| `--user` | `session-summary`, `create-adr`, `capture-lesson`, `recall`, `sync-all` | Route capture or search to the personal KG (`~/.kmgraph/`). Bypasses `kg_capture`; writes directly via the Write tool. Natural-language equivalent: "user level" / "for the user". |
-| `--project` | `session-summary`, `create-adr`, `capture-lesson`, `recall`, `sync-all` | Route to the current project's KG, resolved from the working directory. Natural-language equivalent: "for this project" / "project level". |
-| `--named=<kg>` | `session-summary`, `create-adr`, `capture-lesson`, `recall`, `sync-all` | Route to a specific named KG from `kg-config.json`. Natural-language equivalent: naming the KG directly (e.g., "career-ops"). |
+| `--user` | `session-summary`, `create-adr`, `capture-lesson`, `recall` | Route capture or search to the personal KG (`~/.kmgraph/`). Bypasses `kg_capture`; writes directly via the Write tool. Natural-language equivalent: "user level" / "for the user". |
+| `--project` | `session-summary`, `create-adr`, `capture-lesson`, `recall` | Route to the current project's KG, resolved from the working directory. Natural-language equivalent: "for this project" / "project level". |
+| `--named=<kg>` | `session-summary`, `create-adr`, `capture-lesson`, `recall` | Route to a specific named KG from `kg-config.json`. Natural-language equivalent: naming the KG directly (e.g., "career-ops"). |
 
 ---
 

@@ -173,18 +173,14 @@ echo "── Key command content checks ─────────────�
 if [ -f "$COMMANDS_DIR/kmg-help.md" ]; then
   HELP_CONTENT=$(cat "$COMMANDS_DIR/kmg-help.md")
   MISSING_REFS=0
-  # NOTE: "backfill" intentionally not checked here yet — kmg-help.md gets only a
-  # bare removal of the sync-all/update-graph lines in this task (see ADR-071 Task 1).
-  # Task 7's kmg-help.md restructure adds a real kmg-backfill reference and should
-  # add "backfill" back to this list at that point.
-  for key_cmd in "capture-lesson" "recall" "session-summary"; do
+  for key_cmd in "capture-lesson" "recall" "session-summary" "backfill"; do
     if ! echo "$HELP_CONTENT" | grep -q "$key_cmd"; then
       echo "    kmg-help.md missing reference to: $key_cmd"
       MISSING_REFS=$((MISSING_REFS + 1))
     fi
   done
   if [ $MISSING_REFS -eq 0 ]; then
-    pass "kmg-help.md references all key commands (capture-lesson, recall, session-summary)"
+    pass "kmg-help.md references all key commands (capture-lesson, recall, session-summary, backfill)"
   else
     fail "kmg-help.md missing $MISSING_REFS key command references"
   fi

@@ -73,6 +73,44 @@ describe("kg_extract", () => {
     const result = await handleExtract({ sourcePaths: [] }, tmpDir);
     expect("error" in result && result.error === "VALIDATION_ERROR").toBe(true);
   });
+
+  it("rejects sourcePaths outside the resolved graph's chat-history/lessons-learned/decisions", async () => {
+    const outside = fs.mkdtempSync(path.join(os.tmpdir(), "kg-extract-outside-"));
+    try {
+      fs.writeFileSync(path.join(outside, "private-notes.md"), "# Private\n\nSecret stuff.\n");
+      const result = await handleExtract({ sourcePaths: [outside] }, tmpDir);
+      expect("error" in result && result.error === "KG_MISMATCH").toBe(true);
+    } finally {
+      fs.rmSync(outside, { recursive: true, force: true });
+    }
+  });
+
+  it("returns a structured error instead of throwing when a sourcePath doesn't exist", async () => {
+    const missing = path.join(tmpDir, "lessons-learned", "does-not-exist.md");
+    const result = await handleExtract({ sourcePaths: [missing] }, tmpDir);
+    expect("error" in result && result.error === "VALIDATION_ERROR").toBe(true);
+  });
+
+  it("rejects a symlink inside an allowed root that points outside the graph", async () => {
+    const outside = fs.mkdtempSync(path.join(os.tmpdir(), "kg-extract-symlink-target-"));
+    try {
+      fs.writeFileSync(path.join(outside, "escaped.md"), "# Escaped\n\nShould not be readable.\n");
+      const linkPath = path.join(tmpDir, "lessons-learned", "escape-link");
+      fs.symlinkSync(outside, linkPath, "dir");
+
+      const result = await handleExtract({ sourcePaths: [linkPath] }, tmpDir);
+      expect("error" in result && result.error === "KG_MISMATCH").toBe(true);
+    } finally {
+      fs.rmSync(outside, { recursive: true, force: true });
+    }
+  });
+
+  it("resolves a relative sourcePath against the graph root, not the process cwd", async () => {
+    const result = await handleExtract({ sourcePaths: ["lessons-learned"] }, tmpDir);
+    if ("error" in result) throw new Error(`unexpected error: ${result.message}`);
+    expect(result.candidates.length).toBe(1);
+    expect(result.candidates[0].sourceRef).toContain("example.md");
+  });
 });
 
 describe("kg_extract registration", () => {

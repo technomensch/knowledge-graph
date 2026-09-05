@@ -20,7 +20,7 @@ description: Prompt for session summary when user indicates they are stopping wo
 - `knowledge/decisions/*.md` has ADRs with `Status: Proposed` or `Status: Draft` (open decisions)
 - Recent commits have lesson-worthy keywords (`fix`, `solved`, `implement`, `pattern`, `debug`, `refactor`) but no corresponding lesson file in `knowledge/lessons-learned/`
 - Rules were captured to `knowledge/rules.md` or `knowledge/me.md` this session: surface "You established N guideline(s) this session. Worth checking whether any of them only apply in specific situations."
-- Governance signals were flagged by update-graph this session (lesson output contained governance flag) but no rules were captured: surface "Some lessons this session might be worth saving as guidelines. Want to capture them before wrapping up?"
+- Governance signals were flagged by `kmg-backfill` this session (lesson output contained governance flag) but no rules were captured: surface "Some lessons this session might be worth saving as guidelines. Want to capture them before wrapping up?"
 
 **Block Conditions:**
 - Stop hook coordination flag exists: `/tmp/.kg-session-summarized-{kg-name}-{date}` — if present, do NOT prompt (Stop hook already fired; avoid double-prompting)

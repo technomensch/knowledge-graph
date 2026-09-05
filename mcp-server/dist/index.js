@@ -2984,7 +2984,7 @@ var require_compile = __commonJS({
       const schOrFunc = root.refs[ref];
       if (schOrFunc)
         return schOrFunc;
-      let _sch = resolve8.call(this, root, ref);
+      let _sch = resolve9.call(this, root, ref);
       if (_sch === void 0) {
         const schema = (_a2 = root.localRefs) === null || _a2 === void 0 ? void 0 : _a2[ref];
         const { schemaId } = this.opts;
@@ -3011,7 +3011,7 @@ var require_compile = __commonJS({
     function sameSchemaEnv(s1, s2) {
       return s1.schema === s2.schema && s1.root === s2.root && s1.baseId === s2.baseId;
     }
-    function resolve8(root, ref) {
+    function resolve9(root, ref) {
       let sch;
       while (typeof (sch = this.refs[ref]) == "string")
         ref = sch;
@@ -3736,7 +3736,7 @@ var require_fast_uri = __commonJS({
       }
       return uri;
     }
-    function resolve8(baseURI, relativeURI, options) {
+    function resolve9(baseURI, relativeURI, options) {
       const schemelessOptions = options ? Object.assign({ scheme: "null" }, options) : { scheme: "null" };
       const { parsed: baseParsed, malformedAuthorityOrPort: baseMalformed } = parseWithStatus(baseURI, schemelessOptions);
       const { parsed: relativeParsed, malformedAuthorityOrPort: relativeMalformed } = parseWithStatus(relativeURI, schemelessOptions);
@@ -3747,49 +3747,49 @@ var require_fast_uri = __commonJS({
       schemelessOptions.skipEscape = true;
       return serialize(resolved, schemelessOptions);
     }
-    function resolveComponent(base, relative8, options, skipNormalization) {
+    function resolveComponent(base, relative9, options, skipNormalization) {
       const target = {};
       if (!skipNormalization) {
         base = parse4(serialize(base, options), options);
-        relative8 = parse4(serialize(relative8, options), options);
+        relative9 = parse4(serialize(relative9, options), options);
       }
       options = options || {};
-      if (!options.tolerant && relative8.scheme) {
-        target.scheme = relative8.scheme;
-        target.userinfo = relative8.userinfo;
-        target.host = relative8.host;
-        target.port = relative8.port;
-        target.path = removeDotSegments(relative8.path || "");
-        target.query = relative8.query;
+      if (!options.tolerant && relative9.scheme) {
+        target.scheme = relative9.scheme;
+        target.userinfo = relative9.userinfo;
+        target.host = relative9.host;
+        target.port = relative9.port;
+        target.path = removeDotSegments(relative9.path || "");
+        target.query = relative9.query;
       } else {
-        if (relative8.userinfo !== void 0 || relative8.host !== void 0 || relative8.port !== void 0) {
-          target.userinfo = relative8.userinfo;
-          target.host = relative8.host;
-          target.port = relative8.port;
-          target.path = removeDotSegments(relative8.path || "");
-          target.query = relative8.query;
+        if (relative9.userinfo !== void 0 || relative9.host !== void 0 || relative9.port !== void 0) {
+          target.userinfo = relative9.userinfo;
+          target.host = relative9.host;
+          target.port = relative9.port;
+          target.path = removeDotSegments(relative9.path || "");
+          target.query = relative9.query;
         } else {
-          if (!relative8.path) {
+          if (!relative9.path) {
             target.path = base.path;
-            if (relative8.query !== void 0) {
-              target.query = relative8.query;
+            if (relative9.query !== void 0) {
+              target.query = relative9.query;
             } else {
               target.query = base.query;
             }
           } else {
-            if (relative8.path[0] === "/") {
-              target.path = removeDotSegments(relative8.path);
+            if (relative9.path[0] === "/") {
+              target.path = removeDotSegments(relative9.path);
             } else {
               if ((base.userinfo !== void 0 || base.host !== void 0 || base.port !== void 0) && !base.path) {
-                target.path = "/" + relative8.path;
+                target.path = "/" + relative9.path;
               } else if (!base.path) {
-                target.path = relative8.path;
+                target.path = relative9.path;
               } else {
-                target.path = base.path.slice(0, base.path.lastIndexOf("/") + 1) + relative8.path;
+                target.path = base.path.slice(0, base.path.lastIndexOf("/") + 1) + relative9.path;
               }
               target.path = removeDotSegments(target.path);
             }
-            target.query = relative8.query;
+            target.query = relative9.query;
           }
           target.userinfo = base.userinfo;
           target.host = base.host;
@@ -3797,7 +3797,7 @@ var require_fast_uri = __commonJS({
         }
         target.scheme = base.scheme;
       }
-      target.fragment = relative8.fragment;
+      target.fragment = relative9.fragment;
       return target;
     }
     function equal(uriA, uriB, options) {
@@ -4019,7 +4019,7 @@ var require_fast_uri = __commonJS({
     var fastUri = {
       SCHEMES,
       normalize,
-      resolve: resolve8,
+      resolve: resolve9,
       resolveComponent,
       equal,
       serialize,
@@ -28183,7 +28183,7 @@ var Protocol = class {
           return;
         }
         const pollInterval = task2.pollInterval ?? this._options?.defaultTaskPollInterval ?? 1e3;
-        await new Promise((resolve8) => setTimeout(resolve8, pollInterval));
+        await new Promise((resolve9) => setTimeout(resolve9, pollInterval));
         options?.signal?.throwIfAborted();
       }
     } catch (error48) {
@@ -28200,7 +28200,7 @@ var Protocol = class {
    */
   request(request, resultSchema, options) {
     const { relatedRequestId, resumptionToken, onresumptiontoken, task, relatedTask } = options ?? {};
-    return new Promise((resolve8, reject) => {
+    return new Promise((resolve9, reject) => {
       const earlyReject = (error48) => {
         reject(error48);
       };
@@ -28278,7 +28278,7 @@ var Protocol = class {
           if (!parseResult.success) {
             reject(parseResult.error);
           } else {
-            resolve8(parseResult.data);
+            resolve9(parseResult.data);
           }
         } catch (error48) {
           reject(error48);
@@ -28539,12 +28539,12 @@ var Protocol = class {
       }
     } catch {
     }
-    return new Promise((resolve8, reject) => {
+    return new Promise((resolve9, reject) => {
       if (signal.aborted) {
         reject(new McpError(ErrorCode.InvalidRequest, "Request cancelled"));
         return;
       }
-      const timeoutId = setTimeout(resolve8, interval);
+      const timeoutId = setTimeout(resolve9, interval);
       signal.addEventListener("abort", () => {
         clearTimeout(timeoutId);
         reject(new McpError(ErrorCode.InvalidRequest, "Request cancelled"));
@@ -29725,7 +29725,7 @@ var McpServer = class {
     let task = createTaskResult.task;
     const pollInterval = task.pollInterval ?? 5e3;
     while (task.status !== "completed" && task.status !== "failed" && task.status !== "cancelled") {
-      await new Promise((resolve8) => setTimeout(resolve8, pollInterval));
+      await new Promise((resolve9) => setTimeout(resolve9, pollInterval));
       const updatedTask = await extra.taskStore.getTask(taskId);
       if (!updatedTask) {
         throw new McpError(ErrorCode.InternalError, `Task ${taskId} not found during polling`);
@@ -30392,12 +30392,12 @@ var StdioServerTransport = class {
     this.onclose?.();
   }
   send(message) {
-    return new Promise((resolve8) => {
+    return new Promise((resolve9) => {
       const json2 = serializeMessage(message);
       if (this._stdout.write(json2)) {
-        resolve8();
+        resolve9();
       } else {
-        this._stdout.once("drain", resolve8);
+        this._stdout.once("drain", resolve9);
       }
     });
   }
@@ -30805,10 +30805,10 @@ async function gate(opts) {
   const timeoutMs = opts.timeoutMs ?? 3e4;
   const controller = new AbortController();
   let timeoutHandle;
-  const timeout = new Promise((resolve8) => {
+  const timeout = new Promise((resolve9) => {
     timeoutHandle = setTimeout(() => {
       controller.abort();
-      resolve8(requireInput(`${opts.reason}_timeout`, opts.param, opts.accepts, opts.detail));
+      resolve9(requireInput(`${opts.reason}_timeout`, opts.param, opts.accepts, opts.detail));
     }, timeoutMs);
   });
   const asked = Promise.resolve().then(() => opts.ask(controller.signal, opts.detail));
@@ -35638,6 +35638,10 @@ function collectMarkdownFiles(sourcePath) {
     return entry.isDirectory() ? collectMarkdownFiles(full) : entry.isFile() && full.endsWith(".md") ? [full] : [];
   });
 }
+function isWithinRoot(target, root) {
+  const rel = path13.relative(root, target);
+  return rel === "" || !rel.startsWith("..") && !path13.isAbsolute(rel);
+}
 async function handleExtract(request, workspaceRoot, toolCallMeta) {
   if (!request.sourcePaths || request.sourcePaths.length === 0) {
     return { error: "VALIDATION_ERROR", message: "sourcePaths must contain at least one path" };
@@ -35658,7 +35662,30 @@ async function handleExtract(request, workspaceRoot, toolCallMeta) {
     return { error: "KG_MISMATCH", message: `This graph was merged into "${resolution.into}". Use that graph instead.` };
   }
   const targetKgPath = resolution.graph.path;
-  const candidates = request.sourcePaths.flatMap((p) => collectMarkdownFiles(p)).map((filePath) => draftFromFile(filePath));
+  const resolvedKgPath = fs13.existsSync(targetKgPath) ? fs13.realpathSync(targetKgPath) : path13.resolve(targetKgPath);
+  const allowedRoots = ["chat-history", "lessons-learned", "decisions"].map((d) => path13.resolve(resolvedKgPath, d));
+  let resolvedSourcePaths;
+  try {
+    resolvedSourcePaths = request.sourcePaths.map((p) => fs13.realpathSync(path13.resolve(resolvedKgPath, p)));
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: "VALIDATION_ERROR", message: `Unable to resolve one or more sourcePaths: ${message}` };
+  }
+  const outOfScope = resolvedSourcePaths.filter((p) => !allowedRoots.some((root) => isWithinRoot(p, root)));
+  if (outOfScope.length > 0) {
+    return {
+      error: "KG_MISMATCH",
+      message: `sourcePaths must be under the resolved graph's chat-history/, lessons-learned/, or decisions/ directories. Out of scope: ${outOfScope.join(", ")}`
+    };
+  }
+  let candidates;
+  try {
+    const markdownFiles = resolvedSourcePaths.flatMap((p) => collectMarkdownFiles(p));
+    candidates = markdownFiles.map((filePath) => draftFromFile(filePath));
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: "VALIDATION_ERROR", message: `Unable to read one or more sourcePaths: ${message}` };
+  }
   return { candidates, targetKgPath };
 }
 function registerExtractTool(server2) {

@@ -32,7 +32,7 @@ Auto-triggered context providers that enhance agent behavior:
 
 Heavy-lift task handlers that keep main context clean:
 
-- **knowledge-extractor** — Read-only parsing of large files for KG extraction (approval-gated writes)
+- **knowledge-extractor** — Read-only parsing of large files for KG extraction (never writes — coordinator writes after approval)
 - **session-documenter** — Git archaeology for session summaries (approval-gated commits/pushes)
 
 ## Code Protection Rules

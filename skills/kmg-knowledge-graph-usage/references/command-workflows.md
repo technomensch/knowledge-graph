@@ -666,23 +666,16 @@ ls knowledge/chat-history/
 
 #### Step 4: Update Knowledge Graph
 
-Processes lessons-learned/:
-- Extracts patterns
-- Updates knowledge/templates/patterns.md
-- Updates knowledge/templates/gotchas.md
-- Updates knowledge/templates/architecture.md
-- Preserves git metadata
+Run `/kmgraph:kmg-backfill knowledge/lessons-learned/` to index `lessons-learned/`:
+- Drafts KG-index entries pointing back to each existing lesson file
+- Preserves source file references (no content is duplicated)
+- Presents candidates and confirms before writing anything
 
 #### Step 5: Review Generated Content
 
-**Check knowledge graph files:**
+**Check what was drafted:**
 
-```bash
-# Review what was consolidated
-cat knowledge/templates/patterns.md
-cat knowledge/templates/gotchas.md
-cat knowledge/templates/architecture.md
-```
+Review the candidate KG-index entries `kmg-backfill` presented in Step 4 before approving.
 
 **Edit for:**
 - Clarity and organization
@@ -691,6 +684,8 @@ cat knowledge/templates/architecture.md
 - Improve categorization
 
 #### Step 6: One-Command Alternative
+
+After Step 1 (`kmg-extract-chat`) has populated `chat-history/`, `/kmgraph:kmg-backfill` can combine Steps 2-4 (reviewing chat-history, drafting lesson candidates, and indexing `lessons-learned/`) into a single confirm-before-write pass — run it instead of doing them manually.
 
 ### Consolidation Checklist
 
@@ -1129,12 +1124,7 @@ find knowledge/lessons-learned -name "*.md" -mtime +180
 
 #### Step 5: Update Knowledge Graph
 
-<!-- TODO(Task 3): replace with kmg-backfill workflow once it ships -->
-
-Review generated:
-- knowledge/templates/patterns.md
-- knowledge/templates/gotchas.md
-- knowledge/templates/architecture.md
+Run `/kmgraph:kmg-backfill` to index the consolidated `lessons-learned/`/`decisions/` content into the knowledge graph — it drafts KG-index entries pointing back to each file, then review generated candidates:
 
 #### Step 6: Archive or Remove Obsolete
 

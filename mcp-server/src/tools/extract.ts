@@ -58,6 +58,14 @@ function collectMarkdownFiles(sourcePath: string): string[] {
   });
 }
 
+// True if `target` is `root` itself or nested under it (path-boundary safe --
+// unlike a bare startsWith(), this won't treat "/kg/decisions-archive" as
+// nested under "/kg/decisions").
+function isWithinRoot(target: string, root: string): boolean {
+  const rel = path.relative(root, target);
+  return rel === "" || (!rel.startsWith("..") && !path.isAbsolute(rel));
+}
+
 export async function handleExtract(
   request: ExtractRequest,
   workspaceRoot?: string,
@@ -86,7 +94,46 @@ export async function handleExtract(
   // resolution.kind is now "resolved" or "archived" -- both carry `graph`
   const targetKgPath = resolution.graph.path;
 
-  const candidates: ExtractCandidate[] = request.sourcePaths.flatMap((p) => collectMarkdownFiles(p)).map((filePath) => draftFromFile(filePath));
+  // sourcePaths must actually live under the resolved graph's chat-history/,
+  // lessons-learned/, or decisions/ -- without this, a caller could point
+  // sourcePaths at any readable path on disk and have its contents echoed
+  // back as "candidates" (the KG resolution above would otherwise be
+  // decorative, not enforced). Relative paths resolve against the graph
+  // root (matching the documented "paths under chat-history/, ..." contract),
+  // not the process cwd -- a personal-KG (~/.kmgraph) resolution invoked from
+  // a project directory would otherwise resolve relative paths to the wrong
+  // place. Absolute paths are unaffected either way.
+  const resolvedKgPath = fs.existsSync(targetKgPath) ? fs.realpathSync(targetKgPath) : path.resolve(targetKgPath);
+  const allowedRoots = ["chat-history", "lessons-learned", "decisions"].map((d) => path.resolve(resolvedKgPath, d));
+
+  let resolvedSourcePaths: string[];
+  try {
+    // realpathSync (not path.resolve) so a symlink inside an allowed root
+    // pointing outside the graph can't be used to read arbitrary files --
+    // it also fails fast on a nonexistent sourcePath with a clean error
+    // instead of surfacing later as an unhandled ENOENT.
+    resolvedSourcePaths = request.sourcePaths.map((p) => fs.realpathSync(path.resolve(resolvedKgPath, p)));
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: "VALIDATION_ERROR", message: `Unable to resolve one or more sourcePaths: ${message}` };
+  }
+
+  const outOfScope = resolvedSourcePaths.filter((p) => !allowedRoots.some((root) => isWithinRoot(p, root)));
+  if (outOfScope.length > 0) {
+    return {
+      error: "KG_MISMATCH",
+      message: `sourcePaths must be under the resolved graph's chat-history/, lessons-learned/, or decisions/ directories. Out of scope: ${outOfScope.join(", ")}`,
+    };
+  }
+
+  let candidates: ExtractCandidate[];
+  try {
+    const markdownFiles = resolvedSourcePaths.flatMap((p) => collectMarkdownFiles(p));
+    candidates = markdownFiles.map((filePath) => draftFromFile(filePath));
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { error: "VALIDATION_ERROR", message: `Unable to read one or more sourcePaths: ${message}` };
+  }
 
   return { candidates, targetKgPath };
 }

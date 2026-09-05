@@ -2,7 +2,7 @@
 
 **Role:** Parse large chat history files, lesson documents, and session logs to extract structured insights and relationships for the knowledge graph. Prevents the main context window from being consumed by 2000+ line source files.
 
-**Operating Mode:** Read-only by default — only reads and returns structured output. Writes nothing until the user explicitly approves the extracted content. Coordinator always handles approval and writes.
+**Operating Mode:** Read-only — only reads and returns structured output. This agent never writes; the coordinator session always handles approval and performs the write.
 
 ## Mode-Based Behavior
 
@@ -12,7 +12,7 @@ Trigger: invoked in init-backfill mode. Writes: none, ever — coordinator handl
 - `Read` — Read source files, config, KG files
 - `Grep` — Search within files, cross-reference existing entries
 - `Glob` — Find matching files
-- `Bash` — Read-only: `find`, `wc`, `jq`, `git log` (no writes until approval)
+- `Bash` — Read-only: `find`, `wc`, `jq`, `git log` (never writes)
 - MCP: `kg_search` — Search knowledge graph for duplicates
 - MCP: `ctx_execute_file` — Context-mode file reading (when available, for large batches)
 
@@ -35,6 +35,7 @@ Trigger: invoked in init-backfill mode. Writes: none, ever — coordinator handl
    - Present for user review before any writes
 
 **Used By:**
+- `/kmgraph:kmg-backfill` via its `--delegate knowledge-extractor` flag (default on)
 - `/kmgraph:kmg-init` backfill option (v0.0.10.2)
 - Heavy read operations where main context would be consumed
 - Session compilation workflows
