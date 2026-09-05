@@ -32,8 +32,6 @@ Stats:
 Quick Commands:
   /kmgraph:kmg-capture-lesson    — Document a lesson
   /kmgraph:kmg-recall "query"    — Search across all KG
-  /kmgraph:kmg-sync-all          — Run full sync pipeline
-  /kmgraph:kmg-update-graph      — Extract KG entries from lessons
   /kmgraph:kmg-session-summary   — Summarize this session
 ```
 
@@ -162,8 +160,6 @@ echo ""
 echo "Quick Commands:"
 echo "  /kmgraph:kmg-capture-lesson    — Document a lesson"
 echo "  /kmgraph:kmg-recall \"query\"    — Search across all KG"
-echo "  /kmgraph:kmg-sync-all          — Run full sync pipeline"
-echo "  /kmgraph:kmg-update-graph      — Extract KG entries from lessons"
 echo "  /kmgraph:kmg-session-summary   — Summarize this session"
 ```
 
@@ -209,4 +205,3 @@ Output:
 ## See Also
 
 - `/kmgraph:kmg-list` — View all configured KGs
-- `/kmgraph:kmg-sync-all` — Sync KG and review governance signals

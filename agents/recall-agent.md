@@ -235,4 +235,3 @@ If nothing is found after searching all scoped directories:
 
 - If recall surfaces 0 results, suggest `/kmgraph:kmg-capture-lesson`.
 - If user asks about "today's work" and no session summary exists, suggest `/kmgraph:kmg-session-summary`.
-- If results are found and user wants to extract insights, suggest `/kmgraph:kmg-update-graph`.

@@ -183,7 +183,6 @@ EXPECTED_AGENTS=(
   "lesson-capture-agent"
   "session-summary-agent"
   "mcp-setup-agent"
-  "sync-all-agent"
   "create-adr-agent"
   "platform-sync-agent"
   "recall-agent"
@@ -212,17 +211,17 @@ for agent in "${EXPECTED_AGENTS[@]}"; do
   fi
 done
 if [ $MISSING_AGENTS -eq 0 ]; then
-  pass "All 11 agent files present"
+  pass "All 10 agent files present"
 else
   fail "$MISSING_AGENTS agent file(s) missing"
 fi
 
-# Test 12: Exact count is 11
+# Test 12: Exact count is 10
 ACTUAL_COUNT=$(find "$AGENTS_DIR" -name "*.md" -maxdepth 1 -type f | wc -l | tr -d ' ')
-if [ "$ACTUAL_COUNT" -eq 11 ]; then
-  pass "Exact agent count is 11"
+if [ "$ACTUAL_COUNT" -eq 10 ]; then
+  pass "Exact agent count is 10"
 else
-  fail "Agent count is $ACTUAL_COUNT (expected 11)"
+  fail "Agent count is $ACTUAL_COUNT (expected 10)"
 fi
 
 # Test 13: No empty agent files

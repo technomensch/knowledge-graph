@@ -163,11 +163,6 @@ Commands remain available for explicit, interactive use. They operate on all fou
 - Available for manual use at any time
 - Dispatches to session-summary-agent
 
-**`/kmgraph:kmg-sync-all`**
-- Full orchestration pipeline in one command
-- Extract → capture → update graph
-- Dispatches multiple agents in sequence
-
 ### Search and Recall
 
 **`/kmgraph:kmg-recall "query"`**
@@ -226,23 +221,12 @@ Commands remain available for explicit, interactive use. They operate on all fou
 3. Apply documented solution or adapt approach
 ```
 
-**Periodic knowledge consolidation:**
-```
-1. /kmgraph:kmg-sync-all
-   - Extracts recent chats
-   - Captures lessons from extracted content
-   - Updates knowledge graph with insights
-2. Review generated content for quality
-```
-
 **After lesson capture (NEW - v0.0.3):**
 ```
 Context: User just completed /kmgraph:kmg-capture-lesson
 
 Proactive suggestion:
 "✅ Lesson captured! Extract insights to Knowledge Graph?"
-- Recommended: /kmgraph:kmg-update-graph (extracts patterns/gotchas/concepts)
-- Full pipeline: /kmgraph:kmg-sync-all (extraction + governance check + GitHub)
 - Later: Skip for now, run manually later
 
 Why now: Fresh context enables better extraction. The knowledge-reviewer

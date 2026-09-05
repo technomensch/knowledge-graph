@@ -666,17 +666,12 @@ ls knowledge/chat-history/
 
 #### Step 4: Update Knowledge Graph
 
-```bash
-# Consolidate lessons into knowledge graph
-/kmgraph:kmg-update-graph
-
-# Processes lessons-learned/:
-# - Extracts patterns
-# - Updates knowledge/templates/patterns.md
-# - Updates knowledge/templates/gotchas.md
-# - Updates knowledge/templates/architecture.md
-# - Preserves git metadata
-```
+Processes lessons-learned/:
+- Extracts patterns
+- Updates knowledge/templates/patterns.md
+- Updates knowledge/templates/gotchas.md
+- Updates knowledge/templates/architecture.md
+- Preserves git metadata
 
 #### Step 5: Review Generated Content
 
@@ -696,21 +691,6 @@ cat knowledge/templates/architecture.md
 - Improve categorization
 
 #### Step 6: One-Command Alternative
-
-**Use consolidated workflow:**
-
-```bash
-# Single command for complete pipeline
-/kmgraph:kmg-sync-all
-
-# Equivalent to:
-# 1. /kmgraph:kmg-extract-chat
-# 2. Auto-capture lessons from chats
-# 3. /kmgraph:kmg-update-graph
-# 4. Generate session summaries
-```
-
-**Benefit:** Automated end-to-end knowledge consolidation.
 
 ### Consolidation Checklist
 
@@ -1149,15 +1129,12 @@ find knowledge/lessons-learned -name "*.md" -mtime +180
 
 #### Step 5: Update Knowledge Graph
 
-```bash
-# Re-consolidate lessons
-/kmgraph:kmg-update-graph
+<!-- TODO(Task 3): replace with kmg-backfill workflow once it ships -->
 
-# Review generated:
-# - knowledge/templates/patterns.md
-# - knowledge/templates/gotchas.md
-# - knowledge/templates/architecture.md
-```
+Review generated:
+- knowledge/templates/patterns.md
+- knowledge/templates/gotchas.md
+- knowledge/templates/architecture.md
 
 #### Step 6: Archive or Remove Obsolete
 
@@ -1216,7 +1193,7 @@ rm knowledge/lessons-learned/obsolete-lesson.md
 | End-of-Session | After productive sessions | 5-10 min | 1-2x/day | `/kmgraph:kmg-session-summary` |
 | Problem-Solving | Facing specific problem | Varies | As needed | `/kmgraph:kmg-recall`, `/kmgraph:kmg-capture-lesson` |
 | Complex Investigation | Multi-attempt problems | Multiple sessions | 1-2x/month | `/kmgraph:kmg-meta-issue` |
-| Periodic Consolidation | Knowledge maintenance | 30-60 min | Weekly/bi-weekly | `/kmgraph:kmg-sync-all` |
+| Periodic Consolidation | Knowledge maintenance | 30-60 min | Weekly/bi-weekly | — |
 | Knowledge Search | Finding past knowledge | 2-10 min | Multiple/day | `/kmgraph:kmg-recall` |
 | Team Collaboration | Sharing with team | Continuous | Continuous | Selective git strategy |
 | Project Onboarding | Starting on project | 30-60 min | Once | `cd` into project (auto-resolves), read knowledge graph |
@@ -1238,9 +1215,6 @@ rm knowledge/lessons-learned/obsolete-lesson.md
 
 **"Same issue third time"**
 → `/kmgraph:kmg-meta-issue [number]`
-
-**"Weekly review time"**
-→ `/kmgraph:kmg-sync-all`
 
 **"New project setup"**
 → `/kmgraph:kmg-init [name]`
@@ -1273,7 +1247,6 @@ rm knowledge/lessons-learned/obsolete-lesson.md
 - More efficient than constant updates
 
 **Automation:**
-- Use `/kmgraph:kmg-sync-all` for full pipeline
 - Configure git hooks for validation
 - Automate sensitive data checks
 - Schedule periodic reviews

@@ -129,8 +129,7 @@ Commands are markdown files with YAML frontmatter and embedded bash scripts.
 | All namespace refs use `/kmgraph:` format | Negative grep check |
 | Bash code blocks pass `bash -n` | No syntax errors in embedded scripts |
 | No hardcoded `/Users/<name>` paths | Grep returns 0 hits |
-| `help.md` references key commands | capture-lesson, recall, sync-all, session-summary |
-| `sync-all.md` references sub-commands | ≥ 2 of: update-graph, session-summary, capture-lesson |
+| `help.md` references key commands | capture-lesson, recall, session-summary |
 
 ---
 

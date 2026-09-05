@@ -117,5 +117,4 @@ The agent handles all search execution, ranking, and result formatting.
 
 **Related commands:**
 - `/kmgraph:kmg-capture-lesson` — Document new lessons learned
-- `/kmgraph:kmg-update-graph` — Extract insights from lessons to KG
 - `/kmgraph:kmg-status` — Show active KG info

@@ -59,7 +59,6 @@ Output in this format:
   /kmgraph:kmg-recall            Search across all project memory systems
 
 🟡 Intermediate
-  /kmgraph:kmg-update-graph      Extract insights from lessons to knowledge graph
   /kmgraph:kmg-add-category      Add a new category to an existing knowledge graph
   /kmgraph:kmg-session-summary   Create a summary of the current chat session
   /kmgraph:kmg-list              Display all configured knowledge graphs
@@ -72,7 +71,6 @@ Output in this format:
   /kmgraph:kmg-start-issue-tracking  Initialize structured issue tracking with Git branch
   /kmgraph:kmg-update-issue-plan     Sync progress to plans and GitHub
   /kmgraph:kmg-link-issue        Link lessons or ADRs to GitHub Issues
-  /kmgraph:kmg-sync-all          Run the full sync pipeline in one command
 
 📄 Documentation
   /kmgraph:kmg-create-doc        Scaffold new documentation files

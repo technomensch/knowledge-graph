@@ -147,7 +147,7 @@ if [ -f "$OLD_DB" ] && [ "$FTS5_MIGRATED" != "true" ]; then
       rm -f /tmp/kg-config-tmp.json
       printf '⚠️  kg-config.json update failed (jq error or invalid output) — original left untouched.\n'
     fi
-    printf '✓ Index location updated. Run kg_fts5_rebuild or /kmgraph:kmg-sync-all to rebuild.\n'
+    printf '✓ Index location updated. Run kg_fts5_rebuild to rebuild.\n'
   else
     printf 'Skipped. Search continues via linear scan until you choose to migrate.\n'
   fi
@@ -182,7 +182,7 @@ REAL_DB=$(find "$INDEX_DIR" -maxdepth 1 -type f \
   2>/dev/null | head -1)
 if [ -z "$REAL_DB" ]; then
   echo "ℹ️  Skipping stale FTS5 cleanup — no index found for \"${kg_name}\" under $INDEX_DIR."
-  echo "   Run /kmgraph:kmg-sync-all to build it first, then re-run /kmgraph:kmg-init."
+  echo "   Build the index first, then re-run /kmgraph:kmg-init."
   # exit_step
 fi
 
@@ -652,12 +652,12 @@ KG_ENTRY_COUNT=$(find "knowledge/knowledge" -name "*.md" ! -name "*template*" 2>
 if [ "$LESSON_COUNT" -gt 0 ] && [ "$KG_ENTRY_COUNT" -eq 0 ]; then
   echo "⚠️  $LESSON_COUNT lessons migrated but no KG entries exist yet."
   echo ""
-  echo "  Run /kmgraph:kmg-update-graph to extract patterns from your lessons?"
+  echo "  Extract patterns from your lessons now?"
   echo "  This populates knowledge/ with structured entries for fast recall."
   echo ""
-  echo "    1. Yes — run update-graph now"
+  echo "    1. Yes — run extraction now"
   echo "    2. Skip — I'll run it later"
-  # If Yes: invoke /kmgraph:kmg-update-graph --auto --sync-all
+  # TODO(Task 4): wire the Yes branch to a real extraction command (Step 1.10 rewrite)
 fi
 
 # h. Content migration offer — populate me.md and rules.md from existing CLAUDE.md
@@ -929,7 +929,7 @@ Parameters:
 
 #### 1g. Knowledge extraction check
 
-The `knowledge/` directory holds structured patterns, concepts, and gotchas extracted from lessons. It is populated by `/kmgraph:kmg-update-graph` and is never populated automatically. Check whether extraction has been run:
+The `knowledge/` directory holds structured patterns, concepts, and gotchas extracted from lessons. It is never populated automatically. Check whether extraction has been run:
 
 ```bash
 LESSON_COUNT=$(find "$KG_ROOT/lessons-learned" -name "*.md" ! -name "*template*" 2>/dev/null | wc -l | tr -d ' ')
@@ -938,13 +938,14 @@ KG_COUNT=$(find "$KG_ROOT/knowledge" -name "*.md" ! -name "*template*" 2>/dev/nu
 if [ "$LESSON_COUNT" -gt 0 ] && [ "$KG_COUNT" -eq 0 ]; then
   echo "⚠️  knowledge/ is empty — $LESSON_COUNT lessons exist but patterns have never been extracted."
   echo ""
-  echo "  Run /kmgraph:kmg-update-graph now to populate structured KG entries?"
+  echo "  Extract patterns from existing lessons now to populate structured KG entries?"
   echo "    1. Yes — extract patterns from existing lessons"
   echo "    2. Skip for now"
 fi
 ```
 
-If the user selects **Yes**, run `/kmgraph:kmg-update-graph --auto --sync-all`. The `--auto` flag skips per-lesson prompts (consent was given by answering Yes here) and `--sync-all` processes all lessons with missing entries in one pass. If the user selects **Skip**, continue — `update-graph` can be run at any time.
+<!-- TODO(Task 4): wire the Yes branch to a real extraction command (Step 1.10 rewrite) -->
+If the user selects **Skip**, continue — extraction can be run at any time.
 
 #### 1h. Output verification summary
 
