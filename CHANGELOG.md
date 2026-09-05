@@ -9,6 +9,9 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+- `kmg-backfill` — new standalone command consolidating chat-history/lessons-learned/decisions extraction into one confirm-before-write flow. Replaces `kmg-update-graph`. See ADR-071.
+
 ### Removed
 - `kmg-update-graph`, `kmg-sync-all`, `sync-all-agent` — confirmed-dead orchestration pipeline, inherited unmodified from an unrelated prior project (`optimize-my-resume`), zero confirmed real-world use ([issue-37](knowledge/issues/issue-37/issue-37-description.md)). Superseded by `kmg-backfill`. See ADR-071.
 

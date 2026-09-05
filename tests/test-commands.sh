@@ -40,6 +40,7 @@ echo "── File presence ─────────────────�
 # unprefixed "switch.md" command was retired and has no kmg- successor.
 EXPECTED_COMMANDS=(
   "kmg-add-category.md"
+  "kmg-backfill.md"
   "kmg-capture-lesson.md"
   "kmg-check-sensitive.md"
   "kmg-config-sanitization.md"
@@ -72,20 +73,19 @@ for cmd in "${EXPECTED_COMMANDS[@]}"; do
 done
 
 if [ $MISSING -eq 0 ]; then
-  pass "All 22 expected command files present"
+  pass "All 23 expected command files present"
 else
   fail "$MISSING command file(s) missing (see above)"
 fi
 
-# Test 3: Exact count is 22 (top-level only — kmg-init-shared/ modules are excluded)
-# will become 23 once kmg-backfill.md ships (Task 3)
+# Test 3: Exact count is 23 (top-level only — kmg-init-shared/ modules are excluded)
 ACTUAL_COUNT=$(find "$COMMANDS_DIR" -maxdepth 1 -name "*.md" -type f | wc -l | tr -d ' ')
-if [ "$ACTUAL_COUNT" -eq 22 ]; then
-  pass "Exact command count is 22"
-elif [ "$ACTUAL_COUNT" -gt 22 ]; then
-  fail "More than 22 command files found ($ACTUAL_COUNT) — unexpected files?"
+if [ "$ACTUAL_COUNT" -eq 23 ]; then
+  pass "Exact command count is 23"
+elif [ "$ACTUAL_COUNT" -gt 23 ]; then
+  fail "More than 23 command files found ($ACTUAL_COUNT) — unexpected files?"
 else
-  fail "Fewer than 22 command files found ($ACTUAL_COUNT)"
+  fail "Fewer than 23 command files found ($ACTUAL_COUNT)"
 fi
 
 # Test 4: No zero-byte files
@@ -190,6 +190,20 @@ if [ -f "$COMMANDS_DIR/kmg-help.md" ]; then
   fi
 else
   fail "kmg-help.md not found"
+fi
+
+# Test 12: kmg-backfill.md exists and documents required flags
+if [ -f "$COMMANDS_DIR/kmg-backfill.md" ]; then
+  CONTENT=$(cat "$COMMANDS_DIR/kmg-backfill.md")
+  if echo "$CONTENT" | grep -q -- "--delegate knowledge-extractor" && \
+     echo "$CONTENT" | grep -q -- "--date=" && \
+     ! echo "$CONTENT" | grep -q -- "--source "; then
+    pass "kmg-backfill.md documents required flags, omits rejected --source"
+  else
+    fail "kmg-backfill.md missing required flags or has a rejected flag"
+  fi
+else
+  fail "kmg-backfill.md not found"
 fi
 
 echo ""
