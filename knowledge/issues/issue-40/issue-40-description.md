@@ -10,12 +10,12 @@ related_issues: ["issue-18"]
 
 # issue-40: Capture-level flag naming/targeting consistency across commands+agents (`--named` vs `--project` vs `--graph`)
 
-**Update (2026-09-04):** `commands/kmg-sync-all.md`, one of the 5 files listed below, is slated for removal per [ENH-034](../../enhancements/ENH-034/ENH-034-specification.md) (confirmed-dead pipeline). Drop it from this issue's file list once that removal ships — the `--named` naming decision still applies to the remaining 4 commands + 3 agents regardless.
+**Update (2026-09-04):** `commands/kmg-sync-all.md`, one of the 5 files listed below, was removed per [ENH-034](../../enhancements/ENH-034/ENH-034-specification.md) (confirmed-dead pipeline) in v0.7.7. Dropped from this issue's file list — the `--named` naming decision still applies to the remaining 4 commands + 3 agents.
 
 ## Problem
 
 `--named=<kg>` is used across `commands/kmg-session-summary.md`, `commands/kmg-recall.md`,
-`commands/kmg-capture-lesson.md`, `commands/kmg-create-adr.md`, `commands/kmg-sync-all.md`,
+`commands/kmg-capture-lesson.md`, `commands/kmg-create-adr.md`,
 and the 3 agents they dispatch to (`create-adr-agent.md`, `lesson-capture-agent.md`,
 `session-summary-agent.md`) — this is the flag vocabulary that survived Phase 7.1 of
 ADR-067 (see [issue-18](../issue-18/issue-18-description.md)'s "Resolved" section) once
@@ -43,7 +43,7 @@ gap, not just the one spot-checked.
 
 ## Scope
 
-Touches 5 commands + 3 agents (the Phase 7.1 files) + potentially
+Touches 4 commands + 3 agents (the Phase 7.1 files) + potentially
 `commands/kmg-extract-chat.md` (naming precedent only, not necessarily code) + any other
 command using similar flag vocabulary. Worth a `grep -rn "\-\-named=" commands/ agents/`
 sweep to confirm the full file list before scoping a fix.
@@ -80,6 +80,5 @@ the answer.
   `tests/test-create-adr-implements.sh` failure and this issue's flag-naming question both
   touch `commands/kmg-create-adr.md`/`commands/kmg-capture-lesson.md`'s comparison logic;
   good single-PR candidate alongside issue-41.
-- `commands/kmg-sync-all.md` hotspot: also touched by
-  [issue-37](../issue-37/issue-37-description.md), issue-38 (above), and ENH-026 — FYI,
-  not batched here.
+- `commands/kmg-sync-all.md` (removed in v0.7.7) was previously a hotspot also touched by
+  [issue-37](../issue-37/issue-37-description.md), issue-38 (above), and ENH-026.

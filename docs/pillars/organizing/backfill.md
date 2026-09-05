@@ -41,11 +41,13 @@ Export chat history from Claude Code or Gemini CLI first:
 /kmgraph:kmg-extract-chat
 ```
 
-The command locates chat logs, extracts lessons and decisions, and presents them for review before writing. Use `--delegate knowledge-extractor` for large exports (10+ sessions):
+The command locates chat logs and archives them into `chat-history/` — it does **not** extract lessons or decisions. Use `--delegate knowledge-extractor` for large exports (10+ sessions):
 
 ```bash
 /kmgraph:kmg-extract-chat --delegate knowledge-extractor
 ```
+
+Then run `/kmgraph:kmg-backfill` (see "After init" above) to draft lesson/decision candidates from the archived chat history.
 
 ## Related
 
@@ -56,7 +58,13 @@ The command locates chat logs, extracts lessons and decisions, and presents them
 
 ### Init completed but backfill was skipped
 
-If the initialization wizard ran but the backfill offer didn't appear (or you declined it), run backfill manually:
+If the initialization wizard ran but the backfill offer didn't appear (or you declined it), you don't need to re-run all of init — for `chat-history/`, `lessons-learned/`, or `decisions/` specifically, run backfill directly:
+
+```bash
+/kmgraph:kmg-backfill
+```
+
+Or re-run init to re-trigger the full offer (covers `plans/`/`research/`/`specs/`/`README.md`/`CHANGELOG.md` too):
 
 **Claude Code:**
 ```
@@ -73,7 +81,7 @@ Same behavior — re-running init on an initialized project triggers the backfil
 **Codex / other platforms:**
 Use the MCP tool directly:
 ```
-kg_capture  (after running kg_search to confirm the KG is active)
+kg_extract  (after running kg_search to confirm the KG is active)
 ```
 Or re-run the init command for your platform — the existing KG is preserved and the backfill step runs again.
 

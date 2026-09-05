@@ -1,7 +1,7 @@
 ---
 id: issue-37
 type: Enhancement
-status: accepted
+status: resolved
 github-issue: "#238"
 branch: none
 created: 2026-08-01
@@ -9,7 +9,9 @@ created: 2026-08-01
 
 # issue-37: Explore Auto-Trigger vs. Manual Invocation for `kmg-sync-all`
 
-**Update (2026-09-04):** Resolved via [ENH-034](../../enhancements/ENH-034/ENH-034-specification.md) — its `kmg-update-graph` removal decision (Option C) takes `kmg-sync-all`/`sync-all-agent` with it, since this issue's own finding (zero observed real-world usage) is what made that removal safe. Close this issue once ENH-034 ships rather than resolving the auto-trigger-vs-manual question independently.
+**Update (2026-09-04):** Resolved via [ENH-034](../../enhancements/ENH-034/ENH-034-specification.md) — its `kmg-update-graph` removal decision (Option C) takes `kmg-sync-all`/`sync-all-agent` with it, since this issue's own finding (zero observed real-world usage) is what made that removal safe.
+
+**Closed 2026-09-04 (implementation):** `kmg-sync-all`/`sync-all-agent` removed in Task 1 — see commit history on `v0.7.7-remove-stale-commands`.
 
 ## Problem
 

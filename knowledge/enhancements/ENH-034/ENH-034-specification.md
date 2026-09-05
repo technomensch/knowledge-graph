@@ -1,14 +1,14 @@
 ---
 id: ENH-034
 type: Enhancement
-status: proposed
+status: implemented
 ---
 
 # ENH-034: Capture-pipeline command naming and grouping
 
 **Local ID:** ENH-034 | **GitHub Issue:** [#232](https://github.com/technomensch/knowledge-graph/issues/232) (filed 2026-08-22, retroactively — see [issue-52](../../issues/issue-52/issue-52-description.md) for why brainstorm-originated specs don't reliably get one automatically)
 
-**Status:** 🟡 Proposed
+**Status:** ✅ Implemented
 **Discovered:** 2026-07-01
 **Governed by:** [ADR-058](../../decisions/ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md)
 **Related:** [ADR-053](../../decisions/ADR-053-kmg-prefix-cross-platform-naming.md) (the June `kmg-` rename whose blast radius bounds this ENH's scope), [ADR-057](../../decisions/ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth.md) (the DETECT-layer subset of the same cluster), [ENH-026](../ENH-026/ENH-026-specification.md) (KG Write Guard — its `commands/kmg-update-graph.md` guard should wait for this ENH's Option A/B rename decision, validated 2026-07-11), [ENH-035](../ENH-035/ENH-035-specification.md) (chat-history backfill extractor `kmg-backfill` — its own blast-radius deep-dive (2026-09-04) independently found and needs to fix 2 `kmg-update-graph` references in `docs/pillars/organizing/backfill.md`; coordinate so this ENH's removal and ENH-035's fix don't land as conflicting edits to the same file), [ENH-042](../ENH-042/ENH-042-specification.md) (release-doc-sync reconciliation — its fix references `kmg-update-graph`/`kmg-execute-plan`/`kmg-update-doc.md` by name; hold its implementation until this ENH's Option A/B decision lands, validated 2026-07-11 — kept as a separate ENH since it's sync-logic + a new enforcement gate, not naming/IA), `docs/reference/command-guide.md`, `docs/reference/commands.md`, `docs/pillars/organizing/backfill.md`, `commands/kmg-update-graph.md`, `commands/kmg-update-issue-plan.md`
@@ -146,20 +146,20 @@ Applying the pipeline-stage mapping already established this session's swimlane 
 
 ## Acceptance Criteria
 
-- [ ] `command-guide.md` and `kmg-help` present the capture-pipeline cluster in workflow-stage order, not alphabetical.
-- [ ] The pipeline stage each command belongs to is legible from the grouping.
-- [ ] A decision is recorded on `kmg-update-issue-plan` (rename vs. leave, Option A vs. B); if renamed, old name remains a deprecated alias for at least one release (ADR-053 precedent).
+- [x] `command-guide.md` and `kmg-help` present the capture-pipeline cluster in workflow-stage order, not alphabetical.
+- [x] The pipeline stage each command belongs to is legible from the grouping.
+- [x] A decision is recorded on `kmg-update-issue-plan` (rename vs. leave, Option A vs. B); if renamed, old name remains a deprecated alias for at least one release (ADR-053 precedent). Decided: Option A, kept as-is, no rename — see ADR-071 Decision 6.
 - [x] Decision recorded 2026-09-04: `kmg-update-graph` removed (Option C). `kmg-sync-all`/`sync-all-agent` removed in the same pass (this also resolves `issue-37`'s open deprecation question — close it with a pointer here). ENH-035 (12 refs) + ADR-058 (6 refs) + `docs/pillars/organizing/backfill.md` (3 refs) updated in the same pass — coordinated with ENH-035's own edits to that last file, not duplicated.
-- [ ] `knowledge-extractor`'s `update-graph` mode section (KG Entry Extraction Mode) is removed/deprecated from `agents/knowledge-extractor.md` in the same pass as this removal, coordinated with ENH-035 (which absorbs its logic into `kmg-backfill`) so it isn't deleted twice or left half-updated. Its `init-backfill` mode is unaffected.
-- [ ] `knowledge-reviewer`'s fate (retained for reuse by `kmg-backfill`, or retired alongside `kmg-update-graph`/`kmg-sync-all`) is decided during ENH-035's implementation — not a gating condition for this removal.
-- [ ] No full-cluster rename is performed.
-- [ ] Any new/renamed name passes the ADR-058 naming/scope check (audience, collision, accuracy).
-- [ ] No behavioral change to any command in the cluster, other than the `kmg-update-graph` removal itself if Option C is chosen.
+- [x] `knowledge-extractor`'s `update-graph` mode section (KG Entry Extraction Mode) is removed/deprecated from `agents/knowledge-extractor.md` in the same pass as this removal, coordinated with ENH-035 (which absorbs its logic into `kmg-backfill`) so it isn't deleted twice or left half-updated. Its `init-backfill` mode is unaffected.
+- [x] `knowledge-reviewer`'s fate (retained for reuse by `kmg-backfill`, or retired alongside `kmg-update-graph`/`kmg-sync-all`) is decided during ENH-035's implementation — not a gating condition for this removal. Decided: retired (Option X) — see ADR-071.
+- [x] No full-cluster rename is performed.
+- [x] Any new/renamed name passes the ADR-058 naming/scope check (audience, collision, accuracy). `kmg-backfill` checked in ENH-035's own Naming decision section.
+- [x] No behavioral change to any command in the cluster, other than the `kmg-update-graph` removal itself if Option C is chosen (plus `kmg-init` Step 1.10's scoped bug fix, tracked explicitly under ENH-035).
 
 **Post-implementation ticket sync (do not skip — these were left "pending"/"not yet implemented" specifically so this work would close them):**
-- [ ] `issue-37` updated from its 2026-09-04 "accepted" note to `resolved`/closed, pointing at the shipped removal.
-- [ ] `ENH-025` updated from `accepted` to `implemented` (its `kg_extract` design ships as part of ENH-035's implementation, not this ENH's — but if this ENH's removal lands first, note here that ENH-025/035 are still pending).
-- [ ] `ENH-026` — its 2026-09-04 update note (guard items 1 superseded/moot) is re-checked against what actually shipped; status/scope updated to match, not left as a forward-looking note.
-- [ ] `issue-40` — `kmg-sync-all.md` dropped from its file list once removed, per its 2026-09-04 note.
-- [ ] `ADR-071` status moved from `Proposed` to `Accepted` once this ENH and ENH-035 both ship.
+- [x] `issue-37` updated from its 2026-09-04 "accepted" note to `resolved`/closed, pointing at the shipped removal.
+- [x] `ENH-025` updated from `accepted` to `implemented` (its `kg_extract` design shipped as part of ENH-035's implementation).
+- [x] `ENH-026` — its 2026-09-04 update note (guard items 1 superseded/moot) re-checked against what actually shipped; wording updated to confirmed past tense.
+- [x] `issue-40` — `kmg-sync-all.md` dropped from its file list.
+- [x] `ADR-071` status moved from `Proposed` to `Accepted`.
 </content>

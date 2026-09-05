@@ -1,12 +1,12 @@
 ---
 id: ENH-035
 type: Enhancement
-status: proposed
+status: implemented
 ---
 
 # ENH-035: Chat-history-and-lessons-to-KG backfill extractor (standalone, consolidates the now-retired kmg-update-graph)
 
-**Status:** 🟡 Proposed
+**Status:** ✅ Implemented
 **Discovered:** 2026-07-03
 **Governed by:** [ADR-058](../../decisions/ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings.md)
 **Related:** [ADR-057](../../decisions/ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth.md) (the DETECT-layer / auto-capture pipeline this ENH is deliberately NOT coupled to), [ENH-032](../ENH-032/ENH-032-specification.md) (resolved — establishes the extractor-never-writes / coordinator-confirms-then-writes pattern this ENH's command must preserve), [ENH-034](../ENH-034/ENH-034-specification.md) (its `kmg-update-graph` removal decision (Option C) is made unconditionally safe by this ENH's consolidation — coordinate implementation order so `knowledge-extractor`'s KG Entry Extraction Mode isn't deleted twice or left half-updated), [ENH-025](../ENH-025/ENH-025-specification.md) (proposed, found via 2026-09-04 open-ticket overlap check — its `kg_extract` MCP tool design is adopted as this ENH's cross-platform-parity answer; implement together), `commands/kmg-extract-chat.md`, `commands/kmg-update-graph.md`, `commands/kmg-init.md` (Step 1.10), `agents/knowledge-extractor.md`, `docs/pillars/organizing/backfill.md`
@@ -139,24 +139,24 @@ Requested check: what else does introducing `kmg-backfill` and refactoring `kmg-
 
 ## Acceptance Criteria
 
-- [ ] `kmg-extract-chat`'s docstring no longer claims backfill/extraction; it describes only its actual archive behavior.
-- [ ] `docs/pillars/organizing/backfill.md`'s "From chat history" section no longer claims `kmg-extract-chat` extracts lessons/decisions; both `kmg-update-graph` references there (After-init section, "no candidates" troubleshooting) are updated to current guidance.
-- [ ] `kmg-backfill` exists as a new standalone command that reads `chat-history/`, `lessons-learned/`, and `decisions/`, drafting lesson/decision candidates from the former and KG-index entries from the latter two — absorbing `kmg-update-graph`'s prior job.
-- [ ] `kmg-init` Step 1.10's `sources[]` array is fixed to detect `knowledge/lessons-learned/` and `knowledge/decisions/` (bug: previously never checked, despite `knowledge-extractor.md` documenting otherwise) and delegates all three of `chat-history/`/`lessons-learned/`/`decisions/` to `kmg-backfill` instead of duplicating/half-implementing that logic; the other five source types (`plans/`, `research/`, `specs/`, `README.md`, `CHANGELOG.md`) remain Step 1.10's own responsibility.
-- [ ] `agents/knowledge-extractor.md`'s Init-Backfill Mode doc no longer claims `lessons-learned/`/`decisions/` scanning that doesn't happen there post-refactor; its KG Entry Extraction Mode section is removed/deprecated in the same pass as ENH-034's `kmg-update-graph` removal (not left dangling either direction).
-- [ ] `docs/pillars/organizing/backfill.md`'s "Init completed but backfill was skipped" troubleshooting offers running `kmg-backfill` directly as a recovery path, not only re-running all of `kmg-init`.
-- [ ] Supports positional `[path]` and `--date=`/`--after=`/`--before=` for scoping input; supports `--delegate knowledge-extractor` (or defaults to it) for large-file reads.
-- [ ] Does NOT implement `--source`, `--output-dir`, `--today`, `--rebuild`, `--dry-run`, `--yes`/`--no-confirm`, or `--project`/`--confirm-unscoped` — see "Flags" section for rejection reasons on each.
-- [ ] Docstring explicitly distinguishes this command from `kmg-init`'s own backfill offer (narrower, chat-history-specific vs. `kmg-init`'s broader setup-time scan).
-- [ ] Before any write, the command prints the resolved source file(s) and destination KG path (reused ENH-033 step-3a pattern).
-- [ ] The extractor presents drafts for human confirmation and never auto-writes — preserves ENH-032's resolved coordinator-confirms-then-writes pattern; the extractor subagent itself never writes.
-- [ ] The extractor has **no** code dependency on `capture_mode`, the auto-capture pipeline, or the ENH-036 classifier.
-- [ ] `kmg-update-graph` is untouched by this ENH (Option B rejected) — its removal is tracked separately under ENH-034 Option C.
-- [ ] `tests/test-skills-agents.sh` (Test 15) and `tests/README.md`'s `knowledge-extractor` assertions still pass after the Step 1.10 refactor (no regression, generic wording only — verify, do not need to change).
+- [x] `kmg-extract-chat`'s docstring no longer claims backfill/extraction; it describes only its actual archive behavior.
+- [x] `docs/pillars/organizing/backfill.md`'s "From chat history" section no longer claims `kmg-extract-chat` extracts lessons/decisions; both `kmg-update-graph` references there (After-init section, "no candidates" troubleshooting) are updated to current guidance. (Caught and fixed during Task 8's AC verification — the "From chat history" overclaim and the stale `kg_capture` MCP reference had survived Task 7's sweep.)
+- [x] `kmg-backfill` exists as a new standalone command that reads `chat-history/`, `lessons-learned/`, and `decisions/`, drafting lesson/decision candidates from the former and KG-index entries from the latter two — absorbing `kmg-update-graph`'s prior job.
+- [x] `kmg-init` Step 1.10's `sources[]` array is fixed to detect `knowledge/lessons-learned/` and `knowledge/decisions/` (bug: previously never checked, despite `knowledge-extractor.md` documenting otherwise) and delegates all three of `chat-history/`/`lessons-learned/`/`decisions/` to `kmg-backfill` instead of duplicating/half-implementing that logic; the other five source types (`plans/`, `research/`, `specs/`, `README.md`, `CHANGELOG.md`) remain Step 1.10's own responsibility.
+- [x] `agents/knowledge-extractor.md`'s Init-Backfill Mode doc no longer claims `lessons-learned/`/`decisions/` scanning that doesn't happen there post-refactor; its KG Entry Extraction Mode section is removed/deprecated in the same pass as ENH-034's `kmg-update-graph` removal (not left dangling either direction).
+- [x] `docs/pillars/organizing/backfill.md`'s "Init completed but backfill was skipped" troubleshooting offers running `kmg-backfill` directly as a recovery path, not only re-running all of `kmg-init`.
+- [x] Supports positional `[path]` and `--date=`/`--after=`/`--before=` for scoping input; supports `--delegate knowledge-extractor` (or defaults to it) for large-file reads.
+- [x] Does NOT implement `--source`, `--output-dir`, `--today`, `--rebuild`, `--dry-run`, `--yes`/`--no-confirm`, or `--project`/`--confirm-unscoped` — see "Flags" section for rejection reasons on each.
+- [x] Docstring explicitly distinguishes this command from `kmg-init`'s own backfill offer (narrower, chat-history-specific vs. `kmg-init`'s broader setup-time scan).
+- [x] Before any write, the command prints the resolved source file(s) and destination KG path (reused ENH-033 step-3a pattern).
+- [x] The extractor presents drafts for human confirmation and never auto-writes — preserves ENH-032's resolved coordinator-confirms-then-writes pattern; the extractor subagent itself never writes.
+- [x] The extractor has **no** code dependency on `capture_mode`, the auto-capture pipeline, or the ENH-036 classifier.
+- [x] `kmg-update-graph` is untouched by this ENH (Option B rejected) — its removal is tracked separately under ENH-034 Option C.
+- [x] `tests/test-skills-agents.sh` (Test 15) and `tests/README.md`'s `knowledge-extractor` assertions still pass after the Step 1.10 refactor (verified green; `tests/README.md`'s agent-count wording also corrected during post-implementation review).
 
 **Post-implementation ticket sync (do not skip — these were left "pending"/"not yet implemented" specifically so this work would close them):**
-- [ ] `ENH-025` updated from `accepted` to `implemented` — its `kg_extract` tool ships as part of this ENH's implementation.
-- [ ] `issue-37` updated from `accepted` to `resolved`/closed, pointing at the shipped removal (tracked primarily under ENH-034, cross-check here since this ENH ships the replacement).
-- [ ] `docs/pillars/organizing/backfill.md`'s fixes (all three: "From chat history" overclaim, "After init" `kmg-update-graph` reference, "no candidates" troubleshooting reference, "backfill was skipped" section) are confirmed landed, not left as open TODOs in the doc itself.
-- [ ] `ADR-071` status moved from `Proposed` to `Accepted` once this ENH and ENH-034 both ship.
+- [x] `ENH-025` updated from `accepted` to `implemented` — its `kg_extract` tool shipped as part of this ENH's implementation.
+- [x] `issue-37` updated from `accepted` to `resolved`/closed, pointing at the shipped removal (tracked primarily under ENH-034, cross-checked here since this ENH shipped the replacement).
+- [x] `docs/pillars/organizing/backfill.md`'s fixes (all three: "From chat history" overclaim, "After init" `kmg-update-graph` reference, "no candidates" troubleshooting reference, "backfill was skipped" section) are confirmed landed, not left as open TODOs in the doc itself.
+- [x] `ADR-071` status moved from `Proposed` to `Accepted`.
 </content>

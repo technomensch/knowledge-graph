@@ -2,7 +2,7 @@
 title: "ADR-071: Retire kmg-update-graph/kmg-sync-all, Consolidate Extraction into kmg-backfill and kg_extract"
 number: 071
 created: 2026-09-04T00:00:00Z
-status: Proposed
+status: Accepted
 author: technomensch
 email: mkitact@gmail.com
 git:
@@ -25,7 +25,7 @@ category: architecture
 # ADR-071: Retire kmg-update-graph/kmg-sync-all, Consolidate Extraction into kmg-backfill and kg_extract
 
 **Date:** 2026-09-04
-**Status:** Proposed
+**Status:** Accepted
 **Related:** [[ENH-034-capture-pipeline-command-naming-and-grouping]], [[ENH-035-chat-history-and-lessons-to-kg-backfill-extractor]], [[ENH-025-cross-platform-knowledge-extractor-backfill-from-chat-history]], [[issue-37-explore-auto-trigger-vs-manual-invocation-for-kmg-sync-all]]
 
 ---
@@ -133,8 +133,7 @@ Originally flagged in ENH-034 alongside `kmg-update-graph` as a second misleadin
 ### Negative / Open
 
 1. **Larger one-time edit surface than a simple rename would have been.** References across ENH-035 (12 mentions), ADR-058 (6 mentions), and `docs/pillars/organizing/backfill.md` (3 mentions) all need updating in the same implementation pass — tracked in ENH-034/035's own Affected Files tables, not repeated here.
-2. **`knowledge-reviewer`'s fate is not decided by this ADR.** Called only by `kmg-update-graph` (Step 6) and `kmg-sync-all` — both retired by Decision 1 — but whether `kmg-backfill` incorporates an equivalent quality-check step (possibly reusing this agent) is left to ENH-035's implementation, not resolved here.
-3. **Not yet implemented.** This ADR is Proposed, not Accepted — it formalizes decisions made in specs, not shipped code. Status should move to Accepted once ENH-034/035 land.
+2. **`knowledge-reviewer`'s fate, resolved during implementation:** retired (Option X) — deleted outright. It was called only by `kmg-update-graph` (Step 6) and `kmg-sync-all`, both retired by Decision 1; `kmg-backfill` ships without a dedicated quality-check step, matching this project's convention that human confirmation before write is the quality gate (no other capture-pipeline command has a separate reviewer agent either).
 
 ### Neutral
 
@@ -168,12 +167,14 @@ Originally flagged in ENH-034 alongside `kmg-update-graph` as a second misleadin
 ---
 
 **Decision Made:** 2026-09-04
-**Last Updated:** 2026-09-04
-**Status:** Proposed — will move to Accepted once ENH-034/035 implementation lands
+**Last Updated:** 2026-09-05
+**Status:** Accepted
 
 ---
 
 ## Open Questions
 
-- Should `knowledge-reviewer`'s fate (retained for reuse by `kmg-backfill`, or retired) be decided before implementation starts, or during it? Currently deferred to ENH-035's implementation phase.
-- Should this ADR's status move to Accepted now (decisions are locked) or wait for code to ship, per this project's usual convention of Proposed → Accepted at implementation time?
+Both resolved at implementation completion (2026-09-05):
+
+- `knowledge-reviewer`'s fate: retired (Option X) — see Consequences → Negative/Open, item 2.
+- When to flip Proposed → Accepted: now, at implementation completion — matching this project's usual Proposed → Accepted convention.
