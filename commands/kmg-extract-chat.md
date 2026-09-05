@@ -15,7 +15,7 @@ For multi-session history extraction (10+ sessions or 100+ KB chat logs), consid
 /kmgraph:kmg-extract-chat --delegate knowledge-extractor
 ```
 
-This parses chat logs and extracts insights without consuming your main context, ideal for backfilling knowledge graphs from large chat histories.
+This parses and archives chat logs into `chat-history/` without consuming your main context. It does **not** extract lessons or decisions — for that, run `/kmgraph:kmg-backfill` afterward.
 
 ---
 
