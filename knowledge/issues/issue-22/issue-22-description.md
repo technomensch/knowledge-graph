@@ -9,6 +9,18 @@ created: 2026-07-17
 
 # Issue-22: Init wizard's "selective" git strategy is misleading about what it actually excludes
 
+**Note (2026-09-05):** Partially stale — `commands/kmg-init.md`'s "selective" git-strategy
+branch now unconditionally appends `knowledge/sessions/` and `knowledge/chat-history/` to
+`.gitignore` regardless of the user's per-category choices (fixed by commit `bf2ba7c9`,
+2026-06-16, which predates this issue's filing). So the original complaint — "selective...
+does not control sessions/, chat-history/" — no longer holds for those two folders.
+Remaining scope, still valid: (1) the wizard's Step 4 prompt copy still lists only the five
+content categories and never discloses that sessions/chat-history are already silently
+auto-excluded, and decisions/ and lessons-learned/ never get any auto-handling at all
+(`commands/kmg-init.md` only handles per-category subfolders inside lessons-learned/, not
+the folder as a whole) — so the "wizard gives no signal" complaint remains accurate for
+those two.
+
 ## Problem
 
 During the same live Codex CLI installation session as issue-21, the init wizard asked the user to choose a git strategy — **all committed / all ignored / selective** — applied per-category across five categories: architecture, process, patterns, debugging, governance.

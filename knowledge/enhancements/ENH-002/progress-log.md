@@ -41,6 +41,14 @@ created: 2026-03-28
 
 ---
 
+### 2026-09-05 — Snapshot Mode Implementation Confirmed Live
+
+- `agents/session-summary-agent.md` now has full working S1–S5 snapshot logic: S1 resolve
+  output path (line 99), S2 gather lightweight context (142), S3 compose snapshot block
+  (160), S4 write-or-append with dedup logic (178, 201) including `existingFile`
+  update-in-place routing (226), S5 save via `kg_capture` (206). The "agent `--snapshot`
+  mode" pending item below is done — not just spec prose.
+
 ## Pending
 
 - [ ] Create GitHub issue #41
@@ -50,3 +58,4 @@ created: 2026-03-28
 - [x] Fix Snapshot Gate language in `commands/create-adr.md` — 2026-04-06
 - [x] Fix Snapshot Gate language in `commands/start-issue-tracking.md` — 2026-04-06
 - [x] Update `agents/lesson-capture-agent.md` Phase 2 to check for today's session summary and offer to pre-fill context from it — 2026-04-06
+- [x] Implement agent `--snapshot` mode (S1-S5 logic in `session-summary-agent.md`) — confirmed live 2026-09-05

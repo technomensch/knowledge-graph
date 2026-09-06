@@ -3,12 +3,21 @@ id: issue-32
 type: Bug
 status: tracked
 github-issue: "#236"
-branch: v0.7.0
+branch: v0.7.0 (stale target — merged 2026-08-04 without this commit-group, see 2026-09-05 note)
 created: 2026-07-28
 related_adrs: ["ADR-054", "ADR-055", "ADR-067"]
 ---
 
 # issue-32: Already-running MCP server processes silently keep serving stale plugin code after an upgrade
+
+**Note (2026-09-05):** Design remains valid and un-superseded — no code implements the
+`index.ts` per-tool-call warning described below (`checkVersionMismatch`/stale-process
+sentinel absent from `mcp-server/src/*.ts`), and `knowledge/plans/v0.7.0-c4-issue-32-stale-mcp-warning.md`
+never landed. The sequencing decision below (ships as "4th commit-group on `v0.7.0`") is
+stale — that branch merged as v0.7.0 on 2026-08-04 without this commit-group, and the repo
+is now on v0.7.8. Needs re-targeting to a current branch (and re-checking whether the
+`index.ts` ordering dependency against ADR-067's own tasks, described below, still applies
+now that ADR-067 has long since shipped) before implementation resumes.
 
 ## Problem
 

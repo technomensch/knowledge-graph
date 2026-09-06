@@ -32,7 +32,9 @@ skip it. The durable fix is to move the CWD check into `core/scripts/run_extract
 
 ## Scope
 
-1. **Add Step 0 guard to `sync-all` and `update-graph`** — same pattern as extract-chat v0.5.10.8.
+1. ~~**Add Step 0 guard to `sync-all` and `update-graph`**~~ — **moot (2026-09-04):** both
+   commands were removed outright in v0.7.7 per ENH-034's decision (Option C, removal not
+   rename). No file remains to guard.
 2. **Move CWD check into `run_extraction.py`** — read `kg-config.json`, compare `projectRoot`
    vs `os.getcwd()`, raise `SystemExit` with a clear message if mismatch and no explicit
    `--output-dir` override. Model-independent, cross-platform, bypass-proof.
@@ -44,7 +46,7 @@ skip it. The durable fix is to move the CWD check into `core/scripts/run_extract
 
 ## Success Criteria
 
-- `sync-all` and `update-graph` block on active-KG/CWD mismatch with the same three-option prompt
+- ~~`sync-all` and `update-graph` block on active-KG/CWD mismatch with the same three-option prompt~~ — moot, both commands removed in v0.7.7 (see Scope item 1)
 - `run_extraction.py` refuses to write on mismatch unless an explicit `--output-dir` override is passed
 - ADR-019 is marked Superseded with a link to the new ADR
 

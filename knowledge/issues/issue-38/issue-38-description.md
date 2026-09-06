@@ -1,7 +1,7 @@
 ---
 id: issue-38
 type: Bug
-status: deferred
+status: resolved
 github-issue: "#201"
 branch: none
 created: 2026-08-01
@@ -10,6 +10,12 @@ related_issues: ["issue-31", "issue-35"]
 ---
 
 # issue-38: Multiple `tests/` Suites Reference Pre-`kmg-`-Prefix Command/Skill Names — Silently Broken Since the Rename Migration
+
+**Resolved (2026-09-05):** All 7 named suites now reference `kmg-`-prefixed paths and pass
+100%: `test-commands.sh` 11/11, `test-skills-agents.sh` 16/16, `test-tier-resolver-smoke.sh`
+6/6, `test-tier-resolver-edge.sh` 15/15, `test-create-adr-implements.sh` 7/7,
+`test-dispatcher-tier-refactor.sh` 6/6, `test-decision-governance.sh` 19/19. Fixed by commit
+`82ff949c` ("fix(tests): update 8 stale test suites for kmg- rename + arch drift").
 
 **Note (2026-09-04):** [ENH-035](../../enhancements/ENH-035/ENH-035-specification.md) also touches `tests/test-skills-agents.sh` (re-verifying its Test 15 `knowledge-extractor` assertion still passes after a refactor) — same file, unrelated concern (stale pre-`kmg-` paths here vs. a behavior refactor there). Not worth merging the two efforts; just don't land both edits to this file in parallel without checking for conflicts.
 

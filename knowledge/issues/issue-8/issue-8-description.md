@@ -1,7 +1,7 @@
 ---
 id: issue-8
 type: Enhancement
-status: in-progress
+status: resolved
 branch: v0.5.9.3-docs-enforcement-protocol-gap
 created: 2026-05-30
 related-adrs: [ADR-013, ADR-021, ADR-036]
@@ -10,6 +10,14 @@ target-release: v0.5.9.3
 ---
 
 # Issue-8: Docs Update Enforcement 3-Gate Fix
+
+**Resolved (2026-09-05):** All 3 gates are live — `scripts/plan-docs-xref-check.sh` (checks
+the `## Docs Impact` heading, wired in `hooks/hooks.json`) and `scripts/pre-push-gate.sh`
+(Gate 2 version-sync, Gate 3 docs-impact-scan flag, also wired in `hooks/hooks.json`)
+confirmed live-firing. Landed via commit `a3b540ef` ("feat(governance): v0.5.9.3 — docs
+enforcement gates + inline recommendation gate"), matching this issue's own
+`target-release: v0.5.9.3`. The gate set has since grown well beyond the original 3 (Gates
+4/4b/5/7 added in later releases) — current version is 0.7.7.
 
 ## Problem
 
@@ -31,16 +39,16 @@ Three enforcement gaps allow docs/version drift to reach `origin` unchecked:
 
 ## Acceptance Criteria
 
-- [ ] plan-docs-xref-check.sh fires advisory reminder when `## Docs Impact` absent from plan file
-- [ ] plan-docs-xref-check.sh is silent when section present or on non-plan writes
-- [ ] per-file-hash idempotency: no re-injection on unchanged content
-- [ ] pre-push-gate.sh detects version drift between package.json and plugin.json
-- [ ] pre-push-gate.sh checks docs-impact-scan per-commit flag and injects reminder when absent
-- [ ] pre-push-gate.sh output via `hookSpecificOutput.additionalContext` (not systemMessage)
-- [ ] pre-push-gate.sh fires only on git push token; git commit does not trigger it
-- [ ] docs-impact-scan SKILL.md Step 8 writes per-commit flag on completion
-- [ ] All scripts graceful no-op when optional files absent (ENH-016 fallback pattern)
-- [ ] validate-plugin.sh passes
+- [x] plan-docs-xref-check.sh fires advisory reminder when `## Docs Impact` absent from plan file
+- [x] plan-docs-xref-check.sh is silent when section present or on non-plan writes
+- [x] per-file-hash idempotency: no re-injection on unchanged content
+- [x] pre-push-gate.sh detects version drift between package.json and plugin.json
+- [x] pre-push-gate.sh checks docs-impact-scan per-commit flag and injects reminder when absent
+- [x] pre-push-gate.sh output via `hookSpecificOutput.additionalContext` (not systemMessage)
+- [x] pre-push-gate.sh fires only on git push token; git commit does not trigger it
+- [x] docs-impact-scan SKILL.md Step 8 writes per-commit flag on completion
+- [x] All scripts graceful no-op when optional files absent (ENH-016 fallback pattern)
+- [x] validate-plugin.sh passes
 
 ## Related
 

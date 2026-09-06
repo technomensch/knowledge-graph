@@ -1,7 +1,7 @@
 ---
 id: ENH-042
 type: Bug
-status: proposed
+status: partially-implemented
 ---
 
 # ENH-042: Three disconnected release-doc-sync mechanisms leave README and actual version numbers chronically out of sync
@@ -69,4 +69,10 @@ This ENH documents the finding; it does not itself implement the fix (no plan/br
 - [x] Root cause identified with direct evidence (not assumption): three specific mechanisms and their exact non-overlapping scopes cited by file/line.
 - [x] The immediate instance (this branch's unsynced versions) fixed: `package.json`, `.claude-plugin/plugin.json`, `README.md` all now read `0.6.16`.
 - [x] The compounding stale-path bug in `kmg-update-doc.md`'s Tier-1 list fixed (`docs/COMMAND-GUIDE.md` → `docs/reference/command-guide.md`).
-- [ ] A future implementation reconciles the three mechanisms or builds the enforcement gate described in Proposed Behavior — not attempted in this ENH, tracked here as the open follow-on work.
+- [x] The enforcement-gate half of this criterion is done: `scripts/pre-push-gate.sh` Gate 2
+  (added in commit `a3b540ef`, "v0.5.9.3 — docs enforcement gates", predates this ENH) already
+  compares `package.json` against `plugin.json`/`codex-plugin.json`/`marketplace.json` and
+  flags README version-line mismatches at push time — the mechanical check item 3 asked for.
+- [ ] Reconciling the three disconnected mechanisms (items 1-2) is still open — Gate 2 is
+  advisory only, so it doesn't force items 1-2's authoritative-checklist work to happen (e.g.
+  README's footer version line was still one release stale as of this note, 2026-09-05).

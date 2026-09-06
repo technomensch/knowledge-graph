@@ -1,7 +1,7 @@
 ---
 id: issue-39
 type: Bug
-status: deferred
+status: resolved
 github-issue: "#202"
 branch: none
 created: 2026-08-01
@@ -9,6 +9,15 @@ related_issues: ["issue-18", "issue-36"]
 ---
 
 # issue-39: `kg_capture` Prepends a Second, Differently-Shaped Frontmatter Block When Updating a File via `existingFile`
+
+**Resolved (2026-09-05):** `mcp-server/src/tools/capture.ts` now has
+`stripLeadingFrontmatterOnce`/`stripLeadingFrontmatter` helpers, called at both the
+update-in-place write site and the fresh-file write site before `generateFrontmatter()`
+runs — fixing both call sites flagged in Scope items 1 and 2. Fixed by `e082d7f9`
+("fix(mcp-server): harden capture/upgrade against filename double-prepend and frontmatter
+duplication"), hardened further by `94ff2897`. Regression test added:
+`mcp-server/tests/capture.test.ts` — "strips embedded frontmatter at the update-in-place
+write site too" (Scope item 4).
 
 ## Problem
 

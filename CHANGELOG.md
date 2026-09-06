@@ -161,7 +161,7 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 ### Fixed
 
 - Multiple personal-scope gate gaps closed across independent review passes: `kg_check_sensitive`'s `kgPath` param could bypass the personal-scope gate; `kg_compare_graphs`'s gate only matched an exact root, not subdirectories; the broad-ancestor guard had a personal-exclusion gap; `kg_search` silently returned empty results for a KG with a missing path instead of surfacing the problem.
-- A section-skip regression and a personal-scope hook-resolve bypass found and closed in the same review pass that closed out the branch. Closes issue-41.
+- A section-skip regression and a personal-scope hook-resolve bypass found and closed in the same review pass that closed out the branch. Closes the migration-completeness half of issue-41 (the worktree-registration-guardrails half — collision warnings, tree-identifying naming, merge-time conflict resolution — remains open; see issue-41 for details).
 
 ## [0.6.20] — 2026-07-18
 

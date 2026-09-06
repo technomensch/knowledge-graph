@@ -1,7 +1,7 @@
 ---
 title: "ENH-006: Sequential Prompts, Decoupled Decisions, and Skill Trigger Gaps"
 number: 006
-status: proposed
+status: implemented
 version_target: "v0.2.2"
 github_issue: 47
 created: 2026-03-30
@@ -10,6 +10,16 @@ related_enhs: []
 ---
 
 # ENH-006: Sequential Prompts, Decoupled Decisions, and Skill Trigger Gaps
+
+**Implemented (2026-09-05):** the command this spec targets was renamed
+`commands/start-issue-tracking.md` → `commands/kmg-start-issue-tracking.md` during the
+`kmg-` prefix migration (commit `eda7108b`) — update any tooling/links still pointing at
+the old path. The proposed redesign (Part A) is live in the current file: Steps 1.1–1.4
+are fully independent sequential prompts, each gated with an explicit "WAIT FOR USER
+ANSWER" instruction before the next is asked (`commands/kmg-start-issue-tracking.md:193,
+206, 213, 220`); the active-branch guard now primes the user before Step 1.1
+(`commands/kmg-start-issue-tracking.md:175`) and flows into Step 6.2's mandatory lesson-
+capture gate (line 186). Step 5.0 now means `gh issue create` (line 515).
 
 ## Problem
 
