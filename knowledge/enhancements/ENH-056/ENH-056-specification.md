@@ -225,7 +225,9 @@ but ENH-056's scope is broader: any documented multi-step command in
 
 **Adoption decision (2026-09-05, branch v0.7.8-preflight-gate-hardening):** this candidate prompt gets wired into `kmg-meta-issue` for the first time in that branch's Commit 4, in the same pass as ENH-058's diminishing-returns addition (ENH-058's own design already targets this exact prompt). Recorded here per Opus's plan review, which flagged that the plan referenced adopting this section without ENH-056 itself carrying a decision record for it.
 
-## Candidate Meta-Issue Attempt-Loop Prompt (revised 2026-07-30) — not yet adopted
+**Adopted (2026-09-05, Commit 4):** wired into `commands/kmg-meta-issue.md`'s new "Attempt-Loop Workflow (Running the Next Attempt)" section, verbatim per the prompt below plus ENH-058's diminishing-returns explain folded into the same review step. Not yet exercised on a real multi-attempt series in practice.
+
+## Candidate Meta-Issue Attempt-Loop Prompt (revised 2026-07-30) — adopted 2026-09-05, see `commands/kmg-meta-issue.md`
 
 A potential prompt/instruction set for the recurring "next attempt in a meta-issue" pattern, offered for consideration as part of this enhancement's hardening. Originally captured verbatim from a live session, then revised in place to close gaps this enhancement itself documents (naming the scaffold command instead of leaving it implicit — instance #4 above; pinning "highest model available" to this project's own tier vocabulary; adding `context-mode`/recall usage as reliability levers, not just efficiency ones — see rationale below the prompt). Not yet reviewed, adopted, or wired into any command:
 
