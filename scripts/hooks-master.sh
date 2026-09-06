@@ -236,24 +236,36 @@ fi
 # plugin's own dev repo (detected via scripts/sync-plugin-cache.sh's
 # presence at the resolved repo root). Extends the absence-only pattern
 # used in Section 1 to a staleness (mtime) comparison -- non-blocking.
+#
+# Corrected 2026-09-05 (Opus review): originally compared mcp-server/dist/
+# index.js. That file is a poor sentinel -- sync-plugin-cache.sh's `cp -r`
+# (no -p) stamps every synced file with the sync time itself, so right after
+# any sync the cache's dist is *always* newer than the working tree's,
+# regardless of which of the two is actually stale content-wise. A commit
+# that only touches scripts/ (like the one that added this very check) never
+# touches mcp-server/dist/ at all, so the old comparison could never detect
+# exactly the drift it existed to catch. scripts/pre-push-gate.sh is the
+# actual sentinel this issue's own verification method already points at
+# ("grep -c 'Gate 7' <cache-dir>/scripts/pre-push-gate.sh") -- use it here
+# too, so a scripts/-only change is what actually gets detected as stale.
 # ─────────────────────────────────────────────────────────────
 
 if [ "$PROJECT_RESOLVED" = true ] && [ "$(basename "$KG_PATH")" = "knowledge" ]; then
     _dev_repo_root="$(dirname "$KG_PATH")"
     _sync_script="$_dev_repo_root/scripts/sync-plugin-cache.sh"
     if [ -f "$_sync_script" ]; then
-        _dev_dist="$_dev_repo_root/mcp-server/dist/index.js"
-        _cache_dist="$PLUGIN_ROOT/mcp-server/dist/index.js"
-        if [ -f "$_dev_dist" ] && [ -f "$_cache_dist" ]; then
+        _dev_sentinel="$_dev_repo_root/scripts/pre-push-gate.sh"
+        _cache_sentinel="$PLUGIN_ROOT/scripts/pre-push-gate.sh"
+        if [ -f "$_dev_sentinel" ] && [ -f "$_cache_sentinel" ]; then
             if [[ "$OSTYPE" == "darwin"* ]]; then
-                _dev_mtime=$(stat -f %m "$_dev_dist")
-                _cache_mtime=$(stat -f %m "$_cache_dist")
+                _dev_mtime=$(stat -f %m "$_dev_sentinel")
+                _cache_mtime=$(stat -f %m "$_cache_sentinel")
             else
-                _dev_mtime=$(stat -c %Y "$_dev_dist")
-                _cache_mtime=$(stat -c %Y "$_cache_dist")
+                _dev_mtime=$(stat -c %Y "$_dev_sentinel")
+                _cache_mtime=$(stat -c %Y "$_cache_sentinel")
             fi
             if [ "$_dev_mtime" -gt "$_cache_mtime" ]; then
-                echo -e "${YELLOW}⚠️  Installed plugin cache looks stale: mcp-server/dist is newer in the working tree than in the installed cache.${NC}"
+                echo -e "${YELLOW}⚠️  Installed plugin cache looks stale: scripts/pre-push-gate.sh is newer in the working tree than in the installed cache.${NC}"
                 echo "   Run: $_sync_script"
                 echo ""
             fi

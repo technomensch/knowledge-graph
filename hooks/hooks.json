@@ -109,9 +109,9 @@
         "hooks": [
           {
             "type": "command",
-            "comment": "Before git push: version-sync check (Gate 2) and docs-impact-scan completion flag check (Gate 3) — issue-8",
+            "comment": "Before git push: version-sync check (Gate 2) and docs-impact-scan completion flag check (Gate 3) — issue-8. Raised 10s -> 90s (2026-09-05, Opus review, issue-13): Gate 8's docs-build check needs real headroom (internal bound 75s) -- at 10s, an external kill here would silently lose Gates 2-7's output too, not just Gate 8's.",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/pre-push-gate.sh",
-            "timeout": 10
+            "timeout": 90
           }
         ]
       }

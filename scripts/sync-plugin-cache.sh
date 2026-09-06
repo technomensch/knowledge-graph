@@ -1,10 +1,18 @@
 #!/bin/bash
 # sync-plugin-cache.sh - issue-28
 #
-# Copies mcp-server/dist/ + hook-wired scripts/ (+ hooks/hooks.json) from this
-# working tree into the installed plugin cache, so live hook calls
-# (${CLAUDE_PLUGIN_ROOT} resolves to the cache, not this repo) actually reflect
-# current working-tree code instead of a stale cached copy.
+# Copies mcp-server/dist/, scripts/, skills/, commands/, agents/, and
+# hooks/hooks.json from this working tree into the installed plugin cache, so
+# live hook/skill/command calls (${CLAUDE_PLUGIN_ROOT} resolves to the cache,
+# not this repo) actually reflect current working-tree code instead of a
+# stale cached copy.
+#
+# Widened 2026-09-05 (Opus review): the original version of this script only
+# synced mcp-server/dist/ + scripts/ + hooks.json. skills/, commands/, and
+# agents/ are equally loaded live from the installed cache -- this branch's
+# own Commit 2 (skills/kmg-paperwork-audit) and Commit 4
+# (commands/kmg-meta-issue.md) would otherwise never actually reach a live
+# session despite this script reporting success.
 #
 # See: knowledge/issues/issue-28/issue-28-description.md
 #
@@ -47,23 +55,48 @@ CACHE_DIR="${CACHE_DIR%/}"
 
 echo "sync-plugin-cache: syncing $REPO_ROOT -> $CACHE_DIR"
 
-if [ -d "$REPO_ROOT/mcp-server/dist" ]; then
-    mkdir -p "$CACHE_DIR/mcp-server"
-    rm -rf "$CACHE_DIR/mcp-server/dist"
-    cp -r "$REPO_ROOT/mcp-server/dist" "$CACHE_DIR/mcp-server/dist"
-    echo "  synced mcp-server/dist/"
-fi
+SYNC_FAILED=0
 
-if [ -d "$REPO_ROOT/scripts" ]; then
-    rm -rf "$CACHE_DIR/scripts"
-    cp -r "$REPO_ROOT/scripts" "$CACHE_DIR/scripts"
-    echo "  synced scripts/"
-fi
+# sync_dir <relative-path>: rm-rf + cp -r the named directory from the
+# working tree into the same relative path under the cache. Checks cp's own
+# exit status -- rm -rf then cp with no error check would leave the cache
+# with that directory deleted-and-not-replaced on a mid-copy failure (disk
+# full, permissions, interrupted), silently gutting whatever it governs
+# while this script still reports success.
+sync_dir() {
+    local rel="$1"
+    [ -d "$REPO_ROOT/$rel" ] || return 0
+    local parent
+    parent="$(dirname "$CACHE_DIR/$rel")"
+    mkdir -p "$parent"
+    rm -rf "${CACHE_DIR:?}/$rel"
+    if cp -r "$REPO_ROOT/$rel" "$CACHE_DIR/$rel"; then
+        echo "  synced $rel/"
+    else
+        echo "  FAILED to sync $rel/ -- cache may now be incomplete for this path" >&2
+        SYNC_FAILED=1
+    fi
+}
+
+sync_dir "mcp-server/dist"
+sync_dir "scripts"
+sync_dir "skills"
+sync_dir "commands"
+sync_dir "agents"
 
 if [ -f "$REPO_ROOT/hooks/hooks.json" ]; then
     mkdir -p "$CACHE_DIR/hooks"
-    cp "$REPO_ROOT/hooks/hooks.json" "$CACHE_DIR/hooks/hooks.json"
-    echo "  synced hooks/hooks.json"
+    if cp "$REPO_ROOT/hooks/hooks.json" "$CACHE_DIR/hooks/hooks.json"; then
+        echo "  synced hooks/hooks.json"
+    else
+        echo "  FAILED to sync hooks/hooks.json" >&2
+        SYNC_FAILED=1
+    fi
+fi
+
+if [ "$SYNC_FAILED" -ne 0 ]; then
+    echo "sync-plugin-cache: done with errors -- see FAILED lines above" >&2
+    exit 1
 fi
 
 echo "sync-plugin-cache: done"

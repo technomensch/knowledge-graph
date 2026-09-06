@@ -40,7 +40,7 @@ git diff --name-only "$MERGE_BASE" HEAD -- \
   'knowledge/enhancements/*/ENH-*-specification.md'
 ```
 
-If `DEFAULT_BRANCH` can't be determined (no `main`/`master` branch found), skip Steps 2-4 (they depend on this diff scope) and proceed to Step 5 — Step 5 scans every meta-issue in the repo directly and needs no diff scope, and neither does Step 6 (CHANGELOG check runs directly against `CHANGELOG.md`/`package.json`) — before reporting the Steps 2-4 portion as skipped with that reason at Step 7. Don't guess a fallback branch.
+If `DEFAULT_BRANCH` can't be determined (no `main`/`master` branch found), skip Steps 2-4 (they depend on this diff scope) and proceed to Step 5 — Step 5 scans every meta-issue in the repo directly and needs no diff scope. Step 6's condition (a) doesn't need it either, but condition (b) does (needs `MERGE_BASE` to compare `package.json` versions) and is silently skipped without one — report the Steps 2-4 portion (and Step 6's condition (b), if applicable) as skipped with that reason at Step 7. Don't guess a fallback branch.
 
 ### Step 2 — Check `status: resolved` items for supporting evidence
 
@@ -190,7 +190,7 @@ workflow 5a checks, not in an automated edit to someone's README.
 ### Step 6 — CHANGELOG-Entry-Currency (ENH-052)
 
 Unlike Steps 1-4, not diff-scoped to the issue/ENH doc paths — this checks `CHANGELOG.md` and
-`package.json` directly, on every run. Mechanical trigger only, not a verdict: it raises a flag,
+`package.json` directly. Mechanical trigger only, not a verdict: it raises a flag,
 this step's own job is to confirm-or-dismiss it, not re-derive judgment from scratch (a checker
 that's a flat, unchallengeable assertion just gets skimmed past and ignored — see ENH-052's own
 "Design, concretely" section for why Gate 2's version-string check alone didn't stop this
@@ -205,17 +205,38 @@ if [ -n "$CURRENT_VERSION" ] && grep -qE "^## \[?${CURRENT_VERSION//./\\.}\]?" C
   CHANGELOG_HAS_HEADER=true
 fi
 
+# Condition (b) reuses Step 1's DEFAULT_BRANCH/MERGE_BASE. Corrected 2026-09-05
+# (Opus review): originally "any commit landed after CHANGELOG.md's last touch" --
+# true on virtually every WIP branch (CHANGELOG is release-only per CLAUDE.md, so a
+# mid-branch commit almost always postdates it), which made this condition fire
+# on nearly every push regardless of whether anything release-relevant actually
+# happened -- exactly the "checker that's a flat, unchallengeable assertion just
+# gets skimmed past and ignored" failure mode this step's own design set out to
+# avoid. Narrowed to only count once this branch has actually bumped its version
+# away from the merge-base's -- the real "in flight toward a release" signal, and
+# the actual shape of the incident this step was designed for (a fix landing
+# after the version-promote commit but before push, per Gate 2's own header
+# comment: "08-04 and 08-19 happened after Gate 2's version-string-presence
+# check already existed").
+MERGE_BASE_VERSION=""
+if [ -n "${MERGE_BASE:-}" ]; then
+  MERGE_BASE_VERSION=$(git show "${MERGE_BASE}:package.json" 2>/dev/null \
+    | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{process.stdout.write(JSON.parse(d).version||'')}catch(e){}})" 2>/dev/null)
+fi
+
 CHANGELOG_LAST_COMMIT=$(git log -1 --format=%H -- CHANGELOG.md 2>/dev/null)
 COMMITS_AFTER_CHANGELOG=0
-if [ -n "$CHANGELOG_LAST_COMMIT" ]; then
+if [ -n "$CHANGELOG_LAST_COMMIT" ] && [ -n "$MERGE_BASE_VERSION" ] && [ "$CURRENT_VERSION" != "$MERGE_BASE_VERSION" ]; then
   COMMITS_AFTER_CHANGELOG=$(git log --format=%H "${CHANGELOG_LAST_COMMIT}..HEAD" 2>/dev/null | grep -c .)
 fi
 ```
 
 - (a) `CHANGELOG_HAS_HEADER` is false — no header in `CHANGELOG.md` matches `package.json`'s
-  current version.
-- (b) `COMMITS_AFTER_CHANGELOG` is greater than 0 — commits have landed on the branch after
-  `CHANGELOG.md` was last touched.
+  current version. Independent of diff scope, always evaluable.
+- (b) `COMMITS_AFTER_CHANGELOG` is greater than 0 — this branch has bumped `package.json`'s
+  version away from its merge-base's, **and** commits have landed after `CHANGELOG.md` was
+  last touched. Needs `MERGE_BASE` (from Step 1); silently skipped without one, same as
+  Steps 2-4.
 
 If either is true:
 
@@ -265,7 +286,7 @@ Flag filename formula: `/tmp/kmgraph-paperwork-audit-<branch>-<sha>.flag`, detac
 
 | Situation | Behavior |
 |-----------|----------|
-| No `main`/`master` branch found | Skip Steps 2-4 (need the diff scope), still run Step 5 and Step 6 (neither needs the diff scope) and Step 7, report the Steps 2-4 portion as skipped with that reason, still write the completion flag (the audit "ran" — it just couldn't determine a diff scope for that portion) |
+| No `main`/`master` branch found | Skip Steps 2-4 (need the diff scope), still run Step 5 (no diff scope needed), Step 6 (condition (a) still runs; condition (b) is silently skipped — needs `MERGE_BASE`), and Step 7, report the skipped portions with that reason, still write the completion flag (the audit "ran" — it just couldn't determine a diff scope for those portions) |
 | No issue/ENH docs changed on this branch | Skip Steps 2-3 silently, still run Steps 4-6, still write the flag |
 | `status:` field missing or unrecognized value entirely | Skip that doc for Steps 2-3, don't guess an intended status; note it as a separate, smaller finding ("`issue-N` has no recognized `status:` value") |
 | Multiple session summaries exist for the same branch | Use the most recently modified one; don't flag older ones as stale duplicates — that's a different concern, not this skill's job |

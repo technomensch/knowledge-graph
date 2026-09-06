@@ -41,9 +41,10 @@
 #   that to 'throw'; issue-13's own text says that must wait until link
 #   clusters 2+3 are fixed first, or CI hard-fails on unrelated pre-existing
 #   breaks). Bounded by a timeout since a full build inside a PreToolUse hook
-#   otherwise adds real latency to every push; output captured via command
-#   substitution so a nonzero build exit can't abort the rest of this script
-#   under `set -e` (same pattern as Gate 4b).
+#   otherwise adds real latency to every push; the build runs as a background
+#   job with its exit captured via `wait ... || VAR=$?`, so a nonzero/killed
+#   build can't abort the rest of this script under `set -e` (same guard
+#   idiom Gate 4b uses via command substitution).
 #
 # Why gates, not a smarter skill (ADR-043, ADR-050):
 #   ADR-043: "Previous fix attempts via CLAUDE.md edits and ADRs failed
@@ -309,15 +310,28 @@ fi
 # Note: Gate numbers stay in original discovery order (7 already exists below
 # this historically); placed here so it runs alongside the other content
 # checks rather than reordering existing gates.
+#
+# Corrected 2026-09-05 (Opus review): DOCS_BUILD_TIMEOUT_SECS must stay well
+# under this hook's own PreToolUse timeout (hooks/hooks.json, currently 90s --
+# raised from 10s in the same pass, since 10s left ~0 margin for a real build
+# plus every other gate). If this script is ever killed externally before it
+# reaches the emit block below, Gates 2-7's output is lost too, not just
+# Gate 8's -- so the internal bound must be the one that actually fires.
 
-DOCS_BUILD_TIMEOUT_SECS=120
+DOCS_BUILD_TIMEOUT_SECS=75
 DOCS_BUILD_LOG=$(mktemp 2>/dev/null || printf '/tmp/kmgraph-docs-build-%s.log' "$$")
 
 ( cd "$REPO_ROOT" && npm run build > "$DOCS_BUILD_LOG" 2>&1 ) &
 DOCS_BUILD_PID=$!
 DOCS_BUILD_ELAPSED=0
+DOCS_BUILD_TIMED_OUT=false
 while kill -0 "$DOCS_BUILD_PID" 2>/dev/null; do
   if [ "$DOCS_BUILD_ELAPSED" -ge "$DOCS_BUILD_TIMEOUT_SECS" ]; then
+    DOCS_BUILD_TIMED_OUT=true
+    # Kill the build's actual child (npm/docusaurus) first -- the backgrounded
+    # job above is a subshell wrapper, so killing only its PID orphans the
+    # real build process instead of stopping it.
+    pkill -P "$DOCS_BUILD_PID" 2>/dev/null || true
     kill "$DOCS_BUILD_PID" 2>/dev/null || true
     break
   fi
@@ -330,18 +344,37 @@ wait "$DOCS_BUILD_PID" 2>/dev/null || DOCS_BUILD_EXIT=$?
 DOCS_BUILD_OUT=$(cat "$DOCS_BUILD_LOG" 2>/dev/null || true)
 rm -f "$DOCS_BUILD_LOG" 2>/dev/null || true
 
-if [ "$DOCS_BUILD_ELAPSED" -ge "$DOCS_BUILD_TIMEOUT_SECS" ]; then
+if [ "$DOCS_BUILD_TIMED_OUT" = true ]; then
   FINDINGS="${FINDINGS}DOCS BUILD ADVISORY: npm run build did not finish within ${DOCS_BUILD_TIMEOUT_SECS}s and was killed. Broken-link check skipped for this push -- run 'npm run build' locally to check manually.
 "
 elif [ "$DOCS_BUILD_EXIT" -ne 0 ]; then
   FINDINGS="${FINDINGS}DOCS BUILD ADVISORY: npm run build failed (exit ${DOCS_BUILD_EXIT}). Broken-link check skipped for this push -- run 'npm run build' locally to see the full error.
 "
 else
-  DOCS_BROKEN_LINKS=$(printf '%s' "$DOCS_BUILD_OUT" | grep -iE 'broken link' || true)
+  # Anchor to Docusaurus's actual per-link bullet format ("- Broken link on
+  # source page path = ..."), not a loose 'broken link' substring match --
+  # the latter also matches the build's own header/note lines ("[WARNING]
+  # Docusaurus found broken links!", "Note: it's possible to ignore..."),
+  # wasting slots in the capped display below on boilerplate instead of
+  # actual per-link entries.
+  DOCS_BROKEN_LINKS=$(printf '%s' "$DOCS_BUILD_OUT" | grep -E '^- Broken link on source page' || true)
   if [ -n "$DOCS_BROKEN_LINKS" ]; then
-    FINDINGS="${FINDINGS}DOCS BUILD ADVISORY: broken link(s) detected by 'npm run build' (onBrokenLinks: warn, not blocking):
-${DOCS_BROKEN_LINKS}
+    DOCS_BROKEN_COUNT=$(printf '%s\n' "$DOCS_BROKEN_LINKS" | grep -c . || true)
+    # Cap displayed lines -- ENH-052's own documented caution applies here too
+    # ("a checker that produces false positives erodes trust... gets ignored
+    # just as fast as a silent one"): a known, currently-unfixable set of
+    # links (issue-13's clusters 2+3, deliberately deferred) would otherwise
+    # repeat in full on every single push. Note the volume rather than
+    # silently truncating, matching kmg-paperwork-audit's own house style
+    # for large-output edge cases.
+    DOCS_BROKEN_SHOWN=$(printf '%s\n' "$DOCS_BROKEN_LINKS" | head -5)
+    FINDINGS="${FINDINGS}DOCS BUILD ADVISORY: ${DOCS_BROKEN_COUNT} broken link(s) detected by 'npm run build' (onBrokenLinks: warn, not blocking) -- showing first 5:
+${DOCS_BROKEN_SHOWN}
 "
+    if [ "$DOCS_BROKEN_COUNT" -gt 5 ]; then
+      FINDINGS="${FINDINGS}  ... and $((DOCS_BROKEN_COUNT - 5)) more. Run 'npm run build' locally for the full list.
+"
+    fi
   fi
 fi
 

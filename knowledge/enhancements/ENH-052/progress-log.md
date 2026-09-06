@@ -48,7 +48,9 @@ repo's history plus a cross-project (nimbalyst) check, then independent
 Sonnet + Opus recommendations, converged on: mechanical git-log detection
 (missing version header, or commits landed after CHANGELOG.md's last touch)
 delivered as a trigger into `kmg-paperwork-audit`'s existing flag pattern
-(new Step 5) rather than a second silent Gate-2-style print — the skill
+(new Step 6 — corrected from an original "Step 5" draft, which would have
+collided with issue-45's already-shipped Step 5; see the spec's own
+"Design, concretely" note) rather than a second silent Gate-2-style print — the skill
 confirms-or-dismisses, it doesn't re-derive judgment from scratch. Full
 reasoning in the spec's new "Decided" section. `status:` stays `deferred`
 until built.
