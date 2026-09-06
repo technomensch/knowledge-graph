@@ -60,6 +60,14 @@ wherever the "read installed/stamped version" or per-file metadata parse opens
 the `.md` file and decodes a byte slice instead of the full file / a
 character-safe slice.
 
+**Confirmed (2026-09-05):** exact location is `core/scripts/extract_claude.py`,
+`parse_metadata_from_file()`, lines 58-63 — opens the file in text mode
+(`encoding='utf-8'`) then does `f.seek(max(0, size - 10240), os.SEEK_SET)` before
+`f.read()`, i.e. seeks to an arbitrary byte offset in a UTF-8 text stream. This is the
+"fixed byte window seek, not character-safe" bug described above. (Note:
+`check_extraction_health.py` itself reads whole-file and is not the culprit — the bug
+lives specifically in `extract_claude.py`.) Fix is still unapplied.
+
 ## Proposed Fix Direction (not yet investigated in depth)
 
 - Decode the whole file (or a chunk `.decode('utf-8', errors='ignore')`) rather

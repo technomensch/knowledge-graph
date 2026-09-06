@@ -249,6 +249,29 @@ Enforces that each attempt documents a distinct hypothesis before execution. Ste
 
 ---
 
+## Attempt-Loop Workflow (Running the Next Attempt)
+
+**Wired in 2026-09-05 (branch v0.7.8-preflight-gate-hardening, Commit 4)** — ENH-056's candidate attempt-loop prompt (revised 2026-07-30, previously documented but not adopted anywhere) plus ENH-058's diminishing-returns explain, folded into the same pass per ENH-058's own design.
+
+When performing the next attempt in a meta-issue series — not just creating the attempt folder via `--add-attempt`/`--log-attempt`, but actually doing the troubleshooting/patching work for it — follow this process:
+
+1. Before starting, use `/kmgraph:kmg-auto-recall` (or the underlying recall mechanism) if available, to establish broader context from the rest of the graph — related issues, ADRs, past decisions elsewhere in the KG — as a supplement to, not a replacement for, this meta-issue's own README/paperwork trail, which remains the isolated, authoritative record for this specific attempt.
+2. Start the attempt via `/kmgraph:kmg-meta-issue --add-attempt NNN "short name"` (or `--log-attempt NNN "hypothesis"`) — do not hand-edit `implementation-log.md` directly.
+3. Throughout every step of the current attempt, complete the paperwork explicitly required in the README.
+4. This attempt is for patching and testing/validating the plan, not for running the patch as a separate, later production action. Also retest items flagged as passing in the previous attempt, to confirm they were not false positives.
+5. If necessary, update the test cases, or add new ones, to validate any modifications made.
+6. Use the `context-mode` plugin (`ctx_batch_execute`/`ctx_search`/`ctx_execute_file`) throughout, to keep large tool/file outputs out of this attempt's own context window rather than reading them in directly.
+7. After patching the plan, ask the configured `powerful-tier` model for the active platform (per `~/.kmgraph/me.md`) for a review, which can include testing to validate, and recommendations to address any findings. It is not making any changes — it is a read-only test and review. It is also to check the existing test cases to ensure they are testing as expected, and recommend updates and/or additions if required.
+
+   **Diminishing-returns explain (ENH-058), folded into this same review step:** for each test/item this review finds still failing that also failed in the immediately preceding independent-review round, compare the current finding against that prior round's stored finding and tag the comparison as one of three states — the reviewer decides this from the two data points, it is not a system judgment: `not actually fixed`, `same issue, new instance`, or `different sub-issue, same test`. Record the tag and a running per-test consecutive-failure count in this attempt's `implementation-log.md` entry (e.g. "**Test Comparisons:** Test 8 — same issue, new instance (2 consecutive)").
+
+   If a test/item has now failed **2 consecutive independent-review rounds**, include a plain-English diminishing-returns note in this attempt's close-out summary: what the test is actually checking, what's still failing, and how narrow or broad the remaining gap looks, plus a recommendation — worth one more targeted round, or diminishing returns and worth considering as an accepted known risk. This is explanation plus a recommendation, never an automatic accept or a forced exit — a real, unfixed blocker still gets tagged `not actually fixed` and stays visibly blocking; the person decides whether to keep pursuing it.
+8. Close out the attempt via the same `kmg-meta-issue` command, then stop.
+
+**Known gap (issue-34, closed 2026-08-01):** step 1's recall assumption — that `kg_search`/FTS5 cover `knowledge/issues/` and `knowledge/enhancements/` — was previously unverified in practice; commit `50d839f8` on branch `v0.7.0` added both directories to the FTS5 index and search fallback. Confirmed pushed and merged as of this branch.
+
+---
+
 ## Command: Update Root Cause Understanding
 
 **Syntax:** `/kmgraph:kmg-meta-issue --update-understanding "Root cause is network latency"`

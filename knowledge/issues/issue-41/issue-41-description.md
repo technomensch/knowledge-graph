@@ -103,9 +103,30 @@ time-sensitive: if this branch merges without that audit, commands beyond the al
 9 will silently misbehave against real user configs (as `kmg-start-issue-tracking.md` just
 demonstrated) the first time someone runs one on a stale, unmigrated `kg-config.json`.
 
+## Supersession note (2026-09-05)
+
+Gaps 3-4 of the worktree-registration-guardrails half (tree-identifying numbering, merge-time
+conflict resolution) are **superseded/resolved** by ADR-067 § Round 2 Item 4's cross-branch
+ID-collision mechanism, shipped **v0.7.4.1 (2026-08-23)**: `scripts/check-numbering-collision.sh`
+and `scripts/fix-numbering-collision.sh` (wired into the pre-push gate) detect and resolve
+`issue-N`/`ENH-N` numbering collisions at merge time — a flat-numbering + merge-time-detection
+design chosen over this issue's originally-proposed tree-identifying-ID scheme, but resolving
+the same underlying risk. See `knowledge/decisions/ADR-067-implementation-spec.md` (status:
+"numbering-collision mechanism shipped v0.7.4.1").
+
+Gaps 1-2 (silent registration from inside a worktree with no warning; no hard-block on a
+worktree reusing an existing registered `name`) are **NOT** resolved by ADR-067 § item 12's
+duplicate-`graphId` prompt (`mcp-server/src/tools/config.ts:39,501,638`) — confirmed by reading
+that flow: it only fires when a fresh registration's `graphId` marker content-matches an
+*existing* entry (i.e., the same physical repo re-registered/cloned elsewhere). A brand-new
+worktree naturally mints its own distinct `graphId` and hits neither check — no warning fires,
+and nothing blocks it from reusing an existing entry's plain `name` key (silent overwrite risk
+as originally described). These two gaps remain genuinely open; narrow this issue's remaining
+scope to just gaps 1-2 going forward.
+
 ## Status
 
-**In progress — one half done, one half open.**
+**In progress — one half done, one half open (narrowed 2026-09-05, see Supersession note above).**
 
 - **Migration-completeness half: done**, see update below.
 - **Worktree-registration-guardrails half (gaps 1-4 above): still tracked only.** No plan,

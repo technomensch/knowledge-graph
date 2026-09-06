@@ -1,6 +1,6 @@
 # issue-28: Solution Approach
 
-**Status:** Deferred (Track only, Mode 3) — no fix implemented or proposed for immediate action.
+**Status:** Resolved (2026-09-05, branch `v0.7.8-preflight-gate-hardening`, Commit 1) — see issue-28-description.md's "Resolved" section for what was built. Original deferred write-up below kept for history.
 
 ## Why Deferred
 
@@ -15,6 +15,8 @@ If this is picked up later, options to weigh — none evaluated in depth here:
 3. **A local-link install mode** — e.g., a symlink from the plugin cache path to the repo's `mcp-server/dist/`, so rebuilds are picked up without any copy step. This would be the most invasive option (crosses into how Claude Code's plugin cache is structured) and was not investigated for feasibility.
 
 No direction has been chosen. This section exists to give a future implementer a starting point, not to commit to an approach.
+
+**Chosen (2026-09-05):** Option 1, extended — `scripts/sync-plugin-cache.sh` copies `mcp-server/dist/`, `scripts/`, and `hooks/hooks.json` into the resolved installed cache dir (resolved dynamically, not hardcoded). Option 3 (symlink-based install mode) stays a future, separately-ADR'd option per issue-28-description.md's "On the ADR question" section — not investigated here.
 
 ## Related
 

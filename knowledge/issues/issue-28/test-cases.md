@@ -11,6 +11,7 @@ No implementation exists yet (Mode 3 — Track only, deferred). These are the ch
 
 ## Checks a Future Fix Would Need to Satisfy (not yet implemented)
 
-- [ ] Whatever dev-loop mechanism is chosen (see solution-approach.md candidates) must be verified to actually change what `kg_*` tool calls execute in a live Claude Code session — not just what a standalone `node dist/index.js` process returns.
-- [ ] If the fix extends the `cp`-to-cache workaround: confirm whether `/reload-plugins` alone reconnects the MCP server process, or whether a manual "MCP Server → Reconnect" step (per `claude-code-plugin-cache-stale-after-update.md`) is also required for `mcp-server/dist/` changes specifically.
-- [ ] If a documented recipe is written: confirm it works end-to-end for a fresh contributor with no prior context (not just for the person who discovered the workaround).
+- [x] Whatever dev-loop mechanism is chosen (see solution-approach.md candidates) must be verified to actually change what `kg_*` tool calls execute in a live Claude Code session — not just what a standalone `node dist/index.js` process returns.
+      **2026-09-05:** Verified the sync mechanism moves bytes into the live cache (marker-string grep, 0→1 — see implementation-log.md). Whether a running session's `kg_*` tool calls pick up the synced copy without a manual reconnect is the next item below — still open.
+- [ ] If the fix extends the `cp`-to-cache workaround: confirm whether `/reload-plugins` alone reconnects the MCP server process, or whether a manual "MCP Server → Reconnect" step (per `claude-code-plugin-cache-stale-after-update.md`) is also required for `mcp-server/dist/` changes specifically. **Not yet confirmed** — pending a live session test.
+- [ ] If a documented recipe is written: confirm it works end-to-end for a fresh contributor with no prior context (not just for the person who discovered the workaround). Not applicable as written — this shipped as a script + hook, not a manual recipe; no fresh-contributor test performed.

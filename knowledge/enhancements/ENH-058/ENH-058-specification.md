@@ -1,7 +1,7 @@
 ---
 id: ENH-058
 type: Enhancement
-status: proposed
+status: resolved
 github-issue: "#211"
 branch: none
 created: 2026-07-30
@@ -44,3 +44,7 @@ Captured live, lightweight — track only, no plan, no branch. Directly informed
 
 - ENH-056 (`knowledge/enhancements/ENH-056/ENH-056-specification.md`) — the candidate meta-issue attempt-loop prompt this diminishing-returns check is a natural addition to
 - `docs-readme-poc` repo, `knowledge/issues/style-guide-required-sections-saga/` — the live incident this enhancement is drawn from (Test 8, Attempts 014-017)
+
+## Resolved (2026-09-05, branch v0.7.8-preflight-gate-hardening, Commit 4)
+
+Wired into `commands/kmg-meta-issue.md`'s new "Attempt-Loop Workflow" section, in the same pass as ENH-056's candidate attempt-loop prompt (that prompt had no adoption point until this commit). Threshold shipped as decided above (2nd consecutive failure, per-test independent counter, reviewer-tagged comparison — `not actually fixed` / `same issue, new instance` / `different sub-issue, same test` — not a system judgment). Tag and running count recorded in the attempt's own `implementation-log.md` entry. Not yet exercised against a real repeatedly-failing test in practice.

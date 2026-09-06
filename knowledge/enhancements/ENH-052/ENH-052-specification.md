@@ -1,7 +1,7 @@
 ---
 id: ENH-052
 type: Hardening
-status: deferred
+status: resolved
 github-issue: "#188"
 branch: none
 created: 2026-07-18
@@ -220,6 +220,18 @@ Resolved (no longer open) design questions from the original sketch:
 - Scope boundary vs. issue-13 — preserved: Gate 5/6 do **not** cover Docusaurus
   link integrity or `commands/*.md` references; those stay issue-13's and
   issue-26's domains.
+
+## Decided: CHANGELOG-Entry-Currency (2026-09-05, branch v0.7.8-preflight-gate-hardening — brainstormed, not yet built)
+
+Resolves the last open blocker noted above. Two rounds of research first:
+
+- **Recall across this repo's own history** found the failure is overwhelmingly one of two shapes: entry missing entirely for a shipped version bump (2026-02-22, 03-03, 08-04, 08-19), or entry drafted mid-session then never updated for commits that landed after (07-18, the incident that inspired this spec). Notably, 08-04 and 08-19 happened **after** Gate 2's version-string-presence check already existed — it did not stop the recurrence, because it's silent/advisory and easy to skim past.
+- **Cross-project recall** (nimbalyst KG) surfaced a caution: a checker that produces false positives erodes trust and gets ignored just as fast as a silent one. Also confirmed causes 3 (dual CHANGELOG file drift) and 4 (downstream version-bump files not synced) are separate problems, already handled elsewhere (ADR-023 symlink; Gate 2) — this check only needs to cover the two causes above.
+- **Independent Sonnet + Opus recommendations converged**: the detection logic should be mechanical (git log — does a header exist for the current version; have commits landed on the branch after CHANGELOG.md was last touched), but delivered through **Gate 6's completion-flag pattern**, not a second Gate-2-style silent print. Opus's refinement, adopted: the mechanical check is a **trigger, not a verdict** — it raises a flag, and the existing `kmg-paperwork-audit` skill's job (new Step 6 — see "Design, concretely" below for why not Step 5) is only to confirm-or-dismiss it, not re-derive judgment from scratch. This also answers the false-positive caution directly: a dismissal path exists instead of the check being a flat, unchallengeable assertion.
+
+**Design, concretely:** `kmg-paperwork-audit` gets a new **Step 6** (not Step 5 — the skill already has a Step 5 for meta-issue attempts drift, from issue-45, and a Step 6 for report/flag-write; the new CHANGELOG check slots in as Step 6, and the existing report/flag step becomes Step 7. Caught during Opus review of the v0.7.8 plan — the original draft of this section said "Step 5," which would have collided with issue-45's already-shipped step). Step 6 checks (a) does CHANGELOG.md have a header matching `package.json`'s current version, (b) does `git log` show commits on the branch after CHANGELOG.md's last-touched commit. Either condition true → flag for the skill to confirm-or-dismiss, same flag/gate mechanics as Steps 2-4. No new skill, no new top-level gate — extends the existing Gate 6 (pre-push-gate.sh) completion-flag pattern.
+
+**Built 2026-09-05 (branch v0.7.8-preflight-gate-hardening, Commit 2):** `skills/kmg-paperwork-audit/SKILL.md` now has Step 6 (CHANGELOG-entry-currency) exactly as designed above, with the old report/flag-write step renumbered Step 6 → Step 7 throughout the file (scope-boundary note, edge-cases table included). `status:` flips deferred → resolved on that basis — the skill's judgment logic on a real case (does it correctly confirm-or-dismiss a genuine stale-CHANGELOG situation) hasn't been exercised live yet, but the mechanism itself is built and matches the decided design.
 
 ## Out of Scope
 

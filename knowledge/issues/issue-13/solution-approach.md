@@ -1,7 +1,7 @@
 ---
 id: issue-13
 title: Solution Approach — No automated broken-link detection
-status: deferred
+status: partially-implemented
 created: 2026-07-14
 ---
 
@@ -34,6 +34,11 @@ Option 1 alone would satisfy most of the actual need, since CI already runs the 
 
 ## Test Plan (once implementation is scoped)
 
-- Confirm `npm run build` hard-fails (non-zero exit) when a broken link is deliberately introduced into a fixture doc page.
-- Confirm the full site builds clean (0 broken links) before flipping `onBrokenLinks` to `'throw'` — this is the actual gating condition for doing this work at all.
+- Confirm `npm run build` hard-fails (non-zero exit) when a broken link is deliberately introduced into a fixture doc page. **Still open** — this test applies to Option 1 (throw-mode), not yet done.
+- Confirm the full site builds clean (0 broken links) before flipping `onBrokenLinks` to `'throw'` — this is the actual gating condition for doing this work at all. **Still open.**
 - If a pre-push gate is added: verify it fires on a push containing a newly-broken link and does not fire on a clean push, mirroring the verification pattern already used for Gate 4 (github-issue-sync invariant, issue-11) — live test against a real throwaway fixture, not just code review.
+  **Done, partially (2026-09-05):** verified Gate 8 fires against this branch's actual (pre-existing) broken links — confirms the "fires on broken" half. Did not additionally test against a clean-site push, since the live site currently has real broken links to detect; the "does not fire on a clean push" half is implied by the advisory logic (only appends a finding when `grep` matches "broken link" in the build output) but wasn't separately exercised against a synthetic clean fixture.
+
+## Built (2026-09-05, branch v0.7.8-preflight-gate-hardening, Commit 5)
+
+Implemented Option 2 (pre-push gate), not Option 1 (throw-mode) — see issue-13-description.md's "Partially Implemented" section for what shipped and why Option 1 stays deferred.

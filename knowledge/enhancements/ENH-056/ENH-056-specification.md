@@ -1,7 +1,7 @@
 ---
 id: ENH-056
 type: Hardening
-status: tracked
+status: partially-implemented
 github-issue: "#199"
 branch: none
 created: 2026-07-28
@@ -13,6 +13,12 @@ related_adrs: ["ADR-043", "ADR-050", "ADR-068"]
 **Retyped `Enhancement` → `Hardening` (2026-08-01):** this work hardens existing documented behavior that isn't being enforced; it doesn't add new capability. Stays the umbrella tracking artifact (GitHub #199 preserved) — the actual mechanism design now lives in [ADR-068](../../decisions/ADR-068-lightweight-vs-full-workflow-rule-and-piloted-command-completion-check.md), which also resolves issue-25 (a blocking dependency for this enhancement's AC-3/AC-4) and pilots a fix for issue-33 (instance #3 below).
 
 **Pilot implemented (2026-08-01):** ADR-068's Half B shipped — `scripts/handoff-file-tracing-gate.sh`, a hard-stop `Stop` hook checking `commands/kmg-handoff.md`'s embedded manifest against the session's `Read` history. First ENH-056 instance closed. Instances #1 (`kmg-handoff` never invoking `kmg-session-summary`), #2, and #4 (`kmg-meta-issue` attempt logging) remain open, per ADR-068's explicit Non-Goal against generalizing this pilot into a framework.
+
+**Instance #1 resolved (found already-closed 2026-09-05, branch v0.7.8-preflight-gate-hardening, Commit 3):** turns out this was already fixed on `main` before this branch existed — `commands/kmg-handoff.md` was updated in commit `d25c47fd` ("fix(commands): kmg-handoff writes to knowledge/handoffs/ and auto-generates a missing session summary") to actually invoke `session-summary-agent --auto` when no summary exists for the day, rather than only falling back to inline pointer text. `skills/kmg-session-wrap/SKILL.md`'s own "Behavior" section likewise already reads "directly dispatch to `session-summary-agent`," not prompt-only. `issue-30` (this instance's own tracking issue) is independently already `status: resolved`. This branch's v0.7.8 plan folded instance #1 into Commit 3 without checking whether it had already landed — it had. No `commands/` edit was needed or made for this instance; this note is the paperwork correction closing the gap between this spec's problem statement (below, left as historical record) and the code's actual current state.
+
+**Instance #4 resolved for its verification half (2026-09-05, branch v0.7.8-preflight-gate-hardening, Commit 3):** per the "Decided: Instance #4 Scope" section below, the verification half was already built (`skills/kmg-paperwork-audit/SKILL.md` Step 5, from issue-45) and only needed `issue-28`'s Commit 1 fix to protect a real push — which landed earlier on this same branch. No new code in Commit 3 either. Full auto-capture (removing the remembered `--add-attempt` step) stays out of scope, per that same section — spun out to a future ENH, not yet filed.
+
+**Net effect on this spec's status:** two of four instances now closed (pilot + #1), instance #4 closed for its in-scope half (verification), instance #2 stays open (needs its own dedicated enforcement design, not yet brainstormed — see Commit 3's own exclusion note in `knowledge/plans/v0.7.8-preflight-gate-hardening.md`), and instance #4's auto-capture half is deliberately deferred to a separate future ENH. `status:` reflects this as `partially-implemented`, not `resolved` — the umbrella tracks all four instances, and #2 plus #4's auto-capture half remain genuinely open.
 
 # ENH-056: Commands/Workflows Documented as Multi-Step Processes Are Inconsistently Executed in Full
 
@@ -217,7 +223,11 @@ useful precedent for what a mechanically-checkable completion gate looks like,
 but ENH-056's scope is broader: any documented multi-step command in
 `commands/*.md`, not just paperwork-adjacent ones.
 
-## Candidate Meta-Issue Attempt-Loop Prompt (revised 2026-07-30) — not yet adopted
+**Adoption decision (2026-09-05, branch v0.7.8-preflight-gate-hardening):** this candidate prompt gets wired into `kmg-meta-issue` for the first time in that branch's Commit 4, in the same pass as ENH-058's diminishing-returns addition (ENH-058's own design already targets this exact prompt). Recorded here per Opus's plan review, which flagged that the plan referenced adopting this section without ENH-056 itself carrying a decision record for it.
+
+**Adopted (2026-09-05, Commit 4):** wired into `commands/kmg-meta-issue.md`'s new "Attempt-Loop Workflow (Running the Next Attempt)" section, verbatim per the prompt below plus ENH-058's diminishing-returns explain folded into the same review step. Not yet exercised on a real multi-attempt series in practice.
+
+## Candidate Meta-Issue Attempt-Loop Prompt (revised 2026-07-30) — adopted 2026-09-05, see `commands/kmg-meta-issue.md`
 
 A potential prompt/instruction set for the recurring "next attempt in a meta-issue" pattern, offered for consideration as part of this enhancement's hardening. Originally captured verbatim from a live session, then revised in place to close gaps this enhancement itself documents (naming the scaffold command instead of leaving it implicit — instance #4 above; pinning "highest model available" to this project's own tier vocabulary; adding `context-mode`/recall usage as reliability levers, not just efficiency ones — see rationale below the prompt). Not yet reviewed, adopted, or wired into any command:
 
@@ -246,6 +256,17 @@ A potential prompt/instruction set for the recurring "next attempt in a meta-iss
 **Update, 2026-08-01:** This gap is now addressed by commit `50d839f8` ("fix(mcp-server): add issues/enhancements to FTS5 index and search fallback dirs") on branch `v0.7.0`, which adds `knowledge/issues/` and `knowledge/enhancements/` to both the FTS5 `contentDirs` list (`mcp-server/src/tools/fts5.ts`) and the search fallback `searchDirs` list (`mcp-server/src/tools/search.ts`). **Caveat: this fix is not yet pushed to origin, and has not yet been tested or reviewed by the user beyond the implementing agent's own automated unit tests (151/151 passing locally).** Until it is pushed and confirmed working end-to-end, the candidate attempt-loop prompt's recall assumption above should still be treated as unverified in practice.
 
 **Why the recall/context-mode additions matter here specifically, not just as general hygiene:** this enhancement's own thesis is that documented steps get silently dropped under attention pressure (ADR-043/ADR-050), and a context window crowded with raw tool output or missing prior history is a plausible amplifier of that exact failure mode. Keeping context lean and front-loading relevant history are reliability levers for the specific failure class this enhancement tracks, not separate concerns.
+
+## Decided: Instance #4 Scope (2026-09-05, branch v0.7.8-preflight-gate-hardening — brainstormed, not yet built)
+
+Two-pronged recall (this repo's history + cross-project) found the verification half of instance #4 is **already built**: `skills/kmg-paperwork-audit/SKILL.md` Step 5 (added for issue-45) already pairs `## Attempt NNN` headers against `attempts/NNN-slug/` folders in both directions — header-without-folder (total miss, the 002-007/009-012 pattern) and folder-without-header (the Attempt-015 inverse drift). It just needs `issue-28`'s Commit-1 fix to actually protect a real push, same as Gates 5/6.
+
+**What's still genuinely open — auto-capture, not verification:** removing the remembered `--add-attempt` step entirely, so attempt data gets captured as a side effect of the troubleshooting work itself, per the spec's own recommended direction above. Weighed doing this on the current branch vs. spinning out separately:
+
+- **Con (decisive):** no prior-art design exists for this anywhere in the KG (confirmed via recall — only verification designs were ever drafted). It requires inferring intent from tool-call patterns, which risks false-positive attempt creation or missed real ones — a materially different, riskier kind of mechanism than a gate check, and out of proportion with this branch's low-risk, same-file-pass premise.
+- **Decision:** spin out a separate ENH for full auto-capture, filed properly through the normal workflow when picked up (not as a lightweight note — that would repeat this very enhancement's instance #2). This branch ships verification-only for instance #4.
+
+Also noted in passing (not actioned this branch): `core/docs/META-ISSUE-GUIDE.md` still documents folder-creation and log-update as two independent manual steps, never mentioning the atomic `--add-attempt` command — a docs-level drift vector distinct from the model-forgetfulness one, worth its own small fix later.
 
 ## Related
 

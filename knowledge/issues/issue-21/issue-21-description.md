@@ -41,3 +41,14 @@ This is a real, currently-reproducing cross-platform compatibility gap, not a hy
 ## Status
 
 Deferred (Mode 3 — track only). No branch created, no implementation planned yet. Needs investigation into Codex CLI's actual hook JSON contract before a fix can be scoped.
+
+**Note (2026-09-05) — likely already fixed, needs live re-verification before further work:**
+`scripts/session-end-prompt.sh` already has a platform-aware exit trap (`if [ -n
+"${CLAUDECODE:-}" ]` emits Claude-Code JSON, else emits a plain `{"decision":"continue"}`
+for Codex), and `.codex-plugin/hooks/hooks.json` registers this same script as Codex's Stop
+hook. Both landed via commits `34bec979` (2026-06-17) and `f6755c99` (v0.6.10, 2026-06-22)
+— **both predate this issue's filing date (2026-07-17)**. This suggests the original repro
+session may have been running a stale cached plugin copy (same failure class as issue-28's
+installed-cache-vs-working-tree drift) rather than a still-live bug. Recommend re-testing
+live on current Codex CLI before scoping any further investigation; if it no longer
+reproduces, close citing `34bec979`/`f6755c99`.

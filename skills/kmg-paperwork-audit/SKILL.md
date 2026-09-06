@@ -16,7 +16,7 @@ Does **not** apply to:
 - Mid-session status updates for a single, already-known issue — just edit its frontmatter directly
 - Commits that touch no `knowledge/issues/` or `knowledge/enhancements/` files and don't need a session summary
 
-**Scope boundary (ENH-052):** this skill covers the two checks `scripts/pre-push-gate.sh` Gate 5 cannot do mechanically — issue/enhancement `status:` accuracy and session-summary currency — plus one exception (Step 5, issue-45): a mechanical check with nowhere else to live, because `scripts/` is dev-only tooling for this source repo and is never distributed to consumer repos, while this skill ships on the same trigger set every consumer repo gets. It does **not** re-check index counts or backlink symmetry; Gate 5 already covers those cheaply in bash, and duplicating that work here would just be the same fact checked twice by two mechanisms.
+**Scope boundary (ENH-052):** this skill covers the two checks `scripts/pre-push-gate.sh` Gate 5 cannot do mechanically — issue/enhancement `status:` accuracy and session-summary currency — plus two exceptions, each a mechanical check with nowhere else to live because `scripts/` is dev-only tooling for this source repo and is never distributed to consumer repos, while this skill ships on the same trigger set every consumer repo gets: Step 5 (issue-45, meta-issue attempts drift) and Step 6 (ENH-052, CHANGELOG-entry currency). It does **not** re-check index counts or backlink symmetry; Gate 5 already covers those cheaply in bash, and duplicating that work here would just be the same fact checked twice by two mechanisms.
 
 ---
 
@@ -40,7 +40,7 @@ git diff --name-only "$MERGE_BASE" HEAD -- \
   'knowledge/enhancements/*/ENH-*-specification.md'
 ```
 
-If `DEFAULT_BRANCH` can't be determined (no `main`/`master` branch found), skip Steps 2-4 (they depend on this diff scope) and proceed to Step 5 — Step 5 scans every meta-issue in the repo directly and needs no diff scope — before reporting the Steps 2-4 portion as skipped with that reason at Step 6. Don't guess a fallback branch.
+If `DEFAULT_BRANCH` can't be determined (no `main`/`master` branch found), skip Steps 2-4 (they depend on this diff scope) and proceed to Step 5 — Step 5 scans every meta-issue in the repo directly and needs no diff scope. Step 6's condition (a) doesn't need it either, but condition (b) does (re-derives its own `MERGE_BASE` rather than reusing this step's, since each step typically runs as a separate bash invocation — see Step 6 for why) and is silently skipped without one — report the Steps 2-4 portion (and Step 6's condition (b), if applicable) as skipped with that reason at Step 7. Don't guess a fallback branch.
 
 ### Step 2 — Check `status: resolved` items for supporting evidence
 
@@ -187,7 +187,87 @@ re-litigating case by case. This is advisory, same as every other check in this 
 it, don't auto-trim it; the fix belongs in the same `--add-attempt`/`implementation-log.md`
 workflow 5a checks, not in an automated edit to someone's README.
 
-### Step 6 — Report and write completion flag
+### Step 6 — CHANGELOG-Entry-Currency (ENH-052)
+
+Unlike Steps 1-4, not diff-scoped to the issue/ENH doc paths — this checks `CHANGELOG.md` and
+`package.json` directly. Mechanical trigger only, not a verdict: it raises a flag,
+this step's own job is to confirm-or-dismiss it, not re-derive judgment from scratch (a checker
+that's a flat, unchallengeable assertion just gets skimmed past and ignored — see ENH-052's own
+"Design, concretely" section for why Gate 2's version-string check alone didn't stop this
+recurring).
+
+Two conditions, either true → flag:
+
+```bash
+CURRENT_VERSION=$(node -e "process.stdout.write(require('./package.json').version)" 2>/dev/null)
+CHANGELOG_HAS_HEADER=false
+if [ -n "$CURRENT_VERSION" ] && grep -qE "^## \[?${CURRENT_VERSION//./\\.}\]?" CHANGELOG.md 2>/dev/null; then
+  CHANGELOG_HAS_HEADER=true
+fi
+
+# Condition (b) needs DEFAULT_BRANCH/MERGE_BASE. Corrected 2026-09-05 (Opus
+# review): originally "any commit landed after CHANGELOG.md's last touch" --
+# true on virtually every WIP branch (CHANGELOG is release-only per CLAUDE.md, so a
+# mid-branch commit almost always postdates it), which made this condition fire
+# on nearly every push regardless of whether anything release-relevant actually
+# happened -- exactly the "checker that's a flat, unchallengeable assertion just
+# gets skimmed past and ignored" failure mode this step's own design set out to
+# avoid. Narrowed to only count once this branch has actually bumped its version
+# away from the merge-base's -- the real "in flight toward a release" signal, and
+# the actual shape of the incident this step was designed for (a fix landing
+# after the version-promote commit but before push, per Gate 2's own header
+# comment: "08-04 and 08-19 happened after Gate 2's version-string-presence
+# check already existed").
+#
+# Re-derived here rather than reused from Step 1 (2nd Opus review, 2026-09-05):
+# each step's bash block is typically its own invocation/fresh shell, so a bare
+# `${MERGE_BASE:-}` left over from Step 1 would silently be empty here almost
+# always -- turning condition (b) from "fires on nearly every push" into
+# "never fires," the opposite failure mode. Self-contained instead.
+DEFAULT_BRANCH=""
+for candidate in main master; do
+  if git show-ref --verify --quiet "refs/heads/${candidate}" 2>/dev/null; then
+    DEFAULT_BRANCH="$candidate"
+    break
+  fi
+done
+MERGE_BASE=""
+if [ -n "$DEFAULT_BRANCH" ]; then
+  MERGE_BASE=$(git merge-base "$DEFAULT_BRANCH" HEAD 2>/dev/null)
+fi
+
+MERGE_BASE_VERSION=""
+if [ -n "${MERGE_BASE:-}" ]; then
+  MERGE_BASE_VERSION=$(git show "${MERGE_BASE}:package.json" 2>/dev/null \
+    | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{process.stdout.write(JSON.parse(d).version||'')}catch(e){}})" 2>/dev/null)
+fi
+
+CHANGELOG_LAST_COMMIT=$(git log -1 --format=%H -- CHANGELOG.md 2>/dev/null)
+COMMITS_AFTER_CHANGELOG=0
+if [ -n "$CHANGELOG_LAST_COMMIT" ] && [ -n "$MERGE_BASE_VERSION" ] && [ "$CURRENT_VERSION" != "$MERGE_BASE_VERSION" ]; then
+  COMMITS_AFTER_CHANGELOG=$(git log --format=%H "${CHANGELOG_LAST_COMMIT}..HEAD" 2>/dev/null | grep -c .)
+fi
+```
+
+- (a) `CHANGELOG_HAS_HEADER` is false — no header in `CHANGELOG.md` matches `package.json`'s
+  current version. Independent of diff scope, always evaluable.
+- (b) `COMMITS_AFTER_CHANGELOG` is greater than 0 — this branch has bumped `package.json`'s
+  version away from its merge-base's, **and** commits have landed after `CHANGELOG.md` was
+  last touched. Re-derives its own `DEFAULT_BRANCH`/`MERGE_BASE` (doesn't reuse Step 1's —
+  see the code comment above); silently skipped if no `main`/`master` branch is found,
+  same as Steps 2-4.
+
+If either is true:
+
+> ⚠️ `CHANGELOG.md` may be out of date for v`$CURRENT_VERSION` — no matching version header, or N
+> commit(s) landed since it was last touched. Confirm the entry is current before pushing, or
+> dismiss if this branch genuinely doesn't need one yet (e.g. mid-branch, not the release commit).
+
+This is advisory and confirm-or-dismiss, same as every other step here — don't auto-write a
+CHANGELOG entry. No new skill, no new top-level gate — extends the existing Gate 6
+(`pre-push-gate.sh`) completion-flag pattern via Step 7 below, same as Steps 2-5.
+
+### Step 7 — Report and write completion flag
 
 Present findings the same way `kmg-docs-impact-scan` does — advisory notes for the user to review, never auto-corrections:
 
@@ -225,10 +305,11 @@ Flag filename formula: `/tmp/kmgraph-paperwork-audit-<branch>-<sha>.flag`, detac
 
 | Situation | Behavior |
 |-----------|----------|
-| No `main`/`master` branch found | Skip Steps 2-4 (need the diff scope), still run Step 5 (no diff scope needed) and Step 6, report the Steps 2-4 portion as skipped with that reason, still write the completion flag (the audit "ran" — it just couldn't determine a diff scope for that portion) |
-| No issue/ENH docs changed on this branch | Skip Steps 2-3 silently, still run Steps 4-5, still write the flag |
+| No `main`/`master` branch found | Skip Steps 2-4 (need the diff scope), still run Step 5 (no diff scope needed), Step 6 (condition (a) still runs; condition (b) is silently skipped — needs `MERGE_BASE`), and Step 7, report the skipped portions with that reason, still write the completion flag (the audit "ran" — it just couldn't determine a diff scope for those portions) |
+| No issue/ENH docs changed on this branch | Skip Steps 2-3 silently, still run Steps 4-6, still write the flag |
 | `status:` field missing or unrecognized value entirely | Skip that doc for Steps 2-3, don't guess an intended status; note it as a separate, smaller finding ("`issue-N` has no recognized `status:` value") |
 | Multiple session summaries exist for the same branch | Use the most recently modified one; don't flag older ones as stale duplicates — that's a different concern, not this skill's job |
 | Diff is very large (many issue/ENH docs changed, Steps 1-4) | No cap — unlike `kmg-docs-impact-scan`'s 20-identifier cap, this scope is already narrow (only issue/ENH docs, only this branch) and unlikely to be large enough to need one; if it ever is, note the volume to the user rather than silently truncating |
 | Many meta-issues exist repo-wide (Step 5) | No cap here either, but a different cost shape than the row above — Step 5 is a full repo-wide scan every run, not diff-scoped, because the drift it looks for can predate the current branch. Cheap at this repo's current meta-issue count; if that stops being true, note the volume rather than silently truncating, same policy as the diff-scoped steps |
 | Attempt folder name doesn't start with a zero-padded number (e.g. an enhancement-ID-named folder) | Not paired against a header positionally — reported once per issue as its own finding, folder↔header check skipped for just those folders (see Step 5a) |
+| `CHANGELOG.md` missing entirely, or `package.json` version unreadable (Step 6) | Skip the corresponding condition check rather than guessing; if both are unreadable, skip Step 6 silently and note it wasn't checkable rather than flagging a false positive |

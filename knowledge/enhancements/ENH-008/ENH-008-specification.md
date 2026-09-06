@@ -1,7 +1,7 @@
 ---
 title: "ENH-008: capture-router — Context-Aware Capture with Single Confirmation"
 number: 008
-status: proposed
+status: implemented
 version_target: "v0.2.3"
 github_issue: null
 created: 2026-03-30
@@ -10,6 +10,13 @@ related_enhs: []
 ---
 
 # ENH-008: capture-router Skill
+
+**Implemented (2026-09-05):** `skills/kmg-capture-router/SKILL.md` exists, with a purpose
+statement matching this spec almost verbatim ("Route... requests to the correct
+destination... via auto-detection and single confirmation"). It is registered live in the
+skills roster as `kmgraph:kmg-capture-router`. See also
+`knowledge/lessons-learned/patterns/2026-03-30-capture-router-auto-detect-type-and-location.md`
+(same creation date as this spec).
 
 ## Problem
 

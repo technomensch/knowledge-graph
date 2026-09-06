@@ -8,7 +8,9 @@ status: proposed
 
 **Status:** 🟡 Proposed
 **Discovered:** 2026-06-28
-**Related:** `kmg-init`, `kmg-switch`, `kmg-list`
+**Related:** `kmg-init`, `kmg-list`, `mcp-server/src/config.ts`/`resolution.ts` (current
+`status: pending|active|archived|deleted` registry lifecycle model — see 2026-09-01 note
+below; `kmg-switch` is retired, no longer a valid reference point)
 **GitHub Issue:** #256
 
 ---
@@ -42,7 +44,7 @@ A new command `/kmgraph:kmg-remove` (or `kg_remove` MCP tool) that:
 
 ## Notes
 
-- `config.json` manipulation already exists in `kg_config_switch` — the remove command can reuse that pattern
+- ~~`config.json` manipulation already exists in `kg_config_switch` — the remove command can reuse that pattern~~ **Stale (2026-09-01) — see Status note below: `kg_config_switch` is retired.** Reuse the current `status`/`statusChangedAt` registry lifecycle in `mcp-server/src/config.ts`/`resolution.ts` instead.
 - The delete-files path must be guarded: require user to type the KG name to confirm (similar to GitHub repo deletion UX)
 
 ---

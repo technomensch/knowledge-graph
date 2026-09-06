@@ -7,10 +7,16 @@ branch: v0.5.9.1-review-audit-protocol
 created: 2026-05-28
 related-adrs: [ADR-049]
 related-enhs: [ENH-020]
-target-release: v0.7.0
+target-release: v0.7.0 (stale — unaddressed as of v0.7.7, see 2026-09-05 note)
 ---
 
 # Issue-7: Bash Permission Prompt Provides No Context — Indistinguishable from Review Audit HALT
+
+**Note (2026-09-05):** Still open, `target-release: v0.7.0` is stale — current version is
+0.7.7, three-plus releases have passed with no revisit. `.claude/settings.json` still has
+no Bash allow-list for read-only git commands (`git diff`/`log`/`show`/`status`), and no
+description-injection pattern was found in `agents/*.md`. Re-scope the target release (or
+drop the field) rather than leaving it pointing at a version already three releases past.
 
 ## Problem
 
