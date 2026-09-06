@@ -229,6 +229,39 @@ else
 fi
 
 # ─────────────────────────────────────────────────────────────
+# SECTION 2.5: Plugin Cache Staleness Backup Check (issue-28)
+# Backup for issue-28's primary post-commit sync trigger (git post-commit
+# hook, local/unversioned) -- covers fresh clones and machines where that
+# local hook isn't installed. Only fires when the resolved project IS this
+# plugin's own dev repo (detected via scripts/sync-plugin-cache.sh's
+# presence at the resolved repo root). Extends the absence-only pattern
+# used in Section 1 to a staleness (mtime) comparison -- non-blocking.
+# ─────────────────────────────────────────────────────────────
+
+if [ "$PROJECT_RESOLVED" = true ] && [ "$(basename "$KG_PATH")" = "knowledge" ]; then
+    _dev_repo_root="$(dirname "$KG_PATH")"
+    _sync_script="$_dev_repo_root/scripts/sync-plugin-cache.sh"
+    if [ -f "$_sync_script" ]; then
+        _dev_dist="$_dev_repo_root/mcp-server/dist/index.js"
+        _cache_dist="$PLUGIN_ROOT/mcp-server/dist/index.js"
+        if [ -f "$_dev_dist" ] && [ -f "$_cache_dist" ]; then
+            if [[ "$OSTYPE" == "darwin"* ]]; then
+                _dev_mtime=$(stat -f %m "$_dev_dist")
+                _cache_mtime=$(stat -f %m "$_cache_dist")
+            else
+                _dev_mtime=$(stat -c %Y "$_dev_dist")
+                _cache_mtime=$(stat -c %Y "$_cache_dist")
+            fi
+            if [ "$_dev_mtime" -gt "$_cache_mtime" ]; then
+                echo -e "${YELLOW}⚠️  Installed plugin cache looks stale: mcp-server/dist is newer in the working tree than in the installed cache.${NC}"
+                echo "   Run: $_sync_script"
+                echo ""
+            fi
+        fi
+    fi
+fi
+
+# ─────────────────────────────────────────────────────────────
 # SECTION 3: Recent Lessons (from recent-lessons.sh)
 # Project-scoped -- only runs when a project KG resolved from CWD.
 # ─────────────────────────────────────────────────────────────

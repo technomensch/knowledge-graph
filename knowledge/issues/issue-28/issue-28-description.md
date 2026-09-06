@@ -1,7 +1,7 @@
 ---
 id: issue-28
 type: Hardening
-status: deferred
+status: resolved
 github-issue: "#192"
 branch: none
 created: 2026-07-18
@@ -68,6 +68,21 @@ Checked `hooks/hooks.json`: the hook is wired as `${CLAUDE_PLUGIN_ROOT}/scripts/
 
 **This means the original title ("Live `kg_*` Tool Calls") undersold the scope.** Any project mechanism wired via `${CLAUDE_PLUGIN_ROOT}` — not just MCP tools — is subject to this gap: hooks, and likely anything else in `hooks.json` that references the same variable. Retitled to reflect this.
 
+## Decided (2026-09-05, branch v0.7.8-preflight-gate-hardening — brainstormed, not yet built)
+
+**Approach:** Extend the existing cp-to-cache workaround, not just document the JSON-RPC bypass and not the bigger symlink-based install mode (that stays a future, separately-ADR'd option per this issue's own "On the ADR question" section below). New `scripts/sync-plugin-cache.sh` copies `mcp-server/dist/` + hook-wired scripts into the installed plugin cache path.
+
+**Why not doc-only:** investigated whether the user personally triggers this — he doesn't. Confirmed instead: `skills/kmg-lesson-capture` and `skills/kmg-session-wrap` auto-dispatch background agents that call `kg_capture`/`kg_search` on trigger phrases, mid-session, with no human step to "remember." A doc-only fix has no human moment to attach to. Also confirmed `mcp-server/src/` changes ~1.2x/day (109 commits/90 days) — frequent enough that staleness is the common case, not an edge case.
+
+**Trigger point:** git post-commit hook on `mcp-server/src/` changes (primary) — fires within seconds of a fix landing, closes the exact highest-risk window (right after a fix, before the next session restart). Existing SessionStart hook's staleness check (extend it to check mtime, not just absence) kept as a backup — covers fresh clones and machines where the local post-commit hook isn't installed (git hooks are local/unversioned).
+
+Both Sonnet and Opus independently recommended commit-time-primary + session-start-backup; converged reasoning: the failure mode is silent (background skills hit stale code with no observer), so cost of firing on every relevant commit (~once/day, a few seconds) is worth it against a silent-corruption risk.
+
+**Gaps found by Opus's review of the v0.7.8 plan (2026-09-05), still open at build time:**
+- **Cache path resolution unspecified.** The installed plugin cache path is version-pinned (this issue's own example: `.../kmgraph/0.6.15/`), but the working tree's version moves independently during active development (currently 0.7.7). `sync-plugin-cache.sh` must resolve the live installed version's cache directory dynamically, not assume it matches `package.json` — sketch: `ls -d ~/.claude/plugins/cache/*/kmgraph/*/ | sort -V | tail -1` (latest installed version dir), refine at build time rather than hardcode a version.
+- **Mid-branch live-hook risk.** Once this sync script works, every subsequent commit on the v0.7.8 branch immediately becomes the real hook governing the developer's own pushes — including not-yet-fully-tested gate additions later in the same branch (e.g. Commit 5's build gate). Needs a disable/bypass switch, or manual verification of each new gate addition before trusting auto-sync to propagate it live.
+- **Verification method flaw.** Re-running ENH-052's *simulated* PreToolUse test proves nothing new — that same simulation approach is what already masked this bug once (the real gap was only found by accident, via a live hook firing). Verify instead by directly inspecting the synced cache copy (e.g. `grep` it for "Gate 7"/"KG INDEX DRIFT" post-sync) and observing a real push's injected context.
+
 ## Related
 
 - [issue-27](../issue-27/issue-27-description.md) — the bug fix being tested when this gap was discovered
@@ -89,3 +104,13 @@ Checked `hooks/hooks.json`: the hook is wired as `${CLAUDE_PLUGIN_ROOT}/scripts/
 ### On the ADR question
 
 No new ADR was created for this finding. This is judged to be a process/dev-tooling gap — there is no real architectural alternative being weighed here (the fix, if one is ever built, would most likely be "document the JSON-RPC bypass" or "extend the existing cp-to-cache workaround to cover `mcp-server/dist/`," both of which are documentation/tooling additions consistent with the ADR-054 direction already accepted, not a new decision point). If a future investigation finds this needs an actual architectural choice (e.g., a symlink-based local-install mode with real trade-offs), it should get its own ADR at that time.
+
+## Resolved (2026-09-05, branch v0.7.8-preflight-gate-hardening — Commit 1)
+
+Implemented per the "Decided" section above: `scripts/sync-plugin-cache.sh` resolves the latest installed version dir dynamically (`sort -V`, no hardcoded version) and copies `mcp-server/dist/`, `scripts/`, and `hooks/hooks.json` into it. Disable/bypass switch: `~/.kmgraph/.sync-disabled` (touch to skip).
+
+- **Primary trigger:** local (unversioned) git `post-commit` hook — fires the sync when a commit touches `mcp-server/src/`. Installed directly into `.git/hooks/post-commit` on this machine (not git-tracked; per this issue's own note, git hooks are local/unversioned, so this doesn't survive a fresh clone).
+- **Backup trigger:** `scripts/hooks-master.sh` Section 2.5 — extends the existing SessionStart absence-only pattern (Section 1) to an mtime comparison: warns (non-blocking) when the working tree's `mcp-server/dist/index.js` is newer than the installed cache's copy, scoped to only fire when the resolved project is this plugin's own dev repo (detected via `scripts/sync-plugin-cache.sh`'s presence at the resolved repo root).
+- **Verified** per the corrected method (not a simulated re-run): ran the sync script directly against the live installed cache (`.../kmgraph/0.7.5/`). Confirmed `Gate 7` was a poor test string — it already existed in that cache version pre-sync (predates this branch). Instead grepped for the string `SECTION 2.5: Plugin Cache Staleness Backup Check` (unique to this commit's `hooks-master.sh` edit, below): absent in the cache copy before running the script (count 0), present after (count 1) — confirms the sync actually moved bytes, not a simulated pass.
+
+Status flipped deferred → resolved on that basis; final confirmation is a real push exercising the live hook end-to-end (pending).
