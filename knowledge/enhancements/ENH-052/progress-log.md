@@ -41,3 +41,23 @@ finding, now confirmed for hooks too. Updated and retitled `issue-28` with
 this evidence. `status:` stays `deferred` — CHANGELOG-entry-currency remains
 unassigned, and the skill's judgment logic hasn't been exercised on a real
 case yet, but the core mechanism now exists and demonstrably works.
+
+**2026-09-05** — CHANGELOG-entry-currency design decided (brainstormed for
+branch `v0.7.8-preflight-gate-hardening`, not yet built). Recall across this
+repo's history plus a cross-project (nimbalyst) check, then independent
+Sonnet + Opus recommendations, converged on: mechanical git-log detection
+(missing version header, or commits landed after CHANGELOG.md's last touch)
+delivered as a trigger into `kmg-paperwork-audit`'s existing flag pattern
+(new Step 5) rather than a second silent Gate-2-style print — the skill
+confirms-or-dismisses, it doesn't re-derive judgment from scratch. Full
+reasoning in the spec's new "Decided" section. `status:` stays `deferred`
+until built.
+
+**2026-09-05** — Built on branch `v0.7.8-preflight-gate-hardening`, Commit 2
+(after Commit 1 landed the `mcp-server`/hook-resolution fix that makes Gates
+5/6 real against a live push, not just this working tree). Added Step 6
+(CHANGELOG-entry-currency) to `skills/kmg-paperwork-audit/SKILL.md`,
+renumbered the existing report/flag-write step 6 → 7 throughout the file.
+`status:` flips deferred → resolved; the skill's confirm-or-dismiss judgment
+on a real stale-CHANGELOG case is still unexercised live, noted as open in
+the spec's "Built" note.
