@@ -317,6 +317,20 @@ fi
 # plus every other gate). If this script is ever killed externally before it
 # reaches the emit block below, Gates 2-7's output is lost too, not just
 # Gate 8's -- so the internal bound must be the one that actually fires.
+#
+# Corrected 2026-09-05 (2nd Opus review): this script is distributed via
+# ${CLAUDE_PLUGIN_ROOT}/scripts/ and fires in every consumer project that
+# installs this plugin, not just this repo -- REPO_ROOT above resolves to
+# whatever project the hook runs in. Raising the hook timeout to 90s (this
+# same pass) widened the exposure: any consumer repo with its own `npm run
+# build` script would otherwise run it (looking for a Docusaurus-specific
+# "broken link" string that will never appear there) on every single push,
+# for up to 76s, for no benefit. Gate 8 is specifically a Docusaurus
+# broken-link check (issue-13's own scope) -- guard it on this repo actually
+# being a Docusaurus site, same graceful-no-op-when-absent convention as
+# every other optional check in this file (Gate 4/4b's `[ -x ... ]` guards).
+
+if [ -f "$REPO_ROOT/docusaurus.config.js" ]; then
 
 DOCS_BUILD_TIMEOUT_SECS=75
 DOCS_BUILD_LOG=$(mktemp 2>/dev/null || printf '/tmp/kmgraph-docs-build-%s.log' "$$")
@@ -368,7 +382,11 @@ else
     # silently truncating, matching kmg-paperwork-audit's own house style
     # for large-output edge cases.
     DOCS_BROKEN_SHOWN=$(printf '%s\n' "$DOCS_BROKEN_LINKS" | head -5)
-    FINDINGS="${FINDINGS}DOCS BUILD ADVISORY: ${DOCS_BROKEN_COUNT} broken link(s) detected by 'npm run build' (onBrokenLinks: warn, not blocking) -- showing first 5:
+    # Each matched line names one source PAGE with at least one broken link,
+    # not one broken link -- Docusaurus lists the actual target(s) on
+    # indented sub-lines beneath each page. Label accordingly so the count
+    # doesn't overstate/understate what it's actually counting.
+    FINDINGS="${FINDINGS}DOCS BUILD ADVISORY: ${DOCS_BROKEN_COUNT} page(s) with broken link(s) detected by 'npm run build' (onBrokenLinks: warn, not blocking) -- showing first 5:
 ${DOCS_BROKEN_SHOWN}
 "
     if [ "$DOCS_BROKEN_COUNT" -gt 5 ]; then
@@ -377,6 +395,8 @@ ${DOCS_BROKEN_SHOWN}
     fi
   fi
 fi
+
+fi # end: docusaurus.config.js guard
 
 # ── Gate 7: numbering collision detection (ADR-067 § Mechanism resolved 2026-08-23) ──
 

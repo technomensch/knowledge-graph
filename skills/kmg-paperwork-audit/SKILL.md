@@ -40,7 +40,7 @@ git diff --name-only "$MERGE_BASE" HEAD -- \
   'knowledge/enhancements/*/ENH-*-specification.md'
 ```
 
-If `DEFAULT_BRANCH` can't be determined (no `main`/`master` branch found), skip Steps 2-4 (they depend on this diff scope) and proceed to Step 5 — Step 5 scans every meta-issue in the repo directly and needs no diff scope. Step 6's condition (a) doesn't need it either, but condition (b) does (needs `MERGE_BASE` to compare `package.json` versions) and is silently skipped without one — report the Steps 2-4 portion (and Step 6's condition (b), if applicable) as skipped with that reason at Step 7. Don't guess a fallback branch.
+If `DEFAULT_BRANCH` can't be determined (no `main`/`master` branch found), skip Steps 2-4 (they depend on this diff scope) and proceed to Step 5 — Step 5 scans every meta-issue in the repo directly and needs no diff scope. Step 6's condition (a) doesn't need it either, but condition (b) does (re-derives its own `MERGE_BASE` rather than reusing this step's, since each step typically runs as a separate bash invocation — see Step 6 for why) and is silently skipped without one — report the Steps 2-4 portion (and Step 6's condition (b), if applicable) as skipped with that reason at Step 7. Don't guess a fallback branch.
 
 ### Step 2 — Check `status: resolved` items for supporting evidence
 
@@ -205,8 +205,8 @@ if [ -n "$CURRENT_VERSION" ] && grep -qE "^## \[?${CURRENT_VERSION//./\\.}\]?" C
   CHANGELOG_HAS_HEADER=true
 fi
 
-# Condition (b) reuses Step 1's DEFAULT_BRANCH/MERGE_BASE. Corrected 2026-09-05
-# (Opus review): originally "any commit landed after CHANGELOG.md's last touch" --
+# Condition (b) needs DEFAULT_BRANCH/MERGE_BASE. Corrected 2026-09-05 (Opus
+# review): originally "any commit landed after CHANGELOG.md's last touch" --
 # true on virtually every WIP branch (CHANGELOG is release-only per CLAUDE.md, so a
 # mid-branch commit almost always postdates it), which made this condition fire
 # on nearly every push regardless of whether anything release-relevant actually
@@ -218,6 +218,24 @@ fi
 # after the version-promote commit but before push, per Gate 2's own header
 # comment: "08-04 and 08-19 happened after Gate 2's version-string-presence
 # check already existed").
+#
+# Re-derived here rather than reused from Step 1 (2nd Opus review, 2026-09-05):
+# each step's bash block is typically its own invocation/fresh shell, so a bare
+# `${MERGE_BASE:-}` left over from Step 1 would silently be empty here almost
+# always -- turning condition (b) from "fires on nearly every push" into
+# "never fires," the opposite failure mode. Self-contained instead.
+DEFAULT_BRANCH=""
+for candidate in main master; do
+  if git show-ref --verify --quiet "refs/heads/${candidate}" 2>/dev/null; then
+    DEFAULT_BRANCH="$candidate"
+    break
+  fi
+done
+MERGE_BASE=""
+if [ -n "$DEFAULT_BRANCH" ]; then
+  MERGE_BASE=$(git merge-base "$DEFAULT_BRANCH" HEAD 2>/dev/null)
+fi
+
 MERGE_BASE_VERSION=""
 if [ -n "${MERGE_BASE:-}" ]; then
   MERGE_BASE_VERSION=$(git show "${MERGE_BASE}:package.json" 2>/dev/null \
@@ -235,8 +253,9 @@ fi
   current version. Independent of diff scope, always evaluable.
 - (b) `COMMITS_AFTER_CHANGELOG` is greater than 0 — this branch has bumped `package.json`'s
   version away from its merge-base's, **and** commits have landed after `CHANGELOG.md` was
-  last touched. Needs `MERGE_BASE` (from Step 1); silently skipped without one, same as
-  Steps 2-4.
+  last touched. Re-derives its own `DEFAULT_BRANCH`/`MERGE_BASE` (doesn't reuse Step 1's —
+  see the code comment above); silently skipped if no `main`/`master` branch is found,
+  same as Steps 2-4.
 
 If either is true:
 
