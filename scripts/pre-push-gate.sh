@@ -211,6 +211,13 @@ if [ -n "$SCAN_FLAG" ] && [ ! -f "$SCAN_FLAG" ]; then
 fi
 
 # ── Gate 4: github-issue-sync invariant (issue-11) ────────────────────────────
+# Note (issue-52, comment-only, 2026-09-05): issue-52 researches a related but
+# distinct gap -- superpowers:brainstorming-originated specs still bypassing
+# kmg-start-issue-tracking's GitHub-issue creation entirely (this gate only
+# checks sync for docs that already claim a github-issue field, not whether
+# one was ever created). Track-only/research, no fix decided yet as of this
+# note -- see knowledge/issues/issue-52/issue-52-description.md before
+# touching this gate next, to avoid re-doing the hotspot discovery work.
 
 SYNC_CHECK="${REPO_ROOT}/scripts/check-github-issue-sync.sh"
 if [ -x "$SYNC_CHECK" ]; then
