@@ -35,6 +35,16 @@
 #   currency) and can't be mechanically verified in bash. A companion skill
 #   (not yet built) would write the completion flag after running.
 #
+# Gate 8 — docs-build broken-link check (issue-13, advisory only):
+#   Runs `npm run build` (Docusaurus) and surfaces broken-link warnings
+#   (onBrokenLinks: 'warn' in docusaurus.config.js -- this gate does not flip
+#   that to 'throw'; issue-13's own text says that must wait until link
+#   clusters 2+3 are fixed first, or CI hard-fails on unrelated pre-existing
+#   breaks). Bounded by a timeout since a full build inside a PreToolUse hook
+#   otherwise adds real latency to every push; output captured via command
+#   substitution so a nonzero build exit can't abort the rest of this script
+#   under `set -e` (same pattern as Gate 4b).
+#
 # Why gates, not a smarter skill (ADR-043, ADR-050):
 #   ADR-043: "Previous fix attempts via CLAUDE.md edits and ADRs failed
 #   because they depend on model attention during skill execution — the
@@ -284,6 +294,46 @@ if [ -n "$SCAN_FLAG" ]; then
   PAPERWORK_FLAG="${SCAN_FLAG/docs-scan/paperwork-audit}"
   if [ ! -f "$PAPERWORK_FLAG" ]; then
     FINDINGS="${FINDINGS}REMINDER: paperwork-audit has not run on this branch at this commit (ENH-052 — issue status accuracy, session-summary currency). Run it before pushing, or confirm not applicable.
+"
+  fi
+fi
+
+# ── Gate 8: docs-build broken-link check (issue-13, advisory only) ────────────
+# Note: Gate numbers stay in original discovery order (7 already exists below
+# this historically); placed here so it runs alongside the other content
+# checks rather than reordering existing gates.
+
+DOCS_BUILD_TIMEOUT_SECS=120
+DOCS_BUILD_LOG=$(mktemp 2>/dev/null || printf '/tmp/kmgraph-docs-build-%s.log' "$$")
+
+( cd "$REPO_ROOT" && npm run build > "$DOCS_BUILD_LOG" 2>&1 ) &
+DOCS_BUILD_PID=$!
+DOCS_BUILD_ELAPSED=0
+while kill -0 "$DOCS_BUILD_PID" 2>/dev/null; do
+  if [ "$DOCS_BUILD_ELAPSED" -ge "$DOCS_BUILD_TIMEOUT_SECS" ]; then
+    kill "$DOCS_BUILD_PID" 2>/dev/null || true
+    break
+  fi
+  sleep 2
+  DOCS_BUILD_ELAPSED=$((DOCS_BUILD_ELAPSED + 2))
+done
+
+DOCS_BUILD_EXIT=0
+wait "$DOCS_BUILD_PID" 2>/dev/null || DOCS_BUILD_EXIT=$?
+DOCS_BUILD_OUT=$(cat "$DOCS_BUILD_LOG" 2>/dev/null || true)
+rm -f "$DOCS_BUILD_LOG" 2>/dev/null || true
+
+if [ "$DOCS_BUILD_ELAPSED" -ge "$DOCS_BUILD_TIMEOUT_SECS" ]; then
+  FINDINGS="${FINDINGS}DOCS BUILD ADVISORY: npm run build did not finish within ${DOCS_BUILD_TIMEOUT_SECS}s and was killed. Broken-link check skipped for this push -- run 'npm run build' locally to check manually.
+"
+elif [ "$DOCS_BUILD_EXIT" -ne 0 ]; then
+  FINDINGS="${FINDINGS}DOCS BUILD ADVISORY: npm run build failed (exit ${DOCS_BUILD_EXIT}). Broken-link check skipped for this push -- run 'npm run build' locally to see the full error.
+"
+else
+  DOCS_BROKEN_LINKS=$(printf '%s' "$DOCS_BUILD_OUT" | grep -iE 'broken link' || true)
+  if [ -n "$DOCS_BROKEN_LINKS" ]; then
+    FINDINGS="${FINDINGS}DOCS BUILD ADVISORY: broken link(s) detected by 'npm run build' (onBrokenLinks: warn, not blocking):
+${DOCS_BROKEN_LINKS}
 "
   fi
 fi

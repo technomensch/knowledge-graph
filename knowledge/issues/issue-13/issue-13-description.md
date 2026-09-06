@@ -1,7 +1,7 @@
 ---
 id: issue-13
 type: Hardening
-status: deferred
+status: partially-implemented
 github-issue: "#170"
 branch: none
 created: 2026-07-14
@@ -47,6 +47,12 @@ Confirmed 2026-07-14, while auditing the docs site ahead of a v0.6.19 presentati
   issue-17, not part of this cross-link pass) separately discuss/propose changes to
   `knowledge/rules.md`'s enforcement — FYI, not batched with this issue.
 
-## Explicitly Deferred (Mode 3 — Track only)
+## Partially Implemented (2026-09-05, branch v0.7.8-preflight-gate-hardening, Commit 5)
 
-No implementation plan, no branch. This issue documents the finding for later scheduling. Sequencing note: any fix here (e.g. flipping `onBrokenLinks` to `'throw'`) should land *after* broken-link clusters 2 and 3 (the examples/ relative-path mismatch and meta-issue scaffold nav, deferred separately — see session summary `docs-site-broken-links-audit` snapshot) are also fixed, since flipping to `'throw'` immediately would hard-fail CI on those still-broken clusters.
+Added `scripts/pre-push-gate.sh` Gate 8: runs `npm run build` on every push, bounded by a 120s timeout, output captured via command substitution so a nonzero/killed build can't abort the rest of the script (same safe pattern as Gate 4b). Surfaces any "broken link" lines from the build output as an advisory finding — never blocks the push, matches Gate 2's advisory style. Verified live: ran the gate against this branch's actual state and confirmed it correctly surfaced the site's existing (pre-dating this branch) broken links, while gates 2/3/4/4b/5/6/7 continued to report normally alongside it.
+
+**Deliberately not done:** `onBrokenLinks`/`onBrokenMarkdownLinks` in `docusaurus.config.js` stay `'warn'`, not flipped to `'throw'` — see "Explicitly Deferred" below, unchanged. This gate is the advisory half of solution-approach.md's Option 2; Option 1 (hard-fail) still waits on clusters 2+3.
+
+## Explicitly Deferred (throw-mode, Mode 3 — Track only)
+
+Flipping `onBrokenLinks` to `'throw'` (solution-approach.md's Option 1) should land *after* broken-link clusters 2 and 3 (the examples/ relative-path mismatch and meta-issue scaffold nav, deferred separately — see session summary `docs-site-broken-links-audit` snapshot) are also fixed, since flipping to `'throw'` immediately would hard-fail CI on those still-broken clusters. This branch's Gate 8 (above) is advisory-only specifically to respect this sequencing constraint.
