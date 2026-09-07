@@ -13,13 +13,23 @@ import { registerCompareTools } from "./tools/compare.js";
 import { registerResolveTool } from "./tools/resolve.js";
 import { registerExtractTool } from "./tools/extract.js";
 import { PersonalScopeSession, CrossKgSearchSession } from "./resolution.js";
+import { installStaleProcessWarning } from "./lib/installStaleProcessWarning.js";
+import { resolveRunningVersion } from "./lib/staleProcessCheck.js";
 
 declare const __SERVER_VERSION__: string;
+const SERVER_VERSION = typeof __SERVER_VERSION__ !== "undefined" ? __SERVER_VERSION__ : "0.0.0";
 
 const server = new McpServer({
   name: "knowledge-graph",
-  version: typeof __SERVER_VERSION__ !== "undefined" ? __SERVER_VERSION__ : "0.0.0",
+  version: SERVER_VERSION,
 });
+
+// issue-32 / ADR-055 amendment Component C: wrap server.tool() before any
+// register*Tools(server) call below so every tool gets a cheap per-call
+// check for whether this process is running code older than what's
+// actually installed on disk (Node doesn't hot-reload -- a session open
+// before an upgrade lands keeps serving old code indefinitely otherwise).
+installStaleProcessWarning(server, resolveRunningVersion());
 
 // ADR-067 Task 6.3 (spec §11): one ephemeral, process-lifetime scope session
 // shared between kg_search and kg_capture -- constructed once here so a

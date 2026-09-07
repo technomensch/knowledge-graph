@@ -3230,8 +3230,8 @@ var require_utils = __commonJS({
       }
       return ind;
     }
-    function removeDotSegments(path14) {
-      let input = path14;
+    function removeDotSegments(path15) {
+      let input = path15;
       const output = [];
       let nextSlash = -1;
       let len = 0;
@@ -3576,8 +3576,8 @@ var require_schemes = __commonJS({
         wsComponent.secure = void 0;
       }
       if (wsComponent.resourceName) {
-        const [path14, query] = wsComponent.resourceName.split("?");
-        wsComponent.path = path14 && path14 !== "/" ? path14 : void 0;
+        const [path15, query] = wsComponent.resourceName.split("?");
+        wsComponent.path = path15 && path15 !== "/" ? path15 : void 0;
         wsComponent.query = query;
         wsComponent.resourceName = void 0;
       }
@@ -6995,12 +6995,12 @@ var require_dist = __commonJS({
         throw new Error(`Unknown format "${name}"`);
       return f;
     };
-    function addFormats(ajv, list, fs14, exportName) {
+    function addFormats(ajv, list, fs15, exportName) {
       var _a2;
       var _b;
       (_a2 = (_b = ajv.opts.code).formats) !== null && _a2 !== void 0 ? _a2 : _b.formats = (0, codegen_1._)`require("ajv-formats/dist/formats").${exportName}`;
       for (const f of list)
-        ajv.addFormat(f, fs14[f]);
+        ajv.addFormat(f, fs15[f]);
     }
     module2.exports = exports2 = formatsPlugin;
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -7367,8 +7367,8 @@ function getErrorMap() {
 
 // node_modules/zod/v3/helpers/parseUtil.js
 var makeIssue = (params) => {
-  const { data, path: path14, errorMaps, issueData } = params;
-  const fullPath = [...path14, ...issueData.path || []];
+  const { data, path: path15, errorMaps, issueData } = params;
+  const fullPath = [...path15, ...issueData.path || []];
   const fullIssue = {
     ...issueData,
     path: fullPath
@@ -7483,11 +7483,11 @@ var errorUtil;
 
 // node_modules/zod/v3/types.js
 var ParseInputLazyPath = class {
-  constructor(parent, value, path14, key) {
+  constructor(parent, value, path15, key) {
     this._cachedPath = [];
     this.parent = parent;
     this.data = value;
-    this._path = path14;
+    this._path = path15;
     this._key = key;
   }
   get path() {
@@ -11410,10 +11410,10 @@ function mergeDefs(...defs) {
 function cloneDef(schema) {
   return mergeDefs(schema._zod.def);
 }
-function getElementAtPath(obj, path14) {
-  if (!path14)
+function getElementAtPath(obj, path15) {
+  if (!path15)
     return obj;
-  return path14.reduce((acc, key) => acc?.[key], obj);
+  return path15.reduce((acc, key) => acc?.[key], obj);
 }
 function promiseAllObject(promisesObj) {
   const keys = Object.keys(promisesObj);
@@ -11796,11 +11796,11 @@ function aborted(x, startIndex = 0) {
   }
   return false;
 }
-function prefixIssues(path14, issues) {
+function prefixIssues(path15, issues) {
   return issues.map((iss) => {
     var _a2;
     (_a2 = iss).path ?? (_a2.path = []);
-    iss.path.unshift(path14);
+    iss.path.unshift(path15);
     return iss;
   });
 }
@@ -11983,7 +11983,7 @@ function formatError(error48, mapper = (issue2) => issue2.message) {
 }
 function treeifyError(error48, mapper = (issue2) => issue2.message) {
   const result = { errors: [] };
-  const processError = (error49, path14 = []) => {
+  const processError = (error49, path15 = []) => {
     var _a2, _b;
     for (const issue2 of error49.issues) {
       if (issue2.code === "invalid_union" && issue2.errors.length) {
@@ -11993,7 +11993,7 @@ function treeifyError(error48, mapper = (issue2) => issue2.message) {
       } else if (issue2.code === "invalid_element") {
         processError({ issues: issue2.issues }, issue2.path);
       } else {
-        const fullpath = [...path14, ...issue2.path];
+        const fullpath = [...path15, ...issue2.path];
         if (fullpath.length === 0) {
           result.errors.push(mapper(issue2));
           continue;
@@ -12025,8 +12025,8 @@ function treeifyError(error48, mapper = (issue2) => issue2.message) {
 }
 function toDotPath(_path) {
   const segs = [];
-  const path14 = _path.map((seg) => typeof seg === "object" ? seg.key : seg);
-  for (const seg of path14) {
+  const path15 = _path.map((seg) => typeof seg === "object" ? seg.key : seg);
+  for (const seg of path15) {
     if (typeof seg === "number")
       segs.push(`[${seg}]`);
     else if (typeof seg === "symbol")
@@ -24432,13 +24432,13 @@ function resolveRef(ref, ctx) {
   if (!ref.startsWith("#")) {
     throw new Error("External $ref is not supported, only local refs (#/...) are allowed");
   }
-  const path14 = ref.slice(1).split("/").filter(Boolean);
-  if (path14.length === 0) {
+  const path15 = ref.slice(1).split("/").filter(Boolean);
+  if (path15.length === 0) {
     return ctx.rootSchema;
   }
   const defsKey = ctx.version === "draft-2020-12" ? "$defs" : "definitions";
-  if (path14[0] === defsKey) {
-    const key = path14[1];
+  if (path15[0] === defsKey) {
+    const key = path15[1];
     if (!key || !ctx.defs[key]) {
       throw new Error(`Reference not found: ${ref}`);
     }
@@ -35737,11 +35737,110 @@ function registerExtractTool(server2) {
   );
 }
 
+// src/lib/staleProcessCheck.ts
+var fs14 = __toESM(require("fs"));
+var path14 = __toESM(require("path"));
+function compareSemver(a, b) {
+  const aParts = a.split(".");
+  const bParts = b.split(".");
+  const maxLen = Math.max(aParts.length, bParts.length);
+  for (let i = 0; i < maxLen; i++) {
+    const aNum = parseInt((aParts[i] ?? "0").replace(/[^0-9]/g, "") || "0", 10);
+    const bNum = parseInt((bParts[i] ?? "0").replace(/[^0-9]/g, "") || "0", 10);
+    if (aNum > bNum) return 1;
+    if (aNum < bNum) return -1;
+  }
+  return 0;
+}
+var SEMVER_DIR_RE = /^\d+\.\d+\.\d+$/;
+function resolveFreshestInstalledVersion() {
+  const pluginRoot = getPluginRoot();
+  const versionsParentDir = path14.dirname(pluginRoot);
+  let entries;
+  try {
+    entries = fs14.readdirSync(versionsParentDir, { withFileTypes: true });
+  } catch {
+    return null;
+  }
+  const versions = entries.filter((e) => e.isDirectory() && SEMVER_DIR_RE.test(e.name)).map((e) => e.name);
+  if (versions.length === 0) return null;
+  return versions.reduce((max, v) => compareSemver(v, max) === 1 ? v : max);
+}
+function resolveRunningVersion() {
+  const base = path14.basename(getPluginRoot());
+  if (SEMVER_DIR_RE.test(base)) return base;
+  return true ? "0.7.7" : "0.0.0";
+}
+function getRemediationText(clientName) {
+  const name = (clientName ?? "").toLowerCase();
+  if (name.includes("claude") && name.includes("desktop")) {
+    return "Restart Claude Desktop to pick up the new version (no in-app reload available).";
+  }
+  if (name.includes("claude-code") || name.includes("claude code")) {
+    return "Run /reload-plugins to pick up the new version.";
+  }
+  if (name.includes("gemini")) {
+    return "Restart Gemini CLI to pick up the new version.";
+  }
+  if (name.includes("codex")) {
+    return "Restart Codex to pick up the new version.";
+  }
+  if (name.includes("antigravity")) {
+    return "Restart Antigravity to pick up the new version (assumed -- not independently confirmed; flagged in ADR-055's amendment).";
+  }
+  return "Restart your AI tool to pick up the new version.";
+}
+
+// src/lib/staleProcessWarning.ts
+function checkStaleProcess(runningVersion, clientName) {
+  const freshest = resolveFreshestInstalledVersion();
+  if (!freshest) return null;
+  const cmp = compareSemver(freshest, runningVersion);
+  if (cmp !== 1) return null;
+  const remediation = getRemediationText(clientName);
+  return `KMGraph process is running v${runningVersion}, but v${freshest} is now installed. ${remediation}`;
+}
+
+// src/lib/installStaleProcessWarning.ts
+function installStaleProcessWarning(server2, runningVersion) {
+  let clientName;
+  let clientNameResolved = false;
+  const resolveClientName = () => {
+    if (!clientNameResolved) {
+      clientName = server2.server.getClientVersion()?.name;
+      if (clientName !== void 0) clientNameResolved = true;
+    }
+    return clientName;
+  };
+  const originalTool = server2.tool.bind(server2);
+  server2.tool = (...args) => {
+    const callback = args[args.length - 1];
+    const wrappedCallback = async (...cbArgs) => {
+      const result = await callback(...cbArgs);
+      const warning = checkStaleProcess(runningVersion, resolveClientName());
+      if (!warning) return result;
+      const content = [...result.content ?? []];
+      if (content.length > 0 && content[0].type === "text") {
+        content[0] = { ...content[0], text: `${warning}
+
+${content[0].text ?? ""}` };
+      } else {
+        content.unshift({ type: "text", text: warning });
+      }
+      return { ...result, content };
+    };
+    const newArgs = [...args.slice(0, -1), wrappedCallback];
+    return originalTool(...newArgs);
+  };
+}
+
 // src/index.ts
+var SERVER_VERSION = true ? "0.7.7" : "0.0.0";
 var server = new McpServer({
   name: "knowledge-graph",
-  version: true ? "0.7.7" : "0.0.0"
+  version: SERVER_VERSION
 });
+installStaleProcessWarning(server, resolveRunningVersion());
 var personalScopeSession = new PersonalScopeSession();
 var crossKgSearchSession = new CrossKgSearchSession();
 registerConfigTools(server, personalScopeSession);
