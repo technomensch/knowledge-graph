@@ -34,6 +34,7 @@ Commands work across platforms, but full automation is Claude Code-specific.
 ### Getting Started
 - **Set up a new knowledge graph** → `/kmgraph:kmg-init`
 - **See what's in my knowledge graph** → `/kmgraph:kmg-status`
+- **Check for a pending upgrade without the full init wizard** → `/kmgraph:kmg-upgrade`
 - **Document what I just learned** → `/kmgraph:kmg-capture-lesson`
 - **Find something I documented before** → `/kmgraph:kmg-recall "search query"`
 
@@ -77,6 +78,7 @@ Get the knowledge graph running and configure how it works.
 - [🟡 `/kmgraph:kmg-list`](#-kmgraphlist) — View all configured knowledge graphs
 - [🟡 `/kmgraph:kmg-add-category`](#-kmgraphadd-category) — Add custom categories
 - [🟡 `/kmgraph:kmg-config-sanitization`](#-kmgraphconfig-sanitization) — Set up safety features for team sharing
+- [🟡 `/kmgraph:kmg-upgrade`](#-kmgraphkmg-upgrade) — Check for and apply pending upgrades without the full init wizard
 
 #### Capture Pipeline (workflow order)
 
@@ -249,6 +251,32 @@ The `--dry-run` mode shows which files will be modified and what cross-reference
 - Lesson files created *after* v0.3.3 automatically follow the `Lessons_Learned_X` naming convention and are auto-linked.
 
 **Related**: For naming conventions and documentation structure, see [Style Guide](STYLE-GUIDE.md).
+
+---
+
+### 🟡 `/kmgraph:kmg-upgrade`
+
+**Purpose**: Run after installing an upgraded version of the plugin. Checks this KG for what's new (new directories, templates, config fields, backfix categories) and applies pending changes, without going through the full `/kmgraph:kmg-init` wizard.
+
+**When to use**:
+
+- You know a new plugin version is installed and want to check what's new for an already-set-up KG
+- You don't need `/kmgraph:kmg-init`'s "existing KG detected" menu; you just want the upgrade check
+
+**What it does**:
+
+1. Resolves the target graph (cwd via `kg_resolve`, or `--named=<kg>` for an exact match)
+2. Calls the existing `kg_upgrade` inspector and enters the same shared Apply/Choose/Skip menu `/kmgraph:kmg-init`'s "See what's new" option uses
+3. Skips the "existing KG detected" pre-wizard menu entirely: there's no new-KG-creation path to disambiguate against
+
+**Example**:
+```bash
+/kmgraph:kmg-upgrade
+/kmgraph:kmg-upgrade --named=knowledge-graph
+/kmgraph:kmg-upgrade --preview
+```
+
+**Related**: `/kmgraph:kmg-init`'s "See what's new" path enters the same shared upgrade-inspector module.
 
 ---
 

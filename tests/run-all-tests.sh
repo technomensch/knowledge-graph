@@ -37,7 +37,7 @@ SUITES=(
   "test-mcp-resources.sh|MCP resources — kg://config + kg://templates|yes"
   "test-mcp-offload.sh|MCP offloading — KG at non-local path|yes"
   "test-mcp-edge-cases.sh|MCP edge cases — error handling|yes"
-  "test-commands.sh|Commands — 25 commands structural + syntax|no"
+  "test-commands.sh|Commands — 24 commands structural + syntax|no"
   "test-skills-agents.sh|Skills + Agents — structural validation|no"
   "test-hooks.sh|Hooks — SessionStart hook validation|no"
   "test-stop-hook.sh|Stop hook flag — kg-name+date dedup|no"

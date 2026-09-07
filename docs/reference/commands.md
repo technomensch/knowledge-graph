@@ -87,6 +87,7 @@ title: Commands Reference
 |---|---|---|
 | [`/kmgraph:kmg-init`](#init) | Create a new KG with wizard; optionally backfills from existing project context; discovers locally running Ollama and LM Studio instances and offers to configure them for tier mapping | — |
 | [`/kmgraph:kmg-init-personal-kg`](#init-personal-kg) | Create a personal KG at `~/.kmgraph/` for cross-project lessons | — |
+| [`/kmgraph:kmg-upgrade`](#upgrade) | Check for and apply pending upgrades (new directories, templates, config fields, backfix categories) without the full init wizard | `--named=<kg>`, `--preview` |
 | [`/kmgraph:kmg-add-category`](#add-category) | Add a new category directory and KG entry file to an existing knowledge graph | `--prefix <p>`, `--git ignore\|commit` |
 | [`/kmgraph:kmg-list`](#list) | List all configured knowledge graphs from `~/.kmgraph/kg-config.json` | `--names-only`, `--json` |
 | [`/kmgraph:kmg-config-sanitization`](#config-sanitization) | Install a pre-commit hook for sensitive-data detection with interactive pattern wizard | — |
@@ -101,6 +102,8 @@ title: Commands Reference
 /kmgraph:kmg-add-category ml-ops --prefix ml- --git ignore
 /kmgraph:kmg-check-sensitive
 /kmgraph:kmg-update-doc COMMAND-GUIDE.md --user-facing
+/kmgraph:kmg-upgrade
+/kmgraph:kmg-upgrade --named=knowledge-graph
 ```
 
 ---
@@ -140,7 +143,7 @@ These flags appear across multiple commands and share consistent behavior.
 | `--delegate` | Advanced usage | Signals that execution should be handed off to the agent layer rather than handled inline. Applies to thin-dispatcher commands that route to `agents/`. |
 | `--user` | `session-summary`, `create-adr`, `capture-lesson`, `recall` | Route capture or search to the personal KG (`~/.kmgraph/`). Bypasses `kg_capture`; writes directly via the Write tool. Natural-language equivalent: "user level" / "for the user". |
 | `--project` | `session-summary`, `create-adr`, `capture-lesson`, `recall` | Route to the current project's KG, resolved from the working directory. Natural-language equivalent: "for this project" / "project level". |
-| `--named=<kg>` | `session-summary`, `create-adr`, `capture-lesson`, `recall` | Route to a specific named KG from `kg-config.json`. Natural-language equivalent: naming the KG directly (e.g., "career-ops"). |
+| `--named=<kg>` | `session-summary`, `create-adr`, `capture-lesson`, `recall`, `upgrade` | Route to a specific named KG from `kg-config.json`. Natural-language equivalent: naming the KG directly (e.g., "career-ops"). |
 
 ---
 
