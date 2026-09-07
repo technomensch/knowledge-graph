@@ -274,6 +274,29 @@ if [ "$PROJECT_RESOLVED" = true ] && [ "$(basename "$KG_PATH")" = "knowledge" ];
 fi
 
 # ─────────────────────────────────────────────────────────────
+# SECTION 2.6: Pending-Upgrade Check (ADR-055 amendment, Component B)
+# Cheap, no MCP/LLM round-trip: compare installed plugin version against
+# this graph's lastAppliedVersion. Only nudge when genuinely behind.
+# ─────────────────────────────────────────────────────────────
+
+if [ "$PROJECT_RESOLVED" = true ] \
+   && [ -f "$PLUGIN_ROOT/.claude-plugin/plugin.json" ] \
+   && [ -f "$CONFIG_PATH" ] \
+   && [ -f "$PLUGIN_ROOT/scripts/lib/upgrade-check.sh" ]; then
+  source "$PLUGIN_ROOT/scripts/lib/upgrade-check.sh"
+  installed_version=$(jq -r '.version // empty' "$PLUGIN_ROOT/.claude-plugin/plugin.json" 2>/dev/null)
+  last_applied=$(jq -r --arg kg "$RESOLVED_KG" '.graphs[$kg].lastAppliedVersion // empty' "$CONFIG_PATH" 2>/dev/null)
+  if [ -n "$installed_version" ] && [ -n "$last_applied" ]; then
+    cmp=$(semver_compare "$installed_version" "$last_applied")
+    if [ "$cmp" = "1" ]; then
+      echo ""
+      echo "KMGraph updated: v${last_applied} → v${installed_version} installed but not yet applied to this graph."
+      echo "Run /kmgraph:kmg-upgrade to review and apply."
+    fi
+  fi
+fi
+
+# ─────────────────────────────────────────────────────────────
 # SECTION 3: Recent Lessons (from recent-lessons.sh)
 # Project-scoped -- only runs when a project KG resolved from CWD.
 # ─────────────────────────────────────────────────────────────
