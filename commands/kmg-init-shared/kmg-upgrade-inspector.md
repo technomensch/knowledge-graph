@@ -159,6 +159,13 @@ WIKI_DONE=$(jq -r '.graphs["{kg_name}"].wiki_pass_complete // false' "$CONFIG_PA
 [ "$WIKI_DONE" != "true" ] && \
   upgrades+=("Wiki pass available: convert bare ADR-NNN, ENH-NNN, #NNN, and lesson filename references to [[wiki links]] across knowledge files")
 
+# Gemini CLI upgrade-check hook retrofit (v0.7.9 — ADR-055 amendment, Component B)
+_project_root_for_gemini_check="$(dirname "{KG_PATH}")"
+if [ -f "${_project_root_for_gemini_check}/GEMINI.md" ] && \
+   [ ! -f "${_project_root_for_gemini_check}/.gemini/kmgraph-upgrade-check.sh" ]; then
+  upgrades+=("Gemini CLI session-start upgrade-check hook available: nudges toward /kmgraph:kmg-upgrade when a pending upgrade exists, without an LLM/MCP round-trip")
+fi
+
 # Section (c): Template update detection
 # Only run if _mcp_covered_templates is not set (kg_upgrade did not cover this in Step 0)
 # New templates (files in plugin core/default-templates not yet in KG)
@@ -1242,3 +1249,16 @@ Before issue-31's fix, `/kmgraph:kmg-handoff` wrote every package to `<repoRoot>
 - Never overwrites — a destination file that differs from its stray counterpart is left untouched on both sides and named in the result for manual review (ADR-063).
 - A stray dated folder (and `handoff-packages/` itself) is only removed once it's fully empty; anything flagged for manual review keeps its folder in place.
 - Idempotent — applying again after a manual review/cleanup only touches what's still actually stray.
+
+#### r. Gemini CLI upgrade-check hook retrofit (v0.7.9 — ADR-055 amendment, Component B)
+
+**Purpose:** Deploy the session-start upgrade-check hook (`.gemini/kmgraph-upgrade-check.sh` + its `.gemini/settings.json` registration) into a project that already has `GEMINI.md` configured from before this feature shipped. New Gemini CLI configurations get this automatically via `/kmgraph:kmg-init`'s own platform-configuration step; this section only covers already-configured projects that would otherwise never receive it.
+
+**Detection:** fires when `GEMINI.md` exists at the project root (Gemini CLI already configured) AND `.gemini/kmgraph-upgrade-check.sh` does not exist yet (the detection check above already verified this).
+
+**Execute:** identical deploy-and-register logic as `/kmgraph:kmg-init` § Step 1.11's Gemini CLI platform block — `mkdir -p .gemini`, `sed`-substitute `__DEPLOY_TIME_PLUGIN_CACHE_ROOT__` with `$(dirname "${CLAUDE_PLUGIN_ROOT}")`, write and `chmod +x` `.gemini/kmgraph-upgrade-check.sh`, then filter-then-append the hook entry into `.gemini/settings.json`'s `hooks.SessionStart` array (never `unique_by(.name)` — that would collapse every pre-existing nameless hook entry into one on first run).
+
+**Constraints:**
+- Gated behind the wizard's existing per-item yes/no in the Apply/Choose/Skip menu — same consent model as every other bash-only-detected item in this file (e.g. Wiki pass above); no separate confirmation flow.
+- Idempotent: re-running after successful deployment finds `.gemini/kmgraph-upgrade-check.sh` already present and skips this check silently.
+- Additive only: never removes or overwrites a pre-existing hand-written `hooks.SessionStart` entry — only our own prior `"kmgraph-upgrade-check"`-named entry is replaced in place.

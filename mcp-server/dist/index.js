@@ -35007,6 +35007,27 @@ function checkVersionMismatch(installedVersion, kgType, config2, graphName) {
     details: `Apply categories: directories, templates, starter-relocation${kgType === "project-local" ? ", stray-knowledge-dir" : ""}`
   }];
 }
+function resolveInstalledVersion() {
+  try {
+    const pluginJsonPath = path11.join(getPluginRoot(), ".claude-plugin", "plugin.json");
+    const parsed = JSON.parse(fs11.readFileSync(pluginJsonPath, "utf-8"));
+    if (parsed.version) return parsed.version;
+  } catch {
+  }
+  return handleVersion().installed;
+}
+function compareVersionsForward(a, b) {
+  const aParts = a.split(".");
+  const bParts = b.split(".");
+  const maxLen = Math.max(aParts.length, bParts.length);
+  for (let i = 0; i < maxLen; i++) {
+    const av = parseInt((aParts[i] ?? "0").replace(/[^0-9]/g, "") || "0", 10);
+    const bv = parseInt((bParts[i] ?? "0").replace(/[^0-9]/g, "") || "0", 10);
+    if (av > bv) return true;
+    if (av < bv) return false;
+  }
+  return false;
+}
 function updateLastAppliedVersion(installedVersion, graphName) {
   const config2 = readConfig();
   const graph = config2.graphs[graphName];
@@ -35014,7 +35035,7 @@ function updateLastAppliedVersion(installedVersion, graphName) {
   writeConfig(config2);
 }
 async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSession(), toolCallMeta) {
-  const installedVersion = handleVersion().installed;
+  const installedVersion = resolveInstalledVersion();
   const config2 = readConfig();
   const cwd = resolveEffectiveCwd({ processCwd: process.cwd(), toolCallMeta });
   let connectedGraph;
@@ -35139,6 +35160,13 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
     result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config2, target.name));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
+    if (!("error" in target)) {
+      const lastApplied = config2.graphs[target.name].lastAppliedVersion;
+      if (result.upgrades.length === 1 && result.upgrades[0].category === "version-update" && lastApplied && compareVersionsForward(installedVersion, lastApplied)) {
+        updateLastAppliedVersion(installedVersion, target.name);
+        result.upgrades = [];
+      }
+    }
     return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
   }
   const results = [];

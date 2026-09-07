@@ -2408,6 +2408,38 @@ function checkVersionMismatch(
   }];
 }
 
+function resolveInstalledVersion(): string {
+  try {
+    const pluginJsonPath = path.join(getPluginRoot(), ".claude-plugin", "plugin.json");
+    const parsed = JSON.parse(fs.readFileSync(pluginJsonPath, "utf-8")) as { version?: string };
+    if (parsed.version) return parsed.version;
+  } catch {
+    // Not running from an installed plugin-cache directory (repo working
+    // tree, Jest) -- fall back to mcp-server's own build-time version so
+    // this never throws and inspect/apply keep working outside a real
+    // plugin install.
+  }
+  return handleVersion().installed;
+}
+
+// c2 Task 0: numeric, component-by-component forward-only compare. Not a
+// reuse of c3's compareSemver -- the orchestration's dependency-ordering
+// section rules out a c2<->c3 file dependency, so this is a local port of
+// the same logic shape. Returns true only when a > b (strictly forward);
+// equal or backward both return false.
+function compareVersionsForward(a: string, b: string): boolean {
+  const aParts = a.split(".");
+  const bParts = b.split(".");
+  const maxLen = Math.max(aParts.length, bParts.length);
+  for (let i = 0; i < maxLen; i++) {
+    const av = parseInt((aParts[i] ?? "0").replace(/[^0-9]/g, "") || "0", 10);
+    const bv = parseInt((bParts[i] ?? "0").replace(/[^0-9]/g, "") || "0", 10);
+    if (av > bv) return true;
+    if (av < bv) return false;
+  }
+  return false;
+}
+
 function updateLastAppliedVersion(installedVersion: string, graphName: string): void {
   // Fresh read to avoid clobbering field additions made by applyConfig() in the same apply run
   const config = readConfig();
@@ -2473,7 +2505,7 @@ export async function handleUpgrade(
   toolCallMeta?: Record<string, unknown>
 ): Promise<HandleUpgradeResult> {
   // Under Jest/ts-jest __SERVER_VERSION__ is undefined → installedVersion = "0.0.0"
-  const installedVersion = handleVersion().installed;
+  const installedVersion = resolveInstalledVersion();
   const config = readConfig();
   const cwd = resolveEffectiveCwd({ processCwd: process.cwd(), toolCallMeta });
 
@@ -2663,6 +2695,29 @@ export async function handleUpgrade(
     result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config, target.name));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
+
+    // c2 Task 0: a clean inspect (nothing else pending) with installed
+    // genuinely ahead of lastAppliedVersion has nothing for the user to
+    // apply -- "version-update" is inspect-only (never a member of
+    // ApplyCategory), so a graph with no other pending items could never
+    // clear this via apply. Auto-advance the sentinel and drop the item
+    // instead of reporting something the user can never act on. Never on a
+    // downgrade/equal case (forward-only), and never when other real work
+    // is also pending (that would hide it, or rewrite the sentinel ahead of
+    // categories the user hasn't actually applied yet).
+    if (!("error" in target)) {
+      const lastApplied = (config.graphs[target.name] as unknown as Record<string, unknown>).lastAppliedVersion as string | undefined;
+      if (
+        result.upgrades.length === 1 &&
+        result.upgrades[0].category === "version-update" &&
+        lastApplied &&
+        compareVersionsForward(installedVersion, lastApplied)
+      ) {
+        updateLastAppliedVersion(installedVersion, target.name);
+        result.upgrades = [];
+      }
+    }
+
     return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
   }
 
