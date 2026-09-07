@@ -2,7 +2,7 @@
 
 **Source:** `core/rules-registry/review-audit-protocol.md`
 **Personal deployment:** `~/.kmgraph/governance-rules.md § Review Audit Protocol`
-**Distributed deployment:** `core/templates/knowledge/templates/user/governance-rules.md`
+**Distributed deployment:** `core/default-templates/concepts/templates/user/governance-rules.md`
 
 ---
 

@@ -8,10 +8,10 @@ This is the **canonical source** for all KMGraph templates. Edit templates here.
 
 | Location | Purpose | Committed? |
 |----------|---------|------------|
-| `core/templates/` | Canonical source (this folder) | ✅ Yes |
+| `core/default-templates/` | Canonical source (this folder) | ✅ Yes |
 | `docs/templates/` | Published template reference for the Docusaurus docs site | ✅ Yes |
 
-**Do not edit files in `docs/templates/` directly.** Make changes here in `core/templates/` and sync to `docs/templates/` as part of the release.
+**Do not edit files in `docs/templates/` directly.** Make changes here in `core/default-templates/` and sync to `docs/templates/` as part of the release.
 
 ---
 
