@@ -2,7 +2,7 @@
 title: "ADR-037: Default Graph-Usage Rules Seeded at Deployment"
 number: 037
 created: 2026-04-20T00:00:00Z
-status: Proposed
+status: Accepted
 author: technomensch
 email: mkitact@gmail.com
 git:
@@ -25,7 +25,7 @@ category: process
 # ADR-037: Default Graph-Usage Rules Seeded at Deployment
 
 **Date:** 2026-04-20
-**Status:** Proposed
+**Status:** Accepted
 **Related:** [[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file]] (triggers.md), [[ADR-034-capture-level-routing-dispatcher-agent-split]] (capture-level routing)
 
 ---
@@ -97,7 +97,7 @@ Seed a **default graph-usage rules block** into `knowledge/rules.md` during `/km
 ### Implementation Approach
 
 - Modify the `directory-scaffold` init step to write `rules.md` with the default block instead of an empty file
-- The block is marked with a comment: `<!-- kmgraph-defaults: do not remove -->`
+- The block is marked with a comment: `<!-- kmgraph-defaults -->` (corrected 2026-09-07 — see § Amendment; every already-deployed graph across every user of this plugin has this short form baked into their `rules.md`, and § Migration Path below already used it)
 - Project-specific rules go below a `## Project Rules` separator
 
 ---
@@ -194,6 +194,20 @@ Seed a **default graph-usage rules block** into `knowledge/rules.md` during `/km
 
 ---
 
+## Amendment (2026-09-07) — Content gap closed (c4, `v0.7.9-upgrade-triggering`)
+
+**The actual implementation history:** commit `d39f8a8e` (v0.5.1-beta, 2026-04-21 — one day after this ADR's creation) created this ADR, the `templates/project/rules.md` starter, and § j's seed logic in one squashed commit — but the starter shipped generic Git Workflow / Version & Release content instead of this ADR's own `## Knowledge Governance` Decision content above. The two were never cross-checked against each other, and the gap went unnoticed for 5 months.
+
+**Not a deliberate supersession.** No other ADR references superseding ADR-037. `ENH-022`'s v0.5.10.7 migration plan (2026-06-12) is the only other artifact that touched this gap, and its author explicitly noted "ADR-037 — no conflict" rather than reconciling the template against it — a declined fix, not a dismissal of the ADR itself.
+
+**Resolved:** c4 fixed the seeded content to match this ADR's Decision section (Task 1, commit `5e433bee`), added a retrofit path so already-seeded graphs pick up the fix too (Task 2, commit `af48c7fb`), and this amendment closes out the ADR itself. Confirmed live in the merged template as of Task 1's commit.
+
+**Marker-text correction:** § Implementation Approach above originally specified `<!-- kmgraph-defaults: do not remove -->`, but everything actually shipped — the template file itself, § j's `grep -c` detection pattern, and this very ADR's own § Migration Path two sections below — used the shorter `<!-- kmgraph-defaults -->` with no suffix. That internal inconsistency (the ADR disagreeing with itself) is the corroborating evidence that the long form was the typo, not the other way around. The marker text was **not** changed to match the old ADR wording — every already-deployed graph across every user of this plugin has the short form baked into their `rules.md`, so changing it now would break § j's own detection for zero benefit. § Implementation Approach above is corrected to match shipped reality instead.
+
+**Status flipped Proposed → Accepted** — the decision's actual content now matches what ships, closing the 5-month gap between this ADR's creation and its content actually taking effect.
+
+---
+
 **Decision Made:** 2026-04-20
-**Last Updated:** 2026-04-20
-**Status:** Proposed
+**Last Updated:** 2026-09-07
+**Status:** Accepted

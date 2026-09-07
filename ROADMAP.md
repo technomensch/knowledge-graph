@@ -15,7 +15,6 @@ A filtered, ranked view onto the sections below — not a replacement for them. 
 - **ENH-002 — Refile as a new GitHub issue.** Issue #41 is closed, but only a wording fix actually shipped — the real feature (agent `--snapshot` mode, flag file, hooks, dedicated branch) was never built. The tracker says done when it isn't. Filing a fresh issue costs nothing and stops that false "closed" signal from being trusted later.
 - **"Wrong session captured"** — a live, unresolved bug in the chat-extraction-reliability saga. The extractor sometimes grabs the wrong session, so captured knowledge can silently come from the wrong conversation entirely.
 - **Docs-updates feed → site nav link.** The feed (`/knowledge-graph/docs-updates/`) plus RSS/Atom endpoints already exist and work — none are linked from navbar or footer. Wiring, not development.
-- **ADR-037 — seed default graph-usage rules block at `/kmgraph:init`.** New KGs were supposed to ship with a baseline rules block, but the seeding step never made it into the init scaffold. Small fix — closes the gap between decision and reality.
 - **ENH-023 remainder — "Protected files guard" injection.** Most of ENH-023 already shipped; this is the last piece — injecting a protected-files check into `pre-skill-rules-inject.sh` so paths like `commands/`/`core/default-templates/` can't be silently modified by a skill.
 - **issue-28 — No dev-loop mechanism for locally rebuilt `mcp-server/dist/`.** Found while verifying issue-27's fix: live `kg_*` tool calls run whatever version is installed in the plugin cache, not this repo's own rebuild — passing tests can mask a fix that was never actually exercised live. No existing documented solution found; deferred (Track only), no ADR needed.
 - **issue-25/issue-26/ENH-051 — process/reference gaps found while filing ENH-051.** issue-25: no documented authority for which of two overlapping mechanisms (hand-written `ENH-NNN` spec vs. `/kmgraph:kmg-start-issue-tracking`) governs enhancement capture. issue-26: `kmg-start-issue-tracking.md` references `docs/issue-tracker.md`, which never existed — same detection-gap class as issue-13. ENH-051 itself: `kg_config_init`/`kg_scaffold` still can't compute a KG path from a location choice, so `cli.ts` and `kmg-init.md` each hand-maintain their own copy — ADR-066 named the fix, never built. All three deferred (Track only).
@@ -150,7 +149,6 @@ Full detail, file:line evidence, and verdicts for every item below: `knowledge/a
 - ENH-041 — Broken nav breadcrumb baked into ~11 README scaffold files (root cause: ADR-027 deleted GETTING-STARTED.md)
 
 **Small governance/process gaps:**
-- ADR-037 — seed default graph-usage rules block at `/kmgraph:init` (not yet seeded in any scaffold)
 - ENH-023 (remainder) — "Protected files guard" injection in `pre-skill-rules-inject.sh` not yet added (the rest of ENH-023 is already done)
 - **ENH-002 — closed-but-incomplete: needs a new GitHub issue.** Spec (`knowledge/enhancements/ENH-002/ENH-002-specification.md`) and progress-log both self-report `status: partially-implemented` — only the Snapshot Gate wording fix shipped (v0.2.3.2-beta); the actual feature (agent `--snapshot` mode, flag file, hooks, dedicated implementation branch) was never built. Yet GitHub issue #41 is `CLOSED`. Found 2026-07-12 while trimming ROADMAP.md per ADR-065 — this version's stale-status class of bug (status says done, issue closed, work isn't done) is exactly what this Outstanding Action Items section exists to catch. Action: file a fresh GitHub issue for the remaining ENH-002 scope; do not treat #41's closure as evidence the feature works.
 - **issue-13 / GH #170 — No automated broken-link detection anywhere in the docs pipeline — 45 broken links accumulated silently for ~3 months.** Filed 2026-07-14 (`knowledge/issues/issue-13/`, [GitHub #170](https://github.com/technomensch/knowledge-graph/issues/170), status `deferred` — Mode 3 track-only, no branch). Root cause: `docusaurus.config.js`'s `onBrokenLinks`/`onBrokenMarkdownLinks` are both `'warn'`, so no build (manual or CI) can ever hard-fail on a dead link; `skills/kmg-docs-impact-scan/SKILL.md` only greps diff'd identifiers against doc prose, structurally incapable of catching a dangling relative path; `scripts/pre-push-gate.sh` has no gate that runs a build or checks link validity at all. Full detail and proposed fix: `knowledge/issues/issue-13/solution-approach.md`. Deliberately sequenced after broken-link clusters 2/3 are fixed (see docs-site-broken-links-audit), since flipping to `'throw'` immediately would hard-fail CI on those still-broken clusters.
@@ -175,6 +173,15 @@ Full detail, file:line evidence, and verdicts for every item below: `knowledge/a
 - ENH-033 — repo-context auto-detection for `kmg-update-doc`/`kmg-create-doc`
 - "Wrong session captured" — live, unresolved session-selection bug in chat-extraction-reliability-saga (the oldest open thread in that saga)
 - Real-data-validation checkpoint for `--rebuild`'s backup-vs-destroy behavior on a real split-eligible date — pending trigger condition, no code needed until it occurs
+
+---
+
+## v0.7.9 — Post-Release Patches (landed on `v0.7.9-upgrade-triggering`, pending release)
+
+Branch: `v0.7.9-upgrade-triggering` (c4)
+
+### Planned
+- ✅ ADR-037 — the seeded default rules block existed since v0.5.1-beta, but never actually contained ADR-037's own Knowledge Governance decision content (generic Git Workflow/Version & Release shipped instead, never reconciled). Fixed the template's content, added a retrofit path for already-seeded graphs, resolved an orphaned duplicate template file, and corrected ADR-037's own status/marker-text — commits `5e433bee`, `af48c7fb`, `8e28ac68`.
 
 ---
 
