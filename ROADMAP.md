@@ -16,7 +16,7 @@ A filtered, ranked view onto the sections below — not a replacement for them. 
 - **"Wrong session captured"** — a live, unresolved bug in the chat-extraction-reliability saga. The extractor sometimes grabs the wrong session, so captured knowledge can silently come from the wrong conversation entirely.
 - **Docs-updates feed → site nav link.** The feed (`/knowledge-graph/docs-updates/`) plus RSS/Atom endpoints already exist and work — none are linked from navbar or footer. Wiring, not development.
 - **ADR-037 — seed default graph-usage rules block at `/kmgraph:init`.** New KGs were supposed to ship with a baseline rules block, but the seeding step never made it into the init scaffold. Small fix — closes the gap between decision and reality.
-- **ENH-023 remainder — "Protected files guard" injection.** Most of ENH-023 already shipped; this is the last piece — injecting a protected-files check into `pre-skill-rules-inject.sh` so paths like `commands/`/`core/templates/` can't be silently modified by a skill.
+- **ENH-023 remainder — "Protected files guard" injection.** Most of ENH-023 already shipped; this is the last piece — injecting a protected-files check into `pre-skill-rules-inject.sh` so paths like `commands/`/`core/default-templates/` can't be silently modified by a skill.
 - **issue-28 — No dev-loop mechanism for locally rebuilt `mcp-server/dist/`.** Found while verifying issue-27's fix: live `kg_*` tool calls run whatever version is installed in the plugin cache, not this repo's own rebuild — passing tests can mask a fix that was never actually exercised live. No existing documented solution found; deferred (Track only), no ADR needed.
 - **issue-25/issue-26/ENH-051 — process/reference gaps found while filing ENH-051.** issue-25: no documented authority for which of two overlapping mechanisms (hand-written `ENH-NNN` spec vs. `/kmgraph:kmg-start-issue-tracking`) governs enhancement capture. issue-26: `kmg-start-issue-tracking.md` references `docs/issue-tracker.md`, which never existed — same detection-gap class as issue-13. ENH-051 itself: `kg_config_init`/`kg_scaffold` still can't compute a KG path from a location choice, so `cli.ts` and `kmg-init.md` each hand-maintain their own copy — ADR-066 named the fix, never built. All three deferred (Track only).
 
@@ -262,7 +262,7 @@ Enhancements:
 
 **Example extended template**:
 ```markdown
-<!-- Extends: ${CLAUDE_PLUGIN_ROOT}/core/templates/lessons-learned/lesson-template.md -->
+<!-- Extends: ${CLAUDE_PLUGIN_ROOT}/core/default-templates/lessons-learned/lesson-template.md -->
 <!-- Adds: security-impact field -->
 
 ---

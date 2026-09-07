@@ -150,7 +150,7 @@ codex plugin marketplace add technomensch/knowledge-graph
 codex plugin add kmgraph@knowledge-management-graph
 ```
 
-- If a plan includes edits to `commands/`, `skills/`, `agents/`, or `core/templates/`, add a final step: use the commands above to sync cache and reload (exclude `.SynologyWorkingDirectory` from any copy operations)
+- If a plan includes edits to `commands/`, `skills/`, `agents/`, or `core/default-templates/`, add a final step: use the commands above to sync cache and reload (exclude `.SynologyWorkingDirectory` from any copy operations)
 - **Why:** plugin systems serve from cache, not the local repo; local fixes had no effect until the cache path was discovered during v0.3.0-beta testing
 - **Source:** [Plugin Cache Not Synced From Local Repo](lessons-learned/debugging/Lessons_Learned_Debugging_Plugin_Cache_Not_Synced_From_Local_Repo.md)
 
@@ -242,7 +242,7 @@ Do not use numbered headings in knowledge files — use plain headings (e.g., `#
 | Path | Status |
 |------|--------|
 | `commands/` | PROTECTED — do not modify without explicit permission |
-| `core/templates/` | PROTECTED — do not modify without explicit permission |
+| `core/default-templates/` | PROTECTED — do not modify without explicit permission |
 
 ---
 
@@ -263,7 +263,7 @@ Do not use numbered headings in knowledge files — use plain headings (e.g., `#
 | `commands/` | Claude Code slash commands | yes (PROTECTED) |
 | `skills/` | Auto-invoked context providers | yes |
 | `agents/` | Subagent definitions | yes |
-| `core/templates/` | Platform-agnostic templates | yes (PROTECTED) |
+| `core/default-templates/` | Platform-agnostic templates | yes (PROTECTED) |
 | `mcp-server/` | TypeScript MCP server | yes |
 | `docs/` | MkDocs Material documentation site | yes |
 | `hooks/hooks.json` | SessionStart automation | yes |

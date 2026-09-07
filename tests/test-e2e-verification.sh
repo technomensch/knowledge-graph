@@ -143,7 +143,7 @@ else
 fi
 
 # Test 3.7: AGENTS-template documents MCP failures
-AGENTS_TEMPLATE="$REPO_ROOT/core/templates/AGENTS-template.md"
+AGENTS_TEMPLATE="$REPO_ROOT/core/default-templates/AGENTS-template.md"
 if [ -f "$AGENTS_TEMPLATE" ]; then
   if grep -q "MCP.*not.*responding\|MCP.*fail" "$AGENTS_TEMPLATE"; then
     pass "AGENTS-template documents MCP failure handling"

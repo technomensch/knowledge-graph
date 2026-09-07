@@ -37,7 +37,7 @@ Heavy-lift task handlers that keep main context clean:
 
 ## Code Protection Rules
 
-⚠️ NEVER modify `commands/` or `core/templates/` without explicit user permission.
+⚠️ NEVER modify `commands/` or `core/default-templates/` without explicit user permission.
 
 ## Version Naming Conventions
 
