@@ -163,7 +163,7 @@ This guide focuses on **platform capabilities and usage patterns** after install
 
 **Usage pattern:**
 - Add `read-only-paths` for knowledge directories in `.aider.conf.yml`
-- Ask Aider to create lessons using the template at `core/templates/lessons-learned/lesson-template.md`
+- Ask Aider to create lessons using the template at `core/default-templates/lessons-learned/lesson-template.md`
 - Aider assists with content; file operations are manual
 
 **Limitations:**
