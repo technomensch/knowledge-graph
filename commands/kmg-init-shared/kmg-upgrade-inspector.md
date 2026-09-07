@@ -932,24 +932,62 @@ echo "✅ Content template migration complete"
 
 #### j. kmgraph-defaults block seed in rules.md (v0.5.0 — ADR-037)
 
-**Purpose:** Detect `rules.md` files missing the `<!-- kmgraph-defaults -->` ... `<!-- /kmgraph-defaults -->` block (introduced in v0.5.0) and offer to prepend it.
-
-**Schema version gate:** If `$SCHEMA_VERSION -ge 2` (computed in section i), skip section j silently.
+**Purpose:** Detect `rules.md` files missing the `<!-- kmgraph-defaults -->` ... `<!-- /kmgraph-defaults -->` block (introduced in v0.5.0) and offer to prepend it. Also detect graphs that already have the block but predate ADR-037's Knowledge Governance content fix (v0.7.9 — c4), and offer to retrofit just that section.
 
 **Detection:**
 
 ```bash
-HAS_DEFAULTS=$(grep -c '<!-- kmgraph-defaults -->' "{KG_PATH}/rules.md" 2>/dev/null)
+# rules.md not existing at all is a distinct, higher-priority case --
+# nothing to seed into. Bail before the grep/awk below, which would
+# otherwise leave $HAS_DEFAULTS as an empty string (not "0"), and
+# `[ "$HAS_DEFAULTS" -ge 1 ]` errors on an empty string rather than
+# branching cleanly. Section h (scaffold missing root files, runs BEFORE
+# section j) is what's responsible for creating a missing rules.md; if
+# § j sees one still missing, the user already declined section h's own
+# offer, so silently skipping here is clearly correct, not just defensible.
+#
+# HAS_DEFAULTS is unconditionally reset to empty before the check below --
+# do not skip this reset. Without it, a leftover truthy value from earlier
+# in the same script run would make `${HAS_DEFAULTS:-...}` treat the
+# variable as "already set" and skip the grep entirely on the file-exists
+# path, silently keeping the stale value instead of computing a real one.
+HAS_DEFAULTS=""
+if [ ! -f "{KG_PATH}/rules.md" ]; then
+  HAS_DEFAULTS=-1  # sentinel: skip all branches below
+fi
+
+HAS_DEFAULTS=${HAS_DEFAULTS:-$(grep -c '<!-- kmgraph-defaults -->' "{KG_PATH}/rules.md" 2>/dev/null)}
+# Marker-presence alone is not enough -- a graph seeded before this fix has
+# the marker but not the Knowledge Governance content added under it.
+# Check for the specific sub-heading, restricted to the marker-delimited
+# region so a coincidental "## Knowledge Governance" heading elsewhere in
+# the user's own rules.md (outside the block) doesn't cause a false skip.
+#
+# Caveat, accepted rather than solved here: if the OPENING marker is present
+# but the CLOSING marker is missing (a malformed/hand-edited block), this
+# awk's region-restriction degenerates to "rest of the file" -- so a user's
+# own genuine "## Knowledge Governance" heading written later in their file,
+# entirely unrelated to this block, would false-positive HAS_GOVERNANCE and
+# cause a silent skip on a block that's actually malformed and empty inside.
+# Detecting a missing closing marker as its own error state is out of scope
+# for this task (it's a pre-existing malformed-file case, not something this
+# fix introduces) -- flagging it here rather than silently ignoring it.
+HAS_GOVERNANCE=$(awk '/<!-- kmgraph-defaults -->/{found=1} found{print} /<!-- \/kmgraph-defaults -->/{exit}' "{KG_PATH}/rules.md" 2>/dev/null | grep -c '^## Knowledge Governance')
 ```
 
-If `$HAS_DEFAULTS` is `1` or greater, skip this check silently.
+Four branches:
+- **`$HAS_DEFAULTS` is `-1`** (sentinel — `rules.md` doesn't exist): skip silently, nothing to seed into.
+- **`$HAS_DEFAULTS` is `0`** (marker entirely absent): schema-version gate applies here, unchanged from before — if `$SCHEMA_VERSION -ge 2` (computed in section i), skip silently; otherwise the existing full-block prepend path below.
+- **`$HAS_DEFAULTS -ge 1` AND `$HAS_GOVERNANCE -ge 1`**: skip silently — already fully seeded, nothing to do.
+- **`$HAS_DEFAULTS -ge 1` AND `$HAS_GOVERNANCE` is `0`**: the marker exists but predates ADR-037's content fix, regardless of what migrations the graph has separately been through — **not gated by `$SCHEMA_VERSION`** (that gate exists for section i's own, unrelated content-template relocation, not this block's content). Offer the additive-only retrofit path below, never re-prepending the whole block.
 
-**If block absent,** display and offer:
+**If `$HAS_DEFAULTS` is `0` (block absent),** display and offer:
 
 ```
 rules.md is missing the kmgraph-defaults block (added in v0.5.0).
 
-This block seeds basic Git workflow and version release rules that work across teams.
+This block seeds basic Git workflow, version release, and knowledge-governance
+rules (when to create an ADR vs. a memory file) that work across teams.
 It does not override anything you've already written.
 
 Options:
@@ -981,10 +1019,67 @@ Options:
    fi
    ```
 
+**If `$HAS_DEFAULTS -ge 1` AND `$HAS_GOVERNANCE` is `0` (marker present, Knowledge Governance missing),** display and offer:
+
+```
+rules.md has the kmgraph-defaults block, but it predates a later addition
+(Knowledge Governance rules: process decisions -> ADR, memory files as thin
+pointers, rules.md-cites-ADR -- ADR-037).
+
+This does not touch anything you've already written, including inside the
+existing block.
+
+Options:
+  a. Append the Knowledge Governance section into the existing block
+  b. Skip — I'll add it manually
+```
+
+**If option (a) — retrofit-append:**
+
+1. Archive `rules.md` first, using the exact same archive step as the full-prepend path above (sets `$ARCHIVE_DIR`, must run before the awk block below).
+
+2. Append the Knowledge Governance section immediately before the closing marker:
+   ```bash
+   GOVERNANCE_BLOCK=$(awk '/^## Knowledge Governance$/{found=1} found{print}' \
+     "${CLAUDE_PLUGIN_ROOT}/core/default-templates/concepts/templates/project/rules.md" \
+     | awk '/^<!-- \/kmgraph-defaults -->$/{exit} {print}')
+
+   # GOVERNANCE_BLOCK is multi-line. Do NOT pass it via `awk -v` -- BSD awk
+   # (the only awk on macOS) rejects a literal newline in a -v assignment
+   # outright, so this would fail 100% of the time on the target platform.
+   # Pass it through the environment instead, which does not run
+   # escape-sequence processing on the value and has no newline restriction.
+   #
+   # Anchored `^...$` match (not a bare substring match) on the closing
+   # marker, with a `done` guard so only the FIRST occurrence is treated as
+   # the real closing tag -- an unanchored, unguarded match would also fire
+   # on a second literal `<!-- /kmgraph-defaults -->` occurrence elsewhere
+   # in the file (e.g. a user documenting this exact marker inside their
+   # own fenced code example), inserting the section a second time.
+   #
+   # `END { exit(done ? 0 : 1) }` makes a genuine miss (no closing marker
+   # found at all) a real failure instead of a silently-successful no-op:
+   # awk would otherwise pass the file through completely unchanged, the
+   # `[ -s ]` check would still see a non-empty file, and the script would
+   # report success while having appended nothing.
+   GOVERNANCE_BLOCK="$GOVERNANCE_BLOCK" awk '
+     BEGIN { block = ENVIRON["GOVERNANCE_BLOCK"] }
+     /^<!-- \/kmgraph-defaults -->$/ && !done { print block "\n"; print; done = 1; next }
+     { print }
+     END { exit(done ? 0 : 1) }
+   ' "{KG_PATH}/rules.md" > /tmp/rules-governance-patched.md \
+     && [ -s /tmp/rules-governance-patched.md ] \
+     && mv /tmp/rules-governance-patched.md "{KG_PATH}/rules.md" \
+     && echo "✅ Knowledge Governance section appended inside the existing kmgraph-defaults block" \
+     || { rm -f /tmp/rules-governance-patched.md; echo "⚠️  Append failed — closing <!-- /kmgraph-defaults --> marker not found, or a write error occurred. Add the section manually, or restore from the archived copy at $ARCHIVE_DIR/rules.md."; }
+   ```
+
 **Safety rules:**
-- Archive is always taken before writing.
-- Prepend only — never replaces or removes existing user content.
-- Idempotent: detection gate skips if block already present.
+- Archive is always taken before writing, on both paths.
+- Prepend/append only — never replaces or removes existing user content, including `## Git Workflow`/`## Version & Release` on the retrofit path.
+- First-match-only, anchored: the retrofit path never double-inserts on a repeated or quoted closing-marker string, and never fires inside a fenced code block that happens to quote the marker.
+- A missing closing marker on the retrofit path is a reported failure, not a silent no-op that claims success.
+- Idempotent: both paths' detection gates skip if their respective content is already present.
 
 #### k. Platform block detection in rules.md (v0.5.0 — ADR-032 remediation)
 
