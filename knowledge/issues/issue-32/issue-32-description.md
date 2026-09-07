@@ -1,9 +1,9 @@
 ---
 id: issue-32
 type: Bug
-status: tracked
+status: resolved
 github-issue: "#236"
-branch: v0.7.0 (stale target — merged 2026-08-04 without this commit-group, see 2026-09-05 note)
+branch: v0.7.9-upgrade-triggering (c3, v0.7.9-c3-stale-process-check)
 created: 2026-07-28
 related_adrs: ["ADR-054", "ADR-055", "ADR-067"]
 ---
@@ -84,3 +84,20 @@ Prior art confirms this is a known class of bug, not unique to this codebase:
 **Scope note (open, not decided):** this needs to hook into `mcp-server/src/index.ts` (the tool-call entry point) to fire "on every call," but `index.ts` is also heavily rewritten by the unrelated, in-progress ADR-067/v0.7.0 KG-resolution work. The file overlap is real but the purposes are unrelated. Recommend this ships as its own separate plan, not folded into ADR-067's phase numbering, sequenced either onto its own branch or as a distinct commit sequence on `v0.7.0` after that branch's `index.ts` changes settle, to avoid conflicting edits. This sequencing decision has not been made — it is recorded here as open.
 
 **Resolved (2026-08-01, retargeted 2026-08-01): 4th commit-group on the shared `v0.7.0` branch, not a separate branch.** See `knowledge/plans/v0.7.0-c4-issue-32-stale-mcp-warning.md` § Global Constraints (moved from its original location at `knowledge/issues/issue-32/v0.6.21-plan.md`, written under an earlier, now-superseded assumption of a standalone `v0.6.21-fix-stale-mcp-process-warning` branch off `main`). This ships as the 4th queued commit-group landing on the already-checked-out `v0.7.0` branch, alongside `knowledge/plans/v0.7.0-adr-067-kg-resolution.md` (the foundational/first commit-group), `knowledge/plans/v0.7.0-c2-issue-34-35-patch.md`, and `knowledge/plans/v0.7.0-c3-adr-068-pilot.md`. No separate branch or version bump — this plan folds into the release-wide `0.6.20` → `0.7.0` bump owned by the ADR-067 plan's own version-bump task. The only file overlap is `mcp-server/src/index.ts`, where this plan adds one new import and one new function call immediately after `const server = new McpServer(...)` and before the `register*Tools(server)` block. Because this is now a same-branch sequencing question rather than a two-branch merge-order question, the resolution is a strict ordering dependency: the ADR-067 plan's own `index.ts`-touching tasks (registering `registerCompareTools(server)`, adding the module-level `personalScopeSession` const) must be committed on `v0.7.0` before this plan's index.ts-wiring task runs — not interleaved, not reversed.
+
+## Resolution (2026-09-07 — shipped as c3 on `v0.7.9-upgrade-triggering`, not `v0.7.0`)
+
+The `v0.7.0-c4-issue-32-stale-mcp-warning.md` plan referenced above never landed (2026-09-05 note above already recorded this). The design it captured remained valid and was re-planned from scratch as `v0.7.9-c3-stale-process-check-plan.md`, part of the `v0.7.9-upgrade-triggering` orchestration alongside ADR-055's amendment (Components A and B). The sequencing concern above (ordering against ADR-067's `index.ts` changes) was re-verified moot before implementation — ADR-067's changes had long since shipped by this point, confirmed directly by reading the current `index.ts`.
+
+**Implemented exactly as resolved-designed above:** never self-restarts; resolves the freshest installed version via sibling-directory scan of the plugin cache root (semver-max, never mtime/string-sort); checks lazily on every tool call, no caching of the scan itself; warns only forward (installed > running), never backward; delivers the warning merged into the tool response's own first text block, addressed to the human; both this mechanism and ADR-055's session-start sentinel fire independently, no suppression (as resolved above).
+
+**Commits:**
+- `ddae32da` — `resolveFreshestInstalledVersion`, `resolveRunningVersion`, `compareSemver`, `getRemediationText` (`mcp-server/src/lib/staleProcessCheck.ts`)
+- `c39e09ab` — `checkStaleProcess` (`mcp-server/src/lib/staleProcessWarning.ts`)
+- `691aea11` — `installStaleProcessWarning` wired into `index.ts`, plus the label-collision relabel this issue's own resolved design called for ("Task 6" above): `upgrade.ts`'s `checkVersionMismatch` description string changed from "Installed vX" to "Running vX", since after ADR-055's own Component B fix (`resolveInstalledVersion()` now reads the plugin manifest for *this specific call*) it and this mechanism's freshest-on-disk scan were two different numbers both claiming to be "installed" — exactly the collision flagged above, now resolved in the same branch that implements this mechanism.
+
+**Real `clientInfo.name` value for Claude Code: still unconfirmed.** Attempted live verification this session (temporary debug log line, rebuilt server, real `--debug` Claude Code session) but the debug log capture didn't line up with the triggering tool call before the attempt was abandoned. The `"claude-code"`/`"claude code"` substring match in `getRemediationText` remains an unverified assumption, same status as the Gemini CLI/Codex/Antigravity rows in the same table — flagged for whoever next has a convenient way to check, not blocking this resolution.
+
+**End-to-end verified** against the real built `dist/index.js` (not just unit tests): a throwaway script spawned the actual compiled server pinned to an older sibling version directory via a real MCP client/server handshake over stdio, called a tool, and confirmed the response's first content block carried the stale-process warning naming both versions, with the tool's normal response intact alongside it.
+
+**Not done (explicitly out of scope, per this issue's own "Explicitly out of scope" section above):** this mechanism warns per-stale-process; it does not reduce the count of already-accumulated stale processes. Live on this machine at the time of this resolution: a genuinely stale `.../kmgraph/0.7.5/mcp-server/dist/index.js` process (PID 48270, started the prior Tuesday) is still running alongside the current `0.7.7` process — a real, unprompted demonstration of the exact bug this issue describes, left running (not killed) since cleaning up existing stale processes is explicitly a different, separate fix.

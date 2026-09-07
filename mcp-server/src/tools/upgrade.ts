@@ -2403,7 +2403,15 @@ function checkVersionMismatch(
   if (!lastApplied || lastApplied === installedVersion) return [];
   return [{
     category: "version-update",
-    description: `Installed v${installedVersion} > last applied v${lastApplied} — run apply to update`,
+    // issue-32's own resolution flagged a label collision: this string used to say
+    // "Installed", but installedVersion here is what THIS process/inspect-call is
+    // running (resolveInstalledVersion() -- the plugin.json this specific call
+    // resolves from), a different concept from c3's stale-process warning, which
+    // separately uses "installed" for the freshest version scanned across sibling
+    // plugin-cache directories (possibly newer than what this very call sees).
+    // Relabeled to "Running" so the two warnings, if both fire, never show two
+    // different numbers both claiming to be "installed".
+    description: `Running v${installedVersion} > last applied v${lastApplied} — run apply to update`,
     details: `Apply categories: directories, templates, starter-relocation${kgType === "project-local" ? ", stray-knowledge-dir" : ""}`,
   }];
 }

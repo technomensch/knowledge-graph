@@ -44,7 +44,7 @@ Three options were considered:
 - Codex users on first install see no upgrade prompt (acceptable — clean install has correct structure)
 - Existing Codex users upgrading from pre-v0.6.4 see `version-update` item on first session after install (desired behavior)
 
-## Known Gap — found 2026-07-28, not yet resolved
+## Known Gap — found 2026-07-28, resolved 2026-09-07 (§ Amendment → Component C)
 
 **Tracked as `issue-32`** (`knowledge/issues/issue-32/issue-32-description.md`), filed 2026-07-28 so this gap has a real ID for release-grouping purposes alongside ADR-067.
 
@@ -52,7 +52,7 @@ This ADR's sentinel model covers *"the installed plugin version is ahead of what
 
 **Live evidence:** at the time of writing, all 5 real MCP server processes running on this machine were on v0.6.16 code, two of them 2+ days old, while the installed plugin was newer — confirmed the more plausible root cause of a live config split-brain incident caught mid-session during ADR-067's research (see `knowledge/decisions/ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md`, § Fable Review Findings, item 9), independently validated by Opus.
 
-**Not designed here — recorded as a genuine open gap this ADR's own mechanism doesn't reach.** A fix would need the running process to detect its own code version is behind what's on disk and surface that mid-session (distinct from this ADR's inspect-time check, which only runs when explicitly invoked).
+**Resolved 2026-09-07 — see § Amendment (2026-09-06) → Component C below for the design and its implementation.** The running process now detects its own code version is behind what's on disk and surfaces that mid-session, on every tool call, distinct from this ADR's inspect-time check.
 
 **Clean repro, same day, before/after `/reload-plugins`:** `kg_version` reported `installed: "0.3.10"` before a plugin update+reload (itself reading the stale legacy `~/.claude/kg-config.json` — the exact split-brain § Live Split-Brain Caught Mid-Session already documents). After running `/plugin` update then `/reload-plugins`, the same tool call in the same session correctly reported `installed: "0.6.20"` — confirming a session's own process *does* pick up new code on reload. But a process listing taken at that same instant showed **6 of 8 live `mcp-server/dist/index.js` processes still running from `.../kmgraph/0.6.16/...`**, unaffected by the reload — only the two sessions that actually ran `/plugin` + `/reload-plugins` got new processes (PIDs `43105`, `41761`, both `.../kmgraph/0.6.20/...`). Every other open session, across other terminals/IDEs, keeps serving 0.6.16 indefinitely with no signal that it's now behind. This is the exact mechanism gap stated above, caught mid-repro rather than inferred.
 
@@ -126,6 +126,8 @@ Two points below were **open gaps in issue-32's design that Claude identified an
 
 **Disposition:** this replaces the "Not designed here" line in § Known Gap above. `issue-32`'s own file should be re-targeted from its current stale `v0.7.0` branch reference to whatever branch actually ships this amendment, and its status updated once Component C lands.
 
-## Amendment status: design complete, pending implementation
+**Component C: implemented 2026-09-07 (c3, `v0.7.9-c3-stale-process-check`).** Commits: `ddae32da` (freshest-installed-version resolver, `compareSemver`, `getRemediationText`), `c39e09ab` (`checkStaleProcess`), `691aea11` (wired into `index.ts` via `installStaleProcessWarning`; also relabels `upgrade.ts`'s `checkVersionMismatch` description from "Installed" to "Running", per issue-32's own resolved design § "Task 6" — the label collision this component's own warning would otherwise create with that string). Verified end-to-end against the real built `dist/index.js` via a real MCP client/server handshake, not just unit tests. The `clientInfo.name` value for Claude Code remains unconfirmed (attempted, inconclusive) — the `"claude-code"`/`"claude code"` substring match in the host table above stays a flagged assumption, same status as Gemini CLI/Codex/Antigravity's rows. See `issue-32`'s own resolution note for full detail.
 
-Components A, B, and C are all approved as of 2026-09-06. Next step is `superpowers:writing-plans` to turn this into an implementation plan — not done as part of this ADR update.
+## Amendment status: Components A, B, and C all implemented (2026-09-07)
+
+Components A, B, and C were approved as of 2026-09-06 and implemented as c1/c2/c3 of the `v0.7.9-upgrade-triggering` orchestration. See each component's closeout note above for commit hashes.
