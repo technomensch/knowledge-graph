@@ -9,6 +9,33 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.9] — 2026-09-07
+
+v0.7.8 was never cut as its own release (version files stayed at 0.7.7 while that branch's work landed on `main`) — this entry covers both v0.7.8's preflight/governance-tooling work and v0.7.9's upgrade-triggering work together.
+
+### Added
+- `/kmgraph:kmg-upgrade` — new standalone command, a thin dispatcher into the existing `kg_upgrade` inspector. Bypasses `/kmgraph:kmg-init`'s full "existing KG detection" wizard for the common case of just checking for pending upgrades. See ADR-055's Amendment (2026-09-06), Component A.
+- Session-start upgrade nudges for Claude Code (`hooks-master.sh`) and Gemini CLI (new `core/scripts/gemini-upgrade-check.sh`, deployed by `/kmgraph:kmg-init`) — both compare the installed plugin version against the graph's recorded `lastAppliedVersion` with a shared `semver_compare`/`compareSemver` (numeric, never lexical — `0.6.20 > 0.6.9`, `0.10.0 > 0.9.0`) and print a one-line nudge toward `/kmgraph:kmg-upgrade` only when something is actually pending, avoiding an unconditional per-session tool call. Codex and Antigravity have no equivalent hook system and stay on their existing static-instruction fallback. See ADR-055's Amendment, Component B.
+- Per-tool-call stale-process check inside the MCP server itself (`mcp-server/src/lib/staleProcessCheck.ts`, `staleProcessWarning.ts`, `installStaleProcessWarning.ts`) — closes `issue-32`: a session left open across an upgrade keeps serving old in-memory code indefinitely (Node doesn't hot-reload), with no signal to the user. Lazy, uncached, resolved on first real tool call (client identity isn't available until after the MCP `initialize` handshake, which happens after this wrapper installs) and memoized per-process afterward. Never self-restarts — warns via the tool response text, addressed to the human. See ADR-055's Amendment, Component C.
+- Knowledge Governance content retrofit for already-seeded graphs (`kmg-upgrade-inspector.md` § j) — a graph whose `rules.md` has the `<!-- kmgraph-defaults -->` block but predates ADR-037's Knowledge Governance section gets offered an additive-only append, gated on the block being unambiguous (`SAFE_SINGLE_BLOCK`: exactly one opening marker, exactly one closing marker, correct order, no NUL bytes) before any write — never guesses which occurrence is real when a file has duplicate, orphaned, misordered, or binary-corrupted markers. See ADR-037.
+- `pre-push-gate.sh` Gate 8 — advisory `npm run build` broken-link check, guarded on the target actually being a Docusaurus site (`docusaurus.config.js` present) so it no-ops in any consumer repo with this plugin installed. Closes #170 (issue-13, partially-implemented).
+- `scripts/sync-plugin-cache.sh` — syncs `mcp-server/dist/`, `scripts/`, `hooks/hooks.json`, `skills/`, `commands/`, and `agents/` from the working tree into the installed plugin cache, resolving the live cache version dynamically. Wired to a local post-commit hook on `mcp-server/src/`/`scripts/`/`hooks/hooks.json` changes, with an `hooks-master.sh` mtime-staleness backup check for machines without the local hook. Closes #192 (issue-28).
+- `kmg-paperwork-audit` Step 6 — CHANGELOG-entry-currency check: flags when `package.json`'s version has no matching CHANGELOG header and commits have landed since. Closes #188 (ENH-052).
+- `kmg-meta-issue` attempt-loop workflow — recall-before-starting, atomic `--add-attempt`/`--log-attempt`, and a diminishing-returns explain: a test failing 2 consecutive review rounds gets a plain-English explanation instead of another silent retry. Closes #211 (ENH-056/058).
+
+### Fixed
+- Stale-process warning was merged into `content[0].text` instead of added as its own leading content block, corrupting the ~27 tool handlers whose `content[0]` is a `JSON.stringify` payload (`kg_upgrade`, `kg_search`, `kg_resolve`, `kg_version`, `kg_capture`, `kg_compare`, etc.) for the entire life of a stale process.
+- `checkVersionMismatch`'s `version-update` item asserted an inverted claim ("Running vX > last applied vY") on a downgrade or local dev build; now direction-aware, with no bogus "run apply" call-to-action when there's nothing to apply.
+- Gemini CLI upgrade-check hook deploy computed a bogus cache root (`dirname ""`) when `CLAUDE_PLUGIN_ROOT` was unset or the plugin was loaded from a non-cache path, silently deploying a hook that could never fire — now guarded, with a warning instead of a silent no-op.
+- `core/templates/` → `core/default-templates/` stale references corrected across `CLAUDE.md`, `AGENTS.md`, `knowledge/rules.md`, `knowledge/me.md`, and 7 files under `core/`.
+- `lastAppliedVersion` sentinel now auto-advances on a clean `inspect` (nothing else pending) when the installed version is genuinely ahead — previously `version-update` (inspect-only, never an `apply` category) could never clear on a graph with no other pending items. Forward-only; never on a downgrade or equal case.
+- `tests/run-all-tests.sh` now registers `scripts/upgrade-check.test.sh` (the `semver_compare` regression guard) and `tests/test-e2e-verification.sh`, both previously never wired into the aggregate suite runner despite existing.
+- `pre-push-gate.sh`'s hook timeout (90s) now exceeds Gate 8's internal build timeout (75s), so an external kill can no longer silently discard every other gate's output along with Gate 8's; Gate 8's broken-link count and kill-path (child-process cleanup, boundary timing) corrected.
+- issue-38, issue-39, issue-8 closed as already-resolved-but-never-flipped; issue-41's worktree-guardrail scope narrowed to what ADR-067 doesn't already cover; issue-32 re-targeted off its stale `v0.7.0` branch reference; ENH-026's now-moot scope item struck.
+
+### Removed
+- `core/default-templates/concepts/rules.md` — orphaned duplicate of `core/default-templates/concepts/templates/project/rules.md`, superseded, zero live references.
+
 ## [0.7.7] — 2026-09-05
 
 ### Added

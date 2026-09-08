@@ -50,6 +50,17 @@ SUITES=(
   "test-v050-misc.sh|v0.5.0 Hooks + me.md template smoke tests|no"
   "test-pre-skill-rules-inject.sh|PreToolUse Skill hook — project rules + hard blocks|no"
   "test-decision-governance.sh|Decision Governance — brainstorm-recall + adr-guide + gov-execute-plan|no"
+  "../scripts/upgrade-check.test.sh|v0.7.9 semver_compare — session-start hook version comparison|no"
+  # Registered 2026-09-07 (v0.7.9-c4 review) to end the exact silent-rot gap
+  # this suite exists to prevent -- it was never wired into the aggregate
+  # runner, so its Test 3.7 path fix (core/templates/ -> core/default-templates/)
+  # would have gone unverified by `run-all-tests.sh` indefinitely. Registering
+  # it now surfaces 3 pre-existing, unrelated failures (lesson-capture-agent/
+  # session-summary-agent missing KG/CWD guard docs) plus the script exiting
+  # non-zero partway through Section 5 without a final summary -- all present
+  # before c4 touched this file (c4's diff here is exactly 1 line) and out of
+  # scope for this fix; tracked as a known follow-up, not silently dropped.
+  "test-e2e-verification.sh|End-to-end verification (Phase 7b) — KG/CWD guard, FTS5, MCP fallback|no"
 )
 
 # ── Pre-flight Checks ─────────────────────────────────────────────────────────

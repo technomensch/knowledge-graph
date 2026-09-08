@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.7.7
+**Version:** 0.7.9
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -88,6 +88,15 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 ---
 
 ## v0.7.x Feature Highlights
+
+**v0.7.9 — 2026-09-07** *(upgrade-triggering: standalone command, hook parity, stale-process check, ADR-037 defaults retrofit)*
+
+- **New standalone `/kmgraph:kmg-upgrade` command** — checks for pending upgrades directly, without going through `/kmgraph:kmg-init`'s full wizard.
+- **Session-start upgrade nudges for Claude Code and Gemini CLI** — a one-line nudge toward `/kmgraph:kmg-upgrade` when something is actually pending, instead of an unconditional per-session tool call.
+- **Per-tool-call stale-process check** — a session left open across a plugin upgrade now gets warned that it's still serving old code, instead of running stale indefinitely with no signal. Closes issue-32.
+- **Knowledge Governance content retrofit** for graphs seeded before ADR-037's rules.md content fix — offered automatically on the next `kg_upgrade`/`kmg-upgrade` run, additive-only, gated on the block being unambiguous.
+- Existing users: run `/kmgraph:kmg-upgrade` (or `kg_upgrade` directly) to receive the Knowledge Governance retrofit — opt-in, not automatic.
+- Also folds in v0.7.8's preflight/governance tooling (advisory docs-build broken-link check, plugin-cache sync-on-commit, CHANGELOG-currency check), never released under its own version number. Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 **v0.7.5 — 2026-08-23** *(ENH-064 — attribution README)*
 
@@ -256,7 +265,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.7.3 (2026-08-20)
+**Current Release:** v0.7.9 (2026-09-07)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
@@ -358,6 +367,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.7.6 (2026-09-01)
+**Current Version:** v0.7.9 (2026-09-07)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info

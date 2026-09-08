@@ -1572,17 +1572,22 @@ describe("T-50: checkVersionMismatch detects installed > lastApplied", () => {
   // Under Jest, __SERVER_VERSION__ is undefined → handleVersion().installed = "0.0.0"
   const getInstalledVersion = () => handleVersion().installed; // "0.0.0" under Jest
 
-  test("reports version-update item when lastAppliedVersion is stale", async () => {
+  test("reports version-update item when installed is genuinely ahead of lastAppliedVersion", async () => {
     const kgRoot = makeTempDir("t50");
     tempDirs.push(kgRoot);
     scaffoldKg(kgRoot);
-    mockActiveKg(kgRoot, { lastAppliedVersion: "0.0.0-old" }); // any value != installed
+    // Forward-only: the item only fires when installed > lastApplied, so
+    // mock a real plugin manifest version ahead of lastApplied rather than
+    // relying on Jest's fixed "0.0.0" fallback (which can't be "behind"
+    // anything).
+    mockActiveKg(kgRoot, { lastAppliedVersion: "0.7.7" });
+    mockPluginManifestVersion("0.7.9");
 
     const result = await handleUpgrade({});
     const parsed = parseResult(result);
     const item = parsed.upgrades.find((u) => u.category === "version-update");
     expect(item).toBeDefined();
-    expect(item!.description).toContain("0.0.0-old");
+    expect(item!.description).toContain("0.7.7");
   });
 
   test("no version-update item when lastAppliedVersion matches installed", async () => {
@@ -1662,11 +1667,16 @@ describe("c2 Task 0: lastAppliedVersion auto-clears on a clean forward-only insp
     const result = await handleUpgrade({});
     const parsed = parseResult(result);
 
-    // Inequality-only check still reports the mismatch in this direction.
+    // Inequality-only check still reports the mismatch in this direction
+    // (per spec), but with direction-aware wording -- no longer the inverted
+    // "Running vX > last applied vY" claim, and no bogus "run apply" call to
+    // action for a downgrade.
     const item = parsed.upgrades.find((u) => u.category === "version-update");
     expect(item).toBeDefined();
+    expect(item!.description).toContain("is behind last applied");
+    expect(item!.description).not.toContain(">");
 
-    // But the sentinel must never auto-advance backwards.
+    // The sentinel must never auto-advance backwards either.
     expect(writeConfigCalled).toBe(false);
   });
 });

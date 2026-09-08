@@ -2400,7 +2400,18 @@ function checkVersionMismatch(
 ): UpgradeItem[] {
   const graphRecord = config.graphs[graphName] as unknown as Record<string, unknown>;
   const lastApplied = graphRecord.lastAppliedVersion as string | undefined;
+  // Inequality-only, per spec (c2 master plan, "Clean graph, installed BEHIND
+  // lastAppliedVersion" case) -- this item still fires on a downgrade. Only
+  // the auto-advance sentinel below is forward-only; that's a separate
+  // concern from whether this item is reported at all.
   if (!lastApplied || lastApplied === installedVersion) return [];
+  // Direction-aware wording -- a plain "Running vX > last applied vY — run
+  // apply to update" is a factually inverted claim on a downgrade (installed
+  // < lastApplied), where there's also no forward apply step to run.
+  const isForward = compareVersionsForward(installedVersion, lastApplied);
+  const description = isForward
+    ? `Running v${installedVersion} > last applied v${lastApplied} — run apply to update`
+    : `Running v${installedVersion} is behind last applied v${lastApplied} — likely a downgrade or local dev build; no apply action for this, sentinel will not move backwards`;
   return [{
     category: "version-update",
     // issue-32's own resolution flagged a label collision: this string used to say
@@ -2411,8 +2422,10 @@ function checkVersionMismatch(
     // plugin-cache directories (possibly newer than what this very call sees).
     // Relabeled to "Running" so the two warnings, if both fire, never show two
     // different numbers both claiming to be "installed".
-    description: `Running v${installedVersion} > last applied v${lastApplied} — run apply to update`,
-    details: `Apply categories: directories, templates, starter-relocation${kgType === "project-local" ? ", stray-knowledge-dir" : ""}`,
+    description,
+    details: isForward
+      ? `Apply categories: directories, templates, starter-relocation${kgType === "project-local" ? ", stray-knowledge-dir" : ""}`
+      : "No apply categories apply to a downgrade.",
   }];
 }
 

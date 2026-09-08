@@ -939,9 +939,9 @@ echo "✅ Content template migration complete"
 ```bash
 # rules.md not existing at all is a distinct, higher-priority case --
 # nothing to seed into. Bail before the grep/awk below, which would
-# otherwise leave $HAS_DEFAULTS as an empty string (not "0"), and
-# `[ "$HAS_DEFAULTS" -ge 1 ]` errors on an empty string rather than
-# branching cleanly. Section h (scaffold missing root files, runs BEFORE
+# otherwise leave $HAS_DEFAULTS as an empty string (not "0"), and the
+# numeric comparisons below error on an empty string rather than branching
+# cleanly. Section h (scaffold missing root files, runs BEFORE
 # section j) is what's responsible for creating a missing rules.md; if
 # § j sees one still missing, the user already declined section h's own
 # offer, so silently skipping here is clearly correct, not just defensible.
@@ -952,11 +952,60 @@ echo "✅ Content template migration complete"
 # variable as "already set" and skip the grep entirely on the file-exists
 # path, silently keeping the stale value instead of computing a real one.
 HAS_DEFAULTS=""
+HAS_DEFAULTS_CLOSE=""
+RULES_IS_TEXT=true
 if [ ! -f "{KG_PATH}/rules.md" ]; then
   HAS_DEFAULTS=-1  # sentinel: skip all branches below
+  HAS_DEFAULTS_CLOSE=-1
 fi
 
-HAS_DEFAULTS=${HAS_DEFAULTS:-$(grep -c '<!-- kmgraph-defaults -->' "{KG_PATH}/rules.md" 2>/dev/null)}
+# NUL-byte check -- a rules.md containing NUL bytes (unusual: a bad
+# copy/paste, a binary artifact accidentally saved with this name) is not
+# safe for the retrofit mutation below to touch, even once `-a` (below)
+# makes the marker-detection greps stop erroring on it. macOS's own awk
+# (BSD awk, the one actually shipped -- confirmed `awk version 20200816`;
+# the "only awk on macOS" comment further down is about this exact binary)
+# TRUNCATES a line at its first NUL byte when it re-prints that line. That
+# means the retrofit mutation could round-trip a NUL-containing file, exit
+# 0, `[ -s ]` would pass, and `mv` would overwrite rules.md with content
+# silently missing whatever came after the NUL on that line -- exactly the
+# "never removes existing user content" safety rule below being violated,
+# dressed up as a reported success. Detect and refuse instead of trying to
+# make binary content survive a line-oriented text tool:
+if [ -f "{KG_PATH}/rules.md" ] && LC_ALL=C tr -d '\0' < "{KG_PATH}/rules.md" | cmp -s - "{KG_PATH}/rules.md"; then
+  RULES_IS_TEXT=true
+elif [ -f "{KG_PATH}/rules.md" ]; then
+  RULES_IS_TEXT=false  # NUL byte(s) present -- forces SAFE_SINGLE_BLOCK false below
+fi
+
+HAS_DEFAULTS=${HAS_DEFAULTS:-$(grep -ac '<!-- kmgraph-defaults -->' "{KG_PATH}/rules.md" 2>/dev/null)}
+# Also count the CLOSING marker independently -- counting only the opening
+# marker misses the case where the opening marker appears exactly once (the
+# real block) but the CLOSING marker appears more than once (e.g. a stray
+# extra closing marker quoted in a fenced example, with no matching stray
+# opening marker alongside it). `<!-- kmgraph-defaults -->` is not a
+# substring of `<!-- /kmgraph-defaults -->`, so the two counts are
+# independent, and neither count alone is sufficient -- see `SAFE_SINGLE_BLOCK`
+# below, which requires exactly one of BOTH markers, in the right order.
+HAS_DEFAULTS_CLOSE=${HAS_DEFAULTS_CLOSE:-$(grep -ac '<!-- /kmgraph-defaults -->' "{KG_PATH}/rules.md" 2>/dev/null)}
+# First-occurrence LINE NUMBERS of each marker -- counts alone (above) can't
+# catch a malformed file where exactly one of each marker exists, but in the
+# WRONG ORDER (e.g. a stray orphan closing marker sitting above the real
+# block's own opening marker, from a bad hand-edit). Safe to compute
+# unconditionally, even on a missing file or missing markers -- `grep -n`
+# on a miss just yields empty output, `head -1` of empty is empty, and the
+# branch table below never consults these unless both counts are already
+# confirmed to be exactly 1.
+#
+# `-a` (force text mode) on all four `grep`/`grep -c` calls in this section:
+# without it, a rules.md containing a NUL byte (unusual, but not impossible --
+# a bad copy/paste, a binary artifact accidentally saved with this name) makes
+# `grep -c` still return real counts, but `grep -n` prints a "Binary file ...
+# matches" line instead of `line:content`, so `cut -d: -f1` extracts non-numeric
+# garbage into $OPEN_LINE/$CLOSE_LINE and the numeric `-lt` comparison below
+# throws a raw shell error instead of cleanly routing to the malformed branch.
+OPEN_LINE=$(grep -an '<!-- kmgraph-defaults -->' "{KG_PATH}/rules.md" 2>/dev/null | head -1 | cut -d: -f1)
+CLOSE_LINE=$(grep -an '<!-- /kmgraph-defaults -->' "{KG_PATH}/rules.md" 2>/dev/null | head -1 | cut -d: -f1)
 # Marker-presence alone is not enough -- a graph seeded before this fix has
 # the marker but not the Knowledge Governance content added under it.
 # Check for the specific sub-heading, restricted to the marker-delimited
@@ -967,21 +1016,26 @@ HAS_DEFAULTS=${HAS_DEFAULTS:-$(grep -c '<!-- kmgraph-defaults -->' "{KG_PATH}/ru
 # but the CLOSING marker is missing (a malformed/hand-edited block), this
 # awk's region-restriction degenerates to "rest of the file" -- so a user's
 # own genuine "## Knowledge Governance" heading written later in their file,
-# entirely unrelated to this block, would false-positive HAS_GOVERNANCE and
-# cause a silent skip on a block that's actually malformed and empty inside.
-# Detecting a missing closing marker as its own error state is out of scope
-# for this task (it's a pre-existing malformed-file case, not something this
-# fix introduces) -- flagging it here rather than silently ignoring it.
+# entirely unrelated to this block, would false-positive HAS_GOVERNANCE. This
+# no longer causes a silent skip on the malformed case, though: the branch
+# table below now routes any opening/closing count or order mismatch to its
+# own reported-and-skip branch BEFORE `$HAS_GOVERNANCE` is ever consulted.
 HAS_GOVERNANCE=$(awk '/<!-- kmgraph-defaults -->/{found=1} found{print} /<!-- \/kmgraph-defaults -->/{exit}' "{KG_PATH}/rules.md" 2>/dev/null | grep -c '^## Knowledge Governance')
 ```
 
-Four branches:
-- **`$HAS_DEFAULTS` is `-1`** (sentinel — `rules.md` doesn't exist): skip silently, nothing to seed into.
-- **`$HAS_DEFAULTS` is `0`** (marker entirely absent): schema-version gate applies here, unchanged from before — if `$SCHEMA_VERSION -ge 2` (computed in section i), skip silently; otherwise the existing full-block prepend path below.
-- **`$HAS_DEFAULTS -ge 1` AND `$HAS_GOVERNANCE -ge 1`**: skip silently — already fully seeded, nothing to do.
-- **`$HAS_DEFAULTS -ge 1` AND `$HAS_GOVERNANCE` is `0`**: the marker exists but predates ADR-037's content fix, regardless of what migrations the graph has separately been through — **not gated by `$SCHEMA_VERSION`** (that gate exists for section i's own, unrelated content-template relocation, not this block's content). Offer the additive-only retrofit path below, never re-prepending the whole block.
+A file has **exactly one well-formed block** only if `$RULES_IS_TEXT` is true AND `$HAS_DEFAULTS` is `1` AND `$HAS_DEFAULTS_CLOSE` is `1` AND `$OPEN_LINE` is less than `$CLOSE_LINE` (the opening marker actually precedes the closing one). Call this `SAFE_SINGLE_BLOCK` below. `$RULES_IS_TEXT` being false (NUL bytes present) makes `SAFE_SINGLE_BLOCK` false unconditionally, regardless of what the marker counts/order say — a file the mutation awk can't safely round-trip is unsafe for the retrofit path no matter how clean its markers look. When implementing the `$OPEN_LINE`/`$CLOSE_LINE` comparison, also treat either value being empty or non-numeric as `SAFE_SINGLE_BLOCK` being false (route to the malformed branch), not as a shell error to let propagate — the `-a` flag on the `grep -n` calls above handles the ordinary binary-content case, but failing safe on the comparison itself costs nothing and removes any dependence on that being exhaustive.
 
-**If `$HAS_DEFAULTS` is `0` (block absent),** display and offer:
+Five branches:
+- **`$HAS_DEFAULTS` is `-1`** (sentinel — `rules.md` doesn't exist): skip silently, nothing to seed into.
+- **NOT `SAFE_SINGLE_BLOCK`, and NOT (`$HAS_DEFAULTS` is `0` AND `$HAS_DEFAULTS_CLOSE` is `0`)** (some marker text is present — one or more opening markers, one or more closing markers, or both — but it does not resolve to exactly one well-ordered pair in a text-safe file): **skip both the retrofit and prepend paths, always, regardless of `$HAS_GOVERNANCE`.** This single branch now covers every malformed/ambiguous shape marker-count, order, and file-content can produce: two-or-more of either marker anywhere in the file (a real block plus a fenced-code-block example elsewhere quoting one or both marker strings, or a genuine duplicate block); a count mismatch (opening present with no closing at all, or a closing marker present with no opening at all -- an orphan); exactly one of each but in the wrong order (a stray orphan closing marker sitting above the real block, e.g. from a bad hand-edit); and `$RULES_IS_TEXT` being false (the file contains NUL bytes) -- macOS's own awk truncates a line at its first NUL byte when re-printing it, so even a marker-clean NUL-containing file is not safe for the retrofit mutation to touch, regardless of how well-formed its markers look. `<!-- kmgraph-defaults -->` is not a substring of `<!-- /kmgraph-defaults -->`, so the two counts are independent — a file can have exactly one opening marker while still being unsafe on any of the other grounds. There is no reliable way to tell which occurrence is the real block, to safely prepend a brand-new block above an orphan closing marker (that would leave two closing markers in the file), or to safely mutate a file a line-oriented text tool can't round-trip, from counts and order alone. Neither the detection awk (unanchored, matches the closing marker as a substring anywhere) nor the mutation awk (first-match, normalized-equality) can recover from any of these shapes on their own — the check has to happen upstream, before either path is offered. Report:
+  ```
+  ⚠️  rules.md's <!-- kmgraph-defaults --> block looks malformed or ambiguous (opening/closing marker count or order doesn't resolve to exactly one well-formed block). Skipping the defaults/governance check for this run. Resolve manually (remove a duplicate or orphaned marker, de-quote a documented example, or fix the marker order) and re-run to continue.
+  ```
+- **`$HAS_DEFAULTS` is `0` AND `$HAS_DEFAULTS_CLOSE` is `0`** (both markers entirely absent — the clean, unambiguous "nothing here yet" case): schema-version gate applies here, unchanged from before — if `$SCHEMA_VERSION -ge 2` (computed in section i), skip silently; otherwise the existing full-block prepend path below.
+- **`SAFE_SINGLE_BLOCK` AND `$HAS_GOVERNANCE -ge 1`**: skip silently — already fully seeded, nothing to do.
+- **`SAFE_SINGLE_BLOCK` AND `$HAS_GOVERNANCE` is `0`**: the marker exists exactly once, well-formed, but predates ADR-037's content fix, regardless of what migrations the graph has separately been through — **not gated by `$SCHEMA_VERSION`** (that gate exists for section i's own, unrelated content-template relocation, not this block's content). Offer the additive-only retrofit path below, never re-prepending the whole block. `SAFE_SINGLE_BLOCK` is what makes this path safe to automate — see the branch above for the shapes that aren't.
+
+**If `$HAS_DEFAULTS` is `0` AND `$HAS_DEFAULTS_CLOSE` is `0` (both markers cleanly absent),** display and offer:
 
 ```
 rules.md is missing the kmgraph-defaults block (added in v0.5.0).
@@ -1019,7 +1073,7 @@ Options:
    fi
    ```
 
-**If `$HAS_DEFAULTS -ge 1` AND `$HAS_GOVERNANCE` is `0` (marker present, Knowledge Governance missing),** display and offer:
+**If `SAFE_SINGLE_BLOCK` AND `$HAS_GOVERNANCE` is `0` (exactly one well-formed block, Knowledge Governance missing),** display and offer:
 
 ```
 rules.md has the kmgraph-defaults block, but it predates a later addition
@@ -1050,12 +1104,33 @@ Options:
    # Pass it through the environment instead, which does not run
    # escape-sequence processing on the value and has no newline restriction.
    #
-   # Anchored `^...$` match (not a bare substring match) on the closing
-   # marker, with a `done` guard so only the FIRST occurrence is treated as
-   # the real closing tag -- an unanchored, unguarded match would also fire
-   # on a second literal `<!-- /kmgraph-defaults -->` occurrence elsewhere
-   # in the file (e.g. a user documenting this exact marker inside their
-   # own fenced code example), inserting the section a second time.
+   # Matched on a WHITESPACE-NORMALIZED copy of each line (strip a trailing
+   # \r for CRLF-authored files, and trailing spaces/tabs), not the raw line
+   # -- the detection awk above (line ~975) matches the closing marker as an
+   # unanchored substring, so it already treats a marker with trailing
+   # whitespace or CRLF line endings as "present". A strict `^...$` match on
+   # the raw line here would disagree with that and offer a retrofit it then
+   # can't perform (verified against fixtures with both variants).
+   #
+   # Deliberately NOT stripping LEADING whitespace/indentation here, even
+   # though that would make detection and mutation agree on an indented
+   # marker too: 4+ spaces of leading indentation is Markdown's own syntax
+   # for a fenced code block (verbatim-quoted text), so an indented marker
+   # line is exactly the "a user is quoting this marker as a documented
+   # example" case this whole path exists to not corrupt -- stripping the
+   # indentation would make the mutation match a quoted example instead of
+   # correctly refusing to. An indented real closing marker (an unusual
+   # authoring choice) will still fail loudly via the `END` guard below
+   # rather than being silently mismatched; that's the safe direction to be
+   # wrong in.
+   #
+   # The `done` guard still ensures only the first NORMALIZED-match occurrence
+   # is treated as the real closing tag; combined with the `SAFE_SINGLE_BLOCK`
+   # gate above (which requires exactly one occurrence of BOTH markers, in
+   # the right order -- see the branch table), "first match" and "the real
+   # block" are the same thing by the time this code runs. The original
+   # (unnormalized) line is what gets printed back out, so trailing
+   # whitespace/CRLF in the user's file is preserved untouched.
    #
    # `END { exit(done ? 0 : 1) }` makes a genuine miss (no closing marker
    # found at all) a real failure instead of a silently-successful no-op:
@@ -1064,7 +1139,12 @@ Options:
    # report success while having appended nothing.
    GOVERNANCE_BLOCK="$GOVERNANCE_BLOCK" awk '
      BEGIN { block = ENVIRON["GOVERNANCE_BLOCK"] }
-     /^<!-- \/kmgraph-defaults -->$/ && !done { print block "\n"; print; done = 1; next }
+     {
+       norm = $0
+       gsub(/\r$/, "", norm)
+       gsub(/[ \t]+$/, "", norm)
+     }
+     norm == "<!-- /kmgraph-defaults -->" && !done { print block "\n"; print; done = 1; next }
      { print }
      END { exit(done ? 0 : 1) }
    ' "{KG_PATH}/rules.md" > /tmp/rules-governance-patched.md \
@@ -1077,8 +1157,9 @@ Options:
 **Safety rules:**
 - Archive is always taken before writing, on both paths.
 - Prepend/append only — never replaces or removes existing user content, including `## Git Workflow`/`## Version & Release` on the retrofit path.
-- First-match-only, anchored: the retrofit path never double-inserts on a repeated or quoted closing-marker string, and never fires inside a fenced code block that happens to quote the marker.
-- A missing closing marker on the retrofit path is a reported failure, not a silent no-op that claims success.
+- `SAFE_SINGLE_BLOCK` (exactly one opening marker, exactly one closing marker, opening before closing) is checked BEFORE the retrofit offer is ever shown, not handled inside the retrofit mutation itself — first-match logic inside the awk cannot tell "the real block" from "a quoted example that happens to come first in file order," a raw opening-marker count alone would miss a stray extra closing marker with no matching stray opening marker, and neither count alone catches an orphan closing marker sitting above the real block's own opening marker. All three shapes (duplicate/multiple, count mismatch, wrong order) are caught upstream by `SAFE_SINGLE_BLOCK`, before either path is offered, instead of guessed at downstream. See the branch table above.
+- Once the retrofit path is reached (which only happens when `SAFE_SINGLE_BLOCK` holds), the mutation matches on a whitespace/CRLF-normalized (trailing whitespace and CRLF only, deliberately NOT leading indentation — see the code comment above the awk) equality test, consistent with the detection awk's own unanchored substring match — a trailing-whitespace or CRLF-terminated closing marker that detection already counted as present will not silently fail to append. An indented closing marker is a real mismatch between detection and mutation that's still possible in principle, but fails loudly (reported failure) rather than silently mismatching, which is the safer direction to leave unresolved.
+- A malformed block (missing, duplicated, or misordered markers) never reaches the retrofit path at all — caught upstream by `SAFE_SINGLE_BLOCK`. Within the retrofit path itself, a genuine awk-level miss is still a reported failure, not a silent no-op that claims success.
 - Idempotent: both paths' detection gates skip if their respective content is already present.
 
 #### k. Platform block detection in rules.md (v0.5.0 — ADR-032 remediation)

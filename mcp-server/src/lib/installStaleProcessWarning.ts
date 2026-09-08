@@ -62,18 +62,15 @@ export function installStaleProcessWarning(server: McpServer, runningVersion: st
       const warning = checkStaleProcess(runningVersion, resolveClientName());
       if (!warning) return result;
 
-      // Merge into the first text block rather than adding a new array
-      // element -- keeps the warning visually attached to the response it's
-      // about, in the same content item, instead of a separate block a
-      // caller could inspect content[0] and miss.
-      const content = [...(result.content ?? [])];
-      if (content.length > 0 && content[0].type === "text") {
-        content[0] = { ...content[0], text: `${warning}\n\n${content[0].text ?? ""}` };
-      } else {
-        content.unshift({ type: "text" as const, text: warning });
-      }
-
-      return { ...result, content };
+      // Prepend as its own leading content block -- do NOT merge into
+      // content[0].text. Many handlers put a JSON.stringify payload in
+      // content[0] (kg_upgrade, kg_search, kg_resolve, kg_version,
+      // kg_capture, kg_compare, etc.); splicing text into that string
+      // would corrupt it for any caller that does JSON.parse(content[0].text).
+      return {
+        ...result,
+        content: [{ type: "text" as const, text: warning }, ...(result.content ?? [])],
+      };
     };
 
     const newArgs = [...args.slice(0, -1), wrappedCallback];

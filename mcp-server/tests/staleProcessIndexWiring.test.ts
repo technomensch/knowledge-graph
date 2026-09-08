@@ -26,8 +26,13 @@ describe("installStaleProcessWarning", () => {
     const registered = (server as unknown as { _registeredTools: Record<string, { handler: (...a: unknown[]) => Promise<{ content: Array<{ type: string; text: string }> }> }> })._registeredTools["test_tool"];
     const result = await registered.handler({}, {});
 
-    expect(result.content[0].text).toContain("STALE WARNING TEXT");
-    expect(result.content[0].text).toContain("original response");
+    // Warning must be its own leading block, NOT merged into content[0].text --
+    // many handlers put a JSON.stringify payload in content[0], and merging
+    // text into that string would corrupt it for any JSON.parse(content[0].text)
+    // caller.
+    expect(result.content).toHaveLength(2);
+    expect(result.content[0].text).toBe("STALE WARNING TEXT");
+    expect(result.content[1].text).toBe("original response");
   });
 
   it("does not alter the response when checkStaleProcess returns null", async () => {

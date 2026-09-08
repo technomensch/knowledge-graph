@@ -33551,7 +33551,7 @@ var os9 = __toESM(require("os"));
 var import_child_process4 = require("child_process");
 
 // src/tools/version.ts
-var pkg = { version: true ? "0.7.7" : "0.0.0" };
+var pkg = { version: true ? "0.7.9" : "0.0.0" };
 var SCHEMA_VERSION = 2;
 function handleVersion() {
   return { installed: pkg.version, schema: SCHEMA_VERSION };
@@ -35001,6 +35001,8 @@ function checkVersionMismatch(installedVersion, kgType, config2, graphName) {
   const graphRecord = config2.graphs[graphName];
   const lastApplied = graphRecord.lastAppliedVersion;
   if (!lastApplied || lastApplied === installedVersion) return [];
+  const isForward = compareVersionsForward(installedVersion, lastApplied);
+  const description = isForward ? `Running v${installedVersion} > last applied v${lastApplied} \u2014 run apply to update` : `Running v${installedVersion} is behind last applied v${lastApplied} \u2014 likely a downgrade or local dev build; no apply action for this, sentinel will not move backwards`;
   return [{
     category: "version-update",
     // issue-32's own resolution flagged a label collision: this string used to say
@@ -35011,8 +35013,8 @@ function checkVersionMismatch(installedVersion, kgType, config2, graphName) {
     // plugin-cache directories (possibly newer than what this very call sees).
     // Relabeled to "Running" so the two warnings, if both fire, never show two
     // different numbers both claiming to be "installed".
-    description: `Running v${installedVersion} > last applied v${lastApplied} \u2014 run apply to update`,
-    details: `Apply categories: directories, templates, starter-relocation${kgType === "project-local" ? ", stray-knowledge-dir" : ""}`
+    description,
+    details: isForward ? `Apply categories: directories, templates, starter-relocation${kgType === "project-local" ? ", stray-knowledge-dir" : ""}` : "No apply categories apply to a downgrade."
   }];
 }
 function resolveInstalledVersion() {
@@ -35777,7 +35779,7 @@ function resolveFreshestInstalledVersion() {
 function resolveRunningVersion() {
   const base = path14.basename(getPluginRoot());
   if (SEMVER_DIR_RE.test(base)) return base;
-  return true ? "0.7.7" : "0.0.0";
+  return true ? "0.7.9" : "0.0.0";
 }
 function getRemediationText(clientName) {
   const name = (clientName ?? "").toLowerCase();
@@ -35827,15 +35829,10 @@ function installStaleProcessWarning(server2, runningVersion) {
       const result = await callback(...cbArgs);
       const warning = checkStaleProcess(runningVersion, resolveClientName());
       if (!warning) return result;
-      const content = [...result.content ?? []];
-      if (content.length > 0 && content[0].type === "text") {
-        content[0] = { ...content[0], text: `${warning}
-
-${content[0].text ?? ""}` };
-      } else {
-        content.unshift({ type: "text", text: warning });
-      }
-      return { ...result, content };
+      return {
+        ...result,
+        content: [{ type: "text", text: warning }, ...result.content ?? []]
+      };
     };
     const newArgs = [...args.slice(0, -1), wrappedCallback];
     return originalTool(...newArgs);
@@ -35843,7 +35840,7 @@ ${content[0].text ?? ""}` };
 }
 
 // src/index.ts
-var SERVER_VERSION = true ? "0.7.7" : "0.0.0";
+var SERVER_VERSION = true ? "0.7.9" : "0.0.0";
 var server = new McpServer({
   name: "knowledge-graph",
   version: SERVER_VERSION
