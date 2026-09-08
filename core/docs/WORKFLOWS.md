@@ -66,7 +66,7 @@ git commit -m "docs: initialize knowledge graph structure"
 
 ```bash
 # Copy all templates to your project
-cp -r core/templates/. knowledge/templates/
+cp -r core/default-templates/. knowledge/templates/
 ```
 
 Templates available after copying:
@@ -339,13 +339,13 @@ mkdir -p knowledge/meta-issues/performance-degradation/{attempts,analysis}
 **2. Copy core files from templates:**
 
 ```bash
-cp core/templates/meta-issue/README-template.md \
+cp core/default-templates/meta-issue/README-template.md \
    knowledge/meta-issues/performance-degradation/README.md
-cp core/templates/meta-issue/description-template.md \
+cp core/default-templates/meta-issue/description-template.md \
    knowledge/meta-issues/performance-degradation/description.md
-cp core/templates/meta-issue/implementation-log-template.md \
+cp core/default-templates/meta-issue/implementation-log-template.md \
    knowledge/meta-issues/performance-degradation/implementation-log.md
-cp core/templates/meta-issue/test-cases-template.md \
+cp core/default-templates/meta-issue/test-cases-template.md \
    knowledge/meta-issues/performance-degradation/test-cases.md
 ```
 
@@ -353,9 +353,9 @@ cp core/templates/meta-issue/test-cases-template.md \
 
 ```bash
 mkdir knowledge/meta-issues/performance-degradation/attempts/001-caching
-cp core/templates/meta-issue/solution-approach-template.md \
+cp core/default-templates/meta-issue/solution-approach-template.md \
    knowledge/meta-issues/performance-degradation/attempts/001-caching/solution-approach.md
-cp core/templates/meta-issue/attempt-results-template.md \
+cp core/default-templates/meta-issue/attempt-results-template.md \
    knowledge/meta-issues/performance-degradation/attempts/001-caching/attempt-results.md
 ```
 

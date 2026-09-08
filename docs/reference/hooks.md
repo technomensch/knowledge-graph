@@ -46,7 +46,7 @@ Hooks with a `matcher` field fire only when the tool name (and optionally the to
 
 | Script | Event | Matcher | Enabled by default | What it does |
 |---|---|---|---|---|
-| `hooks-master.sh` | `SessionStart` | (all) | Yes | Resolves the knowledge graph for the current directory (cwd-derived, via the same `resolveGraph()` logic `kg_resolve` exposes — see below); validates the resolved KG's path and the MCP server build; displays recent lessons (last 7 days) from the resolved and personal KGs; checks MEMORY.md staleness and diffs since last session |
+| `hooks-master.sh` | `SessionStart` | (all) | Yes | Resolves the knowledge graph for the current directory (cwd-derived, via the same `resolveGraph()` logic `kg_resolve` exposes — see below); validates the resolved KG's path and the MCP server build; checks the installed plugin version against the resolved graph's `lastAppliedVersion` and nudges toward `/kmgraph:kmg-upgrade` when genuinely behind (no MCP/LLM round-trip — a cheap semver compare against `kg-config.json` and `.claude-plugin/plugin.json` directly); displays recent lessons (last 7 days) from the resolved and personal KGs; checks MEMORY.md staleness and diffs since last session |
 | `post-tool-lesson-check.sh` | `PostToolUse` | `Write\|Edit` | Yes | Scans tool input for lesson-worthy keywords (`fix`, `solved`, `debug`, `pattern`, etc.); suppresses on `docs/`, `.git/`, and `.md`-only writes; surfaces a prompt to run `/kmgraph:kmg-capture-lesson` |
 | `platform-file-change-check.sh` | `PostToolUse` | `Write\|Edit` | Yes | Detects writes to platform config files (`CLAUDE.md`, `GEMINI.md`, `.cursorrules`, `copilot-instructions.md`, etc.); prompts the user to consider syncing other platform files via `/kmgraph:kmg-setup-platform` |
 | `plan-mirror.sh` | `PostToolUse` | `Write` | Yes | Detects writes to `~/.claude/plans/`; resolves the KG for the current directory; copies the file to `knowledge/plans/` in that KG's project root (falling back to `docs/plans/` when the project has no `knowledge/` dir); exits silently if no KG resolves or the target directory does not exist |
@@ -56,6 +56,10 @@ Hooks with a `matcher` field fire only when the tool name (and optionally the to
 | `stop-plan-gate.sh` | `Stop` | (all) | Yes | Re-injects the plan approval gate reminder at session end when a plan was written this session; uses a daily flag file to suppress duplicates |
 | `post-plan-validate-checklist.sh` | `PostToolUse` | `Write` | Yes | After writing any `plans/*.md` file, outputs an advisory post-plan validation checklist; exits silently for non-plan writes |
 | `notification-dispatch.sh` | `Notification` | (all) | No (opt-in) | Forwards the notification text to a configured `webhookUrl` in `kg-config.json`; exits silently if `webhookUrl` is absent; network failures never block the hook |
+
+## Gemini CLI's Equivalent Hook
+
+Claude Code's `hooks-master.sh` pending-upgrade check (above) has no equivalent trigger on Gemini CLI, since Gemini CLI never invokes this project's `hooks.json` at all — it has its own, separate hook system. `/kmgraph:kmg-init` deploys `.gemini/kmgraph-upgrade-check.sh` (from the `core/scripts/gemini-upgrade-check.sh` template) and registers it under `.gemini/settings.json`'s `hooks.SessionStart`, doing the same semver comparison in Gemini CLI's own hook contract (JSON-only stdout, a `systemMessage` field). See [Platform Adaptation](PLATFORM-ADAPTATION.md) for deployment details. Codex CLI and Antigravity CLI are not covered by this check — both fall back to their existing static-instruction pattern.
 
 ## Enabled vs Disabled by Default
 

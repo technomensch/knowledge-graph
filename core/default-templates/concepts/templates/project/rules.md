@@ -15,6 +15,32 @@
 - Sync all version files before committing a version bump
 - Run `npm run build` before opening a PR that touches docs
 
+## Knowledge Governance
+
+### Decision Records
+- Process decisions, architectural decisions, and governance rules → create an ADR in `knowledge/decisions/`
+- This includes emergent decisions discovered during reviews, remediations, and sessions — not just planned decisions
+- ADR is the canonical record; `rules.md` references it for enforcement; memory files point to it
+
+### Memory Files
+- Memory files are thin pointers only — no canonical content
+- Canonical content belongs in: ADRs (decisions), rules.md (enforcement), lessons-learned/ (patterns)
+- A memory file body should be ≤10 lines: the rule/fact in one sentence, Why, How to apply, and a pointer to the canonical source
+
+### Rules Entries
+- Every enforcement rule in rules.md that derives from a decision must link to its source ADR
+- Format: `### Rule Name ([[ADR-XXX-title|ADR-XXX]])`
+- Rules without ADR backing are acceptable for lightweight conventions but should be promoted to ADRs if contested or cross-project
+
+### When to Create Each Artifact
+| Finding type | Artifact |
+|---|---|
+| Architecture or process decision | ADR |
+| Enforcement rule | rules.md entry (+ ADR link) |
+| Repeating pattern or anti-pattern | lessons-learned/ |
+| Cross-session recall pointer | memory file (thin) |
+| Project state / in-flight context | memory file (thin) |
+
 <!-- /kmgraph-defaults -->
 
 ## Knowledge Capture

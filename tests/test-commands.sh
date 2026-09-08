@@ -32,7 +32,7 @@ else
   exit 1
 fi
 
-# ── Test 2: All 22 expected command files present ────────────────────────────
+# ── Test 2: All 24 expected command files present ────────────────────────────
 
 echo "── File presence ───────────────────────────────────────────────"
 
@@ -62,6 +62,7 @@ EXPECTED_COMMANDS=(
   "kmg-update-issue-plan.md"
   "kmg-init-personal-kg.md"
   "kmg-migration.md"
+  "kmg-upgrade.md"
 )
 
 MISSING=0
@@ -73,19 +74,19 @@ for cmd in "${EXPECTED_COMMANDS[@]}"; do
 done
 
 if [ $MISSING -eq 0 ]; then
-  pass "All 23 expected command files present"
+  pass "All 24 expected command files present"
 else
   fail "$MISSING command file(s) missing (see above)"
 fi
 
-# Test 3: Exact count is 23 (top-level only — kmg-init-shared/ modules are excluded)
+# Test 3: Exact count is 24 (top-level only — kmg-init-shared/ modules are excluded)
 ACTUAL_COUNT=$(find "$COMMANDS_DIR" -maxdepth 1 -name "*.md" -type f | wc -l | tr -d ' ')
-if [ "$ACTUAL_COUNT" -eq 23 ]; then
-  pass "Exact command count is 23"
-elif [ "$ACTUAL_COUNT" -gt 23 ]; then
-  fail "More than 23 command files found ($ACTUAL_COUNT) — unexpected files?"
+if [ "$ACTUAL_COUNT" -eq 24 ]; then
+  pass "Exact command count is 24"
+elif [ "$ACTUAL_COUNT" -gt 24 ]; then
+  fail "More than 24 command files found ($ACTUAL_COUNT) — unexpected files?"
 else
-  fail "Fewer than 23 command files found ($ACTUAL_COUNT)"
+  fail "Fewer than 24 command files found ($ACTUAL_COUNT)"
 fi
 
 # Test 4: No zero-byte files

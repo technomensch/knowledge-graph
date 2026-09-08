@@ -268,10 +268,10 @@ Focus on connection setup (2,400ms)
 mkdir -p docs/meta-issues/[issue-name]/{attempts,analysis}
 
 # Copy templates
-cp core/templates/meta-issue/README-template.md \
+cp core/default-templates/meta-issue/README-template.md \
    docs/meta-issues/[issue-name]/README.md
 
-cp core/templates/meta-issue/description-template.md \
+cp core/default-templates/meta-issue/description-template.md \
    docs/meta-issues/[issue-name]/description.md
 
 # ... (copy other templates)

@@ -1772,6 +1772,53 @@ echo "For full context, read knowledge/rules.md and knowledge/me.md before actin
 echo "" >> "$(pwd)/GEMINI.md"
 cat "${CLAUDE_PLUGIN_ROOT}/core/default-templates/AGENTS-template.md" >> "$(pwd)/GEMINI.md"
 
+# Deploy the session-start upgrade-check hook alongside GEMINI.md.
+# NOTE: a plain `cp` is wrong here (see Task 3's Critical notes) — the copy
+# must have __DEPLOY_TIME_PLUGIN_CACHE_ROOT__ replaced with this run's real,
+# absolute plugin CACHE ROOT, since Gemini CLI itself never sets
+# CLAUDE_PLUGIN_ROOT when it later invokes this script as its own
+# SessionStart hook. Bake in the CACHE ROOT — one directory up from
+# ${CLAUDE_PLUGIN_ROOT}, e.g. ".../kmgraph" not ".../kmgraph/0.7.7" — never
+# one specific version directory: plugin upgrades add a new sibling rather
+# than replacing one in place, so pinning to today's version would make the
+# deployed hook permanently blind to every upgrade after this deploy.
+mkdir -p "$(pwd)/.gemini"
+# Guard: CLAUDE_PLUGIN_ROOT must be set and must not be the filesystem root --
+# either would make `dirname` produce a cache root with no version-pinned
+# siblings, which bakes a hook that silently returns {} on every session
+# start forever (deploy would still report success with no diagnostic).
+if [ -z "${CLAUDE_PLUGIN_ROOT:-}" ] || [ "${CLAUDE_PLUGIN_ROOT}" = "/" ]; then
+  echo "⚠️  CLAUDE_PLUGIN_ROOT is unset or invalid ('${CLAUDE_PLUGIN_ROOT:-<empty>}') -- skipping Gemini CLI upgrade-check hook deploy. Re-run kmg-init from a context where the plugin is loaded from its normal cache path."
+else
+  PLUGIN_CACHE_ROOT="$(dirname "${CLAUDE_PLUGIN_ROOT}")"
+  sed "s|__DEPLOY_TIME_PLUGIN_CACHE_ROOT__|${PLUGIN_CACHE_ROOT}|" \
+    "${CLAUDE_PLUGIN_ROOT}/core/scripts/gemini-upgrade-check.sh" \
+    > "$(pwd)/.gemini/kmgraph-upgrade-check.sh"
+  chmod +x "$(pwd)/.gemini/kmgraph-upgrade-check.sh"
+
+  # Register it in .gemini/settings.json under hooks.SessionStart, merging
+  # with any existing hooks rather than overwriting the file. Filter-then-append
+  # (not unique_by) — unique_by(.name) groups ALL entries lacking a "name" key
+  # (i.e. every pre-existing hook a user wrote by hand, since "name" is not part
+  # of any documented Gemini CLI hook schema) into a single null-keyed bucket,
+  # silently deleting all but one of them on the very first run. Filtering only
+  # our own prior entry out by name, then appending, cannot destroy anything we
+  # didn't add ourselves.
+  GEMINI_SETTINGS="$(pwd)/.gemini/settings.json"
+  if [ ! -f "$GEMINI_SETTINGS" ]; then
+    echo '{}' > "$GEMINI_SETTINGS"
+  fi
+  jq '.hooks.SessionStart = ((.hooks.SessionStart // []) | map(select(.name != "kmgraph-upgrade-check"))) + [{
+        "type": "command",
+        "command": "./.gemini/kmgraph-upgrade-check.sh",
+        "name": "kmgraph-upgrade-check"
+      }]' \
+    "$GEMINI_SETTINGS" > "${GEMINI_SETTINGS}.tmp" \
+    && jq empty "${GEMINI_SETTINGS}.tmp" 2>/dev/null \
+    && mv "${GEMINI_SETTINGS}.tmp" "$GEMINI_SETTINGS" \
+    || { rm -f "${GEMINI_SETTINGS}.tmp"; echo "⚠️  Failed to register Gemini CLI upgrade-check hook — .gemini/settings.json left untouched."; }
+fi
+
 # Cursor / Windsurf — write pointer line + KMGraph behaviors subset
 # Continue.dev — inject pointer line + prompt section into .continue/config.json
 # VS Code Copilot — write pointer line + minimal content to .github/copilot-instructions.md

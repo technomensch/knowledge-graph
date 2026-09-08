@@ -2400,12 +2400,65 @@ function checkVersionMismatch(
 ): UpgradeItem[] {
   const graphRecord = config.graphs[graphName] as unknown as Record<string, unknown>;
   const lastApplied = graphRecord.lastAppliedVersion as string | undefined;
+  // Inequality-only, per spec (c2 master plan, "Clean graph, installed BEHIND
+  // lastAppliedVersion" case) -- this item still fires on a downgrade. Only
+  // the auto-advance sentinel below is forward-only; that's a separate
+  // concern from whether this item is reported at all.
   if (!lastApplied || lastApplied === installedVersion) return [];
+  // Direction-aware wording -- a plain "Running vX > last applied vY — run
+  // apply to update" is a factually inverted claim on a downgrade (installed
+  // < lastApplied), where there's also no forward apply step to run.
+  const isForward = compareVersionsForward(installedVersion, lastApplied);
+  const description = isForward
+    ? `Running v${installedVersion} > last applied v${lastApplied} — run apply to update`
+    : `Running v${installedVersion} is behind last applied v${lastApplied} — likely a downgrade or local dev build; no apply action for this, sentinel will not move backwards`;
   return [{
     category: "version-update",
-    description: `Installed v${installedVersion} > last applied v${lastApplied} — run apply to update`,
-    details: `Apply categories: directories, templates, starter-relocation${kgType === "project-local" ? ", stray-knowledge-dir" : ""}`,
+    // issue-32's own resolution flagged a label collision: this string used to say
+    // "Installed", but installedVersion here is what THIS process/inspect-call is
+    // running (resolveInstalledVersion() -- the plugin.json this specific call
+    // resolves from), a different concept from c3's stale-process warning, which
+    // separately uses "installed" for the freshest version scanned across sibling
+    // plugin-cache directories (possibly newer than what this very call sees).
+    // Relabeled to "Running" so the two warnings, if both fire, never show two
+    // different numbers both claiming to be "installed".
+    description,
+    details: isForward
+      ? `Apply categories: directories, templates, starter-relocation${kgType === "project-local" ? ", stray-knowledge-dir" : ""}`
+      : "No apply categories apply to a downgrade.",
   }];
+}
+
+function resolveInstalledVersion(): string {
+  try {
+    const pluginJsonPath = path.join(getPluginRoot(), ".claude-plugin", "plugin.json");
+    const parsed = JSON.parse(fs.readFileSync(pluginJsonPath, "utf-8")) as { version?: string };
+    if (parsed.version) return parsed.version;
+  } catch {
+    // Not running from an installed plugin-cache directory (repo working
+    // tree, Jest) -- fall back to mcp-server's own build-time version so
+    // this never throws and inspect/apply keep working outside a real
+    // plugin install.
+  }
+  return handleVersion().installed;
+}
+
+// c2 Task 0: numeric, component-by-component forward-only compare. Not a
+// reuse of c3's compareSemver -- the orchestration's dependency-ordering
+// section rules out a c2<->c3 file dependency, so this is a local port of
+// the same logic shape. Returns true only when a > b (strictly forward);
+// equal or backward both return false.
+function compareVersionsForward(a: string, b: string): boolean {
+  const aParts = a.split(".");
+  const bParts = b.split(".");
+  const maxLen = Math.max(aParts.length, bParts.length);
+  for (let i = 0; i < maxLen; i++) {
+    const av = parseInt((aParts[i] ?? "0").replace(/[^0-9]/g, "") || "0", 10);
+    const bv = parseInt((bParts[i] ?? "0").replace(/[^0-9]/g, "") || "0", 10);
+    if (av > bv) return true;
+    if (av < bv) return false;
+  }
+  return false;
 }
 
 function updateLastAppliedVersion(installedVersion: string, graphName: string): void {
@@ -2473,7 +2526,7 @@ export async function handleUpgrade(
   toolCallMeta?: Record<string, unknown>
 ): Promise<HandleUpgradeResult> {
   // Under Jest/ts-jest __SERVER_VERSION__ is undefined → installedVersion = "0.0.0"
-  const installedVersion = handleVersion().installed;
+  const installedVersion = resolveInstalledVersion();
   const config = readConfig();
   const cwd = resolveEffectiveCwd({ processCwd: process.cwd(), toolCallMeta });
 
@@ -2663,6 +2716,29 @@ export async function handleUpgrade(
     result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config, target.name));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
+
+    // c2 Task 0: a clean inspect (nothing else pending) with installed
+    // genuinely ahead of lastAppliedVersion has nothing for the user to
+    // apply -- "version-update" is inspect-only (never a member of
+    // ApplyCategory), so a graph with no other pending items could never
+    // clear this via apply. Auto-advance the sentinel and drop the item
+    // instead of reporting something the user can never act on. Never on a
+    // downgrade/equal case (forward-only), and never when other real work
+    // is also pending (that would hide it, or rewrite the sentinel ahead of
+    // categories the user hasn't actually applied yet).
+    if (!("error" in target)) {
+      const lastApplied = (config.graphs[target.name] as unknown as Record<string, unknown>).lastAppliedVersion as string | undefined;
+      if (
+        result.upgrades.length === 1 &&
+        result.upgrades[0].category === "version-update" &&
+        lastApplied &&
+        compareVersionsForward(installedVersion, lastApplied)
+      ) {
+        updateLastAppliedVersion(installedVersion, target.name);
+        result.upgrades = [];
+      }
+    }
+
     return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
   }
 

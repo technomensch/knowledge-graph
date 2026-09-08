@@ -38,6 +38,23 @@ Then follow the same `/plugin uninstall` → `/plugin install` steps above.
 
 ---
 
+## "Process is running an older version" warning
+
+As of v0.7.9, a tool response may include a warning like:
+
+```
+KMGraph process is running v0.7.7, but v0.7.9 is now installed.
+Run /reload-plugins (or restart the MCP server) to pick up the update.
+```
+
+This is closing the exact gap the "Plugin update not taking effect" section above describes, from the other direction: instead of you noticing something is stale, the MCP server process itself now detects that a newer version is installed on disk than what it's running in memory, and says so — on the first tool call after it notices, and on every call after that until you reload.
+
+**Why this happens:** Node doesn't hot-reload. A session opened before a plugin update lands keeps executing the old in-memory code indefinitely, even after `/plugin update` and the on-disk files are current. This check catches that mid-session instead of leaving it silent.
+
+**What to do:** the same fix as "Plugin update not taking effect" above — `/reload-plugins`, or fully quit and relaunch, or restart the MCP server (`/mcp restart kmgraph`). No data is at risk; this is a read-only detection with no automatic restart (restarting the process out from under the host would break the connection mid-session).
+
+---
+
 ## Commands do not appear in Claude Code autocomplete
 
 - Verify the plugin is loaded: start Claude Code with `claude --plugin-dir /path/to/knowledge-graph`

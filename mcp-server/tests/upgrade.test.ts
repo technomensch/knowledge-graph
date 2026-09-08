@@ -1572,17 +1572,22 @@ describe("T-50: checkVersionMismatch detects installed > lastApplied", () => {
   // Under Jest, __SERVER_VERSION__ is undefined → handleVersion().installed = "0.0.0"
   const getInstalledVersion = () => handleVersion().installed; // "0.0.0" under Jest
 
-  test("reports version-update item when lastAppliedVersion is stale", async () => {
+  test("reports version-update item when installed is genuinely ahead of lastAppliedVersion", async () => {
     const kgRoot = makeTempDir("t50");
     tempDirs.push(kgRoot);
     scaffoldKg(kgRoot);
-    mockActiveKg(kgRoot, { lastAppliedVersion: "0.0.0-old" }); // any value != installed
+    // Forward-only: the item only fires when installed > lastApplied, so
+    // mock a real plugin manifest version ahead of lastApplied rather than
+    // relying on Jest's fixed "0.0.0" fallback (which can't be "behind"
+    // anything).
+    mockActiveKg(kgRoot, { lastAppliedVersion: "0.7.7" });
+    mockPluginManifestVersion("0.7.9");
 
     const result = await handleUpgrade({});
     const parsed = parseResult(result);
     const item = parsed.upgrades.find((u) => u.category === "version-update");
     expect(item).toBeDefined();
-    expect(item!.description).toContain("0.0.0-old");
+    expect(item!.description).toContain("0.7.7");
   });
 
   test("no version-update item when lastAppliedVersion matches installed", async () => {
@@ -1607,6 +1612,72 @@ describe("T-50: checkVersionMismatch detects installed > lastApplied", () => {
     const parsed = parseResult(result);
     const item = parsed.upgrades.find((u) => u.category === "version-update");
     expect(item).toBeUndefined(); // absent = first install, not a mismatch
+  });
+});
+
+// ---------------------------------------------------------------------------
+// c2 Task 0: resolveInstalledVersion() reads the plugin manifest, and a
+// clean inspect (nothing else pending) auto-advances lastAppliedVersion when
+// installed is genuinely ahead — never on a downgrade/equal case.
+// ---------------------------------------------------------------------------
+
+function mockPluginManifestVersion(version: string): void {
+  const mockPluginRoot = makeTempDir("c2-task0-plugin");
+  tempDirs.push(mockPluginRoot);
+  const manifestDir = path.join(mockPluginRoot, ".claude-plugin");
+  fs.mkdirSync(manifestDir, { recursive: true });
+  fs.writeFileSync(path.join(manifestDir, "plugin.json"), JSON.stringify({ version }), "utf-8");
+  const { getPluginRoot } = jest.requireMock("../src/utils.js") as { getPluginRoot: jest.Mock };
+  getPluginRoot.mockReturnValueOnce(mockPluginRoot);
+}
+
+describe("c2 Task 0: lastAppliedVersion auto-clears on a clean forward-only inspect", () => {
+  test("clean graph, installed genuinely ahead: sentinel auto-advances, version-update not reported", async () => {
+    const kgRoot = makeTempDir("c2t0-forward");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    fs.writeFileSync(path.join(kgRoot, "README.md"), "# Test KG\n", "utf-8"); // avoid missing-root-readme noise
+    mockActiveKg(kgRoot, { lastAppliedVersion: "0.7.7" });
+    mockPluginManifestVersion("0.7.9");
+
+    let writtenConfig: ReturnType<typeof readConfig> | undefined;
+    (writeConfig as jest.Mock).mockImplementation((cfg) => { writtenConfig = cfg; });
+
+    const result = await handleUpgrade({});
+    const parsed = parseResult(result);
+
+    const item = parsed.upgrades.find((u) => u.category === "version-update");
+    expect(item).toBeUndefined();
+
+    expect(writtenConfig).toBeDefined();
+    const lastApplied = (writtenConfig!.graphs["test-kg"] as unknown as Record<string, unknown>).lastAppliedVersion;
+    expect(lastApplied).toBe("0.7.9");
+  });
+
+  test("clean graph, installed BEHIND lastAppliedVersion (downgrade/local dev build): sentinel never moves backwards", async () => {
+    const kgRoot = makeTempDir("c2t0-backward");
+    tempDirs.push(kgRoot);
+    scaffoldKg(kgRoot);
+    mockActiveKg(kgRoot, { lastAppliedVersion: "0.7.9" });
+    mockPluginManifestVersion("0.7.5");
+
+    let writeConfigCalled = false;
+    (writeConfig as jest.Mock).mockImplementation(() => { writeConfigCalled = true; });
+
+    const result = await handleUpgrade({});
+    const parsed = parseResult(result);
+
+    // Inequality-only check still reports the mismatch in this direction
+    // (per spec), but with direction-aware wording -- no longer the inverted
+    // "Running vX > last applied vY" claim, and no bogus "run apply" call to
+    // action for a downgrade.
+    const item = parsed.upgrades.find((u) => u.category === "version-update");
+    expect(item).toBeDefined();
+    expect(item!.description).toContain("is behind last applied");
+    expect(item!.description).not.toContain(">");
+
+    // The sentinel must never auto-advance backwards either.
+    expect(writeConfigCalled).toBe(false);
   });
 });
 

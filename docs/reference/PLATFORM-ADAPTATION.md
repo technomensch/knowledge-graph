@@ -26,6 +26,7 @@ This guide focuses on **platform capabilities and usage patterns** after install
 |----------|-----------------|-------------|----------|
 | **Claude Code** | Full | ✅ | 22 commands |
 | **Codex CLI** | Full | ✅ | 22 commands + skills |
+| **Gemini CLI** | Medium | ✅ (via MCP) | None (use MCP tools) |
 | **Cursor** | Medium | ✅ (via MCP) | None (use MCP tools) |
 | **Windsurf** | Medium | ✅ (via MCP) | None (use MCP tools) |
 | **Continue.dev** | Medium | ✅ (via MCP) | Custom slash commands |
@@ -88,6 +89,18 @@ codex plugin add kmgraph@knowledge-management-graph
 ```
 
 **For installation:** See [INSTALL.md](../INSTALL.md) or use the commands above.
+
+---
+
+## Gemini CLI
+
+**Configuration:** `/kmgraph:kmg-init`'s platform-configuration step (§ Step 1.11) writes `GEMINI.md` at the project root from `core/default-templates/AGENTS-template.md`, giving Gemini CLI the same behavioral rules pointer Claude Code reads from `CLAUDE.md`.
+
+**Session-start upgrade check (v0.7.9 — ADR-055 amendment, Component B):** the same step also deploys `.gemini/kmgraph-upgrade-check.sh` (from the `core/scripts/gemini-upgrade-check.sh` template) and registers it under `.gemini/settings.json`'s `hooks.SessionStart` array. It does a cheap semver comparison — installed plugin version vs. the resolved graph's `lastAppliedVersion` in `kg-config.json` — with no MCP/LLM round-trip, mirroring Claude Code's `hooks-master.sh` check (see [Hooks Reference](hooks.md)). Gemini CLI's own hook contract requires JSON-only stdout; the hook emits `{"systemMessage": "..."}` when genuinely behind, `{}` otherwise.
+
+- The deployed script's plugin cache root is baked in at deploy time (`${CLAUDE_PLUGIN_ROOT}`'s parent directory) since Gemini CLI never sets `CLAUDE_PLUGIN_ROOT` itself when it later invokes the hook. It scans sibling version directories under that root and takes the numeric-max as the freshest installed version, so a later plugin upgrade is detected without redeploying the hook.
+- Already-configured projects (created before this feature shipped) get the hook retrofitted via `/kmgraph:kmg-init` → the upgrade-inspector's Gemini CLI retrofit check, once approved from the Apply/Choose/Skip menu.
+- Idempotent: re-running `/kmgraph:kmg-init` replaces only the plugin's own `hooks.SessionStart` entry (matched by a `"name": "kmgraph-upgrade-check"` marker), leaving any hand-written hook entries untouched.
 
 ---
 
