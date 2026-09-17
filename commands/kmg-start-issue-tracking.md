@@ -493,6 +493,8 @@ If yes, run it. If no, ensure a task is added to the plan to update the KG after
 The `solution-approach.md` MUST link to the resulting lesson or updated entry in the Knowledge Graph. Use `/kmgraph:kmg-link-issue` to create bidirectional references.
 
 ### 6.4: Release Documentation Hook
+This step owns ROADMAP.md + CHANGELOG.md sync only. User-facing release docs (README, CHANGELOG, etc.) are handled separately by `/kmgraph:kmg-update-doc`'s Tier-1 pass — see `commands/kmg-update-doc.md`.
+
 **Mandatory Question:** Present this question and wait for a user response:
 
 > "Would you like me to run **`/kmgraph:kmg-update-issue-plan`** now to synchronize the ROADMAP and CHANGELOG before I stage and push these initialization files? **(yes / no)**"

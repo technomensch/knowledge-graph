@@ -58,7 +58,7 @@ Heavy-lift task handlers that keep main context clean:
 
 - **Plans:** Plans are **LOCAL-ONLY and gitignored** (`knowledge/plans/` is in `.gitignore`). Work in `~/.claude/plans/` first, then copy to `knowledge/plans/` for local reference during implementation. **Do NOT attempt to commit plan files.** Only commit implementation work (code, tests, docs).
 - **Branches:** Push to origin, await user review (never auto-merge)
-- **Versions:** Sync package.json + plugin.json before pushing (mcp-server independent)
+- **Versions:** Before pushing, sync the version number across every file listed in `knowledge/rules.md § Version Files` — that section is the single authoritative checklist (package.json, all plugin manifests, README's several version mentions, CHANGELOG, INSTALL.md, and mcp-server/package.json conditionally). `scripts/pre-push-gate.sh` Gate 2 checks most of this automatically and flags drift — advisory only, does not block the push.
 - **Docs updates:** Update affected reference and guide pages when behavior changes
 
 ## Documentation Updates Workflow

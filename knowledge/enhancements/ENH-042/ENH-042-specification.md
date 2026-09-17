@@ -36,6 +36,8 @@ Separately: `README.md` itself carried **two mutually inconsistent version menti
 This ENH documents the finding; it does not itself implement the fix (no plan/branch scoped yet — see Explicitly Out of Scope). A future implementation should consider:
 
 1. **A single, authoritative version-bump checklist** that explicitly lists every file touched by a version change in one place: `package.json`, `.claude-plugin/plugin.json`, `README.md` (badge line **and** footer "Current Version" line **and** a new Feature Highlights entry), `CHANGELOG.md`, `ROADMAP.md`. `mcp-server/package.json` is explicitly independent per existing `CLAUDE.md` text and should stay out of this list, not be added by mistake.
+
+   **Superseded (v0.7.10):** `knowledge/rules.md § Version Files` turned out to already be this authoritative checklist (more complete than this item's own list — it also covers `.codex-plugin/plugin.json`, `.claude-plugin/marketplace.json`'s embedded version, and `INSTALL.md`'s upgrade table). `CLAUDE.md`'s "Versions:" line now points there instead of duplicating a shorter list. Separately, `scripts/pre-push-gate.sh` Gate 2 (added after this item was written) checks `mcp-server/package.json` *conditionally* — only when `mcp-server/src/` changed on the branch — which contradicts this line's "should stay out of this list" instruction. That conditional check is the correct behavior (unconditional independence was itself a source of drift); this line's "independent" claim is stale as of v0.7.10 and superseded by the gate's logic.
 2. **Reconcile `kmg-execute-plan`'s Step 6.4 and `kmg-update-doc`'s Tier-1 list** so they either share one definition of "release sync scope" or explicitly cross-reference each other's scope instead of silently disagreeing on whether README and ROADMAP belong in the same pass.
 3. **A mechanical check** (hook or pre-push gate, mirroring the existing `pre-push-gate.sh` pattern already used for docs-impact-scan) that fails loudly if `package.json` and `.claude-plugin/plugin.json` versions differ from each other, or if README's badge doesn't match `package.json`, at push time — turning CLAUDE.md's existing "Sync package.json + plugin.json before pushing" prose rule into an enforced gate instead of an easily-skipped instruction.
 4. Fix the remaining stale `COMMAND-GUIDE.md`/`GETTING-STARTED.md`-style bare-filename mentions elsewhere in `commands/kmg-update-doc.md` (lines 20, 35, 64, 483, 490, 562 per this session's grep) if a fuller cleanup pass is later scoped — this ENH only fixed the one operationally load-bearing Tier-1 list entry, not every illustrative mention in the file.
@@ -73,6 +75,11 @@ This ENH documents the finding; it does not itself implement the fix (no plan/br
   (added in commit `a3b540ef`, "v0.5.9.3 — docs enforcement gates", predates this ENH) already
   compares `package.json` against `plugin.json`/`codex-plugin.json`/`marketplace.json` and
   flags README version-line mismatches at push time — the mechanical check item 3 asked for.
-- [ ] Reconciling the three disconnected mechanisms (items 1-2) is still open — Gate 2 is
-  advisory only, so it doesn't force items 1-2's authoritative-checklist work to happen (e.g.
-  README's footer version line was still one release stale as of this note, 2026-09-05).
+- [x] Reconciled (v0.7.10): `commands/kmg-update-doc.md`'s Excluded line and
+  `commands/kmg-start-issue-tracking.md`'s Step 6.4 section now cross-reference each other's
+  scope (ROADMAP+CHANGELOG vs. Tier-1 user-facing docs) instead of silently disagreeing, with an
+  explicit caveat that Step 6.4's only verifier is Gemini/Antigravity-only. The authoritative
+  checklist item 1 asked for turned out to already exist at `knowledge/rules.md § Version Files`
+  (more complete than anything drafted from scratch) — `CLAUDE.md`'s Versions line now points
+  there instead of duplicating it. Stale `COMMAND-GUIDE.md`/`GETTING-STARTED`/`CONCEPTS.md`
+  references in `kmg-update-doc.md` (item 4, lines 20/35/64/172/212/470/483/490/562) fixed.
