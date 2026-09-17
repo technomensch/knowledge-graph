@@ -14,7 +14,8 @@ const config = {
   projectName: 'knowledge-graph',
   trailingSlash: undefined,
 
-  onBrokenLinks: 'warn',
+  onBrokenLinks: 'throw',
+  onBrokenAnchors: 'throw',
 
   i18n: {
     defaultLocale: 'en',
@@ -27,7 +28,7 @@ const config = {
     mermaid: true,
     format: 'detect',
     hooks: {
-      onBrokenMarkdownLinks: 'warn',
+      onBrokenMarkdownLinks: 'throw',
     },
   },
 
