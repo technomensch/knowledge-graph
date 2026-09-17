@@ -3,7 +3,7 @@
 
 Initialize and manage meta-issue tracking for complex, multi-attempt problems that evolve understanding over time.
 
-**Based on:** ADR-008 Meta-Issue Tracking Pattern
+**Based on:** ADR-072 Meta-Issue Tracking Pattern
 
 ---
 
@@ -216,7 +216,9 @@ cp "${CLAUDE_PLUGIN_ROOT}/core/default-templates/meta-issue/attempt-template/"* 
 2. Create folder: `attempts/[NNN]-[slug]/`
 3. Copy attempt template files
 4. Update implementation-log.md with new attempt entry
-5. Link to plan if exists
+5. Update README.md's Timeline Summary table with a new row for this attempt
+6. Update description.md's attempt-count/status field to reflect the new total
+7. Link to plan if exists
 
 **Example:**
 ```bash
@@ -231,7 +233,17 @@ cp "${CLAUDE_PLUGIN_ROOT}/core/default-templates/meta-issue/attempt-template/"* 
 echo "## Attempt 003: Connection Pooling (2026-02-12)" >> "${meta_dir}/implementation-log.md"
 echo "**Status:** In Progress" >> "${meta_dir}/implementation-log.md"
 echo "**Plan:** [v2.3.1](../../plans/v2.3.1-connection-pooling.md)" >> "${meta_dir}/implementation-log.md"
+
+# Update README.md's Timeline Summary table (append new row, same step, not deferred)
+# | 003 | Connection Pooling | 2026-02-12 | In Progress |
+sed -i.bak "/^## Timeline Summary/,/^$/ s/^$/| 003 | Connection Pooling | 2026-02-12 | In Progress |\n/" \
+   "${meta_dir}/README.md" && rm -f "${meta_dir}/README.md.bak"
+
+# Update description.md's attempt-count/status field in the same step
+sed -i.bak "s/^\*\*Attempts:\*\* .*/\*\*Attempts:\*\* 3/" "${meta_dir}/description.md" && rm -f "${meta_dir}/description.md.bak"
 ```
+
+**Why this matters:** `implementation-log.md` is the detailed record, but `README.md`'s Timeline Summary and `description.md`'s attempt-count/status are the fields readers check first. If only `implementation-log.md` updates, those summary fields silently drift out of sync with the real attempt count — exactly the kind of gap found in `docs/examples/meta-issue/example-performance-saga/` (see ADR-072 Addendum). All three files update in this same step, never as a separate manual task.
 
 ---
 
@@ -245,7 +257,8 @@ Enforces that each attempt documents a distinct hypothesis before execution. Ste
 2. Pre-populate `solution-approach.md` hypothesis field with provided description
 3. Require confirmation that this hypothesis is distinct from prior attempts
 4. Update `implementation-log.md`
-5. If attempt count ≥ 3: remind user to invoke `stuck-work-escalation` skill if not already active
+5. Update `README.md`'s Timeline Summary table with a new row for this attempt (include the hypothesis in the row) and update `description.md`'s attempt-count/status field — same step as `implementation-log.md`, not a separate task
+6. If attempt count ≥ 3: remind user to invoke `stuck-work-escalation` skill if not already active
 
 ---
 
@@ -498,5 +511,5 @@ Updated: description.md (current understanding section)
 
 **Created:** 2026-02-12
 **Version:** 1.0 (Plugin version)
-**Based On:** ADR-008 Meta-Issue Tracking Pattern
+**Based On:** ADR-072 Meta-Issue Tracking Pattern
 **Related Skills:** /kmgraph:kmg-capture-lesson, /kmgraph:kmg-session-summary

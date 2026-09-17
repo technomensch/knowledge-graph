@@ -4,8 +4,8 @@
 
 Comprehensive catalog of all lessons-learned documents.
 
-**Total Lessons:** 63 (10 architecture, 26 process, 21 patterns, 6 debugging)
-**Last Updated:** 2026-08-04
+**Total Lessons:** 64 (10 architecture, 26 process, 22 patterns, 6 debugging)
+**Last Updated:** 2026-09-17
 
 > **Known issues in this index** (see [issue tracker](../issues/README.md) for permanent tracking):
 > - Two files live at the top of `lessons-learned/` instead of inside their declared category folder: `Lessons_Learned_gh_issue_create_omission.md` (process) and `Lessons_Learned_InBand_Version_Warning_Burst_Cadence_Pattern.md` (patterns). Listed below under their correct category; not physically moved.
@@ -66,8 +66,9 @@ Comprehensive catalog of all lessons-learned documents.
 
 ---
 
-### Patterns Lessons (21 total)
+### Patterns Lessons (22 total)
 
+- [Bundled Example Content Drifts Like Real Data; Ported Patterns Need Their ADR Citation Verified](patterns/Lessons_Learned_Patterns_Bundled_Example_Content_Drift_And_Dangling_Adr_Citations.md) — 2026-09-17
 - [Dispatch, Don't Duplicate: Corpus-Verify Before Backfilling](patterns/Lessons_Learned_Patterns_Dispatch_Dont_Duplicate_Corpus_Verify_Before_Backfilling.md) — 2026-08-19
 - [Fix Ownership Follows the Root-Cause KG, Not the Code's Location](patterns/Lessons_Learned_Patterns_Fix_Ownership_Follows_Root_Cause_KG_Not_Code_Location.md) — 2026-07-10
 - [LLM Compliance Gate for Branching Commands](patterns/Lessons_Learned_Patterns_LLM_Compliance_Gate_For_Branching_Commands.md) — 2026-06-21
@@ -110,6 +111,7 @@ Comprehensive catalog of all lessons-learned documents.
 ## Chronological Index
 
 **2026**
+- [2026-09-17] [Bundled Example Content Drifts Like Real Data; Ported Patterns Need Their ADR Citation Verified](patterns/Lessons_Learned_Patterns_Bundled_Example_Content_Drift_And_Dangling_Adr_Citations.md)
 - [2026-08-19] [Dispatch, Don't Duplicate: Corpus-Verify Before Backfilling](patterns/Lessons_Learned_Patterns_Dispatch_Dont_Duplicate_Corpus_Verify_Before_Backfilling.md)
 - [2026-07-14] [Resource-Path Migrations Must Grep the Prompt Layer, Not Just the Server Layer](process/Lessons_Learned_Process_Migration_Must_Grep_Prompt_Layer_Not_Just_Server_Layer.md)
 - [2026-07-12] [os.homedir() Stale Cache On macOS](debugging/Lessons_Learned_os_homedir_Stale_Cache_On_macOS.md)
@@ -179,7 +181,7 @@ Comprehensive catalog of all lessons-learned documents.
 
 **#architecture** (10 lessons) — see [By Category](#architecture-lessons-10-total) above
 **#process** (25 lessons) — see [By Category](#process-lessons-25-total) above
-**#patterns** (21 lessons) — see [By Category](#patterns-lessons-21-total) above
+**#patterns** (22 lessons) — see [By Category](#patterns-lessons-22-total) above
 **#debugging** (4 lessons) — see [By Category](#debugging-lessons-4-total) above
 
 Fine-grained per-lesson tags are in each file's own `tags:` frontmatter — use `/kmgraph:recall "<keyword>"` (FTS5 search) to search across them rather than maintaining a hand-built reverse index here; at this scale a manually maintained fine-grained tag cloud drifts out of sync faster than it can be kept useful.

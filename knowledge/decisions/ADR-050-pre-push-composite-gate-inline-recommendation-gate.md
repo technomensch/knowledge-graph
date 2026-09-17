@@ -121,6 +121,23 @@ The [[ADR-049-review-audit-protocol-post-plan-pre-push-review-governance]] Revie
 
 ---
 
+## Addendum (2026-09-17, v0.7.10 — issue-13 docs-build CI gate)
+
+**Does this change ADR-050's advisory-injection model?** No. `pre-push-gate.sh` (Gate 8 included) remains exactly as decided in Part A above: `exit 0` always, advisory-only, injects into `additionalContext`, never blocks `git push`. Nothing in this addendum touches that.
+
+**What's new:** `.github/workflows/docs.yml` gained a `pull_request: branches: [main]` trigger (alongside its existing `push` trigger), running the same `npm run build` Docusaurus build on every PR — with the "Deploy to GitHub Pages" step gated to `if: github.event_name == 'push'` so PRs build-check only, never deploy. A PR whose build fails now shows a **failing, blocking GitHub check on the PR itself** — genuinely enforced, not advisory.
+
+**Why this is a deliberate, narrow exception rather than a reversal of Part A's philosophy:**
+
+1. **Different layer.** ADR-050 Part A governs the local `PreToolUse Bash` pre-push hook — a mechanism that fires inside a developer's own session, before a commit ever leaves their machine. The new gate lives in CI, on GitHub's infrastructure, evaluated against a PR — a different enforcement point entirely, not a change to how `pre-push-gate.sh` behaves.
+2. **Much lower false-positive risk.** ADR-050's advisory-only stance exists because the local gates (version-sync heuristics, docs-impact-scan flag presence, backlink symmetry, numbering collisions) are judgment-based or heuristic — exactly the kind of check that can wrongly flag legitimate work, which is why hard-blocking them was rejected. The Docusaurus build's own link/anchor validation is not a heuristic: it is the same renderer that builds the production site, checking whether a link or anchor resolves. There is no plausible "false positive" — either the target exists or it doesn't.
+3. **The failure mode is objectively binary, not a judgment call.** A failed docs build means the site literally cannot render that page as linked. This is unlike the other local gates, which flag drift, staleness, or missing process steps — all things a maintainer might reasonably decide to accept or defer. A broken link/anchor has no legitimate "accept and proceed" case once `onBrokenLinks`/`onBrokenAnchors` are `'throw'` (issue-13, this same branch) — it is simply broken.
+4. **Relationship to Gate 8:** Gate 8 (local, advisory, pre-push) and this CI check (blocking, PR-time) now cover the same underlying build in two complementary ways — Gate 8 catches it before a push even happens; the CI check catches it on the PR if Gate 8 was skipped, bypassed, or not run (e.g., pushed from a machine without the plugin's hooks installed). Neither supersedes the other.
+
+This addendum should not be read as license to add further hard-blocking CI gates without similar justification — the low-false-positive-rate and binary-failure-mode reasoning above is specific to a build-validation check, not a general precedent for CI enforcement over this project's advisory philosophy.
+
+---
+
 ## Related
 
 - [ADR-012](ADR-012-hook-security-model.md) — Hook security contract; `exit 0` advisory model
