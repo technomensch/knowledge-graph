@@ -266,9 +266,9 @@ Sources consulted while solving this problem:
 ## Related Documentation
 
 **Knowledge Graph:**
-- [Platform Agnostic Paths](../../knowledge/patterns.md#platform-agnostic-paths) — Implementation details for relative path enforcement.
-- [Absolute Path Regression](../../knowledge/gotchas.md#absolute-path-regression) — Common pitfalls of path handling in AI agents.
-- [Portability First](../../knowledge/concepts.md#portability-first) — Core project philosophy regarding environment isolation.
+- [Platform Agnostic Paths](../../knowledge/sample-patterns.md) — Implementation details for relative path enforcement.
+- [Absolute Path Regression](../../knowledge/sample-gotchas.md) — Common pitfalls of path handling in AI agents.
+- [Portability First](../../knowledge/sample-concepts.md) — Core project philosophy regarding environment isolation.
 
 ---
 

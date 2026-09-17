@@ -267,8 +267,8 @@ Sources consulted while solving this problem:
 ## Related Documentation
 
 **Knowledge Graph:**
-- [Branch Naming Convention](../../knowledge/patterns.md#branch-naming-convention) — Standards for naming preserved branches.
-- [Audit Trail First](../../knowledge/concepts.md#audit-trail-first) — Rationale for prioritizing history over repo "cleanliness".
+- [Branch Naming Convention](../../knowledge/sample-patterns.md) — Standards for naming preserved branches.
+- [Audit Trail First](../../knowledge/sample-concepts.md) — Rationale for prioritizing history over repo "cleanliness".
 
 ---
 

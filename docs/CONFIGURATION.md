@@ -244,7 +244,7 @@ node core/mcp-server.js
 # Should see: "MCP server listening..."
 ```
 
-See [core/docs/PLATFORM-ADAPTATION.md#mcp-server](reference/PLATFORM-ADAPTATION.md#mcp-server) for troubleshooting.
+See [core/docs/PLATFORM-ADAPTATION.md#mcp-tools-reference](reference/PLATFORM-ADAPTATION.md#mcp-tools-reference) for troubleshooting.
 
 ---
 

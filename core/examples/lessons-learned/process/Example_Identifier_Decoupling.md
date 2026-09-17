@@ -125,8 +125,8 @@ Sources consulted while solving this problem:
 ## Related Documentation
 
 **Knowledge Graph:**
-- [Identifier Decoupling](../../knowledge/patterns.md#identifier-decoupling) — The core pattern derived from this lesson.
-- [Cross-Referencing](../../knowledge/concepts.md#cross-referencing) — Methods for linking disparate ID systems safely.
+- [Identifier Decoupling](../../knowledge/sample-patterns.md#identifier-decoupling) — The core pattern derived from this lesson.
+- [Cross-Referencing](../../knowledge/sample-concepts.md#cross-referencing) — Methods for linking disparate ID systems safely.
 
 ---
 

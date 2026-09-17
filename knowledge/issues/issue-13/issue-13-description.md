@@ -1,7 +1,7 @@
 ---
 id: issue-13
 type: Hardening
-status: partially-implemented
+status: resolved
 github-issue: "#170"
 branch: none
 created: 2026-07-14
@@ -53,6 +53,10 @@ Added `scripts/pre-push-gate.sh` Gate 8: runs `npm run build` on every push, bou
 
 **Deliberately not done:** `onBrokenLinks`/`onBrokenMarkdownLinks` in `docusaurus.config.js` stay `'warn'`, not flipped to `'throw'` — see "Explicitly Deferred" below, unchanged. This gate is the advisory half of solution-approach.md's Option 2; Option 1 (hard-fail) still waits on clusters 2+3.
 
-## Explicitly Deferred (throw-mode, Mode 3 — Track only)
+## Resolved (v0.7.10, branch v0.7.10-fix-release-doc-sync-and-broken-links)
 
-Flipping `onBrokenLinks` to `'throw'` (solution-approach.md's Option 1) should land *after* broken-link clusters 2 and 3 (the examples/ relative-path mismatch and meta-issue scaffold nav, deferred separately — see session summary `docs-site-broken-links-audit` snapshot) are also fixed, since flipping to `'throw'` immediately would hard-fail CI on those still-broken clusters. This branch's Gate 8 (above) is advisory-only specifically to respect this sequencing constraint.
+Clusters 2+3 (examples/ `sample-` filename mismatch + 5 dead anchors + ADR-005 reference; meta-issue scaffold depth/nonexistent-attempt/dead-directory bugs) fixed, plus a third, previously-untracked cluster found this release (`docs/specs/2026-07-11-kg-config-location-refactor-design.md` linking into excluded `knowledge/` content) — de-linked to plain text. Verified via a clean, cache-cleared `npm run build`: zero broken links site-wide. `onBrokenLinks`/`onBrokenMarkdownLinks` flipped from `'warn'` to `'throw'` in `docusaurus.config.js` (Option 1 from `solution-approach.md`) — future broken links now hard-fail the build instead of silently shipping.
+
+**Scope note (per issue-26's own instruction to this issue, not to be silently assumed away):** this closes broken-link detection for the Docusaurus `docs/` build only. `commands/*.md` and other non-`docs/` content (as issue-26 found for `commands/kmg-start-issue-tracking.md`'s own stale reference) remain unscanned by any link-check mechanism — a broken reference inside a command file would not be caught by this fix.
+
+**Addendum (2026-09-17, same branch v0.7.10-fix-release-doc-sync-and-broken-links):** beyond the `onBrokenLinks`/`onBrokenAnchors` throw-mode flip recorded above, a PR-time CI build gate was also added to `.github/workflows/docs.yml` (`pull_request: branches: [main]` trigger, build-only — the deploy step stays gated to actual pushes to `main`). This closes the gap the original problem statement identified in `.github/workflows/docs.yml` above: previously a broken link/anchor introduced by a future PR would merge into `main` cleanly and only surface as a post-merge failed deploy; it now shows as a failing check on the PR itself, before merge. See `knowledge/decisions/ADR-050-pre-push-composite-gate-inline-recommendation-gate.md`'s addendum for why this CI-level hard gate doesn't conflict with this project's advisory-only local-gate philosophy.

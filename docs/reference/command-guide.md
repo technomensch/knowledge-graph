@@ -73,11 +73,11 @@ Commands work across platforms, but full automation is Claude Code-specific.
 
 Get the knowledge graph running and configure how it works.
 
-- [🟢 `/kmgraph:kmg-init`](#-kmgraphinit) — Initialize a new knowledge graph
-- [🟡 `/kmgraph:kmg-init-personal-kg`](#-kmgraphinit-personal-kg) — Create personal KG for cross-project lessons
-- [🟡 `/kmgraph:kmg-list`](#-kmgraphlist) — View all configured knowledge graphs
-- [🟡 `/kmgraph:kmg-add-category`](#-kmgraphadd-category) — Add custom categories
-- [🟡 `/kmgraph:kmg-config-sanitization`](#-kmgraphconfig-sanitization) — Set up safety features for team sharing
+- [🟢 `/kmgraph:kmg-init`](#-kmgraphkmg-init) — Initialize a new knowledge graph
+- [🟡 `/kmgraph:kmg-init-personal-kg`](#-kmgraphkmg-init-personal-kg) — Create personal KG for cross-project lessons
+- [🟡 `/kmgraph:kmg-list`](#-kmgraphkmg-list) — View all configured knowledge graphs
+- [🟡 `/kmgraph:kmg-add-category`](#-kmgraphkmg-add-category) — Add custom categories
+- [🟡 `/kmgraph:kmg-config-sanitization`](#-kmgraphkmg-config-sanitization) — Set up safety features for team sharing
 - [🟡 `/kmgraph:kmg-upgrade`](#-kmgraphkmg-upgrade) — Check for and apply pending upgrades without the full init wizard
 
 #### Capture Pipeline (workflow order)
@@ -85,37 +85,37 @@ Get the knowledge graph running and configure how it works.
 The capture-pipeline cluster, grouped by the stage each command belongs to — read top to bottom in the order you'd actually use them, not alphabetically.
 
 **Capture**
-- [🟢 `/kmgraph:kmg-capture-lesson`](#-kmgraphcapture-lesson) — Capture problems solved and patterns discovered *(skills: `kmg-lesson-capture`, `kmg-capture-router`)*
+- [🟢 `/kmgraph:kmg-capture-lesson`](#-kmgraphkmg-capture-lesson) — Capture problems solved and patterns discovered *(skills: `kmg-lesson-capture`, `kmg-capture-router`)*
 
 **Structure**
-- [🟡 `/kmgraph:kmg-backfill`](#-kmgraphbackfill) — Index existing lessons/decisions/chat-history into the knowledge graph
+- [🟡 `/kmgraph:kmg-backfill`](#-kmgraphkmg-backfill) — Index existing lessons/decisions/chat-history into the knowledge graph
 
 **Track / Link**
-- [🔴 `/kmgraph:kmg-start-issue-tracking`](#-kmgraphstart-issue-tracking) — Systematic issue tracking with Git branches
-- [🔴 `/kmgraph:kmg-link-issue`](#-kmgraphlink-issue) — Connect lessons to GitHub issues
-- [🔴 `/kmgraph:kmg-meta-issue`](#-kmgraphmeta-issue) — Track multi-attempt bugs and features
+- [🔴 `/kmgraph:kmg-start-issue-tracking`](#-kmgraphkmg-start-issue-tracking) — Systematic issue tracking with Git branches
+- [🔴 `/kmgraph:kmg-link-issue`](#-kmgraphkmg-link-issue) — Connect lessons to GitHub issues
+- [🔴 `/kmgraph:kmg-meta-issue`](#-kmgraphkmg-meta-issue) — Track multi-attempt bugs and features
 
 **Propagate**
-- [🔴 `/kmgraph:kmg-update-issue-plan`](#-kmgraphupdate-issue-plan) — Sync progress with GitHub and plans
+- [🔴 `/kmgraph:kmg-update-issue-plan`](#-kmgraphkmg-update-issue-plan) — Sync progress with GitHub and plans
 
 **Session**
-- [🟡 `/kmgraph:kmg-session-summary`](#-kmgraphsession-summary) — Summarize important work sessions *(skill: `kmg-session-wrap`)*
-- [🔴 `/kmgraph:kmg-handoff`](#-kmgraphhandoff) — Create comprehensive handoff documentation *(agent: `session-documenter`)*
+- [🟡 `/kmgraph:kmg-session-summary`](#-kmgraphkmg-session-summary) — Summarize important work sessions *(skill: `kmg-session-wrap`)*
+- [🔴 `/kmgraph:kmg-handoff`](#-kmgraphkmg-handoff) — Create comprehensive handoff documentation *(agent: `session-documenter`)*
 
 #### Search & Document
 
 Find knowledge and manage documentation outside the capture pipeline.
 
-- [🟢 `/kmgraph:kmg-status`](#-kmgraphstatus) — Check current knowledge graph status
-- [🟢 `/kmgraph:kmg-recall`](#-kmgraphrecall) — Search across all knowledge entries
-- [🟡 `/kmgraph:kmg-extract-chat`](#-kmgraphextract-chat) — Export chat history to markdown
-- [🟡 `/kmgraph:kmg-update-doc`](#-kmgraphupdate-doc) — Update documentation with changes
+- [🟢 `/kmgraph:kmg-status`](#-kmgraphkmg-status) — Check current knowledge graph status
+- [🟢 `/kmgraph:kmg-recall`](#-kmgraphkmg-recall) — Search across all knowledge entries
+- [🟡 `/kmgraph:kmg-extract-chat`](#-kmgraphkmg-extract-chat) — Export chat history to markdown
+- [🟡 `/kmgraph:kmg-update-doc`](#-kmgraphkmg-update-doc) — Update documentation with changes
 
 #### Team & Sharing
 
 Share knowledge safely with team members.
 
-- [🟡 `/kmgraph:kmg-check-sensitive`](#-kmgraphcheck-sensitive) — Scan for sensitive data before sharing
+- [🟡 `/kmgraph:kmg-check-sensitive`](#-kmgraphkmg-check-sensitive) — Scan for sensitive data before sharing
 
 ---
 
@@ -139,7 +139,7 @@ Share knowledge safely with team members.
 3. Asks for optional custom prefixes per category
 4. Creates directory structure (`knowledge/`, `lessons-learned/`, `decisions/`, `sessions/`, `chat-history/`)
 5. Copies templates from the plugin
-6. Offers to create a **personal KG** at `~/.kmgraph/` for cross-project lessons (see [`/kmgraph:kmg-init-personal-kg`](#-kmgraphinit-personal-kg))
+6. Offers to create a **personal KG** at `~/.kmgraph/` for cross-project lessons (see [`/kmgraph:kmg-init-personal-kg`](#-kmgraphkmg-init-personal-kg))
 7. Optionally backfills from existing project context (README, CHANGELOG, lessons, decisions, chat history)
 8. Optionally installs a git post-commit hook for lesson capture suggestions
 9. Updates `.gitignore` based on chosen git strategy

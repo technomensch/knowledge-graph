@@ -295,11 +295,11 @@ Sources consulted while solving this problem:
 ## Related Documentation
 
 **Knowledge Graph:**
-- [Four-Pillar Memory](../../knowledge/patterns.md#four-pillar-memory) — Architectural overview of the system layers.
-- [Bidirectional Memory Sync](../../knowledge/patterns.md#bidirectional-memory-sync) — Logic for keeping local and global memory aligned.
+- [Four-Pillar Memory](../../knowledge/sample-patterns.md#four-pillar-memory) — Architectural overview of the system layers.
+- [Bidirectional Memory Sync](../../knowledge/sample-patterns.md#bidirectional-memory-sync) — Logic for keeping local and global memory aligned.
 
 **Architecture Decisions:**
-- [ADR-005: Memory System Architecture](../../decisions/ADR-005-example.md) — Core decision to adopt this patterns.
+- [ADR-002: Memory System Architecture](../../decisions/ADR-002-example.md) — Core decision to adopt this patterns.
 
 **Workflows:**
 - `/kmgraph:kmg-capture-lesson` - Standardized lesson extraction.

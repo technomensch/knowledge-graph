@@ -225,8 +225,8 @@ Sources consulted while solving this problem:
 ## Related Documentation
 
 **Knowledge Graph:**
-- [Automation Strategy](../../knowledge/concepts.md#automation-strategy) — Framework for automating history capture.
-- [Automated Orchestrator](../../knowledge/patterns.md#automated-orchestrator) — The pattern behind the `/extract-chat` command.
+- [Automation Strategy](../../knowledge/sample-concepts.md#automation-strategy) — Framework for automating history capture.
+- [Automated Orchestrator](../../knowledge/sample-patterns.md#automated-orchestrator) — The pattern behind the `/extract-chat` command.
 
 **Scripts:**
 - `core/scripts/extract_claude.py` - Local Claude history extractor.

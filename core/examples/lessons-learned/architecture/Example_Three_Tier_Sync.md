@@ -118,7 +118,7 @@ Sources consulted while solving this problem:
 ## Related Documentation
 
 **Knowledge Graph:**
-- [Multi-Tier Synchronization](../../knowledge/patterns.md#multi-tier-synchronization) — The architectural pattern used to solve this.
+- [Multi-Tier Synchronization](../../knowledge/sample-patterns.md#multi-tier-synchronization) — The architectural pattern used to solve this.
 
 ---
 

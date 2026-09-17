@@ -168,12 +168,12 @@ Sources consulted while solving this problem:
 ## Related Documentation
 
 **Knowledge Graph:**
-- [Positive Constraint Framing](../../knowledge/patterns.md#positive-constraint-framing) — Strategy for framing validation rules.
-- [Passive vs Active Enforcement](../../knowledge/concepts.md#passive-vs-active-enforcement) — Differentiating between documentation and code-based checks.
+- [Positive Constraint Framing](../../knowledge/sample-patterns.md#positive-constraint-framing) — Strategy for framing validation rules.
+- [Passive vs Active Enforcement](../../knowledge/sample-concepts.md#passive-vs-active-enforcement) — Differentiating between documentation and code-based checks.
 
 **Gotchas:**
-- [The Vibe-Coding Drift](../../knowledge/gotchas.md#the-vibe-coding-drift) — When agents prioritize current task progress over long-term rules.
-- [Instructional Saturation](../../knowledge/gotchas.md#instructional-saturation) — When agents ignore rules due to prompt length.
+- [The Vibe-Coding Drift](../../knowledge/sample-gotchas.md#the-vibe-coding-drift) — When agents prioritize current task progress over long-term rules.
+- [Instructional Saturation](../../knowledge/sample-gotchas.md#instructional-saturation) — When agents ignore rules due to prompt length.
 
 ---
 
