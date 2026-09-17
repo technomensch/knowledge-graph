@@ -9,6 +9,16 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.10] — 2026-09-15
+
+### Added
+- `attempts/README.md` and `attempts/001-baseline/README.md` index pages in the `example-performance-saga` meta-issue scaffold (both `docs/examples/` and `core/examples/` trees) — Docusaurus doesn't auto-generate a landing page for a bare directory link, so these were dead links until now.
+
+### Fixed
+- Closes #170 (issue-13, fully resolved): three broken-link clusters fixed (examples/ `sample-` filename mismatch across 10 files, meta-issue scaffold depth/nonexistent-attempt/dead-directory bugs, and a third cluster found this release — a `docs/specs/` page linking into excluded `knowledge/` content, de-linked). `onBrokenLinks`/`onBrokenMarkdownLinks` flipped from `'warn'` to `'throw'` in `docusaurus.config.js` — verified live against a deliberately-broken fixture before landing. Scope note: this covers the Docusaurus `docs/` build only, not `commands/*.md` or other non-`docs/` content.
+- Closes ENH-042 (release-doc-sync reconciliation): `kmg-update-doc.md`'s Excluded-ROADMAP line and `kmg-start-issue-tracking.md`'s Step 6.4 section now cross-reference each other's scope instead of silently disagreeing, with an explicit note that Step 6.4's only verifier (`kmg-execute-plan`'s prerequisite check) is Gemini/Antigravity-only. Seven stale `COMMAND-GUIDE.md`/`GETTING-STARTED`/`CONCEPTS.md`/`quickstart.md` references in `kmg-update-doc.md` corrected to their real post-ADR-027 paths. `CLAUDE.md`'s version-sync line now points at `knowledge/rules.md § Version Files` as the single authoritative checklist instead of a shorter duplicate.
+- Five dead anchor fragments and one broken `ADR-005` reference (repointed to the real `ADR-002-example.md`) found and fixed in the `examples/lessons-learned/` scaffold content while fixing the link-target bug above.
+
 ## [0.7.9] — 2026-09-07
 
 v0.7.8 was never cut as its own release (version files stayed at 0.7.7 while that branch's work landed on `main`) — this entry covers both v0.7.8's preflight/governance-tooling work and v0.7.9's upgrade-triggering work together.

@@ -2,7 +2,7 @@
 
 Structured knowledge capture, lesson-learned documentation, and cross-session memory for Claude Code projects.
 
-**Version:** 0.7.9
+**Version:** 0.7.10
 **Status:** Actively developed and in daily use
 
 Documentation: https://kmgraph.stayinginsync.info
@@ -88,6 +88,12 @@ Pull the latest version and run `/kmgraph:kmg-init` in any project that uses it.
 ---
 
 ## v0.7.x Feature Highlights
+
+**v0.7.10 — 2026-09-15** *(release-doc-sync reconciliation, broken-link detection hardened to hard-fail)*
+
+- **`onBrokenLinks`/`onBrokenMarkdownLinks` flipped from `'warn'` to `'throw'`** — the docs build now hard-fails on any broken link instead of silently shipping one. Closes issue-13 (all three broken-link clusters fixed, including one found during this release).
+- **Release-doc-sync mechanisms reconciled** — `kmg-update-doc.md`'s Tier-1 pass and `kmg-start-issue-tracking.md`'s Step 6.4 now cross-reference each other's scope instead of silently disagreeing on where ROADMAP.md sync lives. `knowledge/rules.md § Version Files` confirmed as the one authoritative version-bump checklist. Closes ENH-042.
+- Seven stale `COMMAND-GUIDE.md`/`GETTING-STARTED`/`CONCEPTS.md` references in `kmg-update-doc.md` corrected to their real post-ADR-027 paths.
 
 **v0.7.9 — 2026-09-07** *(upgrade-triggering: standalone command, hook parity, stale-process check, ADR-037 defaults retrofit)*
 
@@ -367,6 +373,6 @@ MIT License - See [LICENSE](LICENSE)
 ---
 
 **Created:** 2026-02-12
-**Current Version:** v0.7.9 (2026-09-07)
+**Current Version:** v0.7.10 (2026-09-15)
 
 📚 **Full documentation:** https://kmgraph.stayinginsync.info
