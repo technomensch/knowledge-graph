@@ -271,7 +271,7 @@ knowledge-graph/
 
 ## Development Status
 
-**Current Release:** v0.7.9 (2026-09-07)
+**Current Release:** v0.7.10 (2026-09-15)
 
 Actively developed and in daily use. Behavior may evolve between minor versions.
 
