@@ -272,7 +272,7 @@ check_kg_index_count() {
 check_kg_index_count "decisions"       "Total ADRs"   "-maxdepth 1 -iname 'ADR-*.md'"
 check_kg_index_count "enhancements"    "Total ENHs"   "-maxdepth 1 -type d -iname 'ENH-*'"
 check_kg_index_count "issues"          "Total Issues" "-maxdepth 1 -type d -iname 'issue-*'"
-check_kg_index_count "lessons-learned" "Total Lessons" "-mindepth 2 -iname 'Lessons_Learned_*.md'"
+check_kg_index_count "lessons-learned" "Total Lessons" "-mindepth 2 -iname '*.md' ! -iname 'README.md'"
 
 # Backlink symmetry: for issue/ENH docs changed on this branch, does every
 # cross-reference to another issue/ENH get reciprocated? Scoped to the
