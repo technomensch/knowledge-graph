@@ -5,6 +5,7 @@ status: resolved
 github-issue: "#222"
 branch: v0.7.1.4-issue-45-meta-issue-attempts-paperwork-drift
 created: 2026-08-13
+related_enhs: ["ENH-056"]
 ---
 
 # Issue-45: Meta-Issue "Attempts" Convention Drifts From Paperwork — Enforced Only By Prose, Failed 3x
@@ -72,6 +73,7 @@ other consumer repo. Any new mechanical check for this convention cannot assume
 ## Related
 
 - [issue-49](../issue-49/issue-49-description.md) — cites this issue's branch/plan (`v0.7.1.4-issue-45`) as one of five fully-merged `v0.7.1.x` plans audited for the Safety-Header STATUS-freeze bug. Backlinked 2026-08-19.
+- [ENH-056](../../enhancements/ENH-056/ENH-056-specification.md) — umbrella enhancement whose instance #4 (meta-issue attempt logging) reuses the verification built for this issue.
 
 ## Reported By
 

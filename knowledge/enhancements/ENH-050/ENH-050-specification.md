@@ -8,6 +8,7 @@ created: 2026-07-17
 related_adrs: []
 related_enhs: ["ENH-006"]
 notes: "Request captured only; docs files, format, and sync strategy deferred to implementation scoping."
+related_issues: ["issue-25"]
 ---
 
 # ENH-050: Document Trigger Keywords Tied to Each Command/Skill in User-Facing Docs
@@ -41,6 +42,7 @@ A user reading the docs can see *what a command does*, but not *what phrases/tri
   [ENH-034](../ENH-034/ENH-034-specification.md) (which already cross-links
   [ENH-042](../ENH-042/ENH-042-specification.md)) — same docs surface as this ENH's
   trigger-keyword documentation goal, FYI.
+- [issue-25](../../issues/issue-25/issue-25-description.md) — cites ENH-050 as the most recent lightweight, hand-authored spec precedent.
 
 ## Out of Scope
 

@@ -5,7 +5,8 @@ status: resolved
 github-issue: "#205"
 branch: none
 created: 2026-07-28
-related_enhs: ["ENH-065"]
+related_enhs: ["ENH-065", "ENH-056"]
+related_issues: ["issue-25", "issue-33"]
 ---
 
 # issue-30: `kmg-handoff` and `kmg-session-wrap` Only Reference Session-Summary — Neither Generates One
@@ -38,6 +39,9 @@ Captured live, lightweight — not run through the full `kmg-start-issue-trackin
 - [issue-56](../issue-56/issue-56-description.md) — added the missing `kg_upgrade` category
   and `CHANGELOG.md` disclosure that this issue's batched `[0.7.4]` PR (with issue-31) was
   missing for the `kmg-handoff.md` output-path change.
+- [ENH-056](../../enhancements/ENH-056/ENH-056-specification.md) — umbrella enhancement for documented multi-step commands being inconsistently executed; this issue is its instance #1.
+- [issue-25](../issue-25/issue-25-description.md) — lightweight-vs-full workflow authority issue, cited this issue as lightweight-path precedent.
+- [issue-33](../issue-33/issue-33-description.md) — adjacent handoff/recall gap; this issue is cited as related to it.
 
 ## Resolution (2026-08-22)
 
