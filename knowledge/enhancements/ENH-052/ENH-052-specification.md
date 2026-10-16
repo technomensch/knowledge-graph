@@ -5,7 +5,7 @@ status: resolved
 github-issue: "#188"
 branch: none
 created: 2026-07-18
-related_issues: ["issue-13", "issue-26", "issue-28", "issue-45", "issue-49", "issue-50", "issue-51", "issue-52"]
+related_issues: ["issue-13", "issue-26", "issue-28", "issue-45", "issue-49", "issue-50", "issue-51", "issue-52", "issue-61"]
 related_enhs: ["ENH-042", "ENH-062", "ENH-065"]
 ---
 
@@ -249,6 +249,7 @@ Resolves the last open blocker noted above. Two rounds of research first:
 
 ## Related (Hotspot Cross-Links)
 
+- [issue-61](../../issues/issue-61/issue-61-description.md) — records that this umbrella's Gate 5 backlink check treats every ID mention as a relationship and cascades across the corpus.
 - [ENH-065](../ENH-065/ENH-065-specification.md) — extends this paperwork-drift umbrella's Gate 5/6 lineage with a folder-completeness check.
 - [ENH-062](../ENH-062/ENH-062-specification.md) — relationship-mapping/status-schema ENH whose schema work feeds this umbrella's consistency checks.
 - **`scripts/pre-push-gate.sh` hotspot:** besides this ENH's own Gates 5/6,

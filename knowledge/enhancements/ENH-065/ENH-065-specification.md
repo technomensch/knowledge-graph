@@ -5,7 +5,7 @@ status: deferred
 github-issue: "#262"
 branch: none
 created: 2026-10-16
-related_issues: ["issue-25", "issue-30", "issue-33", "issue-60"]
+related_issues: ["issue-25", "issue-30", "issue-33", "issue-60", "issue-61"]
 related_enhs: ["ENH-051", "ENH-052", "ENH-056", "ENH-062", "ENH-063"]
 related_adrs: ["ADR-043", "ADR-050", "ADR-068", "ADR-072"]
 ---
@@ -156,6 +156,7 @@ These need an owner decision before implementation. No code, template, or doc ch
 
 ## Related
 
+- [issue-61](../../issues/issue-61/issue-61-description.md) — this spec's evidence lists triggered the 33-finding Gate 5 report that issue documents.
 - [issue-25](../../issues/issue-25/issue-25-description.md) — the lightweight-vs-full ambiguity; ADR-068 Half A resolved the *choice* but not the *completion* rule.
 - [issue-30](../../issues/issue-30/issue-30-description.md) — the 2026-07-28 "deliberately lightweight" single-file issue that started the pattern.
 - [issue-33](../../issues/issue-33/issue-33-description.md) and [ENH-056](../ENH-056/ENH-056-specification.md) — the command-completion check pilot; the same "documented multi-step prose is inconsistently executed" class.
