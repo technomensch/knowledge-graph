@@ -6,7 +6,7 @@ version_target: "v0.5.8"
 github_issue: null
 created: 2026-05-22
 related_adrs: []
-related_enhs: []
+related_enhs: ["ENH-016"]
 ---
 
 # ENH-014: Audit and fix MEMORY.md cascade
@@ -129,3 +129,7 @@ Decision required: implement the commands, or remove all references.
 - MEMORY.md files remain valid as index/pointer files — do NOT delete them or remove their use as an index
 - Content at `/Users/mkaplan/.claude/projects/-Users-mkaplan-GitHub-knowledge-graph/memory/MEMORY.md` has only 1 substantive entry (hook variable regression) — no content loss risk
 - `docs/pillars/recalling/session-memory.md` lines 18-22 already correctly describe the three-layer model; only the archive/restore section (lines 49-95) is stale
+
+## Related
+
+- [ENH-016](../ENH-016/ENH-016-specification.md) — rules.md auto-split recommendation; its split-target and precedent analysis cites this ENH.

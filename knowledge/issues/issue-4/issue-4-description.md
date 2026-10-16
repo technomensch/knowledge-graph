@@ -8,6 +8,7 @@ plan: docs/plans/v0.5.5-fix-session-flag-dedup.md
 created: 2026-04-28
 resolved: 2026-04-29
 fix-commits: ["667e7a87", "fb37e2ea"]
+related-enhs: [ENH-016]
 ---
 
 # Issue-4: Stop Hook /tmp Flag Accumulates Per-Subprocess Instead of Per-Session
@@ -51,6 +52,7 @@ Discovered during v0.5.4 session wrap-up (2026-04-28). Branch `v0.5.4-profile-au
 
 - `session-wrap` skill — the double-prompt prevention mechanism this flag supports
 - ADR-020 — lifecycle hooks suite
+- [ENH-016](../../enhancements/ENH-016/ENH-016-specification.md) — rules.md auto-split recommendation; cites this issue's rules-injection context.
 
 ## Resolution
 
