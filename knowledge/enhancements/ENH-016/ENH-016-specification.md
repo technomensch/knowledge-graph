@@ -6,7 +6,7 @@ version_target: "v0.5.9.1"
 github_issue: null
 created: 2026-05-25
 related_adrs: ["ADR-028"]
-related_enhs: ["ENH-010", "ENH-014", "ENH-015"]
+related_enhs: ["ENH-010", "ENH-014", "ENH-015", "ENH-062"]
 ---
 
 # ENH-016: Rules File Auto-Split Recommendation
@@ -187,3 +187,4 @@ Both checks follow the same pattern: append to FINDINGS with advisory message (n
 ## Related
 
 - issue-8: Docs Update Enforcement Meta-Issue (ENH-016 multi-file fallback pattern required by issue-8 fix)
+- [ENH-062](../ENH-062/ENH-062-specification.md): cites this ENH's auto-split threshold as precedent when deciding not to split `kmg-paperwork-audit`

@@ -6,7 +6,7 @@ github-issue: "#188"
 branch: none
 created: 2026-07-18
 related_issues: ["issue-13", "issue-26", "issue-28", "issue-45", "issue-49", "issue-50", "issue-51", "issue-52"]
-related_enhs: ["ENH-042"]
+related_enhs: ["ENH-042", "ENH-062"]
 ---
 
 # ENH-052: No Pre-PR Consistency Check for the Knowledge Graph's Own Internal Paperwork
@@ -249,6 +249,7 @@ Resolves the last open blocker noted above. Two rounds of research first:
 
 ## Related (Hotspot Cross-Links)
 
+- [ENH-062](../ENH-062/ENH-062-specification.md) — relationship-mapping/status-schema ENH whose schema work feeds this umbrella's consistency checks.
 - **`scripts/pre-push-gate.sh` hotspot:** besides this ENH's own Gates 5/6,
   [issue-13](../../issues/issue-13/issue-13-description.md),
   [issue-28](../../issues/issue-28/issue-28-description.md),

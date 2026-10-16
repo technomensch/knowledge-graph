@@ -66,10 +66,13 @@ Comprehensive catalog of all lessons-learned documents.
 
 ---
 
-### Patterns Lessons (22 total)
+### Patterns Lessons (25 total)
 
 - [Bundled Example Content Drifts Like Real Data; Ported Patterns Need Their ADR Citation Verified](patterns/Lessons_Learned_Patterns_Bundled_Example_Content_Drift_And_Dangling_Adr_Citations.md) — 2026-09-17
+- [Fixed-Name Test Fixtures Collide With Real, Non-Sandboxed Shared State](patterns/Lessons_Learned_Patterns_Fixed_Name_Test_Fixtures_Collide_With_Real,_Non_Sandboxed_Shared_State.md) — 2026-08-22
 - [Dispatch, Don't Duplicate: Corpus-Verify Before Backfilling](patterns/Lessons_Learned_Patterns_Dispatch_Dont_Duplicate_Corpus_Verify_Before_Backfilling.md) — 2026-08-19
+- [Hardcoded main...HEAD Branch-Comparison Base Silently Returns Empty Pre-Divergence](patterns/Lessons_Learned_Patterns_Hardcoded_Main...head_Branch_Comparison_Base_Silently_Returns_Empty_Pre_Divergence.md) — 2026-08-16
+- [Ownership-of-Derivation Contract Violation Causes Double-Prefixed Filenames](patterns/Lessons_Learned_Patterns_Ownership_Of_Derivation_Contract_Violation_Causes_Double_Prefixed_Filenames.md) — 2026-08-16
 - [Fix Ownership Follows the Root-Cause KG, Not the Code's Location](patterns/Lessons_Learned_Patterns_Fix_Ownership_Follows_Root_Cause_KG_Not_Code_Location.md) — 2026-07-10
 - [LLM Compliance Gate for Branching Commands](patterns/Lessons_Learned_Patterns_LLM_Compliance_Gate_For_Branching_Commands.md) — 2026-06-21
 - [Routing-Layer-Only Profile Injection Pattern](patterns/Lessons_Learned_Routing_Layer_Injection_Pattern.md) — 2026-04-28
@@ -112,7 +115,10 @@ Comprehensive catalog of all lessons-learned documents.
 
 **2026**
 - [2026-09-17] [Bundled Example Content Drifts Like Real Data; Ported Patterns Need Their ADR Citation Verified](patterns/Lessons_Learned_Patterns_Bundled_Example_Content_Drift_And_Dangling_Adr_Citations.md)
+- [2026-08-22] [Fixed-Name Test Fixtures Collide With Real, Non-Sandboxed Shared State](patterns/Lessons_Learned_Patterns_Fixed_Name_Test_Fixtures_Collide_With_Real,_Non_Sandboxed_Shared_State.md)
 - [2026-08-19] [Dispatch, Don't Duplicate: Corpus-Verify Before Backfilling](patterns/Lessons_Learned_Patterns_Dispatch_Dont_Duplicate_Corpus_Verify_Before_Backfilling.md)
+- [2026-08-16] [Hardcoded main...HEAD Branch-Comparison Base Silently Returns Empty Pre-Divergence](patterns/Lessons_Learned_Patterns_Hardcoded_Main...head_Branch_Comparison_Base_Silently_Returns_Empty_Pre_Divergence.md)
+- [2026-08-16] [Ownership-of-Derivation Contract Violation Causes Double-Prefixed Filenames](patterns/Lessons_Learned_Patterns_Ownership_Of_Derivation_Contract_Violation_Causes_Double_Prefixed_Filenames.md)
 - [2026-07-14] [Resource-Path Migrations Must Grep the Prompt Layer, Not Just the Server Layer](process/Lessons_Learned_Process_Migration_Must_Grep_Prompt_Layer_Not_Just_Server_Layer.md)
 - [2026-07-12] [os.homedir() Stale Cache On macOS](debugging/Lessons_Learned_os_homedir_Stale_Cache_On_macOS.md)
 - [2026-07-12] [Two-Cycle Cross-Model Review for High-Risk Changes](process/Lessons_Learned_Process_Two_Cycle_Cross_Model_Review_For_High_Risk_Changes.md)
@@ -256,6 +262,4 @@ See [core/examples/lessons-learned/](../../examples/lessons-learned/) for filled
 **How to capture**:
 - [Manual Workflow](../../docs/WORKFLOWS.md#workflow-1-create-lesson-learned) - Step-by-step
 - [Command Guide](../../../docs/COMMAND-GUIDE.md#essential-commands) - Automated (Claude Code)
-- [Ownership-of-Derivation Contract Violation Causes Double-Prefixed Filenames](patterns/Lessons_Learned_Patterns_Ownership_Of_Derivation_Contract_Violation_Causes_Double_Prefixed_Filenames.md)
-- [Hardcoded main...HEAD Branch-Comparison Base Silently Returns Empty Pre-Divergence](patterns/Lessons_Learned_Patterns_Hardcoded_Main...head_Branch_Comparison_Base_Silently_Returns_Empty_Pre_Divergence.md)
-- [Fixed-Name Test Fixtures Collide With Real, Non-Sandboxed Shared State](patterns/Lessons_Learned_Patterns_Fixed_Name_Test_Fixtures_Collide_With_Real,_Non_Sandboxed_Shared_State.md)
+
