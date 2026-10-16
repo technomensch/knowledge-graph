@@ -66,7 +66,7 @@ Tracking of investigated bugs, defects, and meta-issues for this project.
 - [issue-16: mcp-server kg_version / MCP handshake reports stale hardcoded 0.3.10](issue-16/issue-16-description.md) — **Status:** ✅ Resolved — confirmed merged to main 2026-08-22
 - [issue-15: Personal-KG FTS5 search index built in the wrong bucket — `rebuildIndex` never receives `kgType`](issue-15/issue-15-description.md) — **Status:** 🟡 Tracked
 - [issue-14: kg-config.json write-path split-brain — 37 files still hardcode the pre-migration `~/.claude/kg-config.json` path](issue-14/issue-14-description.md) — **Status:** ✅ Resolved
-- [issue-13: No automated broken-link detection anywhere in the docs pipeline](issue-13/issue-13-description.md) — **Status:** 🟡 Deferred (Track only)
+- [issue-13: No automated broken-link detection anywhere in the docs pipeline](issue-13/issue-13-description.md) — **Status:** ✅ Resolved (v0.7.10) — broken links AND broken anchors eliminated site-wide (three clusters fixed, including one found during this release); `onBrokenLinks`/`onBrokenMarkdownLinks`/`onBrokenAnchors` all flipped from `'warn'` to `'throw'` in `docusaurus.config.js`, plus a new PR-time CI build gate added to `.github/workflows/docs.yml`. Scope: Docusaurus `docs/` build only, not `commands/*.md`.
 - [issue-12: `kmg-execute-plan` fires in Claude Code sessions despite being a Gemini/Antigravity-only guardrail](issue-12/issue-12-description.md) — **Status:** ✅ Resolved
 - [issue-11: Two distinct, undiagnosed causes behind ENH specs missing a real GitHub issue link](issue-11/issue-11-description.md) — **Status:** ✅ Resolved
 - [issue-10: kg_capture KG_MISMATCH false positive when KG path doesn't end in /docs](issue-10/issue-10-description.md) — **Status:** ✅ Resolved
