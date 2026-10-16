@@ -6,7 +6,7 @@ github-issue: "#255"
 branch: v0.7.2-issues-46-51
 created: 2026-08-17
 related_enhs: ["ENH-052"]
-related_issues: ["issue-50", "issue-48"]
+related_issues: ["issue-50", "issue-48", "issue-52"]
 ---
 
 # issue-51: kg_upgrade Wizard's Hardcoded Category Allow-List Has Drifted From the Tool's Real Schema — Two Categories Unreachable via /kmgraph:kmg-init
@@ -200,6 +200,7 @@ Found live 2026-08-17 while investigating issue-50's root-cause question ("is a 
 
 ## Related
 
+- [issue-52](../issue-52/issue-52-description.md) — issue-52's spec cross-references this item.
 - [issue-48](../issue-48/issue-48-description.md) — cites this issue as a case study whose
   backfix (`capture-corruption`) only reached the wizard because this issue's own fix landed;
   without it, `capture-corruption` would join `config-location` on the unreachable side of the

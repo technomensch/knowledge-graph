@@ -7,6 +7,7 @@ github_issue: null
 created: 2026-05-25
 related_adrs: ["ADR-043", "ADR-049"]
 related_enhs: ["ENH-016", "ENH-020"]
+related_issues: ["issue-5"]
 ---
 
 # ENH-015: Decision Governance Protocol
@@ -207,6 +208,7 @@ Pre-v0.5.9: only File Location, Parallelism, Approval Gates, RECALL_HARD_BLOCK, 
 
 ## Related ENHs / Known Gaps
 
+- [issue-5](../../issues/issue-5/issue-5-description.md) — issue-5's spec cross-references this item.
 ### ENH-020 — Preventive Cascade Template + Profile Ecosystem Docs
 
 **Status:** Deferred

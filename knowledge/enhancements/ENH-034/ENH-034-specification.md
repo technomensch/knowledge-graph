@@ -2,6 +2,8 @@
 id: ENH-034
 type: Enhancement
 status: implemented
+related_enhs: ["ENH-050"]
+related_issues: ["issue-41"]
 ---
 
 # ENH-034: Capture-pipeline command naming and grouping
@@ -163,3 +165,8 @@ Applying the pipeline-stage mapping already established this session's swimlane 
 - [x] `issue-40` — `kmg-sync-all.md` dropped from its file list.
 - [x] `ADR-071` status moved from `Proposed` to `Accepted`.
 </content>
+
+## Related
+
+- [issue-41](../../issues/issue-41/issue-41-description.md) — issue-41's spec cross-references this item.
+- [ENH-050](../ENH-050/ENH-050-specification.md) — ENH-050's spec cross-references this enhancement.

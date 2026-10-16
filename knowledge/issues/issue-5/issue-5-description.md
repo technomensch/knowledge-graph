@@ -7,6 +7,7 @@ branch: v0.5.9.2-fix-gh-issue-create
 created: 2026-05-28
 related-adrs: [ADR-024]
 related-enhs: [ENH-017]
+related_issues: ["issue-52"]
 ---
 
 # Issue-5: `start-issue-tracking` Never Calls `gh issue create`
@@ -45,6 +46,7 @@ In Step 5 of `commands/start-issue-tracking.md`:
 
 ## Related
 
+- [issue-52](../issue-52/issue-52-description.md) — issue-52's spec cross-references this item.
 - **ADR-024** — documents the sequential prompt design for `start-issue-tracking`; any
   Step 5 changes must remain consistent with the UX decisions there
 - **ENH-017** — proposes UX improvements to Step 1.2; shares the same command file;

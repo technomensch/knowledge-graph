@@ -2,6 +2,7 @@
 id: ENH-032
 type: Bug
 status: resolved
+related_enhs: ["ENH-035"]
 ---
 
 # ENH-032: Knowledge-Extractor Approval Gate Blocks Coordinator Relay
@@ -86,3 +87,7 @@ Keep the current flow but remove the approval gate from the extractor. Instead, 
 - [ ] User sees explicit "write N files?" confirmation before any writes occur
 - [ ] Extractor subagent is not responsible for writes — returns candidate list only
 - [ ] No regression on single-candidate lesson capture via `kmg-capture-lesson`
+
+## Related
+
+- [ENH-035](../ENH-035/ENH-035-specification.md) — ENH-035's spec cross-references this item.

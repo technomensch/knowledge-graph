@@ -7,6 +7,7 @@ branch: v0.6.18-misc-patches (deferred — not yet created; this work lands as a
 created: 2026-07-11
 related-adrs: []
 related-enhs: [ENH-027]
+related_issues: ["issue-52"]
 ---
 
 # Issue-11: Two distinct, undiagnosed causes behind ENH specs missing a real GitHub issue link
@@ -150,6 +151,7 @@ concurred: fix the gate, do not unify; recommended going further than a command-
 
 ## Related
 
+- [issue-52](../issue-52/issue-52-description.md) — issue-52's spec cross-references this item.
 - [ENH-027](../../enhancements/ENH-027/ENH-027-specification.md) — cross-linked, KG-linkage half of this same root cause
 - GitHub #124 / local `issue-5` — the Cause-1 bug and its fix
 - GitHub #130 — ENH-023, confirms the Cause-1 fix worked

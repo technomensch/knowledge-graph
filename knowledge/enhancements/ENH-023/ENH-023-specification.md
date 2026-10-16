@@ -7,6 +7,7 @@ github_issue: 130
 created: 2026-06-07
 related_adrs: ["ADR-043", "ADR-049"]
 related_enhs: ["ENH-015", "ENH-062"]
+related_issues: ["issue-52"]
 ---
 
 # ENH-023: Extend pre-skill-rules-inject.sh to Cover Official Marketplace Skills
@@ -52,6 +53,7 @@ Add a `code-review` branch to the `pre-skill-rules-inject.sh` case statement tha
 
 ## Related
 
+- [issue-52](../../issues/issue-52/issue-52-description.md) — issue-52's spec cross-references this item.
 - ADR-043: the fix pattern this ENH extends
 - ENH-015: drove ADR-043's expansion to 7 branches
 - ADR-049: the review protocol the code-review skill should respect

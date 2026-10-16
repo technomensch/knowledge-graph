@@ -6,6 +6,7 @@ github-issue: "#229"
 branch: none
 created: 2026-08-19
 related_issues: ["issue-11"]
+related_enhs: ["ENH-034"]
 ---
 
 # issue-52: `superpowers:brainstorming`-Originated Specs Still Bypass `start-issue-tracking`'s GitHub-Issue Creation — Research a Flag/Keyword/Trigger to Close the Gap
@@ -114,6 +115,7 @@ manually triaging, same as every prior occurrence.
 
 ## Related
 
+- [ENH-034](../../enhancements/ENH-034/ENH-034-specification.md) — ENH-034's spec cross-references this item.
 - [issue-11](../issue-11/issue-11-description.md) — the github-issue-sync invariant
   (`scripts/check-github-issue-sync.sh`, Gate 4) this issue's problem space grew out of;
   GitHub #165 is issue-11's own filed issue and the direct source of the research above.

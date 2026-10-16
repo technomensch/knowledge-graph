@@ -7,6 +7,7 @@ status: resolved
 version-target: 0.2.1-beta
 created: 2026-03-27
 parent: v0.2.0-beta-layered-architecture
+related_issues: ["issue-5"]
 ---
 
 # Meta-Issue: v0.2.1 Backlog
@@ -128,3 +129,7 @@ Suggested order:
 4. **Item C** (skill modernization) — lowest urgency; evaluate after A, B, and D
 
 Each item gets its own branch: `v0.2.1-kg-capture`, `v0.2.1-mcp-auto-register`, `v0.2.1-sync-all-refactor`, `v0.2.1-skill-modernization`.
+
+## Related
+
+- [issue-5](../issue-5/issue-5-description.md) — issue-5's spec cross-references this item.

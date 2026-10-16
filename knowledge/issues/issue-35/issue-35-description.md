@@ -6,7 +6,7 @@ github-issue: pending
 branch: none
 created: 2026-07-30
 related_adrs: ["ADR-066"]
-related_issues: ["issue-31", "issue-34"]
+related_issues: ["issue-31", "issue-34", "issue-52"]
 related_enhs: ["ENH-056"]
 ---
 
@@ -40,6 +40,7 @@ Captured live, lightweight, local-only — track only, no plan, no branch. Secon
 
 ## Related
 
+- [issue-52](../issue-52/issue-52-description.md) — issue-52's spec cross-references this item.
 - issue-31 (`knowledge/issues/issue-31/issue-31-description.md`) — the first instance of this exact pattern (`kmg-handoff.md` hardcoded path), whose own "Open Questions" section predicted this recurrence
 - issue-34 (`knowledge/issues/issue-34/issue-34-description.md`) — separate bug found in the same investigation (recall never searches `issues`/`enhancements`)
 - `ADR-066` (`knowledge/decisions/ADR-066-kg-content-storage-location-for-global-and-cowork-modes.md`) — § "Post-Implementation Gap," root cause shared with issue-31

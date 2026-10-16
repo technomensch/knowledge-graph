@@ -2,6 +2,7 @@
 id: ENH-033
 type: Bug
 status: proposed
+related_enhs: ["ENH-035"]
 ---
 
 # ENH-033: Repo-context auto-detection for `kmg-update-doc` / `kmg-create-doc`
@@ -78,3 +79,7 @@ Outside the kmgraph repo, ask the user which conventions to apply (voice, access
 - [ ] User guide documents default read/write targets (README, docs/, CHANGELOG) and how to override applied conventions.
 - [ ] `kmg-update-doc` and `kmg-create-doc` carry a contributor-only severity-dot marker in `docs/reference/commands.md` / COMMANDS.md, and `kmg-help` surfaces a clarifying note.
 - [ ] No regression for the contributor workflow on kmgraph's own docs.
+
+## Related
+
+- [ENH-035](../ENH-035/ENH-035-specification.md) — ENH-035's spec cross-references this item.

@@ -6,6 +6,7 @@ github-issue: pending
 branch: v0.7.2-issues-46-51
 created: 2026-08-17
 related_enhs: ["ENH-052"]
+related_issues: ["issue-52"]
 ---
 
 # issue-50: No Check That a Bug Fix Requiring Data Backfill Gets a kg_upgrade Category — Or That the Category Reaches Users
@@ -120,6 +121,7 @@ need a real follow-up.
 
 ## Related
 
+- [issue-52](../issue-52/issue-52-description.md) — issue-52's spec cross-references this item.
 - [issue-56](../issue-56/issue-56-description.md) — applied this issue's "does the category
   reach users" lesson when deciding to land a `CHANGELOG.md`/`README.md` disclosure alongside
   its own new `kg_upgrade` category.

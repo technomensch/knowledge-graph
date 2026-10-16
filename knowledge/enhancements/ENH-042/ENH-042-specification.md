@@ -3,6 +3,8 @@ id: ENH-042
 type: Bug
 status: resolved
 resolved: 2026-09-17
+related_enhs: ["ENH-050"]
+related_issues: ["issue-41"]
 ---
 
 # ENH-042: Three disconnected release-doc-sync mechanisms leave README and actual version numbers chronically out of sync
@@ -84,3 +86,8 @@ This ENH documents the finding; it does not itself implement the fix (no plan/br
   (more complete than anything drafted from scratch) — `CLAUDE.md`'s Versions line now points
   there instead of duplicating it. Stale `COMMAND-GUIDE.md`/`GETTING-STARTED`/`CONCEPTS.md`
   references in `kmg-update-doc.md` (item 4, lines 20/35/64/172/212/470/483/490/562) fixed.
+
+## Related
+
+- [issue-41](../../issues/issue-41/issue-41-description.md) — issue-41's spec cross-references this item.
+- [ENH-050](../ENH-050/ENH-050-specification.md) — ENH-050's spec cross-references this enhancement.

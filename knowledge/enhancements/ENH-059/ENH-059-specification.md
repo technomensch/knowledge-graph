@@ -6,7 +6,7 @@ github-issue: pending
 branch: none
 created: 2026-07-30
 related_enhs: []
-related_issues: []
+related_issues: ["issue-52"]
 ---
 
 # ENH-059: Recommend `obsidian-skills` During Install for Better Wikilink Generation and Obsidian Integration
@@ -21,4 +21,5 @@ Captured as an idea, 2026-07-30. Not scoped, not designed, not triaged for imple
 
 ## Related
 
+- [issue-52](../../issues/issue-52/issue-52-description.md) — issue-52's spec cross-references this item.
 - https://github.com/kepano/obsidian-skills

@@ -6,6 +6,7 @@ github-issue: pending
 branch: v0.7.2-issues-46-51
 created: 2026-08-17
 related_enhs: ["ENH-052"]
+related_issues: ["issue-52"]
 ---
 
 # issue-49: Plan Safety-Header STATUS Field Frozen at Initial "STOPPED" — Never Rewritten on Approval or Completion
@@ -120,3 +121,7 @@ Surfaced by the user during a routine plan-status audit of the five most recent 
 2026-08-17. Root cause traced live in-session; tied to ENH-052 per the user's explicit correction
 that a new issue should be checked against existing ADR/ENH coverage before filing, not defaulted
 to a fresh ENH.
+
+## Related
+
+- [issue-52](../issue-52/issue-52-description.md) — issue-52's spec cross-references this item.

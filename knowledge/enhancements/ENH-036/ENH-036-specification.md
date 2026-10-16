@@ -2,6 +2,7 @@
 id: ENH-036
 type: Refactor
 status: withdrawn
+related_enhs: ["ENH-034", "ENH-035"]
 ---
 
 # ENH-036: `kmg-capture-router` as the sole detection engine — 5 detection skills consolidated to 2
@@ -162,3 +163,8 @@ Have `capture-router` compute detection/classification in parallel with the 3 st
 - [ ] No code dependency on `capture_mode` or the parent auto-capture pipeline.
 - [ ] **T9 (ADR-058) is satisfied without a new name** — the sole detection engine is `kmg-capture-router` and the sole profile writer is `kmg-update-profile`, both already named; `capture-router`'s scope is *restored* to believed original intent, not newly named.
 </content>
+
+## Related
+
+- [ENH-035](../ENH-035/ENH-035-specification.md) — ENH-035's spec cross-references this item.
+- [ENH-034](../ENH-034/ENH-034-specification.md) — ENH-034's spec cross-references this item.

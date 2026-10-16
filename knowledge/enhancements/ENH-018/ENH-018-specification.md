@@ -7,6 +7,7 @@ github_issue: null
 created: 2026-05-27
 related_adrs: []
 related_enhs: []
+related_issues: ["issue-5"]
 ---
 
 # ENH-018: Rules File H2 Structure Hardening
@@ -70,3 +71,7 @@ When `rules.md` was split into focused files, the split preserved the internal H
 
 - Should the H2 structure standard be formally documented in an ADR, or is the rules.md checklist item sufficient?
 - Does `governance-rules.md` need a wrapper H2 or can all sections be top-level H2s with no parent?
+
+## Related
+
+- [issue-5](../../issues/issue-5/issue-5-description.md) — issue-5's spec cross-references this item.

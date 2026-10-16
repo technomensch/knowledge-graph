@@ -6,7 +6,7 @@ github-issue: pending
 branch: none
 created: 2026-07-30
 related_enhs: ["ENH-056"]
-related_issues: ["issue-35"]
+related_issues: ["issue-35", "issue-52"]
 ---
 
 # issue-34: `kg_search`/FTS5 Index Never Cover `knowledge/issues/` or `knowledge/enhancements/`
@@ -38,6 +38,7 @@ Captured live, lightweight, local-only — track only, no plan, no branch. Direc
 
 ## Related
 
+- [issue-52](../issue-52/issue-52-description.md) — issue-52's spec cross-references this item.
 - `mcp-server/src/tools/fts5.ts` (`rebuildIndex`, `contentDirs`)
 - `mcp-server/src/tools/search.ts` (fallback `searchDirs`)
 - ENH-056 (`knowledge/enhancements/ENH-056/ENH-056-specification.md`) — candidate meta-issue attempt-loop prompt assumes recall covers issues, which this bug shows it currently does not
