@@ -20,7 +20,7 @@ The command prompts for a short issue name (kebab-case), then scaffolds the meta
 
 ```
 docs/meta-issues/<issue-name>/
-├── README.md               # Navigation hub
+├── README.md               # Navigation hub (Timeline Summary table and attempt count)
 ├── description.md          # Living document — update after each attempt
 ├── implementation-log.md   # Chronological attempt timeline
 ├── test-cases.md           # Validation criteria (consistent across attempts)
@@ -119,7 +119,7 @@ At the start of each new session working on this issue:
 /kmgraph:kmg-meta-issue --log-attempt 002 "<distinct hypothesis>"
 ```
 
-This creates the attempt directory, pre-populates the hypothesis field, and checks that the hypothesis differs from prior attempts. At attempt 3 or later, it also surfaces the `stuck-work-escalation` skill reminder.
+This creates the attempt directory, pre-populates the hypothesis field, and checks that the hypothesis differs from prior attempts. It also appends a row to the README Timeline Summary table and updates the README Quick Summary attempt count alongside `implementation-log.md`. At attempt 3 or later, it also surfaces the `stuck-work-escalation` skill reminder.
 
 > 👍 **Tip**
 >

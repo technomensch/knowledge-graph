@@ -876,6 +876,7 @@ With `--user-facing`:
 2. **Add attempt** (`--add-attempt 003 "Try connection pooling"`):
    - Creates numbered attempt folder with solution approach and results templates
    - Updates implementation log
+   - Appends a row to the README Timeline Summary table and updates the README Quick Summary attempt count
 3. **Update understanding** (`--update-understanding "Root cause is network latency"`):
    - Records belief shifts with timestamp and evidence
    - Updates description with current best understanding
@@ -884,6 +885,7 @@ With `--user-facing`:
 5. **Log attempt with hypothesis** (`--log-attempt NNN "hypothesis"`):
    - Enforces a distinct hypothesis before each attempt begins
    - Pre-populates the attempt template's hypothesis field
+   - Updates the implementation log, appends a row to the README Timeline Summary table, and updates the README Quick Summary attempt count
    - Reminds the user to invoke `stuck-work-escalation` at attempt 3+
    - At 5 attempts, exit-path analysis becomes mandatory (see `stuck-work-escalation` skill)
 
