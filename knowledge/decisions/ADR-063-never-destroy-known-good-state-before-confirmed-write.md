@@ -17,7 +17,7 @@ related:
     - knowledge/issues/chat-extraction-reliability-saga/analysis/lessons-learned.md
   kg_entries:
     - knowledge/issues/chat-extraction-reliability-saga/README.md
-    - knowledge/issues/chat-extraction-reliability-saga/attempts/ENH-043/specification.md
+    - knowledge/issues/chat-extraction-reliability-saga/attempts/002-enh-043/specification.md
     - knowledge/issues/kg-config-silent-overwrite/README.md
 tags: [write-safety, data-loss, cross-cutting, v0.6.18]
 category: architecture

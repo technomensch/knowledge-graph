@@ -15,7 +15,7 @@ related:
   adrs: []
   lessons: []
   kg_entries:
-    - knowledge/issues/chat-extraction-reliability-saga/attempts/ENH-044/specification.md
+    - knowledge/issues/chat-extraction-reliability-saga/attempts/005-enh-044/specification.md
     - knowledge/enhancements/ENH-038/ENH-038-specification.md
     - knowledge/enhancements/ENH-061/ENH-061-specification.md
 tags: [privacy, extraction, gemini, claude, worktree, trust-boundary, v0.6.17, v0.7.1.3]
@@ -118,7 +118,7 @@ Given the asymmetry above, the fix must optimize for "never leak foreign content
 - `core/scripts/extract_gemini.py` — `extract_gemini_pb_sessions()` (currently accepts-but-ignores `project_filter`, `:245-254`); hash-named-dir handling on the `.json`/`.jsonl` paths made explicit rather than incidental.
 - `tests/test-extraction-gemini-project-filter.sh` — new assertions for foreign-`.pb` exclusion and hash-dir exclusion, with a visible SKIP (not a silent pass) when `blackboxprotobuf` is unavailable.
 - `commands/kmg-extract-chat.md` — documents the resulting `--project` behavior for `.pb` and hash-named directories.
-- `knowledge/issues/chat-extraction-reliability-saga/attempts/ENH-044/specification.md` — `.pb` scoping moves from Explicitly-Out-of-Scope into Proposed Behavior.
+- `knowledge/issues/chat-extraction-reliability-saga/attempts/005-enh-044/specification.md` — `.pb` scoping moves from Explicitly-Out-of-Scope into Proposed Behavior.
 
 ---
 
@@ -152,7 +152,7 @@ This is a regression in *implementation ordering*, not a reconsideration of the 
 
 **No change to this ADR's Decision, Rationale, or Alternatives sections** — the fail-closed policy stands exactly as decided. This amendment records that a real deviation existed in the shipped code and has been closed, for anyone reading this ADR to understand why "fixed" doesn't mean "never had a bug."
 
-Full detail: `knowledge/issues/chat-extraction-reliability-saga/README.md` § "Post-Merge Regression Findings", finding 3; `attempts/ENH-044/specification.md` item 7.
+Full detail: `knowledge/issues/chat-extraction-reliability-saga/README.md` § "Post-Merge Regression Findings", finding 3; `attempts/005-enh-044/specification.md` item 7.
 
 ---
 

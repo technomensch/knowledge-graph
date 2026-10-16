@@ -16,9 +16,9 @@ related:
   lessons: []
   kg_entries:
     - knowledge/enhancements/ENH-038/ENH-038-specification.md
-    - knowledge/issues/chat-extraction-reliability-saga/attempts/ENH-043/specification.md
-    - knowledge/issues/chat-extraction-reliability-saga/attempts/ENH-044/specification.md
-    - knowledge/issues/chat-extraction-reliability-saga/attempts/ENH-045/specification.md
+    - knowledge/issues/chat-extraction-reliability-saga/attempts/002-enh-043/specification.md
+    - knowledge/issues/chat-extraction-reliability-saga/attempts/005-enh-044/specification.md
+    - knowledge/issues/chat-extraction-reliability-saga/attempts/006-enh-045/specification.md
 tags: [ux-design, extraction, backup-recovery, error-recovery, v0.6.17]
 category: architecture
 ---

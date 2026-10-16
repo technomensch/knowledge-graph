@@ -10,7 +10,7 @@ Chronological record of all attempts to solve chat-extraction reliability.
 ## Attempt 001: Subagent message-loss fix (v0.6.16, ENH-038)
 
 **Status:** Completed (shipped)
-**ENH:** [ENH-038 umbrella](../../enhancements/ENH-038/ENH-038-specification.md) / [full spec](attempts/ENH-038/specification.md)
+**ENH:** [ENH-038 umbrella](../../enhancements/ENH-038/ENH-038-specification.md) / [full spec](attempts/001-enh-038/specification.md)
 **Related:** branch `v0.6.16-update-claude-extract-chat-for-sub-agents`, PR #160, commits `1fbfda7d` / `ddeb1016` / `22c7559d` / `d13f8fd4`
 
 **Approach:**
@@ -27,7 +27,7 @@ Synthetic-only validation left a real-world gap that later surfaced as ENH-043.
 ## Attempt 002: Rebuild mode for permanently-corrupted output (v0.6.17, ENH-043)
 
 **Status:** In progress / partially shipped
-**ENH:** [ENH-038 umbrella](../../enhancements/ENH-038/ENH-038-specification.md) / [full spec](attempts/ENH-043/specification.md)
+**ENH:** [ENH-038 umbrella](../../enhancements/ENH-038/ENH-038-specification.md) / [full spec](attempts/002-enh-043/specification.md)
 **Related:** branch `v0.6.17-fix-extract-chat-rebuild`, plan `knowledge/plans/v0.6.17-fix-extract-chat-rebuild.md`
 
 **Approach:**
@@ -60,7 +60,7 @@ Shifted belief from "marketplace plugin staleness" to "the extractor is selectin
 ## Attempt 004: Dogfooding `--today` extraction, second run → ENH-047 (2026-07-08)
 
 **Status:** Failed, root-caused
-**ENH:** [ENH-038 umbrella](../../enhancements/ENH-038/ENH-038-specification.md) / [full spec](attempts/ENH-047/specification.md)
+**ENH:** [ENH-038 umbrella](../../enhancements/ENH-038/ENH-038-specification.md) / [full spec](attempts/008-enh-047/specification.md)
 
 **Approach:**
 Re-ran `--source claude --project=knowledge-graph --today`, expecting ~3,100+ real messages.
@@ -79,7 +79,7 @@ Fix ENH-047 (per-message date derivation); re-baseline extraction; revisit Attem
 ## Attempt 005: Gemini `--project` filter silently ignored (v0.6.17, ENH-044)
 
 **Status:** Completed (shipped) — `.json`/`.jsonl` scoping (`bf1cb51c`), then fail-closed `.pb`/hash-dir scoping (`126d98ce`) after real-data testing found the first fix incomplete
-**ENH:** [ENH-038 umbrella](../../enhancements/ENH-038/ENH-038-specification.md) / [full spec](attempts/ENH-044/specification.md)
+**ENH:** [ENH-038 umbrella](../../enhancements/ENH-038/ENH-038-specification.md) / [full spec](attempts/005-enh-044/specification.md)
 **Discovered:** 2026-07-06, while manually validating ENH-038's Gemini `.jsonl` fix
 **Related:** commits `bf1cb51c`/`1b2269cf` (`.json`/`.jsonl` fix+test), `ADR-062` (fail-closed decision), `126d98ce`/`faa393d6` (`.pb`/hash-dir fix+test); plan `knowledge/plans/v0.6.17-fix-extract-chat-multiday-bucketing.md`
 
@@ -97,7 +97,7 @@ Partial fixes that scope one format but miss others create a false sense of comp
 ## Attempt 006: Codex incremental mtime-skip bug (v0.6.17, ENH-045)
 
 **Status:** Completed (shipped)
-**Full spec:** [ENH-045/specification.md](attempts/ENH-045/specification.md)
+**Full spec:** [ENH-045/specification.md](attempts/006-enh-045/specification.md)
 **Discovered:** 2026-07-08
 **Related:** commit `27a49f26` (fix), `97059c99` (test)
 
@@ -115,7 +115,7 @@ The same anti-pattern removed from one extractor doesn't automatically get porte
 ## Attempt 007: Gemini `.pb` sessions dated by file mtime, not content (v0.6.17, ENH-046)
 
 **Status:** Completed (shipped)
-**Full spec:** [ENH-046/specification.md](attempts/ENH-046/specification.md)
+**Full spec:** [ENH-046/specification.md](attempts/007-enh-046/specification.md)
 **Discovered:** 2026-07-08, while implementing ENH-043's backup-recovery guidance
 
 **Approach:**
@@ -132,7 +132,7 @@ Backup/restore scenarios (mtime changes on copy) are a recurring class of date-d
 ## Attempt 008: Per-message date bucketing fix (v0.6.17, ENH-047)
 
 **Status:** Completed (shipped)
-**Full spec:** [ENH-047/specification.md](attempts/ENH-047/specification.md)
+**Full spec:** [ENH-047/specification.md](attempts/008-enh-047/specification.md)
 **Discovered:** 2026-07-08 (Attempt 004); fixed 2026-07-10
 **Related:** commits `665c6fed` (fix), `1f7c6112`/`fa78aba2` (tests); plan `~/.claude/plans/v0.6.17-fix-extract-chat-multiday-bucketing.md`
 

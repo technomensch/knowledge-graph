@@ -13,32 +13,32 @@ All six bugs below are tracked under one umbrella: [ENH-038](../../../enhancemen
 ## Per-Bug Specs (now under `attempts/`, not `enhancements/`)
 
 ### ENH-038: Subagent message loss + Gemini format-drift + Codex audit
-- **File:** [../attempts/ENH-038/specification.md](../attempts/ENH-038/specification.md)
+- **File:** [../attempts/001-enh-038/specification.md](../attempts/001-enh-038/specification.md)
 - **Relationship:** Origin of the saga. Fixed in v0.6.16.
 - **Attempts Referenced:** Attempt 001.
 
 ### ENH-043: No rebuild mode; pre-fix files stay corrupted
-- **File:** [../attempts/ENH-043/specification.md](../attempts/ENH-043/specification.md)
+- **File:** [../attempts/002-enh-043/specification.md](../attempts/002-enh-043/specification.md)
 - **Relationship:** Second defect — incremental-append uuid-dedup permanence prevents re-flattening existing output. `--rebuild` added; real-data repair run (9 recovered / 42 unrecoverable). Same file/subsystem, different root cause from ENH-047.
 - **Attempts Referenced:** Attempt 002.
 
 ### ENH-044: Gemini `--project` filter silently ignored
-- **File:** [../attempts/ENH-044/specification.md](../attempts/ENH-044/specification.md)
+- **File:** [../attempts/005-enh-044/specification.md](../attempts/005-enh-044/specification.md)
 - **Relationship:** Cross-project contamination — confirmed real (`career-prism` merged into `knowledge-graph` output). **Fixed (v0.6.17).** `.json`/`.jsonl` scoping shipped first (`bf1cb51c`/`1b2269cf`); real-data testing then found `.pb`/hash-named-directory contamination was still possible, closed fail-closed per [ADR-062](../../../decisions/ADR-062-gemini-pb-project-scoping-fail-closed.md) (`126d98ce`/`faa393d6`), re-verified against real data.
 - **Attempts Referenced:** Attempt 005.
 
 ### ENH-045: Codex incremental mtime-skip bug
-- **File:** [../attempts/ENH-045/specification.md](../attempts/ENH-045/specification.md)
+- **File:** [../attempts/006-enh-045/specification.md](../attempts/006-enh-045/specification.md)
 - **Relationship:** Same anti-pattern already removed from Claude's extractor, never ported to Codex. Fixed in v0.6.17.
 - **Attempts Referenced:** Attempt 006.
 
 ### ENH-046: Gemini `.pb` extractor dated sessions by file mtime
-- **File:** [../attempts/ENH-046/specification.md](../attempts/ENH-046/specification.md)
+- **File:** [../attempts/007-enh-046/specification.md](../attempts/007-enh-046/specification.md)
 - **Relationship:** Sibling — same failure *class* (date-derivation reliability) but in the Gemini extractor. Resolved in v0.6.17.
 - **Attempts Referenced:** Attempt 007.
 
 ### ENH-047: Multi-day date-bucketing defect (Claude)
-- **File:** [../attempts/ENH-047/specification.md](../attempts/ENH-047/specification.md)
+- **File:** [../attempts/008-enh-047/specification.md](../attempts/008-enh-047/specification.md)
 - **Relationship:** Newest and most impactful defect in this saga — whole session file dated by its first message. **Unfixed.**
 - **Attempts Referenced:** Attempt 004.
 

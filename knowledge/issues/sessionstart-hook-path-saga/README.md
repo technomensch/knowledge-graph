@@ -45,26 +45,14 @@ The two `SessionStart:startup hook error` messages were produced by **`learning-
 sessionstart-hook-path-saga/
 ├── README.md (this file)
 ├── description.md (problem, current understanding, status)
-├── implementation-log.md (all 3 attempts chronologically)
+├── implementation-log.md (attempts 004-006; attempts 001-003 and 007 are summarized in this README only)
 ├── test-cases.md (validation: hook runs without errors)
 ├── analysis/
 │   ├── root-cause-evolution.md (belief shift log)
 │   ├── timeline.md (2026-03-28 session history)
 │   └── lessons-learned.md (reusable insights)
 ├── attempts/
-│   ├── 001-revert-env-var/
-│   │   ├── solution-approach.md
-│   │   ├── attempt-results.md
-│   │   └── plan-reference.md
-│   ├── 002-debug-script-paths/
-│   │   ├── solution-approach.md
-│   │   ├── attempt-results.md
-│   │   └── plan-reference.md
-│   ├── 003-fix-actual-paths/
-│   │   ├── solution-approach.md
-│   │   ├── attempt-results.md
-│   │   └── plan-reference.md
-│   ├── 004-root-cause-diagnosis/
+│   ├── 004-apply-real-fix/
 │   │   ├── solution-approach.md
 │   │   └── attempt-results.md
 │   ├── 005-uninstall-and-fix-path/
