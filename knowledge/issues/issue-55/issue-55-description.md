@@ -5,7 +5,11 @@ status: resolved
 github-issue: "#242"
 branch: v0.7.4-bug-fixes
 created: 2026-08-22
-related_issues: ["issue-41", "issue-15", "issue-34", "issue-35"]
+related_issues:
+  - issue-41
+  - issue-15
+  - issue-34
+  - issue-35
 ---
 
 # issue-55: `kg_search`'s project-local FTS5 index path is keyed only by KG name, not by path — stale/cross-repo index collisions silently return wrong (often empty) results
