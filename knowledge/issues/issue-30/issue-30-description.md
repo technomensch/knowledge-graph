@@ -5,6 +5,7 @@ status: resolved
 github-issue: "#205"
 branch: none
 created: 2026-07-28
+related_enhs: ["ENH-065"]
 ---
 
 # issue-30: `kmg-handoff` and `kmg-session-wrap` Only Reference Session-Summary — Neither Generates One
@@ -27,6 +28,7 @@ Captured live, lightweight — not run through the full `kmg-start-issue-trackin
 
 ## Related
 
+- [ENH-065](../../enhancements/ENH-065/ENH-065-specification.md) — the single-file lightweight issue that started the pattern ENH-065 investigates.
 - `commands/kmg-handoff.md`
 - `commands/kmg-session-summary.md`
 - `skills/kmg-session-wrap/`

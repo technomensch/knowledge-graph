@@ -50,7 +50,7 @@ Of the 47 issues with a done-like status (`resolved`, `implemented`), 21 are sin
 
 Single-file `resolved` issues: 1, 4, 6, 15, 16, 18, 23, 24, 30, 32, 34, 35, 36, 37, 38, 39, 53, 55, 56, 57, 58.
 
-Enhancement folders are mostly 4-file for the earliest items (ENH-001 to ENH-010) and mostly 1-file from ENH-011 onward. Issues follow a similar curve: full folders cluster at issue-7 to issue-9, issue-14, issue-25 to issue-29, and issue-42 to issue-48, with single files dominating the stretches between.
+Enhancement folders are mostly 4-file for the earliest items (ENH 001 to ENH 010) and mostly 1-file from ENH 011 onward. Issues follow a similar curve: full folders cluster at issue 7 to issue 9, issue 14, issue-25 to issue 29, and issue 42 to issue 48, with single files dominating the stretches between.
 
 ### Where the single-file `resolved` issues came from
 
@@ -75,17 +75,17 @@ Method: measurement of the repo, `git log -S` archaeology on the command file, a
 - Step 4 generates an implementation plan template, not the supporting docs.
 - `core/default-templates/issues/` and `core/default-templates/enhancements/` contain only `README.md`. No file templates exist for `solution-approach.md`, `test-cases.md`, `implementation-log.md`, or `progress-log.md`.
 - The layout has been in the command since its first commit, `4641faab` (2026-02-17, "feat(v0.0.5-alpha): validation fixes + start-issue-tracking command"). It was never turned into a generator.
-- The earliest `solution-approach.md` files in the repo are hand-written: ENH-001 (2026-04-11), ENH-020 and issue-7 (2026-05-28), issue-5 (2026-05-30), each arriving in a docs or tracking commit.
+- The earliest `solution-approach.md` files in the repo are hand-written: ENH 001 (2026-04-11), ENH 020 and issue 7 (2026-05-28), issue 5 (2026-05-30), each arriving in a docs or tracking commit.
 - (I) The layout appears to have been ported from the author's earlier `optimize-my-resume` project. `knowledge/chat-history/2026-02/2026-02-17-claude.md` shows the "Remove project-specific references (docs/issues/... optimize-my-resume paths)" cleanup on the day the command was written.
 - Consequence: whether the supporting files exist depends entirely on a model following prose. This repo's own ADR-043 and ADR-050 record that prose-only enforcement was unreliable twice and had to be replaced with deterministic hooks.
 
 ### Finding 2 — The lightweight path became the default without a completion rule (V)
 
 - **2026-07-28** (`knowledge/chat-history/2026-07-28/2026-07-28-claude-part-01.md`): an assistant wrote issue-30 as one file and stated, "No — I deliberately did the lightweight path, not the full `kmg-start-issue-tracking` workflow." It added that no documented rule existed, so "every session makes its own judgment call" (this is issue-25).
-- **2026-08-01** (`knowledge/chat-history/2026-08-01/2026-08-01-claude-part-01.md`): the assistant observed that issue-30, ENH-053/054/055, and issue-33 "were explicitly captured as 'small, deferred, write it down'... That's already the de facto rule; it just isn't documented." This became ADR-068 Half A.
+- **2026-08-01** (`knowledge/chat-history/2026-08-01/2026-08-01-claude-part-01.md`): the assistant observed that issue-30, ENH 053/054/055, and issue-33 "were explicitly captured as 'small, deferred, write it down'... That's already the de facto rule; it just isn't documented." This became ADR-068 Half A.
 - **ADR-068 Half A** defines the lightweight path as: no branch, no GitHub issue; use it when no code change is planned, no outside visibility is needed, and the write-up fits "a paragraph or two"; use the full workflow when code will change, outside visibility is needed, or the write-up "would need to sprawl across multiple files anyway." It says nothing about (a) whether supporting files are optional on the lightweight path, or (b) what must happen when a lightweight doc is later resolved. The phrase "no branch, no GitHub issue" was read by later sessions as "single file."
-- **2026-08-18** (`knowledge/chat-history/2026-08/2026-08-18-claude.md`, line ~928): "issue-49/50/51: Each dir has exactly one file... No solution-approach/implementation-log/test-cases files yet." The word "yet" shows the gap was seen and treated as normal.
-- **2026-08-24** (`knowledge/chat-history/2026-08/2026-08-24-claude.md`, line 123): "Lean single-file docs, no solution-approach.md/test-cases.md/implementation-log.md — recent precedent (issue-53 through issue-56) has moved to a single issue-N-description.md file rather than the command's older 4-file template." This is an assistant decision justified by precedent, applied to issue-57 and issue-58, and it calls the command's own template "older."
+- **2026-08-18** (`knowledge/chat-history/2026-08/2026-08-18-claude.md`, line ~928): for issues 49 to 51: "Each dir has exactly one file... No solution-approach/implementation-log/test-cases files yet." The word "yet" shows the gap was seen and treated as normal.
+- **2026-08-24** (`knowledge/chat-history/2026-08/2026-08-24-claude.md`, line 123): "Lean single-file docs, no solution-approach.md/test-cases.md/implementation-log.md — recent precedent (issue 53 through issue 56) has moved to a single issue-N-description.md file rather than the command's older 4-file template." This is an assistant decision justified by precedent, applied to issue 57 and issue 58, and it calls the command's own template "older."
 - No user instruction was found that says supporting files are unnecessary. Precedent drift is self-reinforcing: each session cites the previous session's single-file output as the live convention.
 
 ### Finding 3 — Nothing checks folder completeness when status flips to resolved (V)
@@ -95,9 +95,9 @@ Method: measurement of the repo, `git log -S` archaeology on the command file, a
 - `scripts/pre-push-gate.sh` Gate 5 checks index counts and backlink symmetry; no gate inspects issue or ENH folder contents.
 - ADR-068 Half B / ENH-056 is a command-completion check piloted on handoff and recall file tracing. It is not a status-flip backfill gate. Its own text depends on issue-25's rule so it can tell "legitimately lightweight" from "silently abbreviated," and that distinction is not recorded anywhere in a doc.
 - Sampled resolutions confirm the mechanism:
-  - **issue-15:** created 2026-07-16 in `b2645ca3`; marked resolved 2026-08-03 in `cfbbd762` ("mark resolved — PR #203 merged, GH #172 already closed"), a frontmatter edit. No supporting docs added or mentioned.
-  - **issue-34:** created 2026-08-01 in `a0baa67a` (the ADR-068 commit); marked resolved the same day in `c3081d5a`. Later commits were backlink and GitHub-link housekeeping only.
-  - **issue-55:** created in `3274ff89` (2026-08-22) with its fix on branch `v0.7.4-bug-fixes`; never expanded.
+  - **issue 15:** created 2026-07-16 in `b2645ca3`; marked resolved 2026-08-03 in `cfbbd762` ("mark resolved — PR #203 merged, GH #172 already closed"), a frontmatter edit. No supporting docs added or mentioned.
+  - **issue 34:** created 2026-08-01 in `a0baa67a` (the ADR-068 commit); marked resolved the same day in `c3081d5a`. Later commits were backlink and GitHub-link housekeeping only.
+  - **issue 55:** created in `3274ff89` (2026-08-22) with its fix on branch `v0.7.4-bug-fixes`; never expanded.
 
 ### Finding 4 — Prior recognition, but not of this exact gap (V)
 
@@ -112,7 +112,7 @@ Method: measurement of the repo, `git log -S` archaeology on the command file, a
 1. **High (~80%):** the command documents the supporting files in comments only; nothing generates or enforces them, so creation relies on model attention to prose.
 2. **High (~75%):** the lightweight path produces a stub by design, and no flip-to-resolved gate or audit step exists. The paperwork audit validates diff evidence, not folder completeness, so the stub just gets its frontmatter edited.
 3. **Medium (~60%):** precedent drift. Sessions cite the last single-file issue as the live convention and call the 4-file layout "older." ADR-068's "de facto practice" wording ratified it.
-4. **Medium-low (~40%):** resolving commits often come from housekeeping or pre-merge passes rather than the implementing session, so the context to write `solution-approach` and `test-cases` is gone by the time `status` flips (issue-15 and issue-34).
+4. **Medium-low (~40%):** resolving commits often come from housekeeping or pre-merge passes rather than the implementing session, so the context to write `solution-approach` and `test-cases` is gone by the time `status` flips (issue 15 and issue 34).
 5. **Low (~20%):** deliberate user intent that supporting files are unnecessary. No user quote supports this.
 
 ## Proposal (not decided — see Decisions Needed)
@@ -129,7 +129,7 @@ This ENH tracks the gap. It does not prescribe the fix. The candidate directions
 
 These need an owner decision before implementation. No code, template, or doc changes were made when this ENH was filed.
 
-1. **What does "resolved" require?** Options: (a) full 4-file folder always; (b) full folder only when code changed (matches ADR-068's own full-workflow criteria); (c) single file allowed if it contains a Resolution section naming the fix commits (several single-file issues already do this, e.g. issue-4).
+1. **What does "resolved" require?** Options: (a) full 4-file folder always; (b) full folder only when code changed (matches ADR-068's own full-workflow criteria); (c) single file allowed if it contains a Resolution section naming the fix commits (several single-file issues already do this, e.g. issue 4).
 2. **Is a single-file doc a valid permanent state?** If yes, the audit needs a way to recognize it; if no, lightweight becomes a staging state that must be promoted.
 3. **Where is the workflow choice recorded?** A new `workflow:` field, reuse of the existing `status`/`branch`/`github-issue` signals (a `branch: none` plus `github-issue: pending` combination already marks drafts), or something else. Check against ENH-062 first, because it already plans to formalize the `status` schema and a `status_category` layer.
 4. **Generator scope.** Should Step 3 create all four files empty, create only the main file and add others on demand, or create files filled from the conversation? Filling from the conversation matches how the full workflow is meant to work but costs more per issue.
@@ -142,7 +142,7 @@ These need an owner decision before implementation. No code, template, or doc ch
 
 - **In scope when scheduled:** folder-completeness policy, file templates, generator step, workflow-choice field, a completeness check at status flip.
 - **Out of scope:** the `status` enum redesign itself (ENH-062 owns it); meta-issue attempts drift (issue-60 and ADR-072); the handoff file-tracing check (ENH-056).
-- **Do not merge into ENH-062.** The two interact (a `workflow` field and a `status_category` layer) but have different risk profiles: ENH-062 is schema design, this ENH is a generator plus a gate. Cross-link, keep separate, same reasoning ENH-042 used against ENH-034.
+- **Do not merge into ENH-062.** The two interact (a `workflow` field and a `status_category` layer) but have different risk profiles: ENH-062 is schema design, this ENH is a generator plus a gate. Cross-link, keep separate, same reasoning ENH 042 used against ENH 034.
 - **Related drift class:** issue-60 / ADR-072 describe the same shape of failure for meta-issue attempts: a documented sync that only fires when a specific command is invoked, so hand-made artifacts drift silently. This ENH is the issue/ENH-folder counterpart.
 
 ## Acceptance Criteria (to be refined once Decisions Needed 1-5 are answered)
@@ -181,6 +181,6 @@ All paths relative to the repo root. Chat-history files are extracted logs and m
 | "No solution-approach ... yet" for issues 49-51 | `knowledge/chat-history/2026-08/2026-08-18-claude.md` |
 | Single-file chosen by precedent for issues 57-58 | `knowledge/chat-history/2026-08/2026-08-24-claude.md` line 123 |
 | Gate warned against being bypassed by next lightweight path | `knowledge/chat-history/2026-07/2026-07-12-claude.md` |
-| Resolve-by-frontmatter-edit samples | commits `cfbbd762` (issue-15), `c3081d5a` (issue-34) |
+| Resolve-by-frontmatter-edit samples | commits `cfbbd762` (issue 15), `c3081d5a` (issue 34) |
 | Audit checks diff evidence, not folder contents | `skills/kmg-paperwork-audit/SKILL.md` Steps 2 and 5 |
 | Gates check counts and backlinks only | `scripts/pre-push-gate.sh` Gate 5 |

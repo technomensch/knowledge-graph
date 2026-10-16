@@ -5,6 +5,7 @@ status: deferred
 github-issue: "#261"
 branch: none
 created: 2026-09-17
+related_enhs: ["ENH-065"]
 ---
 
 # Issue-60: Meta-issue attempt-sync only fires on `--add-attempt`/`--log-attempt`, not on hand-created attempt folders
@@ -31,6 +32,7 @@ This is explicitly recorded as an open, not-yet-closed limitation in `knowledge/
 
 ## Related
 
+- [ENH-065](../../enhancements/ENH-065/ENH-065-specification.md) — same artifact-drift shape, here for meta-issue attempts folders and logs.
 - `knowledge/decisions/ADR-072-meta-issue-tracking-pattern.md` — records the pattern's origin, the v0.7.10 patch, and this exact limitation in its Future Considerations section.
 - `commands/kmg-meta-issue.md` — the command whose SOP 1 / `--log-attempt` steps were patched (partial fix) on v0.7.10.
 - `docs/examples/meta-issue/example-performance-saga/` — the teaching-content example where this exact drift pattern was first discovered (missing `attempts/003-connection-pooling/` files while README/description/implementation-log/test-cases all narrated a 3rd attempt as real).

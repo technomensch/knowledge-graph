@@ -6,7 +6,7 @@ github-issue: "#199"
 branch: none
 created: 2026-07-28
 related_issues: ["issue-25", "issue-30", "issue-33", "issue-34", "issue-35"]
-related_enhs: ["ENH-052", "ENH-058"]
+related_enhs: ["ENH-052", "ENH-058", "ENH-065"]
 related_adrs: ["ADR-043", "ADR-050", "ADR-068"]
 ---
 
@@ -270,6 +270,7 @@ Also noted in passing (not actioned this branch): `core/docs/META-ISSUE-GUIDE.md
 
 ## Related
 
+- [ENH-065](../ENH-065/ENH-065-specification.md) — same documented-steps-inconsistently-executed failure class, for issue/enhancement supporting files.
 - [ENH-058](../ENH-058/ENH-058-specification.md) — companion enhancement, design
   resolved 2026-08-01: at the 2nd consecutive failure of the same test, surfaces
   a plain-English side-by-side of the current and prior finding, tagged "not

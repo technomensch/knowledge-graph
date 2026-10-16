@@ -5,6 +5,7 @@ status: deferred
 github-issue: "#206"
 branch: none
 created: 2026-07-29
+related_enhs: ["ENH-065"]
 ---
 
 # issue-33: Handoff/Recall Commands Don't Require Tracing Linked Files — Sessions Read Only the Pointer Layer
@@ -47,6 +48,7 @@ Captured live, lightweight, local-only — matching the precedent set for issue-
 
 ## Related
 
+- [ENH-065](../../enhancements/ENH-065/ENH-065-specification.md) — same documented-steps-inconsistently-executed failure class, applied to issue/enhancement folder supporting files.
 - `commands/kmg-handoff.md`
 - `commands/kmg-session-summary.md`
 - issue-30 (adjacent gap: handoff/wrap never auto-generate a session summary in the first place; also ENH-056's instance #1)

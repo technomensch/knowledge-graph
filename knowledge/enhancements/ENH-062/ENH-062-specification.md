@@ -6,6 +6,7 @@ github-issue: "#241"
 branch: none
 created: 2026-08-22
 related_issues: ["issue-53", "issue-54"]
+related_enhs: ["ENH-065"]
 ---
 
 # ENH-062: Track issue/ADR/ENH relationships (blocked-by, related-to, depends-on) in local KG metadata, and formalize the `status` field schema
@@ -116,6 +117,7 @@ Proposed mapping of our existing literal values onto these categories:
 
 ## Related
 
+- [ENH-065](../ENH-065/ENH-065-specification.md) — shares the `status` schema and `kg_upgrade` backfill surface, so a `workflow` field must be designed together with this ENH.
 - [issue-53](../../issues/issue-53/issue-53-description.md), [issue-54](../../issues/issue-54/issue-54-description.md) — the ADR-006/orphan-file incident that prompted this session's manual relationship-mapping exercise in the first place.
 - [ENH-052](../ENH-052/ENH-052-specification.md) — broader "internal KG paperwork consistency" umbrella; this ENH's schema work would be a natural input to ENH-052's consistency checks once it exists.
 

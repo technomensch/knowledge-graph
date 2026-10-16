@@ -5,6 +5,7 @@ status: resolved
 github-issue: "#189"
 branch: none
 created: 2026-07-18
+related_enhs: ["ENH-065"]
 ---
 
 # issue-25: No Documented Authority for ENH-Spec vs. Issue-Tracking-Workflow (Enhancement Scope Overlap)
@@ -31,6 +32,7 @@ Discovered live, in-session, on 2026-07-18. While filing what became ENH-051 (KG
 
 ## Related
 
+- [ENH-065](../../enhancements/ENH-065/ENH-065-specification.md) — ENH-065 extends this issue's lightweight-vs-full ruling with a completion rule for what a lightweight folder must still contain.
 - **Resolved by [ADR-068](../../decisions/ADR-068-lightweight-vs-full-workflow-rule-and-piloted-command-completion-check.md) (2026-08-01)** — Half A of that ADR is this issue's rule: lightweight path vs. full `kmg-start-issue-tracking` workflow, formalizing the de facto pattern already used by issue-30/ENH-053/054/055/issue-33. **Implemented:** `knowledge/rules.md` § Bug / Enhancement Triage (Path 1's lightweight-vs-full split bullet).
 - Loosely adjacent to ADR-058 ("naming-scope-upfront-check-for-new-commands-skills-docstrings") — same family of problem (undocumented scope boundaries between project mechanisms), different specific gap.
 - [ENH-051](../../enhancements/ENH-051/ENH-051-specification.md) — the enhancement being filed when this was found.
