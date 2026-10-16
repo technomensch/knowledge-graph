@@ -36,6 +36,9 @@ env/
 chat-history/
 *.backup
 
+# Obsidian Copilot local cache (machine-specific model catalog etc.)
+.copilot/
+
 # Build artifacts
 dist/
 !mcp-server/dist/

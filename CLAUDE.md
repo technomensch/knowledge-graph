@@ -116,3 +116,5 @@ Never run namespace grep scans over `knowledge/plans/` or `.jsonl` chat history 
 ## Active Work
 
 Check `git branch` for current work in progress. Plans live locally in `~/.claude/plans/` (not git-synced) and are copied to `knowledge/plans/` for working reference only.
+
+@AGENTS.md
