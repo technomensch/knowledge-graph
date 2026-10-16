@@ -4,7 +4,7 @@ type: Gap
 status: open
 github-issue: "#175"
 created: 2026-07-17
-related-issues: []
+related-issues: [issue-13]
 target-release: null
 ---
 
@@ -96,3 +96,4 @@ A third instance of the general "skill trigger vocabulary misses real phrasing" 
 ## Related
 
 - [issue-36](../issue-36/issue-36-description.md) — same class: automatic trigger vocabulary that doesn't actually fire (stale `kmgraph:recall` skill-name references live in `scripts/pre-skill-rules-inject.sh`), a separate concrete instance of this issue's broader pattern.
+- [issue-13](../issue-13/issue-13-description.md) — its `knowledge/rules.md` hotspot cross-link notes this issue also discusses changes to rules.md enforcement; FYI, not batched.

@@ -2,8 +2,9 @@
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
-  "mcpToolSearch": true,
   "enabledPlugins": {
-    "caveman@caveman": true
-  }
+    "caveman@caveman": true,
+    "gemini@abiswas97-gemini": true
+  },
+  "mcpToolSearch": true
 }

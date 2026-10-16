@@ -181,8 +181,8 @@ Sources consulted while solving this problem:
 ## Related Documentation
 
 **Knowledge Graph:**
-- [Functional Directory Structure](../../knowledge/patterns.md#functional-directory-structure) — Recommended organization for flat discovery.
-- [Flat Skill Discovery Constraint](../../knowledge/gotchas.md#flat-skill-discovery-constraint) — Analysis of the underlying platform limitation.
+- [Functional Directory Structure](../../knowledge/sample-patterns.md#functional-directory-structure) — Recommended organization for flat discovery.
+- [Flat Skill Discovery Constraint](../../knowledge/sample-gotchas.md#flat-skill-discovery-constraint) — Analysis of the underlying platform limitation.
 
 ---
 

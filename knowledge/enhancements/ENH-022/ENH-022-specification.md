@@ -7,6 +7,7 @@ github_issue: null
 created: 2026-05-29
 related_adrs: ["ADR-009", "ADR-028", "ADR-040"]
 related_enhs: ["ENH-051"]
+related_issues: ["issue-52"]
 ---
 
 # ENH-022: Template Directory Disambiguation
@@ -256,3 +257,7 @@ Two additions to the existing upgrade-inspector check sequence:
 **✅ Brainstorm complete (2026-06-12)** — full scope established. Web research conducted (2026-06-12). Prior brainstorm (2026-06-08) was path-rename only; this session expanded scope to cover starter consolidation, `knowledge/knowledge/` removal, and upgrade-inspector migration.
 
 See `~/.claude/plans/v0.5.10.7-template-disambiguation.md`.
+
+## Related
+
+- [issue-52](../../issues/issue-52/issue-52-description.md) — issue-52's spec cross-references this item.

@@ -7,6 +7,7 @@ github_issue: null
 created: 2026-05-21
 related_adrs: []
 related_enhs: []
+related_issues: ["issue-52"]
 ---
 
 # ENH-013: Rename kg-recall Skill to Reduce Slash Command UI Confusion
@@ -76,6 +77,7 @@ Minimal change — rename the skill directory and update any internal references
 
 ## Related
 
+- [issue-52](../../issues/issue-52/issue-52-description.md) — issue-52's spec cross-references this item.
 - [issue-11](../../issues/issue-11/issue-11-description.md) — cites this ENH (created
   2026-05-21, before the `start-issue-tracking` `gh issue create` fix landed 2026-05-30) as
   one of the Cause-1 casualties: `github_issue: null` because the tool itself silently

@@ -6,6 +6,7 @@ github-issue: "#240"
 branch: none
 created: 2026-08-22
 related-issues: [issue-53]
+related-enhs: [ENH-062]
 ---
 
 # issue-54: `kg_upgrade` has no check category for leftover renumbered-ADR orphan files
@@ -33,3 +34,7 @@ No `UpgradeItem` category in `kg_upgrade`'s schema detects: an ADR/ENH file whos
 ## Status
 
 Deferred — tracking only, no branch or implementation plan created. Filed via `/kmgraph:kmg-start-issue-tracking` Mode 3 (track only) on 2026-08-22, split out from issue-53's item 2 after validating issue-53's item 1 was already resolved by commit `046bc2234`.
+
+## Related
+
+- [ENH-062](../../enhancements/ENH-062/ENH-062-specification.md) — the relationship-mapping/status-schema enhancement prompted by the ADR-006/orphan-file incident this issue records.

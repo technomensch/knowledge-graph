@@ -25,7 +25,7 @@ Navigate all knowledge graph entries by category.
 
 [Auto-populated from patterns.md]
 
-- [Pattern Name](patterns.md#pattern-name) — Brief description
+- [Pattern Name](patterns.md#pattern-template) — Brief description
 
 ---
 
@@ -33,7 +33,7 @@ Navigate all knowledge graph entries by category.
 
 [Auto-populated from gotchas.md]
 
-- [Gotcha Name](gotchas.md#gotcha-name) — Brief description
+- [Gotcha Name](gotchas.md#gotcha-template) — Brief description
 
 ---
 
@@ -41,7 +41,7 @@ Navigate all knowledge graph entries by category.
 
 [Auto-populated from concepts.md]
 
-- [Concept Name](concepts.md#concept-name) — Brief description
+- [Concept Name](concepts.md#concept-template) — Brief description
 
 ---
 
@@ -49,7 +49,7 @@ Navigate all knowledge graph entries by category.
 
 [Auto-populated from architecture.md]
 
-- [Architecture Component](architecture.md#architecture-component) — Brief description
+- [Architecture Component](architecture.md#architecture-entry-template) — Brief description
 
 ---
 
@@ -57,7 +57,7 @@ Navigate all knowledge graph entries by category.
 
 [Auto-populated from workflows.md]
 
-- [Workflow Name](workflows.md#workflow-name) — Brief description
+- [Workflow Name](workflows.md#workflow-template) — Brief description
 
 ---
 

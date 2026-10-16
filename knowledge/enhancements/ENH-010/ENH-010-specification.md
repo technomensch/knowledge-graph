@@ -6,7 +6,7 @@ version_target: "v0.3.0-beta"
 github_issue: null
 created: 2026-04-09
 related_adrs: ["ADR-028", "ADR-029"]
-related_enhs: ["ENH-011"]
+related_enhs: ["ENH-011", "ENH-016"]
 ---
 # ENH-010: v0.3.0-beta — Default KG Path Change, Migration Step, and me.md/rules.md Scaffold
 
@@ -151,3 +151,7 @@ See ADR-028: me.md + rules.md as Platform-Agnostic Source of Truth.
 
 `~/.claude/plans/swift-juggling-narwhal.md` (local only, not committed)
 `docs/plans/v0.3.0-beta.md` — Phase 4 Migration Hardening added 2026-04-10
+
+## Related
+
+- [ENH-016](../ENH-016/ENH-016-specification.md) — rules.md auto-split recommendation; its split-target and precedent analysis cites this ENH.

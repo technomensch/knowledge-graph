@@ -2,6 +2,7 @@
 id: ENH-035
 type: Enhancement
 status: implemented
+related_enhs: ["ENH-026"]
 ---
 
 # ENH-035: Chat-history-and-lessons-to-KG backfill extractor (standalone, consolidates the now-retired kmg-update-graph)
@@ -160,3 +161,7 @@ Requested check: what else does introducing `kmg-backfill` and refactoring `kmg-
 - [x] `docs/pillars/organizing/backfill.md`'s fixes (all three: "From chat history" overclaim, "After init" `kmg-update-graph` reference, "no candidates" troubleshooting reference, "backfill was skipped" section) are confirmed landed, not left as open TODOs in the doc itself.
 - [x] `ADR-071` status moved from `Proposed` to `Accepted`.
 </content>
+
+## Related
+
+- [ENH-026](../ENH-026/ENH-026-specification.md) — ENH-026's spec cross-references this item.

@@ -8,6 +8,7 @@ created: 2026-07-28
 related_adrs: ["ADR-067"]
 related_enhs: []
 notes: "Captured as an idea only — not designed, not scoped, not planned."
+related_issues: ["issue-52"]
 ---
 
 # ENH-057: Hook active KG name into claude-hud status bar
@@ -24,4 +25,5 @@ Captured as an idea, 2026-07-28. Not scoped, not designed, not triaged for imple
 
 ## Related
 
+- [issue-52](../../issues/issue-52/issue-52-description.md) — issue-52's spec cross-references this item.
 - ADR-067 (`knowledge/decisions/ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md`) — the resolution model this status-bar display would reflect

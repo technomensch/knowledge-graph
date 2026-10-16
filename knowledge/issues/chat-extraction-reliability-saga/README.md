@@ -4,7 +4,7 @@
 **Scope:** v0.6.16 → v0.6.18 (ongoing); all three extractors (Claude, Gemini, Codex) as of the 2026-07-09 umbrella consolidation. v0.6.17 merged 2026-07-10 (PR #162); post-merge review findings pushed the saga's active scope to v0.6.18.
 **Created:** 2026-07-08
 **Status:** ✅ Resolved and merged to `main`. All 6 post-merge regression findings fixed, PR #164 merged `c968c1d5` (2026-07-11) — full extraction suite green (9 files, 79 assertions, 0 failures). v0.6.17 merged (PR #162, `8c56070a`, 2026-07-10); a post-merge Fable review the same day found these 6 correctness bugs in the shipped code (see "Post-Merge Regression Findings" below), all closed and now live on `main`. **Note:** the unrelated `kg-config-silent-overwrite` fix (`ac70b490`) was merged onto this same branch (`v0.6.18-fix-extraction-regressions`) per an explicit user decision on 2026-07-10 to ship both as one combined release rather than two — different root cause/subsystem, same branch and version number now. See `knowledge/issues/kg-config-silent-overwrite/`. No GitHub tracking issue exists for this saga (tracked purely in the KG via [ENH-038](../../enhancements/ENH-038/ENH-038-specification.md)); the `kg-config-silent-overwrite` sibling's GitHub issue [#163](https://github.com/technomensch/knowledge-graph/issues/163) auto-closed on this same merge.
-**Tracked under:** single umbrella [ENH-038](../../enhancements/ENH-038/ENH-038-specification.md) — this saga was previously split across six ENH numbers (038/043/044/045/046/047); consolidated 2026-07-09 because one feature area ("extract chat history reliably") should not be scattered across six disconnected files. Each bug's full original spec is preserved under `attempts/ENH-0NN/specification.md`.
+**Tracked under:** single umbrella [ENH-038](../../enhancements/ENH-038/ENH-038-specification.md) — this saga was previously split across six ENH numbers (038/043/044/045/046/047); consolidated 2026-07-09 because one feature area ("extract chat history reliably") should not be scattered across six disconnected files. Each bug's full original spec is preserved under `attempts/NNN-enh-0NN/specification.md`.
 **Current Understanding:** Messages go missing/misfiled through several independent defects across all three extractors. Two waves of defects have now been found and fixed: (1) v0.6.17's date-derivation/scoping bugs (a whole session file dated by its first message; Gemini `--project` silently ignored), and (2) v0.6.18's write-path-safety and scoping-direction bugs found by a post-merge diff review (destroying old content before a new write is confirmed; a fail-closed scoping control that failed open under a specific input shape). The recurring lesson: reliability bugs in this subsystem cluster into distinct *classes* (date derivation, scoping direction, write safety) — fixing one class doesn't imply the others are covered.
 
 ---
@@ -34,7 +34,7 @@ Extraction of Claude Code chat history into `knowledge/chat-history/` keeps losi
 
 ## Attempts
 
-Full detail for each: [implementation-log.md](implementation-log.md). Original per-bug specs: `attempts/ENH-0NN/specification.md`.
+Full detail for each: [implementation-log.md](implementation-log.md). Original per-bug specs: `attempts/NNN-enh-0NN/specification.md`.
 
 1. **ENH-038 (v0.6.16)** — Fixed — subagent message loss (Claude) + format-drift (Gemini) + Codex audit; per-message uuid dedup replaced buggy cross-file `last_ts` cutoff.
 2. **ENH-043 (v0.6.17)** — In progress — rebuild mode for permanently-corrupted pre-fix output (Claude); real-data repair run found 68 flagged dates (9 recovered / 42 unrecoverable / rest false-positives from over-loose regex, since tightened).
@@ -66,7 +66,7 @@ After PR #162 merged v0.6.17 to `main` (`8c56070a`), an independent Fable-model 
 
 ## Requirements
 
-The umbrella requirement: `kmg-extract-chat` must extract every real message, under its correct date, for every source (Claude/Gemini/Codex), with no silent loss. Per-bug requirements (full acceptance criteria) live in each spec under `attempts/ENH-0NN/specification.md`:
+The umbrella requirement: `kmg-extract-chat` must extract every real message, under its correct date, for every source (Claude/Gemini/Codex), with no silent loss. Per-bug requirements (full acceptance criteria) live in each spec under `attempts/NNN-enh-0NN/specification.md`:
 
 | Bug | Requirement |
 |---|---|
@@ -144,12 +144,12 @@ The `v0.6.17-fix-extract-chat-rebuild` branch also produced a design decision an
 See [related-issues/github-links.md](related-issues/github-links.md).
 
 - [ENH-038 umbrella](../../enhancements/ENH-038/ENH-038-specification.md) — single tracking ENH for this whole feature area (was 6 numbers, consolidated 2026-07-09)
-- [attempts/ENH-038/specification.md](attempts/ENH-038/specification.md) — original subagent message-loss + Gemini format-drift + Codex audit
-- [attempts/ENH-043/specification.md](attempts/ENH-043/specification.md) — rebuild mode / incremental-append dedup permanence
-- [attempts/ENH-044/specification.md](attempts/ENH-044/specification.md) — Gemini `project_filter` contamination fix (partially fixed: `.json`/`.jsonl` scoping verified working (`bf1cb51c`/`1b2269cf`); `.pb` path still leaks unfiltered sessions — OPEN)
-- [attempts/ENH-045/specification.md](attempts/ENH-045/specification.md) — Codex incremental mtime-skip fix
-- [attempts/ENH-046/specification.md](attempts/ENH-046/specification.md) — Gemini `.pb` date-derivation defect
-- [attempts/ENH-047/specification.md](attempts/ENH-047/specification.md) — multi-day date-bucketing defect — ✅ Fixed (v0.6.17)
+- [attempts/001-enh-038/specification.md](attempts/001-enh-038/specification.md) — original subagent message-loss + Gemini format-drift + Codex audit
+- [attempts/002-enh-043/specification.md](attempts/002-enh-043/specification.md) — rebuild mode / incremental-append dedup permanence
+- [attempts/005-enh-044/specification.md](attempts/005-enh-044/specification.md) — Gemini `project_filter` contamination fix (partially fixed: `.json`/`.jsonl` scoping verified working (`bf1cb51c`/`1b2269cf`); `.pb` path still leaks unfiltered sessions — OPEN)
+- [attempts/006-enh-045/specification.md](attempts/006-enh-045/specification.md) — Codex incremental mtime-skip fix
+- [attempts/007-enh-046/specification.md](attempts/007-enh-046/specification.md) — Gemini `.pb` date-derivation defect
+- [attempts/008-enh-047/specification.md](attempts/008-enh-047/specification.md) — multi-day date-bucketing defect — ✅ Fixed (v0.6.17)
 - [ADR-044](../../decisions/ADR-044-split-oversized-chat-history-files.md) — **pre-existing spec, predates this saga (2026-04-23).** Governs when/how a daily output file gets split into `-part1.md`/`-part2.md`/… (900 KB / 30,000-line threshold, for Obsidian compatibility). ENH-038's fix had to be made compatible with this (uuid-dedup must union across all split parts, not just the last one). ENH-047's fan-out-by-date fix stayed compatible with it too — verified against a pre-split-day fixture (`tests/test-extraction-multiday.sh` Step 4).
 - [ADR-062](../../decisions/ADR-062-gemini-pb-project-scoping-fail-closed.md) — Records the fail-closed decision for ENH-044's remaining `.pb`/hash-dir contamination vector. **Amended 2026-07-11:** a check-ordering regression let this control fail open for hex-valued `--project` filters; closed (see Post-Merge Regression Findings, finding 3).
 - [ADR-063](../../decisions/ADR-063-never-destroy-known-good-state-before-confirmed-write.md) — **New (2026-07-11).** Cross-cutting write-safety principle, prompted by this saga's rebuild write-path fix (findings 1+2) and the sibling `kg-config-silent-overwrite` incident hitting the identical anti-pattern the same day.

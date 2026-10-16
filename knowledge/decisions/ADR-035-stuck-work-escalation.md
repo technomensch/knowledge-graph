@@ -12,7 +12,7 @@ git:
   issue: null
 implements: null
 related:
-  adrs: [8]
+  adrs: [72]
   lessons: []
   kg_entries: []
 tags: [meta-issue, escalation, debugging, stuck-work, opus, process]
@@ -23,7 +23,7 @@ category: process
 
 **Date:** 2026-04-16
 **Status:** Proposed
-**Related:** [[ADR-008-third-person-language-standard]] (Meta-Issue Tracking Pattern)
+**Related:** [[ADR-072-meta-issue-tracking-pattern]] (Meta-Issue Tracking Pattern)
 
 ---
 
@@ -199,7 +199,7 @@ If root cause genuinely shifts (new diagnosis invalidates prior attempts), the a
 
 ## Related Decisions
 
-- **[ADR-008](ADR-008-meta-issue-tracking-pattern.md):** Meta-issue tracking pattern this extends
+- **[ADR-072](ADR-072-meta-issue-tracking-pattern.md):** Meta-issue tracking pattern this extends
 
 ---
 

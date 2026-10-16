@@ -6,7 +6,7 @@ version_target: null
 github_issue: null
 created: 2026-06-12
 related_adrs: []
-related_enhs: ["ENH-024"]
+related_enhs: ["ENH-024", "ENH-032"]
 ---
 
 # ENH-025: Cross-Platform Knowledge Extractor (Backfill from Chat History)
@@ -80,6 +80,7 @@ Found via an open-ticket overlap check while finalizing [ENH-034](../ENH-034/ENH
 
 ## Related
 
+- [ENH-032](../ENH-032/ENH-032-specification.md) — ENH-032's spec cross-references this item.
 - ENH-024: Codex CLI chat history extraction (source format context)
 - ENH-035: consolidated `kmg-backfill` command — `kg_extract` is its MCP-tool equivalent, scope now includes lessons-learned/decisions per the update above
 - ENH-034: `kmg-update-graph` removal — the reason `kg_extract`'s scope grew beyond chat-history

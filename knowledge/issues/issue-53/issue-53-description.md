@@ -6,6 +6,7 @@ github-issue: "#231"
 branch: none
 created: 2026-08-22
 related-issues: [issue-54]
+related-enhs: [ENH-062]
 ---
 
 # issue-53: ADR creation has no collision check — numbers can be assigned twice
@@ -32,3 +33,7 @@ Whatever creates ADR files (the `kmg-create-adr` command/agent, or manual author
 ## Status
 
 **Resolved** — item 1 (the actual collision-check ask) was already shipped before this issue existed. Item 2 (orphan detection) lives on as [issue-54](../issue-54/issue-54-description.md). Filed retroactively after being fixed reactively in commit `8dab9210` on the `main` branch (2026-08-22 session); closed the same day once item 1 was confirmed already resolved.
+
+## Related
+
+- [ENH-062](../../enhancements/ENH-062/ENH-062-specification.md) — the relationship-mapping/status-schema enhancement prompted by the ADR-006/orphan-file incident this issue records.

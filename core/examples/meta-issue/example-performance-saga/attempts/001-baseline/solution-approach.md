@@ -180,7 +180,7 @@ curl http://localhost:3000/metrics/cache
 
 ## Validation
 
-See [test-cases.md](../test-cases.md) for full test methodology.
+See [test-cases.md](../../test-cases.md) for full test methodology.
 
 ### Cache Metrics Observed
 
@@ -306,6 +306,6 @@ While it didn't solve the performance issue, the cache implementation IS valuabl
 
 ## Related
 
-- **Main Issue:** [README.md](../README.md)
-- **Next Attempt:** [002-query-optimization](../attempts/002-query-optimization/)
-- **Test Results:** [test-cases.md](../test-cases.md#attempt-001-caching-layer)
+- **Main Issue:** [README.md](../../README.md)
+- **Next Attempt:** [002-caching](../002-caching/attempt-results.md)
+- **Test Results:** [test-cases.md](../../test-cases.md#attempt-001-caching-layer)

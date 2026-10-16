@@ -229,9 +229,9 @@ Sources consulted while solving this problem:
 ## Related Documentation
 
 **Knowledge Graph:**
-- [Passive vs Active Enforcement](../../knowledge/concepts.md#passive-vs-active-enforcement) — Theoretical framework for this lesson.
-- [Positive Constraint Framing](../../knowledge/patterns.md#positive-constraint-framing) — The core pattern derived from this failure.
-- [The Vibe-Coding Drift](../../knowledge/gotchas.md#the-vibe-coding-drift) — Analysis of agent behavioral drift.
+- [Passive vs Active Enforcement](../../knowledge/sample-concepts.md#passive-vs-active-enforcement) — Theoretical framework for this lesson.
+- [Positive Constraint Framing](../../knowledge/sample-patterns.md#positive-constraint-framing) — The core pattern derived from this failure.
+- [The Vibe-Coding Drift](../../knowledge/sample-gotchas.md#the-vibe-coding-drift) — Analysis of agent behavioral drift.
 
 ---
 

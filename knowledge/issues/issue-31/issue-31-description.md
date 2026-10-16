@@ -7,6 +7,7 @@ branch: none
 created: 2026-07-28
 related_adrs: ["ADR-066"]
 related_enhs: ["ENH-056"]
+related_issues: ["issue-55"]
 ---
 
 # issue-31: `kmg-handoff` Writes to Stale Pre-Migration Path `./handoff-packages/` Instead of `knowledge/handoffs/`
@@ -102,6 +103,7 @@ hardcodes the old path.
 
 ## Related
 
+- [issue-55](../issue-55/issue-55-description.md) — issue-55 mirrored the `kg_upgrade` category pattern to add an equivalent category for this issue's handoff-packages path change.
 - `knowledge/decisions/ADR-066-kg-content-storage-location-for-global-and-cowork-modes.md`
   — § "Post-Implementation Gap (2026-07-28)", full narrative and root cause
 - `knowledge/enhancements/ENH-056/ENH-056-specification.md` — the broader cross-cutting

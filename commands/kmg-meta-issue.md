@@ -3,7 +3,7 @@
 
 Initialize and manage meta-issue tracking for complex, multi-attempt problems that evolve understanding over time.
 
-**Based on:** ADR-008 Meta-Issue Tracking Pattern
+**Based on:** ADR-072 Meta-Issue Tracking Pattern
 
 ---
 
@@ -216,7 +216,9 @@ cp "${CLAUDE_PLUGIN_ROOT}/core/default-templates/meta-issue/attempt-template/"* 
 2. Create folder: `attempts/[NNN]-[slug]/`
 3. Copy attempt template files
 4. Update implementation-log.md with new attempt entry
-5. Link to plan if exists
+5. Update README.md's Timeline Summary table with a new row for this attempt
+6. Update README.md's own Quick Summary `**Attempts:**` count to reflect the new total (there is no attempt-count field in `description.md` — see note below)
+7. Link to plan if exists
 
 **Example:**
 ```bash
@@ -231,7 +233,29 @@ cp "${CLAUDE_PLUGIN_ROOT}/core/default-templates/meta-issue/attempt-template/"* 
 echo "## Attempt 003: Connection Pooling (2026-02-12)" >> "${meta_dir}/implementation-log.md"
 echo "**Status:** In Progress" >> "${meta_dir}/implementation-log.md"
 echo "**Plan:** [v2.3.1](../../plans/v2.3.1-connection-pooling.md)" >> "${meta_dir}/implementation-log.md"
+
+# Update README.md's Timeline Summary table — append the new row AFTER the last
+# existing table row (not after the first blank line, which would land the row
+# between the heading and the header and corrupt the table). Also avoids relying
+# on `\n` inside a sed replacement, which is a GNU extension: it happens to work
+# on the current macOS/BSD sed build, but is not portable across sed versions.
+# | 003 | 2026-02-12 | Connection Pooling | In Progress |
+awk -v newrow="| 003 | 2026-02-12 | Connection Pooling | In Progress |" '
+  $0 ~ /^\| Attempt \| Date \| Approach \| Result \|$/ { in_table=1; print; next }
+  in_table && /^\|/ { print; next }
+  in_table && !/^\|/ { print newrow; in_table=0; print; next }
+  { print }
+  END { if (in_table) print newrow }
+' "${meta_dir}/README.md" > "${meta_dir}/README.md.tmp" && mv "${meta_dir}/README.md.tmp" "${meta_dir}/README.md"
+
+# Update README.md's own Quick Summary "**Attempts:**" count in the same step.
+# This bullet lives under "## Quick Summary" → "**Current Status:**" (see
+# core/default-templates/meta-issue/README.md) — only the count is replaced,
+# leaving the failed/successful/in-progress breakdown for manual review.
+sed -E -i.bak 's/^(- \*\*Attempts:\*\* )[^ ]+/\13/' "${meta_dir}/README.md" && rm -f "${meta_dir}/README.md.bak"
 ```
+
+**Why this matters:** `implementation-log.md` is the detailed record, but `README.md`'s Timeline Summary table and its own Quick Summary `**Attempts:**` count are the fields readers check first. If only `implementation-log.md` updates, those summary fields silently drift out of sync with the real attempt count — exactly the kind of gap found in `docs/examples/meta-issue/example-performance-saga/` (see ADR-072 Addendum). Note: `description.md` has no attempt-count/status field in this repo's actual templates (checked `core/default-templates/meta-issue/description.md`) — the real field lives in `README.md` itself, so both syncs happen in that one file, in this same step, never as a separate manual task.
 
 ---
 
@@ -245,7 +269,8 @@ Enforces that each attempt documents a distinct hypothesis before execution. Ste
 2. Pre-populate `solution-approach.md` hypothesis field with provided description
 3. Require confirmation that this hypothesis is distinct from prior attempts
 4. Update `implementation-log.md`
-5. If attempt count ≥ 3: remind user to invoke `stuck-work-escalation` skill if not already active
+5. Update `README.md`'s Timeline Summary table with a new row for this attempt (include the hypothesis in the row) and update `README.md`'s own Quick Summary `**Attempts:**` count (there is no attempt-count field in `description.md`) — same step as `implementation-log.md`, not a separate task
+6. If attempt count ≥ 3: remind user to invoke `stuck-work-escalation` skill if not already active
 
 ---
 
@@ -498,5 +523,5 @@ Updated: description.md (current understanding section)
 
 **Created:** 2026-02-12
 **Version:** 1.0 (Plugin version)
-**Based On:** ADR-008 Meta-Issue Tracking Pattern
+**Based On:** ADR-072 Meta-Issue Tracking Pattern
 **Related Skills:** /kmgraph:kmg-capture-lesson, /kmgraph:kmg-session-summary

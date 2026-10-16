@@ -5,6 +5,8 @@ status: deferred
 github-issue: "#206"
 branch: none
 created: 2026-07-29
+related_enhs: ["ENH-065"]
+related_issues: ["issue-25"]
 ---
 
 # issue-33: Handoff/Recall Commands Don't Require Tracing Linked Files — Sessions Read Only the Pointer Layer
@@ -47,12 +49,14 @@ Captured live, lightweight, local-only — matching the precedent set for issue-
 
 ## Related
 
+- [ENH-065](../../enhancements/ENH-065/ENH-065-specification.md) — same documented-steps-inconsistently-executed failure class, applied to issue/enhancement folder supporting files.
 - `commands/kmg-handoff.md`
 - `commands/kmg-session-summary.md`
 - issue-30 (adjacent gap: handoff/wrap never auto-generate a session summary in the first place; also ENH-056's instance #1)
 - **ENH-056** (`knowledge/enhancements/ENH-056/ENH-056-specification.md`) — the umbrella enhancement this issue is a third concrete instance of; any fix here should ride ENH-056's eventual deterministic-hook mechanism rather than being designed in isolation
 - `ADR-043`, `ADR-050` — prior evidence that prose-based step enforcement doesn't reliably hold, cited via ENH-056
 - [issue-36](../issue-36/issue-36-description.md) — different failure mode, same recall-subsystem neighborhood (stale skill-name references that don't resolve, vs. this issue's pointers-not-dereferenced)
+- [issue-25](../issue-25/issue-25-description.md) — lightweight-vs-full workflow authority issue that cites this issue as lightweight-path precedent.
 
 ## Fix Design (2026-08-01)
 

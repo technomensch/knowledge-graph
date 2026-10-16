@@ -4,11 +4,11 @@
 
 Comprehensive catalog of all lessons-learned documents.
 
-**Total Lessons:** 63 (10 architecture, 26 process, 21 patterns, 6 debugging)
-**Last Updated:** 2026-08-04
+**Total Lessons:** 67 (10 architecture, 26 process, 25 patterns, 6 debugging)
+**Last Updated:** 2026-09-22
 
 > **Known issues in this index** (see [issue tracker](../issues/README.md) for permanent tracking):
-> - Two files live at the top of `lessons-learned/` instead of inside their declared category folder: `Lessons_Learned_gh_issue_create_omission.md` (process) and `Lessons_Learned_InBand_Version_Warning_Burst_Cadence_Pattern.md` (patterns). Listed below under their correct category; not physically moved.
+> - **Resolved 2026-09-22:** the two files previously living at the top of `lessons-learned/` instead of inside their declared category folder — `Lessons_Learned_gh_issue_create_omission.md` (process) and `Lessons_Learned_InBand_Version_Warning_Burst_Cadence_Pattern.md` (patterns) — have now been physically moved into their correct category folders. Links below updated accordingly.
 > - **2026-08-04 correction (revised):** This index previously declared a "Debugging Lessons (10 total)" category, then a follow-up correction removed all 10 entries as fabricated. A second round of investigation determined that framing was wrong for 4 of the 10: **6 confirmed fabricated** (never legitimately written — either self-reported-but-never-actually-authored, or items from an abandoned 12-lesson plan that got cut short, or an index artifact with no real file behind it) — *MCP Server Rebuild Not Reflected In Live Plugin Tool Calls*, *Truncated Plugin Marketplace Slug Bug*, *Plugin Namespace Visibility - Shadow Command Failure* (the PascalCase filename variant — a same-day index artifact, distinct from the real kebab-case lesson below), *Line vs Token Metrics Must Be Applied Consistently*, *Interactive Prompts and Slash Commands Don't Work in Hooks*, and *Duplicate Hooks Declaration Causes Plugin Load Failure*. **4 confirmed real and restored below** under `debugging/`: one (`namespace-visibility-shadow-command-failure.md`) recovered verbatim from git history at commit `26894611`, the only one of the ten that ever touched git before the category was gitignored; the other three (`Lessons_Learned_os_homedir_Stale_Cache_On_macOS.md`, `Lessons_Learned_Debugging_Plugin_Cache_Not_Synced_From_Local_Repo.md`, `Lessons_Learned_Debugging_Docusaurus_Trailingslash_+_Non_Root_Baseurl_Breaks_Static_Asset_Loading_In_Dev.md`) were reconstructed from chat-history evidence, since their originals were always gitignored and never themselves touched git — each carries a Context note to that effect and should not be read as verbatim recoveries.
 > - **2026-09-01 follow-up:** the 6 fabricated files above were re-discovered still physically present on disk during an unrelated audit — the 2026-08-04 correction's plan only covered the 4 restores + link repairs, and assumed (incorrectly, without re-checking) that an *earlier* removal round had already deleted the 6 fabricated files. It hadn't; they'd been sitting gitignored and un-tracked since 2026-04-10/2026-07-18. Verified via chat-history that no later session ever actually deleted them, then deleted all 6 for real. One (*Truncated Plugin Marketplace Slug Bug*) had a genuinely real underlying incident (28-char slug truncation, fixed live 2026-02-17) — authored fresh below from the verified chat-history transcript, not a restoration of the fabricated file. The other 5 topics either have no independently-verified real incident behind them, or (MCP Server Rebuild) are already tracked elsewhere (issue-28) and don't need a duplicate lesson.
 
@@ -45,7 +45,7 @@ Comprehensive catalog of all lessons-learned documents.
 - [git log origin/* Shows Stale Data Without git fetch](process/2026-06-11-git-fetch-before-diagnosing-remote-state.md) — 2026-06-11
 - [Codex Plugin Marketplace Registration Persists After Uninstall](process/2026-06-11-codex-marketplace-reinstall-two-step.md) — 2026-06-11
 - [Handoff Spec Must Cover All Artifact Shapes](process/Lessons_Learned_Process_Handoff_Spec_Must_Cover_All_Artifact_Shapes.md) — 2026-06-07
-- [gh issue create omission in start-issue-tracking Step 5](Lessons_Learned_gh_issue_create_omission.md) — 2026-05-30 — *misfiled at top level*
+- [gh issue create omission in start-issue-tracking Step 5](process/Lessons_Learned_gh_issue_create_omission.md) — 2026-05-30
 - [Use Sonnet (Not Haiku) for Batch Job Evaluation Workers — And Capture Token Usage via --output-format json](process/Lessons_Learned_Batch_Worker_Model_Selection_And_Token_Tracking.md) — 2026-04-17
 - [Upgrade Path Missing FTS5 Stale File Cleanup](process/Lessons_Learned_Upgrade_Path_Missing_FTS5_Stale_File_Cleanup.md) — 2026-04-12
 - [Parallel Opus Review Before Release](process/Lessons_Learned_Process_Parallel_Opus_Review_Before_Release.md) — 2026-04-12
@@ -66,13 +66,17 @@ Comprehensive catalog of all lessons-learned documents.
 
 ---
 
-### Patterns Lessons (21 total)
+### Patterns Lessons (25 total)
 
+- [Bundled Example Content Drifts Like Real Data; Ported Patterns Need Their ADR Citation Verified](patterns/Lessons_Learned_Patterns_Bundled_Example_Content_Drift_And_Dangling_Adr_Citations.md) — 2026-09-17
+- [Fixed-Name Test Fixtures Collide With Real, Non-Sandboxed Shared State](patterns/Lessons_Learned_Patterns_Fixed_Name_Test_Fixtures_Collide_With_Real,_Non_Sandboxed_Shared_State.md) — 2026-08-22
 - [Dispatch, Don't Duplicate: Corpus-Verify Before Backfilling](patterns/Lessons_Learned_Patterns_Dispatch_Dont_Duplicate_Corpus_Verify_Before_Backfilling.md) — 2026-08-19
+- [Hardcoded main...HEAD Branch-Comparison Base Silently Returns Empty Pre-Divergence](patterns/Lessons_Learned_Patterns_Hardcoded_Main...head_Branch_Comparison_Base_Silently_Returns_Empty_Pre_Divergence.md) — 2026-08-16
+- [Ownership-of-Derivation Contract Violation Causes Double-Prefixed Filenames](patterns/Lessons_Learned_Patterns_Ownership_Of_Derivation_Contract_Violation_Causes_Double_Prefixed_Filenames.md) — 2026-08-16
 - [Fix Ownership Follows the Root-Cause KG, Not the Code's Location](patterns/Lessons_Learned_Patterns_Fix_Ownership_Follows_Root_Cause_KG_Not_Code_Location.md) — 2026-07-10
 - [LLM Compliance Gate for Branching Commands](patterns/Lessons_Learned_Patterns_LLM_Compliance_Gate_For_Branching_Commands.md) — 2026-06-21
 - [Routing-Layer-Only Profile Injection Pattern](patterns/Lessons_Learned_Routing_Layer_Injection_Pattern.md) — 2026-04-28
-- [In-Band Version Warning with Burst Cadence Pattern](Lessons_Learned_InBand_Version_Warning_Burst_Cadence_Pattern.md) — 2026-04-18 — *misfiled at top level*
+- [In-Band Version Warning with Burst Cadence Pattern](patterns/Lessons_Learned_InBand_Version_Warning_Burst_Cadence_Pattern.md) — 2026-04-18
 - [Contamination Grep False-Positive — Require Preference Verb Context](patterns/Lessons_Learned_Patterns_Contamination_Grep_False_Positive_—_Require_Preference_Verb_Context.md) — 2026-04-11
 - [CLI Version Strings Must Read from package.json at Runtime](patterns/Lessons_Learned_Patterns_Cli_Version_Strings_Must_Read_From_Package.json_At_Runtime.md) — 2026-04-11
 - [Shell Boolean Guard — Exit Code Trap with $var && cmd](patterns/Lessons_Learned_Patterns_Shell_Boolean_Guard_Exit_Code.md) — 2026-04-10
@@ -110,7 +114,11 @@ Comprehensive catalog of all lessons-learned documents.
 ## Chronological Index
 
 **2026**
+- [2026-09-17] [Bundled Example Content Drifts Like Real Data; Ported Patterns Need Their ADR Citation Verified](patterns/Lessons_Learned_Patterns_Bundled_Example_Content_Drift_And_Dangling_Adr_Citations.md)
+- [2026-08-22] [Fixed-Name Test Fixtures Collide With Real, Non-Sandboxed Shared State](patterns/Lessons_Learned_Patterns_Fixed_Name_Test_Fixtures_Collide_With_Real,_Non_Sandboxed_Shared_State.md)
 - [2026-08-19] [Dispatch, Don't Duplicate: Corpus-Verify Before Backfilling](patterns/Lessons_Learned_Patterns_Dispatch_Dont_Duplicate_Corpus_Verify_Before_Backfilling.md)
+- [2026-08-16] [Hardcoded main...HEAD Branch-Comparison Base Silently Returns Empty Pre-Divergence](patterns/Lessons_Learned_Patterns_Hardcoded_Main...head_Branch_Comparison_Base_Silently_Returns_Empty_Pre_Divergence.md)
+- [2026-08-16] [Ownership-of-Derivation Contract Violation Causes Double-Prefixed Filenames](patterns/Lessons_Learned_Patterns_Ownership_Of_Derivation_Contract_Violation_Causes_Double_Prefixed_Filenames.md)
 - [2026-07-14] [Resource-Path Migrations Must Grep the Prompt Layer, Not Just the Server Layer](process/Lessons_Learned_Process_Migration_Must_Grep_Prompt_Layer_Not_Just_Server_Layer.md)
 - [2026-07-12] [os.homedir() Stale Cache On macOS](debugging/Lessons_Learned_os_homedir_Stale_Cache_On_macOS.md)
 - [2026-07-12] [Two-Cycle Cross-Model Review for High-Risk Changes](process/Lessons_Learned_Process_Two_Cycle_Cross_Model_Review_For_High_Risk_Changes.md)
@@ -124,12 +132,12 @@ Comprehensive catalog of all lessons-learned documents.
 - [2026-06-11] [git log origin/* Shows Stale Data Without git fetch](process/2026-06-11-git-fetch-before-diagnosing-remote-state.md)
 - [2026-06-11] [Codex Plugin Marketplace Registration Persists After Uninstall](process/2026-06-11-codex-marketplace-reinstall-two-step.md)
 - [2026-06-07] [Handoff Spec Must Cover All Artifact Shapes](process/Lessons_Learned_Process_Handoff_Spec_Must_Cover_All_Artifact_Shapes.md)
-- [2026-05-30] [gh issue create omission in start-issue-tracking Step 5](Lessons_Learned_gh_issue_create_omission.md)
+- [2026-05-30] [gh issue create omission in start-issue-tracking Step 5](process/Lessons_Learned_gh_issue_create_omission.md)
 - [2026-05-27] [FTS5 SearchDirs Missing Chat History](architecture/Lessons_Learned_Architecture_Fts5_Searchdirs_Missing_Chat_History.md)
 - [2026-05-25] [Gate inter-agent state at parent dispatch — subagent /tmp isolation is uncharted](architecture/Lessons_Learned_Subagent_Tmp_Isolation_Gate_At_Parent.md)
 - [2026-05-25] [Plugin Skills Auto-Discovery — No Hooks.json Registration Required](architecture/Lessons_Learned_Plugin_Skills_Auto_Discovery_No_Hooks_Registration.md)
 - [2026-04-28] [Routing-Layer-Only Profile Injection Pattern](patterns/Lessons_Learned_Routing_Layer_Injection_Pattern.md)
-- [2026-04-18] [In-Band Version Warning with Burst Cadence Pattern](Lessons_Learned_InBand_Version_Warning_Burst_Cadence_Pattern.md)
+- [2026-04-18] [In-Band Version Warning with Burst Cadence Pattern](patterns/Lessons_Learned_InBand_Version_Warning_Burst_Cadence_Pattern.md)
 - [2026-04-17] [Use Sonnet (Not Haiku) for Batch Job Evaluation Workers](process/Lessons_Learned_Batch_Worker_Model_Selection_And_Token_Tracking.md)
 - [2026-04-12] [Platform-Agnostic Rule Timing via triggers.md](architecture/Lessons_Learned_Architecture_Platform_Agnostic_Rule_Timing_Via_Triggers.md)
 - [2026-04-12] [Upgrade Path Missing FTS5 Stale File Cleanup](process/Lessons_Learned_Upgrade_Path_Missing_FTS5_Stale_File_Cleanup.md)
@@ -179,7 +187,7 @@ Comprehensive catalog of all lessons-learned documents.
 
 **#architecture** (10 lessons) — see [By Category](#architecture-lessons-10-total) above
 **#process** (25 lessons) — see [By Category](#process-lessons-25-total) above
-**#patterns** (21 lessons) — see [By Category](#patterns-lessons-21-total) above
+**#patterns** (22 lessons) — see [By Category](#patterns-lessons-22-total) above
 **#debugging** (4 lessons) — see [By Category](#debugging-lessons-4-total) above
 
 Fine-grained per-lesson tags are in each file's own `tags:` frontmatter — use `/kmgraph:recall "<keyword>"` (FTS5 search) to search across them rather than maintaining a hand-built reverse index here; at this scale a manually maintained fine-grained tag cloud drifts out of sync faster than it can be kept useful.
@@ -254,6 +262,4 @@ See [core/examples/lessons-learned/](../../examples/lessons-learned/) for filled
 **How to capture**:
 - [Manual Workflow](../../docs/WORKFLOWS.md#workflow-1-create-lesson-learned) - Step-by-step
 - [Command Guide](../../../docs/COMMAND-GUIDE.md#essential-commands) - Automated (Claude Code)
-- [Ownership-of-Derivation Contract Violation Causes Double-Prefixed Filenames](patterns/Lessons_Learned_Patterns_Ownership_Of_Derivation_Contract_Violation_Causes_Double_Prefixed_Filenames.md)
-- [Hardcoded main...HEAD Branch-Comparison Base Silently Returns Empty Pre-Divergence](patterns/Lessons_Learned_Patterns_Hardcoded_Main...head_Branch_Comparison_Base_Silently_Returns_Empty_Pre_Divergence.md)
-- [Fixed-Name Test Fixtures Collide With Real, Non-Sandboxed Shared State](patterns/Lessons_Learned_Patterns_Fixed_Name_Test_Fixtures_Collide_With_Real,_Non_Sandboxed_Shared_State.md)
+

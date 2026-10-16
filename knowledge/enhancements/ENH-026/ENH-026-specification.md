@@ -2,6 +2,7 @@
 id: ENH-026
 type: Hardening
 status: proposed
+related_issues: ["issue-37"]
 ---
 
 # ENH-026: KG Write Guard — Unguarded Command Class
@@ -53,3 +54,7 @@ skip it. The durable fix is to move the CWD check into `core/scripts/run_extract
 ## Deferred From
 
 v0.5.10.8 (this release): extract-chat Step 0 guard only.
+
+## Related
+
+- [issue-37](../../issues/issue-37/issue-37-description.md) — issue-37's spec cross-references this item.

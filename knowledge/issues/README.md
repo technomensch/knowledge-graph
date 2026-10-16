@@ -4,8 +4,8 @@
 
 Tracking of investigated bugs, defects, and meta-issues for this project.
 
-**Total Issues:** 59 numbered issues, plus named meta-issues (see below)
-**Last Updated:** 2026-09-01
+**Total Issues:** 61 numbered issues, plus named meta-issues (see below)
+**Last Updated:** 2026-10-16
 
 ---
 
@@ -19,6 +19,8 @@ Tracking of investigated bugs, defects, and meta-issues for this project.
 
 ## All Issues (Chronological)
 
+- [issue-61: Gate 5 backlink-symmetry check treats every ID mention as a relationship and ripples across the corpus](issue-61/issue-61-description.md) — **Status:** 🟡 Deferred (Track only) — GitHub issue #263 filed. `scripts/pre-push-gate.sh` Gate 5 greps the whole file for issue/ENH IDs, so incidental mentions count as relationships and touching any doc surfaces its legacy one-way references; one new spec produced 33 findings (9 genuine) and a cascade across 32 docs over eight rounds. Options and seven owner decisions recorded; see [ENH-065](../enhancements/ENH-065/ENH-065-specification.md) for the sibling folder-completeness gap.
+- [issue-60: Meta-issue attempt-sync only fires on `--add-attempt`/`--log-attempt`, not on hand-created attempt folders](issue-60/issue-60-description.md) — **Status:** 🟡 Deferred (Track only) — GitHub issue #261 filed. Found while auditing broken links in this tool's own `example-performance-saga` teaching content on branch `v0.7.10-fix-release-doc-sync-and-broken-links`; the v0.7.10 patch closes the command-flag path (`--add-attempt`/`--log-attempt`) but a hand-created or hand-edited attempt folder still drifts silently. Recorded as an open limitation in [ADR-072](../decisions/ADR-072-meta-issue-tracking-pattern.md).
 - [issue-59: Chat-Extraction Health Check False-Positives on Multi-Byte UTF-8 Metadata Read](issue-59/issue-59-description.md) — **Status:** 🟡 Deferred (Track only) — GitHub issue #252 filed. `check_extraction_health.py`'s metadata-parse step decodes at a fixed byte offset instead of a character-safe boundary, so a multi-byte UTF-8 character (e.g. an em-dash) landing near that offset triggers a false "corrupted metadata" flag and an unnecessary rebuild/backup. Found while diff-checking an auto-generated backup during `/kmgraph:kmg-extract-chat` re-run; backup confirmed byte-identical to fresh output (no real data loss) before deletion.
 - [issue-58: `scaffoldGraphDirectory` template-routing drift and scaffold-then-refuse file leak](issue-58/issue-58-description.md) — **Status:** ✅ Resolved — found during automated review of an unrelated branch (see [ADR-070](../decisions/ADR-070-scaffold-upgrade-dead-end-connect-unregistered-graph.md)); MCP-native scaffold routing diverged from the wizard's canonical routing, and scaffold files could leak to disk before a marker-mismatch refusal aborted registration. Fixed in commits `7db94804` and `57396128`.
 - [issue-57: `kg_config_init` and `kg_upgrade` form a circular dead end over unregistered decisions/lessons-learned content](issue-57/issue-57-description.md) — **Status:** ✅ Resolved — found during automated review of an unrelated branch (see [ADR-070](../decisions/ADR-070-scaffold-upgrade-dead-end-connect-unregistered-graph.md)); `kg_config_init`'s refusal message pointed users at `kg_upgrade`, which had no way to register an unregistered folder. Fixed with a new opt-in `connect-unregistered-graph` `kg_upgrade` category, commits `f233c0f6`, `e4cfa44b`, `57396128`.
@@ -65,7 +67,7 @@ Tracking of investigated bugs, defects, and meta-issues for this project.
 - [issue-16: mcp-server kg_version / MCP handshake reports stale hardcoded 0.3.10](issue-16/issue-16-description.md) — **Status:** ✅ Resolved — confirmed merged to main 2026-08-22
 - [issue-15: Personal-KG FTS5 search index built in the wrong bucket — `rebuildIndex` never receives `kgType`](issue-15/issue-15-description.md) — **Status:** 🟡 Tracked
 - [issue-14: kg-config.json write-path split-brain — 37 files still hardcode the pre-migration `~/.claude/kg-config.json` path](issue-14/issue-14-description.md) — **Status:** ✅ Resolved
-- [issue-13: No automated broken-link detection anywhere in the docs pipeline](issue-13/issue-13-description.md) — **Status:** 🟡 Deferred (Track only)
+- [issue-13: No automated broken-link detection anywhere in the docs pipeline](issue-13/issue-13-description.md) — **Status:** ✅ Resolved (v0.7.10) — broken links AND broken anchors eliminated site-wide (three clusters fixed, including one found during this release); `onBrokenLinks`/`onBrokenMarkdownLinks`/`onBrokenAnchors` all flipped from `'warn'` to `'throw'` in `docusaurus.config.js`, plus a new PR-time CI build gate added to `.github/workflows/docs.yml`. Scope: Docusaurus `docs/` build only, not `commands/*.md`.
 - [issue-12: `kmg-execute-plan` fires in Claude Code sessions despite being a Gemini/Antigravity-only guardrail](issue-12/issue-12-description.md) — **Status:** ✅ Resolved
 - [issue-11: Two distinct, undiagnosed causes behind ENH specs missing a real GitHub issue link](issue-11/issue-11-description.md) — **Status:** ✅ Resolved
 - [issue-10: kg_capture KG_MISMATCH false positive when KG path doesn't end in /docs](issue-10/issue-10-description.md) — **Status:** ✅ Resolved

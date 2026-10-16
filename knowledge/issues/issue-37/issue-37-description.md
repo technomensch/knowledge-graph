@@ -5,6 +5,8 @@ status: resolved
 github-issue: "#238"
 branch: none
 created: 2026-08-01
+related_issues: ["issue-52"]
+related_enhs: ["ENH-035"]
 ---
 
 # issue-37: Explore Auto-Trigger vs. Manual Invocation for `kmg-sync-all`
@@ -59,6 +61,8 @@ it.
 
 ## Related
 
+- [ENH-035](../../enhancements/ENH-035/ENH-035-specification.md) — ENH-035's spec cross-references this item.
+- [issue-52](../issue-52/issue-52-description.md) — issue-52's spec cross-references this item.
 - `commands/kmg-sync-all.md`, `agents/sync-all-agent.md` — the command/agent in question
 - `knowledge/decisions/ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md`
   — does not address this; only fixes a broken call site

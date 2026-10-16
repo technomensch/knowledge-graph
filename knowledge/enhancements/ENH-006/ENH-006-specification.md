@@ -6,7 +6,8 @@ version_target: "v0.2.2"
 github_issue: 47
 created: 2026-03-30
 related_adrs: []
-related_enhs: []
+related_enhs: ["ENH-050"]
+related_issues: ["issue-5"]
 ---
 
 # ENH-006: Sequential Prompts, Decoupled Decisions, and Skill Trigger Gaps
@@ -123,3 +124,8 @@ This gates implementation start, not issue tracking completion. The check lives 
 - Changes to Steps 2–5, 7 (issue numbering, directory creation, documentation generation, git integration, termination)
 - Changes to Step 0 (discourse capture / behavior lock)
 - Smart default auto-detection logic (unchanged)
+
+## Related
+
+- [issue-5](../../issues/issue-5/issue-5-description.md) — issue-5's spec cross-references this item.
+- [ENH-050](../ENH-050/ENH-050-specification.md) — ENH-050's spec cross-references this enhancement.

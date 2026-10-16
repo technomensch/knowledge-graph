@@ -17,7 +17,7 @@
 ```
 
 **Examples:**
-- `/kmgraph:kmg-update-doc COMMAND-GUIDE.md --user-facing` → Update plugin documentation wizard
+- `/kmgraph:kmg-update-doc docs/reference/command-guide.md --user-facing` → Update plugin documentation wizard
 - `/kmgraph:kmg-update-doc README.md --user-facing` → Update README with new feature information
 - `/kmgraph:kmg-update-doc some-lesson.md` → Disambiguation dialog, then confirm KG content update
 - `/kmgraph:kmg-update-doc docs/CHEAT-SHEET.md --user-facing` → Update cheat sheet syntax block
@@ -32,7 +32,7 @@ Before any other step, locate the target file.
 - Verify the file exists at the given path
 - If not found, report an error and exit
 
-**If `<file>` is a bare filename** (e.g., `COMMAND-GUIDE.md`):
+**If `<file>` is a bare filename** (e.g., `CHEAT-SHEET.md`):
 - Search in this order:
   1. `docs/<file>`
   2. `core/docs/<file>`
@@ -61,7 +61,7 @@ Resolved file: $TARGET_FILE
 
 1. Plugin documentation (user-facing)
    Docs that ship with the plugin for end users
-   (README, COMMAND-GUIDE, CHEAT-SHEET, GETTING-STARTED, etc.)
+   (README, command-guide, CHEAT-SHEET, quickstart, etc.)
    → Re-run with: /kmgraph:kmg-update-doc <file> --user-facing
 
 2. Knowledge graph content
@@ -169,7 +169,7 @@ grep -inE "Phase [0-9]+ \(|publication\)" "$TARGET_FILE"
 
 **Voice & style**
 ```bash
-# Second-person voice (flag for COMMAND-GUIDE.md)
+# Second-person voice (flag for command-guide.md)
 grep -inE "\b(you|your)\b" "$TARGET_FILE"
 
 # Em dashes
@@ -209,7 +209,7 @@ When running a full release docs pass (`--user-facing` with no specific file), w
 **Tier 2 — When related content changes**
 - `docs/CONFIGURATION.md`
 - `docs/GLOSSARY.md`
-- `docs/CONCEPTS.md`
+- `docs/concepts/`
 - `docs/reference/agents.md`
 - `docs/reference/skills.md`
 - `docs/reference/hooks.md`
@@ -250,6 +250,8 @@ When running a full release docs pass (`--user-facing` with no specific file), w
 - `docs/index.mdx`
 
 **Excluded** (not user-facing): `CLAUDE.md`, `GEMINI.md`, `CONTRIBUTING.md`, `ROADMAP.md`, `docs/specs/`, `docs/plans/`, `knowledge/plans/`, `~/.claude/plans/`, `docs/templates/`
+
+`ROADMAP.md` sync is instead handled by `commands/kmg-start-issue-tracking.md`'s Step 6.4. Note this has no automated enforcement on Claude Code — the only check that verifies Step 6.4 ran (`skills/kmg-execute-plan`'s prerequisite check) is scoped to Gemini/Antigravity sessions only.
 
 ---
 
@@ -449,7 +451,7 @@ When updating documentation that explains a concept or architectural pattern, es
 ```
 Concept: Four-Layer Architecture
 
-Authoritative source: docs/CONCEPTS.md (primary documentation with diagrams, examples, rationale)
+Authoritative source: docs/concepts/ (primary documentation with diagrams, examples, rationale)
 ├─ reference/commands.md → References: "See CONCEPTS.md § Four-Layer Architecture for overview"
 ├─ quickstart.md → References: "See CONCEPTS.md § Four-Layer Architecture"
 └─ CHEAT-SHEET.md → May repeat only syntax/quick-ref snippets, NOT conceptual explanations
@@ -464,10 +466,10 @@ Authoritative source: docs/CONCEPTS.md (primary documentation with diagrams, exa
 **How to apply:**
 
 1. **Identify the authority** — Which doc is the "home" for this concept?
-   - Architectural patterns → `docs/CONCEPTS.md`
+   - Architectural patterns → `docs/concepts/`
    - Command usage/syntax → `docs/reference/commands.md`
    - Quick reference → `docs/CHEAT-SHEET.md`
-   - Getting started workflows → `docs/quickstart.md`
+   - Getting started workflows → `docs/quickstart.mdx`
 
 2. **Write authoritative version once** — Full explanation, examples, rationale in the authority doc
 
@@ -479,15 +481,15 @@ Authoritative source: docs/CONCEPTS.md (primary documentation with diagrams, exa
 
 **Example (avoid):**
 ```
-docs/CONCEPTS.md: "The four-layer architecture separates concerns across Context, Logic, Lifecycle, and Data layers..."
-docs/COMMAND-GUIDE.md: "The four-layer architecture separates concerns across Context, Logic, Lifecycle, and Data layers..."
+the concepts docs: "The four-layer architecture separates concerns across Context, Logic, Lifecycle, and Data layers..."
+docs/reference/command-guide.md: "The four-layer architecture separates concerns across Context, Logic, Lifecycle, and Data layers..."
 ← DUPLICATION: Version skew risk if one is updated but not the other
 ```
 
 **Example (correct):**
 ```
-docs/CONCEPTS.md: "The four-layer architecture separates concerns across Context, Logic, Lifecycle, and Data layers. [full explanation with diagrams]"
-docs/COMMAND-GUIDE.md: "See CONCEPTS.md § Four-Layer Architecture for architectural overview."
+the concepts docs: "The four-layer architecture separates concerns across Context, Logic, Lifecycle, and Data layers. [full explanation with diagrams]"
+docs/reference/command-guide.md: "See the concepts docs § Four-Layer Architecture for architectural overview."
 ← SINGLE SOURCE: One place to update, all docs stay in sync
 ```
 
@@ -557,9 +559,10 @@ If `$TARGET_FILE` is not in the Tier 1 list, exit normally without this prompt.
 - [ ] No stale inline `(vX.X-beta)` version annotations
 - [ ] No hard counts (command totals, agent counts, tool counts)
 - [ ] No broken internal links
+- [ ] No contradiction between status/summary fields (Status, Total Attempts, etc.) and detail sections
 - [ ] No internal roadmap language in user-facing copy
 - [ ] README-specific: no ancient resolved issue notices
-- [ ] Voice: no second-person in COMMAND-GUIDE.md; no em dashes
+- [ ] Voice: no second-person in command-guide.md; no em dashes
 
 **Content update**
 - [ ] Update type selected

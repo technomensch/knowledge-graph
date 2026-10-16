@@ -5,7 +5,7 @@ status: in-progress
 github-issue: "#239"
 branch: none
 created: 2026-08-03
-related-issues: [issue-18, issue-40]
+related-issues: [issue-18, issue-40, "issue-52"]
 ---
 
 # Issue-41: Worktree KG registration has no collision guard, no tree-identifying naming, and no merge-time conflict resolution
@@ -329,6 +329,7 @@ rebuilt, `tests/test-mcp-edge-cases.sh` re-run to close out the "known accepted 
 
 ## Related
 
+- [issue-52](../issue-52/issue-52-description.md) — issue-52's spec cross-references this item.
 - [issue-18](../issue-18/issue-18-description.md) — Phase 7.1, `gov-capture-routing`
   retirement; the 9 files fixed there are a subset of what may need migration per this
   issue's scope note above.

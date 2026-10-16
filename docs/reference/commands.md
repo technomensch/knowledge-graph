@@ -12,10 +12,10 @@ title: Commands Reference
 
 | Command | Description | Key flags |
 |---|---|---|
-| [`/kmgraph:kmg-init`](#init) | Initialize a new knowledge graph with wizard-based setup; discovers locally running Ollama and LM Studio instances and offers to configure them for tier mapping | — |
-| [`/kmgraph:kmg-status`](#status) | Display the resolved KG's health, file counts, and warnings | `--minimal`, `--json` |
-| [`/kmgraph:kmg-recall`](#recall) | Full-text search across lessons, ADRs, KG entries, sessions, and the authoritative profile files (`~/.kmgraph/rules.md`, `~/.kmgraph/me.md`, `knowledge/rules.md`, `knowledge/me.md`) | `--scope=all\|active\|personal-only`, `--user`, `--project`, `--named=<kg>`, `--format=detailed\|paths` |
-| [`/kmgraph:kmg-capture-lesson`](#capture-lesson) | Guided interview to document a problem solved, pattern discovered, or bug fixed | `--user`, `--project`, `--named=<kg>` |
+| [`/kmgraph:kmg-init`](command-guide.md#-kmgraphkmg-init) | Initialize a new knowledge graph with wizard-based setup; discovers locally running Ollama and LM Studio instances and offers to configure them for tier mapping | — |
+| [`/kmgraph:kmg-status`](command-guide.md#-kmgraphkmg-status) | Display the resolved KG's health, file counts, and warnings | `--minimal`, `--json` |
+| [`/kmgraph:kmg-recall`](command-guide.md#-kmgraphkmg-recall) | Full-text search across lessons, ADRs, KG entries, sessions, and the authoritative profile files (`~/.kmgraph/rules.md`, `~/.kmgraph/me.md`, `knowledge/rules.md`, `knowledge/me.md`) | `--scope=all\|active\|personal-only`, `--user`, `--project`, `--named=<kg>`, `--format=detailed\|paths` |
+| [`/kmgraph:kmg-capture-lesson`](command-guide.md#-kmgraphkmg-capture-lesson) | Guided interview to document a problem solved, pattern discovered, or bug fixed | `--user`, `--project`, `--named=<kg>` |
 
 **Examples:**
 ```bash
@@ -32,12 +32,12 @@ title: Commands Reference
 
 | Command | Description | Key flags |
 |---|---|---|
-| [`/kmgraph:kmg-capture-lesson`](#capture-lesson) | Document lessons learned with git metadata, duplicate detection, and optional KG extraction | `--user`, `--project`, `--named=<kg>` |
-| [`/kmgraph:kmg-create-adr`](#create-adr) | Create Architecture Decision Records with auto-numbering, index update, and automatic capture of implementation commit + subject line | `--user`, `--project`, `--named=<kg>` |
-| [`/kmgraph:kmg-session-summary`](#session-summary) | Summarize the active session; supports lightweight mid-session snapshot mode | `--auto`, `--snapshot`, `--snapshot --git`, `--user`, `--project`, `--named=<kg>` |
-| [`/kmgraph:kmg-extract-chat`](#extract-chat) | Export Claude and Gemini chat logs to dated markdown files; extract Codex CLI sessions with `--source codex` (outputs `YYYY-MM-DD-codex.md`; not included in `--source all` yet) | `--today`, `--date=YYYY-MM-DD`, `--after=`, `--before=`, `--project=`, `--source claude\|gemini\|codex\|all`, `--output-dir=`, `--rebuild`, `--incremental`, `--claude-projects-dir=` |
-| [`/kmgraph:kmg-handoff`](#handoff) | Generate a handoff package (thin START-HERE pointer, DOCUMENTATION-MAP, ARCHITECTURE-SNAPSHOT) | `--output-dir=` |
-| [`/kmgraph:kmg-rules-capture`](#rules-capture) | Detect and route a behavioral correction to `rules.md` or `me.md` (project or personal scope) | — |
+| [`/kmgraph:kmg-capture-lesson`](command-guide.md#-kmgraphkmg-capture-lesson) | Document lessons learned with git metadata, duplicate detection, and optional KG extraction | `--user`, `--project`, `--named=<kg>` |
+| [`/kmgraph:kmg-create-adr`](command-guide.md#-kmgraphkmg-create-adr) | Create Architecture Decision Records with auto-numbering, index update, and automatic capture of implementation commit + subject line | `--user`, `--project`, `--named=<kg>` |
+| [`/kmgraph:kmg-session-summary`](command-guide.md#-kmgraphkmg-session-summary) | Summarize the active session; supports lightweight mid-session snapshot mode | `--auto`, `--snapshot`, `--snapshot --git`, `--user`, `--project`, `--named=<kg>` |
+| [`/kmgraph:kmg-extract-chat`](command-guide.md#-kmgraphkmg-extract-chat) | Export Claude and Gemini chat logs to dated markdown files; extract Codex CLI sessions with `--source codex` (outputs `YYYY-MM-DD-codex.md`; not included in `--source all` yet) | `--today`, `--date=YYYY-MM-DD`, `--after=`, `--before=`, `--project=`, `--source claude\|gemini\|codex\|all`, `--output-dir=`, `--rebuild`, `--incremental`, `--claude-projects-dir=` |
+| [`/kmgraph:kmg-handoff`](command-guide.md#-kmgraphkmg-handoff) | Generate a handoff package (thin START-HERE pointer, DOCUMENTATION-MAP, ARCHITECTURE-SNAPSHOT) | `--output-dir=` |
+| [`/kmgraph:kmg-rules-capture`](command-guide.md) | Detect and route a behavioral correction to `rules.md` or `me.md` (project or personal scope) | — |
 
 **Examples:**
 ```bash
@@ -54,9 +54,9 @@ title: Commands Reference
 
 | Command | Description | Key flags |
 |---|---|---|
-| [`/kmgraph:kmg-recall`](#recall) | Search all project memory systems; automatically includes personal KG when registered | `--scope=all\|active\|personal-only`, `--user`, `--project`, `--named=<kg>`, `--format=detailed\|paths` |
-| [`/kmgraph:kmg-status`](#status) | High-level KG overview: file counts, last sync, MEMORY.md warnings | `--minimal`, `--json` |
-| [`/kmgraph:kmg-backfill`](#backfill) | Index existing lessons/decisions/chat-history into the knowledge graph, drafting candidates for confirmation before writing | `[path]`, `--date=<YYYY-MM-DD>`, `--after=<date>`, `--before=<date>`, `--delegate knowledge-extractor` |
+| [`/kmgraph:kmg-recall`](command-guide.md#-kmgraphkmg-recall) | Search all project memory systems; automatically includes personal KG when registered | `--scope=all\|active\|personal-only`, `--user`, `--project`, `--named=<kg>`, `--format=detailed\|paths` |
+| [`/kmgraph:kmg-status`](command-guide.md#-kmgraphkmg-status) | High-level KG overview: file counts, last sync, MEMORY.md warnings | `--minimal`, `--json` |
+| [`/kmgraph:kmg-backfill`](command-guide.md#-kmgraphkmg-backfill) | Index existing lessons/decisions/chat-history into the knowledge graph, drafting candidates for confirmation before writing | `[path]`, `--date=<YYYY-MM-DD>`, `--after=<date>`, `--before=<date>`, `--delegate knowledge-extractor` |
 
 **Examples:**
 ```bash
@@ -72,7 +72,7 @@ title: Commands Reference
 
 | Command | Description | Key flags |
 |---|---|---|
-| [`/kmgraph:kmg-session-summary`](#session-summary) | Create or append a session summary; snapshot mode skips the review gate | `--auto`, `--snapshot`, `--user`, `--project`, `--named=<kg>` |
+| [`/kmgraph:kmg-session-summary`](command-guide.md#-kmgraphkmg-session-summary) | Create or append a session summary; snapshot mode skips the review gate | `--auto`, `--snapshot`, `--user`, `--project`, `--named=<kg>` |
 
 **Examples:**
 ```bash
@@ -85,15 +85,15 @@ title: Commands Reference
 
 | Command | Description | Key flags |
 |---|---|---|
-| [`/kmgraph:kmg-init`](#init) | Create a new KG with wizard; optionally backfills from existing project context; discovers locally running Ollama and LM Studio instances and offers to configure them for tier mapping | — |
-| [`/kmgraph:kmg-init-personal-kg`](#init-personal-kg) | Create a personal KG at `~/.kmgraph/` for cross-project lessons | — |
-| [`/kmgraph:kmg-upgrade`](#upgrade) | Check for and apply pending upgrades (new directories, templates, config fields, backfix categories) without the full init wizard | `--named=<kg>`, `--preview` |
-| [`/kmgraph:kmg-add-category`](#add-category) | Add a new category directory and KG entry file to an existing knowledge graph | `--prefix <p>`, `--git ignore\|commit` |
-| [`/kmgraph:kmg-list`](#list) | List all configured knowledge graphs from `~/.kmgraph/kg-config.json` | `--names-only`, `--json` |
-| [`/kmgraph:kmg-config-sanitization`](#config-sanitization) | Install a pre-commit hook for sensitive-data detection with interactive pattern wizard | — |
-| [`/kmgraph:kmg-check-sensitive`](#check-sensitive) | Scan the resolved KG's files for emails, API keys, and internal URLs before sharing | `--user` |
-| [`/kmgraph:kmg-update-doc`](#update-doc) | Update plugin or project documentation with standards validation and diff preview | `--user-facing` |
-| [`/kmgraph:kmg-setup-platform`](#setup-platform) | Detect installed AI tools and configure KMGraph integrations per platform | — |
+| [`/kmgraph:kmg-init`](command-guide.md#-kmgraphkmg-init) | Create a new KG with wizard; optionally backfills from existing project context; discovers locally running Ollama and LM Studio instances and offers to configure them for tier mapping | — |
+| [`/kmgraph:kmg-init-personal-kg`](command-guide.md#-kmgraphkmg-init-personal-kg) | Create a personal KG at `~/.kmgraph/` for cross-project lessons | — |
+| [`/kmgraph:kmg-upgrade`](command-guide.md#-kmgraphkmg-upgrade) | Check for and apply pending upgrades (new directories, templates, config fields, backfix categories) without the full init wizard | `--named=<kg>`, `--preview` |
+| [`/kmgraph:kmg-add-category`](command-guide.md#-kmgraphkmg-add-category) | Add a new category directory and KG entry file to an existing knowledge graph | `--prefix <p>`, `--git ignore\|commit` |
+| [`/kmgraph:kmg-list`](command-guide.md#-kmgraphkmg-list) | List all configured knowledge graphs from `~/.kmgraph/kg-config.json` | `--names-only`, `--json` |
+| [`/kmgraph:kmg-config-sanitization`](command-guide.md#-kmgraphkmg-config-sanitization) | Install a pre-commit hook for sensitive-data detection with interactive pattern wizard | — |
+| [`/kmgraph:kmg-check-sensitive`](command-guide.md#-kmgraphkmg-check-sensitive) | Scan the resolved KG's files for emails, API keys, and internal URLs before sharing | `--user` |
+| [`/kmgraph:kmg-update-doc`](command-guide.md#-kmgraphkmg-update-doc) | Update plugin or project documentation with standards validation and diff preview | `--user-facing` |
+| [`/kmgraph:kmg-setup-platform`](command-guide.md) | Detect installed AI tools and configure KMGraph integrations per platform | — |
 
 **Examples:**
 ```bash
@@ -112,11 +112,11 @@ title: Commands Reference
 
 | Command | Description | Key flags |
 |---|---|---|
-| [`/kmgraph:kmg-start-issue-tracking`](#start-issue-tracking) | Structured issue tracking: documentation templates, implementation plan, and Git branch | — |
-| [`/kmgraph:kmg-meta-issue`](#meta-issue) | Track complex multi-attempt problems with attempt folders and root-cause evolution | `--add-attempt <N> "<desc>"`, `--update-understanding "<text>"`, `--status` |
-| [`/kmgraph:kmg-update-issue-plan`](#update-issue-plan) | Sync KG extraction with active plans and post a progress comment to GitHub Issues | `--auto`, `--pr=<N>` |
-| [`/kmgraph:kmg-link-issue`](#link-issue) | Manually link an existing lesson or ADR to a GitHub Issue with bidirectional references | `--issue <N>`, `--pr <N>` |
-| [`/kmgraph:kmg-handoff`](#handoff) | Generate a handoff package before transitions, context resets, or onboarding | `--output-dir=` |
+| [`/kmgraph:kmg-start-issue-tracking`](command-guide.md#-kmgraphkmg-start-issue-tracking) | Structured issue tracking: documentation templates, implementation plan, and Git branch | — |
+| [`/kmgraph:kmg-meta-issue`](command-guide.md#-kmgraphkmg-meta-issue) | Track complex multi-attempt problems with attempt folders and root-cause evolution | `--add-attempt <N> "<desc>"`, `--update-understanding "<text>"`, `--status` |
+| [`/kmgraph:kmg-update-issue-plan`](command-guide.md#-kmgraphkmg-update-issue-plan) | Sync KG extraction with active plans and post a progress comment to GitHub Issues | `--auto`, `--pr=<N>` |
+| [`/kmgraph:kmg-link-issue`](command-guide.md#-kmgraphkmg-link-issue) | Manually link an existing lesson or ADR to a GitHub Issue with bidirectional references | `--issue <N>`, `--pr <N>` |
+| [`/kmgraph:kmg-handoff`](command-guide.md#-kmgraphkmg-handoff) | Generate a handoff package before transitions, context resets, or onboarding | `--output-dir=` |
 
 **Examples:**
 ```bash

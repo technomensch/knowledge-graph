@@ -6,7 +6,7 @@ github-issue: "#187"
 branch: none
 created: 2026-07-18
 related_adrs: ["ADR-066", "ADR-067"]
-related_enhs: ["ENH-022"]
+related_enhs: ["ENH-022", "ENH-062", "ENH-065"]
 ---
 
 # ENH-051: Stop Hand-Duplicating KG Path Logic Between cli.ts and kmg-init.md
@@ -35,6 +35,8 @@ Discovered while executing v0.6.20 Task 4 (branch `v0.6.20-storage-migration-com
 
 ## Related
 
+- [ENH-065](../ENH-065/ENH-065-specification.md) — filed lightweight, then redone through the full workflow, one of the cases ENH-065 investigates.
+- [ENH-062](../ENH-062/ENH-062-specification.md) — references this ENH in its relationship-mapping/status-schema design.
 - **ADR-066** — names this exact delegation as the intended root-cause fix (line 78). This spec is the buildable version ADR-066's decision log never got.
 - **ADR-067 (Proposed, open)** — mutable `.active` switch vs. context-derived KG resolution. Adjacent, not overlapping: both concern "which layer decides where a KG lives," but ADR-067 is about *identifying the active graph*, this item is about *computing a new graph's storage path*. Must not assume ADR-067's outcome.
 - **ENH-022 (folder-structure migration)** — already touches `kg_config_init` and `kg_scaffold` (its spec notes both "still create old layout" issues, fixed incrementally across v0.5.10.7/v0.6.4 plans). Same tool surface, different concern. Cross-referenced so future edits to either tool check both specs.

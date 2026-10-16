@@ -6,7 +6,8 @@ version_target: "v0.5.10.5"
 github_issue: null
 created: 2026-06-12
 related_adrs: ["ADR-044"]
-related_enhs: []
+related_enhs: ["ENH-026", "ENH-025"]
+related_issues: ["issue-52"]
 ---
 
 # ENH-024: Add Codex CLI Chat History Extraction Support
@@ -94,6 +95,9 @@ Extracted output follows the existing per-date naming pattern: `YYYY-MM-DD-codex
 
 ## Related
 
+- [ENH-025](../ENH-025/ENH-025-specification.md) — ENH-025's spec cross-references this item.
+- [ENH-026](../ENH-026/ENH-026-specification.md) — ENH-026's spec cross-references this item.
+- [issue-52](../../issues/issue-52/issue-52-description.md) — issue-52's spec cross-references this item.
 - `core/scripts/run_extraction.py` — add `codex` to `--source` choices and dispatch block
 - `core/scripts/extract_claude.py` — reference implementation for new module
 - `core/scripts/extract_gemini.py` — reference implementation for new module

@@ -6,7 +6,8 @@ github-issue: pending
 branch: none
 created: 2026-07-30
 related_adrs: ["ADR-066"]
-related_issues: ["issue-31", "issue-34"]
+related_issues: ["issue-31", "issue-34", "issue-52"]
+related_enhs: ["ENH-056"]
 ---
 
 # issue-35: `kg_search`/FTS5's `"knowledge"` Directory Entry Is a Dead Pre-Migration Path Literal — Recurrence of issue-31's Pattern
@@ -39,6 +40,7 @@ Captured live, lightweight, local-only — track only, no plan, no branch. Secon
 
 ## Related
 
+- [issue-52](../issue-52/issue-52-description.md) — issue-52's spec cross-references this item.
 - issue-31 (`knowledge/issues/issue-31/issue-31-description.md`) — the first instance of this exact pattern (`kmg-handoff.md` hardcoded path), whose own "Open Questions" section predicted this recurrence
 - issue-34 (`knowledge/issues/issue-34/issue-34-description.md`) — separate bug found in the same investigation (recall never searches `issues`/`enhancements`)
 - `ADR-066` (`knowledge/decisions/ADR-066-kg-content-storage-location-for-global-and-cowork-modes.md`) — § "Post-Implementation Gap," root cause shared with issue-31
@@ -48,6 +50,7 @@ Captured live, lightweight, local-only — track only, no plan, no branch. Secon
   project-local index path keyed only by KG name, causing cross-repo index collisions;
   confirmed this issue's dead-`"knowledge"`-literal fix still intact while investigating,
   different defect.
+- [ENH-056](../../enhancements/ENH-056/ENH-056-specification.md) — umbrella enhancement that lists this issue among its related issues.
 
 ## Fix Plan (C2, branch v0.7.0)
 

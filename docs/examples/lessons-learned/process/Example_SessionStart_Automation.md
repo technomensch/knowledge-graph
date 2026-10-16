@@ -235,9 +235,9 @@ Sources consulted while solving this problem:
 ## Related Documentation
 
 **Knowledge Graph:**
-- [Automated Orchestrator](../../knowledge/patterns.md#automated-orchestrator) — The design pattern used for hook execution.
-- [Smart Defaults](../../knowledge/patterns.md#smart-defaults) — Philosophy behind making documentation the easiest path.
-- [Automation Strategy](../../knowledge/concepts.md#automation-strategy) — High-level goals for project-wide automation.
+- [Automated Orchestrator](../../knowledge/sample-patterns.md#automated-orchestrator) — The design pattern used for hook execution.
+- [Smart Defaults](../../knowledge/sample-patterns.md#smart-defaults) — Philosophy behind making documentation the easiest path.
+- [Automation Strategy](../../knowledge/sample-concepts.md#automation-strategy) — High-level goals for project-wide automation.
 
 ---
 

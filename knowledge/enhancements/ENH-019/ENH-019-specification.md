@@ -7,6 +7,7 @@ github_issue: null
 created: 2026-05-27
 related_adrs: []
 related_enhs: []
+related_issues: ["issue-5"]
 ---
 
 # ENH-019: kmgraph Usage Analytics & Stats Dashboard
@@ -82,3 +83,7 @@ This ENH was identified during v0.5.9 work. v0.6.0 is reserved for `kmg-` prefix
 - `solution-approach.md` — to be written after brainstorm session
 - `test-cases.md` — to be written after brainstorm session
 - `progress-log.md` — to be written at implementation start
+
+## Related
+
+- [issue-5](../../issues/issue-5/issue-5-description.md) — issue-5's spec cross-references this item.

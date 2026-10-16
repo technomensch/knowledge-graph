@@ -6,6 +6,7 @@ github-issue: "#208"
 branch: none
 created: 2026-07-26
 related_adrs: ["ADR-067"]
+related_issues: ["issue-25", "issue-33", "issue-52"]
 ---
 
 # ENH-053: Topic-KGs Spanning Multiple Related Projects (Not User-Graph, Not Single-Project)
@@ -34,6 +35,9 @@ practice; don't design speculatively ahead of that.
 
 ## Related
 
+- [issue-52](../../issues/issue-52/issue-52-description.md) — issue-52's spec cross-references this item.
 - ADR-067 (`knowledge/decisions/ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md`) — the KG resolution model this would eventually need to slot into
 - `docs/specs/2026-07-26-adr-067-kg-resolution-v0.7-spec.md` — the v0.7 spec this was descoped out of
 - issue-30 (`knowledge/issues/issue-30/issue-30-description.md`) — cited this ENH's lightweight, deferred "write it down" capture precedent (no branch/PR overhead) when scoping its own `kmg-handoff`/`kmg-session-wrap` fix
+- [issue-25](../../issues/issue-25/issue-25-description.md) — cites ENH-053 as a lightweight-path precedent for the lightweight-vs-full workflow rule.
+- [issue-33](../../issues/issue-33/issue-33-description.md) — cites ENH-053 as precedent for lightweight, deferred capture.

@@ -57,9 +57,9 @@ This problem qualified as meta-issue because:
 
 | Attempt | Date | Approach | Result |
 |---------|------|----------|--------|
-| [001](./attempts/001-baseline/) | 2024-09-01 - 09-07 | Add caching layer | ❌ Failed (incorrect assumption) |
-| [002](./attempts/002-query-optimization/) | 2024-09-15 - 09-25 | Optimize database queries | ⚠️ Partial (30% improvement, not enough) |
-| [003](./attempts/003-connection-pooling/) | 2024-10-01 - 10-12 | Connection pooling + async | ✅ Success (met all targets) |
+| [001](./attempts/001-baseline/README.md) | 2024-09-01 - 09-07 | Add caching layer | ❌ Failed (incorrect assumption) |
+| [002](./attempts/002-caching/solution-approach.md) | 2024-09-15 - 09-25 | Optimize database queries | ⚠️ Partial (30% improvement) |
+| [003](./attempts/003-connection-pooling/solution-approach.md) | 2024-10-01 - 10-12 | Connection pooling + async | ✅ Success (met all targets) |
 
 ---
 

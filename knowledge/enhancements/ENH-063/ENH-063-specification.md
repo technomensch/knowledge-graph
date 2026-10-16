@@ -5,6 +5,7 @@ status: deferred
 github-issue: "#243"
 branch: none
 created: 2026-08-22
+related_enhs: ["ENH-065"]
 ---
 
 # ENH-063: Decision-Provenance Tagging for ADRs
@@ -99,3 +100,7 @@ question the human never saw, `response_channel` must be recorded as
 regardless of what the subagent's own transcript claims.
 
 See `solution-approach.md` for the fuller design and open questions.
+
+## Related
+
+- [ENH-065](../ENH-065/ENH-065-specification.md) — precedent for silent track-only filing with a full four-file folder.

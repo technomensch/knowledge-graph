@@ -35,16 +35,29 @@
 #   currency) and can't be mechanically verified in bash. A companion skill
 #   (not yet built) would write the completion flag after running.
 #
-# Gate 8 — docs-build broken-link check (issue-13, advisory only):
-#   Runs `npm run build` (Docusaurus) and surfaces broken-link warnings
-#   (onBrokenLinks: 'warn' in docusaurus.config.js -- this gate does not flip
-#   that to 'throw'; issue-13's own text says that must wait until link
-#   clusters 2+3 are fixed first, or CI hard-fails on unrelated pre-existing
-#   breaks). Bounded by a timeout since a full build inside a PreToolUse hook
-#   otherwise adds real latency to every push; the build runs as a background
-#   job with its exit captured via `wait ... || VAR=$?`, so a nonzero/killed
-#   build can't abort the rest of this script under `set -e` (same guard
-#   idiom Gate 4b uses via command substitution).
+# Gate 8 — docs-build broken-link/anchor check (issue-13):
+#   Runs `npm run build` (Docusaurus) and surfaces broken-link findings.
+#   Updated 2026-09-17 (v0.7.10, issue-13 resolution): `onBrokenLinks` and
+#   `onBrokenAnchors` in docusaurus.config.js are now BOTH 'throw' (link
+#   clusters 2+3 that previously blocked this flip are fixed) — the build
+#   this gate runs genuinely hard-fails on any broken link or anchor now,
+#   it no longer just warns. Gate 8 itself is still advisory at the LOCAL
+#   pre-push layer: it never blocks `git push` (see "Advisory injection
+#   model" below) — it just surfaces the build's pass/fail result as
+#   additionalContext before the push completes. Bounded by a timeout since
+#   a full build inside a PreToolUse hook otherwise adds real latency to
+#   every push; the build runs as a background job with its exit captured
+#   via `wait ... || VAR=$?`, so a nonzero/killed build can't abort the rest
+#   of this script under `set -e` (same guard idiom Gate 4b uses via command
+#   substitution).
+#
+#   Relationship to the PR-time CI check (`.github/workflows/docs.yml`,
+#   added same branch): Gate 8 = local, advisory, pre-push — catches a
+#   broken link/anchor before you even push. The `docs.yml` `pull_request`
+#   trigger = CI, genuinely blocking at the PR level (a failing GitHub
+#   check) — catches it on the PR itself if Gate 8 was skipped, bypassed,
+#   or never ran locally. See ADR-050's addendum for why the CI layer is a
+#   deliberate, narrow exception to this file's advisory-only philosophy.
 #
 # Why gates, not a smarter skill (ADR-043, ADR-050):
 #   ADR-043: "Previous fix attempts via CLAUDE.md edits and ADRs failed
@@ -259,7 +272,7 @@ check_kg_index_count() {
 check_kg_index_count "decisions"       "Total ADRs"   "-maxdepth 1 -iname 'ADR-*.md'"
 check_kg_index_count "enhancements"    "Total ENHs"   "-maxdepth 1 -type d -iname 'ENH-*'"
 check_kg_index_count "issues"          "Total Issues" "-maxdepth 1 -type d -iname 'issue-*'"
-check_kg_index_count "lessons-learned" "Total Lessons" "-mindepth 2 -iname 'Lessons_Learned_*.md'"
+check_kg_index_count "lessons-learned" "Total Lessons" "-mindepth 2 -iname '*.md' ! -iname 'README.md'"
 
 # Backlink symmetry: for issue/ENH docs changed on this branch, does every
 # cross-reference to another issue/ENH get reciprocated? Scoped to the
@@ -306,10 +319,15 @@ if [ -n "$SCAN_FLAG" ]; then
   fi
 fi
 
-# ── Gate 8: docs-build broken-link check (issue-13, advisory only) ────────────
+# ── Gate 8: docs-build broken-link/anchor check (issue-13, local advisory) ────
 # Note: Gate numbers stay in original discovery order (7 already exists below
 # this historically); placed here so it runs alongside the other content
 # checks rather than reordering existing gates.
+#
+# Note (2026-09-17, v0.7.10): onBrokenLinks/onBrokenAnchors are now 'throw'
+# (see header comment above) -- see also the PR-time CI build gate added to
+# `.github/workflows/docs.yml` this same branch, which is the non-advisory
+# backstop for whatever a bypassed/skipped local push slips past this gate.
 #
 # Corrected 2026-09-05 (Opus review): DOCS_BUILD_TIMEOUT_SECS must stay well
 # under this hook's own PreToolUse timeout (hooks/hooks.json, currently 90s --
@@ -365,6 +383,11 @@ elif [ "$DOCS_BUILD_EXIT" -ne 0 ]; then
   FINDINGS="${FINDINGS}DOCS BUILD ADVISORY: npm run build failed (exit ${DOCS_BUILD_EXIT}). Broken-link check skipped for this push -- run 'npm run build' locally to see the full error.
 "
 else
+  # Note (2026-09-17): with onBrokenLinks/onBrokenAnchors now 'throw', any
+  # actual broken link/anchor already makes DOCS_BUILD_EXIT non-zero and is
+  # caught by the `elif` above -- this branch (parsing 'warn'-style output
+  # lines) is effectively vestigial under throw mode, kept as a harmless
+  # fallback in case either flag is ever reverted to 'warn'.
   # Anchor to Docusaurus's actual per-link bullet format ("- Broken link on
   # source page path = ..."), not a loose 'broken link' substring match --
   # the latter also matches the build's own header/note lines ("[WARNING]
@@ -386,7 +409,7 @@ else
     # not one broken link -- Docusaurus lists the actual target(s) on
     # indented sub-lines beneath each page. Label accordingly so the count
     # doesn't overstate/understate what it's actually counting.
-    FINDINGS="${FINDINGS}DOCS BUILD ADVISORY: ${DOCS_BROKEN_COUNT} page(s) with broken link(s) detected by 'npm run build' (onBrokenLinks: warn, not blocking) -- showing first 5:
+    FINDINGS="${FINDINGS}DOCS BUILD ADVISORY: ${DOCS_BROKEN_COUNT} page(s) with broken link(s) detected by 'npm run build' (fallback path -- only reachable if onBrokenLinks/onBrokenAnchors is reverted to 'warn') -- showing first 5:
 ${DOCS_BROKEN_SHOWN}
 "
     if [ "$DOCS_BROKEN_COUNT" -gt 5 ]; then

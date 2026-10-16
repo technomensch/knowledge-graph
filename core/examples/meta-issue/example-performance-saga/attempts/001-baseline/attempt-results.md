@@ -317,6 +317,6 @@ Based on profiling findings:
 ## Related
 
 - **Solution Approach:** [solution-approach.md](./solution-approach.md)
-- **Test Cases:** [../test-cases.md](../test-cases.md)
-- **Implementation Log:** [../implementation-log.md](../implementation-log.md)  
-- **Next Attempt:** [../002-query-optimization/](../002-query-optimization/)
+- **Test Cases:** [../../test-cases.md](../../test-cases.md)
+- **Implementation Log:** [../../implementation-log.md](../../implementation-log.md)  
+- **Next Attempt:** [../002-caching/attempt-results.md](../002-caching/attempt-results.md)

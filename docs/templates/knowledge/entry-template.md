@@ -36,7 +36,7 @@ Link to lesson learned (`../../lessons-learned/category/lesson-file.md`) — [Co
 
 **Related:**
 - Related KG entry (`./file.md#section`)
-- [Related concept](./concepts.md#section)
+- [Related concept](./concepts.md#concept-template)
 - Related ADR (`../../decisions/ADR-XXX.md`)
 
 **See Lesson:** [Full lesson with deep dive]
