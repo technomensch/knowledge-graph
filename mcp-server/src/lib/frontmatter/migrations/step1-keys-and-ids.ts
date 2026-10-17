@@ -29,6 +29,7 @@ export const step1: Migration = {
   transform: (text) =>
     withFrontmatter(text, (lines, end) => {
       const notes: string[] = [];
+      const attention: string[] = [];
       const blocks = topLevelBlocks(lines, end);
       const keys = new Set(blocks.map((b) => b.key));
       for (const [oldK, newK] of Object.entries(RENAMES)) {
@@ -48,7 +49,7 @@ export const step1: Migration = {
         }
         const list = readList(work, b);
         if (!list) {
-          notes.push(`${b.key}: unrecognized shape, left as is`);
+          attention.push(`${b.key}: unrecognized shape, left as is`);
           if (renamed) renameFirstLine();
           continue;
         }
@@ -57,6 +58,6 @@ export const step1: Migration = {
         if (!renamed && !changed) continue;
         work = replaceLines(work, b.start, contentEnd(work, b), renderList(newKey, items, list.style));
       }
-      return { lines: work, notes };
+      return { lines: work, notes, attention };
     }),
 };

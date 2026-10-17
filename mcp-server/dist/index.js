@@ -41243,8 +41243,8 @@ function withFrontmatter(text, fn) {
     return { text, notes: [], skip: "doubled frontmatter block (issue-46); run the capture-corruption repair first" };
   }
   const r = fn(lines, loc.end);
-  if (r.skip) return { text, notes: r.notes, skip: r.skip };
-  return { text: r.lines.join("\n"), notes: r.notes };
+  if (r.skip) return { text, notes: r.notes, skip: r.skip, attention: r.attention };
+  return { text: r.lines.join("\n"), notes: r.notes, attention: r.attention };
 }
 
 // src/lib/frontmatter/migrations/step1-keys-and-ids.ts
@@ -41278,6 +41278,7 @@ var step1 = {
   scope: (p) => inDirs(p, ["issues", "enhancements", "decisions"]),
   transform: (text) => withFrontmatter(text, (lines, end) => {
     const notes = [];
+    const attention = [];
     const blocks = topLevelBlocks(lines, end);
     const keys = new Set(blocks.map((b) => b.key));
     for (const [oldK, newK] of Object.entries(RENAMES)) {
@@ -41297,7 +41298,7 @@ var step1 = {
       }
       const list = readList(work, b);
       if (!list) {
-        notes.push(`${b.key}: unrecognized shape, left as is`);
+        attention.push(`${b.key}: unrecognized shape, left as is`);
         if (renamed) renameFirstLine();
         continue;
       }
@@ -41306,7 +41307,7 @@ var step1 = {
       if (!renamed && !changed) continue;
       work = replaceLines(work, b.start, contentEnd(work, b), renderList(newKey, items, list.style));
     }
-    return { lines: work, notes };
+    return { lines: work, notes, attention };
   })
 };
 
@@ -41321,13 +41322,14 @@ var step2 = {
   scope: (p) => inDirs(p, ["issues", "enhancements", "decisions"]),
   transform: (text, _relPath, ctx) => withFrontmatter(text, (lines, end) => {
     const notes = [];
+    const attention = [];
     let work = lines;
     for (const b of [...topLevelBlocks(lines, end)].sort((x, y) => y.start - x.start)) {
       const kind = LIST_KEYS[b.key];
       if (!kind) continue;
       const list = readList(work, b);
       if (!list) {
-        notes.push(`${b.key}: unrecognized shape, left as is`);
+        attention.push(`${b.key}: unrecognized shape, left as is`);
         continue;
       }
       const items = list.items.map((v) => {
@@ -41339,7 +41341,7 @@ var step2 = {
       if (items.every((v, i) => v === list.items[i])) continue;
       work = replaceLines(work, b.start, contentEnd(work, b), renderList(b.key, items, list.style));
     }
-    return { lines: work, notes };
+    return { lines: work, notes, attention };
   })
 };
 
@@ -41354,6 +41356,11 @@ var SUBKEYS = {
 var FLAT = ["related_adrs", "related_enhs", "related_issues", "related_lessons", "related_docs"];
 var FLAT_OLD_SPELLING = ["related-adrs", "related-enhs", "related-issues"];
 var ADR_ALWAYS = ["related_adrs", "related_lessons", "related_docs"];
+var PREFIXED_ID = [
+  { re: /^ENH-\d+$/i, kind: "enh" },
+  { re: /^ADR-\d+$/i, kind: "adr" },
+  { re: /^issue-\d+$/i, kind: "issue" }
+];
 var step3 = {
   step: 3,
   id: "flatten-related",
@@ -41364,40 +41371,84 @@ var step3 = {
   scope: (p) => inDirs(p, ["decisions", "lessons-learned"]),
   transform: (text, relPath, ctx) => withFrontmatter(text, (lines, end) => {
     const notes = [];
+    const attention = [];
+    const leftAsIs = () => ({ lines, notes, attention });
     const blocks = topLevelBlocks(lines, end);
     const rel = blocks.find((b) => b.key === "related");
     if (!rel) return { lines, notes };
     if (blocks.some((b) => FLAT.includes(b.key) || FLAT_OLD_SPELLING.includes(b.key))) {
-      return { lines, notes, skip: 'flat related_* keys already present next to "related:"' };
+      attention.push('"related:" left as is: flat related_* keys are already present next to it');
+      return leftAsIs();
     }
     const isAdr = relPath.startsWith("decisions/");
     const first = lines[rel.start];
     const rest = stripComment(first.slice(first.indexOf(":") + 1)).trim();
-    if (!["", "null", "~", "{}"].includes(rest)) return { lines, notes, skip: 'unrecognized "related:" shape' };
     const rEnd = contentEnd(lines, rel);
     const subs = [];
     let subIndent = -1;
+    let plainItems = 0;
     for (let i = rel.start + 1; i < rEnd; i++) {
       const m = /^(\s+)([A-Za-z0-9_-]+):/.exec(lines[i]);
-      if (!m) continue;
-      if (subIndent === -1) subIndent = m[1].length;
-      if (m[1].length === subIndent) subs.push({ key: m[2], start: i, end: rEnd });
+      if (m) {
+        if (subIndent === -1) subIndent = m[1].length;
+        if (m[1].length === subIndent) subs.push({ key: m[2], start: i, end: rEnd });
+        continue;
+      }
+      if (/^\s*-\s+/.test(lines[i]) && subs.length === 0) plainItems++;
     }
     for (let s = 0; s < subs.length - 1; s++) subs[s].end = subs[s + 1].start;
     const mapped = /* @__PURE__ */ new Map();
-    for (const sb of subs) {
-      const spec = SUBKEYS[sb.key];
-      if (!spec) return { lines, notes, skip: `unknown related sub-key "${sb.key}"` };
-      const list = readList(lines, sb);
-      if (!list) return { lines, notes, skip: `related.${sb.key}: unrecognized shape` };
-      const items = list.items.map((v) => {
-        const raw = spec.kind === "path" ? v : normalizeId(spec.kind, v) ?? v;
-        const r = resolveRef2(ctx.index, spec.kind, raw);
-        if ("link" in r) return r.link;
-        notes.push(`related.${sb.key}: unresolved "${r.unresolved}" (no unique note found), kept as plain text`);
-        return raw;
-      });
-      mapped.set(spec.key, [...mapped.get(spec.key) ?? [], ...items]);
+    let totalIn = 0;
+    const resolvePlain = (v) => {
+      const id = PREFIXED_ID.find((p) => p.re.test(v.trim()));
+      const raw = id ? normalizeId(id.kind, v) ?? v : v;
+      const r = id ? resolveRef2(ctx.index, id.kind, raw) : resolveRef2(ctx.index, "path", raw);
+      if ("link" in r) return r.link;
+      notes.push(`related: unresolved "${r.unresolved}" (no unique note found), kept as plain text`);
+      return raw;
+    };
+    const isFlowList = rest.startsWith("[") && rest.endsWith("]");
+    if (isFlowList || rest === "" && plainItems > 0 && subs.length === 0) {
+      const list = readList(lines, rel);
+      if (!list) {
+        attention.push('"related:" left as is: unrecognized list shape');
+        return leftAsIs();
+      }
+      totalIn = list.items.length;
+      mapped.set("related_docs", list.items.map(resolvePlain));
+    } else if (rest !== "" && !["null", "~", "{}"].includes(rest)) {
+      attention.push('"related:" left as is: unrecognized shape');
+      return leftAsIs();
+    } else if (plainItems > 0 && subs.length > 0) {
+      attention.push('"related:" left as is: mixes plain list items with named groups');
+      return leftAsIs();
+    } else {
+      for (const sb of subs) {
+        const spec = SUBKEYS[sb.key];
+        if (!spec) {
+          attention.push(`"related:" left as is: unknown group "${sb.key}"`);
+          return leftAsIs();
+        }
+        const list = readList(lines, sb);
+        if (!list) {
+          attention.push(`"related:" left as is: group "${sb.key}" has an unrecognized shape`);
+          return leftAsIs();
+        }
+        totalIn += list.items.length;
+        const items = list.items.map((v) => {
+          const raw = spec.kind === "path" ? v : normalizeId(spec.kind, v) ?? v;
+          const r = resolveRef2(ctx.index, spec.kind, raw);
+          if ("link" in r) return r.link;
+          notes.push(`related.${sb.key}: unresolved "${r.unresolved}" (no unique note found), kept as plain text`);
+          return raw;
+        });
+        mapped.set(spec.key, [...mapped.get(spec.key) ?? [], ...items]);
+      }
+    }
+    const totalOut = [...mapped.values()].reduce((n, v) => n + v.length, 0);
+    if (totalOut !== totalIn) {
+      attention.push('"related:" left as is: the number of entries would change');
+      return leftAsIs();
     }
     const out = [];
     for (const key of FLAT) {
@@ -41406,8 +41457,8 @@ var step3 = {
       const items = vals ?? [];
       out.push(...renderList(key, items, items.length > 0 ? "block" : "flow"));
     }
-    if (out.length === 0) return { lines, notes };
-    return { lines: replaceLines(lines, rel.start, rEnd, out), notes };
+    if (out.length === 0) return { lines, notes, attention };
+    return { lines: replaceLines(lines, rel.start, rEnd, out), notes, attention };
   })
 };
 
@@ -41422,13 +41473,14 @@ var step4 = {
   scope: (p) => inDirs(p, ["issues", "enhancements", "decisions"]),
   transform: (text) => withFrontmatter(text, (lines, end) => {
     const notes = [];
+    const attention = [];
     const blocks = topLevelBlocks(lines, end);
     const st = blocks.find((b) => b.key === "status");
     if (!st) return { lines, notes };
     const raw = readScalar(lines, st);
     if (raw === null) {
-      notes.push("status: multi-line or empty, status_category not added");
-      return { lines, notes };
+      attention.push("status: multi-line or empty, status_category not added");
+      return { lines, notes, attention };
     }
     const { category, recognized } = categoryFor(raw);
     const existing = blocks.find((b) => b.key === "status_category");
@@ -41451,7 +41503,7 @@ var MIGRATIONS = [step1, step2, step3, step4];
 function planMigrations(kgPath, steps) {
   const ordered = MIGRATIONS.filter((m) => steps.includes(m.step)).sort((a, b) => a.step - b.step);
   const index = buildNoteIndex(kgPath);
-  const result = { scanned: 0, changes: [], skipped: [], notes: [] };
+  const result = { scanned: 0, changes: [], skipped: [], attention: [], ignored: [], notes: [] };
   for (const relPath of index.paths) {
     const applicable = ordered.filter((m) => m.scope(relPath));
     if (applicable.length === 0) continue;
@@ -41462,12 +41514,17 @@ function planMigrations(kgPath, steps) {
       continue;
     }
     result.scanned++;
+    if (!locateFrontmatter(before.split("\n"))) {
+      result.ignored.push({ relPath, reason: before.startsWith("---\r\n") ? "CRLF line endings (not handled)" : "no frontmatter" });
+      continue;
+    }
     let text = before;
     const used = [];
     let skipped = false;
     for (const m of applicable) {
       const r = m.transform(text, relPath, { index });
       result.notes.push(...r.notes.map((n) => `${relPath}: ${n}`));
+      for (const a of r.attention ?? []) result.attention.push({ relPath, step: m.step, reason: a });
       if (r.skip) {
         result.skipped.push({ relPath, step: m.step, reason: r.skip });
         skipped = true;
@@ -41499,6 +41556,16 @@ function stable(v) {
   }
   return JSON.stringify(v) ?? "null";
 }
+function relationshipEntryCount(obj) {
+  let n = 0;
+  const walk = (v) => {
+    if (Array.isArray(v)) v.forEach(walk);
+    else if (v && typeof v === "object") Object.values(v).forEach(walk);
+    else if (typeof v === "string" || typeof v === "number") n++;
+  };
+  for (const [k, v] of Object.entries(obj)) if (/^related([_-]|$)/.test(k)) walk(v);
+  return n;
+}
 function verifyEquivalent(before, after, touched) {
   const b = split(before);
   const a = split(after);
@@ -41517,6 +41584,9 @@ function verifyEquivalent(before, after, touched) {
   }
   const ob = { ...pb };
   const oa = { ...pa };
+  if (touched.some((k) => k.startsWith("related")) && relationshipEntryCount(ob) !== relationshipEntryCount(oa)) {
+    return "relationship entries were lost or added";
+  }
   for (const k of touched) {
     delete ob[k];
     delete oa[k];
@@ -41547,6 +41617,23 @@ function perStepCounts(plan) {
   for (const s of ALL_STEPS) counts.set(s, plan.changes.filter((c) => c.steps.includes(s)).length);
   return counts;
 }
+function needsAttentionItems(plan) {
+  return [
+    ...plan.skipped.map((s) => ({ relPath: s.relPath, reason: `step ${s.step}: ${s.reason}` })),
+    ...plan.attention.map((a) => ({ relPath: a.relPath, reason: `step ${a.step}: ${a.reason}` }))
+  ];
+}
+function needsAttentionFiles(plan) {
+  return new Set(needsAttentionItems(plan).map((i) => i.relPath)).size;
+}
+function needsAttentionLines(plan, max) {
+  const items = needsAttentionItems(plan);
+  if (items.length === 0) return [];
+  const out = [`needs your attention (these notes are left exactly as they are): ${needsAttentionFiles(plan)} file(s)`];
+  for (const i of items.slice(0, max)) out.push(`  - ${i.relPath}: ${i.reason}`);
+  if (items.length > max) out.push(`  ... and ${items.length - max} more`);
+  return out;
+}
 function checkFrontmatterSchema(kgPath) {
   const marker = readSchemaMarker(kgPath);
   if (marker !== null && marker < FRONTMATTER_SCHEMA_FLOOR) {
@@ -41557,16 +41644,16 @@ function checkFrontmatterSchema(kgPath) {
     }];
   }
   const plan = planMigrations(kgPath, ALL_STEPS);
-  if (plan.changes.length === 0 && plan.skipped.length === 0) return [];
+  if (plan.changes.length === 0) return [];
   const counts = perStepCounts(plan);
   const lines = [];
   for (const m of MIGRATIONS) {
     lines.push(`step ${m.step} (${m.title}): ${counts.get(m.step) ?? 0} file(s)${m.requires.length ? `, requires step ${m.requires.join(", ")}` : ""}`);
   }
   lines.push(`marker: ${marker === null ? "absent" : marker} (floor ${FRONTMATTER_SCHEMA_FLOOR})`);
-  if (plan.skipped.length > 0) {
-    lines.push(`skipped (will not be touched): ${plan.skipped.length} file(s)`);
-    for (const s of plan.skipped.slice(0, 5)) lines.push(`  - ${s.relPath} (step ${s.step}): ${s.reason}`);
+  lines.push(...needsAttentionLines(plan, 8));
+  if (plan.ignored.length > 0) {
+    lines.push(`ignored, no frontmatter or CRLF line endings (left alone): ${plan.ignored.length} file(s)`);
   }
   const unresolved = plan.notes.filter((n) => n.includes("unresolved"));
   if (unresolved.length > 0) {
@@ -41583,7 +41670,7 @@ function checkFrontmatterSchema(kgPath) {
   );
   return [{
     category: "frontmatter-schema",
-    description: `frontmatter schema: ${plan.changes.length} file(s) pending, ${plan.skipped.length} skipped`,
+    description: `frontmatter schema: ${plan.changes.length} file(s) pending, ${needsAttentionFiles(plan)} need your attention`,
     details: lines.join("\n")
   }];
 }
@@ -41629,18 +41716,21 @@ function applyFrontmatterSchema(kgPath, steps) {
   const counts = perStepCounts(after);
   let reached = 0;
   for (const s of ALL_STEPS) {
-    if ((counts.get(s) ?? 0) === 0 && !after.skipped.some((k) => k.step === s)) reached = s;
+    if ((counts.get(s) ?? 0) === 0) reached = s;
     else break;
   }
   const previous = marker ?? 0;
   if (reached > previous) writeSchemaMarker(kgPath, reached);
   const parts = [
-    `Applied steps ${wanted.join(", ")}: ${written} file(s) rewritten, ${failed.length} refused by verification, ${plan.skipped.length} skipped.`,
+    `Applied steps ${wanted.join(", ")}: ${written} file(s) rewritten, ${failed.length} refused by verification.`,
     `A .bak copy of each rewritten file sits next to it (delete them after review).`,
     `Schema marker now ${Math.max(previous, reached)}.`
   ];
   for (const f of failed.slice(0, 5)) parts.push(`  refused: ${f}`);
-  for (const s of plan.skipped.slice(0, 5)) parts.push(`  skipped: ${s.relPath} (step ${s.step}): ${s.reason}`);
+  const attentionLines = needsAttentionLines(after, 10);
+  if (attentionLines.length > 0) {
+    parts.push(...attentionLines, "  Fix these by hand if you want them migrated; nothing was changed in them.");
+  }
   return parts.join("\n");
 }
 

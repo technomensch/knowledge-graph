@@ -15,13 +15,14 @@ export const step2: Migration = {
   transform: (text, _relPath, ctx) =>
     withFrontmatter(text, (lines, end) => {
       const notes: string[] = [];
+      const attention: string[] = [];
       let work = lines;
       for (const b of [...topLevelBlocks(lines, end)].sort((x, y) => y.start - x.start)) {
         const kind = LIST_KEYS[b.key];
         if (!kind) continue;
         const list = readList(work, b);
         if (!list) {
-          notes.push(`${b.key}: unrecognized shape, left as is`);
+          attention.push(`${b.key}: unrecognized shape, left as is`);
           continue;
         }
         const items = list.items.map((v) => {
@@ -33,6 +34,6 @@ export const step2: Migration = {
         if (items.every((v, i) => v === list.items[i])) continue;
         work = replaceLines(work, b.start, contentEnd(work, b), renderList(b.key, items, list.style));
       }
-      return { lines: work, notes };
+      return { lines: work, notes, attention };
     }),
 };

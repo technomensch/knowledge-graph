@@ -1,7 +1,12 @@
 import type { NoteIndex } from "../links.js";
 
 export interface MigrationContext { index: NoteIndex }
-export interface StepResult { text: string; notes: string[]; skip?: string }
+/**
+ * notes: informational (for example an unresolved reference kept as plain text).
+ * attention: a field this step could not handle; it is left exactly as it is and reported to the user.
+ * skip: the whole file is left alone (corrupt or conflicting frontmatter).
+ */
+export interface StepResult { text: string; notes: string[]; skip?: string; attention?: string[] }
 
 export interface Migration {
   step: number;

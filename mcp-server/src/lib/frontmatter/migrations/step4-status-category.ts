@@ -14,13 +14,14 @@ export const step4: Migration = {
   transform: (text) =>
     withFrontmatter(text, (lines, end) => {
       const notes: string[] = [];
+      const attention: string[] = [];
       const blocks = topLevelBlocks(lines, end);
       const st = blocks.find((b) => b.key === "status");
       if (!st) return { lines, notes };
       const raw = readScalar(lines, st);
       if (raw === null) {
-        notes.push("status: multi-line or empty, status_category not added");
-        return { lines, notes };
+        attention.push("status: multi-line or empty, status_category not added");
+        return { lines, notes, attention };
       }
       const { category, recognized } = categoryFor(raw);
       const existing = blocks.find((b) => b.key === "status_category");

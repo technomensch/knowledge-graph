@@ -17,6 +17,18 @@ function stable(v: unknown): string {
   return JSON.stringify(v) ?? "null";
 }
 
+/** Number of string/number entries under every relationship key (related, related_*, related-*). */
+function relationshipEntryCount(obj: Record<string, unknown>): number {
+  let n = 0;
+  const walk = (v: unknown): void => {
+    if (Array.isArray(v)) v.forEach(walk);
+    else if (v && typeof v === "object") Object.values(v as Record<string, unknown>).forEach(walk);
+    else if (typeof v === "string" || typeof v === "number") n++;
+  };
+  for (const [k, v] of Object.entries(obj)) if (/^related([_-]|$)/.test(k)) walk(v);
+  return n;
+}
+
 /** ADR-063: null when the rewrite is safe, otherwise the reason it must be refused. */
 export function verifyEquivalent(before: string, after: string, touched: string[]): string | null {
   const b = split(before);
@@ -36,6 +48,10 @@ export function verifyEquivalent(before: string, after: string, touched: string[
   }
   const ob = { ...(pb as Record<string, unknown>) };
   const oa = { ...(pa as Record<string, unknown>) };
+  // Safety net: a step that touches relationship keys must keep exactly as many entries as it found.
+  if (touched.some((k) => k.startsWith("related")) && relationshipEntryCount(ob) !== relationshipEntryCount(oa)) {
+    return "relationship entries were lost or added";
+  }
   for (const k of touched) {
     delete ob[k];
     delete oa[k];

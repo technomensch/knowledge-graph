@@ -216,7 +216,8 @@ describe("step 3: flatten nested related maps", () => {
     root = makeGraph({ "decisions/ADR-011-x.md": fm });
     const plan = planMigrations(root, [3]);
     expect(plan.changes).toHaveLength(0);
-    expect(plan.skipped[0].reason).toContain("already present");
+    expect(plan.skipped).toHaveLength(0);
+    expect(plan.attention[0].reason).toContain("already present");
   });
 
   test("lessons: only keys that existed in the map are emitted; empty related is left alone", () => {
@@ -287,5 +288,104 @@ describe("step 3 normalizes unresolved IDs so the steps converge (Opus review F2
     const after = planMigrations(root, [1, 2, 3]).changes.find((c) => c.relPath === "decisions/ADR-070-x")!.after;
     expect(after).toContain('  - "ADR-067"');
     expect(after).not.toContain('  - "067"');
+  });
+});
+
+describe("notes with non-standard shapes (graphs that predate the plugin)", () => {
+  let root: string;
+  afterEach(() => removeGraph(root));
+
+  const relItems = (text: string): string[] => {
+    const lines = text.split("\n");
+    return lines.filter((l) => /^\s*-\s+/.test(l) || /^related[_-]?\w*:\s*\[/.test(l));
+  };
+
+  test("a plain flow list under related: becomes related_docs; entries are kept", () => {
+    const lesson = ["---", "title: L", "related: [ENH-008, doc-update-router]", "tags: [a]", "---", "b"].join("\n");
+    root = makeGraph({ ...stubs("enhancements/ENH-008/ENH-008-specification.md"), "lessons-learned/patterns/L.md": lesson });
+    const plan = planMigrations(root, [1, 2, 3]);
+    const change = plan.changes.find((c) => c.relPath === "lessons-learned/patterns/L")!;
+    expect(change.after).toContain('  - "[[ENH-008-specification|ENH-008]]"');
+    expect(change.after).toContain('  - "doc-update-router"');
+    expect(change.after).not.toMatch(/^related:/m);
+    expect(change.after).toContain("tags: [a]");
+    expect(plan.skipped).toHaveLength(0);
+  });
+
+  test("a plain block list under related: in an ADR keeps every entry (no silent loss)", () => {
+    const adr = ["---", "number: 080", "status: Accepted", "related:", "  - ADR-007", "  - patterns.md#multi-tier-sync", "---", "b"].join("\n");
+    root = makeGraph({ ...stubs("decisions/ADR-007-x.md"), "decisions/ADR-080-y.md": adr });
+    const after = planMigrations(root, [1, 2, 3]).changes.find((c) => c.relPath === "decisions/ADR-080-y")!.after;
+    expect(after).toContain('related_docs:\n  - "[[ADR-007-x|ADR-007]]"\n  - "patterns.md#multi-tier-sync"');
+    expect(after).toContain("related_adrs: []");
+    expect(after).toContain("related_lessons: []");
+  });
+
+  test("an inline map is left exactly as it is and reported for attention", () => {
+    const adr = ["---", "number: 081", "status: Accepted", "related: {adrs: [ADR-001]}", "---", "b"].join("\n");
+    root = makeGraph({ "decisions/ADR-081-z.md": adr });
+    const plan = planMigrations(root, [3]);
+    expect(plan.changes).toHaveLength(0);
+    expect(plan.attention.map((a) => a.reason).join(" ")).toContain("related:");
+    expect(plan.skipped).toHaveLength(0);
+  });
+
+  test("a mixed shape (plain items next to sub-keys) is left alone and reported", () => {
+    const adr = ["---", "number: 082", "related:", "  - ADR-001", "  adrs: [ADR-002]", "---", "b"].join("\n");
+    root = makeGraph({ "decisions/ADR-082-m.md": adr });
+    const plan = planMigrations(root, [3]);
+    expect(plan.changes).toHaveLength(0);
+    expect(plan.attention).toHaveLength(1);
+  });
+
+  test("an unknown sub-key is reported for attention without blocking the file's other steps", () => {
+    const adr = ["---", "number: 083", "status: Accepted", "related:", "  see_also: [x]", "---", "b"].join("\n");
+    root = makeGraph({ "decisions/ADR-083-u.md": adr });
+    const plan = planMigrations(root, [1, 2, 3, 4]);
+    const change = plan.changes.find((c) => c.relPath === "decisions/ADR-083-u")!;
+    expect(change.after).toContain("status_category: done");
+    expect(change.after).toContain("  see_also: [x]");
+    expect(plan.attention.map((a) => a.reason).join(" ")).toContain("see_also");
+    expect(plan.skipped).toHaveLength(0);
+  });
+
+  test("a multi-line status is reported for attention, not guessed", () => {
+    const fm = ["---", "id: issue-9", "status:", "  folded text", "---", "b"].join("\n");
+    root = makeGraph({ "issues/issue-9/issue-9-description.md": fm });
+    const plan = planMigrations(root, [4]);
+    expect(plan.changes).toHaveLength(0);
+    expect(plan.attention).toHaveLength(1);
+  });
+
+  test("files with no frontmatter, or CRLF line endings, are counted as ignored with a reason", () => {
+    root = makeGraph({
+      "issues/issue-1/README.md": "# no frontmatter here\n",
+      "decisions/ADR-090-crlf.md": "---\r\nnumber: 090\r\nstatus: Accepted\r\n---\r\nbody\r\n",
+    });
+    const plan = planMigrations(root, [1, 2, 3, 4]);
+    expect(plan.changes).toHaveLength(0);
+    const reasons = Object.fromEntries(plan.ignored.map((i) => [i.relPath, i.reason]));
+    expect(reasons["issues/issue-1/README"]).toContain("no frontmatter");
+    expect(reasons["decisions/ADR-090-crlf"]).toContain("CRLF");
+  });
+
+  test("conservation: every relationship entry in survives out, across a messy mix of shapes", () => {
+    const files: Record<string, string> = {
+      "decisions/ADR-100-a.md": ["---", "number: 100", "status: Accepted", "related: [ENH-001, x]", "---", "b"].join("\n"),
+      "decisions/ADR-101-b.md": ["---", "number: 101", "status: Accepted", "related:", "  adrs: [ADR-100]", "  lessons: [l1, l2]", "  kg_entries: [k]", "---", "b"].join("\n"),
+      "decisions/ADR-102-c.md": ["---", "number: 102", "status: Accepted", "related:", "  - a", "  - b", "  - c", "---", "b"].join("\n"),
+    };
+    root = makeGraph(files);
+    const plan = planMigrations(root, [1, 2, 3, 4]);
+    const count = (t: string) => (t.match(/"[^"]+"|\[[^\]]*\]/g) ?? []).length;
+    expect(plan.changes.find((c) => c.relPath === "decisions/ADR-100-a")!.after).toContain('"x"');
+    const c102 = plan.changes.find((c) => c.relPath === "decisions/ADR-102-c")!.after;
+    expect(c102).toContain('"a"');
+    expect(c102).toContain('"b"');
+    expect(c102).toContain('"c"');
+    const c101 = plan.changes.find((c) => c.relPath === "decisions/ADR-101-b")!.after;
+    for (const v of ["ADR-100", "l1", "l2", "k"]) expect(c101).toContain(v);
+    expect(count(c102)).toBeGreaterThan(0);
+    void relItems;
   });
 });

@@ -39,6 +39,26 @@ function perStepCounts(plan: PlanResult): Map<number, number> {
   return counts;
 }
 
+function needsAttentionItems(plan: PlanResult): Array<{ relPath: string; reason: string }> {
+  return [
+    ...plan.skipped.map((s) => ({ relPath: s.relPath, reason: `step ${s.step}: ${s.reason}` })),
+    ...plan.attention.map((a) => ({ relPath: a.relPath, reason: `step ${a.step}: ${a.reason}` })),
+  ];
+}
+
+function needsAttentionFiles(plan: PlanResult): number {
+  return new Set(needsAttentionItems(plan).map((i) => i.relPath)).size;
+}
+
+function needsAttentionLines(plan: PlanResult, max: number): string[] {
+  const items = needsAttentionItems(plan);
+  if (items.length === 0) return [];
+  const out = [`needs your attention (these notes are left exactly as they are): ${needsAttentionFiles(plan)} file(s)`];
+  for (const i of items.slice(0, max)) out.push(`  - ${i.relPath}: ${i.reason}`);
+  if (items.length > max) out.push(`  ... and ${items.length - max} more`);
+  return out;
+}
+
 export function checkFrontmatterSchema(kgPath: string): FrontmatterFinding[] {
   const marker = readSchemaMarker(kgPath);
   if (marker !== null && marker < FRONTMATTER_SCHEMA_FLOOR) {
@@ -49,7 +69,8 @@ export function checkFrontmatterSchema(kgPath: string): FrontmatterFinding[] {
     }];
   }
   const plan = planMigrations(kgPath, ALL_STEPS);
-  if (plan.changes.length === 0 && plan.skipped.length === 0) return [];
+  // Nothing to apply: stay quiet. Notes that need a person are shown while there is pending work, and in the apply summary.
+  if (plan.changes.length === 0) return [];
 
   const counts = perStepCounts(plan);
   const lines: string[] = [];
@@ -57,9 +78,9 @@ export function checkFrontmatterSchema(kgPath: string): FrontmatterFinding[] {
     lines.push(`step ${m.step} (${m.title}): ${counts.get(m.step) ?? 0} file(s)${m.requires.length ? `, requires step ${m.requires.join(", ")}` : ""}`);
   }
   lines.push(`marker: ${marker === null ? "absent" : marker} (floor ${FRONTMATTER_SCHEMA_FLOOR})`);
-  if (plan.skipped.length > 0) {
-    lines.push(`skipped (will not be touched): ${plan.skipped.length} file(s)`);
-    for (const s of plan.skipped.slice(0, 5)) lines.push(`  - ${s.relPath} (step ${s.step}): ${s.reason}`);
+  lines.push(...needsAttentionLines(plan, 8));
+  if (plan.ignored.length > 0) {
+    lines.push(`ignored, no frontmatter or CRLF line endings (left alone): ${plan.ignored.length} file(s)`);
   }
   const unresolved = plan.notes.filter((n) => n.includes("unresolved"));
   if (unresolved.length > 0) {
@@ -76,7 +97,7 @@ export function checkFrontmatterSchema(kgPath: string): FrontmatterFinding[] {
   );
   return [{
     category: "frontmatter-schema",
-    description: `frontmatter schema: ${plan.changes.length} file(s) pending, ${plan.skipped.length} skipped`,
+    description: `frontmatter schema: ${plan.changes.length} file(s) pending, ${needsAttentionFiles(plan)} need your attention`,
     details: lines.join("\n"),
   }];
 }
@@ -122,23 +143,27 @@ export function applyFrontmatterSchema(kgPath: string, steps: number[]): string 
     written++;
   }
 
-  // Marker = highest step N such that steps 1..N have nothing pending and nothing skipped.
+  // Marker = highest step N such that steps 1..N have nothing left to apply. Notes that need a person are
+  // reported but do not hold the marker back; they are left exactly as they are.
   const after = planMigrations(kgPath, ALL_STEPS);
   const counts = perStepCounts(after);
   let reached = 0;
   for (const s of ALL_STEPS) {
-    if ((counts.get(s) ?? 0) === 0 && !after.skipped.some((k) => k.step === s)) reached = s;
+    if ((counts.get(s) ?? 0) === 0) reached = s;
     else break;
   }
   const previous = marker ?? 0;
   if (reached > previous) writeSchemaMarker(kgPath, reached);
 
   const parts = [
-    `Applied steps ${wanted.join(", ")}: ${written} file(s) rewritten, ${failed.length} refused by verification, ${plan.skipped.length} skipped.`,
+    `Applied steps ${wanted.join(", ")}: ${written} file(s) rewritten, ${failed.length} refused by verification.`,
     `A .bak copy of each rewritten file sits next to it (delete them after review).`,
     `Schema marker now ${Math.max(previous, reached)}.`,
   ];
   for (const f of failed.slice(0, 5)) parts.push(`  refused: ${f}`);
-  for (const s of plan.skipped.slice(0, 5)) parts.push(`  skipped: ${s.relPath} (step ${s.step}): ${s.reason}`);
+  const attentionLines = needsAttentionLines(after, 10);
+  if (attentionLines.length > 0) {
+    parts.push(...attentionLines, "  Fix these by hand if you want them migrated; nothing was changed in them.");
+  }
   return parts.join("\n");
 }

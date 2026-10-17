@@ -15,6 +15,12 @@ const FLAT = ["related_adrs", "related_enhs", "related_issues", "related_lessons
 // Old hyphen spellings count as "flat keys already present" too, so a file never ends up with both.
 const FLAT_OLD_SPELLING = ["related-adrs", "related-enhs", "related-issues"];
 const ADR_ALWAYS = ["related_adrs", "related_lessons", "related_docs"];
+// Only values that are clearly an ID (prefix and number) are treated as one in a plain list.
+const PREFIXED_ID: Array<{ re: RegExp; kind: RefKind }> = [
+  { re: /^ENH-\d+$/i, kind: "enh" },
+  { re: /^ADR-\d+$/i, kind: "adr" },
+  { re: /^issue-\d+$/i, kind: "issue" },
+];
 
 export const step3: Migration = {
   step: 3,
@@ -27,43 +33,92 @@ export const step3: Migration = {
   transform: (text, relPath, ctx) =>
     withFrontmatter(text, (lines, end) => {
       const notes: string[] = [];
+      const attention: string[] = [];
+      const leftAsIs = () => ({ lines, notes, attention });
       const blocks = topLevelBlocks(lines, end);
       const rel = blocks.find((b) => b.key === "related");
       if (!rel) return { lines, notes };
       if (blocks.some((b) => FLAT.includes(b.key) || FLAT_OLD_SPELLING.includes(b.key))) {
-        return { lines, notes, skip: 'flat related_* keys already present next to "related:"' };
+        attention.push('"related:" left as is: flat related_* keys are already present next to it');
+        return leftAsIs();
       }
       const isAdr = relPath.startsWith("decisions/");
       const first = lines[rel.start];
       const rest = stripComment(first.slice(first.indexOf(":") + 1)).trim();
-      if (!["", "null", "~", "{}"].includes(rest)) return { lines, notes, skip: 'unrecognized "related:" shape' };
-
       const rEnd = contentEnd(lines, rel);
+
+      // Look at the lines under "related:": sub-keys (a map) and/or plain "- item" lines (a list).
       const subs: KeyBlock[] = [];
       let subIndent = -1;
+      let plainItems = 0;
       for (let i = rel.start + 1; i < rEnd; i++) {
         const m = /^(\s+)([A-Za-z0-9_-]+):/.exec(lines[i]);
-        if (!m) continue;
-        if (subIndent === -1) subIndent = m[1].length;
-        if (m[1].length === subIndent) subs.push({ key: m[2], start: i, end: rEnd });
+        if (m) {
+          if (subIndent === -1) subIndent = m[1].length;
+          if (m[1].length === subIndent) subs.push({ key: m[2], start: i, end: rEnd });
+          continue;
+        }
+        if (/^\s*-\s+/.test(lines[i]) && subs.length === 0) plainItems++;
       }
       for (let s = 0; s < subs.length - 1; s++) subs[s].end = subs[s + 1].start;
 
       const mapped = new Map<string, string[]>();
-      for (const sb of subs) {
-        const spec = SUBKEYS[sb.key];
-        if (!spec) return { lines, notes, skip: `unknown related sub-key "${sb.key}"` };
-        const list = readList(lines, sb);
-        if (!list) return { lines, notes, skip: `related.${sb.key}: unrecognized shape` };
-        const items = list.items.map((v) => {
-          // Normalize plain IDs first (as step 1 does) so an unresolved ID is still canonical and the steps converge.
-          const raw = spec.kind === "path" ? v : (normalizeId(spec.kind, v) ?? v);
-          const r = resolveRef(ctx.index, spec.kind, raw);
-          if ("link" in r) return r.link;
-          notes.push(`related.${sb.key}: unresolved "${r.unresolved}" (no unique note found), kept as plain text`);
-          return raw;
-        });
-        mapped.set(spec.key, [...(mapped.get(spec.key) ?? []), ...items]);
+      let totalIn = 0;
+
+      const resolvePlain = (v: string): string => {
+        const id = PREFIXED_ID.find((p) => p.re.test(v.trim()));
+        const raw = id ? (normalizeId(id.kind, v) ?? v) : v;
+        const r = id ? resolveRef(ctx.index, id.kind, raw) : resolveRef(ctx.index, "path", raw);
+        if ("link" in r) return r.link;
+        notes.push(`related: unresolved "${r.unresolved}" (no unique note found), kept as plain text`);
+        return raw;
+      };
+
+      const isFlowList = rest.startsWith("[") && rest.endsWith("]");
+      if (isFlowList || (rest === "" && plainItems > 0 && subs.length === 0)) {
+        // A plain list (not a map): every entry goes to related_docs, nothing is dropped.
+        const list = readList(lines, rel);
+        if (!list) {
+          attention.push('"related:" left as is: unrecognized list shape');
+          return leftAsIs();
+        }
+        totalIn = list.items.length;
+        mapped.set("related_docs", list.items.map(resolvePlain));
+      } else if (rest !== "" && !["null", "~", "{}"].includes(rest)) {
+        attention.push('"related:" left as is: unrecognized shape');
+        return leftAsIs();
+      } else if (plainItems > 0 && subs.length > 0) {
+        attention.push('"related:" left as is: mixes plain list items with named groups');
+        return leftAsIs();
+      } else {
+        for (const sb of subs) {
+          const spec = SUBKEYS[sb.key];
+          if (!spec) {
+            attention.push(`"related:" left as is: unknown group "${sb.key}"`);
+            return leftAsIs();
+          }
+          const list = readList(lines, sb);
+          if (!list) {
+            attention.push(`"related:" left as is: group "${sb.key}" has an unrecognized shape`);
+            return leftAsIs();
+          }
+          totalIn += list.items.length;
+          const items = list.items.map((v) => {
+            // Normalize plain IDs first (as step 1 does) so an unresolved ID is still canonical and the steps converge.
+            const raw = spec.kind === "path" ? v : (normalizeId(spec.kind, v) ?? v);
+            const r = resolveRef(ctx.index, spec.kind, raw);
+            if ("link" in r) return r.link;
+            notes.push(`related.${sb.key}: unresolved "${r.unresolved}" (no unique note found), kept as plain text`);
+            return raw;
+          });
+          mapped.set(spec.key, [...(mapped.get(spec.key) ?? []), ...items]);
+        }
+      }
+
+      const totalOut = [...mapped.values()].reduce((n, v) => n + v.length, 0);
+      if (totalOut !== totalIn) {
+        attention.push('"related:" left as is: the number of entries would change');
+        return leftAsIs();
       }
 
       const out: string[] = [];
@@ -73,7 +128,7 @@ export const step3: Migration = {
         const items = vals ?? [];
         out.push(...renderList(key, items, items.length > 0 ? "block" : "flow"));
       }
-      if (out.length === 0) return { lines, notes };
-      return { lines: replaceLines(lines, rel.start, rEnd, out), notes };
+      if (out.length === 0) return { lines, notes, attention };
+      return { lines: replaceLines(lines, rel.start, rEnd, out), notes, attention };
     }),
 };

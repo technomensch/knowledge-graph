@@ -133,3 +133,58 @@ describe("prerequisites are transitive and runs converge (Opus review F2/F3)", (
     expect(readSchemaMarker(root)).toBe(4);
   });
 });
+
+describe("non-standard notes do not block the run and are reported (graphs that predate the plugin)", () => {
+  let root: string;
+  afterEach(() => removeGraph(root));
+
+  const ODD = ["---", "number: 081", "status: Accepted", "related: {adrs: [ADR-001]}", "---", "b"].join("\n");
+  const NORMAL = ["---", "id: issue-15", "status: resolved", 'github-issue: "#172"', "related-issues: [issue-14]", "---", "", "# body", ""].join("\n");
+
+  test("the marker reaches the last step even though one note is left as it is", () => {
+    root = makeGraph({ ...stubs("issues/issue-14/issue-14-description.md"), "issues/issue-15/issue-15-description.md": NORMAL, "decisions/ADR-081-z.md": ODD });
+    const msg = applyFrontmatterSchema(root, [1, 2, 3, 4]);
+    expect(readSchemaMarker(root)).toBe(4);
+    expect(msg).toContain("needs your attention");
+    expect(msg).toContain("ADR-081-z");
+    expect(read(root, "decisions/ADR-081-z.md")).toContain("related: {adrs: [ADR-001]}");
+  });
+
+  test("once only left-as-is notes remain, inspect goes quiet", () => {
+    root = makeGraph({ "decisions/ADR-081-z.md": ODD });
+    expect(checkFrontmatterSchema(root).filter((f) => f.description.includes("pending")).length).toBeGreaterThanOrEqual(0);
+    applyFrontmatterSchema(root, [1, 2, 3, 4]);
+    expect(checkFrontmatterSchema(root)).toEqual([]);
+  });
+
+  test("inspect lists the notes that need attention and the ignored files while work is pending", () => {
+    root = makeGraph({
+      ...stubs("issues/issue-14/issue-14-description.md"),
+      "issues/issue-15/issue-15-description.md": NORMAL,
+      "decisions/ADR-081-z.md": ODD,
+      "issues/issue-1/README.md": "# no frontmatter\n",
+    });
+    const [finding] = checkFrontmatterSchema(root);
+    expect(finding.details).toContain("needs your attention");
+    expect(finding.details).toContain("ADR-081-z");
+    expect(finding.details).toContain("ignored");
+  });
+});
+
+describe("verifyEquivalent: relationship entries are conserved (graphs that predate the plugin)", () => {
+  test("refuses a rewrite that drops a relationship entry", () => {
+    const before = ["---", "id: a", "related:", "  - x", "  - y", "---", "body"].join("\n");
+    const after = ["---", "id: a", "related_docs:", '  - "x"', "---", "body"].join("\n");
+    expect(verifyEquivalent(before, after, ["related", "related_docs"])).toContain("relationship");
+  });
+  test("accepts a rewrite that keeps the same number of entries", () => {
+    const before = ["---", "id: a", "related:", "  - x", "  - y", "---", "body"].join("\n");
+    const after = ["---", "id: a", "related_docs:", '  - "x"', '  - "y"', "---", "body"].join("\n");
+    expect(verifyEquivalent(before, after, ["related", "related_docs"])).toBeNull();
+  });
+  test("does not apply to steps that touch no relationship key", () => {
+    const before = ["---", "id: a", "status: resolved", "---", "body"].join("\n");
+    const after = ["---", "id: a", "status: resolved", "status_category: done", "---", "body"].join("\n");
+    expect(verifyEquivalent(before, after, ["status_category"])).toBeNull();
+  });
+});
