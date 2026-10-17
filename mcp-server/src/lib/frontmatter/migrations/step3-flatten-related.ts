@@ -1,6 +1,6 @@
-import { contentEnd, readList, renderList, replaceLines, topLevelBlocks, type KeyBlock } from "../parse.js";
+import { contentEnd, readList, renderList, replaceLines, stripComment, topLevelBlocks, type KeyBlock } from "../parse.js";
 import { resolveRef } from "../links.js";
-import type { RefKind } from "../ids.js";
+import { normalizeId, type RefKind } from "../ids.js";
 import { inDirs, withFrontmatter } from "./shared.js";
 import type { Migration } from "./types.js";
 
@@ -12,6 +12,8 @@ const SUBKEYS: Record<string, { key: string; kind: RefKind | "path" }> = {
   kg_entries: { key: "related_docs", kind: "path" },
 };
 const FLAT = ["related_adrs", "related_enhs", "related_issues", "related_lessons", "related_docs"];
+// Old hyphen spellings count as "flat keys already present" too, so a file never ends up with both.
+const FLAT_OLD_SPELLING = ["related-adrs", "related-enhs", "related-issues"];
 const ADR_ALWAYS = ["related_adrs", "related_lessons", "related_docs"];
 
 export const step3: Migration = {
@@ -28,12 +30,12 @@ export const step3: Migration = {
       const blocks = topLevelBlocks(lines, end);
       const rel = blocks.find((b) => b.key === "related");
       if (!rel) return { lines, notes };
-      if (blocks.some((b) => FLAT.includes(b.key))) {
+      if (blocks.some((b) => FLAT.includes(b.key) || FLAT_OLD_SPELLING.includes(b.key))) {
         return { lines, notes, skip: 'flat related_* keys already present next to "related:"' };
       }
       const isAdr = relPath.startsWith("decisions/");
       const first = lines[rel.start];
-      const rest = first.slice(first.indexOf(":") + 1).replace(/\s+#.*$/, "").trim();
+      const rest = stripComment(first.slice(first.indexOf(":") + 1)).trim();
       if (!["", "null", "~", "{}"].includes(rest)) return { lines, notes, skip: 'unrecognized "related:" shape' };
 
       const rEnd = contentEnd(lines, rel);
@@ -54,10 +56,12 @@ export const step3: Migration = {
         const list = readList(lines, sb);
         if (!list) return { lines, notes, skip: `related.${sb.key}: unrecognized shape` };
         const items = list.items.map((v) => {
-          const r = resolveRef(ctx.index, spec.kind, v);
+          // Normalize plain IDs first (as step 1 does) so an unresolved ID is still canonical and the steps converge.
+          const raw = spec.kind === "path" ? v : (normalizeId(spec.kind, v) ?? v);
+          const r = resolveRef(ctx.index, spec.kind, raw);
           if ("link" in r) return r.link;
           notes.push(`related.${sb.key}: unresolved "${r.unresolved}" (no unique note found), kept as plain text`);
-          return v;
+          return raw;
         });
         mapped.set(spec.key, [...(mapped.get(spec.key) ?? []), ...items]);
       }

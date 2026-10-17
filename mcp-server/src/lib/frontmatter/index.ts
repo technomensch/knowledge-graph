@@ -94,7 +94,8 @@ export function applyFrontmatterSchema(kgPath: string, steps: number[]): string 
   for (const m of MIGRATIONS.filter((x) => wanted.includes(x.step))) {
     for (const req of m.requires) {
       if (wanted.includes(req)) continue;
-      const pending = planMigrations(kgPath, ALL_STEPS.filter((s) => s <= req)).changes.filter((c) => c.steps.includes(req)).length;
+      // Transitive: any pending work at or below the required step blocks, not just work for that step alone.
+      const pending = planMigrations(kgPath, ALL_STEPS.filter((s) => s <= req)).changes.length;
       if (pending > 0) throw new Error(`frontmatter-schema: step ${m.step} requires step ${req} first (${pending} file(s) still pending)`);
     }
   }

@@ -113,3 +113,23 @@ describe("check / apply", () => {
     expect(body).toContain("# body"); // body untouched
   });
 });
+
+describe("prerequisites are transitive and runs converge (Opus review F2/F3)", () => {
+  let root: string;
+  afterEach(() => removeGraph(root));
+
+  test("step 3 is refused while step 1 work is still pending", () => {
+    const fm = ["---", "number: 050", "status: Accepted", "related-adrs: [ADR-099]", "related:", "  adrs: [ADR-098]", "---", "b"].join("\n");
+    root = makeGraph({ "decisions/ADR-050-y.md": fm });
+    expect(() => applyFrontmatterSchema(root, [3])).toThrow(/requires step/);
+    expect(read(root, "decisions/ADR-050-y.md")).toBe(fm);
+  });
+
+  test("an ambiguous reference ends fully converged after steps 1-4", () => {
+    const fm = ["---", "number: 070", "status: Accepted", "related:", '  adrs: ["067"]', "---", "b"].join("\n");
+    root = makeGraph({ ...stubs("decisions/ADR-067-a.md", "decisions/ADR-067-b.md"), "decisions/ADR-070-x.md": fm });
+    applyFrontmatterSchema(root, [1, 2, 3, 4]);
+    expect(checkFrontmatterSchema(root)).toEqual([]);
+    expect(readSchemaMarker(root)).toBe(4);
+  });
+});

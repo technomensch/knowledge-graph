@@ -2913,17 +2913,20 @@ export async function handleUpgrade(
         }
         const mode = resolveInteractionMode({}).mode;
         const rescan = checkFrontmatterSchema(kgPath);
-        const confirmation = rescan.length === 0
-          ? { confirmed: true as const }
-          : await confirmBackfixCategory({
-              reasonCode: "frontmatter_schema_apply",
-              param: "confirmFrontmatterSchema",
-              mode,
-              confirmed: params.confirmFrontmatterSchema,
-              timeoutMs: STUB_ASK_TIMEOUT_MS,
-              detail: rescan[0]?.description,
-              skipAsk: pending.length > 0,
-            });
+        if (rescan.length === 0) {
+          // Nothing to do: write nothing at all (not even the schema marker) without consent.
+          results.push("[frontmatter-schema] nothing pending; no changes made.");
+          break;
+        }
+        const confirmation = await confirmBackfixCategory({
+          reasonCode: "frontmatter_schema_apply",
+          param: "confirmFrontmatterSchema",
+          mode,
+          confirmed: params.confirmFrontmatterSchema,
+          timeoutMs: STUB_ASK_TIMEOUT_MS,
+          detail: rescan[0]?.description,
+          skipAsk: pending.length > 0,
+        });
         if (!("confirmed" in confirmation)) { pending.push(confirmation); anyCategoryFailed = true; break; }
         try {
           results.push(`[frontmatter-schema] ${applyFrontmatterSchema(kgPath, steps)}`);

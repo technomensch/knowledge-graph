@@ -7,6 +7,9 @@ export LC_ALL=C
 
 ROOT="${1:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 KG="${KG_DIR:-$ROOT/knowledge}"
+if [ ! -d "$KG/issues" ] && [ ! -d "$KG/enhancements" ]; then
+  echo "relationship-scan: no issues/ or enhancements/ under $KG (pass the repo root, or set KG_DIR); nothing was scanned" >&2
+fi
 IGNORE_RE='^(README\.md|CHANGELOG\.md|package\.json|CLAUDE\.md|AGENTS\.md|knowledge/rules\.md)$'
 
 id_of() { basename "$1" | grep -oE '^(issue-[0-9]+|ENH-[0-9]+)' | head -1; }

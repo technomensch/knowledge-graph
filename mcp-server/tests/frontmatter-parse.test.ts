@@ -110,3 +110,25 @@ describe("renderList / replaceLines", () => {
     expect(replaceLines(["a", "b", "c"], 1, 2, ["X", "Y"])).toEqual(["a", "X", "Y", "c"]);
   });
 });
+
+describe("quoted # is data, not a comment (Opus review F1)", () => {
+  const fm = (l: string[]) => ["---", ...l, "---"];
+  test("a # inside a quoted block-list item survives", () => {
+    const lines = fm(["k:", '  - "[[issue-6]]  — Bug: GitHub #125"']);
+    expect(readList(lines, topLevelBlocks(lines, 3)[0])).toEqual({ items: ["[[issue-6]]  — Bug: GitHub #125"], style: "block" });
+  });
+  test("a # inside a quoted flow item survives", () => {
+    const lines = fm(['k: ["a #1", "b"]']);
+    expect(readList(lines, topLevelBlocks(lines, 2)[0])).toEqual({ items: ["a #1", "b"], style: "flow" });
+  });
+  test("a real trailing comment is still stripped", () => {
+    const lines = fm(["k:", "  - x # note", "  - y"]);
+    expect(readList(lines, topLevelBlocks(lines, 4)[0])).toEqual({ items: ["x", "y"], style: "block" });
+    const s = fm(["k: value # note"]);
+    expect(readScalar(s, topLevelBlocks(s, 2)[0])).toBe("value");
+  });
+  test("an apostrophe in an unquoted scalar does not hide a later comment", () => {
+    const s = fm(["k: it's fine # note"]);
+    expect(readScalar(s, topLevelBlocks(s, 2)[0])).toBe("it's fine");
+  });
+});

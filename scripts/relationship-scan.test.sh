@@ -55,4 +55,7 @@ echo "$OUT" | grep -q "README.md" && bad "ignored path README.md was used" || ok
 echo "$OUT" | grep -q "notes.md" && bad "bare filename notes.md was flagged" || ok "bare filenames (no directory) are ignored"
 echo "$OUT" | grep -q "hub/file.ts" && bad "hub path shared by 5 docs was flagged" || ok "hub paths shared by more than 4 docs are ignored"
 
+ERR="$(bash "$HERE/relationship-scan.sh" "$TMP/does-not-exist" 2>&1 >/dev/null)"
+echo "$ERR" | grep -q "no issues/ or enhancements/" && ok "wrong root argument prints a note to stderr" || bad "wrong root argument was silent"
+
 [ "$FAIL" -eq 0 ] && echo "ALL PASS" || { echo "SOME FAILED"; exit 1; }

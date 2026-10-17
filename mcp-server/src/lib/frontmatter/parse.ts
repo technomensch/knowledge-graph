@@ -60,8 +60,34 @@ function splitFlow(inner: string): string[] {
   return items.map((s) => unquote(s)).filter((s) => s !== "");
 }
 
+/**
+ * Cut a trailing ` # comment`, but only when the # is outside quotes. A quote only opens a quoted
+ * scalar at the start of a value or right after `[` or `,` (YAML rule), so an apostrophe inside
+ * unquoted text does not hide a real comment.
+ */
+export function stripComment(s: string): string {
+  let quote: string | null = null;
+  let prevNonSpace = "";
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (quote) {
+      if (ch === quote) quote = null;
+      prevNonSpace = ch;
+      continue;
+    }
+    if ((ch === '"' || ch === "'") && (prevNonSpace === "" || prevNonSpace === "[" || prevNonSpace === ",")) {
+      quote = ch;
+      prevNonSpace = ch;
+      continue;
+    }
+    if (ch === "#" && i > 0 && /\s/.test(s[i - 1])) return s.slice(0, i).replace(/\s+$/, "");
+    if (!/\s/.test(ch)) prevNonSpace = ch;
+  }
+  return s;
+}
+
 function valueAfterColon(line: string): string {
-  return line.slice(line.indexOf(":") + 1).replace(/\s+#.*$/, "").trim();
+  return stripComment(line.slice(line.indexOf(":") + 1)).trim();
 }
 
 export function readList(lines: string[], block: KeyBlock): ParsedList | null {
@@ -73,7 +99,7 @@ export function readList(lines: string[], block: KeyBlock): ParsedList | null {
     const items: string[] = [];
     for (let i = block.start + 1; i < block.end; i++) {
       const m = /^\s*-\s+(.*)$/.exec(lines[i]);
-      if (m) items.push(unquote(m[1].replace(/\s+#.*$/, "")));
+      if (m) items.push(unquote(stripComment(m[1])));
       else if (lines[i].trim() === "" || /^\s*#/.test(lines[i])) continue;
       else return null;
     }

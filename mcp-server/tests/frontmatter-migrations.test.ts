@@ -277,3 +277,15 @@ describe("step 4: status_category", () => {
     expect(planMigrations(root, [4]).changes).toHaveLength(0);
   });
 });
+
+describe("step 3 normalizes unresolved IDs so the steps converge (Opus review F2)", () => {
+  let root: string;
+  afterEach(() => removeGraph(root));
+  test("an ambiguous bare number becomes a plain canonical ID, not the raw number", () => {
+    const fm = ["---", "number: 070", "status: Accepted", "related:", '  adrs: ["067"]', "---", "b"].join("\n");
+    root = makeGraph({ ...stubs("decisions/ADR-067-a.md", "decisions/ADR-067-b.md"), "decisions/ADR-070-x.md": fm });
+    const after = planMigrations(root, [1, 2, 3]).changes.find((c) => c.relPath === "decisions/ADR-070-x")!.after;
+    expect(after).toContain('  - "ADR-067"');
+    expect(after).not.toContain('  - "067"');
+  });
+});

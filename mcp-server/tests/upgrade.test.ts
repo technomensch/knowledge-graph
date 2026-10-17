@@ -4517,6 +4517,8 @@ describe("frontmatter-schema (ENH-062)", () => {
     const kgRoot = makeTempDir("fm-clean"); tempDirs.push(kgRoot); scaffoldKg(kgRoot); mockActiveKg(kgRoot);
     const result = await handleUpgrade({ apply: ["frontmatter-schema"], frontmatterSteps: [1] });
     expect(result.isError).not.toBe(true);
-    expect(result.content[0].text).toContain("0 file(s) rewritten");
+    expect(result.content[0].text).toContain("nothing pending");
+    // Opus review F5: a no-op apply must not write anything, including the marker.
+    expect(fs.existsSync(path.join(kgRoot, ".kmgraph-frontmatter-schema"))).toBe(false);
   });
 });

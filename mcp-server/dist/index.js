@@ -41173,8 +41173,28 @@ function splitFlow(inner) {
   if (cur.trim() !== "") items.push(cur);
   return items.map((s) => unquote(s)).filter((s) => s !== "");
 }
+function stripComment(s) {
+  let quote = null;
+  let prevNonSpace = "";
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (quote) {
+      if (ch === quote) quote = null;
+      prevNonSpace = ch;
+      continue;
+    }
+    if ((ch === '"' || ch === "'") && (prevNonSpace === "" || prevNonSpace === "[" || prevNonSpace === ",")) {
+      quote = ch;
+      prevNonSpace = ch;
+      continue;
+    }
+    if (ch === "#" && i > 0 && /\s/.test(s[i - 1])) return s.slice(0, i).replace(/\s+$/, "");
+    if (!/\s/.test(ch)) prevNonSpace = ch;
+  }
+  return s;
+}
 function valueAfterColon(line) {
-  return line.slice(line.indexOf(":") + 1).replace(/\s+#.*$/, "").trim();
+  return stripComment(line.slice(line.indexOf(":") + 1)).trim();
 }
 function readList(lines, block) {
   const rest = valueAfterColon(lines[block.start]);
@@ -41185,7 +41205,7 @@ function readList(lines, block) {
     const items = [];
     for (let i = block.start + 1; i < block.end; i++) {
       const m = /^\s*-\s+(.*)$/.exec(lines[i]);
-      if (m) items.push(unquote(m[1].replace(/\s+#.*$/, "")));
+      if (m) items.push(unquote(stripComment(m[1])));
       else if (lines[i].trim() === "" || /^\s*#/.test(lines[i])) continue;
       else return null;
     }
@@ -41332,6 +41352,7 @@ var SUBKEYS = {
   kg_entries: { key: "related_docs", kind: "path" }
 };
 var FLAT = ["related_adrs", "related_enhs", "related_issues", "related_lessons", "related_docs"];
+var FLAT_OLD_SPELLING = ["related-adrs", "related-enhs", "related-issues"];
 var ADR_ALWAYS = ["related_adrs", "related_lessons", "related_docs"];
 var step3 = {
   step: 3,
@@ -41346,12 +41367,12 @@ var step3 = {
     const blocks = topLevelBlocks(lines, end);
     const rel = blocks.find((b) => b.key === "related");
     if (!rel) return { lines, notes };
-    if (blocks.some((b) => FLAT.includes(b.key))) {
+    if (blocks.some((b) => FLAT.includes(b.key) || FLAT_OLD_SPELLING.includes(b.key))) {
       return { lines, notes, skip: 'flat related_* keys already present next to "related:"' };
     }
     const isAdr = relPath.startsWith("decisions/");
     const first = lines[rel.start];
-    const rest = first.slice(first.indexOf(":") + 1).replace(/\s+#.*$/, "").trim();
+    const rest = stripComment(first.slice(first.indexOf(":") + 1)).trim();
     if (!["", "null", "~", "{}"].includes(rest)) return { lines, notes, skip: 'unrecognized "related:" shape' };
     const rEnd = contentEnd(lines, rel);
     const subs = [];
@@ -41370,10 +41391,11 @@ var step3 = {
       const list = readList(lines, sb);
       if (!list) return { lines, notes, skip: `related.${sb.key}: unrecognized shape` };
       const items = list.items.map((v) => {
-        const r = resolveRef2(ctx.index, spec.kind, v);
+        const raw = spec.kind === "path" ? v : normalizeId(spec.kind, v) ?? v;
+        const r = resolveRef2(ctx.index, spec.kind, raw);
         if ("link" in r) return r.link;
         notes.push(`related.${sb.key}: unresolved "${r.unresolved}" (no unique note found), kept as plain text`);
-        return v;
+        return raw;
       });
       mapped.set(spec.key, [...mapped.get(spec.key) ?? [], ...items]);
     }
@@ -41578,7 +41600,7 @@ function applyFrontmatterSchema(kgPath, steps) {
   for (const m of MIGRATIONS.filter((x) => wanted.includes(x.step))) {
     for (const req of m.requires) {
       if (wanted.includes(req)) continue;
-      const pending = planMigrations(kgPath, ALL_STEPS.filter((s) => s <= req)).changes.filter((c) => c.steps.includes(req)).length;
+      const pending = planMigrations(kgPath, ALL_STEPS.filter((s) => s <= req)).changes.length;
       if (pending > 0) throw new Error(`frontmatter-schema: step ${m.step} requires step ${req} first (${pending} file(s) still pending)`);
     }
   }
@@ -43343,7 +43365,11 @@ async function handleUpgrade(params, personalScopeSession2 = new PersonalScopeSe
         }
         const mode = resolveInteractionMode({}).mode;
         const rescan = checkFrontmatterSchema(kgPath);
-        const confirmation = rescan.length === 0 ? { confirmed: true } : await confirmBackfixCategory({
+        if (rescan.length === 0) {
+          results.push("[frontmatter-schema] nothing pending; no changes made.");
+          break;
+        }
+        const confirmation = await confirmBackfixCategory({
           reasonCode: "frontmatter_schema_apply",
           param: "confirmFrontmatterSchema",
           mode,
