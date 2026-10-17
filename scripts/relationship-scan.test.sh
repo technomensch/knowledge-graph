@@ -116,6 +116,24 @@ OUT="$(env -u KG bash "$BLOCK" 2>"$TMP/stderr")"; RC=$?; ERR="$(cat "$TMP/stderr
 [ "$RC" -eq 0 ] && [ -z "$OUT" ] && echo "$ERR" | grep -q "nothing to scan" \
   && ok "KG unset: empty output, exit 0, nothing-to-scan message" || bad "KG unset was not handled"
 
+# --- Run the block exactly the way the skill tells Claude to: KG=... bash -s <<'SCAN' ---
+# (a command that reads stdin at the top level would swallow the rest of the script here)
+BASHES="$(for b in /bin/bash "$(command -v bash)"; do [ -x "$b" ] && echo "$b"; done | sort -u)"
+for B in $BASHES; do
+  OUT="$(KG="$G" "$B" -s 2>"$TMP/stderr" <<SCAN
+$(cat "$BLOCK")
+SCAN
+)"
+  ERR="$(cat "$TMP/stderr")"
+  echo "$OUT" | grep -q "UNDECLARED: issue-1 <-> issue-2 (shared: src/shared.ts)" && [ -z "$ERR" ] \
+    && ok "heredoc form works, quietly, under $B" || bad "heredoc form (bash -s) failed under $B: $ERR"
+  # the plain-file form under each bash too (the system bash on macOS is 3.2, Homebrew's is 5.x)
+  OUT="$(KG="$G" "$B" "$BLOCK" 2>"$TMP/stderr")"
+  ERR="$(cat "$TMP/stderr")"
+  echo "$OUT" | grep -q "UNDECLARED: issue-1 <-> issue-2 (shared: src/shared.ts)" && [ -z "$ERR" ] \
+    && ok "file form works, quietly, under $B" || bad "file form failed under $B: $ERR"
+done
+
 # --- Missing marker must fail the test, not pass silently ---
 NOMARK="$TMP/no-marker.md"
 grep -v '^<!-- relationship-scan:begin -->$' "$SKILL" > "$NOMARK"

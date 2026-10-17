@@ -273,7 +273,7 @@ Flags pairs of issue/ENH docs that reference the same file but declare no relati
 
 **1. Find the graph.** Call `kg_resolve` with no arguments; its `path` is the graph folder itself (use it as `KG`). Never pass `scope: "user"` here — this step scans the project's graph, not the personal one. If `kg_resolve` returns an error, or the MCP server is not available, fall back to `$(git rev-parse --show-toplevel)/knowledge`. If that folder does not exist either, skip Step 7 with the reason "no knowledge graph resolved" and report it at Step 8.
 
-**2. Run the scan.** The block below is inline on purpose: `scripts/` is not in the user's project folder and `CLAUDE_PLUGIN_ROOT` is not set in the Bash tool, so a path into `scripts/` would silently skip for every user. Run it as a child shell, so its `exit` cannot end the shell you are working in, with the graph folder in `KG`: `KG="<resolved path>" bash -s <<'SCAN'`, then the block, then `SCAN` on its own line. Optional: `REL_SCAN_HUB_MAX` (default 4).
+**2. Run the scan.** The block below is inline on purpose: `scripts/` is not in the user's project folder and `CLAUDE_PLUGIN_ROOT` is not set in the Bash tool, so a path into `scripts/` would silently skip for every user. Run it as a child shell, so its `exit` cannot end the shell you are working in, with the graph folder in `KG`, written in single quotes so a path with a `$`, backtick or double quote cannot break the command: `KG='<resolved path>' bash -s <<'SCAN'`, then the block, then `SCAN` on its own line. Optional: `REL_SCAN_HUB_MAX` (default 4).
 
 <!-- relationship-scan:begin -->
 ```bash
@@ -388,7 +388,7 @@ Flag filename formula: `/tmp/kmgraph-paperwork-audit-<branch>-<sha>.flag`, detac
 | `kg_resolve` returns an error and the `$(git rev-parse --show-toplevel)/knowledge` fallback does not exist | Skip Step 7 with "no knowledge graph resolved"; do not fail the audit. |
 | The graph has no `issues/` and no `enhancements/` folder | Skip Step 7 with "nothing to scan"; do not fail the audit. |
 | More than about 20 flagged pairs (Step 7) | Group by shared file and offer a whole-group dismissal instead of walking through every pair. |
-| No issue/ENH docs changed on this branch | Skip Steps 2-3 silently, still run Steps 4-6, still write the flag |
+| No issue/ENH docs changed on this branch | Skip Steps 2-3 silently, still run Steps 4-7, still write the flag |
 | `status:` field missing or unrecognized value entirely | Skip that doc for Steps 2-3, don't guess an intended status; note it as a separate, smaller finding ("`issue-N` has no recognized `status:` value") |
 | Multiple session summaries exist for the same branch | Use the most recently modified one; don't flag older ones as stale duplicates — that's a different concern, not this skill's job |
 | Diff is very large (many issue/ENH docs changed, Steps 1-4) | No cap — unlike `kmg-docs-impact-scan`'s 20-identifier cap, this scope is already narrow (only issue/ENH docs, only this branch) and unlikely to be large enough to need one; if it ever is, note the volume to the user rather than silently truncating |
