@@ -4,8 +4,8 @@
 
 Comprehensive catalog of all lessons-learned documents.
 
-**Total Lessons:** 67 (10 architecture, 26 process, 25 patterns, 6 debugging)
-**Last Updated:** 2026-09-22
+**Total Lessons:** 68 (10 architecture, 27 process, 25 patterns, 6 debugging)
+**Last Updated:** 2026-10-17
 
 > **Known issues in this index** (see [issue tracker](../issues/README.md) for permanent tracking):
 > - **Resolved 2026-09-22:** the two files previously living at the top of `lessons-learned/` instead of inside their declared category folder — `Lessons_Learned_gh_issue_create_omission.md` (process) and `Lessons_Learned_InBand_Version_Warning_Burst_Cadence_Pattern.md` (patterns) — have now been physically moved into their correct category folders. Links below updated accordingly.
@@ -33,8 +33,9 @@ Comprehensive catalog of all lessons-learned documents.
 
 ---
 
-### Process Lessons (26 total)
+### Process Lessons (27 total)
 
+- [Run New Scan Heuristics on the Real Corpus Before Shipping — Hub Files and Bare Filenames Dominate](process/Lessons_Learned_Process_Run_New_Scan_Heuristics_On_Real_Data_Hub_Files_Dominate.md) — 2026-10-17
 - [kg-config registry orphaned by repo or folder rename - fixed via kmg-init path-repoint](process/Lessons_Learned_Process_Kg_Config_Registry_Orphaned_By_Repo_Or_Folder_Rename_Fixed_Via_Kmg_Init_Path_Repoint.md) — 2026-08-06
 - [Resource-Path Migrations Must Grep the Prompt Layer, Not Just the Server Layer](process/Lessons_Learned_Process_Migration_Must_Grep_Prompt_Layer_Not_Just_Server_Layer.md) — 2026-07-14
 - [Two-Cycle Cross-Model Review (Fable-Review → Opus-Fix → Fable-Re-Review) for High-Risk Changes](process/Lessons_Learned_Process_Two_Cycle_Cross_Model_Review_For_High_Risk_Changes.md) — 2026-07-12
@@ -114,6 +115,7 @@ Comprehensive catalog of all lessons-learned documents.
 ## Chronological Index
 
 **2026**
+- [2026-10-17] [Run New Scan Heuristics on the Real Corpus Before Shipping — Hub Files and Bare Filenames Dominate](process/Lessons_Learned_Process_Run_New_Scan_Heuristics_On_Real_Data_Hub_Files_Dominate.md)
 - [2026-09-17] [Bundled Example Content Drifts Like Real Data; Ported Patterns Need Their ADR Citation Verified](patterns/Lessons_Learned_Patterns_Bundled_Example_Content_Drift_And_Dangling_Adr_Citations.md)
 - [2026-08-22] [Fixed-Name Test Fixtures Collide With Real, Non-Sandboxed Shared State](patterns/Lessons_Learned_Patterns_Fixed_Name_Test_Fixtures_Collide_With_Real,_Non_Sandboxed_Shared_State.md)
 - [2026-08-19] [Dispatch, Don't Duplicate: Corpus-Verify Before Backfilling](patterns/Lessons_Learned_Patterns_Dispatch_Dont_Duplicate_Corpus_Verify_Before_Backfilling.md)
