@@ -35,7 +35,7 @@ related_lessons: []
 
 ## Problem
 
-The ENH-062 relationship scan (`scripts/relationship-scan.sh`, used by `kmg-paperwork-audit` Step 7) was specified as: flag two issue/ENH docs that mention the same file but declare no relationship in frontmatter.
+The ENH-062 relationship scan (first built as `scripts/relationship-scan.sh`, later moved inline into `kmg-paperwork-audit` Step 7) was specified as: flag two issue/ENH docs that mention the same file but declare no relationship in frontmatter.
 
 It passed its own shell test on a toy fixture. On the real knowledge graph it flagged **871 pairs**, which is unusable as an audit step.
 

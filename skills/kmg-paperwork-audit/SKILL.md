@@ -16,7 +16,7 @@ Does **not** apply to:
 - Mid-session status updates for a single, already-known issue — just edit its frontmatter directly
 - Commits that touch no `knowledge/issues/` or `knowledge/enhancements/` files and don't need a session summary
 
-**Scope boundary (ENH-052):** this skill covers the two checks `scripts/pre-push-gate.sh` Gate 5 cannot do mechanically — issue/enhancement `status:` accuracy and session-summary currency — plus two exceptions, each a mechanical check with nowhere else to live because `scripts/` is dev-only tooling for this source repo and is never distributed to consumer repos, while this skill ships on the same trigger set every consumer repo gets: Step 5 (issue-45, meta-issue attempts drift) and Step 6 (ENH-052, CHANGELOG-entry currency). It does **not** re-check index counts or backlink symmetry; Gate 5 already covers those cheaply in bash, and duplicating that work here would just be the same fact checked twice by two mechanisms.
+**Scope boundary (ENH-052):** this skill covers the two checks `scripts/pre-push-gate.sh` Gate 5 cannot do mechanically — issue/enhancement `status:` accuracy and session-summary currency — plus two exceptions, each a mechanical check with nowhere else to live because the package ships `scripts/` (hooks run them from `${CLAUDE_PLUGIN_ROOT}/scripts/`) but it is not copied into a user's project folder, and `CLAUDE_PLUGIN_ROOT` is not set in the Bash tool, so bash in a skill has to be written inline to work for every user — and this skill ships on the same trigger set every consumer repo gets: Step 5 (issue-45, meta-issue attempts drift) and Step 6 (ENH-052, CHANGELOG-entry currency). Step 7 (ENH-062, undeclared relationships) is a third inline scan for the same reason. It does **not** re-check index counts or backlink symmetry; Gate 5 already covers those cheaply in bash, and duplicating that work here would just be the same fact checked twice by two mechanisms.
 
 ---
 
@@ -269,9 +269,82 @@ CHANGELOG entry. No new skill, no new top-level gate — extends the existing Ga
 
 ### Step 7 — Undeclared relationships (ENH-062)
 
-Run `bash scripts/relationship-scan.sh` from the repo root. It prints one `UNDECLARED: <idA> <-> <idB> (shared: <path>)` line per pair of issue/ENH docs that reference the same file but declare no relationship in frontmatter. It ignores bare filenames with no directory and hub paths shared by more than 4 docs (override with `REL_SCAN_HUB_MAX`), since neither says anything about two specific docs. Full-repo scan, not diff-scoped: an undeclared relationship can exist between two docs neither of which changed on this branch.
+Flags pairs of issue/ENH docs that reference the same file but declare no relationship in frontmatter. Full-graph scan, not diff-scoped: an undeclared relationship can exist between two docs neither of which changed on this branch.
 
-This step flags; it never edits. Present each line to the user and let them confirm or dismiss it. On confirm, add the other doc's ID as a quoted wikilink (for example `"[[ENH-042-specification|ENH-042]]"`) to the most fitting list in both docs (`related_to`, `depends_on`, `blocked_by` or `blocking`; create the key if the doc lacks it). Report dismissed pairs as dismissed, not as failures. If `scripts/relationship-scan.sh` does not exist, skip with that reason at Step 8.
+**1. Find the graph.** Call `kg_resolve` with no arguments; its `path` is the graph folder itself (use it as `KG`). Never pass `scope: "user"` here — this step scans the project's graph, not the personal one. If `kg_resolve` returns an error, or the MCP server is not available, fall back to `$(git rev-parse --show-toplevel)/knowledge`. If that folder does not exist either, skip Step 7 with the reason "no knowledge graph resolved" and report it at Step 8.
+
+**2. Run the scan.** The block below is inline on purpose: `scripts/` is not in the user's project folder and `CLAUDE_PLUGIN_ROOT` is not set in the Bash tool, so a path into `scripts/` would silently skip for every user. Run it as a child shell, so its `exit` cannot end the shell you are working in, with the graph folder in `KG`: `KG="<resolved path>" bash -s <<'SCAN'`, then the block, then `SCAN` on its own line. Optional: `REL_SCAN_HUB_MAX` (default 4).
+
+<!-- relationship-scan:begin -->
+```bash
+# relationship-scan (ENH-062): flag issue/ENH doc pairs that reference the same file but
+# declare no relationship in their frontmatter. Flags only: never edits anything and
+# always exits 0 ("trigger, not verdict", ENH-052). Needs KG = the graph folder.
+set -uo pipefail
+export LC_ALL=C
+
+KG="${KG:-}"
+if [ -z "$KG" ] || { [ ! -d "$KG/issues" ] && [ ! -d "$KG/enhancements" ]; }; then
+  echo "relationship-scan: the graph at '${KG:-<unset>}' has no issues/ or enhancements/ folder, so there is nothing to scan" >&2
+  exit 0
+fi
+IGNORE_RE='^(README\.md|CHANGELOG\.md|package\.json|CLAUDE\.md|AGENTS\.md|knowledge/rules\.md)$'
+
+id_of() { basename "$1" | grep -oE '^(issue-[0-9]+|ENH-[0-9]+)' | head -1; }
+
+frontmatter() {
+  awk 'NR==1 && $0!="---"{exit} NR>1 && $0=="---"{exit} NR>1{print}' "$1"
+}
+
+# declared FILE OTHER_ID: true when FILE's frontmatter mentions OTHER_ID
+declared() {
+  frontmatter "$1" | grep -qE "(^|[^A-Za-z0-9])$2([^0-9]|$)"
+}
+
+TMP="$(mktemp)"
+trap 'rm -f "$TMP"' EXIT
+
+find "$KG/issues" "$KG/enhancements" -type f \( -name 'issue-*-description.md' -o -name 'ENH-*-specification.md' \) 2>/dev/null \
+  | sort | while read -r f; do
+    id="$(id_of "$f")"
+    [ -n "$id" ] || continue
+    grep -oE '`[A-Za-z0-9_./-]+\.(md|ts|sh|json|ya?ml)`' "$f" 2>/dev/null | tr -d '`' | sort -u | while read -r p; do
+      if [[ "$p" =~ $IGNORE_RE ]]; then continue; fi
+      printf '%s\t%s\t%s\n' "$p" "$id" "$f"
+    done
+  done > "$TMP"
+
+# A path shared by more than HUB_MAX docs is a hub (many docs legitimately touch it),
+# and a bare filename with no directory is too generic to identify one file: neither
+# says anything about two specific docs being related, so neither produces pairs.
+HUB_MAX="${REL_SCAN_HUB_MAX:-4}"
+
+sort -t "$(printf '\t')" -k1,1 -k2,2 "$TMP" | awk -F '\t' -v hub="$HUB_MAX" '
+  function flush(   i, j) {
+    if (n >= 2 && n <= hub && index(cur, "/") > 0)
+      for (i = 1; i <= n; i++) for (j = i + 1; j <= n; j++)
+        if (id[i] != id[j]) print id[i] "\t" id[j] "\t" cur "\t" file[i] "\t" file[j]
+  }
+  { if ($1 != cur) { flush(); n = 0; cur = $1 }
+    n++; id[n] = $2; file[n] = $3 }
+  END { flush() }
+' | sort -u -t "$(printf '\t')" -k1,2 | while IFS="$(printf '\t')" read -r a b p fa fb; do
+  if declared "$fa" "$b" || declared "$fb" "$a"; then continue; fi
+  echo "UNDECLARED: $a <-> $b (shared: $p)"
+done
+
+exit 0
+```
+<!-- relationship-scan:end -->
+
+It prints one `UNDECLARED: <idA> <-> <idB> (shared: <path>)` line per pair. It ignores bare filenames with no directory and hub paths shared by more than 4 docs, since neither says anything about two specific docs. A graph with no `issues/` and no `enhancements/` folder prints nothing and says so on stderr: skip with that reason.
+
+**3. Present the results.** This step flags; it never edits on its own.
+
+- **About 20 lines or fewer:** present each pair and let the user confirm or dismiss it.
+- **More than about 20 lines:** group the lines by the text after `shared:`. Show each group (the file, how many pairs, which docs), and ask one question per group: dismiss the whole group, walk through its pairs, or record the group as backlog. Going through a long list one pair at a time is too much.
+- **On confirm:** add the other doc's ID as a quoted wikilink (for example `"[[ENH-042-specification|ENH-042]]"`) to the most fitting list in both docs (`related_to`, `depends_on`, `blocked_by` or `blocking`; create the key if the doc lacks it).
+- Report dismissed pairs as dismissed, not as failures. Say plainly that a dismissal is not stored: the same pairs come back on the next audit unless a relationship is declared in either doc's frontmatter.
 
 ### Step 8 — Report and write completion flag
 
@@ -312,7 +385,9 @@ Flag filename formula: `/tmp/kmgraph-paperwork-audit-<branch>-<sha>.flag`, detac
 | Situation | Behavior |
 |-----------|----------|
 | No `main`/`master` branch found | Skip Steps 2-4 (need the diff scope), still run Step 5 (no diff scope needed), Step 6 (condition (a) still runs; condition (b) is silently skipped — needs `MERGE_BASE`), Step 7 (relationship scan, no diff scope needed), and Step 8, report the skipped portions with that reason, still write the completion flag (the audit "ran" — it just couldn't determine a diff scope for those portions) |
-| `scripts/relationship-scan.sh` missing | Skip Step 7 with that reason; do not fail the audit. |
+| `kg_resolve` returns an error and the `$(git rev-parse --show-toplevel)/knowledge` fallback does not exist | Skip Step 7 with "no knowledge graph resolved"; do not fail the audit. |
+| The graph has no `issues/` and no `enhancements/` folder | Skip Step 7 with "nothing to scan"; do not fail the audit. |
+| More than about 20 flagged pairs (Step 7) | Group by shared file and offer a whole-group dismissal instead of walking through every pair. |
 | No issue/ENH docs changed on this branch | Skip Steps 2-3 silently, still run Steps 4-6, still write the flag |
 | `status:` field missing or unrecognized value entirely | Skip that doc for Steps 2-3, don't guess an intended status; note it as a separate, smaller finding ("`issue-N` has no recognized `status:` value") |
 | Multiple session summaries exist for the same branch | Use the most recently modified one; don't flag older ones as stale duplicates — that's a different concern, not this skill's job |
