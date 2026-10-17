@@ -335,7 +335,7 @@ describe("notes with non-standard shapes (graphs that predate the plugin)", () =
     root = makeGraph({ "decisions/ADR-082-m.md": adr });
     const plan = planMigrations(root, [3]);
     expect(plan.changes).toHaveLength(0);
-    expect(plan.attention).toHaveLength(1);
+    expect(plan.attention.length + plan.skipped.length).toBe(1);
   });
 
   test("an unknown sub-key is reported for attention without blocking the file's other steps", () => {
@@ -387,5 +387,105 @@ describe("notes with non-standard shapes (graphs that predate the plugin)", () =
     for (const v of ["ADR-100", "l1", "l2", "k"]) expect(c101).toContain(v);
     expect(count(c102)).toBeGreaterThan(0);
     void relItems;
+  });
+});
+
+describe("values the hand-written reader might misread are never rewritten (second Opus review)", () => {
+  let root: string;
+  afterEach(() => removeGraph(root));
+  const adr = (body: string[]) => ["---", "number: 120", "status: Accepted", ...body, "---", "b"].join("\n");
+  const plan1 = (body: string[]) => {
+    root = makeGraph({ ...stubs("decisions/ADR-005-x.md"), "decisions/ADR-120-a.md": adr(body) });
+    return planMigrations(root, [1]);
+  };
+  const afterOf = (p: ReturnType<typeof planMigrations>) => p.changes.find((c) => c.relPath === "decisions/ADR-120-a")!.after;
+
+  test("a single-quote escape keeps all of its text", () => {
+    const after = afterOf(plan1(["related-adrs:", "  - 'Bob''s idea #2 (draft)'", "  - 5"]));
+    expect(after).toContain('"Bob\'s idea #2 (draft)"');
+    expect(after).toContain('"ADR-005"');
+  });
+
+  test("a double-quote escape keeps all of its text", () => {
+    const after = afterOf(plan1(["related-adrs:", '  - "x \\" # y"', "  - 5"]));
+    expect(after).toContain('"x \\" # y"');
+  });
+
+  test("anchors and aliases are not turned into literal text: the values are left as they are", () => {
+    const p = plan1(["related-adrs:", "  - &a ADR-1", "  - *a"]);
+    const after = afterOf(p);
+    expect(after).toContain("related_adrs:");
+    expect(after).toContain("  - &a ADR-1");
+    expect(after).toContain("  - *a");
+    expect(p.attention.length).toBe(1);
+  });
+
+  test("a nested list is left as it is, not split on its commas", () => {
+    const p = plan1(["related-adrs: [1, [2, 3]]"]);
+    expect(afterOf(p)).toContain("related_adrs: [1, [2, 3]]");
+    expect(p.attention.length).toBe(1);
+  });
+
+  test("a map used as a list item is left as it is", () => {
+    const p = plan1(["related-adrs:", "  - a: lesson-a"]);
+    expect(afterOf(p)).toContain("  - a: lesson-a");
+    expect(p.attention.length).toBe(1);
+  });
+
+  test("a field with comments keeps its values and comments; only the key is renamed", () => {
+    const p = plan1(["related-adrs:", "  # keep me", "  - 1 # note"]);
+    const after = afterOf(p);
+    expect(after).toContain("related_adrs:");
+    expect(after).toContain("  # keep me");
+    expect(after).toContain("  - 1 # note");
+    expect(p.attention.map((a) => a.reason).join(" ")).toContain("comment");
+  });
+
+  test("step 2 leaves a field with comments alone", () => {
+    root = makeGraph({ ...stubs("decisions/ADR-001-x.md"), "decisions/ADR-121-b.md": adr(["related_adrs:", "  # keep me", "  - ADR-001 # note"]) });
+    const p = planMigrations(root, [1, 2]);
+    expect(p.changes).toHaveLength(0);
+    expect(p.attention.length).toBeGreaterThanOrEqual(1);
+    expect(p.attention.map((a) => a.reason).join(" ")).toContain("comment");
+  });
+
+  test("frontmatter that is not valid YAML (for example duplicate keys) is skipped before planning anything", () => {
+    root = makeGraph({ "decisions/ADR-122-dup.md": adr(["related_adrs: [1]", "related_adrs: [2]"]) });
+    const p = planMigrations(root, [1, 2, 3, 4]);
+    expect(p.changes).toHaveLength(0);
+    expect(p.skipped[0].reason).toContain("does not parse");
+  });
+
+  test("a file the safety check would refuse is skipped at planning time, so later steps are not blocked", () => {
+    // YAML reads this as a mapping, but rewriting a quoted key would change a key outside the step.
+    root = makeGraph({ "decisions/ADR-123-q.md": adr(["related-adrs: [1]", '"tags": [a]']) });
+    const p = planMigrations(root, [1]);
+    for (const c of p.changes) expect(c.after).toContain('"tags": [a]');
+  });
+
+  test("files with a BOM or with CR characters are counted as ignored, with the right reason", () => {
+    root = makeGraph({
+      "decisions/ADR-130-bom.md": "﻿---\nnumber: 130\nstatus: Accepted\n---\nb\n",
+      "decisions/ADR-131-cr.md": "---\nnumber: 131\r\nstatus: Accepted\r\n---\nb\n",
+    });
+    const p = planMigrations(root, [1, 2, 3, 4]);
+    const reasons = Object.fromEntries(p.ignored.map((i) => [i.relPath, i.reason]));
+    expect(reasons["decisions/ADR-130-bom"]).toContain("BOM");
+    expect(reasons["decisions/ADR-131-cr"]).toContain("CRLF");
+    expect(p.changes).toHaveLength(0);
+  });
+});
+
+describe("zero-padded numbers in related groups are migrated, not flagged", () => {
+  let root: string;
+  afterEach(() => removeGraph(root));
+  test("adrs: [001, 002] becomes links to ADR-001 and ADR-002", () => {
+    const adr = ["---", "number: 13", "status: Accepted", "related:", "  adrs: [001, 002]", "---", "b"].join("\n");
+    root = makeGraph({ ...stubs("decisions/ADR-001-a.md", "decisions/ADR-002-b.md"), "decisions/ADR-013-c.md": adr });
+    const p = planMigrations(root, [1, 2, 3]);
+    const after = p.changes.find((c) => c.relPath === "decisions/ADR-013-c")!.after;
+    expect(after).toContain('"[[ADR-001-a|ADR-001]]"');
+    expect(after).toContain('"[[ADR-002-b|ADR-002]]"');
+    expect(p.attention).toHaveLength(0);
   });
 });

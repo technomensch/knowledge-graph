@@ -1,4 +1,4 @@
-import { contentEnd, readList, renderList, replaceLines, stripComment, topLevelBlocks, type KeyBlock } from "../parse.js";
+import { contentEnd, crossCheckList, hasComments, readList, renderList, replaceLines, stripComment, topLevelBlocks, yamlEntryCount, type KeyBlock } from "../parse.js";
 import { resolveRef } from "../links.js";
 import { normalizeId, type RefKind } from "../ids.js";
 import { inDirs, withFrontmatter } from "./shared.js";
@@ -31,7 +31,7 @@ export const step3: Migration = {
   touchedKeys: ["related", ...FLAT],
   scope: (p) => inDirs(p, ["decisions", "lessons-learned"]),
   transform: (text, relPath, ctx) =>
-    withFrontmatter(text, (lines, end) => {
+    withFrontmatter(text, (lines, end, doc) => {
       const notes: string[] = [];
       const attention: string[] = [];
       const leftAsIs = () => ({ lines, notes, attention });
@@ -42,6 +42,12 @@ export const step3: Migration = {
         attention.push('"related:" left as is: flat related_* keys are already present next to it');
         return leftAsIs();
       }
+      if (hasComments(lines, rel)) {
+        attention.push('"related:" left as is: it has comments, which would be lost');
+        return leftAsIs();
+      }
+      const relDoc = doc.related;
+      const relObj = relDoc && typeof relDoc === "object" && !Array.isArray(relDoc) ? (relDoc as Record<string, unknown>) : {};
       const isAdr = relPath.startsWith("decisions/");
       const first = lines[rel.start];
       const rest = stripComment(first.slice(first.indexOf(":") + 1)).trim();
@@ -63,7 +69,6 @@ export const step3: Migration = {
       for (let s = 0; s < subs.length - 1; s++) subs[s].end = subs[s + 1].start;
 
       const mapped = new Map<string, string[]>();
-      let totalIn = 0;
 
       const resolvePlain = (v: string): string => {
         const id = PREFIXED_ID.find((p) => p.re.test(v.trim()));
@@ -78,11 +83,10 @@ export const step3: Migration = {
       if (isFlowList || (rest === "" && plainItems > 0 && subs.length === 0)) {
         // A plain list (not a map): every entry goes to related_docs, nothing is dropped.
         const list = readList(lines, rel);
-        if (!list) {
+        if (!list || !crossCheckList(list.items, relDoc)) {
           attention.push('"related:" left as is: unrecognized list shape');
           return leftAsIs();
         }
-        totalIn = list.items.length;
         mapped.set("related_docs", list.items.map(resolvePlain));
       } else if (rest !== "" && !["null", "~", "{}"].includes(rest)) {
         attention.push('"related:" left as is: unrecognized shape');
@@ -98,11 +102,10 @@ export const step3: Migration = {
             return leftAsIs();
           }
           const list = readList(lines, sb);
-          if (!list) {
+          if (!list || !crossCheckList(list.items, relObj[sb.key])) {
             attention.push(`"related:" left as is: group "${sb.key}" has an unrecognized shape`);
             return leftAsIs();
           }
-          totalIn += list.items.length;
           const items = list.items.map((v) => {
             // Normalize plain IDs first (as step 1 does) so an unresolved ID is still canonical and the steps converge.
             const raw = spec.kind === "path" ? v : (normalizeId(spec.kind, v) ?? v);
@@ -115,6 +118,8 @@ export const step3: Migration = {
         }
       }
 
+      // Entry count as a real YAML parser sees it must equal what is being written out.
+      const totalIn = yamlEntryCount(relDoc);
       const totalOut = [...mapped.values()].reduce((n, v) => n + v.length, 0);
       if (totalOut !== totalIn) {
         attention.push('"related:" left as is: the number of entries would change');

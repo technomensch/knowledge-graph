@@ -188,3 +188,33 @@ describe("verifyEquivalent: relationship entries are conserved (graphs that pred
     expect(verifyEquivalent(before, after, ["status_category"])).toBeNull();
   });
 });
+
+describe("verifier checks relationship values, not just their count (second Opus review)", () => {
+  test("refuses a value that was cut short even though the number of entries is unchanged", () => {
+    const before = ["---", "id: a", "related-adrs:", "  - 'Bob''s idea #2 (draft)'", "---", "body"].join("\n");
+    const after = ["---", "id: a", "related_adrs:", "  - \"'Bob''s idea\"", "---", "body"].join("\n");
+    expect(verifyEquivalent(before, after, ["related-adrs", "related_adrs"])).toContain("relationship");
+  });
+  test("accepts ID normalization and path-to-link conversion", () => {
+    const before = ["---", "id: a", "related-adrs: [1]", "related:", "  kg_entries:", "    - knowledge/issues/x/README.md", "---", "body"].join("\n");
+    const after = ["---", "id: a", 'related_adrs: ["ADR-001"]', "related_docs:", '  - "[[x/README|README]]"', "---", "body"].join("\n");
+    expect(verifyEquivalent(before, after, ["related-adrs", "related_adrs", "related", "related_docs"])).toBeNull();
+  });
+});
+
+describe("a file that can never be migrated does not block step-by-step approval (second Opus review)", () => {
+  let root: string;
+  afterEach(() => removeGraph(root));
+  test("steps can be applied one at a time and inspect ends quiet", () => {
+    const dup = ["---", "number: 2", "status: Accepted", "related_adrs: [1]", "related_adrs: [2]", "---", "b"].join("\n");
+    const ok = ["---", "number: 3", "status: Accepted", "related-adrs: [1]", "---", "b"].join("\n");
+    root = makeGraph({ ...stubs("decisions/ADR-001-x.md"), "decisions/ADR-002-dup.md": dup, "decisions/ADR-003-ok.md": ok });
+    applyFrontmatterSchema(root, [1]);
+    expect(() => applyFrontmatterSchema(root, [2])).not.toThrow();
+    applyFrontmatterSchema(root, [3]);
+    applyFrontmatterSchema(root, [4]);
+    expect(checkFrontmatterSchema(root)).toEqual([]);
+    expect(readSchemaMarker(root)).toBe(4);
+    expect(read(root, "decisions/ADR-002-dup.md")).toBe(dup);
+  });
+});

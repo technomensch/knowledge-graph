@@ -40,10 +40,16 @@ function perStepCounts(plan: PlanResult): Map<number, number> {
 }
 
 function needsAttentionItems(plan: PlanResult): Array<{ relPath: string; reason: string }> {
-  return [
-    ...plan.skipped.map((s) => ({ relPath: s.relPath, reason: `step ${s.step}: ${s.reason}` })),
-    ...plan.attention.map((a) => ({ relPath: a.relPath, reason: `step ${a.step}: ${a.reason}` })),
-  ];
+  // The same problem is often found by more than one step; report it once.
+  const seen = new Set<string>();
+  const out: Array<{ relPath: string; reason: string }> = [];
+  for (const i of [...plan.skipped, ...plan.attention]) {
+    const key = `${i.relPath}|${i.reason}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ relPath: i.relPath, reason: i.reason });
+  }
+  return out;
 }
 
 function needsAttentionFiles(plan: PlanResult): number {

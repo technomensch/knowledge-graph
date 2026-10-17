@@ -3732,7 +3732,7 @@ var require_fast_uri = __commonJS({
         normalizeString(uri, options);
       } else if (typeof uri === "object") {
         uri = /** @type {T} */
-        parse5(serialize(uri, options), options);
+        parse6(serialize(uri, options), options);
       }
       return uri;
     }
@@ -3750,8 +3750,8 @@ var require_fast_uri = __commonJS({
     function resolveComponent(base2, relative9, options, skipNormalization) {
       const target = {};
       if (!skipNormalization) {
-        base2 = parse5(serialize(base2, options), options);
-        relative9 = parse5(serialize(relative9, options), options);
+        base2 = parse6(serialize(base2, options), options);
+        relative9 = parse6(serialize(relative9, options), options);
       }
       options = options || {};
       if (!options.tolerant && relative9.scheme) {
@@ -3994,7 +3994,7 @@ var require_fast_uri = __commonJS({
       }
       return { parsed, malformedAuthorityOrPort };
     }
-    function parse5(uri, opts) {
+    function parse6(uri, opts) {
       return parseWithStatus(uri, opts).parsed;
     }
     function normalizeString(uri, opts) {
@@ -4023,7 +4023,7 @@ var require_fast_uri = __commonJS({
       resolveComponent,
       equal,
       serialize,
-      parse: parse5
+      parse: parse6
     };
     module2.exports = fastUri;
     module2.exports.default = fastUri;
@@ -14238,7 +14238,7 @@ var require_public_api = __commonJS({
       }
       return doc;
     }
-    function parse5(src, reviver, options) {
+    function parse6(src, reviver, options) {
       let _reviver = void 0;
       if (typeof reviver === "function") {
         _reviver = reviver;
@@ -14279,7 +14279,7 @@ var require_public_api = __commonJS({
         return value.toString(options);
       return new Document.Document(value, _replacer, options).toString(options);
     }
-    exports2.parse = parse5;
+    exports2.parse = parse6;
     exports2.parseAllDocuments = parseAllDocuments;
     exports2.parseDocument = parseDocument;
     exports2.stringify = stringify;
@@ -41179,6 +41179,15 @@ function stripComment(s) {
   for (let i = 0; i < s.length; i++) {
     const ch = s[i];
     if (quote) {
+      if (quote === '"' && ch === "\\") {
+        i++;
+        prevNonSpace = ch;
+        continue;
+      }
+      if (quote === "'" && ch === "'" && s[i + 1] === "'") {
+        i++;
+        continue;
+      }
       if (ch === quote) quote = null;
       prevNonSpace = ch;
       continue;
@@ -41226,12 +41235,112 @@ function renderList(key, items, style) {
 function replaceLines(lines, start, end, replacement) {
   return [...lines.slice(0, start), ...replacement, ...lines.slice(end)];
 }
+function hasComments(lines, block) {
+  const end = contentEnd(lines, block);
+  for (let i = block.start; i < end; i++) {
+    if (i !== block.start && lines[i].trim().startsWith("#")) return true;
+    let text = i === block.start ? lines[i].slice(lines[i].indexOf(":") + 1) : lines[i];
+    const item = /^\s*-\s+(.*)$/.exec(text);
+    if (item) text = item[1];
+    if (stripComment(text) !== text) return true;
+  }
+  return false;
+}
+function crossCheckList(items, yamlValue) {
+  if (yamlValue === null || yamlValue === void 0) return items.length === 0;
+  if (!Array.isArray(yamlValue)) return false;
+  if (yamlValue.length !== items.length) return false;
+  return yamlValue.every((v, i) => {
+    if (typeof v === "string" || typeof v === "boolean") return String(v) === items[i];
+    if (typeof v === "number") return String(v) === items[i] || /^[+-]?\d+(\.\d+)?$/.test(items[i]) && Number(items[i]) === v;
+    return false;
+  });
+}
+function yamlEntryCount(v) {
+  if (Array.isArray(v)) return v.reduce((n, x) => n + yamlEntryCount(x), 0);
+  if (v && typeof v === "object") return Object.values(v).reduce((n, x) => n + yamlEntryCount(x), 0);
+  return typeof v === "string" || typeof v === "number" || typeof v === "boolean" ? 1 : 0;
+}
 
 // src/lib/frontmatter/plan.ts
 var fs14 = __toESM(require("fs"));
 var path14 = __toESM(require("path"));
 
+// src/lib/frontmatter/verify.ts
+var import_yaml = __toESM(require_dist2());
+function split(text) {
+  const lines = text.split("\n");
+  const loc = locateFrontmatter(lines);
+  if (!loc) return null;
+  return { fm: lines.slice(1, loc.end).join("\n"), body: lines.slice(loc.end + 1).join("\n") };
+}
+function stable(v) {
+  if (Array.isArray(v)) return `[${v.map(stable).join(",")}]`;
+  if (v && typeof v === "object") {
+    const o = v;
+    return `{${Object.keys(o).sort().map((k) => `${JSON.stringify(k)}:${stable(o[k])}`).join(",")}}`;
+  }
+  return JSON.stringify(v) ?? "null";
+}
+function relationshipEntryCount(obj) {
+  let n = 0;
+  const walk = (v) => {
+    if (Array.isArray(v)) v.forEach(walk);
+    else if (v && typeof v === "object") Object.values(v).forEach(walk);
+    else if (typeof v === "string" || typeof v === "number") n++;
+  };
+  for (const [k, v] of Object.entries(obj)) if (/^related([_-]|$)/.test(k)) walk(v);
+  return n;
+}
+function relationshipLeaves(obj) {
+  const out = [];
+  const walk = (v) => {
+    if (Array.isArray(v)) v.forEach(walk);
+    else if (v && typeof v === "object") Object.values(v).forEach(walk);
+    else if (typeof v === "string" || typeof v === "number") out.push(String(v));
+  };
+  for (const [k, v] of Object.entries(obj)) if (/^related([_-]|$)/.test(k)) walk(v);
+  return out;
+}
+function accountedFor(original, after) {
+  const core = original.replace(/^knowledge\//, "").replace(/\.md$/, "").split("/").pop() ?? "";
+  return after.some((a) => a === original || a.includes(original) || core.length > 0 && a.includes(core));
+}
+function verifyEquivalent(before, after, touched) {
+  const b = split(before);
+  const a = split(after);
+  if (!b || !a) return "frontmatter missing";
+  if (b.body !== a.body) return "body changed";
+  let pb;
+  let pa;
+  try {
+    pb = (0, import_yaml.parse)(b.fm) ?? {};
+    pa = (0, import_yaml.parse)(a.fm) ?? {};
+  } catch (err) {
+    return `frontmatter does not parse: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`;
+  }
+  if (typeof pb !== "object" || typeof pa !== "object" || Array.isArray(pb) || Array.isArray(pa)) {
+    return "frontmatter is not a mapping";
+  }
+  const ob = { ...pb };
+  const oa = { ...pa };
+  if (touched.some((k) => k.startsWith("related")) && relationshipEntryCount(ob) !== relationshipEntryCount(oa)) {
+    return "relationship entries were lost or added";
+  }
+  if (touched.some((k) => k.startsWith("related"))) {
+    const afterLeaves = relationshipLeaves(oa);
+    const lost = relationshipLeaves(ob).find((v) => !accountedFor(v, afterLeaves));
+    if (lost !== void 0) return `a relationship value was changed or cut short: "${lost.slice(0, 60)}"`;
+  }
+  for (const k of touched) {
+    delete ob[k];
+    delete oa[k];
+  }
+  return stable(ob) === stable(oa) ? null : "keys outside the migration changed";
+}
+
 // src/lib/frontmatter/migrations/shared.ts
+var import_yaml2 = __toESM(require_dist2());
 function inDirs(relPath, dirs) {
   return dirs.some((d) => relPath.startsWith(`${d}/`));
 }
@@ -41242,7 +41351,17 @@ function withFrontmatter(text, fn) {
   if (isDoubledFrontmatter(lines, loc.end)) {
     return { text, notes: [], skip: "doubled frontmatter block (issue-46); run the capture-corruption repair first" };
   }
-  const r = fn(lines, loc.end);
+  let doc;
+  try {
+    const parsed = (0, import_yaml2.parse)(lines.slice(1, loc.end).join("\n")) ?? {};
+    if (typeof parsed !== "object" || Array.isArray(parsed)) {
+      return { text, notes: [], skip: "frontmatter is not a mapping; left alone" };
+    }
+    doc = parsed;
+  } catch (err) {
+    return { text, notes: [], skip: `frontmatter does not parse as YAML (${err instanceof Error ? err.message.split("\n")[0] : String(err)}); left alone` };
+  }
+  const r = fn(lines, loc.end, doc);
   if (r.skip) return { text, notes: r.notes, skip: r.skip, attention: r.attention };
   return { text: r.lines.join("\n"), notes: r.notes, attention: r.attention };
 }
@@ -41276,7 +41395,7 @@ var step1 = {
     "related_adrs"
   ],
   scope: (p) => inDirs(p, ["issues", "enhancements", "decisions"]),
-  transform: (text) => withFrontmatter(text, (lines, end) => {
+  transform: (text) => withFrontmatter(text, (lines, end, doc) => {
     const notes = [];
     const attention = [];
     const blocks = topLevelBlocks(lines, end);
@@ -41297,8 +41416,13 @@ var step1 = {
         continue;
       }
       const list = readList(work, b);
-      if (!list) {
+      if (!list || !crossCheckList(list.items, doc[b.key])) {
         attention.push(`${b.key}: unrecognized shape, left as is`);
+        if (renamed) renameFirstLine();
+        continue;
+      }
+      if (hasComments(work, b)) {
+        attention.push(`${b.key}: has comments, left as is so the comments are not lost`);
         if (renamed) renameFirstLine();
         continue;
       }
@@ -41320,7 +41444,7 @@ var step2 = {
   requires: [1],
   touchedKeys: ["related_issues", "related_enhs", "related_adrs"],
   scope: (p) => inDirs(p, ["issues", "enhancements", "decisions"]),
-  transform: (text, _relPath, ctx) => withFrontmatter(text, (lines, end) => {
+  transform: (text, _relPath, ctx) => withFrontmatter(text, (lines, end, doc) => {
     const notes = [];
     const attention = [];
     let work = lines;
@@ -41328,8 +41452,12 @@ var step2 = {
       const kind = LIST_KEYS[b.key];
       if (!kind) continue;
       const list = readList(work, b);
-      if (!list) {
+      if (!list || !crossCheckList(list.items, doc[b.key])) {
         attention.push(`${b.key}: unrecognized shape, left as is`);
+        continue;
+      }
+      if (hasComments(work, b)) {
+        attention.push(`${b.key}: has comments, left as is so the comments are not lost`);
         continue;
       }
       const items = list.items.map((v) => {
@@ -41369,7 +41497,7 @@ var step3 = {
   requires: [2],
   touchedKeys: ["related", ...FLAT],
   scope: (p) => inDirs(p, ["decisions", "lessons-learned"]),
-  transform: (text, relPath, ctx) => withFrontmatter(text, (lines, end) => {
+  transform: (text, relPath, ctx) => withFrontmatter(text, (lines, end, doc) => {
     const notes = [];
     const attention = [];
     const leftAsIs = () => ({ lines, notes, attention });
@@ -41380,6 +41508,12 @@ var step3 = {
       attention.push('"related:" left as is: flat related_* keys are already present next to it');
       return leftAsIs();
     }
+    if (hasComments(lines, rel)) {
+      attention.push('"related:" left as is: it has comments, which would be lost');
+      return leftAsIs();
+    }
+    const relDoc = doc.related;
+    const relObj = relDoc && typeof relDoc === "object" && !Array.isArray(relDoc) ? relDoc : {};
     const isAdr = relPath.startsWith("decisions/");
     const first = lines[rel.start];
     const rest = stripComment(first.slice(first.indexOf(":") + 1)).trim();
@@ -41398,7 +41532,6 @@ var step3 = {
     }
     for (let s = 0; s < subs.length - 1; s++) subs[s].end = subs[s + 1].start;
     const mapped = /* @__PURE__ */ new Map();
-    let totalIn = 0;
     const resolvePlain = (v) => {
       const id = PREFIXED_ID.find((p) => p.re.test(v.trim()));
       const raw = id ? normalizeId(id.kind, v) ?? v : v;
@@ -41410,11 +41543,10 @@ var step3 = {
     const isFlowList = rest.startsWith("[") && rest.endsWith("]");
     if (isFlowList || rest === "" && plainItems > 0 && subs.length === 0) {
       const list = readList(lines, rel);
-      if (!list) {
+      if (!list || !crossCheckList(list.items, relDoc)) {
         attention.push('"related:" left as is: unrecognized list shape');
         return leftAsIs();
       }
-      totalIn = list.items.length;
       mapped.set("related_docs", list.items.map(resolvePlain));
     } else if (rest !== "" && !["null", "~", "{}"].includes(rest)) {
       attention.push('"related:" left as is: unrecognized shape');
@@ -41430,11 +41562,10 @@ var step3 = {
           return leftAsIs();
         }
         const list = readList(lines, sb);
-        if (!list) {
+        if (!list || !crossCheckList(list.items, relObj[sb.key])) {
           attention.push(`"related:" left as is: group "${sb.key}" has an unrecognized shape`);
           return leftAsIs();
         }
-        totalIn += list.items.length;
         const items = list.items.map((v) => {
           const raw = spec.kind === "path" ? v : normalizeId(spec.kind, v) ?? v;
           const r = resolveRef2(ctx.index, spec.kind, raw);
@@ -41445,6 +41576,7 @@ var step3 = {
         mapped.set(spec.key, [...mapped.get(spec.key) ?? [], ...items]);
       }
     }
+    const totalIn = yamlEntryCount(relDoc);
     const totalOut = [...mapped.values()].reduce((n, v) => n + v.length, 0);
     if (totalOut !== totalIn) {
       attention.push('"related:" left as is: the number of entries would change');
@@ -41471,7 +41603,7 @@ var step4 = {
   requires: [],
   touchedKeys: ["status_category"],
   scope: (p) => inDirs(p, ["issues", "enhancements", "decisions"]),
-  transform: (text) => withFrontmatter(text, (lines, end) => {
+  transform: (text) => withFrontmatter(text, (lines, end, doc) => {
     const notes = [];
     const attention = [];
     const blocks = topLevelBlocks(lines, end);
@@ -41480,6 +41612,10 @@ var step4 = {
     const raw = readScalar(lines, st);
     if (raw === null) {
       attention.push("status: multi-line or empty, status_category not added");
+      return { lines, notes, attention };
+    }
+    if (typeof doc.status !== "string" || doc.status !== raw) {
+      attention.push("status: unusual form, status_category not added");
       return { lines, notes, attention };
     }
     const { category, recognized } = categoryFor(raw);
@@ -41514,8 +41650,16 @@ function planMigrations(kgPath, steps) {
       continue;
     }
     result.scanned++;
+    if (before.charCodeAt(0) === 65279) {
+      result.ignored.push({ relPath, reason: "BOM at the start of the file (not handled)" });
+      continue;
+    }
+    if (before.includes("\r")) {
+      result.ignored.push({ relPath, reason: "CRLF line endings (not handled)" });
+      continue;
+    }
     if (!locateFrontmatter(before.split("\n"))) {
-      result.ignored.push({ relPath, reason: before.startsWith("---\r\n") ? "CRLF line endings (not handled)" : "no frontmatter" });
+      result.ignored.push({ relPath, reason: "no frontmatter" });
       continue;
     }
     let text = before;
@@ -41535,63 +41679,17 @@ function planMigrations(kgPath, steps) {
         used.push(m.step);
       }
     }
-    if (!skipped && text !== before) result.changes.push({ relPath, before, after: text, steps: used });
+    if (!skipped && text !== before) {
+      const touched = [...new Set(ordered.filter((m) => used.includes(m.step)).flatMap((m) => m.touchedKeys))];
+      const problem = verifyEquivalent(before, text, touched);
+      if (problem) {
+        result.skipped.push({ relPath, step: used[used.length - 1], reason: `would be refused by the safety check (${problem}); left as it is` });
+      } else {
+        result.changes.push({ relPath, before, after: text, steps: used });
+      }
+    }
   }
   return result;
-}
-
-// src/lib/frontmatter/verify.ts
-var import_yaml = __toESM(require_dist2());
-function split(text) {
-  const lines = text.split("\n");
-  const loc = locateFrontmatter(lines);
-  if (!loc) return null;
-  return { fm: lines.slice(1, loc.end).join("\n"), body: lines.slice(loc.end + 1).join("\n") };
-}
-function stable(v) {
-  if (Array.isArray(v)) return `[${v.map(stable).join(",")}]`;
-  if (v && typeof v === "object") {
-    const o = v;
-    return `{${Object.keys(o).sort().map((k) => `${JSON.stringify(k)}:${stable(o[k])}`).join(",")}}`;
-  }
-  return JSON.stringify(v) ?? "null";
-}
-function relationshipEntryCount(obj) {
-  let n = 0;
-  const walk = (v) => {
-    if (Array.isArray(v)) v.forEach(walk);
-    else if (v && typeof v === "object") Object.values(v).forEach(walk);
-    else if (typeof v === "string" || typeof v === "number") n++;
-  };
-  for (const [k, v] of Object.entries(obj)) if (/^related([_-]|$)/.test(k)) walk(v);
-  return n;
-}
-function verifyEquivalent(before, after, touched) {
-  const b = split(before);
-  const a = split(after);
-  if (!b || !a) return "frontmatter missing";
-  if (b.body !== a.body) return "body changed";
-  let pb;
-  let pa;
-  try {
-    pb = (0, import_yaml.parse)(b.fm) ?? {};
-    pa = (0, import_yaml.parse)(a.fm) ?? {};
-  } catch (err) {
-    return `frontmatter does not parse: ${err instanceof Error ? err.message.split("\n")[0] : String(err)}`;
-  }
-  if (typeof pb !== "object" || typeof pa !== "object" || Array.isArray(pb) || Array.isArray(pa)) {
-    return "frontmatter is not a mapping";
-  }
-  const ob = { ...pb };
-  const oa = { ...pa };
-  if (touched.some((k) => k.startsWith("related")) && relationshipEntryCount(ob) !== relationshipEntryCount(oa)) {
-    return "relationship entries were lost or added";
-  }
-  for (const k of touched) {
-    delete ob[k];
-    delete oa[k];
-  }
-  return stable(ob) === stable(oa) ? null : "keys outside the migration changed";
 }
 
 // src/lib/frontmatter/index.ts
@@ -41618,10 +41716,15 @@ function perStepCounts(plan) {
   return counts;
 }
 function needsAttentionItems(plan) {
-  return [
-    ...plan.skipped.map((s) => ({ relPath: s.relPath, reason: `step ${s.step}: ${s.reason}` })),
-    ...plan.attention.map((a) => ({ relPath: a.relPath, reason: `step ${a.step}: ${a.reason}` }))
-  ];
+  const seen = /* @__PURE__ */ new Set();
+  const out = [];
+  for (const i of [...plan.skipped, ...plan.attention]) {
+    const key = `${i.relPath}|${i.reason}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ relPath: i.relPath, reason: i.reason });
+  }
+  return out;
 }
 function needsAttentionFiles(plan) {
   return new Set(needsAttentionItems(plan).map((i) => i.relPath)).size;

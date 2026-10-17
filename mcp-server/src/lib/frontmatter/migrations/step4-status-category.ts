@@ -12,7 +12,7 @@ export const step4: Migration = {
   touchedKeys: ["status_category"],
   scope: (p) => inDirs(p, ["issues", "enhancements", "decisions"]),
   transform: (text) =>
-    withFrontmatter(text, (lines, end) => {
+    withFrontmatter(text, (lines, end, doc) => {
       const notes: string[] = [];
       const attention: string[] = [];
       const blocks = topLevelBlocks(lines, end);
@@ -21,6 +21,10 @@ export const step4: Migration = {
       const raw = readScalar(lines, st);
       if (raw === null) {
         attention.push("status: multi-line or empty, status_category not added");
+        return { lines, notes, attention };
+      }
+      if (typeof doc.status !== "string" || doc.status !== raw) {
+        attention.push("status: unusual form, status_category not added");
         return { lines, notes, attention };
       }
       const { category, recognized } = categoryFor(raw);

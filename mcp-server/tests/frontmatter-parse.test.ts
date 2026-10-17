@@ -1,6 +1,6 @@
 import {
   locateFrontmatter, isDoubledFrontmatter, topLevelBlocks, contentEnd,
-  readList, readScalar, renderList, replaceLines, unquote,
+  readList, readScalar, renderList, replaceLines, unquote, stripComment, crossCheckList, hasComments,
 } from "../src/lib/frontmatter/parse.js";
 
 const ADR = [
@@ -130,5 +130,43 @@ describe("quoted # is data, not a comment (Opus review F1)", () => {
   test("an apostrophe in an unquoted scalar does not hide a later comment", () => {
     const s = fm(["k: it's fine # note"]);
     expect(readScalar(s, topLevelBlocks(s, 2)[0])).toBe("it's fine");
+  });
+});
+
+describe("quote escapes and YAML cross-check (second Opus review)", () => {
+  const fm = (l: string[]) => ["---", ...l, "---"];
+  test("a single-quote escape '' does not end the quoted string", () => {
+    expect(stripComment("'Bob''s idea #2 (draft)' # c")).toBe("'Bob''s idea #2 (draft)'");
+  });
+  test("a double-quote escape \\\" does not end the quoted string", () => {
+    expect(stripComment('"x \\" # y" # c')).toBe('"x \\" # y"');
+  });
+  test("crossCheckList accepts a list YAML reads the same way", () => {
+    expect(crossCheckList(["a", "5"], ["a", 5])).toBe(true);
+    expect(crossCheckList([], null)).toBe(true);
+  });
+  test("crossCheckList rejects any disagreement with YAML", () => {
+    expect(crossCheckList(["ADR-1", "ADR-1"].map((x) => "&a " + x), ["ADR-1", "ADR-1"])).toBe(false);
+    expect(crossCheckList(["1", "[2", "3]"], [1, [2, 3]])).toBe(false);
+    expect(crossCheckList(["a: b"], [{ a: "b" }])).toBe(false);
+    expect(crossCheckList(["a"], "a")).toBe(false);
+  });
+  test("hasComments sees whole-line and trailing comments but not a quoted #", () => {
+    const withComment = fm(["k:", "  # note", "  - x"]);
+    expect(hasComments(withComment, topLevelBlocks(withComment, 4)[0])).toBe(true);
+    const trailing = fm(["k:", "  - x # note"]);
+    expect(hasComments(trailing, topLevelBlocks(trailing, 3)[0])).toBe(true);
+    const quoted = fm(["k:", '  - "a #1"']);
+    expect(hasComments(quoted, topLevelBlocks(quoted, 3)[0])).toBe(false);
+  });
+});
+
+describe("crossCheckList compares numbers by value (zero-padded IDs are common)", () => {
+  test("001, 002, 008 read as the numbers 1, 2, 8 agree with the hand-read text", () => {
+    expect(crossCheckList(["001", "002", "008"], [1, 2, 8])).toBe(true);
+  });
+  test("a number must still agree with its text by value", () => {
+    expect(crossCheckList(["002"], [1])).toBe(false);
+    expect(crossCheckList(["abc"], [1])).toBe(false);
   });
 });

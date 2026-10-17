@@ -1,4 +1,4 @@
-import { contentEnd, readList, renderList, replaceLines, topLevelBlocks } from "../parse.js";
+import { contentEnd, crossCheckList, hasComments, readList, renderList, replaceLines, topLevelBlocks } from "../parse.js";
 import { normalizeId, type RefKind } from "../ids.js";
 import { inDirs, withFrontmatter } from "./shared.js";
 import type { Migration } from "./types.js";
@@ -27,7 +27,7 @@ export const step1: Migration = {
   ],
   scope: (p) => inDirs(p, ["issues", "enhancements", "decisions"]),
   transform: (text) =>
-    withFrontmatter(text, (lines, end) => {
+    withFrontmatter(text, (lines, end, doc) => {
       const notes: string[] = [];
       const attention: string[] = [];
       const blocks = topLevelBlocks(lines, end);
@@ -48,8 +48,13 @@ export const step1: Migration = {
           continue;
         }
         const list = readList(work, b);
-        if (!list) {
+        if (!list || !crossCheckList(list.items, doc[b.key])) {
           attention.push(`${b.key}: unrecognized shape, left as is`);
+          if (renamed) renameFirstLine();
+          continue;
+        }
+        if (hasComments(work, b)) {
+          attention.push(`${b.key}: has comments, left as is so the comments are not lost`);
           if (renamed) renameFirstLine();
           continue;
         }

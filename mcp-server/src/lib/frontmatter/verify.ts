@@ -29,6 +29,27 @@ function relationshipEntryCount(obj: Record<string, unknown>): number {
   return n;
 }
 
+/** Every string/number entry under every relationship key, as text. */
+function relationshipLeaves(obj: Record<string, unknown>): string[] {
+  const out: string[] = [];
+  const walk = (v: unknown): void => {
+    if (Array.isArray(v)) v.forEach(walk);
+    else if (v && typeof v === "object") Object.values(v as Record<string, unknown>).forEach(walk);
+    else if (typeof v === "string" || typeof v === "number") out.push(String(v));
+  };
+  for (const [k, v] of Object.entries(obj)) if (/^related([_-]|$)/.test(k)) walk(v);
+  return out;
+}
+
+/**
+ * An original entry is accounted for when some entry after the rewrite equals it, contains it
+ * (ID normalization, wikilink target or label), or contains its note name (a path turned into a link).
+ */
+function accountedFor(original: string, after: string[]): boolean {
+  const core = original.replace(/^knowledge\//, "").replace(/\.md$/, "").split("/").pop() ?? "";
+  return after.some((a) => a === original || a.includes(original) || (core.length > 0 && a.includes(core)));
+}
+
 /** ADR-063: null when the rewrite is safe, otherwise the reason it must be refused. */
 export function verifyEquivalent(before: string, after: string, touched: string[]): string | null {
   const b = split(before);
@@ -51,6 +72,11 @@ export function verifyEquivalent(before: string, after: string, touched: string[
   // Safety net: a step that touches relationship keys must keep exactly as many entries as it found.
   if (touched.some((k) => k.startsWith("related")) && relationshipEntryCount(ob) !== relationshipEntryCount(oa)) {
     return "relationship entries were lost or added";
+  }
+  if (touched.some((k) => k.startsWith("related"))) {
+    const afterLeaves = relationshipLeaves(oa);
+    const lost = relationshipLeaves(ob).find((v) => !accountedFor(v, afterLeaves));
+    if (lost !== undefined) return `a relationship value was changed or cut short: "${lost.slice(0, 60)}"`;
   }
   for (const k of touched) {
     delete ob[k];

@@ -71,6 +71,8 @@ export function stripComment(s: string): string {
   for (let i = 0; i < s.length; i++) {
     const ch = s[i];
     if (quote) {
+      if (quote === '"' && ch === "\\") { i++; prevNonSpace = ch; continue; } // \" is an escaped quote
+      if (quote === "'" && ch === "'" && s[i + 1] === "'") { i++; continue; } // '' is an escaped quote
       if (ch === quote) quote = null;
       prevNonSpace = ch;
       continue;
@@ -122,4 +124,40 @@ export function renderList(key: string, items: string[], style: ListStyle): stri
 
 export function replaceLines(lines: string[], start: number, end: number, replacement: string[]): string[] {
   return [...lines.slice(0, start), ...replacement, ...lines.slice(end)];
+}
+
+/** True when the block holds any YAML comment (a whole-line comment or a trailing one outside quotes). */
+export function hasComments(lines: string[], block: KeyBlock): boolean {
+  const end = contentEnd(lines, block);
+  for (let i = block.start; i < end; i++) {
+    if (i !== block.start && lines[i].trim().startsWith("#")) return true; // a whole-line comment
+    let text = i === block.start ? lines[i].slice(lines[i].indexOf(":") + 1) : lines[i];
+    const item = /^\s*-\s+(.*)$/.exec(text);
+    if (item) text = item[1]; // judge the value itself, not the "- " bullet in front of it
+    if (stripComment(text) !== text) return true;
+  }
+  return false;
+}
+
+/**
+ * Cross-check the hand-read list against what a real YAML parser says the value is. Any disagreement
+ * (anchors, aliases, nested lists or maps, escapes the reader mishandled) means the field must be left alone.
+ */
+export function crossCheckList(items: string[], yamlValue: unknown): boolean {
+  if (yamlValue === null || yamlValue === undefined) return items.length === 0;
+  if (!Array.isArray(yamlValue)) return false;
+  if (yamlValue.length !== items.length) return false;
+  return yamlValue.every((v, i) => {
+    if (typeof v === "string" || typeof v === "boolean") return String(v) === items[i];
+    // YAML reads 001 as the number 1: compare numbers by value so zero-padded IDs still agree.
+    if (typeof v === "number") return String(v) === items[i] || (/^[+-]?\d+(\.\d+)?$/.test(items[i]) && Number(items[i]) === v);
+    return false;
+  });
+}
+
+/** Number of string, number and boolean entries anywhere inside a parsed YAML value. */
+export function yamlEntryCount(v: unknown): number {
+  if (Array.isArray(v)) return v.reduce((n: number, x) => n + yamlEntryCount(x), 0);
+  if (v && typeof v === "object") return Object.values(v as Record<string, unknown>).reduce((n: number, x) => n + yamlEntryCount(x), 0);
+  return typeof v === "string" || typeof v === "number" || typeof v === "boolean" ? 1 : 0;
 }

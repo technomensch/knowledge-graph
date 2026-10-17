@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { buildNoteIndex } from "./links.js";
 import { locateFrontmatter } from "./parse.js";
+import { verifyEquivalent } from "./verify.js";
 import { MIGRATIONS } from "./migrations/index.js";
 
 export interface PlannedChange { relPath: string; before: string; after: string; steps: number[] }
@@ -35,8 +36,16 @@ export function planMigrations(kgPath: string, steps: number[]): PlanResult {
       continue;
     }
     result.scanned++;
+    if (before.charCodeAt(0) === 0xfeff) {
+      result.ignored.push({ relPath, reason: "BOM at the start of the file (not handled)" });
+      continue;
+    }
+    if (before.includes("\r")) {
+      result.ignored.push({ relPath, reason: "CRLF line endings (not handled)" });
+      continue;
+    }
     if (!locateFrontmatter(before.split("\n"))) {
-      result.ignored.push({ relPath, reason: before.startsWith("---\r\n") ? "CRLF line endings (not handled)" : "no frontmatter" });
+      result.ignored.push({ relPath, reason: "no frontmatter" });
       continue;
     }
     let text = before;
@@ -56,7 +65,17 @@ export function planMigrations(kgPath: string, steps: number[]): PlanResult {
         used.push(m.step);
       }
     }
-    if (!skipped && text !== before) result.changes.push({ relPath, before, after: text, steps: used });
+    if (!skipped && text !== before) {
+      // Run the same safety check apply runs, now, so a file that would be refused is reported as needing
+      // attention instead of staying "pending" forever and blocking the later steps.
+      const touched = [...new Set(ordered.filter((m) => used.includes(m.step)).flatMap((m) => m.touchedKeys))];
+      const problem = verifyEquivalent(before, text, touched);
+      if (problem) {
+        result.skipped.push({ relPath, step: used[used.length - 1], reason: `would be refused by the safety check (${problem}); left as it is` });
+      } else {
+        result.changes.push({ relPath, before, after: text, steps: used });
+      }
+    }
   }
   return result;
 }

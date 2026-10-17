@@ -1,4 +1,4 @@
-import { contentEnd, readList, renderList, replaceLines, topLevelBlocks } from "../parse.js";
+import { contentEnd, crossCheckList, hasComments, readList, renderList, replaceLines, topLevelBlocks } from "../parse.js";
 import { resolveRef } from "../links.js";
 import { inDirs, withFrontmatter } from "./shared.js";
 import { LIST_KEYS } from "./step1-keys-and-ids.js";
@@ -13,7 +13,7 @@ export const step2: Migration = {
   touchedKeys: ["related_issues", "related_enhs", "related_adrs"],
   scope: (p) => inDirs(p, ["issues", "enhancements", "decisions"]),
   transform: (text, _relPath, ctx) =>
-    withFrontmatter(text, (lines, end) => {
+    withFrontmatter(text, (lines, end, doc) => {
       const notes: string[] = [];
       const attention: string[] = [];
       let work = lines;
@@ -21,8 +21,12 @@ export const step2: Migration = {
         const kind = LIST_KEYS[b.key];
         if (!kind) continue;
         const list = readList(work, b);
-        if (!list) {
+        if (!list || !crossCheckList(list.items, doc[b.key])) {
           attention.push(`${b.key}: unrecognized shape, left as is`);
+          continue;
+        }
+        if (hasComments(work, b)) {
+          attention.push(`${b.key}: has comments, left as is so the comments are not lost`);
           continue;
         }
         const items = list.items.map((v) => {
