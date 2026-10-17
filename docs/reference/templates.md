@@ -22,7 +22,7 @@ For customization guidance, see [Customize Templates](../pillars/tailoring/custo
 
 | File | Purpose | Key Fields | Created by | Deploys to |
 |---|---|---|---|---|
-| `decisions/ADR-template.md` | Records an architectural decision with status, context, and consequences | `title`, `number`, `created`, `status`, `author`, `email` | `/kmgraph:kmg-create-adr` | `knowledge/templates/ADR-template.md` |
+| `decisions/ADR-template.md` | Records an architectural decision with status, context, and consequences | `title`, `number`, `created`, `status`, `status_category`, `author`, `email`, `related_adrs`, `related_lessons`, `related_docs` | `/kmgraph:kmg-create-adr` | `knowledge/templates/ADR-template.md` |
 
 ---
 

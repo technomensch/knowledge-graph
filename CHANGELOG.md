@@ -9,6 +9,23 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.11] — 2026-10-17
+
+### Added
+- `frontmatter-schema` category in `kg_upgrade` (ENH-062, #241): migrates relationship fields to a flat canonical schema in four separately approved steps — 1 underscore key spelling and string IDs, 2 unambiguous wikilinks, 3 flatten ADR/lesson `related:` maps, 4 `status_category`. Inspect-first (never writes), its own `confirmFrontmatterSchema` flag plus an explicit `frontmatterSteps` list (never covered by `confirmBackfix`), `.bak` copies, verify-before-write via the new `yaml` dependency, and a graph-level schema marker (`.kmgraph-frontmatter-schema`) with a schema floor.
+- Relationship values are written as quoted wikilinks with the short ID as label (ENH-059): they render as links in Obsidian's Properties panel and create backlinks and graph edges; `tags:` are untouched; a link is only written when its target is unique in the graph.
+- `status_category` stored field (backlog, pending, started, done, cancelled) derived from `status`, in `kg_capture` ADR output and via migration step 4.
+- `scripts/relationship-scan.sh` and a new `kmg-paperwork-audit` Step 7: flags issue/ENH pairs that reference the same file but declare no relationship (ignores common files, bare filenames and hub paths shared by more than 4 docs).
+- New relationship fields on newly created issue/ENH docs: `blocked_by`, `blocking`, `depends_on`, `related_to`.
+
+### Changed
+- `github-issue` is now `github_issue` in new issue/ENH frontmatter (`kmg-start-issue-tracking`); both spellings are still read for one release.
+- ADR frontmatter written by `kg_capture`: the nested `related:` map is replaced by flat `related_adrs`, `related_lessons`, `related_docs` lists (the legacy input shape is still accepted). ADR and lesson templates match.
+- `kmg-paperwork-audit`: the report step is now Step 8.
+
+### Migration
+- Run `kg_upgrade` (or `/kmgraph:kmg-upgrade`), review the dry run for `frontmatter-schema`, and approve steps one at a time. Nothing is applied without your approval.
+
 ## [0.7.10] — 2026-09-15
 
 ### Added
