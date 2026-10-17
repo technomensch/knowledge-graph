@@ -32,6 +32,7 @@ import {
 } from "../interaction.js";
 import { resolveEffectiveCwd } from "../platform-cwd.js";
 import { handleVersion } from "./version.js";
+import { applyFrontmatterSchema, checkFrontmatterSchema } from "../lib/frontmatter/index.js";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -67,6 +68,7 @@ const APPLY_ORDER = [
   "stale-fts5-index-format",   // issue-55 backfix: search-index relocation, order-independent of the others
   "stale-handoff-packages-location",   // issue-56 backfix: file relocation, order-independent of the others
   "missing-root-readme",   // ENH-064 backfix: additive file backfill, order-independent of the others
+  "frontmatter-schema",   // ENH-062: schema migration; own consent flag, never shares confirmBackfix
   "platform-split",
 ];
 
@@ -2482,7 +2484,10 @@ function updateLastAppliedVersion(installedVersion: string, graphName: string): 
 // kmg-upgrade-inspector.md's confirmBackfix wiring: that boolean is per-call, not
 // per-category, so a call consenting to one confirmBackfix-gated category silently
 // also consents to any other one present in the same `apply: [...]` array.
-export type ApplyCategory = "status-schema" | "config-location" | "plan-status-drift" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir" | "capture-corruption" | "diff-blank-reconstruction" | "stale-fts5-index-format" | "stale-handoff-packages-location" | "connect-unregistered-graph" | "missing-root-readme";
+// "frontmatter-schema" is gated on its own confirmFrontmatterSchema flag plus an
+// explicit frontmatterSteps list, NOT on the shared confirmBackfix; its wiring in
+// kmg-upgrade-inspector.md must be reviewed together with this category.
+export type ApplyCategory = "status-schema" | "config-location" | "plan-status-drift" | "directories" | "config" | "templates" | "platform-split" | "starter-relocation" | "stray-knowledge-dir" | "capture-corruption" | "diff-blank-reconstruction" | "stale-fts5-index-format" | "stale-handoff-packages-location" | "connect-unregistered-graph" | "missing-root-readme" | "frontmatter-schema";
 
 export interface HandleUpgradeParams {
   apply?: ApplyCategory[];
@@ -2504,6 +2509,10 @@ export interface HandleUpgradeParams {
   // mode is asked via gate() instead; an explicit true here is still
   // honored in either mode (see confirmBackfixCategory).
   confirmBackfix?: boolean;
+  /** ENH-062: consent for the frontmatter-schema migration. Separate from confirmBackfix on purpose. */
+  confirmFrontmatterSchema?: boolean;
+  /** ENH-062: which schema steps to apply (1 keys/IDs, 2 wikilinks, 3 flatten related, 4 status_category). */
+  frontmatterSteps?: number[];
   // Opus validation review fix #3: required to register a knowledge graph
   // whose path is an ancestor of one or more already-registered graphs, via
   // the "connect-unregistered-graph" category -- same registration guard
@@ -2673,7 +2682,7 @@ export async function handleUpgrade(
       result.upgrades.push({
         category: "resolution",
         description: target.error,
-        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, stale-handoff-packages-location, missing-root-readme, version-update, and the platform-split warning) were skipped.",
+        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, stale-handoff-packages-location, missing-root-readme, frontmatter-schema, version-update, and the platform-split warning) were skipped.",
       });
       return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
     }
@@ -2698,7 +2707,7 @@ export async function handleUpgrade(
       result.upgrades.push({
         category: "resolution",
         description: `KG path not found: ${kgPath}`,
-        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, stale-handoff-packages-location, missing-root-readme, version-update, and the platform-split warning) were skipped.",
+        details: "Graph-dependent checks (directories, config, starter-relocation, templates, stray-knowledge-dir, capture-corruption, diff-blank-reconstruction, stale-fts5-index-format, stale-handoff-packages-location, missing-root-readme, frontmatter-schema, version-update, and the platform-split warning) were skipped.",
       });
       return { content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }] };
     }
@@ -2713,6 +2722,7 @@ export async function handleUpgrade(
     result.upgrades.push(...checkStaleFts5IndexFormat(kgPath, target.name, kgType));
     result.upgrades.push(...checkStaleHandoffPackagesLocation(kgPath, kgType));
     result.upgrades.push(...checkMissingRootReadme(kgPath));
+    result.upgrades.push(...checkFrontmatterSchema(kgPath));
     result.upgrades.push(...checkVersionMismatch(installedVersion, kgType, config, target.name));
     const platformWarning = checkPlatformSplit(kgPath);
     if (platformWarning) result.warnings.push(platformWarning);
@@ -2895,6 +2905,35 @@ export async function handleUpgrade(
         results.push(`[missing-root-readme] ${applyMissingRootReadme(kgPath)}`);
         appliedAnyGraphDependent = true;
         break;
+      case "frontmatter-schema": {
+        const steps = params.frontmatterSteps ?? [];
+        if (steps.length === 0) {
+          results.push("[frontmatter-schema] skipped: pass frontmatterSteps (for example [1]) naming the steps to apply; inspect output lists them.");
+          break;
+        }
+        const mode = resolveInteractionMode({}).mode;
+        const rescan = checkFrontmatterSchema(kgPath);
+        const confirmation = rescan.length === 0
+          ? { confirmed: true as const }
+          : await confirmBackfixCategory({
+              reasonCode: "frontmatter_schema_apply",
+              param: "confirmFrontmatterSchema",
+              mode,
+              confirmed: params.confirmFrontmatterSchema,
+              timeoutMs: STUB_ASK_TIMEOUT_MS,
+              detail: rescan[0]?.description,
+              skipAsk: pending.length > 0,
+            });
+        if (!("confirmed" in confirmation)) { pending.push(confirmation); anyCategoryFailed = true; break; }
+        try {
+          results.push(`[frontmatter-schema] ${applyFrontmatterSchema(kgPath, steps)}`);
+          appliedAnyGraphDependent = true;
+        } catch (err) {
+          results.push(`[frontmatter-schema] ${err instanceof Error ? err.message : String(err)}`);
+          anyCategoryFailed = true;
+        }
+        break;
+      }
       case "capture-corruption": {
         // c5: retrofitted onto the shared backfix gate -- previously applied
         // unconditionally with no consent check at all (the most severe of
@@ -3048,11 +3087,11 @@ export function registerUpgradeTool(server: McpServer, personalScopeSession: Per
     "Inspect and apply KMGraph upgrades for MCP-only installations",
     {
       apply: z
-        .array(z.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction", "stale-fts5-index-format", "stale-handoff-packages-location", "connect-unregistered-graph", "missing-root-readme"]))
+        .array(z.enum(["status-schema", "config-location", "plan-status-drift", "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption", "diff-blank-reconstruction", "stale-fts5-index-format", "stale-handoff-packages-location", "connect-unregistered-graph", "missing-root-readme", "frontmatter-schema"]))
         .optional()
         .default([])
         .describe(
-          'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history), "stale-fts5-index-format" (issue-55 backfix: rebuilds a pre-v0.7.4 name-only search index at the collision-safe path-keyed location; non-destructive, leaves the old file in place), "stale-handoff-packages-location" (issue-56 backfix: moves pre-fix ./handoff-packages/<date>/ folders into knowledge/handoffs/<date>/; non-destructive, dedups identical files and reports rather than overwrites any that differ), "connect-unregistered-graph" (registers the current directory as a new knowledge graph when it already has decisions/ or lessons-learned/ content -- or an orphaned .kmgraph-id marker -- but isn\'t in the config registry yet; does not scaffold any new files, only attaches a registry entry to what\'s already there, then continues into any other categories requested in the same call), "missing-root-readme" (ENH-064 backfix: copies the attribution README to a registered graph\'s root when missing; non-destructive, never overwrites an existing README.md)'
+          'Categories to apply. Omit or pass [] to inspect only. Values: "status-schema", "config-location", "plan-status-drift" (issue-49 backfix: syncs a stale ~/.claude/plans/ mirror STATUS line to its already-COMPLETE knowledge/plans/ canonical -- Tier A only, auto-repairable; Tier B candidates are report-only and never auto-applied), "directories", "config", "templates", "platform-split", "starter-relocation", "stray-knowledge-dir", "capture-corruption" (issue-46 backfix: repairs files corrupted by the filename/frontmatter-double-embed bugs), "diff-blank-reconstruction" (issue-47 backfix: reconstructs blank "key files modified" session sections from git history), "stale-fts5-index-format" (issue-55 backfix: rebuilds a pre-v0.7.4 name-only search index at the collision-safe path-keyed location; non-destructive, leaves the old file in place), "stale-handoff-packages-location" (issue-56 backfix: moves pre-fix ./handoff-packages/<date>/ folders into knowledge/handoffs/<date>/; non-destructive, dedups identical files and reports rather than overwrites any that differ), "connect-unregistered-graph" (registers the current directory as a new knowledge graph when it already has decisions/ or lessons-learned/ content -- or an orphaned .kmgraph-id marker -- but isn\'t in the config registry yet; does not scaffold any new files, only attaches a registry entry to what\'s already there, then continues into any other categories requested in the same call), "missing-root-readme" (ENH-064 backfix: copies the attribution README to a registered graph\'s root when missing; non-destructive, never overwrites an existing README.md), "frontmatter-schema" (ENH-062: migrates frontmatter relationship fields to flat unambiguous wikilinks and adds status_category; inspect-first, steps approved separately via frontmatterSteps, needs its own confirmFrontmatterSchema, never covered by confirmBackfix)'
         ),
       confirm_platform_split: z
         .boolean()
@@ -3090,6 +3129,22 @@ export function registerUpgradeTool(server: McpServer, personalScopeSession: Per
             "flag; setting it authorizes any of these three present in the same apply call. " +
             "Interactive callers are asked to confirm instead."
         ),
+      confirmFrontmatterSchema: z
+        .boolean()
+        .optional()
+        .describe(
+          "Must be true (in automated mode) to apply the \"frontmatter-schema\" category. Separate " +
+            "from confirmBackfix: consent to repair one corrupted file never authorizes rewriting " +
+            "frontmatter across the graph. Interactive callers are asked to confirm instead."
+        ),
+      frontmatterSteps: z
+        .array(z.number().int().min(1))
+        .optional()
+        .describe(
+          "Steps of the \"frontmatter-schema\" migration to apply: 1 key spelling and string IDs, " +
+            "2 wikilinks (needs step 1), 3 flatten related maps (needs step 2), 4 status_category. " +
+            "Required when applying that category; inspect output lists pending steps."
+        ),
       confirmBroadRegistration: z
         .enum(["yes", "no"])
         .optional()
@@ -3099,9 +3154,9 @@ export function registerUpgradeTool(server: McpServer, personalScopeSession: Per
             "before scaffolding; a home/root path is refused outright with no bypass."
         ),
     },
-    async ({ apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix, confirmBroadRegistration }, extra) => {
+    async ({ apply, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix, confirmFrontmatterSchema, frontmatterSteps, confirmBroadRegistration }, extra) => {
       return handleUpgrade(
-        { apply: apply as ApplyCategory[] | undefined, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix, confirmBroadRegistration },
+        { apply: apply as ApplyCategory[] | undefined, confirm_platform_split, scope, confirmPersonalScope, confirmMigration, confirmBackfix, confirmFrontmatterSchema, frontmatterSteps, confirmBroadRegistration },
         personalScopeSession,
         extra?._meta as Record<string, unknown> | undefined
       );
