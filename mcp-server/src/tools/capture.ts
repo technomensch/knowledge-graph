@@ -18,6 +18,8 @@ import {
 import { resolveInteractionMode, InteractionMode, GateResult, STUB_ASK_TIMEOUT_MS, gate, stubAsk } from "../interaction.js";
 import { confirmFirstWrite } from "./config.js";
 import { resolveEffectiveCwd } from "../platform-cwd.js";
+import { buildNoteIndex, resolveRef } from "../lib/frontmatter/links.js";
+import { categoryFor } from "../lib/frontmatter/status.js";
 
 export interface CaptureRequest {
   content: string;
@@ -50,6 +52,9 @@ export interface CaptureRequest {
       lessons?: string[];
       kg_entries?: string[];
     };
+    related_adrs?: string[];
+    related_lessons?: string[];
+    related_docs?: string[];
     search_aliases?: string[];
   };
 }
@@ -151,6 +156,7 @@ const GENERATED_FRONTMATTER_KEYS = new Set([
   "tags", "category", "version", "status", "number",
   "as_of_commit", "last_updated", "implements",
   "related", "adrs", "lessons", "kg_entries",
+  "related_adrs", "related_lessons", "related_docs", "status_category",
   "search_aliases", "deciders", "pr", "issue",
 ]);
 
@@ -315,6 +321,27 @@ export function deriveFileName(
   return `${slugify(metadata.title)}.md`;
 }
 
+/** ENH-059: resolve ADR relationship inputs (legacy map + flat fields) to unambiguous wikilinks. Unresolvable values stay plain text. */
+export function resolveAdrRelated(kgPath: string, metadata: CaptureRequest["metadata"]): CaptureRequest["metadata"] {
+  const index = buildNoteIndex(kgPath);
+  const conv = (kind: "adr" | "path", vals: string[]): string[] => {
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const v of vals) {
+      const r = resolveRef(index, kind, v);
+      const s = "link" in r ? r.link : v;
+      if (!seen.has(s)) { seen.add(s); out.push(s); }
+    }
+    return out;
+  };
+  return {
+    ...metadata,
+    related_adrs: conv("adr", [...(metadata.related_adrs ?? []), ...(metadata.related?.adrs ?? [])]),
+    related_lessons: conv("path", [...(metadata.related_lessons ?? []), ...(metadata.related?.lessons ?? [])]),
+    related_docs: conv("path", [...(metadata.related_docs ?? []), ...(metadata.related?.kg_entries ?? [])]),
+  };
+}
+
 export function generateFrontmatter(
   type: CaptureRequest["type"],
   metadata: CaptureRequest["metadata"]
@@ -363,6 +390,7 @@ export function generateFrontmatter(
     if (metadata.number !== undefined) lines.push(`number: ${metadata.number}`);
     lines.push(`created: ${now}`);
     lines.push(`status: ${metadata.status ?? "Proposed"}`);
+    lines.push(`status_category: ${categoryFor(metadata.status ?? "Proposed").category}`);
     if (metadata.git?.author) lines.push(`author: ${metadata.git.author}`);
     if (metadata.git?.email) lines.push(`email: ${metadata.git.email}`);
     if (metadata.git?.branch || metadata.git?.commit || metadata.git?.pr !== undefined || metadata.git?.issue !== undefined) {
@@ -373,10 +401,15 @@ export function generateFrontmatter(
       lines.push(`  issue: ${metadata.git?.issue ?? "null"}`);
     }
     lines.push(`implements: ${metadata.implements ?? "null"}`);
-    lines.push("related:");
-    lines.push(`  adrs: [${(metadata.related?.adrs ?? []).join(", ")}]`);
-    lines.push(`  lessons: [${(metadata.related?.lessons ?? []).join(", ")}]`);
-    lines.push(`  kg_entries: [${(metadata.related?.kg_entries ?? []).join(", ")}]`);
+    const flat = (key: string, vals: string[] | undefined): void => {
+      const v = vals ?? [];
+      if (v.length === 0) { lines.push(`${key}: []`); return; }
+      lines.push(`${key}:`);
+      for (const item of v) lines.push(`  - ${JSON.stringify(item)}`);
+    };
+    flat("related_adrs", metadata.related_adrs ?? metadata.related?.adrs);
+    flat("related_lessons", metadata.related_lessons ?? metadata.related?.lessons);
+    flat("related_docs", metadata.related_docs ?? metadata.related?.kg_entries);
     if (metadata.tags && metadata.tags.length > 0) {
       lines.push(`tags: [${metadata.tags.join(", ")}]`);
     }
@@ -636,7 +669,7 @@ export async function handleCapture(
     try {
       fs.writeFileSync(
         existing,
-        generateFrontmatter(request.type, request.metadata) + stripLeadingFrontmatter(request.content),
+        generateFrontmatter(request.type, request.type === "adr" ? resolveAdrRelated(kgPath, request.metadata) : request.metadata) + stripLeadingFrontmatter(request.content),
         "utf-8"
       );
       let indexResult: Record<string, unknown> = {};
@@ -679,7 +712,7 @@ export async function handleCapture(
 
   // Write file
   try {
-    fs.writeFileSync(filePath, generateFrontmatter(request.type, request.metadata) + stripLeadingFrontmatter(request.content), "utf-8");
+    fs.writeFileSync(filePath, generateFrontmatter(request.type, request.type === "adr" ? resolveAdrRelated(kgPath, request.metadata) : request.metadata) + stripLeadingFrontmatter(request.content), "utf-8");
   } catch (err: unknown) {
     return { error: "IO_ERROR", message: `Failed to write file: ${err instanceof Error ? err.message : String(err)}` };
   }
@@ -781,7 +814,10 @@ export function registerCaptureTool(server: McpServer, personalScopeSession: Per
               kg_entries: z.array(z.string()).optional(),
             })
             .optional()
-            .describe("adr type only: linked ADRs/lessons/KG entries"),
+            .describe("adr type only: linked ADRs/lessons/KG entries (legacy shape; merged into related_adrs / related_lessons / related_docs)"),
+          related_adrs: z.array(z.string()).optional().describe("adr type only: related ADR IDs (ADR-NNN) or note names; written as unambiguous wikilinks"),
+          related_lessons: z.array(z.string()).optional().describe("adr type only: related lesson paths or note names; written as unambiguous wikilinks"),
+          related_docs: z.array(z.string()).optional().describe("adr type only: other related KG notes (paths or note names); written as unambiguous wikilinks"),
           search_aliases: z.array(z.string()).optional().describe("adr type only: alternate search terms"),
         })
         .describe("Entry metadata"),

@@ -13,6 +13,7 @@ number: XXX  # [FUTURE-AUTO] ADR sequential number (e.g., 001, 002) - will auto-
 created: YYYY-MM-DDTHH:MM:SSZ  # [FUTURE-AUTO] Timestamp when ADR was created (ISO 8601 format: 2024-01-15T14:30:00Z)
 
 status: [Proposed|Accepted|Deprecated|Superseded]  # [MANUAL] Current decision status
+status_category: backlog  # [AUTO] backlog|pending|started|done|cancelled, derived from status (Proposed→backlog, Accepted→done, Superseded→cancelled)
 
 author: [Your Name]  # [FUTURE-AUTO] Filled from git config user.name
 
@@ -26,10 +27,9 @@ git:  # [FUTURE-AUTO] All git metadata detected automatically
 
 implements: [version or null]  # [MANUAL] Optional: Version or feature this applies to (e.g., "v2.0.0")
 
-related:  # [MANUAL] Optional: Links to related ADRs, lessons, KG entries
-  adrs: []  # e.g. ["[[ADR-001-use-postgresql]]", "[[ADR-002-title]]"]
-  lessons: []  # e.g. ["[[Lessons_Learned_filename]]"]
-  kg_entries: []  # e.g. ["[[concept-name]]"]
+related_adrs: []  # [MANUAL] quoted wikilinks, e.g. ["[[ADR-001-use-postgresql|ADR-001]]"]
+related_lessons: []  # e.g. ["[[Lessons_Learned_filename]]"]
+related_docs: []  # other KG notes, e.g. ["[[concept-name]]"]
 
 tags: []  # [MANUAL] Custom tags for searching (e.g., [database, architecture, postgresql])
 

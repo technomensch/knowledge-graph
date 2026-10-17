@@ -33,11 +33,10 @@ category: [architecture|process|patterns|debugging]  # [AUTO-SUGGEST] Command su
 # - patterns: Reusable design patterns, best practices
 # - debugging: Troubleshooting, bug fixes, investigations
 
-related:  # [MANUAL] Optional: Links to related ADRs, enhancements, issues, and lessons
-  adrs: []          # e.g. ["[[ADR-028-rules-md-scaffolding]]"]
-  enhancements: []  # e.g. ["[[ENH-010]]"]
-  issues: []        # e.g. ["[#123](GITHUB_ISSUES_URL/123)"]
-  lessons: []       # e.g. ["[[Lessons_Learned_Plan_File_Dual_Location_Protocol]]"]
+related_adrs: []     # [MANUAL] quoted wikilinks, e.g. ["[[ADR-028-rules-md-scaffolding|ADR-028]]"]
+related_enhs: []     # e.g. ["[[ENH-010-specification|ENH-010]]"]
+related_issues: []   # e.g. ["[[issue-123-description|issue-123]]"]
+related_lessons: []  # e.g. ["[[Lessons_Learned_Plan_File_Dual_Location_Protocol]]"]
 ---
 
 # Lesson Learned: [Title]

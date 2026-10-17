@@ -265,11 +265,9 @@ Call `kg_capture` MCP tool:
     "status": "{status}",
     "number": {NNN},
     "implements": "{$implements_ref}",
-    "related": {
-      "adrs": [],
-      "lessons": [{lesson filenames if provided}],
-      "kg_entries": []
-    },
+    "related_adrs": [],
+    "related_lessons": [{lesson filenames if provided}],
+    "related_docs": [],
     "category": "{category}",
     "tags": ["{category}"],
     "git": {
@@ -284,6 +282,8 @@ Call `kg_capture` MCP tool:
   }
 }
 ```
+
+`related_adrs`, `related_lessons` and `related_docs` take ADR IDs, note names or paths; `kg_capture` resolves them to unambiguous wikilinks and keeps any value it cannot resolve as plain text.
 
 **If `kg_capture` is unavailable or fails:**
 - `--user` (`scope: "user"`): do NOT fall back to a direct Write-tool write. Surface the error and stop — a personal-scope write must never bypass `confirmPersonalScopeAccess`, and a filesystem fallback here would both skip that gate and write to the wrong (project-local) directory. Tell the user `kg_capture` is unreachable and the personal-KG write did not happen.
