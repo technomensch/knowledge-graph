@@ -40,7 +40,7 @@ git diff --name-only "$MERGE_BASE" HEAD -- \
   'knowledge/enhancements/*/ENH-*-specification.md'
 ```
 
-If `DEFAULT_BRANCH` can't be determined (no `main`/`master` branch found), skip Steps 2-4 (they depend on this diff scope) and proceed to Step 5 — Step 5 scans every meta-issue in the repo directly and needs no diff scope. Step 6's condition (a) doesn't need it either, but condition (b) does (re-derives its own `MERGE_BASE` rather than reusing this step's, since each step typically runs as a separate bash invocation — see Step 6 for why) and is silently skipped without one — report the Steps 2-4 portion (and Step 6's condition (b), if applicable) as skipped with that reason at Step 7. Don't guess a fallback branch.
+If `DEFAULT_BRANCH` can't be determined (no `main`/`master` branch found), skip Steps 2-4 (they depend on this diff scope) and proceed to Step 5 — Step 5 scans every meta-issue in the repo directly and needs no diff scope. Step 6's condition (a) doesn't need it either, but condition (b) does (re-derives its own `MERGE_BASE` rather than reusing this step's, since each step typically runs as a separate bash invocation — see Step 6 for why) and is silently skipped without one — report the Steps 2-4 portion (and Step 6's condition (b), if applicable) as skipped with that reason at Step 8. Don't guess a fallback branch.
 
 ### Step 2 — Check `status: resolved` items for supporting evidence
 
@@ -265,9 +265,15 @@ If either is true:
 
 This is advisory and confirm-or-dismiss, same as every other step here — don't auto-write a
 CHANGELOG entry. No new skill, no new top-level gate — extends the existing Gate 6
-(`pre-push-gate.sh`) completion-flag pattern via Step 7 below, same as Steps 2-5.
+(`pre-push-gate.sh`) completion-flag pattern via Step 8 below, same as Steps 2-5.
 
-### Step 7 — Report and write completion flag
+### Step 7 — Undeclared relationships (ENH-062)
+
+Run `bash scripts/relationship-scan.sh` from the repo root. It prints one `UNDECLARED: <idA> <-> <idB> (shared: <path>)` line per pair of issue/ENH docs that reference the same file but declare no relationship in frontmatter. It ignores bare filenames with no directory and hub paths shared by more than 4 docs (override with `REL_SCAN_HUB_MAX`), since neither says anything about two specific docs. Full-repo scan, not diff-scoped: an undeclared relationship can exist between two docs neither of which changed on this branch.
+
+This step flags; it never edits. Present each line to the user and let them confirm or dismiss it. On confirm, add the other doc's ID as a quoted wikilink (for example `"[[ENH-042-specification|ENH-042]]"`) to the most fitting list in both docs (`related_to`, `depends_on`, `blocked_by` or `blocking`; create the key if the doc lacks it). Report dismissed pairs as dismissed, not as failures. If `scripts/relationship-scan.sh` does not exist, skip with that reason at Step 8.
+
+### Step 8 — Report and write completion flag
 
 Present findings the same way `kmg-docs-impact-scan` does — advisory notes for the user to review, never auto-corrections:
 
@@ -305,7 +311,8 @@ Flag filename formula: `/tmp/kmgraph-paperwork-audit-<branch>-<sha>.flag`, detac
 
 | Situation | Behavior |
 |-----------|----------|
-| No `main`/`master` branch found | Skip Steps 2-4 (need the diff scope), still run Step 5 (no diff scope needed), Step 6 (condition (a) still runs; condition (b) is silently skipped — needs `MERGE_BASE`), and Step 7, report the skipped portions with that reason, still write the completion flag (the audit "ran" — it just couldn't determine a diff scope for those portions) |
+| No `main`/`master` branch found | Skip Steps 2-4 (need the diff scope), still run Step 5 (no diff scope needed), Step 6 (condition (a) still runs; condition (b) is silently skipped — needs `MERGE_BASE`), Step 7 (relationship scan, no diff scope needed), and Step 8, report the skipped portions with that reason, still write the completion flag (the audit "ran" — it just couldn't determine a diff scope for those portions) |
+| `scripts/relationship-scan.sh` missing | Skip Step 7 with that reason; do not fail the audit. |
 | No issue/ENH docs changed on this branch | Skip Steps 2-3 silently, still run Steps 4-6, still write the flag |
 | `status:` field missing or unrecognized value entirely | Skip that doc for Steps 2-3, don't guess an intended status; note it as a separate, smaller finding ("`issue-N` has no recognized `status:` value") |
 | Multiple session summaries exist for the same branch | Use the most recently modified one; don't flag older ones as stale duplicates — that's a different concern, not this skill's job |
