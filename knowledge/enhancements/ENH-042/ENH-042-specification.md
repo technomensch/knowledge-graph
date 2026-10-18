@@ -91,3 +91,4 @@ This ENH documents the finding; it does not itself implement the fix (no plan/br
 
 - [issue-41](../../issues/issue-41/issue-41-description.md) — issue-41's spec cross-references this item.
 - [ENH-050](../ENH-050/ENH-050-specification.md) — ENH-050's spec cross-references this enhancement.
+- [ENH-059](../ENH-059/ENH-059-specification.md) and [ENH-062](../ENH-062/ENH-062-specification.md) — use this ENH's spec as the worked example for the frontmatter link form; no dependency on this ENH.

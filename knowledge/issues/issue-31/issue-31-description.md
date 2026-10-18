@@ -122,3 +122,7 @@ hardcodes the old path.
 ## Resolution (2026-08-22)
 
 Fixed — `commands/kmg-handoff.md`'s default output path corrected from `./handoff-packages/$(date +%Y-%m-%d)` to `knowledge/handoffs/$(date +%Y-%m-%d)` (and the matching `--output-dir` doc line). The pre-existing stray `./handoff-packages/*` directories at the repo root (count re-derived live at execution time, not copied from planning-time notes — ADR-059) are left untouched — gitignored, never committed, informational only; disposition (migrate vs. delete) is left to the user's own discretion, not resolved by this fix, per this issue's own "Open Questions" framing. Batched with issue-30 in one PR (same file, non-conflicting). GitHub issue #200 close is a separate, explicit follow-up.
+
+## Related
+
+- [issue-38](../issue-38/issue-38-description.md) — the same migration-verification gap, surfacing a third time; cites this issue.

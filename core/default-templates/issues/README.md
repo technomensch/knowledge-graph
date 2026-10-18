@@ -31,6 +31,22 @@ Tracking of investigated bugs, defects, and meta-issues.
 
 ---
 
+## Status Category
+
+Every document's free-text `status` maps to one `status_category`. It is stored in frontmatter and kept in sync by `kg_upgrade` (frontmatter-schema step 4):
+
+| Category | Meaning | Typical statuses |
+|---|---|---|
+| backlog | Captured, not committed to | proposed, draft, stub, deferred |
+| pending | Committed, not begun | open, tracked, defined |
+| started | Actively worked | in-progress, designed, partially-implemented |
+| done | Finished successfully | resolved, implemented, closed, fixed, accepted |
+| cancelled | Abandoned | withdrawn, superseded |
+
+Unrecognized statuses are treated as `pending`, never `done` or `cancelled`.
+
+---
+
 ## Field Guide
 
 **Header Fields (all manual):**

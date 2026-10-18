@@ -9,6 +9,30 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
+## [0.7.11] — 2026-10-17
+
+### Added
+- `frontmatter-schema` category in `kg_upgrade` (ENH-062, #241): migrates relationship fields to a flat canonical schema in four separately approved steps — 1 underscore key spelling and string IDs, 2 unambiguous wikilinks, 3 flatten ADR/lesson `related:` maps, 4 `status_category`. Inspect-first (never writes), its own `confirmFrontmatterSchema` flag plus an explicit `frontmatterSteps` list (never covered by `confirmBackfix`), `.bak` copies, verify-before-write via the new `yaml` dependency, and a graph-level schema marker (`.kmgraph-frontmatter-schema`) with a schema floor.
+- Relationship values are written as quoted wikilinks with the short ID as label (ENH-059): they render as links in Obsidian's Properties panel and create backlinks and graph edges; `tags:` are untouched; a link is only written when its target is unique in the graph.
+- `status_category` stored field (backlog, pending, started, done, cancelled) derived from `status`, in `kg_capture` ADR output and via migration step 4.
+- New `kmg-paperwork-audit` Step 7: flags issue/ENH pairs that reference the same file but declare no relationship. The scan runs inside the skill (no script, so it works in any project), scans the graph that `kg_resolve` returns, ignores common files, bare filenames and hub paths shared by more than 4 docs, groups the results by shared file when there are many, and warns that a dismissed pair is not remembered (the same pairs reappear until a relationship is declared).
+- New read-only `kg_relationship_scan` MCP tool (ENH-062): the Step 7 relationship scan for platforms that do not run the skill. It scans the graph that `kg_resolve` returns and returns the flagged issue/ENH pairs as data (with the shared file and each note's relative path); `hubMax` (2 to 100, default 4) sets the hub limit, and it warns that a dismissed pair is not remembered. Unlike the skill it has no git-top-level fallback and does not port the skill's SIGPIPE bug on huge frontmatter; parity tests check it against the skill's bash.
+- New relationship fields on newly created issue/ENH docs: `blocked_by`, `blocking`, `depends_on`, `related_to`.
+- The `frontmatter-schema` migration copes with notes that predate the plugin: notes or fields it cannot convert (unusual `related:` shapes, a multi-line `status`) are left exactly as they are and listed under "needs your attention" instead of blocking the run; a plain `related:` list becomes `related_docs`; files with no frontmatter or CRLF line endings are counted as ignored; a field is left as it is when a real YAML parse disagrees with the tool's reading of it or when it has comments; and a safety check refuses any rewrite that changes the number of relationship entries or cuts an entry short (the same check runs during the dry run).
+
+### Changed
+- `github-issue` is now `github_issue` in new issue/ENH frontmatter (`kmg-start-issue-tracking`); both spellings are still read for one release.
+- ADR frontmatter written by `kg_capture`: the nested `related:` map is replaced by flat `related_adrs`, `related_lessons`, `related_docs` lists (the legacy input shape is still accepted). ADR and lesson templates match.
+- `kmg-paperwork-audit`: the report step is now Step 8.
+
+### Fixed
+- `scripts/validate-plugin.sh` (a manual pre-publish check) failed on a clean checkout: it scanned the whole repo, including the project's own notes, and four of its six rules no longer matched anything useful. It now checks only the tracked files that ship to users (not `knowledge/`) for two things, private project names and the maintainer's home path, and fails loudly if `git grep` itself errors. `docs/reference/hooks.md` no longer claims installers or commands call it (issue-62, #265).
+- Dependency security updates (no code change, within the version ranges already allowed): the MCP server now reports no known vulnerabilities in its runtime dependencies (including critical ones in `proxy-addr` and the MCP SDK, now 1.32.1), and the server bundle is rebuilt. The docs toolchain lockfile is updated the same way. The MCP server's test tool moved from Jest 29 to Jest 30 (dev-only, never shipped; all tests unchanged), which clears a `braces` advisory in its test tooling. Six alerts remain open: `braces` and `sprintf-js` have no patched release anywhere yet, and `tinypool` and `postcss-selector-parser` are held back by Docusaurus's own dependency ranges (Docusaurus is already on its latest release).
+- Docs home page: removed an invalid paragraph-inside-paragraph in the hero block (MDX wrapped a multi-line `<p>` a second time), which made the browser log six React hydration errors on every load. The page looks the same.
+
+### Migration
+- Run `kg_upgrade` (or `/kmgraph:kmg-upgrade`), review the dry run for `frontmatter-schema`, and approve steps one at a time. Nothing is applied without your approval.
+
 ## [0.7.10] — 2026-09-15
 
 ### Added
@@ -55,7 +79,7 @@ v0.7.8 was never cut as its own release (version files stayed at 0.7.7 while tha
 - `kg_extract` MCP tool — cross-platform equivalent of `kmg-backfill`, for Codex/Gemini users without Claude Code subagent spawning. Read-only; never writes. Closes ENH-025.
 
 ### Removed
-- `kmg-update-graph`, `kmg-sync-all`, `sync-all-agent` — confirmed-dead orchestration pipeline, inherited unmodified from an unrelated prior project (`optimize-my-resume`), zero confirmed real-world use ([issue-37](knowledge/issues/issue-37/issue-37-description.md)). Superseded by `kmg-backfill`. See ADR-071.
+- `kmg-update-graph`, `kmg-sync-all`, `sync-all-agent` — confirmed-dead orchestration pipeline, inherited unmodified from an unrelated prior project, zero confirmed real-world use ([issue-37](knowledge/issues/issue-37/issue-37-description.md)). Superseded by `kmg-backfill`. See ADR-071.
 
 ### Fixed
 - `kmg-init` Step 1.10's `sources[]` array now actually detects `knowledge/lessons-learned/` and `knowledge/decisions/`, and no longer silently skips the whole step when only those (plus chat-history) are present — previously never scanned despite `knowledge-extractor.md` documenting otherwise (real bug, found while validating ENH-034/035 in ADR-071).

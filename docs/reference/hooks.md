@@ -73,7 +73,7 @@ The other eight scripts are always active once KMGraph is installed. Individual 
 
 ## Script Locations
 
-All hook scripts reside in `scripts/` relative to the plugin root. Additional scripts in that directory (`fuzzy-search-archive.sh`, `install-vscode.sh`, `prepare-mcp.sh`, `validate-plugin.sh`) are invoked by installer and CLI commands, not by the hook system.
+All hook scripts reside in `scripts/` relative to the plugin root. Additional scripts in that directory (`fuzzy-search-archive.sh`, `install-vscode.sh`, `prepare-mcp.sh`) are invoked by installer and CLI commands, not by the hook system. `validate-plugin.sh` is a manual pre-publish check that nothing calls automatically; run it by hand with `bash scripts/validate-plugin.sh`.
 
 ## Knowledge Graph Resolution in Hooks
 

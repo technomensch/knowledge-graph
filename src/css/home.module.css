@@ -49,7 +49,9 @@
 .heroSubtext {
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.72);
-  margin: 0;
+  /* Bottom margin kept from when MDX wrapped this text in a second <p>
+     (invalid nesting, React error #418): the box height is unchanged. */
+  margin: 0 0 var(--ifm-paragraph-margin-bottom);
 }
 
 .heroSubtext code {

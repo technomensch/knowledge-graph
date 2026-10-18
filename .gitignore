@@ -101,3 +101,8 @@ mintlify-preview/
 
 # Git worktrees (local only)
 .worktrees/
+
+# Local tool folders (not part of the project)
+copilot/
+nimbalyst-local/
+.claudian/

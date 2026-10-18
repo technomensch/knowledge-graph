@@ -125,3 +125,4 @@ Does that sound right, or should this go somewhere else?
   of `kmg-capture-router` (per ADR-057's third amendment) as believed-not-original-intent,
   the working premise for broadening the router's trigger surface back out. Backlinked
   2026-08-19.
+- [issue-18](../../issues/issue-18/issue-18-description.md) — cites this ENH by number in a lead that could not be confirmed.

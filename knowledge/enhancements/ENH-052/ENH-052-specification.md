@@ -263,3 +263,4 @@ Resolves the last open blocker noted above. Two rounds of research first:
   (both already cited above), [issue-19](../../issues/issue-19/issue-19-description.md)
   also touches this command's workflow (no prior-art/provenance enforcement) —
   same surface, FYI.
+- [ENH-059](../ENH-059/ENH-059-specification.md) — a link-resolution check could become one of this ENH's gates. [ENH-062](../ENH-062/ENH-062-specification.md) — its relationship schema is a natural input to this ENH's consistency checks, and its paperwork-audit Step 7 (undeclared relationships) extends the audit this ENH created.

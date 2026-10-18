@@ -45,6 +45,21 @@ This enables the AI assistant to query the KG via Obsidian's API, which supports
 | **Templater** | Use KMGraph templates directly inside Obsidian |
 | **Graph Analysis** | Visualize connections between lessons, ADRs, and patterns |
 
+## Relationship links in frontmatter
+
+KMGraph writes relationships between entries (related ADRs, enhancements, issues and lessons) as quoted wikilinks in flat frontmatter lists, with the short ID as the display label:
+
+```yaml
+related_enhs: ["[[ENH-042-specification|ENH-042]]"]
+related_adrs: ["[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth|ADR-028]]"]
+tags: [obsidian, links]
+```
+
+- **Tags stay as they are.** `tags:` remain a plain list and are never rewritten.
+- **Links work in Obsidian.** Wikilinks in frontmatter render as clickable links in the Properties panel, and Obsidian lists them as backlinks and draws graph edges for them (checked with the vault opened at the repository root; not yet checked with the vault opened at `knowledge/`).
+- **No ambiguous links.** A link is written only when its target name is unique in the graph. If a name is shared (for example several `README` files), the shortest unique path ending is used; if no unique target exists, the value stays plain text and is reported.
+- **Migrating an existing graph.** Run `kg_upgrade`, review the dry run for the `frontmatter-schema` category, and approve its steps one at a time. A `.bak` copy is kept beside each rewritten file.
+
 ## Related
 
 - [Integrate with NotebookLM](./integrate-notebooklm.md) — AI-powered Q&A over the knowledge graph

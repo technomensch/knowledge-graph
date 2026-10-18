@@ -15828,10 +15828,9 @@ var init_types = __esm({
     CursorSchema = string2();
     TaskCreationParamsSchema = looseObject({
       /**
-       * Time in milliseconds to keep task results available after completion.
-       * If null, the task has unlimited lifetime until manually cleaned up.
+       * Requested duration in milliseconds to retain task from creation.
        */
-      ttl: union([number2(), _null3()]).optional(),
+      ttl: number2().optional(),
       /**
        * Time in milliseconds to wait between task status requests.
        */
@@ -16130,7 +16129,11 @@ var init_types = __esm({
       /**
        * Present if the client supports task creation.
        */
-      tasks: ClientTasksCapabilitySchema.optional()
+      tasks: ClientTasksCapabilitySchema.optional(),
+      /**
+       * Extensions that the client supports. Keys are extension identifiers (vendor-prefix/extension-name).
+       */
+      extensions: record(string2(), AssertObjectSchema).optional()
     });
     InitializeRequestParamsSchema = BaseRequestParamsSchema.extend({
       /**
@@ -16191,7 +16194,11 @@ var init_types = __esm({
       /**
        * Present if the server supports task creation.
        */
-      tasks: ServerTasksCapabilitySchema.optional()
+      tasks: ServerTasksCapabilitySchema.optional(),
+      /**
+       * Extensions that the server supports. Keys are extension identifiers (vendor-prefix/extension-name).
+       */
+      extensions: record(string2(), AssertObjectSchema).optional()
     });
     InitializeResultSchema = ResultSchema.extend({
       /**
@@ -16383,6 +16390,12 @@ var init_types = __esm({
        * The MIME type of this resource, if known.
        */
       mimeType: optional(string2()),
+      /**
+       * The size of the raw resource content, in bytes (i.e., before base64 encoding or any tokenization), if known.
+       *
+       * This can be used by Hosts to display file sizes and estimate context window usage.
+       */
+      size: optional(number2()),
       /**
        * Optional annotations for the client.
        */
@@ -17332,12 +17345,21 @@ function deserializeMessage(line) {
 function serializeMessage(message) {
   return JSON.stringify(message) + "\n";
 }
-var ReadBuffer;
+var STDIO_DEFAULT_MAX_BUFFER_SIZE, ReadBuffer;
 var init_stdio = __esm({
   "node_modules/@modelcontextprotocol/sdk/dist/esm/shared/stdio.js"() {
     init_types();
+    STDIO_DEFAULT_MAX_BUFFER_SIZE = 10 * 1024 * 1024;
     ReadBuffer = class {
+      constructor(options) {
+        this._maxBufferSize = options?.maxBufferSize ?? STDIO_DEFAULT_MAX_BUFFER_SIZE;
+      }
       append(chunk) {
+        const newSize = (this._buffer?.length ?? 0) + chunk.length;
+        if (newSize > this._maxBufferSize) {
+          this.clear();
+          throw new Error(`ReadBuffer exceeded maximum size of ${this._maxBufferSize} bytes`);
+        }
         this._buffer = this._buffer ? Buffer.concat([this._buffer, chunk]) : chunk;
       }
       readMessage() {
@@ -17370,18 +17392,24 @@ var init_stdio2 = __esm({
     import_node_process = __toESM(require("node:process"), 1);
     init_stdio();
     StdioServerTransport = class {
-      constructor(_stdin = import_node_process.default.stdin, _stdout = import_node_process.default.stdout) {
+      constructor(_stdin = import_node_process.default.stdin, _stdout = import_node_process.default.stdout, options) {
         this._stdin = _stdin;
         this._stdout = _stdout;
-        this._readBuffer = new ReadBuffer();
         this._started = false;
         this._ondata = (chunk) => {
-          this._readBuffer.append(chunk);
-          this.processReadBuffer();
+          try {
+            this._readBuffer.append(chunk);
+            this.processReadBuffer();
+          } catch (error48) {
+            this.onerror?.(error48);
+            this.close().catch(() => {
+            });
+          }
         };
         this._onerror = (error48) => {
           this.onerror?.(error48);
         };
+        this._readBuffer = new ReadBuffer({ maxBufferSize: options?.maxBufferSize });
       }
       /**
        * Starts listening for messages on stdin.
@@ -21564,16 +21592,32 @@ function normalizeObjectSchema(schema) {
   }
   return void 0;
 }
+function getDotPath(path11) {
+  if (path11.length === 0) {
+    return "object root";
+  }
+  return path11.reduce((acc, seg, index) => {
+    if (index === 0) {
+      return String(seg);
+    }
+    if (typeof seg === "number") {
+      return `${acc}[${seg}]`;
+    }
+    return `${acc}.${seg}`;
+  }, "");
+}
 function getParseErrorMessage(error48) {
   if (error48 && typeof error48 === "object") {
+    if ("issues" in error48 && Array.isArray(error48.issues) && error48.issues.length > 0) {
+      return error48.issues.map((i) => {
+        if (!i.path?.length) {
+          return i.message;
+        }
+        return `${i.message} at ${getDotPath(i.path)}`;
+      }).join("\n");
+    }
     if ("message" in error48 && typeof error48.message === "string") {
       return error48.message;
-    }
-    if ("issues" in error48 && Array.isArray(error48.issues) && error48.issues.length > 0) {
-      const firstIssue = error48.issues[0];
-      if (firstIssue && typeof firstIssue === "object" && "message" in firstIssue) {
-        return String(firstIssue.message);
-      }
     }
     try {
       return JSON.stringify(error48);
@@ -23328,6 +23372,9 @@ var init_protocol = __esm({
           this.setRequestHandler(GetTaskPayloadRequestSchema, async (request, extra) => {
             const handleTaskResult = async () => {
               const taskId = request.params.taskId;
+              if (!await this._taskStore.getTask(taskId, extra.sessionId)) {
+                throw new McpError(ErrorCode.InvalidParams, `Task not found: ${taskId}`);
+              }
               if (this._taskMessageQueue) {
                 let queuedMessage;
                 while (queuedMessage = await this._taskMessageQueue.dequeue(taskId, extra.sessionId)) {
@@ -23358,12 +23405,12 @@ var init_protocol = __esm({
                 throw new McpError(ErrorCode.InvalidParams, `Task not found: ${taskId}`);
               }
               if (!isTerminal(task.status)) {
-                await this._waitForTaskUpdate(taskId, extra.signal);
+                await this._waitForTaskUpdate(taskId, extra.signal, extra.sessionId);
                 return await handleTaskResult();
               }
               if (isTerminal(task.status)) {
                 const result = await this._taskStore.getTaskResult(taskId, extra.sessionId);
-                this._clearTaskQueue(taskId);
+                this._clearTaskQueue(taskId, extra.sessionId);
                 return {
                   ...result,
                   _meta: {
@@ -23400,7 +23447,7 @@ var init_protocol = __esm({
                 throw new McpError(ErrorCode.InvalidParams, `Cannot cancel task in terminal status: ${task.status}`);
               }
               await this._taskStore.updateTaskStatus(request.params.taskId, "cancelled", "Client cancelled task execution.", extra.sessionId);
-              this._clearTaskQueue(request.params.taskId);
+              this._clearTaskQueue(request.params.taskId, extra.sessionId);
               const cancelledTask = await this._taskStore.getTask(request.params.taskId, extra.sessionId);
               if (!cancelledTask) {
                 throw new McpError(ErrorCode.InvalidParams, `Task not found after cancellation: ${request.params.taskId}`);
@@ -23499,6 +23546,10 @@ var init_protocol = __esm({
         this._progressHandlers.clear();
         this._taskProgressTokens.clear();
         this._pendingDebouncedNotifications.clear();
+        for (const info of this._timeoutInfo.values()) {
+          clearTimeout(info.timeoutId);
+        }
+        this._timeoutInfo.clear();
         for (const controller of this._requestHandlerAbortControllers.values()) {
           controller.abort();
         }
@@ -23524,6 +23575,19 @@ var init_protocol = __esm({
         const handler = this._requestHandlers.get(request.method) ?? this.fallbackRequestHandler;
         const capturedTransport = this._transport;
         const relatedTaskId = request.params?._meta?.[RELATED_TASK_META_KEY]?.taskId;
+        const sessionId = capturedTransport?.sessionId;
+        const store = this._taskStore;
+        let relatedTaskFound = true;
+        let relatedTaskLookup;
+        if (relatedTaskId && store && this._taskMessageQueue && sessionId !== void 0) {
+          relatedTaskFound = false;
+          relatedTaskLookup = (async () => {
+            if (!await store.getTask(relatedTaskId, sessionId)) {
+              throw new McpError(ErrorCode.InvalidParams, `Task not found: ${relatedTaskId}`);
+            }
+            relatedTaskFound = true;
+          })();
+        }
         if (handler === void 0) {
           const errorResponse2 = {
             jsonrpc: "2.0",
@@ -23533,7 +23597,10 @@ var init_protocol = __esm({
               message: "Method not found"
             }
           };
-          if (relatedTaskId && this._taskMessageQueue) {
+          if (relatedTaskId && relatedTaskLookup) {
+            const queuedError = { type: "error", message: errorResponse2, timestamp: Date.now() };
+            relatedTaskLookup.then(() => this._enqueueTaskMessage(relatedTaskId, queuedError, sessionId), () => capturedTransport?.send(errorResponse2)).catch((error48) => this._onerror(new Error(`Failed to send an error response: ${error48}`)));
+          } else if (relatedTaskId && this._taskMessageQueue) {
             this._enqueueTaskMessage(relatedTaskId, {
               type: "error",
               message: errorResponse2,
@@ -23584,7 +23651,10 @@ var init_protocol = __esm({
           closeSSEStream: extra?.closeSSEStream,
           closeStandaloneSSEStream: extra?.closeStandaloneSSEStream
         };
-        Promise.resolve().then(() => {
+        (relatedTaskLookup ?? Promise.resolve()).then(() => {
+          if (relatedTaskLookup && abortController.signal.aborted) {
+            throw new McpError(ErrorCode.ConnectionClosed, "Request was cancelled");
+          }
           if (taskCreationParams) {
             this.assertTaskHandlerCapability(request.method);
           }
@@ -23619,7 +23689,7 @@ var init_protocol = __esm({
               ...error48["data"] !== void 0 && { data: error48["data"] }
             }
           };
-          if (relatedTaskId && this._taskMessageQueue) {
+          if (relatedTaskId && this._taskMessageQueue && relatedTaskFound) {
             await this._enqueueTaskMessage(relatedTaskId, {
               type: "error",
               message: errorResponse2,
@@ -23629,7 +23699,9 @@ var init_protocol = __esm({
             await capturedTransport?.send(errorResponse2);
           }
         }).catch((error48) => this._onerror(new Error(`Failed to send response: ${error48}`))).finally(() => {
-          this._requestHandlerAbortControllers.delete(request.id);
+          if (this._requestHandlerAbortControllers.get(request.id) === abortController) {
+            this._requestHandlerAbortControllers.delete(request.id);
+          }
         });
       }
       _onprogress(notification) {
@@ -24097,7 +24169,7 @@ var init_protocol = __esm({
           throw new Error("Cannot enqueue task message: taskStore and taskMessageQueue are not configured");
         }
         const maxQueueSize = this._options?.maxTaskQueueSize;
-        await this._taskMessageQueue.enqueue(taskId, message, sessionId, maxQueueSize);
+        await this._taskMessageQueue.enqueue(taskId, message, sessionId ?? this._transport?.sessionId, maxQueueSize);
       }
       /**
        * Clears the message queue for a task and rejects any pending request resolvers.
@@ -24126,12 +24198,13 @@ var init_protocol = __esm({
        * Uses polling to check for updates at the task's configured poll interval.
        * @param taskId The task ID to wait for
        * @param signal Abort signal to cancel the wait
+       * @param sessionId Session of the request that waits, passed to the task store
        * @returns Promise that resolves when an update occurs or rejects if aborted
        */
-      async _waitForTaskUpdate(taskId, signal) {
+      async _waitForTaskUpdate(taskId, signal, sessionId) {
         let interval = this._options?.defaultTaskPollInterval ?? 1e3;
         try {
-          const task = await this._taskStore?.getTask(taskId);
+          const task = await this._taskStore?.getTask(taskId, sessionId);
           if (task?.pollInterval) {
             interval = task.pollInterval;
           }
@@ -27294,10 +27367,14 @@ var require_utils = __commonJS({
     "use strict";
     var isUUID = RegExp.prototype.test.bind(/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iu);
     var isIPv4 = RegExp.prototype.test.bind(/^(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)$/u);
+    var isPort = RegExp.prototype.test.bind(/^\d*$/u);
     var isHexPair = RegExp.prototype.test.bind(/^[\da-f]{2}$/iu);
     var isUnreserved = RegExp.prototype.test.bind(/^[\da-z\-._~]$/iu);
-    var isPathCharacter = RegExp.prototype.test.bind(/^[\da-z\-._~!$&'()*+,;=:@/]$/iu);
-    var isQueryFragmentCharacter = RegExp.prototype.test.bind(/^[\da-z\-._~!$&'()*+,;=:@/?]$/iu);
+    var isPathCharacter = RegExp.prototype.test.bind(/^[A-Za-z0-9\-._~!$&'()*+,;=:@/]$/u);
+    var isQueryFragmentCharacter = RegExp.prototype.test.bind(/^[A-Za-z0-9\-._~!$&'()*+,;=:@/?]$/u);
+    var isUserinfoCharacter = RegExp.prototype.test.bind(/^[A-Za-z0-9\-._~!$&'()*+,;=:]$/u);
+    var isRegNameCharacter = RegExp.prototype.test.bind(/^[A-Za-z0-9\-._~!$&'()*+,;=]$/u);
+    var isLiteralRegName = RegExp.prototype.test.bind(/^[A-Za-z0-9\-._~!$&'()*+,;=]*$/u);
     function stringArrayToHexStripped(input) {
       let acc = "";
       let code = 0;
@@ -27322,91 +27399,110 @@ var require_utils = __commonJS({
       }
       return acc;
     }
+    var isHextet = RegExp.prototype.test.bind(/^[\dA-Fa-f]{1,4}$/);
+    var isIPvFuture = RegExp.prototype.test.bind(/^[vV][\dA-Fa-f]+\.[A-Za-z\d\-._~!$&'()*+,;=:]+$/);
+    var isZoneCharacter = RegExp.prototype.test.bind(/^[A-Za-z\d\-._~]$/);
     var nonSimpleDomain = RegExp.prototype.test.bind(/[^!"$&'()*+,\-.;=_`a-z{}~]/u);
-    function consumeIsZone(buffer) {
-      buffer.length = 0;
+    var nonSimpleDomainChars = RegExp.prototype.test.bind(/[^\d!"$&'()*+,\-.;=_`a-z{}~]/u);
+    var numericLastLabel = RegExp.prototype.test.bind(/(?:^|\.)\d+$/u);
+    function nonSimpleMailtoDomain(domain2) {
+      return nonSimpleDomainChars(domain2) || numericLastLabel(domain2);
+    }
+    function isZoneIdentifier(zone) {
+      if (zone.length === 0) return false;
+      for (let i = 0; i < zone.length; i++) {
+        if (isZoneCharacter(zone[i])) continue;
+        if (zone[i] === "%" && i + 2 < zone.length && isHexPair(zone.slice(i + 1, i + 3))) {
+          i += 2;
+          continue;
+        }
+        return false;
+      }
       return true;
     }
-    function consumeHextets(buffer, address, output) {
-      if (buffer.length) {
-        const hex3 = stringArrayToHexStripped(buffer);
-        if (hex3 !== "") {
-          address.push(hex3);
+    function compressIPv6ZeroRun(hextets) {
+      let bestStart = -1;
+      let bestLength = 0;
+      let runStart = -1;
+      let runLength = 0;
+      for (let i = 0; i < hextets.length; i++) {
+        if (hextets[i] === "0") {
+          if (runStart === -1) runStart = i;
+          runLength++;
+          if (runLength > bestLength) {
+            bestLength = runLength;
+            bestStart = runStart;
+          }
         } else {
-          output.error = true;
-          return false;
+          runStart = -1;
+          runLength = 0;
         }
-        buffer.length = 0;
       }
-      return true;
+      if (bestLength < 2) return hextets.join(":");
+      const head = hextets.slice(0, bestStart).join(":");
+      const tail = hextets.slice(bestStart + bestLength).join(":");
+      return head + "::" + tail;
     }
-    function getIPV6(input) {
-      let tokenCount = 0;
-      const output = { error: false, address: "", zone: "" };
-      const address = [];
-      const buffer = [];
-      let endipv6Encountered = false;
-      let endIpv6 = false;
-      let consume = consumeHextets;
-      for (let i = 0; i < input.length; i++) {
-        const cursor = input[i];
-        if (cursor === "[" || cursor === "]") {
-          continue;
-        }
-        if (cursor === ":") {
-          if (endipv6Encountered === true) {
-            endIpv6 = true;
-          }
-          if (!consume(buffer, address, output)) {
-            break;
-          }
-          if (++tokenCount > 7) {
-            output.error = true;
-            break;
-          }
-          if (i > 0 && input[i - 1] === ":") {
-            endipv6Encountered = true;
-          }
-          address.push(":");
-          continue;
-        } else if (cursor === "%") {
-          if (!consume(buffer, address, output)) {
-            break;
-          }
-          consume = consumeIsZone;
-        } else {
-          buffer.push(cursor);
-          continue;
-        }
+    function normalizeIPv6Address(input) {
+      const compression = input.indexOf("::");
+      if (compression !== -1 && input.indexOf("::", compression + 1) !== -1) return void 0;
+      const left = compression === -1 ? input.split(":") : input.slice(0, compression).split(":");
+      const right = compression === -1 ? [] : input.slice(compression + 2).split(":");
+      if (compression !== -1) {
+        if (left.length === 1 && left[0] === "") left.length = 0;
+        if (right.length === 1 && right[0] === "") right.length = 0;
       }
-      if (buffer.length) {
-        if (consume === consumeIsZone) {
-          output.zone = buffer.join("");
-        } else if (endIpv6) {
-          address.push(buffer.join(""));
-        } else {
-          address.push(stringArrayToHexStripped(buffer));
+      const parts = left.concat(right);
+      let hextetCount = 0;
+      for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        if (part === "") return void 0;
+        if (part.indexOf(".") !== -1) {
+          if (i !== parts.length - 1 || compression !== -1 && right.length === 0 || !isIPv4(part)) return void 0;
+          hextetCount += 2;
+          continue;
         }
+        if (!isHextet(part)) return void 0;
+        parts[i] = parseInt(part, 16).toString(16);
+        hextetCount++;
       }
-      output.address = address.join("");
-      return output;
+      if (compression === -1) {
+        if (hextetCount !== 8) return void 0;
+        return compressIPv6ZeroRun(parts);
+      }
+      if (hextetCount >= 8) return void 0;
+      const expanded = parts.slice(0, left.length);
+      for (let i = hextetCount; i < 8; i++) expanded.push("0");
+      for (let i = left.length; i < parts.length; i++) expanded.push(parts[i]);
+      return compressIPv6ZeroRun(expanded);
     }
     function normalizeIPv6(host) {
-      if (findToken(host, ":") < 2) {
-        return { host, isIPV6: false };
+      const bracketed = host[0] === "[" && host[host.length - 1] === "]";
+      const hasBracket = host[0] === "[" || host[host.length - 1] === "]";
+      if (hasBracket && !bracketed) return { host, isIPV6: false, error: true };
+      let input = bracketed ? host.slice(1, -1) : host;
+      if (bracketed && isIPvFuture(input)) {
+        input = input.toLowerCase();
+        return { host: `[${input}]`, escapedHost: input, isIPV6: false, isIPVFuture: true };
       }
-      const ipv63 = getIPV6(host);
-      if (!ipv63.error) {
-        let newHost = ipv63.address;
-        let escapedHost = ipv63.address;
-        if (ipv63.zone) {
-          newHost += "%" + ipv63.zone;
-          escapedHost += "%25" + ipv63.zone;
-        }
-        return { host: newHost, isIPV6: true, escapedHost };
-      } else {
-        return { host, isIPV6: false };
+      if (findToken(input, ":") < 2) {
+        return { host, isIPV6: false, error: bracketed };
       }
+      let zoneIdentifier = "";
+      const zoneSeparator = input.indexOf("%");
+      if (zoneSeparator !== -1) {
+        const separatorLength = input.slice(zoneSeparator, zoneSeparator + 3).toLowerCase() === "%25" ? 3 : 1;
+        zoneIdentifier = input.slice(zoneSeparator + separatorLength);
+        if (!isZoneIdentifier(zoneIdentifier)) return { host, isIPV6: false, error: true };
+        input = input.slice(0, zoneSeparator);
+      }
+      const address = normalizeIPv6Address(input);
+      if (address === void 0) return { host, isIPV6: false, error: true };
+      return {
+        host: address + (zoneIdentifier ? "%" + zoneIdentifier : ""),
+        escapedHost: address + (zoneIdentifier ? "%25" + zoneIdentifier : ""),
+        isIPV6: true
+      };
     }
     function findToken(str, token) {
       let ind = 0;
@@ -27490,13 +27586,15 @@ var require_utils = __commonJS({
       }
       return output.join("");
     }
-    var HOST_DELIMS = { "@": "%40", "/": "%2F", "?": "%3F", "#": "%23", ":": "%3A" };
-    var HOST_DELIM_RE = /[@/?#:]/g;
-    var HOST_DELIM_NO_COLON_RE = /[@/?#]/g;
-    function reescapeHostDelimiters(host, isIP) {
-      const re = isIP ? HOST_DELIM_NO_COLON_RE : HOST_DELIM_RE;
-      re.lastIndex = 0;
-      return host.replace(re, (ch) => HOST_DELIMS[ch]);
+    var IP_HOST_DELIMS = { "@": "%40", "/": "%2F", "?": "%3F", "#": "%23" };
+    var IP_HOST_DELIM_RE = /[@/?#]/g;
+    function encodeHost(host, isIP, allowNonAscii = false) {
+      if (!isIP) {
+        if (isLiteralRegName(host)) return host;
+        return encodeComponent(host, isRegNameCharacter, allowNonAscii);
+      }
+      IP_HOST_DELIM_RE.lastIndex = 0;
+      return host.replace(IP_HOST_DELIM_RE, (ch) => IP_HOST_DELIMS[ch]);
     }
     function normalizePercentEncoding(input, decodeUnreserved = false) {
       if (input.indexOf("%") === -1) {
@@ -27582,6 +27680,45 @@ var require_utils = __commonJS({
       }
       return output;
     }
+    function serializePathEncoding(input, pathNoScheme = false) {
+      let output = "";
+      let firstSegment = pathNoScheme && input[0] !== "/";
+      for (let i = 0; i < input.length; i++) {
+        const ch = input[i];
+        if (ch === "%" && i + 2 < input.length) {
+          const hex3 = input.slice(i + 1, i + 3);
+          if (isHexPair(hex3)) {
+            output += "%" + hex3.toUpperCase();
+            i += 2;
+            continue;
+          }
+        }
+        if (ch === "/") {
+          firstSegment = false;
+        }
+        if (isPathCharacter(ch) && (ch !== ":" || !firstSegment)) {
+          output += ch;
+        } else {
+          const code = input.charCodeAt(i);
+          if (code < 128) {
+            output += BYTE_HEX[code];
+          } else if (code < 55296 || code > 57343) {
+            output += percentEncodeNonAscii(code);
+          } else if (code <= 56319 && i + 1 < input.length) {
+            const low = input.charCodeAt(i + 1);
+            if (low >= 56320 && low <= 57343) {
+              output += percentEncodeNonAscii(65536 + (code - 55296 << 10) + (low - 56320));
+              i++;
+            } else {
+              output += percentEncodeNonAscii(65533);
+            }
+          } else {
+            output += percentEncodeNonAscii(65533);
+          }
+        }
+      }
+      return output;
+    }
     function normalizeQueryFragmentEncoding(input) {
       let output = "";
       for (let i = 0; i < input.length; i++) {
@@ -27623,6 +27760,50 @@ var require_utils = __commonJS({
       }
       return output;
     }
+    function encodeComponent(input, isAllowed, allowNonAscii = false) {
+      let output = "";
+      for (let i = 0; i < input.length; i++) {
+        const ch = input[i];
+        if (ch === "%" && i + 2 < input.length) {
+          const hex3 = input.slice(i + 1, i + 3);
+          if (isHexPair(hex3)) {
+            output += "%" + hex3.toUpperCase();
+            i += 2;
+            continue;
+          }
+        }
+        if (isAllowed(ch)) {
+          output += ch;
+        } else {
+          const code = input.charCodeAt(i);
+          if (code < 128) {
+            output += BYTE_HEX[code];
+          } else if (code < 55296 || code > 57343) {
+            output += allowNonAscii ? ch : percentEncodeNonAscii(code);
+          } else if (code <= 56319 && i + 1 < input.length) {
+            const low = input.charCodeAt(i + 1);
+            if (low >= 56320 && low <= 57343) {
+              output += allowNonAscii ? ch + input[i + 1] : percentEncodeNonAscii(65536 + (code - 55296 << 10) + (low - 56320));
+              i++;
+            } else {
+              output += allowNonAscii ? "\uFFFD" : percentEncodeNonAscii(65533);
+            }
+          } else {
+            output += allowNonAscii ? "\uFFFD" : percentEncodeNonAscii(65533);
+          }
+        }
+      }
+      return output;
+    }
+    function encodeUserinfo(input) {
+      return encodeComponent(input, isUserinfoCharacter);
+    }
+    function encodeQuery(input) {
+      return encodeComponent(input, isQueryFragmentCharacter);
+    }
+    function encodeFragment(input) {
+      return encodeComponent(input, isQueryFragmentCharacter);
+    }
     function escapePreservingEscapes(input) {
       let output = "";
       for (let i = 0; i < input.length; i++) {
@@ -27654,37 +27835,71 @@ var require_utils = __commonJS({
       }
       return output;
     }
-    function recomposeAuthority(component) {
+    function recomposeZonedIPv6Host(component) {
+      const zone = component.ipv6Zone;
+      if (zone === void 0) return void 0;
+      const host = component.host;
+      const separator = host.indexOf("%");
+      if (separator === -1) return void 0;
+      const address = host.slice(0, separator);
+      const escaped = address + "%25" + zone;
+      const derived = normalizeIPv6("[" + escaped + "]");
+      if (derived.isIPV6 === true && derived.host === host) {
+        return "[" + escaped + "]";
+      }
+      return void 0;
+    }
+    function recomposeAuthority(component, allowNonAscii = false) {
       const uriTokens = [];
       if (component.userinfo !== void 0) {
-        uriTokens.push(component.userinfo);
+        uriTokens.push(encodeUserinfo(component.userinfo));
         uriTokens.push("@");
       }
       if (component.host !== void 0) {
-        let host = unescape(component.host);
+        let host = component.host;
         if (!isIPv4(host)) {
-          const ipV6res = normalizeIPv6(host);
-          if (ipV6res.isIPV6 === true) {
-            host = `[${ipV6res.escapedHost}]`;
+          const zonedHost = recomposeZonedIPv6Host(component);
+          if (zonedHost !== void 0) {
+            host = zonedHost;
           } else {
-            host = reescapeHostDelimiters(host, false);
+            let ipV6res = normalizeIPv6(host);
+            if (ipV6res.isIPV6 !== true && ipV6res.isIPVFuture !== true) {
+              host = normalizePercentEncoding(host, true);
+              ipV6res = normalizeIPv6(host);
+            }
+            if (ipV6res.isIPV6 === true || ipV6res.isIPVFuture === true) {
+              host = `[${ipV6res.escapedHost}]`;
+            } else {
+              host = encodeHost(host, false, allowNonAscii);
+            }
           }
         }
         uriTokens.push(host);
       }
       if (typeof component.port === "number" || typeof component.port === "string") {
+        const port = String(component.port);
+        if (!isPort(port)) {
+          throw new TypeError("URI port is malformed.");
+        }
         uriTokens.push(":");
-        uriTokens.push(String(component.port));
+        uriTokens.push(port);
       }
       return uriTokens.length ? uriTokens.join("") : void 0;
     }
     module2.exports = {
+      BYTE_HEX,
+      percentEncodeNonAscii,
       nonSimpleDomain,
+      nonSimpleMailtoDomain,
       recomposeAuthority,
-      reescapeHostDelimiters,
+      encodeHost,
       normalizePercentEncoding,
       normalizePathEncoding,
+      serializePathEncoding,
       normalizeQueryFragmentEncoding,
+      encodeUserinfo,
+      encodeQuery,
+      encodeFragment,
       escapePreservingEscapes,
       removeDotSegments,
       isIPv4,
@@ -27699,8 +27914,8 @@ var require_utils = __commonJS({
 var require_schemes = __commonJS({
   "node_modules/fast-uri/lib/schemes.js"(exports2, module2) {
     "use strict";
-    var { isUUID } = require_utils();
-    var URN_REG = /([\da-z][\d\-a-z]{0,31}):((?:[\w!$'()*+,\-.:;=@]|%[\da-f]{2})+)/iu;
+    var { isUUID, BYTE_HEX, percentEncodeNonAscii, nonSimpleMailtoDomain } = require_utils();
+    var URN_REG = /^([\da-z][\d\-a-z]{0,31}):((?:[\w!$'()*+,\-./:;=@]|%[\da-f]{2})+)$/iu;
     var supportedSchemeNames = (
       /** @type {const} */
       [
@@ -27709,7 +27924,8 @@ var require_schemes = __commonJS({
         "ws",
         "wss",
         "urn",
-        "urn:uuid"
+        "urn:uuid",
+        "mailto"
       ]
     );
     function isValidSchemeName(name) {
@@ -27761,9 +27977,10 @@ var require_schemes = __commonJS({
         wsComponent.secure = void 0;
       }
       if (wsComponent.resourceName) {
-        const [path11, query] = wsComponent.resourceName.split("?");
+        const queryIndex = wsComponent.resourceName.indexOf("?");
+        const path11 = queryIndex === -1 ? wsComponent.resourceName : wsComponent.resourceName.slice(0, queryIndex);
         wsComponent.path = path11 && path11 !== "/" ? path11 : void 0;
-        wsComponent.query = query;
+        wsComponent.query = queryIndex === -1 ? void 0 : wsComponent.resourceName.slice(queryIndex + 1);
         wsComponent.resourceName = void 0;
       }
       wsComponent.fragment = void 0;
@@ -27775,7 +27992,7 @@ var require_schemes = __commonJS({
         return urnComponent;
       }
       const matches = urnComponent.path.match(URN_REG);
-      if (matches) {
+      if (matches && matches[0] === urnComponent.path) {
         const scheme = options.scheme || urnComponent.scheme || "urn";
         urnComponent.nid = matches[1].toLowerCase();
         urnComponent.nss = matches[2];
@@ -27863,7 +28080,10 @@ var require_schemes = __commonJS({
         scheme: "urn",
         parse: urnParse,
         serialize: urnSerialize,
-        skipNormalize: true
+        skipNormalize: true,
+        // The NSS is opaque to generic URI path processing. In particular, RFC 2141
+        // and RFC 8141 do not treat slash-delimited dot segments as equivalent.
+        absolutePath: true
       }
     );
     var urnuuid = (
@@ -27875,6 +28095,252 @@ var require_schemes = __commonJS({
         skipNormalize: true
       }
     );
+    var LOCAL_PART_ALLOWED = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~!$'()*+=";
+    var HFNAME_ALLOWED = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~!$'()*+,;:@";
+    var DTEXT_ALLOWED = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~!$'()*+;:";
+    function allowSet(chars, allowNonAscii = false) {
+      const table = new Uint8Array(128);
+      for (let i = 0; i < chars.length; i++) {
+        table[chars.charCodeAt(i)] = 1;
+      }
+      const escaped = chars.replace(/[\\\]^-]/gu, "\\$&");
+      const cls = allowNonAscii ? `[${escaped}]|[^\\0-\\x7F\\uD800-\\uDFFF]` : `[${escaped}]`;
+      return { all: new RegExp(`^(?:${cls})*$`, "u"), table, allowNonAscii };
+    }
+    var LOCAL_PART = allowSet(LOCAL_PART_ALLOWED);
+    var HFNAME = allowSet(HFNAME_ALLOWED);
+    var DTEXT = allowSet(DTEXT_ALLOWED);
+    var DTEXT_IRI = allowSet(DTEXT_ALLOWED, true);
+    var HEX_PAIR = /^[\da-f]{2}$/iu;
+    var MAILTO_DOMAIN_LITERAL = /^\[[\x21-\x5A\x5E-\x7E]*\]$/u;
+    var MAILTO_DOMAIN_ERROR = "URI mailto has an invalid recipient domain.";
+    var MAILTO_AUTHORITY_ERROR = "URI mailto must not have an authority component.";
+    var HAS_SURROGATE = /[\uD800-\uDFFF]/u;
+    function decodeHex(str) {
+      if (typeof str !== "string" || str.indexOf("%") === -1) {
+        return str;
+      }
+      try {
+        return decodeURIComponent(str);
+      } catch {
+        return str;
+      }
+    }
+    function replaceLoneSurrogates(input) {
+      let result = "";
+      for (let i = 0; i < input.length; i++) {
+        const code = input.charCodeAt(i);
+        if (code >= 55296 && code <= 56319 && i + 1 < input.length) {
+          const low = input.charCodeAt(i + 1);
+          if (low >= 56320 && low <= 57343) {
+            result += input[i] + input[i + 1];
+            i++;
+            continue;
+          }
+        }
+        result += code >= 55296 && code <= 57343 ? "\uFFFD" : input[i];
+      }
+      return result;
+    }
+    function encodeWithAllow(input, set2) {
+      if (set2.all.test(input)) {
+        return input;
+      }
+      const table = set2.table;
+      let result = "";
+      for (let i = 0; i < input.length; i++) {
+        const code = input.charCodeAt(i);
+        if (code < 128) {
+          if (table[code] === 1) {
+            result += input[i];
+          } else if (code === 37 && i + 2 < input.length && HEX_PAIR.test(input.slice(i + 1, i + 3))) {
+            result += "%" + input.slice(i + 1, i + 3).toUpperCase();
+            i += 2;
+          } else {
+            result += BYTE_HEX[code];
+          }
+          continue;
+        }
+        if (code < 55296 || code > 57343) {
+          result += set2.allowNonAscii ? input[i] : percentEncodeNonAscii(code);
+          continue;
+        }
+        if (code <= 56319 && i + 1 < input.length) {
+          const low = input.charCodeAt(i + 1);
+          if (low >= 56320 && low <= 57343) {
+            result += set2.allowNonAscii ? input[i] + input[i + 1] : percentEncodeNonAscii(65536 + (code - 55296 << 10) + (low - 56320));
+            i++;
+            continue;
+          }
+        }
+        result += set2.allowNonAscii ? "\uFFFD" : percentEncodeNonAscii(65533);
+      }
+      return result;
+    }
+    function mailtoNormalizeDomain(domain2, options, component) {
+      const normalizedDomain = String(domain2).toLowerCase();
+      if (MAILTO_DOMAIN_LITERAL.test(normalizedDomain)) {
+        return normalizedDomain;
+      }
+      if (normalizedDomain !== "" && !nonSimpleMailtoDomain(normalizedDomain)) {
+        return normalizedDomain;
+      }
+      try {
+        const parsedDomain = new URL("http://" + normalizedDomain);
+        if (parsedDomain.username || parsedDomain.password || parsedDomain.port || parsedDomain.pathname !== "/" || parsedDomain.search || parsedDomain.hash || !parsedDomain.hostname) {
+          throw new Error(MAILTO_DOMAIN_ERROR);
+        }
+        return options && options.unicodeSupport ? normalizedDomain : parsedDomain.hostname;
+      } catch {
+        if (component) {
+          component.error = component.error || MAILTO_DOMAIN_ERROR;
+        }
+        return normalizedDomain;
+      }
+    }
+    function mailtoEncodeDomain(domain2, options) {
+      const set2 = options && options.unicodeSupport ? DTEXT_IRI : DTEXT;
+      if (domain2.length > 1 && domain2[0] === "[" && domain2[domain2.length - 1] === "]") {
+        return "[" + encodeWithAllow(domain2.slice(1, -1), set2) + "]";
+      }
+      return encodeWithAllow(domain2, set2);
+    }
+    function mailtoParse(component, options) {
+      const mailtoComponent = component;
+      let rawPath = mailtoComponent.path;
+      let rawQuery = mailtoComponent.query;
+      if (rawPath && HAS_SURROGATE.test(rawPath)) rawPath = replaceLoneSurrogates(rawPath);
+      if (rawQuery && HAS_SURROGATE.test(rawQuery)) rawQuery = replaceLoneSurrogates(rawQuery);
+      const to = rawPath ? rawPath.indexOf(",") === -1 ? [rawPath] : rawPath.split(",") : [];
+      mailtoComponent.path = void 0;
+      if (rawQuery) {
+        let headers = null;
+        let start = 0;
+        while (start <= rawQuery.length) {
+          let end = rawQuery.indexOf("&", start);
+          if (end === -1) end = rawQuery.length;
+          const token = rawQuery.slice(start, end);
+          start = end + 1;
+          const eqIdx = token.indexOf("=");
+          if (eqIdx !== token.lastIndexOf("=")) {
+            mailtoComponent.error = mailtoComponent.error || "URI mailto has malformed header fields.";
+            continue;
+          }
+          const name = decodeHex(eqIdx === -1 ? token : token.slice(0, eqIdx));
+          const normalizedName = name.toLowerCase();
+          const value = eqIdx === -1 ? "" : token.slice(eqIdx + 1);
+          if (normalizedName === "to") {
+            const addrs = value.split(",");
+            for (let j = 0; j < addrs.length; j++) to.push(addrs[j]);
+            continue;
+          }
+          if (normalizedName === "subject") {
+            mailtoComponent.subject = decodeHex(value);
+            continue;
+          }
+          if (normalizedName === "body") {
+            mailtoComponent.body = decodeHex(value);
+            continue;
+          }
+          if (headers === null) headers = /** @type {Record<string,string>} */
+          /* @__PURE__ */ Object.create(null);
+          headers[name] = decodeHex(value);
+        }
+        if (headers !== null) mailtoComponent.headers = headers;
+      }
+      mailtoComponent.query = void 0;
+      if (to.length > 0 && (mailtoComponent.userinfo !== void 0 || mailtoComponent.host !== void 0 || mailtoComponent.port !== void 0)) {
+        mailtoComponent.userinfo = void 0;
+        mailtoComponent.host = void 0;
+        mailtoComponent.port = void 0;
+        mailtoComponent.error = mailtoComponent.error || MAILTO_AUTHORITY_ERROR;
+      }
+      for (let i = 0; i < to.length; i++) {
+        const rawAddr = to[i];
+        const atIdx = rawAddr.lastIndexOf("@");
+        if (atIdx < 0) {
+          mailtoComponent.error = mailtoComponent.error || MAILTO_DOMAIN_ERROR;
+          to[i] = decodeHex(rawAddr);
+          continue;
+        }
+        const local = decodeHex(rawAddr.slice(0, atIdx));
+        const domain2 = mailtoNormalizeDomain(decodeHex(rawAddr.slice(atIdx + 1)), options, mailtoComponent);
+        to[i] = local + "@" + domain2;
+      }
+      if (to.length) mailtoComponent.to = to;
+      return mailtoComponent;
+    }
+    function mailtoEncodeHeaderName(name) {
+      return encodeWithAllow(name.replace(/%/gu, "%25"), HFNAME);
+    }
+    function mailtoSerialize(component, options) {
+      const mailtoComponent = component;
+      const to = Array.isArray(mailtoComponent.to) ? mailtoComponent.to.slice() : [];
+      const sourceHeaders = mailtoComponent.headers && typeof mailtoComponent.headers === "object" ? Object.assign(/* @__PURE__ */ Object.create(null), mailtoComponent.headers) : /* @__PURE__ */ Object.create(null);
+      const headers = /* @__PURE__ */ Object.create(null);
+      for (const name in sourceHeaders) {
+        const normalizedName = name.toLowerCase();
+        if (normalizedName === "to") {
+          const addrs = String(sourceHeaders[name]).split(",");
+          for (let i = 0; i < addrs.length; i++) to.push(addrs[i]);
+        } else if (normalizedName === "subject" || normalizedName === "body") {
+          headers[normalizedName] = sourceHeaders[name];
+        } else {
+          headers[name] = sourceHeaders[name];
+        }
+      }
+      if (mailtoComponent.subject !== void 0) headers.subject = mailtoComponent.subject;
+      if (mailtoComponent.body !== void 0) headers.body = mailtoComponent.body;
+      mailtoComponent.headers = headers;
+      if (to.length) {
+        mailtoComponent.userinfo = void 0;
+        mailtoComponent.host = void 0;
+        mailtoComponent.port = void 0;
+        for (let i = 0; i < to.length; i++) {
+          const addr = String(to[i]);
+          const atIdx = addr.lastIndexOf("@");
+          const rawLocal = atIdx >= 0 ? addr.slice(0, atIdx) : addr;
+          const rawDomain = atIdx >= 0 ? addr.slice(atIdx + 1) : "";
+          const local = encodeWithAllow(rawLocal, LOCAL_PART);
+          const decodedDomain = decodeHex(rawDomain);
+          const normalizedDomain = mailtoNormalizeDomain(decodedDomain, options);
+          to[i] = local + "@" + mailtoEncodeDomain(normalizedDomain, options);
+        }
+        mailtoComponent.path = to.join(",");
+        options.skipEscape = true;
+      } else {
+        mailtoComponent.path = void 0;
+      }
+      let query = "";
+      let count = 0;
+      for (const name in headers) {
+        if (count++ !== 0) query += "&";
+        query += mailtoEncodeHeaderName(name) + "=" + encodeWithAllow(String(headers[name]), HFNAME);
+      }
+      if (count !== 0) {
+        mailtoComponent.query = query;
+      } else {
+        mailtoComponent.headers = void 0;
+      }
+      return mailtoComponent;
+    }
+    var mailto = (
+      /** @type {SchemeHandler} */
+      {
+        scheme: "mailto",
+        parse: mailtoParse,
+        serialize: mailtoSerialize,
+        domainHost: false,
+        unicodeSupport: true,
+        // `mailtoParse` re-derives every component from the raw path/query via
+        // `decodeHex`, which subsumes the generic normalizers, so running them first
+        // is wasted work (~28% of parsing a URI with header fields).
+        skipNormalize: true,
+        // A recipient list has no dot segments to remove, and `removeDotSegments`
+        // would rewrite a "./"-prefixed local part.
+        absolutePath: true
+      }
+    );
     var SCHEMES = (
       /** @type {Record<SchemeName, SchemeHandler>} */
       {
@@ -27883,7 +28349,8 @@ var require_schemes = __commonJS({
         ws,
         wss,
         urn,
-        "urn:uuid": urnuuid
+        "urn:uuid": urnuuid,
+        mailto
       }
     );
     Object.setPrototypeOf(SCHEMES, null);
@@ -27909,8 +28376,17 @@ var require_schemes = __commonJS({
 var require_fast_uri = __commonJS({
   "node_modules/fast-uri/index.js"(exports2, module2) {
     "use strict";
-    var { normalizeIPv6, removeDotSegments, recomposeAuthority, normalizePercentEncoding, normalizePathEncoding, normalizeQueryFragmentEncoding, escapePreservingEscapes, reescapeHostDelimiters, isIPv4, nonSimpleDomain } = require_utils();
+    var { normalizeIPv6, removeDotSegments, recomposeAuthority, normalizePercentEncoding, normalizePathEncoding, serializePathEncoding, normalizeQueryFragmentEncoding, encodeQuery, encodeFragment, encodeHost, isIPv4, nonSimpleDomain } = require_utils();
     var { SCHEMES, getSchemeHandler } = require_schemes();
+    var VALID_SCHEME = /^[A-Za-z][A-Za-z0-9+.-]*$/u;
+    var MALFORMED_SCHEME_ERROR = "URI scheme is malformed.";
+    function decodeValidScheme(scheme) {
+      const decodedScheme = unescape(String(scheme));
+      if (!VALID_SCHEME.test(decodedScheme)) {
+        throw new TypeError(MALFORMED_SCHEME_ERROR);
+      }
+      return decodedScheme;
+    }
     function normalize(uri, options) {
       if (typeof uri === "string") {
         uri = /** @type {T} */
@@ -27923,14 +28399,50 @@ var require_fast_uri = __commonJS({
     }
     function resolve6(baseURI, relativeURI, options) {
       const schemelessOptions = options ? Object.assign({ scheme: "null" }, options) : { scheme: "null" };
-      const { parsed: baseParsed, malformedAuthorityOrPort: baseMalformed } = parseWithStatus(baseURI, schemelessOptions);
-      const { parsed: relativeParsed, malformedAuthorityOrPort: relativeMalformed } = parseWithStatus(relativeURI, schemelessOptions);
-      if (baseMalformed || relativeMalformed) {
+      const {
+        parsed: baseParsed,
+        malformedAuthorityOrPort: baseMalformed,
+        malformedReferenceEdge: baseMalformedReferenceEdge,
+        malformedPercentEncoding: baseMalformedPercentEncoding,
+        malformedSchemeSpecific: baseMalformedSchemeSpecific,
+        malformedHost: baseMalformedHost,
+        malformedScheme: baseMalformedScheme
+      } = parseWithStatus(baseURI, schemelessOptions);
+      const {
+        parsed: relativeParsed,
+        malformedAuthorityOrPort: relativeMalformed,
+        malformedReferenceEdge: relativeMalformedReferenceEdge,
+        malformedPercentEncoding: relativeMalformedPercentEncoding,
+        malformedSchemeSpecific: relativeMalformedSchemeSpecific,
+        malformedHost: relativeMalformedHost,
+        malformedScheme: relativeMalformedScheme
+      } = parseWithStatus(relativeURI, schemelessOptions);
+      if (baseMalformed || relativeMalformed || baseMalformedReferenceEdge || relativeMalformedReferenceEdge || baseMalformedPercentEncoding || relativeMalformedPercentEncoding || baseMalformedSchemeSpecific || relativeMalformedSchemeSpecific || baseMalformedHost || relativeMalformedHost || baseMalformedScheme || relativeMalformedScheme) {
         throw new Error(baseParsed.error || relativeParsed.error || "URI is malformed.");
       }
       const resolved = resolveComponent(baseParsed, relativeParsed, schemelessOptions, true);
+      const resolvedSchemeHandler = getSchemeHandler(options && options.scheme || resolved.scheme);
+      const resolvedHost = resolved.host;
+      if ((resolved.scheme === "http" || resolved.scheme === "https") && !resolvedHost) {
+        throw new Error("HTTP URIs must have a host.");
+      }
+      const resolvedHostIsIP = resolvedHost !== void 0 && resolvedHost !== "" && (isIPv4(resolvedHost) || normalizeIPv6(resolvedHost).isIPV6);
+      canonicalizeHost(resolved, options || {}, resolvedSchemeHandler, resolvedHostIsIP);
+      const encodedASCIIHost = resolvedHost && resolvedHost.indexOf("%") !== -1 && !new RegExp("\\P{ASCII}", "u").test(resolvedHost);
+      if (resolved.error && !encodedASCIIHost) {
+        throw new Error(resolved.error);
+      }
       schemelessOptions.skipEscape = true;
+      if (resolvedSchemeHandler && resolvedSchemeHandler.absolutePath) {
+        schemelessOptions.absolutePath = true;
+      }
       return serialize(resolved, schemelessOptions);
+    }
+    function copyHost(target, source) {
+      target.host = source.host;
+      if (source.ipv6Zone !== void 0) {
+        target.ipv6Zone = source.ipv6Zone;
+      }
     }
     function resolveComponent(base, relative6, options, skipNormalization) {
       const target = {};
@@ -27942,14 +28454,15 @@ var require_fast_uri = __commonJS({
       if (!options.tolerant && relative6.scheme) {
         target.scheme = relative6.scheme;
         target.userinfo = relative6.userinfo;
-        target.host = relative6.host;
+        copyHost(target, relative6);
         target.port = relative6.port;
-        target.path = removeDotSegments(relative6.path || "");
+        const relativeSchemeHandler = getSchemeHandler(relative6.scheme);
+        target.path = relativeSchemeHandler && relativeSchemeHandler.absolutePath ? relative6.path || "" : removeDotSegments(relative6.path || "");
         target.query = relative6.query;
       } else {
         if (relative6.userinfo !== void 0 || relative6.host !== void 0 || relative6.port !== void 0) {
           target.userinfo = relative6.userinfo;
-          target.host = relative6.host;
+          copyHost(target, relative6);
           target.port = relative6.port;
           target.path = removeDotSegments(relative6.path || "");
           target.query = relative6.query;
@@ -27977,7 +28490,7 @@ var require_fast_uri = __commonJS({
             target.query = relative6.query;
           }
           target.userinfo = base.userinfo;
-          target.host = base.host;
+          copyHost(target, base);
           target.port = base.port;
         }
         target.scheme = base.scheme;
@@ -27988,11 +28501,12 @@ var require_fast_uri = __commonJS({
     function equal(uriA, uriB, options) {
       const normalizedA = normalizeComparableURI(uriA, options);
       const normalizedB = normalizeComparableURI(uriB, options);
-      return normalizedA !== void 0 && normalizedB !== void 0 && normalizedA.toLowerCase() === normalizedB.toLowerCase();
+      return normalizedA !== void 0 && normalizedB !== void 0 && normalizedA === normalizedB;
     }
     function serialize(cmpts, opts) {
       const component = {
         host: cmpts.host,
+        ipv6Zone: cmpts.ipv6Zone,
         scheme: cmpts.scheme,
         userinfo: cmpts.userinfo,
         port: cmpts.port,
@@ -28005,26 +28519,34 @@ var require_fast_uri = __commonJS({
         reference: cmpts.reference,
         resourceName: cmpts.resourceName,
         secure: cmpts.secure,
+        to: cmpts.to,
+        subject: cmpts.subject,
+        body: cmpts.body,
+        headers: cmpts.headers,
         error: ""
       };
       const options = Object.assign({}, opts);
       const uriTokens = [];
+      if (component.scheme) {
+        component.scheme = decodeValidScheme(component.scheme);
+      }
       const schemeHandler = getSchemeHandler(options.scheme || component.scheme);
       if (schemeHandler && schemeHandler.serialize) schemeHandler.serialize(component, options);
+      const hasAuthority = component.userinfo !== void 0 || component.host !== void 0 || component.port !== void 0;
+      const pathNoScheme = !options.skipEscape && component.scheme === void 0 && !hasAuthority;
       if (component.path !== void 0) {
         if (!options.skipEscape) {
-          component.path = escapePreservingEscapes(component.path);
-          if (component.scheme !== void 0) {
-            component.path = component.path.split("%3A").join(":");
-          }
+          component.path = serializePathEncoding(component.path, pathNoScheme);
         } else {
           component.path = normalizePercentEncoding(component.path);
         }
       }
       if (options.reference !== "suffix" && component.scheme) {
+        component.scheme = decodeValidScheme(component.scheme);
         uriTokens.push(component.scheme, ":");
       }
-      const authority = recomposeAuthority(component);
+      const allowNonAsciiHost = options.unicodeSupport === true || Boolean(schemeHandler && schemeHandler.unicodeSupport);
+      const authority = recomposeAuthority(component, allowNonAsciiHost);
       if (authority !== void 0) {
         if (options.reference !== "suffix") {
           uriTokens.push("//");
@@ -28039,16 +28561,19 @@ var require_fast_uri = __commonJS({
         if (!options.absolutePath && (!schemeHandler || !schemeHandler.absolutePath)) {
           s = removeDotSegments(s);
         }
+        if (pathNoScheme) {
+          s = serializePathEncoding(s, true);
+        }
         if (authority === void 0 && s[0] === "/" && s[1] === "/") {
           s = "/%2F" + s.slice(2);
         }
         uriTokens.push(s);
       }
       if (component.query !== void 0) {
-        uriTokens.push("?", component.query);
+        uriTokens.push("?", encodeQuery(component.query));
       }
       if (component.fragment !== void 0) {
-        uriTokens.push("#", component.fragment);
+        uriTokens.push("#", encodeFragment(component.fragment));
       }
       return uriTokens.join("");
     }
@@ -28064,6 +28589,36 @@ var require_fast_uri = __commonJS({
       }
       return void 0;
     }
+    function hasMalformedPercentEncoding(component) {
+      if (component === void 0) return false;
+      let percent = component.indexOf("%");
+      while (percent !== -1) {
+        if (percent + 2 >= component.length || !/^[\da-f]{2}$/iu.test(component.slice(percent + 1, percent + 3))) {
+          return true;
+        }
+        percent = component.indexOf("%", percent + 3);
+      }
+      return false;
+    }
+    function isIPLiteral(host) {
+      return host[0] === "[" && host[host.length - 1] === "]";
+    }
+    function hasMalformedComponentPercentEncoding(matches) {
+      const host = matches[4];
+      return hasMalformedPercentEncoding(matches[3]) || host !== void 0 && !isIPLiteral(host) && hasMalformedPercentEncoding(host) || hasMalformedPercentEncoding(matches[6]) || hasMalformedPercentEncoding(matches[7]) || hasMalformedPercentEncoding(matches[8]);
+    }
+    function canonicalizeHost(parsed, options, schemeHandler, isIP) {
+      const bracketedIPLiteral = parsed.host && parsed.host[0] === "[" && parsed.host[parsed.host.length - 1] === "]";
+      if (!options.unicodeSupport && (!schemeHandler || !schemeHandler.unicodeSupport) && parsed.host && !isIPLiteral(parsed.host) && (options.domainHost || schemeHandler && schemeHandler.domainHost) && isIP === false && !bracketedIPLiteral && nonSimpleDomain(parsed.host)) {
+        try {
+          parsed.host = new URL("http://" + parsed.host).hostname;
+        } catch (e) {
+          parsed.error = parsed.error || "Host's domain name can not be converted to ASCII: " + e;
+          return true;
+        }
+      }
+      return false;
+    }
     function parseWithStatus(uri, opts) {
       const options = Object.assign({}, opts);
       const parsed = {
@@ -28076,6 +28631,12 @@ var require_fast_uri = __commonJS({
         fragment: void 0
       };
       let malformedAuthorityOrPort = false;
+      const malformedReferenceEdge = uri.length !== 0 && (uri.charCodeAt(0) <= 32 || uri.charCodeAt(uri.length - 1) <= 32);
+      let malformedPercentEncoding = false;
+      let malformedSchemeSpecific = false;
+      let malformedHost = false;
+      let malformedIPLiteral = false;
+      let malformedScheme = false;
       let isIP = false;
       if (options.reference === "suffix") {
         if (options.scheme) {
@@ -28103,15 +28664,31 @@ var require_fast_uri = __commonJS({
           }
         }
       }
+      if (malformedReferenceEdge) {
+        parsed.error = parsed.error || "URI must not contain leading or trailing C0 controls or spaces.";
+      }
       const matches = uri.match(URI_PARSE);
       if (matches) {
-        parsed.scheme = matches[1] === void 0 ? void 0 : matches[1].toLowerCase();
+        parsed.scheme = matches[1];
         parsed.userinfo = matches[3];
         parsed.host = matches[4];
         parsed.port = parseInt(matches[5], 10);
         parsed.path = matches[6] || "";
         parsed.query = matches[7];
         parsed.fragment = matches[8];
+        if (parsed.scheme !== void 0) {
+          const decodedScheme = unescape(parsed.scheme);
+          if (VALID_SCHEME.test(decodedScheme)) {
+            parsed.scheme = decodedScheme.toLowerCase();
+          } else {
+            parsed.error = parsed.error || MALFORMED_SCHEME_ERROR;
+            malformedScheme = true;
+          }
+        }
+        malformedPercentEncoding = hasMalformedComponentPercentEncoding(matches);
+        if (malformedPercentEncoding) {
+          parsed.error = parsed.error || "URI contains malformed percent-encoding.";
+        }
         if (isNaN(parsed.port)) {
           parsed.port = matches[5];
         }
@@ -28123,9 +28700,19 @@ var require_fast_uri = __commonJS({
         if (parsed.host) {
           const ipv4result = isIPv4(parsed.host);
           if (ipv4result === false) {
+            const bracketedIPLiteral = isIPLiteral(parsed.host);
+            const hasIPLiteralBracket = parsed.host.indexOf("[") !== -1 || parsed.host.indexOf("]") !== -1;
             const ipv6result = normalizeIPv6(parsed.host);
-            parsed.host = ipv6result.host.toLowerCase();
-            isIP = ipv6result.isIPV6;
+            isIP = ipv6result.isIPV6 || ipv6result.isIPVFuture === true;
+            malformedIPLiteral = hasIPLiteralBracket && (!bracketedIPLiteral || ipv6result.error === true);
+            parsed.host = isIP ? ipv6result.host : ipv6result.host.toLowerCase();
+            if (isIP && ipv6result.isIPV6 === true && parsed.host.indexOf("%") !== -1) {
+              parsed.ipv6Zone = parsed.host.slice(parsed.host.indexOf("%") + 1);
+            }
+            if (malformedIPLiteral) {
+              parsed.error = parsed.error || "URI host is malformed.";
+              malformedAuthorityOrPort = true;
+            }
           } else {
             isIP = true;
           }
@@ -28143,24 +28730,23 @@ var require_fast_uri = __commonJS({
           parsed.error = parsed.error || "URI is not a " + options.reference + " reference.";
         }
         const schemeHandler = getSchemeHandler(options.scheme || parsed.scheme);
-        if (!options.unicodeSupport && (!schemeHandler || !schemeHandler.unicodeSupport)) {
-          if (parsed.host && (options.domainHost || schemeHandler && schemeHandler.domainHost) && isIP === false && nonSimpleDomain(parsed.host)) {
-            try {
-              parsed.host = new URL("http://" + parsed.host).hostname;
-            } catch (e) {
-              parsed.error = parsed.error || "Host's domain name can not be converted to ASCII: " + e;
-            }
+        if (!malformedIPLiteral) {
+          malformedHost = canonicalizeHost(parsed, options, schemeHandler, isIP);
+        }
+        if (parsed.host !== void 0 && !malformedIPLiteral) {
+          let host = parsed.host;
+          if (uri.indexOf("%") !== -1 && !isIP) {
+            host = normalizePercentEncoding(host, true);
+            host = normalizePercentEncoding(host.toLowerCase());
+          }
+          if (options.scheme !== "null") {
+            const allowNonAsciiHost = options.unicodeSupport === true || Boolean(schemeHandler && schemeHandler.unicodeSupport);
+            parsed.host = encodeHost(host, isIP, allowNonAsciiHost);
+          } else {
+            parsed.host = host;
           }
         }
         if (!schemeHandler || schemeHandler && !schemeHandler.skipNormalize) {
-          if (uri.indexOf("%") !== -1) {
-            if (parsed.scheme !== void 0) {
-              parsed.scheme = unescape(parsed.scheme);
-            }
-            if (parsed.host !== void 0) {
-              parsed.host = reescapeHostDelimiters(unescape(parsed.host), isIP);
-            }
-          }
           if (parsed.path) {
             parsed.path = normalizePathEncoding(parsed.path);
           }
@@ -28173,11 +28759,14 @@ var require_fast_uri = __commonJS({
         }
         if (schemeHandler && schemeHandler.parse) {
           schemeHandler.parse(parsed, options);
+          if (schemeHandler === SCHEMES.urn && parsed.nid === void 0) {
+            malformedSchemeSpecific = true;
+          }
         }
       } else {
         parsed.error = parsed.error || "URI can not be parsed.";
       }
-      return { parsed, malformedAuthorityOrPort };
+      return { parsed, malformedAuthorityOrPort, malformedReferenceEdge, malformedPercentEncoding, malformedSchemeSpecific, malformedHost, malformedScheme };
     }
     function parse4(uri, opts) {
       return parseWithStatus(uri, opts).parsed;
@@ -28186,20 +28775,29 @@ var require_fast_uri = __commonJS({
       return normalizeStringWithStatus(uri, opts).normalized;
     }
     function normalizeStringWithStatus(uri, opts) {
-      const { parsed, malformedAuthorityOrPort } = parseWithStatus(uri, opts);
+      const { parsed, malformedAuthorityOrPort, malformedReferenceEdge, malformedPercentEncoding, malformedSchemeSpecific, malformedHost, malformedScheme } = parseWithStatus(uri, opts);
       return {
-        normalized: malformedAuthorityOrPort ? uri : serialize(parsed, opts),
-        malformedAuthorityOrPort
+        normalized: malformedAuthorityOrPort || malformedReferenceEdge || malformedPercentEncoding || malformedSchemeSpecific || malformedHost || malformedScheme ? uri : serialize(parsed, opts),
+        malformedAuthorityOrPort,
+        malformedReferenceEdge,
+        malformedPercentEncoding,
+        malformedSchemeSpecific,
+        malformedHost,
+        malformedScheme
       };
     }
     function normalizeComparableURI(uri, opts) {
-      if (typeof uri === "string") {
-        const { normalized, malformedAuthorityOrPort } = normalizeStringWithStatus(uri, opts);
-        return malformedAuthorityOrPort ? void 0 : normalized;
+      if (typeof uri !== "string" && typeof uri !== "object") {
+        return void 0;
       }
-      if (typeof uri === "object") {
-        return serialize(uri, opts);
+      let value;
+      try {
+        value = typeof uri === "string" ? uri : serialize(uri, opts);
+      } catch {
+        return void 0;
       }
+      const { normalized, malformedAuthorityOrPort, malformedReferenceEdge, malformedPercentEncoding, malformedSchemeSpecific, malformedHost, malformedScheme } = normalizeStringWithStatus(value, opts);
+      return malformedAuthorityOrPort || malformedReferenceEdge || malformedPercentEncoding || malformedSchemeSpecific || malformedHost || malformedScheme ? void 0 : normalized;
     }
     var fastUri = {
       SCHEMES,
@@ -31270,6 +31868,7 @@ var init_ajv_provider = __esm({
 var ExperimentalServerTasks;
 var init_server = __esm({
   "node_modules/@modelcontextprotocol/sdk/dist/esm/experimental/tasks/server.js"() {
+    init_types();
     ExperimentalServerTasks = class {
       constructor(_server) {
         this._server = _server;
@@ -31290,6 +31889,147 @@ var init_server = __esm({
        */
       requestStream(request, resultSchema, options) {
         return this._server.requestStream(request, resultSchema, options);
+      }
+      /**
+       * Sends a sampling request and returns an AsyncGenerator that yields response messages.
+       * The generator is guaranteed to end with either a 'result' or 'error' message.
+       *
+       * For task-augmented requests, yields 'taskCreated' and 'taskStatus' messages
+       * before the final result.
+       *
+       * @example
+       * ```typescript
+       * const stream = server.experimental.tasks.createMessageStream({
+       *     messages: [{ role: 'user', content: { type: 'text', text: 'Hello' } }],
+       *     maxTokens: 100
+       * }, {
+       *     onprogress: (progress) => {
+       *         // Handle streaming tokens via progress notifications
+       *         console.log('Progress:', progress.message);
+       *     }
+       * });
+       *
+       * for await (const message of stream) {
+       *     switch (message.type) {
+       *         case 'taskCreated':
+       *             console.log('Task created:', message.task.taskId);
+       *             break;
+       *         case 'taskStatus':
+       *             console.log('Task status:', message.task.status);
+       *             break;
+       *         case 'result':
+       *             console.log('Final result:', message.result);
+       *             break;
+       *         case 'error':
+       *             console.error('Error:', message.error);
+       *             break;
+       *     }
+       * }
+       * ```
+       *
+       * @param params - The sampling request parameters
+       * @param options - Optional request options (timeout, signal, task creation params, onprogress, etc.)
+       * @returns AsyncGenerator that yields ResponseMessage objects
+       *
+       * @experimental
+       */
+      createMessageStream(params, options) {
+        const clientCapabilities = this._server.getClientCapabilities();
+        if ((params.tools || params.toolChoice) && !clientCapabilities?.sampling?.tools) {
+          throw new Error("Client does not support sampling tools capability.");
+        }
+        if (params.messages.length > 0) {
+          const lastMessage = params.messages[params.messages.length - 1];
+          const lastContent = Array.isArray(lastMessage.content) ? lastMessage.content : [lastMessage.content];
+          const hasToolResults = lastContent.some((c) => c.type === "tool_result");
+          const previousMessage = params.messages.length > 1 ? params.messages[params.messages.length - 2] : void 0;
+          const previousContent = previousMessage ? Array.isArray(previousMessage.content) ? previousMessage.content : [previousMessage.content] : [];
+          const hasPreviousToolUse = previousContent.some((c) => c.type === "tool_use");
+          if (hasToolResults) {
+            if (lastContent.some((c) => c.type !== "tool_result")) {
+              throw new Error("The last message must contain only tool_result content if any is present");
+            }
+            if (!hasPreviousToolUse) {
+              throw new Error("tool_result blocks are not matching any tool_use from the previous message");
+            }
+          }
+          if (hasPreviousToolUse) {
+            const toolUseIds = new Set(previousContent.filter((c) => c.type === "tool_use").map((c) => c.id));
+            const toolResultIds = new Set(lastContent.filter((c) => c.type === "tool_result").map((c) => c.toolUseId));
+            if (toolUseIds.size !== toolResultIds.size || ![...toolUseIds].every((id) => toolResultIds.has(id))) {
+              throw new Error("ids of tool_result blocks and tool_use blocks from previous message do not match");
+            }
+          }
+        }
+        return this.requestStream({
+          method: "sampling/createMessage",
+          params
+        }, CreateMessageResultSchema, options);
+      }
+      /**
+       * Sends an elicitation request and returns an AsyncGenerator that yields response messages.
+       * The generator is guaranteed to end with either a 'result' or 'error' message.
+       *
+       * For task-augmented requests (especially URL-based elicitation), yields 'taskCreated'
+       * and 'taskStatus' messages before the final result.
+       *
+       * @example
+       * ```typescript
+       * const stream = server.experimental.tasks.elicitInputStream({
+       *     mode: 'url',
+       *     message: 'Please authenticate',
+       *     elicitationId: 'auth-123',
+       *     url: 'https://example.com/auth'
+       * }, {
+       *     task: { ttl: 300000 } // Task-augmented for long-running auth flow
+       * });
+       *
+       * for await (const message of stream) {
+       *     switch (message.type) {
+       *         case 'taskCreated':
+       *             console.log('Task created:', message.task.taskId);
+       *             break;
+       *         case 'taskStatus':
+       *             console.log('Task status:', message.task.status);
+       *             break;
+       *         case 'result':
+       *             console.log('User action:', message.result.action);
+       *             break;
+       *         case 'error':
+       *             console.error('Error:', message.error);
+       *             break;
+       *     }
+       * }
+       * ```
+       *
+       * @param params - The elicitation request parameters
+       * @param options - Optional request options (timeout, signal, task creation params, etc.)
+       * @returns AsyncGenerator that yields ResponseMessage objects
+       *
+       * @experimental
+       */
+      elicitInputStream(params, options) {
+        const clientCapabilities = this._server.getClientCapabilities();
+        const mode = params.mode ?? "form";
+        switch (mode) {
+          case "url": {
+            if (!clientCapabilities?.elicitation?.url) {
+              throw new Error("Client does not support url elicitation.");
+            }
+            break;
+          }
+          case "form": {
+            if (!clientCapabilities?.elicitation?.form) {
+              throw new Error("Client does not support form elicitation.");
+            }
+            break;
+          }
+        }
+        const normalizedParams = mode === "form" && params.mode === void 0 ? { ...params, mode: "form" } : params;
+        return this.requestStream({
+          method: "elicitation/create",
+          params: normalizedParams
+        }, ElicitResultSchema, options);
       }
       /**
        * Gets the current status of a task.
@@ -31457,16 +32197,7 @@ var init_server2 = __esm({
         if (!methodSchema) {
           throw new Error("Schema is missing a method literal");
         }
-        let methodValue;
-        if (isZ4Schema(methodSchema)) {
-          const v4Schema = methodSchema;
-          const v4Def = v4Schema._zod?.def;
-          methodValue = v4Def?.value ?? v4Schema.value;
-        } else {
-          const v3Schema = methodSchema;
-          const legacyDef = v3Schema._def;
-          methodValue = legacyDef?.value ?? v3Schema.value;
-        }
+        const methodValue = getLiteralValue(methodSchema);
         if (typeof methodValue !== "string") {
           throw new Error("Schema method literal must be a string");
         }
@@ -32107,6 +32838,42 @@ __export(mcp_exports, {
   McpServer: () => McpServer,
   ResourceTemplate: () => ResourceTemplate
 });
+function toolInputElementCount(value, max) {
+  let count = 0;
+  const stack = [value];
+  while (stack.length > 0) {
+    const node = stack.pop();
+    if (node === null || typeof node !== "object")
+      continue;
+    if (Array.isArray(node)) {
+      for (const child of node) {
+        if (++count > max)
+          return count;
+        if (child !== null && typeof child === "object")
+          stack.push(child);
+      }
+    } else {
+      for (const key in node) {
+        if (!Object.prototype.hasOwnProperty.call(node, key))
+          continue;
+        if (++count > max)
+          return count;
+        const child = node[key];
+        if (child !== null && typeof child === "object")
+          stack.push(child);
+      }
+    }
+  }
+  return count;
+}
+function resolveMaxToolInputElements(value) {
+  if (value === void 0 || value === Infinity)
+    return void 0;
+  if (typeof value !== "number" || Number.isNaN(value) || value < 1) {
+    throw new RangeError(`maxToolInputElements must be a number of at least 1, or Infinity, got ${String(value)}`);
+  }
+  return value;
+}
 function isZodTypeLike(value) {
   return value !== null && typeof value === "object" && "parse" in value && typeof value.parse === "function" && "safeParse" in value && typeof value.safeParse === "function";
 }
@@ -32131,6 +32898,9 @@ function getZodSchemaObject(schema) {
   }
   if (isZodRawShapeCompat(schema)) {
     return objectFromShape(schema);
+  }
+  if (!isZodSchemaInstance(schema)) {
+    throw new Error("inputSchema must be a Zod schema or raw shape, received an unrecognized object");
   }
   return schema;
 }
@@ -32192,6 +32962,7 @@ var init_mcp = __esm({
         this._resourceHandlersInitialized = false;
         this._promptHandlersInitialized = false;
         this.server = new Server(serverInfo, options);
+        this._maxToolInputElements = resolveMaxToolInputElements(options?.maxToolInputElements);
       }
       /**
        * Access experimental features.
@@ -32322,12 +33093,15 @@ var init_mcp = __esm({
        * Validates tool input arguments against the tool's input schema.
        */
       async validateToolInput(tool, args, toolName) {
+        if (this._maxToolInputElements !== void 0 && toolInputElementCount(args, this._maxToolInputElements) > this._maxToolInputElements) {
+          throw new McpError(ErrorCode.InvalidParams, `Invalid arguments for tool ${toolName}: arguments contain more than the maximum of ${this._maxToolInputElements} elements`);
+        }
         if (!tool.inputSchema) {
           return void 0;
         }
         const inputObj = normalizeObjectSchema(tool.inputSchema);
         const schemaToParse = inputObj ?? tool.inputSchema;
-        const parseResult = await safeParseAsync3(schemaToParse, args);
+        const parseResult = await safeParseAsync3(schemaToParse, args ?? {});
         if (!parseResult.success) {
           const error48 = "error" in parseResult ? parseResult.error : "Unknown error";
           const errorMessage = getParseErrorMessage(error48);
@@ -32565,7 +33339,7 @@ var init_mcp = __esm({
           }
           if (prompt.argsSchema) {
             const argsObj = normalizeObjectSchema(prompt.argsSchema);
-            const parseResult = await safeParseAsync3(argsObj, request.params.arguments);
+            const parseResult = await safeParseAsync3(argsObj, request.params.arguments ?? {});
             if (!parseResult.success) {
               const error48 = "error" in parseResult ? parseResult.error : "Unknown error";
               const errorMessage = getParseErrorMessage(error48);
@@ -32804,6 +33578,9 @@ var init_mcp = __esm({
               annotations = rest.shift();
             }
           } else if (typeof firstArg === "object" && firstArg !== null) {
+            if (Object.values(firstArg).some((v) => typeof v === "object" && v !== null)) {
+              throw new Error(`Tool ${name} expected a Zod schema or ToolAnnotations, but received an unrecognized object`);
+            }
             annotations = rest.shift();
           }
         }
@@ -33994,7 +34771,7 @@ function resolveKgPath(config2, params, cwd = process.cwd()) {
 }
 
 // src/cli.ts
-var SERVER_VERSION = true ? "0.7.9" : (() => {
+var SERVER_VERSION = true ? "0.7.11" : (() => {
   try {
     return null.version;
   } catch {

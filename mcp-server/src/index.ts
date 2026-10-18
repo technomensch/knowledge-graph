@@ -12,6 +12,7 @@ import { registerVersionTool } from "./tools/version.js";
 import { registerCompareTools } from "./tools/compare.js";
 import { registerResolveTool } from "./tools/resolve.js";
 import { registerExtractTool } from "./tools/extract.js";
+import { registerRelationshipScanTool } from "./tools/relationship-scan.js";
 import { PersonalScopeSession, CrossKgSearchSession } from "./resolution.js";
 import { installStaleProcessWarning } from "./lib/installStaleProcessWarning.js";
 import { resolveRunningVersion } from "./lib/staleProcessCheck.js";
@@ -43,7 +44,7 @@ const personalScopeSession = new PersonalScopeSession();
 // personalScopeSession above.
 const crossKgSearchSession = new CrossKgSearchSession();
 
-// Register tools (14 core tools)
+// Register tools
 registerConfigTools(server, personalScopeSession);    // kg_config_init, kg_config_list, kg_config_add_category
 registerSearchTool(server, personalScopeSession, crossKgSearchSession); // kg_search
 registerScaffoldTool(server);   // kg_scaffold
@@ -56,6 +57,7 @@ registerVersionTool(server);    // kg_version
 registerCompareTools(server, personalScopeSession);   // kg_compare_graphs
 registerResolveTool(server, personalScopeSession);    // kg_resolve (issue-41, Phase 7.2 Task 7.2.1)
 registerExtractTool(server);    // kg_extract (ENH-025: cross-platform kmg-backfill equivalent)
+registerRelationshipScanTool(server); // kg_relationship_scan (ENH-062: cross-platform relationship scan)
 
 // Register resources (2 resources)
 registerConfigResource(server);    // kg://config

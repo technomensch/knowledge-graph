@@ -545,9 +545,7 @@ title: "Three-Tier Configuration Sync"
 date: 2024-08-15
 category: architecture
 tags: [synchronization, configuration, modularity]
-related:
-  - ADR-007
-  - patterns.md#multi-tier-sync
+related_adrs: ["[[ADR-007-three-tier-config|ADR-007]]"]
 ---
 
 # Lesson Content

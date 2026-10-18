@@ -78,3 +78,7 @@ Fixed all 4 occurrences in `scripts/pre-skill-rules-inject.sh` (lines 160, 168, 
 ## Status
 
 Resolved — GitHub issue #237 close is a separate, explicit follow-up (not automated by this fix).
+
+## Related
+
+- [issue-39](../issue-39/issue-39-description.md) — related phantom-skill case that cites this issue.

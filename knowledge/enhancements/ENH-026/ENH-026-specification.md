@@ -58,3 +58,4 @@ v0.5.10.8 (this release): extract-chat Step 0 guard only.
 ## Related
 
 - [issue-37](../../issues/issue-37/issue-37-description.md) — issue-37's spec cross-references this item.
+- [issue-38](../../issues/issue-38/issue-38-description.md) — shares the `commands/sync-all.md` hotspot with this ENH (noted there as FYI, not batched).

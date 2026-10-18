@@ -1,0 +1,172 @@
+import {
+  locateFrontmatter, isDoubledFrontmatter, topLevelBlocks, contentEnd,
+  readList, readScalar, renderList, replaceLines, unquote, stripComment, crossCheckList, hasComments,
+} from "../src/lib/frontmatter/parse.js";
+
+const ADR = [
+  "---",
+  'title: "T"',
+  "git:",
+  "  branch: b",
+  "  pr: null",
+  "related:",
+  "  adrs: []",
+  "tags: [a, b]",
+  "---",
+  "body line",
+];
+
+describe("locateFrontmatter", () => {
+  test("finds the closing delimiter", () => {
+    expect(locateFrontmatter(ADR)).toEqual({ end: 8 });
+  });
+  test("returns null when the file does not start with ---", () => {
+    expect(locateFrontmatter(["# Title", "---"])).toBeNull();
+  });
+  test("returns null when there is no closing delimiter", () => {
+    expect(locateFrontmatter(["---", "a: 1"])).toBeNull();
+  });
+  test("CRLF files are not recognized", () => {
+    expect(locateFrontmatter(["---\r", "a: 1\r", "---\r"])).toBeNull();
+  });
+});
+
+describe("isDoubledFrontmatter", () => {
+  test("detects a second block immediately after the first", () => {
+    const lines = ["---", "title: a", "---", "---", "title: b", "---", "body"];
+    expect(isDoubledFrontmatter(lines, 2)).toBe(true);
+  });
+  test("a body that starts with a horizontal rule is not doubled", () => {
+    const lines = ["---", "title: a", "---", "---", "Some prose here", "---"];
+    expect(isDoubledFrontmatter(lines, 2)).toBe(false);
+  });
+});
+
+describe("topLevelBlocks", () => {
+  test("nested lines belong to the preceding top-level key", () => {
+    const blocks = topLevelBlocks(ADR, 8);
+    expect(blocks.map((b) => b.key)).toEqual(["title", "git", "related", "tags"]);
+    const git = blocks.find((b) => b.key === "git")!;
+    expect([git.start, git.end]).toEqual([2, 5]);
+  });
+  test("contentEnd excludes trailing blank and comment lines", () => {
+    const lines = ["---", "a:", "  - x", "", "# note", "b: 1", "---"];
+    const a = topLevelBlocks(lines, 6)[0];
+    expect(a.end).toBe(5);
+    expect(contentEnd(lines, a)).toBe(3);
+  });
+});
+
+describe("readList", () => {
+  const fm = (line: string[]) => ["---", ...line, "---"];
+  test("flow list of bare numbers", () => {
+    const lines = fm(["related_adrs: [1, 19, 55]"]);
+    const b = topLevelBlocks(lines, 2)[0];
+    expect(readList(lines, b)).toEqual({ items: ["1", "19", "55"], style: "flow" });
+  });
+  test("flow list of quoted strings keeps commas inside quotes", () => {
+    const lines = fm(['k: ["a, b", \'c\']']);
+    expect(readList(lines, topLevelBlocks(lines, 2)[0])).toEqual({ items: ["a, b", "c"], style: "flow" });
+  });
+  test("block list", () => {
+    const lines = fm(["k:", '  - "x"', "  - y"]);
+    expect(readList(lines, topLevelBlocks(lines, 4)[0])).toEqual({ items: ["x", "y"], style: "block" });
+  });
+  test("empty and null are empty flow lists", () => {
+    expect(readList(fm(["k: []"]), topLevelBlocks(fm(["k: []"]), 2)[0])).toEqual({ items: [], style: "flow" });
+    expect(readList(fm(["k: null"]), topLevelBlocks(fm(["k: null"]), 2)[0])).toEqual({ items: [], style: "flow" });
+  });
+  test("a nested map is not a list", () => {
+    const lines = fm(["k:", "  adrs: []"]);
+    expect(readList(lines, topLevelBlocks(lines, 3)[0])).toBeNull();
+  });
+});
+
+describe("readScalar / unquote", () => {
+  test("reads and unquotes", () => {
+    const lines = ["---", 'github_issue: "#172"', "---"];
+    expect(readScalar(lines, topLevelBlocks(lines, 2)[0])).toBe("#172");
+  });
+  test("empty value is null", () => {
+    const lines = ["---", "k:", "---"];
+    expect(readScalar(lines, topLevelBlocks(lines, 2)[0])).toBeNull();
+  });
+  test("unquote handles single quotes", () => {
+    expect(unquote("'it''s'")).toBe("it's");
+  });
+});
+
+describe("renderList / replaceLines", () => {
+  test("flow", () => {
+    expect(renderList("k", ["a", "b"], "flow")).toEqual(['k: ["a", "b"]']);
+  });
+  test("block", () => {
+    expect(renderList("k", ["a"], "block")).toEqual(["k:", '  - "a"']);
+  });
+  test("empty is always flow", () => {
+    expect(renderList("k", [], "block")).toEqual(["k: []"]);
+  });
+  test("replaceLines splices", () => {
+    expect(replaceLines(["a", "b", "c"], 1, 2, ["X", "Y"])).toEqual(["a", "X", "Y", "c"]);
+  });
+});
+
+describe("quoted # is data, not a comment (Opus review F1)", () => {
+  const fm = (l: string[]) => ["---", ...l, "---"];
+  test("a # inside a quoted block-list item survives", () => {
+    const lines = fm(["k:", '  - "[[issue-6]]  — Bug: GitHub #125"']);
+    expect(readList(lines, topLevelBlocks(lines, 3)[0])).toEqual({ items: ["[[issue-6]]  — Bug: GitHub #125"], style: "block" });
+  });
+  test("a # inside a quoted flow item survives", () => {
+    const lines = fm(['k: ["a #1", "b"]']);
+    expect(readList(lines, topLevelBlocks(lines, 2)[0])).toEqual({ items: ["a #1", "b"], style: "flow" });
+  });
+  test("a real trailing comment is still stripped", () => {
+    const lines = fm(["k:", "  - x # note", "  - y"]);
+    expect(readList(lines, topLevelBlocks(lines, 4)[0])).toEqual({ items: ["x", "y"], style: "block" });
+    const s = fm(["k: value # note"]);
+    expect(readScalar(s, topLevelBlocks(s, 2)[0])).toBe("value");
+  });
+  test("an apostrophe in an unquoted scalar does not hide a later comment", () => {
+    const s = fm(["k: it's fine # note"]);
+    expect(readScalar(s, topLevelBlocks(s, 2)[0])).toBe("it's fine");
+  });
+});
+
+describe("quote escapes and YAML cross-check (second Opus review)", () => {
+  const fm = (l: string[]) => ["---", ...l, "---"];
+  test("a single-quote escape '' does not end the quoted string", () => {
+    expect(stripComment("'Bob''s idea #2 (draft)' # c")).toBe("'Bob''s idea #2 (draft)'");
+  });
+  test("a double-quote escape \\\" does not end the quoted string", () => {
+    expect(stripComment('"x \\" # y" # c')).toBe('"x \\" # y"');
+  });
+  test("crossCheckList accepts a list YAML reads the same way", () => {
+    expect(crossCheckList(["a", "5"], ["a", 5])).toBe(true);
+    expect(crossCheckList([], null)).toBe(true);
+  });
+  test("crossCheckList rejects any disagreement with YAML", () => {
+    expect(crossCheckList(["ADR-1", "ADR-1"].map((x) => "&a " + x), ["ADR-1", "ADR-1"])).toBe(false);
+    expect(crossCheckList(["1", "[2", "3]"], [1, [2, 3]])).toBe(false);
+    expect(crossCheckList(["a: b"], [{ a: "b" }])).toBe(false);
+    expect(crossCheckList(["a"], "a")).toBe(false);
+  });
+  test("hasComments sees whole-line and trailing comments but not a quoted #", () => {
+    const withComment = fm(["k:", "  # note", "  - x"]);
+    expect(hasComments(withComment, topLevelBlocks(withComment, 4)[0])).toBe(true);
+    const trailing = fm(["k:", "  - x # note"]);
+    expect(hasComments(trailing, topLevelBlocks(trailing, 3)[0])).toBe(true);
+    const quoted = fm(["k:", '  - "a #1"']);
+    expect(hasComments(quoted, topLevelBlocks(quoted, 3)[0])).toBe(false);
+  });
+});
+
+describe("crossCheckList compares numbers by value (zero-padded IDs are common)", () => {
+  test("001, 002, 008 read as the numbers 1, 2, 8 agree with the hand-read text", () => {
+    expect(crossCheckList(["001", "002", "008"], [1, 2, 8])).toBe(true);
+  });
+  test("a number must still agree with its text by value", () => {
+    expect(crossCheckList(["002"], [1])).toBe(false);
+    expect(crossCheckList(["abc"], [1])).toBe(false);
+  });
+});

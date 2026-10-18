@@ -40,6 +40,7 @@ import {
   checkExistingFile,
   displayTitleFor,
   checkTitlePrefix,
+  resolveAdrRelated,
 } from "../src/tools/capture.js";
 import type { CaptureRequest, CaptureResponse, CaptureError } from "../src/tools/capture.js";
 import { readConfig } from "../src/utils.js";
@@ -548,8 +549,10 @@ describe("generateFrontmatter", () => {
     expect(fm).toContain("  pr: null");
     expect(fm).toContain("  issue: null");
     expect(fm).toContain("implements: null");
-    expect(fm).toContain("related:");
-    expect(fm).toContain("  adrs: []");
+    expect(fm).toContain("related_adrs: []");
+    expect(fm).toContain("related_lessons: []");
+    expect(fm).toContain("related_docs: []");
+    expect(fm).not.toMatch(/^related:/m);
     expect(fm).toContain("tags: [db]");
   });
 
@@ -570,9 +573,9 @@ describe("generateFrontmatter", () => {
     });
     expect(fm).toContain("number: 69");
     expect(fm).toContain("implements: v2.0.0");
-    expect(fm).toContain("adrs: [ADR-001]");
-    expect(fm).toContain("lessons: [Some_Lesson]");
-    expect(fm).toContain("kg_entries: [concept-x]");
+    expect(fm).toContain('related_adrs:\n  - "ADR-001"');
+    expect(fm).toContain('related_lessons:\n  - "Some_Lesson"');
+    expect(fm).toContain('related_docs:\n  - "concept-x"');
     expect(fm).toContain("search_aliases: [alias-one]");
     expect(fm).toContain("category: architecture");
   });
@@ -1786,5 +1789,68 @@ describe("displayTitleFor", () => {
 
   test("lesson: returns bare title unchanged (never had a prefix)", () => {
     expect(displayTitleFor("lesson", { title: "Some Lesson" })).toBe("Some Lesson");
+  });
+});
+
+describe("flat related fields and status_category (ENH-059 / ENH-062)", () => {
+  test("flat related_* inputs are emitted as quoted block lists", () => {
+    const fm = generateFrontmatter("adr", {
+      title: "T", related_adrs: ["[[ADR-001-x|ADR-001]]"], related_lessons: [], related_docs: ["[[a/README|README]]"],
+    });
+    expect(fm).toContain('related_adrs:\n  - "[[ADR-001-x|ADR-001]]"');
+    expect(fm).toContain("related_lessons: []");
+    expect(fm).toContain('related_docs:\n  - "[[a/README|README]]"');
+  });
+
+  test("status_category follows status (default Proposed -> backlog)", () => {
+    expect(generateFrontmatter("adr", { title: "T" })).toContain("status_category: backlog");
+    expect(generateFrontmatter("adr", { title: "T", status: "Accepted" })).toContain("status_category: done");
+    expect(generateFrontmatter("adr", { title: "T", status: "Superseded" })).toContain("status_category: cancelled");
+  });
+
+  test("lessons and sessions do not get status_category or related fields", () => {
+    expect(generateFrontmatter("lesson", { title: "L" })).not.toContain("status_category");
+    expect(generateFrontmatter("session", { title: "S" })).not.toContain("related_");
+  });
+
+  test("tags still render as a flow list, unchanged", () => {
+    expect(generateFrontmatter("adr", { title: "T", tags: ["a", "b"] })).toContain("tags: [a, b]");
+  });
+
+  test("an ADR frontmatter block is not doubled (issue-46 regression)", () => {
+    const fm = generateFrontmatter("adr", { title: "T" });
+    expect(fm.match(/^---$/gm)).toHaveLength(2);
+  });
+
+  describe("resolveAdrRelated", () => {
+    let kg: string;
+    beforeAll(() => {
+      kg = fs.mkdtempSync(path.join(os.tmpdir(), "capture-related-"));
+      const put = (rel: string) => {
+        fs.mkdirSync(path.dirname(path.join(kg, rel)), { recursive: true });
+        fs.writeFileSync(path.join(kg, rel), "# stub\n");
+      };
+      put("decisions/ADR-001-centralized-multi-kg-configuration.md");
+      put("issues/saga/analysis/lessons-learned.md");
+      put("issues/other/analysis/lessons-learned.md");
+    });
+    afterAll(() => fs.rmSync(kg, { recursive: true, force: true }));
+
+    test("legacy related map and flat fields merge, resolve to wikilinks, and de-duplicate", () => {
+      const out = resolveAdrRelated(kg, {
+        title: "T",
+        related: { adrs: ["ADR-001"], lessons: ["knowledge/issues/saga/analysis/lessons-learned.md"], kg_entries: [] },
+        related_adrs: ["1"],
+      });
+      expect(out.related_adrs).toEqual(["[[ADR-001-centralized-multi-kg-configuration|ADR-001]]"]);
+      expect(out.related_lessons).toEqual(["[[saga/analysis/lessons-learned|lessons-learned]]"]);
+      expect(out.related_docs).toEqual([]);
+    });
+
+    test("unresolvable values are kept as plain text, never guessed", () => {
+      const out = resolveAdrRelated(kg, { title: "T", related_adrs: ["ADR-999"], related_docs: ["lessons-learned"] });
+      expect(out.related_adrs).toEqual(["ADR-999"]);
+      expect(out.related_docs).toEqual(["lessons-learned"]); // ambiguous bare name stays plain
+    });
   });
 });

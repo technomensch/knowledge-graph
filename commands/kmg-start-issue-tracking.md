@@ -310,16 +310,26 @@ mkdir -p {active_kg_path}/issues/issue-N/
 id: issue-N
 type: [Bug|Enhancement|Refactor|Hardening]
 status: [tracked|in-progress|implemented|deferred|tracked-not-implemented]
-github-issue: "#N"
+status_category: [pending|done|backlog]
+github_issue: "#N"
 branch: [branch-name or "none"]
 created: YYYY-MM-DD
+related_issues: []
+related_enhs: []
+related_adrs: []
+blocked_by: []
+blocking: []
+depends_on: []
+related_to: []
 ---
 ```
 
-Set initial `status` based on `{workflow_mode}`:
-- Mode 1: `tracked`
-- Mode 2: `implemented`
-- Mode 3: `deferred`
+Relationship values are quoted wikilinks with the short ID as label, for example `"[[ENH-042-specification|ENH-042]]"`; leave a list empty rather than writing a link whose target note does not exist. `status_category` is derived from `status` (see the Status Category table in the issues and enhancements READMEs).
+
+Set initial `status` based on `{workflow_mode}` (and `status_category` to match):
+- Mode 1: `tracked` (`status_category: pending`)
+- Mode 2: `implemented` (`status_category: done`)
+- Mode 3: `deferred` (`status_category: backlog`)
 
 ### 3.2: For Enhancements
 ```bash
@@ -403,18 +413,18 @@ Write issue number back to spec frontmatter immediately:
 For bugs/issues (`{active_kg_path}/issues/issue-N/issue-N-description.md`):
 ```bash
 SPEC={active_kg_path}/issues/issue-N/issue-N-description.md
-sed -i.bak -E "s/github-issue: (null|\"TBD\"|\"#N\")/github-issue: \"#${GITHUB_ISSUE_NUM}\"/" \
+sed -i.bak -E "s/github_issue: (null|\"TBD\"|\"#N\")/github_issue: \"#${GITHUB_ISSUE_NUM}\"/" \
   "${SPEC}" && rm "${SPEC}.bak"
-grep -E "github-issue: \"#[0-9]+\"" "${SPEC}" || \
+grep -E "github_issue: \"#[0-9]+\"" "${SPEC}" || \
   { echo "ERROR: write-back failed — issue #${GITHUB_ISSUE_NUM} created on GitHub. Update frontmatter manually."; exit 1; }
 ```
 
 For enhancements (`{active_kg_path}/enhancements/ENH-NNN/ENH-NNN-specification.md`):
 ```bash
 SPEC={active_kg_path}/enhancements/ENH-NNN/ENH-NNN-specification.md
-sed -i.bak -E "s/github-issue: (null|\"TBD\"|\"#N\")/github-issue: \"#${GITHUB_ISSUE_NUM}\"/" \
+sed -i.bak -E "s/github_issue: (null|\"TBD\"|\"#N\")/github_issue: \"#${GITHUB_ISSUE_NUM}\"/" \
   "${SPEC}" && rm "${SPEC}.bak"
-grep -E "github-issue: \"#[0-9]+\"" "${SPEC}" || \
+grep -E "github_issue: \"#[0-9]+\"" "${SPEC}" || \
   { echo "ERROR: write-back failed — issue #${GITHUB_ISSUE_NUM} created on GitHub. Update frontmatter manually."; exit 1; }
 ```
 

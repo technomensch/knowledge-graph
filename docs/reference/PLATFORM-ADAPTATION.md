@@ -281,6 +281,7 @@ For all MCP-capable platforms, these tools are available:
 | `kg_compare_graphs` | Compare two KG folders by content hash + relative path to distinguish a duplicate/forked/worktree registration from genuine divergence |
 | `kg_scaffold` | Create a file from a template |
 | `kg_check_sensitive` | Scan for potentially sensitive data |
+| `kg_relationship_scan` | Read-only: list issue/enhancement pairs that mention the same file but declare no relationship in their frontmatter. Returns the pairs as data; for platforms that do not run the `kmg-paperwork-audit` skill. Optional `hubMax` (2 to 100, default 4) |
 | `kg_extract` | Read-only extraction of lesson/decision/KG-entry candidates from `chat-history/`, `lessons-learned/`, or `decisions/` paths — pair with `kg_capture` for the approval-gated write step. Cross-platform equivalent of `kmg-backfill` for Codex/Gemini users without Claude Code subagent spawning |
 
 ### `kg_compare_graphs`

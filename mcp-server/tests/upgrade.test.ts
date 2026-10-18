@@ -4429,3 +4429,96 @@ describe("upgrade category: missing-root-readme (ENH-064)", () => {
     expect(fs.existsSync(path.join(kgRoot, "README.md"))).toBe(false);
   });
 });
+
+describe("frontmatter-schema (ENH-062)", () => {
+  function seed(kgRoot: string): string {
+    fs.mkdirSync(path.join(kgRoot, "issues", "issue-14"), { recursive: true });
+    fs.mkdirSync(path.join(kgRoot, "issues", "issue-15"), { recursive: true });
+    fs.writeFileSync(
+      path.join(kgRoot, "issues", "issue-14", "issue-14-description.md"),
+      "---\nid: issue-14\nstatus: resolved\n---\n\n# 14\n",
+      "utf-8"
+    );
+    const f15 = path.join(kgRoot, "issues", "issue-15", "issue-15-description.md");
+    fs.writeFileSync(
+      f15,
+      '---\nid: issue-15\nstatus: resolved\ngithub-issue: "#172"\nrelated-issues: [issue-14]\n---\n\n# 15\n',
+      "utf-8"
+    );
+    return f15;
+  }
+
+  test("inspect lists the category and never writes", async () => {
+    const kgRoot = makeTempDir("fm-inspect"); tempDirs.push(kgRoot); scaffoldKg(kgRoot); mockActiveKg(kgRoot);
+    const f15 = seed(kgRoot);
+    const before = fs.readFileSync(f15, "utf-8");
+    const result = await handleUpgrade({});
+    const parsed = JSON.parse(result.content[0].text);
+    const item = parsed.upgrades.find((u: { category: string }) => u.category === "frontmatter-schema");
+    expect(item).toBeDefined();
+    expect(item.details).toContain("frontmatterSteps");
+    expect(fs.readFileSync(f15, "utf-8")).toBe(before);
+    expect(fs.existsSync(path.join(kgRoot, ".kmgraph-frontmatter-schema"))).toBe(false);
+  });
+
+  test("apply without confirmFrontmatterSchema returns KMG_INPUT_REQUIRED and changes nothing", async () => {
+    const kgRoot = makeTempDir("fm-noconfirm"); tempDirs.push(kgRoot); scaffoldKg(kgRoot); mockActiveKg(kgRoot);
+    const f15 = seed(kgRoot);
+    const before = fs.readFileSync(f15, "utf-8");
+    const result = await handleUpgrade({ apply: ["frontmatter-schema"], frontmatterSteps: [1] });
+    expect(result.isError).toBe(true);
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed.error).toBe("KMG_INPUT_REQUIRED");
+    expect(parsed.resolveWith.param).toBe("confirmFrontmatterSchema");
+    expect(fs.readFileSync(f15, "utf-8")).toBe(before);
+  });
+
+  test("confirmBackfix does NOT authorize this category", async () => {
+    const kgRoot = makeTempDir("fm-wrongflag"); tempDirs.push(kgRoot); scaffoldKg(kgRoot); mockActiveKg(kgRoot);
+    const f15 = seed(kgRoot);
+    const before = fs.readFileSync(f15, "utf-8");
+    const result = await handleUpgrade({ apply: ["frontmatter-schema"], frontmatterSteps: [1], confirmBackfix: true });
+    expect(result.isError).toBe(true);
+    expect(fs.readFileSync(f15, "utf-8")).toBe(before);
+  });
+
+  test("apply with steps and its own confirm rewrites keys, keeps a .bak, writes the marker", async () => {
+    const kgRoot = makeTempDir("fm-apply"); tempDirs.push(kgRoot); scaffoldKg(kgRoot); mockActiveKg(kgRoot);
+    const f15 = seed(kgRoot);
+    const result = await handleUpgrade({ apply: ["frontmatter-schema"], frontmatterSteps: [1], confirmFrontmatterSchema: true });
+    expect(result.content[0].text).toContain("[frontmatter-schema]");
+    const after = fs.readFileSync(f15, "utf-8");
+    expect(after).toContain('github_issue: "#172"');
+    expect(after).toContain('related_issues: ["issue-14"]');
+    expect(fs.existsSync(`${f15}.bak`)).toBe(true);
+    expect(fs.readFileSync(path.join(kgRoot, ".kmgraph-frontmatter-schema"), "utf-8").trim()).toBe("1");
+  });
+
+  test("apply without frontmatterSteps is skipped with guidance, even when confirmed", async () => {
+    const kgRoot = makeTempDir("fm-nosteps"); tempDirs.push(kgRoot); scaffoldKg(kgRoot); mockActiveKg(kgRoot);
+    const f15 = seed(kgRoot);
+    const before = fs.readFileSync(f15, "utf-8");
+    const result = await handleUpgrade({ apply: ["frontmatter-schema"], confirmFrontmatterSchema: true });
+    expect(result.content[0].text).toContain("frontmatterSteps");
+    expect(fs.readFileSync(f15, "utf-8")).toBe(before);
+  });
+
+  test("step 2 before step 1 is refused", async () => {
+    const kgRoot = makeTempDir("fm-order"); tempDirs.push(kgRoot); scaffoldKg(kgRoot); mockActiveKg(kgRoot);
+    const f15 = seed(kgRoot);
+    const before = fs.readFileSync(f15, "utf-8");
+    const result = await handleUpgrade({ apply: ["frontmatter-schema"], frontmatterSteps: [2], confirmFrontmatterSchema: true });
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("requires step 1");
+    expect(fs.readFileSync(f15, "utf-8")).toBe(before);
+  });
+
+  test("nothing pending: apply is a harmless no-op and needs no confirmation", async () => {
+    const kgRoot = makeTempDir("fm-clean"); tempDirs.push(kgRoot); scaffoldKg(kgRoot); mockActiveKg(kgRoot);
+    const result = await handleUpgrade({ apply: ["frontmatter-schema"], frontmatterSteps: [1] });
+    expect(result.isError).not.toBe(true);
+    expect(result.content[0].text).toContain("nothing pending");
+    // Opus review F5: a no-op apply must not write anything, including the marker.
+    expect(fs.existsSync(path.join(kgRoot, ".kmgraph-frontmatter-schema"))).toBe(false);
+  });
+});

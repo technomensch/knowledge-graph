@@ -165,3 +165,5 @@ Requested check: what else does introducing `kmg-backfill` and refactoring `kmg-
 ## Related
 
 - [ENH-026](../ENH-026/ENH-026-specification.md) — ENH-026's spec cross-references this item.
+- [ENH-062](../ENH-062/ENH-062-specification.md) — its field backfill (a `kg_upgrade` category) is a different thing from `kmg-backfill` extraction; noted there so the two are not confused.
+- [issue-38](../../issues/issue-38/issue-38-description.md) — shares the test file `tests/test-skills-agents.sh` with this ENH; noted there.
