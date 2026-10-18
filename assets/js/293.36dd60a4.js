@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkknowledge_graph_plugin=self.webpackChunkknowledge_graph_plugin||[]).push([[293],{60293(e,g,n){n.d(g,{createEventModelingServices:()=>l.g});var l=n(46988);n(80184)}}]);

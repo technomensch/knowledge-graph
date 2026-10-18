@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkknowledge_graph_plugin=self.webpackChunkknowledge_graph_plugin||[]).push([[3192],{13192(e,r,c){c.d(r,{createArchitectureServices:()=>p.S});var p=c(84549);c(80184)}}]);
