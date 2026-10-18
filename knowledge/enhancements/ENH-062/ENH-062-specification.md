@@ -1,7 +1,7 @@
 ---
 id: ENH-062
 type: Enhancement
-status: proposed
+status: implemented
 github-issue: "#241"
 branch: none
 created: 2026-08-22
@@ -11,6 +11,8 @@ related_docs: ["[[ENH-062-relationship-scan-mcp-tool-spec|ENH-062 relationship s
 ---
 
 # ENH-062: Track issue/ADR/ENH relationships (blocked-by, related-to, depends-on) in local KG metadata, and formalize the `status` field schema
+
+**Status:** ✅ Implemented in v0.7.11
 
 **Local ID:** ENH-062 | **GitHub Issue:** #N (filed via `/kmgraph:kmg-start-issue-tracking`, Mode 3, track only)
 
@@ -236,7 +238,7 @@ Updated 2026-10-18 to match what v0.7.11 built. Earlier questions that are now a
 - **Computed `blocked` state and mirroring GitHub's relationship model** (the "GitHub Issue relationships" question near the top). Neither was built in v0.7.11; the typed fields exist, nothing reads them yet.
 - **A remembered "not related" list** for pairs the user dismisses in the relationship scan (see "Relationship Scan: Where the Logic Lives" and Known Risks). Undecided.
 - **A cross-platform MCP tool for the relationship scan.** Built in v0.7.11 as `kg_relationship_scan`, specified in [[ENH-062-relationship-scan-mcp-tool-spec|ENH-062-relationship-scan-mcp-tool-spec]]. Settled; kept here for the record. Making the skill call the tool instead of carrying the bash is deferred.
-- **When `status` flips to `implemented`** for this ENH and ENH-059, and the matching rows in `knowledge/enhancements/README.md`. The maintainer decides this after running the upgrade on this repo's own graph, which is not part of the v0.7.11 release.
+- **Status flip.** Settled 2026-10-18: this ENH and ENH-059 are marked `implemented` for v0.7.11, matching the other implemented enhancements. Running the migration on this repo's own graph is still not part of the release.
 
 ## Related
 
@@ -249,7 +251,7 @@ Updated 2026-10-18 to match what v0.7.11 built. Earlier questions that are now a
 
 ## Status
 
-Built in release v0.7.11 (branch `v0.7.11-kg-frontmatter-links`, not yet merged at the time of writing), including the cross-platform `kg_relationship_scan` MCP tool (branch `v0.7.11.2-mcp-relationship-scan`, see [[ENH-062-relationship-scan-mcp-tool-spec|ENH-062-relationship-scan-mcp-tool-spec]]). This document's own `status:` stays `proposed` until the maintainer decides the flip (see Open Questions).
+Built in release v0.7.11 (branch `v0.7.11-kg-frontmatter-links`, not yet merged at the time of writing), including the cross-platform `kg_relationship_scan` MCP tool (branch `v0.7.11.2-mcp-relationship-scan`, see [[ENH-062-relationship-scan-mcp-tool-spec|ENH-062-relationship-scan-mcp-tool-spec]]). This document's `status:` is `implemented` for the v0.7.11 release (maintainer decision 2026-10-18); the items under "Still open" and "Not part of the release" below are follow-ups, not blockers.
 
 **Built:** the `frontmatter-schema` category in `kg_upgrade` (inspect first; its own consent flag `confirmFrontmatterSchema` plus an explicit `frontmatterSteps` list; four separately approved steps; `.bak` copies; real-YAML cross-check; schema marker file and floor); `kg_capture` writing the flat wikilink `related_*` fields and `status_category`; the typed relationship fields in new issue and enhancement documents (`kmg-start-issue-tracking`); the updated protected templates; and the relationship scan as `kmg-paperwork-audit` Step 7, running inside the skill; and the cross-platform `kg_relationship_scan` MCP tool, which returns the same pairs as data (specified in `ENH-062-relationship-scan-mcp-tool-spec.md`).
 

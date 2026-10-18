@@ -1,7 +1,7 @@
 ---
 id: ENH-059
 type: Enhancement
-status: proposed
+status: implemented
 github-issue: pending
 branch: none
 created: 2026-07-30
@@ -10,6 +10,8 @@ related_issues: ["issue-52"]
 ---
 
 # ENH-059: Render KG Relationships as Real Obsidian Links (Tags Kept)
+
+**Status:** ✅ Implemented in v0.7.11
 
 ## Problem
 
@@ -80,7 +82,7 @@ The docs build and broken-links question is out of scope here. `knowledge/` is n
 
 ## Status
 
-Proposed. Idea capture expanded 2026-10-17; Obsidian behavior tested the same day. Not scheduled.
+Implemented in v0.7.11 (marked by the maintainer 2026-10-18). Relationship values are written as quoted wikilinks in flat lists with the short ID as label, `tags:` are untouched, and no extra plugin is needed. They are written by `kg_upgrade` (`frontmatter-schema` step 2) for existing notes and by `kg_capture` and the issue/ENH/ADR/lesson templates for new ones. Caveat carried over from the Obsidian test: link rendering was verified with the vault at the repo root, not yet with the vault at `knowledge/`. The optional mention of `obsidian-skills` from the original idea is not part of the release.
 
 ## Related
 
