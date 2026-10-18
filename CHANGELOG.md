@@ -9,9 +9,6 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
-### Fixed
-- `scripts/validate-plugin.sh` (a manual pre-publish check) failed on a clean checkout: it scanned the whole repo, including the project's own notes, and four of its six rules no longer matched anything useful. It now checks only the tracked files that ship to users (not `knowledge/`) for two things, private project names and the maintainer's home path, and fails loudly if `git grep` itself errors. `docs/reference/hooks.md` no longer claims installers or commands call it (issue-62, #265).
-
 ## [0.7.11] — 2026-10-17
 
 ### Added
@@ -27,6 +24,9 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 - `github-issue` is now `github_issue` in new issue/ENH frontmatter (`kmg-start-issue-tracking`); both spellings are still read for one release.
 - ADR frontmatter written by `kg_capture`: the nested `related:` map is replaced by flat `related_adrs`, `related_lessons`, `related_docs` lists (the legacy input shape is still accepted). ADR and lesson templates match.
 - `kmg-paperwork-audit`: the report step is now Step 8.
+
+### Fixed
+- `scripts/validate-plugin.sh` (a manual pre-publish check) failed on a clean checkout: it scanned the whole repo, including the project's own notes, and four of its six rules no longer matched anything useful. It now checks only the tracked files that ship to users (not `knowledge/`) for two things, private project names and the maintainer's home path, and fails loudly if `git grep` itself errors. `docs/reference/hooks.md` no longer claims installers or commands call it (issue-62, #265).
 
 ### Migration
 - Run `kg_upgrade` (or `/kmgraph:kmg-upgrade`), review the dry run for `frontmatter-schema`, and approve steps one at a time. Nothing is applied without your approval.
