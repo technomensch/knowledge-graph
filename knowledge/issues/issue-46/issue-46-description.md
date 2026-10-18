@@ -252,6 +252,7 @@ the `capture-corruption` backfix category. Full mcp-server suite: 440/440.
   issue as one of five case studies of internal paperwork drifting silently
   with nothing to catch it. Backlinked 2026-08-19.
 - [ENH-059](../../enhancements/ENH-059/ENH-059-specification.md) — notes that duplicate frontmatter blocks (this issue is one of three) may stop Obsidian reading a note's properties.
+- [issue-24](../issue-24/issue-24-description.md) — a duplicate of this issue's Manifestation B; closed as resolved by this fix.
 
 ## Discovery Context
 

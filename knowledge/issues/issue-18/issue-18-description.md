@@ -251,3 +251,7 @@ That trace-through caught a real bug: `kmg-recall.md`'s replacement text had car
 These were left as a new issue rather than folded into this one because they span more files than Phase 7.1 touched and deserve their own scoped investigation.
 
 **Re-verified after the `96c8f901` fix, before closing this out:** full `npx jest` (38 suites / 366 tests) and `npx tsc --noEmit` both clean; the MCP-level cwd-alternation + personal-scope-isolation regression check (3 sandboxes, 1 persistent connection, 9 steps) re-run and still passing; and the specific `kmg-recall.md` "nothing specified" trace re-walked against `recall-agent.md`'s real auto-detect contract, confirmed correct — no level flag is now passed when nothing is signaled, letting `recall-agent`'s own `all`/`active` auto-detect run unshortcircuited.
+
+## Related
+
+- [issue-39](../issue-39/issue-39-description.md) — documents the same phantom-skill pattern from a second case and cites this issue.

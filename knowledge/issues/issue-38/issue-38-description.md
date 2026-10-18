@@ -136,3 +136,4 @@ local-only.
 - `commands/kmg-sync-all.md` hotspot: also touched by
   [issue-37](../issue-37/issue-37-description.md), issue-40 (above), and ENH-026 —
   FYI, not batched with this issue.
+- [issue-39](../issue-39/issue-39-description.md) — filed afterward using this issue's workflow-mode choice as its precedent.
