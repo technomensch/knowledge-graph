@@ -226,6 +226,7 @@ For all MCP-capable platforms, these tools are available:
 | `kg_search` | Full-text search across a resolved KG |
 | `kg_scaffold` | Create a file from a template |
 | `kg_check_sensitive` | Scan for potentially sensitive data |
+| `kg_relationship_scan` | Read-only: list issue/enhancement pairs that mention the same file but declare no relationship in their frontmatter. Returns the pairs as data; for platforms that do not run the `kmg-paperwork-audit` skill. Optional `hubMax` (2 to 100, default 4) |
 
 ---
 

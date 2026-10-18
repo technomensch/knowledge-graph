@@ -108,6 +108,7 @@ MCP (Model Context Protocol) tools handle all persistence, search, and retrieval
 **What MCP tools do:**
 
 - `kg_search` — Query the knowledge graph by text, tags, or category
+- `kg_relationship_scan` — Read-only: list issue/enhancement pairs that mention the same file but declare no relationship
 - `kg_scaffold` — Create new knowledge graph entries from templates
 - `kg_config_*` — Manage configuration (init, list, switch, add category)
 - `kg_fts5_rebuild` — Build or refresh the full-text search index
