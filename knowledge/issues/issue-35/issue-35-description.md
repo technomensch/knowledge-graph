@@ -82,3 +82,7 @@ Status unchanged (`deferred` → will move to in-progress once Phase 1 execution
 **Not yet pushed to origin and not yet tested/reviewed by the user beyond automated unit tests.**
 
 **Confirmed merged (2026-08-22):** commit `d3db547e` is now an ancestor of `main`. Re-verified live: no dead `"knowledge"` literal remains in `mcp-server/src/tools/fts5.ts`'s `contentDirs`. Status updated to `resolved`.
+
+## Related
+
+- [issue-38](../issue-38/issue-38-description.md) — the same migration-verification gap, surfacing a third time; cites this issue.
