@@ -155,3 +155,4 @@ See ADR-028: me.md + rules.md as Platform-Agnostic Source of Truth.
 ## Related
 
 - [ENH-016](../ENH-016/ENH-016-specification.md) — rules.md auto-split recommendation; its split-target and precedent analysis cites this ENH.
+- [ENH-059](../ENH-059/ENH-059-specification.md) — cites Phase 4 of this ENH (graph visibility of plans) while rendering the KG's relationship fields as real Obsidian links.

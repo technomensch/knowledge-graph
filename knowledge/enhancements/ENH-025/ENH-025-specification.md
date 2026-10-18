@@ -86,3 +86,4 @@ Found via an open-ticket overlap check while finalizing [ENH-034](../ENH-034/ENH
 - ENH-034: `kmg-update-graph` removal — the reason `kg_extract`'s scope grew beyond chat-history
 - `agents/knowledge-extractor.md`: Claude Code-only equivalent
 - `commands/kmg-init.md` Step 1.10: backfill offer that calls the extractor (renamed from `commands/init.md`)
+- [ENH-062](../ENH-062/ENH-062-specification.md) — its relationship and status field backfill is a different thing from this extraction work; noted there so the two are not confused.

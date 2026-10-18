@@ -69,3 +69,7 @@ Manually edited the saved file to remove the tool-generated outer frontmatter bl
 
 Resolved — see "Resolution (2026-08-22)" above. Fixed as part of [[issue-46]]'s
 Manifestation B; no separate branch or implementation needed for this issue.
+
+## Related
+
+- [ENH-059](../../enhancements/ENH-059/ENH-059-specification.md) — notes that duplicate frontmatter blocks (this issue is one of three) may stop Obsidian reading a note's properties.

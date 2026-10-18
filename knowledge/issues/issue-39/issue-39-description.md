@@ -130,3 +130,4 @@ state-dependent, not as a finding that it's resolved project-wide.
 - `knowledge/issues/issue-36/` — related phantom-skill pattern tracking
 - `knowledge/issues/issue-38/issue-38-description.md` — precedent for this filing's
   workflow-mode choice (track-only, full workflow over lightweight capture)
+- [ENH-059](../../enhancements/ENH-059/ENH-059-specification.md) — notes that duplicate frontmatter blocks (this issue is one of three) may stop Obsidian reading a note's properties.
