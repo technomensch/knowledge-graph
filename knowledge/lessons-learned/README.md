@@ -4,8 +4,8 @@
 
 Comprehensive catalog of all lessons-learned documents.
 
-**Total Lessons:** 68 (10 architecture, 27 process, 25 patterns, 6 debugging)
-**Last Updated:** 2026-10-17
+**Total Lessons:** 71 (10 architecture, 28 process, 25 patterns, 8 debugging)
+**Last Updated:** 2026-10-18
 
 > **Known issues in this index** (see [issue tracker](../issues/README.md) for permanent tracking):
 > - **Resolved 2026-09-22:** the two files previously living at the top of `lessons-learned/` instead of inside their declared category folder — `Lessons_Learned_gh_issue_create_omission.md` (process) and `Lessons_Learned_InBand_Version_Warning_Burst_Cadence_Pattern.md` (patterns) — have now been physically moved into their correct category folders. Links below updated accordingly.
@@ -33,8 +33,9 @@ Comprehensive catalog of all lessons-learned documents.
 
 ---
 
-### Process Lessons (27 total)
+### Process Lessons (28 total)
 
+- [Fixing One-Way-Link Advisories Can Expose New Ones: Model the Whole Chain Against the Gate's Real Rule](process/Lessons_Learned_Process_Fixing_One_Way_Link_Advisories_Can_Expose_New_Ones:_Model_The_Whole_Chain_Against_The_Gate's_Real_Rule.md)
 - [Run New Scan Heuristics on the Real Corpus Before Shipping — Hub Files and Bare Filenames Dominate](process/Lessons_Learned_Process_Run_New_Scan_Heuristics_On_Real_Data_Hub_Files_Dominate.md) — 2026-10-17
 - [kg-config registry orphaned by repo or folder rename - fixed via kmg-init path-repoint](process/Lessons_Learned_Process_Kg_Config_Registry_Orphaned_By_Repo_Or_Folder_Rename_Fixed_Via_Kmg_Init_Path_Repoint.md) — 2026-08-06
 - [Resource-Path Migrations Must Grep the Prompt Layer, Not Just the Server Layer](process/Lessons_Learned_Process_Migration_Must_Grep_Prompt_Layer_Not_Just_Server_Layer.md) — 2026-07-14
@@ -99,7 +100,7 @@ Comprehensive catalog of all lessons-learned documents.
 
 ---
 
-### Debugging Lessons (6 total)
+### Debugging Lessons (8 total)
 
 - [Plugin Namespace Visibility - Shadow Command Failure](debugging/namespace-visibility-shadow-command-failure.md) — 2026-02-16 — *recovered verbatim from git history (commit `26894611`)*
 - [Plugin Cache Not Synced From Local Repo](debugging/Lessons_Learned_Debugging_Plugin_Cache_Not_Synced_From_Local_Repo.md) — 2026-04-09 — *reconstructed from chat-history evidence*
@@ -107,6 +108,8 @@ Comprehensive catalog of all lessons-learned documents.
 - [os.homedir() Stale Cache On macOS](debugging/Lessons_Learned_os_homedir_Stale_Cache_On_macOS.md) — 2026-07-12 — *reconstructed from chat-history evidence*
 - [Anchor Path-Comparison Scripts to Session cwd, Not a Fixed Project-Root Env Var — Git Worktrees Break the Assumption](debugging/Lessons_Learned_Debugging_Anchor_Path_Comparison_Scripts_To_Session_Cwd,_Not_A_Fixed_Project_Root_Env_Var_—_Git_Worktrees_Break_The_Assumption.md) — 2026-08-10 — *local-only, `debugging/` is gitignored — never committed (PR #216, issue-43, per its own frontmatter, but the file itself has no git history)*
 - [Marketplace slug truncated at 28 characters causes "plugin not found" error](debugging/Lessons_Learned_Debugging_Marketplace_Slug_Truncated_At_28_Characters_Causes_Plugin_Not_Found_Error.md) — 2026-02-17 — *authored fresh 2026-09-01, independently verified against chat-history — see § fabrication note above; not a restoration of the earlier fabricated file of a similar name*
+- [A Post-Commit Cache-Sync Hook Must Handle Merge Commits and Every Folder It Syncs](debugging/Lessons_Learned_Debugging_A_Post_Commit_Cache_Sync_Hook_Must_Handle_Merge_Commits_And_Every_Folder_It_Syncs.md) — 2026-10-18
+- [Graph Tools Called From a Git Worktree Still Resolve to the Original Folder Knowledge Graph](debugging/Lessons_Learned_Debugging_Graph_Tools_Called_From_A_Git_Worktree_Still_Resolve_To_The_Original_Folder_Knowledge_Graph.md) — 2026-10-18
 
 **Tags:** #debugging
 
@@ -115,6 +118,8 @@ Comprehensive catalog of all lessons-learned documents.
 ## Chronological Index
 
 **2026**
+- [2026-10-18] [Graph Tools Called From a Git Worktree Still Resolve to the Original Folder Knowledge Graph](debugging/Lessons_Learned_Debugging_Graph_Tools_Called_From_A_Git_Worktree_Still_Resolve_To_The_Original_Folder_Knowledge_Graph.md)
+- [2026-10-18] [A Post-Commit Cache-Sync Hook Must Handle Merge Commits and Every Folder It Syncs](debugging/Lessons_Learned_Debugging_A_Post_Commit_Cache_Sync_Hook_Must_Handle_Merge_Commits_And_Every_Folder_It_Syncs.md)
 - [2026-10-17] [Run New Scan Heuristics on the Real Corpus Before Shipping — Hub Files and Bare Filenames Dominate](process/Lessons_Learned_Process_Run_New_Scan_Heuristics_On_Real_Data_Hub_Files_Dominate.md)
 - [2026-09-17] [Bundled Example Content Drifts Like Real Data; Ported Patterns Need Their ADR Citation Verified](patterns/Lessons_Learned_Patterns_Bundled_Example_Content_Drift_And_Dangling_Adr_Citations.md)
 - [2026-08-22] [Fixed-Name Test Fixtures Collide With Real, Non-Sandboxed Shared State](patterns/Lessons_Learned_Patterns_Fixed_Name_Test_Fixtures_Collide_With_Real,_Non_Sandboxed_Shared_State.md)
@@ -264,4 +269,3 @@ See [core/examples/lessons-learned/](../../examples/lessons-learned/) for filled
 **How to capture**:
 - [Manual Workflow](../../docs/WORKFLOWS.md#workflow-1-create-lesson-learned) - Step-by-step
 - [Command Guide](../../../docs/COMMAND-GUIDE.md#essential-commands) - Automated (Claude Code)
-
