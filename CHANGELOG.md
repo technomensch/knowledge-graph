@@ -9,6 +9,9 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+- `scripts/validate-plugin.sh` (a manual pre-publish check) failed on a clean checkout: it scanned the whole repo, including the project's own notes, and four of its six rules no longer matched anything useful. It now checks only the tracked files that ship to users (not `knowledge/`) for two things, private project names and the maintainer's home path, and fails loudly if `git grep` itself errors. `docs/reference/hooks.md` no longer claims installers or commands call it (issue-62, #265).
+
 ## [0.7.11] — 2026-10-17
 
 ### Added
@@ -73,7 +76,7 @@ v0.7.8 was never cut as its own release (version files stayed at 0.7.7 while tha
 - `kg_extract` MCP tool — cross-platform equivalent of `kmg-backfill`, for Codex/Gemini users without Claude Code subagent spawning. Read-only; never writes. Closes ENH-025.
 
 ### Removed
-- `kmg-update-graph`, `kmg-sync-all`, `sync-all-agent` — confirmed-dead orchestration pipeline, inherited unmodified from an unrelated prior project (`optimize-my-resume`), zero confirmed real-world use ([issue-37](knowledge/issues/issue-37/issue-37-description.md)). Superseded by `kmg-backfill`. See ADR-071.
+- `kmg-update-graph`, `kmg-sync-all`, `sync-all-agent` — confirmed-dead orchestration pipeline, inherited unmodified from an unrelated prior project, zero confirmed real-world use ([issue-37](knowledge/issues/issue-37/issue-37-description.md)). Superseded by `kmg-backfill`. See ADR-071.
 
 ### Fixed
 - `kmg-init` Step 1.10's `sources[]` array now actually detects `knowledge/lessons-learned/` and `knowledge/decisions/`, and no longer silently skips the whole step when only those (plus chat-history) are present — previously never scanned despite `knowledge-extractor.md` documenting otherwise (real bug, found while validating ENH-034/035 in ADR-071).
