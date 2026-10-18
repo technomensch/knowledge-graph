@@ -78,7 +78,9 @@ echo "$OUT" | grep -q "ENH-004" && bad "unrelated ENH-004 was flagged" || ok "un
 echo "$OUT" | grep -q "README.md" && bad "ignored path README.md was used" || ok "common paths are ignored"
 echo "$OUT" | grep -q "notes.md" && bad "bare filename notes.md was flagged" || ok "bare filenames (no directory) are ignored"
 echo "$OUT" | grep -q "hub/file.ts" && bad "hub path shared by 5 docs was flagged" || ok "hub paths shared by more than 4 docs are ignored"
-[ -z "$ERR" ] && ok "a normal graph writes nothing to stderr" || bad "unexpected stderr: $ERR"
+[ "$(echo "$ERR" | grep -c .)" -eq 1 ] && echo "$ERR" | grep -q "reappear on every audit until a relationship is declared" \
+  && ok "flagged pairs come with exactly one warning that dismissals are not remembered" || bad "expected the dismissal warning as the only stderr line, got: $ERR"
+echo "$ERR" | grep -q "6 pair(s) flagged\|[0-9]* pair(s) flagged" && ok "the warning states how many pairs were flagged" || bad "warning does not state a pair count"
 
 # --- A graph folder that is not called "knowledge", and is not inside a repo ---
 G2="$TMP/elsewhere/my-notes"
@@ -111,6 +113,14 @@ run_scan "$G4"
 [ "$RC" -eq 0 ] && echo "$OUT" | grep -q "UNDECLARED: ENH-010 <-> ENH-011 (shared: lib/core.ts)" \
   && ok "a graph with only enhancements/ is scanned" || bad "enhancements-only graph was not scanned"
 
+# --- A graph where every pair is already declared: no output, and no warning ---
+G5="$TMP/all-declared"
+mkdir -p "$G5/enhancements/ENH-020" "$G5/enhancements/ENH-021"
+printf -- '---\nid: ENH-020\nrelated_enhs: ["ENH-021"]\n---\nTouches `lib/core.ts`.\n' > "$G5/enhancements/ENH-020/ENH-020-specification.md"
+printf -- '---\nid: ENH-021\n---\nTouches `lib/core.ts`.\n' > "$G5/enhancements/ENH-021/ENH-021-specification.md"
+run_scan "$G5"
+[ "$RC" -eq 0 ] && [ -z "$OUT" ] && [ -z "$ERR" ] && ok "nothing flagged: empty output and no warning" || bad "unexpected output or warning when nothing is flagged: $OUT / $ERR"
+
 # --- KG unset ---
 OUT="$(env -u KG bash "$BLOCK" 2>"$TMP/stderr")"; RC=$?; ERR="$(cat "$TMP/stderr")"
 [ "$RC" -eq 0 ] && [ -z "$OUT" ] && echo "$ERR" | grep -q "nothing to scan" \
@@ -124,12 +134,12 @@ for B in $BASHES; do
 $(cat "$BLOCK")
 SCAN
 )"
-  ERR="$(cat "$TMP/stderr")"
+  ERR="$(grep -v 'reappear on every audit' "$TMP/stderr")"
   echo "$OUT" | grep -q "UNDECLARED: issue-1 <-> issue-2 (shared: src/shared.ts)" && [ -z "$ERR" ] \
     && ok "heredoc form works, quietly, under $B" || bad "heredoc form (bash -s) failed under $B: $ERR"
   # the plain-file form under each bash too (the system bash on macOS is 3.2, Homebrew's is 5.x)
   OUT="$(KG="$G" "$B" "$BLOCK" 2>"$TMP/stderr")"
-  ERR="$(cat "$TMP/stderr")"
+  ERR="$(grep -v 'reappear on every audit' "$TMP/stderr")"
   echo "$OUT" | grep -q "UNDECLARED: issue-1 <-> issue-2 (shared: src/shared.ts)" && [ -z "$ERR" ] \
     && ok "file form works, quietly, under $B" || bad "file form failed under $B: $ERR"
 done

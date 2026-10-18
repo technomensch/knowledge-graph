@@ -302,7 +302,8 @@ declared() {
 }
 
 TMP="$(mktemp)"
-trap 'rm -f "$TMP"' EXIT
+FOUND="$(mktemp)"
+trap 'rm -f "$TMP" "$FOUND"' EXIT
 
 find "$KG/issues" "$KG/enhancements" -type f \( -name 'issue-*-description.md' -o -name 'ENH-*-specification.md' \) 2>/dev/null \
   | sort | while read -r f; do
@@ -331,7 +332,12 @@ sort -t "$(printf '\t')" -k1,1 -k2,2 "$TMP" | awk -F '\t' -v hub="$HUB_MAX" '
 ' | sort -u -t "$(printf '\t')" -k1,2 | while IFS="$(printf '\t')" read -r a b p fa fb; do
   if declared "$fa" "$b" || declared "$fb" "$a"; then continue; fi
   echo "UNDECLARED: $a <-> $b (shared: $p)"
-done
+done > "$FOUND"
+
+if [ -s "$FOUND" ]; then
+  cat "$FOUND"
+  echo "relationship-scan: $(wc -l < "$FOUND" | tr -d ' ') pair(s) flagged. Dismissing a pair here does not save anything: the same pairs reappear on every audit until a relationship is declared in either note's frontmatter." >&2
+fi
 
 exit 0
 ```
@@ -344,7 +350,7 @@ It prints one `UNDECLARED: <idA> <-> <idB> (shared: <path>)` line per pair. It i
 - **About 20 lines or fewer:** present each pair and let the user confirm or dismiss it.
 - **More than about 20 lines:** group the lines by the text after `shared:`. Show each group (the file, how many pairs, which docs), and ask one question per group: dismiss the whole group, walk through its pairs, or record the group as backlog. Going through a long list one pair at a time is too much.
 - **On confirm:** add the other doc's ID as a quoted wikilink (for example `"[[ENH-042-specification|ENH-042]]"`) to the most fitting list in both docs (`related_to`, `depends_on`, `blocked_by` or `blocking`; create the key if the doc lacks it).
-- Report dismissed pairs as dismissed, not as failures. Say plainly that a dismissal is not stored: the same pairs come back on the next audit unless a relationship is declared in either doc's frontmatter.
+- Report dismissed pairs as dismissed, not as failures. The scan prints a one-line warning on stderr whenever it flags pairs (a dismissal is not stored: the same pairs reappear on every audit until a relationship is declared in either note's frontmatter). Pass that warning on to the user, in your own words or verbatim, next to the list; do not drop it.
 
 ### Step 8 — Report and write completion flag
 
