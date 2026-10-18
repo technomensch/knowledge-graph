@@ -27,6 +27,7 @@ All notable changes to the Knowledge Plugin will be documented in this file.
 
 ### Fixed
 - `scripts/validate-plugin.sh` (a manual pre-publish check) failed on a clean checkout: it scanned the whole repo, including the project's own notes, and four of its six rules no longer matched anything useful. It now checks only the tracked files that ship to users (not `knowledge/`) for two things, private project names and the maintainer's home path, and fails loudly if `git grep` itself errors. `docs/reference/hooks.md` no longer claims installers or commands call it (issue-62, #265).
+- Dependency security updates (no code change, within the version ranges already allowed): the MCP server now reports no known vulnerabilities in its runtime dependencies (including critical ones in `proxy-addr` and the MCP SDK, now 1.32.1), and the server bundle is rebuilt. The docs toolchain lockfile is updated the same way. Six alerts remain open: `braces` and `sprintf-js` have no patched release anywhere yet, and `tinypool` and `postcss-selector-parser` are held back by Docusaurus's own dependency ranges (Docusaurus is already on its latest release).
 
 ### Migration
 - Run `kg_upgrade` (or `/kmgraph:kmg-upgrade`), review the dry run for `frontmatter-schema`, and approve steps one at a time. Nothing is applied without your approval.
