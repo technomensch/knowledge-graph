@@ -119,6 +119,12 @@ const config = {
             className: 'header-linkedin-link',
             'aria-label': 'LinkedIn profile',
           },
+          {
+            href: 'https://cal.com/marckaplan/listening-tour-sync',
+            position: 'right',
+            className: 'header-cal-link',
+            'aria-label': 'Book a call',
+          },
         ],
       },
       footer: {
