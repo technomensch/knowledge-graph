@@ -3,6 +3,7 @@ title: "ADR-025: Do not commit `enabledPlugins` blocks in `.claude/settings.json
 number: 025
 created: 2026-04-06T00:00:00Z
 status: Accepted
+status_category: done
 author: technomensch
 email: 917847+technomensch@users.noreply.github.com
 git:
@@ -11,11 +12,10 @@ git:
   pr: null
   issue: null
 implements: "non-git-tracked — original branch v0.2.3.2-beta; migrated to knowledge/ in [[e523d8b3]]"
-related:
-  adrs: []
-  lessons:
-    - Lessons_Learned_Plugin_Settings_Scope_Consistency.md
-  kg_entries: []
+related_adrs: []
+related_lessons:
+  - "[[Lessons_Learned_Plugin_Settings_Scope_Consistency]]"
+related_docs: []
 tags: [process]
 category: process
 ---

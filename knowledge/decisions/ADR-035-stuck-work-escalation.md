@@ -3,6 +3,7 @@ title: "ADR-035: Stuck-Work Escalation — Auto-Trigger Meta-Issue with Opus Gat
 number: 035
 created: 2026-04-16T00:00:00Z
 status: Proposed
+status_category: backlog
 author: mkaplan
 email: mkitact@gmail.com
 git:
@@ -11,10 +12,10 @@ git:
   pr: null
   issue: null
 implements: null
-related:
-  adrs: [72]
-  lessons: []
-  kg_entries: []
+related_adrs:
+  - "[[ADR-072-meta-issue-tracking-pattern|ADR-072]]"
+related_lessons: []
+related_docs: []
 tags: [meta-issue, escalation, debugging, stuck-work, opus, process]
 category: process
 ---

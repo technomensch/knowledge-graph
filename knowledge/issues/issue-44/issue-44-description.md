@@ -2,7 +2,8 @@
 id: issue-44
 type: Bug
 status: resolved
-github-issue: "#217"
+status_category: done
+github_issue: "#217"
 branch: v0.7.1.2-issue-44-worktree-gitignored-handoff-files
 created: 2026-08-10
 resolved: 2026-08-10

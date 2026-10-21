@@ -2,6 +2,7 @@
 title: "ENH-001: User-Level Global Knowledge Graphs"
 number: 001
 status: implemented
+status_category: done
 version_target: "v0.2.2"
 github_issue: null
 created: 2026-03-27

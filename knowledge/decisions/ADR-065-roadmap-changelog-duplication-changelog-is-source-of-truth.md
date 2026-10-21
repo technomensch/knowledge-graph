@@ -2,6 +2,7 @@
 title: "ADR-065: ROADMAP.md and CHANGELOG.md duplication — CHANGELOG is the single source of truth for shipped history"
 number: 065
 status: Accepted
+status_category: done
 date: 2026-07-12
 author: technomensch
 email: mkitact@gmail.com
@@ -11,10 +12,9 @@ git:
   pr: null
   issue: null
 implements: null
-related:
-  adrs: []
-  lessons: []
-  kg_entries: []
+related_adrs: []
+related_lessons: []
+related_docs: []
 tags: [documentation, governance, drift, process, roadmap, changelog]
 category: process
 ---

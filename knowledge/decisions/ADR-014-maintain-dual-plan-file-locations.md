@@ -3,6 +3,7 @@ title: "ADR-014: Maintain Dual Plan File Locations"
 number: 014
 created: 2026-03-01T12:00:00Z
 status: Accepted
+status_category: done
 author: Claude Sonnet 4.6
 email: noreply@anthropic.com
 git:
@@ -11,11 +12,10 @@ git:
   pr: null
   issue: null
 implements: "non-git-tracked — original branch v0.0.8.7.3-alpha-fix-installer-page; migrated to knowledge/ in [[e523d8b3]]"
-related:
-  adrs: []
-  lessons:
-    - lessons-learned/process/Lessons_Learned_Plan_File_Dual_Location_Protocol.md
-  kg_entries: []
+related_adrs: []
+related_lessons:
+  - "[[Lessons_Learned_Plan_File_Dual_Location_Protocol]]"
+related_docs: []
 tags:
   - process
 category: process

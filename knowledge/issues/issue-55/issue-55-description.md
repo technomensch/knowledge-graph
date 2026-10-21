@@ -2,14 +2,15 @@
 id: issue-55
 type: Bug
 status: resolved
-github-issue: "#242"
+status_category: done
+github_issue: "#242"
 branch: v0.7.4-bug-fixes
 created: 2026-08-22
 related_issues:
-  - issue-41
-  - issue-15
-  - issue-34
-  - issue-35
+  - "[[issue-41-description|issue-41]]"
+  - "[[issue-15-description|issue-15]]"
+  - "[[issue-34-description|issue-34]]"
+  - "[[issue-35-description|issue-35]]"
 ---
 
 # issue-55: `kg_search`'s project-local FTS5 index path is keyed only by KG name, not by path — stale/cross-repo index collisions silently return wrong (often empty) results

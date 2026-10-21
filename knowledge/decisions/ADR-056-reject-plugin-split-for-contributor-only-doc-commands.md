@@ -2,6 +2,7 @@
 title: "ADR-056: Reject plugin-split for contributor-only doc commands; fix via repo-context auto-detection"
 number: 056
 status: Accepted
+status_category: done
 date: 2026-07-01
 author: technomensch
 email: mkitact@gmail.com
@@ -11,12 +12,12 @@ git:
   pr: null
   issue: null
 implements: null
-related:
-  adrs: [027]
-  lessons: []
-  kg_entries:
-    - knowledge/chat-history/2026-04/2026-04-07-claude-part-02.md
-    - knowledge/chat-history/2026-02/2026-02-20-claude-part-01.md
+related_adrs:
+  - "[[ADR-027-docusaurus-restructure-diataxis-docs-feed|ADR-027]]"
+related_lessons: []
+related_docs:
+  - "knowledge/chat-history/2026-04/2026-04-07-claude-part-02.md"
+  - "knowledge/chat-history/2026-02/2026-02-20-claude-part-01.md"
 tags: [architecture, plugin-packaging, doc-commands, contributor-tools, kmg-update-doc, kmg-create-doc]
 category: architecture
 ---

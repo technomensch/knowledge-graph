@@ -3,6 +3,7 @@ title: "ADR-050: Pre-Push Composite Gate + Inline Recommendation Gate"
 number: 050
 created: 2026-05-30T00:00:00Z
 status: Accepted
+status_category: done
 author: mkaplan
 email: mkitact@gmail.com
 git:
@@ -11,10 +12,15 @@ git:
   pr: null
   issue: null
 implements: v0.5.9.3
-related:
-  adrs: [012, 013, 021, 036, 043, 049]
-  lessons: []
-  kg_entries: []
+related_adrs:
+  - "[[ADR-012-hook-security-model|ADR-012]]"
+  - "[[ADR-013-documentation-update-protocol|ADR-013]]"
+  - "[[ADR-021-single-source-of-truth-dry-documentation|ADR-021]]"
+  - "[[ADR-036-docs-impact-scan|ADR-036]]"
+  - "[[ADR-043-pretooluse-hook-injection-superpowers-rule-enforcement|ADR-043]]"
+  - "[[ADR-049-review-audit-protocol-post-plan-pre-push-review-governance|ADR-049]]"
+related_lessons: []
+related_docs: []
 tags: [hooks, governance, pre-push, recommendation, UserPromptSubmit, advisory]
 category: governance
 ---

@@ -2,11 +2,12 @@
 id: issue-49
 type: Bug
 status: resolved
-github-issue: pending
+status_category: done
+github_issue: pending
 branch: v0.7.2-issues-46-51
 created: 2026-08-17
-related_enhs: ["ENH-052"]
-related_issues: ["issue-52"]
+related_enhs: ["[[ENH-052-specification|ENH-052]]"]
+related_issues: ["[[issue-52-description|issue-52]]"]
 ---
 
 # issue-49: Plan Safety-Header STATUS Field Frozen at Initial "STOPPED" — Never Rewritten on Approval or Completion

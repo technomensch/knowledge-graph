@@ -2,7 +2,8 @@
 id: issue-48
 type: Refactor
 status: resolved
-github-issue: "#228"
+status_category: done
+github_issue: "#228"
 branch: v0.7.2-issues-46-51
 created: 2026-08-17
 folded-from: v0.7.1.6-issue-48-adr-dual-implementation

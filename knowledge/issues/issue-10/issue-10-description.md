@@ -2,12 +2,13 @@
 id: issue-10
 type: Bug
 status: resolved
+status_category: done
 branch: v0.6.16-update-claude-extract-chat-for-sub-agents
 resolved-on-branch: v0.6.18-misc-patches
 created: 2026-07-11
 resolved: 2026-07-12
-related-adrs: [ADR-001]
-related-enhs: []
+related_adrs: ["[[ADR-001-centralized-multi-kg-configuration|ADR-001]]"]
+related_enhs: []
 target-release: v0.6.18
 ---
 

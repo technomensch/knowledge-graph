@@ -2,7 +2,8 @@
 id: issue-46
 type: Bug
 status: resolved
-github-issue: "#226"
+status_category: done
+github_issue: "#226"
 branch: v0.7.2-issues-46-51
 created: 2026-08-16
 ---

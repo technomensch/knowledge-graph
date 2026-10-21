@@ -3,6 +3,7 @@ title: "ADR-029: Plan File Location in Knowledge Graph"
 number: 029
 created: 2026-04-09T21:15:00Z
 status: Accepted
+status_category: done
 author: technomensch
 email: 917847+technomensch@users.noreply.github.com
 git:
@@ -11,10 +12,11 @@ git:
   pr: null
   issue: null
 implements: v0.3.0-beta
-related:
-  adrs: [14, 28]
-  lessons: []
-  kg_entries: []
+related_adrs:
+  - "[[ADR-014-maintain-dual-plan-file-locations|ADR-014]]"
+  - "[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth|ADR-028]]"
+related_lessons: []
+related_docs: []
 tags: [plans, knowledge-graph, file-location, workflow, pre-implementation]
 category: process
 ---

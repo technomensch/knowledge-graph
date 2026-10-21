@@ -2,10 +2,11 @@
 id: issue-41
 type: Enhancement
 status: in-progress
-github-issue: "#239"
+status_category: started
+github_issue: "#239"
 branch: none
 created: 2026-08-03
-related-issues: [issue-18, issue-40, "issue-52"]
+related_issues: ["[[issue-18-description|issue-18]]", "[[issue-40-description|issue-40]]", "[[issue-52-description|issue-52]]"]
 ---
 
 # Issue-41: Worktree KG registration has no collision guard, no tree-identifying naming, and no merge-time conflict resolution

@@ -2,7 +2,8 @@
 id: ENH-035
 type: Enhancement
 status: implemented
-related_enhs: ["ENH-026"]
+status_category: done
+related_enhs: ["[[ENH-026-specification|ENH-026]]"]
 ---
 
 # ENH-035: Chat-history-and-lessons-to-KG backfill extractor (standalone, consolidates the now-retired kmg-update-graph)

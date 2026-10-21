@@ -2,11 +2,12 @@
 id: issue-61
 type: Hardening
 status: deferred
-github-issue: "#263"
+status_category: backlog
+github_issue: "#263"
 branch: none
 created: 2026-10-16
-related_enhs: ["ENH-052", "ENH-062", "ENH-065"]
-related_adrs: ["ADR-043", "ADR-050", "ADR-068"]
+related_enhs: ["[[ENH-052-specification|ENH-052]]", "[[ENH-062-specification|ENH-062]]", "[[ENH-065-specification|ENH-065]]"]
+related_adrs: ["[[ADR-043-pretooluse-hook-injection-superpowers-rule-enforcement|ADR-043]]", "[[ADR-050-pre-push-composite-gate-inline-recommendation-gate|ADR-050]]", "[[ADR-068-lightweight-vs-full-workflow-rule-and-piloted-command-completion-check|ADR-068]]"]
 ---
 
 # issue-61: Gate 5 backlink-symmetry check treats every ID mention as a relationship and ripples across the corpus

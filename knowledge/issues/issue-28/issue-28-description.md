@@ -2,7 +2,8 @@
 id: issue-28
 type: Hardening
 status: resolved
-github-issue: "#192"
+status_category: done
+github_issue: "#192"
 branch: none
 created: 2026-07-18
 ---

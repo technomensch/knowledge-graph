@@ -2,6 +2,7 @@
 title: "ADR-059: Plans must not hardcode derivable counts — derive at run time"
 number: 059
 status: Accepted
+status_category: done
 date: 2026-07-04
 author: technomensch
 email: mkitact@gmail.com
@@ -11,12 +12,11 @@ git:
   pr: null
   issue: null
 implements: null
-related:
-  adrs: []
-  lessons: []
-  kg_entries:
-    - knowledge/enhancements/ENH-037/ENH-037-specification.md
-    - knowledge/enhancements/ENH-038/ENH-038-specification.md
+related_adrs: []
+related_lessons: []
+related_docs:
+  - "[[ENH-037-specification]]"
+  - "[[ENH-038-specification]]"
 tags: [governance, process, plans, plan-authoring, concurrency]
 category: process
 ---

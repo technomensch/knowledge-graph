@@ -2,13 +2,14 @@
 title: "ENH-050: Document Trigger Keywords Tied to Each Command/Skill in User-Facing Docs"
 number: 050
 status: proposed
+status_category: backlog
 version_target: null
 github_issue: 181
 created: 2026-07-17
 related_adrs: []
-related_enhs: ["ENH-006"]
+related_enhs: ["[[ENH-006-specification|ENH-006]]"]
 notes: "Request captured only; docs files, format, and sync strategy deferred to implementation scoping."
-related_issues: ["issue-25"]
+related_issues: ["[[issue-25-description|issue-25]]"]
 ---
 
 # ENH-050: Document Trigger Keywords Tied to Each Command/Skill in User-Facing Docs

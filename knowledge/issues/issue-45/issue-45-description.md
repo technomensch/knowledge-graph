@@ -2,10 +2,11 @@
 id: issue-45
 type: Bug
 status: resolved
-github-issue: "#222"
+status_category: done
+github_issue: "#222"
 branch: v0.7.1.4-issue-45-meta-issue-attempts-paperwork-drift
 created: 2026-08-13
-related_enhs: ["ENH-056"]
+related_enhs: ["[[ENH-056-specification|ENH-056]]"]
 ---
 
 # Issue-45: Meta-Issue "Attempts" Convention Drifts From Paperwork — Enforced Only By Prose, Failed 3x

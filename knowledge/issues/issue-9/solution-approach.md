@@ -2,6 +2,7 @@
 id: issue-9
 file: solution-approach
 status: designed
+status_category: started
 ---
 
 # Issue-9 Solution Approach

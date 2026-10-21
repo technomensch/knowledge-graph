@@ -3,6 +3,7 @@ title: "ADR-069: Prompt Hardening — Project Instruction Files"
 number: 069
 created: 2026-08-20T00:00:00Z
 status: Accepted
+status_category: done
 author: technomensch
 git:
   branch: v0.7.3-prompt-improvements
@@ -10,10 +11,10 @@ git:
   pr: null
   issue: null
 implements: v0.7.3
-related:
-  adrs: [2]
-  lessons: []
-  kg_entries: []
+related_adrs:
+  - "[[ADR-002-commands-vs-skills-architecture|ADR-002]]"
+related_lessons: []
+related_docs: []
 tags: [prompting, instruction-design, commands, skills, governance]
 category: process
 ---

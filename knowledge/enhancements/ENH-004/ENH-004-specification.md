@@ -2,6 +2,7 @@
 title: "ENH-004: session-summary optional context-mode event DB integration"
 number: 004
 status: implemented
+status_category: done
 version_target: "v0.2.2"
 github_issue: null
 created: 2026-03-29

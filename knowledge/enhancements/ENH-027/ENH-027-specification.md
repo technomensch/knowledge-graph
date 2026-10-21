@@ -2,6 +2,7 @@
 id: ENH-027
 type: Enhancement
 status: proposed
+status_category: backlog
 ---
 
 # ENH-027: Superpowers Brainstorming Spec → KG Linkage

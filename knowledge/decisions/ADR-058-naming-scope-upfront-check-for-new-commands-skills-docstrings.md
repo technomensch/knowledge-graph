@@ -2,6 +2,7 @@
 title: "ADR-058: Command/skill naming and scope decisions require an upfront check, not ad-hoc creation"
 number: 058
 status: Accepted
+status_category: done
 date: 2026-07-03
 author: technomensch
 email: mkitact@gmail.com
@@ -11,14 +12,16 @@ git:
   pr: null
   issue: null
 implements: null
-related:
-  adrs: [053, 056, 057]
-  lessons: []
-  kg_entries:
-    - knowledge/enhancements/ENH-033/ENH-033-specification.md
-    - knowledge/enhancements/ENH-034/ENH-034-specification.md
-    - knowledge/enhancements/ENH-035/ENH-035-specification.md
-    - knowledge/enhancements/ENH-036/ENH-036-specification.md
+related_adrs:
+  - "[[ADR-053-kmg-prefix-cross-platform-naming|ADR-053]]"
+  - "[[ADR-056-reject-plugin-split-for-contributor-only-doc-commands|ADR-056]]"
+  - "[[ADR-057-detection-layer-requires-unified-design-not-piecemeal-growth|ADR-057]]"
+related_lessons: []
+related_docs:
+  - "[[ENH-033-specification]]"
+  - "[[ENH-034-specification]]"
+  - "[[ENH-035-specification]]"
+  - "[[ENH-036-specification]]"
 tags: [governance, process, naming, scope, commands, skills, docstrings, contributing]
 category: process
 ---

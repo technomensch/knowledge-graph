@@ -2,10 +2,11 @@
 id: issue-40
 type: Gap
 status: open
-github-issue: "#207"
+status_category: pending
+github_issue: "#207"
 branch: v0.7.0-adr-067-c1
 created: 2026-08-03
-related_issues: ["issue-18"]
+related_issues: ["[[issue-18-description|issue-18]]"]
 ---
 
 # issue-40: Capture-level flag naming/targeting consistency across commands+agents (`--named` vs `--project` vs `--graph`)

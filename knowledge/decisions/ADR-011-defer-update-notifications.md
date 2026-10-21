@@ -1,6 +1,7 @@
 ---
 title: "ADR-011: Defer Update Notifications and Version Sync to v0.0.9"
 status: Accepted
+status_category: done
 date: 2026-02-21
 deciders: technomensch, Claude Opus 4.6
 ---

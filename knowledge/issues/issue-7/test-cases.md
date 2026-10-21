@@ -2,6 +2,7 @@
 id: issue-7
 file: test-cases
 status: defined
+status_category: pending
 ---
 
 # Issue-7 Test Cases

@@ -2,10 +2,11 @@
 id: issue-32
 type: Bug
 status: resolved
-github-issue: "#236"
+status_category: done
+github_issue: "#236"
 branch: v0.7.9-upgrade-triggering (c3, v0.7.9-c3-stale-process-check)
 created: 2026-07-28
-related_adrs: ["ADR-054", "ADR-055", "ADR-067"]
+related_adrs: ["[[ADR-054-document-cache-clear-upgrade-workaround|ADR-054]]", "[[ADR-055-cross-platform-upgrade-triggering-version-sentinel-over-startup-notification|ADR-055]]", "ADR-067"]
 ---
 
 # issue-32: Already-running MCP server processes silently keep serving stale plugin code after an upgrade

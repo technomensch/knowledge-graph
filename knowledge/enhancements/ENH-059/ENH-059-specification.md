@@ -2,11 +2,12 @@
 id: ENH-059
 type: Enhancement
 status: implemented
-github-issue: pending
+status_category: done
+github_issue: pending
 branch: none
 created: 2026-07-30
-related_enhs: ["ENH-062"]
-related_issues: ["issue-52"]
+related_enhs: ["[[ENH-062-specification|ENH-062]]"]
+related_issues: ["[[issue-52-description|issue-52]]"]
 ---
 
 # ENH-059: Render KG Relationships as Real Obsidian Links (Tags Kept)

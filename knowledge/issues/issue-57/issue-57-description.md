@@ -2,10 +2,11 @@
 id: issue-57
 type: Bug
 status: resolved
-github-issue: "#248"
+status_category: done
+github_issue: "#248"
 branch: v0.7.4.2-fix-scaffold-upgrade-gaps
 created: 2026-08-23
-related_adrs: ["ADR-070"]
+related_adrs: ["[[ADR-070-scaffold-upgrade-dead-end-connect-unregistered-graph|ADR-070]]"]
 ---
 
 # issue-57: `kg_config_init` and `kg_upgrade` form a circular dead end over unregistered `decisions/`/`lessons-learned/` content

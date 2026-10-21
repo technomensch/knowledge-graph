@@ -2,7 +2,8 @@
 id: ENH-060
 type: Enhancement
 status: resolved
-github-issue: "#219"
+status_category: done
+github_issue: "#219"
 branch: v0.7.1.3-ENH-060-profile-approval-gate
 created: 2026-08-12
 related_enhs: []

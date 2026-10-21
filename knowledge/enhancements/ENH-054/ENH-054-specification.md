@@ -2,7 +2,8 @@
 id: ENH-054
 type: Enhancement
 status: proposed
-github-issue: "#209"
+status_category: backlog
+github_issue: "#209"
 branch: none
 created: 2026-07-26
 related_adrs: ["ADR-067"]

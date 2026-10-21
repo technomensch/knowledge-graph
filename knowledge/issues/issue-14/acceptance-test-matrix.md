@@ -2,7 +2,8 @@
 id: issue-14
 title: Operational Acceptance-Test Matrix — config-path migration (c1/c2/c3)
 status: tracked
-github-issue: "#171"
+status_category: pending
+github_issue: "#171"
 created: 2026-07-15
 ---
 

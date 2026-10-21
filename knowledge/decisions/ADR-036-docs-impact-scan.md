@@ -3,6 +3,7 @@ title: "ADR-036: docs-impact-scan Skill — Pre-PR Docs Discovery Layer"
 number: 036
 created: 2026-04-16T00:00:00Z
 status: Accepted
+status_category: done
 author: mkaplan
 email: mkitact@gmail.com
 git:
@@ -11,10 +12,12 @@ git:
   pr: null
   issue: null
 implements: v0.5.9.3
-related:
-  adrs: [013, 021, 050]
-  lessons: []
-  kg_entries: []
+related_adrs:
+  - "[[ADR-013-documentation-update-protocol|ADR-013]]"
+  - "[[ADR-021-single-source-of-truth-dry-documentation|ADR-021]]"
+  - "[[ADR-050-pre-push-composite-gate-inline-recommendation-gate|ADR-050]]"
+related_lessons: []
+related_docs: []
 tags: [docs, release-process, skills, update-doc, pre-pr, discovery]
 category: process
 ---

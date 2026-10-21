@@ -2,11 +2,12 @@
 title: "ENH-025: Cross-Platform Knowledge Extractor (Backfill from Chat History)"
 number: 025
 status: implemented
+status_category: done
 version_target: null
 github_issue: null
 created: 2026-06-12
 related_adrs: []
-related_enhs: ["ENH-024", "ENH-032"]
+related_enhs: ["[[ENH-024-specification|ENH-024]]", "[[ENH-032-specification|ENH-032]]"]
 ---
 
 # ENH-025: Cross-Platform Knowledge Extractor (Backfill from Chat History)

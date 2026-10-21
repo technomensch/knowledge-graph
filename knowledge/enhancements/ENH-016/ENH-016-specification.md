@@ -2,12 +2,13 @@
 title: "ENH-016: Rules File Auto-Split Recommendation"
 number: 016
 status: implemented
+status_category: done
 version_target: "v0.5.9.1"
 github_issue: null
 created: 2026-05-25
-related_adrs: ["ADR-028"]
-related_enhs: ["ENH-010", "ENH-014", "ENH-015", "ENH-062"]
-related_issues: ["issue-5"]
+related_adrs: ["[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth|ADR-028]]"]
+related_enhs: ["[[ENH-010-specification|ENH-010]]", "[[ENH-014-specification|ENH-014]]", "[[ENH-015-specification|ENH-015]]", "[[ENH-062-specification|ENH-062]]"]
+related_issues: ["[[issue-5-description|issue-5]]"]
 ---
 
 # ENH-016: Rules File Auto-Split Recommendation

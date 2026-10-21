@@ -2,6 +2,7 @@
 id: ENH-030
 type: Enhancement
 status: proposed
+status_category: backlog
 ---
 
 # ENH-030: KG Remove / Unregister Command

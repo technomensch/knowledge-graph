@@ -2,11 +2,12 @@
 id: issue-34
 type: Bug
 status: resolved
-github-issue: pending
+status_category: done
+github_issue: pending
 branch: none
 created: 2026-07-30
-related_enhs: ["ENH-056"]
-related_issues: ["issue-35", "issue-52"]
+related_enhs: ["[[ENH-056-specification|ENH-056]]"]
+related_issues: ["[[issue-35-description|issue-35]]", "[[issue-52-description|issue-52]]"]
 ---
 
 # issue-34: `kg_search`/FTS5 Index Never Cover `knowledge/issues/` or `knowledge/enhancements/`

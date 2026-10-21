@@ -2,11 +2,12 @@
 id: issue-52
 type: Enhancement
 status: deferred
-github-issue: "#229"
+status_category: backlog
+github_issue: "#229"
 branch: none
 created: 2026-08-19
-related_issues: ["issue-11"]
-related_enhs: ["ENH-034"]
+related_issues: ["[[issue-11-description|issue-11]]"]
+related_enhs: ["[[ENH-034-specification|ENH-034]]"]
 ---
 
 # issue-52: `superpowers:brainstorming`-Originated Specs Still Bypass `start-issue-tracking`'s GitHub-Issue Creation — Research a Flag/Keyword/Trigger to Close the Gap

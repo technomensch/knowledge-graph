@@ -2,11 +2,12 @@
 title: "ENH-014: Audit and fix MEMORY.md cascade — update all commands/skills/agents/hooks to use profile files"
 number: 014
 status: implemented
+status_category: done
 version_target: "v0.5.8"
 github_issue: null
 created: 2026-05-22
 related_adrs: []
-related_enhs: ["ENH-016"]
+related_enhs: ["[[ENH-016-specification|ENH-016]]"]
 ---
 
 # ENH-014: Audit and fix MEMORY.md cascade

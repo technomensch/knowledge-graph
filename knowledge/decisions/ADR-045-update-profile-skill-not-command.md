@@ -3,6 +3,7 @@ title: "ADR-045: Implement Profile Update Functionality as a Skill, Not a Comman
 number: 45
 created: 2026-04-23T00:00:00Z
 status: Accepted
+status_category: done
 author: technomensch
 email: 917847+technomensch@users.noreply.github.com
 git:
@@ -11,10 +12,9 @@ git:
   pr: null
   issue: null
 implements: null
-related:
-  adrs: []
-  lessons: []
-  kg_entries: []
+related_adrs: []
+related_lessons: []
+related_docs: []
 tags: [profile, skill, command, platform-agnostic, user-profile]
 category: architecture
 ---

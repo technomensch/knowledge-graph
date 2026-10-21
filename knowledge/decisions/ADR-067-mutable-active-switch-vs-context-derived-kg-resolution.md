@@ -2,6 +2,7 @@
 title: "ADR-067: Mutable `.active` switch vs context-derived KG resolution — decision pending"
 number: 067
 status: Proposed
+status_category: backlog
 date: 2026-07-15
 author: technomensch
 email: mkitact@gmail.com
@@ -11,11 +12,17 @@ git:
   pr: null
   issue: null
 implements: null
-related:
-  adrs: [1, 19, 60, 66]
-  lessons: []
-  kg_entries: []
-  issues: [10, 14, 18]
+related_adrs:
+  - "[[ADR-001-centralized-multi-kg-configuration|ADR-001]]"
+  - "[[ADR-019-write-guard-agent-instructions-vs-data-layer|ADR-019]]"
+  - "[[ADR-060-narrow-kg-search-scope-away-from-raw-chat-history|ADR-060]]"
+  - "[[ADR-066-kg-content-storage-location-for-global-and-cowork-modes|ADR-066]]"
+related_issues:
+  - "[[issue-10-description|issue-10]]"
+  - "[[issue-14-description|issue-14]]"
+  - "[[issue-18-description|issue-18]]"
+related_lessons: []
+related_docs: []
 tags: [architecture, kg-resolution, switch, context-mode, cross-kg-bleed, state-model, decision-pending]
 category: architecture
 ---

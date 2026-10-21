@@ -1,6 +1,7 @@
 ---
 title: "ADR-002: Commands vs Skills Architecture"
 status: Accepted
+status_category: done
 date: 2026-02-16
 deciders: technomensch, Claude Sonnet 4.5
 ---

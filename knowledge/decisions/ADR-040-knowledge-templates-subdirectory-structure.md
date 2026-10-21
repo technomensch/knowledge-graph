@@ -3,6 +3,7 @@ title: "ADR-040: Restructure Knowledge Templates into Subdirectory"
 number: 040
 created: 2026-04-21T00:00:00Z
 status: Accepted
+status_category: done
 author: technomensch
 email: mkitact@gmail.com
 git:
@@ -11,10 +12,15 @@ git:
   pr: null
   issue: null
 implements: v0.4.3-beta
-related:
-  adrs: [9, 28, 32, 33, 37, 39]
-  lessons: []
-  kg_entries: []
+related_adrs:
+  - "[[ADR-009-three-tier-installation-architecture|ADR-009]]"
+  - "[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth|ADR-028]]"
+  - "[[ADR-032-platform-specific-directives-in-platform-config|ADR-032]]"
+  - "[[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file|ADR-033]]"
+  - "[[ADR-037-default-rules-for-graph-deployment|ADR-037]]"
+  - "[[ADR-039-profile-terminology|ADR-039]]"
+related_lessons: []
+related_docs: []
 tags: [templates, knowledge, directory-structure, init, upgrade]
 category: architecture
 ---

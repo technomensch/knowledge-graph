@@ -2,11 +2,12 @@
 title: "ENH-021: Session Summary + Handoff Asymmetric Coupling via `continues_from`"
 number: 021
 status: implemented
+status_category: done
 version_target: "v0.5.10"
 github_issue: null
 created: 2026-05-28
-related_adrs: ["ADR-049", "ADR-050", "ADR-051"]
-related_enhs: ["ENH-020"]
+related_adrs: ["[[ADR-049-review-audit-protocol-post-plan-pre-push-review-governance|ADR-049]]", "[[ADR-050-pre-push-composite-gate-inline-recommendation-gate|ADR-050]]", "[[ADR-051-session-summary-handoff-asymmetric-coupling|ADR-051]]"]
+related_enhs: ["[[ENH-020-specification|ENH-020]]"]
 ---
 
 # ENH-021: Session Summary + Handoff Asymmetric Coupling via `continues_from`

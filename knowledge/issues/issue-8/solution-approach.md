@@ -2,6 +2,7 @@
 id: issue-8
 file: solution-approach
 status: designed
+status_category: started
 ---
 
 # Issue-8 Solution Approach

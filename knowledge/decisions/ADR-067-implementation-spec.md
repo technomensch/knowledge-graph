@@ -1,12 +1,13 @@
 ---
 title: "ADR-067 Implementation Spec: KG Resolution Model"
 status: Implemented (core model shipped v0.7.0, 2026-08-04; numbering-collision mechanism shipped v0.7.4.1, 2026-08-23) — 2 optional fold-ins remain unbuilt, see Implementation Status
+status_category: done
 date: 2026-07-28
 supersedes_draft: "docs/specs/2026-07-26-adr-067-kg-resolution-v0.7-spec.md"
 source_adr: "knowledge/decisions/ADR-067-mutable-active-switch-vs-context-derived-kg-resolution.md"
-related_adrs: [1, 19, 55, 60, 63, 66]
-related_enhs: [53, 54, 55]
-related_issues: [10, 14, 15, 27]
+related_adrs: ["[[ADR-001-centralized-multi-kg-configuration|ADR-001]]", "[[ADR-019-write-guard-agent-instructions-vs-data-layer|ADR-019]]", "[[ADR-055-cross-platform-upgrade-triggering-version-sentinel-over-startup-notification|ADR-055]]", "[[ADR-060-narrow-kg-search-scope-away-from-raw-chat-history|ADR-060]]", "[[ADR-063-never-destroy-known-good-state-before-confirmed-write|ADR-063]]", "[[ADR-066-kg-content-storage-location-for-global-and-cowork-modes|ADR-066]]"]
+related_enhs: ["[[ENH-053-specification|ENH-053]]", "[[ENH-054-specification|ENH-054]]", "[[ENH-055-specification|ENH-055]]"]
+related_issues: ["[[issue-10-description|issue-10]]", "[[issue-14-description|issue-14]]", "[[issue-15-description|issue-15]]", "[[issue-27-description|issue-27]]"]
 ---
 
 # ADR-067 Implementation Spec: KG Resolution Model

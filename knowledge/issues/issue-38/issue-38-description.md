@@ -2,11 +2,12 @@
 id: issue-38
 type: Bug
 status: resolved
-github-issue: "#201"
+status_category: done
+github_issue: "#201"
 branch: none
 created: 2026-08-01
 related_adrs: ["ADR-067"]
-related_issues: ["issue-31", "issue-35"]
+related_issues: ["[[issue-31-description|issue-31]]", "[[issue-35-description|issue-35]]"]
 ---
 
 # issue-38: Multiple `tests/` Suites Reference Pre-`kmg-`-Prefix Command/Skill Names — Silently Broken Since the Rename Migration

@@ -2,11 +2,12 @@
 id: ENH-052
 type: Hardening
 status: resolved
-github-issue: "#188"
+status_category: done
+github_issue: "#188"
 branch: none
 created: 2026-07-18
-related_issues: ["issue-13", "issue-26", "issue-28", "issue-45", "issue-49", "issue-50", "issue-51", "issue-52", "issue-61"]
-related_enhs: ["ENH-042", "ENH-062", "ENH-065"]
+related_issues: ["[[issue-13-description|issue-13]]", "[[issue-26-description|issue-26]]", "[[issue-28-description|issue-28]]", "[[issue-45-description|issue-45]]", "[[issue-49-description|issue-49]]", "[[issue-50-description|issue-50]]", "[[issue-51-description|issue-51]]", "[[issue-52-description|issue-52]]", "[[issue-61-description|issue-61]]"]
+related_enhs: ["[[ENH-042-specification|ENH-042]]", "[[ENH-062-specification|ENH-062]]", "[[ENH-065-specification|ENH-065]]"]
 ---
 
 # ENH-052: No Pre-PR Consistency Check for the Knowledge Graph's Own Internal Paperwork

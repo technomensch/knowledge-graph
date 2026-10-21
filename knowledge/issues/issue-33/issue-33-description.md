@@ -2,11 +2,12 @@
 id: issue-33
 type: Hardening
 status: deferred
-github-issue: "#206"
+status_category: backlog
+github_issue: "#206"
 branch: none
 created: 2026-07-29
-related_enhs: ["ENH-065"]
-related_issues: ["issue-25"]
+related_enhs: ["[[ENH-065-specification|ENH-065]]"]
+related_issues: ["[[issue-25-description|issue-25]]"]
 ---
 
 # issue-33: Handoff/Recall Commands Don't Require Tracing Linked Files — Sessions Read Only the Pointer Layer

@@ -1,6 +1,7 @@
 ---
 title: "ADR-054: Document Cache-Clear as Official Upgrade Path for Claude Code Plugin"
 status: Accepted
+status_category: done
 date: 2026-03-03
 deciders: technomensch, Claude Haiku 4.5
 ---

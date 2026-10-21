@@ -2,7 +2,8 @@
 id: issue-59
 type: Bug
 status: deferred
-github-issue: "#252"
+status_category: backlog
+github_issue: "#252"
 branch: none
 created: 2026-09-01
 ---

@@ -2,10 +2,11 @@
 id: issue-36
 type: Bug
 status: resolved
-github-issue: "#237"
+status_category: done
+github_issue: "#237"
 branch: none
 created: 2026-07-31
-related_issues: ["issue-17", "issue-18", "issue-33"]
+related_issues: ["[[issue-17-description|issue-17]]", "[[issue-18-description|issue-18]]", "[[issue-33-description|issue-33]]"]
 ---
 
 # issue-36: Hook-injected instructions reference `kmgraph:recall` — a skill name that doesn't exist

@@ -3,6 +3,7 @@ title: "ADR-070: Scaffold/Upgrade Dead-End — connect-unregistered-graph, Share
 number: 070
 created: 2026-08-23T00:00:00Z
 status: Accepted
+status_category: done
 author: technomensch
 email: mkitact@gmail.com
 git:
@@ -12,10 +13,10 @@ git:
   pr: null
   issue: null
 implements: "[[57396128]] — fix(review): address opus validation findings — stale dist rebuild, remaining scaffold leak, registration-guard gap, cli.ts parity, version sync"
-related:
-  adrs: ["067"]
-  lessons: []
-  kg_entries: []
+related_adrs:
+  - "ADR-067"
+related_lessons: []
+related_docs: []
 tags: [kg_config_init, kg_upgrade, scaffold, registration-guard, data-safety, ai-code-review]
 category: architecture
 ---

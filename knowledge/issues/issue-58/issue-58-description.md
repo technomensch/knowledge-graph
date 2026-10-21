@@ -2,10 +2,11 @@
 id: issue-58
 type: Bug
 status: resolved
-github-issue: "#249"
+status_category: done
+github_issue: "#249"
 branch: v0.7.4.2-fix-scaffold-upgrade-gaps
 created: 2026-08-23
-related_adrs: ["ADR-070"]
+related_adrs: ["[[ADR-070-scaffold-upgrade-dead-end-connect-unregistered-graph|ADR-070]]"]
 ---
 
 # issue-58: `scaffoldGraphDirectory` drifted from the wizard's canonical template routing, and scaffold files leaked to disk before registration refusal checks could abort

@@ -2,6 +2,7 @@
 title: "ADR-063: Never destroy known-good state before the replacement is confirmed written"
 number: 063
 status: Accepted
+status_category: done
 date: 2026-07-11
 author: technomensch
 email: mkitact@gmail.com
@@ -11,14 +12,13 @@ git:
   pr: null
   issue: null
 implements: null
-related:
-  adrs: []
-  lessons:
-    - knowledge/issues/chat-extraction-reliability-saga/analysis/lessons-learned.md
-  kg_entries:
-    - knowledge/issues/chat-extraction-reliability-saga/README.md
-    - knowledge/issues/chat-extraction-reliability-saga/attempts/002-enh-043/specification.md
-    - knowledge/issues/kg-config-silent-overwrite/README.md
+related_adrs: []
+related_lessons:
+  - "[[chat-extraction-reliability-saga/analysis/lessons-learned|lessons-learned]]"
+related_docs:
+  - "[[chat-extraction-reliability-saga/README|README]]"
+  - "[[002-enh-043/specification|specification]]"
+  - "[[kg-config-silent-overwrite/README|README]]"
 tags: [write-safety, data-loss, cross-cutting, v0.6.18]
 category: architecture
 ---

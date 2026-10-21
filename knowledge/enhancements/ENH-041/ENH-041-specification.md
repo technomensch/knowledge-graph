@@ -2,6 +2,7 @@
 id: ENH-041
 type: Bug
 status: proposed
+status_category: backlog
 ---
 
 # ENH-041: Broken nav breadcrumb (`GETTING-STARTED.md` / `WORKFLOWS.md`) baked into every index README scaffold

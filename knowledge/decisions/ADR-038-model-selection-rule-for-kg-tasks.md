@@ -3,6 +3,7 @@ title: "ADR-038: Model Selection Rule for Knowledge Graph Tasks"
 number: 038
 created: 2026-04-21T15:30:00Z
 status: Accepted
+status_category: done
 author: technomensch
 email: 917847+technomensch@users.noreply.github.com
 git:
@@ -11,11 +12,10 @@ git:
   pr: null
   issue: null
 implements: "[[36dc84cf]] — docs(adr): create ADR-038: Model Selection Rule for Knowledge Graph Tasks"
-related:
-  adrs:
-    - "[[ADR-037-default-rules-for-graph-deployment]]"
-  lessons: []
-  kg_entries: []
+related_adrs:
+  - "[[ADR-037-default-rules-for-graph-deployment]]"
+related_lessons: []
+related_docs: []
 tags: [process, model-selection, task-routing, optimization]
 category: process
 ---

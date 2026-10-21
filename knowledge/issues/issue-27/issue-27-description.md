@@ -2,7 +2,8 @@
 id: issue-27
 type: Bug
 status: resolved
-github-issue: "#191"
+status_category: done
+github_issue: "#191"
 branch: v0.6.20-storage-migration-completion
 created: 2026-07-18
 ---

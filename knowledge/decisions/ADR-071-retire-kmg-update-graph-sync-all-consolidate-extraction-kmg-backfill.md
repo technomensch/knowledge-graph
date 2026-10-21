@@ -3,6 +3,7 @@ title: "ADR-071: Retire kmg-update-graph/kmg-sync-all, Consolidate Extraction in
 number: 071
 created: 2026-09-04T00:00:00Z
 status: Accepted
+status_category: done
 author: technomensch
 email: mkitact@gmail.com
 git:
@@ -11,13 +12,12 @@ git:
   pr: null
   issue: null
 implements: null
-related:
-  adrs:
-    - "[[ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings]]"
-    - "[[ADR-053-kmg-prefix-cross-platform-naming]]"
-    - "[[ADR-062-gemini-pb-project-scoping-fail-closed]]"
-  lessons: []
-  kg_entries: []
+related_adrs:
+  - "[[ADR-058-naming-scope-upfront-check-for-new-commands-skills-docstrings]]"
+  - "[[ADR-053-kmg-prefix-cross-platform-naming]]"
+  - "[[ADR-062-gemini-pb-project-scoping-fail-closed]]"
+related_lessons: []
+related_docs: []
 tags: [command-lifecycle, extraction-pipeline, consolidation, kmg-backfill, kg_extract, deprecation]
 category: architecture
 ---

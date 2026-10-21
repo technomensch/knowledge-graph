@@ -3,6 +3,7 @@ title: "ADR-039: Profile Terminology for Behavioral Configuration"
 number: 039
 created: 2026-04-21T18:00:00Z
 status: Accepted
+status_category: done
 author: technomensch
 email: 917847+technomensch@users.noreply.github.com
 git:
@@ -11,12 +12,11 @@ git:
   pr: null
   issue: null
 implements: "[[1aa5c455]] — docs(adr): add ADR-039 profile terminology (mirrors user-level ADR-010)"
-related:
-  adrs:
-    - "[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]]"
-    - "ADR-010 (user-level mirror at ~/.kmgraph/decisions/ADR-010-profile-terminology.md)"
-  lessons: []
-  kg_entries: []
+related_adrs:
+  - "[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]]"
+  - "ADR-010 (user-level mirror at ~/.kmgraph/decisions/ADR-010-profile-terminology.md)"
+related_lessons: []
+related_docs: []
 tags: [terminology, documentation, consolidation]
 category: process
 ---

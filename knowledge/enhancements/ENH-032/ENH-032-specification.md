@@ -2,7 +2,8 @@
 id: ENH-032
 type: Bug
 status: resolved
-related_enhs: ["ENH-035"]
+status_category: done
+related_enhs: ["[[ENH-035-specification|ENH-035]]"]
 ---
 
 # ENH-032: Knowledge-Extractor Approval Gate Blocks Coordinator Relay

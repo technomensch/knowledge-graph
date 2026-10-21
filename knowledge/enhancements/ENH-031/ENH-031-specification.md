@@ -2,6 +2,7 @@
 id: ENH-031
 type: Bug
 status: resolved
+status_category: done
 ---
 
 # ENH-031: Init Completeness — Backfill, triggers.md, and CLAUDE.md Gaps

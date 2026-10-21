@@ -2,12 +2,13 @@
 id: issue-11
 type: Hardening
 status: resolved
-github-issue: "#165"
+status_category: done
+github_issue: "#165"
 branch: v0.6.18-misc-patches (deferred — not yet created; this work lands as an additional commit once c0 creates it)
 created: 2026-07-11
-related-adrs: []
-related-enhs: [ENH-027]
-related_issues: ["issue-52"]
+related_adrs: []
+related_enhs: ["[[ENH-027-specification|ENH-027]]"]
+related_issues: ["[[issue-52-description|issue-52]]"]
 ---
 
 # Issue-11: Two distinct, undiagnosed causes behind ENH specs missing a real GitHub issue link

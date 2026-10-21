@@ -2,6 +2,7 @@
 id: ENH-037
 type: Enhancement
 status: resolved
+status_category: done
 ---
 
 # ENH-037: README indexes for enhancements/ and issues/, cross-referenced with decisions/

@@ -2,13 +2,14 @@
 id: issue-4
 type: Bug
 status: resolved
-github-issue: "#106"
+status_category: done
+github_issue: "#106"
 branch: v0.5.5-fix-session-flag-dedup
 plan: docs/plans/v0.5.5-fix-session-flag-dedup.md
 created: 2026-04-28
 resolved: 2026-04-29
 fix-commits: ["667e7a87", "fb37e2ea"]
-related-enhs: [ENH-016]
+related_enhs: ["[[ENH-016-specification|ENH-016]]"]
 ---
 
 # Issue-4: Stop Hook /tmp Flag Accumulates Per-Subprocess Instead of Per-Session

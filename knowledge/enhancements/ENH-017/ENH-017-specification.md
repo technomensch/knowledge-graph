@@ -2,6 +2,7 @@
 title: "ENH-017: Improve start-issue-tracking Step 1.2 Version Impact UX"
 number: 017
 status: implemented
+status_category: done
 version_target: "v0.5.10"
 github_issue: null
 created: 2026-05-27

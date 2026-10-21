@@ -2,12 +2,13 @@
 id: issue-31
 type: Bug
 status: resolved
-github-issue: "#200"
+status_category: done
+github_issue: "#200"
 branch: none
 created: 2026-07-28
-related_adrs: ["ADR-066"]
-related_enhs: ["ENH-056"]
-related_issues: ["issue-55"]
+related_adrs: ["[[ADR-066-kg-content-storage-location-for-global-and-cowork-modes|ADR-066]]"]
+related_enhs: ["[[ENH-056-specification|ENH-056]]"]
+related_issues: ["[[issue-55-description|issue-55]]"]
 ---
 
 # issue-31: `kmg-handoff` Writes to Stale Pre-Migration Path `./handoff-packages/` Instead of `knowledge/handoffs/`

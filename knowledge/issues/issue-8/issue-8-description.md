@@ -2,10 +2,11 @@
 id: issue-8
 type: Enhancement
 status: resolved
+status_category: done
 branch: v0.5.9.3-docs-enforcement-protocol-gap
 created: 2026-05-30
-related-adrs: [ADR-013, ADR-021, ADR-036]
-related-enhs: [ENH-015]
+related_adrs: ["[[ADR-013-documentation-update-protocol|ADR-013]]", "[[ADR-021-single-source-of-truth-dry-documentation|ADR-021]]", "[[ADR-036-docs-impact-scan|ADR-036]]"]
+related_enhs: ["[[ENH-015-specification|ENH-015]]"]
 target-release: v0.5.9.3
 ---
 

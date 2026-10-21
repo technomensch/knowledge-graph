@@ -2,7 +2,8 @@
 id: issue-21
 type: Bug
 status: deferred
-github-issue: "#182"
+status_category: backlog
+github_issue: "#182"
 branch: none
 created: 2026-07-17
 ---

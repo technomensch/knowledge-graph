@@ -2,6 +2,7 @@
 id: ENH-038
 type: Bug
 status: resolved
+status_category: done
 ---
 
 # ENH-038: Extract-chat-history reliability (umbrella)

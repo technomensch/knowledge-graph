@@ -2,11 +2,12 @@
 id: ENH-051
 type: Enhancement
 status: deferred
-github-issue: "#187"
+status_category: backlog
+github_issue: "#187"
 branch: none
 created: 2026-07-18
-related_adrs: ["ADR-066", "ADR-067"]
-related_enhs: ["ENH-022", "ENH-062", "ENH-065"]
+related_adrs: ["[[ADR-066-kg-content-storage-location-for-global-and-cowork-modes|ADR-066]]", "ADR-067"]
+related_enhs: ["[[ENH-022-specification|ENH-022]]", "[[ENH-062-specification|ENH-062]]", "[[ENH-065-specification|ENH-065]]"]
 ---
 
 # ENH-051: Stop Hand-Duplicating KG Path Logic Between cli.ts and kmg-init.md

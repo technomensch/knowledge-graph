@@ -2,6 +2,7 @@
 title: "ADR-060: Narrow kg_search scope away from raw chat-history — let context-mode own session recall"
 number: 060
 status: Proposed
+status_category: backlog
 date: 2026-07-05
 author: technomensch
 email: mkitact@gmail.com
@@ -11,12 +12,11 @@ git:
   pr: null
   issue: null
 implements: null
-related:
-  adrs:
-    - ADR-001-centralized-multi-kg-configuration.md
-  lessons: []
-  kg_entries:
-    - knowledge/enhancements/ENH-040/ENH-040-specification.md
+related_adrs:
+  - "[[ADR-001-centralized-multi-kg-configuration]]"
+related_lessons: []
+related_docs:
+  - "[[ENH-040-specification]]"
 tags: [architecture, search, context-mode, fts5, scope]
 category: architecture
 ---

@@ -2,10 +2,11 @@
 id: ENH-063
 type: Enhancement
 status: deferred
-github-issue: "#243"
+status_category: backlog
+github_issue: "#243"
 branch: none
 created: 2026-08-22
-related_enhs: ["ENH-065"]
+related_enhs: ["[[ENH-065-specification|ENH-065]]"]
 ---
 
 # ENH-063: Decision-Provenance Tagging for ADRs

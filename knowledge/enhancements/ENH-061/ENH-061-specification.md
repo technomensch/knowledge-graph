@@ -2,13 +2,14 @@
 id: ENH-061
 type: Enhancement
 status: resolved
-github-issue: "#221"
+status_category: done
+github_issue: "#221"
 branch: v0.7.1.3-ENH-060-profile-approval-gate
 created: 2026-08-12
 resolved: 2026-08-13
 related_enhs: [ENH-044]
 related_issues: []
-related_adrs: [ADR-062]
+related_adrs: ["[[ADR-062-gemini-pb-project-scoping-fail-closed|ADR-062]]"]
 ---
 
 # ENH-061: Extraction Fails Closed on Unscoped Runs (All Sources), Claude Attributes by `cwd` Not Directory Name

@@ -2,10 +2,11 @@
 id: issue-9
 type: Bug
 status: resolved
+status_category: done
 branch: v0.5.9.3-docs-enforcement-protocol-gap
 created: 2026-05-30
-related-adrs: [ADR-049, ADR-043]
-related-enhs: [ENH-021]
+related_adrs: ["[[ADR-049-review-audit-protocol-post-plan-pre-push-review-governance|ADR-049]]", "[[ADR-043-pretooluse-hook-injection-superpowers-rule-enforcement|ADR-043]]"]
+related_enhs: ["[[ENH-021-specification|ENH-021]]"]
 target-release: v0.5.9.3
 ---
 

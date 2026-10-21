@@ -2,11 +2,12 @@
 id: issue-37
 type: Enhancement
 status: resolved
-github-issue: "#238"
+status_category: done
+github_issue: "#238"
 branch: none
 created: 2026-08-01
-related_issues: ["issue-52"]
-related_enhs: ["ENH-035"]
+related_issues: ["[[issue-52-description|issue-52]]"]
+related_enhs: ["[[ENH-035-specification|ENH-035]]"]
 ---
 
 # issue-37: Explore Auto-Trigger vs. Manual Invocation for `kmg-sync-all`

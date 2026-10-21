@@ -1,6 +1,7 @@
 ---
 title: "Cross-platform upgrade triggering: version sentinel over startup notification"
 status: Accepted
+status_category: done
 date: 2026-06-19
 tags: [codex, upgrade, kg_upgrade, version-sentinel, cross-platform, ENH-022, v0.6.4, gemini-cli, antigravity, hooks, issue-32]
 ---

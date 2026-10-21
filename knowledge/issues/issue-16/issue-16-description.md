@@ -2,9 +2,10 @@
 id: issue-16
 type: Bug
 status: resolved
-github-issue: "#174"
+status_category: done
+github_issue: "#174"
 created: 2026-07-16
-related-issues: []
+related_issues: []
 target-release: null
 ---
 

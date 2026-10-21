@@ -3,6 +3,7 @@ title: "Store GitHub traffic history in a separate private metrics repo"
 number: 73
 created: 2026-10-16T21:07:42.222Z
 status: Accepted
+status_category: done
 author: technomensch
 email: 917847+technomensch@users.noreply.github.com
 git:
@@ -11,10 +12,9 @@ git:
   pr: null
   issue: null
 implements: null
-related:
-  adrs: []
-  lessons: []
-  kg_entries: []
+related_adrs: []
+related_lessons: []
+related_docs: []
 tags: [Architecture, metrics, github-traffic]
 category: Architecture
 ---

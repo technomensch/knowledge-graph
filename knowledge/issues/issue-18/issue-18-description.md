@@ -2,9 +2,10 @@
 id: issue-18
 type: Gap
 status: resolved
-github-issue: "#176"
+status_category: done
+github_issue: "#176"
 created: 2026-07-17
-related-issues: [issue-17]
+related_issues: ["[[issue-17-description|issue-17]]"]
 target-release: null
 ---
 

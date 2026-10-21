@@ -2,9 +2,10 @@
 id: issue-19
 type: Gap
 status: open
-github-issue: "#177"
+status_category: pending
+github_issue: "#177"
 created: 2026-07-17
-related-issues: [issue-17, issue-18]
+related_issues: ["[[issue-17-description|issue-17]]", "[[issue-18-description|issue-18]]"]
 target-release: null
 ---
 

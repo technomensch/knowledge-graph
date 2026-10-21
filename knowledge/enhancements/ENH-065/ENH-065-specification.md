@@ -2,12 +2,13 @@
 id: ENH-065
 type: Enhancement
 status: deferred
-github-issue: "#262"
+status_category: backlog
+github_issue: "#262"
 branch: none
 created: 2026-10-16
-related_issues: ["issue-25", "issue-30", "issue-33", "issue-60", "issue-61"]
-related_enhs: ["ENH-051", "ENH-052", "ENH-056", "ENH-062", "ENH-063"]
-related_adrs: ["ADR-043", "ADR-050", "ADR-068", "ADR-072"]
+related_issues: ["[[issue-25-description|issue-25]]", "[[issue-30-description|issue-30]]", "[[issue-33-description|issue-33]]", "[[issue-60-description|issue-60]]", "[[issue-61-description|issue-61]]"]
+related_enhs: ["[[ENH-051-specification|ENH-051]]", "[[ENH-052-specification|ENH-052]]", "[[ENH-056-specification|ENH-056]]", "[[ENH-062-specification|ENH-062]]", "[[ENH-063-specification|ENH-063]]"]
+related_adrs: ["[[ADR-043-pretooluse-hook-injection-superpowers-rule-enforcement|ADR-043]]", "[[ADR-050-pre-push-composite-gate-inline-recommendation-gate|ADR-050]]", "[[ADR-068-lightweight-vs-full-workflow-rule-and-piloted-command-completion-check|ADR-068]]", "[[ADR-072-meta-issue-tracking-pattern|ADR-072]]"]
 ---
 
 # ENH-065: Issue and enhancement folders routinely fall short of the documented template; nothing generates the supporting files or checks them at resolution

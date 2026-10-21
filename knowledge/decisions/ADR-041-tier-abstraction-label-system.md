@@ -3,6 +3,7 @@ title: "ADR-041: Tier Abstraction Label System for Model Selection"
 number: 041
 created: 2026-04-21T00:00:00Z
 status: Accepted
+status_category: done
 author: technomensch
 email: mkitact@gmail.com
 git:
@@ -11,10 +12,12 @@ git:
   pr: null
   issue: null
 implements: "[[62a472cb]] — feat(release): v0.5.1-beta — tier abstraction label system"
-related:
-  adrs: [34, 38, 39]
-  lessons: []
-  kg_entries: []
+related_adrs:
+  - "[[ADR-034-capture-level-routing-dispatcher-agent-split|ADR-034]]"
+  - "[[ADR-038-model-selection-rule-for-kg-tasks|ADR-038]]"
+  - "[[ADR-039-profile-terminology|ADR-039]]"
+related_lessons: []
+related_docs: []
 tags: [tiers, model-selection, platform-abstraction, dispatcher]
 category: architecture
 ---

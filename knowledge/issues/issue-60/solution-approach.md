@@ -2,6 +2,7 @@
 id: issue-60
 title: Solution Approach — Real automatic attempt-sync detection
 status: deferred
+status_category: backlog
 created: 2026-09-17
 ---
 

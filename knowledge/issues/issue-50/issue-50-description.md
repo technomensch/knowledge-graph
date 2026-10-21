@@ -2,11 +2,12 @@
 id: issue-50
 type: Hardening
 status: resolved
-github-issue: pending
+status_category: done
+github_issue: pending
 branch: v0.7.2-issues-46-51
 created: 2026-08-17
-related_enhs: ["ENH-052"]
-related_issues: ["issue-52"]
+related_enhs: ["[[ENH-052-specification|ENH-052]]"]
+related_issues: ["[[issue-52-description|issue-52]]"]
 ---
 
 # issue-50: No Check That a Bug Fix Requiring Data Backfill Gets a kg_upgrade Category — Or That the Category Reaches Users

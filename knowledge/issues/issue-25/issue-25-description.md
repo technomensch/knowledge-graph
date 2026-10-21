@@ -2,10 +2,11 @@
 id: issue-25
 type: Hardening
 status: resolved
-github-issue: "#189"
+status_category: done
+github_issue: "#189"
 branch: none
 created: 2026-07-18
-related_enhs: ["ENH-065"]
+related_enhs: ["[[ENH-065-specification|ENH-065]]"]
 ---
 
 # issue-25: No Documented Authority for ENH-Spec vs. Issue-Tracking-Workflow (Enhancement Scope Overlap)

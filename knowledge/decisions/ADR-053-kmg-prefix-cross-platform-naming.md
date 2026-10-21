@@ -3,6 +3,7 @@ id: ADR-053
 title: kmg- Prefix as Canonical Cross-Platform Skill and Command Naming Convention
 date: 2026-06-12
 status: Accepted
+status_category: done
 version_target: v0.6.0
 related_adr:
   - ADR-003

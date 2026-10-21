@@ -2,7 +2,8 @@
 id: issue-23
 type: Bug
 status: resolved
-github-issue: "#183"
+status_category: done
+github_issue: "#183"
 branch: none
 created: 2026-07-17
 ---

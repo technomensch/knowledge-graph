@@ -2,7 +2,8 @@
 id: issue-43
 type: Bug
 status: resolved
-github-issue: "#215"
+status_category: done
+github_issue: "#215"
 branch: v0.7.1.1-issue-43-worktree-repo-root-mismatch
 created: 2026-08-10
 resolved: 2026-08-10

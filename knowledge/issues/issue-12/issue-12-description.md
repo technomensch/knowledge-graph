@@ -2,11 +2,12 @@
 id: issue-12
 type: Hardening
 status: resolved
-github-issue: "#166"
+status_category: done
+github_issue: "#166"
 branch: v0.6.18-misc-patches (deferred — additional commit on the existing shared branch once planned)
 created: 2026-07-12
-related-adrs: []
-related-enhs: []
+related_adrs: []
+related_enhs: []
 ---
 
 # Issue-12: `kmg-execute-plan` fires in Claude Code sessions despite being a Gemini/Antigravity-only guardrail
