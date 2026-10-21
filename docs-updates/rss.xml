@@ -4,10 +4,23 @@
         <title>KMGraph Docs Updates</title>
         <link>https://technomensch.github.io/knowledge-graph/docs-updates</link>
         <description>Knowledge Management Graph Blog</description>
-        <lastBuildDate>Tue, 05 May 2026 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Wed, 21 Oct 2026 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Book a call from the site header]]></title>
+            <link>https://technomensch.github.io/knowledge-graph/docs-updates/2026/10/21/header-booking-link</link>
+            <guid>https://technomensch.github.io/knowledge-graph/docs-updates/2026/10/21/header-booking-link</guid>
+            <pubDate>Wed, 21 Oct 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[The site header now includes a calendar icon next to the GitHub and LinkedIn links. It opens a booking page where you can schedule a listening-tour call to share feedback on KMGraph.]]></description>
+            <content:encoded><![CDATA[<p>The site header now includes a calendar icon next to the GitHub and LinkedIn links. It opens a booking page where you can schedule a listening-tour call to share feedback on KMGraph.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="what-changed">What changed<a href="https://technomensch.github.io/knowledge-graph/docs-updates/2026/10/21/header-booking-link#what-changed" class="hash-link" aria-label="Direct link to What changed" title="Direct link to What changed" translate="no">​</a></h2>
+<ul>
+<li class="">A new calendar icon in the top-right header, matching the existing GitHub and LinkedIn icons in light and dark mode.</li>
+<li class="">The icon links to the booking page at <code>cal.com/marckaplan/listening-tour-sync</code>.</li>
+</ul>]]></content:encoded>
+        </item>
         <item>
             <title><![CDATA[Docs restructured around five user skill pillars]]></title>
             <link>https://technomensch.github.io/knowledge-graph/docs-updates/2026/05/05/site-restructure-v2</link>
