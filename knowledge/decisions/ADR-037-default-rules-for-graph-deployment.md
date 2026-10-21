@@ -3,6 +3,7 @@ title: "ADR-037: Default Graph-Usage Rules Seeded at Deployment"
 number: 037
 created: 2026-04-20T00:00:00Z
 status: Accepted
+status_category: done
 author: technomensch
 email: mkitact@gmail.com
 git:
@@ -11,13 +12,12 @@ git:
   pr: null
   issue: null
 implements: null
-related:
-  adrs:
-    - "[[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file]]"
-    - "[[ADR-034-capture-level-routing-dispatcher-agent-split]]"
-    - "[[user:ADR-007-memory-thin-pointers-adr-first]]"
-  lessons: []
-  kg_entries: []
+related_adrs:
+  - "[[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file]]"
+  - "[[ADR-034-capture-level-routing-dispatcher-agent-split]]"
+  - "[[user:ADR-007-memory-thin-pointers-adr-first]]"
+related_lessons: []
+related_docs: []
 tags: [process, deployment, init, rules, defaults, graph-governance]
 category: process
 ---

@@ -2,6 +2,7 @@
 title: "ADR-057: Detection layer requires unified design, not piecemeal growth"
 number: 057
 status: Accepted
+status_category: done
 date: 2026-07-01
 author: technomensch
 email: mkitact@gmail.com
@@ -11,12 +12,14 @@ git:
   pr: null
   issue: null
 implements: null
-related:
-  adrs: [034, 045, 056]
-  lessons: []
-  kg_entries:
-    - knowledge/enhancements/ENH-006/ENH-006-specification.md
-    - knowledge/enhancements/ENH-008/ENH-008-specification.md
+related_adrs:
+  - "[[ADR-034-capture-level-routing-dispatcher-agent-split|ADR-034]]"
+  - "[[ADR-045-update-profile-skill-not-command|ADR-045]]"
+  - "[[ADR-056-reject-plugin-split-for-contributor-only-doc-commands|ADR-056]]"
+related_lessons: []
+related_docs:
+  - "[[ENH-006-specification]]"
+  - "[[ENH-008-specification]]"
 tags: [architecture, detection-layer, skills, capture, classifier, auto-capture-pipeline]
 category: architecture
 ---

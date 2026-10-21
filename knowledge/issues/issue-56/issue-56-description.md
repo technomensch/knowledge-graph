@@ -2,10 +2,11 @@
 id: issue-56
 type: Bug
 status: resolved
-github-issue: "#244"
+status_category: done
+github_issue: "#244"
 branch: v0.7.4-bug-fixes
 created: 2026-08-22
-related_issues: ["issue-31", "issue-30", "issue-55"]
+related_issues: ["[[issue-31-description|issue-31]]", "[[issue-30-description|issue-30]]", "[[issue-55-description|issue-55]]"]
 ---
 
 # issue-56: `kmg-handoff`'s default-path fix (issue-31) has no `kg_upgrade` category — 17 stray `./handoff-packages/*` directories are undetected and undisclosed

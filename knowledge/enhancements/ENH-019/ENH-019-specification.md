@@ -2,12 +2,13 @@
 title: "ENH-019: kmgraph Usage Analytics & Stats Dashboard"
 number: 019
 status: deferred
+status_category: backlog
 version_target: null
 github_issue: null
 created: 2026-05-27
 related_adrs: []
 related_enhs: []
-related_issues: ["issue-5"]
+related_issues: ["[[issue-5-description|issue-5]]"]
 ---
 
 # ENH-019: kmgraph Usage Analytics & Stats Dashboard

@@ -2,7 +2,8 @@
 id: issue-26
 type: Hardening
 status: resolved
-github-issue: "#190"
+status_category: done
+github_issue: "#190"
 branch: none
 created: 2026-07-18
 ---

@@ -2,8 +2,9 @@
 id: ENH-034
 type: Enhancement
 status: implemented
-related_enhs: ["ENH-050"]
-related_issues: ["issue-41"]
+status_category: done
+related_enhs: ["[[ENH-050-specification|ENH-050]]"]
+related_issues: ["[[issue-41-description|issue-41]]"]
 ---
 
 # ENH-034: Capture-pipeline command naming and grouping

@@ -2,6 +2,7 @@
 id: issue-14
 title: Solution Approach — kg-config.json write-path split-brain
 status: tracked
+status_category: pending
 created: 2026-07-14
 ---
 

@@ -2,12 +2,13 @@
 id: ENH-056
 type: Hardening
 status: partially-implemented
-github-issue: "#199"
+status_category: started
+github_issue: "#199"
 branch: none
 created: 2026-07-28
-related_issues: ["issue-25", "issue-30", "issue-33", "issue-34", "issue-35"]
-related_enhs: ["ENH-052", "ENH-058", "ENH-065"]
-related_adrs: ["ADR-043", "ADR-050", "ADR-068"]
+related_issues: ["[[issue-25-description|issue-25]]", "[[issue-30-description|issue-30]]", "[[issue-33-description|issue-33]]", "[[issue-34-description|issue-34]]", "[[issue-35-description|issue-35]]"]
+related_enhs: ["[[ENH-052-specification|ENH-052]]", "[[ENH-058-specification|ENH-058]]", "[[ENH-065-specification|ENH-065]]"]
+related_adrs: ["[[ADR-043-pretooluse-hook-injection-superpowers-rule-enforcement|ADR-043]]", "[[ADR-050-pre-push-composite-gate-inline-recommendation-gate|ADR-050]]", "[[ADR-068-lightweight-vs-full-workflow-rule-and-piloted-command-completion-check|ADR-068]]"]
 ---
 
 **Retyped `Enhancement` → `Hardening` (2026-08-01):** this work hardens existing documented behavior that isn't being enforced; it doesn't add new capability. Stays the umbrella tracking artifact (GitHub #199 preserved) — the actual mechanism design now lives in [ADR-068](../../decisions/ADR-068-lightweight-vs-full-workflow-rule-and-piloted-command-completion-check.md), which also resolves issue-25 (a blocking dependency for this enhancement's AC-3/AC-4) and pilots a fix for issue-33 (instance #3 below).

@@ -2,12 +2,13 @@
 id: issue-35
 type: Bug
 status: resolved
-github-issue: pending
+status_category: done
+github_issue: pending
 branch: none
 created: 2026-07-30
-related_adrs: ["ADR-066"]
-related_issues: ["issue-31", "issue-34", "issue-52"]
-related_enhs: ["ENH-056"]
+related_adrs: ["[[ADR-066-kg-content-storage-location-for-global-and-cowork-modes|ADR-066]]"]
+related_issues: ["[[issue-31-description|issue-31]]", "[[issue-34-description|issue-34]]", "[[issue-52-description|issue-52]]"]
+related_enhs: ["[[ENH-056-specification|ENH-056]]"]
 ---
 
 # issue-35: `kg_search`/FTS5's `"knowledge"` Directory Entry Is a Dead Pre-Migration Path Literal — Recurrence of issue-31's Pattern

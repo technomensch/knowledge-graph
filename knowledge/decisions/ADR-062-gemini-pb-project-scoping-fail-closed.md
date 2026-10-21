@@ -2,6 +2,7 @@
 title: "ADR-062: Gemini .pb / hash-named directory project-scoping fails closed, not open"
 number: 062
 status: Accepted
+status_category: done
 date: 2026-07-10
 author: technomensch
 email: mkitact@gmail.com
@@ -11,13 +12,12 @@ git:
   pr: null
   issue: null
 implements: null
-related:
-  adrs: []
-  lessons: []
-  kg_entries:
-    - knowledge/issues/chat-extraction-reliability-saga/attempts/005-enh-044/specification.md
-    - knowledge/enhancements/ENH-038/ENH-038-specification.md
-    - knowledge/enhancements/ENH-061/ENH-061-specification.md
+related_adrs: []
+related_lessons: []
+related_docs:
+  - "[[005-enh-044/specification|specification]]"
+  - "[[ENH-038-specification]]"
+  - "[[ENH-061-specification]]"
 tags: [privacy, extraction, gemini, claude, worktree, trust-boundary, v0.6.17, v0.7.1.3]
 category: architecture
 ---

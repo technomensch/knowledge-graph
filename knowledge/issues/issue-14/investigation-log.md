@@ -2,7 +2,8 @@
 id: issue-14
 title: Investigation Log — config-path split-brain (blast-radius findings)
 status: tracked
-github-issue: "#171"
+status_category: pending
+github_issue: "#171"
 updated: 2026-07-14
 ---
 

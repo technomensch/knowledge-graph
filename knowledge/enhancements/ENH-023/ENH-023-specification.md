@@ -2,12 +2,13 @@
 title: "ENH-023: Extend pre-skill-rules-inject.sh to Cover Official Marketplace Skills"
 number: 023
 status: proposed
+status_category: backlog
 version_target: null
 github_issue: 130
 created: 2026-06-07
-related_adrs: ["ADR-043", "ADR-049"]
-related_enhs: ["ENH-015", "ENH-062"]
-related_issues: ["issue-52"]
+related_adrs: ["[[ADR-043-pretooluse-hook-injection-superpowers-rule-enforcement|ADR-043]]", "[[ADR-049-review-audit-protocol-post-plan-pre-push-review-governance|ADR-049]]"]
+related_enhs: ["[[ENH-015-specification|ENH-015]]", "[[ENH-062-specification|ENH-062]]"]
+related_issues: ["[[issue-52-description|issue-52]]"]
 ---
 
 # ENH-023: Extend pre-skill-rules-inject.sh to Cover Official Marketplace Skills

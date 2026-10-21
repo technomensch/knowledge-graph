@@ -2,11 +2,12 @@
 id: ENH-055
 type: Enhancement
 status: proposed
-github-issue: "#210"
+status_category: backlog
+github_issue: "#210"
 branch: none
 created: 2026-07-26
-related_enhs: ["ENH-053", "ENH-054"]
-related_issues: ["issue-17"]
+related_enhs: ["[[ENH-053-specification|ENH-053]]", "[[ENH-054-specification|ENH-054]]"]
+related_issues: ["[[issue-17-description|issue-17]]"]
 ---
 
 # ENH-055: `kmg-capture-router`'s Trigger Vocabulary Misses "Future Idea" Phrasing

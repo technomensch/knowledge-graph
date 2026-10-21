@@ -2,12 +2,13 @@
 title: "ENH-022: Template Directory Disambiguation — core/default-templates/, starter consolidation, knowledge/knowledge/ removal"
 number: 022
 status: resolved
+status_category: done
 version_target: "v0.5.10.7"
 github_issue: null
 created: 2026-05-29
-related_adrs: ["ADR-009", "ADR-028", "ADR-040"]
-related_enhs: ["ENH-051"]
-related_issues: ["issue-52"]
+related_adrs: ["[[ADR-009-three-tier-installation-architecture|ADR-009]]", "[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth|ADR-028]]", "[[ADR-040-knowledge-templates-subdirectory-structure|ADR-040]]"]
+related_enhs: ["[[ENH-051-specification|ENH-051]]"]
+related_issues: ["[[issue-52-description|issue-52]]"]
 ---
 
 # ENH-022: Template Directory Disambiguation

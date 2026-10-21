@@ -2,6 +2,7 @@
 id: issue-13
 title: Solution Approach — No automated broken-link detection
 status: resolved
+status_category: done
 created: 2026-07-14
 ---
 

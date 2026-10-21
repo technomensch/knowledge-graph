@@ -2,7 +2,8 @@
 id: ENH-033
 type: Bug
 status: proposed
-related_enhs: ["ENH-035"]
+status_category: backlog
+related_enhs: ["[[ENH-035-specification|ENH-035]]"]
 ---
 
 # ENH-033: Repo-context auto-detection for `kmg-update-doc` / `kmg-create-doc`

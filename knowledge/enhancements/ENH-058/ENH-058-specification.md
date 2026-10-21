@@ -2,10 +2,11 @@
 id: ENH-058
 type: Enhancement
 status: resolved
-github-issue: "#211"
+status_category: done
+github_issue: "#211"
 branch: none
 created: 2026-07-30
-related_enhs: ["ENH-056"]
+related_enhs: ["[[ENH-056-specification|ENH-056]]"]
 related_issues: []
 ---
 

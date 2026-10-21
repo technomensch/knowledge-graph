@@ -2,11 +2,12 @@
 title: "ENH-011: Duplicate Check in capture-lesson Before Creating New Entry"
 number: 011
 status: implemented
+status_category: done
 version_target: "v0.3.0-beta"
 github_issue: null
 created: 2026-04-09
 related_adrs: []
-related_enhs: ["ENH-010"]
+related_enhs: ["[[ENH-010-specification|ENH-010]]"]
 ---
 # ENH-011: Duplicate Check in capture-lesson Before Creating New Entry
 

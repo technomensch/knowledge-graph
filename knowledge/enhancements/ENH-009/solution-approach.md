@@ -2,6 +2,7 @@
 id: ENH-009-solution
 type: Hardening
 status: OPEN
+status_category: pending
 ---
 
 # Solution Approach: ENH-009

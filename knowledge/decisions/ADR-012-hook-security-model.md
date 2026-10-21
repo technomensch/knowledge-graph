@@ -1,6 +1,7 @@
 ---
 title: "ADR-012: Hook Security Model"
 status: accepted
+status_category: done
 created: 2026-02-27
 category: architecture
 tags: [security, hooks, shell-scripts, session-start]

@@ -2,7 +2,8 @@
 id: issue-29
 type: Bug
 status: resolved
-github-issue: "#197"
+status_category: done
+github_issue: "#197"
 branch: issue/29-chat-extraction-cross-project-bleed
 created: 2026-07-27
 resolved: 2026-08-22

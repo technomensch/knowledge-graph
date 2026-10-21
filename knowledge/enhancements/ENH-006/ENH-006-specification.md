@@ -2,12 +2,13 @@
 title: "ENH-006: Sequential Prompts, Decoupled Decisions, and Skill Trigger Gaps"
 number: 006
 status: implemented
+status_category: done
 version_target: "v0.2.2"
 github_issue: 47
 created: 2026-03-30
 related_adrs: []
-related_enhs: ["ENH-050"]
-related_issues: ["issue-5"]
+related_enhs: ["[[ENH-050-specification|ENH-050]]"]
+related_issues: ["[[issue-5-description|issue-5]]"]
 ---
 
 # ENH-006: Sequential Prompts, Decoupled Decisions, and Skill Trigger Gaps

@@ -6,6 +6,7 @@ number: 032
 created: 2026-04-11T00:00:00Z
 
 status: Superseded
+status_category: cancelled
 
 author: technomensch
 
@@ -19,10 +20,12 @@ git:
 
 implements: v0.3.5-beta
 
-related:
-  adrs: [ADR-028, ADR-017, ADR-021]
-  lessons: []
-  kg_entries: []
+related_adrs:
+  - "[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth|ADR-028]]"
+  - "[[ADR-017-four-layer-architecture-thin-commands|ADR-017]]"
+  - "[[ADR-021-single-source-of-truth-dry-documentation|ADR-021]]"
+related_lessons: []
+related_docs: []
 
 tags: [platform-portability, rules-md, tool-preferences, claude, architecture, v0.3.5-beta]
 

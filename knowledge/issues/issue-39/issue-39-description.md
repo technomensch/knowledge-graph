@@ -2,10 +2,11 @@
 id: issue-39
 type: Bug
 status: resolved
-github-issue: "#202"
+status_category: done
+github_issue: "#202"
 branch: none
 created: 2026-08-01
-related_issues: ["issue-18", "issue-36"]
+related_issues: ["[[issue-18-description|issue-18]]", "[[issue-36-description|issue-36]]"]
 ---
 
 # issue-39: `kg_capture` Prepends a Second, Differently-Shaped Frontmatter Block When Updating a File via `existingFile`

@@ -2,6 +2,7 @@
 id: issue-60
 title: Implementation Log
 status: deferred
+status_category: backlog
 created: 2026-09-17
 ---
 

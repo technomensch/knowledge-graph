@@ -3,6 +3,7 @@ title: "ADR-051: Session Summary / Handoff Asymmetric Coupling via continues_fro
 number: 051
 created: 2026-06-07T00:00:00Z
 status: Accepted
+status_category: done
 author: technomensch
 email: 917847+technomensch@users.noreply.github.com
 git:
@@ -11,10 +12,12 @@ git:
   pr: null
   issue: null
 implements: v0.5.10
-related:
-  adrs: [26, 49, 50]
-  lessons: []
-  kg_entries: []
+related_adrs:
+  - "[[ADR-026-snapshot-gate-uses-session-summary|ADR-026]]"
+  - "[[ADR-049-review-audit-protocol-post-plan-pre-push-review-governance|ADR-049]]"
+  - "[[ADR-050-pre-push-composite-gate-inline-recommendation-gate|ADR-050]]"
+related_lessons: []
+related_docs: []
 tags: [session-summary, handoff, continues_from, coupling, context-transfer]
 category: process
 ---

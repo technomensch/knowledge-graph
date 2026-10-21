@@ -3,6 +3,7 @@ title: "ADR-044: Split Oversized Daily Chat History Files for Obsidian Compatibi
 number: 44
 created: 2026-04-23T00:00:00Z
 status: Accepted
+status_category: done
 author: technomensch
 email: 917847+technomensch@users.noreply.github.com
 git:
@@ -11,10 +12,9 @@ git:
   pr: null
   issue: null
 implements: null
-related:
-  adrs: []
-  lessons: []
-  kg_entries: []
+related_adrs: []
+related_lessons: []
+related_docs: []
 tags: [chat-history, obsidian, extraction, file-splitting]
 category: architecture
 ---

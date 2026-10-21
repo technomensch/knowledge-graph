@@ -2,6 +2,7 @@
 id: issue-2-solution
 type: Hardening
 status: OPEN
+status_category: pending
 ---
 
 # Solution Approach: issue-2

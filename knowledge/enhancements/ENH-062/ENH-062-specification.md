@@ -2,11 +2,12 @@
 id: ENH-062
 type: Enhancement
 status: implemented
-github-issue: "#241"
+status_category: done
+github_issue: "#241"
 branch: none
 created: 2026-08-22
-related_issues: ["issue-53", "issue-54", "issue-61"]
-related_enhs: ["ENH-065", "ENH-059"]
+related_issues: ["[[issue-53-description|issue-53]]", "[[issue-54-description|issue-54]]", "[[issue-61-description|issue-61]]"]
+related_enhs: ["[[ENH-065-specification|ENH-065]]", "[[ENH-059-specification|ENH-059]]"]
 related_docs: ["[[ENH-062-relationship-scan-mcp-tool-spec|ENH-062 relationship scan tool spec]]"]
 ---
 

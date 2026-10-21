@@ -2,11 +2,12 @@
 id: issue-53
 type: Bug
 status: resolved
-github-issue: "#231"
+status_category: done
+github_issue: "#231"
 branch: none
 created: 2026-08-22
-related-issues: [issue-54]
-related-enhs: [ENH-062]
+related_issues: ["[[issue-54-description|issue-54]]"]
+related_enhs: ["[[ENH-062-specification|ENH-062]]"]
 ---
 
 # issue-53: ADR creation has no collision check — numbers can be assigned twice

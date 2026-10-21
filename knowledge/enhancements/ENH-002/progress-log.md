@@ -3,6 +3,7 @@ title: Progress Log — ENH-002 Session Snapshot on Capture
 enhancement_id: ENH-002
 github_issue: 41
 status: Partially Implemented
+status_category: started
 created: 2026-03-28
 ---
 

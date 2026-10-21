@@ -3,6 +3,7 @@ title: "ADR-026: Snapshot Gate Invokes session-summary-agent, Not a Lightweight 
 number: 026
 created: 2026-04-06T00:00:00Z
 status: Accepted
+status_category: done
 author: mkaplan
 git:
   branch: v0.2.3.2-beta
@@ -10,10 +11,10 @@ git:
   pr: null
   issue: 41
 implements: ENH-002
-related:
-  adrs: [20]
-  lessons: []
-  kg_entries: []
+related_adrs:
+  - "[[ADR-020-lifecycle-hooks-suite-automated-capture|ADR-020]]"
+related_lessons: []
+related_docs: []
 tags: [snapshot-gate, session-summary, capture-lesson, ux]
 category: process
 ---

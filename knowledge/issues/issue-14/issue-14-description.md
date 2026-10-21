@@ -2,7 +2,8 @@
 id: issue-14
 type: Bug
 status: resolved
-github-issue: "#171"
+status_category: done
+github_issue: "#171"
 branch: v0.6.19
 created: 2026-07-14
 ---

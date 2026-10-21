@@ -2,7 +2,8 @@
 id: issue-2
 type: Hardening
 status: IMPLEMENTED
-github-issue: "#56"
+status_category: done
+github_issue: "#56"
 branch: v0.2.3.x-issue-2-start-issue-tracking-no-git
 created: 2026-04-07
 ---

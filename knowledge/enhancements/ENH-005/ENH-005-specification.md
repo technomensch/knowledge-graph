@@ -2,10 +2,11 @@
 title: "ENH-005: FTS5 Database Relocation to User-Level Cache"
 number: 005
 status: resolved
+status_category: done
 version_target: "v0.2.2"
 github_issue: 46
 created: 2026-03-30
-related_adrs: ["ADR-011"]
+related_adrs: ["[[ADR-011-defer-update-notifications|ADR-011]]"]
 related_enhs: []
 ---
 

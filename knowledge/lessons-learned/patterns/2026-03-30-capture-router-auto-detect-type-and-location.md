@@ -9,7 +9,9 @@ git:
   commit_short: 4071bfe8
   author: Marc K
   email: 917847+technomensch@users.noreply.github.com
-related: [ENH-008, doc-update-router]
+related_docs:
+  - "[[ENH-008-specification|ENH-008]]"
+  - "doc-update-router"
 ---
 
 ## Problem

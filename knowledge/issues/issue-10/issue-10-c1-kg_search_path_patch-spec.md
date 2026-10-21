@@ -2,10 +2,11 @@
 id: issue-10-c1
 type: Spec
 status: draft
+status_category: backlog
 parent: issue-10
 branch: v0.6.18-misc-patches
 plan-slug: v0.6.18.c1-kg_search_path_patch
-related-adrs: [ADR-001]
+related_adrs: ["[[ADR-001-centralized-multi-kg-configuration|ADR-001]]"]
 created: 2026-07-11
 ---
 

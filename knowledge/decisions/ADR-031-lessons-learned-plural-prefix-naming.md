@@ -6,6 +6,7 @@ number: 031
 created: 2026-04-10T00:00:00Z
 
 status: Accepted
+status_category: done
 
 author: technomensch
 
@@ -19,10 +20,9 @@ git:
 
 implements: v0.2.1-beta
 
-related:
-  adrs: []
-  lessons: []
-  kg_entries: []
+related_adrs: []
+related_lessons: []
+related_docs: []
 
 tags: [naming, lessons-learned, conventions, capture, mcp]
 

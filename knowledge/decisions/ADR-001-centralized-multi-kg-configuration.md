@@ -1,6 +1,7 @@
 ---
 title: "ADR-001: Centralized Multi-KG Configuration"
 status: Accepted
+status_category: done
 date: 2026-02-15
 deciders: technomensch, Claude Sonnet 4.5
 ---

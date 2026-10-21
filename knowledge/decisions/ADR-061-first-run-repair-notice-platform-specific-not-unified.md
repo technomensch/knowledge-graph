@@ -2,6 +2,7 @@
 title: "ADR-061: First-run repair notice must be platform-specific, not one unified mechanism"
 number: 061
 status: Accepted
+status_category: done
 date: 2026-07-08
 author: technomensch
 email: mkitact@gmail.com
@@ -11,14 +12,13 @@ git:
   pr: null
   issue: null
 implements: null
-related:
-  adrs: []
-  lessons: []
-  kg_entries:
-    - knowledge/enhancements/ENH-038/ENH-038-specification.md
-    - knowledge/issues/chat-extraction-reliability-saga/attempts/002-enh-043/specification.md
-    - knowledge/issues/chat-extraction-reliability-saga/attempts/005-enh-044/specification.md
-    - knowledge/issues/chat-extraction-reliability-saga/attempts/006-enh-045/specification.md
+related_adrs: []
+related_lessons: []
+related_docs:
+  - "[[ENH-038-specification]]"
+  - "[[002-enh-043/specification|specification]]"
+  - "[[005-enh-044/specification|specification]]"
+  - "[[006-enh-045/specification|specification]]"
 tags: [ux-design, extraction, backup-recovery, error-recovery, v0.6.17]
 category: architecture
 ---

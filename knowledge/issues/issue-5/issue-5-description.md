@@ -2,12 +2,13 @@
 id: issue-5
 type: Bug
 status: resolved
-github-issue: "#124"
+status_category: done
+github_issue: "#124"
 branch: v0.5.9.2-fix-gh-issue-create
 created: 2026-05-28
-related-adrs: [ADR-024]
-related-enhs: [ENH-017]
-related_issues: ["issue-52"]
+related_adrs: ["[[ADR-024-decouple-issue-tracking-decisions-sequential-prompts|ADR-024]]"]
+related_enhs: ["[[ENH-017-specification|ENH-017]]"]
+related_issues: ["[[issue-52-description|issue-52]]"]
 ---
 
 # Issue-5: `start-issue-tracking` Never Calls `gh issue create`

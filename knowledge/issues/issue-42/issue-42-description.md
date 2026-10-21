@@ -2,7 +2,8 @@
 id: issue-42
 type: Bug
 status: resolved
-github-issue: "#213"
+status_category: done
+github_issue: "#213"
 branch: v0.7.0-fix-handoff-gate-path-mismatch
 resolved-on-branch: v0.7.0-fix-handoff-gate-path-mismatch
 created: 2026-08-06

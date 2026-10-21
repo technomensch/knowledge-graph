@@ -2,6 +2,7 @@
 title: "ADR-068: Lightweight-vs-Full Workflow Rule, and a Piloted Command-Completion Check for Handoff/Recall File Tracing"
 number: 068
 status: Accepted
+status_category: done
 date: 2026-08-01
 author: technomensch
 email: mkitact@gmail.com
@@ -11,15 +12,14 @@ git:
   pr: null
   issue: null
 implements: knowledge/plans/v0.7.0-c3-adr-068-pilot.md
-related:
-  adrs: []
-  lessons: []
-  kg_entries:
-    - knowledge/issues/issue-25/issue-25-description.md
-    - knowledge/issues/issue-33/issue-33-description.md
-    - knowledge/enhancements/ENH-056/ENH-056-specification.md
-    - knowledge/enhancements/ENH-056/solution-approach.md
-    - knowledge/enhancements/ENH-056/test-cases.md
+related_adrs: []
+related_lessons: []
+related_docs:
+  - "[[issue-25-description]]"
+  - "[[issue-33-description]]"
+  - "[[ENH-056-specification]]"
+  - "[[ENH-056/solution-approach|solution-approach]]"
+  - "[[ENH-056/test-cases|test-cases]]"
 tags: [governance, workflow-enforcement, hooks, process, v0.7.0]
 category: architecture
 ---

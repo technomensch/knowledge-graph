@@ -3,6 +3,7 @@ title: "ADR-024: Decouple Issue Tracking Decisions into Four Independent Sequent
 number: 024
 created: 2026-03-30T00:00:00Z
 status: Accepted
+status_category: done
 author: technomensch
 email: 917847+technomensch@users.noreply.github.com
 git:
@@ -11,10 +12,10 @@ git:
   pr: null
   issue: null
 implements: v0.2.2-beta
-related:
-  adrs: []
-  lessons: []
-  kg_entries: [docs/enhancements/ENH-006/]
+related_adrs: []
+related_lessons: []
+related_docs:
+  - "docs/enhancements/ENH-006/"
 tags: [process, command-ux, issue-tracking]
 category: process
 ---

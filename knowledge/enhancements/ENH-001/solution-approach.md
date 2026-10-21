@@ -2,6 +2,7 @@
 title: User-Level Global KG — Implementation Approach
 enhancement_id: ENH-001
 status: Proposed
+status_category: backlog
 ---
 
 # Solution Approach: User-Level Global Knowledge Graphs

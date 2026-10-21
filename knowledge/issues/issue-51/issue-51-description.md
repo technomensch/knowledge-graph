@@ -2,11 +2,12 @@
 id: issue-51
 type: Bug
 status: resolved
-github-issue: "#255"
+status_category: done
+github_issue: "#255"
 branch: v0.7.2-issues-46-51
 created: 2026-08-17
-related_enhs: ["ENH-052"]
-related_issues: ["issue-50", "issue-48", "issue-52"]
+related_enhs: ["[[ENH-052-specification|ENH-052]]"]
+related_issues: ["[[issue-50-description|issue-50]]", "[[issue-48-description|issue-48]]", "[[issue-52-description|issue-52]]"]
 ---
 
 # issue-51: kg_upgrade Wizard's Hardcoded Category Allow-List Has Drifted From the Tool's Real Schema — Two Categories Unreachable via /kmgraph:kmg-init

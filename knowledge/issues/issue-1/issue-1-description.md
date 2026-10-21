@@ -4,10 +4,11 @@ local-id: issue-1
 github-id: 39
 type: meta-issue
 status: resolved
+status_category: done
 version-target: 0.2.1-beta
 created: 2026-03-27
 parent: v0.2.0-beta-layered-architecture
-related_issues: ["issue-5"]
+related_issues: ["[[issue-5-description|issue-5]]"]
 ---
 
 # Meta-Issue: v0.2.1 Backlog

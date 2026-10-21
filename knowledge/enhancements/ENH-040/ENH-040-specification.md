@@ -2,6 +2,7 @@
 id: ENH-040
 type: Hardening
 status: proposed
+status_category: backlog
 ---
 
 # ENH-040: Remove chat-history/*.md from kg_search / kg_fts5_rebuild indexing scope

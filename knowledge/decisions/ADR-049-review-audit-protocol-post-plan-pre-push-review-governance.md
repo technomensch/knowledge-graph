@@ -3,6 +3,7 @@ title: "ADR-049: Review Audit Protocol — Post-Plan/Pre-Push Review Governance"
 number: 049
 created: "2026-05-28T00:00:00Z"
 status: Accepted
+status_category: done
 author: technomensch
 email: 917847+technomensch@users.noreply.github.com
 git:
@@ -11,16 +12,15 @@ git:
   pr: null
   issue: null
 implements: null
-related:
-  adrs:
-    - "[[ADR-043-pretooluse-hook-injection-superpowers-rule-enforcement]]"
-    - "[[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file]]"
-  lessons: []
-  kg_entries:
-    - ENH-015
-    - ENH-020 (pending)
-  issues:
-    - "[[issue-6]]  — Bug: post-plan validation not enforced (advisory-only hook, static stub); GitHub #125"
+related_adrs:
+  - "[[ADR-043-pretooluse-hook-injection-superpowers-rule-enforcement]]"
+  - "[[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file]]"
+related_issues:
+  - "[[issue-6]]  — Bug: post-plan validation not enforced (advisory-only hook, static stub); GitHub #125"
+related_lessons: []
+related_docs:
+  - "ENH-015"
+  - "ENH-020 (pending)"
 tags:
   - process
   - governance

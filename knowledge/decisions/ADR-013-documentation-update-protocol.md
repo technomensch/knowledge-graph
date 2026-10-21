@@ -3,13 +3,18 @@ title: "ADR-013: Documentation Update Protocol for Multi-Branch Releases"
 number: 013
 created: 2026-02-27T00:00:00Z
 status: "Accepted"
+status_category: done
 author: "technomensch"
 category: "process"
 tags: ["documentation", "release-management", "process"]
 decision: "Establish two-layer documentation update protocol mandatory for all multi-branch feature releases"
-related:
-  adrs: [001, 002, 008]
-  lessons: ["documentation-update-triggers-multibranchfeatures.md"]
+related_adrs:
+  - "[[ADR-001-centralized-multi-kg-configuration|ADR-001]]"
+  - "[[ADR-002-commands-vs-skills-architecture|ADR-002]]"
+  - "[[ADR-008-third-person-language-standard|ADR-008]]"
+related_lessons:
+  - "[[documentation-update-triggers-multibranchfeatures]]"
+related_docs: []
 ---
 
 # ADR-013: Documentation Update Protocol for Multi-Branch Releases

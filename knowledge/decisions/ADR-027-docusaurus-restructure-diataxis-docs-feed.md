@@ -3,6 +3,7 @@ title: "ADR-027: Docusaurus Docs Restructure — Diátaxis IA, docs-updates Feed
 number: 027
 created: 2026-04-08T00:00:00Z
 status: Accepted
+status_category: done
 author: mkaplan
 git:
   branch: docs-update-docusaurus-migration-restructure
@@ -10,12 +11,13 @@ git:
   pr: null
   issue: null
 implements: v0.0.6
-related:
-  adrs: [13, 23]
-  lessons:
-    - lessons-learned/process/Lessons_Learned_Dual_Changelog_Both_Must_Be_Updated.md
-    - lessons-learned/process/documentation-update-triggers-multibranchfeatures.md
-  kg_entries: []
+related_adrs:
+  - "[[ADR-013-documentation-update-protocol|ADR-013]]"
+  - "[[ADR-023-single-source-of-truth-changelog|ADR-023]]"
+related_lessons:
+  - "[[Lessons_Learned_Dual_Changelog_Both_Must_Be_Updated]]"
+  - "[[documentation-update-triggers-multibranchfeatures]]"
+related_docs: []
 tags: [docs, docusaurus, diataxis, information-architecture, changelog, branch-naming, landing-page]
 category: process
 ---

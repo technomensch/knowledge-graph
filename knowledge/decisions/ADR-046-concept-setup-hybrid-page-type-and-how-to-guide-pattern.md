@@ -3,6 +3,7 @@ title: "Introduce concept+setup hybrid page type and document how-to guide patte
 number: 046
 created: 2026-04-28T00:00:00Z
 status: Accepted
+status_category: done
 author: technomensch
 email: 917847+technomensch@users.noreply.github.com
 git:
@@ -11,10 +12,9 @@ git:
   pr: null
   issue: null
 implements: null
-related:
-  adrs: []
-  lessons: []
-  kg_entries: []
+related_adrs: []
+related_lessons: []
+related_docs: []
 tags: [architecture, documentation, style-guide]
 category: architecture
 ---

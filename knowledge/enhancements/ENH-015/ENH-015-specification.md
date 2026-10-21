@@ -2,12 +2,13 @@
 title: "ENH-015: Decision Governance Protocol"
 number: 015
 status: implemented
+status_category: done
 version_target: "v0.5.9"
 github_issue: null
 created: 2026-05-25
-related_adrs: ["ADR-043", "ADR-049"]
-related_enhs: ["ENH-016", "ENH-020"]
-related_issues: ["issue-5"]
+related_adrs: ["[[ADR-043-pretooluse-hook-injection-superpowers-rule-enforcement|ADR-043]]", "[[ADR-049-review-audit-protocol-post-plan-pre-push-review-governance|ADR-049]]"]
+related_enhs: ["[[ENH-016-specification|ENH-016]]", "[[ENH-020-specification|ENH-020]]"]
+related_issues: ["[[issue-5-description|issue-5]]"]
 ---
 
 # ENH-015: Decision Governance Protocol

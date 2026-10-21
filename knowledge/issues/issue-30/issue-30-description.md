@@ -2,11 +2,12 @@
 id: issue-30
 type: Hardening
 status: resolved
-github-issue: "#205"
+status_category: done
+github_issue: "#205"
 branch: none
 created: 2026-07-28
-related_enhs: ["ENH-065", "ENH-056"]
-related_issues: ["issue-25", "issue-33", "issue-52"]
+related_enhs: ["[[ENH-065-specification|ENH-065]]", "[[ENH-056-specification|ENH-056]]"]
+related_issues: ["[[issue-25-description|issue-25]]", "[[issue-33-description|issue-33]]", "[[issue-52-description|issue-52]]"]
 ---
 
 # issue-30: `kmg-handoff` and `kmg-session-wrap` Only Reference Session-Summary — Neither Generates One

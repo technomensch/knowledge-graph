@@ -2,7 +2,8 @@
 id: ENH-026
 type: Hardening
 status: proposed
-related_issues: ["issue-37"]
+status_category: backlog
+related_issues: ["[[issue-37-description|issue-37]]"]
 ---
 
 # ENH-026: KG Write Guard — Unguarded Command Class

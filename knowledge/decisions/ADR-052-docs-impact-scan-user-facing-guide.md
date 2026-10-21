@@ -3,6 +3,7 @@ title: "ADR-052: docs-impact-scan User-Facing Guide Page"
 number: 052
 created: 2026-06-12T00:00:00Z
 status: Accepted
+status_category: done
 author: mkaplan
 email: mkitact@gmail.com
 git:
@@ -11,10 +12,11 @@ git:
   pr: null
   issue: null
 implements: v0.5.10.5
-related:
-  adrs: [036, 050]
-  lessons: []
-  kg_entries: []
+related_adrs:
+  - "[[ADR-036-docs-impact-scan|ADR-036]]"
+  - "[[ADR-050-pre-push-composite-gate-inline-recommendation-gate|ADR-050]]"
+related_lessons: []
+related_docs: []
 tags: [docs, tailoring, docs-impact-scan, pre-push, governance]
 category: documentation
 ---

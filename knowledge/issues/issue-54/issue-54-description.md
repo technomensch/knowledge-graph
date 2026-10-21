@@ -2,11 +2,12 @@
 id: issue-54
 type: Bug
 status: deferred
-github-issue: "#240"
+status_category: backlog
+github_issue: "#240"
 branch: none
 created: 2026-08-22
-related-issues: [issue-53]
-related-enhs: [ENH-062]
+related_issues: ["[[issue-53-description|issue-53]]"]
+related_enhs: ["[[ENH-062-specification|ENH-062]]"]
 ---
 
 # issue-54: `kg_upgrade` has no check category for leftover renumbered-ADR orphan files

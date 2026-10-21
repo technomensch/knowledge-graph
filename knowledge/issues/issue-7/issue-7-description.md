@@ -2,11 +2,12 @@
 id: issue-7
 type: Bug
 status: tracked
-github-issue: "TBD"
+status_category: pending
+github_issue: "TBD"
 branch: v0.5.9.1-review-audit-protocol
 created: 2026-05-28
-related-adrs: [ADR-049]
-related-enhs: [ENH-020]
+related_adrs: ["[[ADR-049-review-audit-protocol-post-plan-pre-push-review-governance|ADR-049]]"]
+related_enhs: ["[[ENH-020-specification|ENH-020]]"]
 target-release: v0.7.0 (stale — unaddressed as of v0.7.7, see 2026-09-05 note)
 ---
 

@@ -2,11 +2,12 @@
 title: "ENH-048: Session-Wrap Status-Alignment Verification"
 number: 048
 status: proposed
+status_category: backlog
 version_target: TBD
 github_issue: 178
 created: 2026-07-17
 related_adrs: []
-related_enhs: ["ENH-002"]
+related_enhs: ["[[ENH-002-specification|ENH-002]]"]
 notes: "Same subsystem as ENH-002 (session-summary/session-wrap) but distinct scope: ENH-002 covers incremental snapshot accumulation across runs; this covers verifying that outstanding-item status characterizations are still accurate at wrap time. Linked, not merged, per knowledge/rules.md same-feature-area triage rule."
 ---
 

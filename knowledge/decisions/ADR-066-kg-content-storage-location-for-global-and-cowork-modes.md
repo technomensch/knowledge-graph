@@ -2,6 +2,7 @@
 title: "ADR-066: KG content-storage location for global-topic and cowork modes"
 number: 066
 status: Accepted
+status_category: done
 date: 2026-07-14
 resolved: 2026-07-17
 author: technomensch
@@ -12,10 +13,11 @@ git:
   pr: null
   issue: "#171 (surfaced during, but out of scope for, issue-14)"
 implements: "v0.6.20 (planned — decision made 2026-07-17, execution not yet started; see ~/.claude/plans/v0.6.20-storage-migration-completion.md)"
-related:
-  adrs: [028, 001]
-  lessons: []
-  kg_entries: []
+related_adrs:
+  - "[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth|ADR-028]]"
+  - "[[ADR-001-centralized-multi-kg-configuration|ADR-001]]"
+related_lessons: []
+related_docs: []
 tags: [storage, platform-agnostic, kg-location, cowork, init, split-brain, resolved]
 category: architecture
 ---

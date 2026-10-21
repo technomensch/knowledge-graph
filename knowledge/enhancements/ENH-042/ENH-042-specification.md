@@ -2,9 +2,10 @@
 id: ENH-042
 type: Bug
 status: resolved
+status_category: done
 resolved: 2026-09-17
-related_enhs: ["ENH-050"]
-related_issues: ["issue-41"]
+related_enhs: ["[[ENH-050-specification|ENH-050]]"]
+related_issues: ["[[issue-41-description|issue-41]]"]
 ---
 
 # ENH-042: Three disconnected release-doc-sync mechanisms leave README and actual version numbers chronically out of sync

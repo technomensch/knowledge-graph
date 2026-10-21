@@ -2,11 +2,12 @@
 id: ENH-053
 type: Enhancement
 status: proposed
-github-issue: "#208"
+status_category: backlog
+github_issue: "#208"
 branch: none
 created: 2026-07-26
 related_adrs: ["ADR-067"]
-related_issues: ["issue-25", "issue-33", "issue-52"]
+related_issues: ["[[issue-25-description|issue-25]]", "[[issue-33-description|issue-33]]", "[[issue-52-description|issue-52]]"]
 ---
 
 # ENH-053: Topic-KGs Spanning Multiple Related Projects (Not User-Graph, Not Single-Project)

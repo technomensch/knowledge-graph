@@ -2,6 +2,7 @@
 id: ENH-029
 type: Bug
 status: resolved
+status_category: done
 ---
 
 # ENH-029: Upgrade Inspector Preview Correctness

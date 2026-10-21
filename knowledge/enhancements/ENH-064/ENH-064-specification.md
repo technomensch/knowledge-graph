@@ -2,7 +2,8 @@
 id: ENH-064
 type: Enhancement
 status: implemented
-github-issue: "#246"
+status_category: done
+github_issue: "#246"
 branch: v0.7.5-ENH-064-add-readme-to-graph
 created: 2026-08-23
 ---

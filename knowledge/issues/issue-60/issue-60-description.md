@@ -2,10 +2,11 @@
 id: issue-60
 type: Hardening
 status: deferred
-github-issue: "#261"
+status_category: backlog
+github_issue: "#261"
 branch: none
 created: 2026-09-17
-related_enhs: ["ENH-065"]
+related_enhs: ["[[ENH-065-specification|ENH-065]]"]
 ---
 
 # Issue-60: Meta-issue attempt-sync only fires on `--add-attempt`/`--log-attempt`, not on hand-created attempt folders

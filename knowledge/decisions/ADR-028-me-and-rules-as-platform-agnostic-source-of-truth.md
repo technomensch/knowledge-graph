@@ -1,6 +1,7 @@
 ---
 title: "ADR-028: me.md + rules.md as Platform-Agnostic Source of Truth"
 status: Accepted
+status_category: done
 date: 2026-04-09
 tags: [adr, identity, rules, platform-portability, me-md, rules-md, source-of-truth, v0.3.0-beta]
 ---

@@ -3,6 +3,7 @@ title: "ADR-047: Profile Auto-Load — Inject Routing Layer Only (me.md + trigge
 number: 047
 created: 2026-04-28T00:00:00Z
 status: Accepted
+status_category: done
 author: technomensch
 email: 917847+technomensch@users.noreply.github.com
 git:
@@ -11,14 +12,13 @@ git:
   pr: "104"
   issue: null
 implements: "v0.5.4 — Profile Auto-Load"
-related:
-  adrs:
-    - "[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]]"
-    - "[[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file]]"
-    - "[[ADR-020-lifecycle-hooks-suite-automated-capture]]"
-    - "[[ADR-045-update-profile-skill-not-command]]"
-  lessons: []
-  kg_entries: []
+related_adrs:
+  - "[[ADR-028-me-and-rules-as-platform-agnostic-source-of-truth]]"
+  - "[[ADR-033-triggersmd-platform-agnostic-rule-timing-companion-file]]"
+  - "[[ADR-020-lifecycle-hooks-suite-automated-capture]]"
+  - "[[ADR-045-update-profile-skill-not-command]]"
+related_lessons: []
+related_docs: []
 tags: [hooks, session-start, profile, context-loading, routing-layer]
 category: architecture
 ---
